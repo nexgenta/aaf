@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.27.2.2 2004/08/04 18:53:29 akharkev Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.27.2.3 2004/08/04 20:22:06 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,6 +40,9 @@
 
 #include "AAFPrivate.h"
 #include "AAFResult.h"
+
+#include "AAFSDKBuild.h"
+
 
 #include "ImplAAFPluginManager.h"
 #include "ImplAAFFile.h"
@@ -1112,6 +1115,12 @@ ImplAAFCreateAAFFileOnRawStorage
   return hr;
 }
 
+
+
+extern const char AAFReferenceImplementationIdent[];
+
+const char AAFReferenceImplementationIdent[] = "@(#) " AAF_SDK_RELEASE; // for Linux and Irix
+const aafProductVersion_t AAFReferenceImplementationVersion = {AAF_MAJOR_VERSION, AAF_MINOR_VERSION, AAF_MAINT_RELEASE, AAF_PATCH_LEVEL, AAF_RELEASE_STAGE};
 
 
 STDAPI

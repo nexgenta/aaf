@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.90 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.90.2.1 2004/08/04 20:22:06 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,6 +29,7 @@
 #include "aafTable.h"
 #include "aafErr.h"
 #include "AAFUtils.h"
+#include "ImplAAFModule.h"
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
