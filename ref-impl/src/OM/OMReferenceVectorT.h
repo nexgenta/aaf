@@ -26,6 +26,7 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMReferenceVector
 #ifndef OMREFERENCEVECTORT_H
 #define OMREFERENCEVECTORT_H
 
@@ -67,8 +68,8 @@ ReferencedObject* OMReferenceVector<ReferencedObject>::setValueAt(
                                                 const size_t index)
 {
   TRACE("OReferenceVector<ReferencedObject>::setValueAt");
-  PRECONDITION("Valid index", (index >= 0) && (index <= count()));
-  
+  PRECONDITION("Valid index", index <= count());
+
   if (index == count()) {
     // This is an append, make sure the new element is defined.
     VectorElement newElement(object);
@@ -85,6 +86,26 @@ ReferencedObject* OMReferenceVector<ReferencedObject>::setValueAt(
   return oldObject;
 }
 
+  // @mfunc Set the value of this <c OMReferenceVector>
+  //        at position <p index> to 0.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm The position to clear.
+  //   @rdesc A pointer to the old <p ReferencedObject>.
+template <typename ReferencedObject>
+ReferencedObject*
+OMReferenceVector<ReferencedObject>::clearValueAt(const size_t index)
+{
+  TRACE("OReferenceVector<ReferencedObject>::clearValueAt");
+  PRECONDITION("Valid index", index < count());
+
+  VectorElement& element = _vector.getAt(index);
+  ReferencedObject* oldObject = element.setValue(0);
+
+  POSTCONDITION("Object properly cleared",
+                                         _vector.getAt(index).getValue() == 0);
+  return oldObject;
+}
+
   // @mfunc The value of this <c OMReferenceVector> at position <p index>.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The position from which to get the <p ReferencedObject>.
@@ -95,7 +116,7 @@ ReferencedObject* OMReferenceVector<ReferencedObject>::valueAt(
                                                       const size_t index) const
 {
   TRACE("OMReferenceVector<ReferencedObject>::valueAt");
-  PRECONDITION("Valid index", ((index >= 0) && (index < count())));
+  PRECONDITION("Valid index", index < count());
 
   VectorElement& element = _vector.getAt(index);
 
@@ -116,7 +137,7 @@ void OMReferenceVector<ReferencedObject>::getValueAt(
 {
   TRACE("OMReferenceVector<ReferencedObject>::getValueAt");
   OBSOLETE("OMReferenceVector<ReferencedObject>::valueAt");
-  PRECONDITION("Valid index", ((index >= 0) && (index < count())));
+  PRECONDITION("Valid index", index < count());
 
   VectorElement& element = _vector.getAt(index);
 
@@ -200,8 +221,8 @@ void OMReferenceVector<ReferencedObject>::insertAt(
 {
   TRACE("OMReferenceVector<ReferencedObject>::insertAt");
 
-  PRECONDITION("Valid index", (index >= 0) && (index <= count()));
-  
+  PRECONDITION("Valid index", index <= count());
+
   VectorElement newElement(object);
   _vector.insertAt(newElement, index);
 
@@ -264,9 +285,9 @@ ReferencedObject*
 OMReferenceVector<ReferencedObject>::removeAt(const size_t index)
 {
   TRACE("OMReferenceVector<ReferencedObject>::removeAt");
-  PRECONDITION("Valid index", (index >= 0) && (index <= count()));
+  PRECONDITION("Valid index", index < count());
 
-  ReferencedObject* result = setValueAt(0, index);
+  ReferencedObject* result = clearValueAt(index);
   _vector.removeAt(index);
   return result;
 }
@@ -420,6 +441,159 @@ void OMReferenceVector<ReferencedObject>::grow(const size_t capacity)
     VectorElement voidElement;
     _vector.insert(voidElement);
   }
+}
+
+  // @mfunc Insert <p object> into this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::insertObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::insertObject");
+}
+
+  // @mfunc Does this <c OMReferenceVector> contain <p object> ?
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+bool
+OMReferenceVector<ReferencedObject>::containsObject(
+                                                  const OMObject* object) const
+{
+  TRACE("OMReferenceVector<ReferencedObject>::containsObject");
+
+  ASSERT("Unimplemented code not reached", false);
+  return false; // tjb TBS
+}
+
+  // @mfunc Remove <p object> from this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::removeObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::removeObject");
+
+  // tjb TBS
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // @mfunc Remove all objects from this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::removeAllObjects(void)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::removeAllObjects");
+
+  // tjb TBS
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // @mfunc Create an <c OMReferenceContainerIterator> over this
+  //        <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMReferenceContainerIterator*
+OMReferenceVector<ReferencedObject>::createIterator(void) const
+{
+  TRACE("OMReferenceVector<ReferencedObject>::createIterator");
+
+  ASSERT("Unimplemented code not reached", false);
+  return 0; // tjb TBS
+}
+
+  // @mfunc Set the value of this <c OMReferenceVector>
+  //        at position <p index> to <p object>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMObject*
+OMReferenceVector<ReferencedObject>::setObjectAt(const OMObject* object,
+                                                 const size_t index)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::setObjectAt");
+
+  ASSERT("Unimplemented code not reached", false);
+  return 0; // tjb TBS
+}
+
+  // @mfunc The value of this <c OMReferenceVector>
+  //        at position <p index>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMObject*
+OMReferenceVector<ReferencedObject>::getObjectAt(const size_t index) const
+{
+  TRACE("OMReferenceVector<ReferencedObject>::getObjectAt");
+
+  ASSERT("Unimplemented code not reached", false);
+  return 0; // tjb TBS
+}
+
+  // @mfunc Append the given <p OMObject> <p object> to
+  //        this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::appendObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::appendObject");
+
+  // tjb TBS
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // @mfunc Prepend the given <p OMObject> <p object> to
+  //        this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::prependObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::prependObject");
+
+  // tjb TBS
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // @mfunc Remove the object from this
+  //        <c OMReferenceVector> at position <p index>.
+  //        Existing objects in this <c OMReferenceVector>
+  //        at <p index> + 1 and higher are shifted down one index
+  //        position.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMObject*
+OMReferenceVector<ReferencedObject>::removeObjectAt(const size_t index)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::removeObjectAt");
+
+  ASSERT("Unimplemented code not reached", false);
+  return 0; // tjb TBS
+}
+
+  // @mfunc Insert <p object> into this <c OMReferenceVector>
+  //        at position <p index>. Existing objects at <p index> and
+  //        higher are shifted up one index position.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @parm TBS
+template <typename ReferencedObject>
+void
+OMReferenceVector<ReferencedObject>::insertObjectAt(const OMObject* object,
+                                                    const size_t index)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::insertObjectAt");
+
+  // tjb TBS
+  ASSERT("Unimplemented code not reached", false);
 }
 
 #endif
