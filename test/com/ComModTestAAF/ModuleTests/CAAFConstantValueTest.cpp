@@ -21,9 +21,9 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 #include "aafUtils.h"
-
+#include "AAFDefUIDs.h"
 
 static aafUID_t	zeroID = { 0 };
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
@@ -83,8 +83,10 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
+	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -93,7 +95,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		*ppFile = NULL;
 		return hr;
 	}
@@ -129,7 +135,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceReference *pSourceRef = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	aafUID_t			testDataDef = DDEF_Video;
+	aafUID_t			testDataDef = DDEF_Picture;
 	aafLength_t			effectLen = TEST_EFFECT_LEN;
 	aafUID_t			effectID = kTestEffectID;
 	aafUID_t			parmID = kTestParmID;
@@ -166,7 +172,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pDefObject->Release();
 		pDefObject = NULL;
 
-//!!!Not testing the SetAUID on AAFDefObject
 		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
 		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
@@ -341,7 +346,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafUID_t			readSourceID;
 	aafBool				readIsTimeWarp;
 	aafInt32			catLen, checkNumInputs, testNumSources, testNumParam;
-	aafUInt32			checkBypass, testLen;
+	aafUInt32			checkBypass;
 	HRESULT				hr = S_OK;
 	wchar_t				checkCat[256], checkName[256];
 	aafNumSlots_t		s;

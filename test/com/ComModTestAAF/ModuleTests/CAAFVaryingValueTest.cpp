@@ -22,6 +22,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "aafUtils.h"
 
@@ -87,8 +88,10 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
+	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -97,8 +100,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -138,7 +144,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTypeDef			*pTypeDef = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	aafUID_t			testDataDef = DDEF_Video, testInterpDef = kAAFExpRational;
+	aafUID_t			testDataDef = DDEF_Picture, testInterpDef = kAAFExpRational;
 	aafLength_t			effectLen = TEST_EFFECT_LEN;
 	aafUID_t			effectID = kTestEffectID;
 	aafUID_t			parmID = kTestParmID;
@@ -167,6 +173,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pDictionary->CreateInstance(&AUID_AAFParameterDef,
 							  IID_IAAFParameterDef, 
 							  (IUnknown **)&pParamDef));
+		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->Init (&parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
+		pDefObject->Release();
+		pDefObject = NULL;
+
 		checkResult(pDictionary->CreateInstance(&AUID_AAFTypeDefInt,
 							  IID_IAAFTypeDefInt, 
 							  (IUnknown **)&pIntDef));
@@ -188,7 +199,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pDefObject->Release();
 		pDefObject = NULL;
 
-//!!!Not testing the SetAUID on AAFDefObject
 		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
 		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
@@ -199,10 +209,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Init (&parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
 
 		//Make the first mob
 		long	test;
@@ -218,7 +224,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetName(L"AAFOperationGroupTest"));
 	  
 		// Add some slots
-		for(test = 0; test < 1/*!!!*/; test++)
+		for(test = 0; test < 2; test++)
 		{
  			checkResult(pDictionary->CreateInstance(&AUID_AAFOperationGroup,
 							     IID_IAAFOperationGroup, 
@@ -527,6 +533,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
 			checkExpression(checkNumInputs == TEST_NUM_INPUTS, AAFRESULT_TEST_FAILED);
+			checkResult(pOperationDef->GetParameterDefinitions (&pParmDefEnum));
+			checkResult(pParmDefEnum->NextOne(&pParmDef));
+			pParmDefEnum->Release();
+			pParmDefEnum = NULL;
+			pParmDef->Release();
+			pParmDef = NULL;
 			pOperationDef->Release();
 			pOperationDef = NULL;
 			/**/

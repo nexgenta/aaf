@@ -21,8 +21,9 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 #include "aafUtils.h"
+#include "AAFDefUIDs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -86,8 +87,10 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
+	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -96,8 +99,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -121,7 +127,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	aafUID_t			testDataDef = DDEF_Video, testParmID = kParmID;
+	aafUID_t			testDataDef = DDEF_Picture, testParmID = kParmID;
 	aafInt32			index;
 	IAAFOperationDef	*pOperationDef = NULL, *defResults[3] = { NULL, NULL, NULL };
 
@@ -161,7 +167,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			pDefObject->Release();
 			pDefObject = NULL;
 			
-			//!!!Not testing the SetAUID on AAFDefObject
 			checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
 			checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 			checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
@@ -231,7 +236,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFParameterDef	*pParmDef = NULL;
 	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
-	aafUID_t			readDataDef, checkDataDef = DDEF_Video;
+	aafUID_t			readDataDef, checkDataDef = DDEF_Picture;
 	aafBool				readIsTimeWarp;
 	aafInt32			catLen, checkNumInputs;
 	aafUInt32			checkBypass, testLen;
@@ -252,9 +257,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
 		checkResult(pDefObject->GetName (checkName, sizeof(checkName)));
-		checkExpression(wcscmp(checkName, effectNames[0/*!!!*/]) == 0, AAFRESULT_TEST_FAILED);
+		checkExpression(wcscmp(checkName, effectNames[0]) == 0, AAFRESULT_TEST_FAILED);
 		checkResult(pDefObject->GetDescription (checkName, sizeof(checkName)));
-		checkExpression(wcscmp(checkName, effectDesc[0/*!!!*/]) == 0, AAFRESULT_TEST_FAILED);
+		checkExpression(wcscmp(checkName, effectDesc[0]) == 0, AAFRESULT_TEST_FAILED);
 		pDefObject->Release();
 		pDefObject = NULL;
 		
