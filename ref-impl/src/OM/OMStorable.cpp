@@ -3,6 +3,7 @@
 #include "OMFile.h"
 #include "OMClassFactory.h"
 #include "OMObjectDirectory.h"
+#include "OMTypes.h"
 
 #include "OMAssertions.h"
 
@@ -19,11 +20,13 @@ void OMStorable::saveTo(OMStoredObject& s) const
 {
   TRACE("OMStorable::saveTo");
   
+  size_t context = 0;
   //_file->objectDirectory()->insert(pathName(), this);
   s.saveClassId(classId());
   for (size_t i = 0; i < _persistentProperties.count(); i++)
   {
-    OMProperty* p = _persistentProperties.get(i);
+    OMProperty* p = 0;
+    _persistentProperties.iterate(context, p);
     ASSERT("Valid property", p != 0);
     s.save(p);
   }
@@ -48,7 +51,7 @@ void OMStorable::restoreContentsFrom(OMStoredObject& s)
 OMStorable* OMStorable::restoreFrom(const OMStorable* containingObject, const char* name, OMStoredObject& s)
 {
   TRACE("OMStorable::restoreFrom");
-  int cid = s.restoreClassId();
+  OMClassId cid = s.restoreClassId();
   OMFile* f = containingObject->file();
   OMStorable* object = f->classFactory()->create(cid);
   ASSERT("Registered class id", object != 0);
