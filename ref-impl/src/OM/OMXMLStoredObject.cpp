@@ -37,7 +37,7 @@
 OMXMLStoredObject* OMXMLStoredObject::openRead(OMRawStorage* ANAME(rawStorage))
 {
   TRACE("OMXMLStoredObject::openRead");
-  PRECONDITION("Compatible raw storage access mode", rawStorage->isReadable());
+  PRECONDITION("Compatible raw storage", rawStorage->isReadable());
   ASSERT("Unimplemented code not reached", false); // tjb TBS
   return 0;
 }
@@ -50,27 +50,10 @@ OMXMLStoredObject* OMXMLStoredObject::openModify(
                                                OMRawStorage* ANAME(rawStorage))
 {
   TRACE("OMXMLStoredObject::openModify");
-  PRECONDITION("Compatible raw storage access mode",
+  PRECONDITION("Compatible raw storage",
                          rawStorage->isReadable() && rawStorage->isWritable());
-  PRECONDITION("Compatible raw storage", rawStorage->isPositionable());
   ASSERT("Unimplemented code not reached", false); // tjb TBS
   return 0;
-}
-
-  // @mfunc Create a new root <c OMXMLStoredObject> in the raw storage
-  //        <p rawStorage>. The byte order of the newly created root
-  //        is given by <p byteOrder>.
-  //   @parm The raw storage in which to create the file.
-  //   @parm The desired byte ordering for the new file.
-  //   @rdesc An <c OMXMLStoredObject> representing the root object.
-OMXMLStoredObject* OMXMLStoredObject::createWrite(OMRawStorage* rawStorage,
-                                                  const OMByteOrder byteOrder)
-{
-  TRACE("OMXMLStoredObject::createWrite");
-  PRECONDITION("Compatible raw storage access mode", rawStorage->isWritable());
-  OMXMLStoredObject* result = new OMXMLStoredObject(rawStorage, byteOrder);
-  ASSERT("Valid heap pointer", result != 0);
-  return result;
 }
 
   // @mfunc Create a new root <c OMXMLStoredObject> in the raw storage
@@ -83,9 +66,8 @@ OMXMLStoredObject* OMXMLStoredObject::createModify(OMRawStorage* rawStorage,
                                                    const OMByteOrder byteOrder)
 {
   TRACE("OMXMLStoredObject::createModify");
-  PRECONDITION("Compatible raw storage access mode",
+  PRECONDITION("Compatible raw storage",
                          rawStorage->isReadable() && rawStorage->isWritable());
-  PRECONDITION("Compatible raw storage", rawStorage->isPositionable());
   OMXMLStoredObject* result = new OMXMLStoredObject(rawStorage, byteOrder);
   ASSERT("Valid heap pointer", result != 0);
   return result;
