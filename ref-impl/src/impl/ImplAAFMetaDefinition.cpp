@@ -58,9 +58,6 @@
 #include "ImplEnumAAFPropertyDefs.h"
 #endif
 
-#include "ImplAAFSmartPointer.h"
-typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
-
 //#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -274,6 +271,12 @@ ImplAAFMetaDefinition::GetDictionary(ImplAAFDictionary **ppDictionary) const
 // for the parent class of the given class until current class is a "root" class.
 void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
 {
+#if 0
+  // Since ImplAAFMetaDefinition is still a subclass of ImplAAFObject we
+  // should just delegate property initialization:
+  ImplAAFObject::InitOMProperties(pClassDef);
+#else //#if 0
+
   assert (pClassDef);
   AAFRESULT hr;
 
@@ -316,13 +319,27 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
       pProp = ps->get (defPid);
     }      
     else if(defPid != PID_InterchangeObject_ObjClass
-      && (defPid != PID_InterchangeObject_Generation))
+      && (defPid != PID_InterchangeObject_Generation)
+      && (defPid != PID_PropertyDefinition_DefaultValue))
     {
       assert (0);
+#if 0
+      // Defined property wasn't found in OM property set.
+      // We'll have to install one.
+      pProp = propDefSP->CreateOMProperty ();
+      assert (pProp);
+      
+      // Remember this property so we can delete it later.
+      RememberAddedProp (pProp);
+      
+      // Add the property to the property set.
+      ps->put (pProp);
+#endif
     }
     
   if(defPid != PID_InterchangeObject_ObjClass
-      && (defPid != PID_InterchangeObject_Generation))
+      && (defPid != PID_InterchangeObject_Generation)
+      && (defPid != PID_PropertyDefinition_DefaultValue))
   {
       ImplAAFPropertyDef * pPropDef =
         (ImplAAFPropertyDef*) propDefSP;
@@ -339,6 +356,7 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
     propDefSP = 0;
     pProp = 0;
   }
+#endif // #else // #if 0
 }
 
 const OMUniqueObjectIdentification&
@@ -385,31 +403,3 @@ void ImplAAFMetaDefinition::onRestore(void* /*clientContext*/) const
   // Cast away constness (maintaining logical constness)
   ((ImplAAFMetaDefinition*) this)->setInitialized ();
 }
-
-
-// Overrides of ImplAAFStorable.
-// Return true if this is a meta object
-// NOTE: These objects will eventually owned by the Object Manager.
-bool ImplAAFMetaDefinition::metaObject(void) const
-{
-  return true;
-}
-
-// Return true is this is a data object (Interchange object).
-bool ImplAAFMetaDefinition::dataObject(void) const
-{
-  return false;
-}
-
-
-// Method is called after associated class has been added to MetaDictionary.
-// If this method fails the class is removed from the MetaDictionary and the
-// registration method will fail.
-HRESULT ImplAAFMetaDefinition::CompleteClassRegistration(void)
-{
-  // Default implementation just returns success.
-  return AAFRESULT_SUCCESS;
-}
-
-
-
