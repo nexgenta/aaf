@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMAssertions
+
 #include "OMAssertions.h"
 
 class OMAssertionViolation {
@@ -41,12 +43,9 @@ public:
 
 #if defined (OM_ENABLE_DEBUG)
 
-#include <string.h>
-
-#include <iostream.h>
-#include <stdlib.h>
 #include <ctype.h>
 
+#include "OMOStream.h"
 #include "OMUtilities.h"
 
 #if defined(OM_ENABLE_STACK_TRACE)
@@ -59,17 +58,17 @@ void reportAssertionViolation(char* assertionKind,
                               char* expressionString,
                               char* routineName,
                               char* fileName,
-                              size_t lineNumber)
+                              OMUInt32 lineNumber)
 {
-  cerr << assertionKind
-       << " \"" << assertionName << "\" violated in routine \""
-       << routineName  << "\"." << endl;
-  cerr << "The violation occurred at line " << lineNumber
-       << " in file \"" << fileName << "\"." << endl;
-  cerr << "The condition \"" << expressionString << "\" was false." << endl;
+  omlog << assertionKind
+        << " \"" << assertionName << "\" violated in routine \""
+        << routineName  << "\"." << endl;
+  omlog << "The violation occurred at line " << lineNumber
+        << " in file \"" << fileName << "\"." << endl;
+  omlog << "The condition \"" << expressionString << "\" was false." << endl;
 
 #if defined(OM_ENABLE_STACK_TRACE)
-  printStackTrace(cerr);
+  printStackTrace(omlog);
 #endif
 
 #if defined(OM_EXIT_ON_ASSERT)
@@ -93,7 +92,7 @@ bool validString(const char* string)
   } else {
     size_t length = strlen(string);
     if (length == 0) {
-	  // bad length
+      // bad length
       result = false;
     } else {
       for (size_t i = 0; i < length; i++) {
@@ -104,7 +103,7 @@ bool validString(const char* string)
           break;
         }
       }
-	}
+    }
   }
 
   return result;
@@ -124,7 +123,7 @@ bool validOMString(const OMCharacter* string)
 
 void trace(const char* routineName)
 {
-  cerr << "Enter \"" << routineName << "\"." << endl;
+  omlog << "Enter \"" << routineName << "\"." << endl;
 }
 
 #endif
@@ -133,10 +132,10 @@ void trace(const char* routineName)
 
 void obsolete(const char* routineName, const char* newRoutineName)
 {
-  cerr << "The routine \""
-       << routineName
-       << "\" is obsolete. Please use \""
-       << newRoutineName << "\" instead." << endl;
+  omlog << "The routine \""
+        << routineName
+        << "\" is obsolete. Please use \""
+        << newRoutineName << "\" instead." << endl;
 }
 
 #endif

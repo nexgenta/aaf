@@ -29,9 +29,18 @@
 #ifndef OMASSERTIONS_H
 #define OMASSERTIONS_H
 
-#include "OMPortability.h"
 
 #include <stddef.h>
+
+// @module OMAssertions | Functions and macros to implement run-time
+//         monitoring of assertions.
+//
+// References ...
+//
+// [1] "Object Oriented Software Construction", Bertrand Meyer,
+// 1997 Prentice Hall PTR, ISBN 0-13-629155-4
+//
+//   @mauthor Tim Bingham | tjb | Avid Technology, Inc.
 
   // @class OMAssertionViolation | Object Manager assertion
   //        violation. An instance of this opaque class is thrown
@@ -48,9 +57,10 @@ class OMAssertionViolation;
   //         ASSERT.
   //   @parm The name of the assertion. The assertion name is a
   //         description of the assertion that makes sense from the
-  //         point of view of someone reading the source text. The
-  //         name comprises a portion of the message that is printed
-  //         by this routine.
+  //         internal point of view (that of someone reading the source
+  //         text). The name comprises a portion of the message that is
+  //         printed by this routine. The message that is printed makes
+  //         sense from the external point of view.
   //   @parm The expression, as a text string, that was found not to
   //         be true.
   //   @parm The name of the routine in which the assertion violation
@@ -64,7 +74,7 @@ void reportAssertionViolation(char* assertionKind,
                               char* expressionString,
                               char* routineName,
                               char* fileName,
-                              size_t lineNumber);
+                              OMUInt32 lineNumber);
 
   // @func Is the given string valid ? Use <f validString> in
   //       expressions passed to the assertion macros
@@ -106,9 +116,12 @@ void trace(const char* routineName);
 
 #else
 
+inline void noTrace(const char* /* routine */) {}
+
 #define TRACE(routine) \
   char* currentRoutineName; \
-  currentRoutineName = routine;
+  currentRoutineName = routine; \
+  noTrace(currentRoutineName);
 
 #endif
 
@@ -142,9 +155,10 @@ void obsolete(const char* routineName, const char* newRoutineName);
   //       invocation of the <f TRACE> macro.
   //   @parm The name of the precondition. The precondition name is a
   //         description of the precondition that makes sense from the
-  //         point of view of someone reading the source text. The
-  //         name comprises a portion of the message that is printed
-  //         if the precondition is violated.
+  //         internal point of view (that of someone reading the source
+  //         text). The name comprises a portion of the message that is
+  //         printed if the precondition is violated. The message that
+  //         is printed makes sense from the external point of view.
   //   @parm The precondition expression. The expression should be
   //         free of side effects.
 #define PRECONDITION(name, expression) \
@@ -159,9 +173,10 @@ void obsolete(const char* routineName, const char* newRoutineName);
   //       invocation of the <f TRACE> macro.
   //   @parm The name of the postcondition. The postcondition name is a
   //         description of the postcondition that makes sense from the
-  //         point of view of someone reading the source text. The
-  //         name comprises a portion of the message that is printed
-  //         if the postcondition is violated.
+  //         internal point of view (that of someone reading the source
+  //         text). The name comprises a portion of the message that is
+  //         printed if the postcondition is violated. The message that
+  //         is printed makes sense from the external point of view.
   //   @parm The postcondition expression. The expression should be
   //         free of side effects.
 #define POSTCONDITION(name, expression) \
@@ -176,9 +191,10 @@ void obsolete(const char* routineName, const char* newRoutineName);
   //       invocation of the <f TRACE> macro.
   //   @parm The name of the condition. The condition name is a
   //         description of the condition that makes sense from the
-  //         point of view of someone reading the source text. The
-  //         name comprises a portion of the message that is printed
-  //         if the condition is violated.
+  //         internal point of view (that of someone reading the source
+  //         text). The name comprises a portion of the message that is
+  //         printed if the condition is violated. The message that
+  //         is printed makes sense from the external point of view.
   //   @parm The condition expression. The expression should be
   //         free of side effects.
 #define ASSERT(name, expression) \
