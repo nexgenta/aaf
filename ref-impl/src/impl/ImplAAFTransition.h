@@ -4,14 +4,27 @@
 #define __ImplAAFTransition_h__
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __AAFTypes_h__
@@ -25,8 +38,10 @@ class ImplAAFDataDef;
 #include "ImplAAFComponent.h"
 #endif
 
-#ifndef __ImplAAFEffect_h__
-#include "ImplAAFEffect.h"
+#include "OMStrongRefProperty.h"
+
+#ifndef __ImplAAFOperationGroup_h__
+#include "ImplAAFOperationGroup.h"
 #endif
 
 class ImplAAFTransition : public ImplAAFComponent
@@ -42,18 +57,14 @@ protected:
   virtual ~ImplAAFTransition ();
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTransition)
-
 
   //****************
-  // Create()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Create
+    Initialize
         (// @parm [in] Data Definition Object
-         aafUID_t * pDatadef,
+         ImplAAFDataDef * pDataDef,
 
 		 // @parm [in] Length property value
          aafLength_t  length,
@@ -61,8 +72,8 @@ public:
          // @parm [in] The point at which a cut would be inserted if the transition were removed
          aafPosition_t  cutPoint,
 
-         // @parm [in] A reference to an effect invocation object
-         ImplAAFEffect * effect);	 
+         // @parm [in] A reference to an OperationGroup object
+         ImplAAFOperationGroup * group);	 
 
   //****************
   // GetCutPoint()
@@ -77,9 +88,9 @@ public:
   // GetEffect()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetEffect
+    GetOperationGroup
         // @parm [out] Effect used by transition
-        (ImplAAFEffect ** effObj);
+        (ImplAAFOperationGroup ** effObj);
 	//@comm Replaces part of omfsTransitionGetInfo
 
   //****************
@@ -94,21 +105,20 @@ public:
   // SetEffect()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetEffect
+    SetOperationGroup
         // @parm [in] Effect used by transition
-        (ImplAAFEffect * effObj);
+        (ImplAAFOperationGroup * group);
 
 
+  	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
+												aafMobID_constref to);
 
-public:
+	virtual AAFRESULT GetComponentType(implCompType_t* pType) {*pType = kTransition; return AAFRESULT_SUCCESS;}
 
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFTransitionTest.cpp.
-  static AAFRESULT test();
 
 private:
-	OMStrongReferenceProperty<ImplAAFEffect>	_effect;
-	OMFixedSizeProperty<aafPosition_t>			_cutPoint;
+	OMStrongReferenceProperty<ImplAAFOperationGroup>	_operationGroup;
+	OMFixedSizeProperty<aafPosition_t>					_cutPoint;
 
 };
 
