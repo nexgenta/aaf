@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9.2.1 2004/04/05 09:35:15 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -33,28 +33,28 @@ include $(AAFBASE)/build/common.mk
 
 # Include directories
 INCLUDES = -I$(AAFSDKINCLUDEDIR) \
-	   -I../../../../ref-impl/include/ref-api \
-	   -I../../../../ref-impl/include/com-api \
-	   -I../../../../ref-impl/src/com-api/com-dll \
-	   -I../../../../Utilities/Include \
-	   -I..
+		-I../../../../ref-impl/include/ref-api \
+		-I../../../../ref-impl/include/com-api \
+		-I../../../../ref-impl/src/com-api \
+		-I../../../../ref-impl/src/com-api/com-dll \
+		-I..
 
 
 .PHONY : all
 all : $(OBJDIR) \
-      $(AAFSDKBINDIR)/libAAFPersonnelExtension$(DLL) \
-      $(AAFSDKBINDIR)/ComPersonnelPluginWrite$(EXE)
+		$(AAFSDKBINDIR)/libAAFPersonnelExtension$(DLL) \
+		$(AAFSDKBINDIR)/ComPersonnelPluginWrite$(EXE)
 
 
 CXXFILES = AAFPersonnelExtension.cpp \
-	   CAAFAdminMob.cpp \
-	   CAAFPersonnelResource.cpp
+		CAAFAdminMob.cpp \
+		CAAFPersonnelResource.cpp
 
 
 SUPOBJS = $(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFClassFactory$(OBJ) \
-	  $(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFServer$(OBJ) \
-	  $(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFUnknown$(OBJ) \
-	  $(OBJDIR)/extensionUtils$(OBJ)
+		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFServer$(OBJ) \
+		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFUnknown$(OBJ) \
+		$(OBJDIR)/extensionUtils$(OBJ)
 
 
 $(AAFSDKBINDIR)/libAAFPersonnelExtension$(DLL) : $(CXXOBJS)
@@ -62,13 +62,13 @@ $(AAFSDKBINDIR)/libAAFPersonnelExtension$(DLL) : $(CXXOBJS)
 
 
 CXXFILES2 = extensionReadPlugin.cpp \
-	    extensionWritePlugin.cpp \
-	    writePlugin.cpp
+		extensionWritePlugin.cpp \
+		writePlugin.cpp
 
 
 $(AAFSDKBINDIR)/ComPersonnelPluginWrite$(EXE) : $(CXXOBJS2)
 	$(LD) $(CXXOBJS2) $(OBJDIR)/extensionUtils$(OBJ) \
-	-L$(AAFSDKLIBDIR) -laaflib -laafiid  $(LIBCIO) -o $@
+	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
 
 
 .PHONY : clean

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.6 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6.2.1 2004/04/05 09:35:15 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -34,8 +34,7 @@ include $(AAFBASE)/build/common.mk
 # Include directories
 INCLUDES = -I../../../ref-impl/include \
 	   -I../../../ref-impl/include/ref-api \
-	   -I../../../ref-impl/include/com-api \
-	   -I../../../Utilities/Include
+	   -I../../../ref-impl/include/com-api
 
 
 .PHONY : all
@@ -43,7 +42,7 @@ all : $(OBJDIR) $(AAFSDKBINDIR)/EssenceAccess$(EXE)
 
 
 $(AAFSDKBINDIR)/EssenceAccess$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid -o $@
+	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) -o $@
 
 
 .PHONY : clean
