@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.129 2004/09/28 12:02:41 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.130 2004/10/01 16:35:43 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -309,7 +309,11 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 		if (hr != AAFRESULT_SUCCESS)
 		  return hr;
 		_factory->SetEnableDefRegistration (regWasEnabled);
-		dictionary->InitBuiltins();
+
+		// For reading, we don't want to register the built-in data
+		// and container defs. Just stick with the ones actually in
+		// in the file we're reading.
+		// dictionary->InitBuiltins();
 		dictionary->ReleaseReference();
 		dictionary = 0;
 	}
