@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -36,7 +36,7 @@
 template<typename PropertyType>
 OMVariableSizeProperty<PropertyType>::OMVariableSizeProperty(
                                                  const OMPropertyId propertyId,
-                                                 const char* name)
+                                                 const wchar_t* name)
 : OMSimpleProperty(propertyId, name)
 {
   TRACE("OMVariableSizeProperty<PropertyType>::OMVariableSizeProperty");
@@ -115,7 +115,7 @@ void OMVariableSizeProperty<PropertyType>::getValueAt(PropertyType* value,
                                                       const size_t index) const
 {
   TRACE("OMVariableSizeProperty<PropertyType>::getValueAt");
-  PRECONDITION("Valid index", (index >= 0) && (index < count()));
+  PRECONDITION("Valid index", index < count());
   PRECONDITION("Valid value", value != 0);
 
   *value = ((PropertyType*)_bits)[index];
@@ -136,7 +136,7 @@ void OMVariableSizeProperty<PropertyType>::setValueAt(
                                                      const size_t index)
 {
   TRACE("OMVariableSizeProperty<PropertyType>::setValueAt");
-  PRECONDITION("Valid index", (index >= 0) && (index < count()));
+  PRECONDITION("Valid index", index < count());
   PRECONDITION("Valid value", value != 0);
 
   ((PropertyType*)_bits)[index] = *value;
@@ -155,7 +155,7 @@ template<typename PropertyType>
 void OMVariableSizeProperty<PropertyType>::appendValue(
                                                      const PropertyType* value)
 {
-  TRACE("OMVariableSizeProperty<PropertyType>::prependValue");
+  TRACE("OMVariableSizeProperty<PropertyType>::appendValue");
   PRECONDITION("Valid value", value != 0);
 
   size_t oldCount = count();
