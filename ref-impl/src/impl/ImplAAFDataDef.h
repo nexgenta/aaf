@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataDef.h,v 1.14 2004/04/16 08:24:54 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDataDef.h,v 1.15 2004/10/27 16:52:57 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -137,7 +137,35 @@ public:
         // @parm [retval,out] pointer to the return value
         (aafBool *  bIsEdgecodeKind);
 
+  //****************
+  // IsAuxiliaryKind()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsAuxiliaryKind
+        // @parm [retval,out] pointer to the return value
+        (aafBool *  bIsAuxiliaryKind);
+
+  //****************
+  // IsDescriptiveKind()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsDescriptiveKind
+        // @parm [retval,out] pointer to the return value
+        (aafBool *  bIsDescriptiveKind);
+
+
 private:
+
+  //****************
+  // IsDataDefEquivalentOf()
+  //
+  AAFRESULT IsDataDefEquivalentOf
+        (// @parm [in,ref] data def to compare against
+         ImplAAFDataDef * pDataDef,
+
+         // @parm [retval,out] pointer to result
+         aafBool *  bIsDataDefEquivalentOf);
+
   // *NOT* reference counted!
   ImplAAFDictionary * _pCachedDict;
 

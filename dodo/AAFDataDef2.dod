@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef2.dod,v 1.2 2004/09/16 15:00:43 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef2.dod,v 1.3 2004/10/27 16:48:29 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -147,7 +147,7 @@ AD_XMETHOD2(DoesDataDefConvertFrom,
   // parameter specified with the DataDefName string.)
 
 #c
-#c New AAFDataDef2 methods
+#c AAFDataDef2 methods
 #c
 
 AD_XMETHOD1(IsEdgecodeKind,

@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef.dod,v 1.27 2004/10/27 16:48:29 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef3.dod,v 1.1 2004/10/27 16:47:13 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -20,25 +20,21 @@
 #c Licensor of the AAF Association is Avid Technology.
 #c All rights reserved.
 #c
+#c Portions created by British Broadcasting Corporation are
+#c Copyright 2004, British Broadcasting Corporation.  All rights reserved.
+#c
 #c *********************************************************************
 #startm .this-module 0
-AAFDataDef\
+AAFDataDef3\
 #endm
 #c
 #startm .parent-module 0
 AAFDefObject\
 #endm
-#import ./AAFDataDef2.exp
-#import ./AAFDataDef3.exp
 AD_HEAD
-AD_IDL(//
-// IAAFDataDef is DEPRECATED\,  Please use IAAFDataDef2.
-//)
-
-AD_CLASS_UUID(dfbd652A, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
-
-AD_DEFAULT_UUID(dfbd6529, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
-AD_COM_EXT2_CLASS_BEGIN(public IAAFDataDef2,public IAAFDataDef3)
+AD_CLASS_UUID(3e912bbb, c77d, 470e, 8b, e6, e7, 23, 3d, af, c4, 93)
+AD_DEFAULT_UUID(858109c4, cb51, 48ad, 90, 86, a3, fc, fe, 97, 39, fa)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD3(Initialize,
 		   [in\, ref],
 		   objPass,
@@ -151,15 +147,43 @@ AD_XMETHOD2(DoesDataDefConvertFrom,
   // parameter specified with the DataDefName string.)
 
 #c
-#c DataDef2 methods
+#c AAFDataDef2 methods
 #c
-AD_COM_METH(.method-IsEdgecodeKind)
-AD_COM_METH(.method-IsTimecodeKind)
+
+AD_XMETHOD1(IsEdgecodeKind,
+		   [retval\,out],
+		   objPass,
+		   aafBoolean_t *,
+		   bIsEdgecodeKind,
+		   pointer to the return value, 
+		   Sets return value to TRUE if DataDef is an edgecode.)
+
+AD_XMETHOD1(IsTimecodeKind,
+		   [retval\,out],
+		   objPass,
+		   aafBoolean_t *,
+		   bIsTimecodeKind,
+		   pointer to the return value, 
+		   Sets return value to TRUE if DataDef is a timecode.)
 
 #c
-#c DataDef3 methods
+#c AAFDataDef3 methods
 #c
-AD_COM_METH(.method-IsDescriptiveKind)
-AD_COM_METH(.method-IsAuxiliaryKind)
 
-AD_COM_EXT2_CLASS_END(AAFDataDef2, AAFDataDef3)
+AD_XMETHOD1(IsAuxiliaryKind,
+		   [retval\,out],
+		   objPass,
+		   aafBoolean_t *,
+		   bIsAuxiliaryKind,
+		   pointer to the return value, 
+		   Sets return value to TRUE if DataDef is auxiliary.)
+
+AD_XMETHOD1(IsDescriptiveKind,
+		   [retval\,out],
+		   objPass,
+		   aafBoolean_t *,
+		   bIsDescriptiveKind,
+		   pointer to the return value, 
+		   Sets return value to TRUE if DataDef is descriptive.)
+
+AD_XCLASS_END(Concrete, StoredObject)

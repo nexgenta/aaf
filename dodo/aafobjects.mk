@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.150 2004/09/10 17:12:09 stuart_hc Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.151 2004/10/27 16:48:29 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@ AAFCOMINTERFACESONLY="\
 	AAFComponent2 \
 	AAFCompositionMob2 \
 	AAFDataDef2 \
+	AAFDataDef3 \
 	AAFDictionary2 \
 	AAFDigitalImageDescriptor2 \
 	AAFEndian \
