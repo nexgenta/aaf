@@ -1,35 +1,43 @@
 // @doc INTERNAL
 // @com This file handles bdirectional translation of effect metadata between OMF and AAF
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <iostream.h>
 
+namespace OMF2
+{
 #include "omPublic.h"
 #include "omMedia.h"
+}
 
 // OMF Includes
 
@@ -47,12 +55,12 @@
 static bool LookupAAFIDInTable(aafUID_t					&AAFEffectID,
 							aafUInt32				numEntries,
 							effectXlate_t			*table,
-							omfUniqueNamePtr_t effectID,
-							omfUniqueNamePtr_t ExtendedEffectID);
+							OMF2::omfUniqueNamePtr_t effectID,
+							OMF2::omfUniqueNamePtr_t ExtendedEffectID);
 static void AddDirectionalPart(IAAFOperationGroup *effect,
-									  omfUniqueNamePtr_t ExtendedEffectID);
+									  OMF2::omfUniqueNamePtr_t ExtendedEffectID);
 static void BuildWipeEffectID(IAAFOperationGroup *effect,
-									  omfUniqueNamePtr_t ExtendedEffectID);
+									  OMF2::omfUniqueNamePtr_t ExtendedEffectID);
 
 EffectTranslate::EffectTranslate()
 {
@@ -93,8 +101,8 @@ EffectTranslate::~EffectTranslate()
 
 
 	HRESULT EffectTranslate::GetEffectIDs(IAAFOperationGroup *effect,
-									   omfUniqueNamePtr_t effectID,
-									   omfUniqueNamePtr_t ExtendedEffectID)
+									   OMF2::omfUniqueNamePtr_t effectID,
+									   OMF2::omfUniqueNamePtr_t ExtendedEffectID)
 {
 	IAAFOperationDef		*pOpDef = NULL;
 	IAAFDefObject			*pDef = NULL;
@@ -135,8 +143,8 @@ EffectTranslate::~EffectTranslate()
 static bool LookupAAFIDInTable(aafUID_t					&AAFEffectID,
 							aafUInt32				numEntries,
 							effectXlate_t			*xlateTable,
-							omfUniqueNamePtr_t effectID,
-							omfUniqueNamePtr_t ExtendedEffectID)
+							OMF2::omfUniqueNamePtr_t effectID,
+							OMF2::omfUniqueNamePtr_t ExtendedEffectID)
 {
 	bool		found = false;
 	aafUInt32	n;
@@ -183,15 +191,15 @@ bool EffectTranslate::isPrivateEffect(aafUID_t& uid)
 	return result;
 }
 
-HRESULT EffectTranslate::GetAAFEffectID(	omfUniqueNamePtr_t OMFEffectIDPtr,
-						omfUniqueNamePtr_t ExtendedEffectIDPtr,
+HRESULT EffectTranslate::GetAAFEffectID(	OMF2::omfUniqueNamePtr_t OMFEffectIDPtr,
+						OMF2::omfUniqueNamePtr_t ExtendedEffectIDPtr,
 						aafUID_t	*aafUID)
 {
 	HRESULT				rc = AAFRESULT_SUCCESS;
 	long				n, numStdEntries = sizeof(stdXlateTable)/sizeof(effectXlate_t);
 	bool				found = false;
-	omfUniqueName_t	OMFEffectID;
-	omfUniqueName_t	ExtendedEffectID;
+	OMF2::omfUniqueName_t	OMFEffectID;
+	OMF2::omfUniqueName_t	ExtendedEffectID;
 	char				*init = (char *)aafUID;
 	char				*effectPrefix = "omfi:effect:";
 	long				prefixLen = strlen(effectPrefix);

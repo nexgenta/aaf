@@ -46,7 +46,6 @@ static wchar_t *manuf2URL = L"www.avid.com";
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFClassDefUIDs.h"
@@ -442,18 +441,14 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFPluginLocators_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFPluginLocators_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFPluginLocators_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFPluginLocatorsTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(pFileName);
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
