@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.120.2.3 2004/07/07 13:01:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.120.2.4 2004/07/23 19:08:27 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1208,6 +1208,14 @@ ImplAAFFile::SaveCopyAs (ImplAAFFile * pDestFile)
 
     ImplAAFSmartPointer<ImplAAFDictionary> spDstDict;
     checkResult( spDstHeader->GetDictionary(&spDstDict) );
+
+    // Merge the dictionary
+    {
+      ImplAAFSmartPointer<ImplAAFDictionary> spSrcDict;
+      checkResult( GetDictionary(&spSrcDict) );
+
+      checkResult( spSrcDict->MergeTo( spDstDict ) );
+    }
 
     // Clone the content store.
     {
