@@ -105,14 +105,14 @@ ImplAAFClassDef::~ImplAAFClassDef ()
   if (AAFRESULT_FAILED (hr))
 	throw hr;
 
-  aafUInt32 i;
-  for (i = 0; i < numProps; i++)
+	OMStrongReferenceSetIterator<ImplAAFPropertyDef>propertyDefinitions(_Properties);
+	while(++propertyDefinitions)
 	{
-	  ImplAAFPropertyDef *pd = _Properties.setValueAt(0, i);
-	  if (pd)
+		ImplAAFPropertyDef *pProperty = propertyDefinitions.setValue(0);
+		if (pProperty)
 		{
-		  pd->ReleaseReference();
-		  pd = 0;
+		  pProperty->ReleaseReference();
+		  pProperty = 0;
 		}
 	}
 }
@@ -180,7 +180,12 @@ AAFRESULT STDMETHODCALLTYPE
   	return AAFRESULT_NOMEMORY;
 
   AAFRESULT hr;
-  hr = theEnum->SetEnumStrongProperty(this, &_Properties);
+  OMStrongReferenceSetIterator<ImplAAFPropertyDef>* iter = 
+	new OMStrongReferenceSetIterator<ImplAAFPropertyDef>(_Properties);
+  if(iter == 0)
+	hr = AAFRESULT_NOMEMORY;
+  else
+	hr = theEnum->SetIterator(this, iter);
   if (AAFRESULT_FAILED (hr))
 	{
 		theEnum->ReleaseReference();
@@ -293,7 +298,7 @@ AAFRESULT STDMETHODCALLTYPE
   return pvtRegisterPropertyDef (id,
 								 pName,
 								 typeId,
-								 AAFTrue,
+								 kAAFTrue,
 								 ppPropDef);
 }
 
@@ -303,6 +308,7 @@ AAFRESULT STDMETHODCALLTYPE
       const pvtPropertyIdentifier & propId,
       ImplAAFPropertyDef ** ppPropDef)
 {
+		///!!!JeffB: Leave this in original loop form until the OM  genericizes the lookup key
   if (! ppPropDef)
 	return AAFRESULT_NULL_PARAM;
 
@@ -522,7 +528,7 @@ aafBool ImplAAFClassDef::pvtPropertyIdentifierOMPid:: DoesMatch
   OMPropertyId testPid;
   assert (pTestPropDef);
   testPid = pTestPropDef->OmPid ();
-  return (_id == testPid) ? AAFTrue : AAFFalse;
+  return (_id == testPid) ? kAAFTrue : kAAFFalse;
 }
 
 aafBool ImplAAFClassDef::pvtPropertyIdentifierAUID::DoesMatch
@@ -532,7 +538,7 @@ aafBool ImplAAFClassDef::pvtPropertyIdentifierAUID::DoesMatch
   assert (pTestPropDef);
   AAFRESULT hr = pTestPropDef->GetAUID (&testUID);
   assert (AAFRESULT_SUCCEEDED (hr));
-  return (EqualAUID (&_id, &testUID) ? AAFTrue : AAFFalse);
+  return (EqualAUID (&_id, &testUID) ? kAAFTrue : kAAFFalse);
 }
 
 
