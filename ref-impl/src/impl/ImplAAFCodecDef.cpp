@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -45,23 +27,18 @@
 #endif
 
 #include "ImplAAFDataDef.h"
-#include "ImplAAFPluginManager.h"
+
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 #include "AafUtils.h"
-#include "ImplAAFDictionary.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFDataDefs;
-extern "C" const aafClassID_t CLSID_EnumAAFCodecFlavours;
 
 ImplAAFCodecDef::ImplAAFCodecDef ()
-:  _dataDefs(		PID_CodecDefinition_DataDefinitions,			"DataDefinitions"),
-   _fileDescClass(	PID_CodecDefinition_FileDescriptorClass,		"FileDescriptorClass")
-
+:  _dataDefs(		PID_CodecDefinition_DataDefinitions,			"DataDefinitions")
 {
 	_persistentProperties.put(_dataDefs.address());
-	_persistentProperties.put(_fileDescClass.address());
 }
 
 
@@ -97,15 +74,9 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(aVal)
-		  {
 			aVal->ReleaseReference();
-			aVal = 0;
-		  }
 		if(dataEnum)
-		  {
 			dataEnum->ReleaseReference();
-			dataEnum = 0;
-		  }
 	}
 	XEND;
 
@@ -153,162 +124,36 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::AreThereFlavours (
-      aafBool *pResult)
+      aafBool *  /*pResult*/)
 {
-	aafUID_t						uid;
-	ImplAAFPluginManager			*mgr = NULL;
-	IAAFPlugin						*pPlug = NULL;
-	IAAFEssenceCodec				*pCodec = NULL;
-	aafBool							found;
-	aafInt32						flavourCount;
-
-	if(pResult == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	XPROTECT()
-	{
-		CHECK(GetAUID(&uid));
-		mgr = ImplAAFPluginManager::GetPluginManager();
-		// Only looks at first codec matching
-		found = AAFFalse;
-		if(mgr->GetPluginInstance(uid, &pPlug) == AAFRESULT_SUCCESS)
-		{
-			if(pPlug->QueryInterface(IID_IAAFEssenceCodec, (void **)&pCodec) == AAFRESULT_SUCCESS)
-			{
-				found = AAFTrue;
-			}
-		}
-		if(!found)
-			RAISE(AAFRESULT_CODEC_INVALID);
-
-		CHECK(pCodec->GetFlavourCount(&flavourCount));
-		*pResult = (flavourCount >= 2 ? AAFTrue : AAFFalse);
-		pPlug->Release();
-		pPlug = NULL;
-		pCodec->Release();
-		pCodec = NULL;
-		mgr->ReleaseReference();
-		mgr = NULL;
-	}
-	XEXCEPT
-	{
-		if(pPlug != NULL)
-			pPlug->Release();
-		if(pCodec != NULL)
-			pCodec->Release();
-		if(mgr != NULL)
-		  {
-			mgr->ReleaseReference();
-			mgr = 0;
-		  }
-	}
-	XEND;
-
-	return(AAFRESULT_SUCCESS);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::GetFileDescriptorClass (
-      ImplAAFClassDef **ppClass)
+      ImplAAFClassDef ** /*ppClass*/)
 {
-	aafUID_t			classID;
-	ImplAAFDictionary	*pDict = NULL;
-	AAFRESULT			status;
-
-	if (ppClass == NULL)
-	{
-		status =  AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		classID = _fileDescClass;
-		status = GetDictionary(&pDict);
-		if(status == AAFRESULT_SUCCESS)
-			status = pDict->LookupClass(&classID, ppClass);
-	}
-
-	return status;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::SetFileDescriptorClass (
-      ImplAAFClassDef *pClass)
+      ImplAAFClassDef * /*pClass*/)
 {
-	aafUID_t	classID;
-	
-	if (pClass == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		pClass->GetAUID(&classID);
-		_fileDescClass = classID;
-	}
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::EnumCodecFlavours (
-      ImplEnumAAFCodecFlavours **ppEnum)
+      ImplEnumAAFCodecFlavours ** /*ppEnum*/)
 {
-	aafUID_t						uid;
-	ImplAAFPluginManager			*mgr = NULL;
-	IAAFPlugin						*pPlug = NULL;
-	IAAFEssenceCodec				*pCodec = NULL;
-	aafBool							found;
-
-	if(ppEnum == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	XPROTECT()
-	{
-		*ppEnum = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
-		if(*ppEnum == NULL)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(GetAUID(&uid));
-		mgr = ImplAAFPluginManager::GetPluginManager();
-		// Only looks at first codec matching
-		found = AAFFalse;
-		if(mgr->GetPluginInstance(uid, &pPlug) == AAFRESULT_SUCCESS)
-		{
-			if(pPlug->QueryInterface(IID_IAAFEssenceCodec, (void **)&pCodec) == AAFRESULT_SUCCESS)
-			{
-				found = AAFTrue;
-			}
-		}
-		if(!found)
-			RAISE(AAFRESULT_CODEC_INVALID);
-
-		(*ppEnum)->SetEnumCodec(pCodec);
-		pPlug->Release();
-		pPlug = NULL;
-		pCodec->Release();
-		pCodec = NULL;
-		mgr->ReleaseReference();
-		mgr = NULL;
-	}
-	XEXCEPT
-	{
-		if(pPlug != NULL)
-			pPlug->Release();
-		if(pCodec != NULL)
-			pCodec->Release();
-		if(mgr != NULL)
-		  {
-			mgr->ReleaseReference();
-			mgr = 0;
-		  }
-	}
-	XEND;
-
-	return(AAFRESULT_SUCCESS);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
   
@@ -328,5 +173,6 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
+OMDEFINE_STORABLE(ImplAAFCodecDef, AUID_AAFCodecDef);
 
 

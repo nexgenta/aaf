@@ -29,7 +29,7 @@
 #include "aafCvt.h"
 
 ImplAAFComponent::ImplAAFComponent ():
-	_dataDef(	PID_Component_DataDefinition,	"Data Definition"),
+	_dataDef(	PID_Component_DataDefinition,	"DataDefinition"),
 	_length(	PID_Component_Length,	"Length")
 {
 	_persistentProperties.put(   _dataDef.address());
@@ -175,12 +175,12 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 											 ImplAAFMob *mob, ImplAAFMobSlot *track,
 											 aafMediaCriteria_t *mediaCrit,
 											 aafPosition_t currentObjPos,
-											 aafEffectChoice_t *effectChoice,
+											 aafOperationChoice_t *operationChoice,
 											 ImplAAFComponent	*prevObject,
 											 ImplAAFComponent *nextObject,
 											 ImplAAFScopeStack *scopeStack,
 											 aafPosition_t *diffPos, aafLength_t *minLength,
-											 ImplAAFEffectInvocation **effeObject, aafInt32	*nestDepth,
+											 ImplAAFOperationGroup **groupObject, aafInt32	*nestDepth,
 											 ImplAAFComponent **found, aafBool *foundTransition)
 {
 	aafLength_t	tmpMinLen;
@@ -215,5 +215,9 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 }
 
 
+AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+{
+	return AAFRESULT_SUCCESS;
+}
 
 OMDEFINE_STORABLE(ImplAAFComponent, AUID_AAFComponent);
