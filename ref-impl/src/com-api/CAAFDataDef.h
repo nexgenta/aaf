@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDataDef.h,v 1.8 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFDataDef.h,v 1.9 2004/10/27 17:04:10 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,10 +44,16 @@
 #include "CAAFDefObject.h"
 #endif
 
+//
+// Forward declaration
+//
+class ImplAAFDataDef;
+
 
 class CAAFDataDef
   : public IAAFDataDef,
     public IAAFDataDef2,
+	public IAAFDataDef3,
     public CAAFDefObject
 {
 protected:
@@ -196,6 +202,36 @@ public:
     // @parm [retval,out] aafBoolean_t * | bIsTimecodeKind | pointer to the return value
     aafBoolean_t *  bIsTimecodeKind
   );
+
+
+  //***********************************************************
+  // METHOD NAME: IsDescriptiveKind()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFDataDef3 | IsDescriptiveKind |
+  // Sets return value to TRUE if DataDef is descriptive.
+  // @end
+  // 
+  STDMETHOD (IsDescriptiveKind)
+   (
+    // @parm [retval,out] aafBoolean_t * | bIsDescriptiveKind | pointer to the return value
+    aafBoolean_t *  bIsDescriptiveKind
+  );
+
+  //***********************************************************
+  // METHOD NAME: IsAuxiliaryKind()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFDataDef3 | IsAuxiliaryKind |
+  // Sets return value to TRUE if DataDef is auxiliary.
+  // @end
+  // 
+  STDMETHOD (IsAuxiliaryKind)
+   (
+    // @parm [retval,out] aafBoolean_t * | bIsAuxiliaryKind | pointer to the return value
+    aafBoolean_t *  bIsAuxiliaryKind
+  );
+
 
 
 protected:
