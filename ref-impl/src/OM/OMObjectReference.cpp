@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReference.cpp,v 1.17 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMObjectReference.cpp,v 1.18 2004/11/30 21:25:11 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -562,7 +562,7 @@ OMWeakObjectReference::operator= (const OMWeakObjectReference& rhs)
 {
   TRACE("OMWeakObjectReference::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
   OMObjectReference::operator=(rhs);
