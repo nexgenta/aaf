@@ -25,6 +25,7 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "aafUtils.h"
+#include "AAFInterpolatorDefs.h"
 
 static aafUID_t	zeroID = { 0 };
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
@@ -78,7 +79,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFMasterMob Test";
+	ProductInfo.productName = L"AAFControlPoints Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
