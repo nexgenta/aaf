@@ -26,7 +26,11 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRootStorable
+
 #include "OMRootStorable.h"
+
+#include "OMStoredObject.h"
 
 OMRootStorable::OMRootStorable(void)
 : _clientRoot(0x0002, L"Header"),
@@ -61,8 +65,16 @@ void OMRootStorable::save(void) const
 {
   TRACE("OMRootStorable::save");
 
-  store()->save(classId());
-  store()->save(_persistentProperties);
+  OMRootStorable* nonConstThis = const_cast<OMRootStorable*>(this);
+  store()->save(*nonConstThis);
+}
+
+  // @mfunc Close this <c OMRootStorable>.
+void OMRootStorable::close(void)
+{
+  TRACE("OMRootStorable::close");
+
+  OMStorable::close(); // call base class close() for now
 }
 
   // @mfunc Restore the contents of an <c OMRootStorable>.
@@ -91,4 +103,8 @@ void OMRootStorable::initialize(OMStorable* clientRoot,
 
   _clientRoot = clientRoot;
   _dictionary = dictionary;
+
+  _clientRoot.initialize(OMDictionary::find(0x0002));
+  _dictionary.initialize(OMDictionary::find(0x0001));
+
 }
