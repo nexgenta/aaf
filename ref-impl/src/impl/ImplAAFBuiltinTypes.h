@@ -1,24 +1,11 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFBuiltinTypes_h__
 #define __ImplAAFBuiltinTypes_h__
@@ -27,27 +14,25 @@
 // Support for built-in type definitions.
 //
 
-
 #include "AAFTypes.h"
+#include "OMProperty.h"
 
-#ifndef __ImplAAFSearchableStack_h__
-#include "ImplAAFSearchableStack.h"
-#endif
-
-#ifndef __ImplAAFUID_h__
-#include "ImplAAFUID.h"
-#endif
-
-class ImplAAFDictionary;
 class ImplAAFTypeDef;
 class ImplAAFTypeDefEnum;
+class ImplAAFTypeDefInt;
+class ImplAAFTypeDefFixedArray;
 class ImplAAFTypeDefRecord;
-
+class ImplAAFTypeDefVariableArray;
+class ImplAAFTypeDefStrongObjRef;
+class ImplAAFTypeDefString;
+class ImplAAFDictionary;
 
 class ImplAAFBuiltinTypes
 {
 public:
   ImplAAFBuiltinTypes (ImplAAFDictionary* dictionary);
+  ~ImplAAFBuiltinTypes ();
+
 
   //
   // Creates the requested type def object, registers it in the
@@ -56,26 +41,58 @@ public:
   AAFRESULT ImportBuiltinTypeDef (const aafUID_t & rTypeID,
 								  ImplAAFTypeDef ** ppResult);
 
+private:
 
   //
-  // Creates the requested type def object and initializes the OM
-  // properties therein.
+  // Will create a new type definition object and return it to the
+  // caller.  No attempt is made to see if this type def has already
+  // been created.
   //
   AAFRESULT NewBuiltinTypeDef (const aafUID_t & rTypeID,
 							   ImplAAFTypeDef ** ppResult);
 
-  //
-  // If the given type defs are built-in, will register their
-  // offsets/sizes.
-  //
-  static void RegisterExistingType (ImplAAFTypeDefEnum * ptde);
-  static void RegisterExistingType (ImplAAFTypeDefRecord * ptdr);
 
-private:
+  AAFRESULT TypeDefAUID (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefAUIDArray (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefUInt8Array (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefUInt8Array8 (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefUInt8 (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefUInt16 (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefInt16 (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefUInt32 (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefInt32 (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefInt64 (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefObjRef (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefObjRefArray (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefWCharString (ImplAAFTypeDef ** ptd);
+  AAFRESULT TypeDefFadeType (ImplAAFTypeDef ** ptd);
 
   ImplAAFDictionary* _dictionary; // pointer back to associated dictionary (temp)
+  ImplAAFTypeDefRecord *        _TD_AUID;
+  ImplAAFTypeDefVariableArray * _TD_AUIDArray;
+  ImplAAFTypeDefVariableArray * _TD_UInt8Array;
+  ImplAAFTypeDefFixedArray *    _TD_UInt8Array8;
+  ImplAAFTypeDefInt *           _TD_UInt8;
+  ImplAAFTypeDefInt *           _TD_UInt16;
+  ImplAAFTypeDefInt *           _TD_Int16;
+  ImplAAFTypeDefInt *           _TD_UInt32;
+  ImplAAFTypeDefInt *           _TD_Int32;
+  ImplAAFTypeDefInt *           _TD_Int64;
+  ImplAAFTypeDefStrongObjRef *  _TD_ObjRef;
+  ImplAAFTypeDefVariableArray * _TD_ObjRefArray;
+  ImplAAFTypeDefString *        _TD_WCharString;
+  ImplAAFTypeDefEnum *          _TD_FadeType;
 
-  ImplAAFSearchableStack<ImplAAFUID> _lookupStack;
+  typedef AAFRESULT (ImplAAFBuiltinTypes::*pTypeFunc_t)(ImplAAFTypeDef**);
+
+  struct TypeTblEntry
+  {
+	const aafUID_t * pID;
+	pTypeFunc_t      pTypeFunc;
+  };
+
+  static /*const*/ TypeTblEntry sBuiltinTypeTable[];
+
 };
 
 #endif // ! __ImplAAFBuiltinTypes_h__
