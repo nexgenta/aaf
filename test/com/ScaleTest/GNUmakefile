@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.1 2005/03/18 16:10:33 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.2 2005/04/01 02:58:14 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,13 @@ PACKAGE = Test
 AAFBASE ?= ../../..
 
 
+ifeq ($(shell uname), IRIX)
+# Warnings turned off:
+# 1107 - signed bit field has length of 1 bit in various stl files
+MODULE_PLATFORM_CFLAGS = -LANG:std -woff 1107
+LIBCIO = -lCio
+endif
+
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
@@ -44,7 +51,7 @@ $(AAFSDKBINDIR)/ScaleTest$(EXE) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
 else
 $(AAFSDKBINDIR)/ScaleTest$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) -o $@
+	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
 endif
 
 
