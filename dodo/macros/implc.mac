@@ -22,6 +22,23 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c Pass through argument if for idl otherwise omit it.
+#c 
+#c This macro is generally used to specify IDL options that would
+#c make since to emit to c++.
+#c To allow proper marshalling code generation of a struct: |
+#c typedef struct
+#c {
+#c     aafInt32 length;
+#c     AD_IDL([length_is(length)]) aafWchar *str;
+#c } aafString_t;
+#c
+#startm AD_IDL 01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Includes another file.
 #c
 #c Argument: Base filename
@@ -40,6 +57,14 @@
 #c Arguments: none
 #c
 #startm AD_HEAD 00
+/******************************************\\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\\******************************************/
 #endm
 
 
@@ -144,10 +169,6 @@ Impl%01\
 #include "Impl.this-module.h"
 #endif
 
-#ifndef __.this-module_h__
-#include ".this-module.h"
-#endif
-
 #include <assert.h>
 
 
@@ -162,6 +183,18 @@ Impl.this-module::~Impl.this-module ()
 
 #ccccccccccccccccccccccccccc
 #c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_BEGIN 01
+AD_CLASS_BEGIN\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Starts a class definition with no parent class
 #c
 #c Arguments: none
@@ -170,6 +203,9 @@ Impl.this-module::~Impl.this-module ()
 #ifndef __Impl.this-module_h__
 #include "Impl.this-module.h"
 #endif
+
+// Include the declaration for the reference counting container callback function.
+#include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 
@@ -182,6 +218,32 @@ Impl.this-module::Impl.this-module ()
 Impl.this-module::~Impl.this-module ()
 {}
 
+
+// Increment the object reference count.
+aafUInt32 Impl.this-module::AcquireReference() const
+{ // inforce conceptual 'constness'
+  // Delegate to global function to increment the reference
+  // count for this implementation object's COM or C++ API object.
+  return AcquireImplReference(const_cast<Impl.this-module *>(this));
+}
+
+// Decrement the object reference count and delete the container.
+aafUInt32 Impl.this-module::ReleaseReference()
+{
+  // If there is only a single reference left it is the container's
+  // reference to this implementation object. Tell the container to
+  // Delete itself. The container's destructor will delete this
+  // object.
+  return ReleaseImplReference(this);
+}
+
+// Just return the count. (this could be inline in the header...)
+aafUInt32 Impl.this-module::ReferenceCount() const
+{ // inforce conceptual 'constness'
+  // Delegate to global function to return the reference
+  // count for this implementation object's COM or C++ API object.
+  return ReferenceImplCount(const_cast<Impl.this-module *>(this));
+}
 
 void Impl.this-module::InitContainer (void * pContainer)
 {
@@ -273,6 +335,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 17: method description
 #c
 #startm AD_XMETHOD3 17
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/)
@@ -300,7 +363,8 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 22: method description
 #c
 #startm AD_XMETHOD4 22
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
+ AAFRESULT STDMETHODCALLTYPE
+   Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
                            .%18-adornment%19 .%18-indirection /*%20*/)
@@ -329,6 +393,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 27: method description
 #c
 #startm AD_XMETHOD5 27
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -360,7 +425,8 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 32: method description
 #c
 #startm AD_XMETHOD6 32
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
+AAFRESULT STDMETHODCALLTYPE
+   Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
                            .%18-adornment%19 .%18-indirection /*%20*/,
@@ -393,6 +459,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 37: method description
 #c
 #startm AD_XMETHOD7 37
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -428,6 +495,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 42: method description
 #c
 #startm AD_XMETHOD8 42
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -465,6 +533,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 47: method description
 #c
 #startm AD_XMETHOD9 47
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -504,6 +573,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 52: method description
 #c
 #startm AD_XMETHOD_10 52
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -545,6 +615,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 57: method description
 #c
 #startm AD_XMETHOD_11 57
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -569,6 +640,22 @@ AAFRESULT STDMETHODCALLTYPE
 #c Arguments: none
 #c
 #startm AD_CLASS_END 00
+
+extern "C" const aafClassID_t CLSID_.this-module;
+
+OMDEFINE_STORABLE(Impl.this-module, CLSID_.this-module);
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_END 01
+AD_CLASS_END\
 #endm
 
 
@@ -579,8 +666,6 @@ AAFRESULT STDMETHODCALLTYPE
 #c Arguments: none
 #c
 #startm AD_ROOT_CLASS_END 00
-
-class IAAFObject;
 
 void * Impl.this-module::GetContainer ()
 {
@@ -597,7 +682,18 @@ void * Impl.this-module::GetContainer ()
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
-Impl%01-cpp(.this-module)
+%01-implc(.this-module)
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Specifies a method in a separate COM interface.
+#c
+#c Argument: method declaration
+#c
+#startm AD_COM_METH 01
+%01-com-meth-implc(.this-module)
 #endm
 
 
@@ -691,6 +787,23 @@ Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/,
 
 #ccccccccccccccccccccccccccc
 #c
+#c Inserts declaration for a static method used to bootstrap an AAF
+#c session by creating the first session object.
+#c
+#startm AD_BEGIN_SESSION 00
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a static method used for a container to create
+#c its contained objects in the cpp API.
+#c
+#startm AD_STATIC_CREATE 00
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c The following macros assist in passing arguments to methods of the
 #c contained implementation class:
 #c
@@ -721,4 +834,14 @@ Impl\
 
 #startm .objOut-adornment 00
 Impl\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Hack to quote the .this-module macro and keep it out of export
+#c files.  Do not define this macro in exp.mac!!!
+#c
+#startm AD_EXPORT_THIS_MODULE 00
+.this-module\
 #endm

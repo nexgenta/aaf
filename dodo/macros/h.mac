@@ -221,6 +221,10 @@ AD_CLASS_BEGIN\
 #include "AAFTypes.h"
 #endif
 
+#ifndef __AAFResult_h_
+#include "AAFResult.h"
+#endif
+
 //
 // Forward declaration
 //
@@ -239,9 +243,9 @@ public:
 
 
   // Reference Counting interface
-  virtual aafUInt32 AcquireRef();
-  virtual aafUInt32 ReleaseRef();
-  virtual aafUInt32 RefCount();
+  virtual aafUInt32 AcquireReference() const;
+  virtual aafUInt32 ReleaseReference();
+  virtual aafUInt32 ReferenceCount() const;
 
 public:\
 #endm
