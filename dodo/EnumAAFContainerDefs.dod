@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 EnumAAFContainerDefs\
 #endm
@@ -13,6 +6,14 @@ AAFRoot\
 #endm
 #c
 AD_HEAD
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
+
 
 AD_FORWARD_DECLARATION(AAFContainerDef)
 
