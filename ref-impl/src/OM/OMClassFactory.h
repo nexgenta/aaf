@@ -1,51 +1,54 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
-
-// @doc OMEXTERNAL
 #ifndef OMCLASSFACTORY_H
 #define OMCLASSFACTORY_H
 
-#include "OMDataTypes.h"
+#include "OMPortability.h"
+#include "OMTypes.h"
 
 class OMStorable;
 
-// @class Abstract base class decribing the class factory used by
-//        the Object Manager and provided by Object Manager clients.
-//
 class OMClassFactory {
 public:
-  // @access Public members.
 
-    //@cmember Destructor.
-  virtual ~OMClassFactory(void) {}
+  // Create with space for `capacity' entries.
+  //
+  OMClassFactory(int capacity);
 
-    // @cmember Create an instance of the appropriate derived class,
-    //          given the class id.
-  virtual OMStorable* create(const OMClassId& classId) const = 0;
+  // Register a class id and its associated creation function.
+  //
+  void add(const OMClassId& classId, OMStorable* (*create)(const OMClassId&));
+
+  // Deregister a class id.
+  //
+  void remove(const OMClassId& classId);
+
+  // Create an instance of the appropriate derived class, given the class id.
+  //
+  OMStorable* create(const OMClassId& classId) const;
+
+protected:
+
+  struct FactoryEntry;
+
+  // FactoryEntry for `classId' or null if not found.
+  //
+  FactoryEntry* find(const OMClassId& classId) const;
+
+  // First free entry or null if full.
+  //
+  FactoryEntry* find(void) const;
+
+  static bool equal(const OMClassId& ida, const OMClassId& idb);
+
+private:
+
+  struct FactoryEntry {
+    OMClassId _classId;
+    OMStorable* (*_creationFunction)(const OMClassId&);
+    int _valid;
+  };
+
+  int _capacity;        // Number of potential entries.
+  FactoryEntry* _table; // Dynamically allocated array.
 
 };
 
