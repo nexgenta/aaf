@@ -15,7 +15,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -73,7 +73,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AddMasterSlot
         (// @parm [in] Data kind of new Master Mob slot
-		 aafUID_t * pDataDef,
+		 ImplAAFDataDef * pDataDef,
 
 		 // @parm [in] Slot ID of the Source Mob slot to be added to the Master Mob
          aafSlotID_t  sourceSlotID,
@@ -85,7 +85,7 @@ public:
 		 aafSlotID_t  masterSlotID,
 
 		 // @parm [in, string] Name to assign to new slot in Master Mob
-		 aafWChar *  pSlotName);
+		 const aafWChar *  pSlotName);
 
 
 
@@ -95,13 +95,13 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeName
         (// @parm [in] SlotID of the Master Mob slot
-		 aafInt32  masterSlotID,
+		 aafUInt32  masterSlotID,
 
 		 // @parm [out, size_is(bufSize), string] The returned name
 		 aafWChar *  pTapeName,
 
 		 // @parm [in] the size of the pTapeName buffer
-         aafInt32  bufSize);
+         aafUInt32  bufSize);
 
 
   //****************
@@ -110,10 +110,10 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeNameBufLen
         (// @parm [in] SlotID of the Master Mob slot
-		 aafInt32  masterSlotID,
+		 aafUInt32  masterSlotID,
 
 		 // @parm [out] required buffer length
-         aafInt32 *  pLen);
+         aafUInt32 *  pLen);
 
 
   //****************
@@ -249,15 +249,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     NewPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 aafRational_t  editrate,
+		 const aafRational_t & editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
+         ImplAAFDataDef * pEssenceKind,
 
-		aafSourceRef_t  ref,
+		 aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -268,15 +268,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 aafRational_t  editrate,
+		 const aafRational_t & editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
+         ImplAAFDataDef * pEssenceKind,
 
-		aafSourceRef_t  ref,
+		 aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -291,7 +291,7 @@ public:
          aafSlotID_t  masterSlotID,
 
          // @parm [in] create essence of this type
-         aafUID_t	mediaKind,
+         ImplAAFDataDef * pMediaKind,
 
  		 aafUID_t			codecID,
 		 aafRational_t	editRate,
@@ -323,7 +323,7 @@ public:
     CreateMultiEssence
         (
  							aafUID_t codecID,
-                          aafInt16  /*arrayElemCount*/,
+                          aafUInt16  /*arrayElemCount*/,
                            aafmMultiCreate_t *  /*mediaArray*/,
                            aafCompressEnable_t  /*Enable*/,
 							ImplAAFLocator		*destination,
@@ -400,10 +400,10 @@ public:
 
   /****/
   //****************
-  // GetNumChannels()
+  // CountChannels()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumChannels
+    CountChannels
         (// @parm [in] On this slot
          aafSlotID_t  slotID,
 
@@ -411,10 +411,10 @@ public:
          aafMediaCriteria_t*  mediaCrit,
 
          // @parm [in] for this essence type
-         aafUID_t mediaKind,
+         ImplAAFDataDef * pMediaKind,
 
          // @parm [out] How many channels?
-         aafInt16*  numCh);
+         aafUInt16*  numCh);
 	//@comm Returns the number of interleaved essence channels of a given type in the essence stream referenced by the given file mob
 	//@comm If the data format is not interleaved, then the answer will
 	// always be zero or one.  This function correctly returns zero
