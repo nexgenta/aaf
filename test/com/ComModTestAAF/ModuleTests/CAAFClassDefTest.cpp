@@ -1,31 +1,26 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFClassDef
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAF.h"
 #include "AAFResult.h"
@@ -47,6 +42,7 @@ typedef IAAFSmartPointer<IAAFHeader>               IAAFHeaderSP;
 typedef IAAFSmartPointer<IAAFPropertyDef>          IAAFPropertyDefSP;
 typedef IAAFSmartPointer<IAAFTypeDef>              IAAFTypeDefSP;
 typedef IAAFSmartPointer<IEnumAAFPropertyDefs>     IEnumAAFPropertyDefsSP;
+typedef IAAFSmartPointer<IAAFMetaDefinition>       IAAFMetaDefinitionSP;
 
 // Structure used internally by class CAAFModTestLog below
 class CAAFModTestLogEntry
@@ -65,6 +61,8 @@ class CAAFModTestLog
 {
 public:
 	CAAFModTestLog(int iMethods,const char **ppMethodNames);
+	~CAAFModTestLog();
+
 	// Mark a specific method as having been tested.  Note that T is always effectively an integer type.
 	void MarkAsTested(T Method)
 	{
@@ -86,7 +84,9 @@ private:
 
 // CAAFModTestLog allocates array of CAAFModTestLogEntry in which to keep track of tests.
 template <class T>
-CAAFModTestLog<T>::CAAFModTestLog(int iMethods,const char **ppMethodNames)
+CAAFModTestLog<T>::CAAFModTestLog(int iMethods,const char **ppMethodNames):
+  _iMethods(0),
+  _pLog(NULL)
 {
 	_iMethods=iMethods;
 	_pLog=new CAAFModTestLogEntry[_iMethods];
@@ -96,6 +96,13 @@ CAAFModTestLog<T>::CAAFModTestLog(int iMethods,const char **ppMethodNames)
 		_pLog[n]._bTestPassed=kAAFTrue;
 		_pLog[n]._pName=ppMethodNames[n];
 	}
+}
+
+template <class T>
+CAAFModTestLog<T>::~CAAFModTestLog()
+{
+  delete [] _pLog;
+  _pLog = NULL;
 }
 
 // PrintSummary() prints a summary of the results of the tests that were carried out for the
@@ -204,6 +211,13 @@ static aafCharacter_constptr pNewClassName=L"New Class";
 static aafCharacter_constptr pNewPropertyName=L"New Property";
 static aafCharacter_constptr pOptionalPropertyName=L"Optional Property";
 
+
+// {CADEF284-6D3C-11d3-8449-00600832ACB8}
+static const aafUID_t ourPid2 = 
+{ 0xcadef284, 0x6d3c, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
+static aafCharacter_constptr kOptionalObjectPropertyName = L"Optional Object Property";
+
+
 // Use existing class AAFFiller as parent for the new class definition we will 
 // create
 static aafUID_t AUID_ParentClass=AUID_AAFFiller;
@@ -262,8 +276,13 @@ static void VerifyAAFFile(CAAFClassDefTestLog& Log,IAAFFileSP pFile)
 	checkExpression(pFile!=0);
 	checkResult(pFile->GetHeader(&pHeader));
 	checkExpression(pHeader!=0);
+  
+	aafProductVersion_t toolkitVersion, fileToolkitVersion;
+	checkResult(GetAAFVersions(pHeader, &toolkitVersion, &fileToolkitVersion));
+
 	checkResult(pHeader->GetDictionary(&pDict));
 	checkExpression(pDict!=0);
+  
 
 	// Look up the new class we created
 	IAAFClassDefSP pNewClass;
@@ -367,6 +386,14 @@ static void VerifyAAFFile(CAAFClassDefTestLog& Log,IAAFFileSP pFile)
 		if(AreUnksSame(pReturnedParent,pParentClass)==kAAFFalse)
 			Log.MarkTestFailed(GET_PARENT);
 	}
+
+	if (ExtendingAAFObjectSupported(toolkitVersion) && ExtendingAAFObjectSupported(fileToolkitVersion))
+	{
+		IAAFClassDefSP pObjectClass;
+		IAAFPropertyDefSP propDef2;
+		checkResult(pDict->LookupClassDef(AUID_AAFObject, &pObjectClass));
+		checkResult(pObjectClass->LookupPropertyDef(ourPid2, &propDef2));
+	}
 }
 
 // This function creates the AAF file we will use for our test, and also performs
@@ -378,10 +405,6 @@ static void CreateAAFFile(CAAFClassDefTestLog& Log)
 	// {CADEF283-6D3C-11d3-8449-00600832ACB8}
 	aafUID_t ourPid1 = 
 	{ 0xcadef283, 0x6d3c, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-	// {CADEF284-6D3C-11d3-8449-00600832ACB8}
-	aafUID_t ourPid2 = 
-	{ 0xcadef284, 0x6d3c, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
 	// {CADEF285-6D3C-11d3-8449-00600832ACB8}
 	aafUID_t ourPid3 = 
@@ -412,8 +435,12 @@ static void CreateAAFFile(CAAFClassDefTestLog& Log)
 	checkResult(pFile->GetHeader(&pHeader));
 	checkExpression(pHeader!=0);
 
+	aafProductVersion_t toolkitVersion;
+	checkResult(GetAAFVersions(pHeader, &toolkitVersion, NULL));
+
 	checkResult(pHeader->GetDictionary(&pDict));
 	checkExpression(pDict!=0);
+
 
 	IAAFTypeDefSP ptd;
 	checkResult(pDict->LookupTypeDef(kAAFTypeID_UInt8, &ptd));
@@ -426,16 +453,6 @@ static void CreateAAFFile(CAAFClassDefTestLog& Log)
 	if(badClass1->RegisterOptionalPropertyDef (ourPid1,L"First prop",ptd,
 		&propDef1)!=AAFRESULT_NOT_EXTENDABLE)
 		Log.MarkTestFailed(REGISTER_OPTIONAL_PROPERTY_DEF);
-	
-	// Try to extend an AAFObject.  Should fail, for now at least.
-	IAAFClassDefSP badClass2;
-	checkResult(pDict->LookupClassDef (AUID_AAFObject, &badClass2));
-	
-	IAAFPropertyDefSP propDef2;
-	if(badClass2->RegisterOptionalPropertyDef (ourPid2,L"Second prop",ptd,
-		&propDef2)!=AAFRESULT_NOT_EXTENDABLE)
-		Log.MarkTestFailed(REGISTER_OPTIONAL_PROPERTY_DEF);
-
 	// Try to extend an AAFSequence.  Should succeed.
 	IAAFClassDefSP goodClass;
 	checkResult(pDict->LookupClassDef (AUID_AAFSequence, &goodClass));
@@ -514,6 +531,22 @@ static void CreateAAFFile(CAAFClassDefTestLog& Log)
 
 	// Register our new class definition in the dictionary.
 	checkResult(pDict->RegisterClassDef(pNewClass));
+
+	
+	// Try to extend an AAFObject.  Should fail, for now at least.
+	IAAFClassDefSP badClass2;
+	checkResult(pDict->LookupClassDef (AUID_AAFObject, &badClass2));
+	IAAFPropertyDefSP propDef2;
+	// The following call will succeed on "some newer" toolkits.
+	HRESULT result = badClass2->RegisterOptionalPropertyDef (ourPid2, kOptionalObjectPropertyName, ptd,&propDef2);
+	if (FAILED(result))
+	{
+		if (ExtendingAAFObjectSupported(toolkitVersion))
+			Log.MarkTestFailed(REGISTER_OPTIONAL_PROPERTY_DEF);
+		else if (result!=AAFRESULT_NOT_EXTENDABLE)
+			Log.MarkTestFailed(REGISTER_OPTIONAL_PROPERTY_DEF);
+	}
+
 
 	VerifyAAFFile(Log,pFile);
 
