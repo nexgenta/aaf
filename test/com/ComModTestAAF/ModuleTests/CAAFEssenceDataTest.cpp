@@ -34,27 +34,12 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
-
-static const 	aafMobID_t	TEST_MobIDs[2] =
-{// begin mobid's ...
-	//first id
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x79a699c8, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
-
-	//second if
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xe7824a42, 0x040c, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}
-
-}; // ...end mobid's
 
 
 // Utility class to implement the test.
@@ -66,7 +51,7 @@ struct EssenceDataTest
   void createFile(wchar_t *pFileName);
   void openFile(wchar_t *pFileName);
 
-  void createFileMob(unsigned int mobid_Index);
+  void createFileMob();
   void createEssenceData(IAAFSourceMob *pSourceMob);
   void openEssenceData();
 
@@ -85,7 +70,6 @@ struct EssenceDataTest
 
   // Shared member data:
   HRESULT _hr;
-  aafProductVersion_t _prodecutVersion;
   aafProductIdentification_t _productInfo;
   IAAFFile *_pFile;
   bool _bFileOpen;
@@ -108,7 +92,7 @@ struct EssenceDataTest
 extern "C" HRESULT CAAFEssenceData_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t *fileName = L"AAFEssenceDataTest.aaf";
+  wchar_t fileName[] = L"AAFEssenceDataTest.aaf";
   EssenceDataTest edt;
 
   try
@@ -124,8 +108,7 @@ extern "C" HRESULT CAAFEssenceData_test()
   catch (...)
   {
     cerr << "CAAFEssenceData_test...Caught general C++"
-		 << " exception!" << endl; 
-	hr = AAFRESULT_TEST_FAILED;
+    " exception!" << endl; 
   }
 
   // Cleanup our object if it exists.
@@ -187,14 +170,15 @@ EssenceDataTest::EssenceDataTest():
   _buffer(NULL),
   _bufferSize(0)
 {
-  _prodecutVersion.major = 1;
-  _prodecutVersion.minor = 0;
-  _prodecutVersion.tertiary = 0;
-  _prodecutVersion.patchLevel = 0;
-  _prodecutVersion.type = kAAFVersionUnknown;
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   _productInfo.companyName = L"AAF Developers Desk";
   _productInfo.productName = L"AAFEssenceData Test";
-  _productInfo.productVersion = &_prodecutVersion;
+  _productInfo.productVersion = &v;
   _productInfo.productVersionString = NULL;
   _productInfo.productID = UnitTestProductID;
   _productInfo.platform = NULL;
@@ -327,8 +311,8 @@ void EssenceDataTest::createFile(wchar_t *pFileName)
   check(_pFile->GetHeader(&_pHeader));
   check(_pHeader->GetDictionary(&_pDictionary));
 
-  createFileMob(0); //use unique mobid's (without using cocreate guid()
-  createFileMob(1); //use unique mobid's (without using cocreate guid()
+  createFileMob();
+  createFileMob();
 
   check(_pFile->Save());
 
@@ -346,7 +330,7 @@ void EssenceDataTest::openFile(wchar_t *pFileName)
   cleanupReferences();
 }
 
-void EssenceDataTest::createFileMob(unsigned int mobid_Index)
+void EssenceDataTest::createFileMob()
 {
   assert(_pFile && _pHeader && _pDictionary);
   assert(NULL == _pSourceMob);
@@ -363,19 +347,14 @@ void EssenceDataTest::createFileMob(unsigned int mobid_Index)
 
   check(_pSourceMob->QueryInterface (IID_IAAFMob, (void **)&_pMob));
   
-  check(_pMob->SetMobID(TEST_MobIDs[mobid_Index]));
+  aafMobID_t newMobID = {0};
+  check(CoCreateGuid((GUID *)&newMobID));
+  check(_pMob->SetMobID(newMobID));
   check(_pMob->SetName(L"EssenceDataTest File Mob"));
   
-  // instantiate a concrete subclass of FileDescriptor
-  check(defs.cdAIFCDescriptor()->
-		CreateInstance(IID_IAAFFileDescriptor,
+  check(defs.cdFileDescriptor()->
+		CreateInstance(IID_IAAFEssenceDescriptor, 
 					   (IUnknown **)&_pFileDescriptor));
-
-	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
-	check(_pFileDescriptor->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-	check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-	pAIFCDesc->Release();
-	pAIFCDesc = NULL;
 
   check(_pFileDescriptor->QueryInterface (IID_IAAFEssenceDescriptor,
                                           (void **)&_pEssenceDescriptor));

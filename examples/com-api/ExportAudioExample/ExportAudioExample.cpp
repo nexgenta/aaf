@@ -17,7 +17,7 @@
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDefUIDS.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
 #include "AAFContainerDefs.h"
@@ -227,7 +227,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		/* Create the Essence Data specifying the codec, container, edit rate and sample rate */
 		check(pMasterMob->CreateEssence(1,				// Slot ID
 									pSoundDef,			// MediaKind
-									kAAFCodecWAVE,			// codecID
+									CodecWave,			// codecID
 									editRate,			// edit rate
 									sampleRate,			// sample rate
 									kAAFCompressionDisable,

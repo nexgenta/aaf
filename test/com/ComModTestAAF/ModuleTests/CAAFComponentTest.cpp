@@ -31,7 +31,6 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -42,16 +41,6 @@
 #include "CAAFBuiltinDefs.h"
 
 static aafWChar *slotName = L"SLOT1";
-
-static const	aafMobID_t	TEST_MobID = 
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xb9768af0, 0x03fd, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-static const	aafMobID_t	TEST_referencedMobID = 
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xc2fff2f0, 0x03fd, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -98,6 +87,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafLength_t					testLength = TEST_LENGTH;
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
+	aafMobID_t					newMobID, referencedMobID;
 	aafUID_t					dataDef = TEST_DDEF;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
@@ -135,14 +125,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdMasterMob()->
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pReferencedMob));
-		checkResult(pReferencedMob->SetMobID(TEST_referencedMobID));
+		checkResult(CoCreateGuid((GUID *)&referencedMobID));
+		checkResult(pReferencedMob->SetMobID(referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
 
 		// Create a Mob
 		checkResult(defs.cdCompositionMob()->
 					CreateInstance(IID_IAAFMob,
 								   (IUnknown **)&pMob));
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"AAFSourceClipTest"));
 
 		// Create a SourceClip
@@ -294,40 +286,34 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
-			aafMobID_t	debugMobID;
-
-			checkResult(pMob->GetMobID(&debugMobID));
 			checkResult(pMob->CountSlots(&numSlots));
-			if(0 != numSlots)	// numSlots == 0 on referenced mob
+			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
+
+			checkResult(pMob->GetSlots(&pSlotIter));
+			while (AAFRESULT_SUCCESS == pSlotIter->NextOne(&pSlot))
 			{
-				checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
-				
-				checkResult(pMob->GetSlots(&pSlotIter));
-				while (AAFRESULT_SUCCESS == pSlotIter->NextOne(&pSlot))
-				{
-					// The segment should be a source clip...
-					checkResult(pSlot->GetSegment(&pSegment));
-					checkResult(pSegment->QueryInterface (IID_IAAFComponent,
-						(void **)&comp));
-					checkResult(comp->GetDataDef (&pDataDef));
-					checkResult(pDataDef->QueryInterface (IID_IAAFDefObject,
-						(void **)&pDefObj));
-					checkResult(pDefObj->GetAUID (&testUID));
-					pDataDef->Release ();
-					pDataDef = 0;
-					pDefObj->Release ();
-					pDefObj = 0;
-					checkExpression(memcmp(&testUID, &checkUID, sizeof(testUID)) == 0, AAFRESULT_TEST_FAILED);
-					checkResult(comp->GetLength (&testLength));
-					checkExpression(TEST_LENGTH == testLength, AAFRESULT_TEST_FAILED);
-					comp->Release();
-					comp = NULL;
-					pSegment->Release();
-					pSegment = NULL;
-					
-					pSlot->Release();
-					pSlot = NULL;
-				}
+				// The segment should be a source clip...
+				checkResult(pSlot->GetSegment(&pSegment));
+				checkResult(pSegment->QueryInterface (IID_IAAFComponent,
+                                          (void **)&comp));
+				checkResult(comp->GetDataDef (&pDataDef));
+				checkResult(pDataDef->QueryInterface (IID_IAAFDefObject,
+                                          (void **)&pDefObj));
+				checkResult(pDefObj->GetAUID (&testUID));
+				pDataDef->Release ();
+				pDataDef = 0;
+				pDefObj->Release ();
+				pDefObj = 0;
+				checkExpression(memcmp(&testUID, &checkUID, sizeof(testUID)) == 0, AAFRESULT_TEST_FAILED);
+				checkResult(comp->GetLength (&testLength));
+				checkExpression(TEST_LENGTH == testLength, AAFRESULT_TEST_FAILED);
+				comp->Release();
+				comp = NULL;
+				pSegment->Release();
+				pSegment = NULL;
+
+				pSlot->Release();
+				pSlot = NULL;
 			}
 
 			pMob->Release();
@@ -434,7 +420,7 @@ extern "C" HRESULT CAAFComponent_test()
 	catch (...)
 	{
 	  cerr << "CAAFComponent_test...Caught general C++"
-		   << " exception!" << endl; 
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

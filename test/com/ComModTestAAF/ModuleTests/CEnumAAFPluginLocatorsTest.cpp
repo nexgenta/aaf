@@ -42,14 +42,12 @@ static wchar_t *manuf2URL = L"www.avid.com";
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "AAFClassDefUIDs.h"
-#include "AAFUtils.h"
+#include "aafUtils.h"
 #include "AAFCodecDefs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -152,8 +150,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*	pDictionary = NULL;
   IAAFDefObject*	pPlugDef = NULL;
   IAAFCodecDef*		pCodecDef = NULL;
-  IAAFClassDef*		pClassDef = NULL;
-  IAAFPluginDef *pDesc = NULL;
+  IAAFPluginDescriptor *pDesc = NULL;
   IAAFNetworkLocator *pNetLoc = NULL, *pNetLoc2 = NULL, *pNetLoc3 = NULL;
   IAAFLocator		*pLoc = NULL, *pLoc2 = NULL, *pLoc3 = NULL;
   aafUID_t			category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
@@ -180,8 +177,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFDefObject, 
 							   (IUnknown **)&pPlugDef));
     
-	checkResult(defs.cdPluginDef()->
-				CreateInstance(IID_IAAFPluginDef, 
+	checkResult(defs.cdPluginDescriptor()->
+				CreateInstance(IID_IAAFPluginDescriptor, 
 							   (IUnknown **)&pDesc));
 	checkResult(defs.cdNetworkLocator()->
 				CreateInstance(IID_IAAFNetworkLocator, 
@@ -225,15 +222,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(pLoc2->SetPath (manuf2URL));
     checkResult(pDesc->AppendLocator(pLoc2));
 	/**/
-	checkResult(pDesc->SetDefinitionObjectID(TestPluginDesc));
+	checkResult(pPlugDef->AppendPluginDef(pDesc));
 
 	
 	checkResult(pPlugDef->QueryInterface (IID_IAAFCodecDef,
                                           (void **)&pCodecDef));
-	checkResult(pCodecDef->Initialize (kAAFNoCodec, L"TestCodec", L"Just a test"));
+	checkResult(pCodecDef->Initialize (NoCodec, L"TestCodec", L"Just a test"));
 	checkResult(pCodecDef->AddEssenceKind (defs.ddMatte()));
-	checkResult(pDictionary->LookupClassDef(kAAFClassID_EssenceDescriptor, &pClassDef));
-	checkResult(pCodecDef->SetFileDescriptorClass (pClassDef));
 	checkResult(pDictionary->RegisterCodecDef(pCodecDef));
 	/**/
 	checkResult(defs.cdNetworkLocator()->
@@ -267,8 +262,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     pNetLoc2->Release();
   if (pNetLoc3)
     pNetLoc3->Release();
-  if (pClassDef)
-    pClassDef->Release();
   if (pLoc)
     pLoc->Release();
   if (pLoc2)
@@ -303,8 +296,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFCodecDefs *pEnumPluggable = NULL;
 	IAAFCodecDef *pCodecDef = NULL;
 	IAAFDefObject *pDefObj = NULL;
-	IEnumAAFPluginDefs *pEnumDesc;
-	IAAFPluginDef *pPlugin = NULL;
+	IEnumAAFPluginDescriptors *pEnumDesc;
+	IAAFPluginDescriptor *pPlugin = NULL;
 	IAAFNetworkLocator	*pNetLoc = NULL;
 	IAAFLocator			*pLocator = NULL;
 	IEnumAAFPluginLocators *pEnumLoc = NULL;
@@ -326,7 +319,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetPluginDefs (&pEnumDesc));
+		checkResult(pDictionary->GetCodecDefs(&pEnumPluggable));
+		checkResult(pEnumPluggable->NextOne (&pCodecDef));
+		checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject, (void **)&pDefObj));
+		checkResult(pDefObj->GetPluginDefs (&pEnumDesc));
 		checkResult(pEnumDesc->NextOne (&pPlugin));
 
 		/**/
@@ -454,9 +450,7 @@ extern "C" HRESULT CEnumAAFPluginLocators_test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFPluginLocators_test..."
-			 << "Caught general C++ exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CEnumAAFPluginLocators_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.

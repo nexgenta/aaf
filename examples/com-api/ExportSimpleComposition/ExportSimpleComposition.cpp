@@ -17,12 +17,12 @@
 #include <stdlib.h>
 
 #if defined(macintosh) || defined(_MAC)
-#include "DataInput.h"
+#include <console.h> /* Mac command line window */
 #endif
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDefUIDS.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
 #include "AAFContainerDefs.h"
@@ -257,7 +257,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 			/* Create the Essence Data specifying the codec, container, edit rate and sample rate */
 			check(pMasterMob->CreateEssence(1,				// Slot ID
 				pSoundDef,			// MediaKind
-				kAAFCodecWAVE,		// codecID
+				CodecWave,			// codecID
 				editRate,			// edit rate
 				sampleRate,			// sample rate
 				kAAFCompressionDisable,
@@ -855,6 +855,12 @@ void usage(void)
 //  The specified filename is the name of the file that is created by the program.
 int main(int argumentCount, char* argumentVector[])
 {
+	/* console window for mac */
+	#if defined(macintosh) || defined(_MAC)
+	argumentCount = ccommand(&argumentVector);
+	#endif
+
+
 	CComInitialize comInit;
 	CAAFInitialize aafInit;
 
@@ -894,7 +900,7 @@ int main(int argumentCount, char* argumentVector[])
 	// Access the AAF file with name set from argument or lack thereof
 	printf("Working on file %s using ReadSamples\n", pFileName);
 	ProcessAAFFile(pwFileName, testStandardCalls);
-
+	
 	printf("DONE\n\n");
 
 	return(0);

@@ -1,24 +1,43 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+// @com This file implements the module test for CEnumAAFSegments
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
-#ifndef __CEnumAAFSegments_h__
-#include "CEnumAAFSegments.h"
-#endif
+#include "AAF.h"
 
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 #include <iostream.h>
 #include <stdio.h>
 
 #include "AAFStoredObjectIDs.h"
+#include "AAFDefUIDs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -55,49 +74,29 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFSelector Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productName = L"EnumAAFSegments Test";
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
-	/*
-	hr = CoCreateInstance(CLSID_AAFSession,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFSession, 
-						   (void **)ppSession);
-	*/
-	hr = CoCreateInstance(CLSID_AAFFile,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFFile, 
-						   (void **)ppFile);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-    hr = (*ppFile)->Initialize();
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	// hr = (*ppSession)->SetDefaultIdentification(&ProductInfo);
-	// if (AAFRESULT_SUCCESS != hr)
-	// 	return hr;
+	*ppFile = NULL;
 
 	switch (mode)
 	{
-	case kMediaOpenReadOnly:
-		// hr = (*ppSession)->OpenReadFile(pFileName, ppFile);
-		hr = (*ppFile)->OpenExistingRead(pFileName, 0);
+	case kAAFMediaOpenReadOnly:
+		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kMediaOpenAppend:
-		// hr = (*ppSession)->CreateFile(pFileName, kAAFRev1, ppFile);
-		hr = (*ppFile)->OpenNewModify(pFileName, 0, &ProductInfo);
+	case kAAFMediaOpenAppend:
+		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
 	default:
@@ -107,18 +106,17 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		// (*ppSession)->Release();
-		// *ppSession = NULL;
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
   	hr = (*ppFile)->GetHeader(ppHeader);
 	if (FAILED(hr))
 	{
-		// (*ppSession)->Release();
-		// *ppSession = NULL;
 		(*ppFile)->Release();
 		*ppFile = NULL;
 		return hr;
@@ -133,20 +131,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*			pHeader = NULL;
 	IAAFDictionary*		pDictionary = NULL;
 	IAAFMob*			pMob = NULL;
-	IAAFMobSlot*		pMobSlot = NULL;
+	IAAFTimelineMobSlot*	pMobSlot = NULL;
 	IAAFMob*			pReferencedMob = NULL;
 	IAAFSourceClip*		pSourceClip = NULL;
 	IAAFFiller*			pFiller = NULL;
 	IAAFSegment*		pSegment = NULL;
 	IAAFSelector*		pSelector = NULL;
 	IAAFCompositionMob*	pCompMob = NULL;
-	aafUID_t			NewMobID, referencedMobID;
+	IAAFComponent*		pComponent = NULL;
+	aafMobID_t			NewMobID, referencedMobID;
 	aafInt32			fadeInLen  = 1000;
 	aafInt32			fadeOutLen = 2000;
-	aafFadeType_t		fadeInType = kFadeLinearAmp;
-	aafFadeType_t		fadeOutType = kFadeLinearPower;
+	aafFadeType_t		fadeInType = kAAFFadeLinearAmp;
+	aafFadeType_t		fadeOutType = kAAFFadeLinearPower;
 	aafSourceRef_t		sourceRef; 
-	aafUID_t			fillerUID = DDEF_Video;
 	aafLength_t			fillerLength = 3200;
 
 	HRESULT				hr = AAFRESULT_SUCCESS;
@@ -158,34 +156,40 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
  		
 		// Create a mob to be referenced by the source clip
-		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
-								 IID_IAAFMob, 
-								 (IUnknown **)&pReferencedMob));
+		checkResult(defs.cdMasterMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pReferencedMob));
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
-		checkResult(pReferencedMob->SetMobID(&referencedMobID));
+		checkResult(pReferencedMob->SetMobID(referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
-
+		pReferencedMob->Release();
+		pReferencedMob = NULL;
 		// Create a Composition Mob
-		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
-											  IID_IAAFCompositionMob, 
-											  (IUnknown **)&pCompMob));
+		checkResult(defs.cdCompositionMob()->
+					CreateInstance(IID_IAAFCompositionMob, 
+								   (IUnknown **)&pCompMob));
 
 	    // get a IAAFMob interface
 		checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		checkResult(pMob->SetMobID(&NewMobID));
+		checkResult(pMob->SetMobID(NewMobID));
 		checkResult(pMob->SetName(L"AAFSelectorTest"));
 	  
 		// Create a Source clip 
- 		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
-						     IID_IAAFSourceClip, 
-						     (IUnknown **)&pSourceClip));		
+ 		checkResult(defs.cdSourceClip()->
+					CreateInstance(IID_IAAFSourceClip, 
+								   (IUnknown **)&pSourceClip));		
+		 checkResult(pSourceClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 
 		// Set the properties for the SourceClip
 		checkResult(pSourceClip->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
@@ -195,16 +199,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSourceClip->SetSourceReference(sourceRef));
 
 		// create a filler 
-	    checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
-												IID_IAAFFiller, 
-												(IUnknown **)&pFiller));
+	    checkResult(defs.cdFiller()->
+					CreateInstance(IID_IAAFFiller, 
+								   (IUnknown **)&pFiller));
 		// Set its properties.
-	    checkResult(pFiller->Initialize( &fillerUID, fillerLength));
+	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
 
 		// Now create a selector 
-	    checkResult(pDictionary->CreateInstance(&AUID_AAFSelector,
-												IID_IAAFSelector, 
-												(IUnknown **)&pSelector));
+	    checkResult(defs.cdSelector()->
+					CreateInstance(IID_IAAFSelector, 
+								   (IUnknown **)&pSelector));
+		 checkResult(pSelector->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 
 		// Get a segment interface from the source clip
 		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
@@ -220,10 +228,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSegment->Release();
 		checkResult(pSelector->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 	    // append the Selector to the MOB tree
-		checkResult(pMob->AppendNewSlot(pSegment, 1, L"SelectorSlot", &pMobSlot)); 
+		aafRational_t editRate = { 0, 1};
+		checkResult(pMob->AppendNewTimelineSlot(editRate,
+												pSegment,
+												1,
+												L"SelectorSlot",
+												0,
+												&pMobSlot)); 
 		
 		// Add the composition mob to the file
-		pHeader->AppendMob(pMob);
+		pHeader->AddMob(pMob);
 
 	}
 	catch (HRESULT& rResult)
@@ -250,6 +264,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pCompMob)
 		pCompMob->Release();
 
+	if (pComponent)
+		pComponent->Release();
+
 	if (pMob)
 		pMob->Release();
 
@@ -261,6 +278,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	if (pFile)
 	{
+		pFile->Save();
 		pFile->Close();
 		pFile->Release();
 	}
@@ -295,25 +313,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 
 		// Validate that there is only one composition mob.
-		checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over Composition MOBs
-		criteria.searchTag = kByMobKind;
-		criteria.tags.mobKind = kCompMob;
-		checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
+		criteria.searchTag = kAAFByMobKind;
+		criteria.tags.mobKind = kAAFCompMob;
+		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 		{
 			aafNumSlots_t		numSlots = 0;
 
-			checkResult(pMob->GetNumSlots(&numSlots));
+			checkResult(pMob->CountSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
 
 			// Enumerate over all MOB slots for this MOB
-			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
+			checkResult(pMob->GetSlots(&pSlotIter));
 			while (pSlotIter && pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS)
 			{
 				checkResult(pSlot->GetSegment(&pSegment));
@@ -349,6 +367,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 				pSegment->Release();
 				pSegment = NULL;
+
+				pSelector->Release();
+				pSelector = NULL;
 
 				pSlot->Release();
 				pSlot = NULL;
@@ -411,7 +432,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return 	hr;
 }
 
-HRESULT CEnumAAFSegments::test()
+extern "C" HRESULT CEnumAAFSegments_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"EnumAAFSegmentsTest.aaf";
@@ -424,7 +445,7 @@ HRESULT CEnumAAFSegments::test()
 	}
 	catch (...)
 	{
-	  cerr << "CEnumAAFSegments::test...Caught general C++"
+	  cerr << "CEnumAAFSegments_test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
