@@ -1,37 +1,46 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFEvent
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
-
-
-
-
-
-
-#include "CAAFEvent.h"
-#include "CAAFEvent.h"
-#ifndef __CAAFEvent_h__
-#error - improperly defined include guard
-#endif
-
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
 #include <memory.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <stdlib.h>
+#include <wchar.h>
+#include "AAFDefUIDs.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+
+#include "CAAFBuiltinDefs.h"
 
 
 // Cross-platform utility to delete a file.
@@ -47,7 +56,6 @@ static void RemoveTestFile(const wchar_t* pFileName)
   }
 }
 
-
 // convenient error handlers.
 inline void checkResult(HRESULT r)
 {
@@ -59,6 +67,9 @@ inline void checkExpression(bool expression, HRESULT r)
   if (!expression)
     throw r;
 }
+
+static const aafUID_t DDEF_TEST = 
+{ 0x81831639, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 
 class EventTest
@@ -79,7 +90,7 @@ private:
   bool _bWritableFile;
   IAAFHeader *_pHeader;
   IAAFDictionary *_pDictionary;
-  aafUID_t _compositionMobID;
+  aafMobID_t _compositionMobID;
 
   // MobSlot static data
   static const wchar_t* _slotName;
@@ -91,23 +102,26 @@ private:
   static const wchar_t* _eventComment;
 };
 
+const aafUID_t NIL_UID = { 0 };
 
-HRESULT CAAFEvent::test()
+extern "C" HRESULT CAAFEvent_test()
 {
   HRESULT hr = S_OK;
   aafProductIdentification_t	ProductInfo = {0};
-  aafWChar * pFileName = L"EventTest.aaf";
+  aafWChar * pFileName = L"AAFEventTest.aaf";
 
   // Initialize the product info for this module test
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFEvent Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
-  ProductInfo.productID = -1;
+  ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
 
   // Create an instance of our text clip test class and run the
@@ -128,7 +142,8 @@ HRESULT CAAFEvent::test()
   }
   catch (...)
   {
-    cerr << "CAAFEventMobSlot::test...Caught general C++ exception!" << endl;
+    cerr << "CAAFEventMobSlot_test..."
+		 << "Caught general C++ exception!" << endl;
     hr = AAFRESULT_TEST_FAILED;
   }
 
@@ -236,26 +251,39 @@ void EventTest::CreateEvent()
   IAAFEventMobSlot *pEventMobSlot = NULL;
   IAAFSegment *pSegment = NULL;
   IAAFMobSlot *pMobSlot = NULL;
+  IAAFDataDef *pDataDef = NULL;
+  IAAFComponent *pComp = NULL;
   IAAFMob *pMob = NULL;
 
+  CAAFBuiltinDefs defs (_pDictionary);
 
   try
   {
-    // Create an event (note: this will be replaced by a concrete event in a
-    // later version after such an event is implemented.)
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFEvent,
-                                             IID_IAAFEvent, 
-                                             (IUnknown **)&pEvent));
+	  // not already in dictionary
+		checkResult(defs.cdDataDef()->
+					CreateInstance (IID_IAAFDataDef,
+									(IUnknown **)&pDataDef));
+	  hr = pDataDef->Initialize (DDEF_TEST, L"Test", L"Test data");
+	  hr = _pDictionary->RegisterDataDef (pDataDef);
+
+	// Create a concrete subclass of event
+    checkResult(defs.cdCommentMarker()->
+				CreateInstance(IID_IAAFEvent, 
+							   (IUnknown **)&pEvent));
     checkResult(pEvent->SetPosition(_position));
     checkResult(pEvent->SetComment(const_cast<wchar_t*>(_eventComment)));
+	checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pComp));
+	checkResult(pComp->SetDataDef(pDataDef));
+	pComp->Release();
+	pComp = NULL;
 
     // Get the segment inteface to the event to install into the mob slot.
     checkResult(pEvent->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 
     // Create and initialize an EventMobSlot
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFEventMobSlot,
-                                             IID_IAAFEventMobSlot, 
-                                             (IUnknown **)&pEventMobSlot));
+    checkResult(defs.cdEventMobSlot()->
+				CreateInstance(IID_IAAFEventMobSlot, 
+							   (IUnknown **)&pEventMobSlot));
     checkResult(pEventMobSlot->SetEditRate(const_cast<aafRational_t *>(&_editRate)));
 
     // Get the mob slot interface so that we can add the event segment.
@@ -265,16 +293,16 @@ void EventTest::CreateEvent()
     checkResult(pMobSlot->SetSegment(pSegment));
 
     // Create the mob to hold the new event mob slot.
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFCompositionMob,
-                                             IID_IAAFMob, 
-                                             (IUnknown **)&pMob));
+    checkResult(defs.cdCompositionMob()->
+				CreateInstance(IID_IAAFMob, 
+							   (IUnknown **)&pMob));
     checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));
 
     // Append event slot to the composition mob.
     checkResult(pMob->AppendSlot(pMobSlot));
 
     // Attach the mob to the header...
-    checkResult(_pHeader->AppendMob(pMob));
+    checkResult(_pHeader->AddMob(pMob));
 
     // Save the id of the composition mob that contains our test
     // event mob slot.
@@ -291,6 +319,18 @@ void EventTest::CreateEvent()
   {
     pMob->Release();
     pMob = NULL;
+  }
+
+  if (pDataDef)
+  {
+    pDataDef->Release();
+    pDataDef = NULL;
+  }
+
+  if (pComp)
+  {
+    pComp->Release();
+    pComp = NULL;
   }
 
   if (pMobSlot)
@@ -343,10 +383,10 @@ void EventTest::OpenEvent()
   try
   {
     // Get the composition mob that we created to hold the
-    checkResult(_pHeader->LookupMob(&_compositionMobID, &pMob));
+    checkResult(_pHeader->LookupMob(_compositionMobID, &pMob));
 
     // Get the first mob slot and check that it is an event mob slot.
-    checkResult(pMob->EnumAAFAllMobSlots(&pEnumSlots));
+    checkResult(pMob->GetSlots(&pEnumSlots));
     checkResult(pEnumSlots->NextOne(&pMobSlot));
     checkResult(pMobSlot->QueryInterface(IID_IAAFEventMobSlot, (void **)&pEventMobSlot));
     checkResult(pEventMobSlot->GetEditRate(&editRate));
@@ -365,7 +405,7 @@ void EventTest::OpenEvent()
 
     // Validate the comment buffer size.
     aafUInt32 expectedLen = wcslen(_eventComment) + 1;
-    aafUInt32 expectedSize = expectedLen * 2;
+    aafUInt32 expectedSize = expectedLen * sizeof(wchar_t);
     aafUInt32 commentBufSize = 0;
     checkResult(pEvent->GetCommentBufLen(&commentBufSize));
     checkExpression(commentBufSize == expectedSize, AAFRESULT_TEST_FAILED);
