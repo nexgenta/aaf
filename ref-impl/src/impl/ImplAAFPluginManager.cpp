@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginManager.cpp,v 1.41 2005/02/03 22:13:43 heydowns Exp $ $Name:  $
+// $Id: ImplAAFPluginManager.cpp,v 1.42 2005/03/12 19:36:51 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -597,8 +597,8 @@ static char * NewStringFromAAFString(aafCharacter_constptr wName)
 {
   char * name = NULL;
   int wNameLength = wcslen(wName);
-  int nameLegth = wcsu8slen(wName);
-  name = new char[nameLegth];
+  int nameLength = wcsu8slen(wName);
+  name = new char[nameLength+1];
   if (NULL != name)
   {
     size_t status = wcstombs(name, wName, wNameLength + 1);
