@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.24.2.2 2004/12/19 03:51:26 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.24.2.3 2005/01/09 05:49:17 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -387,8 +387,19 @@ protected:
 
 private:
 
-  AAFRESULT PvtMergeBuiltinPropDefsToFile();
+  // Merge prop defs found in src but not in dst.
+  AAFRESULT PvtMergePropDefs( ImplAAFClassDef* pSrcClassDef, ImplAAFClassDef* pDstClassDef,
+			      const wchar_t* srcName, const wchar_t* dstName );
+
+  // Sync class defs found in both the _fileClassDefinitions and _classDefinitions.
+  AAFRESULT PvtSyncCommonClassDefs();
+
+  // Merge class defs that exist in _fileClassDefinition but in
+  // _classDefinitions into _classDefinitions.
   AAFRESULT PvtMergeBuiltinClassDefsToFile();
+
+  // Merge class defs that exist in _classDefinitions but not in
+  // _fileClassDefinition into _fileClassDefinition.
   AAFRESULT PvtMergeFileClassDefsToBuiltin();
 
   //
