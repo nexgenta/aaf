@@ -10,7 +10,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -25,10 +25,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
-
-
-
 
 
 #ifndef __ImplAAFIdentification_h__
@@ -80,55 +76,6 @@ ImplAAFIdentification::ImplAAFIdentification():
 #endif
 
 }
-
-ImplAAFIdentification::ImplAAFIdentification(
-                                     const wchar_t* companyName,
-                                     const wchar_t* productName,
-                                     const aafProductVersion_t* productVersion,
-                                     const wchar_t* productVersionString,
-                                     const aafUID_t* productId,
-                                     const aafTimeStamp_t date,
-                                     const aafProductVersion_t* toolKitVersion,
-                                     const wchar_t* platform
-                                     // const AUID* generation
-                                     ):
-  _companyName(         PID_Identification_CompanyName,          "CompanyName"),
-  _productName(         PID_Identification_ProductName,          "ProductName"),
-  _productVersion(      PID_Identification_ProductVersion,       "ProductVersion"),
-  _productVersionString(PID_Identification_ProductVersionString, "ProductVersionString"),
-  _productId(			  PID_Identification_ProductID,            "ProductID"),
-  _date(                PID_Identification_Date,                 "Date"),
-  _toolkitVersion(      PID_Identification_ToolkitVersion,       "ToolkitVersion"),
-  _platform(            PID_Identification_Platform,             "Platform"),
-  _generation(       PID_Identification_GenerationAUID,       "GenerationAUID")
-{
-  // Insert the properties into the persistent property set.
-  //
-  _persistentProperties.put(   _companyName.address());
-  _persistentProperties.put(   _productName.address());
-  _persistentProperties.put(_productVersion.address());
-  _persistentProperties.put(   _productVersionString.address());
-  _persistentProperties.put(_productId.address());
-  _persistentProperties.put(   _date.address());
-  _persistentProperties.put(_toolkitVersion.address());
-  _persistentProperties.put(   _platform.address());
-  _persistentProperties.put(_generation.address());
-
-  // Initialize members.
-  //
-  _companyName = companyName;
-  _productName = productName;
-	_productVersion = *productVersion;
-  _productVersionString = productVersionString;
-  _productId = *productId;
-  _date = date;
-	_toolkitVersion = *toolKitVersion;
-  _platform = platform;
-  // _generation.???;
-
-};
-
-
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -348,7 +295,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetCompanyName (aafWChar *  pName)
+    ImplAAFIdentification::SetCompanyName (const aafCharacter * pName)
 {
   if (! pName)
 	{
@@ -362,7 +309,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetProductName (aafWChar *  pName)
+    ImplAAFIdentification::SetProductName (const aafCharacter * pName)
 {
   if (! pName)
 	{
@@ -391,7 +338,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetProductVersionString (aafWChar * pVS)
+    ImplAAFIdentification::SetProductVersionString (const aafCharacter * pVS)
 {
 	if (! pVS)
 	{
@@ -405,12 +352,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetProductID (aafUID_t * pPID)
+    ImplAAFIdentification::SetProductID (const aafUID_t & PID)
 {
-  if (! pPID)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  _productId = *pPID;
+  _productId = PID;
   return AAFRESULT_SUCCESS;
 }
