@@ -39,7 +39,6 @@
 #define AUID_AAFInterchangeObject AUID_AAFObject
 #define AUID_AAFJPEGImageData AUID_AAFJPEGData
 #define AUID_AAFMIDIFileData AUID_AAFMIDIData
-#define AUID_AAFMIDIFileDescriptor AUID_AAFMIDIDescriptor
 #define AUID_AAFParameterDefinition AUID_AAFParameterDef
 #define AUID_AAFPropertyDefinition AUID_AAFPropertyDef
 #define AUID_AAFTypeDefinition AUID_AAFTypeDef
@@ -58,7 +57,6 @@
 #define AUID_AAFCodecDefinition AUID_AAFCodecDef
 #define AUID_AAFContainerDefinition AUID_AAFContainerDef
 #define AUID_AAFPluggableDefinition AUID_AAFPluggableDef
-
 
 // Include the inside-out macro files that invokes the AAF_CLASS macros.
 #include "AAFMetaDictionary.h"
