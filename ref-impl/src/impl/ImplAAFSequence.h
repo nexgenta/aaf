@@ -3,16 +3,28 @@
 #ifndef __ImplAAFSequence_h__
 #define __ImplAAFSequence_h__
 
-#include "OMStorable.h"
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 class ImplAAFTimecode;
 
@@ -22,18 +34,15 @@ class ImplAAFSegment;
 
 class ImplAAFDataDef;
 
-class ImplEnumAAFComponents;
-
-
-
-
+template <class T> 
+class ImplAAFEnumerator;
+typedef ImplAAFEnumerator<ImplAAFComponent> ImplEnumAAFComponents;
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
 #endif
 
-
-const int PID_SEQUENCE_COMPONENTS	= 30;
+#include "OMStrongRefVectorProperty.h"
 
 class ImplAAFSequence : public ImplAAFSegment
 {
@@ -47,12 +56,12 @@ public:
 
 
   //****************
-  // SetInitialValue()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetInitialValue
+    Initialize
 		// @parm [in] Data Definition object
-        (aafUID_t * pDatadef);
+        (ImplAAFDataDef * pDataDef);
 
 
   //****************
@@ -65,28 +74,70 @@ public:
 
 
   //****************
-  // RemoveComponent()
+  // PrependComponent()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveComponent
-		// @parm [in] Component to append to the sequence
+    PrependComponent
+		// @parm [in] Component to prepend to the sequence
         (ImplAAFComponent * pComponent);
 
 
   //****************
-  // GetNumComponents()
+  // InsertComponentAt()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumComponents
-		// @parm [out] Number of components
-        (aafInt32 *  pNumCpnts);
+    InsertComponentAt
+		// @parm [in] index to insert component
+        (aafUInt32 index,
+
+		 // @parm [in] Component to insert into the sequence
+		 ImplAAFComponent * pComponent);
 
 
   //****************
-  // EnumComponents()
+  // GetComponentAt()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    EnumComponents
+    GetComponentAt
+		// @parm [in] index of component to retrieve
+        (aafUInt32 index,
+
+		 // @parm [out, retval] retrieved component
+		 ImplAAFComponent ** ppComponent);
+
+
+  //****************
+  // RemoveComponentAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveComponentAt
+		// @parm [in] index of component to remove
+        (aafUInt32 index);
+
+
+  //****************
+  // RemoveComponent()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveComponent
+		// @parm [in] Component to remove from the sequence
+        (ImplAAFComponent * pComponent);
+
+
+  //****************
+  // CountComponents()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountComponents
+		// @parm [out, retval] Component Enumeration
+        (aafUInt32 * pResult);
+
+
+  //****************
+  // GetComponents()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetComponents
 		// @parm [out, retval] Component Enumeration
         (ImplEnumAAFComponents ** ppEnum);
 
@@ -105,16 +156,20 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFSequence)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFSequenceTest.cpp.
-  static AAFRESULT test();
 
   // Interfaces visible inside the toolkit, but not exposed through the API
   AAFRESULT GetNthComponent(aafUInt32 index, ImplAAFComponent **ppComponent);
+	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
+												aafMobID_constref to);
+  AAFRESULT
+    SetNthComponent (aafUInt32 index, ImplAAFComponent* pComponent);
+
+	virtual AAFRESULT TraverseToClip( aafLength_t length,
+									  ImplAAFSegment **sclp,
+									  ImplAAFPulldown **pulldownObj,
+									  aafInt32 *pulldownPhase,
+									  aafLength_t *sclpLen,
+									  aafBool *isMask);
 
 private:
 	OMStrongReferenceVectorProperty<ImplAAFComponent> _components;
