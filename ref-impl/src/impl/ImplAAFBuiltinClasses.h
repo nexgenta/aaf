@@ -33,6 +33,7 @@
 //
 
 #include "AAFTypes.h"
+#include "OMProperty.h"
 #include "AAFUtils.h"
 
 #ifndef __ImplAAFSearchableStack_h__
@@ -115,7 +116,6 @@ private:
 	const aafUID_t * pTypeGuid;
 	const aafUID_t * pOwnerClassGuid;
 	bool             mandatory;
-  bool             isUniqueIdentifier; // this property is a unique identifier for the class
 	ImplAAFOMPropertyCreateFunc_t omPropCreateFunc;
 	PropTblEntry *   nextProp;  // null if this is the last one
   };
@@ -127,7 +127,6 @@ private:
 	const aafUID_t     * pParentId;
 	ClassTblEntry      * pParent;     // null for root
 	PropTblEntry       * pProperties; // null for none
-	bool                 isConcrete;
   };
 
 
@@ -186,7 +185,6 @@ private:
   // Initialiaztion function which instantiates all axiomatic classes
   // and initializes them as much as it can.
   void instantiateClasses ();
-  void FinishInitClasses ();
 
   static ClassTblEntry sBuiltinClassTable[];
   static const aafUInt32 ksNumClassDefs;
