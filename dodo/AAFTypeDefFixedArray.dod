@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefFixedArray\
 #endm
@@ -6,13 +13,14 @@ AAFTypeDefFixedArray\
 AAFTypeDef\
 #endm
 #c
+#import ./AAFTypeDef.exp
 AD_HEAD
 AD_IDL(//
 // This interface is used to define fixed-sized Array types used in
 // AAF persistent objects.
-//
 AD_STD_COMMENT_IFC_HEADER
 AD_STD_COMMENT_IFC_STUB)
+AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_CLASS_UUID(c3274645, 9467, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(c3274646, 9467, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
@@ -38,23 +46,35 @@ AD_XMETHOD4(Initialize,
 
 			[in],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pTypeName,
 			friendly name of this type definition,
 
      Initializes this type def to contain elements of the given type\,
-  // and have the given fixed size.
+  // and have the given fixed size.  Note that it is only possible to
+  // use certain types as the element type.  Those permissible types
+  // include:
+  // - AAFTypeDefInt
+  // - AAFTypeDefRecord
+  // - AAFTypeDefEnum
+  // - AAFTypeDefExtEnum
+  // - AAFTypeDefFixedArray
   //
   // This method must be called after allocation\, and before
   // any other method can be called.
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
+  // - pID is a valid pointer.
   // - pTypeDef is a valid pointer.
-  //
+  // - pTypeName is a valid pointer.
+  // - element type is permissible for use in a FixedArray.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pTypeDef or pTypeName\))
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pID\\\, pTypeDef\\\, or pTypeName\)
+  //
+  // AAFRESULT_BAD_TYPE
+  //   - an illegal element type was given.)
 
 
 AD_XMETHOD1(GetType,
@@ -69,7 +89,6 @@ AD_XMETHOD1(GetType,
   // Succeeds if:
   // - Initialize\(\) has already been called on this object.
   // - ppTypeDef is a valid pointer.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppTypeDef\))
@@ -87,7 +106,6 @@ AD_XMETHOD1(GetCount,
   // Succeeds if:
   // - Initialize\(\) has already been called on this object.
   // - pCount is a valid pointer.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pCount\))
@@ -98,7 +116,7 @@ AD_X2METHOD3(CreateValueFromValues,
 			 [in\, size_is\(numElements\)],
 			 objInArray,
 			 AAFPropertyValue,
-			 pElementValues,
+			 ppElementValues,
        array of property values for elements of array value which
     // is to be created.,
 			 numElements,
@@ -130,10 +148,10 @@ AD_X2METHOD3(CreateValueFromValues,
   // - numElements matches the number of elements in this array
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pElementValues or ppPropVal\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - numElements does not match GetCount\(\).)
 
@@ -171,10 +189,10 @@ AD_XMETHOD3(CreateValueFromCArray,
   // - compile-time struct has had its member offests registered.
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInitData or ppPropVal\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - initDataSize indicates pInitData is of the wrong size.
   //
@@ -212,10 +230,10 @@ AD_XMETHOD3(GetElementValue,
   // - the index exists in this array type def.
   // - The pInPropVal pointer is valid.
   // - The ppOutPropVal pointer is valid.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pInPropVal or ppOutPropVal\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - The given index is out of range for this array type def.)
 
@@ -252,10 +270,10 @@ AD_XMETHOD3(GetCArray,
   // - compile-time struct has had its member offests registered.
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pPropVal or pData\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - dataSize indicates pData is too small.
   //
@@ -293,10 +311,10 @@ AD_XMETHOD3(SetElementValue,
   // - the index exists in this array type def.
   // - The pInPropVal pointer is valid.
   // - The ppOutPropVal pointer is valid.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInPropVal or ppOutPropVal\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - The given index is out of range for this array type def.)
 
@@ -334,13 +352,16 @@ AD_XMETHOD3(SetCArray,
   //   registered.
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pPropVal or pData\)
+  //
   // AAFRESULT_BAD_PARAM
   //  - dataSize indicates pData is not the correct size.
   //
   // AAFRESULT_NOT_REGISTERED
   //  - offsets of any contained struct have not yet been registered.)
+
+
+AD_OVERRIDE(.method-GetTypeCategory)
 AD_XCLASS_END(Concrete, StoredObject)
