@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: typeDefUid.cpp,v 1.12 2004/02/27 15:41:23 phil_tudor Exp $ $Name:  $
+// $Id: typeDefUid.cpp,v 1.13 2005/03/19 19:43:39 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -154,5 +154,5 @@ int main(int argc, char** argv)
   validateArgs(argc, argv, moduleName);
   assert(moduleName);
   doFile(moduleName);
-  exit(0);
+  return 0;
 }

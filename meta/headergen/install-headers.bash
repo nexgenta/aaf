@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: install-headers.bash,v 1.4 2005/03/18 14:44:47 terabrit Exp $ $Name:  $
+# $Id: install-headers.bash,v 1.5 2005/03/19 19:43:39 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -47,8 +47,17 @@ AAFOPDefs.h \
 AAFKLVDataDefs.h \
 AAFTaggedValueDefs.h \
 AAFPluginDefs.h \
+AAFCodecDefs.h \
 AAFCompressionDefs.h \
 "
+
+# Oliver - 050319 - anticipate:
+
+# AAFPluginExtEnum.h
+# AAFCodecFlavours.h
+# AAFEssenceFormats.h
+# AAFEnumerations.h
+
 
 SOURCE=./include
 DEST=../../ref-impl/include
