@@ -1,30 +1,12 @@
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #include "AAFTypes.h"
@@ -124,23 +106,20 @@ ImplAAFHeader::~ImplAAFHeader ()
 		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
 
 		if (pIdent) {
-		  pIdent->ReleaseReference();
-		  pIdent = 0;
+			pIdent->ReleaseReference();
 		}
 	}
 
 	// Release the content storage pointer.
 	ImplAAFContentStorage *contentStorage = _contentStorage.setValue(0);
 	if (contentStorage) {
-	  contentStorage->ReleaseReference();
-	  contentStorage = 0;
+		contentStorage->ReleaseReference();
 	}
 
 	// Release the dictionary pointer.
 	ImplAAFDictionary *dictionary = _dictionary.setValue(0);
 	if (dictionary) {
-	  dictionary->ReleaseReference();
-	  dictionary = 0;
+		dictionary->ReleaseReference();
 	}
 }
 
@@ -479,8 +458,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if (theEnum)
-		  theEnum->ReleaseReference();
-		theEnum = 0;
+			theEnum->ReleaseReference();
 		return(XCODE());
 	}
 	XEND;
@@ -583,7 +561,7 @@ AAFRESULT
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -628,7 +606,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
 {
-	aafTimeStamp_t	now = { 0 };
+	aafTimeStamp_t	now;
 
 	AAFGetDateTime(&now);
 	_lastModified = now;
@@ -705,10 +683,9 @@ ImplAAFDictionary *ImplAAFHeader::GetDictionary()
   assert(AAFRESULT_SUCCESS == ImplAAFObject::GetDictionary(&pDictionary));
   assert(pDictionary);
   assert(pDictionary == result);
-  aafUInt32 refCount = pDictionary->ReleaseReference();
-  pDictionary = 0;
-  assert(0 != refCount);
+  assert(0 != pDictionary->ReleaseReference());
 
   return(result);
 }
 
+OMDEFINE_STORABLE(ImplAAFHeader, AUID_AAFHeader);
