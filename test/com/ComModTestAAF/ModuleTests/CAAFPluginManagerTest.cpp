@@ -3,7 +3,7 @@
 
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -31,11 +31,13 @@
 
 
 #include <iostream.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
-#include "aafUtils.h"
 #include "AAFDefUIDs.h"
 #include "AAF.h"
 #include "AAFPlugin.h"
@@ -126,36 +128,38 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	return hr;
 }
 
-extern "C" HRESULT CAAFPluginManager_test()
+extern "C" HRESULT CAAFPluginManager_test(testMode_t );
+extern "C" HRESULT CAAFPluginManager_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
-	IEnumAAFLoadedPlugins	*pEnum;
-	IAAFPluginManager		*pMgr;
+	IEnumAAFLoadedPlugins	*pEnum = NULL;
+	IAAFPluginManager		*pMgr = NULL;
 	aafUID_t				testUID;
 	IAAFFile*		pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader *        pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
 	aafWChar * pFileName = L"AAFPluginManagerTest.aaf";
-	IAAFDefObject	*pPluginDef;
+	IAAFDefObject	*pPluginDef = NULL;
 	IAAFPlugin	*plugin			= NULL;
 
 	try
 	{
-		
+		if(mode != kAAFUnitTestReadWrite)
+			return AAFRESULT_SUCCESS;			// Can't run this test read-only
+
 		// Remove the previous test file if any.
 		RemoveTestFile(pFileName);
+
 		
+		checkResult(AAFGetPluginManager (&pMgr));
 		
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
 		bFileOpen = true;
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		
-		checkResult(AAFGetPluginManager (&pMgr));
-		checkResult(pMgr->RegisterSharedPlugins());
 
 		checkResult(pMgr->EnumLoadedPlugins (AUID_AAFCodecDef, &pEnum));
 		while(pEnum->NextOne (&testUID) == AAFRESULT_SUCCESS)
@@ -171,12 +175,19 @@ extern "C" HRESULT CAAFPluginManager_test()
 			IID_IAAFPlugin, 
 			(void **)&plugin));
 	}
-	catch (...)
+	catch (HRESULT& rhr)
 	{
-		cerr << "CAAFPluginManager_test..."
-			 << "Caught general C++ exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+		hr = rhr;
 	}
+
+	if (plugin)
+		plugin->Release();
+
+	if (pEnum)
+		pEnum->Release();
+
+	if (pMgr)
+		pMgr->Release();
 
 	if (pDictionary)
 		pDictionary->Release();

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFKLVData
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -38,6 +38,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -175,7 +176,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		//Make the first mob
 	  long	test;
-	  aafRational_t	audioRate = { 44100, 1 };
 
 	  // Create a concrete subclass of Mob
 	  checkResult(defs.cdMasterMob()->
@@ -253,6 +253,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   if (pMob)
     pMob->Release();
 
+  if (pBaseType)
+    pBaseType->Release();
+
   if (pDictionary)
     pDictionary->Release();
 
@@ -287,22 +290,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFTypeDef*		pBaseType = NULL;
 
   IAAFMobSlot		*slot = NULL;
-  aafProductIdentification_t	ProductInfo;
   aafNumSlots_t	numMobs, n, slt;
   aafUInt32		numKLV, com;
   HRESULT						hr = S_OK;
-
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-  ProductInfo.companyName = L"AAF Developers Desk";
-  ProductInfo.productName = L"EnumAAFKLVData Test";
-  ProductInfo.productVersion = &v;
-  ProductInfo.productVersionString = NULL;
-  ProductInfo.platform = NULL;
 
   try
   {
@@ -437,14 +427,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 }
  
 	    
-extern "C" HRESULT CEnumAAFKLVData_test()
+extern "C" HRESULT CEnumAAFKLVData_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFKLVData_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"EnumAAFKLVDataTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFRGBADescriptor
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -33,9 +33,11 @@
 #include <iostream.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -251,6 +253,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   if (pDIDesc)
     pDIDesc->Release();
 
+  if (pRGBADesc)
+    pRGBADesc->Release();
+
   if (pMob)
     pMob->Release();
 
@@ -416,6 +421,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   if (pEssDesc)
     pEssDesc->Release();
 
+  if (pRGBADesc)
+    pRGBADesc->Release();
+
   if (pDIDesc)
     pDIDesc->Release();
 
@@ -440,7 +448,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFRGBADescriptor_test()
+extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode)
 {
 	aafWChar*	pFileName = L"AAFRGBADescripTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
@@ -448,7 +457,10 @@ extern "C" HRESULT CAAFRGBADescriptor_test()
 
    	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}

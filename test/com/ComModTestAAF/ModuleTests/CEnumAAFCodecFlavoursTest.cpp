@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFCodecFlavours
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -38,12 +38,17 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "AAFUtils.h"
 #include "AAFCodecDefs.h"
 
 #include "CAAFBuiltinDefs.h"
+
+static aafBool  EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
+{
+    return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
+}
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -239,14 +244,14 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		// Check with Next()
 		checkResult(pEnum->Reset ());
-		checkResult(pEnum->NextOne(&testFlavour));
+		checkResult(pEnum->Next(1,&testFlavour,NULL));
 		checkExpression (EqualAUID(&testFlavour, &checkFlavour) ? true : false,
 						 AAFRESULT_TEST_FAILED);
 		
 		// Check out clones version
 		checkResult(pEnum->Reset ());
 		checkResult(pEnum->Clone (&pCloneEnum));
-		checkResult(pCloneEnum->NextOne(&testFlavour));
+		checkResult(pCloneEnum->Next(1,&testFlavour,NULL));
 		checkExpression (EqualAUID(&testFlavour, &checkFlavour) ? true : false,
 						 AAFRESULT_TEST_FAILED);
 	}
@@ -256,6 +261,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	}
 
 	// Cleanup and return
+	if (pCloneEnum)
+		pCloneEnum->Release();
 	if (pEnum)
 		pEnum->Release();
 	if (pDataDef)
@@ -279,14 +286,18 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFCodecFlavours_test()
+extern "C" HRESULT CEnumAAFCodecFlavours_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFCodecFlavours_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFCodecFlavoursTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFCommentMarker
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -38,6 +38,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "CAAFBuiltinDefs.h"
 #include "AAFDefUIDs.h"
 
@@ -105,7 +106,8 @@ private:
 
 const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
-extern "C" HRESULT CAAFCommentMarker_test()
+extern "C" HRESULT CAAFCommentMarker_test(testMode_t mode);
+extern "C" HRESULT CAAFCommentMarker_test(testMode_t mode)
 {
 	HRESULT hr = S_OK;
 	aafProductIdentification_t	ProductInfo = {0};
@@ -132,7 +134,8 @@ extern "C" HRESULT CAAFCommentMarker_test()
 	try
 	{
 		// Attempt to create a test file
-		test.Create(pFileName, &ProductInfo);
+		if(mode == kAAFUnitTestReadWrite)
+			test.Create(pFileName, &ProductInfo);
 		
 		// Attempt to read the test file.
 		test.Open(pFileName);
@@ -386,6 +389,18 @@ void CommentMarkerTest::CreateEvent()
 	{
 		pEvent->Release();
 		pEvent = NULL;
+	}
+	
+	if (pComp)
+	{
+		pComp->Release();
+		pComp = NULL;
+	}
+	
+	if (pDataDef)
+	{
+		pDataDef->Release();
+		pDataDef = NULL;
 	}
 	
 	

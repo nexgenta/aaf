@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFIdentifications
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -39,6 +39,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 #include "CAAFBuiltinDefs.h"
 
@@ -170,6 +171,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	// Cleanup and return
 	if (pIdent)
 		pIdent->Release();
+	
+	if (pDictionary)
+		pDictionary->Release();
 	
 	if (pHeader)
 		pHeader->Release();
@@ -595,14 +599,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CEnumAAFIdentifications_test()
+extern "C" HRESULT CEnumAAFIdentifications_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFIdentifications_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFIdentificationsTest.aaf";
 	
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

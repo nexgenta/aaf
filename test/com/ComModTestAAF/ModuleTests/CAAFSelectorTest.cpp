@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFSelector
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -33,6 +33,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
@@ -40,6 +41,19 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+
+static const	aafMobID_t	TEST_MobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x5ed723c8, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
+static const	aafMobID_t	TEST_referencedMobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x643df7b0, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 
 // Temporarily necessary global declarations.
 extern "C" const CLSID CLSID_AAFSelector; // generated
@@ -80,13 +94,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFSelector Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -142,11 +158,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSegment*		pSegment = NULL;
 	IAAFSelector*		pSelector = NULL;
 	IAAFCompositionMob*	pCompMob = NULL;
-	aafMobID_t			NewMobID, referencedMobID;
-	aafInt32			fadeInLen  = 1000;
-	aafInt32			fadeOutLen = 2000;
-	aafFadeType_t		fadeInType = kAAFFadeLinearAmp;
-	aafFadeType_t		fadeOutType = kAAFFadeLinearPower;
 	aafSourceRef_t		sourceRef; 
 	aafLength_t			fillerLength = 3200;
 	aafInt32			numAlternates;
@@ -170,8 +181,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdMasterMob()->
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pReferencedMob));
-		checkResult(CoCreateGuid((GUID *)&referencedMobID));
-		checkResult(pReferencedMob->SetMobID(referencedMobID));
+		checkResult(pReferencedMob->SetMobID(TEST_referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
 		checkResult(pHeader->AddMob(pReferencedMob));
 		pReferencedMob->Release();
@@ -184,8 +194,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	    // get a IAAFMob interface
 		checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		checkResult(pMob->SetMobID(NewMobID));
+		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(L"AAFSelectorTest"));
 	  
 		// Create a Source clip 
@@ -198,8 +207,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pComponent = NULL;
 
 		// Set the properties for the SourceClip
-		checkResult(pSourceClip->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
-		sourceRef.sourceID = referencedMobID;
+		sourceRef.sourceID = TEST_referencedMobID;
 		sourceRef.sourceSlotID = 0;
 		sourceRef.startTime = 0;
 		checkResult(pSourceClip->SetSourceReference(sourceRef));
@@ -232,6 +240,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSelector->AppendAlternateSegment(pSegment));
 		// Release the intreface so we can reuse the pointer
 		pSegment->Release();
+		pSegment = NULL;
+		pFiller->Release();
+		pFiller = NULL;
 
 		// create another filler, add it as an alternate, count two alternates, 
 		// then delete and check for only one alternate
@@ -241,14 +252,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
 		checkResult(pFiller->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 		checkResult(pSelector->AppendAlternateSegment(pSegment));
-		pSegment->Release();
 		checkResult(pSelector->GetNumAlternateSegments (&numAlternates));
 		checkExpression(2 == numAlternates, AAFRESULT_TEST_FAILED);
 		checkResult(pSelector->RemoveAlternateSegment (pSegment));
 		checkResult(pSelector->GetNumAlternateSegments (&numAlternates));
 		checkExpression(1 == numAlternates, AAFRESULT_TEST_FAILED);
-
-
+		pSegment->Release();
+		pSegment = NULL;
+		pFiller->Release();
+		pFiller = NULL;
 
 
 		checkResult(pSelector->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
@@ -457,21 +469,27 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	return 	hr;
 }
 
-extern "C" HRESULT CAAFSelector_test()
+extern "C" HRESULT CAAFSelector_test(testMode_t mode);
+extern "C" HRESULT CAAFSelector_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFSelectorTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 		
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFSelector_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFSelector_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;
