@@ -1,10 +1,12 @@
-#c /***********************************************\
-#c *                                               *
-#c * Advanced Authoring Format                     *
-#c *                                               *
-#c * Copyright (c) 1998-1999 Avid Technology, Inc. *
-#c *                                               *
-#c \***********************************************/
+#c /******************************************\
+#c *                                          *
+#c * Advanced Authoring Format                *
+#c *                                          *
+#c * Copyright (c) 1998 Avid Technology, Inc. *
+#c * Copyright (c) 1998 Microsoft Corporation *
+#c *                                          *
+#c \******************************************/
+
 
 
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -54,34 +56,20 @@
 #c Arguments: none
 #c
 #startm AD_HEAD 00
-/***********************************************************************
-*
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-*  prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
-#ifndef __.this-module_h__
-#define __.this-module_h__
+//=--------------------------------------------------------------------------=
+// .this-module.h")
+//=--------------------------------------------------------------------------=
+// (C) Copyright 1998 Avid Technology.
+// (C) Copyright 1998 Microsoft Corporation.
+//
+// THIS CODE AND INFORMATION IS PROVIDED 'AS IS' WITHOUT WARRANTY OF
+// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+//=--------------------------------------------------------------------------=
+// .this-module Interface.
+//=--------------------------------------------------------------------------=
+//
 
 #ifndef __AAFCOMPlatform_h__
 #include "AAFCOMPlatform.h"
@@ -100,34 +88,20 @@ interface I.this-module;
 #c Arguments: none
 #c
 #startm AD_TYPES_HEAD 00
-/***********************************************************************
-*
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-*  prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
-#ifndef __.this-module_h__
-#define __.this-module_h__
+//=--------------------------------------------------------------------------=
+// .this-module.h")
+//=--------------------------------------------------------------------------=
+// (C) Copyright 1998 Avid Technology.
+// (C) Copyright 1998 Microsoft Corporation.
+//
+// THIS CODE AND INFORMATION IS PROVIDED 'AS IS' WITHOUT WARRANTY OF
+// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+//=--------------------------------------------------------------------------=
+// .this-module Interface.
+//=--------------------------------------------------------------------------=
+//
 
 #ifndef __AAFCOMPlatformTypes_h__
 #include "AAFCOMPlatformTypes.h"
@@ -156,30 +130,6 @@ DECLARE_INTERFACE_(I.this-module, IUnknown)
   STDMETHOD_(ULONG,Release) (THIS) PURE;
 
   /* *** I.this-module methods *** */\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Ends a class definition for classes which support more than the
-#c primary COM interface.
-#c
-#c Arguments: additional interface name
-#c
-#startm AD_COM_EXT_CLASS_BEGIN 01
-AD_CLASS_BEGIN\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Ends a class definition for classes which support more than the
-#c primary COM interface.
-#c
-#c Arguments: additional interface name
-#c
-#startm AD_COM_EXT2_CLASS_BEGIN 02
-AD_CLASS_BEGIN\
 #endm
 
 
@@ -229,8 +179,6 @@ AD_CLASS_BEGIN\
 #c Arguments: none
 #c
 #startm AD_TYPES_END 00
-
-#endif // #ifndef __.this-module_h__\
 #endm
 
 
@@ -264,7 +212,7 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD1 07
   // %07
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05) PURE;\
 #endm
 
 
@@ -286,8 +234,8 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD2 12
   // %12
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10) PURE;\
 #endm
 
 
@@ -310,9 +258,9 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD3 17
   // %17
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15) PURE;\
 #endm
 
 
@@ -336,10 +284,10 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD4 22
   // %22
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20) PURE;\
 #endm
 
 
@@ -364,11 +312,11 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD5 27
   // %27
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20,
-    /*%22*/ .%23-adornment%24 .%23-indirection %25) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20,
+	%22 .%23-adornment%24 .%23-indirection %25) PURE;\
 #endm
 
 
@@ -394,12 +342,12 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD6 32
   // %32
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20,
-    /*%22*/ .%23-adornment%24 .%23-indirection %25,
-    /*%27*/ .%28-adornment%29 .%28-indirection %30) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20,
+	%22 .%23-adornment%24 .%23-indirection %25,
+	%27 .%28-adornment%29 .%28-indirection %30) PURE;\
 #endm
 
 
@@ -426,13 +374,13 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD7 37
   // %37
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20,
-    /*%22*/ .%23-adornment%24 .%23-indirection %25,
-    /*%27*/ .%28-adornment%29 .%28-indirection %30,
-    /*%32*/ .%33-adornment%34 .%33-indirection %35) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20,
+	%22 .%23-adornment%24 .%23-indirection %25,
+	%27 .%28-adornment%29 .%28-indirection %30,
+	%32 .%33-adornment%34 .%33-indirection %35) PURE;\
 #endm
 
 
@@ -460,14 +408,14 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD8 42
   // %42
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20,
-    /*%22*/ .%23-adornment%24 .%23-indirection %25,
-    /*%27*/ .%28-adornment%29 .%28-indirection %30,
-    /*%32*/ .%33-adornment%34 .%33-indirection %35,
-    /*%37*/ .%38-adornment%39 .%38-indirection %40) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20,
+	%22 .%23-adornment%24 .%23-indirection %25,
+	%27 .%28-adornment%29 .%28-indirection %30,
+	%32 .%33-adornment%34 .%33-indirection %35,
+	%37 .%38-adornment%39 .%38-indirection %40) PURE;\
 #endm
 
 
@@ -496,15 +444,15 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD9 47
   // %47
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20,
-    /*%22*/ .%23-adornment%24 .%23-indirection %25,
-    /*%27*/ .%28-adornment%29 .%28-indirection %30,
-    /*%32*/ .%33-adornment%34 .%33-indirection %35,
-    /*%37*/ .%38-adornment%39 .%38-indirection %40,
-    /*%42*/ .%43-adornment%44 .%43-indirection %45) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20,
+	%22 .%23-adornment%24 .%23-indirection %25,
+	%27 .%28-adornment%29 .%28-indirection %30,
+	%32 .%33-adornment%34 .%33-indirection %35,
+	%37 .%38-adornment%39 .%38-indirection %40,
+	%42 .%43-adornment%44 .%43-indirection %45) PURE;\
 #endm
 
 
@@ -534,16 +482,16 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD_10 52
   // %52
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20,
-    /*%22*/ .%23-adornment%24 .%23-indirection %25,
-    /*%27*/ .%28-adornment%29 .%28-indirection %30,
-    /*%32*/ .%33-adornment%34 .%33-indirection %35,
-    /*%37*/ .%38-adornment%39 .%38-indirection %40,
-    /*%42*/ .%43-adornment%44 .%43-indirection %45,
-    /*%47*/ .%48-adornment%49 .%48-indirection %50) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20,
+	%22 .%23-adornment%24 .%23-indirection %25,
+	%27 .%28-adornment%29 .%28-indirection %30,
+	%32 .%33-adornment%34 .%33-indirection %35,
+	%37 .%38-adornment%39 .%38-indirection %40,
+	%42 .%43-adornment%44 .%43-indirection %45,
+	%47 .%48-adornment%49 .%48-indirection %50) PURE;\
 #endm
 
 
@@ -574,129 +522,17 @@ AD_CLASS_BEGIN\
 #startm AD_XMETHOD_11 57
   // %57
   STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-    /*%17*/ .%18-adornment%19 .%18-indirection %20,
-    /*%22*/ .%23-adornment%24 .%23-indirection %25,
-    /*%27*/ .%28-adornment%29 .%28-indirection %30,
-    /*%32*/ .%33-adornment%34 .%33-indirection %35,
-    /*%37*/ .%38-adornment%39 .%38-indirection %40,
-    /*%42*/ .%43-adornment%44 .%43-indirection %45,
-    /*%47*/ .%48-adornment%49 .%48-indirection %50,
-    /*%52*/ .%53-adornment%54 .%53-indirection %55) PURE;\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes three arguments.
-#c Allows an additional macro argument per method argument to let
-#c macro caller pass more info.  For example:
-#c
-#c For type           Arg is
-#c     ----           ------
-#c     objInArray     array size
-#c     objOutArray    array size
-#c     objInCustom    custom input "marshal" code
-#c     objOutCustom   custom output "marshal" code
-#c     all else       ignored
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt aux
-#c ----------   ----------   ---------   ----    ----    -------- --
-#c metharg 1    02           03          04      05      06       07
-#c metharg 2    08           09          10      11      12       13
-#c metharg 3    14           15          16      17      18       19
-#c
-#c Macro Arg 20: method description
-#c
-#startm AD_X2METHOD3 20
-  // %20
-  STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%08*/ .%09-adornment%10 .%09-indirection %11,
-    /*%14*/ .%15-adornment%16 .%15-indirection %17) PURE;\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes four arguments.
-#c Allows an additional macro argument per method argument to let
-#c macro caller pass more info.  For example:
-#c
-#c For type           Arg is
-#c     ----           ------
-#c     objInArray     array size
-#c     objOutArray    array size
-#c     objInCustom    custom input "marshal" code
-#c     objOutCustom   custom output "marshal" code
-#c     all else       ignored
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt aux
-#c ----------   ----------   ---------   ----    ----    -------- --
-#c metharg 1    02           03          04      05      06       07
-#c metharg 2    08           09          10      11      12       13
-#c metharg 3    14           15          16      17      18       19
-#c metharg 4    20           21          22      23      24       25
-#c
-#c Macro Arg 26: method description
-#c
-#startm AD_X2METHOD4 26
-  // %26
-  STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%08*/ .%09-adornment%10 .%09-indirection %11,
-    /*%14*/ .%15-adornment%16 .%15-indirection %17,
-    /*%20*/ .%21-adornment%22 .%21-indirection %23) PURE;\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes five arguments.
-#c Allows an additional macro argument per method argument to let
-#c macro caller pass more info.  For example:
-#c
-#c For type           Arg is
-#c     ----           ------
-#c     objInArray     array size
-#c     objPassArray   array size
-#c     objOutArray    array size
-#c     objInCustom    custom input "marshal" code
-#c     objOutCustom   custom output "marshal" code
-#c     all else       ignored
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt aux
-#c ----------   ----------   ---------   ----    ----    -------- --
-#c metharg 1    02           03          04      05      06       07
-#c metharg 2    08           09          10      11      12       13
-#c metharg 3    14           15          16      17      18       19
-#c metharg 4    20           21          22      23      24       25
-#c metharg 5    26           27          28      29      30       31
-#c
-#c Macro Arg 32: method description
-#c
-#startm AD_X2METHOD5 32
-  // %32
-  STDMETHOD(%01) (THIS_
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-    /*%08*/ .%09-adornment%10 .%09-indirection %11,
-    /*%14*/ .%15-adornment%16 .%15-indirection %17,
-    /*%20*/ .%21-adornment%22 .%21-indirection %23,
-    /*%26*/ .%27-adornment%28 .%27-indirection %29) PURE;\
+	%02 .%03-adornment%04 .%03-indirection %05,
+	%07 .%08-adornment%09 .%08-indirection %10,
+	%12 .%13-adornment%14 .%13-indirection %15,
+	%17 .%18-adornment%19 .%18-indirection %20,
+	%22 .%23-adornment%24 .%23-indirection %25,
+	%27 .%28-adornment%29 .%28-indirection %30,
+	%32 .%33-adornment%34 .%33-indirection %35,
+	%37 .%38-adornment%39 .%38-indirection %40,
+	%42 .%43-adornment%44 .%43-indirection %45,
+	%47 .%48-adornment%49 .%48-indirection %50,
+	%52 .%53-adornment%54 .%53-indirection %55) PURE;\
 #endm
 
 
@@ -732,11 +568,9 @@ interface I%01;\
 #c Example:
 #c AD_DEFAULT_UUID(b1a21372, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
 #c
-#c TomR:990304: replaced
-#c DEFINE_GUID(IID_I.this-module, 0x%01, 0x%02, 0x%03, 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11);
 #c
 #startm AD_DEFAULT_UUID 11
-EXTERN_C const IID IID_I.this-module;\
+DEFINE_GUID(IID_I.this-module, 0x%01, 0x%02, 0x%03, 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11);\
 #endm
 
 
@@ -763,10 +597,9 @@ EXTERN_C const IID IID_I.this-module;\
 #c AD_CLASS_UUID(b1a21373, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
 #c
 #c TomR:980713: Added
-#c TomR:990304: Removed
-#c DEFINE_GUID(CLSID_.this-module, 0x%01, 0x%02, 0x%03, 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11);\
 #c
 #startm AD_CLASS_UUID 11
+DEFINE_GUID(CLSID_.this-module, 0x%01, 0x%02, 0x%03, 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11);\
 #endm
 
 
@@ -778,34 +611,15 @@ EXTERN_C const IID IID_I.this-module;\
 #c
 #startm AD_CLASS_END 00
 
+  //
+  // Return private implementation pointer for delegation.
+  // NOTE: This is NOT the pointer to the COM object's implementation
+  // object!
+  //
+  STDMETHOD(GetImplRep)(THIS_ char **) PURE;
+
   END_INTERFACE
 };
-
-#endif // #ifndef __.this-module_h__\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Ends a class definition for classes which support more than the
-#c primary COM interface.
-#c
-#c Arguments: additional interface name
-#c
-#startm AD_COM_EXT_CLASS_END 01
-AD_CLASS_END\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Ends a class definition for classes which support more than the
-#c primary COM interface.
-#c
-#c Arguments: additional interface name
-#c
-#startm AD_COM_EXT2_CLASS_END 02
-AD_CLASS_END\
 #endm
 
 
@@ -822,20 +636,10 @@ AD_CLASS_END\
   // NOTE: This is NOT the pointer to the COM object's implementation
   // object!
   //
-  STDMETHOD(GetImplRep)(THIS_ void **) PURE;
-
-  //
-  // Intialize class extensions. This method is called after the
-  // contained Impl object has been completely initialized. This
-  // allows the aggregated extension object access to all of the
-  // interfaces and property data of its controlling unknown.
-  //
-  STDMETHOD(InitializeExtension)(THIS_ REFCLSID clsid) PURE;
+  STDMETHOD(GetImplRep)(THIS_ char **) PURE;
 
   END_INTERFACE
-};
-
-#endif // #ifndef __.this-module_h__\
+};\
 #endm
 
 
@@ -846,16 +650,6 @@ AD_CLASS_END\
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Specifies a method in a separate COM interface.
-#c
-#c Argument: method declaration
-#c
-#startm AD_COM_METH 01
 #endm
 
 
@@ -950,7 +744,7 @@ AD_CLASS_END\
 #startm AD_GETOBJ_METHOD1 06
   // %06
   STDMETHOD(%01) (THIS_
-    /*%02*/ %03 ** I%04) PURE;\
+	%02 %03 ** I%04) PURE;\
 #endm
 
 
@@ -971,7 +765,7 @@ AD_CLASS_END\
 #startm AD_SETOBJ_METHOD1 06
   // %06
   STDMETHOD(%01) (THIS_
-    /*%02*/ %03 * I%04) PURE;\
+	%02 %03 * I%04) PURE;\
 #endm
 
 
@@ -1039,7 +833,7 @@ interface I%01;\
 #c The objIn macros are for use with pointers to objects that are
 #c passed into the method.  The Type argument is the base type, with
 #c no indirection specified.  For example, if you're passing in
-#c AAFObject*, AAFObject should be specified for the Type argument.
+#c AAFObject*, AAFObject should be specified for the Type argument.#c
 #c
 #c The objOut macros are for use with pointers to pointers to objects
 #c that are passed out of the method.  The Type argument is the base
@@ -1057,256 +851,10 @@ I\
 #endm
 
 
-#startm .objInArray-adornment 00
-I\
-#endm
-
-
 #startm .objPass-adornment 00
 #endm
 
 
 #startm .objOut-adornment 00
 I\
-#endm
-
-
-#startm .objOutArray-adornment 00
-I\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Hack to quote the .this-module macro and keep it out of export
-#c files.  Do not define this macro in exp.mac!!!
-#c
-#startm AD_EXPORT_THIS_MODULE 00
-.this-module\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Starts a class definition
-#c
-#c Argument1: Abstract or Concrete
-#c Argument2: Transient or StoredObject
-#c            special cases:CommonBase and StoredObjectBase
-#c
-#c Note: Concrete-StoredObject means Persistent. In other words
-#c Concrete-StoredObject objects (and derived objects) are the 
-#c only types of objects that should ever be found in an AAF
-#c file.
-#c
-#c Valid combiniations:          examples
-#c -----------------------       ---------------
-#c   Abstract-CommonBase         AAFRoot 
-#c   Abstract-Transient          ????
-#c   Abstract-StoredObjectBase   AAFObject
-#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
-#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
-#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
-#c
-#startm AD_XCLASS_BEGIN 02
-.begin-%01-%02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Ends a class definition
-#c
-#c Argument1: Abstract or Concrete
-#c Argument2: Transient or StoredObject
-#c            special cases:CommonBase and StoredObjectBase
-#c
-#c Note: Concrete-StoredObject means Persistent. In other words
-#c Concrete-StoredObject objects (and derived objects) are the 
-#c only types of objects that should ever be found in an AAF
-#c file.
-#c
-#c Valid combiniations:          examples
-#c -----------------------       ---------------
-#c   Abstract-CommonBase         AAFRoot 
-#c   Abstract-Transient          ????
-#c   Abstract-StoredObjectBase   AAFObject
-#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
-#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
-#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
-#c
-#startm AD_XCLASS_END 02
-.end-%01-%02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c The following macros implement all of the allowable
-#c combinations of the AD_XCLASS_BEGIN and AD_XCLASS_END
-#c
-
-
-#ccccccccccccccccccccccccccc
-#c Abstract-CommonBase
-#c Special case for the common base class for all AAF objects,
-#c Transient and StoredObject classes.
-#c (first version defined backwords compatibility)
-
-#startm .begin-Abstract-CommonBase 00
-AD_ROOT_CLASS_BEGIN\
-#endm
-
-#startm .end-Abstract-CommonBase 00
-AD_ROOT_CLASS_END\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Abstract-StoredObjectBase
-#c Special case for the base class for all AAF stored objects
-#c (first version defined backwords compatibility)
-
-#startm .begin-Abstract-StoredObjectBase 00
-AD_CLASS_BEGIN\
-#endm
-
-#startm .end-Abstract-StoredObjectBase 00
-AD_CLASS_END\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Abstract-Transient
-#c (first version defined backwords compatibility)
-
-#startm .begin-Abstract-Transient 00
-AD_CLASS_BEGIN\
-#endm
-
-#startm .end-Abstract-Transient 00
-AD_CLASS_END\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Abstract-StoredObject
-#c (first version defined backwords compatibility)
-
-#startm .begin-Abstract-StoredObject 00
-AD_CLASS_BEGIN\
-#endm
-
-#startm .end-Abstract-StoredObject 00
-AD_CLASS_END\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Concrete-Transient
-#c (first version defined backwords compatibility)
-
-#startm .begin-Concrete-Transient 00
-AD_CLASS_BEGIN\
-#endm
-
-#startm .end-Concrete-Transient 00
-AD_CLASS_END\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Concrete-StoredObject
-#c Note: These are the persistent classes.
-#c (first version defined backwords compatibility)
-
-#startm .begin-Concrete-StoredObject 00
-AD_CLASS_BEGIN\
-#endm
-
-#startm .end-Concrete-StoredObject 00
-AD_CLASS_END\
-#endm
-
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c REFH 
-#c Declaration for the dictionary's factory method.
-#c
-#startm AD_DICTIONARY_FACTORY 02
-  //***********************************************************
-  //
-  // %01()
-  //
-  // %02 
-  // 
-  STDMETHOD(%01)(THIS_
-    // Class identifier (AUID) of the stored object. This is the
-    // corresponding SMPTE identifier (as a GUID) for all predefined
-    // built-in classes.
-    aafUID_constref id,
-
-    // Reference to the identifier of the interface
-    REFIID riid,
-
-    // Address of output variable that receives the 
-    // interface pointer requested in riid
-    IUnknown ** ppvObject) PURE;
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Begining of the module definitions
-#c
-#startm AD_MODULE_BEGIN 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c End of the module definitions
-#c
-#startm AD_MODULE_END 00
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes no arguments.
-#c
-#c Argument1: function name
-#c Argument2: function description
-#c
-#startm AD_FUNCTION0 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes four arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c
-#c Macro Arg 22: function description
-#c
-#startm AD_XFUNCTION4 22
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c macro for things which are not to be exported.
-#c
-#startm AD_NO_EXPORT 01
-%01\
 #endm
