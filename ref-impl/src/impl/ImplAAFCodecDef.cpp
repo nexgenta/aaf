@@ -49,7 +49,7 @@
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
-#include "AafUtils.h"
+#include "AAFUtils.h"
 #include "ImplAAFDictionary.h"
 
 #include "ImplAAFSmartPointer.h"
@@ -93,7 +93,6 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return pvtInitialize(id, pName, pDesc);
 	}
-	return AAFRESULT_SUCCESS;
 }
 
 
@@ -376,7 +375,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	

@@ -68,8 +68,8 @@ ImplAAFVaryingValue::ImplAAFVaryingValue ()
 ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 {
 	// Release all of the locator pointers.
-	size_t size = _controlPoints.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _controlPoints.count();
+	for (size_t i = 0; i < count; i++)
 	{
 		ImplAAFControlPoint *pControl = _controlPoints.clearValueAt(i);
 		if (pControl)
@@ -138,7 +138,6 @@ AAFRESULT STDMETHODCALLTYPE
 		  controlPointsType->ReleaseReference();
 		if (parameterType)
 		  parameterType->ReleaseReference();
-		return(XCODE());
 	}
 	XEND;
 
@@ -168,7 +167,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
-		return(XCODE());
 	}
 	XEND;
 	
@@ -182,7 +180,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if(! pResult) return(AAFRESULT_NULL_PARAM);
 
-  *pResult = _controlPoints.getSize();
+  *pResult = _controlPoints.count();
 
   return AAFRESULT_SUCCESS;
 }
