@@ -2,7 +2,7 @@
 #ifndef OMDATASTREAMPROPERTY_H
 #define OMDATASTREAMPROPERTY_H
 
-#include "OMTypes.h"
+#include "OMDataTypes.h"
 
 #include "OMProperty.h"
 
@@ -23,10 +23,9 @@ public:
     // @this const
   virtual void save(void) const;
 
-    // @cmember Restore this <c OMDataStreamProperty> from the
-    //          <c OMStoredObject> <p s>, the size of the
+    // @cmember Restore this <c OMDataStreamProperty>, the size of the
     //          <c OMDataStreamProperty> is <p size>.
-  virtual void restoreFrom(OMStoredObject& s, size_t size);
+  virtual void restore(size_t size);
 
     // @cmember Close this  <c OMDataStreamProperty>.
   virtual void close(void);
@@ -65,6 +64,17 @@ public:
   void write(const OMByte* buffer,
              const OMUInt32 bytes,
              OMUInt32& bytesWritten);
+
+  // Direct property access interface
+
+    // @cmember The size of the raw bits of this
+    //          <c OMDataStreamProperty>. The size is given in bytes.
+  virtual size_t bitsSize(void) const;
+
+    // @cmember Get the raw bits of this <c OMDataStreamProperty>. The
+    //          raw bits are copied to the buffer at address <p bits>
+    //          which is <p size> bytes in size.
+  virtual void getBits(OMByte* bits, size_t size) const;
 
 private:
 
