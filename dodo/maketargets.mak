@@ -21,7 +21,7 @@ test_only:
 run:
 	 cd tool ; $(MAKE) run
 
-.SUFFIXES: .cpp .h .comc .comh .dod .exp .idl .fidl .implc .implh .comt .cppt .refh .frefh
+.SUFFIXES: .cpp .h .comc .comcx .comh .dod .exp .idl .fidl .implc .implh .comt .cppt .refh .frefh
 
 # This file contains the list of all of the targets to be built...								   
 include targets.mk
@@ -65,7 +65,6 @@ $(INCLUDE_DIR)/com-api/AAF.idl : $(FIDL_TARGETS)
 	    done ; \
 	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
 	    	echo ""; \
-	    	echo "// I$$class"; \
 	    	echo ""; \
 	    	cat $$class.fidl; \
 	    done ; \
@@ -94,16 +93,20 @@ $(INCLUDE_DIR)/ref-api/AAF.h : $(FREFH_TARGETS)
 	    echo \#include \"AAFCOMPlatform.h\" ; \
 	    echo \#endif ; \
 	    echo "" ; \
+	    echo \#ifndef __AAFTypes_h__ ; \
+	    echo \#include \"AAFTypes.h\" ; \
+	    echo \#endif ; \
+	    echo "" ; \
 	    echo \#ifdef __cplusplus ; \
-	    for class in $(DODO_TARGET_NAMES) ; do \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
 	    	echo interface I$$class\;; \
 	    done ; \
 	    echo \#else ; \
-	    for class in $(DODO_TARGET_NAMES) ; do \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
 	    	echo typedef interface I$$class I$$class\;;  \
 	    done ; \
 	    echo \#endif ; \
-	    for class in $(DODO_TARGET_NAMES); do \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
 	    	echo ""; \
 	    	echo "// I$$class"; \
 	    	echo ""; \
@@ -152,6 +155,14 @@ SRC_DIR = ../ref-impl/src
 	mv $*.tmp $*.comc
 	chmod -w $*.comc
 	cp -f $*.comc $(SRC_DIR)/com-api/C$*.cpp
+	chmod -w $(SRC_DIR)/com-api/C$*.cpp
+
+.dod.comcx :
+	$(RM) -f $*.comcx
+	./tool/$(DODO) -f macros/comcx.mac < $*.dod > $*.tmp
+	mv $*.tmp $*.comcx
+	chmod -w $*.comcx
+	cp -f $*.comcx $(SRC_DIR)/com-api/C$*.cpp
 	chmod -w $(SRC_DIR)/com-api/C$*.cpp
 
 .dod.comt :
@@ -219,7 +230,7 @@ SRC_DIR = ../ref-impl/src
 clean:
 	cd tool ; $(MAKE) clean
 	$(RM) -f *.cpp *.cppt *.h *.idl *.fidl *.exp
-	$(RM) -f *.comc *.comh *.comt *.refh *.frefh
+	$(RM) -f *.comc *.comcx *.comh *.comt *.refh *.frefh
 	$(RM) -f *.implc *.implh
 	$(RM) -f core
 	@for file in $(AAFOBJECTS) ; do \
@@ -236,21 +247,25 @@ clean:
 	done
 	$(RM) -f $(SRC_DIR)/cpp-api/test/AAF*Test.cpp
 	$(RM) -f $(SRC_DIR)/cpp-api/test/EnumAAF*Test.cpp
-	$(RM) -f $(SRC_DIR)/com-api/test/CAAF*Test.cpp
-	$(RM) -f $(SRC_DIR)/com-api/test/CEnumAAF*Test.cpp
+#	$(RM) -f $(SRC_DIR)/com-api/test/CAAF*Test.cpp
+#	$(RM) -f $(SRC_DIR)/com-api/test/CEnumAAF*Test.cpp
 	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.h
 	$(RM) -f $(INCLUDE_DIR)/com-api/AAFTypes.h
 	$(RM) -f $(INCLUDE_DIR)/com-api/AAFModuleTest.h
 	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.idl
 	$(RM) -f $(INCLUDE_DIR)/com-api/AAFTypes.idl
 	$(RM) -f $(INCLUDE_DIR)/com-api/AAFModuleTest.idl
+	$(RM) -f $(INCLUDE_DIR)/ref-api/AAF.h
+	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFTypes.h
+	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFModuleTest.h
 	@for file in $(AUTO_GEN_IMPL) ; do \
 		echo $(RM) -f $(SRC_DIR)/impl/Impl$$file.cpp ; \
 		$(RM) -f $(SRC_DIR)/impl/Impl$$file.cpp ; \
 		echo $(RM) -f $(SRC_DIR)/impl/Impl$$file.h ; \
 		$(RM) -f $(SRC_DIR)/impl/Impl$$file.h ; \
+		echo $(RM) -f $(SRC_DIR)/com-api/test/C$${file}Test.cpp ; \
+		$(RM) -f $(SRC_DIR)/com-api/test/C$${file}Test.cpp ; \
 	done
-
 
 # This file contains the list of all dependents...
 include depend.mk
