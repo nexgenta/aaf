@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: comc.mac,v 1.68.2.1 2004/05/01 02:05:40 jptrainor Exp $ $Name:  $
+#c $Id: comc.mac,v 1.68.2.2 2004/09/02 17:38:33 jptrainor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -1495,7 +1495,7 @@ HRESULT C.this-module::InternalQueryInterface
     }
     if (EQUAL_UID(riid,IID_I%03)) 
     { 
-        *ppvObj = (I%02 *)this; 
+        *ppvObj = (I%03 *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
