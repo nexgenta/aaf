@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxSmartPointer.h,v 1.13 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxSmartPointer.h,v 1.13.2.1 2004/09/02 19:48:16 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -131,6 +131,7 @@ AXSP_TDEF_A( MasterMob )
 AXSP_TDEF_B( MasterMobEx )
 AXSP_TDEF_A( MetaDefinition )
 AXSP_TDEF_A( Mob )
+AXSP_TDEF_B( Mob2 )
 AXSP_TDEF_A( MobSlot )
 AXSP_TDEF_A( NestedScope )
 AXSP_TDEF_A( NetworkLocator )
