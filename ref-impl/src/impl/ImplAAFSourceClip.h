@@ -60,7 +60,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetFade
         (// @parm [out] Fade In Length
-		 aafInt32 *       fadeInLen     ,
+		 aafLength_t *       fadeInLen     ,
 
 		 // @parm [out] Fade In Type
 		 aafFadeType_t *  fadeInType    ,
@@ -69,7 +69,7 @@ public:
          aafBool *        fadeInPresent ,
 
 		 // @parm [out] Fade Out Length
-		 aafInt32 *       fadeOutLen    ,
+		 aafLength_t *     fadeOutLen    ,
 
 		 // @parm [out] Fade Out Type
          aafFadeType_t *  fadeOutType   ,
@@ -121,10 +121,6 @@ public:
 
 public:
 
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFSourceClipTest.cpp.
-  static AAFRESULT test();
-
 	virtual AAFRESULT TraverseToClip(aafLength_t length,
 					ImplAAFSegment **sclp,
 					 ImplAAFPulldown **pulldownObj,
@@ -133,13 +129,12 @@ public:
 					 aafBool *isMask);
 
 private:
-	OMFixedSizeProperty<aafInt32>		_fadeInLen;
+	OMFixedSizeProperty<aafLength_t>	_fadeInLength;
 	OMFixedSizeProperty<aafFadeType_t>	_fadeInType;
-	OMFixedSizeProperty<aafBool>		_fadeInPresent;
-	OMFixedSizeProperty<aafInt32> 		_fadeOutLen;
+	OMFixedSizeProperty<aafLength_t> 	_fadeOutLength;
 	OMFixedSizeProperty<aafFadeType_t>	_fadeOutType;
-	OMFixedSizeProperty<aafBool>		_fadeOutPresent;
 	OMFixedSizeProperty<aafPosition_t>	_startTime;
+
 };
 
 #endif // ! __ImplAAFSourceClip_h__
