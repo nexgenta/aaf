@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkdict.awk,v 1.46 2004/02/27 18:25:14 stuart_hc Exp $ $Name:  $
+# $Id: mkdict.awk,v 1.47 2004/03/18 14:34:54 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -140,7 +140,7 @@ BEGIN {
   printf("// the License for the specific language governing rights and limitations\n");
   printf("// under the License.\n");
   printf("//\n");
-  printf("// The Original Code of this file is Copyright 1998-2001, Licensor of the\n");
+  printf("// The Original Code of this file is Copyright 1998-2004, Licensor of the\n");
   printf("// AAF Association.\n");
   printf("//\n");
   printf("// The Initial Developer of the Original Code of this file and the\n");
