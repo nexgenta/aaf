@@ -34,15 +34,19 @@ depend.mk : aafobjects.mk
 	@ echo AAFTypes.idl : macros/idl.mac macros/base.mac >> depend.tmp
 	@ echo AAFTypes.refh : macros/refh.mac macros/base.mac >> depend.tmp
 	@ echo "" >> depend.tmp
-	@ echo "#" >> depend.tmp
-	@ echo "#" >> depend.tmp
-	@ echo "#" special case the utility classes since they will not be exposed by com >> depend.tmp
-	@ echo AAFModuleTest.all...
-	@ echo "" >> depend.tmp
-	@ echo AAFModuleTest.all : AAFModuleTest.idl >> depend.tmp
-	@ echo AAFModuleTest.all : AAFModuleTest.refh >> depend.tmp
-	@ echo AAFModuleTest.idl : macros/idl.mac macros/base.mac >> depend.tmp
-	@ echo AAFModuleTest.refh : macros/refh.mac macros/base.mac >> depend.tmp
+	@ echo "#" Special case AAFRoot since this is a private implementation object... >> depend.tmp
+	@ echo AAFRoot.all...
+	@ echo AAFRoot.all : AAFRoot.idl >> depend.tmp
+	@ echo AAFRoot.all : AAFRoot.refh >> depend.tmp
+	@ echo AAFRoot.all : AAFRoot.comc AAFRoot.comh >> depend.tmp
+	@ echo AAFRoot.all : AAFRoot.implc AAFRoot.implh >> depend.tmp
+	@ echo AAFRoot.idl : macros/idl.mac macros/base.mac >> depend.tmp
+	@ echo AAFRoot.refh : macros/refh.mac macros/base.mac >> depend.tmp
+	@ echo AAFRoot.comc : macros/comc.mac macros/base.mac >> depend.tmp
+	@ echo AAFRoot.comh : macros/comh.mac macros/base.mac >> depend.tmp
+	@ echo AAFRoot.implc : macros/implc.mac macros/base.mac >> depend.tmp
+	@ echo AAFRoot.implh : macros/implh.mac macros/base.mac >> depend.tmp
+	@ echo AAFRoot.exp : macros/exp.mac macros/base.mac >> depend.tmp
 	@ for base in $(DODO_TARGET_NAMES) ; do \
 		echo $$base.all... ; \
 		echo "" >> depend.tmp ; \
