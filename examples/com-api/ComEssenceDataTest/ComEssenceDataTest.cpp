@@ -59,10 +59,6 @@ static aafSourceRef_t sourceRef;
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
 
-static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
-{
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
-}
 
 #define TEST_PATH	L"SomeFile.dat"
 
@@ -100,12 +96,12 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
-static void AUIDtoString(aafUID_t *uid, char *buf)
+static void MobIDtoString(aafMobID_constref uid, char *buf)
 {
 	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
-			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
-			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
+			uid.Data1, uid.Data2, uid.Data3, (int)uid.Data4[0],
+			(int)uid.Data4[1], (int)uid.Data4[2], (int)uid.Data4[3], (int)uid.Data4[4],
+			(int)uid.Data4[5], (int)uid.Data4[6], (int)uid.Data4[7]);
 }
 
 typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
@@ -151,8 +147,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
+	IAAFClassDef                *pCDMasterMob = 0;
+	IAAFClassDef                *pCDNetworkLocator = 0;
+	IAAFDataDef                 *pDdefSound = 0;
 	// !!!Previous revisions of this file contained variables here required to handle external essence
-	aafUID_t					masterMobID;
+	aafMobID_t					masterMobID;
 	aafProductIdentification_t	ProductInfo;
 	aafRational_t				editRate = {44100, 1};
 	aafRational_t				sampleRate = {44100, 1};
@@ -190,13 +189,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
 	check(pFile->GetHeader(&pHeader));
 
-  // Get the AAF Dictionary so that we can create valid AAF objects.
-  check(pHeader->GetDictionary(&pDictionary));
+	// Get the AAF Dictionary so that we can create valid AAF objects.
+	check(pHeader->GetDictionary(&pDictionary));
+
+	check(pDictionary->LookupClassDef(AUID_AAFMasterMob,
+									  &pCDMasterMob));
+	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
+									  &pCDNetworkLocator));
+	check(pDictionary->LookupDataDef(DDEF_Sound,
+									 &pDdefSound));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
   // Get a Master MOB Interface
-	check(pDictionary->CreateInstance( AUID_AAFMasterMob,
+	check(pDictionary->CreateInstance( pCDMasterMob,
 						   IID_IAAFMasterMob, 
 						   (IUnknown **)&pMasterMob));
 	// Get a Mob interface and set its variables.
@@ -212,7 +218,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	if(dataFile != NULL)
 	{
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
+		check(pDictionary->CreateInstance(pCDNetworkLocator,
 								IID_IAAFLocator, 
 								(IUnknown **)&pLocator));		
 		check(pLocator->SetPath (dataFile->dataFilename));
@@ -249,7 +255,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 		// now create the Essence data file
 		check(pMasterMob->CreateEssence(1,				// Slot ID
-									DDEF_Sound,		// MediaKind
+									pDdefSound,		// MediaKind
 									CodecWave,		// codecID
 									editRate,		// edit rate
 									sampleRate,		// sample rate
@@ -388,6 +394,24 @@ cleanup:
 	if (pHeader)
 		pHeader->Release();
 
+	if (pCDMasterMob)
+	  {
+		pCDMasterMob->Release();
+		pCDMasterMob = 0;
+	  }
+
+	if (pCDNetworkLocator)
+	  {
+		pCDNetworkLocator->Release();
+		pCDNetworkLocator = 0;
+	  }
+
+	if (pDdefSound)
+	  {
+		pDdefSound->Release ();
+		pDdefSound = 0;
+	  }
+
 	if (pFile)
   {
     pFile->Close();
@@ -415,7 +439,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	aafNumSlots_t				numMobs, numSlots;
 	aafSearchCrit_t				criteria;
 	aafRational_t				readSampleRate;
-	aafUID_t					mobID;
+	aafMobID_t					mobID;
 	aafWChar					namebuf[1204];
 	unsigned char				AAFDataBuf[4096];
 	aafUInt32					AAFBytesRead, samplesRead;
@@ -450,7 +474,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 			check(pMob->GetMobID (&mobID));
 			check(pMob->GetName (namebuf, sizeof(namebuf)));
 			convert(mobName, sizeof(mobName), namebuf);
-			AUIDtoString(&mobID, mobIDstr);
+			MobIDtoString(mobID, mobIDstr);
 			printf("    MasterMob Name = '%s'\n", mobName);
 			printf("        (mobID %s)\n", mobIDstr);
 			// Make sure we have one slot 
@@ -808,18 +832,36 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	return(AAFRESULT_SUCCESS);
 }
 
-void TestPluginManager(void)
+// Make sure all of our required plugins have been registered.
+static HRESULT RegisterRequiredPlugins(void)
 {
+  HRESULT hr = S_OK;
 	IAAFPluginManager	*mgr = NULL;
 
-//	check(AAFGetPluginManager(&mgr));
+  // Load the plugin manager 
+  check(AAFGetPluginManager(&mgr));
 
-	// BobT 9/15/99: comment out cleanup label because it is only used
-	// in the check macro.  Since the above line is commented out, the
-	// cleanup: label yields a warning in VC++.  Un-comment it when
-	// the above line is un-commented.
-// cleanup:
-	return;
+  // Attempt load and register all of the plugins
+  // in the shared plugin directory.
+  check(mgr->RegisterSharedPlugins());
+
+  // Attempt to register all of the plugin files
+  // in the given directorys:
+  //check(mgr->RegisterPluginDirectory(directory1));
+  //check(mgr->RegisterPluginDirectory(directory2));
+
+
+  // Attempt to register all of the plugins in any
+  // of the given files:
+  //check(mgr->RegisterPluginFile(file1));
+  //check(mgr->RegisterPluginFile(file2));
+  //...
+
+cleanup:
+  if (mgr)
+    mgr->Release();
+
+	return moduleErrorTmp;
 }
 
 main()
@@ -832,6 +874,9 @@ main()
 	aafWChar *	rawData = L"EssenceTestRaw.wav";
 	aafWChar *	externalAAF = L"ExternalAAFEssence.aaf";
 	testDataFile_t	dataFile;
+
+  // Make sure all of our required plugins have been registered.
+  checkFatal(RegisterRequiredPlugins());
 
 	printf("***Creating file %s using writeRawData (Internal Media)\n", pFileName);
 	checkFatal(CreateAAFFile(pwFileName, NULL, testRawCalls));
@@ -869,8 +914,6 @@ main()
 	checkFatal(CreateAAFFile(pwFileName, &dataFile, testStandardCalls));
 	printf("***Re-opening file %s using ReadSamples\n", pFileName);
 	ReadAAFFile(pwFileName, testStandardCalls);
-
-//	TestPluginManager();
 
 	printf("Done\n");
 

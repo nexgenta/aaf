@@ -37,6 +37,7 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
+#include "CAAFBuiltinDefs.h"
 
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
@@ -120,7 +121,7 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
 // (as returned by StringFromGUID2).
 const size_t MAX_CLSID_BUFFER = 40;
 
-static void formatMobID(char *cBuffer, size_t length, aafUID_t *pMobID)
+static void formatMobID(char *cBuffer, size_t length, aafMobID_t *pMobID)
 {
   assert(pMobID, "Valid input mobID");
   assert(cBuffer != 0, "Valid output buffer");
@@ -265,7 +266,7 @@ static void ReadAAFFile(aafWChar * pFileName)
             aafWChar name[500], slotName[500];
             char chName[1000], chMobID[MAX_CLSID_BUFFER];
             aafNumSlots_t  numSlots;
-            aafUID_t    mobID = {0};
+            aafMobID_t    mobID = {0};
             aafSlotID_t    trackID;
             aafRational_t  rate;
 
@@ -423,7 +424,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFHeader *        pHeader = NULL;
   IAAFDictionary *pDictionary = NULL;
   aafProductIdentification_t  ProductInfo;
-  aafUID_t          newUID;
+  //aafMobID_t          newMobID;
   
   // delete any previous test file before continuing...
   char chFileName[1000];
@@ -443,11 +444,12 @@ static void CreateAAFFile(aafWChar * pFileName)
   ProductInfo.platform = NULL;
   
   check(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
-  
+  #if 0
   check(pFile->GetHeader(&pHeader));
 
   // Get the AAF Dictionary so that we can create valid AAF objects.
   check(pHeader->GetDictionary(&pDictionary));
+  CAAFBuiltinDefs defs (pDictionary);
    
 //Make the first mob
   IAAFMob            *pMob = NULL;
@@ -469,17 +471,17 @@ static void CreateAAFFile(aafWChar * pFileName)
   {
      // Create a source Mob with a FileDescriptor attached
     check(pDictionary->CreateInstance(
-                AUID_AAFSourceMob, 
+                defs.cdSourceMob(),
                 IID_IAAFSourceMob, 
                 (IUnknown **)&smob));
     check(smob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-    check(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
-    //newUID.Data1 = test;
-    check(pMob->SetMobID(newUID));
+    check(CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
+    //newMobID.Data1 = test;
+    check(pMob->SetMobID(newMobID));
     check(pMob->SetName(names[test]));
 
     check(pDictionary->CreateInstance(
-              AUID_AAFFileDescriptor,
+              defs.cdFileDescriptor(),
               IID_IAAFFileDescriptor, 
               (IUnknown **)&fileDesc));
     check(fileDesc->SetSampleRate(audioRate));
@@ -488,7 +490,7 @@ static void CreateAAFFile(aafWChar * pFileName)
     {
       HRESULT stat;
       stat = pDictionary->CreateInstance(
-                  AUID_AAFNetworkLocator,
+                  defs.cdNetworkLocator(),
                   IID_IAAFLocator, 
                   (IUnknown **)&pLocator);
       check (stat);
@@ -501,7 +503,7 @@ static void CreateAAFFile(aafWChar * pFileName)
     // Add some slots
     for(testSlot = 0; testSlot < 3; testSlot++)
     {
-       check(pDictionary->CreateInstance(AUID_AAFSourceClip,
+       check(pDictionary->CreateInstance(defs.cdSourceClip(),
                IID_IAAFSourceClip, 
                (IUnknown **)&sclp));
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
@@ -551,7 +553,7 @@ static void CreateAAFFile(aafWChar * pFileName)
 
   pHeader->Release();
   pHeader = NULL;
-  
+  #endif
   check(pFile->Save());
   check(pFile->Close());
   if (pFile)
@@ -600,8 +602,8 @@ main()
 
   printf("***Creating file %s\n", pFileName);
   CreateAAFFile(pwFileName);
-  printf("***Re-opening file %s\n", pFileName);
-  ReadAAFFile(pwFileName);
+  // printf("***Re-opening file %s\n", pFileName);
+  // ReadAAFFile(pwFileName);
   
   printf("Done\n");
   return(0);
