@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFMob
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFMobTest.cpp,v 1.55.2.1 2004/03/17 20:43:55 jptrainor Exp $ $Name:  $
+// $Id: CAAFMobTest.cpp,v 1.55.2.2 2004/04/07 18:26:48 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -125,8 +125,10 @@ static const char KLVfrowney[] =        /* 16x16 frowney face */
 
 
 
+namespace {
 const aafCharacter* AttributeNames[]  = { L"Attribute A Name", L"Attribute B Name" };
 const aafCharacter* AttributeValues[] = { L"Attribute A Value", L"Attribute B Value" };
+};
 
 
 static aafFrameOffset_t 	TCstartFrame = 108000;	// One hour
