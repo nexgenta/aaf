@@ -2459,7 +2459,7 @@ AAFRESULT
 ImplAAFEssenceAccess::CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, ImplAAFLocator *loc, ImplAAFFile **result)
 {
 	ImplAAFIdentification			*xferIdent = NULL;
-	aafProductIdentification_t		identSetup = { 0 };
+	aafProductIdentification_t		identSetup;
 	aafUInt32						length;
 	aafInt32						buflen;
 	wchar_t							*nameBuf = NULL;
