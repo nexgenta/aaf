@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCDCIDescriptor.cpp,v 1.23 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCDCIDescriptor.cpp,v 1.23.2.1 2004/08/03 18:58:42 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,16 +66,13 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	AAFRESULT	hr;
 
-	switch (ComponentWidth)
+	if (ComponentWidth >= 0)
 	{
-	case 8:
-	case 10:
-	case 16:
 		_componentWidth = ComponentWidth;
 		hr = AAFRESULT_SUCCESS;
-		break;
-
-	default:
+	}
+	else
+	{
 		hr = AAFRESULT_BAD_PROP;
 	}
 
@@ -206,10 +203,10 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFCDCIDescriptor::GetVerticalSubsampling (aafUInt32* pVerticalSubsampling)
 {
 	if (pVerticalSubsampling == NULL)
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 
-	if (!_verticalSubsampling.isPresent())
-	  return AAFRESULT_PROP_NOT_PRESENT;
+	if(!_verticalSubsampling.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pVerticalSubsampling = _verticalSubsampling;
 
