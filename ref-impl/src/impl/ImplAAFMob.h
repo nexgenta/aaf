@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.h,v 1.44.2.4 2004/07/16 15:23:13 bakerian Exp $ $Name:  $
+// $Id: ImplAAFMob.h,v 1.44.2.5 2004/07/23 00:24:33 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -663,6 +663,13 @@ virtual AAFRESULT STDMETHODCALLTYPE
   bool IsNameEqual( const aafString_t name ) const;
   HRESULT IsClassIDEqual( const aafClassID_t* id, bool& result ) const;
   bool IsUsageCodeEqual( const aafUID_t* usageCode ) const;
+
+
+protected:
+
+  AAFRESULT CloneDependencies(aafIncMedia_t  includeMedia,
+                              ImplAAFFile * destFile);
+
 
 	protected:
 	OMFixedSizeProperty<aafMobID_t>		_mobID;
