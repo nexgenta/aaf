@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.140.2.1 2004/12/13 04:34:34 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.140.2.2 2004/12/19 03:51:26 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -274,6 +274,10 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 		assert(d);
 		d->InstantiateAxiomaticDefinitions();
 
+		// Sync the file's dictionary with the built in
+		// dictionary before proceeding further.
+		checkResult( d->SyncMetaDictionaries() );
+
 		// Get the byte order
 		OMByteOrder byteOrder = _file->byteOrder();
 		if (byteOrder == littleEndian) {
@@ -415,8 +419,9 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 		assert(d);
 		checkResult( d->InstantiateAxiomaticDefinitions() );
 
-		// Merge the builtin dictionary into the file dictionary.
-		checkResult( d->MergeWithFile() );
+		// Sync the file's dictionary with the built in
+		// dictionary before proceeding further.
+		checkResult( d->SyncMetaDictionaries() );
 
 		// Get the byte order
 		OMByteOrder byteOrder = _file->byteOrder();
@@ -623,6 +628,10 @@ ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 		ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(mf);
 		assert(d);
 		d->InstantiateAxiomaticDefinitions();
+
+		// Sync the file's dictionary with the built in
+		// dictionary before proceeding further.
+		checkResult( d->SyncMetaDictionaries() );
 
 		// Now that the file is open and the header has been
 		// restored, complete the initialization of the
@@ -1144,13 +1153,24 @@ ImplAAFFile::Save ()
 	// If any new modes are added then the following line will
 	// have to be updated.
 	if (IsWriteable ()) {
+
 	  // Assure no registration of def objects in dictionary during
 	  // save operation
 	  ImplAAFDictionarySP dictSP;
 	  AAFRESULT hr = _head->GetDictionary(&dictSP);
 	  if (AAFRESULT_FAILED (hr))
 		return hr;
+
+	  // Sync the file's dictionary with the built in dictionary
+	  // before proceeding with the save.
+	  OMDictionary* mf = _file->dictionary();
+	  assert(mf == _metafactory);
+  	  ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(mf);
+	  assert(d);
+	  checkResult( d->SyncMetaDictionaries() );
+
 	  dictSP->AssureClassPropertyTypes ();
+
 	  bool regWasEnabled = dictSP->SetEnableDefRegistration (false);
 
 	  // OMFile::save() allows us to pass a client context to be

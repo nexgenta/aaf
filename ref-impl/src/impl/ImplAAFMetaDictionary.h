@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.24.2.1 2004/12/13 04:34:35 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.24.2.2 2004/12/19 03:51:26 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -329,8 +329,8 @@ public:
   // Create and initialize all of the axiomatic definitions.
   AAFRESULT InstantiateAxiomaticDefinitions(void);
 
-  // Merge the builtin dictionary into the file dictionary.
-  AAFRESULT MergeWithFile();
+  // Sync the builtin dictionary and the file dictionary definitions.
+  AAFRESULT SyncMetaDictionaries();
 
   // Create all of the axiomatic classes as uninitialized objects.
   void CreateAxiomaticClasses(void); // throw AAFRESULT
@@ -386,6 +386,10 @@ protected:
   virtual void InitOMProperties (ImplAAFClassDef * pClassDef);
 
 private:
+
+  AAFRESULT PvtMergeBuiltinPropDefsToFile();
+  AAFRESULT PvtMergeBuiltinClassDefsToFile();
+  AAFRESULT PvtMergeFileClassDefsToBuiltin();
 
   //
   // Persistent data members.
