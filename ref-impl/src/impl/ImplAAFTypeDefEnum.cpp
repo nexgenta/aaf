@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.cpp,v 1.36.2.2 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.cpp,v 1.36.2.3 2004/08/09 20:15:48 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -335,7 +335,7 @@ ImplAAFTypeDefEnum::GetElementType (
 	
 	if(_ElementType.isVoid())
 		return AAFRESULT_OBJECT_NOT_FOUND;
-	ImplAAFTypeDef *pTypeDef = _ElementType;
+	ImplAAFTypeDef *pTypeDef = bootstrapTypeWeakReference(_ElementType);
 	
 	*ppTypeDef = pTypeDef;
 	assert (*ppTypeDef);
