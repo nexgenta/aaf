@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportAudioExample.cpp,v 1.15 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+// $Id: ExportAudioExample.cpp,v 1.16 2004/05/05 15:48:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -96,10 +96,10 @@ const AAFByteOrder INTEL_ORDER		      = 0x4949; // 'II' for Intel
 const AAFByteOrder MOTOROLA_ORDER         = 0x4d4d; // 'MM' for Motorola
 
 
-AAFByteOrder GetNativeByteOrder(void);
-void AAFByteSwap32(
+AAFByteOrder getNativeByteOrder(void);
+void ByteSwap32(
 			aafInt32 *lp);	/* IN/OUT -- Byte swap this value */
-void AAFByteSwap16(
+void ByteSwap16(
 			aafInt16 * wp);	/* IN/OUT -- Byte swap this value */
 void scanWAVEData(aafUInt8 **srcBufHdl, aafInt32 maxsize, void *data);
 void scanSwappedWAVEData(aafUInt8 **srcBufHdl, aafInt32 maxsize, void *data);
@@ -405,7 +405,7 @@ struct CAAFInitialize
 
 //**********************
 // Extra code required to scan the original WAVE headers and extract metadata parameters & data offset
-AAFByteOrder GetNativeByteOrder(void)
+AAFByteOrder getNativeByteOrder(void)
 {
   aafInt16 word = 0x1234;
   aafInt8  byte = *((aafInt8*)&word);
@@ -421,7 +421,7 @@ AAFByteOrder GetNativeByteOrder(void)
   return result;
 }
 
-void AAFByteSwap32(
+void ByteSwap32(
 			aafInt32 *lp)	/* IN/OUT -- Byte swap this value */
 {
 	register unsigned char *cp = (unsigned char *) lp;
@@ -435,7 +435,7 @@ void AAFByteSwap32(
 	cp[1]	= t;
 }
 
-void AAFByteSwap16(
+void ByteSwap16(
 			aafInt16 * wp)	/* IN/OUT -- Byte swap this value */
 {
 	register unsigned char *cp = (unsigned char *) wp;
@@ -455,14 +455,14 @@ void scanWAVEData(aafUInt8 **srcBufHdl, aafInt32 maxsize, void *data)
 
 void scanSwappedWAVEData(aafUInt8 **srcBufHdl, aafInt32 maxsize, void *data)
 {
-	AAFByteOrder	nativeByteOrder = GetNativeByteOrder();
+	AAFByteOrder	nativeByteOrder = getNativeByteOrder();
 	memcpy(data, *srcBufHdl, maxsize);
 	(*srcBufHdl) += maxsize;
 	
 	if ((maxsize == sizeof(aafInt32)) && (INTEL_ORDER != nativeByteOrder))
-			AAFByteSwap32((aafInt32 *) data);
+			ByteSwap32((aafInt32 *) data);
 	else if ((maxsize == sizeof(aafInt16)) && (INTEL_ORDER != nativeByteOrder))
-			AAFByteSwap16((aafInt16 *) data);
+			ByteSwap16((aafInt16 *) data);
 }
 
 AAFRESULT loadWAVEHeader(aafUInt8 *buf,
