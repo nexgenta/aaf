@@ -59,7 +59,7 @@ public:
 	HRESULT ConvertOMFHeader( void );
 	HRESULT ConvertOMFDataDefinitionObject( OMF2::omfObject_t obj);
 	HRESULT ConvertOMFClassDictionaryObject( OMF2::omfObject_t obj);
-	HRESULT ConvertOMFMediaDataObject( OMF2::omfObject_t obj);
+	HRESULT ConvertOMFMediaDataObject( OMF2::omfObject_t obj, OMF2::omfUID_t inMediaID);
 	HRESULT ConvertOMFDatakind(OMF2::omfDDefObj_t datakind, aafUID_t* pDatadef);
 	HRESULT ConvertUniqueNameToAUID(OMF2::omfUniqueName_t datakindName, aafUID_t* pDatadef);
 	HRESULT ConvertOMFMOBObject( OMF2::omfObject_t obj, IAAFMob* pMob );
@@ -76,11 +76,11 @@ public:
 	HRESULT ConvertOMFSelector(OMF2::omfObject_t selector, IAAFSelector* pSelector);
 	HRESULT ConvertOMFLocator(OMF2::omfObject_t locator, IAAFEssenceDescriptor* pEssenceDesc);
 	HRESULT ConvertOMFCDCIDescriptorLocator(OMF2::omfObject_t mediaDescriptor, IAAFCDCIDescriptor* pAAFDescriptor);
-	HRESULT SetEffectOptionalProperties(OMF2::omfEffObj_t effect, IAAFEffect* pEffect,
+	HRESULT SetEffectOptionalProperties(OMF2::omfEffObj_t effect, IAAFOperationGroup* pEffect,
 										aafLength_t effectLength, aafUID_t effectDatadef);
-	HRESULT ConvertOMFEffects(OMF2::omfEffObj_t effect, IAAFEffect* pEffect);
-	HRESULT ConvertOMFEffectDefinition(OMF2::omfDDefObj_t effectDef, aafUID_t* pEffectAUID, IAAFEffectDef** ppEffectDef);
-	void CreateParameterDefinition(IAAFEffectDef*	pEffectDef);
+	HRESULT ConvertOMFEffects(OMF2::omfEffObj_t effect, IAAFOperationGroup* pEffect);
+	HRESULT ConvertOMFEffectDefinition(OMF2::omfDDefObj_t effectDef, aafUID_t* pEffectAUID, IAAFOperationDef** ppEffectDef);
+	void CreateParameterDefinition(IAAFOperationDef*	pEffectDef);
 
 private:
 
