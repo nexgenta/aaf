@@ -29,6 +29,14 @@
 #startm AD_HEAD 00
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDefinitionObject
+/******************************************\\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\\******************************************/
 #endm
 
 
@@ -45,10 +53,52 @@
 #error - improperly defined include guard
 #endif
 
+#include <iostream.h>
+
 AAFRESULT .this-module::test()
 {
+  .this-module * pObject = 0;
+
+  try
+  {
+    // Attempt to create an .this-module.
+    pObject = new .this-module;
+	if (!pObject)
+	{
+      cerr << ".this-module::test...FAILED!";
+      cerr << "\\tnew .this-module returned NULL." << endl;
+	  // return out of memory error code...
+	}
+	  // module-specific tests go here
+
+      if (pObject)
+        delete pObject;
+	  return AAFRESULT_NOT_IMPLEMENTED;
+
+  }
+  catch (...)
+  {
+    cerr << ".this-module::test...Caught general C++ exception!" << endl; 
+  }
+
+
+  // Cleanup our object if it exists.
+  if (pObject)
+	delete pObject;
   return AAFRESULT_NOT_IMPLEMENTED;
 }
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_BEGIN 01
+AD_CLASS_BEGIN\
 #endm
 
 
@@ -65,8 +115,38 @@ AAFRESULT .this-module::test()
 #error - improperly defined include guard
 #endif
 
+#include <iostream.h>
+
 AAFRESULT .this-module::test()
 {
+  .this-module * pObject = 0;
+
+  try
+  {
+    // Attempt to create an .this-module.
+    pObject = new .this-module;
+	if (!pObject)
+	{
+      cerr << ".this-module::test...FAILED!";
+      cerr << "\\tnew .this-module returned NULL." << endl;
+	  // return out of memory error code...
+	}
+	  // module-specific tests go here
+
+      if (pObject)
+        delete pObject;
+	  return AAFRESULT_NOT_IMPLEMENTED;
+
+  }
+  catch (...)
+  {
+    cerr << ".this-module::test...Caught general C++ exception!" << endl; 
+  }
+
+
+  // Cleanup our object if it exists.
+  if (pObject)
+	delete pObject;
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 #endm
@@ -76,6 +156,9 @@ AAFRESULT .this-module::test()
 #c
 #c Note that most macros are are unused, and simply have null bodies!
 #c
+#startm AD_IDL 01
+#endm
+
 #startm AD_INCLUDE 01
 #endm
 
@@ -145,10 +228,16 @@ AAFRESULT .this-module::test()
 #startm AD_CLASS_END 00
 #endm
 
+#startm AD_COM_EXT_CLASS_END 01
+#endm
+
 #startm AD_ROOT_CLASS_END 00
 #endm
 
 #startm AD_OVERRIDE 01
+#endm
+
+#startm AD_COM_METH 01
 #endm
 
 #startm AD_XCONSTRUCTOR1 06
@@ -166,6 +255,7 @@ AAFRESULT .this-module::test()
 #startm AD_BEGIN_SESSION 00
 #endm
 
+
 #ccccccccccccccccccccccccccc
 #c
 #c Inserts declaration for a static method used for a container to create
@@ -174,3 +264,12 @@ AAFRESULT .this-module::test()
 #startm AD_STATIC_CREATE 00
 #endm
 
+
+#ccccccccccccccccccccccccccc
+#c
+#c Hack to quote the .this-module macro and keep it out of export
+#c files.  Do not define this macro in exp.mac!!!
+#c
+#startm AD_EXPORT_THIS_MODULE 00
+.this-module\
+#endm

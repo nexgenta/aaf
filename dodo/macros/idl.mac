@@ -57,6 +57,15 @@ import "%01.idl";
 #c Arguments: none
 #c
 #startm AD_HEAD 00
+/******************************************\\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\\******************************************/
+
 cpp_quote("//=--------------------------------------------------------------------------=")
 cpp_quote("// .this-module.h")
 cpp_quote("//=--------------------------------------------------------------------------=")
@@ -124,6 +133,18 @@ import "wtypes.idl";
 #startm AD_CLASS_BEGIN 00
 interface I.this-module : IUnknown
 {\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_BEGIN 01
+AD_CLASS_BEGIN\
 #endm
 
 
@@ -627,8 +648,20 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
   // NOTE: This is NOT the pointer to the COM object's implementation
   // object!
   //
-  HRESULT GetImplRep([out, string, retval] char **);
+  [local] HRESULT GetImplRep([out, retval] void **);
 }\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_END 01
+AD_CLASS_END\
 #endm
 
 
@@ -644,7 +677,7 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
   // NOTE: This is NOT the pointer to the COM object's implementation
   // object!
   //
-  HRESULT GetImplRep([out, string, retval] char **);
+  [local] HRESULT GetImplRep([out, retval] void **);
 }\
 #endm
 
@@ -656,6 +689,16 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Specifies a method in a separate COM interface.
+#c
+#c Argument: method declaration
+#c
+#startm AD_COM_METH 01
 #endm
 
 
@@ -863,4 +906,14 @@ I\
 
 #startm .objOut-adornment 00
 I\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Hack to quote the .this-module macro and keep it out of export
+#c files.  Do not define this macro in exp.mac!!!
+#c
+#startm AD_EXPORT_THIS_MODULE 00
+.this-module\
 #endm
