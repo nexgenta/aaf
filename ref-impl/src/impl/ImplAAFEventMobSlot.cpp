@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -214,13 +215,10 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
   {
     if (NULL != pComponent)
       pComponent->ReleaseReference();
-	pComponent = 0;
     if (NULL != pDict)
       pDict->ReleaseReference();
-	pDict = 0;
     if (NULL != pDef)
       pDef->ReleaseReference();
-	pDef = 0;
   }
   XEND;
 
@@ -229,5 +227,6 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
 
 
 
+OMDEFINE_STORABLE(ImplAAFEventMobSlot, AUID_AAFEventMobSlot);
 
 

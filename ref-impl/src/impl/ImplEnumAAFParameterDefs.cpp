@@ -1,35 +1,16 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
 /***********************************************\
-*	Stub only.   Implementation not yet added	*
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
 \***********************************************/
 
 
 #ifndef __ImplAAFParameterDef_h__
 #include "ImplAAFParameterDef.h"
 #endif
-
-
-
-
-
 
 #ifndef __ImplEnumAAFParameterDefs_h__
 #include "ImplEnumAAFParameterDefs.h"
@@ -82,7 +63,8 @@ AAFRESULT STDMETHODCALLTYPE
 		_enumStrongProp->getSize(siz);
 		numElem = siz;
 	}
-	//!!!Else assert
+	else
+		return(AAFRESULT_INCONSISTANCY);
 
 	if(ppParameterDef == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -106,7 +88,8 @@ AAFRESULT STDMETHODCALLTYPE
 			_enumStrongProp->getValueAt(*ppParameterDef, _current);
 			(*ppParameterDef)->AcquireReference();
 		}
-		//!!!Else assert
+		else
+			RAISE(AAFRESULT_INCONSISTANCY);
 		_current++;
 		if (head) {
 			head->ReleaseReference();
@@ -182,7 +165,8 @@ AAFRESULT STDMETHODCALLTYPE
 		_enumStrongProp->getSize(siz);
 		numElem = siz;
 	}
-	//!!!Else assert
+	else
+		return(AAFRESULT_INCONSISTANCY);
 
 	newCurrent = _current + count;
 

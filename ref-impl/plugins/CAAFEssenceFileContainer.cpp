@@ -136,8 +136,21 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetPluggableID (aafUID_t *uid)
+    CAAFEssenceFileContainer::GetNumDefinitions (aafInt32 *pDefCount)
 {
+	if(pDefCount == NULL)
+		return AAFRESULT_NULL_PARAM;
+	
+	*pDefCount = 1;
+	return AAFRESULT_SUCCESS;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
+{
+	if(uid == NULL)
+		return AAFRESULT_NULL_PARAM;
+
 	*uid = ContainerFile;		// UID of the DefObject
 	return AAFRESULT_SUCCESS;
 }
@@ -151,11 +164,14 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetDefinitionObject (IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	aafUID_t			uid;
 	IAAFContainerDef	*container = NULL;
 	IAAFDefObject		*obj = NULL;
+	if((dict == NULL) || (def == NULL))
+		return AAFRESULT_NULL_PARAM;
+
 	XPROTECT()
 	{
 		CHECK(dict->CreateInstance(&AUID_AAFContainerDef,
@@ -184,7 +200,6 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
-//!!!Need some real values for the descriptor
 static wchar_t *manufURL = L"http://www.avid.com";
 static wchar_t *downloadURL = L"ftp://ftp.avid.com/pub/";
 const aafUID_t MANUF_JEFFS_PLUGINS = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
@@ -194,12 +209,11 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
+    CAAFEssenceFileContainer::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
 {
 	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
 	IAAFNetworkLocator		*pNetLoc = NULL;
-	IAAFDefObject			*defObject = NULL;
 	aafUID_t				category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
 	aafUID_t				plugID = EXAMPLE_FILE_PLUGIN;
 	
@@ -209,10 +223,7 @@ HRESULT STDMETHODCALLTYPE
 			IID_IAAFPluginDescriptor, 
 			(IUnknown **)&desc));
 		*descPtr = desc;
-		CHECK(desc->QueryInterface(IID_IAAFDefObject, (void **)&defObject));
-		CHECK(defObject->Init(&plugID, L"Essence File Container", L"Handles non-container files."));
-		defObject->Release();
-		defObject = NULL;
+		CHECK(desc->Init(&plugID, L"Essence File Container", L"Handles non-container files."));
 
 		CHECK(desc->SetCategoryClass(&category));
 		CHECK(desc->SetPluginVersionString(manufRev));
@@ -252,8 +263,6 @@ HRESULT STDMETHODCALLTYPE
 			pLoc->Release();
 		if(pNetLoc != NULL)
 			pNetLoc->Release();
-		if(defObject != NULL)
-			defObject->Release();
 	}
 	XEND
 
