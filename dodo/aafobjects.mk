@@ -60,6 +60,7 @@ AAFNONPERSISTENTOBJECTS = \
 	EnumAAFMobComments \
 	EnumAAFParameterSlots \
 	EnumAAFPropertyDefs \
+	EnumAAFProperties \
 	EnumAAFReferenceValues \
 	EnumAAFSegments \
 	EnumAAFTypeDefs 
@@ -69,8 +70,7 @@ AAFNONPERSISTENTOBJECTS = \
 # implemented in other objects.
 AAFCOMINTERFACESONLY = \
 	AAFEndian \
-	AAFSearchSource \
-	AAFMobPrivate
+	AAFSearchSource
 
 # These are the impl files that are typed by humans.  Be sure to
 # remove them from the other list.  As you check each one in, just add
@@ -93,7 +93,6 @@ HUMAN_TYPED_IMPL = \
 	AAFObject \
 	AAFSegment \
 	AAFSequence \
-	AAFSession \
 	AAFSourceClip \
 	AAFSourceMob \
 	AAFSourceReference \
