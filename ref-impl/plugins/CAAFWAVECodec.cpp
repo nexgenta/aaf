@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.64 2004/11/22 15:02:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.65 2004/11/24 16:44:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -593,6 +593,7 @@ HRESULT STDMETHODCALLTYPE
 		if(!_sampleDataHeaderWritten)
 		{
 			CHECK(CreateWAVEheader(header, HEADER_BUFSIZE, _numCh, &headerSize));
+			CHECK(_mdes->SetSummary(headerSize, header));
 
 			_stream->Seek(0);
 			_sampleDataHeaderWritten = kAAFTrue;
@@ -1110,11 +1111,10 @@ HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::PutEssenceFormat (IAAFEssenceFormat * pFormat)
 {
 	aafInt32		numSpecifiers, n, bytesRead;
-	aafUInt32		valueUInt32, headerSize;
+	aafUInt32		valueUInt32;
 	aafRational_t	valueRat;
 	aafUID_t		opcode;
 	aafUInt8		buf[256];
-	aafUInt8		header[HEADER_BUFSIZE];
 
 	XPROTECT()
 	{
@@ -1171,10 +1171,7 @@ HRESULT STDMETHODCALLTYPE
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 			}
 		}
-		
-		CHECK(CreateWAVEheader(header, HEADER_BUFSIZE, _numCh, &headerSize));
-		CHECK(_mdes->SetSummary (headerSize, header));
-		
+
 		// This will output the header on the next non-raw write
 		_sampleDataHeaderWritten = kAAFFalse;
 	}
