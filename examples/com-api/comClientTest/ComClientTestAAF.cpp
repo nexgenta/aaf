@@ -239,7 +239,7 @@ static void ReadAAFFile(aafWChar * pFileName)
           pIdent = NULL;
         }
 
-        hr = pHeader->CountMobs(kAllMob, &numMobs);
+        hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
         check(hr); // display error message
         if (FAILED(hr))
           numMobs = 0;
@@ -251,7 +251,7 @@ static void ReadAAFFile(aafWChar * pFileName)
         if (SUCCEEDED(hr))
         {
           //!!!  aafSearchCrit_t    criteria;
-          //!!!  criteria.searchTag = kNoSearch;
+          //!!!  criteria.searchTag = kAAFNoSearch;
           hr = pHeader->GetMobs (NULL, &mobIter);
           check(hr); // display error message
         }
@@ -439,7 +439,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -466,6 +466,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFEssenceDescriptor *essenceDesc = NULL;
   aafRational_t  audioRate = { 44100, 1 };
   IAAFLocator    *pLocator = NULL;
+	IAAFComponent*		pComponent = NULL;
 
   for(test = 0; test < 5; test++)
   {
@@ -503,6 +504,10 @@ static void CreateAAFFile(aafWChar * pFileName)
        check(defs.cdSourceClip()->
 			 CreateInstance(IID_IAAFSourceClip, 
 							(IUnknown **)&sclp));
+		 check(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 check(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
       check(pMob->AppendNewTimelineSlot
 			(editRate,
@@ -547,6 +552,9 @@ static void CreateAAFFile(aafWChar * pFileName)
   // Cleanup
   pDictionary->Release();
   pDictionary = NULL;
+
+	if (pComponent)
+		pComponent->Release();
 
   pHeader->Release();
   pHeader = NULL;
