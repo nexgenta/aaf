@@ -32,27 +32,22 @@
  ************************************************************************/
 
 
-class ImplAAFRoot;
+class OMObject;
+class OMProperty;
+class OMReferenceContainer;
+
+
+class ImplAAFStorable;
+class ImplAAFTypeDef;
+class ImplEnumAAFPropertyValues;
+class ImplAAFTypeDefObjectRef;
 
 #ifndef __ImplAAFPropertyValue_h__
 #include "ImplAAFPropertyValue.h"
 #endif
 
-#ifndef __ImplAAFPropValData_h__
-#include "ImplAAFPropValData.h"
-#endif
-
-class ImplAAFTypeDef;
-
-class OMProperty;
-//class OMContainerProperty; // TBD: the base class for reference containers
-
-
-//class ImplAAFRefContainerValue : public ImplAAFPropertyValue // TBD:
-class ImplAAFRefContainerValue : public ImplAAFPropValData
+class ImplAAFRefContainerValue : public ImplAAFPropertyValue // TBD:
 {
-public:
-
 protected:
   //
   // Constructor/destructor
@@ -62,16 +57,73 @@ protected:
   virtual ~ImplAAFRefContainerValue ();
 
   // non-published method to initialize this object.
-  // NOTE: The given property's type must be a reference type.
-  AAFRESULT Initialize (const ImplAAFTypeDef *referenceType,
-                        OMProperty *property);
-public:
+  // Initialize an instance from a type definition. This is the "old-style"
+  // "non-direct" access initialization method. 
+  AAFRESULT Initialize (const ImplAAFTypeDef *propertyType);
 
-  virtual AAFRESULT STDMETHODCALLTYPE WriteTo(OMProperty* pOmProp);
+  // non-published method to initialize this object.
+  // NOTE: The given property's type must be a reference type.
+  AAFRESULT Initialize (const ImplAAFTypeDef *containerType,
+                        OMProperty *property);
   
-private:
-  OMProperty * _containerProperty; // TBD: the base class for singleton references
-	ImplAAFRoot * _propertyContainer; // save reference to owning container.
+  // Retrieve the property as an OMReferenceContainer.
+  OMReferenceContainer* referenceContainer(void) const;
+
+  // Utility for converting the a property value (parameter) into an object.
+  static ImplAAFStorable * GetStorableFromPropertyValue(ImplAAFPropertyValue* pPropertyValue, AAFRESULT & result);
+  
+  // Utility to release an old OMObject from the container.
+  void ReleaseOldObject(OMObject *object);
+  
+  // Utility to release all old OMObjects from the given container.
+  AAFRESULT ReleaseAllObjects(OMReferenceContainer *pContainerProperty);
+  
+  //
+  // Methods that must be overridden by subclasses of reference containers.
+  //
+public:  
+  // Return the type of object references in the container.
+  virtual ImplAAFTypeDefObjectRef * GetElementType(void) const = 0; // the result is NOT reference counted.
+  
+public:
+  // Perform specialized validation for an object before it is added
+  // to a container.
+  virtual AAFRESULT ValidateNewObject(ImplAAFStorable *pNewObject) const = 0;
+  
+  // Perform any specialized cleanup of any object after it has been removed
+  // from the container.
+  virtual bool usesReferenceCounting(void) const = 0;
+  
+public:
+  // Override of ImplAAFPropertyValue (just validates input property).
+  virtual AAFRESULT STDMETHODCALLTYPE WriteTo(OMProperty* pOmProp);
+
+  
+  // Insert the given object into this contain property.
+  virtual AAFRESULT STDMETHODCALLTYPE InsertObject(ImplAAFStorable* pObject);
+
+  // Is the given object in the container property.
+  virtual AAFRESULT STDMETHODCALLTYPE ContainsObject(ImplAAFStorable* pObject, aafBoolean_t* pResult);
+  
+  // Remove the given object from the container property.
+  virtual AAFRESULT STDMETHODCALLTYPE RemoveObject(ImplAAFStorable* pObject);
+
+
+  
+  // Insert the given object into this contain property.
+  virtual AAFRESULT STDMETHODCALLTYPE InsertElement(ImplAAFPropertyValue* pPropertyValue);
+
+  // Is the given object in the container property.
+  virtual AAFRESULT STDMETHODCALLTYPE ContainsElement(ImplAAFPropertyValue* pPropertyValue, aafBoolean_t* pResult);
+
+  // The number of objects in the container property
+  virtual AAFRESULT STDMETHODCALLTYPE Count(aafUInt32* pCount);
+  
+  // Remove the given object from the container property.
+  virtual AAFRESULT STDMETHODCALLTYPE RemoveElement(ImplAAFPropertyValue* pPropertyValue);
+
+  // Get an enumerator for the given container property
+  virtual AAFRESULT STDMETHODCALLTYPE GetElements(ImplEnumAAFPropertyValues** ppEnum);
 };
 
 //
