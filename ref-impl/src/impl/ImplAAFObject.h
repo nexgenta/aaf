@@ -206,6 +206,12 @@ public:
 public:
   // Interfaces ivisible inside the toolkit, but not exposed through the API
 
+  // Associate the existing OMProperties with corresponding property definitions from
+  // the given class definition. NOTE: This call is recursive, it calls itself again
+  // for the parent class of the given class until current class is a "root" class.
+  virtual void InitOMProperties (ImplAAFClassDef * pClassDef);
+
+
   // Gets the head object of the file containing this object.
   // This function is used to maintain MOB and Definition tables in the
   // head object.
@@ -230,8 +236,9 @@ public:
 
   aafBoolean_t pvtIsGenerationTracked() const;
 
-  // Override callback from OMStorable
+  // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 
 private:
 
@@ -275,6 +282,13 @@ private:
   //
   // number of those props that are actually used
   aafUInt32 _savedPropsCount;
+  
+  aafBool	_isInitialized;
+
+
+protected:
+  aafBool isInitialized (void) const;
+  void    setInitialized (void);
 };
 
 //
