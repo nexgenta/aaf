@@ -9,6 +9,7 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
@@ -103,6 +104,10 @@ public:
 	virtual AAFRESULT STDMETHODCALLTYPE
 		GetTypeDef(ImplAAFTypeDef **ppTypeDef);
 
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFVaryingValue)
 private:
 	OMFixedSizeProperty<aafUID_t>						 _interpolation;
     OMStrongReferenceVectorProperty<ImplAAFControlPoint> _controlPoints;

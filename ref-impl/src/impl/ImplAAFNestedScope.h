@@ -9,6 +9,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -88,7 +89,10 @@ public:
 	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
 
 
-private:
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFNestedScope)
 
   // Persistent Properties	
   OMStrongReferenceVectorProperty<ImplAAFSegment>		_slots;

@@ -9,6 +9,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -17,6 +18,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -97,6 +99,13 @@ public:
         (ImplEnumAAFLocators ** ppEnum);
   //@comm The number of locators may be zero if the essence is in the current file.
 
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFEssenceDescriptor)
 
 public:
 	// Functions internal to the toolkit

@@ -9,6 +9,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -107,6 +108,11 @@ public:
     GetDataDefinitions
         // @parm [out,retval] Parameter definition enumeration
         (ImplEnumAAFDataDefs ** ppEnum);
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFCodecDef)
 
 private:
 	DataDefWeakRefArrayProp_t			_dataDefs;

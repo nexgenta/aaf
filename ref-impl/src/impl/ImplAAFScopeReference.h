@@ -9,6 +9,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -79,6 +80,9 @@ public:
 
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFScopeReference)
 
   // Persistent Properties
   OMFixedSizeProperty<aafUInt32>	_relativeScope;

@@ -9,6 +9,7 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \************************************************/
 
@@ -498,6 +499,15 @@ public:
     EnumPluginLocators
         // @parm [out, retval] Plugin Locator Enumeration
         (ImplEnumAAFPluginLocators ** ppEnum);
+
+
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFPluginDescriptor)
 
 public:
 	virtual AAFRESULT
