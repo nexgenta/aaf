@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRedBlackTreeIteratorT.h,v 1.11.2.1 2004/06/08 13:45:40 stuart_hc Exp $ $Name:  $
+// $Id: OMRedBlackTreeIteratorT.h,v 1.11.2.2 2004/07/23 00:06:48 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -320,12 +320,11 @@ Value OMRedBlackTreeIterator<Key, Value>::setValue(const Key ANAME(k),
   //   @rdesc The <p Key> at the current position.
   //   @this const
 template <typename Key, typename Value>
-Key OMRedBlackTreeIterator<Key, Value>::key(void) const
+const Key& OMRedBlackTreeIterator<Key, Value>::key(void) const
 {
   TRACE("OMRedBlackTreeIterator<Key, Value>::key");
 
   PRECONDITION("Valid iterator", this->valid());
 
-  Key result = _current->_key;
-  return result;
+  return _current->_key;
 }
