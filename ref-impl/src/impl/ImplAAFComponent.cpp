@@ -76,7 +76,7 @@ ImplAAFComponent::~ImplAAFComponent ()
 		size_t size = _KLVData.count();
 		for (size_t j = 0; j < size; j++)
 		{
-			ImplAAFKLVData* pKLVData = _KLVData.setValueAt(0, j);
+			ImplAAFKLVData* pKLVData = _KLVData.clearValueAt(j);
 			if (pKLVData)
 			  pKLVData->ReleaseReference();
 			pKLVData = 0;
@@ -314,6 +314,7 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 	{
 		*foundTransition = kAAFFalse;
 		*found = this;
+    AcquireReference(); // We are returning a reference so bump the reference count!
 		CHECK(GetLength(&tmpMinLen));
 		if (Int64Less(tmpMinLen, rootLen))
 		{

@@ -58,7 +58,7 @@
 #endif
 
 #include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIds.h"
+#include "AAFPropertyIDs.h"
 
 #ifndef __ImplAAFOperationGroup_h__
 #include "ImplAAFOperationGroup.h"
@@ -107,7 +107,7 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 	size_t size = _inputSegments.getSize();
 	for (size_t i = 0; i < size; i++)
 	{
-		ImplAAFSegment *pSeg = _inputSegments.setValueAt(0, i);
+		ImplAAFSegment *pSeg = _inputSegments.clearValueAt(i);
 		if (pSeg)
 		{
 		  pSeg->ReleaseReference();
@@ -117,14 +117,14 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>parameters(_parameters);
 	while(++parameters)
 	{
-		ImplAAFParameter *pParm = parameters.setValue(0);
+		ImplAAFParameter *pParm = parameters.clearValue();
 		if (pParm)
 		{
 		  pParm->ReleaseReference();
 		  pParm = 0;
 		}
 	}
-	ImplAAFSourceReference *ref = _rendering.setValue(0);
+	ImplAAFSourceReference *ref = _rendering.clearValue();
 	if (ref)
 	{
 	  ref->ReleaseReference();
@@ -606,6 +606,34 @@ AAFRESULT STDMETHODCALLTYPE
 	pSeg = _inputSegments.removeAt(index);
 	if(pSeg)
 		pSeg->ReleaseReference();
+
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT ImplAAFOperationGroup::ChangeContainedReferences(aafMobID_constref from,
+													aafMobID_constref to)
+{
+	aafUInt32			n, count;
+	ImplAAFSegment		*seg = NULL;
+	
+	XPROTECT()
+	{
+		CHECK(CountSourceSegments (&count));
+		for(n = 0; n < count; n++)
+		{
+			CHECK(GetInputSegmentAt (n, &seg));
+			CHECK(seg->ChangeContainedReferences(from, to));
+			seg->ReleaseReference();
+			seg = NULL;
+		}
+	}
+	XEXCEPT
+	{
+		if(seg != NULL)
+		  seg->ReleaseReference();
+		seg = 0;
+	}
+	XEND;
 
 	return AAFRESULT_SUCCESS;
 }
