@@ -9,7 +9,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -46,10 +45,6 @@ public:
   // Declare this class to be storable.
   //
   OMDECLARE_STORABLE(ImplAAFHTMLDescriptor)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFHTMLDescriptorTest.cpp.
-  static AAFRESULT test();
 };
 
 #endif // ! __ImplAAFHTMLDescriptor_h__

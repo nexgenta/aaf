@@ -9,7 +9,6 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
@@ -213,9 +212,6 @@ public:
   //
   OMDECLARE_STORABLE(ImplAAFTimecodeStream)
 
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFTimecodeStreamTest.cpp.
-  static AAFRESULT test();
 private: 
   virtual AAFRESULT STDMETHODCALLTYPE
     Write(aafUInt32  bytes, aafDataBuffer_t  buffer, aafUInt32 *  bytesWritten);

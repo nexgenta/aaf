@@ -1,0 +1,46 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
+#startm .this-module 0
+AAFEdgecode\
+#endm
+#c
+#startm .parent-module 0
+AAFSegment\
+#endm
+#c
+#c #import ./AAFSegment.exp
+AD_HEAD
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
+
+ 
+
+
+AD_CLASS_UUID(38e6f8a2, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
+AD_DEFAULT_UUID(38e6f8a4, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
+
+AD_METHOD2(Create,
+	[in],aafLength_t  ,length  ,Length Property Value,
+	[in],aafEdgecode_t,edgecode,Edgecode Value,
+	This function creates a new edgecode clip with the
+  // given property values.  The edgecode value is represented with an
+  // aafEdgecode_t struct consisting of startFrame\\\, filmKind\\\, and
+  // codeFormat.)
+
+AD_METHOD1(GetEdgecode,
+		   [out],aafEdgecode_t *,edgecode,Edgecode,
+		   This set of functions returns the required property values
+  // for the object identified by XXX.)
+
+AD_XCLASS_END(Concrete, StoredObject)
