@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,7 +31,7 @@
 
 #include "OMVector.h"
 #include "OMContainerElement.h"
-#include "OMContainerProperty.h"
+#include "OMRefVectorProperty.h"
 
 template <typename ReferencedObject>
 class OMStrongReferenceVectorIterator;
@@ -46,22 +46,21 @@ class OMVectorIterator;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @base public | <c OMContainerProperty>
+  //   @base public | <c OMReferenceVectorProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceVectorProperty :
-                                 public OMContainerProperty<ReferencedObject> {
+class OMStrongReferenceVectorProperty : public OMReferenceVectorProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
   OMStrongReferenceVectorProperty(const OMPropertyId propertyId,
-                                  const char* name);
+                                  const wchar_t* name);
 
     // @cmember Destructor.
   virtual ~OMStrongReferenceVectorProperty(void);
 
     // @cmember Save this <c OMStrongReferenceVectorProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember Close this <c OMStrongReferenceVectorProperty>.
   virtual void close(void);
@@ -88,6 +87,10 @@ public:
     //          at position <p index> to <p object>.
   ReferencedObject* setValueAt(const ReferencedObject* object,
                                const size_t index);
+
+    // @cmember Set the value of this <c OMStrongReferenceVectorProperty>
+    //          at position <p index> to 0.
+  ReferencedObject* clearValueAt(const size_t index);
 
     // @cmember The value of this <c OMStrongReferenceVectorProperty>
     //          at position <p index>.
@@ -194,6 +197,51 @@ public:
     //          copied from the buffer at address <p bits> which is
     //          <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
+
+    // @cmember Insert <p object> into this
+    //          <c OMStrongReferenceVectorProperty>.
+  virtual void insertObject(const OMObject* object);
+
+    // @cmember Does this <c OMStrongReferenceVectorProperty> contain
+    //          <p object> ?
+  virtual bool containsObject(const OMObject* object) const;
+
+    // @cmember Remove <p object> from this
+    //          <c OMStrongReferenceVectorProperty>.
+  virtual void removeObject(const OMObject* object);
+
+    // @cmember Create an <c OMReferenceContainerIterator> over this
+    //          <c OMStrongReferenceVectorProperty>.
+  virtual OMReferenceContainerIterator* createIterator(void) const;
+
+    // @cmember Set the value of this <c OMStrongReferenceVectorProperty>
+    //          at position <p index> to <p object>.
+  virtual OMObject* setObjectAt(const OMObject* object,
+                                const size_t index);
+
+    // @cmember The value of this <c OMStrongReferenceVectorProperty>
+    //          at position <p index>.
+  virtual OMObject* getObjectAt(const size_t index) const;
+
+    // @cmember Append the given <p OMObject> <p object> to
+    //          this <c OMStrongReferenceVectorProperty>.
+  virtual void appendObject(const OMObject* object);
+
+    // @cmember Prepend the given <p OMObject> <p object> to
+    //          this <c OMStrongReferenceVectorProperty>.
+  virtual void prependObject(const OMObject* object);
+
+    // @cmember Remove the object from this
+    //          <c OMStrongReferenceVectorProperty> at position <p index>.
+    //          Existing objects in this <c OMStrongReferenceVectorProperty>
+    //          at <p index> + 1 and higher are shifted down one index
+    //          position.
+  virtual OMObject* removeObjectAt(const size_t index);
+
+    // @cmember Insert <p object> into this <c OMStrongReferenceVectorProperty>
+    //          at position <p index>. Existing objects at <p index> and
+    //          higher are shifted up one index position.
+  virtual void insertObjectAt(const OMObject* object, const size_t index);
 
 private:
 
