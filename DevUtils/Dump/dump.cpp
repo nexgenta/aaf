@@ -11,7 +11,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 // 
-// The Original Code of this file is Copyright 1998-2002, Licensor of the
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
 // AAF Association.
 // 
 // The Initial Developer of the Original Code of this file and the
@@ -22,32 +22,48 @@
 //
 // Low-level AAF file dumper.
 //
-// This program is deliberately constructed as one file with no dependencies
-// (except for Microsoft Structured Storage) so that it can be ported with
-// relative ease to a new host. You'll be able to make some progress
-// understanding a Structured Storage AAF file even if all you have is this
-// source and a C++ compiler.
-
-// This program is complicated by the fact that it supports stored format
-// versions earlier than version 32 - the first and only shipping version.
-
-// The low-level stored format for Structured Storage AAF files is
-// documented in the file StoredFormat.doc
 
 // Tim Bingham 05-May-1998 Tim_Bingham@avid.com
 //             19-June-1998
 //             12-August-1998
 //                April-2000
-//                May/June-2002
 //
 // Tom Ransdell 28-Sept-1998 Tom_Ransdell@avid.com
 //              Adapt to building on the Macintosh with CodeWarrior Pro3
 //              24-Jan-2000
-//              Added new conditional macro ios_base_fmtflags for CW Pro 5.
+//              Added new conditional macro IOS_FMT_FLAGS for CodeWarrior Pro5.
 //
 // Terry Skotz 4-27-2000 Terry_Skotz@avid.com
 //             added support for DataInput.h so dump can get input from text
 //             file.
+
+//
+// Usage:
+//
+//  $ dump [-x -r -p -a -s -z <pid> -m <n> -l <n> -h] files...
+//
+//    -x       = hex dump, works for any file.
+//    -r       = raw dump, works for any structured storage file.
+//    -p       = property dump, works for files using the AAF stored
+//                 object format.
+//    -a       = AAF file dump, works only for AAF files.
+//    -s       = print statistics.
+//    -z <pid> = dump properties with pid <pid> (hex) as all zeroes.
+//    -m <n>   = dump only the first <n> bytes (dec) of media streams. 
+//    -l <n>   = dump only the first <n> bytes (dec) of the file.
+//    -v       = validate the structure of the file
+//    -h       = print help.
+//
+//  Notes:
+//
+//    1) -x, -r, -p and -a are mutually exclusive.
+//    2) -s is valid with -r, -p and -a. When combined with either -p or -a
+//       statistics on objects and properties are displayed, when combined
+//       with -r statistics on IStorages, IStreams and bytes are displayed.
+//    3) -z is not valid with -r. Multiple -z flags may be supplied.
+//    4) <pid> must be specified in hex. Examples are 1a00 0x1a00 0x1A00 
+//    5) -m is not valid with -r.
+//    6) -v is only valid with -p or -a, it is not valid with -x or -r
 //
 
 #include <iostream.h>
@@ -64,8 +80,6 @@
 #define OM_OS_WINDOWS
 #elif defined(_MAC) || defined(macintosh)
 #define OM_OS_MACOS
-#elif defined(__MWERKS__) && defined(__MACH__)
-#define OM_OS_MACOSX
 #elif defined(__sgi) || defined(__linux__) || defined (__FreeBSD__) || \
       defined (__APPLE__) || defined(__CYGWIN__)
 #define OM_OS_UNIX
@@ -76,13 +90,11 @@
 // Determine which implementation of structured storage to use.
 //
 #if defined(OM_OS_WINDOWS)
-#define OM_USE_WINDOWS_SS
+#define OM_WINDOWS_SS
 #elif defined(OM_OS_MACOS)
-#define OM_USE_MACINTOSH_SS
-#elif defined(OM_OS_MACOSX)
-#define OM_USE_WRAPPED_MACINTOSH_SS
+#define OM_MACINTOSH_SS
 #elif defined(OM_OS_UNIX)
-#define OM_USE_REFERENCE_SS
+#define OM_REFERENCE_SS
 #else
 #error "Don't know which implementation of structured storage to use."
 #endif
@@ -90,26 +102,18 @@
 // Include the structured storage headers. These are different
 // depending on the implementation.
 //
-#if defined(OM_USE_WINDOWS_SS)
+#if defined(OM_WINDOWS_SS)
 #include <objbase.h>
-#elif defined(OM_USE_MACINTOSH_SS)
+#elif defined(OM_MACINTOSH_SS)
+
+#include "macpub.h"
 #include "wintypes.h"
 #include "macdef.h"
-#include "macpub.h"
 #include "compobj.h"
 #include "storage.h"
 #include "initguid.h"
 #include "coguid.h"
-#elif defined(OM_USE_WRAPPED_MACINTOSH_SS)
-#include "wintypes.h"
-#include "macdef.h"
-#include "macpub.h"
-#include "compobj.h"
-#include "storage.h"
-#include "initguid.h"
-#include "coguid.h"
-#include "SSWrapper.h"
-#elif defined(OM_USE_REFERENCE_SS)
+#elif defined(OM_REFERENCE_SS)
 #include "h/storage.h"
 #endif
 
@@ -142,14 +146,12 @@ typedef char OMCHAR;
 // CodeWarrior Pro 5 MSL changes.
 #if defined(__MWERKS__)
 #if defined(__MSL_CPP__) && (__MSL_CPP__ >= 0x5300)
-#define ios_base_fmtflags ios_base::fmtflags
+#define IOS_FMT_FLAGS ios_base::fmtflags
 #else
-#define ios_base_fmtflags long int
+#define IOS_FMT_FLAGS long int
 #endif
-#elif defined(__GNUC__) && (__GNUC__ >= 3)
-#define ios_base_fmtflags std::ios_base::fmtflags
 #else
-#define ios_base_fmtflags long int
+#define IOS_FMT_FLAGS long int
 #endif
 
 // Stored forms
@@ -465,13 +467,10 @@ const OMUInt32 HIGHVERSION = 32;
 //
 enum optionType {hexadecimal, raw, property, aaf};
 enum optionType option = raw; // default
-bool cFlag = false;
 bool zFlag = false;
 bool mFlag = false;
 bool lFlag = false;
 bool vFlag = false;
-bool verboseFlag = false;
-bool hFlag = false;
 unsigned long int mLimit = 0;
 unsigned long int lLimit = 0;
 
@@ -490,22 +489,6 @@ size_t totalFileBytes;
 // Validity checking
 //
 size_t warningCount = 0;
-size_t errorCount = 0;
-
-// Structured Storage file header
-//
-typedef struct {
-  OMUInt8  _abSig[8];
-  CLSID    _clid;
-  OMUInt16 _uMinorVersion;
-  OMUInt16 _uDllVersion;
-  OMUInt16 _uByteOrder;
-  OMUInt16 _uSectorShift;
-  OMUInt16 _uMiniSectorShift;
-  OMUInt8  _padding1[22]; // Uninteresting fields
-  OMUInt32 _ulMiniSectorCutoff;
-  OMUInt8  _padding2[452]; // Other uninteresting fields
-} StructuredStorageHeader;
 
 // Prototypes for local functions.
 //
@@ -519,12 +502,11 @@ static ByteOrder hostByteOrder(void);
 static const char* byteOrder(ByteOrder bo);
 static void formatError(DWORD errorCode);
 static void fatalError(char* routineName, char* message);
-static void error(char* routineName, char* message);
 static void warning(char* routineName, char* message);
 static void printError(const char* prefix,
                        const char* fileName,
                        DWORD errorCode);
-static int checkStatus(const char* fileName, DWORD resultCode);
+static int check(const char* fileName, DWORD resultCode);
 static int checks(DWORD resultCode);
 #if defined(OM_UNICODE_APIS)
 static void convert(wchar_t* wcName, size_t length, const char* name);
@@ -537,12 +519,9 @@ static void convertName(char* cName,
                         size_t length,
                         OMCHAR* wideName,
                         char** tag);
-static char* makePathName(const char* pathName,
-                          const char* componentName,
-                          int isRoot);
 static void indent(int level);
 static void getClass(IStorage* storage, CLSID* clsid, const char* fileName);
-static void printClsid(const CLSID& clsid, ostream& stream);
+static void printClsid(const CLSID& clsid);
 static void printRawKey(OMByte* key, size_t keySize);
 static void printUMID(const UMID& umid);
 static void openStream(IStorage* storage,
@@ -598,13 +577,8 @@ void reportBadIndex(char* pathName,
                     OMUInt32 expectedSize,
                     OMUInt32 actualSize);
 static void reportBadIndexEntry(OMUInt32 i,
-                                const IndexEntry* entry,
-                                const CLSID& clsid,
-                                const char* path);
-static bool isValid(const IndexEntry* index,
-                    const OMUInt32 entries,
-                    const CLSID& clsid,
-                    const char* path);
+                                const IndexEntry* entry);
+static bool isValid(const IndexEntry* index, const OMUInt32 entries);
 static size_t valueStreamSize(const IndexEntry* index, const OMUInt32 entries);
 static char* typeName(OMUInt32 type);
 static void openStorage(IStorage* parentStorage,
@@ -626,7 +600,6 @@ static VectorIndexEntry* readVectorIndex(IStream* stream,
 static void dumpSetIndexEntry(OMUInt32 i,
                               SetIndexEntry* setIndexEntry,
                               bool printKey);
-static void printReferenceCount(OMUInt32 referenceCount);
 static void printSetIndex(SetIndexEntry* setIndex,
                           OMUInt32 count,
                           OMUInt32 highWaterMark,
@@ -707,9 +680,6 @@ static void openStorage(char* fileName, IStorage** storage);
 static void dumpFileHex(char* fileName);
 static void dumpFile(char* fileName);
 static OMUInt16 determineVersion(IStorage* storage);
-static void readHeader(StructuredStorageHeader& header, FILE* f);
-static void printHeader(StructuredStorageHeader& header);
-static void dumpHeader(char* fileName);
 static void dumpFileProperties(char* fileName, const char* label);
 static void dumpReferencedProperties(IStorage* root, OMUInt16 version);
 static FILE* wfopen(const wchar_t* fileName, const wchar_t* mode);
@@ -736,9 +706,6 @@ static double percent(size_t whole, size_t part);
 static bool ignoring(OMUInt32 pid);
 static void ignore(OMUInt32 pid);
 
-static void initializeCOM(void);
-static void finalizeCOM(void);
-void exitHandler(void);
 
 static char* readName(IStream* stream,
                       OMUInt32 nameOffset,
@@ -864,7 +831,7 @@ void Dumper::output(void)
   spaces(LEADINGSPACES);
   _line++;
   
-  ios_base_fmtflags savedFlags = cout.setf(ios::basefield);
+  IOS_FMT_FLAGS savedFlags = cout.setf(ios::basefield);
   char savedFill = cout.fill();
   
   for (i = 0; i < _count; i++) {
@@ -981,8 +948,6 @@ void checkSizes(void)
   ASSERT("Correct definition for OMUInt8",  sizeof(OMUInt8)  == 1);
   ASSERT("Correct definition for OMUInt16", sizeof(OMUInt16) == 2);
   ASSERT("Correct definition for OMUInt32", sizeof(OMUInt32) == 4);
-  ASSERT("Correct definition for StructuredStorageHeader",
-          sizeof(StructuredStorageHeader) == 512);
 
   if (sizeof(OMUInt8) != 1) {
     fatalError("checkSizes", "Incorrect definition for OMUInt8.");
@@ -1023,69 +988,20 @@ const char* byteOrder(ByteOrder bo)
   return result;
 }
 
-#if defined(OM_OS_WINDOWS)
-
-#include <windows.h>
-
-typedef enum WindowsKind {
-  wkError,       // error/unknown
-  wk3_1,         // Win32s
-  wkConsumer,    // Windows 95/98/Me
-  wkProfessional // Windows NT/2000/XP
-} WindowsKind;
-
-static WindowsKind getWindowsKind(void)
-{
-  WindowsKind result = wkError;
-
-  DWORD version = GetVersion();
-  BYTE majorVersion = (BYTE)(version        & 0x000000ff);
-  BYTE minorVersion = (BYTE)((version >> 8) & 0x000000ff);
-  if (version < 0x80000000) {
-    result = wkProfessional;
-  } else if (majorVersion < 4) {
-    result = wk3_1;
-  } else {
-    result = wkConsumer;
-  }
-  return result;
-}
-
-#endif
-
 void formatError(DWORD errorCode)
 {
 #if defined(OM_OS_WINDOWS)
+  OMCHAR buffer[256];
+  int status = FormatMessage(
+    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    errorCode,
+    LANG_SYSTEM_DEFAULT,
+    buffer,
+    sizeof(buffer)/sizeof(buffer[0]),
+    NULL);
   char message[256];
-  int status;
-  if (getWindowsKind() == wkProfessional) {
-    OMCHAR buffer[256];
-    status = FormatMessage(
-      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      errorCode,
-      LANG_SYSTEM_DEFAULT,
-      buffer,
-      sizeof(buffer)/sizeof(buffer[0]),
-      NULL);
-    if (status != 0) {
-      convert(message, 256, buffer);
-    }
-  } else {
-    char buffer[256];
-    status = FormatMessageA(
-      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      errorCode,
-      LANG_SYSTEM_DEFAULT,
-      buffer,
-      sizeof(buffer)/sizeof(buffer[0]),
-      NULL);
-    if (status != 0) {
-      convert(message, 256, buffer);
-    }
-  }
-
+  convert(message, 256, buffer);
   if (status != 0) {
     int length = strlen(message);
     if (length >= 2) {
@@ -1104,34 +1020,18 @@ char* programName;
 
 void fatalError(char* routineName, char* message)
 {
-  cerr << programName << ": Fatal error";
-  if (verboseFlag) {
-    cerr << " in routine \"" << routineName << "\"";
-  }
-  cerr << ": " << message << endl;
+  cerr << programName
+       << ": Fatal error in routine \"" << routineName << "\". "
+       << message << endl;
 
   exit(EXIT_FAILURE);
 }
 
-void error(char* routineName, char* message)
-{
-  cerr << programName << ": Error";
-  if (verboseFlag) {
-    cerr << " in routine \"" << routineName << "\"";
-  }
-  cerr << ": " << message << endl;
-
-  errorCount = errorCount + 1;
-}
-
 void warning(char* routineName, char* message)
 {
-  cerr << programName << ": Warning";
-  if (verboseFlag) {
-    cerr << " in routine \"" << routineName << "\"";
-  }
-  cerr << ": " << message << endl;
-  warningCount = warningCount + 1;
+  cerr << programName
+       << ": Warning in routine \"" << routineName << "\". "
+       << message << endl;
 }
 
 void printError(const char* prefix, const char* fileName, DWORD errorCode)
@@ -1140,7 +1040,7 @@ void printError(const char* prefix, const char* fileName, DWORD errorCode)
   formatError(errorCode);
 }
 
-int checkStatus(const char* fileName, DWORD resultCode)
+int check(const char* fileName, DWORD resultCode)
 {
   if (FAILED(resultCode)) {
     printError(programName, fileName, resultCode);
@@ -1232,25 +1132,6 @@ void convertName(char* cName, size_t length, OMCHAR* wideName, char** tag)
   strncpy(cName, pName, length);
 }
 
-char* makePathName(const char* pathName,
-                   const char* componentName,
-                   int isRoot)
-{
-  const char* separator = "/";
-  size_t length = strlen(pathName) + strlen(componentName);
-  if (!isRoot) {
-    length = length + strlen(separator);
-  }
-  char* newPathName = new char[length + 1];
-  ASSERT("Successfully allocated new path name", newPathName != 0);
-  strcpy(newPathName, pathName);
-  if (!isRoot) {
-    strcat(newPathName, separator);
-  }
-  strcat(newPathName, componentName);
-  return newPathName;
-}
-
 void indent(int level)
 {
   for (int i = 0; i < level; i++) {
@@ -1258,7 +1139,7 @@ void indent(int level)
   }
 }
 
-#if defined(OM_USE_REFERENCE_SS)
+#if defined(OM_REFERENCE_SS)
 
 static const unsigned char guidMap[] =
 { 3, 2, 1, 0, '-', 5, 4, '-', 7, 6, '-', 8, 9, '-', 10, 11, 12, 13, 14, 15 }; 
@@ -1294,13 +1175,13 @@ void getClass(IStorage* storage, CLSID* clsid, const char* fileName)
 {
   STATSTG statstg;
   HRESULT result = storage->Stat(&statstg, STATFLAG_DEFAULT);
-  if (!checkStatus(fileName, result)) {
+  if (!check(fileName, result)) {
     fatalError("getClass", "IStorage::Stat() failed.");
   }
   *clsid = statstg.clsid;
 }
 
-void printClsid(const CLSID& clsid, ostream& stream)
+void printClsid(const CLSID& clsid)
 {
   char cs[256];
 
@@ -1311,12 +1192,12 @@ void printClsid(const CLSID& clsid, ostream& stream)
   } else {
     convert(cs, 256, s);
   }
-  stream << cs;
+  cout << cs;
 }
 
 void printRawKey(OMByte* key, size_t keySize)
 {
-  ios_base_fmtflags savedFlags = cout.setf(ios::basefield);
+  IOS_FMT_FLAGS savedFlags = cout.setf(ios::basefield);
   char savedFill = cout.fill();
 
   for (OMUInt32 j = 0; j < keySize; j++) {
@@ -1328,7 +1209,7 @@ void printRawKey(OMByte* key, size_t keySize)
 
 void printUMID(const UMID& umid)
 {
-  ios_base_fmtflags savedFlags = cout.setf(ios::basefield);
+  IOS_FMT_FLAGS savedFlags = cout.setf(ios::basefield);
   char savedFill = cout.fill();
   cout << "{";
   for (size_t i = 0; i < sizeof(umid.SMPTELabel); i++) {
@@ -1343,7 +1224,7 @@ void printUMID(const UMID& umid)
   cout << "-";
   cout << setfill('0') << setw(2) << hex << (int)umid.instanceLow;
   cout << "-";
-  printClsid(umid.material, cout);
+  printClsid(umid.material);
   cout << "}";
   cout.setf(savedFlags, ios::basefield);
   cout.fill(savedFill);
@@ -1361,7 +1242,7 @@ void openStream(IStorage* storage, const char* streamName, IStream** stream)
     STGM_SHARE_EXCLUSIVE | STGM_READ,
     0,
     stream);
-  if (!checkStatus(streamName, result)) {
+  if (!check(streamName, result)) {
     fatalError("openStream", "Failed to open stream.");
   }
 
@@ -1389,8 +1270,8 @@ size_t sizeOfStream(IStream* stream, const char* streamName)
 {
   STATSTG statstg;
   HRESULT result = stream->Stat(&statstg, STATFLAG_NONAME);
-  if (!checkStatus(streamName, result)) {
-    fatalError("sizeOfStream", "Failed to Stat() stream.");
+  if (!check(streamName, result)) {
+    fatalError("sizeOfStream", "Falied to Stat() stream.");
   }
   unsigned long int streamBytes = statstg.cbSize.LowPart;
   if (statstg.cbSize.HighPart != 0) {
@@ -1431,7 +1312,7 @@ void printStat(STATSTG* statstg, char* tag)
   if (statstg->type == STGTY_STORAGE) {
     indent(6);
     cout << "clsid  = ";
-    printClsid(statstg->clsid, cout);
+    printClsid(statstg->clsid);
     cout << endl;
   }
 
@@ -1502,7 +1383,7 @@ void dumpStream(IStream* stream, STATSTG* statstg, char* pathName)
   
   for (unsigned long int i = 0; i < byteCount; i++) {
     result = stream->Read(&ch, 1, &bytesRead);
-    if (!checkStatus(pathName, result)) {
+    if (!check(pathName, result)) {
       fatalError("dumpStream", "IStream::Read() failed.");
     }
     if (bytesRead != 1) {
@@ -1557,12 +1438,12 @@ void dumpStorage(IStorage* storage,
 
   IEnumSTATSTG* enumerator;
   result = storage->EnumElements(0, NULL, 0, &enumerator);
-  if (!checkStatus(pathName, result)) {
+  if (!check(pathName, result)) {
     fatalError("dumpStorage", "IStorage::EnumElements() failed.");
   }
   
   result = enumerator->Reset();
-  if (!checkStatus(pathName, result)) {
+  if (!check(pathName, result)) {
     fatalError("dumpStorage", "IStorage::Reset() failed.");
   }
   
@@ -1582,7 +1463,7 @@ void dumpStorage(IStorage* storage,
           NULL,
           0,
           &subStorage);
-        if (!checkStatus(pathName, result)) {
+        if (!check(pathName, result)) {
           fatalError("dumpStorage", "IStorage::OpenStorage() failed.");
         }
         dumpStorage(subStorage, &statstg, myPathName, 0);
@@ -1598,7 +1479,7 @@ void dumpStorage(IStorage* storage,
           STGM_SHARE_EXCLUSIVE | STGM_READ,
           0,
           &subStream);
-        if (!checkStatus(pathName, result)) {
+        if (!check(pathName, result)) {
           fatalError("dumpStorage", "IStorage::OpenStream() failed.");
         }
         dumpStream(subStream, &statstg, myPathName);
@@ -1744,7 +1625,7 @@ void readPidString(IStream* stream,
 
 void printPidString(const OMPropertyId* string)
 {
-  ios_base_fmtflags savedFlags = cout.setf(ios::basefield);
+  IOS_FMT_FLAGS savedFlags = cout.setf(ios::basefield);
   char savedFill = cout.fill();
 
   const OMPropertyId* p = string;
@@ -1881,19 +1762,14 @@ void reportBadIndex(char* pathName,
        << " (" << endianity << ")"
        << ", Version = " << version
        << ", Number of entries = " << entryCount << " )" << endl;
-  cerr << "Expected property stream size = " << expectedSize
-       << ", Actual property stream size = " << actualSize << "." << endl;
+  cerr << "Expected index stream size = " << expectedSize
+       << ", Actual index stream size = " << actualSize << "." << endl;
 }
 
 void reportBadIndexEntry(OMUInt32 i,
-                         const IndexEntry* entry,
-                         const CLSID& clsid,
-                         const char* path)
+                         const IndexEntry* entry)
 {
   cerr << "Property set index entry is invalid." << endl;
-  cerr << path << endl;
-  printClsid(clsid, cerr);
-  cerr << endl;
   cerr << setw(12) << "property";
   cerr << setw(12) << "pid (hex)";
   cerr << setw(12) << "form (hex)";
@@ -1912,10 +1788,7 @@ void reportBadIndexEntry(OMUInt32 i,
   cerr << endl;
 }
 
-bool isValid(const IndexEntry* index,
-             const OMUInt32 entries,
-             const CLSID& clsid,
-             const char* path)
+bool isValid(const IndexEntry* index, const OMUInt32 entries)
 {
   bool result = true;
 
@@ -1929,8 +1802,10 @@ bool isValid(const IndexEntry* index,
     currentLength = index[i]._length;
     // Check length
     if (currentLength == 0) {
-      reportBadIndexEntry(i, &index[i], clsid, path);
-      error("isValid", "Property set index entry has zero length.");
+      reportBadIndexEntry(i, &index[i]);
+      fatalError("isValid", "Property set index entry has zero length.");
+      result = false;
+      break;
     }
     if (i == 0) {
       // First entry
@@ -1939,12 +1814,12 @@ bool isValid(const IndexEntry* index,
     } else {
       // Subsequent entries
       if (currentOffset < previousOffset) {
-        reportBadIndexEntry(i, &index[i], clsid, path);
+        reportBadIndexEntry(i, &index[i]);
         warning("isValid", "Property set index entries out of order.");
         result = false;
         break;
       } else if (position > currentOffset) {
-        reportBadIndexEntry(i, &index[i], clsid, path);
+        reportBadIndexEntry(i, &index[i]);
         warning("isValid", "Property set index entries overlap.");
         result = false;
         break; 
@@ -2045,7 +1920,7 @@ void openStorage(IStorage* parentStorage,
     NULL,
     0,
     subStorage);
-  if (!checkStatus(storageName, result)) {
+  if (!check(storageName, result)) {
     fatalError("openStorage", "IStorage::OpenStorage() failed.");
   }
 }
@@ -2128,29 +2003,15 @@ void dumpSetIndexEntry(OMUInt32 i,
   cout << setw(8) << i
        << " : "
        << setw(10) << setIndexEntry->_elementName
+       << "     "
+       << setw(8) << setIndexEntry->_referenceCount
        << "     ";
-  printReferenceCount(setIndexEntry->_referenceCount);
-  cout << "     ";
   if (printKey) {
-    printClsid(setIndexEntry->_key, cout);
+    printClsid(setIndexEntry->_key);
   } else {
-    printClsid(nullCLSID, cout);
+    printClsid(nullCLSID);
   }
   cout << endl;
-}
-
-void printReferenceCount(OMUInt32 referenceCount)
-{
-  if (cFlag) {
-      cout << setw(8) << referenceCount;
-  } else {
-    OMUInt32 count = referenceCount - 2;
-    if (count == 0xffffffff) {
-      cout << setw(8) << "sticky";
-    } else {
-      cout << setw(8) << count;
-    }
-  }
 }
 
 void printSetIndex(SetIndexEntry* setIndex,
@@ -2235,9 +2096,9 @@ void printSetIndex(SetIndexEntry* setIndex,
       cout << setw(8) << i
            << " : "
            << setw(10) << setIndex[i]._elementName
+           << "     "
+           << setw(8) << setIndex[i]._referenceCount
            << "     ";
-      printReferenceCount(setIndex[i]._referenceCount);
-      cout << "     ";
       cout << endl;
       cout << "  ";
       if (keySize == 32) {
@@ -2294,7 +2155,7 @@ void printWeakCollectionIndex(int containerType,
     for (OMUInt32 i = 0; i < count; i++) {
       cout << setw(8) << i;
       cout << " : ";
-      printClsid(collectionIndex[i]._key, cout);
+      printClsid(collectionIndex[i]._key);
       cout << endl;
     }
   } else {
@@ -2541,12 +2402,12 @@ void checkObject(IStorage* storage,
 
   IEnumSTATSTG* enumerator;
   result = storage->EnumElements(0, NULL, 0, &enumerator);
-  if (!checkStatus(pathName, result)) {
+  if (!check(pathName, result)) {
     fatalError("checkObject", "IStorage::EnumElements() failed.");
   }
   
   result = enumerator->Reset();
-  if (!checkStatus(pathName, result)) {
+  if (!check(pathName, result)) {
     fatalError("checkObject", "IStorage::Reset() failed.");
   }
   
@@ -2632,10 +2493,12 @@ void dumpContainedObjects(IStorage* storage,
       
       // Compute the pathname for this stream
       //
-      char* thisPathName = makePathName(pathName, subStreamName, isRoot);
-
-      // open the stream
-      //
+      char thisPathName[256];
+      strcpy(thisPathName, pathName);
+      if (!isRoot) {
+        strcat(thisPathName, "/");
+      }
+      strcat(thisPathName, subStreamName);
       IStream* stream = 0;
       openStream(storage, subStreamName, &stream);
       dumpDataStream(stream, thisPathName, subStreamName, version, byteOrder);
@@ -2643,8 +2506,6 @@ void dumpContainedObjects(IStorage* storage,
       stream->Release();
       stream = 0;
 
-      delete [] thisPathName;
-      thisPathName = 0;
       delete [] subStreamName;
       subStreamName = 0;
     }
@@ -2661,7 +2522,12 @@ void dumpContainedObjects(IStorage* storage,
       
       // Compute the pathname for this object
       //
-      char* thisPathName = makePathName(pathName, subStorageName, isRoot);
+      char thisPathName[256];
+      strcpy(thisPathName, pathName);
+      if (!isRoot) {
+        strcat(thisPathName, "/");
+      }
+      strcat(thisPathName, subStorageName);
 
       // open the storage
       //
@@ -2674,8 +2540,6 @@ void dumpContainedObjects(IStorage* storage,
       //
       dumpObject(subStorage, thisPathName, 0, version);
 
-      delete [] thisPathName;
-      thisPathName = 0;
       delete [] subStorageName;
       subStorageName = 0;
 
@@ -2701,7 +2565,12 @@ void dumpContainedObjects(IStorage* storage,
 
       // Compute the pathname for this object
       //
-      char* thisPathName = makePathName(pathName, vectorName, isRoot);
+      char thisPathName[256];
+      strcpy(thisPathName, pathName);
+      if (!isRoot) {
+        strcat(thisPathName, "/");
+      }
+      strcat(thisPathName, vectorName);
 
       // open the vector index stream
       //
@@ -2762,7 +2631,12 @@ void dumpContainedObjects(IStorage* storage,
 
         // Compute the path name for this element
         //
-        char* elementPathName = makePathName(pathName, subStorageName, isRoot);
+        char thisPathName[256];
+        strcpy(thisPathName, pathName);
+        if (!isRoot) {
+          strcat(thisPathName, "/");
+        }
+        strcat(thisPathName, subStorageName);
         
         // open the storage
         //
@@ -2773,13 +2647,10 @@ void dumpContainedObjects(IStorage* storage,
         }
         // dump the object
         //
-        dumpObject(subStorage, elementPathName, 0, version);
+        dumpObject(subStorage, thisPathName, 0, version);
 
         delete [] elementName;
         elementName = 0;
-
-        delete [] elementPathName;
-        elementPathName = 0;
 
         delete [] subStorageName;
         subStorageName = 0;
@@ -2790,9 +2661,6 @@ void dumpContainedObjects(IStorage* storage,
 
       delete [] vectorName;
       vectorName = 0;
-
-      delete [] thisPathName;
-      thisPathName = 0;
 
       delete [] vectorIndexName;
       vectorIndexName = 0;
@@ -2821,7 +2689,12 @@ void dumpContainedObjects(IStorage* storage,
 
       // Compute the pathname for this object
       //
-      char* thisPathName = makePathName(pathName, setName, isRoot);
+      char thisPathName[256];
+      strcpy(thisPathName, pathName);
+      if (!isRoot) {
+        strcat(thisPathName, "/");
+      }
+      strcat(thisPathName, setName);
 
       // open the set index stream
       //
@@ -2934,7 +2807,12 @@ void dumpContainedObjects(IStorage* storage,
 
         // Compute the path name for this element
         //
-        char* elementPathName = makePathName(pathName, subStorageName, isRoot);
+        char thisPathName[256];
+        strcpy(thisPathName, pathName);
+        if (!isRoot) {
+          strcat(thisPathName, "/");
+        }
+        strcat(thisPathName, subStorageName);
         
         // open the storage
         //
@@ -2945,13 +2823,10 @@ void dumpContainedObjects(IStorage* storage,
         }
         // dump the object
         //
-        dumpObject(subStorage, elementPathName, 0, version);
+        dumpObject(subStorage, thisPathName, 0, version);
 
         delete [] elementName;
         elementName = 0;
-
-        delete [] elementPathName;
-        elementPathName = 0;
 
         delete [] subStorageName;
         subStorageName = 0;
@@ -2959,9 +2834,6 @@ void dumpContainedObjects(IStorage* storage,
         subStorage->Release();
         subStorage = 0;
       }
-
-      delete [] thisPathName;
-      thisPathName = 0;
 
       delete [] setName;
       setName = 0;
@@ -2998,7 +2870,12 @@ void dumpContainedObjects(IStorage* storage,
 
       // Compute the pathname for this object
       //
-      char* thisPathName = makePathName(pathName, setName, isRoot);
+      char thisPathName[256];
+      strcpy(thisPathName, pathName);
+      if (!isRoot) {
+        strcat(thisPathName, "/");
+      }
+      strcat(thisPathName, setName);
 
       // open the index stream
       //
@@ -3055,16 +2932,7 @@ void dumpContainedObjects(IStorage* storage,
       //
       cout << endl;
       cout << thisPathName << endl;
-      printWeakCollectionIndex(containerType,
-                               collectionIndex,
-                               _count,
-                               _tag,
-                               keyPid,
-                               keySize,
-                               version);
-
-      delete [] thisPathName;
-      thisPathName = 0;
+      printWeakCollectionIndex(containerType, collectionIndex, _count, _tag, keyPid, keySize, version);
 
       delete [] setName;
       setName = 0;
@@ -3106,8 +2974,8 @@ void dumpDataStream(IStream* stream,
 
   STATSTG statstg;
   HRESULT result = stream->Stat(&statstg, STATFLAG_NONAME);
-  if (!checkStatus(streamName, result)) {
-    fatalError("dumpdataStream", "Failed to Stat() stream.");
+  if (!check(streamName, result)) {
+    fatalError("dumpdataStream", "Falied to Stat() stream.");
   }
   unsigned long int streamBytes = statstg.cbSize.LowPart;
   if (statstg.cbSize.HighPart != 0) {
@@ -3211,21 +3079,11 @@ void dumpProperties(IStorage* storage,
   if (version > 23) {
     size_t correctSize = expectedStreamSize + 4 + (entries * 6);
     if (actualStreamSize != correctSize) {
-      warning("dumpProperties", "Incorrect property stream size.");
-      OMUInt16 bo = hostByteOrder();
-      if (swapNeeded) {
-        if (bo == littleEndian) {
-          bo = bigEndian;
-        } else {
-          bo = littleEndian;
-        }
-      }
-      reportBadIndex(pathName,
-                     bo,
-                     version,
-                     entries,
-                     correctSize,
-                     actualStreamSize);
+      cerr << programName
+           << ": Warning : Property value stream wrong size"
+           << " (actual = " << actualStreamSize
+           << ", expected = " << correctSize <<" )." << endl;
+      warningCount = warningCount + 1;
     }
   }
 
@@ -3253,7 +3111,7 @@ void dumpProperties(IStorage* storage,
     bool ignore = ignoring(index[i]._pid);
 
     cout << endl;
-    ios_base_fmtflags savedFlags = cout.setf(ios::basefield);
+    IOS_FMT_FLAGS savedFlags = cout.setf(ios::basefield);
     char savedFill = cout.fill();
     cout << "property " << i << " "
          << "( pid = "
@@ -3468,7 +3326,7 @@ void dumpObject(IStorage* storage,
 
   CLSID clsid;
   getClass(storage, &clsid, pathName);
-  printClsid(clsid, cout);
+  printClsid(clsid);
   cout << endl;
 
   char* endianity;
@@ -3487,7 +3345,7 @@ void dumpObject(IStorage* storage,
   IndexEntry* index = readIndex(stream, _entryCount, swapNeeded, version);
   printIndex(index, _entryCount);
 
-  if (!isValid(index, _entryCount, clsid, pathName)) {
+  if (!isValid(index, _entryCount)) {
     fatalError("dumpObject", "Invalid property set index.");
   }
 
@@ -3543,7 +3401,7 @@ void openStorage(char* fileName, IStorage** storage)
     
   }
   
-  if (!checkStatus(fileName, result)) {
+  if (!check(fileName, result)) {
     fatalError("openStorage", "StgIsStorageFile() failed.");
   }
   
@@ -3559,7 +3417,7 @@ void openStorage(char* fileName, IStorage** storage)
     NULL,
     0,
     storage);
-  if (!checkStatus(fileName, result)) {
+  if (!check(fileName, result)) {
     fatalError("openStorage", "StgOpenStorage() failed.");
   }
 
@@ -3595,7 +3453,6 @@ void dumpFile(char* fileName)
 {
   resetStatistics();
 
-  initializeCOM();
   IStorage* storage = 0;
   openStorage(fileName, &storage);
 
@@ -3605,7 +3462,7 @@ void dumpFile(char* fileName)
 
   STATSTG statstg;
   HRESULT result = storage->Stat(&statstg, STATFLAG_DEFAULT);
-  if (!checkStatus(fileName, result)) {
+  if (!check(fileName, result)) {
     fatalError("dumpFile", "IStorage::Stat() failed.");
   }
 
@@ -3619,8 +3476,6 @@ void dumpFile(char* fileName)
     
   // Releasing the last reference to the root storage closes the file.
   storage->Release();
-  storage = 0;
-  finalizeCOM();
 
   totalFileBytes = fileSize(fileName);
   printStatistics();
@@ -3666,107 +3521,10 @@ OMUInt16 determineVersion(IStorage* storage)
   return result;
 }
 
-void readHeader(StructuredStorageHeader& header, FILE* f)
-{
-  size_t result = fread(&header, sizeof(StructuredStorageHeader), 1, f);
-  if (result != 1 ) {
-    fatalError("readHeader", "fread() failed.");
-  }
-}
-
-void printHeader(StructuredStorageHeader& header)
-{
-  cout << "Structured Storage header." << endl;
-
-  // Structured storage signature
-  //
-  ios_base_fmtflags savedFlags = cout.setf(ios::basefield);
-  char savedFill = cout.fill();
-  cout.setf(ios::uppercase);
-
-  cout << "  Signature                 = [";
-  for (size_t i = 0; i < 8; i++) {
-    cout << setfill('0') << setw(2) << hex << (unsigned int)header._abSig[i];
-  }
-  cout << "]" << endl;
-
-  cout.setf(savedFlags, ios::basefield);
-  cout.fill(savedFill);
-  cout.unsetf(ios::uppercase);
-
-  // File signature
-  //
-  cout << "  File signature            = ";
-  printClsid(header._clid, cout);
-  cout << endl;
-
-  // File version
-  //
-  cout << "  File version              = "
-       << dec
-       << header._uDllVersion
-       << "."
-       << header._uMinorVersion
-       << endl;
-
-  // Byte order
-  //
-  cout << "  Byte order                = ";
-  if (header._uByteOrder == 0xFFFE) {
-    cout << "Intel";
-  } else {
-    cout << "Unknown";
-  }
-  cout << endl;
-
-  // Sector shift/sector size
-  //
-  cout << "  Sector shift              = "
-       << dec
-       << header._uSectorShift
-       << " (sector size = "
-       << (1 << header._uSectorShift)
-       << " bytes)"
-       << endl;
-
-  cout << "  Mini-sector shift         = "
-       << dec
-       << header._uMiniSectorShift
-       << " (mini-sector size = "
-       << (1 << header._uMiniSectorShift)
-       << " bytes)"
-       << endl;
-
-  cout << "  Mini-sector cutoff size   = "
-       << dec
-       << header._ulMiniSectorCutoff
-       << endl;
-}
-
-void dumpHeader(char* fileName)
-{
-  FILE* f = fopen(fileName, "rb");
-  if (f == 0) {
-    cerr << programName <<": Error: "
-         << "File \"" << fileName << "\" not found."
-         << endl;
-    exit(EXIT_FAILURE);
-  }
-  StructuredStorageHeader header;
-  readHeader(header, f);
-  fclose(f);
-  printHeader(header);
-}
-
 void dumpFileProperties(char* fileName, const char* label)
 {
   resetStatistics();
 
-  if (hFlag) {
-    dumpHeader(fileName);
-  }
-
-  initializeCOM();
   IStorage* storage = 0;
   openStorage(fileName, &storage);
 
@@ -3792,7 +3550,6 @@ void dumpFileProperties(char* fileName, const char* label)
   // Releasing the last reference to the root storage closes the file.
   storage->Release();
   storage = 0;
-  finalizeCOM();
 
   totalFileBytes = fileSize(fileName);
   printStatistics();
@@ -3910,35 +3667,35 @@ static void dumpReferencedProperties(IStorage* root, OMUInt16 version)
   }    // version  0 - 18 no referenced properties table
 }
 
-// _wfopen() and _wremove() are in the W32 API on Windows 95, 98 and
-// ME but with an implementation that always fails. So we only call
-// them if getWindowsKind() == wkProfessional.
+// _wfopen() and _wremove are in the W32 API on Windows 95, 98 and ME
+// but with an implementation that always fails. By default we use
+// _wfopen() when compiled on/for the W32 API, this can be overridden
+// by defining NO_W32_WFUNCS.
 
-// Just like ANSI fopen() except for wchar_t* file names and modes.
+#if !defined(NO_W32_WFUNCS)
+#if defined(_WIN32) || defined(WIN32)
+#define W32_WFOPEN
+#define W32_WREMOVE
+#endif
+#endif
+
+// Just like fopen() except for wchar_t* file names.
 //
 FILE* wfopen(const wchar_t* fileName, const wchar_t* mode)
 {
-  //TRACE("wfopen");
-  ASSERT("Valid file name", fileName != 0);
-  ASSERT("Valid mode", mode != 0);
-
   FILE* result = 0;
-#if defined(OM_OS_WINDOWS)
-  if (getWindowsKind() == wkProfessional) {
-    result = _wfopen(fileName, mode);
-  } else {
-#endif
-    char cFileName[FILENAME_MAX];
-    size_t status = wcstombs(cFileName, fileName, FILENAME_MAX);
-    ASSERT("Convert succeeded", status != (size_t)-1);
+#if defined(W32_WFOPEN)
+  result = _wfopen(fileName, mode);
+#else
+  char cFileName[FILENAME_MAX];
+  size_t status = wcstombs(cFileName, fileName, FILENAME_MAX);
+  ASSERT("Convert succeeded", status != (size_t)-1);
 
-    char cMode[FILENAME_MAX];
-    status = wcstombs(cMode, mode, FILENAME_MAX);
-    ASSERT("Convert succeeded", status != (size_t)-1);
+  char cMode[FILENAME_MAX];
+  status = wcstombs(cMode, mode, FILENAME_MAX);
+  ASSERT("Convert succeeded", status != (size_t)-1);
 
-    result = fopen(cFileName, cMode);
-#if defined(OM_OS_WINDOWS)
-  }
+  result = fopen(cFileName, cMode);
 #endif
   return result;
 }
@@ -4030,53 +3787,31 @@ static int isAnAAFFile(const wchar_t* fileName,
 void usage(void)
 {
   cerr << programName << ": Usage : " << programName
-       << " OPTIONS <file...>"
-       << endl;
-  cerr << "--help              = help (-h)          :"
-       << "print this message and exit"
-       << endl;
-  cerr << "--verbose           = verbose            :"
-       << "print verbose error messages"
-       << endl;
-  cerr << endl;
-  cerr << "--hex-dump          = hex dump (-x)      :"
-       <<"any file"
-       << endl;
-  cerr << "--raw-dump          = raw dump (-r)      :"
-       << "any structured storage file (default)"
-       << endl;
-  cerr << "--property-dump     = property dump (-p) :"
-       << "any file using the AAF stored format"
-       << endl;
-  cerr << "--aaf-dump          = AAF file dump (-a) :"
-       << "any AAF file"
-       << endl;
-  cerr << endl;
-  cerr << "Use the following with --raw-dump, --property-dump and --aaf-dump"
-       << endl;
-  cerr << "  --statistics      = print statistics (-s)"
-       << endl;
-  cerr << endl;
-  cerr << "Use the following with --property-dump and --aaf-dump"
-       << endl;
-  cerr << "  --raw-counts      = print raw reference counts (-c)"
-       << endl;
-  cerr << "  --zero-out <pid>  = "
-       << "dump properties with pid <pid> (hex) as all zeros (-z)"
-       << endl;
-  cerr << "  --media-bytes <n> = "
-       << "dump only the first <n> bytes (dec) of media streams (-m)"
-       << endl;
-  cerr << "  --validate        = validate the structure of the file (-v)"
-       << endl;
-  cerr << "  --mss-header      = dump the structured storage header"
-       << endl;
-  cerr << endl;
-  cerr << "Use the following with --hex-dump"
-       << endl;
-  cerr << "  --file-bytes <n>  = "
-       << "dump only the first <n> bytes (dec) of the file (-l)"
-       << endl;
+       << " [-x -r -p -a -s -z <pid> -m <n> -l <n> -h] <file...>" << endl;
+  cerr << "-x       = hex dump"
+       << " : for any file." << endl;
+  cerr << "-r       = raw dump"
+       << " : for any structured storage file (default)." << endl;
+  cerr << "-p       = property dump"
+       << " : for any file using the AAF stored object format." << endl;
+  cerr << "-a       = AAF file dump"
+       << " : for any AAF file." << endl;
+  cerr << "-s       = print statistics"
+       << " : combine with -r, -p and -a." << endl;
+  cerr << "-z <pid> = dump properties with pid <pid> (hex) as all zeros :"
+       << endl
+       << "             combine with -p and -a." << endl;
+  cerr << "-m <n>   = dump only the first <n> bytes (dec) of media streams :"
+       << endl
+       << "             combine with -p and -a." << endl;
+  cerr << "-l <n>   = dump only the first <n> bytes (dec) of the file :"
+       << endl
+       << "             combine with -x." << endl;
+  cerr << "-v       = validate the structure of the file :"
+       << endl
+       << "             combine with -p and -a." << endl;
+  cerr << "-h       = help"
+       << " : print this message and exit." << endl;
 }
 
 bool printStats = false; // default
@@ -4091,7 +3826,7 @@ void printInteger(const size_t value, char* label)
 
 void printFixed(const double value, char* label)
 {
-    ios_base_fmtflags oldFlags = cout.flags(ios::right | ios::fixed);
+    IOS_FMT_FLAGS oldFlags = cout.flags(ios::right | ios::fixed);
     cout << label
          << setw(8)
          << setprecision(2)
@@ -4102,7 +3837,7 @@ void printFixed(const double value, char* label)
 
 void printFixedPercent(const double value, char* label)
 {
-    ios_base_fmtflags oldFlags = cout.flags(ios::right | ios::fixed);
+    IOS_FMT_FLAGS oldFlags = cout.flags(ios::right | ios::fixed);
     cout << label
          << setw(8)
          << setprecision(2)
@@ -4244,71 +3979,47 @@ void ignore(OMUInt32 pid)
   }
 }
 
-void initializeCOM(void)
-{
-#if !defined(OM_USE_REFERENCE_SS)
-  CoInitialize(0);
-#endif
-}
-
-void finalizeCOM(void)
-{
-#if !defined(OM_USE_REFERENCE_SS)
-  CoUninitialize();
-#endif
-}
-
-bool completed = false;
-
-void exitHandler(void)
-{
-  if (!completed) {
-    cerr << programName << ": Dump incomplete because of errors."
-         << endl;
-  }
-}
 
 int main(int argumentCount, char* argumentVector[])
 {
+  checkSizes();
+
 #if defined(OM_OS_MACOS)
 #if defined(USECONSOLE)
   argumentCount = ccommand(&argumentVector); // console window for mac
 #endif
 #endif
-  programName = baseName(argumentVector[0]);
-  atexit(exitHandler);
-  checkSizes();
 
+  programName = baseName(argumentVector[0]);
   int fileCount = 0;
   int flagCount = 0;
   int i;
 
   for (i = 1; i < argumentCount; i++) {
 
-    char* opt = argumentVector[i];
+    char* argument = argumentVector[i];
+    char c = argument[0];
 
-    if ((strlen(opt) >= 2) && (opt[0] == '-')) {
+    if ((c == '-') && (strlen(argument) >= 2)) {
+      char flag = argument[1];
 
-      if ((strcmp(opt, "-x") == 0) ||
-          (strcmp(opt, "--hex-dump") == 0)) {
+      switch (flag) {
+      case 'x':
         option = hexadecimal;
-      } else if ((strcmp(opt, "-r") == 0) ||
-                 (strcmp(opt, "--raw-dump") == 0)) {
+        break;
+      case 'r':
         option = raw;
-      } else if ((strcmp(opt, "-p") == 0) ||
-                 (strcmp(opt, "--property-dump") == 0)) {
+        break;
+      case 'p':
         option = property;
-      } else if ((strcmp(opt, "-a") == 0) ||
-                 (strcmp(opt, "--aaf-dump") == 0)) {
+        break;
+      case 'a':
         option = aaf;
-      } else if ((strcmp(opt, "-c") == 0) ||
-                 (strcmp(opt, "--raw-counts") == 0)) {
-        cFlag = true;
-      } else if ((strcmp(opt, "-s") == 0) ||
-                 (strcmp(opt, "--statistics") == 0)) {
+        break;
+      case 's':
         printStats = true;
-      } else if ((strcmp(opt, "-z") == 0) ||
-                 (strcmp(opt, "--zero-out") == 0)) {
+        break;
+      case 'z':
 
         // Does a value follow -z ?
         //
@@ -4348,13 +4059,13 @@ int main(int argumentCount, char* argumentVector[])
           }
         } else {
           cerr << programName
-               << ": Error : " << opt <<" must be followed by a property id."
+               << ": Error : -z must be followed by a property id."
                << endl;
           usage();
           exit(EXIT_FAILURE);
         }
-      } else if ((strcmp(opt, "-m") == 0) ||
-                 (strcmp(opt, "--media-bytes") == 0)) {
+        break;
+      case 'm':
 
         // Does a value follow -m ?
         //
@@ -4386,13 +4097,13 @@ int main(int argumentCount, char* argumentVector[])
           mLimit = bytes;
         } else {
           cerr << programName
-               << ": Error : " << opt << " must be followed by a byte count."
+               << ": Error : -m must be followed by a byte count."
                << endl;
           usage();
           exit(EXIT_FAILURE);
         }
-      } else if ((strcmp(opt, "-l") == 0) ||
-                 (strcmp(opt, "--file-bytes") == 0)) {
+        break;
+      case 'l':
 
         // Does a value follow -l ?
         //
@@ -4424,27 +4135,23 @@ int main(int argumentCount, char* argumentVector[])
           lLimit = bytes;
         } else {
           cerr << programName
-               << ": Error : " << opt << " must be followed by a byte count."
+               << ": Error : -l must be followed by a byte count."
                << endl;
           usage();
           exit(EXIT_FAILURE);
         }
-      } else if ((strcmp(opt, "-v") == 0) ||
-                 (strcmp(opt, "--validate") == 0)) {
+        break;
+      case 'v':
         vFlag = true;
-      } else if (strcmp(opt, "--verbose") == 0) {
-        verboseFlag = true;
-      } else if (strcmp(opt, "--mss-header") == 0) {
-        hFlag = true;
-      } else if ((strcmp(opt, "-h") == 0) ||
-                 (strcmp(opt, "--help") == 0)) {
+        break;
+      case 'h':
         usage();
-        completed = true;
         exit(EXIT_SUCCESS);
-      } else {
+        break;
+      default:
         cerr << programName
-             << ": Error : "
-             << opt
+             << ": Error : -"
+             << flag
              << " is not a recognized option."
              << endl;
         usage();
@@ -4468,13 +4175,6 @@ int main(int argumentCount, char* argumentVector[])
     if (mFlag) {
       cerr << programName
            << ": Error : -m not valid with -x."
-           << endl;
-      usage();
-      exit(EXIT_FAILURE);
-    }
-    if (hFlag) {
-      cerr << programName
-           << ": Error : --mss-header not valid with --hex-dump."
            << endl;
       usage();
       exit(EXIT_FAILURE);
@@ -4583,26 +4283,11 @@ int main(int argumentCount, char* argumentVector[])
   }
 
   int result;
-  if ((warningCount != 0) && (errorCount != 0)){
-    cerr << programName << ": Dump completed with "
-         << errorCount << " errors and "
-         << warningCount << " warnings."
-         << endl;
-    result = EXIT_FAILURE;
-  } else if (errorCount != 0) {
-    cerr << programName << ": Dump completed with "
-         << errorCount << " errors."
-         << endl;
-    result = EXIT_FAILURE;
-  } else if (warningCount != 0) {
-    cerr << programName << ": Dump completed with "
-         << warningCount << " warnings."
-         << endl;
-    result = 2;
-  } else {
+  if (warningCount == 0) {
     result = EXIT_SUCCESS;
+  } else {
+    result = 2;
   }
-  completed = true;
   return result;
 }
 
