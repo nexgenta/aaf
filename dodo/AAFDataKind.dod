@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFDataKind\
 #endm
@@ -13,12 +6,14 @@ AAFDataKind\
 AAFObject\
 #endm
 #c
+#import ./AAFUnitTest.exp
 AD_HEAD
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -207,7 +202,7 @@ AD_METHOD2(DoesDatakindConvertTo,
 		   Sets return value to TRUE if the datakind of the given object
 		   // can be converted to the datakind specified in the IN 
 		   // parameter with the datakindName string.)
-				 
+		   
 AD_METHOD2(IsDatakindOf,
 		   [retval][out],AAFBool *,bIsDatakindOf, pointer to result,
 		   [in],AAFString, datakindname, DatakindName to compare against
@@ -221,5 +216,7 @@ AD_METHOD2(DoesDatakindConvertFrom,
 		   Sets return value to TRUE if the datakind of the given object
 		   // can be converted from the datakind specified in the IN 
 		   // parameter specified with the datakindName string.)
+
+AD_OVERRIDE(.method-Test)
 
 AD_CLASS_END
