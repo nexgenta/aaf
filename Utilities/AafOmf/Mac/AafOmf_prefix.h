@@ -1,25 +1,4 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-//
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-//
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-//
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
-
+// >>> © 1998 Avid Technology, Inc.  All rights reserved. <<<
 #define __dest_os	__mac_os
 
 //#define CHECKMEMORYLEAKS // Uncomment this line to turn leak checking on
@@ -63,46 +42,16 @@
 #endif // GUID_DEFINED
 
 
+// Define to enable the module testing of the shared library.
+#define AAF_MODULE_TEST
 
-//OMF Prefix
-#define OMFI_NEED_ULONG 1
-#define OMFI_ENABLE_SEMCHECK	1
-#define OMFI_ERROR_TRACE	1
-#define OMFI_JPEG_CODEC 1
-#define OMFI_ENABLE_STREAM_CACHE 1
-#define NEW_MEMORY_MECHANISM	1
-#define VIRTUAL_BENTO_OBJECTS	1
-
-#define NO_CONTAINER_EXPORTS 1  // support new 2.2
-
-// Cannot include more than a single pre-compiled header (MacHeaders already included.
-// There is a conflict with the omf portkey.h file because one of its symbols is
-// precompiled with AAFTypes.h in AAFUtilLibPrecomp.pch.
-
-//#include "AAFUtilLibPrecomp.pch"
-
-// Define symbols needed to compile the headers from the UtlLib.
-// [The minimum set from AAFUtilLibPrecomp.pch]
-
-#define IN
-
-#define OUT
+//#ifndef _DEBUG
+//#define _DEBUG
+//#endif
 
 
+// AAF OM symbols
+//#define OM_ENABLE_DEBUG
+//#define OM_ENABLE_TRACE
 
-#ifndef HKEY
-
-#define HKEY unsigned long
-
-#endif
-
-
-
-#define FACILITY_WIN32                   7
-
-#define HRESULT_FROM_WIN32(x)   (x ? ((HRESULT) (((x) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000)) : 0 )
-
-
-typedef char            TCHAR;
-
-#define _TCHAR_DEFINED
+#define BOB_TEST
