@@ -1,125 +1,196 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1996 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ *
+ ************************************************************************/
 
+// WARNING! WARNING! WARNING!
+// This is untested code. It has not even been compiled!
+// [trr:1999-04-20]
+// At this time the irix port has not been maintained for several months.
+// Even then it was using the MainWin environment.
+//
+// This code is provided as a template to the irix port engineer.
+//
 
-// Declare the public interface that must be implemented.
-#include "aaflib.h"
 
 //
 // Use include guard so that the file can be included in every 
 // platform build without causing any errors in the build.
 //
-#if defined( OS_UNIX )
+#if defined(sgi)
+
 
 // Declare the public interface that must be implemented.
+#include "aaflib.h"
 
-#include "aafrdli.h"
 #include "AAFResult.h"
 
+
 #include <dlfcn.h>
-#include <string.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
-AAFRDLIRESULT AAFLoadLibrary(
-   const char* name,
-   AAFLibraryHandle* pLibHandle)
+
+class SGIAAFDLL : public AAFDLL
 {
-   if (NULL == name || NULL == pLibHandle) {
-      return AAFRESULT_NULL_PARAM;
-   }
+public:
+  // Constructor and destructor.
+  SGIAAFDLL();
+  ~SGIAAFDLL();
+
+  // Implements SGI specific initialization of dll and entry points.
+  virtual HRESULT Load(const char *);
   
-   // Attempt to load the library.
-   *pLibHandle = ::dlopen(name, RTLD_NOW );
-    
-   if (NULL == *pLibHandle) {
-      fprintf(stderr, "dlopen() failed for %s: <%s>\n", name, dlerror() );
-		return -1; // Need an AAFRESULT
-   }
-   else {
-   }	
-   
-   return AAFRESULT_SUCCESS;
-}
+  // Implements SGI specific cleanup of dll and entry points.
+  virtual HRESULT Unload();
 
-AAFRDLIRESULT AAFUnloadLibrary(
-   AAFLibraryHandle libHandle)
+private:
+  // The handle to the dll's module instance.
+  HINSTANCE _handle;
+};
+
+
+
+//***********************************************************
+//
+// Factory function just returns an instance of the currect platform
+// dll wrapper object.
+AAFDLL * MakeAAFDLL()
 {
-   if (NULL == libHandle) {
-      return AAFRESULT_NULL_PARAM;
-   }
-    
-   // FIXME - Calls ~CAAFInProcServer() when unloading libaffpgapi.so.
-	// ND'A, April 11, 2000.  
-	//   ::dlclose(libHandle);
-   return AAFRESULT_SUCCESS;
+  return new SGIAAFDLL;
 }
 
-AAFRDLIRESULT AAFFindSymbol(
-   AAFLibraryHandle libHandle,
-   const char* symbolName,
-   AAFSymbolAddr* pSymbol)
+
+
+//***********************************************************
+//
+SGIAAFDLL::SGIAAFDLL()
 {
-   if (NULL == libHandle || NULL == symbolName || NULL == pSymbol)
-      return AAFRESULT_NULL_PARAM;
-   
-   *pSymbol = ::dlsym(libHandle, symbolName );
-   
-   if (NULL == *pSymbol) {
-      fprintf(stderr, "dlsym(\"%s\") failed <%s>.\n", symbolName, dlerror());
-      return -2; // Need an AAFRESULT
-   }
- 
-   return AAFRESULT_SUCCESS;
+  _handle = NULL;
 }
 
-/* Limited set of platform independent directory searching functions.*/
-AAFRDLIRESULT AAFFindLibrary(
-   const char* name,
-   LPFNAAFTESTFILEPROC testProc,
-   void *userData)
+
+
+//***********************************************************
+//
+SGIAAFDLL::~SGIAAFDLL()
 {
-   // Default implementation will just continue to use a hard-coded list
-	// of shared libaries.
-   
-   const char *pluginFileNames[] =  {
-		"libaafpgapi.so",
-		"libaafintp.so",
-      0
-   };
-   
-   AAFRDLIRESULT rc = AAFRESULT_SUCCESS;
-   
-
-	if (NULL == name || NULL == testProc) {
-		return AAFRESULT_NULL_PARAM;
-	}
-		
-	for (int i = 0; AAFRESULT_SUCCESS == rc && pluginFileNames[i]; ++i) {
-		rc = testProc("",pluginFileNames[i], false , userData);
-	}
-
-   return rc;
 }
 
-#endif /* #if defined( OS_UNIX ) */
 
+
+//***********************************************************
+//
+HRESULT SGIAAFDLL::Load(const char *dllname)
+{
+  const char* fcnName[] =
+  {
+    "AAFFileOpenExistingRead",
+    "AAFFileOpenExistingModify",
+    "AAFFileOpenNewModify",
+    "AAFFileOpenTransient",
+    "AAFGetPluginManager"
+  };
+
+  if (NULL == dllname)
+  { // use a realistic default name.
+    dllname = "aafcoapi.so";
+  }
+
+  // Attempt to load the library.
+  _handle = ::dlopen(dllname, RTLD_LAZY);
+  if (NULL == _handle)
+  {
+    fprintf(stderr, "dlopen(\"%s\", RTLD_LAZY) failed.\n", dllname);
+    return -1; // Need an AAFRESULT
+  }
+
+  //
+  // Attempt to initialize the entry points...
+  //
+  _pfnOpenExistingRead = (LPFNAAFFILEOPENEXISTINGREAD)
+                         ::dlsym(_handle, fcnName[0]);
+  if (NULL == _pfnOpenExistingRead)
+  {
+    fprintf(stderr, "dlsym(\"%s\") failed. %s\n", fcnName[0]);
+    return -2; // Need an AAFRESULT
+  }
+
+  _pfnOpenExistingModify = (LPFNAAFFILEOPENEXISTINGMODIFY)
+                           ::dlsym(_handle, fcnName[1]);
+  if (NULL == _pfnOpenExistingModify)
+  {
+    fprintf(stderr, "dlsym(\"%s\") failed.\n", fcnName[1]);
+    return -2; // Need an AAFRESULT
+  }
+
+  _pfnOpenNewModify = (LPFNAAFFILEOPENNEWMODIFY)
+                      ::dlsym(_handle, fcnName[2]);
+  if (NULL == _pfnOpenNewModify)
+  {
+    dlmsg = dlerror();
+    fprintf(stderr, "dlsym(\"%s\") failed.\n", fcnName[2]);
+    return -2; // Need an AAFRESULT
+  }
+
+  _pfnOpenTransient = (LPFNAAFFILEOPENTRANSIENT)
+                         ::dlsym(_handle, fcnName[3]);
+  if (NULL == _pfnOpenTransient)
+  {
+    fprintf(stderr, "dlsym(\"%s\") failed.\n", fcnName[3]);
+    return -2; // Need an AAFRESULT
+  }
+
+  _pfnGetPluginManager = (LPFNAAFGETPLUGINMANAGER)
+                         ::dlsym(_handle, fcnName[4]);
+  if (NULL == _pfnGetPluginManager)
+  {
+    fprintf(stderr, "dlsym(\"%s\") failed.\n", fcnName[4]);
+    return -2; // Need an AAFRESULT
+  }
+
+  return S_OK;
+}
+
+
+
+//***********************************************************
+//
+HRESULT SGIAAFDLL::Unload()
+{
+  if (_handle)
+  {
+    ::dlclose(_handle))
+
+    // Reset the entry point function pointers to NULL.
+    ClearEntrypoints();
+
+    _handle = NULL;
+  }
+  
+  return S_OK;
+}
+
+#endif /* #if defined(sgi) */
