@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.cpp,v 1.56 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMUtilities.cpp,v 1.56.2.1 2004/07/07 13:01:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -223,12 +223,22 @@ int compareWideString(const wchar_t* string1, const wchar_t* string2)
   return result;
 }
 
-void convertWideStringToString(char* /* result */,
-                               const wchar_t* /* string */,
-                               size_t /* resultSize */)
+void convertWideStringToString(char*  result,
+                               const wchar_t*  string ,
+                               size_t  resultSize)
 {
   TRACE("convertWideStringToString");
-  ASSERT("Unimplemented code not reached", false);
+  PRECONDITION("Valid string", validWideString(string));
+  PRECONDITION("Valid output buffer", result != 0);
+  PRECONDITION("Valid output buffer size", resultSize > 0);
+
+  size_t length = lengthOfWideString(string);
+  if (length > (resultSize - 1)) {
+    length = resultSize - 1;
+  }
+  size_t status = wcstombs(result, string, length);
+  ASSERT("Successful conversion", status != (size_t)-1);
+  result[length] = 0;
 }
 
 void convertStringToWideString(wchar_t* result,
