@@ -1,57 +1,47 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 #include "CAAFBasicInterp.h"
 
 #include <assert.h>
-#include <string.h>
 #include "AAFResult.h"
 
 #include "AAF.h"
 
 #include "aafErr.h"
-#include "AAFDefUIDs.h"
+#include "aafUtils.h"
+#include "aafCvt.h"
+#include "aafDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFRational.h"
-#include "AAFInterpolatorDefs.h"
-#include "AAFTypeDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
-
-const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kAAFVersionBeta};
+const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kVersionBeta};
 
 const CLSID CLSID_AAFBasicInterp = { 0x5B6C85A1, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
 
 const aafUID_t BASIC_INTERP_PLUGIN = { 0x5B6C85A2, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
 
-static bool EqualAUID(const aafUID_t *id1, const aafUID_t * id2)
+HRESULT STDMETHODCALLTYPE
+    CAAFBasicInterp::Start (void)
 {
-  assert (id1 && id2);
-  return (0 == memcmp(id1, id2, sizeof(aafUID_t)));
+	return AAFRESULT_SUCCESS;
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::CountDefinitions (aafUInt32 *pDefCount)
+    CAAFBasicInterp::Finish (void)
+{
+	return AAFRESULT_SUCCESS;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFBasicInterp::GetNumDefinitions (aafInt32 *pDefCount)
 {
 	if(pDefCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -60,7 +50,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *pUid)
+    CAAFBasicInterp::GetIndexedDefinitionID (aafInt32 index, aafUID_t *pUid)
 {
 	if(pUid == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -78,24 +68,22 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetIndexedDefinitionObject (aafUInt32 /* index */, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFBasicInterp::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	IAAFInterpolationDef	*interpDef = NULL;
 	IAAFDefObject	*obj = NULL;
 	aafUID_t		uid;
 	
-	if((dict == NULL) || (def == NULL))
-		return AAFRESULT_NULL_PARAM;
-	
+	//!!!Add error checking
 	XPROTECT()
 	{
-	    CAAFBuiltinDefs defs (dict);
-		CHECK(defs.cdInterpolationDefinition()->
-			  CreateInstance(IID_IAAFInterpolationDef, 
-							 (IUnknown **)&interpDef));
+		//!!!Later, add in dataDefs supported & filedescriptor class
+		CHECK(dict->CreateInstance(&AUID_AAFInterpolationDefinition,
+							IID_IAAFInterpolationDef, 
+							(IUnknown **)&interpDef));
 		uid = LinearInterpolator;
 		CHECK(interpDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
-		CHECK(interpDef->Initialize(uid, L"Basic Plugins", L"Handles step and linear interpolation."));
+		CHECK(obj->Init(&uid, L"Basic Plugins", L"Handles step and linear interpolation."));
 		*def = obj;
 		interpDef->Release();
 		interpDef = NULL;
@@ -110,6 +98,7 @@ HRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+//!!!Need some real values for the descriptor
 static wchar_t *manufURL = L"http://www.avid.com";
 static wchar_t *downloadURL = L"ftp://ftp.avid.com/pub/";
 const aafUID_t MANUF_AVID_TECH = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
@@ -119,26 +108,27 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
+    CAAFBasicInterp::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
 {
-	IAAFPluginDef			*desc = NULL;
+	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
  	IAAFNetworkLocator		*pNetLoc = NULL;
+	aafUID_t				category = AUID_AAFDefObject, manufacturer = MANUF_AVID_TECH;
+	aafUID_t				plugID = BASIC_INTERP_PLUGIN;
 	
 	XPROTECT()
 	{
-	    CAAFBuiltinDefs defs (dict);
-		CHECK(defs.cdPluginDef()->
-			  CreateInstance(IID_IAAFPluginDef, 
-							 (IUnknown **)&desc));
+		CHECK(dict->CreateInstance(&AUID_AAFPluginDescriptor,
+			IID_IAAFPluginDescriptor, 
+			(IUnknown **)&desc));
 		*descPtr = desc;
 		desc->AddRef();
-		CHECK(desc->Initialize(BASIC_INTERP_PLUGIN, L"Example interpolators", L"Handles step and linear interpolation."));
-		CHECK(desc->SetCategoryClass(AUID_AAFInterpolationDefinition));
+		CHECK(desc->Init(&plugID, L"Example interpolators", L"Handles step and linear interpolation."));
+		CHECK(desc->SetCategoryClass(&category));
 		CHECK(desc->SetPluginVersionString(manufRev));
-		CHECK(defs.cdNetworkLocator()->
-			  CreateInstance(IID_IAAFLocator, 
-							 (IUnknown **)&pLoc));
+		CHECK(dict->CreateInstance(&AUID_AAFNetworkLocator,
+			IID_IAAFLocator, 
+			(IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (manufURL));
 		CHECK(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		CHECK(desc->SetManufacturerInfo(pNetLoc));
@@ -147,16 +137,16 @@ HRESULT STDMETHODCALLTYPE
 		pLoc->Release();
 		pLoc = NULL;
 
-		CHECK(desc->SetManufacturerID(MANUF_AVID_TECH));
+		CHECK(desc->SetManufacturerID(&manufacturer));
 		CHECK(desc->SetPluginManufacturerName(manufName));
-		CHECK(desc->SetIsSoftwareOnly(kAAFTrue));
-		CHECK(desc->SetIsAccelerated(kAAFFalse));
-		CHECK(desc->SetSupportsAuthentication(kAAFFalse));
+		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
+		CHECK(desc->SetIsAccelerated(AAFFalse));
+		CHECK(desc->SetSupportsAuthentication(AAFFalse));
 		
 		/**/
-		CHECK(defs.cdNetworkLocator()->
-			  CreateInstance(IID_IAAFLocator, 
-							 (IUnknown **)&pLoc));
+		CHECK(dict->CreateInstance(&AUID_AAFNetworkLocator,
+			IID_IAAFLocator, 
+			(IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (downloadURL));
 		CHECK(desc->AppendLocator(pLoc));
 		desc->Release();	// We have addRefed for the return value
@@ -177,9 +167,9 @@ HRESULT STDMETHODCALLTYPE
 
 	return AAFRESULT_SUCCESS;
 }
+\
 
-
-CAAFBasicInterp::CAAFBasicInterp (IUnknown * pControllingUnknown)
+CAAFBasicInterp::CAAFBasicInterp (IUnknown * pControllingUnknown, aafBool doInit)
   : CAAFUnknown (pControllingUnknown)
 {
 	_typeDef = NULL;
@@ -197,7 +187,7 @@ CAAFBasicInterp::~CAAFBasicInterp ()
 
 HRESULT STDMETHODCALLTYPE
     CAAFBasicInterp::GetNumTypesSupported(
-		/* [out] */aafUInt32*  pCount)
+		/* [out] */aafInt32*  pCount)
 {
 	if(pCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -207,14 +197,14 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFBasicInterp::GetIndexedSupportedType(
-		/* [in] */ aafUInt32  index,
+		/* [in] */ aafInt32  index,
 		/* [out] */IAAFTypeDef ** ppType)
 {
 	if(ppType == NULL)
 		return AAFRESULT_NULL_PARAM;
 	if(index < 0 || index >= 1)
 		return AAFRESULT_BADINDEX;
-//!!!	*ppType = kAAFTypeID_Int32;					// temp!!! Use type definition mechanism
+//!!!	*ppType = kAAFExpLong;					// temp!!! Use type definition mechanism
 	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
@@ -272,35 +262,18 @@ HRESULT STDMETHODCALLTYPE
 	AAFRational		timeA, timeB;
 	AAFRational		inputTime;
 	IAAFDefObject	*pDef = NULL;
-  IAAFMetaDefinition * pMetaDefinition = NULL;
-	IAAFVaryingValue *pVaryVal = NULL;
-	IAAFInterpolationDef *pInterpDef = NULL;
-	aafUID_t		defID, interpID;
+	aafUID_t		defID;
 	
 	if(pInputValue == NULL || pOutputValue == NULL)
 		return AAFRESULT_NULL_PARAM;
 	XPROTECT()
 	{
-		if(_parameter->QueryInterface(IID_IAAFVaryingValue, (void **)&pVaryVal) == AAFRESULT_SUCCESS)
-		{
-			CHECK(pVaryVal->GetInterpolationDefinition (&pInterpDef));
- 			CHECK(pInterpDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
-			pDef->GetAUID(&interpID);
-			pDef->Release();
-			pDef = NULL;
-			pInterpDef->Release();
-			pInterpDef = NULL;
- 			pVaryVal->Release();
-			pVaryVal = NULL;
-		}
+		CHECK(_typeDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
 		if(pInputValue->denominator == 0)
 			RAISE(AAFRESULT_ZERO_DIVIDE);
 		inputTime = (AAFRational)*pInputValue;
-		CHECK(_typeDef->QueryInterface(IID_IAAFMetaDefinition, (void **)&pMetaDefinition));
-		CHECK(pMetaDefinition->GetAUID (&defID));
-		pMetaDefinition->Release();
-		pMetaDefinition = NULL;
-		if(EqualAUID(&defID, &kAAFTypeID_Int32))
+		CHECK(pDef->GetAUID (&defID));
+		if(EqualAUID(&defID, &kAAFExpLong))
 		{
 			if(bufSize < sizeof(aafUInt32))
 				RAISE(AAFRESULT_SMALLBUF);
@@ -308,52 +281,36 @@ HRESULT STDMETHODCALLTYPE
 			aafInt32	lowerBound, upperBound;
 			CHECK(FindBoundValues(*pInputValue, sizeof(aafInt32), &timeA, (aafMemPtr_t)&lowerBound,
 				&timeB, (aafMemPtr_t)&upperBound));
-			if(EqualAUID(&interpID, &LinearInterpolator))
-				*result = (aafInt32)(((inputTime - timeA) / (timeB - timeA)) * (upperBound - lowerBound)) + lowerBound;
-			else if(EqualAUID(&interpID, &ConstantInterpolator))
-				*result = lowerBound;
-			else
-				RAISE(AAFRESULT_INVALID_INTERPKIND);
-				
+			*result = (aafInt32)(((inputTime - timeA) / (timeB - timeA)) * (upperBound - lowerBound)) + lowerBound;
 			*bytesRead = sizeof(aafUInt32);
 		}
-		else if(EqualAUID(&defID, &kAAFTypeID_Rational))
+		else if(EqualAUID(&defID, &kAAFExpRational))
 		{
 			aafRational_t	*result = (aafRational_t *)pOutputValue;
-			AAFRational		lowerBound, upperBound, subResult, timeDelta, num, denom;
+			AAFRational		lowerBound, upperBound, subResult, timeDelta;
 
 			if(bufSize < sizeof(aafUInt32))
 				RAISE(AAFRESULT_SMALLBUF);
 			CHECK(FindBoundValues(*pInputValue, sizeof(aafRational_t), &timeA, (aafMemPtr_t)&lowerBound,
 				&timeB, (aafMemPtr_t)&upperBound));
-			num = inputTime - timeA;
-			denom = timeB - timeA;
-			if(denom == 0)
-				RAISE(AAFRESULT_ZERO_DIVIDE);
-			timeDelta = num / denom;
+//!!!			if(lowerBound.denominator == 0 || upperBound.denominator == 0)
+//				RAISE(AAFRESULT_ZERO_DIVIDE);
+			timeDelta = ((inputTime - timeA) / (timeB - timeA));
 			subResult = upperBound - lowerBound;
-
-			if(EqualAUID(&interpID, &LinearInterpolator))
-				*result = (aafRational_t)((timeDelta * subResult) + lowerBound);
-			else if(EqualAUID(&interpID, &ConstantInterpolator))
-				*result = lowerBound;
-			else
-				RAISE(AAFRESULT_INVALID_INTERPKIND);
+			// Find common denominator
+			//
+			*result = (aafRational_t)((timeDelta * subResult) + lowerBound);
 			*bytesRead = sizeof(aafRational_t);
 		}
 		else
 			RAISE(AAFRESULT_BAD_TYPE);
+		pDef->Release();
+		pDef = NULL;
 	}
 	XEXCEPT
 	{
 		if(pDef)
 			pDef->Release();
-    if (pMetaDefinition)
-      pMetaDefinition->Release();
-		if(pInterpDef)
-			pInterpDef->Release();
- 		if(pVaryVal)
-			pVaryVal->Release();
 	}
 	XEND;
 	return(AAFRESULT_SUCCESS);
@@ -362,7 +319,7 @@ HRESULT STDMETHODCALLTYPE
 HRESULT CAAFBasicInterp::InterpolateMany(
 	/* [in] */ aafRational_t *  pStartInputValue,
     /* [in] */ aafRational_t *  pInputStep,
-    /* [in] */ aafUInt32  /* pGenerateCount */,
+    /* [in] */ aafInt32  pGenerateCount,
     /* [out] */aafMemPtr_t pOutputValue,
     /* [out] */aafUInt32 *  pResultCount)
 {
@@ -395,8 +352,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 		{
 			aafUInt32	count;
 			CHECK(pConstValue->GetValue (valueSize, lowerBoundValue, &count));
-			if(count != valueSize)
-				RAISE(AAFRESULT_WRONG_SIZE);
+			///!!!Assert count == sizeof(val)
 			memcpy(upperBoundValue, lowerBoundValue, valueSize);
 			*lowerBoundTime = zero;
 			*upperBoundTime = zero;
@@ -410,7 +366,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 
 			prevTime = zero;
 			CHECK(pVaryingValue->GetControlPoints(&theEnum));
-			found = kAAFFalse;
+			found = AAFFalse;
 			prevPoint = NULL;
 			while(!found && (theEnum->NextOne(&testPoint) == AAFRESULT_SUCCESS))
 			{
@@ -418,8 +374,8 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 				CHECK(testPoint->GetTime(&testRat));
 				testTime = (AAFRational)testRat;
 
-				if(testRat.denominator == 0)
-					RAISE(AAFRESULT_ZERO_DIVIDE);
+//!!!				if(testRat.denominator == 0)
+//					RAISE(AAFRESULT_ZERO_DIVIDE);
 				found = (testTime > inputTime);
 				if(!found)
 				{
@@ -435,18 +391,13 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			theEnum->Release();
 			theEnum = NULL;
 			
-			if((prevPoint== NULL) && (testPoint == NULL))
-				RAISE(AAFRESULT_INCONSISTANCY);
-			
+			//!!!Assert if prevPoint and testPoint are both NULL
 			if(prevPoint != NULL && testPoint != NULL)		// Real interpolation
 			{
+				//!!! Fail if prevPoint also is NULL
 				CHECK(prevPoint->GetValue (valueSize, lowerBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
 				CHECK(testPoint->GetValue (valueSize, upperBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
-
+				///!!!Assert count == sizeof(val)
 				*lowerBoundTime = prevTime;
 				*upperBoundTime = testTime;
 				testPoint->Release();
@@ -457,9 +408,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			else if(prevPoint == NULL)						// Off the begining
 			{
 				CHECK(testPoint->GetValue (valueSize, lowerBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
-
+				///!!!Assert count == sizeof(val)
 				memcpy(upperBoundValue, lowerBoundValue, valueSize);
 				*lowerBoundTime = testTime;
 				*upperBoundTime = testTime;
@@ -469,9 +418,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			else											// Off of the end
 			{
 				CHECK(prevPoint->GetValue (valueSize, lowerBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
-
+				///!!!Assert count == sizeof(val)
 				memcpy(upperBoundValue, lowerBoundValue, valueSize);
 				*lowerBoundTime = prevTime;
 				*upperBoundTime = prevTime;
@@ -481,8 +428,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			pVaryingValue->Release();
 			pVaryingValue = NULL;
 		}
-		else
-			RAISE(AAFRESULT_UNKNOWN_PARAMETER_CLASS);
+		// else assert bad parameter type!!!
 	}
 	XEXCEPT
 	{
@@ -501,10 +447,6 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 //
 // 
 // 
-inline int EQUAL_UID(const GUID & a, const GUID & b)
-{
-  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
-}
 HRESULT CAAFBasicInterp::InternalQueryInterface
 (
     REFIID riid,
@@ -516,13 +458,13 @@ HRESULT CAAFBasicInterp::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IClassFactory interface 
-    if (EQUAL_UID(riid,IID_IAAFInterpolator))
+    if (riid == IID_IAAFInterpolator)
     { 
         *ppvObj = (IAAFInterpolator *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
+    else if (riid == IID_IAAFPlugin) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
@@ -536,10 +478,14 @@ HRESULT CAAFBasicInterp::InternalQueryInterface
 //
 // Define the contrete object support implementation.
 // 
-AAF_DEFINE_FACTORY(AAFBasicInterp)
-
-
-
-
-
+HRESULT CAAFBasicInterp::COMCreate(IUnknown *pUnkOuter, void **ppvObjOut)
+{
+	*ppvObjOut = NULL;
+ 	CAAFBasicInterp *pAAFBasicInterp = new CAAFBasicInterp(pUnkOuter);
+ 	if (NULL == pAAFBasicInterp)
+ 		return E_OUTOFMEMORY;
+ 	*ppvObjOut = static_cast<IAAFInterpolator *>(pAAFBasicInterp);
+ 	((IUnknown *)(*ppvObjOut))->AddRef();
+ 	return S_OK;
+ }
 
