@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -57,6 +57,8 @@ ImplAAFPropertyDef::ImplAAFPropertyDef ()
   : _Type(PID_PropertyDefinition_Type, "Type"),
     _IsOptional(PID_PropertyDefinition_IsOptional, "IsOptional"),
     _pid(PID_PropertyDefinition_LocalIdentification, "LocalIdentification"),
+    _DefaultValue(PID_PropertyDefinition_DefaultValue, "DefaultValue"),
+    _IsUniqueIdentifier(PID_PropertyDefinition_IsUniqueIdentifier, "IsUniqueIdentifier"),
 	_cachedType (0),  // BobT: don't reference count the cached type!
 	_bname (0),
 	_OMPropCreateFunc (0)
@@ -64,6 +66,8 @@ ImplAAFPropertyDef::ImplAAFPropertyDef ()
   _persistentProperties.put (_Type.address());
   _persistentProperties.put (_IsOptional.address());
   _persistentProperties.put (_pid.address());
+  _persistentProperties.put (_DefaultValue.address());
+  _persistentProperties.put (_IsUniqueIdentifier.address());
 }
 
 
@@ -79,23 +83,28 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFPropertyDef::pvtInitialize (
       const aafUID_t & propertyAuid,
       OMPropertyId omPid,
-      wchar_t * pPropName,
+      const aafCharacter * pPropName,
 	  const aafUID_t & typeId,
-      aafBool isOptional)
+      aafBoolean_t isOptional,
+      aafBoolean_t isUniqueIdentifier)
 {
   AAFRESULT hr;
 
   if (! pPropName) return AAFRESULT_NULL_PARAM;
 
-  hr = SetAUID (propertyAuid);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  hr = SetName (pPropName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(propertyAuid, pPropName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
   _Type = typeId;
   _pid = omPid;
   _IsOptional = isOptional;
+
+  if (isUniqueIdentifier)
+  {
+    // Only set this optional property if true.
+    _IsUniqueIdentifier = isUniqueIdentifier;
+  }
 
   return AAFRESULT_SUCCESS;
 }
@@ -153,23 +162,28 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
-
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPropertyDef::GetIsSearchable (
-      aafBool *  /*pIsSearchable*/)
+    ImplAAFPropertyDef::GetIsUniqueIdentifier (
+       aafBool * pIsUniqueIdentifier) const
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (! pIsUniqueIdentifier)
+	  return AAFRESULT_NULL_PARAM;
+
+  if (! _IsUniqueIdentifier.isPresent())
+	{
+    // If the property is not present then this property
+    // definition cannot be for a unique identifier! Just
+    // return false.
+    *pIsUniqueIdentifier = kAAFFalse;
+//	  return AAFRESULT_PROP_NOT_PRESENT;
+	}
+  else
+  {
+    *pIsUniqueIdentifier = _IsUniqueIdentifier;
+  }
+
+  return AAFRESULT_SUCCESS;
 }
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPropertyDef::SetIsSearchable (
-      aafBool  /*IsSearchable*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -249,7 +263,7 @@ const char* ImplAAFPropertyDef::name(void) const
 }
 
 
-OMPropertyId ImplAAFPropertyDef::identification(void) const
+OMPropertyId ImplAAFPropertyDef::localIdentification(void) const
 {
   return _pid;
 }
@@ -257,7 +271,7 @@ OMPropertyId ImplAAFPropertyDef::identification(void) const
 
 bool ImplAAFPropertyDef::isOptional(void) const
 {
-  return (AAFTrue == _IsOptional) ? true : false;
+  return (kAAFTrue == _IsOptional) ? true : false;
 }
 
 
