@@ -38,10 +38,12 @@ OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
 : OMReferenceProperty<ReferencedObject>(propertyId,
                                         SF_STRONG_OBJECT_REFERENCE,
                                         name),
-  _reference(this, name)
+  _reference()
 {
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
+
+  _reference = OMStrongObjectReference<ReferencedObject>(this, name);
 }
 
 template <typename ReferencedObject>
@@ -85,9 +87,9 @@ ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::setValue(
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::setValue");
 
+  ReferencedObject* result = _reference.setValue(object);
   setPresent();
-  return _reference.setValue(object);
-
+  return result;
 }
 
   // @mfunc Assignment operator.
@@ -157,11 +159,9 @@ OMStrongReferenceProperty<ReferencedObject>::operator ReferencedObject* ()
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @parm Client context for callbacks.
   //   @this const
 template <typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::save(
-                                                     void* clientContext) const
+void OMStrongReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::save");
 
@@ -179,7 +179,7 @@ void OMStrongReferenceProperty<ReferencedObject>::save(
            (void *)propertyName,
            strlen(propertyName) + 1);
 
-  _reference.save(clientContext);
+  _reference.save();
 
 }
 
