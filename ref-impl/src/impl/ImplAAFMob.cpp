@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.1 2004/03/10 18:00:39 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.2 2004/03/17 20:45:14 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1098,11 +1098,13 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::GetUsageCode (aafUID_t*  /*pUsageCode*/)
+    ImplAAFMob::GetUsageCode (aafUID_t*  pUsageCode )
 {
   if ( !_usageCode.isPresent() ) {
     return AAFRESULT_PROP_NOT_PRESENT;
   }
+
+  *pUsageCode = _usageCode;
 
   return AAFRESULT_SUCCESS;
 
