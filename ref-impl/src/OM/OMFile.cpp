@@ -51,13 +51,15 @@
   //         this <c OMFile>.
   //   @parm The <e OMFile::OMLoadMode> for this <c OMFile>.
 OMFile::OMFile(const wchar_t* fileName,
+               void* clientOnRestoreContext,
                const OMAccessMode mode,
                OMStoredObject* store,
                const OMClassFactory* factory,
                const OMLoadMode loadMode)
 : _root(0), _rootStoredObject(store),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
-  _loadMode(loadMode), _fileName(0)
+  _loadMode(loadMode), _fileName(0),
+  _clientOnSaveContext(0), _clientOnRestoreContext(clientOnRestoreContext)
 {
   TRACE("OMFile::OMFile");
 
@@ -79,6 +81,7 @@ OMFile::OMFile(const wchar_t* fileName,
   //         this <c OMFile>.
   //   @parm The root <c OMStorable> object to save in this file.
 OMFile::OMFile(const wchar_t* fileName,
+               void* clientOnRestoreContext,
                OMFileSignature signature,
                const OMAccessMode mode,
                OMStoredObject* store,
@@ -86,7 +89,8 @@ OMFile::OMFile(const wchar_t* fileName,
                OMStorable* root)
 : _root(root), _rootStoredObject(store),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
-  _loadMode(lazyLoad), _fileName(0), _signature(signature)
+  _loadMode(lazyLoad), _fileName(0), _signature(signature),
+  _clientOnSaveContext(0), _clientOnRestoreContext(clientOnRestoreContext)
 {
   TRACE("OMFile::OMFile");
 
@@ -121,6 +125,7 @@ OMFile::~OMFile(void)
   //   @rdesc The newly opened <c OMFile>.
 OMFile* OMFile::openExistingRead(const wchar_t* fileName,
                                  const OMClassFactory* factory,
+                                 void* clientOnRestoreContext,
                                  const OMLoadMode loadMode)
 {
   TRACE("OMFile::openExistingRead");
@@ -129,6 +134,7 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
 
   OMStoredObject* store = OMStoredObject::openRead(fileName);
   OMFile* newFile = new OMFile(fileName,
+                               clientOnRestoreContext,
                                readOnlyMode,
                                store,
                                factory,
@@ -148,6 +154,7 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
   //   @rdesc The newly opened <c OMFile>.
 OMFile* OMFile::openExistingModify(const wchar_t* fileName,
                                    const OMClassFactory* factory,
+                                   void* clientOnRestoreContext,
                                    const OMLoadMode loadMode)
 {
   TRACE("OMFile::openExistingModify");
@@ -156,6 +163,7 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
 
   OMStoredObject* store = OMStoredObject::openModify(fileName);
   OMFile* newFile = new OMFile(fileName,
+                               clientOnRestoreContext,
                                modifyMode,
                                store,
                                factory,
@@ -178,6 +186,7 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   //   @rdesc The newly created <c OMFile>.
 OMFile* OMFile::openNewModify(const wchar_t* fileName,
                               const OMClassFactory* factory,
+                              void* clientOnRestoreContext,
                               const OMByteOrder byteOrder,
                               OMStorable* root,
                               const OMFileSignature& signature)
@@ -192,6 +201,7 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
 
   OMStoredObject* store = OMStoredObject::createModify(fileName, byteOrder);
   OMFile* newFile = new OMFile(fileName,
+                               clientOnRestoreContext,
                                signature,
                                modifyMode,
                                store,
@@ -222,13 +232,14 @@ bool OMFile::validSignature(const OMFileSignature& signature)
   //        <c OMFile>. It is not possible to <mf OMFile::save>
   //        read-only or transient files.
   //   @parm Client context for callbacks.
-void OMFile::save(void* clientContext)
+void OMFile::save(void* clientOnSaveContext)
 {
   TRACE("OMFile::save");
 
   if (_mode == modifyMode) {
-    _root->onSave(clientContext);
-    _root->save(clientContext);
+    _clientOnSaveContext = clientOnSaveContext;
+    _root->onSave(_clientOnSaveContext);
+    _root->save();
     _rootStoredObject->save(referencedProperties());
   }
 }
@@ -438,6 +449,16 @@ bool OMFile::persistent(void) const
   // Transient files NYI so by definition a file is persistent.
   //
   return true;
+}
+
+void* OMFile::clientOnSaveContext(void)
+{
+  return _clientOnSaveContext;
+}
+
+void* OMFile::clientOnRestoreContext(void)
+{
+  return _clientOnRestoreContext;
 }
 
   // @mfunc Write the signature to the given file.
