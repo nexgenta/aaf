@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.59 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.60 2004/11/30 21:58:33 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -576,7 +576,9 @@ void OMWeakReferenceProperty<ReferencedObject>::shallowCopyTo(
   ASSERT("Valid destination", dest != this);
   ASSERT("Valid source", (_targetName != 0) || (_targetPropertyPath != 0));
 
-  dest->_reference = _reference;
+  dest->_reference = OMWeakObjectReference(dest,
+                                           _reference.identification(),
+                                           nullOMPropertyTag);
   dest->_targetTag = nullOMPropertyTag;
   dest->_targetName = _targetName;
   delete [] dest->_targetPropertyPath;
@@ -610,6 +612,9 @@ void OMWeakReferenceProperty<ReferencedObject>::deepCopyTo(
     typedef OMWeakReferenceProperty<ReferencedObject> Property;
     Property* wp = dynamic_cast<Property*>(destination);
     ASSERT("Correct property type", wp != 0);
+
+    // Update the target tag on object reference
+    wp->reference().setTargetTag(wp->targetTag());
 
     OMStrongReferenceSet* dest = wp->targetSet();
     ASSERT("Destination is correct type", dest != 0);
