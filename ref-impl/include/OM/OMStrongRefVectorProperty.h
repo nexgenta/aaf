@@ -31,6 +31,7 @@
 
 #include "OMVector.h"
 #include "OMContainerElement.h"
+#include "OMContainerProperty.h"
 
 template <typename ReferencedObject>
 class OMStrongReferenceVectorIterator;
@@ -44,7 +45,8 @@ class OMStrongReferenceVectorIterator;
   //          <c OMStorable>.
   //   @base public | <c OMContainerProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceVectorProperty : public OMContainerProperty {
+class OMStrongReferenceVectorProperty :
+                                 public OMContainerProperty<ReferencedObject> {
 public:
   // @access Public members.
 
@@ -56,7 +58,7 @@ public:
   virtual ~OMStrongReferenceVectorProperty(void);
 
     // @cmember Save this <c OMStrongReferenceVectorProperty>.
-  virtual void save(void) const;
+  virtual void save(void* clientContext) const;
 
     // @cmember Close this <c OMProperty>.
   virtual void close(void);
@@ -91,8 +93,32 @@ public:
     //          this <c OMStrongReferenceVectorProperty>.
   void appendValue(const ReferencedObject*& value);
 
+    // @cmember Prepend the given <p ReferencedObject> <p value> to
+    //          this <c OMStrongReferenceVectorProperty>.
+  void prependValue(const ReferencedObject* value);
+
+    // @cmember Insert <p object> into this
+    //          <c OMStrongReferenceVectorProperty>.
+  void insert(const ReferencedObject* object);
+
+    // @cmember Insert <p value> into this <c OMStrongReferenceVectorProperty>
+    //          at position <p index>. Existing values at <p index> and
+    //          higher are shifted up one index position.
+  void insertAt(const ReferencedObject* value, const size_t index);
+
+    // @cmember Does this <c OMStrongReferenceVectorProperty> contain
+    //          <p object> ?
+  bool containsValue(const ReferencedObject* object) const;
+
+    // @cmember Remove <p object> from this
+    //          <c OMStrongReferenceVectorProperty>.
+  void removeValue(const ReferencedObject* object);
+
+    // @cmember The index of the <p ReferencedObject*> <p object>.
+  size_t indexOfValue(const ReferencedObject* object) const;
+
     // @cmember Increase the capacity of this
-    //          <c OMStrongReferemceVectorProperty> so that it
+    //          <c OMStrongReferenceVectorProperty> so that it
     //          can contain at least <p capacity> <p ReferencedObject>s
     //          without having to be resized.
   void grow(const size_t capacity);

@@ -30,12 +30,16 @@
 #define OMSTRONGREFVECTORPROPERTYT_H
 
 #include "OMAssertions.h"
+#include "OMStoredVectorIndex.h"
+#include "OMStrongReferenceVectorIter.h"
 
 template <typename ReferencedObject>
 OMStrongReferenceVectorProperty<ReferencedObject>::
                  OMStrongReferenceVectorProperty(const OMPropertyId propertyId,
                                                  const char* name)
-: OMContainerProperty(propertyId, SF_STRONG_OBJECT_REFERENCE_VECTOR, name)
+: OMContainerProperty<ReferencedObject>(propertyId,
+                                        SF_STRONG_OBJECT_REFERENCE_VECTOR,
+                                        name)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::"
                                             "OMStrongReferenceVectorProperty");
@@ -59,11 +63,11 @@ OMStrongReferenceVectorProperty<ReferencedObject>::
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @parm  The <c OMStoredObject> on which to save this
-  //          <c OMStrongReferenceVectorProperty>.
+  //   @parm Client context for callbacks.
   //   @this const
 template <typename ReferencedObject>
-void OMStrongReferenceVectorProperty<ReferencedObject>::save(void) const
+void OMStrongReferenceVectorProperty<ReferencedObject>::save(
+                                                     void* clientContext) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::save");
 
@@ -101,7 +105,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::save(void) const
 
     // save the object
     //
-    element.save();
+    element.save(clientContext);
 
     position = position + 1;
 
@@ -179,11 +183,13 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
     OMUInt32 localKey;
     for (size_t i = 0; i < entries; i++) {
       vectorIndex->iterate(context, localKey);
-      const char* name = elementName(localKey);
+      char* name = elementName(localKey);
       OMVectorElement<OMStrongObjectReference<ReferencedObject>,
                       ReferencedObject> element(this, name, localKey);
       element.restore();
       _vector.setAt(element, i);
+      delete [] name;
+      name = 0; // for BoundsChecker
     }
   }
   delete vectorIndex;
@@ -210,6 +216,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getSize(
                                                             size_t& size) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getSize");
+  OBSOLETE("OMStrongReferenceVectorProperty<ReferencedObject>::count");
 
   size = count();
 }
@@ -224,6 +231,7 @@ template <typename ReferencedObject>
 size_t OMStrongReferenceVectorProperty<ReferencedObject>::getSize(void) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getSize");
+  OBSOLETE("OMStrongReferenceVectorProperty<ReferencedObject>::count");
 
   return count();
 }
@@ -251,10 +259,11 @@ ReferencedObject*
   if (index == count()) {
     // This is an append, make sure the new element is defined.
     OMUInt32 localKey = nextLocalKey();
-    const char* name = elementName(localKey);
+    char* name = elementName(localKey);
     OMVectorElement<OMStrongObjectReference<ReferencedObject>,
                     ReferencedObject> newElement(this, name, localKey);
     _vector.append(newElement);
+    delete [] name;
   }
 
   // Set the vector to contain the new object
@@ -309,6 +318,104 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::appendValue(
 
   setValueAt(value, count());
 
+}
+
+  // @mfunc Prepend the given <p ReferencedObject> <p value> to
+  //        this <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm A pointer to a <p ReferencedObject>.
+template <typename ReferencedObject>
+void OMStrongReferenceVectorProperty<ReferencedObject>::prependValue(
+                                                const ReferencedObject* value)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::prependValue");
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // @mfunc Insert <p object> into this
+  //        <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm A pointer to a <p ReferencedObject> by reference.
+template <typename ReferencedObject>
+void OMStrongReferenceVectorProperty<ReferencedObject>::insert(
+                                                const ReferencedObject* object)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insert");
+
+  appendValue(object);
+}
+
+  // @mfunc Insert <p value> into this <c OMStrongReferenceVectorProperty>
+  //        at position <p index>. Existing values at <p index> and
+  //        higher are shifted up one index position.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm A pointer to a <p ReferencedObject>.
+  //   @parm The position at which to insert the <p ReferencedObject>.
+template <typename ReferencedObject>
+void OMStrongReferenceVectorProperty<ReferencedObject>::insertAt(
+                             const ReferencedObject* value, const size_t index)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insertAt");
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // @mfunc Does this <c OMStrongReferenceVectorProperty> contain
+  //        <p object> ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm A pointer to a <p ReferencedObject> by reference.
+  //   @this const
+template <typename ReferencedObject>
+bool OMStrongReferenceVectorProperty<ReferencedObject>::containsValue(
+                                          const ReferencedObject* object) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::containsValue");
+
+  ASSERT("Unimplemented code not reached", false);
+
+  bool result = false;
+  return result;
+}
+
+  // @mfunc Remove <p object> from this
+  //        <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm A pointer to a <p ReferencedObject> by reference.
+template <typename ReferencedObject>
+void OMStrongReferenceVectorProperty<ReferencedObject>::removeValue(
+                                                const ReferencedObject* object)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeValue");
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // @mfunc The index of the <p ReferencedObject*> <p object>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm A pointer to the <p ReferencedObject> to find.
+  //   @rdesc The index.
+  //   @this const
+template <typename ReferencedObject>
+size_t OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue(
+                                          const ReferencedObject* object) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeValue");
+
+  ASSERT("Unimplemented code not reached", false);
+  return 0;
 }
 
   // @mfunc Increase the capacity of this
