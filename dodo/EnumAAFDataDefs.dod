@@ -1,6 +1,9 @@
 #startm .this-module 0
 EnumAAFDataDefs\
 #endm
+#startm .parent-module 0
+AAFRoot\
+#endm
 #c
 AD_HEAD
 /******************************************\
@@ -12,13 +15,20 @@ AD_HEAD
 *                                          *
 \******************************************/
 
+
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
 AD_FORWARD_DECLARATION(AAFDataDef)
 
 
-AD_CLASS_UUID(B1A2138B, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
+AD_CLASS_UUID(D8000381, 498E, 11D2, 84, 1B, 00, 60, 08, 32, AC, B8)
 
-AD_DEFAULT_UUID(B1A2138A, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_ROOT_CLASS_BEGIN
+AD_DEFAULT_UUID(d8000382, 498e, 11d2, 84, 1B, 00, 60, 08, 32, AC, B8)
+
+AD_XCLASS_BEGIN(Concrete, Transient)
 
 AD_XMETHOD1(NextOne,
 			[out\,retval], objOut, AAFDataDef, ppDataDef, The Next DataDefinition,
@@ -26,12 +36,12 @@ AD_XMETHOD1(NextOne,
   // properly releasing the returned pointer when it is no longer needed.
   // @comm This is a just simplified version of the Next method. )
 
-AD_XMETHOD3(Next,
-			[in], objPass, aafUInt32, count, number of data definitions requested,
+AD_X2METHOD3(Next,
+			[in], objPass, aafUInt32, count, number of data definitions requested,xxx,
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOut, AAFDataDef, ppDataDef, array to receive data definitions,
+			objOutArray, AAFDataDef, ppDataDef, array to receive data definitions,count,
 			[out\,ref], objPass, aafUInt32 *, pFetched,
-			number of actual DataDefinition fetched into ppDataDefinition array,
+			number of actual DataDefinition fetched into ppDataDefinition array,xxx,
 			Enumerates the next count elements \(AAFDataDef pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
@@ -57,4 +67,4 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_ROOT_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
