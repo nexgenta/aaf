@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -43,15 +44,40 @@ ImplAAFTaggedValue::~ImplAAFTaggedValue ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::Initialize (wchar_t* pName, aafUID_t*  pDataDef)
+    ImplAAFTaggedValue::Initialize (wchar_t* pName, ImplAAFTypeDef* pTypeDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
+	ImplAAFHeader*			pHeader = NULL;
+	ImplAAFDictionary*		pDictionary = NULL;
+	ImplAAFTypeDef*			pTempTypeDef = NULL;
+	aafUID_t				typeDefUID;
 
-	if (pName == NULL || pDataDef == NULL)
+	if (pName == NULL || pTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	_type = *pDataDef;
-	_name = pName;
+	XPROTECT()
+	{
+		// Get the Header and the dictionary objects for this file.
+		CHECK(pTypeDef->MyHeadObject(&pHeader));
+		CHECK(pHeader->GetDictionary(&pDictionary));
+		// make sure the given type is already registered in the file's dictionary
+		CHECK(pTypeDef->GetAUID(&typeDefUID));
+		CHECK(pDictionary->LookupType(&typeDefUID, &pTempTypeDef));
+		_type = typeDefUID;
+		pTypeDef->AcquireReference();
+		_name = pName;
+		pHeader->ReleaseReference();
+		pDictionary->ReleaseReference();
+	}
+	XEXCEPT
+	{
+		if(pHeader != NULL)
+			pHeader->ReleaseReference();
+		if(pDictionary)
+			pDictionary->ReleaseReference();
+	}
+	XEND;
+
 
 	return rc;
 }
@@ -116,11 +142,9 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(dict != NULL)
-		  dict->ReleaseReference();
-		dict = 0;
+			dict->ReleaseReference();
 		if(head != NULL)
-		  head->ReleaseReference();
-		head = 0;
+			head->ReleaseReference();
 	}
 	XEND;
 
