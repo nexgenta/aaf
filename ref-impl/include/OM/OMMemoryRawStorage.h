@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
 #ifndef OMMEMORYRAWSTORAGE_H
@@ -31,6 +26,7 @@
 
 #include "OMRawStorage.h"
 #include "OMFile.h"
+#include "OMVector.h"
 
 #include <stdio.h>
 
@@ -40,7 +36,8 @@
   //        This is an Object Manager built-in implementation of the
   //        <c OMRawStorage> interface.
   //
-  //   @base public | OMRawStorage
+  //   @base public | <c OMRawStorage>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMMemoryRawStorage : public OMRawStorage {
 public:
   // @access Static members.
@@ -50,11 +47,11 @@ public:
 
   // @access Public members.
 
-    // @cmember Constructor.
-  OMMemoryRawStorage(void);
-
     // @cmember Destructor.
   virtual ~OMMemoryRawStorage(void);
+
+    // @cmember Is it possible to read from this <c OMMemoryRawStorage> ?
+  virtual bool isReadable(void) const;
 
     // @cmember Attempt to read the number of bytes given by <p byteCount>
     //          from the current position in this <c OMMemoryRawStorage>
@@ -67,6 +64,23 @@ public:
   virtual void read(OMByte* bytes,
                     OMUInt32 byteCount,
                     OMUInt32& bytesRead) const;
+
+    // @cmember Attempt to read the number of bytes given by <p byteCount>
+    //          from offset <p position> in this <c OMMemoryRawStorage>
+    //          into the buffer at address <p bytes>.
+    //          The actual number of bytes read is returned in <p bytesRead>.
+    //          Reading from positions greater than
+    //          <mf OMMemoryRawStorage::size> causes <p bytesRead> to be less
+    //          than <p byteCount>. Reading bytes that have never been written
+    //          returns undefined data in <p bytes>.
+    //          @precondition <f isReadable()> && <f isPositionable()>
+  virtual void readAt(OMUInt64 position,
+                      OMByte* bytes,
+                      OMUInt32 byteCount,
+                      OMUInt32& bytesRead) const;
+
+    // @cmember Is it possible to write to this <c OMMemoryRawStorage> ?
+  virtual bool isWritable(void) const;
 
     // @cmember Attempt to write the number of bytes given by <p byteCount>
     //          to the current position in this <c OMMemoryRawStorage>
@@ -82,17 +96,29 @@ public:
                      OMUInt32 byteCount,
                      OMUInt32& bytesWritten);
 
-    // @cmember May this <c OMMemoryRawStorage> be changed in size ?
-    //          An implementation of <c OMMemoryRawStorage> for disk files
-    //          would most probably return true. An implemetation
-    //          for network streams would return false. An implementation
-    //          for fixed size contiguous memory files (avoiding copying)
-    //          would return false.
-  virtual bool isSizeable(void) const;
+    // @cmember Attempt to write the number of bytes given by <p byteCount>
+    //          to offset <p position> in this <c OMMemoryRawStorage>
+    //          from the buffer at address <p bytes>.
+    //          The actual number of bytes written is returned in
+    //          <p bytesWritten>.
+    //          Writing to positions greater than
+    //          <mf OMMemoryRawStorage::size> causes this
+    //          <c OMMemoryRawStorage>
+    //          to be extended, however such extension can fail, causing
+    //          <p bytesWritten> to be less than <p byteCount>.
+    //          @precondition <f isWritable()> && <f isPositionable()>
+    //   @devnote How is failure to extend indicated ?
+  virtual void writeAt(OMUInt64 position,
+                       const OMByte* bytes,
+                       OMUInt32 byteCount,
+                       OMUInt32& bytesWritten);
 
-    // @cmember The current size of this <c OMMemoryRawStorage> in bytes.
-    //          precondition - isSizeable()
-  virtual OMUInt64 size(void) const;
+    // @cmember May this <c OMMemoryRawStorage> be changed in size ?
+  virtual bool isExtendible(void) const;
+
+    // @cmember The current extent of this <c OMMemoryRawStorage> in bytes.
+    //          precondition - isPositionable()
+  virtual OMUInt64 extent(void) const;
 
     // @cmember Set the size of this <c OMMemoryRawStorage> to <p newSize>
     //          bytes.
@@ -102,16 +128,26 @@ public:
     //          <c OMMemoryRawStorage> is truncated. Truncation may also result
     //          in the current position for <f read()> and <f write()>
     //          being set to <mf OMMemoryRawStorage::size>.
-    //          precondition - isSizeable()
-  virtual void setSize(OMUInt64 newSize);
+    //          precondition - isExtendible()
+  virtual void extend(OMUInt64 newSize);
+
+    // @cmember The current size of this <c OMMemoryRawStorage> in bytes.
+    //          precondition - isPositionable()
+  virtual OMUInt64 size(void) const;
 
     // @cmember May the current position, for <f read()> and <f write()>,
     //          of this <c OMMemoryRawStorage> be changed ?
-    //          An implementation of <c OMMemoryRawStorage> for disk files
-    //          would most probably return true. An implemetation
-    //          for network streams would return false. An implementation
-    //          for memory files would return true.
   virtual bool isPositionable(void) const;
+
+    // @cmember Synchronize this <c OMMemoryRawStorage> with its external
+    //          representation.
+  virtual void synchronize(void);
+
+private:
+  // @access Private members.
+
+    // @cmember Constructor.
+  OMMemoryRawStorage(void);
 
     // @cmember The current position for <f read()> and <f write()>, as an
     //          offset in bytes from the beginning of this
@@ -123,12 +159,24 @@ public:
     //          offset in bytes from the beginning of this
     //          <c OMMemoryRawStorage>.
     //          precondition - isPositionable()
-  virtual void setPosition(OMUInt64 newPosition);
+  virtual void setPosition(OMUInt64 newPosition) const;
 
-private:
-  // @access Private members.
+    // @cmember Write a page or partial page.
+  virtual void write(size_t page,
+                     size_t offset,
+                     size_t byteCount,
+                     const OMByte* source);
 
-  // NYI
+    // @cmember Read a page or partial page.
+  virtual void read(size_t page,
+                    size_t offset,
+                    size_t byteCount,
+                    OMByte* destination) const;
+
+  OMVector<OMByte*> _pageVector;
+  size_t _pageSize;
+  OMUInt64 _size;
+  OMUInt64 _position;
 };
 
 #endif

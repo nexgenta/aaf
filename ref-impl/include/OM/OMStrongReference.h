@@ -20,35 +20,32 @@
 //
 //=---------------------------------------------------------------------=
 
-// @doc OMEXTERNAL
-#ifndef OMREFVECTORPROPERTY_H
-#define OMREFVECTORPROPERTY_H
+// @doc OMINTERNAL
+#ifndef OMSTRONGREFERENCE_H
+#define OMSTRONGREFERENCE_H
 
-#include "OMContainerProperty.h"
-#include "OMObjectVector.h"
+#include "OMRefProperty.h"
 
-  // @class Abstract base class for persistent object reference vector
+class OMStrongObjectReference;
+
+  // @class Persistent strong reference (contained object)
   //        properties supported by the Object Manager.
-  //   @base public | <c OMContainerProperty>
-  //   @base public | <c OMObjectVector>
+  //   @base public | <c OMReferenceProperty>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMReferenceVectorProperty : public OMContainerProperty,
-                                  public OMObjectVector {
+class OMStrongReference : public OMReferenceProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMReferenceVectorProperty(const OMPropertyId propertyId,
-                            const OMStoredForm storedForm,
-                            const wchar_t* name);
+  OMStrongReference(const OMPropertyId propertyId,
+                    const wchar_t* name);
 
     // @cmember Destructor.
-  virtual ~OMReferenceVectorProperty(void);
+  ~OMStrongReference(void);
 
-    // @cmember Convert to <c OMReferenceContainer>.
-  virtual OMReferenceContainer* referenceContainer(void);
+  virtual OMStrongObjectReference& reference(void) const = 0;
+
 
 };
 
 #endif
-

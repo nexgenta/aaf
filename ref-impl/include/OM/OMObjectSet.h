@@ -21,32 +21,32 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
-#ifndef OMREFVECTORPROPERTY_H
-#define OMREFVECTORPROPERTY_H
+#ifndef OMOBJECTSET_H
+#define OMOBJECTSET_H
 
-#include "OMContainerProperty.h"
-#include "OMObjectVector.h"
+#include "OMReferenceContainer.h"
 
-  // @class Abstract base class for persistent object reference vector
+  // @class Abstract base class for persistent object reference set
   //        properties supported by the Object Manager.
-  //   @base public | <c OMContainerProperty>
-  //   @base public | <c OMObjectVector>
+  //   @base public | <c OMReferenceContainer>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMReferenceVectorProperty : public OMContainerProperty,
-                                  public OMObjectVector {
+class OMObjectSet : public OMReferenceContainer {
 public:
   // @access Public members.
 
-    // @cmember Constructor.
-  OMReferenceVectorProperty(const OMPropertyId propertyId,
-                            const OMStoredForm storedForm,
-                            const wchar_t* name);
+    // @cmember Remove the <c OMObject> identified by <p identification>
+    //          from this <c OMObjectSet>.
+  virtual OMObject* remove(void* identification) = 0;
 
-    // @cmember Destructor.
-  virtual ~OMReferenceVectorProperty(void);
+    // @cmember Does this <c OMObjectSet> contain an
+    //          <c OMObject> identified by <p identification> ?
+  virtual bool contains(void* identification) const = 0;
 
-    // @cmember Convert to <c OMReferenceContainer>.
-  virtual OMReferenceContainer* referenceContainer(void);
+    // @cmember Find the <c OMObject> in this <c OMObjectSet>
+    //          identified by <p identification>.  If the object is found
+    //          it is returned in <p object> and the result is < e bool.true>.
+    //          If the object is not found the result is <e bool.false>.
+  virtual bool findObject(void* identification, OMObject*& object) const = 0;
 
 };
 

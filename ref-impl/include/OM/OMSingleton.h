@@ -21,34 +21,33 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
-#ifndef OMREFVECTORPROPERTY_H
-#define OMREFVECTORPROPERTY_H
+#ifndef OMSINGLETON_H
+#define OMSINGLETON_H
 
-#include "OMContainerProperty.h"
-#include "OMObjectVector.h"
-
-  // @class Abstract base class for persistent object reference vector
-  //        properties supported by the Object Manager.
-  //   @base public | <c OMContainerProperty>
-  //   @base public | <c OMObjectVector>
+  // @class Singleton objects.
+  //
+  // References ...
+  //
+  // [1] "Design Patterns: Elements of Reusable Object-Oriented Software",
+  // Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides,
+  // 1994 Addison-Wesley, ISBN 0-201-63361-2, Singleton(127)
+  //
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMReferenceVectorProperty : public OMContainerProperty,
-                                  public OMObjectVector {
+template <typename Type>
+class OMSingleton{
 public:
-  // @access Public members.
 
-    // @cmember Constructor.
-  OMReferenceVectorProperty(const OMPropertyId propertyId,
-                            const OMStoredForm storedForm,
-                            const wchar_t* name);
+  static Type* instance(void);
+  static void destroy(void);
 
-    // @cmember Destructor.
-  virtual ~OMReferenceVectorProperty(void);
+protected:
+  OMSingleton(void);
+  virtual ~OMSingleton(void);
 
-    // @cmember Convert to <c OMReferenceContainer>.
-  virtual OMReferenceContainer* referenceContainer(void);
-
+private:
+  static Type* _onlyInstance;
 };
 
-#endif
+#include "OMSingletonT.h"
 
+#endif
