@@ -1,26 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFEssenceAccess
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -31,8 +36,7 @@
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
-#include "AAFDefUIDs.h"
+#include "AAFDefUIDS.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
 #include "AAFContainerDefs.h"
@@ -45,19 +49,25 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
-#include "CAAFBuiltinDefs.h"
 
 
 
 // This static variables are here so they can be referenced 
 // thru out the whole program.
 
+static aafSourceRef_t sourceRef; 
+
 static const aafInt32 STD_SLOT_ID = 1;
 static const aafInt32 STD_WIDTH	= 128L;
 static const aafInt32 STD_HEIGHT = 96L;
 static const aafInt32 PIXELS_PER_FRAME = (STD_WIDTH * STD_HEIGHT);
 static const aafInt32 FRAME_BYTES = (PIXELS_PER_FRAME * 3L);
+static const aafInt32 LINE_BYTES = (FRAME_BYTES / STD_HEIGHT);
+
 static const aafInt32 SAMPLE_422_BYTES = (PIXELS_PER_FRAME * 2L); 
+
+/* Size of compressed data (below) when decompressed */
+static const aafInt32 COMPRESS_FRAME_BYTES = (128L * 96L * 3L);
 
 static const aafUInt32 MAX_SAMPLE_COUNT = 2;
 static const aafUInt32 STD_SAMPLE_COUNT = 1;
@@ -66,6 +76,8 @@ static const aafUInt8 green[] =		{ 0x00, 0xff, 0x00 };
 
 /* This is the value of the YCbCr returned by IJG when decompressing
    compressedJFIF */
+static const aafUInt8 yuv_decompressed_from_green_rgb[] = { 0x96, 0x2c, 0x15 };
+static const aafUInt8 hsv_from_green_rgb[] = { 0x50, 0xf0, 0x78 };
 static const aafUInt8 yuv_green[] = { 0x96, 0x2c, 0x15 };
 
 
@@ -186,8 +198,13 @@ static const aafUInt8 compressed422JFIF[] =
 };
 
 // Prototype to satisfy the CW compiler.
-extern "C" HRESULT CAAFEssenceAccess_test(testMode_t mode);
+extern "C" HRESULT CAAFEssenceAccess_test();
 
+
+static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
+{
+	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
+}
 
 #define TEST_PATH	L"SomeFile.dat"
 
@@ -236,8 +253,7 @@ static void HexDumpBuffer(const char* label, aafDataBuffer_t buffer, aafUInt32 b
 	printf("static const aafUInt8 %s[] =\n{", label);
 	if (buffer && 0 < bufferSize)
 	{
-		aafUInt32 i;
-		for (i = 0; i < (bufferSize - 1); ++i)
+		for (aafUInt32 i = 0; i < (bufferSize - 1); ++i)
 		{
 			if ((i % cols) == 0)
 				printf("\n  ");
@@ -265,33 +281,15 @@ static void HexDumpBuffer(const char* label, aafDataBuffer_t buffer, aafUInt32 b
 #endif // #ifdef _DEBUG
 
 
-static void MobIDtoString(aafMobID_constref uid, char *buf)
+static void MobIDtoString(aafMobID_t *uid, char *buf)
 {
-    sprintf( buf, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x-" \
-		  "%02x-%02x-%02x-%02x-" \
-		  "%08x%04x%04x" \
-		  "%02x%02x%02x%02x%02x%02x%02x%02x",
-
-	(int)uid.SMPTELabel[0], (int)uid.SMPTELabel[1], 
-	(int)uid.SMPTELabel[2], (int)uid.SMPTELabel[3],
-	(int)uid.SMPTELabel[4], (int)uid.SMPTELabel[5], 
-	(int)uid.SMPTELabel[6], (int)uid.SMPTELabel[7],
-	(int)uid.SMPTELabel[8], (int)uid.SMPTELabel[9], 
-	(int)uid.SMPTELabel[10], (int)uid.SMPTELabel[11],
-
-	(int)uid.length, (int)uid.instanceHigh, 
-	(int)uid.instanceMid, (int)uid.instanceLow,
-
-	uid.material.Data1, uid.material.Data2, uid.material.Data3,
-
-	(int)uid.material.Data4[0], (int)uid.material.Data4[1], 
-	(int)uid.material.Data4[2], (int)uid.material.Data4[3],
-	(int)uid.material.Data4[4], (int)uid.material.Data4[5], 
-	(int)uid.material.Data4[6], (int)uid.material.Data4[7] );
+	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
+		uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
+		(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
+		(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
 }
 
-
-typedef enum { testStandardCalls, testMultiCalls } testType_t;
+typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
 
 typedef aafInt16	AAFByteOrder;
 const AAFByteOrder INTEL_ORDER		      = 0x4949; // 'II' for Intel
@@ -318,14 +316,9 @@ typedef struct
 	aafUID_t	dataFormat;
 } testDataFile_t;
 
-typedef IAAFSmartPointer<IAAFEssenceFormat> IAAFEssenceFormatSP;
-
 const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
-static HRESULT hrSetTransformParameters=0;
-
-static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, testType_t testType,
-								  aafUID_t codecID,aafBool bCallSetTransformParameters=kAAFFalse)
+static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, testType_t testType)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
 	IAAFFile*					pFile = NULL;
@@ -335,8 +328,9 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 	IAAFMasterMob*				pMasterMob = NULL;
 	
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
-	IAAFEssenceFormatSP			pFormat;
+	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
 	// !!!Previous revisions of this file contained variables here required to handle external essence
@@ -346,11 +340,11 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 	aafRational_t				sampleRate = {44100, 1};
 	FILE*						pWavFile = NULL;
 	unsigned char				dataBuff[4096], *dataPtr;
-	aafUInt32					dataOffset, dataLen;
+	size_t						bytesRead;
+	aafUInt32					bytesWritten, dataOffset, dataLen;
 	aafUInt16					bitsPerSample, numCh;
 	aafInt32			n, numSpecifiers;
 	aafUID_t			essenceFormatCode, testContainer;
-  aafUInt32 samplesWritten, bytesWritten;
 	// delete any previous test file before continuing...
 	char chNameBuffer[1000];
 
@@ -367,32 +361,30 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 			remove(chNameBuffer);
 		}
 		
-		aafProductVersion_t v;
-		v.major = 1;
-		v.minor = 0;
-		v.tertiary = 0;
-		v.patchLevel = 0;
-		v.type = kAAFVersionUnknown;
+		
 		ProductInfo.companyName = L"AAF Developers Desk";
 		ProductInfo.productName = L"Essence Data Test";
-		ProductInfo.productVersion = &v;
+		ProductInfo.productVersion.major = 1;
+		ProductInfo.productVersion.minor = 0;
+		ProductInfo.productVersion.tertiary = 0;
+		ProductInfo.productVersion.patchLevel = 0;
+		ProductInfo.productVersion.type = kVersionUnknown;
 		ProductInfo.productVersionString = NULL;
-		ProductInfo.productID = UnitTestProductID;
+		ProductInfo.productID = NIL_UID;
 		ProductInfo.platform = NULL;
 		
 		checkResult(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
 		checkResult(pFile->GetHeader(&pHeader));
-
+		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
 		
 		// !!!Previous revisions of this file contained code here required to handle external essence
 		
 		// Get a Master MOB Interface
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMasterMob, 
-								   (IUnknown **)&pMasterMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
+			IID_IAAFMasterMob, 
+			(IUnknown **)&pMasterMob));
 		// Get a Mob interface and set its variables.
 		checkResult(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 		checkResult(pMob->GetMobID(&masterMobID));
@@ -406,9 +398,9 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 		if(dataFile != NULL)
 		{
 			// Make a locator, and attach it to the EssenceDescriptor
-			checkResult(defs.cdNetworkLocator()->
-						CreateInstance(IID_IAAFLocator, 
-									   (IUnknown **)&pLocator));		
+			checkResult(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
+				IID_IAAFLocator, 
+				(IUnknown **)&pLocator));		
 			checkResult(pLocator->SetPath (dataFile->dataFilename));
 			testContainer = dataFile->dataFormat;
 		}
@@ -423,32 +415,34 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 		pWavFile = fopen("Laser.wav", "r");
 		checkExpression(pWavFile != NULL, AAFRESULT_TEST_FAILED);
 		// read in the essence data
-		fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
+		bytesRead = fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
 		checkResult(loadWAVEHeader(dataBuff,
 			&bitsPerSample,
 			&numCh,
 			&sampleRate,
 			&dataOffset,
 			&dataLen));
-		dataPtr = dataBuff + dataOffset;
+		if(testType != testRawCalls)
+		{
+			dataPtr = dataBuff + dataOffset;
+		}
+		else
+		{	
+			dataPtr = dataBuff;
+			dataLen = bytesRead;
+		}
 		
 		// now create the Essence data file
 		checkResult(pMasterMob->CreateEssence(1,				// Slot ID
-			defs.ddSound(),	// MediaKind
-			codecID,		// kAAFCodecWAVE
+			DDEF_Sound,		// MediaKind
+			CodecWave,		// codecID
 			editRate,		// edit rate
 			sampleRate,		// sample rate
-			kAAFCompressionDisable,
+			kSDKCompressionDisable,
 			pLocator,	// In current file
 			testContainer,	// In AAF Format
 			&pEssenceAccess));// Compress disabled
-
-    // Get the codecID and validate that it is what we expect.
-    aafUID_t codecID = {0};
-		checkResult(pEssenceAccess->GetCodecID(&codecID));
-		checkExpression(0 == memcmp(&codecID, &codecID, sizeof(codecID)), AAFRESULT_TEST_FAILED);
-    
-
+		
 		checkResult(pEssenceAccess->GetFileFormatParameterList (&format));
 		checkResult(format->NumFormatSpecifiers (&numSpecifiers));
 		for(n = 0; n < numSpecifiers; n++)
@@ -465,28 +459,31 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 		aafInt32	sampleSize = bitsPerSample;
 		checkResult(pFormat->AddFormatSpecifier (kAAFAudioSampleBits, sizeof(sampleSize), (aafUInt8 *)&sampleSize));
 		checkResult(pEssenceAccess->PutFileFormat (pFormat));
-
-		// At the time this test was written, SetTransformParameters() returned
-		// AAFRESULT_NOT_IN_CURRENT_VERSION, and therefore did not need to be 
-		// tested.  We simply store the HRESULT from SetTransformParameters(), and
-		// check at the end of CAAFEssenceAccess_test(testMode_t mode) if the function still
-		// returns that code.
-		if(bCallSetTransformParameters==kAAFTrue)
-			hrSetTransformParameters=pEssenceAccess->SetTransformParameters(
-				pFormat);
-
-		// NIL flavour is the only one available for kAAFCodecWAVE
-		checkResult(pEssenceAccess->SetEssenceCodecFlavour(kAAFNilCodecFlavour));
-
+		pFormat->Release();
+		pFormat = NULL;
 		// write out the data
-		if(testType == testStandardCalls)
+		if(testType == testRawCalls)
+		{
+			checkResult(pEssenceAccess->QueryInterface(IID_IAAFEssenceRawAccess, (void **)&pRawEssence));
+			checkResult(pRawEssence->WriteRawData(	dataLen,	// Number of Samples
+				dataPtr,	// THE Raw data
+				sizeof(dataBuff)));// buffer size
+			pRawEssence->Release();
+			pRawEssence = NULL;
+		}
+		else if(testType == testStandardCalls)
 		{
 			checkResult(pEssenceAccess->WriteSamples(	dataLen,	//!!! hardcoded bytes/sample ==1// Number of Samples
-						      sizeof(dataBuff),// buffer size
-				          dataPtr,	// THE data
-									&samplesWritten,
-									&bytesWritten));
-    }
+				dataPtr,	// THE Raw data
+				sizeof(dataBuff)));// buffer size
+		}
+		else if(testType == testFractionalCalls)
+		{
+			checkResult(pEssenceAccess->WriteFractionalSample(
+				dataLen,			// number of bytes
+				dataPtr,			// THE data	
+				&bytesWritten));	// !!!checkResult this when it works
+		}
 		else if(testType == testMultiCalls)
 		{
 			aafmMultiXfer_t		xfer;
@@ -502,11 +499,8 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 			checkResult(pMultiEssence->WriteMultiSamples(1, &xfer, &result));
 			pMultiEssence->Release();
 			pMultiEssence = NULL;
-
-			samplesWritten = result.samplesXfered;
-			bytesWritten = result.bytesXfered;
 		}
-
+		
 		// close essence data file
 		fclose(pWavFile);
 		pWavFile = NULL;
@@ -531,6 +525,12 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 	if (pMultiEssence)
 		pMultiEssence->Release();
 	
+	if (pRawEssence)
+		pRawEssence->Release();
+
+	if(pFormat)
+		pFormat->Release();
+
 	if(format)
 		format->Release();
 
@@ -570,19 +570,20 @@ static HRESULT CreateAudioAAFFile(aafWChar * pFileName, testDataFile_t *dataFile
 	return hr;
 }
 
-static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType, aafUID_t codecID)
+static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	IAAFDictionary*					pDictionary = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat			*fmtTemplate =  NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
-	IAAFEssenceFormatSP pFormat;
+	IAAFEssenceFormat*			pFormat = NULL;
 	
 	aafNumSlots_t				numMobs, numSlots;
 	aafSearchCrit_t				criteria;
@@ -608,10 +609,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType, aafUID_t c
 		
 		// Here we checkResult on the number of mobs in the file. 
 		// Get the number of master mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAAFMasterMob, &numMobs));
+		checkResult(pHeader->CountMobs(kMasterMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFMasterMob;
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kMasterMob;
 		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while(AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
@@ -622,7 +623,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType, aafUID_t c
 			checkResult(pMob->GetMobID (&mobID));
 			checkResult(pMob->GetName (namebuf, sizeof(namebuf)));
 			convert(mobName, sizeof(mobName), namebuf);
-			MobIDtoString(mobID, mobIDstr);
+			MobIDtoString(&mobID, mobIDstr);
 			// Make sure we have one slot 
 			checkResult(pMob->CountSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
@@ -633,19 +634,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType, aafUID_t c
 			// Open the Essence Data
 			checkResult(pMasterMob->OpenEssence(	1,						// SlotID 1
 				NULL,				// mediaCriteria (Don't care)
-				kAAFMediaOpenReadOnly,	// Open mode
-				kAAFCompressionDisable,// Compress disabled
+				kMediaOpenReadOnly,	// Open mode
+				kSDKCompressionDisable,// Compress disabled
 				&pEssenceAccess));
 			
-			aafUID_t tstCodecID = {0};
-			checkResult(pEssenceAccess->GetCodecID(&tstCodecID));
-			if (false && memcmp(&tstCodecID, &codecID, sizeof(codecID)))
-			{
-			  cout << "     Warning:GetCodecID did not return CodecJPEG." << endl;
-			}
-
-      
-      // Open and read the Wave file (for comparison)
+			// Open and read the Wave file (for comparison)
 			pWavFile = fopen("Laser.wav", "r");
 			checkExpression(pWavFile != NULL, AAFRESULT_TEST_FAILED);
 			
@@ -659,7 +652,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType, aafUID_t c
 				&readSampleRate,
 				&dataOffset,
 				&dataLen));
-			dataPtr = WAVDataBuf + dataOffset;
+			if(testType != testRawCalls)
+			{
+				dataPtr = WAVDataBuf + dataOffset;
+			}
+			else
+			{	
+				dataPtr = WAVDataBuf;
+				dataLen = WAVBytesRead;
+			}
 			
 			aafUInt32			sampleBits;
 			aafInt32			bytesRead;
@@ -672,15 +673,34 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType, aafUID_t c
 			
 			checkResult(pFormat->GetFormatSpecifier (kAAFAudioSampleBits, sizeof(sampleBits),
 				(aafDataBuffer_t)&sampleBits, &bytesRead));
+			pFormat->Release();
+			pFormat = NULL;
 			checkExpression(sampleBits == bitsPerSample, AAFRESULT_TEST_FAILED);
 			
-			// Read the Data from the AAF file
-			if(testType == testStandardCalls)
+			// Read the Raw Data from the AAF file
+			if(testType == testRawCalls)
+			{
+				checkResult(pEssenceAccess->QueryInterface(IID_IAAFEssenceRawAccess, (void **)&pRawEssence));
+				checkResult(pRawEssence->ReadRawData(	dataLen,		// Number of Samples 
+					sizeof(AAFDataBuf),	// Maximum buffer size
+					AAFDataBuf,			// Buffer for the data
+					&AAFBytesRead,	// Actual number of bytes read
+					&samplesRead));		// Actual number of samples read
+				pRawEssence->Release();
+				pRawEssence = NULL;
+			}
+			else if(testType == testStandardCalls)
 			{
 				checkResult(pEssenceAccess->ReadSamples(	dataLen,	//!!! Hardcoded	// Number of Samples 
 					sizeof(AAFDataBuf),	// Maximum buffer size
 					AAFDataBuf,			// Buffer for the data
 					&samplesRead,		// Actual number of samples read
+					&AAFBytesRead));	// Actual number of bytes read
+			}
+			else if(testType == testFractionalCalls)
+			{
+				checkResult(pEssenceAccess->ReadFractionalSample(dataLen,	// bytes to read
+					AAFDataBuf,			// Buffer for the data
 					&AAFBytesRead));	// Actual number of bytes read
 			}
 			else if(testType == testMultiCalls)
@@ -740,6 +760,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType, aafUID_t c
 	if (pMultiEssence)
 		pMultiEssence->Release();
 
+	if (pRawEssence)
+		pRawEssence->Release();
+	
+	if (pFormat)
+		pFormat->Release();
+	
 	if(fmtTemplate)
 		fmtTemplate->Release();
 
@@ -824,13 +850,12 @@ static void FillYCbCr422SampleBufferFromYCbCr(
 	}
 }
 
-static HRESULT CreateVideoAAFFile(
+static HRESULT CreateJPEGAAFFile(
   aafWChar * pFileName,
   testDataFile_t *dataFile,
   aafCompressEnable_t compressEnable,
 	aafColorSpace_t colorSpace,
 	aafUInt32 horizontalSubsample,
-	aafUID_t /*codecID*/,
 	testType_t testType)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
@@ -841,8 +866,9 @@ static HRESULT CreateVideoAAFFile(
 	IAAFMasterMob*				pMasterMob = NULL;
 	
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
-	IAAFEssenceFormatSP			pFormat;
+	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFEssenceFormat* pTransformFormat = NULL;
 	IAAFLocator					*pLocator = NULL;
@@ -862,13 +888,12 @@ static HRESULT CreateVideoAAFFile(
 	aafDataBuffer_t rgbColorBuffer = NULL, compressedBuffer = NULL;
 	aafDataBuffer_t writeBuffer = NULL;
 	aafUInt32 writeBufferSize = 0, compressedBufferSize = 0;
-  aafUInt32 samplesWritten, bytesWritten;
 
 
 	try
 	{
 		checkExpression((1 == horizontalSubsample || 
-			              (2 == horizontalSubsample && kAAFColorSpaceYUV == colorSpace)),
+			              (2 == horizontalSubsample && kColorSpaceYUV == colorSpace)),
 										AAFRESULT_TEST_FAILED);
 		
 		// delete any previous test file before continuing...
@@ -882,7 +907,7 @@ static HRESULT CreateVideoAAFFile(
 		}
 
 
-		if (kAAFColorSpaceYUV == colorSpace && 2 == horizontalSubsample)
+		if (kColorSpaceYUV == colorSpace && 2 == horizontalSubsample)
 		{
 			compressedBuffer = const_cast<aafDataBuffer_t>(compressed422JFIF);
 			compressedBufferSize = sizeof(compressed422JFIF);
@@ -894,9 +919,9 @@ static HRESULT CreateVideoAAFFile(
 		}
 
 
-		if (compressEnable == kAAFCompressionEnable)
+		if (compressEnable == kSDKCompressionEnable)
 		{
-			if (kAAFColorSpaceYUV == colorSpace)
+			if (kColorSpaceYUV == colorSpace)
 			{
 				if (2 == horizontalSubsample)
 				{
@@ -928,16 +953,15 @@ static HRESULT CreateVideoAAFFile(
 			writeBuffer = compressedBuffer;
 			writeBufferSize = compressedBufferSize;
 		}
+
 		
-		aafProductVersion_t v;
-		v.major = 1;
-		v.minor = 0;
-		v.tertiary = 0;
-		v.patchLevel = 0;
-		v.type = kAAFVersionUnknown;
 		ProductInfo.companyName = L"AAF Developers Desk";
-		ProductInfo.productName = L"Video Essence Codec Test";
-		ProductInfo.productVersion = &v;
+		ProductInfo.productName = L"JPEG Essence Codec Test";
+		ProductInfo.productVersion.major = 1;
+		ProductInfo.productVersion.minor = 0;
+		ProductInfo.productVersion.tertiary = 0;
+		ProductInfo.productVersion.patchLevel = 0;
+		ProductInfo.productVersion.type = kVersionUnknown;
 		ProductInfo.productVersionString = NULL;
 		ProductInfo.productID = NIL_UID;
 		ProductInfo.platform = NULL;
@@ -947,12 +971,12 @@ static HRESULT CreateVideoAAFFile(
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
+		
 		
 		// Get a Master MOB Interface
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMasterMob, 
-								   (IUnknown **)&pMasterMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
+			IID_IAAFMasterMob, 
+			(IUnknown **)&pMasterMob));
 		// Get a Mob interface and set its variables.
 		checkResult(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 		checkResult(pMob->GetMobID(&masterMobID));
@@ -966,9 +990,9 @@ static HRESULT CreateVideoAAFFile(
 		if(dataFile != NULL)
 		{
 			// Make a locator, and attach it to the EssenceDescriptor
-			checkResult(defs.cdNetworkLocator()->
-						CreateInstance(IID_IAAFLocator, 
-									   (IUnknown **)&pLocator));		
+			checkResult(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
+				IID_IAAFLocator, 
+				(IUnknown **)&pLocator));		
 			checkResult(pLocator->SetPath (dataFile->dataFilename));
 			testContainer = dataFile->dataFormat;
 		}
@@ -981,8 +1005,8 @@ static HRESULT CreateVideoAAFFile(
 		
 		// now create the Essence data file
 		checkResult(pMasterMob->CreateEssence(STD_SLOT_ID,				// Slot ID
-			defs.ddPicture(),	// MediaKind
-			kAAFCodecJPEG,		// codecID
+			DDEF_Picture,		// MediaKind
+			CodecJPEG,		// codecID
 			editRate,		// edit rate
 			sampleRate,		// sample rate
 			compressEnable, // compression
@@ -994,12 +1018,6 @@ static HRESULT CreateVideoAAFFile(
 		checkResult(pEssenceAccess->GetCodecName(sizeof(wNameBuffer), wNameBuffer));
 		convert(chNameBuffer, sizeof(chNameBuffer), wNameBuffer);
 //		cout << "        Codec:" << chNameBuffer << endl;
-
-    // Get the codecID and validate that it is what we expect.
-    aafUID_t codecID = {0};
-		checkResult(pEssenceAccess->GetCodecID(&codecID));
-		checkExpression(0 == memcmp(&codecID, &kAAFCodecJPEG, sizeof(codecID)), AAFRESULT_TEST_FAILED);
-
 
 		checkResult(pEssenceAccess->GetFileFormatParameterList (&format));
 		checkResult(format->NumFormatSpecifiers (&numSpecifiers));
@@ -1032,7 +1050,7 @@ static HRESULT CreateVideoAAFFile(
 		checkResult(pFormat->AddFormatSpecifier (kAAFSampledRect, sizeof(rc), (aafDataBuffer_t)&rc));
 		checkResult(pFormat->AddFormatSpecifier (kAAFDisplayRect, sizeof(rc), (aafDataBuffer_t)&rc));
 
-		if (compressEnable == kAAFCompressionEnable)
+		if (compressEnable == kSDKCompressionEnable)
 		{
 			aafUInt8 quality = 75;
 			checkResult(pFormat->AddFormatSpecifier (kAAFCompressionQuality, sizeof(quality), (aafDataBuffer_t)&quality));
@@ -1040,9 +1058,12 @@ static HRESULT CreateVideoAAFFile(
 
 		// Set the values for the codec.
 		checkResult(pEssenceAccess->PutFileFormat (pFormat));
+		pFormat->Release();
+		pFormat = NULL;
+
 
 		// Change the output pixel format / color space if necessary.
-		if (compressEnable == kAAFCompressionEnable && defaultPixelColorSpace != colorSpace)
+		if (compressEnable == kSDKCompressionEnable && defaultPixelColorSpace != colorSpace)
 		{
 			// NOTE: TransformParameters have not been implemented yet!
 			// For now just use the PutFileFormat method.
@@ -1050,7 +1071,7 @@ static HRESULT CreateVideoAAFFile(
 			checkResult(pEssenceAccess->GetEmptyFileFormat (&pTransformFormat));
 
 
-			if (kAAFColorSpaceYUV == colorSpace)
+			if (kColorSpaceYUV == colorSpace)
 			{
 				checkResult(pTransformFormat->AddFormatSpecifier (kAAFCDCIHorizSubsampling, sizeof(horizontalSubsample), (aafDataBuffer_t)&horizontalSubsample));
 			}
@@ -1068,14 +1089,38 @@ static HRESULT CreateVideoAAFFile(
 		aafUInt32 index;
 		for (index = 0; index < MAX_SAMPLE_COUNT; ++index)
 		{
-			if(testType == testStandardCalls)
+			if(testType == testRawCalls)
+			{
+				checkResult(pEssenceAccess->QueryInterface(IID_IAAFEssenceRawAccess, (void **)&pRawEssence));
+
+				checkResult(pRawEssence->WriteRawData(STD_SAMPLE_COUNT,	// Number of Samples
+					const_cast<aafDataBuffer_t>(compressedJFIF),	// THE Raw data
+					sizeof(compressedJFIF)));// buffer size
+				
+				pRawEssence->Release();
+				pRawEssence = NULL;
+			}
+			else if(testType == testStandardCalls)
 			{
 				checkResult(pEssenceAccess->WriteSamples(STD_SAMPLE_COUNT,	//!!! hardcoded bytes/sample ==1// Number of Samples
-					writeBufferSize, // buffer size
-					writeBuffer,	// THE data
-					&samplesWritten,
-					&bytesWritten));
+					writeBuffer,	// THE Raw data
+					writeBufferSize));// buffer size
 			}
+//			else if(testType == testFractionalCalls)
+//			{
+//				cout << "        WriteFractionalSample" << endl;
+//				// It is ok for a codec to only support writing whole samples.
+//				hr = pEssenceAccess->WriteFractionalSample(
+//					sizeof(compressedJFIF),			// number of bytes
+//					const_cast<aafDataBuffer_t>(compressedJFIF),			// THE data	
+//					&bytesWritten);	// !!!checkResult this when it works
+//				if (AAFRESULT_NOT_IMPLEMENTED == hr)
+//				{
+//					cout << "        Codec does not support writing fractional samples." << endl;
+//					hr = S_OK;
+//				}
+//				checkResult(hr);
+//			}
 			else if(testType == testMultiCalls)
 			{
 				aafmMultiXfer_t		xfer;
@@ -1092,9 +1137,6 @@ static HRESULT CreateVideoAAFFile(
 
 				pMultiEssence->Release();
 				pMultiEssence = NULL;
-
-			  samplesWritten = result.samplesXfered;
-			  bytesWritten = result.bytesXfered;
 			}
 		
 		}
@@ -1123,6 +1165,12 @@ static HRESULT CreateVideoAAFFile(
 	if (pMultiEssence)
 		pMultiEssence->Release();
 	
+	if (pRawEssence)
+		pRawEssence->Release();
+
+	if(pFormat)
+		pFormat->Release();
+
 	if(format)
 		format->Release();
 
@@ -1163,12 +1211,11 @@ static HRESULT CreateVideoAAFFile(
 }
 
 
-static HRESULT ReadVideoAAFFile(
+static HRESULT ReadJPEGAAFFile(
   aafWChar * pFileName, 
 	aafCompressEnable_t compressEnable,
 	aafColorSpace_t colorSpace,
 	aafUInt32 horizontalSubsample,
-	aafUID_t /*codecID*/,
   testType_t testType)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
@@ -1176,13 +1223,14 @@ static HRESULT ReadVideoAAFFile(
 	IAAFHeader *				pHeader = NULL;
 	IAAFDictionary*					pDictionary = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat			*fmtTemplate =  NULL;
 	IAAFEssenceFormat* pTransformFormat = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
-	IAAFEssenceFormatSP			pFormat;
+	IAAFEssenceFormat*			pFormat = NULL;
 	aafNumSlots_t				numMobs, numSlots;
 	aafSearchCrit_t				criteria;
 //	aafRational_t				readSampleRate;
@@ -1203,13 +1251,13 @@ static HRESULT ReadVideoAAFFile(
 	try
 	{
 		checkExpression((1 == horizontalSubsample || 
-			              (2 == horizontalSubsample && kAAFColorSpaceYUV == colorSpace)),
+			              (2 == horizontalSubsample && kColorSpaceYUV == colorSpace)),
 										AAFRESULT_TEST_FAILED);
 		
 
-		if (compressEnable == kAAFCompressionEnable)
+		if (compressEnable == kSDKCompressionEnable)
 		{
-			if (kAAFColorSpaceYUV == colorSpace)
+			if (kColorSpaceYUV == colorSpace)
 			{
 				if (2 == horizontalSubsample)
 				{
@@ -1236,7 +1284,7 @@ static HRESULT ReadVideoAAFFile(
 		}
 		else
 		{
-			if (kAAFColorSpaceYUV == colorSpace && 2 == horizontalSubsample)
+			if (kColorSpaceYUV == colorSpace && 2 == horizontalSubsample)
 			{
 				compressedBufferSize = sizeof(compressed422JFIF);
 				compressedBuffer = new aafUInt8[compressedBufferSize];
@@ -1259,14 +1307,14 @@ static HRESULT ReadVideoAAFFile(
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
+		
 		
 		// Here we checkResult on the number of mobs in the file. 
 		// Get the number of master mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAAFMasterMob, &numMobs));
+		checkResult(pHeader->CountMobs(kMasterMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFMasterMob;
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kMasterMob;
 		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while(AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
@@ -1277,7 +1325,7 @@ static HRESULT ReadVideoAAFFile(
 			checkResult(pMob->GetMobID (&mobID));
 			checkResult(pMob->GetName (namebuf, sizeof(namebuf)));
 			convert(mobName, sizeof(mobName), namebuf);
-			MobIDtoString(mobID, mobIDstr);
+			MobIDtoString(&mobID, mobIDstr);
 			// Make sure we have one slot 
 			checkResult(pMob->CountSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
@@ -1288,16 +1336,10 @@ static HRESULT ReadVideoAAFFile(
 			// Open the Essence Data
 			checkResult(pMasterMob->OpenEssence(STD_SLOT_ID,						// SlotID 1
 				NULL,				// mediaCriteria (Don't care)
-				kAAFMediaOpenReadOnly,	// Open mode
+				kMediaOpenReadOnly,	// Open mode
 				compressEnable,// Compression
 				&pEssenceAccess));
 
-			aafUID_t codecID = {0};
-			checkResult(pEssenceAccess->GetCodecID(&codecID));
-			if (false && memcmp(&codecID, &kAAFCodecJPEG, sizeof(codecID)))
-			{
-			  cout << "     Warning:GetCodecID did not return CodecJPEG." << endl;
-			}
 
 			// Setup the formats that we want to query.
 			checkResult(pEssenceAccess->GetEmptyFileFormat (&fmtTemplate));
@@ -1339,8 +1381,12 @@ static HRESULT ReadVideoAAFFile(
 			checkResult(pFormat->GetFormatSpecifier (kAAFPixelFormat, sizeof(defaultPixelColorSpace),(aafDataBuffer_t)&defaultPixelColorSpace, &bytesRead));
 			checkExpression(sizeof(defaultPixelColorSpace) == bytesRead, AAFRESULT_TEST_FAILED);
 			
+			pFormat->Release();
+			pFormat = NULL;
+
+
 			// Change the output pixel format / color space if necessary.
-			if (compressEnable == kAAFCompressionEnable)
+			if (compressEnable == kSDKCompressionEnable)
 			{
 				// NOTE: TransformParameters have not been implemented yet!
 				// For now just use the PutFileFormat method.
@@ -1362,14 +1408,14 @@ static HRESULT ReadVideoAAFFile(
 //			cout << "        Codec:" << chNameBuffer << endl;
 
 			aafLength_t maxSampleSize = 0;
-			checkResult(pEssenceAccess->GetLargestSampleSize(defs.ddPicture(), &maxSampleSize));
+			checkResult(pEssenceAccess->GetLargestSampleSize(DDEF_Picture, &maxSampleSize));
 			aafUInt32 sampleBufferSize = static_cast<aafUInt32>(maxSampleSize);
 
 
 
 			
 			// Validate the buffer size.
-			if (kAAFCompressionDisable == compressEnable)
+			if (kSDKCompressionDisable == compressEnable)
 			{	// If the data is compressed then the size of the buffer should be the
 				// same as the original compressed JFIF data.
 				checkExpression(compressedBufferSize == sampleBufferSize, AAFRESULT_TEST_FAILED);
@@ -1384,24 +1430,37 @@ static HRESULT ReadVideoAAFFile(
 			checkExpression(NULL != AAFDataBuf, AAFRESULT_NOMEMORY);
 
 			aafLength_t sampleCount = 0;
-			checkResult(pEssenceAccess->CountSamples(defs.ddPicture(), &sampleCount));
+			checkResult(pEssenceAccess->GetSampleCount(DDEF_Picture, &sampleCount));
 			checkExpression(MAX_SAMPLE_COUNT == sampleCount, AAFRESULT_TEST_FAILED);
 
 			aafUInt32 index;
 			for (index = 0; index < sampleCount; ++index)
 			{
 				aafLength_t sampleSize;
-				checkResult(pEssenceAccess->GetIndexedSampleSize(defs.ddPicture(), index, &sampleSize));
-				if (kAAFCompressionDisable == compressEnable)
+				checkResult(pEssenceAccess->GetSampleFrameSize(DDEF_Picture, index, &sampleSize));
+				if (kSDKCompressionDisable == compressEnable)
 					checkExpression(compressedBufferSize == sampleSize, AAFRESULT_TEST_FAILED);
 				else
 					checkExpression(sampleBufferSize == sampleSize, AAFRESULT_TEST_FAILED);
 
 
-				// Read the Data from the AAF file
+				// Read the Raw Data from the AAF file
 				samplesRead = 0;
 				AAFBytesRead = 0;
-				if(testType == testStandardCalls)
+				if(testType == testRawCalls)
+				{
+					checkResult(pEssenceAccess->QueryInterface(IID_IAAFEssenceRawAccess, (void **)&pRawEssence));
+					
+					checkResult(pRawEssence->ReadRawData(STD_SAMPLE_COUNT,		// Number of Samples 
+						sampleBufferSize,	// Maximum buffer size
+						AAFDataBuf,			// Buffer for the data
+						&samplesRead,	// Actual number of samples read
+						&AAFBytesRead));		// Actual number of bytes read
+
+					pRawEssence->Release();
+					pRawEssence = NULL;
+				}
+				else if(testType == testStandardCalls)
 				{
 					checkResult(pEssenceAccess->ReadSamples(STD_SAMPLE_COUNT,	//!!! Hardcoded	// Number of Samples 
 						sampleBufferSize,	// Maximum buffer size
@@ -1409,6 +1468,12 @@ static HRESULT ReadVideoAAFFile(
 						&samplesRead,		// Actual number of samples read
 						&AAFBytesRead));	// Actual number of bytes read
 				}
+//				else if(testType == testFractionalCalls)
+//				{
+//				checkResult(pEssenceAccess->ReadFractionalSample(dataLen,	// bytes to read
+//					AAFDataBuf,			// Buffer for the data
+//					&AAFBytesRead));	// Actual number of bytes read
+//				}
 				else if(testType == testMultiCalls)
 				{
 					aafmMultiXfer_t		xfer;
@@ -1428,7 +1493,7 @@ static HRESULT ReadVideoAAFFile(
 					pMultiEssence = NULL;
 				}
 				
-				if (kAAFCompressionDisable == compressEnable)
+				if (kSDKCompressionDisable == compressEnable)
 				{	// If compression is disabled then compare the bytes read to the original
 					// compressedJFIF data buffer.
 					if (compressedBufferSize != AAFBytesRead)
@@ -1491,8 +1556,14 @@ static HRESULT ReadVideoAAFFile(
 	if (pMultiEssence)
 		pMultiEssence->Release();
 
+	if (pRawEssence)
+		pRawEssence->Release();
+
 	if (pTransformFormat)
 		pTransformFormat->Release();
+	
+	if (pFormat)
+		pFormat->Release();
 	
 	if(fmtTemplate)
 		fmtTemplate->Release();
@@ -1500,7 +1571,7 @@ static HRESULT ReadVideoAAFFile(
 	if (NULL != AAFDataBuf)
 	{
 #ifdef _DEBUG
- 		if (kAAFCompressionDisable == compressEnable)
+ 		if (kSDKCompressionDisable == compressEnable)
 		{
 			if (2 == horizontalSubsample)
 				HexDumpBuffer("compressed422JFIF.jpg", AAFDataBuf, AAFBytesRead);
@@ -1545,6 +1616,20 @@ static HRESULT ReadVideoAAFFile(
 	return hr;
 }
 
+
+struct CComInitialize
+{
+	CComInitialize()
+	{
+		CoInitialize(NULL);
+	}
+	
+	~CComInitialize()
+	{
+		CoUninitialize();
+	}
+};
+
 //**********************
 // Extra code required to scan the original WAVE headers and extract metadata parameters & data offset
 AAFByteOrder GetNativeByteOrder(void)
@@ -1587,6 +1672,7 @@ void AAFByteSwap16(
 	cp[1] = cp[0];
 	cp[0] = t;
 }
+
 // app work on all WAVE files, not just laser.wav.
 void scanWAVEData(aafUInt8 **srcBufHdl, aafInt32 maxsize, void *data)
 {
@@ -1617,7 +1703,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
+	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
 	aafUInt8			chunkID[4];
 	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -1660,14 +1746,14 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = kAAFTrue;
+			fmtFound = AAFTrue;
 		} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
 			*dataLen = chunkSize / bytesPerFrame;
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 			
-			dataFound = kAAFTrue;
+			dataFound = AAFTrue;
 		}
 		
 		if((ptr-buf) > formSize)
@@ -1681,339 +1767,260 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 }
 
 
-HRESULT CAAFEssenceAccess_test(testMode_t mode);
-HRESULT CAAFEssenceAccess_test(testMode_t mode)
+HRESULT CAAFEssenceAccess_test()
 {
+	CComInitialize comInit;
 	AAFRESULT	hr = S_OK;
 	
-	aafWChar *	rawDataWave = L"EssenceAccessExtRaw.wav";
-	aafWChar *	rawDataAifc = L"EssenceAccessExtRaw.aif";
-	aafWChar *	externalWaveAAF = L"EssenceAccessExtWAV.aaf";
-	aafWChar *	externalAifcAAF = L"EssenceAccessExtAIF.aaf";
+	aafWChar *	rawData = L"EssenceAccessExtRaw.wav";
+	aafWChar *	externalAAF = L"EssenceAccessExtAAF.aaf";
+#if 1
 	testDataFile_t	dataFile;
+#endif
 	
+#if 1
   cout << "    Internal Essence (WAVE)" << endl;
-  
+  cout << "        WriteRawData" << endl;
+	hr = CreateAAFFile(L"EssenceAccessRaw.aaf", NULL, testRawCalls);
+	if(hr == AAFRESULT_SUCCESS)
+	{
+		hr = ReadAAFFile(L"EssenceAccessRaw.aaf", testRawCalls);
+	}
+	
 	/**/
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
+	if(hr == AAFRESULT_SUCCESS)
 	{
         cout << "        WriteSamples" << endl;
-		hr = CreateAudioAAFFile(L"EssenceAccess.aaf", NULL, testStandardCalls, kAAFCodecWAVE,kAAFTrue);
+		hr = CreateAAFFile(L"EssenceAccess.aaf", NULL, testStandardCalls);
 	}
 	
 	if(hr == AAFRESULT_SUCCESS)
 	{
-        if(mode == kAAFUnitTestReadOnly)
-        	cout << "        ReadSamples" << endl;
-		hr = ReadAAFFile(L"EssenceAccess.aaf", testStandardCalls, kAAFCodecWAVE);
+		hr = ReadAAFFile(L"EssenceAccess.aaf", testStandardCalls);
 	}
 	/**/
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
+	if(hr == AAFRESULT_SUCCESS)
 	{
         cout << "        WriteMultiSamples" << endl;
-		checkResult(CreateAudioAAFFile(L"EssenceAccessMulti.aaf", NULL, testMultiCalls, kAAFCodecWAVE));
+		checkResult(CreateAAFFile(L"EssenceAccessMulti.aaf", NULL, testMultiCalls));
 	}
 	if(hr == AAFRESULT_SUCCESS)
 	{
-        if(mode == kAAFUnitTestReadOnly)
-       		cout << "        ReadMultiSamples" << endl;
-		hr = ReadAAFFile(L"EssenceAccessMulti.aaf", testMultiCalls, kAAFCodecWAVE);
+		hr = ReadAAFFile(L"EssenceAccessMulti.aaf", testMultiCalls);
 	}
 	/**/
+	if(hr == AAFRESULT_SUCCESS)
+	{
+        cout << "        WriteFractionalSample" << endl;
+		hr = CreateAAFFile(L"EssenceAccessFract.aaf", NULL, testFractionalCalls);
+	}
+	if(hr == AAFRESULT_SUCCESS)
+	{
+		hr = ReadAAFFile(L"EssenceAccessFract.aaf", testFractionalCalls);
+	}
 	/**/
-	dataFile.dataFilename = rawDataWave;
+	dataFile.dataFilename = rawData;
 	dataFile.dataFormat = ContainerFile;
 	if(hr == AAFRESULT_SUCCESS)
-	    cout << "    External Essence (WAVE)" << endl;
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
 	{
+        cout << "    External Essence:" << endl;
         cout << "        WriteSamples (External Raw Essence)" << endl;
-		hr = CreateAudioAAFFile(L"EssenceAccessRawRef.aaf", &dataFile, testStandardCalls, kAAFCodecWAVE);
+		hr = CreateAAFFile(L"EssenceAccessRawRef.aaf", &dataFile, testStandardCalls);
 	}
 	if(hr == AAFRESULT_SUCCESS)
 	{
-        if(mode == kAAFUnitTestReadOnly)
-       		 cout << "        ReadSamples (External Raw Essence)" << endl;
-		hr = ReadAAFFile(L"EssenceAccessRawRef.aaf", testStandardCalls, kAAFCodecWAVE);
+		hr = ReadAAFFile(L"EssenceAccessRawRef.aaf", testStandardCalls);
 	}
 	/**/
-	dataFile.dataFilename = externalWaveAAF;
+	dataFile.dataFilename = externalAAF;
 	dataFile.dataFormat = ContainerAAF;
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
+	if(hr == AAFRESULT_SUCCESS)
 	{
         cout << "        WriteSamples (External AAF Essence)" << endl;
-		hr = CreateAudioAAFFile(L"EssenceAccessRef.aaf", &dataFile, testStandardCalls, kAAFCodecWAVE);
+		hr = CreateAAFFile(L"EssenceAccessRef.aaf", &dataFile, testStandardCalls);
 	}
 	if(hr == AAFRESULT_SUCCESS)
 	{
-        if(mode == kAAFUnitTestReadOnly)
-       		 cout << "        ReadSamples (External AAF Essence)" << endl;
-		hr = ReadAAFFile(L"EssenceAccessRef.aaf", testStandardCalls, kAAFCodecWAVE);
+		hr = ReadAAFFile(L"EssenceAccessRef.aaf", testStandardCalls);
 	}
 	
-	if(hr == AAFRESULT_SUCCESS)
-		  cout << "    Internal Essence (AIFC)" << endl;
-  
-	/**/
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-        cout << "        WriteSamples" << endl;
-		hr = CreateAudioAAFFile(L"EssenceAccessAIFC.aaf", NULL, testStandardCalls, kAAFCODEC_AIFC);
-	}
-	
-	if(hr == AAFRESULT_SUCCESS)
-	{
-        if(mode == kAAFUnitTestReadOnly)
-       		 cout << "        ReadSamples" << endl;
-		hr = ReadAAFFile(L"EssenceAccessAIFC.aaf", testStandardCalls, kAAFCODEC_AIFC);
-	}
-	/**/
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-        cout << "        WriteMultiSamples" << endl;
-		checkResult(CreateAudioAAFFile(L"EssenceAccessMultiAIFC.aaf", NULL, testMultiCalls, kAAFCODEC_AIFC));
-	}
-	if(hr == AAFRESULT_SUCCESS)
-	{
-        if(mode == kAAFUnitTestReadOnly)
-        	cout << "        ReadMultiSamples" << endl;
-		hr = ReadAAFFile(L"EssenceAccessMultiAIFC.aaf", testMultiCalls, kAAFCODEC_AIFC);
-	}
-	/**/
-	/**/
-	dataFile.dataFilename = rawDataAifc;
-	dataFile.dataFormat = ContainerFile;
-	if(hr == AAFRESULT_SUCCESS)
-		cout << "    External Essence (AIFC)" << endl;
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-        cout << "        WriteSamples (External Raw Essence)" << endl;
-		hr = CreateAudioAAFFile(L"EssenceAccessRawRefAIFC.aaf", &dataFile, testStandardCalls, kAAFCODEC_AIFC);
-	}
-	if(hr == AAFRESULT_SUCCESS)
-	{
-        if(mode == kAAFUnitTestReadOnly)
-   		     cout << "        ReadSamples (External Raw Essence)" << endl;
-		hr = ReadAAFFile(L"EssenceAccessRawRefAIFC.aaf", testStandardCalls, kAAFCODEC_AIFC);
-	}
-	/**/
-	dataFile.dataFilename = externalAifcAAF;
-	dataFile.dataFormat = ContainerAAF;
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-        cout << "        WriteSamples (External AAF Essence)" << endl;
-		hr = CreateAudioAAFFile(L"EssenceAccessRefAIFC.aaf", &dataFile, testStandardCalls, kAAFCODEC_AIFC);
-	}
-	if(hr == AAFRESULT_SUCCESS)
-	{
-        if(mode == kAAFUnitTestReadOnly)
-        	cout << "        ReadSamples (External AAF Essence)" << endl;
-		hr = ReadAAFFile(L"EssenceAccessRefAIFC.aaf", testStandardCalls, kAAFCODEC_AIFC);
-	}
+#endif // #if 0
 
-	if (SUCCEEDED(hr))
-  {
-    cout << "    Internal Essence (JPEG):" << endl;
-  }
-  
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-		cout << "        WriteSamples (compression disabled, RGB)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEG.aaf",NULL, kAAFCompressionDisable, kAAFColorSpaceRGB, 1, 
-				kAAFCodecJPEG, testStandardCalls);
-	}
+  cout << "    Internal Essence (JPEG):" << endl;
+  cout << "        WriteRawData" << endl;
+	hr = CreateJPEGAAFFile(L"EssenceAccessJPEGRaw.aaf",NULL, kSDKCompressionDisable, kColorSpaceRGB, 1, testRawCalls);
 	if (SUCCEEDED(hr))
 	{
-		cout << "        ReadSamples (compression disabled, RGB)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEG.aaf", kAAFCompressionDisable, kAAFColorSpaceRGB, 1,  
-				kAAFCodecJPEG, testStandardCalls);
+	  cout << "        ReadRawData" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGRaw.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testRawCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
 		cout << "        ReadSamples (compression enabled, RGB)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEG.aaf", kAAFCompressionEnable, kAAFColorSpaceRGB, 1,  
-				kAAFCodecJPEG, testStandardCalls);
-	}
-
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-		cout << "        WriteSamples (compression enabled, RGB)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEGComp.aaf",NULL, kAAFCompressionEnable, kAAFColorSpaceRGB, 1,  
-				kAAFCodecJPEG, testStandardCalls);
-	}
-	if (SUCCEEDED(hr))
-	{
-		cout << "        ReadSamples (compression disabled, RGB)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGComp.aaf", kAAFCompressionDisable, kAAFColorSpaceRGB, 1,  
-				kAAFCodecJPEG, testStandardCalls);
-	}
-	if (SUCCEEDED(hr))
-	{
-		cout << "        ReadSamples (compression enabled, RGB)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGComp.aaf", kAAFCompressionEnable, kAAFColorSpaceRGB, 1,  
-				kAAFCodecJPEG, testStandardCalls);
-	}
-
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-		cout << "        WriteMultiSamples (compression disabled, RGB)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEGMulti.aaf",NULL, kAAFCompressionDisable, kAAFColorSpaceRGB, 1, 
-				kAAFCodecJPEG, testMultiCalls);
-    if (AAFRESULT_INVALID_OP_CODEC == hr)
-    {
-      cout << "          Codec does not support interleaved data." << endl;
-      hr = AAFRESULT_SUCCESS;
-    }
-    else
-    {
-	    if (SUCCEEDED(hr))
-	    {
-		    cout << "        ReadMultiSamples (compression disabled, RGB)" << endl;
-		    hr = ReadVideoAAFFile(L"EssenceAccessJPEGMulti.aaf", kAAFCompressionDisable, kAAFColorSpaceRGB, 1,  
-				kAAFCodecJPEG, testMultiCalls);
-	    }
-	    if (SUCCEEDED(hr))
-	    {
-		    cout << "        ReadMultiSamples (compression enabled, RGB)" << endl;
-		    hr = ReadVideoAAFFile(L"EssenceAccessJPEGMulti.aaf", kAAFCompressionEnable, kAAFColorSpaceRGB, 1,  
-				kAAFCodecJPEG, testMultiCalls);
-	    }
-    }
-  }
-
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-		cout << "        WriteMultiSamples (compression enabled, RGB)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEGMultiComp.aaf",NULL, kAAFCompressionEnable, kAAFColorSpaceRGB,1, 
-				kAAFCodecJPEG, testMultiCalls);
-    if (AAFRESULT_INVALID_OP_CODEC == hr)
-    {
-      cout << "          Codec does not support interleaved data." << endl;
-      hr = AAFRESULT_SUCCESS;
-    }
-    else
-    {
-	    if (SUCCEEDED(hr))
-	    {
-		    cout << "        ReadMultiSamples (compression disabled, RGB)" << endl;
-		    hr = ReadVideoAAFFile(L"EssenceAccessJPEGMultiComp.aaf", kAAFCompressionDisable, kAAFColorSpaceRGB, 1, 
-				kAAFCodecJPEG, testMultiCalls);
-	    }
-	    if (SUCCEEDED(hr))
-	    {
-		    cout << "        ReadMultiSamples (compression enabled, RGB)" << endl;
-		    hr = ReadVideoAAFFile(L"EssenceAccessJPEGMultiComp.aaf", kAAFCompressionEnable, kAAFColorSpaceRGB, 1, 
-				kAAFCodecJPEG, testMultiCalls);
-	    }
-    }
-	}
-
-
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-		cout << "        WriteSamples (compression enabled, YUV)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEGCompYUV.aaf",NULL, kAAFCompressionEnable, kAAFColorSpaceYUV, 1, 
-				kAAFCodecJPEG, testStandardCalls);
-	}
-	if (SUCCEEDED(hr))
-	{
-		cout << "        ReadSamples (compression disabled, YUV)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kAAFCompressionDisable, kAAFColorSpaceYUV, 1, 
-				kAAFCodecJPEG, testStandardCalls);
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGRaw.aaf", kSDKCompressionEnable, kColorSpaceRGB, 1, testStandardCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
 		cout << "        ReadSamples (compression enabled, YUV)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kAAFCompressionEnable, kAAFColorSpaceYUV, 1, 
-				kAAFCodecJPEG, testStandardCalls);
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGRaw.aaf", kSDKCompressionEnable, kColorSpaceYUV, 1, testStandardCalls);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		cout << "        WriteSamples (compression disabled, RGB)" << endl;
+		hr = CreateJPEGAAFFile(L"EssenceAccessJPEG.aaf",NULL, kSDKCompressionDisable, kColorSpaceRGB, 1, testStandardCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+	  cout << "        ReadRawData" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEG.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testRawCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadSamples (compression disabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEG.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testStandardCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
 		cout << "        ReadSamples (compression enabled, RGB)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kAAFCompressionEnable, kAAFColorSpaceRGB, 1, 
-				kAAFCodecJPEG, testStandardCalls);
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEG.aaf", kSDKCompressionEnable, kColorSpaceRGB, 1, testStandardCalls);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		cout << "        WriteSamples (compression enabled, RGB)" << endl;
+		hr = CreateJPEGAAFFile(L"EssenceAccessJPEGComp.aaf",NULL, kSDKCompressionEnable, kColorSpaceRGB, 1, testStandardCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+	  cout << "        ReadRawData" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGComp.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testRawCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadSamples (compression disabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGComp.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testStandardCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadSamples (compression enabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGComp.aaf", kSDKCompressionEnable, kColorSpaceRGB, 1, testStandardCalls);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		cout << "        WriteMultiSamples (compression disabled, RGB)" << endl;
+		hr = CreateJPEGAAFFile(L"EssenceAccessJPEGMulti.aaf",NULL, kSDKCompressionDisable, kColorSpaceRGB, 1, testMultiCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+	  cout << "        ReadRawData" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGMulti.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testRawCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadMultiSamples (compression disabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGMulti.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testMultiCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadMultiSamples (compression enabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGMulti.aaf", kSDKCompressionEnable, kColorSpaceRGB, 1, testMultiCalls);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		cout << "        WriteMultiSamples (compression enabled, RGB)" << endl;
+		hr = CreateJPEGAAFFile(L"EssenceAccessJPEGMultiComp.aaf",NULL, kSDKCompressionEnable, kColorSpaceRGB, 1, testMultiCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+	  cout << "        ReadRawData" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGMultiComp.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testRawCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadMultiSamples (compression disabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGMultiComp.aaf", kSDKCompressionDisable, kColorSpaceRGB, 1, testMultiCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadMultiSamples (compression enabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGMultiComp.aaf", kSDKCompressionEnable, kColorSpaceRGB, 1, testMultiCalls);
 	}
 
 
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
+	if (SUCCEEDED(hr))
 	{
-		cout << "        WriteSamples (compression enabled, YUV 4-2-2)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEGCompYUV422.aaf",NULL, kAAFCompressionEnable, kAAFColorSpaceYUV, 2, 
-				kAAFCodecJPEG, testStandardCalls);
+		cout << "        WriteSamples (compression enabled, YUV)" << endl;
+		hr = CreateJPEGAAFFile(L"EssenceAccessJPEGCompYUV.aaf",NULL, kSDKCompressionEnable, kColorSpaceYUV, 1, testStandardCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+	  cout << "        ReadRawData" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kSDKCompressionDisable, kColorSpaceYUV, 1, testRawCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
 		cout << "        ReadSamples (compression disabled, YUV)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGCompYUV422.aaf", kAAFCompressionDisable, kAAFColorSpaceYUV, 2, 
-				kAAFCodecJPEG, testStandardCalls);
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kSDKCompressionDisable, kColorSpaceYUV, 1, testStandardCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
-		cout << "        ReadSamples (compression enabled, YUV 4-2-2)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGCompYUV422.aaf", kAAFCompressionEnable, kAAFColorSpaceYUV, 2, 
-				kAAFCodecJPEG, testStandardCalls);
+		cout << "        ReadSamples (compression enabled, YUV)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kSDKCompressionEnable, kColorSpaceYUV, 1, testStandardCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
 		cout << "        ReadSamples (compression enabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kSDKCompressionEnable, kColorSpaceRGB, 1, testStandardCalls);
 	}
 
-#if 0
+
 	if (SUCCEEDED(hr))
 	{
-		cout << "    Internal Essence (CDCI):" << endl;
-	}
-	
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-		cout << "        WriteSamples (YUV)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEGCompYUV.aaf",NULL, kAAFCompressionEnable, kAAFColorSpaceYUV, 1, 
-			kAAFCodecJPEG, testStandardCalls);
+		cout << "        WriteSamples (compression enabled, YUV 4-2-2)" << endl;
+		hr = CreateJPEGAAFFile(L"EssenceAccessJPEGCompYUV422.aaf",NULL, kSDKCompressionEnable, kColorSpaceYUV, 2, testStandardCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
-		cout << "        ReadSamples (YUV)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGCompYUV.aaf", kAAFCompressionEnable, kAAFColorSpaceYUV, 1, 
-			kAAFCodecJPEG, testStandardCalls);
-	}
-	
-	
-	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
-	{
-		cout << "        WriteSamples (YUV 4-2-2)" << endl;
-		hr = CreateVideoAAFFile(L"EssenceAccessJPEGCompYUV422.aaf",NULL, kAAFCompressionEnable, kAAFColorSpaceYUV, 2, 
-			kAAFCodecJPEG, testStandardCalls);
+	  cout << "        ReadRawData" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV422.aaf", kSDKCompressionDisable, kColorSpaceYUV, 2, testRawCalls);
 	}
 	if (SUCCEEDED(hr))
 	{
-		cout << "        ReadSamples (YUV 4-2-2)" << endl;
-		hr = ReadVideoAAFFile(L"EssenceAccessJPEGCompYUV422.aaf", kAAFCompressionEnable, kAAFColorSpaceYUV, 2, 
-			kAAFCodecJPEG, testStandardCalls);
+		cout << "        ReadSamples (compression disabled, YUV)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV422.aaf", kSDKCompressionDisable, kColorSpaceYUV, 2, testStandardCalls);
 	}
-#endif
-
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		// Global variable hrSetTransformParameters gives the result of calling
-		// SetTransformParameters() within CreateAAFFile().  At the time this
-		// test code was written, SetTransformParameters() was not part of the
-		// current version of the reference implementation.  Therefore, as long as
-		// this method returns AAFRESULT_NOT_IN_CURRENT_VERSION, it does not
-		// need to be tested, and our test can return full success.  If, at some
-		// point, this method returns some other result, that means it has been
-		// implemented and should be tested, in which case our test can only 
-		// return partial success.
-		
-		if(hr == AAFRESULT_SUCCESS)
-			hr = AAFRESULT_NOT_IN_CURRENT_VERSION;
-//		if(hrSetTransformParameters!=AAFRESULT_NOT_IN_CURRENT_VERSION)
-//		{
-//			cout << "The following IAAFEssenceAccess methods have not been tested:" 
-//			<< endl;  
-//			cout << "     SetTransformParameters" << endl; 	
-//			hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-//		}
+		cout << "        ReadSamples (compression enabled, YUV 4-2-2)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV422.aaf", kSDKCompressionEnable, kColorSpaceYUV, 2, testStandardCalls);
+	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "        ReadSamples (compression enabled, RGB)" << endl;
+		hr = ReadJPEGAAFFile(L"EssenceAccessJPEGCompYUV422.aaf", kSDKCompressionEnable, kColorSpaceRGB, 1, testStandardCalls);
 	}
 
+
+	// When all of the functionality of this class is tested, we can return success.
+	// When a method and its unit test have been implemented, remove it from the list.
+	if (SUCCEEDED(hr))
+	{
+		cout << "The following IAAFEssenceAccess methods have not been tested:" << endl;  
+		cout << "     CountChannels" << endl;
+//		cout << "     GetSampleFrameSize" << endl; 
+//		cout << "     GetSampleCount" << endl; 
+//		cout << "     GetCodecName" << endl; 
+		cout << "     GetCodecID" << endl; 
+		cout << "     SetEssenceCodecFlavour" << endl; 
+//		cout << "     GetLargestSampleSize" << endl; 
+		cout << "     SetTransformParameters" << endl; 
+		cout << "     AddSampleIndexEntry" << endl; 
+		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+	}
+	
 	return(hr);
 }
+	
