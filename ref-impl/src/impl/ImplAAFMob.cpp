@@ -26,14 +26,17 @@
 #include "ImplEnumAAFMobSlots.h"
 #endif
 
-#ifndef __ImplEnumAAFMobComments_h__
-#include "ImplEnumAAFMobComments.h"
+#ifndef __ImplAAFOperationGroup_h__
+#include "ImplAAFOperationGroup.h"
 #endif
 
-#ifndef __ImplAAFEffect_h__
-#include "ImplAAFEffect.h"
+#ifndef __ImplAAFTaggedValue_h__
+#include "ImplAAFTaggedValue.h"
 #endif
 
+#ifndef __ImplEnumAAFTaggedValues_h__
+#include "ImplEnumAAFTaggedValues.h"
+#endif
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -57,26 +60,31 @@
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
-#include "aafdefuids.h"
+#include "AAFDefUIDs.h"
 
 extern "C" const aafClassID_t CLSID_AAFMobSlot;
 extern "C" const aafClassID_t CLSID_AAFTimelineMobSlot;
 extern "C" const aafClassID_t CLSID_EnumAAFMobSlots;
+extern "C" const aafClassID_t CLSID_EnumAAFTaggedValues;
 extern "C" const aafClassID_t CLSID_AAFSourceClip;
 extern "C" const aafClassID_t CLSID_AAFFindSourceInfo;
+extern "C" const aafClassID_t CLSID_AAFTypeDefString;
+extern "C" const aafClassID_t CLSID_AAFTaggedValue;
 
 ImplAAFMob::ImplAAFMob ()
 : _mobID(			PID_Mob_MobID,			"MobID"),
   _name(			PID_Mob_Name,			"Name"),
   _creationTime(    PID_Mob_CreationTime,	"CreationTime"),
-  _lastModified(    PID_Mob_LastModified,		"LastModified"),
-  _slots(			PID_Mob_Slots,			"Slots")
+  _lastModified(    PID_Mob_LastModified,	"LastModified"),
+  _slots(			PID_Mob_Slots,			"Slots"),
+  _userComments(	PID_Mob_UserComments,	"UserComments")
 {
 	_persistentProperties.put(_mobID.address());
 	_persistentProperties.put(_name.address());
 	_persistentProperties.put(_creationTime.address());
 	_persistentProperties.put(_lastModified.address());
 	_persistentProperties.put(_slots.address());
+	_persistentProperties.put(_userComments.address());
 	(void)aafMobIDNew(&_mobID);		// Move this out of constructor when we get 2-stage create
 	AAFGetDateTime(&_creationTime);
 	AAFGetDateTime(&_lastModified);
@@ -479,54 +487,59 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::AppendComment (aafWChar *  /*category*/,
-                           aafWChar *  /*comment*/)
+    ImplAAFMob::AppendComment ( aafWChar*  pTagName,
+								aafWChar*  pComment)
 {
-#if FULL_TOOLKIT
-	aafProperty_t		prop;
-	aafInt32			n, cnt;
-	AAFObject			*attb, *head;
-    char				oldCommentName[64];
-    aafBool				commentFound;
-    aafAttributeKind_t	kind;
+	ImplAAFTaggedValue*			pTaggedValue = NULL;
+	ImplEnumAAFTaggedValues*	pEnum = NULL;
+	ImplAAFTypeDef*				pTypeDef = NULL;
+	ImplAAFHeader*				pHeader = NULL;
+	ImplAAFDictionary*			pDictionary = NULL;
 	
-	aafAssertValidFHdl(_file);
-	aafAssert((category != NULL), _file, AAFRESULT_NULLOBJECT);
-	aafAssert((comment != NULL), _file, AAFRESULT_NULLOBJECT);
+	aafWChar					oldTagName[64];
+    aafBool						commentFound = AAFFalse;
+	aafUID_t					typeDefUID = CLSID_AAFTypeDefString;
+	
+	if (pTagName == NULL || pComment == NULL)
+		return AAFRESULT_NULL_PARAM;
 
-	XPROTECT(_file)
+
+	XPROTECT()
 	{
-			head = this;
-		
+		CHECK(EnumAAFAllMobComments(&pEnum));
+		CHECK(pEnum->NextOne(&pTaggedValue));
+		while(pTaggedValue)
 		{
-			prop = OMMOBJUserAttributes;
-		}
-
-		commentFound = AAFFalse;
-		cnt = head->GetNumAttributes(prop);
-		for(n = 1; n <= cnt; n++)
-		{
-			CHECK(head->ReadNthAttribute(prop, &attb, n));
-			CHECK(attb->ReadAttrKind(OMATTBKind, &kind));
-			CHECK(attb->ReadString(OMATTBName, oldCommentName, sizeof(oldCommentName)));
-			if((kind == kAAFObjectAttribute) &&
-			   (strcmp(oldCommentName, comment) == 0))
+			CHECK(pTaggedValue->GetName(oldTagName, sizeof(oldTagName)));
+			if (wcscmp(oldTagName, pTagName) == 0)
 			{
 				commentFound = AAFTrue;
-				CHECK(attb->WriteString(OMATTBName, comment));
 				break;
 			}
+			pTaggedValue->ReleaseReference();
+			pTaggedValue = NULL;
+			pEnum->NextOne(&pTaggedValue);
 		}
-			
-		if(!commentFound)
+		if (commentFound)
 		{
-			attb = new AAFAttribute(_file);
-			CHECK(attb->WriteAttrKind(OMATTBKind, kAAFStringAttribute));
-			CHECK(attb->WriteString(OMATTBName, category));
-			CHECK(attb->WriteString(OMATTBStringAttribute, comment));
-			CHECK(head->AppendAttribute(prop, attb));
+			// Update existing comment
+			CHECK(pTaggedValue->SetValue(wcslen(pComment), (unsigned char *)pComment));
+			pTaggedValue->ReleaseReference();
+			pTaggedValue = NULL;
 		}
+		else
+		{
+			// Create a new comment and add it to the list!
+			CHECK(this->MyHeadObject(&pHeader));
+			CHECK(pHeader->GetDictionary(&pDictionary));
+			CHECK(pDictionary->LookupType(&typeDefUID, &pTypeDef));
+			pTaggedValue = (ImplAAFTaggedValue *)CreateImpl(CLSID_AAFTaggedValue);
+			CHECK(pTaggedValue->Initialize(pTagName, pTypeDef));
+			CHECK(pTaggedValue->SetValue(wcslen(pComment), (unsigned char *)pComment));
+			pTaggedValue->ReleaseReference();
+			pTaggedValue = NULL;
 
+		}
 	}
 	XEXCEPT
 	{
@@ -535,9 +548,6 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND;
 	
 	return(AAFRESULT_SUCCESS);
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
 }
 
 //****************
@@ -551,35 +561,41 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::GetNumComments (aafUInt32 *  /*pEnum*/)
+    ImplAAFMob::GetNumComments (aafUInt32*  pNumComments)
 {
-#if FULL_TOOLKIT
-	aafAssert((numComments != NULL), _file, AAFRESULT_NULLOBJECT);
-	*numComments = 0;
+	size_t	numComments;
 
-	XPROTECT(_file)
-	  {
-	  	{
-	  		*numComments = GetNumAttributes(OMMOBJUserAttributes);
-	  	}
-	}
-	XEXCEPT
-	{
-		return(XCODE());
-	}
-	XEND;
+	if (pNumComments == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	_userComments.getSize(numComments);
+
+	*pNumComments = numComments;
 
 	return(AAFRESULT_SUCCESS);
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::EnumAAFAllMobComments (ImplEnumAAFMobComments ** /*ppEnum*/)
+    ImplAAFMob::EnumAAFAllMobComments (ImplEnumAAFTaggedValues** ppEnum)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	ImplEnumAAFTaggedValues*	theEnum = (ImplEnumAAFTaggedValues *)CreateImpl(CLSID_EnumAAFTaggedValues);
+
+	XPROTECT()
+	{
+		CHECK(theEnum->SetEnumStrongProperty(this, &_userComments));
+		CHECK(theEnum->Reset());
+		*ppEnum = theEnum;
+	}
+	XEXCEPT
+	{
+		if (theEnum)
+			theEnum->ReleaseReference();
+		return(XCODE());
+	}
+	XEND;
+	
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -1363,7 +1379,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 										   aafPosition_t offset,
 										   aafMobKind_t mobKind,
 										   aafMediaCriteria_t *pMediaCrit,
-										   aafEffectChoice_t *pEffectChoice,
+										   aafOperationChoice_t *pOperationChoice,
 										   ImplAAFFindSourceInfo **ppSourceInfo)
 {
 	ImplAAFMobSlot 			*track = NULL;
@@ -1379,7 +1395,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 	aafSlotID_t				nextTrackID;
 	ImplAAFFindSourceInfo	*sourceInfo = NULL ;
 	ImplAAFComponent		*leafObj = NULL;
-	ImplAAFEffect	*effeObject;
+	ImplAAFOperationGroup	*effeObject;
 	
 	if(ppSourceInfo == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -1402,7 +1418,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 		
 		/*** Find leaf object in this track that points to the next mob ***/
 		CHECK(MobFindLeaf(track, 
-			pMediaCrit, pEffectChoice,
+			pMediaCrit, pOperationChoice,
 			rootObj, offset, cpntLen,
 			NULL, NULL, 
 			NULL, /* Shouldn't be scopes here */
@@ -1447,7 +1463,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 		
 		/*** Find component at referenced position in new mob ***/
 		CHECK(nextMob->MobFindSource(nextTrackID, nextPos, nextLen,
-			mobKind, pMediaCrit, pEffectChoice,
+			mobKind, pMediaCrit, pOperationChoice,
 			sourceInfo, &sourceFound));
 		if (!sourceFound)
 			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
@@ -1464,7 +1480,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 	XEXCEPT
 	{
 		if(XCODE() == AAFRESULT_PARSE_EFFECT_AMBIGUOUS)
-			sourceInfo->SetEffect(effeObject);
+			sourceInfo->SetOperationGroup(effeObject);
 
 		if (nextMob)
 			nextMob->ReleaseReference();
@@ -1486,7 +1502,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 										   										   
 AAFRESULT ImplAAFMob::MobFindLeaf(ImplAAFMobSlot *track,
 								  aafMediaCriteria_t *mediaCrit,
-								  aafEffectChoice_t *effectChoice,
+								  aafOperationChoice_t *operationChoice,
 								  ImplAAFComponent *rootObj,
 								  aafPosition_t rootPos,
 								  aafLength_t rootLen,
@@ -1497,7 +1513,7 @@ AAFRESULT ImplAAFMob::MobFindLeaf(ImplAAFMobSlot *track,
 								  ImplAAFComponent **foundObj,
 								  aafLength_t *minLength,
 								  aafBool *foundTransition,
-								  ImplAAFEffect **effeObject,
+								  ImplAAFOperationGroup **effeObject,
 								  aafInt32	*nestDepth,
 								  aafPosition_t *diffPos)
 {
@@ -1519,7 +1535,7 @@ AAFRESULT ImplAAFMob::MobFindLeaf(ImplAAFMobSlot *track,
 		CHECK(track->GetSlotID(&trackID));
 		
 		CHECK(rootObj->GetMinimumBounds(rootPos, rootLen,this, track, mediaCrit, currentObjPos,
-			effectChoice, prevObject, nextObject, scopeStack,
+			operationChoice, prevObject, nextObject, scopeStack,
 			diffPos, minLength, effeObject, nestDepth,
 			foundObj, foundTransition));
 	} /* XPROTECT */
@@ -1640,7 +1656,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 									aafLength_t length,   /* expected length of clip */
 									aafMobKind_t mobKind,
 									aafMediaCriteria_t *mediaCrit,
-									aafEffectChoice_t *effectChoice,
+									aafOperationChoice_t *operationChoice,
 									ImplAAFFindSourceInfo *sourceInfo,
 									aafBool *foundSource)
 {
@@ -1648,7 +1664,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 	ImplAAFPulldown			*pulldownObj = NULL;
 	ImplAAFSegment			*rootObj = NULL;
 	ImplAAFComponent		*leafObj = NULL;
-	ImplAAFEffect	*effeObject = NULL;
+	ImplAAFOperationGroup	*effeObject = NULL;
 	ImplAAFMob				*nextMob = NULL;
 	aafSlotID_t				foundTrackID;
 	aafBool					nextFoundSource = AAFFalse, foundTransition = AAFFalse;
@@ -1720,7 +1736,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 		* on the master mob and down - so, we shouldn't run into transitions.
 		* So, passing NULL for prevObject and nextObject is probably alright.
 		*/
-		CHECK(MobFindLeaf(track, mediaCrit, effectChoice, 
+		CHECK(MobFindLeaf(track, mediaCrit, operationChoice, 
 			rootObj, offset, tmpLength,
 			NULL, NULL, 
 			NULL, /* Shouldn't be scopes here */
@@ -1766,7 +1782,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 		/* Find component at referenced position in new mob */
 		CHECK(nextMob->MobFindSource(foundTrackID,
 			foundPos, foundLen,
-			mobKind, mediaCrit, effectChoice,
+			mobKind, mediaCrit, operationChoice,
 			sourceInfo, &nextFoundSource));
 		if (nextFoundSource)
 		{
@@ -1788,7 +1804,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 	XEXCEPT
 	{
 		if(XCODE() == AAFRESULT_PARSE_EFFECT_AMBIGUOUS)
-			sourceInfo->SetEffect(effeObject);
+			sourceInfo->SetOperationGroup(effeObject);
 
 		if (nextMob)
 			nextMob->ReleaseReference();
