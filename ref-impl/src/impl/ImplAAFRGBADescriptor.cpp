@@ -9,7 +9,7 @@
 * notice appear in all copies of the software and related documentation,
 * and (ii) the name Avid Technology, Inc. may not be used in any
 * advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
+*  prior written permission of Avid Technology, Inc.
 *
 * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -46,9 +46,9 @@
 
 
 ImplAAFRGBADescriptor::ImplAAFRGBADescriptor ()
-:	_pixelLayout(PID_RGBADescriptor_PixelLayout,					L"PixelLayout"),
-	_palette(PID_RGBADescriptor_Palette,							L"Palette"),
-	_paletteLayout(PID_RGBADescriptor_PaletteLayout,				L"PaletteLayout")
+:	_pixelLayout(PID_RGBADescriptor_PixelLayout,					"PixelLayout"),
+	_palette(PID_RGBADescriptor_Palette,							"Palette"),
+	_paletteLayout(PID_RGBADescriptor_PaletteLayout,				"PaletteLayout")
 {
 	RGBComponentArray	comp;
 	aafUInt16			n;
@@ -82,38 +82,17 @@ AAFRESULT STDMETHODCALLTYPE
 		return(AAFRESULT_NULL_PARAM);
 	if (numberElements > MAX_NUM_RGBA_COMPS)
 	  return AAFRESULT_SMALLBUF;
-
-	memcpy(&local, PixelLayoutArray, numberElements*sizeof(aafRGBAComponent_t));
-
+	memcpy(local.comps, PixelLayoutArray, numberElements*sizeof(aafRGBAComponent_t));
 	for(n = numberElements; n < MAX_NUM_RGBA_COMPS; n++)
 	{
 		local.comps[n].Code = kAAFCompNone;
 		local.comps[n].Size = 0;
 	}
-	_pixelLayout = local;
+	_pixelLayout.setValue(local);
 
 	return AAFRESULT_SUCCESS;
 }
 
-HRESULT STDMETHODCALLTYPE
-    ImplAAFRGBADescriptor::CountPixelLayoutElements (aafUInt32 *  pResult)
-{
-	aafUInt32			n, result;
-	RGBComponentArray	local;
-
-	local = _pixelLayout;
-	for( n = 0, result = 0; n < MAX_NUM_RGBA_COMPS; n++)
-	{
-		if(local.comps[n].Code != kAAFCompNone)
-		{
-			result++;
-		}
-	}
-
-	*pResult = result;
-
-	return AAFRESULT_SUCCESS;
-}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFRGBADescriptor::GetPixelLayout (
@@ -125,10 +104,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if(PixelLayoutArray == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	if (MAX_NUM_RGBA_COMPS < numberElements)
+	if (_pixelLayout.size() < numberElements)
 	  return AAFRESULT_SMALLBUF;
 
-	local = _pixelLayout;
+	_pixelLayout.getValue(local);
 	memcpy(PixelLayoutArray, local.comps, numberElements * sizeof(aafRGBAComponent_t));
 
 	return(AAFRESULT_SUCCESS);
@@ -136,7 +115,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFRGBADescriptor::SetPalette (
+    ImplAAFRGBADescriptor::SetPallete (
       aafUInt32  numberElements,
       aafUInt8*  pPalette)
 {
@@ -203,25 +182,6 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-HRESULT STDMETHODCALLTYPE
-    ImplAAFRGBADescriptor::CountPaletteLayoutElements (aafUInt32 *  pResult)
-{
-	aafUInt32			n, result;
-	RGBComponentArray	local;
-
-	local = _paletteLayout;
-	for( n = 0, result = 0; n < MAX_NUM_RGBA_COMPS; n++)
-	{
-		if(local.comps[n].Code != kAAFCompNone)
-		{
-			result++;
-		}
-	}
-
-	*pResult = result;
-
-	return AAFRESULT_SUCCESS;
-}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFRGBADescriptor::GetPaletteLayout (
