@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFModule.cpp,v 1.10 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFModule.cpp,v 1.11 2004/10/27 14:14:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,10 +35,6 @@
 #include "OMExceptions.h"
 
 #include <assert.h>
-
-#if defined(_MAC)
-#pragma export on
-#endif // #if defined(_MAC)
 
 
 
@@ -1097,7 +1093,4 @@ STDAPI
   return hr;
 }
 
-#if defined(_MAC)
-#pragma export off
-#endif // #if defined(_MAC)
 
