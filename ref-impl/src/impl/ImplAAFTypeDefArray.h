@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefArray.h,v 1.14 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefArray.h,v 1.14.2.1 2004/08/09 22:10:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,9 +29,11 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMArrayType.h"
+
 class ImplAAFPropertyValue;
 
-class ImplAAFTypeDefArray : public ImplAAFTypeDef
+class ImplAAFTypeDefArray : public ImplAAFTypeDef, public OMArrayType
 {
 public:
   //
