@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -33,6 +33,10 @@
 #include "ImplAAFTypeDefString.h"
 #endif
 
+#ifndef __ImplAAFTypeDefCharacter_h__
+#include "ImplAAFTypeDefCharacter.h"
+#endif
+
 #ifndef __ImplAAFTypeDefInt_h__
 #include "ImplAAFTypeDefInt.h"
 #endif
@@ -52,7 +56,7 @@
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefString::ImplAAFTypeDefString ()
-  : _ElementType  ( PID_TypeDefinitionString_ElementType,  "ElementType")
+  : _ElementType  ( PID_TypeDefinitionString_ElementType,  "ElementType", "/Dictionary/TypeDefinitions", PID_DefinitionObject_Identification)
 {
   _persistentProperties.put(_ElementType.address());
 }
@@ -63,9 +67,9 @@ ImplAAFTypeDefString::~ImplAAFTypeDefString ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::Initialize (
-      const aafUID_t * pID,
+      const aafUID_t & id,
       ImplAAFTypeDef * pTypeDef,
-      wchar_t * pTypeName)
+      const aafCharacter * pTypeName)
 {
   if (! pTypeDef)  return AAFRESULT_NULL_PARAM;
 
@@ -73,34 +77,26 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsStringable())
 	return AAFRESULT_BAD_TYPE;
 
-  aafUID_t id;
-  AAFRESULT hr = pTypeDef->GetAUID(&id);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  return pvtInitialize (pID, &id, pTypeName);
+  return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::pvtInitialize (
-      const aafUID_t * pID,
-	  const aafUID_t * pTypeId,
-      wchar_t * pTypeName)
+      const aafUID_t & id,
+      const ImplAAFTypeDef * pTypeDef,
+      const aafCharacter * pTypeName)
 {
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
-  if (! pTypeId)   return AAFRESULT_NULL_PARAM;
-  if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
-  hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (pID);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
-  assert (pTypeId);
-  _ElementType = *pTypeId;
+  _ElementType = pTypeDef;
 
   return AAFRESULT_SUCCESS;
 }
@@ -111,31 +107,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::GetType (
       ImplAAFTypeDef ** ppTypeDef) const
 {
-  if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
+  if (! ppTypeDef)
+	return AAFRESULT_NULL_PARAM;
 
-  if (!_cachedBaseType)
-	{
-	  ImplAAFDictionarySP pDict;
+   if(_ElementType.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFTypeDef *pTypeDef = _ElementType;
 
-	  AAFRESULT hr;
-	  hr = GetDictionary(&pDict);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pDict);
-
-	  ImplAAFTypeDefString * pNonConstThis =
-		  (ImplAAFTypeDefString *) this;
-	  aafUID_t id = _ElementType;
-	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedBaseType);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (_cachedBaseType);
-	}
-  assert (ppTypeDef);
-  *ppTypeDef = _cachedBaseType;
+  *ppTypeDef = pTypeDef;
   assert (*ppTypeDef);
   (*ppTypeDef)->AcquireReference ();
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -229,6 +210,7 @@ AAFRESULT STDMETHODCALLTYPE
   hr = GetType (&pBaseType);
 
   assert (pBaseType->IsFixedSize ());
+  pBaseType->AttemptBuiltinRegistration ();
   assert (pBaseType->IsRegistered ());
   // Size of individual elements
   aafUInt32 elemSize = pBaseType->NativeSize ();
@@ -454,7 +436,7 @@ void ImplAAFTypeDefString::internalize(OMByte* externalBytes,
 
 aafBool ImplAAFTypeDefString::IsFixedSize (void) const
 {
-  return AAFFalse;
+  return kAAFFalse;
 }
 
 
@@ -490,33 +472,44 @@ OMProperty * ImplAAFTypeDefString::pvtCreateOMPropertyMBS
 
   OMProperty * result = 0;
 
-  ImplAAFTypeDefInt * ptdi = 
-	dynamic_cast<ImplAAFTypeDefInt*>((ImplAAFTypeDef*) ptd);
-  if (ptdi)
-	{
-	  // element is integral type
-	  aafUInt32 intSize;
-	  AAFRESULT hr;
-	  hr = ptdi->GetSize (&intSize);
-	  switch (intSize)
-		{
-		case 1:
-		  result = new OMVariableSizeProperty<aafUInt8> (pid, name);
-		  break;
-		case 2:
-		  result = new OMVariableSizeProperty<aafUInt16> (pid, name);
-		  break;
-		case 4:
-		  result = new OMVariableSizeProperty<aafUInt32> (pid, name);
-		  break;
-		case 8:
-		  result = new OMVariableSizeProperty<aafInt64> (pid, name);
-		  break;
-		default:
-		  // We only support strings of those types.
-		  assert (0);
-		}
-	}
+
+  ImplAAFTypeDefCharacter * ptdCharacter = 
+	dynamic_cast<ImplAAFTypeDefCharacter*>((ImplAAFTypeDef*) ptd);
+  if (ptdCharacter)
+  {
+    result = new OMWideStringProperty(pid, name);
+  }
+  else
+  {
+    ImplAAFTypeDefInt * ptdi = 
+	  dynamic_cast<ImplAAFTypeDefInt*>((ImplAAFTypeDef*) ptd);
+    assert (ptdi);
+    if (ptdi)
+	  {
+	    // element is integral type
+	    aafUInt32 intSize;
+	    AAFRESULT hr;
+	    hr = ptdi->GetSize (&intSize);
+	    switch (intSize)
+		  {
+		  case 1:
+		    result = new OMVariableSizeProperty<aafUInt8> (pid, name);
+		    break;
+		  case 2:
+		    result = new OMVariableSizeProperty<aafUInt16> (pid, name);
+		    break;
+		  case 4:
+		    result = new OMVariableSizeProperty<aafUInt32> (pid, name);
+		    break;
+		  case 8:
+		    result = new OMVariableSizeProperty<aafInt64> (pid, name);
+		    break;
+		  default:
+		    // We only support strings of those types.
+		    assert (0);
+		  }
+	  }
+  }
 
   // If result wasn't set above, we don't support the type.
   assert (result);

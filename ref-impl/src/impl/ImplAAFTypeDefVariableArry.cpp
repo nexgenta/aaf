@@ -57,7 +57,7 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 
 ImplAAFTypeDefVariableArray::ImplAAFTypeDefVariableArray ()
-  : _ElementType  ( PID_TypeDefinitionVariableArray_ElementType,  "ElementType")
+  : _ElementType  ( PID_TypeDefinitionVariableArray_ElementType,  "ElementType", "/Dictionary/TypeDefinitions", PID_DefinitionObject_Identification)
 {
   _persistentProperties.put(_ElementType.address());
 }
@@ -72,31 +72,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefVariableArray::GetType (
       ImplAAFTypeDef ** ppTypeDef) const
 {
-  if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
+  if (! ppTypeDef)
+	return AAFRESULT_NULL_PARAM;
 
-  if (!_cachedElemType)
-	{
-	  ImplAAFDictionarySP pDict;
+   if(_ElementType.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFTypeDef *pTypeDef = _ElementType;
 
-	  AAFRESULT hr;
-	  hr = GetDictionary(&pDict);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pDict);
-
-	  ImplAAFTypeDefVariableArray * pNonConstThis =
-		  (ImplAAFTypeDefVariableArray*) this;
-	  aafUID_t id = _ElementType;
-	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedElemType);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (_cachedElemType);
-	}
-  assert (ppTypeDef);
-  *ppTypeDef = _cachedElemType;
+  *ppTypeDef = pTypeDef;
   assert (*ppTypeDef);
   (*ppTypeDef)->AcquireReference ();
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -104,9 +89,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefVariableArray::Initialize (
-      const aafUID_t *  pID,
+      const aafUID_t & id,
       ImplAAFTypeDef * pTypeDef,
-      wchar_t *  pTypeName)
+      const aafCharacter * pTypeName)
 {
   if (! pTypeDef)  return AAFRESULT_NULL_PARAM;
 
@@ -114,33 +99,25 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsVariableArrayable())
 	return AAFRESULT_BAD_TYPE;
 
-  aafUID_t id;
-  AAFRESULT hr = pTypeDef->GetAUID(&id);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  return pvtInitialize (pID, &id, pTypeName);
+  return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefVariableArray::pvtInitialize (
-      const aafUID_t *  pID,
-      const aafUID_t * pTypeId,
-      wchar_t *  pTypeName)
+      const aafUID_t & id,
+       const ImplAAFTypeDef *pType,
+      const aafCharacter * pTypeName)
 {
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
-  if (! pTypeId)   return AAFRESULT_NULL_PARAM;
-  if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
-  hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (pID);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
-  assert (pTypeId);
-  _ElementType = *pTypeId;
+  _ElementType = pType;
 
   return AAFRESULT_SUCCESS;
 }
@@ -285,6 +262,57 @@ ImplAAFTypeDefVariableArray::CreateEmptyValue
   return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefVariableArray::CreateValueFromValues (
+      ImplAAFPropertyValue ** ppElementValues,
+      aafUInt32  numElements,
+      ImplAAFPropertyValue ** ppPropVal)
+{
+	AAFRESULT hr;
+
+	//first validate params + basic stuff ...
+	if (!ppElementValues || !ppPropVal)
+		return AAFRESULT_NULL_PARAM;
+
+	//verify that all the individual elem types are the same as each other,
+	// AND that each of them is VARIABLE  Arrayable
+
+	//get Base TD and size
+	ImplAAFTypeDefSP spTargetTD;
+	hr = GetType(&spTargetTD); //gets base elem type
+	if (AAFRESULT_FAILED (hr)) 
+		return hr;
+	aafUInt32 targetElemSize = spTargetTD->NativeSize();
+
+	for (aafUInt32 i=0; i<numElements; i++)
+	{
+		//get  source size
+		ImplAAFTypeDefSP  spSourceTD;
+		hr = ppElementValues[i]->GetType (&spSourceTD);
+		if (AAFRESULT_FAILED (hr)) 
+			return hr;
+
+		//verify FIXED Arrayable
+		if (! spSourceTD->IsVariableArrayable())
+			return AAFRESULT_BAD_TYPE;
+
+		//verify that spTargetTD == spSourceTD
+		if (spSourceTD != spTargetTD )
+			return AAFRESULT_BAD_TYPE;
+
+		//verify that the target elem size is equal to that of source 
+		aafUInt32 sourceSize = spSourceTD->NativeSize();	
+		if (sourceSize != targetElemSize )
+			return AAFRESULT_BAD_SIZE;
+
+	}//for each elem
+
+	// All params validated; proceed ....
+
+	//... just defer to Base-Class Array implementation:
+	return ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues, numElements, ppPropVal);
+}
+
 
 ImplAAFTypeDefSP ImplAAFTypeDefVariableArray::BaseType() const
 {
@@ -326,7 +354,12 @@ size_t ImplAAFTypeDefVariableArray::externalSize(OMByte* internalBytes,
 
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
-  aafUInt32 intElemSize = ptd->NativeSize ();
+  aafUInt32 intElemSize;
+  if (ptd->IsRegistered())
+	intElemSize = ptd->NativeSize ();
+  else
+	intElemSize = extElemSize;
+
   // aafUInt32 extElemSize = ptd->externalSize (0, 0);
   // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   assert (intElemSize);
@@ -358,8 +391,8 @@ void ImplAAFTypeDefVariableArray::externalize(OMByte* internalBytes,
   else
 	{
 	  aafUInt32 numElems = internalBytesSize / intElemSize;
-	  aafInt32 intNumBytesLeft = externalBytesSize;
-	  aafInt32 extNumBytesLeft = internalBytesSize;
+	  aafInt32 intNumBytesLeft = internalBytesSize;
+	  aafInt32 extNumBytesLeft = externalBytesSize;
 	  aafUInt32 elem = 0;
 
 	  for (elem = 0; elem < numElems; elem++)
@@ -388,7 +421,12 @@ size_t ImplAAFTypeDefVariableArray::internalSize(OMByte* externalBytes,
 
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
-  aafUInt32 intElemSize = ptd->NativeSize ();
+  aafUInt32 intElemSize;
+  if (ptd->IsRegistered())
+	intElemSize = ptd->NativeSize ();
+  else
+	intElemSize = extElemSize;
+
   // aafUInt32 extElemSize = ptd->externalSize (0, 0);
   // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   assert (intElemSize);
@@ -458,7 +496,7 @@ aafUInt32 ImplAAFTypeDefVariableArray::pvtCount
 
 aafBool ImplAAFTypeDefVariableArray::IsFixedSize (void) const
 {
-  return AAFFalse;
+  return kAAFFalse;
 }
 
 
@@ -510,12 +548,29 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMPropertyMBS
 	{
 	  // We don't support variable arrays of variably-sized properties.
 	  assert (ptd->IsFixedSize());
-	  aafUInt32 elemSize = ptd->NativeSize ();
+
+	  // aafUInt32 elemSize = ptd->NativeSize ();
+	  // BobT, 2000-02-14: Hack to handle unpersisting objects which have
+	  // properties of client-defined types which have not yet had
+	  // their types registered.
+	  //
+	  // Was: aafUInt32 elemSize = ptd->NativeSize ();
+	  //
+//	  aafUInt32 elemSize;
+//	  if (ptd->IsRegistered())
+//		elemSize = ptd->NativeSize ();
+//	  else
+//		elemSize = ptd->PropValSize ();
 
 	  // But even though elems are fixed size, the variable array is
 	  // of variable size.  Specify a size of one element.
-	  result = new OMSimpleProperty (pid, name, elemSize);
-	}
+//	  result = new OMSimpleProperty (pid, name, elemSize);
+
+    // Use a variable sized property so that we can allow a property value
+    // size of 0 (i.e. no elements in the array). (transdel 2000-MAR-14)
+	  result = new OMVariableSizeProperty<aafUInt8> (pid, name);
+
+  }
 
   assert (result);
   return result;
