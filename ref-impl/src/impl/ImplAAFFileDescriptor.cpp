@@ -14,14 +14,17 @@
 #include "ImplAAFFileDescriptor.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+
 #include <assert.h>
 #include "AAFResult.h"
 
 ImplAAFFileDescriptor::ImplAAFFileDescriptor ()
-: _sampleRate(			PID_FILE_DESC_SAMPLERATE,	"sampleRate"),
- _length(				PID_FILE_DESC_LENGTH,		"length"),
- _isInContainer(        PID_FILE_DESC_INCONTAINER,	"isInContainer"),
- _containerFmt(         PID_FILE_DESC_CONTAINERFMT,	"containerFormat")
+: _sampleRate(			PID_FileDescriptor_SampleRate,	"SampleRate"),
+ _length(				PID_FileDescriptor_Length,		"Length"),
+ _isInContainer(        PID_FileDescriptor_IsInContainer,	"IsInContainer"),
+ _containerFmt(         PID_FileDescriptor_ContainerFormat,	"ContainerFormat")
 {
   _persistentProperties.put(_sampleRate.address());
   _persistentProperties.put(_length.address());
@@ -104,6 +107,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pFormat == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
 	_containerFmt = *pFormat;
 	return AAFRESULT_SUCCESS;
 }
@@ -114,6 +118,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pFormat == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if (!_containerFmt.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;	
+	
 	*pFormat = _containerFmt;
 	return AAFRESULT_SUCCESS;
 }
@@ -128,19 +136,4 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-extern "C" const aafClassID_t CLSID_AAFFileDescriptor;
-
-OMDEFINE_STORABLE(ImplAAFFileDescriptor, CLSID_AAFFileDescriptor);
-
-// Cheat!  We're using this object's CLSID instead of object class...
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFFileDescriptor::GetObjectClass(aafUID_t * pClass)
-{
-	if (! pClass)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	memcpy (pClass, &CLSID_AAFFileDescriptor, sizeof (aafClassID_t));
-	return AAFRESULT_SUCCESS;
-}
-
+OMDEFINE_STORABLE(ImplAAFFileDescriptor, AUID_AAFFileDescriptor);

@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*                                               *
+\***********************************************/
 
 
 #ifndef __ImplEnumAAFPropertyDefs_h__
@@ -53,7 +35,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
-#include "ImplAAFBuiltinDefs.h"
 #include "AAFUtils.h"
 
 #include <assert.h>
@@ -90,8 +71,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFPropertyDefs;
 
 ImplAAFClassDef::ImplAAFClassDef ()
   : _ParentClass  ( PID_ClassDefinition_ParentClass,  "ParentClass"),
-	_Properties   ( PID_ClassDefinition_Properties,   "Properties"),
-	_propTypesLoaded (false)
+	_Properties   ( PID_ClassDefinition_Properties,   "Properties")
 {
   _persistentProperties.put(_ParentClass.address());
   _persistentProperties.put(_Properties.address());
@@ -112,7 +92,6 @@ ImplAAFClassDef::~ImplAAFClassDef ()
 	  if (pd)
 		{
 		  pd->ReleaseReference();
-		  pd = 0;
 		}
 	}
 }
@@ -120,47 +99,32 @@ ImplAAFClassDef::~ImplAAFClassDef ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::Initialize (
-      const aafUID_t & classID,
+      const aafUID_t * pID,
       ImplAAFClassDef * pParentClass,
-      const aafCharacter * pClassName)
+      const wchar_t *  pClassName)
 {
+  if (!pID) return AAFRESULT_NULL_PARAM;
   if (!pClassName) return AAFRESULT_NULL_PARAM;
-
-  HRESULT hr;
-  aafUID_t parentId;
-  if (pParentClass)
-	{
-	  hr = pParentClass->GetAUID(&parentId);
-	  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-	}
-  else
-	{
-	  aafUID_t NULL_UID = { 0 };
-	  parentId = NULL_UID;
-	}
-
-  return pvtInitialize (classID, &parentId, pClassName);
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFClassDef::pvtInitialize (
-      const aafUID_t & classID,
-      const aafUID_t * pParentClassId,
-      const aafCharacter * pClassName)
-{
-  if (!pClassName) return AAFRESULT_NULL_PARAM;
-  if (! pParentClassId) return AAFRESULT_NULL_PARAM;
-
 
   HRESULT hr;
   hr = SetName (pClassName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (classID);
+  hr = SetAUID (pID);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _ParentClass = *pParentClassId;
+  aafUID_t id;
+  if (pParentClass)
+	{
+	  hr = pParentClass->GetAUID(&id);
+	  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+	}
+  else
+	{
+	  aafUID_t NULL_UID = { 0 };
+	  id = NULL_UID;
+	}
+  _ParentClass = id;
 
   return AAFRESULT_SUCCESS;
 }
@@ -170,27 +134,26 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetPropertyDefs (
       ImplEnumAAFPropertyDefs ** ppEnum)
 {
-  ImplEnumAAFPropertyDefs * theEnum = 0;
+  ImplEnumAAFPropertyDefs * theEnum = NULL;;
 
   if (NULL == ppEnum)
 	return AAFRESULT_NULL_PARAM;
 
   theEnum = (ImplEnumAAFPropertyDefs *)CreateImpl (CLSID_EnumAAFPropertyDefs);
-  if (NULL == theEnum)
-  	return AAFRESULT_NOMEMORY;
-
-  AAFRESULT hr;
+	if (NULL == theEnum)
+		return AAFRESULT_NOMEMORY;
+	
+  AAFRESULT hr = AAFRESULT_SUCCESS;
   hr = theEnum->SetEnumStrongProperty(this, &_Properties);
   if (AAFRESULT_FAILED (hr))
 	{
 		theEnum->ReleaseReference();
 		theEnum = NULL;
-		return hr;
 	}
 	
-  *ppEnum = theEnum;
+	*ppEnum = theEnum;
 
-  return AAFRESULT_SUCCESS;
+  return hr;
 }
 
 
@@ -198,30 +161,28 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::CountPropertyDefs (
       aafUInt32 *  pCount)
 {
-  if (! pCount) return AAFRESULT_NULL_PARAM;
-
-  assert (pCount);
-  if (!_Properties.isPresent())
-	*pCount = 0;
-
-  else  *pCount = _Properties.getSize ();
+	if (! pCount) return AAFRESULT_NULL_PARAM;
 	
-  return AAFRESULT_SUCCESS;
+	assert (pCount);
+	
+	if (!_Properties.isPresent())
+		*pCount = 0;
+
+	else  *pCount = _Properties.getSize ();
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFClassDef::RegisterNewPropertyDef (
-      const aafUID_t &      id,
-      const aafCharacter *  pName,
+    ImplAAFClassDef::AppendNewPropertyDef (
+      aafUID_t *            pID,
+      wchar_t *             pName,
       ImplAAFTypeDef *      pTypeDef,
       aafBool               isOptional,
       ImplAAFPropertyDef ** ppPropDef)
 {
   // This will only work if this class has not yet been registered.
-
-  if (! pTypeDef)
-	return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
   ImplAAFDictionarySP pDict;
@@ -237,7 +198,7 @@ AAFRESULT STDMETHODCALLTYPE
 	  hr = GetAUID (&thisClassID);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 
-	  hr = pDict->dictLookupClassDef (thisClassID, &pClassDef);
+	  hr = pDict->dictLookupClass (&thisClassID, &pClassDef);
 	  if (AAFRESULT_SUCCEEDED (hr))
 		{
 		  // pClassDef is unused; we only want to know the result of
@@ -247,54 +208,42 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
   // If we're here, we're not already registered.  OK to continue.
-
-  aafUID_t typeId;
-  hr = pTypeDef->GetAUID (&typeId);
-  if (AAFRESULT_FAILED (hr))
-	return hr;
-
-  return pvtRegisterPropertyDef (id,
-								 pName,
-								 typeId,
-								 isOptional,
-								 ppPropDef);
+  return pvtAppendPropertyDef (pID,
+							   pName,
+							   pTypeDef,
+							   isOptional,
+							   ppPropDef);
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFClassDef::RegisterOptionalPropertyDef (
-      const aafUID_t &      id,
-      const aafCharacter *  pName,
+    ImplAAFClassDef::AppendOptionalPropertyDef (
+      aafUID_t *            pID,
+      wchar_t *             pName,
       ImplAAFTypeDef *      pTypeDef,
       ImplAAFPropertyDef ** ppPropDef)
 {
-  AAFRESULT hr;
-  if (! pTypeDef)
-	return AAFRESULT_NULL_PARAM;
+  return pvtAppendPropertyDef (pID,
+							   pName,
+							   pTypeDef,
+							   AAFTrue,
+							   ppPropDef);
+}
 
-  ImplAAFDictionarySP pDict;
-  hr = GetDictionary (&pDict);
-  assert (AAFRESULT_SUCCEEDED (hr));
 
-  aafUID_t myAuid;
-  hr = GetAUID (&myAuid);
-  assert (AAFRESULT_SUCCEEDED (hr));
-
-  // Test to see if this class is axiomatic; if so, then we can't
-  // augment it.
-  if (pDict->IsAxiomaticClass (myAuid))
-	return AAFRESULT_NOT_EXTENDABLE;
-
-  aafUID_t typeId;
-  hr = pTypeDef->GetAUID (&typeId);
-  if (AAFRESULT_FAILED (hr))
-	return hr;
-
-  return pvtRegisterPropertyDef (id,
-								 pName,
-								 typeId,
-								 kAAFTrue,
-								 ppPropDef);
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFClassDef::pvtAppendNewPropertyDef (
+      aafUID_t *  pID,
+	  wchar_t *  pName,
+	  ImplAAFTypeDef * pTypeDef,
+	  aafBool  isOptional,
+	  ImplAAFPropertyDef ** ppPropDef)
+{
+  return pvtAppendPropertyDef (pID,
+							   pName,
+							   pTypeDef,
+							   isOptional,
+							   ppPropDef);
 }
 
 
@@ -343,19 +292,20 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT hr = GetParent (&parentSP);
   if (AAFRESULT_FAILED (hr))
 	return hr;
-  if (parentSP)
-    return parentSP->generalLookupPropertyDef (propId, ppPropDef);
-  else
-	return AAFRESULT_NO_MORE_OBJECTS;
+  assert (parentSP);
+  return parentSP->generalLookupPropertyDef (propId, ppPropDef);
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::LookupPropertyDef (
-      const aafUID_t & propID,
+      aafUID_t * pPropID,
       ImplAAFPropertyDef ** ppPropDef) const
 {
-  const pvtPropertyIdentifierAUID generalPropId = propID;
+  if (! pPropID)
+	return AAFRESULT_NULL_PARAM;
+
+  const pvtPropertyIdentifierAUID generalPropId = *pPropID;
 
   // cast away bitwise const-ness; maintaining conceptual const-ness
   return ((ImplAAFClassDef*)this)->generalLookupPropertyDef
@@ -377,13 +327,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-void ImplAAFClassDef::pvtGetParentAUID (aafUID_t & result)
-{
-  result = _ParentClass;
-}
-
-
-
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetParent (
       ImplAAFClassDef ** ppClassDef)
@@ -395,31 +338,14 @@ AAFRESULT STDMETHODCALLTYPE
 	  ImplAAFDictionarySP pDict;
 	  AAFRESULT hr;
 
-	  // If no parent, return NULL (and success)
-	  aafUID_t parentClass;
-	  pvtGetParentAUID (parentClass);
-	  const aafUID_t null_UID = { 0 };
-	  if (EqualAUID(&parentClass, &null_UID))
-		{
-		  assert (ppClassDef);
-		  *ppClassDef = 0;
-		  return AAFRESULT_SUCCESS;
-		}
-
 	  hr = GetDictionary(&pDict);
 	  if (AAFRESULT_FAILED (hr)) return hr;
 	  assert (pDict);
 
-	  ImplAAFClassDefSP tmp;
-	  assert (! _cachedParentClass);
-	  hr = pDict->LookupClassDef (parentClass, &tmp);
+	  aafUID_t parentClass = _ParentClass;
+	  hr = pDict->LookupClass (&parentClass, &_cachedParentClass);
 	  if (AAFRESULT_FAILED (hr))
 		return hr;
-	  // If _cachedParentClass was set during process of looking this
-	  // up, then simply throw away the most recently looked-up one
-	  // (in tmp).
-	  if (! _cachedParentClass)
-		_cachedParentClass = tmp;
 	  assert (_cachedParentClass);
 	}
   assert (ppClassDef);
@@ -432,82 +358,43 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFClassDef::CreateInstance (
-      ImplAAFObject ** ppObject)
-{
-  if (! ppObject)
-	return AAFRESULT_NULL_PARAM;
-
-  AAFRESULT hr;
-  ImplAAFDictionarySP pDict;
-  hr = GetDictionary (&pDict);
-  if (AAFRESULT_FAILED (hr))
-	return hr;
-  assert (pDict);
-  ImplAAFObject * pObj =
-	pDict->CreateAndInit (this);
-  assert (pObj);
-  *ppObject = pObj;
-  // don't bother with *ppObject->addref() and pObj->ReleaseRef();
-  // consider the ref count to be transferred from pObj to *ppObject.
-  pObj = 0;  // to keep boundschecker happy
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFClassDef::pvtRegisterPropertyDef (
-      const aafUID_t &      id,
-      const aafCharacter *  pName,
-      const aafUID_t &      typeId,
+    ImplAAFClassDef::pvtAppendPropertyDef (
+      aafUID_t *            pID,
+      wchar_t *             pName,
+      ImplAAFTypeDef *      pTypeDef,
       aafBool               isOptional,
       ImplAAFPropertyDef ** ppPropDef)
 {
+  if (! pID) return AAFRESULT_NULL_PARAM;
   if (! pName) return AAFRESULT_NULL_PARAM;
+  if (! pTypeDef) return AAFRESULT_NULL_PARAM;
+  if (! ppPropDef) return AAFRESULT_NULL_PARAM;
 
   ImplAAFDictionarySP pDict;
   ImplAAFPropertyDefSP pd;
 
   check_result (GetDictionary (&pDict));
   assert (pDict);
+  assert (pID);
   OMPropertyId omPid;
-  check_result (pDict->GenerateOmPid (id, omPid));
+  check_result (pDict->GenerateOmPid (*pID, omPid));
 
-  AAFRESULT hr;
-  hr = pDict->GetBuiltinDefs()->cdPropertyDef()->
-	CreateInstance((ImplAAFObject**)&pd);
-  if (AAFRESULT_FAILED (hr))
-	return hr;
+  pd = (ImplAAFPropertyDef *)pDict->CreateImplObject (AUID_AAFPropertyDef);
+  if (!pd) return AAFRESULT_NOMEMORY;
 
-  check_result (pd->pvtInitialize (id,
+  assert (pd);
+  check_result (pd->Initialize (pID,
 								omPid,
 								pName,
-								typeId,
+								pTypeDef,
 								isOptional));
 
   ImplAAFPropertyDef * pdTemp = pd;
   _Properties.appendValue(pdTemp);
-  pdTemp->AcquireReference ();
 
-  if (ppPropDef)
-  {
-	*ppPropDef = pd;
-	(*ppPropDef)->AcquireReference ();
-  }
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFClassDef::pvtRegisterExistingPropertyDef
-(ImplAAFPropertyDef * pPropDef)
-{
-  if (!pPropDef)
-	return AAFRESULT_NULL_PARAM;
-
-  _Properties.appendValue(pPropDef);
-  pPropDef->AcquireReference ();
+  assert (ppPropDef);
+  *ppPropDef = pd;
+  (*ppPropDef)->AcquireReference ();
 
   return AAFRESULT_SUCCESS;
 }
@@ -522,7 +409,7 @@ aafBool ImplAAFClassDef::pvtPropertyIdentifierOMPid:: DoesMatch
   OMPropertyId testPid;
   assert (pTestPropDef);
   testPid = pTestPropDef->OmPid ();
-  return (_id == testPid) ? kAAFTrue : kAAFFalse;
+  return (_id == testPid) ? AAFTrue : AAFFalse;
 }
 
 aafBool ImplAAFClassDef::pvtPropertyIdentifierAUID::DoesMatch
@@ -532,154 +419,7 @@ aafBool ImplAAFClassDef::pvtPropertyIdentifierAUID::DoesMatch
   assert (pTestPropDef);
   AAFRESULT hr = pTestPropDef->GetAUID (&testUID);
   assert (AAFRESULT_SUCCEEDED (hr));
-  return (EqualAUID (&_id, &testUID) ? kAAFTrue : kAAFFalse);
+  return (EqualAUID (&_id, &testUID) ? AAFTrue : AAFFalse);
 }
 
-
-void ImplAAFClassDef::AssurePropertyTypesLoaded ()
-{
-  if (! _propTypesLoaded)
-	{
-	  _propTypesLoaded = true;
-
-	  AAFRESULT hr;
-	  ImplAAFClassDefSP spDef;
-	  spDef	= this;
-	  assert (spDef);
-	  while (1)
-		{
-		  // Loop through this class and all its parents
-		  ImplEnumAAFPropertyDefsSP pdEnumSP;
-		  hr = spDef->GetPropertyDefs (&pdEnumSP);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
-		  ImplAAFPropertyDefSP propDefSP;
-
-		  // Loop through all properties of this class
-		  while (AAFRESULT_SUCCEEDED (pdEnumSP->NextOne (&propDefSP)))
-			{
-			  // return value unused; just force the lookup.
-			  propDefSP->type ();
-			}
-
-		  // Look at the parent of this class
-		  ImplAAFClassDefSP parentSP;
-		  hr = spDef->GetParent (&parentSP);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-		  if (! parentSP)
-			break;
-		  spDef = parentSP;
-		}
-	}
-}
-
-
-//
-// Here is the mapping of DM type defs to OMProperty concrete
-// classes.
-//
-// DM TypeDef				Treatment
-// ----------				-------------------------
-// AAFTypeDefEnum			FixedData(sizeof rep'd type)
-//
-// AAFTypeDefExtEnum		FixedData(sizeof auid)
-//
-// AAFTypeDefFixedArray     FixedData(sizeof elem * num elems)
-//
-// AAFTypeDefInt			FixedData(sizeof int)
-//
-// AAFTypeDefRecord         FixedData(sum of sizes of elements)
-//
-// AAFTypeDefRename         <refer to referenced type>
-//
-// AAFTypeDefSet:
-//   if elem type is StrRef	OMStrongReferenceVectorProperty<AAFObject>
-//   if elem type is WkRef  VariableData(sizeof auid)
-//   if elem is fixed data  VariableData(sizeof elem)
-//   else                   <not yet supported; maybe never!>
-//
-// AAFTypeDefStream			<not yet supported>
-//
-// AAFTypeDefString			VariableData(sizeof elem)
-//
-// AAFTypeDefStrongObjRef	OMStrongReferenceProperty<AAFObject>
-//
-// AAFTypeDefVariableArray
-//   if elem type is StrRef	OMStrongReferenceVectorProperty<AAFObject>
-// 	 if elem type is WkRef  VariableData(sizeof auid)
-// 	 if elem is fixed data  VariableData(sizeof elem)
-//   else                   <not yet supported; maybe never!>
-//
-// AAFTypeDefWeakObjRef     FixedData(sizeof auid)
-//
-
-
-void ImplAAFClassDef::InitOMProperties (ImplAAFObject * pObj)
-{
-  assert (pObj);
-  AAFRESULT hr;
-
-  //
-  // Init base class properties first
-  //
-  ImplAAFClassDefSP parentSP;
-  hr = GetParent (&parentSP);
-  assert (AAFRESULT_SUCCEEDED (hr));
-  // parentSP will be NULL if this class has no parent.
-  if (parentSP)
-	parentSP->InitOMProperties (pObj);
-
-  // See if currently existing OM properties are defined in the class
-  // def.
-  //
-  OMPropertySet * ps = pObj->propertySet();
-  assert (ps);
-  const size_t propCount = ps->count();
-
-  // Loop through properties of this class
-  ImplEnumAAFPropertyDefsSP pdEnumSP;
-  hr = GetPropertyDefs (&pdEnumSP);
-  assert (AAFRESULT_SUCCEEDED (hr));
-
-  ImplAAFPropertyDefSP propDefSP;
-  while (AAFRESULT_SUCCEEDED (pdEnumSP->NextOne (&propDefSP)))
-	{
-	  OMPropertyId defPid = propDefSP->OmPid ();
-	  // assert (ps->isAllowed (defPid));
-	  OMProperty * pProp = 0;
-	  if (ps->isPresent (defPid))
-		{
-		  // Defined property was already in property set.  (Most
-		  // probably declared in the impl constructor.)  Get that
-		  // property.
-		  pProp = ps->get (defPid);
-		}		  
-	  else
-		{
-		  // Defined property wasn't found in OM property set.
-		  // We'll have to install one.
-		  pProp = propDefSP->CreateOMProperty ();
-		  assert (pProp);
-
-		  // Remember this property so we can delete it later.
-		  pObj->RememberAddedProp (pProp);
-
-		  // Add the property to the property set.
-		  ps->put (pProp);
-		}
-
-	  ImplAAFPropertyDef * pPropDef =
-		(ImplAAFPropertyDef*) propDefSP;
-	  OMPropertyDefinition * pOMPropDef =
-		dynamic_cast<OMPropertyDefinition*>(pPropDef);
-	  assert (pOMPropDef);
-
-	  assert (pProp);
-	  pProp->initialize (pOMPropDef);
-
-	  propDefSP = 0;
-	  pProp = 0;
-	  pOMPropDef = 0;
-	  pPropDef = 0;
-	}
-}
+OMDEFINE_STORABLE(ImplAAFClassDef, AUID_AAFClassDef);
