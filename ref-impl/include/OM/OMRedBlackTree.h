@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -28,6 +28,12 @@
 // @doc OMINTERNAL
 #ifndef OMREDBLACKTREE_H
 #define OMREDBLACKTREE_H
+
+#if defined (_MSC_VER)
+  // - 'identifier' : identifier was truncated to 'number' characters in
+  //   the debug information
+#pragma warning(disable:4786) // Gak !
+#endif
 
 #include "OMAssertions.h"
 #include <stddef.h>
@@ -64,6 +70,12 @@ public:
     //          <p v> and the result is true. If the element is not
     //          found the result is false.
   bool find(const Key k, Value& v) const;
+
+    // @cmember Find the item in this <c OMRedBlackTree> identified
+    //          <p k>.  If the item is found it is returned in
+    //          <p v> and the result is true. If the element is not
+    //          found the result is false.
+  bool find(const Key k, Value** v) const;
 
     // @cmember Does this <c OMRdBlackTree> contain an item
     //          identified by <p k>?
@@ -118,7 +130,7 @@ private:
   void leftRotate(Node* n);
 
   void rightRotate(Node* n);
- 
+
   void rebalance(Node* x);
 
   void traverseInOrder(
