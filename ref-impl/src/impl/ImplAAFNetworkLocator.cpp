@@ -14,13 +14,15 @@
 #include "ImplAAFNetworkLocator.h"
 #endif
 
+#include "AAFPropertyIDs.h"
+
 #include "AAFResult.h"
 
 #include <assert.h>
 
 
 ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
-: _path(PID_NETWORKLOCATOR_URLSTRING, "URLString")
+: _path(PID_NetworkLocator_URLString, "URL String")
 {
   _persistentProperties.put(_path.address());
   _path = L"";
@@ -29,6 +31,14 @@ ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
 
 ImplAAFNetworkLocator::~ImplAAFNetworkLocator ()
 {}
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFNetworkLocator::Initialize ()
+{
+  return AAFRESULT_SUCCESS;
+}
+
 
 // Override from AAFLocator
 AAFRESULT STDMETHODCALLTYPE
@@ -58,7 +68,7 @@ ImplAAFNetworkLocator::GetPathBufLen (aafInt32 *  pLen)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  *pLen = _path.length()+1;
+  *pLen = _path.size();
   return AAFRESULT_SUCCESS;
 }
 
