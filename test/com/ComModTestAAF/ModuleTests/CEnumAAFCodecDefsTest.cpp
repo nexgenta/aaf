@@ -72,6 +72,9 @@ static wchar_t *sName1 = L"Test Descriptor Name1";
 static wchar_t *sDescription1 = L"Test Descriptor Description1";
 static wchar_t *sName2 = L"Test Descriptor Name2";
 static wchar_t *sDescription2 = L"Test Descriptor Description2";
+// {E4E190C9-EA4A-11d3-A352-009027DFCA6A}
+static const aafUID_t TESTID_2 = 
+{ 0xe4e190c9, 0xea4a, 0x11d3, { 0xa3, 0x52, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
@@ -88,14 +91,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -140,7 +143,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Create the AAF file
-	checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+	checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
     bFileOpen = true;
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
@@ -162,7 +165,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 							   (IUnknown **)&pCodecDef));
     
 	checkResult(pCodecDef->AddEssenceKind (defs.ddMatte()));
-	uid = NoCodec;
+	uid = TESTID_2;
 	checkResult(pCodecDef->Initialize (uid, sName2, sDescription2));
 
 	checkResult(pDictionary->RegisterCodecDef(pCodecDef));
@@ -215,7 +218,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
