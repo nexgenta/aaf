@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.h,v 1.4 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.h,v 1.5 2005/02/08 14:32:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -299,7 +299,7 @@ private:
 	aafUInt16			_bitsPerSample;
 	aafUInt16			_numCh;
 	aafUInt16			_bytesPerFrame;
-	aafUInt32			_sampleFrames;
+	aafPosition_t		_sampleFrames;
 	aafBoolean_t				_headerLoaded;
 	interleaveBufAIFF_t		*_interleaveBuf;
 	aafInt64			_dataStartOffset;

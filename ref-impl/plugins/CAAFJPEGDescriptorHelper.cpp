@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGDescriptorHelper.cpp,v 1.16 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGDescriptorHelper.cpp,v 1.17 2005/02/08 14:32:32 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,6 @@
 #include "AAF.h"
 
 #include "AAFUtils.h"
-#include "aafCvt.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"

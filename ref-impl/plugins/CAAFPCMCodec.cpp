@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.6 2004/11/22 15:33:37 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.7 2005/02/08 14:32:32 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,6 @@
 
 #include "aafErr.h"
 #include "AAFUtils.h"
-#include "aafCvt.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
