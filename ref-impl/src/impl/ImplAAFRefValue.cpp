@@ -31,91 +31,115 @@
 #include "ImplAAFRoot.h"
 #endif
 
+#ifndef __ImplAAFStorable_h__
+#include "ImplAAFStorable.h"
+#endif
+
+#ifndef __ImplAAFObject_h__
+#include "ImplAAFObject.h"
+#endif
+
+#ifndef __ImplAAFMetaDefinition_h__
+#include "ImplAAFMetaDefinition.h"
+#endif
+
 #ifndef __ImplAAFTypeDefObjectRef_h__
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
 
 #include "OMProperty.h"
-//#include "OMRefProperty.h" // TBD: include header for base class for singleton references.
+#include "OMRefProperty.h" // Include header for base class for singleton references.
 #include "OMPropertyDefinition.h"
 
 #include <assert.h>
 #include <string.h>
 
+#ifndef USE_IMPLSTORABLE
+#define USE_IMPLSTORABLE 1
+#endif
+
+// Utility routine
+/* static */ ImplAAFStorable * ImplAAFRefValue::ConvertOMObjectToRoot(OMObject *object)
+{
+  ImplAAFStorable* result = NULL;
+#if USE_IMPLSTORABLE
+  ImplAAFStorable *pObject = dynamic_cast<ImplAAFStorable *>(object);
+  result = pObject;
+#else
+  ImplAAFObject *pObject = dynamic_cast<ImplAAFObject *>(object);
+  if (NULL != pObject)
+  {
+    result = pObject;
+  }
+  else
+  {
+    ImplAAFMetaDefinition* metaDefinition = dynamic_cast<ImplAAFMetaDefinition *>(object);
+    if (NULL != metaDefinition)
+    {
+      result = metaDefinition;
+    }
+  }
+#endif  
+  // A strong reference MUST be either an ImplAAFObject or an ImplAAFMetaDefintion!!!
+  assert (NULL != result);
+  return result;
+}
+
+/* static */ ImplAAFStorable * ImplAAFRefValue::ConvertRootToOMStorable(ImplAAFRoot *object)
+{
+  ImplAAFStorable* result = NULL;
+#if USE_IMPLSTORABLE
+  ImplAAFStorable *pObject = dynamic_cast<ImplAAFStorable *>(object);
+  result = pObject;
+#else
+  ImplAAFObject *pObject = dynamic_cast<ImplAAFObject *>(object);
+  if (NULL != pObject)
+  {
+    result = pObject;
+  }
+  else
+  {
+    ImplAAFMetaDefinition* metaDefinition = dynamic_cast<ImplAAFMetaDefinition *>(object);
+    if (NULL != metaDefinition)
+    {
+      result = metaDefinition;
+    }
+  }
+#endif  
+  
+  // A strong reference MUST be either an ImplAAFObject or an ImplAAFMetaDefintion!!!
+  assert (NULL != result);
+  return result;
+}
 
 ImplAAFRefValue::ImplAAFRefValue () :
-  _referenceProperty(NULL),
-  _propertyContainer(NULL)
+  _localObject(NULL)
 {}
 
 
 ImplAAFRefValue::~ImplAAFRefValue ()
 {
-  _referenceProperty = NULL;
-  
-#if defined(REFERENCE_PROPERTY_CONTAINER)
-  if (_propertyContainer)
-  {
-    _propertyContainer->ReleaseReference();
-    _propertyContainer = NULL;
-  }
-#endif // #if defined(REFERENCE_PROPERTY_CONTAINER)
+  // Release the old object (if necessary)
+  SetLocalObject(NULL);
 }
 
 
 
-
-
+AAFRESULT ImplAAFRefValue::Initialize (
+  const ImplAAFTypeDefObjectRef *referenceType)
+{
+  AAFRESULT result = ImplAAFPropertyValue::Initialize(referenceType);
+  return result;
+}
 
 
 AAFRESULT ImplAAFRefValue::Initialize (
   const ImplAAFTypeDefObjectRef *referenceType,    
   OMProperty *property)
 {
-  AAFRESULT result = AAFRESULT_SUCCESS;
-  
-  assert (!isInitialized());
-  if (isInitialized())
-    return AAFRESULT_ALREADY_INITIALIZED;
-  assert (property);
-  if (NULL == referenceType || NULL == property)
-    return AAFRESULT_NULL_PARAM;
-
-  // Get the type definition. This must be a stream type.
-  assert (property->definition());
-  if (NULL == property->definition())
-    return AAFRESULT_INVALID_PARAM;
-  const OMType *type = property->definition()->type();
-  assert (type);
-  
-// TBD: The given property must be an OM reference property.  
-// Until the OMReferenceProperty is checked in just use the given
-// property as the referenceProperty
-  OMProperty *referenceProperty = property;
-//  OMReferenceProperty *referenceProperty = dynamic_cast<OMReferenceProperty *>(property);
-//  assert (referenceProperty);
-//  if (NULL == referenceProperty)
-//    return AAFRESULT_INVALID_PARAM;
-
-  // Get the storable container for this property. Since this is a "direct 
-  // access" interface we need to hold onto a reference so tha the container
-  // is not deleted.
-  ImplAAFRoot * propertyContainer = dynamic_cast<ImplAAFRoot *>
-                                      (property->propertySet()->container());
-  assert (propertyContainer);
-  if (NULL == propertyContainer)
-    return AAFRESULT_INVALID_PARAM;
-  
-  // Save our initialized member data.
-  SetType(const_cast<ImplAAFTypeDefObjectRef *>(referenceType));
-  _referenceProperty = referenceProperty;
-  _propertyContainer = propertyContainer;
-#if defined(REFERENCE_PROPERTY_CONTAINER)
-  _propertyContainer->AcquireReference();
-#endif // #if defined(REFERENCE_PROPERTY_CONTAINER)
-    
-  return AAFRESULT_SUCCESS;
+  AAFRESULT result = ImplAAFPropertyValue::Initialize(referenceType, property);
+  return result;
 }
 
 //
@@ -124,13 +148,41 @@ AAFRESULT ImplAAFRefValue::Initialize (
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefValue::WriteTo(
   OMProperty* pOmProp)
 {
-  // Make sure that the given property is the same one that was used to 
-  // initialize this property value. NOTE: Copying an object reference to a 
-  // different OMProperty should be handled through another interface.
-  if (pOmProp != _referenceProperty)
-    return AAFRESULT_INVALID_PARAM;
+  if (NULL != property())
+  {
+    // Make sure that the given property is the same one that was used to 
+    // initialize this property value. NOTE: Copying an object reference to a 
+    // different OMProperty should be handled through another interface.
+    if (pOmProp != property())
+      return AAFRESULT_INVALID_PARAM;
+  }
   
   // The first version of this class defers to the older   
-  return ImplAAFPropValData::WriteTo(pOmProp);
-//  return AAFRESULT_SUCCESS;
+//  return ImplAAFPropValData::WriteTo(pOmProp);
+  return AAFRESULT_SUCCESS;
+}
+
+
+// Return the instance's property as a reference property.
+OMReferenceProperty * ImplAAFRefValue::referenceProperty(void) const
+{
+  return (static_cast<OMReferenceProperty *>(property()));
+}
+
+
+void ImplAAFRefValue::SetLocalObject(ImplAAFStorable * localObject)
+{
+  if (NULL != _localObject)
+    _localObject->ReleaseReference();
+
+  _localObject = localObject;
+
+  if (NULL != localObject)
+    localObject->AcquireReference();
+}
+
+
+ImplAAFStorable * ImplAAFRefValue::GetLocalObject(void) const // not reference counted
+{
+  return _localObject;
 }

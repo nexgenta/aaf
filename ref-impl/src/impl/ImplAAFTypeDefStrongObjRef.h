@@ -39,6 +39,8 @@ class ImplAAFClassDef;
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
+#include "OMWeakRefVectorProperty.h"
+#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefStrongObjRef : public ImplAAFTypeDefObjectRef
 {
@@ -54,23 +56,38 @@ protected:
 
 public:
 
+  //****************
+  // Initialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Initialize
+        (// @parm [in] auid to be used to identify this type
+         const aafUID_t & id,
+
+         // @parm [in] class def of objects permitted to be referenced
+         ImplAAFClassDef * pObjType,
+
+         // @parm [in, string] friendly name of this type definition
+         const aafCharacter * pTypeName);
+
+
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     SetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[in]*/ ImplAAFObject * ppObject);
+      /*[in]*/ ImplAAFRoot * ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[out]*/ ImplAAFObject ** ppObject);
+      /*[out]*/ ImplAAFRoot ** ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType) const;
+    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
-    CreateValue (/*[in]*/ ImplAAFObject * pObj,
+    CreateValue (/*[in]*/ ImplAAFRoot * pObj,
       /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
 
   // Override from AAFTypeDef
@@ -83,9 +100,9 @@ public:
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
-        (const aafUID_t *  pID,
-         const aafUID_t * pRefdObjID,
-         wchar_t *  pTypeName);
+        (const aafUID_t & id,
+         const ImplAAFClassDef *pType,
+         const aafCharacter * pTypeName);
 
   // overrides from ImplAAFTypeDef
   //
@@ -95,16 +112,26 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
+  // Allocate and initialize the correct subclass of ImplAAFPropertyValue 
+  // for the given OMProperty.
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreatePropertyValue(OMProperty *property, 
+                        ImplAAFPropertyValue ** pPropertyValue) const;
+
+
+
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 
 private:
-  // OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
-  OMFixedSizeProperty<aafUID_t> _referencedType;
-
-  // avoid shortcut typedef in an effort to not include other headers
-  ImplAAFSmartPointer<ImplAAFClassDef> _cachedObjType;
+  OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
 };
 
 
