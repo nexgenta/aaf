@@ -1,66 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
-
 //
 // An example program that calls the test AAF COM interfaces.
 //
 
 //
 #include <iostream.h>
-#include <fstream.h>
 #include <stdlib.h>
-#include <string.h>
+#include <time.h>
 
 
-#ifndef __AAF_h__
-#include "AAF.h"
-#endif
-
-#ifndef __AAFTypes_h__
-#include "AAFTypes.h"
-#endif
-
-
-#if defined( OS_WINDOWS )
-#include <winbase.h>
+#ifdef WIN32
 #include <unknwn.h>
 #include <objbase.h>
 #endif
 
-#if defined( OS_MACOS )
+#ifdef __powerc
+
 #define _MAC
 
-// Make sure we have defined IID_IUnknown and IID_IClassFactory.
-#include <initguid.h>
-#include <coguid.h>  
-#include "DataInput.h"
-
 #if !defined(CDECL) && defined(_MSC_VER)
-#define CDECL  _cdecl
+#define CDECL	_cdecl
 #endif // CDECL
 
 #if !defined(FAR)
@@ -71,29 +29,62 @@
 #include "dispatch.h"
 #include "wintypes.h"
 #include <olectl.h>
+#endif
 
-#endif  // OS_MACOS
+
+#ifndef __AAFTypes_h__
+
+#include "AAFTypes.h"
+
+#endif
 
 
-#include "CAAFModuleTest.h"
-#include "ModuleTest.h"
+#include "AAFModuleTest.h"
 
+#ifdef __powerc
+#include <console.h> /* Mac command line window */
+#endif
+
+#ifdef WIN32
+#include <winbase.h>
+#endif
 
 typedef AAFRESULT (*AAFModuleTestProc)();
+
+// CLSID for AAFObject 
+// {B1A213AE-1A7D-11D2-BF78-00104BC9156D}
+const CLSID CLSID_AAFModuleTest = { 0xB1A213AE, 0x1A7D, 0x11D2, { 0xBF, 0x78, 0x00, 0x10, 0x4B, 0xC9, 0x15, 0x6D } };
+
+
+// Default Interface for AAFObject 
+// {B1A213AD-1A7D-11D2-BF78-00104BC9156D}
+const IID IID_IAAFModuleTest = { 0xB1A213AD, 0x1A7D, 0x11D2, { 0xBF, 0x78, 0x00, 0x10, 0x4B, 0xC9, 0x15, 0x6D } };
 
 
 #define SUCCESS (0)
 #define FAILURE (-1)
 
-// routine copied from Tim Bingham's test program...
-static void formatError(DWORD errorCode)
-{
-  cerr << "RESULT = " << (long)errorCode << " (0x" << hex << errorCode << dec << ")" << endl;
 
-#if defined( OS_WINDOWS )
+// helper class
+struct CComInitialize
+{
+	CComInitialize() { CoInitialize(NULL); }
+	~CComInitialize() { CoUninitialize(); }
+};
+
+
+
+
+// forward declarations.
+void AAFFooTest();
+
+#ifdef WIN32
+// routine copied from Tim Bingham's test program...
+void formatError(DWORD errorCode)
+{
   CHAR buffer[256];
 
-  int status = FormatMessageA(
+  int status = FormatMessage(
     FORMAT_MESSAGE_FROM_SYSTEM,
     NULL,
     errorCode,
@@ -103,77 +94,15 @@ static void formatError(DWORD errorCode)
 
   if (status != 0) {
     int length = strlen(buffer);
-    if (length >= 1) {
-      buffer[length - 1] = '\0';
+    if (length >= 2) {
+      buffer[length - 2] = '\0';
     }
     cerr << buffer << endl;
-  }
-#endif // OS_WINDOWS
-
-  cerr << endl;
-}
-
-static void throwIfError(HRESULT hr)
-{
-  if (FAILED(hr))
-  {
-    formatError(hr);
-    throw hr;
+  } else {
+    cerr << hex << errorCode << dec << endl;
   }
 }
-
-
-// simple helper class to initialize and cleanup AAF library.
-struct CAAFInitialize
-{
-  CAAFInitialize(const char *dllname = NULL)
-  {
-    cout << "Attempting to load the AAF dll...";
-    cout.flush();
-    HRESULT hr = AAFLoad(dllname);
-    if (S_OK != hr)
-    {
-      cerr << "FAILED! ";
-      throwIfError(hr);
-    }
-    cout << "DONE" << endl;
-  }
-
-  ~CAAFInitialize()
-  {
-    AAFUnload();
-  }
-};
-
-
-// simple helper class to initialize and cleanup AAF library.
-class CAAFInitializePlugins
-{
-public:
-  CAAFInitializePlugins() :
-    pPluginMgr(NULL)
-  {
-    throwIfError(AAFGetPluginManager(&pPluginMgr));
-    throwIfError(pPluginMgr->RegisterSharedPlugins());
-    pPluginMgr->Release();
-    pPluginMgr = NULL;
-  }
-
-  ~CAAFInitializePlugins()
-  {
-    if (pPluginMgr)
-      pPluginMgr->Release();
-  }
-
-  // cached for error cleanup.
-  IAAFPluginManager *pPluginMgr;
-};
-
-
-// forward declarations.
-
-
-
+#endif
 
 //
 // If there are no arguments then perform the module test for all modules.
@@ -184,84 +113,105 @@ public:
 
 int main(int argc, char* argv[])
 {
-  int result = SUCCESS;
-  int  startArg = 1;
-  testMode_t  testMode = kAAFUnitTestReadWrite;
-  bool skipTests = false;
+	int result = SUCCESS;
+
+	// Initialize com library for this process.
+	CComInitialize comInit;
+
+	// Attempt Create the module test object.
+	IAAFModuleTest *pAAFModuleTest = NULL;
+	try
+	{
+		HRESULT hr = S_OK;
+
+		/* console window for mac */
+
+		#ifdef __powerc
+		argc = ccommand(&argv);
+		#endif
 
 
-  // Create the module test object.
-  CAAFModuleTest AAFModuleTest;
-  try
-  {
-    HRESULT hr = S_OK;
+		// Attempt to create an instance of AAFFoo and return the IID_IAAFUnitTest interface pointer.
+		hr = CoCreateInstance(CLSID_AAFModuleTest,
+				NULL, 
+				CLSCTX_INPROC_SERVER, 
+				IID_IAAFModuleTest, 
+				(void **)&pAAFModuleTest);
+		if (FAILED(hr))
+		{
+			cerr << "Module test FAILED! Either the dll has not been registered with regsvr32 or " << endl;
+			cerr << "module testing is not available in the registered dll." << endl;
+		}
+		else
+		{
+			/* Check arguments to see if help was requested */
+
+			if ( argc > 1 &&
+				(0 == strncmp(argv[1],"-h",2) ||
+				 0 == strncmp(argv[1],"-H",2) )	)
+			{
+				cout<< "\nCOMMODAAF***********************\n"; 
+				cout<< "No arguments --> To run all tests\n";
+				cout<< "Otherwise any AAF object class name can be typed\n";
+				cout<< "and that objects test method will be executed.\n";
+				cout<< "ex AAFSegment AAFTransition etc\n"<< endl;
+
+				return(0);
+			}
+
+			/* Print Header */
+			cout<< "\n\n"<< endl;
+			cout<< "***************************\n";
+			cout<< "*       COMMODAAF         *\n";
+			cout<< "*   AAF COM Module Test   *\n";
+			cout<< "***************************\n"<< endl;	
 
 
-    for (startArg = 1; (startArg < argc) && ('-' == argv[startArg][0]); startArg++)
-    {
-      /* List the AAF class names, one per line, in the order that the tests will be run. */
-      /* This can be used for more selective automated testing... */
-      if (0 == strcmp(argv[startArg],"-l") || 0 == strcmp(argv[startArg],"--list"))
-      {
-        AAFModuleTest.List();
-        return(0);
-      }
-      else if (0 == strcmp(argv[startArg],"-r") || 0 == strcmp(argv[startArg],"--readonly"))
-      {
-        testMode = kAAFUnitTestReadOnly;
-       }
-      else if (0 == strcmp(argv[startArg],"-s") || 0 == strcmp(argv[startArg],"--skip"))
-      {
-        skipTests = true;
-      }
-      /* Check arguments to see if help was requested */
-      else
-      {
-        cout<< "\nCOMMODAAF [-l] [-r] [-s] [test1 test2 etc] ***********************\n"; 
-        cout<< " No arguments --> To run all tests\n";
-        cout<< " Otherwise any AAF object class name can be typed\n";
-        cout<< " and that objects test method will be executed.\n";
-        cout<< "ex AAFSegment AAFTransition etc\n\n";
-        cout<< " -l : print list of all tests to stdout\n";
-        cout<< " -r : run read/only tests for regression and cross-platform testing.\n";
-        cout<< " -s : Use with -r to skip tests that were not supported in earlier releases.\n";
-        cout<< endl;        
+			/* Get and print start time */
+			time_t s_time;
+			time(&s_time);
+			cout<< ctime(&s_time)<< endl<< endl;
 
-        return(0);
-      }
-    }
+			if (1 >= argc)
+				// Call all Module tests...
+				hr = pAAFModuleTest->Test(NULL);
+			else
+			{
+				// Call only the modules that are named in the command line.
+				int module;
+
+				for (module = 1; module < argc; module++)
+					hr = pAAFModuleTest->Test(reinterpret_cast<unsigned char *>(argv[module]));
+			}
+			
+			/* Get and Print finish time	*/
+			time_t e_time;
+			time(&e_time);
+			cout<< endl<< ctime(&e_time)<< endl;
+
+			/* Determine and print elapsed time */
+			double elapsed_time = difftime( e_time, s_time );
+			cout<< "COMMODAAF completed in ";
+			cout<< ((long)elapsed_time/3600) <<":"; /* hours */
+			cout<< (((long)elapsed_time%3600)/60) <<":"; /* minutes */
+			cout<< (((long)elapsed_time%3600)%60) <<"\n" <<endl; /* seconds */
 
 
-    // Make sure the dll can be loaded and initialized.
-    CAAFInitialize aafInit;
+		}
+		result = (int)hr;
+	}
+	catch (...)
+	{
+		result = FAILURE;
+	}
+	
+	if (pAAFModuleTest)
+	{
+		pAAFModuleTest->Release();
+		pAAFModuleTest = NULL;
+	}
 
-    // Make sure the shared plugins can be loaded and registered.
-     CAAFInitializePlugins aafInitPlugins;
-
-    if (startArg >= argc)
-    {    
-      // Call all Module tests...
-      hr = AAFModuleTest.Test(testMode);
-    }
-    else
-    {
-      // Call only the modules that are named in the command line.
-      hr = AAFModuleTest.Test(testMode, skipTests, argc - startArg, const_cast<const char **>(&argv[startArg]));
-    }
-
-    result = (int)hr;
-  }
-  catch (HRESULT& rhr)
-  {
-    result = rhr;
-  }
-  catch (...)
-  {
-    result = FAILURE;
-  }
-  
-
-  return result;
+	return result;
 }
 
 
