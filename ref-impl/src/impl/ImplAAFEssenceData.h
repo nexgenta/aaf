@@ -5,6 +5,7 @@
 
 #include "OMStorable.h"
 #include "OMProperty.h"
+#include "OMDataStreamProperty.h"
 
 /******************************************\
 *                                          *
@@ -22,6 +23,7 @@ class ImplAAFSourceMob;
 #include "ImplAAFObject.h"
 #endif
 
+#include "AAFPropertyIDs.h"
 
 class ImplAAFEssenceData : public ImplAAFObject
 {
@@ -46,14 +48,11 @@ public:
         (// @parm [in] write this many bytes
 		 aafUInt32  bytes,
 
-		 // @parm [in] from a buffer of this size
-		 aafUInt32  buflen,
-
 		 // @parm [out, size_is(buflen), length_is(*bytesRead)] here is the buffer
          aafDataBuffer_t  buffer,
 
 		 // @parm [out,ref] 
-		 aafUInt32 *  bytesRead);
+		 aafUInt32 *  bytesWritten);
 
 /****/
   //****************
@@ -64,9 +63,6 @@ public:
         (// @parm [in] read this many bytes
 		 aafUInt32  bytes,
 
-		 // @parm [in] to a buffer of this size
-		 aafUInt32  buflen,
-
 		 // @parm [out, size_is(buflen), length_is(*bytesRead)] here is the buffer
          aafDataBuffer_t  buffer,
 
@@ -75,12 +71,21 @@ public:
 
 /****/
   //****************
-  // Seek()
+  // SetPosition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Seek
+    SetPosition
 		// @parm [in] offset from beginning of essence
         (aafPosition_t  offset);
+
+/****/
+  //****************
+  // SetPosition()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetPosition
+		// @parm [in] offset from beginning of essence
+        (aafPosition_t  *pOffset);
 
 /****/
   //****************
@@ -135,7 +140,7 @@ public:
 
 private:
   OMFixedSizeProperty<aafUID_t> _fileMobID;
-//??  OMMediaProperty _mediaData;
+  OMDataStreamProperty _mediaData;
 };
 
 #endif // ! __ImplAAFEssenceData_h__
