@@ -1,41 +1,33 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFSequence
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+// @com This file implements the module test for CAAFDefinitionObject
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
-#include "AAF.h"
+
+
+
+
+
+
+
+#include "CAAFSequence.h"
+#include "CAAFSequence.h"
+#ifndef __CAAFSequence_h__
+#error - improperly defined include guard
+#endif
 
 #include <iostream.h>
 #include <stdio.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
 #define kNumComponents	5
@@ -71,6 +63,7 @@ inline void checkExpression(bool expression, HRESULT r)
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
+						   // IAAFSession**		ppSession,
 						   IAAFFile**			ppFile,
 						   IAAFHeader**			ppHeader)
 {
@@ -85,18 +78,41 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
+	/*
+	hr = CoCreateInstance(CLSID_AAFSession,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSession, 
+						   (void **)ppSession);
+	*/
+	hr = CoCreateInstance(CLSID_AAFFile,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFFile, 
+						   (void **)ppFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+    hr = (*ppFile)->Initialize();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	// hr = (*ppSession)->SetDefaultIdentification(&ProductInfo);
+	// if (AAFRESULT_SUCCESS != hr)
+	// 	return hr;
 
 	switch (mode)
 	{
 	case kMediaOpenReadOnly:
-		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
+		// hr = (*ppSession)->OpenReadFile(pFileName, ppFile);
+		hr = (*ppFile)->OpenExistingRead(pFileName, 0);
 		break;
 
 	case kMediaOpenAppend:
-		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
+		// hr = (*ppSession)->CreateFile(pFileName, kAAFRev1, ppFile);
+		hr = (*ppFile)->OpenNewModify(pFileName, 0, &ProductInfo);
 		break;
 
 	default:
@@ -106,17 +122,18 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		// (*ppSession)->Release();
+		// *ppSession = NULL;
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
   	hr = (*ppFile)->GetHeader(ppHeader);
 	if (FAILED(hr))
 	{
+		// (*ppSession)->Release();
+		// *ppSession = NULL;
 		(*ppFile)->Release();
 		*ppFile = NULL;
 		return hr;
@@ -165,7 +182,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  	  checkResult(pDictionary->CreateInstance(&AUID_AAFSequence,
 						     IID_IAAFSequence, 
 						     (IUnknown **)&pSequence));		
-	  checkResult(pSequence->Initialize((aafUID_t*)&DDEF_Sound));
+	  checkResult(pSequence->Initialize((aafUID_t*)&DDEF_Audio));
 
 	  //
 	  //	Add some segments.  Need to test failure conditions
@@ -180,7 +197,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 								  IID_IAAFComponent, 
 								  (IUnknown **)&pComponent));
 
-		  checkResult(pComponent->SetDataDef((aafUID_t*)&DDEF_Sound));
+		  checkResult(pComponent->SetDataDef((aafUID_t*)&DDEF_Audio));
 		  checkResult(pComponent->SetLength(&len));
 		  checkResult(pSequence->AppendComponent(pComponent));
 
@@ -232,7 +249,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	if (pFile)
 	{
-		pFile->Save();
 		pFile->Close();
 		pFile->Release();
 	}
@@ -254,7 +270,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFComponents*	pCompIter = NULL;
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
-	HRESULT			hr = S_OK;
+	HRESULT			hr;
 
 
   try
@@ -299,7 +315,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 					numCpnts++;
 
 					checkResult(pComp->GetDataDef(&dataDef));
-					checkExpression(memcmp(&DDEF_Sound, &dataDef, sizeof(aafUID_t)) == 0,
+					checkExpression(memcmp(&DDEF_Audio, &dataDef, sizeof(aafUID_t)) == 0,
 					                AAFRESULT_TEST_FAILED);
 
 					checkResult(pComp->GetLength(&len));
@@ -376,7 +392,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	return 	hr;
 }
 
-extern "C" HRESULT CAAFSequence_test()
+HRESULT CAAFSequence::test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFSequenceTest.aaf";
@@ -389,7 +405,7 @@ extern "C" HRESULT CAAFSequence_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFSequence_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFSequence::test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
@@ -397,7 +413,7 @@ extern "C" HRESULT CAAFSequence_test()
 	if (SUCCEEDED(hr))
 	{
 		cout << "The following AAFSequence methods have not been implemented:" << endl; 
-//		cout << "     RemoveComponent" << endl; 
+		cout << "     RemoveComponent" << endl; 
 		cout << "     SegmentOffsetToTC - needs unit test" << endl; 
 		cout << "     SegmentTCToOffset - needs unit test" << endl; 
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
