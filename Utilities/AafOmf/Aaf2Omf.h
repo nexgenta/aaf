@@ -40,48 +40,50 @@
 class Aaf2Omf
 {
 public:
-	Aaf2Omf();
-	~Aaf2Omf();
+	Aaf2Omf( AAFDomainUtils *aafDomainUtils, OMFDomainUtils *omfDomainUtils, EffectTranslate *effectTranslate );
+	virtual ~Aaf2Omf();
 
 public:
-	HRESULT OpenInputFile( void );
+	void OpenInputFile( void );
 		
-	HRESULT ConvertFile( void );
+	void ConvertFile( void );
 
 protected:
-	void ConvertMobIDtoUID(aafMobID_constptr pMobID, OMF2::omfUID_t* pOMFMobID);
-	HRESULT OpenOutputFile( void );
+	void ConvertMobIDtoUID(aafMobID_constptr pMobID, omfUID_t* pOMFMobID);
+	void OpenOutputFile( void );
 	void CloseInputFile( void );
 	void CloseOutputFile(void );
-	HRESULT AAFFileRead( void );
-	virtual HRESULT ConvertCompositionMob(IAAFCompositionMob* pCompMob, OMF2::omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
-	HRESULT ConvertMasterMob(IAAFMasterMob* pMasterMob, OMF2::omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
-	HRESULT ConvertSourceMob(IAAFSourceMob* pSourceMob, OMF2::omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
-	HRESULT TraverseMob(IAAFMob* pMob, OMF2::omfMobObj_t* pOMFMob);
-	HRESULT ProcessComponent(IAAFComponent* pComponent, OMF2::omfObject_t* pOMFSegment);
-	HRESULT ConvertAAFDatadef(aafUID_t Datadef, OMF2::omfDDefObj_t* pDatakind);
-	virtual HRESULT ConvertAAFTypeIDDatakind(aafUID_t, OMF2::omfDDefObj_t* pDatakind);
-	HRESULT TraverseSequence(IAAFSequence* pSequence, OMF2::omfObject_t* pOMFSequence );
-	HRESULT ConvertSelector(IAAFSelector* pSelector, OMF2::omfObject_t* pOMFSelector );
-	HRESULT ConvertLocator(IAAFEssenceDescriptor* pEssenceDesc, OMF2::omfMobObj_t*	pOMFSourceMob );
-	HRESULT ConvertEssenceDataObject(IAAFEssenceData* pEssenceData);
-	virtual HRESULT ConvertEffects(IAAFOperationGroup* pEffect, OMF2::omfEffObj_t*	pOMFEffect);
-	virtual HRESULT ConvertParameter(IAAFParameter* pParm,
+	void AAFFileRead( void );
+	virtual void ConvertCompositionMob(IAAFCompositionMob* pCompMob, omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
+	void ConvertMasterMob(IAAFMasterMob* pMasterMob, omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
+	void ConvertSourceMob(IAAFSourceMob* pSourceMob, omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
+	void TraverseMob(IAAFMob* pMob, omfMobObj_t* pOMFMob);
+	void ProcessComponent(IAAFComponent* pComponent, omfObject_t* pOMFSegment);
+	void ConvertAAFDatadef(aafUID_t Datadef, omfDDefObj_t* pDatakind);
+	virtual void ConvertAAFTypeIDDatakind(aafUID_t, omfDDefObj_t* pDatakind);
+	void TraverseSequence(IAAFSequence* pSequence, omfObject_t* pOMFSequence );
+	void ConvertSelector(IAAFSelector* pSelector, omfObject_t* pOMFSelector );
+	void ConvertEssenceGroup(IAAFEssenceGroup* pGroup, omfObject_t* pOMFMediaGroup );
+	void ConvertLocator(IAAFEssenceDescriptor* pEssenceDesc, omfMobObj_t*	pOMFSourceMob );
+	void ConvertEssenceDataObject(IAAFEssenceData* pEssenceData);
+	virtual void ConvertEffects(IAAFOperationGroup* pEffect, omfEffObj_t nest, omfEffObj_t*	pOMFEffect);
+	virtual void ConvertParameter(IAAFParameter* pParm,
 		aafUID_t			&effectDefID,
-		OMF2::omfSegObj_t pOMFEffect,
-		OMF2::omfInt32 slotNum, OMF2::omfLength_t effectLen);
-	virtual void	FinishUpMob(IAAFMob* pMob, OMF2::omfMobObj_t pOMFMob) {};
-	OMF2::omfObject_t LocateSlot(OMF2::omfEffObj_t pOMFEffect, aafInt32 slotID);
+		omfSegObj_t pOMFEffect,
+		omfInt32 slotNum, omfLength_t effectLen);
+	virtual void	FinishUpMob(IAAFMob* /*pMob*/, omfMobObj_t /*pOMFMob*/) {};
+	omfObject_t LocateSlot(omfEffObj_t pOMFEffect, aafInt32 slotID);
 	virtual void ConvertValueBuf(aafUID_t &typeDefID,
 								aafDataBuffer_t srcValue, aafUInt32 srcValueLen,
 								aafDataBuffer_t *destValue, aafUInt32 *destValueLen,
 								bool *didAllocateNew);
-	virtual HRESULT ConvertObjectProps(IAAFObject* pObj, OMF2::omfObject_t pOMFObject);
+	virtual void ConvertObjectProps(IAAFObject* pObj, omfObject_t pOMFObject);
+	virtual void ConvertNestedScope(IAAFNestedScope* pNest, omfObject_t* pOMFNest );
 protected:
 
-    OMF2::omfSessionHdl_t	OMFSession;
-	OMF2::omfHdl_t			OMFFileHdl;
-	OMF2::omfFileRev_t		OMFFileRev;
+    omfSessionHdl_t	OMFSession;
+	omfHdl_t			OMFFileHdl;
+	omfFileRev_t		OMFFileRev;
 	IAAFFile*				pFile;
 	IAAFHeader*				pHeader;
 	IAAFDictionary*			pDictionary;
