@@ -98,15 +98,14 @@ public:
 public:
   // Declare this class to be storable.
   //
-  OMDECLARE_STORABLE(ImplEnumAAFMobSlots);
+  OMDECLARE_STORABLE(ImplEnumAAFMobSlots)
 
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplEnumAAFMobSlotsTest.cpp.
   static AAFRESULT test();
 
 //Internal
-AAFRESULT
-    ImplEnumAAFMobSlots::SetEnumMob(ImplAAFMob *aMob);
+AAFRESULT SetEnumMob(ImplAAFMob *aMob);
 
 private:
 	aafInt32		_current;
