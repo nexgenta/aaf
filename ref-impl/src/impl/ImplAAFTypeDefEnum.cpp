@@ -57,7 +57,7 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 ImplAAFTypeDefEnum::ImplAAFTypeDefEnum ()
   : _ElementType   ( PID_TypeDefinitionEnumeration_ElementType,
                      L"ElementType",
-                     L"/Dictionary/TypeDefinitions",
+                     L"/MetaDictionary/TypeDefinitions",
                      PID_MetaDefinition_Identification),
 	_ElementNames  ( PID_TypeDefinitionEnumeration_ElementNames,  L"ElementNames"),
 	_ElementValues ( PID_TypeDefinitionEnumeration_ElementValues, L"ElementValues"),
@@ -861,3 +861,25 @@ bool ImplAAFTypeDefEnum::IsVariableArrayable () const
 
 bool ImplAAFTypeDefEnum::IsStringable () const
 { return true; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefEnum::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefEnum));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefEnum::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefEnum::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
