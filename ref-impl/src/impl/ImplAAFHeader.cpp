@@ -212,6 +212,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+// Implementer note:
+// based on omfmIsMediaDataPresent
+//
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::IsMediaDataPresent (aafUID_t *pFileMobID,
                            aafFileFormat_t fmt,
@@ -644,4 +647,16 @@ ImplAAFDictionary *ImplAAFHeader::GetDictionary()
 extern "C" const aafClassID_t CLSID_AAFHeader;
 
 OMDEFINE_STORABLE(ImplAAFHeader, CLSID_AAFHeader);
+
+// Cheat!  We're using this object's CLSID instead of object class...
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFHeader::GetObjectClass(aafUID_t * pClass)
+{
+  if (! pClass)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  memcpy (pClass, &CLSID_AAFHeader, sizeof (aafClassID_t));
+  return AAFRESULT_SUCCESS;
+}
 
