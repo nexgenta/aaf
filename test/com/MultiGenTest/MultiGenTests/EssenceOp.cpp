@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EssenceOp.cpp,v 1.4 2004/10/22 16:03:21 phil_tudor Exp $ $Name:  $
+// $Id: EssenceOp.cpp,v 1.5 2004/10/28 17:23:22 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,7 +70,7 @@ void write_video_samples( IAAFSmartPointer<IAAFEssenceAccess> access,
   
   while (numSamplesStillToWrite > 0) {
     
-    const int numBytesPerSample = 2 * rect.xSize * rect.ySize;
+    const aafUInt32 numBytesPerSample = 2 * rect.xSize * rect.ySize;
     auto_ptr<aafUInt8> pixels( new aafUInt8 [numBytesPerSample] );
     
     // TODO - Write some unique data into the buffer that can be
@@ -105,18 +105,18 @@ void write_audio_samples( IAAFSmartPointer<IAAFEssenceAccess> access,
   
   CHECK_HRESULT( access->PutFileFormat( format ) );
   
-  int numSamplesStillToWrite = numSamples;
+  aafUInt32 numSamplesStillToWrite = numSamples;
 
   while (numSamplesStillToWrite > 0) {
 
-    int numSamplesThisTime = 1000;
+    aafUInt32 numSamplesThisTime = 1000;
 
     if ( numSamplesThisTime > numSamplesStillToWrite ) {
       numSamplesThisTime = numSamplesStillToWrite;
     }
 
-    const int numBytesPerSample = (MULTI_GEN_AUDIO_SAMPLE_BPP+7)/8;
-    const int numBytesThisTime = numSamplesThisTime * numBytesPerSample;
+    const aafUInt32 numBytesPerSample = (MULTI_GEN_AUDIO_SAMPLE_BPP+7)/8;
+    const aafUInt32 numBytesThisTime = numSamplesThisTime * numBytesPerSample;
     auto_ptr<aafUInt8> pixels( new aafUInt8 [numBytesThisTime] );
     
     // TODO - Write some unique data into the buffer that can be

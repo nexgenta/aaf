@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.22 2004/10/22 14:22:44 phil_tudor Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.23 2004/10/28 17:23:21 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,17 +44,6 @@ using namespace std;
 #include "AAFFileKinds.h"
 
 #include "CAAFBuiltinDefs.h"
-
-static void CoutTestFile(const aafWChar* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1) {
-    cout << endl << cFileName << endl;
-  }
-}
 
 static void RemoveTestFile(const aafWChar* pFileName)
 {

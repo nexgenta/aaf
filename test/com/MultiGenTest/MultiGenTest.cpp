@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MultiGenTest.cpp,v 1.11 2004/10/22 16:00:02 phil_tudor Exp $ $Name:  $
+// $Id: MultiGenTest.cpp,v 1.12 2004/10/28 17:23:22 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -226,7 +226,7 @@ void Usage( const char* argv0 )
   MultiGenTestFactory* factory;
   MultiGenTestRegistry& registry = MultiGenTestRegistry::GetInstance();
   registry.ResetIter();
-  while ( factory = registry.Next() ) {
+  while ( (factory = registry.Next()) ) {
     cout << "Name:\t" << factory->GetName()  << endl;
     cout << "Desc:\t" << factory->GetDesc()  << endl;
     cout << "Usage:\t" << factory->GetUsage() << endl;
@@ -241,8 +241,8 @@ class CmdFunc {
 public:
   CmdFunc( int minArgs )
     : _minArgs( minArgs ),
-      _subArgV(0),
-      _subArgC(-1)
+      _subArgC(-1),
+      _subArgV(0)
   {}
   virtual void operator()( CmdState& state ) {}
   int GetMinArgs()               { return _minArgs; }
@@ -381,8 +381,6 @@ int main( int argc, char **argv )
       Usage( argv[0] );
       throw -1;
     }
-
-    MultiGenTestRegistry& registry = MultiGenTestRegistry::GetInstance();
 
     ProcessCommandLineArgs( argc, argv );
   }
