@@ -61,6 +61,7 @@ class ImplEnumAAFSegments;
 #include "ImplAAFSegment.h"
 #endif
 
+#include "OMStrongRefVectorProperty.h"
 
 class ImplAAFNestedScope : public ImplAAFSegment
 {
@@ -86,25 +87,62 @@ public:
         (ImplAAFSegment * pSegment);
 
   //****************
-  // RemoveSegment()
+  // PrependSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveSegment
+    PrependSegment
         // @parm [in] Pointer to segment to be added
         (ImplAAFSegment * pSegment);
 
   //****************
-  // GetSlots()
+  // InsertSegmentAt()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetSlots
+    InsertSegmentAt
+        // @parm [in] index where segment is to be inserted
+        (aafUInt32 index,
+        // @parm [in] Pointer to segment to be added
+		 ImplAAFSegment * pSegment);
+
+  //****************
+  // CountSegments()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountSegments
+        // @parm [out\, retval] number of segments
+        (aafUInt32 * pResult);
+
+  //****************
+  // RemoveSegment()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveSegmentAt
+        // @parm [in] index of segment to be removed
+        (aafUInt32 index);
+
+  //****************
+  // GetSegmentAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetSegmentAt
+        // @parm [in] index of segment to retrieve
+        (aafUInt32 index,
+        // @parm [out, retval] retrieved segment
+		 ImplAAFSegment ** ppSegment);
+
+  //****************
+  // GetSegments()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetSegments
         // @parm [retval][out] Slots - segment list  enumeration
         (ImplEnumAAFSegments ** ppEnum);
 
 public:
 	// SDK-internal
 
-	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
+	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
+												aafMobID_constref to);
 
 
 private:
