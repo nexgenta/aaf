@@ -3,7 +3,6 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \************************************************/
 
@@ -38,7 +37,10 @@
 extern "C" const aafClassID_t CLSID_EnumAAFPluginLocators;
 
 
-ImplAAFPluginDescriptor::ImplAAFPluginDescriptor ():
+ImplAAFPluginDescriptor::ImplAAFPluginDescriptor ()
+: _name           (		PID_PluginDescriptor_Name,				"Name"),
+  _description    (		PID_PluginDescriptor_Description,		"Description"),
+  _identification (		PID_PluginDescriptor_Identification,	"Identification"),
  _categoryClass(		PID_PluginDescriptor_CategoryClass,		"CategoryClass"),
  _pluginVersion(        PID_PluginDescriptor_VersionNumber,     "VersionNumber"),
  _pluginVersionString(	PID_PluginDescriptor_VersionString,		"VersionString"),
@@ -59,6 +61,9 @@ ImplAAFPluginDescriptor::ImplAAFPluginDescriptor ():
  _locators(				PID_PluginDescriptor_Locators,			"Locators"),
  _authentication(		PID_PluginDescriptor_Authentication,	"Authentication")
 {
+  _persistentProperties.put(_name.address());
+  _persistentProperties.put(_description.address());
+  _persistentProperties.put(_identification.address());
   _persistentProperties.put(_categoryClass.address());
   _persistentProperties.put(_pluginVersion.address());
   _persistentProperties.put(_pluginVersionString.address());
@@ -87,7 +92,8 @@ ImplAAFPluginDescriptor::~ImplAAFPluginDescriptor ()
 	ImplAAFNetworkLocator *pNetLocator = _manufacturerURL.setValue(0);
 	if (pNetLocator)
 	{
-		pNetLocator->ReleaseReference();
+	  pNetLocator->ReleaseReference();
+	  pNetLocator = 0;
 	}
 
 	// Release all of the other locator pointers.
@@ -97,11 +103,164 @@ ImplAAFPluginDescriptor::~ImplAAFPluginDescriptor ()
 		ImplAAFLocator *pLocator = _locators.setValueAt(0, i);
 		if (pLocator)
 		{
-			pLocator->ReleaseReference();
+		  pLocator->ReleaseReference();
+		  pLocator = 0;
 		}
 	}
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::Init (
+      aafUID_t *pAuid, aafWChar *pName, aafWChar *pDesc)
+{
+	if (pAuid == NULL || pName == NULL || pDesc == NULL)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+		_identification = *pAuid;
+		_name = pName;
+		_description = pDesc;
+	}
+	return AAFRESULT_SUCCESS;
+}
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::SetName (
+      wchar_t *  pName)
+{
+	if (! pName)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	
+	_name = pName;
+	
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::GetName (
+      wchar_t *  pName,
+      aafUInt32  bufSize)
+{
+	bool stat;
+	if (! pName)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	stat = _name.copyToBuffer(pName, bufSize);
+	if (! stat)
+	{
+		return AAFRESULT_SMALLBUF;
+	}
+	
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::GetNameBufLen (
+      aafUInt32 *  pBufSize)  //@parm [in,out] Definition Name length
+{
+  if (! pBufSize)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  *pBufSize = _name.size();
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::SetDescription (
+      wchar_t * pDescription)
+{
+	if (! pDescription)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	
+	_description = pDescription;
+	
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::GetDescription (
+      wchar_t * pDescription,
+      aafUInt32 bufSize)
+{
+	if (! pDescription)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	
+	if (!_description.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
+	bool stat;
+	
+	stat = _description.copyToBuffer(pDescription, bufSize);
+	if (! stat)
+	{
+		return AAFRESULT_SMALLBUF;
+	}
+	
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::GetDescriptionBufLen (
+      aafUInt32 * pBufSize)  //@parm [in,out] Definition Name length
+{
+	if (! pBufSize)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+
+	if (!_description.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+		
+	*pBufSize = _description.size();
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::GetAUID (
+      aafUID_t *pAuid) const
+{
+  if (pAuid == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  else
+	{
+	  *pAuid = _identification;
+	}
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::SetAUID (
+      aafUID_t *pAuid)
+{
+  if (pAuid == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  else
+	{
+	  _identification = *pAuid;
+	}
+  return AAFRESULT_SUCCESS;
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::GetCategoryClass (
@@ -177,6 +336,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pVersionString == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if (!_pluginVersionString.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
 	stat = _pluginVersionString.copyToBuffer(pVersionString, bufSize);
 	if (! stat)
 	{
@@ -194,6 +356,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if (!_pluginVersionString.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
 	*pLen = _pluginVersionString.size();
 	return(AAFRESULT_SUCCESS); 
 }
@@ -217,18 +383,21 @@ AAFRESULT STDMETHODCALLTYPE
       wchar_t *  pManufacturerName,
       aafInt32  bufSize)
 {
-	bool stat;
-
 	if(pManufacturerName == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if (!_pluginManufacturerName.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+	bool stat;
+		
 	stat = _pluginManufacturerName.copyToBuffer(pManufacturerName, bufSize);
 	if (! stat)
 	{
-	  return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
+		return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
 	}
-
-	return(AAFRESULT_SUCCESS); 
+	
+	return AAFRESULT_SUCCESS; 
 }
 
 
@@ -238,9 +407,13 @@ AAFRESULT STDMETHODCALLTYPE
       aafInt32 * pLen)
 {
 	if(pLen == NULL)
-		return(AAFRESULT_NULL_PARAM);
+		return AAFRESULT_NULL_PARAM;
+
+	if(!_pluginManufacturerName.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
 	*pLen = _pluginManufacturerName.size();
-	return(AAFRESULT_SUCCESS); 
+	return AAFRESULT_SUCCESS; 
 }
 
 
@@ -263,11 +436,13 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (ppResult == NULL)
 		return AAFRESULT_NULL_PARAM;
-
+	
+	if (!_manufacturerURL.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
+	
 	*ppResult = _manufacturerURL;
-	// !!!Handle case where manufacturer info may not
-	// exist, return  AAFRESULT_NO_ESSENCE_DESC.
-
 	if (*ppResult)
 		(*ppResult)->AcquireReference();
 
@@ -282,9 +457,13 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pManufacturerInfo == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	ImplAAFNetworkLocator *pOldLoc = _manufacturerURL;
-	if (pOldLoc)
-		pOldLoc->ReleaseReference();
+	if (_manufacturerURL.isPresent ())
+	  {
+		ImplAAFNetworkLocator *pOldLoc = _manufacturerURL;
+		if (pOldLoc)
+		  pOldLoc->ReleaseReference();
+		pOldLoc = 0;
+	  }
 
 	_manufacturerURL = pManufacturerInfo;
 	
@@ -302,6 +481,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pManufacturerID == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
+	}
+	else if (!_pluginManufacturerID.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
 	else
 	{
@@ -337,6 +520,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
+	else if (!_platform.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		*pHardwarePlatform = _platform;
@@ -364,6 +551,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pMinVersion == NULL || pMaxVersion == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
+	}
+	else if (!_minPlatformVersion.isPresent() || !_maxPlatformVersion.isPresent() )
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
 	else
 	{
@@ -415,6 +606,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
+	else if (!_engine.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		*pEngine = _engine;
@@ -443,6 +638,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pMinVersion == NULL || pMaxVersion == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
+	}
+	else if (!_minEngineVersion.isPresent() || !_maxEngineVersion.isPresent() )
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
 	else
 	{
@@ -497,6 +696,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
+	else if (!_pluginAPI.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		*pPluginAPI = _pluginAPI;
@@ -525,6 +728,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pMinVersion == NULL || pMaxVersion == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
+	}
+	else if (!_minPluginAPIVersion.isPresent() || !_maxPluginAPIVersion.isPresent() )
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
 	else
 	{
@@ -576,6 +783,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
+	else if (!_softwareOnly.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		*pIsSoftwareOnly = _softwareOnly;
@@ -606,6 +817,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
+	else if (!_accelerator.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		*pIsAccelerated = _accelerator;
@@ -613,7 +828,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 	return AAFRESULT_SUCCESS;
 }
-
 
 
 
@@ -634,6 +848,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pSupportsAuthentication == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
+	}
+	else if (!_authentication.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
 	else
 	{
@@ -658,7 +876,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::GetPluggableCode (
       ImplAAFPluggableCode ** /*pCode*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -724,24 +942,28 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::IsPluginLocal (
       aafBool *  /*pIsLocal*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::GetPluginDescriptorID (
-      aafUID_t *  /*pDescriptorID*/)
+      aafUID_t *pDescriptorID)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if(pDescriptorID == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	*pDescriptorID = _identification;
+	return AAFRESULT_SUCCESS;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPluginDescriptorID (
-      aafUID_t  /*descriptorID*/)
+      aafUID_t  descriptorID)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	_identification = descriptorID;
+	return AAFRESULT_SUCCESS;
 }
 
   
@@ -761,7 +983,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if (theEnum)
-			theEnum->ReleaseReference();
+		  theEnum->ReleaseReference();
+		theEnum = 0;
 		return(XCODE());
 	}
 	XEND;

@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -14,7 +13,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -73,7 +71,8 @@ ImplAAFNestedScope::~ImplAAFNestedScope ()
 
 		if (pSegment)
 		{
-			pSegment->ReleaseReference();
+		  pSegment->ReleaseReference();
+		  pSegment = 0;
 		}
 	}
 
@@ -97,7 +96,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFNestedScope::RemoveSegment (
       ImplAAFSegment * /*pSegment*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -107,12 +106,12 @@ AAFRESULT STDMETHODCALLTYPE
 	if(ppEnum == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-//	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
-//	if(*ppEnum == NULL)
-//		return(AAFRESULT_NOMEMORY);
-//	(*ppEnum)->SetEnumProperty(this, &_slots);
+	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumStrongProperty(this, &_slots);
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	return(AAFRESULT_SUCCESS);
 }
 
 AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
@@ -134,7 +133,8 @@ AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafUID_t *from, aafUID_t
 	XEXCEPT
 	{
 		if(comp != NULL)
-			comp->ReleaseReference();
+		  comp->ReleaseReference();
+		comp = 0;
 	}
 	XEND;
 

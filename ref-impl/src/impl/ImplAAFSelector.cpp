@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -29,6 +28,7 @@
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
+#include "ImplAAFMob.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
@@ -46,7 +46,8 @@ ImplAAFSelector::~ImplAAFSelector ()
 	ImplAAFSegment *selected = _selected.setValue(0);
 	if (selected != NULL)
 	{
-		selected->ReleaseReference();
+	  selected->ReleaseReference();
+	  selected = 0;
 	}
 
 	size_t size = _alternates.getSize();
@@ -55,7 +56,8 @@ ImplAAFSelector::~ImplAAFSelector ()
 		ImplAAFSegment* pSegment = _alternates.setValueAt(0, i);
 		if (pSegment)
 		{
-			pSegment->ReleaseReference();
+		  pSegment->ReleaseReference();
+		  pSegment = 0;
 		}
 	}
 }
@@ -101,7 +103,8 @@ AAFRESULT STDMETHODCALLTYPE
 		pPrevSelected = _selected;
 		if (pPrevSelected)
 		{
-			pPrevSelected->ReleaseReference();
+		  pPrevSelected->ReleaseReference();
+		  pPrevSelected = 0;
 		}
 		_selected = pSelSegment;
 		_selected->AcquireReference();
@@ -208,37 +211,15 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::EnumAlternateSegments (ImplEnumAAFSegments** ppEnum)
 {
-	ImplEnumAAFSegments*	theEnum = NULL;
-	HRESULT					hr = AAFRESULT_SUCCESS;
+	if(ppEnum == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-	if (ppEnum == NULL)
-	{
-		hr = AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		theEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
-		if (theEnum == NULL)
-		{
-			hr = E_FAIL;
-		}
-		else
-		{
-			hr = theEnum->SetEnumSelector(this);
-			if (SUCCEEDED(hr))
-			{
-				theEnum->Reset();
-				*ppEnum = theEnum;
-			}
-			else
-			{
-				theEnum->ReleaseReference();
-				*ppEnum = NULL;
-			}
-		}
-	}
+	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumStrongProperty(this, &_alternates);
 
-	return hr;
+	return(AAFRESULT_SUCCESS);
 }
 
 //***********************************************************
@@ -276,6 +257,62 @@ AAFRESULT
 }
 
 
+
+AAFRESULT
+	ImplAAFSelector::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
+										ImplAAFMob *mob, ImplAAFMobSlot *track,
+										aafMediaCriteria_t *mediaCrit,
+										aafPosition_t currentObjPos,
+										aafOperationChoice_t *effectChoice,
+										ImplAAFComponent	*prevObject,
+										ImplAAFComponent *nextObject,
+										ImplAAFScopeStack *scopeStack,
+										aafPosition_t *diffPos, aafLength_t *minLength,
+										ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
+										ImplAAFComponent **foundObj, aafBool *foundTransition)
+{  
+	ImplAAFSegment		*selected = NULL;
+	ImplAAFComponent	*tmpFound = NULL;
+	aafLength_t	tmpMinLen;
+	
+	XPROTECT()
+	{
+	*foundObj = NULL;
+	
+	  CHECK(GetSelectedSegment(&selected));
+	  if (selected)
+		{
+		  CHECK(mob->MobFindLeaf(track, mediaCrit, effectChoice,
+							selected, rootPos, rootLen,
+							prevObject, nextObject, 
+							scopeStack, 
+							currentObjPos, &tmpFound, &tmpMinLen, foundTransition,
+							effeObject, nestDepth, diffPos));
+		  if (tmpFound)
+			{
+			  *foundObj = tmpFound;
+			  if (Int64Less(tmpMinLen, rootLen))
+				*minLength = tmpMinLen;
+			  else
+				*minLength = rootLen;
+			}
+		  else
+			{
+			  RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+			}
+		}
+	  else
+		{
+		  RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+		}
+	} /* XPROTECT */
+  XEXCEPT
+	{
+	}
+  XEND;
+
+  return(AAFRESULT_SUCCESS);
+}
 
 OMDEFINE_STORABLE(ImplAAFSelector, AUID_AAFSelector);
 
