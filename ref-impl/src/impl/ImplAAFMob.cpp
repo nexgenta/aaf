@@ -10,7 +10,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -56,6 +56,14 @@
 #include "ImplEnumAAFTaggedValues.h"
 #endif
 
+#ifndef __ImplAAFKLVData_h__
+#include "ImplAAFKLVData.h"
+#endif
+
+#ifndef __ImplEnumAAFKLVData_h__
+#include "ImplEnumAAFKLVData.h"
+#endif
+
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -78,28 +86,31 @@
 #include "ImplEnumAAFMobSlots.h"
 #include "ImplEnumAAFComponents.h"
 
-#if defined(_MAC) || defined(macintosh)
-#include <wstring.h>
-#endif
-
 #include <assert.h>
+#include <wchar.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
-#include "AAFDefUIDs.h"
+
+#include "ImplAAFBuiltinDefs.h"
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
+
 
 extern "C" const aafClassID_t CLSID_EnumAAFMobSlots;
 extern "C" const aafClassID_t CLSID_EnumAAFTaggedValues;
 extern "C" const aafClassID_t CLSID_AAFFindSourceInfo;
 extern "C" const aafClassID_t CLSID_AAFTypeDefString;
+extern "C" const aafClassID_t CLSID_EnumAAFKLVData;
 
 ImplAAFMob::ImplAAFMob ()
-: _mobID(			PID_Mob_MobID,			"MobID"),
-  _name(			PID_Mob_Name,			"Name"),
-  _creationTime(    PID_Mob_CreationTime,	"CreationTime"),
-  _lastModified(    PID_Mob_LastModified,	"LastModified"),
-  _slots(			PID_Mob_Slots,			"Slots"),
-  _userComments(	PID_Mob_UserComments,	"UserComments")
+: _mobID(			PID_Mob_MobID,			L"MobID"),
+  _name(			PID_Mob_Name,			L"Name"),
+  _creationTime(    PID_Mob_CreationTime,	L"CreationTime"),
+  _lastModified(    PID_Mob_LastModified,	L"LastModified"),
+  _slots(			PID_Mob_Slots,			L"Slots"),
+  _userComments(	PID_Mob_UserComments,	L"UserComments"),
+  _KLVData(			PID_Mob_KLVData,		L"KLVData")
 {
 	_persistentProperties.put(_mobID.address());
 	_persistentProperties.put(_name.address());
@@ -107,6 +118,7 @@ ImplAAFMob::ImplAAFMob ()
 	_persistentProperties.put(_lastModified.address());
 	_persistentProperties.put(_slots.address());
 	_persistentProperties.put(_userComments.address());
+	_persistentProperties.put(_KLVData.address());
 	(void)aafMobIDNew(&_mobID);		// Move this out of constructor when we get 2-stage create
 	AAFGetDateTime(&_creationTime);
 	AAFGetDateTime(&_lastModified);
@@ -138,6 +150,17 @@ ImplAAFMob::~ImplAAFMob ()
 			pTaggedValue = 0;
 		}
 	}
+	if(_KLVData.isPresent())
+	{
+		size = _KLVData.getSize();
+		for (size_t j = 0; j < size; j++)
+		{
+			ImplAAFKLVData* pKLVData = _KLVData.setValueAt(0, j);
+			if (pKLVData)
+			  pKLVData->ReleaseReference();
+			pKLVData = 0;
+		}
+	}
 }
 
 //****************
@@ -147,14 +170,113 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::AppendSlot
         (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
 {
-	AAFRESULT aafError = AAFRESULT_SUCCESS;
-
 	if (NULL == pSlot)
 		return AAFRESULT_NULL_PARAM;
+  if (pSlot->attached ())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_slots.appendValue(pSlot);
 	pSlot->AcquireReference();
+	return AAFRESULT_SUCCESS;
+}
+
+//****************
+// PrependSlot()
+//
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMob::PrependSlot
+        (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
+{
+	if (NULL == pSlot)
+		return AAFRESULT_NULL_PARAM;
+  if (pSlot->attached ())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+	_slots.prependValue(pSlot);
+	pSlot->AcquireReference();
+	return AAFRESULT_SUCCESS;
+}
+
+//****************
+// InsertSlotAt()
+//
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMob::InsertSlotAt
+        (aafUInt32 index,          //@parm [in] index to insert
+		 ImplAAFMobSlot *  pSlot)  //@parm [in] Mob Name length
+{
+	if (NULL == pSlot)
+		return AAFRESULT_NULL_PARAM;
+  if (pSlot->attached ())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+	if (index > _slots.count()) // we can "insert" one after the end
+	  return AAFRESULT_BADINDEX;
+
+	_slots.insertAt(pSlot, index);
+	pSlot->AcquireReference();
+	return AAFRESULT_SUCCESS;
+}
+
+//****************
+// RemoveSlotAt()
+//
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMob::RemoveSlotAt
+        (aafUInt32 index)  //@parm [in] index of slot to remove
+{
+	if (index >= _slots.count())
+	  return AAFRESULT_BADINDEX;
+
+	ImplAAFMobSlot *pSlot = NULL;
+  pSlot = _slots.removeAt(index);
+  if (pSlot)
+  {
+    // We have removed an element from a "stong reference container" so we must
+    // decrement the objects reference count. This will not delete the object
+    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
+    pSlot->ReleaseReference ();
+  }
+
+  return AAFRESULT_SUCCESS;
+}
+
+//****************
+// GetSlotAt()
+//
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMob::GetSlotAt
+        (aafUInt32 index,          //@parm [in] index to insert
+		 ImplAAFMobSlot ** ppSlot)  //@parm [out] returned slot
+{
+	AAFRESULT aafError = AAFRESULT_SUCCESS;
+
+	if (NULL == ppSlot)
+		return AAFRESULT_NULL_PARAM;
+
+
+	if (_slots.find (index, *ppSlot))
+  {
+    assert (*ppSlot); // It is an internal DM programming error if this assertion fails!
+    (*ppSlot)->AcquireReference ();
+  }
+  else
+  {
+	  aafError = AAFRESULT_BADINDEX;
+  }
+
 	return aafError;
+}
+
+//****************
+// LookupSlot()
+//
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMob::LookupSlot
+        (aafSlotID_t slotId,          //@parm [in] ID of slot to get
+		 ImplAAFMobSlot ** ppSlot)  //@parm [out] returned slot
+{
+	return FindSlotBySlotID (slotId, ppSlot);
 }
 
 //****************
@@ -164,11 +286,22 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::RemoveSlot
         (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	if (NULL == pSlot)
+		return AAFRESULT_NULL_PARAM;
+  if (!pSlot->attached ()) // slot could not possibly be in _slots container.
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
+
+  size_t index;
+  if (_slots.findIndex (pSlot, index))
+	  return RemoveSlotAt (index);
+  else
+    return AAFRESULT_OBJECT_NOT_FOUND;
+
+	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::GetMobID (aafUID_t *pMobID)
+    ImplAAFMob::GetMobID (aafMobID_t *pMobID)
 {
 	AAFRESULT aafError = AAFRESULT_SUCCESS;
 
@@ -196,8 +329,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::GetName (aafWChar *pName,
-	aafInt32 bufSize)
+    ImplAAFMob::GetName (aafCharacter *pName,
+	aafUInt32 bufSize)
 {
 	bool stat;
 
@@ -222,7 +355,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFMob::GetNameBufLen
-        (aafInt32 *  pSize)  //@parm [in,out] Mob Name length
+        (aafUInt32 *  pSize)  //@parm [in,out] Mob Name length
 {
 	if(pSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -239,7 +372,10 @@ ImplAAFMob::GetNameBufLen
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::GetModTime (aafTimeStamp_t *lastModified)
 {
-	aafAssert(lastModified != NULL, NULL, AAFRESULT_NULL_PARAM);
+  // Validate input pointer...
+  if (NULL == lastModified)
+    return (AAFRESULT_NULL_PARAM);
+
 	*lastModified = _lastModified;
 	return(AAFRESULT_SUCCESS); 
 }
@@ -248,7 +384,9 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::GetCreateTime (aafTimeStamp_t *creationTime)
 {
-	aafAssert(creationTime != NULL, NULL, AAFRESULT_NULL_PARAM);
+  // Validate input pointer...
+  if (NULL == creationTime)
+    return (AAFRESULT_NULL_PARAM);
 
 	*creationTime = _creationTime;
 
@@ -259,17 +397,27 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::GetMobInfo (aafTimeStamp_t *lastModified,
                            aafTimeStamp_t *creationTime,
-							aafWChar *name,
-							aafInt32 nameLen)
+							aafCharacter *name,
+							aafUInt32 nameLen)
 {
-	aafAssert(creationTime != NULL, NULL, AAFRESULT_NULL_PARAM);
-	aafAssert(creationTime != NULL, NULL, AAFRESULT_NULL_PARAM);
-	aafAssert(creationTime != NULL, NULL, AAFRESULT_NULL_PARAM);
-    XPROTECT()
+  // Validate input pointers...
+  if (NULL == lastModified || NULL == creationTime || NULL == name)
+    return (AAFRESULT_NULL_PARAM);
+
+    
+  XPROTECT()
 	{
-		CHECK(GetCreateTime (creationTime));
-		CHECK(GetModTime (creationTime));
+		// Assign from local copies so that we do not change the
+    // contents of the input parameters if there is a failure.
+    // This is the documented behavior for output parameters.
+    aafTimeStamp_t modified, created;
+
+		CHECK(GetCreateTime (&created));
+		CHECK(GetModTime (&modified));
 		CHECK(GetName(name, nameLen));
+
+		*lastModified = modified;
+		*creationTime = created;
 	}
 	XEXCEPT
 	XEND;
@@ -278,36 +426,41 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::GetNumSlots (aafNumSlots_t *pNumSlots)
+    ImplAAFMob::CountSlots (aafNumSlots_t *pNumSlots)
 {
-   size_t numSlots;
-
-	_slots.getSize(numSlots);
+  // Validate input pointer...
+  if (NULL == pNumSlots)
+    return (AAFRESULT_NULL_PARAM);
 	
-	*pNumSlots = numSlots;
+	*pNumSlots = _slots.count();
 
 	return(AAFRESULT_SUCCESS);
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::SetModTime (aafTimeStamp_t *modTime)
+    ImplAAFMob::SetModTime (aafTimeStamp_constref modTime)
 {
-	_lastModified = *modTime;
+	_lastModified = modTime;
+
+	return(AAFRESULT_SUCCESS);
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFMob::SetCreateTime (aafTimeStamp_constref createTime)
+{
+	_creationTime = createTime;
 
 	return(AAFRESULT_SUCCESS);
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::SetMobID (aafUID_t *newMobID)
+    ImplAAFMob::SetMobID (aafMobID_constref newMobID)
 {
 	AAFRESULT				hr = AAFRESULT_SUCCESS;
 	ImplAAFMob				*mobPtr = NULL;
 	ImplAAFHeader			*head = NULL;
 	ImplAAFContentStorage	*cstore = NULL;
-
-	if(newMobID == NULL)
-		return(AAFRESULT_NULL_PARAM);
 
 	XPROTECT()
 	{
@@ -329,7 +482,7 @@ AAFRESULT STDMETHODCALLTYPE
 				}	
 				else if(hr== AAFRESULT_MOB_NOT_FOUND)
 				{
-					_mobID = *newMobID;
+					_mobID = newMobID;
 					CHECK(cstore->ChangeIndexedMobID (this, newMobID));
 				}
 				else
@@ -346,7 +499,7 @@ AAFRESULT STDMETHODCALLTYPE
 			RAISE(hr);
 	  }
     else
-		 _mobID = *newMobID;
+		 _mobID = newMobID;
 
 	} /* XPROTECT */
 	XEXCEPT
@@ -370,7 +523,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::SetName (aafWChar *pName)
+    ImplAAFMob::SetName (const aafCharacter *pName)
 {	
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -391,14 +544,19 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pMobKind == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	*pMobKind = kAllMob;				// Abstract superclass, only match "all"
+	*pMobKind = kAAFAllMob;				// Abstract superclass, only match "all"
 	return AAFRESULT_SUCCESS;
 }
 
+// This method creates an "abstract" class. It should FAIL but it does not.
+// We should either remove this method from the API or change it so that
+// it taks the class definition for one of the "derived" classes TimelineMobSlot,
+// StaticMobSlot, EventMobSlot, etc...(transdel 2000-MAR-10)
+//
  AAFRESULT STDMETHODCALLTYPE
    ImplAAFMob::AppendNewSlot (ImplAAFSegment *segment,
                            aafSlotID_t  slotID,
-                           aafWChar *slotName,
+                           const aafCharacter *slotName,
                            ImplAAFMobSlot **newSlot)
 {
 	ImplAAFMobSlot * tmpSlot = NULL;
@@ -407,15 +565,17 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFDictionary *pDictionary = NULL;
 	AAFRESULT aafError = AAFRESULT_SUCCESS;
 
+  // Validate input pointers...
+  if (NULL == segment || NULL == slotName || NULL == newSlot)
+    return (AAFRESULT_NULL_PARAM);
+
 	*newSlot = NULL;
-	aafAssert((segment != NULL), _file, AAFRESULT_NULL_PARAM);
 
 	XPROTECT()
 	{
 		CHECK(GetDictionary(&pDictionary));
-		tmpSlot = (ImplAAFMobSlot *)pDictionary->CreateImplObject(AUID_AAFMobSlot);
-		if(tmpSlot == NULL)
-			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(pDictionary->GetBuiltinDefs()->cdMobSlot()->
+			  CreateInstance ((ImplAAFObject**) &tmpSlot));
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
 
@@ -451,10 +611,10 @@ AAFRESULT STDMETHODCALLTYPE
 //
 AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::AppendNewTimelineSlot
-        (aafRational_t  editRate,   //@parm [in] Edit rate property value
+        (const aafRational_t &editRate,   //@parm [in] Edit rate property value
 		 ImplAAFSegment * segment,   //@parm [in] Segment to append as slot component
 		 aafSlotID_t  slotID,   //@parm [in] The Slot ID
-         aafWChar *  slotName,   //@parm [in] Slot Name (optional)
+         const aafCharacter *  slotName,   //@parm [in] Slot Name (optional)
 		 aafPosition_t  origin,
 		 ImplAAFTimelineMobSlot ** newSlot)  //@parm [out] Newly created slot
 {
@@ -465,22 +625,25 @@ AAFRESULT STDMETHODCALLTYPE
 ///	aafLength_t	mobLength = CvtInt32toLength(0, mobLength);
 	AAFRESULT aafError = AAFRESULT_SUCCESS;
 
+
+  // Validate input pointers...
+  if (NULL == segment || NULL == slotName || NULL == newSlot)
+    return (AAFRESULT_NULL_PARAM);
+
 	*newSlot = NULL;
-	aafAssert((segment != NULL), _file, AAFRESULT_NULL_PARAM);
 
 	XPROTECT()
 	  {
 		CHECK(GetDictionary(&pDictionary));
-		aSlot = (ImplAAFTimelineMobSlot *)pDictionary->CreateImplObject(AUID_AAFTimelineMobSlot);
-		if (NULL == aSlot)
-			return (AAFRESULT_NOMEMORY);
+		CHECK(pDictionary->GetBuiltinDefs()->cdTimelineMobSlot()->
+			  CreateInstance ((ImplAAFObject**) &aSlot));
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
-
+    CHECK(aSlot->Initialize());
 		CHECK(aSlot->SetSegment(segment));
 		CHECK(aSlot->SetSlotID(slotID));
 		CHECK(aSlot->SetName(slotName));
-		CHECK(aSlot->SetEditRate(&editRate));
+		CHECK(aSlot->SetEditRate(editRate));
 		CHECK(aSlot->SetOrigin(origin));
 
 		/* Append new slot to mob */
@@ -509,17 +672,26 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::EnumAAFAllMobSlots (ImplEnumAAFMobSlots **ppEnum)
+    ImplAAFMob::GetSlots (ImplEnumAAFMobSlots **ppEnum)
 {
-	ImplEnumAAFMobSlots		*theEnum = (ImplEnumAAFMobSlots *)CreateImpl (CLSID_EnumAAFMobSlots);
-	if(theEnum == NULL)
-		return(E_FAIL);
+  // Validate input pointer...
+  if (NULL == ppEnum)
+    return (AAFRESULT_NULL_PARAM);
+
+  
+  ImplEnumAAFMobSlots *theEnum =
+	(ImplEnumAAFMobSlots *) CreateImpl (CLSID_EnumAAFMobSlots);
+  if(theEnum == NULL)
+	return(E_FAIL);
 
 	// !!!Does not obey search criteria yet
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumMob(this));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFMobSlot>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFMobSlot>(_slots);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFMobSlots, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -536,15 +708,14 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::AppendComment ( aafWChar*  pTagName,
-								aafWChar*  pComment)
+    ImplAAFMob::AppendComment ( const aafCharacter*  pTagName,
+								const aafCharacter*  pComment)
 {
 	ImplAAFTaggedValue*			pTaggedValue = NULL;
 	ImplEnumAAFTaggedValues*	pEnum = NULL;
 	
-	aafWChar					oldTagName[64];
-	aafBool						commentFound = AAFFalse;
-	aafUID_t					stringTypeUID = CLSID_AAFTypeDefString;
+	aafCharacter					oldTagName[64];
+	aafBool						commentFound = kAAFFalse;
 	aafUInt32					numComments = 0;
 	ImplAAFDictionary *pDictionary = NULL;
 	
@@ -554,17 +725,17 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		CHECK(GetNumComments(&numComments));
+		CHECK(CountComments(&numComments));
 		if (numComments > 0)
 		{
-			CHECK(EnumAAFAllMobComments(&pEnum));
+			CHECK(GetComments(&pEnum));
 			CHECK(pEnum->NextOne(&pTaggedValue));
 			while(pTaggedValue)
 			{
 				CHECK(pTaggedValue->GetName(oldTagName, sizeof(oldTagName)));
 				if (wcscmp(oldTagName, pTagName) == 0)
 				{
-					commentFound = AAFTrue;
+					commentFound = kAAFTrue;
 					break;
 				}
 				pTaggedValue->ReleaseReference();
@@ -574,24 +745,34 @@ AAFRESULT STDMETHODCALLTYPE
 			pEnum->ReleaseReference();
 			pEnum = 0;
 		}
+
+		CHECK(GetDictionary(&pDictionary));
+    // Do not reference count the following type and class definitions...
+    ImplAAFTypeDef *pTaggedValueType = pDictionary->GetBuiltinDefs()->tdString();
+    assert (pTaggedValueType); // this is supposed to be a builtin type.
+ 		ImplAAFClassDef *pTaggedValueClass = pDictionary->GetBuiltinDefs()->cdTaggedValue();
+    assert (pTaggedValueClass); // this is supposed to be a builtin type.
+
 		if (commentFound)
 		{
 			// Update existing comment
-			CHECK(pTaggedValue->SetValue((wcslen(pComment)*sizeof(aafWChar)+2), (aafDataValue_t)pComment));
+			CHECK(pTaggedValue->SetValue((wcslen(pComment)+1)*sizeof(aafCharacter), (aafDataValue_t)pComment));
 			pTaggedValue->ReleaseReference();
 			pTaggedValue = 0;
 		}
 		else
 		{
 			// Create a new comment and add it to the list!
-			CHECK(GetDictionary(&pDictionary));
-			pTaggedValue = (ImplAAFTaggedValue *)pDictionary->CreateImplObject(AUID_AAFTaggedValue);
-			pDictionary->ReleaseReference();
-			pDictionary = NULL;
-			CHECK(pTaggedValue->Initialize(pTagName, &stringTypeUID));
-			CHECK(pTaggedValue->SetValue((wcslen(pComment)*sizeof(aafWChar)+2), (aafDataValue_t)pComment));
+			CHECK(pTaggedValueClass->CreateInstance ((ImplAAFObject**) &pTaggedValue));
+			CHECK(pTaggedValue->Initialize(pTagName,
+										   pTaggedValueType,
+                       ((wcslen(pComment)+1)*sizeof(aafCharacter)), 
+                       (aafDataValue_t)pComment));
 			_userComments.appendValue(pTaggedValue);
 		}
+		pDictionary->ReleaseReference();
+		pDictionary = NULL;
+
 	}
 	XEXCEPT
 	{
@@ -613,16 +794,35 @@ AAFRESULT STDMETHODCALLTYPE
 //
 AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::RemoveComment
-        (aafMobComment_t *  comment)
+        (ImplAAFTaggedValue * comment)
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	if (! comment)
+		return AAFRESULT_NULL_PARAM;
+  if (!comment->attached ()) // object could not possibly be in container.
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
+	if(!_userComments.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+  size_t index;
+  if (_userComments.findIndex (comment, index))
+  {
+	  _userComments.removeAt(index);
+    // We have removed an element from a "stong reference container" so we must
+    // decrement the objects reference count. This will not delete the object
+    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
+    comment->ReleaseReference ();
+  }
+  else
+  {
+    return AAFRESULT_OBJECT_NOT_FOUND;
+  }
+
+	return(AAFRESULT_SUCCESS);
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::GetNumComments (aafUInt32*  pNumComments)
+    ImplAAFMob::CountComments (aafUInt32*  pNumComments)
 {
-	size_t	numComments;
-
 	if (pNumComments == NULL)
 		return AAFRESULT_NULL_PARAM;
 
@@ -633,26 +833,32 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		_userComments.getSize(numComments);
-
-		*pNumComments = numComments;
+		*pNumComments = _userComments.count();
 	}
 		
 	return(AAFRESULT_SUCCESS);
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::EnumAAFAllMobComments (ImplEnumAAFTaggedValues** ppEnum)
+    ImplAAFMob::GetComments (ImplEnumAAFTaggedValues** ppEnum)
 {
+  // Validate input pointer...
+  if (NULL == ppEnum)
+    return (AAFRESULT_NULL_PARAM);
+
 	if(!_userComments.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
 		
-	ImplEnumAAFTaggedValues*	theEnum = (ImplEnumAAFTaggedValues *)CreateImpl(CLSID_EnumAAFTaggedValues);
+	ImplEnumAAFTaggedValues* theEnum =
+	  (ImplEnumAAFTaggedValues *)CreateImpl(CLSID_EnumAAFTaggedValues);
 
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_userComments));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFTaggedValue>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFTaggedValue>(_userComments);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFTaggedValues, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -668,6 +874,100 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFMob::AppendKLVData (ImplAAFKLVData * pData)
+{
+	if (NULL == pData)
+		return AAFRESULT_NULL_PARAM;
+  if (pData->attached ())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+	_KLVData.appendValue(pData);
+	pData->AcquireReference();
+	return AAFRESULT_SUCCESS;
+}
+
+//****************
+// RemoveKLVData()
+//
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMob::RemoveKLVData
+        (ImplAAFKLVData * pData)
+{
+	if (! pData)
+		return AAFRESULT_NULL_PARAM;
+  if (!pData->attached ()) // object could not possibly be in container.
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
+	if(!_KLVData.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+  size_t index;
+  if (_KLVData.findIndex (pData, index))
+  {
+	  _KLVData.removeAt(index);
+    // We have removed an element from a "stong reference container" so we must
+    // decrement the objects reference count. This will not delete the object
+    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
+    pData->ReleaseReference ();
+  }
+  else
+  {
+    return AAFRESULT_OBJECT_NOT_FOUND;
+  }
+
+	return(AAFRESULT_SUCCESS);
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFMob::CountKLVData (aafUInt32*  pNumComments)
+{
+	if (pNumComments == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	if(!_KLVData.isPresent())
+	{	// If the userComments property is not present then
+		// number of user comments is zero!
+		*pNumComments = 0; //return AAFRESULT_PROP_NOT_PRESENT;
+	}
+	else
+	{
+		*pNumComments = _KLVData.count();
+	}
+		
+	return(AAFRESULT_SUCCESS);
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFMob::GetKLVData (ImplEnumAAFKLVData** ppEnum)
+{
+  if (NULL == ppEnum)
+	return AAFRESULT_NULL_PARAM;
+  *ppEnum = 0;
+	
+  ImplEnumAAFKLVData *theEnum = (ImplEnumAAFKLVData *)CreateImpl (CLSID_EnumAAFKLVData);
+	
+  XPROTECT()
+	{
+		OMStrongReferenceVectorIterator<ImplAAFKLVData>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFKLVData>(_KLVData);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFKLVData, this, iter));
+	  *ppEnum = theEnum;
+	}
+  XEXCEPT
+	{
+	  if (theEnum)
+		{
+		  theEnum->ReleaseReference();
+		  theEnum = 0;
+		}
+	  return(XCODE());
+	}
+  XEND;
+	
+  return(AAFRESULT_SUCCESS);
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::OffsetToMobTimecode (ImplAAFSegment *tcSlotID,
@@ -679,14 +979,21 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFSegment		*pdwnInput = NULL;
 	ImplEnumAAFMobSlots *iter = NULL;
 	ImplAAFSegment		*seg = NULL;
-	aafTimecode_t		timecode;
-	aafBool				reverse = AAFFalse;
-	aafUInt32			frameOffset;
-	aafUID_t			dataDefID;
-	aafPosition_t		newStart;
-	aafInt32			start32;
+//	aafTimecode_t		timecode;
+	aafBool				reverse = kAAFFalse;
+//	aafUInt32			frameOffset;
+//	aafUID_t			dataDefID;
+//	aafPosition_t		newStart;
+//	aafInt32			start32;
 	AAFRESULT			aafError = AAFRESULT_SUCCESS;
 	
+
+  // Validate input pointers...
+  if (NULL == tcSlotID || NULL == offset || NULL == result)
+    return (AAFRESULT_NULL_PARAM);
+  
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+#if 0
 	memset(result, 0, sizeof(aafTimecode_t));
 	memset(&timecode, 0, sizeof(aafTimecode_t));
 	result->startFrame = 0;
@@ -696,7 +1003,7 @@ AAFRESULT STDMETHODCALLTYPE
 		
 		/* Find timecode slot in mob */
 		//!!!			iterHdl = new AAFIterate(_file);
-		CHECK(EnumAAFAllMobSlots (&iter));
+		CHECK(GetSlots (&iter));
 		while(iter->NextOne(&slot) == AAFRESULT_SUCCESS)
 		{
 			CHECK(slot->GetSegment(&seg));
@@ -704,7 +1011,9 @@ AAFRESULT STDMETHODCALLTYPE
 			/* Verify that it's a timecode slot by looking at the
 			* datakind of the slot segment. 
 			*/
-			CHECK(seg->GetDataDef(&dataDefID));
+			ImplAAFDataDefSP pDataDef;
+			CHECK(seg->GetDataDef(&pDataDef));
+			CHECK(pDataDef->GetAUID(&dataDefID));
 			
 			if (!EqualAUID(&dataDefID, &DDEF_Timecode))
 			{
@@ -727,7 +1036,7 @@ AAFRESULT STDMETHODCALLTYPE
 			*/
 			if (pdwn)
 			{
-				reverse = AAFFalse;
+				reverse = kAAFFalse;
 				CHECK(pdwn->MapOffset(*offset, reverse, &newStart, NULL));
 				CHECK(TruncInt64toInt32(newStart, &start32));
 				timecode.startFrame += start32;
@@ -780,6 +1089,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND;
 	
 	return(AAFRESULT_SUCCESS);
+#endif
 }
 
 
@@ -787,24 +1097,30 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::FindSlotBySlotID (aafSlotID_t	slotID,
                            ImplAAFMobSlot **destSlot)
 {
-	aafInt32		loop, numSlots;
+	aafUInt32		loop;
+	aafNumSlots_t	numSlots;
 	ImplAAFMobSlot	*tmpSlot = NULL;
 	aafSlotID_t	tmpSlotID;
-	aafBool			foundSlot = AAFFalse;
+	aafBool			foundSlot = kAAFFalse;
+	
 
+  // Validate input pointers...
+  if (NULL == destSlot)
+    return (AAFRESULT_NULL_PARAM);
+  
 	XPROTECT()
 	{
 		*destSlot = NULL;
 		
 		// For size entries the valid positions are 0 .. size - 1
-		CHECK(GetNumSlots(&numSlots));
+		CHECK(CountSlots(&numSlots));
 		for (loop = 0; loop < numSlots; loop++)
 		{
 			_slots.getValueAt(tmpSlot, loop);
 			CHECK(tmpSlot->GetSlotID(&tmpSlotID));
 			if (tmpSlotID == slotID)
 			{
-				foundSlot = AAFTrue;
+				foundSlot = kAAFTrue;
 				break;
 			}
 		}
@@ -837,29 +1153,35 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFSegment			*seg = NULL;
 	aafTimecode_t 			timecode;
 	aafMediaCriteria_t		mediaCrit;
-	ImplAAFFindSourceInfo	*sourceInfo;
+	ImplAAFFindSourceInfo	*sourceInfo = NULL;
 	aafRational_t			editRate;
 	aafPosition_t			frameOffset64;
-	aafUID_t				datakind;
 	aafLength_t				zeroLen = CvtInt32toLength(0, zeroLen);
 	ImplEnumAAFMobSlots		*slotIter = NULL;
 	ImplAAFDictionary		*dict = NULL;
 	ImplAAFDataDef			*dataDef = NULL;
 	ImplAAFMob				*tapeMob = NULL;
 
-	memset(result, 0, sizeof(aafTimecode_t));
+  // Validate input pointers...
+  if (NULL == slotID || NULL == offset || NULL == result)
+    return (AAFRESULT_NULL_PARAM);
+
+  memset(result, 0, sizeof(aafTimecode_t));
 	memset(&timecode, 0, sizeof(aafTimecode_t));
 	result->startFrame = 0;
 	
 	XPROTECT()
 	{
+
 		CHECK(GetDictionary(&dict));
+		ImplAAFDataDefSP pDDPicture;
+		CHECK(dict->LookupDataDef(DDEF_Picture, &pDDPicture));
 		mediaCrit.type = kAAFAnyRepresentation;
-		CHECK(InternalSearchSource(*slotID, *offset, kTapeMob,
+		CHECK(InternalSearchSource(*slotID, *offset, kAAFTapeMob,
 			&mediaCrit, NULL, &sourceInfo));
 		
 		CHECK(sourceInfo->GetMob(&tapeMob));
-		CHECK(tapeMob->EnumAAFAllMobSlots (&slotIter));
+		CHECK(tapeMob->GetSlots (&slotIter));
 		while(slotIter->NextOne((ImplAAFMobSlot**)&slot) == AAFRESULT_SUCCESS)
 		{
 			CHECK(slot->GetEditRate(&editRate));
@@ -867,13 +1189,11 @@ AAFRESULT STDMETHODCALLTYPE
 			slot->ReleaseReference();
 			slot = NULL;
 			/* Verify that it's a timecode slot by looking at the
-			* datakind of the slot segment.
+			* datadef of the slot segment.
 			*/
-			CHECK(seg->GetDataDef(&datakind));
-			CHECK(dict->LookupDataDefintion(&datakind, &dataDef));
-			aafUID_t	uid = DDEF_Timecode;
+			CHECK(seg->GetDataDef(&dataDef));
 			aafBool		isTimecode;
-			CHECK(dataDef->IsDataDefOf(&uid, &isTimecode));
+			CHECK(dataDef->IsDataDefOf(pDDPicture, &isTimecode));
 			if (isTimecode)
 			{
 				/* Assume found at this point, so finish generating result */
@@ -892,6 +1212,7 @@ AAFRESULT STDMETHODCALLTYPE
 		tapeMob = NULL;
 		slotIter->ReleaseReference();
 		slotIter = NULL;
+    sourceInfo->ReleaseReference();
 		dict->ReleaseReference();
 		dict = NULL;
 		
@@ -912,6 +1233,9 @@ AAFRESULT STDMETHODCALLTYPE
 		if (slot)
 		  slot->ReleaseReference();
 		slot = 0;
+    if (sourceInfo)
+      sourceInfo->ReleaseReference();
+    sourceInfo = NULL;
 		if (dict)
 		  dict->ReleaseReference();
 		dict = 0;
@@ -939,22 +1263,26 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFSegment *pdwnInput = NULL;
 	aafPosition_t zero;
 	AAFRESULT	aafError = AAFRESULT_SUCCESS;
-	aafBool found = AAFFalse;
+	aafBool found = kAAFFalse;
 	aafRational_t	editRate;
 	aafLength_t	zeroLen;
 	ImplAAFFindSourceInfo	*sourceInfo = NULL;
 	ImplAAFMob	*tapeMob = NULL;
-	
+
+  // Validate input pointer...
+  if (NULL == result)
+    return (AAFRESULT_NULL_PARAM);
+
 	CvtInt32toPosition(0, zero);
 	CvtInt32toLength(0, zeroLen);
 	
 	XPROTECT()
 	{
-		CHECK(InternalSearchSource(slotID, zero, kTapeMob,
+		CHECK(InternalSearchSource(slotID, zero, kAAFTapeMob,
 			NULL /* mediaCrit */, NULL, &sourceInfo));
 		
 		CHECK(sourceInfo->GetMob(&tapeMob));
-		CHECK(tapeMob->EnumAAFAllMobSlots(&iterHdl));
+		CHECK(tapeMob->GetSlots(&iterHdl));
 		while(iterHdl->NextOne(&slot) == AAFRESULT_SUCCESS)
 		{
 			timelineSlot = dynamic_cast<ImplAAFTimelineMobSlot*>(slot);
@@ -964,7 +1292,7 @@ AAFRESULT STDMETHODCALLTYPE
 				CHECK(timelineSlot->GetSegment(&seg));
 			
 				if(seg->SegmentTCToOffset(&timecode, &editRate, result) == AAFRESULT_SUCCESS)
-					found = AAFTrue;
+					found = kAAFTrue;
 				
 				timelineSlot->ReleaseReference();
 				timelineSlot = NULL;
@@ -1046,7 +1374,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::Copy (aafWChar *  /*destMobName*/,
+    ImplAAFMob::Copy (const aafCharacter *  /*destMobName*/,
                            ImplAAFMob ** /*destMob*/)
 {
 #if FULL_TOOLKIT
@@ -1099,15 +1427,15 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::ChangeRef (aafUID_t *oldMobID,
-                           aafUID_t *newMobID)
+    ImplAAFMob::ChangeRef (aafMobID_constref oldMobID,
+                           aafMobID_constref newMobID)
 {
 	ImplEnumAAFMobSlots		*iter = NULL;
 	ImplAAFMobSlot			*slot = NULL;
 
 	XPROTECT()
 	{
-		CHECK(EnumAAFAllMobSlots (&iter));
+		CHECK(GetSlots (&iter));
 		while(iter->NextOne(&slot) == AAFRESULT_SUCCESS)
 		{
 			CHECK(slot->ChangeContainedReferences(oldMobID, newMobID));
@@ -1136,10 +1464,10 @@ AAFRESULT STDMETHODCALLTYPE
  *
  *      This function clones the given mob in the source file into
  *      a destination mob in the destination file with the same Mob ID.
- *      If resolveDependencies is AAFTrue, it will also clone all mobs 
+ *      If resolveDependencies is kAAFTrue, it will also clone all mobs 
  *      referenced by the given source mob. 
  *
- *      If includeMedia is AAFTrue, it will also copy the media data 
+ *      If includeMedia is kAAFTrue, it will also copy the media data 
  *      associated with the source mob.  The destination mob is
  *      returned. All private data is also cloned.
  *
@@ -1163,7 +1491,7 @@ AAFRESULT STDMETHODCALLTYPE
                            ImplAAFMob ** /*destMob*/)
 {
 #if FULL_TOOLKIT
-    aafUID_t saveMobID, newMobID;
+    aafMobID_t saveMobID, newMobID;
 	aafString destMobName = NULL;
     AAFMob * tmpDestMob = NULL;
 	AAFObject *tmpDestMedia = NULL;
@@ -1219,7 +1547,7 @@ AAFRESULT STDMETHODCALLTYPE
 		  {
 			if (aafError == AAFRESULT_SUCCESS)
 			  {
-				CHECK(tmpDestMob->SetPrimary(AAFTrue));
+				CHECK(tmpDestMob->SetPrimary(kAAFTrue));
 			  }
 			else
 			  {
@@ -1280,7 +1608,11 @@ AAFRESULT
 {
 	AAFRESULT rc = AAFRESULT_SUCCESS;
 	ImplAAFMobSlot	*obj;
-	_slots.getValueAt(obj, index);
+
+  if (NULL == ppMobSlot)
+		return AAFRESULT_NULL_PARAM;
+  
+  _slots.getValueAt(obj, index);
 	if (obj)
 		obj->AcquireReference();
 	else
@@ -1294,7 +1626,7 @@ AAFRESULT STDMETHODCALLTYPE
 ImplAAFMob::AddPhysSourceRef (aafAppendOption_t  addType,
 							  aafRational_t  editrate,
 							  aafSlotID_t  aMobSlot,
-							  aafUID_t *pEssenceKind,
+							  const aafUID_t & essenceKind,
 							  aafSourceRef_t  ref,
 							  aafLength_t  srcRefLength)
 {
@@ -1314,12 +1646,15 @@ ImplAAFMob::AddPhysSourceRef (aafAppendOption_t  addType,
 	{
 		CvtInt32toInt64(0, &zeroPos);
 		CHECK(GetDictionary(&pDictionary));
-		sclp = (ImplAAFSourceClip *)pDictionary->CreateImplObject(AUID_AAFSourceClip);
+		CHECK(pDictionary->GetBuiltinDefs()->cdSourceClip()->
+			  CreateInstance ((ImplAAFObject **) &sclp));
 		if (NULL == sclp)
 			RAISE(AAFRESULT_NOMEMORY);
+		ImplAAFDataDefSP pDataDef;
+		CHECK(pDictionary->LookupDataDef(essenceKind, &pDataDef))
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
-		CHECK(sclp->Initialize(pEssenceKind, &srcRefLength, ref));
+		CHECK(sclp->Initialize(pDataDef, srcRefLength, ref));
 				
 		status = FindSlotBySlotID(aMobSlot, &slot);
 		if (status == AAFRESULT_SUCCESS)
@@ -1402,7 +1737,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 	ImplAAFSegment			*rootObj = NULL;
 	aafRational_t			srcRate;
 	aafPosition_t			diffPos, nextPos;
-	aafBool					sourceFound = AAFFalse, foundTransition = AAFFalse;
+	aafBool					sourceFound = kAAFFalse, foundTransition = kAAFFalse;
 	ImplAAFMob				*nextMob = NULL;
 	aafInt32				nestDepth, pulldownPhase;
 	aafPosition_t			zeroPos = CvtInt32toPosition(0, zeroPos);
@@ -1579,10 +1914,10 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 {
 	ImplAAFSourceClip		*sclp = NULL;
 	aafLength_t				sclpLen;
-	aafBool					isMask = AAFFalse, reverse = AAFFalse;
+	aafBool					isMask = kAAFFalse, reverse = kAAFFalse;
 	aafSourceRef_t			sourceRef;
 	ImplAAFMob				*nextMob = NULL;
-	aafUID_t				nullUID = NilMOBID;		// Need "isNIL" utility
+  aafMobID_t				nullMobID = { 0 };		// Need "isNIL" utility
 	ImplAAFMobSlot 			*nextTrack = NULL;
 	aafSlotID_t				tmpTrackID, nextTrackID;
 	aafPosition_t			tmpPos, convertPos;
@@ -1605,7 +1940,7 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		
 		
 		CHECK(sclp->GetSourceReference(&sourceRef));
-		if (EqualAUID(&nullUID, &sourceRef.sourceID))
+		if (memcmp(&nullMobID, &sourceRef.sourceID, sizeof(sourceRef.sourceID)) == 0)
 		{
 			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
 		}
@@ -1626,7 +1961,7 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		*/
 		if (isMask)
 		{
-			reverse = AAFFalse;
+			reverse = kAAFFalse;
 			/* !!!Check out if we need phase returned from here */
 			CHECK((*pulldownObj)->MapOffset(diffPos, reverse, &tmpPos, NULL));
 		}
@@ -1649,7 +1984,7 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		nextTrack->ReleaseReference();
 		nextTrack = 0;
 
-//		sclp->ReleaseReference(); // causes 800400c8 to be returned from MasterMob::OpenEssence
+		sclp->ReleaseReference(); // causes 800400c8 to be returned from MasterMob::OpenEssence
 	}
 	XEXCEPT
 	{
@@ -1659,8 +1994,8 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		if (nextMob)
 		  nextMob->ReleaseReference();
 		nextMob = 0;
-//		if (sclp)
-//			sclp->ReleaseReference();
+		if (sclp)
+			sclp->ReleaseReference();
 	}
 	XEND;
 	
@@ -1684,7 +2019,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 	ImplAAFOperationGroup	*effeObject = NULL;
 	ImplAAFMob				*nextMob = NULL;
 	aafSlotID_t				foundTrackID;
-	aafBool					nextFoundSource = AAFFalse, foundTransition = AAFFalse;
+	aafBool					nextFoundSource = kAAFFalse, foundTransition = kAAFFalse;
 	aafPosition_t			foundPos, diffPos, zeroPos;
 	aafRational_t			srcRate;
 	aafLength_t				tmpLength, foundLen, minLength, newLen;
@@ -1698,7 +2033,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 	XPROTECT()
 	{
 		/* Initialize return values */
-		*foundSource = AAFFalse;
+		*foundSource = kAAFFalse;
 		CHECK(sourceInfo->Clear());
 		
 		/* Verify that track and position are valid */
@@ -1713,16 +2048,16 @@ AAFRESULT ImplAAFMob::MobFindSource(
 		
 		/* 1) Is this the mob that we're looking for? */
 		CHECK(GetMobKind (&tstKind));
-		if ((mobKind == kCompMob) ||
-			(mobKind == kMasterMob) || 
-			(mobKind == kFileMob) ||
-			(mobKind == kTapeMob) ||
-			(mobKind == kFilmMob))
+		if ((mobKind == kAAFCompMob) ||
+			(mobKind == kAAFMasterMob) || 
+			(mobKind == kAAFFileMob) ||
+			(mobKind == kAAFTapeMob) ||
+			(mobKind == kAAFFilmMob))
 		{
-			*foundSource = (mobKind == tstKind ? AAFTrue : AAFFalse);
+			*foundSource = (mobKind == tstKind ? kAAFTrue : kAAFFalse);
 		}
-		else if (mobKind == kAllMob)
-			*foundSource = AAFTrue;
+		else if (mobKind == kAAFAllMob)
+			*foundSource = kAAFTrue;
 		else
 		{
 			RAISE(AAFRESULT_INVALID_MOBTYPE);
@@ -1857,6 +2192,11 @@ AAFRESULT ImplAAFMob::ReconcileMobLength(void)
 }
 
 
+const OMMaterialIdentification&
+  ImplAAFMob::identification(void) const
+{
+  return *reinterpret_cast<const OMMaterialIdentification*>(&_mobID.reference());
+}
 
 
 
