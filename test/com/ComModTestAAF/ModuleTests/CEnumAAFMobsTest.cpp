@@ -35,7 +35,6 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -627,18 +626,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
  
-extern "C" HRESULT CEnumAAFMobs_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFMobs_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFMobs_test()
 {
 	HRESULT hr = AAFRESULT_TEST_PARTIAL_SUCCESS; //AAFRESULT_SUCCESS;
  	aafWChar * pFileName = L"EnumAAFMobsTest.aaf";
 
   try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if(AAFRESULT_SUCCESS == hr)
 			hr = ReadAAFFile( pFileName );
 		

@@ -29,7 +29,6 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
@@ -152,7 +151,7 @@ static void RemoveTestFile(const wchar_t* pFileName)
 	}
 }
 
-static HRESULT  createENUMType (IAAFDictionary * const pDict)
+HRESULT  createENUMType (IAAFDictionary * const pDict)
 {
 	CAAFBuiltinDefs defs(pDict);
 	
@@ -570,19 +569,14 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	
 }//ReadAAFFile()
 
-extern "C" HRESULT CAAFTypeDefEnum_test(testMode_t mode);
-extern "C" HRESULT CAAFTypeDefEnum_test(testMode_t mode)
+extern "C" HRESULT CAAFTypeDefEnum_test()
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
 	aafWChar * pFileName = L"AAFTypeDefEnumTest.aaf";
 	
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
-			
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );	
 		

@@ -1,132 +1,173 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDefinitionObject
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
 
 
 
-#ifndef __CAAFCompositionMob_h__
-#include "CAAFCompositionMob.h"
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFDefUIDs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 
 static aafInt32 fadeInLen  = 1000;
-static aafFadeType_t fadeInType = kFadeLinearAmp;
+static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
 static aafRational_t fadeInEditUnit = { 25, 1};
+
+static const	aafMobID_t	TEST_MobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x9269dfa2, 0x0407, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
+
+
+// Cross-platform utility to delete a file.
+static void RemoveTestFile(const wchar_t* pFileName)
+{
+  const size_t kMaxFileName = 512;
+  char cFileName[kMaxFileName];
+
+  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
+  if (status != (size_t)-1)
+  { // delete the file.
+    remove(cFileName);
+  }
+}
+
+// convenient error handlers.
+inline void checkResult(HRESULT r)
+{
+  if (FAILED(r))
+    throw r;
+}
+inline void checkExpression(bool expression, HRESULT r)
+{
+  if (!expression)
+    throw r;
+}
+
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
+  bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
+	IAAFDictionary*	pDictionary = NULL;
 
 	IAAFCompositionMob*			pCompMob = NULL;
 	IAAFMob*					pMob = NULL;
 
-	aafUID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
-	HRESULT						hr;
+	HRESULT						hr = S_OK;
 
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"Make AVR Example";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
-	ProductInfo.platform = NULL;
+  try
+  {
+      // Remove the previous test file if any.
+      RemoveTestFile(pFileName);
 
-	/*
-	hr = CoCreateInstance(CLSID_AAFSession,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFSession, 
-						   (void **)&pSession);
-	*/
-	hr = CoCreateInstance(CLSID_AAFFile,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFFile, 
-						   (void **)&pFile);
+	  aafProductVersion_t v;
+	  v.major = 1;
+	  v.minor = 0;
+	  v.tertiary = 0;
+	  v.patchLevel = 0;
+	  v.type = kAAFVersionUnknown;
+	  ProductInfo.companyName = L"AAF Developers Desk";
+	  ProductInfo.productName = L"AAFCompositionMobTest";
+	  ProductInfo.productVersion = &v;
+	  ProductInfo.productVersionString = NULL;
+	  ProductInfo.productID = UnitTestProductID;
+	  ProductInfo.platform = NULL;
 
-	if (AAFRESULT_SUCCESS == hr)
-	{
-		// We assume the following functions have been tested and they do work
-		// The next 3 function calls open the AAF file
-	    // hr = pSession->SetDefaultIdentification(&ProductInfo);
-		// hr = pSession->CreateFile(pFileName, kAAFRev1, &pFile);
-	    hr = pFile->Initialize();
-	    hr = pFile->OpenNewModify(pFileName, 0, &ProductInfo);
-	  	hr = pFile->GetHeader(&pHeader);
+    
+		// Create the new AAF file.
+	  checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
+	  bFileOpen = true;
 
-		// Create a CompositionMob
-		hr = CoCreateInstance(CLSID_AAFCompositionMob,
-								NULL, 
-								CLSCTX_INPROC_SERVER, 
-								IID_IAAFCompositionMob, 
-								(void **)&pCompMob);
-		if (AAFRESULT_SUCCESS == hr)
-		{
-			// Get a MOB Interface 
-			hr = pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob);
-			CoCreateGuid((GUID *)&newMobID);
-			hr = pMob->SetMobID(&newMobID);
+	  // We can't really do anthing in AAF without the header.
+	  checkResult(pFile->GetHeader(&pHeader));
 
-			hr = pCompMob->Initialize( L"COMPMOB01" );
-			if (AAFRESULT_SUCCESS == hr)
-			{
-				hr = pCompMob->SetDefaultFade(fadeInLen, fadeInType, fadeInEditUnit);
-			}	
+	  // Get the AAF Dictionary so that we can create valid AAF objects.
+	  checkResult(pHeader->GetDictionary(&pDictionary));
 
-			hr = pHeader->AppendMob(pMob);
-		}
-	}
+	  CAAFBuiltinDefs defs (pDictionary);
+	  // Create a CompositionMob
+	  checkResult(defs.cdCompositionMob()->
+				  CreateInstance(IID_IAAFCompositionMob, 
+								 (IUnknown **)&pCompMob));
+	  // Get a MOB Interface 
+	  checkResult(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
+		
+	  // Assign the mob a new id.
+	  checkResult(pMob->SetMobID(TEST_MobID));
+    
+	  // Initialize the composition mob.
+	  checkResult(pCompMob->Initialize( L"COMPMOB01" ));
+	  checkResult(pCompMob->SetDefaultFade(fadeInLen, fadeInType, fadeInEditUnit));
+
+	  // Add the mob to the file.
+	  checkResult(pHeader->AddMob(pMob));
+  }
+  catch (HRESULT& rResult)
+  {
+    hr = rResult;
+  }
 
 
-	if (pMob)
+  // Cleanup and return
+  if (pMob)
 		pMob->Release();
 
 	if (pCompMob)
 		pCompMob->Release();
 
+	if (pDictionary)
+		pDictionary->Release();
+
 	if (pHeader)
 		pHeader->Release();
 
-	// Cleanup and return
 	if (pFile) 
 	{
-		pFile->Close();
+    if (bFileOpen)
+      {
+		  pFile->Save();
+		  pFile->Close();
+      }
 		pFile->Release();
 	}
-
-	/*
-	if (pSession)
-	{
-		pSession->EndSession();
-		pSession->Release();
-	}
-	*/
-
 
 
 	return hr;
@@ -135,96 +176,54 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
-	IAAFFile *					pFile = NULL;
-	IAAFHeader *				pHeader = NULL;
+  IAAFFile *					pFile = NULL;
+  IAAFHeader *				pHeader = NULL;
+ 
+  IEnumAAFMobs*				pMobIter = NULL;
+  IAAFMob*					pMob = NULL;
+  IAAFCompositionMob*			pCompMob = NULL;
 
-	IEnumAAFMobs*				pMobIter = NULL;
-	IAAFMob*					pMob = NULL;
-	IAAFCompositionMob*			pCompMob = NULL;
+  aafSearchCrit_t				criteria;
+  aafDefaultFade_t			defaultFade;
+  aafNumSlots_t				numMobs;
+  HRESULT						hr = S_OK;
 
-	aafSearchCrit_t				criteria;
-	aafDefaultFade_t			defaultFade;
-	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t				numMobs;
-	HRESULT						hr;
-
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
-	ProductInfo.platform = NULL;
-	  
-	/*
-	hr = CoCreateInstance(CLSID_AAFSession,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFSession, 
-						   (void **)&pSession);
-	*/
-	hr = CoCreateInstance(CLSID_AAFFile,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFFile, 
-						   (void **)&pFile);
-
-	if (AAFRESULT_SUCCESS == hr)
-	{
-		// We assume the following functions have been tested and they do work
-		// The next 3 function calls open the AAF file
-		// hr = pSession->SetDefaultIdentification(&ProductInfo);
-		// hr = pSession->OpenReadFile(pFileName, &pFile);
-	    hr = pFile->Initialize();
-		hr = pFile->OpenExistingRead(pFileName, 0);
-	  	hr = pFile->GetHeader(&pHeader);
+  try
+  {
+		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
+	  checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		hr = pHeader->GetNumMobs( kAllMob, &numMobs );
-		if ( 1 == numMobs )
+		checkResult(pHeader->CountMobs( kAAFAllMob, &numMobs ));
+		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
+
+		// Enumerate over all Composition Mobs
+		criteria.searchTag = kAAFByMobKind;
+		criteria.tags.mobKind = kAAFCompMob;
+		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
+		while (pMobIter && (pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS))
 		{
-			// Enumerate over all Composition Mobs
-			criteria.searchTag = kByMobKind;
-			criteria.tags.mobKind = kCompMob;
-			hr = pHeader->EnumAAFAllMobs(&criteria, &pMobIter);
-			while (pMobIter && (pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS))
-			{
-				// Get A CompositionMob Interface 
-				hr = pMob->QueryInterface(IID_IAAFCompositionMob,(void **)&pCompMob);
-				if (AAFRESULT_SUCCESS == hr)
-				{
-					hr = pCompMob->GetDefaultFade( &defaultFade );
-					if ( (defaultFade.fadeLength != fadeInLen) ||
-						 (defaultFade.fadeType != fadeInType) ||
-						 (memcmp( &( defaultFade.fadeEditUnit), &fadeInEditUnit, sizeof( fadeInEditUnit ))!= 0) ||
-						 (defaultFade.valid != AAFTrue)
-						)
-					{
-						hr = AAFRESULT_TEST_FAILED;
-					}
+			// Get A CompositionMob Interface 
+			checkResult(pMob->QueryInterface(IID_IAAFCompositionMob,(void **)&pCompMob));
+			checkResult(pCompMob->GetDefaultFade( &defaultFade ));
+			
+      checkExpression( (defaultFade.fadeLength == fadeInLen) &&
+				  (defaultFade.fadeType == fadeInType) &&
+				  (memcmp( &( defaultFade.fadeEditUnit), &fadeInEditUnit, sizeof( fadeInEditUnit ))== 0) &&
+				  (defaultFade.valid == kAAFTrue), 
+         AAFRESULT_TEST_FAILED);
 
-					pCompMob->Release();
-					pCompMob = NULL;
-				}
-				else
-				{
-					hr = AAFRESULT_TEST_FAILED;
-				}
+			pCompMob->Release();
+			pCompMob = NULL;
 
-				pMob->Release();
-				pMob = NULL;
-			}
+			pMob->Release();
+			pMob = NULL;
 		}
-		else
-		{
-			hr = AAFRESULT_TEST_FAILED;
-		}
-	}
-
+  }
+  catch (HRESULT& rResult)
+  {
+    hr = rResult;
+  }
 
 	// Cleanup and return
 	if (pMobIter)
@@ -245,22 +244,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		pFile->Release();
 	}
 
-	/*
-	if (pSession)
-	{
-		pSession->EndSession();
-		pSession->Release();
-	}
-	*/
 
 
 	return hr;
 }
 
-HRESULT CAAFCompositionMob::test()
+extern "C" HRESULT CAAFCompositionMob_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"CompMobTest.aaf";
+	aafWChar * pFileName = L"AAFCompositionMobTest.aaf";
 
 	try
 	{
@@ -270,8 +262,8 @@ HRESULT CAAFCompositionMob::test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFCompositionMob::test...Caught general C++"
-		" exception!" << endl; 
+	  cerr << "CAAFCompositionMob_test...Caught general C++"
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

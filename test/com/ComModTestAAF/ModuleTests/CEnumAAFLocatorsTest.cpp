@@ -36,7 +36,6 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -385,18 +384,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
  
-extern "C" HRESULT CEnumAAFLocators_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFLocators_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFLocators_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
   aafWChar * pFileName = L"EnumAAFLocators.aaf";
 
   try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

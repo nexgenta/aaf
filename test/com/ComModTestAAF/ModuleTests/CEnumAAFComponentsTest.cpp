@@ -31,7 +31,6 @@
 #include "AAF.h"
 
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include <iostream.h>
 #include <stdio.h>
@@ -622,18 +621,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CEnumAAFComponents_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFComponents_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFComponents_test()
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
  	aafWChar * pFileName = L"EnumAAFComponentsTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
