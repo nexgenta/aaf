@@ -31,12 +31,15 @@
 
 #include "OMContainerIterator.h"
 
-// @class Abstract base class for iterators over Object Manager reference
-//        container properties.
-//        The references may be Strong or Weak.
-//        The collections may be Vectors or Sets.
-//   @tcarg class | ReferencedObject | The type of the contained objects.
-template <typename ReferencedObject>
+#include <stddef.h>
+
+class OMObject;
+
+  // @class Abstract base class for iterators over Object Manager reference
+  //        containers.
+  //        The references may be Strong or Weak.
+  //        The collections may be Vectors or Sets.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMReferenceContainerIterator {
 public:
   // @access Public members.
@@ -45,74 +48,74 @@ public:
   virtual ~OMReferenceContainerIterator(void) {}
 
     // @cmember Create a copy of this <c OMReferenceContainerIterator>.
-  virtual OMReferenceContainerIterator<ReferencedObject>* copy(void) const = 0;
+  virtual OMReferenceContainerIterator* copy(void) const = 0;
 
     // @cmember Reset this <c OMReferenceContainerIterator> to the given
     //          <p initialPosition>.
     //          If <p initialPosition> is specified as
     //          <e OMIteratorPosition.OMBefore> then this
     //          <c OMReferenceContainerIterator> is made ready to traverse the
-    //          associated reference container property in the forward
+    //          associated reference container in the forward
     //          direction (increasing <p Key>s).
     //          If <p initialPosition> is specified as
     //          <e OMIteratorPosition.OMAfter> then this
     //          <c OMReferenceContainerIterator> is made ready to traverse the
-    //          associated reference container property in the reverse
+    //          associated reference container in the reverse
     //          direction (decreasing <p Key>s).
-   virtual void reset(OMIteratorPosition initialPosition = OMBefore) = 0;
+  virtual void reset(OMIteratorPosition initialPosition = OMBefore) = 0;
 
     // @cmember Is this <c OMReferenceContainerIterator> positioned before
-    //          the first <p ReferencedObject> ?
-   virtual bool before(void) const = 0;
+    //          the first <p OMObject> ?
+  virtual bool before(void) const = 0;
 
     // @cmember Is this <c OMReferenceContainerIterator> positioned after
-    //          the last <p ReferencedObject> ?
-   virtual bool after(void) const = 0;
+    //          the last <p OMObject> ?
+  virtual bool after(void) const = 0;
 
     // @cmember Is this <c OMReferenceContainerIterator> validly
-    //          positioned on a <p ReferencedObject> ?
+    //          positioned on a <p OMObject> ?
   virtual bool valid(void) const = 0;
 
-    // @cmember The number of <p ReferencedObject>s in the associated
-    //          reference container property.
+    // @cmember The number of <p OMObject>s in the associated
+    //          reference container.
   virtual size_t count(void) const = 0;
 
     // @cmember Advance this <c OMReferenceContainerIterator> to the next
-    //          <p ReferencedObject>, if any.
+    //          <p OMObject>, if any.
     //          If the end of the associated
-    //          reference container property is not reached then the
+    //          reference container is not reached then the
     //          result is <e bool.true>,
     //          <mf OMReferenceContainerIterator::valid> becomes <e bool.true>
     //          and <mf OMReferenceContainerIterator::after> becomes
     //          <e bool.false>.
     //          If the end of the associated
-    //          reference container property is reached then the result
+    //          reference container is reached then the result
     //          is <e bool.false>, <mf OMReferenceContainerIterator::valid>
     //          becomes <e bool.false> and
     //          <mf OMReferenceContainerIterator::after> becomes
     //          <e bool.true>. 
-   virtual bool operator++() = 0;
+  virtual bool operator++() = 0;
 
     // @cmember Retreat this <c OMReferenceContainerIterator> to the previous
-    //          <p ReferencedObject>, if any.
+    //          <p OMObject>, if any.
     //          If the beginning of the associated
-    //          reference container property is not reached then the
+    //          reference container is not reached then the
     //          result is <e bool.true>,
     //          <mf OMReferenceContainerIterator::valid> becomes <e bool.true>
     //          and <mf OMReferenceContainerIterator::before> becomes
     //          <e bool.false>.
     //          If the beginning of the associated
-    //          reference container property is reached then the result
+    //          reference container is reached then the result
     //          is <e bool.false>, <mf OMReferenceContainerIterator::valid>
     //          becomes <e bool.false> and
     //          <mf OMReferenceContainerIterator::before> becomes
     //          <e bool.true>. 
-   virtual bool operator--() = 0;
+  virtual bool operator--() = 0;
 
-    // @cmember Return the <p ReferencedObject> in the associated
-    //          reference container property at the position currently
+    // @cmember Return the <p OMObject> in the associated
+    //          reference container at the position currently
     //          designated by this <c OMReferenceContainerIterator>.
-   virtual ReferencedObject* value(void) const = 0;
+  virtual OMObject* currentObject(void) const = 0;
 
 };
 

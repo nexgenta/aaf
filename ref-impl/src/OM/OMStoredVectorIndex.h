@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,50 +29,67 @@
 #ifndef OMSTOREDVECTORINDEX_H
 #define OMSTOREDVECTORINDEX_H
 
-#include "OMPortability.h"
 #include "OMDataTypes.h"
 
 #include <stddef.h>
 
   // @class The in-memory representation of the on-disk index for a
   //        stored object vector.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMStoredVectorIndex {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMStoredVectorIndex(size_t size);
+  OMStoredVectorIndex(size_t capacity);
 
     // @cmember Destructor.
   ~OMStoredVectorIndex(void);
 
-    // @cmember The high water mark in the set of keys assigned to
+    // @cmember The first free key in the set of local keys assigned to
     //          this <c OMStoredVectorIndex>.
-    // @this const
-  OMUInt32 highWaterMark(void) const;
+  OMUInt32 firstFreeKey(void) const;
+
+    // @cmember Set the first free key in the set of local keys assigned to
+    //          this <c OMStoredVectorIndex>.
+  void setFirstFreeKey(OMUInt32 firstFreeKey);
+
+    // @cmember The last free key in the set of local keys assigned to
+    //          this <c OMStoredVectorIndex>.
+  OMUInt32 lastFreeKey(void) const;
+
+    // @cmember Set the last free key in the set of local keys assigned to
+    //          this <c OMStoredVectorIndex>.
+  void setLastFreeKey(OMUInt32 lastFreeKey);
 
     // @cmember Insert a new element in this <c OMStoredVectorIndex>
-    //          at position <p position> with key <p key>.
-  void insert(size_t position, OMUInt32 key);
+    //          at position <p position> with local key <p localKey>.
+    //          The local key of an element is an integer.
+    //          The local key is used to derive the name of the storage
+    //          on which an element is saved. Local keys are assigned
+    //          such that the names of existing elements do not have to
+    //          change when other elements are added to or removed from
+    //          the associated <c OMStrongReferenceVector>. The local key is
+    //          independent of the element's logical or physical position
+    //          within the associated <c OMStrongReferenceVector>.
+  void insert(size_t position, OMUInt32 localKey);
 
     // @cmember The number of elements in this <c OMStoredVectorIndex>.
-    // @this const
   size_t entries(void) const;
 
     // @cmember Iterate over the elements in this <c OMStoredVectorIndex>.
-    // @this const
-  void iterate(size_t& context, OMUInt32& key) const;
+  void iterate(size_t& context, OMUInt32& localKey) const;
 
     // @cmember Is this <c OMStoredVectorIndex> valid ?
-    // @this const
   bool isValid(void) const;
 
 private:
 
-  OMUInt32 _highWaterMark;
-  size_t _size;
+  OMUInt32 _firstFreeKey;
+  OMUInt32 _lastFreeKey;
+  size_t _capacity;
   size_t _entries;
-  OMUInt32* _keys;
+  OMUInt32* _localKeys;
 };
 
 #endif

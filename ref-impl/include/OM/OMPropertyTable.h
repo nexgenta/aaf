@@ -34,6 +34,7 @@
 #include "OMVector.h"
 
   // @class Persistent tables of property instance names.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMPropertyTable {
 public:
   // @access Public members.
@@ -44,14 +45,14 @@ public:
     // @cmember Destructor.
   ~OMPropertyTable(void);
 
-    // @cmember If <p propertyName> is not already present then insert
+    // @cmember If <p propertyPath> is not already present then insert
     //          it (by copying) into the table and return its tag,
     //          otherwise just return its tag. Tags are allocated
     //          sequentially.
-  OMPropertyTag insert(const char* propertyName);
+  OMPropertyTag insert(const OMPropertyId* propertyPath);
 
-    // @cmember The property name corresponding to <p tag> in the table.
-  const char* valueAt(OMPropertyTag tag) const;
+    // @cmember The property path corresponding to <p tag> in the table.
+  const OMPropertyId* valueAt(OMPropertyTag tag) const;
 
     // @cmember The count of entries in the table.
   size_t count(void) const;
@@ -61,7 +62,7 @@ public:
 
 private:
 
-  OMVector<char*> _vector;
+  OMVector<OMPropertyId*> _vector;
 
 };
 
