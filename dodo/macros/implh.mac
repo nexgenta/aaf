@@ -151,13 +151,13 @@ class Impl%01;
 
 class Impl.this-module : public Impl.parent-module
 {
-  public:
-  Impl.this-module ();
-  virtual ~Impl.this-module ();
+public:
   //
   // Constructor/destructor
   //
   //********
+  Impl.this-module ();
+  ~Impl.this-module ();
 #endm
 
 
@@ -178,12 +178,12 @@ class .this-module;
 class Impl.this-module
 {
 public:
-  Impl.this-module ();
-  ~Impl.this-module ();
   //
   // Constructor/destructor
   //
   //********
+  Impl.this-module ();
+  virtual ~Impl.this-module ();
 #endm
 
 
@@ -606,19 +606,13 @@ public:
   // in /test/Impl.this-moduleTest.cpp.
   static AAFRESULT test();
 
-  void InitComParent (I.this-module * pComParent);
+  void InitContainer (void * pContainer);
 
-  void InitCppParent (.this-module * pCppParent);
-
-  I.this-module * GetCOMParent ();
-
-  .this-module * GetCppParent ();
+  void * GetContainer ();
 
 private:
 
-  I.this-module * _pComParent;
-
-  .this-module * _pCppParent;
+  void * _pParent;
 
 };
 
@@ -829,49 +823,18 @@ private:
 
 #ccccccccccccccccccccccccccc
 #c
-#c Inserts declaration for a method which takes one argument, which is
-#c a pointer to an AAF object which is to be returned to the caller.
-#c This is different from the normal METHOD macro because the
-#c _rep will probably have the object in a different form.
+#c Inserts declaration for a static method used to bootstrap an AAF
+#c session by creating the first session object.
 #c
-#c Argument1: method name
-#c Argument2: argument modifiers (e.g. [in])
-#c Argument3: argument type
-#c Argument4: argument name
-#c Argument5: argument comment
-#c Argument6: method description
-#c
-#startm AD_GETOBJ_METHOD1 06
-  //****************
-  // %01()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    %01
-        (Impl%03 ** %04);   //@parm %02 %05
+#startm AD_BEGIN_SESSION 00
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
-#c Inserts declaration for a method which takes one argument, which is
-#c a pointer to an AAF object which is to be passed in from the caller.
-#c This is different from the normal METHOD macro because the
-#c _rep will probably have the object in a different form.
+#c Inserts declaration for a static method used for a container to create
+#c its contained objects in the cpp API.
 #c
-#c Argument1: method name
-#c Argument2: argument modifiers (e.g. [in])
-#c Argument3: argument type
-#c Argument4: argument name
-#c Argument5: argument comment
-#c Argument6: method description
-#c
-#startm AD_SETOBJ_METHOD1 06
-  //****************
-  // %01()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    %01
-        (Impl%03 * %04);    //@parm %02 %05
+#startm AD_STATIC_CREATE 00
 #endm
 
 

@@ -98,6 +98,10 @@
 #ifndef __%01_h__
 #include "%01.h"
 #endif
+
+#ifndef __Impl%01_h__
+#include "Impl%01.h"
+#endif
 #endm
 
 
@@ -168,7 +172,7 @@
       newRep = new Impl.this-module;
       assert (newRep);
       InitRep (newRep);
-      newRep->InitParent (this);
+      newRep->InitContainer (this);
 #endif
     }
 }
@@ -177,7 +181,7 @@
 .this-module::~.this-module ()
 {
 #ifdef BOB_TEST
-  Impl.this-module * rep;
+  ImplAAFObject * rep;
   rep = GetRepObject ();
   assert (rep);
   delete rep;
@@ -213,7 +217,7 @@
       newRep = new Impl.this-module;
       assert (newRep);
       InitRep (newRep);
-      newRep->InitParent (this);
+      newRep->InitContainer (this);
 #endif
     }
 }
@@ -236,7 +240,7 @@ void .this-module::InitRep (Impl.this-module * newRep)
   assert (newRep);
   assert (_rep);
   _rep = newRep;
-  newRep->InitParent (this);
+  newRep->InitContainer (this);
 #endif
 }
 
@@ -266,7 +270,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 #ifdef BOB_TEST
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -301,7 +305,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -342,7 +346,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -388,7 +392,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -439,7 +443,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -495,7 +499,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -556,7 +560,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -622,7 +626,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -693,7 +697,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -769,7 +773,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -850,7 +854,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -936,7 +940,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  ImplAAFObject * pO;
+  void * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -1033,7 +1037,7 @@ AAFRESULT STDMETHODCALLTYPE
 #ifdef BOB_TEST
 .%02-setup(%03, %04)
   Impl.this-module * newRep;
-  newRep = new Impl.this-module (%04);
+  newRep = new Impl.this-module (.%02-internalname(%04));
   assert (newRep);
   InitRep (newRep);
 .%02-cleanup(%03, %04)
@@ -1060,14 +1064,14 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_XCONSTRUCTOR2 11
 .this-module::.this-module (%03 .%02-indirection %04,
-								%08 .%07-indirection %09)
+    %08 .%07-indirection %09)
 {
 #ifdef BOB_TEST
 .%02-setup(%03, %04)
 .%07-setup(%08, %09)
   Impl.this-module * newRep;
-  newRep = new Impl.this-module (%04,
-								 %09);
+  newRep = new Impl.this-module (.%02-internalname(%04),
+    .%07-internalname(%09));
   assert (newRep);
   InitRep (newRep);
 .%02-cleanup(%03, %04)
@@ -1096,17 +1100,17 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_XCONSTRUCTOR3 16
 .this-module::.this-module (%03 .%02-indirection %04,
-								%08 .%07-indirection %09,
-								%13 .%12-indirection %14)
+    %08 .%07-indirection %09,
+    %13 .%12-indirection %14)
 {
 #ifdef BOB_TEST
 .%02-setup(%03, %04)
 .%07-setup(%08, %09)
 .%12-setup(%13, %14)
   Impl.this-module * newRep;
-  newRep = new Impl.this-module (%04,
-								 %09,
-								 %14);
+  newRep = new Impl.this-module (.%02-internalname(%04),
+    .%07-internalname(%09),
+    .%12-internalname(%14));
   assert (newRep);
   InitRep (newRep);
 .%02-cleanup(%03, %04)
@@ -1137,9 +1141,9 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_XCONSTRUCTOR4 21
 .this-module::.this-module (%03 .%02-indirection %04,
-								%08 .%07-indirection %09,
-								%13 .%12-indirection %14,
-								%18 .%17-indirection %19)
+    %08 .%07-indirection %09,
+    %13 .%12-indirection %14,
+    %18 .%17-indirection %19)
 {
 #ifdef BOB_TEST
 .%02-setup(%03, %04)
@@ -1147,10 +1151,10 @@ AAFRESULT STDMETHODCALLTYPE
 .%12-setup(%13, %14)
 .%17-setup(%18, %19)
   Impl.this-module * newRep;
-  newRep = new Impl.this-module (%04,
-								 %09,
-								 %14,
-								 %19);
+  newRep = new Impl.this-module (.%02-internalname(%04),
+    .%07-internalname(%09),
+    .%12-internalname(%14),
+    .%17-internalname(%19));
   assert (newRep);
   InitRep (newRep);
 .%02-cleanup(%03, %04)
@@ -1163,6 +1167,52 @@ AAFRESULT STDMETHODCALLTYPE
 }
 #endm
 
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a static method used to bootstrap an AAF
+#c session by creating the first session object.
+#c
+#startm AD_BEGIN_SESSION 00
+AAFRESULT STDMETHODCALLTYPE
+    AAFSession::BeginSession (aafProductIdentification_t * pIdent,
+        AAFSession ** ppSession)
+{
+#ifdef BOB_TEST
+  AAFSession * pObj;
+  pObj = new AAFSession;
+  assert (pObj);
+  assert (ppSession);
+  *ppSession = pObj;
+  return AAFRESULT_SUCCESS;
+
+#else
+  return AAFRESULT_NOT_IMPLEMENTED;
+#endif
+}
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a static method used for a container to create
+#c its contained objects in the cpp API.
+#c
+#startm AD_STATIC_CREATE 00
+AAFRESULT STDMETHODCALLTYPE
+    .this-module::CreateObject (.this-module ** result)
+{
+#ifdef BOB_TEST
+  .this-module * pObj;
+  pObj = new .this-module;
+  assert (pObj);
+  assert (result);
+  *result = pObj;
+  return AAFRESULT_SUCCESS;
+#else
+  return AAFRESULT_NOT_IMPLEMENTED;
+#endif
+}
+#endm
 
 #ccccccccccccccccccccccccccc
 #c
@@ -1193,10 +1243,10 @@ AAFRESULT STDMETHODCALLTYPE
 #c arg2 = external arg name
 #c
 #startm .objIn-setup 02
-  Impl%01 * internal%02 = NULL;
+  Impl%01 * internal%02 = (Impl%01*)NULL;
   if (%02)
     {
-	  internal%02 = static_cast<Impl%01*>(%02->GetImpl());
+	  internal%02 = static_cast<Impl%01*>(%02->GetRepObject());
 	  assert (internal%02);
     }
 #endm
@@ -1222,7 +1272,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm .objOut-setup 02
   Impl%01 * internal%02;
-  Impl%01 ** pinternal%02 = NULL;
+  Impl%01 ** pinternal%02 = (Impl%01**)NULL;
   if (%02)
     {
 	  pinternal%02 = &internal%02;
@@ -1301,6 +1351,6 @@ pinternal%01\
 	}
   else
     {
-	  *%02 = NULL;
+	  *%02 = (%01*)NULL;
 	}
 #endm

@@ -175,8 +175,7 @@ Impl.this-module::~Impl.this-module ()
 
 
 Impl.this-module::Impl.this-module ()
-: _pComParent (0),
-  _pCppParent (0)
+: _pContainer (0)
 {}
 
 
@@ -184,21 +183,11 @@ Impl.this-module::~Impl.this-module ()
 {}
 
 
-void Impl.this-module::InitComParent (I.this-module * pComParent)
+void Impl.this-module::InitContainer (void * pContainer)
 {
-  assert (! _pComParent);
-  _pComParent = pComParent;
-  assert (_pComParent);
-  assert (! _pCppParent);
-}
-
-
-void Impl.this-module::InitCppParent (.this-module * pCppParent)
-{
-  assert (! _pCppParent);
-  _pCppParent = pCppParent;
-  assert (_pCppParent);
-  assert (! _pComParent);
+  assert (! _pContainer);
+  _pContainer = pContainer;
+  assert (_pContainer);
 }
 #endm
 
@@ -284,6 +273,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 17: method description
 #c
 #startm AD_XMETHOD3 17
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/)
@@ -311,7 +301,8 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 22: method description
 #c
 #startm AD_XMETHOD4 22
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
+ AAFRESULT STDMETHODCALLTYPE
+   Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
                            .%18-adornment%19 .%18-indirection /*%20*/)
@@ -340,6 +331,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 27: method description
 #c
 #startm AD_XMETHOD5 27
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -371,7 +363,8 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 32: method description
 #c
 #startm AD_XMETHOD6 32
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
+ AAFRESULT STDMETHODCALLTYPE
+   Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
                            .%18-adornment%19 .%18-indirection /*%20*/,
@@ -404,6 +397,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 37: method description
 #c
 #startm AD_XMETHOD7 37
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -439,6 +433,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 42: method description
 #c
 #startm AD_XMETHOD8 42
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -476,6 +471,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 47: method description
 #c
 #startm AD_XMETHOD9 47
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -515,6 +511,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 52: method description
 #c
 #startm AD_XMETHOD_10 52
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -556,6 +553,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 57: method description
 #c
 #startm AD_XMETHOD_11 57
+AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
                            .%08-adornment%09 .%08-indirection /*%10*/,
                            .%13-adornment%14 .%13-indirection /*%15*/,
@@ -593,19 +591,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 class IAAFObject;
 
-I.this-module * Impl.this-module::GetCOMParent ()
+void * Impl.this-module::GetContainer ()
 {
-  assert (_pComParent);
-  assert (! _pCppParent);
-  return _pComParent;
-}
-
-
-.this-module * Impl.this-module::GetCppParent ()
-{
-  assert (! _pComParent);
-  assert (_pCppParent);
-  return _pCppParent;
+  assert (_pContainer);
+  return _pContainer;
 }
 #endm
 
@@ -711,55 +700,18 @@ Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/,
 
 #ccccccccccccccccccccccccccc
 #c
-#c Inserts declaration for a method which takes one argument, which is
-#c a pointer to an AAF object which is to be returned to the caller.
-#c This is different from the normal METHOD macro because the
-#c _rep will probably have the object in a different form.
+#c Inserts declaration for a static method used to bootstrap an AAF
+#c session by creating the first session object.
 #c
-#c Argument1: method name
-#c Argument2: argument modifiers (e.g. [in])
-#c Argument3: argument type
-#c Argument4: argument name
-#c Argument5: argument comment
-#c Argument6: method description
-#c
-#c NOTE!!! This macro takes as type, the object itself, not the
-#c pointer to it.  The indirection will be added by the macro
-#c expansion.
-#c
-#startm AD_GETOBJ_METHOD1 06
-AAFRESULT STDMETHODCALLTYPE
-    Impl.this-module::%01 (Impl%03 ** %04)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
+#startm AD_BEGIN_SESSION 00
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
-#c Inserts declaration for a method which takes one argument, which is
-#c a pointer to an AAF object which is to be passed in from the caller.
-#c This is different from the normal METHOD macro because the
-#c _rep will probably have the object in a different form.
+#c Inserts declaration for a static method used for a container to create
+#c its contained objects in the cpp API.
 #c
-#c NOTE!!! This macro takes as type, the object itself, not the
-#c pointer to it.  The indirection will be added by the macro
-#c expansion.
-#c
-#c Argument1: method name
-#c Argument2: argument modifiers (e.g. [in])
-#c Argument3: argument type
-#c Argument4: argument name
-#c Argument5: argument comment
-#c Argument6: method description
-#c
-#startm AD_SETOBJ_METHOD1 06
-AAFRESULT STDMETHODCALLTYPE
-    Impl.this-module::%01 (Impl%03 * %04)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
+#startm AD_STATIC_CREATE 00
 #endm
 
 
