@@ -3,11 +3,11 @@ AAFMediaFilmDescriptor\
 #endm
 #c
 #startm .parent-module 0
-AAFEssenceDescriptor\
+AAFMediaDescriptor\
 #endm
 #c
-#c #import ./AAFEssenceDescriptor.exp
-AD_HEAD
+#import ./AAFUnitTest.exp
+
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -17,81 +17,89 @@ AD_HEAD
 *                                          *
 \******************************************/
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-AD_INCLUDE(AAFTypes)
-
-AD_CLASS_UUID(e58a8564, 2a3e, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
-
-AD_DEFAULT_UUID(e58a8563, 2a3e, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
-AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_CLASS_BEGIN
 
 //@access Public Members
 
 /****/
 AD_METHOD1(SetFilmManufacturer,
-[in],aafString_t *,name,,
+[in],AAFString *,name,,
 Sets the manufacturer name of the film stock [optional].)
 
 /****/
 AD_METHOD1(GetFilmManufacturer,
-[out],aafString_t *,name,Pass in a string object which will be erased and filled,
+[out],AAFString *,name,Pass in a string object,which will be erased and filled,
 Gets the optional manufacturer name of the film stock.)
 	//@comm Returns a zero-length string if the property was not present
 	
 /****/
 AD_METHOD1(SetFilmModel,
-[in],aafString_t *,name,,
+[in],AAFString *,name,,
 Sets the model or brand of the film stock [optional].)
 
 /****/
 AD_METHOD1(GetFilmModel,
-[out],aafString_t *,name,Pass in a string object which will be erased and filled,
+[out],AAFString *,name,Pass in a string object,which will be erased and filled,
 Gets the optional model or brand of the film stock.)
 
 /****/
 AD_METHOD1(GetFilmFormat,
-[out],aafFilmType_t*,filmFormat,filmFormat,
-Get the film format.)
-	//@comm Film format may be: kFt35MM, kFt16MM, kFt8MM, kFt65MM
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t GetFilmFormat(
+		  omfFilmType_t *filmFormat); /* OUT - Film Format 
+												*      (kFt35MM, kFt16MM, kFt8MM, kFt65MM)
+												*/
 
 /****/
 AD_METHOD1(GetFrameRate,
-[out],aafUInt32*,rate,Frame Rate,
-Get the frame rate of the film.)
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t GetFrameRate(
+		  omfUInt32 *frameRate);      /* OUT - Frame Rate */
 
 /****/
 AD_METHOD1(GetPerfPerFrame,
-[out],aafUInt8*,perfPerFrame,Perforations per frame,
-Get the number of perforations per frame.)
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t GetPerfPerFrame(
+		  omfUInt8 *perfPerFrame);   /* OUT - Perforations per frame */
 
 /****/
 AD_METHOD1(GetFilmAspectRatio,
-[out],aafRational_t*,aspectRatio,Film Aspect Ratio,
-Get the image aspect ratio.)
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t GetFilmAspectRatio(
+		  omfRational_t *aspectRatio);/* OUT - Film Aspect Ratio  */
 
 /****/
 AD_METHOD1(SetFilmFormat,
-[in],aafFilmType_t,filmFormat,Film Format,
-Set the film format.)
-	//@comm kFt35MM, kFt16MM, kFt8MM, kFt65MM
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t SetFilmFormat(
+		  omfFilmType_t filmFormat); /* IN - Film Format (optional) 
+												*      (kFt35MM, kFt16MM, kFt8MM, kFt65MM)
+												*/
 
 /****/
 AD_METHOD1(SetFrameRate,
-[in],aafUInt32,rate,Frame Rate,
-Set the frame rate of the film.)
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t SetFrameRate(
+		  omfUInt32 frameRate);      /* IN - Frame Rate (optional) */
 
 /****/
 AD_METHOD1(SetPerfPerFrame,
-[in],aafUInt8,perfPerFrame,Perforations per frame,
-Set the number of perforations per frame.)
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t SetPerfPerFrame(
+		  omfUInt8 perfPerFrame);    /* IN - Perforations per frame
+												*      (optional)
+												*/
 
 /****/
 AD_METHOD1(SetFilmAspectRatio,
-[in],aafRational_t,aspectRatio,Film Aspect Ratio,
-Set the image aspect ratio.)
-
-AD_XCLASS_END(Concrete, StoredObject)
-   
+[in],OMLObject,obj,,
+Constructor from persistant store.)
+aafErr_t SetFilmAspectRatio(
+		  omfRational_t aspectRatio);/* IN - Film Aspect Ratio (optional) */
