@@ -38,6 +38,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -105,7 +106,8 @@ struct EssenceDataTest
   static const char _frowney[];
 };
 
-extern "C" HRESULT CAAFEssenceData_test()
+extern "C" HRESULT CAAFEssenceData_test(testMode_t mode);
+extern "C" HRESULT CAAFEssenceData_test(testMode_t mode)
 {
   HRESULT hr = AAFRESULT_SUCCESS;
   wchar_t *fileName = L"AAFEssenceDataTest.aaf";
@@ -113,7 +115,8 @@ extern "C" HRESULT CAAFEssenceData_test()
 
   try
   {
-    edt.createFile(fileName);
+	if(mode == kAAFUnitTestReadWrite)
+    	edt.createFile(fileName);
     edt.openFile(fileName);
   }
   catch (HRESULT& ehr)
@@ -210,7 +213,7 @@ void EssenceDataTest::cleanupReferences()
 
   if (NULL != _buffer)
   {
-    CoTaskMemFree(_buffer);
+    delete _buffer;
     _buffer = NULL;
   }
 
@@ -276,7 +279,7 @@ void EssenceDataTest::setBufferSize(aafUInt32 bufferSize)
   // Allocate the buffer.
   if (NULL != _buffer && bufferSize > _bufferSize)
   {
-    CoTaskMemFree(_buffer);
+    delete _buffer;
     _buffer = NULL;
   }
 
@@ -284,7 +287,7 @@ void EssenceDataTest::setBufferSize(aafUInt32 bufferSize)
   if (NULL == _buffer)
   {
     _bufferSize = bufferSize;
-    _buffer = static_cast<aafDataBuffer_t>(CoTaskMemAlloc(_bufferSize));
+    _buffer = (aafDataBuffer_t)new char[ _bufferSize ];
     checkExpression(NULL != _buffer, AAFRESULT_NOMEMORY);
   }
 }
