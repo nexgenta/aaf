@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxTypes.h,v 1.11 2004/04/10 14:27:39 jptrainor Exp $ $Name:  $
+// $Id: AxTypes.h,v 1.12 2004/07/12 11:58:37 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -140,7 +140,7 @@ public:
 
 	AxBuffer& operator=( const AxBuffer& rhs )
 	{
-		if ( this != &rsh ) {
+		if ( this != &rhs ) {
 			_ptr = rhs._ptr;
 			_size = rhs._size;
 		}
