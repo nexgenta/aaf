@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.141 2005/02/05 18:13:36 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.142 2005/03/16 17:58:01 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1117,9 +1117,10 @@ ImplAAFFile::Open ()
 		  HRESULT hr = _head->GetDictionary(&dictionary);
 		  if (hr != AAFRESULT_SUCCESS)
 			return hr;
+		  _factory->SetEnableDefRegistration (regWasEnabled);
+		  dictionary->InitBuiltins();
 		  dictionary->ReleaseReference ();
 		  dictionary = 0;
-		  _factory->SetEnableDefRegistration (regWasEnabled);
 
 		  if (IsWriteable())
 			{
