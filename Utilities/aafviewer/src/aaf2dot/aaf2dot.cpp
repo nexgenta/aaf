@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaf2dot.cpp,v 1.4 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
+// $Id: aaf2dot.cpp,v 1.5 2005/01/24 16:15:04 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -372,7 +372,7 @@ int main( int argc, char** argv )
    }
 
    catch ( const AxEx& ex ) {
-      wcout << ex.what() << endl;
+      cout << ex.what() << endl;
       return -1;
    }
 
