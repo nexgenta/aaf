@@ -59,6 +59,7 @@
   //        <c OMMappedFileRawStorage> - an implementation of <c OMRawStorage>
   //                                     for files mapped into memory.
   //
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMRawStorage {
 public:
   // @access Public members.
@@ -77,10 +78,24 @@ public:
     //          <mf OMRawStorage::size> causes <p bytesRead> to be less
     //          than <p byteCount>. Reading bytes that have never been written
     //          returns undefined data in <p bytes>.
-    //          precondition <f isReadable()>
+    //          @precondition <f isReadable()>
   virtual void read(OMByte* bytes,
                     OMUInt32 byteCount,
                     OMUInt32& bytesRead) const = 0;
+
+    // @cmember Attempt to read the number of bytes given by <p byteCount>
+    //          from offset <p position> in this <c OMRawStorage>
+    //          into the buffer at address <p bytes>.
+    //          The actual number of bytes read is returned in <p bytesRead>.
+    //          Reading from positions greater than
+    //          <mf OMRawStorage::size> causes <p bytesRead> to be less
+    //          than <p byteCount>. Reading bytes that have never been written
+    //          returns undefined data in <p bytes>.
+    //          @precondition <f isReadable()> && <f isPositionable()>
+  virtual void readAt(OMUInt64 possition,
+                      OMByte* bytes,
+                      OMUInt32 byteCount,
+                      OMUInt32& bytesRead) const = 0;
 
     // @cmember Is it possible to write to this <c OMRawStorage> ?
   virtual bool isWritable(void) const = 0;
@@ -94,7 +109,7 @@ public:
     //          <mf OMRawStorage::size> causes this <c OMRawStorage>
     //          to be extended, however such extension can fail, causing
     //          <p bytesWritten> to be less than <p byteCount>.
-    //          precondition <f isWritable()>
+    //          @precondition <f isWritable()>
     //   @devnote How is failure to extend indicated ?
   virtual void write(const OMByte* bytes,
                      OMUInt32 byteCount,
@@ -109,7 +124,7 @@ public:
   virtual bool isSizeable(void) const = 0;
 
     // @cmember The current size of this <c OMRawStorage> in bytes.
-    //          precondition <f isSizeable()>
+    //          @precondition <f isSizeable()>
   virtual OMUInt64 size(void) const = 0;
 
     // @cmember Set the size of this <c OMRawStorage> to <p newSize> bytes.
@@ -119,7 +134,7 @@ public:
     //          <c OMRawStorage> is truncated. Truncation may also result
     //          in the current position for <f read()> and <f write()>
     //          being set to <mf OMRawStorage::size>.
-    //          precondition <f isSizeable()>
+    //          @precondition <f isSizeable()>
     //   @devnote How is failure to extend indicated ?
   virtual void setSize(OMUInt64 newSize) = 0;
 
@@ -133,12 +148,12 @@ public:
 
     // @cmember The current position for <f read()> and <f write()>, as an
     //          offset in bytes from the beginning of this <c OMRawStorage>.
-    //          precondition <f isPositionable()>
+    //          @precondition <f isPositionable()>
   virtual OMUInt64 position(void) const = 0;
 
     // @cmember Set the current position for <f read()> and <f write()>, as an
     //          offset in bytes from the beginning of this <c OMRawStorage>.
-    //          precondition <f isPositionable()>
+    //          @precondition <f isPositionable()>
   virtual void setPosition(OMUInt64 newPosition) = 0;
 
     // @cmember Synchronize this <c OMRawStorage> with its external

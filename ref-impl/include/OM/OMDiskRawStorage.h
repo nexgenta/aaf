@@ -42,6 +42,7 @@
   //        ANSI file functions only.
   //
   //   @base public | <c OMRawStorage>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMDiskRawStorage : public OMRawStorage {
 public:
   // @access Static members.
@@ -80,6 +81,20 @@ public:
   virtual void read(OMByte* bytes,
                     OMUInt32 byteCount,
                     OMUInt32& bytesRead) const;
+
+    // @cmember Attempt to read the number of bytes given by <p byteCount>
+    //          from offset <p position> in this <c OMDiskRawStorage>
+    //          into the buffer at address <p bytes>.
+    //          The actual number of bytes read is returned in <p bytesRead>.
+    //          Reading from positions greater than
+    //          <mf OMDiskRawStorage::size> causes <p bytesRead> to be less
+    //          than <p byteCount>. Reading bytes that have never been written
+    //          returns undefined data in <p bytes>.
+    //          @precondition <f isReadable()> && <f isPositionable()>
+  virtual void readAt(OMUInt64 possition,
+                      OMByte* bytes,
+                      OMUInt32 byteCount,
+                      OMUInt32& bytesRead) const;
 
     // @cmember Is it possible to write to this <c OMDiskRawStorage> ?
   virtual bool isWritable(void) const;
