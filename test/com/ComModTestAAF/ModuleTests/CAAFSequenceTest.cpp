@@ -18,7 +18,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
-#include "AAFDefUIDs.h"
 
 #define kNumComponents	5
 
@@ -67,7 +66,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -379,7 +378,7 @@ extern "C" HRESULT CAAFSequence_test()
 	if (SUCCEEDED(hr))
 	{
 		cout << "The following AAFSequence methods have not been implemented:" << endl; 
-//		cout << "     RemoveComponent" << endl; 
+		cout << "     RemoveComponent" << endl; 
 		cout << "     SegmentOffsetToTC - needs unit test" << endl; 
 		cout << "     SegmentTCToOffset - needs unit test" << endl; 
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
