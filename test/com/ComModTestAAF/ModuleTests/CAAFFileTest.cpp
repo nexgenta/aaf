@@ -169,9 +169,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			return AAFRESULT_TEST_FAILED;
 		if ( memcmp(&mobID, &newUID, sizeof(mobID)) != 0)
 			return AAFRESULT_TEST_FAILED;
+
+		aMob->Release();
+		aMob = NULL;
 	}
 
-	//!!! Problem deleting, let it leak -- 	delete mobIter;
+	mobIter->Release();
+	mobIter = NULL;
+
 	hr = pFile->Close();
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
@@ -196,8 +201,8 @@ HRESULT CAAFFile::test()
 	try
 	{
 		hr = CreateAAFFile(	pFileName );
-
-		hr = ReadAAFFile( pFileName );
+		if(hr == AAFRESULT_SUCCESS)
+			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
@@ -210,6 +215,9 @@ HRESULT CAAFFile::test()
   if (pObject)
 	pObject->Release();
 
+  	// When all of the functionality of this class is tested, we can return success
+	if(hr == AAFRESULT_SUCCESS)
+		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
   return hr;
 }
 
