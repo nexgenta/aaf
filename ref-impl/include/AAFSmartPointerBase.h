@@ -1,31 +1,13 @@
 #ifndef __AAFSmartPointerBase_h__
 #define __AAFSmartPointerBase_h__
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*                                               *
+\***********************************************/
 
 //
 // This is a smart pointer template class for use as a reference to
@@ -113,8 +95,8 @@ template <typename ReferencedObject>
 struct AAFCountedReference
 {
 protected:
-  virtual aafUInt32 acquire (ReferencedObject * pObj) = 0;
-  virtual aafUInt32 release (ReferencedObject * pObj) = 0;
+  virtual void acquire (ReferencedObject * pObj) = 0;
+  virtual void release (ReferencedObject * pObj) = 0;
 };
 
 
@@ -132,7 +114,7 @@ template <typename ReferencedType, typename RefCountType>
 struct AAFSmartPointerBase : public RefCountType
 {
   // ctor to create 
-  inline AAFSmartPointerBase ();
+  AAFSmartPointerBase ();
 
   // copy ctor
   AAFSmartPointerBase (const AAFSmartPointerBase<ReferencedType, RefCountType> & src);
@@ -149,17 +131,28 @@ struct AAFSmartPointerBase : public RefCountType
   ReferencedType ** operator & ();
  
   // Allows passing this smart ptr as argument to methods which expect
-  // a ReferencedType*
-  inline operator ReferencedType * () const;
+  // a ReferencedType* (non-const and const)
+  operator ReferencedType * ();
+  operator ReferencedType * () const;
  
   // member access operators (non-const and const)
-  inline ReferencedType * operator-> ();
-  inline const ReferencedType * operator-> () const;
+  ReferencedType * operator-> ();
+  const ReferencedType * operator-> () const;
+
+protected:
+
+  // Utility to keep track of who should get acquired and released
+  void updateRefCounts ();
 
 private:
 
   // Current referenced object
   ReferencedType * _rep;
+
+  // Last known referenced object.  If _rep changes from under us, we
+  // can detect it with this and do the appropriate acquire/release
+  // references.
+  ReferencedType * _lastKnownRep;
 };
 
 
@@ -176,9 +169,10 @@ private:
 #endif // ! AAF_SMART_POINTER_ASSERT
 
 template <typename ReferencedType, typename RefCountType>
-inline AAFSmartPointerBase<ReferencedType, RefCountType>::
+AAFSmartPointerBase<ReferencedType, RefCountType>::
 AAFSmartPointerBase ()
-  : _rep (0)
+  : _rep (0),
+	_lastKnownRep (0)
 {}
 
 
@@ -186,10 +180,17 @@ template <typename ReferencedType, typename RefCountType>
 AAFSmartPointerBase<ReferencedType, RefCountType>::
 AAFSmartPointerBase\
   (const AAFSmartPointerBase<ReferencedType, RefCountType> & src)
-	: _rep (src._rep)
+	: _rep (src._rep),
+	  _lastKnownRep (0) // NULL to make updateRefCounts() work
 {
+  // BobT 1999-07-07: Bug! See comment in updateRefCounts() to see why
+  // we need to addref this one explicitly.
   if (_rep)
 	acquire(_rep);
+
+  // depends on _lastKnownRep being NULL for proper operation in this
+  // case.
+  updateRefCounts ();
 }  
 
 
@@ -197,12 +198,12 @@ template <typename ReferencedType, typename RefCountType>
 AAFSmartPointerBase<ReferencedType, RefCountType>::
 ~AAFSmartPointerBase ()
 {
-  if (_rep)
-	{
-	  aafUInt32 refCnt =
-	  release (_rep);
-	  _rep = 0;
-	}
+  // in case something changed since last time
+  updateRefCounts ();
+
+  // Set _rep to NULL to let updateRefCounts() do the dirty work.
+  _rep = 0;
+  updateRefCounts ();
 }
 
 
@@ -212,15 +213,21 @@ AAFSmartPointerBase<ReferencedType, RefCountType>::
 operator=
   (const AAFSmartPointerBase<ReferencedType, RefCountType> & src)
 {
-  if (_rep)
-	{
-	  release (_rep);
-	  _rep = 0;
-	}
+  // in case something changed since last time
+  updateRefCounts ();
+
+  // Set _rep to NULL to let updateRefCounts() do the dirty work.
+  _rep = 0;
+  updateRefCounts ();
 
   _rep = src._rep;
+
+  // BobT 1999-07-07: Bug! See comment in updateRefCounts() to see why
+  // we need to addref this one explicitly.
   if (_rep)
 	acquire(_rep);
+
+  updateRefCounts ();
 
   return *this;
 }
@@ -230,41 +237,87 @@ template <typename ReferencedType, typename RefCountType>
 ReferencedType** AAFSmartPointerBase<ReferencedType, RefCountType>::
 operator & ()
 {
-  if (_rep)
-	{
-	  release (_rep);
-	  _rep = 0;
-	}
+  // in case something changed since last time
+
+  updateRefCounts ();
   return &_rep;
 }
 
 
 template <typename ReferencedType, typename RefCountType>
-inline AAFSmartPointerBase<ReferencedType, RefCountType>::
+AAFSmartPointerBase<ReferencedType, RefCountType>::
+operator ReferencedType* ()
+{
+  // in case something changed since last time
+
+  updateRefCounts ();
+  return _rep;
+}
+
+
+template <typename ReferencedType, typename RefCountType>
+AAFSmartPointerBase<ReferencedType, RefCountType>::
 operator ReferencedType* () const
 {
   // in case something changed since last time
 
-  // ((AAFSmartPointerBase<ReferencedType, RefCountType>*)this)->updateRefCounts ();
+  ((AAFSmartPointerBase<ReferencedType, RefCountType>*)this)->updateRefCounts ();
   return _rep;
 }
 
 
 template <typename ReferencedType, typename RefCountType>
-inline ReferencedType* AAFSmartPointerBase<ReferencedType, RefCountType>::
+ReferencedType* AAFSmartPointerBase<ReferencedType, RefCountType>::
 operator-> ()
 {
+  // in case something changed since last time
+  updateRefCounts ();
+
   AAF_SMART_POINTER_ASSERT (_rep);
   return _rep;
 }
 
 template <typename ReferencedType, typename RefCountType>
-inline const ReferencedType *
+const ReferencedType *
 AAFSmartPointerBase<ReferencedType, RefCountType>::
 operator-> () const
 {
+  // in case something changed since last time
+  updateRefCounts ();
+
   AAF_SMART_POINTER_ASSERT (_rep);
   return _rep;
+}
+
+
+template <typename ReferencedType, typename RefCountType>
+void AAFSmartPointerBase<ReferencedType, RefCountType>::
+updateRefCounts ()
+{
+  if (_rep != _lastKnownRep)
+	{
+	  // _rep changed since we last knew it.  Release last known
+	  // rep.
+	  if (_lastKnownRep)
+		{
+		  release(_lastKnownRep);
+		}
+	  // Make sure we know what we're pointing to now
+	  _lastKnownRep = _rep;
+	  if (_rep)
+		{
+		  // _rep was changed to something else since we last knew.
+		  // acquire the new one.
+		  //
+		  // BobT 1999-07-07: Bug! operator&() is used when passing a
+		  // smart pointer to GetObject(obj**)-style methods; however
+		  // these typically addref the returned object before they
+		  // return it! So in that case, we *don't* want to acquire a
+		  // reference to it, since it was already done for us.
+		  // Comment out this acquire()...
+		  // acquire(_rep);
+		}
+	}
 }
 
 
