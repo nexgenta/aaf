@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: UTF8FileNameTest.cpp,v 1.1.2.1 2004/07/16 12:20:55 bakerian Exp $ $Name:  $
+// $Id: UTF8FileNameTest.cpp,v 1.1.2.2 2004/08/30 17:04:33 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,7 +19,8 @@
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
+// Licensor of the AAF Association is Avid Technology, 
+// with parts Metaglue Corporation.
 // All rights reserved.
 //
 //=---------------------------------------------------------------------=
