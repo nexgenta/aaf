@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUUIDUtils.c,v 1.3 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: AAFUUIDUtils.c,v 1.3.2.1 2004/04/05 09:13:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,7 +49,7 @@
 #include <net/if_arp.h>
 #endif
 
-#ifdef OS_MACOS
+#if defined(OS_DARWIN) || defined(OS_MACOS)
 #include <CoreServices/CoreServices.h>
 #endif
 #ifdef OS_IRIX
@@ -118,7 +118,7 @@ extern "C" {
  *
  *  kAAFTrue if it found the IEEE node number
  */
-#if !defined OS_WINDOWS && !defined OS_IRIX && !defined OS_MACOS
+#if !defined OS_WINDOWS && !defined OS_IRIX && !defined OS_DARWIN && !defined OS_MACOS
 #if defined OS_SOLARIS
 static aafBoolean_t get_ieee_node_id(aafUUID_Node_t *node)
 {
@@ -505,7 +505,7 @@ extern int aafUUIDCreate (aafUUID_t * uuid)
 	uuid_t tmp;
 	uuid_generate_time (tmp);
 	memcpy (uuid, &tmp, sizeof(*uuid));
-#elif defined OS_MACOS
+#elif defined OS_DARWIN || defined OS_MACOS
 	CFUUIDRef	a;
 	a = CFUUIDCreate( kCFAllocatorDefault );
 	CFUUIDBytes b = CFUUIDGetUUIDBytes(a);
@@ -543,4 +543,3 @@ extern int aafUUIDCreate (aafUUID_t * uuid)
 #endif
 	return(1);
 }
-

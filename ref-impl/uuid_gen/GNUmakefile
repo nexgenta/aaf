@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4.2.1 2004/04/05 09:13:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -33,18 +33,12 @@ include $(AAFBASE)/build/common.mk
 
 # Include directories
 INCLUDES = -I../include/ref-api \
-	   -I../include
+			-I../include
 
 
 .PHONY : all
 
-ifeq ($(AAFPLATFORM),SparcSolaris)
 all : uuid_gen
-else
-all:
-	$(warning uuid_gen library is only required for Solaris)
-	$(warning and so is not being built)
-endif
 
 .PHONY : uuid_gen
 uuid_gen : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libuuid_gen$(LIB)
@@ -52,7 +46,6 @@ uuid_gen : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libuuid_gen$(LIB)
 
 $(LIBDIR)/libuuid_gen$(LIB) : $(CXXOBJS)
 	$(LD_STAT_LIB) $@ $(CXXOBJS)
-
 
 
 .PHONY : clean
@@ -66,6 +59,4 @@ clean:
 .PHONY : realclean
 realclean : clean
 
-
 include $(AAFBASE)/build/rules.mk
-
