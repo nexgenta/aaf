@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefVectorPropertyT.h,v 1.73 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
+// $Id: OMWeakRefVectorPropertyT.h,v 1.74 2004/11/23 17:54:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -557,7 +557,7 @@ size_t OMWeakReferenceVectorProperty<ReferencedObject>::indexOfValue(
   PRECONDITION("Valid object", object != 0);
   PRECONDITION("Object is present", containsValue(object));
 
-  size_t result;
+  size_t result = 0;
 
   VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMReferenceVectorT.h,v 1.12 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMReferenceVectorT.h,v 1.13 2004/11/23 17:54:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -331,7 +331,7 @@ size_t OMReferenceVector<ReferencedObject>::indexOfValue(
   PRECONDITION("Valid object", object != 0);
   PRECONDITION("Object is present", containsValue(object));
 
-  size_t result;
+  size_t result = 0;
 
   VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
