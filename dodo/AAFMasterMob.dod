@@ -6,7 +6,6 @@ AAFMasterMob\
 AAFMob\
 #endm
 #c
-#import ./AAFUnitTest.exp
 #import ./AAFObject.exp
 #import ./AAFMob.exp
 
@@ -20,6 +19,7 @@ AD_HEAD
 *                                          *
 \******************************************/
 
+AD_FORWARD_DECLARATION(AAFSourceClip)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types required by this module:
@@ -40,6 +40,8 @@ AD_HEAD
 AD_FORWARD_DECLARATION(AAFSourceClip)
 AD_FORWARD_DECLARATION(AAFSourceMob)
 AD_FORWARD_DECLARATION(AAFComponent)
+AD_FORWARD_DECLARATION(AAFDataDefinition)
+AD_FORWARD_DECLARATION(AAFFindSourceInfo)
 
 AD_CLASS_UUID(b1a21373, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
 
@@ -88,7 +90,7 @@ This function returns the number of media representations available for the
 AD_XMETHOD3(GetRepresentationSourceClip,
 [in], objPass, aafTrackID_t, trackID, TrackID.,
 [in], objPass, aafInt32, index, Index of requested representation.,
-[out], objOut, AAFSourceClip*, sourceClip, Source Clip that is the requested number representation within
+[out], objOut, AAFSourceClip, sourceClip, Source Clip that is the requested number representation within
   // the specified track of this Master Mob.,
 Returns the indexed media representation for the specified Master Mob\,
   // TrackID\, and index.
@@ -146,7 +148,7 @@ AD_XMETHOD7(SearchSource,
   // @ex Possible values for omfEffectChoice_t are: |
   //	kFindNull,
 [out], objOut, AAFComponent, component, The current object in the sequence in the specified track and Mob.,
-[out], objPass, aafFindSourceInfo_t *, sourceInfo, Preallocated buffer to hold source information.,
+[out], objOut, AAFFindSourceInfo, sourceInfo, Preallocated buffer to hold source information.,
 Returns source information for a track in a Master Mob or Source Mob.
   // @commThis function returns the source information for a track in a Master Mob or
   // Source Mob. It follows the Source Clip references in the specified track until it
@@ -155,8 +157,6 @@ Returns source information for a track in a Master Mob or Source Mob.
   // called iteratively; use the omfiMobOpenSearch\, omfiMobGetNextSource\,
   // omfiMobGetThisSource\, and omfiMobCloseSearch functions for those
   // purposes.)
-
-AD_OVERRIDE(.method-Test)
 
 AD_OVERRIDE(.method-Delete)
 

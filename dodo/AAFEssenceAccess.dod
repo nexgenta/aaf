@@ -2,7 +2,6 @@
 AAFMedia\
 #endm
 #c
-#import ./AAFUnitTest.exp
 #import ./AAFObject.exp
 AD_HEAD
 /******************************************\
@@ -17,7 +16,7 @@ AD_HEAD
 AD_INCLUDE(AAFTypes)
 AD_FORWARD_DECLARATION(AAFDataDefinition)
 AD_FORWARD_DECLARATION(AAFMasterMob)
-AD_FORWARD_DECLARATION(AAFFileMob)
+AD_FORWARD_DECLARATION(AAFSourceMob)
 AD_FORWARD_DECLARATION(AAFSourceClip)
 
 AD_ROOT_CLASS_BEGIN
@@ -26,7 +25,7 @@ AD_ROOT_CLASS_BEGIN
 AD_XMETHOD7(AudioMediaCreate,
 [in],objIn, AAFMasterMob,masterMob,on this master mob,
 [in],objPass, aafTrackID_t,masterTrackID,,
-[in],objIn, AAFFileMob,fileMob,and this file mob create audio,
+[in],objIn, AAFSourceMob,fileMob,and this file mob create audio,
 [in],objPass, aafRational_t,samplerate,with this sample rate,
 [in],objPass, aafCompressEnable_t,enable,optionally compressing it,
 [in],objPass, aafInt16,sampleSize,with this sample size,
@@ -55,7 +54,7 @@ Creates an audio media stream.)
 AD_XMETHOD9(VideoMediaCreate,
 [in],objIn, AAFMasterMob,masterMob,on this master mob,
 [in],objPass, aafTrackID_t,masterTrackID,masterTrackID,
-[in],objIn, AAFFileMob,fileMob,and this file mob create video,
+[in],objIn, AAFSourceMob,fileMob,and this file mob create video,
 [in],objPass, aafCompressEnable_t,enable,optionally compressing it,
 [in],objPass, aafRational_t,editrate,editrate,
 [in],objPass, aafUInt32,StoredHeight,with this height,
@@ -86,7 +85,7 @@ Creates an audio media stream.)
 AD_XMETHOD6(Create,
 [in],objIn, AAFMasterMob,masterMob,on this master mob,
 [in],objPass, aafTrackID_t,masterTrackID,,
-[in],objIn, AAFFileMob,fileMob,and this file mob,
+[in],objIn, AAFSourceMob,fileMob,and this file mob,
 [in],objIn, AAFDataDefinition,mediaKind,create media of this type,
 [in],objPass, aafRational_t,samplerate,with this sample rate,
 [in],objPass, aafCompressEnable_t,enable,optionally compressing it,
@@ -107,7 +106,7 @@ Creates a single channel stream of media.)
 /****/
 AD_XMETHOD6(MultiCreate,
 [in],objIn, AAFMasterMob,masterMob,on this master mob,
-[in],objIn, AAFFileMob,fileMob,and this file mob create,
+[in],objIn, AAFSourceMob,fileMob,and this file mob create,
 [in],objPass, aafInt16,arrayElemCount,this many channels,
 [in],objPass, aafmMultiCreate_t *,mediaArray,using these definitions,
 [in],objPass, aafRational_t ,editRate,,
@@ -562,7 +561,7 @@ Given an array of audio format blocks read the opcodes and operands and change t
 /****/
 AD_XMETHOD3(IsHardwareAssistedCodec,
 [in],objPass, aafCodecID_t,codecID,,
-[in],objIn, AAFFileMob,mob,,
+[in],objIn, AAFSourceMob,mob,,
 [out],objPass, aafBool*,result,,
 Tells if the given codec is hardware-assisted.)
 	//@comm That is, does
@@ -618,7 +617,5 @@ AD_METHOD1(SourceGetVideoSignalType,
 [in],aafVideoSignalType_t*,signalType,,
 Get the video signal type [NTSC/PAL/SECAM].)
 	//@comm Replaces omfmSourceGetVideoSignalType */
-
-AD_OVERRIDE(.method-Test)
 
 AD_ROOT_CLASS_END
