@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFMob
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFMobTest.cpp,v 1.55.2.2 2004/04/07 18:26:48 jptrainor Exp $ $Name:  $
+// $Id: CAAFMobTest.cpp,v 1.55.2.3 2004/06/16 19:05:29 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
