@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSSStoredObject.cpp,v 1.67 2004/06/17 19:36:19 jptrainor Exp $ $Name:  $
+// $Id: OMMSSStoredObject.cpp,v 1.68 2004/06/21 15:16:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2733,13 +2733,14 @@ void OMMSSStoredObject::externalizeUInt16Array(const OMUInt16* internalArray,
   }
 }
 /*
-* MS VC++ versions prior to version 7.0 do not define STGOPTIONS.
+* MS VC++ versions prior to version 7.0 do not define STGOPTIONS (unless a
+* recent Microsoft platform SDK was installed).  Hence test for STGOPTIONS_VERSION.
 */
 #ifdef OM_USE_STORAGE_EX
 #ifndef STGOPTIONS_VERSION
 typedef void STGOPTIONS;
-#endif //_MSC_VER
-#endif //OM_USE_STORAGE_EX
+#endif // STGOPTIONS_VERSION
+#endif // OM_USE_STORAGE_EX
 
 OMMSSStoredObject* OMMSSStoredObject::openFile(const wchar_t* fileName,
                                                const OMFile::OMAccessMode mode)
