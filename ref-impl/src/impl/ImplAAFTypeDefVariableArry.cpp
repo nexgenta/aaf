@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.62 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.63 2004/10/08 19:35:52 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -649,7 +649,17 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMProperty
 		
 		// Use a variable sized property so that we can allow a property value
 		// size of 0 (i.e. no elements in the array). (transdel 2000-MAR-14)
-		aafUInt32 elemSize = ptd->NativeSize();
+
+		// Oliver/Ian 2004-10-08: reinstate code to accept objects with
+		// properties of client-defined types that have not yet had
+		// their types registered.
+
+		// aafUInt32 elemSize = ptd->NativeSize();
+        aafUInt32 elemSize; 
+        if (ptd->IsRegistered()) 
+                elemSize = ptd->NativeSize (); 
+        else 
+				elemSize = ptd->PropValSize (); 
 		switch (elemSize) {
 		case 1:
 			result = new OMArrayProperty<aafUInt8> (pid, name);
