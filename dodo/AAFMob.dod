@@ -1,10 +1,24 @@
-#c/*************************************************\
-#c*                                                 *
-#c* Advanced Authoring Format                       *
-#c*                                                 *
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.   *
-#c*                                                 *
-#c\*************************************************/
+#c *********************************************************************
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c 
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c 
+#c The Original Code of this file is Copyright 1998-2001, Licensor of the
+#c AAF Association.
+#c 
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFMob\
 #endm
@@ -42,6 +56,9 @@ AD_FORWARD_DECLARATION(AAFTimelineMobSlot)
 AD_FORWARD_DECLARATION(AAFFile)
 AD_FORWARD_DECLARATION(EnumAAFMobSlots)
 AD_FORWARD_DECLARATION(EnumAAFTaggedValues)
+AD_FORWARD_DECLARATION(AAFKLVData)
+AD_FORWARD_DECLARATION(EnumAAFKLVData)
+
 AD_CLASS_UUID(B1A21375, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21374, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
@@ -130,8 +147,6 @@ AD_XMETHOD1(AppendSlot,
 
 			Appends the given mob slot to the mob.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the pSlot pointer is valid.
   // 
@@ -157,8 +172,6 @@ AD_XMETHOD1(PrependSlot,
 
 			Prepends the given mob slot to the mob.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the pSlot pointer is valid.
   // 
@@ -193,8 +206,6 @@ AD_XMETHOD2(InsertSlotAt,
   // existing slots at the given and higher index will be moved up one
   // index to accommodate.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the pSlot pointer is valid.
   // - index is less than or equal to the result obtained by
@@ -228,8 +239,6 @@ AD_XMETHOD1(RemoveSlotAt,
   // indices higher than the given index will be moved down one index
   // to accommodate.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - index is less than the result obtained by CountSlots\(\).
   // 
@@ -263,8 +272,6 @@ AD_XMETHOD2(GetSlotAt,
 
      Returns the indexed slot in *ppSlot.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - ppSlot is a valid pointer.
   // - index is less than the result obtained by CountSlots\(\).
@@ -615,8 +622,6 @@ AD_XMETHOD4(GetMobInfo,
   // Caller may call GetNameBufLen\(\) to determine the required pName
   // buffer size.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the pLastModified pointer is valid.
   // - the pCreationTime pointer is valid.
@@ -658,12 +663,10 @@ AD_XMETHOD3(OffsetToMobTimecode,
 			pResult,
 			The resulting timecode,
 
-			This method will determine the timecode at the given offset into
+	This method will determine the timecode at the given offset into
   // the given timecode segment\, and will return it in *pResult.  If
   // pTcSeg is NULL\, will search for the slot containing a timecode
   // segment and will use that instead.
-  //
-  // NOTE! Stub only.   Implementation not yet added.
   //
   // Succeeds if all of the following are true:
   // - the pTcSeg pointer is valid.
@@ -677,6 +680,8 @@ AD_XMETHOD3(OffsetToMobTimecode,
   // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
   // 
+  // NOTE! Stub only.   Implementation not yet added.
+  //
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
@@ -742,8 +747,6 @@ AD_XMETHOD2(ChangeRef,
   // Mob looking for Source Clips\, and changes the sourceID property
   // on all Source Clips with oldMobID to newMobID.
   //
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // If this method fails no state will be changed.
   // 
   // This method will return the following codes.  If more than one of
@@ -779,7 +782,7 @@ AD_XMETHOD4(CloneExternal,
 			ppDestMob,
 			Destination Mob,
 
-			Clones the specified Source Mob\, and optionally all dependent
+	Clones the specified Source Mob\, and optionally all dependent
   // Mobs\, to an external file\, keeping the same MobID.  A pointer
   // to the newly created destination mob is returned in *ppDestMob.
   // 
@@ -797,8 +800,6 @@ AD_XMETHOD4(CloneExternal,
   // same AAF Version number.
   //
   // The returned mob is AddRef\(\)ed before it is returned.
-  //
-  // NOTE! Stub only.   Implementation not yet added.
   //
   // Succeeds if all of the following are true:
   // - the pDestFile pointer is valid.
@@ -840,8 +841,6 @@ AD_XMETHOD2(Copy,
   // 
   // The returned mob is AddRef\(\)ed before it is returned.
   //
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the pDestMobName pointer is valid.
   // - the ppDestMob pointer is valid.
@@ -857,4 +856,111 @@ AD_XMETHOD2(Copy,
   //
   // AAFRESULT_NULL_PARAM
   //   - either pDestMobName or pDestMob arguments is NULL.)
+  //
+
+AD_XMETHOD1(AppendKLVData,
+			[in],
+			objIn,
+			AAFKLVData,
+			pData,
+			KLV object,
+
+			Appends a pre-existing KLV Data object to the specified
+  // Mob.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pKLV pointer is valid.
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - the pData arg is NULL.)
+
+
+AD_XMETHOD1(CountKLVData,
+			[out],
+			objPass,
+			aafUInt32 *,
+			pNumData,
+			Number  of KLV data objects,
+
+			return total number of KLV data objects attached to this mob.
+  //
+  // Succeeds if all of the following are true:
+  // - the pNumData pointer is valid.
+  // 
+  // If this method fails nothing will be written to *pNumComments.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pNumData arg is NULL.)
+
+
+AD_XMETHOD1(GetKLVData,
+			[out],
+			objOut,
+			EnumAAFKLVData,
+			ppEnum,
+			KLV data objects,
+
+			return the enumeration for all KLV data objects on this mob.  The returned
+  // enumerator is AddRef\(\)ed before it is returned.  The enumerator
+  // is implemented as a EnumAAFKLVData.
+  // 
+  // Succeeds if all of the following are true:
+  // - the ppEnum pointer is valid.
+  // 
+  // If this method fails nothing will be written to *ppEnum.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppEnum is null.)
+
+
+AD_XMETHOD1(RemoveKLVData,
+			[in],
+			objIn,
+			AAFKLVData,
+			pData,
+			KLV data object to remove,
+
+  // Removes the given KLV data object from this mob.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pData pointer is valid.
+  // - the given KLV data object is present in the mob.
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pData is null.
+  //
+  // AAFRESULT_OBJECT_NOT_FOUND
+  //   - the given KLV data object is not in this mob.)
 AD_XCLASS_END(Abstract, StoredObject)
