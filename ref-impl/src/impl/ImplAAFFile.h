@@ -16,7 +16,11 @@
 #include "AAFTypes.h"
 #endif
 
-#include "Stubs.h"
+#ifndef __ImplAAFRoot_h__
+#include "AAFRoot.h"
+#endif
+
+#include "Container.h"
 
 typedef enum
 {
@@ -30,13 +34,12 @@ struct IAAFFile;
 class AAFFile;
 struct IAAFMedia;
 class AAFMedia;
-struct IAAFHeader;
-class AAFHeader;
+class ImplAAFHeader;
 struct IAAFSession;
 class ImplAAFSession;
 class ImplAAFDataDefinition;
 
-class ImplAAFFile
+class ImplAAFFile : public ImplAAFRoot
 {
 public:
   //
@@ -75,10 +78,6 @@ public:
   // in /test/ImplAAFFileTest.cpp.
   static AAFRESULT test();
 
-  void InitContainer (void * pContainer);
-
-  void * GetContainer ();
-
 AAFRESULT Create(
 			aafDataBuffer_t		stream, 
 			ImplAAFSession *	session, 
@@ -91,11 +90,10 @@ AAFRESULT OpenModify(
 			ImplAAFSession *	session);
 private:
 
-AAFRESULT InternOpenFile(aafDataBuffer_t stream, 
+	AAFRESULT InternOpenFile(aafDataBuffer_t stream, 
 								   ImplAAFSession * session,
 								   OMLContainerUseMode useMode, 
 								   openType_t type);
-  void * _pContainer;
 
 		aafInt32       	_cookie;
 		aafFileFormat_t _fmt;
@@ -103,8 +101,8 @@ AAFRESULT InternOpenFile(aafDataBuffer_t stream,
 		aafInt16           _byteOrder;
 		openType_t		_openType;
 		ImplAAFFile			*_prevFile;
+		ImplAAFHeader *     _head;		// Needed by Head object
 #if FULL_TOOLKIT
-		AAFHeader *     _head;		// Needed by Head object
 		aafCloseMediaPtr _closeMediaProc;
 		aafBool			_customStreamFuncsExist;	//!!!	
 		struct aafCodecStreamFuncs _streamFuncs;	//!!!	
