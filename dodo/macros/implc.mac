@@ -22,6 +22,23 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c Pass through argument if for idl otherwise omit it.
+#c 
+#c This macro is generally used to specify IDL options that would
+#c make since to emit to c++.
+#c To allow proper marshalling code generation of a struct: |
+#c typedef struct
+#c {
+#c     aafInt32 length;
+#c     AD_IDL([length_is(length)]) aafWchar *str;
+#c } aafString_t;
+#c
+#startm AD_IDL 01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Includes another file.
 #c
 #c Argument: Base filename
@@ -40,7 +57,26 @@
 #c Arguments: none
 #c
 #startm AD_HEAD 00
+/******************************************\\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\\******************************************/
 #endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c AAFTypes support for IDL
+#c
+#c Arguments: none
+#c
+#startm AD_TYPES_HEAD 00
+#endm
+
 
 #ccccccccccccccccccccccccccc
 #c
@@ -99,7 +135,7 @@ Impl%01\
 #c Argument: class name
 #c
 #startm AD_FORWARD_DECLARATION 01
-#ifndef _Impl%01_h_
+#ifndef __Impl%01_h__
 #include "Impl%01.h"
 #endif
 #endm
@@ -129,15 +165,12 @@ Impl%01\
 #c Arguments: none
 #c
 #startm AD_CLASS_BEGIN 00
-#ifndef _Impl.this-module_h_
+#ifndef __Impl.this-module_h__
 #include "Impl.this-module.h"
 #endif
 
-#ifndef _.this-module_h_
-#include ".this-module.h"
-#endif
-
 #include <assert.h>
+#include <string.h>
 
 
 Impl.this-module::Impl.this-module ()
@@ -145,7 +178,19 @@ Impl.this-module::Impl.this-module ()
 
 
 Impl.this-module::~Impl.this-module ()
-{}
+{}\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_BEGIN 01
+AD_CLASS_BEGIN\
 #endm
 
 
@@ -156,16 +201,18 @@ Impl.this-module::~Impl.this-module ()
 #c Arguments: none
 #c
 #startm AD_ROOT_CLASS_BEGIN 00
-#ifndef _Impl.this-module_h_
+#ifndef __Impl.this-module_h__
 #include "Impl.this-module.h"
 #endif
+
+// Include the declaration for the reference counting container callback function.
+#include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 
 
 Impl.this-module::Impl.this-module ()
-: _pComParent (0),
-  _pCppParent (0)
+: _pContainer (0)
 {}
 
 
@@ -173,21 +220,37 @@ Impl.this-module::~Impl.this-module ()
 {}
 
 
-void Impl.this-module::InitComParent (I.this-module * pComParent)
-{
-  assert (! _pComParent);
-  _pComParent = pComParent;
-  assert (_pComParent);
-  assert (! _pCppParent);
+// Increment the object reference count.
+aafUInt32 Impl.this-module::AcquireReference() const
+{ // inforce conceptual 'constness'
+  // Delegate to global function to increment the reference
+  // count for this implementation object's COM or C++ API object.
+  return AcquireImplReference(const_cast<Impl.this-module *>(this));
 }
 
-
-void Impl.this-module::InitCppParent (.this-module * pCppParent)
+// Decrement the object reference count and delete the container.
+aafUInt32 Impl.this-module::ReleaseReference()
 {
-  assert (! _pCppParent);
-  _pCppParent = pCppParent;
-  assert (_pCppParent);
-  assert (! _pComParent);
+  // If there is only a single reference left it is the container's
+  // reference to this implementation object. Tell the container to
+  // Delete itself. The container's destructor will delete this
+  // object.
+  return ReleaseImplReference(this);
+}
+
+// Just return the count. (this could be inline in the header...)
+aafUInt32 Impl.this-module::ReferenceCount() const
+{ // inforce conceptual 'constness'
+  // Delegate to global function to return the reference
+  // count for this implementation object's COM or C++ API object.
+  return ReferenceImplCount(const_cast<Impl.this-module *>(this));
+}
+
+void Impl.this-module::InitContainer (void * pContainer)
+{
+  assert (! _pContainer);
+  _pContainer = pContainer;
+  assert (_pContainer);
 }
 #endm
 
@@ -224,7 +287,8 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_XMETHOD1 07
 AAFRESULT STDMETHODCALLTYPE
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/)
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -248,8 +312,9 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_XMETHOD2 12
 AAFRESULT STDMETHODCALLTYPE
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/)
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -273,9 +338,11 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 17: method description
 #c
 #startm AD_XMETHOD3 17
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/)
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -300,10 +367,12 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 22: method description
 #c
 #startm AD_XMETHOD4 22
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/)
+ AAFRESULT STDMETHODCALLTYPE
+   Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -329,11 +398,13 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 27: method description
 #c
 #startm AD_XMETHOD5 27
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/,
-                           .%23-adornment%24 .%23-indirection /*%25*/)
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/,
+      .%23-adornment%24 .%23-indirection /*%25*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -360,12 +431,14 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 32: method description
 #c
 #startm AD_XMETHOD6 32
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/,
-                           .%23-adornment%24 .%23-indirection /*%25*/,
-                           .%28-adornment%29 .%28-indirection /*%30*/)
+AAFRESULT STDMETHODCALLTYPE
+   Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/,
+      .%23-adornment%24 .%23-indirection /*%25*/,
+      .%28-adornment%29 .%28-indirection /*%30*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -393,13 +466,15 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 37: method description
 #c
 #startm AD_XMETHOD7 37
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/,
-                           .%23-adornment%24 .%23-indirection /*%25*/,
-                           .%28-adornment%29 .%28-indirection /*%30*/,
-                           .%33-adornment%34 .%33-indirection /*%35*/)
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/,
+      .%23-adornment%24 .%23-indirection /*%25*/,
+      .%28-adornment%29 .%28-indirection /*%30*/,
+      .%33-adornment%34 .%33-indirection /*%35*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -428,14 +503,16 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 42: method description
 #c
 #startm AD_XMETHOD8 42
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/,
-                           .%23-adornment%24 .%23-indirection /*%25*/,
-                           .%28-adornment%29 .%28-indirection /*%30*/,
-                           .%33-adornment%34 .%33-indirection /*%35*/,
-                           .%38-adornment%39 .%38-indirection /*%40*/)
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/,
+      .%23-adornment%24 .%23-indirection /*%25*/,
+      .%28-adornment%29 .%28-indirection /*%30*/,
+      .%33-adornment%34 .%33-indirection /*%35*/,
+      .%38-adornment%39 .%38-indirection /*%40*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -465,15 +542,17 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 47: method description
 #c
 #startm AD_XMETHOD9 47
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/,
-                           .%23-adornment%24 .%23-indirection /*%25*/,
-                           .%28-adornment%29 .%28-indirection /*%30*/,
-                           .%33-adornment%34 .%33-indirection /*%35*/,
-                           .%38-adornment%39 .%38-indirection /*%40*/,
-                           .%43-adornment%44 .%43-indirection /*%45*/)
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/,
+      .%23-adornment%24 .%23-indirection /*%25*/,
+      .%28-adornment%29 .%28-indirection /*%30*/,
+      .%33-adornment%34 .%33-indirection /*%35*/,
+      .%38-adornment%39 .%38-indirection /*%40*/,
+      .%43-adornment%44 .%43-indirection /*%45*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -504,16 +583,18 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 52: method description
 #c
 #startm AD_XMETHOD_10 52
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/,
-                           .%23-adornment%24 .%23-indirection /*%25*/,
-                           .%28-adornment%29 .%28-indirection /*%30*/,
-                           .%33-adornment%34 .%33-indirection /*%35*/,
-                           .%38-adornment%39 .%38-indirection /*%40*/,
-                           .%43-adornment%44 .%43-indirection /*%45*/,
-                           .%48-adornment%49 .%48-indirection /*%50*/)
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/,
+      .%23-adornment%24 .%23-indirection /*%25*/,
+      .%28-adornment%29 .%28-indirection /*%30*/,
+      .%33-adornment%34 .%33-indirection /*%35*/,
+      .%38-adornment%39 .%38-indirection /*%40*/,
+      .%43-adornment%44 .%43-indirection /*%45*/,
+      .%48-adornment%49 .%48-indirection /*%50*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -545,17 +626,97 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 57: method description
 #c
 #startm AD_XMETHOD_11 57
-    Impl.this-module::%01 (.%03-adornment%04 .%03-indirection /*%05*/,
-                           .%08-adornment%09 .%08-indirection /*%10*/,
-                           .%13-adornment%14 .%13-indirection /*%15*/,
-                           .%18-adornment%19 .%18-indirection /*%20*/,
-                           .%23-adornment%24 .%23-indirection /*%25*/,
-                           .%28-adornment%29 .%28-indirection /*%30*/,
-                           .%33-adornment%34 .%33-indirection /*%35*/,
-                           .%38-adornment%39 .%38-indirection /*%40*/,
-                           .%43-adornment%44 .%43-indirection /*%45*/,
-                           .%48-adornment%49 .%48-indirection /*%50*/,
-                           .%53-adornment%54 .%53-indirection /*%55*/)
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%08-adornment%09 .%08-indirection /*%10*/,
+      .%13-adornment%14 .%13-indirection /*%15*/,
+      .%18-adornment%19 .%18-indirection /*%20*/,
+      .%23-adornment%24 .%23-indirection /*%25*/,
+      .%28-adornment%29 .%28-indirection /*%30*/,
+      .%33-adornment%34 .%33-indirection /*%35*/,
+      .%38-adornment%39 .%38-indirection /*%40*/,
+      .%43-adornment%44 .%43-indirection /*%45*/,
+      .%48-adornment%49 .%48-indirection /*%50*/,
+      .%53-adornment%54 .%53-indirection /*%55*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a method which takes three arguments.
+#c Allows an additional macro argument per method argument to let
+#c macro caller pass more info.  For example:
+#c
+#c For type           Arg is
+#c     ----           ------
+#c     objInArray     array size
+#c     objOutArray    array size
+#c     objInCustom    custom input "marshal" code
+#c     objOutCustom   custom output "marshal" code
+#c     all else       ignored
+#c
+#c Macro Arg 01: method name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt aux
+#c ----------   ----------   ---------   ----    ----    -------- --
+#c metharg 1    02           03          04      05      06       07
+#c metharg 2    08           09          10      11      12       13
+#c metharg 3    14           15          16      17      18       19
+#c
+#c Macro Arg 20: method description
+#c
+#startm AD_X2METHOD3 20
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%09-adornment%10 .%09-indirection /*%11*/,
+      .%15-adornment%16 .%15-indirection /*%17*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a method which takes four arguments.
+#c Allows an additional macro argument per method argument to let
+#c macro caller pass more info.  For example:
+#c
+#c For type           Arg is
+#c     ----           ------
+#c     objInArray     array size
+#c     objOutArray    array size
+#c     objInCustom    custom input "marshal" code
+#c     objOutCustom   custom output "marshal" code
+#c     all else       ignored
+#c
+#c Macro Arg 01: method name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt aux
+#c ----------   ----------   ---------   ----    ----    -------- --
+#c metharg 1    02           03          04      05      06       07
+#c metharg 2    08           09          10      11      12       13
+#c metharg 3    14           15          16      17      18       19
+#c metharg 4    20           21          22      23      24       25
+#c
+#c Macro Arg 26: method description
+#c
+#startm AD_X2METHOD4 26
+AAFRESULT STDMETHODCALLTYPE
+    Impl.this-module::%01 (
+      .%03-adornment%04 .%03-indirection /*%05*/,
+      .%09-adornment%10 .%09-indirection /*%11*/,
+      .%15-adornment%16 .%15-indirection /*%17*/,
+      .%21-adornment%22 .%21-indirection /*%23*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -569,6 +730,35 @@ AAFRESULT STDMETHODCALLTYPE
 #c Arguments: none
 #c
 #startm AD_CLASS_END 00
+
+extern "C" const aafClassID_t CLSID_.this-module;
+
+OMDEFINE_STORABLE(Impl.this-module, CLSID_.this-module);
+
+// Cheat!  We're using this object's CLSID instead of object class...
+AAFRESULT STDMETHODCALLTYPE
+Impl.this-module::GetObjectClass(aafUID_t * pClass)
+{
+  if (! pClass)
+    {
+      return AAFRESULT_NULL_PARAM;
+    }
+  memcpy (pClass, &CLSID_.this-module, sizeof (aafClassID_t));
+  return AAFRESULT_SUCCESS;
+}
+\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_END 01
+AD_CLASS_END\
 #endm
 
 
@@ -580,21 +770,10 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_ROOT_CLASS_END 00
 
-class IAAFObject;
-
-I.this-module * Impl.this-module::GetCOMParent ()
+void * Impl.this-module::GetContainer ()
 {
-  assert (_pComParent);
-  assert (! _pCppParent);
-  return _pComParent;
-}
-
-
-.this-module * Impl.this-module::GetCppParent ()
-{
-  assert (! _pComParent);
-  assert (_pCppParent);
-  return _pCppParent;
+  assert (_pContainer);
+  return _pContainer;
 }
 #endm
 
@@ -606,6 +785,18 @@ I.this-module * Impl.this-module::GetCOMParent ()
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
+%01-implc(.this-module)
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Specifies a method in a separate COM interface.
+#c
+#c Argument: method declaration
+#c
+#startm AD_COM_METH 01
+%01-com-meth-implc(.this-module)
 #endm
 
 
@@ -644,7 +835,7 @@ Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/)
 #c
 #startm AD_XCONSTRUCTOR2 11
 Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/,
-	.%07-adornment%08 .%07-indirection /*%09*/)
+    .%07-adornment%08 .%07-indirection /*%09*/)
 {}
 #endm
 
@@ -666,8 +857,8 @@ Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/,
 #c
 #startm AD_XCONSTRUCTOR3 16
 Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/,
-	.%07-adornment%08 .%07-indirection /*%09*/,
-	.%12-adornment%13 .%12-indirection /*%14*/)
+    .%07-adornment%08 .%07-indirection /*%09*/,
+    .%12-adornment%13 .%12-indirection /*%14*/)
 {}
 #endm
 
@@ -690,64 +881,27 @@ Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/,
 #c
 #startm AD_XCONSTRUCTOR4 21
 Impl.this-module::Impl.this-module (.%02-adornment%03 .%02-indirection /*%04*/,
-	.%07-adornment%08 .%07-indirection /*%09*/,
-	.%12-adornment%13 .%12-indirection /*%14*/,
-	.%17-adornment%18 .%17-indirection /*%19*/)
+    .%07-adornment%08 .%07-indirection /*%09*/,
+    .%12-adornment%13 .%12-indirection /*%14*/,
+    .%17-adornment%18 .%17-indirection /*%19*/)
 {}
 #endm
 
 
 #ccccccccccccccccccccccccccc
 #c
-#c Inserts declaration for a method which takes one argument, which is
-#c a pointer to an AAF object which is to be returned to the caller.
-#c This is different from the normal METHOD macro because the
-#c _rep will probably have the object in a different form.
+#c Inserts declaration for a static method used to bootstrap an AAF
+#c session by creating the first session object.
 #c
-#c Argument1: method name
-#c Argument2: argument modifiers (e.g. [in])
-#c Argument3: argument type
-#c Argument4: argument name
-#c Argument5: argument comment
-#c Argument6: method description
-#c
-#c NOTE!!! This macro takes as type, the object itself, not the
-#c pointer to it.  The indirection will be added by the macro
-#c expansion.
-#c
-#startm AD_GETOBJ_METHOD1 06
-AAFRESULT STDMETHODCALLTYPE
-    Impl.this-module::%01 (Impl%03 ** %04)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
+#startm AD_BEGIN_SESSION 00
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
-#c Inserts declaration for a method which takes one argument, which is
-#c a pointer to an AAF object which is to be passed in from the caller.
-#c This is different from the normal METHOD macro because the
-#c _rep will probably have the object in a different form.
+#c Inserts declaration for a static method used for a container to create
+#c its contained objects in the cpp API.
 #c
-#c NOTE!!! This macro takes as type, the object itself, not the
-#c pointer to it.  The indirection will be added by the macro
-#c expansion.
-#c
-#c Argument1: method name
-#c Argument2: argument modifiers (e.g. [in])
-#c Argument3: argument type
-#c Argument4: argument name
-#c Argument5: argument comment
-#c Argument6: method description
-#c
-#startm AD_SETOBJ_METHOD1 06
-AAFRESULT STDMETHODCALLTYPE
-    Impl.this-module::%01 (Impl%03 * %04)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
+#startm AD_STATIC_CREATE 00
 #endm
 
 
@@ -777,10 +931,235 @@ Impl\
 #endm
 
 
+#startm .objInArray-adornment 00
+Impl\
+#endm
+
+
+#startm .objInArrayCustom-adornment 00
+Impl\
+#endm
+
+
 #startm .objPass-adornment 00
 #endm
 
 
 #startm .objOut-adornment 00
 Impl\
+#endm
+
+
+#startm .objOutArray-adornment 00
+Impl\
+#endm
+
+
+#startm .objOutArrayCustom-adornment 00
+Impl\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Hack to quote the .this-module macro and keep it out of export
+#c files.  Do not define this macro in exp.mac!!!
+#c
+#startm AD_EXPORT_THIS_MODULE 00
+.this-module\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Starts a class definition
+#c
+#c Argument1: Abstract or Concrete
+#c Argument2: Transient or StoredObject
+#c            special cases:CommonBase and StoredObjectBase
+#c
+#c Note: Concrete-StoredObject means Persistent. In other words
+#c Concrete-StoredObject objects (and derived objects) are the 
+#c only types of objects that should ever be found in an AAF
+#c file.
+#c
+#c Valid combiniations:          examples
+#c -----------------------       ---------------
+#c   Abstract-CommonBase         AAFRoot 
+#c   Abstract-Transient          ????
+#c   Abstract-StoredObjectBase   AAFObject
+#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
+#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
+#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
+#c
+#startm AD_XCLASS_BEGIN 02
+.begin-%01-%02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition
+#c
+#c Argument1: Abstract or Concrete
+#c Argument2: Transient or StoredObject
+#c            special cases:CommonBase and StoredObjectBase
+#c
+#c Note: Concrete-StoredObject means Persistent. In other words
+#c Concrete-StoredObject objects (and derived objects) are the 
+#c only types of objects that should ever be found in an AAF
+#c file.
+#c
+#c Valid combiniations:          examples
+#c -----------------------       ---------------
+#c   Abstract-CommonBase         AAFRoot 
+#c   Abstract-Transient          ????
+#c   Abstract-StoredObjectBase   AAFObject
+#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
+#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
+#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
+#c
+#startm AD_XCLASS_END 02
+.end-%01-%02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c The following macros implement all of the allowable
+#c combinations of the AD_XCLASS_BEGIN and AD_XCLASS_END
+#c
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-CommonBase
+#c Special case for the common base class for all AAF objects,
+#c Transient and StoredObject classes.
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-CommonBase 00
+AD_ROOT_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-CommonBase 00
+AD_ROOT_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-StoredObjectBase
+#c Special case for the base class for all AAF stored objects
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-StoredObjectBase 00
+#include "AAFStoredObjectIDs.h"
+
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-StoredObjectBase 00
+
+OMDEFINE_STORABLE(Impl.this-module, AUID_.this-module);
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-Transient
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-Transient 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-Transient 00
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-StoredObject
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-StoredObject 00
+#include "AAFStoredObjectIDs.h"
+
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-StoredObject 00
+OMDEFINE_STORABLE(Impl.this-module, AUID_.this-module);
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Concrete-Transient
+#c (first version defined backwords compatibility)
+
+#startm .begin-Concrete-Transient 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Concrete-Transient 00
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Concrete-StoredObject
+#c Note: These are the persistent classes.
+#c (first version defined backwords compatibility)
+
+#startm .begin-Concrete-StoredObject 00
+#include "AAFStoredObjectIDs.h"
+
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Concrete-StoredObject 00
+
+OMDEFINE_STORABLE(Impl.this-module, AUID_.this-module);
+#endm
+
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c IMPLC 
+#c Declaration for the dictionary's factory method.
+#c
+#startm AD_DICTIONARY_FACTORY 02
+
+#ifndef __ImplAAFBaseClassFactory_h__
+#include "ImplAAFBaseClassFactory.h"
+#endif
+
+// %02
+AAFRESULT STDMETHODCALLTYPE 
+  Impl.this-module::%01 (
+    // Class identifier (AUID) of the stored object. This is the
+    // corresponding SMPTE identifier (as a GUID) for all predefined
+    // built-in classes.
+    aafUID_t * pAUID,
+
+    // Address of output variable that receives the 
+    // object pointer requested in pAUID
+    ImplAAFObject ** ppvObject)
+{
+  if (NULL == pAUID || NULL == ppvObject)
+    return AAFRESULT_NULL_PARAM;
+  
+  // Look for the object in the built-in base class factory.
+  *ppvObject = ImplAAFBaseClassFactory::CreateInstance(pAUID);
+
+  if (NULL == *ppvObject)
+  {
+    // TBD:
+    // Search the rest of the dictionary for extension classes.
+    // 
+  }
+  
+
+  if (NULL == *ppvObject)
+    return AAFRESULT_INVALID_CLASS_ID;
+  else
+    return AAFRESULT_SUCCESS;
+}
 #endm
