@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComEssenceDataTest.cpp,v 1.67 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
+// $Id: ComEssenceDataTest.cpp,v 1.68 2004/11/29 14:41:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -557,7 +557,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					// Now compare the data read from the AAF file to the actual WAV file
 					if (dataLen != AAFBytesRead)
 					{
-						printf("***Wrong number of bytes read ( was %d , should be %d)\n",
+						printf("***Wrong number of bytes read (was %u , should be %zu)\n",
 							AAFBytesRead, WAVBytesRead);
 					}
 					if (memcmp( dataPtr, AAFDataBuf, dataLen) != 0)
