@@ -26,6 +26,7 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRedBlackTree
 #ifndef OMREDBLACKTREET_H
 #define OMREDBLACKTREET_H
 
@@ -300,6 +301,25 @@ bool OMRedBlackTree<Key, Value>::remove(const Key k)
   POSTCONDITION("Value not present", !contains(k));
 
   return result;
+}
+
+  // @mfunc Remove all items from this <c OMRedBlackTree>.
+  //   @tcarg class | Key  | The type of the unique key used to identify
+  //          elements. This type must support operator =, operator !=
+  //          and operator <lt>.
+  //   @tcarg class | Value | The type of the value carried in an
+  //          <c OMRedBlackTree> item. This type must support operator =.
+template <typename Key, typename Value>
+void OMRedBlackTree<Key, Value>::clear(void)
+{
+  TRACE("OMRedBlackTree<Key, Value>::clear");
+
+  destroy(_root);
+  _root = _nil;
+
+  POSTCONDITION("Empty tree", _root == _nil);
+  POSTCONDITION("All elements removed", count() == 0);
+  INVARIANT();
 }
 
   // @mfunc The number of items in this <c OMRedBlackTree>.
@@ -846,6 +866,7 @@ void OMRedBlackTree<Key, Value>::destroy(Node* subTree)
     destroy(subTree->_left);
     destroy(subTree->_right);
     delete subTree;
+    _count = _count - 1;
   }
 }
 

@@ -26,6 +26,7 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMSet
 #ifndef OMSETT_H
 #define OMSETT_H
 
@@ -247,6 +248,26 @@ void OMSet<Key, Element>::removeValue(const Element value)
   TRACE("OMSet<Key, Element>::removeValue");
 
   _tree.remove(value.identification());
+}
+
+  // @mfunc Remove all elements from this <c OMSet>.
+  //   @tcarg class | Element | The type of an <c OMSet> element.
+  //          This type must support operator = and operator==.
+  //          Instances of this type must be able to return a unique
+  //          value of type <p Key> to identify themselves through a
+  //          function with the signature
+  //          const Key Element::identification(void) const.
+  //   @tcarg class | Key  | The type of the unique key used to identify
+  //          elements. This type must support operator =, operator !=
+  //          and operator <lt>.
+  //   @parm The <p Element> to remove.
+template <typename Key, typename Element>
+void OMSet<Key, Element>::clear(void)
+{
+  TRACE("OMSet<Key, Element>::clear");
+
+  _tree.clear();
+  POSTCONDITION("All elements removed", count() == 0);
 }
 
 #endif

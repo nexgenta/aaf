@@ -50,6 +50,7 @@ class OMRedBlackTreeIterator;
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
   //          <c OMRedBlackTree> item. This type must support operator =.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Key, typename Value>
 class OMRedBlackTree {
 public:
@@ -87,6 +88,9 @@ public:
     // @cmember Remove the item assciated with <p Key> k from this
     //          <c OMRedBlackTree>.
   bool remove(const Key k);
+
+    // @cmember Remove all items from this <c OMRedBlackTree>.
+  virtual void clear(void);
 
     // @cmember The number of items in this <c OMRedBlackTree>.
     //          <mf OMRedBlackTree::count> returns the actual number

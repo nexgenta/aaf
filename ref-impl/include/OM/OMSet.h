@@ -49,6 +49,7 @@ class OMSetIterator;
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @base public | <c OMContainer>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Key, typename Element>
 class OMSet : public OMContainer<Element> {
 public:
@@ -97,6 +98,9 @@ public:
 
     // @cmember Remove <p value> from this <c OMSet>.
   virtual void removeValue(const Element value);
+
+    // @cmember Remove all elements from this <c OMSet>.
+  virtual void clear(void);
 
 private:
   // @access Private members.
