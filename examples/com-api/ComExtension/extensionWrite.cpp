@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -122,6 +122,7 @@ void extensionWrite (const aafCharacter * filename)
   IAAFDictionary *pDict=NULL;
   IAAFMob *pAdminMob=NULL;
   IAAFObject *pPersResource=NULL;
+  IAAFClassDef *pcd = 0;
   
 
   try
@@ -137,13 +138,15 @@ void extensionWrite (const aafCharacter * filename)
 
     // Create a new file...
     static const aafUID_t NULL_UID = { 0 };
-    ProductInfo.companyName = L"AAF Developers Desk";
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
+	ProductInfo.companyName = L"AAF Developers Desk";
     ProductInfo.productName = L"AAF extension example";
-    ProductInfo.productVersion.major = 1;
-    ProductInfo.productVersion.minor = 0;
-    ProductInfo.productVersion.tertiary = 0;
-    ProductInfo.productVersion.patchLevel = 0;
-    ProductInfo.productVersion.type = kVersionUnknown;
+    ProductInfo.productVersion = &v;
     ProductInfo.productVersionString = 0;
     ProductInfo.productID = NULL_UID;
     ProductInfo.platform = 0;
@@ -160,9 +163,11 @@ void extensionWrite (const aafCharacter * filename)
 
  
     // Instantiate a AdministrativeMob object.
-    check (pDict->CreateInstance (kClassID_AdminMob,
-								  IID_IAAFMob,
-								  (IUnknown**) &pAdminMob));
+	check (pDict->LookupClassDef (kClassID_AdminMob, &pcd));
+    check (pcd->CreateInstance (IID_IAAFMob,
+								(IUnknown**) &pAdminMob));
+	pcd->Release();
+	pcd = 0;
     check (pAdminMob->SetName (L"Administrative Information"));
  
 
@@ -171,9 +176,11 @@ void extensionWrite (const aafCharacter * filename)
 
     // Add several PersonnelResource objects to the AdminMob.
     // Instantiate the PersonnelResource object.
-    check (pDict->CreateInstance (kClassID_PersonnelResource,
-								  IID_IAAFObject,
-								  (IUnknown**) &pPersResource));
+	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
+    check (pcd->CreateInstance (IID_IAAFObject,
+								(IUnknown**) &pPersResource));
+	pcd->Release();
+	pcd = 0;
 
     PersonnelResourceInitialize (pPersResource,
 							     L"Morgan",
@@ -186,9 +193,11 @@ void extensionWrite (const aafCharacter * filename)
     pPersResource=NULL;
 
   // Instantiate the PersonnelResource object.
-    check (pDict->CreateInstance (kClassID_PersonnelResource,
-								  IID_IAAFObject,
-								  (IUnknown**) &pPersResource));
+	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
+    check (pcd->CreateInstance (IID_IAAFObject,
+								(IUnknown**) &pPersResource));
+	pcd->Release ();
+	pcd = 0;
 
     PersonnelResourceInitialize (pPersResource,
 							     L"Ohanian",
@@ -202,9 +211,11 @@ void extensionWrite (const aafCharacter * filename)
     pPersResource->Release();
     pPersResource=NULL;
   // Instantiate the PersonnelResource object.
-    check (pDict->CreateInstance (kClassID_PersonnelResource,
-								  IID_IAAFObject,
-								  (IUnknown**) &pPersResource));
+	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd))
+    check (pcd->CreateInstance (IID_IAAFObject,
+								(IUnknown**) &pPersResource));
+	pcd->Release();
+	pcd = 0;
 
     PersonnelResourceInitialize (pPersResource,
 							     L"Oldman",
@@ -240,6 +251,12 @@ void extensionWrite (const aafCharacter * filename)
       pDict->Release();
     if (pHead)
       pHead->Release();
+	if (pcd)
+	  {
+		pcd->Release();
+		pcd = 0;
+	  }
+
     if (pFile)
     {
       pFile->Close();
