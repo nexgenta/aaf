@@ -36,12 +36,11 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
-#include "AAFUtils.h"
+#include "aafUtils.h"
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"
 
@@ -73,8 +72,7 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-static const aafUID_t TEST_CATEGORY = 
-{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
+#define TEST_CATEGORY		L"Test Parameters"
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -82,11 +80,6 @@ static const aafUID_t TEST_CATEGORY =
 #define TEST_PARAM_DESC		L"A longer description of the TestEffect parameter"
 #define TEST_PARAM_UNITS	L"Furlongs per Fortnight"
 static aafUID_t	checkTypeID = kAAFTypeID_UInt8;
-
-#define TEST_EFFECT_LEN		60
-
-const aafUID_t kTestEffectID = { 0xD15E7611, 0xFE40, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
-const aafUID_t kTestParmID = { 0xC7265931, 0xFE57, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
@@ -96,15 +89,13 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFParameterDef Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -146,8 +137,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFParameterDef*	pParamDef = NULL;
 	IAAFDefObject*		pDefObject = NULL;
 	IAAFTypeDef*		pTypeDef = NULL;
-	aafUID_t			effectID = kTestEffectID;
-	aafUID_t			parmID = kTestParmID;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
 /*	long				test;
@@ -175,14 +164,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFParameterDef, 
 								   (IUnknown **)&pParamDef));
 
-		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
-
- 		checkResult(pDictionary->LookupTypeDef (checkTypeID , &pTypeDef));
-    checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC, pTypeDef));
-		pTypeDef->Release();
-		pTypeDef = NULL;
-   
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
 		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
@@ -198,10 +180,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
+		// !!!Added circular definitions because we don't have optional properties
+		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-
-    checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDictionary->LookupTypeDef (checkTypeID , &pTypeDef));
+		checkResult(pParamDef->SetTypeDef(pTypeDef));
+		pTypeDef->Release();
+		pTypeDef = NULL;
+		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
 		checkResult(pDefObject->SetName (TEST_PARAM_NAME));
 		checkResult(pDefObject->SetDescription (TEST_PARAM_DESC));
 		pDefObject->Release();
@@ -255,15 +242,14 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFOperationDef		*pOperationDef = NULL;
 	IAAFParameterDef	*pParmDef = NULL;
 	IAAFDefObject*		pDefObject = NULL;
-  IAAFMetaDefinition *pMetaDefinition = NULL;
 	IAAFTypeDef*		pTypeDef = NULL;
 	bool				bFileOpen = false;
 	aafBool				readIsTimeWarp;
+	aafUInt32			catLen;
 	aafInt32			checkNumInputs;
-	aafUInt32			checkBypass;
+	aafUInt32			checkBypass, testLen;
 	HRESULT				hr = S_OK;
-	wchar_t				checkName[256];
-	aafUID_t			checkCat;
+	wchar_t				checkCat[256], checkName[256];
 	aafUID_t			testAUID;
 	IAAFDataDefSP		pReadDataDef;
 
@@ -293,8 +279,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkExpression(bResult == kAAFTrue, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->IsTimeWarp (&readIsTimeWarp));
 		checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
-		checkResult(pOperationDef->GetCategory (&checkCat));
-		checkExpression(memcmp(&checkCat, &TEST_CATEGORY, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
+		checkResult(pOperationDef->GetCategoryBufLen (&catLen));
+		testLen = wcslen(TEST_CATEGORY);
+		checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));
+		checkExpression(wcscmp(checkCat, TEST_CATEGORY) == 0, AAFRESULT_TEST_FAILED);
+		checkExpression(testLen == wcslen(checkCat), AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetBypass (&checkBypass));
 		checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
@@ -302,12 +291,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pOperationDef->GetParameterDefs (&pParmDefEnum));
 		checkResult(pParmDefEnum->NextOne (&pParmDef));
 
-		checkResult(pParmDef->GetTypeDefinition(&pTypeDef));
-		checkResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition, (void **) &pMetaDefinition));
-		checkResult(pMetaDefinition->GetAUID(&testAUID));
+		checkResult(pParmDef->GetTypeDef(&pTypeDef));
+		checkResult(pTypeDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->GetAUID(&testAUID));
 		checkExpression(memcmp(&testAUID, &checkTypeID, sizeof(testAUID)) == 0, AAFRESULT_TEST_FAILED);
-		pMetaDefinition->Release();
-		pMetaDefinition = NULL;
+		pDefObject->Release();
+		pDefObject = NULL;
 		pTypeDef->Release();
 		pTypeDef = NULL;
 		checkResult(pParmDef->GetDisplayUnits (checkName, sizeof(checkName)));
@@ -348,9 +337,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pDefObject)
 		pDefObject->Release();
 
-  if (pMetaDefinition)
-    pMetaDefinition->Release();
-
 	if (pTypeDef)
 		pTypeDef->Release();
 
@@ -381,9 +367,7 @@ extern "C" HRESULT CAAFParameterDef_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFParameterDef_test..."
-			 << "Caught general C++ exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CAAFParameterDef_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
@@ -392,7 +376,7 @@ extern "C" HRESULT CAAFParameterDef_test()
 //	{
 //		cout << "The following IAAFParameterDef methods have not been implemented:" << endl; 
 //		cout << "     SetTypeDef" << endl; 
-//		cout << "     GetTypeDefinition" << endl; 
+//		cout << "     GetTypeDef" << endl; 
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

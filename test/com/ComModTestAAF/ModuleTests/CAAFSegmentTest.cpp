@@ -31,7 +31,6 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -41,22 +40,12 @@
 #include "CAAFBuiltinDefs.h"
 
 static aafWChar *slotName = L"SLOT1";
-//static aafInt32 fadeInLen  = 1000;
-//static aafInt32 fadeOutLen = 2000;
-//static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
-//static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
-//static aafSourceRef_t sourceRef; 
+static aafInt32 fadeInLen  = 1000;
+static aafInt32 fadeOutLen = 2000;
+static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
+static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
+static aafSourceRef_t sourceRef; 
 
-
-static const	aafMobID_t	TEST_MobID = 
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x4412fd64, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-static const	aafMobID_t	TEST_referencedMobID = 
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x4ac5382a, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -96,20 +85,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob*					pReferencedMob = NULL;
 	IAAFTimelineMobSlot*		newSlot = NULL;
 	IAAFSegment*				seg = NULL;
+	aafRational_t				audioRate = { 44100, 1 };
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
+	aafMobID_t					newMobID, referencedMobID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
-	IAAFComponent*				pComponent = NULL;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFSegment Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -134,24 +122,22 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdMasterMob()->
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pReferencedMob));
-		checkResult(pReferencedMob->SetMobID(TEST_referencedMobID));
+		checkResult(CoCreateGuid((GUID *)&referencedMobID));
+		checkResult(pReferencedMob->SetMobID(referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
 
 		// Create a Mob
 		checkResult(defs.cdCompositionMob()->
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pMob));
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"AAFSourceClipTest"));
 
 		// Create a SourceClip
 		checkResult(defs.cdSourceClip()->
 					CreateInstance(IID_IAAFSegment, 
 								   (IUnknown **)&seg));
-		 checkResult(seg->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
-		pComponent->Release();
-		pComponent = NULL;
 								 		
 		aafRational_t editRate = { 0, 1};
 		checkResult(pMob->AppendNewTimelineSlot (editRate,
@@ -172,9 +158,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   // Cleanup and return
 	if (newSlot)
 		newSlot->Release();
-
-	if (pComponent)
-		pComponent->Release();
 
 	if (seg)
 		seg->Release();
@@ -218,9 +201,20 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFSegment*				pSegment = NULL;
 	IAAFSourceClip*				pSourceClip = NULL;
 	bool bFileOpen = false;
+	aafProductIdentification_t	ProductInfo;
 	aafSearchCrit_t				criteria;
 	aafNumSlots_t				numMobs, numSlots;
 	HRESULT						hr = AAFRESULT_SUCCESS;
+
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"AAFSegment Test. NOT!";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.platform = NULL;
 
 	try
 	{ 
@@ -316,7 +310,7 @@ extern "C" HRESULT CAAFSegment_test()
 	catch (...)
 	{
 	  cerr << "CAAFSegment_test...Caught general C++"
-		   << " exception!" << endl; 
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

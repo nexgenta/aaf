@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -40,6 +40,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFClassIDs.h"
 #include "ImplAAFDictionary.h"
+#include "ImplAAFBuiltinDefs.h"
 
 
 ImplAAFSegment::ImplAAFSegment ()
@@ -136,7 +137,7 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 		if (Int64LessEqual(begPos, offset) &&
 			Int64Less(offset, endPos))
 		{
-			*found = AAFTrue;
+			*found = kAAFTrue;
 			*subseg = this;
 			// We are returning a reference to this object so bump the ref count
 			AcquireReference();
@@ -144,7 +145,7 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 		}
 		else
 		{
-			*found = AAFFalse;
+			*found = kAAFFalse;
 			*subseg = NULL;
 			*sequPosPtr = 0;
 		}
@@ -177,9 +178,8 @@ AAFRESULT ImplAAFSegment::GenerateSequence(ImplAAFSequence **seq)
 	{
 // ***	CHECK(GetDatakind(&datakind));
     CHECK(GetDictionary(&pDictionary));
-    tmp = (ImplAAFSequence *)pDictionary->CreateImplObject(AUID_AAFSequence);
-    if (NULL == tmp)
-      RAISE(AAFRESULT_NOMEMORY);
+	CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
+		  CreateInstance ((ImplAAFObject**) &tmp));
     pDictionary->ReleaseReference();
     pDictionary = NULL;
 

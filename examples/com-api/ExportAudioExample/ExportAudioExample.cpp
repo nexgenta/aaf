@@ -17,7 +17,7 @@
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDefUIDS.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
 #include "AAFContainerDefs.h"
@@ -30,6 +30,10 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
+// This static variables are here so they can be referenced 
+// throughout the whole program.
+
+static aafSourceRef_t sourceRef; 
 
 #define assert(b, msg) \
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
@@ -73,7 +77,7 @@ static void convert(char* cName, size_t length, const wchar_t* name)
 }
 
 
-typedef enum { testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
+typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
 
 typedef aafInt16	AAFByteOrder;
 const AAFByteOrder INTEL_ORDER		      = 0x4949; // 'II' for Intel
@@ -113,6 +117,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceRawAccess*		pRawEssence = NULL;
+	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
@@ -122,6 +128,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	aafRational_t				sampleRate = {44100, 1};
 	FILE*						pWavFile = NULL;
 	unsigned char				dataBuff[4096], *dataPtr;
+	size_t						bytesRead;
 	aafUInt32					dataOffset, dataLen;
 	aafUInt16					bitsPerSample, numCh;
 	aafInt32					n, numSpecifiers;
@@ -129,7 +136,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
   IAAFClassDef *pMasterMobDef = NULL;
   IAAFClassDef *pNetworkLocatorDef = NULL;
   IAAFDataDef *pSoundDef = NULL;
-  aafUInt32 samplesWritten, bytesWritten;
 
 
 	// Delete any previous test file before continuing...
@@ -144,15 +150,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		remove(chFileName);
 	}
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF-East: Avid Technology";
 	ProductInfo.productName = L"Export Audio Example";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -207,7 +211,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	if (pWavFile)
 	{
 		// Read in the essence data
-		fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
+		bytesRead = fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
 		check(loadWAVEHeader(dataBuff,
 										&bitsPerSample,
 										&numCh,
@@ -221,7 +225,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		/* Create the Essence Data specifying the codec, container, edit rate and sample rate */
 		check(pMasterMob->CreateEssence(1,				// Slot ID
 									pSoundDef,			// MediaKind
-									kAAFCodecWAVE,			// codecID
+									CodecWave,			// codecID
 									editRate,			// edit rate
 									sampleRate,			// sample rate
 									kAAFCompressionDisable,
@@ -258,10 +262,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		while (samplesLeft >0)
 		{
 			check(pEssenceAccess->WriteSamples(	dataLen,	//!!! hardcoded bytes/sample ==1// Number of Samples
-												sizeof(dataBuff), // buffer size
-												dataPtr,	// THE data
-												&samplesWritten,
-												&bytesWritten));
+												dataPtr,	// THE Raw data
+												sizeof(dataBuff)));// buffer size
 			samplesLeft=samplesLeft-dataLen;
 		}
 
@@ -520,6 +522,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 // Make sure all of our required plugins have been registered.
 static HRESULT RegisterRequiredPlugins(void)
 {
+  HRESULT hr = S_OK;
 	IAAFPluginManager	*mgr = NULL;
 
   // Load the plugin manager 
