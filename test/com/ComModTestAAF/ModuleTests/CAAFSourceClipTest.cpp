@@ -31,11 +31,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
-#include "AAFUtils.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -97,7 +98,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSegment*				seg = NULL;
 	IAAFComponent*		pComponent = NULL;
 	IAAFSourceClip*				sclp = NULL;
-	aafRational_t				audioRate = { 44100, 1 };
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
@@ -150,7 +150,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&sclp));
 		 checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddSound()));
 		pComponent->Release();
 		pComponent = NULL;
 								 		
@@ -230,7 +230,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFSegment*				pSegment = NULL;
 	IAAFSourceClip*				pSourceClip = NULL;
 	bool bFileOpen = false;
-	aafProductIdentification_t	ProductInfo;
 	aafSearchCrit_t				criteria;
 	aafNumSlots_t				numMobs, numSlots;
 	aafLength_t					rFadeInLen;
@@ -242,18 +241,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafBool						fadeOutPresent;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafMobID_t					rReferencedMobID;
-
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFSourceClip Test. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 
 	try
 	{ 
@@ -294,6 +281,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 				checkExpression(kAAFTrue == fadeOutPresent, AAFRESULT_TEST_FAILED);
 				checkExpression(rFadeOutLen == fadeOutLen && rFadeOutType == fadeOutType, 
 				                AAFRESULT_TEST_FAILED);
+				sourceRef.sourceID = TEST_referencedMobID;
+				sourceRef.sourceSlotID = 0;
+				sourceRef.startTime = 0;
 				checkExpression(memcmp(&(rSourceRef.sourceID), &(sourceRef.sourceID), sizeof(sourceRef.sourceID)) == 0, 
 				                AAFRESULT_TEST_FAILED);
 				checkExpression(rSourceRef.sourceSlotID == sourceRef.sourceSlotID &&
@@ -356,21 +346,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
  
 
 
-extern "C" HRESULT CAAFSourceClip_test()
+extern "C" HRESULT CAAFSourceClip_test(testMode_t mode);
+extern "C" HRESULT CAAFSourceClip_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"AAFSourceClipTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CAAFSourceClip_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

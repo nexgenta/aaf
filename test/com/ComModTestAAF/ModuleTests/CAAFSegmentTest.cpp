@@ -31,19 +31,32 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
-#include "AAFUtils.h"
+
+#include "CAAFBuiltinDefs.h"
 
 static aafWChar *slotName = L"SLOT1";
-static aafInt32 fadeInLen  = 1000;
-static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kFadeLinearAmp;
-static aafFadeType_t fadeOutType = kFadeLinearPower;
-static aafSourceRef_t sourceRef; 
+//static aafInt32 fadeInLen  = 1000;
+//static aafInt32 fadeOutLen = 2000;
+//static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
+//static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
+//static aafSourceRef_t sourceRef; 
 
+
+static const	aafMobID_t	TEST_MobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x4412fd64, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
+static const	aafMobID_t	TEST_referencedMobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x4ac5382a, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -83,58 +96,62 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob*					pReferencedMob = NULL;
 	IAAFTimelineMobSlot*		newSlot = NULL;
 	IAAFSegment*				seg = NULL;
-	aafRational_t				audioRate = { 44100, 1 };
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID, referencedMobID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
+	IAAFComponent*				pComponent = NULL;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFSegment Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	try
 	{
-    // Remove the previous test file if any.
-    RemoveTestFile(pFileName);
+	    // Remove the previous test file if any.
+	    RemoveTestFile(pFileName);
 
-    // Create the file
+		// Create the file
 		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
  
-    // We can't really do anthing in AAF without the header.
+		// We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 
-    // Get the AAF Dictionary so that we can create valid AAF objects.
-    checkResult(pHeader->GetDictionary(&pDictionary));
+		// Get the AAF Dictionary so that we can create valid AAF objects.
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
  		
 		//Make the MOB to be referenced
-		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
-								 IID_IAAFMob, 
-								 (IUnknown **)&pReferencedMob));
-		checkResult(CoCreateGuid((GUID *)&referencedMobID));
-		checkResult(pReferencedMob->SetMobID(referencedMobID));
+		checkResult(defs.cdMasterMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pReferencedMob));
+		checkResult(pReferencedMob->SetMobID(TEST_referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
 
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
-								 IID_IAAFMob, 
-								 (IUnknown **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(defs.cdCompositionMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pMob));
+		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(L"AAFSourceClipTest"));
 
 		// Create a SourceClip
-		checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
-								 IID_IAAFSegment, 
-								 (IUnknown **)&seg));
+		checkResult(defs.cdSourceClip()->
+					CreateInstance(IID_IAAFSegment, 
+								   (IUnknown **)&seg));
+		 checkResult(seg->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 								 		
 		aafRational_t editRate = { 0, 1};
 		checkResult(pMob->AppendNewTimelineSlot (editRate,
@@ -155,6 +172,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   // Cleanup and return
 	if (newSlot)
 		newSlot->Release();
+
+	if (pComponent)
+		pComponent->Release();
 
 	if (seg)
 		seg->Release();
@@ -198,20 +218,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFSegment*				pSegment = NULL;
 	IAAFSourceClip*				pSourceClip = NULL;
 	bool bFileOpen = false;
-	aafProductIdentification_t	ProductInfo;
 	aafSearchCrit_t				criteria;
 	aafNumSlots_t				numMobs, numSlots;
 	HRESULT						hr = AAFRESULT_SUCCESS;
-
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFSegment Test. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 
 	try
 	{ 
@@ -223,12 +232,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression(2 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over all Composition Mobs
-		criteria.searchTag = kByMobKind;
-		criteria.tags.mobKind = kCompMob;
+		criteria.searchTag = kAAFByMobKind;
+		criteria.tags.mobKind = kAAFCompMob;
 		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
@@ -293,21 +302,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
  
 
 
-extern "C" HRESULT CAAFSegment_test()
+extern "C" HRESULT CAAFSegment_test(testMode_t mode);
+extern "C" HRESULT CAAFSegment_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"AAFSegmentTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CAAFSegment_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

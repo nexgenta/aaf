@@ -35,8 +35,8 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
-#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -256,23 +256,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafLength_t					testLength;
 	aafUID_t					testUID, checkUID = TEST_DDEF;
 	bool bFileOpen = false;
-	aafProductIdentification_t	ProductInfo;
 	aafSearchCrit_t				criteria;
 	aafNumSlots_t				numMobs, numSlots;
 	HRESULT						hr = AAFRESULT_SUCCESS;
-
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFComponent Test. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
-	ProductInfo.platform = NULL;
 
 	try
 	{ 
@@ -419,14 +405,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
  
 
 
-extern "C" HRESULT CAAFComponent_test()
+extern "C" HRESULT CAAFComponent_test(testMode_t mode);
+extern "C" HRESULT CAAFComponent_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"AAFComponentTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
+			
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
