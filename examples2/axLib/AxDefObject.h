@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDefObject.h,v 1.4 2004/08/30 14:57:19 jptrainor Exp $ $Name:  $
+// $Id: AxDefObject.h,v 1.5 2004/09/02 12:51:02 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -205,6 +205,12 @@ public:
 	void SetCategory( const aafUID_t& category_auid );
 	void SetNumberInputs( aafInt32 );
 	void SetBypass( aafUInt32 );
+	
+	IAAFDataDefSP GetDataDef();
+	aafBoolean_t IsTimeWarp();
+	aafUID_t GetCategory();
+	aafInt32 GetNumberInputs();
+	aafUInt32 GetBypass();
 	
 	inline operator IAAFOperationDefSP ()
 	{ return _spIaafOperationDef; }

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.h,v 1.18 2004/08/29 18:19:42 jptrainor Exp $ $Name:  $
+// $Id: AxComponent.h,v 1.19 2004/09/02 12:51:02 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,6 +82,8 @@ public:
 
 	aafPosition_t GetCutPoint();
 	void SetCutPoint( aafPosition_t cutPoint );
+
+	IAAFOperationGroupSP GetOperationGroup();
 
 	operator IAAFTransitionSP ()
 	{ return _spIaafTransition; }

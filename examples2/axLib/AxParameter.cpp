@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxParameter.cpp,v 1.1 2004/08/30 14:58:31 jptrainor Exp $
+// $Id: AxParameter.cpp,v 1.2 2004/09/02 12:51:02 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,13 @@ AxParameter::AxParameter( IAAFParameterSP spIaafParameter )
 AxParameter::~AxParameter()
 {}
 
+IAAFParameterDefSP AxParameter::GetParameterDefinition()
+{
+  IAAFParameterDefSP spParamDef;
+  CHECK_HRESULT( _spIaafParameter->GetParameterDefinition( &spParamDef ) );
+  return spParamDef;
+}
+
 //=---------------------------------------------------------------------=
 
 AxConstantValue::AxConstantValue( IAAFConstantValueSP spIaafConstantValue )
@@ -45,6 +52,13 @@ void AxConstantValue::Initialize( IAAFParameterDefSP spParameterDef,
 				  aafDataBuffer_t pValue )
 {
   CHECK_HRESULT( _spIaafConstantValue->Initialize( spParameterDef, valueSize, pValue ) );
+}
+
+void AxConstantValue::GetValue( aafUInt32 valueSize,
+				aafDataBuffer_t pValue,
+				aafUInt32* bytesRead )
+{
+  CHECK_HRESULT( _spIaafConstantValue->GetValue( valueSize, pValue, bytesRead ) );
 }
 
 //=---------------------------------------------------------------------=
