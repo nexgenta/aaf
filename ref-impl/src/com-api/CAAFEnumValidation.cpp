@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.cpp,v 1.6 2005/03/17 18:02:31 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEnumValidation.cpp,v 1.7 2005/03/18 13:51:19 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -124,6 +124,9 @@ bool Is_aafColorSiting_t_Valid(aafColorSiting_t param)
     case kAAFCoSiting:
     case kAAFAveraging:
     case kAAFThreeTap:
+    case kAAFQuincunx:
+    case kAAFRec601:
+    case kAAFUnknownSiting:
       return true;
     default:
       return false;
@@ -583,6 +586,10 @@ bool Is_aafPulldownKind_t_Valid(aafPulldownKind_t param)
     case kAAFPALPD:
     case kAAFOneToOneNTSC:
     case kAAFOneToOnePAL:
+    case kAAFVideoTapNTSC:
+    case kAAFOneToOneHDSixty:
+    case kAAFTwentyFourToSixtyPD:
+    case kAAFTwoToOnePD:
       return true;
     default:
       return false;

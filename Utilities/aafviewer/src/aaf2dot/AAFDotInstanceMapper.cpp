@@ -1,6 +1,6 @@
 
 /*
- * $Id: AAFDotInstanceMapper.cpp,v 1.15 2005/01/12 03:14:37 jfpanisset Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.cpp,v 1.16 2005/03/18 13:51:18 phil_tudor Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -363,7 +363,7 @@ AAFDotInstanceMapper::MapKnownAAFRecordTypes( AxProperty axProperty, bool &popSt
    AxPropertyDef propertyDef( axProperty.GetDefinition() );
    AxTypeDef typeDef( propertyDef.GetTypeDef() );
 
-   if ( typeDef.GetAUID() == kAAFTypeID_MobID )	// MobID
+   if ( typeDef.GetAUID() == kAAFTypeID_MobIDType )	// MobID
    {
       ObjectStalker *oStalker = dynamic_cast< ObjectStalker* > ( PopStalker() );
       if ( oStalker == 0 )

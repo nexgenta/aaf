@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.11 2005/03/17 18:02:31 phil_tudor Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.12 2005/03/18 13:51:19 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -323,7 +323,10 @@ typedef enum _aafColorSiting_e
 {
 	kAAFCoSiting = 0, 
 	kAAFAveraging = 1, 
-	kAAFThreeTap = 2
+	kAAFThreeTap = 2,
+	kAAFQuincunx = 3, 
+	kAAFRec601 = 4, 
+	kAAFUnknownSiting = 255
 } aafColorSiting_e;
 	
 typedef aafInt32 aafPropertyOpt_t;
@@ -496,7 +499,11 @@ typedef enum _aafPulldownKind_e
 	kAAFTwoThreePD = 0,
 	kAAFPALPD = 1,
 	kAAFOneToOneNTSC = 2,
-	kAAFOneToOnePAL = 3
+	kAAFOneToOnePAL = 3,
+	kAAFVideoTapNTSC = 4,
+	kAAFOneToOneHDSixty = 5,
+	kAAFTwentyFourToSixtyPD = 6,
+	kAAFTwoToOnePD = 7
 } aafPulldownKind_e;
 
 typedef aafInt32	aafPhaseFrame_t;

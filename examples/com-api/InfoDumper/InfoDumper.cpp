@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.27 2005/03/11 04:21:59 jptrainor Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.28 2005/03/18 13:51:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2150,7 +2150,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 		checkResult(ptd->QueryInterface(IID_IUnknown,
 						(void**)&pUnkAUID));
 		// See if it is a MobID
-		checkResult (pDict->LookupTypeDef (kAAFTypeID_MobID, &ptd));
+		checkResult (pDict->LookupTypeDef (kAAFTypeID_MobIDType, &ptd));
 		IUnknown * pUnkMobID = 0;
 		checkResult(ptd->QueryInterface(IID_IUnknown,
 						(void**)&pUnkMobID));
