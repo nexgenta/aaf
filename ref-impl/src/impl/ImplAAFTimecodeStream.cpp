@@ -1,29 +1,10 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 
@@ -43,9 +24,9 @@
 #include "aafErr.h"
 
 ImplAAFTimecodeStream::ImplAAFTimecodeStream ()
-: _sampleRate(		PID_TimecodeStream_SampleRate,	L"SampleRate"),
-  _source(			PID_TimecodeStream_Source,		L"Source"),
-  _sourceType(		PID_TimecodeStream_SourceType,	L"SourceType")
+: _sampleRate(		PID_TimecodeStream_SampleRate,	"SampleRate"),
+  _source(			PID_TimecodeStream_Source,		"Source"),
+  _sourceType(		PID_TimecodeStream_SourceType,	"SourceType")
 {
   _persistentProperties.put(_sampleRate.address());
   _persistentProperties.put(_source.address());
@@ -228,7 +209,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafPosition_t	testOffset, scanStart;
 	aafTimecode_t	baseTimecode, testTimecode;
 	aafPosition_t	increment = pTimecode->fps * 10;	// Skip at 10 second intervals
-	aafBool			found = kAAFFalse;
+	aafBool			found = AAFFalse;
 	aafInt32		error;
 	aafLength_t		len, numSamples;
 	aafUInt32		sampleSize;
@@ -256,7 +237,7 @@ AAFRESULT STDMETHODCALLTYPE
 			{
 				// TEST: Path #1 through code
 				*pOffset = testOffset;
-				found = kAAFTrue;
+				found = AAFTrue;
 			}
 			else
 			{
@@ -272,7 +253,7 @@ AAFRESULT STDMETHODCALLTYPE
 					{
 						// TEST: Path #2 through code
 						*pOffset = testOffset;
-						found = kAAFTrue;
+						found = AAFTrue;
 					}
 				}
 			}
@@ -324,7 +305,7 @@ AAFRESULT STDMETHODCALLTYPE
 				{
 					// TEST: Path #6 through code
 					*pOffset = testOffset;
-					found = kAAFTrue;
+					found = AAFTrue;
 					break;
 				}
 			}
@@ -343,13 +324,13 @@ AAFRESULT STDMETHODCALLTYPE
 				{
 					// TEST: Path #7 through code
 					*pOffset = testOffset;
-					found = kAAFTrue;
+					found = AAFTrue;
 					break;
 				}
 			}
 		}
 
-		if(found == kAAFFalse)
+		if(found == AAFFalse)
 		{
 			// TEST: Path #8 through code
 			return AAFRESULT_TIMECODE_NOT_FOUND;
@@ -365,33 +346,33 @@ AAFRESULT STDMETHODCALLTYPE
 //*** Abstract operations which must be overridden by a subclass of AAFTimecodeStream
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecodeStream::GetUserDataLength (
-      aafInt32 */*length*/)
+      aafInt32 *length)
 {
   return AAFRESULT_ABSTRACT_CLASS;
 }
 
   AAFRESULT STDMETHODCALLTYPE
-	ImplAAFTimecodeStream::UnpackTimecode(aafUInt8 */*buffer*/, aafUInt32 /*buflen*/, aafUInt32 /*fps*/, aafTimecode_t */*tc*/)
+	ImplAAFTimecodeStream::UnpackTimecode(aafUInt8 *buffer, aafUInt32 buflen, aafUInt32 fps, aafTimecode_t *tc)
 {
     return AAFRESULT_ABSTRACT_CLASS;
 }
 
   AAFRESULT STDMETHODCALLTYPE
-	ImplAAFTimecodeStream::PackTimecode(aafTimecode_t */*tc*/, aafUInt8 */*buffer*/, aafUInt32 /*buflen*/)
+	ImplAAFTimecodeStream::PackTimecode(aafTimecode_t *tc, aafUInt8 *buffer, aafUInt32 buflen)
 {
     return AAFRESULT_ABSTRACT_CLASS;
 }
 
   AAFRESULT STDMETHODCALLTYPE
-	ImplAAFTimecodeStream::UnpackUserBits(aafUInt8 */*packedBuffer*/, aafUInt32 /*packedBuflen*/,
-									  aafUInt8 */*unpackedBuffer*/, aafUInt32 /*unpackedBuflen*/)
+	ImplAAFTimecodeStream::UnpackUserBits(aafUInt8 *packedBuffer, aafUInt32 packedBuflen,
+									  aafUInt8 *unpackedBuffer, aafUInt32 unpackedBuflen)
 {
     return AAFRESULT_ABSTRACT_CLASS;
 }
 
   AAFRESULT STDMETHODCALLTYPE
-	ImplAAFTimecodeStream::PackUserBits(aafUInt8 */*unpackedBuffer*/, aafUInt32 /*unpackedBuflen*/,
-									  aafUInt8 */*packedBuffer*/, aafUInt32 /*packedBuflen*/)
+	ImplAAFTimecodeStream::PackUserBits(aafUInt8 *unpackedBuffer, aafUInt32 unpackedBuflen,
+									  aafUInt8 *packedBuffer, aafUInt32 packedBuflen)
 {
     return AAFRESULT_ABSTRACT_CLASS;
 }

@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -12,7 +11,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -61,4 +59,3 @@ AAFRESULT ImplAAFFiller::TraverseToClip(aafLength_t length,
 	return ( AAFRESULT_FILL_FOUND );
 }
 
-OMDEFINE_STORABLE(ImplAAFFiller, AUID_AAFFiller);
