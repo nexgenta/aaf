@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: Windows_NT.mk,v 1.14 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+# $Id: Windows_NT.mk,v 1.15 2004/03/18 18:58:42 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -23,14 +23,8 @@
 ###############################################################################
 
 #
-# Contains elements for Windows NT/i386 builds.
-#
-
-#
-# Hack! Windows NT doesn't return the proper uname, so when common.mk
-# includes $(UNAME).mk, on WinNT it will only include ".mk", not
-# "Windows_NT.mk".  That's why a file called ".mk" exists in this
-# directory, which includes this file.
+# Contains elements for i386 MS Windows NT/2000/XP builds.
+# Tested with cgywin-5.0, cygwin-5.1 on MS Windows 2000.
 #
 
 PTFM_SUFX = nt
@@ -44,11 +38,11 @@ CP = cp.exe
 CAT = cat.exe
 CHMOD = chmod.exe
 MV = mv.exe
-SH = sh.exe
+SH = bash.exe
 TOUCH = touch.exe
 PERL = perl.exe
 
-SHELL = c:/mksnt/sh.exe
+SHELL = bash.exe
 MAKE_SUFFIX =
 
 CC = cl
