@@ -18,7 +18,7 @@ class ImplAAFTaggedValue;
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFComponent.h,v 1.32.2.1 2004/03/24 00:36:44 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFComponent.h,v 1.32.2.2 2004/03/24 17:49:19 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -286,6 +286,9 @@ private:
 	OMWeakReferenceProperty<ImplAAFDataDef>		_dataDef;
 	OMFixedSizeProperty<aafLength_t>	_length;
     OMStrongReferenceVectorProperty<ImplAAFKLVData> _KLVData;
+    OMStrongReferenceVectorProperty<ImplAAFTaggedValue> _userComments;
+    OMStrongReferenceVectorProperty<ImplAAFTaggedValue> _attributes;
+
 };
 
 #endif // ! __ImplAAFComponent_h__
