@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -49,8 +49,8 @@
 //
 // DictP18-277-1847BMaster.csv 
 //
-// This file was generated on Wed Mar 22 09:54:07 EST 2000
-// by user bedell on system JBEDELL2.
+// This file was generated on Thu May 11 16:21:05 EDT 2000
+// by user transdel on system TRANSDEL.
 //
 // Key to macros.
 //
@@ -86,7 +86,7 @@
 //
 //   Separate one AAF class definition from another.
 //
-// AAF_PROPERTY(name, id, tag, type, mandatory, container)
+// AAF_PROPERTY(name, id, tag, type, mandatory, uid, container)
 //
 //   Define an AAF property.
 //
@@ -96,6 +96,9 @@
 //     type      = the type of the property [*]
 //     mandatory = true if the property is mandatory
 //                 false if the property is optional
+//     uid       = true if the property is the unique identifier
+//                 for this class, false if the property is not
+//                 the unique identifier for this class
 //     container = the class that defines this property
 //
 // AAF_TYPE(type)
@@ -234,17 +237,23 @@
 //     name      = the name of the type
 //
 //
-// AAF_TYPE_DEFINITION_CHARACTER(name, id, size)
+// AAF_TYPE_DEFINITION_CHARACTER(name, id)
 //
 //   Define an AAF character type.
 //
 //     name      = the name of the type
 //     id        = the auid used to identify the type [*]
-//     size      = the size (in bytes) of the type
 //
 // AAF_TYPE_DEFINITION_INDIRECT(name, id)
 //
 //   Define an AAF indirect type.
+//
+//     name      = the name of the type
+//     id        = the auid used to identify the type [*]
+//
+// AAF_TYPE_DEFINITION_OPAQUE(name, id)
+//
+//   Define an AAF opque type.
 //
 //     name      = the name of the type
 //     id        = the auid used to identify the type [*]
@@ -342,7 +351,7 @@
 #endif
 
 #ifndef AAF_PROPERTY
-#define AAF_PROPERTY(name, id, tag, type, mandatory, container)
+#define AAF_PROPERTY(name, id, tag, type, mandatory, uid, container)
 #endif
 
 #ifndef AAF_TYPE
@@ -422,11 +431,15 @@
 #endif
 
 #ifndef AAF_TYPE_DEFINITION_CHARACTER
-#define AAF_TYPE_DEFINITION_CHARACTER(name, id, size)
+#define AAF_TYPE_DEFINITION_CHARACTER(name, id)
 #endif
 
 #ifndef AAF_TYPE_DEFINITION_INDIRECT
 #define AAF_TYPE_DEFINITION_INDIRECT(name, id)
+#endif
+
+#ifndef AAF_TYPE_DEFINITION_OPAQUE
+#define AAF_TYPE_DEFINITION_OPAQUE(name, id)
 #endif
 
 #ifndef AAF_TYPE_DEFINITION_SET
@@ -490,6 +503,7 @@ AAF_CLASS(InterchangeObject,
     0x0101,
     AAF_REFERENCE_TYPE(WeakReference, ClassDefinition),
     true,
+    false,
     InterchangeObject)
   AAF_PROPERTY(Generation,
     AAF_LITERAL_AUID(0x06020000,
@@ -497,6 +511,7 @@ AAF_CLASS(InterchangeObject,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0102,
     AAF_TYPE(AUID),
+    false,
     false,
     InterchangeObject)
 AAF_CLASS_END(InterchangeObject)
@@ -517,6 +532,7 @@ AAF_CLASS(Component,
     0x0201,
     AAF_REFERENCE_TYPE(WeakReference, DataDefinition),
     true,
+    false,
     Component)
   AAF_PROPERTY(Length,
     AAF_LITERAL_AUID(0x06410200,
@@ -524,6 +540,16 @@ AAF_CLASS(Component,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0202,
     AAF_TYPE(Length),
+    false,
+    false,
+    Component)
+  AAF_PROPERTY(KLVData,
+    AAF_LITERAL_AUID(0x06410300,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x0203,
+    AAF_REFERENCE_TYPE(StrongReferenceVector, KLVData),
+    false,
     false,
     Component)
 AAF_CLASS_END(Component)
@@ -555,6 +581,7 @@ AAF_CLASS(EdgeCode,
     0x0401,
     AAF_TYPE(Position),
     true,
+    false,
     EdgeCode)
   AAF_PROPERTY(FilmKind,
     AAF_LITERAL_AUID(0x06414142,
@@ -563,6 +590,7 @@ AAF_CLASS(EdgeCode,
     0x0402,
     AAF_TYPE(FilmType),
     true,
+    false,
     EdgeCode)
   AAF_PROPERTY(CodeFormat,
     AAF_LITERAL_AUID(0x06414142,
@@ -571,6 +599,7 @@ AAF_CLASS(EdgeCode,
     0x0403,
     AAF_TYPE(EdgeType),
     true,
+    false,
     EdgeCode)
   AAF_PROPERTY(Header,
     AAF_LITERAL_AUID(0x06414142,
@@ -578,6 +607,7 @@ AAF_CLASS(EdgeCode,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0404,
     AAF_TYPE(DataValue),
+    false,
     false,
     EdgeCode)
 AAF_CLASS_END(EdgeCode)
@@ -598,6 +628,7 @@ AAF_CLASS(EssenceGroup,
     0x0501,
     AAF_REFERENCE_TYPE(StrongReferenceVector, SourceReference),
     true,
+    false,
     EssenceGroup)
   AAF_PROPERTY(StillFrame,
     AAF_LITERAL_AUID(0x06414143,
@@ -605,6 +636,7 @@ AAF_CLASS(EssenceGroup,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0502,
     AAF_REFERENCE_TYPE(StrongReference, SourceReference),
+    false,
     false,
     EssenceGroup)
 AAF_CLASS_END(EssenceGroup)
@@ -625,6 +657,7 @@ AAF_CLASS(Event,
     0x0601,
     AAF_TYPE(Position),
     true,
+    false,
     Event)
   AAF_PROPERTY(Comment,
     AAF_LITERAL_AUID(0x06414144,
@@ -633,35 +666,9 @@ AAF_CLASS(Event,
     0x0602,
     AAF_TYPE(String),
     false,
+    false,
     Event)
 AAF_CLASS_END(Event)
-AAF_CLASS_SEPARATOR()
-
-// IntraFrameMarker
-//
-AAF_CLASS(IntraFrameMarker,
-  AAF_LITERAL_AUID(0x06414144,
-    0x4100, 0x0000,
-    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-  Event,
-  true)
-  AAF_PROPERTY(HotSpotRect,
-    AAF_LITERAL_AUID(0x06414144,
-      0x4101, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x0701,
-    AAF_TYPE(Rectangle),
-    false,
-    IntraFrameMarker)
-  AAF_PROPERTY(HotSpotMatte,
-    AAF_LITERAL_AUID(0x06414144,
-      0x4102, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x0702,
-    AAF_REFERENCE_TYPE(StrongReference, SourceClip),
-    false,
-    IntraFrameMarker)
-AAF_CLASS_END(IntraFrameMarker)
 AAF_CLASS_SEPARATOR()
 
 // GPITrigger
@@ -679,6 +686,7 @@ AAF_CLASS(GPITrigger,
     0x0801,
     AAF_TYPE(Boolean),
     true,
+    false,
     GPITrigger)
 AAF_CLASS_END(GPITrigger)
 AAF_CLASS_SEPARATOR()
@@ -697,6 +705,7 @@ AAF_CLASS(CommentMarker,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0901,
     AAF_REFERENCE_TYPE(StrongReference, SourceReference),
+    false,
     false,
     CommentMarker)
 AAF_CLASS_END(CommentMarker)
@@ -728,6 +737,7 @@ AAF_CLASS(OperationGroup,
     0x0b01,
     AAF_REFERENCE_TYPE(WeakReference, OperationDefinition),
     true,
+    false,
     OperationGroup)
   AAF_PROPERTY(InputSegments,
     AAF_LITERAL_AUID(0x06414146,
@@ -736,13 +746,15 @@ AAF_CLASS(OperationGroup,
     0x0b02,
     AAF_REFERENCE_TYPE(StrongReferenceVector, Segment),
     false,
+    false,
     OperationGroup)
   AAF_PROPERTY(Parameters,
     AAF_LITERAL_AUID(0x06414146,
       0x0300, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0b03,
-    AAF_REFERENCE_TYPE(StrongReferenceSet, Parameter),
+    AAF_REFERENCE_TYPE(StrongReferenceVector, Parameter),
+    false,
     false,
     OperationGroup)
   AAF_PROPERTY(BypassOverride,
@@ -752,6 +764,7 @@ AAF_CLASS(OperationGroup,
     0x0b04,
     AAF_TYPE(UInt32),
     false,
+    false,
     OperationGroup)
   AAF_PROPERTY(Rendering,
     AAF_LITERAL_AUID(0x06414146,
@@ -759,6 +772,7 @@ AAF_CLASS(OperationGroup,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0b05,
     AAF_REFERENCE_TYPE(StrongReference, SourceReference),
+    false,
     false,
     OperationGroup)
 AAF_CLASS_END(OperationGroup)
@@ -779,6 +793,7 @@ AAF_CLASS(NestedScope,
     0x0c01,
     AAF_REFERENCE_TYPE(StrongReferenceVector, Segment),
     true,
+    false,
     NestedScope)
 AAF_CLASS_END(NestedScope)
 AAF_CLASS_SEPARATOR()
@@ -798,6 +813,7 @@ AAF_CLASS(Pulldown,
     0x0d01,
     AAF_REFERENCE_TYPE(StrongReference, Segment),
     true,
+    false,
     Pulldown)
   AAF_PROPERTY(PulldownKind,
     AAF_LITERAL_AUID(0x06414148,
@@ -806,6 +822,7 @@ AAF_CLASS(Pulldown,
     0x0d02,
     AAF_TYPE(PulldownKindType),
     true,
+    false,
     Pulldown)
   AAF_PROPERTY(PulldownDirection,
     AAF_LITERAL_AUID(0x06414148,
@@ -814,6 +831,7 @@ AAF_CLASS(Pulldown,
     0x0d03,
     AAF_TYPE(PulldownDirectionType),
     true,
+    false,
     Pulldown)
   AAF_PROPERTY(PhaseFrame,
     AAF_LITERAL_AUID(0x06414148,
@@ -822,6 +840,7 @@ AAF_CLASS(Pulldown,
     0x0d04,
     AAF_TYPE(PhaseFrameType),
     true,
+    false,
     Pulldown)
 AAF_CLASS_END(Pulldown)
 AAF_CLASS_SEPARATOR()
@@ -841,6 +860,7 @@ AAF_CLASS(ScopeReference,
     0x0e01,
     AAF_TYPE(UInt32),
     true,
+    false,
     ScopeReference)
   AAF_PROPERTY(RelativeSlot,
     AAF_LITERAL_AUID(0x06414149,
@@ -849,6 +869,7 @@ AAF_CLASS(ScopeReference,
     0x0e02,
     AAF_TYPE(UInt32),
     true,
+    false,
     ScopeReference)
 AAF_CLASS_END(ScopeReference)
 AAF_CLASS_SEPARATOR()
@@ -868,13 +889,15 @@ AAF_CLASS(Selector,
     0x0f01,
     AAF_REFERENCE_TYPE(StrongReference, Segment),
     true,
+    false,
     Selector)
   AAF_PROPERTY(Alternates,
     AAF_LITERAL_AUID(0x0641414A,
       0x0200, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x0f02,
-    AAF_REFERENCE_TYPE(StrongReferenceSet, Segment),
+    AAF_REFERENCE_TYPE(StrongReferenceVector, Segment),
+    false,
     false,
     Selector)
 AAF_CLASS_END(Selector)
@@ -895,6 +918,7 @@ AAF_CLASS(Sequence,
     0x1001,
     AAF_REFERENCE_TYPE(StrongReferenceVector, Component),
     true,
+    false,
     Sequence)
 AAF_CLASS_END(Sequence)
 AAF_CLASS_SEPARATOR()
@@ -914,6 +938,7 @@ AAF_CLASS(SourceReference,
     0x1101,
     AAF_REFERENCE_TYPE(WeakReference, Mob),
     false,
+    false,
     SourceReference)
   AAF_PROPERTY(SourceMobSlotID,
     AAF_LITERAL_AUID(0x0641414C,
@@ -922,6 +947,7 @@ AAF_CLASS(SourceReference,
     0x1102,
     AAF_TYPE(UInt32),
     true,
+    false,
     SourceReference)
 AAF_CLASS_END(SourceReference)
 AAF_CLASS_SEPARATOR()
@@ -941,6 +967,7 @@ AAF_CLASS(SourceClip,
     0x1201,
     AAF_TYPE(Position ),
     false,
+    false,
     SourceClip)
   AAF_PROPERTY(FadeInLength,
     AAF_LITERAL_AUID(0x0641414C,
@@ -948,6 +975,7 @@ AAF_CLASS(SourceClip,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1202,
     AAF_TYPE(Length),
+    false,
     false,
     SourceClip)
   AAF_PROPERTY(FadeInType,
@@ -957,6 +985,7 @@ AAF_CLASS(SourceClip,
     0x1203,
     AAF_TYPE(FadeType),
     false,
+    false,
     SourceClip)
   AAF_PROPERTY(FadeOutLength,
     AAF_LITERAL_AUID(0x0641414C,
@@ -965,6 +994,7 @@ AAF_CLASS(SourceClip,
     0x1204,
     AAF_TYPE(Length),
     false,
+    false,
     SourceClip)
   AAF_PROPERTY(FadeOutType,
     AAF_LITERAL_AUID(0x0641414C,
@@ -972,6 +1002,7 @@ AAF_CLASS(SourceClip,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1205,
     AAF_TYPE(FadeType),
+    false,
     false,
     SourceClip)
 AAF_CLASS_END(SourceClip)
@@ -1003,6 +1034,7 @@ AAF_CLASS(HTMLClip,
     0x1401,
     AAF_TYPE(String),
     false,
+    false,
     HTMLClip)
   AAF_PROPERTY(EndAnchor,
     AAF_LITERAL_AUID(0x0641414C,
@@ -1010,6 +1042,7 @@ AAF_CLASS(HTMLClip,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1402,
     AAF_TYPE(String),
+    false,
     false,
     HTMLClip)
 AAF_CLASS_END(HTMLClip)
@@ -1030,6 +1063,7 @@ AAF_CLASS(Timecode,
     0x1501,
     AAF_TYPE(Position),
     true,
+    false,
     Timecode)
   AAF_PROPERTY(FPS,
     AAF_LITERAL_AUID(0x0641414D,
@@ -1038,6 +1072,7 @@ AAF_CLASS(Timecode,
     0x1502,
     AAF_TYPE(UInt16),
     true,
+    false,
     Timecode)
   AAF_PROPERTY(Drop,
     AAF_LITERAL_AUID(0x0641414D,
@@ -1046,6 +1081,7 @@ AAF_CLASS(Timecode,
     0x1503,
     AAF_TYPE(Boolean),
     true,
+    false,
     Timecode)
 AAF_CLASS_END(Timecode)
 AAF_CLASS_SEPARATOR()
@@ -1065,6 +1101,7 @@ AAF_CLASS(TimecodeStream,
     0x1601,
     AAF_TYPE(Rational),
     true,
+    false,
     TimecodeStream)
   AAF_PROPERTY(Source,
     AAF_LITERAL_AUID(0x0641414E,
@@ -1073,6 +1110,7 @@ AAF_CLASS(TimecodeStream,
     0x1602,
     AAF_TYPE(DataStream),
     true,
+    false,
     TimecodeStream)
   AAF_PROPERTY(SourceType,
     AAF_LITERAL_AUID(0x0641414E,
@@ -1081,6 +1119,7 @@ AAF_CLASS(TimecodeStream,
     0x1603,
     AAF_TYPE(TCSource),
     true,
+    false,
     TimecodeStream)
 AAF_CLASS_END(TimecodeStream)
 AAF_CLASS_SEPARATOR()
@@ -1100,6 +1139,7 @@ AAF_CLASS(TimecodeStream12M,
     0x1701,
     AAF_TYPE(Boolean),
     true,
+    false,
     TimecodeStream12M)
 AAF_CLASS_END(TimecodeStream12M)
 AAF_CLASS_SEPARATOR()
@@ -1119,6 +1159,7 @@ AAF_CLASS(Transition,
     0x1801,
     AAF_REFERENCE_TYPE(StrongReference, OperationGroup),
     true,
+    false,
     Transition)
   AAF_PROPERTY(CutPoint,
     AAF_LITERAL_AUID(0x06414202,
@@ -1127,6 +1168,7 @@ AAF_CLASS(Transition,
     0x1802,
     AAF_TYPE(Position),
     true,
+    false,
     Transition)
 AAF_CLASS_END(Transition)
 AAF_CLASS_SEPARATOR()
@@ -1146,6 +1188,7 @@ AAF_CLASS(ContentStorage,
     0x1901,
     AAF_REFERENCE_TYPE(StrongReferenceSet, Mob),
     true,
+    false,
     ContentStorage)
   AAF_PROPERTY(EssenceData,
     AAF_LITERAL_AUID(0x06420200,
@@ -1153,6 +1196,7 @@ AAF_CLASS(ContentStorage,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1902,
     AAF_REFERENCE_TYPE(StrongReferenceSet, EssenceData),
+    false,
     false,
     ContentStorage)
 AAF_CLASS_END(ContentStorage)
@@ -1173,6 +1217,7 @@ AAF_CLASS(ControlPoint,
     0x1a02,
     AAF_TYPE(Indirect),
     true,
+    false,
     ControlPoint)
   AAF_PROPERTY(Time,
     AAF_LITERAL_AUID(0x06430300,
@@ -1181,6 +1226,7 @@ AAF_CLASS(ControlPoint,
     0x1a03,
     AAF_TYPE(Rational),
     true,
+    false,
     ControlPoint)
   AAF_PROPERTY(EditHint,
     AAF_LITERAL_AUID(0x06430400,
@@ -1188,6 +1234,7 @@ AAF_CLASS(ControlPoint,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1a04,
     AAF_TYPE(EditHintType),
+    false,
     false,
     ControlPoint)
 AAF_CLASS_END(ControlPoint)
@@ -1208,6 +1255,7 @@ AAF_CLASS(DefinitionObject,
     0x1b01,
     AAF_TYPE(AUID),
     true,
+    true,
     DefinitionObject)
   AAF_PROPERTY(Name,
     AAF_LITERAL_AUID(0x06440200,
@@ -1216,6 +1264,7 @@ AAF_CLASS(DefinitionObject,
     0x1b02,
     AAF_TYPE(String),
     true,
+    false,
     DefinitionObject)
   AAF_PROPERTY(Description,
     AAF_LITERAL_AUID(0x06440300,
@@ -1224,13 +1273,6 @@ AAF_CLASS(DefinitionObject,
     0x1b03,
     AAF_TYPE(String),
     false,
-    DefinitionObject)
-  AAF_PROPERTY(PluginDescriptors,
-    AAF_LITERAL_AUID(0x06440400,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x1b04,
-    AAF_REFERENCE_TYPE(WeakReferenceSet, PluginDescriptor),
     false,
     DefinitionObject)
 AAF_CLASS_END(DefinitionObject)
@@ -1242,7 +1284,7 @@ AAF_CLASS(ClassDefinition,
   AAF_LITERAL_AUID(0x06444100,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-  DefinitionObject,
+  MetaDefinition,
   true)
   AAF_PROPERTY(ParentClass,
     AAF_LITERAL_AUID(0x06444101,
@@ -1251,6 +1293,7 @@ AAF_CLASS(ClassDefinition,
     0x1c01,
     AAF_REFERENCE_TYPE(WeakReference, ClassDefinition),
     true,
+    false,
     ClassDefinition)
   AAF_PROPERTY(Properties,
     AAF_LITERAL_AUID(0x06444102,
@@ -1258,6 +1301,16 @@ AAF_CLASS(ClassDefinition,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1c02,
     AAF_REFERENCE_TYPE(StrongReferenceSet, PropertyDefinition),
+    false,
+    false,
+    ClassDefinition)
+  AAF_PROPERTY(IsConcrete,
+    AAF_LITERAL_AUID(0x06444103,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x1c03,
+    AAF_TYPE(Boolean),
+    true,
     false,
     ClassDefinition)
 AAF_CLASS_END(ClassDefinition)
@@ -1289,6 +1342,7 @@ AAF_CLASS(OperationDefinition,
     0x1e01,
     AAF_REFERENCE_TYPE(WeakReference, DataDefinition),
     true,
+    false,
     OperationDefinition)
   AAF_PROPERTY(IsTimeWarp,
     AAF_LITERAL_AUID(0x06444302,
@@ -1296,6 +1350,7 @@ AAF_CLASS(OperationDefinition,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1e02,
     AAF_TYPE(Boolean),
+    false,
     false,
     OperationDefinition)
   AAF_PROPERTY(DegradeTo,
@@ -1305,13 +1360,15 @@ AAF_CLASS(OperationDefinition,
     0x1e03,
     AAF_REFERENCE_TYPE(WeakReferenceVector, OperationDefinition),
     false,
+    false,
     OperationDefinition)
   AAF_PROPERTY(Category,
     AAF_LITERAL_AUID(0x06444306,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1e06,
-    AAF_TYPE(String),
+    AAF_TYPE(AUID),
+    false,
     false,
     OperationDefinition)
   AAF_PROPERTY(NumberInputs,
@@ -1321,6 +1378,7 @@ AAF_CLASS(OperationDefinition,
     0x1e07,
     AAF_TYPE(Int32),
     true,
+    false,
     OperationDefinition)
   AAF_PROPERTY(Bypass,
     AAF_LITERAL_AUID(0x06444308,
@@ -1329,6 +1387,7 @@ AAF_CLASS(OperationDefinition,
     0x1e08,
     AAF_TYPE(UInt32),
     false,
+    false,
     OperationDefinition)
   AAF_PROPERTY(ParametersDefined,
     AAF_LITERAL_AUID(0x06444309,
@@ -1336,6 +1395,7 @@ AAF_CLASS(OperationDefinition,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1e09,
     AAF_REFERENCE_TYPE(WeakReferenceSet, ParameterDefinition),
+    false,
     false,
     OperationDefinition)
 AAF_CLASS_END(OperationDefinition)
@@ -1356,6 +1416,7 @@ AAF_CLASS(ParameterDefinition,
     0x1f01,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     ParameterDefinition)
   AAF_PROPERTY(DisplayUnits,
     AAF_LITERAL_AUID(0x06444403,
@@ -1363,6 +1424,7 @@ AAF_CLASS(ParameterDefinition,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x1f03,
     AAF_TYPE(String),
+    false,
     false,
     ParameterDefinition)
 AAF_CLASS_END(ParameterDefinition)
@@ -1374,7 +1436,7 @@ AAF_CLASS(PropertyDefinition,
   AAF_LITERAL_AUID(0x06444500,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-  DefinitionObject,
+  MetaDefinition,
   true)
   AAF_PROPERTY(Type,
     AAF_LITERAL_AUID(0x06444501,
@@ -1383,6 +1445,7 @@ AAF_CLASS(PropertyDefinition,
     0x2001,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     PropertyDefinition)
   AAF_PROPERTY(IsOptional,
     AAF_LITERAL_AUID(0x06444505,
@@ -1391,13 +1454,15 @@ AAF_CLASS(PropertyDefinition,
     0x2005,
     AAF_TYPE(Boolean),
     true,
+    false,
     PropertyDefinition)
   AAF_PROPERTY(DefaultValue,
     AAF_LITERAL_AUID(0x06444506,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2006,
-    AAF_TYPE(DataValue),
+    AAF_TYPE(Indirect),
+    false,
     false,
     PropertyDefinition)
   AAF_PROPERTY(LocalIdentification,
@@ -1405,8 +1470,18 @@ AAF_CLASS(PropertyDefinition,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2007,
-    AAF_TYPE(UInt32),
+    AAF_TYPE(UInt16),
     true,
+    false,
+    PropertyDefinition)
+  AAF_PROPERTY(IsUniqueIdentifier,
+    AAF_LITERAL_AUID(0x06444508,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x2008,
+    AAF_TYPE(Boolean),
+    false,
+    false,
     PropertyDefinition)
 AAF_CLASS_END(PropertyDefinition)
 AAF_CLASS_SEPARATOR()
@@ -1417,51 +1492,28 @@ AAF_CLASS(TypeDefinition,
   AAF_LITERAL_AUID(0x06444600,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-  DefinitionObject,
+  MetaDefinition,
   false)
 AAF_CLASS_END(TypeDefinition)
 AAF_CLASS_SEPARATOR()
 
-// PluginDescriptor
+// PluginDefinition
 //
-AAF_CLASS(PluginDescriptor,
+AAF_CLASS(PluginDefinition,
   AAF_LITERAL_AUID(0x06444700,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-  InterchangeObject,
+  DefinitionObject,
   true)
-  AAF_PROPERTY(Identification,
-    AAF_LITERAL_AUID(0x06444701,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x2200,
-    AAF_TYPE(AUID),
-    true,
-    PluginDescriptor)
-  AAF_PROPERTY(Name,
-    AAF_LITERAL_AUID(0x06444702,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x2201,
-    AAF_TYPE(String),
-    true,
-    PluginDescriptor)
-  AAF_PROPERTY(Description,
-    AAF_LITERAL_AUID(0x06444703,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x2202,
-    AAF_TYPE(String),
-    false,
-    PluginDescriptor)
   AAF_PROPERTY(CategoryClass,
     AAF_LITERAL_AUID(0x06444704,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2203,
-    AAF_REFERENCE_TYPE(WeakReference, DefinitionObject),
+    AAF_TYPE(AUID),
     true,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(VersionNumber,
     AAF_LITERAL_AUID(0x06444705,
       0x0000, 0x0000,
@@ -1469,7 +1521,8 @@ AAF_CLASS(PluginDescriptor,
     0x2204,
     AAF_TYPE(VersionType),
     true,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(VersionString,
     AAF_LITERAL_AUID(0x06444706,
       0x0000, 0x0000,
@@ -1477,7 +1530,8 @@ AAF_CLASS(PluginDescriptor,
     0x2205,
     AAF_TYPE(String),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(Manufacturer,
     AAF_LITERAL_AUID(0x06444707,
       0x0000, 0x0000,
@@ -1485,7 +1539,8 @@ AAF_CLASS(PluginDescriptor,
     0x2206,
     AAF_TYPE(String),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(ManufacturerInfo,
     AAF_LITERAL_AUID(0x06444708,
       0x0000, 0x0000,
@@ -1493,7 +1548,8 @@ AAF_CLASS(PluginDescriptor,
     0x2207,
     AAF_REFERENCE_TYPE(StrongReference, NetworkLocator),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(ManufacturerID,
     AAF_LITERAL_AUID(0x06444709,
       0x0000, 0x0000,
@@ -1501,7 +1557,8 @@ AAF_CLASS(PluginDescriptor,
     0x2208,
     AAF_TYPE(AUID),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(Platform,
     AAF_LITERAL_AUID(0x0644470A,
       0x0000, 0x0000,
@@ -1509,7 +1566,8 @@ AAF_CLASS(PluginDescriptor,
     0x2209,
     AAF_TYPE(AUID),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(MinPlatformVersion,
     AAF_LITERAL_AUID(0x0644470B,
       0x0000, 0x0000,
@@ -1517,7 +1575,8 @@ AAF_CLASS(PluginDescriptor,
     0x220a,
     AAF_TYPE(VersionType),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(MaxPlatformVersion,
     AAF_LITERAL_AUID(0x0644470C,
       0x0000, 0x0000,
@@ -1525,7 +1584,8 @@ AAF_CLASS(PluginDescriptor,
     0x220b,
     AAF_TYPE(VersionType),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(Engine,
     AAF_LITERAL_AUID(0x0644470D,
       0x0000, 0x0000,
@@ -1533,7 +1593,8 @@ AAF_CLASS(PluginDescriptor,
     0x220c,
     AAF_TYPE(AUID),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(MinEngineVersion,
     AAF_LITERAL_AUID(0x0644470E,
       0x0000, 0x0000,
@@ -1541,7 +1602,8 @@ AAF_CLASS(PluginDescriptor,
     0x220d,
     AAF_TYPE(VersionType),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(MaxEngineVersion,
     AAF_LITERAL_AUID(0x0644470F,
       0x0000, 0x0000,
@@ -1549,7 +1611,8 @@ AAF_CLASS(PluginDescriptor,
     0x220e,
     AAF_TYPE(VersionType),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(PluginAPI,
     AAF_LITERAL_AUID(0x06444710,
       0x0000, 0x0000,
@@ -1557,7 +1620,8 @@ AAF_CLASS(PluginDescriptor,
     0x220f,
     AAF_TYPE(AUID),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(MinPluginAPI,
     AAF_LITERAL_AUID(0x06444711,
       0x0000, 0x0000,
@@ -1565,7 +1629,8 @@ AAF_CLASS(PluginDescriptor,
     0x2210,
     AAF_TYPE(VersionType),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(MaxPluginAPI,
     AAF_LITERAL_AUID(0x06444712,
       0x0000, 0x0000,
@@ -1573,7 +1638,8 @@ AAF_CLASS(PluginDescriptor,
     0x2211,
     AAF_TYPE(VersionType),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(SoftwareOnly,
     AAF_LITERAL_AUID(0x06444713,
       0x0000, 0x0000,
@@ -1581,7 +1647,8 @@ AAF_CLASS(PluginDescriptor,
     0x2212,
     AAF_TYPE(Boolean),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(Accelerator,
     AAF_LITERAL_AUID(0x06444714,
       0x0000, 0x0000,
@@ -1589,7 +1656,8 @@ AAF_CLASS(PluginDescriptor,
     0x2213,
     AAF_TYPE(Boolean),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(Locators,
     AAF_LITERAL_AUID(0x06444715,
       0x0000, 0x0000,
@@ -1597,7 +1665,8 @@ AAF_CLASS(PluginDescriptor,
     0x2214,
     AAF_REFERENCE_TYPE(StrongReferenceVector, Locator),
     false,
-    PluginDescriptor)
+    false,
+    PluginDefinition)
   AAF_PROPERTY(Authentication,
     AAF_LITERAL_AUID(0x06444716,
       0x0000, 0x0000,
@@ -1605,8 +1674,18 @@ AAF_CLASS(PluginDescriptor,
     0x2215,
     AAF_TYPE(Boolean),
     false,
-    PluginDescriptor)
-AAF_CLASS_END(PluginDescriptor)
+    false,
+    PluginDefinition)
+  AAF_PROPERTY(DefinitionObject,
+    AAF_LITERAL_AUID(0x06444717,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x2216,
+    AAF_TYPE(AUID),
+    false,
+    false,
+    PluginDefinition)
+AAF_CLASS_END(PluginDefinition)
 AAF_CLASS_SEPARATOR()
 
 // CodecDefinition
@@ -1624,6 +1703,7 @@ AAF_CLASS(CodecDefinition,
     0x2301,
     AAF_REFERENCE_TYPE(WeakReference, ClassDefinition),
     true,
+    false,
     CodecDefinition)
   AAF_PROPERTY(DataDefinitions,
     AAF_LITERAL_AUID(0x06444802,
@@ -1632,6 +1712,7 @@ AAF_CLASS(CodecDefinition,
     0x2302,
     AAF_REFERENCE_TYPE(WeakReferenceSet, DataDefinition),
     true,
+    false,
     CodecDefinition)
 AAF_CLASS_END(CodecDefinition)
 AAF_CLASS_SEPARATOR()
@@ -1645,11 +1726,12 @@ AAF_CLASS(ContainerDefinition,
   DefinitionObject,
   true)
   AAF_PROPERTY(EssenceIsIdentified,
-    AAF_LITERAL_AUID(0x06444900,
+    AAF_LITERAL_AUID(0x06444901,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2401,
     AAF_TYPE(Boolean),
+    false,
     false,
     ContainerDefinition)
 AAF_CLASS_END(ContainerDefinition)
@@ -1669,81 +1751,72 @@ AAF_CLASS_SEPARATOR()
 // Dictionary
 //
 AAF_CLASS(Dictionary,
-  AAF_LITERAL_AUID(0x06450000,
+  AAF_LITERAL_AUID(0x06455000,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
   InterchangeObject,
   true)
-  AAF_PROPERTY(ClassDefinitions,
-    AAF_LITERAL_AUID(0x06450100,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x2601,
-    AAF_REFERENCE_TYPE(StrongReferenceSet, ClassDefinition),
-    false,
-    Dictionary)
-  AAF_PROPERTY(TypeDefinitions,
-    AAF_LITERAL_AUID(0x06450200,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x2602,
-    AAF_REFERENCE_TYPE(StrongReferenceSet, TypeDefinition),
-    false,
-    Dictionary)
   AAF_PROPERTY(OperationDefinitions,
-    AAF_LITERAL_AUID(0x06450300,
+    AAF_LITERAL_AUID(0x06455003,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2603,
     AAF_REFERENCE_TYPE(StrongReferenceSet, OperationDefinition),
     false,
+    false,
     Dictionary)
   AAF_PROPERTY(ParameterDefinitions,
-    AAF_LITERAL_AUID(0x06450400,
+    AAF_LITERAL_AUID(0x06455004,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2604,
     AAF_REFERENCE_TYPE(StrongReferenceSet, ParameterDefinition),
     false,
+    false,
     Dictionary)
   AAF_PROPERTY(DataDefinitions,
-    AAF_LITERAL_AUID(0x06450500,
+    AAF_LITERAL_AUID(0x06455005,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2605,
     AAF_REFERENCE_TYPE(StrongReferenceSet, DataDefinition),
     false,
+    false,
     Dictionary)
   AAF_PROPERTY(PluginDefinitions,
-    AAF_LITERAL_AUID(0x06450600,
+    AAF_LITERAL_AUID(0x06455006,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2606,
-    AAF_REFERENCE_TYPE(StrongReferenceSet, PluginDescriptor),
+    AAF_REFERENCE_TYPE(StrongReferenceSet, PluginDefinition),
+    false,
     false,
     Dictionary)
   AAF_PROPERTY(CodecDefinitions,
-    AAF_LITERAL_AUID(0x06450700,
+    AAF_LITERAL_AUID(0x06455007,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2607,
     AAF_REFERENCE_TYPE(StrongReferenceSet, CodecDefinition),
     false,
+    false,
     Dictionary)
   AAF_PROPERTY(ContainerDefinitions,
-    AAF_LITERAL_AUID(0x06450800,
+    AAF_LITERAL_AUID(0x06455008,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2608,
     AAF_REFERENCE_TYPE(StrongReferenceSet, ContainerDefinition),
     false,
+    false,
     Dictionary)
   AAF_PROPERTY(InterpolationDefinitions,
-    AAF_LITERAL_AUID(0x06450900,
+    AAF_LITERAL_AUID(0x06455009,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2609,
     AAF_REFERENCE_TYPE(StrongReferenceSet, InterpolationDefinition),
+    false,
     false,
     Dictionary)
 AAF_CLASS_END(Dictionary)
@@ -1762,7 +1835,8 @@ AAF_CLASS(EssenceData,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2701,
-    AAF_REFERENCE_TYPE(WeakReference, Mob),
+    AAF_TYPE(MobID),
+    true,
     true,
     EssenceData)
   AAF_PROPERTY(Data,
@@ -1772,13 +1846,15 @@ AAF_CLASS(EssenceData,
     0x2702,
     AAF_TYPE(DataStream),
     true,
+    false,
     EssenceData)
   AAF_PROPERTY(SampleIndex,
     AAF_LITERAL_AUID(0x06460300,
       0x0100, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x2b01,
-    AAF_TYPE(PositionArray),
+    AAF_TYPE(DataStream),
+    false,
     false,
     EssenceData)
 AAF_CLASS_END(EssenceData)
@@ -1799,6 +1875,7 @@ AAF_CLASS(EssenceDescriptor,
     0x2f01,
     AAF_REFERENCE_TYPE(StrongReferenceVector, Locator),
     false,
+    false,
     EssenceDescriptor)
 AAF_CLASS_END(EssenceDescriptor)
 AAF_CLASS_SEPARATOR()
@@ -1818,6 +1895,7 @@ AAF_CLASS(FileDescriptor,
     0x3001,
     AAF_TYPE(Rational),
     true,
+    false,
     FileDescriptor)
   AAF_PROPERTY(Length,
     AAF_LITERAL_AUID(0x06474102,
@@ -1826,14 +1904,7 @@ AAF_CLASS(FileDescriptor,
     0x3002,
     AAF_TYPE(Length),
     true,
-    FileDescriptor)
-  AAF_PROPERTY(IsInContainer,
-    AAF_LITERAL_AUID(0x06474103,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x3003,
-    AAF_TYPE(Boolean),
-    true,
+    false,
     FileDescriptor)
   AAF_PROPERTY(ContainerFormat,
     AAF_LITERAL_AUID(0x06474104,
@@ -1841,6 +1912,16 @@ AAF_CLASS(FileDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3004,
     AAF_REFERENCE_TYPE(WeakReference, ContainerDefinition),
+    false,
+    false,
+    FileDescriptor)
+  AAF_PROPERTY(CodecDefinition,
+    AAF_LITERAL_AUID(0x06474105,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x3005,
+    AAF_REFERENCE_TYPE(WeakReference, CodecDefinition),
+    false,
     false,
     FileDescriptor)
 AAF_CLASS_END(FileDescriptor)
@@ -1861,6 +1942,7 @@ AAF_CLASS(AIFCDescriptor,
     0x3101,
     AAF_TYPE(DataValue),
     true,
+    false,
     AIFCDescriptor)
 AAF_CLASS_END(AIFCDescriptor)
 AAF_CLASS_SEPARATOR()
@@ -1880,6 +1962,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x3201,
     AAF_TYPE(AUID),
     false,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(StoredHeight,
     AAF_LITERAL_AUID(0x06474142,
@@ -1888,6 +1971,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x3202,
     AAF_TYPE(UInt32),
     true,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(StoredWidth,
     AAF_LITERAL_AUID(0x06474142,
@@ -1896,6 +1980,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x3203,
     AAF_TYPE(UInt32),
     true,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(SampledHeight,
     AAF_LITERAL_AUID(0x06474142,
@@ -1904,13 +1989,15 @@ AAF_CLASS(DigitalImageDescriptor,
     0x3204,
     AAF_TYPE(UInt32),
     false,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(SampledWidth,
     AAF_LITERAL_AUID(0x06474142,
       0x0500, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3205,
-    AAF_TYPE(Int32),
+    AAF_TYPE(UInt32),
+    false,
     false,
     DigitalImageDescriptor)
   AAF_PROPERTY(SampledXOffset,
@@ -1920,6 +2007,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x3206,
     AAF_TYPE(Int32),
     false,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(SampledYOffset,
     AAF_LITERAL_AUID(0x06474142,
@@ -1927,6 +2015,7 @@ AAF_CLASS(DigitalImageDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3207,
     AAF_TYPE(Int32),
+    false,
     false,
     DigitalImageDescriptor)
   AAF_PROPERTY(DisplayHeight,
@@ -1936,6 +2025,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x3208,
     AAF_TYPE(UInt32),
     false,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(DisplayWidth,
     AAF_LITERAL_AUID(0x06474142,
@@ -1943,6 +2033,7 @@ AAF_CLASS(DigitalImageDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3209,
     AAF_TYPE(UInt32),
+    false,
     false,
     DigitalImageDescriptor)
   AAF_PROPERTY(DisplayXOffset,
@@ -1952,6 +2043,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x320a,
     AAF_TYPE(Int32),
     false,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(DisplayYOffset,
     AAF_LITERAL_AUID(0x06474142,
@@ -1959,6 +2051,7 @@ AAF_CLASS(DigitalImageDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x320b,
     AAF_TYPE(Int32),
+    false,
     false,
     DigitalImageDescriptor)
   AAF_PROPERTY(FrameLayout,
@@ -1968,6 +2061,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x320c,
     AAF_TYPE(LayoutType),
     true,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(VideoLineMap,
     AAF_LITERAL_AUID(0x06474142,
@@ -1976,6 +2070,7 @@ AAF_CLASS(DigitalImageDescriptor,
     0x320d,
     AAF_TYPE(Int32Array),
     true,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(ImageAspectRatio,
     AAF_LITERAL_AUID(0x06474142,
@@ -1984,13 +2079,15 @@ AAF_CLASS(DigitalImageDescriptor,
     0x320e,
     AAF_TYPE(Rational),
     true,
+    false,
     DigitalImageDescriptor)
   AAF_PROPERTY(AlphaTransparency,
     AAF_LITERAL_AUID(0x06474142,
       0x0F00, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x320f,
-    AAF_TYPE(Rational),
+    AAF_TYPE(AlphaTransparency),
+    false,
     false,
     DigitalImageDescriptor)
   AAF_PROPERTY(Gamma,
@@ -1998,7 +2095,8 @@ AAF_CLASS(DigitalImageDescriptor,
       0x1000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3210,
-    AAF_TYPE(Rational),
+    AAF_TYPE(AUID),
+    false,
     false,
     DigitalImageDescriptor)
   AAF_PROPERTY(ImageAlignmentFactor,
@@ -2007,6 +2105,7 @@ AAF_CLASS(DigitalImageDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3211,
     AAF_TYPE(UInt32),
+    false,
     false,
     DigitalImageDescriptor)
 AAF_CLASS_END(DigitalImageDescriptor)
@@ -2025,8 +2124,9 @@ AAF_CLASS(CDCIDescriptor,
       0x4101, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3301,
-    AAF_TYPE(Int32),
+    AAF_TYPE(UInt32),
     true,
+    false,
     CDCIDescriptor)
   AAF_PROPERTY(HorizontalSubsampling,
     AAF_LITERAL_AUID(0x06474142,
@@ -2035,6 +2135,7 @@ AAF_CLASS(CDCIDescriptor,
     0x3302,
     AAF_TYPE(UInt32),
     true,
+    false,
     CDCIDescriptor)
   AAF_PROPERTY(ColorSiting,
     AAF_LITERAL_AUID(0x06474142,
@@ -2042,6 +2143,7 @@ AAF_CLASS(CDCIDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3303,
     AAF_TYPE(ColorSitingType),
+    false,
     false,
     CDCIDescriptor)
   AAF_PROPERTY(BlackReferenceLevel,
@@ -2051,6 +2153,7 @@ AAF_CLASS(CDCIDescriptor,
     0x3304,
     AAF_TYPE(UInt32),
     false,
+    false,
     CDCIDescriptor)
   AAF_PROPERTY(WhiteReferenceLevel,
     AAF_LITERAL_AUID(0x06474142,
@@ -2058,6 +2161,7 @@ AAF_CLASS(CDCIDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3305,
     AAF_TYPE(UInt32),
+    false,
     false,
     CDCIDescriptor)
   AAF_PROPERTY(ColorRange,
@@ -2067,6 +2171,7 @@ AAF_CLASS(CDCIDescriptor,
     0x3306,
     AAF_TYPE(UInt32),
     false,
+    false,
     CDCIDescriptor)
   AAF_PROPERTY(PaddingBits,
     AAF_LITERAL_AUID(0x06474142,
@@ -2075,6 +2180,7 @@ AAF_CLASS(CDCIDescriptor,
     0x3307,
     AAF_TYPE(Int16),
     false,
+    false,
     CDCIDescriptor)
   AAF_PROPERTY(VerticalSubsampling,
     AAF_LITERAL_AUID(0x06474142,
@@ -2082,6 +2188,7 @@ AAF_CLASS(CDCIDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3308,
     AAF_TYPE(UInt32),
+    false,
     false,
     CDCIDescriptor)
 AAF_CLASS_END(CDCIDescriptor)
@@ -2102,6 +2209,7 @@ AAF_CLASS(RGBADescriptor,
     0x3401,
     AAF_TYPE(RGBALayout),
     true,
+    false,
     RGBADescriptor)
   AAF_PROPERTY(Palette,
     AAF_LITERAL_AUID(0x06474142,
@@ -2110,6 +2218,7 @@ AAF_CLASS(RGBADescriptor,
     0x3403,
     AAF_TYPE(DataValue),
     false,
+    false,
     RGBADescriptor)
   AAF_PROPERTY(PaletteLayout,
     AAF_LITERAL_AUID(0x06474142,
@@ -2117,6 +2226,7 @@ AAF_CLASS(RGBADescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3404,
     AAF_TYPE(RGBALayout),
+    false,
     false,
     RGBADescriptor)
 AAF_CLASS_END(RGBADescriptor)
@@ -2131,17 +2241,6 @@ AAF_CLASS(HTMLDescriptor,
   FileDescriptor,
   true)
 AAF_CLASS_END(HTMLDescriptor)
-AAF_CLASS_SEPARATOR()
-
-// MIDIFileDescriptor
-//
-AAF_CLASS(MIDIFileDescriptor,
-  AAF_LITERAL_AUID(0x06474144,
-    0x0000, 0x0000,
-    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-  FileDescriptor,
-  true)
-AAF_CLASS_END(MIDIFileDescriptor)
 AAF_CLASS_SEPARATOR()
 
 // TIFFDescriptor
@@ -2159,6 +2258,7 @@ AAF_CLASS(TIFFDescriptor,
     0x3701,
     AAF_TYPE(Boolean),
     true,
+    false,
     TIFFDescriptor)
   AAF_PROPERTY(IsContiguous,
     AAF_LITERAL_AUID(0x06474145,
@@ -2167,6 +2267,7 @@ AAF_CLASS(TIFFDescriptor,
     0x3702,
     AAF_TYPE(Boolean),
     true,
+    false,
     TIFFDescriptor)
   AAF_PROPERTY(LeadingLines,
     AAF_LITERAL_AUID(0x06474145,
@@ -2174,6 +2275,7 @@ AAF_CLASS(TIFFDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3703,
     AAF_TYPE(Int32),
+    false,
     false,
     TIFFDescriptor)
   AAF_PROPERTY(TrailingLines,
@@ -2183,6 +2285,7 @@ AAF_CLASS(TIFFDescriptor,
     0x3704,
     AAF_TYPE(Int32),
     false,
+    false,
     TIFFDescriptor)
   AAF_PROPERTY(JPEGTableID,
     AAF_LITERAL_AUID(0x06474145,
@@ -2190,6 +2293,7 @@ AAF_CLASS(TIFFDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3705,
     AAF_TYPE(JPEGTableIDType),
+    false,
     false,
     TIFFDescriptor)
   AAF_PROPERTY(Summary,
@@ -2199,6 +2303,7 @@ AAF_CLASS(TIFFDescriptor,
     0x3706,
     AAF_TYPE(DataValue),
     true,
+    false,
     TIFFDescriptor)
 AAF_CLASS_END(TIFFDescriptor)
 AAF_CLASS_SEPARATOR()
@@ -2218,6 +2323,7 @@ AAF_CLASS(WAVEDescriptor,
     0x3801,
     AAF_TYPE(DataValue),
     true,
+    false,
     WAVEDescriptor)
 AAF_CLASS_END(WAVEDescriptor)
 AAF_CLASS_SEPARATOR()
@@ -2237,6 +2343,7 @@ AAF_CLASS(FilmDescriptor,
     0x3901,
     AAF_TYPE(FilmType),
     false,
+    false,
     FilmDescriptor)
   AAF_PROPERTY(FrameRate,
     AAF_LITERAL_AUID(0x06474202,
@@ -2244,6 +2351,7 @@ AAF_CLASS(FilmDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3902,
     AAF_TYPE(UInt32),
+    false,
     false,
     FilmDescriptor)
   AAF_PROPERTY(PerforationsPerFrame,
@@ -2253,6 +2361,7 @@ AAF_CLASS(FilmDescriptor,
     0x3903,
     AAF_TYPE(UInt8),
     false,
+    false,
     FilmDescriptor)
   AAF_PROPERTY(FilmAspectRatio,
     AAF_LITERAL_AUID(0x06474204,
@@ -2260,6 +2369,7 @@ AAF_CLASS(FilmDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3904,
     AAF_TYPE(Rational),
+    false,
     false,
     FilmDescriptor)
   AAF_PROPERTY(Manufacturer,
@@ -2269,6 +2379,7 @@ AAF_CLASS(FilmDescriptor,
     0x3905,
     AAF_TYPE(String),
     false,
+    false,
     FilmDescriptor)
   AAF_PROPERTY(Model,
     AAF_LITERAL_AUID(0x06474206,
@@ -2276,6 +2387,7 @@ AAF_CLASS(FilmDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3906,
     AAF_TYPE(String),
+    false,
     false,
     FilmDescriptor)
 AAF_CLASS_END(FilmDescriptor)
@@ -2296,6 +2408,7 @@ AAF_CLASS(TapeDescriptor,
     0x3a01,
     AAF_TYPE(TapeCaseType),
     false,
+    false,
     TapeDescriptor)
   AAF_PROPERTY(VideoSignal,
     AAF_LITERAL_AUID(0x06474302,
@@ -2303,6 +2416,7 @@ AAF_CLASS(TapeDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3a02,
     AAF_TYPE(VideoSignalType),
+    false,
     false,
     TapeDescriptor)
   AAF_PROPERTY(TapeFormat,
@@ -2312,13 +2426,15 @@ AAF_CLASS(TapeDescriptor,
     0x3a03,
     AAF_TYPE(TapeFormatType),
     false,
+    false,
     TapeDescriptor)
   AAF_PROPERTY(Length,
     AAF_LITERAL_AUID(0x06474304,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3a04,
-    AAF_TYPE(Length),
+    AAF_TYPE(UInt32),
+    false,
     false,
     TapeDescriptor)
   AAF_PROPERTY(ManufacturerID,
@@ -2328,6 +2444,7 @@ AAF_CLASS(TapeDescriptor,
     0x3a05,
     AAF_TYPE(String),
     false,
+    false,
     TapeDescriptor)
   AAF_PROPERTY(Model,
     AAF_LITERAL_AUID(0x06474306,
@@ -2335,6 +2452,7 @@ AAF_CLASS(TapeDescriptor,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3a06,
     AAF_TYPE(String),
+    false,
     false,
     TapeDescriptor)
 AAF_CLASS_END(TapeDescriptor)
@@ -2355,6 +2473,7 @@ AAF_CLASS(Header,
     0x3b01,
     AAF_TYPE(Int16),
     true,
+    false,
     Header)
   AAF_PROPERTY(LastModified,
     AAF_LITERAL_AUID(0x06480200,
@@ -2363,6 +2482,7 @@ AAF_CLASS(Header,
     0x3b02,
     AAF_TYPE(TimeStamp),
     true,
+    false,
     Header)
   AAF_PROPERTY(Content,
     AAF_LITERAL_AUID(0x06480300,
@@ -2371,6 +2491,7 @@ AAF_CLASS(Header,
     0x3b03,
     AAF_REFERENCE_TYPE(StrongReference, ContentStorage),
     true,
+    false,
     Header)
   AAF_PROPERTY(Dictionary,
     AAF_LITERAL_AUID(0x06480400,
@@ -2379,6 +2500,7 @@ AAF_CLASS(Header,
     0x3b04,
     AAF_REFERENCE_TYPE(StrongReference, Dictionary),
     true,
+    false,
     Header)
   AAF_PROPERTY(Version,
     AAF_LITERAL_AUID(0x06480500,
@@ -2387,6 +2509,7 @@ AAF_CLASS(Header,
     0x3b05,
     AAF_TYPE(VersionType),
     true,
+    false,
     Header)
   AAF_PROPERTY(IdentificationList,
     AAF_LITERAL_AUID(0x06480600,
@@ -2395,6 +2518,7 @@ AAF_CLASS(Header,
     0x3b06,
     AAF_REFERENCE_TYPE(StrongReferenceVector, Identification),
     true,
+    false,
     Header)
   AAF_PROPERTY(ObjectModelVersion,
     AAF_LITERAL_AUID(0x06480700,
@@ -2402,6 +2526,7 @@ AAF_CLASS(Header,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3b07,
     AAF_TYPE(UInt32),
+    false,
     false,
     Header)
 AAF_CLASS_END(Header)
@@ -2422,6 +2547,7 @@ AAF_CLASS(Identification,
     0x3c01,
     AAF_TYPE(String),
     true,
+    false,
     Identification)
   AAF_PROPERTY(ProductName,
     AAF_LITERAL_AUID(0x06490200,
@@ -2430,6 +2556,7 @@ AAF_CLASS(Identification,
     0x3c02,
     AAF_TYPE(String),
     true,
+    false,
     Identification)
   AAF_PROPERTY(ProductVersion,
     AAF_LITERAL_AUID(0x06490300,
@@ -2437,6 +2564,7 @@ AAF_CLASS(Identification,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3c03,
     AAF_TYPE(ProductVersion),
+    false,
     false,
     Identification)
   AAF_PROPERTY(ProductVersionString,
@@ -2446,6 +2574,7 @@ AAF_CLASS(Identification,
     0x3c04,
     AAF_TYPE(String),
     true,
+    false,
     Identification)
   AAF_PROPERTY(ProductID,
     AAF_LITERAL_AUID(0x06490500,
@@ -2454,6 +2583,7 @@ AAF_CLASS(Identification,
     0x3c05,
     AAF_TYPE(AUID),
     true,
+    false,
     Identification)
   AAF_PROPERTY(Date,
     AAF_LITERAL_AUID(0x06490600,
@@ -2462,6 +2592,7 @@ AAF_CLASS(Identification,
     0x3c06,
     AAF_TYPE(TimeStamp),
     true,
+    false,
     Identification)
   AAF_PROPERTY(ToolkitVersion,
     AAF_LITERAL_AUID(0x06490700,
@@ -2469,6 +2600,7 @@ AAF_CLASS(Identification,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x3c07,
     AAF_TYPE(ProductVersion),
+    false,
     false,
     Identification)
   AAF_PROPERTY(Platform,
@@ -2478,6 +2610,7 @@ AAF_CLASS(Identification,
     0x3c08,
     AAF_TYPE(String),
     false,
+    false,
     Identification)
   AAF_PROPERTY(GenerationAUID,
     AAF_LITERAL_AUID(0x06490900,
@@ -2486,6 +2619,7 @@ AAF_CLASS(Identification,
     0x3c09,
     AAF_TYPE(AUID),
     true,
+    false,
     Identification)
 AAF_CLASS_END(Identification)
 AAF_CLASS_SEPARATOR()
@@ -2516,6 +2650,7 @@ AAF_CLASS(NetworkLocator,
     0x4001,
     AAF_TYPE(String),
     true,
+    false,
     NetworkLocator)
 AAF_CLASS_END(NetworkLocator)
 AAF_CLASS_SEPARATOR()
@@ -2535,6 +2670,7 @@ AAF_CLASS(TextLocator,
     0x4101,
     AAF_TYPE(String),
     true,
+    false,
     TextLocator)
 AAF_CLASS_END(TextLocator)
 AAF_CLASS_SEPARATOR()
@@ -2554,6 +2690,7 @@ AAF_CLASS(Mob,
     0x4401,
     AAF_TYPE(MobID),
     true,
+    true,
     Mob)
   AAF_PROPERTY(Name,
     AAF_LITERAL_AUID(0x064B0200,
@@ -2561,6 +2698,7 @@ AAF_CLASS(Mob,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x4402,
     AAF_TYPE(String),
+    false,
     false,
     Mob)
   AAF_PROPERTY(Slots,
@@ -2570,6 +2708,7 @@ AAF_CLASS(Mob,
     0x4403,
     AAF_REFERENCE_TYPE(StrongReferenceVector, MobSlot),
     true,
+    false,
     Mob)
   AAF_PROPERTY(LastModified,
     AAF_LITERAL_AUID(0x064B0400,
@@ -2578,6 +2717,7 @@ AAF_CLASS(Mob,
     0x4404,
     AAF_TYPE(TimeStamp),
     true,
+    false,
     Mob)
   AAF_PROPERTY(CreationTime,
     AAF_LITERAL_AUID(0x064B0500,
@@ -2586,13 +2726,24 @@ AAF_CLASS(Mob,
     0x4405,
     AAF_TYPE(TimeStamp),
     true,
+    false,
     Mob)
   AAF_PROPERTY(UserComments,
     AAF_LITERAL_AUID(0x064B0600,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x4406,
-    AAF_REFERENCE_TYPE(StrongReferenceSet, TaggedValue),
+    AAF_REFERENCE_TYPE(StrongReferenceVector, TaggedValue),
+    false,
+    false,
+    Mob)
+  AAF_PROPERTY(KLVData,
+    AAF_LITERAL_AUID(0x064B0700,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x4407,
+    AAF_REFERENCE_TYPE(StrongReferenceVector, KLVData),
+    false,
     false,
     Mob)
 AAF_CLASS_END(Mob)
@@ -2613,6 +2764,7 @@ AAF_CLASS(CompositionMob,
     0x4501,
     AAF_TYPE(Length),
     false,
+    false,
     CompositionMob)
   AAF_PROPERTY(DefFadeType,
     AAF_LITERAL_AUID(0x064B4102,
@@ -2621,6 +2773,7 @@ AAF_CLASS(CompositionMob,
     0x4502,
     AAF_TYPE(FadeType),
     false,
+    false,
     CompositionMob)
   AAF_PROPERTY(DefFadeEditUnit,
     AAF_LITERAL_AUID(0x064B4103,
@@ -2628,6 +2781,7 @@ AAF_CLASS(CompositionMob,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x4503,
     AAF_TYPE(Rational),
+    false,
     false,
     CompositionMob)
 AAF_CLASS_END(CompositionMob)
@@ -2659,6 +2813,7 @@ AAF_CLASS(SourceMob,
     0x4701,
     AAF_REFERENCE_TYPE(StrongReference, EssenceDescriptor),
     true,
+    false,
     SourceMob)
 AAF_CLASS_END(SourceMob)
 AAF_CLASS_SEPARATOR()
@@ -2678,6 +2833,7 @@ AAF_CLASS(MobSlot,
     0x4801,
     AAF_TYPE(Int32),
     true,
+    false,
     MobSlot)
   AAF_PROPERTY(SlotName,
     AAF_LITERAL_AUID(0x064C0200,
@@ -2685,6 +2841,7 @@ AAF_CLASS(MobSlot,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x4802,
     AAF_TYPE(String),
+    false,
     false,
     MobSlot)
   AAF_PROPERTY(Segment,
@@ -2694,6 +2851,7 @@ AAF_CLASS(MobSlot,
     0x4803,
     AAF_REFERENCE_TYPE(StrongReference, Segment),
     true,
+    false,
     MobSlot)
   AAF_PROPERTY(PhysicalTrackNumber,
     AAF_LITERAL_AUID(0x064C0400,
@@ -2701,6 +2859,7 @@ AAF_CLASS(MobSlot,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x4804,
     AAF_TYPE(UInt32),
+    false,
     false,
     MobSlot)
 AAF_CLASS_END(MobSlot)
@@ -2721,6 +2880,7 @@ AAF_CLASS(EventMobSlot,
     0x4901,
     AAF_TYPE(Rational),
     true,
+    false,
     EventMobSlot)
 AAF_CLASS_END(EventMobSlot)
 AAF_CLASS_SEPARATOR()
@@ -2751,6 +2911,7 @@ AAF_CLASS(TimelineMobSlot,
     0x4b01,
     AAF_TYPE(Rational),
     true,
+    false,
     TimelineMobSlot)
   AAF_PROPERTY(Origin,
     AAF_LITERAL_AUID(0x064C4302,
@@ -2759,6 +2920,7 @@ AAF_CLASS(TimelineMobSlot,
     0x4b02,
     AAF_TYPE(Position),
     true,
+    false,
     TimelineMobSlot)
 AAF_CLASS_END(TimelineMobSlot)
 AAF_CLASS_SEPARATOR()
@@ -2778,6 +2940,7 @@ AAF_CLASS(Parameter,
     0x4c01,
     AAF_REFERENCE_TYPE(WeakReference, ParameterDefinition),
     true,
+    false,
     Parameter)
 AAF_CLASS_END(Parameter)
 AAF_CLASS_SEPARATOR()
@@ -2797,6 +2960,7 @@ AAF_CLASS(ConstantValue,
     0x4d01,
     AAF_TYPE(Indirect),
     true,
+    false,
     ConstantValue)
 AAF_CLASS_END(ConstantValue)
 AAF_CLASS_SEPARATOR()
@@ -2816,6 +2980,7 @@ AAF_CLASS(VaryingValue,
     0x4e01,
     AAF_REFERENCE_TYPE(WeakReference, InterpolationDefinition),
     true,
+    false,
     VaryingValue)
   AAF_PROPERTY(PointList,
     AAF_LITERAL_AUID(0x064D4202,
@@ -2824,6 +2989,7 @@ AAF_CLASS(VaryingValue,
     0x4e02,
     AAF_REFERENCE_TYPE(StrongReferenceVector, ControlPoint),
     true,
+    false,
     VaryingValue)
 AAF_CLASS_END(VaryingValue)
 AAF_CLASS_SEPARATOR()
@@ -2843,14 +3009,7 @@ AAF_CLASS(TaggedValue,
     0x5001,
     AAF_TYPE(String),
     true,
-    TaggedValue)
-  AAF_PROPERTY(Type,
-    AAF_LITERAL_AUID(0x064F0200,
-      0x0000, 0x0000,
-      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
-    0x5002,
-    AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
-    true,
+    false,
     TaggedValue)
   AAF_PROPERTY(Value,
     AAF_LITERAL_AUID(0x064F0300,
@@ -2859,8 +3018,29 @@ AAF_CLASS(TaggedValue,
     0x5003,
     AAF_TYPE(Indirect),
     true,
+    false,
     TaggedValue)
 AAF_CLASS_END(TaggedValue)
+AAF_CLASS_SEPARATOR()
+
+// KLVData
+//
+AAF_CLASS(KLVData,
+  AAF_LITERAL_AUID(0x06500000,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+  InterchangeObject,
+  true)
+  AAF_PROPERTY(Value,
+    AAF_LITERAL_AUID(0x06500100,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x5101,
+    AAF_TYPE(Opaque),
+    true,
+    false,
+    KLVData)
+AAF_CLASS_END(KLVData)
 AAF_CLASS_SEPARATOR()
 
 // TypeDefinitionInteger
@@ -2878,6 +3058,7 @@ AAF_CLASS(TypeDefinitionInteger,
     0x5201,
     AAF_TYPE(UInt8),
     true,
+    false,
     TypeDefinitionInteger)
   AAF_PROPERTY(IsSigned,
     AAF_LITERAL_AUID(0x06510200,
@@ -2886,6 +3067,7 @@ AAF_CLASS(TypeDefinitionInteger,
     0x5202,
     AAF_TYPE(Boolean),
     true,
+    false,
     TypeDefinitionInteger)
 AAF_CLASS_END(TypeDefinitionInteger)
 AAF_CLASS_SEPARATOR()
@@ -2905,6 +3087,7 @@ AAF_CLASS(TypeDefinitionStrongObjectReference,
     0x5301,
     AAF_REFERENCE_TYPE(WeakReference, ClassDefinition),
     true,
+    false,
     TypeDefinitionStrongObjectReference)
 AAF_CLASS_END(TypeDefinitionStrongObjectReference)
 AAF_CLASS_SEPARATOR()
@@ -2924,6 +3107,7 @@ AAF_CLASS(TypeDefinitionWeakObjectReference,
     0x5401,
     AAF_REFERENCE_TYPE(WeakReference, ClassDefinition),
     true,
+    false,
     TypeDefinitionWeakObjectReference)
 AAF_CLASS_END(TypeDefinitionWeakObjectReference)
 AAF_CLASS_SEPARATOR()
@@ -2943,6 +3127,7 @@ AAF_CLASS(TypeDefinitionEnumeration,
     0x5501,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     TypeDefinitionEnumeration)
   AAF_PROPERTY(ElementNames,
     AAF_LITERAL_AUID(0x06540200,
@@ -2951,6 +3136,7 @@ AAF_CLASS(TypeDefinitionEnumeration,
     0x5502,
     AAF_TYPE(StringArray),
     true,
+    false,
     TypeDefinitionEnumeration)
   AAF_PROPERTY(ElementValues,
     AAF_LITERAL_AUID(0x06540300,
@@ -2959,6 +3145,7 @@ AAF_CLASS(TypeDefinitionEnumeration,
     0x5503,
     AAF_TYPE(Int64Array),
     true,
+    false,
     TypeDefinitionEnumeration)
 AAF_CLASS_END(TypeDefinitionEnumeration)
 AAF_CLASS_SEPARATOR()
@@ -2978,6 +3165,7 @@ AAF_CLASS(TypeDefinitionFixedArray,
     0x5601,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     TypeDefinitionFixedArray)
   AAF_PROPERTY(ElementCount,
     AAF_LITERAL_AUID(0x06550200,
@@ -2986,6 +3174,7 @@ AAF_CLASS(TypeDefinitionFixedArray,
     0x5602,
     AAF_TYPE(UInt32),
     true,
+    false,
     TypeDefinitionFixedArray)
 AAF_CLASS_END(TypeDefinitionFixedArray)
 AAF_CLASS_SEPARATOR()
@@ -3005,6 +3194,7 @@ AAF_CLASS(TypeDefinitionVariableArray,
     0x5701,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     TypeDefinitionVariableArray)
 AAF_CLASS_END(TypeDefinitionVariableArray)
 AAF_CLASS_SEPARATOR()
@@ -3024,6 +3214,7 @@ AAF_CLASS(TypeDefinitionSet,
     0x5801,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     TypeDefinitionSet)
 AAF_CLASS_END(TypeDefinitionSet)
 AAF_CLASS_SEPARATOR()
@@ -3043,6 +3234,7 @@ AAF_CLASS(TypeDefinitionString,
     0x5901,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     TypeDefinitionString)
 AAF_CLASS_END(TypeDefinitionString)
 AAF_CLASS_SEPARATOR()
@@ -3062,6 +3254,7 @@ AAF_CLASS(TypeDefinitionStream,
     0x5a01,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     TypeDefinitionStream)
 AAF_CLASS_END(TypeDefinitionStream)
 AAF_CLASS_SEPARATOR()
@@ -3081,6 +3274,7 @@ AAF_CLASS(TypeDefinitionRecord,
     0x5b01,
     AAF_REFERENCE_TYPE(WeakReferenceVector, TypeDefinition),
     true,
+    false,
     TypeDefinitionRecord)
   AAF_PROPERTY(MemberNames,
     AAF_LITERAL_AUID(0x065A0200,
@@ -3089,6 +3283,7 @@ AAF_CLASS(TypeDefinitionRecord,
     0x5b02,
     AAF_TYPE(StringArray),
     true,
+    false,
     TypeDefinitionRecord)
 AAF_CLASS_END(TypeDefinitionRecord)
 AAF_CLASS_SEPARATOR()
@@ -3108,6 +3303,7 @@ AAF_CLASS(TypeDefinitionRename,
     0x5c01,
     AAF_REFERENCE_TYPE(WeakReference, TypeDefinition),
     true,
+    false,
     TypeDefinitionRename)
 AAF_CLASS_END(TypeDefinitionRename)
 AAF_CLASS_SEPARATOR()
@@ -3127,6 +3323,7 @@ AAF_CLASS(TypeDefinitionExtendibleEnumeration,
     0x5d01,
     AAF_TYPE(StringArray),
     true,
+    false,
     TypeDefinitionExtendibleEnumeration)
   AAF_PROPERTY(ElementValues,
     AAF_LITERAL_AUID(0x065C0200,
@@ -3135,6 +3332,7 @@ AAF_CLASS(TypeDefinitionExtendibleEnumeration,
     0x5d02,
     AAF_TYPE(AUIDArray),
     true,
+    false,
     TypeDefinitionExtendibleEnumeration)
 AAF_CLASS_END(TypeDefinitionExtendibleEnumeration)
 AAF_CLASS_SEPARATOR()
@@ -3150,23 +3348,93 @@ AAF_CLASS(TypeDefinitionIndirect,
 AAF_CLASS_END(TypeDefinitionIndirect)
 AAF_CLASS_SEPARATOR()
 
+// TypeDefinitionOpaque
+//
+AAF_CLASS(TypeDefinitionOpaque,
+  AAF_LITERAL_AUID(0x065E0000,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+  TypeDefinitionIndirect,
+  true)
+AAF_CLASS_END(TypeDefinitionOpaque)
+AAF_CLASS_SEPARATOR()
+
 // TypeDefinitionCharacter
 //
 AAF_CLASS(TypeDefinitionCharacter,
-  AAF_LITERAL_AUID(0x065E0000,
+  AAF_LITERAL_AUID(0x065F0000,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
   TypeDefinition,
   true)
-  AAF_PROPERTY(Size,
-    AAF_LITERAL_AUID(0x065E0100,
+AAF_CLASS_END(TypeDefinitionCharacter)
+AAF_CLASS_SEPARATOR()
+
+// MetaDefinition
+//
+AAF_CLASS(MetaDefinition,
+  AAF_LITERAL_AUID(0x06600000,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+  Root,
+  false)
+  AAF_PROPERTY(Identification,
+    AAF_LITERAL_AUID(0x06600100,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
     0x5e01,
-    AAF_TYPE(UInt8),
+    AAF_TYPE(AUID),
     true,
-    TypeDefinitionCharacter)
-AAF_CLASS_END(TypeDefinitionCharacter)
+    true,
+    MetaDefinition)
+  AAF_PROPERTY(Name,
+    AAF_LITERAL_AUID(0x06600200,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x5e02,
+    AAF_TYPE(String),
+    true,
+    false,
+    MetaDefinition)
+  AAF_PROPERTY(Description,
+    AAF_LITERAL_AUID(0x06600300,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x5e03,
+    AAF_TYPE(String),
+    false,
+    false,
+    MetaDefinition)
+AAF_CLASS_END(MetaDefinition)
+AAF_CLASS_SEPARATOR()
+
+// MetaDictionary
+//
+AAF_CLASS(MetaDictionary,
+  AAF_LITERAL_AUID(0x06610000,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+  Root,
+  true)
+  AAF_PROPERTY(ClassDefinitions,
+    AAF_LITERAL_AUID(0x06610100,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x5f01,
+    AAF_REFERENCE_TYPE(StrongReferenceSet, ClassDefinition),
+    false,
+    false,
+    MetaDictionary)
+  AAF_PROPERTY(TypeDefinitions,
+    AAF_LITERAL_AUID(0x06610200,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x04),
+    0x5f02,
+    AAF_REFERENCE_TYPE(StrongReferenceSet, TypeDefinition),
+    false,
+    false,
+    MetaDictionary)
+AAF_CLASS_END(MetaDictionary)
 
 AAF_TABLE_END()
 
@@ -3431,7 +3699,7 @@ AAF_TYPE_SEPARATOR()
 // PulldownKindType
 //
 AAF_TYPE_DEFINITION_ENUMERATION(PulldownKindType, 
-  AAF_LITERAL_AUID(0x0C020F00,
+  AAF_LITERAL_AUID(0x0C021000,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C), AAF_TYPE(UInt8))
   AAF_TYPE_DEFINITION_ENUMERATION_MEMBER(kAAFTwoThreePD,
@@ -3523,6 +3791,19 @@ AAF_TYPE_DEFINITION_ENUMERATION(ReferenceType,
 AAF_TYPE_DEFINITION_ENUMERATION_END(ReferenceType)
 AAF_TYPE_SEPARATOR()
 
+// AlphaTransparency
+//
+AAF_TYPE_DEFINITION_ENUMERATION(AlphaTransparency, 
+  AAF_LITERAL_AUID(0x0C020F00,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C), AAF_TYPE(UInt8))
+  AAF_TYPE_DEFINITION_ENUMERATION_MEMBER(kAAFMinValueTransparent,
+    0, AlphaTransparency)
+  AAF_TYPE_DEFINITION_ENUMERATION_MEMBER(kAAFMaxValueTransparent,
+    1, AlphaTransparency)
+AAF_TYPE_DEFINITION_ENUMERATION_END(AlphaTransparency)
+AAF_TYPE_SEPARATOR()
+
 // UInt8Array8
 //
 AAF_TYPE_DEFINITION_FIXED_ARRAY(UInt8Array8, 
@@ -3583,7 +3864,7 @@ AAF_TYPE_DEFINITION_VARYING_ARRAY(StringArray,
   AAF_LITERAL_AUID(0x0C040500,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
-  AAF_TYPE(String))
+  AAF_TYPE(Character))
 AAF_TYPE_SEPARATOR()
 
 // AUIDArray
@@ -3799,7 +4080,7 @@ AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(OperationCategory,
   AAF_LITERAL_AUID(0x0C080000,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C))
-  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(Effect,
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFOperationEffect,
     AAF_LITERAL_AUID(0x0D000000,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
@@ -3812,7 +4093,7 @@ AAF_TYPE_SEPARATOR()
 AAF_TYPE_DEFINITION_CHARACTER(Character, 
   AAF_LITERAL_AUID(0x0C090000,
     0x0000, 0x0000,
-    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C), 2)
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C))
 AAF_TYPE_SEPARATOR()
 
 // DataStream
@@ -3821,6 +4102,39 @@ AAF_TYPE_DEFINITION_STREAM(DataStream,
   AAF_LITERAL_AUID(0x0C0A0000,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C))
+AAF_TYPE_SEPARATOR()
+
+// GammaType
+//
+AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(GammaType, 
+  AAF_LITERAL_AUID(0x0C0B0000,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C))
+AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(GammaType)
+AAF_TYPE_SEPARATOR()
+
+// CategoryType
+//
+AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(CategoryType, 
+  AAF_LITERAL_AUID(0x0C0C0000,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C))
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFPluginCatagoryEffect,
+    AAF_LITERAL_AUID(0x0C0C0100,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+    CategoryType)
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFPluginCatagoryCodec,
+    AAF_LITERAL_AUID(0x0C0C0200,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+    CategoryType)
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFPluginCatagoryInterpolation,
+    AAF_LITERAL_AUID(0x0C0C0300,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+    CategoryType)
+AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(CategoryType)
 AAF_TYPE_SEPARATOR()
 
 // DataValue
@@ -3849,11 +4163,19 @@ AAF_TYPE_DEFINITION_INDIRECT(Indirect,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0xFF))
 AAF_TYPE_SEPARATOR()
 
+// Opaque
+//
+AAF_TYPE_DEFINITION_OPAQUE(Opaque, 
+  AAF_LITERAL_AUID(0xFFFFFFFF,
+    0xFFFF, 0xFFFC,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0xFF))
+AAF_TYPE_SEPARATOR()
+
 // StrongReference<ContentStorage>
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, ContentStorage), 
-  AAF_LITERAL_AUID(0x0C0B0000,
+  AAF_LITERAL_AUID(0x0C0D0000,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ContentStorage))
@@ -3863,7 +4185,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, Dictionary), 
-  AAF_LITERAL_AUID(0x0C0B0001,
+  AAF_LITERAL_AUID(0x0C0D0001,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Dictionary))
@@ -3873,7 +4195,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, EssenceDescriptor), 
-  AAF_LITERAL_AUID(0x0C0B0002,
+  AAF_LITERAL_AUID(0x0C0D0002,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(EssenceDescriptor))
@@ -3883,7 +4205,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, NetworkLocator), 
-  AAF_LITERAL_AUID(0x0C0B0003,
+  AAF_LITERAL_AUID(0x0C0D0003,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(NetworkLocator))
@@ -3893,7 +4215,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, OperationGroup), 
-  AAF_LITERAL_AUID(0x0C0B0004,
+  AAF_LITERAL_AUID(0x0C0D0004,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(OperationGroup))
@@ -3903,7 +4225,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, Segment), 
-  AAF_LITERAL_AUID(0x0C0B0005,
+  AAF_LITERAL_AUID(0x0C0D0005,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Segment))
@@ -3913,7 +4235,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, SourceClip), 
-  AAF_LITERAL_AUID(0x0C0B0006,
+  AAF_LITERAL_AUID(0x0C0D0006,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(SourceClip))
@@ -3923,7 +4245,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, SourceReference), 
-  AAF_LITERAL_AUID(0x0C0B0007,
+  AAF_LITERAL_AUID(0x0C0D0007,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(SourceReference))
@@ -3933,7 +4255,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, ClassDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0008,
+  AAF_LITERAL_AUID(0x0C0D0008,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ClassDefinition))
@@ -3943,7 +4265,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, CodecDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0009,
+  AAF_LITERAL_AUID(0x0C0D0009,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(CodecDefinition))
@@ -3953,7 +4275,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, Component), 
-  AAF_LITERAL_AUID(0x0C0B000A,
+  AAF_LITERAL_AUID(0x0C0D000A,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Component))
@@ -3963,7 +4285,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, ContainerDefinition), 
-  AAF_LITERAL_AUID(0x0C0B000B,
+  AAF_LITERAL_AUID(0x0C0D000B,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ContainerDefinition))
@@ -3973,7 +4295,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, ControlPoint), 
-  AAF_LITERAL_AUID(0x0C0B000C,
+  AAF_LITERAL_AUID(0x0C0D000C,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ControlPoint))
@@ -3983,7 +4305,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, DataDefinition), 
-  AAF_LITERAL_AUID(0x0C0B000D,
+  AAF_LITERAL_AUID(0x0C0D000D,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(DataDefinition))
@@ -3993,7 +4315,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, EssenceData), 
-  AAF_LITERAL_AUID(0x0C0B000E,
+  AAF_LITERAL_AUID(0x0C0D000E,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(EssenceData))
@@ -4003,7 +4325,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, Identification), 
-  AAF_LITERAL_AUID(0x0C0B000F,
+  AAF_LITERAL_AUID(0x0C0D000F,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Identification))
@@ -4013,7 +4335,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, InterpolationDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0010,
+  AAF_LITERAL_AUID(0x0C0D0010,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(InterpolationDefinition))
@@ -4023,7 +4345,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, Locator), 
-  AAF_LITERAL_AUID(0x0C0B0011,
+  AAF_LITERAL_AUID(0x0C0D0011,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Locator))
@@ -4033,7 +4355,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, Mob), 
-  AAF_LITERAL_AUID(0x0C0B0012,
+  AAF_LITERAL_AUID(0x0C0D0012,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Mob))
@@ -4043,7 +4365,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, MobSlot), 
-  AAF_LITERAL_AUID(0x0C0B0013,
+  AAF_LITERAL_AUID(0x0C0D0013,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(MobSlot))
@@ -4053,7 +4375,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, OperationDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0014,
+  AAF_LITERAL_AUID(0x0C0D0014,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(OperationDefinition))
@@ -4063,7 +4385,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, Parameter), 
-  AAF_LITERAL_AUID(0x0C0B0015,
+  AAF_LITERAL_AUID(0x0C0D0015,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Parameter))
@@ -4073,27 +4395,27 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, ParameterDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0016,
+  AAF_LITERAL_AUID(0x0C0D0016,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ParameterDefinition))
 AAF_TYPE_SEPARATOR()
 
-// StrongReference<PluginDescriptor>
+// StrongReference<PluginDefinition>
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
-  AAF_REFERENCE_TYPE_NAME(StrongReference, PluginDescriptor), 
-  AAF_LITERAL_AUID(0x0C0B0017,
+  AAF_REFERENCE_TYPE_NAME(StrongReference, PluginDefinition), 
+  AAF_LITERAL_AUID(0x0C0D0017,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
-  AAF_TYPE(PluginDescriptor))
+  AAF_TYPE(PluginDefinition))
 AAF_TYPE_SEPARATOR()
 
 // StrongReference<PropertyDefinition>
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, PropertyDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0018,
+  AAF_LITERAL_AUID(0x0C0D0018,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(PropertyDefinition))
@@ -4103,7 +4425,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, TaggedValue), 
-  AAF_LITERAL_AUID(0x0C0B0019,
+  AAF_LITERAL_AUID(0x0C0D0019,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TaggedValue))
@@ -4113,17 +4435,27 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(StrongReference, TypeDefinition), 
-  AAF_LITERAL_AUID(0x0C0B001A,
+  AAF_LITERAL_AUID(0x0C0D001A,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TypeDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<KLVData>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, KLVData), 
+  AAF_LITERAL_AUID(0x0C0D001b,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(KLVData))
 AAF_TYPE_SEPARATOR()
 
 // StrongReferenceSet<ClassDefinition>
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, ClassDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0100,
+  AAF_LITERAL_AUID(0x0C0D0100,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ClassDefinition))
@@ -4133,7 +4465,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, CodecDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0101,
+  AAF_LITERAL_AUID(0x0C0D0101,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(CodecDefinition))
@@ -4143,7 +4475,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, ContainerDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0102,
+  AAF_LITERAL_AUID(0x0C0D0102,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ContainerDefinition))
@@ -4153,7 +4485,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, DataDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0103,
+  AAF_LITERAL_AUID(0x0C0D0103,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(DataDefinition))
@@ -4163,7 +4495,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, EssenceData), 
-  AAF_LITERAL_AUID(0x0C0B0104,
+  AAF_LITERAL_AUID(0x0C0D0104,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(EssenceData))
@@ -4173,7 +4505,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, InterpolationDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0105,
+  AAF_LITERAL_AUID(0x0C0D0105,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(InterpolationDefinition))
@@ -4183,7 +4515,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, Locator), 
-  AAF_LITERAL_AUID(0x0C0B0106,
+  AAF_LITERAL_AUID(0x0C0D0106,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Locator))
@@ -4193,7 +4525,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, Mob), 
-  AAF_LITERAL_AUID(0x0C0B0107,
+  AAF_LITERAL_AUID(0x0C0D0107,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Mob))
@@ -4203,47 +4535,37 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, OperationDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0108,
+  AAF_LITERAL_AUID(0x0C0D0108,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(OperationDefinition))
-AAF_TYPE_SEPARATOR()
-
-// StrongReferenceSet<Parameter>
-//
-AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
-  AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, Parameter), 
-  AAF_LITERAL_AUID(0x0C0B0109,
-    0x0000, 0x0000,
-    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
-  AAF_TYPE(Parameter))
 AAF_TYPE_SEPARATOR()
 
 // StrongReferenceSet<ParameterDefinition>
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, ParameterDefinition), 
-  AAF_LITERAL_AUID(0x0C0B010A,
+  AAF_LITERAL_AUID(0x0C0D010A,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ParameterDefinition))
 AAF_TYPE_SEPARATOR()
 
-// StrongReferenceSet<PluginDescriptor>
+// StrongReferenceSet<PluginDefinition>
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
-  AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, PluginDescriptor), 
-  AAF_LITERAL_AUID(0x0C0B010B,
+  AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, PluginDefinition), 
+  AAF_LITERAL_AUID(0x0C0D010B,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
-  AAF_TYPE(PluginDescriptor))
+  AAF_TYPE(PluginDefinition))
 AAF_TYPE_SEPARATOR()
 
 // StrongReferenceSet<PropertyDefinition>
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, PropertyDefinition), 
-  AAF_LITERAL_AUID(0x0C0B010C,
+  AAF_LITERAL_AUID(0x0C0D010C,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(PropertyDefinition))
@@ -4253,7 +4575,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, Segment), 
-  AAF_LITERAL_AUID(0x0C0B010D,
+  AAF_LITERAL_AUID(0x0C0D010D,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Segment))
@@ -4263,7 +4585,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, TaggedValue), 
-  AAF_LITERAL_AUID(0x0C0B010E,
+  AAF_LITERAL_AUID(0x0C0D010E,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TaggedValue))
@@ -4273,7 +4595,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceSet, TypeDefinition), 
-  AAF_LITERAL_AUID(0x0C0B010F,
+  AAF_LITERAL_AUID(0x0C0D010F,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TypeDefinition))
@@ -4283,7 +4605,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, Component), 
-  AAF_LITERAL_AUID(0x0C0B0200,
+  AAF_LITERAL_AUID(0x0C0D0200,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Component))
@@ -4293,7 +4615,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, ControlPoint), 
-  AAF_LITERAL_AUID(0x0C0B0201,
+  AAF_LITERAL_AUID(0x0C0D0201,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ControlPoint))
@@ -4303,7 +4625,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, Identification), 
-  AAF_LITERAL_AUID(0x0C0B0202,
+  AAF_LITERAL_AUID(0x0C0D0202,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Identification))
@@ -4313,7 +4635,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, Locator), 
-  AAF_LITERAL_AUID(0x0C0B0203,
+  AAF_LITERAL_AUID(0x0C0D0203,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Locator))
@@ -4323,7 +4645,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, MobSlot), 
-  AAF_LITERAL_AUID(0x0C0B0204,
+  AAF_LITERAL_AUID(0x0C0D0204,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(MobSlot))
@@ -4333,7 +4655,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, Segment), 
-  AAF_LITERAL_AUID(0x0C0B0205,
+  AAF_LITERAL_AUID(0x0C0D0205,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Segment))
@@ -4343,7 +4665,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, SourceReference), 
-  AAF_LITERAL_AUID(0x0C0B0206,
+  AAF_LITERAL_AUID(0x0C0D0206,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(SourceReference))
@@ -4353,17 +4675,37 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, TaggedValue), 
-  AAF_LITERAL_AUID(0x0C0B0207,
+  AAF_LITERAL_AUID(0x0C0D0207,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TaggedValue))
+AAF_TYPE_SEPARATOR()
+
+// StrongReferenceVector<KLVData>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
+  AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, KLVData), 
+  AAF_LITERAL_AUID(0x0C0D0208,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(KLVData))
+AAF_TYPE_SEPARATOR()
+
+// StrongReferenceVector<Parameter>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(
+  AAF_REFERENCE_TYPE_NAME(StrongReferenceVector, Parameter), 
+  AAF_LITERAL_AUID(0x0C0D0209,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(Parameter))
 AAF_TYPE_SEPARATOR()
 
 // WeakReference<ClassDefinition>
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, ClassDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0300,
+  AAF_LITERAL_AUID(0x0C0D0300,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ClassDefinition))
@@ -4373,7 +4715,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, ContainerDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0301,
+  AAF_LITERAL_AUID(0x0C0D0301,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ContainerDefinition))
@@ -4383,7 +4725,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, DataDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0302,
+  AAF_LITERAL_AUID(0x0C0D0302,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(DataDefinition))
@@ -4393,7 +4735,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, DefinitionObject), 
-  AAF_LITERAL_AUID(0x0C0B0303,
+  AAF_LITERAL_AUID(0x0C0D0303,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(DefinitionObject))
@@ -4403,7 +4745,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, Identification), 
-  AAF_LITERAL_AUID(0x0C0B0304,
+  AAF_LITERAL_AUID(0x0C0D0304,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Identification))
@@ -4413,7 +4755,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, InterpolationDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0305,
+  AAF_LITERAL_AUID(0x0C0D0305,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(InterpolationDefinition))
@@ -4423,7 +4765,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, Mob), 
-  AAF_LITERAL_AUID(0x0C0B0306,
+  AAF_LITERAL_AUID(0x0C0D0306,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(Mob))
@@ -4433,7 +4775,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, OperationDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0307,
+  AAF_LITERAL_AUID(0x0C0D0307,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(OperationDefinition))
@@ -4443,7 +4785,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, ParameterDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0308,
+  AAF_LITERAL_AUID(0x0C0D0308,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ParameterDefinition))
@@ -4453,27 +4795,37 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
   AAF_REFERENCE_TYPE_NAME(WeakReference, TypeDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0309,
+  AAF_LITERAL_AUID(0x0C0D0309,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TypeDefinition))
 AAF_TYPE_SEPARATOR()
 
-// WeakReference<PluginDescriptor>
+// WeakReference<PluginDefinition>
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE(
-  AAF_REFERENCE_TYPE_NAME(WeakReference, PluginDescriptor), 
-  AAF_LITERAL_AUID(0x0C0B030A,
+  AAF_REFERENCE_TYPE_NAME(WeakReference, PluginDefinition), 
+  AAF_LITERAL_AUID(0x0C0D030A,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
-  AAF_TYPE(PluginDescriptor))
+  AAF_TYPE(PluginDefinition))
+AAF_TYPE_SEPARATOR()
+
+// WeakReference<CodecDefinition>
+//
+AAF_TYPE_DEFINITION_WEAK_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(WeakReference, CodecDefinition), 
+  AAF_LITERAL_AUID(0x0C0D030B,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(CodecDefinition))
 AAF_TYPE_SEPARATOR()
 
 // WeakReferenceSet<DataDefinition>
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(WeakReferenceSet, DataDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0400,
+  AAF_LITERAL_AUID(0x0C0D0400,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(DataDefinition))
@@ -4483,27 +4835,27 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET(
   AAF_REFERENCE_TYPE_NAME(WeakReferenceSet, ParameterDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0401,
+  AAF_LITERAL_AUID(0x0C0D0401,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(ParameterDefinition))
 AAF_TYPE_SEPARATOR()
 
-// WeakReferenceSet<PluginDescriptor>
+// WeakReferenceSet<PluginDefinition>
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET(
-  AAF_REFERENCE_TYPE_NAME(WeakReferenceSet, PluginDescriptor), 
-  AAF_LITERAL_AUID(0x0C0B0402,
+  AAF_REFERENCE_TYPE_NAME(WeakReferenceSet, PluginDefinition), 
+  AAF_LITERAL_AUID(0x0C0D0402,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
-  AAF_TYPE(PluginDescriptor))
+  AAF_TYPE(PluginDefinition))
 AAF_TYPE_SEPARATOR()
 
 // WeakReferenceVector<OperationDefinition>
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(WeakReferenceVector, OperationDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0500,
+  AAF_LITERAL_AUID(0x0C0D0500,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(OperationDefinition))
@@ -4513,7 +4865,7 @@ AAF_TYPE_SEPARATOR()
 //
 AAF_TYPE_DEFINITION_WEAK_REFERENCE_VECTOR(
   AAF_REFERENCE_TYPE_NAME(WeakReferenceVector, TypeDefinition), 
-  AAF_LITERAL_AUID(0x0C0B0501,
+  AAF_LITERAL_AUID(0x0C0D0501,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TypeDefinition))
@@ -4577,6 +4929,8 @@ AAF_TYPE_TABLE_END()
 #undef AAF_TYPE_DEFINITION_CHARACTER
 
 #undef AAF_TYPE_DEFINITION_INDIRECT
+
+#undef AAF_TYPE_DEFINITION_OPAQUE
 
 #undef AAF_TYPE_DEFINITION_SET
 
