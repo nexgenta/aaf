@@ -127,7 +127,13 @@ public:
 
     // @cmember Assignment operator.
   OMStrongReferenceProperty<ReferencedObject>& operator =
-                                              (const ReferencedObject*& value);
+                                              (const ReferencedObject* value);
+
+    // @cmember Dereference operator.
+  ReferencedObject* operator -> (void);
+
+    // @cmember Dereference operator.
+  const ReferencedObject* operator -> (void) const;
 
     // @cmember Type conversion. Convert an
     //          <c OMStrongReferenceProperty> into a pointer to the
@@ -168,9 +174,15 @@ public:
     //   @this const
   virtual void getValue(ReferencedObject*& object) const;
 
-    // @cmember Assignmant operator.
+    // @cmember Assignment operator.
   OMWeakReferenceProperty<ReferencedObject>& operator =
-                                              (const ReferencedObject*& value);
+                                              (const ReferencedObject* value);
+
+    // @cmember Dereference operator.
+  ReferencedObject* operator -> (void);
+
+    // @cmember Dereference operator.
+  const ReferencedObject* operator -> (void) const;
 
     // @cmember Type conversion. Convert an
     //          <c OMWeakReferenceProperty> into a pointer to the
@@ -356,10 +368,14 @@ public:
     //   @this const
   void getSize(size_t& size) const;
 
+    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
+    //   @this const
+  size_t getSize(void) const;
+
     // @cmember Set the value of the <p OMReferencedObject> at
     //          position <p index> in this
     //          <c OMStrongReferenceVectorProperty>.
-  void setValueAt(const ReferencedObject*& value, const size_t index);
+  void setValueAt(const ReferencedObject* value, const size_t index);
 
     // @cmember Get the value of the <p OMReferencedObject> at
     //          position <p index> in this
