@@ -34,9 +34,9 @@
 #include "ImplAAFPropertyDef.h"
 #endif
 
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
-#endif
+//#ifndef __ImplAAFDefObject_h__
+//#include "ImplAAFDefObject.h"
+//#endif
 
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
@@ -92,8 +92,8 @@ extern "C" const aafClassID_t CLSID_AAFObject;
 
 
 ImplAAFClassDef::ImplAAFClassDef ()
-  : _ParentClass  ( PID_ClassDefinition_ParentClass,  "ParentClass", "/Dictionary/ClassDefinitions"),
-	_Properties   ( PID_ClassDefinition_Properties,   "Properties"),
+  : _ParentClass  ( PID_ClassDefinition_ParentClass,  "ParentClass", "/Dictionary/ClassDefinitions", PID_DefinitionObject_Identification),
+	_Properties   ( PID_ClassDefinition_Properties,   "Properties", PID_DefinitionObject_Identification),
 	_propTypesLoaded (false),
 	_BootstrapParent(0)
 {
@@ -109,7 +109,7 @@ ImplAAFClassDef::~ImplAAFClassDef ()
   if (AAFRESULT_FAILED (hr))
 	throw hr;
 
-	OMStrongReferenceSetIterator<ImplAAFPropertyDef>propertyDefinitions(_Properties);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPropertyDef>propertyDefinitions(_Properties);
 	while(++propertyDefinitions)
 	{
 		ImplAAFPropertyDef *pProperty = propertyDefinitions.setValue(0);
@@ -146,11 +146,9 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_OBJECT_NOT_ATTACHED;	
 	
 	HRESULT hr;
-	hr = SetName (pClassName);
-	if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-	
-	hr = SetAUID (classID);
-	if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(classID, pClassName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 	
 	_ParentClass = pParentClass;
 	
@@ -172,8 +170,8 @@ AAFRESULT STDMETHODCALLTYPE
   	return AAFRESULT_NOMEMORY;
 
   AAFRESULT hr;
-  OMStrongReferenceSetIterator<ImplAAFPropertyDef>* iter = 
-	new OMStrongReferenceSetIterator<ImplAAFPropertyDef>(_Properties);
+  OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPropertyDef>* iter = 
+	new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPropertyDef>(_Properties);
   if(iter == 0)
 	hr = AAFRESULT_NOMEMORY;
   else

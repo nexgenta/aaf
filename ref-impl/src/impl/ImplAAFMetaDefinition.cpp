@@ -53,9 +53,9 @@
 
 
 ImplAAFMetaDefinition::ImplAAFMetaDefinition ()
-: _name           (PID_MetaDefinition_Name,           L"Name"),
-  _description    (PID_MetaDefinition_Description,    L"Description"),
-  _identification (PID_MetaDefinition_Identification, L"Identification")
+: _name           (PID_MetaDefinition_Name,           "Name"),
+  _description    (PID_MetaDefinition_Description,    "Description"),
+  _identification (PID_MetaDefinition_Identification, "Identification")
 {
   _persistentProperties.put(_name.address());
   _persistentProperties.put(_description.address());
@@ -208,20 +208,6 @@ AAFRESULT STDMETHODCALLTYPE
 		*pBufSize = _description.size();
 	
 	return AAFRESULT_SUCCESS;
-}
-
-
-
-
-
-// Associate the existing OMProperties with corresponding property definitions from
-// the given class definition. NOTE: This call is recursive, it calls itself again
-// for the parent class of the given class until current class is a "root" class.
-void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
-{
-  // Since ImplAAFMetaDefinition is still a subclass of ImplAAFObject we
-  // should just delegate property initialization:
-  ImplAAFObject::InitOMProperties(pClassDef);
 }
 
 const OMUniqueObjectIdentification&

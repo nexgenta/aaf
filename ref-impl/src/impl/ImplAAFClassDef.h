@@ -35,15 +35,15 @@ class ImplAAFDefObject;
 class ImplAAFTypeDef;
 class ImplAAFPropertyDef;
 
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
+#ifndef __ImplAAFMetaDefinition_h__
+#include "ImplAAFMetaDefinition.h"
 #endif
 
 #ifndef __ImplAAFPropertyDef_h__
 #include "ImplAAFPropertyDef.h"
 #endif
 
-class ImplAAFClassDef : public ImplAAFDefObject
+class ImplAAFClassDef : public ImplAAFMetaDefinition
 {
 public:
   //
@@ -306,7 +306,7 @@ private:
   // OMWeakReferenceProperty<ImplAAFClassDef> _ParentClass;
   OMWeakReferenceProperty<ImplAAFClassDef>         _ParentClass;
 
-  OMStrongReferenceSetProperty<ImplAAFPropertyDef> _Properties;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPropertyDef> _Properties;
 
   ImplAAFClassDef	*_BootstrapParent;
 
