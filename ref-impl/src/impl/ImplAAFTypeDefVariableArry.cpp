@@ -55,6 +55,14 @@
 #include "ImplAAFHeader.h"
 #endif
 
+#ifndef __ImplAAFMob_h__
+#include "ImplAAFMob.h"
+#endif
+
+#ifndef __ImplAAFEssenceData_h__
+#include "ImplAAFEssenceData.h"
+#endif
+
 #include "ImplEnumAAFPropertyValues.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -265,14 +273,6 @@ ImplAAFTypeDefVariableArray::AppendElement
 }
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFTypeDefVariableArray::CreateEmptyValue
-(ImplAAFPropertyValue ** ppPropVal)
-{
-	//simply defer to base impl (size is 0)
-	return ImplAAFTypeDefArray::CreateValue(ppPropVal);
-}
-
-AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefVariableArray::ValidateInputParams (
 												  ImplAAFPropertyValue ** ppElementValues,
 												  aafUInt32  numElements)								  
@@ -289,24 +289,11 @@ ImplAAFTypeDefVariableArray::ValidateInputParams (
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFTypeDefVariableArray::CreateValueFromValues (
-													ImplAAFPropertyValue ** ppElementValues,
-													aafUInt32  numElements,
-													ImplAAFPropertyValue ** ppPropVal)
-{
-	//Simply defer to base impl.
-	return  ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues,numElements,
-		ppPropVal);
-}
-
-
 AAFRESULT
 ImplAAFTypeDefVariableArray::GetElements (
 										  ImplAAFPropertyValue *pInPropVal,
 										  ImplEnumAAFPropertyValues **ppEnum)
 {
-  AAFRESULT result = AAFRESULT_SUCCESS;
   if (NULL == pInPropVal || NULL == ppEnum)
 	  return AAFRESULT_NULL_PARAM;
   *ppEnum = NULL;
@@ -352,7 +339,7 @@ void ImplAAFTypeDefVariableArray::reorder(OMByte* externalBytes,
 }
 
 
-size_t ImplAAFTypeDefVariableArray::externalSize(OMByte* internalBytes,
+size_t ImplAAFTypeDefVariableArray::externalSize(OMByte* /*internalBytes*/,
 												 size_t internalBytesSize) const
 {
 	ImplAAFTypeDefSP ptd = BaseType ();
@@ -419,7 +406,7 @@ void ImplAAFTypeDefVariableArray::externalize(OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefVariableArray::internalSize(OMByte* externalBytes,
+size_t ImplAAFTypeDefVariableArray::internalSize(OMByte* /*externalBytes*/,
 												 size_t externalBytesSize) const
 {
 	ImplAAFTypeDefSP ptd = BaseType ();
@@ -537,18 +524,50 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMProperty
 	ImplAAFTypeDefSP ptd = BaseType ();
 	assert (ptd);
 	
-	OMProperty * result = 0;
+  OMProperty * result = 0;
+  ImplAAFTypeDefWeakObjRef *pWeakRefType = NULL;
 	
 	if (dynamic_cast<ImplAAFTypeDefStrongObjRef*>((ImplAAFTypeDef*) ptd))
 	{
 		// element is strong ref
 		result = new OMStrongReferenceVectorProperty<ImplAAFObject> (pid, name);
 	}
-	else if (dynamic_cast<ImplAAFTypeDefWeakObjRef*>((ImplAAFTypeDef*) ptd))
+	else if (NULL != (pWeakRefType = dynamic_cast<ImplAAFTypeDefWeakObjRef*>((ImplAAFTypeDef*) ptd)))
 	{
+#if defined(USE_SIMPLEPROPERTY)
 		// element is weak ref, hence implemented as AUID array.
 		// Specify a size of one element.
 		result = new OMSimpleProperty (pid, name, sizeof (aafUID_t));
+#else // #if defined(USE_SIMPLEPROPERTY)
+    
+    if (pWeakRefType->GetTargetPids())
+    {
+      
+      switch (pWeakRefType->GetUniqueIdentifierPid())
+      {
+        case PID_MetaDefinition_Identification:
+          result = new OMWeakReferenceVectorProperty<ImplAAFMetaDefinition>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+          break;
+      
+        case PID_DefinitionObject_Identification:
+          result = new OMWeakReferenceVectorProperty<ImplAAFDefObject>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+          break;
+    
+//			  case PID_Mob_MobID:
+//          result = new OMWeakReferenceVectorProperty<ImplAAFMob>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+//          break;
+//
+//			  case PID_EssenceData_MobID:
+//          result = new OMWeakReferenceVectorProperty<ImplAAFEssenceData>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+//          break;
+    
+        default:
+          // No support for other "key properties"
+          assert (0);
+          break;
+      }
+    }
+#endif // #else // #if defined(USE_SIMPLEPROPERTY)
 	}
 	
 	else
