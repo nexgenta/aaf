@@ -78,12 +78,20 @@
 #include "ImplEnumAAFPropertyDefs.h"
 #endif
 
+#ifndef __ImplAAFTypeDefRename_h__
+#include "ImplAAFTypeDefRename.h"
+#endif
+
 #ifndef __ImplEnumAAFContainerDefs_h__
 #include "ImplEnumAAFContainerDefs.h"
 #endif
 
 #ifndef __ImplEnumAAFInterpolationDefs_h__
 #include "ImplEnumAAFInterpolationDefs.h"
+#endif
+
+#ifndef __ImplEnumAAFPluginDefs_h__
+#include "ImplEnumAAFPluginDefs.h"
 #endif
 
 #ifndef __AAFTypeDefUIDs_h__
@@ -131,7 +139,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFDefObjects;
 extern "C" const aafClassID_t CLSID_EnumAAFInterpolationDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFOperationDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFParameterDefs;
-extern "C" const aafClassID_t CLSID_EnumAAFPluginDescriptors;
+extern "C" const aafClassID_t CLSID_EnumAAFPluginDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFTypeDefs;
 
 ImplAAFDictionary::ImplAAFDictionary ()
@@ -141,7 +149,7 @@ ImplAAFDictionary::ImplAAFDictionary ()
   _containerDefinitions(PID_Dictionary_ContainerDefinitions, "ContainerDefinitions", PID_DefinitionObject_Identification),
   _interpolationDefinitions      (PID_Dictionary_InterpolationDefinitions,    "InterpolationDefinitions", PID_DefinitionObject_Identification),
   _dataDefinitions      (PID_Dictionary_DataDefinitions,    "DataDefinitions", PID_DefinitionObject_Identification),
-  _pluginDefinitions      (PID_Dictionary_PluginDefinitions,    "PluginDefinitions", PID_PluginDescriptor_Identification),
+  _pluginDefinitions      (PID_Dictionary_PluginDefinitions,    "PluginDefinitions", PID_DefinitionObject_Identification),
   _typeDefinitions      (PID_Dictionary_TypeDefinitions,      "TypeDefinitions", PID_DefinitionObject_Identification),
   _classDefinitions      (PID_Dictionary_ClassDefinitions,    "ClassDefinitions", PID_DefinitionObject_Identification),
   _pBuiltinClasses (0),
@@ -175,11 +183,11 @@ ImplAAFDictionary::~ImplAAFDictionary ()
   while(++opaqueTypeDefinitions)
   {
     // NOTE: Temporary OpaqueTypeDefinitions are created to hold the type definition
-    // pointers.           |                               |
-    //                     V                               V
-    ImplAAFTypeDef *pType = opaqueTypeDefinitions.setValue(0);
-    if (pType)
-    {
+    // pointers.           |
+    //                     V
+	  ImplAAFTypeDef *pType = opaqueTypeDefinitions.value();
+   if (pType)
+   {
 		  pType->ReleaseReference();
 		  pType = 0;
     }
@@ -263,10 +271,10 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDescriptor>pluginDefinitions(_pluginDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDef>pluginDefinitions(_pluginDefinitions);
 	while(++pluginDefinitions)
 	{
-		ImplAAFPluginDescriptor *pPlug = pluginDefinitions.setValue(0);
+		ImplAAFPluginDef *pPlug = pluginDefinitions.setValue(0);
 		if (pPlug)
 		{
 		  pPlug->ReleaseReference();
@@ -1058,7 +1066,8 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_RGBAComponent,
   & kAAFTypeID_MobID,
   & kAAFTypeID_DataValue,
- 
+  & kAAFTypeID_CategoryType,
+
   & kAAFTypeID_ClassDefinitionStrongReference,
   & kAAFTypeID_ClassDefinitionStrongReferenceSet,
   & kAAFTypeID_ClassDefinitionWeakReference,
@@ -1086,10 +1095,10 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_ParameterDefinitionStrongReferenceSet,
   & kAAFTypeID_ParameterDefinitionWeakReference,
   & kAAFTypeID_ParameterDefinitionWeakReferenceSet,
-  & kAAFTypeID_PluginDescriptorStrongReference,
-  & kAAFTypeID_PluginDescriptorStrongReferenceSet,
-  & kAAFTypeID_PluginDescriptorWeakReference,
-  & kAAFTypeID_PluginDescriptorWeakReferenceSet,
+  & kAAFTypeID_PluginDefinitionStrongReference,
+  & kAAFTypeID_PluginDefinitionStrongReferenceSet,
+  & kAAFTypeID_PluginDefinitionWeakReference,
+  & kAAFTypeID_PluginDefinitionWeakReferenceSet,
   & kAAFTypeID_PropertyDefinitionStrongReference,
   & kAAFTypeID_PropertyDefinitionStrongReferenceSet,
   & kAAFTypeID_TypeDefinitionStrongReference,
@@ -1296,7 +1305,7 @@ const OMUniqueObjectIdentification
 		assert (AAFRESULT_SUCCEEDED(result));
 	}
 
-  return (*reinterpret_cast<const OMUniqueObjectIdentification *>(&typeId));
+	return (*reinterpret_cast<const OMUniqueObjectIdentification *>(&typeId));
 }
 
 ImplAAFDictionary::OpaqueTypeDefinition& 
@@ -1433,7 +1442,26 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDictionary::RegisterKLVDataKey (
+      aafUID_t keyUID, 
+	  ImplAAFTypeDef *underlyingType)
+{
+	ImplAAFTypeDef			*pDef = NULL;
+	ImplAAFTypeDefRename	*pRenameDef = NULL;
+	
+	XPROTECT()
+	{
+		CHECK(GetBuiltinDefs()->cdTypeDefRename()->
+				CreateInstance((ImplAAFObject**)&pRenameDef));
+		CHECK(pRenameDef->Initialize (keyUID, underlyingType, L"KLV Data"));
+		CHECK(RegisterOpaqueTypeDef(pRenameDef));
+	}
+	XEXCEPT
+	XEND
+		
+	return AAFRESULT_SUCCESS;
+}
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterDataDef (
       ImplAAFDataDef *pDataDef)
@@ -2140,7 +2168,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterPluginDef (		//!!! Bring this out through the IDL
-      ImplAAFPluginDescriptor *pDesc)
+      ImplAAFPluginDef *pDesc)
 {
   assert (_defRegistrationAllowed);
 
@@ -2159,7 +2187,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::LookupPluginDef (		//!!! Bring this out through the IDL
       const aafUID_t & interpolationID,
-      ImplAAFPluginDescriptor **ppPluginDesc)
+      ImplAAFPluginDef **ppPluginDesc)
 {
   if (!ppPluginDesc) return AAFRESULT_NULL_PARAM;
 
@@ -2185,18 +2213,18 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::GetPluginDefs (		//!!! Bring this out through the IDL
-      ImplEnumAAFPluginDescriptors **ppEnum)
+      ImplEnumAAFPluginDefs **ppEnum)
 {
 	if (NULL == ppEnum)
 		return AAFRESULT_NULL_PARAM;
 	*ppEnum = 0;
 	
-	ImplEnumAAFPluginDescriptors *theEnum = (ImplEnumAAFPluginDescriptors *)CreateImpl (CLSID_EnumAAFPluginDescriptors);
+	ImplEnumAAFPluginDefs *theEnum = (ImplEnumAAFPluginDefs *)CreateImpl (CLSID_EnumAAFPluginDefs);
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDescriptor>* iter = 
-			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDescriptor>(_pluginDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDef>(_pluginDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
