@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFTimecode
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -10,9 +10,7 @@
 \******************************************/
 
 
-#ifndef __CAAFTimecode_h__
-#include "CAAFTimecode.h"
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -20,8 +18,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "aafCvt.h"
 #include "AAFResult.h"
-
-
+#include "AAFDefUIDs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -77,7 +74,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 
@@ -171,7 +168,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFFile *					pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 	IEnumAAFMobSlots*			pEnum = NULL;
 	IAAFMob*					pMob = NULL;
@@ -185,14 +181,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"AAFTimecode test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -225,7 +220,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
         checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
+
+        pTimecode->Release();
+        pTimecode = NULL;
+
+        pSeg->Release();
+        pSeg = NULL;
       }
+
+      pEnum->Release();
+      pEnum = NULL;
 
       pMob->Release();
       pMob = NULL;
@@ -253,8 +257,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (pMob)
 		pMob->Release();
 
-	if (pDictionary)
-		pDictionary->Release();
+	if (pMobIter)
+		pMobIter->Release();
 
 	if (pHeader)
 		pHeader->Release();
@@ -269,10 +273,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-HRESULT CAAFTimecode::test()
+extern "C" HRESULT CAAFTimecode_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"TimecodeTest.aaf";
+	aafWChar * pFileName = L"AAFTimecodeTest.aaf";
 
 	try
 	{
@@ -282,7 +286,7 @@ HRESULT CAAFTimecode::test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFTimecodeMob::test...Caught general C++"
+	  cerr << "CAAFTimecodeMob_test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}

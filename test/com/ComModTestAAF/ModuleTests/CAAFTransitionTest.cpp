@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFTransition
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -9,9 +9,7 @@
 *                                          *
 \******************************************/
 
-#ifndef __CAAFTransition_h__
-#include "CAAFTransition.h"
-#endif
+#include "AAF.h"
 
 
 #include <iostream.h>
@@ -20,11 +18,13 @@
 #include "AAFStoredObjectIDs.h"
 #include "aafCvt.h"
 #include "AAFResult.h"
+#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
 // This values are used for testing purposes
-static aafUID_t    fillerUID = DDEF_Video;
+static aafUID_t    fillerUID = DDEF_Picture;
 static aafLength_t  fillerLength = 3200;
+static aafUID_t	zeroID = { 0 };
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -51,6 +51,18 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
+#define TEST_NUM_INPUTS		1
+#define TEST_CATEGORY		L"Test Parameters"
+#define TEST_BYPASS			1
+#define TEST_EFFECT_NAME	L"A TestEffect"
+#define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
+#define TEST_PARAM_NAME		L"A TestEffect parameter"
+#define TEST_PARAM_DESC		L"A longer description of the TestEffect parameter"
+#define TEST_PARAM_UNITS	L"Furlongs per Fortnight"
+#define TEST_EFFECT_LEN		60
+
+const aafUID_t kTestEffectID = { 0xD15E7611, 0xFE40, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+const aafUID_t kTestParmID = { 0xC7265931, 0xFE57, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
@@ -61,20 +73,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFCompositionMob*			pCompMob=NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFMobSlot*				pNewSlot = NULL;
+	IAAFSourceClip*				pSourceClip = NULL;
+	IAAFSourceReference*		pSourceRef = NULL;
 	IAAFTransition*				pTransition = NULL;
-	IAAFGroup*					pGroup = NULL;
-	IAAFGroup*					pGroupCopy = NULL;
+	IAAFOperationGroup*			pOperationGroup = NULL;
 	IAAFSegment*				pSegment = NULL;
+	IAAFSegment*				pEffectFiller = NULL;
 	IAAFComponent*				pComponent = NULL;
 	IAAFFiller*					pFiller = NULL;
 	IAAFSequence*				pSequence = NULL;
+	IAAFOperationDef*				pOperationDef = NULL;
+	IAAFParameter				*pParm = NULL;
+	IAAFParameterDef*			pParamDef = NULL;
+	IAAFDefObject*				pDefObject = NULL;
 	
 	aafUID_t					newMobID;
-	aafUID_t					datadef = DDEF_Video;
+	aafUID_t					datadef = DDEF_Picture;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
 	aafLength_t					transitionLength;
 	aafPosition_t				cutPoint = 0;
+	aafUID_t					testDataDef = DDEF_Picture;
+	aafLength_t					effectLen = TEST_EFFECT_LEN;
+	aafUID_t					effectID = kTestEffectID;
+	aafUID_t					parmID = kTestParmID;
 
 	CvtInt32toLength(100, transitionLength);
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -85,7 +107,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 
@@ -101,15 +123,42 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  
 		// We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
-		// Get the number of mobs to force creation of the content storage.
-		// This is temporary as the content storage should be created by
-		// the call to OpenNewModify above.
-		aafNumSlots_t n;
-		checkResult(pHeader->GetNumMobs(kAllMob, &n));
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
  		
+		// Create the effect and parameter definitions
+		checkResult(pDictionary->CreateInstance(&AUID_AAFOperationDef,
+							  IID_IAAFOperationDef, 
+							  (IUnknown **)&pOperationDef));
+    
+		checkResult(pDictionary->CreateInstance(&AUID_AAFParameterDef,
+							  IID_IAAFParameterDef, 
+							  (IUnknown **)&pParamDef));
+
+		checkResult(pDictionary->RegisterOperationDefinition(pOperationDef));
+		checkResult(pDictionary->RegisterParameterDefinition(pParamDef));
+
+		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->Init (&effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
+		pDefObject->Release();
+		pDefObject = NULL;
+
+		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
+		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
+		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
+		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
+		checkResult(pOperationDef->AddParameterDefs (pParamDef));
+		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
+		// !!!Added circular definitions because we don't have optional properties
+		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
+
+		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
+		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->Init (&parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
+		pDefObject->Release();
+		pDefObject = NULL;
+
 		// ------------------------------------------------------------
 		//	To test a Transition we need to create a Sequence which will 
 		//	a Filler, a transition and another Filler. I know this is not 
@@ -163,20 +212,45 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pComponent->Release();
 		pComponent = NULL;
 
-		// Also release the filler
-		pFiller->Release();
-		pFiller = NULL;
 		
 	    checkResult(pDictionary->CreateInstance(&AUID_AAFTransition,
 												IID_IAAFTransition, 
 												(IUnknown **)&pTransition));
-		// Create an empty Effect object !!
-		checkResult(pDictionary->CreateInstance(&AUID_AAFGroup,
-												IID_IAAFGroup,
-												(IUnknown **)&pGroup));
 
-		checkResult(pTransition->Create (&datadef, transitionLength, cutPoint, pGroup));
-		checkResult(pGroup->Initialize(&datadef, transitionLength, NULL));
+		// Create an empty EffectGroup object !!
+		checkResult(pDictionary->CreateInstance(&AUID_AAFOperationGroup,
+												IID_IAAFOperationGroup,
+												(IUnknown **)&pOperationGroup));
+
+		checkResult(pDictionary->CreateInstance(&AUID_AAFParameter,
+												IID_IAAFParameter, 
+												(IUnknown **)&pParm));
+		checkResult(pParm->SetParameterDefinition (pParamDef));
+ // !!!  ImplAAFParameter::SetTypeDefinition (ImplAAFTypeDef*  pTypeDef)
+		checkResult(pOperationGroup->Initialize(&datadef, transitionLength, pOperationDef));
+		checkResult(pOperationGroup->AddNewParameter (pParm));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
+												IID_IAAFFiller,
+												(IUnknown **) &pEffectFiller));
+		checkResult(pOperationGroup->AppendNewInputSegment (pEffectFiller));
+		// release the filler
+		pEffectFiller->Release();
+		pFiller->Release();
+		pFiller = NULL;
+
+		checkResult(pOperationGroup->SetBypassOverride (1));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
+						  IID_IAAFSourceClip, 
+						  (IUnknown **)&pSourceClip));
+		aafSourceRef_t	sourceRef;
+		sourceRef.sourceID = zeroID;
+		sourceRef.sourceSlotID = 0;
+		sourceRef.startTime = 0;
+		checkResult(pSourceClip->Initialize (&testDataDef,&effectLen, sourceRef));
+		checkResult(pSourceClip->QueryInterface (IID_IAAFSourceReference, (void **)&pSourceRef));
+		checkResult(pOperationGroup->SetRender (pSourceRef));
+
+		checkResult(pTransition->Create (&datadef, transitionLength, cutPoint, pOperationGroup));
 		checkResult(pTransition->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
 
 		// now append the transition
@@ -219,10 +293,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	if (pFiller)
 		pFiller->Release();
+	if (pOperationDef)
+		pOperationDef->Release();
 
 
-	if (pGroup)
-		pGroup->Release();
+	if (pOperationGroup)
+		pOperationGroup->Release();
 
 	if (pMob)
 		pMob->Release();
@@ -270,7 +346,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFTransition*				pTransition = NULL;
 	IAAFComponent*				pComponent = NULL;
 	IAAFFiller*					pFiller = NULL;
-	IAAFGroup*					pGroup = NULL;
+	IAAFOperationGroup*					pOperationGroup = NULL;
 	IEnumAAFComponents*			pCompIter = NULL;
 //	aafUID_t					datadef ;
 	aafLength_t					transitionLength;
@@ -282,14 +358,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"AAFTransition Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -330,7 +405,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 						// This is the transition 
 						checkResult(pTransition->GetCutPoint (&cutPoint));
 						checkResult(pComponent->GetLength(&transitionLength));
-						checkResult(pTransition->GetEffect(&pGroup));
+						checkResult(pTransition->GetOperationGroup(&pOperationGroup));
 						// Check results !!
 						checkExpression(cutPoint == 0, AAFRESULT_TEST_FAILED);
 						checkExpression(transitionLength == 100, AAFRESULT_TEST_FAILED);
@@ -357,8 +432,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (pTransition)
 		pTransition->Release();
 
-	if (pGroup)
-		pGroup->Release();
+	if (pOperationGroup)
+		pOperationGroup->Release();
 
 	if (pComponent)
 		pComponent->Release();
@@ -400,10 +475,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-HRESULT CAAFTransition::test()
+extern "C" HRESULT CAAFTransition_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"TransitionTest.aaf";
+	aafWChar * pFileName = L"AAFTransitionTest.aaf";
 
 	try
 	{
@@ -413,7 +488,7 @@ HRESULT CAAFTransition::test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFTransition::test...Caught general C++"
+	  cerr << "CAAFTransition_test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
