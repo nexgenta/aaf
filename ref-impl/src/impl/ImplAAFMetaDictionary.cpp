@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplAAFMetaDictionary_h__
@@ -216,6 +211,8 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
   // If we are creating the meta dictionary then just return this.
   if (0 == memcmp(&AUID_AAFMetaDictionary, &classId, sizeof(classId)))
   {
+	ImplAAFClassDef* pClassDef = findAxiomaticClassDefinition(AUID_AAFMetaDictionary);
+    assert(NULL != pClassDef);
     storable = const_cast<ImplAAFMetaDictionary *>(this);
   }
   else
@@ -373,8 +370,10 @@ void ImplAAFMetaDictionary::addAxiomaticClassDefinition(ImplAAFClassDef *pClassD
   pClassDef->AcquireReference();
   
   // Save the new axiomatic class definition in a persistent set.
+#if 0
   _classDefinitions.appendValue(pClassDef);
   pClassDef->AcquireReference();
+#endif
 }
 
 
@@ -395,8 +394,10 @@ void ImplAAFMetaDictionary::addAxiomaticTypeDefinition(ImplAAFTypeDef *pTypeDef)
   pTypeDef->AcquireReference();
 
   // Save the new axiomatic type definition in a persistent set.
+#if 0
   _typeDefinitions.appendValue(pTypeDef);
   pTypeDef->AcquireReference();
+#endif
 }
 
 
@@ -564,7 +565,7 @@ AAFRESULT STDMETHODCALLTYPE
   
   // Make sure that we have connected all of the OMProperties
   // to the correct ImplAAFPropertyDefs.
-  (*ppMetaObject)->InitOMProperties(pClassDef);
+  (*ppMetaObject)->InitializeOMStorable(pClassDef);
 
 
   return hr;
@@ -1159,7 +1160,7 @@ void ImplAAFMetaDictionary::RegisterAxiomaticProperties(void)
 
 
 // Initialize all of the OMProperties for each aximatic definition.
-void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
+void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
 {
   ImplAAFClassDef *pClassDef;
  
@@ -1178,7 +1179,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
     if (!pClass)
       throw AAFRESULT_INVALID_OBJ;
 
-    pClass->InitOMProperties(pClassDef);
+    pClass->InitializeOMStorable(pClassDef);
   }
 
  
@@ -1197,7 +1198,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
     if (!pProperty)
       throw AAFRESULT_INVALID_OBJ;
 
-    pProperty->InitOMProperties(pClassDef);
+    pProperty->InitializeOMStorable(pClassDef);
   }
 
 
@@ -1231,24 +1232,15 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
     if (!pType)
       throw AAFRESULT_CLASS_NOT_FOUND;
 
-    pType->InitOMProperties(pClassDef);
+    pType->InitializeOMStorable(pClassDef);
   }
   
    
   // Handle special case of initializition the meta dictionary's 
-  // OM propreties. TODO: Add InitOMProperties method to ImplAAFMetaDictionary.
+  // OM propreties. TODO: Add InitializeOMStorable method to ImplAAFMetaDictionary.
   pClassDef = findAxiomaticClassDefinition(AUID_AAFMetaDictionary);
   assert (pClassDef);
-  OMPropertySetIterator iter(*propertySet(), OMBefore);
-  while (++iter)
-  {
-    ImplAAFPropertyDefSP pPropertyDef;
-    pClassDef->LookupPropertyDefbyOMPid(iter.propertyId(), &pPropertyDef);
-    OMPropertyDefinition * propertyDefinition = static_cast<OMPropertyDefinition *>((ImplAAFPropertyDef *)pPropertyDef);
-    assert(propertyDefinition);
-    OMProperty *property = iter.property();
-    property->initialize(propertyDefinition);
-  }
+  InitializeOMStorable(pClassDef);
 }
 
 
@@ -1289,11 +1281,11 @@ void ImplAAFMetaDictionary::InitializeAxiomaticDefinitions(void)
   InitializeAxiomaticProperties();
 
   RegisterAxiomaticProperties();
-  InitializeAxiomaticOMProperties();
+  InitializeAxiomaticOMDefinitions();
 }
 
-// Create and initialize all of the axiomatic definitions.
-AAFRESULT ImplAAFMetaDictionary::InstantiateAxiomaticDefinitions(void)
+  // Initialize only the non-persistent parts of the meta dictionary
+AAFRESULT ImplAAFMetaDictionary::Initialize(void)
 {
   AAFRESULT result = AAFRESULT_SUCCESS;
   try
@@ -1310,4 +1302,100 @@ AAFRESULT ImplAAFMetaDictionary::InstantiateAxiomaticDefinitions(void)
 
   return (result);
 }
+
+// Create and initialize all of the axiomatic definitions.
+AAFRESULT ImplAAFMetaDictionary::InstantiateAxiomaticDefinitions(void)
+{
+  AAFRESULT result = AAFRESULT_SUCCESS;
+	// Make sure that all of the axiomatic objects are in the dictionary.
+	// Use only low-level OM methods so that we can eliminate side-effects
+	// in the DM.
+	OMUniqueObjectIdentification id = {0};
+	ImplAAFMetaDictionary * nonConstThis = const_cast<ImplAAFMetaDictionary *>(this);
+	
+  // Make sure all of the _axiomaticClassDefinitions are in the persistent set.
+  OMReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFClassDef> axiomaticClassDefinitions(_axiomaticClassDefinitions);
+  while(++axiomaticClassDefinitions)
+  {
+    ImplAAFClassDef *pAxiomaticClassDef = axiomaticClassDefinitions.value();
+    assert (pAxiomaticClassDef);
+    if (pAxiomaticClassDef)
+    {
+      id = axiomaticClassDefinitions.identification();
+      if (!_classDefinitions.contains(id))
+      {
+	    nonConstThis->_classDefinitions.appendValue(pAxiomaticClassDef);
+      }
+      else
+      {
+	    ImplAAFClassDef* old = nonConstThis->_classDefinitions.replace(pAxiomaticClassDef);
+	    if (old != 0)
+	      old->ReleaseReference();
+      }
+      pAxiomaticClassDef->AcquireReference(); // saving another reference...
+    }
+  }
+
+  // Make sure all of the _axiomaticTypeDefinitions are in the persistent set.
+  OMReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef> axiomaticTypeDefinitions(_axiomaticTypeDefinitions);
+  while(++axiomaticTypeDefinitions)
+  {
+    ImplAAFTypeDef *pAxiomaticTypeDef = axiomaticTypeDefinitions.value();
+    if (pAxiomaticTypeDef)
+    {
+      id = axiomaticTypeDefinitions.identification();
+      if (!_typeDefinitions.contains(id))
+      {
+	    nonConstThis->_typeDefinitions.appendValue(pAxiomaticTypeDef);
+      }
+      else
+      {
+	    ImplAAFTypeDef* old = nonConstThis->_typeDefinitions.replace(pAxiomaticTypeDef);
+	    if (old != 0)
+	      old->ReleaseReference();
+      }
+      pAxiomaticTypeDef->AcquireReference(); // saving another reference... 
+    }
+  }
+  return result;
+}
+
+
+
+
+//
+// Methods that would be inherited or overriden from ImplAAFStrorable
+//
+
+// Associate OMClassDefinition and OMPropertyDefinitions with this object.
+void ImplAAFMetaDictionary::InitializeOMStorable(ImplAAFClassDef * pClassDef)
+{
+  assert (NULL != pClassDef);
+  
+  // Install the class definition for this storable.
+  setDefinition(pClassDef);
+  
+  // Make sure all of the properties exist and have property definitions.
+  InitOMProperties(pClassDef);
+}
+
+// Associate the existing OMProperties with corresponding property definitions from
+// the given class definition. NOTE: This call is recursive, it calls itself again
+// for the parent class of the given class until current class is a "root" class.
+void ImplAAFMetaDictionary::InitOMProperties (ImplAAFClassDef * pClassDef)
+{
+  assert (NULL != pClassDef);
+  
+  OMPropertySetIterator iter(*propertySet(), OMBefore);
+  while (++iter)
+  {
+    ImplAAFPropertyDefSP pPropertyDef;
+    pClassDef->LookupPropertyDefbyOMPid(iter.propertyId(), &pPropertyDef);
+    OMPropertyDefinition * propertyDefinition = static_cast<OMPropertyDefinition *>((ImplAAFPropertyDef *)pPropertyDef);
+    assert(propertyDefinition);
+    OMProperty *property = iter.property();
+    property->initialize(propertyDefinition);
+  }
+}
+
 
