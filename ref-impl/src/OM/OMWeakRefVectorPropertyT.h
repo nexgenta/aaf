@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -32,6 +32,8 @@
 #include "OMAssertions.h"
 #include "OMStoredVectorIndex.h"
 #include "OMWeakReferenceVectorIter.h"
+#include "OMPropertyTable.h"
+#include "OMUtilities.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -41,15 +43,16 @@
   //         <c OMWeakReferenceVectorProperty> reside.
 template <typename ReferencedObject>
 OMWeakReferenceVectorProperty<ReferencedObject>::
-                   OMWeakReferenceVectorProperty(const OMPropertyId propertyId,
-                                                 const char* name,
-                                                 const char* targetName)
+                OMWeakReferenceVectorProperty(const OMPropertyId propertyId,
+                                              const wchar_t* name,
+                                              const wchar_t* targetName,
+                                              const OMPropertyId keyPropertyId)
 : OMContainerProperty<ReferencedObject>(propertyId,
                                         SF_WEAK_OBJECT_REFERENCE_VECTOR,
                                         name),
   _targetTag(nullOMPropertyTag),
-  _targetName(saveString(targetName)),
-  _targetSet(0)
+  _targetName(convertWideString(targetName)),
+  _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
                                               "OMWeakReferenceVectorProperty");
@@ -69,26 +72,16 @@ OMWeakReferenceVectorProperty<ReferencedObject>::
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @parm Client context for callbacks.
   //   @this const
 template <typename ReferencedObject>
-void OMWeakReferenceVectorProperty<ReferencedObject>::save(
-                                                     void* clientContext) const
+void OMWeakReferenceVectorProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::save");
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* s = container->store();
 
-  OMFile* file = container->file();
-  OMPropertyTag tag = file->referencedProperties()->insert(_targetName);
-
-  const char* propertyName = name();
+  OMPropertyTag tag = file()->referencedProperties()->insert(_targetName);
 
   // create a vector index
   //
@@ -103,11 +96,10 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::save(
   // Iterate over the vector saving each element. The index entries
   // are written in order of their unique keys.
   //
-  OMVectorIterator<OMWeakReferenceVectorElement<ReferencedObject> >
-                                                   iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
 
-    OMWeakReferenceVectorElement<ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
 
     // enter into the index
     //
@@ -115,7 +107,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::save(
 
     // save the object
     //
-    element.save(clientContext);
+    element.save();
 
     position = position + 1;
 
@@ -123,13 +115,17 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::save(
 
   // save the vector index
   //
-  s->save(_propertyId,
-          _storedForm,
-          propertyName,
-          index,
-          count,
-          tag);
+  store()->save(name(),
+                index,
+                count,
+                tag,
+                _keyPropertyId);
   delete [] index;
+
+  // make an entry in the property index
+  //
+  saveName();
+
 }
 
   // @mfunc Close this <c OMWeakReferenceVectorProperty>.
@@ -141,8 +137,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::close(void)
 {
   size_t count = _vector.count();
   for (size_t i = 0; i < count; i++) {
-    OMWeakReferenceVectorElement<ReferencedObject>&
-                                                    element = _vector.getAt(i);
+    VectorElement& element = _vector.getAt(i);
     element.close();
   }
 }
@@ -157,8 +152,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::detach(void)
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::detach");
   size_t count = _vector.count();
   for (size_t i = 0; i < count; i++) {
-    OMWeakReferenceVectorElement<ReferencedObject>&
-                                                    element = _vector.getAt(i);
+    VectorElement& element = _vector.getAt(i);
     element.detach();
   }
 }
@@ -177,33 +171,26 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::restore(
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::restore");
 
-  PRECONDITION("Consistent property size", externalSize == strlen(name()) + 1);
-
   // get the name of the vector index stream
   //
-  char* propertyName = new char[externalSize];
-  ASSERT("Valid heap pointer", propertyName != 0);
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
+  restoreName(externalSize);
 
   // restore the index
   //
   OMUniqueObjectIdentification* vectorIndex = 0;
   size_t entries;
   OMPropertyTag tag;
-  store->restore(_propertyId,
-                 _storedForm,
-                 propertyName,
-                 externalSize,
-                 vectorIndex,
-                 entries,
-                 tag);
+  OMPropertyId keyPropertyId;
+  store()->restore(name(),
+                   vectorIndex,
+                   entries,
+                   tag,
+                   keyPropertyId);
 
   ASSERT("Valid vector index", IMPLIES(entries != 0, vectorIndex != 0));
   ASSERT("Valid vector index", IMPLIES(entries == 0, vectorIndex == 0));
-  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
+  ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
   _targetTag = tag;
-  delete [] propertyName;
 
   // Iterate over the index restoring the elements of the vector.
   //
@@ -211,9 +198,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::restore(
     grow(entries); // Set the vector size
     for (size_t i = 0; i < entries; i++) {
       OMUniqueObjectIdentification key = vectorIndex[i];
-      OMWeakReferenceVectorElement<ReferencedObject> newElement(this,
-                                                                key,
-                                                                _targetTag);
+      VectorElement newElement(this, key, _targetTag);
       newElement.restore();
       _vector.setAt(newElement, i);
     }
@@ -285,15 +270,13 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
   if (index == count()) {
     // This is an append, make sure the new element is defined.
     OMUniqueObjectIdentification key = object->identification();
-    OMWeakReferenceVectorElement<ReferencedObject>
-                                             newElement(this, key, _targetTag);
+    VectorElement newElement(this, key, _targetTag);
     _vector.append(newElement);
   }
 
   // Set the vector to contain the new object
   //
-  OMWeakReferenceVectorElement<ReferencedObject>&
-                                                element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
   ReferencedObject* oldObject = element.setValue(object);
   setPresent();
 
@@ -319,8 +302,7 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::valueAt(
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid index", ((index >= 0) && (index < count())));
 
-  OMWeakReferenceVectorElement<ReferencedObject>&
-                                                element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
 
   ReferencedObject* result = element.getValue();
   return result;
@@ -345,8 +327,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::getValueAt(
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid index", ((index >= 0) && (index < count())));
 
-  OMWeakReferenceVectorElement<ReferencedObject>&
-                                                element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
 
   object = element.getValue();
 
@@ -443,14 +424,12 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::insertAt(
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::insertAt");
 
   PRECONDITION("Valid index", (index >= 0) && (index <= count()));
-  
-  OMUInt32 localKey = nextLocalKey();
-  char* name = elementName(localKey);
-  OMWeakReferenceVectorElement<ReferencedObject>
-                                              newElement(this, name, localKey);
+  PRECONDITION("Valid object", object != 0);
+
+  OMUniqueObjectIdentification key = object->identification();
+  VectorElement newElement(this, key, _targetTag);
   newElement.setValue(object);
   _vector.insertAt(newElement, index);
-  delete [] name;
   setPresent();
 
   POSTCONDITION("Object properly inserted",
@@ -473,11 +452,9 @@ bool OMWeakReferenceVectorProperty<ReferencedObject>::containsValue(
   PRECONDITION("Valid object", object != 0);
 
   bool result = false;
-  OMVectorIterator<
-    OMWeakReferenceVectorElement<ReferencedObject> >
-                                                   iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMWeakReferenceVectorElement<ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     if (element.pointer() == object) {
       result = true;
       break;
@@ -583,11 +560,9 @@ size_t OMWeakReferenceVectorProperty<ReferencedObject>::indexOfValue(
 
   size_t result;
 
-  OMVectorIterator<
-    OMWeakReferenceVectorElement<ReferencedObject> >
-                                                   iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMWeakReferenceVectorElement<ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     if (element.pointer() == object) {
       result = iterator.index();
       break;
@@ -614,11 +589,9 @@ size_t OMWeakReferenceVectorProperty<ReferencedObject>::countOfValue(
 
   size_t result = 0;
 
-  OMVectorIterator<
-    OMWeakReferenceVectorElement<ReferencedObject> >
-                                                   iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMWeakReferenceVectorElement<ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     if (element.pointer() == object) {
       result = result + 1;
     }
@@ -666,11 +639,9 @@ bool OMWeakReferenceVectorProperty<ReferencedObject>::findIndex(
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::findIndex");
   bool result = false;
 
-  OMVectorIterator<
-    OMWeakReferenceVectorElement<ReferencedObject> >
-                                                   iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMWeakReferenceVectorElement<ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     if (element.pointer() == object) {
       index = iterator.index();
       result = true;
@@ -698,7 +669,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::grow(
 
   // Make sure the new elements are defined.
   for (size_t i = oldCount; i < capacity; i++) {
-    OMWeakReferenceVectorElement<ReferencedObject> voidElement;
+    VectorElement voidElement;
     _vector.insert(voidElement);
   }
 }
@@ -717,11 +688,9 @@ bool OMWeakReferenceVectorProperty<ReferencedObject>::isVoid(void) const
 
   bool result = true;
 
-  OMVectorIterator<
-    OMWeakReferenceVectorElement<ReferencedObject> >
-                                                   iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMWeakReferenceVectorElement<ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     ReferencedObject* object = element.getValue();
     if (object != 0) {
       result = false;
@@ -785,12 +754,9 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::getBits(
 
   const ReferencedObject** p = (const ReferencedObject**)bits;
 
-  OMVectorIterator<
-    OMWeakReferenceVectorElement<ReferencedObject> >
-                                                   iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMWeakReferenceVectorElement<ReferencedObject>&
-                                                    element = iterator.value();
+    VectorElement& element = iterator.value();
     *p++ = element.getValue();
   }
 }
