@@ -1,1274 +1,504 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying 
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted, 
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
-
-#if defined(macintosh)
-// Make sure we have defined IID_IUnknown and IID_IClassFactory.
-#include <initguid.h>
-#include <coguid.h>	
-#endif
-
-
-
 #include "AAF.h"
-#include "AAFResult.h"
-#include "AAFStoredObjectIDs.h"
-#include "AAFTypeDefUIDs.h"
+#include "../AAFResult.h"
 #include <assert.h>
-#include <iostream.h>
-#include <iomanip.h>
-#include <fstream.h>
-#include <stdlib.h>
-#include <stdio.h> // for sprintf()
-#include <string.h>
-
-#ifndef __AAFSmartPointer_h__
-#include "AAFSmartPointer.h"
-#endif
-
-#if defined(macintosh) || defined(_MAC)
-#include "DataInput.h"
-#endif
-
-#if defined(__MWERKS__)
-#if defined(__MSL_CPP__) && (__MSL_CPP__ >= 0x5300)
-#define IOS_FMT_FLAGS ios_base::fmtflags
-#else
-#define IOS_FMT_FLAGS long int
-#endif
-#else
-#define IOS_FMT_FLAGS long int
-#endif
-
-
-// handy smart pointer typedefs
-typedef IAAFSmartPointer<IAAFObject>               IAAFObjectSP;
-typedef IAAFSmartPointer<IAAFPropertyValue>        IAAFPropertyValueSP;
-typedef IAAFSmartPointer<IAAFProperty>             IAAFPropertySP;
-typedef IAAFSmartPointer<IAAFPropertyDef>          IAAFPropertyDefSP;
-typedef IAAFSmartPointer<IAAFTypeDef>              IAAFTypeDefSP;
-typedef IAAFSmartPointer<IAAFMetaDefinition>       IAAFMetaDefinitionSP;
-typedef IAAFSmartPointer<IAAFDictionary>           IAAFDictionarySP;
-typedef IAAFSmartPointer<IAAFTypeDefCharacter>     IAAFTypeDefCharacterSP;
-typedef IAAFSmartPointer<IAAFTypeDefIndirect>      IAAFTypeDefIndirectSP;
-typedef IAAFSmartPointer<IAAFTypeDefOpaque>        IAAFTypeDefOpaqueSP;
-typedef IAAFSmartPointer<IAAFTypeDefInt>           IAAFTypeDefIntSP;
-typedef IAAFSmartPointer<IAAFTypeDefObjectRef>     IAAFTypeDefObjectRefSP;
-typedef IAAFSmartPointer<IAAFClassDef>             IAAFClassDefSP;
-typedef IAAFSmartPointer<IAAFTypeDefRename>        IAAFTypeDefRenameSP;
-typedef IAAFSmartPointer<IAAFTypeDefEnum>          IAAFTypeDefEnumSP;
-typedef IAAFSmartPointer<IAAFTypeDefExtEnum>       IAAFTypeDefExtEnumSP;
-typedef IAAFSmartPointer<IAAFTypeDefFixedArray>    IAAFTypeDefFixedArraySP;
-typedef IAAFSmartPointer<IAAFTypeDefVariableArray> IAAFTypeDefVariableArraySP;
-typedef IAAFSmartPointer<IAAFTypeDefString>        IAAFTypeDefStringSP;
-typedef IAAFSmartPointer<IAAFTypeDefRecord>        IAAFTypeDefRecordSP;
-typedef IAAFSmartPointer<IAAFTypeDefStream>        IAAFTypeDefStreamSP;
-typedef IAAFSmartPointer<IAAFFile>                 IAAFFileSP;
-typedef IAAFSmartPointer<IAAFHeader>               IAAFHeaderSP;
-typedef IAAFSmartPointer<IEnumAAFProperties>       IEnumAAFPropertiesSP;
-typedef IAAFSmartPointer<IAAFTypeDefCharacter>       IAAFTypeDefCharacterSP;
-typedef IAAFSmartPointer<IEnumAAFPropertyValues>   IEnumAAFPropertyValuesSP;
-typedef IAAFSmartPointer<IAAFTypeDefSet>           IAAFTypeDefSetSP;
+#include <stdio.h>
 
 
 // convenient error handlers.
-/*inline*/ static void checkResult(HRESULT r)
+inline void checkResult(HRESULT r)
 {
-	if (FAILED(r))
-		throw r;
+  if (FAILED(r))
+    throw r;
 }
-/*inline*/ static void checkExpression(bool expression, HRESULT r)
+inline void checkExpression(bool expression, HRESULT r)
 {
-	if (!expression)
-		throw r;
-}
-
-
-static void printIndent (int indent, ostream & os)
-{
-	while (indent--) os << " ";
+  if (!expression)
+    throw r;
 }
 
-
-static void convert(aafCharacter* wcName, size_t length, const char* name)
-{
-	assert((name && *name));
-	assert(wcName != 0);
-	assert(length > 0);
-	
-	size_t status = mbstowcs(wcName, name, length);
-	if (status == (size_t)-1) {
-		cerr << "Error : Failed to convert'"
-			<< name
-			<< "' to a wide character string.\n\n";
-		exit(1);  
-	}
-}
-
-
-static void convert(char* cName, size_t length, const char* name)
-{
-	assert((name && *name));
-	assert(cName != 0);
-	assert(length > 0);
-	
-	size_t sourceLength = strlen(name);
-	if (sourceLength < length - 1) {
-		strncpy(cName, name, length);
-	} else {
-		cerr << "Error : Failed to copy '" << name << "'.\n\n";
-		exit(1);  
-	}
-}
-
-static void convert(aafCharacter* wName, size_t length, const aafCharacter* name)
-{
-	assert((name && *name));
-	assert(wName != 0);
-	assert(length > 0);
-	
-	size_t sourceLength = 0;
-	while (*name)
-		++sourceLength;
-	if (sourceLength < length - 1) {
-		// Copy the string if there is enough room in the destinition buffer.
-		while (0 != (*wName++ = *name++))
-			;
-	} else {
-		cerr << "Error : Failed to copy '" << name << "'.\n\n";
-		exit(1);  
-	}
-}
-
-static void convert(char* cName, size_t length, const aafCharacter* name)
-{
-	assert((name && *name));
-	assert(cName != 0);
-	assert(length > 0);
-	
-	size_t status = wcstombs(cName, name, length);
-	if (status == (size_t)-1) {
-		cerr << ": Error : Conversion failed.\n\n";
-		exit(1); 
-	}
-}
-
-static char * make_mbstring(size_t length, const aafCharacter* name)
-{
-	assert(name);
-	assert(length > 0);
-	
-	size_t mbLength = (length * MB_CUR_MAX) + 1;
-	char * mbStr = new char[mbLength];
-	
-	if (*name)
-	{
-		assert(mbStr);
-		convert(mbStr, mbLength, name);
-	}
-	else
-	{
-		*mbStr = 0;
-	}
-	return mbStr;
-}
-
-static void printTimeStamp (const aafTimeStamp_t & ts,
-							ostream & os)
-{
-	static const char * const monthNames[] =
-	{
-		"Jan", "Feb", "Mar",
-			"Apr", "May", "Jun",
-			"Jul", "Aug", "Sep",
-			"Oct", "Nov", "Dec"
-	};
-	
-	char monthNameBuf [10];
-	if ((ts.date.month < 1) ||
-		(ts.date.month > 12))
-	{
-		sprintf (monthNameBuf, "Month %d", ts.date.month);
-	}
-	else
-	{
-		// I replaced assert(month_index >= 0) 2 lines below
-		// with this one because the value is unsigned and will
-		// never be negative. - Alex, 11-Sep-00
-		assert (ts.date.month > 0 );
-		aafUInt8 month_index = ts.date.month-1;
-		assert (month_index < (sizeof (monthNames) / sizeof (monthNames[0])));
-		strcpy (monthNameBuf, monthNames[month_index]);
-	}
-	
-	os << dec
-		<< monthNameBuf << " "
-		<< (int) ts.date.day << ", "
-		<< (int) ts.date.year <<	" ";
-	char buf [12];
-	sprintf (buf, "%d:%02d:%02d.%02d",
-		ts.time.hour,
-		ts.time.minute,
-		ts.time.second,
-		ts.time.fraction);
-	os << buf;
-	os << " GMT";
-}
 
 
 static HRESULT dumpObject
 (
- IAAFObjectSP pContainer, // object to be dumped
- IAAFDictionary * pDict,  // dictionary for this file
- int indent,
- ostream & os
- );
+ IAAFObject *pContainer // object to be dumped
+);
 
 static HRESULT dumpPropertyValue
 (
- IAAFPropertyValueSP pPVal,
- IAAFDictionary * pDict,  // dictionary for this file
- int indent,
- ostream & os
- );
-
-static HRESULT dumpRawStreamPropertyValue
-(
- IAAFPropertyValue * pPVal,
- IAAFTypeDef *pTD,
- IAAFDictionary * pDict,  // dictionary for this file
- int indent,
- ostream & os
- );
-
-static HRESULT dumpPropertyValues
-(
- IEnumAAFPropertyValues* pPVEnum,
- IAAFTypeDef *pTD,
- IAAFDictionary * pDict,  // dictionary for this file
- int indent,
- ostream & os
- );
+ IAAFPropertyValue * pPVal
+);
 
 
-HRESULT dumpObject(IAAFObjectSP pContainer,
-				   IAAFDictionary * pDict,
-				   int indent,
-				   ostream & os)
+HRESULT dumpObject(IAAFObject *pContainer)
 {
-	HRESULT returnHr = AAFRESULT_SUCCESS;
-	
-	IEnumAAFPropertiesSP pPropEnum;
-	IAAFPropertySP pProp;
-	IAAFPropertyDefSP pPDef;
-	IAAFPropertyValueSP pPVal;
-	IAAFClassDefSP pClassDef;
-	
-	try
+  HRESULT returnHr = AAFRESULT_SUCCESS;
+
+  IEnumAAFProperties * pPropEnum = 0;
+  IAAFProperty * pProp = 0;
+  IAAFPropertyDef *pPDef = 0;
+  IAAFPropertyValue *pPVal = 0;
+  try
 	{
-		// Get the contained properties.
-		checkResult(pContainer->GetProperties (&pPropEnum));
-		
-		os << endl;
-		printIndent (indent, os);
-		os << "Object of Class: ";
-		checkResult(pContainer->GetDefinition (&pClassDef));
-		aafUInt32 bufClassNameSize;
-		checkResult(pClassDef->GetNameBufLen (&bufClassNameSize));
-		aafCharacter * classNameBuf = new aafCharacter[bufClassNameSize];
-		assert (classNameBuf);
-		checkResult(pClassDef->GetName(classNameBuf, bufClassNameSize));
-		char *mbBuf = make_mbstring(bufClassNameSize, classNameBuf); // create an ansi/asci
-		checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-		os << mbBuf << endl;
-		delete[] mbBuf;
-		delete[] classNameBuf;
-		
-		// Enumerate across Properties
-		while (AAFRESULT_SUCCEEDED (pPropEnum->NextOne (&pProp)))
+	  // Get the contained properties.
+	  checkResult(pContainer->GetProperties (&pPropEnum));
+
+	  // Enumerate across Properties
+	  while (AAFRESULT_SUCCEEDED (pPropEnum->NextOne (&pProp)))
 		{
-			// Get property def
-			checkResult(pProp->GetDefinition(&pPDef));
-			
-			// Here we print out property's name using pPDef->GetName()
-			aafUInt32 bufSize;
-			checkResult(pPDef->GetNameBufLen (&bufSize));
-			aafCharacter * nameBuf = new aafCharacter[bufSize];
-			assert (nameBuf);
-			checkResult(pPDef->GetName(nameBuf, bufSize));
-			char *mbBuf = make_mbstring(bufSize, nameBuf); // create an ansi/asci
-			checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-			printIndent (indent, os);
-			os << "Prop: "<< mbBuf << "; ";
-			delete[] mbBuf;
-			delete[] nameBuf;
-			
-			// Get the PropertyValue
-			checkResult(pProp->GetValue(&pPVal));
-			
-			// dump property value
-			checkResult (dumpPropertyValue (pPVal, pDict, indent+1, os));
-			
+		  // Get property def
+		  checkResult(pProp->GetDefinition(&pPDef));
+		  assert (pPDef);
+
+		  // Here we print out property's name using pPDef->GetName()
+		  aafUInt32 bufSize;
+		  checkResult(pPDef->GetNameBufLen (&bufSize));
+		  wchar_t * nameBuf = new wchar_t[bufSize];
+		  assert (nameBuf);
+		  checkResult(pPDef->GetName(nameBuf, bufSize));
+		  wprintf (L"Property definition: %s; ", nameBuf);
+		  delete[] nameBuf;
+
+		  // Get the PropertyValue
+		  checkResult(pProp->GetValue(&pPVal));
+
+		  // dump property value
+		  dumpPropertyValue (pPVal);
+
+		  pPVal->Release();
+		  pPVal = 0;
+
+		  pPDef->Release ();
+		  pPDef = 0;
+
 		} // while ()...
 	}
-	catch (HRESULT &caught)
+  catch (HRESULT &caught)
 	{
-		os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
-		returnHr = caught;
+	  returnHr = caught;
 	}
-	
-	return returnHr;
+
+  if (pPropEnum) pPropEnum->Release(); pPropEnum = 0;
+  if (pProp) pProp->Release(); pProp = 0;
+  if (pPDef) pPDef->Release(); pPDef = 0;
+  if (pPVal) pPVal->Release(); pPVal = 0;
+
+  return returnHr;
 }
 
 
-HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
-						   IAAFDictionary * pDict,
-						   int indent,
-						   ostream & os)
+HRESULT dumpPropertyValue (IAAFPropertyValue * pPVal)
 {
-	// get the type of the data value
-	IAAFTypeDefSP pTD;
-	checkResult(pPVal->GetType(&pTD));
-	
-	if (! pTD)
+  // get the type of the data value
+  IAAFTypeDef *pTD = 0;
+  checkResult(pPVal->GetType(&pTD));
+
+  if (! pTD)
 	{
-		// unknown type, due to damaged file.
-		
-		// Dump "damaged object" message.
-		// Optionally, dump the property's bits using pPVal->GetBits().
-		printIndent (indent, os);
-		os << "***Unknown type def.***" << endl;
-		return E_FAIL;
+	  // unknown type, due to damaged file.
+
+	  // Dump "damaged object" message.
+	  // Optionally, dump the property's bits using pPVal->GetBits().
+	  wprintf (L"Unknown type def.\n");
 	}
-	
-	else
+
+  else
 	{
-		{
-			aafCharacter bigBuf[100];
-			char mbBigBuf[100 * 3 /*MB_CUR_MAX */];
-			IAAFMetaDefinitionSP pd;
-			checkResult(pTD->QueryInterface(IID_IAAFMetaDefinition, (void**)&pd));
-			checkResult(pd->GetName (bigBuf, sizeof (bigBuf)));
-			convert(mbBigBuf, sizeof(mbBigBuf), bigBuf);
-			os << "type: " << mbBigBuf << "; ";
-		}
-		
-		// get the type category of the data value
-		eAAFTypeCategory_t tid;
-		checkResult(pTD->GetTypeCategory (&tid));
-		
-		switch (tid)
+	  {
+		wchar_t bigBuf[100];
+		assert (pTD);
+		IAAFDefObject * pd = NULL;
+		checkResult(pTD->QueryInterface(IID_IAAFDefObject, (void**)&pd));
+		assert (pd);
+		checkResult(pd->GetName (bigBuf, sizeof (bigBuf)));
+		pd->Release ();
+		wprintf (L"type is %s; ", bigBuf);
+	  }
+
+	  // get the type category of the data value
+	  eAAFTypeCategory_t tid;
+	  checkResult(pTD->GetTypeCategory (&tid));
+
+	  switch (tid)
 		{
 		case kAAFTypeCatInt:
-			{
-				// integral type; get the specific type def int interface
-				IAAFTypeDefIntSP pTDI;
-				
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefInt,
-					(void**)&pTDI));
-				
-				aafInt64 val;
-				checkResult(pTDI->GetInteger(pPVal, (aafMemPtr_t) &val, sizeof (val)));
-				
-				os << "value: ";
-				aafInt32 hi = (aafUInt32) ((val & 0xffffffff00000000) >> 32);
-				aafInt32 lo = (aafInt32) val & 0xffffffff;
-				if (hi && ((hi != ~0) || (lo >= 0)))
-				{
-					int width = os.width();
-					char fill = os.fill();
-					os << hex << "0x";
-					os.width(8);
-					os.fill('0');
-					os << hi << lo;
-					os.width(width);
-					os.fill(fill);
-				}
-				else
-				{
-					os << "0x" << hex << lo;
-				}
-				os << "." << endl;
-				
-				break;
-			}
+		  {
+			// integral type; get the specific type def int interface
+			IAAFTypeDefInt * pTDI = 0;
 			
-		case kAAFTypeCatCharacter:
-			{
-				// aafCharacter  type; 
-				IAAFTypeDefCharacterSP pTDChar;
-				
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefCharacter,
-					(void**)&pTDChar));
-				
-				aafCharacter val;
-				checkResult(pTDChar->GetCharacter(pPVal, &val));
-				
-				os << "value: 0x" << hex << val << endl;
-				
-				break;
-			}
-			
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefInt,
+										   (void**)&pTDI));
+
+			aafInt64 val;
+			checkResult(pTDI->GetInteger(pPVal, (aafMemPtr_t) &val, sizeof (val)));
+
+			wprintf (L"value is %d.\n", val);
+
+			pTDI->Release();
+			pTDI = 0;
+			break;
+		  }
+
 		case kAAFTypeCatStrongObjRef:
-			{
-				// strong object reference; recursively dump contents.
-				IAAFTypeDefObjectRefSP pTDO;
-				AAFRESULT hr = pTD->QueryInterface(IID_IAAFTypeDefObjectRef,
-					(void**)&pTDO);
-				checkResult(hr);
-				
-				IAAFObjectSP pObj;
-				checkResult(pTDO->GetObject(pPVal, IID_IAAFObject, (IUnknown **)&pObj));
-				os << "Value: an object:" << endl;
-				checkResult (dumpObject (pObj, pDict, indent+1, os));
-				
-				break;	
-			}
-			
+		  {
+			// strong object reference; recursively dump contents.
+			IAAFTypeDefObjectRef * pTDO = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefObjectRef,
+										   (void**)&pTDO));
+
+			IAAFObject * pObj = 0;
+			checkResult(pTDO->GetObject(pPVal, &pObj));
+			wprintf (L"Value is an object:\n");
+			dumpObject (pObj);
+
+			pObj->Release();
+			pObj = 0;
+
+			pTDO->Release();
+			pTDO = 0;
+			break;	
+		  }
+
 #if 0
 		case kAAFTypeCatWeakObjRef:
-			{
-				// weak object reference; only dump summary info (not
-				// recursively)
-				IAAFTypeDefObjectRefSP pTDO;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefObjectRef,
-					(void**)&pTDO));
-				
-				IAAFObjectSP pObj;
-				checkResult(pTDO->GetObject(pPVal, &pObj));
-				IAAFClassDefSP pClassDef;
-				checkResult(pObj->GetDefinition(&pClassDef));
-				
-				// Here is where you print the class def's name, etc. and any
-				// other summary info
-				
-				break;	
-			}
-#endif // 0
-			
-		case kAAFTypeCatRename:
-			{
-				// A renamed type; print this type's name, then dump contents
-				// as source type
-				IAAFTypeDefRenameSP pTDR;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefRename,
-					(void**)&pTDR));
-				// Here print rename's type using pTDR->GetName()
-				
-				// Now get base property value and recursively print that
-				IAAFPropertyValueSP pBasePropVal;
-				checkResult(pTDR->GetBaseValue (pPVal, &pBasePropVal));
-				checkResult (dumpPropertyValue (pBasePropVal,
-					pDict,
-					indent+1,
-					os));
-				
-				break;
-			}
-			
-		case kAAFTypeCatEnum:
-			{
-				// Print enum element's text tag as well as int value
-				IAAFTypeDefEnumSP pTDE;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefEnum,
-					(void**)&pTDE));
-				
-				// first, get the int value
-				aafInt64 enumValue;
-				checkResult(pTDE->GetIntegerValue(pPVal, &enumValue));
-				
-				// now, get the text tag for that value.  Start with name
-				// buf len, and allocating a buffer to hold the name
-				aafCharacter * nameBuf;
-				aafUInt32 nameBufLen;
-				checkResult(pTDE->GetNameBufLenFromInteger(enumValue, &nameBufLen));
-				// don't forget NameBufLen is in bytes, not aafCharacters
-				nameBuf = (aafCharacter*) new aafUInt8[nameBufLen];
-				
-				// and now get the name itself
-				checkResult(pTDE->GetNameFromInteger(enumValue, nameBuf, nameBufLen));
-				
-				// Print the contents
-				char *mbBuf = make_mbstring(nameBufLen, nameBuf); // create an ansi/asci
-				checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-				os << "Value: " << mbBuf << endl;
-				delete[] mbBuf;
-				mbBuf = 0;
-				delete[] nameBuf;
-				nameBuf = 0;
-				
-				break;
-			}
-			
-		case kAAFTypeCatExtEnum:
-			{
-				// Print enum element's text tag
-				IAAFTypeDefExtEnumSP pTDE;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefExtEnum,
-					(void**)&pTDE));
-				
-				// first, get the AUID value
-				aafUID_t enumValue;
-				checkResult(pTDE->GetAUIDValue(pPVal, &enumValue));
-				
-				// now, get the text tag for that value.  Start with name
-				// buf len, and allocating a buffer to hold the name
-				aafCharacter * nameBuf;
-				aafUInt32 nameBufLen;
-				checkResult(pTDE->GetNameBufLenFromAUID(enumValue, &nameBufLen));
-				// don't forget NameBufLen is in bytes, not aafCharacters
-				nameBuf = (aafCharacter*) new aafUInt8[nameBufLen];
-				
-				// and now get the name itself
-				checkResult(pTDE->GetNameFromAUID(enumValue, nameBuf, nameBufLen));
-				
-				// Print the contents
-				char *mbBuf = make_mbstring(nameBufLen, nameBuf); // create an ansi/asci
-				checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-				os << "Value: " << mbBuf << endl;
-				delete[] mbBuf;
-				mbBuf = 0;
-				delete[] nameBuf;
-				nameBuf = 0;
-				
-				break;
-			}
-			
-		case kAAFTypeCatFixedArray:
-			{
-				// Print out elements of array.
-				IAAFTypeDefFixedArraySP pTDFA;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefFixedArray,
-					(void**)&pTDFA));
-				
-				// Get number of elements
-				aafUInt32 numElems = 0;
-				checkResult(pTDFA->GetCount(&numElems));
-				
-				os << "Value: fixed-sized array[" << numElems << "]:" << endl;
-				
-				aafUInt32 i;
-				for (i = 0; i < numElems; i++)
-				{
-					printIndent (indent, os);
-					os << "  [" << i << "]: ";
-					IAAFPropertyValueSP pElemPropVal;
-					checkResult(pTDFA->GetElementValue(pPVal, i, &pElemPropVal));
-					checkResult (dumpPropertyValue (pElemPropVal,
-						pDict,
-						indent+1,
-						os));
-				}
-				
-				break;
-			}
-			
-		case kAAFTypeCatVariableArray:
-			{
-				// Print out elements of array.
-				IAAFTypeDefVariableArraySP pTDVA;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefVariableArray,
-					(void**)&pTDVA));
-				
-				// Get number of elements
-				aafUInt32 numElems;
-				checkResult(pTDVA->GetCount(pPVal, &numElems));
-				
-				os << "Value: variably-sized array[" << numElems << "]:" << endl;
+		  {
+			// weak object reference; only dump summary info (not
+			// recursively)
+			IAAFTypeDefObjectRef * pTDO = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefObjectRef,
+										   (void**)&pTDO));
 
-				aafUInt32 i;
-				for (i = 0; i < numElems; i++)
-				{
-					printIndent (indent, os);
-					os << "[" << i << "]: ";
-					IAAFPropertyValueSP pElemPropVal;
-					checkResult(pTDVA->GetElementValue(pPVal, i, &pElemPropVal));
-					checkResult (dumpPropertyValue (pElemPropVal,
-						pDict,
-						indent+1,
-						os));
-				}
-				break;
-			}
-			
-		case kAAFTypeCatSet:
-			{
-				// Print out elements of array.
-				IAAFTypeDefSetSP pTDSet;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefSet, (void**)&pTDSet));
-				
-				// Get number of elements
-				aafUInt32 numElems;
-				checkResult(pTDSet->GetCount(pPVal, &numElems));
-				
-				os << "Value: set[" << numElems << "]:" << endl;
+			IAAFObject * pObj = 0;
+			checkResult(pTDO->GetObject(pPVal, &pObj));
+			IAAFClassDef * pClassDef = 0;
+			checkResult(pObj->GetDefinition(&pClassDef));
 
-				IEnumAAFPropertyValuesSP pPVEnum;
-				checkResult(pTDSet->GetElements(pPVal, &pPVEnum));
-				checkResult(dumpPropertyValues(pPVEnum, pTD, pDict, indent, os));
-				break;
-			}
-			
-		case kAAFTypeCatString:
-			{
-				IAAFTypeDefStringSP pTDS;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefString,
-					(void**)&pTDS));
-				
-				// Get typedef of an element
-				IAAFTypeDefSP pETD;
-				checkResult(pTDS->GetType(&pETD));
-				
-				// get the type category of the element
-				eAAFTypeCategory_t elemTID;
-				checkResult(pETD->GetTypeCategory (&elemTID));
-				
-				//ELEM type should be EITHER :  INT or CHAR
-				
-				if (kAAFTypeCatCharacter == elemTID)
-				{
-					
-					IAAFTypeDefCharacterSP pETDcharacter;
-					checkResult(pETD->QueryInterface(IID_IAAFTypeDefCharacter,
-						(void**) &pETDcharacter));
-					
-					// determine the sizes of elements, and of the buffer
-					// required to hold them.
-					aafUInt32 bufSize = 0;
-					aafUInt32 count = 0;
-					aafUInt32 elemSize = 0;
-					checkResult(pTDS->GetCount(pPVal, &count));
-					count ++; // make room for terminator
-					//			checkResult(pETDcharacter->GetSize (&elemSize));
-					// The element size must be the in-memory size of an aafCharacter since
-					// the character type currently only supports 2 byte <=> 2 byte and
-					// 2 byte <=> 4 byte character conversion. There is no support for
-					// non-unicode character conversion: 1 byte <=> 2 byte, or 1 byte <=> 4 byte.
-					elemSize = sizeof(aafCharacter);
-					bufSize = count * elemSize;
-					
-					// First, let's actually get the bits.
-					
-					// get bits
-					aafCharacter * buf = new aafCharacter[count];
-					memset (buf, 0, bufSize);  // zero all, including terminator
-					checkResult(pTDS->GetElements(pPVal, (aafDataBuffer_t)buf, bufSize));
-					
-					// NULL-terminated wide character string.
-					// create an ansi/asci
-					char *mbBuf = make_mbstring(bufSize, (aafCharacter*) buf);
-					checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-					os << " value: \"" << mbBuf << "\"" << endl;
-					delete [] mbBuf;
-					mbBuf = 0;
-					
-					assert (buf);     delete[] buf;       buf = 0;
-					break;
-				}//IF CHARACTER
-				
-				else if (kAAFTypeCatInt == elemTID) 
-				{
-					IAAFTypeDefIntSP pETDInt;
-					checkResult(pETD->QueryInterface(IID_IAAFTypeDefInt,
-						(void**) &pETDInt));
-					
-					// determine the sizes of elements, and of the buffer
-					// required to hold them.
-					aafUInt32 bufSize = 0;
-					aafUInt32 count = 0;
-					aafUInt32 elemSize = 0;
-					checkResult(pTDS->GetCount(pPVal, &count));
-					count ++; // make room for terminator
-					checkResult(pETDInt->GetSize (&elemSize));
-					bufSize = count * elemSize;
-					
-					// See if this is a type we can easily represent.  We know
-					// it is some kind of integral type.  Maybe we can dump
-					// it.  First, let's actually get the bits.
-					
-					// get bits
-					aafUInt8 * buf = new aafUInt8[bufSize];
-					memset (buf, 0, bufSize);  // zero all, including terminator
-					checkResult(pTDS->GetElements(pPVal, buf, bufSize));
-					
-					// Now determine size of integral elements
-					if (1 == elemSize)
-					{
-						// 1-byte integer characters; interpret as a
-						// NULL-terminated C string.
-						printIndent (indent, os);
-						os << " value: \"" << buf << "\"" << endl;
-					}
-					else if (2 == elemSize)
-					{
-						// 2-byte integral characters; interpret as a
-						// NULL-terminated wide character string.
-						// create an ansi/asci
-						char *mbBuf = make_mbstring(bufSize, (aafCharacter*) buf);
-						checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-						os << " value: \"" << mbBuf << "\"" << endl;
-						delete [] mbBuf;
-						mbBuf = 0;
-					}
-					else
-					{
-						// elements are too wide to be C or unicode strings;
-						// perhaps just hex dump them, looking for terminator
-						// character.
-						
-						// But for now, we won't bother dumping them... ;)
-						assert (0);
-					}
-					
-					assert (buf);     delete[] buf;       buf = 0;
-					break;
-				}//if INT
-				else
-				{
-					// Hmmmm ... Elem Type is NEITHER a  Character NOR an INT ...
-					//  ....  flag this as a problem ?! 
-					assert (0);
-				}
-				
-		  }//kAAFTypeCatString
-		  
-		case kAAFTypeCatRecord:
-			{
-				aafUInt32 i;
-				IAAFTypeDefRecordSP pTDR;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefRecord,
-					(void**)&pTDR));
-				
-				// Special case!  See if this is an AUID
-				IUnknown * pUnkTest = 0;
-				checkResult(pTDR->QueryInterface(IID_IUnknown,
-					(void**)&pUnkTest));
-				
-				IAAFTypeDefSP ptd;
-				assert (pDict);
-				checkResult (pDict->LookupTypeDef (kAAFTypeID_AUID, &ptd));
-				IUnknown * pUnkAUID = 0;
-				checkResult(ptd->QueryInterface(IID_IUnknown,
-					(void**)&pUnkAUID));
-				assert (pDict);
-				checkResult (pDict->LookupTypeDef (kAAFTypeID_TimeStamp, &ptd));
-				IUnknown * pUnkTimeStamp = 0;
-				checkResult(ptd->QueryInterface(IID_IUnknown,
-					(void**)&pUnkTimeStamp));
-				
-				if (pUnkTest == pUnkAUID)
-				{
-					// dump it as an auid
-					aafUID_t auidVal;
-					checkResult (pTDR->GetStruct (pPVal,
-						(aafMemPtr_t) &auidVal,
-						sizeof (auidVal)));
-					char buf[100];
-					sprintf (buf, "{ 0x%08x, 0x%04x, 0x%04x, ",
-						auidVal.Data1, auidVal.Data2, auidVal.Data3);
-					
-					os << "Value: " << buf << "{ ";
-					for (i = 0; i < 8; i++)
-					{
-						sprintf (buf, "0x%x", auidVal.Data4[i]);
-						os << buf;
-						if (i != 7)
-							os << ", ";
-					}
-					os << " } }" << endl;
-				}
-				
-				else if (pUnkTest == pUnkTimeStamp)
-				{
-					// dump it as an aafTimeStamp_t
-					aafTimeStamp_t ts;
-					checkResult (pTDR->GetStruct (pPVal,
-						(aafMemPtr_t) &ts,
-						sizeof (ts)));
-					
-					os << "Value: ";
-					printTimeStamp (ts, os);
-					os << endl;
-				}
-				
-				else
-				{
-					// dump it as a plain record
-					// get the number of members in this record
-					aafUInt32 numMembers = 0;
-					checkResult(pTDR->GetCount(&numMembers));
-					
-					os << "Value: record of " << numMembers << " members:" << endl;
-					
-					// recursively dump each struct field
-					for (i = 0; i < numMembers; i++)
-					{
-						aafUInt32 nameBufLen;
-						checkResult(pTDR->GetMemberNameBufLen(i, &nameBufLen));
-						// nameBufLen is in bytes, not aafCharacters
-						aafCharacter * nameBuf = (aafCharacter*) new aafUInt8 [nameBufLen];
-						assert (nameBuf);
-						checkResult(pTDR->GetMemberName(i, nameBuf, nameBufLen));
-						// create an ansi/asci
-						char *mbBuf = make_mbstring(nameBufLen, nameBuf);
-						checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-						printIndent (indent, os);
-						os << "  [" << mbBuf << "]: ";
-						delete[] nameBuf;
-						delete[] mbBuf;
-						
-						IAAFPropertyValueSP pMemberPropVal;
-						checkResult(pTDR->GetValue(pPVal, i, &pMemberPropVal));
-						// recursively dump prop value
-						checkResult (dumpPropertyValue (pMemberPropVal,
-							pDict,
-							indent+1,
-							os));
-					}
-				}
-				if (pUnkTest)
-				{
-					pUnkTest->Release ();
-					pUnkTest = 0;
-				}
-				if (pUnkAUID)
-				{
-					pUnkAUID->Release ();
-					pUnkAUID = 0;
-				}
-				if (pUnkTimeStamp)
-				{
-					pUnkTimeStamp->Release ();
-					pUnkTimeStamp = 0;
-				}
-				break;
+			// Here is where you print the class def's name, etc. and any
+			// other summary info
+
+			pClassDef->Release;
+			pClassDef = 0;
+
+			pObj->Release;
+			pObj = 0;
+
+			pTDO->Release();
+			pTDO = 0;
+			break;	
 		  }
-		  
-		case kAAFTypeCatIndirect:
-			{
-				// Print out the actual value of the indirect type.
-				IAAFTypeDefIndirectSP pIndirectType;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefIndirect,
-					(void**)&pIndirectType));
-				
-				os << "Value [indirect]:" << endl;
-				
-				// Get the actual value
-				IAAFPropertyValueSP pActualValue;
-				checkResult(pIndirectType->GetActualValue(pPVal, &pActualValue));
+#endif // 0
+
+#if 0
+		case kAAFTypeCatRename:
+		  {
+			// A renamed type; print this type's name, then dump contents
+			// as source type
+			IAAFTypeDefRename * pTDR = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefRename,
+										   (void**)&pTDR));
+			// Here print rename's type using pTDR->GetName()
+
+			// Now get base property value and recursively print that
+			IAAFPropertyValue * pBasePropValue = 0;
+			checkResult(pTDR->GetValue (pPVal, &pBasePropVal));
+			dumpPropertyValue (pBasePropVal);
+
+			pBasePropVal->Release();
+			pBasePropVal = 0;
+
+			pTDR->Release();
+			pTDR = 0;
+			break;
+		  }
+#endif // 0
+
+#if 0
+		case kAAFTypeCatEnum:
+		  {
+			// Print enum element's text tag as well as int value
+			IAAFTypeDefEnum * pTDE = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefEnum,
+										   (void**)&pTDE));
+
+			// first, get the int value
+			aafInt32 enumValue;
+			checkResult(pTDE->GetValue(pPVal, &enumValue));
+
+			// now, get the text tag for that value.  Start with name
+			// buf len, and allocating a buffer to hold the name
+			wchar_t * nameBuf;
+			aafUInt32 nameBufLen;
+			checkResult(pTDE->GetElemNameBufLen(enumValue, &nameBufLen));
+			// don't forget NameBufLen is in bytes, not wchar_ts
+			nameBuf = (wchar_t*) new aafUInt8[nameBufLen];
+
+			// and now get the name itself
+			checkResult(pTDE->GetElemName(elemValue, nameBuf, nameBufLen));
+
+			// Here you print out nameBuf to indicate enum's value
+
+			delete[] nameBuf;
+			nameBuf = 0;
+
+			pTDE->Release();
+			pTDE = 0;
+			break;
+		  }
+#endif // 0
+
+		case kAAFTypeCatFixedArray:
+		  {
+			// Print out elements of array.
+			IAAFTypeDefFixedArray * pTDFA = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefFixedArray,
+										   (void**)&pTDFA));
+
+			// Get number of elements
+			aafUInt32 numElems = 0;
+			checkResult(pTDFA->GetCount(&numElems));
+
+			wprintf (L"Value is a fixed-sized of size %d:\n", numElems);
+
+			aafUInt32 i;
+			for (i = 0; i < numElems; i++)
+			  {
+				wprintf (L"Element %d has value: ", i);
+				IAAFPropertyValue * pElemPropVal = 0;
+				checkResult(pTDFA->GetElementValue(pPVal, i, &pElemPropVal));
+				dumpPropertyValue (pElemPropVal);
+				pElemPropVal->Release();
+			  }
+
+			pTDFA->Release();
+			pTDFA = 0;
+			break;
+		  }
+
+		case kAAFTypeCatVariableArray:
+		  {
+			// Print out elements of array.
+			IAAFTypeDefVariableArray * pTDVA = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefVariableArray,
+										   (void**)&pTDVA));
+
+			// Get number of elements
+			aafUInt32 numElems;
+			checkResult(pTDVA->GetCount(pPVal, &numElems));
+
+			wprintf (L"Value is a variably-sized array of size %d:\n", numElems);
+
+			aafUInt32 i;
+			for (i = 0; i < numElems; i++)
+			  {
+				wprintf (L"Element %d has value:\n", i);
+				IAAFPropertyValue * pElemPropVal = 0;
+				checkResult(pTDVA->GetElementValue(pPVal, i, &pElemPropVal));
+				dumpPropertyValue (pElemPropVal);
+				pElemPropVal->Release();
+				pElemPropVal = 0;
+			  }
+
+			pTDVA->Release();
+			pTDVA = 0;
+			break;
+		  }
+
+#if 0
+		case kAAFTypeCatString:
+		  {
+			IAAFTypeDefString * pTDS = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefString,
+										   (void**)&pTDS));
+
+			// Get typedef of an element
+			IAAFTypeDef * pETD = 0;
+			checkResult(pTDS->GetType(&pETD));
+
+			// get the type category of the element
+			eAAFTypeCategory_t elemTID;
+			checkResult(pETD->GetTypeCategory (&elemTID));
+
+			// See if this is a type we can easily represent
+			if (kAAFTypeCatInt == elemTID)
+			  {
+				// it is some kind of integral type.  Maybe we can
+				// dump it.  First, let's actually get the bits.
+
+				// get size of buffer req'd to hold it
+				aafUInt32 bufSize = 0;
+				checkResult(pPVal->GetBitsSize(&bufSize));
+				// and allocate buffer
+				aafUInt8 * buf = new aafUInt8[bufSize];
+				// get bits
+				checkResult(pPVal->GetBits(buf, bufSize));
+
+				// Now check to see what the integer size is.
+				aafUInt32 intSize = 0;
+				IAAFTypeDefInt * pETDInt = 0;
+				checkResult(pETD->QueryInterface(IID_IAAFTypeDefInt,
+										   (void**)&pETDInt));
+				checkResult(pETDInt->GetSize(&intSize));
+				if (1 == intSize)
+				  {
+					// 1-byte integer characters; could be a C string;
+					// check for NULL terminator
+					char * term;
+					checkResult(pTDS->GetTermValue(&term, sizeof (term)));
+					if (NULL == term)
+					  {
+						// We'll interpret it as a C string.  Use printf
+						// or equiv to dump raw chars in buf.
+						printf ("string is: %s\n", buf);
+					  }
+					else
+					  {
+						// Not NULL-terminated; do a hex dump or
+						// equivalent of contents of buf, looking for
+						// terminator character.
+					  }
+				  } // 1==intSize
+				else if (2 == intSize)
+				  {
+					// could be a unicode string; check for NULL terminator
+					wchar_t wterm;
+					checkResult(pTDS->GetTermValue(&wterm, sizeof (wterm)));
+					if (NULL == wterm)
+					  {
+						// We'll interpret it as a unicode string.
+						wprintf (L"string is %s\n", (wchar_t*) buf);
+					  }
+					else
+					  {
+						// Not NULL-terminated; do a hex dump or
+						// equivalent of contents of buf, looking for
+						// terminator character.
+					  }
+				  } // 2==intSize
+				else
+				  {
+					// elements are too wide to be C or unicode strings;
+					// perhaps just hex dump them, looking for terminator
+					// character.
+				  }
+
+				delete[] buf;
+				buf = 0;
+			  } // elemType==typeCatInt
+
+			else
+			  {
+				// type category isn't an int type; dump data in buf
+				// similarly to variable array, except check for
+				// terminator element.
+			  }
+		  }
+#endif // 0
+
+#if 0
+		case kAAFTypeCatComposite:
+		  {
+			IAAFTypeDefComposite * pTDC = 0;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefComposite,
+										   (void**)&pTDC));
+
+			// get the number of elements in this composite
+			aafInt32 numElements = 0;
+			checkResult(pTDC->GetCount(&numElements));
+
+			// recursively dump each struct field
+			aafInt32 i;
+			for (i = 0; i < numElements; i++)
+			  {
+				aafUInt32 nameBufLen;
+				checkResult(pTDC->GetElemNameBufLen(i, &nameBufLen));
+				wchar_t * buf = (wchar_t*) new aafUInt8[nameBufLen];
+				// print elem name here
+				delete[] buf;
+
+				IAAFPropertyValue * pElemPropVal = 0;
+				checkResult(pTDC->GetElemValue(pPVal, i, &pElemPropVal));
 				// recursively dump prop value
-				checkResult (dumpPropertyValue (pActualValue,
-					pDict,
-					indent+1,
-					os));
-				break;
-			}
-			
-		case kAAFTypeCatOpaque:
-			{
-				// Print out the actual value of the opaque type.
-				IAAFTypeDefOpaqueSP pOpaqueType;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefOpaque,
-					(void**)&pOpaqueType));
-				
-				os << "Value [opaque]:" << endl;
-				
-				// Get the opaque type id
-				aafUID_t opaqueTypeID = {0};
-				checkResult(pOpaqueType->GetActualTypeID(pPVal, &opaqueTypeID));
-				
-				// If not then register a corresponding opaque type in the
-				// dictionary that is a rename of UInt8Array.      
-				IAAFTypeDefSP pType;
-				if (FAILED(pDict->LookupTypeDef(opaqueTypeID, &pType)))
-				{
-					IAAFTypeDefSP pBaseType;
-					IAAFClassDefSP pRenamedClassDef;
-					IAAFTypeDefRenameSP pRenamedType;
-					
-					checkResult(pDict->LookupTypeDef(kAAFTypeID_UInt8Array, &pBaseType));
-					checkResult(pDict->CreateMetaInstance(AUID_AAFTypeDefRename, IID_IAAFTypeDefRename, (IUnknown **)&pRenamedType));
-					checkResult(pRenamedType->Initialize (opaqueTypeID, pBaseType, L"Opaque Data"));
-					checkResult(pRenamedType->QueryInterface(IID_IAAFTypeDef, (void **)&pType));
-					checkResult(pDict->RegisterOpaqueTypeDef(pType));
-				}
-				
-				// Opaque types objects also implement the indirect type interface
-				// to access the actual value data when the type is "known" either
-				// public or opaque.
-				IAAFTypeDefIndirectSP pIndirectType;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefIndirect,
-					(void**)&pIndirectType));
-				
-				// Get the actual value
-				IAAFPropertyValueSP pActualValue;
-				checkResult(pIndirectType->GetActualValue(pPVal, &pActualValue));
-				// recursively dump prop value
-				checkResult (dumpPropertyValue (pActualValue,
-					pDict,
-					indent+1,
-					os));
-				break;
-			}
-			
-		case kAAFTypeCatStream:
-			{
-				// Print out the actual value of the stream type.
-				checkResult(dumpRawStreamPropertyValue(pPVal, pTD, pDict, indent, os));
-				break;
-			}
-			
+				dumpPropertyValue (pElemPropVal);
+				pElemPropVal->Release();
+				pElemPropVal = 0;
+			  }
+
+			pTDC->Release();
+			pTDC = 0;
+		  }
+#endif // 0
+
 		default:
-			os << "***Unknown type category " << dec << (int) tid
-				<< ".***" << endl;
-			return E_FAIL;
-			break;
+		  // Unknown type category.  Dump 'error' message.
+		  break;
 		}
-		return AAFRESULT_SUCCESS;
 	} // !pTD
-}
 
-HRESULT dumpRawStreamPropertyValue
-(
- IAAFPropertyValue * pPVal,
- IAAFTypeDef *pTD,
- IAAFDictionary * /*pDict*/,  // dictionary for this file
- int /*indent*/,
- ostream & os
- )
-{
-	// Interpret values 0x00 - 0xff as ASCII characters.
-	// 
-	static const char asciiTable[256] = 
-	{
-		'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			' ',  '!',  '"',  '#',  '$',  '%',  '&', '\'',
-			'(',  ')',  '*',  '+',  ',',  '-',  '.',  '/',
-			'0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',
-			'8',  '9',  ':',  ';',  '<',  '=',  '>',  '?',
-			'@',  'A',  'B',  'C',  'D',  'E',  'F',  'G',
-			'H',  'I',  'J',  'K',  'L',  'M',  'N',  'O',
-			'P',  'Q',  'R',  'S',  'T',  'U',  'V',  'W',
-			'X',  'Y',  'Z',  '[', '\\',  ']',  '^',  '_',
-			'`',  'a',  'b',  'c',  'd',  'e',  'f',  'g',
-			'h',  'i',  'j',  'k',  'l',  'm',  'n',  'o',
-			'p',  'q',  'r',  's',  't',  'u',  'v',  'w',
-			'x',  'y',  'z',  '{',  '|',  '}',  '~',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.',
-			'.',  '.',  '.',  '.',  '.',  '.',  '.',  '.'
-	};
-	
-	
-	// Print out the actual value of the stream type.
-	AAFRESULT streamResult = AAFRESULT_SUCCESS;
-	IAAFTypeDefStreamSP pStreamType;
-	checkResult(pTD->QueryInterface(IID_IAAFTypeDefStream,
-		(void**)&pStreamType));
-	
-	// Get number of bytes
-	aafInt64 streamSize = 0;
-	checkResult(pStreamType->GetSize(pPVal, &streamSize));
-	
-	os << "Value: stream: " << endl;
-	if (0x00000000FFFFFFFF < streamSize)
-	{
-		os << "  Large (64-bit) stream not supported in ascii dump!" << endl;
-		os << "  WARNING: Stream will be truncated!" << endl;
-	}
-	
-	aafUInt32 bytesLeft = (aafUInt32)(streamSize);
-	const aafUInt32 kStreamBytesPerLine = 16;
-	const aafUInt32 kStreamReadSize = kStreamBytesPerLine;
-	const aafUInt32 kOffsetWidth = 8;
-	aafUInt8 streamBuffer[kStreamReadSize];
-	aafUInt32 bytes = 0;
-	aafUInt32 bytesRead = 0;
-	aafUInt32 offset = 0;
-	
-    
-	os << "{/* size: " << bytesLeft << " bytes */" << endl;
-	
-	while ((0 < bytesLeft) && AAFRESULT_SUCCEEDED(streamResult))
-	{
-		if (bytesLeft > kStreamReadSize)
-			bytes = kStreamReadSize;
-		else
-			bytes = bytesLeft;
-		
-		streamResult = pStreamType->Read(pPVal, bytes, streamBuffer, &bytesRead);
-		if (AAFRESULT_FAILED(streamResult))
-		{
-			os << "  // FAILED after reading " << (aafUInt32)streamSize - bytesLeft << " bytes." << endl;
-			break;
-		}
-		bytesLeft -= bytesRead;
-		
-		
-		os << " /*" << dec << setw(kOffsetWidth) << offset << " */";  
-		offset += kStreamBytesPerLine;    
-		
-		aafUInt32 i;
-		
-		IOS_FMT_FLAGS savedFlags = os.setf(ios::basefield);
-		char savedFill = cout.fill();
-		
-		for (i = 0; (i < kStreamBytesPerLine) && (i < bytesRead);)
-		{
-			os << " 0x" << hex << setw(2) << setfill('0') << (int)streamBuffer[i++];
-			if (i == bytesRead && 0 == bytesLeft)
-			{
-				os << " ";
-				break;
-			}
-			
-			os << ",";
-		}
-		
-		os.setf(savedFlags, ios::basefield);
-		os.fill(savedFill);      
-		
-		
-		// add padding on last row if necessary.
-		for (aafUInt32 j = i; (j < kStreamBytesPerLine); ++j)
-		{
-			os << "      ";
-		}
-		
-		// dump the ascii representation of the stream bytes
-		os << " /*";
-		for (i = 0; i < bytesRead; ++i)
-		{
-			os << asciiTable[streamBuffer[i]];
-		} 
-		os << "*/";
-		
-		os << endl;
-	}
-	
-	
-	os << "};" << endl;
-	os << dec << endl;
-	
-	return streamResult;
+  pTD->Release ();
+  pTD = 0;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
 
-HRESULT dumpPropertyValues
-(
- IEnumAAFPropertyValues* pPVEnum,
- IAAFTypeDef * /*pTD*/,
- IAAFDictionary * pDict,  // dictionary for this file
- int indent,
- ostream & os
- )
+static void dumpFile (wchar_t * pwFileName)
 {
-	HRESULT result = S_OK;
-	aafUInt32 i = 0;
-	IAAFPropertyValueSP pElemPropVal;
-	while (SUCCEEDED(pPVEnum->NextOne(&pElemPropVal)))
+  assert (pwFileName);
+
+  IAAFFile *   pFile = NULL;
+  IAAFHeader * pHeader = NULL;
+  IAAFObject * pHdrObj = NULL;
+
+  checkResult(CoCreateInstance(CLSID_AAFFile,
+							   NULL, 
+							   CLSCTX_INPROC_SERVER, 
+							   IID_IAAFFile, 
+							   (void **)&pFile));
+  assert (pFile);
+  checkResult(pFile->Initialize());
+  checkResult(pFile->OpenExistingRead(pwFileName, 0));
+  checkResult(pFile->GetHeader(&pHeader));
+  assert (pHeader);
+  checkResult(pHeader->QueryInterface(IID_IAAFObject,
+									  (void**)&pHdrObj));
+  assert (pHdrObj);
+
+  dumpObject (pHdrObj);
+  if (pHdrObj) pHdrObj->Release (); pHdrObj = 0;
+  if (pHeader) pHeader->Release (); pHeader = 0;
+  if (pFile)
 	{
-		printIndent (indent, os);
-		os << "[" << i << "]: ";
-		result = dumpPropertyValue (pElemPropVal,
-			pDict,
-			indent+1,
-			os);
-		++i;
+	  pFile->Close ();
+	  pFile->Release ();
+	  pFile = 0;
 	}
-	
-	return result;
 }
 
 
-//
-// Dumps the given file.  Returns true if successful; returns false if
-// an error was encountered.
-//
-static bool dumpFile (aafCharacter * pwFileName,
-					  const char * name,
-					  ostream & os)
+struct CComInitialize
 {
-	assert (pwFileName);
-	
-	IAAFFileSP       pFile;
-	IAAFHeaderSP     pHeader;
-	IAAFObjectSP     pHdrObj;
-	IAAFDictionarySP pDict;
-	HRESULT          hr;
-	
-	hr = AAFFileOpenExistingRead (pwFileName, 0, &pFile);
-	if (! SUCCEEDED (hr))
-	{
-		cerr << "File " << name
-			<< " is either missing or is an illegal AAF file."
-			<< endl;
-		return false;
-	}
-	checkResult (pFile->GetHeader (&pHeader));
-	checkResult (pHeader->GetDictionary (&pDict));
-	checkResult (pHeader->QueryInterface (IID_IAAFObject,
-		(void**)&pHdrObj));
-	
-	hr = dumpObject (pHdrObj, pDict, 0, os);
-	if (pFile)
-	{
-		pFile->Close ();
-	}
-	return SUCCEEDED (hr) ? true : false;
-}
+  CComInitialize()
+  {
+    CoInitialize(NULL);
+  }
 
-
-// simple helper class to initialize and cleanup AAF library.
-struct CAAFInitialize
-{
-	CAAFInitialize(const char *dllname = NULL)
-	{
-		// clog << "Attempting to load the AAF dll..." << endl;
-		HRESULT hr = AAFLoad(dllname);
-		// clog << ((SUCCEEDED(hr)) ? "DONE" : "FAILED") << endl;
-	}
-	
-	~CAAFInitialize()
-	{
-		AAFUnload();
-	}
+  ~CComInitialize()
+  {
+    CoUninitialize();
+  }
 };
 
 
-static void usage (const char * progname)
-{
-	assert (progname);
-	
-	cerr << "Usage: " << progname << " <aaf-file-to-dump>" << endl;
-	cerr << "       " << progname << " -o <output-text-file>"
-		<< " <aaf-file-to-dump>" << endl;
-}
 
-
-int main(int argc, char* argv[])
+main()
 {
-	bool succeeded;
-	ostream * os = 0;
-	char * infilename = 0;
-	
-	ofstream filestream;
-	bool file_opened = false;
-	
-	CAAFInitialize aafInit;
-	
-	// If only two args are (correctly) given:
-	// argv[0] is this program's name
-	// argv[1] is the name of the AAF file to dump
-	if (argc == 2)
-	{
-		os = &cout;
-		infilename = argv[1];
-	}
-	
-	// If four args are (correctly) given:
-	// argv[0] is this program's name
-	// argv[1] is the string "-o"
-	// argv[2] is the desired name of the output text file
-	// argv[3] is the name of the AAF file to dump
-	else if (argc == 4)
-	{
-		infilename = argv[3];
-		if ( strcmp ("-o", argv[1]))
-		{
-			// If more than 2 args given, first must be "-o" flag
-			usage (argv[0]);
-			exit (1);
-		}
-		char * outfilename = argv[2];
-		filestream.open (outfilename, ios::out);
-		if (filestream.rdstate() && ios::failbit)
-		{
-			cerr << "Output file " << outfilename << " could not be"
-				<< " opened for write." << endl;
-			usage (argv[0]);
-			exit (1);
-		}
-		os = &filestream;
-		file_opened = true;
-	}
-	
-	else
-	{
-		usage (argv[0]);
-		exit (1);
-	}
-	
-	// The first argument should be an AAF file name.
-	aafCharacter pwFileName[260];
-	assert (infilename);
-	assert (os);
-	convert(pwFileName, 260, infilename);
-	
-	// clog << "***Dumping file "
-	// << infilename
-	// << " using direct prop access***)" << endl;
-	succeeded = dumpFile (pwFileName, infilename, *os);
-	
-	if (succeeded)
-	{
-		// clog << endl << "Done." << endl;
-		if (file_opened)
-			filestream.close ();
-		exit (0);
-	}
-	else
-	{
-		clog << endl
-			<< "Errors were encountered while dumping "
-			<< infilename
-			<< "." << endl;
-		if (file_opened)
-			filestream.close ();
-		exit (1);
-	}
-	
-	// Should have exited before now...
-	assert (0); // not reached
-	return 1;   // to keep compiler happy
+  CComInitialize comInit;
+  wchar_t * pwFileName = L"d:/views/main/coresw/AAF-toolkit/AAFWinSDK/Debug/Examples/Com/EssenceTest.aaf";
+
+  wprintf(L"***Dumping file %s using direct prop access)\n", pwFileName);
+  dumpFile (pwFileName);
+
+  printf("Done\n");
+
+  return(0);
 }
