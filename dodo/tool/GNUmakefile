@@ -1,25 +1,3 @@
-###############################################################################
-#
-# The contents of this file are subject to the AAF SDK Public
-# Source License Agreement (the "License"); You may not use this file
-# except in compliance with the License.  The License is available in
-# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-# Association or its successor.
-# 
-# Software distributed under the License is distributed on an "AS IS"
-# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-# the License for the specific language governing rights and limitations
-# under the License.
-# 
-# The Original Code of this file is Copyright 1998-2001, Licensor of the
-# AAF Association.
-# 
-# The Initial Developer of the Original Code of this file and the
-# Licensor of the AAF Association is Avid Technology.
-# All rights reserved.
-#
-###############################################################################
-
 PACKAGE = dodoTool
 
 AAFBASE ?= ../..
@@ -57,24 +35,24 @@ all : dodo
 
 
 .PHONY : dodo
-dodo: $(OBJDIR)/dodo$(EXE)
+dodo: $(BINDIR)/dodo$(EXE)
 
 
 .PHONY : test
-test: $(OBJDIR)/dodo.test$(EXE)
+test: $(BINDIR)/dodo.test$(EXE)
 
 
 # Note: Although all the object files are in dependencies list
 # we don't link all of them to make the target. 
 # 
-$(OBJDIR)/dodo$(EXE): $(OBJDIR) $(CXXOBJS)
+$(BINDIR)/dodo$(EXE): $(OBJDIR) $(BINDIR) $(CXXOBJS)
 	$(CC) $(CFLAGS) $(DODO_APP_OBJS) -o $@
 
 
 # Note: Although all the object files are in dependencies list
 # we don't link all of them to make the target. 
 # 
-$(OBJDIR)/dodo.test$(EXE) : $(OBJDIR) $(CXXOBJS)
+$(BINDIR)/dodo.test$(EXE) : $(OBJDIR) $(BINDIR) $(CXXOBJS)
 	$(CC) $(CFLAGS) $(DODO_TEST_OBJS) -o $@
 
 
@@ -82,8 +60,8 @@ $(OBJDIR)/dodo.test$(EXE) : $(OBJDIR) $(CXXOBJS)
 clean :
 	@$(RM) $(DODO_APP_OBJS) $(DODO_TEST_OBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(OBJDIR)/dodo$(EXE)
-	@$(RM) $(OBJDIR)/dodo.test$(EXE)
+	@$(RM) $(BINDIR)/dodo$(EXE)
+	@$(RM) $(BINDIR)/dodo.test$(EXE)
 
 
 .PHONY : realclean
