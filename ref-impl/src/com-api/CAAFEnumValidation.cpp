@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.cpp,v 1.3 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEnumValidation.cpp,v 1.4 2004/11/02 11:37:29 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -382,6 +382,7 @@ bool Is_aafFileRev_t_Valid(aafFileRev_t param)
 {
   switch (param) {
     case kAAFRev1:
+    case kAAFRev2:
       return true;
     default:
       return false;
@@ -674,12 +675,12 @@ bool Is_aafSignalStandard_t_Valid(aafSignalStandard_t param)
 {
   switch (param) {
     case kAAFSignalNone:
-    case kAAFSignalS125MInterlace:
-    case kAAFSignalS125MProgressive:
-    case kAAFSignalS347M:
-    case kAAFSignalS274M:
-    case kAAFSignalS296M:
-    case kAAFSignalS349M:
+    case kAAFSignalITU601:
+    case kAAFSignalITU1358:
+    case kAAFSignalSMPTE347M:
+    case kAAFSignalSMPTE274M:
+    case kAAFSignalSMPTE296M:
+    case kAAFSignalSMPTE349M:
       return true;
     default:
       return false;
