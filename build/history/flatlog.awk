@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: flatlog.awk,v 1.8 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: flatlog.awk,v 1.9 2004/06/14 17:41:03 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -127,7 +127,7 @@
     tag = $1;
     tagrev = $2;
     gsub(":", "", tag);
-    /* Associative array - yum ! */
+    # Associative array - yum !
     tagmap[tagrev] = tagmap[tagrev] " " tag;
   }
 }
