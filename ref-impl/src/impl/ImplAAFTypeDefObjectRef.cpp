@@ -41,7 +41,8 @@
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
+
 #include <string.h>
 
 
@@ -53,39 +54,11 @@ ImplAAFTypeDefObjectRef::~ImplAAFTypeDefObjectRef ()
 {}
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefObjectRef::Initialize (
-      const aafUID_t & id,
-      ImplAAFClassDef * pObjType,
-      const aafCharacter * pTypeName)
-{
-  AAFRESULT hr;
-  aafUID_t typeId;
-
-  if (! pObjType)  return AAFRESULT_NULL_PARAM;
-  hr = pObjType->GetAUID(&typeId);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  return pvtInitialize (id, typeId, pTypeName);
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefObjectRef::pvtInitialize (
-      const aafUID_t & /*pID*/,
-      const aafUID_t & /*pRefdObjID*/,
-      const aafCharacter * /*pTypeName*/)
-{
-  // This is a virtual function should be implemented in a derived class.
-  return AAFRESULT_INTERNAL_ERROR;
-}
-
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::CreateValue (
-      ImplAAFObject * /*pObj*/,
+      ImplAAFRoot * /*pObj*/,
       ImplAAFPropertyValue ** /*ppPropVal*/)
 {
   // This is a virtual function should be implemented in a derived class.
@@ -107,7 +80,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::GetObject (
       ImplAAFPropertyValue * /*pPropVal*/,
-      ImplAAFObject ** /*ppObject*/)
+      ImplAAFRoot ** /*ppObject*/)
 {
   // This is a virtual function should be implemented in a derived class.
   return AAFRESULT_INTERNAL_ERROR;
@@ -118,7 +91,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::SetObject (
       ImplAAFPropertyValue * /*pPropVal*/,
-      ImplAAFObject * /*ppObject*/)
+      ImplAAFRoot * /*ppObject*/)
 {
   // This is a virtual function should be implemented in a derived class.
   return AAFRESULT_INTERNAL_ERROR;
@@ -142,10 +115,16 @@ size_t ImplAAFTypeDefObjectRef::externalSize(OMByte* /*internalBytes*/,
 void ImplAAFTypeDefObjectRef::externalize(OMByte* internalBytes,
 										  size_t internalBytesSize,
 										  OMByte* externalBytes,
-										  size_t externalBytesSize,
-										  OMByteOrder /*byteOrder*/) const
+										  size_t ANAME(externalBytesSize),
+										  OMByteOrder NNAME(byteOrder)) const
 {
-  assert (externalBytesSize >= internalBytesSize);
+  TRACE("ImplAAFTypeDefObjectRef::externalize");
+  PRECONDITION("Valid internal bytes", internalBytes != 0);
+  PRECONDITION("Valid internal byte size", internalBytesSize > 0);
+  PRECONDITION("Valid external bytes", externalBytes != 0);
+  PRECONDITION("Valid external byte size", externalBytesSize > 0);
+  PRECONDITION("Internal and external sizes are equal", externalBytesSize == internalBytesSize);
+
   copy (internalBytes, externalBytes, internalBytesSize);
 }
 
@@ -160,10 +139,16 @@ size_t ImplAAFTypeDefObjectRef::internalSize(OMByte* /*externalBytes*/,
 void ImplAAFTypeDefObjectRef::internalize(OMByte* externalBytes,
 										  size_t externalBytesSize,
 										  OMByte* internalBytes,
-										  size_t internalBytesSize,
-										  OMByteOrder /*byteOrder*/) const
+										  size_t ANAME(internalBytesSize),
+										  OMByteOrder NNAME(byteOrder)) const
 {
-  assert (internalBytesSize >= externalBytesSize);
+  TRACE("ImplAAFTypeDefObjectRef::internalize");
+  PRECONDITION("Valid external bytes", externalBytes != 0);
+  PRECONDITION("Valid external byte size", externalBytesSize > 0);
+  PRECONDITION("Valid internal bytes", internalBytes != 0);
+  PRECONDITION("Valid internal byte size", internalBytesSize > 0);
+  PRECONDITION("Internal and external sizes are equal", internalBytesSize == externalBytesSize);
+		           
   copy (externalBytes, internalBytes, externalBytesSize);
 }
 
@@ -182,3 +167,17 @@ bool ImplAAFTypeDefObjectRef::IsVariableArrayable () const
 
 bool ImplAAFTypeDefObjectRef::IsStringable () const
 { return false; }
+
+
+
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefObjectRef::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefObjectRef::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}

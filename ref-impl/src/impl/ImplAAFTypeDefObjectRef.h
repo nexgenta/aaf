@@ -33,7 +33,7 @@
 
 
 class ImplAAFPropertyValue;
-
+class ImplAAFRoot;
 class ImplAAFClassDef;
 
 
@@ -60,27 +60,12 @@ protected:
 public:
 
   //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
-
-         // @parm [in] class def of objects permitted to be referenced
-         ImplAAFClassDef * pObjType,
-
-         // @parm [in, string] friendly name of this type definition
-         const aafCharacter * pTypeName);
-
-
-  //****************
   // CreateValue()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     CreateValue
         (// @parm [in] object with which to initialize this object reference
-         ImplAAFObject * pObj,
+         ImplAAFRoot * pObj,
 
          // @parm [out] newly created property value
          ImplAAFPropertyValue ** ppPropVal);
@@ -104,7 +89,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [out] pointer to object value
-         ImplAAFObject ** ppObject);
+         ImplAAFRoot ** ppObject);
 
 
   //****************
@@ -116,7 +101,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [in] pointer to object value
-         ImplAAFObject * ppObject);
+         ImplAAFRoot * ppObject);
 
 
 
@@ -148,26 +133,6 @@ public:
                            OMByteOrder byteOrder) const;
 
 
-  // Similar to Initialize(), but doesn't require a real referenced
-  // object type; can merely pass along the ref'd object's AUID.  NOT
-  // FOR CLIENT CONSUMPTION!  This is only here to break a bootstrap
-  // dependency when instantiating the first class definition:
-  //
-  // ClassDef requires
-  // ObjRefArray (array of strong object references), which requires
-  // ObjectReference, which requires
-  // ClassDef (for use as referenced type).
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
-        (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
-
-         // @parm [in] class def of objects permitted to be referenced
-         const aafUID_t & refdObjID,
-
-         // @parm [in, string] friendly name of this type definition
-         const aafCharacter * pTypeName);
 
 public:
   // Overrides from ImplAAFTypeDef
@@ -176,6 +141,10 @@ public:
   virtual bool IsFixedArrayable () const;
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 };
 
 //
