@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -42,7 +42,7 @@ template <typename UniqueIdentification, typename ReferencedObject>
 OMStrongReferenceSetProperty<UniqueIdentification,
                              ReferencedObject>::OMStrongReferenceSetProperty(
                                               const OMPropertyId propertyId,
-                                              const char* name,
+                                              const wchar_t* name,
                                               const OMPropertyId keyPropertyId)
 : OMContainerProperty<ReferencedObject>(propertyId,
                                         SF_STRONG_OBJECT_REFERENCE_SET,
@@ -70,25 +70,17 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable> and <c OMUnique>.
-  //   @parm Client context for callbacks.
   //   @this const
 template <typename UniqueIdentification, typename ReferencedObject>
 void
 OMStrongReferenceSetProperty<UniqueIdentification,
-                             ReferencedObject>::save(void* clientContext) const
+                             ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::save");
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* s = container->store();
-
-  const char* propertyName = name();
 
   // create a set index
   //
@@ -121,7 +113,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 
     // save the object
     //
-    element.save(clientContext);
+    element.save();
 
     position = position + 1;
 
@@ -130,15 +122,16 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   // save the set index
   //
   ASSERT("Valid set index", index->isValid());
-  s->save(index, name());
+  store()->save(index, name());
   delete index;
 
   // make an entry in the property index
   //
-  s->write(_propertyId,
-           _storedForm,
-           (void *)propertyName,
-           strlen(propertyName) + 1);
+  const char* propertyName = name();
+  store()->write(_propertyId,
+                 _storedForm,
+                 (void *)propertyName,
+                 strlen(propertyName) + 1);
 
 }
 
@@ -202,17 +195,15 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   //
   char* propertyName = new char[externalSize];
   ASSERT("Valid heap pointer", propertyName != 0);
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
 
-  store->read(_propertyId, _storedForm, propertyName, externalSize);
+  store()->read(_propertyId, _storedForm, propertyName, externalSize);
   ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
   delete [] propertyName;
 
   // restore the index
   //
   OMStoredSetIndex* setIndex = 0;
-  store->restore(setIndex, name());
+  store()->restore(setIndex, name());
   ASSERT("Valid set index", setIndex->isValid());
   ASSERT("Consistent key sizes",
                           setIndex->keySize() == sizeof(UniqueIdentification));

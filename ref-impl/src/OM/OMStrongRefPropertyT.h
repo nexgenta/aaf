@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -34,14 +34,18 @@
 template <typename ReferencedObject>
 OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
                                                  const OMPropertyId propertyId,
-                                                 const char* name)
+                                                 const wchar_t* name)
 : OMReferenceProperty<ReferencedObject>(propertyId,
                                         SF_STRONG_OBJECT_REFERENCE,
                                         name),
-  _reference(this, name)
+  _reference()
 {
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
+
+  char* cName = convertWideString(name);
+  _reference = OMStrongObjectReference<ReferencedObject>(this, cName);
+  delete [] cName;
 }
 
 template <typename ReferencedObject>
@@ -157,29 +161,21 @@ OMStrongReferenceProperty<ReferencedObject>::operator ReferencedObject* ()
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @parm Client context for callbacks.
   //   @this const
 template <typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::save(
-                                                     void* clientContext) const
+void OMStrongReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::save");
 
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-
   // Write the index entry.
   //
-  OMStoredObject* s = container->store();
   const char* propertyName = name();
-  s->write(_propertyId,
-           _storedForm,
-           (void *)propertyName,
-           strlen(propertyName) + 1);
+  store()->write(_propertyId,
+                 _storedForm,
+                 (void *)propertyName,
+                 strlen(propertyName) + 1);
 
-  _reference.save(clientContext);
+  _reference.save();
 
 }
 
@@ -226,10 +222,7 @@ void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
   char* storageName = new char[externalSize];
   ASSERT("Valid heap pointer", storageName != 0);
 
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  store->read(_propertyId, _storedForm, storageName, externalSize);
+  store()->read(_propertyId, _storedForm, storageName, externalSize);
   ASSERT("Consistent property size", externalSize == strlen(storageName) + 1);
   ASSERT("Consistent property name", strcmp(storageName, name()) == 0);
   delete [] storageName;
