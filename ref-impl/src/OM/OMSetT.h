@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,12 +31,12 @@
 
 #include "OMAssertions.h"
 
-template<typename Key, typename Element>
+template <typename Key, typename Element>
 OMSet<Key, Element>::OMSet()
 {
 }
 
-template<typename Key, typename Element>
+template <typename Key, typename Element>
 OMSet<Key, Element>::~OMSet()
 {
 }
