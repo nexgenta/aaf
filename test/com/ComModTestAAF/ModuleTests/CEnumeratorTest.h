@@ -33,6 +33,7 @@
 #include "AAFResult.h"
 #include "AAFSmartPointer.h"
 #include "CAAFBuiltinDefs.h"
+#include "AAFDefUIDs.h"
 
 #include <stdlib.h>
 
@@ -46,7 +47,7 @@ class CEnumeratorTest
 {
   public:
 	CEnumeratorTest() {}
-	void Run();
+	void Run(testMode_t mode);
 
   protected:
 	// "Callbacks" to count the number of items we are enumerating over, to get an
@@ -74,7 +75,7 @@ class CEnumeratorTest
 };
 
 template<class TEnum,class TItem>
-void CEnumeratorTest<TEnum,TItem>::Run()
+void CEnumeratorTest<TEnum,TItem>::Run(testMode_t mode)
 {
 	typedef IAAFSmartPointer<TEnum> TEnumSP;
 	typedef IAAFSmartPointer<TItem> TItemSP;
@@ -91,15 +92,24 @@ void CEnumeratorTest<TEnum,TItem>::Run()
 	ProductInfo.productName = L"AAF Enumerator Test";
 	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	// Remove the previous test file, if any.
-	RemoveTestFile(L"CEnumeratorTest.aaf");
+	if(mode == kAAFUnitTestReadWrite)
+		RemoveTestFile(L"CEnumeratorTest.aaf");
 
 	// Create new AAF file.
 	IAAFFileSP pFile;
-	checkResult(AAFFileOpenNewModify(L"CEnumeratorTest.aaf",0,&ProductInfo,
-		&pFile));
+	if(mode == kAAFUnitTestReadWrite)
+	{
+		checkResult(AAFFileOpenNewModify(L"CEnumeratorTest.aaf",0,&ProductInfo,
+			&pFile));
+	}
+	else
+	{
+		checkResult(AAFFileOpenExistingRead(L"CEnumeratorTest.aaf",0,&pFile));
+	}
 
 	// Get AAF header & dictionary
 	IAAFHeaderSP pHeader;

@@ -42,18 +42,21 @@ static wchar_t *manuf2URL = L"www.avid.com";
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "aafUtils.h"
+#include "AAFClassDefUIDs.h"
+#include "AAFUtils.h"
 #include "AAFCodecDefs.h"
 
 #include "CAAFBuiltinDefs.h"
 
 const aafUID_t MANUF_JEFFS_PLUGINS = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };		/* operand.expPixelFormat */
-static aafVersionType_t samplePluginVersion = { 0, 0 };//, 0, 0, kVersionReleased };
+//static aafVersionType_t samplePluginVersion = { 0, 0 };//, 0, 0, kVersionReleased };
 static aafVersionType_t sampleMinPlatformVersion = { 1, 2 }; //, 3, 4, kVersionDebug };
 static aafVersionType_t sampleMinEngineVersion = { 5, 6 }; //7, 9, kVersionPatched };
 static aafVersionType_t sampleMinAPIVersion = { 10, 11 };//, 12, 13, kAAFVersionBeta };
@@ -150,7 +153,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*	pDictionary = NULL;
   IAAFDefObject*	pPlugDef = NULL;
   IAAFCodecDef*		pCodecDef = NULL;
-  IAAFPluginDescriptor *pDesc = NULL;
+  IAAFClassDef*		pClassDef = NULL;
+  IAAFPluginDef *pDesc = NULL;
   IAAFNetworkLocator *pNetLoc = NULL, *pNetLoc2 = NULL, *pNetLoc3 = NULL;
   IAAFLocator		*pLoc = NULL, *pLoc2 = NULL, *pLoc3 = NULL;
   aafUID_t			category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
@@ -177,8 +181,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFDefObject, 
 							   (IUnknown **)&pPlugDef));
     
-	checkResult(defs.cdPluginDescriptor()->
-				CreateInstance(IID_IAAFPluginDescriptor, 
+	checkResult(defs.cdPluginDef()->
+				CreateInstance(IID_IAAFPluginDef, 
 							   (IUnknown **)&pDesc));
 	checkResult(defs.cdNetworkLocator()->
 				CreateInstance(IID_IAAFNetworkLocator, 
@@ -222,13 +226,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(pLoc2->SetPath (manuf2URL));
     checkResult(pDesc->AppendLocator(pLoc2));
 	/**/
-	checkResult(pPlugDef->AppendPluginDef(pDesc));
+	checkResult(pDesc->SetDefinitionObjectID(TestPluginDesc));
 
 	
 	checkResult(pPlugDef->QueryInterface (IID_IAAFCodecDef,
                                           (void **)&pCodecDef));
-	checkResult(pCodecDef->Initialize (NoCodec, L"TestCodec", L"Just a test"));
+	checkResult(pCodecDef->Initialize (kAAFNoCodec, L"TestCodec", L"Just a test"));
 	checkResult(pCodecDef->AddEssenceKind (defs.ddMatte()));
+	checkResult(pDictionary->LookupClassDef(kAAFClassID_EssenceDescriptor, &pClassDef));
+	checkResult(pCodecDef->SetFileDescriptorClass (pClassDef));
 	checkResult(pDictionary->RegisterCodecDef(pCodecDef));
 	/**/
 	checkResult(defs.cdNetworkLocator()->
@@ -262,6 +268,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     pNetLoc2->Release();
   if (pNetLoc3)
     pNetLoc3->Release();
+  if (pClassDef)
+    pClassDef->Release();
   if (pLoc)
     pLoc->Release();
   if (pLoc2)
@@ -296,8 +304,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFCodecDefs *pEnumPluggable = NULL;
 	IAAFCodecDef *pCodecDef = NULL;
 	IAAFDefObject *pDefObj = NULL;
-	IEnumAAFPluginDescriptors *pEnumDesc;
-	IAAFPluginDescriptor *pPlugin = NULL;
+	IEnumAAFPluginDefs *pEnumDesc;
+	IAAFPluginDef *pPlugin = NULL;
 	IAAFNetworkLocator	*pNetLoc = NULL;
 	IAAFLocator			*pLocator = NULL;
 	IEnumAAFPluginLocators *pEnumLoc = NULL;
@@ -319,10 +327,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetCodecDefs(&pEnumPluggable));
-		checkResult(pEnumPluggable->NextOne (&pCodecDef));
-		checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject, (void **)&pDefObj));
-		checkResult(pDefObj->GetPluginDefs (&pEnumDesc));
+		checkResult(pDictionary->GetPluginDefs (&pEnumDesc));
 		checkResult(pEnumDesc->NextOne (&pPlugin));
 
 		/**/
@@ -437,20 +442,26 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFPluginLocators_test()
+extern "C" HRESULT CEnumAAFPluginLocators_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFPluginLocators_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFPluginLocatorsTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFPluginLocators_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFPluginLocators_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.

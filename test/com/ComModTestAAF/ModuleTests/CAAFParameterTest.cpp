@@ -36,11 +36,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"
 
@@ -84,7 +86,8 @@ do {\
 
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -209,8 +212,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
-		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 
 
@@ -223,8 +224,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pMob));
 
-//		checkResult(CoCreateGuid((GUID *)&newUID));
-//		checkResult(pMob->SetMobID(newUID));
 		checkResult(pMob->SetName(L"AAFOperationGroupTest"));
 	  
 		// Add some slots
@@ -364,6 +363,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFParameterDef	*pParmDef = NULL;
 	IAAFParameter		*pParameter = NULL;
 	IAAFDefObject*		pDefObject = NULL;
+  IAAFMetaDefinition *pMetaDefinition = NULL;
 	IAAFSegment*		pSeg = NULL;
 	IAAFOperationGroup*			pOperationGroup = NULL;
 	IEnumAAFMobs		*mobIter = NULL;
@@ -374,7 +374,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFConstantValue		*pConstValue = NULL;
 	IAAFTypeDef			*pTypeDef = NULL;
 	bool				bFileOpen = false;
-	aafInt32			testNumParam;
+	aafUInt32			testNumParam;
 	HRESULT				hr = S_OK;
 	wchar_t				checkName[256];
 	aafNumSlots_t		s;
@@ -417,11 +417,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			pDefObject->Release();
 			pDefObject = NULL;
 			checkResult(pParameter->GetTypeDefinition (&pTypeDef));
-			checkResult(pTypeDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-			checkResult(pDefObject->GetAUID (&testUID));
+			checkResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition, (void **) &pMetaDefinition));
+			checkResult(pMetaDefinition->GetAUID (&testUID));
 			checkExpression(memcmp(&testUID, &kAAFTypeID_Rational, sizeof(testUID)) == 0, AAFRESULT_TEST_FAILED);
-			pDefObject->Release();
-			pDefObject = NULL;
+			pMetaDefinition->Release();
+			pMetaDefinition = NULL;
 
 			pParmDef->Release();
 			pParmDef = NULL;
@@ -493,6 +493,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
       
 	if (pDefObject)
 		pDefObject->Release();
+  
+  if (pMetaDefinition)
+    pMetaDefinition->Release();
 
 	if (pParmDef)
 		pParmDef->Release();
@@ -508,21 +511,26 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFParameter_test()
+extern "C" HRESULT CAAFParameter_test(testMode_t mode);
+extern "C" HRESULT CAAFParameter_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFParameterTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-		cerr << "CAAFParameter_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFParameter_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 

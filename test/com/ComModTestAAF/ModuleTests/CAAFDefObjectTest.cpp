@@ -47,31 +47,30 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 #include "AAFContainerDefs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 #include "CAAFBuiltinDefs.h"
 
 // Some handy smart pointers
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFDefObject>             IAAFDefObjectSP;
-typedef IAAFSmartPointer<IAAFPluginDescriptor>      IAAFPluginDescriptorSP;
+typedef IAAFSmartPointer<IAAFMetaDefinition>        IAAFMetaDefinitionSP;
+typedef IAAFSmartPointer<IAAFPluginDef>				IAAFPluginDescriptorSP;
 typedef IAAFSmartPointer<IAAFTypeDef>               IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefInt>            IAAFTypeDefIntSP;
-typedef IAAFSmartPointer<IEnumAAFPluginDescriptors> IEnumAAFPluginDescriptorsSP;
+typedef IAAFSmartPointer<IEnumAAFPluginDefs>		IEnumAAFPluginDescriptorsSP;
 
 
 //
 // Some guids
 //
-
-// {005DFB20-7B5B-11d3-844F-00600832ACB8}
-static const aafUID_t kTestTypeId = 
-{ 0x5dfb20, 0x7b5b, 0x11d3, { 0x84, 0x4f, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
 // {005DFB21-7B5B-11d3-844F-00600832ACB8}
 static const aafUID_t kTestPluginDescID1 = 
@@ -86,6 +85,9 @@ static const aafUID_t kTestPluginDescID3 =
 { 0x5dfb23, 0x7b5b, 0x11d3, { 0x84, 0x4f, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
 
+// {4E84045D-0F29-11d4-A359-009027DFCA6A}
+static const aafUID_t testUID = 
+{ 0x4e84045d, 0xf29, 0x11d4, { 0xa3, 0x59, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -198,67 +200,42 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-	checkResult(pContainerDef->Initialize (ContainerAAF, sName, sDescription));
+	checkResult(pContainerDef->Initialize (testUID, sName, sDescription));
 	checkResult(pDictionary->RegisterContainerDef(pContainerDef));
 
-	//
-	// Test GetAUID() using a type def
-	//
-	IAAFTypeDefIntSP pTypeDef;
-	checkResult (defs.cdTypeDefInt()->
-				 CreateInstance (IID_IAAFTypeDefInt,
-								 (IUnknown **)&pTypeDef));
-	checkResult (pTypeDef->Initialize (kTestTypeId,
-									   1,
-									   kAAFFalse,
-									   L"Test Unsigned Byte"));
 
 	//
 	// test Append, Prepend, and enum plugin descriptor using same type def
 	//
 	IAAFPluginDescriptorSP pd1;
-	checkResult (defs.cdPluginDescriptor()->
-				 CreateInstance (IID_IAAFPluginDescriptor,
+	checkResult (defs.cdPluginDef()->
+				 CreateInstance (IID_IAAFPluginDef,
 								 (IUnknown **)&pd1));
 	checkResult (pd1->Initialize (kTestPluginDescID1,
 							L"PluginDesc1",
 							L"Plugin Descriptor 1 description"));
-	checkResult (pDictionary->RegisterPluginDef (pd1));
+	checkResult(pd1->SetDefinitionObjectID(kTestPluginDescID1));
+		checkResult (pDictionary->RegisterPluginDef (pd1));
 
 	IAAFPluginDescriptorSP pd2;
-	checkResult (defs.cdPluginDescriptor()->
-				 CreateInstance (IID_IAAFPluginDescriptor,
+	checkResult (defs.cdPluginDef()->
+				 CreateInstance (IID_IAAFPluginDef,
 								 (IUnknown **)&pd2));
 	checkResult (pd2->Initialize (kTestPluginDescID2,
 							L"PluginDesc2",
 							L"Plugin Descriptor 2 description"));
+	checkResult(pd2->SetDefinitionObjectID(kTestPluginDescID2));
 	checkResult (pDictionary->RegisterPluginDef (pd2));
 
 	IAAFPluginDescriptorSP pd3;
-	checkResult (defs.cdPluginDescriptor()->
-				 CreateInstance (IID_IAAFPluginDescriptor,
+	checkResult (defs.cdPluginDef()->
+				 CreateInstance (IID_IAAFPluginDef,
 								 (IUnknown **)&pd3));
 	checkResult (pd3->Initialize (kTestPluginDescID3,
 							L"PluginDesc3",
 							L"Plugin Descriptor 3 description"));
+	checkResult(pd3->SetDefinitionObjectID(kTestPluginDescID3));
 	checkResult (pDictionary->RegisterPluginDef (pd3));
-
-	IAAFDefObjectSP pDefObj;
-	checkResult(pTypeDef->QueryInterface (IID_IAAFDefObject,
-                                          (void **)&pDefObj));
-
-	// pd2 will eventually be second one
-	checkResult (pDefObj->AppendPluginDef (pd2));
-	// pd3 will eventually be third one
-	checkResult (pDefObj->AppendPluginDef (pd3));
-	// pd1 will be first one
-	checkResult (pDefObj->PrependPluginDef (pd1));
-
-	IAAFTypeDefSP ptd;
-	checkResult(pTypeDef->QueryInterface (IID_IAAFTypeDef,
-                                          (void **)&ptd));
-	checkResult (pDictionary->RegisterTypeDef (ptd));
-
   }
   catch (HRESULT& rResult)
   {
@@ -302,6 +279,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFContainerDef*	pContainerDef = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
+	aafUID_t			readUID;
 	wchar_t				testString[256];
 
 	try
@@ -313,52 +291,38 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
 		checkResult(pDictionary->GetContainerDefs(&pPlug));
-		checkResult(pPlug->NextOne(&pContainerDef));
-		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
-                                          (void **)&pDef));
+		while(pPlug->NextOne (&pContainerDef) == AAFRESULT_SUCCESS)
+		{
+			checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject, (void **)&pDef));
+			checkResult(pDef->GetAUID(&readUID));
+			if(memcmp(&readUID, &testUID, sizeof(aafUID_t)) == 0)
+			{
+				checkResult(pDef->GetName (testString, sizeof(testString)));
+				checkExpression (wcscmp(testString, sName) == 0, AAFRESULT_TEST_FAILED);
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName) == 0, AAFRESULT_TEST_FAILED);
-
-		aafUInt32 nameLen;
-		checkResult (pDef->GetNameBufLen (&nameLen));
-		checkExpression (((wcslen (sName)+1) * sizeof (aafCharacter) == nameLen),
+				aafUInt32 nameLen;
+				checkResult (pDef->GetNameBufLen (&nameLen));
+				checkExpression (((wcslen (sName)+1) * sizeof (aafCharacter) == nameLen),
 						 AAFRESULT_TEST_FAILED);
 
-		checkResult(pDef->GetDescription (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sDescription) == 0, AAFRESULT_TEST_FAILED);
+				checkResult(pDef->GetDescription (testString, sizeof(testString)));
+				checkExpression (wcscmp(testString, sDescription) == 0, AAFRESULT_TEST_FAILED);
 
-		checkResult (pDef->GetDescriptionBufLen (&nameLen));
-		checkExpression (((wcslen (sDescription)+1) * sizeof (aafCharacter) == nameLen),
+				checkResult (pDef->GetDescriptionBufLen (&nameLen));
+				checkExpression (((wcslen (sDescription)+1) * sizeof (aafCharacter) == nameLen),
 						 AAFRESULT_TEST_FAILED);
 
-		IAAFTypeDefSP pTypeDef;
-		checkResult (pDictionary->LookupTypeDef (kTestTypeId, &pTypeDef));
+				break;
+			}
 
-		IAAFDefObjectSP pDefObj;
-		checkResult(pTypeDef->QueryInterface (IID_IAAFDefObject,
-											  (void **)&pDefObj));
+                        pDef->Release();
+                        pDef = NULL;
+                        pContainerDef->Release();
+                        pContainerDef = NULL;
 
-		aafUID_t id;
-		checkResult (pDefObj->GetAUID (&id));
-		checkExpression (0 != EqualAUID (&id, &kTestTypeId), AAFRESULT_TEST_FAILED);
+		}//		checkResult(pPlug->NextOne(&pContainerDef));
 
-		IEnumAAFPluginDescriptorsSP epd;
-		checkResult (pDefObj->GetPluginDefs (&epd));
 
-		IAAFPluginDescriptorSP pd;
-		// Check that plugin descriptors are entered in order.
-		checkResult (epd->NextOne (&pd));
-		checkResult (pd->GetAUID (&id));
-		checkExpression (0 != EqualAUID (&id, &kTestPluginDescID1), AAFRESULT_TEST_FAILED);
-
-		checkResult (epd->NextOne (&pd));
-		checkResult (pd->GetAUID (&id));
-		checkExpression (0 != EqualAUID (&id, &kTestPluginDescID2), AAFRESULT_TEST_FAILED);
-
-		checkResult (epd->NextOne (&pd));
-		checkResult (pd->GetAUID (&id));
-		checkExpression (0 != EqualAUID (&id, &kTestPluginDescID3), AAFRESULT_TEST_FAILED);
 	}
 	catch (HRESULT& rResult)
 	{
@@ -392,20 +356,26 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFDefObject_test()
+extern "C" HRESULT CAAFDefObject_test(testMode_t mode);
+extern "C" HRESULT CAAFDefObject_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFDefObjectTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFDefObject_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFDefObject_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;

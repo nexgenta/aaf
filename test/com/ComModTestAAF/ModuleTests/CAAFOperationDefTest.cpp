@@ -36,11 +36,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -71,7 +73,8 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Effects"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME1	L"A TestEffect"
 #define TEST_EFFECT_DESC1	L"A longer description of the TestEffect"
@@ -194,7 +197,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			pOperationDef = NULL;
 		}
 
-		// !!!Added circular definitions because we don't have optional properties
 		checkResult(defResults[1]->AppendDegradeToOperation (defResults[1]));
 		checkResult(defResults[2]->AppendDegradeToOperation (defResults[2]));
 		checkResult(defResults[0]->AppendDegradeToOperation (defResults[1]));
@@ -261,11 +263,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	bool				bFileOpen = false;
 	IAAFDataDefSP		pReadDataDef;
 	aafBool				readIsTimeWarp;
-	aafUInt32			catLen;
 	aafInt32			checkNumInputs;
-	aafUInt32			checkBypass, testLen;
+	aafUInt32			checkBypass;
 	HRESULT				hr = S_OK;
-	wchar_t				checkCat[256], checkName[256];
+	wchar_t				checkName[256];
+	aafUID_t			checkCat;
 	aafBool				bResult = kAAFFalse;
 
 	try
@@ -294,11 +296,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 						
 		checkResult(pOperationDef->IsTimeWarp (&readIsTimeWarp));
 		checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
-		checkResult(pOperationDef->GetCategoryBufLen (&catLen));
-		testLen = wcslen(TEST_CATEGORY);
-		checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));
-		checkExpression(wcscmp(checkCat, TEST_CATEGORY) == 0, AAFRESULT_TEST_FAILED);
-		checkExpression(testLen == wcslen(checkCat), AAFRESULT_TEST_FAILED);
+		checkResult(pOperationDef->GetCategory (&checkCat));
+		checkExpression(memcmp(&checkCat, &TEST_CATEGORY, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetBypass (&checkBypass));
 		checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
@@ -383,20 +382,26 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFOperationDef_test()
+extern "C" HRESULT CAAFOperationDef_test(testMode_t mode);
+extern "C" HRESULT CAAFOperationDef_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFOperationDefTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFOperationDef_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFOperationDef_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.

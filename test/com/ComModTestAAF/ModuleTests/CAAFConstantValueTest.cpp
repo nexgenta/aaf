@@ -36,11 +36,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -74,7 +76,8 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -197,8 +200,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
-		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
 
@@ -211,8 +212,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pMob));
 
-//		checkResult(CoCreateGuid((GUID *)&newUID));
-//		checkResult(pMob->SetMobID(newUID));
 		checkResult(pMob->SetName(L"AAFOperationGroupTest"));
 	  
 		// Add some slots
@@ -359,11 +358,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	bool				bFileOpen = false;
 	aafMobID_t			readSourceID;
 	aafBool				readIsTimeWarp;
-	aafUInt32			catLen;
-	aafInt32			checkNumInputs, testNumSources, testNumParam;
-	aafUInt32			checkBypass;
+	aafUInt32			checkBypass, testNumSources, testNumParam;
+	aafInt32			checkNumInputs;
 	HRESULT				hr = S_OK;
-	wchar_t				checkCat[256], checkName[256];
+	wchar_t				checkName[256];
+	aafUID_t			checkCat;
 	aafNumSlots_t		s;
 	aafNumSlots_t	numSlots;
 	aafUInt32			readOverride;
@@ -444,11 +443,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkExpression(wcscmp(checkName, TEST_EFFECT_DESC) == 0, AAFRESULT_TEST_FAILED);
 			pDefObject->Release();
 			pDefObject = NULL;
-			checkResult(pOperationDef->GetCategoryBufLen (&catLen));
-			testLen = wcslen(TEST_CATEGORY);
-			checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));
-			checkExpression(wcscmp(checkCat, TEST_CATEGORY) == 0, AAFRESULT_TEST_FAILED);
-			checkExpression(testLen == wcslen(checkCat), AAFRESULT_TEST_FAILED);
+			checkResult(pOperationDef->GetCategory (&checkCat));
+			checkExpression(memcmp(&checkCat, &TEST_CATEGORY, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetBypass (&checkBypass));
 			checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
@@ -547,20 +543,26 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFConstantValue_test()
+extern "C" HRESULT CAAFConstantValue_test(testMode_t mode);
+extern "C" HRESULT CAAFConstantValue_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFConstantValueTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFConstantValue_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFConstantValue_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.

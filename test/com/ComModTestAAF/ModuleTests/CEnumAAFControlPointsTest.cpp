@@ -40,9 +40,10 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFInterpolatorDefs.h"
 #include "AAFTypeDefUIDs.h"
 
@@ -77,7 +78,8 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -208,8 +210,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
-		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
 
@@ -222,8 +222,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pMob));
 
-//		checkResult(CoCreateGuid((GUID *)&newUID));
-//		checkResult(pMob->SetMobID(newUID));
 		checkResult(pMob->SetName(L"AAFOperationGroupTest"));
 	  
 		// Add some slots
@@ -401,7 +399,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFInterpolationDef	*pInterpDef = NULL;
 	bool				bFileOpen = false;
 	aafBool				readIsTimeWarp;
-	aafInt32			testNumSources, testNumParam;
+	aafUInt32			testNumSources, testNumParam;
 	HRESULT				hr = S_OK;
 	aafNumSlots_t		s;
 	aafNumSlots_t	numSlots;
@@ -643,20 +641,26 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
 
 
-extern "C" HRESULT CEnumAAFControlPoints_test()
+extern "C" HRESULT CEnumAAFControlPoints_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFControlPoints_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFControlPointsTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFControlPoints_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFControlPoints_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
