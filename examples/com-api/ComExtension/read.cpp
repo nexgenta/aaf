@@ -30,7 +30,7 @@
 
 void main ()
 {
-  const aafWChar * filename = L"foo";
+  const aafWChar * filename = L"extension.aaf";
 
   bool status = extensionRead (filename);
   if (! status)
@@ -40,5 +40,9 @@ void main ()
 		   << "." << endl;
 
 	  exit (1);
+	}
+  else
+	{
+	  cout << "Succeeded." << endl;
 	}
 }
