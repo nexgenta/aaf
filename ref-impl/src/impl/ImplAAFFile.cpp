@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFFile.h"
 
@@ -306,6 +325,8 @@ ImplAAFFile::OpenNewModify (wchar_t * pFileName,
 		if (hr != AAFRESULT_SUCCESS)
 		  return hr;
 		dictionary->InitBuiltins();
+		dictionary->InitOMProperties ();
+
 		dictionary->ReleaseReference();
 		dictionary = 0;
 
@@ -435,7 +456,17 @@ ImplAAFFile::Save ()
 	// If any new modes are added then the following line will
 	// have to be updated.
 	if (kOmCreate == _openType || kOmModify == _openType) {
+	  // Assure no registration of def objects in dictionary during
+	  // save operation
+	  ImplAAFDictionarySP dictSP;
+	  AAFRESULT hr = _head->GetDictionary(&dictSP);
+	  dictSP->AssureClassPropertyTypes ();
+	  bool regWasEnabled = dictSP->SetEnableDefRegistration (false);
+
 	  _file->save();
+
+	  dictSP->SetEnableDefRegistration (regWasEnabled);
+
 	} else {
 	  return AAFRESULT_WRONG_OPENMODE;
 	}
@@ -461,8 +492,17 @@ ImplAAFFile::SaveAs (wchar_t * pFileName,
 	if (modeFlags)
 		return AAFRESULT_BAD_FLAGS;
 
+	// Assure no registration of def objects in dictionary during
+	// save operation
+	ImplAAFDictionarySP dictSP;
+	AAFRESULT hr = _head->GetDictionary(&dictSP);
+	dictSP->AssureClassPropertyTypes ();
+	bool regWasEnabled = dictSP->SetEnableDefRegistration (false);
+
 	assert(_file);
 	_file->saveAs(pFileName);
+
+	dictSP->SetEnableDefRegistration (regWasEnabled);
 
 	return AAFRESULT_SUCCESS;
 }
