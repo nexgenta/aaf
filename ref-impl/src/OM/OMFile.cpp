@@ -32,6 +32,7 @@
 #include "OMStoredObject.h"
 #include "OMClassFactory.h"
 #include "OMObjectDirectory.h"
+#include "OMPropertyTable.h"
 #include "OMUtilities.h"
 
 #include <string.h>
@@ -54,13 +55,15 @@ OMFile::OMFile(const wchar_t* fileName,
                OMStoredObject* store,
                const OMClassFactory* factory,
                const OMLoadMode loadMode)
-: _root(0), _rootStoredObject(store), _classFactory(factory),
-  _objectDirectory(0), _mode(mode), _loadMode(loadMode), _fileName(0)
+: _root(0), _rootStoredObject(store),
+  _objectDirectory(0), _referencedProperties(0), _mode(mode),
+  _loadMode(loadMode), _fileName(0)
 {
   TRACE("OMFile::OMFile");
 
   PRECONDITION("Valid file name", validWideString(fileName));
   _fileName = saveWideString(fileName);
+  setClassFactory(factory);
   readSignature(_fileName);
   setName("/");
 }
@@ -81,17 +84,17 @@ OMFile::OMFile(const wchar_t* fileName,
                OMStoredObject* store,
                const OMClassFactory* factory,
                OMStorable* root)
-: _root(root), _rootStoredObject(store), _classFactory(factory),
-  _objectDirectory(0), _mode(mode), _loadMode(lazyLoad), _fileName(0),
-  _signature(signature)
+: _root(root), _rootStoredObject(store),
+  _objectDirectory(0), _referencedProperties(0), _mode(mode),
+  _loadMode(lazyLoad), _fileName(0), _signature(signature)
 {
   TRACE("OMFile::OMFile");
 
   PRECONDITION("Valid file name", validWideString(fileName));
   _fileName = saveWideString(fileName);
+  setClassFactory(factory);
   setName("<file>");
-  _root->setContainingObject(this);
-  _root->setName("/");
+  _root->attach(this, "/");
   _root->setStore(rootStoredObject());
 }
 
@@ -100,9 +103,10 @@ OMFile::~OMFile(void)
 {
   TRACE("OMFile::~OMFile");
 
-  _classFactory = 0;
   delete _objectDirectory;
   _objectDirectory = 0;
+  delete _referencedProperties;
+  _referencedProperties = 0;
   delete _fileName;
   _fileName = 0;
 }
@@ -161,36 +165,6 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   return newFile;
 }
 
-  // @mfunc Open a new <c OMFile> for write-only access, the
-  //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
-  //        <p factory> to create the objects. The file must not already
-  //        exist. The byte ordering on the newly created file is given
-  //        by <p byteOrder>. The root <c OMStorable> in the newly
-  //        created file is given by <p root>.
-  //   @parm The name of the file to create.
-  //   @parm The factory to use for creating objects.
-  //   @parm The byte order to use for the newly created file.
-  //   @parm The root <c OMStorable> in the newly created file.
-  //   @rdesc The newly created <c OMFile>.
-OMFile* OMFile::openNewWrite(const wchar_t* fileName,
-                             const OMClassFactory* factory,
-                             const OMByteOrder byteOrder,
-                             OMStorable* root,
-                             const OMFileSignature& signature)
-{
-  TRACE("OMFile::openNewWrite");
-  PRECONDITION("Valid file name", validWideString(fileName));
-  PRECONDITION("Valid class factory", factory != 0);
-  PRECONDITION("Valid byte order",
-                    ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
-  PRECONDITION("Valid root", root != 0);
-  PRECONDITION("Valid signature", validSignature(signature));
-
-  // Not yet implemented.
-  //
-  return 0;
-}
-
   // @mfunc Open a new <c OMFile> for modify access, the
   //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
   //        <p factory> to create the objects. The file must not already
@@ -227,32 +201,6 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
   return newFile;
 }
 
-  // @mfunc Open a new transient <c OMFile> for modify access, the
-  //        <c OMFile> is not named, use the <c OMClassFactory>
-  //        <p factory> to create the objects.
-  //        The byte ordering on the newly created file is given
-  //        by <p byteOrder>. The root <c OMStorable> in the newly
-  //        created file is given by <p root>.
-  //   @parm The factory to use for creating objects.
-  //   @parm The byte order to use for the newly created file.
-  //   @parm The root <c OMStorable> in the newly created file.
-  //   @rdesc The newly created <c OMFile>.
-OMFile* OMFile::openNewTransient(const OMClassFactory* factory,
-                                 const OMByteOrder byteOrder,
-                                 OMStorable* root)
-{
-  TRACE("OMFile::openNewTransient");
-  PRECONDITION("Valid class factory", factory != 0);
-  PRECONDITION("Valid byte order",
-                    ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
-  PRECONDITION("Valid root", root != 0);
-
-  // Not yet implemented.
-  //
-  ASSERT("Not yet implemented", false);
-  return 0;
-}
-
    // @mfunc Is <p signature> a valid signature for an <c OMFile> ?
    //   @parm The signature to check.
    //   @rdesc True if <p signature> is a valid signature for an
@@ -281,6 +229,7 @@ void OMFile::save(void* clientContext)
   if (_mode == modifyMode) {
     _root->onSave(clientContext);
     _root->save(clientContext);
+    _rootStoredObject->save(referencedProperties());
   }
 }
 
@@ -289,15 +238,14 @@ void OMFile::save(void* clientContext)
   //        must not already exist. <mf OMFile::saveAs> may be called
   //        for files opened in modify mode and for files opened in
   //        read-only and transient modes.
-  //   @parm The name of the file to open.
-  //
+  //   @parm const wchar_t* | fileName | The name of the file to open.
   //   @this const
-void OMFile::saveAs(const wchar_t* fileName) const
+void OMFile::saveAs(const wchar_t* ANAME(fileName)) const
 {
   TRACE("OMFile::saveAs");
   PRECONDITION("Valid file name", validWideString(fileName));
 
-  ASSERT("Not yet implemented", false);
+  ASSERT("Unimplemented code not reached", false);
 }
 
   // @mfunc Discard all changes made to this <c OMFile> since the
@@ -306,7 +254,7 @@ void OMFile::revert(void)
 {
   TRACE("OMFile::revert");
 
-  ASSERT("Not yet implemented", false);
+  ASSERT("Unimplemented code not reached", false);
 }
 
   // @mfunc Restore the root <c OMStorable> object from this <c OMFile>.
@@ -315,6 +263,7 @@ OMStorable* OMFile::restore(void)
 {
   TRACE("OMFile::restore");
 
+  _rootStoredObject->restore(_referencedProperties);
   _root = OMStorable::restoreFrom(this, "/", *rootStoredObject());
   return root();
 }
@@ -328,11 +277,7 @@ void OMFile::close(void)
   if (_mode == modifyMode) {
     writeSignature(_fileName);
   }
-#if 0
-  _rootStoredObject->close();
-  delete _rootStoredObject;
-  _rootStoredObject = 0;
-#endif
+  _root->detach();
 }
 
   // @mfunc Retrieve the root <c OMStorable> from this <c OMFile>.
@@ -353,14 +298,17 @@ OMStoredObject* OMFile::rootStoredObject(void)
   return _rootStoredObject;
 }
 
-  // @mfunc Retrieve the <c OMClassFactory> from this <c OMFile>.
-  //   @rdesc The <c OMClassFactory> used to create objects in this file.
-  //   @this const
-const OMClassFactory* OMFile::classFactory(void) const
+  // @mfunc Retrieve the <c OMPropertyTable> from this <c OMFile>.
+  //   @rdesc The table of referenced properties.
+OMPropertyTable* OMFile::referencedProperties(void)
 {
-  TRACE("OMFile::classFactory");
+  TRACE("OMFile::referencedProperties");
 
-  return _classFactory;
+  if (_referencedProperties == 0) {
+    _referencedProperties = new OMPropertyTable();
+    ASSERT("Valid heap pointer", _referencedProperties != 0);
+  }
+  return _referencedProperties;
 }
 
   // @mfunc Retrieve the <c OMObjectDirectory> from this <c OMFile>.
@@ -419,6 +367,48 @@ bool OMFile::isOMFile(void) const
 OMFileSignature OMFile::signature(void) const
 {
   return _signature;
+}
+
+  // @mfunc Find the property instance in this <c OMFile>
+  //        named by <p propertyPathName>.
+  //   @parm The pathname to the desired property.
+  //   @rdesc The property instance.
+  //   @this const
+OMProperty* OMFile::findPropertyPath(const char* propertyPathName) const
+{
+  TRACE("OMFile::findPropertyPath");
+  PRECONDITION("Valid property path name", validString(propertyPathName));
+  PRECONDITION("Path name is absolute", propertyPathName[0] == '/');
+  PRECONDITION("Valid root", _root != 0);
+
+  char* path = new char[strlen(propertyPathName) + 1];
+  ASSERT("Valid heap pointer", path != 0);
+  strcpy(path, propertyPathName);
+  
+  char* element = path;
+  element++; // skip first '/'
+
+  const OMStorable* storable = _root;
+  OMProperty* result = 0;
+
+  char* end = strchr(element, '/');
+  
+  while (end != 0) {
+    *end = 0;
+    storable = storable->find(element);
+    ASSERT("Valid storable pointer", storable != 0);
+    element = ++end;
+    end = strchr(element, '/');
+  }
+
+  if ((element != 0) && (strlen(element) > 0)) {
+    result = storable->findProperty(element);
+  } else {
+    result = 0;
+  }
+
+  delete [] path;
+  return result;
 }
 
 const OMClassId& OMFile::classId(void) const
