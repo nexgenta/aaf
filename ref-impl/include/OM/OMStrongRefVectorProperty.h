@@ -31,7 +31,7 @@
 
 #include "OMVector.h"
 #include "OMContainerElement.h"
-#include "OMRefVectorProperty.h"
+#include "OMStrongReferenceVector.h"
 
 template <typename ReferencedObject>
 class OMStrongReferenceVectorIterator;
@@ -46,9 +46,10 @@ class OMVectorIterator;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @base public | <c OMReferenceVectorProperty>
+  //   @base public | <c OMStrongReferenceVector>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
-class OMStrongReferenceVectorProperty : public OMReferenceVectorProperty {
+class OMStrongReferenceVectorProperty : public OMStrongReferenceVector {
 public:
   // @access Public members.
 
@@ -76,12 +77,6 @@ public:
     // @cmember The number of <p ReferencedObject>s in this
     //          <c OMStrongReferenceVectorProperty>.
   size_t count(void) const;
-
-    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
-  void getSize(size_t& size) const;
-
-    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
-  size_t getSize(void) const;
 
     // @cmember Set the value of this <c OMStrongReferenceVectorProperty>
     //          at position <p index> to <p object>.
@@ -177,7 +172,7 @@ public:
   virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceVectorProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
   // Direct property access interface
 
@@ -200,15 +195,19 @@ public:
 
     // @cmember Insert <p object> into this
     //          <c OMStrongReferenceVectorProperty>.
-  virtual void insert(const OMObject* object);
+  virtual void insertObject(const OMObject* object);
 
     // @cmember Does this <c OMStrongReferenceVectorProperty> contain
     //          <p object> ?
-  virtual bool containsValue(const OMObject* object) const;
+  virtual bool containsObject(const OMObject* object) const;
 
     // @cmember Remove <p object> from this
     //          <c OMStrongReferenceVectorProperty>.
-  virtual void removeValue(const OMObject* object);
+  virtual void removeObject(const OMObject* object);
+
+    // @cmember Remove all objects from this
+    //          <c OMStrongReferenceVectorProperty>.
+  virtual void removeAllObjects(void);
 
     // @cmember Create an <c OMReferenceContainerIterator> over this
     //          <c OMStrongReferenceVectorProperty>.
@@ -245,7 +244,7 @@ public:
 
 private:
 
-  typedef OMStrongReferenceVectorElement<ReferencedObject> VectorElement;
+  typedef OMStrongReferenceVectorElement VectorElement;
 
   typedef OMVectorIterator<VectorElement> VectorIterator;
 
