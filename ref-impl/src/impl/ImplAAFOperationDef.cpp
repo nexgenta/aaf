@@ -101,11 +101,8 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-	else
-	{
-	  return pvtInitialize(id, pName, pDesc);
-	}
-	return AAFRESULT_SUCCESS;
+
+	return pvtInitialize(id, pName, pDesc);
 }
 
 
@@ -244,7 +241,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -373,7 +369,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 
