@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: propaccess.cpp,v 1.23 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
+// $Id: propaccess.cpp,v 1.24 2004/10/28 17:12:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -239,31 +239,6 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
 
   return S_OK;
 }
-
-
-static HRESULT createRenamedRational16 (IAAFDictionary * pDict)
-{
-  IAAFTypeDefRenameSP pRenamedRational16;
-  CAAFBuiltinDefs defs (pDict);
-
-  // look up existing type
-  IAAFTypeDefSP pTDRational16;
-  PROPAGATE_RESULT(pDict->LookupTypeDef(AUID_TypeRational16,
-										&pTDRational16));
-
-  // create new (rename) type
-  PROPAGATE_RESULT(pDict->CreateMetaInstance(AUID_AAFTypeDefRename,
-                                             IID_IAAFTypeDefRename,
-                                             (IUnknown **) &pRenamedRational16));
-
-  // connect 'em up
-  PROPAGATE_RESULT(pRenamedRational16->Initialize(AUID_TypeRenamedRational16,
-												  pTDRational16,
-												  L"RenamedRational16"));
-
-  return S_OK;
-}
-
 
 
 //
@@ -541,21 +516,6 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 }
 
 
-static void convert(wchar_t* wcName, size_t length, const char* name)
-{
-  assert (name);
-  assert (*name);
-  assert (wcName);
-  assert (length > 0);
-  
-  size_t status = mbstowcs(wcName, name, length);
-  if (status == (size_t)-1) {
-    cerr << "\nError : Failed to convert \'" << name
-		 << "\' to a wide character string.\n" << endl;
-    exit(1);  
-  }
-}
-
 static void convert(char* cName, size_t length, const wchar_t* name)
 {
   assert (name);
@@ -566,44 +526,6 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   size_t status = wcstombs(cName, name, length);
   if (status == (size_t)-1) {
     cerr << "\nError : Conversion failed.\n" << endl;
-    exit(1);  
-  }
-}
-
-static void convert(char* cName, size_t length, const char* name)
-{
-  assert (name);
-  assert (*name);
-  assert (cName);
-  assert (length > 0);
-
-  size_t sourceLength = strlen(name);
-  if (sourceLength < length - 1) {
-    strncpy(cName, name, length);
-  } else {
-	cerr << "\nError : Failed to copy \'" << name
-		 << "\'.\n" << endl;
-    exit(1);  
-  }
-}
-
-static void convert(wchar_t* wName, size_t length, const wchar_t* name)
-{
-  assert (name);
-  assert (*name);
-  assert (wName);
-  assert (length > 0);
-
-  size_t sourceLength = 0;
-  while (*name)
-    ++sourceLength;
-  if (sourceLength < length - 1) {
-    // Copy the string if there is enough room in the destinition buffer.
-    while (0 != (*wName++ = *name++))
-      ;
-  } else {
-	cerr << "\nError : Failed to copy \'" << name
-		 << "\'.\n" << endl;
     exit(1);  
   }
 }

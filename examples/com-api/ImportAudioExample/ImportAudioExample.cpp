@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImportAudioExample.cpp,v 1.19 2004/10/27 14:07:16 stuart_hc Exp $ $Name:  $
+// $Id: ImportAudioExample.cpp,v 1.20 2004/10/28 17:12:25 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -194,7 +194,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	check(pHeader->CountMobs(kAAFMasterMob, &numMobs));
 	if (numMobs != 0)
 	{
-		printf("Found %ld Master Mobs\n", numMobs);
+		printf("Found %d Master Mobs\n", numMobs);
 		criteria.searchTag = kAAFByMobKind;
 		criteria.tags.mobKind = kAAFMasterMob;
 		check(pHeader->GetMobs(&criteria, &pMobIter));
@@ -263,7 +263,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 							(aafDataBuffer_t)&sampleBits, &bytesRead));
 		
 						// Output the size so we can see what's going on
-						printf("File has %ld Sample Bits.\n",sampleBits);
+						printf("File has %d Sample Bits.\n",sampleBits);
 		
 						pFormat->Release();
 						pFormat = NULL;

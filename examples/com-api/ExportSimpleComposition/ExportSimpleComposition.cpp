@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportSimpleComposition.cpp,v 1.23 2004/10/27 14:07:15 stuart_hc Exp $ $Name:  $
+// $Id: ExportSimpleComposition.cpp,v 1.24 2004/10/28 17:12:25 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,11 +58,6 @@ static aafSourceRef_t sourceRef;
 #define assert(b, msg) \
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
-
-static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
-{
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
-}
 
 #define TEST_PATH	L"SomeFile.dat"
 
@@ -460,7 +455,7 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
 	check(pHeader->CountMobs(kAAFMasterMob, &numMobs));
 	if (numMobs != 0)
 	{
-		printf("Found %ld Master Mobs\n", numMobs);
+		printf("Found %d Master Mobs\n", numMobs);
 		criteria.searchTag = kAAFByMobKind;
 		criteria.tags.mobKind = kAAFMasterMob;
 		check(pHeader->GetMobs(&criteria, &pMobIter));

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: dumper.cpp,v 1.51 2004/10/27 14:07:15 stuart_hc Exp $ $Name:  $
+// $Id: dumper.cpp,v 1.52 2004/10/28 17:12:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,41 +114,6 @@ static void convert(aafCharacter* wcName, size_t length, const char* name)
 		cerr << "Error : Failed to convert'"
 			<< name
 			<< "' to a wide character string.\n\n";
-		exit(1);  
-	}
-}
-
-
-static void convert(char* cName, size_t length, const char* name)
-{
-	assert((name && *name));
-	assert(cName != 0);
-	assert(length > 0);
-	
-	size_t sourceLength = strlen(name);
-	if (sourceLength < length - 1) {
-		strncpy(cName, name, length);
-	} else {
-		cerr << "Error : Failed to copy '" << name << "'.\n\n";
-		exit(1);  
-	}
-}
-
-static void convert(aafCharacter* wName, size_t length, const aafCharacter* name)
-{
-	assert((name && *name));
-	assert(wName != 0);
-	assert(length > 0);
-	
-	size_t sourceLength = 0;
-	while (*name)
-		++sourceLength;
-	if (sourceLength < length - 1) {
-		// Copy the string if there is enough room in the destinition buffer.
-		while (0 != (*wName++ = *name++))
-			;
-	} else {
-		cerr << "Error : Failed to copy '" << name << "'.\n\n";
 		exit(1);  
 	}
 }

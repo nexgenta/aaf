@@ -2,7 +2,7 @@
 #define __extensionUtils_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionUtils.h,v 1.14 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+// $Id: extensionUtils.h,v 1.15 2004/10/28 17:12:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -159,11 +159,6 @@ typedef aafUID_t  ePosition;
 // Contract ID type
 typedef aafUInt32 contractID_t;
 
-
-
-static void SetStringProperty (IAAFObject * pObj,
-						aafUID_constref propertyID,
-						aafCharacter_constptr strValue);
 
 bool classDefinitionIsA ( IAAFClassDef *pClassDefQuery,
 							   aafUID_constref targetAUID);
