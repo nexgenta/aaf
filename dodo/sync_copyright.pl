@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: sync_copyright.pl,v 1.4 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+# $Id: sync_copyright.pl,v 1.5 2004/03/18 14:11:27 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -142,6 +142,9 @@ sub read_copyright_message
     # Prepend the GENERATED file text...
     $copyright_message = "This file was GENERATED for the AAF SDK\n\n";
   }
+
+  # Added the Id and Name CVS keywords
+  $copyright_message .= "\$Id\$ \$Name\$\n\n";
 
   while (<COPYRIGHT_HANDLE>) {
 	s/[\n\r]//g; # rather than chomp in order to handle files downloaded on other platforms
