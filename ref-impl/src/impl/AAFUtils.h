@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.h,v 1.23 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.h,v 1.24 2004/05/10 18:39:52 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -180,6 +180,12 @@ double FloatFromRational(
 			aafRational_t	e);		/* IN - Convert this into a double */
 aafRational_t RationalFromFloat(
 			double	f);		/* IN - Convert this number into a rational */
+
+
+// URL utility functions
+void wcsconvertURLtoFilepath(wchar_t *url, wchar_t *filepath);
+void wcsconvertFilepathtoURL(wchar_t *filepath, wchar_t *url);
+
 
 #endif				/* _AAF_UTIL_API_ */
 
