@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.4 2004/05/09 03:15:50 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.5 2004/05/24 19:06:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,6 +62,15 @@ protected:
 
 public:
 
+  //****************
+  // Initialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Initialize
+        // @parm [in] Pointer to an AUID reference
+        (const aafUID_t & id,
+		 const aafCharacter *name,
+		 const aafCharacter *description);
 
   //****************
   // AddParentProperty()

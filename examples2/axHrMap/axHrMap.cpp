@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axHrMap.cpp,v 1.2 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: axHrMap.cpp,v 1.2.2.1 2004/05/24 19:06:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,7 @@ int main( int argc, char** argv )
 	try {
 		long hresult = AxStringUtil::strtoul( argv[1] );
 	
-		wcout << AxHrMap::getInstance().getStr( hresult );
+		wcout << AxHrMap::getInstance().getStr( hresult ) << endl;
 	}
 
 	catch( const AxEx& ex ) {

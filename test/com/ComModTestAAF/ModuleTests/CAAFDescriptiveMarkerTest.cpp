@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveMarkerTest.cpp,v 1.1.2.3 2004/05/14 22:01:09 jptrainor Exp $ $Name:  $
+// $Id: CAAFDescriptiveMarkerTest.cpp,v 1.1.2.4 2004/05/24 19:06:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -130,8 +130,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
     SimpleFilePointers filePointers;
     ReadSimpleAAFFile( pFileName, &filePointers );
-
-    RegisterDescriptiveTestFramework( filePointers.pDictionary );
 
     // Get slot 2 from the composition and verify that that attached
     // segment is a DescriptiveMarker.

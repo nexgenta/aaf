@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFKLVDataDefsTest.cpp,v 1.1.2.1 2004/04/27 01:27:13 jptrainor Exp $ $Name:  $
+// $Id: CEnumAAFKLVDataDefsTest.cpp,v 1.1.2.2 2004/05/24 19:06:21 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,38 +26,21 @@
 //
 //=---------------------------------------------------------------------=
 
-
-
-
-
-
-
-
-
+#include <ModuleTest.h>
 
 #include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
 
+HRESULT KLVDataDefinitionTest( aafCharacter* pFileName,
+			       aafCharacter* pTestName,
+			       testMode_t mode );
+
 // Required function prototype.
-extern "C" HRESULT CEnumAAFKLVDataDefs_test(void);
+extern "C" HRESULT CEnumAAFKLVDataDefs_test(testMode_t mode);
 
-HRESULT CEnumAAFKLVDataDefs_test()
+HRESULT CEnumAAFKLVDataDefs_test(testMode_t mode)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return KLVDataDefinitionTest( L"EnumAAFKLVDataDefTest.aaf", 
+				L"CEnumAAFKLVDataDef_test",
+				mode );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

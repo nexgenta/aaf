@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFKLVDataDefinition.cpp,v 1.1.2.3 2004/05/09 03:15:50 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFKLVDataDefinition.cpp,v 1.1.2.4 2004/05/24 19:06:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,6 +66,21 @@ ImplAAFKLVDataDefinition::ImplAAFKLVDataDefinition ()
 ImplAAFKLVDataDefinition::~ImplAAFKLVDataDefinition ()
 {}
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFKLVDataDefinition::Initialize (
+      const aafUID_t & id,
+      const aafWChar * pName,
+      const aafWChar * pDesc)
+{
+	if (pName == NULL || pDesc == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+	  return pvtInitialize(id, pName, pDesc);
+	}
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFKLVDataDefinition::AddParentProperty (
@@ -113,7 +128,7 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NULL_PARAM;
   }
 
-  if ( _klvDataTypeDef.isPresent() ) {
+  if ( !_klvDataTypeDef.isPresent() ) {
     return AAFRESULT_PROP_NOT_PRESENT;
   }
 

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.64.2.3 2004/04/18 19:38:45 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.64.2.4 2004/05/24 19:06:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -553,8 +553,8 @@ public:
   // 
   virtual AAFRESULT STDMETHODCALLTYPE
   LookupKLVDataDef (
-    // @parm [in, ref] aafUID_constref | parameterId | Parameter Unique ID
-    aafUID_constref  parameterId,
+    // @parm [in, ref] aafUID_constref | defId | KLV data definition ID
+    aafUID_constref  defId,
 
     // @parm [out,retval] AAFKLVDataDefinition | ppDef | KLVData descriptor object
     ImplAAFKLVDataDefinition ** ppDef
@@ -628,8 +628,8 @@ public:
   // 
   virtual AAFRESULT STDMETHODCALLTYPE
   LookupTaggedValueDef (
-    // @parm [in, ref] aafUID_constref | parameterId | Parameter Unique ID
-    aafUID_constref  parameterId,
+    // @parm [in, ref] aafUID_constref | defId | tagged value definition ID
+    aafUID_constref  defId,
 
     // @parm [out,retval] AAFTaggedValueDefinition | ppDef | tagged value descriptor object
     ImplAAFTaggedValueDefinition ** ppDef
