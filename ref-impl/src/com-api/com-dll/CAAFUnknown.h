@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFUnknown.h,v 1.8 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: CAAFUnknown.h,v 1.9 2004/12/14 20:40:33 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -297,7 +297,12 @@ private:
   {
     //@access Public Members
   public:
-    //@cmember Implements non-delegating <om IUnknown.QueryInterface>.
+    STDMETHOD_(void, SetParentUnknown)(CAAFUnknown *parent)
+    {
+      m_This = parent; 
+    }
+
+     //@cmember Implements non-delegating <om IUnknown.QueryInterface>.
     STDMETHOD(QueryInterface)(REFIID riid, void **ppvObjOut)
 		{
 			return This()->InternalQueryInterface(riid, ppvObjOut);
@@ -319,7 +324,9 @@ private:
     //@access Private Members
     private:
       //@cmember Return pointer to outer object's this pointer.
-      CAAFUnknown *This();
+      CAAFUnknown *This() { return m_This; }
+      CAAFUnknown *m_This; 
+
   };
 
   // so they can reference themselves in CAAFUnknown from pMainUnknown()
