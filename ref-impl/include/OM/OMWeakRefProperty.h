@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,7 +29,9 @@
 #ifndef OMWEAKREFPROPERTY_H
 #define OMWEAKREFPROPERTY_H
 
-#include "OMPropertyBase.h"
+#include "OMDataTypes.h"
+#include "OMProperty.h"
+#include "OMRefProperty.h"
 #include "OMObjectReference.h"
 
   // @class Persistent weak reference (pointer to shared object)
@@ -38,13 +40,23 @@
   //          (pointed to) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @base public | <c OMReferenceProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
-class OMWeakReferenceProperty : public OMReferenceProperty<ReferencedObject> {
+class OMWeakReferenceProperty : public OMReferenceProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMWeakReferenceProperty(const OMPropertyId propertyId, const char* name);
+  OMWeakReferenceProperty(const OMPropertyId propertyId,
+                          const wchar_t* name,
+                          const wchar_t* targetName,
+                          const OMPropertyId keyPropertyId);
+
+    // @cmember Constructor.
+  OMWeakReferenceProperty(const OMPropertyId propertyId,
+                          const wchar_t* name,
+                          const OMPropertyId keyPropertyId,
+                          const OMPropertyId* targetPropertyPath);
 
     // @cmember Destructor.
   virtual ~OMWeakReferenceProperty(void);
@@ -54,6 +66,9 @@ public:
 
     // @cmember set the value of this <c OMWeakReferenceProperty>.
   virtual ReferencedObject* setValue(const ReferencedObject* object);
+
+    // @cmember Clear the value of this <c OMWeakReferenceProperty>.
+  virtual ReferencedObject* clearValue(void);
 
     // @cmember Assignment operator.
   OMWeakReferenceProperty<ReferencedObject>& operator =
@@ -71,7 +86,7 @@ public:
   operator ReferencedObject*() const;
 
     // @cmember Save this <c OMWeakReferenceProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember close this <c OMWeakReferenceProperty>.
   virtual void close(void);
@@ -80,6 +95,9 @@ public:
     //          (persisted) size of the <c OMWeakReferenceProperty> is
     //          <p externalSize>.
   virtual void restore(size_t externalSize);
+
+    // @cmember Is this <c OMWeakReferenceProperty> void ?
+  virtual bool isVoid(void) const;
 
     // @cmember Get the raw bits of this <c OMWeakReferenceProperty>. The
     //          raw bits are copied to the buffer at address <p bits>
@@ -91,9 +109,25 @@ public:
     //          is <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
+    // @cmember Get the value of this <c OMWeakReferenceProperty>.
+  virtual OMObject* getObject(void) const;
+
+    // @cmember set the value of this <c OMWeakReferenceProperty>.
+  virtual OMObject* setObject(const OMObject* object);
+
 private:
 
+  OMPropertyTag targetTag(void) const;
+
+  OMPropertyId* targetPropertyPath(void) const;
+
+  void clearTargetTag(void) const;
+
   OMWeakObjectReference<ReferencedObject> _reference;
+  OMPropertyTag _targetTag;
+  const wchar_t* _targetName;
+  OMPropertyId* _targetPropertyPath;
+  OMPropertyId _keyPropertyId;
 
 };
 
