@@ -6,7 +6,6 @@ AAFEffectInvocation\
 AAFSegment\
 #endm
 #c
-#import ./AAFUnitTest.exp
 #import ./AAFSegment.exp
 AD_HEAD
 
@@ -18,6 +17,7 @@ AD_FORWARD_DECLARATION(AAFParameter)
 AD_FORWARD_DECLARATION(AAFParameterSlot)
 AD_FORWARD_DECLARATION(EnumAAFEffectDefinitions)
 AD_FORWARD_DECLARATION(EnumAAFControlCodeDefinitions)
+AD_FORWARD_DECLARATION(AAFSegment)
 
 /******************************************\
 *                                          *
@@ -27,6 +27,11 @@ AD_FORWARD_DECLARATION(EnumAAFControlCodeDefinitions)
 * Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
+
+AD_CLASS_UUID(3AE3BA81, 2C98, 11d2, 80, 42, 00, 60, 08, 14, 3E, 6F)
+
+AD_DEFAULT_UUID(3AE3BA82, 2C98, 11d2, 80, 42, 00, 60, 08, 14, 3E, 6F)
+
 
 AD_CLASS_BEGIN
 
@@ -119,7 +124,4 @@ AD_XMETHOD2(GetIndexedInputSegment,
 		   [out], objOut, AAFSegment, inputSegment, Input segment,
 		   Given an index\, returns the corresponding input segment.)
 
-AD_OVERRIDE(.method-Test)
-
 AD_CLASS_END
-
