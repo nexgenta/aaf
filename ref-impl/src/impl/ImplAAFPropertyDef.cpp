@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -76,28 +76,24 @@ ImplAAFPropertyDef::~ImplAAFPropertyDef ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPropertyDef::Initialize (
-      const aafUID_t * pPropertyAuid,
+    ImplAAFPropertyDef::pvtInitialize (
+      const aafUID_t & propertyAuid,
       OMPropertyId omPid,
-      wchar_t * pPropName,
-	  const aafUID_t * pTypeId,
+      const aafCharacter * pPropName,
+	  const aafUID_t & typeId,
       aafBool isOptional)
 {
   AAFRESULT hr;
 
-  if (! pPropertyAuid)       return AAFRESULT_NULL_PARAM;
-  if (! pTypeId)  return AAFRESULT_NULL_PARAM;
   if (! pPropName) return AAFRESULT_NULL_PARAM;
 
-  hr = SetAUID (pPropertyAuid);
+  hr = SetAUID (propertyAuid);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   hr = SetName (pPropName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  assert (pTypeId);
-  _Type = *pTypeId;
-
+  _Type = typeId;
   _pid = omPid;
   _IsOptional = isOptional;
 
@@ -126,7 +122,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	  // Remember that _cachedType is *not* referenced counted!
 	  ImplAAFTypeDef * tmp = 0;
-	  hr = pDict->LookupType (&typeId, &tmp);
+	  hr = pDict->LookupTypeDef (typeId, &tmp);
 	  if (AAFRESULT_FAILED (hr))
 		return hr;
 	  assert (tmp);
@@ -253,7 +249,7 @@ const char* ImplAAFPropertyDef::name(void) const
 }
 
 
-OMPropertyId ImplAAFPropertyDef::identification(void) const
+OMPropertyId ImplAAFPropertyDef::localIdentification(void) const
 {
   return _pid;
 }
