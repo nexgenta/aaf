@@ -30,15 +30,11 @@
 #define OMREFSETPROPERTY_H
 
 #include "OMContainerProperty.h"
-#include "OMObjectSet.h"
 
   // @class Abstract base class for persistent object reference set
   //        properties supported by the Object Manager.
-  //   @base public | <c OMContainerProperty>
-  //   @base public | <c OMObjectSet>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMReferenceSetProperty : public OMContainerProperty,
-                               public OMObjectSet {
+  //   @base public | <c OMProperty>
+class OMReferenceSetProperty : public OMContainerProperty {
 public:
   // @access Public members.
 

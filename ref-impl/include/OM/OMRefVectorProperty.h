@@ -30,15 +30,11 @@
 #define OMREFVECTORPROPERTY_H
 
 #include "OMContainerProperty.h"
-#include "OMObjectVector.h"
 
   // @class Abstract base class for persistent object reference vector
   //        properties supported by the Object Manager.
-  //   @base public | <c OMContainerProperty>
-  //   @base public | <c OMObjectVector>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMReferenceVectorProperty : public OMContainerProperty,
-                                  public OMObjectVector {
+  //   @base public | <c OMProperty>
+class OMReferenceVectorProperty : public OMContainerProperty {
 public:
   // @access Public members.
 
