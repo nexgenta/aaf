@@ -627,7 +627,7 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
   // NOTE: This is NOT the pointer to the COM object's implementation
   // object!
   //
-  HRESULT GetImplRep([out, string, retval] char **);
+  [local] HRESULT GetImplRep([out, retval] void **);
 }\
 #endm
 
@@ -644,7 +644,7 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
   // NOTE: This is NOT the pointer to the COM object's implementation
   // object!
   //
-  HRESULT GetImplRep([out, string, retval] char **);
+  [local] HRESULT GetImplRep([out, retval] void **);
 }\
 #endm
 
@@ -811,6 +811,23 @@ I%01 \
 #c
 #startm AD_DECLARE_FORWARD_AAFTYPES 01
 interface I%01;\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a static method used to bootstrap an AAF
+#c session by creating the first session object.
+#c
+#startm AD_BEGIN_SESSION 00
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a static method used for a container to create
+#c its contained objects in the cpp API.
+#c
+#startm AD_STATIC_CREATE 00
 #endm
 
 
