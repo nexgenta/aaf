@@ -1,11 +1,29 @@
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFParameterDef_h__
@@ -27,21 +45,22 @@
 extern "C" const aafClassID_t CLSID_EnumAAFParameterDefs;
 
 ImplEnumAAFParameterDefs::ImplEnumAAFParameterDefs ()
+: _enumProp(0), _iterator(0)
 {
 	_current = 0;
 	_enumObj = NULL;
 	_enumProp = NULL;
-	_enumStrongProp = NULL;
 }
 
 
 ImplEnumAAFParameterDefs::~ImplEnumAAFParameterDefs ()
 {
 	if (_enumObj)
-	{
 		_enumObj->ReleaseReference();
-		_enumObj = NULL;
-	}
+	_enumObj = NULL;
+	if (_iterator)
+		delete _iterator;
+	_iterator = NULL;
 }
 
 
@@ -53,61 +72,57 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUID_t			value;
 	ImplAAFHeader		*head = NULL;
 	ImplAAFDictionary	*dict = NULL;
+	AAFRESULT ar = AAFRESULT_NO_MORE_OBJECTS;
 
 	if(_enumProp != NULL)
 		numElem = _enumProp->size() / sizeof(aafUID_t);
-	else if(_enumStrongProp != NULL)
-	{
-		size_t	siz;
-		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
-	}
-	//!!!Else assert
+	else if(_iterator == NULL)
+		return(AAFRESULT_INCONSISTANCY);
 
 	if(ppParameterDef == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	if(_current >= numElem)
-		return AAFRESULT_NO_MORE_OBJECTS;
 	XPROTECT()
 	{
 		if(_enumProp != NULL)
 		{
+			if(_current >= numElem)
+				return AAFRESULT_NO_MORE_OBJECTS;
 			_enumProp->getValueAt(&value, _current);
 			CHECK(_enumObj->MyHeadObject(&head));
 			CHECK(head->GetDictionary (&dict));
-			CHECK(dict->LookupParameterDefinition(&value, ppParameterDef));
+			CHECK(dict->LookupParameterDef (value, ppParameterDef));
 			head->ReleaseReference();
 			head = NULL;
 			dict->ReleaseReference();
 			dict = NULL;
+			_current++;
+			ar = AAFRESULT_SUCCESS;
 		}
-		else if(_enumStrongProp != NULL)
+		else
 		{
-			_enumStrongProp->getValueAt(*ppParameterDef, _current);
-			(*ppParameterDef)->AcquireReference();
-		}
-		//!!!Else assert
-		_current++;
-		if (head) {
-			head->ReleaseReference();
-			head = NULL;
-		}
-		if (dict) {
-			dict->ReleaseReference();
-			dict = NULL;
+			if (_iterator->before() || _iterator->valid())
+			{
+				if (++(*_iterator))
+				{
+					*ppParameterDef = _iterator->value();
+					(*ppParameterDef)->AcquireReference();
+					ar = AAFRESULT_SUCCESS;
+				}
+			}
 		}
 	}
 	XEXCEPT
 	{
 		if(head)
-			head->ReleaseReference();
+		  head->ReleaseReference();
+		head = 0;
 		if(dict)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 	}
 	XEND;
-
-	return(AAFRESULT_SUCCESS); 
+	
+	return ar;
 }
 
 
@@ -128,15 +143,9 @@ AAFRESULT STDMETHODCALLTYPE
 	ppDef = ppParameterDefs;
 	for (numDefs = 0; numDefs < count; numDefs++)
 	{
-		hr = NextOne(ppDef);
+		hr = NextOne(&ppDef[numDefs]);
 		if (FAILED(hr))
 			break;
-
-		// Point at the next component in the array.  This
-		// will increment off the end of the array when
-		// numComps == count-1, but the for loop should
-		// prevent access to this location.
-		ppDef++;
 	}
 	
 	if (pFetched)
@@ -150,42 +159,63 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFParameterDefs::Skip (
       aafUInt32  count)
 {
-	AAFRESULT	hr;
+	AAFRESULT	ar = AAFRESULT_SUCCESS;
 	aafUInt32	newCurrent;
-	aafUInt32	numElem;
+	aafUInt32	numElem, n;
 
 	if(_enumProp != NULL)
+	{
 		numElem = _enumProp->size() / sizeof(aafUID_t);
-	else if(_enumStrongProp != NULL)
-	{
-		size_t	siz;
 		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
-	}
-	//!!!Else assert
-
-	newCurrent = _current + count;
-
-	if(newCurrent < numElem)
-	{
-		_current = newCurrent;
-		hr = AAFRESULT_SUCCESS;
+		newCurrent = _current + count;
+		
+		if(newCurrent < numElem)
+		{
+			_current = newCurrent;
+		}
+		else
+		{
+			ar = E_FAIL;
+		}
 	}
 	else
 	{
-		hr = E_FAIL;
+		
+		for(n = 1; n <= count; n++)
+		{
+			// Defined behavior of skip is to NOT advance at all if it would push us off of the end
+			if(!++(*_iterator))
+			{
+				// Off the end, increment 'n' to match the iterator, then
+				// decrement both back to the starting position
+				n++;
+				while(n >= 1)
+				{
+					--(*_iterator);
+					n--;
+				}
+				break;
+			}
+		}
 	}
 
-	return hr;
+	return ar;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFParameterDefs::Reset ()
 {
-	_current = 0;
-	return AAFRESULT_SUCCESS;
+	AAFRESULT ar = AAFRESULT_SUCCESS;
+	if(_enumProp != NULL)
+	{
+		_current = 0;
+	}
+	else
+	{
+		_iterator->reset();
+	}
+	return ar;
 }
 
 
@@ -194,28 +224,43 @@ AAFRESULT STDMETHODCALLTYPE
       ImplEnumAAFParameterDefs **ppEnum)
 {
 	ImplEnumAAFParameterDefs	*result;
-	AAFRESULT					hr;
-
+	AAFRESULT					ar = AAFRESULT_SUCCESS;
+	
 	result = (ImplEnumAAFParameterDefs *)CreateImpl(CLSID_EnumAAFParameterDefs);
 	if (result == NULL)
 		return E_FAIL;
-
+	
 	if(_enumProp != NULL)
-		hr = result->SetEnumProperty(_enumObj, _enumProp);
-	else if(_enumStrongProp != NULL)
-		hr = result->SetEnumStrongProperty(_enumObj, _enumStrongProp);
-	if (SUCCEEDED(hr))
 	{
-		result->_current = _current;
-		*ppEnum = result;
+		ar = result->SetEnumProperty(_enumObj, _enumProp);
+		if (SUCCEEDED(ar))
+		{
+			result->_current = _current;
+			*ppEnum = result;
+		}
+		else
+		{
+			result->ReleaseReference();
+			result = 0;
+			*ppEnum = NULL;
+		}
 	}
 	else
 	{
-		result->ReleaseReference();
-		*ppEnum = NULL;
+		ar = result->SetIterator(_enumObj,_iterator->copy());
+		if (SUCCEEDED(ar))
+		{
+			*ppEnum = result;
+		}
+		else
+		{
+			result->ReleaseReference();
+			result = 0;
+			*ppEnum = NULL;
+		}
 	}
 	
-	return hr;
+	return ar;
 }
 
 
@@ -223,27 +268,33 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFParameterDefs::SetEnumProperty( ImplAAFObject *pObj, parmDefWeakRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-		_enumObj->ReleaseReference();
+	  _enumObj->ReleaseReference();
+	_enumObj = 0;
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
 	_enumProp = pProp;				// Don't refcount, same lifetime as the object.
-	_enumStrongProp = NULL;
 
 	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFParameterDefs::SetEnumStrongProperty( ImplAAFObject *pObj, parmDefStrongRefArrayProp_t *pProp)
+    ImplEnumAAFParameterDefs::SetIterator(
+                        ImplAAFObject *pObj,
+                        OMReferenceContainerIterator<ImplAAFParameterDef>* iterator)
 {
+	AAFRESULT ar = AAFRESULT_SUCCESS;
+	
+	_enumProp = NULL;
 	if (_enumObj)
 		_enumObj->ReleaseReference();
+	_enumObj = 0;
+	
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
-	/**/
-	_enumStrongProp = pProp;		// Don't refcount, same lifetime as the object.
-	_enumProp = NULL;
-
-	return AAFRESULT_SUCCESS;
+	
+	delete _iterator;
+	_iterator = iterator;
+	return ar;
 }

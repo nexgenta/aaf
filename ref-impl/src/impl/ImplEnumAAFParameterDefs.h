@@ -44,7 +44,6 @@ class ImplAAFParameterDef;
 #endif
 #include "OMReferenceContainerIter.h"
 
-#include "OMVariableSizeProperty.h"
 typedef OMVariableSizeProperty<aafUID_t> parmDefWeakRefArrayProp_t;
 
 class ImplEnumAAFParameterDefs : public ImplAAFRoot
@@ -112,12 +111,16 @@ public:
 public:
   // SDK Internal 
   virtual AAFRESULT STDMETHODCALLTYPE
+    SetEnumProperty( ImplAAFObject *pObj, parmDefWeakRefArrayProp_t *pProp);
+  virtual AAFRESULT STDMETHODCALLTYPE
 	  SetIterator(ImplAAFObject *pObj,
-				OMReferenceContainerIterator* iterator);
+				OMReferenceContainerIterator<ImplAAFParameterDef>* iterator);
 
 private:
+	aafUInt32						_current;
 	ImplAAFObject					*_enumObj;
-	OMReferenceContainerIterator*	_iterator;
+	parmDefWeakRefArrayProp_t		*_enumProp;
+	OMReferenceContainerIterator<ImplAAFParameterDef>*	_iterator;
 };
 
 #endif // ! __ImplEnumAAFParameterDefs_h__
