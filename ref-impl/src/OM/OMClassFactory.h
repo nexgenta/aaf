@@ -1,51 +1,44 @@
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
+
 #ifndef OMCLASSFACTORY_H
 #define OMCLASSFACTORY_H
 
 #include "OMPortability.h"
+#include "OMDataTypes.h"
 
 class OMStorable;
 
 class OMClassFactory {
 public:
 
-  // Create with space for `capacity' entries.
-  //
-  OMClassFactory(int capacity);
-
-  // Register a class id and its associated creation function.
-  //
-  void add(int classId, OMStorable* (*create)(void));
-
-  // Deregister a class id.
-  //
-  void remove(int classId);
-
   // Create an instance of the appropriate derived class, given the class id.
   //
-  OMStorable* create(int classId) const;
-
-protected:
-
-  struct FactoryEntry;
-
-  // FactoryEntry for `classId' or null if not found.
-  //
-  FactoryEntry* find(int classId) const;
-
-  // First free entry or null if full.
-  //
-  FactoryEntry* find(void) const;
-
-private:
-
-  struct FactoryEntry {
-    int _classId;
-    OMStorable* (*_creationFunction)(void);
-    int _valid;
-  };
-
-  int _capacity;        // Number of potential entries.
-  FactoryEntry* _table; // Dynamically allocated array.
+  virtual OMStorable* create(const OMClassId& classId) const = 0;
 
 };
 

@@ -1,139 +1,116 @@
-#include <iostream.h>
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 #include "OMUtilities.h"
+
 #include "OMAssertions.h"
 
-const char* programName;
+#include <iostream.h>
+#include <string.h>
+#include <stdio.h>
+
+static char programName[FILENAME_MAX] = "Object Manager";
 
 void setProgramName(const char* name)
 {
-  programName = name;
-}
+  TRACE("setProgramName");
 
-void convert(wchar_t* wcName, size_t length, const char* name)
-{
-  TRACE("convert");
-  PRECONDITION("Valid input name", validString(name));
-  PRECONDITION("Valid output buffer", wcName != 0);
-  PRECONDITION("Valid output buffer size", length > 0);
+  PRECONDITION("Valid program name", validString(name));
 
-  size_t status  = mbstowcs(wcName, name, length);
-  if (status == -1) {
-    cerr << programName
-      << "Error : Failed to convert \""
-      << name
-      << "\" to a wide character string."
-      << endl;
-    exit(FAILURE);  
+  size_t size = strlen(name) + 1;
+  if (size >= FILENAME_MAX) {
+    size = FILENAME_MAX - 1;
   }
+  strncpy(programName, name, size);
+  programName[size] = '\0';
 }
 
-void convert(char* cName, size_t length, wchar_t* name)
+const char* getProgramName(void)
 {
-  size_t status  = wcstombs(cName, name, length);
-  if (status == -1) {
-    cerr << programName
-      << ": Error : Conversion failed."
-      << endl;
-    exit(FAILURE);  
-  }
+  return programName;
 }
 
-void formatError(DWORD errorCode)
+OMByteOrder hostByteOrder(void)
 {
-  wchar_t buffer[256];
+  TRACE("hostByteOrder");
 
-  int status = FormatMessage(
-    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    errorCode,
-    LANG_SYSTEM_DEFAULT,
-    buffer, 256,
-    NULL);
+  OMInt16 word = 0x1234;
+  OMInt8  byte = *((OMInt8*)&word);
+  OMByteOrder result;
 
-  char message[256];
+  ASSERT("Valid byte order", ((byte == 0x12) || (byte == 0x34)));
 
-  convert(message, 256, buffer);
-
-  if (status != 0) {
-    int length = strlen(message);
-    // zap cr/lf
-    if (length >= 2) {
-      message[length - 2] = '\0';
-    }
-    cerr << message << endl;
+  if (byte == 0x12) {
+    result = bigEndian;
   } else {
-    cerr << "Error code = " << hex << errorCode << dec << endl;
+    result = littleEndian;
   }
-
+  return result;
 }
 
-void printError(const char* prefix, const char* type)
+// Same as strlen(), but for wide characters.
+//
+size_t lengthOfWideString(const wchar_t* string)
 {
-  cerr << prefix << ": " << type << ": ";
-}
-
-void printName(const char* name)
-{
-  cerr << "\"" << name << "\": ";
-}
-
-int check(HRESULT resultCode)
-{
-  TRACE("check");
-
-  if (FAILED(resultCode)) {
-    printError(programName, "Error");
-    formatError(resultCode);
-    return FALSE;
-  } else {
-    return TRUE;
+  const wchar_t* p = string;
+  size_t length = 0;
+  while (*p != 0) {
+    ++length;
+    ++p;
   }
+  return length;
 }
 
-int checkFile(HRESULT resultCode, const char* fileName)
+// Same as strncpy(), but for wide characters.
+//
+wchar_t* copyWideString(wchar_t* destination,
+                        const wchar_t* source,
+                        const size_t length)
 {
-  TRACE("checkFile");
-  PRECONDITION("Valid file name", validString(fileName));
+  wchar_t* d = destination;
+  const wchar_t* s = source;
+  size_t i = 0;
 
-  if (FAILED(resultCode)) {
-    printError(programName, "File error");
-    printName(fileName);
-    formatError(resultCode);
-    return FALSE;
-  } else {
-    return TRUE;
+  for (i = 0; ((i < length) && (*s != 0)); i++) {
+    *d++ = *s++;
   }
+  for (i = i; i < length; i++) {
+    *d++ = 0;
+  }
+  return destination;
 }
 
-int checkStream(HRESULT resultCode, const char* streamName)
+size_t lengthOfOMWideString(const OMWideCharacter* string)
 {
-  TRACE("checkStream");
-  PRECONDITION("Valid stream name", validString(streamName));
-
-  if (FAILED(resultCode)) {
-    printError(programName, "Stream error");
-    printName(streamName);
-    formatError(resultCode);
-    return FALSE;
-  } else {
-    return TRUE;
+  const OMWideCharacter* p = string;
+  size_t length = 0;
+  while (*p != 0) {
+    ++length;
+    ++p;
   }
-
-}
-
-int checkStorage(HRESULT resultCode, const char* storageName)
-{
-  TRACE("checkStorage");
-  PRECONDITION("Valid storage name", validString(storageName));
-
-  if (FAILED(resultCode)) {
-    printError(programName, "Storage error");
-    printName(storageName);
-    formatError(resultCode);
-    return FALSE;
-  } else {
-    return TRUE;
-  }
-
+  return length;
 }
