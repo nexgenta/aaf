@@ -6,7 +6,6 @@ AAFParameter\
 AAFObject\
 #endm
 #c
-#import ./AAFUnitTest.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -18,7 +17,7 @@ AD_HEAD
 \******************************************/
 
 AD_INCLUDE(AAFTypes)
-AD_FORWARD_DECLARATION(AAFDataDefinition)
+AD_FORWARD_DECLARATION(AAFDataDef)
 
 AD_CLASS_UUID(9c568a82, 2096, 11d2, bf, 98, 00, 60, 97, 11, 62, 1) 
 
@@ -33,33 +32,31 @@ AD_METHOD1(SetLength,
 		   sets the length property values on the input component object.)
 
 AD_METHOD1(GetLength,
-		   [retval][out],
-		   aafLength_t,
+		   [out\\\,retval],
+		   aafLength_t *,
 		   length,
 		   Length of this component,
 		   Gets the starting time and places it into the pStartTime
 		   // argument.  This function returns the length of a component.  It
 		   // supports both 1.x and 2.x component objects.  Length is not
-		   // stored as an implicit property on 1.x objects\, so this routine
+		   // stored as an implicit property on 1.x objects\\\, so this routine
 		   // recursively calculates the length.)
 	
 AD_XMETHOD1(SetDataDefinition,
 			[in],
 			objIn,
-			AAFDataDefinition,
+			AAFDataDef,
 			datadef,
 			Data Definition of this object,
 			sets the datakind property values on the input component object.)
 
 AD_XMETHOD1(GetDataKind,
-			[retval][out],
+			[out\,retval],
 			objOut,
-			AAFDataDefinition *,
+			AAFDataDef *,
 			datadef,
 			Data Definition of this object,
 			returns datakind definition object)
-
-AD_OVERRIDE(.method-Test)
 
 AD_CLASS_END
 
