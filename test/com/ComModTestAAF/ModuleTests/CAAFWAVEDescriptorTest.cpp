@@ -1,136 +1,42 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFWAVEDescriptor
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+// @com This file implements the module test for CAAFDefinitionObject
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
-#undef WIN32_LEAN_AND_MEAN
 
 
-#include "AAF.h"
-
-#include <iostream.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "AAFTypes.h"
-#include "AAFStoredObjectIDs.h"
-#include "AAFResult.h"
-#include "ModuleTest.h"
-#include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
-
-#if !defined( OS_WINDOWS )
-
-#define WAVE_FORMAT_PCM 0x0001
-
-//typedef struct tWAVEFORMATEX
-//{
-//    WORD        wFormatTag;         /* format type */
-//    WORD        nChannels;          /* number of channels (i.e. mono, stereo...) */
- //   DWORD       nSamplesPerSec;     /* sample rate */
-//    DWORD       nAvgBytesPerSec;    /* for buffer estimation */
-//    WORD        nBlockAlign;        /* block size of data */
-//    WORD        wBitsPerSample;     /* number of bits per sample of mono data */
-//    WORD        cbSize;             /* the count in bytes of the size of */
-//				    /* extra information (after cbSize) */
-//} WAVEFORMATEX, *PWAVEFORMATEX;
 
 
-#endif  // !defined( OS_WINDOWS )
-
-
-  // Simple utilities to swap bytes.
-  static void SwapBytes(void *buffer, size_t count)
-  {
-    unsigned char *pBuffer = (unsigned char *)buffer;
-    unsigned char tmp;
-    int front = 0;
-    int back = count - 1;
-  
-    for (front = 0, back = count - 1; front < back; ++front, --back)
-    {
-      tmp = pBuffer[front];
-      pBuffer[front] = pBuffer[back];
-      pBuffer[back] = tmp;
-    }
-  }
-
-
-#if defined(_WIN32)
-#define WRITE_LONG(ptr, val) { memcpy(ptr, val, 4); ptr += 4; }
-#define WRITE_SHORT(ptr, val) { memcpy(ptr, val, 2); ptr += 2; }
-#define WRITE_CHARS(ptr, val, len) { memcpy(ptr, val, len); ptr += len; }
-#define READ_LONG(ptr, val) { memcpy(val, ptr, 4); ptr += 4; }
-#define READ_SHORT(ptr, val) { memcpy(val, ptr, 2); ptr += 2; }
-#define READ_CHARS(ptr, val, len) { memcpy(val, ptr, len); ptr += len; }
-#else
-#define WRITE_LONG(ptr, val) { memcpy(ptr, val, 4); SwapBytes(ptr,4); ptr += 4; }
-#define WRITE_SHORT(ptr, val) { memcpy(ptr, val, 2); SwapBytes(ptr,2); ptr += 2; }
-#define WRITE_CHARS(ptr, val, len) { memcpy(ptr, val, len); ptr += len; }
-#define READ_LONG(ptr, val) { memcpy(val, ptr, 4); SwapBytes(val,4); ptr += 4; }
-#define READ_SHORT(ptr, val) { memcpy(val, ptr, 2); SwapBytes(val,2); ptr += 2; }
-#define READ_CHARS(ptr, val, len) { memcpy(val, ptr, len); ptr += len; }
+#include "CAAFWAVEDescriptor.h"
+#include "CAAFWAVEDescriptor.h"
+#ifndef __CAAFWAVEDescriptor_h__
+#error - improperly defined include guard
 #endif
 
+#include <iostream.h>
+#include "AAFResult.h"
+#include "AAFDefUIDs.h"
 
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x09273e8e, 0x0406, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
+#if 0
+typedef struct tWAVEFORMATEX
 {
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
-
-// convenient error handlers.
-inline void checkResult(HRESULT r)
-{
-  if (FAILED(r))
-    throw r;
-}
-inline void checkExpression(bool expression, HRESULT r)
-{
-  if (!expression)
-    throw r;
-}
-
-
+    WORD        wFormatTag;         /* format type */
+    WORD        nChannels;          /* number of channels (i.e. mono, stereo...) */
+    DWORD       nSamplesPerSec;     /* sample rate */
+    DWORD       nAvgBytesPerSec;    /* for buffer estimation */
+    WORD        nBlockAlign;        /* block size of data */
+    WORD        wBitsPerSample;     /* number of bits per sample of mono data */
+    WORD        cbSize;             /* the count in bytes of the size of */
+				    /* extra information (after cbSize) */
+} WAVEFORMATEX, *PWAVEFORMATEX;
+#endif
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
@@ -140,29 +46,36 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFWAVEDescriptor Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productName = L"Make AVR Example";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	*ppFile = NULL;
+	hr = CoCreateInstance(CLSID_AAFFile,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFFile, 
+						   (void **)ppFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+    hr = (*ppFile)->Initialize();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
-		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
+	case kMediaOpenReadOnly:
+		hr = (*ppFile)->OpenExistingRead(pFileName, 0);
 		break;
 
-	case kAAFMediaOpenAppend:
-		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
+	case kMediaOpenAppend:
+		hr = (*ppFile)->OpenNewModify(pFileName, 0, &ProductInfo);
 		break;
 
 	default:
@@ -172,11 +85,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
@@ -195,107 +105,87 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
-	IAAFMob*	pMob = NULL;
-  IAAFWAVEDescriptor*	pWAVEDesc = NULL;
-  IAAFEssenceDescriptor*	pEssDesc = NULL;
+	aafUID_t		newUID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
+	// Create the AAF file
+	hr = OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader);
+	if (FAILED(hr))
+		return hr;
 
-  try
-  {
-    // Remove the previous test file if any.
-    RemoveTestFile(pFileName);
+	// Create a source mob
+	hr = CoCreateInstance(CLSID_AAFSourceMob,
+						NULL, 
+						CLSCTX_INPROC_SERVER, 
+						IID_IAAFSourceMob, 
+						(void **)&pSourceMob);
+	if (SUCCEEDED(hr))
+	{
+		IAAFMob*	pMob = NULL;
 
+		hr = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
+		if (SUCCEEDED(hr))
+		{
+			IAAFWAVEDescriptor*	pWAVEDesc = NULL;
 
-	  // Create the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
+			CoCreateGuid((GUID *)&newUID);
+			pMob->SetMobID(&newUID);
+			pMob->SetName(L"WAVEDescriptorTest");
+			hr = CoCreateInstance(CLSID_AAFWAVEDescriptor,
+									NULL, 
+									CLSCTX_INPROC_SERVER, 
+									IID_IAAFWAVEDescriptor, 
+									(void **)&pWAVEDesc);		
+			if (SUCCEEDED(hr))
+			{
+				IAAFEssenceDescriptor*	pEssDesc = NULL;
+				WAVEFORMATEX			summary;
 
-    // Get the AAF Dictionary so that we can create valid AAF objects.
-    checkResult(pHeader->GetDictionary(&pDictionary));
-	CAAFBuiltinDefs defs (pDictionary);
- 		
-	  // Create a source mob
-		checkResult(defs.cdSourceMob()->
-					CreateInstance(IID_IAAFSourceMob, 
-								   (IUnknown **)&pSourceMob));
-		checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
+				summary.cbSize = sizeof(WAVEFORMATEX);
+				summary.wFormatTag = WAVE_FORMAT_PCM;
+				summary.wBitsPerSample = 16;
+				summary.nAvgBytesPerSec = 88200;
+				summary.nChannels = 1;
+				summary.nBlockAlign = 2;
+				summary.nSamplesPerSec = 44100;
 
-		checkResult(pMob->SetMobID(TEST_MobID));
-		checkResult(pMob->SetName(L"WAVEDescriptorTest"));
-		checkResult(defs.cdWAVEDescriptor()->
-					CreateInstance(IID_IAAFWAVEDescriptor, 
-								   (IUnknown **)&pWAVEDesc));		
+				// NOTE: The elements in the summary structure need to be byte swapped
+				//       on Big Endian system (i.e. the MAC).
 
-		unsigned char writeBuf[18], *writePtr;
-		aafInt16	shortVal;
-		aafInt32	longVal;
+				hr = pWAVEDesc->SetSummary(sizeof(WAVEFORMATEX), (aafDataValue_t)&summary);
+				if (SUCCEEDED(hr))
+				{
+					hr = pWAVEDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc);
+					if (SUCCEEDED(hr))
+					{
+						hr = pSourceMob->SetEssenceDescriptor(pEssDesc);
+						if (SUCCEEDED(hr))
+						{
+						}
+						pEssDesc->Release();
+						pEssDesc = NULL;
+					}
+				}
+				pWAVEDesc->Release();
+				pWAVEDesc = NULL;
+			}
 
-		//typedef struct tWAVEFORMATEX
-		//{
-		//    WORD        wFormatTag;         /* format type */
-		//    WORD        nChannels;          /* number of channels (i.e. mono, stereo...) */
-		//	  DWORD       nSamplesPerSec;     /* sample rate */
-		//    DWORD       nAvgBytesPerSec;    /* for buffer estimation */
-		//    WORD        nBlockAlign;        /* block size of data */
-		//    WORD        wBitsPerSample;     /* number of bits per sample of mono data */
-		//    WORD        cbSize;             /* the count in bytes of the size of */
-		//				    /* extra information (after cbSize) */
-		//} WAVEFORMATEX, *PWAVEFORMATEX;
+			// Add the MOB to the file
+			if (SUCCEEDED(hr))
+				hr = pHeader->AppendMob(pMob);
 
-		writePtr = writeBuf;
-		shortVal = WAVE_FORMAT_PCM;
-		WRITE_SHORT(writePtr, &shortVal);	// wFormatTag
-		shortVal = 1;
-		WRITE_SHORT(writePtr, &shortVal);	// nChannels
-		longVal = 44100;
-		WRITE_LONG(writePtr, &longVal);	// nSamplesPerSec
-		longVal = 88200;
-		WRITE_LONG(writePtr, &longVal);	// nAvgBytesPerSec
-		shortVal = 2;
-		WRITE_SHORT(writePtr, &shortVal);	// nBlockAlign
-		shortVal = 16;
-		WRITE_SHORT(writePtr, &shortVal);	// wBitsPerSample
-		shortVal = 0;
-		WRITE_SHORT(writePtr, &shortVal);	// cbSize
-
-		checkResult(pWAVEDesc->SetSummary(sizeof(writeBuf), (aafDataValue_t)writeBuf));
-
-    checkResult(pWAVEDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc));
-		checkResult(pSourceMob->SetEssenceDescriptor(pEssDesc));
-
-		// Add the MOB to the file
-		checkResult(pHeader->AddMob(pMob));
+			pMob->Release();
+			pMob = NULL;
+		}
+		pSourceMob->Release();
+		pSourceMob = NULL;
 	}
-  catch (HRESULT& rResult)
-  {
-    hr = rResult;
-  }
-	
-  
-  // Cleanup and return
-  if (pEssDesc)
-    pEssDesc->Release();
 
-  if (pWAVEDesc)
-    pWAVEDesc->Release();
-
-  if (pMob)
-    pMob->Release();
-
-  if (pSourceMob)
-    pSourceMob->Release();
-
-  if (pDictionary)
-    pDictionary->Release();
-
-	if (pHeader)
-    pHeader->Release();
+	if (pHeader) pHeader->Release();
 
 	if (pFile)
 	{
-		pFile->Save();
 		pFile->Close();
 		pFile->Release();
 	}
@@ -308,83 +198,98 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IEnumAAFMobs*	pMobIter = NULL;
-	IAAFMob*	pMob = NULL;
-	IAAFSourceMob*	pSourceMob = NULL;
-	IAAFEssenceDescriptor*	pEssDesc = NULL;
-	IAAFWAVEDescriptor*	pWAVEDesc = NULL;
 	aafNumSlots_t	numMobs = 0;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
+	// Open the AAF file
+	hr = OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader);
+	if (FAILED(hr))
+		return hr;
 
-  try
-  {
-	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
-
-	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
-	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
-
-	  checkResult(pHeader->GetMobs(NULL, &pMobIter));
-		checkResult(pMobIter->NextOne(&pMob));
-		checkResult(pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob));
-		
-    // Back into testing mode
-		checkResult(pSourceMob->GetEssenceDescriptor(&pEssDesc));
-		
-    // if there is an Essence Descriptor then it MUST be an (essence) WAVE Descriptor
-		checkResult(pEssDesc->QueryInterface(IID_IAAFWAVEDescriptor, (void **) &pWAVEDesc));
-
-		unsigned char readBuf[18], *readPtr;
-		aafInt16	shortVal;
-		aafInt32	longVal;
-		  aafUInt32		size = 0;
-
-		checkResult(pWAVEDesc->GetSummaryBufferSize(&size));
-
-
-		checkResult(pWAVEDesc->GetSummary(sizeof(readBuf), (aafDataValue_t)readBuf));
-
-
-		readPtr = readBuf;
-		READ_SHORT(readPtr, &shortVal);	// wFormatTag
-		checkExpression(shortVal == WAVE_FORMAT_PCM, AAFRESULT_TEST_FAILED);
-		READ_SHORT(readPtr, &shortVal);	// nChannels
-		checkExpression(shortVal == 1, AAFRESULT_TEST_FAILED);
-		READ_LONG(readPtr, &longVal);	// nSamplesPerSec
-		checkExpression(longVal == 44100, AAFRESULT_TEST_FAILED);
-		READ_LONG(readPtr, &longVal);	// nAvgBytesPerSec
-		checkExpression(longVal == 88200, AAFRESULT_TEST_FAILED);
-		READ_SHORT(readPtr, &shortVal);	// nBlockAlign
-		checkExpression(shortVal == 2, AAFRESULT_TEST_FAILED);
-		READ_SHORT(readPtr, &shortVal);	// wBitsPerSample
-		checkExpression(shortVal == 16, AAFRESULT_TEST_FAILED);
-		READ_SHORT(readPtr, &shortVal);	// cbSize
-		checkExpression(shortVal == 0, AAFRESULT_TEST_FAILED);
+	hr = pHeader->GetNumMobs(kAllMob, &numMobs);
+	if (1 != numMobs)
+	{
+		hr = AAFRESULT_TEST_FAILED;
+		goto Cleanup;
 	}
-  catch (HRESULT& rResult)
-  {
-    hr = rResult;
-  }
-	
-  
-  // Cleanup and return
-  if (pEssDesc)
-    pEssDesc->Release();
 
-  if (pWAVEDesc)
-    pWAVEDesc->Release();
+	hr = pHeader->EnumAAFAllMobs(NULL, &pMobIter);
+	if (SUCCEEDED(hr))
+	{
+		IAAFMob*	pMob = NULL;
 
-  if (pMob)
-    pMob->Release();
+		hr = pMobIter->NextOne(&pMob);
+		if (SUCCEEDED(hr))
+		{
+			IAAFSourceMob*	pSourceMob = NULL;
 
-  if (pMobIter)
-    pMobIter->Release();
+			hr = pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob);
+			if (SUCCEEDED(hr))
+			{					 
+				IAAFEssenceDescriptor*	pEssDesc = NULL;
 
-  if (pSourceMob)
-    pSourceMob->Release();
+				// Back into testing mode
+				hr = pSourceMob->GetEssenceDescriptor(&pEssDesc);
+				if (SUCCEEDED(hr))
+				{
+					IAAFWAVEDescriptor*	pWAVEDesc = NULL;
 
-	if (pHeader)
-    pHeader->Release();
+					// if there is an Essence Descriptor then it MUST be an (essence) WAVE Descriptor
+					hr = pEssDesc->QueryInterface(IID_IAAFWAVEDescriptor, (void **) &pWAVEDesc);
+					if (SUCCEEDED(hr))
+					{
+						WAVEFORMATEX	summary;
+						aafUInt32		size = 0;
+
+						pWAVEDesc->GetSummaryBufferSize(&size);
+						if (size == sizeof(WAVEFORMATEX))
+						{
+							hr = pWAVEDesc->GetSummary(size, (aafDataValue_t)&summary);
+							if (SUCCEEDED(hr))
+							{
+								// NOTE: The elements in the summary structure need to be byte swapped
+								//       on Big Endian system (i.e. the MAC).
+
+								if (summary.cbSize != sizeof(WAVEFORMATEX)	||
+									summary.wFormatTag != WAVE_FORMAT_PCM	||
+									summary.wBitsPerSample != 16			||
+									summary.nAvgBytesPerSec != 88200		||
+									summary.nChannels != 1					||
+									summary.nBlockAlign != 2				||
+									summary.nSamplesPerSec != 44100)
+								{
+									hr = AAFRESULT_TEST_FAILED;
+								}
+							}
+						}
+						else
+						{
+							hr = AAFRESULT_TEST_FAILED;
+						}
+
+						pWAVEDesc->Release();
+						pWAVEDesc = NULL;
+					}
+					pEssDesc->Release();
+					pEssDesc = NULL;
+				}
+				else
+				{
+					hr = AAFRESULT_TEST_FAILED;
+				}
+				pSourceMob->Release();
+				pSourceMob = NULL;
+			}
+			pMob->Release();
+			pMob = NULL;
+		}
+		pMobIter->Release();
+		pMobIter = NULL;
+	}
+
+Cleanup:
+
+	if (pHeader) pHeader->Release();
 
 	if (pFile)
 	{
@@ -395,26 +300,20 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFWAVEDescriptor_test(testMode_t mode);
-extern "C" HRESULT CAAFWAVEDescriptor_test(testMode_t mode)
+HRESULT CAAFWAVEDescriptor::test()
 {
 	aafWChar*	pFileName = L"AAFWAVEDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(pFileName);
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFWAVEDescriptor_test..."
-			 << "Caught general C++ exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CAAFWAVEDescriptor::test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
