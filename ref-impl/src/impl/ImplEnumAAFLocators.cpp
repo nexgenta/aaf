@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -11,6 +12,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -31,25 +33,22 @@
 #include "aafErr.h"
 #include "AAFResult.h"
 #include "ImplAAFObjectCreation.h"
-#include "ImplAAFHeader.h"
-#include "ImplAAFDictionary.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFLocators;
 
 ImplEnumAAFLocators::ImplEnumAAFLocators ()
 {
 	_current = 0;
-	_enumObj = NULL;
-	_enumStrongProp = NULL;
+	_cEssenceDesc = NULL;
 }
 
 
 ImplEnumAAFLocators::~ImplEnumAAFLocators ()
 {
-	if (_enumObj)
+	if (_cEssenceDesc)
 	{
-		_enumObj->ReleaseReference();
-		_enumObj = NULL;
+		_cEssenceDesc->ReleaseReference();
+		_cEssenceDesc = NULL;
 	}
 }
 
@@ -57,105 +56,39 @@ ImplEnumAAFLocators::~ImplEnumAAFLocators ()
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFLocators::NextOne (ImplAAFLocator **ppLocator)
 {
-	aafUInt32			numElem;
-	if(_enumStrongProp != NULL)
-	{
-		size_t	siz;
-		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
-	}
-	else
-		return(AAFRESULT_INCONSISTANCY);
+	aafNumSlots_t	cur = _current, siz;
 
-	if(ppLocator == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	if(_current >= numElem)
-		return AAFRESULT_NO_MORE_OBJECTS;
-	XPROTECT()
+    XPROTECT()
 	{
-		if(_enumStrongProp != NULL)
+		CHECK(_cEssenceDesc->GetNumLocators (&siz));
+		if(cur < siz)
 		{
-			_enumStrongProp->getValueAt(*ppLocator, _current);
-			(*ppLocator)->AcquireReference();
+			CHECK(_cEssenceDesc->GetNthLocator (cur, ppLocator));
+			_current = ++cur;
 		}
 		else
-			RAISE(AAFRESULT_INCONSISTANCY);
-		_current++;
+			RAISE(AAFRESULT_NO_MORE_OBJECTS);
 	}
 	XEXCEPT
-	{
-	}
-	XEND;
+	XEND
 
-	return(AAFRESULT_SUCCESS); 
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFLocators::Next (aafUInt32  count,
-                           ImplAAFLocator **ppLocators,
-                           aafUInt32 *pFetched)
+    ImplEnumAAFLocators::Next (aafUInt32  /*count*/,
+                           ImplAAFLocator ** /*ppLocators*/,
+                           aafUInt32 *  /*pFetched*/)
 {
-	ImplAAFLocator		**	ppLoc;
-	aafUInt32				numDefs;
-	HRESULT					hr;
-
-	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
-		return E_INVALIDARG;
-
-	// Point at the first component in the array.
-	ppLoc = ppLocators;
-	for (numDefs = 0; numDefs < count; numDefs++)
-	{
-		hr = NextOne(ppLoc);
-		if (FAILED(hr))
-			break;
-
-		// Point at the next component in the array.  This
-		// will increment off the end of the array when
-		// numComps == count-1, but the for loop should
-		// prevent access to this location.
-		ppLoc++;
-	}
-	
-	if (pFetched)
-		*pFetched = numDefs;
-
-	return hr;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFLocators::Skip (aafUInt32 count)
+    ImplEnumAAFLocators::Skip (aafUInt32  /*count*/)
 {
-	AAFRESULT	hr;
-	aafUInt32	newCurrent;
-	aafUInt32	numElem;
-
-	if(_enumStrongProp != NULL)
-	{
-		size_t	siz;
-		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
-	}
-	else
-		return(AAFRESULT_INCONSISTANCY);
-
-	newCurrent = _current + count;
-
-	if(newCurrent < numElem)
-	{
-		_current = newCurrent;
-		hr = AAFRESULT_SUCCESS;
-	}
-	else
-	{
-		hr = E_FAIL;
-	}
-
-	return hr;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -177,8 +110,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if (result == NULL)
 		return E_FAIL;
 
-	if(_enumStrongProp != NULL)
-		hr = result->SetEnumStrongProperty(_enumObj, _enumStrongProp);
+	hr = result->SetEssenceDesc(_cEssenceDesc);
 	if (SUCCEEDED(hr))
 	{
 		result->_current = _current;
@@ -186,25 +118,28 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = NULL;
+		result->ReleaseReference();
+		*ppEnum = NULL;
 	}
 	
 	return hr;
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFLocators::SetEnumStrongProperty( ImplAAFObject *pObj, locatorStrongRefArrayProp_t *pProp)
+AAFRESULT
+    ImplEnumAAFLocators::SetEssenceDesc(ImplAAFEssenceDescriptor *pEDesc)
 {
-	if (_enumObj)
-	  _enumObj->ReleaseReference();
-	_enumObj = 0;
-	_enumObj = pObj;
-	if (pObj)
-		pObj->AcquireReference();
-	/**/
-	_enumStrongProp = pProp;		// Don't refcount, same lifetime as the object.
+	if (_cEssenceDesc)
+		_cEssenceDesc->ReleaseReference();
 
+	_cEssenceDesc = pEDesc;
+
+	if (pEDesc)
+		pEDesc->AcquireReference();
 	return AAFRESULT_SUCCESS;
 }
+
+
+extern "C" const aafClassID_t CLSID_EnumAAFLocators;
+
+OMDEFINE_STORABLE(ImplEnumAAFLocators, CLSID_EnumAAFLocators);
+
