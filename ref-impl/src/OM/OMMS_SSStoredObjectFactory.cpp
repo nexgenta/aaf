@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.2 2004/10/11 10:16:09 phil_tudor Exp $ $Name:  $
+// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.3 2004/10/22 15:51:56 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -149,8 +149,8 @@ OMMS_SSStoredObjectFactory::createFile (OMRawStorage* rawStorage,
 
 	// choose sector size based on signature from factory
 	unsigned long sectorSize=0;
-	if( OMSignature_Aaf_SSBin_512 == signature ) sectorSize=512;
-	else if( OMSignature_Aaf_SSBin_4K == signature ) sectorSize=4096;
+	if( OMSignature_Aaf512Binary == signature ) sectorSize=512;
+	else if( OMSignature_Aaf4KBinary == signature ) sectorSize=4096;
 	PRECONDITION("Valid Signature", sectorSize!=0 );
 
 	IStorage* storage = 0;
@@ -273,8 +273,8 @@ OMMS_SSStoredObjectFactory::createFile (const wchar_t* fileName,
 
 // choose sector size based on signature from factory
 	unsigned long sectorSize=0;
-	if( OMSignature_Aaf_SSBin_512 == signature ) sectorSize=512;
-	else if( OMSignature_Aaf_SSBin_4K == signature ) sectorSize=4096;
+	if( OMSignature_Aaf512Binary == signature ) sectorSize=512;
+	else if( OMSignature_Aaf4KBinary == signature ) sectorSize=4096;
 	PRECONDITION("Valid Signature", sectorSize!=0 );
 
   SSCHAR omFileName[FILENAME_MAX];
