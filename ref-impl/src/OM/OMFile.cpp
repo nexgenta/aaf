@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -34,6 +34,8 @@
 #include "OMObjectDirectory.h"
 #include "OMPropertyTable.h"
 #include "OMUtilities.h"
+#include "OMDictionary.h"
+#include "OMRootStorable.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -51,14 +53,17 @@
   //         this <c OMFile>.
   //   @parm The <e OMFile::OMLoadMode> for this <c OMFile>.
 OMFile::OMFile(const wchar_t* fileName,
+               void* clientOnRestoreContext,
                const OMAccessMode mode,
                OMStoredObject* store,
                const OMClassFactory* factory,
+               OMDictionary* dictionary,
                const OMLoadMode loadMode)
 : _root(0), _rootStoredObject(store),
+  _dictionary(dictionary),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
   _loadMode(loadMode), _fileName(0),
-  _clientOnSaveContext(0)
+  _clientOnSaveContext(0), _clientOnRestoreContext(clientOnRestoreContext)
 {
   TRACE("OMFile::OMFile");
 
@@ -80,15 +85,18 @@ OMFile::OMFile(const wchar_t* fileName,
   //         this <c OMFile>.
   //   @parm The root <c OMStorable> object to save in this file.
 OMFile::OMFile(const wchar_t* fileName,
+               void* clientOnRestoreContext,
                OMFileSignature signature,
                const OMAccessMode mode,
                OMStoredObject* store,
                const OMClassFactory* factory,
+               OMDictionary* dictionary,
                OMStorable* root)
 : _root(root), _rootStoredObject(store),
+  _dictionary(dictionary),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
   _loadMode(lazyLoad), _fileName(0), _signature(signature),
-  _clientOnSaveContext(0)
+  _clientOnSaveContext(0), _clientOnRestoreContext(clientOnRestoreContext)
 {
   TRACE("OMFile::OMFile");
 
@@ -123,7 +131,9 @@ OMFile::~OMFile(void)
   //   @rdesc The newly opened <c OMFile>.
 OMFile* OMFile::openExistingRead(const wchar_t* fileName,
                                  const OMClassFactory* factory,
-                                 const OMLoadMode loadMode)
+                                 void* clientOnRestoreContext,
+                                 const OMLoadMode loadMode,
+                                 OMDictionary* dictionary)
 {
   TRACE("OMFile::openExistingRead");
   PRECONDITION("Valid file name", validWideString(fileName));
@@ -131,9 +141,11 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
 
   OMStoredObject* store = OMStoredObject::openRead(fileName);
   OMFile* newFile = new OMFile(fileName,
+                               clientOnRestoreContext,
                                readOnlyMode,
                                store,
                                factory,
+                               dictionary,
                                loadMode);
   ASSERT("Valid heap pointer", newFile != 0);
   POSTCONDITION("Object Manager file", newFile->isOMFile());
@@ -150,7 +162,9 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
   //   @rdesc The newly opened <c OMFile>.
 OMFile* OMFile::openExistingModify(const wchar_t* fileName,
                                    const OMClassFactory* factory,
-                                   const OMLoadMode loadMode)
+                                   void* clientOnRestoreContext,
+                                   const OMLoadMode loadMode,
+                                   OMDictionary* dictionary)
 {
   TRACE("OMFile::openExistingModify");
   PRECONDITION("Valid file name", validWideString(fileName));
@@ -158,9 +172,11 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
 
   OMStoredObject* store = OMStoredObject::openModify(fileName);
   OMFile* newFile = new OMFile(fileName,
+                               clientOnRestoreContext,
                                modifyMode,
                                store,
                                factory,
+                               dictionary,
                                loadMode);
   ASSERT("Valid heap pointer", newFile != 0);
   POSTCONDITION("Object Manager file", newFile->isOMFile());
@@ -180,9 +196,11 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   //   @rdesc The newly created <c OMFile>.
 OMFile* OMFile::openNewModify(const wchar_t* fileName,
                               const OMClassFactory* factory,
+                              void* clientOnRestoreContext,
                               const OMByteOrder byteOrder,
                               OMStorable* root,
-                              const OMFileSignature& signature)
+                              const OMFileSignature& signature,
+                              OMDictionary* dictionary)
 {
   TRACE("OMFile::openNewModify");
   PRECONDITION("Valid file name", validWideString(fileName));
@@ -194,10 +212,12 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
 
   OMStoredObject* store = OMStoredObject::createModify(fileName, byteOrder);
   OMFile* newFile = new OMFile(fileName,
+                               clientOnRestoreContext,
                                signature,
                                modifyMode,
                                store,
                                factory,
+                               dictionary,
                                root);
   ASSERT("Valid heap pointer", newFile != 0);
   return newFile;
@@ -299,6 +319,13 @@ OMStoredObject* OMFile::rootStoredObject(void)
   TRACE("OMFile::rootStoredObject");
 
   return _rootStoredObject;
+}
+
+OMDictionary* OMFile::dictionary(void) const
+{
+  TRACE("OMFile::dictionary");
+
+  return _dictionary;
 }
 
   // @mfunc Retrieve the <c OMPropertyTable> from this <c OMFile>.
@@ -446,6 +473,11 @@ bool OMFile::persistent(void) const
 void* OMFile::clientOnSaveContext(void)
 {
   return _clientOnSaveContext;
+}
+
+void* OMFile::clientOnRestoreContext(void)
+{
+  return _clientOnRestoreContext;
 }
 
   // @mfunc Write the signature to the given file.
