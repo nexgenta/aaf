@@ -1,30 +1,31 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
-
-#include <stdlib.h>
-#include <string.h>
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
-
 
 #include "CAAFBuiltinDefs.h"
 
@@ -119,7 +120,7 @@ typedef IAAFSmartPointer<IAAFClassDef>          IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFDictionary>        IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFEssenceDescriptor> IAAFEssenceDescriptorSP;
 typedef IAAFSmartPointer<IAAFFile>              IAAFFileSP;
-typedef IAAFSmartPointer<IAAFAIFCDescriptor>    IAAFAIFCDescriptorSP;
+typedef IAAFSmartPointer<IAAFFileDescriptor>    IAAFFileDescriptorSP;
 typedef IAAFSmartPointer<IAAFFiller>            IAAFFillerSP;
 typedef IAAFSmartPointer<IAAFHeader>            IAAFHeaderSP;
 typedef IAAFSmartPointer<IAAFMob>               IAAFMobSP;
@@ -175,13 +176,6 @@ const aafUID_t AUID_TypeRenamedRational16 =
 const aafUID_t AUID_PropertyComponentOdor = 
 { 0x36847472, 0xd263, 0x11d2, { 0x84, 0x29, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
-//
-// new source mob id
-//{060c2b340205110101001000-13-00-00-00-{6d800930-9bcd-11d4-9f7f-080036210804}}
-static const aafMobID_t SRC_MobID = {
-{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
-0x13, 0x00, 0x00, 0x00, 
-{0x6d800930, 0x9bcd, 0x11d4, 0x9f, 0x7f, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}};
 
 
 #define PROPAGATE_RESULT(condition) \
@@ -219,9 +213,9 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
 
   // Allocate a new typedef which will represent a 16-bit rational
   IAAFTypeDefRecordSP pTDRational16;
-  PROPAGATE_RESULT(pDict->CreateMetaInstance(AUID_AAFTypeDefRecord,
-                                             IID_IAAFTypeDefRecord,
-                                             (IUnknown **) &pTDRational16));
+  PROPAGATE_RESULT(defs.cdTypeDefRecord()->
+				   CreateInstance(IID_IAAFTypeDefRecord,
+								  (IUnknown **) &pTDRational16));
   PROPAGATE_RESULT(pTDRational16->Initialize(AUID_TypeRational16,
 											 memberTypes,
 											 memberNames,
@@ -238,7 +232,7 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
 }
 
 
-static HRESULT createRenamedRational16 (IAAFDictionary * pDict)
+HRESULT createRenamedRational16 (IAAFDictionary * pDict)
 {
   IAAFTypeDefRenameSP pRenamedRational16;
   CAAFBuiltinDefs defs (pDict);
@@ -249,9 +243,9 @@ static HRESULT createRenamedRational16 (IAAFDictionary * pDict)
 										&pTDRational16));
 
   // create new (rename) type
-  PROPAGATE_RESULT(pDict->CreateMetaInstance(AUID_AAFTypeDefRename,
-                                             IID_IAAFTypeDefRename,
-                                             (IUnknown **) &pRenamedRational16));
+  PROPAGATE_RESULT(defs.cdTypeDefRename()->
+				   CreateInstance(IID_IAAFTypeDefRename,
+								  (IUnknown **) &pRenamedRational16));
 
   // connect 'em up
   PROPAGATE_RESULT(pRenamedRational16->Initialize(AUID_TypeRenamedRational16,
@@ -595,7 +589,7 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
     ++sourceLength;
   if (sourceLength < length - 1) {
     // Copy the string if there is enough room in the destinition buffer.
-    while (0 != (*wName++ = *name++))
+    while (*wName++ = *name++)
       ;
   } else {
 	cerr << "\nError : Failed to copy \'" << name
@@ -603,6 +597,46 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
     exit(1);  
   }
 }
+
+
+#if defined(_MAC) || defined(macintosh)
+// For some reason the CoCreateGuid() function is not implemented in the 
+// Microsoft Component Library...so we define something that should be
+// fairly unique on the mac.
+
+#include <Events.h>
+#include <time.h>
+
+STDAPI CoCreateGuid(GUID  *pguid)
+{
+  // {1994bd00-69de-11d2-b6bc-fcab70ff7331}
+  static GUID sTemplate = 
+    { 0x1994bd00, 0x69de, 0x11d2, { 0xb6, 0xbc, 0xfc, 0xab, 0x70, 0xff, 0x73, 0x31 } };
+
+  static bool sInitializedTemplate = false;
+  
+  if (NULL == pguid)
+    return E_INVALIDARG;
+    
+  if (!sInitializedTemplate)
+  {
+    time_t timer = time(NULL);
+    UInt32 ticks = TickCount();
+   
+    sTemplate.Data1 += timer + ticks;
+    
+    sInitializedTemplate = true;
+  }
+  
+  // Just bump the first member of the guid to emulate GUIDGEN behavior.
+  ++sTemplate.Data1;
+  
+  *pguid = sTemplate;
+  
+  return S_OK;
+}
+
+#endif
 
 
 static void ReadAAFFile(aafWChar * pFileName,
@@ -613,15 +647,6 @@ static void ReadAAFFile(aafWChar * pFileName,
 
   IAAFHeaderSP spHeader;
   check (spFile->GetHeader(&spHeader));
-
-  IAAFDictionarySP spDictionary;
-  check (spHeader->GetDictionary(&spDictionary));
-   
-  // This registration needs to be done, even though offsets were
-  // registered when file was written.  Note that if it is to be done
-  // at all, it has to be done before any attempt to read any object
-  // containing a property of this type is done.
-  check (registerRational16StructOffsets (spDictionary));
 
   IAAFMobSP spMob;
   check (spHeader->LookupMob (createdMobID, &spMob));
@@ -646,6 +671,13 @@ static void ReadAAFFile(aafWChar * pFileName,
   IAAFFillerSP spFiller;
   check (spSegment->QueryInterface(IID_IAAFFiller,
 								   (void**)&spFiller));
+
+  IAAFDictionarySP spDictionary;
+  check (spHeader->GetDictionary(&spDictionary));
+   
+  // This registration needs to be done, even though offsets were
+  // registered when file was written.
+  check (registerRational16StructOffsets (spDictionary));
 
   // We do the checking in this function.
   check (checkStinkyFiller (spDictionary, spFiller));
@@ -709,18 +741,20 @@ static void CreateAAFFile(aafWChar * pFileName,
   IAAFMobSP spMob;
   check (smob->QueryInterface (IID_IAAFMob, (void **)&spMob));
 
-  check (spMob->SetMobID(SRC_MobID));
+  aafMobID_t newMobID;
+  check (CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
+  check (spMob->SetMobID(newMobID));
   check (spMob->SetName(L"a Source Mob"));
 
-  IAAFAIFCDescriptorSP  spAIFCDesc;
-  check (defs.cdAIFCDescriptor()->
-		 CreateInstance(IID_IAAFAIFCDescriptor, 
-						(IUnknown **) &spAIFCDesc));
+  IAAFFileDescriptorSP  spFileDesc;
+  check (defs.cdFileDescriptor()->
+		 CreateInstance(IID_IAAFFileDescriptor, 
+						(IUnknown **) &spFileDesc));
   aafRational_t  audioRate = { 44100, 1 };
+  check (spFileDesc->SetSampleRate(audioRate));
 
   IAAFEssenceDescriptorSP spEssenceDesc;
-  check(spAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-  check (spAIFCDesc->QueryInterface (IID_IAAFEssenceDescriptor,
+  check (spFileDesc->QueryInterface (IID_IAAFEssenceDescriptor,
 								   (void **)&spEssenceDesc));
   check (smob->SetEssenceDescriptor (spEssenceDesc));
 
@@ -745,9 +779,25 @@ static void CreateAAFFile(aafWChar * pFileName,
   check (spFile->Close());
 
   // Return the created mob ID to the user.
-  createdMobID = SRC_MobID;
+  createdMobID = newMobID;
 }
 
+
+//
+// simple helper class to initialize and cleanup COM library.
+//
+struct CComInitialize
+{
+  CComInitialize()
+  {
+    CoInitialize(NULL);
+  }
+
+  ~CComInitialize()
+  {
+    CoUninitialize();
+  }
+};
 
 //
 // simple helper class to initialize and cleanup AAF library.
@@ -768,8 +818,9 @@ struct CAAFInitialize
 };
 
 
-int main(int /* argc */, char** /* argv */)
+main()
 {
+  CComInitialize comInit;
   CAAFInitialize aafInit;
 
   aafWChar * pwFileName = L"PropAccess.aaf";
