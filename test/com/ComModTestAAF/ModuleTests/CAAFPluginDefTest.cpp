@@ -1,16 +1,35 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFPluginDescriptor
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAF.h"
+#include "AAFPluginDefs.h"
 
 #include <iostream.h>
 
@@ -86,7 +105,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFMasterMob Test";
+	ProductInfo.productName = L"AAFPluginDescriptor Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -131,12 +150,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*	pDictionary = NULL;
   IAAFDefObject*	pPlugDef = NULL;
   IAAFCodecDef*		pCodecDef = NULL;
-  IAAFPluginDescriptor *pDesc;
-  IAAFNetworkLocator *pNetLoc, *pNetLoc2, *pNetLoc3;
-  IAAFLocator		*pLoc, *pLoc2, *pLoc3;
+  IAAFPluginDescriptor *pDesc = NULL;
+  IAAFNetworkLocator *pNetLoc = NULL, *pNetLoc2 = NULL, *pNetLoc3 = NULL;
+  IAAFLocator		*pLoc = NULL, *pLoc2 = NULL, *pLoc3 = NULL;
   aafUID_t			category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
   bool				bFileOpen = false;
-  aafUID_t			uid;
 	HRESULT			hr = S_OK;
 /*	long			test;
 */
@@ -154,25 +172,25 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
     
-	checkResult(pDictionary->CreateInstance(&AUID_AAFCodecDef,
+	checkResult(pDictionary->CreateInstance(AUID_AAFCodecDef,
 							  IID_IAAFDefObject, 
 							  (IUnknown **)&pPlugDef));
     
-	checkResult(pDictionary->CreateInstance(&AUID_AAFPluginDescriptor,
+	checkResult(pDictionary->CreateInstance(AUID_AAFPluginDescriptor,
 							  IID_IAAFPluginDescriptor, 
 							  (IUnknown **)&pDesc));
-	checkResult(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+	checkResult(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
 							  IID_IAAFNetworkLocator, 
 							  (IUnknown **)&pNetLoc));
 	checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
                                           (void **)&pLoc));
 	checkResult(pLoc->SetPath (manuf2URL));
 
-	checkResult(pDesc->Init (&TestPluginDesc, L"Test Plugin", L"TestPlugin Description"));
-	checkResult(pDesc->SetCategoryClass(&category));
+	checkResult(pDesc->Initialize (TestPluginDesc, L"Test Plugin", L"TestPlugin Description"));
+	checkResult(pDesc->SetCategoryClass(category));
 	checkResult(pDesc->SetPluginVersionString(manufRev));
     checkResult(pDesc->SetManufacturerInfo(pNetLoc));
-    checkResult(pDesc->SetManufacturerID(&manufacturer));
+    checkResult(pDesc->SetManufacturerID(manufacturer));
     checkResult(pDesc->SetPluginManufacturerName(manufName));
     checkResult(pDesc->SetIsSoftwareOnly(AAFTrue));
     checkResult(pDesc->SetIsAccelerated(AAFFalse));
@@ -181,21 +199,21 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 //!!!	aafProductVersion_t samplePluginVersion = { 0, 0, 0, 0, kVersionReleased };
     /**/
     checkResult(pDesc->SetHardwarePlatform(kAAFPlatformIndependant));
-    checkResult(pDesc->SetPlatformMinimumVersion(&sampleMinPlatformVersion));
-    checkResult(pDesc->SetPlatformMaximumVersion(&sampleMaxPlatformVersion));
+    checkResult(pDesc->SetPlatformMinimumVersion(sampleMinPlatformVersion));
+    checkResult(pDesc->SetPlatformMaximumVersion(sampleMaxPlatformVersion));
     /**/
  	checkResult(pDesc->SetEngine(kAAFNoEngine));
-    checkResult(pDesc->SetEngineMinimumVersion(&sampleMinEngineVersion));
-    checkResult(pDesc->SetEngineMaximumVersion(&sampleMaxEngineVersion));
+    checkResult(pDesc->SetEngineMinimumVersion(sampleMinEngineVersion));
+    checkResult(pDesc->SetEngineMaximumVersion(sampleMaxEngineVersion));
     /**/
 	checkResult(pDesc->SetPluginAPI(kAAFEssencePluginAPI));
-    checkResult(pDesc->SetPluginAPIMinimumVersion(&sampleMinAPIVersion));
-    checkResult(pDesc->SetPluginAPIMaximumVersion(&sampleMaxAPIVersion));
+    checkResult(pDesc->SetPluginAPIMinimumVersion(sampleMinAPIVersion));
+    checkResult(pDesc->SetPluginAPIMaximumVersion(sampleMaxAPIVersion));
 
 	checkResult(pDictionary->RegisterPluginDescriptor (	pDesc));
 
 	  /**/
-	checkResult(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+	checkResult(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
 							  IID_IAAFNetworkLocator, 
 							  (IUnknown **)&pNetLoc2));
 	checkResult(pNetLoc2->QueryInterface (IID_IAAFLocator,
@@ -208,11 +226,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	
 	checkResult(pPlugDef->QueryInterface (IID_IAAFCodecDef,
                                           (void **)&pCodecDef));
-	uid = DDEF_Matte;
-	checkResult(pCodecDef->AppendEssenceKind (&uid));
+	checkResult(pCodecDef->AppendEssenceKind (DDEF_Matte));
 	checkResult(pDictionary->RegisterCodecDefinition(pCodecDef));
 	/**/
-	checkResult(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+	checkResult(pDictionary->CreateInstance( AUID_AAFNetworkLocator,
 							  IID_IAAFNetworkLocator, 
 							  (IUnknown **)&pNetLoc3));
 	checkResult(pNetLoc3->QueryInterface (IID_IAAFLocator,
@@ -228,8 +245,32 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
   // Cleanup and return
+  if (pDesc)
+    pDesc->Release();
+
   if (pPlugDef)
     pPlugDef->Release();
+
+  if (pNetLoc)
+    pNetLoc->Release();
+
+  if (pNetLoc2)
+    pNetLoc2->Release();
+
+  if (pNetLoc3)
+    pNetLoc3->Release();
+
+  if (pLoc)
+    pLoc->Release();
+
+  if (pLoc2)
+    pLoc2->Release();
+
+  if (pLoc3)
+    pLoc3->Release();
+
+  if (pCodecDef)
+    pCodecDef->Release();
 
   if (pDictionary)
     pDictionary->Release();
@@ -308,6 +349,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
                                           (void **)&pLoc));
 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		pNetLoc->Release();
+		pNetLoc = NULL;
+		pLoc->Release();
+		pLoc = NULL;
 		checkExpression (wcscmp(testString, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
 		checkResult(pPlugin->GetManufacturerID(&testUID));
 		checkExpression(EqualAUID(&testUID, &manufacturer) == AAFTrue, AAFRESULT_TEST_FAILED);
@@ -338,8 +383,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkExpression (count == 2, AAFRESULT_TEST_FAILED);
 		checkResult(pPlugin->EnumPluginLocators(&pEnumLoc));
 
-		pLoc->Release(); // this local variable was already has a reference that must be released!
-		pLoc = NULL;
 		checkResult(pEnumLoc->NextOne (&pLoc));
  		checkResult(pLoc->GetPath (testString, sizeof(testString)));
 		checkExpression (wcscmp(testString, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
@@ -365,6 +408,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	// Cleanup and return
 	if (pEnumLoc)
 		pEnumLoc->Release();
+
+	if (pEnumPluggable)
+		pEnumPluggable->Release();
 
 	if (pLoc)
 		pLoc->Release();
@@ -418,13 +464,13 @@ extern "C" HRESULT CAAFPluginDescriptor_test()
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
-	if (SUCCEEDED(hr))
-	{
-		cout << "The following IAAFPluginDescriptor methods have not been implemented:" << endl;       
-		cout << "     GetPluggableCode" << endl; 
-		cout << "     IsPluginLocal" << endl; 
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-	}
+//	if (SUCCEEDED(hr))
+//	{
+//		cout << "The following IAAFPluginDescriptor methods have not been implemented:" << endl;       
+//		cout << "     GetPluggableCode" << endl; 
+//		cout << "     IsPluginLocal" << endl; 
+//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+//	}
 
 	return hr;
 }

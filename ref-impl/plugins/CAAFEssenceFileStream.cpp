@@ -1,31 +1,34 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "CAAFEssenceFileStream.h"
 #include "CAAFEssenceFileContainer.h"
 
 #include <assert.h>
-#include <string.h>
-#include <stdlib.h>
 #include "AAFResult.h"
 
 #include <errno.h>
@@ -35,19 +38,20 @@
 
 
 
+
 //
 // NOTE: The following two routines will have to be rewritten
-// if fpos_t is defined to be a structure or aafPosition_t is a 
+// if fpos_t is defined to be a structure or aafInt64 is a 
 // structure.
 //
-/*inline*/ bool AafPos2AnsiPos(fpos_t *ansiPos, const aafPosition_t *aafPos)
+/*inline*/ bool AafPos2AnsiPos(fpos_t *ansiPos, const aafInt64 *aafPos)
 {
   // For first version just assume that platform an perform conversion.
-  if (sizeof(fpos_t) < sizeof(aafPosition_t))
+  if (sizeof(fpos_t) < sizeof(aafInt64))
   {
     // The following test assumes 64 bit arithematic!
-    aafPosition_t trunPos = (AAFCONSTINT64(0x00000000FFFFFFFF) & *aafPos);
-    if (trunPos != *aafPos && AAFCONSTINT64(0xFFFFFFFFFFFFFFFF) != *aafPos)
+    aafInt64 trunPos = (0x00000000FFFFFFFF & *aafPos);
+    if (trunPos != *aafPos && 0xFFFFFFFFFFFFFFFF != *aafPos)
       return false;
 
     *ansiPos = *aafPos;
@@ -59,7 +63,7 @@
 }
 
 
-/*inline*/ bool AnsiPos2AafPos(aafPosition_t *aafPos, const fpos_t *ansiPos)
+/*inline*/ bool AnsiPos2AafPos(aafInt64 *aafPos, const fpos_t *ansiPos)
 {
   // For first version just assume that platform an perform conversion.
   *aafPos = *ansiPos;
@@ -159,7 +163,7 @@ void CAAFEssenceFileStream::RemoveFileStreamFromContainer()
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileStream::Init (const aafCharacter * pFilePath,
-        aafMobID_constptr pMobID)
+        const aafUID_t * pMobID)
 {
   if (NULL == pFilePath)
     return E_INVALIDARG;
@@ -180,7 +184,7 @@ HRESULT STDMETHODCALLTYPE
   charCount = i + 1; // include the terminating null.
 
   // Copy the wide character path name.
-  _pwPath = new wchar_t[charCount];
+  _pwPath = (wchar_t *)CoTaskMemAlloc(charCount * sizeof(wchar_t));
   if (NULL == _pwPath)
     return AAFRESULT_NOMEMORY;
   for (i = 0; i < charCount; ++i)
@@ -190,7 +194,7 @@ HRESULT STDMETHODCALLTYPE
   // Allocate the maximum possible multibyte string for the current
   // locale.
   size_t byteCount = (MB_CUR_MAX * (charCount - 1)) + 1;
-  _pPath = new char[byteCount];
+  _pPath = (char *)CoTaskMemAlloc(byteCount);
   if (NULL == _pPath)
     return AAFRESULT_NOMEMORY;
   size_t convertedBytes = wcstombs( _pPath, _pwPath, byteCount);
@@ -201,10 +205,10 @@ HRESULT STDMETHODCALLTYPE
   // Copy the optional mobID it it exists.
   if (pMobID)
   {
-    _pMobID = new aafMobID_t;
-    if (NULL == _pMobID)
+    _pMobID = (aafUID_t *)CoTaskMemAlloc(sizeof(aafUID_t));
+    if (NULL == _pwPath)
       return AAFRESULT_NOMEMORY;
-    memcpy(_pMobID, pMobID, sizeof(aafMobID_t));
+    memcpy(_pMobID, pMobID, sizeof(aafUID_t));
   }
 
 
@@ -217,19 +221,19 @@ void CAAFEssenceFileStream::CleanupBuffers(void)
 {
   if (_pwPath)
   {
-    delete [] _pwPath;
+    CoTaskMemFree((void *)_pwPath);
     _pwPath = NULL;
   }
 
   if (_pMobID)
   {
-    delete _pMobID;
+    CoTaskMemFree((void *)_pMobID);
     _pMobID = NULL;
   }
 
   if (_pPath)
   {
-    delete [] _pPath;
+    CoTaskMemFree((void *)_pPath);
     _pPath = NULL;
   }
 }
@@ -311,7 +315,7 @@ CAAFEssenceFileStream::FileStreamOp CAAFEssenceFileStream::SetStreamOp(FileStrea
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileStream::Create (const aafCharacter *  pFilePath,
-        aafMobID_constptr  pMobID)
+        const aafUID_t *  pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -340,7 +344,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileStream::OpenRead (const aafCharacter * pFilePath,
-        aafMobID_constptr pMobID)
+        const aafUID_t * pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -364,7 +368,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileStream::OpenAppend (const aafCharacter * pFilePath,
-        aafMobID_constptr  pMobID)
+        const aafUID_t *  pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -414,16 +418,14 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Write (
-      aafUInt32 bytes,
-      aafDataBuffer_t  buffer,
-      aafUInt32 * bytesWritten)
+    CAAFEssenceFileStream::Write (aafDataBuffer_t  buffer,
+        aafInt32  buflen)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
-  if (NULL == buffer || NULL == bytesWritten)
+  if (NULL == buffer)
     return E_INVALIDARG;
-  if (0 > bytes)
+  if (0 > buflen)
     return E_INVALIDARG;
   if (openRead == _streamMode)
     return AAFRESULT_NOT_WRITEABLE;
@@ -447,8 +449,8 @@ HRESULT STDMETHODCALLTYPE
   // Write the given data to the file at the current file
   // position.
   errno = 0;
-  *bytesWritten = fwrite(buffer, 1, bytes, _pFile);
-  if (*bytesWritten != (size_t)bytes)
+  size_t bytesWritten = fwrite(buffer, 1, buflen, _pFile);
+  if (bytesWritten != (size_t)buflen)
   { // What error code should we return?
     long err = errno;
 
@@ -506,7 +508,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Seek (aafPosition_t  byteOffset)
+    CAAFEssenceFileStream::Seek (aafInt64  byteOffset)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -556,7 +558,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::IsPosValid (aafPosition_t  byteOffset,
+    CAAFEssenceFileStream::IsPosValid (aafInt64  byteOffset,
         aafBool *  isValid)
 {
   if (NULL == _pFile) 
@@ -564,18 +566,18 @@ HRESULT STDMETHODCALLTYPE
   if (NULL == isValid)
     return E_INVALIDARG;
   
-  *isValid = kAAFFalse;
+  *isValid = AAFFalse;
 
   if (0 < byteOffset)
   {
-    aafLength_t length = 0;
+    aafInt64 length = 0;
     HRESULT hr = GetLength(&length);
     if (AAFRESULT_SUCCESS != hr)
       return hr;
 
     if (byteOffset < length)
     {
-      *isValid = kAAFTrue;
+      *isValid = AAFTrue;
     }
     else if (byteOffset == length)
     {
@@ -584,7 +586,7 @@ HRESULT STDMETHODCALLTYPE
         // we don't know whether or not the next
         // file operation will be a read or a write
         // so we just return true.
-        *isValid = kAAFTrue;
+        *isValid = AAFTrue;
       }
     }
   }
@@ -594,7 +596,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::GetPosition (aafPosition_t *  position)
+    CAAFEssenceFileStream::GetPosition (aafInt64 *  position)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -629,7 +631,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::GetLength (aafLength_t *  position)
+    CAAFEssenceFileStream::GetLength (aafInt64 *  position)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -673,7 +675,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::SetCacheSize (aafUInt32  itsSize)
+    CAAFEssenceFileStream::SetCacheSize (aafInt32  itsSize)
 {
   // PRE-CONDITION
   // Ansi states that setvbuf should be called before the first read or write
@@ -704,10 +706,6 @@ HRESULT STDMETHODCALLTYPE
 //
 // 
 // 
-inline int EQUAL_UID(const GUID & a, const GUID & b)
-{
-  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
-}
 HRESULT CAAFEssenceFileStream::InternalQueryInterface
 (
     REFIID riid,
@@ -719,13 +717,13 @@ HRESULT CAAFEssenceFileStream::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IAAFEssenceStream interface
-    if (EQUAL_UID(riid,IID_IAAFEssenceStream)) 
+    if (riid == IID_IAAFEssenceStream) 
     { 
         *ppvObj = (IAAFEssenceStream *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
+    else if (riid == IID_IAAFPlugin) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
