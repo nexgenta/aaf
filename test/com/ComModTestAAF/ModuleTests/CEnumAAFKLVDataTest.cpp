@@ -167,12 +167,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult(pHeader->GetDictionary(&pDictionary));
 	  CAAFBuiltinDefs defs (pDictionary);
  		
-		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(kTestUID1, pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(kTestUID2, pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(kTestUID3, pBaseType));
-
-		//Make the first mob
+	  //Make the first mob
 	  long	test;
 	  aafRational_t	audioRate = { 44100, 1 };
 
@@ -190,7 +185,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdKLVData()->
 					CreateInstance(IID_IAAFKLVData, 
 								   (IUnknown **)&pData));
-		checkResult(pData->Initialize(*(KLVTags[test]), sizeof(KLVfrowney), (unsigned char *)KLVData[test]));
+		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
+		checkResult(pData->Initialize(*(KLVTags[test]), sizeof(KLVfrowney), (unsigned char *)KLVData[test], pBaseType));
 		checkResult(pMob->AppendKLVData (pData));
 		pData->Release();
 		pData = NULL;
@@ -282,8 +278,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   IEnumAAFKLVData* pKLVIterator = NULL;
   IEnumAAFKLVData* pCloneIterator = NULL;
   IAAFKLVData*		pData = NULL;
-	IAAFDictionary*		pDictionary = NULL;
-	IAAFTypeDef*		pBaseType = NULL;
 
   IAAFMobSlot		*slot = NULL;
   aafProductIdentification_t	ProductInfo;
@@ -312,11 +306,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->GetDictionary(&pDictionary));
-		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(kTestUID1, pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(kTestUID2, pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(kTestUID3, pBaseType));
 
 	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
@@ -401,12 +390,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   if (slotIter)
     slotIter->Release();
 
-  if (pDictionary)
-    pDictionary->Release();
-
-  if (pBaseType)
-    pBaseType->Release();
-
   if (pData)
     pData->Release();
 
@@ -450,7 +433,7 @@ extern "C" HRESULT CEnumAAFKLVData_test()
 	catch (...)
 	{
 	  cerr << "CEnumAAFKLVData_test...Caught general C++"
-		   << " exception!" << endl; 
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
