@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.12 2004/03/26 12:15:23 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -36,20 +36,20 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR) \
 	   -I../../ss-impl/ref
 
 
-ifeq ($(AAFPLATFORM),SunSunOS)
-
+ifeq ($(AAFPLATFORM),SparcSolaris)
 .PHONY : all
-
 else
+ifeq ($(AAFPLATFORM),PPCDarwin)
 .PHONY : all
+else
+
 all : $(OBJDIR) $(AAFSDKBINDIR)/dump$(EXE)
-
-
 
 $(AAFSDKBINDIR)/dump$(EXE) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) $(RPATH_OPT) -L$(AAFSDKLIBDIR) $(LIBCIO) -o $@ \
 	$(AAFBUILDDIR)/ss-impl/librefstg$(LIB)
 
+endif 
 endif 
 
 .PHONY : clean
