@@ -34,8 +34,9 @@
 
 class OMProperty;
 
-  // @class Pointer elements of Object Manager vectors.
+  // @class Pointer elements of non-persistent Object Manager vectors.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMVectorElement {
 public:
@@ -77,8 +78,9 @@ private:
 
 };
 
-  // @class Pointer elements of Object Manager sets.
+  // @class Pointer elements of non-persistent Object Manager sets.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMSetElement : public OMVectorElement<ReferencedObject> {
 public:
@@ -118,6 +120,7 @@ public:
   //          reference 
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ObjectReference, typename ReferencedObject>
 class OMContainerElement {
 public:
@@ -191,6 +194,7 @@ protected:
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMContainerElement>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMStrongReferenceVectorElement : public
                  OMContainerElement<OMStrongObjectReference<ReferencedObject>,
@@ -243,6 +247,7 @@ private:
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMContainerElement>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetElement : public
                              OMStrongReferenceVectorElement<ReferencedObject> {
@@ -308,6 +313,7 @@ private:
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMContainerElement>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMWeakReferenceVectorElement : public
                    OMContainerElement<OMWeakObjectReference<ReferencedObject>,
@@ -351,6 +357,7 @@ public:
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMContainerElement>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMWeakReferenceSetElement : public
                    OMContainerElement<OMWeakObjectReference<ReferencedObject>,
