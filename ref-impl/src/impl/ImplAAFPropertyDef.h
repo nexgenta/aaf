@@ -3,50 +3,33 @@
 #ifndef __ImplAAFPropertyDef_h__
 #define __ImplAAFPropertyDef_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
 
 class ImplEnumAAFPropertyValues;
+
 class ImplAAFPropertyValue;
+
 class ImplAAFTypeDef;
 
-#ifndef __ImplAAFMetaDefinition_h__
-#include "ImplAAFMetaDefinition.h"
+ 
+
+
+
+#ifndef __ImplAAFDefObject_h__
+#include "ImplAAFDefObject.h"
 #endif
 
-#include "OMPropertyDefinition.h"
-#include "OMVariableSizeProperty.h"
 
-typedef OMProperty* (*ImplAAFOMPropertyCreateFunc_t)
-  (OMPropertyId pid,
-   const wchar_t * name);
-
-class ImplAAFPropertyDef : public ImplAAFMetaDefinition,
-						   public OMPropertyDefinition
+class ImplAAFPropertyDef : public ImplAAFDefObject
 {
 public:
   //
@@ -66,139 +49,151 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeDef
         // @parm [out] definition of type contained by this property
-        (ImplAAFTypeDef ** ppTypeDef) const;
+        (ImplAAFTypeDef ** ppTypeDef);
 
 
   //****************
-  // IsOptional()
+  // GetName()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIsOptional
-      (// @parm [out] pointer to the result
-       aafBool * pIsOptional) const;
+    GetName
+        (// @parm [out, size_is(bufSize), string] buffer into which the name is written
+         wchar_t *  pName,
+
+         // @parm [in] The size of the pName buffer, in bytes
+         aafInt32  bufSize);
 
 
   //****************
-  // IsUniqueIdentifier()
+  // GetNameBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIsUniqueIdentifier
-      (// @parm [out] pointer to the result
-       aafBool * pIsUniqueIdentifier) const;
-
-  //
-  // Non-published methods (yet still public)
-  //
-
-  //****************
-  // pvtInitialize()
-  //
-  AAFRESULT pvtInitialize
-       (// @parm [in] auid to be used to identify this property definition
-        const aafUID_t & propertyAuid,
-			
-        // @parm [in] OM pid (small integer) to be used to identify
-		// this property definition
-        OMPropertyId omPid,
-			
-        // @parm [in, string] friendly name of this property
-	    const aafCharacter * pPropName,
-	
-        // @parm [in] Type definition of this property definition,
-	    const aafUID_t & typeID,
-
-        // @parm [in] Is this property optional? (mandatory, if not)
-		  aafBoolean_t isOptional,
-
-        // @parm [in] Is this property a unique identifier
-		  aafBoolean_t isUniqueIdentifier);
+    GetNameBufLen
+        // @parm [out] required buffer length, in bytes
+        (aafInt32 *  pLen);
 
 
   //****************
-  // pvtInitialize()
+  // GetMinVersion()
   //
-  AAFRESULT pvtInitialize
-       (// @parm [in] auid to be used to identify this property definition
-        aafUID_constref propertyAuid,
-			
-        // @parm [in] OM pid (small integer) to be used to identify
-		// this property definition
-        OMPropertyId omPid,
-			
-        // @parm [in, string] friendly name of this property
-	aafCharacter_constptr pPropName,
-	
-        // @parm [in] Type definition of this property definition,
-	ImplAAFTypeDef *pType,
-
-        // @parm [in] Is this property optional? (mandatory, if not)
-	aafBoolean_t isOptional,
-
-        // @parm [in] Is this property a unique identifier
-	aafBoolean_t isUniqueIdentifier);
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetMinVersion
+        // @parm [out, retval] Pointer to the minimum version 
+        (aafVersionType_t *  pMinVersion);
 
 
-  OMPropertyId OmPid (void) const;
+  //****************
+  // SetMinVersion()
   //
-  // Returns the OM pid (small integer) identifying this property
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetMinVersion
+        // @parm [in] Pointer to the minimum AAF Version
+        (aafVersionType_t *  pMinVersion);
 
+
+  //****************
+  // GetMaxVersion()
   //
-  // Overrides from OMPropertyDefinition
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetMaxVersion
+        // @parm [out, retval] Pointer to the maximum version 
+        (aafVersionType_t *  pMaxVersion);
+
+
+  //****************
+  // SetMaxVersion()
   //
-  const OMType* type(void) const;
-  const wchar_t* name(void) const;
-  OMPropertyId localIdentification(void) const;
-  bool isOptional(void) const;
-
-  // Allocates and returns an OMProperty which can represent this
-  // property.  
-  OMProperty * CreateOMProperty () const;
-
-  // Sets the function which creates OMProperties useful for these
-  // properties.
-  void SetOMPropCreateFunc (ImplAAFOMPropertyCreateFunc_t pFunc);
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetMaxVersion
+        // @parm [in] Pointer to the maximum AAF Version
+        (aafVersionType_t *  pMaxVersion);
 
 
-  // override from OMStorable.
-  virtual const OMClassId& classId(void) const;
+  //****************
+  // GetIsSearchable()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetIsSearchable
+        // @parm [out, retval] pointer to the result
+        (aafBool *  pIsSearchable);
 
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
 
-  // Method is called after class has been added to MetaDictionary.
-  // If this method fails the class is removed from the MetaDictionary and the
-  // registration method will fail.
-  virtual HRESULT CompleteClassRegistration(void);
+  //****************
+  // SetIsSearchable()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetIsSearchable
+        // @parm [in] is searchable value
+        (aafBool  IsSearchable);
 
-private:
 
-  // OMWeakReferenceProperty<ImplAAFTypeDef> _Type;
-  OMFixedSizeProperty<aafUID_t>              _Type;
+  //****************
+  // GetDescription()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDescription
+        (// @parm [out, size_is(bufSize), string] Pointer to description
+         wchar_t *  pStrDescription,
 
-  OMFixedSizeProperty<aafBool>               _IsOptional;
+         // @parm [in] The size of the pstrDescription buffer
+         aafInt32  bufSize);
 
-  OMFixedSizeProperty<OMPropertyId>          _pid;
 
-  OMFixedSizeProperty<aafBool>               _IsUniqueIdentifier;
+  //****************
+  // GetDescriptionBufLen()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDescriptionBufLen
+        // @parm [out] required buffer length
+        (aafInt32 *  pLen);
 
-  ImplAAFTypeDef *                           _cachedType;
 
-  wchar_t * _wname;  // name in wide characters
+  //****************
+  // SetDescription()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetDescription
+        // @parm [in, string] description
+        (wchar_t *  pStrDescription);
 
-  ImplAAFOMPropertyCreateFunc_t              _OMPropCreateFunc;
 
+  //****************
+  // GetDefaultValue()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDefaultValue
+        // @parm [out, retval] Pointer to default data value
+        (ImplAAFPropertyValue ** ppDataValue);
+
+
+  //****************
+  // SetDefaultValue()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetDefaultValue
+        // @parm [in] default data value
+        (ImplAAFPropertyValue * pDataValue);
+
+
+  //****************
+  // GetRefValues()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetRefValues
+        // @parm [out,retval] Reference value Enumeration
+        (ImplEnumAAFPropertyValues ** ppEnum);
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFPropertyDef)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFPropertyDefTest.cpp.
+  static AAFRESULT test();
 };
 
-//
-// smart pointer
-//
-
-#ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
-#include "ImplAAFSmartPointer.h"
-#endif
-
-typedef ImplAAFSmartPointer<ImplAAFPropertyDef> ImplAAFPropertyDefSP;
-
 #endif // ! __ImplAAFPropertyDef_h__
+
+
