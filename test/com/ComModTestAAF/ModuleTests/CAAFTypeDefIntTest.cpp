@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFTypeDefInt
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -9,11 +9,7 @@
 *                                          *
 \******************************************/
 
-#include "CAAFTypeDefInt.h"
-#include "CAAFTypeDefInt.h"
-#ifndef __CAAFTypeDefInt_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
@@ -88,7 +84,7 @@ static void RemoveTestFile(const wchar_t* pFileName)
 
 
 static HRESULT CreateOneTypeDef (IAAFDictionary *  pDict,
-								 aafUInt32         intSize,
+								 aafUInt8          intSize,
 								 aafBool           isSigned,
 								 aafUID_t *        pID,
 								 wchar_t *         name,
@@ -580,27 +576,44 @@ static HRESULT TestTypeDefInt ()
 	  caughtHr = rResult;
 	}
 
-  ptds8->Release();
-  ptds16->Release();
-  ptds32->Release();
-  ptds64->Release();
-  ptdu8->Release();
-  ptdu16->Release();
-  ptdu32->Release();
-  ptdu64->Release();
-  pDict->Release();
-  pHeader->Release();
-  hr = pFile->Save();
-  if (! SUCCEEDED (hr)) return hr;
-  hr = pFile->Close();
-  if (! SUCCEEDED (hr)) return hr;
-  pFile->Release();
+  if (ptds8)
+    ptds8->Release();
+  if (ptds16)
+    ptds16->Release();
+  if (ptds32)
+    ptds32->Release();
+  if (ptds64)
+    ptds64->Release();
+  if (ptdu8)
+    ptdu8->Release();
+  if (ptdu16)
+    ptdu16->Release();
+  if (ptdu32)
+  	ptdu32->Release();
+  if (ptdu64)
+  	ptdu64->Release();
+  if (pDict)
+    pDict->Release();
+  if (pHeader)
+  	pHeader->Release();
+  if (pFile)
+  {
+	hr = pFile->Save();
+	if (! SUCCEEDED (hr))
+	{  
+	  pFile->Release();
+	  return hr;
+	}
+	hr = pFile->Close();
+	pFile->Release();
+  }
 
-  return AAFRESULT_SUCCESS;
+  
+  return (caughtHr != AAFRESULT_SUCCESS) ? caughtHr : hr;
 }
 
 
-HRESULT CAAFTypeDefInt::test()
+extern "C" HRESULT CAAFTypeDefInt_test()
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 
@@ -610,7 +623,7 @@ HRESULT CAAFTypeDefInt::test()
 	}
   catch (...)
     {
-      cerr << "CAAFTypeDefInt::test...Caught general C++"
+      cerr << "CAAFTypeDefInt_test...Caught general C++"
         " exception!" << endl; 
     }
   return hr;
