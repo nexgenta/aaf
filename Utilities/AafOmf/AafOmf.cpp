@@ -35,11 +35,9 @@
 #ifdef macintosh
 	#include <console.h>
 #endif 
-namespace OMF2
-{
+
 #include "omPublic.h"
 #include "omMedia.h"
-}
 
 #include "AAFException.h"
 #include "OMFException.h"
@@ -63,16 +61,15 @@ namespace OMF2
 #endif
 #include "Aaf2Omf.h"
 #include "Omf2Aaf.h"
-#include "aafclassdefuids.h"
+#include "AAFClassDefUIDs.h"
 #include "EffectTranslate.h"
 
 //#include "AAFUtils.h"
-AAFRESULT aafMobIDNew(aafUID_t *mobID);
-AAFRESULT aafMobIDFromMajorMinor(
-        aafUInt32	major,
-		aafUInt32	minor,
-		aafUID_t *mobID);     /* OUT - Newly created Mob ID */
-
+//AAFRESULT aafMobIDNew(aafMobID_t *mobID);
+//AAFRESULT aafMobIDFromMajorMinor(
+//        aafUInt32	major,
+//		aafUInt32	minor,
+//		aafMobID_t *mobID);     /* OUT - Newly created Mob ID */
 
 // ============================================================================
 // Global Variables and functions
@@ -88,32 +85,6 @@ int deleteFile(char* fileName)
 
 }
 
-static char* baseName(char* fullName)
-{
-	char* result;
-#if defined(WIN32)
-	const int delimiter = '\\';
-#elif defined(_MAC) || defined(macintosh)
-	const int delimiter = ':';
-#else
-	const in delimiter = '/';
-#endif
-	result = strrchr(fullName, delimiter);
-	if (result == 0)
-	{
-		result = fullName;
-	}
-	else if (strlen(result) == 0) 
-	{
-		result = fullName;
-	}
-	else 
-	{
-		result++;
-	}
-
-	return result;
-}
 
 void AUIDtoString(aafUID_t *uid, char *buf)
 {
@@ -122,46 +93,108 @@ void AUIDtoString(aafUID_t *uid, char *buf)
 			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
 			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
 }
+
+void MobIDtoString(aafMobID_constref uid, char *buf)
+{
+    sprintf( buf, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x-" \
+		  "%02x-%02x-%02x-%02x-" \
+		  "%08x%04x%04x" \
+		  "%02x%02x%02x%02x%02x%02x%02x%02x",
+
+	(int)uid.SMPTELabel[0], (int)uid.SMPTELabel[1], 
+	(int)uid.SMPTELabel[2], (int)uid.SMPTELabel[3],
+	(int)uid.SMPTELabel[4], (int)uid.SMPTELabel[5], 
+	(int)uid.SMPTELabel[6], (int)uid.SMPTELabel[7],
+	(int)uid.SMPTELabel[8], (int)uid.SMPTELabel[9], 
+	(int)uid.SMPTELabel[10], (int)uid.SMPTELabel[11],
+
+	(int)uid.length, (int)uid.instanceHigh, 
+	(int)uid.instanceMid, (int)uid.instanceLow,
+
+	uid.material.Data1, uid.material.Data2, uid.material.Data3,
+
+	(int)uid.material.Data4[0], (int)uid.material.Data4[1], 
+	(int)uid.material.Data4[2], (int)uid.material.Data4[3],
+	(int)uid.material.Data4[4], (int)uid.material.Data4[5], 
+	(int)uid.material.Data4[6], (int)uid.material.Data4[7] );
+}
+
+
 struct SMPTELabel
 {
 	aafUInt32	MobIDMajor;
-	aafUInt32	MobIDMinor;
+	aafUInt16	MobIDMinorLow;
+	aafUInt16	MobIDMinorHigh;
 	aafUInt8	oid;
 	aafUInt8	size;
 	aafUInt8	ulcode;
 	aafUInt8	SMPTE;
 	aafUInt8	Registry;
 	aafUInt8	unused;
-	aafUInt16	MobIDPrefix;
+	aafUInt8	MobIDPrefixLow;
+	aafUInt8	MobIDPrefixHigh;
 };
 
-union label
+
+
+struct OMFMobID
 {
-	aafUID_t			guid;
-	struct SMPTELabel	smpte;
+    aafUInt8			SMPTELabel[12];		// 12-bytes of label prefix
+	aafUInt8			length;
+    aafUInt8			instanceHigh;
+    aafUInt8			instanceMid;
+    aafUInt8			instanceLow;
+	struct SMPTELabel	material;
+};
+
+union MobIDOverlay
+{
+	aafMobID_t			mobID;
+	struct OMFMobID		OMFMobID;
 };
 
 AAFRESULT aafMobIDFromMajorMinor(
+        aafUInt32	prefix,
         aafUInt32	major,
 		aafUInt32	minor,
-		aafUID_t *mobID)     /* OUT - Newly created Mob ID */
+		aafUInt8	UMIDType,
+		aafMobID_t *mobID)     /* OUT - Newly created Mob ID */
 {
-	union label		aLabel;
+	union MobIDOverlay		aLabel;
 	
-	aLabel.smpte.oid = 0x06;
-	aLabel.smpte.size = 0x0E;
-	aLabel.smpte.ulcode = 0x2B;
-	aLabel.smpte.SMPTE = 0x34;
-	aLabel.smpte.Registry = 0x02;
-	aLabel.smpte.unused = 0;
-	aLabel.smpte.MobIDPrefix = 42;		// Means its an OMF Uid
+    aLabel.OMFMobID.SMPTELabel[0]	= 0x06;
+    aLabel.OMFMobID.SMPTELabel[1]	= 0x0C;
+    aLabel.OMFMobID.SMPTELabel[2]	= 0x2B;
+    aLabel.OMFMobID.SMPTELabel[3]	= 0x34;
+    aLabel.OMFMobID.SMPTELabel[4]	= 0x02;			// Still Open
+    aLabel.OMFMobID.SMPTELabel[5]	= 0x05;			// Still Open
+    aLabel.OMFMobID.SMPTELabel[6]	= 0x11;			// Still Open
+    aLabel.OMFMobID.SMPTELabel[7]	= 0x01;			// Still Open
+    aLabel.OMFMobID.SMPTELabel[8]	= 0x01;			// Still Open
+    aLabel.OMFMobID.SMPTELabel[9]	= UMIDType;
+    aLabel.OMFMobID.SMPTELabel[10]	= 0x10;			// Still Open
+    aLabel.OMFMobID.SMPTELabel[11]	= 0x00;
+	aLabel.OMFMobID.length			= 0x13;
+    aLabel.OMFMobID.instanceHigh		= 0x00;
+    aLabel.OMFMobID.instanceMid		= 0x00;
+	aLabel.OMFMobID.instanceLow		= 0x00;
+	aLabel.OMFMobID.material.oid				= 0x06;
+	aLabel.OMFMobID.material.size				= 0x0E;
+	aLabel.OMFMobID.material.ulcode			= 0x2B;
+	aLabel.OMFMobID.material.SMPTE				= 0x34;
+	aLabel.OMFMobID.material.Registry			= 0x7F;
+	aLabel.OMFMobID.material.unused			= 0x7F;
+	aLabel.OMFMobID.material.MobIDPrefixHigh	= (aafUInt8)((prefix >> 7L) | 0x80);
+	aLabel.OMFMobID.material.MobIDPrefixLow	= (aafUInt8)(prefix & 0x7F);
 
-	aLabel.smpte.MobIDMajor = major;
-	aLabel.smpte.MobIDMinor = minor;
+	aLabel.OMFMobID.material.MobIDMajor		= major;
+	aLabel.OMFMobID.material.MobIDMinorLow		= (aafUInt16)(minor & 0xFFFF);
+	aLabel.OMFMobID.material.MobIDMinorHigh	=  (aafUInt16)((minor >> 16L) & 0xFFFF);
 
-	*mobID = aLabel.guid;
+	*mobID = (aafMobID_t)aLabel.mobID;
 	return(AAFRESULT_SUCCESS);
 }
+
 
 // ============================================================================
 // InitGlobalVars
@@ -169,24 +202,24 @@ AAFRESULT aafMobIDFromMajorMinor(
 //		Allocates memory and intializes the global variables
 //
 // ============================================================================
-static HRESULT InitGlobalVars( void )
+HRESULT InitGlobalVars( void )
 {
 	gpGlobals = new AafOmfGlobals;
 	if (gpGlobals == NULL)
 		return AAFRESULT_NOMEMORY;
 
-	gpGlobals->bAAFFileOpen = AAFFalse;
-	gpGlobals->bConvertAllObjects = AAFFalse;
-	gpGlobals->bCreateTOCFile = AAFFalse;
-	gpGlobals->bDefFile = AAFFalse;
-	gpGlobals->bLogFile = AAFFalse;
+	gpGlobals->bAAFFileOpen = kAAFFalse;
+	gpGlobals->bConvertAllObjects = kAAFFalse;
+	gpGlobals->bCreateTOCFile = kAAFFalse;
+	gpGlobals->bDefFile = kAAFFalse;
+	gpGlobals->bLogFile = kAAFFalse;
 	gpGlobals->pLogger = NULL;
-	gpGlobals->bOMFFileOpen = AAFFalse;
-	gpGlobals->bVerboseMode = AAFFalse;
+	gpGlobals->bOMFFileOpen = kAAFFalse;
+	gpGlobals->bVerboseMode = kAAFFalse;
 	gpGlobals->numIndents = 0;
 	gpGlobals->pProgramName = NULL;
-	gpGlobals->bDeleteOutput  = AAFTrue;
-	gpGlobals->bConvertAAFFile  = AAFFalse;
+	gpGlobals->bDeleteOutput  = kAAFTrue;
+	gpGlobals->bConvertAAFFile  = kAAFFalse;
 
 	gpGlobals->nNumAAFMobs = 0;
 	gpGlobals->nNumAAFObjects = 0;
@@ -209,29 +242,6 @@ static HRESULT InitGlobalVars( void )
 	return AAFRESULT_SUCCESS;
 }
 
-// ============================================================================
-// Usage
-// 
-//		Displays short help text with the program arguments.
-//
-// ============================================================================
-static void Usage( void )
-{
-	printf("\n*******************\n\n");
-	printf("%s : OMF/AAF file conversion Version 0.01.00\n\n", gpGlobals->pProgramName);
-	printf("Usage: \n");
-	printf("%s [-v] [-s] [-p logfile] [-d deffile] [-t tocfile] <infile> [outfile]\n\n", gpGlobals->pProgramName);
-	printf("-v         = Verbose - give progress report (optional)\n" );
-	printf("-s         = Straight conversion. Do NOT discard unnecessary objects (optional)\n");
-	printf("-nr        = DO NOT replace Output file. If Output file is present, give an error (optional)!!\n");
-//	printf("-p logfile = Log file name(optional)\n");
-//	printf("-d deffile = Definition file (optional)\n");
-//	printf("-t tocfile = Dump OMFI Table of contents (optional)\n");
-	printf("-OMF       = Convert an AAF file to OMF 2.1 version\n");
-	printf("infile     = input file name (required)\n");
-	printf("outfile    = output file name (optional)\n");
-	printf("\n*******************\n\n");
-}
 /******************** IncIndentLevel *******************
 	Increases the incrementation used for readability
 
@@ -269,139 +279,6 @@ void DecIndentLevel(void)
 	if (gpGlobals->numIndents >= 0 && gpGlobals->numIndents < MAX_INDENT)
 		gpGlobals->indentLeader[gpGlobals->numIndents] = 0;
 
-}
-
-// ============================================================================
-// DisplaySummary
-// 
-//		Displays summary of execution at the end of the run.
-//
-// ============================================================================
-static void DisplaySummary( void )
-{
-	printf("\n*******************\n\n");
-	printf("%s Summary for the file :%s\n\n",gpGlobals->pProgramName, gpGlobals->sOutFileName);
-	printf("\tTotal OMF Mobs \t\t\t: %ld\n", gpGlobals->nNumOMFMobs);
-	printf("\tTotal AAF Mobs \t\t\t: %ld\n", gpGlobals->nNumAAFMobs);
-	printf("\tTotal OMF Objects \t\t: %ld\n", gpGlobals->nNumOMFObjects);
-	printf("\tTotal AAF Objects \t\t: %ld\n", gpGlobals->nNumAAFObjects);
-	printf("\tTotal OMF Properties \t\t: %ld\n", gpGlobals->nNumOMFProperties);
-	printf("\tTotal AAF Properties \t\t: %ld\n", gpGlobals->nNumAAFProperties);
-	printf("\tTotal OMF Objects NOT found\t: %ld\n", gpGlobals->nNumUndefinedOMFObjects);
-	printf("\n*******************\n\n");
-}
-// ============================================================================
-// GetUserInput
-//
-//		Parse program arguments and extract names of OMF and AAF files.
-//
-// ============================================================================
-static HRESULT GetUserInput(int argc, char* argv[])
-{
-	HRESULT			rc = AAFRESULT_SUCCESS;
-	aafInt32		nFileCount = 0;
-
-	if (argc > 1)
-	{
-		for (int i = 1; i < argc; i++)
-		{
-			char*	pNextArgument = argv[i];
-			char	c = pNextArgument[0];
-			char*	pFileName;
-
-			if ((c == '-') && (strlen(pNextArgument) == 2))
-			{
-				char flag = pNextArgument[1];
-				switch( flag )
-				{
-					case 'v':
-						gpGlobals->bVerboseMode = AAFTrue;
-						break;
-					case 's':
-						gpGlobals->bConvertAllObjects = AAFTrue;
-						break;
-					case 'p':
-						if ((i + 1 < argc)&& (*argv[i+1] != '-'))
-						{
-							i++;	// Consume the value
-							pFileName = argv[i];
-							if (strlen(pFileName))
-							{
-								gpGlobals->bLogFile = AAFTrue;
-								strcpy(gpGlobals->sLogFileName, pFileName);
-							}
-						}
-						break;
-					case 'd':
-						if ((i + 1 < argc)&& (*argv[i+1] != '-'))
-						{
-							i++;	// Consume the value
-							pFileName = argv[i];
-							if (strlen(pFileName))
-							{
-								gpGlobals->bDefFile = AAFTrue;
-								strcpy(gpGlobals->sDefinitionFileName, pFileName);
-							}
-						}
-						break;
-					case 't':
-						if ((i + 1 < argc)&& (*argv[i+1] != '-'))
-						{
-							i++;	// Consume the value
-							pFileName = argv[i];
-							if (strlen(pFileName))
-							{
-								gpGlobals->bCreateTOCFile = AAFTrue;
-								strcpy(gpGlobals->sTOCFileName, pFileName);
-							}
-						}
-						break;
-					default:
-						rc = AAFRESULT_BAD_FLAGS;
-						break;
-				}
-			}
-			else if ((c == '-') && (strlen(pNextArgument) > 2))
-			{
-				char* pArg = &pNextArgument[1];
-				char  lc[4];
-				memset(lc, 0, sizeof(lc));
-				unsigned int i ;
-				unsigned int j = strlen(pArg);
-				if (strlen(pArg) <=3)
-				{
-					for (i = 0; i < j; i++, pArg++)
-					{
-						lc[i] = tolower(*pArg);
-					}
-					if (strcmp(lc, "nr") == 0)
-					{
-						gpGlobals->bDeleteOutput = AAFFalse;
-					}
-					else if ( strcmp(lc, "omf") == 0 ) 
-					{
-						gpGlobals->bConvertAAFFile = AAFTrue;
-					}
-					else
-						rc = AAFRESULT_BAD_FLAGS;
-				}
-				else
-					rc = AAFRESULT_BAD_FLAGS;
-			}
-			else
-			{
-				nFileCount += 1;
-				if (nFileCount == 1)
-					strcpy(gpGlobals->sInFileName, argv[i]);
-				else
-					strcpy(gpGlobals->sOutFileName, argv[i]);
-			}
-		}
-	}
-	else
-		rc = AAFRESULT_BAD_FLAGS;
-
-	return rc;
 }
 
 // ============================================================================
@@ -451,149 +328,37 @@ HRESULT IsOMFFile (char * pFileName )
 	return rc;
 }
 
-// ============================================================================
-// MAIN Module 
-//
-//		This is the application's main controlling routine.  
-//
-// ============================================================================
-int main(int argc, char *argv[])
-{
-	HRESULT			hr;
-	CComInitialize	comInit;
-	ExtendedAaf2Omf		AAFMain;
-	ExtendedOmf2Aaf		OMFMain;
-
-#ifdef macintosh
-	argc = ccommand(&argv);	// calls up a command line window
-#endif 
-
-	hr = InitGlobalVars();
-	if (FAILED(hr))
-		return 1; //!!!UTLEcFromHr(hr);
-
-	gpGlobals->pProgramName = baseName(argv[0]);
-
-	printf("%s: Version 0.01.00\n", gpGlobals->pProgramName);
-	hr = GetUserInput(argc, argv);
-	if (FAILED(hr))
-	{
-		Usage();
-		return 1; //!!!UTLEcFromHr(hr);
-	}
-
-	// ************** Set up the logging utility for the application.**********
-
-	// If in verbose mode we will have 3 levels of logging: error (0), warning (1),
-	// and info (2). Otherwise we just log warnings and errors.
-	unsigned logLevel = gpGlobals->bVerboseMode ? kLogInfo : kLogWarn;
-	if(  gpGlobals->bLogFile )
-	{
-		// The user specified a log file on the command line.
-		try
-		{
-			// Clobber any previous log file that was hanging around.
-			gpGlobals->pLogger = new FileStreamLogger( gpGlobals->sLogFileName, "w", logLevel );
-		}
-		catch( FileStreamLogger::LogStreamNULL )
-		{
-			// Couldn't open log file for writing. Send log output to stdout.
-			gpGlobals->pLogger = new StreamLogger( stdout, logLevel );
-			gpGlobals->pLogger->Log( kLogError, "Could not open log file %s."
-			"Logging to the console instead.\n", gpGlobals->sLogFileName );
-		}
-	}
-	else
-	{
-		// Use stdout.
-		gpGlobals->pLogger = new StreamLogger( stdout, logLevel );
-	}
-
-	// Wire up excepion handling to the logger. .
-	ExceptionBase::SetLogger( gpGlobals->pLogger );
-	// **************************************************************************
-
-	try
-	{
-		AAFCheck check;
-		if (gpGlobals->bConvertAAFFile)
-		{
-			// User indicated input file must be an AAF 
-			// Convert AAF to OMF
-			check = AAFMain.ConvertFile();
-		}
-		else
-		{
-			// User indicated Input file must be an OMF file
-			// Conert OMF to AAF
-			check = IsOMFFile(gpGlobals->sInFileName);
-			OMFMain.ConvertFile();
-		}
-
-		// We are done, just display a summary of results
-		DisplaySummary();
-	}
-	catch( ExceptionBase &e )
-	{
-		// Ultimately we want the exception to print itself out instead
-		// of doing this case analysis...
-		if( e.Code() == AAFRESULT_FILE_NOT_OMF )
-		{
-			gpGlobals->pLogger->Log( kLogError, 
-				"File \"%s\" is not a valid OMF file.\n", gpGlobals->sInFileName );
-		}
-		else if( e.Code() == AAFRESULT_BADOPEN )
-		{
-			gpGlobals->pLogger->Log( kLogError, 
-				"Cannot open file \"%s\".\n", gpGlobals->sInFileName );
-		}
-		else
-		{
-			gpGlobals->pLogger->Log( kLogError, 
-				"main(): %s exception %ld\n", e.Type(), e.Code() );
-		}
-		hr = e.Code();
-	}
-
-	// If we get here then the gpGlobals was created.
-	delete gpGlobals;
-
-	return( hr );
-}
-
-
-void RegisterCodecProperties(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession)
+void RegisterCodecProperties(AafOmfGlobals *globals, omfSessionHdl_t OMFSession)
 {
 	OMFCheck	OMFError;
 
 	// To get the CDCI codec related properties we first reister them in OMF
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+	OMFError = omfsRegisterDynamicProp(OMFSession, kOmfTstRevEither, 
 									   "ComponentWidth", OMClassCDCI, 
-									   OMF2::OMVersionType, OMF2::kPropRequired, 
+									   OMVersionType, kPropRequired, 
 									   &(globals->omCDCIComponentWidth));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+	OMFError = omfsRegisterDynamicProp(OMFSession, kOmfTstRevEither, 
 									   "HorizontalSubsampling", OMClassCDCI, 
-									   OMF2::OMBoolean, OMF2::kPropRequired, 
+									   OMBoolean, kPropRequired, 
 									   &(globals->omCDCIHorizontalSubsampling));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+	OMFError = omfsRegisterDynamicProp(OMFSession, kOmfTstRevEither, 
 									   "ColorSiting", OMClassCDCI, 
-									   OMF2::OMBoolean, OMF2::kPropRequired, 
+									   OMBoolean, kPropRequired, 
 									   &(globals->omCDCIColorSiting));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+	OMFError = omfsRegisterDynamicProp(OMFSession, kOmfTstRevEither, 
 									   "BlackReferenceLevel", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   OMInt32, kPropRequired, 
 									   &(globals->omCDCIBlackReferenceLevel));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+	OMFError = omfsRegisterDynamicProp(OMFSession, kOmfTstRevEither, 
 									   "WhiteReferenceLevel", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   OMInt32, kPropRequired, 
 									   &(globals->omCDCIWhiteReferenceLevel));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+	OMFError = omfsRegisterDynamicProp(OMFSession, kOmfTstRevEither, 
 									   "ColorRange", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   OMInt32, kPropRequired, 
 									   &(globals->omCDCIColorRange));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+	OMFError = omfsRegisterDynamicProp(OMFSession, kOmfTstRevEither, 
 									   "PaddingBits", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   OMInt32, kPropRequired, 
 									   &(globals->omCDCIPaddingBits));
 }
-

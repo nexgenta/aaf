@@ -33,11 +33,8 @@
 #include <stdlib.h>
 #include <iostream.h>
 
-namespace OMF2
-{
 #include "omPublic.h"
 #include "omMedia.h"
-}
 
 // OMF Includes
 
@@ -74,7 +71,7 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 
 #define checkOMF(a)  \
 { moduleErrorTmp = a; \
-	if (moduleErrorTmp != OMF2::OM_ERR_NONE) \
+	if (moduleErrorTmp != OM_ERR_NONE) \
 	{ \
 	    LogError(moduleErrorTmp, __LINE__, __FILE__);\
 		goto cleanup; \
@@ -91,7 +88,8 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 // ============================================================================
 // Constructor
 // ============================================================================
-ExtendedOmf2Aaf::ExtendedOmf2Aaf()	// : pFile(NULL), pHeader(NULL), pDictionary(NULL)
+ExtendedOmf2Aaf::ExtendedOmf2Aaf( AAFDomainUtils *aafDomainUtils, OMFDomainUtils *omfDomainUtils, EffectTranslate *effectTranslate ) 
+	: Omf2Aaf( aafDomainUtils, omfDomainUtils, effectTranslate ) 
 {
 }
 // ============================================================================
@@ -104,7 +102,8 @@ ExtendedOmf2Aaf::~ExtendedOmf2Aaf()
 // ============================================================================
 // Constructor
 // ============================================================================
-ExtendedAaf2Omf::ExtendedAaf2Omf() //	: pFile(NULL), pHeader(NULL), pDictionary(NULL)
+ExtendedAaf2Omf::ExtendedAaf2Omf(AAFDomainUtils *aafDomainUtils, OMFDomainUtils *omfDomainUtils, EffectTranslate *effectTranslate ) 
+	: Aaf2Omf( aafDomainUtils, omfDomainUtils, effectTranslate )
 {
 }
 // ============================================================================
