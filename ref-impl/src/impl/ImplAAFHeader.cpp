@@ -13,6 +13,7 @@
 #include "AAFResult.h"
 #include "aafTable.h"
 #include "aafErr.h"
+#include "aafUtils.h"
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
@@ -22,8 +23,8 @@
 #include "ImplEnumAAFMobs.h"
 #endif
 
-#ifndef __ImplEnumAAFMedia_h__
-#include "ImplEnumAAFMedia.h"
+#ifndef __ImplEnumAAFEssenceData_h__
+#include "ImplEnumAAFEssenceData.h"
 #endif
 
 #ifndef __ImplAAFDictionary_h__
@@ -43,6 +44,8 @@
 #endif
 
 #include "ImplAAFFile.h"
+
+#include "AAFPropertyIDs.h"
 
 #include <assert.h>
 
@@ -211,9 +214,22 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::IsMediaDataPresent (aafUID_t *pFileMobID,
+    ImplAAFHeader::GetNumEssenceData(aafUInt32 *  pNumEssenceData)
+{
+  if(pNumEssenceData == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  ImplAAFContentStorage *cstore = GetContentStorage();
+  return(cstore->GetNumEssenceData(pNumEssenceData));
+}
+
+
+// Implementer note:
+// based on omfmIsMediaDataPresent
+//
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::IsEssenceDataPresent (aafUID_t *pFileMobID,
                            aafFileFormat_t fmt,
                            aafBool *pResult)
 {
@@ -222,44 +238,45 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	  }
 	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->IsMediaDataPresent(pFileMobID, fmt, pResult));
+	return(cstore->IsEssenceDataPresent(pFileMobID, fmt, pResult));
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::EnumAAFMediaObjects (aafMediaCriteria_t *pMediaCriteria,
-                           ImplEnumAAFMedia **ppEnum)
+    ImplAAFHeader::EnumEssenceData (ImplEnumAAFEssenceData **ppEnum)
 {
-    if ((! pMediaCriteria) || (! ppEnum))
+    if (! ppEnum)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
 	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->GetMedia(pMediaCriteria, ppEnum));
+	return(cstore->EnumEssenceData(ppEnum));
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::AppendMedia (ImplAAFMedia * pMedia)
+    ImplAAFHeader::AppendEssenceData (ImplAAFEssenceData * pEssenceData)
 {
-  if (! pMedia)
+  if (! pEssenceData)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+  ImplAAFContentStorage *cstore = GetContentStorage();
+  return(cstore->AppendEssenceData(pEssenceData));
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::RemoveMedia (ImplAAFMedia * pMedia)
+    ImplAAFHeader::RemoveEssenceData (ImplAAFEssenceData * pEssenceData)
 {
-  if (! pMedia)
+  if (! pEssenceData)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+  ImplAAFContentStorage *cstore = GetContentStorage();
+  return(cstore->RemoveEssenceData(pEssenceData));
 }
 
 
@@ -510,9 +527,17 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
+AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
+{
+	aafTimeStamp_t	now;
+
+	AAFGetDateTime(&now);
+	return (OM_ERR_NONE);
+}
+
 AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 {
-	_toolkitRev = AAFToolkitVersion;
+	_toolkitRev = AAFReferenceImplementationVersion;
 	return (OM_ERR_NONE);
 }
 
