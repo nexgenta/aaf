@@ -11,6 +11,7 @@
 #include "ImplAAFSourceMob.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
 #ifndef __ImplAAFEssenceData_h__
@@ -60,7 +61,7 @@ ImplAAFEssenceData::~ImplAAFEssenceData ()
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_NOT_IN_FILE;
+    return AAFRESULT_OBJECT_NOT_PERSISTENT;
   
   try
   {
@@ -91,7 +92,7 @@ ImplAAFEssenceData::~ImplAAFEssenceData ()
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_NOT_IN_FILE;
+    return AAFRESULT_OBJECT_NOT_PERSISTENT;
   
   try
   {
@@ -117,7 +118,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT result = AAFRESULT_SUCCESS;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_NOT_IN_FILE;
+    return AAFRESULT_OBJECT_NOT_PERSISTENT;
 
   try
   {
@@ -146,7 +147,7 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_NOT_IN_FILE;
+    return AAFRESULT_OBJECT_NOT_PERSISTENT;
 
   try
   {
@@ -174,7 +175,7 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_NOT_IN_FILE;
+    return AAFRESULT_OBJECT_NOT_PERSISTENT;
 
 
   AAFRESULT result = AAFRESULT_SUCCESS;
@@ -282,7 +283,7 @@ AAFRESULT STDMETHODCALLTYPE
     CHECK(GetFileMobID(&mobID));
 
     // Does a mob with the ID already exist?  If not, return error.
-    // NOTE: Will return AAFRESULT_NOT_IN_FILE if this object has
+    // NOTE: Will return AAFRESULT_OBJECT_NOT_PERSISTENT if this object has
     // not been appended to to the file.
     CHECK(MyHeadObject(&pHeader));
     CHECK(pHeader->LookupMob(&mobID, &pMob));
@@ -342,20 +343,4 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-extern "C" const aafClassID_t CLSID_AAFEssenceData;
-
-OMDEFINE_STORABLE(ImplAAFEssenceData, CLSID_AAFEssenceData);
-
-// Cheat!  We're using this object's CLSID instead of object class...
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFEssenceData::GetObjectClass(aafUID_t * pClass)
-{
-  if (! pClass)
-  {
-    return AAFRESULT_NULL_PARAM;
-  }
-  memcpy (pClass, &CLSID_AAFEssenceData, sizeof (aafClassID_t));
-  return AAFRESULT_SUCCESS;
-}
-
-
+OMDEFINE_STORABLE(ImplAAFEssenceData, AUID_AAFEssenceData);
