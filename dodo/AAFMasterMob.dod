@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFMasterMob\
 #endm
@@ -276,7 +283,7 @@ AD_XMETHOD3(GetRepresentationSourceClip,
 			  Slot ID,
 			[in],
 			  objPass,
-			  aafInt32,
+			  aafUInt32,
 			  index,
 			  Index of requested representation,
 			[out],
