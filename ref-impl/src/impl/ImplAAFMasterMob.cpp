@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -161,13 +160,17 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(pSegment != NULL)
-			pSegment->ReleaseReference();
+		  pSegment->ReleaseReference();
+		pSegment = 0;
 		if(pNewSlot != NULL)
-			pNewSlot->ReleaseReference();
+		  pNewSlot->ReleaseReference();
+		pNewSlot = 0;
 		if(pSrcClip != NULL)
-			pSrcClip->ReleaseReference();
+		  pSrcClip->ReleaseReference();
+		pSrcClip = 0;
 		if(pDictionary != NULL)
-			pDictionary->ReleaseReference();
+		  pDictionary->ReleaseReference();
+		pDictionary = 0;
 	}
 	XEND;
 	return hr;
@@ -236,9 +239,11 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(info != NULL)
-			info->ReleaseReference();
+		  info->ReleaseReference();
+		info = 0;
 		if(mob != NULL)
-			mob->ReleaseReference();
+		  mob->ReleaseReference();
+		mob = 0;
 	}
 	XEND;
 
@@ -301,9 +306,11 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(info != NULL)
-			info->ReleaseReference();
+		  info->ReleaseReference();
+		info = 0;
 		if(mob != NULL)
-			mob->ReleaseReference();
+		  mob->ReleaseReference();
+		mob = 0;
 	}
 	XEND;
 
@@ -686,19 +693,26 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 	XEXCEPT
 	{
 		if(slotIter != NULL)
-			slotIter->ReleaseReference();
+		  slotIter->ReleaseReference();
+		slotIter = 0;
 		if(fileSlotIter != NULL)
-			fileSlotIter->ReleaseReference();
+		  fileSlotIter->ReleaseReference();
+		fileSlotIter = 0;
 		if(fileSlot != NULL)
-			fileSlot->ReleaseReference();
+		  fileSlot->ReleaseReference();
+		fileSlot = 0;
 		if(slot != NULL)
-			slot->ReleaseReference();
+		  slot->ReleaseReference();
+		slot = 0;
 		if(fileSeg != NULL)
-			fileSeg->ReleaseReference();
+		  fileSeg->ReleaseReference();
+		fileSeg = 0;
 		if(seg != NULL)
-			seg->ReleaseReference();
+		  seg->ReleaseReference();
+		seg = 0;
 		if(fileMob != NULL)
-			fileMob->ReleaseReference();
+		  fileMob->ReleaseReference();
+		fileMob = 0;
 	}
 	XEND
 		
