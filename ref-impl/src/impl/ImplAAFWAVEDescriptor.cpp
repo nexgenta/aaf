@@ -16,14 +16,12 @@
 #include "ImplAAFWAVEDescriptor.h"
 #endif
 
-#include "AAFPropertyIDs.h"
-
 #include <assert.h>
 #include <string.h>
 
 
 ImplAAFWAVEDescriptor::ImplAAFWAVEDescriptor ()
-:   _summary(PID_WAVEDescriptor_Summary,	"Summary")
+:   _summary(PID_WAVEDESCRIPTOR_SUMMARY,	"Summary")
 {
 	_persistentProperties.put(_summary.address());
 }
@@ -33,13 +31,6 @@ ImplAAFWAVEDescriptor::~ImplAAFWAVEDescriptor ()
 {
 	// TODO: free summary
 }
-
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFWAVEDescriptor::Initialize ()
-{
-  return AAFRESULT_SUCCESS;
-}
-
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFWAVEDescriptor::GetSummary (aafUInt32 size, aafDataValue_t pSummary)
