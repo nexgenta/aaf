@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -86,12 +86,24 @@
 #include "ImplAAFTypeDefWeakObjRef.h"
 #endif
 
+#ifndef __ImplAAFTypeDefStream_h__
+#include "ImplAAFTypeDefStream.h"
+#endif
+
+#ifndef __ImplAAFTypeDefSet_h__
+#include "ImplAAFTypeDefSet.h"
+#endif
+
 #ifndef __AAFStoredObjectIDs_h__
 #include "AAFStoredObjectIDs.h"
 #endif
 
 #ifndef __AAFClassDefUIDs_h__
 #include "AAFClassDefUIDs.h"
+#endif
+
+#ifndef __AAFTypeDefUIDs_h__
+#include "AAFTypeDefUIDs.h"
 #endif
 
 #include "ImplAAFBuiltinDefs.h"
@@ -115,6 +127,10 @@
 
 #include <assert.h>
 
+// Weak references may not be in v1.0...
+#ifndef ENABLE_WEAK_REFERENCES
+#define ENABLE_WEAK_REFERENCES 1
+#endif
 
 
 static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
@@ -923,6 +939,51 @@ static AAFRESULT CreateNewOpaqueType (const aafUID_t & idToCreate,
 }
 
 
+static AAFRESULT CreateNewStreamType (const aafUID_t & idToCreate,
+									ImplAAFDictionary * pDict,
+									ImplAAFTypeDef ** ppCreatedTypeDef)
+{
+  assert (pDict);
+  AAFRESULT hr = AAFRESULT_SUCCESS;
+  aafUInt32 index, count;
+  assert (ppCreatedTypeDef);
+
+  // Go through the list, attempting to identify the requested
+  // ID.
+  TypeStream * curStream = &s_AAFAllTypeStreams[0];
+  for (index = 0, count = (sizeof(s_AAFAllTypeStreams) / sizeof(TypeStream)); index < count; ++index)
+  {
+    // Check to see if the current ID matches the ID of the type
+    // def we want to create.
+    if (! memcmp (&idToCreate, curStream->typeID, sizeof (aafUID_t)))
+    {          
+      // Yes, this is the one.
+      ImplAAFTypeDefStream * ptd = 0;
+      hr = pDict->CreateMetaInstance (AUID_AAFTypeDefStream, (ImplAAFMetaDefinition **) &ptd);
+      if (AAFRESULT_FAILED (hr))
+        return hr;
+
+      hr = ptd->pvtInitialize (*curStream->typeID,
+                               curStream->typeName);
+      assert (AAFRESULT_SUCCEEDED (hr));
+      if (AAFRESULT_SUCCEEDED (hr))
+      {
+        *ppCreatedTypeDef = ptd; // refcount is 1.
+        ptd = NULL;
+      }
+      else
+      {
+        ptd->ReleaseReference ();
+      }
+      return hr;
+    }
+
+    curStream++;
+  }
+  return AAFRESULT_NO_MORE_OBJECTS;
+}
+
+
 static AAFRESULT CreateNewStrongRefType (const aafUID_t & idToCreate,
 									ImplAAFDictionary * pDict,
 									ImplAAFTypeDef ** ppCreatedTypeDef)
@@ -987,6 +1048,7 @@ static AAFRESULT CreateNewStrongRefSetType (const aafUID_t & idToCreate,
 	  // def we want to create.
 	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
 		{		
+#if 0
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
@@ -994,7 +1056,13 @@ static AAFRESULT CreateNewStrongRefSetType (const aafUID_t & idToCreate,
 		  if (AAFRESULT_FAILED (hr))
 			return hr;
 		  assert (ptd);
-
+#else
+			ImplAAFTypeDefSet* ptd = NULL;
+		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefSet, (ImplAAFMetaDefinition **) &ptd);
+		  if (AAFRESULT_FAILED (hr))
+				return hr;
+		  assert (ptd);
+#endif
 		  ImplAAFTypeDefSP pRefdType;
 		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -1084,7 +1152,13 @@ static AAFRESULT CreateNewWeakRefType
 	  // def we want to create.
 	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
 		{		
-#if 0  // weak refs not implemented yet
+#if ENABLE_WEAK_REFERENCES  // weak refs not implemented yet
+      ImplAAFClassDefSP pTargetClass;
+      hr = pDict->LookupClassDef (*curElem->pRefdTypeId, &pTargetClass);
+      assert (AAFRESULT_SUCCEEDED(hr));
+      if (AAFRESULT_FAILED (hr))
+        return hr;
+
 		  // Yes, this is the one.
 		  // Create an impl typedefWeakRef object (as yet uninitialized)
 		  ImplAAFTypeDefWeakObjRef * ptd = 0;
@@ -1092,13 +1166,30 @@ static AAFRESULT CreateNewWeakRefType
 		  if (AAFRESULT_FAILED (hr))
 			return hr;
 		  assert (ptd);
+		  
+		  
 
+      assert(curElem->size > 0);
+      aafUID_t * targetSet = new aafUID_t[curElem->size];
+      if (NULL == targetSet)
+        return AAFRESULT_NOMEMORY;
+      
+      // Copy the property ids to the targetSet array.  
+      aafUInt32 index;
+      for (index = 0; index < curElem->size; ++index)
+      {
+        memcpy(&targetSet[index], curElem->members[index].propertyId, sizeof(aafUID_t));
+      }
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
-										  curElem->refdType,
-										  curElem->typeName);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
+										  pTargetClass,
+										  curElem->typeName,
+										  curElem->size,
+										  targetSet);
+			delete [] targetSet;
+			targetSet = NULL;
+			if (AAFRESULT_FAILED(hr))
+			  return hr;
 #else
 		  ImplAAFTypeDef * ptd = 0;
 		  // Instead, alias to an auid
@@ -1143,16 +1234,30 @@ static AAFRESULT CreateNewWeakRefSetType (const aafUID_t & idToCreate,
 	  // def we want to create.
 	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
 		{		
-		  // Yes, this is the one.
+#if ENABLE_WEAK_REFERENCES  // weak refs not implemented yet
+			ImplAAFTypeDefSet* ptd = NULL;
+		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefSet, (ImplAAFMetaDefinition **) &ptd);
+		  if (AAFRESULT_FAILED (hr))
+				return hr;
+		  assert (ptd);
+
+      ImplAAFTypeDefSP pRefdType;
+		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
+#else
+      // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
 		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefVariableArray, (ImplAAFMetaDefinition **) &ptd);
 		  if (AAFRESULT_FAILED (hr))
 			return hr;
 		  assert (ptd);
+      
+      // Temporarily pretend that weak reference sets are still implemented as arrays
+      // of AUIDs
+      ImplAAFTypeDefSP pRefdType;
+		  hr = pDict->LookupTypeDef(kAAFTypeID_AUID, &pRefdType);
+#endif
 
-		  ImplAAFTypeDefSP pRefdType;
-		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pRefdType);
 
@@ -1199,7 +1304,13 @@ static AAFRESULT CreateNewWeakRefVectorType (const aafUID_t & idToCreate,
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pRefdType;
+#if ENABLE_WEAK_REFERENCES
 		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
+#else     
+		  // Temporarily pretend that weak reference sets are still implemented as arrays
+		  // of AUIDs
+		  hr = pDict->LookupTypeDef(kAAFTypeID_AUID, &pRefdType);
+#endif
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pRefdType);
 
@@ -1347,6 +1458,11 @@ AAFRESULT ImplAAFBuiltinTypes::NewBuiltinTypeDef
   hr = CreateNewWeakRefVectorType (idToCreate,
 								   _dictionary,
 								   ppCreatedTypeDef);
+  if (AAFRESULT_SUCCEEDED (hr))	return hr;
+
+  hr = CreateNewStreamType (idToCreate,
+                            _dictionary,
+                            ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
   // all known types failed

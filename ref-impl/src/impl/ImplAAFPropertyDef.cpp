@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -48,6 +48,8 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "AAFTypeDefUIDs.h"
+
 
 #include <assert.h>
 #include <string.h>
@@ -57,7 +59,6 @@ ImplAAFPropertyDef::ImplAAFPropertyDef ()
   : _Type(PID_PropertyDefinition_Type, L"Type"),
     _IsOptional(PID_PropertyDefinition_IsOptional, L"IsOptional"),
     _pid(PID_PropertyDefinition_LocalIdentification, L"LocalIdentification"),
-    _DefaultValue(PID_PropertyDefinition_DefaultValue, L"DefaultValue"),
     _IsUniqueIdentifier(PID_PropertyDefinition_IsUniqueIdentifier, L"IsUniqueIdentifier"),
 	_cachedType (0),  // BobT: don't reference count the cached type!
 	_wname (0),
@@ -66,7 +67,6 @@ ImplAAFPropertyDef::ImplAAFPropertyDef ()
   _persistentProperties.put (_Type.address());
   _persistentProperties.put (_IsOptional.address());
   _persistentProperties.put (_pid.address());
-  _persistentProperties.put (_DefaultValue.address());
   _persistentProperties.put (_IsUniqueIdentifier.address());
 }
 
@@ -226,24 +226,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPropertyDef::GetDefaultValue (
-      ImplAAFPropertyValue ** /*ppDataValue*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPropertyDef::SetDefaultValue (
-      ImplAAFPropertyValue * /*pDataValue*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
 OMPropertyId ImplAAFPropertyDef::OmPid (void) const
 {
   return _pid;
@@ -305,8 +287,6 @@ OMProperty * ImplAAFPropertyDef::CreateOMProperty () const
 {
   OMProperty * result = 0;
 
-  ImplAAFPropertyDef* pNonConstThis = (ImplAAFPropertyDef*) this;
-
   if (_OMPropCreateFunc)
 	{
 	  result = _OMPropCreateFunc (_pid, name());
@@ -351,7 +331,101 @@ void ImplAAFPropertyDef::onSave(void* clientContext) const
   ImplAAFMetaDefinition::onSave(clientContext);
 }
 
+
+#define AAF_BEGIN_TYPE_PATCHES()\
+  ImplAAFPropertyDef *nonConstThis;\
+  OMPropertyId pid = _pid;\
+  aafUID_t typeId;\
+  switch (pid)\
+  {
+
+
+#define AAF_PATCH_PROPETY_TYPE(pid, tid)\
+    case pid:\
+    {\
+      nonConstThis = const_cast<ImplAAFPropertyDef *>(this);\
+      typeId = _Type;\
+      if (0 != memcmp(&typeId, &tid, sizeof(aafUID_t)))\
+      {\
+        nonConstThis->_Type = tid;\
+      }\
+    }\
+    break;
+
+      
+#define AAF_END_TYPE_PATCHES()\
+    default:\
+      break;\
+  }
+
+
 void ImplAAFPropertyDef::onRestore(void* clientContext) const
 {
+  // NOTE: This is a patch for DR3 & DR4 and 
+  // earlier files. Such files actually have the wrong type definition
+  // associated with the property definition.
+
+  AAF_BEGIN_TYPE_PATCHES()
+
+    // All strong reference sets in DR3 files were incorrectly described as variable arrays.
+    // DR4 now has an implementation for strong reference sets so we need to "remap" all of
+    // the builtin types so the strong reference sets will be created instead of strong
+    // reference arrays.
+    AAF_PATCH_PROPETY_TYPE(PID_ClassDefinition_Properties, kAAFTypeID_PropertyDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_ContentStorage_Mobs, kAAFTypeID_MobStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_ContentStorage_EssenceData, kAAFTypeID_EssenceDataStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_OperationDefinitions, kAAFTypeID_OperationDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_ParameterDefinitions, kAAFTypeID_ParameterDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_DataDefinitions, kAAFTypeID_DataDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_PluginDefinitions, kAAFTypeID_PluginDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_CodecDefinitions, kAAFTypeID_CodecDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_ContainerDefinitions, kAAFTypeID_ContainerDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_InterpolationDefinitions, kAAFTypeID_InterpolationDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_MetaDictionary_ClassDefinitions, kAAFTypeID_ClassDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_MetaDictionary_TypeDefinitions, kAAFTypeID_TypeDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_OperationDefinition_ParametersDefined, kAAFTypeID_ParameterDefinitionWeakReferenceSet)
+  
+    // The DataDefinitions property is implemented as a weak reference vector. The object model for 
+    // DR4, AAFMetaDictionary.h, and earlier incorrectly described this type as a weak reference set.
+    AAF_PATCH_PROPETY_TYPE(PID_CodecDefinition_DataDefinitions, kAAFTypeID_DataDefinitionWeakReferenceVector)    
+   
+    // The Definition property was incorrectly implemented as an AUID. The object model for 
+    // DR4, AAFMetaDictionary.h, and earlier correctly described this type as a weak reference.
+    // Since the file format if "frozen" the new AAFMetaDictionary describes this property
+    // as an AUID to be consistent with the implementation.
+    AAF_PATCH_PROPETY_TYPE(PID_Parameter_Definition, kAAFTypeID_AUID)
+   
+    // The Type property was incorrectly implemented as an AUID. The object model for 
+    // DR4, AAFMetaDictionary.h, and earlier correctly described this type as a weak reference.
+    // Since the file format if "frozen" the new AAFMetaDictionary describes this property
+    // as an AUID to be consistent with the implementation.
+    AAF_PATCH_PROPETY_TYPE(PID_PropertyDefinition_Type, kAAFTypeID_AUID)
+
+  AAF_END_TYPE_PATCHES()
+
+
   ImplAAFMetaDefinition::onRestore(clientContext);
+}
+
+
+#undef AAF_BEGIN_TYPE_PATCHES
+#undef AAF_PATCH_PROPETY_TYPE
+#undef AAF_END_TYPE_PATCHES
+
+
+
+// Method is called after class has been added to MetaDictionary.
+// If this method fails the class is removed from the MetaDictionary and the
+// registration method will fail.
+HRESULT ImplAAFPropertyDef::CompleteClassRegistration(void)
+{
+  // Make sure the associated type definition can complete.
+  //
+  ImplAAFTypeDefSP pType;
+  AAFRESULT hr = GetTypeDef (&pType);
+  if (AAFRESULT_SUCCEEDED(hr))
+  {
+    hr = pType->CompleteClassRegistration();
+  }
+  return hr;
 }
