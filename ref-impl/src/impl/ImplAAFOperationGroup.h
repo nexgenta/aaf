@@ -4,50 +4,52 @@
 #define __ImplAAFOperationGroup_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
 
-#ifndef __ImplAAFOperationDef_h__
-#include "ImplAAFOperationDef.h"
-#endif
-
-#include "OMStrongRefProperty.h"
-#include "OMStrongRefVectorProperty.h"
-#include "OMStrongRefSetProperty.h"
-#include "OMWeakRefProperty.h"
 
 class ImplAAFDataDef;
-class ImplAAFParameter;
-class ImplAAFSegment;
-class ImplAAFSourceReference;
 
-template <class T> 
-class ImplAAFEnumerator;
-typedef ImplAAFEnumerator<ImplAAFParameter> ImplEnumAAFParameters;
+class ImplAAFOperationDef;
+
+class ImplAAFParameter;
+
+class ImplEnumAAFOperationDefs;
+
+class ImplEnumAAFParameterDefs;
+
+class ImplAAFSegment;
+
+class ImplAAFSourceReference;
 
 #ifndef __ImplAAFParameter_h__
 #include "ImplAAFParameter.h"
@@ -83,7 +85,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] Data Definition Object
-         ImplAAFDataDef * pDataDef,
+         const aafUID_t & datadef,
 
 
          // @parm [in] Length property value
@@ -103,14 +105,6 @@ public:
         // @parm [out] Effect definition object
         (ImplAAFOperationDef ** OperationDef);
 	//@comm Replaces part of omfiEffectGetInfo
-
-  //****************
-  // SetOperationDefinition()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetOperationDefinition
-        // @parm [in] Effect definition object
-        (ImplAAFOperationDef * OperationDef);
 
 
   //****************
@@ -147,22 +141,22 @@ public:
 	//@comm Replaces omfiEffectGetBypassOverride
 
   //****************
-  // CountSourceSegments()
+  // GetNumSourceSegments()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountSourceSegments
+    GetNumSourceSegments
         // @parm [out] Number of source media segments in the effect
-        (aafUInt32 *  numSources);
+        (aafInt32 *  numSources);
 	//@comm Replaces omfiEffectGetNumSlots
 
 
   //****************
-  // CountParameters()
+  // GetNumParameters()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountParameters
+    GetNumParameters
         // @parm [out] Number of parameter slots in the effect
-        (aafUInt32 *  numParameters);
+        (aafInt32 *  numParameters);
 	//@comm Replaces omfiEffectGetNumSlots
 
   //****************
@@ -174,40 +168,20 @@ public:
         (aafBool *  validTransition);
 
   //****************
-  // AddParameter()
+  // AddNewParameter()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddParameter
+    AddNewParameter
         (// @parm [in] Parameter to place in effect slot
          ImplAAFParameter * value);
 	//@comm Replaces part of omfiEffectAddNewSlot
 
   //****************
-  // AppendInputSegment()
+  // AddNewInputSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendInputSegment
+    AppendNewInputSegment
         (// @parm [in] Segment to place in effect
-         ImplAAFSegment * value);
-	//@comm Replaces part of omfiEffectAddNewSlot
-
-  //****************
-  // PrependInputSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    PrependInputSegment
-        (// @parm [in] Segment to place in effect
-         ImplAAFSegment * value);
-	//@comm Replaces part of omfiEffectAddNewSlot
-
-  //****************
-  // PrependInputSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    InsertInputSegmentAt
-        (// @parm [in] index to place segment
-         aafUInt32 index,
-	     // @parm [in] Segment to place in effect
          ImplAAFSegment * value);
 	//@comm Replaces part of omfiEffectAddNewSlot
 
@@ -233,7 +207,7 @@ public:
   // GetParameterByArgID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupParameter
+    GetParameterByArgID
         (// @parm [in] Arg ID
          aafArgIDType_t  argID,
 
@@ -241,41 +215,20 @@ public:
          ImplAAFParameter ** parameter);
 
   //****************
-  // GetParameters()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetParameters
-        (// @parm [out] enumerator across parameters
-         ImplEnumAAFParameters ** ppEnum);
-
-  //****************
   // GetIndexedInputSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetInputSegmentAt
+    GetIndexedInputSegment
         (// @parm [in] 1-based index into the effet inputs
-         aafUInt32  index,
+         aafInt32  index,
 
          // @parm [out] Input segment
          ImplAAFSegment ** inputSegment);
 
-  //****************
-  // GetIndexedInputSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveInputSegmentAt
-        (// @parm [in] 1-based index into the effet inputs
-         aafUInt32  index);
-
-public:
-
-	 virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
-												aafMobID_constref to);
-
 private:
-	OMWeakReferenceProperty<ImplAAFOperationDef>		_operationDefinition;
+	OMFixedSizeProperty<aafUID_t>						_operationDefinition;
 	OMStrongReferenceVectorProperty<ImplAAFSegment>		_inputSegments;
-	OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFParameter>		_parameters;
+	OMStrongReferenceVectorProperty<ImplAAFParameter>	_parameters;
 	OMFixedSizeProperty<aafUInt32>						_bypassOverride;
 	OMStrongReferenceProperty<ImplAAFSourceReference>	_rendering;
 };

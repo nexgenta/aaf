@@ -3,14 +3,32 @@
 #ifndef __ImplAAFIdentification_h__
 #define __ImplAAFIdentification_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -40,14 +58,12 @@ public:
     const wchar_t* productName,
     const aafProductVersion_t* productVersion,
     const wchar_t* productVersionString,
-    // const AUID* productId,
+    const aafUID_t & productId,
     const aafTimeStamp_t date,
     const aafProductVersion_t* toolKitVersion,
     const wchar_t* platform
     // const AUID* generation
     );
-
-  OMDECLARE_STORABLE(ImplAAFIdentification)
 
 
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -81,7 +97,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetCompanyName
 		// @parm [in, string] The Company Name
-        (wchar_t *  pName);
+        (const aafCharacter * pName);
 
 
   //****************
@@ -111,7 +127,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductName
 		// @parm [in, string] The Product Name
-        (wchar_t *  pName);
+        (const aafCharacter * pName);
 
 
   //****************
@@ -141,7 +157,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductVersionString
 		// @parm [in, string] The Product Version String
-        (wchar_t *  pVersionString);
+        (const aafCharacter * pVersionString);
 
 
   //****************
@@ -177,7 +193,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductID
 		// @parm [in] The Product ID
-        (aafUID_t *  pProductID);
+        (const aafUID_t & productID);
 
 
   //****************
@@ -227,21 +243,16 @@ public:
 		// @parm [out] The unique generation
         (aafUID_t *  pGeneration);
 
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFIdentificationTest.cpp.
-  static AAFRESULT test();
-
 private:
-  OMWideStringProperty                             _companyName;
-  OMWideStringProperty                             _productName;
-  // StructuredProperty<aafProductVersion_t> _productVersion;
-  OMWideStringProperty                             _productVersionString;
-  // FixedSizeProperty<AUID>                 _productId;
-  OMFixedSizeProperty<aafTimeStamp_t>          _date;
-  // StructuredProperty<aafProductVersion_t> _toolkitVersion;
-  OMWideStringProperty                             _platform;
-  // FixedSizeProperty<AUID>                 _generation;
+  OMWideStringProperty                      _companyName;
+  OMWideStringProperty						_productName;
+  OMFixedSizeProperty<aafProductVersion_t>	_productVersion;
+  OMWideStringProperty                      _productVersionString;
+  OMFixedSizeProperty<aafUID_t>             _productId;
+  OMFixedSizeProperty<aafTimeStamp_t>       _date;
+  OMFixedSizeProperty<aafProductVersion_t>	_toolkitVersion;
+  OMWideStringProperty                      _platform;
+  OMFixedSizeProperty<aafUID_t>             _generation;
 };
 
 #endif // ! __ImplAAFIdentification_h__

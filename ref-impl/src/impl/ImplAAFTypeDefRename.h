@@ -37,7 +37,6 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
-#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefRename : public ImplAAFTypeDef
 {
@@ -153,7 +152,10 @@ public:
 private:
   ImplAAFTypeDefSP BaseType () const;
 
-   OMWeakReferenceProperty<ImplAAFTypeDef> _RenamedType;
+  // OMWeakReferenceProperty<ImplAAFTypeDef> _RenamedType;
+  OMFixedSizeProperty<aafUID_t>           _RenamedType;
+
+  ImplAAFTypeDefSP _cachedBaseType;
 };
 
 //
