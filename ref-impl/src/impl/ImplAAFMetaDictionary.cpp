@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.1 2004/12/13 04:34:35 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.2 2004/12/13 04:35:50 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1424,23 +1424,13 @@ AAFRESULT ImplAAFMetaDictionary::MergeWithFile()
             PrintPropertyName(pPropDef); 
             std::wcout << " compiled-in but not in file." << std::endl; 
 
-#if 1
+	    // Merge the property to the file class.
 	    hr = pPropDef->MergeTo( pFileClassDef );
 	    assert( AAFRESULT_SUCCESS == hr );
 	    if ( AAFRESULT_SUCCESS != hr ) {
 	      result = hr;
 	      break;
 	    }
-#else
-	    // This might (redundantly) be called multiple times.
-	    ImplAAFDictionary* pFileDictionary = 0;
-	    hr = pFileClassDef->GetDictionary( &pFileDictionary );
-	    assert( AAFRESULT_SUCCESS == hr );
-	    if ( AAFRESULT_SUCCESS == hr ) {
-	      pClassDef->MergeTo( pFileDictionary );
-	      pFileDictionary->ReleaseReference();
-	    }
-#endif
           }
         } 
       } 
