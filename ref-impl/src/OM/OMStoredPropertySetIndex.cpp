@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,6 +26,9 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. |
+//         OMStoredPropertySetIndex
+
 #include "OMStoredPropertySetIndex.h"
 
 #include "OMAssertions.h"
@@ -41,7 +44,7 @@ OMStoredPropertySetIndex::OMStoredPropertySetIndex(size_t capacity)
   for (size_t i = 0; i < _capacity; i++) {
     _table[i]._valid = false;
     _table[i]._propertyId = 0;
-    _table[i]._type = 0;
+    _table[i]._storedForm = 0;
     _table[i]._length = 0;
     _table[i]._offset = 0;
   }
@@ -56,17 +59,17 @@ OMStoredPropertySetIndex::~OMStoredPropertySetIndex(void)
 }
 
   // @mfunc Insert a new property into this <c OMStoredPropertySetIndex>.
-  //        The new property has id <p propertyId>. The property
-  //        representation is of type <p type>. The property value
+  //        The new property has id <p propertyId>. The stored property
+  //        representation is <p storedForm>. The property value
   //        occupies <p length> bytes starting at offset <p offset>.
   //   @parm The id of the property to insert.
-  //   @parm The type of representation to use for the property.
+  //   @parm The stored form to use for the property.
   //   @parm The offset of the property value in bytes.
   //   @parm The size of the property value in bytes.
 void OMStoredPropertySetIndex::insert(OMPropertyId propertyId,
-                                      OMUInt32 type,
-                                      OMUInt32 offset,
-                                      OMUInt32 length)
+                                      OMStoredForm storedForm,
+                                      OMPropertyOffset offset,
+                                      OMPropertySize length)
 {
   TRACE("OMStoredPropertySetIndex::insert");
 
@@ -81,7 +84,7 @@ void OMStoredPropertySetIndex::insert(OMPropertyId propertyId,
   ASSERT("Valid index entry", entry != 0);
 
   entry->_propertyId = propertyId;
-  entry->_type = type;
+  entry->_storedForm = storedForm;
   entry->_offset = offset;
   entry->_length = length;
   entry->_valid = true;
@@ -101,15 +104,15 @@ size_t OMStoredPropertySetIndex::entries(void) const
   //   @parm Iteration  context. Set this to 0 to start with the
   //         "first" property.
   //   @parm The id of the "current" property.
-  //   @parm The type of representation used for the "current" property.
+  //   @parm The stored form used for the "current" property.
   //   @parm The offset of the "current" property value in bytes.
   //   @parm The size of the "current" property value in bytes.
   //   @this const
 void OMStoredPropertySetIndex::iterate(size_t& context,
                                        OMPropertyId& propertyId,
-                                       OMUInt32& type,
-                                       OMUInt32& offset,
-                                       OMUInt32& length) const
+                                       OMStoredForm& storedForm,
+                                       OMPropertyOffset& offset,
+                                       OMPropertySize& length) const
 {
   TRACE("OMStoredPropertySetIndex::iterate");
 
@@ -126,7 +129,7 @@ void OMStoredPropertySetIndex::iterate(size_t& context,
   }
   if (entry != 0) {
     propertyId = entry->_propertyId;
-    type = entry->_type;
+    storedForm = entry->_storedForm;
     offset = entry->_offset;
     length = entry->_length;
     context = ++found;
@@ -136,24 +139,24 @@ void OMStoredPropertySetIndex::iterate(size_t& context,
 }
 
   // @mfunc Find the property with property id <p propertyId> in this
-  //        <c OMStoredPropertySetIndex>. If found the <p type>,
+  //        <c OMStoredPropertySetIndex>. If found the <p storedForm>,
   //        <p offset> and <p length> of the property are returned.
   //   @parm The id of the property to find.
-  //   @parm The type of representation used for the property.
+  //   @parm The stored form used for the property.
   //   @parm The offset of the property value in bytes.
   //   @parm The size of the property value in bytes.
   //   @rdesc True if a property with the given id was found, false otherwise.
-  //   @this const  
+  //   @this const
 bool OMStoredPropertySetIndex::find(const OMPropertyId& propertyId,
-                                    OMUInt32& type,
-                                    OMUInt32& offset,
-                                    OMUInt32& length) const
+                                    OMStoredForm& storedForm,
+                                    OMPropertyOffset& offset,
+                                    OMPropertySize& length) const
 {
   bool result;
 
   OMStoredPropertySetIndex::IndexEntry* e = find(propertyId);
   if (e != 0) {
-    type = e->_type;
+    storedForm = e->_storedForm;
     offset = e->_offset;
     length = e->_length;
     result = true;
@@ -167,7 +170,7 @@ bool OMStoredPropertySetIndex::find(const OMPropertyId& propertyId,
   //   @rdesc True if this <c OMStoredPropertySetIndex> is valid,
   //          false otherwise.
   //   @this const
-bool OMStoredPropertySetIndex::isValid(void) const
+bool OMStoredPropertySetIndex::isValid(OMPropertyOffset baseOffset) const
 {
   TRACE("OMStoredPropertySetIndex::isValid");
 
@@ -181,7 +184,7 @@ bool OMStoredPropertySetIndex::isValid(void) const
   size_t entries = 0;
   size_t currentOffset;
   size_t currentLength;
-  size_t position = 0;
+  size_t position = baseOffset;
 
   for (size_t i = 0; i < _capacity; i++) {
     if (_table[i]._valid) {
@@ -195,7 +198,7 @@ bool OMStoredPropertySetIndex::isValid(void) const
       if (currentOffset != position) {
         result = false;  // gap or overlap
         break;
-	  }
+      }
       // this entry is valid, calculate the expected next position
       position = position + currentLength;
     }
@@ -204,7 +207,7 @@ bool OMStoredPropertySetIndex::isValid(void) const
   if (entries != _entries) {
     result = false;
   }
-  
+
   return result;
 }
 
