@@ -9,6 +9,7 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \************************************************/
 
@@ -57,16 +58,13 @@ public:
 
 
 public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFPluginManagerTest.cpp.
+  static AAFRESULT test();
+
+public:
 	//Toolkit internal only
 static ImplAAFPluginManager *GetPluginManager(void);
-
-// Create an object contained within one of the loaded plugin files.
-AAFRESULT CreateInstance(
-			REFCLSID rclsid, 
-			IUnknown* pUnkOuter, 
-			REFIID riid, 
-			void ** result);
-
 
 AAFRESULT GetPluginInstance(
 			aafUID_t		pluginID,
@@ -90,7 +88,6 @@ AAFRESULT CreatePluginDefinition (aafUID_t  pluginDefID,
         IAAFDefObject ** pPluginDesc);
 
 private:
-  aafTable_t	*_pluginFiles;
 	aafTable_t	*_plugins;
 	aafTable_t	*_codecDesc;
 };
@@ -105,3 +102,21 @@ private:
 //	AAFEssenceCodec			*dispatch;
 //	aafCodecMetaInfo_t		metaInfo;
 //} codecTableEntry_t;
+
+#if FULL_TOOLKIT
+			class AAFEssenceCodec	*pluginRoutine,
+			aafPluginType_t			type);
+#endif
+
+
+
+#if FULL_TOOLKIT
+AAFRESULT EnumCodecs(
+			aafUID_t		dataDefinition,
+			aafFileRev_t	rev);
+
+AAFRESULT EnumCodecVarieties(
+			aafUID_t		codecID,
+			aafFileRev_t    setrev,
+			aafUID_t		dataDefinition);
+#endif
