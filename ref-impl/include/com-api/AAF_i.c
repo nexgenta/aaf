@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAF_i.c,v 1.4.2.1 2004/03/19 18:16:21 stuart_hc Exp $ $Name:  $
+// $Id: AAF_i.c,v 1.4.2.2 2004/03/24 14:07:51 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -440,6 +440,9 @@ const IID IID_IAAFMasterMobEx = {0xb1a21370,0x1a7d,0x11d2,{0xbf,0x78,0x00,0x10,0
 
 
 const IID IID_IAAFMob2 = {0xa94fdb8b,0x451f,0x4d62,{0xac,0x17,0x16,0x95,0x03,0x44,0x83,0x2e}};
+
+
+const IID IID_IAAFComponent2 = {0xc703e7f5,0xb97f,0x44fb,{0x87,0xda,0xa4,0x12,0xe6,0x0e,0xa6,0xaa}};
 
 
 #ifdef __cplusplus
