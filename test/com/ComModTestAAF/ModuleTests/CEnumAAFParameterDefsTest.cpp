@@ -40,8 +40,10 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
+
+#include "AAFWideString.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -71,7 +73,8 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 static const aafUID_t TEST_EFFECT_AUID = 
 { 0x12684769, 0xcd02, 0x11d3, { 0xa3, 0xf4, 0x0, 0x4, 0xac, 0x96, 0xa9, 0x37 } };
@@ -94,13 +97,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"EnumAAFParameterDefs Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -170,16 +175,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
 
-		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
-
 		// Add two parameter defs, so that we can test all functions
 		checkResult(defs.cdParameterDef()->
 					CreateInstance(IID_IAAFParameterDef, 
 								   (IUnknown **)&pParamDef));
 
+		checkResult(pParamDef->Initialize (TestParamUID1, TEST_PARAM_NAME1, TEST_PARAM_DESC1, defs.tdRational()));
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->Initialize (TestParamUID1, TEST_PARAM_NAME1, TEST_PARAM_DESC1));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		pParamDef->Release();
@@ -190,7 +192,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 								   (IUnknown **)&pParamDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->Initialize (TestParamUID2, TEST_PARAM_NAME2, TEST_PARAM_DESC2));
+		checkResult(pParamDef->Initialize (TestParamUID2, TEST_PARAM_NAME2, TEST_PARAM_DESC2, defs.tdRational()));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		pParamDef->Release();
@@ -242,11 +244,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
 	aafBool				readIsTimeWarp;
-	aafUInt32			catLen;
 	aafInt32			checkNumInputs;
-	aafUInt32			checkBypass, testLen;
+	aafUInt32			checkBypass;
 	HRESULT				hr = S_OK;
-	wchar_t				checkCat[256], checkName[256];
+	wchar_t				checkName[256];
+	aafUID_t			checkCat;
 	wchar_t				testString[256];
 	aafUInt32			resultCount;
 	IAAFDataDefSP		pReadDataDef;
@@ -277,11 +279,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkExpression(bResult == kAAFTrue, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->IsTimeWarp (&readIsTimeWarp));
 		checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
-		checkResult(pOperationDef->GetCategoryBufLen (&catLen));
-		testLen = wcslen(TEST_CATEGORY);
-		checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));
-		checkExpression(wcscmp(checkCat, TEST_CATEGORY) == 0, AAFRESULT_TEST_FAILED);
-		checkExpression(testLen == wcslen(checkCat), AAFRESULT_TEST_FAILED);
+		checkResult(pOperationDef->GetCategory (&checkCat));
+		checkExpression(memcmp(&checkCat, &TEST_CATEGORY, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetBypass (&checkBypass));
 		checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
@@ -441,7 +440,9 @@ extern "C" HRESULT CEnumAAFParameterDefs_test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFParameterDefs_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFParameterDefs_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
