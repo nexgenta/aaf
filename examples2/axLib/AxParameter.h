@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxParameter.h,v 1.2.2.1 2004/09/02 13:37:42 jptrainor Exp $
+// $Id: AxParameter.h,v 1.2.2.2 2004/09/02 14:27:13 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,8 @@ class AxParameter : public AxObject {
   AxParameter( IAAFParameterSP spIaafParameter );
   virtual ~AxParameter();
 
+  IAAFParameterDefSP GetParameterDefinition();
+  
   inline operator IAAFParameterSP ()
     { return _spIaafParameter; }
 
@@ -53,6 +55,25 @@ class AxConstantValue : public AxParameter {
   void Initialize( IAAFParameterDefSP spParameterDef,
 		   aafUInt32 valueSize,
 		   aafDataBuffer_t pValue );
+
+  void GetValue( aafUInt32 valueSize,
+		 aafDataBuffer_t pValue,
+		 aafUInt32* bytesRead );
+
+  template <typename ParamType>
+  void GetValue( ParamType& val )
+  {
+    ParamType tmp;
+    aafUInt32 bytesRead;
+    GetValue( sizeof(tmp), reinterpret_cast<aafDataBuffer_t>(&tmp), &bytesRead );
+    if ( sizeof(tmp) == bytesRead ) {
+      val = tmp;
+    }
+    else {
+      throw AxEx( L"size mismatch in AxConstantValue::GetValue()" );      
+    }
+  }
+
 
   inline operator IAAFConstantValueSP ()
     { return _spIaafConstantValue; }
