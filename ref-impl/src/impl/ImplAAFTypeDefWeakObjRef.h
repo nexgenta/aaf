@@ -5,7 +5,7 @@
 
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -38,6 +38,7 @@ class ImplAAFClassDef;
 #ifndef __ImplAAFTypeDefObjectRef_h__
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
+#include "OMWeakRefProperty.h"
 
 
 class ImplAAFTypeDefWeakObjRef : public ImplAAFTypeDefObjectRef
@@ -68,39 +69,53 @@ public:
          // @parm [in, string] friendly name of this type definition
          const aafCharacter * pTypeName,
 
-		 // List of property definition IDs indicating the property where
-		 // the target is to be found.
-		 aafUID_t * pTargetHint,
+         // @parm [in] Number of property def IDs in pTargetSet
+         aafUInt32  ids,
 
-		 // Number of property def IDs in pTargetHint
-		 aafUInt32 targetHintCount);
+         // @parm [in, size_is(ids)] List of property definition IDs indicating the property where
+         // the target is to be found.
+         aafUID_constptr  pTargetSet);
+
+  // Override from AAFTypeDefObjectRef
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateValue (/*[in]*/ ImplAAFRoot * pObj,
+      /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     SetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[in]*/ ImplAAFObject * ppObject);
+      /*[in]*/ ImplAAFRoot * ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[out]*/ ImplAAFObject ** ppObject);
+      /*[out]*/ ImplAAFRoot ** ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
-
-  // Override from AAFTypeDefObjectRef
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateValue (/*[in]*/ ImplAAFObject * pObj,
-      /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
 
   // Override from AAFTypeDef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
 
 
+private:
+  // Synchronize the array of OM pids with the current TargetSet property.
+  AAFRESULT SyncTargetPidsFromTargetSet(void);
+  
+  // Synchronize the TargetSet property from the current targetPids OM pid array.
+  AAFRESULT SyncTargetSetFromTargetPids(void);
 
 public:
+
+
+  // Override from AAFTypeDefObjectRef
+  virtual AAFRESULT STDMETHODCALLTYPE
+    pvtInitialize
+        (const aafUID_t & id,
+         const ImplAAFClassDef *pType,
+         const aafCharacter * pTypeName);
 
   // overrides from ImplAAFTypeDef
   //
@@ -110,16 +125,27 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
+
+
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 
 private:
+  // Persistent member properties
   OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
-
-  ImplAAFTypeDefSP                     _cachedAuidType;
-
-  ImplAAFTypeDefSP BaseType (void) const;
+  OMVariableSizeProperty<aafUID_t> _targetSet; // array of property definition ids
+  
+  // Transient members
+  OMPropertyId * _targetPids;
+  aafUInt32 _targetPidCount;
+  OMPropertyId _uniqueIdentifierPid;
 };
 
 

@@ -33,7 +33,7 @@
 
 
 class ImplAAFPropertyValue;
-
+class ImplAAFRoot;
 class ImplAAFClassDef;
 
 
@@ -65,7 +65,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     CreateValue
         (// @parm [in] object with which to initialize this object reference
-         ImplAAFObject * pObj,
+         ImplAAFRoot * pObj,
 
          // @parm [out] newly created property value
          ImplAAFPropertyValue ** ppPropVal);
@@ -89,7 +89,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [out] pointer to object value
-         ImplAAFObject ** ppObject);
+         ImplAAFRoot ** ppObject);
 
 
   //****************
@@ -101,7 +101,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [in] pointer to object value
-         ImplAAFObject * ppObject);
+         ImplAAFRoot * ppObject);
 
 
 
@@ -161,6 +161,10 @@ public:
   virtual bool IsFixedArrayable () const;
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 };
 
 //
