@@ -3,27 +3,8 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
- 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-
-
 
 
 #ifndef __ImplAAFFindSourceInfo_h__
@@ -33,42 +14,61 @@
 #include <assert.h>
 #include <string.h>
 #include "aafCvt.h"
+#include "ImplAAFMob.h"
+#include "ImplAAFOperationGroup.h"
+#include "AAFDefUIDs.h"
 
 ImplAAFFindSourceInfo::ImplAAFFindSourceInfo ()
-{}
+{
+	_mob = NULL;
+	_cpnt = NULL;
+	_editRate.numerator = 0;
+	_editRate.denominator = 1;
+	CvtInt32toLength(0, _position);
+	CvtInt32toLength(0, _length);
+	_operationGroup = NULL;
+}
 
 
 ImplAAFFindSourceInfo::~ImplAAFFindSourceInfo ()
-{}
-
-
-extern "C" const aafClassID_t CLSID_AAFFindSourceInfo;
-
-OMDEFINE_STORABLE(ImplAAFFindSourceInfo, CLSID_AAFFindSourceInfo);
-
-// Cheat!  We're using this object's CLSID instead of object class...
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFFindSourceInfo::GetObjectClass(aafUID_t * pClass)
 {
-  if (! pClass)
+	if (_mob)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		_mob->ReleaseReference();
+		_mob = NULL;
 	}
-  memcpy (pClass, &CLSID_AAFFindSourceInfo, sizeof (aafClassID_t));
-  return AAFRESULT_SUCCESS;
+	if (_cpnt)
+	{
+		_cpnt->ReleaseReference();
+		_cpnt = NULL;
+	}
+	if (_operationGroup)
+	{
+		_operationGroup->ReleaseReference();
+		_operationGroup = NULL;
+	}
 }
+
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFindSourceInfo::Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t position,
 							aafRational_t editRate, aafLength_t length,
 							ImplAAFComponent *cpnt)
 {
+	if (_mob)
+		_mob->ReleaseReference();
 	_mob = mob;
+	if (mob)
+		mob->AcquireReference();
 	_slotID = slotID;
 	_position = position;
 	_editRate = editRate;
 	_length = length;
+	if (_cpnt)
+		_cpnt->ReleaseReference();
 	_cpnt = cpnt;
+	if (cpnt)
+		cpnt->AcquireReference();
 	return(AAFRESULT_SUCCESS);
 }
 
@@ -87,7 +87,12 @@ ImplAAFFindSourceInfo::Duplicate(ImplAAFFindSourceInfo *result)
 
 AAFRESULT STDMETHODCALLTYPE ImplAAFFindSourceInfo::Clear(void)
 {
+	if (_mob)
+		_mob->ReleaseReference();
 	_mob = NULL;
+	if (_cpnt)
+		_cpnt->ReleaseReference();
+	_cpnt = NULL;
 	_editRate.numerator = 0;
 	_editRate.denominator = 1;
 //!!!	  (*sourceInfo).filmTapePdwn = NULL;
@@ -95,22 +100,89 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFFindSourceInfo::Clear(void)
 //!!!	  (*sourceInfo).effeObject = NULL;
 	CvtInt32toLength(0, _position);
 	CvtInt32toLength(0, _length);
-	_effect = NULL;
+	if (_operationGroup)
+		_operationGroup->ReleaseReference();
+	_operationGroup = NULL;
 
 	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFindSourceInfo::SetEffect(
-										ImplAAFEffectInvocation *effect)
+ImplAAFFindSourceInfo::SetOperationGroup(
+				ImplAAFOperationGroup *group)
 {
-	_effect = effect;
+	if (_operationGroup)
+		_operationGroup->ReleaseReference();
+	_operationGroup = group;
+	if (group)
+	  group->AcquireReference();
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFFindSourceInfo::SetComponent(
+				ImplAAFComponent *cpnt)
+{
+	if (_cpnt)
+		_cpnt->ReleaseReference();
+	_cpnt = cpnt;
+	if (cpnt)
+	  cpnt->AcquireReference();
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+		ImplAAFFindSourceInfo::GetSourceReference(aafSourceRef_t *pSourceRef)
+{
+	if (pSourceRef == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		pSourceRef->sourceSlotID = _slotID;
+		pSourceRef->startTime = _position;
+		if(_mob != NULL)
+		{
+			CHECK(_mob->GetMobID(&pSourceRef->sourceID));
+		}
+		else
+		{
+			pSourceRef->sourceID = NilMOBID;
+		}
+	}
+	XEXCEPT
+	XEND;
+
 	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFindSourceInfo::GetMob(ImplAAFMob **ppMob)
 {
+	if(ppMob == NULL)
+		return AAFRESULT_NULL_PARAM;
 	*ppMob = _mob;
+	if (*ppMob)
+	  (*ppMob)->AcquireReference();
+	else
+	  return AAFRESULT_NULLOBJECT;
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFFindSourceInfo::GetEditRate(aafRational_t *pEditRate)
+{
+	if(pEditRate == NULL)
+		return AAFRESULT_NULL_PARAM;
+	*pEditRate = _editRate;
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFFindSourceInfo::GetLength(aafLength_t *pLength)
+{
+	if(pLength == NULL)
+		return AAFRESULT_NULL_PARAM;
+	*pLength = _length;
 	return AAFRESULT_SUCCESS;
 }

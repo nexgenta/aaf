@@ -4,7 +4,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -108,12 +107,15 @@ ImplAAFMob::~ImplAAFMob ()
 		}
 	}
 
-	size = _userComments.getSize();
-	for (size_t j = 0; j < size; j++)
+	if(_userComments.isPresent())
 	{
-		ImplAAFTaggedValue* pTaggedValue = _userComments.setValueAt(0, j);
-		if (pTaggedValue)
-			pTaggedValue->ReleaseReference();
+		size = _userComments.getSize();
+		for (size_t j = 0; j < size; j++)
+		{
+			ImplAAFTaggedValue* pTaggedValue = _userComments.setValueAt(0, j);
+			if (pTaggedValue)
+				pTaggedValue->ReleaseReference();
+		}
 	}
 }
 
@@ -141,7 +143,7 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::RemoveSlot
         (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -181,7 +183,11 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	stat = _name.copyToBuffer(pName, bufSize);
+	if(!_name.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	else
+		stat = _name.copyToBuffer(pName, bufSize);
+	
 	if (! stat)
 	{
 	  return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
@@ -199,8 +205,14 @@ ImplAAFMob::GetNameBufLen
 {
 	if(pSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	*pSize = _name.size();
-	return(AAFRESULT_SUCCESS); 
+	
+	if(!_name.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	else
+	{
+		*pSize = _name.size();
+		return(AAFRESULT_SUCCESS); 
+	}
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -224,12 +236,24 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::GetMobInfo (aafTimeStamp_t *  /*lastModified*/,
-                           aafTimeStamp_t *  /*creationTime*/,
-							aafWChar *  /*name*/,
+    ImplAAFMob::GetMobInfo (aafTimeStamp_t *lastModified,
+                           aafTimeStamp_t *creationTime,
+							aafWChar *name,
 							aafInt32 nameLen)
-                           {
-  return AAFRESULT_NOT_IMPLEMENTED;
+{
+	aafAssert(creationTime != NULL, NULL, AAFRESULT_NULL_PARAM);
+	aafAssert(creationTime != NULL, NULL, AAFRESULT_NULL_PARAM);
+	aafAssert(creationTime != NULL, NULL, AAFRESULT_NULL_PARAM);
+    XPROTECT()
+	{
+		CHECK(GetCreateTime (creationTime));
+		CHECK(GetModTime (creationTime));
+		CHECK(GetName(name, nameLen));
+	}
+	XEXCEPT
+	XEND;
+
+	return(AAFRESULT_SUCCESS); 
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -243,16 +267,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 	return(AAFRESULT_SUCCESS);
 }
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::SetNewProps (aafBool  /*isMasterMob*/,
-                           aafWChar *  /*name*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::SetModTime (aafTimeStamp_t *modTime)
@@ -572,7 +586,7 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::RemoveComment
         (aafMobComment_t *  comment)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -583,17 +597,27 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pNumComments == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	_userComments.getSize(numComments);
+	if(!_userComments.isPresent())
+	{	// If the userComments property is not present then
+		// number of user comments is zero!
+		*pNumComments = 0; //return AAFRESULT_PROP_NOT_PRESENT;
+	}
+	else
+	{
+		_userComments.getSize(numComments);
 
-	*pNumComments = numComments;
-
+		*pNumComments = numComments;
+	}
+		
 	return(AAFRESULT_SUCCESS);
 }
-
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::EnumAAFAllMobComments (ImplEnumAAFTaggedValues** ppEnum)
 {
+	if(!_userComments.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+		
 	ImplEnumAAFTaggedValues*	theEnum = (ImplEnumAAFTaggedValues *)CreateImpl(CLSID_EnumAAFTaggedValues);
 
 	XPROTECT()
@@ -685,22 +709,22 @@ AAFRESULT STDMETHODCALLTYPE
 			}
 			
 			*result = timecode;
-			if(slot = NULL)
+			if(slot != NULL)
 			{
 				slot->ReleaseReference();
 				slot = NULL;
 			}
-			if(pdwn = NULL)
+			if(pdwn != NULL)
 			{
 				pdwn->ReleaseReference();
 				pdwn = NULL;
 			}
-			if(pdwnInput = NULL)
+			if(pdwnInput != NULL)
 			{
 				pdwnInput->ReleaseReference();
 				pdwnInput = NULL;
 			}
-			if(iter = NULL)
+			if(iter != NULL)
 			{
 				iter->ReleaseReference();
 				iter = NULL;
@@ -709,13 +733,13 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XEXCEPT
 	{
-		if(iter = NULL)
+		if(iter != NULL)
 			iter->ReleaseReference();
-		if(slot = NULL)
+		if(slot != NULL)
 			slot->ReleaseReference();
-		if(pdwn = NULL)
+		if(pdwn != NULL)
 			pdwn->ReleaseReference();
-		if(pdwnInput = NULL)
+		if(pdwnInput != NULL)
 			pdwnInput->ReleaseReference();
 		return(XCODE());
 	}
@@ -1746,7 +1770,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 
 AAFRESULT ImplAAFMob::ReconcileMobLength(void)
 {
-	return(AAFRESULT_NOT_IMPLEMENTED);	// MUST call one of the subclasses
+	return(AAFRESULT_ABSTRACT_CLASS);	// MUST call one of the subclasses
 }
 
 
