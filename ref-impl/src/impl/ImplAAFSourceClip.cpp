@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.cpp,v 1.46.2.1 2004/07/23 16:16:06 akharkev Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.cpp,v 1.46.2.2 2004/07/23 21:39:27 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -360,11 +360,4 @@ AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 void ImplAAFSourceClip::Accept(AAFComponentVisitor& visitor)
 {
 	visitor.VisitSourceClip(this);
-}
-
-
-
-void ImplAAFSourceClip::onCopy(void* clientContext) const
-{
-  ImplAAFSourceReference::onCopy(clientContext);
 }
