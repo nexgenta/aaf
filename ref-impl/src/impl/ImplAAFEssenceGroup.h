@@ -116,15 +116,15 @@ public:
 										ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
 										ImplAAFComponent **foundObj, aafBool *foundTransition);
 
+	AAFRESULT GetCriteriaSourceClip(
+			aafMediaCriteria_t *criteria,
+			ImplAAFSourceClip		**retSrcClip);
 
 public:
   // Declare this class to be storable.
   //
   OMDECLARE_STORABLE(ImplAAFEssenceGroup)
 
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFEssenceGroupTest.cpp.
-  static AAFRESULT test();
 private:
 	OMStrongReferenceVectorProperty<ImplAAFSourceClip>	_choices;
 	OMStrongReferenceProperty<ImplAAFSourceClip>		_stillFrame;
