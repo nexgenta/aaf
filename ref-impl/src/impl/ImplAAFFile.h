@@ -12,13 +12,8 @@
 *                                          *
 \******************************************/
 
-#ifndef __AAFTypes_h__
 #include "AAFTypes.h"
-#endif
-
-#ifndef __ImplAAFRoot_h__
-#include "AAFRoot.h"
-#endif
+#include "ImplAAFRoot.h"
 
 #include "Container.h"
 
@@ -49,6 +44,8 @@ public:
   ImplAAFFile ();
   virtual ~ImplAAFFile ();
 
+  OMDECLARE_STORABLE(AAFFile);
+
   //***********************************************************
   // METHOD NAME: Close()
   //
@@ -71,6 +68,11 @@ public:
   GetRevision (
     // @parm aafFileRev_t * | rev | [out] Revision of the current file
     aafFileRev_t *  rev
+  );
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+  GetHeader (
+    ImplAAFHeader ** header
   );
 
 public:
