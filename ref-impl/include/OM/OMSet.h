@@ -34,6 +34,9 @@
 
 #include <stddef.h>
 
+template <typename Key, typename Element>
+class OMSetIterator;
+
   // @class Sets of uniquely identified elements. Duplicate elements
   //        are not allowed.
   //   @tcarg class | Element | The type of an <c OMSet> element.
@@ -61,33 +64,33 @@ public:
   virtual void insert(const Element value);
 
     // @cmember Does this <c OMSet> contain <p value> ?
-    //   @this const
-  virtual bool contains(const Element value) const;
+  virtual bool containsValue(const Element value) const;
 
     // @cmember Does this <c OMSet> contain an <p Element>
     //          identified by <p key>?
-    //   @this const
   virtual bool contains(const Key key) const;
 
     // @cmember Find the <p Element> in this <c OMSet> identified by
     //          <p key>.  If the element is found it is returned in
     //          <p value> and the result is true. If the element is
     //          not found the result is false.
-    //   @this const
   virtual bool find(const Key key, Element& value) const;
 
     // @cmember The number of elements in this <c OMSet>.
     //          <mf OMSet::count> returns the actual number
     //          of elements in the <c OMSet>.
-    //   @this const
   size_t count(void) const;
 
     // @cmember Append the given <p Element> <p value> to
     //          this <c OMSet>.
   void append(const Element value);
 
+    // @cmember Remove the <p Element> with <p Key> <p key>
+    //          from this <c OMSet>.
+  virtual void remove(const Key key);
+
     // @cmember Remove <p value> from this <c OMSet>.
-  virtual void remove(const Element value);
+  virtual void removeValue(const Element value);
 
 private:
   // @access Private members.
@@ -95,6 +98,8 @@ private:
     // The set is implemented as a binary search tree.
     //
   OMRedBlackTree<Key, Element> _tree;
+
+  friend class OMSetIterator<Key, Element>;
 
 };
 

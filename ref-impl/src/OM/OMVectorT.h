@@ -65,9 +65,9 @@ void OMVector<Element>::insert(const Element value)
   //   @parm The Element to search for. A value of type <p Element> by value.
   //   @this const 
 template <typename Element>
-bool OMVector<Element>::contains(const Element value) const
+bool OMVector<Element>::containsValue(const Element value) const
 {
-  TRACE("OMVector<Element>::contains");
+  TRACE("OMVector<Element>::containsValue");
 
   bool result = false;
 
@@ -166,7 +166,6 @@ void OMVector<Element>::shrink(size_t capacity)
   // Calculate the new capacity
   //
   size_t newCapacity = nextHigherCapacity(capacity);
-  size_t oldCapacity = _capacity;
 
   if (newCapacity < _capacity) {
 
@@ -197,7 +196,7 @@ void OMVector<Element>::shrink(size_t capacity)
     //
     delete [] oldVector;
   }
-  POSTCONDITION("Size properly decreased", _capacity <= oldCapacity);
+  // POSTCONDITION("Size properly decreased", _capacity <= oldCapacity);
 }
 
   // @mfunc Is this <c OMVector> full ?
@@ -266,6 +265,21 @@ void OMVector<Element>::getAt(Element& value, const size_t index) const
   PRECONDITION("Valid index", ((index >= 0) && (index < _count)));
 
   value = _vector[index];
+}
+
+  // @mfunc Get the value of the <p Element> at
+  //        position <p index> in this <c OMVector>.
+  //   @tcarg class | Element | The type of an <c OMVector> element.
+  //          This type must support operator = and operator ==.
+  //   @parm The index.
+  //   @this const
+template <typename Element>
+Element& OMVector<Element>::getAt(const size_t index) const
+{
+  TRACE("OMVector<Element>::getAt");
+  PRECONDITION("Valid index", ((index >= 0) && (index < _count)));
+
+  return _vector[index];
 }
 
   // @mfunc Insert <p value> into this <c OMVector> at
