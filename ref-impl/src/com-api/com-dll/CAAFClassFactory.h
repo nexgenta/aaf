@@ -32,14 +32,14 @@
 #include "CAAFUnknown.h"
 #endif
 
-// We need the following definition for a bool type since
+// We meed the following definition for a bool type since
 // the Win32 used BOOL as an int and ActiveX SDK, MacOLE use
 // unsigned long for OLEBOOL.
 // NOTE: We may have to move this definition to AAFTypes.h.
-#if defined(_MAC) || defined(_MAC_) || defined(macintosh)
-#define AAFBOOL OLEBOOL
-#else
+#if defined(_WIN32) || defined(WIN32)
 #define AAFBOOL BOOL
+#else
+#define AAFBOOL OLEBOOL
 #endif
 
 // Define the object creation callback function that should be
@@ -59,15 +59,13 @@ public:
 	
 protected:
 	// CAAFUnknown override
-    STDMETHOD(InternalQueryInterface)(REFIID riid, void **ppv);
-
-  // Wrapper to call the private _pfnCreate proc.
-  HRESULT CallClassFactoryFunction(IUnknown *, void **);
+    virtual HRESULT InternalQueryInterface(REFIID riid, void **ppv);
 
 public:
     // IClassFactory methods 
-    STDMETHOD(CreateInstance)(IUnknown * pUnkOuter, REFIID riid, void ** ppv); 
+    STDMETHOD(CreateInstance)(IUnknown * punkOuter, REFIID riid, void ** ppv); 
     STDMETHOD(LockServer)(AAFBOOL fLock);     
+     
 
 private:
 	AAFCreateComObjectProc _pfnCreate;

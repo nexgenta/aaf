@@ -62,12 +62,13 @@ HRESULT CAAFClassFactory::InternalQueryInterface
 	if (NULL == ppvObj)
 		return E_INVALIDARG;
 
+    // We only support the IClassFactory interface 
     if (riid == IID_IClassFactory) 
     { 
-        *ppvObj = (IClassFactory *)this; 
+        *ppvObj = this; 
         ((IUnknown *)*ppvObj)->AddRef();
-        return S_OK;
-    }
+		return S_OK;
+    } 
 
 	// Always delegate back to base implementation.
 	return CAAFUnknown::InternalQueryInterface(riid, ppvObj);
@@ -89,48 +90,21 @@ STDMETHODIMP CAAFClassFactory::CreateInstance
 
 	*ppvObj = NULL;
 	
-	// "Note that the nondelegating versions of QueryInteface, 
-	// AddRef, and Relase are used. If a stand-alone identity is
-	// being created, this is certainly appropriate. If an aggregate
-	// is being created, this is necessary to ensure that the inner
-	// object is Addrefed, not the outer object. Also note that 
-	// the outer object must request IUnknown as the initial 
-	// inteface. This is mandated by the COM Specification.
-	// If the outer object could request any initial inteface, then
-	// the inner object would essentially need to keep two duplicate
-	// sets of vptrs, one set that delegated its QueryInterface, 
-	// AddRef, and Release implementations and another set that did
-	// not. By restricting the initial interface to IUnknown, the 
-	// object implementor needs to isolate only the one vptr to act
-	// as the nondelegating IUnknown." (p. 194, "Essensial COM", by
-	// Don Box, Addison Wesley, 2nd Printing Feb. 1998)
-	if (NULL != pUnkOuter && IID_IUnknown != riid)
-		return E_INVALIDARG; //CLASS_E_NOAGGREGATION;
-
 	// Ask the callback function to create the object instance.
-	CAAFUnknown* pUnknown = NULL;
-	hr = CallClassFactoryFunction(pUnkOuter, (void **)&pUnknown);
+	IUnknown* pUnknown = NULL;
+	hr = _pfnCreate(pUnkOuter, (void **)&pUnknown);
 	if (FAILED(hr))
 		return hr;
-
-	// Bump the reference count.
-	pUnknown->InternalAddRef();
-	
+		
 	// See if the object implements the requested interface. if 
 	// this call succeeds than the reference count should be two if 
 	// it fails then the reference count will still be one and the 
-	// following release will delete the object.
-	hr = pUnknown->InternalQueryInterface(riid, ppvObj);
+	// following spObject release will delete the object.
+	hr = pUnknown->QueryInterface(riid, ppvObj);
 
-	pUnknown->InternalRelease();
+	pUnknown->Release();
 
 	return hr;
-}
-
-// Wrapper to call the private _pfnCreate proc.
-HRESULT CAAFClassFactory::CallClassFactoryFunction(IUnknown *pUnkOuter, void **ppvObj)
-{
-	return (*_pfnCreate)(pUnkOuter, ppvObj);
 }
 
 
@@ -139,6 +113,9 @@ STDMETHODIMP CAAFClassFactory::LockServer
 	AAFBOOL fLock
 )
 {
-  g_pAAFServer->Lock((fLock) ? kAAFTrue : kAAFFalse);
+	g_pAAFServer->Lock(static_cast<aafBool>(fLock));
 	return S_OK;
 }
+
+
+
