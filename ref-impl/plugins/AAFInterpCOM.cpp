@@ -43,6 +43,7 @@
 //		run nmake -f aafcomps.mk in the project directory.
 
 
+#include "AAFTypes.h"
 #include "CAAFInProcServer.h"
 
 static CAAFInProcServer g_AAFInProcServer;
@@ -55,7 +56,7 @@ CAAFServer* g_pAAFServer = &g_AAFInProcServer;
 #include "AAFPlugin_i.c"
 
 
-#if defined(_MAC)
+#if defined( OS_MACOS )
 
 // Make sure we have defined IID_IUnknown and IID_IClassFactory.
 #include <initguid.h>
@@ -100,9 +101,9 @@ void pascal DllTerminationRoutine();
 
 
 #pragma export on
-#endif // #if defined(_MAC)
+#endif // #if defined( OS_MACOS )
 
-#if defined(__sgi)
+#if defined( OS_UNIX )
 
 class InterpCOMInitialize {
 public:
@@ -122,9 +123,9 @@ InterpCOMInitialize::~InterpCOMInitialize()
 
 InterpCOMInitialize init;
 
-#endif
+#endif  // OS_UNIX
 
-#if defined(WIN32) || defined(_WIN32)
+#if defined( OS_WINDOWS )
 // Include the entry point for the windows dll.
 /////////////////////////////////////////////////////////////////////////////
 // DLL Entry Point
@@ -146,13 +147,13 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 	return TRUE;    // ok
 }
 
-#endif
+#endif  // OS_WINDOWS
 
 
 /////////////////////////////////////////////////////////////////////////////
 // Used to determine whether the DLL can be unloaded by OLE
 
-extern "C" STDAPI DllCanUnloadNow(void)
+STDAPI DllCanUnloadNow(void)
 {
 	return g_AAFInProcServer.CanUnloadNow();
 }
@@ -160,7 +161,7 @@ extern "C" STDAPI DllCanUnloadNow(void)
 /////////////////////////////////////////////////////////////////////////////
 // Returns a class factory to create an object of the requested type
 
-extern "C" STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
+STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
 	return g_AAFInProcServer.GetClassObject(rclsid, riid, ppv);
 }
@@ -168,7 +169,7 @@ extern "C" STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 /////////////////////////////////////////////////////////////////////////////
 // DllRegisterServer - Adds entries to the system registry
 
-extern "C" STDAPI DllRegisterServer(void)
+STDAPI DllRegisterServer(void)
 {
 	// registers objects, typelib and all interfaces in typelib
 	return g_AAFInProcServer.RegisterServer(TRUE);
@@ -177,7 +178,7 @@ extern "C" STDAPI DllRegisterServer(void)
 /////////////////////////////////////////////////////////////////////////////
 // DllUnregisterServer - Removes entries from the system registry
 
-extern "C" STDAPI DllUnregisterServer(void)
+STDAPI DllUnregisterServer(void)
 {
 	// Unregisters all objects.
 	return g_AAFInProcServer.UnregisterServer();
@@ -191,20 +192,20 @@ extern "C" STDAPI DllUnregisterServer(void)
 //
 
 // Return the number of coclasses exported from this dll.
-extern "C" STDAPI_(ULONG) AAFGetClassCount(void)
+STDAPI_(ULONG) AAFGetClassCount(void)
 {
 	return g_AAFInProcServer.GetClassCount();
 }
 
 // Get the nth implementation coclass id.
-extern "C" STDAPI AAFGetClassObjectID(ULONG index, CLSID *pClassID)
+STDAPI AAFGetClassObjectID(ULONG index, CLSID *pClassID)
 {
 	return g_AAFInProcServer.GetClassObjectID(index, pClassID);
 }
 
 
 
-#if defined(_MAC)
+#if defined( OS_MACOS )
 //
 //  DllGetVersion
 //
@@ -342,5 +343,5 @@ DllTerminationRoutine()
 
 
 #pragma export off
-#endif // #if defined(_MAC)
+#endif // #if defined( OS_MACOS )
 

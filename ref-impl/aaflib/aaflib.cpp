@@ -1,24 +1,30 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
+
 
 
 
@@ -47,19 +53,16 @@
 #endif
 
 
-// Use conditional to control inclusion of stream code.
-#ifndef USE_IOSTREAM
-#define USE_IOSTREAM 0
-#endif
 
 
 // ASSERT code copied from OM...
+#include <iostream.h>
 
 #ifdef _DEBUG
 
-#if USE_IOSTREAM
+#include <stdlib.h>
 
-#include <iostream.h>
+#define FAILURE -1
 
 void reportAssertionFailure(char* kind,
                             char* name,
@@ -73,23 +76,8 @@ void reportAssertionFailure(char* kind,
   cerr << "The failure occurred at line " << lineNumber
        << " in file \"" << fileName << "\"." << endl;
   cerr << "The condition \"" << expressionString << "\" was violated." << endl;
-  throw AAFRESULT_ASSERTION_VIOLATION;
+  abort();
 }
-
-#else // #if USE_IOSTREAM
-
-void reportAssertionFailure(char*,
-                            char*,
-                            char*,
-                            char*,
-                            char*,
-                            size_t)
-{
-  throw AAFRESULT_ASSERTION_VIOLATION;
-}
-
-#endif // #else // #if USE_IOSTREAM
-
 
 
 #endif
@@ -215,7 +203,6 @@ STDAPI AAFFileOpenExistingRead (
   aafUInt32  modeFlags,
   IAAFFile ** ppFile)
 {
-  TRACE("AAFFileOpenExistingRead");
   HRESULT hr = S_OK;
   AAFDLL *pAAFDLL = NULL;
 
@@ -239,6 +226,13 @@ STDAPI AAFFileOpenExistingRead (
     // Attempt to call the dll's exported function...
     hr = pAAFDLL->OpenExistingRead(pFileName, modeFlags, ppFile);
   }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
+  }
   catch (...)
   {
     // Return a reasonable exception code.
@@ -260,7 +254,6 @@ STDAPI AAFFileOpenExistingModify (
   aafProductIdentification_t *  pIdent,
   IAAFFile ** ppFile)
 {
-  TRACE("AAFFileOpenExistingModify");
   HRESULT hr = S_OK;
   AAFDLL *pAAFDLL = NULL;
 
@@ -283,6 +276,13 @@ STDAPI AAFFileOpenExistingModify (
   {
     // Attempt to call the dll's exported function...
     hr = pAAFDLL->OpenExistingModify(pFileName, modeFlags, pIdent, ppFile);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
   }
   catch (...)
   {
@@ -307,9 +307,9 @@ STDAPI AAFFileOpenNewModify (
   aafProductIdentification_t *  pIdent,
   IAAFFile ** ppFile)
 {
-  TRACE("AAFFileOpenNewModify");
   HRESULT hr = S_OK;
   AAFDLL *pAAFDLL = NULL;
+
 
   // Get the dll wrapper
   hr = LoadIfNecessary(&pAAFDLL);
@@ -320,6 +320,13 @@ STDAPI AAFFileOpenNewModify (
   {
     // Attempt to call the dll's exported function...
     hr = pAAFDLL->OpenNewModify(pFileName, modeFlags, pIdent, ppFile);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
   }
   catch (...)
   {
@@ -341,9 +348,9 @@ STDAPI AAFFileOpenTransient (
   aafProductIdentification_t *  pIdent,
   IAAFFile ** ppFile)
 {
-  TRACE("AAFFileOpenTransient");
   HRESULT hr = S_OK;
   AAFDLL *pAAFDLL = NULL;
+
 
   // Get the dll wrapper
   hr = LoadIfNecessary(&pAAFDLL);
@@ -354,6 +361,13 @@ STDAPI AAFFileOpenTransient (
   {
     // Attempt to call the dll's exported function...
     hr = pAAFDLL->OpenTransient(pIdent, ppFile);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
   }
   catch (...)
   {
@@ -401,7 +415,7 @@ static aafBool isRecognizedSignature(unsigned char* signature,
                                      size_t signatureSize,
                                      aafUID_t* fileKind);
 
-static const size_t maxSignatureSize = 256; //signatureSize();
+static size_t maxSignatureSize = signatureSize();
 
 // Just like fopen() except for wchar_t* file names.
 //
@@ -438,11 +452,10 @@ HRESULT readSignature(FILE* file,
   TRACE("readSignature");
   ASSERT("Valid file", file != 0);
   ASSERT("Valid signature buffer", signature != 0);
-  ASSERT("Valid signature buffer size", signatureSize != 0 
-                      && signatureSize <= maxSignatureSize);
+  ASSERT("Valid signature buffer size", signatureSize != 0);
 
   HRESULT hr = S_OK;
-  unsigned char sig[maxSignatureSize];
+  unsigned char* sig = new unsigned char[signatureSize];
   if (sig == 0) {
     hr = AAFRESULT_NOMEMORY;
   } else {
@@ -453,6 +466,7 @@ HRESULT readSignature(FILE* file,
       hr = AAFRESULT_NOT_AAF_FILE;  // Can't read signature
     }
   }
+  delete [] sig;
   return hr;
 }
 
@@ -509,7 +523,6 @@ STDAPI AAFFileIsAAFFile (
     aafUID_t *  pAAFFileKind,
     aafBool *  pFileIsAAFFile)
 {
-  TRACE("AAFFileIsAAFFile");
   if (pFileName == 0)
     return AAFRESULT_NULL_PARAM;
 
@@ -519,20 +532,17 @@ STDAPI AAFFileIsAAFFile (
   if (pFileIsAAFFile == 0)
     return AAFRESULT_NULL_PARAM;
 
-  ASSERT("Valid signature buffer size", signatureSize() <= maxSignatureSize);
-
-
   HRESULT hr = S_OK;
-  unsigned char signature[maxSignatureSize];
+  unsigned char* signature = new unsigned char[maxSignatureSize];
   if (signature == 0) {
     hr = AAFRESULT_NOMEMORY;
   } else {
     FILE* f = wfopen(pFileName, L"rb");
     if (f != 0) {
-      hr = readSignature(f, signature, signatureSize());
+      hr = readSignature(f, signature, maxSignatureSize);
       if (SUCCEEDED(hr)) {
         *pFileIsAAFFile = isRecognizedSignature(signature,
-                                                signatureSize(),
+                                                maxSignatureSize,
                                                 pAAFFileKind);
       } else {
         // The file exists but we can't read the signature
@@ -544,127 +554,9 @@ STDAPI AAFFileIsAAFFile (
       hr = AAFRESULT_FILE_NOT_FOUND; // Can't open file
     }
   }
+  delete [] signature;
   return hr;
 }
-
-
-
-//***********************************************************
-//
-// AAFCreateRawStorageMemory()
-//
-STDAPI AAFCreateRawStorageMemory (
-  aafFileAccess_t  access,
-  IAAFRawStorage ** ppNewRawStorage)
-{
-  HRESULT hr = S_OK;
-  AAFDLL *pAAFDLL = NULL;
-
-  // Get the dll wrapper
-  hr = LoadIfNecessary(&pAAFDLL);
-  if (FAILED(hr))
-    return hr;
-  
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->CreateRawStorageMemory(access,
-										 ppNewRawStorage);
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
-
-  return hr;
-}
-
-
-
-//***********************************************************
-//
-// AAFCreateRawStorageDisk()
-//
-STDAPI AAFCreateRawStorageDisk (
-  aafCharacter_constptr  filename,
-  aafFileExistence_t  existence,
-  aafFileAccess_t  access,
-  IAAFRawStorage ** ppNewRawStorage)
-{
-  HRESULT hr = S_OK;
-  AAFDLL *pAAFDLL = NULL;
-
-  // Get the dll wrapper
-  hr = LoadIfNecessary(&pAAFDLL);
-  if (FAILED(hr))
-    return hr;
-  
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->CreateRawStorageDisk
-	  (filename,
-	   existence,
-	   access,
-	   ppNewRawStorage);
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
-
-  return hr;
-}
-
-
-
-//***********************************************************
-//
-// AAFCreateAAFFileOnRawStorage()
-//
-STDAPI AAFCreateAAFFileOnRawStorage (
-  IAAFRawStorage * pRawStorage,
-  aafFileExistence_t  existence,
-  aafFileAccess_t  access,
-  aafUID_constptr  pFileKind,
-  aafUInt32  modeFlags,
-  aafProductIdentification_constptr  pIdent,
-  IAAFFile ** ppNewFile)
-{
-  HRESULT hr = S_OK;
-  AAFDLL *pAAFDLL = NULL;
-
-  // Get the dll wrapper
-  hr = LoadIfNecessary(&pAAFDLL);
-  if (FAILED(hr))
-    return hr;
-  
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->CreateAAFFileOnRawStorage
-	  (pRawStorage,
-	   existence,
-	   access,
-	   pFileKind,
-	   modeFlags,
-	   pIdent,
-	   ppNewFile);
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
-
-  return hr;
-}
-
 
 
 //***********************************************************
@@ -687,6 +579,13 @@ STDAPI AAFGetPluginManager (
   {
     // Attempt to call the dll's exported function...
     hr = pAAFDLL->GetPluginManager(ppPluginManager);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
   }
   catch (...)
   {
@@ -797,29 +696,7 @@ HRESULT AAFDLL::Load(const char *dllname)
   if (AAFRESULT_FAILED(rc))
     return rc;
 
-  // These callbacks did not exist in DR4 or earlier toolkits. Ignore the error
-  // return if the first new exported function cannot be found. If the first
-  // exported function is present then all three must be present for the dll
-  // to be valid.
-  rc = ::AAFFindSymbol(_libHandle,
-					   "AAFCreateRawStorageMemory",
-					   (AAFSymbolAddr *)&_pfnCreateRawStorageMemory);
-  if (AAFRESULT_SUCCEEDED(rc))
-  {
-    rc = ::AAFFindSymbol(_libHandle,
-  					   "AAFCreateRawStorageDisk",
-  					   (AAFSymbolAddr *)&_pfnCreateRawStorageDisk);
-    if (AAFRESULT_FAILED(rc))
-      return rc;
-
-    rc = ::AAFFindSymbol(_libHandle,
-  					   "AAFCreateAAFFileOnRawStorage",
-  					   (AAFSymbolAddr *)&_pfnCreateAAFFileOnRawStorage);
-    if (AAFRESULT_FAILED(rc))
-      return rc;
-  }
-
-  return AAFRESULT_SUCCESS;
+  return rc;
 }
 
 
@@ -857,9 +734,6 @@ void AAFDLL::ClearEntrypoints()
   _pfnOpenNewModify = NULL;
   _pfnOpenTransient = NULL;
   _pfnGetPluginManager = NULL;
-  _pfnCreateRawStorageMemory = 0;
-  _pfnCreateRawStorageDisk = 0;
-  _pfnCreateAAFFileOnRawStorage = 0;
 }
 
 
@@ -917,57 +791,4 @@ HRESULT AAFDLL::GetPluginManager (
   TRACE("AAFDLL::GetPluginManager");
   ASSERT("Valid dll callback function", _pfnGetPluginManager);
   return _pfnGetPluginManager(ppPluginManager);  
-}
-
-HRESULT AAFDLL::CreateRawStorageMemory (
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage)
-{
-  TRACE("AAFDLL::CreateRawStorageMemory");
-//  ASSERT("Valid dll callback function", _pfnCreateRawStorageMemory);
-  // This callback did not exist in DR4 or earlier toolkits.
-  if (NULL == _pfnCreateRawStorageMemory)
-    return AAFRESULT_DLL_SYMBOL_NOT_FOUND;
-    
-  return _pfnCreateRawStorageMemory(access, ppNewRawStorage);
-}
-
-HRESULT AAFDLL::CreateRawStorageDisk (
-    aafCharacter_constptr  filename,
-    aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage)
-{
-  TRACE("AAFDLL::CreateRawStorageDisk");
-//  ASSERT("Valid dll callback function", _pfnCreateRawStorageDisk);
-  // This callback did not exist in DR4 or earlier toolkits.
-  if (NULL == _pfnCreateRawStorageDisk)
-    return AAFRESULT_DLL_SYMBOL_NOT_FOUND;
-    
-  return _pfnCreateRawStorageDisk(filename, existence, access, ppNewRawStorage);  
-}
-
-HRESULT AAFDLL::CreateAAFFileOnRawStorage (
-    IAAFRawStorage * pRawStorage,
-	aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	aafUID_constptr  pFileKind,
-	aafUInt32  modeFlags,
-	aafProductIdentification_constptr  pIdent,
-	IAAFFile ** ppNewFile)
-{
-  TRACE("AAFDLL::CreateAAFFileOnRawStorage");
-//  ASSERT("Valid dll callback function", _pfnCreateAAFFileOnRawStorage);
-  // This callback did not exist in DR4 or earlier toolkits.
-  if (NULL == _pfnCreateAAFFileOnRawStorage)
-    return AAFRESULT_DLL_SYMBOL_NOT_FOUND;
-    
-  return _pfnCreateAAFFileOnRawStorage
-	(pRawStorage,
-	 existence,
-	 access,
-	 pFileKind,
-	 modeFlags,
-	 pIdent,
-	 ppNewFile);
 }
