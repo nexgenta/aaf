@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.44 2004/10/19 14:51:53 bakerian Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.45 2004/10/20 09:12:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-//#include <strings.h>		// for strncasecmp()
 #include <iostream>
 using namespace std;
 
@@ -233,12 +232,13 @@ static aafUInt8 *readDVframe(aafUInt32 *bufferSize)
 // TODO: We need to create a general-purpose library which all tests and
 // perhaps all examples have access to instead of duplicating code.
 
-#ifdef _MSC_VER			// MS VC++ dosen't provide POSIX strcasecmp, getcwd
+#ifdef _MSC_VER			// MS VC++ dosen't provide POSIX strncasecmp, getcwd
 #define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
 #include <direct.h>
 #define getcwd(buf, size) _getcwd(buf, size)
 #else
-#include <unistd.h>		// getcwd
+#include <strings.h>	// strncasecmp()
+#include <unistd.h>		// getcwd()
 #endif
 
 static bool acceptable_pchar(unsigned char c)

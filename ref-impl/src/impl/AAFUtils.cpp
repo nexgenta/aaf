@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.55 2004/10/18 15:29:54 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.56 2004/10/20 09:12:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,7 +42,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <strings.h>		// for strncasecmp()
 #include <assert.h>
 #include <time.h>
 #include <math.h>
@@ -809,8 +808,10 @@ void AAFByteSwap64(
 //
 // NB. ':' is acceptable unescaped in the fpath component
 
-#ifdef _MSC_VER			// MS VC++ dosen't provide POSIX strcasecmp
+#ifdef _MSC_VER			// MS VC++ dosen't provide POSIX strncasecmp
 #define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
+#else
+#include <strings.h>	// strncasecmp()
 #endif
 
 static bool acceptable_pchar(unsigned char c)
