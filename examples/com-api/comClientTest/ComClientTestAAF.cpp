@@ -32,6 +32,7 @@
 
 // Include the AAF interface declarations.
 #include "AAF.h"
+#include "AAFTypes.h"
 
 
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
@@ -39,10 +40,38 @@
 
 #include "CAAFBuiltinDefs.h"
 
-#if defined(macintosh) || defined(_MAC)
+#if defined( OS_MACOS )
 #include "DataInput.h"
 #endif
 
+static const aafMobID_t TEST_MobID[5] = {
+
+//{060c2b340205110101001000-13-00-00-00-{fcd55620-9bca-11d4-9f7f-080036210804}}
+{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00, 
+{0xfcd55620, 0x9bca, 0x11d4, 0x9f, 0x7f, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
+
+//{060c2b340205110101001000-13-00-00-00-{5cf19020-9f89-11d4-9f82-080036210804}}
+{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+0x13, 0x00, 0x00, 0x00, 
+{0x5cf19020, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
+
+//{060c2b340205110101001000-13-00-00-00-{5de486f0-9f89-11d4-9f82-080036210804}}
+{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+0x13, 0x00, 0x00, 0x00, 
+{0x5de486f0, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
+
+//{060c2b340205110101001000-13-00-00-00-{5e8e24c0-9f89-11d4-9f82-080036210804}}
+{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+0x13, 0x00, 0x00, 0x00, 
+{0x5e8e24c0, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
+
+//{060c2b340205110101001000-13-00-00-00-{5f37c290-9f89-11d4-9f82-080036210804}}
+{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+0x13, 0x00, 0x00, 0x00, 
+{0x5f37c290, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
+
+}; // TEST_MobID[]
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
 {
@@ -116,12 +145,12 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
     while (*wName++ = *name++)
       ;
   } else {
-    fprintf(stderr, "\nError : Failed to copy '%s'.\n\n", name);
+    fprintf(stderr, "\nError : Failed to copy string.\n\n");
     exit(1);  
   }
 }
 
-#if defined(__sgi) || defined(__linux__) || defined (__FreeBSD__)
+#if defined( OS_UNIX )
 
 static const unsigned char guidMap[] =
 { 3, 2, 1, 0, '-', 5, 4, '-', 7, 6, '-', 8, 9, '-', 10, 11, 12, 13, 14, 15 }; 
@@ -176,45 +205,6 @@ static void formatMobID(char *cBuffer, size_t length, aafMobID_t *pMobID)
     exit(1);  
   }
 }
-
-#if defined(_MAC) || defined(macintosh)
-// For some reason the CoCreateGuid() function is not implemented in the 
-// Microsoft Component Library...so we define something that should be
-// fairly unique on the mac.
-
-#include <Events.h>
-#include <time.h>
-
-STDAPI CoCreateGuid(GUID  *pguid)
-{
-  // {1994bd00-69de-11d2-b6bc-fcab70ff7331}
-  static GUID sTemplate = 
-    { 0x1994bd00, 0x69de, 0x11d2, { 0xb6, 0xbc, 0xfc, 0xab, 0x70, 0xff, 0x73, 0x31 } };
-
-  static bool sInitializedTemplate = false;
-  
-  if (NULL == pguid)
-    return E_INVALIDARG;
-    
-  if (!sInitializedTemplate)
-  {
-    time_t timer = time(NULL);
-    UInt32 ticks = TickCount();
-   
-    sTemplate.Data1 += timer + ticks;
-    
-    sInitializedTemplate = true;
-  }
-  
-  // Just bump the first member of the guid to emulate GUIDGEN behavior.
-  ++sTemplate.Data1;
-  
-  *pguid = sTemplate;
-  
-  return S_OK;
-}
-
-#endif
 
 static void printIdentification(IAAFIdentification* pIdent)
 {
@@ -375,7 +365,6 @@ static void ReadAAFFile(aafWChar * pFileName)
                   check(hr); // display error message
                   if(SUCCEEDED(hr))
                   {
-                    assert ((numLocators >= 0), "numLocators written");
                     printf ("    It has %d locator%s attached.\n",
                             numLocators,
                             numLocators==1 ? "" : "s");
@@ -463,7 +452,6 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFHeader *        pHeader = NULL;
   IAAFDictionary *pDictionary = NULL;
   aafProductIdentification_t  ProductInfo;
-  aafMobID_t          newMobID;
  
   // delete any previous test file before continuing...
   char chFileName[1000];
@@ -517,9 +505,7 @@ static void CreateAAFFile(aafWChar * pFileName)
 		  CreateInstance(IID_IAAFSourceMob, 
 						 (IUnknown **)&smob));
     check(smob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-    check(CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
-    //newMobID.Data1 = test;
-    check(pMob->SetMobID(newMobID));
+    check(pMob->SetMobID( TEST_MobID[ test ] ));
     check(pMob->SetName(names[test]));
 
 	// Create a concrete subclass of FileDescriptor
@@ -612,19 +598,6 @@ static void CreateAAFFile(aafWChar * pFileName)
 
 }
 
-// simple helper class to initialize and cleanup COM library.
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
 
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
@@ -645,7 +618,6 @@ struct CAAFInitialize
 
 int main(int argc, char *argv[])
 {
-  CComInitialize comInit;
   CAAFInitialize aafInit;
 
   aafWChar * pwFileName = L"Foo.aaf";
