@@ -41,11 +41,6 @@
 
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xce1b01e6, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -84,20 +79,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceClip	*sclp = NULL;
 	IAAFComponent*		pComponent = NULL;
 	aafProductIdentification_t	ProductInfo;
+	aafMobID_t					newMobID;
 	HRESULT						hr = S_OK;
 	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFStaticMobSlot Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+	
 	
 	try
 	{
@@ -119,12 +114,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		long	test;
 		aafRational_t	audioRate = { 44100, 1 };
 		
-		// Create a concrete subclass of Mob
-		checkResult(defs.cdMasterMob()->
+		// Create a Mob
+		checkResult(defs.cdMob()->
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pMob));
 		
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"MOBTest"));
 		
 		// Add some slots
@@ -212,15 +208,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafNumSlots_t	numMobs, n, s;
 	HRESULT						hr = S_OK;
 	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFStaticMobSlot Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 	
@@ -319,7 +313,7 @@ extern "C" HRESULT CAAFStaticMobSlot_test()
 	catch (...)
 	{
 		cerr << "CAAFStaticMobSlot_test...Caught general C++"
-			 << " exception!" << endl; 
+			" exception!" << endl; 
 		hr = AAFRESULT_TEST_FAILED;
 	}
 	
