@@ -50,7 +50,7 @@ typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 extern "C" const aafClassID_t CLSID_EnumAAFComponents;
 
 ImplAAFSequence::ImplAAFSequence ()
-:   _components(			PID_Sequence_Components,		"Components")
+:   _components(			PID_Sequence_Components,		L"Components")
 {
 	_persistentProperties.put(_components.address());
 }
@@ -289,7 +289,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pComponent) return AAFRESULT_NULL_PARAM;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -306,7 +306,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -323,7 +323,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
