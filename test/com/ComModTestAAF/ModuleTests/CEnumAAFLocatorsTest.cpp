@@ -31,8 +31,6 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -86,6 +84,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
 	IAAFEssenceDescriptor *edesc = NULL;
+	aafRational_t	audioRate = { 44100, 1 };
 	aafProductIdentification_t	ProductInfo;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
@@ -227,6 +226,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IEnumAAFLocators *			pCloneEnum = NULL;
 	IAAFLocator	*				pLocator = NULL;
 	aafUInt32					numLocators;
+	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	bool bFileOpen = false;
@@ -235,6 +235,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFLocator				**	pArrayPoint = pArray;
 	aafUInt32			resultCount;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"EnumAAFLocators Test. NOT!";
+	ProductInfo.productVersion = &v;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.platform = NULL;
 
 	try
 	{	

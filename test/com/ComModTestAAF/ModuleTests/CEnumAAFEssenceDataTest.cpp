@@ -39,7 +39,6 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -51,8 +50,8 @@ struct EnumEssenceDataTest
   EnumEssenceDataTest();
   ~EnumEssenceDataTest();
 
-  void createFile(const wchar_t *pFileName);
-  void openFile(const wchar_t *pFileName);
+  void createFile(wchar_t *pFileName);
+  void openFile(wchar_t *pFileName);
 
   void createFileMob(int itemNumber);
   void createEssenceData(IAAFSourceMob *pSourceMob);
@@ -81,17 +80,15 @@ struct EnumEssenceDataTest
   static const aafUInt32 _maxMobCount;
 };
 
-extern "C" HRESULT CEnumAAFEssenceData_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFEssenceData_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFEssenceData_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t const *fileName = L"EnumAAFEssenceDataTest.aaf";
+  wchar_t fileName[] = L"EnumAAFEssenceDataTest.aaf";
   EnumEssenceDataTest edt;
 
   try
   {
-     if(mode == kAAFUnitTestReadWrite)
-   		 edt.createFile(fileName);
+    edt.createFile(fileName);
     edt.openFile(fileName);
   }
   catch (HRESULT& ehr)
@@ -254,7 +251,7 @@ void EnumEssenceDataTest::removeTestFile(const wchar_t* pFileName)
   }
 }
 
-void EnumEssenceDataTest::createFile(const wchar_t *pFileName)
+void EnumEssenceDataTest::createFile(wchar_t *pFileName)
 {
   // Remove the previous test file if any.
   removeTestFile(pFileName);
@@ -273,7 +270,7 @@ void EnumEssenceDataTest::createFile(const wchar_t *pFileName)
   cleanupReferences();
 }
 
-void EnumEssenceDataTest::openFile(const wchar_t *pFileName)
+void EnumEssenceDataTest::openFile(wchar_t *pFileName)
 {
   check(AAFFileOpenExistingRead(pFileName, 0, &_pFile));
   _bFileOpen = true;
