@@ -20,8 +20,8 @@
 //
 //=---------------------------------------------------------------------=
 
-// @doc OMINTERNAL
-#ifndef OMIOSTREAM_H
-#define OMIOSTREAM_H
+// @doc OMPRIVATE
+#ifndef STACKTRACE_H
+#define STACKTRACE_H
 // Nothing yet
 #endif
