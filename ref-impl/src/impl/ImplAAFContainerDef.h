@@ -15,7 +15,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -31,6 +31,7 @@
  *
  ************************************************************************/
 
+
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
 #endif
@@ -44,6 +45,17 @@ public:
   //
   //********
   ImplAAFContainerDef ();
+
+
+  //****************
+  // Initialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Initialize
+        // @parm [in] Pointer to an AUID reference
+        (const aafUID_t & id,
+		 const aafCharacter *name,
+		 const aafCharacter *description);
 
 protected:
   virtual ~ImplAAFContainerDef ();
@@ -67,12 +79,6 @@ public:
     SetEssenceIsIdentified
         // @parm [in] The EssenceIsIdentified flag
         (aafBool  EssenceIsIdentified);
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFContainerDef)
 
 private:
 	OMFixedSizeProperty<aafBool>					_isIdentified;
