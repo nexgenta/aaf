@@ -1,41 +1,101 @@
-// @doc OMINTERNAL
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
+
+// @doc OMEXTERNAL
 #include "OMFile.h"
 
 #include "OMAssertions.h"
 #include "OMStoredObject.h"
 #include "OMClassFactory.h"
 #include "OMObjectDirectory.h"
+#include "OMUtilities.h"
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define OM_OBJECT_DIRECTORY_CAPACITY  (5000)
 
-OMFile::OMFile(const OMAccessMode mode,
+  // @mfunc Constructor. Create an <c OMFile> object representing
+  //        an existing external file.
+  //   @parm The name of this <c OMFile>.
+  //   @parm The access mode of this <c OMFile>.
+  //   @parm The <c OMStoredObject> containing the root
+  //         <c OMStorable> object.
+  //   @parm The <c OMClassFactory> to use to restore objects from
+  //         this <c OMFile>.
+  //   @parm The <e OMFile::OMLoadMode> for this <c OMFile>.
+OMFile::OMFile(const wchar_t* fileName,
+               const OMAccessMode mode,
                OMStoredObject* store,
-               const OMClassFactory* factory)
+               const OMClassFactory* factory,
+               const OMLoadMode loadMode)
 : _root(0), _rootStoredObject(store), _classFactory(factory),
-  _objectDirectory(0), _mode(mode)
+  _objectDirectory(0), _mode(mode), _loadMode(loadMode), _fileName(0)
 {
   TRACE("OMFile::OMFile");
 
+  PRECONDITION("Valid file name", validWideString(fileName));
+  _fileName = saveWideString(fileName);
+  readSignature(_fileName);
   setName("/");
 }
 
-OMFile::OMFile(const OMAccessMode mode,
+  // @mfunc Constructor. Create an <c OMFile> object representing
+  //        a new external file.
+  //   @parm The name of this <c OMFile>.
+  //   @parm The signature of this <c OMFile>.
+  //   @parm The access mode of this <c OMFile>.
+  //   @parm The <c OMStoredObject> in which to store the root
+  //         <c OMStorable> object.
+  //   @parm The <c OMClassFactory> to use to restore objects from
+  //         this <c OMFile>.
+  //   @parm The root <c OMStorable> object to save in this file.
+OMFile::OMFile(const wchar_t* fileName,
+               OMFileSignature signature,
+               const OMAccessMode mode,
                OMStoredObject* store,
                const OMClassFactory* factory,
                OMStorable* root)
 : _root(root), _rootStoredObject(store), _classFactory(factory),
-  _objectDirectory(0), _mode(mode)
+  _objectDirectory(0), _mode(mode), _loadMode(lazyLoad), _fileName(0),
+  _signature(signature)
 {
   TRACE("OMFile::OMFile");
 
-  setName("/");
+  PRECONDITION("Valid file name", validWideString(fileName));
+  _fileName = saveWideString(fileName);
+  setName("<file>");
   _root->setContainingObject(this);
-  _root->setName("head");
+  _root->setName("/");
   _root->setStore(rootStoredObject());
 }
 
+  // @mfunc Destructor.
 OMFile::~OMFile(void)
 {
   TRACE("OMFile::~OMFile");
@@ -43,6 +103,8 @@ OMFile::~OMFile(void)
   _classFactory = 0;
   delete _objectDirectory;
   _objectDirectory = 0;
+  delete _fileName;
+  _fileName = 0;
 }
 
   // @mfunc Open an existing <c OMFile> for read-only access, the
@@ -51,17 +113,24 @@ OMFile::~OMFile(void)
   //        exist.
   //   @parm The name of the file to open.
   //   @parm The factory to use for creating objects.
+  //   @parm Specifies the use of lazy or eager loading.
   //   @rdesc The newly opened <c OMFile>.
 OMFile* OMFile::openExistingRead(const wchar_t* fileName,
-                                 const OMClassFactory* factory)
+                                 const OMClassFactory* factory,
+                                 const OMLoadMode loadMode)
 {
   TRACE("OMFile::openExistingRead");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
 
   OMStoredObject* store = OMStoredObject::openRead(fileName);
-  OMFile* newFile = new OMFile(readOnlyMode, store, factory);
+  OMFile* newFile = new OMFile(fileName,
+                               readOnlyMode,
+                               store,
+                               factory,
+                               loadMode);
   ASSERT("Valid heap pointer", newFile != 0);
+  POSTCONDITION("Object Manager file", newFile->isOMFile());
   return newFile;
 }
 
@@ -71,17 +140,24 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
   //        exist.
   //   @parm The name of the file to open.
   //   @parm The factory to use for creating objects.
+  //   @parm Specifies the use of lazy or eager loading.
   //   @rdesc The newly opened <c OMFile>.
 OMFile* OMFile::openExistingModify(const wchar_t* fileName,
-                                   const OMClassFactory* factory)
+                                   const OMClassFactory* factory,
+                                   const OMLoadMode loadMode)
 {
   TRACE("OMFile::openExistingModify");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
 
   OMStoredObject* store = OMStoredObject::openModify(fileName);
-  OMFile* newFile = new OMFile(modifyMode, store, factory);
+  OMFile* newFile = new OMFile(fileName,
+                               modifyMode,
+                               store,
+                               factory,
+                               loadMode);
   ASSERT("Valid heap pointer", newFile != 0);
+  POSTCONDITION("Object Manager file", newFile->isOMFile());
   return newFile;
 }
 
@@ -97,14 +173,18 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   //   @parm The root <c OMStorable> in the newly created file.
   //   @rdesc The newly created <c OMFile>.
 OMFile* OMFile::openNewWrite(const wchar_t* fileName,
-                            const OMClassFactory* factory,
-                            const OMByteOrder byteOrder,
-                            OMStorable* root)
+                             const OMClassFactory* factory,
+                             const OMByteOrder byteOrder,
+                             OMStorable* root,
+                             const OMFileSignature& signature)
 {
   TRACE("OMFile::openNewWrite");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
+  PRECONDITION("Valid byte order",
+                    ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
   PRECONDITION("Valid root", root != 0);
+  PRECONDITION("Valid signature", validSignature(signature));
 
   // Not yet implemented.
   //
@@ -125,15 +205,24 @@ OMFile* OMFile::openNewWrite(const wchar_t* fileName,
 OMFile* OMFile::openNewModify(const wchar_t* fileName,
                               const OMClassFactory* factory,
                               const OMByteOrder byteOrder,
-                              OMStorable* root)
+                              OMStorable* root,
+                              const OMFileSignature& signature)
 {
   TRACE("OMFile::openNewModify");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
+  PRECONDITION("Valid byte order",
+                    ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
   PRECONDITION("Valid root", root != 0);
+  PRECONDITION("Valid signature", validSignature(signature));
 
   OMStoredObject* store = OMStoredObject::createModify(fileName, byteOrder);
-  OMFile* newFile = new OMFile(modifyMode, store, factory, root);
+  OMFile* newFile = new OMFile(fileName,
+                               signature,
+                               modifyMode,
+                               store,
+                               factory,
+                               root);
   ASSERT("Valid heap pointer", newFile != 0);
   return newFile;
 }
@@ -154,6 +243,8 @@ OMFile* OMFile::openNewTransient(const OMClassFactory* factory,
 {
   TRACE("OMFile::openNewTransient");
   PRECONDITION("Valid class factory", factory != 0);
+  PRECONDITION("Valid byte order",
+                    ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
   PRECONDITION("Valid root", root != 0);
 
   // Not yet implemented.
@@ -162,15 +253,53 @@ OMFile* OMFile::openNewTransient(const OMClassFactory* factory,
   return 0;
 }
 
+   // @mfunc Is <p signature> a valid signature for an <c OMFile> ?
+   //   @parm The signature to check.
+   //   @rdesc True if <p signature> is a valid signature for an
+   //          <c OMFile>, false otherwise.
+bool OMFile::validSignature(const OMFileSignature& signature)
+{
+  TRACE("OMFile::validSignature");
+  bool result;
+
+  if ((signature.Data2 == 0x4F4F) && (signature.Data3 == 0x4D4D)) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+  // @mfunc Initialize the Object Manager specific parts
+  //        (Data2 and Data3) of the OMFileSignature <p prototype>.
+  //   @parm A prototype (partially complete) OMFileSignature.
+  //   @rdesc The fully initialized OMFileSignature.
+OMFileSignature OMFile::initializeSignature(const OMFileSignature& prototype)
+{
+  TRACE("OMFile::initializeSignature");
+
+  PRECONDITION("Reserved fields zero",
+                           ((prototype.Data2 == 0) && (prototype.Data3 == 0)));
+
+  OMFileSignature result = prototype;
+  result.Data2 = 0x4F4F; // "OO"
+  result.Data3 = 0x4D4D; // "MM" 
+
+  POSTCONDITION("Valid signature", validSignature(result));
+  return result;
+}
+
   // @mfunc Save all changes made to the contents of this
   //        <c OMFile>. It is not possible to <mf OMFile::save>
   //        read-only or transient files.
-void OMFile::save(void)
+  //   @parm Client context for callbacks.
+void OMFile::save(void* clientContext)
 {
   TRACE("OMFile::save");
 
   if (_mode == modifyMode) {
-    _root->save();
+    _root->onSave(clientContext);
+    _root->save(clientContext);
   }
 }
 
@@ -205,7 +334,7 @@ OMStorable* OMFile::restore(void)
 {
   TRACE("OMFile::restore");
 
-  _root = OMStorable::restoreFrom(this, "head", *rootStoredObject());
+  _root = OMStorable::restoreFrom(this, "/", *rootStoredObject());
   return root();
 }
 
@@ -215,6 +344,9 @@ void OMFile::close(void)
   TRACE("OMFile::close");
 
   _root->close();
+  if (_mode == modifyMode) {
+    writeSignature(_fileName);
+  }
 #if 0
   _rootStoredObject->close();
   delete _rootStoredObject;
@@ -241,7 +373,7 @@ OMStoredObject* OMFile::rootStoredObject(void)
 }
 
   // @mfunc Retrieve the <c OMClassFactory> from this <c OMFile>.
-  //   @rdesc The <c OMClassfactory> used to create objects in this file.
+  //   @rdesc The <c OMClassFactory> used to create objects in this file.
   //   @this const
 const OMClassFactory* OMFile::classFactory(void) const
 {
@@ -264,11 +396,48 @@ OMObjectDirectory* OMFile::objectDirectory(void)
 }
 
   // @mfunc The byte order of this <c OMFile>.
+  //   @rdesc The byte order of this <c OMFile>.
   //   @this const
 OMByteOrder OMFile::byteOrder(void) const
 {
+  TRACE("OMFile::byteOrder");
+
   ASSERT("Valid root", _rootStoredObject != 0);
   return _rootStoredObject->byteOrder();
+}
+
+  // @mfunc The loading mode (eager or lazy) of this <c OMFile>.
+  //   @rdesc The loading mode (eager or lazy) of this <c OMFile>.
+  //   @this const
+OMFile::OMLoadMode OMFile::loadMode(void) const
+{
+  TRACE("OMFile::loadMode");
+  return _loadMode;
+}
+
+  // @mfunc Is this file recognized by the Object Manager ?
+  //   @rdesc True if this file is recognized by the Object Manager,
+  //          false otherwise.
+  //   @this const
+bool OMFile::isOMFile(void) const
+{
+  TRACE("OMFile::isOMFile");
+
+  bool result;
+
+  if (validSignature(_signature)) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+  // @mfunc The signature of this <c OMFile>.
+  //   @rdesc The signature of this <c OMFile>.
+OMFileSignature OMFile::signature(void) const
+{
+  return _signature;
 }
 
 const OMClassId& OMFile::classId(void) const
@@ -298,4 +467,61 @@ bool OMFile::persistent(void) const
   // Transient files NYI so by definition a file is persistent.
   //
   return true;
+}
+
+  // @mfunc Write the signature to the given file.
+  //   @parm The file name.
+void OMFile::writeSignature(const wchar_t* fileName)
+{
+  TRACE("OMFile::writeSignature");
+  OMFileSignature sig = _signature;
+
+  // There's no ANSI function to open a file with a wchar_t* name.
+  // for now convert the name. In future add 
+  // FILE* fopen(const wchar_t* fileName, const wchar_t* mode);
+  //
+  char cFileName[256];
+  size_t status = wcstombs(cFileName, fileName, 256);
+  ASSERT("Convert succeeded", status != (size_t)-1);
+
+  if (hostByteOrder() != littleEndian) {
+    OMStoredObject::reorderUniqueObjectIdentification(sig);
+  }
+
+  FILE* f = fopen(cFileName, "rb+");
+  ASSERT("File exists", f != 0);
+  status = fseek(f, 8, SEEK_SET);
+  ASSERT("Seek succeeded", status == 0);
+  status = fwrite(&sig, sizeof(sig), 1, f);
+  ASSERT("Write succeeded", status == 1);
+
+  fclose(f);
+}
+
+  // @mfunc Read the signature from the given file.
+  //   @parm The file name.
+void OMFile::readSignature(const wchar_t* fileName)
+{
+  TRACE("OMFile::readSignature");
+  OMFileSignature sig;
+
+  char cFileName[256];
+  size_t status = wcstombs(cFileName, fileName, 256);
+  ASSERT("Convert succeeded", status != (size_t)-1);
+
+  FILE* f = fopen(cFileName, "rb");
+  ASSERT("File exists", f != 0);
+  status = fseek(f, 8, SEEK_SET);
+  ASSERT("Seek succeeded", status == 0);
+  status = fread(&sig, sizeof(sig), 1, f);
+  ASSERT("Read succeeded", status == 1);
+
+  fclose(f);
+
+  if (hostByteOrder() != littleEndian) {
+    OMStoredObject::reorderUniqueObjectIdentification(sig);
+  }
+
+  _signature = sig;
+
 }
