@@ -22,7 +22,7 @@ AD_FORWARD_DECLARATION(AAFIdentification)
 AD_CLASS_UUID(B1A21385, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21384, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, Transient)
 AD_XMETHOD1(NextOne,
 			[out\, retval],
 			objOut,
@@ -53,22 +53,25 @@ AD_XMETHOD1(NextOne,
   //   - no Identifications remaining to be returned.)
 
 
-AD_XMETHOD3(Next,
+AD_X2METHOD3(Next,
 			[in],
 			  objPass,
-			  aafInt32,
+			  aafUInt32,
 			  count,
 			  number of identifications requested,
+			  xxx,
 			[out\, size_is\(count\)\, length_is\(*pNumFetched\)],
-			  objOut,
+			  objOutArray,
 			  AAFIdentification,
 			  ppIdentifications,
 			  array to receive identification objects,
+			  count,
 			[out],
 			  objPass,
-			  aafInt32 *,
+			  aafUInt32 *,
 			  pNumFetched,
 			  number of actual Identifications fetched into ppIdentifications array,
+			  xxx,
   // Enumerates the next count elements \(AAFIdentification pointers\)
   // in the enumerator's list\, returning them in the given array
   // along with the actual number of enumerated elements in
@@ -156,4 +159,4 @@ AD_XMETHOD1(Clone,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-AD_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
