@@ -45,6 +45,8 @@ namespace OMF2
 #include "AAFException.h"
 #include "AutoRelease.h"
 
+#include "CAAFBuiltinDefs.h"
+
 #define CHECKAAF
 
 
@@ -61,11 +63,18 @@ AAFDomainUtils::~AAFDomainUtils()
 {
 }
 
+void AAFDomainUtils::SetDictionary(IAAFDictionary *dict)
+{
+	_dict = dict;
+}
+
 IAAFInterpolationDef *AAFDomainUtils::CreateInterpolationDefinition(IAAFDictionary *dict, aafUID_t interpolationDefID)
 {
 	IAAFInterpolationDef	*interpDef;
 	IAAFDefObject			*defObject;
 	AAFRESULT				rc;
+
+	CAAFBuiltinDefs defs (dict);
 
 	rc = dict->LookupInterpolationDef(interpolationDefID,&interpDef);
 	if(rc == AAFRESULT_SUCCESS && interpDef != NULL)
@@ -73,7 +82,7 @@ IAAFInterpolationDef *AAFDomainUtils::CreateInterpolationDefinition(IAAFDictiona
 
 //	dprintf("AEffect::CreateInterpolationDefinition()\n");	//JeffB:
 
-	(void)(dict->CreateInstance(kAAFClassID_InterpolationDefinition,
+	(void)(dict->CreateInstance(defs.cdInterpolationDefinition(),
 			IID_IAAFInterpolationDef,
 			(IUnknown **)&interpDef));
 	(void)(interpDef->QueryInterface(IID_IAAFDefObject, (void **) &defObject));
@@ -100,12 +109,14 @@ IAAFTypeDef *AAFDomainUtils::CreateTypeDefinition(IAAFDictionary *pDict, aafUID_
 	IAAFDefObject	*defObject;
 	AAFRESULT		rc;
 
+	CAAFBuiltinDefs defs (pDict);
+
 //	dprintf("AEffect::CreateTypeDefinition()\n");	//JeffB:
 	rc = pDict->LookupTypeDef(typeDefID,&typeDef);
 	if(rc == AAFRESULT_SUCCESS && typeDef != NULL)
 		return typeDef;
 
-	CHECKAAF(pDict->CreateInstance(kAAFClassID_TypeDefinition,
+	CHECKAAF(pDict->CreateInstance(defs.cdTypeDef(),
 			IID_IAAFTypeDef,
 			(IUnknown **)&typeDef));
 	CHECKAAF(typeDef->QueryInterface(IID_IAAFDefObject, (void **) &defObject));
@@ -137,7 +148,9 @@ void AAFDomainUtils::AAFAddOnePoint(IAAFDictionary *dict, aafRational_t percentT
 	IAAFControlPoint	*pPoint = NULL;
 //	AAFRESULT			rc;
 
-	CHECKAAF(dict->CreateInstance(kAAFClassID_ControlPoint,
+	CAAFBuiltinDefs defs (dict);
+
+	CHECKAAF(dict->CreateInstance(defs.cdControlPoint(),
 		IID_IAAFControlPoint,
 		(IUnknown **)&pPoint));
 		
@@ -156,7 +169,9 @@ IAAFParameter *AAFDomainUtils::AAFAddConstantVal(IAAFDictionary *dict, long bufl
 	IAAFParameter		*pParm = NULL;
 //	AAFRESULT			rc;
 
-	CHECKAAF(dict->CreateInstance(kAAFClassID_ConstantValue,
+	CAAFBuiltinDefs defs (dict);
+
+	CHECKAAF(dict->CreateInstance(defs.cdConstantValue(),
 		IID_IAAFConstantValue,
 		(IUnknown **)&pCVal));
 	CHECKAAF(pCVal->SetValue(buflen, (unsigned char *)buf));
@@ -175,7 +190,9 @@ IAAFVaryingValue *AAFDomainUtils::AAFAddEmptyVaryingVal(IAAFDictionary *dict, IA
 	IAAFParameter		*pParm = NULL;
 //	AAFRESULT			rc;
 
-	CHECKAAF(dict->CreateInstance(kAAFClassID_VaryingValue,
+	CAAFBuiltinDefs defs (dict);
+
+	CHECKAAF(dict->CreateInstance(defs.cdVaryingValue(),
 		IID_IAAFVaryingValue,
 		(IUnknown **)&pVVal));
 	CHECKAAF(pVVal->SetInterpolationDefinition(CreateInterpolationDefinition(
@@ -203,7 +220,9 @@ IAAFParameterDef *AAFDomainUtils::CreateParameterDefinition(IAAFDictionary *pDic
 	if(rc == AAFRESULT_SUCCESS && parmDef != NULL)
 		return parmDef;
 
-	CHECKAAF(pDict->CreateInstance(kAAFClassID_ParameterDefinition,
+	CAAFBuiltinDefs defs (pDict);
+
+	CHECKAAF(pDict->CreateInstance(defs.cdParameterDef(),
 			IID_IAAFParameterDef,
 			(IUnknown **)&parmDef));
 	CHECKAAF(parmDef->QueryInterface(IID_IAAFDefObject, (void **) &defObject));
@@ -372,3 +391,343 @@ HRESULT AAFDomainUtils::AddPropertyToClass(IAAFDictionary *dict, const aafUID_t*
 	AutoRelease< IAAFPropertyDef > r3( pPropDef );	
 	return AAFRESULT_SUCCESS;
 }
+
+//***********************************************************
+//
+//	SetObjRefArrayPropOnObject()
+//
+//	Set an object reference array property on the AAF object
+//	specified by pObj.  The value of the property is specified
+//	in pArray.
+//
+//	Returns:
+//
+//		On Success: S_OK
+//		On Failure: A failed HRESULT
+//
+HRESULT AAFDomainUtils::SetObjRefArrayPropOnObject(IAAFObject* pObj, aafUID_t* pClassID, const aafUID_t* pPropTypeID, const aafUID_t* pElementTypeID, aafUID_t* pPropID, IAAFObject** pArray, aafUInt32 numObjects)
+{
+	IAAFPropertyValue*	pPVArray = NULL;
+	IAAFTypeDef*		pTD;
+	HRESULT				hr;
+
+	// For each object in the source array, create a property value
+	// and append it to the property value for the variable array.
+	hr = _dict->LookupTypeDef(*pPropTypeID, &pTD);
+	if (SUCCEEDED(hr))
+	{
+		IAAFTypeDefVariableArray*	pTDVarArray;
+
+		hr = pTD->QueryInterface(IID_IAAFTypeDefVariableArray, (void**)&pTDVarArray);
+		if (SUCCEEDED(hr))
+		{
+			IAAFTypeDef*	pTDElement;
+
+			hr = _dict->LookupTypeDef(*pElementTypeID, &pTDElement);
+			if (SUCCEEDED(hr))
+			{
+				IAAFTypeDefObjectRef*	pTDObjRef;
+
+				hr = pTDElement->QueryInterface (IID_IAAFTypeDefObjectRef, (void **)&pTDObjRef);
+				if (SUCCEEDED(hr))
+				{
+					for (aafUInt32 i = 0; i < numObjects; i++)
+					{
+						IAAFPropertyValue* pPVObject;
+
+						hr = pTDObjRef->CreateValue(pArray[i], &pPVObject);
+						if (SUCCEEDED(hr))
+						{
+							if (pPVArray == NULL)
+								pTDVarArray->CreateEmptyValue(&pPVArray);
+
+							hr = pTDVarArray->AppendElement(pPVArray, pPVObject);
+							pPVObject->Release();
+						}
+					}
+					pTDObjRef->Release();
+				}
+				pTDElement->Release();
+			}
+			pTDVarArray->Release();
+		}
+		pTD->Release();
+	}
+
+	// If the object reference array was successfully created,
+	// set the property value on the target object.
+	if (pPVArray)
+	{
+		IAAFClassDef*		pCD;
+
+		// Get the class def for the object
+		hr = _dict->LookupClassDef(*pClassID, &pCD);
+		if (SUCCEEDED(hr))
+		{
+			IAAFPropertyDef*	pPD;
+
+			hr = pCD->LookupPropertyDef(*pPropID, &pPD);
+			if (SUCCEEDED(hr))
+			{
+				hr = pObj->SetPropertyValue(pPD, pPVArray);
+				pPD->Release();
+			}
+			pCD->Release();
+		}
+		pPVArray->Release();
+	}
+
+	return hr;
+}
+
+//***********************************************************
+//
+//	GetObjRefArrayPropFromObject()
+//
+//	Get an object reference array property on the AAF object
+//	specified by pObj.  The value of the property is returned
+//	in pArray.
+//
+//	Returns:
+//
+//		On Success: S_OK
+//		On Failure: A failed HRESULT
+//
+HRESULT AAFDomainUtils::GetObjRefArrayPropFromObject(IAAFObject* pObj, aafUID_t* pClassID, const aafUID_t* pPropTypeID, aafUID_t* pPropID, IAAFObject*** pArray, aafUInt32* pNumObjects)
+{
+	IAAFTypeDefVariableArray*	pTDVarArray = NULL;
+	IAAFPropertyValue*			pPVVarArray = NULL;
+	IAAFTypeDefObjectRef*		pTDArrayElement = NULL;
+	IAAFClassDef*				pCD;
+	HRESULT						hr;
+
+	// Get the property value for the target property
+	hr = _dict->LookupClassDef(*pClassID, &pCD);
+	if (SUCCEEDED(hr))
+	{
+		IAAFPropertyDef*	pPD;
+
+		hr = pCD->LookupPropertyDef(*pPropID, &pPD);
+		if (SUCCEEDED(hr))
+		{
+			aafBool	present = AAFFalse;
+
+			pObj->IsPropertyPresent(pPD, &present);
+			if (present == AAFTrue)
+				hr = pObj->GetPropertyValue(pPD, &pPVVarArray);
+			else
+				hr = AAFRESULT_PROP_NOT_PRESENT;
+
+			pPD->Release();
+		}
+		pCD->Release();
+	}
+
+	// Get the property type def from the dictionary to interpret this property value.
+	if (SUCCEEDED(hr))
+	{
+		IAAFTypeDef* pTD;
+
+		hr = _dict->LookupTypeDef(*pPropTypeID, &pTD);
+		if (SUCCEEDED(hr))
+		{
+			hr = pTD->QueryInterface(IID_IAAFTypeDefVariableArray, (void**)&pTDVarArray);
+			pTD->Release();
+		}
+	}
+
+	// Get the array element type def to interpret the element property value.
+	if (SUCCEEDED(hr))
+	{
+		IAAFTypeDef*	pTDElement;
+
+		hr = pTDVarArray->GetType(&pTDElement);
+		if (SUCCEEDED(hr))
+		{
+			pTDElement->QueryInterface(IID_IAAFTypeDefObjectRef, (void **)&pTDArrayElement);
+			pTDElement->Release();
+		}
+	}
+
+	// Get each element out of the property, convert them to an IAAFObject pointer and
+	// add them to the array of object which is returned to the user.
+	if (SUCCEEDED(hr))
+	{
+		IAAFObject**	pTempArray;
+		aafUInt32		count = 0, numElements = 0;
+
+		pTDVarArray->GetCount(pPVVarArray, &count);
+		pTempArray = new IAAFObject* [count];
+		if (pTempArray)
+		{
+			for (aafUInt32 i = 0; i < count; i++)
+			{
+				IAAFPropertyValue*	pPVElement;
+
+				hr = pTDVarArray->GetElementValue(pPVVarArray, i, &pPVElement);
+				if (SUCCEEDED(hr))
+				{
+					IAAFObject*	pTempObj;
+
+					hr = pTDArrayElement->GetObject(pPVElement, &pTempObj);
+					if (SUCCEEDED(hr))
+					{
+						pTempArray[numElements] = pTempObj;
+						numElements++;
+					}
+					pPVElement->Release();
+				}
+			}
+			if (numElements == 0)
+			{
+				delete [] pTempArray;
+				pTempArray = NULL;
+			}
+
+			*pArray = pTempArray;
+			*pNumObjects = numElements;
+		}
+	}
+
+	if (pTDArrayElement) pTDArrayElement->Release();
+	if (pTDVarArray) pTDVarArray->Release();
+	if (pPVVarArray) pPVVarArray->Release();
+
+	return hr;
+}
+
+//***********************************************************
+//
+//	SetObjRefPropOnObject()
+//
+//	Set an object reference property on the AAF object specified
+//	by pObj.  The value of the property is specified in pObject.
+//
+//	Returns:
+//
+//		On Success: S_OK
+//		On Failure: A failed HRESULT
+//
+HRESULT AAFDomainUtils::SetObjRefPropOnObject(IAAFObject* pObj, aafUID_t* pClassID, const aafUID_t* pPropTypeID, aafUID_t* pPropID, IAAFObject* pValue)
+{
+	IAAFPropertyValue*	pPV = NULL;
+	IAAFTypeDef*		pTD;
+	HRESULT				hr;
+
+	// Create a property value from the supplied value (pValue)
+	hr = _dict->LookupTypeDef(*pPropTypeID, &pTD);
+	if (SUCCEEDED(hr))
+	{
+		IAAFTypeDefObjectRef*	pTDObjRef;
+
+		hr = pTD->QueryInterface(IID_IAAFTypeDefObjectRef, (void**)&pTDObjRef);
+		if (SUCCEEDED(hr))
+		{
+			hr = pTDObjRef->CreateValue(pValue, &pPV);
+			pTDObjRef->Release();
+		}
+		pTD->Release();
+	}
+
+	// Add the property to the target object.
+	if (SUCCEEDED(hr))
+	{
+		if (SUCCEEDED(hr))
+		{
+			IAAFClassDef*		pCD;
+
+			// Get the class def for the object
+			hr = _dict->LookupClassDef(*pClassID, &pCD);
+			if (SUCCEEDED(hr))
+			{
+				IAAFPropertyDef*	pPD;
+
+				hr = pCD->LookupPropertyDef(*pPropID, &pPD);
+				if (SUCCEEDED(hr))
+				{
+					// Set the propeter value on the target object
+					hr = pObj->SetPropertyValue(pPD, pPV);
+					pPD->Release();
+				}
+				pCD->Release();
+			}
+		}
+	}
+
+	if (pPV) pPV->Release();
+
+	return hr;
+}
+
+//***********************************************************
+//
+//	GetObjRefPropFromObject()
+//
+//	Get a object reference property on the AAF object specified
+//	by pObj.  The value of the property is returned in ppObject.
+//
+//	Returns:
+//
+//		On Success: S_OK
+//		On Failure: A failed HRESULT
+//
+HRESULT AAFDomainUtils::GetObjRefPropFromObject(IAAFObject* pObj, aafUID_t* pClassID, const aafUID_t* pPropTypeID, aafUID_t* pPropID, IAAFObject** ppObject)
+{
+	IAAFPropertyValue*		pPV = NULL;
+	IAAFClassDef*			pCD;
+	HRESULT					hr;
+
+	// Get the property value for the target property
+	hr = _dict->LookupClassDef(*pClassID, &pCD);
+	if (SUCCEEDED(hr))
+	{
+		IAAFPropertyDef*	pPD;
+
+		hr = pCD->LookupPropertyDef(*pPropID, &pPD);
+		if (SUCCEEDED(hr))
+		{
+			aafBool	present = AAFFalse;
+
+			pObj->IsPropertyPresent(pPD, &present);
+			if (present == AAFTrue)
+				hr = pObj->GetPropertyValue(pPD, &pPV);
+			else
+				hr = AAFRESULT_PROP_NOT_PRESENT;
+
+			pPD->Release();
+		}
+		pCD->Release();
+	}
+
+	// Get the property type def from the dictionary to interpret this property value
+	// and return the resulting object.
+	if (SUCCEEDED(hr))
+	{
+		IAAFTypeDef* pTD;
+
+		hr = _dict->LookupTypeDef(*pPropTypeID, &pTD);
+		if (SUCCEEDED(hr))
+		{
+			IAAFTypeDefObjectRef*	pTDObjectRef;
+
+			hr = pTD->QueryInterface(IID_IAAFTypeDefObjectRef, (void**)&pTDObjectRef);
+			if (SUCCEEDED(hr))
+			{
+				IAAFObject*	pTempObj;
+
+				hr = pTDObjectRef->GetObject(pPV, &pTempObj);
+				if (SUCCEEDED(hr))
+				{
+					*ppObject = pTempObj;
+				}
+				pTDObjectRef->Release();
+			}
+			pTD->Release();
+		}
+	}
+
+	if (pPV) pPV->Release();
+
+	return hr;
+}
+

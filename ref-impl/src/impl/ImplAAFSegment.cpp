@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFSegment_h__
@@ -64,7 +69,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSegment::SegmentTCToOffset (aafTimecode_t *pTimecode,
-                           aafRational_t * /*pEditRate*/,
+                           aafRational_t *pEditRate,
                            aafFrameOffset_t *pOffset)
 {
 	AAFRESULT aafError = AAFRESULT_SUCCESS;
@@ -106,7 +111,7 @@ AAFRESULT ImplAAFSegment::AccumulateLength( aafLength_t *length)
 	return(AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFSegment::OffsetToTimecodeClip(aafPosition_t /*offset*/,
+AAFRESULT ImplAAFSegment::OffsetToTimecodeClip(aafPosition_t offset,
 											   ImplAAFTimecode **result,
 											   aafPosition_t *tcStartPos)
 {
@@ -132,7 +137,7 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 		if (Int64LessEqual(begPos, offset) &&
 			Int64Less(offset, endPos))
 		{
-			*found = kAAFTrue;
+			*found = AAFTrue;
 			*subseg = this;
 			// We are returning a reference to this object so bump the ref count
 			AcquireReference();
@@ -140,7 +145,7 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 		}
 		else
 		{
-			*found = kAAFFalse;
+			*found = AAFFalse;
 			*subseg = NULL;
 			*sequPosPtr = 0;
 		}
@@ -153,12 +158,12 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 	return(AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFSegment::TraverseToClip(aafLength_t /*length*/,
-										 ImplAAFSegment ** /*sclp*/,
-										 ImplAAFPulldown ** /*pulldownObj*/,
-										 aafInt32 * /*pulldownPhase*/,
-										 aafLength_t * /*sclpLen*/,
-										 aafBool * /*isMask*/)
+AAFRESULT ImplAAFSegment::TraverseToClip(aafLength_t length,
+										 ImplAAFSegment **sclp,
+										 ImplAAFPulldown **pulldownObj,
+										 aafInt32 *pulldownPhase,
+										 aafLength_t *sclpLen,
+										 aafBool *isMask)
 {
 	return(AAFRESULT_TRAVERSAL_NOT_POSS);
 }
@@ -173,8 +178,10 @@ AAFRESULT ImplAAFSegment::GenerateSequence(ImplAAFSequence **seq)
 	{
 // ***	CHECK(GetDatakind(&datakind));
     CHECK(GetDictionary(&pDictionary));
-	CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
-		  CreateInstance ((ImplAAFObject**) &tmp));
+    tmp = (ImplAAFSequence *)pDictionary->CreateImplObject
+	  (pDictionary->GetBuiltinDefs()->cdSequence());
+    if (NULL == tmp)
+      RAISE(AAFRESULT_NOMEMORY);
     pDictionary->ReleaseReference();
     pDictionary = NULL;
 
