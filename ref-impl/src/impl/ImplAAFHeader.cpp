@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.91 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.92 2004/12/17 22:12:40 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -877,8 +877,6 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::UpdateEssenceContainers ()
 {
-#if 0  // Avid private
-
   if (_essenceContainers.isPresent())
   {
     _essenceContainers.clear();
@@ -944,7 +942,6 @@ AAFRESULT STDMETHODCALLTYPE
     pSourceMobs->ReleaseReference();
     pSourceMobs = 0;
   }
-#endif  // Avid private
 
 
   return AAFRESULT_SUCCESS;
