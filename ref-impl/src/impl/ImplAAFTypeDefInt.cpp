@@ -679,3 +679,26 @@ OMProperty * ImplAAFTypeDefInt::pvtCreateOMPropertyMBS
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefInt::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  // Return variable array of unsigned char
+  return pvtGetUInt8Array8Type (ppRawTypeDef);
+}
+
+
+bool ImplAAFTypeDefInt::IsAggregatable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsStreamable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsFixedArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsVariableArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsStringable () const
+{ return true; }
