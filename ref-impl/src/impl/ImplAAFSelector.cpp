@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSelector.cpp,v 1.26 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSelector.cpp,v 1.27 2005/02/07 18:51:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,7 +42,6 @@
 #include <assert.h>
 #include <string.h>
 #include "AAFResult.h"
-#include "aafCvt.h"
 #include "AAFUtils.h"
 #include "ImplAAFMob.h"
 
@@ -341,7 +340,7 @@ AAFRESULT
 		  if (tmpFound)
 			{
 			  *foundObj = tmpFound;
-			  if (Int64Less(tmpMinLen, rootLen))
+			  if (tmpMinLen < rootLen)
 				*minLength = tmpMinLen;
 			  else
 				*minLength = rootLen;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEventMobSlot.cpp,v 1.20 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEventMobSlot.cpp,v 1.21 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,6 @@
 #include "AAFPropertyIDs.h"
 #include "AAFResult.h"
 #include "aafErr.h"
-#include "aafCvt.h"
 #include "AAFUtils.h"
 
 #include <assert.h>
@@ -194,7 +193,7 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
         // previous event.
         aafPosition_t currentPosition;
         CHECK(pEvent->GetPosition(&currentPosition));
-        if (Int64Less(currentPosition, previousPosition))
+        if (currentPosition < previousPosition)
           RAISE(AAFRESULT_OBJECT_SEMANTIC);
 
         // Save the current position to compare to the next event.

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEdgecode.cpp,v 1.19 2005/01/19 16:39:24 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFEdgecode.cpp,v 1.20 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,6 @@
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "aafErr.h"
-#include "aafCvt.h"
 #include "AAFUtils.h"
 #include "AAFDataDefs.h"
 

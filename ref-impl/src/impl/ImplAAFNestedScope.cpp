@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFNestedScope.cpp,v 1.32 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFNestedScope.cpp,v 1.33 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -55,7 +55,6 @@
 #include <assert.h>
 #include <string.h>
 #include "AAFResult.h"
-#include "aafCvt.h"
 #include "aafErr.h"
 
 extern "C" const aafClassID_t CLSID_AAFSegment;

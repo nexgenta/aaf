@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTimecode.cpp,v 1.28 2005/01/19 16:39:25 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFTimecode.cpp,v 1.29 2005/02/07 18:51:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,6 @@
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "aafErr.h"
-#include "aafCvt.h"
 #include "AAFUtils.h"
 #include "AAFDataDefs.h"
 
@@ -164,8 +163,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::SegmentOffsetToTC (/*[in]*/ aafPosition_t *pOffset,
 	  /*[out]*/ aafTimecode_t *pTimecode)
 {
-  aafUInt32		frameOffset;
-
   	if(pOffset == NULL)
 		return(AAFRESULT_NULL_PARAM);
   	if(pTimecode == NULL)
@@ -173,8 +170,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
     {
 		CHECK(GetTimecode(pTimecode));
-	  	CHECK(TruncInt64toUInt32(*pOffset, &frameOffset));
-		pTimecode->startFrame += frameOffset;
+		pTimecode->startFrame += *pOffset;
     }
 
   XEXCEPT
@@ -207,19 +203,14 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(GetLength(&tcLen));
 		
 		// Assume found at this point, so finish generating result
-		CvtInt32toInt64((pTimecode->startFrame - startTC.startFrame), &oldStart);
+		oldStart = pTimecode->startFrame - startTC.startFrame;
 
 // Since the new call works only on a segment, the offset is assumed to be in the units
 // of the enclosing segment, so no conversion need to be done.  The old code took a mob
 // pointer, and so had some context
 // CHECK(AAFConvertEditRate(_editRate, oldStart,
 //		  							*pEditRate , kRoundFloor, &newStart));
-//!!!		CHECK(TruncInt64toInt32(_offset, &frameOffset));	/* OK FRAMEOFFSET */
-		// BobT 3/26/99: change aafFrameOffset_t to 64-bit, so we need to use a
-		// 32-bit temp for this function call.
-		aafUInt32 offset32;
-		CHECK(TruncInt64toUInt32(oldStart, &offset32));		/* OK FRAMEOFFSET */
-		*pOffset = offset32;
+		*pOffset = oldStart;
 
 	   /* check for out of bound timecode */
 	   if (pTimecode->startFrame < startTC.startFrame) 
@@ -229,9 +220,7 @@ AAFRESULT STDMETHODCALLTYPE
 	   }
 	   else
 	   {
-		    aafUInt32 len;
-		    CHECK(TruncInt64toUInt32(tcLen, &len));
-		    if (pTimecode->startFrame > (startTC.startFrame + len))
+		    if (pTimecode->startFrame > (startTC.startFrame + tcLen))
 		    {
 					/* out of right bound */
 			     RAISE(AAFRESULT_BADSAMPLEOFFSET);
@@ -254,7 +243,7 @@ aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t /* offset !!!*/, Im
   	if(result == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	*result = this;
-	CvtInt32toInt64(0, tcStartPos);
+	*tcStartPos = 0;
 	return(AAFRESULT_SUCCESS);
 }
 

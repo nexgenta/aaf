@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.cpp,v 1.59 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.cpp,v 1.60 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,6 @@
 #include "ImplAAFEssenceAccess.h"
 #include <assert.h>
 #include "AAFResult.h"
-#include "aafCvt.h"
 #include "AAFUtils.h"
 
 #include "AAFStoredObjectIDs.h"
@@ -174,7 +173,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 		// Add the master slot
 
-			CvtInt32toPosition(0, zeroPos);
+			zeroPos = 0;
 			ref.sourceID = sourceMobID;
 			ref.sourceSlotID = sourceSlotID;
 			ref.startTime = zeroPos;
@@ -220,7 +219,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 		// Add the master slot
 
-			CvtInt32toPosition(0, zeroPos);
+			zeroPos = 0;
 			ref.sourceID = sourceMobID;
 			ref.sourceSlotID = sourceSlotID;
 			ref.startTime = zeroPos;

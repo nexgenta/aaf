@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFComponent.cpp,v 1.54 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFComponent.cpp,v 1.55 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,6 @@
 #include <assert.h>
 #include "AAFResult.h"
 #include "aafErr.h"
-#include "aafCvt.h"
 #include "ImplAAFSmartPointer.h"
 typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
@@ -370,21 +369,20 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 		*found = this;
     AcquireReference(); // We are returning a reference so bump the reference count!
 		CHECK(GetLength(&tmpMinLen));
-		if (Int64Less(tmpMinLen, rootLen))
+		if (tmpMinLen < rootLen)
 		{
 			*minLength = tmpMinLen;
 			if(diffPos != NULL)
 			{
 				/* Figure out diffPos */
-				*diffPos = rootPos;
-				SubInt64fromInt64(currentObjPos, diffPos);
+				*diffPos = rootPos - currentObjPos;
 			}
 		}
 		else
 		{
 			*minLength = rootLen;
 			if(diffPos != NULL)
-				CvtInt32toInt64(0, diffPos);
+				*diffPos = 0;
 		}
 	} /* XPROTECT */
 	XEXCEPT

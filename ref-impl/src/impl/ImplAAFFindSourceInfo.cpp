@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFindSourceInfo.cpp,v 1.21 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFindSourceInfo.cpp,v 1.22 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,7 @@
 
 #include <assert.h>
 #include <string.h>
-#include "aafCvt.h"
+#include "aafErr.h"
 #include "ImplAAFMob.h"
 #include "ImplAAFOperationGroup.h"
 #include "AAFDefUIDs.h"
@@ -40,8 +40,8 @@ ImplAAFFindSourceInfo::ImplAAFFindSourceInfo ()
 	_cpnt = NULL;
 	_editRate.numerator = 0;
 	_editRate.denominator = 1;
-	CvtInt32toLength(0, _position);
-	CvtInt32toLength(0, _length);
+	_position = 0;
+	_length = 0;
 	_operationGroup = NULL;
 }
 
@@ -123,11 +123,8 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFFindSourceInfo::Clear(void)
 	_cpnt = NULL;
 	_editRate.numerator = 0;
 	_editRate.denominator = 1;
-//!!!	  (*sourceInfo).filmTapePdwn = NULL;
-//!!!	  (*sourceInfo).tapeFilmPdwn = NULL;
-//!!!	  (*sourceInfo).effeObject = NULL;
-	CvtInt32toLength(0, _position);
-	CvtInt32toLength(0, _length);
+	_position = 0;
+	_length = 0;
 	if (_operationGroup)
 		_operationGroup->ReleaseReference();
 	_operationGroup = NULL;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.cpp,v 1.48 2005/01/11 09:27:52 jfpanisset Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.cpp,v 1.49 2005/02/07 18:51:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,6 @@
 #include "AAFPropertyIDs.h"
 
 #include <assert.h>
-#include "aafCvt.h" 
 #include "AAFResult.h"
 #include "AAFUtils.h"
 #include "AAFDefUIDs.h"
@@ -305,7 +304,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if(memcmp(&sourceRef.sourceID, &nullMobID, sizeof(sourceRef.sourceID)) == 0)
 	{
 		sourceRef.sourceSlotID = 0;
-		CvtInt32toPosition(0, sourceRef.startTime);	
+		sourceRef.startTime = 0;
 	}
 	SetSourceID( sourceRef.sourceID );
 	SetSourceMobSlotID( sourceRef.sourceSlotID) ;
@@ -329,7 +328,7 @@ AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 		// We are returning a reference to this object so bump the ref count
 		AcquireReference();
 		CHECK((*sclp)->GetLength(sclpLen));
-		if (Int64Less(length, *sclpLen))
+		if (length < *sclpLen)
 		{
 			*sclpLen = length;
 		}

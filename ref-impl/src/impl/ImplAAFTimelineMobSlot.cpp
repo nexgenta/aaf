@@ -2,7 +2,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTimelineMobSlot.cpp,v 1.34 2004/09/16 15:05:46 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFTimelineMobSlot.cpp,v 1.35 2005/02/07 18:51:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,6 @@
 
 #include <assert.h>
 #include "AAFResult.h"
-#include "aafCvt.h" 
 #include "AAFUtils.h"
 
 ImplAAFTimelineMobSlot::ImplAAFTimelineMobSlot ():
@@ -186,7 +185,7 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 					  aafPosition_t *diffPos)
 {
 	aafBool					foundClip = kAAFFalse;
-	aafPosition_t begPos = CvtInt32toPosition(0, begPos);
+	aafPosition_t begPos = 0;
 	aafRational_t tmpSrcRate;
 	aafPosition_t origin = 0;
 	aafSlotID_t tmpTrackID;
@@ -226,7 +225,7 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 		// sample 10+5 = 15.
 		// 
 		// All that, to explain the following line of code:
-   		AddInt64toInt64(origin, &offset);
+   		offset += origin;
 		
 		CHECK(tmpSegment->FindSubSegment(offset, &begPos, segment, &foundClip));
 		if(!foundClip)
@@ -235,8 +234,7 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 		/* Calculate diffPos - difference between requested offset and
 		* the beginning of clip that contains it. 
 		*/
-		(*diffPos) = offset;
-		CHECK(SubInt64fromInt64(begPos, diffPos));
+		*diffPos = offset - begPos;
 		tmpSegment->ReleaseReference();
 		tmpSegment = 0;
 		
