@@ -16,18 +16,13 @@
 //
 // Forward declarations
 //
+class AAFObject;
 class ImplEnumAAFProperties;
-class ImplAAFClassDef;
-class ImplAAFProperty;
-class ImplAAFPropertyDef;
-class ImplAAFPropertyValue;
-class ImplPropertyCollection;
+
 
 #include "AAFTypes.h"
 #include "OMStorable.h"
-#include "OMProperty.h"
 #include "ImplAAFRoot.h"
-
 
 class ImplAAFObject : public OMStorable, public ImplAAFRoot
 {
@@ -59,15 +54,6 @@ public:
 
 
   //****************
-  // GetDefinition()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetDefinition
-		// @parm [out] class definition of which this object is an instance.
-        (ImplAAFClassDef ** ppClassDef);
-
-
-  //****************
   // GetObjectClass()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -76,46 +62,11 @@ public:
 
 
   //****************
-  // GetProperties()
+  // EnumProperties()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-	GetProperties
+	EnumProperties
 		(ImplEnumAAFProperties ** ppEnum);
-
-
-  //****************
-  // CountProperties()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-	CountProperties
-		(aafUInt32 * pCount);
-
-
-  //****************
-  // GetPropertyValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetPropertyValue
-		(ImplAAFPropertyDef * pPropDef,
-		 ImplAAFPropertyValue ** ppPropVal);
-
-
-  //****************
-  // SetPropertyValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-	SetPropertyValue
-		(ImplAAFPropertyDef * pPropDef,
-		 ImplAAFPropertyValue * pPropVal);
-
-
-  //****************
-  // IsPropertyPresent()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-	IsPropertyPresent
-		(ImplAAFPropertyDef * pPropDef,
-		 aafBool * pResult);
 
 
   //***********************************************************
@@ -171,13 +122,8 @@ public:
   static AAFRESULT test();
 
   OMDECLARE_STORABLE(ImplAAFObject)
-
-private:
-  // private method
-  AAFRESULT InitProperties ();
-
-  ImplPropertyCollection * _pProperties;
 };
 
 
 #endif // ! __ImplAAFObject_h__
+
