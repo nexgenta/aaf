@@ -31,11 +31,16 @@
  ************************************************************************/
 
 
+
+
+
+
+
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
 #endif
 
-#include "OMWideStringProperty.h"
+
 
 class ImplAAFIdentification : public ImplAAFObject
 {
@@ -48,11 +53,22 @@ public:
   
   ImplAAFIdentification();
 
+  /*
+  ImplAAFIdentification(
+    const wchar_t* companyName,
+    const wchar_t* productName,
+    const aafProductVersion_t* productVersion,
+    const wchar_t* productVersionString,
+    const aafUID_t & productId,
+    const aafTimeStamp_t date,
+    const aafProductVersion_t* toolKitVersion,
+    const wchar_t* platform
+    // const AUID* generation
+    );
+	*/
+
   virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize (aafCharacter_constptr companyName,
-				aafCharacter_constptr productName,
-				aafCharacter_constptr productVersionString,
-				aafUID_constref productID);
+	Initialize ();
 
 
   //****************
@@ -160,7 +176,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductVersion
 		// @parm [in] The Product Version
-        (aafProductVersion_constref version);
+        (aafProductVersion_t *  pVersion);
 
 
   //****************
