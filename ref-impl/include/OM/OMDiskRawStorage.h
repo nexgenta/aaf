@@ -49,16 +49,16 @@ public:
     // @cmember Create an <c OMDiskRawStorage> object by opening an existing
     //          file for read-only access, the file is named <p fileName>.
     //          The file must already exist.
-  static OMDiskRawStorage* openExistingRead(const wchar_t* fileName);
+  static OMDiskRawStorage* openExisitingRead(const wchar_t* fileName);
 
     // @cmember Create an <c OMDiskRawStorage> object by opening an existing
     //          file for modify access, the file is named <p fileName>.
     //          The file must already exist.
-  static OMDiskRawStorage* openExistingModify(const wchar_t* fileName);
+  static OMDiskRawStorage* openExisitingModify(const wchar_t* fileName);
 
     // @cmember Create an <c OMDiskRawStorage> object by creating a new
     //          file for modify access, the file is named <p fileName>.
-    //          The file must not already exist.
+    //          The file must note already exist.
   static OMDiskRawStorage* openNewModify(const wchar_t* fileName);
 
   // @access Public members.
@@ -67,74 +67,41 @@ public:
   OMDiskRawStorage(FILE* file, OMFile::OMAccessMode accessMode);
 
     // @cmember Destructor.
-  virtual ~OMDiskRawStorage(void);
+  ~OMDiskRawStorage(void);
 
     // @cmember Attempt to read the number of bytes given by <p byteCount>
-    //          from the current position in this <c OMDiskRawStorage>
-    //          into the buffer at address <p bytes>.
-    //          The actual number of bytes read is returned in <p bytesRead>.
-    //          Reading from positions greater than
-    //          <mf OMDiskRawStorage::size> causes <p bytesRead> to be less
-    //          than <p byteCount>. Reading bytes that have never been written
+    //          from this <c OMDiskRawStorage> at <p offset> into the buffer
+    //          at address <p bytes>. The actual number of bytes read is
+    //          returned in <p bytesRead>. Reading from offsets greater than
+    //          <mf OMRawStorage::size> causes <p bytesRead> to be less than
+    //          <p byteCount>. Reading bytes that have never been written
     //          returns undefined data in <p bytes>.
-  virtual void read(OMByte* bytes,
-                    OMUInt32 byteCount,
-                    OMUInt32& bytesRead) const;
+  virtual void readAt(OMUInt64 offset,
+                      OMByte* bytes,
+                      OMUInt32 byteCount,
+                      OMUInt32& bytesRead) const;
 
     // @cmember Attempt to write the number of bytes given by <p byteCount>
-    //          to the current position in this <c OMDiskRawStorage>
-    //          from the buffer at address <p bytes>.
-    //          The actual number of bytes written is returned in
-    //          <p bytesWritten>.
-    //          Writing to positions greater than
-    //          <mf OMDiskRawStorage::size> causes this <c OMDiskRawStorage>
+    //          to this <c OMDiskRawStorage> at <p offset> from the buffer
+    //          at address <p bytes>. The actual number of bytes written is
+    //          returned in <p bytesWritten>. Writing to offsets greater than
+    //          <mf OMRawStorage::size> causes this <c OMDiskRawStorage>
     //          to be extended, however such extension can fail, causing
     //          <p bytesWritten> to be less than <p byteCount>.
-  virtual void write(const OMByte* bytes,
-                     OMUInt32 byteCount,
-                     OMUInt32& bytesWritten);
+  virtual void writeAt(OMUInt64 offset,
+                       OMByte* bytes,
+                       OMUInt32 byteCount,
+                       OMUInt32& bytesWritten);
 
-    // @cmember May this <c OMDiskRawStorage> be changed in size ?
-    //          An implementation of <c OMDiskRawStorage> for disk files
-    //          would most probably return true. An implemetation
-    //          for network streams would return false. An implementation
-    //          for fixed size contiguous memory files (avoiding copying)
-    //          would return false.
-  virtual bool isSizeable(void) const;
-
-    // @cmember The current size of this <c OMDiskRawStorage> in bytes.
-    //          precondition - isSizeable()
+    // @cmember The current size of this <c OMDiskRawStorage>.
   virtual OMUInt64 size(void) const;
 
-    // @cmember Set the size of this <c OMDiskRawStorage> to <p newSize> bytes.
-    //          If <p newSize> is greater than <mf OMDiskRawStorage::size>
+    // @cmember Set the size of this <c OMDiskRawStorage> to <p newSize>.
+    //          If <p newSize> is greater than <mf OMRawStorage::size>
     //          then this <c OMDiskRawStorage> is extended. If <p newSize>
-    //          is less than <mf OMDiskRawStorage::size> then this
-    //          <c OMDiskRawStorage> is truncated. Truncation may also result
-    //          in the current position for <f read()> and <f write()>
-    //          being set to <mf OMDiskRawStorage::size>.
-    //          precondition - isSizeable()
+    //          is less than <mf OMRawStorage::size> then this
+    //          <c OMDiskRawStorage> is truncated.
   virtual void setSize(OMUInt64 newSize);
-
-    // @cmember May the current position, for <f read()> and <f write()>,
-    //          of this <c OMDiskRawStorage> be changed ?
-    //          An implementation of <c OMDiskRawStorage> for disk files
-    //          would most probably return true. An implemetation
-    //          for network streams would return false. An implementation
-    //          for memory files would return true.
-  virtual bool isPositionable(void) const;
-
-    // @cmember The current position for <f read()> and <f write()>, as an
-    //          offset in bytes from the beginning of this
-    //          <c OMDiskRawStorage>.
-    //          precondition - isPositionable()
-  virtual OMUInt64 position(void) const;
-
-    // @cmember Set the current position for <f read()> and <f write()>, as an
-    //          offset in bytes from the beginning of this
-    //          <c OMDiskRawStorage>.
-    //          precondition - isPositionable()
-  virtual void setPosition(OMUInt64 newPosition);
 
 private:
   // @access Private members.
