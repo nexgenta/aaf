@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFClassDef
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -29,6 +29,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFSmartPointer.h"
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"
@@ -57,13 +58,15 @@ public:
 
 // The template class CAAFModTestLog provides a way to keep track of which methods in a class have been
 // tested, and whether the tests have passed or failed.  The parameter class T should be set to an 
-// enumeration type giving a named index for each method to be tested (see usage in CAAFClassDef_test() 
+// enumeration type giving a named index for each method to be tested (see usage in CAAFClassDef_test(testMode_t mode) 
 // below).
 template<class T>
 class CAAFModTestLog
 {
 public:
 	CAAFModTestLog(int iMethods,const char **ppMethodNames);
+	~CAAFModTestLog();
+
 	// Mark a specific method as having been tested.  Note that T is always effectively an integer type.
 	void MarkAsTested(T Method)
 	{
@@ -85,7 +88,9 @@ private:
 
 // CAAFModTestLog allocates array of CAAFModTestLogEntry in which to keep track of tests.
 template <class T>
-CAAFModTestLog<T>::CAAFModTestLog(int iMethods,const char **ppMethodNames)
+CAAFModTestLog<T>::CAAFModTestLog(int iMethods,const char **ppMethodNames):
+  _iMethods(0),
+  _pLog(NULL)
 {
 	_iMethods=iMethods;
 	_pLog=new CAAFModTestLogEntry[_iMethods];
@@ -95,6 +100,13 @@ CAAFModTestLog<T>::CAAFModTestLog(int iMethods,const char **ppMethodNames)
 		_pLog[n]._bTestPassed=kAAFTrue;
 		_pLog[n]._pName=ppMethodNames[n];
 	}
+}
+
+template <class T>
+CAAFModTestLog<T>::~CAAFModTestLog()
+{
+  delete [] _pLog;
+  _pLog = NULL;
 }
 
 // PrintSummary() prints a summary of the results of the tests that were carried out for the
@@ -545,13 +557,20 @@ static void ReadAAFFile(CAAFClassDefTestLog& Log)
 	checkResult(pFile->Close());
 }
 
-static void ClassDefTest(CAAFClassDefTestLog& Log)
+static void ClassDefTest(CAAFClassDefTestLog& Log, testMode_t mode)
 {
-	CreateAAFFile(Log);
+	if(mode == kAAFUnitTestReadWrite)
+		CreateAAFFile(Log);
+	else	// These tests occur only on write, but are required to pass the whole thing
+	{
+		Log.MarkAsTested(INITIALIZE);
+	}
+	
 	ReadAAFFile(Log);
 }
 
-extern "C" HRESULT CAAFClassDef_test()
+extern "C" HRESULT CAAFClassDef_test(testMode_t mode);
+extern "C" HRESULT CAAFClassDef_test(testMode_t mode)
 {
 	// Create test log
 	CAAFClassDefTestLog Log(NUM_IAAFCLASSDEF_METHODS,
@@ -561,7 +580,7 @@ extern "C" HRESULT CAAFClassDef_test()
 	aafBool bException=kAAFFalse;
 	try
 	{
-		ClassDefTest(Log);
+		ClassDefTest(Log, mode);
 	}
 	catch (...)
 	{
