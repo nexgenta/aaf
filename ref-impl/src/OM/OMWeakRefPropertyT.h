@@ -34,10 +34,12 @@
 template<typename ReferencedObject>
 OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
                                                  const OMPropertyId propertyId,
-                                                 const char* name)
+                                                 const char* name,
+                                                 const char* targetName)
 : OMReferenceProperty<ReferencedObject>(propertyId,
                                         SF_WEAK_OBJECT_REFERENCE,
-                                        name), _reference(this, name)
+                                        name), _reference(this, name),
+  _targetTag(0), _targetName(saveString(targetName)), _targetSet(0)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty");
 }
@@ -142,9 +144,10 @@ OMWeakReferenceProperty<ReferencedObject>::operator ReferencedObject* () const
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (pointed to) object. This type must be a descendant of
   //          <c OMStorable>.
+  //   @parm Client context for callbacks.
   //   @this const
 template<typename ReferencedObject>
-void OMWeakReferenceProperty<ReferencedObject>::save(void) const
+void OMWeakReferenceProperty<ReferencedObject>::save(void* clientContext) const
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::save");
 
@@ -164,7 +167,7 @@ void OMWeakReferenceProperty<ReferencedObject>::save(void) const
            (void *)pathName,
            strlen(pathName) + 1);
 
-  _reference.save();
+  _reference.save(clientContext);
 
 }
 
@@ -202,6 +205,7 @@ void OMWeakReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 
   _reference.setPathName(pathName);
   _reference.restore();
+  delete [] pathName;
 
 }
 

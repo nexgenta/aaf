@@ -32,6 +32,9 @@
 #include "OMPropertyBase.h"
 #include "OMObjectReference.h"
 
+template <typename ReferencedObject>
+class OMStrongReferenceSetProperty;
+
   // @class Persistent weak reference (pointer to shared object)
   //        properties supported by the Object Manager.
   //   @tcarg class | ReferencedObject | The type of the referenced
@@ -44,7 +47,9 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMWeakReferenceProperty(const OMPropertyId propertyId, const char* name);
+  OMWeakReferenceProperty(const OMPropertyId propertyId,
+                          const char* name,
+                          const char* targetName);
 
     // @cmember Destructor.
   virtual ~OMWeakReferenceProperty(void);
@@ -71,7 +76,7 @@ public:
   operator ReferencedObject*() const;
 
     // @cmember Save this <c OMWeakReferenceProperty>.
-  virtual void save(void) const;
+  virtual void save(void* clientContext) const;
 
     // @cmember close this <c OMWeakReferenceProperty>.
   virtual void close(void);
@@ -94,6 +99,9 @@ public:
 private:
 
   OMWeakObjectReference<ReferencedObject> _reference;
+  OMUInt32 _targetTag;
+  char* _targetName;
+  OMStrongReferenceSetProperty<ReferencedObject>* _targetSet;
 
 };
 
