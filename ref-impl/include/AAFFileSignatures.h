@@ -1,26 +1,31 @@
-#ifndef __AAFFileSignatures_h__
-#define __AAFFileSignatures_h__
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+#ifndef __ImplAAFFileSignatures_h__
+#define __ImplAAFFileSignatures_h__
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
@@ -28,13 +33,13 @@
 
 // AAF (and MXF) file signatures as byte streams.
 
-const aafInt8 aafObjectModelDevelopmentVersion = 0;
+const aafInt8 aafObjectModelDevelopmentVersion = -17;
 
 // Development versions start at -1 and count down. Version 0
 // indicates a released version.
 
 // If you change aafObjectModelDevelopmentVersion above you must also
-// change the signatures below (a program is available).
+// change the signatures below.
 
 // The aafObjectModelDevelopmentVersion appears in the signatures as
 // follows
@@ -42,29 +47,29 @@ const aafInt8 aafObjectModelDevelopmentVersion = 0;
 //   - Bytes 73 (most significant) and 74 (least significant) of
 //     the text signatures.
 
-// AAF files encoded as structured storage (binary).
+// The signature for structured storage binary AAF files. This
+// includes the structured storage file signature.
 //
 const aafUInt8 aafFileSignatureAafSSBinary[] = {
   0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1,
-  0x41, 0x41, 0x46, 0x42, 0x0d, 0x00, 0x4f, 0x4d,
+  0x41, 0x41, 0x46, 0x42, 0x0d, 0xef, 0x4f, 0x4d,
   0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff
 };
 
-const aafUID_t aafFileSignatureAafSSBinaryGUID = 
-{0x42464141, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
+const aafUID_t aafFileSignatureGUID = 
+{0x42464141, 0xef0d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
 
-// MXF files encoded as structured storage (binary).
+// The signature for structured storage binary MXF files. This includes
+// the structured storage file signature.
 //
 const aafUInt8 aafFileSignatureMxfSSBinary[] = {
   0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1,
-  0x4d, 0x58, 0x46, 0x42, 0x0d, 0x00, 0x4f, 0x4d,
+  0x4d, 0x58, 0x46, 0x42, 0x0d, 0xef, 0x4f, 0x4d,
   0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff
 };
 
-const aafUID_t aafFileSignatureMxfSSBinaryGUID = 
-{0x4246584d, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
 
-// AAF files encoded as XML (text).
+// The signature for XML text AAF files.
 //
 const aafUInt8 aafFileSignatureAafXmlText[] = {
   0x3c, 0x3f, 0x78, 0x6d, 0x6c, 0x20, 0x76, 0x65,
@@ -76,13 +81,10 @@ const aafUInt8 aafFileSignatureAafXmlText[] = {
   0x46, 0x46, 0x30, 0x44, 0x2d, 0x34, 0x44, 0x34,
   0x46, 0x2d, 0x30, 0x36, 0x30, 0x45, 0x2d, 0x32,
   0x42, 0x33, 0x34, 0x30, 0x31, 0x30, 0x31, 0x30,
-  0x31, 0x30, 0x30, 0x7d, 0x22, 0x3f, 0x3e
+  0x31, 0x45, 0x46, 0x7d, 0x22, 0x3f, 0x3e
 };
 
-const aafUID_t aafFileSignatureAafXmlTextGUID = 
-{0x58464141, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
-
-// MXF files encoded as XML (text).
+// The signature for XML text MXF files.
 //
 const aafUInt8 aafFileSignatureMxfXmlText[] = {
   0x3c, 0x3f, 0x78, 0x6d, 0x6c, 0x20, 0x76, 0x65,
@@ -94,32 +96,7 @@ const aafUInt8 aafFileSignatureMxfXmlText[] = {
   0x46, 0x46, 0x30, 0x44, 0x2d, 0x34, 0x44, 0x34,
   0x46, 0x2d, 0x30, 0x36, 0x30, 0x45, 0x2d, 0x32,
   0x42, 0x33, 0x34, 0x30, 0x31, 0x30, 0x31, 0x30,
-  0x31, 0x30, 0x30, 0x7d, 0x22, 0x3f, 0x3e
+  0x31, 0x45, 0x46, 0x7d, 0x22, 0x3f, 0x3e
 };
 
-const aafUID_t aafFileSignatureMxfXmlTextGUID = 
-{0x5846584d, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
-
-// AAF files encoded as SMPTE KLV (binary).
-//
-const aafUInt8 aafFileSignatureAafKlvBinary[] = {
-  0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1,
-  0x41, 0x41, 0x46, 0x4b, 0x0d, 0x00, 0x4f, 0x4d,
-  0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff
-};
-
-const aafUID_t aafFileSignatureAafKlvBinaryGUID = 
-{0x4b464141, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
-
-// MXF files encoded as SMPTE KLV (binary).
-//
-const aafUInt8 aafFileSignatureMxfKlvBinary[] = {
-  0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1,
-  0x4d, 0x58, 0x46, 0x4b, 0x0d, 0x00, 0x4f, 0x4d,
-  0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff
-};
-
-const aafUID_t aafFileSignatureMxfKlvBinaryGUID = 
-{0x4b46584d, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
-
-#endif // !__AAFFileSignatures_h__
+#endif // !__ImplAAFFileSignatures_h__
