@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFBuiltinTypes_h__
@@ -153,20 +172,20 @@ ImplAAFBuiltinTypes::ImplAAFBuiltinTypes (ImplAAFDictionary* dictionary) :
 
 ImplAAFBuiltinTypes::~ImplAAFBuiltinTypes ()
 {
-  if (_TD_AUID)        _TD_AUID->ReleaseReference ();
-  if (_TD_AUIDArray)   _TD_AUIDArray->ReleaseReference ();
-  if (_TD_UInt8Array)  _TD_UInt8Array->ReleaseReference ();
-  if (_TD_UInt8Array8) _TD_UInt8Array8->ReleaseReference ();
-  if (_TD_UInt8)       _TD_UInt8->ReleaseReference ();
-  if (_TD_UInt16)      _TD_UInt16->ReleaseReference ();
-  if (_TD_Int16)       _TD_Int16->ReleaseReference ();
-  if (_TD_UInt32)      _TD_UInt32->ReleaseReference ();
-  if (_TD_Int32)       _TD_Int32->ReleaseReference ();
-  if (_TD_Int64)       _TD_Int64->ReleaseReference ();
-  if (_TD_ObjRef)      _TD_ObjRef->ReleaseReference ();
-  if (_TD_ObjRefArray) _TD_ObjRefArray->ReleaseReference ();
-  if (_TD_WCharString) _TD_WCharString->ReleaseReference ();
-  if (_TD_FadeType)    _TD_FadeType->ReleaseReference ();
+  if (_TD_AUID)        _TD_AUID->ReleaseReference (); _TD_AUID = 0;
+  if (_TD_AUIDArray)   _TD_AUIDArray->ReleaseReference (); _TD_AUIDArray = 0;
+  if (_TD_UInt8Array)  _TD_UInt8Array->ReleaseReference (); _TD_UInt8Array = 0;
+  if (_TD_UInt8Array8) _TD_UInt8Array8->ReleaseReference (); _TD_UInt8Array8 = 0;
+  if (_TD_UInt8)       _TD_UInt8->ReleaseReference (); _TD_UInt8 = 0;
+  if (_TD_UInt16)      _TD_UInt16->ReleaseReference (); _TD_UInt16 = 0;
+  if (_TD_Int16)       _TD_Int16->ReleaseReference (); _TD_Int16 = 0;
+  if (_TD_UInt32)      _TD_UInt32->ReleaseReference (); _TD_UInt32 = 0;
+  if (_TD_Int32)       _TD_Int32->ReleaseReference (); _TD_Int32 = 0;
+  if (_TD_Int64)       _TD_Int64->ReleaseReference (); _TD_Int64 = 0;
+  if (_TD_ObjRef)      _TD_ObjRef->ReleaseReference (); _TD_ObjRef = 0;
+  if (_TD_ObjRefArray) _TD_ObjRefArray->ReleaseReference (); _TD_ObjRefArray = 0;
+  if (_TD_WCharString) _TD_WCharString->ReleaseReference (); _TD_WCharString = 0;
+  if (_TD_FadeType)    _TD_FadeType->ReleaseReference (); _TD_FadeType = 0;
 }
 
 
@@ -204,6 +223,7 @@ ImplAAFBuiltinTypes::TypeDefAUID (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefRecord);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefRecord);
 
 	  _TD_AUID = static_cast<ImplAAFTypeDefRecord*>(pObj);
 	  assert (_TD_AUID);
@@ -229,8 +249,11 @@ ImplAAFBuiltinTypes::TypeDefAUID (ImplAAFTypeDef ** ptd)
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  }
 	  pTDUInt8Array8->ReleaseReference ();
+	  pTDUInt8Array8 = 0;
 	  pTDUInt16->ReleaseReference ();
+	  pTDUInt16 = 0;
 	  pTDUInt32->ReleaseReference ();
+	  pTDUInt32 = 0;
 	}
   assert (_TD_AUID);
   if (! ptd) return AAFRESULT_NULL_PARAM;
@@ -254,6 +277,7 @@ ImplAAFBuiltinTypes::TypeDefUInt8 (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefInt);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefInt);
 
 	  _TD_UInt8 = static_cast<ImplAAFTypeDefInt*>(pObj);
 	  assert (_TD_UInt8);
@@ -288,6 +312,7 @@ ImplAAFBuiltinTypes::TypeDefUInt16 (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefInt);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefInt);
 
 	  _TD_UInt16 = static_cast<ImplAAFTypeDefInt*>(pObj);
 	  assert (_TD_UInt16);
@@ -322,6 +347,7 @@ ImplAAFBuiltinTypes::TypeDefInt16 (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefInt);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefInt);
 
 	  _TD_Int16 = static_cast<ImplAAFTypeDefInt*>(pObj);
 	  assert (_TD_Int16);
@@ -356,6 +382,7 @@ ImplAAFBuiltinTypes::TypeDefUInt32 (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefInt);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefInt);
 
 	  _TD_UInt32 = static_cast<ImplAAFTypeDefInt*>(pObj);
 	  assert (_TD_UInt32);
@@ -390,6 +417,7 @@ ImplAAFBuiltinTypes::TypeDefInt32 (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefInt);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefInt);
 
 	  _TD_Int32 = static_cast<ImplAAFTypeDefInt*>(pObj);
 	  assert (_TD_Int32);
@@ -424,6 +452,7 @@ ImplAAFBuiltinTypes::TypeDefInt64 (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefInt);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefInt);
 
 	  _TD_Int64 = static_cast<ImplAAFTypeDefInt*>(pObj);
 	  assert (_TD_Int64);
@@ -459,6 +488,7 @@ ImplAAFBuiltinTypes::TypeDefObjRef (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefStrongObjRef);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefStrongObjRef);
 
 	  _TD_ObjRef = static_cast<ImplAAFTypeDefStrongObjRef*>(pObj);
 	  assert (_TD_ObjRef);
@@ -495,6 +525,7 @@ ImplAAFBuiltinTypes::TypeDefObjRefArray (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefVariableArray);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefVariableArray);
 
 	  _TD_ObjRefArray = static_cast<ImplAAFTypeDefVariableArray*>(pObj);
 	  assert (_TD_ObjRefArray);
@@ -511,6 +542,7 @@ ImplAAFBuiltinTypes::TypeDefObjRefArray (ImplAAFTypeDef ** ptd)
 	  hr = _TD_ObjRefArray->Initialize (&kAAFTypeID_ObjRefArray, ptdo, L"Strong Object Reference Array");
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  ptdo->ReleaseReference ();
+	  ptdo = 0;
 	}
   assert (_TD_ObjRefArray);
   if (! ptd) return AAFRESULT_NULL_PARAM;
@@ -535,6 +567,7 @@ ImplAAFBuiltinTypes::TypeDefAUIDArray (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefVariableArray);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefVariableArray);
 
 	  _TD_AUIDArray = static_cast<ImplAAFTypeDefVariableArray*>(pObj);
 	  assert (_TD_AUIDArray);
@@ -551,6 +584,7 @@ ImplAAFBuiltinTypes::TypeDefAUIDArray (ImplAAFTypeDef ** ptd)
 	  hr = _TD_AUIDArray->Initialize (&kAAFTypeID_AUIDArray, ptda, L"AUID Array");
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  ptda->ReleaseReference ();
+	  ptda = 0;
 	}
   assert (_TD_AUIDArray);
   if (! ptd) return AAFRESULT_NULL_PARAM;
@@ -574,6 +608,7 @@ ImplAAFBuiltinTypes::TypeDefUInt8Array (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefVariableArray);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefVariableArray);
 
 	  _TD_UInt8Array = static_cast<ImplAAFTypeDefVariableArray*>(pObj);
 	  assert (_TD_UInt8Array);
@@ -590,6 +625,7 @@ ImplAAFBuiltinTypes::TypeDefUInt8Array (ImplAAFTypeDef ** ptd)
 	  hr = _TD_UInt8Array->Initialize (&kAAFTypeID_UInt8Array, ptd8, L"UInt8 Array");
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  ptd8->ReleaseReference ();
+	  ptd8 = 0;
 	}
   assert (_TD_UInt8Array);
   if (! ptd) return AAFRESULT_NULL_PARAM;
@@ -614,6 +650,7 @@ ImplAAFBuiltinTypes::TypeDefUInt8Array8 (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefFixedArray);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefFixedArray);
 
 	  _TD_UInt8Array8 = static_cast<ImplAAFTypeDefFixedArray*>(pObj);
 	  assert (_TD_UInt8Array8);
@@ -630,6 +667,7 @@ ImplAAFBuiltinTypes::TypeDefUInt8Array8 (ImplAAFTypeDef ** ptd)
 	  hr = _TD_UInt8Array8->Initialize (&kAAFTypeID_UInt8Array8, ptd8, 8, L"UInt8[8]");
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  ptd8->ReleaseReference ();
+	  ptd8 = 0;
 	}
   assert (_TD_UInt8Array8);
   if (! ptd) return AAFRESULT_NULL_PARAM;
@@ -653,6 +691,7 @@ ImplAAFBuiltinTypes::TypeDefWCharString (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefString);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefString);
 
 	  _TD_WCharString = static_cast<ImplAAFTypeDefString*>(pObj);
 	  assert (_TD_WCharString);
@@ -669,6 +708,7 @@ ImplAAFBuiltinTypes::TypeDefWCharString (ImplAAFTypeDef ** ptd)
 	  hr = _TD_WCharString->Initialize (&kAAFTypeID_WCharString, ptd16, L"Wide Char String");
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  ptd16->ReleaseReference ();
+	  ptd16 = 0;
 	}
   assert (_TD_WCharString);
   if (! ptd) return AAFRESULT_NULL_PARAM;
@@ -693,6 +733,7 @@ ImplAAFBuiltinTypes::TypeDefFadeType (ImplAAFTypeDef ** ptd)
 		_dictionary->pvtCreateBaseClassInstance (&AUID_AAFTypeDefEnum);
 	  if (! pObj) return AAFRESULT_NOMEMORY;
 	  pObj->setClassFactory(_dictionary);
+	  pObj->pvtSetSoid (AUID_AAFTypeDefEnum);
 
 	  _TD_FadeType = static_cast<ImplAAFTypeDefEnum*>(pObj);
 	  assert (_TD_FadeType);
@@ -728,6 +769,7 @@ ImplAAFBuiltinTypes::TypeDefFadeType (ImplAAFTypeDef ** ptd)
 									 L"FadeType");
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  ptd32->ReleaseReference ();
+	  ptd32 = 0;
 	}
   assert (_TD_FadeType);
   if (! ptd) return AAFRESULT_NULL_PARAM;
@@ -798,6 +840,7 @@ AAFRESULT ImplAAFBuiltinTypes::ImportBuiltinTypeDef (const aafUID_t & rTypeID,
 			{
 			  assert (ptd);
 			  ptd->ReleaseReference ();
+			  ptd = 0;
 			  return hr;
 			}
 
