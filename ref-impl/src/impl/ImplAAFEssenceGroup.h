@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceGroup.h,v 1.16 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEssenceGroup.h,v 1.16.2.1 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -162,6 +162,10 @@ public:
 	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
 												aafMobID_constref to);
 	virtual AAFRESULT ValidateChoice(ImplAAFSegment *choice);
+
+	// Visit this component and its sub-components
+	// with the specified visitor.
+	virtual void Accept(AAFComponentVisitor& visitor);
 
 private:
 	OMStrongReferenceVectorProperty<ImplAAFSegment>	_choices;

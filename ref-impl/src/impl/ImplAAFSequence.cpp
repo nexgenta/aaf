@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.cpp,v 1.58.2.1 2004/06/08 13:46:06 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSequence.cpp,v 1.58.2.2 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1191,3 +1191,23 @@ AAFRESULT ImplAAFSequence::UpdateSequenceLength( ImplAAFComponent* pComponent )
 
 	return AAFRESULT_SUCCESS;
 }
+
+void ImplAAFSequence::Accept(AAFComponentVisitor& visitor)
+{
+	aafUInt32 count = 0;
+	CountComponents(&count);
+	for(aafUInt32 i=0; i<count; i++)
+	{
+		ImplAAFComponent* pComponent = 0;
+		GetNthComponent(i, &pComponent);
+
+       	        pComponent->Accept(visitor);
+
+		pComponent->ReleaseReference();
+		pComponent = NULL;
+	}
+
+	// TODO
+	// visitor.VisitSequence(this);
+}
+

@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFComponent.cpp,v 1.53.2.2 2004/03/24 17:49:18 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFComponent.cpp,v 1.53.2.3 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -401,6 +401,13 @@ AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafMobID_constref /*from*/
 {
 	return AAFRESULT_SUCCESS;
 }
+
+
+void ImplAAFComponent::Accept(AAFComponentVisitor&)
+{
+	// do nothing
+}
+
 
 void ImplAAFComponent::onCopy(void* clientContext) const
 {

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.cpp,v 1.46 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.cpp,v 1.46.2.1 2004/07/23 16:16:06 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,6 +44,7 @@
 #include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 #include "AAFDataDefs.h"
+#include "AAFComponentVisitor.h"
 #include "ImplAAFHeader.h"
 
 #include "ImplAAFSmartPointer.h"
@@ -353,6 +354,14 @@ AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 	
 	return(AAFRESULT_SUCCESS);
 }
+
+
+
+void ImplAAFSourceClip::Accept(AAFComponentVisitor& visitor)
+{
+	visitor.VisitSourceClip(this);
+}
+
 
 
 void ImplAAFSourceClip::onCopy(void* clientContext) const

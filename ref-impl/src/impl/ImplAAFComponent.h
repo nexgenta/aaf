@@ -18,7 +18,7 @@ class ImplAAFTaggedValue;
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFComponent.h,v 1.32.2.3 2004/07/22 18:41:38 akharkev Exp $ $Name:  $
+// $Id: ImplAAFComponent.h,v 1.32.2.4 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,6 +65,8 @@ enum _implCompType_t
 		kSegment	= 1,
 		kComponent	=2
 	} implCompType_t;
+
+class AAFComponentVisitor;
 
 class ImplAAFComponent : public ImplAAFObject
 {
@@ -277,6 +279,10 @@ public:
 	virtual AAFRESULT GetComponentType(implCompType_t* pType) {*pType = kComponent; return AAFRESULT_SUCCESS;}
 	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
 												aafMobID_constref to);
+
+	// Visit this component and its sub-components
+	// with the specified visitor.
+	virtual void Accept(AAFComponentVisitor& visitor);
 
 
   // OM deep copy notification

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOperationGroup.cpp,v 1.58 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFOperationGroup.cpp,v 1.58.2.1 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -629,6 +629,26 @@ AAFRESULT ImplAAFOperationGroup::ChangeContainedReferences(aafMobID_constref fro
 	XEND;
 
 	return AAFRESULT_SUCCESS;
+}
+
+
+void ImplAAFOperationGroup::Accept(AAFComponentVisitor& visitor)
+{
+	aafUInt32 count = 0;
+	CountSourceSegments(&count);
+	for(aafUInt32 i=0; i<count; i++)
+	{
+		ImplAAFSegment* pSegment = 0;
+		GetInputSegmentAt(i, &pSegment);
+
+       	        pSegment->Accept(visitor);
+
+		pSegment->ReleaseReference();
+		pSegment = NULL;
+	}
+
+	// TODO
+	// visitor.VisitOperationGroup(this);
 }
 
 

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.h,v 1.29 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.h,v 1.29.2.1 2004/07/23 16:16:06 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,6 +139,10 @@ public:
 					 aafInt32 *pulldownPhase,
 					 aafLength_t *sclpLen,
 					 aafBool *isMask);
+
+	// Visit this component and its sub-components
+	// with the specified visitor.
+	virtual void Accept(AAFComponentVisitor& visitor);
 
 	// OM deep copy notification
 	virtual void onCopy(void* clientContext) const;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceGroup.cpp,v 1.32 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEssenceGroup.cpp,v 1.32.2.1 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -540,4 +540,23 @@ AAFRESULT ImplAAFEssenceGroup::ValidateChoice(
 	XEND;
 
 	return(AAFRESULT_SUCCESS);
+}
+
+void ImplAAFEssenceGroup::Accept(AAFComponentVisitor& visitor)
+{
+	aafUInt32 count = 0;
+	CountChoices(&count);
+	for(aafUInt32 i=0; i<count; i++)
+	{
+		ImplAAFSegment* pChoice = 0;
+		GetChoiceAt(i, &pChoice);
+
+       	        pChoice->Accept(visitor);
+
+		pChoice->ReleaseReference();
+		pChoice = NULL;
+	}
+
+	// TODO
+	// visitor.VisitEssenceGroup(this);
 }
