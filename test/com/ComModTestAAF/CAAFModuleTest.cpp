@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFModuleTest.cpp,v 1.27 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFModuleTest.cpp,v 1.28 2004/03/19 17:27:12 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -257,6 +257,8 @@ HRESULT CAAFModuleTest::Test
         {
           cout << AAFObjectMap[index].pClassName << endl;
           testResults[index] = AAFObjectMap[index].CallTestProc(mode);
+          if (testResults[index] != AAFRESULT_SUCCESS)
+			cout << "     ^^^ NOT SUCCESS ^^^" << endl;
           ++testCount;
         }
         else
@@ -275,6 +277,8 @@ HRESULT CAAFModuleTest::Test
           
         cout << "  " << AAFObjectMap[index].pClassName << endl;
         testResults[index] = AAFObjectMap[index].CallTestProc(mode);
+		if (testResults[index] != AAFRESULT_SUCCESS)
+			cout << "     ^^^ NOT SUCCESS ^^^" << endl;
         ++testCount;
       }
     }
