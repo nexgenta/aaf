@@ -17,6 +17,9 @@ OMObjectDirectory::OMObjectDirectory(int capacity)
 
 OMObjectDirectory::~OMObjectDirectory(void)
 {
+  for (int i = 0; i < _current; i++) {
+    delete [] _table[i]._name;
+  }
   delete [] _table;
   _table = 0;
 }
@@ -46,6 +49,8 @@ void OMObjectDirectory::insert(const char* name, const OMStorable* p)
     _table[_current]._object = const_cast<OMStorable *>(p);
     _table[_current]._name = n;
     _current++;
+  } else {
+    ASSERT("Table not full", false);
   }
 }
 
