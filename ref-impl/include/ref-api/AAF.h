@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.15.2.14 2004/08/05 17:41:25 akharkev Exp $ $Name:  $
+// $Id: AAF.h,v 1.15.2.15 2004/08/05 17:59:45 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15901,7 +15901,6 @@ DECLARE_INTERFACE_(IAAFPCMDescriptor, IUnknown)
   // Succeeds if all of the following are true:
   // - the object is initialized.
   // - the pBps pointer is valid.
-  // - the property is present.
   // 
   // If this method fails nothing will be written to *pBps.
   // 
@@ -15916,12 +15915,66 @@ DECLARE_INTERFACE_(IAAFPCMDescriptor, IUnknown)
   // AAFRESULT_NULL_PARAM
   //   - pBps arg is NULL.
   //
-  // AAFRESULT_PROP_NOT_PRESENT
-  //   - the property is not present.
-  //
   STDMETHOD(GetAverageBPS) (THIS_
     // Average bytes per second of the essence stream.
     /*[out]*/ aafUInt32 *  pBps) PURE;
+
+
+  //***********************************************************
+  //
+  // SetChannelAssignment()
+  //
+  // Sets the channel assignment scheme. This property is optional.
+  // 
+  // Succeeds if all of the following are true:
+  // - the object is initialized.
+  // 
+  // If this method fails the ChannelAssignment property will not be
+  // changed.
+  // 
+  // This method will return the following codes:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - the object is not initialized.
+  //
+  STDMETHOD(SetChannelAssignment) (THIS_
+    // The channel assignment to use.
+    /*[in, ref]*/ aafUID_constref  channelAssignment) PURE;
+
+
+  //***********************************************************
+  //
+  // GetChannelAssignment()
+  //
+  // Gets the channel assignment scheme. This property is optional.
+  // 
+  // Succeeds if all of the following are true:
+  // - the object is initialized.
+  // - the pChannelAssignment pointer is valid.
+  // - the property is present.
+  // 
+  // If this method fails nothing will be written to *pChannelAssignment.
+  // 
+  // This method will return the following codes:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - the object is not initialized.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pChannelAssignment arg is NULL.
+  //
+  // AAFRESULT_PROP_NOT_PRESENT
+  //   - the property is not present.
+  //
+  STDMETHOD(GetChannelAssignment) (THIS_
+    // The channel assignment in use.
+    /*[out]*/ aafUID_t *  pChannelAssignment) PURE;
 
 
   //***********************************************************
