@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extEnumUid.cpp,v 1.10 2004/02/27 15:41:23 phil_tudor Exp $ $Name:  $
+// $Id: extEnumUid.cpp,v 1.11 2005/03/17 18:02:27 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,7 @@
 
 #include "headerGenUtils.h"
 
-const char* prefix = "";
+const char* prefix = "kAAF";
 
 #define AAF_TYPE_TABLE_BEGIN() {
 #define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(name, id) \

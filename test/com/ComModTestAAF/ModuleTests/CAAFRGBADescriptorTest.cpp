@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFRGBADescriptor
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRGBADescriptorTest.cpp,v 1.19 2005/01/11 10:38:09 jfpanisset Exp $ $Name:  $
+// $Id: CAAFRGBADescriptorTest.cpp,v 1.20 2005/03/17 18:02:33 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,7 @@ using namespace std;
 #define kComponentMinRefTestVal		16
 #define kAlphaMaxRefTestVal		235
 #define kAlphaMinRefTestVal		16
-#define kScanningDirectionTestVal			kAAFScanningBottomToTopRightToLeft
+#define kScanningDirectionTestVal			kAAFScanningDirection_BottomToTopRightToLeft
 
 
 #define NUM_TEST_ELEMENTS	3
@@ -352,7 +352,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		aafUInt32				componentMinRef;
 		aafUInt32				alphaMaxRef;
 		aafUInt32				alphaMinRef;
-	  aafScanningDirection_t scanningDirection = kAAFScanningLeftToRightTopToBottom;
+	  aafScanningDirection_t scanningDirection = kAAFScanningDirection_LeftToRightTopToBottom;
 
 	  memset(&compTestVal, 0, sizeof(aafUID_t));
 

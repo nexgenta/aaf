@@ -41,7 +41,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.9 2005/02/08 17:52:24 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.10 2005/03/17 18:02:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1037,6 +1037,8 @@ enum _eAAFTypeCategory_e
 	kAAFTypeCatEncrypted	= 16
     }	eAAFTypeCategory_e;
 
+typedef aafAlphaTransparency_t aafAlphaTransparencyType_t;
+
 typedef aafBoolean_t aafBool;
 
 typedef aafColorSiting_t aafColorSitingType_t;
@@ -1045,15 +1047,17 @@ typedef aafEditHint_t aafEditHintType_t;
 
 typedef aafFrameLayout_t aafLayoutType_t;
 
-typedef aafTimecodeSourceType_t aafTCSource_t;
+typedef aafMobID_t aafMobIDType_t;
 
 typedef aafPulldownDir_t aafPulldownDirectionType_t;
 
 typedef aafPulldownKind_t aafPulldownKindType_t;
 
+typedef aafScanningDirection_t aafScanningDirectionType_t;
+
 typedef aafSignalStandard_t aafSignalStandardType_t;
 
-typedef aafScanningDirection_t aafScanningDirectionType_t;
+typedef aafTimecodeSourceType_t aafTCSource_t;
 
 /**************************/
 #ifndef STDMETHODCALLTYPE

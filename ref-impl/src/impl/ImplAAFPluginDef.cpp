@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginDef.cpp,v 1.39 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPluginDef.cpp,v 1.40 2005/03/17 18:02:32 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFPluginLocators;
 
 
 ImplAAFPluginDef::ImplAAFPluginDef ()
-: _categoryClass(		PID_PluginDefinition_CategoryClass,		L"CategoryClass"),
+: _categoryClass(		PID_PluginDefinition_PluginCategory,		L"CategoryClass"),
  _pluginVersion(        PID_PluginDefinition_VersionNumber,     L"VersionNumber"),
  _pluginVersionString(	PID_PluginDefinition_VersionString,		L"VersionString"),
  _pluginManufacturerName(PID_PluginDefinition_Manufacturer,		L"Manufacturer"),

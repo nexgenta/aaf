@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.15 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.16 2005/03/17 18:02:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,7 +59,7 @@ const int PID_GPITrigger_ActiveState                             = 0x0801;
 const int PID_CommentMarker_Annotation                           = 0x0901;
 const int PID_DescriptiveMarker_DescribedSlots                   = 0x6102;
 const int PID_DescriptiveMarker_Description                      = 0x6101;
-const int PID_OperationGroup_OperationDefinition                 = 0x0B01;
+const int PID_OperationGroup_Operation                           = 0x0B01;
 const int PID_OperationGroup_InputSegments                       = 0x0B02;
 const int PID_OperationGroup_Parameters                          = 0x0B03;
 const int PID_OperationGroup_BypassOverride                      = 0x0B04;
@@ -108,7 +108,7 @@ const int PID_ClassDefinition_IsConcrete                         = 0x000A;
 const int PID_OperationDefinition_DataDefinition                 = 0x1E01;
 const int PID_OperationDefinition_IsTimeWarp                     = 0x1E02;
 const int PID_OperationDefinition_DegradeTo                      = 0x1E03;
-const int PID_OperationDefinition_Category                       = 0x1E06;
+const int PID_OperationDefinition_OperationCategory              = 0x1E06;
 const int PID_OperationDefinition_NumberInputs                   = 0x1E07;
 const int PID_OperationDefinition_Bypass                         = 0x1E08;
 const int PID_OperationDefinition_ParametersDefined              = 0x1E09;
@@ -118,7 +118,7 @@ const int PID_PropertyDefinition_Type                            = 0x000B;
 const int PID_PropertyDefinition_IsOptional                      = 0x000C;
 const int PID_PropertyDefinition_LocalIdentification             = 0x000D;
 const int PID_PropertyDefinition_IsUniqueIdentifier              = 0x000E;
-const int PID_PluginDefinition_CategoryClass                     = 0x2203;
+const int PID_PluginDefinition_PluginCategory                    = 0x2203;
 const int PID_PluginDefinition_VersionNumber                     = 0x2204;
 const int PID_PluginDefinition_VersionString                     = 0x2205;
 const int PID_PluginDefinition_Manufacturer                      = 0x2206;

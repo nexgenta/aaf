@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOperationGroup.cpp,v 1.60 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFOperationGroup.cpp,v 1.61 2005/03/17 18:02:32 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,7 +81,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFParameters;
 
 
 ImplAAFOperationGroup::ImplAAFOperationGroup ()
-: _operationDefinition( PID_OperationGroup_OperationDefinition, L"OperationDefinition", L"/Header/Dictionary/OperationDefinitions", PID_DefinitionObject_Identification),
+: _operationDefinition( PID_OperationGroup_Operation, L"OperationDefinition", L"/Header/Dictionary/OperationDefinitions", PID_DefinitionObject_Identification),
   _inputSegments( PID_OperationGroup_InputSegments, L"InputSegments"),
   _parameters( PID_OperationGroup_Parameters, L"Parameters", PID_DefinitionObject_Identification),
   _bypassOverride( PID_OperationGroup_BypassOverride, L"BypassOverride"),
