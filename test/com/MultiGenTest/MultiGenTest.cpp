@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MultiGenTest.cpp,v 1.12 2004/10/28 17:23:22 stuart_hc Exp $ $Name:  $
+// $Id: MultiGenTest.cpp,v 1.13 2005/04/05 17:23:38 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -244,6 +244,7 @@ public:
       _subArgC(-1),
       _subArgV(0)
   {}
+  virtual ~CmdFunc() {}
   virtual void operator()( CmdState& state ) {}
   int GetMinArgs()               { return _minArgs; }
   void SetArgC( int subArgC )    { _subArgC = subArgC; }

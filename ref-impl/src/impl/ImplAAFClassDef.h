@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.h,v 1.37 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFClassDef.h,v 1.38 2005/04/05 17:23:38 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -330,6 +330,8 @@ private:
   class pvtPropertyIdentifier
   {
   public:
+    virtual ~pvtPropertyIdentifier() {}
+
 	// Returns kAAFTrue if this property identifier matches the given
 	// property definition.
 	virtual aafBool DoesMatch

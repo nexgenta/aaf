@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModel.h,v 1.7 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModel.h,v 1.8 2005/04/05 17:23:37 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -135,6 +135,8 @@ public:
     _createDefinitionProc(0),
     _initializeDefinitionProc(0)
   {}
+
+  virtual ~Definition() {}
 
   aafUID_constptr id(void) const { return _id; }
   aafCharacter_constptr name(void) const { return _name; }
@@ -435,6 +437,8 @@ public:
     _containerId(containerId)
   {}
 
+  virtual ~DefinitionEnumerationMember() {}
+
   virtual void Initialize (void); // only the member data of this object
 
   aafCharacter_constptr name(void) const { return _name; }
@@ -566,6 +570,8 @@ public:
     _fieldOffset(fieldOffset),
     _typeDefinition(0)
   {}
+
+  virtual ~DefinitionRecordField() {}
 
   virtual void Initialize (void); // only the member data of this object
 
@@ -717,6 +723,8 @@ public:
     _auid(auid),
     _containerId(containerId)
   {}
+
+  virtual ~DefinitionExtendibleEnumerationMember() {}
 
   virtual void Initialize (void); // only the member data of this object
 
