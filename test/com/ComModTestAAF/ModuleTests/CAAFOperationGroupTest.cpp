@@ -74,7 +74,8 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -90,7 +91,9 @@ const aafString_t  TEST_PARAM_DESC [2]	=	{L"A longer description of the TestEffe
 												L"An aproximation of PI"};
 const aafString_t  TEST_PARAM_UNITS[2]	=   {L"Furlongs per Fortnight", L"PI fractional members"};
 
-aafUID_t kTestParm2ID = {0x14b66cc5, 0x1a1, 0x11d4, { 0x80, 0x46, 0x8, 0x0, 0x36, 0x21, 0x8, 0x4 } };
+static const 	aafUID_t	kTestParm2ID =
+{ 0x47240c2b, 0x19d, 0x11d4, { 0x8e, 0x3d, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x7c } };
+
 
 typedef IAAFSmartPointer<IAAFParameterDef>					IAAFParameterDefSP;
 typedef IAAFSmartPointer<IEnumAAFParameters>				IEnumAAFParametersSP;
@@ -160,10 +163,28 @@ static HRESULT verifyParams(IAAFOperationGroup * const pOperationGroup )
 	IAAFDefObjectSP spDefObject;
 
 
+  // Attempt to load the parameters into an array.
 	aafUInt32 num_fetched = 0;
+  aafUInt32 num_released = 0;
 	//make sure 2 parameters can be fetched
-	checkResult(spEnumParams->Next(2, &spParameter, &num_fetched));
+  IAAFParameter * parameterArray[2] = {0};
+	checkResult(spEnumParams->Next(2, parameterArray, &num_fetched));
+  if (parameterArray[0])
+  {
+    parameterArray[0]->Release();
+    parameterArray[0] = NULL;
+    ++num_released;
+  }
+  if (parameterArray[1])
+  {
+    parameterArray[1]->Release();
+    parameterArray[1] = NULL;
+    ++num_released;
+  }
+
 	checkExpression(num_fetched == 2, AAFRESULT_TEST_FAILED);
+	checkExpression(num_released == 2, AAFRESULT_TEST_FAILED);
+
 	//so far, so good.  Reset
 	spEnumParams->Reset();
 
@@ -296,6 +317,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(pOperationGroup->Initialize(defs.ddPicture(),
 				TEST_EFFECT_LEN,
 				pOperationDef));
+
+      pComponent->Release();
+      pComponent = NULL;
 			
 			checkResult(defs.cdConstantValue()->
 				CreateInstance(IID_IAAFConstantValue, 
@@ -323,6 +347,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(pOperationGroup->AddParameter (pParm));			
 			pConstValue->Release ();
 			pConstValue = NULL;
+			pParm->Release();
+			pParm = NULL;
 
 
 			// filler ....
@@ -340,6 +366,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(pOperationGroup->AppendInputSegment (pFiller));
 			pFiller->Release();
 			pFiller = NULL;
+      pComponent->Release();
+      pComponent = NULL;
+
 			checkResult(pOperationGroup->CountSourceSegments (&numSegments));
 			checkExpression(2 == numSegments, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationGroup->RemoveInputSegmentAt (1));
@@ -372,10 +401,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			
 			pOperationGroup->Release();
 			pOperationGroup = NULL;
-			pParm->Release();
-			pParm = NULL;
-			pComponent->Release();
-			pComponent = NULL;
 			pSourceRef->Release();
 			pSourceRef = NULL;
 			pSourceClip->Release();
@@ -461,11 +486,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	bool				bFileOpen = false;
 	aafMobID_t			readSourceID;
 	aafBool				readIsTimeWarp;
-	aafUInt32			catLen;
 	aafInt32			checkNumInputs, testNumSources, testNumParam;
-	aafUInt32			checkBypass, testLen;
+	aafUInt32			checkBypass;
 	HRESULT				hr = S_OK;
-	wchar_t				checkCat[256], checkName[256];
+	wchar_t				checkName[256];
+	aafUID_t			checkCat;
 	aafNumSlots_t		s;
 	aafNumSlots_t	numSlots;
 	aafUInt32			readOverride;
@@ -523,11 +548,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkExpression(wcscmp(checkName, TEST_EFFECT_DESC) == 0, AAFRESULT_TEST_FAILED);
 			pDefObject->Release();
 			pDefObject = NULL;
-			checkResult(pOperationDef->GetCategoryBufLen (&catLen));
-			testLen = wcslen(TEST_CATEGORY);
-			checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));
-			checkExpression(wcscmp(checkCat, TEST_CATEGORY) == 0, AAFRESULT_TEST_FAILED);
-			checkExpression(testLen == wcslen(checkCat), AAFRESULT_TEST_FAILED);
+			checkResult(pOperationDef->GetCategory (&checkCat));
+			checkExpression(memcmp(&checkCat, &TEST_CATEGORY, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetBypass (&checkBypass));
 			checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
@@ -634,6 +656,7 @@ extern "C" HRESULT CAAFOperationGroup_test()
 	catch (...)
 	{
 		cerr << "CAAFOperationGroup_test...Caught general C++ exception!" << endl; 
+    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
 	}
 	
 	return hr;
