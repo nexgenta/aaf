@@ -43,6 +43,9 @@
 #c Argument: Base filename
 #c
 #startm AD_INCLUDE 01
+#ifndef __%01_h__
+#include "%01.h"
+#endif\
 #endm
 
 
@@ -53,14 +56,31 @@
 #c Arguments: none
 #c
 #startm AD_HEAD 00
-/******************************************\\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\\******************************************/
+//=--------------------------------------------------------------------------=
+// .this-module.h")
+//=--------------------------------------------------------------------------=
+// (C) Copyright 1998 Avid Technology.
+// (C) Copyright 1998 Microsoft Corporation.
+//
+// THIS CODE AND INFORMATION IS PROVIDED 'AS IS' WITHOUT WARRANTY OF
+// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+//=--------------------------------------------------------------------------=
+// .this-module Interface.
+//=--------------------------------------------------------------------------=
+//
+#ifndef __.this-module_h__
+#define __.this-module_h__
+
+#ifndef __AAFCOMPlatform_h__
+#include "AAFCOMPlatform.h"
+#endif
+
+
+// Forward declaration of interface. This should make sure that for any "circular" 
+// imports a given iterface will always have a forward declaration.
+interface I.this-module;
 #endm
 
 #ccccccccccccccccccccccccccc
@@ -188,10 +208,6 @@ AD_CLASS_BEGIN\
 #c Argument2: method description
 #c
 #startm AD_METHOD0 02
-  //***********************************************************
-  //
-  // %01()
-  //
   // %02
   STDMETHOD(%01) (THIS) PURE;\
 #endm
@@ -212,14 +228,8 @@ AD_CLASS_BEGIN\
 #c Macro Arg 07: method description
 #c
 #startm AD_XMETHOD1 07
-  //***********************************************************
-  //
-  // %01()
-  //
   // %07
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05) PURE;\
 #endm
 
@@ -240,17 +250,9 @@ AD_CLASS_BEGIN\
 #c Macro Arg 12: method description
 #c
 #startm AD_XMETHOD2 12
-  //***********************************************************
-  //
-  // %01()
-  //
   // %12
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10) PURE;\
 #endm
 
@@ -272,20 +274,10 @@ AD_CLASS_BEGIN\
 #c Macro Arg 17: method description
 #c
 #startm AD_XMETHOD3 17
-  //***********************************************************
-  //
-  // %01()
-  //
   // %17
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15) PURE;\
 #endm
 
@@ -308,23 +300,11 @@ AD_CLASS_BEGIN\
 #c Macro Arg 22: method description
 #c
 #startm AD_XMETHOD4 22
-  //***********************************************************
-  //
-  // %01()
-  //
   // %22
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20) PURE;\
 #endm
 
@@ -348,26 +328,12 @@ AD_CLASS_BEGIN\
 #c Macro Arg 27: method description
 #c
 #startm AD_XMETHOD5 27
-  //***********************************************************
-  //
-  // %01()
-  //
   // %27
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20,
-
-    // %26
     /*%22*/ .%23-adornment%24 .%23-indirection %25) PURE;\
 #endm
 
@@ -392,29 +358,13 @@ AD_CLASS_BEGIN\
 #c Macro Arg 32: method description
 #c
 #startm AD_XMETHOD6 32
-  //***********************************************************
-  //
-  // %01()
-  //
   // %32
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20,
-
-    // %26
     /*%22*/ .%23-adornment%24 .%23-indirection %25,
-
-    // %31
     /*%27*/ .%28-adornment%29 .%28-indirection %30) PURE;\
 #endm
 
@@ -440,32 +390,14 @@ AD_CLASS_BEGIN\
 #c Macro Arg 37: method description
 #c
 #startm AD_XMETHOD7 37
-  //***********************************************************
-  //
-  // %01()
-  //
   // %37
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20,
-
-    // %26
     /*%22*/ .%23-adornment%24 .%23-indirection %25,
-
-    // %31
     /*%27*/ .%28-adornment%29 .%28-indirection %30,
-
-    // %36
     /*%32*/ .%33-adornment%34 .%33-indirection %35) PURE;\
 #endm
 
@@ -492,35 +424,15 @@ AD_CLASS_BEGIN\
 #c Macro Arg 42: method description
 #c
 #startm AD_XMETHOD8 42
-  //***********************************************************
-  //
-  // %01()
-  //
   // %42
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20,
-
-    // %26
     /*%22*/ .%23-adornment%24 .%23-indirection %25,
-
-    // %31
     /*%27*/ .%28-adornment%29 .%28-indirection %30,
-
-    // %36
     /*%32*/ .%33-adornment%34 .%33-indirection %35,
-
-    // %41
     /*%37*/ .%38-adornment%39 .%38-indirection %40) PURE;\
 #endm
 
@@ -548,38 +460,16 @@ AD_CLASS_BEGIN\
 #c Macro Arg 47: method description
 #c
 #startm AD_XMETHOD9 47
-  //***********************************************************
-  //
-  // %01()
-  //
   // %47
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20,
-
-    // %26
     /*%22*/ .%23-adornment%24 .%23-indirection %25,
-
-    // %31
     /*%27*/ .%28-adornment%29 .%28-indirection %30,
-
-    // %36
     /*%32*/ .%33-adornment%34 .%33-indirection %35,
-
-    // %41
     /*%37*/ .%38-adornment%39 .%38-indirection %40,
-
-    // %46
     /*%42*/ .%43-adornment%44 .%43-indirection %45) PURE;\
 #endm
 
@@ -608,41 +498,17 @@ AD_CLASS_BEGIN\
 #c Macro Arg 52: method description
 #c
 #startm AD_XMETHOD_10 52
-  //***********************************************************
-  //
-  // %01()
-  //
   // %52
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20,
-
-    // %26
     /*%22*/ .%23-adornment%24 .%23-indirection %25,
-
-    // %31
     /*%27*/ .%28-adornment%29 .%28-indirection %30,
-
-    // %36
     /*%32*/ .%33-adornment%34 .%33-indirection %35,
-
-    // %41
     /*%37*/ .%38-adornment%39 .%38-indirection %40,
-
-    // %46
     /*%42*/ .%43-adornment%44 .%43-indirection %45,
-
-    // %51
     /*%47*/ .%48-adornment%49 .%48-indirection %50) PURE;\
 #endm
 
@@ -672,44 +538,18 @@ AD_CLASS_BEGIN\
 #c Macro Arg 57: method description
 #c
 #startm AD_XMETHOD_11 57
-  //***********************************************************
-  //
-  // %01()
-  //
   // %57
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
     /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
     /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
     /*%17*/ .%18-adornment%19 .%18-indirection %20,
-
-    // %26
     /*%22*/ .%23-adornment%24 .%23-indirection %25,
-
-    // %31
     /*%27*/ .%28-adornment%29 .%28-indirection %30,
-
-    // %36
     /*%32*/ .%33-adornment%34 .%33-indirection %35,
-
-    // %41
     /*%37*/ .%38-adornment%39 .%38-indirection %40,
-
-    // %46
     /*%42*/ .%43-adornment%44 .%43-indirection %45,
-
-    // %51
     /*%47*/ .%48-adornment%49 .%48-indirection %50,
-
-    // %56
     /*%52*/ .%53-adornment%54 .%53-indirection %55) PURE;\
 #endm
 
@@ -741,20 +581,10 @@ AD_CLASS_BEGIN\
 #c Macro Arg 20: method description
 #c
 #startm AD_X2METHOD3 20
-  //***********************************************************
-  //
-  // %01()
-  //
   // %20
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %12
     /*%08*/ .%09-adornment%10 .%09-indirection %11,
-
-    // %18
     /*%14*/ .%15-adornment%16 .%15-indirection %17) PURE;\
 #endm
 
@@ -787,23 +617,11 @@ AD_CLASS_BEGIN\
 #c Macro Arg 26: method description
 #c
 #startm AD_X2METHOD4 26
-  //***********************************************************
-  //
-  // %01()
-  //
   // %26
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %12
     /*%08*/ .%09-adornment%10 .%09-indirection %11,
-
-    // %18
     /*%14*/ .%15-adornment%16 .%15-indirection %17,
-
-    // %24
     /*%20*/ .%21-adornment%22 .%21-indirection %23) PURE;\
 #endm
 
@@ -838,26 +656,12 @@ AD_CLASS_BEGIN\
 #c Macro Arg 32: method description
 #c
 #startm AD_X2METHOD5 32
-  //***********************************************************
-  //
-  // %01()
-  //
   // %32
-  //
   STDMETHOD(%01) (THIS_
-    // %06
     /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %12
     /*%08*/ .%09-adornment%10 .%09-indirection %11,
-
-    // %18
     /*%14*/ .%15-adornment%16 .%15-indirection %17,
-
-    // %24
     /*%20*/ .%21-adornment%22 .%21-indirection %23,
-
-    // %30
     /*%26*/ .%27-adornment%28 .%27-indirection %29) PURE;\
 #endm
 
@@ -869,6 +673,7 @@ AD_CLASS_BEGIN\
 #c Argument: Base name
 #c
 #startm AD_FORWARD_DECLARATION 01
+interface I%01;\
 #endm
 
 
@@ -893,13 +698,10 @@ AD_CLASS_BEGIN\
 #c Example:
 #c AD_DEFAULT_UUID(b1a21372, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
 #c
-#c TomR:990304: removed
+#c TomR:990304: replaced
 #c DEFINE_GUID(IID_I.this-module, 0x%01, 0x%02, 0x%03, 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11);
 #c
 #startm AD_DEFAULT_UUID 11
-#ifndef __I.this-module_INTERFACE_DEFINED__
-#define __I.this-module_INTERFACE_DEFINED__
-
 EXTERN_C const IID IID_I.this-module;\
 #endm
 
@@ -908,7 +710,7 @@ EXTERN_C const IID IID_I.this-module;\
 #c
 #c Defining the Class "Factory" UUID.
 #c NOTE: should be placed before AD_DEFAULT_UUID or after
-#c AD_CLASS_UUID
+#c AD_CLASS_END
 #c
 #c GUID
 #c Argument01: hex long  0-3[leading 0's w/o leading 0x]
@@ -927,8 +729,9 @@ EXTERN_C const IID IID_I.this-module;\
 #c AD_CLASS_UUID(b1a21373, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
 #c
 #c TomR:980713: Added
-#c TomR:990303: Removed 
-#c DEFINE_GUID(CLSID_.this-module, 0x%01, 0x%02, 0x%03, 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11);
+#c TomR:990304: Removed
+#c DEFINE_GUID(CLSID_.this-module, 0x%01, 0x%02, 0x%03, 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11);\
+#c
 #startm AD_CLASS_UUID 11
 #endm
 
@@ -942,9 +745,9 @@ EXTERN_C const IID IID_I.this-module;\
 #startm AD_CLASS_END 00
 
   END_INTERFACE
-};\
+};
 
-#endif // __I.this-module_INTERFACE_DEFINED__
+#endif // #ifndef __.this-module_h__\
 #endm
 
 
@@ -976,9 +779,9 @@ AD_CLASS_END\
   STDMETHOD(GetImplRep)(THIS_ void **) PURE;
 
   END_INTERFACE
-};\
+};
 
-#endif // __I.this-module_INTERFACE_DEFINED__
+#endif // #ifndef __.this-module_h__\
 #endm
 
 
@@ -1205,10 +1008,6 @@ I\
 #endm
 
 
-#startm .objInArrayCustom-adornment 00
-#endm
-
-
 #startm .objPass-adornment 00
 #endm
 
@@ -1220,10 +1019,6 @@ I\
 
 #startm .objOutArray-adornment 00
 I\
-#endm
-
-
-#startm .objOutArrayCustom-adornment 00
 #endm
 
 
@@ -1383,7 +1178,7 @@ AD_CLASS_END\
 
 #ccccccccccccccccccccccccccc
 #c
-#c FREFH 
+#c REFH 
 #c Declaration for the dictionary's factory method.
 #c
 #startm AD_DICTIONARY_FACTORY 02
@@ -1409,77 +1204,6 @@ AD_CLASS_END\
 
 
 #ccccccccccccccccccccccccccc
-#c
-#c Some standard comment macros for use where APIs are commented
-#c
-#startm AD_STD_COMMENT_METH_ERR_NULL_PARAM 01
-  // AAFRESULT_NULL_PARAM
-  //   - %01 arg is NULL.
-  //\
-#endm
-
-#startm AD_STD_COMMENT_METH_ERR_NO_INIT 00
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
-  //\
-#endm
-
-#startm AD_STD_COMMENT_METH_ERR_ALREADY_INIT 00
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - This object has already had Initialize() called on it.
-  //\
-#endm
-
-#startm AD_STD_COMMENT_METH_ERR_HEADER 00
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //\
-#endm
-
-#startm AD_STD_COMMENT_IFC_HEADER 00
-// In addition to the specific error results listed for each method,
-// all methods in this interface may also return one of the following
-// values:
-// 
-// AAFRESULT_NOMEMORY
-//   - insufficient system memory is available to perform the
-//     operation.
-//\
-#endm
-
-#startm AD_STD_COMMENT_IFC_INIT 00
-// AAFRESULT_NOT_INITIALIZED
-//   - This object has not yet had Initialize() called on it through
-//     this object's primary interface.  Note that IAAFObject is a
-//     primary interface for an abstract class, so it is not
-//     appropriate for the Initialize() method to exist in this
-//     interface.  The Initialize() method is available through the
-//     concrete object's primary interface.
-//\
-#endm
-
-#startm AD_STD_COMMENT_METH_STUB 00
-  // NOTE! Stub only.   Implementation not yet added.
-  //
-#endm
-
-#startm AD_STD_COMMENT_IFC_STUB 00
-/***********************************************\\
-*   Stub only.   Implementation not yet added   *
-\\***********************************************/\
-#endm
-
-#startm AD_STD_COMMENT_METH_ADDREF 01
-  // *%01 is AddRef()ed before it is returned.
-  // \
-#endm
-
-
-#ccccccccccccccccccccccccccc
 #c Begining of the module definitions
 #c
 #startm AD_MODULE_BEGIN 02
@@ -1501,106 +1225,6 @@ AD_CLASS_END\
 #c Argument2: function description
 #c
 #startm AD_FUNCTION0 02
-  //***********************************************************
-  //
-  // %01()
-  //
-  // %02
-  // 
-  STDAPI %01 ();\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes one argument.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt	
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c
-#c Macro Arg 07: function description
-#c
-#startm AD_XFUNCTION1 07
-  //***********************************************************
-  //
-  // %01()
-  //
-  // %07
-  // 
-  STDAPI %01 (
-    // %06
-    /*%02*/ .%03-adornment%04 .%03-indirection %05);\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes two arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c
-#c Macro Arg 12: function description
-#c
-#startm AD_XFUNCTION2 12
-  //***********************************************************
-  //
-  // %01()
-  //
-  // %12
-  // 
-  STDAPI %01 (
-    // %06
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
-    /*%07*/ .%08-adornment%09 .%08-indirection %10);\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes three arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c
-#c Macro Arg 17: function description
-#c
-#startm AD_XFUNCTION3 17
-  //***********************************************************
-  //
-  // %01()
-  //
-  // %17
-  // 
-  STDAPI %01 (
-    // %06
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
-    /*%12*/ .%13-adornment%14 .%13-indirection %15);\
 #endm
 
 
@@ -1622,24 +1246,6 @@ AD_CLASS_END\
 #c Macro Arg 22: function description
 #c
 #startm AD_XFUNCTION4 22
-  //***********************************************************
-  //
-  // %01()
-  //
-  // %22
-  // 
-  STDAPI %01 (
-    // %06
-    /*%02*/ .%03-adornment%04 .%03-indirection %05,
-
-    // %11
-    /*%07*/ .%08-adornment%09 .%08-indirection %10,
-
-    // %16
-    /*%12*/ .%13-adornment%14 .%13-indirection %15,
-
-    // %21
-    /*%17*/ .%18-adornment%19 .%18-indirection %20);\
 #endm
 
 

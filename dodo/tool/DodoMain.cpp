@@ -1,24 +1,11 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 //
 // Main() for AutoDodo - Yet Another Macro Processor.  This one allows
@@ -46,8 +33,6 @@
 #include <string.h>
 #if !defined(macintosh)
 #include <assert.h>
-#else
-#include <CursorCtl.h>
 #endif
 
 static void printHelp ()
@@ -195,12 +180,6 @@ void main (int argc, char ** argv)
       usage (command);	// does not return
     }
 
-#if defined(macintosh)
-  // Intialize the MPW cursors so that we can release time 
-  // to the operating system (pre-MacOS X).
-  InitCursorCtl(NULL);
-#endif
-
   TextStream macroText;
   macroText.Append (macrofile,
 		    SourceInfo (macrofilename, 1));
@@ -227,10 +206,6 @@ void main (int argc, char ** argv)
 	{
 #if DEBUG
 	  fprintf (stderr, "Pass %d...\n\n", repeats+1);
-#endif
-#if defined(macintosh)
-    // Release time to the operating system (pre-MacOS X).
-//	SpinCursor(1);
 #endif
 	  output.Clear();
 	  changed = macros.ApplyMacros (input, output);

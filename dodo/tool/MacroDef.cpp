@@ -1,32 +1,17 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #ifndef _MacroDef_h_
 #include "MacroDef.h"
 #endif
 
-#if !defined(macintosh)
 #include <assert.h>
-#endif
 #include <string.h>
 
 
@@ -64,7 +49,6 @@ MacroDef::eAppendStat MacroDef::AppendMacroExpansion
 		  if (text.Expect ("%"))
 			{
 			  // escape of '%' character: that's OK
-			  _definition.Append (c);
 			  _definition.Append (c);
 			  continue;
 			}
@@ -199,20 +183,6 @@ const char * MacroDef::InvErrString (eInvokeMacroStat stat)
 int MacroDef::GetNumArgs () const
 {
   return _numArgs;
-}
-
-
-char MacroDef::GetInitial () const
-{
-  const char * rep = _name.GetCString();
-  if (! rep)
-	{
-	  return '\0';
-	}
-  else
-	{
-	  return *rep;
-	}
 }
 
 

@@ -11,8 +11,7 @@
 
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #c
-#c AutoDodo macro file for use in generating C++ API implementation
-#c files.
+#c AutoDodo macro file for use in generating C++ API header files.
 #c
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
@@ -43,12 +42,11 @@
 #c
 #c Argument: Base filename
 #c
-#c Note: it is not necessary to expand it here, since it was already
-#c included in this module's header file.
-#c
 #startm AD_INCLUDE 01
+#ifndef __%01_h__
+#include "%01.h"
+#endif
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
@@ -58,8 +56,6 @@
 #c
 #c Example:
 #c AD_TYPES_BEGIN(b1a21372, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
-#c
-#c TomR:980716: Added
 #c
 #startm AD_TYPES_BEGIN 11
 #endm
@@ -74,6 +70,7 @@
 #c Arguments: none
 #c
 #startm AD_TYPES_END 00
+#endif // __Impl.this-module_h__
 #endm
 
 
@@ -82,7 +79,7 @@
 #c Argument1: base name to be converted to output type.
 #c
 #startm AD_AAFTYPES 01
-%01\
+Impl%01\
 #endm
 
 
@@ -91,36 +88,28 @@
 #c Argument1: base name to be converted to output type.
 #c
 #startm AD_DECLARE_FORWARD_AAFTYPES 01
+class Impl%01;
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
 #c Argument1: text to be quoted.
 #c 
-#c Ignore input this was already processed in the header file. 
+#c Just pass through the input. 
 #c
 #startm AD_CPP_QUOTE 01
+%01 \
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
-#c We need to include the class file here since it was only declared as
-#c a class in the header.
+#c Generate a forward declaration of a class.
 #c
 #c Argument: class name
 #c
 #startm AD_FORWARD_DECLARATION 01
-#ifndef __%01_h__
-#include "%01.h"
-#endif
-
-#ifndef __Impl%01_h__
-#include "Impl%01.h"
-#endif
+class Impl%01;
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
@@ -131,7 +120,6 @@
 #startm AD_CLASS_UUID 11
 #endm
 
-
 #ccccccccccccccccccccccccccc
 #c
 #c Default UUID.
@@ -141,7 +129,6 @@
 #startm AD_DEFAULT_UUID 11
 #endm
 
-
 #ccccccccccccccccccccccccccc
 #c
 #c Goes at the head of the file.
@@ -149,6 +136,12 @@
 #c Arguments: none
 #c
 #startm AD_HEAD 00
+//@doc
+//@class    .this-module | Implementation class for .this-module
+#ifndef __Impl.this-module_h__
+#define __Impl.this-module_h__
+
+
 /******************************************\\
 *                                          *
 * Advanced Authoring Format                *
@@ -177,34 +170,25 @@
 #c Arguments: none
 #c
 #startm AD_CLASS_BEGIN 00
-#ifndef __.this-module_h__
-#include ".this-module.h"
+
+#ifndef __Impl.parent-module_h__
+#include "Impl.parent-module.h"
 #endif
 
-#ifndef __Impl.this-module_h__
-#include "Impl.this-module.h"
-#endif
 
-#include <assert.h>
-
-.this-module::.this-module (aafBool doInit)
-: .parent-module (AAFFalse)
+class Impl.this-module : public Impl.parent-module
 {
-  if (doInit)
-    {
-#ifdef BOB_TEST
-      Impl.this-module * newRep;
-      newRep = new Impl.this-module;
-      assert (newRep);
-      InitRep (newRep);
-#endif
-    }
-}
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  Impl.this-module ();
 
+protected:
+  virtual ~Impl.this-module ();
 
-.this-module::~.this-module ()
-{
-}
+public:\
 #endm
 
 
@@ -222,127 +206,40 @@ AD_CLASS_BEGIN\
 
 #ccccccccccccccccccccccccccc
 #c
-#c Starts a class definition with no parent class
+#c Starts a class definition
 #c
 #c Arguments: none
 #c
 #startm AD_ROOT_CLASS_BEGIN 00
-#ifndef __.this-module_h__
-#include ".this-module.h"
+//
+// Forward declaration
+//
+struct I.this-module;
+class .this-module;
+
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
 #endif
 
-#ifndef __Impl.this-module_h__
-#include "Impl.this-module.h"
+#ifndef __AAFResult_h_
+#include "AAFResult.h"
 #endif
 
-#include <assert.h>
-#include <iostream.h>
-
-#if defined(WIN32)
-// Include declarations for InterlockedIncrement() and InterlockcedDecrment().
-#include <windows.h>
-#endif
-
-
-.this-module::.this-module (aafBool doInit)
-  : _rep((Impl.this-module *)NULL),
-    _refCount(1)
+class Impl.this-module
 {
-  if (doInit)
-    {
-#ifdef BOB_TEST
-      Impl.this-module * newRep;
-      newRep = new Impl.this-module;
-      assert (newRep);
-      InitRep (newRep);
-#endif
-    }
-}
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  Impl.this-module ();
+  virtual ~Impl.this-module ();
 
-
-.this-module::~.this-module ()
-{
-#ifdef BOB_TEST
-  // The base class destructor of Impl.this-module must be declared as virtual.
-  // Eventhough the Impl.this-module is reference counted we call delete 
-  // directly since the Impl.this-module::ReleaseReference() delegates its
-  // release to .this-module::Release().
-  if (_rep)
-  {
-    delete _rep;
-    _rep = 0;
-  } 
-#endif
-}
-
-
-#if defined(macintosh) || defined(_MAC)
-inline long InterlockedIncrement(
-  long * pAddend   // pointer to the variable to increment
-)
-{
-  return ++(*pAddend);
-}
-
-inline long InterlockedDecrement(
-  long * pAddend   // pointer to the variable to decrement
-)
-{
-  return --(*pAddend);
-}
-#endif
-
-
-// Increment the object reference count.
-aafUInt32 .this-module::AcquireReference() const
-{ // inforce conceptual 'constness'
-  return InterlockedIncrement(reinterpret_cast<long *>(&(const_cast<.this-module *>(this)->_refCount)));
-}
-
-// Decrement the object reference count and delete the container.
-aafUInt32 .this-module::ReleaseReference()
-{
-  long count = InterlockedDecrement(reinterpret_cast<long *>(&_refCount));
-#if !defined(DONT_DELETE_LAST_REFERENCE)
-  if (0 == count)
-    delete this;
-#else
-  if (0 > count)
-  {
-    cerr << this << " Error: Releasing an object with reference count:" << count << endl;
-  }
-#endif
-  
-  return count;
-}
-
-// Just return the count. (this could be inline in the header...)
-aafUInt32 .this-module::ReferenceCount() const
-{
-  return _refCount;
-}
-
-
-void .this-module::InitRep (Impl.this-module * newRep)
-{
-#ifdef BOB_TEST
-  assert (newRep);
-  assert (!_rep);
-  _rep = newRep;
-  newRep->InitContainer (this);
-#endif
-}
-
-
-Impl.this-module * .this-module::GetRepObject ()
-{
-#ifdef BOB_TEST
-  assert (_rep);
-  return _rep;
-#else
-    return ((Impl.this-module *)NULL);
-#endif
-}
+public:
+  // Reference Counting interface
+  virtual aafUInt32 AcquireReference() const;
+  virtual aafUInt32 ReleaseReference();
+  virtual aafUInt32 ReferenceCount() const;
 #endm
 
 
@@ -354,21 +251,11 @@ Impl.this-module * .this-module::GetRepObject ()
 #c Argument2: method description
 #c
 #startm AD_METHOD0 02
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 ()
-{
-#ifdef BOB_TEST
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
-  return ptr->%01();
-#else
-    return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01 ();
 #endm
 
 
@@ -387,27 +274,13 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 07: method description
 #c
 #startm AD_XMETHOD1 07
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
-
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
-
-.%03-setup(%04, %05)
-  stat = ptr->%01 (.%03-internalname(%05));
-.%03-cleanup(%04, %05)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        // @parm %02 %06
+        (.%03-adornment%04 .%03-indirection %05);\
 #endm
 
 
@@ -427,31 +300,16 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 12: method description
 #c
 #startm AD_XMETHOD2 12
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
-
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10);\
 #endm
 
 
@@ -472,35 +330,19 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 17: method description
 #c
 #startm AD_XMETHOD3 17
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15);\
 #endm
 
 
@@ -522,39 +364,22 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 22: method description
 #c
 #startm AD_XMETHOD4 22
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20);\
 #endm
 
 
@@ -577,43 +402,25 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 27: method description
 #c
 #startm AD_XMETHOD5 27
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20,
-        %24 .%23-indirection %25)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-.%23-setup(%24, %25)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20),
-    .%23-internalname(%25));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-.%23-cleanup(%24, %25)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
+
+         // @parm %22 %26
+         .%23-adornment%24 .%23-indirection %25);\
 #endm
 
 
@@ -637,47 +444,28 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 32: method description
 #c
 #startm AD_XMETHOD6 32
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20,
-        %24 .%23-indirection %25,
-        %29 .%28-indirection %30)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-.%23-setup(%24, %25)
-.%28-setup(%29, %30)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20),
-    .%23-internalname(%25),
-    .%28-internalname(%30));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-.%23-cleanup(%24, %25)
-.%28-cleanup(%29, %30)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
+
+         // @parm %22 %26
+         .%23-adornment%24 .%23-indirection %25,
+
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30);\
 #endm
 
 
@@ -702,51 +490,31 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 37: method description
 #c
 #startm AD_XMETHOD7 37
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20,
-        %24 .%23-indirection %25,
-        %29 .%28-indirection %30,
-        %34 .%33-indirection %35)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-.%23-setup(%24, %25)
-.%28-setup(%29, %30)
-.%33-setup(%34, %35)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20),
-    .%23-internalname(%25),
-    .%28-internalname(%30),
-    .%33-internalname(%35));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-.%23-cleanup(%24, %25)
-.%28-cleanup(%29, %30)
-.%33-cleanup(%34, %35)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
+
+         // @parm %22 %26
+         .%23-adornment%24 .%23-indirection %25,
+
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
+
+         // @parm %32 %36
+         .%33-adornment%34 .%33-indirection %35);\
 #endm
 
 
@@ -772,55 +540,34 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 42: method description
 #c
 #startm AD_XMETHOD8 42
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20,
-        %24 .%23-indirection %25,
-        %29 .%28-indirection %30,
-        %34 .%33-indirection %35,
-        %39 .%38-indirection %40)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-.%23-setup(%24, %25)
-.%28-setup(%29, %30)
-.%33-setup(%34, %35)
-.%38-setup(%39, %40)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20),
-    .%23-internalname(%25),
-    .%28-internalname(%30),
-    .%33-internalname(%35),
-    .%38-internalname(%40));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-.%23-cleanup(%24, %25)
-.%28-cleanup(%29, %30)
-.%33-cleanup(%34, %35)
-.%38-cleanup(%39, %40)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
+
+         // @parm %22 %26
+         .%23-adornment%24 .%23-indirection %25,
+
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
+
+         // @parm %32 %36
+         .%33-adornment%34 .%33-indirection %35,
+
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40);\
 #endm
 
 
@@ -847,59 +594,37 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 47: method description
 #c
 #startm AD_XMETHOD9 47
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20,
-        %24 .%23-indirection %25,
-        %29 .%28-indirection %30,
-        %34 .%33-indirection %35,
-        %39 .%38-indirection %40,
-        %44 .%43-indirection %45)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-.%23-setup(%24, %25)
-.%28-setup(%29, %30)
-.%33-setup(%34, %35)
-.%38-setup(%39, %40)
-.%43-setup(%44, %45)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20),
-    .%23-internalname(%25),
-    .%28-internalname(%30),
-    .%33-internalname(%35),
-    .%38-internalname(%40),
-    .%43-internalname(%45));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-.%23-cleanup(%24, %25)
-.%28-cleanup(%29, %30)
-.%33-cleanup(%34, %35)
-.%38-cleanup(%39, %40)
-.%43-cleanup(%44, %45)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
+
+         // @parm %22 %26
+         .%23-adornment%24 .%23-indirection %25,
+
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
+
+         // @parm %32 %36
+         .%33-adornment%34 .%33-indirection %35,
+
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40,
+
+         // @parm %42 %46
+         .%43-adornment%44 .%43-indirection %45);\
 #endm
 
 
@@ -927,63 +652,40 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 52: method description
 #c
 #startm AD_XMETHOD_10 52
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20,
-        %24 .%23-indirection %25,
-        %29 .%28-indirection %30,
-        %34 .%33-indirection %35,
-        %39 .%38-indirection %40,
-        %44 .%43-indirection %45,
-        %49 .%48-indirection %50)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-.%23-setup(%24, %25)
-.%28-setup(%29, %30)
-.%33-setup(%34, %35)
-.%38-setup(%39, %40)
-.%43-setup(%44, %45)
-.%48-setup(%49, %50)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20),
-    .%23-internalname(%25),
-    .%28-internalname(%30),
-    .%33-internalname(%35),
-    .%38-internalname(%40),
-    .%43-internalname(%45),
-    .%48-internalname(%50));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-.%23-cleanup(%24, %25)
-.%28-cleanup(%29, %30)
-.%33-cleanup(%34, %35)
-.%38-cleanup(%39, %40)
-.%43-cleanup(%44, %45)
-.%48-cleanup(%49, %50)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
+
+         // @parm %22 %26
+         .%23-adornment%24 .%23-indirection %25,
+
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
+
+         // @parm %32 %36
+         .%33-adornment%34 .%33-indirection %35,
+
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40,
+
+         // @parm %42 %46
+         .%43-adornment%44 .%43-indirection %45,
+
+         // @parm %47 %51
+         .%48-adornment%49 .%48-indirection %50);\
 #endm
 
 
@@ -1012,67 +714,43 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 57: method description
 #c
 #startm AD_XMETHOD_11 57
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %09 .%08-indirection %10,
-        %14 .%13-indirection %15,
-        %19 .%18-indirection %20,
-        %24 .%23-indirection %25,
-        %29 .%28-indirection %30,
-        %34 .%33-indirection %35,
-        %39 .%38-indirection %40,
-        %44 .%43-indirection %45,
-        %49 .%48-indirection %50,
-        %54 .%53-indirection %55)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-.%03-setup(%04, %05)
-.%08-setup(%09, %10)
-.%13-setup(%14, %15)
-.%18-setup(%19, %20)
-.%23-setup(%24, %25)
-.%28-setup(%29, %30)
-.%33-setup(%34, %35)
-.%38-setup(%39, %40)
-.%43-setup(%44, %45)
-.%48-setup(%49, %50)
-.%53-setup(%54, %55)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%08-internalname(%10),
-    .%13-internalname(%15),
-    .%18-internalname(%20),
-    .%23-internalname(%25),
-    .%28-internalname(%30),
-    .%33-internalname(%35),
-    .%38-internalname(%40),
-    .%43-internalname(%45),
-    .%48-internalname(%50),
-    .%53-internalname(%55));
-.%03-cleanup(%04, %05)
-.%08-cleanup(%09, %10)
-.%13-cleanup(%14, %15)
-.%18-cleanup(%19, %20)
-.%23-cleanup(%24, %25)
-.%28-cleanup(%29, %30)
-.%33-cleanup(%34, %35)
-.%38-cleanup(%39, %40)
-.%43-cleanup(%44, %45)
-.%48-cleanup(%49, %50)
-.%53-cleanup(%54, %55)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %12 %16
+         .%13-adornment%14 .%13-indirection %15,
+
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
+
+         // @parm %22 %26
+         .%23-adornment%24 .%23-indirection %25,
+
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
+
+         // @parm %32 %36
+         .%33-adornment%34 .%33-indirection %35,
+
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40,
+
+         // @parm %42 %46
+         .%43-adornment%44 .%43-indirection %45,
+
+         // @parm %47 %51
+         .%48-adornment%49 .%48-indirection %50,
+
+         // @parm %52 %56
+         .%53-adornment%54 .%53-indirection %55);\
 #endm
 
 
@@ -1103,35 +781,19 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 20: method description
 #c
 #startm AD_X2METHOD3 20
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %10 .%09-indirection %11,
-        %16 .%15-indirection %17)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %08 %12
+         .%09-adornment%10 .%09-indirection %11,
 
-.%03-setup(%04, %05)
-.%09-setup(%10, %11)
-.%15-setup(%16, %17)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%09-internalname(%11),
-    .%15-internalname(%17));
-.%03-cleanup(%04, %05)
-.%09-cleanup(%10, %11)
-.%15-cleanup(%16, %17)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %14 %18
+         .%15-adornment%16 .%15-indirection %17);\
 #endm
 
 
@@ -1163,39 +825,22 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 26: method description
 #c
 #startm AD_X2METHOD4 26
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %10 .%09-indirection %11,
-        %16 .%15-indirection %17,
-        %22 .%21-indirection %23)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %08 %12
+         .%09-adornment%10 .%09-indirection %11,
 
-.%03-setup(%04, %05)
-.%09-setup(%10, %11)
-.%15-setup(%16, %17)
-.%21-setup(%20, %23)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%09-internalname(%11),
-    .%15-internalname(%17),
-    .%21-internalname(%23));
-.%03-cleanup(%04, %05)
-.%09-cleanup(%10, %11)
-.%15-cleanup(%16, %17)
-.%21-cleanup(%22, %23)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %14 %18
+         .%15-adornment%16 .%15-indirection %17,
+
+         // @parm %20 %24
+         .%21-adornment%22 .%21-indirection %23);\
 #endm
 
 
@@ -1229,43 +874,25 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 32: method description
 #c
 #startm AD_X2METHOD5 32
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%04 .%03-indirection %05,
-        %10 .%09-indirection %11,
-        %16 .%15-indirection %17,
-        %22 .%21-indirection %23,
-        %28 .%27-indirection %29)
-{
-#ifdef BOB_TEST
-  AAFRESULT stat;
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+        (// @parm %02 %06
+         .%03-adornment%04 .%03-indirection %05,
 
-  Impl.this-module * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<Impl.this-module*> (pO);
-  assert (ptr);
+         // @parm %08 %12
+         .%09-adornment%10 .%09-indirection %11,
 
-.%03-setup(%04, %05)
-.%09-setup(%10, %11)
-.%15-setup(%16, %17)
-.%21-setup(%20, %23)
-.%27-setup(%26, %29)
-  stat = ptr->%01 (.%03-internalname(%05),
-    .%09-internalname(%11),
-    .%15-internalname(%17),
-    .%21-internalname(%23),
-    .%27-internalname(%29));
-.%03-cleanup(%04, %05)
-.%09-cleanup(%10, %11)
-.%15-cleanup(%16, %17)
-.%21-cleanup(%22, %23)
-.%27-cleanup(%28, %29)
-  return stat;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+         // @parm %14 %18
+         .%15-adornment%16 .%15-indirection %17,
+
+         // @parm %20 %24
+         .%21-adornment%22 .%21-indirection %23,
+
+         // @parm %26 %30
+         .%27-adornment%28 .%27-indirection %29);\
 #endm
 
 
@@ -1276,6 +903,23 @@ AAFRESULT STDMETHODCALLTYPE
 #c Arguments: none
 #c
 #startm AD_CLASS_END 00
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(Impl.this-module)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetObjectClass(aafUID_t * pClass);
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
 
 
@@ -1293,11 +937,26 @@ AD_CLASS_END\
 
 #ccccccccccccccccccccccccccc
 #c
-#c Ends a class definition
+#c Ends a class definition for AAFRoot
 #c
 #c Arguments: none
 #c
 #startm AD_ROOT_CLASS_END 00
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+
+  void InitContainer (void * pContainer);
+
+  void * GetContainer ();
+
+private:
+
+  void * _pContainer;
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
 
 
@@ -1308,7 +967,7 @@ AD_CLASS_END\
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
-%01-cpp(.this-module)
+%01-h
 #endm
 
 
@@ -1319,7 +978,7 @@ AD_CLASS_END\
 #c Argument: method declaration
 #c
 #startm AD_COM_METH 01
-%01-com-meth-cpp(.this-module)
+%01-com-meth-h
 #endm
 
 
@@ -1337,19 +996,11 @@ AD_CLASS_END\
 #c Macro Arg 06: method description
 #c
 #startm AD_XCONSTRUCTOR1 06
-.this-module::.this-module (%03 .%02-indirection %04)
-{
-#ifdef BOB_TEST
-.%02-setup(%03, %04)
-  Impl.this-module * newRep;
-  newRep = new Impl.this-module (.%02-internalname(%04));
-  assert (newRep);
-  InitRep (newRep);
-.%02-cleanup(%03, %04)
-#else
-  // return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+  //****************
+  // constructor
+  //
+  Impl.this-module
+        (.%02-adornment%03 .%02-indirection %04);  // @parm %01 %05
 #endm
 
 
@@ -1368,23 +1019,12 @@ AD_CLASS_END\
 #c Macro Arg 11: method description
 #c
 #startm AD_XCONSTRUCTOR2 11
-.this-module::.this-module (%03 .%02-indirection %04,
-    %08 .%07-indirection %09)
-{
-#ifdef BOB_TEST
-.%02-setup(%03, %04)
-.%07-setup(%08, %09)
-  Impl.this-module * newRep;
-  newRep = new Impl.this-module (.%02-internalname(%04),
-    .%07-internalname(%09));
-  assert (newRep);
-  InitRep (newRep);
-.%02-cleanup(%03, %04)
-.%07-cleanup(%08, %09)
-#else
-  // return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+  //****************
+  // constructor
+  //
+  Impl.this-module
+        (.%02-adornment%03 .%02-indirection %04,   // @parm %01 %05
+         .%07-adornment%08 .%07-indirection %09);  // @parm %06 %10
 #endm
 
 
@@ -1404,27 +1044,13 @@ AD_CLASS_END\
 #c Macro Arg 16: method description
 #c
 #startm AD_XCONSTRUCTOR3 16
-.this-module::.this-module (%03 .%02-indirection %04,
-    %08 .%07-indirection %09,
-    %13 .%12-indirection %14)
-{
-#ifdef BOB_TEST
-.%02-setup(%03, %04)
-.%07-setup(%08, %09)
-.%12-setup(%13, %14)
-  Impl.this-module * newRep;
-  newRep = new Impl.this-module (.%02-internalname(%04),
-    .%07-internalname(%09),
-    .%12-internalname(%14));
-  assert (newRep);
-  InitRep (newRep);
-.%02-cleanup(%03, %04)
-.%07-cleanup(%08, %09)
-.%12-cleanup(%13, %14)
-#else
-  // return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+  //****************
+  // constructor
+  //
+  Impl.this-module
+        (.%02-adornment%03 .%02-indirection %04,   // @parm %01 %05
+         .%07-adornment%08 .%07-indirection %09,   // @parm %06 %10
+         .%12-adornment%13 .%12-indirection %14);  // @parm %11 %15
 #endm
 
 
@@ -1445,31 +1071,104 @@ AD_CLASS_END\
 #c Macro Arg 21: method description
 #c
 #startm AD_XCONSTRUCTOR4 21
-.this-module::.this-module (%03 .%02-indirection %04,
-    %08 .%07-indirection %09,
-    %13 .%12-indirection %14,
-    %18 .%17-indirection %19)
-{
-#ifdef BOB_TEST
-.%02-setup(%03, %04)
-.%07-setup(%08, %09)
-.%12-setup(%13, %14)
-.%17-setup(%18, %19)
-  Impl.this-module * newRep;
-  newRep = new Impl.this-module (.%02-internalname(%04),
-    .%07-internalname(%09),
-    .%12-internalname(%14),
-    .%17-internalname(%19));
-  assert (newRep);
-  InitRep (newRep);
-.%02-cleanup(%03, %04)
-.%07-cleanup(%08, %09)
-.%12-cleanup(%13, %14)
-.%17-cleanup(%18, %19)
-#else
-  // return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
+  //****************
+  // constructor
+  //
+  Impl.this-module
+        (.%02-adornment%03 .%02-indirection %04,   // @parm %01 %05
+         .%07-adornment%08 .%07-indirection %09,   // @parm %06 %10
+         .%12-adornment%13 .%12-indirection %14,   // @parm %11 %15
+         .%17-adornment%18 .%17-indirection %19);  // @parm %16 %20
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a constructor which takes two arguments.
+#c Constructor name is assumed to be Impl.this-module.
+#c
+#c Argument1: argument modifiers (e.g. [in])
+#c Argument2: argument1 type
+#c Argument3: argument1 name
+#c Argument4: argument1 comment
+#c Argument5: argument modifiers (e.g. [in])
+#c Argument6: argument2 type
+#c Argument7: argument2 name
+#c Argument8: argument2 comment
+#c Argument9: constructor description
+#c
+#startm AD_CONSTRUCTOR2 09
+  //****************
+  // constructor
+  //
+    Impl.this-module
+       (%02 %03,    // @parm %01 %04
+        %06 %07);   // @parm %05 %08
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a constructor which takes three arguments.
+#c Constructor name is assumed to be .this-module.
+#c
+#c Argument1: argument1 modifiers (e.g. [in])
+#c Argument2: argument1 type
+#c Argument3: argument1 name
+#c Argument4: argument1 comment
+#c Argument5: argument2 modifiers (e.g. [in])
+#c Argument6: argument2 type
+#c Argument7: argument2 name
+#c Argument8: argument2 comment
+#c Argument9: argument3 modifiers (e.g. [in])
+#c Argument10: argument3 type
+#c Argument11: argument3 name
+#c Argument12: argument3 comment
+#c Argument13: constructor description
+#c
+#startm AD_CONSTRUCTOR3 13
+  //****************
+  // constructor
+  //
+    Impl.this-module
+       (%02 %03,    // @parm %01 %04
+        %06 %07,    // @parm %05 %08
+        %10 %11);   // @parm %09 %12
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a constructor which takes four arguments.
+#c Constructor name is assumed to be .this-module.
+#c
+#c Argument1: argument1 modifiers (e.g. [in])
+#c Argument2: argument1 type
+#c Argument3: argument1 name
+#c Argument4: argument1 comment
+#c Argument5: argument2 modifiers (e.g. [in])
+#c Argument6: argument2 type
+#c Argument7: argument2 name
+#c Argument8: argument2 comment
+#c Argument9: argument3 modifiers (e.g. [in])
+#c Argument10: argument3 type
+#c Argument11: argument3 name
+#c Argument12: argument3 comment
+#c Argument13: argument4 modifiers (e.g. [in])
+#c Argument14: argument4 type
+#c Argument15: argument4 name
+#c Argument16: argument4 comment
+#c Argument17: constructor description
+#c
+#startm AD_CONSTRUCTOR4 17
+  //****************
+  // constructor
+  //
+    Impl.this-module
+       (%02 %03,    // @parm %01 %04
+        %06 %07,    // @parm %05 %08
+        %10 %11,    // @parm %09 %12
+        %14 %15);   // @parm %13 %16
 #endm
 
 
@@ -1479,30 +1178,6 @@ AD_CLASS_END\
 #c session by creating the first session object.
 #c
 #startm AD_BEGIN_SESSION 00
-
-#include "ImplAAFObjectCreation.h"
-
-extern "C" const aafClassID_t CLSID_AAFSession;
-
-AAFRESULT STDMETHODCALLTYPE
-    AAFSession::BeginSession (aafProductIdentification_t * pIdent,
-        AAFSession ** ppSession)
-{
-#ifdef BOB_TEST
-
-  assert(ppSession);
-  ImplAAFSession* pSession = static_cast<ImplAAFSession*>(CreateImpl(CLSID_AAFSession));
-  assert(pSession);
-  *ppSession = static_cast<AAFSession*>(pSession->GetContainer());
-
-  pSession->BeginSession(pIdent);
-
-  return AAFRESULT_SUCCESS;
-
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
 #endm
 
 #ccccccccccccccccccccccccccc
@@ -1511,21 +1186,8 @@ AAFRESULT STDMETHODCALLTYPE
 #c its contained objects in the cpp API.
 #c
 #startm AD_STATIC_CREATE 00
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::CreateObject (.this-module ** result)
-{
-#ifdef BOB_TEST
-  .this-module * pObj;
-  pObj = new .this-module;
-  assert (pObj);
-  assert (result);
-  *result = pObj;
-  return AAFRESULT_SUCCESS;
-#else
-  return AAFRESULT_NOT_IMPLEMENTED;
-#endif
-}
 #endm
+
 
 #ccccccccccccccccccccccccccc
 #c
@@ -1548,124 +1210,37 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 
 
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objIn-setup(T, externArg, internArg)
-#c
-#c arg1 = unadorned type
-#c arg2 = external arg name
-#c
-#startm .objIn-setup 02
-  Impl%01 * internal%02 = (Impl%01*)NULL;
-  if (%02)
-    {
-      internal%02 = static_cast<Impl%01*>(%02->GetRepObject());
-      assert (internal%02);
-    }
+#startm .objIn-adornment 00
+Impl\
 #endm
 
 
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objPass-setup(T, externArg, internArg)      /* nothing */
-#c
-#c arg1 = unadorned type
-#c arg2 = external arg name
-#c
-#startm .objPass-setup 02
+#startm .objInArray-adornment 00
+Impl\
 #endm
 
 
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objOut-setup(T, externArg, internArg)
-#c
-#c arg1 = unadorned type
-#c arg2 = external arg name
-#c
-#startm .objOut-setup 02
-  Impl%01 * internal%02;
-  Impl%01 ** pinternal%02 = (Impl%01**)NULL;
-  if (%02)
-    {
-      pinternal%02 = &internal%02;
-    }
+#startm .objInArrayCustom-adornment 00
+Impl\
 #endm
 
 
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objIn-internalname(externArg, internArg)    (internArg)
-#c
-#c arg1 = external arg name
-#c
-#startm .objIn-internalname 01
-internal%01\
+#startm .objPass-adornment 00
 #endm
 
 
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objPass-internalname(externArg, internArg)  (internArg)
-#c
-#c arg1 = external arg name
-#c
-#startm .objPass-internalname 01
-%01\
+#startm .objOut-adornment 00
+Impl\
 #endm
 
 
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objOut-internalname(externArg, internArg)   (internArg)
-#c
-#c arg1 = external arg name
-#c
-#startm .objOut-internalname 01
-pinternal%01\
+#startm .objOutArray-adornment 00
+Impl\
 #endm
 
 
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objIn-cleanup(T, externArg, internArg)      /* nothing */
-#c
-#c arg1 = unadorned type
-#c arg2 = external arg name
-#c
-#startm .objIn-cleanup 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objPass-cleanup(T, externArg, internArg)    /* nothing */
-#c
-#c arg1 = unadorned type
-#c arg2 = external arg name
-#c
-#startm .objPass-cleanup 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c #define .objOut-cleanup(T, externArg, internArg)
-#c
-#c arg1 = unadorned type
-#c arg2 = external arg name
-#c
-#startm .objOut-cleanup 02
-  if (internal%02)
-    {
-      assert (%02);
-      *%02 = static_cast<%01*>(internal%02->GetContainer());
-      assert (*%02);
-    }
-  else
-    {
-      *%02 = (%01*)NULL;
-    }
+#startm .objOutArrayCustom-adornment 00
+Impl\
 #endm
 
 
@@ -1761,11 +1336,25 @@ AD_ROOT_CLASS_END\
 #c (first version defined backwords compatibility)
 
 #startm .begin-Abstract-StoredObjectBase 00
+#include "OMStorable.h"
+
 AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Abstract-StoredObjectBase 00
-AD_CLASS_END\
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(Impl.this-module)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
 
 
@@ -1778,7 +1367,15 @@ AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Abstract-Transient 00
-AD_CLASS_END\
+
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
 
 
@@ -1791,7 +1388,19 @@ AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Abstract-StoredObject 00
-AD_CLASS_END\
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(Impl.this-module)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
 
 
@@ -1804,7 +1413,15 @@ AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Concrete-Transient 00
-AD_CLASS_END\
+
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
 
 
@@ -1818,26 +1435,35 @@ AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Concrete-StoredObject 00
-AD_CLASS_END\
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(Impl.this-module)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
 
 
 
 #ccccccccccccccccccccccccccc
 #c
-#c IMPLC 
+#c IMPLH 
 #c Declaration for the dictionary's factory method.
 #c
 #startm AD_DICTIONARY_FACTORY 02
-
-#ifndef __ImplAAFBaseClassFactory_h__
-#include "ImplAAFBaseClassFactory.h"
-#endif
-
-
-// %02
-AAFRESULT STDMETHODCALLTYPE 
-  .this-module::%01 (
+  //****************
+  // %01()
+  //
+  // %02
+  virtual AAFRESULT STDMETHODCALLTYPE 
+  %01 (
     // Class identifier (AUID) of the stored object. This is the
     // corresponding SMPTE identifier (as a GUID) for all predefined
     // built-in classes.
@@ -1845,33 +1471,7 @@ AAFRESULT STDMETHODCALLTYPE
 
     // Address of output variable that receives the 
     // object pointer requested in pAUID
-    AAFObject ** ppvObject)
-{
-  AAFRESULT result = AAFRESULT_SUCCESS;
-
-  // Validate the input arguments.
-  if (NULL == pAUID || NULL == ppvObject)
-    return AAFRESULT_NULL_PARAM;
-
-  // Find the factory on the corresponding impl class.
-  Impl.this-module * pImpl.this-module = GetRepObject();
-  assert(pImpl.this-module);
-
-  // Create the corresponding impl object.
-  ImplAAFObject *pObject = NULL;
-  result = pImpl.this-module->CreateInstance(pAUID, &pObject);
-  if (AAFRESULT_SUCCESS != result)
-    return result;
-
-  // Get the C++ container for the new Impl object
-  *ppvObject = pObject->GetContainer();
-  
-  // Release the impl object pointer. 
-  if (NULL == *ppvObject)
-    pObject->ReleaseReference();
-
-  return result;
-}
+    ImplAAFObject ** ppvObject);
 #endm
 
 
