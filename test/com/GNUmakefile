@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.10 2004/09/21 15:21:55 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11 2004/10/28 17:21:36 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -57,6 +57,8 @@ UTF8FileNameTest :
 check :
 	cd ComModTestAAF && $(MAKE) $@
 	cd CreateSequence && $(MAKE) $@
+	cd EssenceAccess && $(MAKE) $@
+	cd MultiGenTest && $(MAKE) $@
 	cd ComFileKindTest && $(MAKE) $@
 	cd UTF8FileNameTest && $(MAKE) $@
 
