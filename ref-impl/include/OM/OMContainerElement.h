@@ -185,8 +185,11 @@ protected:
 };
 
   // @class Elements of Object Manager reference vectors.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMContainerElement>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+template <typename ReferencedObject>
 class OMStrongReferenceVectorElement : public
                                   OMContainerElement<OMStrongObjectReference> {
 public:
@@ -201,7 +204,8 @@ public:
                                  OMUInt32 localKey);
 
     // @cmember Copy constructor.
-  OMStrongReferenceVectorElement(const OMStrongReferenceVectorElement& rhs);
+  OMStrongReferenceVectorElement(
+                  const OMStrongReferenceVectorElement<ReferencedObject>& rhs);
 
     // @cmember Destructor.
   ~OMStrongReferenceVectorElement(void);
@@ -209,16 +213,17 @@ public:
     // @cmember Assignment.
     //          This operator provides value semantics for <c OMVector>.
     //          This operator does not provide assignment of object references.
-  OMStrongReferenceVectorElement& operator=(
-                                    const OMStrongReferenceVectorElement& rhs);
+  OMStrongReferenceVectorElement<ReferencedObject>& operator=(
+                  const OMStrongReferenceVectorElement<ReferencedObject>& rhs);
 
     // @cmember Equality.
     //          This operator provides value semantics for <c OMVector>.
     //          This operator does not provide equality of object references.
-  bool operator== (const OMStrongReferenceVectorElement& rhs) const;
+  bool operator== (
+            const OMStrongReferenceVectorElement<ReferencedObject>& rhs) const;
 
     // @cmember Set the value of this <c OMStrongReferenceVectorElement>.
-  OMStorable* setValue(const OMStorable* value);
+  ReferencedObject* setValue(const ReferencedObject* value);
 
     // @cmember The local key of this <c OMStrongReferenceVectorElement>.
   OMUInt32 localKey(void) const;
@@ -240,7 +245,8 @@ private:
   //   @base public | <c OMContainerElement>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
-class OMStrongReferenceSetElement : public OMStrongReferenceVectorElement {
+class OMStrongReferenceSetElement : public
+                             OMStrongReferenceVectorElement<ReferencedObject> {
 public:
   // @access Public members.
 
