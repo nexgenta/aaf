@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.cpp,v 1.58 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.cpp,v 1.59 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -76,8 +76,8 @@ ImplAAFMasterMob::Initialize ()
 // The dataDef parameter requires a data kind valid for a media
 // stream. Valid data kinds are:
 //
-// - DDEF_Picture
-// - DDEF_Sound
+// - Picture
+// - Sound
 //
 // Note: If pSlotName is passed in with zero length, then the
 // slot is not assigned a name.  Slot names are not used by the

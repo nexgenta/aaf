@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.30 2004/09/28 12:02:42 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.31 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -185,9 +185,9 @@ STDAPI ImplAAFFileOpenExistingRead (
 	{
 	  const aafUID_t* pFileKind;
 	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &aafFileKindAaf512Binary;
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
       else
-	  	pFileKind = &aafFileKindAaf4KBinary;
+	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
@@ -358,9 +358,9 @@ STDAPI ImplAAFFileOpenExistingModify (
 	{
 	  const aafUID_t* pFileKind;
 	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &aafFileKindAaf512Binary;
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
       else
-	  	pFileKind = &aafFileKindAaf4KBinary;
+	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
@@ -517,9 +517,9 @@ STDAPI ImplAAFFileOpenNewModify (
 	{
 	  const aafUID_t* pFileKind;
 	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &aafFileKindAaf512Binary;
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
       else
-	  	pFileKind = &aafFileKindAaf4KBinary;
+	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
@@ -703,9 +703,9 @@ STDAPI ImplAAFFileOpenTransient (
 	{
 	  const aafUID_t* pFileKind;
 	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &aafFileKindAaf512Binary;
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
       else
-	  	pFileKind = &aafFileKindAaf4KBinary;
+	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTimecode.cpp,v 1.26 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTimecode.cpp,v 1.27 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,7 +77,7 @@ AAFRESULT STDMETHODCALLTYPE
 		ImplAAFDictionarySP pDict;
 		CHECK(GetDictionary (&pDict));
 		CHECK(SetNewProps(length,
-						  pDict->GetBuiltinDefs()->ddTimecode()));
+						  pDict->GetBuiltinDefs()->ddkAAFTimecode()));
 		_start = timecode->startFrame;
 		if (timecode->drop == kAAFTcDrop)
 		{
