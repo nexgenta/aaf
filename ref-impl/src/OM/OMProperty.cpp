@@ -13,7 +13,11 @@ OMProperty::OMProperty(const OMPropertyId propertyId,
                        const int storedForm,
                        const char* name)
 : _propertyId(propertyId), _storedForm(storedForm), _name(name), _type(0),
-  _isOptional(false), _isPresent(false)
+  // _isOptional(false),
+  // BobT: make optional by default, to hack around problem where
+  // props may be restored before they're initialized by DM.
+  _isOptional(true),
+  _isPresent(false)
 {
   TRACE("OMProperty::OMProperty");
 }
@@ -404,6 +408,20 @@ void OMSimpleProperty::getBits(OMByte* bits, size_t bitsSize) const
   PRECONDITION("Valid size", bitsSize >= _size);
 
   memcpy(bits, _bits, _size);
+}
+
+  // @mfunc Set the raw bits of this <c OMSimpleProperty>.
+  //        The raw bits are copied from the buffer at address <p bits> which
+  //        is <p size> bytes in size.
+  //   @parm The address of the buffer from which the raw bits are copied.
+  //   @parm The size of the buffer.
+void OMSimpleProperty::setBits(const OMByte* bits, size_t size)
+{
+  TRACE("OMSimpleProperty::setBits");
+  PRECONDITION("Valid bits", bits != 0);
+  PRECONDITION("Valid size", size > 0);
+
+  set(bits, size);
 }
 
 // class OMCollectionProperty
