@@ -13,11 +13,17 @@
 
 
 
-#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
+#include "CEnumAAFPluginDescriptors.h"
+#include "CEnumAAFPluginDescriptors.h"
+#ifndef __CEnumAAFPluginDescriptors_h__
+#error - improperly defined include guard
+#endif
+
+
 #include "AAFResult.h"
 
 
-extern "C" HRESULT CEnumAAFPluginDescriptors_test()
+HRESULT CEnumAAFPluginDescriptors::test()
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
