@@ -55,10 +55,6 @@
 #include ".this-module.h"
 #endif
 
-#ifndef _I.this-module_h_
-#include "I.this-module.h"
-#endif
-
 #include <assert.h>
 
 
@@ -168,7 +164,7 @@ AAFRESULT STDMETHODCALLTYPE
 #startm AD_METHOD2 10
 AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (%03 /*%04*/,
-						   %07 /*%08*/)
+                           %07 /*%08*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -197,8 +193,8 @@ AAFRESULT STDMETHODCALLTYPE
 #startm AD_METHOD3 14
 AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (%03 /*%04*/,
-						   %07 /*%08*/,
-						   %11, /*%12*/)
+                           %07 /*%08*/,
+                           %11, /*%12*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -231,9 +227,9 @@ AAFRESULT STDMETHODCALLTYPE
 #startm AD_METHOD4 18
 AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (%03 /*%04*/,
-						   %07 /*%08*/,
-						   %11 /*%12*/,
-						   %15 /*%16*/)
+                           %07 /*%08*/,
+                           %11 /*%12*/,
+                           %15 /*%16*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -270,10 +266,10 @@ AAFRESULT STDMETHODCALLTYPE
 #startm AD_METHOD5 22
 AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (%03 /*%04*/,
-						   %07 /*%08*/,
-						   %11 /*%12*/,
-						   %15 /*%16*/,
-						   %19 /*%20*/)
+                           %07 /*%08*/,
+                           %11 /*%12*/,
+                           %15 /*%16*/,
+                           %19 /*%20*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -314,11 +310,11 @@ AAFRESULT STDMETHODCALLTYPE
 #startm AD_METHOD6 26
 AAFRESULT STDMETHODCALLTYPE
     Impl.this-module::%01 (%03 /*%04*/,
-						   %07 /*%08*/,
-						   %11 /*%12*/,
-						   %15 /*%16*/,
-						   %19 /*%20*/,
-						   %23 /*%24*/)
+                           %07 /*%08*/,
+                           %11 /*%12*/,
+                           %15 /*%16*/,
+                           %19 /*%20*/,
+                           %23 /*%24*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -404,7 +400,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Argument9: constructor description
 #c
 #startm AD_CONSTRUCTOR2 09
-    .this-module::.this-module (%02 %03,%06 %07)
+    Impl.this-module::.this-module (%02 %03,%06 %07)
 {}
 #endm
 
@@ -429,9 +425,9 @@ AAFRESULT STDMETHODCALLTYPE
 #c Argument13: constructor description
 #c
 #startm AD_CONSTRUCTOR3 13
-    .this-module::.this-module (%02 %03,
-								%06 %07,
-								%10 %11)
+    Impl.this-module::.this-module (%02 %03,
+                                %06 %07,
+                                %10 %11)
 {}
 #endm
 
@@ -460,10 +456,10 @@ AAFRESULT STDMETHODCALLTYPE
 #c Argument17: constructor description
 #c
 #startm AD_CONSTRUCTOR4 17
-    .this-module::.this-module (%02 %03,
-								%06 %07,
-								%10 %11,
-								%14 %15)
+    Impl.this-module::.this-module (%02 %03,
+                                %06 %07,
+                                %10 %11,
+                                %14 %15)
 {}
 #endm
 
@@ -488,7 +484,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_GETOBJ_METHOD1 06
 AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (Impl%03 ** %04)
+    Impl.this-module::%01 (Impl%03 ** %04)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -515,7 +511,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_SETOBJ_METHOD1 06
 AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (Impl%03 * %04)
+    Impl.this-module::%01 (Impl%03 * %04)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }

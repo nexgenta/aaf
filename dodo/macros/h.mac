@@ -37,7 +37,7 @@
 #c
 #startm AD_HEAD 00
 //@doc
-//@class 	.this-module | Implementation class for .this-module
+//@class    .this-module | Implementation class for .this-module
 #ifndef _.this-module_h_
 #define _.this-module_h_
 #endm
@@ -62,7 +62,8 @@ class Impl.this-module;
 
 class .this-module : public .parent-module
 {
-  .this-module (AAFBool doInit = AAFTrue);
+  public:
+  .this-module (aafBool doInit = AAFTrue);
   ~.this-module ();
   //
   // Constructor/destructor
@@ -73,7 +74,7 @@ class .this-module : public .parent-module
 
 #ccccccccccccccccccccccccccc
 #c
-#c Starts a class definition
+#c Starts a root class definition
 #c
 #c Arguments: none
 #c
@@ -87,7 +88,7 @@ class Impl.this-module;
 class .this-module
 {
 public:
-  .this-module ();
+  .this-module (aafBool doInit=AAFTrue);
   ~.this-module ();
   //
   // Constructor/destructor
@@ -134,7 +135,7 @@ public:
   // %06
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	    (%03 %04);	//@parm %02 %05
+        (%03 %04);  //@parm %02 %05
   //@rdesc Returns an AAFResult status code
 #endm
 
@@ -162,8 +163,8 @@ public:
   // %10
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08);	//@parm %06 %09
+       (%03 %04,    //@parm %02 %05
+        %07 %08);   //@parm %06 %09
   //@rdesc Returns an AAFResult status code
 #endm
 
@@ -195,10 +196,10 @@ public:
   // %14
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05,
-		%07 %08,	//@parm %06 %09,
-		%11 %12);	//@parm %10 %13
-		
+       (%03 %04,    //@parm %02 %05,
+        %07 %08,    //@parm %06 %09,
+        %11 %12);   //@parm %10 %13
+        
   //@rdesc Returns an AAFResult status code
 #endm
 
@@ -234,10 +235,10 @@ public:
   // %14
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08,	//@parm %06 %09
-		%11 %12,	//@parm %10 %13
-		%15 %16);	//@parm %14 %17
+       (%03 %04,    //@parm %02 %05
+        %07 %08,    //@parm %06 %09
+        %11 %12,    //@parm %10 %13
+        %15 %16);   //@parm %14 %17
   //@rdesc Returns an AAFResult status code
 #endm
 
@@ -277,11 +278,11 @@ public:
   // %22
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08,	//@parm %06 %09
-		%11 %12,	//@parm %10 %13
-		%15 %16,	//@parm %14 %17
-		%19 %20);	//@parm %18 %21
+       (%03 %04,    //@parm %02 %05
+        %07 %08,    //@parm %06 %09
+        %11 %12,    //@parm %10 %13
+        %15 %16,    //@parm %14 %17
+        %19 %20);   //@parm %18 %21
   //@rdesc Returns an AAFResult status code
 #endm
 
@@ -325,12 +326,12 @@ public:
   // %26
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08,	//@parm %06 %09
-		%11 %12,	//@parm %10 %13
-		%15 %16,	//@parm %14 %17
-		%19 %20,	//@parm %18 %21
-		%23 %24);	//@parm %22 %25
+       (%03 %04,    //@parm %02 %05
+        %07 %08,    //@parm %06 %09
+        %11 %12,    //@parm %10 %13
+        %15 %16,    //@parm %14 %17
+        %19 %20,    //@parm %18 %21
+        %23 %24);   //@parm %22 %25
   //@rdesc Returns an AAFResult status code
 #endm
 
@@ -399,7 +400,7 @@ private:
   //
   // %05
   .this-module
-	    (%02 %03);	//@parm %01 %04
+        (%02 %03);  //@parm %01 %04
 #endm
 
 
@@ -424,8 +425,8 @@ private:
   //
   // %09
     .this-module
-	   (%02 %03,	//@parm %01 %04
-		%06 %07);	//@parm %05 %08
+       (%02 %03,    //@parm %01 %04
+        %06 %07);   //@parm %05 %08
 #endm
 
 
@@ -454,9 +455,9 @@ private:
   //
   // %13
     .this-module
-	   (%02 %03,	//@parm %01 %04
-		%06 %07,	//@parm %05 %08
-		%10 %11);	//@parm %09 %12
+       (%02 %03,    //@parm %01 %04
+        %06 %07,    //@parm %05 %08
+        %10 %11);   //@parm %09 %12
 #endm
 
 
@@ -489,10 +490,10 @@ private:
   //
   // %17
     .this-module
-	   (%02 %03,	//@parm %01 %04
-		%06 %07,	//@parm %05 %08
-		%10 %11,	//@parm %09 %12
-		%14 %15);	//@parm %13 %16
+       (%02 %03,    //@parm %01 %04
+        %06 %07,    //@parm %05 %08
+        %10 %11,    //@parm %09 %12
+        %14 %15);   //@parm %13 %16
 #endm
 
 
@@ -518,7 +519,7 @@ private:
   // %06
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	    (%03 ** %04);	//@parm %02 %05
+        (%03 ** %04);   //@parm %02 %05
   //@rdesc Returns an AAFResult status code
 #endm
 
@@ -545,6 +546,6 @@ private:
   // %06
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	    (%03 * %04);	//@parm %02 %05
+        (%03 * %04);    //@parm %02 %05
   //@rdesc Returns an AAFResult status code
 #endm
