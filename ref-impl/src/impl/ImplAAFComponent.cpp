@@ -74,17 +74,18 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFComponent::GetLength (aafLength_t * pLength)
 {
-    AAFRESULT aafError = AAFRESULT_SUCCESS;
+  if (pLength == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
 
-	if (pLength == NULL)
+  if (! _length.isPresent())
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_PROP_NOT_PRESENT;
 	}
-	else
-	{
-		*pLength = _length;
-	}
-	return aafError;
+	
+  *pLength = _length;
+  return AAFRESULT_SUCCESS;
 }
 
 	
@@ -175,12 +176,12 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 											 ImplAAFMob *mob, ImplAAFMobSlot *track,
 											 aafMediaCriteria_t *mediaCrit,
 											 aafPosition_t currentObjPos,
-											 aafEffectChoice_t *effectChoice,
+											 aafOperationChoice_t *operationChoice,
 											 ImplAAFComponent	*prevObject,
 											 ImplAAFComponent *nextObject,
 											 ImplAAFScopeStack *scopeStack,
 											 aafPosition_t *diffPos, aafLength_t *minLength,
-											 ImplAAFEffect **effeObject, aafInt32	*nestDepth,
+											 ImplAAFOperationGroup **groupObject, aafInt32	*nestDepth,
 											 ImplAAFComponent **found, aafBool *foundTransition)
 {
 	aafLength_t	tmpMinLen;
@@ -215,5 +216,9 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 }
 
 
+AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+{
+	return AAFRESULT_SUCCESS;
+}
 
 OMDEFINE_STORABLE(ImplAAFComponent, AUID_AAFComponent);
