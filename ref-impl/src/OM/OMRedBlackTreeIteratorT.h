@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRedBlackTreeIteratorT.h,v 1.11.2.2 2004/07/23 00:06:48 akharkev Exp $ $Name:  $
+// $Id: OMRedBlackTreeIteratorT.h,v 1.11.2.3 2004/07/23 16:15:00 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -207,7 +207,7 @@ bool OMRedBlackTreeIterator<Key, Value>::operator++()
   POSTCONDITION("Consistent result", IMPLIES( result,  this->valid()));
   POSTCONDITION("Consistent result", IMPLIES(!result, !this->valid()));
   POSTCONDITION("Valid result",
-               IMPLIES(this->valid(), (_current != 0) && (_current != _tree->_nil)));
+         IMPLIES(this->valid(), (_current != 0) && (_current != _tree->_nil)));
   return result;
 }
 
@@ -261,7 +261,7 @@ bool OMRedBlackTreeIterator<Key, Value>::operator--()
   POSTCONDITION("Consistent result", IMPLIES( result,  this->valid()));
   POSTCONDITION("Consistent result", IMPLIES(!result, !this->valid()));
   POSTCONDITION("Valid result",
-               IMPLIES(this->valid(), (_current != 0) && (_current != _tree->_nil)));
+         IMPLIES(this->valid(), (_current != 0) && (_current != _tree->_nil)));
   return result;
 }
 
