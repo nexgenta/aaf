@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -34,16 +34,16 @@
 template <typename ReferencedObject>
 OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
                                                  const OMPropertyId propertyId,
-                                                 const char* name)
-: OMReferenceProperty<ReferencedObject>(propertyId,
-                                        SF_STRONG_OBJECT_REFERENCE,
-                                        name),
+                                                 const wchar_t* name)
+: OMReferenceProperty(propertyId,
+                      SF_STRONG_OBJECT_REFERENCE,
+                      name),
   _reference()
 {
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
 
-  _reference = OMStrongObjectReference<ReferencedObject>(this, name);
+  _reference = OMStrongObjectReference<ReferencedObject>(this, storedName());
 }
 
 template <typename ReferencedObject>
@@ -89,6 +89,23 @@ ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::setValue(
 
   ReferencedObject* result = _reference.setValue(object);
   setPresent();
+  return result;
+}
+
+  // @mfunc Clear the value of this <c OMStrongReferenceProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @rdesc A pointer to the old <p ReferencedObject>. If lazy
+  //          loading is enabled and the referenced object was never
+  //          loaded the value returned is 0.
+template <typename ReferencedObject>
+ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::clearValue(void)
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::clearValue");
+
+  ReferencedObject* result = _reference.setValue(0);
+
   return result;
 }
 
@@ -165,19 +182,9 @@ void OMStrongReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::save");
 
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-
   // Write the index entry.
   //
-  OMStoredObject* s = container->store();
-  const char* propertyName = name();
-  s->write(_propertyId,
-           _storedForm,
-           (void *)propertyName,
-           strlen(propertyName) + 1);
+  saveName();
 
   _reference.save();
 
@@ -223,16 +230,7 @@ void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 
   // retrieve sub-storage name
   //
-  char* storageName = new char[externalSize];
-  ASSERT("Valid heap pointer", storageName != 0);
-
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  store->read(_propertyId, _storedForm, storageName, externalSize);
-  ASSERT("Consistent property size", externalSize == strlen(storageName) + 1);
-  ASSERT("Consistent property name", strcmp(storageName, name()) == 0);
-  delete [] storageName;
+  restoreName(externalSize);
 
   _reference.restore();
 
@@ -320,6 +318,47 @@ void OMStrongReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
 
   const ReferencedObject* p = *(const ReferencedObject**)bits;
   setValue(p);
+}
+
+  // @mfunc Get the value of this <c OMStrongReferenceProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (pointed to) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @rdesc A pointer to an <c OMObject>.
+  //   @this const
+template<typename ReferencedObject>
+OMObject*
+OMStrongReferenceProperty<ReferencedObject>::getObject(void) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::getObject");
+
+  ReferencedObject* p = 0;  
+  getValue(p);
+  OMObject* result = p;
+
+  return result;
+}
+
+  // @mfunc Set the value of this <c OMStrongReferenceProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm A pointer to the new <c OMObject>.
+  //   @rdesc A pointer to the old <c OMObject>. If lazy
+  //          loading is enabled and the referenced object was never
+  //          loaded the value returned is 0.
+template <typename ReferencedObject>
+OMObject* OMStrongReferenceProperty<ReferencedObject>::setObject(
+                                                        const OMObject* object)
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::setObject");
+
+  PRECONDITION("Valid object", object != 0);
+
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  return setValue(p);
 }
 
   // @mfunc The value of this <c OMStrongReferenceProperty>
