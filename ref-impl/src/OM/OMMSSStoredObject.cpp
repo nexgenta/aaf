@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSSStoredObject.cpp,v 1.70 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMMSSStoredObject.cpp,v 1.71 2004/09/14 13:34:19 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1061,6 +1061,7 @@ void OMMSSStoredObject::restore(OMDataVector& property,
 
     property.appendValue(value);
   }
+  delete [] value;
   delete [] buffer;
 }
 

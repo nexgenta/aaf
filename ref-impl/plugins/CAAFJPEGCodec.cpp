@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.44 2004/09/13 17:40:05 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.45 2004/09/14 13:34:19 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -4076,6 +4076,7 @@ HRESULT CAAFJPEGCodec::ReadSampleIndex32(aafUInt16 fileByteOrder)
 			}
 			_sampleIndex[index] = tempBuf[index];
 		}
+		delete [] tempBuf;
 
 		// Add the extra frame to the sample index so that the last element
 		// can contain the position one byte beyond the end of last sample.
