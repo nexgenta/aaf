@@ -36,13 +36,18 @@ ImplAAFCompositionMob::ImplAAFCompositionMob ():
 	
 }
 
+
+
+
 ImplAAFCompositionMob::~ImplAAFCompositionMob ()
 {}
 
 
   //@access Public Members
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCompositionMob::Initialize (aafWChar	*pName)
+    ImplAAFCompositionMob::SetInitialValues (aafWChar	*pName,
+											 aafBool	isPrimary
+											 )
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	if (pName == NULL)
@@ -52,6 +57,8 @@ AAFRESULT STDMETHODCALLTYPE
 	else
 	{
 		aafError = SetName( pName );
+		if (aafError == AAFRESULT_SUCCESS)
+			aafError = SetPrimary( isPrimary );
 	}
 
 	return aafError;
@@ -97,17 +104,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-	if (fadeLength >= 0) 
+	if (fadeLength > 0) 
 	{
-		if (fadeType >= kFadeNone ||
-			fadeType <= kFadeLinearPower)
-		{
-			_defaultFadeLen = fadeLength;
-			_defaultFadeType = fadeType;
-			_defaultFadeEditUnit = fadeEditUnit;
-		}
-		else
-			aafError = AAFRESULT_BAD_TYPE;
+		_defaultFadeLen = fadeLength;
+		_defaultFadeType = fadeType;
+		_defaultFadeEditUnit = fadeEditUnit;
 	}
 	else
 		aafError = AAFRESULT_BAD_LENGTH;
