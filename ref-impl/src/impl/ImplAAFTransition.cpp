@@ -9,8 +9,8 @@
 
 
 
-#ifndef __ImplAAFOperationGroup_h__
-#include "ImplAAFOperationGroup.h"
+#ifndef __ImplAAFGroup_h__
+#include "ImplAAFGroup.h"
 #endif
 
 #ifndef __ImplAAFDataDef_h__
@@ -26,7 +26,7 @@
 #endif
 
 #include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
+#include "AAFPropertyIds.h"
 
 #include <assert.h>
 #include <string.h>
@@ -35,7 +35,7 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "AAFUtils.h"
+#include "aafUtils.h"
 #include "AAFDefUIDs.h"
 
 
@@ -58,44 +58,44 @@
 
 
 ImplAAFTransition::ImplAAFTransition ():
-_operationGroup( PID_Transition_OperationGroup, "OperationGroup"),
+_effect( PID_Transition_Effect, "Effect"),
 _cutPoint( PID_Transition_CutPoint, "CutPoint")
 {
-	_persistentProperties.put(_operationGroup.address());
+	_persistentProperties.put(_effect.address());
 	_persistentProperties.put(_cutPoint.address());
 }
 
 
 ImplAAFTransition::~ImplAAFTransition ()
 {
-	ImplAAFOperationGroup *group = _operationGroup.setValue(0);
-	if (group)
+	ImplAAFGroup *effect = _effect.setValue(0);
+	if (effect)
 	{
-		group->ReleaseReference();
+		effect->ReleaseReference();
 	}
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-	ImplAAFTransition::Create (aafUID_t*				pDatadef,
-							   aafLength_t				length,
-							   aafPosition_t			cutPoint,
-							   ImplAAFOperationGroup*	pOperationGroup)
+	ImplAAFTransition::Create (aafUID_t*		pDatadef,
+							   aafLength_t		length,
+							   aafPosition_t	cutPoint,
+							   ImplAAFGroup*	pEffect)
 {
 	HRESULT		rc = AAFRESULT_SUCCESS;
 
-	if (pDatadef == NULL || pOperationGroup == NULL)
+	if (pDatadef == NULL || pEffect == NULL)
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
 		CHECK(SetNewProps(length, pDatadef));
 		_cutPoint = cutPoint;
-		if (_operationGroup)
-			_operationGroup->ReleaseReference();
-		_operationGroup = pOperationGroup;
-		if (pOperationGroup)
-			pOperationGroup->AcquireReference();
+		if (_effect)
+			_effect->ReleaseReference();
+		_effect = pEffect;
+		if (pEffect)
+			pEffect->AcquireReference();
 
 	}
 	XEXCEPT
@@ -120,12 +120,12 @@ AAFRESULT STDMETHODCALLTYPE
 	//@comm Replaces part of omfsTransitionGetInfo
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTransition::GetOperationGroup (ImplAAFOperationGroup ** ppEffObj)
+    ImplAAFTransition::GetEffect (ImplAAFGroup ** ppEffObj)
 {
 	if (ppEffObj == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	*ppEffObj = _operationGroup;
+	*ppEffObj = _effect;
 	if (*ppEffObj)
 		(*ppEffObj)->AcquireReference();
 
@@ -144,17 +144,13 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTransition::SetOperationGroup (ImplAAFOperationGroup * pEffObj)
+    ImplAAFTransition::SetEffect (ImplAAFGroup * pEffObj)
 {
 
 	if (pEffObj == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
-	if (_operationGroup)
-		_operationGroup->ReleaseReference();
-
-	_operationGroup = pEffObj;
-	_operationGroup->AcquireReference();
+	_effect = pEffObj;
 	return AAFRESULT_SUCCESS; 
 }
 

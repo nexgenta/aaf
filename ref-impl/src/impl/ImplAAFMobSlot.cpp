@@ -1,30 +1,12 @@
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types required by this module:
@@ -72,8 +54,7 @@ ImplAAFMobSlot::~ImplAAFMobSlot ()
 	ImplAAFSegment *segment = _segment.setValue(0);
 	if (segment)
 	{
-	  segment->ReleaseReference();
-	  segment = 0;
+		segment->ReleaseReference();
 	}
 }
 
@@ -95,8 +76,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFMobSlot::SetSegment (ImplAAFSegment *value)
 {
 	if (_segment)
-	  _segment->ReleaseReference();
-	_segment = 0;
+		_segment->ReleaseReference();
 
 	_segment = value;
 
@@ -117,9 +97,6 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	if(!_name.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
 	stat = _name.copyToBuffer(pName, size);
 	if (! stat)
 	{
@@ -139,17 +116,13 @@ ImplAAFMobSlot::GetNameBufLen
 {
 	if(pSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if(!_name.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
 	*pSize = _name.size();
 
 	return(AAFRESULT_SUCCESS); 
 }
   
  AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMobSlot::SetName (const aafCharacter *pName)
+    ImplAAFMobSlot::SetName (aafWChar *pName)
 {
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -165,10 +138,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(result == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if(!_physicalTrackNum.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
 	*result = _physicalTrackNum;
 	return AAFRESULT_SUCCESS;
 }
@@ -215,6 +184,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+OMDEFINE_STORABLE(ImplAAFMobSlot, AUID_AAFMobSlot);
 
 
 AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
@@ -248,14 +218,12 @@ AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
 		*/
 		*diffPos = offset;
 		tmpSegment->ReleaseReference();
-		tmpSegment = 0;
 		
 	} /* XPROTECT */
 	XEXCEPT
 	{
 		if (tmpSegment)	
-		  tmpSegment->ReleaseReference();
-		tmpSegment = 0;
+			tmpSegment->ReleaseReference();
 	}
 	XEND;
 	return(AAFRESULT_SUCCESS);
@@ -267,7 +235,7 @@ AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
 {
 	if(convertPos == NULL )
 		return(AAFRESULT_NULL_PARAM);
-	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping
+	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping!!!
 	return AAFRESULT_SUCCESS;
 }
 
@@ -277,19 +245,6 @@ AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
 {
 	if(convertPos == NULL )
 		return(AAFRESULT_NULL_PARAM);
-	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping
-	return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT ImplAAFMobSlot::ChangeContainedReferences(const aafUID_t & from,
-													const aafUID_t & to)
-{
-	ImplAAFSegment	*seg;
-	
-	seg = _segment;
-
-	if(seg != NULL)
-		seg->ChangeContainedReferences(from, to);
-
+	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping!!!
 	return AAFRESULT_SUCCESS;
 }
