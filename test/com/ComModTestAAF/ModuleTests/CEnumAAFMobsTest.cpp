@@ -1,653 +1,286 @@
 // @doc INTERNAL
-// @com This file implements the module test for CEnumAAFMobs
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+// @com This file implements the module test for CAAFDefinitionObject
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-#include "AAF.h"
+
+
+
+
+#include "CEnumAAFMobs.h"
+#include "CEnumAAFMobs.h"
+#ifndef __CEnumAAFMobs_h__
+#error - improperly defined include guard
+#endif
 
 #include <iostream.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
-#include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
-
-static const 	aafMobID_t	TEST_File_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x6ee8dbba, 0x0406, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-static const 	aafMobID_t	TEST_Master_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x74fdbb4c, 0x0406, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-static const 	aafMobID_t	TEST_Composition_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x7ad23b60, 0x0406, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
-
-// convenient error handlers.
-inline void checkResult(HRESULT r)
-{
-  if (FAILED(r))
-    throw r;
-}
-inline void checkExpression(bool expression, HRESULT r)
-{
-  if (!expression)
-    throw r;
-}
-
-
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
+	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
-	bool 						bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-  	IAAFDictionary*  			pDictionary = NULL;
-	IAAFSourceMob				*pSourceMob = NULL;
-	IAAFMob						*pMob = NULL;
-	IAAFEssenceDescriptor 		*edesc = NULL;
 	aafProductIdentification_t	ProductInfo;
-	HRESULT						hr = S_OK;
-
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
+	aafUID_t					newUID;
+	HRESULT						hr;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFMobs Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productName = L"Make AVR Example";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
+	hr = CoCreateInstance(CLSID_AAFSession,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSession, 
+						   (void **)&pSession);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-  try
-  {
-    // Remove the previous test file if any.
-    RemoveTestFile(pFileName);
-
-
-    // Create the file
-		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
-		bFileOpen = true;
- 
-    // We can't really do anthing in AAF without the header.
-		checkResult(pFile->GetHeader(&pHeader));
-
-    // Get the AAF Dictionary so that we can create valid AAF objects.
-    checkResult(pHeader->GetDictionary(&pDictionary));
-	CAAFBuiltinDefs defs (pDictionary);
- 		
-    //Make the first mob
-
-	  // Create a FileMob
-	  checkResult(defs.cdSourceMob()->
-				  CreateInstance(IID_IAAFSourceMob, 
-								 (IUnknown **)&pSourceMob));
-
-	  checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-
-	  checkResult(pMob->SetMobID(TEST_File_MobID));
-	  checkResult(pMob->SetName(L"File Mob"));
-	
-	  // Create a concrete subclass of FileDescriptor
- 	  checkResult(defs.cdAIFCDescriptor()->
-				  CreateInstance(IID_IAAFEssenceDescriptor, 
-								 (IUnknown **)&edesc));		
-
-
-		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
-		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-		pAIFCDesc->Release();
-		pAIFCDesc = NULL;
-
-    checkResult(pSourceMob->SetEssenceDescriptor (edesc));
-
-	  checkResult(pHeader->AddMob(pMob));
-
-    // Reusing local variable so we need to release the inteface.
-    pMob->Release();
-    pMob = NULL;
-
-	  // Create a MasterMob
-	  checkResult(defs.cdMasterMob()->
-				  CreateInstance(IID_IAAFMob, 
-								 (IUnknown **)&pMob));
-
-	  checkResult(pMob->SetMobID(TEST_Master_MobID));
-	  checkResult(pMob->SetName(L"Master Mob"));
-
-	  checkResult(pHeader->AddMob(pMob));
-
-    // Reusing local variable so we need to release the inteface.
-    pMob->Release();
-    pMob = NULL;
-
-	  // Create a CompositionMob
-	  checkResult(defs.cdCompositionMob()->
-				  CreateInstance(IID_IAAFMob, 
-								 (IUnknown **)&pMob));
-
-	  checkResult(pMob->SetMobID(TEST_Composition_MobID));
-  	checkResult(pMob->SetName(L"Composition Mob"));
-
-	  checkResult(pHeader->AddMob(pMob));
-	}
-  catch (HRESULT& rResult)
-  {
-    hr = rResult;
-  }
-	
-
-  // Cleanup and return
-  if (edesc)
-    edesc->Release();
-
-  if (pMob)
-    pMob->Release();
+	hr = pSession->CreateFile(pFileName, kAAFRev1, &pFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
   
-  if (pSourceMob)
-    pSourceMob->Release();
+  	hr = pFile->GetHeader(&pHeader);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+ 	
+//Make the first mob
+	IAAFSourceMob	*pSourceMob;
+	IAAFMob			*pMob;
+	IAAFEssenceDescriptor *edesc;
 
-	if (pDictionary)
-		pDictionary->Release();
+	// Create a FileMob
+	hr = CoCreateInstance(CLSID_AAFSourceMob,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFSourceMob, 
+							(void **)&pSourceMob);
 
-	if (pHeader)
-		pHeader->Release();
 
-	if (pFile) 
-	{
-		if (bFileOpen)
-		  {
-			pFile->Save();
-			pFile->Close();
-		  }
-		pFile->Release();
-	}
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	hr = pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	return hr;
+	hr = CoCreateGuid((GUID *)&newUID); // hack: we need a utility function.
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pMob->SetMobID(&newUID);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	
+	hr = pMob->SetName(L"File Mob");
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	
+ 	hr = CoCreateInstance(CLSID_AAFFileDescriptor,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFFileDescriptor, 
+							(void **)&edesc);		
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+ 	hr = pSourceMob->SetEssenceDescription (edesc);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pHeader->AppendMob(pMob);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	// Create a MasterMob
+	hr = CoCreateInstance(CLSID_AAFMasterMob,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFMob, 
+							(void **)&pMob);
+
+
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = CoCreateGuid((GUID *)&newUID); // hack: we need a utility function.
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pMob->SetMobID(&newUID);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	
+	hr = pMob->SetName(L"Master Mob");
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pHeader->AppendMob(pMob);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	// Create a CompositionMob
+	hr = CoCreateInstance(CLSID_AAFCompositionMob,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFMob, 
+							(void **)&pMob);
+
+
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = CoCreateGuid((GUID *)&newUID); // hack: we need a utility function.
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pMob->SetMobID(&newUID);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	
+	hr = pMob->SetName(L"Composition Mob");
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pHeader->AppendMob(pMob);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	// Close the file and get out of here
+	hr = pFile->Close();
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pSession->EndSession();
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	pMob->Release();
+	if (pFile) pFile->Release();
+	if (pSession) pSession->Release();
+
+	return AAFRESULT_SUCCESS;
 }
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
+	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
-	bool 						bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-	aafNumSlots_t				numMobs, i;
-	HRESULT						hr = S_OK;
-	HRESULT						localhr = S_OK;
-	IEnumAAFMobs 				*mobIter = NULL;
-	IEnumAAFMobs 				*cloneMobIter = NULL;
-	IAAFMob						*aMob = NULL;
-	IAAFMob						**mobArray = NULL;
-	aafSearchCrit_t				criteria;
-	aafUInt32					numFetched = 0;
+	aafProductIdentification_t	ProductInfo;
+	aafNumSlots_t	numMobs;
+	HRESULT						hr;
 
-
-  try
-  {
-    // Open the file
-		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
-		bFileOpen = true;
- 
-    // We can't really do anthing in AAF without the header.
-		checkResult(pFile->GetHeader(&pHeader));
-
-	  // Make sure that we have one master, one file, and one composition (three total)
-	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
-	  checkExpression (3 == numMobs, AAFRESULT_TEST_FAILED);
-
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.productID = -1;
+	ProductInfo.platform = NULL;
 	  
-	  criteria.searchTag = kAAFNoSearch;
-	  checkResult(pHeader->GetMobs (&criteria, &mobIter));
-	  
+	hr = CoCreateInstance(CLSID_AAFSession,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSession, 
+						   (void **)&pSession);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-/* Test the Reset method *******************************/
-	if (mobIter->Reset() == AAFRESULT_SUCCESS)
-		cout<< "	Reset() ...		Passed" << endl;	
-	else	{
-		cout<< "	Reset() ...		Failed!!!" << endl;	
-		hr = AAFRESULT_TEST_FAILED;
-	}
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
+	hr = pSession->OpenReadFile(pFileName, &pFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+  
+  	hr = pFile->GetHeader(&pHeader);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-/* Test the NextOne method ******************************/
-	
-	// Call NextOne once for each mob for a total of numMobs times	
-	for (i=0; i<numMobs; i++)	{
-		if (mobIter->NextOne(&aMob) == AAFRESULT_SUCCESS)	{
-			aMob->Release();
-			aMob = NULL;
-		}
-		else
-			localhr = AAFRESULT_TEST_FAILED;
-	}
+	// Make sure that we have one master, one file, and one composition (three total)
+	hr = pHeader->GetNumMobs(kAllMob, &numMobs);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	if (3 != numMobs )
+		return AAFRESULT_TEST_FAILED;
 
-	// Make sure we are at the end
-	if (mobIter->NextOne(&aMob) != AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-	
-	mobIter->Reset();
-	// this should return AAFRESULT_NULL_PARAM
-	if (mobIter->NextOne(NULL) != AAFRESULT_NULL_PARAM)
-			localhr = AAFRESULT_TEST_FAILED;
+	hr = pHeader->GetNumMobs(kMasterMob, &numMobs);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	if (1 != numMobs )
+		return AAFRESULT_TEST_FAILED;
 
-	if (SUCCEEDED(localhr))
-		cout<< "	NextOne() ...	Passed" << endl;	
-	else	{
-		cout<< "	NextOne() ...	Failed!!!" << endl;	
-		hr = AAFRESULT_TEST_FAILED;
-	}
+	hr = pHeader->GetNumMobs(kFileMob, &numMobs);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	if (1 != numMobs )
+		return AAFRESULT_TEST_FAILED;
 
-/* Test the Skip method ******************************/
+	hr = pHeader->GetNumMobs(kCompMob, &numMobs);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	if (1 != numMobs )
+		return AAFRESULT_TEST_FAILED;
 
-	localhr = S_OK;
-	mobIter->Reset();
-	
-	// skip over each Mob one at a time.
-	for (i=0; i<numMobs; i++)
-		if (mobIter->Skip(1) != AAFRESULT_SUCCESS)
-			localhr = AAFRESULT_TEST_FAILED;
+	//!!! Problem deleting, let it leak -- 	delete mobIter;
+	hr = pFile->Close();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	// Make sure we are at the end.
-	if (mobIter->Skip(1) != AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-	
-	mobIter->Reset();
-	// Skip over multiple Mobs at a time.		
-	for (i=2; i<=numMobs; i++)	{
-		if (mobIter->Skip(i) != AAFRESULT_SUCCESS)
-			localhr = AAFRESULT_TEST_FAILED;
+	hr = pSession->EndSession();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-		mobIter->Reset();
-	}
+	if (pHeader) pHeader->Release();
+	if (pFile) pFile->Release();
+	if (pSession) pSession->Release();
 
-	// Make sure we are at the end.
-	if (mobIter->Skip(numMobs+1) != AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-			
-	if (SUCCEEDED(localhr))
-		cout<< "	Skip() ...		Passed" << endl;
-	else	{
-		cout<< "	Skip() ...		Failed!!!" << endl;
-		hr = AAFRESULT_TEST_FAILED;
-	}
-
-/* Next()  ******************************************/
-
-	mobArray = new IAAFMob *[numMobs];
-
-	localhr = S_OK;
-	numFetched = 1;
-
-	// Iterate thru the Mobs using Next doing 1 at a time
-	mobIter->Reset();
-	for ( i=0; i<numMobs ;i++)	{
-		if (mobIter->Next(1, &aMob, &numFetched) == AAFRESULT_SUCCESS)	{
-			aMob->Release();
-	 	    aMob = NULL;
-
-			if (1 != numFetched)
-				localhr = AAFRESULT_TEST_FAILED;
-		}
-		else
-			localhr = AAFRESULT_TEST_FAILED;
-	}
-			
-	// Make sure we are at the end
-	if (mobIter->Next(1, &aMob, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
-		localhr = AAFRESULT_TEST_FAILED;
-	if(numFetched != 0)
-		localhr = AAFRESULT_TEST_FAILED;
-		
-	// Test the Next method filling out an array of Mobs
-	numFetched = 0;
-	mobIter->Reset();
-	for ( i=2; i<=numMobs ;i++)	{
-		if (mobIter->Next(i, mobArray, &numFetched) == AAFRESULT_SUCCESS)	{
-			if (i != numFetched)
-				localhr = AAFRESULT_TEST_FAILED;
-
-			for (i = 0; i < numFetched; i++)
-				if (mobArray[i] != NULL)	// should have been set
-				{
-					mobArray[i]->Release();
-					mobArray[i] = NULL;
-				}
-				else
-					localhr = AAFRESULT_TEST_FAILED;
-		}
-		else
-			localhr = AAFRESULT_TEST_FAILED;
-			
-		mobIter->Reset();
-	}
-
-	// Make sure we can't get more Mobs than numMobs	
-	if (mobIter->Next(i+1, mobArray, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
-		localhr = AAFRESULT_TEST_FAILED;
-
-	if (numMobs != numFetched)
-		localhr = AAFRESULT_TEST_FAILED;
-		
-	for (i = 0; i < numMobs; i++)
-		if (mobArray[i] != NULL)	
-		{
-			mobArray[i]->Release();
-			mobArray[i] = NULL;
-		}
-		else
-			localhr = AAFRESULT_TEST_FAILED;
-		
-	
-	mobIter->Reset();
-	mobIter->Skip(2);
-
-	// Make sure we can't go past the end to fill the array
-	if (mobIter->Next(numMobs, mobArray, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
-		localhr = AAFRESULT_TEST_FAILED;
-
-	if ((numMobs-2) != numFetched)
-		localhr = AAFRESULT_TEST_FAILED;
-		
-	for (i = 0; i < numMobs-2; i++)
-		if (mobArray[i] != NULL)
-		{
-			mobArray[i]->Release();
-			mobArray[i] = NULL;
-		}
-		else
-			localhr = AAFRESULT_TEST_FAILED;
-			
-	mobIter->Reset();
-	// Make sure it returns AAFRESULT_NULL_PARAM
-	if (mobIter->Next(1, NULL, &numFetched) != AAFRESULT_NULL_PARAM)
-		localhr = AAFRESULT_TEST_FAILED;
-
-	// Make sure it returns E_INVALIDARG	
-	if (mobIter->Next(1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
-		localhr = AAFRESULT_TEST_FAILED;
-	else
-	{
-		for (i = 0; i < numFetched; i++)
-		if (mobArray[i] != NULL)
-		{
-			mobArray[i]->Release();
-			mobArray[i] = NULL;
-		}
-		else
-			localhr = AAFRESULT_TEST_FAILED;		
-	}
-
-	if (SUCCEEDED(localhr))
-		cout<< "	Next() ...		Passed" << endl;
-	else	{
-		cout<< "	Next() ...		Failed!!!" << endl;
-		hr = AAFRESULT_TEST_FAILED;
-	}
-
-
-/* Clone() ************************************/
-
-	// Test the Clone method with with enumerator at begining
-	localhr = S_OK;
-	mobIter->Reset();
-	if (mobIter->Clone(&cloneMobIter) == AAFRESULT_SUCCESS)	{
-		for (i=0; i < numMobs; i++)	{
-			if (cloneMobIter->NextOne(&aMob) == AAFRESULT_SUCCESS)	{
-				aMob->Release();
-    			aMob = NULL;
-			}
-			else
-				localhr = AAFRESULT_TEST_FAILED;		
-		}
-
-		if (cloneMobIter->NextOne(&aMob) != AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		cloneMobIter->Reset();
-		if (cloneMobIter->Next(numMobs, mobArray, &numFetched) 
-			!= AAFRESULT_SUCCESS)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		if (numMobs != numFetched)
-			localhr = AAFRESULT_TEST_FAILED;
-		
-		for (i = 0; i < numMobs; i++) {
-			if (mobArray[i] != NULL)	{
-				mobArray[i]->Release();
-				mobArray[i] = NULL;
-			}
-			else
-				localhr = AAFRESULT_TEST_FAILED;
-		}
-
-		cloneMobIter->Reset();
-
-		if (cloneMobIter->Next(numMobs+1, mobArray, &numFetched) 
-			!= AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		if (numMobs != numFetched)
-			localhr = AAFRESULT_TEST_FAILED;
-		
-		for (i = 0; i < numMobs; i++) {
-			if (mobArray[i] != NULL)	{
-				mobArray[i]->Release();
-				mobArray[i] = NULL;
-			}
-			else
-				localhr = AAFRESULT_TEST_FAILED;
-		}
-
-		cloneMobIter->Reset();
-		cloneMobIter->Skip(1);
-
-		if (cloneMobIter->Next(numMobs, mobArray, &numFetched) 
-			!= AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		if ((numMobs-1) != numFetched)
-			localhr = AAFRESULT_TEST_FAILED;
-		
-		for (i = 0; i < numMobs-1; i++) {
-			if (mobArray[i] != NULL)	{
-				mobArray[i]->Release();
-				mobArray[i] = NULL;
-			}
-			else
-				localhr = AAFRESULT_TEST_FAILED;
-		}
-	
-		cloneMobIter->Release();
-	 	cloneMobIter = NULL;
-	}
-	else
-		localhr = AAFRESULT_TEST_FAILED;
-	
-	// Test the Clone method with with enumerator at end.
-	// Indirectly tests the Skip and Reset methods.
-	mobIter->Reset();
-	mobIter->Skip(numMobs-1);
-	if (mobIter->Clone(&cloneMobIter) == AAFRESULT_SUCCESS) {
-		if (cloneMobIter->NextOne(&aMob) == AAFRESULT_SUCCESS)	{
-			aMob->Release();
-		    aMob = NULL;
-		}
-		if (cloneMobIter->NextOne(&aMob) != AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		cloneMobIter->Release();
-  		cloneMobIter = NULL;
-	}
-	else
-		localhr = AAFRESULT_TEST_FAILED;
-
-	// Test the Clone method with with enumerator in the middle.
-	// Indirectly tests the Skip and Reset methods.
-	mobIter->Reset();
-	mobIter->Skip(numMobs-2);
-	if (mobIter->Clone(&cloneMobIter) == AAFRESULT_SUCCESS)	{
-		cloneMobIter->Skip(1);
-		if (cloneMobIter->NextOne(&aMob) == AAFRESULT_SUCCESS)	{
-			aMob->Release();
-		    aMob = NULL;
-		}
-		else
-			localhr = AAFRESULT_TEST_FAILED;
-		
-		if (cloneMobIter->NextOne(&aMob) != AAFRESULT_NO_MORE_OBJECTS)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		cloneMobIter->Release();
-  		cloneMobIter = NULL;
-	}
-	else
-		localhr = AAFRESULT_TEST_FAILED;
-
-
-	mobIter->Reset();
-	if (mobIter->Clone(&cloneMobIter) == AAFRESULT_SUCCESS)	{
-		if (cloneMobIter->Next(1, NULL, &numFetched) != AAFRESULT_NULL_PARAM)
-			localhr = AAFRESULT_TEST_FAILED;
-	
-		if (cloneMobIter->Next(1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
-			localhr = AAFRESULT_TEST_FAILED;
-		else
-		{
-			for (i = 0; i < numFetched; i++) {
-				if (mobArray[i] != NULL)
-				{
-					mobArray[i]->Release();
-					mobArray[i] = NULL;
-				}
-				else
-					localhr = AAFRESULT_TEST_FAILED;		
-			}
-		}
-
-		cloneMobIter->Release();
- 		cloneMobIter = NULL;
-	}
-	else
-		localhr = AAFRESULT_TEST_FAILED;
-
-	
-	if (SUCCEEDED(localhr))
-		cout<< "	Clone() ...		Passed" << endl;
-	else	{
-		cout<< "	Clone() ...		Failed!!!" << endl;
-		hr = AAFRESULT_TEST_FAILED;
-	}
-	  	  	  
-	  checkResult(pHeader->CountMobs(kAAFMasterMob, &numMobs));
-	  checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
-
-	  checkResult(pHeader->CountMobs(kAAFFileMob, &numMobs));
-	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
-
-	  checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
-	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
-
-	}
-  catch (HRESULT& rResult)
-  {
-    hr = rResult;
-  }
-	
-
-	// Cleanup and return
-	
-	delete [] mobArray;
-
-	if (mobIter)
-		mobIter->Release();
-
-	if (pHeader)
-		pHeader->Release();
-
-	if (pFile) 
-	{
-		if (bFileOpen)
-			pFile->Close();
-		pFile->Release();
-	}
-
-	return hr;
+	return 	AAFRESULT_SUCCESS;
 }
  
-extern "C" HRESULT CEnumAAFMobs_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFMobs_test(testMode_t mode)
+HRESULT CEnumAAFMobs::test()
 {
-	HRESULT hr = AAFRESULT_TEST_PARTIAL_SUCCESS; //AAFRESULT_SUCCESS;
- 	aafWChar * pFileName = L"EnumAAFMobsTest.aaf";
+	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
+	IAAFSourceMob *pObject = NULL;
+ 	aafWChar * pFileName = L"EnumMOBTest.aaf";
 
   try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
-		if(AAFRESULT_SUCCESS == hr)
-			hr = ReadAAFFile( pFileName );
-		
-		if(hr == AAFRESULT_SUCCESS)
-			hr = AAFRESULT_NOT_IN_CURRENT_VERSION;
+		hr = CreateAAFFile(	pFileName );
+
+		hr = ReadAAFFile( pFileName );
 	}
   catch (...)
 	{
-	  cerr << "CEnumAAFMobs_test...Caught general C++"
-		   << " exception!" << endl; 
-	  hr = AAFRESULT_TEST_FAILED;
+	  cerr << "CAAFSourceMob::test...Caught general C++"
+		" exception!" << endl; 
 	}
 
-	return hr;
+  // Cleanup our object if it exists.
+  if (pObject)
+	pObject->Release();
+
+  return hr;
 }
 
 
