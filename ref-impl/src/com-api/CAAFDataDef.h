@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDataDef.h,v 1.6 2004/06/02 20:34:31 jptrainor Exp $ $Name:  $
+// $Id: CAAFDataDef.h,v 1.7 2004/06/03 12:27:09 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,7 @@
 
 class CAAFDataDef
   : public IAAFDataDef,
+    public IAAFDataDef2,
     public CAAFDefObject
 {
 protected:
@@ -57,7 +58,6 @@ protected:
   virtual ~CAAFDataDef ();
 
 public:
-
 
   //***********************************************************
   //
@@ -167,6 +167,35 @@ public:
     // pointer to result
     /*[retval, out]*/ aafBoolean_t *  bDoesConvertFrom);
 
+  //***********************************************************
+  // METHOD NAME: IsEdgecodeKind()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFDataDef2 | IsEdgecodeKind |
+  // Sets return value to TRUE if DataDef is an edgecode.
+  // @end
+  // 
+  STDMETHOD (IsEdgecodeKind)
+   (
+    // @parm [retval,out] aafBoolean_t * | bIsEdgecodeKind | pointer to the return value
+    aafBoolean_t *  bIsEdgecodeKind
+  );
+
+  //***********************************************************
+  // METHOD NAME: IsTimecodeKind()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFDataDef2 | IsTimecodeKind |
+  // Sets return value to TRUE if DataDef is a timecode.
+  // @end
+  // 
+  STDMETHOD (IsTimecodeKind)
+   (
+    // @parm [retval,out] aafBoolean_t * | bIsTimecodeKind | pointer to the return value
+    aafBoolean_t *  bIsTimecodeKind
+  );
+
+
 protected:
   // 
   // Declare the QI that implements for the interfaces
@@ -187,5 +216,4 @@ public:
 };
 
 #endif // ! __CAAFDataDef_h__
-
 
