@@ -31,7 +31,7 @@
 #include "AAFUtils.h"
 
 ImplAAFTimelineMobSlot::ImplAAFTimelineMobSlot ():
-	_editRate(	PID_TimelineMobSlot_EditRate,	"Edit Rate"),
+	_editRate(	PID_TimelineMobSlot_EditRate,	"EditRate"),
 	_origin(	PID_TimelineMobSlot_Origin,		"Origin")
 
 {
@@ -93,9 +93,9 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
-										  ImplAAFSegment **segment,
-										  aafRational_t *srcRate,
-										  aafPosition_t *diffPos)
+					  ImplAAFSegment **segment,
+					  aafRational_t *srcRate,
+					  aafPosition_t *diffPos)
 {
 	aafBool					foundClip = AAFFalse;
 	ImplAAFMobSlot			*tmpTrack = NULL;
@@ -139,10 +139,13 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 		*/
 		(*diffPos) = offset;
 		CHECK(SubInt64fromInt64(begPos, diffPos));
+		tmpSegment->ReleaseReference();
 		
 	} /* XPROTECT */
 	XEXCEPT
 	{
+		if (tmpSegment)	
+			tmpSegment->ReleaseReference();
 	}
 	XEND;
 	return(AAFRESULT_SUCCESS);
