@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataSet.cpp,v 1.1.2.2 2004/07/23 18:56:13 tbingham Exp $ $Name:  $
+// $Id: OMDataSet.cpp,v 1.1.2.3 2004/07/23 19:07:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,6 +52,7 @@ void OMDataSet::save(void) const
 void OMDataSet::restore(size_t externalSize)
 {
   TRACE("OMDataSet::restore");
+
   // tjb -- resize ?
   store()->restore(*this, externalSize);
   setPresent();
