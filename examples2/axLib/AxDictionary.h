@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.h,v 1.17 2004/04/10 14:14:04 jptrainor Exp $ $Name:  $
+// $Id: AxDictionary.h,v 1.18 2004/08/29 18:16:00 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -111,6 +111,18 @@ IAAFSmartPointer<Type> AxCreateInstance( AxDictionary& dict )
 {
 	Type* dummy = 0;
 
+	IUnknownSP spIUnknown = dict.CreateInstance( AxAUID(dummy), AxIID(dummy) );
+	IAAFSmartPointer<Type> sp;
+	AxQueryInterface( spIUnknown, sp );
+	return sp;
+}
+
+template <class Type>
+IAAFSmartPointer<Type> AxCreateInstance( IAAFDictionarySP spDict )
+{
+	Type* dummy = 0;
+	
+	AxDictionary dict(spDict);
 	IUnknownSP spIUnknown = dict.CreateInstance( AxAUID(dummy), AxIID(dummy) );
 	IAAFSmartPointer<Type> sp;
 	AxQueryInterface( spIUnknown, sp );
