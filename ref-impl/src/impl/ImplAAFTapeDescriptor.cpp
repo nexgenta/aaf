@@ -87,7 +87,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetManufacturerNameLen (aafInt32 *pLen)
+    ImplAAFTapeDescriptor::GetTapeManBufLen (aafInt32 *pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -141,7 +141,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeModelLen (aafInt32*	pLen)
+    ImplAAFTapeDescriptor::GetTapeModelBufLen (aafInt32*	pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -306,4 +306,16 @@ AAFRESULT STDMETHODCALLTYPE
 extern "C" const aafClassID_t CLSID_AAFTapeDescriptor;
 
 OMDEFINE_STORABLE(ImplAAFTapeDescriptor, CLSID_AAFTapeDescriptor);
+
+// Cheat!  We're using this object's CLSID instead of object class...
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTapeDescriptor::GetObjectClass(aafUID_t * pClass)
+{
+  if (! pClass)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  memcpy (pClass, &CLSID_AAFTapeDescriptor, sizeof aafClassID_t);
+  return AAFRESULT_SUCCESS;
+}
 
