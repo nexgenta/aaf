@@ -1,58 +1,76 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
-
+/***********************************************************************
+ *
+ *              Copyright (c) 1996 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __aaflib_h__
 #define __aaflib_h__
 
 #include "AAF.h"
-#include "AAFTypes.h"
-#include "aafrdli.h"
 
 
+
+
+// ASSERT code copied from OM...
+#ifdef _DEBUG
+
+#define ASSERT(name, expression) \
+  (expression) \
+    ? (void)0  \
+    : reportAssertionFailure("Assertion",    name, #expression, \
+                             currentRoutineName, __FILE__, __LINE__)
+
+#define TRACE(routine) char* currentRoutineName = routine;
+
+#else
+
+#define ASSERT(name, expression)
+
+#define TRACE(routine)
+
+#endif
 
 
 //***********************************************************
 // Define function prototypes in a manner consistent with the 
 // ActiveX and OLE SDK's.
 
-#if !defined( COMPILER_MSC )
-//
-// Compiler other than MS Visual C++
-//
+#if !defined(_MSC_VER)
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGREAD)(
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     IAAFFile ** ppFile);
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGMODIFY)(
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENNEWMODIFY)(
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
@@ -64,43 +82,21 @@ typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENTRANSIENT)(
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETPLUGINMANAGER)(
     IAAFPluginManager ** ppPluginManager);
 
-typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATERAWSTORAGEMEMORY)(
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage);
-
-typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATERAWSTORAGEDISK)(
-    aafCharacter_constptr  pFilename,
-    aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage);
-
-typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
-    IAAFRawStorage * pRawStorage,
-	aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	aafUID_constptr  pFileKind,
-	aafUInt32  modeFlags,
-	aafProductIdentification_constptr  pIdent,
-	IAAFFile ** ppNewFile);
-
 #else
-//
-// MS Visual C++ compiler
-//
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGREAD)(
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     IAAFFile ** ppFile);
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGMODIFY)(
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENNEWMODIFY)(
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
@@ -111,25 +107,6 @@ typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENTRANSIENT)(
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETPLUGINMANAGER)(
     IAAFPluginManager ** ppPluginManager);
-
-typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATERAWSTORAGEMEMORY)(
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage);
-
-typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATERAWSTORAGEDISK)(
-    aafCharacter_constptr  pFilename,
-    aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage);
-
-typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
-    IAAFRawStorage * pRawStorage,
-	aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	aafUID_constptr  pFileKind,
-	aafUInt32  modeFlags,
-	aafProductIdentification_constptr  pIdent,
-	IAAFFile ** ppNewFile);
 
 #endif
 
@@ -151,24 +128,21 @@ protected:
 public:
   virtual ~AAFDLL();
 
-	// Factory method.
-	static AAFDLL * MakeAAFDLL();
-
-
   // Return the singleton instance.
   static AAFDLL * GetAAFDLL();
 
 
-  // Implement platform specific initialization of dll and 
-	// entry points. NOTE: ALL ENTRY POINTS ARE REQUIRED! 
-	// If any entry point cannot be found then the override 
-	// of of Load MUST FAIL.
-  HRESULT Load(const char *dllname);
+  // Abstract method that must be overridden to implement
+  // platform specific initialization of dll and entry points.
+  // NOTE: ALL ENTRY POINTS ARE REQUIRED! If any entry point
+  // cannot be found then the override of of Load MUST FAIL.
+  virtual HRESULT Load(const char *dllname) = 0;
   
-  // Implement platform specific cleanup of dll and entry points.
+  // Abstract method that must be overridden to implement
+  // platform specific cleanup of dll and entry points.
   // NOTE: Implementations must be prepared to be called
   // even if their implementation of Load has failed.
-  HRESULT Unload();
+  virtual HRESULT Unload() = 0;
   
   // Resets all entry point function pointers to NULL.
   void ClearEntrypoints();
@@ -178,18 +152,18 @@ public:
   // Wrapper functions for calling member entry points.
   //
   HRESULT OpenExistingRead (
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     IAAFFile ** ppFile);
   
   HRESULT OpenExistingModify (
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
 
   HRESULT OpenNewModify (
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
@@ -201,48 +175,22 @@ public:
   HRESULT GetPluginManager (
     IAAFPluginManager ** ppPluginManager);
   
-  HRESULT CreateRawStorageMemory (
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage);
   
-  HRESULT CreateRawStorageDisk (
-    aafCharacter_constptr  pFilename,
-    aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	IAAFRawStorage ** ppNewRawStorage);
-
-  HRESULT CreateAAFFileOnRawStorage (
-    IAAFRawStorage * pRawStorage,
-	aafFileExistence_t  existence,
-	aafFileAccess_t  access,
-	aafUID_constptr  pFileKind,
-	aafUInt32  modeFlags,
-	aafProductIdentification_constptr  pIdent,
-	IAAFFile ** ppNewFile);
-
 protected:
   //
   // The single instance of the dll wrapper.
   //
   static AAFDLL *_singleton;
 
-	//
-	// Platform independent (opaque) handle to the loaded dynamic library.
-	//
-	AAFLibraryHandle _libHandle;
-
   //
   // Callback function member data loaded by overridden versions
   // of the Load() method:
   //
-  LPFNAAFFILEOPENEXISTINGREAD      _pfnOpenExistingRead;
-  LPFNAAFFILEOPENEXISTINGMODIFY    _pfnOpenExistingModify;
-  LPFNAAFFILEOPENNEWMODIFY         _pfnOpenNewModify;
-  LPFNAAFFILEOPENTRANSIENT         _pfnOpenTransient;
-  LPFNAAFGETPLUGINMANAGER          _pfnGetPluginManager;
-  LPFNAAFCREATERAWSTORAGEMEMORY    _pfnCreateRawStorageMemory;
-  LPFNAAFCREATERAWSTORAGEDISK      _pfnCreateRawStorageDisk;
-  LPFNAAFCREATEAAFFILEONRAWSTORAGE _pfnCreateAAFFileOnRawStorage;
+  LPFNAAFFILEOPENEXISTINGREAD   _pfnOpenExistingRead;
+  LPFNAAFFILEOPENEXISTINGMODIFY _pfnOpenExistingModify;
+  LPFNAAFFILEOPENNEWMODIFY      _pfnOpenNewModify;
+  LPFNAAFFILEOPENTRANSIENT      _pfnOpenTransient;
+  LPFNAAFGETPLUGINMANAGER       _pfnGetPluginManager;
 };
 
 
@@ -251,40 +199,30 @@ protected:
 extern "C"{
 #endif 
 
+//
+// Global factory function that create an instance of the appropriate platform
+// specific subclass of AAFDLL.
+//
+AAFDLL * MakeAAFDLL();
+
+//
+// TBD: Decide where to declare these functions (AAF.h or AAFLIB.h ???)
+//
+STDAPI AAFLoad(const char * dllname);
+STDAPI AAFUnload();
 
 
-
+#ifdef _DEBUG
 //
 // Assertion code copied from OM...
 //
-
-#ifdef _DEBUG
-
 void reportAssertionFailure(char* kind,
                             char* name,
                             char* expressionString,
                             char* routine,
                             char* fileName,
                             size_t lineNumber);
-
-
-#define ASSERT(name, expression) \
-  (expression) \
-    ? (void)0  \
-    : reportAssertionFailure("Assertion",    name, #expression, \
-                             currentRoutineName, __FILE__, __LINE__)
-
-#define TRACE(routine) char* currentRoutineName = routine;
-
-#else
-
-#define ASSERT(name, expression)
-
-#define TRACE(routine)
-
 #endif /* _DEBUG */
-
-
 
 #ifdef __cplusplus
 }
@@ -294,4 +232,3 @@ void reportAssertionFailure(char* kind,
 
 
 #endif /* __aaflib_h__ */
-
