@@ -6,7 +6,6 @@ AAFControlPoint\
 AAFObject\
 #endm
 #c
-#import ./AAFUnitTest.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -17,54 +16,57 @@ AD_HEAD
 *                                          *
 \******************************************/
 
+AD_FORWARD_DECLARATION(AAFDataDefinition)
+
+AD_CLASS_UUID(86192db2, 2a23, 11D2, BF, a3, 00, 60, 97, 11, 62, 12)
+
+AD_DEFAULT_UUID(86192db1, 2a23, 11D2, BF, a3, 00, 60, 97, 11, 62, 12)
 AD_CLASS_BEGIN
 
 AD_METHOD1(GetTime,
-		   [retval][out],
-		   aafRational_t *,
-		   pTime,
-		   Pointer to an aafRational_t,
-		   Returns the Time of control point.)
+			[out\\\,retval],
+			aafRational_t *,
+			pTime,
+			Pointer to an aafRational_t,
+			Returns the Time of control point.)
 
 AD_METHOD1(GetEditHint,
-		   [retval][out],
-		   aafEditHint_t *,
-		   pEditHint,
-		   Pointer to an aafEditHint_t,
-		   Returns the edit hint of control point.)
+			[out\\\,retval],
+			aafEditHint_t *,
+			pEditHint,
+			Pointer to an aafEditHint_t,
+			Returns the edit hint of control point.)
 
-AD_METHOD1(GetDatakind,
-		   [retval][out],
-		   AAFDataDefinition *,
-		   pDatadef,
-		   Pointer to a Data Definition object,
-		   Returns the Data Definition object of the control point.)
+AD_XMETHOD1(GetDatakind,
+			[out\,retval],
+			objOut,
+			AAFDataDefinition,
+			pDatadef,
+			Pointer to a Data Definition object,
+			Returns the Data Definition object of the control point.)
 
 AD_METHOD3(GetValue,
 		   [in],aafInt32, valueSize, value size,
-		   [retval][out], aafInt32 *,pBytesRead, Pointer to actual bytes read, 
-		   [retval][out],void *, pValue, Preallocated buffer to hold value,
+		   [out\\\, size_is\\\(valueSize\\\)\\\,length_is\\\(*pBytesRead\\\)], char *, pValue, Preallocated buffer to hold value,
+		   [out\\\,ref], aafInt32 *,pBytesRead, Pointer to actual bytes read, 
 		   Returns the data value of the control point.)
 
 AD_METHOD1(SetTime,
-		   [in],  aafRational_t, Time,Control Point time,
+		   [in], aafRational_t, Time,Control Point time,
 		   Sets the control point time value.)
 
 AD_METHOD1(SetEditHint,
-		   [in],  aafEditHint_t, editHint,Control Point Edit hint,
+		   [in], aafEditHint_t, editHint,Control Point Edit hint,
 		   Sets the control point Edit hint value.)
 
-AD_METHOD1(SetDataDefinition,
-		   [in],  AAFDataDefinition *, datadef,Control Point data definition,
-		   Sets the control point datakind value.)
+AD_XMETHOD1(SetDataDefinition,
+			[in], objIn, AAFDataDefinition, datadef,Control Point data definition,
+			Sets the control point datakind value.)
 
 AD_METHOD2(SetValue,
 		   [in],aafInt32, valueSize, value size,
-		   [in],void *, pValue, Preallocated buffer to hold value,
+		   [in\\\, size_is\\\(valueSize\\\)], char *, pValue, Preallocated buffer to hold value,
 		   Sets the control point data value.)
-
-AD_OVERRIDE(.method-Test)
-
 
 AD_CLASS_END
 
