@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.53 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.54 2004/09/24 12:32:49 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -900,7 +900,8 @@ void wcsconvertURLtoFilepath(wchar_t *url, wchar_t *filepath)
 {
 	// Convert to char* for ease of processing.
 	// (wcsncasecmp and similiar are not available everywhere)
-	unsigned tlen = wcslen(url);
+	//unsigned tlen = wcslen(url);
+	unsigned tlen =wcsu8slen(url);
 	char *tmp = new char[tlen+1];		// +1 includes terminating '\0'
 	wcstou8s(tmp, url, tlen+1);
 
