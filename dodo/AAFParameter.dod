@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFParameter\
 #endm
@@ -16,7 +9,7 @@ AAFObject\
 AD_HEAD
 AD_IDL(//
 // The IAAFParameter interface is implemented by objects that specify an
-// Instantiation of an operation parameter.  It is an abstract class\, so you should use
+// Instantiation of an effect parameter.  It is an abstract class\, so you should use
 // AAFConstantValue or AAFVaryingValue.
 //
 // In addition to the specific error results listed for each method\,
@@ -33,8 +26,15 @@ AD_IDL(//
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
+
+
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
 
 AD_INCLUDE(AAFTypes)
 AD_FORWARD_DECLARATION(AAFParameterDef)
@@ -52,8 +52,8 @@ AD_XMETHOD1(SetParameterDefinition,
 		   pParmDef,
 		   New parameter definition,
 			Sets the parameter definition property value on the input component object.
-  // The length of an operation parameter is in the same edit units and has the
-  // same value as the IAAFOperationGroup enclosing this parameter.
+  // The length of an effect parameter is in the same edit units and has the
+  // same value as the IAAFGroup enclosing this parameter.
   // 
   // If this method fails no state will be changed.
   // 
@@ -71,9 +71,9 @@ AD_XMETHOD1(GetParameterDefinition,
 		   AAFParameterDef,
 		   ppParmDef,
 		   New parameter definition,
-			Places the parameter definition of the operation parameter into the
-  // *ppParmDef argument.  The length of an operation parameter is in the same
-  // edit units and has the same value as the IAAFOperationGroup enclosing this parameter.
+			Places the parameter definition of the effect parameter into the
+  // *ppParmDef argument.  The length of an effect parameter is in the same
+  // edit units and has the same value as the IAAFGroup enclosing this parameter.
   //
   // Succeeds if all of the following are true:
   // - the ppParmDef pointer is valid.
@@ -97,13 +97,8 @@ AD_XMETHOD1(SetTypeDefinition,
 			objIn,
 			AAFTypeDef,
 			pTypeDef,
-			Type Definition of the data value inside of this object,
-			Sets the IAAFTypeDefinition of the data value inside this parameter to be the given one.
-  // The data value is the value of the parameter.  It is often an integer
-  // or rational\, and may change over time.  An example of a value would be the \"level\" parameter
-  // of a video dissolve\, which has control points with a value of zero \(0 percent B material\) at the
-  // start\, to one \(100 percent B material\) at the end.  The data value will actually be stored
-  // in either AAFConstantValue or one of the AAFControlPoints inside of an AAFVaryingValue.
+			Type Definition of the dataval inside of this object,
+			Sets the IAAFTypeDefinition of the dataval inside this parameter to be the given one.
   //
   // Succeeds if all of the following are true:
   // - the pTypeDef pointer is valid.
@@ -126,16 +121,9 @@ AD_XMETHOD1(GetTypeDefinition,
 			objOut,
 			AAFTypeDef,
 			ppTypeDef,
-			Type Definition of the data value inside of this object,
-			Places the IAAFTypeDefinition of the data value inside this parameter into the
-  // *ppTypeDef argument.  The data value is the value of the parameter.  It is often an integer
-  // or rational\, and may change over time.  An example of a value would be the \"level\" parameter
-  // of a video dissolve\, which has control points with a value of zero \(0 percent B material\) at the
-  // start\, to one \(100 percent B material\) at the end.  The data value will actually be stored
-  // in either AAFConstantValue or one of the AAFControlPoints inside of an AAFVaryingValue.
-  //
-  // The definition is stored in the base class because it should be constant
-  // for all control points inside of a varying value.
+			Type Definition of the dataval inside of this object,
+			Places the IAAFTypeDefinition of the dataval inside this parameter into the
+  // *ppTypeDef argument.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
