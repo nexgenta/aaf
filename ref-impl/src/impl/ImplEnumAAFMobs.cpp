@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplEnumAAFMobs.cpp,v 1.33 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplEnumAAFMobs.cpp,v 1.33.2.1 2004/06/16 19:00:54 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -153,6 +153,16 @@ AAFRESULT STDMETHODCALLTYPE
 		    }
 		  }
 
+		  pCandidate->ReleaseReference();
+		  pCandidate = NULL;
+		  break;
+
+		case kAAFByUsageCode:
+		  
+		  if ( pCandidate->IsUsageCodeEqual( &_criteria.tags.usageCode ) ) {
+		    *ppMob = pCandidate;
+		    return AAFRESULT_SUCCESS;
+		  }
 		  pCandidate->ReleaseReference();
 		  pCandidate = NULL;
 		  break;

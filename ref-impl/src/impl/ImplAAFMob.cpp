@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.6 2004/04/30 12:05:51 bakerian Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.7 2004/06/16 19:00:52 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2343,6 +2343,23 @@ HRESULT ImplAAFMob::IsClassIDEqual( const aafClassID_t* classId, bool& result ) 
   }
 
   return AAFRESULT_SUCCESS;
+}
+
+bool ImplAAFMob::IsUsageCodeEqual( const aafUID_t* usageCode ) const
+{
+  if ( !_usageCode.isPresent() ) {
+    return false;
+  }
+
+  aafUID_t thisUsageCode = _usageCode;
+
+  if ( ::memcmp( usageCode, &thisUsageCode, sizeof(aafUID_t) ) == 0 ) {
+    return true;
+  }
+  else {
+    return false;
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
