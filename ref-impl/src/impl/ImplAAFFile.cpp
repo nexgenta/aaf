@@ -1,3 +1,4 @@
+
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -7,53 +8,38 @@
 *                                          *
 \******************************************/
 
+
+
+#include "Container.h"
+
+
+#ifndef __ImplAAFFile_h__
 #include "ImplAAFFile.h"
+#endif
 
-#include "OMFile.h"
-#include "OMUtilities.h"
-#include "ImplAAFDictionary.h"
-
+#include "AAFTypes.h"
 #include "ImplAAFSession.h"
 #include "ImplAAFHeader.h"
 #include "ImplAAFDataDef.h"
-
+#include "AAFUtils.h"
+#include "aafErr.h"
+//#include "aafDefs.h"
 #include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 
-// local function for simplifying error handling.
-inline void checkResult(AAFRESULT r)
-{
-  if (AAFRESULT_SUCCESS != r)
-    throw r;
-}
-
-inline void checkExpression(bool test, AAFRESULT r)
-{
-  if (!test)
-    throw r;
-}
-
-
 extern "C" const aafClassID_t CLSID_AAFHeader;
-extern "C" const aafClassID_t CLSID_AAFDictionary;
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::Initialize ()
 {
-	if (_initialized)
+  if (_initialized)
 	{
-		return AAFRESULT_ALREADY_INITIALIZED;
+	  return AAFRESULT_ALREADY_INITIALIZED;
 	}
+  _initialized = AAFTrue;
 
-	// Create the class factory for base classes.
-	_dictionary = static_cast<ImplAAFDictionary *>(CreateImpl(CLSID_AAFDictionary));
-	if (NULL == _dictionary)
-		return AAFRESULT_NOMEMORY;
-
-	_initialized = AAFTrue;
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -61,72 +47,39 @@ AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::OpenExistingRead (wchar_t * pFileName,
 							   aafUInt32 modeFlags)
 {
-	ImplAAFSession * pS;
-	AAFRESULT stat = AAFRESULT_SUCCESS;
+  ImplAAFSession * pS;
+  AAFRESULT stat = AAFRESULT_INTERNAL_ERROR;
 
-	// Validate parameters and preconditions.
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
-
-	if (_open)
-		return AAFRESULT_ALREADY_OPEN;
-
-	if (_file)
-		return AAFRESULT_ALREADY_OPEN;
-
-	if (! pFileName)
-		return AAFRESULT_NULL_PARAM;
-
-	if (modeFlags)
-		return AAFRESULT_BAD_FLAGS;
-	
-
-	pS = ImplAAFSession::GetInstance();
-	assert (pS);
-
-	// Save the mode flags for now. They are not currently (2/4/1999) used by the
-	// OM to open the doc file. Why do we return an error if modeFlags != 0?
-	_modeFlags = modeFlags;
-
-	try
+  if (! _initialized)
 	{
-		// Ask the OM to open the file.
-		_file = OMFile::openExistingRead(pFileName, _dictionary);
-		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
-
-		// Get the byte order
-		_byteOrder = _file->byteOrder();
-
-		// Restore the header.
-		OMStorable* head = _file->restore();
-		_head = dynamic_cast<ImplAAFHeader *>(head);
-		checkExpression(NULL != _head, AAFRESULT_BADHEAD);
-		
-		// Initialize the mob lookup tables.
-		checkResult(_head->LoadMobTables());
-		
-		_open = AAFTrue;
-		_openType = kOmOpenRead;
+	  return AAFRESULT_NOT_INITIALIZED;
 	}
-	catch (AAFRESULT &r)
+
+  if (_open)
 	{
-		stat = r;
-
-		// Cleanup after failure.
-		if (_file)
-		{
-			_file->close();
-			_file = 0;
-		}
-
-		if (NULL == _head)
-		{
-			_head->ReleaseReference();
-			_head = 0;
-		}
+	  return AAFRESULT_ALREADY_OPEN;
 	}
-	
-	return stat;
+
+  if (! pFileName)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (modeFlags)
+	{
+	  return AAFRESULT_BAD_FLAGS;
+	}
+
+  pS = ImplAAFSession::GetInstance();
+  assert (pS);
+
+  stat = OpenRead (pFileName, pS);
+  if (AAFRESULT_FAILED(stat))
+	{
+	  return stat;
+	}
+  _open = AAFTrue;
+  return stat;
 }
 
 
@@ -136,91 +89,45 @@ ImplAAFFile::OpenExistingModify (wchar_t * pFileName,
 								 aafUInt32 modeFlags,
 								 aafProductIdentification_t * pIdent)
 {
-	ImplAAFSession * pS;
-	AAFRESULT stat = AAFRESULT_SUCCESS;
+  ImplAAFSession * pS;
+  AAFRESULT stat = AAFRESULT_INTERNAL_ERROR;
 
-
-	// Validate parameters and preconditions.
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
-
-	if (_open)
-		return AAFRESULT_ALREADY_OPEN;
-
-	if (! pFileName)
-		return AAFRESULT_NULL_PARAM;
-
-	if (! pIdent)
-		return AAFRESULT_NULL_PARAM;
-
-	if (modeFlags)
-		return AAFRESULT_BAD_FLAGS;
-
-	memcpy (&_ident, pIdent, sizeof (_ident));
-
-	pS = ImplAAFSession::GetInstance();
-	assert (pS);
-
-	
-	// Save the mode flags for now. They are not currently (2/4/1999) used by the
-	// OM to open the doc file. Why do we return an error if modeFlags != 0?
-	_modeFlags = modeFlags;
-
-	try 
+  if (! _initialized)
 	{
-		// Ask the OM to open the file.
-		_file = OMFile::openExistingModify(pFileName, _dictionary);
-		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
-
-		// Get the byte order
-		_byteOrder = _file->byteOrder();
-
-		// Restore the header.
-		OMStorable* head = _file->restore();
-		_head = dynamic_cast<ImplAAFHeader *>(head);
-		checkExpression(NULL != _head, AAFRESULT_BADHEAD);
-		
-		// Initialize the mob lookup tables.
-		checkResult(_head->LoadMobTables());
-
-		checkResult(_head->SetToolkitRevisionCurrent());
-	  
-		// NOTE: If modifying an existing file WITHOUT an IDNT object, add a
-		// dummy IDNT object to indicate that this program was not the creator.
-		//
-		aafInt32	numIdent = 0;
-		checkResult(_head->GetNumIdentifications(&numIdent));
-		if(numIdent == 0)
-		{
-			_head->AddIdentificationObject((aafProductIdentification_t *)NULL);
-		}
-		// Now, always add the information from THIS application */
-		_head->AddIdentificationObject(&_ident);
-		
-
-		_open = AAFTrue;
-		_openType = kOmModify;
-	}
-	catch (AAFRESULT &rc)
-	{
-		stat = rc;
-
-		// Cleanup after failure.
-		if (_file)
-		{
-			_file->close();
-			_file = 0;
-		}
-
-		if (NULL == _head)
-		{
-			_head->ReleaseReference();
-			_head = 0;
-		}
+	  return AAFRESULT_NOT_INITIALIZED;
 	}
 
+  if (_open)
+	{
+	  return AAFRESULT_ALREADY_OPEN;
+	}
 
+  if (! pFileName)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (! pIdent)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (modeFlags)
+	{
+	  return AAFRESULT_BAD_FLAGS;
+	}
+
+  memcpy (&_ident, pIdent, sizeof (_ident));
+
+  pS = ImplAAFSession::GetInstance();
+  assert (pS);
+
+  stat = OpenModify (pFileName, pS);
+  if (AAFRESULT_FAILED(stat))
 	return stat;
+
+  _open = AAFTrue;
+  return stat;
 }
 
 
@@ -229,209 +136,58 @@ ImplAAFFile::OpenNewModify (wchar_t * pFileName,
 							aafUInt32 modeFlags,
 							aafProductIdentification_t * pIdent)
 {
-	ImplAAFSession * pS;
-	ImplAAFContentStorage	*pCStore = NULL;
-	AAFRESULT stat = AAFRESULT_SUCCESS;
+  ImplAAFSession * pS;
+  AAFRESULT stat = AAFRESULT_INTERNAL_ERROR;
 
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
-
-	if (_open)
-		return AAFRESULT_ALREADY_OPEN;
-
-	if (! pFileName)
-		return AAFRESULT_NULL_PARAM;
-
-	if (! pIdent)
-		return AAFRESULT_NULL_PARAM;
-
-	if (modeFlags)
-		return AAFRESULT_BAD_FLAGS;
-
-
-	pS = ImplAAFSession::GetInstance();
-	assert (pS);
-
-	memcpy (&_ident, pIdent, sizeof (_ident));
-
-	try
+  if (! _initialized)
 	{
-		// Create the header for the OM manager to use as the root
-		// for the file.
-		_head = dynamic_cast<ImplAAFHeader*>(CreateImpl(CLSID_AAFHeader));
-		checkExpression(NULL != _head, AAFRESULT_BADHEAD);
-		
-		// Make sure the header is initialized with our previously created
-		// dictionary.
-		_head->SetDictionary(_dictionary);
-
-		// Add the ident to the header.
-		checkResult(_head->AddIdentificationObject(&_ident));
-		  
-		// Set the byte order
-		_byteOrder = hostByteOrder();
-		_head->SetByteOrder(_byteOrder);
-
-		//JeffB!!! We must decide whether def-only files have a content storage
-		checkResult(_head->GetContentStorage(&pCStore));
-		pCStore->ReleaseReference(); // need to release this pointer!
-
-		// Attempt to create the file.
-		_file = OMFile::openNewModify(pFileName, _dictionary, _byteOrder, _head);
-		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
-
-		_open = AAFTrue;
-		_openType = kOmCreate;
-		GetRevision(&_setrev);
-	}
-	catch (AAFRESULT &rc)
-	{
-		stat = rc;
-
-		// Cleanup after failure.
-		if (_file)
-		{
-			_file->close();
-			_file = 0;
-		}
-
-		if (NULL == _head)
-		{
-			_head->ReleaseReference();
-			_head = 0;
-		}
+	  return AAFRESULT_NOT_INITIALIZED;
 	}
 
+  if (_open)
+	{
+	  return AAFRESULT_ALREADY_OPEN;
+	}
+
+  if (! pFileName)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (modeFlags)
+	{
+	  return AAFRESULT_BAD_FLAGS;
+	}
+
+  memcpy (&_ident, pIdent, sizeof (_ident));
+
+  pS = ImplAAFSession::GetInstance();
+  assert (pS);
+
+  stat = Create (pFileName, pS, kAAFRev1);
+  if (AAFRESULT_FAILED(stat))
 	return stat;
+
+  _open = AAFTrue;
+  return stat;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFile::OpenTransient (aafProductIdentification_t * pIdent)
+ImplAAFFile::OpenTransient ()
 {
-	ImplAAFSession * pS;
-	ImplAAFContentStorage	*pCStore = NULL;
-	AAFRESULT stat = AAFRESULT_SUCCESS;
 
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
-
-	if (_open)
-		return AAFRESULT_ALREADY_OPEN;
-
-	if (! pIdent)
-		return AAFRESULT_NULL_PARAM;
-
-	pS = ImplAAFSession::GetInstance();
-	assert (pS);
-
-	memcpy (&_ident, pIdent, sizeof (_ident));
-
-	try
+  if (! _initialized)
 	{
-		// Create the header for the OM manager to use as the root
-		// for the file.
-		_head = dynamic_cast<ImplAAFHeader*>(CreateImpl(CLSID_AAFHeader));
-		checkExpression(NULL != _head, AAFRESULT_BADHEAD);
-		
-		// Make sure the header is initialized with our previously created
-		// dictionary.
-		_head->SetDictionary(_dictionary);
-
-		// Add the ident to the header.
-		checkResult(_head->AddIdentificationObject(&_ident));
-		  
-		// Set the byte order
-		_byteOrder = hostByteOrder();
-		_head->SetByteOrder(_byteOrder);
-
-		//JeffB!!! We must decide whether def-only files have a content storage
-		checkResult(_head->GetContentStorage(&pCStore));
-		pCStore->ReleaseReference(); // need to release this pointer!
-
-		// Attempt to create the file.
-		_file = OMFile::openNewTransient(_dictionary, _byteOrder, _head);
-		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
-
-		_open = AAFTrue;
-		_openType = kOmTransient;
-		GetRevision(&_setrev);
-	}
-	catch (AAFRESULT &rc)
-	{
-		stat = rc;
-
-		// Cleanup after failure.
-		if (_file)
-		{
-			_file->close();
-			_file = 0;
-		}
-
-		if (NULL == _head)
-		{
-			_head->ReleaseReference();
-			_head = 0;
-		}
+	  return AAFRESULT_NOT_INITIALIZED;
 	}
 
-	return stat;
-	pS = ImplAAFSession::GetInstance();
-	assert (pS);
-
-	memcpy (&_ident, pIdent, sizeof (_ident));
-
-	try
+  if (_open)
 	{
-		// Create the header for the OM manager to use as the root
-		// for the file.
-		_head = dynamic_cast<ImplAAFHeader*>(CreateImpl(CLSID_AAFHeader));
-		checkExpression(NULL != _head, AAFRESULT_BADHEAD);
-		
-		// Make sure the header is initialized with our previously created
-		// dictionary.
-		_head->SetDictionary(_dictionary);
-
-		// Add the ident to the header.
-		checkResult(_head->AddIdentificationObject(&_ident));
-		  
-		// Set the byte order
-		_byteOrder = hostByteOrder();
-		_head->SetByteOrder(_byteOrder);
-
-		 //JeffB!!! We must decide whether def-only files have a content storage
-		checkResult(_head->GetContentStorage(&pCStore));
-		pCStore->ReleaseReference(); // need to release this pointer!
-
-		// Attempt to create the file.
-		_file = OMFile::openNewTransient(_dictionary, _byteOrder, _head);
-		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
-
-		_open = AAFTrue;
-		_openType = kOmTransient;
-		GetRevision(&_setrev);
-
-
-	}
-	catch (AAFRESULT &rc)
-	{
-		stat = rc;
-
-		// Cleanup after failure.
-		if (_file)
-		{
-			_file->close();
-			_file = 0;
-		}
-
-		if (NULL == _head)
-		{
-			_head->ReleaseReference();
-			_head = 0;
-		}
+	  return AAFRESULT_ALREADY_OPEN;
 	}
 
-	return stat;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -439,124 +195,93 @@ ImplAAFFile::OpenTransient (aafProductIdentification_t * pIdent)
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::Save ()
 {
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
-
-
-	if (!_open)
-		return AAFRESULT_NOT_OPEN;
-
-	// If any new modes are added then the following line will
-	// have to be updated.
-	if (kOmCreate == _openType || kOmModify == _openType) {
-	  _file->save();
-	} else {
-	  return AAFRESULT_WRONG_OPENMODE;
+  if (! _initialized)
+	{
+	  return AAFRESULT_NOT_INITIALIZED;
 	}
 
+  if (!_open)
+	{
+	  return AAFRESULT_NOT_OPEN;
+	}
 
-	// Record the fact that this file was modified
-	_head->SetModified();
-
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFFile::SaveAs (wchar_t * pFileName,
-					 aafUInt32 modeFlags)
-{
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
-
-	if (!_open)
-		return AAFRESULT_NOT_OPEN;
-
-	if (modeFlags)
-		return AAFRESULT_BAD_FLAGS;
-
-	assert(_file);
-	_file->saveAs(pFileName);
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::Revert ()
 {
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
+  if (! _initialized)
+	{
+	  return AAFRESULT_NOT_INITIALIZED;
+	}
 
+  if (!_open)
+	{
+	  return AAFRESULT_NOT_OPEN;
+	}
 
-	if (!_open)
-		return AAFRESULT_NOT_OPEN;
-
-        assert(_file);
-        _file->revert();
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 ImplAAFFile::ImplAAFFile () :
-		_cookie(0),
-		_file(0),
-		_dictionary(NULL),
-		_byteOrder(0),
-		_openType(kOmUndefined),
-		_head(NULL),
-		_semanticCheckEnable(AAFFalse),
-		_nilKind(0),
-		_pictureKind(0),
-		_soundKind(0),
-		_initialized(AAFFalse),
-		_open(AAFFalse),
-		_modeFlags(0)
+  _cookie(0),
+  _fmt(kAAFiMedia),
+  _container(0),
+  _byteOrder(0),
+  _openType(kOmUndefined),
+  _prevFile(0),
+  _head(0),
+  _semanticCheckEnable(AAFFalse),
+  _session(0),
+  _nilKind(0),
+  _pictureKind(0),
+  _soundKind(0),
+  _initialized(AAFFalse),
+  _open(AAFFalse)
 {
-	memset (&_ident, 0, sizeof (_ident));
+  memset (&_ident, 0, sizeof (_ident));
 }
 
 
 ImplAAFFile::~ImplAAFFile ()
 {
-	InternalReleaseObjects();
+  InternalReleaseObjects();
 
-	// cleanup the container.
-	if (_dictionary)
+  // cleanup the container.
+  delete _container;
+  _container = 0;
+
+#if MAYNEEDTHIS
+  if (0 != _session)
 	{
-		_dictionary->ReleaseReference();
-		_dictionary = NULL;
+	  _session->ReleaseReference();
+	  _session = 0;
 	}
-
-	// cleanup the OM File.
-	if (_file)
-	{
-		delete _file;
-		_file = NULL;
-	}
-
+#endif //MAYNEEDTHIS
 }
 
 void ImplAAFFile::InternalReleaseObjects()
 {
-	if (0 != _soundKind)
+  if (0 != _soundKind)
 	{
-		_soundKind->ReleaseReference();
-		_soundKind = 0;
+	  _soundKind->ReleaseReference();
+	  _soundKind = 0;
 	}
 
-	if (0 != _pictureKind)
+  if (0 != _pictureKind)
 	{
-		_pictureKind->ReleaseReference();
-		_pictureKind = 0;
+	  _pictureKind->ReleaseReference();
+	  _pictureKind = 0;
 	}
 
-	if (0 != _nilKind)
+  if (0 != _nilKind)
 	{
-		_nilKind->ReleaseReference();
-		_nilKind = 0;
-	}
+	  _nilKind->ReleaseReference();
+	  _nilKind = 0;
+  }
 }
 
 
@@ -567,52 +292,130 @@ void ImplAAFFile::InternalReleaseObjects()
 // @mfunc AAFRESULT | AAFFile | Close |
 // Closes an AAF file, saving the result.
 // @end
-//
-// TODO: the FULL_TOOLKIT code closes all associated media files
-// and removes this file node from the session's file list.
-//
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::Close ()
 {
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
-
-	if (!_open)
-		return AAFRESULT_NOT_OPEN;
-
-
-	// Release all of the pointers that we created or copied
-	// during the create or open methods.
-	InternalReleaseObjects();
-
-
-	// Close the OM file.
-	_file->close();
-
-
-	// Whenever a file is created or opened a new container is
-	// created.  If we don't want to leak the container object
-	// and any objects in the associated OMFile object we had
-	// better delete the container object here.
-	delete _file;
-	_file = 0;
-  
-	// Release the last reference to the header of the file. 
-	// We need to release the header after the file is closed so
-	// that the OMFile object within the container can safely
-	// use its reference to its root (a.k.a. header).
-	if (0 != _head)
+  if (! _initialized)
 	{
-		_head->ReleaseReference();
-		_head = 0;
+	  return AAFRESULT_NOT_INITIALIZED;
 	}
 
-	_cookie = 0;
-	_open = AAFFalse;
-	_openType = kOmUndefined;
+  if (!_open)
+	{
+	  return AAFRESULT_NOT_OPEN;
+	}
 
+#if FULL_TOOLKIT
+  AAFFile *tstFile;
+  clearBentoErrors();
+  aafAssert((_topMedia == NULL) || (_closeMediaProc != NULL), 
+			this,
+			OM_ERR_MEDIA_CANNOT_CLOSE);
+#endif
+  
+#if FULL_TOOLKIT
+  XPROTECT()
+	{
+#endif
+#if FULL_TOOLKIT
+	  if (_closeMediaProc != NULL)
+		{
+		  while (_topMedia != NULL)
+			CHECK((*_closeMediaProc) (_topMedia));
+		}
+		
+	  if (this == _session->_topFile)
+		_session->_topFile = _prevFile;
+	  else
+		{
+		  tstFile = _session->_topFile;
+		  while (tstFile && tstFile->_prevFile != NULL)
+			{
+			  if (tstFile->_prevFile == this)
+				{
+				  tstFile->_prevFile = _prevFile;
+				  break;
+				}
+			  else
+				tstFile = tstFile->_prevFile;
+			}
+		}
+#endif
 
-	return(AAFRESULT_SUCCESS);
+	  if (_fmt == kAAFiMedia)
+		{
+		  switch(_openType)
+			{
+			case kOmCreate:
+			case kOmModify:
+			  break;
+			
+			default:
+			  break;
+			}
+		}
+	  else
+		{
+#if FULL_TOOLKIT
+		  if(_rawFileDesc != NULL)
+			AAFFree(_rawFileDesc);
+#endif
+		}
+
+#ifdef AAF_ERROR_TRACE
+	  if(_stackTrace != NULL)
+		{
+		  AAFFree(_stackTrace);
+		}
+	  _stackTraceSize = 0;
+	  _stackTrace = NULL;
+#endif
+	  if (_fmt == kAAFiMedia)
+		{
+		  // Release all of the pointers that we created or copied
+		  // during the create or open methods.
+		  InternalReleaseObjects();
+
+#if FULL_TOOLKIT
+		  if (_BentoErrorNumber)
+			_container->OMLAbortContainer();
+		  else
+			{
+#endif
+			  _container->OMLCloseContainer();
+#if FULL_TOOLKIT
+			}
+#endif
+  
+		  // Whenever a file is created or opened a new container is
+		  // created.  If we don't want to leak the container object
+		  // and any objects in the associated OMFile object we had
+		  // better delete the container object here.
+		  delete _container;
+		  _container = 0;
+      
+		  // Release the last reference to the header of the file. 
+		  // We need to release the header after the file is closed so
+		  // that the OMFile object within the container can safely
+		  // use its reference to its root (a.k.a. header).
+		  if (0 != _head)
+			{
+			  _head->ReleaseReference();
+			  _head = 0;
+			}
+		}
+	  _cookie = 0;
+#if FULL_TOOLKIT
+	}
+  XEXCEPT
+	{
+	}
+  XEND
+#endif
+
+///	  omOptFree(NULL, file);
+
+  return(AAFRESULT_SUCCESS);
 }
 
 
@@ -647,3 +450,268 @@ ImplAAFFile::GetHeader (ImplAAFHeader ** header)
 
   return(AAFRESULT_SUCCESS);
 }
+
+
+/************************
+ * Function: InternOpenFile	(INTERNAL)
+ *
+ * 	Open a file, given a container use mode and type.   This
+ *		is the function which takes care of most of the operations
+ *		involved in opening the file.   The wrapper routines 
+ *		omfsOpenFile() and omfsModifyFile() should be called instead
+ *		by client applications.
+ *
+ * Argument Notes:
+ *		<none>.
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ *		OM_ERR_BAD_SESSION - Session handle is invalid.
+ *		OM_ERR_BADHEAD - Head object is invalid or missing.
+ *		OM_ERR_NOTAAFFILE - The file is not an AAF file.
+ *		OM_ERR_BADOPEN - The file is an AAF file, but fails to open.
+ */
+AAFRESULT ImplAAFFile::InternOpenFile(aafWChar* stream, 
+									  ImplAAFSession * session,
+									  OMLContainerUseMode useMode, 
+									  openType_t type)
+{
+  OMLRefCon        	myRefCon = NULL;
+  aafErr_t			finalStatus = OM_ERR_NONE;
+
+  if (session == NULL)
+	return(OM_ERR_BAD_SESSION);	
+
+  XPROTECT()
+	{
+	  _openType = type;
+
+	  if (stream == NULL) 
+		RAISE(OM_ERR_NULL_PARAM);
+	  
+	  /*
+	   * Open the container
+	   */
+	  assert(NULL == _container);
+	  _container = new OMContainer;
+	  _container->OMLOpenContainer(stream,
+								   session->GetContainerSession(),
+								   myRefCon, "AAF", 
+								   useMode,
+								   _head);
+	  if (_container == NULL)
+		{
+		  // Handle error returns from open HERE!!!
+		}
+	  
+	  CHECK(_head->LoadMobTables());
+	  /* We now use datakinds in the whole API, not just 2.x
+	   */
+#if FULL_TOOLKIT
+	  _session->HandleOpenCallback(this);
+#endif
+	}
+  XEXCEPT
+	{
+	  finalStatus = XCODE();
+	  NO_PROPAGATE(); /* Rely on finalStatus variable, as file will be NULL */
+
+	  /* Reset to previous state before returning with error */
+	  if (session && this)
+		{
+
+#ifdef AAF_ERROR_TRACE
+		  if(_stackTrace != NULL)
+			{
+			  AAFFree(_stackTrace);
+			}
+		  _stackTraceSize = 0;
+		  _stackTrace = NULL;
+#endif
+		  if(_container != NULL)
+			{
+			  _container->OMLAbortContainer();
+			}
+		  else if(myRefCon != NULL)
+			OMLFree((OMContainer *)NULL, myRefCon, session->GetContainerSession());
+
+		  /* Set to previous file or NULL */
+		  session->SetTopFile(_prevFile);
+		  _cookie = 0;
+		}
+	}
+  XEND;
+
+  return (finalStatus);
+}
+
+
+/************************
+ * Function: Create
+ *
+ * 	Create an AAF file referencing the given session, of the
+ *		given revision.
+ *
+ * Argument Notes:
+ *		Stream -- Must be of a type which matches the Bento file handler.
+ *		ie:	a SFReply record pointer for omfmacsf.c
+ *				or a path string for aafansic.c
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ */
+AAFRESULT ImplAAFFile::Create(
+							  aafWChar*		stream, 
+							  ImplAAFSession		*session, 
+							  aafFileRev_t		rev)
+{
+  OMLRefCon        myRefCon;
+
+  XPROTECT()
+	{
+	  if (stream == NULL) 
+		RAISE(OM_ERR_NULL_PARAM);
+
+	  if (session == NULL)
+		RAISE(OM_ERR_BAD_SESSION);	
+
+	  _setrev = rev;
+	  _openType = kOmCreate;
+
+	  _head = dynamic_cast<ImplAAFHeader*>(CreateImpl(CLSID_AAFHeader));
+	  if (_head == NULL)
+		RAISE(OM_ERR_BADHEAD);
+
+	  _head->AddIdentificationObject(&_ident);
+	  
+	  assert(NULL == _container);
+	  _container = new OMContainer;
+	  _container->OMLOpenNewContainer(stream,
+									  _head,
+									  session->GetContainerSession(),
+									  myRefCon,
+									  "AAF",
+									  (OMLContainerUseMode) kOMLWriting,
+									  1,
+									  0,
+									  0);
+	  if(_container == NULL)
+		RAISE(OM_ERR_BADOPEN);
+	  
+	}
+  XEXCEPT
+	{
+	  /* Reset to previous state before returning with error */
+	  if (session && this)
+		{
+		  /* Added by MT: you need to save the pointer before deleting
+		   * the  object
+		   */
+		  ImplAAFFile *pSavedAddr = _prevFile;
+
+		  //!!!			if (session->GetTopFile())
+		  //				delete(session->GetTopFile());
+		  
+		  /* Set to previous this or NULL */
+		  session->SetTopFile(pSavedAddr);
+		}
+	}
+  XEND;
+  
+  return (OM_ERR_NONE);
+}
+
+	OMLRefCon        myRefCon = NULL;
+
+/************************
+ * Function: OpenRead
+ *
+ * 	Opens an AAF file read-only.
+ *
+ * Argument Notes:
+ *		Stream -- Must be of a type which matches the Bento file handler.
+ *		ie:	a SFReply record pointer for omfmacsf.c
+ *				or a path string for aafansic.c
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ *		OM_ERR_BAD_SESSION - Session handle is invalid.
+ *		OM_ERR_BADHEAD - Head object is invalid or missing.
+ *		OM_ERR_NOTAAFFILE - The file is not an AAF file.
+ *		OM_ERR_BADOPEN - The file is an AAF file, but fails to open.
+ */
+AAFRESULT ImplAAFFile::OpenRead(
+								aafWChar*		stream, 
+								ImplAAFSession *	session)
+{
+  return (InternOpenFile(stream,
+						 session,
+						 (OMLContainerUseMode) 0, 
+						 kOmOpenRead));
+}
+
+
+/************************
+ * Function: omfsModifyFile
+ *
+ * 	Opens an AAF file for update (read-write).
+ *
+ * Argument Notes:
+ *		Stream -- Must be of a type which matches the Bento file handler.
+ *		ie:	a SFReply record pointer for omfmacsf.c
+ *				or a path string for aafansic.c
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ *		OM_ERR_BAD_SESSION - Session handle is invalid.
+ *		OM_ERR_BADHEAD - Head object is invalid or missing.
+ *		OM_ERR_NOTAAFFILE - The file is not an AAF file.
+ *		OM_ERR_BADOPEN - The file is an AAF file, but fails to open.
+ */
+AAFRESULT ImplAAFFile::OpenModify(aafWChar*		stream, 
+								  ImplAAFSession *	session)
+{
+  aafInt32	numIdent;
+  
+  XPROTECT()
+	{
+	  CHECK(InternOpenFile(stream, session,
+						   (OMLContainerUseMode) kOMLReuseFreeSpace, kOmModify));
+	  CHECK(_head->SetToolkitRevisionCurrent());
+	  
+	  /* NOTE: If modifying an existing file WITHOUT an IDNT object, add a
+	   * dummy IDNT object to indicate that this program was not the creator.
+	   */
+	  CHECK(_head->GetNumIdentifications(&numIdent));
+	  if(numIdent == 0)
+		{
+		  _head->AddIdentificationObject((aafProductIdentification_t *)NULL);
+		}
+	  /* Now, always add the information from THIS application */
+	  _head->AddIdentificationObject(&_ident);
+	}
+  XEXCEPT
+	{
+	}
+  XEND;
+  
+  return (OM_ERR_NONE);
+}
+
+#if 0
+extern "C" const aafClassID_t CLSID_AAFFile;
+
+OMDEFINE_STORABLE(ImplAAFFile, CLSID_AAFFile);
+#endif
