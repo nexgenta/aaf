@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -32,6 +32,7 @@
 
 
 class ImplAAFBuiltinClasses;
+class ImplAAFBuiltinDefs;
 class ImplAAFBuiltinTypes;
 class ImplAAFClassDef;
 class ImplAAFCodecDef;
@@ -84,8 +85,10 @@ protected:
   virtual ~ImplAAFDictionary ();
 
 public:
-  // Create an instance of the appropriate derived class, given the class id.
-  //  This method implements the OMClassFactory interface.
+  // Create an instance of the appropriate derived class, given the
+  // class id.  Initializes the OM properties.
+  // 
+  // This method implements the OMClassFactory interface.
   //
   OMStorable* create(const OMClassId& classId) const;
 
@@ -97,10 +100,8 @@ public:
   // with a specified stored object id.
   virtual AAFRESULT STDMETHODCALLTYPE 
   CreateInstance (
-    // Class identifier (AUID) of the stored object. This is the
-    // corresponding SMPTE identifier (as a GUID) for all predefined
-    // built-in classes.
-    aafUID_t * pAUID,
+    // ID of the stored object to be created.
+    aafUID_constref classId,
 
     // Address of output variable that receives the 
     // object pointer requested in pAUID
@@ -108,231 +109,323 @@ public:
 
 
   //****************
-  // LookupClass()
+  // LookupClassDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupClass
+    LookupClassDef
         (// @parm [in,ref] Class Unique ID
-         const aafUID_t *  pClassID,
+         const aafUID_t & classId,
 
          // @parm [out,retval] Class Definition
          ImplAAFClassDef ** ppClassDef);
 
 
   //****************
-  // RegisterClass()
+  // RegisterClassDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterClass
+    RegisterClassDef
         (// @parm [in] Class Definition
          ImplAAFClassDef * pClassDef);
 
 
   //****************
-  // GetClassDefinitions()
+  // GetClassDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetClassDefinitions
+    GetClassDefs
         // @parm [out,retval] Class Definition Enumeration
         (ImplEnumAAFClassDefs ** ppEnum);
 
 
   //****************
-  // RegisterType()
+  // CountClassDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterType
+    CountClassDefs
+        // @parm [out, retval] Total number of class definition objects
+        (aafUInt32 * pResult);
+
+  //****************
+  // RegisterTypeDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterTypeDef
         (// @parm [in] Type Definition Object
          ImplAAFTypeDef * pTypeDef);
 
   //****************
-  // LookupType()
+  // LookupTypeDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupType
+    LookupTypeDef
         (// @parm [in,ref] Type Unique ID
-         const aafUID_t *  pTypeID,
+         const aafUID_t & typeID,
 
          // @parm [out,retval] Type Definition Object
          ImplAAFTypeDef ** ppTypeDef);
 
   //****************
-  // GetTypeDefinitions()
+  // GetTypeDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTypeDefinitions
+    GetTypeDefs
         // @parm [out,retval] Type Def Enumeration
         (ImplEnumAAFTypeDefs ** ppEnum);
 
 
   //****************
-  // RegisterDataDefintion()
+  // CountTypeDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterDataDefintion
+    CountTypeDefs
+        // @parm [out, retval] Total number of type definition objects
+        (aafUInt32 * pResult);
+
+  //****************
+  // RegisterDataDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterDataDef
         // @parm [in] Data Definition Object
         (ImplAAFDataDef * pDataDef);
 
   //****************
-  // LookupDataDefintion()
+  // LookupDataDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupDataDefintion
-        (// @parm [in,ref] Datak Defintion Unique ID
-         aafUID_t *  pDataDefintionID,
+    LookupDataDef
+        (// @parm [in,ref] Datak Definition Unique ID
+         const aafUID_t & dataDefinitionId,
 
          // @parm [out,retval] Data Definition Object
          ImplAAFDataDef ** ppDataDef);
 
   //****************
-  // GetDataDefinitions()
+  // GetDataDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetDataDefinitions
+    GetDataDefs
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFDataDefs ** ppEnum);
 
 
   //****************
-  // RegisterOperationDefinition()
+  // CountDataDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterOperationDefinition
+    CountDataDefs
+        // @parm [out, retval] Total number of data definition objects
+        (aafUInt32 * pResult);
+
+  //****************
+  // RegisterOperationDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterOperationDef
         // @parm [in] Effect Definition Object
         (ImplAAFOperationDef * pOperationDef);
 
   //****************
-  // LookupOperationDefinition()
+  // LookupOperationDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupOperationDefinition
+    LookupOperationDef
         (// @parm [in,ref] Effect Unique ID
-         aafUID_t *  effectID,
+         const aafUID_t & effectId,
 
          // @parm [out,retval] Effect definition object
          ImplAAFOperationDef ** ppOperationDef);
 
   //****************
-  // GetOperationDefinitions()
+  // GetOperationDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetOperationDefinitions
+    GetOperationDefs
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFOperationDefs ** ppEnum);
 
+
   //****************
-  // RegisterParameterDefinition()
+  // CountOperationDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterParameterDefinition
+    CountOperationDefs
+        // @parm [out, retval] Total number of interpolation definition objects
+        (aafUInt32 * pResult);
+
+
+  //****************
+  // RegisterParameterDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterParameterDef
         // @parm [in] Parameter Definition Object
         (ImplAAFParameterDef * pParameterDef);
 
   //****************
-  // LookupParameterDefinition()
+  // LookupParameterDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupParameterDefinition
+    LookupParameterDef
         (// @parm [in,ref] Parameter Unique ID
-         aafUID_t *  ParameterID,
+         const aafUID_t & parameterId,
 
          // @parm [out,retval] Parameter definition object
          ImplAAFParameterDef ** ppParameterDef);
 
   //****************
-  // GetParameterDefinitions()
+  // GetParameterDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetParameterDefinitions
+    GetParameterDefs
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFParameterDefs ** ppEnum);
 
   //****************
-  // RegisterCodecDefinition()
+  // CountParameterDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterCodecDefinition
+    CountParameterDefs
+        // @parm [out, retval] Total number of parameter definition objects
+        (aafUInt32 * pResult);
+
+  //****************
+  // RegisterCodecDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterCodecDef
         // @parm [in] Pluggable Definition
         (ImplAAFCodecDef * pPlugDef);
 
   //****************
-  // RegisterCodecDefinition()
+  // GetCodecDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-   GetCodecDefinitions
+   GetCodecDefs
       // @parm [out,retval] Definition Enumeration
       (ImplEnumAAFCodecDefs ** ppEnum);
 
-   	AAFRESULT LookupCodecDefinition(aafUID_t *containerID, ImplAAFCodecDef **result);
 
-	//****************
-  // RegisterContainerDefinition()
+  virtual AAFRESULT STDMETHODCALLTYPE
+    LookupCodecDef
+      (const aafUID_t & containerId,
+	   ImplAAFCodecDef **result);
+
+
+  //****************
+  // CountCodecDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterContainerDefinition
+    CountCodecDefs
+        // @parm [out, retval] Total number of codec definition objects
+        (aafUInt32 * pResult);
+
+
+  //****************
+  // RegisterContainerDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterContainerDef
         // @parm [in] Pluggable Definition
         (ImplAAFContainerDef * pPlugDef);
 
+
   //****************
-  // GetContainerDefinitions()
+  // GetContainerDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetContainerDefinitions
+    GetContainerDefs
         // @parm [out,retval] Definition Enumeration
        (ImplEnumAAFContainerDefs ** ppEnum);
 
-    AAFRESULT LookupContainerDefinition(aafUID_t *containerID, ImplAAFContainerDef **result);
 
   //****************
-  // RegisterInterpolationDefinition()
+  // LookupContainerDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterInterpolationDefinition
+     LookupContainerDef
+       (const aafUID_t & containerID,
+		ImplAAFContainerDef **result);
+
+
+  //****************
+  // CountContainerDefs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountContainerDefs
+        // @parm [out, retval] Total number of container definition objects
+        (aafUInt32 * pResult);
+
+
+  //****************
+  // RegisterInterpolationDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterInterpolationDef
         // @parm [in] Interpolation Definition Object
         (ImplAAFInterpolationDef * pInterpolationDef);
 
   //****************
-  // LookupInterpolationDefinition()
+  // LookupInterpolationDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupInterpolationDefinition
+    LookupInterpolationDef
         (// @parm [in,ref] Interpolation Unique ID
-         aafUID_t *  InterpolationID,
+         const aafUID_t & interpolationID,
 
          // @parm [out,retval] Interpolation definition object
          ImplAAFInterpolationDef ** ppInterpolationDef);
 
   //****************
-  // GetInterpolationDefinitions()
+  // GetInterpolationDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetInterpolationDefinitions
+    GetInterpolationDefs
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFInterpolationDefs ** ppEnum);
 
   //****************
-  // RegisterPluginDescriptor()
+  // CountInterpolationDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterPluginDescriptor
+    CountInterpolationDefs
+        // @parm [out, retval] Total number of interpolation definition objects
+        (aafUInt32 * pResult);
+
+
+  //****************
+  // RegisterPluginDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterPluginDef
         (ImplAAFPluginDescriptor * pPluginDesc);
 
   //****************
-  // LookupPluginDescriptor()
+  // LookupPluginDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupPluginDescriptor
+    LookupPluginDef
         (// @parm [in,ref] Interpolation Unique ID
-         aafUID_t *  InterpolationID,
+         const aafUID_t & interpolationID,
 
          ImplAAFPluginDescriptor ** ppPluginDesc);
 
   //****************
-  // GetPluginDescriptors()
+  // GetPluginDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPluginDescriptors
+    GetPluginDefs
         (ImplEnumAAFPluginDescriptors ** ppEnum);
+
+
+  //****************
+  // CountPluginDefs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountPluginDefs
+        // @parm [out, retval] Total number of plugin definition objects
+        (aafUInt32 * pResult);
 
 public:
 
@@ -360,26 +453,51 @@ public:
   // make sure built-in types are initialized.
   void InitBuiltins();
 
+  //
+  // Toolkit-internal "Create" methods
+  //
+
   // Factory method for creating a Dictionary.
   static ImplAAFDictionary *CreateDictionary(void);
 
-  // internal utility factory method to create an ImplAAFObject given an auid.
-  // This method was created to make it simpler to replace calls to "Deprecated"
-  // call to CreateImpl which should only be used for instanciating transient
-  // non-ImplAAFObject classes such as an enumerator.
-  ImplAAFObject *CreateImplObject(const aafUID_t& auid); 
+  // internal utility factory method to create an ImplAAFObject given
+  // a classdef.  This method was created to make it simpler to
+  // replace calls to "Deprecated" call to CreateImpl which should
+  // only be used for instanciating transient non-ImplAAFObject
+  // classes such as an enumerator.
+  ImplAAFObject *CreateImplObject(aafUID_constref classID); 
+
+  //
+  // Instantiates an object of the given class and initializes its OM
+  // properties.
+  //
+  ImplAAFObject * CreateAndInit(ImplAAFClassDef * pClassDef) const;
+
+  //
+  // Instantiates the most derived class known to the code which
+  // represents the given AUID.  Doesn't init its OM properties.
+  //
+  ImplAAFObject* pvtInstantiate(const aafUID_t & id) const;
+
+  //
+  // If the given AUID is known to the code, instantiates an object of
+  // that type.  Otherwise, returns NULL.  Doesn't init its OM
+  // properties.
+  //
+  static ImplAAFObject* pvtCreateBaseClassInstance(const aafUID_t & id);
+
 
   // Generates an OM PID corresponding to the given property def auid.
   AAFRESULT GenerateOmPid (const aafUID_t & rAuid,
 						   OMPropertyId & rOutPid);
 
 
-  // Like LookupClass(), except will only look at classes currently
+  // Like LookupClassDef(), except will only look at classes currently
   // registered in this dictionary; will not attempt to look at
   // builtins which may not have already been entered into the dict.
-  AAFRESULT dictLookupClass
+  AAFRESULT dictLookupClassDef
     (// @parm [in,ref] Class Unique ID
-	 const aafUID_t *  pClassID,
+	 const aafUID_t & classID,
 
 	 // @parm [out,retval] Class Definition
 	 ImplAAFClassDef ** ppClassDef);
@@ -388,19 +506,13 @@ public:
   // Like LookupType(), except will only look at types currently
   // registered in this dictionary; will not attempt to look at
   // builtins which may not have already been entered into the dict.
-  AAFRESULT dictLookupType
+  AAFRESULT dictLookupTypeDef
     (// @parm [in,ref] Type Unique ID
-	 const aafUID_t *  pTypeID,
+	 const aafUID_t & typeID,
 
 	 // @parm [out,retval] Type Definition Object
 	 ImplAAFTypeDef ** ppTypeDef);
 
-
-  static ImplAAFObject* pvtCreateBaseClassInstance(const aafUID_t* pAUID);
-
-  // Similar to create(), but takes an AUID as argument and doesn't
-  // init properties.
-  ImplAAFObject* pvtInstantiate(const aafUID_t * pAUID) const;
 
   // Attempt to register the sizes of this type def if it is a
   // built-in type.  Currently implemented for Enum and Record
@@ -419,18 +531,21 @@ public:
   // value of flag.  Default is enabled.
   bool SetEnableDefRegistration (bool isEnabled);
 
-  bool IsAxiomaticClass (const aafUID_t &classID) const;
+  bool IsAxiomaticClass (const aafUID_t & classID) const;
+
+  ImplAAFBuiltinDefs * GetBuiltinDefs ();
 
 private:
 
-  bool pvtLookupAxiomaticType (const aafUID_t &typeID,
+  bool pvtLookupAxiomaticTypeDef (const aafUID_t & typeID,
 							   ImplAAFTypeDef ** ppTypeDef);
 
-  bool pvtLookupAxiomaticClass (const aafUID_t &classID,
-								ImplAAFClassDef ** ppClassDef);
+  bool pvtLookupAxiomaticClassDef (const aafUID_t & classID,
+								   ImplAAFClassDef ** ppClassDef);
 
   ImplAAFBuiltinClasses * _pBuiltinClasses;
   ImplAAFBuiltinTypes   * _pBuiltinTypes;
+  ImplAAFBuiltinDefs    * _pBuiltinDefs;
 
   OMStrongReferenceVectorProperty<ImplAAFCodecDef>         _codecDefinitions;
   OMStrongReferenceVectorProperty<ImplAAFContainerDef>     _containerDefinitions;
