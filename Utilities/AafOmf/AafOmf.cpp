@@ -1,29 +1,35 @@
 // @doc INTERNAL
 // @com This file implements the conversion of OMF files to AAF file format.
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1996 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
  *
  ************************************************************************/
 
@@ -41,37 +47,23 @@ namespace OMF2
 #include "omMedia.h"
 }
 
-#include "AAFException.h"
-#include "OMFException.h"
-#include "AutoRelease.h"
-
+// AAF Utilities Infra-structure 
+#include "UtlConsole.h"
 // OMF Includes
 
 
 #include "AafOmf.h"
 
-#include "AAFDomainUtils.h"
-#include "OMFDomainUtils.h"
-#if AVID_SPECIAL
-#include "ConvertAvid.h"
-#include "AAFDomainAvidUtils.h"
-#include "OMFDomainAvidUtils.h"
-#else
-#include "AAFDomainExtensions.h"
-#include "OMFDomainExtensionUtils.h"
-#include "Extensions.h"
-#endif
 #include "Aaf2Omf.h"
 #include "Omf2Aaf.h"
-#include "AAFClassDefUIDs.h"
-#include "EffectTranslate.h"
 
 //#include "AAFUtils.h"
-//AAFRESULT aafMobIDNew(aafMobID_t *mobID);
-//AAFRESULT aafMobIDFromMajorMinor(
-//        aafUInt32	major,
-//		aafUInt32	minor,
-//		aafMobID_t *mobID);     /* OUT - Newly created Mob ID */
+AAFRESULT aafMobIDNew(aafUID_t *mobID);
+AAFRESULT aafMobIDFromMajorMinor(
+        aafUInt32	major,
+		aafUInt32	minor,
+		aafUID_t *mobID);     /* OUT - Newly created Mob ID */
+
 
 // ============================================================================
 // Global Variables and functions
@@ -87,6 +79,32 @@ int deleteFile(char* fileName)
 
 }
 
+char* baseName(char* fullName)
+{
+	char* result;
+#if defined(WIN32)
+	const int delimiter = '\\';
+#elif defined(_MAC) || defined(macintosh)
+	const int delimiter = ':';
+#else
+	const in delimiter = '/';
+#endif
+	result = strrchr(fullName, delimiter);
+	if (result == 0)
+	{
+		result = fullName;
+	}
+	else if (strlen(result) == 0) 
+	{
+		result = fullName;
+	}
+	else 
+	{
+		result++;
+	}
+
+	return result;
+}
 
 void AUIDtoString(aafUID_t *uid, char *buf)
 {
@@ -95,96 +113,46 @@ void AUIDtoString(aafUID_t *uid, char *buf)
 			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
 			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
 }
-
-void MobIDtoString(aafMobID_t *uid, char *buf)
-{
-	sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x--%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-		(int)uid->SMPTELabel[0], (int)uid->SMPTELabel[1], (int)uid->SMPTELabel[2], (int)uid->SMPTELabel[3], 
-		(int)uid->SMPTELabel[4], (int)uid->SMPTELabel[5], (int)uid->SMPTELabel[6], (int)uid->SMPTELabel[7], 
-		(int)uid->SMPTELabel[8], (int)uid->SMPTELabel[8], (int)uid->SMPTELabel[10], (int)uid->SMPTELabel[11], 
-		(int)uid->length, (int)uid->instanceHigh, (int)uid->instanceMid, (int)uid->instanceLow, 
-		uid->material.Data1, uid->material.Data2, uid->material.Data3, (int)uid->material.Data4[0],
-		(int)uid->material.Data4[1], (int)uid->material.Data4[2], (int)uid->material.Data4[3],
-		(int)uid->material.Data4[4],
-		(int)uid->material.Data4[5], (int)uid->material.Data4[6], (int)uid->material.Data4[7]);
-}
-
-
 struct SMPTELabel
 {
 	aafUInt32	MobIDMajor;
-	aafUInt16	MobIDMinorLow;
-	aafUInt16	MobIDMinorHigh;
+	aafUInt32	MobIDMinor;
 	aafUInt8	oid;
 	aafUInt8	size;
 	aafUInt8	ulcode;
 	aafUInt8	SMPTE;
 	aafUInt8	Registry;
 	aafUInt8	unused;
-	aafUInt8	MobIDPrefixLow;
-	aafUInt8	MobIDPrefixHigh;
+	aafUInt16	MobIDPrefix;
 };
 
-
-
-struct OMFMobID
+union label
 {
-    aafUInt8			SMPTELabel[12];		// 12-bytes of label prefix
-	aafUInt8			length;
-    aafUInt8			instanceHigh;
-    aafUInt8			instanceMid;
-    aafUInt8			instanceLow;
-	struct SMPTELabel	material;
-};
-
-union MobIDOverlay
-{
-	aafMobID_t			mobID;
-	struct OMFMobID		OMFMobID;
+	aafUID_t			guid;
+	struct SMPTELabel	smpte;
 };
 
 AAFRESULT aafMobIDFromMajorMinor(
-        aafUInt32	prefix,
         aafUInt32	major,
 		aafUInt32	minor,
-		aafUInt8	UMIDType,
-		aafMobID_t *mobID)     /* OUT - Newly created Mob ID */
+		aafUID_t *mobID)     /* OUT - Newly created Mob ID */
 {
-	union MobIDOverlay		aLabel;
+	union label		aLabel;
 	
-    aLabel.OMFMobID.SMPTELabel[0]	= 0x06;
-    aLabel.OMFMobID.SMPTELabel[1]	= 0x0C;
-    aLabel.OMFMobID.SMPTELabel[2]	= 0x2B;
-    aLabel.OMFMobID.SMPTELabel[3]	= 0x34;
-    aLabel.OMFMobID.SMPTELabel[4]	= 0x02;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[5]	= 0x05;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[6]	= 0x11;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[7]	= 0x01;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[8]	= 0x01;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[9]	= UMIDType;
-    aLabel.OMFMobID.SMPTELabel[10]	= 0x10;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[11]	= 0x00;
-	aLabel.OMFMobID.length			= 0x13;
-    aLabel.OMFMobID.instanceHigh		= 0x00;
-    aLabel.OMFMobID.instanceMid		= 0x00;
-	aLabel.OMFMobID.instanceLow		= 0x00;
-	aLabel.OMFMobID.material.oid				= 0x06;
-	aLabel.OMFMobID.material.size				= 0x0E;
-	aLabel.OMFMobID.material.ulcode			= 0x2B;
-	aLabel.OMFMobID.material.SMPTE				= 0x34;
-	aLabel.OMFMobID.material.Registry			= 0x7F;
-	aLabel.OMFMobID.material.unused			= 0x7F;
-	aLabel.OMFMobID.material.MobIDPrefixHigh	= (aafUInt8)((prefix >> 7L) | 0x80);
-	aLabel.OMFMobID.material.MobIDPrefixLow	= (aafUInt8)(prefix & 0x7F);
+	aLabel.smpte.oid = 0x06;
+	aLabel.smpte.size = 0x0E;
+	aLabel.smpte.ulcode = 0x2B;
+	aLabel.smpte.SMPTE = 0x34;
+	aLabel.smpte.Registry = 0x02;
+	aLabel.smpte.unused = 0;
+	aLabel.smpte.MobIDPrefix = 42;		// Means its an OMF Uid
 
-	aLabel.OMFMobID.material.MobIDMajor		= major;
-	aLabel.OMFMobID.material.MobIDMinorLow		= (aafUInt16)(minor & 0xFFFF);
-	aLabel.OMFMobID.material.MobIDMinorHigh	=  (aafUInt16)((minor >> 16L) & 0xFFFF);
+	aLabel.smpte.MobIDMajor = major;
+	aLabel.smpte.MobIDMinor = minor;
 
-	*mobID = (aafMobID_t)aLabel.mobID;
+	*mobID = aLabel.guid;
 	return(AAFRESULT_SUCCESS);
 }
-
 
 // ============================================================================
 // InitGlobalVars
@@ -194,22 +162,21 @@ AAFRESULT aafMobIDFromMajorMinor(
 // ============================================================================
 HRESULT InitGlobalVars( void )
 {
-	gpGlobals = new AafOmfGlobals;
-	if (gpGlobals == NULL)
-		return AAFRESULT_NOMEMORY;
+	HRESULT hr = UTLMemoryAlloc(sizeof(AafOmfGlobals),(void**)&gpGlobals);
+	if (FAILED(hr))
+		return hr;
 
-	gpGlobals->bAAFFileOpen = kAAFFalse;
-	gpGlobals->bConvertAllObjects = kAAFFalse;
-	gpGlobals->bCreateTOCFile = kAAFFalse;
-	gpGlobals->bDefFile = kAAFFalse;
-	gpGlobals->bLogFile = kAAFFalse;
-	gpGlobals->pLogger = NULL;
-	gpGlobals->bOMFFileOpen = kAAFFalse;
-	gpGlobals->bVerboseMode = kAAFFalse;
+	gpGlobals->bAAFFileOpen = AAFFalse;
+	gpGlobals->bConvertAllObjects = AAFFalse;
+	gpGlobals->bCreateTOCFile = AAFFalse;
+	gpGlobals->bDefFile = AAFFalse;
+	gpGlobals->bLogFile = AAFFalse;
+	gpGlobals->bOMFFileOpen = AAFFalse;
+	gpGlobals->bVerboseMode = AAFFalse;
 	gpGlobals->numIndents = 0;
 	gpGlobals->pProgramName = NULL;
-	gpGlobals->bDeleteOutput  = kAAFTrue;
-	gpGlobals->bConvertAAFFile  = kAAFFalse;
+	gpGlobals->bDeleteOutput  = AAFTrue;
+	gpGlobals->bConvertAAFFile  = AAFFalse;
 
 	gpGlobals->nNumAAFMobs = 0;
 	gpGlobals->nNumAAFObjects = 0;
@@ -232,6 +199,29 @@ HRESULT InitGlobalVars( void )
 	return AAFRESULT_SUCCESS;
 }
 
+// ============================================================================
+// Usage
+// 
+//		Displays short help text with the program arguments.
+//
+// ============================================================================
+void Usage( void )
+{
+	UTLstdprintf("\n*******************\n\n");
+	UTLstdprintf("%s : OMF/AAF file conversion Version 0.01.00\n\n", gpGlobals->pProgramName);
+	UTLstdprintf("Usage: \n");
+	UTLstdprintf("%s [-v] [-s] [-p logfile] [-d deffile] [-t tocfile] <infile> [outfile]\n\n", gpGlobals->pProgramName);
+	UTLstdprintf("-v         = Verbose - give progress report (optional)\n" );
+	UTLstdprintf("-s         = Straight conversion. Do NOT discard unnecessary objects (optional)\n");
+	UTLstdprintf("-nr        = DO NOT replace Output file. If Output file is present, give an error (optional)!!\n");
+//	UTLstdprintf("-p logfile = Log file name(optional)\n");
+//	UTLstdprintf("-d deffile = Definition file (optional)\n");
+//	UTLstdprintf("-t tocfile = Dump OMFI Table of contents (optional)\n");
+	UTLstdprintf("-OMF       = Convert an AAF file to OMF 2.1 version\n");
+	UTLstdprintf("infile     = input file name (required)\n");
+	UTLstdprintf("outfile    = output file name (optional)\n");
+	UTLstdprintf("\n*******************\n\n");
+}
 /******************** IncIndentLevel *******************
 	Increases the incrementation used for readability
 
@@ -272,83 +262,270 @@ void DecIndentLevel(void)
 }
 
 // ============================================================================
-// IsOMFFile
-//  This function returns AAFRESULT_SUCCESS if the given file is an OMF file.
-//  and the error code otherwise.
+// DisplaySummary
+// 
+//		Displays summary of execution at the end of the run.
 //
 // ============================================================================
-HRESULT IsOMFFile (char * pFileName )
+void DisplaySummary( void )
 {
-	// verify if file exists
-	gpGlobals->pLogger->Log( kLogInfo, "Verifying that \"%s\" is an OMF file\n", 
-		pFileName );
-	if ( strlen(pFileName) == 0)
-	{
-		return  AAFRESULT_NULL_PARAM;
-	}
+	UTLstdprintf("\n*******************\n\n");
+	UTLstdprintf("%s Summary for the file :%s\n\n",gpGlobals->pProgramName, gpGlobals->sOutFileName);
+	UTLstdprintf("\tTotal OMF Mobs \t\t\t: %ld\n", gpGlobals->nNumOMFMobs);
+	UTLstdprintf("\tTotal AAF Mobs \t\t\t: %ld\n", gpGlobals->nNumAAFMobs);
+	UTLstdprintf("\tTotal OMF Objects \t\t: %ld\n", gpGlobals->nNumOMFObjects);
+	UTLstdprintf("\tTotal AAF Objects \t\t: %ld\n", gpGlobals->nNumAAFObjects);
+	UTLstdprintf("\tTotal OMF Properties \t\t: %ld\n", gpGlobals->nNumOMFProperties);
+	UTLstdprintf("\tTotal AAF Properties \t\t: %ld\n", gpGlobals->nNumAAFProperties);
+	UTLstdprintf("\tTotal OMF Objects NOT found\t: %ld\n", gpGlobals->nNumUndefinedOMFObjects);
+	UTLstdprintf("\n*******************\n\n");
+}
+// ============================================================================
+// GetUserInput
+//
+//		Parse program arguments and extract names of OMF and AAF files.
+//
+// ============================================================================
+HRESULT GetUserInput(int argc, char* argv[])
+{
+	HRESULT			rc = AAFRESULT_SUCCESS;
+	aafInt32		nFileCount = 0;
 
-	FILE *pStream = fopen(pFileName, "r");
-	if( pStream == NULL )
+	if (argc > 1)
 	{
-		return AAFRESULT_BADOPEN;
-	}
-
-	HRESULT rc = AAFRESULT_FILE_NOT_OMF;
-	int result = fseek(pStream, -24, SEEK_END);
-	if( result == 0 )
-	{	
-		char		ReadBuffer[8];
-		char		CompBuffer[8];
-		CompBuffer[0] = (char)0xA4;
-		CompBuffer[1] = 'C';
-		CompBuffer[2] = 'M';
-		CompBuffer[3] = (char)0xA5;
-		CompBuffer[4] = 'H';
-		CompBuffer[5] = 'd';
-		CompBuffer[6] = 'r';
-		CompBuffer[7] = 0x00;
-		result = fread(ReadBuffer, sizeof( char ), sizeof(ReadBuffer), pStream);
-		if (result > 0 && memcmp(CompBuffer, ReadBuffer, strlen(CompBuffer)) == 0)
+		for (int i = 1; i < argc; i++)
 		{
-				rc = AAFRESULT_SUCCESS;
+			char*	pNextArgument = argv[i];
+			char	c = pNextArgument[0];
+			char*	pFileName;
+
+			if ((c == '-') && (strlen(pNextArgument) == 2))
+			{
+				char flag = pNextArgument[1];
+				switch( flag )
+				{
+					case 'v':
+						gpGlobals->bVerboseMode = AAFTrue;
+						break;
+					case 's':
+						gpGlobals->bConvertAllObjects = AAFTrue;
+						break;
+					case 'p':
+						if ((i + 1 < argc)&& (*argv[i+1] != '-'))
+						{
+							i++;	// Consume the value
+							pFileName = argv[i];
+							if (strlen(pFileName))
+							{
+								gpGlobals->bLogFile = AAFTrue;
+								strcpy(gpGlobals->sLogFileName, pFileName);
+							}
+						}
+						break;
+					case 'd':
+						if ((i + 1 < argc)&& (*argv[i+1] != '-'))
+						{
+							i++;	// Consume the value
+							pFileName = argv[i];
+							if (strlen(pFileName))
+							{
+								gpGlobals->bDefFile = AAFTrue;
+								strcpy(gpGlobals->sDefinitionFileName, pFileName);
+							}
+						}
+						break;
+					case 't':
+						if ((i + 1 < argc)&& (*argv[i+1] != '-'))
+						{
+							i++;	// Consume the value
+							pFileName = argv[i];
+							if (strlen(pFileName))
+							{
+								gpGlobals->bCreateTOCFile = AAFTrue;
+								strcpy(gpGlobals->sTOCFileName, pFileName);
+							}
+						}
+						break;
+					default:
+						rc = AAFRESULT_BAD_FLAGS;
+						break;
+				}
+			}
+			else if ((c == '-') && (strlen(pNextArgument) > 2))
+			{
+				char* pArg = &pNextArgument[1];
+				char  lc[4];
+				memset(lc, 0, sizeof(lc));
+				unsigned int i ;
+				unsigned int j = strlen(pArg);
+				if (strlen(pArg) <=3)
+				{
+					for (i = 0; i < j; i++, pArg++)
+					{
+						lc[i] = tolower(*pArg);
+					}
+					if (strcmp(lc, "nr") == 0)
+					{
+						gpGlobals->bDeleteOutput = AAFFalse;
+					}
+					else if ( strcmp(lc, "omf") == 0 ) 
+					{
+						gpGlobals->bConvertAAFFile = AAFTrue;
+					}
+					else
+						rc = AAFRESULT_BAD_FLAGS;
+				}
+				else
+					rc = AAFRESULT_BAD_FLAGS;
+			}
+			else
+			{
+				nFileCount += 1;
+				if (nFileCount == 1)
+					strcpy(gpGlobals->sInFileName, argv[i]);
+				else
+					strcpy(gpGlobals->sOutFileName, argv[i]);
+			}
 		}
 	}
+	else
+		rc = AAFRESULT_BAD_FLAGS;
 
-	fclose(pStream);
 	return rc;
 }
 
-void RegisterCodecProperties(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession)
+// ============================================================================
+// IsOMFFile
+//			This function returns AAFTrue if the given file is an OMF file.
+//
+// ============================================================================
+HRESULT IsOMFFile (char * pFileName, aafBool* pReturn)
 {
-	OMFCheck	OMFError;
+	HRESULT		rc = AAFRESULT_SUCCESS;
+	FILE*		pStream = NULL;
 
-	// To get the CDCI codec related properties we first reister them in OMF
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "ComponentWidth", OMClassCDCI, 
-									   OMF2::OMVersionType, OMF2::kPropRequired, 
-									   &(globals->omCDCIComponentWidth));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "HorizontalSubsampling", OMClassCDCI, 
-									   OMF2::OMBoolean, OMF2::kPropRequired, 
-									   &(globals->omCDCIHorizontalSubsampling));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "ColorSiting", OMClassCDCI, 
-									   OMF2::OMBoolean, OMF2::kPropRequired, 
-									   &(globals->omCDCIColorSiting));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "BlackReferenceLevel", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIBlackReferenceLevel));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "WhiteReferenceLevel", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIWhiteReferenceLevel));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "ColorRange", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIColorRange));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "PaddingBits", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIPaddingBits));
+	int			result = 0;
+	char		ReadBuffer[8];
+	char		CompBuffer[8];
+
+
+	CompBuffer[0] = (char)0xA4;
+	CompBuffer[1] = 'C';
+	CompBuffer[2] = 'M';
+	CompBuffer[3] = (char)0xA5;
+	CompBuffer[4] = 'H';
+	CompBuffer[5] = 'd';
+	CompBuffer[6] = 'r';
+	CompBuffer[7] = 0x00;
+
+	// verify if file exists
+	if (strlen(pFileName) > 0)
+	{
+		pStream = fopen(pFileName, "r");
+		if (pStream != NULL)
+		{
+			result = fseek(pStream, -24, SEEK_END);
+			if (result == 0)
+			{
+				result = fread(ReadBuffer, sizeof( char ), sizeof(ReadBuffer), pStream);
+				if (result > 0)
+				{
+					if (memcmp(CompBuffer, ReadBuffer, strlen(CompBuffer)) == 0)
+						*pReturn = AAFTrue;
+				}
+			}
+			fclose(pStream);
+		}
+		else
+		{
+			rc = AAFRESULT_FILE_NOT_FOUND;
+		}
+	}
+	else
+	{
+		rc = AAFRESULT_NULL_PARAM;
+	}
+			
+	return rc;
+}
+
+// ============================================================================
+// MAIN Module 
+//
+//		This is the application's main controlling routine.  
+//
+// ============================================================================
+int main(int argc, char *argv[])
+{
+	HRESULT			hr;
+
+	CComInitialize	comInit;
+	Aaf2Omf			AAFMain;
+	Omf2Aaf			OMFMain;
+
+	aafBool			bIsOMFFile = AAFFalse;
+
+#ifdef macintosh
+	argc = ccommand(&argv);	// calls up a command line window
+#endif 
+
+	hr = UTLInitFileIO();
+	if (FAILED(hr))
+		return UTLEcFromHr(hr);
+
+	hr = InitGlobalVars();
+	if (FAILED(hr))
+		return UTLEcFromHr(hr);
+
+	gpGlobals->pProgramName = baseName(argv[0]);
+
+	UTLstdprintf("%s: Version 0.01.00\n", gpGlobals->pProgramName);
+	hr = GetUserInput(argc, argv);
+	if (FAILED(hr))
+	{
+		Usage();
+		return UTLEcFromHr(hr);
+	}
+	if (gpGlobals->bConvertAAFFile)
+	{
+		// User indictaded input file must be an AAF 
+		// Convert AAF to OMF
+		hr = AAFMain.ConvertFile();
+
+	}
+	else
+	{
+		// User indictaed Input file must be an OMF file
+		hr = IsOMFFile(gpGlobals->sInFileName, &bIsOMFFile);
+		if (FAILED(hr))
+		{
+			UTLstdprintf("OMF Input file NOT Found !!\n");
+			Usage();
+		}
+		else
+		{
+			if (!bIsOMFFile)
+			{
+				UTLstdprintf("Input file is NOT a valid  OMF File !!\n");
+				Usage();
+			}
+			else
+			{
+				hr = OMFMain.ConvertFile();
+			}
+		}
+	}
+
+	// We are done, just
+	if (SUCCEEDED(hr))
+		DisplaySummary();
+
+	// clean up memory
+	if(gpGlobals)
+		UTLMemoryFree(gpGlobals);
+
+	// close fileio
+	hr = UTLExitFileIO();
+
+	return UTLEcFromHr(hr);
 }

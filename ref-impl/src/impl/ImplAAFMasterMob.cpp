@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -21,9 +20,11 @@
 #include <assert.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
+#include "aafUtils.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "ImplAAFEssenceGroup.h"
 
 extern "C" const aafClassID_t CLSID_AAFEssenceAccess;
 
@@ -127,7 +128,7 @@ AAFRESULT STDMETHODCALLTYPE
 		pSegment = NULL;
 
 		// Make sure the slot contains the expected media type.
-		if (memcmp(&DataDef, pDataDef, sizeof(aafUID_t)) != 0)
+		if (!EqualAUID(&DataDef, pDataDef))
 			RAISE(AAFRESULT_INVALID_DATADEF);
 
 		pMobSlot->ReleaseReference();
@@ -279,7 +280,33 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFMasterMob::GetTapeNameBufLen (aafInt32	masterSlotID,
 										 aafInt32*  pLen)
 {
-	return AAFRESULT_NOT_IMPLEMENTED;
+	ImplAAFFindSourceInfo	*info = NULL;
+	ImplAAFMob				*mob = NULL;
+
+	if(pLen == NULL)
+		return AAFRESULT_NULL_PARAM;
+	
+	XPROTECT()
+	{
+		CHECK(SearchSource (masterSlotID, 0, kTapeMob, NULL, NULL,
+									&info));
+		CHECK(info->GetMob(&mob));
+		CHECK(mob->GetNameBufLen(pLen));
+		info->ReleaseReference();
+		info = NULL;
+		mob->ReleaseReference();
+		mob = NULL;
+	}
+	XEXCEPT
+	{
+		if(info != NULL)
+			info->ReleaseReference();
+		if(mob != NULL)
+			mob->ReleaseReference();
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
 }
 
 //***********************************************************
@@ -380,7 +407,40 @@ AAFRESULT STDMETHODCALLTYPE
 												   aafInt32				index,
 												   ImplAAFSourceClip**	ppSourceClip)
 {
-	return AAFRESULT_NOT_IMPLEMENTED;
+	ImplAAFMobSlot	*pSlot = NULL;
+	ImplAAFSegment	*pSegment = NULL;
+	ImplAAFEssenceGroup	*pGroup = NULL;
+	HRESULT			hr;
+	aafNumSlots_t	numReps;
+
+	if (!ppSourceClip)
+		return AAFRESULT_NULL_PARAM;
+
+	numReps = 0;
+	
+	hr = FindSlotBySlotID(slotID, &pSlot);
+	if (SUCCEEDED(hr))
+	{
+		hr = pSlot->GetSegment(&pSegment);
+		if (SUCCEEDED(hr))
+		{
+			hr = pSegment->NumRepresentations(&numReps);
+			if(index < 0 || index >= numReps)
+				return(AAFRESULT_BADINDEX);
+			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
+			if(pGroup == NULL)
+				return(AAFRESULT_INCONSISTANCY);
+			hr = pGroup->GetIndexedChoice (index, ppSourceClip);
+			pGroup->ReleaseReference();
+			pGroup = NULL;
+			pSegment->ReleaseReference();
+			pSegment = NULL;
+		}
+		pSlot->ReleaseReference();
+		pSlot = NULL;
+	}
+
+	return hr;
 }
 
 //***********************************************************
@@ -435,7 +495,38 @@ AAFRESULT STDMETHODCALLTYPE
 											 aafMediaCriteria_t*	pCriteria,
 											 ImplAAFSourceClip**	ppSourceClip)
 {
-	return AAFRESULT_NOT_IMPLEMENTED;
+	ImplAAFMobSlot	*pSlot = NULL;
+	ImplAAFSegment	*pSegment = NULL;
+	ImplAAFEssenceGroup	*pGroup = NULL;
+	HRESULT			hr;
+	aafNumSlots_t	numReps;
+
+	if (!ppSourceClip || !pCriteria)
+		return AAFRESULT_NULL_PARAM;
+
+	numReps = 0;
+	
+	hr = FindSlotBySlotID(slotID, &pSlot);
+	if (SUCCEEDED(hr))
+	{
+		hr = pSlot->GetSegment(&pSegment);
+		if (SUCCEEDED(hr))
+		{
+			hr = pSegment->NumRepresentations(&numReps);
+			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
+			if(pGroup == NULL)
+				return(AAFRESULT_INCONSISTANCY);
+			hr = pGroup->GetCriteriaSourceClip (pCriteria, ppSourceClip);
+			pGroup->ReleaseReference();
+			pGroup = NULL;
+			pSegment->ReleaseReference();
+			pSegment = NULL;
+		}
+		pSlot->ReleaseReference();
+		pSlot = NULL;
+	}
+
+	return hr;
 }
 
 
@@ -667,12 +758,20 @@ AAFRESULT STDMETHODCALLTYPE
 							aafCompressEnable_t Enable,
 							ImplAAFLocator		*destination,
 							aafUID_t			fileFormat,
-							ImplAAFEssenceAccess **result)
+							IAAFEssenceMultiAccess **result)
 {
 	ImplAAFEssenceAccess	*access;
+	IUnknown				*iUnk = NULL;
+	AAFRESULT				hr;
 
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-	*result = access;
+	iUnk = static_cast<IUnknown *> (access->GetContainer());
+	hr = iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)result);
+	if(hr != AAFRESULT_SUCCESS)
+		return hr;
+
+	iUnk->Release();
+	iUnk = NULL;
 	return access->MultiCreate(this, codecID, arrayElemCount, mediaArray, Enable);
 }
 
@@ -726,12 +825,19 @@ AAFRESULT STDMETHODCALLTYPE
                            aafMediaCriteria_t*  mediaCrit,
                            aafMediaOpenMode_t  openMode,
                            aafCompressEnable_t  compEnable,
-							ImplAAFEssenceAccess **result)
+							IAAFEssenceMultiAccess **result)
 {
 	ImplAAFEssenceAccess	*access;
+	IUnknown				*iUnk = NULL;
+	AAFRESULT				hr;
 
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-	*result = access;
+	iUnk = static_cast<IUnknown *> (access->GetContainer());
+	hr = iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)result);
+	if(hr != AAFRESULT_SUCCESS)
+		return hr;
+	iUnk->Release();
+	iUnk = NULL;
 	return access->MultiOpen(this, slotID, mediaCrit, openMode, compEnable);
 }
 

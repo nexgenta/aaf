@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -512,7 +511,7 @@ AAFRESULT STDMETHODCALLTYPE
   {
     _source.write(buffer, bytes, *bytesWritten);
     if (0 < bytes && 0 == *bytesWritten)
-      result = AAFRESULT_NOT_IMPLEMENTED;
+      result = AAFRESULT_CONTAINERWRITE;
   }
   //catch (OMException& ome)
   //{
@@ -543,7 +542,7 @@ AAFRESULT STDMETHODCALLTYPE
   {
     _source.read(buffer, bytes, *bytesRead);
     if (0 < bytes && 0 == *bytesRead)
-      result = AAFRESULT_NOT_IMPLEMENTED;
+      result = AAFRESULT_END_OF_DATA;
   }
   //catch (OMException& ome)
   //{
