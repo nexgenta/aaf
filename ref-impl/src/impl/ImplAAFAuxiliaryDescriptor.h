@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFAuxiliaryDescriptor.h,v 1.1.2.1 2004/05/01 19:03:16 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFAuxiliaryDescriptor.h,v 1.1.2.2 2004/05/03 01:17:56 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,24 +30,15 @@
 //=---------------------------------------------------------------------=
 
 
-
-
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
-
-
-
-
-
-
-
-
 
 #ifndef __ImplAAFPhysicalDescriptor_h__
 #include "ImplAAFPhysicalDescriptor.h"
 #endif
 
+#include "OMWideStringProperty.h"
 
 class ImplAAFAuxiliaryDescriptor : public ImplAAFPhysicalDescriptor
 {
@@ -127,6 +118,19 @@ public:
     GetCharSetBufLen
         // @parm [out] size of required buffer, in bytes
         (aafUInt32 *  pBufSize);
+
+ private:
+
+  // FIXME - These could be moved to their own file.
+  AAFRESULT SetString (aafCharacter_constptr  pCharSet,
+		       OMWideStringProperty& theStoredString );
+  AAFRESULT GetString( aafCharacter *  pCharSet, aafUInt32 bufSize,
+		       OMWideStringProperty& theStoredString );
+  AAFRESULT GetStringBufLen( aafUInt32 *  pBufSize,
+			     OMWideStringProperty& theStoredString );
+    
+  OMWideStringProperty _mimeType;
+  OMWideStringProperty _charSet;
 
 };
 

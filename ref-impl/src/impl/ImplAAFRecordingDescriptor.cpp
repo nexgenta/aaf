@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFRecordingDescriptor.cpp,v 1.1.2.1 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFRecordingDescriptor.cpp,v 1.1.2.2 2004/05/03 01:17:56 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -55,7 +55,7 @@ ImplAAFRecordingDescriptor::~ImplAAFRecordingDescriptor ()
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFRecordingDescriptor::Initialize ()
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_SUCCESS;
 }
 
 
