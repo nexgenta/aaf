@@ -4,32 +4,28 @@
 #define __ImplAAFTaggedValue_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
+
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
 #endif
@@ -38,6 +34,10 @@
 #include "ImplAAFObject.h"
 #endif
 
+#include "OMWideStringProperty.h"
+#include "OMVariableSizeProperty.h"
+
+class ImplAAFTypeDef;
 
 class ImplAAFTaggedValue : public ImplAAFObject
 {
@@ -60,10 +60,16 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in, string] User defined name of this tagged value object
-         wchar_t *  pName,
+         const aafCharacter * pName,
 
-         // @parm [in] Type definition of this tagged value object
-         aafUID_t * pDatadef);
+         // @parm [in] Type Definition of the following value data
+         ImplAAFTypeDef * pType,
+         
+         // @parm [in] Size of preallocated buffer
+         aafUInt32  valueSize,
+
+         // @parm [in, size_is(valueSize)] buffer containing value
+         aafDataBuffer_t  pValue);
 
   //****************
   // GetName()
@@ -82,7 +88,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetNameBufLen
         // @parm [out] Name buffer length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
   //****************
   // GetTypeDefinition()
@@ -151,15 +157,13 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTaggedValue)
 
 	// persistent data
 	OMWideStringProperty				_name;
-	OMFixedSizeProperty<aafUID_t>		_type;
 	OMVariableSizeProperty<aafUInt8>	_value;
 
+  bool _initialized;
+  ImplAAFTypeDef * _cachedTypeDef;
 };
 
 #endif // ! __ImplAAFTaggedValue_h__

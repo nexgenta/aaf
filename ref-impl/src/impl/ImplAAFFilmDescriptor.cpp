@@ -1,10 +1,24 @@
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\***********************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -18,12 +32,12 @@
 #include "aafErr.h"
 
 ImplAAFFilmDescriptor::ImplAAFFilmDescriptor ()
-: _manufacturer(	PID_FilmDescriptor_Manufacturer,		"Manufacturer"),
-  _model(			PID_FilmDescriptor_Model,				"Model"),
-  _format(			PID_FilmDescriptor_FilmFormat,			"FilmFormat"),
-  _frameRate(		PID_FilmDescriptor_FrameRate,			"FrameRate"),
-  _perfPerFrame(	PID_FilmDescriptor_PerforationsPerFrame,"PerforationsPerFrame"),
-  _aspectRatio(		PID_FilmDescriptor_FilmAspectRatio,		"FilmAspectRatio")
+: _manufacturer(	PID_FilmDescriptor_Manufacturer,		L"Manufacturer"),
+  _model(			PID_FilmDescriptor_Model,				L"Model"),
+  _format(			PID_FilmDescriptor_FilmFormat,			L"FilmFormat"),
+  _frameRate(		PID_FilmDescriptor_FrameRate,			L"FrameRate"),
+  _perfPerFrame(	PID_FilmDescriptor_PerforationsPerFrame,L"PerforationsPerFrame"),
+  _aspectRatio(		PID_FilmDescriptor_FilmAspectRatio,		L"FilmAspectRatio")
 {
 	_persistentProperties.put(_manufacturer.address());
 	_persistentProperties.put(_model.address());
@@ -38,12 +52,10 @@ ImplAAFFilmDescriptor::~ImplAAFFilmDescriptor ()
 }
 
 
-//@access Public Members
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmManufacturer (
-      wchar_t *name)
+      const aafCharacter *name)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -54,10 +66,10 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmManufacturer (
-      wchar_t *name, aafInt32 bufSize)
+      aafCharacter *name, aafUInt32 bufSize)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -76,12 +88,10 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-	//@comm Returns a zero-length string if the property was not present
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmManufacturerBufLen (
-      aafInt32 *bufSize)
+      aafUInt32 *bufSize)
 {
 	if(bufSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -93,10 +103,10 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 	
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmModel (
-      wchar_t *name)
+      const aafCharacter *name)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -107,10 +117,10 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmModel (
-      wchar_t *name, aafInt32 bufSize)
+      aafCharacter *name, aafUInt32 bufSize)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -129,10 +139,10 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmModelBufLen (
-      aafInt32 *bufSize)
+      aafUInt32 *bufSize)
 {		
 	if(bufSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -144,7 +154,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmFormat (
       aafFilmType_t*filmFormat)
@@ -158,9 +168,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-	//@comm Film format may be: kFt35MM, kFt16MM, kFt8MM, kFt65MM
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFrameRate (
       aafUInt32*  rate)
@@ -175,7 +183,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetPerfPerFrame (
       aafUInt8* perfPerFrame)
@@ -190,7 +198,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmAspectRatio (
       aafRational_t*aspectRatio)
@@ -205,7 +213,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmFormat (
       aafFilmType_t  filmFormat)
@@ -214,9 +222,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-	//@comm kFt35MM, kFt16MM, kFt8MM, kFt65MM
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFrameRate (
       aafUInt32 rate)
@@ -226,7 +232,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetPerfPerFrame (
       aafUInt8 perfPerFrame)
@@ -236,7 +242,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmAspectRatio (
       aafRational_t  aspectRatio)
@@ -247,4 +253,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFFilmDescriptor::GetOwningMobKind (aafMobKind_t *pMobKind)
+{
+	*pMobKind = kAAFFilmMob;
+	return(AAFRESULT_SUCCESS);
+}
