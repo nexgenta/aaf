@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMUtilities
+
 #include "OMUtilities.h"
 
 #include "OMAssertions.h"
@@ -34,8 +36,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <iostream.h>
 
 static char programName[FILENAME_MAX] = "Object Manager";
 
