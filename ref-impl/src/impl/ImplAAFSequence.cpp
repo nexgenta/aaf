@@ -50,7 +50,7 @@ typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 extern "C" const aafClassID_t CLSID_EnumAAFComponents;
 
 ImplAAFSequence::ImplAAFSequence ()
-:   _components(			PID_Sequence_Components,		"Components")
+:   _components(			PID_Sequence_Components,		L"Components")
 {
 	_persistentProperties.put(_components.address());
 }
@@ -337,7 +337,15 @@ AAFRESULT STDMETHODCALLTYPE
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-	_components.removeAt(index);
+	ImplAAFComponent *pComp = NULL;
+	pComp = 	_components.removeAt(index);
+	if (pComp)
+	{
+		// We have removed an element from a "stong reference container" so we must
+		// decrement the objects reference count. This will not delete the object
+		// since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
+		pComp->ReleaseReference ();
+	}
 	return AAFRESULT_SUCCESS;
 }
 
@@ -372,6 +380,8 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_BADINDEX;
 
 	_components.removeValue(pComponent);
+	pComponent->ReleaseReference();
+
 	return AAFRESULT_SUCCESS;
 }
 
