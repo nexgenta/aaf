@@ -3,14 +3,32 @@
 #ifndef __CAAFEssenceFileContainer_h__
 #define __CAAFEssenceFileContainer_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -60,19 +78,13 @@ public:
   // IAAFPlugin interface methods.
   //
 
-  // Set up the plugin.
-  STDMETHOD (Start)(void);
-
-  // Tear down the plugin.
-  STDMETHOD (Finish)(void);
- 
- 
-  STDMETHOD (GetPluggableID)(aafUID_t *result);
+  STDMETHOD (CountDefinitions)(aafUInt32 *pDefCount);
+  STDMETHOD (GetIndexedDefinitionID)(aafUInt32 index, aafUID_t *result);
   STDMETHOD (GetPluginDescriptorID)(aafUID_t *result);
 
-  STDMETHOD (GetPluggableDefinition)(IAAFDictionary *dict, IAAFPluggableDef **def);
+  STDMETHOD (GetIndexedDefinitionObject)(aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def);
 
-  STDMETHOD (GetDescriptor)(IAAFDictionary *dict, IAAFPluginDescriptor **desc);
+  STDMETHOD (CreateDescriptor)(IAAFDictionary *dict, IAAFPluginDescriptor **desc);
 
   //
   // IAAFEssenceFileContainer interface methods.
@@ -81,29 +93,29 @@ public:
   // Attempt to create an essence stream in the container 
   // for reading and writing.
   STDMETHOD (CreateEssenceStream)
-    (/*[in,string]*/ wchar_t *  pName, // String key to identify the new essence within container
-     /*[in]*/ aafUID_t *  pMobID, // Optional mobID identifying the essence
+    (/*[in,string]*/ const aafCharacter * pName, // String key to identify the new essence within container
+     /*[in]*/ aafMobID_constptr pMobID, // Optional mobID identifying the essence
      /*[out,retval]*/ IAAFEssenceStream ** ppEssenceStream); // address of local variable to contain the essence stream pointer. 
 
   // Attempt to create an essence stream in the container 
   // for writing.
   STDMETHOD (CreateEssenceStreamWriteOnly)
-    (/*[in,string]*/ wchar_t *  pPath, // String key to identify the new essence within container
-     /*[in]*/ aafUID_t *  pMobID, // Optional mobID identifying the essence
+    (/*[in,string]*/ const aafCharacter * pPath, // String key to identify the new essence within container
+     /*[in]*/ aafMobID_constptr pMobID, // Optional mobID identifying the essence
      /*[out,retval]*/ IAAFEssenceStream ** ppEssenceStream); // address of local variable to contain the essence stream pointer. 
 
   // Attempt to open an essence stream for reading.
   // Returns one of the following:
   STDMETHOD (OpenEssenceStreamReadOnly)
-    (/*[in,string]*/ wchar_t *  pFilePath, // String key to identify the existing essence within container
-     /*[in]*/ aafUID_t *  pMobID, // Optional mobID identifying the essence
+    (/*[in,string]*/ const aafCharacter * pFilePath, // String key to identify the existing essence within container
+     /*[in]*/ aafMobID_constptr pMobID, // Optional mobID identifying the essence
      /*[out,retval]*/ IAAFEssenceStream ** ppEssenceStream); // address of local variable to contain the essence stream pointer. 
 
   // Attempt to open an essence stream for appending.
   // Returns one of the following:
   STDMETHOD (OpenEssenceStreamAppend)
-    (/*[in,string]*/ wchar_t *  pFilePath, // String key to identify the existing essence within container
-     /*[in]*/ aafUID_t *  pMobID, // Optional mobID identifying the essence
+    (/*[in,string]*/ const aafCharacter * pFilePath, // String key to identify the existing essence within container
+     /*[in]*/ aafMobID_constptr pMobID, // Optional mobID identifying the essence
      /*[out,retval]*/ IAAFEssenceStream ** ppEssenceStream); // address of local variable to contain the essence stream pointer. 
 
 
@@ -113,7 +125,7 @@ protected:
   // Declare the QI that implements for the interfaces
   // for this module. This will be called by CAAFUnknown::QueryInterface().
   // 
-  virtual HRESULT InternalQueryInterface(REFIID riid, void **ppvObjOut);
+  STDMETHOD(InternalQueryInterface)(REFIID riid, void **ppvObjOut);
 
 public:
   // Accessors
