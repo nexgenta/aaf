@@ -32,6 +32,7 @@
  ************************************************************************/
 
 
+
 class ImplAAFClassDef;
 
 class ImplEnumAAFCodecFlavours;
@@ -125,11 +126,6 @@ public:
     GetDataDefinitions
         // @parm [out,retval] Parameter definition enumeration
         (ImplEnumAAFDataDefs ** ppEnum);
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFCodecDef)
 
 private:
 	DataDefWeakRefArrayProp_t			_dataDefs;

@@ -31,6 +31,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 class ImplAAFEssenceData;
 class ImplAAFContentStorage;
 

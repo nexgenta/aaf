@@ -14,7 +14,6 @@
 
 /******************************************\
 *                                          *
-* Advanced Authoring Format                *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -41,6 +40,8 @@
  * LIABILITY.
  *
  ************************************************************************/
+
+class ImplEnumAAFLocators;
 
 
 
@@ -115,13 +116,6 @@ public:
         (ImplEnumAAFLocators ** ppEnum);
   //@comm The number of locators may be zero if the essence is in the current file.
 
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFEssenceDescriptor)
 
 public:
 	// Functions internal to the toolkit

@@ -75,11 +75,11 @@ public:
     GetInterpolationDefinition
         (ImplAAFInterpolationDef ** ppDef);
 
-  //****************
-  // AddControlPoint()
+    //****************
+  // AppendPoint()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddControlPoint
+    AppendPoint
         // @parm [in] pointer to IAAFControlPoint object
         (ImplAAFControlPoint * pPoint);
 
@@ -91,35 +91,6 @@ public:
     GetControlPoints
         // @parm [out,retval] Parameter definition enumeration
         (ImplEnumAAFControlPoints ** ppEnum);
-
-  //****************
-  // CountControlPoints()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountControlPoints
-        // @parm [out,retval] Parameter definition enumeration
-        (aafUInt32 * pResult);
-
-
-  //****************
-  // GetControlPointAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetControlPointAt
-        // @parm [in] index of control point to retrieve
-        (aafUInt32 index,
-		 // @parm [out,retval] retrieved control point
-		 ImplAAFControlPoint ** ppControlPoint);
-
-
-  //****************
-  // RemoveControlPointAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveControlPointAt
-        // @parm [in] index of control point to remove
-        (aafUInt32 index);
-
 
   //****************
   // GetValueBufLen()
@@ -154,10 +125,7 @@ public:
 private:
 	OMFixedSizeProperty<aafUID_t>						 _interpolation;
     OMStrongReferenceVectorProperty<ImplAAFControlPoint> _controlPoints;
-	OMVariableSizeProperty<aafUInt8>					_value;
-    OMWideStringProperty								 _displayValue;
-	OMFixedSizeProperty<aafReferenceType_t>				_significance;
-};	
+};
 
 #endif // ! __ImplAAFVaryingValue_h__
 

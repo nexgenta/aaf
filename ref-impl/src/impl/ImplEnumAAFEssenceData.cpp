@@ -25,6 +25,7 @@
  *
  ************************************************************************/
 
+
 #ifndef __ImplAAFEssenceData_h__
 #include "ImplAAFEssenceData.h"
 #endif

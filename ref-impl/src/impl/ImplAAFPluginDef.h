@@ -4,14 +4,32 @@
 #define __ImplAAFPluginDescriptor_h__
 
 
-/************************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\************************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 class ImplAAFPluggableCode;
 
@@ -39,6 +57,81 @@ protected:
   virtual ~ImplAAFPluginDescriptor ();
 
 public:
+  // SetAUID()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Init
+        // @parm [in] Pointer to an AUID reference
+        (aafUID_t *  pAuid, wchar_t *name, wchar_t *description);
+  //****************
+  // GetAUID()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetAUID
+        // @parm [retval,out] Pointer to an AUID reference
+        (aafUID_t *  pAuid) const;
+
+  //****************
+  // SetAUID()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetAUID
+        // @parm [in] Pointer to an AUID reference
+        (aafUID_t *  pAuid);
+
+
+  //****************
+  // SetName()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetName
+        (aafWChar *  name);  //@parm [in, ref] Definition Name
+
+
+  //****************
+  // GetName()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetName
+        (// @parm [out, string, size_is(bufSize)] buffer into which Name is to be written
+         wchar_t *  pName,
+
+         // @parm [in] size of *pName buffer in bytes
+         aafUInt32  bufSize);
+
+
+  //****************
+  // GetNameBufLen()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetNameBufLen
+        (aafUInt32 *  nameLen);  //@parm [in,out] Definition Name length
+
+
+  //****************
+  // SetDescription()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetDescription
+        (aafWChar *  description);  //@parm [in, ref] Definition description
+
+
+  //****************
+  // GetDescription()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDescription
+        (aafWChar *  description,  //@parm [in] Definition Description
+		 aafUInt32 bufSize);	  //@parm [in] size of the buffer required to hold Definition Description + terminator
+
+
+  //****************
+  // GetDescriptionBufLen()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDescriptionBufLen
+        (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
+
 
 
   //****************
@@ -425,19 +518,6 @@ public:
         // @parm [out, retval] Plugin Locator Enumeration
         (ImplEnumAAFPluginLocators ** ppEnum);
 
-
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFPluginDescriptor)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFPluginDescriptorTest.cpp.
-  static AAFRESULT test();
-
 public:
 	virtual AAFRESULT
 		GetNthLocator (aafInt32 index, ImplAAFLocator **ppLocator);
@@ -445,21 +525,24 @@ public:
 		 GetNumLocators (aafInt32 *  pCount);
 
 private:
+	OMWideStringProperty          _name;
+	OMWideStringProperty          _description;
+	OMFixedSizeProperty<aafUID_t> _identification;
 	OMFixedSizeProperty<aafUID_t>					_categoryClass;
-	OMFixedSizeProperty<aafVersionType_t>			_pluginVersion;	//!!!StructuredProperty?
+	OMFixedSizeProperty<aafVersionType_t>			_pluginVersion;
 	OMWideStringProperty                            _pluginVersionString;
 	OMWideStringProperty                            _pluginManufacturerName;
 	OMStrongReferenceProperty<ImplAAFNetworkLocator> _manufacturerURL;
 	OMFixedSizeProperty<aafUID_t>					_pluginManufacturerID;
 	OMFixedSizeProperty<aafUID_t>					_platform;
-	OMFixedSizeProperty<aafVersionType_t>			_minPlatformVersion;	//!!!StructuredProperty?
-	OMFixedSizeProperty<aafVersionType_t>			_maxPlatformVersion;	//!!!StructuredProperty?
+	OMFixedSizeProperty<aafVersionType_t>			_minPlatformVersion;
+	OMFixedSizeProperty<aafVersionType_t>			_maxPlatformVersion;
 	OMFixedSizeProperty<aafUID_t>					_engine;
-	OMFixedSizeProperty<aafVersionType_t>			_minEngineVersion;	//!!!StructuredProperty?
-	OMFixedSizeProperty<aafVersionType_t>			_maxEngineVersion;	//!!!StructuredProperty?
+	OMFixedSizeProperty<aafVersionType_t>			_minEngineVersion;
+	OMFixedSizeProperty<aafVersionType_t>			_maxEngineVersion;
 	OMFixedSizeProperty<aafUID_t>					_pluginAPI;
-	OMFixedSizeProperty<aafVersionType_t>			_minPluginAPIVersion;	//!!!StructuredProperty?
-	OMFixedSizeProperty<aafVersionType_t>			_maxPluginAPIVersion;	//!!!StructuredProperty?
+	OMFixedSizeProperty<aafVersionType_t>			_minPluginAPIVersion;
+	OMFixedSizeProperty<aafVersionType_t>			_maxPluginAPIVersion;
 	OMFixedSizeProperty<aafBool>					_softwareOnly;
 	OMFixedSizeProperty<aafBool>					_accelerator;
     OMStrongReferenceVectorProperty<ImplAAFLocator> _locators;

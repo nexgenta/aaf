@@ -25,7 +25,6 @@
  *
  ************************************************************************/
 
-
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
 #endif
@@ -95,7 +94,7 @@ AAFRESULT STDMETHODCALLTYPE
 			_enumProp->getValueAt(&value, _current);
 			CHECK(_enumObj->MyHeadObject(&head));
 			CHECK(head->GetDictionary (&dict));
-			CHECK(dict->LookupTypeDef (value, ppTypeDef));
+			CHECK(dict->LookupType(&value, ppTypeDef));
 		}
 		else if(_enumStrongProp != NULL)
 			_enumStrongProp->getValueAt(*ppTypeDef, _current);

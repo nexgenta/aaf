@@ -31,6 +31,7 @@
  *
  ************************************************************************/
 
+
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
@@ -106,10 +107,7 @@ public:
 	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
 
 
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFNestedScope)
+private:
 
   // Persistent Properties	
   OMStrongReferenceVectorProperty<ImplAAFSegment>		_slots;

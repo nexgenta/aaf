@@ -29,6 +29,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 #ifndef __ImplAAFMobSlot_h__
 #include "ImplAAFMobSlot.h"
 #endif
@@ -79,7 +80,6 @@ public:
   ImplAAFMob ();
   ~ImplAAFMob ();
 
-  OMDECLARE_STORABLE(ImplAAFMob)
 
   //****************
   // GetMobID()
