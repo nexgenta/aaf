@@ -4,27 +4,32 @@
 #define __ImplAAFStreamPropertyValue_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 2000 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 class ImplAAFRoot;
@@ -48,12 +53,135 @@ public:
 
 
   //  
-  // All reads/and writes advance the current position 
+  // All reads/and writes advance the current element 
   // 
+
+  // Stream element count and positioning. 
+
+  //****************
+  // GetElementCount()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetElementCount
+        (// @parm [out] count of elements in the specified stream property value
+         aafInt64 *  pElementCount);
+
+  //****************
+  // SetElementCount()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetElementCount
+        (// @parm [in] new count of elements in the specified stream property value
+         aafInt64  newElementCount);
+
+  //****************
+  // GetElementIndex()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetElementIndex
+        (// @parm [out] current index in the specified stream property value
+         aafInt64 *  pIndex);
+
+  //****************
+  // SetElementIndex()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetElementIndex
+        (// @parm [in] the current element index in the specified stream property value
+         aafInt64  newElementIndex);
+
+
+  // Sequential access in chunks of Elements 
+
+  //****************
+  // ReadElements()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadElements
+        (// @parm [in] number of bytes to read (must be evenly divisible by the elemenet 
+         // type length)
+         aafUInt32  dataSize,
+
+         // @parm [out, size_is(dataSize), length_is(*bytesRead)] buffer into which elements from the stream should be written
+         aafMemPtr_t  pData,
+
+         // @parm [out,ref] number of bytes actually read (will be either dataSize or 0 if 
+         // there is in error)
+         aafUInt32 *  bytesRead);
+
+  //****************
+  // WriteElements()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteElements
+        (// @parm [in] number of bytes to write (must be evenly divisible by the elemenet type 
+         // length)
+         aafUInt32  dataSize,
+
+         // @parm [in, ref, size_is(dataSize)] buffer into which elements from the stream should be written
+         aafMemPtr_t  pData);
+
+
+  // Sequential access one Element at a time. 
+
+  //****************
+  // ReadElement()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadElement
+        (// @parm [in] number of bytes to read (must be equal to the elemenet type length)
+         aafUInt32  dataSize,
+
+         // @parm [out, size_is(dataSize), length_is(*bytesRead)] buffer into which one element from the stream should be written
+         aafMemPtr_t  pData,
+
+         // @parm [out,ref] number of bytes actually read (will be either dataSize or 0 if there 
+         // is in error)
+         aafUInt32 *  bytesRead);
+
+  //****************
+  // WriteElement()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteElement
+        (// @parm [in] number of bytes to write (must be equal to the elemenet type length)
+         aafUInt32  dataSize,
+
+         // @parm [in, ref, size_is(dataSize)] buffer into which should contain one element to be written to the stream
+         aafMemPtr_t  pData);
+
+
+  // Extend in chunks of Elements 
+
+  //****************
+  // AppendElements()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AppendElements
+        (// @parm [in] number of bytes to write (must be evenly divisible by the elemenet type 
+         // length)
+         aafUInt32  dataSize,
+
+         // @parm [in, ref, size_is(dataSize)] buffer into which elements from the stream should be written
+         aafMemPtr_t  pData);
+
+
+  // Extend one Element at a time 
+
+  //****************
+  // AppendElement()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AppendElement
+        (// @parm [in] number of bytes to write (must be equal to the elemenet type length)
+         aafUInt32  dataSize,
+
+         // @parm [in, ref, size_is(dataSize)] buffer into which should contain one element to be written to the stream
+         aafMemPtr_t  pData);
 
 
   // 
-  // Raw byte stream access 
+  // Raw un-typed stream access 
   // 
 
 
@@ -106,7 +234,7 @@ public:
          aafMemPtr_t  pData,
 
          // @parm [out,ref] number of bytes actually read (will be either dataSize or 0 if there 
-         // is in error)
+    // is in error)
          aafUInt32 *  bytesRead);
 
   //****************
@@ -128,105 +256,10 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Append
-        (// @parm [in] number of bytes to write (must be equal to the element type length)
+        (// @parm [in] number of bytes to write (must be equal to the elemenet type length)
          aafUInt32  dataSize,
 
          // @parm [in, ref, size_is(dataSize)] buffer into which should contain one element to be written to the stream
-         aafMemPtr_t  pData);
-
-
-
-  // 
-  // Access byte order of the stream 
-  // 
-
-
-  //****************
-  // HasStoredByteOrder()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    HasStoredByteOrder
-        (// @parm [out] kAAFTrue if this stream has a stored byte order
-         aafBoolean_t *  pHasByteOrder);
-
-  //****************
-  // GetStoredByteOrder()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetStoredByteOrder
-        (// @parm [out] Pointer to variable where byte order is to be copied
-         eAAFByteOrder_t *  pByteOrder);
-
-  //****************
-  // SetStoredByteOrder()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetStoredByteOrder
-        (// @parm [in] byte order is to be stored with the stream
-         eAAFByteOrder_t  byteOrder);
-
-  //****************
-  // ClearStoredByteOrder()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    ClearStoredByteOrder(void);
-
-
-
-  // 
-  // Access in typed chunks of Elements 
-  // 
-
-  //****************
-  // ReadElements()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    ReadElements
-        (// @parm [in] the type definition of the elements to read
-         ImplAAFTypeDef * pElementType,
-
-         // @parm [in] number of bytes to read (must be evenly divisible by the element 
-         // type length)
-         aafUInt32  dataSize,
-
-         // @parm [out, size_is(dataSize), length_is(*pBytesRead)] buffer into which elements from the stream should be written
-         aafMemPtr_t  pData,
-
-         // @parm [out,ref] number of bytes actually read (will be either dataSize or 0 if 
-         // there is in error)
-         aafUInt32 *  pBytesRead);
-
-  //****************
-  // WriteElements()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    WriteElements
-        (// @parm [in] the type definition of the elements to read
-         ImplAAFTypeDef * pElementType,
-
-         // @parm [in] number of bytes to write (must be evenly divisible by the element type 
-         // length)
-         aafUInt32  dataSize,
-
-         // @parm [in, ref, size_is(dataSize)] buffer into which elements from the stream should be written
-         aafMemPtr_t  pData);
-
-
-  // Extend in chunks of typed Elements 
-
-  //****************
-  // AppendElements()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    AppendElements
-        (// @parm [in] the type definition of the elements to read
-         ImplAAFTypeDef * pElementType,
-
-         // @parm [in] number of bytes to write (must be evenly divisible by the element type 
-         // length)
-         aafUInt32  dataSize,
-
-         // @parm [in, ref, size_is(dataSize)] buffer into which elements from the stream should be written
          aafMemPtr_t  pData);
 
 
@@ -247,6 +280,10 @@ protected:
   
 private:
 	OMDataStreamProperty * _streamProperty;
+	ImplAAFTypeDef * _streamElementType;
+	ImplAAFRoot * _propertyContainer; // save reference to owning container.
+	aafUInt32 _externalElementSize;
+	aafUInt32 _internalElemeentSize;
 };
 
 //
