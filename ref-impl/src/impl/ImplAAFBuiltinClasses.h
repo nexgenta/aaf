@@ -33,7 +33,6 @@
 //
 
 #include "AAFTypes.h"
-#include "OMProperty.h"
 #include "AAFUtils.h"
 
 #ifndef __ImplAAFSearchableStack_h__
@@ -134,31 +133,31 @@ private:
 
   static OMProperty * CreateOMPropTypeSimple
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
   static OMProperty * CreateOMPropTypeWeakReference
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
   static OMProperty * CreateOMPropTypeWeakReferenceSet
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
   static OMProperty * CreateOMPropTypeWeakReferenceVector
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
   static OMProperty * CreateOMPropTypeStrongReference
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
   static OMProperty * CreateOMPropTypeStrongReferenceSet
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
   static OMProperty * CreateOMPropTypeStrongReferenceVector
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
 
 
