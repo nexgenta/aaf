@@ -116,10 +116,44 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
     while (*wName++ = *name++)
       ;
   } else {
-    fprintf(stderr, "\nError : Failed to copy '%s'.\n\n", name);
+    fprintf(stderr, "\nError : Failed to copy string.\n\n");
     exit(1);  
   }
 }
+
+#if defined(__sgi) || defined(__linux__) || defined (__FreeBSD__)
+
+static const unsigned char guidMap[] =
+{ 3, 2, 1, 0, '-', 5, 4, '-', 7, 6, '-', 8, 9, '-', 10, 11, 12, 13, 14, 15 }; 
+static const wchar_t digits[] = L"0123456789ABCDEF"; 
+
+#define GUIDSTRMAX 38 
+
+typedef OLECHAR OMCHAR;
+
+int StringFromGUID2(const GUID& guid, OMCHAR* buffer, int bufferSize) 
+{
+  const unsigned char* ip = (const unsigned char*) &guid; // input pointer
+  OMCHAR* op = buffer;                                    // output pointer
+
+  *op++ = L'{'; 
+ 
+  for (size_t i = 0; i < sizeof(guidMap); i++) { 
+
+    if (guidMap[i] == '-') { 
+      *op++ = L'-'; 
+    } else { 
+      *op++ = digits[ (ip[guidMap[i]] & 0xF0) >> 4 ]; 
+      *op++ = digits[ (ip[guidMap[i]] & 0x0F) ]; 
+    } 
+  } 
+  *op++ = L'}'; 
+  *op = L'\0'; 
+ 
+  return GUIDSTRMAX; 
+} 
+
+#endif
 
 // The maximum number of characters in the formated CLSID.
 // (as returned by StringFromGUID2).
@@ -341,7 +375,6 @@ static void ReadAAFFile(aafWChar * pFileName)
                   check(hr); // display error message
                   if(SUCCEEDED(hr))
                   {
-                    assert ((numLocators >= 0), "numLocators written");
                     printf ("    It has %d locator%s attached.\n",
                             numLocators,
                             numLocators==1 ? "" : "s");
