@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -188,7 +187,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	  {
 		if(head)
-			head->ReleaseReference();
+		  head->ReleaseReference();
+		head = 0;
 		return(XCODE());
 	  }
 	XEND;
