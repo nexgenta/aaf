@@ -10,12 +10,10 @@
 AAFPERSISTENTOBJECTS = \
 	AAFAIFCData \
 	AAFDataDef \
-	AAFDOSLocator \
 	AAFJPEGData \
 	AAFHTMLData \
 	AAFImageData \
 	AAFLocator \
-	AAFMacLocator \
 	AAFMediaFilmDescriptor \
 	AAFMediaGroup \
 	AAFMIDIData \
@@ -32,9 +30,7 @@ AAFPERSISTENTOBJECTS = \
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTypeDefSet \
-	AAFUnixLocator \
-	AAFWAVEData \
-	AAFWindowsLocator
+	AAFWAVEData
 
 
 # These are all of the other non-persistent objects:
@@ -57,6 +53,7 @@ AAFNONPERSISTENTOBJECTS = \
 # implemented in other objects.
 AAFCOMINTERFACESONLY = \
 	AAFEndian \
+	AAFEssenceSampleStream \
 	AAFSearchSource
 
 # These are the impl files that are typed by humans.  Be sure to
@@ -77,7 +74,7 @@ HUMAN_TYPED_IMPL = \
 	AAFDefObject \
 	AAFDictionary \
 	AAFEdgecode \
-	AAFEffectDef \
+	AAFOperationDef \
 	AAFEssenceAccess \
 	AAFEssenceData \
 	AAFEssenceDescriptor \
@@ -91,7 +88,7 @@ HUMAN_TYPED_IMPL = \
 	AAFEssenceFormat \
 	AAFFiller \
 	AAFFindSourceInfo \
-	AAFEffect \
+	AAFOperationGroup \
 	AAFGPITrigger \
 	AAFHeader \
 	AAFHTMLClip \
@@ -141,7 +138,7 @@ HUMAN_TYPED_IMPL = \
 	EnumAAFCodecDefs \
 	EnumAAFComponents \
 	EnumAAFContainerDefs \
-	EnumAAFEffectDefs \
+	EnumAAFOperationDefs \
 	EnumAAFEssenceData \
 	EnumAAFLoadedPlugins \
 	EnumAAFLocators \
@@ -182,7 +179,6 @@ AUTO_GEN_IMPL = \
 PLUGIN_OBJECTS = \
 	AAFPlugin \
 	AAFEssenceStream \
-	AAFEssenceSampleStream \
 	AAFEssenceDataStream \
 	AAFEssenceCodec \
 	AAFEssenceContainer
