@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #include "CAAFEssenceDataStream.h"
 
@@ -33,7 +15,7 @@
 #include "AAFResult.h"
 
 const CLSID CLSID_AAFEssenceDataStream = { 0x42A63FE1, 0x968A, 0x11d2, { 0x80, 0x89, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
-//const IID IID_IAAFEssenceData = { 0x6a33f4e2, 0x8ed6, 0x11d2, { 0xbf, 0x9d, 0x00, 0x10, 0x4b, 0xc9, 0x15, 0x6d } };
+const IID IID_IAAFEssenceData = { 0x6a33f4e2, 0x8ed6, 0x11d2, { 0xbf, 0x9d, 0x00, 0x10, 0x4b, 0xc9, 0x15, 0x6d } };
 
 
 CAAFEssenceDataStream::CAAFEssenceDataStream (IUnknown * pControllingUnknown)
@@ -45,9 +27,6 @@ CAAFEssenceDataStream::CAAFEssenceDataStream (IUnknown * pControllingUnknown)
 
 CAAFEssenceDataStream::~CAAFEssenceDataStream ()
 {
-	if(_data != NULL)
-		_data->Release();
-	_data = NULL;
 }
 
 HRESULT STDMETHODCALLTYPE
@@ -91,18 +70,8 @@ HRESULT STDMETHODCALLTYPE
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceDataStream::Seek (aafInt64  byteOffset)
 {
-	HRESULT		hr = S_OK;
-	aafBool		valid;
-
-	if (NULL == _data)
-		return AAFRESULT_NOT_INITIALIZED;
-
-  	hr = IsPosValid (byteOffset, &valid);
-	if(hr != S_OK)
-		return(hr);
-
-	if(!valid)
-		return(AAFRESULT_BADSAMPLEOFFSET);
+  if (NULL == _data)
+    return AAFRESULT_NOT_INITIALIZED;
 
 	return(_data->SetPosition(byteOffset));
 }
@@ -141,9 +110,9 @@ HRESULT STDMETHODCALLTYPE
   if (NULL == isValid)
     return E_INVALIDARG;
   
-  *isValid = kAAFFalse;
+  *isValid = AAFFalse;
 
-  if (0 <= byteOffset)
+  if (0 < byteOffset)
   {
     aafInt64 length = 0;
     HRESULT hr = GetLength(&length);
@@ -152,7 +121,7 @@ HRESULT STDMETHODCALLTYPE
 
     if (byteOffset < length)
     {
-      *isValid = kAAFTrue;
+      *isValid = AAFTrue;
     }
     else if (byteOffset == length)
     {
@@ -160,7 +129,7 @@ HRESULT STDMETHODCALLTYPE
       // we don't know whether or not the next
       // file operation will be a read or a write
       // so we just return true.
-      *isValid = kAAFTrue;
+      *isValid = AAFTrue;
     }
   }
 
@@ -194,7 +163,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::FlushCache ()
+    CAAFEssenceDataStream::omcFlushCache ()
 {
   return S_OK; //AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -233,12 +202,6 @@ HRESULT CAAFEssenceDataStream::InternalQueryInterface
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (riid == IID_IAAFPlugin) 
-    { 
-        *ppvObj = (IAAFPlugin *)this; 
-        ((IUnknown *)*ppvObj)->AddRef();
-        return S_OK;
-    }
 
     // Always delegate back to base implementation.
     return CAAFUnknown::InternalQueryInterface(riid, ppvObj);
@@ -247,4 +210,16 @@ HRESULT CAAFEssenceDataStream::InternalQueryInterface
 //
 // Define the contrete object support implementation.
 // 
-AAF_DEFINE_FACTORY(AAFEssenceDataStream)
+//
+// Define the contrete object support implementation.
+// 
+HRESULT CAAFEssenceDataStream::COMCreate(IUnknown *pUnkOuter, void **ppvObjOut)
+{
+	*ppvObjOut = NULL;
+ 	CAAFEssenceDataStream *pAAFEssenceDataStream = new CAAFEssenceDataStream(pUnkOuter);
+ 	if (NULL == pAAFEssenceDataStream)
+ 		return E_OUTOFMEMORY;
+ 	*ppvObjOut = static_cast<IAAFEssenceStream *>(pAAFEssenceDataStream);
+ 	((IUnknown *)(*ppvObjOut))->AddRef();
+ 	return S_OK;
+ }
