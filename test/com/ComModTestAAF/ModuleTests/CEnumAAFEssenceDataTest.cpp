@@ -11,7 +11,11 @@
 
 
 
-#include "AAF.h"
+#include "CEnumAAFEssenceData.h"
+#include "CEnumAAFEssenceData.h"
+#ifndef __CEnumAAFEssenceData_h__
+#error - improperly defined include guard
+#endif
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -20,8 +24,6 @@
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
-#include "AAFResult.h"
-#include "AAFDefUIDs.h"
 
 
 // Utility class to implement the test.
@@ -59,10 +61,10 @@ struct EnumEssenceDataTest
   static const aafUInt32 _maxMobCount;
 };
 
-extern "C" HRESULT CEnumAAFEssenceData_test()
+HRESULT CEnumAAFEssenceData::test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t fileName[] = L"EnumAAFEssenceDataTest.aaf";
+  wchar_t fileName[] = L"EnumEssenceDataTest.aaf";
   EnumEssenceDataTest edt;
 
   try
@@ -72,12 +74,12 @@ extern "C" HRESULT CEnumAAFEssenceData_test()
   }
   catch (HRESULT& ehr)
   {
-    // thrown by EnumEssenceDataTest_check() method.
+    // thrown by EnumEssenceDataTest::check() method.
     hr = ehr;
   }
   catch (...)
   {
-    cerr << "CAAFEssenceData_test...Caught general C++"
+    cerr << "CAAFEssenceData::test...Caught general C++"
     " exception!" << endl; 
   }
 
@@ -104,14 +106,14 @@ EnumEssenceDataTest::EnumEssenceDataTest():
   _pEssenceData(NULL)
 {
   _productInfo.companyName = L"AAF Developers Desk";
-  _productInfo.productName = L"EnumAAFEssenceData Module Test";
+  _productInfo.productName = L"EnumEssenceData Module Test";
   _productInfo.productVersion.major = 1;
   _productInfo.productVersion.minor = 0;
   _productInfo.productVersion.tertiary = 0;
   _productInfo.productVersion.patchLevel = 0;
   _productInfo.productVersion.type = kVersionUnknown;
   _productInfo.productVersionString = NULL;
-  _productInfo.productID = UnitTestProductID;
+  _productInfo.productID = -1;
   _productInfo.platform = NULL;
 }
 
@@ -205,7 +207,13 @@ void EnumEssenceDataTest::createFile(wchar_t *pFileName)
   removeTestFile(pFileName);
 
 
-  check(AAFFileOpenNewModify(pFileName, 0, &_productInfo, &_pFile));
+  check(CoCreateInstance(CLSID_AAFFile,
+                         NULL, 
+                         CLSCTX_INPROC_SERVER, 
+                         IID_IAAFFile, 
+                         (void **)&_pFile));
+  check(_pFile->Initialize());
+  check(_pFile->OpenNewModify(pFileName, 0, &_productInfo));
   _bFileOpen = true;
   check(_pFile->GetHeader(&_pHeader));
   check(_pHeader->GetDictionary(&_pDictionary));
@@ -220,7 +228,13 @@ void EnumEssenceDataTest::createFile(wchar_t *pFileName)
 
 void EnumEssenceDataTest::openFile(wchar_t *pFileName)
 {
-  check(AAFFileOpenExistingRead(pFileName, 0, &_pFile));
+  check(CoCreateInstance(CLSID_AAFFile,
+                         NULL, 
+                         CLSCTX_INPROC_SERVER, 
+                         IID_IAAFFile, 
+                         (void **)&_pFile));
+  check(_pFile->Initialize());
+  check(_pFile->OpenExistingRead(pFileName, 0));
   _bFileOpen = true;
   check(_pFile->GetHeader(&_pHeader));
 
