@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -79,7 +78,10 @@ AAFRESULT STDMETHODCALLTYPE
 					return AAFRESULT_NOT_IN_CURRENT_VERSION;
 				}
 				if(!found)
-					(*ppMob)->ReleaseReference();
+				{
+				  (*ppMob)->ReleaseReference();
+				  *ppMob = 0;
+				}
 
 			} while(!found && cur < siz);
 		}
@@ -191,8 +193,9 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		theEnum->ReleaseReference();
-		*ppEnum = NULL;
+	  theEnum->ReleaseReference();
+	  theEnum = 0;
+	  *ppEnum = NULL;
 	}
 
 	return hr;
@@ -203,7 +206,8 @@ AAFRESULT
     ImplEnumAAFMobs::SetContentStorage(ImplAAFContentStorage *pCStore)
 {
   if (_cStorage)
-		_cStorage->ReleaseReference();
+	_cStorage->ReleaseReference();
+  _cStorage = 0;
 
 	_cStorage = pCStore;
 
