@@ -1,29 +1,24 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTypeDefExtEnum
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*                                               *
+\***********************************************/
 
 
 
 
 
 
-#include "CAAFTypeDefExtEnum.h"
-#include "CAAFTypeDefExtEnum.h"
-#ifndef __CAAFTypeDefExtEnum_h__
-#error - improperly defined include guard
-#endif
-
+#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
 
 
-HRESULT CAAFTypeDefExtEnum::test()
+extern "C" HRESULT CAAFTypeDefExtEnum_test()
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
