@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFFileDescriptor\
 #endm
@@ -6,7 +13,7 @@ AAFFileDescriptor\
 AAFEssenceDescriptor\
 #endm
 #c
-#import ./AAFEssenceDescriptor.exp
+#c #import ./AAFEssenceDescriptor.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFFileDescriptor interface is implemented by objects which
@@ -78,8 +85,8 @@ AD_XMETHOD1(GetLength,
 
 AD_XMETHOD1(SetIsInContainer,
 			[in],
-			objPass,
-			aafBool,
+			enumIn,
+			aafBoolean_t,
 			isAAF,
 			is this AAF or raw essence,
   // Set to TRUE if this is AAF-wrapped essence FALSE if the essence
@@ -98,7 +105,7 @@ AD_XMETHOD1(SetIsInContainer,
 AD_XMETHOD1(GetIsInContainer,
 			[out],
 			objPass,
-			aafBool *,
+			aafBoolean_t *,
 			pIsAAF,
 			is this AAF or raw media,
   // Places TRUE into *pIsAAF if this is AAF-wrapped essence.  Places
@@ -123,13 +130,10 @@ AD_XMETHOD1(GetIsInContainer,
 AD_XMETHOD1(SetSampleRate,
 			[in],
 			objPass,
-			aafRational_t *,
-			pRate,
+			aafRational_constref,
+			rate,
 			sample rate of the essence,
 			Sets sample rate of the essence as opposed to the edit rate.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pRate pointer is valid.
   // 
   // If this method fails the sample rate property will not be
   // changed.
@@ -139,10 +143,7 @@ AD_XMETHOD1(SetSampleRate,
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pRate arg is NULL.)
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_XMETHOD1(GetSampleRate,
@@ -173,14 +174,11 @@ AD_XMETHOD1(GetSampleRate,
 AD_XMETHOD1(SetContainerFormat,
 			[in],
 			objPass,
-			aafUID_t *,
-			pFormat,
+			aafUID_constref,
+			format,
 			file format,
 			Identifies the file format.  The container format is an optional
   // property.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pFormat pointer is valid.
   // 
   // If this method fails the container format property will not be
   // changed.
@@ -190,10 +188,7 @@ AD_XMETHOD1(SetContainerFormat,
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pFormat arg is NULL.)
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_XMETHOD1(GetContainerFormat,
