@@ -11,6 +11,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -19,6 +20,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -54,6 +56,11 @@ public:
 		aafInt32		bufSize,		//length of the buffer to hold Codec Name,
 		aafUID_t		*codecID);		//ID used to access the codec,
 
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFEssenceAccessTest.cpp.
+  static AAFRESULT test();
 };
 
 #endif // ! __ImplAAFEssenceAccess_h__
