@@ -27,6 +27,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
 #endif

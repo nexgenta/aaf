@@ -24,6 +24,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 #ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
 #endif
@@ -481,6 +482,5 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFOperationGroup, AUID_AAFOperationGroup);
 
 

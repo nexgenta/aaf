@@ -31,6 +31,7 @@
  *
  ************************************************************************/
 
+
 class ImplAAFPropertyValue;
 
 class ImplEnumAAFPropertyValues;
@@ -183,12 +184,6 @@ public:
   virtual size_t PropValSize (void) const;
   virtual aafBool IsRegistered (void) const;
   virtual size_t NativeSize (void) const;
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTypeDefSet)
 };
 
 #endif // ! __ImplAAFTypeDefSet_h__

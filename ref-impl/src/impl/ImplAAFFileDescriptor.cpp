@@ -27,6 +27,7 @@
 
 
 
+
 #ifndef __ImplAAFFileDescriptor_h__
 #include "ImplAAFFileDescriptor.h"
 #endif
@@ -153,4 +154,3 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-OMDEFINE_STORABLE(ImplAAFFileDescriptor, AUID_AAFFileDescriptor);

@@ -25,6 +25,7 @@
  *
  ************************************************************************/
 
+
 #ifndef __ImplAAFPropValData_h__
 #include "ImplAAFPropValData.h"
 #endif
@@ -218,6 +219,3 @@ OMProperty * ImplAAFTypeDefWeakObjRef::pvtCreateOMPropertyMBS
   assert (result);
   return result;
 }
-
-
-OMDEFINE_STORABLE(ImplAAFTypeDefWeakObjRef, AUID_AAFTypeDefWeakObjRef);
