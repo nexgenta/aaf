@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTest.cpp,v 1.4.2.1 2004/03/17 21:43:26 akharkev Exp $ $Name:  $
+// $Id: ModuleTest.cpp,v 1.4.2.2 2004/03/22 18:06:46 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -134,6 +134,43 @@ HRESULT GetAAFVersions(IAAFHeader * pHeader,
   }
   
   return result;
+}
+
+
+
+bool operator ==( const aafUID_t uid1, const aafUID_t uid2 )
+{
+    bool    are_equal = true;
+    int     i = 0;
+
+    for( i=0; i<8; i++ )
+    {
+        if( uid1.Data4[i] != uid2.Data4[i] )
+        {
+            are_equal = false;
+            break;
+        }
+    }
+
+    if( are_equal == true )
+    {
+        if( uid1.Data1 != uid2.Data1  ||
+            uid1.Data2 != uid2.Data2  ||
+            uid1.Data3 != uid2.Data3 )
+        {
+            are_equal = false;
+        }
+    }
+
+
+    return are_equal;
+}
+
+
+
+bool operator !=( const aafUID_t uid1, const aafUID_t uid2 )
+{
+    return (! operator==( uid1, uid2 ) );
 }
 
 

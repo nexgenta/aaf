@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTest.h,v 1.5.2.2 2004/03/17 21:43:26 akharkev Exp $ $Name:  $
+// $Id: ModuleTest.h,v 1.5.2.3 2004/03/22 18:06:46 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,6 +71,9 @@ bool RC1TestSupported(aafProductVersion_constref toolkitVersion);
 //
 // Comparison operators
 //
+bool operator ==( const aafUID_t uid1, const aafUID_t uid2 );
+bool operator !=( const aafUID_t uid1, const aafUID_t uid2 );
+
 bool operator ==( const aafRational_t& a, const aafRational_t& b );
 bool operator !=( const aafRational_t& a, const aafRational_t& b );
 
