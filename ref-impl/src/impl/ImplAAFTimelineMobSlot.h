@@ -8,7 +8,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -38,9 +37,6 @@ public:
   //********
   ImplAAFTimelineMobSlot ();
   ~ImplAAFTimelineMobSlot ();
-
-  OMDECLARE_STORABLE(ImplAAFMobSlot)
-
 
   virtual AAFRESULT STDMETHODCALLTYPE
 	Initialize ();
@@ -88,11 +84,6 @@ virtual AAFRESULT FindSegment(aafPosition_t offset,
   virtual AAFRESULT ConvertToMyRate(aafPosition_t tmpPos,
 										  ImplAAFMobSlot *srcSlot,
 										aafPosition_t *convertPos);
-
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFTimelineMobSlotTest.cpp.
-	static AAFRESULT test();
 
 protected:
 	OMFixedSizeProperty<aafRational_t>	_editRate;
