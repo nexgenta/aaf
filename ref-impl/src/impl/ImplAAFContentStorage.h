@@ -53,15 +53,13 @@ class ImplAAFFile;
 #include "ImplAAFObject.h"
 #endif
 
-#include "aafTable.h"
-
 #include "aafErr.h"
 #include "ImplAAFObject.h"
 #include "ImplAAFMob.h"
 #include "ImplAAFEssenceData.h"
 
-#include "OMProperty.h"
-
+#include "OMStrongRefSetProperty.h"
+#include "OMDataTypes.h"
 
 class AAFDataKind;
 class AAFOperationDef;
@@ -83,7 +81,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     LookupMob
-        (const aafUID_t &  mobID,   //@parm [in,ref] The Mob ID
+        (aafMobID_constref  mobID,   //@parm [in,ref] The Mob ID
 		 ImplAAFMob ** ppMob);  //@parm [out,retval] Matching Mob
 
 
@@ -134,7 +132,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     IsEssenceDataPresent
         (// @parm [in] A Unique File Mob ID
-		 const aafUID_t & fileMobID,
+		 aafMobID_constref fileMobID,
 
 		 // @parm [in] The Essence File Format
 		 aafFileFormat_t  fmt,
@@ -172,23 +170,14 @@ public:
 
 
 	// Interfaces visible inside the toolkit, but not exposed through the API
-	virtual AAFRESULT UnlinkMobID(const aafUID_t & mobID);
+	virtual AAFRESULT UnlinkMobID(aafMobID_constref mobID);
 
-	AAFRESULT LookupEssence (const aafUID_t & fileMobID, ImplAAFEssenceData **ppEssence);
-	AAFRESULT ChangeIndexedMobID (ImplAAFMob *pMob, const aafUID_t & newID);
-
-AAFRESULT
-    GetNthMob (aafInt32 index, ImplAAFMob **ppEnum);
-
-AAFRESULT
-    GetNthEssenceData (aafInt32 index, ImplAAFEssenceData **ppEnum);
-
-AAFRESULT LoadMobTables(void);
+	AAFRESULT LookupEssence (aafMobID_constref fileMobID, ImplAAFEssenceData **ppEssence);
+	AAFRESULT ChangeIndexedMobID (ImplAAFMob *pMob, aafMobID_constref newID);
 
 private:
-	aafTable_t		*_mobIndex;		// Non-persistant
-    OMStrongReferenceVectorProperty<ImplAAFMob> _mobs;
-    OMStrongReferenceVectorProperty<ImplAAFEssenceData> _essenceData;
+    OMStrongReferenceSetProperty<OMUniqueMaterialIdentification, ImplAAFMob> _mobs;
+    OMStrongReferenceSetProperty<OMUniqueMaterialIdentification, ImplAAFEssenceData> _essenceData;
 };
 
 #endif // ! __ImplAAFHeader_h__
