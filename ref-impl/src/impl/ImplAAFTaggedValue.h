@@ -15,7 +15,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -39,7 +39,6 @@
 #include "ImplAAFObject.h"
 #endif
 
-class ImplAAFTypeDef;
 
 class ImplAAFTaggedValue : public ImplAAFObject
 {
@@ -62,10 +61,10 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in, string] User defined name of this tagged value object
-         const aafCharacter * pName,
+         wchar_t *  pName,
 
          // @parm [in] Type definition of this tagged value object
-         ImplAAFTypeDef * pTypeDef);
+         aafUID_t * pDatadef);
 
   //****************
   // GetName()
@@ -84,7 +83,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetNameBufLen
         // @parm [out] Name buffer length
-        (aafUInt32 *  pLen);
+        (aafInt32 *  pLen);
 
   //****************
   // GetTypeDefinition()

@@ -16,7 +16,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -97,13 +97,13 @@ public:
 		 aafSlotID_t  slotID,
 
 		 // @parm [in] Duration of the Source Clip to be added to the new slot
-		 const aafLength_t & length,
+		 aafLength_t  length,
 
 		 // @parm [in] Data kind of the new slot
-         ImplAAFDataDef * pDataDef,
+         aafUID_t * dataDef,
 
 		 // @parm [in] Edit rate of the new slot
-		 const aafRational_t & editRate);
+		 aafRational_t  editRate);
 
 
   //****************
@@ -179,15 +179,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     NewPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 const aafRational_t & editrate,
+		 aafRational_t  editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         ImplAAFDataDef * pEssenceKind,
+         aafUID_t * pEssenceKind,
 
-		 aafSourceRef_t  ref,
+		aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -198,15 +198,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 const aafRational_t & editrate,
+		 aafRational_t  editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         ImplAAFDataDef * pEssenceKind,
+         aafUID_t * pEssenceKind,
 
-		 aafSourceRef_t  ref,
+		aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -219,15 +219,15 @@ public:
         (aafAppendOption_t  addType,
 		
 		// @parm [in] Edit rate of slot to contain reference
-		 const aafRational_t & editrate,
+		 aafRational_t  editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         ImplAAFDataDef * pEssenceKind,
+         aafUID_t * pEssenceKind,
 
-		 aafSourceRef_t  ref,
+		aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip in the Source Mob
          aafLength_t  srcRefLength,

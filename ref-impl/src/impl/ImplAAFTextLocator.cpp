@@ -1,8 +1,3 @@
-//@doc
-//@class    AAFConstantValue | Implementation class for AAFConstantValue
-#ifndef __ImplAAFConstantValue_h__
-#define __ImplAAFConstantValue_h__
-
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -30,72 +25,82 @@
  *
  ************************************************************************/
 
-
-class ImplAAFDataDef;
-class ImplAAFParameter;
-
-
-#ifndef __ImplAAFParameter_h__
-#include "ImplAAFParameter.h"
+#ifndef __ImplAAFTextLocator_h__
+#include "ImplAAFTextLocator.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
 
-class ImplAAFConstantValue : public ImplAAFParameter
+#include "AAFResult.h"
+#include <assert.h>
+#include <string.h>
+
+
+ImplAAFTextLocator::ImplAAFTextLocator () :
+	_name(PID_TextLocator_Name,		"Text Locator")
 {
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplAAFConstantValue ();
-
-protected:
-  virtual ~ImplAAFConstantValue ();
-
-public:
+	_persistentProperties.put(_name.address());
+	_name = L"";
+}
 
 
+ImplAAFTextLocator::~ImplAAFTextLocator ()
+{}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTextLocator::Initialize ()
+{
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTextLocator::GetName (wchar_t* pNameBuf, aafInt32  bufSize)
+{
+	bool stat;
+	if (! pNameBuf)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	stat = _name.copyToBuffer(pNameBuf, bufSize);
+	if (! stat)
+	{
+		return AAFRESULT_SMALLBUF;
+	}
 	
-/****/
-  //****************
-  // GetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
-
-         // @parm [out, size_is(valueSize),length_is(*bytesRead)] Preallocated buffer to hold value
-         aafDataBuffer_t  pValue,
-
-         // @parm [out] Number of actual bytes read
-         aafUInt32*  bytesRead);
+	return AAFRESULT_SUCCESS;
+}
 
 
-  //****************
-  // GetValueBufLen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValueBufLen
-        // @parm [out] Mob Name
-        (aafUInt32 *  pLen);
 
-/****/
-  //****************
-  // SetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTextLocator::GetNameBufLen (aafInt32* pLen)
+{
+	if (! pLen)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	*pLen = _name.size();
+	
+	return AAFRESULT_SUCCESS;
+}
 
-         // @parm [in, size_is(valueSize)] buffer containing value
-         aafDataBuffer_t  pValue);
 
-private:
-  OMVariableSizeProperty<aafUInt8>	_value;
-};
 
-#endif // ! __ImplAAFConstantValue_h__
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTextLocator::SetName (wchar_t* pNameBuf)
+{
+	if (! pNameBuf)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	_name = pNameBuf;
+
+	return(AAFRESULT_SUCCESS); 
+}
+
+
+
 
 

@@ -1,8 +1,3 @@
-//@doc
-//@class    AAFConstantValue | Implementation class for AAFConstantValue
-#ifndef __ImplAAFConstantValue_h__
-#define __ImplAAFConstantValue_h__
-
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -30,72 +25,49 @@
  *
  ************************************************************************/
 
-
-class ImplAAFDataDef;
-class ImplAAFParameter;
-
-
-#ifndef __ImplAAFParameter_h__
-#include "ImplAAFParameter.h"
+#ifndef __ImplAAFGPITrigger_h__
+#include "ImplAAFGPITrigger.h"
 #endif
 
 
-class ImplAAFConstantValue : public ImplAAFParameter
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+#include <AAFResult.h>
+
+
+ImplAAFGPITrigger::ImplAAFGPITrigger () :
+  _activeState(PID_GPITrigger_ActiveState, "ActiveState")
 {
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplAAFConstantValue ();
-
-protected:
-  virtual ~ImplAAFConstantValue ();
-
-public:
+  _persistentProperties.put(_activeState.address());
+}
 
 
-	
-/****/
-  //****************
-  // GetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
-
-         // @parm [out, size_is(valueSize),length_is(*bytesRead)] Preallocated buffer to hold value
-         aafDataBuffer_t  pValue,
-
-         // @parm [out] Number of actual bytes read
-         aafUInt32*  bytesRead);
+ImplAAFGPITrigger::~ImplAAFGPITrigger ()
+{}
 
 
-  //****************
-  // GetValueBufLen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValueBufLen
-        // @parm [out] Mob Name
-        (aafUInt32 *  pLen);
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFGPITrigger::GetActiveState (
+      aafBool *pActiveState)
+{
+  if (NULL == pActiveState)
+    return AAFRESULT_NULL_PARAM;
 
-/****/
-  //****************
-  // SetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
+  *pActiveState = _activeState;
+  return AAFRESULT_SUCCESS;
+}
 
-         // @parm [in, size_is(valueSize)] buffer containing value
-         aafDataBuffer_t  pValue);
 
-private:
-  OMVariableSizeProperty<aafUInt8>	_value;
-};
 
-#endif // ! __ImplAAFConstantValue_h__
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFGPITrigger::SetActiveState (
+      aafBool  ActiveState)
+{
+  _activeState = ActiveState;
+  return AAFRESULT_SUCCESS;
+}
+
+
+
 
 

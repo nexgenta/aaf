@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -63,48 +63,48 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeManufacturer
 		// @parm [in,string] Manufacturers name
-        (const aafCharacter*  pName);
+        (aafWChar*  pName);
   //****************
   // GetTapeManufacturer()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeManufacturer
 	    (// @parm [in,string] pass in a buffer which is cleared and filled.
-         aafCharacter*  pName,
+         aafWChar*  pName,
 
 		 // @parm [in] Length of the buffer to hold the Manufacturers name
-		 aafUInt32  buflen);
+		 aafInt32  buflen);
   //****************
-  // GetTapeManufacturerBufLen()
+  // GetTapeManBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTapeManufacturerBufLen
+    GetTapeManBufLen
 		// @parm [out] Manufacturers Name length
-        (aafUInt32 *  pLen);
+        (aafInt32 *  pLen);
   //****************
   // SetTapeModel()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeModel
 		// @parm [in,string] Tape Manufacturers Brand name
-        (const aafCharacter*  pModelName);
+        (aafWChar*  pModelName);
   //****************
   // GetTapeModel()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeModel
 	    (// @parm [in,string] pass in a buffer which is cleared and filled.
-         aafCharacter*  pModelName,
+         aafWChar*  pModelName,
 
 		 // @parm [in] Length of the buffer to hold the Manufacturers Brand name
-		 aafUInt32  buflen);
+		 aafInt32  buflen);
   //****************
   // GetTapeModelBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeModelBufLen
 		// @parm [out] Model length
-        (aafUInt32 *  pLen);
+        (aafInt32 *  pLen);
 
   //****************
   // SetTapeFormFactor()

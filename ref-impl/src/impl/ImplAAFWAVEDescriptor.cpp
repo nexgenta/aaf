@@ -1,8 +1,3 @@
-//@doc
-//@class    AAFConstantValue | Implementation class for AAFConstantValue
-#ifndef __ImplAAFConstantValue_h__
-#define __ImplAAFConstantValue_h__
-
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -31,71 +26,74 @@
  ************************************************************************/
 
 
-class ImplAAFDataDef;
-class ImplAAFParameter;
 
 
-#ifndef __ImplAAFParameter_h__
-#include "ImplAAFParameter.h"
+
+
+#ifndef __ImplAAFWAVEDescriptor_h__
+#include "ImplAAFWAVEDescriptor.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
 
-class ImplAAFConstantValue : public ImplAAFParameter
+#include <assert.h>
+#include <string.h>
+
+
+ImplAAFWAVEDescriptor::ImplAAFWAVEDescriptor ()
+:   _summary(PID_WAVEDescriptor_Summary,	"Summary")
 {
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplAAFConstantValue ();
-
-protected:
-  virtual ~ImplAAFConstantValue ();
-
-public:
+	_persistentProperties.put(_summary.address());
+}
 
 
-	
-/****/
-  //****************
-  // GetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
+ImplAAFWAVEDescriptor::~ImplAAFWAVEDescriptor ()
+{
+	// TODO: free summary
+}
 
-         // @parm [out, size_is(valueSize),length_is(*bytesRead)] Preallocated buffer to hold value
-         aafDataBuffer_t  pValue,
-
-         // @parm [out] Number of actual bytes read
-         aafUInt32*  bytesRead);
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFWAVEDescriptor::Initialize ()
+{
+  return AAFRESULT_SUCCESS;
+}
 
 
-  //****************
-  // GetValueBufLen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValueBufLen
-        // @parm [out] Mob Name
-        (aafUInt32 *  pLen);
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFWAVEDescriptor::GetSummary (aafUInt32 size, aafDataValue_t pSummary)
+{
+	if(pSummary == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-/****/
-  //****************
-  // SetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
+	if (_summary.size() > size)
+	  return AAFRESULT_SMALLBUF;
 
-         // @parm [in, size_is(valueSize)] buffer containing value
-         aafDataBuffer_t  pValue);
+	_summary.copyToBuffer(pSummary, size);
 
-private:
-  OMVariableSizeProperty<aafUInt8>	_value;
-};
-
-#endif // ! __ImplAAFConstantValue_h__
+	return(AAFRESULT_SUCCESS); 
+}
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFWAVEDescriptor::GetSummaryBufferSize (aafUInt32* pSize)
+{
+	if(pSize == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	*pSize = _summary.size();
+
+	return(AAFRESULT_SUCCESS); 
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFWAVEDescriptor::SetSummary (aafUInt32 size, aafDataValue_t  pSummary)
+{
+	if(pSummary == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	_summary.setValue(pSummary, size);
+
+	return(AAFRESULT_SUCCESS); 
+}

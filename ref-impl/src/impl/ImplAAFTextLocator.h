@@ -1,8 +1,3 @@
-//@doc
-//@class    AAFParameterDef | Implementation class for AAFParameterDef
-#ifndef __ImplAAFParameterDef_h__
-#define __ImplAAFParameterDef_h__
-
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -29,81 +24,72 @@
  * LIABILITY.
  *
  ************************************************************************/
+//@doc
+//@class    AAFTextLocator | Implementation class for AAFTextLocator
+#ifndef __ImplAAFTextLocator_h__
+#define __ImplAAFTextLocator_h__
 
- 
-
-
-
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
+#ifndef __ImplAAFLocator_h__
+#include "ImplAAFLocator.h"
 #endif
 
-class ImplAAFTypeDef;
 
-class ImplAAFParameterDef : public ImplAAFDefObject
+class ImplAAFTextLocator : public ImplAAFLocator
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFParameterDef ();
+  ImplAAFTextLocator ();
 
 protected:
-  virtual ~ImplAAFParameterDef ();
+  virtual ~ImplAAFTextLocator ();
 
 public:
 
-
   //****************
-  // GetParameterDataDefID()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTypeDef
-        // @parm [retval][out] Pointer to an AUID reference
-        (ImplAAFTypeDef **  pParameterDataDefID);
+    Initialize ();
+
 
   //****************
-  // SetParameterDataDefID()
+  // GetName()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetTypeDef
-        // @parm [in] an AUID reference
-        (ImplAAFTypeDef * ParameterDataDefID);
+    GetName
+        (// @parm [out, size_is(bufSize), string] buffer into which Name is written
+         wchar_t *  pNameBuf,
 
-  //****************
-  // GetDisplayUnits()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetDisplayUnits
-        (// @parm [in,string] DisplayUnits
-         wchar_t *  pDisplayUnits,
-
-         // @parm [in] length of the buffer to hold DisplayUnits
+         // @parm [in] The size of the pNameBuf buffer
          aafInt32  bufSize);
 
+
   //****************
-  // GetDisplayUnitsBufLen()
+  // GetNameBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetDisplayUnitsBufLen
-        // @parm [out] DisplayUnits
+    GetNameBufLen
+        // @parm [out] required buffer length
         (aafInt32 *  pLen);
 
 
-
   //****************
-  // SetDisplayUnits()
+  // SetName()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetDisplayUnits
-        // @parm [in, string] DisplayUnits
-        (wchar_t *  pDisplayUnits);
+    SetName
+        // @parm [in, string] the new Name
+        (wchar_t *  pNameBuf);
 
+
+  // Persistent data
 private:
-	OMFixedSizeProperty<aafUID_t>							_typeDef;
-	OMWideStringProperty									_displayUnits;
+	OMWideStringProperty                      _name;
 };
 
-#endif // ! __ImplAAFParameterDef_h__
+#endif // ! __ImplAAFTextLocator_h__
+
 

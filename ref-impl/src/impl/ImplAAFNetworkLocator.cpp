@@ -1,8 +1,3 @@
-//@doc
-//@class    AAFConstantValue | Implementation class for AAFConstantValue
-#ifndef __ImplAAFConstantValue_h__
-#define __ImplAAFConstantValue_h__
-
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -31,71 +26,86 @@
  ************************************************************************/
 
 
-class ImplAAFDataDef;
-class ImplAAFParameter;
 
 
-#ifndef __ImplAAFParameter_h__
-#include "ImplAAFParameter.h"
+#ifndef __ImplAAFNetworkLocator_h__
+#include "ImplAAFNetworkLocator.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
 
-class ImplAAFConstantValue : public ImplAAFParameter
+#include "AAFResult.h"
+
+#include <assert.h>
+
+
+ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
+: _path(PID_NetworkLocator_URLString, "URLString")
 {
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplAAFConstantValue ();
-
-protected:
-  virtual ~ImplAAFConstantValue ();
-
-public:
+  _persistentProperties.put(_path.address());
+  _path = L"";
+}
 
 
-	
-/****/
-  //****************
-  // GetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
-
-         // @parm [out, size_is(valueSize),length_is(*bytesRead)] Preallocated buffer to hold value
-         aafDataBuffer_t  pValue,
-
-         // @parm [out] Number of actual bytes read
-         aafUInt32*  bytesRead);
+ImplAAFNetworkLocator::~ImplAAFNetworkLocator ()
+{}
 
 
-  //****************
-  // GetValueBufLen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetValueBufLen
-        // @parm [out] Mob Name
-        (aafUInt32 *  pLen);
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFNetworkLocator::Initialize ()
+{
+  return AAFRESULT_SUCCESS;
+}
 
-/****/
-  //****************
-  // SetValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetValue
-        (// @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
 
-         // @parm [in, size_is(valueSize)] buffer containing value
-         aafDataBuffer_t  pValue);
+// Override from AAFLocator
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFNetworkLocator::GetPath (aafWChar *  pPathBuf,
+								aafInt32    bufSize)
+{
+  bool stat;
+  if (! pPathBuf)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  stat = _path.copyToBuffer(pPathBuf, bufSize);
+  if (! stat)
+	{
+	  return AAFRESULT_SMALLBUF;
+	}
+  return AAFRESULT_SUCCESS;
+}
 
-private:
-  OMVariableSizeProperty<aafUInt8>	_value;
-};
 
-#endif // ! __ImplAAFConstantValue_h__
+
+// Override from AAFLocator
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFNetworkLocator::GetPathBufLen (aafInt32 *  pLen)
+{
+  if (! pLen)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  *pLen = _path.size();
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+// Override from AAFLocator
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFNetworkLocator::SetPath (aafWChar *  pPathBuf)
+{
+  if (! pPathBuf)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+	_path = pPathBuf;
+
+	return(AAFRESULT_SUCCESS); 
+}
+
 
 

@@ -1,7 +1,5 @@
-//@doc
-//@class    AAFParameterDef | Implementation class for AAFParameterDef
-#ifndef __ImplAAFParameterDef_h__
-#define __ImplAAFParameterDef_h__
+#ifndef __ImplAAFWAVEDescriptor_h__
+#define __ImplAAFWAVEDescriptor_h__
 
 /***********************************************************************
  *
@@ -30,80 +28,62 @@
  *
  ************************************************************************/
 
- 
+
+#include "ImplAAFFileDescriptor.h"
 
 
-
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
-#endif
-
-class ImplAAFTypeDef;
-
-class ImplAAFParameterDef : public ImplAAFDefObject
+class ImplAAFWAVEDescriptor : public ImplAAFFileDescriptor
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFParameterDef ();
+  ImplAAFWAVEDescriptor ();
 
 protected:
-  virtual ~ImplAAFParameterDef ();
+  virtual ~ImplAAFWAVEDescriptor ();
 
 public:
+  virtual AAFRESULT STDMETHODCALLTYPE
+	Initialize ();
 
 
   //****************
-  // GetParameterDataDefID()
+  // GetSummary()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTypeDef
-        // @parm [retval][out] Pointer to an AUID reference
-        (ImplAAFTypeDef **  pParameterDataDefID);
+    GetSummary
+	    (// [in] Size of preallocated buffer
+         aafUInt32  size,
+
+		 // [out, size_is(size)] Preallocated buffer to hold the WAVE file information
+		 aafDataValue_t  pSummary);
 
   //****************
-  // SetParameterDataDefID()
+  // GetSummaryBufferSize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetTypeDef
-        // @parm [in] an AUID reference
-        (ImplAAFTypeDef * ParameterDataDefID);
+    GetSummaryBufferSize
+		// [out] required buffer size
+        (aafUInt32 *  pSize);
 
   //****************
-  // GetDisplayUnits()
+  // SetSummary()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetDisplayUnits
-        (// @parm [in,string] DisplayUnits
-         wchar_t *  pDisplayUnits,
+    SetSummary
+	    (// [in] Size of preallocated buffer
+         aafUInt32  size,
 
-         // @parm [in] length of the buffer to hold DisplayUnits
-         aafInt32  bufSize);
+		 // [in, size_is(size)] buffer containing value
+		 aafDataValue_t  pSummary);
 
-  //****************
-  // GetDisplayUnitsBufLen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetDisplayUnitsBufLen
-        // @parm [out] DisplayUnits
-        (aafInt32 *  pLen);
-
-
-
-  //****************
-  // SetDisplayUnits()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetDisplayUnits
-        // @parm [in, string] DisplayUnits
-        (wchar_t *  pDisplayUnits);
 
 private:
-	OMFixedSizeProperty<aafUID_t>							_typeDef;
-	OMWideStringProperty									_displayUnits;
+	OMVariableSizeProperty<aafUInt8> _summary;
+
 };
 
-#endif // ! __ImplAAFParameterDef_h__
+#endif // ! __ImplAAFWAVEDescriptor_h__
 

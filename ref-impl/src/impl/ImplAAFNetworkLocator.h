@@ -58,20 +58,20 @@ public:
 
   // Override from AAFLocator
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPath (/*[out, size_is(bufSize), string]*/ aafCharacter *  pPathBuf,
-	  /*[in]*/ aafUInt32  bufSize);
+    GetPath (/*[out, size_is(bufSize), string]*/ aafWChar *  pPathBuf,
+	  /*[in]*/ aafInt32  bufSize);
 
 
 
   // Override from AAFLocator
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPathBufLen (/*[out]*/ aafUInt32 *  pLen);
+    GetPathBufLen (/*[out]*/ aafInt32 *  pLen);
 
 
 
   // Override from AAFLocator
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetPath (/*[in, string]*/ const aafCharacter *  pPathBuf);
+    SetPath (/*[in, string]*/ aafWChar *  pPathBuf);
 
 private:
   OMWideStringProperty                             _path;
