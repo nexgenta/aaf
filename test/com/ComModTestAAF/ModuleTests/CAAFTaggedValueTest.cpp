@@ -1,49 +1,25 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTaggedValue
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
+
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
-
-#include "AAFSmartPointer.h"
-typedef IAAFSmartPointer<IAAFDataDef> IAAFDataDefSP;
 
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 static const aafUID_t *	slotDDefs[5] = {&DDEF_Picture, &DDEF_Sound, &DDEF_Sound, &DDEF_Picture, &DDEF_Picture};
@@ -51,24 +27,12 @@ static aafLength_t	slotsLength[5] = { 297, 44100, 44100, 44100, 44100};
 
 static aafInt32 fadeInLen  = 1000;
 static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
-static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
+static aafFadeType_t fadeInType = kFadeLinearAmp;
+static aafFadeType_t fadeOutType = kFadeLinearPower;
 static aafSourceRef_t sourceRef; 
 static aafWChar* TagNames =  L"TAG01";
 static aafWChar* Comments =  L"Comment 1";	
 static aafWChar* AltComment = L"Alternate Comment";
-
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xebf452a8, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-static const 	aafMobID_t	TEST_referencedMobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x25ede122, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
 {
@@ -105,24 +69,24 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob*			pRMob = NULL;
 	IAAFMasterMob*		pReferencedMob = NULL;
 	IAAFCompositionMob* pCompMob = NULL;
-	IAAFTimelineMobSlot	*newSlot = NULL;
+	IAAFMobSlot			*newSlot = NULL;
 	IAAFSegment			*seg = NULL;
 	IAAFSourceClip		*sclp = NULL;
 	aafProductIdentification_t	ProductInfo;
+	aafUID_t			newUID, referencedMobID;
 	HRESULT				hr = S_OK;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFTaggedValue Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productName = L"AAFTaggedValues Test";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
 
 	try
 	{
@@ -138,19 +102,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
  		
 		//Make the first mob
 		long	test;
 		aafRational_t	audioRate = { 44100, 1 };
 
 		// Create a  Composition Mob
-		checkResult(defs.cdCompositionMob()->
-					CreateInstance(IID_IAAFCompositionMob, 
-								   (IUnknown **)&pCompMob));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+								  IID_IAAFCompositionMob, 
+								  (IUnknown **)&pCompMob));
 
 		checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&newUID));
+		checkResult(pMob->SetMobID(&newUID));
 		checkResult(pMob->SetName(L"AAFTaggedValuesTest"));
 
 		// append a comment to this mob !!
@@ -159,38 +123,31 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->AppendComment(TagNames, AltComment));
 
 		// Create a master mob to be referenced
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMasterMob, 
-								   (IUnknown **)&pReferencedMob));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
+								 IID_IAAFMasterMob, 
+								 (IUnknown **)&pReferencedMob));
 
 		checkResult(pReferencedMob->QueryInterface(IID_IAAFMob, (void **)&pRMob));
-		checkResult(pRMob->SetMobID(TEST_referencedMobID));
+		checkResult(CoCreateGuid((GUID *)&referencedMobID));
+		checkResult(pRMob->SetMobID(&referencedMobID));
 		checkResult(pRMob->SetName(L"AAFTaggedValueTest::ReferencedMob"));
 
 		// Add some slots
 		for(test = 0; test < 5; test++)
 		{
- 			checkResult(defs.cdSourceClip()->
-						CreateInstance(IID_IAAFSourceClip, 
-									   (IUnknown **)&sclp));		
+ 			checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
+								     IID_IAAFSourceClip, 
+								     (IUnknown **)&sclp));		
 			// Set the properties for the SourceClip
-			sourceRef.sourceID = TEST_referencedMobID;
+			sourceRef.sourceID = referencedMobID;
 			sourceRef.sourceSlotID = 0;
 			sourceRef.startTime = 0;
-			IAAFDataDefSP pDataDef;
-			checkResult(pDictionary->LookupDataDef(*slotDDefs[test], &pDataDef));
-			checkResult(sclp->Initialize(pDataDef, slotsLength[test], sourceRef));
+			checkResult(sclp->Initialize((aafUID_t *)slotDDefs[test], &slotsLength[test], sourceRef));
 			checkResult(sclp->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
 
 			checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 			
-			aafRational_t editRate = { 0, 1};
-			checkResult(pMob->AppendNewTimelineSlot (editRate,
-													 seg,
-													 test+1,
-													 slotNames[test],
-													 0,
-													 &newSlot));
+			checkResult(pMob->AppendNewSlot (seg, test+1, slotNames[test], &newSlot));
 
 			newSlot->Release();
 			newSlot = NULL;
@@ -203,8 +160,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		}
 
 		// Add the mob to the file.
-		checkResult(pHeader->AddMob(pMob));
-		checkResult(pHeader->AddMob(pRMob));
+		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pHeader->AppendMob(pRMob));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -273,15 +230,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafWChar		Value[64];
 	aafSearchCrit_t	criteria;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFTaggedValue Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productName = L"AAFMob Test";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
@@ -294,21 +249,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		// We can't really do anthing in AAF without the header.
   		checkResult(pFile->GetHeader(&pHeader));
 
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFCompMob;
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kCompMob;
 
 
-		checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
+		checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 
-		checkResult(pHeader->GetMobs (&criteria, &mobIter));
+		checkResult(pHeader->EnumAAFAllMobs (&criteria, &mobIter));
 
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500], slotName[500];
 			aafNumSlots_t	numSlots;
-			aafMobID_t		mobID;
+			aafUID_t		mobID;
 			aafSlotID_t		trackID;
 
 			checkResult(mobIter->NextOne (&aMob));
@@ -316,9 +271,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(aMob->GetMobID (&mobID));
 
 			// Check for comments
-			checkResult(aMob->CountComments(&numComments));
+			checkResult(aMob->GetNumComments(&numComments));
 			checkExpression(1 == numComments, AAFRESULT_TEST_FAILED);
-			checkResult(aMob->GetComments(&pCommentIterator));
+			checkResult(aMob->EnumAAFAllMobComments(&pCommentIterator));
 			for(com = 0; com < numComments; com++)
 			{
 				checkResult(pCommentIterator->NextOne(&pComment));
@@ -330,10 +285,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			}
 			pCommentIterator->Release();
 			
-			checkResult(aMob->CountSlots (&numSlots));
+			checkResult(aMob->GetNumSlots (&numSlots));
 			checkExpression(5 == numSlots, AAFRESULT_TEST_FAILED);
 
-			checkResult(aMob->GetSlots(&slotIter));
+			checkResult(aMob->EnumAAFAllMobSlots(&slotIter));
 
 			for(slt = 0; slt < numSlots; slt++)
 			{
@@ -385,7 +340,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CAAFTaggedValue_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
- 	aafWChar * pFileName = L"AAFTaggedValueTest.aaf";
+ 	aafWChar * pFileName = L"TaggedValuesTest.aaf";
 
 	try
 	{
@@ -396,7 +351,7 @@ extern "C" HRESULT CAAFTaggedValue_test()
 	catch (...)
 	{
 	  cerr << "CTaggedValues_test...Caught general C++"
-		   << " exception!" << endl; 
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

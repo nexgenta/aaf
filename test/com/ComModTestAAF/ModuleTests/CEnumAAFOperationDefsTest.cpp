@@ -1,31 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFContainerDefs object
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/************************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\************************************************/
 
 #include "AAF.h"
 
@@ -39,8 +21,6 @@
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -84,7 +64,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFOperationDefs Test";
+	ProductInfo.productName = L"AAFMasterMob Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -124,15 +104,18 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
-  IAAFFile*			pFile = NULL;
-  IAAFHeader *		pHeader = NULL;
-  IAAFDictionary*		pDictionary = NULL;
-  IAAFDefObject*		pDef = NULL;
-  IAAFOperationDef*	pOperationDef = NULL;
-  IAAFParameterDef*	pParamDef = NULL;
-  bool				bFileOpen = false;
-  HRESULT				hr = S_OK;
-  long				n;
+	IAAFFile*			pFile = NULL;
+	IAAFHeader *		pHeader = NULL;
+	IAAFDictionary*		pDictionary = NULL;
+	IAAFDefObject*		pDef = NULL;
+	IAAFOperationDef*	pOperationDef = NULL;
+	IAAFParameterDef*	pParamDef = NULL;
+	bool				bFileOpen = false;
+	HRESULT				hr = S_OK;
+	long				n;
+	aafUID_t			testDataDef = DDEF_Picture;
+/*	long				test;
+*/
 
   try
   {
@@ -141,27 +124,23 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Create the AAF file
-	checkResult(OpenAAFFile(pFileName,
-							kMediaOpenAppend,
-							&pFile,
-							&pHeader));
+	checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
     bFileOpen = true;
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
-	CAAFBuiltinDefs defs (pDictionary);
     
 	for(n = 0; n < 2; n++)
 	{
-		checkResult(defs.cdOperationDef()->
-					CreateInstance(IID_IAAFOperationDef, 
-								   (IUnknown **)&pOperationDef));    
-		checkResult(defs.cdParameterDef()->
-					CreateInstance(IID_IAAFParameterDef, 
-								   (IUnknown **)&pParamDef));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFOperationDef,
+			IID_IAAFOperationDef, 
+			(IUnknown **)&pOperationDef));    
+				checkResult(pDictionary->CreateInstance(&AUID_AAFParameterDef,
+									  IID_IAAFParameterDef, 
+									  (IUnknown **)&pParamDef));
 		
-		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
-		checkResult(pDictionary->RegisterParameterDef(pParamDef));
+		checkResult(pDictionary->RegisterOperationDefinition(pOperationDef));
+		checkResult(pDictionary->RegisterParameterDefinition(pParamDef));
 		
 		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
 		checkResult(pDef->SetName (sName[n]));
@@ -170,22 +149,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pDef = NULL;
 		
 		//!!!Not testing the INIT on AAFDefObject
-		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
+		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
 		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
-		checkResult(pOperationDef->AddParameterDef (pParamDef));
+		checkResult(pOperationDef->AddParameterDefs (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
 		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
+		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
 		
 		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
 		checkResult(pDef->SetName (TEST_PARAM_NAME));
 		checkResult(pDef->SetDescription (TEST_PARAM_DESC));
 		pDef->Release();
 		pDef = NULL;
-		pParamDef->Release();
-		pParamDef = NULL;
 		
 		pOperationDef->Release();
 		pOperationDef = NULL;
@@ -250,7 +227,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetOperationDefs(&pPlug));
+		checkResult(pDictionary->GetOperationDefinitions(&pPlug));
 		/* Read and check the first element */
 		checkResult(pPlug->NextOne(&pOperationDef));
 		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
@@ -359,9 +336,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pArray[1])
 		pArray[1]->Release();
             
-	if (pDictionary)
-		pDictionary->Release();
-
 	if (pFile)
 	{  // Close file
 		if (bFileOpen)
