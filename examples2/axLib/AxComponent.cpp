@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.cpp,v 1.21 2005/01/12 04:23:40 jfpanisset Exp $ $Name:  $
+// $Id: AxComponent.cpp,v 1.22 2005/01/12 04:35:36 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -487,11 +487,6 @@ aafUInt32 AxOperationGroup::CountParameters()
 	CHECK_HRESULT( _spIaafOperationGroup->CountParameters(&numParams));
 
 	return numParams;
-}
-
-void AxOperationGroup::AddParameter( IAAFParameterSP spIaafParameter )
-{
-  CHECK_HRESULT( _spIaafOperationGroup->AddParameter(spIaafParameter));
 }
 
 IEnumAAFParametersSP AxOperationGroup::GetParameters()
