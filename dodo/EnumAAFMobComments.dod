@@ -1,10 +1,8 @@
 #startm .this-module 0
-EnumAAFMobComments\
-#endm
-#startm .parent-module 0
-AAFRoot\
+EnumAAFMobCommentComments\
 #endm
 #c
+#import ./AAFUnitTest.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -15,16 +13,11 @@ AD_HEAD
 *                                          *
 \******************************************/
 
- 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
 
 AD_CLASS_UUID(B1A213A7, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A213A6, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_ROOT_CLASS_BEGIN
 
 AD_METHOD1(NextOne,
 			[out\\\,retval], aafMobComment_t *, pMobComment, The Next MobComment,
@@ -46,7 +39,7 @@ AD_METHOD3(Next,
 AD_METHOD1(Skip,
 		   [in], aafUInt32, count, Number of elements to skip,
 		   Instructs the enumerator to skip the next count elements in the enumeration so that 
-  // the next call to EnumAAFMobComments::Next will not return 
+  // the next call to EnumAAFMobCommentComments::Next will not return 
   // those elements.)
 
 AD_METHOD0(Reset,
@@ -58,7 +51,7 @@ Instructs the enumerator to position itself at the beginning of the list of elem
 AD_XMETHOD1(Clone,
 			[out\,retval],
 			objOut,
-			EnumAAFMobComments,
+			EnumAAFMobCommentComments,
 			ppEnum,
 			new enumeration,
 			Creates another mob comment enumerator with the same state as the current 
@@ -67,4 +60,7 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_CLASS_END
+
+AD_OVERRIDE(.method-Test)
+
+AD_ROOT_CLASS_END
