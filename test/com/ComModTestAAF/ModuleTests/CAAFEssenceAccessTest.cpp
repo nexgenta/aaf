@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.37.2.2 2004/07/01 22:50:55 tbingham Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.37.2.3 2004/07/02 14:33:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,12 +31,6 @@
 using namespace std;
 
 #include "AAFPlatform.h"
-
-#if !defined(COMPILER_MSC)
-#include <unistd.h>
-#else
-#include <direct.h>
-#endif
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
@@ -203,6 +197,8 @@ static const aafUInt8 compressed422JFIF[] =
 #define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
 #include <direct.h>
 #define getcwd(buf, size) _getcwd(buf, size)
+#else
+#include <unistd.h>		// getcwd
 #endif
 
 static bool acceptable_pchar(unsigned char c)
