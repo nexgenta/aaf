@@ -151,7 +151,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFCodecDef,
 								   (IUnknown **)&pPlugDef));
     
-		uid = CodecWave;
+		uid = kAAFCodecWAVE;
 		checkResult(pPlugDef->Initialize (uid, L"TestCodec", L"TestCodecDescription"));
 
 		checkResult(pPlugDef->AddEssenceKind (defs.ddMatte()));
@@ -205,8 +205,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFCodecFlavours	*pEnum = NULL;
 	bool					bFileOpen = false;
 	aafBool					testResult;
-	aafUID_t				codecID = CodecWave;
-	aafUID_t				readFlavour, checkFlavour = NilCodecFlavour;
+	aafUID_t				codecID = kAAFCodecWAVE;
+	aafUID_t				readFlavour, checkFlavour = kAAFNilCodecFlavour;
 	HRESULT					hr = S_OK;
 
 	try
@@ -273,7 +273,9 @@ extern "C" HRESULT CAAFCodecDef_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFCodecDef_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFCodecDef_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
