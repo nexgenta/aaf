@@ -103,15 +103,88 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFNestedScope::RemoveSegment (
-      ImplAAFSegment * /*pSegment*/)
+    ImplAAFNestedScope::PrependSegment (ImplAAFSegment* pSegment)
 {
+	if(pSegment == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFNestedScope::InsertSegmentAt (aafUInt32 index,
+										 ImplAAFSegment* pSegment)
+{
+  if(pSegment == NULL)
+	return(AAFRESULT_NULL_PARAM);
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountSegments (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFNestedScope::CountSegments (aafUInt32 * pResult)
+{
+  // Validate input pointer...
+  if (NULL == pResult)
+    return (AAFRESULT_NULL_PARAM);
+
+  size_t numSegments;
+
+	_slots.getSize(numSegments);
+	
+	*pResult = numSegments;
+
+	return(AAFRESULT_SUCCESS);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFNestedScope::GetSegmentAt (aafUInt32 index,
+									  ImplAAFSegment ** ppSegment)
+{
+  if(ppSegment == NULL)
+	return(AAFRESULT_NULL_PARAM);
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountSegments (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFNestedScope::RemoveSegmentAt (
+      aafUInt32 index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountSegments (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
   return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFNestedScope::GetSlots (ImplEnumAAFSegments** ppEnum)
+    ImplAAFNestedScope::GetSegments (ImplEnumAAFSegments** ppEnum)
 {
 	if(ppEnum == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -124,7 +197,8 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafMobID_constref from,
+														aafMobID_constref to)
 {
 	ImplAAFComponent	*comp = NULL;
 	
