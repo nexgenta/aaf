@@ -92,17 +92,6 @@ public:
          // @parm [out] character that is read
          aafCharacter *  pCharacter);
 
-  //****************
-  // GetCharacter()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetCharacter
-        (// @parm [in] character property value to modify
-         ImplAAFPropertyValue * pCharacterValue,
-
-         // @parm [in] character that is to be written
-         aafCharacter character);
-
   // Override from AAFTypeDef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
@@ -143,8 +132,8 @@ public:
   virtual size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
 
   virtual bool IsAggregatable () const;
   virtual bool IsStreamable () const;
