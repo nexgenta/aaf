@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.62 2004/11/19 17:22:28 stuart_hc Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.63 2004/11/22 03:34:00 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -969,7 +969,7 @@ HRESULT STDMETHODCALLTYPE
 	{
 		aafInt64 filesize = 0;
 		CHECK(_stream->GetPosition(&filesize));
-		aafUInt32 wavesize = filesize & 0xffffffff;		// 64bit -> 32bit
+		aafUInt32 wavesize = static_cast<aafUInt32>(filesize & 0xffffffff);		// 64bit -> 32bit
 
 		if(!_readOnly && _sampleDataHeaderWritten)
 		{
@@ -1001,7 +1001,7 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(fillSwappedWAVEData(&p, 4, &size32));
 
 		// Patch in data chunk size
-		size32 = wavesize - (_dataSizeOffset + 4);
+		size32 = static_cast<aafUInt32>(wavesize - (_dataSizeOffset + 4));
 		p = buf + _dataSizeOffset;
 		CHECK(fillSwappedWAVEData(&p, 4, &size32));
 
