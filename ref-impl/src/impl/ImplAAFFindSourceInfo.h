@@ -3,17 +3,39 @@
 #ifndef __ImplAAFFindSourceInfo_h__
 #define __ImplAAFFindSourceInfo_h__
 
+#include "OMStorable.h"
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+ 
 /***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
+*	Stub only.   Implementation not yet added	*
 \***********************************************/
+
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
+
+
+
+
 
 #ifndef __ImplAAFRoot_h__
 #include "ImplAAFRoot.h"
@@ -21,7 +43,7 @@
 
 class ImplAAFMob;
 class ImplAAFComponent;
-class ImplAAFOperationGroup;
+class ImplAAFEffectInvocation;
 class ImplAAFPulldown;
 
 class ImplAAFFindSourceInfo : public ImplAAFRoot
@@ -42,7 +64,7 @@ protected:
 	aafRational_t	_editRate;
 	aafLength_t		_length;
 	ImplAAFComponent *_cpnt;
-	ImplAAFOperationGroup *_operationGroup;
+	ImplAAFEffectInvocation *_effect;
 
 public:
 
@@ -53,9 +75,7 @@ public:
 	virtual AAFRESULT STDMETHODCALLTYPE
 		AddPulldown(ImplAAFPulldown *pdwn);
 	virtual AAFRESULT STDMETHODCALLTYPE
-		SetOperationGroup(ImplAAFOperationGroup *OperationGroup);
-	virtual AAFRESULT STDMETHODCALLTYPE
-		SetComponent(ImplAAFComponent *cpnt);
+		SetEffect(ImplAAFEffectInvocation *effect);
 
 	virtual AAFRESULT STDMETHODCALLTYPE
 		Duplicate(ImplAAFFindSourceInfo *info);
@@ -63,16 +83,19 @@ public:
 		Clear(void);
 	virtual AAFRESULT STDMETHODCALLTYPE
 		GetMob(ImplAAFMob **ppMob);
-	virtual AAFRESULT STDMETHODCALLTYPE
-		GetSourceReference(aafSourceRef_t *pSourceRef);
-	virtual AAFRESULT STDMETHODCALLTYPE
-		GetEditRate(aafRational_t *pEditRate);
-	virtual AAFRESULT STDMETHODCALLTYPE
-		GetLength(aafLength_t *pLength);
-//	virtual AAFRESULT STDMETHODCALLTYPE
-//		GetEnclosingOperationGroup(ImplAAFOperationGroup *pSourceRef);
-//	virtual AAFRESULT STDMETHODCALLTYPE
-//		GetEnclosingComponent(ImplAAFOperationGroup *pSourceRef);
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFFindSourceInfo)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFFindSourceInfoTest.cpp.
+  static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 };
 
 #endif // ! __ImplAAFFindSourceInfo_h__

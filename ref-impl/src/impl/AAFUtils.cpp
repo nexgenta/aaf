@@ -1,27 +1,26 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1996 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
  *
  ************************************************************************/
 
@@ -122,17 +121,17 @@
  *
  * All functions can return the following error codes if the following
  * argument values are NULL:
- *		AAFRESULT_NULL_FHDL -- aafHdl_t was NULL.
- *		AAFRESULT_NULLOBJECT -- aafObject_t was NULL.
- *		AAFRESULT_BADDATAADDRESS -- Data address was NULL.
- *		AAFRESULT_NULL_SESSION -- No session was open.
- *		AAFRESULT_SWAB -- Unable to byte swap the given data type.
+ *		OM_ERR_NULL_FHDL -- aafHdl_t was NULL.
+ *		OM_ERR_NULLOBJECT -- aafObject_t was NULL.
+ *		OM_ERR_BADDATAADDRESS -- Data address was NULL.
+ *		OM_ERR_NULL_SESSION -- No session was open.
+ *		OM_ERR_SWAB -- Unable to byte swap the given data type.
  * 
  * Accessor functions can also return the error codes below:
- *		AAFRESULT_BAD_PROP -- aafProperty_t code was out of range.
- *		AAFRESULT_OBJECT_SEMANTIC -- Failed a semantic check on an input obj
- *		AAFRESULT_DATA_IN_SEMANTIC -- Failed a semantic check on an input data
- *		AAFRESULT_DATA_OUT_SEMANTIC -- Failed a semantic check on an output data
+ *		OM_ERR_BAD_PROP -- aafProperty_t code was out of range.
+ *		OM_ERR_OBJECT_SEMANTIC -- Failed a semantic check on an input obj
+ *		OM_ERR_DATA_IN_SEMANTIC -- Failed a semantic check on an input data
+ *		OM_ERR_DATA_OUT_SEMANTIC -- Failed a semantic check on an output data
  */
 
 //#include "masterhd.h"
@@ -150,12 +149,10 @@
 
 //#include "omPublic.h"
 //#include "omPvt.h" 
-//#include "Container.h"
+#include "Container.h"
 #include "AAFTypes.h"
 #include "AAFUtils.h"
 #include "aafCvt.h"
-#include "AAFResult.h"
-
 
 /* Moved math.h down here to make NEXT's compiler happy */
 #include <math.h>
@@ -172,23 +169,8 @@ static aafBool  InitCalled = AAFFalse;
 
 const aafProductVersion_t AAFReferenceImplementationVersion = {1, 0, 0, 1, kVersionBeta};
 
-AAFByteOrder GetNativeByteOrder(void)
-{
-  aafInt16 word = 0x1234;
-  aafInt8  byte = *((aafInt8*)&word);
-  AAFByteOrder result;
 
-//  ASSERT("Valid byte order", ((byte == 0x12) || (byte == 0x34)));
-
-  if (byte == 0x12) {
-    result = MOTOROLA_ORDER;
-  } else {
-    result = INTEL_ORDER;
-  }
-  return result;
-}
-
-aafBool	EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
+aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
 {
 	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
 }
@@ -197,6 +179,10 @@ static aafInt32 powi(
 			aafInt32	base,
 			aafInt32	exponent);
 
+double FloatFromRational(
+			aafRational_t	e);		/* IN - Convert this into a double */
+aafRational_t RationalFromFloat(
+			double	f);		/* IN - Convert this number into a rational */
 
 	/************************************************************
 	 *
@@ -222,8 +208,8 @@ static aafInt32 powi(
  * Possible Errors:
  *		Standard errors (see top of file).
  *************************************************************************/
-aafBool isObjFunc(ImplAAFFile * file,       /* IN - File Handle */
-				  ImplAAFObject * obj,     /* IN - Object to match */
+aafBool isObjFunc(AAFFile * file,       /* IN - File Handle */
+				  AAFObject * obj,     /* IN - Object to match */
 				  void *data)          /* IN/OUT - Match Data */
 {
   /* Match all objects in the subtree */
@@ -251,9 +237,7 @@ aafBool isObjFunc(ImplAAFFile * file,       /* IN - File Handle */
 void AAFGetDateTime(aafTimeStamp_t *time)
 {
 #if defined(_MAC) || defined(macintosh)
-	unsigned long tmpTime;
-	GetDateTime(&tmpTime);
-	time->TimeVal = tmpTime;
+	GetDateTime(&(time->TimeVal));
 	time->IsGMT = FALSE;
 #elif  defined(_WIN32)
 	time->TimeVal = (long) clock();
@@ -285,7 +269,7 @@ aafErr_t AAFConvertEditRate(
 		CvtInt32toInt64(0, destPosition);
 		if ((howRound != kRoundCeiling) && (howRound != kRoundFloor))
 		{
-			RAISE(AAFRESULT_INVALID_ROUNDING);
+			RAISE(OM_ERR_INVALID_ROUNDING);
 		}
 
 		if(FloatFromRational(srcRate) != FloatFromRational(destRate))
@@ -329,7 +313,7 @@ aafErr_t AAFConvertEditRate(
 	}
 	XEND;
 
-	return(AAFRESULT_SUCCESS);
+	return(OM_ERR_NONE);
 }
 
 /************************
@@ -509,53 +493,13 @@ union label
 AAFRESULT aafMobIDNew(
         aafUID_t *mobID)     /* OUT - Newly created Mob ID */
 {
-	aafUInt32	major, minor;
+	union label		aLabel;
 	static aafUInt32 last_part2 = 0;		// Get rid of this!!!
 //#ifdef sun
 //	struct rusage rusage_struct;
 //	int status;
 //#endif
 	aafTimeStamp_t	timestamp;
-	
-	AAFGetDateTime(&timestamp);
-	major = (aafUInt32)timestamp.TimeVal;	// Will truncate
-#if defined(_MAC) || defined(macintosh)
-	minor = TickCount();
-#else
-#ifdef _WIN32
-	minor = ((unsigned long)(time(NULL)*60/CLK_TCK));
-#else 
-//#if defined(sun)
-//	status = getrusage(RUSAGE_SELF, &rusage_struct);
-//
-//	/* On the Sun, add system and user time */
-//	minor = rusage_struct.ru_utime.tv_sec*60 + 
-//	      rusage_struct.ru_utime.tv_usec*60/1000000 +
-//		  rusage_struct.ru_stime.tv_sec*60 +
-//		  rusage_struct.ru_stime.tv_usec*60/1000000;
-//#else
-	{
-	  static struct tms timebuf;
-	  minor = ((unsigned long)(times(&timebuf)*60/HZ));
-	}	
-//#endif
-#endif
-#endif
-
-	if (last_part2 >= minor)
-	  minor = last_part2 + 1;
-		
-	last_part2 = minor;
-
-	return(aafMobIDFromMajorMinor(major, minor, mobID));
-}
-
-AAFRESULT aafMobIDFromMajorMinor(
-        aafUInt32	major,
-		aafUInt32	minor,
-		aafUID_t *mobID)     /* OUT - Newly created Mob ID */
-{
-	union label		aLabel;
 	
 	aLabel.smpte.oid = 0x06;
 	aLabel.smpte.size = 0x0E;
@@ -565,12 +509,121 @@ AAFRESULT aafMobIDFromMajorMinor(
 	aLabel.smpte.unused = 0;
 	aLabel.smpte.MobIDPrefix = 42;		// Means its an OMF Uid
 
-	aLabel.smpte.MobIDMajor = major;
-	aLabel.smpte.MobIDMinor = minor;
+	AAFGetDateTime(&timestamp);
+	aLabel.smpte.MobIDMajor = timestamp.TimeVal;
+#if defined(_MAC) || defined(macintosh)
+	aLabel.smpte.MobIDMinor = TickCount();
+#else
+#ifdef _WIN32
+	aLabel.smpte.MobIDMinor = ((unsigned long)(time(NULL)*60/CLK_TCK));
+#else 
+//#if defined(sun)
+//	status = getrusage(RUSAGE_SELF, &rusage_struct);
+//
+//	/* On the Sun, add system and user time */
+//	label.smpte.MobIDMminor = rusage_struct.ru_utime.tv_sec*60 + 
+//	      rusage_struct.ru_utime.tv_usec*60/1000000 +
+//		  rusage_struct.ru_stime.tv_sec*60 +
+//		  rusage_struct.ru_stime.tv_usec*60/1000000;
+//#else
+	{
+	  static struct tms timebuf;
+	  aLabel.smpte.MobIDMminor = ((unsigned long)(times(&timebuf)*60/HZ));
+	}	
+//#endif
+#endif
+#endif
+
+	if (last_part2 >= aLabel.smpte.MobIDMinor)
+	  aLabel.smpte.MobIDMinor = last_part2 + 1;
+		
+	last_part2 = aLabel.smpte.MobIDMinor;
 
 	*mobID = aLabel.guid;
-	return(AAFRESULT_SUCCESS);
+	return(OM_ERR_NONE);
 }
+
+#if 0	//!!! Add functions from the end of the file as needed 
+
+
+/************************
+ * Function: omfsSetProgressCallback
+ *
+ * 	Sets a callback which will be called at intervals
+ *		during long operations, in order to allow your application
+ *		to pin a watch cursor, move a thermometer, etc...
+ *
+ * Argument Notes:
+ *
+ *		The progress callback supplied by you should have the following
+ *		prototype:
+ *
+ *			void ProgressProc(aafHdl_t file, aafInt32 curVal, aafInt32 endVal);
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ */
+aafErr_t omfsSetProgressCallback(
+			aafHdl_t				file,		/* IN - For this file */
+			aafProgressProc_t aProc)	/* IN - Set this progress callback */
+{
+	aafAssertValidFHdl(file);
+	file->progressProc = aProc;
+	return(OM_ERR_NONE);
+}
+
+	/************************************************************
+	 *
+	 * Public functions used to extend the toolkit API
+	 *
+	 *************************************************************/
+
+
+
+
+
+	/************************************************************
+	 *
+	 * Toolkit private functions
+	 *
+	 *************************************************************/
+
+
+
+/************************
+ * Function: omfsInit	(INTERNAL)
+ *
+ * 		Called from BeginSession() to initialize static information
+ *
+ *		This function initializes read-only variables, and therefore contains a
+ *		reference to the only write/read global.  Do not call this function or
+ *		BeginSession() from a thread.
+ *
+ * Argument Notes:
+ *		<none>
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard assertions.  See top of the file.
+ */
+aafErr_t omfsInit(
+			void)
+{
+	if (!InitCalled)
+	{
+		omfsErrorInit();
+	}
+	InitCalled = TRUE;
+
+	return (OM_ERR_NONE);
+}
+#endif
+
 
 typedef struct
 	{
@@ -636,7 +689,7 @@ aafErr_t PvtOffsetToTimecode(
 {
   frameTbl_t info;
   aafUInt32		frames_day;
-  aafFrameOffset_t min10, min1;
+  aafInt32 min10, min1;
   aafBool frame_dropped;
 
   info = GetFrameInfo(frameRate);
@@ -698,7 +751,7 @@ aafErr_t PvtOffsetToTimecode(
 		*frames = (aafInt16)(offset % frameRate);
 	 }
 
-  return(AAFRESULT_SUCCESS);
+  return(OM_ERR_NONE);
 }
 
 
@@ -747,99 +800,8 @@ aafErr_t PvtTimecodeToOffset(
 	
 	*result = val;
 
-	return(AAFRESULT_SUCCESS);
+	return(OM_ERR_NONE);
 }
-
-/************************
- * Function: AAFByteSwap16		(INTERNAL)
- *
- * 	Byte swap a short value to convert between big-endian and
- *		little-endian formats.
- *
- * Argument Notes:
- *		See argument comments.
- *
- * ReturnValue:
- *		Modifies the value in place
- *
- * Possible Errors:
- *		none
- */
-void AAFByteSwap16(
-			aafInt16 * wp)	/* IN/OUT -- Byte swap this value */
-{
-	register unsigned char *cp = (unsigned char *) wp;
-	int             t;
-
-	t = cp[1];
-	cp[1] = cp[0];
-	cp[0] = t;
-}
-
-/************************
- * Function: AAFByteSwap32		(INTERNAL)
- *
- * 	Byte swap a long value to convert between big-endian and
- *		little-endian formats.
- *
- * Argument Notes:
- *		See argument comments.
- *
- * ReturnValue:
- *		Modifies the value in place
- *
- * Possible Errors:
- *		none
- */
-void AAFByteSwap32(
-			aafInt32 *lp)	/* IN/OUT -- Byte swap this value */
-{
-	register unsigned char *cp = (unsigned char *) lp;
-	int             t;
-
-	t = cp[3];
-	cp[3] = cp[0];
-	cp[0] = t;
-	t = cp[2];
-	cp[2] = cp[1];
-	cp[1] = t;
-}
-
-/************************
- * Function: AAFByteSwap64		(INTERNAL)
- *
- * 	Byte swap a long value to convert between big-endian and
- *		little-endian formats.
- *
- * Argument Notes:
- *		See argument comments.
- *
- * ReturnValue:
- *		Modifies the value in place
- *
- * Possible Errors:
- *		none
- */
-void AAFByteSwap64(
-			aafInt64 *lp)	/* IN/OUT -- Byte swap this value */
-{
-	register unsigned char *cp = (unsigned char *) lp;
-	int             t;
-
-	t = cp[7];
-	cp[7] = cp[0];
-	cp[0] = t;
-	t = cp[6];
-	cp[6] = cp[1];
-	cp[1] = t;
-	t = cp[5];
-	cp[5] = cp[2];
-	cp[2] = t;
-	t = cp[4];
-	cp[4] = cp[3];
-	cp[3] = t;
-}
-
 /*
 ;;; Local Variables: ***
 ;;; tab-width:3 ***
