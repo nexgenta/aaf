@@ -1,24 +1,3 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
 #startm .this-module 0
 AAFSourceMob\
 #endm
@@ -27,9 +6,9 @@ AAFSourceMob\
 AAFMob\
 #endm
 #c
-#c #import ./AAFObject.exp
-#c #import ./AAFComponent.exp
-#c #import ./AAFMob.exp
+#import ./AAFObject.exp
+#import ./AAFComponent.exp
+#import ./AAFMob.exp
 #import ./AAFSearchSource.exp
 AD_HEAD
 AD_IDL(//
@@ -73,8 +52,7 @@ AD_FORWARD_DECLARATION(AAFSegment)
 AD_CLASS_UUID(B1A2137D, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A2137C, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-#c AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_COM_EXT_CLASS_BEGIN(public IAAFSearchSource)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_METHOD0(Initialize,
 		   Initializes a newly allocated\, empty IAAFSourceMob-supporting
   // object.  This method must be called after allocation\, and before
@@ -166,9 +144,9 @@ AD_XMETHOD4(AddNilReference,
 			  length,
 			  Duration of the Source Clip to be added to the new slot,
 			[in],
-			  objIn,
-			  AAFDataDef,
-			  pDataDef,
+			  objPass,
+			  aafUID_t *,
+			  dataDef,
 			  Data definition of the new slot,
 			[in],
 			  objPass,
@@ -189,7 +167,7 @@ AD_XMETHOD4(AddNilReference,
   // videotape.
   //
   // Succeeds if all of the following are true:
-  // - The pDataDef parameter is valid.
+  // - dataDef is a valid pointer.
   // - editRate is valid.
   // 
   // This method will return the following codes.  If more than one of
@@ -199,11 +177,11 @@ AD_XMETHOD4(AddNilReference,
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NULL_PARAM
-  //   - the pDataDef parameter is NULL.
-  //
   // AAFRESULT_NOT_INITIALIZED
   //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - dataDef is NULL
   //
   // AAFRESULT_BADRATE
   //   - the editRate is not valid.)
@@ -289,7 +267,7 @@ AD_XMETHOD7(AppendEdgecodeSlot,
 			  length32,
 			  Length of the Edgecode component in the slot,
 			[in],
-			  enumIn,
+			  objPass,
 			  aafFilmType_t,
 			  filmKind,
 			The film kind.  Can be one of:
@@ -299,7 +277,7 @@ AD_XMETHOD7(AppendEdgecodeSlot,
     // - kFt8MM
     // - kFt65MM,
 			[in],
-			  enumIn,
+			  objPass,
 			  aafEdgeType_t,
 			  codeFormat,
 			  The code format.  Can be one of:
@@ -408,8 +386,8 @@ AD_XMETHOD5(AppendPhysSourceRef,
 			  aMobSlot,
 			  SlotID of slot to contain reference,
 			[in],
-			  objIn,
-			  AAFDataDef,
+			  objPass,
+			  aafUID_t *,
 			  pEssenceKind,
 			Data kind of slot to contain reference.  Requires a data kind
 	// valid for a essence stream.  Valid data kinds are:
@@ -441,8 +419,8 @@ AD_XMETHOD5(AppendPhysSourceRef,
   // AAFTapeDescriptor or NIL.
   //
   // Succeeds if all of the following are true:
-  // - the pSourceRefObj pointer is valid.
   // - the pEssenceKind pointer is valid.
+  // - the pSourceRefObj pointer is valid.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -455,7 +433,7 @@ AD_XMETHOD5(AppendPhysSourceRef,
   //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSourceRefObj or pEssenceKind is null.)
+  //   - either pEssenceKind or pSourceRefObj is null.)
 
 
 AD_XMETHOD5(NewPhysSourceRef,
@@ -470,10 +448,10 @@ AD_XMETHOD5(NewPhysSourceRef,
 			  aMobSlot,
 			  SlotID of slot to contain reference,
 			[in],
-			  objIn,
-			  AAFDataDef,
+				objPass,
+				aafUID_t *,
 			  pEssenceKind,
-			  Data kind of slot to contain reference.  Requires a data kind
+			Data kind of slot to contain reference.  Requires a data kind
 	// valid for a essence stream.  Valid data kinds are:
     // - Picture
     // - Sound,
@@ -503,8 +481,8 @@ AD_XMETHOD5(NewPhysSourceRef,
   // AAFTapeDescriptor or NIL.
   //
   // Succeeds if all of the following are true:
-  // - the pSourceRefObj pointer is valid.
   // - the pEssenceKind pointer is valid.
+  // - the pSourceRefObj pointer is valid.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -517,12 +495,12 @@ AD_XMETHOD5(NewPhysSourceRef,
   //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSourceRefObj or pEssenceKind is null.)
+  //   - either pEssenceKind or pSourceRefObj is null.)
 
 
 AD_XMETHOD9(AddPulldownRef,
 			[in],
-			  enumIn,
+			  objPass,
 			  aafAppendOption_t,
 			  addType,
 			  Tells whether to overwrite an existing slot segment\, or create
@@ -538,8 +516,8 @@ AD_XMETHOD9(AddPulldownRef,
 			  aMobSlot,
 			  SlotID of slot to contain reference,
 			[in],
-			  objIn,
-			  AAFDataDef,
+			  objPass,
+			  aafUID_t *,
 			  pEssenceKind,
 			  Data kind of slot to contain reference.  Requires a data kind
 	// valid for a essence stream.  Valid data kinds are:
@@ -556,7 +534,7 @@ AD_XMETHOD9(AddPulldownRef,
 			  srcRefLength,
 			  Length of the Source Clip in the Source Mob,
 			[in],
-			  enumIn,
+			  objPass,
 			  aafPulldownKind_t,
 			  pulldownKind,
 			  Method of conversion.  Possible values are:
@@ -570,7 +548,7 @@ AD_XMETHOD9(AddPulldownRef,
 			  phaseFrame,
 			  phase of first frame,
 			[in],
-			  enumIn,
+			  objPass,
 			  aafPulldownDir_t,
 			  direction,
 			  Direction of the pulldown conversion. Possible values are:
@@ -594,8 +572,8 @@ AD_XMETHOD9(AddPulldownRef,
   // often an AAFFilmDescriptor or NIL.
   //
   // Succeeds if all of the following are true:
-  // - the pSourceRefObj pointer is valid.
   // - the pEssenceKind pointer is valid.
+  // - the pSourceRefObj pointer is valid.
   // - a valid pulldown direction was specified.
   // 
   // This method will return the following codes.  If more than one of
@@ -609,11 +587,9 @@ AD_XMETHOD9(AddPulldownRef,
   //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSourceRefObj or pEssenceKind is null.
+  //   - either pEssenceKind or pSourceRefObj is null.
   //
   // AAFRESULT_PULLDOWN_DIRECTION
   //   - an invalid pulldown direction was specified.)
 AD_COM_METH(.method-SearchSource)
-#c AD_XCLASS_END(Concrete, StoredObject)
-AD_COM_EXT_CLASS_END(AAFSearchSource)
-
+AD_XCLASS_END(Concrete, StoredObject)
