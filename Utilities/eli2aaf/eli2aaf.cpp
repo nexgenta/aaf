@@ -1,5 +1,5 @@
 //
-// $Id: eli2aaf.cpp,v 1.14 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+// $Id: eli2aaf.cpp,v 1.15 2004/10/22 09:32:12 stuart_hc Exp $ $Name:  $
 //
 // eli2aaf.cpp -	Create an AAF file with embedded media from a lavtools
 //					(mjpegtools) ELI format file.  Such a format is created
@@ -372,7 +372,7 @@ static wchar_t* getNetLocPath(const char *filepath, const char *audio_track)
 	// Now convert to wchar
 	size_t length = strlen(c_str);
 	wchar_t* path = new wchar_t[length + 1];
-	size_t status = mbstowcs(path, c_str, length + 1);
+	mbstowcs(path, c_str, length + 1);
 	return path;
 }
 
@@ -1240,7 +1240,7 @@ static bool createAAFFileForEditDecisions(const char *output_aaf_file,
 	}
 	catch(AxEx & ex)
 	{
-		printf("%ls",ex.what());
+		printf("Exception when creating AAF file: %s",ex.what());
 		result = false;
 	}
 	try
@@ -1251,7 +1251,7 @@ static bool createAAFFileForEditDecisions(const char *output_aaf_file,
 	}
 	catch(AxEx & ex)
 	{
-		printf("Problem closing file.  Error: %ls", ex.what());
+		printf("Problem closing file.  Error: %s", ex.what());
 		return false;
 	}
 	return result;
