@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -12,7 +11,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -57,7 +55,8 @@ ImplAAFEssenceDescriptor::~ImplAAFEssenceDescriptor ()
 		ImplAAFLocator *pLocator = _locators.setValueAt(0, i);
 		if (pLocator)
 		{
-			pLocator->ReleaseReference();
+		  pLocator->ReleaseReference();
+		  pLocator = 0;
 		}
 	}
 }
@@ -141,7 +140,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if (theEnum)
-			theEnum->ReleaseReference();
+		  theEnum->ReleaseReference();
+		theEnum = 0;
 		return(XCODE());
 	}
 	XEND;
@@ -176,4 +176,3 @@ AAFRESULT
 	return AAFRESULT_SUCCESS;
 }
 
-OMDEFINE_STORABLE(ImplAAFEssenceDescriptor, AUID_AAFEssenceDescriptor);

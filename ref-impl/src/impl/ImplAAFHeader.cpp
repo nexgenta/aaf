@@ -4,7 +4,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -67,6 +66,7 @@
 
 extern "C" const aafClassID_t CLSID_EnumAAFIdentifications;
 
+const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 
 ImplAAFHeader::ImplAAFHeader ()
@@ -105,20 +105,23 @@ ImplAAFHeader::~ImplAAFHeader ()
 		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
 
 		if (pIdent) {
-			pIdent->ReleaseReference();
+		  pIdent->ReleaseReference();
+		  pIdent = 0;
 		}
 	}
 
 	// Release the content storage pointer.
 	ImplAAFContentStorage *contentStorage = _contentStorage.setValue(0);
 	if (contentStorage) {
-		contentStorage->ReleaseReference();
+	  contentStorage->ReleaseReference();
+	  contentStorage = 0;
 	}
 
 	// Release the dictionary pointer.
 	ImplAAFDictionary *dictionary = _dictionary.setValue(0);
 	if (dictionary) {
-		dictionary->ReleaseReference();
+	  dictionary->ReleaseReference();
+	  dictionary = 0;
 	}
 }
 
@@ -406,7 +409,7 @@ AAFRESULT STDMETHODCALLTYPE
 		}
   } else {
     *ppIdentification = 0;
-    result = AAFRESULT_NOT_IMPLEMENTED; // tjb - Should be AAFRESULT_FAILURE
+    result = AAFRESULT_INCONSISTANCY;
   }
   return result;
 }
@@ -457,7 +460,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if (theEnum)
-			theEnum->ReleaseReference();
+		  theEnum->ReleaseReference();
+		theEnum = 0;
 		return(XCODE());
 	}
 	XEND;
@@ -493,7 +497,7 @@ AAFRESULT
 			fiction.companyName = L"Unknown";
 			fiction.productName = L"Unknown";
 			fiction.productVersionString = (aafWChar*)NULL;
-			fiction.productID = -1;
+			fiction.productID = NIL_UID;
 			fiction.platform = (aafWChar*)NULL;
 			fiction.productVersion.major = 0;
 			fiction.productVersion.minor = 0;
@@ -523,6 +527,7 @@ AAFRESULT
     CHECK(identObj->SetCompanyName(pIdent->companyName));
     CHECK(identObj->SetProductName(pIdent->productName));
     CHECK(identObj->SetProductVersionString(pIdent->productVersionString));
+	CHECK(identObj->SetProductID(&pIdent->productID));
 
     _identificationList.appendValue(identObj);
  
@@ -559,7 +564,7 @@ AAFRESULT
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -604,7 +609,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
 {
-	aafTimeStamp_t	now;
+	aafTimeStamp_t	now = { 0 };
 
 	AAFGetDateTime(&now);
 	_lastModified = now;
@@ -618,9 +623,13 @@ void ImplAAFHeader::SetByteOrder(const aafInt16 byteOrder)
 
 void ImplAAFHeader::SetDictionary(ImplAAFDictionary *pDictionary)
 {
-	_dictionary = pDictionary;
+  _dictionary = pDictionary;
   if (pDictionary)
     pDictionary->AcquireReference();
+
+  // If this hasn't been done before, make sure the dictionary has had
+  // its properties initialized.
+  _dictionary->pvtInitCriticalBuiltins ();
 }
 
 AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
@@ -643,38 +652,44 @@ AAFRESULT ImplAAFHeader::LoadMobTables(void)
 // 
 ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
 {
-	ImplAAFContentStorage	*result = _contentStorage;
+  ImplAAFContentStorage	*result = _contentStorage;
 
-	// Create the content storage object if it does not exist.
-	if (NULL == result)
+  // Create the content storage object if it does not exist.
+  if (NULL == result)
   { // Get the dictionary so that we can use the factory
     // method to create the identification.
     ImplAAFDictionary *pDictionary = GetDictionary();
     if (NULL != pDictionary)
-    {
-      pDictionary->CreateInstance(&AUID_AAFContentStorage, (ImplAAFObject **)&result);
-		  _contentStorage = result;
-    }
-	}
+	  {
+		pDictionary->CreateInstance (&AUID_AAFContentStorage,
+									 (ImplAAFObject **)&result);
+		_contentStorage = result;
+	  }
+  }
 
-	return(result);
+  return(result);
 }
 
 // Fill in when dictionary property is supported.
 ImplAAFDictionary *ImplAAFHeader::GetDictionary()
 {
-	ImplAAFDictionary	*result = _dictionary;
+  ImplAAFDictionary	*result = _dictionary;
   assert(result);
 
-	// Make sure that _dictionary member points to the same instance
-	// as the value returned by ImplAAFObject::GetDictionary()!
-	ImplAAFDictionary	*pDictionary = NULL;
-	assert(AAFRESULT_SUCCESS == ImplAAFObject::GetDictionary(&pDictionary));
-  assert(pDictionary);
-	assert(pDictionary == result);
-	assert(0 != pDictionary->ReleaseReference());
+  // If this hasn't been done before, make sure the dictionary has had
+  // its properties initialized.
+  _dictionary->pvtInitCriticalBuiltins ();
 
-	return(result);
+  // Make sure that _dictionary member points to the same instance
+  // as the value returned by ImplAAFObject::GetDictionary()!
+  ImplAAFDictionary	*pDictionary = NULL;
+  assert(AAFRESULT_SUCCESS == ImplAAFObject::GetDictionary(&pDictionary));
+  assert(pDictionary);
+  assert(pDictionary == result);
+  aafUInt32 refCount = pDictionary->ReleaseReference();
+  pDictionary = 0;
+  assert(0 != refCount);
+
+  return(result);
 }
 
-OMDEFINE_STORABLE(ImplAAFHeader, AUID_AAFHeader);
