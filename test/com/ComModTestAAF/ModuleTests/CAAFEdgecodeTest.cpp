@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEdgecode
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEdgecodeTest.cpp,v 1.29 2005/01/11 09:54:51 jfpanisset Exp $ $Name:  $
+// $Id: CAAFEdgecodeTest.cpp,v 1.30 2005/02/08 13:34:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,6 @@ using namespace std;
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
-//#include "aafCvt.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
 #include "AAFDefUIDs.h"
@@ -91,7 +90,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   aafLength_t					zero;
   aafEdgecode_t				startEC;
 
-//  CvtInt32toLength(0, zero);
   zero = 0;
   aafProductVersion_t v;
   v.major = 1;

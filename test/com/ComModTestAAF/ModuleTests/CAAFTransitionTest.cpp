@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTransition
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTransitionTest.cpp,v 1.46 2005/01/12 02:59:23 jfpanisset Exp $ $Name:  $
+// $Id: CAAFTransitionTest.cpp,v 1.47 2005/02/08 13:34:15 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,6 @@ using namespace std;
 #include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
-//#include "aafCvt.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
 #include "AAFDataDefs.h"
@@ -148,7 +147,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUID_t					effectID = kTestEffectID;
 	aafUID_t					parmID = kTestParmID;
 
-	//CvtInt32toLength(100, transitionLength);
 	transitionLength = 100;
 	aafProductVersion_t v;
 	v.major = 1;

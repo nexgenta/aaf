@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTimecodeStream
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTimecodeStreamTest.cpp,v 1.29 2005/01/12 03:01:07 jfpanisset Exp $ $Name:  $
+// $Id: CAAFTimecodeStreamTest.cpp,v 1.30 2005/02/08 13:34:15 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,6 @@ using namespace std;
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
-//#include "aafCvt.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
 #include "AAFDefUIDs.h"

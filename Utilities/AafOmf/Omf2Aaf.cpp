@@ -2,7 +2,7 @@
 // @com This file implements the conversion of OMF files to AAF file format.
 //=---------------------------------------------------------------------=
 //
-// $Id: Omf2Aaf.cpp,v 1.79 2004/10/22 14:57:27 phil_tudor Exp $ $Name:  $
+// $Id: Omf2Aaf.cpp,v 1.80 2005/02/08 13:33:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,15 +45,6 @@ using namespace std;
 #include "AAFCodecDefs.h"
 
 #include "CAAFBuiltinDefs.h"
-
-//#include "AAFUtils.h"
-//AAFRESULT aafMobIDNew(aafUID_t *mobID);
-//AAFRESULT aafMobIDFromMajorMinor(
-//        aafUInt32	major,
-//		aafUInt32	minor,
-//		aafUID_t *mobID);     /* OUT - Newly created Mob ID */
-
-//#include "aafCvt.h"
 
 #include "AAFDomainUtils.h"
 #include "OMFDomainUtils.h"
