@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.121 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.122 2004/11/02 12:41:27 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1490,7 +1490,6 @@ void ImplAAFDictionary::InitBuiltins()
   InitDataDef (kAAFDataDef_PictureWithMatte, L"PictureWithMatte", L"PictureWithMatte data");
   InitDataDef (kAAFDataDef_Sound, L"Sound", L"Sound data");
   InitDataDef (kAAFDataDef_Timecode, L"Timecode", L"Timecode data");
-  InitDataDef (kAAFDataDef_Unknown, L"Unknown", L"Unknown data");
 
   // Legacy definitions
   InitDataDef (kAAFDataDef_LegacyPicture, L"Picture", L"Picture data (legacy)");
