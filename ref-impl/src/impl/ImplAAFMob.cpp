@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.10 2004/07/23 00:46:51 akharkev Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.11 2004/07/23 16:19:17 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2430,9 +2430,7 @@ AAFRESULT ImplAAFMob::CloneDependencies(
     spSlot->GetSegment(&spSegment);
 
     AAFMobCollectingComponentVisitor mobCollector;
-#if 0 // Commented out until Accept is implemented
     spSegment->Accept(mobCollector);
-#endif
 
 
     // Clone each of the referenced mobs
