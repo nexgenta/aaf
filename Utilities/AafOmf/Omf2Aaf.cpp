@@ -1,31 +1,26 @@
 // @doc INTERNAL
 // @com This file implements the conversion of OMF files to AAF file format.
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include <stdio.h>
 #include <string.h>
@@ -866,7 +861,7 @@ void Omf2Aaf::ConvertOMFMediaDataObject( omfObject_t obj, omfUID_t inMediaID )
 
 			Assert( numBytes == OMFOffset );
 			if(pBuffer)
-				delete [] pBuffer;
+				delete [] (char *)pBuffer;
 		}
 	}
 
@@ -1534,7 +1529,7 @@ void Omf2Aaf::ProcessOMFComponent(omfObject_t OMFSegment, IAAFComponent** ppComp
 
 					IAAFOperationDef*		pEffectDef;
 					GetAAFOperationDefinition("omfi::effectSimpleMonoAudioDissolve", NULL, "Simple Mono Audio Dissolve", "Combines two mono audio streams",
-									-1, kAAFFalse, 2, DDEF_Sound, &pEffectDef);
+									(aafUInt32)-1, kAAFFalse, 2, DDEF_Sound, &pEffectDef);
 					AutoRelease<IAAFOperationDef> peffdef( pEffectDef );
 
 					IAAFParameterDef*		pParameterDef;
@@ -1549,7 +1544,7 @@ void Omf2Aaf::ProcessOMFComponent(omfObject_t OMFSegment, IAAFComponent** ppComp
 
 					rc = pEffectDef->AddParameterDef(pParameterDef);
 					rc = pEffect->Initialize(pDataDef, (aafLength_t)OMFLength, pEffectDef);
-					rc = pEffect->SetBypassOverride(-1);
+					rc = pEffect->SetBypassOverride((aafUInt32)-1);
 					rc = pEffect->QueryInterface(IID_IAAFComponent, (void **)ppComponent);
 				}
 				else if ( (strcmp(EffectID1x, "Blend:Dissolve") == 0) && 
@@ -1566,7 +1561,7 @@ void Omf2Aaf::ProcessOMFComponent(omfObject_t OMFSegment, IAAFComponent** ppComp
 					IAAFOperationDef* pEffectDef;
 					GetAAFOperationDefinition("omfi::effectSimpleVideoDissolve", NULL, 
 									"Simple Video Dissolve", "Combines two video streams",
-									-1, kAAFFalse, 2, DDEF_PictureWithMatte, &pEffectDef);
+									(aafUInt32)-1, kAAFFalse, 2, DDEF_PictureWithMatte, &pEffectDef);
 					AutoRelease<IAAFOperationDef> peffdef( pEffectDef );
 
 					IAAFParameterDef* pParameterDef;
@@ -1581,7 +1576,7 @@ void Omf2Aaf::ProcessOMFComponent(omfObject_t OMFSegment, IAAFComponent** ppComp
 
 					rc = pEffectDef->AddParameterDef(pParameterDef);
 					rc = pEffect->Initialize(pDataDef, (aafLength_t)OMFLength, pEffectDef);
-					rc = pEffect->SetBypassOverride(-1);
+					rc = pEffect->SetBypassOverride((aafUInt32)-1);
 					rc = pEffect->QueryInterface(IID_IAAFComponent, (void **)ppComponent);
 				}
 				else if ( strncmp(EffectID1x, "Wipe:SMPTE:", 11) == 0)
@@ -1603,11 +1598,11 @@ void Omf2Aaf::ProcessOMFComponent(omfObject_t OMFSegment, IAAFComponent** ppComp
 					IAAFOperationDef* pEffectDef;
 					GetAAFOperationDefinition("omfi:effect:SMPTEVideoWipe", NULL, 
 									"SMPTE Video Wipe", "Combines two video streams according to SMPTE ",
-									-1, kAAFFalse, 2, DDEF_Picture, &pEffectDef);
+									(aafUInt32)-1, kAAFFalse, 2, DDEF_Picture, &pEffectDef);
 					AutoRelease<IAAFOperationDef> peffdef( pEffectDef );
 
 					rc = pEffect->Initialize(pDataDef, (aafLength_t)OMFLength, pEffectDef);
-					rc = pEffect->SetBypassOverride(-1);
+					rc = pEffect->SetBypassOverride((aafUInt32)-1);
 
 					// Port over Wipe number
 					IAAFParameterDef* pParameterDef;
@@ -2665,7 +2660,7 @@ void Omf2Aaf::ConvertOMFConstValue(omfSegObj_t segment,
 		pTypeDef = NULL;
 	}
 	if (pcvBuffer)
-		delete [] pcvBuffer;
+		delete [] (char*)pcvBuffer;
 }
 // ============================================================================
 // ConvertOMFVaryingValue
@@ -2776,7 +2771,7 @@ void Omf2Aaf::ConvertOMFVaryingValue(omfSegObj_t segment,
 			pControlPoint->Release();
 			pControlPoint = NULL;
 			if (pCPBuffer)
-				delete [] pCPBuffer;
+				delete [] (char*)pCPBuffer;
 			if (pControlPoint)
 				pControlPoint->Release();
 			pControlPoint = NULL;
