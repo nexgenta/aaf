@@ -76,7 +76,7 @@ ImplAAFComponent::~ImplAAFComponent ()
 		size_t size = _KLVData.count();
 		for (size_t j = 0; j < size; j++)
 		{
-			ImplAAFKLVData* pKLVData = _KLVData.setValueAt(0, j);
+			ImplAAFKLVData* pKLVData = _KLVData.clearValueAt(j);
 			if (pKLVData)
 			  pKLVData->ReleaseReference();
 			pKLVData = 0;
@@ -245,7 +245,6 @@ AAFRESULT STDMETHODCALLTYPE
 		  theEnum->ReleaseReference();
 		  theEnum = 0;
 		}
-	  return(XCODE());
 	}
   XEND;
 	
@@ -297,15 +296,15 @@ AAFRESULT ImplAAFComponent::AccumulateLength(aafLength_t *pLength)
 }
 
 AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
-											 ImplAAFMob *mob, ImplAAFMobSlot *track,
-											 aafMediaCriteria_t *mediaCrit,
+											 ImplAAFMob */*mob*/, ImplAAFMobSlot */*track*/,
+											 aafMediaCriteria_t */*mediaCrit*/,
 											 aafPosition_t currentObjPos,
-											 aafOperationChoice_t *operationChoice,
-											 ImplAAFComponent	*prevObject,
-											 ImplAAFComponent *nextObject,
-											 ImplAAFScopeStack *scopeStack,
+											 aafOperationChoice_t */*operationChoice*/,
+											 ImplAAFComponent	*/*prevObject*/,
+											 ImplAAFComponent */*nextObject*/,
+											 ImplAAFScopeStack */*scopeStack*/,
 											 aafPosition_t *diffPos, aafLength_t *minLength,
-											 ImplAAFOperationGroup **groupObject, aafInt32	*nestDepth,
+											 ImplAAFOperationGroup **/*groupObject*/, aafInt32	*/*nestDepth*/,
 											 ImplAAFComponent **found, aafBool *foundTransition)
 {
 	aafLength_t	tmpMinLen;
@@ -341,8 +340,8 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 }
 
 
-AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafMobID_constref from,
-													  aafMobID_constref to)
+AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafMobID_constref /*from*/,
+													  aafMobID_constref /*to*/)
 {
 	return AAFRESULT_SUCCESS;
 }
