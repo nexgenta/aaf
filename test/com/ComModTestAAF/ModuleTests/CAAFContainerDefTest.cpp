@@ -1,32 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDefinitionObject
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
- 
 /***********************************************\
-*	Stub only.   Implementation not yet added	*
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
 \***********************************************/
-
-
-
 
 #include "CAAFContainerDef.h"
 #include "CAAFContainerDef.h"
@@ -121,7 +102,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFHeader *        pHeader = NULL;
   IAAFDictionary*  pDictionary = NULL;
   IAAFContainerDef*	pContainerDef = NULL;
-  IAAFPluggableDef	*pPlugDef = NULL;
   bool bFileOpen = false;
 	HRESULT			hr = S_OK;
 /*	long			test;
@@ -146,8 +126,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     
 		checkResult(pContainerDef->SetEssenceIsIdentified (AAFTrue));
 
-		checkResult(pContainerDef->QueryInterface (IID_IAAFPluggableDef, (void **)&pPlugDef));
-		checkResult(pDictionary->RegisterPluggableDefinition(pPlugDef));
+		checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -156,9 +135,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
   // Cleanup and return
-  if (pPlugDef)
-    pPlugDef->Release();
-
   if (pContainerDef)
     pContainerDef->Release();
 
@@ -186,8 +162,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
-	IEnumAAFPluggableDefs *pPlug = NULL;
-	IAAFPluggableDef		*pPlugDef = NULL;
+//@!!!	IEnumAAFContainerDefs *pPlug = NULL;
+//	IAAFPluggableDef		*pPlugDef = NULL;
 	IAAFContainerDef		*pContainerDef = NULL;
 	bool bFileOpen = false;
 	aafBool			testBool;
@@ -201,11 +177,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetPluggableDefinitions(&pPlug));
-		checkResult(pPlug->NextOne (&pPlugDef));
-		checkResult(pPlugDef->QueryInterface (IID_IAAFContainerDef, (void **)&pContainerDef));
-		checkResult(pContainerDef->EssenceIsIdentified (&testBool));
-		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
+//!!!		checkResult(pDictionary->GetPluggableDefinitions(&pPlug));
+//!!!		checkResult(pPlug->NextOne (&pPlugDef));
+//!!!		checkResult(pPlugDef->QueryInterface (IID_IAAFContainerDef, (void **)&pContainerDef));
+//!!!		checkResult(pContainerDef->EssenceIsIdentified (&testBool));
+//!!!		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 	}
 	catch (HRESULT& rResult)
 	{
@@ -216,11 +192,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pContainerDef)
 		pContainerDef->Release();
 
-	if (pPlugDef)
-		pPlugDef->Release();
+//!!!	if (pPlugDef)
+//		pPlugDef->Release();
 
-	if (pPlug)
-		pPlug->Release();
+//!!!	if (pPlug)
+//		pPlug->Release();
 
   if (pDictionary)
 		pDictionary->Release();
