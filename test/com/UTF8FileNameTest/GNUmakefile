@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2004/09/10 17:13:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2004/09/21 15:21:55 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -49,6 +49,11 @@ else
 $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
 endif
+
+
+.PHONY : check
+check : $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
+	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
 
 
 .PHONY : clean

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/09/20 14:02:49 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2004/09/21 15:21:55 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -52,6 +52,13 @@ ComFileKindTest :
 .PHONY : UTF8FileNameTest
 UTF8FileNameTest :
 	cd UTF8FileNameTest && $(MAKE)
+
+.PHONY : check
+check :
+	cd ComModTestAAF && $(MAKE) $@
+	cd CreateSequence && $(MAKE) $@
+	cd ComFileKindTest && $(MAKE) $@
+	cd UTF8FileNameTest && $(MAKE) $@
 
 .PHONY : clean
 clean :

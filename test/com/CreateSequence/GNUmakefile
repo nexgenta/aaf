@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/05/05 16:04:38 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2004/09/21 15:21:55 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,14 @@ $(AAFSDKBINDIR)/CreateSequence$(EXE) : $(CXXOBJS)
 endif
 
 
+# Create a non-trivial Composition with 2000 elements in the sequence.
+# This creates an AAF file with 6001 mobs and exercises the Structured Storage
+# implementation.
+.PHONY : check
+check : $(AAFSDKBINDIR)/CreateSequence$(EXE)
+	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/CreateSequence$(EXE) 2000
+
+
 .PHONY : clean
 clean :
 	@$(RM) $(CXXOBJS)
@@ -63,4 +71,3 @@ realclean : clean
 
 
 include $(AAFBASE)/build/rules.mk
-
