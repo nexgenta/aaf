@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFFindSourceInfo_h__
@@ -57,7 +75,10 @@ ImplAAFFindSourceInfo::Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t p
 							ImplAAFComponent *cpnt)
 {
 	if (_mob)
+	  {
 		_mob->ReleaseReference();
+		_mob = 0;
+	  }
 	_mob = mob;
 	if (mob)
 		mob->AcquireReference();
@@ -66,7 +87,10 @@ ImplAAFFindSourceInfo::Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t p
 	_editRate = editRate;
 	_length = length;
 	if (_cpnt)
+	  {
 		_cpnt->ReleaseReference();
+		_cpnt = 0;
+	  }
 	_cpnt = cpnt;
 	if (cpnt)
 		cpnt->AcquireReference();
@@ -74,13 +98,13 @@ ImplAAFFindSourceInfo::Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t p
 }
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFindSourceInfo::AddPulldown(ImplAAFPulldown *pdwn)
+ImplAAFFindSourceInfo::AddPulldown(ImplAAFPulldown * /*pdwn*/)
 {
 	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFindSourceInfo::Duplicate(ImplAAFFindSourceInfo *result)
+ImplAAFFindSourceInfo::Duplicate(ImplAAFFindSourceInfo * /*result*/)
 {
 	return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -89,10 +113,16 @@ ImplAAFFindSourceInfo::Duplicate(ImplAAFFindSourceInfo *result)
 AAFRESULT STDMETHODCALLTYPE ImplAAFFindSourceInfo::Clear(void)
 {
 	if (_mob)
+	  {
 		_mob->ReleaseReference();
+		_mob = 0;
+	  }
 	_mob = NULL;
 	if (_cpnt)
+	  {
 		_cpnt->ReleaseReference();
+		_cpnt = 0;
+	  }
 	_cpnt = NULL;
 	_editRate.numerator = 0;
 	_editRate.denominator = 1;
@@ -113,7 +143,10 @@ ImplAAFFindSourceInfo::SetOperationGroup(
 				ImplAAFOperationGroup *group)
 {
 	if (_operationGroup)
+	  {
 		_operationGroup->ReleaseReference();
+		_operationGroup = 0;
+	  }
 	_operationGroup = group;
 	if (group)
 	  group->AcquireReference();
@@ -125,7 +158,10 @@ ImplAAFFindSourceInfo::SetComponent(
 				ImplAAFComponent *cpnt)
 {
 	if (_cpnt)
+	  {
 		_cpnt->ReleaseReference();
+		_cpnt = 0;
+	  }
 	_cpnt = cpnt;
 	if (cpnt)
 	  cpnt->AcquireReference();
@@ -148,7 +184,7 @@ AAFRESULT STDMETHODCALLTYPE
 		}
 		else
 		{
-			pSourceRef->sourceID = NilMOBID;
+			memset(&pSourceRef->sourceID, 0, sizeof(pSourceRef->sourceID));
 		}
 	}
 	XEXCEPT
