@@ -1,10 +1,24 @@
-#c/*************************************************\
-#c*                                                 *
-#c* Advanced Authoring Format                       *
-#c*                                                 *
-#c* Copyright (c) 1998-2000 Avid Technology, Inc.   *
-#c*                                                 *
-#c\*************************************************/
+#c *********************************************************************
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c 
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c 
+#c The Original Code of this file is Copyright 1998-2001, Licensor of the
+#c AAF Association.
+#c 
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFTypeDefStream\
 #endm
@@ -20,25 +34,13 @@ AD_IDL(//
 // persistent objects.  Streams are conceptually similar to
 // variably-sized arrays except that they are intended to be used for
 // very large pieces of data \(such as essence\).
+// Note: All reads/and writes advance the current position.
 AD_STD_COMMENT_IFC_HEADER)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_CLASS_UUID(307e9e6d, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(307e9e6e, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
-
-
-AD_CPP_QUOTE(\  //) 
-AD_CPP_QUOTE(\  // All reads/and writes advance the current position)
-AD_CPP_QUOTE(\  //)
-
-
-AD_CPP_QUOTE(\  //)
-AD_CPP_QUOTE(\  // Raw byte stream access)
-AD_CPP_QUOTE(\  //)
-
-
-AD_CPP_QUOTE(\  // Stream size and positioning)
 
 AD_XMETHOD2(GetSize,
 			[in],
@@ -136,8 +138,6 @@ AD_XMETHOD2(SetPosition,
   //   - newPosition is outside the bounds of the stream.)
 
 
-AD_CPP_QUOTE(\  // Sequential access)
-
 AD_XMETHOD4(Read,
 			[in],
 			objIn,
@@ -164,7 +164,8 @@ AD_XMETHOD4(Read,
 			number of bytes actually read \(will be either dataSize or 0 if there 
     // is in error\),
 
-     Copies the data at the position of the stream to the given
+     Sequential access.
+  // Copies the data at the position of the stream to the given
   // buffer.
   //
   // Succeeds if all of the following are true:
@@ -195,7 +196,8 @@ AD_XMETHOD3(Write,
 			pData,
 			buffer into which should contain one element to be written to the stream,
 
-     Copies the data in the given buffer into the stream at the 
+     Sequential access.
+  // Copies the data in the given buffer into the stream at the 
   // current position of the stream..
   //
   // Succeeds if all of the following are true:
@@ -206,9 +208,6 @@ AD_XMETHOD3(Write,
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pStreamPropertyValue or pData\))
-
-
-AD_CPP_QUOTE(\  // Extending the stream)
 
 AD_XMETHOD3(Append,
 			[in],
@@ -229,7 +228,8 @@ AD_XMETHOD3(Append,
 			pData,
 			buffer into which should contain one element to be written to the stream,
 
-     Copies the data in the given buffer into the stream at the 
+     Extending the stream.
+  // Copies the data in the given buffer into the stream at the 
   // end of the stream.
   //
   // Succeeds if all of the following are true:
@@ -240,12 +240,6 @@ AD_XMETHOD3(Append,
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pStreamPropertyValue or pData\))
-
-
-
-AD_CPP_QUOTE(\  //)
-AD_CPP_QUOTE(\  // Access byte order of the stream)
-AD_CPP_QUOTE(\  //)
 
 
 AD_XMETHOD2(HasStoredByteOrder,
@@ -285,13 +279,12 @@ AD_XMETHOD2(GetStoredByteOrder,
 			pByteOrder,
 			Pointer to variable where byte order is to be copied,
 
-     Returns kAAFTrue if the stream has a stored byte order or 
-  // kAAFFalse otherwise.
+     Access byte order of the stream.
   //
   // Succeeds if:
   // - Initialize\(\) has already been called on this object.
   // - pStreamPropertyValue is a valid pointer.
-  // - pHasByteOrder is a valid pointer.
+  // - pByteOrder is a valid pointer.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pStreamPropertyValue or pByteOrder\))
@@ -338,12 +331,6 @@ AD_XMETHOD1(ClearStoredByteOrder,
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pStreamPropertyValue\))
 
-
-
-AD_CPP_QUOTE(\  //)
-AD_CPP_QUOTE(\  // Access in typed chunks of Elements)
-AD_CPP_QUOTE(\  //)
-
 AD_XMETHOD5(ReadElements,
 			[in],
 			objIn,
@@ -377,7 +364,8 @@ AD_XMETHOD5(ReadElements,
 			number of bytes actually read \(will be either dataSize or 0 if 
     // there is in error\),
 
-     Copies the data at the current position of the stream to the given
+     Access in typed chunks of Elements.
+  // Copies the data at the current position of the stream to the given
   // buffer. Requires that any structures declared within element 
   // typedef have had their offsets registered with that type.
   //
@@ -428,7 +416,8 @@ AD_XMETHOD4(WriteElements,
 			pData,
 			buffer into which elements from the stream should be written,
 
-     Copies the data in the given buffer into the stream at the  
+     Access in typed chunks of Elements.
+  // Copies the data in the given buffer into the stream at the  
   // current position of the stream. Requires that any structures 
   // declared within element 
   // typedef have had their offsets registered with that type..
@@ -481,7 +470,8 @@ AD_XMETHOD4(AppendElements,
 			pData,
 			buffer into which elements from the stream should be written,
 
-     Copies the data in the given buffer onto the end of the stream. 
+     Access in typed chunks of Elements.
+  // Copies the data in the given buffer onto the end of the stream. 
   // Requires that any structures declared within element 
   // typedef have had their offsets registered with that type..
   //
