@@ -74,14 +74,7 @@ typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
     ImplEnumAAFIdentificationsSP;
 
 #include <assert.h>
-
-#if defined(__MWERKS__)
-// Since the ansi standard does not define wcslen and the other wide
-// string functions are not normally placed in string.h along with the
-// single-byte string functions, as is done with VC++, CodeWarrior
-// places all of the "wide-string" functions in wstring.h.
-#include <wstring.h>
-#endif
+#include <wchar.h>
 
 #include "ImplAAFObjectCreation.h"
 
@@ -388,7 +381,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->LookupEssence(mobID, ppEssenceData));
+		CHECK(cstore->LookupEssenceData(mobID, ppEssenceData));
 	}
 	XEXCEPT
 	XEND
@@ -486,7 +479,7 @@ AAFRESULT STDMETHODCALLTYPE
   while (AAFRESULT_SUCCEEDED (pEnumIds->NextOne (&pTestId)))
 	{
 	  aafUID_t testGen;
-	  hr = pTestId->GetGeneration (&testGen);
+	  hr = pTestId->GetGenerationID (&testGen);
 	  if (AAFRESULT_FAILED (hr)) return hr;
 	  if (EqualAUID (&testGen, &generation))
 		{
@@ -528,7 +521,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_identificationList));
+		OMStrongReferenceVectorIterator<ImplAAFIdentification>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFIdentification>(_identificationList);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFIdentifications, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -716,8 +713,7 @@ AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 
 // trr - NOTE: Eventhough this method returns a reference counted object it
 // does NOT bump the reference count. Currently only other file that calls
-// this method is ImplAAFMob.cpp. We should probably make this method protected
-// or private and create an new version the conforms to our other API guidlines:
+// this method is ImplAAFMob.cpp. There is another version the conforms to our other API guidlines:
 // AAFRESULT GetContentStorage(ImplAAFContentStorage **ppContentStorage);
 // 
 ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
