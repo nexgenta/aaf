@@ -112,9 +112,17 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
+
+
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 
 private:
   OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
