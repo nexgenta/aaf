@@ -9,9 +9,17 @@
 *                                          *
 \******************************************/
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-#ifndef __CAAFTimecode_h__
-#include "CAAFTimecode.h"
+#ifndef __CAAFEdgecode_h__
+#include "CAAFEdgecode.h"
 #endif
 
 #include <iostream.h>
@@ -20,8 +28,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "aafCvt.h"
 #include "AAFResult.h"
-
-
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -53,24 +59,24 @@ inline void checkExpression(bool expression, HRESULT r)
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile *					pFile = NULL;
-	bool bFileOpen = false;
+	bool						bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
+	IAAFDictionary*				pDictionary = NULL;
 	IAAFCompositionMob*			pCompMob=NULL;
 	IAAFMob						*pMob = NULL;
 	IAAFMobSlot					*pNewSlot = NULL;
-	IAAFTimecode				*pTimecode = NULL;
+	IAAFEdgecode				*pEdgecode = NULL;
 	IAAFSegment					*pSeg = NULL;
 
 	aafUID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
 	aafLength_t					zero;
-	aafTimecode_t				startTC;
+	aafEdgecode_t				startEC;
 
 	CvtInt32toLength(0, zero);
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFTimecode Test";
+	ProductInfo.productName = L"AAFEdgecode Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -115,17 +121,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		checkResult(pCompMob->Initialize(L"COMPMOB01"));
 		
-    checkResult(pDictionary->CreateInstance(&AUID_AAFTimecode,
-								IID_IAAFTimecode, 
-								(IUnknown **)&pTimecode));		
+	    checkResult(pDictionary->CreateInstance(&AUID_AAFEdgecode,
+								IID_IAAFEdgecode, 
+								(IUnknown **)&pEdgecode));		
 
-		startTC.startFrame = 108000;	// One hour
-		startTC.drop = kTcNonDrop;
-		startTC.fps = 30;
-	  checkResult(pTimecode->Initialize (zero, &startTC));
-		checkResult(pTimecode->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
+		startEC.startFrame = 108000;	// One hour
+		startEC.filmKind = kFt35MM;
+		startEC.codeFormat = kEtKeycode;
+		memcpy(&startEC.header,"DevDesk",7);
+		startEC.header[7] = '\0';
+		checkResult(pEdgecode->Create (zero, startEC));
+		checkResult(pEdgecode->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
 
-		checkResult(pMob->AppendNewSlot (pSeg, 0, L"timecode", &pNewSlot));
+		checkResult(pMob->AppendNewSlot (pSeg, 0, L"edgecode", &pNewSlot));
 		
 		checkResult(pHeader->AppendMob(pMob));
 	}
@@ -142,8 +150,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pSeg)
 		pSeg->Release();
 
-  if (pTimecode)
-		pTimecode->Release();
+  if (pEdgecode)
+		pEdgecode->Release();
 
 	if (pMob)
 		pMob->Release();
@@ -175,16 +183,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
     // IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
-	bool bFileOpen = false;
+	bool						bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
+	IAAFDictionary*				pDictionary = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 	IEnumAAFMobSlots*			pEnum = NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFMobSlot*				pMobSlot = NULL;
 	IAAFSegment*				pSeg = NULL;
-	IAAFTimecode*				pTimecode = NULL;
-	aafTimecode_t				startTC;
+	IAAFEdgecode*				pEdgecode = NULL;
+	aafEdgecode_t				startEC;
 
 	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs;
@@ -229,14 +237,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
       while (AAFRESULT_SUCCESS == pEnum->NextOne (&pMobSlot))
       {
         checkResult(pMobSlot->GetSegment (&pSeg));
-        // Get a Timecode interface 
-        checkResult(pSeg->QueryInterface (IID_IAAFTimecode, (void **)&pTimecode));
-        checkResult(pTimecode->GetTimecode (&startTC));
+        // Get an Edgeecode interface 
+        checkResult(pSeg->QueryInterface (IID_IAAFEdgecode, (void **)&pEdgecode));
+        checkResult(pEdgecode->GetEdgecode (&startEC));
 
         // Check results !!
-        checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
+        checkExpression(startEC.startFrame == 108000, AAFRESULT_TEST_FAILED);
+        checkExpression(startEC.filmKind == kFt35MM, AAFRESULT_TEST_FAILED);
+        checkExpression(startEC.codeFormat == kEtKeycode, AAFRESULT_TEST_FAILED);
+        checkExpression(memcmp(startEC.header,"DevDesk", 7) == 0, AAFRESULT_TEST_FAILED);
       }
 
       pMob->Release();
@@ -250,8 +259,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	
 
 	// Cleanup and return
-  if (pTimecode)
-		pTimecode->Release();
+  if (pEdgecode)
+		pEdgecode->Release();
 
 	if (pSeg)
 		pSeg->Release();
@@ -281,10 +290,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-HRESULT CAAFTimecode::test()
+HRESULT CAAFEdgecode::test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"TimecodeTest.aaf";
+	aafWChar * pFileName = L"EdgecodeTest.aaf";
 
 	try
 	{
@@ -294,17 +303,19 @@ HRESULT CAAFTimecode::test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFTimecodeMob::test...Caught general C++"
+	  cerr << "CAAFEdgecodeMob::test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
-  	// When all of the functionality of this class is tested, we can return success
-	if(hr == AAFRESULT_SUCCESS)
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-
-	// Cleanup our object if it exists.
-	return hr;
+  return hr;
 }
+
+
+
+
+
+
+
 
 
