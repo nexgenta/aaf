@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataContainer.h,v 1.1.2.1 2004/07/06 18:58:43 tbingham Exp $ $Name:  $
+// $Id: OMDataContainer.h,v 1.1.2.2 2004/07/23 15:58:08 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,8 @@
 
 #ifndef OMDATACONTAINER_H
 #define OMDATACONTAINER_H
+
+#include <stddef.h>
 
 class OMDataContainerIterator;
 

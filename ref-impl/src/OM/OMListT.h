@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMListT.h,v 1.6.2.1 2004/07/22 18:05:51 tbingham Exp $ $Name:  $
+// $Id: OMListT.h,v 1.6.2.2 2004/07/23 16:01:05 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,6 +28,7 @@
 #define OMLISTT_H
 
 #include "OMAssertions.h"
+#include "OMContainerIterator.h"
 
 // This implementation was taken from [1].
 //
