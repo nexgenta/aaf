@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.64.2.1 2004/04/17 20:30:29 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.64.2.2 2004/04/18 16:22:39 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -816,7 +816,8 @@ private:
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFInterpolationDef>		_interpolationDefinitions;
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFDataDef>				_dataDefinitions;
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPluginDef>				_pluginDefinitions;
-
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFKLVDataDefinition>                  _klvDataDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFTaggedValueDefinition>               _taggedValueDefinitions;
 
   aafInt16 _lastGeneratedPid;	// must be signed!
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.115.2.1 2004/04/17 20:30:30 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.115.2.2 2004/04/18 16:22:38 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -88,6 +88,8 @@ ImplAAFDictionary::ImplAAFDictionary ()
   _interpolationDefinitions      (PID_Dictionary_InterpolationDefinitions,    L"InterpolationDefinitions", PID_DefinitionObject_Identification),
   _dataDefinitions      (PID_Dictionary_DataDefinitions,    L"DataDefinitions", PID_DefinitionObject_Identification),
   _pluginDefinitions      (PID_Dictionary_PluginDefinitions,    L"PluginDefinitions", PID_DefinitionObject_Identification),
+  _klvDataDefinitions( PID_Dictionary_KLVDataDefinitions, L"KLVDataDefinitions", PID_DefinitionObject_Identification),
+  _taggedValueDefinitions( PID_Dictionary_TaggedValueDefinitions, L"TaggedValueDefinitions", PID_DefinitionObject_Identification),
   _pBuiltinClasses (0),
   _pBuiltinTypes (0),
   _pBuiltinDefs (0),
@@ -106,6 +108,8 @@ ImplAAFDictionary::ImplAAFDictionary ()
   _persistentProperties.put(_interpolationDefinitions.address());
   _persistentProperties.put(_dataDefinitions.address());
   _persistentProperties.put(_pluginDefinitions.address());
+  _persistentProperties.put(_klvDataDefinitions.address());
+  _persistentProperties.put(_taggedValueDefinitions.address());
 
 }
 
