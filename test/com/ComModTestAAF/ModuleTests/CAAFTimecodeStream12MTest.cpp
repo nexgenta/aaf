@@ -81,6 +81,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTimecodeStream12M		*pTimecodeStream12M = NULL;
 	IAAFTimecodeStream			*pTimecodeStream = NULL;
 	IAAFSegment					*pSeg = NULL;
+	IAAFComponent*		pComponent = NULL;
 
 	aafMobID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
@@ -90,17 +91,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUInt32					n;
 
 	zero = 0;
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTimecodeStream12M Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
-
 
 	try
 	{
@@ -134,6 +136,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdTimecodeStream12M()->
 					CreateInstance(IID_IAAFTimecodeStream12M, 
 								   (IUnknown **)&pTimecodeStream12M));		
+		 checkResult(pTimecodeStream12M->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 		 
 
 		checkResult(pTimecodeStream12M->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
@@ -152,7 +158,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pTimecodeStream->SetSourceType(kAAFTimecodeLTC));
 
 		startTC.startFrame = 108000;		// 1 hour, non-drop
-		startTC.drop = kTcNonDrop;
+		startTC.drop = kAAFTcNonDrop;
 		startTC.fps = 30;
 
 		// Set up:
@@ -212,6 +218,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pSeg)
 		pSeg->Release();
 
+	if (pComponent)
+		pComponent->Release();
 	if (pTimecodeStream12M)
 		pTimecodeStream12M->Release();
 
@@ -246,38 +254,39 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-    // IAAFSession *				pSession = NULL;
-	IAAFFile *					pFile = NULL;
-	bool bFileOpen = false;
-	IAAFHeader *				pHeader = NULL;
-	IEnumAAFMobs*				pMobIter = NULL;
-	IEnumAAFMobSlots*			pEnum = NULL;
-	IAAFMob*					pMob = NULL;
-	IAAFMobSlot*				pMobSlot = NULL;
-	IAAFSegment*				pSeg = NULL;
-	IAAFTimecodeStream12M*		pTimecodeStream12M = NULL;
-	IAAFTimecodeStream*			pTimecodeStream = NULL;
-	aafTimecode_t				startTC;
-	aafTimecodeSourceType_t		checkType;
-	aafRational_t				checkSpeed, testRate;
-	aafUInt32					checkSampleSize, checkUserData;
-	// aafUInt32				checkUserDataLen;
-	aafPosition_t				offset;
-	AAFRESULT					status;
-	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t				numMobs;
-	HRESULT						hr = S_OK;
+  // IAAFSession *				pSession = NULL;
+  IAAFFile *					pFile = NULL;
+  bool bFileOpen = false;
+  IAAFHeader *				pHeader = NULL;
+  IEnumAAFMobs*				pMobIter = NULL;
+  IEnumAAFMobSlots*			pEnum = NULL;
+  IAAFMob*					pMob = NULL;
+  IAAFMobSlot*				pMobSlot = NULL;
+  IAAFSegment*				pSeg = NULL;
+  IAAFTimecodeStream12M*		pTimecodeStream12M = NULL;
+  IAAFTimecodeStream*			pTimecodeStream = NULL;
+  aafTimecode_t				startTC;
+  aafTimecodeSourceType_t		checkType;
+  aafRational_t				checkSpeed, testRate;
+  aafUInt32					checkSampleSize, checkUserData;
+  // aafUInt32				checkUserDataLen;
+  aafPosition_t				offset;
+  AAFRESULT					status;
+  aafProductIdentification_t	ProductInfo;
+  aafNumSlots_t				numMobs;
+  HRESULT						hr = S_OK;
 
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFTimecodeStream12M Test. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
-
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
+  ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+  ProductInfo.productName = L"AAFTimecodeStream12M Test. NOT!";
+  ProductInfo.productVersion = &v;
+  ProductInfo.productVersionString = NULL;
+  ProductInfo.platform = NULL;
 
   try
   {
@@ -289,7 +298,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
     checkResult(pHeader->GetMobs( NULL, &pMobIter));
@@ -317,7 +326,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 		checkResult(pTimecodeStream->GetPositionTimecode(0, &startTC));
         checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 
 
@@ -334,41 +343,41 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		offset = 0;		// Group 1 lower bound	 
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 60;	// Group 2 lower bound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == 108090, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 120;	// Group 3 Lower Bound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == (108000L * 2L), AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 121;	// Group 3 Middle
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == (108000L * 2L)+1, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 179;	// Group 3 UpperBound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == (108000L * 2L)+59, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 180;	// Group 3 lower bound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == 0, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 
 		/**********/
-        startTC.drop = kTcNonDrop;
+        startTC.drop = kAAFTcNonDrop;
         startTC.fps = 30;
         startTC.startFrame = 108000;		// Group 1 lower bound (Tests path #1 through code)
 		checkResult(pSeg->SegmentTCToOffset(&startTC, &testRate, &offset));

@@ -83,14 +83,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
 
-
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFFile Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -165,26 +166,28 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-	IAAFFile *					pFile = NULL;
-	bool bFileOpen = false;
-	IAAFHeader *				pHeader = NULL;
-	IEnumAAFMobs *mobIter = NULL;
+  IAAFFile *					pFile = NULL;
+  bool bFileOpen = false;
+  IAAFHeader *				pHeader = NULL;
+  IEnumAAFMobs *mobIter = NULL;
   IAAFMob			*pMob = NULL;
-	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t				numMobs, n;
-	HRESULT						hr = S_OK;
-	aafWChar					name[500];
-	aafMobID_t					mobID;
+  aafProductIdentification_t	ProductInfo;
+  aafNumSlots_t				numMobs, n;
+  HRESULT						hr = S_OK;
+  aafWChar					name[500];
+  aafMobID_t					mobID;
 
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFFile Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
+  ProductInfo.companyName = L"AAF Developers Desk";
+  ProductInfo.productName = L"AAFFile Test";
+  ProductInfo.productVersion = &v;
+  ProductInfo.productVersionString = NULL;
+  ProductInfo.platform = NULL;
 	  
   try
   {
@@ -195,7 +198,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
     checkResult(pHeader->GetMobs (NULL, &mobIter));
