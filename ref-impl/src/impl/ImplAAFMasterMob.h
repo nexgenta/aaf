@@ -3,33 +3,16 @@
 #ifndef __ImplAAFMasterMob_h__
 #define __ImplAAFMasterMob_h__
 
+#include "OMStorable.h"
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 class ImplAAFSourceClip;
 
@@ -41,11 +24,9 @@ class ImplAAFDataDef;
 
 class ImplAAFFindSourceInfo;
 
-class ImplAAFEssenceAccess;
 
-class ImplAAFLocator;
 
-#include "AAF.h"
+
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
@@ -63,30 +44,25 @@ public:
   virtual ~ImplAAFMasterMob ();
 
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize ();
-
-
   //****************
   // AddMasterSlot()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     AddMasterSlot
-        (// @parm [in] Data kind of new Master Mob slot
-		 ImplAAFDataDef * pDataDef,
+        (// @parm [in] Data kind of new slot
+		 aafUID_t * pDataDef,
 
-		 // @parm [in] Slot ID of the Source Mob slot to be added to the Master Mob
-         aafSlotID_t  sourceSlotID,
+		 // @parm [in] SlotID of new Master Mob slot
+		 aafSlotID_t  slotID,
 
-		 // @parm [in] Source Mob containing the slot to be added to the Master Mob
-         ImplAAFSourceMob * pSourceMob,
-
-		 // @parm [in] SlotID assigned to the new Master Mob slot
-		 aafSlotID_t  masterSlotID,
+		 // @parm [in] File Source Mob slot ID
+         aafSlotID_t  fileSlotID,
 
 		 // @parm [in, string] Name to assign to new slot in Master Mob
-		 const aafWChar *  pSlotName);
+		 aafWChar *  pSlotName,
 
+		 // @parm [in] File Source Mob associated with new slot
+         ImplAAFSourceMob * pFileMob);
 
 
   //****************
@@ -95,13 +71,13 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeName
         (// @parm [in] SlotID of the Master Mob slot
-		 aafUInt32  masterSlotID,
+		 aafInt32  masterSlotID,
 
 		 // @parm [out, size_is(bufSize), string] The returned name
 		 aafWChar *  pTapeName,
 
 		 // @parm [in] the size of the pTapeName buffer
-         aafUInt32  bufSize);
+         aafInt32  bufSize);
 
 
   //****************
@@ -110,10 +86,10 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeNameBufLen
         (// @parm [in] SlotID of the Master Mob slot
-		 aafUInt32  masterSlotID,
+		 aafInt32  masterSlotID,
 
 		 // @parm [out] required buffer length
-         aafUInt32 *  pLen);
+         aafInt32 *  pLen);
 
 
   //****************
@@ -132,30 +108,30 @@ public:
   // GetRepresentationSourceClip()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetRepresentation
+    GetRepresentationSourceClip
         (// @parm [in] Slot ID
 		 aafSlotID_t  slotID,
 
 		 // @parm [in] Index of requested representation
-		 aafUInt32  index,
+		 aafInt32  index,
 
-		 // @parm [out] Requested Segment
-         ImplAAFSegment ** ppSegment);
+		 // @parm [out] Requested Source Clip
+         ImplAAFSourceClip ** ppSourceClip);
 
 
   //****************
   // GetCriteriaSourceClip()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetCriteriaSegment
+    GetCriteriaSourceClip
         (// @parm [in] Slot ID
 		 aafSlotID_t  slotID,
 
 		 // @parm [in] Index of requested representation
 		 aafMediaCriteria_t *  pCriteria,
 
-		 // @parm [out] Requested Segment
-         ImplAAFSegment ** ppSegment);
+		 // @parm [out] Requested Source Clip
+         ImplAAFSourceClip ** ppSourceClip);
 
 
   //***********************************************************
@@ -205,8 +181,11 @@ public:
     // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
     aafMediaCriteria_t *  pMediaCrit,
 
-    // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
-    aafOperationChoice_t *  pOperationChoice,
+    // @parm [in] aafEffectChoice_t * | pEffectChoice | Effect Choice
+    aafEffectChoice_t *  pEffectChoice,
+
+    // @parm [out] AAFComponent | ppThisCpnt | The found component
+    ImplAAFComponent ** ppThisCpnt,
 
     // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
     ImplAAFFindSourceInfo ** ppSourceInfo
@@ -243,189 +222,16 @@ public:
     aafMobKind_t *  pMobKind
   );
 
-  //****************
-  // NewPhysSourceRef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    NewPhysSourceRef
-        (// @parm [in] Edit rate of slot to contain reference
-		 const aafRational_t & editrate,
 
-		 // @parm [in] SlotID of slot to contain reference
-		 aafSlotID_t  aMobSlot,
-
-		 // @parm [in] Data kind of slot to contain reference
-         ImplAAFDataDef * pEssenceKind,
-
-		 aafSourceRef_t  ref,
-
-		 // @parm [in] Length of the Source Clip
-         aafLength_t  srcRefLength);
-
-  //****************
-  // AddPhysSourceRef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    AppendPhysSourceRef
-        (// @parm [in] Edit rate of slot to contain reference
-		 const aafRational_t & editrate,
-
-		 // @parm [in] SlotID of slot to contain reference
-		 aafSlotID_t  aMobSlot,
-
-		 // @parm [in] Data kind of slot to contain reference
-         ImplAAFDataDef * pEssenceKind,
-
-		 aafSourceRef_t  ref,
-
-		 // @parm [in] Length of the Source Clip
-         aafLength_t  srcRefLength);
-
-
-  //****************
-  // Create()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateEssence
-        (// @parm [in] 
-         aafSlotID_t  masterSlotID,
-
-         // @parm [in] create essence of this type
-         ImplAAFDataDef * pMediaKind,
-
- 		 aafUID_t			codecID,
-		 aafRational_t	editRate,
-		 aafRational_t	sampleRate,
-
-         // @parm [in] optionally compressing it
-         aafCompressEnable_t  Enable,
-		ImplAAFLocator		*destination,
-		aafUID_t			fileFormat,
-		ImplAAFEssenceAccess **result);
-	//@comm Creates a single channel stream of essence.  Convenience functions
-	// exist to create audio or video essence, and a separate call
-	// (MultiCreate) exists to create interleaved audio and
-	// video data.
-	//@comm The essence handle from this call can be used with
-	// WriteDataSamples  and possibly WriteDataLines, but NOT with
-	// WriteMultiSamples.
-	//@comm If you are creating the essence, and then attaching it to a master
-	// mob, then the "masterMob" field may be left NULL.
-	// For video, the sampleRate should be the edit rate of the file mob.
-	// For audio, the sample rate should be the actual samples per second.
-	//@comm Replaces omfmMediaCreate
-	
-/****/
-  //****************
-  // MultiCreate()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateMultiEssence
-        (
- 							aafUID_t codecID,
-                          aafUInt16  /*arrayElemCount*/,
-                           aafmMultiCreate_t *  /*mediaArray*/,
-                           aafCompressEnable_t  /*Enable*/,
-							ImplAAFLocator		*destination,
-							aafUID_t			fileFormat,
-							IAAFEssenceMultiAccess **result);
-	//@comm The essence handle from this call can be used with
-	// WriteDataSamples or WriteMultiSamples but NOT with 
-	// or WriteDataLines.
-	//@comm If you are creating the essence, and then attaching it to a master
-	// mob, then the "masterMob" field may be left NULL.
-	//@comm Replaces omfmMediaMultiCreate
-
-    //****************
-  // Open()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    OpenEssence
-        (// @parm [in] On this slot
-         aafSlotID_t  slotID,
-
-         // @parm [in] using this essence criteria
-         aafMediaCriteria_t*  mediaCrit,
-
-         // @parm [in] ReadOnly or Append
-         aafMediaOpenMode_t  openMode,
-
-         // @parm [in] optionally decompressing
-         aafCompressEnable_t  compEnable,
-		ImplAAFEssenceAccess **result);
-	//@comm If the essence is interleaved,
-	// then it will be di-interleaved when samples are read.  This routine
-	// follows the locator, and may call the locator failure callback if
-	// the essence can not be found.  If the failure callback finds the essence,
-	// then this routine will return normally.
-	//@comm The essence handle from this call can be used with
-	// ReadDataSamples  and possibly ReadDataLines, but NOT with
-	// ReadMultiSamples.
-	//@comm Possible Errors:
-	// 	Standard errors (see top of file).
-	// 	OM_ERR_NOMEMORY -- couldn't allocate memory for the essence handle
-	//@comm NOTE: If a locator is followed, then essencePtr may reference ANOTHER file
-	// object, which must be closed on file close.
-	//@comm Replaces omfmMediaOpen*/
-	
-/****/
-  //****************
-  // MultiOpen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    OpenMultiEssence
-        ( // @parm [in] On this slot
-         aafSlotID_t  slotID,
-
-         // @parm [in] using this essence criteria
-         aafMediaCriteria_t*  mediaCrit,
-
-         // @parm [in] ReadOnly or Append
-         aafMediaOpenMode_t  openMode,
-
-         // @parm [in] optionally decompressing
-         aafCompressEnable_t  compEnable,
-		IAAFEssenceMultiAccess **result);
-	//@comm This routine
-	// follows the locator, and may call the locator failure callback if
-	// the essence can not be found.  If the failure callback finds the essence,
-	// then this routine will return normally.
-	//@comm The essence handle from this call can be used with
-	// WriteDataSamples or WriteMultiSamples but NOT with 
-	//  WriteDataLines.
-	//@comm Possible Errors:
-	// 	Standard errors (see top of file).
-	// 	OM_ERR_NOMEMORY -- couldn't allocate memory for the essence handle
-	//@comm Replaces omfmMediaMultiOpen*/
-
-  /****/
-  //****************
-  // CountChannels()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountChannels
-        (// @parm [in] On this slot
-         aafSlotID_t  slotID,
-
-         // @parm [in] using this essence criteria
-         aafMediaCriteria_t*  mediaCrit,
-
-         // @parm [in] for this essence type
-         ImplAAFDataDef * pMediaKind,
-
-         // @parm [out] How many channels?
-         aafUInt16*  numCh);
-	//@comm Returns the number of interleaved essence channels of a given type in the essence stream referenced by the given file mob
-	//@comm If the data format is not interleaved, then the answer will
-	// always be zero or one.  This function correctly returns zero
-	// for essence types not handled by a given codec, and handles codecs
-	// which work with multiple essence types.
-	//@comm Replaces omfmGetNumChannels*/
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFMasterMob)
 
-  // Internal to the SDK
-  virtual AAFRESULT ReconcileMobLength(void);
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFMasterMobTest.cpp.
+  static AAFRESULT test();
 };
 
 #endif // ! __ImplAAFMasterMob_h__
