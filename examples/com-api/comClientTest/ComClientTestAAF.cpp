@@ -37,6 +37,7 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
+#include "CAAFBuiltinDefs.h"
 
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
@@ -443,11 +444,11 @@ static void CreateAAFFile(aafWChar * pFileName)
   ProductInfo.platform = NULL;
   
   check(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
-  
   check(pFile->GetHeader(&pHeader));
 
   // Get the AAF Dictionary so that we can create valid AAF objects.
   check(pHeader->GetDictionary(&pDictionary));
+  CAAFBuiltinDefs defs (pDictionary);
    
 //Make the first mob
   IAAFMob            *pMob = NULL;
@@ -468,29 +469,26 @@ static void CreateAAFFile(aafWChar * pFileName)
   for(test = 0; test < 5; test++)
   {
      // Create a source Mob with a FileDescriptor attached
-    check(pDictionary->CreateInstance(
-                AUID_AAFSourceMob, 
-                IID_IAAFSourceMob, 
-                (IUnknown **)&smob));
+    check(defs.cdSourceMob()->
+		  CreateInstance(IID_IAAFSourceMob, 
+						 (IUnknown **)&smob));
     check(smob->QueryInterface (IID_IAAFMob, (void **)&pMob));
     check(CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
     //newMobID.Data1 = test;
     check(pMob->SetMobID(newMobID));
     check(pMob->SetName(names[test]));
 
-    check(pDictionary->CreateInstance(
-              AUID_AAFFileDescriptor,
-              IID_IAAFFileDescriptor, 
-              (IUnknown **)&fileDesc));
+    check(defs.cdFileDescriptor()->
+		  CreateInstance(IID_IAAFFileDescriptor, 
+						 (IUnknown **)&fileDesc));
     check(fileDesc->SetSampleRate(audioRate));
     check(fileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&essenceDesc));
 
     {
       HRESULT stat;
-      stat = pDictionary->CreateInstance(
-                  AUID_AAFNetworkLocator,
-                  IID_IAAFLocator, 
-                  (IUnknown **)&pLocator);
+      stat = defs.cdNetworkLocator()->
+		CreateInstance(IID_IAAFLocator, 
+					   (IUnknown **)&pLocator);
       check (stat);
     }
     check(fileDesc->SetSampleRate(audioRate));
@@ -501,9 +499,9 @@ static void CreateAAFFile(aafWChar * pFileName)
     // Add some slots
     for(testSlot = 0; testSlot < 3; testSlot++)
     {
-       check(pDictionary->CreateInstance(AUID_AAFSourceClip,
-               IID_IAAFSourceClip, 
-               (IUnknown **)&sclp));
+       check(defs.cdSourceClip()->
+			 CreateInstance(IID_IAAFSourceClip, 
+							(IUnknown **)&sclp));
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
       check(pMob->AppendNewTimelineSlot
 			(editRate,
@@ -551,7 +549,6 @@ static void CreateAAFFile(aafWChar * pFileName)
 
   pHeader->Release();
   pHeader = NULL;
-  
   check(pFile->Save());
   check(pFile->Close());
   if (pFile)
@@ -590,7 +587,7 @@ struct CAAFInitialize
 };
 
 
-main()
+int main()
 {
   CComInitialize comInit;
   CAAFInitialize aafInit;

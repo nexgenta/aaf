@@ -147,6 +147,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
+	IAAFClassDef                *pCDMasterMob = 0;
+	IAAFClassDef                *pCDNetworkLocator = 0;
+	IAAFDataDef                 *pDdefSound = 0;
 	// !!!Previous revisions of this file contained variables here required to handle external essence
 	aafMobID_t					masterMobID;
 	aafProductIdentification_t	ProductInfo;
@@ -186,15 +189,22 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
 	check(pFile->GetHeader(&pHeader));
 
-  // Get the AAF Dictionary so that we can create valid AAF objects.
-  check(pHeader->GetDictionary(&pDictionary));
+	// Get the AAF Dictionary so that we can create valid AAF objects.
+	check(pHeader->GetDictionary(&pDictionary));
+
+	check(pDictionary->LookupClassDef(AUID_AAFMasterMob,
+									  &pCDMasterMob));
+	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
+									  &pCDNetworkLocator));
+	check(pDictionary->LookupDataDef(DDEF_Sound,
+									 &pDdefSound));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
   // Get a Master MOB Interface
-	check(pDictionary->CreateInstance( AUID_AAFMasterMob,
-						   IID_IAAFMasterMob, 
-						   (IUnknown **)&pMasterMob));
+	check(pCDMasterMob->
+		  CreateInstance(IID_IAAFMasterMob, 
+						 (IUnknown **)&pMasterMob));
 	// Get a Mob interface and set its variables.
 	check(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 	check(pMob->GetMobID(&masterMobID));
@@ -208,9 +218,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	if(dataFile != NULL)
 	{
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
-								IID_IAAFLocator, 
-								(IUnknown **)&pLocator));		
+		check(pCDNetworkLocator->
+			  CreateInstance(IID_IAAFLocator, 
+							 (IUnknown **)&pLocator));		
 		check(pLocator->SetPath (dataFile->dataFilename));
 		testContainer = dataFile->dataFormat;
 	}
@@ -245,7 +255,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 		// now create the Essence data file
 		check(pMasterMob->CreateEssence(1,				// Slot ID
-									DDEF_Sound,		// MediaKind
+									pDdefSound,		// MediaKind
 									CodecWave,		// codecID
 									editRate,		// edit rate
 									sampleRate,		// sample rate
@@ -383,6 +393,24 @@ cleanup:
 
 	if (pHeader)
 		pHeader->Release();
+
+	if (pCDMasterMob)
+	  {
+		pCDMasterMob->Release();
+		pCDMasterMob = 0;
+	  }
+
+	if (pCDNetworkLocator)
+	  {
+		pCDNetworkLocator->Release();
+		pCDNetworkLocator = 0;
+	  }
+
+	if (pDdefSound)
+	  {
+		pDdefSound->Release ();
+		pDdefSound = 0;
+	  }
 
 	if (pFile)
   {
@@ -836,7 +864,7 @@ cleanup:
 	return moduleErrorTmp;
 }
 
-main()
+int main()
 {
 	CComInitialize comInit;
   CAAFInitialize aafInit;
