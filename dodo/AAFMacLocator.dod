@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFMacLocator\
 #endm
@@ -13,50 +6,50 @@ AAFMacLocator\
 AAFLocator\
 #endm
 #c
-AD_HEAD
+#import ./AAFUnitTest.exp
+
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
+AD_CLASS_BEGIN()
 
-
-AD_INCLUDE(AAFTypes)
-
-AD_CLASS_UUID(94659781, 2a3c, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
-
-AD_DEFAULT_UUID(94659781, 2a3c, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
-AD_XCLASS_BEGIN(Concrete, StoredObject)
-
+/****/
 AD_METHOD1(GetVolumeName,
-[out],aafString_t*,volname,Pass in a string which will be filled in,
+[out],AAFString*,volname,Pass in a string, which will be filled in,
 Get the volume name from a Mac locator.)
 
+/****/
 AD_METHOD1(GetVRef,
-[out],aafInt16*,vRef, value ref,
+[out],aafInt16*,vRef,,
 Get the volume reference number from a Mac locator.)
 	//@comm Present on Macs only.
 	
-
+/****/
 AD_METHOD1(GetDirID,
-[out],aafInt32*,DirID, directory ID,
+[out],aafInt32*,DirID,,
 Get the DirID from a Mac locator.)
 	//@comm Replaces part of omfmMacLocatorGetInfo
 	
 /****/
-AD_METHOD1(SetVolumeName,
-[out],aafString_t*,volname,pass in a reference to a string object,
+AD_METHOD2(SetVolumeName,
+[out],AAFString*,volname,pass in a reference to a string object,
 Set the volume name for a Mac locator.)
 
 /****/
-AD_METHOD1(SetDirID,
-[in],aafInt32 ,DirID, directory ID,
+AD_METHOD2(SetDirID,
+[out],aafInt32,DirID,,
 Set the DirID for a Mac locator.)
 
-AD_XCLASS_END(Concrete, StoredObject)
+  //
+  // IAAFUnitTest interface method overrides
+  //
+.method-Test
+
+
+AD_CLASS_END
