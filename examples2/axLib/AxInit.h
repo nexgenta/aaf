@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxInit.h,v 1.3 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxInit.h,v 1.4 2004/04/10 14:21:15 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,8 +25,10 @@
 class AxInit {
 public:
 	AxInit();
+	AxInit( const char* dllname );
 	virtual ~AxInit();
 private:
+	void Init( const char* dllname );
 	static bool once;
 };
 
