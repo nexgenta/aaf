@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.17 2004/09/24 09:41:25 stuart_hc Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.18 2004/09/27 09:41:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,7 @@ using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>		// for pathconf()
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
