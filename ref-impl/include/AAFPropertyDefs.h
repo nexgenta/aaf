@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.2 2004/03/11 18:58:32 stuart_hc Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.3 2004/03/24 17:52:46 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,6 +52,14 @@ const aafUID_t kAAFPropID_Component_Length =
 //{03010210-0400-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_Component_KLVData =
 {0x03010210, 0x0400, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{03020102-1600-0000-060e-2b3401010107}
+const aafUID_t kAAFPropID_Component_UserComments =
+{0x03020102, 0x1600, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x07}};
+
+//{03010210-0800-0000-060e-2b3401010107}
+const aafUID_t kAAFPropID_Component_Attributes =
+{0x03010210, 0x0800, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x07}};
 
 //{01040901-0000-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_EdgeCode_Start =

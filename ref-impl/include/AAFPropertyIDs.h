@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.2 2004/03/11 18:58:32 stuart_hc Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.3 2004/03/24 17:52:46 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,8 @@ const int PID_InterchangeObject_Generation                       = 0x0102;
 const int PID_Component_DataDefinition                           = 0x0201;
 const int PID_Component_Length                                   = 0x0202;
 const int PID_Component_KLVData                                  = 0x0203;
+const int PID_Component_UserComments                             = 0x0204;
+const int PID_Component_Attributes                               = 0x0205;
 const int PID_EdgeCode_Start                                     = 0x0401;
 const int PID_EdgeCode_FilmKind                                  = 0x0402;
 const int PID_EdgeCode_CodeFormat                                = 0x0403;
