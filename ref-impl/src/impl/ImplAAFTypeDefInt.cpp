@@ -215,12 +215,11 @@ ImplAAFTypeDefInt::~ImplAAFTypeDefInt ()
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefInt::Initialize (
-      const aafUID_t *  pID,
+      const aafUID_t & id,
       aafUInt8  intSize,
       aafBool  isSigned,
-      wchar_t *  pTypeName)
+      const aafCharacter * pTypeName)
 {
-  assert (pID);
   assert (intSize > 0);
   assert (pTypeName);
 
@@ -234,7 +233,7 @@ AAFRESULT STDMETHODCALLTYPE
   _isSigned = isSigned;
   AAFRESULT hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
@@ -315,12 +314,12 @@ AAFRESULT STDMETHODCALLTYPE
 	return hr;
 
   aafMemPtr_t pBits = NULL;
-  hr = pv->AllocateBits (valSize, &pBits);
+  hr = pv->AllocateBits (_size, &pBits);
   if (! AAFRESULT_SUCCEEDED (hr))
 	return hr;
 
   assert (pBits);
-  memcpy (pBits, valBuf, valSize);
+  memcpy (pBits, valBuf, _size);
 
   *ppPropVal = pv;
   (*ppPropVal)->AcquireReference ();
@@ -537,7 +536,8 @@ void ImplAAFTypeDefInt::reorder(OMByte* bytes,
   assert (IsFixedSize());
   assert (PropValSize() == bytesSize);
   assert (bytes);
-  reorderInteger (bytes, bytesSize);
+  if (bytesSize > 1)
+	reorderInteger (bytes, bytesSize);
 }
 
 
@@ -607,8 +607,8 @@ void ImplAAFTypeDefInt::internalize(OMByte* externalBytes,
   assert (externalBytes);
   assert (internalBytes);
   // assert (internalBytesSize == externalBytesSize);
-  const size_t thisNativeSize = NativeSize ();
-  assert (internalBytesSize == thisNativeSize);
+  // const size_t thisNativeSize = NativeSize ();
+  // assert (internalBytesSize == thisNativeSize);
 
   if (externalBytesSize > internalBytesSize)
 	{
@@ -678,3 +678,26 @@ OMProperty * ImplAAFTypeDefInt::pvtCreateOMPropertyMBS
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefInt::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  // Return variable array of unsigned char
+  return pvtGetUInt8Array8Type (ppRawTypeDef);
+}
+
+
+bool ImplAAFTypeDefInt::IsAggregatable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsStreamable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsFixedArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsVariableArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefInt::IsStringable () const
+{ return true; }

@@ -56,7 +56,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in] Type of values in this enumeration
          ImplAAFTypeDef * pType,
@@ -73,7 +73,7 @@ public:
          aafUInt32  numElems,
 
          // @parm [in] friendly name of this type definition
-         wchar_t *  pTypeName);
+         const aafCharacter * pTypeName);
 
 
   //****************
@@ -185,6 +185,15 @@ public:
          aafInt64  valueIn);
 
 
+  //****************
+  // RegisterSize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterSize
+        (// @parm [in] size of this enum
+         aafUInt32  enumSize);
+
+
   // Override from AAFTypeDef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
@@ -230,6 +239,32 @@ public:
                            OMByteOrder byteOrder) const;
 
 
+  //****************
+  // pvtInitialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    pvtInitialize
+        (// @parm [in] auid to be used to identify this type
+         const aafUID_t & id,
+
+         // @parm [in] Type of values in this enumeration
+         const aafUID_t & typeId,
+
+         // @parm [in, size_is(numElems)] array of element values to be represented in this enumerated
+    // type
+         aafInt64 * pElementValues,
+
+         // @parm [in, size_is(numElems)] array of element names to be represented in this enumerated
+    // type
+         aafString_t *  pElementNames,
+
+         // @parm [in] number of members in pElementValues and pElementNames arrays
+         aafUInt32  numElems,
+
+         // @parm [in] friendly name of this type definition
+         const aafCharacter * pTypeName);
+
+
 private:
   // OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
   OMFixedSizeProperty<aafUID_t>   _ElementType;
@@ -242,6 +277,10 @@ private:
   OMVariableSizeProperty<aafInt64> _ElementValues;
 
   ImplAAFTypeDefSP _cachedBaseType;
+
+  aafBool          _isRegistered;
+  aafBool          _registrationAttempted;
+  aafUInt32        _registeredSize;
 
   //
   // private methods
@@ -257,6 +296,14 @@ private:
 
 
   ImplAAFTypeDefSP BaseType (void) const;
+
+public:
+  // Overrides from ImplAAFTypeDef
+  virtual bool IsAggregatable () const;
+  virtual bool IsStreamable () const;
+  virtual bool IsFixedArrayable () const;
+  virtual bool IsVariableArrayable () const;
+  virtual bool IsStringable () const;
 };
 
 //

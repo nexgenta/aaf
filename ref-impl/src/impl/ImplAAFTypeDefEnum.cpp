@@ -40,6 +40,10 @@
 #include "ImplAAFHeader.h"
 #endif
 
+#ifndef __AAFTypeDefUIDs_h__
+#include "AAFTypeDefUIDs.h"
+#endif
+
 #include <assert.h>
 #include <string.h>
 
@@ -51,9 +55,11 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 
 ImplAAFTypeDefEnum::ImplAAFTypeDefEnum ()
-  : _ElementType   ( PID_TypeDefinitionEnumeration_ElementType,   "Element Type"),
-	_ElementNames  ( PID_TypeDefinitionEnumeration_ElementNames,  "Element Names"),
-	_ElementValues ( PID_TypeDefinitionEnumeration_ElementValues, "Element Values")
+  : _ElementType   ( PID_TypeDefinitionEnumeration_ElementType,   "ElementType"),
+	_ElementNames  ( PID_TypeDefinitionEnumeration_ElementNames,  "ElementNames"),
+	_ElementValues ( PID_TypeDefinitionEnumeration_ElementValues, "ElementValues"),
+	_isRegistered (AAFFalse),
+	_registrationAttempted (AAFFalse)
 {
   _persistentProperties.put(_ElementType.address());
   _persistentProperties.put(_ElementNames.address());
@@ -67,31 +73,56 @@ ImplAAFTypeDefEnum::~ImplAAFTypeDefEnum ()
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefEnum::Initialize (
-      const aafUID_t * pID,
+      const aafUID_t & id,
       ImplAAFTypeDef * pType,
       aafInt64 * pElementValues,
       aafString_t * pElementNames,
       aafUInt32 numElements,
-      wchar_t * pTypeName)
+      const wchar_t * pTypeName)
 {
-  if (!pID)
+  if (!pType)
 	return AAFRESULT_NULL_PARAM;
+
+  eAAFTypeCategory_t baseTypeCat;  
+  assert (pType);
+  AAFRESULT hr = pType->GetTypeCategory(&baseTypeCat);
+  if (AAFRESULT_FAILED(hr))
+	return hr;
+  if (kAAFTypeCatInt != baseTypeCat)
+	return AAFRESULT_BAD_TYPE;
+
+  aafUID_t typeUID;
+  assert (pType);
+  hr = pType->GetAUID(&typeUID);
+  assert (AAFRESULT_SUCCEEDED(hr));
+  _ElementType = typeUID;
+
+  return pvtInitialize (id,
+						typeUID,
+						pElementValues,
+						pElementNames,
+						numElements,
+						pTypeName);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTypeDefEnum::pvtInitialize (
+      const aafUID_t & id,
+      const aafUID_t & typeId,
+      aafInt64 * pElementValues,
+      aafString_t * pElementNames,
+      aafUInt32 numElements,
+      const wchar_t * pTypeName)
+{
   if (!pTypeName)
     return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  eAAFTypeCategory_t baseTypeCat;  
-  assert (pType);
-  hr = pType->GetTypeCategory(&baseTypeCat);
-  if (AAFRESULT_FAILED(hr))
-	return hr;
-  if (kAAFTypeCatInt != baseTypeCat)
-	return AAFRESULT_BAD_TYPE;
 
   aafUInt32 i;
   aafUInt32 totalNameSize = 0;
@@ -119,11 +150,7 @@ ImplAAFTypeDefEnum::Initialize (
 	  tmpNamePtr += wcslen (pElementNames[i]) + 1;
 	}
 
-  aafUID_t typeUID;
-  assert (pType);
-  hr = pType->GetAUID(&typeUID);
-  assert (AAFRESULT_SUCCEEDED(hr));
-  _ElementType = typeUID;
+  _ElementType = typeId;
 
   _ElementNames.setValue (namesBuf, totalNameSize * sizeof(wchar_t));
   delete[] namesBuf;
@@ -142,20 +169,14 @@ ImplAAFTypeDefEnum::GetElementType (
 
   if (! _cachedBaseType)
 	{
-	  ImplAAFHeaderSP pHead;
 	  ImplAAFDictionarySP pDict;
 
-	  AAFRESULT hr;
-	  hr = MyHeadObject(&pHead);
-	  if (AAFRESULT_FAILED(hr)) return hr;
-
-	  hr = (pHead->GetDictionary(&pDict));
+	  AAFRESULT hr = GetDictionary(&pDict);
 	  if (AAFRESULT_FAILED(hr)) return hr;
 
 	  ImplAAFTypeDefEnum * pNonConstThis =
 		  (ImplAAFTypeDefEnum *) this;
-	  aafUID_t id = _ElementType;
-	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedBaseType);
+	  hr = pDict->LookupType (_ElementType, &pNonConstThis->_cachedBaseType);
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	}
   assert (ppTypeDef);
@@ -333,45 +354,84 @@ ImplAAFTypeDefEnum::GetIntegerValue (
   assert (ptdi);
 
   // Get the size of the base integer type
-  aafUInt32 baseIntSize;
-  hr = ptdi->GetSize (&baseIntSize);
-  if (AAFRESULT_FAILED(hr)) return hr;
-  assert (pPropValIn);
+  aafUInt32 localIntSize;
+
+  // BobT: Don't check the size of the underlying integral type;
+  // instead check the native size of this enumeration to determine
+  // the local representation.
+  // hr = ptdi->GetSize (&baseIntSize);
+  // if (AAFRESULT_FAILED(hr)) return hr;
+  localIntSize = NativeSize();
+
   aafInt64 retval;
-  switch (baseIntSize)
+
+  ImplAAFDictionarySP pDict;
+  hr = GetDictionary(&pDict);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  // Use a locally-looked-up type def to represent the local
+  // underlying integer type.  This might be different than the
+  // underlying integer type declared by AAF.
+  ImplAAFTypeDefSP ptd;
+  switch (localIntSize)
+	{
+	case 1:
+	  hr = pDict->LookupType (kAAFTypeID_UInt8, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	case 2:
+	  hr = pDict->LookupType (kAAFTypeID_UInt16, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	case 4:
+	  hr = pDict->LookupType (kAAFTypeID_UInt32, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	case 8:
+	  hr = pDict->LookupType (kAAFTypeID_UInt64, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	}
+  assert (ptd);
+  ImplAAFTypeDefInt * pLocalTd =
+	dynamic_cast<ImplAAFTypeDefInt*>((ImplAAFTypeDef*) ptd);
+  assert (pLocalTd);
+
+  assert (pPropValIn);
+  switch (localIntSize)
 	{
 	case 1:
 	  aafUInt8 ui8Val;
-	  hr = ptdi->GetInteger (pPropValIn,
-							 (aafMemPtr_t) &ui8Val,
-							 sizeof (ui8Val));
+	  hr = pLocalTd->GetInteger (pPropValIn,
+								 (aafMemPtr_t) &ui8Val,
+								 sizeof (ui8Val));
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  retval = ui8Val;
 	  break;
 
 	case 2:
 	  aafUInt16 ui16Val;
-	  hr = ptdi->GetInteger (pPropValIn,
-							 (aafMemPtr_t) &ui16Val,
-							 sizeof (ui16Val));
+	  hr = pLocalTd->GetInteger (pPropValIn,
+								 (aafMemPtr_t) &ui16Val,
+								 sizeof (ui16Val));
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  retval = ui16Val;
 	  break;
 
 	case 4:
 	  aafUInt32 ui32Val;
-	  hr = ptdi->GetInteger (pPropValIn,
-							 (aafMemPtr_t) &ui32Val,
-							 sizeof (ui32Val));
+	  hr = pLocalTd->GetInteger (pPropValIn,
+								(aafMemPtr_t) &ui32Val,
+								sizeof (ui32Val));
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  retval = ui32Val;
 	  break;
 
 	case 8:
 	  aafInt64 i64Val;
-	  hr = ptdi->GetInteger (pPropValIn,
-							 (aafMemPtr_t) &i64Val,
-							 sizeof (i64Val));
+	  hr = pLocalTd->GetInteger (pPropValIn,
+								(aafMemPtr_t) &i64Val,
+								sizeof (i64Val));
 	  if (AAFRESULT_FAILED(hr)) return hr;
 	  retval = i64Val;
 	  break;
@@ -413,11 +473,49 @@ ImplAAFTypeDefEnum::SetIntegerValue (
   assert (ptdi);
 
   // Get the size of the base integer type
-  aafUInt32 baseIntSize;
-  hr = ptdi->GetSize (&baseIntSize);
-  if (AAFRESULT_FAILED(hr)) return hr;
+  aafUInt32 localIntSize;
+
+  // BobT: Don't check the size of the underlying integral type;
+  // instead check the native size of this enumeration to determine
+  // the local representation.
+  // hr = ptdi->GetSize (&baseIntSize);
+  // if (AAFRESULT_FAILED(hr)) return hr;
+  localIntSize = NativeSize();
+
+  ImplAAFDictionarySP pDict;
+  hr = GetDictionary(&pDict);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  // Use a locally-looked-up type def to represent the local
+  // underlying integer type.  This might be different than the
+  // underlying integer type declared by AAF.
+  ImplAAFTypeDefSP ptd;
+  switch (localIntSize)
+	{
+	case 1:
+	  hr = pDict->LookupType (kAAFTypeID_UInt8, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	case 2:
+	  hr = pDict->LookupType (kAAFTypeID_UInt16, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	case 4:
+	  hr = pDict->LookupType (kAAFTypeID_UInt32, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	case 8:
+	  hr = pDict->LookupType (kAAFTypeID_UInt64, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  break;
+	}
+  assert (ptd);
+  ImplAAFTypeDefInt * pLocalTd =
+	dynamic_cast<ImplAAFTypeDefInt*>((ImplAAFTypeDef*) ptd);
+  assert (pLocalTd);
+
   assert (pPropValToSet);
-  switch (baseIntSize)
+  switch (localIntSize)
 	{
 	case 1:
 	  if (valueIn > ((1 << 8)-1))
@@ -427,9 +525,9 @@ ImplAAFTypeDefEnum::SetIntegerValue (
 
 	  aafUInt8 ui8Val;
 	  ui8Val = (aafUInt8) valueIn;
-	  hr = ptdi->SetInteger (pPropValToSet,
-							 (aafMemPtr_t) &ui8Val,
-							 sizeof (ui8Val));
+	  hr = pLocalTd->SetInteger (pPropValToSet,
+							   (aafMemPtr_t) &ui8Val,
+							   sizeof (ui8Val));
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  break;
@@ -442,9 +540,9 @@ ImplAAFTypeDefEnum::SetIntegerValue (
 
 	  aafUInt16 ui16Val;
 	  ui16Val = (aafUInt16) valueIn;
-	  hr = ptdi->SetInteger (pPropValToSet,
-							 (aafMemPtr_t) &ui16Val,
-							 sizeof (ui16Val));
+	  hr = pLocalTd->SetInteger (pPropValToSet,
+								(aafMemPtr_t) &ui16Val,
+								sizeof (ui16Val));
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  break;
@@ -457,7 +555,7 @@ ImplAAFTypeDefEnum::SetIntegerValue (
 
 	  aafUInt32 ui32Val;
 	  ui32Val = (aafUInt32) valueIn;
-	  hr = ptdi->SetInteger (pPropValToSet,
+	  hr = pLocalTd->SetInteger (pPropValToSet,
 							 (aafMemPtr_t) &ui32Val,
 							 sizeof (ui32Val));
 	  if (AAFRESULT_FAILED(hr))
@@ -465,9 +563,9 @@ ImplAAFTypeDefEnum::SetIntegerValue (
 	  break;
 
 	case 8:
-	  hr = ptdi->SetInteger (pPropValToSet,
-							 (aafMemPtr_t) &valueIn,
-							 sizeof (valueIn));
+	  hr = pLocalTd->SetInteger (pPropValToSet,
+								(aafMemPtr_t) &valueIn,
+								sizeof (valueIn));
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  break;
@@ -479,6 +577,15 @@ ImplAAFTypeDefEnum::SetIntegerValue (
   return AAFRESULT_SUCCESS;
 }
 
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTypeDefEnum::RegisterSize (aafUInt32  enumSize)
+{
+  _registeredSize = enumSize;
+  _isRegistered = AAFTrue;
+  return AAFRESULT_SUCCESS;
+}
 
 
 // Override from AAFTypeDef
@@ -641,10 +748,10 @@ void ImplAAFTypeDefEnum::reorder(OMByte* externalBytes,
 }
 
 
-size_t ImplAAFTypeDefEnum::externalSize(OMByte* internalBytes,
-										size_t internalBytesSize) const
+size_t ImplAAFTypeDefEnum::externalSize(OMByte* /*internalBytes*/,
+										size_t /*internalBytesSize*/) const
 {
-  return BaseType()->externalSize (internalBytes, internalBytesSize);
+  return PropValSize ();
 }
 
 
@@ -662,10 +769,13 @@ void ImplAAFTypeDefEnum::externalize(OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefEnum::internalSize(OMByte* externalBytes,
-										size_t externalBytesSize) const
+size_t ImplAAFTypeDefEnum::internalSize(OMByte* /*externalBytes*/,
+										size_t /*externalBytesSize*/) const
 {
-  return BaseType()->internalSize (externalBytes, externalBytesSize);
+  if (IsRegistered ())
+	return NativeSize ();
+  else
+	return PropValSize ();
 }
 
 
@@ -695,14 +805,42 @@ size_t ImplAAFTypeDefEnum::PropValSize (void) const
   return BaseType()->PropValSize ();
 }
 
+
 aafBool ImplAAFTypeDefEnum::IsRegistered (void) const
 {
-  return BaseType()->IsRegistered ();
+  if (!_isRegistered)
+	{
+	  if (! _registrationAttempted)
+		{
+		  ImplAAFDictionarySP pDict;
+		  AAFRESULT hr = GetDictionary(&pDict);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  pDict->pvtAttemptBuiltinSizeRegistration ((ImplAAFTypeDefEnum*) this);
+		  ((ImplAAFTypeDefEnum*)this)->_registrationAttempted = AAFTrue;
+		}
+	}
+  return (_isRegistered ? AAFTrue : AAFFalse);
 }
+
 
 size_t ImplAAFTypeDefEnum::NativeSize (void) const
 {
-  return BaseType()->NativeSize ();
+  assert (IsRegistered());
+  return _registeredSize;
+}
+
+
+static OMProperty * pvtMakeProperty (OMPropertyId pid,
+									 const char * name,
+									 size_t size)
+{
+  if (0 == size) { assert (0); return 0; }
+  else if (1 == size) { return new OMFixedSizeProperty<aafUInt8>(pid, name); }
+  else if (2 == size) { return new OMFixedSizeProperty<aafUInt16>(pid, name); }
+  else if (4 == size) { return new OMFixedSizeProperty<aafUInt32>(pid, name); }
+  else if (8 == size) { return new OMFixedSizeProperty<aafInt64>(pid, name); }
+  else if (sizeof(aafUID_t) == size) { return new OMFixedSizeProperty<aafUID_t>(pid, name); }
+  else { assert (0); return 0; }
 }
 
 
@@ -711,10 +849,24 @@ OMProperty * ImplAAFTypeDefEnum::pvtCreateOMPropertyMBS
    const char * name) const
 {
   assert (name);
-  size_t elemSize = PropValSize ();
-  OMProperty * result = new OMSimpleProperty (pid, name, elemSize);
+  size_t elemSize = NativeSize ();
+  OMProperty * result = pvtMakeProperty (pid, name, elemSize);
   assert (result);
   return result;
 }
 
 
+bool ImplAAFTypeDefEnum::IsAggregatable () const
+{ return true; }
+
+bool ImplAAFTypeDefEnum::IsStreamable () const
+{ return true; }
+
+bool ImplAAFTypeDefEnum::IsFixedArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefEnum::IsVariableArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefEnum::IsStringable () const
+{ return true; }
