@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -43,7 +43,7 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMStreamProperty(const OMPropertyId propertyId, const char* name);
+  OMStreamProperty(const OMPropertyId propertyId, const wchar_t* name);
 
     // @cmember Destructor.
   virtual ~OMStreamProperty(void);
@@ -109,7 +109,7 @@ public:
 
     // @cmember Write a single <p Element> to the end of
     //          this <c OMStreamProperty>.
-  void appendElement(const Element element);
+  void appendElement(const Element* element);
 
   // Stream positioning and count of elements
 
