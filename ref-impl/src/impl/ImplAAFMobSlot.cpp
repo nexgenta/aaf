@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMobSlot.cpp,v 1.43 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMobSlot.cpp,v 1.43.2.1 2005/01/06 11:14:41 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,7 +98,8 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  if( _segment == value )
 		return AAFRESULT_SUCCESS;
-	  _segment->ReleaseReference();
+		ImplAAFSegment *segment = _segment.clearValue();
+	  segment->ReleaseReference();
 	}
 
 	if( value->attached() )
