@@ -1,76 +1,153 @@
-#include "OMUtilities.h"
+#include <iostream.h>
 
+#include "OMUtilities.h"
 #include "OMAssertions.h"
 
-#include <iostream.h>
-#include <string.h>
-#include <stdio.h>
+#include <windows.h>
 
-static char programName[FILENAME_MAX] = "Object Manager";
+const char* programName;
 
 void setProgramName(const char* name)
 {
-  TRACE("setProgramName");
+  programName = name;
+}
 
-  PRECONDITION("Valid program name", validString(name));
+void convert(wchar_t* wcName, size_t length, const char* name)
+{
+  TRACE("convert");
+  PRECONDITION("Valid input name", validString(name));
+  PRECONDITION("Valid output buffer", wcName != 0);
+  PRECONDITION("Valid output buffer size", length > 0);
+  
+  ASSERT("Valid program name", validString(programName));
 
-  size_t size = strlen(name) + 1;
-  if (size >= FILENAME_MAX) {
-    size = FILENAME_MAX - 1;
+  size_t status  = mbstowcs(wcName, name, length);
+  if (status == -1) {
+    cerr << programName
+      << "Error : Failed to convert \""
+      << name
+      << "\" to a wide character string."
+      << endl;
+    exit(FAILURE);  
   }
-  strncpy(programName, name, size);
-  programName[size] = '\0';
 }
 
-const char* getProgramName(void)
+void convert(char* cName, size_t length, wchar_t* name)
 {
-  return programName;
+  ASSERT("Valid program name", validString(programName));
+
+  size_t status  = wcstombs(cName, name, length);
+  if (status == -1) {
+    cerr << programName
+      << ": Error : Conversion failed."
+      << endl;
+    exit(FAILURE);  
+  }
 }
 
-OMByteOrder hostByteOrder(void)
+void formatError(DWORD errorCode)
 {
-  TRACE("hostByteOrder");
+  wchar_t buffer[256];
 
-  OMInt16 word = 0x1234;
-  OMInt8  byte = *((OMInt8*)&word);
-  OMByteOrder result;
+  int status = FormatMessage(
+    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    errorCode,
+    LANG_SYSTEM_DEFAULT,
+    buffer, 256,
+    NULL);
 
-  ASSERT("Valid byte order", ((byte == 0x12) || (byte == 0x34)));
+  char message[256];
 
-  if (byte == 0x12) {
-    result = bigEndian;
+  convert(message, 256, buffer);
+
+  if (status != 0) {
+    int length = strlen(message);
+    // zap cr/lf
+    if (length >= 2) {
+      message[length - 2] = '\0';
+    }
+    cerr << message << endl;
   } else {
-    result = littleEndian;
+    cerr << "Error code = " << hex << errorCode << dec << endl;
   }
-  return result;
+
 }
 
-size_t wideStringLength(const wchar_t* string)
+void printError(const char* prefix, const char* type)
 {
-  const wchar_t* p = string;
-  size_t length = 0;
-  while (*p != 0) {
-    ++length;
-    ++p;
-  }
-  return length;
+  cerr << prefix << ": " << type << ": ";
 }
 
-// Same as strncpy(), but for wide characters.
-//
-wchar_t* wideStringCopy(wchar_t* destination,
-                        const wchar_t* source,
-                        const size_t length)
+void printName(const char* name)
 {
-  wchar_t* d = destination;
-  const wchar_t* s = source;
-  size_t i = 0;
+  cerr << "\"" << name << "\": ";
+}
 
-  for (i = 0; ((i < length) && (*s != 0)); i++) {
-    *d++ = *s++;
+int check(HRESULT resultCode)
+{
+  TRACE("check");
+
+  ASSERT("Valid program name", validString(programName));
+
+  if (FAILED(resultCode)) {
+    printError(programName, "Error");
+    formatError(resultCode);
+    return FALSE;
+  } else {
+    return TRUE;
   }
-  for (i = i; i < length; i++) {
-    *d++ = 0;
+}
+
+int checkFile(HRESULT resultCode, const char* fileName)
+{
+  TRACE("checkFile");
+  PRECONDITION("Valid file name", validString(fileName));
+
+  ASSERT("Valid program name", validString(programName));
+
+  if (FAILED(resultCode)) {
+    printError(programName, "File error");
+    printName(fileName);
+    formatError(resultCode);
+    return FALSE;
+  } else {
+    return TRUE;
   }
-  return destination;
+}
+
+int checkStream(HRESULT resultCode, const char* streamName)
+{
+  TRACE("checkStream");
+  PRECONDITION("Valid stream name", validString(streamName));
+
+  ASSERT("Valid program name", validString(programName));
+
+  if (FAILED(resultCode)) {
+    printError(programName, "Stream error");
+    printName(streamName);
+    formatError(resultCode);
+    return FALSE;
+  } else {
+    return TRUE;
+  }
+
+}
+
+int checkStorage(HRESULT resultCode, const char* storageName)
+{
+  TRACE("checkStorage");
+  PRECONDITION("Valid storage name", validString(storageName));
+
+  ASSERT("Valid program name", validString(programName));
+
+  if (FAILED(resultCode)) {
+    printError(programName, "Storage error");
+    printName(storageName);
+    formatError(resultCode);
+    return FALSE;
+  } else {
+    return TRUE;
+  }
+
 }
