@@ -58,8 +58,20 @@
 #include "ImplAAFTypeDefInt.h"
 #endif
 
+#ifndef __ImplAAFTypeDefCharacter_h__
+#include "ImplAAFTypeDefCharacter.h"
+#endif
+
 #ifndef __ImplAAFTypeDefString_h__
 #include "ImplAAFTypeDefString.h"
+#endif
+
+#ifndef __ImplAAFTypeDefIndirect_h__
+#include "ImplAAFTypeDefIndirect.h"
+#endif
+
+#ifndef __ImplAAFTypeDefOpaque_h__
+#include "ImplAAFTypeDefOpaque.h"
 #endif
 
 #ifndef __ImplAAFTypeDefStrongObjRef_h__
@@ -266,6 +278,99 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 	}
   return AAFRESULT_NO_MORE_OBJECTS;
 }
+
+//
+// Looks up idToCreate in the structures.  If found, creates and
+// initializes a type def to match (using the supplied dictionary),
+// and returns it in ppCreatedTypeDef.  Returns true if successful;
+// returns false if not found.  Does not register the new type.
+//
+static AAFRESULT CreateNewExtEnumerationType (const aafUID_t & idToCreate,
+									  ImplAAFDictionary * pDict,
+									  ImplAAFTypeDef ** ppCreatedTypeDef)
+{
+  assert (pDict);
+  AAFRESULT hr;
+
+  // Go through the enumeration list, attempting to identify the requested
+  // ID.
+  TypeEnumeration ** curEnumeration = s_AAFAllTypeEnumerations;
+  while (*curEnumeration)
+	{
+	  // Check to see if the current enumeration matches the ID of the type
+	  // def we want to create.
+	  if (! memcmp (&idToCreate, &(*curEnumeration)->typeID, sizeof (aafUID_t)))
+		{		
+		  // Yes, this is the one.
+
+		  // Create an impl enumeration object (as yet uninitialized)
+		  ImplAAFTypeDefEnum * ptd = 0;
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefEnum()->
+			CreateInstance ((ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (ptd);
+
+		  // count up how many members in this enumeration
+		  aafUInt32 numMembers = 0;
+		  TypeEnumerationMember ** pMember = (*curEnumeration)->members;
+		  while (*pMember)
+			{
+			  numMembers++;
+			  pMember++;
+			}
+	  
+		  ImplAAFTypeDefSP pElemType;
+		  // Look up the type of this enumeration
+		  hr = pDict->LookupTypeDef(*(*curEnumeration)->pElementTypeId, &pElemType);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (pElemType);
+
+		  // allocate arrays to hold memberTypes pointers and memberNames.
+		  aafInt64 * memberValues =	new aafInt64 [numMembers];
+		  assert (memberValues);
+	  
+		  aafString_t * memberNames = 
+			new aafString_t[numMembers];
+		  assert (memberNames);
+
+		  // fill the types and names arrays.
+		  aafUInt32 i;
+		  for (i = 0; i < numMembers; i++)
+			{
+			  memberValues[i] = (*curEnumeration)->members[i]->memberValue;
+			  memberNames[i] = (*curEnumeration)->members[i]->memberName;
+			  assert (memberNames[i]);
+			}
+
+		  // use those arrays to initialize the type def
+		  hr = ptd->Initialize ((*curEnumeration)->typeID,
+								pElemType,
+								memberValues,
+								memberNames,
+								numMembers,
+								(*curEnumeration)->typeName);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+
+		  hr = ptd->RegisterSize ((*curEnumeration)->size);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+
+		  // clean up
+		  delete[] memberValues;
+		  delete[] memberNames;
+
+		  assert (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
+		}
+
+	  curEnumeration++;
+	}
+  return AAFRESULT_NO_MORE_OBJECTS;
+}
+
 
 
 //
@@ -613,17 +718,17 @@ static AAFRESULT CreateNewCharacterType (const aafUID_t & idToCreate,
 	  // def we want to create.
 	  if (! memcmp (&idToCreate, &curCharacter->typeID, sizeof (aafUID_t)))
 		{		
+      assert(curCharacter->size == 2); // we only persist 2 byte unicode characters.
+
 		  // Yes, this is the one.
 		  // Create an impl typedefinteger object (as yet uninitialized)
-		  ImplAAFTypeDefInt * ptd = 0;
-		  hr = pDict->GetBuiltinDefs()->cdTypeDefInt()->
+		  ImplAAFTypeDefCharacter * ptd = 0;
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefCharacter()->
 			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
-		  AAFRESULT hr = ptd->Initialize (curCharacter->typeID,
-										  curCharacter->size,
-										  kAAFFalse,
+		  AAFRESULT hr = ptd->pvtInitialize (curCharacter->typeID,
 										  curCharacter->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 
@@ -636,6 +741,89 @@ static AAFRESULT CreateNewCharacterType (const aafUID_t & idToCreate,
 		}
 
 	  curCharacter++;
+	}
+  return AAFRESULT_NO_MORE_OBJECTS;
+}
+
+
+static AAFRESULT CreateNewIndirectType (const aafUID_t & idToCreate,
+									ImplAAFDictionary * pDict,
+									ImplAAFTypeDef ** ppCreatedTypeDef)
+{
+  assert (pDict);
+  AAFRESULT hr;
+
+  // Go through the character list, attempting to identify the requested
+  // ID.
+  TypeIndirect * curIndirect = s_AAFAllTypeIndirects;
+  while (curIndirect->isValid)
+	{
+	  // Check to see if the current ID matches the ID of the type
+	  // def we want to create.
+	  if (! memcmp (&idToCreate, &curIndirect->typeID, sizeof (aafUID_t)))
+		{		
+		  // Yes, this is the one.
+		  // Create an impl typedefinteger object (as yet uninitialized)
+		  ImplAAFTypeDefIndirect * ptd = 0;
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefIndirect()->
+			CreateInstance ((ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (ptd);
+
+		  AAFRESULT hr = ptd->pvtInitialize (curIndirect->typeID,
+										  curIndirect->typeName);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+
+		  assert (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
+		}
+
+	  curIndirect++;
+	}
+  return AAFRESULT_NO_MORE_OBJECTS;
+}
+
+
+static AAFRESULT CreateNewOpaqueType (const aafUID_t & idToCreate,
+									ImplAAFDictionary * pDict,
+									ImplAAFTypeDef ** ppCreatedTypeDef)
+{
+  assert (pDict);
+  AAFRESULT hr;
+
+  // Go through the list, attempting to identify the requested
+  // ID.
+  TypeOpaque * curOpaque = s_AAFAllTypeOpaques;
+  while (curOpaque->isValid)
+	{
+	  // Check to see if the current ID matches the ID of the type
+	  // def we want to create.
+	  if (! memcmp (&idToCreate, &curOpaque->typeID, sizeof (aafUID_t)))
+		{		
+		  // Yes, this is the one.
+		  ImplAAFTypeDefOpaque * ptd = 0;
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefOpaque()->
+			CreateInstance ((ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (ptd);
+
+		  AAFRESULT hr = ptd->pvtInitialize (curOpaque->typeID,
+										  curOpaque->typeName);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+
+		  assert (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
+		}
+
+	  curOpaque++;
 	}
   return AAFRESULT_NO_MORE_OBJECTS;
 }
@@ -1012,12 +1200,22 @@ AAFRESULT ImplAAFBuiltinTypes::NewBuiltinTypeDef
 							ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
+  hr = CreateNewCharacterType (idToCreate,
+							   _dictionary,
+							   ppCreatedTypeDef);
+  if (AAFRESULT_SUCCEEDED (hr))	return hr;
+
   hr = CreateNewStringType (idToCreate,
 							_dictionary,
 							ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
-  hr = CreateNewCharacterType (idToCreate,
+  hr = CreateNewIndirectType (idToCreate,
+							   _dictionary,
+							   ppCreatedTypeDef);
+  if (AAFRESULT_SUCCEEDED (hr))	return hr;
+
+  hr = CreateNewOpaqueType (idToCreate,
 							   _dictionary,
 							   ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
