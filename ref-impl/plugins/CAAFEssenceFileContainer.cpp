@@ -136,9 +136,18 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetPluggableID (aafUID_t *uid)
+    CAAFEssenceFileContainer::GetNumDefinitions (aafInt32 *pDefCount)
 {
-	*uid = ContainerFile;		// UID of the PluggableDef
+	//!!!Add error checking
+	*pDefCount = 1;
+	return AAFRESULT_SUCCESS;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
+{
+	//!!!Add error checking
+	*uid = ContainerFile;		// UID of the DefObject
 	return AAFRESULT_SUCCESS;
 }
 
@@ -151,11 +160,12 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetPluggableDefinition (IAAFDictionary *dict, IAAFPluggableDef **def)
+    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	aafUID_t			uid;
 	IAAFContainerDef	*container = NULL;
 	IAAFDefObject		*obj = NULL;
+	//!!!Add error checking
 	XPROTECT()
 	{
 		CHECK(dict->CreateInstance(&AUID_AAFContainerDef,
@@ -167,7 +177,7 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(obj->Init(&uid, L"Raw file Container", L"Essence is in a non-container file."));
 		obj->Release();
 		obj = NULL;
-		CHECK(container->QueryInterface(IID_IAAFPluggableDef, (void **)def));
+		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)def));
 		container->Release();
 		container = NULL;
 	}
@@ -194,13 +204,13 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
+    CAAFEssenceFileContainer::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
 {
 	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
 	IAAFNetworkLocator		*pNetLoc = NULL;
 	IAAFDefObject			*defObject = NULL;
-	aafUID_t				category = AUID_AAFPluggableDefinition, manufacturer = MANUF_JEFFS_PLUGINS;
+	aafUID_t				category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
 	aafUID_t				plugID = EXAMPLE_FILE_PLUGIN;
 	
 	XPROTECT()
