@@ -29,12 +29,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 //#include "AAFPluginManager.h"
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "AAFDefUIDS.h"
+#include "AAFDefUIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
 #include "AAFContainerDefs.h"
@@ -47,6 +46,11 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
+
+
+#if defined(macintosh) || defined(_MAC)
+#include "DataInput.h"
+#endif
 
 
 
@@ -823,7 +827,7 @@ cleanup:
 	return moduleErrorTmp;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	CComInitialize comInit;
   CAAFInitialize aafInit;
