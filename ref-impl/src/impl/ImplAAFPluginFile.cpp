@@ -1,36 +1,21 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/************************************************\
+*												                         *
+* Advanced Authoring Format						           *
+*												                         *
+* Copyright (c) 1998-1999 Avid Technology, Inc.  *
+*												                         *
+\************************************************/
 
 #include "ImplAAFPluginFile.h"
 
 // Include the AAF Runtime Dynamic (Library) Loader Interface  
 #include "aafrdli.h"
 
-#include "AAFTypes.h"
 #include "AAFResult.h"
 #include <assert.h>
 #include <string.h>
 
-#if defined( OS_WINDOWS )
+#if defined(WIN32)
 // Include declarations for InterlockedIncrement() and InterlockcedDecrment().
 #include <winbase.h>
 #endif
@@ -40,7 +25,7 @@
 ImplAAFPluginFile::ImplAAFPluginFile(const char *name) :
   _refCount(1),
   _name(name),
-  _libHandle(0)
+  _libHandle(NULL)
 {
   ClearEntryPoints();
 }
@@ -49,7 +34,7 @@ ImplAAFPluginFile::ImplAAFPluginFile(const char *name) :
 ImplAAFPluginFile::~ImplAAFPluginFile()
 {
   delete[] const_cast<char *>(_name);
-  _name = 0;
+  _name = NULL;
 }
 
 
@@ -61,22 +46,22 @@ HRESULT ImplAAFPluginFile::CreatePluginFile(
   ImplAAFPluginFile** ppPluginFile)
 {
   HRESULT result = S_OK;
-  ImplAAFPluginFile* pPluginFile = 0;
+  ImplAAFPluginFile* pPluginFile = NULL;
 
 
-  if (!name || !ppPluginFile)
+  if (NULL == name || NULL == ppPluginFile)
     return AAFRESULT_NULL_PARAM;
 
   // copy the given name. this will be owned by the plugin file object.
   int len = strlen(name) + 1;
   char *name_copy = new char[len];
-  if (!name_copy)
+  if (NULL == name_copy)
     result = AAFRESULT_NOMEMORY;
   else
   {
     strcpy(name_copy, name);
     pPluginFile = new ImplAAFPluginFile(name_copy);
-    if (!pPluginFile)
+    if (NULL == pPluginFile)
       result = AAFRESULT_NOMEMORY;
     else
     {
@@ -85,14 +70,13 @@ HRESULT ImplAAFPluginFile::CreatePluginFile(
       if (AAFRESULT_SUCCEEDED(result))
       {
         *ppPluginFile = pPluginFile;
-        pPluginFile = 0;
+        pPluginFile = NULL;
       }      
     }
   }
 
   if (pPluginFile)
     pPluginFile->ReleaseReference();
-  pPluginFile = 0;
 
   return result;
 }
@@ -102,7 +86,7 @@ HRESULT ImplAAFPluginFile::CreatePluginFile(
 aafUInt32 ImplAAFPluginFile::AcquireReference() const
 {  
   ImplAAFPluginFile *nonConstThis = const_cast<ImplAAFPluginFile *>(this);
-#if defined( OS_WINDOWS )
+#if defined(WIN32)
 	return ::InterlockedIncrement(reinterpret_cast<long *>(&nonConstThis->_refCount));
 #else
   ++(nonConstThis->_refCount);
@@ -113,7 +97,7 @@ aafUInt32 ImplAAFPluginFile::AcquireReference() const
 // Decrement the object reference count and delete the container.
 aafUInt32 ImplAAFPluginFile::ReleaseReference()
 {
-#if defined( OS_WINDOWS )
+#if defined(WIN32)
 	aafUInt32 count = ::InterlockedDecrement(reinterpret_cast<long *>(&_refCount));
 #else
 	aafUInt32 count = --(_refCount);
@@ -139,10 +123,10 @@ aafUInt32 ImplAAFPluginFile::ReferenceCount() const
 
 void ImplAAFPluginFile::ClearEntryPoints()
 {
-  _pfnCanUnloadNow = 0;
-  _pfnGetClassObject = 0;
-  _pfnGetClassCount = 0;
-  _pfnGetClassObjectID = 0;
+  _pfnCanUnloadNow = NULL;
+  _pfnGetClassObject = NULL;
+  _pfnGetClassCount = NULL;
+  _pfnGetClassObjectID = NULL;
 }
 
 
@@ -204,14 +188,14 @@ HRESULT ImplAAFPluginFile::Unload()
 {
   HRESULT result = AAFRESULT_SUCCESS;
 
-  if (_libHandle)
+  if (NULL != _libHandle)
   {
     result = ::AAFUnloadLibrary((AAFLibraryHandle)_libHandle);
 
     if (AAFRESULT_SUCCEEDED(result))
     {
       ClearEntryPoints();
-      _libHandle = 0;
+      _libHandle = NULL;
     }
 
   }
