@@ -1,101 +1,187 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1996 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
  *
  ************************************************************************/
 
-
-
-
-// Declare the public interface that must be implemented.
-#include "aaflib.h"
-
+// Declare all of the public functions.
+#include "AAF.h"
 #include "AAFResult.h"
-#include "AAFFileKinds.h"
-#include "AAFFileSignatures.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-//
-// Define the platform specific default dll name.
-//
-#if defined( OS_WINDOWS )
-#define DEFAULT_AAFDLL_NAME "AAFCOAPI.dll"
-#elif defined( OS_MACOS )
-#define DEFAULT_AAFDLL_NAME "AAFCOAPI.DLL (PPC)"
-#elif defined( OS_UNIX )
-#define DEFAULT_AAFDLL_NAME "libcom-api.so"
-#else
-#error Unknown operating system
-#endif
+#include <assert.h>
 
 
+// 
+#ifdef __cplusplus
+extern "C"{
+#endif 
 
+STDAPI AAFLoad(wchar_t * dllname);
+STDAPI AAFUnload();
 
-// ASSERT code copied from OM...
-#include <iostream.h>
-
-#ifdef _DEBUG
-
-#include <stdlib.h>
-
-#define FAILURE -1
-
-void reportAssertionFailure(char* kind,
-                            char* name,
-                            char* expressionString,
-                            char* routine,
-                            char* fileName,
-                            size_t lineNumber)
-{
-  cerr << kind << " \"" << name << "\" failed in routine \""
-       << routine  << "\"." << endl;
-  cerr << "The failure occurred at line " << lineNumber
-       << " in file \"" << fileName << "\"." << endl;
-  cerr << "The condition \"" << expressionString << "\" was violated." << endl;
-  abort();
+#ifdef __cplusplus
 }
-
-
 #endif
 
 
-//
-// Initialize the AUID's.
-//
-#define INIT_AUID
-#include "AAFStoredObjectIDs.h"
-#undef INIT_AUID
 
 
+//***********************************************************
+// Define function prototypes in a manner consistent with the 
+// ActiveX and OLE SDK's.
+
+#if !defined(_MSC_VER)
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGREAD)(
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    IAAFFile ** ppFile);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGMODIFY)(
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENNEWMODIFY)(
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENTRANSIENT)(
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETPLUGINMANAGER)(
+    IAAFPluginManager ** ppPluginManager);
+
+#else
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGREAD)(
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    IAAFFile ** ppFile);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGMODIFY)(
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENNEWMODIFY)(
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENTRANSIENT)(
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETPLUGINMANAGER)(
+    IAAFPluginManager ** ppPluginManager);
+
+#endif
+
+//***********************************************************
+// Abstract helper class to hide the platform dependent
+// details for handling dll entrypoints.
 //
-// Initialize static singleton data.
+class AAFDLL;
+
+class AAFDLL
+{
+public:
+  // Constructor and destructor for base class.
+  AAFDLL();
+  virtual ~AAFDLL();
+
+  // Return the singleton instance.
+  static AAFDLL * GetAAFDLL();
+
+
+  // Abstract method that must be overridden to implement
+  // platform specific initialization of dll and entry points.
+  virtual HRESULT Load(wchar_t *dllname) = 0;
+  
+  // Abstract method that must be overridden to implement
+  // platform specific cleanup of dll and entry points.
+  virtual HRESULT Unload() = 0;
+
+
+  // Wrapper functions for calling member entry points.
+  //
+  HRESULT OpenExistingRead (
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    IAAFFile ** ppFile);
+  
+  HRESULT OpenExistingModify (
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+  HRESULT OpenNewModify (
+    wchar_t *  pFileName,
+    aafUInt32  modeFlags,
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+  HRESULT OpenTransient (
+    aafProductIdentification_t *  pIdent,
+    IAAFFile ** ppFile);
+
+  HRESULT GetPluginManager (
+    IAAFPluginManager ** ppPluginManager);
+  
+  // Make the global factory a friend.
+  friend AAFDLL * MakeAAFDLL();
+
+protected:
+  // The single instance of the dll wrapper.
+  static AAFDLL *_singleton;
+
+  // Callback function member data loaded by overridden versions
+  // of the Load() method:
+  LPFNAAFFILEOPENEXISTINGREAD _pfnOpenExistingRead;
+  LPFNAAFFILEOPENEXISTINGMODIFY _pfnOpenExistingModify;
+  LPFNAAFFILEOPENNEWMODIFY _pfnOpenNewModify;
+  LPFNAAFFILEOPENTRANSIENT _pfnOpenTransient;
+  LPFNAAFGETPLUGINMANAGER _pfnGetPluginManager;
+};
+
+//
+// Initialize static data.
 //
 AAFDLL * AAFDLL::_singleton = NULL;
 
+
+//
+// Forward declaration for factory function just returns an instance 
+// of the currect platform dll wrapper object.
+//
+AAFDLL * MakeAAFDLL();
 
 
 
@@ -122,23 +208,28 @@ static AAFUnloadWrapper g_GuarenteeAAFUnload;
 // initialize the following functions to call the corresponding
 // entry point exported from the DLL.
 // 
-STDAPI AAFLoad(const char * dllname)
+STDAPI AAFLoad(wchar_t * dllname)
 {
   AAFDLL *pAAFDLL = AAFDLL::GetAAFDLL();
   if (NULL != pAAFDLL)
     return AAFRESULT_ALREADY_INITIALIZED;
 
   // Create the appropriate dll wrapper
-  pAAFDLL = AAFDLL::MakeAAFDLL();
+  pAAFDLL = MakeAAFDLL();
   if (NULL == pAAFDLL)
     return AAFRESULT_NOMEMORY;
 
-  // Attempt to load the dll and initialize the entry points.
-  // If the load fails cleanup immediately.
-  HRESULT hr = pAAFDLL->Load(dllname);
-  if (S_OK != hr)
-    AAFUnload();
-  return hr;
+  if (NULL == dllname)
+  { // use a realistic default name.
+#ifdef _DEBUG
+    dllname = L"AAFD.dll";
+#else
+    dllname = L"AAF.dll";
+#endif
+  }
+
+  // Attempt to load the dll and initialize the entry points
+  return pAAFDLL->Load(dllname);
 }
 
 
@@ -175,7 +266,6 @@ STDAPI AAFUnload()
 // 
 static HRESULT LoadIfNecessary(AAFDLL **ppAAFDLL)
 {
-  TRACE("LoadIfNecessary");
   HRESULT hr = S_OK;
 
   // Get the dll wrapper
@@ -186,7 +276,7 @@ static HRESULT LoadIfNecessary(AAFDLL **ppAAFDLL)
     if (SUCCEEDED(hr))
     {
       pAAFDLL = AAFDLL::GetAAFDLL();
-      ASSERT("Valid AAFDLL wrapper", pAAFDLL);
+      assert(pAAFDLL);
     }
   }
   
@@ -199,46 +289,21 @@ static HRESULT LoadIfNecessary(AAFDLL **ppAAFDLL)
 // AAFFileOpenExistingRead()
 // 
 STDAPI AAFFileOpenExistingRead (
-  const wchar_t *  pFileName,
+  wchar_t *  pFileName,
   aafUInt32  modeFlags,
   IAAFFile ** ppFile)
 {
   HRESULT hr = S_OK;
   AAFDLL *pAAFDLL = NULL;
 
-  // Check that the file is an AAF file
-  aafUID_t fileKind;
-  aafBool isAnAAFFile;
-  hr = AAFFileIsAAFFile(pFileName, &fileKind, &isAnAAFFile);
-  if (FAILED(hr))
-    return hr;
-
-  if (isAnAAFFile == kAAFFalse)
-    return AAFRESULT_NOT_AAF_FILE;
 
   // Get the dll wrapper
   hr = LoadIfNecessary(&pAAFDLL);
   if (FAILED(hr))
     return hr;
- 
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->OpenExistingRead(pFileName, modeFlags, ppFile);
-  }
-  catch (const char* exStr)
-  {
-    // Return a reasonable exception code.
-    //
-    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
-    hr = AAFRESULT_ASSERTION_VIOLATION;
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
+  
+  // Attempt to call the dll's exported function...
+  hr = pAAFDLL->OpenExistingRead(pFileName, modeFlags, ppFile);
 
   return hr;
 }
@@ -249,7 +314,7 @@ STDAPI AAFFileOpenExistingRead (
 // AAFFileOpenExistingModify()
 // 
 STDAPI AAFFileOpenExistingModify (
-  const wchar_t *  pFileName,
+  wchar_t *  pFileName,
   aafUInt32  modeFlags,
   aafProductIdentification_t *  pIdent,
   IAAFFile ** ppFile)
@@ -257,39 +322,14 @@ STDAPI AAFFileOpenExistingModify (
   HRESULT hr = S_OK;
   AAFDLL *pAAFDLL = NULL;
 
-  // Check that the file is an AAF file
-  aafUID_t fileKind;
-  aafBool isAnAAFFile;
-  hr = AAFFileIsAAFFile(pFileName, &fileKind, &isAnAAFFile);
-  if (FAILED(hr))
-    return hr;
-
-  if (isAnAAFFile == kAAFFalse)
-    return AAFRESULT_NOT_AAF_FILE;
 
   // Get the dll wrapper
   hr = LoadIfNecessary(&pAAFDLL);
   if (FAILED(hr))
     return hr;
   
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->OpenExistingModify(pFileName, modeFlags, pIdent, ppFile);
-  }
-  catch (const char* exStr)
-  {
-    // Return a reasonable exception code.
-    //
-    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
-    hr = AAFRESULT_ASSERTION_VIOLATION;
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
+  // Attempt to call the dll's exported function...
+  hr = pAAFDLL->OpenExistingModify(pFileName, modeFlags, pIdent, ppFile);
 
   return hr;
 }
@@ -302,7 +342,7 @@ STDAPI AAFFileOpenExistingModify (
 //
 // 
 STDAPI AAFFileOpenNewModify (
-  const wchar_t *  pFileName,
+  wchar_t *  pFileName,
   aafUInt32  modeFlags,
   aafProductIdentification_t *  pIdent,
   IAAFFile ** ppFile)
@@ -316,24 +356,8 @@ STDAPI AAFFileOpenNewModify (
   if (FAILED(hr))
     return hr;
   
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->OpenNewModify(pFileName, modeFlags, pIdent, ppFile);
-  }
-  catch (const char* exStr)
-  {
-    // Return a reasonable exception code.
-    //
-    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
-    hr = AAFRESULT_ASSERTION_VIOLATION;
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
+  // Attempt to call the dll's exported function...
+  hr = pAAFDLL->OpenNewModify(pFileName, modeFlags, pIdent, ppFile);
 
   return hr;
 }
@@ -357,206 +381,12 @@ STDAPI AAFFileOpenTransient (
   if (FAILED(hr))
     return hr;
   
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->OpenTransient(pIdent, ppFile);
-  }
-  catch (const char* exStr)
-  {
-    // Return a reasonable exception code.
-    //
-    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
-    hr = AAFRESULT_ASSERTION_VIOLATION;
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
+  // Attempt to call the dll's exported function...
+  hr = pAAFDLL->OpenTransient(pIdent, ppFile);
 
   return hr;
 }
 
-// Helpers for AAFFileIsAAFFile().
-//
-
-// Table mapping valid signatures to file kinds.
-// Signatures are found at the beginning of the file and are variable in size.
-// There are multiple signatures since there are multiple file kinds
-// e.g. "AAF structured storage binary" and "AAF XML text".
-//
-struct mapSignatureToFileKind {
-  const aafUInt8* signature;
-  size_t signatureSize;
-  const aafUID_t* fileKind;
-} fileKindTable[] = {
-  {aafFileSignatureAafSSBinary,
-   sizeof(aafFileSignatureAafSSBinary),
-   &aafFileKindAafSSBinary},
-  {aafFileSignatureMxfSSBinary,
-   sizeof(aafFileSignatureMxfSSBinary),
-   &aafFileKindMxfSSBinary},
-  {aafFileSignatureAafXmlText,
-   sizeof(aafFileSignatureAafXmlText),
-   &aafFileKindAafXmlText},
-  {aafFileSignatureMxfXmlText,
-   sizeof(aafFileSignatureMxfXmlText),
-   &aafFileKindMxfXmlText}
-};
-
-static FILE* wfopen(const wchar_t* fileName, const wchar_t* mode);
-static HRESULT readSignature(FILE* file,
-                             unsigned char* signature,
-                             size_t signatureSize);
-static size_t signatureSize(void);
-static aafBool isRecognizedSignature(unsigned char* signature,
-                                     size_t signatureSize,
-                                     aafUID_t* fileKind);
-
-static size_t maxSignatureSize = signatureSize();
-
-// Just like fopen() except for wchar_t* file names.
-//
-FILE* wfopen(const wchar_t* fileName, const wchar_t* mode)
-{
-  TRACE("wfopen");
-  ASSERT("Valid file name", fileName != 0);
-  ASSERT("Valid mode", mode != 0);
-
-  FILE* result = 0;
-#if defined( OS_WINDOWS )
-  result = _wfopen(fileName, mode);
-#else
-  char cFileName[FILENAME_MAX];
-  size_t status = wcstombs(cFileName, fileName, FILENAME_MAX);
-  ASSERT("Convert succeeded", status != (size_t)-1);
-
-  char cMode[FILENAME_MAX];
-  status = wcstombs(cMode, mode, FILENAME_MAX);
-  ASSERT("Convert succeeded", status != (size_t)-1);
-
-  result = fopen(cFileName, cMode);
-#endif
-  return result;
-}
-
-// Read the file signature. Assumes that no valid file may be shorter
-// than the longest signature.
-//
-HRESULT readSignature(FILE* file,
-                      unsigned char* signature,
-                      size_t signatureSize)
-{
-  TRACE("readSignature");
-  ASSERT("Valid file", file != 0);
-  ASSERT("Valid signature buffer", signature != 0);
-  ASSERT("Valid signature buffer size", signatureSize != 0);
-
-  HRESULT hr = S_OK;
-  unsigned char* sig = new unsigned char[signatureSize];
-  if (sig == 0) {
-    hr = AAFRESULT_NOMEMORY;
-  } else {
-    size_t status = fread(sig, signatureSize, 1, file);
-    if (status == 1) {
-      memcpy(signature, sig, signatureSize);
-    } else {
-      hr = AAFRESULT_NOT_AAF_FILE;  // Can't read signature
-    }
-  }
-  delete [] sig;
-  return hr;
-}
-
-// The number of bytes to read to be sure of getting the signature.
-//
-size_t signatureSize(void)
-{
-  size_t result = 0;
-  for (size_t i = 0; i < sizeof(fileKindTable)/sizeof(fileKindTable[0]); i++) {
-    if (fileKindTable[i].signatureSize > result) {
-      result = fileKindTable[i].signatureSize;
-    }
-  }
-  return result;
-}
-
-// Try to recognize a file signature. Assumes that no signature is a
-// prefix of any other signature.
-//
-aafBool isRecognizedSignature(unsigned char* signature,
-                              size_t signatureSize,
-                              aafUID_t* fileKind)
-{
-  TRACE("isRecognizedSignature");
-  ASSERT("Valid signature buffer", signature != 0);
-  ASSERT("Valid signature buffer size", signatureSize != 0);
-  ASSERT("Valid file kind", fileKind != 0);
-
-  aafBool result = kAAFFalse;
-
-  for (size_t i = 0; i < sizeof(fileKindTable)/sizeof(fileKindTable[0]); i++) {
-    if (fileKindTable[i].signatureSize <= signatureSize) {
-      if (memcmp(fileKindTable[i].signature,
-                 signature,
-                 fileKindTable[i].signatureSize) == 0) {
-        result = kAAFTrue;
-        memcpy(fileKind, fileKindTable[i].fileKind, sizeof(CLSID));
-        break;
-      }
-    }
-  }
-  return result;
-}
-
-//***********************************************************
-//
-// AAFFileIsAAFFile()
-//
-// This function is implemented here so that it can be called without
-// having to load the DLL.
-//
-STDAPI AAFFileIsAAFFile (
-    aafCharacter_constptr  pFileName,
-    aafUID_t *  pAAFFileKind,
-    aafBool *  pFileIsAAFFile)
-{
-  if (pFileName == 0)
-    return AAFRESULT_NULL_PARAM;
-
-  if (pAAFFileKind == 0)
-    return AAFRESULT_NULL_PARAM;
-
-  if (pFileIsAAFFile == 0)
-    return AAFRESULT_NULL_PARAM;
-
-  HRESULT hr = S_OK;
-  unsigned char* signature = new unsigned char[maxSignatureSize];
-  if (signature == 0) {
-    hr = AAFRESULT_NOMEMORY;
-  } else {
-    FILE* f = wfopen(pFileName, L"rb");
-    if (f != 0) {
-      hr = readSignature(f, signature, maxSignatureSize);
-      if (SUCCEEDED(hr)) {
-        *pFileIsAAFFile = isRecognizedSignature(signature,
-                                                maxSignatureSize,
-                                                pAAFFileKind);
-      } else {
-        // The file exists but we can't read the signature
-        *pFileIsAAFFile = kAAFFalse;
-        hr = S_OK;
-      }
-      fclose(f);
-    } else {
-      hr = AAFRESULT_FILE_NOT_FOUND; // Can't open file
-    }
-  }
-  delete [] signature;
-  return hr;
-}
 
 
 //***********************************************************
@@ -575,160 +405,19 @@ STDAPI AAFGetPluginManager (
   if (FAILED(hr))
     return hr;
   
-  try
-  {
-    // Attempt to call the dll's exported function...
-    hr = pAAFDLL->GetPluginManager(ppPluginManager);
-  }
-  catch (const char* exStr)
-  {
-    // Return a reasonable exception code.
-    //
-    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
-    hr = AAFRESULT_ASSERTION_VIOLATION;
-  }
-  catch (...)
-  {
-    // Return a reasonable exception code.
-    //
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-  }
+  // Attempt to call the dll's exported function...
+  hr = pAAFDLL->GetPluginManager(ppPluginManager);
 
   return hr;
 }
 
 
 
-
-
-//***********************************************************
-//
 // Constructor for the base class
-AAFDLL::AAFDLL() :
-  _libHandle(NULL)
+AAFDLL::AAFDLL()
 {
-  TRACE("AAFDLL::AAFDLL");
-  ASSERT("There Can Be Only One!", NULL == _singleton);
-  _singleton = this;
-  
-  // Initialize all funtions pointers
-  ClearEntrypoints();
-}
-
-
-
-//***********************************************************
-//
-// Destructor for the base class
-AAFDLL::~AAFDLL()
-{
-  TRACE("AAFDLL::~AAFDLL");
-  ASSERT("There Can Be Only One!", this == _singleton);
-
-  // Reset the entry point function pointers to NULL.
-  ClearEntrypoints();
-
-  // Clear the reference to the singleton
-  _singleton = NULL;
-}
-
-
-
-//***********************************************************
-//
-// Static accessor method for the singleton.
-//
-AAFDLL * AAFDLL::GetAAFDLL()
-{
-  return _singleton;
-}
-
-
-//***********************************************************
-//
-// Factory function just returns an instance of the currect platform
-// dll wrapper object.
-AAFDLL * AAFDLL::MakeAAFDLL()
-{
-  AAFDLL *pAAFDLL =  new AAFDLL;
-  return pAAFDLL;
-}
-
-
-//***********************************************************
-//
-HRESULT AAFDLL::Load(const char *dllname)
-{
-  HRESULT rc = S_OK;
-
-
-  if (NULL == dllname)
-  { // use a realistic default name.
-    dllname = DEFAULT_AAFDLL_NAME;
-  }
-
-  // Attempt to load the library.
-  rc = ::AAFLoadLibrary(dllname, &_libHandle);
-
-  if (AAFRESULT_SUCCESS != rc)
-    return rc;
-
-  //
-  // Attempt to initialize the entry points...
-  //
-  rc = ::AAFFindSymbol(_libHandle, "AAFFileOpenExistingRead", (AAFSymbolAddr *)&_pfnOpenExistingRead);
-  if (AAFRESULT_FAILED(rc))
-    return rc;
-
-  rc = ::AAFFindSymbol(_libHandle, "AAFFileOpenExistingModify", (AAFSymbolAddr *)&_pfnOpenExistingModify);
-  if (AAFRESULT_FAILED(rc))
-    return rc;
-
-  rc = ::AAFFindSymbol(_libHandle, "AAFFileOpenNewModify", (AAFSymbolAddr *)&_pfnOpenNewModify);
-  if (AAFRESULT_FAILED(rc))
-    return rc;
-
-  rc = ::AAFFindSymbol(_libHandle, "AAFFileOpenTransient", (AAFSymbolAddr *)&_pfnOpenTransient);
-  if (AAFRESULT_FAILED(rc))
-    return rc;
-
-  rc = ::AAFFindSymbol(_libHandle, "AAFGetPluginManager", (AAFSymbolAddr *)&_pfnGetPluginManager);
-  if (AAFRESULT_FAILED(rc))
-    return rc;
-
-  return rc;
-}
-
-
-
-//***********************************************************
-//
-HRESULT AAFDLL::Unload()
-{
-  HRESULT rc = S_OK;
-
-  if (_libHandle)
-  {
-    rc = ::AAFUnloadLibrary(_libHandle);
-    if (AAFRESULT_SUCCEEDED(rc))
-    {
-      // Reset the entry point function pointers to NULL.
-      ClearEntrypoints();
-
-      _libHandle = NULL;
-    }
-  }
-  
-  return rc;
-}
-
-
-
-//***********************************************************
-//
-// Resets all entry point function pointers to NULL.
-void AAFDLL::ClearEntrypoints()
-{
+  // There Can Be Only One!
+  assert(NULL == _singleton);
   _pfnOpenExistingRead = NULL;
   _pfnOpenExistingModify = NULL;
   _pfnOpenNewModify = NULL;
@@ -736,43 +425,46 @@ void AAFDLL::ClearEntrypoints()
   _pfnGetPluginManager = NULL;
 }
 
+// Destructor for the base class
+AAFDLL::~AAFDLL()
+{
+  // There Can Be Only One!
+  assert(this == _singleton);
 
+  _singleton = NULL;
+}
 
-//***********************************************************
-//
-// Wrapper functions for calling member entry points.
-//
+AAFDLL * AAFDLL::GetAAFDLL()
+{
+  return _singleton;
+}
 
 HRESULT AAFDLL::OpenExistingRead (
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     IAAFFile ** ppFile)
 {
-  TRACE("AAFDLL::OpenExistingRead");
-  ASSERT("Valid dll callback function", _pfnOpenExistingRead);
-  
+  assert(_pfnOpenExistingRead);
   return _pfnOpenExistingRead(pFileName, modeFlags, ppFile);  
 }
   
 HRESULT AAFDLL::OpenExistingModify (
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile)
 {
-  TRACE("AAFDLL::OpenExistingModify");
-  ASSERT("Valid dll callback function", _pfnOpenExistingModify);
+  assert(_pfnOpenExistingModify);
   return _pfnOpenExistingModify(pFileName, modeFlags, pIdent, ppFile);  
 }
 
 HRESULT AAFDLL::OpenNewModify (
-    const wchar_t *  pFileName,
+    wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile)
 {
-  TRACE("AAFDLL::OpenNewModify");
-  ASSERT("Valid dll callback function", _pfnOpenNewModify);
+  assert(_pfnOpenNewModify);
   return _pfnOpenNewModify(pFileName, modeFlags, pIdent, ppFile);  
 }
 
@@ -780,15 +472,200 @@ HRESULT AAFDLL::OpenTransient (
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile)
 {
-  TRACE("AAFDLL::OpenTransient");
-  ASSERT("Valid dll callback function", _pfnOpenTransient);
+  assert(_pfnOpenTransient);
   return _pfnOpenTransient(pIdent, ppFile);  
 }
 
 HRESULT AAFDLL::GetPluginManager (
   IAAFPluginManager ** ppPluginManager)
 {
-  TRACE("AAFDLL::GetPluginManager");
-  ASSERT("Valid dll callback function", _pfnGetPluginManager);
+  assert(_pfnGetPluginManager);
   return _pfnGetPluginManager(ppPluginManager);  
 }
+ 
+
+
+
+
+
+#if defined(macintosh) || defined(_MAC)
+class MacAAFDLL : public AAFDLL
+{
+public:
+  // Constructor and destructor.
+  MacAAFDLL();
+  ~MacAAFDLL();
+
+  // Implements Mac specific initialization of dll and entry points.
+  virtual HRESULT Load(wchar_t *);
+  
+  // Implements Mac specific cleanup of dll and entry points.
+  virtual HRESULT Unload();
+
+private:
+  // The handle to the dll's module.
+  long _libref;
+};
+
+// Factory function just returns an instance of the currect platform
+// dll wrapper object.
+AAFDLL * MakeAAFDLL()
+{
+  AAFDLL *pAAFDLL =  new MacAAFDLL;
+  AAFDLL::_singleton = pAAFDLL;
+  return pAAFDLL;
+}
+
+
+HRESULT MacAAFDLL::Load(wchar_t *)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+HRESULT MacAAFDLL::Unload()
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+ 
+
+#elif defined(WIN32) || defined(_WIN32)
+
+class Win32AAFDLL : public AAFDLL
+{
+public:
+  // Constructor and destructor.
+  Win32AAFDLL();
+  ~Win32AAFDLL();
+
+  // Implements Win32 specific initialization of dll and entry points.
+  virtual HRESULT Load(wchar_t *);
+  
+  // Implements Win32 specific cleanup of dll and entry points.
+  virtual HRESULT Unload();
+
+private:
+  // The handle to the dll's module instance.
+  HINSTANCE _hInstance;
+};
+
+
+// Factory function just returns an instance of the currect platform
+// dll wrapper object.
+AAFDLL * MakeAAFDLL()
+{
+  assert(NULL == AAFDLL::_singleton);
+  AAFDLL *pAAFDLL =  new Win32AAFDLL;
+  AAFDLL::_singleton = pAAFDLL;
+  return pAAFDLL;
+}
+
+
+Win32AAFDLL::Win32AAFDLL()
+{
+  _hInstance = NULL;
+}
+
+Win32AAFDLL::~Win32AAFDLL()
+{
+}
+
+
+HRESULT Win32AAFDLL::Load(wchar_t *dllname)
+{
+  // Attempt to load the library.
+  _hInstance = ::LoadLibraryW(dllname);
+
+  if (NULL == _hInstance)
+  {
+    return HRESULT_FROM_WIN32(GetLastError());
+  }
+
+  //
+  // Attempt to initialize the entry points...
+  //
+  _pfnOpenExistingRead = (LPFNAAFFILEOPENEXISTINGREAD)
+                         GetProcAddress(_hInstance, "AAFFileOpenExistingRead");
+  if (NULL == _pfnOpenExistingRead)
+    return HRESULT_FROM_WIN32(GetLastError());
+
+  _pfnOpenExistingModify = (LPFNAAFFILEOPENEXISTINGMODIFY)
+                           GetProcAddress(_hInstance, "AAFFileOpenExistingModify");
+  if (NULL == _pfnOpenExistingModify)
+    return HRESULT_FROM_WIN32(GetLastError());
+
+  _pfnOpenNewModify = (LPFNAAFFILEOPENNEWMODIFY)
+                      GetProcAddress(_hInstance, "AAFFileOpenNewModify");
+  if (NULL == _pfnOpenNewModify)
+    return HRESULT_FROM_WIN32(GetLastError());
+
+  _pfnOpenTransient = (LPFNAAFFILEOPENTRANSIENT)
+                         GetProcAddress(_hInstance, "AAFFileOpenTransient");
+  if (NULL == _pfnOpenTransient)
+    return HRESULT_FROM_WIN32(GetLastError());
+
+  _pfnGetPluginManager = (LPFNAAFGETPLUGINMANAGER)
+                         GetProcAddress(_hInstance, "AAFGetPluginManager");
+  if (NULL == _pfnGetPluginManager)
+    return HRESULT_FROM_WIN32(GetLastError());
+
+  return S_OK;
+}
+
+
+HRESULT Win32AAFDLL::Unload()
+{
+  if (_hInstance)
+  {
+    _pfnOpenExistingRead = NULL;
+    _pfnOpenExistingModify = NULL;
+    _pfnOpenNewModify = NULL;
+    _pfnOpenTransient = NULL;
+
+    if (!::FreeLibrary(_hInstance))
+      return HRESULT_FROM_WIN32(GetLastError());
+
+    _hInstance = NULL;
+  }
+  
+  return S_OK;
+}
+
+#else
+
+class UnknownAAFDLL : public AAFDLL
+{
+public:
+  // Implements Unknown platform specific initialization of dll and entry points.
+  virtual HRESULT Load(wchar_t *aafdll);
+  
+  // Implements Unknown platform specific cleanup of dll and entry points.
+  virtual HRESULT Unload();
+
+private:
+  // The handle to the dll's module instance.
+};
+
+// Factory function just returns an instance of the currect platform
+// dll wrapper object.
+AAFDLL * MakeAAFDLL()
+{
+  assert(NULL == AAFDLL::_singleton);
+  AAFDLL *pAAFDLL =  new UnknownAAFDLL;
+  AAFDLL::_singleton = pAAFDLL;
+  return pAAFDLL;
+}
+
+
+HRESULT UnknownAAFDLL::Load(wchar_t *)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+HRESULT UnknownAAFDLL::Unload()
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+ 
+#endif
