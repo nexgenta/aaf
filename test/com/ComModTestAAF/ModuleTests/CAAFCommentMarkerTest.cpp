@@ -33,13 +33,14 @@
 #include <stdio.h>
 #include <assert.h>
 #include <memory.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "CAAFBuiltinDefs.h"
+#include "AAFDefUIDs.h"
 
 
 
@@ -56,7 +57,6 @@ static void RemoveTestFile(const wchar_t* pFileName)
 	}
 }
 
-
 // convenient error handlers.
 inline void checkResult(HRESULT r)
 {
@@ -68,6 +68,7 @@ inline void checkExpression(bool expression, HRESULT r)
 	if (!expression)
 		throw r;
 }
+
 // {81831639-EDF4-11d3-A353-009027DFCA6A}
 static const aafUID_t DDEF_TEST = 
 { 0x81831639, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
@@ -105,7 +106,8 @@ private:
 
 const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
-extern "C" HRESULT CAAFCommentMarker_test()
+extern "C" HRESULT CAAFCommentMarker_test(testMode_t mode);
+extern "C" HRESULT CAAFCommentMarker_test(testMode_t mode)
 {
 	HRESULT hr = S_OK;
 	aafProductIdentification_t	ProductInfo = {0};
@@ -122,7 +124,7 @@ extern "C" HRESULT CAAFCommentMarker_test()
 	ProductInfo.productName = L"AAFCommentMarker Test";
 	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = NIL_UID;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 	
 	// Create an instance of our text clip test class and run the
@@ -132,7 +134,8 @@ extern "C" HRESULT CAAFCommentMarker_test()
 	try
 	{
 		// Attempt to create a test file
-		test.Create(pFileName, &ProductInfo);
+		if(mode == kAAFUnitTestReadWrite)
+			test.Create(pFileName, &ProductInfo);
 		
 		// Attempt to read the test file.
 		test.Open(pFileName);
@@ -438,7 +441,7 @@ void CommentMarkerTest::OpenEvent()
 		
 		// Validate the comment buffer size.
 		aafUInt32 expectedLen = wcslen(_eventComment) + 1;
-		aafUInt32 expectedSize = expectedLen * 2;
+		aafUInt32 expectedSize = expectedLen * sizeof(wchar_t);
 		aafUInt32 commentBufSize = 0;
 		checkResult(pEvent->GetCommentBufLen(&commentBufSize));
 		checkExpression(commentBufSize == expectedSize, AAFRESULT_TEST_FAILED);
