@@ -80,13 +80,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFSelector Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -149,6 +151,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafFadeType_t		fadeOutType = kAAFFadeLinearPower;
 	aafSourceRef_t		sourceRef; 
 	aafLength_t			fillerLength = 3200;
+	aafInt32			numAlternates;
+	IAAFComponent*		pComponent = NULL;
 
 	HRESULT				hr = AAFRESULT_SUCCESS;
 
@@ -190,6 +194,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		checkResult(defs.cdSourceClip()->
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&pSourceClip));		
+		 checkResult(pSourceClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 
 		// Set the properties for the SourceClip
 		checkResult(pSourceClip->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
@@ -209,6 +217,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	    checkResult(defs.cdSelector()->
 					CreateInstance(IID_IAAFSelector, 
 								   (IUnknown **)&pSelector));
+		 checkResult(pSelector->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 
 		// Get a segment interface from the source clip
 		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
@@ -222,6 +234,25 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSelector->AppendAlternateSegment(pSegment));
 		// Release the intreface so we can reuse the pointer
 		pSegment->Release();
+
+		// create another filler, add it as an alternate, count two alternates, 
+		// then delete and check for only one alternate
+	    checkResult(defs.cdFiller()->
+					CreateInstance(IID_IAAFFiller, 
+								   (IUnknown **)&pFiller));
+	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
+		checkResult(pFiller->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
+		checkResult(pSelector->AppendAlternateSegment(pSegment));
+		pSegment->Release();
+		checkResult(pSelector->GetNumAlternateSegments (&numAlternates));
+		checkExpression(2 == numAlternates, AAFRESULT_TEST_FAILED);
+		checkResult(pSelector->RemoveAlternateSegment (pSegment));
+		checkResult(pSelector->GetNumAlternateSegments (&numAlternates));
+		checkExpression(1 == numAlternates, AAFRESULT_TEST_FAILED);
+
+
+
+
 		checkResult(pSelector->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 	    // append the Selector to the MOB tree
 		aafRational_t editRate = { 0, 1};
@@ -244,6 +275,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	// Cleanup and return
 	if (pMobSlot)
 		pMobSlot->Release();
+
+	if (pComponent)
+		pComponent->Release();
 
 	if (pSourceClip)
 		pSourceClip->Release();
