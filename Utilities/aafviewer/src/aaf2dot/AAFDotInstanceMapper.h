@@ -2,7 +2,7 @@
 #define __AAFDOTINSTANCEMAPPER_H__
 
 /*
- * $Id: AAFDotInstanceMapper.h,v 1.4 2004/02/27 16:41:23 stuart_hc Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.h,v 1.5 2004/03/08 15:38:32 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -158,8 +158,10 @@ class AAFDotInstanceMapper : public AxBaseObjRecIterListener
    bool FilterAAFObject( AxObject axObject, bool &popStack );
 
    // extract int value from the int property value; possibly display in hex ( see MapperSettings.h)
+   std::string GetIntValue( AxTypeDefInt &axTypeDefInt, AxPropertyValue axPropertyValue, bool displayHex );
    std::string GetIntValue( AxTypeDefInt &axTypeDefInt, AxPropertyValue axPropertyValue,
 			    std::string objectName, std::string propertyName );
+   std::string GetIntValue( AxTypeDefInt &axTypeDefInt, AxPropertyValue axPropertyValue );
 
 
    // find the node referenced by the scope reference. 
