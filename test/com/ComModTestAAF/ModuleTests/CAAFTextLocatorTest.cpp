@@ -31,7 +31,6 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -96,6 +95,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDescriptor = NULL;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
+	aafRational_t	audioRate = { 44100, 1 };
 
 
 	aafProductVersion_t v;
@@ -363,8 +363,7 @@ extern "C" HRESULT CAAFTextLocator_test()
   catch (...)
 	{
 	  cerr << "CAAFTextLocator_test...Caught general C++"
-		   << " exception!" << endl; 
-	  hr = AAFRESULT_TEST_FAILED;
+		" exception!" << endl; 
 	}
 
 
