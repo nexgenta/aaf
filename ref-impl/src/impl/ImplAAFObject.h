@@ -16,13 +16,20 @@
 //
 // Forward declarations
 //
-class AAFObject;
 class ImplEnumAAFProperties;
-
+class ImplAAFClassDef;
+class ImplAAFProperty;
+class ImplAAFPropertyDef;
+class ImplAAFPropertyValue;
+class ImplPropertyCollection;
+class ImplAAFDictionary;
 
 #include "AAFTypes.h"
 #include "OMStorable.h"
+#include "OMProperty.h"
 #include "ImplAAFRoot.h"
+
+
 
 class ImplAAFObject : public OMStorable, public ImplAAFRoot
 {
@@ -54,6 +61,15 @@ public:
 
 
   //****************
+  // GetDefinition()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDefinition
+		// @parm [out] class definition of which this object is an instance.
+        (ImplAAFClassDef ** ppClassDef);
+
+
+  //****************
   // GetObjectClass()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -62,11 +78,46 @@ public:
 
 
   //****************
-  // EnumProperties()
+  // GetProperties()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-	EnumProperties
+	GetProperties
 		(ImplEnumAAFProperties ** ppEnum);
+
+
+  //****************
+  // CountProperties()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	CountProperties
+		(aafUInt32 * pCount);
+
+
+  //****************
+  // GetPropertyValue()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetPropertyValue
+		(ImplAAFPropertyDef * pPropDef,
+		 ImplAAFPropertyValue ** ppPropVal);
+
+
+  //****************
+  // SetPropertyValue()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	SetPropertyValue
+		(ImplAAFPropertyDef * pPropDef,
+		 ImplAAFPropertyValue * pPropVal);
+
+
+  //****************
+  // IsPropertyPresent()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	IsPropertyPresent
+		(ImplAAFPropertyDef * pPropDef,
+		 aafBool * pResult);
 
 
   //***********************************************************
@@ -107,13 +158,17 @@ public:
 
 
 public:
-	// Interfaces ivisible inside the toolkit, but not exposed through the API
-  
-	// Gets the head object of the file containing this object.
-	// This function is used to maintain MOB and Definition tables in the
-	// head object.
-	virtual AAFRESULT MyHeadObject
-		(class ImplAAFHeader **header);
+  // Interfaces ivisible inside the toolkit, but not exposed through the API
+
+  // Gets the head object of the file containing this object.
+  // This function is used to maintain MOB and Definition tables in the
+  // head object.
+  virtual AAFRESULT MyHeadObject
+    (class ImplAAFHeader **header);
+
+  // Gets the dictionary used to create this instance.
+  virtual AAFRESULT STDMETHODCALLTYPE 
+    GetDictionary(ImplAAFDictionary **ppDictionary);
 
 
 public:
@@ -122,8 +177,13 @@ public:
   static AAFRESULT test();
 
   OMDECLARE_STORABLE(ImplAAFObject)
+
+private:
+  // private method
+  AAFRESULT InitProperties ();
+
+  ImplPropertyCollection * _pProperties;
 };
 
 
 #endif // ! __ImplAAFObject_h__
-
