@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefSetPropertyT.h,v 1.62 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
+// $Id: OMWeakRefSetPropertyT.h,v 1.63 2004/11/30 21:59:38 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -918,7 +918,8 @@ void OMWeakReferenceSetProperty<ReferencedObject>::shallowCopyTo(
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
     SetElement& element = iterator.value();
-    dest->_set.insert(element.identification(), element);
+    SetElement destElement( dest, element.identification(), nullOMPropertyTag);
+    dest->_set.insert(destElement.identification(), destElement);
   }
 
   dest->_targetTag = nullOMPropertyTag;
@@ -939,6 +940,13 @@ void OMWeakReferenceSetProperty<ReferencedObject>::deepCopyTo(
   typedef OMWeakReferenceSetProperty<ReferencedObject> Property;
   Property* wp = dynamic_cast<Property*>(destination);
   ASSERT("Correct property type", wp != 0);
+
+  // Update the target tags on elements
+  SetIterator destIterator(wp->_set, OMBefore);
+  while (++destIterator) {
+    SetElement& element = destIterator.value();
+    element.reference().setTargetTag(wp->targetTag());
+  }
 
   OMStrongReferenceSet* dest = wp->targetSet();
   ASSERT("Destination is correct type", dest != 0);
