@@ -37,7 +37,9 @@ template <typename ReferencedObject>
 OMStrongReferenceSetProperty<ReferencedObject>::
                     OMStrongReferenceSetProperty(const OMPropertyId propertyId,
                                                  const char* name)
-: OMContainerProperty(propertyId, SF_STRONG_OBJECT_REFERENCE_SET, name)
+: OMContainerProperty<ReferencedObject>(propertyId,
+                                        SF_STRONG_OBJECT_REFERENCE_SET,
+                                        name)
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::"
                                                "OMStrongReferenceSetProperty");
@@ -263,10 +265,10 @@ void OMStrongReferenceSetProperty<ReferencedObject>::appendValue(
                                                 const ReferencedObject*& value)
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::appendValue");
-  PRECONDITION("Valid object", object != 0);
+  PRECONDITION("Valid object", value != 0);
 
   OBSOLETE("OMStrongReferenceSetProperty<ReferencedObject>::insert");
-  insert(object);
+  insert(value);
 }
 
   // @mfunc Remove this optional <c OMStrongReferenceSetProperty>.
