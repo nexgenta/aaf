@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.h,v 1.18 2004/08/29 18:16:00 jptrainor Exp $ $Name:  $
+// $Id: AxDictionary.h,v 1.19 2004/08/29 18:18:17 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,8 @@ public:
 	~AxDictionary();
 
 	bool isKnownTypeDef( const aafUID_t& typeId );
-	bool isKnownOperationDef( const aafUID_t& typeId );
+	bool isKnownOperationDef( const aafUID_t& opId );
+	bool isKnownParameterDef( const aafUID_t& paramId );
 	
 	void RegisterClassDef( IAAFClassDefSP spIaafClassDef );
 
@@ -54,11 +55,9 @@ public:
 	IEnumAAFParameterDefsSP GetParameterDefs();
 
 	void RegisterOpaqueTypeDef( IAAFTypeDefSP );
-
 	void RegisterOperationDef( IAAFOperationDefSP );
-
+	void RegisterParameterDef( IAAFParameterDefSP );
 	void RegisterCodecDef( IAAFCodecDefSP );
-
 	void RegisterKLVDataKey( const aafUID_t& uuid,
 				 IAAFTypeDefSP spTypeDef );
 
