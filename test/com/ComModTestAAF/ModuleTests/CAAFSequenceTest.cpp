@@ -1,78 +1,38 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFSequence
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+// @com This file implements the module test for CAAFDefinitionObject
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
-#include "AAF.h"
 
-#include <iostream.h>
-#include <stdio.h>
 
-#include "AAFStoredObjectIDs.h"
+
+
+
+
+
+#include "CAAFSequence.h"
+#include "CAAFSequence.h"
+#ifndef __CAAFSequence_h__
+#error - improperly defined include guard
+#endif
+
 #include "AAFResult.h"
-#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
+#include <iostream.h>
 
 #define kNumComponents	5
 
-
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
-
-// convenient error handlers.
-inline void checkResult(HRESULT r)
-{
-  if (FAILED(r))
-    throw r;
-}
-inline void checkExpression(bool expression, HRESULT r)
-{
-  if (!expression)
-    throw r;
-}
-
-
-
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
+						   IAAFSession**		ppSession,
 						   IAAFFile**			ppFile,
 						   IAAFHeader**			ppHeader)
 {
@@ -80,25 +40,36 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFSequence Test";
+	ProductInfo.productName = L"Make AVR Example";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
+	hr = CoCreateInstance(CLSID_AAFSession,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSession, 
+						   (void **)ppSession);
+	if (FAILED(hr))
+		return hr;
+
+	hr = (*ppSession)->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
-		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
+	case kMediaOpenReadOnly:
+		hr = (*ppSession)->OpenReadFile(pFileName, ppFile);
 		break;
 
-	case kAAFMediaOpenAppend:
-		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
+	case kMediaOpenAppend:
+		hr = (*ppSession)->CreateFile(pFileName, kAAFRev1, ppFile);
 		break;
 
 	default:
@@ -108,17 +79,16 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppSession)->Release();
+		*ppSession = NULL;
 		return hr;
 	}
   
   	hr = (*ppFile)->GetHeader(ppHeader);
 	if (FAILED(hr))
 	{
+		(*ppSession)->Release();
+		*ppSession = NULL;
 		(*ppFile)->Release();
 		*ppFile = NULL;
 		return hr;
@@ -129,127 +99,104 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
+	IAAFSession*	pSession = NULL;
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
 	IAAFMob*		pMob = NULL;
-	IAAFTimelineMobSlot*	pMobSlot = NULL;
-	IAAFSequence*	pSequence = NULL;
-	IAAFSegment*	pSegment = NULL;
-	IAAFComponent*	pComponent = NULL;
-	aafMobID_t		NewMobID;
-	aafUInt32		numComponents;
+	IAAFMobSlot*	pMobSlot;
+	IAAFSequence*	pSequence;
+	IAAFSegment*	pSegment;
+	aafUID_t		NewMobID;
 	int				i;
-	HRESULT			hr = S_OK;
+	HRESULT			hr;
 
+	// Create the AAF file
+	hr = OpenAAFFile(pFileName, kMediaOpenAppend, &pSession, &pFile, &pHeader);
+	if (FAILED(hr))
+		return hr;
 
-  try
-  {  
-      // Remove the previous test file if any.
-      RemoveTestFile(pFileName);
+	// Create a Composition Mob
+	hr = CoCreateInstance(CLSID_AAFCompositionMob,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFMob, 
+							(void **)&pMob);
+	if (FAILED(hr))
+		goto Cleanup;
 
+	CoCreateGuid((GUID *)&NewMobID);
+	hr = pMob->SetMobID(&NewMobID);
+	hr = pMob->SetName(L"AAFSequenceTest");
+	
+	// Add mob slot w/ sequence
+ 	hr = CoCreateInstance(CLSID_AAFSequence,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSequence, 
+						   (void **)&pSequence);		
+ 	if (AAFRESULT_SUCCESS != hr)
+		goto Cleanup;
 
-	  // Create the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
+	pSequence->SetInitialValue((aafUID_t*)&DDEF_Audio);
 
-	  // Get the AAF Dictionary so that we can create valid AAF objects.
-	  checkResult(pHeader->GetDictionary(&pDictionary));
-	  CAAFBuiltinDefs defs (pDictionary);
- 		
-	  // Create a Composition Mob
-	  checkResult(defs.cdCompositionMob()->
-				  CreateInstance(IID_IAAFMob, 
-								 (IUnknown **)&pMob));
+	//
+	//	Add some segments.  Need to test failure conditions
+	//	(i.e. starting/ending w/ transition, two trans back
+	//	to bacl).
+	//
+	for(i = 0; i < kNumComponents; i++)
+	{
+		IAAFComponent*	pComponent;
+		aafLength_t		len = 10;
 
-	  checkResult(CoCreateGuid((GUID *)&NewMobID));
-	  checkResult(pMob->SetMobID(NewMobID));
-	  checkResult(pMob->SetName(L"AAFSequenceTest"));
-	  
-	  // Add mob slot w/ sequence
- 	  checkResult(defs.cdSequence()->
-				  CreateInstance(IID_IAAFSequence, 
-								 (IUnknown **)&pSequence));		
-	  checkResult(pSequence->Initialize(defs.ddSound()));
+		hr = CoCreateInstance(CLSID_AAFFiller,
+								NULL, 
+								CLSCTX_INPROC_SERVER, 
+								IID_IAAFComponent, 
+								(void **)&pComponent);
+ 		if (FAILED(hr))
+			break;
 
-	  //
-	  //	Add some segments.  Need to test failure conditions
-	  //	(i.e. starting/ending w/ transition, two trans back
-	  //	to bacl).
-	  //
-	  for(i = 0; i < kNumComponents + 1; i++)	// Add one more for delete below
-	  {
-		  aafLength_t		len = 10;
-		  
-		  checkResult(defs.cdFiller()->
-			  CreateInstance(IID_IAAFComponent, 
-			  (IUnknown **)&pComponent));
-		  
-		  checkResult(pComponent->SetDataDef(defs.ddSound()));
-		  checkResult(pComponent->SetLength(len));
-		  checkResult(pSequence->AppendComponent(pComponent));
-		  
-		  pComponent->Release();
-		  pComponent = NULL;
-	  }
-		checkResult(pSequence->CountComponents (&numComponents));
-		checkExpression(kNumComponents + 1 == numComponents, AAFRESULT_TEST_FAILED);
-		checkResult(pSequence->RemoveComponentAt(kNumComponents));
-		checkResult(pSequence->CountComponents (&numComponents));
-		checkExpression(kNumComponents == numComponents, AAFRESULT_TEST_FAILED);
+		pComponent->SetDataDef((aafUID_t*)&DDEF_Audio);
+		pComponent->SetLength(&len);
+		hr = pSequence->AppendCpnt(pComponent);
 
-		checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
+		pComponent->Release();
 
-		aafRational_t editRate = { 0, 1};
-		checkResult(pMob->AppendNewTimelineSlot(editRate,
-												pSegment,
-												1,
-												L"AAF Test Sequence",
-												0,
-												&pMobSlot));
-		
-    pMobSlot->Release();
-    pMobSlot = NULL;
+		if (FAILED(hr))
+			break;
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment);
+		if (FAILED(hr))
+			goto Cleanup;
+
+		pMob->AppendNewSlot(pSegment, 1, L"AAF Test Sequence", &pMobSlot);
+		if (pMobSlot) pMobSlot->Release();
 
 		pSegment->Release();
-    pSegment = NULL;
 
 		// Add the master mob to the file and cleanup
-		pHeader->AddMob(pMob);
+		pHeader->AppendMob(pMob);
+	}
 
-  }
-  catch (HRESULT& rResult)
-  {
-    hr = rResult;
-  }
-
-
-  // Cleanup and return
-  if (pMobSlot)
-    pMobSlot->Release();
-
-  if (pSegment)
-    pSegment->Release();
-
-  if (pComponent)
-    pComponent->Release();
-
-	if (pSequence)
-    pSequence->Release();
-
-	if (pMob)
-    pMob->Release();
-
-	if (pDictionary)
-    pDictionary->Release();
-
-	if (pHeader)
-    pHeader->Release();
+Cleanup:
+	if (pSequence) pSequence->Release();
+	if (pMob) pMob->Release();
+	if (pHeader) pHeader->Release();
 
 	if (pFile)
 	{
-		pFile->Save();
 		pFile->Close();
 		pFile->Release();
+	}
+
+	if (pSession)
+	{
+		pSession->EndSession();
+		pSession->Release();
 	}
 
 	return hr;
@@ -257,189 +204,130 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar* pFileName)
 {
+	IAAFSession*	pSession = NULL;
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IEnumAAFMobs*	pMobIter = NULL;
 	IAAFMob*		pMob;
-	IEnumAAFMobSlots*	pSlotIter = NULL;
-	IAAFMobSlot*		pSlot = NULL;
-	IAAFComponent*		pComp = NULL;
-	IAAFSegment*		pSegment = NULL;
-	IAAFSequence*		pSequence = NULL;
-	IEnumAAFComponents*	pCompIter = NULL;
-	IAAFDataDef*        pDataDef = 0;
-	IAAFDefObject*      pDefObj = 0;
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
-	HRESULT			hr = S_OK;
+	HRESULT			hr;
 
+	// Open the AAF file
+	hr = OpenAAFFile(pFileName, kMediaOpenReadOnly, &pSession, &pFile, &pHeader);
+	if (FAILED(hr))
+		return hr;
 
-  try
-  {
-	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+	pHeader->GetNumMobs(kCompMob, &numMobs);
+	if (1 != numMobs )
+	{
+		hr = AAFRESULT_TEST_FAILED;
+		goto Cleanup;
+	}
 
-    // Validate that there is only one composition mob.
-	  checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
-	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
+	// Enumerate over Composition MOBs
+	criteria.searchTag = kByMobKind;
+	criteria.tags.mobKind = kCompMob;
+    hr = pHeader->EnumAAFAllMobs(&criteria, &pMobIter);
+	while (pMobIter && pMobIter->NextOne(&pMob) != AAFRESULT_NO_MORE_MOBS)
+	{
+		IAAFMobSlot*		pSlot;
+		aafNumSlots_t		numSlots = 0;
+		IEnumAAFMobSlots*	pSlotIter = NULL;
 
-	  // Enumerate over Composition MOBs
-	  criteria.searchTag = kAAFByMobKind;
-	  criteria.tags.mobKind = kAAFCompMob;
-    checkResult(pHeader->GetMobs(&criteria, &pMobIter));
-	  while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
-	  {
-		  aafNumSlots_t		numSlots = 0;
-
-		  checkResult(pMob->CountSlots(&numSlots));
-		  checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
-
-      // Enumerate over all MOB slots for this MOB
-			checkResult(pMob->GetSlots(&pSlotIter));
-			while (pSlotIter && pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS)
+		pMob->GetNumSlots(&numSlots);
+		if (1 != numSlots)
+		{
+			hr = AAFRESULT_TEST_FAILED;
+		}
+		else
+		{
+			// Enumerate over all MOB slots for this MOB
+			hr = pMob->EnumAAFAllMobSlots(&pSlotIter);
+			while (pSlotIter && pSlotIter->NextOne(&pSlot) != AAFRESULT_NO_MORE_OBJECTS)
 			{
-				aafUInt32			numCpnts;
+				IAAFComponent*		pComp;
+				IAAFSegment*		pSegment;
+				IAAFSequence*		pSequence;
+				IEnumAAFComponents*	pCompIter;
+				aafInt32			numCpnts;
 
-				checkResult(pSlot->GetSegment(&pSegment));
-				checkResult(pSegment->QueryInterface(IID_IAAFSequence, (void **) &pSequence));
+				pSlot->GetSegment(&pSegment);
+				pSegment->QueryInterface(IID_IAAFSequence, (void **) &pSequence);
+				pSegment->Release();
 
-				checkResult(pSequence->CountComponents(&numCpnts));
-				checkExpression(numCpnts == kNumComponents, AAFRESULT_TEST_FAILED);
-
-			    checkResult(pSequence->GetComponents(&pCompIter));
-				numCpnts = 0;
-				while (pCompIter && pCompIter->NextOne(&pComp) == AAFRESULT_SUCCESS)
+				pSequence->GetNumCpnts(&numCpnts);
+				if (numCpnts != kNumComponents)
 				{
-					aafLength_t	len;
-					aafUID_t	dataDef;
+					hr = AAFRESULT_TEST_FAILED;
+				}
+				else
+				{
+					pSequence->EnumComponents(&pCompIter);
+					numCpnts = 0;
+					while (pCompIter && pCompIter->NextOne(&pComp) != AAFRESULT_NO_MORE_OBJECTS)
+					{
+						aafLength_t	len;
+						aafUID_t	dataDef;
 
-					numCpnts++;
+						numCpnts++;
 
-					checkResult(pComp->GetDataDef(&pDataDef));
-					checkResult(pDataDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObj));
-					pDataDef->Release();
-					pDataDef = 0;
-					checkResult(pDefObj->GetAUID(&dataDef));
-					pDefObj->Release();
-					pDefObj = 0;
-					checkExpression(memcmp(&DDEF_Sound, &dataDef, sizeof(aafUID_t)) == 0,
-					                AAFRESULT_TEST_FAILED);
+						pComp->GetDataDef(&dataDef);
+						if (memcmp(&DDEF_Audio, &dataDef, sizeof(aafUID_t)) != 0)
+							hr = AAFRESULT_TEST_FAILED;
 
-					checkResult(pComp->GetLength(&len));
-					checkExpression(len == 10, AAFRESULT_TEST_FAILED);
+						pComp->GetLength(&len);
+						if (len != 10)
+							hr = AAFRESULT_TEST_FAILED;
 
-					pComp->Release();
-					pComp = NULL;
+						pComp->Release();
+					}
+
+					if (pCompIter) pCompIter->Release();
+
+					if (numCpnts != kNumComponents)
+						hr = AAFRESULT_TEST_FAILED;
 				}
 
+				pSequence->Release();
+				pSlot->Release();
 
-        checkExpression(numCpnts == kNumComponents, AAFRESULT_TEST_FAILED);
-
-				pCompIter->Release();
-        pCompIter = NULL;
-
-        pSequence->Release();
-        pSequence = NULL;
-
-				pSegment->Release();
-        pSegment = NULL;
-
-        pSlot->Release();
-        pSlot = NULL;
+				if (FAILED(hr))
+					break;
 			}
 
-			pSlotIter->Release();
-      pSlotIter = NULL;
-
-		  pMob->Release();
-      pMob = NULL;
+			if (pSlotIter) pSlotIter->Release();
 		}
 
-
-	}
-	catch (HRESULT& rResult)
-	{
-	  hr = rResult;
-	}
-
-	// Cleanup object references
-	if (pComp)
-	  {
-		pComp->Release();
-		pComp = 0;
-	  }
-
-	if (pCompIter)
-	  {
-		pCompIter->Release();
-		pCompIter = 0;
-	  }
-
-	if (pSequence)
-	  {
-		pSequence->Release();
-		pSequence = 0;
-	  }
-
-	if (pSegment)
-	  {
-		pSegment->Release();
-		pSegment = 0;
-	  }
-
-	if (pSlot)
-	  {
-		pSlot->Release();
-		pSlot = 0;
-	  }
-
-	if (pSlotIter)
-	  {
-		pSlotIter->Release();
-		pSlotIter = 0;
-	  }
-
-	if (pMob)
-	  {
 		pMob->Release();
-		pMob = 0;
-	  }
+
+		if (FAILED(hr))
+			break;
+	}
 
 	if (pMobIter)
-	  {
 		pMobIter->Release();
-		pMobIter = 0;
-	  }
 
-	if (pHeader)
-	  {
-		pHeader->Release();
-		pHeader = 0;
-	  }
+Cleanup:
 
-	if (pDataDef)
-	  {
-		pDataDef->Release();
-		pDataDef = 0;
-	  }
-
-	if (pDefObj)
-	  {
-		pDefObj->Release();
-		pDefObj = 0;
-	  }
+	if (pHeader) pHeader->Release();
 
 	if (pFile)
-	  {
+	{
 		pFile->Close();
 		pFile->Release();
-		pFile = 0;
-	  }
+	}
+
+	if (pSession)
+	{
+		pSession->EndSession();
+		pSession->Release();
+	}
 
 	return 	hr;
 }
 
-extern "C" HRESULT CAAFSequence_test()
+HRESULT CAAFSequence::test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFSequenceTest.aaf";
@@ -452,19 +340,12 @@ extern "C" HRESULT CAAFSequence_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFSequence_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFSequence::test...Caught general C++ exception!" << endl; 
 	}
 
-	// When all of the functionality of this class is tested, we can return success.
-	// When a method and its unit test have been implemented, remove it from the list.
+	// When all of the functionality of this class is tested, we can return success
 	if (SUCCEEDED(hr))
-	{
-		cout << "The following AAFSequence methods have not been implemented:" << endl; 
-//		cout << "     RemoveComponent" << endl; 
-		cout << "     SegmentOffsetToTC - needs unit test" << endl; 
-		cout << "     SegmentTCToOffset - needs unit test" << endl; 
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-	}
 
 	return hr;
 }
