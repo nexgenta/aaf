@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefVariableArray\
 #endm
@@ -6,11 +13,11 @@ AAFTypeDefVariableArray\
 AAFTypeDef\
 #endm
 #c
+#import ./AAFTypeDef.exp
 AD_HEAD
 AD_IDL(//
 // This interface is used to define variably-sized Array types used in
 // AAF persistent objects.
-//
 AD_STD_COMMENT_IFC_HEADER
 AD_STD_COMMENT_IFC_STUB)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
@@ -33,22 +40,35 @@ AD_XMETHOD3(Initialize,
 
 			[in],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pTypeName,
 			friendly name of this type definition,
 
      Initializes this type def to contain elements of the given type.
+  // Note that it is only possible to use certain types as the element
+  // type.  Those permissible types include:
+  // - AAFTypeDefInt
+  // - AAFTypeDefRecord
+  // - AAFTypeDefEnum
+  // - AAFTypeDefExtEnum
+  // - AAFTypeDefFixedArray
+  // - AAFTypeDefObjectRef
   //
   // This method must be called after allocation\, and before
   // any other method can be called.
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
+  // - pID is a valid pointer.
   // - pTypeDef is a valid pointer.
-  //
+  // - pTypeName is a valid pointer.
+  // - element type is permissible for use in a VariableArray.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pTypeDef or pTypeName\))
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pID\\\, pTypeDef\\\, or pTypeName\)
+  //
+  // AAFRESULT_BAD_TYPE
+  //   - an illegal element type was given.)
 
 
 AD_XMETHOD1(GetType,
@@ -88,7 +108,6 @@ AD_XMETHOD2(GetCount,
   // - Initialize\(\) has already been called on this object.
   // - pPropVal is a valid pointer.
   // - pCount is a valid pointer.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pPropVal or pCount\))
@@ -114,9 +133,29 @@ AD_XMETHOD2(AppendElement,
   // - Initialize\(\) has already been called on this object.
   // - pInPropVal pointer is valid.
   // - pMemberPropVal pointer is valid.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInPropVal or pMemberPropVal\))
+
+
+AD_XMETHOD1(CreateEmptyValue,
+
+			 [out],
+			 objOut,
+			 AAFPropertyValue,
+			 ppPropVal,
+			 newly-created empty property value,
+
+     Creates an empty property value which contains a variable array
+  // type that initially is empty \(that is\, contains no elements
+  // yet\).
+  //
+  // Succeeds if all of the following are true:
+  // - the ppPropVal pointer is valid.
+  //
+  // If this method fails nothing will be written to *ppPropVal.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppPropVal\))
 
 
 AD_X2METHOD3(CreateValueFromValues,
@@ -155,7 +194,6 @@ AD_X2METHOD3(CreateValueFromValues,
   // - the ppPropVal pointer is valid.
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pElementValues or ppPropVal\))
@@ -195,10 +233,10 @@ AD_XMETHOD3(CreateValueFromCArray,
   // - compile-time struct has had its member offests registered.
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInitData or ppPropVal\)
+  //
   // AAFRESULT_NOT_REGISTERED
   //  - any contained struct offsets have not yet been registered for
   //    that typedef.)
@@ -233,10 +271,10 @@ AD_XMETHOD3(GetElementValue,
   // - the index exists in this array type def.
   // - The pInPropVal pointer is valid.
   // - The ppOutPropVal pointer is valid.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pInPropVal or ppOutPropVal\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - The given index is out of range for this array type def.)
 
@@ -273,10 +311,10 @@ AD_XMETHOD3(GetCArray,
   // - compile-time struct has had its member offests registered.
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pPropVal or pData\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - dataSize indicates pData is too small.
   //
@@ -314,10 +352,10 @@ AD_XMETHOD3(SetElementValue,
   // - the index exists in this array type def.
   // - The pInPropVal pointer is valid.
   // - The ppOutPropVal pointer is valid.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInPropVal or ppOutPropVal\)
+  //
   // AAFRESULT_BAD_PARAM
   //   - The given index is out of range for this array type def.)
 
@@ -356,10 +394,13 @@ AD_XMETHOD3(SetCArray,
   //   registered.
   //
   // If this method fails nothing will be written to *ppPropVal.
-  //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pPropVal or pData\)
+  //
   // AAFRESULT_NOT_REGISTERED
   //  - offsets of any contained struct have not yet been registered.)
+
+
+AD_OVERRIDE(.method-GetTypeCategory)
 AD_XCLASS_END(Concrete, StoredObject)
