@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -34,7 +34,7 @@
 template<typename PropertyType>
 OMFixedSizeProperty<PropertyType>::OMFixedSizeProperty(
                                                  const OMPropertyId propertyId,
-                                                 const wchar_t* name)
+                                                 const char* name)
 : OMSimpleProperty(propertyId, name, sizeof(PropertyType))
 {
   TRACE("OMFixedSizeProperty<PropertyType>::OMFixedSizeProperty");
@@ -119,19 +119,6 @@ PropertyType* OMFixedSizeProperty<PropertyType>::operator &(void)
 {
   return reinterpret_cast<PropertyType*>(_bits);
 }
-  
-  // @mfunc Convert this <c OMFixedSizeProperty> into a const
-  //        reference to a <p PropertyType>.
-  //   @tcarg class | PropertyType | The type of the property. This
-  //          can be any type with well defined copy and assignment
-  //          semantics.
-  //   @rdesc Const reference to a <p PropertyType>.
-  //   @this const
-template<typename PropertyType>
-const PropertyType& OMFixedSizeProperty<PropertyType>::reference(void) const
-{
-  return *reinterpret_cast<const PropertyType*>(_bits);
-}
 
   // @mfunc Restore this <c OMFixedSizeProperty>, the external (persisted)
   //        size of the <c OMFixedSizeProperty> is <p externalSize>.
@@ -144,7 +131,7 @@ void OMFixedSizeProperty<PropertyType>::restore(size_t externalSize)
 {
   TRACE("OMFixedSizeProperty<PropertyType>::restore");
 
-  read(externalSize);
+  read(_propertyId, _storedForm, _bits, _size, externalSize);
 }
 
 #endif
