@@ -20,7 +20,6 @@
 #include "aafDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFRational.h"
-#include "AAFInterpolatorDefs.h"
 
 const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kVersionBeta};
 
@@ -75,11 +74,10 @@ HRESULT STDMETHODCALLTYPE
 	IAAFDefObject	*obj = NULL;
 	aafUID_t		uid;
 	
-	if((dict == NULL) || (def == NULL))
-		return AAFRESULT_NULL_PARAM;
-	
+	//!!!Add error checking
 	XPROTECT()
 	{
+		//!!!Later, add in dataDefs supported & filedescriptor class
 		CHECK(dict->CreateInstance(&AUID_AAFInterpolationDefinition,
 							IID_IAAFInterpolationDef, 
 							(IUnknown **)&interpDef));
@@ -94,12 +92,15 @@ HRESULT STDMETHODCALLTYPE
 	{
 		if(interpDef != NULL)
 			interpDef->Release();
+		if(obj != NULL)
+			obj->Release();
 	}
 	XEND
 
 	return AAFRESULT_SUCCESS;
 }
 
+//!!!Need some real values for the descriptor
 static wchar_t *manufURL = L"http://www.avid.com";
 static wchar_t *downloadURL = L"ftp://ftp.avid.com/pub/";
 const aafUID_t MANUF_AVID_TECH = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
@@ -114,6 +115,7 @@ HRESULT STDMETHODCALLTYPE
 	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
  	IAAFNetworkLocator		*pNetLoc = NULL;
+	IAAFDefObject			*defObject = NULL;
 	aafUID_t				category = AUID_AAFDefObject, manufacturer = MANUF_AVID_TECH;
 	aafUID_t				plugID = BASIC_INTERP_PLUGIN;
 	
@@ -124,7 +126,11 @@ HRESULT STDMETHODCALLTYPE
 			(IUnknown **)&desc));
 		*descPtr = desc;
 		desc->AddRef();
-		CHECK(desc->Init(&plugID, L"Example interpolators", L"Handles step and linear interpolation."));
+		CHECK(desc->QueryInterface(IID_IAAFDefObject, (void **)&defObject));
+		CHECK(defObject->Init(&plugID, L"Example interpolators", L"Handles step and linear interpolation."));
+		defObject->Release();
+		defObject = NULL;
+
 		CHECK(desc->SetCategoryClass(&category));
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(dict->CreateInstance(&AUID_AAFNetworkLocator,
@@ -163,6 +169,8 @@ HRESULT STDMETHODCALLTYPE
 			pLoc->Release();
 		if(pNetLoc != NULL)
 			pNetLoc->Release();
+		if(defObject != NULL)
+			defObject->Release();
 	}
 	XEND
 
@@ -226,7 +234,6 @@ HRESULT STDMETHODCALLTYPE
 	if(pTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 	_typeDef = pTypeDef;
-	pTypeDef->AddRef();
 	return AAFRESULT_SUCCESS;
 }
 
@@ -246,10 +253,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	if(pParameter == NULL)
 		return AAFRESULT_NULL_PARAM;
-	if(_parameter != NULL)
-		_parameter->Release();
 	_parameter = pParameter;
-	pParameter->AddRef();
 	return AAFRESULT_SUCCESS;
 }
 
@@ -263,33 +267,17 @@ HRESULT STDMETHODCALLTYPE
 	AAFRational		timeA, timeB;
 	AAFRational		inputTime;
 	IAAFDefObject	*pDef = NULL;
-	IAAFVaryingValue *pVaryVal = NULL;
-	IAAFInterpolationDef *pInterpDef = NULL;
-	aafUID_t		defID, interpID;
+	aafUID_t		defID;
 	
 	if(pInputValue == NULL || pOutputValue == NULL)
 		return AAFRESULT_NULL_PARAM;
 	XPROTECT()
 	{
-		if(_parameter->QueryInterface(IID_IAAFVaryingValue, (void **)&pVaryVal) == AAFRESULT_SUCCESS)
-		{
-			CHECK(pVaryVal->GetInterpolationDefinition (&pInterpDef));
- 			CHECK(pInterpDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
-			pDef->GetAUID(&interpID);
-			pDef->Release();
-			pDef = NULL;
-			pInterpDef->Release();
-			pInterpDef = NULL;
- 			pVaryVal->Release();
-			pVaryVal = NULL;
-		}
+		CHECK(_typeDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
 		if(pInputValue->denominator == 0)
 			RAISE(AAFRESULT_ZERO_DIVIDE);
 		inputTime = (AAFRational)*pInputValue;
-		CHECK(_typeDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
 		CHECK(pDef->GetAUID (&defID));
-		pDef->Release();
-		pDef = NULL;
 		if(EqualAUID(&defID, &kAAFExpLong))
 		{
 			if(bufSize < sizeof(aafUInt32))
@@ -298,52 +286,39 @@ HRESULT STDMETHODCALLTYPE
 			aafInt32	lowerBound, upperBound;
 			CHECK(FindBoundValues(*pInputValue, sizeof(aafInt32), &timeA, (aafMemPtr_t)&lowerBound,
 				&timeB, (aafMemPtr_t)&upperBound));
-			if(EqualAUID(&interpID, &LinearInterpolator))
-				*result = (aafInt32)(((inputTime - timeA) / (timeB - timeA)) * (upperBound - lowerBound)) + lowerBound;
-			else if(EqualAUID(&interpID, &ConstantInterpolator))
-				*result = lowerBound;
-			else
-				RAISE(AAFRESULT_INVALID_INTERPKIND);
-				
+			*result = (aafInt32)(((inputTime - timeA) / (timeB - timeA)) * (upperBound - lowerBound)) + lowerBound;
 			*bytesRead = sizeof(aafUInt32);
 		}
 		else if(EqualAUID(&defID, &kAAFExpRational))
 		{
 			aafRational_t	*result = (aafRational_t *)pOutputValue;
-			AAFRational		lowerBound, upperBound, subResult, timeDelta, num, denom;
+			AAFRational		lowerBound, upperBound, subResult, timeDelta;
 
 			if(bufSize < sizeof(aafUInt32))
 				RAISE(AAFRESULT_SMALLBUF);
 			CHECK(FindBoundValues(*pInputValue, sizeof(aafRational_t), &timeA, (aafMemPtr_t)&lowerBound,
 				&timeB, (aafMemPtr_t)&upperBound));
-			num = inputTime - timeA;
-			denom = timeB - timeA;
-			if(denom == 0)
-				RAISE(AAFRESULT_ZERO_DIVIDE);
-			timeDelta = num / denom;
+//!!!			if(lowerBound.denominator == 0 || upperBound.denominator == 0)
+//				RAISE(AAFRESULT_ZERO_DIVIDE);
+			timeDelta = ((inputTime - timeA) / (timeB - timeA));
 			subResult = upperBound - lowerBound;
-
-			if(EqualAUID(&interpID, &LinearInterpolator))
-				*result = (aafRational_t)((timeDelta * subResult) + lowerBound);
-			else if(EqualAUID(&interpID, &ConstantInterpolator))
-				*result = lowerBound;
-			else
-				RAISE(AAFRESULT_INVALID_INTERPKIND);
+			// Find common denominator
+			//
+			*result = (aafRational_t)((timeDelta * subResult) + lowerBound);
 			*bytesRead = sizeof(aafRational_t);
 		}
 		else
 			RAISE(AAFRESULT_BAD_TYPE);
+		pDef->Release();
+		pDef = NULL;
 	}
 	XEXCEPT
 	{
 		if(pDef)
 			pDef->Release();
-		if(pInterpDef)
-			pInterpDef->Release();
- 		if(pVaryVal)
-			pVaryVal->Release();
 	}
 	XEND;
+
 	return(AAFRESULT_SUCCESS);
 }
 
@@ -365,10 +340,13 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 						AAFRational *lowerBoundTime, aafMemPtr_t lowerBoundValue,
 						AAFRational *upperBoundTime, aafMemPtr_t upperBoundValue)
 {
-	IAAFConstantValue			*pConstValue = NULL;
+	IAAFConstValue			*pConstValue = NULL;
 	IAAFVaryingValue		*pVaryingValue = NULL;
+	IAAFControlPoint		*pLowerPoint = NULL;
+	IAAFControlPoint		*pUpperPoint = NULL;
+	IAAFControlPoint		*pTestPoint = NULL;
+	IAAFControlPoint		*pPrevPoint = NULL;
 	IEnumAAFControlPoints	*theEnum = NULL;
-	IAAFControlPoint		*testPoint = NULL, *prevPoint = NULL;
 	aafBool					found;
 	AAFRational				inputTime, prevTime, zero(0,1);
 
@@ -379,12 +357,11 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 		if(point.denominator == 0)
 			RAISE(AAFRESULT_ZERO_DIVIDE);
 		inputTime = (AAFRational)point;
-		if(_parameter->QueryInterface(IID_IAAFConstantValue, (void **)&pConstValue) == AAFRESULT_SUCCESS)
+		if(_parameter->QueryInterface(IID_IAAFConstValue, (void **)&pConstValue) == AAFRESULT_SUCCESS)
 		{
 			aafUInt32	count;
 			CHECK(pConstValue->GetValue (valueSize, lowerBoundValue, &count));
-			if(count != valueSize)
-				RAISE(AAFRESULT_WRONG_SIZE);
+			///!!!Assert count == sizeof(val)
 			memcpy(upperBoundValue, lowerBoundValue, valueSize);
 			*lowerBoundTime = zero;
 			*upperBoundTime = zero;
@@ -394,6 +371,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 		else if(_parameter->QueryInterface(IID_IAAFVaryingValue, (void **)&pVaryingValue) == AAFRESULT_SUCCESS)
 		{
 			aafUInt32			count;
+			IAAFControlPoint	*testPoint, *prevPoint;
 			AAFRational			testTime;
 
 			prevTime = zero;
@@ -406,8 +384,8 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 				CHECK(testPoint->GetTime(&testRat));
 				testTime = (AAFRational)testRat;
 
-				if(testRat.denominator == 0)
-					RAISE(AAFRESULT_ZERO_DIVIDE);
+//!!!				if(testRat.denominator == 0)
+//					RAISE(AAFRESULT_ZERO_DIVIDE);
 				found = (testTime > inputTime);
 				if(!found)
 				{
@@ -420,21 +398,14 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 					testPoint = NULL;
 				}
 			}
-			theEnum->Release();
-			theEnum = NULL;
 			
-			if((prevPoint== NULL) && (testPoint == NULL))
-				RAISE(AAFRESULT_INCONSISTANCY);
-			
+			//!!!Assert if prevPoint and testPoint are both NULL
 			if(prevPoint != NULL && testPoint != NULL)		// Real interpolation
 			{
+				//!!! Fail if prevPoint also is NULL
 				CHECK(prevPoint->GetValue (valueSize, lowerBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
 				CHECK(testPoint->GetValue (valueSize, upperBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
-
+				///!!!Assert count == sizeof(val)
 				*lowerBoundTime = prevTime;
 				*upperBoundTime = testTime;
 				testPoint->Release();
@@ -445,9 +416,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			else if(prevPoint == NULL)						// Off the begining
 			{
 				CHECK(testPoint->GetValue (valueSize, lowerBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
-
+				///!!!Assert count == sizeof(val)
 				memcpy(upperBoundValue, lowerBoundValue, valueSize);
 				*lowerBoundTime = testTime;
 				*upperBoundTime = testTime;
@@ -457,9 +426,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			else											// Off of the end
 			{
 				CHECK(prevPoint->GetValue (valueSize, lowerBoundValue, &count));
-				if(count != valueSize)
-					RAISE(AAFRESULT_WRONG_SIZE);
-
+				///!!!Assert count == sizeof(val)
 				memcpy(upperBoundValue, lowerBoundValue, valueSize);
 				*lowerBoundTime = prevTime;
 				*upperBoundTime = prevTime;
@@ -469,8 +436,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			pVaryingValue->Release();
 			pVaryingValue = NULL;
 		}
-		else
-			RAISE(AAFRESULT_UNKNOWN_PARAMETER_CLASS);
+		// else assert bad parameter type!!!
 	}
 	XEXCEPT
 	{
@@ -480,6 +446,14 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 			pVaryingValue->Release();
 		if(theEnum)
 			theEnum->Release();
+		if(pLowerPoint)
+			pLowerPoint->Release();
+		if(pUpperPoint)
+			pUpperPoint->Release();
+		if(pTestPoint)
+			pTestPoint->Release();
+		if(pPrevPoint)
+			pPrevPoint->Release();
 	}
 	XEND;
 
