@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -38,13 +38,11 @@
 #include "ImplAAFTypeDefStrongObjRef.h"
 #endif
 
-#ifndef __ImplAAFHeader_h_
-#include "ImplAAFHeader.h"
-#endif
-
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
+#include "ImplAAFDictionary.h"
+
 
 #include <assert.h>
 #include <string.h>
@@ -65,12 +63,10 @@ ImplAAFTypeDefStrongObjRef::~ImplAAFTypeDefStrongObjRef ()
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStrongObjRef::pvtInitialize (
-      const aafUID_t *  pID,
-      const aafUID_t * pRefdObjID,
-      wchar_t *  pTypeName)
+      const aafUID_t & id,
+      const aafUID_t & refdObjID,
+      const aafCharacter * pTypeName)
 {
-  if (! pID)       return AAFRESULT_NULL_PARAM;
-  if (! pRefdObjID)  return AAFRESULT_NULL_PARAM;
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
@@ -78,9 +74,9 @@ AAFRESULT STDMETHODCALLTYPE
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _referencedType = *pRefdObjID;
+  _referencedType = refdObjID;
 
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
@@ -162,21 +158,15 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (! _cachedObjType)
 	{
-	  ImplAAFHeaderSP pHead;
 	  ImplAAFDictionarySP pDict;
 
 	  AAFRESULT hr;
-	  hr = MyHeadObject(&pHead);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pHead);
-	  hr = (pHead->GetDictionary(&pDict));
+	  hr = (GetDictionary(&pDict));
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (pDict);
 
-	  aafUID_t id = _referencedType;
-	  hr = pDict->LookupClass (&id, &_cachedObjType);
+	  hr = pDict->LookupClassDef (_referencedType, &_cachedObjType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedObjType);
