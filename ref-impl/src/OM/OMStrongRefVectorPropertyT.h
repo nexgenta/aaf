@@ -26,12 +26,15 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. |
+//         OMStrongReferenceVectorProperty
 #ifndef OMSTRONGREFVECTORPROPERTYT_H
 #define OMSTRONGREFVECTORPROPERTYT_H
 
 #include "OMAssertions.h"
 #include "OMStoredVectorIndex.h"
 #include "OMStrongReferenceVectorIter.h"
+#include "OMStoredObject.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -40,9 +43,7 @@ template <typename ReferencedObject>
 OMStrongReferenceVectorProperty<ReferencedObject>::
                  OMStrongReferenceVectorProperty(const OMPropertyId propertyId,
                                                  const wchar_t* name)
-: OMReferenceVectorProperty(propertyId,
-                            SF_STRONG_OBJECT_REFERENCE_VECTOR,
-                            name)
+: OMStrongReferenceVector(propertyId, name)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::"
                                             "OMStrongReferenceVectorProperty");
@@ -191,37 +192,6 @@ template <typename ReferencedObject>
 size_t OMStrongReferenceVectorProperty<ReferencedObject>::count(void) const
 {
   return _vector.count();
-}
-
-  // @mfunc Get the size of this <c OMStrongReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @parm The size of this <c OMStrongReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-void OMStrongReferenceVectorProperty<ReferencedObject>::getSize(
-                                                            size_t& size) const
-{
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMStrongReferenceVectorProperty<ReferencedObject>::count");
-
-  size = count();
-}
-
-  // @mfunc Get the size of this <c OMStrongReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @rdesc The size of this <c OMStrongReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-size_t OMStrongReferenceVectorProperty<ReferencedObject>::getSize(void) const
-{
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMStrongReferenceVectorProperty<ReferencedObject>::count");
-
-  return count();
 }
 
   // @mfunc Set the value of this <c OMStrongReferenceVectorProperty>
@@ -728,7 +698,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::removeProperty(void)
   //   @rdesc The size of the raw bits of this
   //          <c OMStrongReferenceVectorProperty> in bytes.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 size_t OMStrongReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::bitsSize");
@@ -746,7 +716,7 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
   //   @parm The address of the buffer into which the raw bits are copied.
   //   @parm size_t | size | The size of the buffer.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
                                                       OMByte* bits,
                                                       size_t ANAME(size)) const
@@ -777,7 +747,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
   //          <c OMStorable>.
   //   @parm The address of the buffer from which the raw bits are copied.
   //   @parm The size of the buffer.
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
                                                             const OMByte* bits,
                                                             size_t size)
@@ -865,6 +835,19 @@ OMStrongReferenceVectorProperty<ReferencedObject>::removeObject(
   ASSERT("Object is correct type", p != 0);
 
   removeValue(p);
+}
+
+  // @mfunc Remove all objects from this <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+template <typename ReferencedObject>
+void OMStrongReferenceVectorProperty<ReferencedObject>::removeAllObjects(void)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeAllObjects");
+
+  _vector.clear();
+  POSTCONDITION("All objects removed", count() == 0);
 }
 
   // @mfunc Create an <c OMReferenceContainerIterator> over this
