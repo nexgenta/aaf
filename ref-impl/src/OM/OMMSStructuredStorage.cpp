@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.cpp,v 1.15 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.cpp,v 1.16 2004/10/26 13:37:32 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -303,17 +303,19 @@ OMInt32 OMStgOpenStorageOnILockBytes(ILockBytes* plkbyt,
 
 //Below are the definititions for MS Strucutred Storage Library
 
-typedef unsigned int ULONG;     // 4 bytes
-typedef unsigned short USHORT;  // 2 bytes
-typedef short OFFSET;           // 2 bytes
-typedef ULONG SECT;             // 4 bytes
-typedef ULONG FSINDEX;          // 4 bytes
-typedef USHORT FSOFFSET;        // 2 bytes
-typedef USHORT WCHAR;           // 2 bytes
-typedef ULONG DFSIGNATURE;      // 4 bytes
+#if !defined(OM_OS_WINDOWS)
 typedef unsigned char BYTE;     // 1 byte
 typedef unsigned short WORD;    // 2 bytes
+typedef unsigned short USHORT;  // 2 bytes
+typedef unsigned int ULONG;     // 4 bytes
 typedef unsigned int DWORD;     // 4 bytes
+typedef USHORT WCHAR;           // 2 bytes
+typedef short OFFSET;           // 2 bytes
+typedef USHORT FSOFFSET;        // 2 bytes
+#endif
+typedef ULONG SECT;             // 4 bytes
+typedef ULONG FSINDEX;          // 4 bytes
+typedef ULONG DFSIGNATURE;      // 4 bytes
 typedef ULONG StrID;            // 4 bytes
 
 //FAT Entries
