@@ -127,6 +127,9 @@
  *		OM_ERR_NULL_SESSION -- No session was open.
  *		OM_ERR_SWAB -- Unable to byte swap the given data type.
  * 
+ * Any function may also return the following error codes:
+ *		OM_ERR_BENTO_PROBLEM -- Bento returned an error, check BentoErrorNumber.
+ * 
  * Accessor functions can also return the error codes below:
  *		OM_ERR_BAD_PROP -- aafProperty_t code was out of range.
  *		OM_ERR_OBJECT_SEMANTIC -- Failed a semantic check on an input obj
@@ -138,20 +141,66 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "AAFHeader.h"
 
 #if PORT_SYS_MAC
 #include <memory.h>		/* For AAFMalloc() and AAFFree() */
 #include <OSUtils.h>
+#else
+#if PORT_INC_NEEDS_SYSTIME
+#include <sys/time.h>
 #endif
-#ifdef _WIN32
+#endif
+#if PORT_INC_NEEDS_TIMEH
 #include <time.h>
 #endif
 
 //#include "omPublic.h"
 //#include "omPvt.h" 
-#include "Container.h"
+#include "Stubs.h"
 #include "AAFTypes.h"
 #include "AAFUtils.h"
+#include "AAFFile.h"
+#include "AAFObject.h"
+#if FULL_TOOLKIT
+#include "AAFCompositionMob.h"
+#include "AAFControlPoint.h"
+#include "AAFDataKind.h"
+#include "AAFPulldown.h"
+#include "AAFConstValue.h"
+#include "AAFEffect.h"
+#include "AAFEffectDef.h"
+#include "AAFSourceMob.h"
+#include "AAFFileMob.h"
+#include "AAFFilmMob.h"
+#include "AAFTapeMob.h"
+#include "AAFDOSLocator.h"
+#include "AAFMacLocator.h"
+#include "AAFWindowsLocator.h"
+#include "AAFTextLocator.h"
+#include "AAFNetworkLocator.h"
+#include "AAFUnixLocator.h"
+#include "AAFTapeMob.h"
+#include "AAFEdgecode.h"
+#include "AAFTimecode.h"
+#include "AAFSelector.h"
+#include "AAFSourceClip.h"
+#include "AAFMediaFileDescriptor.h"
+#include "AAFMediaTapeDescriptor.h"
+#include "AAFMediaFilmDescriptor.h"
+#include "AAFEffectSlot.h"
+#include "AAFFiller.h"
+#include "AAFMasterMob.h"
+#include "AAFMediaGroup.h"
+#include "AAFMobSlot.h"
+#include "AAFNestedScope.h"
+#include "AAFScopeRef.h"
+#include "AAFSequence.h"
+#include "AAFTransition.h"
+#include "AAFVaryValue.h"
+#include "AAFPrivate.h"
+#include "AAFTrackDesc.h"
+#endif
 #include "aafCvt.h"
 
 /* Moved math.h down here to make NEXT's compiler happy */
@@ -167,28 +216,86 @@
 
 static aafBool  InitCalled = AAFFalse;
 
-const aafProductVersion_t AAFReferenceImplementationVersion = {1, 0, 0, 1, kVersionBeta};
-
-
-aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
-{
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
-}
+const aafProductVersion_t AAFToolkitVersion = {2, 1, 0, 1, kVersionBeta};
 
 static aafInt32 powi(
 			aafInt32	base,
 			aafInt32	exponent);
-
-double FloatFromRational(
-			aafRational_t	e);		/* IN - Convert this into a double */
-aafRational_t RationalFromFloat(
-			double	f);		/* IN - Convert this number into a rational */
 
 	/************************************************************
 	 *
 	 * Public Functions (Part of the toolkit API)
 	 *
 	 *************************************************************/
+
+
+/************************
+ * Function: AAFMalloc
+ *
+ * 		Allocates a block of memory of a given size.  Having this
+ *		function separate from ANSI malloc works better on the
+ *		Mac, and allows for memory leak tracking.
+ *
+ * Argument Notes:
+ *		<none>.
+ *
+ * ReturnValue:
+ *		Returns a pointer to a block of memory on the heap, or
+ *		NULL if there is no block of that size available.
+ *
+ * Possible Errors:
+ *		NULL -- No memory available.
+ */
+void *AAFMalloc(
+			size_t size)	/* Allocate this many bytes */
+{
+//	return(omOptMalloc(NULL, size)); !!! Need a solution here
+// This should eventually call the same place as the optimized routines
+// eventuall call
+
+#if PORT_SYS_MAC
+	return (NewPtr(size));
+#else
+#if XPDEBUG
+	if (size == 140)
+	  {
+		printf("Size == 140\n");
+	  }
+#endif
+	return ((void *) malloc((size_t) size));
+#endif
+}
+
+/************************
+ * Function: AAFFree
+ *
+ * 	Frees a given block of memory allocated by AAFMalloc. Having this
+ *		function separate from ANSI free() works better on the Mac, and
+ *		allows for memory leak tracking.
+ *
+ * Argument Notes:
+ *		Make sure that the pointer given was really allocated
+ *		by AAFMalloc, just as for ANSI malloc.
+ *
+ * ReturnValue:
+ *		<none>
+ *
+ * Possible Errors:
+ *		<none known>
+ */
+void AAFFree(
+			void *ptr)	/* Free up this buffer */
+{
+//	omOptFree(NULL, ptr);!!! Need a solution here
+// This should eventually call the same place as the optimized routines
+// eventuall call
+
+#if PORT_SYS_MAC
+	DisposPtr((Ptr) ptr);
+#else
+	free((void *) ptr);
+#endif
+}
 
 /*************************************************************************
  * Private Function: isObjFunc() and set1xEditrate()
@@ -234,12 +341,13 @@ aafBool isObjFunc(AAFFile * file,       /* IN - File Handle */
  * Possible Errors:
  *		Standard errors (see top of file).
  */
+#if FULL_TOOLKIT
 void AAFGetDateTime(aafTimeStamp_t *time)
 {
-#if defined(_MAC) || defined(macintosh)
+#if PORT_SYS_MAC
 	GetDateTime(&(time->TimeVal));
 	time->IsGMT = FALSE;
-#elif  defined(_WIN32)
+#elif  PORT_INC_NEEDS_TIMEH
 	time->TimeVal = (long) clock();
 	time->IsGMT = FALSE;
 #else
@@ -253,7 +361,9 @@ void AAFGetDateTime(aafTimeStamp_t *time)
 	}
 #endif
 }
+#endif
 
+#if FULL_TOOLKIT
 aafErr_t AAFConvertEditRate(
 	aafRational_t srcRate,        /* IN - Source Edit Rate */
 	aafPosition_t srcPosition,    /* IN - Source Position */
@@ -264,7 +374,7 @@ aafErr_t AAFConvertEditRate(
 	aafInt64		intPos, destPos;
 	aafInt32		remainder;
 		
-	XPROTECT()
+	XPROTECT(NULL)
 	{
 		CvtInt32toInt64(0, destPosition);
 		if ((howRound != kRoundCeiling) && (howRound != kRoundFloor))
@@ -315,6 +425,7 @@ aafErr_t AAFConvertEditRate(
 
 	return(OM_ERR_NONE);
 }
+#endif
 
 /************************
  * Function: FloatFromRational (INTERNAL)
@@ -422,127 +533,6 @@ static aafInt32 powi(
 	}
 }
 
-#if defined(_MAC) || defined(macintosh)
-#include <OSUtils.h>
-#include <events.h>
-#elif defined(_WIN32)
-#include <time.h>
-#define HZ CLK_TCK
-#endif
-
-/*
- * Doug Cooper - 04-04-96
- * Added proper includes for NeXTStep to define HZ:
- */
-//#ifdef NEXT
-//#include <architecture/ARCH_INCLUDE.h>
-//#import ARCH_INCLUDE(bsd/, param.h)
-//#endif
-
-//#if defined(PORTKEY_OS_UNIX) || defined(PORTKEY_OS_ULTRIX)
-//#if PORT_INC_NEEDS_SYSTIME
-//#include <sys/time.h>
-//#include <sys/times.h>
-//#endif
-//#include <sys/param.h>
-//#endif
-//
-//#ifdef sun
-//#include <sys/resource.h>
-//#endif
-
-/*************************************************************************
- * Function: omfiMobIDNew()
- *
- *      This function can be used to create a new mob ID.  The mob ID
- *      consists of the company specific prefix specified when 
- *      omfsBeginSession() is called.  The major number is the time of day,
- *      and the minor number is the accumulated cpu cycles of the
- *      application.
- *
- *      This function supports both 1.x and 2.x files.
- *
- * Argument Notes:
- *
- * ReturnValue:
- *		Error code (see below).
- *
- * Possible Errors:
- *		Standard errors (see top of file).
- *************************************************************************/
-
-struct SMPTELabel
-{
-	aafUInt32	MobIDMajor;
-	aafUInt32	MobIDMinor;
-	aafUInt8	oid;
-	aafUInt8	size;
-	aafUInt8	ulcode;
-	aafUInt8	SMPTE;
-	aafUInt8	Registry;
-	aafUInt8	unused;
-	aafUInt16	MobIDPrefix;
-};
-
-union label
-{
-	aafUID_t			guid;
-	struct SMPTELabel	smpte;
-};
-
-AAFRESULT aafMobIDNew(
-        aafUID_t *mobID)     /* OUT - Newly created Mob ID */
-{
-	union label		aLabel;
-	static aafUInt32 last_part2 = 0;		// Get rid of this!!!
-//#ifdef sun
-//	struct rusage rusage_struct;
-//	int status;
-//#endif
-	aafTimeStamp_t	timestamp;
-	
-	aLabel.smpte.oid = 0x06;
-	aLabel.smpte.size = 0x0E;
-	aLabel.smpte.ulcode = 0x2B;
-	aLabel.smpte.SMPTE = 0x34;
-	aLabel.smpte.Registry = 0x02;
-	aLabel.smpte.unused = 0;
-	aLabel.smpte.MobIDPrefix = 42;		// Means its an OMF Uid
-
-	AAFGetDateTime(&timestamp);
-	aLabel.smpte.MobIDMajor = timestamp.TimeVal;
-#if defined(_MAC) || defined(macintosh)
-	aLabel.smpte.MobIDMinor = TickCount();
-#else
-#ifdef _WIN32
-	aLabel.smpte.MobIDMinor = ((unsigned long)(time(NULL)*60/CLK_TCK));
-#else 
-//#if defined(sun)
-//	status = getrusage(RUSAGE_SELF, &rusage_struct);
-//
-//	/* On the Sun, add system and user time */
-//	label.smpte.MobIDMminor = rusage_struct.ru_utime.tv_sec*60 + 
-//	      rusage_struct.ru_utime.tv_usec*60/1000000 +
-//		  rusage_struct.ru_stime.tv_sec*60 +
-//		  rusage_struct.ru_stime.tv_usec*60/1000000;
-//#else
-	{
-	  static struct tms timebuf;
-	  aLabel.smpte.MobIDMminor = ((unsigned long)(times(&timebuf)*60/HZ));
-	}	
-//#endif
-#endif
-#endif
-
-	if (last_part2 >= aLabel.smpte.MobIDMinor)
-	  aLabel.smpte.MobIDMinor = last_part2 + 1;
-		
-	last_part2 = aLabel.smpte.MobIDMinor;
-
-	*mobID = aLabel.guid;
-	return(OM_ERR_NONE);
-}
-
 #if 0	//!!! Add functions from the end of the file as needed 
 
 
@@ -593,6 +583,16 @@ aafErr_t omfsSetProgressCallback(
 
 
 
+aafInt32 GetBentoID(
+			aafHdl_t file,		/* IN -- For this aaf file */
+			aafObject_t obj)	/* IN -- return objectID for this object */
+{
+	aafAssertValidFHdl(file);
+	aafAssertIsAAF(file);
+	aafAssert((obj != NULL), file, OM_ERR_NULLOBJECT);
+}
+
+
 /************************
  * Function: omfsInit	(INTERNAL)
  *
@@ -622,8 +622,224 @@ aafErr_t omfsInit(
 
 	return (OM_ERR_NONE);
 }
+
+/************************
+ * Function: clearBentoErrors	(INTERNAL)
+ *
+ * 		Internal function to reset error information at the start of a toolkit
+ *		call to avoid passing back stale information.  Toolkit functions should
+ *		immediately return on error without calling other functions to avoid clearing
+ *		state.
+ *
+ * Argument Notes:
+ *		See argument comments and assertions.
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard assertions.  See top of the file.
+ */
+aafErr_t clearBentoErrors(
+			aafHdl_t file)	/* IN -- For this aaf file */
+{
+	if (file != NULL)
+	{
+		if(file->cookie != FILE_COOKIE)
+			return(OM_ERR_BAD_FHDL);
+		
+		file->BentoErrorNumber = 0;
+		file->BentoErrorRaised = FALSE;
+		if(file->session != NULL)
+		{
+			file->session->BentoErrorNumber = 0;
+			file->session->BentoErrorRaised = FALSE;
+		}
+	}
+
+	return (OM_ERR_NONE);
+}
+
+
+
+#ifdef VIRTUAL_BENTO_OBJECTS
+/*------------------------------------------------------------------------------*
+ | omfsPurgeObject - Flush the property & value data if it has not been touched |
+ *------------------------------------------------------------------------------*
+ 
+ If an object has not been touched, flush the property & value data.  If the object
+ is accessed again, then this information will be reloaded from the file.  This
+ function should be called when a program is REASONABLY sure that it will not need
+ to access an object again.
+*/
+
+aafErr_t Purge(
+			aafHdl_t				file,				/* IN -- For this aaf file */
+			aafObject_t			anObject)		/* IN -- see if this object */
+{
+	OMLPurgeObjectVM((OMLObject)anObject);
+	return(OM_ERR_NONE);
+}
+#endif
 #endif
 
+#if 0
+AAFObject *AAFNewClassFromContainerObj(AAFFile *file, OMLObject obj)
+{
+	OMLProperty      cprop;
+	OMLType          ctype;
+	OMLValue			val;
+	aafPosition_t	zero;
+	aafLength_t		idSize;
+	aafProperty_t 	idProp;
+	aafType_t 		idType;
+	aafClassID_t	objClass;
+	OMContainer	*container;
+	AAFHeader		*head;
+		
+	file->GetHeadObject(&head);
+	CvtInt32toPosition(0, zero);
+	CvtInt32toLength(4, idSize);
+	{
+		idProp = OMOOBJObjClass;
+		idType = OMClassID;
+	}
+
+	cprop = head->CvtPropertyToBento(idProp);
+	ctype = head->CvtTypeToBento(idType, NULL);
+	container = file->GetContainer();
+	
+	val = container->OMLUseValue(obj, cprop, ctype);
+//!!!	if (file->ContainerErrorRaised())
+//!!!		RAISE(OM_ERR_BENTO_PROBLEM);
+
+	(void)container->OMLReadValueData(val, (OMLPtr)objClass, zero, idSize);
+	return(AAFNewClassFromClassID(file, objClass, obj));
+}
+
+AAFObject *AAFNewClassFromClassID(AAFFile *file, char *classID, OMLObject obj)
+{
+	AAFObject	*result;
+	
+/*	if(strncmp(classID, "AIFC",4) == 0)
+		result = new AAFAIFCData(file, obj);
+	else if(strncmp(classID, "AIFD",4) == 0)
+		result = new AAFAIFCDescriptor(file, obj);
+	else if(strncmp(classID, "CLSD",4) == 0)
+		result = new AAFClassDictionary(file, obj);
+	else if(strncmp(classID, "CDCI",4) == 0)
+		result = new AAFCDCIDescriptor(file, obj);
+	else */
+	/* Skip abstract class CPNT */
+#if FULL_TOOLKIT
+	if(strncmp(classID, "CMOB",4) == 0)
+		result = new AAFCompMob(file, obj);
+	else if(strncmp(classID, "CVAL",4) == 0)
+		result = new AAFConstValue(file, obj);
+	else if(strncmp(classID, "CTLP",4) == 0)
+		result = new AAFControlPoint(file, obj);
+	else if(strncmp(classID, "DDEF",4) == 0)
+		result = new AAFDataKind(file, obj);
+	else
+	/*if(strncmp(classID, "DIDD",4) == 0)
+		result = new AAF(file, obj);
+	else */
+	if(strncmp(classID, "DOSL",4) == 0)
+		result = new AAFDOSLocator(file, obj);
+	else if(strncmp(classID, "ECCP",4) == 0)
+		result = new AAFEdgecode(file, obj);
+	/* Skip ERAT */
+	else if(strncmp(classID, "EDEF",4) == 0)
+		result = new AAFEffectDef(file, obj);
+	else if(strncmp(classID, "EFFE",4) == 0)
+		result = new AAFEffect(file, obj);
+	else if(strncmp(classID, "ESLT",4) == 0)
+		result = new AAFEffectSlot(file, obj);
+	else if(strncmp(classID, "FILL",4) == 0)
+		result = new AAFFiller(file, obj);
+	/* Skip HEAD, IDAT, JPEG for the moment */
+	/* Skip LOCR, as it's an abstract class */
+	else if(strncmp(classID, "JPED",4) == 0)
+		result = new AAFMediaFileDescriptor(file, obj);	//!!! Fix this!
+	else if(strncmp(classID, "MACL",4) == 0)
+		result = new AAFMacLocator(file, obj);
+	else if(strncmp(classID, "MMOB",4) == 0)
+		result = new AAFMasterMob(file, obj);
+	/* Skip MDAT for the moment */
+	/* Skip MDES, as it's an abstract class */
+	else if(strncmp(classID, "MDFL",4) == 0)
+		result = new AAFMediaFileDescriptor(file, obj);
+	else if(strncmp(classID, "MDFM",4) == 0)
+		result = new AAFMediaFilmDescriptor(file, obj);	//!!! Fix this!
+	else if(strncmp(classID, "MGRP",4) == 0)
+		result = new AAFMediaGroup(file, obj);
+	else if(strncmp(classID, "MDTP",4) == 0)
+		result = new AAFMediaTapeDescriptor(file, obj);
+	/* Skip MOBJ, as it's an abstract class */
+	else if(strncmp(classID, "MSLT",4) == 0)
+		result = new AAFMobSlot(file, obj);
+	else if(strncmp(classID, "NEST",4) == 0)
+		result = new AAFNestedScope(file, obj);
+	/* Skip OOBJ, as it's an abstract class */
+	/* Skip RGBA for the moment */
+	else if(strncmp(classID, "PDWN",4) == 0)
+		result = new AAFPulldown(file, obj);
+	else if(strncmp(classID, "SREF",4) == 0)
+		result = new AAFScopeRef(file, obj);
+	else if(strncmp(classID, "SEGM",4) == 0)
+		result = new AAFSegment(file, obj);
+	else if(strncmp(classID, "SLCT",4) == 0)
+		result = new AAFSelector(file, obj);
+	else if(strncmp(classID, "SEQU",4) == 0)
+		result = new AAFSequence(file, obj);
+	else if(strncmp(classID, "SCLP",4) == 0)
+		result = new AAFSourceClip(file, obj);
+	else if(strncmp(classID, "SMOB",4) == 0)
+	{
+		AAFSourceMob		*tmp;
+		AAFMediaDescriptor	*mdes;
+		aafErr_t			aafError;
+		aafClassID_t		objClass;
+		
+		tmp = new AAFSourceMob(file, obj);
+		tmp->Load(file);
+		tmp->GetMediaDescription(&mdes);
+		mdes->Load(file);
+		(void)mdes->ReadClassID(OMOOBJObjClass, objClass);
+		if(mdes->IsTypeOf("MDFL", &aafError))
+			result = new AAFFileMob(file, obj, objClass);
+		else if(mdes->IsTypeOf("MDFM", &aafError))
+			result = new AAFFilmMob(file, obj);
+		else if(mdes->IsTypeOf("MDTP", &aafError))
+			result = new AAFTapeMob(file, obj);
+		else
+			result = new AAFSourceMob(file, NULL, objClass, PT_NULL);
+		delete tmp;
+	}
+	else if(strncmp(classID, "TXTL",4) == 0)
+		result = new AAFTextLocator(file, obj);
+	/* Skip TIFF, TIFD for the moment */
+	else if(strncmp(classID, "TCCP",4) == 0)
+		result = new AAFTimecode(file, obj);
+	else if(strncmp(classID, "TRKD",4) == 0)
+		result = new AAFTrackDescriptor(file, obj);
+	else if(strncmp(classID, "TRAN",4) == 0)
+		result = new AAFTransition(file, obj);
+	else if(strncmp(classID, "UNXL",4) == 0)
+		result = new AAFUnixLocator(file, obj);
+	else if(strncmp(classID, "VVAL",4) == 0)
+		result = new AAFVaryValue(file, obj);
+	/* Skip WAVE, WAVD for the moment */
+	else
+#endif
+		result = new AAFObject(file, obj);
+		
+	if(obj == NULL)
+		result->CreatePersistant(file, classID);
+		
+	return(result);
+}
+#endif
 
 typedef struct
 	{
