@@ -10,7 +10,7 @@ AAFSourceReference\
 AD_HEAD
 AD_IDL(//
 // The IAAFSourceClip interface is implemented by objects that
-// reference the content data and identify the source of the content
+// represent the content data and identify the source of the content
 // data.
 //
 // In addition to the specific error results listed for each method\,
@@ -20,14 +20,18 @@ AD_IDL(//
 // AAFRESULT_NOMEMORY
 //   - insufficient system memory is available to perform the
 //     operation.
+//
+// AAFRESULT_NOT_INITIALIZED
+//   - This object has not yet had Initialize\(\) called on it through
+//     this object's primary interface.
 //)
 AD_FORWARD_DECLARATION(AAFDataDef)
 AD_FORWARD_DECLARATION(AAFMob)
 AD_CLASS_UUID(38e6f8a5, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(38e6f8a7, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
-AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_XMETHOD3(Initialize,
+AD_CLASS_BEGIN
+AD_XMETHOD3(InitializeSourceClip,
 			[in],
 				objPass,
 				aafUID_t *,
@@ -47,9 +51,7 @@ AD_XMETHOD3(Initialize,
   // the given properties.  Only required properties are set.
   // Optional properties are added with separate functions.
   //
-  // Succeds if:
-  // - This object has not already been Initialize\(\)d.
-  // - all pDataDef and pLength are valid pointers.
+  // this function only fails if any of the arguments is missing.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -57,9 +59,6 @@ AD_XMETHOD3(Initialize,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize\(\) has already been called on this object.
   //
   // AAFRESULT_NULL_PARAM
   //   - any arg is NULL.)
@@ -108,7 +107,6 @@ AD_XMETHOD6(GetFade,
   // rate.
   //
   // Succeeds if all of the following are true:
-  // - This object has already been Initialize\(\)d.
   // - the all argument pointers are valid.
   // 
   // If this method fails nothing will be written to any of the
@@ -120,9 +118,6 @@ AD_XMETHOD6(GetFade,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - any argument is NULL.)
@@ -141,7 +136,6 @@ AD_XMETHOD1(ResolveRef,
   // The returned mob is AddRef\(\)ed before it is returned.
   //
   // Succeeds if all of the following are true:
-  // - This object has already been Initialize\(\)d.
   // - the ppMob pointer is valid.
   // 
   // If this method fails nothing will be written to *ppMob.
@@ -152,9 +146,6 @@ AD_XMETHOD1(ResolveRef,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - ppMob arg is NULL.
@@ -176,7 +167,6 @@ AD_XMETHOD1(GetSourceReference,
   // reference" are sourceID\, sourceTrackID\, and startTime.
   //
   // Succeeds if all of the following are true:
-  // - This object has already been Initialize\(\)d.
   // - the pSourceRef pointer is valid.
   // 
   // If this method fails nothing will be written to *pSourceRef.
@@ -187,9 +177,6 @@ AD_XMETHOD1(GetSourceReference,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - pSourceRef arg is NULL.)
@@ -219,22 +206,18 @@ AD_XMETHOD4(SetFade,
 
   // This function sets the optional fade properties on this source
   // clip object.  The fade properties only apply to a source clip of
-  // data definition \(or convertible to a data definition\) of type Sound. All
+  // datakind \(or convertible to a datakind\) of type Sound. All
   // arguments should be specified.  Length units are specified by the
   // containing mob slot's edit rate.
   // 
-  // Succeeds if all of the following are true:
-  // - This object has already been Initialize\(\)d.
+  // Always succeeds.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.)
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_METHOD1(SetSourceReference,
@@ -248,16 +231,12 @@ AD_METHOD1(SetSourceReference,
   // Note: the  3 properties of a source Clip that make up the "source
   // reference" are sourceID\\\, sourceTrackID\\\, and startTime.
   // 
-  // Succeeds if all of the following are true:
-  // - This object has already been Initialize\\\(\\\)d.
+  // Always succeeds.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\\\, it will return the first one
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \\\(This is the only code indicating success.\\\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\\\(\\\) called on it.)
-AD_XCLASS_END(Concrete, StoredObject)
+  //   - succeeded.  \\\(This is the only code indicating success.\\\))
+AD_CLASS_END

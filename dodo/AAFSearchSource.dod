@@ -3,15 +3,30 @@ AAFSearchSource\
 #endm
 #c
 AD_HEAD
+AD_IDL(//
+// The IAAFSearchSource interface is used to return source information
+// for some mob slots.
+//
+// In addition to the specific error results listed for each method\,
+// all methods in this interface may also return one of the following
+// values:
+// 
+// AAFRESULT_NOMEMORY
+//   - insufficient system memory is available to perform the
+//     operation.
+//
+// AAFRESULT_NOT_INITIALIZED
+//   - This object has not yet had Initialize\(\) called on it through
+//     this object's primary interface.
+//)
 AD_DEFAULT_UUID(332CBDD0, 5425, 11D2, AA, 7A, 10, 00, 3D, 00, 00, 00)
 AD_CLASS_BEGIN
-
 AD_XMETHOD7(SearchSource,
 			[in],
 			  objPass,
-			  aafTrackID_t,
-			  trackID,
-			  Track ID,
+			  aafSlotID_t,
+			  slotID,
+			  Slot ID,
 			[in],
 			  objPass,
 			  aafPosition_t,
@@ -42,14 +57,17 @@ AD_XMETHOD7(SearchSource,
 			  AAFFindSourceInfo,
 			  ppSourceInfo,
 			  Source Information,
-			This function returns the source information for a track in a
+			This function returns the source information for a slot in a
   // Master Mob or Source Mob.  It follows the Source Clip references
-  // in the specified track until it encounters the kind of Mob
+  // in the specified slot until it encounters the kind of Mob
   // specified in the mobKind parameter.  This function cannot be used
   // on a Composition Mob and is not intended to be called
-  // iteratively; use the omfiMobOpenSearch\, omfiMobGetNextSource\,
-  // omfiMobGetThisSource\, and omfiMobCloseSearch functions for those
+  // iteratively; use the MobOpenSearch\, MobGetNextSource\,
+  // MobGetThisSource\, and MobCloseSearch functions for those
   // purposes. 
+  //
+  // The returned component and find source info are AddRef\(\)ed
+  // before they are returned.
   //
   // Succeeds if all of the following are true:
   // - the ppThisCpnt pointer is valid.
