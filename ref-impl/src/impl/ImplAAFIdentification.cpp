@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFIdentification.cpp,v 1.49 2004/10/27 14:07:20 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFIdentification.cpp,v 1.50 2005/02/25 15:55:11 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,15 +65,7 @@ ImplAAFIdentification::ImplAAFIdentification():
   _persistentProperties.put(   _platform.address());
   _persistentProperties.put(_generation.address());
 
-  
-#if defined( OS_WINDOWS )
-  _platform = L"Win32";
-#elif defined( OS_UNIX )
-  _platform = L"Unix";
-#else
-  _platform = L"Unknown";
-#endif
-
+  _platform = L"AAFSDK (" PLATFORM_NAME L")";
 }
 
 
