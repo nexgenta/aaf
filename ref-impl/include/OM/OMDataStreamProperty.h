@@ -49,7 +49,7 @@ public:
   virtual ~OMDataStreamProperty(void);
 
     // @cmember Save this <c OMDataStreamProperty>.
-  virtual void save(void) const;
+  virtual void save(void* clientContext) const;
 
     // @cmember Restore this <c OMDataStreamProperty>, the size of the
     //          <c OMDataStreamProperty> is <p size>.
@@ -72,7 +72,7 @@ public:
 
     // @cmember Set the current position for <f read()> and <f write()>, as an
     //          offset in bytes from the begining of the data stream.
-  void setPosition(const OMUInt64 offset);
+  void setPosition(const OMUInt64 offset) const;
 
     // @cmember Attempt to read the number of bytes given by <p bytes>
     //          from the data stream into the buffer at address
