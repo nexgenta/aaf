@@ -1,5 +1,5 @@
 #startm .this-module 0
-AAFControlCodeDef\
+AAFParameterDef\
 #endm
 #c
 #startm .parent-module 0
@@ -19,6 +19,11 @@ AD_FORWARD_DECLARATION(EnumAAFReferenceValues)
 * Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
+
+ 
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
 
 
 AD_CLASS_UUID(20045fa2, 1d87, 11d2, bf, 96, 00, 60, 97, 11, 62, 12) 
