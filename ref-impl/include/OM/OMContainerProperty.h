@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,8 +29,6 @@
 #ifndef OMCONTAINERPROPERTY_H
 #define OMCONTAINERPROPERTY_H
 
-#include "OMProperty.h"
-
   // @class Abstract base class for persistent container properties
   //        supported by the Object Manager.
   //   @tcarg class | ReferencedObject | The type of the referenced
@@ -44,33 +42,18 @@ public:
 
     // @cmember Constructor.
   OMContainerProperty(const OMPropertyId propertyId,
-                      const OMStoredForm storedForm,
-                      const wchar_t* name);
+                      const int storedForm,
+                      const char* name);
 
     // @cmember Destructor.
   virtual ~OMContainerProperty(void);
-
-    // @cmember Insert <p object> into this <c OMContainerProperty>.
-  virtual void insert(const ReferencedObject* object) = 0;
-
-    // @cmember Does this <c OMContainerProperty> contain <p object> ?
-  virtual bool containsValue(const ReferencedObject* object) const = 0;
-
-    // @cmember The number of <p ReferencedObject>s in this
-    //          <c OMContainerProperty>. <mf OMContainerProperty::count>
-    //          returns the actual number of <p ReferencedObject>s in the
-    //          <c OMContainerProperty>.
-  virtual size_t count(void) const = 0;
-
-    // @cmember Remove <p object> from this <c OMContainerProperty>.
-  virtual void removeValue(const ReferencedObject* object) = 0;
 
 protected:
   // @access Protected members.
 
     // @cmember Compute the name of an element in this <c OMContainter>
     //          given the element's <p localKey>.
-  wchar_t* elementName(OMUInt32 localKey);
+  char* elementName(OMUInt32 localKey);
 
     // @cmember Obtain the next available local key.
   OMUInt32 nextLocalKey(void);
@@ -82,12 +65,10 @@ protected:
     //          local key assignment.
   void setLocalKey(OMUInt32 newLocalKey);
 
-  virtual const wchar_t* storedName(void) const;
-
 private:
   // @access Private members.
 
-    // @cmember The next available local key.
+    // @cmember The next avaliable local key.
     //
   OMUInt32 _localKey;
 
