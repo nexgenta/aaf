@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSoundDescriptor.cpp,v 1.1.2.3 2004/07/02 16:24:48 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFSoundDescriptor.cpp,v 1.1.2.4 2004/07/05 15:21:37 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 
 ImplAAFSoundDescriptor::ImplAAFSoundDescriptor() :
 
-    _compression(       PID_SoundDescriptor_SoundCompression,        L"SoundCompression"),
+    _compression(       PID_SoundDescriptor_Compression,        L"Compression"),
     _channels(          PID_SoundDescriptor_Channels,           L"Channels"),
     _audioSamplingRate( PID_SoundDescriptor_AudioSamplingRate,  L"AudioSamplingRate"),
     _locked(            PID_SoundDescriptor_Locked,             L"Locked"),

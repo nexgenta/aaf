@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.10 2004/07/02 16:23:52 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.11 2004/07/05 15:20:19 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -199,7 +199,7 @@ const int PID_SoundDescriptor_ElectroSpatial                     = 0x3D05;
 const int PID_SoundDescriptor_Channels                           = 0x3D07;
 const int PID_SoundDescriptor_QuantizationBits                   = 0x3D01;
 const int PID_SoundDescriptor_DialNorm                           = 0x3D0C;
-const int PID_SoundDescriptor_SoundCompression                   = 0x3D06;
+const int PID_SoundDescriptor_Compression                        = 0x3D06;
 const int PID_PCMDescriptor_BlockAlign                           = 0x3D0A;
 const int PID_PCMDescriptor_SequenceOffset                       = 0x3D0B;
 const int PID_PCMDescriptor_AverageBPS                           = 0x3D09;
@@ -269,7 +269,7 @@ const int PID_Mob_UsageCode                                      = 0x4408;
 const int PID_CompositionMob_DefaultFadeLength                   = 0x4501;
 const int PID_CompositionMob_DefFadeType                         = 0x4502;
 const int PID_CompositionMob_DefFadeEditUnit                     = 0x4503;
-const int PID_CompositionMob_CompositionRendering                = 0x4504;
+const int PID_CompositionMob_Rendering                           = 0x4504;
 const int PID_SourceMob_EssenceDescription                       = 0x4701;
 const int PID_MobSlot_SlotID                                     = 0x4801;
 const int PID_MobSlot_SlotName                                   = 0x4802;

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.9 2004/07/02 16:23:52 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.10 2004/07/05 15:20:19 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -670,7 +670,7 @@ const aafUID_t kAAFPropID_SoundDescriptor_DialNorm =
 {0x04020701, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
 
 //{04020402-0000-0000-060e-2b3401010102}
-const aafUID_t kAAFPropID_SoundDescriptor_SoundCompression =
+const aafUID_t kAAFPropID_SoundDescriptor_Compression =
 {0x04020402, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
 
 //{04020302-0100-0000-060e-2b3401010105}
@@ -950,7 +950,7 @@ const aafUID_t kAAFPropID_CompositionMob_DefFadeEditUnit =
 {0x05300403, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
 
 //{06010104-010a-0000-060e-2b3401010108}
-const aafUID_t kAAFPropID_CompositionMob_CompositionRendering =
+const aafUID_t kAAFPropID_CompositionMob_Rendering =
 {0x06010104, 0x010a, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x08}};
 
 //{06010104-0203-0000-060e-2b3401010102}
