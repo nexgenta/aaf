@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,12 +29,6 @@
 #ifndef OMREDBLACKTREE_H
 #define OMREDBLACKTREE_H
 
-#if defined (_MSC_VER)
-  // - 'identifier' : identifier was truncated to 'number' characters in
-  //   the debug information
-#pragma warning(disable:4786) // Gak !
-#endif
-
 #include "OMAssertions.h"
 #include <stddef.h>
 
@@ -45,12 +39,11 @@ class OMRedBlackTreeIterator;
   //        balanced binary search tree providing O(lg N) performance
   //        for the dynamic set operations. Items in the tree are
   //        uniquely identified by key and carry an associated value.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
   //          <c OMRedBlackTree> item. This type must support operator =.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Key, typename Value>
 class OMRedBlackTree {
 public:
@@ -64,9 +57,6 @@ public:
 
     // @cmember Insert the <p Value> <p v> into this
     //          <c OMRedBlackTree> and associate it with <p Key> <p k>.
-    //          If this the first instance of an item identified
-    //          by <p Key> <p k> in this <c OMRedBlackTree>, the result
-    //          is true, otherwise the result is false.
   bool insert(const Key k, Value v);
 
     // @cmember Find the item in this <c OMRedBlackTree> identified
@@ -134,7 +124,7 @@ private:
   void leftRotate(Node* n);
 
   void rightRotate(Node* n);
-
+ 
   void rebalance(Node* x);
 
   void traverseInOrder(
