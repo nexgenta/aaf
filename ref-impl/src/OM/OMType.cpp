@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMType.cpp,v 1.12 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMType.cpp,v 1.13 2004/09/28 14:42:38 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,8 +24,6 @@
 
 // @doc OMEXTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMType
-
-// define OM_PERMIT_ZERO_LENGTH to eliminate debug check for zero-length properties on read
 
 #include "OMType.h"
 
@@ -164,10 +162,7 @@ void OMType::copy(const OMByte* inputBytes,
   TRACE("OMType::copy");
   PRECONDITION("Valid input bytes", inputBytes != 0);
   PRECONDITION("Valid output bytes", outputBytes != 0);
-
-#ifndef OM_PERMIT_ZERO_LENGTH
   PRECONDITION("Valid buffer size", bytesSize > 0);
-#endif
 
   const OMByte* ip = inputBytes;
   OMByte* op = outputBytes;

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9 2004/09/28 14:42:38 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,8 +26,6 @@ PACKAGE = ref-impl
 export PACKAGE
 
 AAFBASE ?= ../../..
-
-CFLAGS = -DOM_KLUDGE_TYPEDEFRECORD
 
 
 # Common definitions

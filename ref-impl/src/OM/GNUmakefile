@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.13 2004/09/28 12:02:41 phil_tudor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.14 2004/09/28 14:42:26 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -58,7 +58,7 @@ CXXOBJS:=$(filter-out %/OMGSFStructuredStorage.o,$(CXXOBJS))
 CXXOBJS:=$(filter-out %/OMGSF_SSStoredObjectFactory.o,$(CXXOBJS))
 endif
 
-CFLAGS += -DOM_PERMIT_ZERO_LENGTH -DOM_STACK_TRACE_ON_ASSERT
+CFLAGS += -DOM_STACK_TRACE_ON_ASSERT
 
 
 .PHONY : all

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStoredPropertySetIndex.cpp,v 1.30 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStoredPropertySetIndex.cpp,v 1.31 2004/09/28 14:42:38 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,8 +25,6 @@
 // @doc OMINTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. |
 //         OMStoredPropertySetIndex
-
-// define OM_PERMIT_ZERO_LENGTH to eliminate debug check for zero-length properties on read
 
 
 #include "OMStoredPropertySetIndex.h"
@@ -174,12 +172,10 @@ bool OMStoredPropertySetIndex::isValid(OMPropertyOffset baseOffset) const
     currentOffset = _index[i]._offset;
     currentLength = _index[i]._length;
 
-#ifdef OM_PERMIT_ZERO_LENGTH
     if (currentLength == 0) {
       result = false; // entry has invalid length
       break;
     }
-#endif
 
     if (currentOffset != position) {
       result = false;  // gap or overlap
