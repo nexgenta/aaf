@@ -10,6 +10,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -311,6 +312,13 @@ public:
 
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFSourceMob)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFSourceMobTest.cpp.
+  static AAFRESULT test();
 
   // SDK Internal
   virtual AAFRESULT ReconcileMobLength(void);
