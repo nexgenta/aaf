@@ -1,24 +1,8 @@
-###############################################################################
-#
-# The contents of this file are subject to the AAF SDK Public
-# Source License Agreement (the "License"); You may not use this file
-# except in compliance with the License.  The License is available in
-# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-# Association or its successor.
-# 
-# Software distributed under the License is distributed on an "AS IS"
-# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-# the License for the specific language governing rights and limitations
-# under the License.
-# 
-# The Original Code of this file is Copyright 1998-2001, Licensor of the
-# AAF Association.
-# 
-# The Initial Developer of the Original Code of this file and the
-# Licensor of the AAF Association is Avid Technology.
-# All rights reserved.
-#
-###############################################################################
+############################################
+#                                          #
+# Copyright (c) 1998 Avid Technology, Inc. #
+#                                          #
+############################################
 
 all : depend.mk
 
@@ -32,26 +16,86 @@ include $(BLD_CFG_DIR)/common.mk
 include aafobjects.mk
 
 
-depend.mk : aafobjects.mk GenDepend.sh
-	@ $(ECHO) Creating depend.tmp ...
-	@ $(RM) -f depend.tmp
-	$(ECHO) Doing first depend step...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenDepend.sh >> tmp.sh
-	$(SH) tmp.sh > depend.tmp
-	$(ECHO) Doing second depend step...
-	$(CP)  aafobjects.mk tmp2.sh
-	$(CHMOD) a+w tmp2.sh
-	$(CAT) GenDepend2.sh >> tmp2.sh
-	$(SH) tmp2.sh
-	$(RM) tmp.sh tmp2.sh
-	@ $(MV) depend.tmp depend.mk
-	@ $(ECHO) "Done with depend.mk."
+depend.mk : aafobjects.mk
+	@ echo Creating depend.tmp ...
+	@ rm -f depend.tmp
+	@ echo "#" This file automatically generated make. > depend.tmp
+	@ echo "#" Special case AAFModule since no object is to be built only headers... >> depend.tmp
+	@ echo AAFModule.all...
+	@ echo AAFModule.all : AAFModule.fidl >> depend.tmp
+	@ echo AAFModule.all : AAFModule.frefh >> depend.tmp
+	@ echo AAFModule.fidl : macros/fidl.mac macros/base.mac >> depend.tmp
+	@ echo AAFModule.frefh : macros/frefh.mac macros/base.mac >> depend.tmp
+	@ echo "" >> depend.tmp
+	@ echo "#" Special case AAFTypes since no object is to be built only headers... >> depend.tmp
+	@ echo AAFTypes.all...
+	@ echo AAFTypes.all : AAFTypes.idl >> depend.tmp
+	@ echo AAFTypes.all : AAFTypes.refh >> depend.tmp
+	@ echo AAFTypes.idl : macros/idl.mac macros/base.mac >> depend.tmp
+	@ echo AAFTypes.refh : macros/refh.mac macros/base.mac >> depend.tmp
+	@ for base in $(DODO_TARGET_NAMES) ; do \
+		echo $$base.all... ; \
+		echo "" >> depend.tmp ; \
+		echo $$base.all : $$base.comc $$base.comh >> depend.tmp ; \
+		echo $$base.all : $$base.comt >> depend.tmp ; \
+		echo $$base.all : $$base.implc $$base.implh >> depend.tmp ; \
+		echo $$base.all : $$base.fidl >> depend.tmp ; \
+		echo $$base.all : $$base.frefh >> depend.tmp ; \
+		echo $$base.comc : macros/comc.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.comh : macros/comh.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.comt : macros/comt.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.implc : macros/implc.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.implh : macros/implh.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.fidl : macros/fidl.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.frefh : macros/frefh.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.exp : macros/exp.mac macros/base.mac >> depend.tmp ; \
+		for import in `grep '^\#import' $$base.dod | sed -e 's,\#import,,' | sed -e 's,.*/,,'` ; do \
+			echo $$base.comc : $$import >> depend.tmp ; \
+			echo $$base.comh : $$import >> depend.tmp ; \
+			echo $$base.comt : $$import >> depend.tmp ; \
+			echo $$base.implc : $$import >> depend.tmp ; \
+			echo $$base.implh : $$import >> depend.tmp ; \
+			echo $$base.fidl : $$import >> depend.tmp ; \
+			echo $$base.frefh : $$import >> depend.tmp ; \
+			echo $$base.exp : $$import >> depend.tmp ; \
+		done ; \
+	  done
+	@ for base in $(AAFCOMINTERFACESONLY) ; do \
+		echo $$base.all... ; \
+		echo "" >> depend.tmp ; \
+		echo $$base.all : $$base.fidl $$base.comcx $$base.exp >> depend.tmp ; \
+		echo $$base.fidl : macros/fidl.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.comcx : macros/comcx.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.exp : macros/exp.mac macros/base.mac >> depend.tmp ; \
+	  done
+	@ echo AAFPluginTypes.all...
+	@ echo "" >> depend.tmp
+	@ echo AAFPluginTypes.all : AAFPluginTypes.idl >> depend.tmp
+	@ echo AAFPluginTypes.all : AAFPluginTypes.refh >> depend.tmp
+	@ echo AAFPluginTypes.idl : macros/idl.mac macros/base.mac >> depend.tmp
+	@ echo AAFPluginTypes.refh : macros/refh.mac macros/base.mac >> depend.tmp
+	@ echo "" >> depend.tmp
+	@ for base in $(PLUGIN_OBJECTS) ; do \
+		echo $$base.all... ; \
+		echo "" >> depend.tmp ; \
+		echo $$base.all : $$base.fidl $$base.frefh >> depend.tmp ; \
+		echo $$base.fidl : macros/fidl.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.exp : macros/exp.mac macros/base.mac >> depend.tmp ; \
+		echo $$base.frefh : macros/frefh.mac macros/base.mac >> depend.tmp ; \
+	done
+	@ echo "" >> depend.tmp
+	for file in $(HUMAN_TYPED_IMPL) ; do \
+		grep -v $$file\.impl depend.tmp | grep -v $$file\.comt > depend.tmp2 ; \
+		rm depend.tmp ; \
+		mv depend.tmp2 depend.tmp ; \
+	  done
+	@ mv depend.tmp depend.mk
+	@ echo "Done with depend.mk."
 
 
 clean :
 	$(RM) -rf depend.mk
+	touch depend.mk
 
 
 

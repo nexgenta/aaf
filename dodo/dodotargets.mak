@@ -1,24 +1,8 @@
-###############################################################################
-#
-# The contents of this file are subject to the AAF SDK Public
-# Source License Agreement (the "License"); You may not use this file
-# except in compliance with the License.  The License is available in
-# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-# Association or its successor.
-# 
-# Software distributed under the License is distributed on an "AS IS"
-# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-# the License for the specific language governing rights and limitations
-# under the License.
-# 
-# The Original Code of this file is Copyright 1998-2001, Licensor of the
-# AAF Association.
-# 
-# The Initial Developer of the Original Code of this file and the
-# Licensor of the AAF Association is Avid Technology.
-# All rights reserved.
-#
-###############################################################################
+############################################
+#                                          #
+# Copyright (c) 1998 Avid Technology, Inc. #
+#                                          #
+############################################
 
 all : targets.mk
 
@@ -32,14 +16,64 @@ include $(BLD_CFG_DIR)/common.mk
 include aafobjects.mk
 
 
-targets.mk : aafobjects.mk GenTargets.sh
-	@ $(ECHO) Creating targets.mk ...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenTargets.sh >> tmp.sh
-	sh tmp.sh > targets.tmp
-	@ $(MV) targets.tmp targets.mk
-	@ $(ECHO) "Done with targets.mk."
+targets.mk : aafobjects.mk
+	@ echo Creating targets.mk ...
+	@ rm -f targets.tmp
+	@ echo "#" This file automatically generated make. > targets.tmp
+	@ echo "#" Special case AAFTypes since no object is to be built only headers... >> targets.tmp
+	@ echo "#" special case the utility classes since they will not be exposed by com >> targets.tmp 
+	@ echo DODO_TARGETS = '\' >> targets.tmp 
+	@ echo '	'AAFTypes.all \\\c>> targets.tmp 
+	@ for base in $(AAFOBJECTS) $(AAFCOMINTERFACESONLY) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.all \\\c>> targets.tmp ; \
+	  done
+	@ echo '\' >> targets.tmp
+	@ echo '	'AAFModule.all \\\c>> targets.tmp ;
+	@ echo '' >> targets.tmp
+	@ echo '' >> targets.tmp
+	@ echo FIDL_TARGETS = \\\c >> targets.tmp 
+	@ for base in $(AAFOBJECTS) $(AAFCOMINTERFACESONLY) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.fidl \\\c>> targets.tmp ; \
+	  done
+	@ echo '\' >> targets.tmp
+	@ echo '	'AAFModule.fidl \\\c>> targets.tmp ;
+	@ echo '' >> targets.tmp
+	@ echo '' >> targets.tmp
+	@ echo FREFH_TARGETS = \\\c >> targets.tmp 
+	@ for base in $(AAFOBJECTS) $(AAFCOMINTERFACESONLY) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.frefh \\\c>> targets.tmp ; \
+	  done
+	@ echo '\' >> targets.tmp
+	@ echo '	'AAFModule.frefh \\\c>> targets.tmp ;
+	@ echo '' >> targets.tmp
+	@ echo '' >> targets.tmp
+	@ echo PLUGIN_TARGETS = '\' >> targets.tmp 
+	@ echo '	'AAFTypes.all' \' >> targets.tmp 
+	@ echo '	'AAFPluginTypes.all \\\c>> targets.tmp 
+	@ for base in $(PLUGIN_OBJECTS) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.all \\\c>> targets.tmp ; \
+	  done
+	@ echo '' >> targets.tmp
+	@ echo '' >> targets.tmp
+	@ echo PLUGIN_FIDL_TARGETS = \\\c >> targets.tmp 
+	@ for base in $(PLUGIN_OBJECTS) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.fidl \\\c>> targets.tmp ; \
+	  done
+	@ echo '' >> targets.tmp
+	@ echo '' >> targets.tmp
+	@ echo PLUGIN_FREFH_TARGETS = \\\c >> targets.tmp 
+	@ for base in $(PLUGIN_OBJECTS) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.frefh \\\c>> targets.tmp ; \
+	  done
+	@ echo '' >> targets.tmp
+	@ mv targets.tmp targets.mk
+	@ echo "Done with targets.mk."
 
 
 clean :
