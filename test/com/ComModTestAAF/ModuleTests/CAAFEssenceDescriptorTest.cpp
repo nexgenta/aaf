@@ -90,7 +90,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -146,6 +146,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(edesc->CountLocators(&numLocators));
 		checkExpression(1 == numLocators, AAFRESULT_TEST_FAILED);
 
+		// Make another locator, and attach it to the EssenceDescriptor
+		checkResult(defs.cdLocator()->
+					CreateInstance(IID_IAAFLocator, 
+								   (IUnknown **)&pLocator));		
+		checkResult(edesc->AppendLocator(pLocator));
+		// Verify that there are now two locators
+		checkResult(edesc->CountLocators(&numLocators));
+		checkExpression(2 == numLocators, AAFRESULT_TEST_FAILED);
+		checkResult(edesc->RemoveLocatorAt (1));
+		// Verify that there is now one locator again
+		checkResult(edesc->CountLocators(&numLocators));
+		checkExpression(1 == numLocators, AAFRESULT_TEST_FAILED);
+
 		// Add the source mob into the tree
 		checkResult(pHeader->AddMob(pMob));
 	}
@@ -172,7 +185,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pDictionary)
     pDictionary->Release();
 
-  if (pHeader)
+	if (pHeader)
 		pHeader->Release();
 			
 	if (pFile)
@@ -211,7 +224,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
@@ -225,7 +238,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		checkResult(pHeader->GetMobs (NULL, &mobIter));
