@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ParamMaps.cpp,v 1.14 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: ParamMaps.cpp,v 1.15 2004/06/17 20:30:05 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,7 +22,7 @@
 
 //=---------------------------------------------------------------------=
 
-#if defined(OS_WINDOWS)
+#ifdef WIN32
 #pragma warning(disable:4660)
 // "template-class specialization 'ParamMap<struct _aafUID_t,class _ContainerDefsTag>'
 // is already instantiated"  etc for the other instances.
