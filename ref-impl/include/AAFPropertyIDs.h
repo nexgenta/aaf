@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.12 2004/08/12 15:22:49 akharkev Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.13 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,6 +57,7 @@ const int PID_Event_Position                                     = 0x0601;
 const int PID_Event_Comment                                      = 0x0602;
 const int PID_GPITrigger_ActiveState                             = 0x0801;
 const int PID_CommentMarker_Annotation                           = 0x0901;
+const int PID_DescriptiveMarker_DescribedSlots                   = 0x6102;
 const int PID_DescriptiveMarker_Description                      = 0x6101;
 const int PID_OperationGroup_OperationDefinition                 = 0x0B01;
 const int PID_OperationGroup_InputSegments                       = 0x0B02;

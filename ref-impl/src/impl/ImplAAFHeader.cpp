@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.90.2.2 2004/08/12 15:25:57 akharkev Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.90.2.3 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFStoredObjectIDs.h,v 1.26.2.5 2004/07/02 16:23:52 phil_tudor Exp $ $Name:  $
+// $Id: AAFStoredObjectIDs.h,v 1.26.2.6 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

@@ -3,7 +3,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAFTypes.idl,v 1.2.10.4 2004/07/14 19:54:53 jptrainor Exp $ $Name:  $")
+cpp_quote("// $Id: AAFTypes.idl,v 1.2.10.5 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \"License\"); You may not use this file")

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.11 2004/08/12 15:22:49 akharkev Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.12 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -100,6 +100,10 @@ const aafUID_t kAAFPropID_GPITrigger_ActiveState =
 //{06010104-020a-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_CommentMarker_Annotation =
 {0x06010104, 0x020a, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{01070105-0000-0000-060e-2b3401010104}
+const aafUID_t kAAFPropID_DescriptiveMarker_DescribedSlots =
+{0x01070105, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
 
 //{06010104-020c-0000-060e-2b3401010105}
 const aafUID_t kAAFPropID_DescriptiveMarker_Description =

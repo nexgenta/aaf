@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.3.2.4 2004/07/14 19:54:53 jptrainor Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.3.2.5 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
