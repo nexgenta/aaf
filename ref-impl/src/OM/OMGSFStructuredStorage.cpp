@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.cpp,v 1.2 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.cpp,v 1.3 2004/09/23 13:32:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -151,13 +151,13 @@ OMGSFIStorage::StgCreateStorageEx( const TCHAR FAR* in_filename,
 	PRECONDITION("Valid access mode", in_accessMode == OMFile::writeOnlyMode);
 	GsfStorage *storage = 0;
 	*out_storage = 0;
-	char storageName[256];
+	char storageName[FILENAME_MAX];
 
 #ifndef OM_UNICODE_APIS
 	strncpy (storageName, in_filename, sizeof(storageName) -1);
 	storageName[sizeof(storageName) -1] = '\0';
 #else
-	 convertWideStringToString (storageName, in_filename, 256);
+	 convertWideStringToString (storageName, in_filename, FILENAME_MAX);
 #endif
 
 
@@ -194,13 +194,13 @@ OMGSFIStorage::StgOpenStorageEx( const TCHAR FAR* in_filename,
 	PRECONDITION("Valid access mode", in_accessMode == OMFile::readOnlyMode);
 	GsfStorage *storage = 0;
 	*out_storage = 0;
-	char storageName[256];
+	char storageName[FILENAME_MAX];
 
 #ifndef OM_UNICODE_APIS
 	strncpy (storageName, in_filename, sizeof(storageName) -1);
 	storageName[sizeof(storageName) -1] = '\0';
 #else
-	convertWideStringToString (storageName, in_filename, 256);
+	convertWideStringToString (storageName, in_filename, FILENAME_MAX);
 #endif
 
 	GError *err;
@@ -261,12 +261,12 @@ OMGSFIStorage::CreateStream(
 
 	GsfStream *stream;
 	int status = GSTG_OK;
-	char streamName[256];
+	char streamName[FILENAME_MAX];
 #ifndef OM_UNICODE_APIS
 	strncpy (streamName, pwcsName, sizeof(streamName) -1);
 	streamName[sizeof(streamName) -1] = '\0';
 #else
-	convertWideStringToString (streamName, pwcsName, 256);
+	convertWideStringToString (streamName, pwcsName, FILENAME_MAX);
 #endif
 
 	ASSERT ("Creating a stream in a WriteOnly GSF Storage", _mode == GSF_WRITE);
@@ -295,12 +295,12 @@ OMGSFIStorage::OpenStream(
 
 	GsfStream *stream;
 	int status = GSTG_OK;
-	char streamName[256];
+	char streamName[FILENAME_MAX];
 #ifndef OM_UNICODE_APIS
 	strncpy (streamName, pwcsName, sizeof(streamName) -1);
 	streamName[sizeof(streamName) -1] = '\0';
 #else
-	convertWideStringToString (streamName, pwcsName, 256);
+	convertWideStringToString (streamName, pwcsName, FILENAME_MAX);
 #endif
 
 	ASSERT ("Opening a stream in a ReadOnly GSF Storage", _mode == GSF_READ);
@@ -332,12 +332,12 @@ OMGSFIStorage::CreateStorage(
 	int status = GSTG_OK;
 	GsfStorage *storage = 0;
 	*ppstg = 0;
-	char storageName[256];
+	char storageName[FILENAME_MAX];
 #ifndef OM_UNICODE_APIS
 	strncpy (storageName, pwcsName, sizeof(storageName) -1);
 	storageName[sizeof(storageName) -1] = '\0';
 #else
-	convertWideStringToString (storageName, pwcsName, 256);
+	convertWideStringToString (storageName, pwcsName, FILENAME_MAX);
 #endif
 
 	ASSERT ("Creating Storage in WriteOnly GSF Storage", _mode == GSF_WRITE);
@@ -367,12 +367,12 @@ OMGSFIStorage::OpenStorage(
 	int status = GSTG_OK;
 	GsfStorage *storage = 0;
 	*ppstg = 0;
-	char storageName[256];
+	char storageName[FILENAME_MAX];
 #ifndef OM_UNICODE_APIS
 	strncpy (storageName, pwcsName, sizeof(storageName) -1);
 	storageName[sizeof(storageName) -1] = '\0';
 #else
-	convertWideStringToString (storageName, pwcsName, 256);
+	convertWideStringToString (storageName, pwcsName, FILENAME_MAX);
 #endif
 
 	ASSERT ("Opening Storage in ReadOnly GSF Storage", _mode == GSF_READ);

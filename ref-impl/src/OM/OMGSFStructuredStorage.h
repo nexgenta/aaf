@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.h,v 1.2 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.h,v 1.3 2004/09/23 13:32:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,8 +31,8 @@
 * Authors: Bob Sabiston, Yuri Khramov, Mark Ambachtsheer
 ************************************************************************
 
-$Revision: 1.2 $
-$Date: 2004/09/10 17:13:10 $
+$Revision: 1.3 $
+$Date: 2004/09/23 13:32:09 $
 */
 #ifndef OMGSFSTRUCTUREDSTORAGE_H
 #define OMGSFSTRUCTUREDSTORAGE_H
@@ -184,7 +184,7 @@ private:
 	GsfStorage*		_storage;
 	GsfAccessMode	_mode;				// TODO: does gsf store this somewhere?
 	ULONG 			_referenceCount;
-	char 			_storageName[256];	// TODO: does gsf store this somewhere?
+	char 			_storageName[FILENAME_MAX];	// TODO: does gsf store this somewhere?
 };
 
 
@@ -269,7 +269,7 @@ private:
 	GsfStream*			_stream;
 	GsfAccessMode	_mode;				// TODO: does gsf store this somewhere?
 	ULONG 			_referenceCount;
-	char 			_streamName[256];	// TODO: does gsf store this somewhere?
+	char 			_streamName[FILENAME_MAX];	// TODO: does gsf store this somewhere?
 };
 
 void OMGSFInitialize();

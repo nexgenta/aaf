@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSxMSSStoredObjectFactory.cpp,v 1.2 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMMSxMSSStoredObjectFactory.cpp,v 1.3 2004/09/23 13:32:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -221,11 +221,11 @@ OMMSxMSSStoredObjectFactory::openFile (const wchar_t* fileName,
     openMode = STGM_DIRECT | STGM_READ      | STGM_SHARE_DENY_WRITE;
   }
 
-  SSCHAR omFileName[256];
+  SSCHAR omFileName[FILENAME_MAX];
 #ifndef OM_UNICODE_APIS
-  convertWideStringToString(omFileName, fileName, 256);
+  convertWideStringToString(omFileName, fileName, FILENAME_MAX);
 #else
-  copyWideString (omFileName, fileName, 256);
+  copyWideString (omFileName, fileName, FILENAME_MAX);
 #endif
 
   IStorage* storage = 0;
@@ -277,11 +277,11 @@ OMMSxMSSStoredObjectFactory::createFile (const wchar_t* fileName,
 	else if( OMSignature_Aaf_SSBin_4K == signature ) sectorSize=4096;
 	PRECONDITION("Valid Signature", sectorSize!=0 );
 
-  SSCHAR omFileName[256];
+  SSCHAR omFileName[FILENAME_MAX];
 #ifndef OM_UNICODE_APIS
-  convertWideStringToString(omFileName, fileName, 256);
+  convertWideStringToString(omFileName, fileName, FILENAME_MAX);
 #else
-  copyWideString (omFileName, fileName, 256);
+  copyWideString (omFileName, fileName, FILENAME_MAX);
 #endif
 
   IStorage* storage = 0;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSSStoredObject.cpp,v 1.72 2004/09/16 17:08:21 stuart_hc Exp $ $Name:  $
+// $Id: OMMSSStoredObject.cpp,v 1.73 2004/09/23 13:32:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3018,8 +3018,8 @@ IStream* OMMSSStoredObject::createStream(IStorage* storage,
                STGM_SHARE_EXCLUSIVE  | STGM_CREATE;
 
   IStream* stream = 0;
-  SSCHAR omStreamName[256];
-  convert(omStreamName, 256, streamName);
+  SSCHAR omStreamName[FILENAME_MAX];
+  convert(omStreamName, FILENAME_MAX, streamName);
 
   HRESULT status = storage->CreateStream(
     omStreamName,
@@ -3051,8 +3051,8 @@ IStream* OMMSSStoredObject::openStream(IStorage* storage,
   }
 
   IStream* stream = 0;
-  SSCHAR omStreamName[256];
-  convert(omStreamName, 256, streamName);
+  SSCHAR omStreamName[FILENAME_MAX];
+  convert(omStreamName, FILENAME_MAX, streamName);
 
   HRESULT status = storage->OpenStream(
     omStreamName,
@@ -3117,8 +3117,8 @@ IStorage* OMMSSStoredObject::createStorage(IStorage* storage,
                STGM_SHARE_EXCLUSIVE  | STGM_CREATE;
 
   IStorage* newStorage = 0;
-  SSCHAR omStorageName[256];
-  convert(omStorageName, 256, storageName);
+  SSCHAR omStorageName[FILENAME_MAX];
+  convert(omStorageName, FILENAME_MAX, storageName);
 
   HRESULT status = storage->CreateStorage(
     omStorageName,
@@ -3153,8 +3153,8 @@ IStorage* OMMSSStoredObject::openStorage(IStorage* storage,
   }
 
   IStorage* newStorage = 0;
-  SSCHAR omStorageName[256];
-  convert(omStorageName, 256, storageName);
+  SSCHAR omStorageName[FILENAME_MAX];
+  convert(omStorageName, FILENAME_MAX, storageName);
 
   HRESULT status = storage->OpenStorage(
     omStorageName,
