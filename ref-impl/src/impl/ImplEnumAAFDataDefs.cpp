@@ -25,5 +25,281 @@
  *
  ************************************************************************/
 
-// This module has been made obsolete by the implementation of a common enumerator
-// template class.
+#ifndef __ImplAAFDataDef_h__
+#include "ImplAAFDataDef.h"
+#endif
+
+
+
+
+
+
+
+#ifndef __ImplEnumAAFDataDefs_h__
+#include "ImplEnumAAFDataDefs.h"
+#endif
+
+#include "ImplAAFDictionary.h"
+#include "ImplAAFHeader.h"
+#include "ImplAAFObjectCreation.h"
+
+#include <assert.h>
+#include <string.h>
+#include "aafErr.h"
+
+extern "C" const aafClassID_t CLSID_EnumAAFDataDefs;
+
+ImplEnumAAFDataDefs::ImplEnumAAFDataDefs ()
+: _enumObj(0), _iterator(0)
+{
+	_current = 0;
+	_enumProp = NULL;
+}
+
+
+ImplEnumAAFDataDefs::~ImplEnumAAFDataDefs ()
+{
+	if (_enumObj)
+		_enumObj->ReleaseReference();
+	_enumObj = NULL;
+	if (_iterator)
+		delete _iterator;
+	_iterator = NULL;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFDataDefs::NextOne (
+      ImplAAFDataDef **ppDataDef)
+{
+	aafUInt32			numElem;
+	aafUID_t			value;
+	ImplAAFHeader		*head = NULL;
+	ImplAAFDictionary	*dict = NULL;
+	AAFRESULT ar = AAFRESULT_NO_MORE_OBJECTS;
+
+	if(_enumProp != NULL)
+		numElem = _enumProp->size() / sizeof(aafUID_t);
+	else if(_iterator == NULL)
+		return(AAFRESULT_INCONSISTANCY);
+
+	if(ppDataDef == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	XPROTECT()
+	{
+		if(_enumProp != NULL)
+		{
+			if(_current >= numElem)
+				return AAFRESULT_NO_MORE_OBJECTS;
+			_enumProp->getValueAt(&value, _current);
+			CHECK(_enumObj->MyHeadObject(&head));
+			CHECK(head->GetDictionary (&dict));
+			CHECK(dict->LookupDataDef (value, ppDataDef));
+			head->ReleaseReference();
+			head = NULL;
+			dict->ReleaseReference();
+			dict = NULL;
+			_current++;
+			ar = AAFRESULT_SUCCESS;
+		}
+		else
+		{
+			if (_iterator->before() || _iterator->valid())
+			{
+				if (++(*_iterator))
+				{
+					*ppDataDef = _iterator->value();
+					(*ppDataDef)->AcquireReference();
+					ar = AAFRESULT_SUCCESS;
+				}
+			}
+		}
+	}
+	XEXCEPT
+	{
+		if(head)
+		  head->ReleaseReference();
+		head = 0;
+		if(dict)
+		  dict->ReleaseReference();
+		dict = 0;
+	}
+	XEND;
+
+	return(AAFRESULT_SUCCESS); 
+	
+	return ar;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFDataDefs::Next (
+      aafUInt32  count,
+      ImplAAFDataDef ** ppDataDefs,
+      aafUInt32 *pFetched)
+{
+	ImplAAFDataDef**		ppDef;
+	aafUInt32				numDefs;
+	HRESULT					hr;
+
+	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
+		return E_INVALIDARG;
+
+	// Point at the first component in the array.
+	ppDef = ppDataDefs;
+	for (numDefs = 0; numDefs < count; numDefs++)
+	{
+		hr = NextOne(&ppDef[numDefs]);
+		if (FAILED(hr))
+			break;
+	}
+	
+	if (pFetched)
+		*pFetched = numDefs;
+
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFDataDefs::Skip (
+      aafUInt32  count)
+{
+	AAFRESULT	ar = AAFRESULT_SUCCESS;
+	aafUInt32	newCurrent;
+	aafUInt32	numElem, n;
+
+	if(_enumProp != NULL)
+	{
+		numElem = _enumProp->size() / sizeof(aafUID_t);
+		
+		newCurrent = _current + count;
+		
+		if(newCurrent < numElem)
+		{
+			_current = newCurrent;
+		}
+		else
+		{
+			ar = E_FAIL;
+		}
+	}
+	else
+	{
+		
+		for(n = 1; n <= count; n++)
+		{
+			// Defined behavior of skip is to NOT advance at all if it would push us off of the end
+			if(!++(*_iterator))
+			{
+				// Off the end, decrement n and iterator back to the starting position
+				while(n >= 1)
+				{
+					--(*_iterator);
+					n--;
+				}
+				ar = AAFRESULT_NO_MORE_OBJECTS;
+				break;
+			}
+		}
+	}
+
+	return ar;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFDataDefs::Reset ()
+{
+	AAFRESULT ar = AAFRESULT_SUCCESS;
+	if(_enumProp != NULL)
+	{
+		_current = 0;
+	}
+	else
+	{
+		_iterator->reset();
+	}
+	return ar;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFDataDefs::Clone (
+      ImplEnumAAFDataDefs **ppEnum)
+{
+	ImplEnumAAFDataDefs	*result;
+	AAFRESULT			ar = AAFRESULT_SUCCESS;
+	
+	result = (ImplEnumAAFDataDefs *)CreateImpl(CLSID_EnumAAFDataDefs);
+	if (result == NULL)
+		return E_FAIL;
+	
+	if(_enumProp != NULL)
+	{
+		ar = result->SetEnumProperty(_enumObj, _enumProp);
+		if (SUCCEEDED(ar))
+		{
+			result->_current = _current;
+			*ppEnum = result;
+		}
+		else
+		{
+			result->ReleaseReference();
+			result = 0;
+			*ppEnum = NULL;
+		}
+	}
+	else
+	{
+		ar = result->SetIterator(_enumObj,_iterator->copy());
+		if (SUCCEEDED(ar))
+		{
+			*ppEnum = result;
+		}
+		else
+		{
+			result->ReleaseReference();
+			result = 0;
+			*ppEnum = NULL;
+		}
+	}
+	
+	return ar;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFDataDefs::SetEnumProperty( ImplAAFObject *pObj, DataDefWeakRefArrayProp_t *pProp)
+{
+	if (_enumObj)
+	  _enumObj->ReleaseReference();
+	_enumObj = 0;
+	_enumObj = pObj;
+	if (pObj)
+		pObj->AcquireReference();
+	_enumProp = pProp;				// Don't refcount, same lifetime as the object.
+
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFDataDefs::SetIterator(
+                        ImplAAFObject *pObj,
+                        OMReferenceContainerIterator<ImplAAFDataDef>* iterator)
+{
+	AAFRESULT ar = AAFRESULT_SUCCESS;
+	
+	_enumProp = NULL;
+	if (_enumObj)
+		_enumObj->ReleaseReference();
+	_enumObj = 0;
+	
+	_enumObj = pObj;
+	if (pObj)
+		pObj->AcquireReference();
+	
+	delete _iterator;
+	_iterator = iterator;
+	return ar;
+}
