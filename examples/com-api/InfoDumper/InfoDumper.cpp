@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.22 2004/09/10 17:12:11 stuart_hc Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.23 2004/09/24 09:46:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2950,10 +2950,10 @@ int main(int argc, char* argv[])
 
 	// Last argument should be input aaf filename
 	infilename = argv[argc-1];
-	aafCharacter pwFileName[260];
+	aafCharacter pwFileName[FILENAME_MAX];
 	assert (infilename);
 	assert (os);
-	convert(pwFileName, 260, infilename);
+	convert(pwFileName, FILENAME_MAX, infilename);
 	
 	succeeded = dumpFile (pwFileName, infilename, dumpFlags, *os);
 	
