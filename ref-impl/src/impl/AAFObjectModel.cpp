@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 #include "AAFObjectModel.h"
 
 
@@ -61,28 +66,8 @@ const static aafUID_t NULL3_AUID = { 0 };
   sizeof(array) / sizeof(array[0])
 
 
-// Simple helper class to force static counter initialization to occur
-// before post-increment (for g++ under Linux). A long term solution
-// would be to move all of this code out of the static initialization
-// phase...
-class ItemCounter
-{
-public:
-  ItemCounter();
-  
-  aafUInt32 operator++(int); // postfix	(x++)
-private:
-  aafUInt32 _count;
-};
 
-ItemCounter::ItemCounter() :
-  _count(0)
-{}
 
-aafUInt32 ItemCounter::operator++(int /*not used*/)
-{
-  return _count++;
-}
 
 //
 // Create a static table of all predefined extendible enumeration ids.
@@ -127,12 +112,6 @@ static PropertyDefinition sPropertyDefinitions[] = \
 #define AAF_TABLE_END() \
 };
 
-// TEMPORARY:
-// The following three lines were copied from ImplAAFBuiltinClasses.cpp
-// String arrays are currently implemented as a single
-// null-character-delimited string
-#define kAAFTypeID_StringArray kAAFTypeID_String
-
 
 #include "AAFMetaDictionary.h"
 
@@ -142,13 +121,11 @@ static PropertyDefinition sPropertyDefinitions[] = \
 #undef MY_CONTAINER_ID
 #undef MY_PROPERTY_ID
 
-#undef kAAFTypeID_StringArray
-
 //
 // Create a static table of the properties for each class.
 //
 #define AAF_TABLE_BEGIN() \
-static ItemCounter sPropertyIndex;
+static aafUInt32 sPropertyIndex = 0;
     
 #define AAF_CLASS(name, id, parent, concrete) \
 static PropertyDefinition * s##name##_PropertyDefinitions[] = \
@@ -157,7 +134,7 @@ static PropertyDefinition * s##name##_PropertyDefinitions[] = \
 #define AAF_PROPERTY(name, id, tag, type, mandatory, uid, container) \
   &sPropertyDefinitions[sPropertyIndex++],
 
-#define AAF_CLASS_END(name, id, parent, concrete) \
+#define AAF_CLASS_END(name) \
   0 \
 };
 
@@ -302,7 +279,7 @@ static TypeDefinition * sTypeDefinitionsById[kTypeDefinitionCount];
 // Create an array of all Integer types.
 //
 
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define MY_TYPE_SIGN(signed) kAAF##signed
 
@@ -361,14 +338,14 @@ const aafUInt32 kTypeDefinitionEnumerationMemberCount =
   s##name##_Member
 
 #define AAF_TYPE_TABLE_BEGIN() \
-static ItemCounter sEnumerationMemberIndex;
+static aafUInt32 sEnumerationMemberIndex = 0;
     
 #define AAF_TYPE_DEFINITION_ENUMERATION(name, id, type) \
 static DefinitionEnumerationMember * MY_ENUM_MEMBER_ARRAY(name)[] = \
 {
 #define AAF_TYPE_DEFINITION_ENUMERATION_MEMBER(name, value, container) \
   &sTypeDefinitionEnumerationMembers[sEnumerationMemberIndex++],
-#define AAF_TYPE_DEFINITION_ENUMERATION_END(name, id, type) \
+#define AAF_TYPE_DEFINITION_ENUMERATION_END(name) \
   0 \
 };
 
@@ -410,7 +387,7 @@ const aafUInt32 kTypeDefinitionEnumerationCount =
 //
 // Create an array of all Variable Array types.
 //
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define AAF_TYPE(name) kAAFTypeID_##name
 
@@ -437,7 +414,7 @@ const aafUInt32 kTypeDefinitionVariableArrayCount =
 //
 // Create an array of all Fixed Array types.
 //
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define AAF_TYPE(type) MY_TYPE_ID(type)
 
@@ -507,7 +484,7 @@ const aafUInt32 kTypeDefinitionRecordFieldCount =
   s##name##_Field
 
 #define AAF_TYPE_TABLE_BEGIN() \
-static ItemCounter sRecordFieldIndex;
+static aafUInt32 sRecordFieldIndex = 0;
     
 #define AAF_TYPE_DEFINITION_RECORD(name, id) \
 static DefinitionRecordField * \
@@ -517,7 +494,7 @@ static DefinitionRecordField * \
 #define AAF_TYPE_DEFINITION_RECORD_FIELD(name, type, container) \
   &sTypeDefinitionRecordFields[sRecordFieldIndex++],
 
-#define AAF_TYPE_DEFINITION_RECORD_END(name, id) \
+#define AAF_TYPE_DEFINITION_RECORD_END(name) \
   0 \
 };
 
@@ -560,7 +537,7 @@ const aafUInt32 kTypeDefinitionRecordCount =
 //
 // Create an array of all Renamed types.
 //
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define AAF_TYPE(type) MY_TYPE_ID(type) /* NOT used for RENAME macro! */
 
@@ -587,7 +564,7 @@ const aafUInt32 kTypeDefinitionRenameCount =
 //
 // Create an array of all string types.
 //
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define AAF_TYPE(type) MY_TYPE_ID(type) /* NOT used for STRING macro! */
 
@@ -646,7 +623,7 @@ const aafUInt32 kTypeDefinitionExtendibleEnumerationMemberCount =
   sExtensible##name##_Member
 
 #define AAF_TYPE_TABLE_BEGIN() \
-static ItemCounter sExtensibleEnumerationMemberIndex;
+static aafUInt32 sExtensibleEnumerationMemberIndex = 0;
     
 #define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(name, id) \
 static DefinitionExtendibleEnumerationMember * \
@@ -654,7 +631,7 @@ static DefinitionExtendibleEnumerationMember * \
 {
 #define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(name, auid, container) \
   &sTypeDefinitionExtendibleEnumerationMembers[sExtensibleEnumerationMemberIndex++],
-#define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name, id) \
+#define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name) \
   0 \
 };
 
@@ -664,7 +641,7 @@ static DefinitionExtendibleEnumerationMember * \
 //
 // Create an array of all string types.
 //
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) &kAAFTypeID_##name
 #define MY_ARRAY_COUNT(name) \
   MY_ARRAY_ELEMENT_COUNT(MY_EXTENDIBLE_MEMBER_ARRAY(name))
@@ -695,7 +672,7 @@ const aafUInt32 kTypeDefinitionExtendibleEnumerationCount =
 //
 // Create an array of all Character types.
 //
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) &kAAFTypeID_##name
 
 #define AAF_TYPE_TABLE_BEGIN() \
@@ -716,13 +693,42 @@ TypeDefinitionCharacter sTypeDefinitionCharacters [] = \
 const aafUInt32 kTypeDefinitionCharacterCount = 
   MY_ARRAY_ELEMENT_COUNT(sTypeDefinitionCharacters);
 
+#if 0 
+// This is an abstract class. There should be NO instances in the
+// Meta Dictionary or in an AAF file.
+//
+// Create an array of all set types.
+//
+#define MY_TYPE_NAME(name) L###name
+#define MY_TYPE_ID(name) &kAAFTypeID_##name
+#define AAF_TYPE(name)	MY_TYPE_ID(name)
+
+#define AAF_TYPE_TABLE_BEGIN() \
+static TypeDefinitionSet sTypeDefinitionSets [] = \
+{
+#define AAF_TYPE_DEFINITION_SET(name, id, type) \
+    TypeDefinitionSet(MY_TYPE_NAME(name), \
+    MY_TYPE_ID(name), \
+    MY_TYPE_ID(type)),
+#define AAF_TYPE_TABLE_END() \
+};
+
+#include "AAFMetaDictionary.h"
+
+#undef MY_TYPE_NAME
+#undef MY_TYPE_ID
+
+
+const aafUInt32 kTypeDefinitionSetCount = 
+  MY_ARRAY_ELEMENT_COUNT(sTypeDefinitionSets);
+#endif
 
 
 //
 // Create an array of all strong reference types.
 //
 
-#define MY_TYPE_NAME(name) L"kAAFTypeID_" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define MY_TARGET_ID(name) AUID_AAF##name
 
@@ -756,7 +762,7 @@ const aafUInt32 kTypeDefinitionStrongReferenceCount =
 // Create an array of all strong reference set types.
 //
 
-#define MY_TYPE_NAME(name) L"kAAFTypeID_" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define MY_TARGET_ID(type) MY_TYPE_ID(type)
 
@@ -790,7 +796,7 @@ const aafUInt32 kTypeDefinitionStrongReferenceSetCount =
 // Create an array of all strong reference vector types.
 //
 
-#define MY_TYPE_NAME(name) L"kAAFTypeID_" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 //#define MY_TARGET_ID(name) AUID_AAF##name
 #define MY_TARGET_ID(type) MY_TYPE_ID(type)
@@ -826,28 +832,6 @@ const aafUInt32 kTypeDefinitionStrongReferenceVectorCount =
 // Create an array of all weak reference types.
 //
 
-#define AAF_TYPE(name) name
-#define AAF_REFERENCE_TYPE(type, target) AAF_TYPE(target##type)
-#define AAF_REFERENCE_TYPE_NAME(type, target) AAF_TYPE(target##type)
-#define MY_PROPERTY_ID(name, parent) &kAAFPropID_##parent##_##name
-#define MY_ARRAY_NAME(name) s_WRPropID_##name
-
-#define AAF_TYPE_DEFINITION_WEAK_REFERENCE(name, id, type) \
-static aafUID_constptr MY_ARRAY_NAME(name)[] = \
-{ \
-
-#define AAF_TYPE_DEFINITION_WEAK_REFERENCE_MEMBER(name, parent, container) \
-  MY_PROPERTY_ID(name, parent),
-  
-#define AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name, id, type) \
-	NULL \
-};
-
-#include "AAFMetaDictionary.h"
-#undef MY_PROPERTY_ID
-
-
-
 #define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 #define MY_TARGET_ID(name) AUID_AAF##name
@@ -863,9 +847,7 @@ static TypeDefinitionWeakReference sTypeDefinitionWeakReferences [] = \
     TypeDefinitionWeakReference( \
     MY_TYPE_NAME(name), \
     (aafUID_constptr) &MY_TYPE_ID(name), \
-    (aafUID_constptr) &MY_TARGET_ID(type), \
-    MY_ARRAY_ELEMENT_COUNT(MY_ARRAY_NAME(name)) - 1, \
-    MY_ARRAY_NAME(name)),
+    (aafUID_constptr) &MY_TARGET_ID(type)),
 #define AAF_TYPE_TABLE_END() \
 };
 
@@ -874,8 +856,6 @@ static TypeDefinitionWeakReference sTypeDefinitionWeakReferences [] = \
 #undef MY_TYPE_NAME
 #undef MY_TYPE_ID
 #undef MY_TARGET_ID
-
-#undef MY_ARRAY_NAME
 
 
 const aafUInt32 kTypeDefinitionWeakReferenceCount = 
@@ -922,7 +902,7 @@ const aafUInt32 kTypeDefinitionWeakReferenceSetCount =
 // Create an array of all weak reference vector types.
 //
 
-#define MY_TYPE_NAME(name) L"kAAFTypeID_" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 //#define MY_TARGET_ID(name) AUID_AAF##name
 #define MY_TARGET_ID(type) MY_TYPE_ID(type)
@@ -987,7 +967,7 @@ const aafUInt32 kTypeDefinitionStreamCount =
 // Create an array of all indirect types.
 //
 
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 
 
@@ -1014,7 +994,7 @@ const aafUInt32 kTypeDefinitionIndirectCount =
 // Create an array of all opaque types.
 //
 
-#define MY_TYPE_NAME(name) L"aaf" L###name
+#define MY_TYPE_NAME(name) L###name
 #define MY_TYPE_ID(name) kAAFTypeID_##name
 
 
@@ -1522,11 +1502,15 @@ void AAFObjectModel::InitializePrivateClassDefinitions(void)
 
 void AAFObjectModel::InitializeAxiomaticDefinitions(void)
 {
+  // There is only one meta dictionary and it must be internally
+  // created.
+  findClassDefinition(&AUID_AAFMetaDictionary)->makeAxiomatic();
+
   // We know that the class definition for all class definitions is
   // axiomatic. This should also make property definitions axiomatic
   // and all associated type definitions.
-  findClassDefinition(&AUID_AAFClassDefinition)->makeAxiomatic();
-  findClassDefinition(&AUID_AAFPropertyDefinition)->makeAxiomatic();
+//  findClassDefinition(&AUID_AAFClassDefinition)->makeAxiomatic();
+//  findClassDefinition(&AUID_AAFPropertyDefinition)->makeAxiomatic();
 
 
   // There really should only be 8 instances of TypeDefinitionInteger.
@@ -1534,7 +1518,7 @@ void AAFObjectModel::InitializeAxiomaticDefinitions(void)
   findTypeDefinition(&kAAFTypeID_UInt8)->makeAxiomatic();
   findTypeDefinition(&kAAFTypeID_UInt16)->makeAxiomatic();
   findTypeDefinition(&kAAFTypeID_UInt32)->makeAxiomatic();
-//  findTypeDefinition(&kAAFTypeID_UInt64)->makeAxiomatic(); // TEMPORARY: for compatibility
+  findTypeDefinition(&kAAFTypeID_UInt64)->makeAxiomatic();
   findTypeDefinition(&kAAFTypeID_Int8)->makeAxiomatic();
   findTypeDefinition(&kAAFTypeID_Int16)->makeAxiomatic();
   findTypeDefinition(&kAAFTypeID_Int32)->makeAxiomatic();
@@ -1546,12 +1530,6 @@ void AAFObjectModel::InitializeAxiomaticDefinitions(void)
   findTypeDefinition(&kAAFTypeID_Stream)->makeAxiomatic();
   findTypeDefinition(&kAAFTypeID_Indirect)->makeAxiomatic();
   findTypeDefinition(&kAAFTypeID_Opaque)->makeAxiomatic();
-
-
-  // There is only one meta dictionary and it must be internally
-  // created.
-  findClassDefinition(&AUID_AAFMetaDictionary)->makeAxiomatic();
-
 
   // Add the following two classes since the we still have the 
   // type, class and property definitions stored in the AAF dictionary.
@@ -2167,9 +2145,9 @@ bool ClassDefinition::visitPostOrder(VisitDefinitionProcType f, void *userData) 
   // Call the visit proc for each property definition.
   // NOTE: Should we acutally visit the properties in "reverse"
   // order for "real" post-order traversal?
-  for (aafUInt32 i = propertyCount(); (i > 0) && bContinue; --i)
+  for (aafUInt32 i = (propertyCount() - 1); (i >= 0) && bContinue; --i)
   {
-    bContinue = propertyDefinitionAt(i-1)->visitPostOrder(f, userData);
+    bContinue = propertyDefinitionAt(i)->visitPostOrder(f, userData);
   }
 
   if (bContinue)
@@ -2258,8 +2236,8 @@ void PropertyDefinition::Initialize (void)
 
   // POSTCONDITION: if the class and type definitions do not exist then
   // the meta dictionary is invalid.
-  assert (_typeDefinition && TypeDefinition::null() != _typeDefinition);
-  assert (_container && ClassDefinition::null() != _container);
+  assert (_typeDefinition);
+  assert (_container);
 }
 
 void PropertyDefinition::makeAxiomatic (void) const
@@ -2396,7 +2374,7 @@ void TypeDefinitionEnumeration::Initialize (void)
   // POSTCONDITION: if the type definition does not exist then either
   // the meta dictionary is invalid or the sort/search mechnism is 
   // broken.
-  assert (_typeDefinition && TypeDefinition::null() != _typeDefinition);
+  assert (_typeDefinition);
 }
 
 const ClassDefinition *
@@ -2477,7 +2455,7 @@ void TypeDefinitionVariableArray::Initialize(void)
   // POSTCONDITION: if the type definition does not exist then either
   // the meta dictionary is invalid or the sort/search mechnism is 
   // broken.
-  assert (_elementType && TypeDefinition::null() != _elementType);
+  assert (_elementType);
 }
 
 void TypeDefinitionVariableArray::makeAxiomatic (void) const
@@ -2604,9 +2582,9 @@ bool TypeDefinitionRecord::visitPostOrder(VisitDefinitionProcType f, void *userD
   bool bContinue = false;
 
   // Call the visit proc for this record's field type definitions.
-  for (aafUInt32 i = fieldCount(); (i > 0) && bContinue; --i)
+  for (aafUInt32 i = (fieldCount() - 1); (i >= 0) && bContinue; ++i)
   {
-    bContinue = fieldAt(i-1)->typeDefinition()->visitPostOrder(f, userData);
+    bContinue = fieldAt(i)->typeDefinition()->visitPostOrder(f, userData);
   }
 
   if (bContinue)
@@ -2636,7 +2614,7 @@ void DefinitionRecordField::Initialize()
   // POSTCONDITION: if the type definition does not exist then either
   // the meta dictionary is invalid or the sort/search mechnism is 
   // broken.
-  assert (_typeDefinition && TypeDefinition::null() != _typeDefinition);
+  assert (_typeDefinition);
 }
 
 void TypeDefinitionRename::Initialize()
@@ -2649,7 +2627,7 @@ void TypeDefinitionRename::Initialize()
 
   // POSTCONDITION: if the type definition does not exist then
   // the meta dictionary is invalid
-  assert (_renamedType && TypeDefinition::null() != _renamedType);
+  assert (_renamedType);
 }
 
 void TypeDefinitionRename::makeAxiomatic (void) const
@@ -2719,7 +2697,7 @@ void TypeDefinitionString::Initialize()
 
   // POSTCONDITION: if the type definition does not exist then
   // the meta dictionary is invalid
-  assert (_stringType && TypeDefinition::null() != _stringType);
+  assert (_stringType);
 }
 
 void TypeDefinitionString::makeAxiomatic (void) const
@@ -2821,7 +2799,7 @@ void TypeDefinitionSet::Initialize()
 
   // POSTCONDITION: if the type definition does not exist then
   // the meta dictionary is invalid
-  assert (_elementType && TypeDefinition::null() != _elementType);
+  assert (_elementType);
 }
 
 void TypeDefinitionSet::makeAxiomatic (void) const
@@ -2889,7 +2867,7 @@ void TypeDefinitionObjectReference::Initialize()
 
   // POSTCONDITION: if the type definition does not exist then
   // the meta dictionary is invalid
-  assert (_target && ClassDefinition::null() != _target);
+  assert (_target);
 }
 
 void TypeDefinitionObjectReference::makeAxiomatic (void) const
@@ -2945,6 +2923,8 @@ bool TypeDefinitionObjectReference::visitPostOrder(VisitDefinitionProcType f, vo
 const ClassDefinition *
   TypeDefinitionStrongReference::classDefinition(void) const
 {
+  // error C2065: 'AUID_AAFTypeDefinitionStrongReference' : undeclared identifier
+//  return objectModel()->findClassDefinition (&AUID_AAFTypeDefinitionStrongReference);
   return objectModel()->findClassDefinition (&AUID_AAFTypeDefinitionStrongObjectReference);
 }
 
@@ -2966,7 +2946,7 @@ void TypeDefinitionStrongReferenceVector::Initialize()
 
   // POSTCONDITION: if the type definition does not exist then
   // the meta dictionary is invalid
-  assert (type && TypeDefinition::null() != type);
+  assert (type);
 }
 
 const ClassDefinition *
@@ -2975,62 +2955,11 @@ const ClassDefinition *
   return objectModel()->findClassDefinition (&AUID_AAFTypeDefinitionVariableArray);
 }
 
-
-
-void TypeDefinitionWeakReference::Initialize(void)
-{
-	TypeDefinitionObjectReference::Initialize();
-
-	assert (targetSetCount() > 1);
-
-  // NOTE: The first property in array since it it special
-  // and connot be found in the global list of properties (this
-  // property is private to the OM). It NUST be one of the
-  // "two-roots" of the file.
-	assert((0 == memcmp(_targetSet[0], &kAAFPropID_Root_MetaDictionary, sizeof(aafUID_t))) ||
-	       (0 == memcmp(_targetSet[0], &kAAFPropID_Root_Header, sizeof(aafUID_t))));
-
-	// Make sure all of the other properties are in the dictionary.
-	const PropertyDefinition *propertyDefinition = NULL;
-	const TypeDefinition * typeDefinition = NULL;
-	for (aafUInt32 i = 1; i < targetSetCount(); i++)
-	{
-    propertyDefinition = objectModel()->findPropertyDefinition(_targetSet[i]);
-    assert (propertyDefinition && PropertyDefinition::null() != propertyDefinition);
-	}
-}
-
-void TypeDefinitionWeakReference::makeAxiomatic (void) const
-{
-  if (!axiomatic())
-  {
-    // Make this definition and its class definition axiomatic
-    TypeDefinitionObjectReference::makeAxiomatic();
-
-    // Make all of the referenced property definitions axiomatic.
-    // Skip over the first property in array since it it special
-    // and connot be found in the global list of properties (this
-    // property is private to the OM).
-    const PropertyDefinition *propertyDefinition = NULL;
-    for (aafUInt32 i = 1; i < targetSetCount(); ++i)
-    {
-    	propertyDefinition = objectModel()->findPropertyDefinition(targetAt(i));
-      propertyDefinition->container()->makeAxiomatic();
-    }
-  }
-}
-
-
-aafUID_constptr
-  TypeDefinitionWeakReference::targetAt(aafUInt32 index) const
-{
-	assert (targetSetCount() > index);
-	return _targetSet[index];
-}
-
 const ClassDefinition *
   TypeDefinitionWeakReference::classDefinition(void) const
 {
+  // error C2065: 'AUID_AAFTypeDefinitionWeakReference' : undeclared identifier
+//  return objectModel()->findClassDefinition (&AUID_AAFTypeDefinitionWeakReference);
   return objectModel()->findClassDefinition (&AUID_AAFTypeDefinitionWeakObjectReference);
 }
 
@@ -3051,7 +2980,7 @@ void TypeDefinitionWeakReferenceVector::Initialize()
 
   // POSTCONDITION: if the type definition does not exist then
   // the meta dictionary is invalid
-  assert (type && TypeDefinition::null() != type);
+  assert (type);
 }
 
 const ClassDefinition *
@@ -3073,7 +3002,7 @@ void TypeDefinitionStream::Initialize()
 
   // POSTCONDITION: if the type definition does not exist then
   // the meta dictionary is invalid
-  assert (_elementType && TypeDefinition::null() != _elementType);
+  assert (_elementType);
 }
 
 void TypeDefinitionStream::makeAxiomatic (void) const
