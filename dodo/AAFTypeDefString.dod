@@ -1,220 +1,243 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
-AAFTypeDefEssence\
+AAFTypeDefString\
 #endm
 #c
 #startm .parent-module 0
 AAFTypeDef\
 #endm
 #c
+#import ./AAFTypeDef.exp
 AD_HEAD
 AD_IDL(//
-// This interface is used to define Essence types used in AAF persistent
-// objects.
-//
-// In addition to the specific error results listed for each method\,
-// all methods in this interface may also return one of the following
-// values:
-// 
-// AAFRESULT_NOMEMORY
-//   - insufficient system memory is available to perform the
-//     operation.
-//
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/)
-AD_CLASS_UUID(809c8ca3, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
+// This interface is used to define variably-sized Array types whose
+// length is determined by a special terminator element value.
+AD_STD_COMMENT_IFC_HEADER
+AD_STD_COMMENT_IFC_STUB)
+AD_FORWARD_DECLARATION(AAFPropertyValue)
+AD_CLASS_UUID(307e9e67, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 
-AD_DEFAULT_UUID(809c8ca4, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
+AD_DEFAULT_UUID(307e9e68, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_METHOD0(Initialize,
-		   Initializes a newly allocated\, empty IAAFTypeDefEssence-supporting
-  // object.  This method must be called after allocation\, and before
+AD_XMETHOD3(Initialize,
+			[in\, ref],
+			objPass,
+			aafUID_constref,
+			id,
+			auid to be used to identify this type,
+
+			[in],
+			objIn,
+			AAFTypeDef,
+			pTypeDef,
+			type of each element to be contained in this array,
+
+			[in],
+			objPass,
+			aafCharacter_constptr,
+			pTypeName,
+			friendly name of this type definition,
+
+			Initializes this type def to contain elements of the given type.
+  // Note that it is only possible to use certain types as the element
+  // type.  Those permissible types include:
+  // - AAFTypeDefInt
+  //
+  // This method must be called after allocation\, and before
   // any other method can be called.
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize\(\) has already been called on this object.)
+  // - pID is a valid pointer.
+  // - pTypeDef is a valid pointer.
+  // - pTypeName is a valid pointer.
+  // - element type is permissible for use in a String.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_ALREADY_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pTypeDef or pTypeName\))
 
 
-AD_XMETHOD2(GetSize,
+AD_XMETHOD1(GetType,
+			[out],
+			objOut,
+			AAFTypeDef,
+			ppTypeDef,
+			type of elements in this array,
+
+     Returns the type of elements in this string.
+  //
+  // Succeeds if:
+  // - Initialize\(\) has already been called on this object.
+  // - ppTypeDef is a valid pointer.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppTypeDef\))
+
+
+AD_XMETHOD2(GetCount,
 			[in],
 			objIn,
 			AAFPropertyValue,
-			pPVal,
-			The Property Value which is to be read for this data,
+			pPropVal,
+			property value of array,
 
 			[out],
 			objPass,
-			aafInt64 *,
-			pSize,
-			the returned size of the media contained in the given Property
-	// Value\, in bytes,
+			aafUInt32 *,
+			pCount,
+			count of elements in the specified string property value,
 
-			Returns the size of the media assumed to be within the specified
-  // Property Value.  Assumes that the given Property Value is of the
-  // kAAFTypeCategoryMedia. 
+     Returns number of elements contained in the referenced property
+  // value.
   //
   // Succeeds if:
-  // - The pPVal pointer is valid.
-  // - The pSize pointer is valid.
-  // - The given Property Value is a kAAFTypeCategoryMedia.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - Either pPVal or pSize pointer is NULL.
-  //
-  // AAFRESULT_BAD_TYPE_CATEGORY
-  //   - The given Property Value is not a kAAFTypeCategoryMedia.)
+  // - Initialize\(\) has already been called on this object.
+  // - pPropVal is a valid pointer.
+  // - pCount is a valid pointer.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pPropVal or pCount\))
 
 
-AD_XMETHOD5(GetValue,
+AD_XMETHOD3(CreateValueFromCString,
+			[in\, size_is\(initDataSize\)],
+			objPass,
+			aafMemPtr_t,
+			pInitData,
+			pointer to compile-time C string containing data to use,
+
+			[in],
+			objPass,
+			aafUInt32,
+			initDataSize,
+			size of data in pInitData\, in bytes,
+
+			[out],
+			objOut,
+			AAFPropertyValue,
+			ppPropVal,
+			newly created property value,
+
+     Creates a property value which contains a string type.  The
+  // string in the property value are initialized from data in a C
+  // string which is pointed to by pInitData.  Returns the
+  // newly-created property value in ppPropVal.  The size of the
+  // newly-created string property value will be determined by the
+  // size of the initialization C array\, as communicated by
+  // initDataSize.
+  //
+  // Succeeds if all of the following are true:
+  // - the pInitData pointer is valid.
+  // - the ppPropVal pointer is valid.
+  //
+  // If this method fails nothing will be written to *ppPropVal.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInitData or ppPropVal\))
+
+
+AD_XMETHOD3(SetCString,
 			[in],
 			objIn,
 			AAFPropertyValue,
-			pPVal,
-			The Property Value which is to be read for this data,
+			pPropVal,
+			property value to write,
+
+			[in\, size_is\(dataSize\)],
+			objPass,
+			aafMemPtr_t,
+			pData,
+			buffer from which C string data should be read,
 
 			[in],
 			objPass,
-		    aafInt64,
-			start,
-			Offset in bytes into the Media property where the read should
-	// start,
+			aafUInt32,
+			dataSize,
+			size of pData buffer in bytes,
 
-			[in],
-			objPass,
-		    aafInt64,
-			len,
-			Length in bytes requested to be read,
-
-			[out],
-			objPass,
-			aafUInt8 *,
-			pValBuf,
-			Buffer into which data should be copied.  Caller guarantees that
-  // buffer is at least len bytes long.,
-
-			[out],
-			objPass,
-			aafInt64 *,
-			pNumRead,
-			Number of bytes actually read,
-
-			Reads a selected portion of media assumed to be within the
-  // specified Property Value\, and places it into the memory 
-  // specified by pValBuf.  The portion of media is selected through
-  // the start and len arguments.  The buffer indicated by pValBuf
-  // must be at least len bytes long.  This method assumes that the
-  // given Property Value is of the kAAFTypeCategoryMedia.  The number
-  // of bytes actually read and copied into pValBuf is returned in the
-  // pNumRead argument.
+     Copies all the string data contained in the C array pointed to by
+  // pData into the given property value\, interpreting the data as a
+  // string of this type.  If dataSize indicates an array size
+  // different from the size currently in the indicated array property
+  // value\, that array property value will be resized.
   //
-  // Note: This method will succeed even if start specifies a position
-  // off the end of the media; in that case\, no data will be written
-  // to pValBuf and *pNumRead will be set to zero.  This method will
-  // also succeed if start+len extends beyond the end of the media; in
-  // that case\, only the available data will be written to pValBuf and
-  // *pNumRead will be set to the actual number of bytes copied.
+  // Succeeds if all of the following are true:
+  // - the pPropVal pointer is valid.
+  // - the pData pointer is valid.
   //
-  // Succeeds if:
-  // - The pPVal\, pValBuf\, and pNumRead pointers are valid.
-  // - The start and len arguments are non-negative.
-  // - The given Property Value is a kAAFTypeCategoryMedia.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - Either pPVal or pSize pointer is NULL.
-  //
-  // AAFRESULT_BAD_TYPE_CATEGORY
-  //   - The given Property Value is not a kAAFTypeCategoryUInt.)
+  // If this method fails nothing will be written to *ppPropVal.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pPropVal or pData\))
 
 
-AD_XMETHOD4(AppendValue,
+AD_XMETHOD2(AppendElements,
+
 			[in],
 			objIn,
 			AAFPropertyValue,
-			pPVal,
-			The Property Value which is to be appended with this data,
+			pInPropVal,
+       property value corresponding to string to which elements are to
+    // be appended,
 
 			[in],
 			objPass,
-		    aafInt64,
-			len,
-			Length in bytes to be written,
+			aafMemPtr_t,
+			pElements,
+			Null-terminated array of elements to be appended,
 
+     Appends elements to the end of the array\, setting them to the
+  // values given in the pElements array.
+  //
+  // Succeeds if:
+  // - Initialize\(\) has already been called on this object.
+  // - pInPropVal pointer is valid.
+  // - pElements pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInPropVal or pElements\))
+
+
+AD_XMETHOD3(GetElements,
 			[in],
-			objPass,
-			aafUInt8 *,
-			pValBuf,
-			Buffer from which data should be copied,
+			objIn,
+			AAFPropertyValue,
+			pInPropVal,
+			property value to read,
 
 			[out],
 			objPass,
-			aafInt64 *,
-			pNumWritten,
-			Number of bytes actually written,
+			aafMemPtr_t,
+			pBuffer,
+			array of values that are read,
 
-  // Writes the data contained in pValBuf onto the end of the given
-  // media data.  The amount of data to be written is given by the len
-  // argument.  This method assumes that the given Property Value is
-  // of the kAAFTypeCategoryMedia.  The number of bytes actually
-  // written is returned in the pNumWritten argument.
-  //
-  // Succeeds if:
-  // - The pPVal\, pValBuf\, and pNumWritten pointers are valid.
-  // - The given Property Value is a kAAFTypeCategoryMedia.
-  // - There is sufficient space in the filesystem to write the data.
-  //
-  // NOTE! The behavior of this method is different from that of other
-  // methods in the Reference Implementation in that the state of the
-  // Media Property Value may be changed even if this method fails!
-  // That can only happen if the filesystem runs out of space during
-  // this method call; in that case as much data as possible will be
-  // written\, *pNumWritten will be set to the number of bytes written\,
-  // and the AAFRESULT_INSUFFICIENT_SPACE result code will be
-  // returned.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
+			[in],
+			objPass,
+			aafUInt32,
+			bufferSize,
+			size of pBuffer\, in bytes,
+
+     Gets the value of this property as a string and places it into
+  // pBuffer.  bufferSize indicates the size of the buffer\, in bytes.
   // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
+  // Succeeds if:
+  // - Initialize\(\) has already been called on this object.
+  // - The pInPropVal pointer is valid.
+  // - bufferSize indicates that pBuffer is large enough to hold the
+  //   data.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pInPropVal\)
   //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - Either pPVal or pSize pointer is NULL.
-  //
-  // AAFRESULT_INSUFFICIENT_SPACE
-  //   - There is insufficient space in the filesystem to write the
-  //   given data.)
+  // AAFRESULT_SMALLBUF
+  //   - bufferSize indicates that pBuffer is too small to hold the
+  //     data.)
+
+
+AD_OVERRIDE(.method-GetTypeCategory)
 AD_XCLASS_END(Concrete, StoredObject)

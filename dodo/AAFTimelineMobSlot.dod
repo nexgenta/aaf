@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTimelineMobSlot\
 #endm
@@ -6,7 +13,7 @@ AAFTimelineMobSlot\
 AAFMobSlot\
 #endm
 #c
-#import ./AAFMobSlot.exp
+#c #import ./AAFMobSlot.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFTimelineMobSlot interface is implemented by objects which
@@ -30,7 +37,7 @@ AD_IDL(//
 AD_CLASS_UUID(B1A21379, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21378, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_METHOD0(Initialize,
 		   Initializes a newly allocated\, empty
   // IAAFTimelineMobSlot-supporting object.  This method must be
@@ -77,13 +84,10 @@ AD_METHOD1(GetEditRate,
 
 AD_METHOD1(SetEditRate,
 		   [in], 
-		   aafRational_t *, 
-		   pEditRate, 
+		   aafRational_constref, 
+		   editRate, 
 		   Edit rate property value,
 		   This method will get set edit rate for this mob slot.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pEditRate pointer is valid.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\\\, it will return the first one
@@ -93,10 +97,7 @@ AD_METHOD1(SetEditRate,
   //   - succeeded.  \\\(This is the only code indicating success.\\\)
   //
   // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\\\(\\\) called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pEditRate arg is NULL.)
+  //   - This object has not yet had Initialize\\\(\\\) called on it.)
 
 
 AD_METHOD1(GetOrigin,
@@ -139,4 +140,4 @@ AD_METHOD1(SetOrigin,
   //
   // AAFRESULT_NOT_INITIALIZED
   //   - This object has not yet had Initialize\\\(\\\) called on it.)
-AD_CLASS_END
+AD_XCLASS_END(Concrete, StoredObject)
