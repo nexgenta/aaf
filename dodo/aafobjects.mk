@@ -66,6 +66,7 @@ HUMAN_TYPED_IMPL="\
 	AAFIdentification \
 	AAFInterpolationDef \
 	AAFIntraFrameMarker \
+	AAFKLVData \
 	AAFLocator \
 	AAFMasterMob \
 	AAFMob  \
@@ -102,6 +103,7 @@ HUMAN_TYPED_IMPL="\
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTypeDef \
+	AAFTypeDefCharacter \
 	AAFTypeDefIndirect \
 	AAFTypeDefInt \
 	AAFTypeDefRename \
@@ -129,6 +131,7 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFInterpolationDefs \
 	EnumAAFOperationDefs \
 	EnumAAFEssenceData \
+	EnumAAFKLVData \
 	EnumAAFLoadedPlugins \
 	EnumAAFLocators \
 	EnumAAFMobSlots \
