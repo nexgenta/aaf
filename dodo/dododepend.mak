@@ -17,85 +17,87 @@ include aafobjects.mk
 
 
 depend.mk : aafobjects.mk
-	@ echo Creating depend.tmp ...
-	@ rm -f depend.tmp
-	@ echo "#" This file automatically generated make. > depend.tmp
-	@ echo "#" Special case AAFModule since no object is to be built only headers... >> depend.tmp
-	@ echo AAFModule.all...
-	@ echo AAFModule.all : AAFModule.fidl >> depend.tmp
-	@ echo AAFModule.all : AAFModule.frefh >> depend.tmp
-	@ echo AAFModule.fidl : macros/fidl.mac macros/base.mac >> depend.tmp
-	@ echo AAFModule.frefh : macros/frefh.mac macros/base.mac >> depend.tmp
-	@ echo "" >> depend.tmp
-	@ echo "#" Special case AAFTypes since no object is to be built only headers... >> depend.tmp
-	@ echo AAFTypes.all...
-	@ echo AAFTypes.all : AAFTypes.idl >> depend.tmp
-	@ echo AAFTypes.all : AAFTypes.refh >> depend.tmp
-	@ echo AAFTypes.idl : macros/idl.mac macros/base.mac >> depend.tmp
-	@ echo AAFTypes.refh : macros/refh.mac macros/base.mac >> depend.tmp
-	@ for base in $(DODO_TARGET_NAMES) ; do \
+	@echo Creating depend.mk ...
+	@rm -f depend.mk
+	@echo # This file automatically generated make. > depend.mk
+	@echo # Special case AAFTypes since no object is to be built only headers... > depend.mk
+	@echo AAFTypes.all...
+	@echo AAFTypes.all : AAFTypes.cpp AAFTypes.h AAFTypes.cppt > depend.mk
+	@echo AAFTypes.all : AAFTypes.comc AAFTypes.comh > depend.mk
+	@echo AAFTypes.all : AAFTypes.implc AAFTypes.implh > depend.mk
+	@echo AAFTypes.all : AAFTypes.idl AAFTypes.exp > depend.mk
+	@echo AAFTypes.h : macros/h.mac macros/base.mac > depend.mk
+	@echo AAFTypes.comh : macros/comh.mac macros/base.mac > depend.mk
+	@echo AAFTypes.implh : macros/implh.mac macros/base.mac > depend.mk
+	@echo AAFTypes.idl : macros/idl.mac macros/base.mac > depend.mk
+	@echo AAFTypes.exp : macros/exp.mac macros/base.mac > depend.mk
+	@echo # > depend.mk
+	@echo # > depend.mk
+	@echo #special case the utility classes since they will not be exposed by com > depend.mk
+	@echo AAFUInt64.all...
+	@echo AAFUInt64.all : AAFUInt64.cpp AAFUInt64.h AAFUInt64.cppt > depend.mk
+	@echo AAFUInt64.all : AAFUInt64.implc AAFUInt64.implh > depend.mk
+	@echo AAFUInt64.all : AAFUInt64.exp > depend.mk
+	@echo AAFUInt64.cpp : macros/cpp.mac macros/base.mac > depend.mk
+	@echo AAFUInt64.h : macros/h.mac macros/base.mac > depend.mk
+	@echo AAFUInt64.cppt : macros/cppt.mac macros/base.mac > depend.mk
+	@echo AAFUInt64.implc : macros/implc.mac macros/base.mac > depend.mk
+	@echo AAFUInt64.implh : macros/implh.mac macros/base.mac > depend.mk
+	@echo AAFUInt64.exp : macros/exp.mac macros/base.mac > depend.mk
+	@echo # > depend.mk
+	@echo AAFInt64.all...
+	@echo AAFInt64.all : AAFInt64.cpp AAFInt64.h AAFInt64.cppt > depend.mk
+	@echo AAFInt64.all : AAFInt64.implc AAFInt64.implh > depend.mk
+	@echo AAFInt64.all : AAFInt64.exp > depend.mk
+	@echo AAFInt64.cpp : macros/cpp.mac macros/base.mac > depend.mk
+	@echo AAFInt64.h : macros/h.mac macros/base.mac > depend.mk
+	@echo AAFInt64.cppt : macros/cppt.mac macros/base.mac > depend.mk
+	@echo AAFInt64.implc : macros/implc.mac macros/base.mac > depend.mk
+	@echo AAFInt64.implh : macros/implh.mac macros/base.mac > depend.mk
+	@echo AAFInt64.exp : macros/exp.mac macros/base.mac > depend.mk
+	@echo # > depend.mk
+	@echo AAFString.all...
+	@echo AAFString.all : AAFString.cpp AAFString.h AAFString.cppt > depend.mk
+	@echo AAFString.all : AAFString.implc AAFString.implh > depend.mk
+	@echo AAFString.all : AAFString.exp > depend.mk
+	@echo AAFString.cpp : macros/cpp.mac macros/base.mac > depend.mk
+	@echo AAFString.h : macros/h.mac macros/base.mac > depend.mk
+	@echo AAFString.cppt : macros/cppt.mac macros/base.mac > depend.mk
+	@echo AAFString.implc : macros/implc.mac macros/base.mac > depend.mk
+	@echo AAFString.implh : macros/implh.mac macros/base.mac > depend.mk
+	@echo AAFString.exp : macros/exp.mac macros/base.mac > depend.mk
+	$(SH_PREFIX) for base in $(DODO_TARGET_NAMES) ; do \
 		echo $$base.all... ; \
-		echo "" >> depend.tmp ; \
-		echo $$base.all : $$base.comc $$base.comh >> depend.tmp ; \
-		echo $$base.all : $$base.comt >> depend.tmp ; \
-		echo $$base.all : $$base.implc $$base.implh >> depend.tmp ; \
-		echo $$base.all : $$base.fidl >> depend.tmp ; \
-		echo $$base.all : $$base.frefh >> depend.tmp ; \
-		echo $$base.comc : macros/comc.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.comh : macros/comh.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.comt : macros/comt.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.implc : macros/implc.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.implh : macros/implh.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.fidl : macros/fidl.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.frefh : macros/frefh.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.exp : macros/exp.mac macros/base.mac >> depend.tmp ; \
-		for import in `grep '^\#import' $$base.dod | sed -e 's,\#import,,' | sed -e 's,.*/,,'` ; do \
-			echo $$base.comc : $$import >> depend.tmp ; \
-			echo $$base.comh : $$import >> depend.tmp ; \
-			echo $$base.comt : $$import >> depend.tmp ; \
-			echo $$base.implc : $$import >> depend.tmp ; \
-			echo $$base.implh : $$import >> depend.tmp ; \
-			echo $$base.fidl : $$import >> depend.tmp ; \
-			echo $$base.frefh : $$import >> depend.tmp ; \
-			echo $$base.exp : $$import >> depend.tmp ; \
+		echo '' >> depend.mk ; \
+		echo $$base.all : $$base.cpp $$base.h $$base.cppt >> depend.mk ; \
+		echo $$base.all : $$base.comc $$base.comh $$base.comt >> depend.mk ; \
+		echo $$base.all : $$base.implc $$base.implh >> depend.mk ; \
+		echo $$base.all : $$base.idl $$base.exp >> depend.mk ; \
+		echo $$base.cpp : macros/cpp.mac macros/base.mac >> depend.mk ; \
+		echo $$base.h : macros/h.mac macros/base.mac >> depend.mk ; \
+		echo $$base.cppt : macros/cppt.mac macros/base.mac >> depend.mk ; \
+		echo $$base.comc : macros/comc.mac macros/base.mac >> depend.mk ; \
+		echo $$base.comh : macros/comh.mac macros/base.mac >> depend.mk ; \
+		echo $$base.comt : macros/comt.mac macros/base.mac >> depend.mk ; \
+		echo $$base.implc : macros/implc.mac macros/base.mac >> depend.mk ; \
+		echo $$base.implh : macros/implh.mac macros/base.mac >> depend.mk ; \
+		echo $$base.idl : macros/idl.mac macros/base.mac >> depend.mk ; \
+		echo $$base.exp : macros/exp.mac macros/base.mac >> depend.mk ; \
+		for import in `grep '^#import' $$base.dod | sed -e 's,#import,,'` ; do \
+			echo $$base.cpp : $$import >> depend.mk ; \
+			echo $$base.h : $$import >> depend.mk ; \
+			echo $$base.cppt : $$import >> depend.mk ; \
+			echo $$base.comc : $$import >> depend.mk ; \
+			echo $$base.comh : $$import >> depend.mk ; \
+			echo $$base.comt : $$import >> depend.mk ; \
+			echo $$base.implc : $$import >> depend.mk ; \
+			echo $$base.implh : $$import >> depend.mk ; \
+			echo $$base.idl : $$import >> depend.mk ; \
+			echo $$base.exp : $$import >> depend.mk ; \
 		done ; \
-	  done
-	@ for base in $(AAFCOMINTERFACESONLY) ; do \
-		echo $$base.all... ; \
-		echo "" >> depend.tmp ; \
-		echo $$base.all : $$base.fidl $$base.comcx $$base.exp >> depend.tmp ; \
-		echo $$base.fidl : macros/fidl.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.comcx : macros/comcx.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.exp : macros/exp.mac macros/base.mac >> depend.tmp ; \
-	  done
-	@ echo AAFPluginTypes.all...
-	@ echo "" >> depend.tmp
-	@ echo AAFPluginTypes.all : AAFPluginTypes.idl >> depend.tmp
-	@ echo AAFPluginTypes.all : AAFPluginTypes.refh >> depend.tmp
-	@ echo AAFPluginTypes.idl : macros/idl.mac macros/base.mac >> depend.tmp
-	@ echo AAFPluginTypes.refh : macros/refh.mac macros/base.mac >> depend.tmp
-	@ echo "" >> depend.tmp
-	@ for base in $(PLUGIN_OBJECTS) ; do \
-		echo $$base.all... ; \
-		echo "" >> depend.tmp ; \
-		echo $$base.all : $$base.fidl $$base.frefh >> depend.tmp ; \
-		echo $$base.fidl : macros/fidl.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.exp : macros/exp.mac macros/base.mac >> depend.tmp ; \
-		echo $$base.frefh : macros/frefh.mac macros/base.mac >> depend.tmp ; \
-	done
-	@ echo "" >> depend.tmp
-	for file in $(HUMAN_TYPED_IMPL) ; do \
-		grep -v $$file\.impl depend.tmp | grep -v $$file\.comt > depend.tmp2 ; \
-		rm depend.tmp ; \
-		mv depend.tmp2 depend.tmp ; \
-	  done
-	@ mv depend.tmp depend.mk
-	@ echo "Done with depend.mk."
+	done $(SH_SUFFIX)
+	@echo "Done with depend.mk."
 
 
 clean :
-	$(RM) -rf depend.mk
-	touch depend.mk
-
-
-
+	$(SH_PREFIX) $(RM) -rf depend.mk $(SH_SUFFIX)
