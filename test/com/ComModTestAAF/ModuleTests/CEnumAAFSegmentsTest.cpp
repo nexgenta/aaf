@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CEnumAAFSegments
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -9,16 +9,15 @@
 *                                          *
 \******************************************/
 
-#ifndef __CEnumAAFSegments_h__
-#include "CEnumAAFSegments.h"
-#endif
+#include "AAF.h"
 
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 #include <iostream.h>
 #include <stdio.h>
 
 #include "AAFStoredObjectIDs.h"
+#include "AAFDefUIDs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -56,16 +55,17 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFSelector Test";
+	ProductInfo.productName = L"EnumAAFSegments Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
+	*ppFile = NULL;
 
 	switch (mode)
 	{
@@ -84,8 +84,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -119,7 +122,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafFadeType_t		fadeInType = kFadeLinearAmp;
 	aafFadeType_t		fadeOutType = kFadeLinearPower;
 	aafSourceRef_t		sourceRef; 
-	aafUID_t			fillerUID = DDEF_Video;
+	aafUID_t			fillerUID = DDEF_Picture;
 	aafLength_t			fillerLength = 3200;
 
 	HRESULT				hr = AAFRESULT_SUCCESS;
@@ -143,7 +146,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
 		checkResult(pReferencedMob->SetMobID(&referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
-
+		pReferencedMob->Release();
+		pReferencedMob = NULL;
 		// Create a Composition Mob
 		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
 											  IID_IAAFCompositionMob, 
@@ -324,6 +328,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 				pSegment->Release();
 				pSegment = NULL;
 
+				pSelector->Release();
+				pSelector = NULL;
+
 				pSlot->Release();
 				pSlot = NULL;
 			}
@@ -385,7 +392,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return 	hr;
 }
 
-HRESULT CEnumAAFSegments::test()
+extern "C" HRESULT CEnumAAFSegments_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"EnumAAFSegmentsTest.aaf";
@@ -398,7 +405,7 @@ HRESULT CEnumAAFSegments::test()
 	}
 	catch (...)
 	{
-	  cerr << "CEnumAAFSegments::test...Caught general C++"
+	  cerr << "CEnumAAFSegments_test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
