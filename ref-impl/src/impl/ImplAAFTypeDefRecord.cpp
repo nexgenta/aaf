@@ -1,11 +1,10 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 
 #ifndef __ImplAAFTypeDefRecord_h__
 #include "ImplAAFTypeDefRecord.h"
@@ -36,15 +35,14 @@
 
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
-#define RELEASE_IF_SET(obj) \
-    if (obj) { obj->ReleaseReference(); obj = NULL; }
-
-
 ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
   : _memberTypes ( PID_TypeDefinitionRecord_MemberTypes, "Member Types"),
 	_memberNames ( PID_TypeDefinitionRecord_MemberNames, "Member Names"),
 	_registeredOffsets (0),
-	_registeredSize (0)
+	_registeredSize (0),
+	_internalSizes (0),
+	_cachedCount ((aafUInt32) -1),
+	_cachedMemberTypes (0)
 {
   _persistentProperties.put(_memberTypes.address());
   _persistentProperties.put(_memberNames.address());
@@ -55,12 +53,46 @@ ImplAAFTypeDefRecord::~ImplAAFTypeDefRecord ()
 {
   if (_registeredOffsets)
 	delete[] _registeredOffsets;
+
+  if (_internalSizes)
+	delete[] _internalSizes;
+
+  if (_cachedMemberTypes)
+	delete[] _cachedMemberTypes;
+}
+
+
+void ImplAAFTypeDefRecord::pvtInitInternalSizes (void) const
+{
+  if (_internalSizes)
+	return;
+
+  ImplAAFTypeDefRecord * pNonConstThis =
+	  (ImplAAFTypeDefRecord*) this;
+  AAFRESULT hr;
+  aafUInt32 count = 0;
+  hr = GetCount(&count);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  pNonConstThis->_internalSizes = new aafUInt32[count];
+  assert(_internalSizes);
+
+  aafUInt32 i;
+
+  for (i = 0; i < count; i++)
+	{
+	  ImplAAFTypeDefSP ptd;
+	  hr = pNonConstThis->GetMemberType (i, &ptd);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  assert (ptd);
+	  _internalSizes[i] = ptd->PropValSize ();
+	}
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::Initialize (
-      aafUID_t * pID,
+      const aafUID_t * pID,
       ImplAAFTypeDef ** ppMemberTypes,
       aafString_t * pMemberNames,
       aafUInt32 numMembers,
@@ -76,6 +108,8 @@ AAFRESULT STDMETHODCALLTYPE
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
   hr = SetAUID (pID);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  _cachedCount = numMembers;
 
   aafUInt32 i;
   aafUInt32 totalNameSize = 0;
@@ -128,7 +162,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
   AAFRESULT hr;
   aafUInt32 count;
-  ImplAAFTypeDef * pMemberType = NULL;
   aafUID_t memberUID;
 
   if (!ppTypeDef) return AAFRESULT_NULL_PARAM;
@@ -138,13 +171,31 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (index >= count) return AAFRESULT_ILLEGAL_VALUE;
 
-  _memberTypes.getValueAt (&memberUID, index);
-  hr = GetDict()->LookupType(&memberUID, &pMemberType);
-  assert (AAFRESULT_SUCCEEDED(hr));
-  assert (pMemberType);
-  pMemberType->AcquireReference();
+  if (! _cachedMemberTypes)
+	{
+	  _cachedMemberTypes = new ImplAAFTypeDefSP[count];
+	  if (! _cachedMemberTypes)
+		return AAFRESULT_NOMEMORY;
+	}
+
+  if (! _cachedMemberTypes[index])
+	{
+	  _memberTypes.getValueAt (&memberUID, index);
+
+	  ImplAAFDictionarySP pDict;
+	  ImplAAFTypeDefSP pMemberType;
+	  hr = GetDictionary (&pDict);
+	  assert (AAFRESULT_SUCCEEDED(hr));
+	  assert (pDict);
+	  hr = pDict->LookupType(&memberUID, &pMemberType);
+	  assert (AAFRESULT_SUCCEEDED(hr));
+	  assert (pMemberType);
+	  _cachedMemberTypes[index] = pMemberType;
+	}
   assert (ppTypeDef);
-  *ppTypeDef = pMemberType;
+  *ppTypeDef = _cachedMemberTypes[index];
+  assert (*ppTypeDef);
+  (*ppTypeDef)->AcquireReference();
   return AAFRESULT_SUCCESS;
 }
 
@@ -292,75 +343,59 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED(hr)) return hr;
   if (numMembers != count) return AAFRESULT_ILLEGAL_VALUE;
 
-  AAFRESULT rReturned = AAFRESULT_SUCCESS;
-  ImplAAFPropValData * pvd = NULL;
-
+  ImplAAFPropValDataSP pvd;
   aafMemPtr_t pBits = NULL;
-  ImplAAFTypeDef * ptd = NULL;
-  try
+  ImplAAFTypeDefSP ptd;
+
+  // Get total property value size from sum of all member prop vals
+  assert (pMemberValues);
+  aafUInt32 size = 0;
+  aafUInt32 i;
+  for (i = 0; i < count ; i++)
 	{
-	  // Get total property value size from sum of all member prop vals
-	  assert (pMemberValues);
-	  aafUInt32 size = 0;
-	  aafUInt32 i;
-	  for (i = 0; i < count ; i++)
-		{
-		  hr = pMemberValues[i]->GetType (&ptd);
-		  if (AAFRESULT_FAILED(hr)) throw hr;
-		  assert (ptd);
-		  assert (ptd->IsFixedSize());
-		  size += ptd->PropValSize();
-		  ptd->ReleaseReference();
-		  ptd = NULL;
-		}
-	  assert (PropValSize() == size);
-
-	  AAFRESULT hr;
-
-	  // create new ueber-prop-val and set it up
-	  pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
-	  if (!pvd) throw AAFRESULT_NOMEMORY;
-
-	  hr = pvd->Initialize (this);
-	  if (AAFRESULT_FAILED(hr)) throw hr;
-
-	  hr = pvd->AllocateBits (size, &pBits);
-	  if (AAFRESULT_FAILED(hr)) throw hr;
-
-	  // copy bits of each subordinate prop val into correct place in
-	  // the ueber one
-	  size_t curOffset = 0;
-	  for (i = 0; i < count; i++)
-		{
-		  aafUInt32 curSize;
-		  hr = pMemberValues[i]->GetType (&ptd);
-		  if (AAFRESULT_FAILED(hr)) throw hr;
-		  assert (ptd);
-		  curSize = ptd->PropValSize();
-		  ptd->ReleaseReference ();
-		  ptd = NULL;
-		  aafMemPtr_t inBits = NULL;
-		  assert (dynamic_cast<ImplAAFPropValData*>(pMemberValues[i]));
-		  hr = dynamic_cast<ImplAAFPropValData*>(pMemberValues[i])
-			->GetBits (&inBits);
-		  if (AAFRESULT_FAILED(hr)) throw hr;
-		  assert (inBits);
-		  memcpy (pBits+curOffset, inBits, curSize);
-		  curOffset += curSize;
-		  assert (curOffset <= size);
-		}
-	  assert (ppPropVal);
-	  *ppPropVal = pvd;
-	  pvd = NULL;
+	  hr = pMemberValues[i]->GetType (&ptd);
+	  if (AAFRESULT_FAILED(hr)) return hr;
+	  assert (ptd);
+	  assert (ptd->IsFixedSize());
+	  size += ptd->PropValSize();
 	}
-  catch (HRESULT &rCaught)
+  assert (PropValSize() == size);
+
+  // create new ueber-prop-val and set it up
+  pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+  if (!pvd) return AAFRESULT_NOMEMORY;
+
+  hr = pvd->Initialize (this);
+  if (AAFRESULT_FAILED(hr)) return hr;
+
+  hr = pvd->AllocateBits (size, &pBits);
+  if (AAFRESULT_FAILED(hr)) return hr;
+
+  // copy bits of each subordinate prop val into correct place in
+  // the ueber one
+  size_t curOffset = 0;
+  for (i = 0; i < count; i++)
 	{
-	  rReturned = rCaught;
+	  aafUInt32 curSize;
+	  hr = pMemberValues[i]->GetType (&ptd);
+	  if (AAFRESULT_FAILED(hr)) return hr;
+	  assert (ptd);
+	  curSize = ptd->PropValSize();
+	  aafMemPtr_t inBits = NULL;
+	  assert (dynamic_cast<ImplAAFPropValData*>(pMemberValues[i]));
+	  hr = dynamic_cast<ImplAAFPropValData*>(pMemberValues[i])
+		->GetBits (&inBits);
+	  if (AAFRESULT_FAILED(hr)) return hr;
+	  assert (inBits);
+	  memcpy (pBits+curOffset, inBits, curSize);
+	  curOffset += curSize;
+	  assert (curOffset <= size);
 	}
+  assert (ppPropVal);
+  *ppPropVal = pvd;
+  (*ppPropVal)->AcquireReference ();
 
-  RELEASE_IF_SET (pvd);
-  RELEASE_IF_SET (ptd);
-  return rReturned;
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -393,66 +428,45 @@ AAFRESULT STDMETHODCALLTYPE
   if (index >= count) return AAFRESULT_ILLEGAL_VALUE;
 
   ImplAAFPropValData * pvdIn = NULL;
-  ImplAAFPropValData * pvdOut = NULL;
-  ImplAAFTypeDef * ptd = NULL;
-  aafUID_t memberUID;
-  AAFRESULT rReturned = AAFRESULT_SUCCESS;
-  try
+  ImplAAFPropValDataSP pvdOut;
+  ImplAAFTypeDefSP ptd;
+
+  aafUInt32 offset = 0;
+  // add up offsets of previous items
+  for (aafUInt32 i = 0; i < index; i++)
 	{
-	  aafUInt32 offset = 0;
-	  // add up offsets of previous items
-	  for (aafUInt32 i = 0; i < index; i++)
-		{
-		  _memberTypes.getValueAt (&memberUID, i);
-		  hr = GetDict()->LookupType (&memberUID, &ptd);
-		  assert (AAFRESULT_SUCCEEDED(hr));
-		  assert (ptd);
-		  ptd->AcquireReference ();
-		  offset += ptd->PropValSize();
-		  ptd->ReleaseReference ();
-		  ptd = NULL;
-		}
-
-	  // offset now points into prop storage
-
-	  pvdOut = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
-	  if (!pvdOut) throw AAFRESULT_NOMEMORY;
-
-	  _memberTypes.getValueAt (&memberUID, index);
-	  hr = GetDict()->LookupType (&memberUID, &ptd);
-	  assert (AAFRESULT_SUCCEEDED (hr));
+	  hr = GetMemberType (i, &ptd);
+	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (ptd);
-	  ptd->AcquireReference();
-
-	  hr = pvdOut->Initialize (ptd);
-	  if (AAFRESULT_FAILED(hr)) throw hr;
-
-	  assert (pInPropVal);
-	  pvdIn = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
-	  assert (pvdIn);
-
-	  hr = pvdOut->AllocateFromPropVal (pvdIn,
-										offset,
-										ptd->PropValSize(),
-										NULL);
-	  if (AAFRESULT_FAILED(hr)) throw hr;
-	  ptd->ReleaseReference();
-	  ptd = NULL;
-	  assert (ppOutPropVal);
-	  *ppOutPropVal = pvdOut;
-	  pvdOut = NULL;  // don't release reference; output param now
-					  // owns it
-	}
-  catch (AAFRESULT &rCaught)
-	{
-	  rReturned = rCaught;
+	  offset += ptd->PropValSize();
 	}
 
-  // Don't release this!  It is simply a dynamic_cast<>ed pInPropVal
-  // RELEASE_IF_SET (pvd);
-  RELEASE_IF_SET (pvdOut);
-  RELEASE_IF_SET (ptd);
-  return rReturned;
+  // offset now points into prop storage
+
+  pvdOut = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+  if (!pvdOut) return AAFRESULT_NOMEMORY;
+
+  hr = GetMemberType (index, &ptd);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (ptd);
+
+  hr = pvdOut->Initialize (ptd);
+  if (AAFRESULT_FAILED(hr)) return hr;
+
+  assert (pInPropVal);
+  pvdIn = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
+  assert (pvdIn);
+
+  hr = pvdOut->AllocateFromPropVal (pvdIn,
+									offset,
+									ptd->PropValSize(),
+									NULL);
+  if (AAFRESULT_FAILED(hr)) return hr;
+  assert (ppOutPropVal);
+  *ppOutPropVal = pvdOut;
+  (*ppOutPropVal)->AcquireReference ();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -509,69 +523,48 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED(hr)) return hr;
   if (index <= count) return AAFRESULT_ILLEGAL_VALUE;
 
-  ImplAAFPropValData * pvdIn = NULL;
-  ImplAAFPropValData * pvdOut = NULL;
-  ImplAAFTypeDef * ptd = NULL;
-  AAFRESULT rReturned = AAFRESULT_SUCCESS;
-  aafUID_t memberUID;
-  try
+  ImplAAFPropValDataSP pvdIn;
+  ImplAAFPropValDataSP pvdOut;
+  ImplAAFTypeDefSP ptd;
+
+  aafUInt32 offset = 0;
+  // add up offsets of previous items
+  for (aafUInt32 i = 0; i < index; i++)
 	{
-	  aafUInt32 offset = 0;
-	  // add up offsets of previous items
-	  for (aafUInt32 i = 0; i < index; i++)
-		{
-		  _memberTypes.getValueAt (&memberUID, i);
-		  hr = GetDict()->LookupType (&memberUID, &ptd);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-		  assert (ptd);
-		  ptd->AcquireReference ();
-		  assert (ptd);
-		  offset += ptd->PropValSize();
-		  ptd->ReleaseReference ();
-		  ptd = NULL;
-		}
-
-	  // offset now points into prop storage
-
-	  _memberTypes.getValueAt (&memberUID, index);
-	  hr = GetDict()->LookupType (&memberUID, &ptd);
+	  hr = GetMemberType (i, &ptd);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  assert (ptd);
-	  ptd->AcquireReference();
-
-	  assert (pMemberPropVal);
-	  pvdIn = dynamic_cast<ImplAAFPropValData*>(pMemberPropVal);
-	  assert (pvdIn);
-
-	  assert (pPropVal);
-	  pvdOut = dynamic_cast<ImplAAFPropValData*>(pPropVal);
-	  assert (pvdOut);
-
-	  assert ((offset+ptd->PropValSize()) <= this->PropValSize());
-
-	  aafMemPtr_t pInBits = NULL;
-	  aafMemPtr_t pOutBits = NULL;
-
-	  hr = pvdIn->GetBits (&pInBits);
-	  if (AAFRESULT_FAILED(hr)) throw hr;
-
-	  hr = pvdOut->GetBits (&pOutBits);
-	  if (AAFRESULT_FAILED(hr)) throw hr;
-
-	  memcpy (pOutBits+offset, pInBits, ptd->PropValSize());
-	  ptd->ReleaseReference();
-	  ptd = NULL;
-	}
-  catch (AAFRESULT &rCaught)
-	{
-	  rReturned = rCaught;
+	  offset += ptd->PropValSize();
 	}
 
-  // Don't release this!  It is simply a dynamic_cast<>ed pPropVal
-  // RELEASE_IF_SET (pvdIn);
-  // RELEASE_IF_SET (pvdOut);
-  RELEASE_IF_SET (ptd);
-  return rReturned;
+  // offset now points into prop storage
+
+  hr = GetMemberType (index, &ptd);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (ptd);
+
+  assert (pMemberPropVal);
+  pvdIn = dynamic_cast<ImplAAFPropValData*>(pMemberPropVal);
+  assert (pvdIn);
+
+  assert (pPropVal);
+  pvdOut = dynamic_cast<ImplAAFPropValData*>(pPropVal);
+  assert (pvdOut);
+
+  assert ((offset+ptd->PropValSize()) <= this->PropValSize());
+
+  aafMemPtr_t pInBits = NULL;
+  aafMemPtr_t pOutBits = NULL;
+
+  hr = pvdIn->GetBits (&pInBits);
+  if (AAFRESULT_FAILED(hr)) return hr;
+
+  hr = pvdOut->GetBits (&pOutBits);
+  if (AAFRESULT_FAILED(hr)) return hr;
+
+  memcpy (pOutBits+offset, pInBits, ptd->PropValSize());
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -614,10 +607,14 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::GetCount (
-      aafUInt32 *  pCount)
+      aafUInt32 *  pCount) const
 {
   if (!pCount) return AAFRESULT_NULL_PARAM;
-  *pCount = _memberTypes.count();
+  if (_cachedCount == ((aafUInt32) -1))
+	((ImplAAFTypeDefRecord*)this)->_cachedCount =
+	  _memberTypes.count();
+  *pCount = _cachedCount;
+
   return AAFRESULT_SUCCESS;
 }
 
@@ -643,9 +640,24 @@ AAFRESULT STDMETHODCALLTYPE
   _registeredOffsets = new aafUInt32[numMembers];
   if (! _registeredOffsets) return AAFRESULT_NOMEMORY;
 
+  pvtInitInternalSizes ();
+  assert (_internalSizes);
+
   for (aafUInt32 i = 0; i < numMembers; i++)
 	{
 	  _registeredOffsets[i] = pOffsets[i];
+	  if ((numMembers-1) == i)
+		{
+		  // Last (or perhaps only) member; take total struct size and
+		  // subtract last offset for this size
+		  _internalSizes[i] = structSize - pOffsets[i];
+		}
+	  else
+		{
+		  // We know it's not the last member, so it's safe to index
+		  // to the next element in pOffsets array.
+		  _internalSizes[i] = pOffsets[i+1] = pOffsets[i];
+		}
 	}
 
   _registeredSize = structSize;
@@ -663,13 +675,153 @@ ImplAAFTypeDefRecord::GetTypeCategory (eAAFTypeCategory_t *  pTid)
 }
 
 
-aafBool ImplAAFTypeDefRecord::IsFixedSize (void)
+void ImplAAFTypeDefRecord::reorder(OMByte* externalBytes,
+								   size_t externalBytesSize) const
+{
+  AAFRESULT hr;
+  aafUInt32 numMembers = 0;
+  aafUInt32 member = 0;
+  aafUInt32 externalMemberSize = 0;
+  ImplAAFTypeDefSP ptdm;
+
+  ImplAAFTypeDefRecord * pNonConstThis =
+	(ImplAAFTypeDefRecord *) this;
+
+  hr = pNonConstThis->GetCount (&numMembers);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  aafInt32 numBytesLeft = externalBytesSize;
+
+  for (member = 0; member < numMembers; member++)
+	{
+	  hr = pNonConstThis->GetMemberType (member, &ptdm);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  externalMemberSize = ptdm->PropValSize ();
+
+	  ptdm->reorder (externalBytes, externalMemberSize);
+	  externalBytes += externalMemberSize;
+	  numBytesLeft -= externalMemberSize;
+	  assert (numBytesLeft >= 0);
+	}
+}
+
+
+size_t ImplAAFTypeDefRecord::externalSize(OMByte* /*internalBytes*/,
+										  size_t /*internalBytesSize*/) const
+{
+  return PropValSize ();
+}
+
+
+void ImplAAFTypeDefRecord::externalize(OMByte* internalBytes,
+									   size_t internalBytesSize,
+									   OMByte* externalBytes,
+									   size_t externalBytesSize,
+									   OMByteOrder byteOrder) const
+{
+  AAFRESULT hr;
+  aafUInt32 numMembers = 0;
+  aafUInt32 member = 0;
+  aafUInt32 externalMemberSize = 0;
+  aafUInt32 internalMemberSize = 0;
+  ImplAAFTypeDefSP ptdm;
+
+  ImplAAFTypeDefRecord * pNonConstThis =
+	(ImplAAFTypeDefRecord *) this;
+
+  hr = pNonConstThis->GetCount (&numMembers);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  aafInt32 internalNumBytesLeft = internalBytesSize;
+  aafInt32 externalNumBytesLeft = externalBytesSize;
+
+  pvtInitInternalSizes ();
+  assert (_internalSizes);
+  for (member = 0; member < numMembers; member++)
+	{
+	  hr = pNonConstThis->GetMemberType (member, &ptdm);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  externalMemberSize = ptdm->PropValSize ();
+	  internalMemberSize = _internalSizes[member];
+	  ptdm->externalize (internalBytes,
+						 internalMemberSize,
+						 externalBytes,
+						 externalMemberSize,
+						 byteOrder);
+	  externalBytes += externalMemberSize;
+	  internalBytes += internalMemberSize;
+	  externalNumBytesLeft -= externalMemberSize;
+	  internalNumBytesLeft -= internalMemberSize;
+	  assert (externalNumBytesLeft >= 0);
+	  assert (internalNumBytesLeft >= 0);
+	}
+}
+
+
+size_t ImplAAFTypeDefRecord::internalSize(OMByte* /*externalBytes*/,
+										  size_t /*externalBytesSize*/) const
+{
+  if (IsRegistered ())
+	return NativeSize ();
+  else
+	return PropValSize ();
+}
+
+
+void ImplAAFTypeDefRecord::internalize(OMByte* externalBytes,
+									   size_t externalBytesSize,
+									   OMByte* internalBytes,
+									   size_t internalBytesSize,
+									   OMByteOrder byteOrder) const
+{
+  AAFRESULT hr;
+  aafUInt32 numMembers = 0;
+  aafUInt32 member = 0;
+  aafUInt32 externalMemberSize = 0;
+  aafUInt32 internalMemberSize = 0;
+  ImplAAFTypeDefSP ptdm;
+
+  ImplAAFTypeDefRecord * pNonConstThis =
+	(ImplAAFTypeDefRecord *) this;
+
+  hr = pNonConstThis->GetCount (&numMembers);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  aafInt32 internalNumBytesLeft = internalBytesSize;
+  aafInt32 externalNumBytesLeft = externalBytesSize;
+
+  pvtInitInternalSizes ();
+  assert (_internalSizes);
+  for (member = 0; member < numMembers; member++)
+	{
+	  hr = pNonConstThis->GetMemberType (member, &ptdm);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  externalMemberSize = ptdm->PropValSize ();
+	  internalMemberSize = _internalSizes[member];
+
+	  ptdm->internalize (externalBytes,
+						 externalMemberSize,
+						 internalBytes,
+						 internalMemberSize,
+						 byteOrder);
+	  externalBytes += externalMemberSize;
+	  internalBytes += internalMemberSize;
+	  externalNumBytesLeft -= externalMemberSize;
+	  internalNumBytesLeft -= internalMemberSize;
+	  assert (externalNumBytesLeft >= 0);
+	  assert (internalNumBytesLeft >= 0);
+	}
+}
+
+
+
+aafBool ImplAAFTypeDefRecord::IsFixedSize (void) const
 {
   return AAFTrue;
 }
 
 
-size_t ImplAAFTypeDefRecord::PropValSize (void)
+size_t ImplAAFTypeDefRecord::PropValSize (void) const
 {
   aafUInt32 count;
   size_t totalSize = 0;
@@ -680,10 +832,14 @@ size_t ImplAAFTypeDefRecord::PropValSize (void)
 
   for (aafUInt32 i = 0; i < count; i++)
 	{
-	  ImplAAFTypeDef * pMemType;
-	  pMemType = 0;
-	  hr = GetMemberType (i, &pMemType);
-	  if (AAFRESULT_FAILED(hr)) return hr;
+	  ImplAAFTypeDefSP pMemType;
+	  // Bobt semi-hack: need non-const this in order to call
+	  // non-const GetMemberType. We know we aren't mangling it, so it
+	  // technically is OK...
+	  ImplAAFTypeDefRecord * pNonConstThis =
+		(ImplAAFTypeDefRecord*) this;
+	  hr = pNonConstThis->GetMemberType (i, &pMemType);
+	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (pMemType);
 	  assert (pMemType->IsFixedSize());
 	  totalSize += pMemType->PropValSize();
@@ -692,16 +848,28 @@ size_t ImplAAFTypeDefRecord::PropValSize (void)
 }
 
 
-aafBool ImplAAFTypeDefRecord::IsRegistered (void)
+aafBool ImplAAFTypeDefRecord::IsRegistered (void) const
 {
   return (_registeredOffsets ? AAFTrue : AAFFalse);
 }
 
 
-size_t ImplAAFTypeDefRecord::NativeSize (void)
+size_t ImplAAFTypeDefRecord::NativeSize (void) const
 {
   assert (IsRegistered());
   return _registeredSize;
+}
+
+
+OMProperty * ImplAAFTypeDefRecord::pvtCreateOMPropertyMBS
+  (OMPropertyId pid,
+   const char * name) const
+{
+  assert (name);
+  size_t elemSize = PropValSize ();
+  OMProperty * result = new OMSimpleProperty (pid, name, elemSize);
+  assert (result);
+  return result;
 }
 
 
