@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSSStructuredStorage.h,v 1.5 2004/04/08 14:07:56 bakerian Exp $ $Name:  $
+// $Id: OMSSSStructuredStorage.h,v 1.6 2004/06/04 14:07:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -17,7 +17,7 @@
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Schema Software Inc.
+// Licensor of the AAF Association is Schema Software, Inc.
 // All rights reserved.
 //
 //=---------------------------------------------------------------------=
@@ -31,8 +31,8 @@
 * Authors: Bob Sabiston, Yuri Khramov, Mark Ambachtsheer
 ************************************************************************
 
-$Revision: 1.5 $
-$Date: 2004/04/08 14:07:56 $
+$Revision: 1.6 $
+$Date: 2004/06/04 14:07:06 $
 */
 #include <StructuredStorage.h>
 #include "OMRawStorage.h"
