@@ -10,26 +10,9 @@
 *                                          *
 \******************************************/
 
-#include "OMStorable.h"
+#ifndef __ImplAAFFileDescriptor_h__
 #include "ImplAAFFileDescriptor.h"
-
-const int PID_DIGITAL_IMAGE_DESC_COMPRESSION			= 20;
-const int PID_DIGITAL_IMAGE_DESC_STOREDHEIGHT			= 21;
-const int PID_DIGITAL_IMAGE_DESC_STOREDWIDTH			= 22;
-const int PID_DIGITAL_IMAGE_DESC_SAMPLEDHEIGHT			= 23;
-const int PID_DIGITAL_IMAGE_DESC_SAMPLEDWIDTH			= 24;
-const int PID_DIGITAL_IMAGE_DESC_SAMPLEDXOFFSET			= 25;
-const int PID_DIGITAL_IMAGE_DESC_SAMPLEDYOFFSET			= 26;
-const int PID_DIGITAL_IMAGE_DESC_DISPLAYHEIGHT			= 27;
-const int PID_DIGITAL_IMAGE_DESC_DISPLAYWIDTH			= 28;
-const int PID_DIGITAL_IMAGE_DESC_DISPLAYXOFFSET			= 29;
-const int PID_DIGITAL_IMAGE_DESC_DISPLAYYOFFSET			= 30;
-const int PID_DIGITAL_IMAGE_DESC_FRAMELAYOUT			= 31;
-const int PID_DIGITAL_IMAGE_DESC_VIDEOLINEMAP			= 32;
-const int PID_DIGITAL_IMAGE_DESC_IMAGEASPECTRATIO		= 33;
-const int PID_DIGITAL_IMAGE_DESC_ALPHATRANSPARENCY		= 34;
-const int PID_DIGITAL_IMAGE_DESC_GAMMA					= 35;
-const int PID_DIGITAL_IMAGE_DESC_IMAGEALIGNMENTFACTOR	= 36;
+#endif
 
 class ImplAAFDigitalImageDescriptor : public ImplAAFFileDescriptor
 {
@@ -270,10 +253,6 @@ public:
   // in /test/ImplAAFDigitalImageDescriptorTest.cpp.
   static AAFRESULT test();
 
-  // Return this objects stored object class.
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
-
 protected:
 	OMFixedSizeProperty<aafUID_t>				_compression;
 	OMFixedSizeProperty<aafUInt32>				_storedHeight;
@@ -289,9 +268,9 @@ protected:
 	OMFixedSizeProperty<aafFrameLayout_t>		_frameLayout;
 	OMVariableSizeProperty<aafInt32>			_videoLineMap;
 	OMFixedSizeProperty<aafRational_t>			_imageAspectRatio;
-	OMFixedSizeProperty<aafAlphaTransparency_t>	_alphaTransparency;
+	OMFixedSizeProperty<aafRational_t>			_alphaTransparency;
 	OMFixedSizeProperty<aafRational_t>			_gamma;
-	OMFixedSizeProperty<aafInt32>				_imageAlignmentFactor;
+	OMFixedSizeProperty<aafUInt32>				_imageAlignmentFactor;
 };
 
 #endif // ! __ImplAAFDigitalImageDescriptor_h__
