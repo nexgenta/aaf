@@ -80,7 +80,8 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -396,7 +397,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFOperationDef		*pOperationDef = NULL;
 	IAAFParameterDef	*pParmDef = NULL;
 	IAAFParameter		*pParameter = NULL;
-	IAAFDefObject*		pDefObject = NULL;
+	IAAFMetaDefinition*		pMetaDefinition = NULL;
 	IAAFSegment*		pSeg = NULL;
 	IAAFOperationGroup*			pOperationGroup = NULL;
 	IEnumAAFMobs		*mobIter = NULL;
@@ -486,15 +487,15 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkResult(pControlPoint->GetEditHint(&checkEditHint));
   			checkExpression(checkEditHint == kAAFRelativeLeft, AAFRESULT_TEST_FAILED);
 			checkResult(pControlPoint->GetTypeDefinition (&pTypeDef));
- 			checkResult(pTypeDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-			checkResult(pDefObject->GetAUID(&testInterpDef));
+ 			checkResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition, (void **) &pMetaDefinition));
+			checkResult(pMetaDefinition->GetAUID(&testInterpDef));
   			checkExpression(memcmp(&testInterpDef, &checkInterpDef, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
 			pControlPoint->Release();
 			pControlPoint = NULL;
 			pTypeDef->Release();
 			pTypeDef = NULL;
-			pDefObject->Release();
-			pDefObject = NULL;
+			pMetaDefinition->Release();
+			pMetaDefinition = NULL;
 			/**/
 			checkResult(pEnumCP->NextOne(&pControlPoint));
 			checkResult(pControlPoint->GetValueBufLen (&testLen));
@@ -509,8 +510,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkResult(pControlPoint->GetEditHint(&checkEditHint));
   			checkExpression(checkEditHint == kAAFProportional, AAFRESULT_TEST_FAILED);
 			checkResult(pControlPoint->GetTypeDefinition (&pTypeDef));
- 			checkResult(pTypeDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-			checkResult(pDefObject->GetAUID(&testInterpDef));
+ 			checkResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition, (void **) &pMetaDefinition));
+			checkResult(pMetaDefinition->GetAUID(&testInterpDef));
   			checkExpression(memcmp(&testInterpDef, &checkInterpDef, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
 
 			pControlPoint->Release();
@@ -519,8 +520,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			pEnumCP = NULL;
 			pTypeDef->Release();
 			pTypeDef = NULL;
-			pDefObject->Release();
-			pDefObject = NULL;
+			pMetaDefinition->Release();
+			pMetaDefinition = NULL;
 
 			/*****/
 
@@ -599,8 +600,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pOperationDef)
 		pOperationDef->Release();
       
-	if (pDefObject)
-		pDefObject->Release();
+	if (pMetaDefinition)
+		pMetaDefinition->Release();
 
 	if (pParmDef)
 		pParmDef->Release();
@@ -632,7 +633,9 @@ extern "C" HRESULT CAAFControlPoint_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFControlPoint_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFControlPoint_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
