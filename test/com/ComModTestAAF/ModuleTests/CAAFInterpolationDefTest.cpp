@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFInterpolationDef
 /***********************************************\
 *												*
 * Advanced Authoring Format						*
@@ -9,11 +9,7 @@
 *												*
 \***********************************************/
 
-#include "CAAFInterpolationDef.h"
-#include "CAAFInterpolationDef.h"
-#ifndef __CAAFInterpolationDef_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 
 #include <iostream.h>
@@ -160,8 +156,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
-//@!!!	IEnumAAFInterpolationDefs *pPlug = NULL;
-//	IAAFPluggableDef		*pPlugDef = NULL;
+	IEnumAAFInterpolationDefs *pPlug = NULL;
+	IAAFInterpolationDef		*pPlugDef = NULL;
 	IAAFInterpolationDef		*pInterpolationDef = NULL;
 	bool bFileOpen = false;
 	HRESULT			hr = S_OK;
@@ -174,11 +170,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-//!!!		checkResult(pDictionary->GetPluggableDefinitions(&pPlug));
-//!!!		checkResult(pPlug->NextOne (&pPlugDef));
-//!!!		checkResult(pPlugDef->QueryInterface (IID_IAAFInterpolationDef, (void **)&pInterpolationDef));
-//!!!		checkResult(pInterpolationDef->EssenceIsIdentified (&testBool));
-//!!!		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkResult(pDictionary->GetInterpolationDefinitions(&pPlug));
+		checkResult(pPlug->NextOne (&pPlugDef));
+		checkResult(pPlugDef->QueryInterface (IID_IAAFInterpolationDef, (void **)&pInterpolationDef));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -212,7 +206,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CAAFInterpolationDef::test()
+extern "C" HRESULT CAAFInterpolationDef_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"InterpolationDefTest.aaf";
@@ -225,7 +219,7 @@ HRESULT CAAFInterpolationDef::test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFInterpolationDef::test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFInterpolationDef_test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
