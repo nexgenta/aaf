@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFOperationDefs.h,v 1.6 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: AAFOperationDefs.h,v 1.7 2004/10/22 13:33:37 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@
 //
 // When an API call asks for a operation definition UID, store it into a local UID variable, and then pass
 // in the address of the variable, as in:
-//		aafUID_t	uid = DDEF_Picture;
+//		aafUID_t	uid = kAAFEffect_VideoDissolve;
 //
 // When you need an IAAFOperationDef *, then do the following (where pDictionary is a pointer to the
 // dictionary object in the current file.)
