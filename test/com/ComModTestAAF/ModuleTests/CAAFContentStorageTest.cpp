@@ -39,8 +39,10 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
-const aafUID_t kTestMobID1 = { 0x464AA9D8, 0x34AC, 0x11d3, { 0x80, 0xB4, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
-const aafUID_t kTestMobID2 = { 0x464AA9D9, 0x34AC, 0x11d3, { 0x80, 0xB4, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+#include "CAAFBuiltinDefs.h"
+
+const aafMobID_t kTestMobID1 = { 0x464AA9D8, 0x34AC, 0x11d3, { 0x80, 0xB4, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+const aafMobID_t kTestMobID2 = { 0x464AA9D9, 0x34AC, 0x11d3, { 0x80, 0xB4, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
 
 // Utility class to implement the test.
@@ -52,7 +54,7 @@ struct ContentStorageTest
 	void createFile(wchar_t *pFileName);
 	void openFile(wchar_t *pFileName);
 	
-	void createFileMob(aafUID_t newMobID);
+	void createFileMob(aafMobID_constref newMobID);
 	void createEssenceData(IAAFSourceMob *pSourceMob);
 	void openEssenceData();
 	
@@ -330,7 +332,7 @@ void ContentStorageTest::openFile(wchar_t *pFileName)
 	aafNumSlots_t	readNumMobs;
 	IAAFMob			*testMob = NULL;
 	IEnumAAFMobs	*pEnum = NULL;
-	aafUID_t		uid, readID;
+	aafMobID_t		uid, readID;
 	aafBool			testBool;
 
 	check(AAFFileOpenExistingRead(pFileName, 0, &_pFile));
@@ -392,7 +394,7 @@ void ContentStorageTest::openFile(wchar_t *pFileName)
 	cleanupReferences();
 }
 
-void ContentStorageTest::createFileMob(aafUID_t newMobID)
+void ContentStorageTest::createFileMob(aafMobID_constref newMobID)
 {
 	assert(_pFile && _pHeader && _pDictionary);
 	assert(NULL == _pSourceMob);
@@ -401,8 +403,10 @@ void ContentStorageTest::createFileMob(aafUID_t newMobID)
 	assert(NULL == _pEssenceDescriptor);
 	assert(NULL == _pSourceMob);
 	
+	CAAFBuiltinDefs defs (_pDictionary);
+
 	// Create a Mob
-	check(_pDictionary->CreateInstance(AUID_AAFSourceMob,
+	check(_pDictionary->CreateInstance(defs.cdSourceMob(),
 		IID_IAAFSourceMob, 
 		(IUnknown **)&_pSourceMob));
 	
@@ -411,7 +415,7 @@ void ContentStorageTest::createFileMob(aafUID_t newMobID)
 	check(_pMob->SetMobID(newMobID));
 	check(_pMob->SetName(L"ContentStorageTest File Mob"));
 	
-	check(_pDictionary->CreateInstance(AUID_AAFFileDescriptor,
+	check(_pDictionary->CreateInstance(defs.cdFileDescriptor(),
 		IID_IAAFEssenceDescriptor, 
 		(IUnknown **)&_pFileDescriptor));
 	
@@ -444,10 +448,10 @@ void ContentStorageTest::createEssenceData(IAAFSourceMob *pSourceMob)
 	assert(NULL == _pEssenceData);
 	
 	
-	
+	CAAFBuiltinDefs defs (_pDictionary);
 	
 	// Attempt to create an AAFEssenceData.
-	check(_pDictionary->CreateInstance(AUID_AAFEssenceData,
+	check(_pDictionary->CreateInstance(defs.cdEssenceData(),
 		IID_IAAFEssenceData,
 		(IUnknown **)&_pEssenceData));
 	
