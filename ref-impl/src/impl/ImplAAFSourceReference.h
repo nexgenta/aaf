@@ -5,17 +5,6 @@
 
 #include "OMStorable.h"
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -42,6 +31,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
@@ -99,12 +89,6 @@ public:
 	//SDK-private
 
 	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFSourceReference)
 
 private:
 	OMFixedSizeProperty<aafUID_t>	_sourceID;

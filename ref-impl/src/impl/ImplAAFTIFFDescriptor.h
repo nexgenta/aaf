@@ -4,22 +4,6 @@
 #define __ImplAAFTIFFDescriptor_h__
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
-
-#ifndef __AAFTypes_h__
-#include "AAFTypes.h"
-#endif
-
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -46,6 +30,10 @@
  * LIABILITY.
  *
  ************************************************************************/
+
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
+#endif
 
 
 #ifndef __ImplAAFFileDescriptor_h__
@@ -178,13 +166,6 @@ public:
 
          // @parm [in, size_is(size)] buffer containing value
          aafDataValue_t  pSummary);
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTIFFDescriptor)
 
 private:
 	OMFixedSizeProperty<aafBool>			_isUniform;

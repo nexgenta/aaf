@@ -31,10 +31,10 @@
  *
  ************************************************************************/
 
+
 /***********************************************\
 *	Stub only.   Implementation not yet added	*
 \***********************************************/
-
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
@@ -73,13 +73,6 @@ public:
     GetEdgecode
         // @parm [out] Edgecode
         (aafEdgecode_t *  edgecode);
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFEdgecode)
 
 private:
 	OMFixedSizeProperty<aafPosition_t>			_start;
