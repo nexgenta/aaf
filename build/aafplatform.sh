@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafplatform.sh,v 1.7 2004/03/18 18:58:42 stuart_hc Exp $ $Name:  $
+# $Id: aafplatform.sh,v 1.8 2004/11/04 18:25:42 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -64,6 +64,11 @@ case "${MACHINE}:${OS}" in
 
 	"Power Macintosh:Darwin")
 	echo PPCDarwin
+	exit 0;;
+
+	# FreeBSD and OpenBSD
+	*86:FreeBSD|*86:OpenBSD)
+	echo ${MACHINE}${OS}
 	exit 0;;
 esac
 

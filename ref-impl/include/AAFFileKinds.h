@@ -2,7 +2,7 @@
 #define __AAFFileKinds_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFFileKinds.h,v 1.18 2004/10/27 16:58:48 phil_tudor Exp $ $Name:  $
+// $Id: AAFFileKinds.h,v 1.19 2004/11/04 18:28:15 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -91,7 +91,7 @@ const aafUID_t kAAFFileKind_MxfKlvBinary = kAAFFileKind_MxfKlvBinary_Value;
 const aafUID_t kAAFFileKind_Aaf512Binary = kAAFFileKind_AafS512Binary_Value;
 const aafUID_t kAAFFileKind_Aaf4KBinary = kAAFFileKind_AafS4KBinary_Value;
 
-#elif defined( OS_DARWIN ) || defined( OS_IRIX ) || defined( OS_LINUX ) || defined( OS_SOLARIS ) || defined( OS_FREEBSD )
+#elif defined( OS_UNIX )
 
 #ifdef USE_LIBGSF
 // When LIBGSF is requested make it the default for 512 and 4k
