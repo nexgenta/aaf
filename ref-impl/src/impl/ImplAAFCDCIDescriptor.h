@@ -1,14 +1,32 @@
 #ifndef __ImplAAFCDCIDescriptor_h__
 #define __ImplAAFCDCIDescriptor_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFDigitalImageDescriptor.h"
 
@@ -45,6 +63,14 @@ public:
     SetHorizontalSubsampling
 		// @parm [in] Integer value.
         (aafUInt32  HorizontalSubsampling);
+
+  //****************
+  // SetVerticalSubsampling()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetVerticalSubsampling
+		// @parm [in] Integer value.
+        (aafUInt32  VerticalSubsampling);
 
   //****************
   // SetColorSiting()
@@ -103,6 +129,14 @@ public:
         (aafUInt32 *  pHorizontalSubsampling);
 
   //****************
+  // GetVerticalSubsampling()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetVerticalSubsampling
+		// @parm [out] Address to store the integer value.
+        (aafUInt32 *  pVerticalSubsampling);
+
+  //****************
   // GetColorSiting()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -142,20 +176,10 @@ public:
 		// @parm [out] Address to store the number of bits.
         (aafInt16 *  pPaddingBits);
 
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFCDCIDescriptor)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFCDCIDescriptorTest.cpp.
-  static AAFRESULT test();
-
 protected:
 	OMFixedSizeProperty<aafInt32>			_componentWidth;
 	OMFixedSizeProperty<aafUInt32>			_horizontalSubsampling;
+	OMFixedSizeProperty<aafUInt32>			_verticalSubsampling;
 	OMFixedSizeProperty<aafColorSiting_t>	_colorSiting;
 	OMFixedSizeProperty<aafUInt32>			_blackReferenceLevel;
 	OMFixedSizeProperty<aafUInt32>			_whiteReferenceLevel;
