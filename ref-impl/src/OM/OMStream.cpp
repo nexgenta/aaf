@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStream.cpp,v 1.12 2005/03/31 13:46:27 jptrainor Exp $ $Name:  $
+// $Id: OMStream.cpp,v 1.13 2005/04/01 03:22:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -193,6 +193,7 @@ TRACE("OMStream::size");
 
 #endif
   ASSERT("Successful seek", status == 0);
+  (void)status;
 
 	// where is the end?
 	OMUInt64 result = position();
