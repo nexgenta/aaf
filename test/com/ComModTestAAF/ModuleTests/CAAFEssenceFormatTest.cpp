@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFEssenceFormat
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -22,17 +40,23 @@
 #include "AAFDefUIDs.h"
 #include "AAFEssenceFormats.h"
 
+#include "CAAFBuiltinDefs.h"
+
 #define	MobName			L"MasterMOBTest"
 //#define	NumMobSlots		3
 
 //static aafWChar* Manufacturer = L"Sony";
 //static aafWChar* Model = L"MyModel";
-//static aafTapeCaseType_t FormFactor = kVHSVideoTape;
-//static aafVideoSignalType_t VideoSignalType = kPALSignal;
-//static aafTapeFormatType_t TapeFormat = kVHSFormat;
+//static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
+//static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
+//static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
 //static aafLength_t TapeLength = 3200 ;
 
-static GUID		NewMobID;	// NOTE: this should really be aafUID_t, but problems w/ IsEqualGUID()
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0xafc51ab6, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 //#define TAPE_MOB_OFFSET	10
 //#define TAPE_MOB_LENGTH	60
 //#define TAPE_MOB_NAME	L"A Tape Mob"
@@ -70,13 +94,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFEssenceFormat Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -85,11 +111,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	
 	switch (mode)
 	{
-	case kMediaOpenReadOnly:
+	case kAAFMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 		
-	case kMediaOpenAppend:
+	case kAAFMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 		
@@ -142,28 +168,34 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		
-		
+		CAAFBuiltinDefs defs (pDictionary);
+				
 		// Create a Master Mob
-		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
-			IID_IAAFMob, 
-			(IUnknown **)&pMob));
+		checkResult(defs.cdMasterMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pMob));
 		
 		// Set the IAAFMob properties
-		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		checkResult(pMob->SetMobID((aafUID_t *)&NewMobID));
+		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(MobName));
 		
 		checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
 		// Add the master mob to the file BEFORE creating the essence
-		checkResult(pHeader->AppendMob(pMob));
-		checkResult(pMasterMob->CreateEssence (1, DDEF_Sound, CodecWave, rate, rate,
-												kSDKCompressionDisable, NULL, ContainerAAF, &pAccess));
+		checkResult(pHeader->AddMob(pMob));
+		checkResult(pMasterMob->CreateEssence (1,
+											   defs.ddSound(),
+											   kAAFCodecWAVE,
+											   rate,
+											   rate,
+											   kAAFCompressionDisable,
+											   NULL,
+											   ContainerAAF,
+											   &pAccess));
 		
 		// Fianlly! Get an essence format to test
 		checkResult(pAccess->GetEmptyFileFormat(&pFormat));
@@ -307,7 +339,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 		
 	}
