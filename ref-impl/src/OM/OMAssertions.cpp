@@ -1,5 +1,16 @@
 #include "OMAssertions.h"
 
+class OMAssertionViolation {
+public:
+
+  OMAssertionViolation() {}
+
+  ~OMAssertionViolation() {}
+
+  OMAssertionViolation(const OMAssertionViolation&) {}
+
+};
+
 #if defined (OM_ENABLE_DEBUG)
 
 #include <string.h>
@@ -14,27 +25,30 @@
 #endif
 
 
-void reportAssertionFailure(char* assertionKind,
-                            char* assertionName,
-                            char* expressionString,
-                            char* routineName,
-                            char* fileName,
-                            size_t lineNumber)
+void reportAssertionViolation(char* assertionKind,
+                              char* assertionName,
+                              char* expressionString,
+                              char* routineName,
+                              char* fileName,
+                              size_t lineNumber)
 {
-  cerr << assertionKind << " \"" << assertionName << "\" failed in routine \""
+  cerr << assertionKind
+       << " \"" << assertionName << "\" violated in routine \""
        << routineName  << "\"." << endl;
-  cerr << "The failure occurred at line " << lineNumber
+  cerr << "The violation occurred at line " << lineNumber
        << " in file \"" << fileName << "\"." << endl;
-  cerr << "The condition \"" << expressionString << "\" was violated." << endl;
+  cerr << "The condition \"" << expressionString << "\" was false." << endl;
 
 #if defined(OM_ENABLE_STACK_TRACE)
   printStackTrace(cerr);
 #endif
 
-#if defined(OM_ENABLE_ABORT)
+#if defined(OM_EXIT_ON_ASSERT)
+  exit(EXIT_FAILURE);
+#elif defined(OM_ABORT_ON_ASSERT)
   abort();
 #else
-  exit(FAILURE);
+  throw OMAssertionViolation();
 #endif
 }
 
