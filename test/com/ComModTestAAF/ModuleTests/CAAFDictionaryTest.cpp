@@ -135,6 +135,12 @@ static const aafUID_t kTestInterpolationDefID =
 static const aafUID_t kTestPluginDescriptorID = 
 { 0x8cf6dbb4, 0x7bfc, 0x11d3, { 0x84, 0x4f, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
+// Test MobID
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x17c73136, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -364,6 +370,14 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
 				  /* IID of def to register */     IID_IAAFOperationDef,
 				  /* SP for def to register */     IAAFOperationDefSP,
 				  /* reg method on pDict */        RegisterOperationDef);
+
+  // Hack!
+  {
+	IAAFOperationDefSP od;
+	checkResult (pDict->LookupOperationDef (kTestOperationDefID,
+										    &od));
+	checkResult (od->SetDataDef (defs.ddMatte()));
+  }  
   
   RegisterOneDef (/* dictionary*/                  pDict,
 				  /* def object's class */         defs.cdParameterDef(),
@@ -542,13 +556,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFDictionary Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -601,7 +617,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFSequenceSP   pSequence;
   IAAFSegmentSP    pSegment;
   IAAFComponentSP  pComponent;
-  aafMobID_t         NewMobID;
   int              i;
   HRESULT          hr = S_OK;
 	
@@ -626,8 +641,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				  CreateInstance(IID_IAAFMob, 
 								 (IUnknown **)&pMob));
 		
-	  checkResult(CoCreateGuid((GUID *)&NewMobID));
-	  checkResult(pMob->SetMobID(NewMobID));
+	  checkResult(pMob->SetMobID(TEST_MobID));
 	  checkResult(pMob->SetName(L"AAFDictionaryTest"));
 		
 	  // Add mob slot w/ Sequence
