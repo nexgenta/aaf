@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -30,20 +30,19 @@
 #define OMSTRONGREFPROPERTYT_H
 
 #include "OMAssertions.h"
+#include "OMFile.h"
 
 template <typename ReferencedObject>
 OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
                                                  const OMPropertyId propertyId,
-                                                 const wchar_t* name)
-: OMReferenceProperty(propertyId,
-                      SF_STRONG_OBJECT_REFERENCE,
-                      name),
-  _reference()
+                                                 const char* name)
+: OMReferenceProperty<ReferencedObject>(propertyId,
+                                        SF_STRONG_OBJECT_REFERENCE,
+                                        name),
+  _storageName(0)
 {
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
-
-  _reference = OMStrongObjectReference<ReferencedObject>(this, storedName());
 }
 
 template <typename ReferencedObject>
@@ -51,7 +50,12 @@ OMStrongReferenceProperty<ReferencedObject>::~OMStrongReferenceProperty(void)
 {
   TRACE(
     "OMStrongReferenceProperty<ReferencedObject>::~OMStrongReferenceProperty");
-  _reference.setValue(0);
+  if (_pointer != 0) {
+    _pointer->clearContainingObject();
+    _pointer->clearContainingProperty();
+  }
+  delete _storageName;
+  _storageName = 0;
 }
 
   // @mfunc Get the value of this <c OMStrongReferenceProperty>.
@@ -68,9 +72,14 @@ void OMStrongReferenceProperty<ReferencedObject>::getValue(
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  ReferencedObject* result = _reference.getValue();
+  if (!isLoaded()) {
+    OMStrongReferenceProperty<ReferencedObject>* nonConstThis =
+                const_cast<OMStrongReferenceProperty<ReferencedObject>*>(this);
+    nonConstThis->load();
+  }
+  ASSERT("Loaded", isLoaded());
 
-  object = result;
+  object = _pointer;
 }
 
   // @mfunc Set the value of this <c OMStrongReferenceProperty>.
@@ -87,28 +96,29 @@ ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::setValue(
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::setValue");
 
-  // tjb - PRECONDITION("Valid object", object != 0);
+  ReferencedObject* oldPointer = _pointer;
 
-  ReferencedObject* result = _reference.setValue(object);
+  // Orphan the old object
+  //
+  if (_pointer != 0) {
+    _pointer->clearContainingObject();
+    _pointer->clearContainingProperty();
+  }
+
+  // Set the reference to contain the new object
+  //
+  OMReferenceProperty<ReferencedObject>::setValue(object);
+
+  // Adopt the new object
+  //
+  if (_pointer != 0) {
+    _pointer->setContainingObject(_propertySet->container());
+    _pointer->setName(name());
+    _pointer->setContainingProperty(this);
+  }
+  setLoaded();
   setPresent();
-  return result;
-}
-
-  // @mfunc Clear the value of this <c OMStrongReferenceProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //   @rdesc A pointer to the old <p ReferencedObject>. If lazy
-  //          loading is enabled and the referenced object was never
-  //          loaded the value returned is 0.
-template <typename ReferencedObject>
-ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::clearValue(void)
-{
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::clearValue");
-
-  ReferencedObject* result = _reference.setValue(0);
-
-  return result;
+  return oldPointer;
 }
 
   // @mfunc Assignment operator.
@@ -137,7 +147,7 @@ template <typename ReferencedObject>
 ReferencedObject*
 OMStrongReferenceProperty<ReferencedObject>::operator -> (void)
 {
-  return _reference.getValue();
+  return pointer();
 }
 
   // @mfunc Dereference operator.
@@ -150,7 +160,7 @@ template <typename ReferencedObject>
 const ReferencedObject*
 OMStrongReferenceProperty<ReferencedObject>::operator -> (void) const
 {
-  return _reference.getValue();
+  return pointer();
 }
 
   // @mfunc Type conversion. Convert an
@@ -184,12 +194,34 @@ void OMStrongReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::save");
 
-  // Write the index entry.
+  ASSERT("Valid property set", _propertySet != 0);
+  OMStorable* container = _propertySet->container();
+  ASSERT("Valid container", container != 0);
+  ASSERT("Container is persistent", container->persistent());
+
+  // Write the strong reference (and an associated index entry).
   //
-  saveName();
+  OMStoredObject* s = container->store();
+  const char* propertyName = name();
+  s->write(_propertyId,
+           _storedForm,
+           (void *)propertyName,
+           strlen(propertyName) + 1);
 
-  _reference.save();
+  // save the object
+  //
+  if (isLoaded()) {
 
+    // Either the object does not exist in the file or the object
+    // exists in the file and has been loaded. In either case the
+    // object is saved. If the object has been loaded, we assume, in
+    // the absence of a dirty bit, that it has been changed.
+
+    OMStorable* object = pointer();
+    ASSERT("Non-void strong reference", object != 0);
+
+    object->save();
+  }
 }
 
   // @mfunc Close this <c OMStrongReferenceProperty>.
@@ -200,21 +232,12 @@ template <typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::close(void)
 {
   if (!isOptional() || isPresent()) {
-    _reference.close();
+    OMStorable* object = pointer();
+    if (object != 0) {
+      object->close();
+    }
   }
-}
-
-  // @mfunc Detach this <c OMStrongReferenceProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-template <typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::detach(void)
-{
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::detach");
-  if (!isOptional() || isPresent()) {
-    _reference.detach();
-  }
+  setLoaded();
 }
 
   // @mfunc Restore this <c OMStrongReferenceProperty>, the external
@@ -229,38 +252,33 @@ template <typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::restore");
+  OMFile::OMLoadMode loadMode = _propertySet->container()->file()->loadMode();
 
   // retrieve sub-storage name
   //
-  restoreName(externalSize);
+  delete [] _storageName;
+  _storageName = new char[externalSize];
+  ASSERT("Valid heap pointer", _storageName != 0);
 
-  _reference.restore();
+  OMStoredObject* store = _propertySet->container()->store();
+  ASSERT("Valid store", store != 0);
 
+  store->read(_propertyId, _storedForm, _storageName, externalSize);
+  ASSERT("Consistent property size", externalSize == strlen(_storageName) + 1);
+  ASSERT("Consistent property name", strcmp(_storageName, name()) == 0);
+
+  ASSERT("Correct initial loaded state", isLoaded());
+  ASSERT("Reference not already set", _pointer == 0);
+  clearLoaded();
+  if (loadMode == OMFile::eagerLoad) {
+    load();
+  }
   setPresent();
 
-}
-
-  // @mfunc  Is this <c OMStrongReferenceProperty> void ?
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //   @rdesc True if this <c OMStrongReferenceProperty> is void, false
-  //          otherwise
-  //   @this const
-template<typename ReferencedObject>
-bool OMStrongReferenceProperty<ReferencedObject>::isVoid(void) const
-{
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::isVoid");
-
-  bool result;
-
-  if (_reference.getValue() == 0) {
-    result = true;
-  } else {
-    result = false;
-  }
-
-  return result;
+  POSTCONDITION("Consistent load mode",
+                           IMPLIES(loadMode == OMFile::eagerLoad, isLoaded()));
+  POSTCONDITION("consistent load mode",
+                           IMPLIES(loadMode == OMFile::lazyLoad, !isLoaded()));
 }
 
   // @mfunc Remove this optional <c OMStrongReferenceProperty>.
@@ -268,122 +286,49 @@ bool OMStrongReferenceProperty<ReferencedObject>::isVoid(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
 template<typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::removeProperty(void)
+void OMStrongReferenceProperty<ReferencedObject>::remove(void)
 {
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::removeProperty");
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::remove");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
-  PRECONDITION("Property is void", isVoid());
+  PRECONDITION("Property is void", _pointer == 0);
   clearPresent();
   POSTCONDITION("Optional property no longer present", !isPresent());
 }
 
-  // @mfunc Get the raw bits of this <c OMStrongReferenceProperty>.
-  //        The raw bits are copied to the buffer at address <p bits>
-  //        which is <p size> bytes in size.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm size_t | size | The size of the buffer.
-  //   @this const
-template<typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::getBits(
-                                                      OMByte* bits,
-                                                      size_t ANAME(size)) const
-{
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
-  OBSOLETE("methods on class OMReferenceProperty");
-
-  PRECONDITION("Optional property is present",
-                                           IMPLIES(isOptional(), isPresent()));
-  PRECONDITION("Valid bits", bits != 0);
-  PRECONDITION("Valid size", size >= bitsSize());
-
-  ReferencedObject* pointer;
-  getValue(pointer);
-
-  memcpy(bits, &pointer, bitsSize());
-}
-
-  // @mfunc Set the raw bits of this <c OMStrongReferenceProperty>. The raw
-  //        bits are copied from the buffer at address <p bits> which
-  //        is <p size> bytes in size.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm size_t | size | The size of the buffer.
-template<typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
-                                                          size_t ANAME(size))
-{
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
-  OBSOLETE("methods on class OMReferenceProperty");
-
-  PRECONDITION("Valid bits", bits != 0);
-  PRECONDITION("Valid size", size >= bitsSize());
-
-  const ReferencedObject* p = *(const ReferencedObject**)bits;
-  setValue(p);
-}
-
-  // @mfunc Get the value of this <c OMStrongReferenceProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (pointed to) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //   @rdesc A pointer to an <c OMObject>.
-  //   @this const
-template<typename ReferencedObject>
-OMObject*
-OMStrongReferenceProperty<ReferencedObject>::getObject(void) const
-{
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::getObject");
-
-  ReferencedObject* p = 0;  
-  getValue(p);
-  OMObject* result = p;
-
-  return result;
-}
-
-  // @mfunc Set the value of this <c OMStrongReferenceProperty>.
+  // @mfunc Load the persisted representation of this
+  //        <c OMStrongReferenceProperty> into memory.
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @parm A pointer to the new <c OMObject>.
-  //   @rdesc A pointer to the old <c OMObject>. If lazy
-  //          loading is enabled and the referenced object was never
-  //          loaded the value returned is 0.
-template <typename ReferencedObject>
-OMObject* OMStrongReferenceProperty<ReferencedObject>::setObject(
-                                                        const OMObject* object)
-{
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::setObject");
-
-  PRECONDITION("Valid object", object != 0);
-
-  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
-  ASSERT("Object is correct type", p != 0);
-
-  return setValue(p);
-}
-
-  // @mfunc The value of this <c OMStrongReferenceProperty>
-  //        as an <c OMStorable>.
-  //   @rdesc The <c OMStorable> represented by this
-  //          <c OMStrongReferenceProperty>
-  //   @this const
 template<typename ReferencedObject>
-OMStorable* OMStrongReferenceProperty<ReferencedObject>::storable(void) const
+void OMStrongReferenceProperty<ReferencedObject>::load(void)
 {
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::storable");
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::load");
+  PRECONDITION("Not already loaded", !isLoaded());
+  PRECONDITION("Valid storage name", validString(_storageName));
 
-  ReferencedObject* pointer;
-  getValue(pointer);
-  OMStorable* result = 0;
-  if (pointer != 0) {
-    result = dynamic_cast<OMStorable*>(pointer);
-  }
-  return result;
+  // open the sub-storage
+  //
+  OMStoredObject* store = _propertySet->container()->store();
+  ASSERT("Valid store", store != 0);
+
+  OMStoredObject* subStorage = store->open(_storageName);
+
+  // restore contents from the sub-storage
+  //
+  OMStorable* object = OMStorable::restoreFrom(_propertySet->container(),
+                                               name(),
+                                               *subStorage);
+  ReferencedObject* referencedObject = dynamic_cast<ReferencedObject*>(object);
+
+  // set the value of this property to point to the newly created object
+  //
+  setValue(referencedObject);
+
+  setLoaded();
+
+  POSTCONDITION("Property properly loaded", isLoaded());
 }
 
 #endif

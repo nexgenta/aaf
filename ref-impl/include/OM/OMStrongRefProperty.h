@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,10 +29,7 @@
 #ifndef OMSTRONGREFPROPERTY_H
 #define OMSTRONGREFPROPERTY_H
 
-#include "OMDataTypes.h"
-#include "OMProperty.h"
-#include "OMRefProperty.h"
-#include "OMObjectReference.h"
+#include "OMPropertyBase.h"
 
   // @class Persistent strong reference (contained object)
   //        properties supported by the Object Manager.
@@ -41,13 +38,13 @@
   //          <c OMStorable>.
   //   @base public | <c OMReferenceProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceProperty : public OMReferenceProperty {
+class OMStrongReferenceProperty :
+                                 public OMReferenceProperty<ReferencedObject> {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMStrongReferenceProperty(const OMPropertyId propertyId,
-                            const wchar_t* name);
+  OMStrongReferenceProperty(const OMPropertyId propertyId, const char* name);
 
     // @cmember Destructor.
   virtual ~OMStrongReferenceProperty(void);
@@ -57,9 +54,6 @@ public:
 
     // @cmember Set the value of this <c OMStrongReferenceProperty>.
   virtual ReferencedObject* setValue(const ReferencedObject* object);
-
-    // @cmember Clear the value of this <c OMStrongReferenceProperty>.
-  virtual ReferencedObject* clearValue(void);
 
     // @cmember Assignment operator.
   OMStrongReferenceProperty<ReferencedObject>& operator =
@@ -82,9 +76,6 @@ public:
     // @cmember Close this <c OMProperty>.
   virtual void close(void);
 
-    // @cmember Detach this <c OMProperty>.
-  virtual void detach(void);
-
     // @cmember Restore this <c OMStrongReferenceProperty>, the external
     //          (persisted) size of the <c OMStrongReferenceProperty>
     //          is <p externalSize>.
@@ -92,35 +83,22 @@ public:
 
   // Optional property interface
 
-    // @cmember Is this <c OMStrongReferenceProperty> void ?
-  virtual bool isVoid(void) const;
-
     // @cmember Remove this optional <c OMStrongReferenceProperty>.
-  virtual void removeProperty(void);
+  virtual void remove(void);
 
-    // @cmember Get the raw bits of this <c OMStrongReferenceProperty>. The
-    //          raw bits are copied to the buffer at address <p bits>
-    //          which is <p size> bytes in size.
-  virtual void getBits(OMByte* bits, size_t size) const;
+protected:
+  // @access Protected members.
 
-    // @cmember Set the raw bits of this <c OMStrongReferenceProperty>. The raw
-    //          bits are copied from the buffer at address <p bits> which
-    //          is <p size> bytes in size.
-  virtual void setBits(const OMByte* bits, size_t size);
-
-    // @cmember Get the value of this <c OMStrongReferenceProperty>.
-  virtual OMObject* getObject(void) const;
-
-    // @cmember set the value of this <c OMStrongReferenceProperty>.
-  virtual OMObject* setObject(const OMObject* object);
-
-    // @cmember The value of this <c OMStrongReferenceProperty>
-    //          as an <c OMStorable>.
-  virtual OMStorable* storable(void) const;
+    // @cmember Load the persisted representation of this
+    //          <c OMStrongReferenceProperty> into memory.
+  virtual void load(void);
 
 private:
 
-  OMStrongObjectReference<ReferencedObject> _reference;
+    // The name of the storage containing the persisted representation
+    // of the referenced object.
+    //
+  char* _storageName;
 
 };
 
