@@ -1,25 +1,124 @@
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-// This module has been made obsolete by the implementation of a common enumerator
-// template class.
+#ifndef __ImplAAFProperty_h__
+#include "ImplAAFProperty.h"
+#endif
+
+#ifndef __ImplEnumAAFProperties_h__
+#include "ImplEnumAAFProperties.h"
+#endif
+
+#include "ImplEnumerator.h"
+#include "ImplAAFObjectCreation.h"
+
+#include <assert.h>
+#include <string.h>
+
+extern "C" const aafClassID_t CLSID_EnumAAFProperties;
+
+
+ImplEnumAAFProperties::ImplEnumAAFProperties ()
+  : _rep (0)
+{}
+
+
+ImplEnumAAFProperties::~ImplEnumAAFProperties ()
+{
+  if (_rep)
+	delete _rep;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFProperties::NextOne (
+      ImplAAFProperty ** ppProperty)
+{
+  if (! _rep) return AAFRESULT_NOT_INITIALIZED;
+  return _rep->NextOne (ppProperty);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFProperties::Next (
+      aafUInt32  count,
+      ImplAAFProperty ** ppProperties,
+      aafUInt32 *  pNumFetched)
+{
+  if (! _rep) return AAFRESULT_NOT_INITIALIZED;
+  return _rep->Next (count, ppProperties, pNumFetched);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFProperties::Skip (
+      aafUInt32  count)
+{
+  if (! _rep) return AAFRESULT_NOT_INITIALIZED;
+  return _rep->Skip (count);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFProperties::Reset ()
+{
+  if (! _rep) return AAFRESULT_NOT_INITIALIZED;
+  return _rep->Reset ();
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFProperties::Clone (
+      ImplEnumAAFProperties ** ppEnum)
+{
+  ImplEnumAAFProperties * theEnum;
+
+  if (! ppEnum) return AAFRESULT_NULL_PARAM;
+  if (! _rep) return AAFRESULT_NOT_INITIALIZED;
+
+  theEnum = (ImplEnumAAFProperties *)CreateImpl(CLSID_EnumAAFProperties);
+  if (theEnum == NULL)
+	return E_FAIL;
+		
+  // copy this enumerator
+  assert (_rep);
+  theEnum->_rep = new ImplEnumerator<ImplAAFProperty*>(*_rep);
+  if (! theEnum->_rep)
+	{
+	  theEnum->ReleaseReference();
+	  return AAFRESULT_NOMEMORY;
+	}
+
+  assert (ppEnum);
+  *ppEnum = theEnum;
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+AAFRESULT
+    ImplEnumAAFProperties::Initialize (
+      ImplCollection<ImplAAFProperty*> * pProperties)
+{
+  if (! pProperties)
+	return AAFRESULT_NULL_PARAM;
+
+  // make sure it hasn't been init'd before
+  assert (! _rep);
+  _rep = new ImplEnumerator<ImplAAFProperty*>(pProperties);
+  if (! _rep)
+	return AAFRESULT_NOMEMORY;
+  assert (_rep);
+
+  return AAFRESULT_SUCCESS;
+}

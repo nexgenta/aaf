@@ -3,33 +3,103 @@
 #ifndef __ImplEnumAAFProperties_h__
 #define __ImplEnumAAFProperties_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+class ImplAAFProperty;
 
 
-#include "ImplAAFEnumerator.h"
+template <typename T> class ImplCollection;
+template <typename T> class ImplEnumerator;
 
-#include "ImplAAFProperty.h"
 
-typedef ImplAAFEnumerator<ImplAAFProperty> ImplEnumAAFProperties;
+#ifndef __ImplAAFRoot_h__
+#include "ImplAAFRoot.h"
+#endif
+
+
+class ImplEnumAAFProperties : public ImplAAFRoot
+{
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  ImplEnumAAFProperties ();
+
+protected:
+  virtual ~ImplEnumAAFProperties ();
+
+public:
+
+  //****************
+  // NextOne()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    NextOne
+        // @parm [out,retval] The Next Property
+        (ImplAAFProperty ** ppProperty);
+
+
+  //****************
+  // Next()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Next
+        (// @parm [in] number of properties requested
+         aafUInt32  count,
+
+         // @parm [out, size_is(count), length_is(*pNumFetched)] array to receive properties
+         ImplAAFProperty ** ppProperties,
+
+         // @parm [out,ref] number of actual Properties fetched into ppProperties array
+         aafUInt32 *  pNumFetched);
+
+
+  //****************
+  // Skip()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Skip
+        // @parm [in] Number of elements to skip
+        (aafUInt32  count);
+
+
+  //****************
+  // Reset()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Reset ();
+
+
+
+  //****************
+  // Clone()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Clone
+        // @parm [out,retval] new enumeration
+        (ImplEnumAAFProperties ** ppEnum);
+
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplEnumAAFPropertiesTest.cpp.
+  static AAFRESULT test();
+
+  AAFRESULT Initialize (ImplCollection<ImplAAFProperty*> * pProperties);
+
+private:
+  ImplEnumerator<ImplAAFProperty*> * _rep;
+};
+
 
 #endif // ! __ImplEnumAAFProperties_h__
+
+
