@@ -1,28 +1,30 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 
 
 
@@ -46,10 +48,10 @@
 
 
 // ASSERT code copied from OM...
+#include <iostream.h>
 
 #ifdef _DEBUG
 
-#include <iostream.h>
 #include <stdlib.h>
 
 #define FAILURE -1
@@ -201,9 +203,25 @@ STDAPI AAFFileOpenExistingRead (
   hr = LoadIfNecessary(&pAAFDLL);
   if (FAILED(hr))
     return hr;
-  
-  // Attempt to call the dll's exported function...
-  hr = pAAFDLL->OpenExistingRead(pFileName, modeFlags, ppFile);
+ 
+  try
+  {
+    // Attempt to call the dll's exported function...
+    hr = pAAFDLL->OpenExistingRead(pFileName, modeFlags, ppFile);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
+  }
+  catch (...)
+  {
+    // Return a reasonable exception code.
+    //
+    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+  }
 
   return hr;
 }
@@ -228,8 +246,24 @@ STDAPI AAFFileOpenExistingModify (
   if (FAILED(hr))
     return hr;
   
-  // Attempt to call the dll's exported function...
-  hr = pAAFDLL->OpenExistingModify(pFileName, modeFlags, pIdent, ppFile);
+  try
+  {
+    // Attempt to call the dll's exported function...
+    hr = pAAFDLL->OpenExistingModify(pFileName, modeFlags, pIdent, ppFile);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
+  }
+  catch (...)
+  {
+    // Return a reasonable exception code.
+    //
+    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+  }
 
   return hr;
 }
@@ -256,8 +290,24 @@ STDAPI AAFFileOpenNewModify (
   if (FAILED(hr))
     return hr;
   
-  // Attempt to call the dll's exported function...
-  hr = pAAFDLL->OpenNewModify(pFileName, modeFlags, pIdent, ppFile);
+  try
+  {
+    // Attempt to call the dll's exported function...
+    hr = pAAFDLL->OpenNewModify(pFileName, modeFlags, pIdent, ppFile);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
+  }
+  catch (...)
+  {
+    // Return a reasonable exception code.
+    //
+    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+  }
 
   return hr;
 }
@@ -281,8 +331,24 @@ STDAPI AAFFileOpenTransient (
   if (FAILED(hr))
     return hr;
   
-  // Attempt to call the dll's exported function...
-  hr = pAAFDLL->OpenTransient(pIdent, ppFile);
+  try
+  {
+    // Attempt to call the dll's exported function...
+    hr = pAAFDLL->OpenTransient(pIdent, ppFile);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
+  }
+  catch (...)
+  {
+    // Return a reasonable exception code.
+    //
+    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+  }
 
   return hr;
 }
@@ -305,8 +371,24 @@ STDAPI AAFGetPluginManager (
   if (FAILED(hr))
     return hr;
   
-  // Attempt to call the dll's exported function...
-  hr = pAAFDLL->GetPluginManager(ppPluginManager);
+  try
+  {
+    // Attempt to call the dll's exported function...
+    hr = pAAFDLL->GetPluginManager(ppPluginManager);
+  }
+  catch (const char* exStr)
+  {
+    // Return a reasonable exception code.
+    //
+    cerr << "Assertion: \"" << exStr << "\" failed!" << endl;
+    hr = AAFRESULT_ASSERTION_VIOLATION;
+  }
+  catch (...)
+  {
+    // Return a reasonable exception code.
+    //
+    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+  }
 
   return hr;
 }
