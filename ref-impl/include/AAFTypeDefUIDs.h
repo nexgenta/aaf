@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.15 2004/11/01 22:23:44 akharkev Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.16 2004/11/03 17:38:01 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -145,9 +145,9 @@ const aafUID_t kAAFTypeID_ElectroSpatialFormulation =
 const aafUID_t kAAFTypeID_SignalStandardType =
 {0x02010127, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
-//{02010125-0000-0000-060e-2b3401040101}
+//{02010128-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_ScanningDirectionType =
-{0x02010125, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+{0x02010128, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{04010800-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_UInt8Array8 =
