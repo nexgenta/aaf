@@ -9,7 +9,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -405,9 +404,6 @@ public:
 	//@comm Replaces omfmGetNumChannels*/
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFMasterMob)
 
   // Internal to the SDK
   virtual AAFRESULT ReconcileMobLength(void);
