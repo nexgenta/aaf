@@ -22,8 +22,6 @@
 
 class ImplAAFDictionary;
 
-#include "ImplAAFPluginDescriptor.h"
-#include "ImplEnumAAFPluginDescriptors.h"
 
 class ImplAAFDefObject : public ImplAAFObject
 {
@@ -44,16 +42,14 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Init
         // @parm [in] Pointer to an AUID reference
-        (const aafUID_t *  pAuid,
-		 const wchar_t *name,
-		 const wchar_t *description);
+        (aafUID_t *  pAuid, wchar_t *name, wchar_t *description);
   //****************
   // GetAUID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetAUID
         // @parm [retval,out] Pointer to an AUID reference
-        (aafUID_t * pAuid) const;
+        (aafUID_t *  pAuid);
 
   //****************
   // SetAUID()
@@ -61,7 +57,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetAUID
         // @parm [in] Pointer to an AUID reference
-        (const aafUID_t *  pAuid);
+        (aafUID_t *  pAuid);
 
 
   //****************
@@ -69,7 +65,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetName
-        (const wchar_t *  name);  //@parm [in, ref] Definition Name
+        (aafWChar *  name);  //@parm [in, ref] Definition Name
 
 
   //****************
@@ -116,39 +112,24 @@ public:
     GetDescriptionBufLen
         (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
 
-  //****************
-  // AppendPluginDescriptor()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    AppendPluginDescriptor
-        // @parm [in] PluginDescriptor to append
-        (ImplAAFPluginDescriptor * pPluginDescriptor);
-
-
-  //****************
-  // PrependPluginDescriptor()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    PrependPluginDescriptor
-        // @parm [in] PluginDescriptor to append
-        (ImplAAFPluginDescriptor * pPluginDescriptor);
-
-  //****************
-  // EnumPluginDescriptors()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    EnumPluginDescriptors
-        // @parm [out, retval] AAFPluginDescriptor Enumeration
-        (ImplEnumAAFPluginDescriptors ** ppEnum);
-
 
 public:
   // Declare this class to be storable.
   //
   OMDECLARE_STORABLE(ImplAAFDefObject)
 
-public:
-	// Functions internal to the toolkit
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFDefObjectTest.cpp.
+  static AAFRESULT test();
+
+  // non-published method to set the containing dictionary for this
+  // object.
+  void SetDict (ImplAAFDictionary * pDict);
+
+protected:
+  // Returns a pointer to the dictionary containing this object.  Will
+  // assert() if not yet set.
+  ImplAAFDictionary * GetDict ();
 
 private:
   // friendly name of this definition
@@ -159,18 +140,9 @@ private:
 
   // auid to be used to identify this definition
   OMFixedSizeProperty<aafUID_t> _identification;
-  OMVariableSizeProperty<aafUID_t> _descriptors;
+
+  // pointer to dict containing this object
+  ImplAAFDictionary *           _pDict;
 };
-
-//
-// smart pointer
-//
-
-#ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
-#include "ImplAAFSmartPointer.h"
-#endif
-
-typedef ImplAAFSmartPointer<ImplAAFDefObject> ImplAAFPropDefObjectSP;
 
 #endif // ! __ImplAAFDefObject_h__
