@@ -39,6 +39,10 @@
 
 #include "CAAFBuiltinDefs.h"
 
+#if defined(macintosh) || defined(_MAC)
+#include "DataInput.h"
+#endif
+
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
 {
@@ -426,20 +430,23 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary *pDictionary = NULL;
   aafProductIdentification_t  ProductInfo;
   aafMobID_t          newMobID;
-  
+ 
   // delete any previous test file before continuing...
   char chFileName[1000];
   convert(chFileName, sizeof(chFileName), pFileName);
   remove(chFileName);
 
   // Create a new file...
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
+
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"Make AVR Example";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kAAFVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -467,6 +474,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   aafRational_t  audioRate = { 44100, 1 };
   IAAFLocator    *pLocator = NULL;
 	IAAFComponent*		pComponent = NULL;
+	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
 
   for(test = 0; test < 5; test++)
   {
@@ -480,11 +488,16 @@ static void CreateAAFFile(aafWChar * pFileName)
     check(pMob->SetMobID(newMobID));
     check(pMob->SetName(names[test]));
 
-    check(defs.cdFileDescriptor()->
+	// Create a concrete subclass of FileDescriptor
+    check(defs.cdAIFCDescriptor()->
 		  CreateInstance(IID_IAAFFileDescriptor, 
 						 (IUnknown **)&fileDesc));
     check(fileDesc->SetSampleRate(audioRate));
     check(fileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&essenceDesc));
+	check(fileDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+	check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+	pAIFCDesc->Release();
+	pAIFCDesc = NULL;
 
     {
       HRESULT stat;
@@ -596,7 +609,7 @@ struct CAAFInitialize
 };
 
 
-int main()
+int main(int argc, char *argv[])
 {
   CComInitialize comInit;
   CAAFInitialize aafInit;
