@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -56,14 +56,15 @@ public:
 
     // @cmember Constructor.
   OMWeakReferenceSetProperty(const OMPropertyId propertyId,
-                             const char* name,
-                             const char* targetName);
+                             const wchar_t* name,
+                             const wchar_t* targetName,
+                             const OMPropertyId keyPropertyId);
 
     // @cmember Destructor.
   virtual ~OMWeakReferenceSetProperty(void);
 
     // @cmember Save this <c OMWeakReferenceSetProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember Close this <c OMWeakReferenceSetProperty>.
   virtual void close(void);

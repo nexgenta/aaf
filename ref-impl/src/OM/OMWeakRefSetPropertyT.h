@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,6 +31,8 @@
 
 #include "OMAssertions.h"
 #include "OMWeakReferenceSetIter.h"
+#include "OMPropertyTable.h"
+#include "OMUtilities.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -40,15 +42,16 @@
   //         <c OMWeakReferenceSetProperty> reside.
 template <typename ReferencedObject>
 OMWeakReferenceSetProperty<ReferencedObject>::
-                      OMWeakReferenceSetProperty(const OMPropertyId propertyId,
-                                                 const char* name,
-                                                 const char* targetName)
+                   OMWeakReferenceSetProperty(const OMPropertyId propertyId,
+                                              const wchar_t* name,
+                                              const wchar_t* targetName,
+                                              const OMPropertyId keyPropertyId)
 : OMContainerProperty<ReferencedObject>(propertyId,
                                         SF_WEAK_OBJECT_REFERENCE_SET,
                                         name),
   _targetTag(nullOMPropertyTag),
-  _targetName(saveString(targetName)),
-  _keyPropertyId(0 /* tjb */)
+  _targetName(convertWideString(targetName)),
+  _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::"
                                                  "OMWeakReferenceSetProperty");
@@ -67,11 +70,9 @@ OMWeakReferenceSetProperty<ReferencedObject>::~OMWeakReferenceSetProperty(void)
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable> and <c OMUnique>.
-  //   @parm Client context for callbacks.
   //   @this const
 template <typename ReferencedObject>
-void OMWeakReferenceSetProperty<ReferencedObject>::save(
-                                                     void* clientContext) const
+void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::save");
 
@@ -112,7 +113,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(
 
     // save the object
     //
-    element.save(clientContext);
+    element.save();
 
     position = position + 1;
 
