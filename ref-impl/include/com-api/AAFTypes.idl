@@ -3,7 +3,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAFTypes.idl,v 1.2.10.2 2004/06/08 13:45:35 stuart_hc Exp $ $Name:  $")
+cpp_quote("// $Id: AAFTypes.idl,v 1.2.10.3 2004/06/16 18:56:21 jptrainor Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \"License\"); You may not use this file")
@@ -793,7 +793,8 @@ typedef enum _aafSearchTag_e
 	kAAFByName = 3, 
 	kAAFByClass = 4, 
 	kAAFByDataDef = 5,
-	kAAFByMediaCrit = 6
+	kAAFByMediaCrit = 6,
+	kAAFByUsageCode = 7
 } aafSearchTag_e;
 
 
@@ -833,6 +834,7 @@ cpp_quote("        aafString_t       name;")
 cpp_quote("        aafClassID_t      objClass;	// shouldn't this be a pointer?") 
 cpp_quote("        aafUID_t		 datadef;	// shouldn't this be a pointer?") 
 cpp_quote("        aafCriteriaType_t mediaCrit;") 
+cpp_quote("        aafUID_t          usageCode;") 
 cpp_quote("    } tags;") 
 cpp_quote("} aafSearchCrit_t;") 
 

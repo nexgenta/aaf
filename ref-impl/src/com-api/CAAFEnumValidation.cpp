@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.cpp,v 1.2.2.2 2004/06/08 13:45:59 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEnumValidation.cpp,v 1.2.2.3 2004/06/16 18:56:23 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -643,6 +643,7 @@ bool Is_aafSearchTag_t_Valid(aafSearchTag_t param)
     case kAAFByClass:
     case kAAFByDataDef:
     case kAAFByMediaCrit:
+    case kAAFByUsageCode:
       return true;
     default:
       return false;

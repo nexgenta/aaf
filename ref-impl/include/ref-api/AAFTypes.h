@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.3.2.2 2004/06/08 13:45:38 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.3.2.3 2004/06/16 18:56:23 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -790,7 +790,8 @@ typedef enum _aafSearchTag_e
 	kAAFByName = 3, 
 	kAAFByClass = 4, 
 	kAAFByDataDef = 5,
-	kAAFByMediaCrit = 6
+	kAAFByMediaCrit = 6,
+	kAAFByUsageCode = 7
 } aafSearchTag_e;
 
 
@@ -830,6 +831,7 @@ typedef struct _aafSearchCrit_t
         aafClassID_t      objClass;	// shouldn't this be a pointer?
         aafUID_t		 datadef;	// shouldn't this be a pointer?
         aafCriteriaType_t mediaCrit;
+        aafUID_t          usageCode;
     } tags;
 } aafSearchCrit_t;
 

@@ -2,9 +2,9 @@
 
 
 /* File created by MIDL compiler version 5.01.0164 */
-/* at TIMESTAMP REMOVED
+/* at Wed Jun 16 09:07:41 2004
  */
-/* Compiler settings for ../ref-impl/include/com-api/AAFTypes.idl:
+/* Compiler settings for AAFTypes.idl:
     Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
     error checks: allocation ref bounds_check enum stub_data 
 */
@@ -41,7 +41,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.3.2.2 2004/06/08 13:45:35 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.3.2.3 2004/06/16 18:56:21 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -848,7 +848,8 @@ enum _aafSearchTag_e
 	kAAFByName	= 3,
 	kAAFByClass	= 4,
 	kAAFByDataDef	= 5,
-	kAAFByMediaCrit	= 6
+	kAAFByMediaCrit	= 6,
+	kAAFByUsageCode	= 7
     }	aafSearchTag_e;
 
 #if 0
@@ -880,6 +881,7 @@ typedef struct _aafSearchCrit_t
         aafClassID_t      objClass;	// shouldn't this be a pointer?
         aafUID_t		 datadef;	// shouldn't this be a pointer?
         aafCriteriaType_t mediaCrit;
+        aafUID_t          usageCode;
     } tags;
 } aafSearchCrit_t;
 typedef aafInt32 aafDefinitionKind_t;

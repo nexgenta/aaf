@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.15.2.11 2004/06/08 13:45:35 stuart_hc Exp $ $Name:  $
+// $Id: AAF.h,v 1.15.2.12 2004/06/16 18:56:21 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
