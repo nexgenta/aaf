@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.62 2004/03/30 16:31:06 bakerian Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.63 2004/04/06 15:58:42 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,6 +82,9 @@ void OMDataStreamProperty::save(void) const
   OMDataStreamProperty* p = const_cast<OMDataStreamProperty*>(this);
   if (!_exists) {
     p->create();
+	// Overcomes Schemasoft library SEGV when writing zero-length DataStream
+	// property
+    p->close();
   }
   if (hasStreamAccess()) {
     // Set the current position to the end of the stream
