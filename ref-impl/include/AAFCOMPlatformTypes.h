@@ -1,11 +1,12 @@
-#ifndef __AAFCOMPlatformTypes_h__
-#define __AAFCOMPlatformTypes_h__
+#ifndef __AAFCOMPlatform_h__
+#define __AAFCOMPlatform_h__
 
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 // Files that contain standard types for windows/com interfaces.
@@ -14,17 +15,15 @@
 // NOTE: This file may have to be modified to support other COM platforms.
 
 #if defined(_MAC) || defined(_MAC_) || defined(macintosh)
-  // Include file form ActiveX SDK for the Macintosh. Otherwise the 
-  // OLE (2.08, 2.24) interfaces cannot be used since they use standard
-  // window's types and defines...
+  // Include file form ActiveX SDK for the Macintosh
   #include <wintypes.h>
 #elif defined(WIN32) || defined(_WIN32)
   #include <wtypes.h>
 #else
   // Default to the reference implementation.
-  #include "ref.hxx"
+  #include "REF.HXX"
 #endif
 
 
-#endif // __AAFCOMPlatformTypes_h__
+#endif // __AAFCOMPlatform_h__
 
