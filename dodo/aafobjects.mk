@@ -75,7 +75,6 @@ HUMAN_TYPED_IMPL="\
 	AAFObject \
 	AAFParameter \
 	AAFParameterDef \
-	AAFPluggableCode \
 	AAFProperty \
 	AAFPropertyDef \
 	AAFPropertyValue \
@@ -103,6 +102,7 @@ HUMAN_TYPED_IMPL="\
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTypeDef \
+	AAFTypeDefCharacter \
 	AAFTypeDefIndirect \
 	AAFTypeDefInt \
 	AAFTypeDefRename \
