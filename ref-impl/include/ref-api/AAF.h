@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.15.2.12 2004/06/16 18:56:21 jptrainor Exp $ $Name:  $
+// $Id: AAF.h,v 1.15.2.13 2004/08/04 18:53:27 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40982,6 +40982,98 @@ DECLARE_INTERFACE_(IAAFCompositionMob2, IUnknown)
 
     // newly-created file
     /*[out]*/ IAAFFile ** ppNewFile);
+
+  //***********************************************************
+  //
+  // AAFGetLibraryVersion()
+  //
+  // Return the version of the AAF library currently
+  // running on this machine, which implements these interfaces.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pVersion pointer is valid.
+  // 
+  // If this method fails nothing is written to *pVersion.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pVersion is null.
+  // 
+  STDAPI AAFGetLibraryVersion (
+    // The library version
+    /*[out, retval]*/ aafProductVersion_t *  pVersion);
+
+  //***********************************************************
+  //
+  // AAFGetLibraryPathNameBufLen()
+  //
+  // Returns size of buffer (in bytes) required for AAFGetLibraryPathName().
+  // 
+  // Succeeds if:
+  // - The pBufSize pointer is valid.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pBufSize arg is NULL.
+  // 
+  STDAPI AAFGetLibraryPathNameBufLen (
+    // size of required buffer, in bytes
+    /*[out]*/ aafUInt32 *  pBufSize);
+
+  //***********************************************************
+  //
+  // AAFGetLibraryPathName()
+  //
+  // Get the pathname of the AAF library.
+  // 
+  // Writes the LibraryPathName, with a trailing null
+  // character, into the pLibraryPathName buffer.  The
+  // buffer is allocated by the caller.  The size of the buffer is
+  // given by bufSize.
+  // 
+  // Caller may call AAFGetLibraryPathNameBufLen() to determine the
+  // required buffer size.
+  // 
+  // If this method fails nothing will be written to
+  // *pLibraryPathName.
+  // 
+  // Succeeds if:
+  // - The pLibraryPathName pointer is valid.
+  // - bufSize indicates that the buffer is large enough to hold
+  //   LibraryPathName.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pLibraryPathName arg is NULL.
+  //
+  // AAFRESULT_SMALLBUF
+  //   - bufSize indicates that the allocated buffer is not large
+  //     enough to hold LibraryPathName.
+  // 
+  STDAPI AAFGetLibraryPathName (
+    // buffer into which LibraryPathName is to be written
+    /*[out, string, size_is(bufSize)]*/ aafCharacter *  pLibraryPathName,
+
+    // size of *pLibraryPathName buffer in bytes
+    /*[in]*/ aafUInt32  bufSize);
 
 
 #endif // __AAF_h__

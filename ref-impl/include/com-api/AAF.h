@@ -922,7 +922,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.5.2.9 2004/06/08 13:45:25 stuart_hc Exp $ $Name:  $
+// $Id: AAF.h,v 1.5.2.10 2004/08/04 18:53:19 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38978,6 +38978,14 @@ STDAPI AAFCreateAAFFileOnRawStorage (
           aafUInt32  modeFlags,
           aafProductIdentification_constptr  pIdent,
           IAAFFile ** ppNewFile);
+
+STDAPI AAFGetLibraryVersion (aafProductVersion_t *  pVersion);
+
+STDAPI AAFGetLibraryPathNameBufLen (aafUInt32 *  pBufSize);
+
+STDAPI AAFGetLibraryPathName (
+          aafCharacter *  pLibraryPathName,
+          aafUInt32  bufSize);
 
 
 
