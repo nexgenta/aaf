@@ -32,33 +32,30 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
+
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "AAFPropertyDefs.h"
 
 #include "CAAFBuiltinDefs.h"
 
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFDataDef> IAAFDataDefSP;
-typedef IAAFSmartPointer<IAAFObject> IAAFObjectSP;
-typedef IAAFSmartPointer<IAAFClassDef> IAAFClassDefSP;
-typedef IAAFSmartPointer<IAAFPropertyDef> IAAFPropertyDefSP;
-typedef IAAFSmartPointer<IAAFPropertyValue> IAAFPropertyValueSP;
-typedef IAAFSmartPointer<IAAFTypeDef> IAAFTypeDefSP;
-typedef IAAFSmartPointer<IAAFTypeDefOpaque> IAAFTypeDefOpaqueSP;
-typedef IAAFSmartPointer<IAAFKLVData> IAAFKLVDataSP;
 
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 static const aafUID_t *	slotDDefs[5] = {&DDEF_Picture, &DDEF_Sound, &DDEF_Sound, &DDEF_Picture, &DDEF_Picture};
 static aafLength_t	slotsLength[5] = { 297, 44100, 44100, 44100, 44100};
 
+static aafInt32 fadeInLen  = 1000;
+static aafInt32 fadeOutLen = 2000;
+static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
+static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
 static aafSourceRef_t sourceRef; 
+static aafWChar* TagNames =  L"TAG01";
+static aafWChar* Comments =  L"Comment 1";	
+static aafWChar* AltComment = L"Alternate Comment";
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
@@ -135,83 +132,6 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-// Use the direct access interfaces to extract an opaque
-// handle from the given KLVData object.
-static void CreateOpaqueHandleFromKLVData(
-  IAAFKLVData* pData,
-  aafDataBuffer_t &opaqueHandle,
-  aafUInt32 &handleSize)
-{
-  checkExpression (NULL != pData, E_INVALIDARG);
-
-  IAAFObjectSP pObject;
-  checkResult(pData->QueryInterface(IID_IAAFObject, (void **)&pObject));
-
-  IAAFClassDefSP pClassDef;
-  checkResult(pObject->GetDefinition(&pClassDef));
-
-  IAAFPropertyDefSP pPropertyDef;
-  checkResult(pClassDef->LookupPropertyDef(kAAFPropID_KLVData_Value, &pPropertyDef));
-
-  IAAFPropertyValueSP pPropertyValue;
-  checkResult(pObject->GetPropertyValue(pPropertyDef, &pPropertyValue));
-
-  IAAFTypeDefSP pTypeDef;
-  checkResult(pPropertyDef->GetTypeDef(&pTypeDef));
-
-  IAAFTypeDefOpaqueSP pTypeDefOpaque;
-  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefOpaque, (void **)&pTypeDefOpaque));
-
-  //
-  // Get the expected size of the handle.
-  //
-  checkResult(pTypeDefOpaque->GetHandleBufLen(pPropertyValue, &handleSize));
-
-  //
-  // Allocate the handle. NOTE: The caller must delete this memory!
-  //
-  opaqueHandle = new aafUInt8[handleSize];
-  checkExpression(NULL != opaqueHandle, AAFRESULT_NOMEMORY);
-
-  aafUInt32 bytesRead = 0;
-  checkResult(pTypeDefOpaque->GetHandle(pPropertyValue, handleSize, opaqueHandle, &bytesRead));
-  checkExpression(handleSize == bytesRead, AAFRESULT_TEST_FAILED);
-}
-
-
-// Use the direct access interfaces to write an opaque
-// handle to the given KLVData object.
-static void InitializeKLVDataFromOpaqueHandle(
-  IAAFKLVData *pData,
-  aafDataBuffer_t opaqueHandle,
-  aafUInt32 handleSize)
-{
-  checkExpression (NULL != opaqueHandle && NULL != pData && 0 < handleSize, E_INVALIDARG);
-
-
-  IAAFObjectSP pObject;
-  checkResult(pData->QueryInterface(IID_IAAFObject, (void **)&pObject));
-
-  IAAFClassDefSP pClassDef;
-  checkResult(pObject->GetDefinition(&pClassDef));
-
-  IAAFPropertyDefSP pPropertyDef;
-  checkResult(pClassDef->LookupPropertyDef(kAAFPropID_KLVData_Value, &pPropertyDef));
-
-  IAAFPropertyValueSP pPropertyValue;
-  checkResult(pObject->GetPropertyValue(pPropertyDef, &pPropertyValue));
-
-  IAAFTypeDefSP pTypeDef;
-  checkResult(pPropertyDef->GetTypeDef(&pTypeDef));
-
-  IAAFTypeDefOpaqueSP pTypeDefOpaque;
-  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefOpaque, (void **)&pTypeDefOpaque));
-
-  checkResult(pTypeDefOpaque->SetHandle(pPropertyValue, handleSize, opaqueHandle));
-  checkResult(pObject->SetPropertyValue(pPropertyDef, pPropertyValue));
-}
-
-
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
@@ -232,8 +152,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafProductIdentification_t	ProductInfo;
 	HRESULT				hr = S_OK;
 	aafUInt32			numComments;
-  aafDataBuffer_t opaqueHandle = NULL;
-  aafUInt32 opaqueHandleSize = 0;
 
 	aafProductVersion_t v;
 	v.major = 1;
@@ -264,11 +182,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
 		CAAFBuiltinDefs defs (pDictionary);
  		
-		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(TEST_KLV, pBaseType));
-
 		//Make the first mob
 		long	test;
+		aafRational_t	audioRate = { 44100, 1 };
 
 		// Create a  Composition Mob
 		checkResult(defs.cdCompositionMob()->
@@ -283,21 +199,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdKLVData()->
 					CreateInstance(IID_IAAFKLVData, 
 								   (IUnknown **)&pData));
-		checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney));
+		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
+		checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney, pBaseType));
 		checkResult(pData->SetValue(sizeof(KLVsmiley), (unsigned char *)KLVsmiley));
 		checkResult(pMob->AppendKLVData (pData));
-
-    // Test extracting an opaque handle from the KLVData value property.
-    // NOTE: This should be a "smiley" value.
-    CreateOpaqueHandleFromKLVData(pData, opaqueHandle, opaqueHandleSize);  
 		pData->Release();
 		pData = NULL;
-
-    // append a second KLVData to this mob, count, delete it, count again
+		// append a second KLVData to this mob, count, delete it, count again
 		checkResult(defs.cdKLVData()->
 					CreateInstance(IID_IAAFKLVData, 
 								   (IUnknown **)&pData));
-		checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney));
+		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
+		checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney, pBaseType));
 		checkResult(pData->SetValue(sizeof(KLVsmiley), (unsigned char *)KLVsmiley));
 		checkResult(pMob->AppendKLVData (pData));
 		checkResult(pMob->CountKLVData(&numComments));
@@ -305,21 +218,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->RemoveKLVData (pData));
 		checkResult(pMob->CountKLVData(&numComments));
 		checkExpression(1 == numComments, AAFRESULT_TEST_FAILED);
-    pData->Release();
+		pData->Release();
 		pData = NULL;
-    
-    // Create a new "frowney" KLVData value and then reinitialize it with the
-    // "smiley" opaque handle created above.
-		checkResult(defs.cdKLVData()->
-					CreateInstance(IID_IAAFKLVData, 
-								   (IUnknown **)&pData));
-		checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney));
- 		checkResult(pMob->AppendKLVData (pData));
-    InitializeKLVDataFromOpaqueHandle(pData, opaqueHandle, opaqueHandleSize);    
-    pData->Release();
-		pData = NULL;
-		checkResult(pMob->CountKLVData(&numComments));
-	  checkExpression(2 == numComments, AAFRESULT_TEST_FAILED);
 
 		// Create a master mob to be referenced
 		checkResult(defs.cdMasterMob()->
@@ -343,6 +243,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			IAAFDataDefSP pDataDef;
 			checkResult(pDictionary->LookupDataDef(*slotDDefs[test], &pDataDef));
 			checkResult(sclp->Initialize(pDataDef, slotsLength[test], sourceRef));
+			checkResult(sclp->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
 
 			checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 
@@ -350,7 +251,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(defs.cdKLVData()->
 						CreateInstance(IID_IAAFKLVData, 
 								   (IUnknown **)&pData));
-			checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney));
+			checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
+			checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney, pBaseType));
 			checkResult(pComponent->AppendKLVData (pData));
 			pData->Release();
 			pData = NULL;
@@ -358,7 +260,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(defs.cdKLVData()->
 					CreateInstance(IID_IAAFKLVData, 
 								   (IUnknown **)&pData));
-			checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney));
+			checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
+			checkResult(pData->Initialize(TEST_KLV, sizeof(KLVfrowney), (unsigned char *)KLVfrowney, pBaseType));
 			checkResult(pData->SetValue(sizeof(KLVsmiley), (unsigned char *)KLVsmiley));
 			checkResult(pComponent->AppendKLVData (pData));
 			checkResult(pComponent->CountKLVData(&numComments));
@@ -402,9 +305,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
   // Cleanup and return
-  if (opaqueHandle)
-    delete [] opaqueHandle;
-
   if (newSlot)
     newSlot->Release();
 
@@ -464,19 +364,29 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFMob			*aMob = NULL;
 	IEnumAAFMobSlots	*slotIter = NULL;
 	IEnumAAFKLVData* pKLVIterator = NULL;
-	IAAFDictionary*		pDictionary = NULL;
-	IAAFTypeDef*		pBaseType = NULL;
 	IAAFKLVData*		pKLVData = NULL;
 	aafUInt32			testKLVLen;
 	aafUID_t			testKey;
 
 	IAAFMobSlot		*slot = NULL;
+	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n, slt;
 	aafUInt32		numComments, bytesRead, com;
 	HRESULT						hr = S_OK;
 	char			Value[sizeof(KLVsmiley)];
 	aafSearchCrit_t	criteria;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
+	ProductInfo.companyName = L"AAF Developers Desk";
+	ProductInfo.productName = L"AAFKLVData Test";
+	ProductInfo.productVersion = &v;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.platform = NULL;
 
 	try
 	{
@@ -490,9 +400,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		criteria.searchTag = kAAFByMobKind;
 		criteria.tags.mobKind = kAAFCompMob;
 
-		checkResult(pHeader->GetDictionary(&pDictionary));
-		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pBaseType));
-		checkResult(pDictionary->RegisterKLVDataKey(TEST_KLV, pBaseType));
 
 		checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
@@ -513,7 +420,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 			// Check for comments
 			checkResult(aMob->CountKLVData(&numComments));
-			checkExpression(2 == numComments, AAFRESULT_TEST_FAILED);
+			checkExpression(1 == numComments, AAFRESULT_TEST_FAILED);
 			checkResult(aMob->GetKLVData(&pKLVIterator));
 			for(com = 0; com < numComments; com++)
 			{
@@ -577,12 +484,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	}
 
 	// Cleanup object references
-  if (pKLVData)
-    pKLVData->Release();
-
-  if (pKLVIterator)
-    pKLVIterator->Release();
-
   if (slot)
     slot->Release();
 
@@ -601,12 +502,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   if (mobIter)
     mobIter->Release();
 
-  if (pDictionary)
-    pDictionary->Release();
-
-  if (pBaseType)
-    pBaseType->Release();
-
   if (pHeader)
     pHeader->Release();
       
@@ -621,25 +516,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 }
  
 
-extern "C" HRESULT CAAFKLVData_test(testMode_t mode);
-extern "C" HRESULT CAAFKLVData_test(testMode_t mode)
+extern "C" HRESULT CAAFKLVData_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"AAFKLVDataTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CKLVData_test...Caught general C++"
-		   << " exception!" << endl; 
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
