@@ -1,27 +1,14 @@
 #ifndef __ImplAAFCDCIDescriptor_h__
 #define __ImplAAFCDCIDescriptor_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #include "ImplAAFDigitalImageDescriptor.h"
 
@@ -58,14 +45,6 @@ public:
     SetHorizontalSubsampling
 		// @parm [in] Integer value.
         (aafUInt32  HorizontalSubsampling);
-
-  //****************
-  // SetVerticalSubsampling()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetVerticalSubsampling
-		// @parm [in] Integer value.
-        (aafUInt32  VerticalSubsampling);
 
   //****************
   // SetColorSiting()
@@ -124,14 +103,6 @@ public:
         (aafUInt32 *  pHorizontalSubsampling);
 
   //****************
-  // GetVerticalSubsampling()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetVerticalSubsampling
-		// @parm [out] Address to store the integer value.
-        (aafUInt32 *  pVerticalSubsampling);
-
-  //****************
   // GetColorSiting()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -171,10 +142,16 @@ public:
 		// @parm [out] Address to store the number of bits.
         (aafInt16 *  pPaddingBits);
 
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFCDCIDescriptor)
+
 protected:
 	OMFixedSizeProperty<aafInt32>			_componentWidth;
 	OMFixedSizeProperty<aafUInt32>			_horizontalSubsampling;
-	OMFixedSizeProperty<aafUInt32>			_verticalSubsampling;
 	OMFixedSizeProperty<aafColorSiting_t>	_colorSiting;
 	OMFixedSizeProperty<aafUInt32>			_blackReferenceLevel;
 	OMFixedSizeProperty<aafUInt32>			_whiteReferenceLevel;
