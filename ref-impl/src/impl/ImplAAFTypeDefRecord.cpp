@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.44 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.45 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,8 +62,8 @@ ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
 	_registeredOffsets (0),
 	_registeredSize (0),
 	_internalSizes (0),
-	_cachedCount ((aafUInt32) -1),
 	_cachedMemberTypes (0),
+	_cachedCount ((aafUInt32) -1),
 	_registrationAttempted (kAAFFalse),
 	_defaultRegistrationUsed (kAAFFalse)
 {

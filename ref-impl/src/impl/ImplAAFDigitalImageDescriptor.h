@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescriptor.h,v 1.17 2004/09/10 17:13:06 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescriptor.h,v 1.18 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -446,16 +446,16 @@ protected:
 	OMFixedSizeProperty<aafRational_t>			_imageAspectRatio;
 	OMFixedSizeProperty<aafAlphaTransparency_t>	_alphaTransparency;
 	OMFixedSizeProperty<aafUID_t>				_transferCharacteristic;
-	OMFixedSizeProperty<aafUID_t>				_codingEquations;
 	OMFixedSizeProperty<aafUID_t>				_colorPrimaries;
+	OMFixedSizeProperty<aafUID_t>				_codingEquations;
 	OMFixedSizeProperty<aafUInt32>				_imageAlignmentFactor;
 	OMFixedSizeProperty<aafFieldNumber_t>				_fieldDominance;
 	OMFixedSizeProperty<aafUInt32>				_fieldStartOffset;
 	OMFixedSizeProperty<aafUInt32>				_fieldEndOffset;
-	OMFixedSizeProperty<aafInt32>				_displayF2Offset;
-	OMFixedSizeProperty<aafInt32>				_storedF2Offset;
-	OMFixedSizeProperty<aafUInt8>				_activeFormatDescriptor;
 	OMFixedSizeProperty<aafSignalStandard_t>		_signalStandard;
+	OMFixedSizeProperty<aafInt32>				_storedF2Offset;
+	OMFixedSizeProperty<aafInt32>				_displayF2Offset;
+	OMFixedSizeProperty<aafUInt8>				_activeFormatDescriptor;
 };
 
 #endif // ! __ImplAAFDigitalImageDescriptor_h__

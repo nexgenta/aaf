@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplEnumAAFPropertyValues.cpp,v 1.7 2004/10/26 01:07:26 jptrainor Exp $ $Name:  $
+// $Id: ImplEnumAAFPropertyValues.cpp,v 1.8 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -97,12 +97,12 @@ AAFRESULT GetElementValueFromSet( ImplAAFPropertyValue* pVal,
 }
 
 ImplEnumAAFPropertyValues::ImplEnumAAFPropertyValues ()
-  : _count(0),
-    _current(0),
+  : _initialized(false),
+    _pDefSet(0),
     _pDef(0),
     _pVal(0),
-    _pDefSet(0),
-   _initialized(false)
+    _count(0),
+    _current(0)
 {}
 
 ImplEnumAAFPropertyValues::~ImplEnumAAFPropertyValues ()

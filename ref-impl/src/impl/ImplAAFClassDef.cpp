@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.cpp,v 1.59 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFClassDef.cpp,v 1.60 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -107,8 +107,8 @@ ImplAAFClassDef::ImplAAFClassDef ()
                     PID_MetaDefinition_Identification),
     _IsConcrete   ( PID_ClassDefinition_IsConcrete,   
                     L"IsConcrete"),
-	_propTypesLoaded (false),
-	_BootstrapParent(0)
+	_BootstrapParent(0),
+	_propTypesLoaded (false)
 {
   _persistentProperties.put(_ParentClass.address());
   _persistentProperties.put(_Properties.address());

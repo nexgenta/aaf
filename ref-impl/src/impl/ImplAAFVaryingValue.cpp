@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFVaryingValue.cpp,v 1.37 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFVaryingValue.cpp,v 1.38 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,11 +51,11 @@
 extern "C" const aafClassID_t CLSID_EnumAAFControlPoints;
 
 ImplAAFVaryingValue::ImplAAFVaryingValue ()
-: _controlPoints(         PID_VaryingValue_PointList,          L"PointList"),
-  _interpolation(         PID_VaryingValue_Interpolation,      L"Interpolation", L"/Header/Dictionary/InterpolationDefinitions", PID_DefinitionObject_Identification)
+: _interpolation(         PID_VaryingValue_Interpolation,      L"Interpolation", L"/Header/Dictionary/InterpolationDefinitions", PID_DefinitionObject_Identification),
+ _controlPoints(         PID_VaryingValue_PointList,          L"PointList")
 {
-	  _persistentProperties.put(_controlPoints.address());
 	  _persistentProperties.put(_interpolation.address());
+	  _persistentProperties.put(_controlPoints.address());
 }
 
 

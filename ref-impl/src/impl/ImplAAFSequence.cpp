@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.cpp,v 1.61 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSequence.cpp,v 1.62 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -164,7 +164,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::AppendComponent (ImplAAFComponent* pComponent)
 {
 	ImplAAFDataDefSP sequDataDef, cpntDataDef;
-	aafBool			isPrevTran = kAAFFalse, willConvert;
+	aafBool			willConvert = kAAFFalse;
 
 	if (pComponent == NULL)
 		return AAFRESULT_NULL_PARAM;
