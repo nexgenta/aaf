@@ -1,10 +1,24 @@
-#c/*************************************************\
-#c*                                                 *
-#c* Advanced Authoring Format                       *
-#c*                                                 *
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.   *
-#c*                                                 *
-#c\*************************************************/
+#c *********************************************************************
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c 
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c 
+#c The Original Code of this file is Copyright 1998-2001, Licensor of the
+#c AAF Association.
+#c 
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFCDCIDescriptor\
 #endm
@@ -164,6 +178,62 @@ AD_XMETHOD1(GetHorizontalSubsampling,
   //
   // AAFRESULT_NULL_PARAM
   //   - pHorizontalSubsampling arg is NULL.)
+
+
+AD_XMETHOD1(SetVerticalSubsampling,
+			[in],
+				objPass,
+				aafUInt32,
+				VerticalSubsampling,
+				Integer value.,
+			Sets the VerticalSubsampling property.  Specifies the ratio of
+  // luminance sampling to chrominance sampling in the vertical direction.
+  // For 4:2:2 video\, the value is 2\, which means that there are twice as
+  // many luminance values as there are color-difference values.
+  // Another typical value is 1; however other values are permitted by
+  // the reference implementation.
+  //
+  // If this method fails\, the VerticalSubsampling property will
+  // not be changed.
+  // 
+  // This method will return the following codes:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.)
+
+
+AD_XMETHOD1(GetVerticalSubsampling,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pVerticalSubsampling,
+				Address to store the integer value.,
+			Gets the VerticalSubsampling property.  Specifies the ratio of
+  // luminance sampling to chrominance sampling in the vertical
+  // direction.  For 4:2:2 video\, the value is 2\, which means that
+  // there are twice as many luminance values as there are
+  // color-difference values.  Another typical value is 1; however
+  // other values are permitted by the reference implementation.
+  //
+  // Succeeds if all of the following are true:
+  // - pVerticalSubsampling is a valid pointer.
+  // 
+  // If this method fails\, *pVerticalSubsampling will not be
+  // changed.
+  // 
+  // This method will return the following codes:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pVerticalSubsampling arg is NULL.)
 
 
 AD_XMETHOD1(SetColorSiting,
