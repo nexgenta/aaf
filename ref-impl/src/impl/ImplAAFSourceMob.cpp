@@ -274,7 +274,6 @@ AAFRESULT STDMETHODCALLTYPE
                            aafEdgeType_t  codeFormat,
                            aafEdgecodeHeader_t  header)
 {
-#if 1
 	ImplAAFFiller *     filler1= NULL, *filler2 = NULL;
 	ImplAAFSequence *ecSequence;
 	ImplAAFEdgecode *edgecodeClip;
@@ -335,9 +334,6 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND;
 
 	return (AAFRESULT_SUCCESS);
-#else
-	return AAFRESULT_NOT_IMPLEMENTED;
-#endif
 }
 
 
@@ -686,10 +682,10 @@ AAFRESULT STDMETHODCALLTYPE
                            aafPosition_t  offset,
                            aafMobKind_t  mobKind,
                            aafMediaCriteria_t *pMediaCrit,
-                           aafEffectChoice_t *pEffectChoice,
+                           aafOperationChoice_t *pOperationChoice,
                            ImplAAFFindSourceInfo **ppSourceInfo)
 {
-	return(InternalSearchSource(slotID, offset, mobKind, pMediaCrit, pEffectChoice,
+	return(InternalSearchSource(slotID, offset, mobKind, pMediaCrit, pOperationChoice,
 										   ppSourceInfo));
 }
 
