@@ -690,8 +690,11 @@ AAFRESULT STDMETHODCALLTYPE
 	// !!!Does not obey search criteria yet
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumMob(this));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFMobSlot>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFMobSlot>(_slots);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFMobSlots, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -854,8 +857,11 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_userComments));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFTaggedValue>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFTaggedValue>(_userComments);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFTaggedValues, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -949,7 +955,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceVectorIterator<ImplAAFKLVData>(_KLVData);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFKLVData, this, iter));
 	  *ppEnum = theEnum;
 	}
   XEXCEPT
@@ -976,12 +982,12 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFSegment		*pdwnInput = NULL;
 	ImplEnumAAFMobSlots *iter = NULL;
 	ImplAAFSegment		*seg = NULL;
-	aafTimecode_t		timecode;
+//	aafTimecode_t		timecode;
 	aafBool				reverse = kAAFFalse;
-	aafUInt32			frameOffset;
-	aafUID_t			dataDefID;
-	aafPosition_t		newStart;
-	aafInt32			start32;
+//	aafUInt32			frameOffset;
+//	aafUID_t			dataDefID;
+//	aafPosition_t		newStart;
+//	aafInt32			start32;
 	AAFRESULT			aafError = AAFRESULT_SUCCESS;
 	
 
@@ -989,7 +995,9 @@ AAFRESULT STDMETHODCALLTYPE
   if (NULL == tcSlotID || NULL == offset || NULL == result)
     return (AAFRESULT_NULL_PARAM);
   
-  memset(result, 0, sizeof(aafTimecode_t));
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+#if 0
+	memset(result, 0, sizeof(aafTimecode_t));
 	memset(&timecode, 0, sizeof(aafTimecode_t));
 	result->startFrame = 0;
 	
@@ -1084,6 +1092,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND;
 	
 	return(AAFRESULT_SUCCESS);
+#endif
 }
 
 
