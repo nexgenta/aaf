@@ -3,6 +3,7 @@
 #ifndef __ImplAAFSequence_h__
 #define __ImplAAFSequence_h__
 
+#include "OMStorable.h"
 
 /******************************************\
 *                                          *
@@ -32,6 +33,8 @@ class ImplEnumAAFComponents;
 #endif
 
 
+const int PID_SEQUENCE_COMPONENTS	= 30;
+
 class ImplAAFSequence : public ImplAAFSegment
 {
 public:
@@ -44,37 +47,37 @@ public:
 
 
   //****************
-  // Initialize()
+  // SetInitialValue()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
+    SetInitialValue
 		// @parm [in] Data Definition object
         (aafUID_t * pDatadef);
 
 
   //****************
-  // AppendComponent()
+  // AppendCpnt()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendComponent
+    AppendCpnt
 		// @parm [in] Component to append to the sequence
         (ImplAAFComponent * pComponent);
 
 
   //****************
-  // RemoveComponent()
+  // RemoveCpnt()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveComponent
+    RemoveCpnt
 		// @parm [in] Component to append to the sequence
         (ImplAAFComponent * pComponent);
 
 
   //****************
-  // GetNumComponents()
+  // GetNumCpnts()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumComponents
+    GetNumCpnts
 		// @parm [out] Number of components
         (aafInt32 *  pNumCpnts);
 
@@ -111,10 +114,7 @@ public:
   static AAFRESULT test();
 
   // Interfaces visible inside the toolkit, but not exposed through the API
-  AAFRESULT GetNthComponent(aafUInt32 index, ImplAAFComponent **ppComponent);
-	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
-  AAFRESULT
-    SetNthComponent (aafUInt32 index, ImplAAFComponent* pComponent);
+  AAFRESULT GetNthComponent(aafInt32 index /* 0-based*/, ImplAAFComponent **ppComponent);
 
 private:
 	OMStrongReferenceVectorProperty<ImplAAFComponent> _components;

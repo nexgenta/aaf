@@ -21,238 +21,56 @@
 #include "ImplEnumAAFComponents.h"
 #include "ImplAAFSequence.h"
 #include "AAFResult.h"
-#include "ImplAAFObjectCreation.h"
-#include "ImplAAFHeader.h"
-#include "ImplAAFDictionary.h"
 
 #include <assert.h>
 
 
-extern "C" const aafClassID_t CLSID_EnumAAFComponents;
-
 ImplEnumAAFComponents::ImplEnumAAFComponents ()
 {
 	_current = 0;
-	_enumObj = NULL;
-	_enumStrongProp = NULL;
+	_pSequence = NULL;
 }
 
 
 ImplEnumAAFComponents::~ImplEnumAAFComponents ()
-{
-	if (_enumObj)
-	{
-		_enumObj->ReleaseReference();
-		_enumObj = NULL;
-	}
-}
+{}
 
-//***********************************************************
-//
-// NextOne()
-//
-// Enumerates to the next element in the enumerators list. The
-// caller is responsible for properly releasing the returned pointer
-// when it is no longer needed.
-// 
-// Succeeds if all of the following are true:
-// - the ppComponent pointer is valid.
-// - there are Component objects remaining to be returned.
-// 
-// If this method fails nothing is written to *ppComponent.
-// 
-// This method will return the following codes.  If more than one of
-// the listed errors is in effect, it will return the first one
-// encountered in the order given below:
-// 
-// AAFRESULT_SUCCESS
-//   - succeeded.  (This is the only code indicating success.)
-//
-// AAFRESULT_NULL_PARAM
-//   - ppComponent is null.
-//
-// AAFRESULT_NO_MORE_OBJECTS
-//   - no Components remaining to be returned.
-// 
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFComponents::NextOne (ImplAAFComponent** ppComponent)
+    ImplEnumAAFComponents::NextOne (ImplAAFComponent ** ppComponent)
 {
-	aafUInt32			numElem;
-	ImplAAFHeader		*head = NULL;
-	ImplAAFDictionary	*dict = NULL;
+	AAFRESULT	result;
+	aafInt32	cur = _current, siz;
 
-	if(_enumStrongProp != NULL)
+    _pSequence->GetNumCpnts(&siz);
+	if(cur < siz)
 	{
-		size_t	siz;
-		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
+		result = _pSequence->GetNthComponent(cur, ppComponent);
+		_current = ++cur;
 	}
 	else
-		return(AAFRESULT_INCONSISTANCY);
+		result = AAFRESULT_NO_MORE_OBJECTS;
 
-	if(ppComponent == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	if(_current >= numElem)
-		return AAFRESULT_NO_MORE_OBJECTS;
-	XPROTECT()
-	{
-		if(_enumStrongProp != NULL)
-		{
-			_enumStrongProp->getValueAt(*ppComponent, _current);
-			(*ppComponent)->AcquireReference();
-		}
-		else
-			RAISE(AAFRESULT_INCONSISTANCY);
-
-		_current++;
-		if (head) {
-			head->ReleaseReference();
-			head = NULL;
-		}
-		if (dict) {
-			dict->ReleaseReference();
-			dict = NULL;
-		}
-	}
-	XEXCEPT
-	{
-		if(head)
-			head->ReleaseReference();
-		if(dict)
-			dict->ReleaseReference();
-	}
-	XEND;
-
-	return(AAFRESULT_SUCCESS); 
+	return result;
 }
 
-  //***********************************************************
-  //
-  // Next()
-  //
-  // Enumerates the next count elements (AAFComponent pointers) in the
-  // enumerator's list, returning them in the given array along with
-  // the actual number of enumerated elements in pNumFetched. The caller
-  // is responsible for properly releasing the returned pointers.
-  // 
-  // Succeeds if all of the following are true:
-  // - The ppMobs pointer is valid.
-  // - The pNumFetched pointer is valid. If count is 1, pNumFetched can be NULL.
-  // - There are Mob objects remaining to be returned.
-  // 
-  // If this method fails nothing is written to *ppComponents or
-  // pNumFetched.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - either ppCompoents or pNumFetched is null.
-  // 
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFComponents::Next (aafUInt32			count,
-								 ImplAAFComponent**	ppComponents,
-								 aafUInt32*			pFetched)
+    ImplEnumAAFComponents::Next (aafUInt32  /*count*/,
+                           ImplAAFComponent ** /*ppComponents*/,
+                           aafUInt32 *  /*pFetched*/)
 {
-	ImplAAFComponent**	ppDef;
-	aafUInt32			numDefs;
-	HRESULT				hr;
-
-	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
-		return E_INVALIDARG;
-
-	// Point at the first component in the array.
-	ppDef = ppComponents;
-	for (numDefs = 0; numDefs < count; numDefs++)
-	{
-		hr = NextOne(ppDef);
-		if (FAILED(hr))
-			break;
-
-		// Point at the next component in the array.  This
-		// will increment off the end of the array when
-		// numComps == count-1, but the for loop should
-		// prevent access to this location.
-		ppDef++;
-	}
-	
-	if (pFetched)
-		*pFetched = numDefs;
-
-	return hr;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-//***********************************************************
-//
-// Skip()
-//
-// Instructs the enumerator to skip the next count elements in the
-// enumeration so that the next call to Next will not
-// return those elements.
-// 
-// Succeeds if all of the following are true:
-// - count is less than or equal to the number of remaining objects.
-// 
-// This method will return the following codes.  If more than one of
-// the listed errors is in effect, it will return the first one
-// encountered in the order given below:
-//
-// AAFRESULT_SUCCESS
-//   - succeeded.
-//
-// AAFRESULT_NO_MORE_OBJECTS
-//   - count exceeded number of remaining objects.
-// 
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFComponents::Skip (aafUInt32  count)
+    ImplEnumAAFComponents::Skip (aafUInt32  /*count*/)
 {
-	AAFRESULT	hr;
-	aafUInt32	newCurrent;
-	aafUInt32	numElem;
-	if(_enumStrongProp != NULL)
-	{
-		size_t	siz;
-		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
-	}
-	else
-		return(AAFRESULT_INCONSISTANCY);
-
-	newCurrent = _current + count;
-
-	if(newCurrent < numElem)
-	{
-		_current = newCurrent;
-		hr = AAFRESULT_SUCCESS;
-	}
-	else
-	{
-		hr = E_FAIL;
-	}
-
-	return hr;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-//***********************************************************
-//
-// Reset()
-//
-// Instructs the enumerator to position itself at the beginning of the list of elements.
-//
-// There is no guarantee that the same set of elements will be enumerated on 
-// each pass through the list, nor will the elements necessarily be enumerated in 
-// the same order. The exact behavior depends on the collection being enumerated.
-// 
-// AAFRESULT_SUCCESS
-//   - succeeded.  (This is the only code indicating success.)
-//
-// 
+
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFComponents::Reset ()
 {
@@ -260,75 +78,23 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-//***********************************************************
-//
-// Clone()
-//
-// Creates another component enumerator with the same state as the current
-// enumerator to iterate over the same list. This method makes it
-// possible to record a point in the enumeration sequence in order
-// to return to that point at a later time.
-//
-// Note: The caller must release this new enumerator separately from
-// the first enumerator.
-// 
-// Succeeds if all of the following are true:
-// - the ppEnum pointer is valid.
-// 
-// This method will return the following codes.  If more than one of
-// the listed errors is in effect, it will return the first one
-// encountered in the order given below:
-// 
-// AAFRESULT_SUCCESS
-//   - succeeded.  (This is the only code indicating success.)
-//
-// AAFRESULT_NULL_PARAM
-//   - ppEnum is null.
-// 
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFComponents::Clone (ImplEnumAAFComponents ** ppEnum)
+    ImplEnumAAFComponents::Clone (ImplEnumAAFComponents ** /*ppEnum*/)
 {
-	ImplEnumAAFComponents	*result;
-	AAFRESULT				hr;
-
-	result = (ImplEnumAAFComponents *)CreateImpl(CLSID_EnumAAFComponents);
-	if (result == NULL)
-		return E_FAIL;
-
-	if(_enumStrongProp != NULL)
-		hr = result->SetEnumStrongProperty(_enumObj, _enumStrongProp);
-	else
-		return(AAFRESULT_INCONSISTANCY);
-
-	if (SUCCEEDED(hr))
-	{
-		result->_current = _current;
-		*ppEnum = result;
-	}
-	else
-	{
-		result->ReleaseReference();
-		*ppEnum = NULL;
-	}
-	
-	return hr;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFComponents::SetEnumStrongProperty( ImplAAFObject *pObj, ComponentStrongRefArrayProp_t *pProp)
+//Internal
+AAFRESULT
+    ImplEnumAAFComponents::SetEnumSequence(ImplAAFSequence * pSequence)
 {
-	if (_enumObj)
-		_enumObj->ReleaseReference();
-	_enumObj = pObj;
-	if (pObj)
-		pObj->AcquireReference();
-	/**/
-	_enumStrongProp = pProp;				// Don't refcount, same lifetime as the object.
-
+	_pSequence = pSequence;
 	return AAFRESULT_SUCCESS;
 }
 
+extern "C" const aafClassID_t CLSID_EnumAAFComponents;
 
-
+OMDEFINE_STORABLE(ImplEnumAAFComponents, CLSID_EnumAAFComponents);
 
