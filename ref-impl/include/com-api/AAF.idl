@@ -2,7 +2,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAF.idl,v 1.20 2004/10/27 17:09:52 phil_tudor Exp $ $Name:  $")
+cpp_quote("// $Id: AAF.idl,v 1.21 2004/11/02 16:22:59 phil_tudor Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \"License\"); You may not use this file")
@@ -7296,6 +7296,9 @@ interface IAAFFile : IUnknown
   //
   // AAFRESULT_NULL_PARAM
   //   - the revision pointer arg is NULL.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not open.
   // 
   HRESULT GetRevision (
     // Revision of the current file

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.22 2004/10/27 17:07:11 phil_tudor Exp $ $Name:  $
+// $Id: AAF.h,v 1.23 2004/11/02 16:22:59 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -7485,6 +7485,9 @@ DECLARE_INTERFACE_(IAAFFile, IUnknown)
   //
   // AAFRESULT_NULL_PARAM
   //   - the revision pointer arg is NULL.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not open.
   //
   STDMETHOD(GetRevision) (THIS_
     // Revision of the current file

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFFile.h,v 1.4 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFile.h,v 1.5 2004/11/02 16:23:00 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -180,6 +180,9 @@ public:
   //
   // AAFRESULT_NULL_PARAM
   //   - the revision pointer arg is NULL.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not open.
   //
   STDMETHOD (GetRevision) (
     // Revision of the current file 
