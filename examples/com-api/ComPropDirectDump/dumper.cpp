@@ -25,10 +25,21 @@
  *
  ************************************************************************/
 
+#if defined(macintosh)
+  // Make sure we have defined IID_IUnknown and IID_IClassFactory.
+  #include <initguid.h>
+  #include <coguid.h>	
+#endif
+
+
+
 #include "AAF.h"
 #include "AAFResult.h"
+#include "AAFTypeDefUIDs.h"
 #include <assert.h>
 #include <iostream.h>
+#include <fstream.h>
+#include <stdio.h> // for sprintf()
 
 #ifndef __AAFSmartPointer_h__
 #include "AAFSmartPointer.h"
@@ -45,11 +56,13 @@ typedef IAAFSmartPointer<IAAFProperty>             IAAFPropertySP;
 typedef IAAFSmartPointer<IAAFPropertyDef>          IAAFPropertyDefSP;
 typedef IAAFSmartPointer<IAAFTypeDef>              IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFDefObject>            IAAFDefObjectSP;
+typedef IAAFSmartPointer<IAAFDictionary>           IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFTypeDefInt>           IAAFTypeDefIntSP;
 typedef IAAFSmartPointer<IAAFTypeDefObjectRef>     IAAFTypeDefObjectRefSP;
 typedef IAAFSmartPointer<IAAFClassDef>             IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefRename>        IAAFTypeDefRenameSP;
 typedef IAAFSmartPointer<IAAFTypeDefEnum>          IAAFTypeDefEnumSP;
+typedef IAAFSmartPointer<IAAFTypeDefExtEnum>       IAAFTypeDefExtEnumSP;
 typedef IAAFSmartPointer<IAAFTypeDefFixedArray>    IAAFTypeDefFixedArraySP;
 typedef IAAFSmartPointer<IAAFTypeDefVariableArray> IAAFTypeDefVariableArraySP;
 typedef IAAFSmartPointer<IAAFTypeDefString>        IAAFTypeDefStringSP;
@@ -72,13 +85,13 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 
-static void printIndent (int indent)
+static void printIndent (int indent, ostream & os)
 {
-  while (indent--) cout << " ";
+  while (indent--) os << " ";
 }
 
 
-static void convert(wchar_t* wcName, size_t length, const char* name)
+static void convert(aafCharacter* wcName, size_t length, const char* name)
 {
   assert((name && *name));
   assert(wcName != 0);
@@ -109,7 +122,7 @@ static void convert(char* cName, size_t length, const char* name)
   }
 }
 
-static void convert(wchar_t* wName, size_t length, const wchar_t* name)
+static void convert(aafCharacter* wName, size_t length, const aafCharacter* name)
 {
   assert((name && *name));
   assert(wName != 0);
@@ -128,7 +141,7 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
   }
 }
 
-static void convert(char* cName, size_t length, const wchar_t* name)
+static void convert(char* cName, size_t length, const aafCharacter* name)
 {
   assert((name && *name));
   assert(cName != 0);
@@ -141,7 +154,7 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
-static char * make_mbstring(size_t length, const wchar_t* name)
+static char * make_mbstring(size_t length, const aafCharacter* name)
 {
   assert(name);
   assert(length > 0);
@@ -164,17 +177,24 @@ static char * make_mbstring(size_t length, const wchar_t* name)
 static HRESULT dumpObject
 (
  IAAFObjectSP pContainer, // object to be dumped
- int indent
+ IAAFDictionary * pDict,  // dictionary for this file
+ int indent,
+ ostream & os
 );
 
 static HRESULT dumpPropertyValue
 (
  IAAFPropertyValueSP pPVal,
- int indent
+ IAAFDictionary * pDict,  // dictionary for this file
+ int indent,
+ ostream & os
 );
 
 
-HRESULT dumpObject(IAAFObjectSP pContainer, int indent)
+HRESULT dumpObject(IAAFObjectSP pContainer,
+				   IAAFDictionary * pDict,
+				   int indent,
+				   ostream & os)
 {
   HRESULT returnHr = AAFRESULT_SUCCESS;
 
@@ -189,18 +209,18 @@ HRESULT dumpObject(IAAFObjectSP pContainer, int indent)
 	  // Get the contained properties.
 	  checkResult(pContainer->GetProperties (&pPropEnum));
 
-	  cout << endl;
-	  printIndent (indent);
-	  cout << "Object of Class: ";
+	  os << endl;
+	  printIndent (indent, os);
+	  os << "Object of Class: ";
 	  checkResult(pContainer->GetDefinition (&pClassDef));
       aafUInt32 bufClassNameSize;
 		  checkResult(pClassDef->GetNameBufLen (&bufClassNameSize));
-		  wchar_t * classNameBuf = new wchar_t[bufClassNameSize];
+		  aafCharacter * classNameBuf = new aafCharacter[bufClassNameSize];
 		  assert (classNameBuf);
 		  checkResult(pClassDef->GetName(classNameBuf, bufClassNameSize));
 		  char *mbBuf = make_mbstring(bufClassNameSize, classNameBuf); // create an ansi/asci
 		  checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-		  cout << mbBuf << endl;
+		  os << mbBuf << endl;
 		  delete[] mbBuf;
 		  delete[] classNameBuf;
 
@@ -213,13 +233,13 @@ HRESULT dumpObject(IAAFObjectSP pContainer, int indent)
 		  // Here we print out property's name using pPDef->GetName()
 		  aafUInt32 bufSize;
 		  checkResult(pPDef->GetNameBufLen (&bufSize));
-		  wchar_t * nameBuf = new wchar_t[bufSize];
+		  aafCharacter * nameBuf = new aafCharacter[bufSize];
 		  assert (nameBuf);
 		  checkResult(pPDef->GetName(nameBuf, bufSize));
 		  char *mbBuf = make_mbstring(bufSize, nameBuf); // create an ansi/asci
 		  checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-		  printIndent (indent);
-		  cout << "Prop: "<< mbBuf << "; ";
+		  printIndent (indent, os);
+		  os << "Prop: "<< mbBuf << "; ";
 		  delete[] mbBuf;
 		  delete[] nameBuf;
 
@@ -227,13 +247,13 @@ HRESULT dumpObject(IAAFObjectSP pContainer, int indent)
 		  checkResult(pProp->GetValue(&pPVal));
 
 		  // dump property value
-		  dumpPropertyValue (pPVal, indent+1);
+		  dumpPropertyValue (pPVal, pDict, indent+1, os);
 
 		} // while ()...
 	}
   catch (HRESULT &caught)
 	{
-	  cout << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+	  os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
 	  returnHr = caught;
 	}
 
@@ -241,7 +261,10 @@ HRESULT dumpObject(IAAFObjectSP pContainer, int indent)
 }
 
 
-HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
+HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
+						   IAAFDictionary * pDict,
+						   int indent,
+						   ostream & os)
 {
   // get the type of the data value
   IAAFTypeDefSP pTD;
@@ -253,20 +276,21 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 
 	  // Dump "damaged object" message.
 	  // Optionally, dump the property's bits using pPVal->GetBits().
-	  printIndent (indent);
-	  cout << "Unknown type def." << endl;
+	  printIndent (indent, os);
+	  os << "***Unknown type def.***" << endl;
+	  return E_FAIL;
 	}
 
   else
 	{
 	  {
-		wchar_t bigBuf[100];
+		aafCharacter bigBuf[100];
 		char mbBigBuf[100 * 3 /*MB_CUR_MAX */];
 		IAAFDefObjectSP pd;
 		checkResult(pTD->QueryInterface(IID_IAAFDefObject, (void**)&pd));
 		checkResult(pd->GetName (bigBuf, sizeof (bigBuf)));
 		convert(mbBigBuf, sizeof(mbBigBuf), bigBuf);
-		cout << "type: " << mbBigBuf << "; ";
+		os << "type: " << mbBigBuf << "; ";
 	  }
 
 	  // get the type category of the data value
@@ -286,25 +310,25 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 			aafInt64 val;
 			checkResult(pTDI->GetInteger(pPVal, (aafMemPtr_t) &val, sizeof (val)));
 
-			cout << "value: ";
+			os << "value: ";
 			aafInt32 hi = (aafUInt32) ((val & 0xffffffff00000000) >> 32);
 			aafInt32 lo = (aafInt32) val & 0xffffffff;
 			if (hi && ((hi != ~0) || (lo >= 0)))
 			  {
-				int width = cout.width();
-				char fill = cout.fill();
-				cout << hex << "0x";
-				cout.width(8);
-				cout.fill('0');
-				cout << hi << lo;
-				cout.width(width);
-				cout.fill(fill);
+				int width = os.width();
+				char fill = os.fill();
+				os << hex << "0x";
+				os.width(8);
+				os.fill('0');
+				os << hi << lo;
+				os.width(width);
+				os.fill(fill);
 			  }
 			else
 			  {
-				cout << "0x" << hex << lo;
+				os << "0x" << hex << lo;
 			  }
-			cout << "." << endl;
+			os << "." << endl;
 
 			break;
 		  }
@@ -319,8 +343,8 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 
 			IAAFObjectSP pObj;
 			checkResult(pTDO->GetObject(pPVal, &pObj));
-			cout << "Value: an object:" << endl;
-			dumpObject (pObj, indent+1);
+			os << "Value: an object:" << endl;
+			dumpObject (pObj, pDict, indent+1, os);
 
 			break;	
 		  }
@@ -346,7 +370,6 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 		  }
 #endif // 0
 
-#if 0
 		case kAAFTypeCatRename:
 		  {
 			// A renamed type; print this type's name, then dump contents
@@ -357,13 +380,12 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 			// Here print rename's type using pTDR->GetName()
 
 			// Now get base property value and recursively print that
-			IAAFPropertyValueSP pBasePropValue;
+			IAAFPropertyValueSP pBasePropVal;
 			checkResult(pTDR->GetValue (pPVal, &pBasePropVal));
-			dumpPropertyValue (pBasePropVal, indent+1);
+			dumpPropertyValue (pBasePropVal, pDict, indent+1, os);
 
 			break;
 		  }
-#endif // 0
 
 		case kAAFTypeCatEnum:
 		  {
@@ -378,11 +400,11 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 
 			// now, get the text tag for that value.  Start with name
 			// buf len, and allocating a buffer to hold the name
-			wchar_t * nameBuf;
+			aafCharacter * nameBuf;
 			aafUInt32 nameBufLen;
 			checkResult(pTDE->GetNameBufLenFromInteger(enumValue, &nameBufLen));
-			// don't forget NameBufLen is in bytes, not wchar_ts
-			nameBuf = (wchar_t*) new aafUInt8[nameBufLen];
+			// don't forget NameBufLen is in bytes, not aafCharacters
+			nameBuf = (aafCharacter*) new aafUInt8[nameBufLen];
 
 			// and now get the name itself
 			checkResult(pTDE->GetNameFromInteger(enumValue, nameBuf, nameBufLen));
@@ -390,7 +412,41 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 			// Print the contents
 			char *mbBuf = make_mbstring(nameBufLen, nameBuf); // create an ansi/asci
 			checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-			cout << "Value: " << mbBuf << endl;
+			os << "Value: " << mbBuf << endl;
+			delete[] mbBuf;
+			mbBuf = 0;
+			delete[] nameBuf;
+			nameBuf = 0;
+
+			break;
+		  }
+
+		case kAAFTypeCatExtEnum:
+		  {
+			// Print enum element's text tag
+			IAAFTypeDefExtEnumSP pTDE;
+			checkResult(pTD->QueryInterface(IID_IAAFTypeDefExtEnum,
+										   (void**)&pTDE));
+
+			// first, get the AUID value
+			aafUID_t enumValue;
+			checkResult(pTDE->GetAUIDValue(pPVal, &enumValue));
+
+			// now, get the text tag for that value.  Start with name
+			// buf len, and allocating a buffer to hold the name
+			aafCharacter * nameBuf;
+			aafUInt32 nameBufLen;
+			checkResult(pTDE->GetNameBufLenFromAUID(enumValue, &nameBufLen));
+			// don't forget NameBufLen is in bytes, not aafCharacters
+			nameBuf = (aafCharacter*) new aafUInt8[nameBufLen];
+
+			// and now get the name itself
+			checkResult(pTDE->GetNameFromAUID(enumValue, nameBuf, nameBufLen));
+
+			// Print the contents
+			char *mbBuf = make_mbstring(nameBufLen, nameBuf); // create an ansi/asci
+			checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
+			os << "Value: " << mbBuf << endl;
 			delete[] mbBuf;
 			mbBuf = 0;
 			delete[] nameBuf;
@@ -410,16 +466,16 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 			aafUInt32 numElems = 0;
 			checkResult(pTDFA->GetCount(&numElems));
 
-			cout << "Value: fixed-sized array[" << numElems << "]:" << endl;
+			os << "Value: fixed-sized array[" << numElems << "]:" << endl;
 
 			aafUInt32 i;
 			for (i = 0; i < numElems; i++)
 			  {
-				printIndent (indent);
-				cout << "  [" << i << "]: ";
+				printIndent (indent, os);
+				os << "  [" << i << "]: ";
 				IAAFPropertyValueSP pElemPropVal;
 				checkResult(pTDFA->GetElementValue(pPVal, i, &pElemPropVal));
-				dumpPropertyValue (pElemPropVal, indent+1);
+				dumpPropertyValue (pElemPropVal, pDict, indent+1, os);
 			  }
 
 			break;
@@ -436,16 +492,16 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 			aafUInt32 numElems;
 			checkResult(pTDVA->GetCount(pPVal, &numElems));
 
-			cout << "Value: variably-sized array[" << numElems << "]:" << endl;
+			os << "Value: variably-sized array[" << numElems << "]:" << endl;
 
 			aafUInt32 i;
 			for (i = 0; i < numElems; i++)
 			  {
-				printIndent (indent);
-				cout << "[" << i << "]: ";
+				printIndent (indent, os);
+				os << "[" << i << "]: ";
 				IAAFPropertyValueSP pElemPropVal;
 				checkResult(pTDVA->GetElementValue(pPVal, i, &pElemPropVal));
-				dumpPropertyValue (pElemPropVal, indent+1);
+				dumpPropertyValue (pElemPropVal, pDict, indent+1, os);
 			  }
 
 			break;
@@ -477,6 +533,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 			aafUInt32 count = 0;
 			aafUInt32 elemSize = 0;
 			checkResult(pTDS->GetCount(pPVal, &count));
+			count ++; // make room for terminator
 			checkResult(pETDInt->GetSize (&elemSize));
 			bufSize = count * elemSize;
 
@@ -486,6 +543,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 
 			// get bits
 			aafUInt8 * buf = new aafUInt8[bufSize];
+			memset (buf, 0, bufSize);  // zero all, including terminator
 			checkResult(pTDS->GetElements(pPVal, buf, bufSize));
 
 			// Now determine size of integral elements
@@ -493,17 +551,17 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 			  {
 				// 1-byte integer characters; interpret as a
 				// NULL-terminated C string.
-				printIndent (indent);
-				cout << " value: \"" << buf << "\"" << endl;
+				printIndent (indent, os);
+				os << " value: \"" << buf << "\"" << endl;
 			  }
 			else if (2 == elemSize)
 			  {
 				// 2-byte integral characters; interpret as a
 				// NULL-terminated wide character string.
 				// create an ansi/asci
-				char *mbBuf = make_mbstring(bufSize, (wchar_t*) buf);
+				char *mbBuf = make_mbstring(bufSize, (aafCharacter*) buf);
 				checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-				cout << " value: \"" << mbBuf << "\"" << endl;
+				os << " value: \"" << mbBuf << "\"" << endl;
 				delete [] mbBuf;
 				mbBuf = 0;
 			  }
@@ -523,70 +581,132 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal, int indent)
 
 		case kAAFTypeCatRecord:
 		  {
+			aafUInt32 i;
 			IAAFTypeDefRecordSP pTDR;
 			checkResult(pTD->QueryInterface(IID_IAAFTypeDefRecord,
 										   (void**)&pTDR));
 
-			// get the number of members in this record
-			aafUInt32 numMembers = 0;
-			checkResult(pTDR->GetCount(&numMembers));
+			// Special case!  See if this is an AUID
+			IAAFTypeDefSP ptd;
+			IUnknown * pUnkTest;
+			checkResult(pTDR->QueryInterface(IID_IUnknown,
+											 (void**)&pUnkTest));
 
-			cout << "Value: record of " << numMembers << " members:" << endl;
-
-			// recursively dump each struct field
-			aafUInt32 i;
-			for (i = 0; i < numMembers; i++)
+			assert (pDict);
+			checkResult (pDict->LookupType (kAAFTypeID_AUID, &ptd));
+			IUnknown * pUnkAUID;
+			checkResult(ptd->QueryInterface(IID_IUnknown,
+											(void**)&pUnkAUID));
+			if (pUnkTest == pUnkAUID)
 			  {
-				aafUInt32 nameBufLen;
-				checkResult(pTDR->GetMemberNameBufLen(i, &nameBufLen));
-				wchar_t * nameBuf = (wchar_t*) new wchar_t[nameBufLen];
-				assert (nameBuf);
-				checkResult(pTDR->GetMemberName(i, nameBuf, nameBufLen));
-				char *mbBuf = make_mbstring(nameBufLen, nameBuf); // create an ansi/asci
-				checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-				printIndent (indent);
-				cout << "  [" << mbBuf << "]: ";
-				delete[] nameBuf;
-				delete[] mbBuf;
+				// dump it as an auid
+				aafUID_t auidVal;
+				checkResult (pTDR->GetStruct (pPVal,
+											  (aafMemPtr_t) &auidVal,
+											  sizeof (auidVal)));
+				char buf[100];
+				sprintf (buf, "{ 0x%08x, 0x%04x, 0x%04x, ",
+						 auidVal.Data1, auidVal.Data2, auidVal.Data3);
 
-				IAAFPropertyValueSP pMemberPropVal;
-				checkResult(pTDR->GetValue(pPVal, i, &pMemberPropVal));
-				// recursively dump prop value
-				dumpPropertyValue (pMemberPropVal, indent+1);
+				os << "Value: " << buf << "{ ";
+				for (i = 0; i < 8; i++)
+				  {
+					sprintf (buf, "0x%x", auidVal.Data4[i]);
+					os << buf;
+					if (i != 7)
+					  os << ", ";
+				  }
+				os << " } }" << endl;
 			  }
 
+			else
+			  {
+				// dump it as a plain record
+				// get the number of members in this record
+				aafUInt32 numMembers = 0;
+				checkResult(pTDR->GetCount(&numMembers));
+
+				os << "Value: record of " << numMembers << " members:" << endl;
+
+				// recursively dump each struct field
+				for (i = 0; i < numMembers; i++)
+				  {
+					aafUInt32 nameBufLen;
+					checkResult(pTDR->GetMemberNameBufLen(i, &nameBufLen));
+					// nameBufLen is in bytes, not aafCharacters
+					aafCharacter * nameBuf = (aafCharacter*) new aafUInt8 [nameBufLen];
+					assert (nameBuf);
+					checkResult(pTDR->GetMemberName(i, nameBuf, nameBufLen));
+					// create an ansi/asci
+					char *mbBuf = make_mbstring(nameBufLen, nameBuf);
+					checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
+					printIndent (indent, os);
+					os << "  [" << mbBuf << "]: ";
+					delete[] nameBuf;
+					delete[] mbBuf;
+
+					IAAFPropertyValueSP pMemberPropVal;
+					checkResult(pTDR->GetValue(pPVal, i, &pMemberPropVal));
+					// recursively dump prop value
+					dumpPropertyValue (pMemberPropVal, pDict, indent+1, os);
+				  }
+			  }
+			assert (pUnkTest);
+			pUnkTest->Release ();
+			pUnkTest = 0;
+			assert (pUnkAUID);
+			pUnkAUID->Release ();
+			pUnkAUID = 0;
 			break;
 		  }
 
 		default:
-		  cout << "Unknown type category." << endl;
+		  os << "***Unknown type category " << dec << (int) tid
+			 << ".***" << endl;
+		  return E_FAIL;
 		  break;
 		}
+	  return AAFRESULT_SUCCESS;
 	} // !pTD
-
-  return AAFRESULT_SUCCESS;
 }
 
 
 
-static void dumpFile (wchar_t * pwFileName)
+//
+// Dumps the given file.  Returns true if successful; returns false if
+// an error was encountered.
+//
+static bool dumpFile (aafCharacter * pwFileName,
+					  const char * name,
+					  ostream & os)
 {
   assert (pwFileName);
 
-  IAAFFileSP   pFile;
-  IAAFHeaderSP pHeader;
-  IAAFObjectSP pHdrObj;
+  IAAFFileSP       pFile;
+  IAAFHeaderSP     pHeader;
+  IAAFObjectSP     pHdrObj;
+  IAAFDictionarySP pDict;
+  HRESULT          hr;
 
-  checkResult(AAFFileOpenExistingRead(pwFileName, 0, &pFile));
-  checkResult(pFile->GetHeader(&pHeader));
-  checkResult(pHeader->QueryInterface(IID_IAAFObject,
-									  (void**)&pHdrObj));
+  hr = AAFFileOpenExistingRead (pwFileName, 0, &pFile);
+  if (! SUCCEEDED (hr))
+	{
+	  cerr << "File " << name
+		   << " is either missing or is an illegal AAF file."
+		   << endl;
+	  return false;
+	}
+  checkResult (pFile->GetHeader (&pHeader));
+  checkResult (pHeader->GetDictionary (&pDict));
+  checkResult (pHeader->QueryInterface (IID_IAAFObject,
+										(void**)&pHdrObj));
 
-  dumpObject (pHdrObj, 0);
+  hr = dumpObject (pHdrObj, pDict, 0, os);
   if (pFile)
 	{
 	  pFile->Close ();
 	}
+  return SUCCEEDED (hr) ? true : false;
 }
 
 
@@ -608,9 +728,9 @@ struct CAAFInitialize
 {
   CAAFInitialize(const char *dllname = NULL)
   {
-  	cout << "Attempting to load the AAF dll..." << endl;
+  	clog << "Attempting to load the AAF dll..." << endl;
     HRESULT hr = AAFLoad(dllname);
-    cout << ((SUCCEEDED(hr)) ? "DONE" : "FAILED") << endl;
+    clog << ((SUCCEEDED(hr)) ? "DONE" : "FAILED") << endl;
   }
 
   ~CAAFInitialize()
@@ -620,8 +740,25 @@ struct CAAFInitialize
 };
 
 
+static void usage (const char * progname)
+{
+  assert (progname);
+
+  cerr << "Usage: " << progname << " <aaf-file-to-dump>" << endl;
+  cerr << "       " << progname << " -o <output-text-file>"
+	   << " <aaf-file-to-dump>" << endl;
+}
+
+
 int main(int argc, char* argv[])
 {
+  bool succeeded;
+  ostream * os = 0;
+  char * infilename = 0;
+
+  ofstream filestream;
+  bool file_opened = false;
+
 	/* console window for mac */
 
 	#if defined(macintosh) || defined(_MAC)
@@ -631,21 +768,74 @@ int main(int argc, char* argv[])
   CComInitialize comInit;
   CAAFInitialize aafInit;
 
-  if (argc != 2) {
-    cerr << "Error : wrong number of arguments" << endl;
-    return(1);
-  }
+  // If only two args are (correctly) given:
+  // argv[0] is this program's name
+  // argv[1] is the name of the AAF file to dump
+  if (argc == 2)
+	{
+	  os = &cout;
+	  infilename = argv[1];
+	}
+
+  // If four args are (correctly) given:
+  // argv[0] is this program's name
+  // argv[1] is the string "-o"
+  // argv[2] is the desired name of the output text file
+  // argv[3] is the name of the AAF file to dump
+  else if (argc == 4)
+	{
+	  infilename = argv[3];
+	  if ( strcmp ("-o", argv[1]))
+		{
+		  // If more than 2 args given, first must be "-o" flag
+		  usage (argv[0]);
+		  exit (1);
+		}
+	  char * outfilename = argv[2];
+	  filestream.open (outfilename, ios::out);
+	  if (filestream.rdstate() && ios::failbit)
+		{
+		  cerr << "Output file " << outfilename << " could not be"
+			   << " opened for write." << endl;
+		  usage (argv[0]);
+		  exit (1);
+		}
+	  os = &filestream;
+	  file_opened = true;
+	}
+
+  else
+	{
+	  usage (argv[0]);
+	  exit (1);
+	}
 
   // The first argument should be an AAF file name.
-  wchar_t pwFileName[260];
-  convert(pwFileName, 260, argv[1]);
+  aafCharacter pwFileName[260];
+  assert (infilename);
+  assert (os);
+  convert(pwFileName, 260, infilename);
   
-  cout << "***Dumping file "
-	   << argv[1]
+  clog << "***Dumping file "
+	   << infilename
 	   << " using direct prop access***)" << endl;
-  dumpFile (pwFileName);
+  succeeded = dumpFile (pwFileName, infilename, *os);
 
-  cout << "Done" << endl;
-
-  return(0);
+  if (succeeded)
+	{
+	  clog << endl << "Done." << endl;
+	  if (file_opened)
+		filestream.close ();
+	  exit (0);
+	}
+  else
+	{
+	  clog << endl << "Errors were encountered." << endl;
+	  if (file_opened)
+		filestream.close ();
+	  exit (1);
+	}
+  // Should have exited before now...
+  assert (0); // not reached
+  return 1;   // to keep compiler happy
 }
