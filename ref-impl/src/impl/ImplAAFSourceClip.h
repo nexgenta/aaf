@@ -12,7 +12,6 @@
 *                                          *
 \******************************************/
 
-#include "OMStorable.h"
 
 class ImplAAFDataDef;
 
@@ -22,19 +21,8 @@ class ImplAAFMob;
 #include "ImplAAFSourceReference.h"
 #endif
 
-#include "ImplAAFObject.h"
-#include "OMProperty.h"
 
 
-// Persistent Property IDs
-
-const int PID_SOURCECLIP_FADEINLEN	= 4;
-const int PID_SOURCECLIP_FADEINTYPE	= 5;
-const int PID_SOURCECLIP_FADEINPRESENT	= 6;
-const int PID_SOURCECLIP_FADEOUTLEN	= 7;
-const int PID_SOURCECLIP_FADEOUTTYPE	= 8;
-const int PID_SOURCECLIP_FADEOUTPRESENT	= 9;
-const int PID_SOURCECLIP_STARTTIME		= 10;
 
 
 class ImplAAFSourceClip : public ImplAAFSourceReference
@@ -144,15 +132,11 @@ public:
 					 aafLength_t *sclpLen,
 					 aafBool *isMask);
 
-	// Return this objects stored object class.
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
-
 private:
-	OMFixedSizeProperty<aafInt32>		_fadeInLen;
+	OMFixedSizeProperty<aafLength_t>	_fadeInLength;
 	OMFixedSizeProperty<aafFadeType_t>	_fadeInType;
 	OMFixedSizeProperty<aafBool>		_fadeInPresent;
-	OMFixedSizeProperty<aafInt32> 		_fadeOutLen;
+	OMFixedSizeProperty<aafLength_t> 	_fadeOutLength;
 	OMFixedSizeProperty<aafFadeType_t>	_fadeOutType;
 	OMFixedSizeProperty<aafBool>		_fadeOutPresent;
 	OMFixedSizeProperty<aafPosition_t>	_startTime;
