@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxIterator.cpp,v 1.13 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxIterator.cpp,v 1.13.2.1 2004/07/14 14:41:49 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -17,6 +17,13 @@
 // AAF Association.
 //
 //=---------------------------------------------------------------------=
+
+#if WIN32
+// Disable VC6 
+// warning C4660: template-class specialization 'AxArrayIterator<struct IAAFTypeDefFixedArray>' is already instantiated
+// etc
+#pragma warning( disable:4660 )
+#endif
 
 #include "AxIterator.h"
 
