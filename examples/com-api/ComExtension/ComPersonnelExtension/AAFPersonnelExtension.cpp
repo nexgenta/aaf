@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 ////////////////////////////////////////////////////////////////////////////////
 // @doc
@@ -35,6 +30,10 @@
 // @end
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
+#endif
 
 #ifndef __CAAFServer_h__
 #include "CAAFServer.h"
@@ -51,6 +50,7 @@
 #include "CAAFAdminMob.h"
 #endif
 
+#include <string.h>
 
 // Structure to define 
 typedef struct tagAAFPluginObjectInfo_t
@@ -64,7 +64,7 @@ typedef struct tagAAFPluginObjectInfo_t
 #define AAF_BEGIN_PLUGIN_MAP(x) static AAFPluginObjectInfo_t x[] = {
 #define AAF_LAST_ENTRY() { NULL, NULL, NULL }
 #define AAF_END_PLUGIN_MAP()  AAF_LAST_ENTRY() };
-#define AAF_PLUGIN_ENTRY(class) { &CLSID_##class, #class, &C##class##::COMCreate },
+#define AAF_PLUGIN_ENTRY(class) { &CLSID_##class, #class, &C##class::COMCreate },
 
 
 class CAAFPluginServer : 
@@ -132,7 +132,7 @@ CAAFServer* g_pAAFServer = &g_AAFPluginServer;
 #include "AAFPersonnelExtension_i.c"
 
 
-#if defined(_MAC)
+#if defined( OS_MACOS )
 
 // Make sure we have defined IID_IUnknown and IID_IClassFactory.
 #include <initguid.h>
@@ -176,11 +176,11 @@ void pascal DllTerminationRoutine();
 
 
 #pragma export on
-#endif // #if defined(_MAC)
+#endif // #if defined( OS_MACOS )
 
 
 
-#if defined(WIN32) || defined(_WIN32)
+#if defined( OS_WINDOWS )
 // Include the entry point for the windows dll.
 /////////////////////////////////////////////////////////////////////////////
 // DLL Entry Point
@@ -202,7 +202,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 	return TRUE;    // ok
 }
 
-#endif
+#endif  // OS_WINDOWS
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ STDAPI AAFGetClassObjectID(ULONG index, CLSID *pClassID)
 
 
 
-#if defined(_MAC)
+#if defined( OS_MACOS )
 //
 //  DllGetVersion
 //
@@ -393,7 +393,7 @@ DllTerminationRoutine()
 
 
 #pragma export off
-#endif // #if defined(_MAC)
+#endif // #if defined(OS_MACOS)
 
 
 
@@ -441,7 +441,7 @@ HRESULT CAAFPluginServer::GetClassObject
   AAFPluginObjectInfo_t *pResult = NULL;
   for (aafUInt32 i = 0; i < GetClassCount(); ++i)
   {
-    if (rclsid == *AAFPluginObjectMap[i].pCLSID)
+    if (!memcmp(&rclsid,AAFPluginObjectMap[i].pCLSID,sizeof(rclsid)))
     {
       pResult = &AAFPluginObjectMap[i];
       break;
