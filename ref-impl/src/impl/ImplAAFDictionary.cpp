@@ -115,6 +115,7 @@
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFBuiltinDefs.h"
+#include "AAFContainerDefs.h"
 #include "AAFClassDefUIDs.h"
 
 
@@ -546,6 +547,53 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+
+//Creates a single uninitialized AAF meta definition associated 
+  // with a specified stored object id.
+AAFRESULT STDMETHODCALLTYPE 
+  ImplAAFDictionary::CreateMetaInstance (
+    // Stored Object ID of the meta object to be created.
+    aafUID_constref classId,
+
+    // Address of output variable that receives the 
+    // object pointer requested in auid
+    ImplAAFMetaDefinition ** ppMetaObject)
+{
+  if (!ppMetaObject)
+    return AAFRESULT_NULL_PARAM;
+
+  *ppMetaObject = NULL;
+
+  // Temporary: The first version just calls the old CreateInstance method.
+  // This will be replaced when the "two-roots", data and meta-data, are 
+  // implemented. transdel:2000-APR-21.
+  ImplAAFObject * pObject = NULL;
+  AAFRESULT result = CreateInstance(classId, &pObject);
+  if (AAFRESULT_SUCCEEDED(result))
+  {
+    // Make sure that this object is in fact a meta definition.
+    *ppMetaObject = dynamic_cast<ImplAAFMetaDefinition*>(pObject);
+    if (NULL == *ppMetaObject)
+    {
+      // Cleanup on failure.
+      pObject->ReleaseReference();
+      pObject = NULL;
+      result = AAFRESULT_INVALID_PARAM;
+    }
+  }
+
+  return (result);
+
+#if 0  
+  // Ask the meta dictionary to create the meta definition
+  return (metaDictionary()->CreateMetaInstance(classId, ppMetaObject));
+#endif
+}
+
+
+
+
+
 AAFRESULT ImplAAFDictionary::dictLookupClassDef (
       const aafUID_t & classID,
       ImplAAFClassDef ** ppClassDef)
@@ -672,7 +720,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED (status))
 	{
 	  // no recognized class guid
-	  return AAFRESULT_NO_MORE_OBJECTS;
+	  return status;
 	}
 
   // Yup, found it in builtins.  Register it.
@@ -685,67 +733,6 @@ AAFRESULT STDMETHODCALLTYPE
 	
   return(AAFRESULT_SUCCESS);
 }
-
-#if USE_NEW_OBJECT_CREATION
-
-
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDictionary::CreateImplClassDef (
-      aafUID_constref classID,
-      ImplAAFClassDef * pParentClass,
-      aafCharacter_constptr pClassName,
-      ImplAAFClassDef ** ppClassDef)
-{
-  assert(pClassName && ppClassDef);
-  AAFRESULT result = AAFRESULT_SUCCESS;
-  *ppClassDef = NULL;
-
-  // Lookup the class definitions class definition! This had
-  // better not be recursive!
-  ImplAAFClassDef *pClassDefsClassDef = GetBuiltinDefs()->cdClassDef();
-  ImplAAFClassDef *pClassDef = NULL;
-
-  // Create an instance of a class definition and initialize it.
-  pClassDef = (ImplAAFClassDef *)pvtInstantiate(AUID_AAFClassDef);
-  if (NULL == pClassDef)
-    return AAFRESULT_NOMEMORY;
-
-  result = pClassDef->pvtInitialize(classID, pParentClass, pClassName);
-  if (AAFRESULT_FAILED(result))
-  {
-    // Delete the new object.
-    pClassDef->ReleaseReference();
-    pClassDef = NULL;
-  }
-  else
-  {
-    // Make sure properties are initialized (???)
-    pClassDefsClassDef->InitOMProperties (pClassDef);
-
-    // The class definition could be successfully initialized. NOTE: This
-    // object has already been reference counted.
-    *ppClassDef = pClassDef;
-  }
-
-  return result;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDictionary::CreateClassDef (
-      aafUID_constref classID,
-      ImplAAFClassDef *pParentClass,
-      aafCharacter_constptr pClassName,
-      ImplAAFClassDef ** ppClassDef)
-{
-
- return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-#endif // #if USE_NEW_OBJECT_CREATION
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -1086,7 +1073,6 @@ AAFRESULT STDMETHODCALLTYPE
       aafUID_t keyUID, 
 	  ImplAAFTypeDef *underlyingType)
 {
-	ImplAAFTypeDef			*pDef = NULL;
 	ImplAAFTypeDefRename	*pRenameDef = NULL;
 	
 	XPROTECT()
@@ -1095,12 +1081,20 @@ AAFRESULT STDMETHODCALLTYPE
 				CreateInstance((ImplAAFObject**)&pRenameDef));
 		CHECK(pRenameDef->Initialize (keyUID, underlyingType, L"KLV Data"));
 		CHECK(RegisterOpaqueTypeDef(pRenameDef));
+		pRenameDef->ReleaseReference();
+		pRenameDef = NULL;
 	}
 	XEXCEPT
+	{
+		if (pRenameDef)
+			pRenameDef->ReleaseReference();
+	}
 	XEND
 		
 	return AAFRESULT_SUCCESS;
 }
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterDataDef (
       ImplAAFDataDef *pDataDef)
@@ -1611,7 +1605,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 void ImplAAFDictionary::InitBuiltins()
 {
-  ImplAAFDataDef	*dataDef = NULL;
+  ImplAAFDataDef		*dataDef = NULL;
+  ImplAAFContainerDef	*containerDef = NULL;
   AAFRESULT		hr;
 
   hr = LookupDataDef (DDEF_Picture, &dataDef);
@@ -1685,6 +1680,45 @@ void ImplAAFDictionary::InitBuiltins()
 	}
   dataDef->ReleaseReference();
   dataDef = NULL;
+
+  //**********************
+  hr = LookupContainerDef (ContainerAAF, &containerDef);
+  if (AAFRESULT_FAILED (hr))
+	{
+	  // not already in dictionary
+	  hr = GetBuiltinDefs()->cdContainerDef()->
+		CreateInstance ((ImplAAFObject **)&containerDef);
+	  hr = containerDef->Initialize (ContainerAAF, L"AAF", L"AAF Container");
+	  hr = RegisterContainerDef (containerDef);
+	}
+  containerDef->ReleaseReference();
+  containerDef = NULL;
+
+  hr = LookupContainerDef (ContainerFile, &containerDef);
+  if (AAFRESULT_FAILED (hr))
+	{
+	  // not already in dictionary
+	  hr = GetBuiltinDefs()->cdContainerDef()->
+		CreateInstance ((ImplAAFObject **)&containerDef);
+	  hr = containerDef->Initialize (ContainerFile, L"External", L"External Container");
+	  hr = RegisterContainerDef (containerDef);
+	}
+  containerDef->ReleaseReference();
+  containerDef = NULL;
+
+  hr = LookupContainerDef (ContainerOMF, &containerDef);
+  if (AAFRESULT_FAILED (hr))
+	{
+	  // not already in dictionary
+
+	  hr = GetBuiltinDefs()->cdContainerDef()->
+		CreateInstance ((ImplAAFObject **)&containerDef);
+	  hr = containerDef->Initialize (ContainerOMF, L"OMF", L"OMF Container");
+	  hr = RegisterContainerDef (containerDef);
+	}
+  containerDef->ReleaseReference();
+  containerDef = NULL;
+
 
   _pBuiltinClasses;
 
@@ -1895,6 +1929,51 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT ImplAAFDictionary::PvtIsPropertyDefDuplicate(
+							aafUID_t propertyDefID,
+							ImplAAFClassDef *correctClass,
+							bool	*isDuplicate)
+{
+	ImplEnumAAFClassDefs	*classEnum = NULL;
+	ImplAAFClassDef			*pClassDef = NULL;
+	aafUID_t				testClassID, correctClassID;
+	bool					foundDup = false;
+
+	if (NULL == correctClass)
+		return AAFRESULT_NULL_PARAM;
+	if (NULL == isDuplicate)
+		return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		CHECK(correctClass->GetAUID(&correctClassID));
+		CHECK(GetClassDefs(&classEnum));
+		while((foundDup == false) && classEnum->NextOne(&pClassDef) == AAFRESULT_SUCCESS)
+		{
+			CHECK(pClassDef->GetAUID(&correctClassID));
+			if(memcmp(&testClassID, &correctClassID, sizeof(aafUID_t)) != 0)
+			{
+				foundDup = pClassDef->PvtIsPropertyDefRegistered(propertyDefID);
+			}
+			pClassDef->ReleaseReference();
+			pClassDef = NULL;
+		}
+	}
+	XEXCEPT
+	{
+		if (classEnum)
+		  {
+			classEnum->ReleaseReference();
+			classEnum = 0;
+		  }
+		return(XCODE());
+	}
+	XEND;
+
+	*isDuplicate = foundDup;
+	
+	return(AAFRESULT_SUCCESS);
+}
 
 AAFRESULT ImplAAFDictionary::GenerateOmPid
 (
@@ -1944,9 +2023,9 @@ AAFRESULT ImplAAFDictionary::GenerateOmPid
 		  assert (! _lastGeneratedPid);
 
 		  // must be signed!
-		  aafInt32 tmpUserPid = 0;
+		  aafInt16 tmpUserPid = 0;
 		  // Make sure we aren't cheating ourselves
-		  assert (sizeof (OMPropertyId) == sizeof (aafInt32));
+		  assert (sizeof (OMPropertyId) == sizeof (aafInt16));
 
 		  // Need to determine which user PIDs have already been used.
 		  ImplEnumAAFClassDefsSP enumClassDefs;
@@ -1967,7 +2046,7 @@ AAFRESULT ImplAAFDictionary::GenerateOmPid
 					 (enumPropDefs->NextOne (&propDef)))
 				{
 				  // must be signed!
-				  aafInt32 tmpPid = (aafInt32) propDef->OmPid ();
+				  aafInt16 tmpPid = (aafInt16) propDef->OmPid ();
 				  if (tmpPid < tmpUserPid)
 					tmpUserPid = tmpPid;
 				}
@@ -1977,7 +2056,7 @@ AAFRESULT ImplAAFDictionary::GenerateOmPid
 		}
 
 	  result = (OMPropertyId) --_lastGeneratedPid;
-	  assert (((aafInt32) result) < 0);
+	  assert (((aafInt16) result) < 0);
 	  rOutPid = result;
 	}
   return AAFRESULT_SUCCESS;
