@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,8 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. |
-//         OMWeakReferenceSetIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMWeakReferenceSetIterator> over the given
@@ -66,7 +64,7 @@ OMWeakReferenceSetIterator<ReferencedObject>::~OMWeakReferenceSetIterator(void)
   //   @rdesc The new <c OMWeakReferenceSetIterator>.
   //   @this const
 template <typename ReferencedObject>
-OMReferenceContainerIterator*
+OMReferenceContainerIterator<ReferencedObject>*
                  OMWeakReferenceSetIterator<ReferencedObject>::copy(void) const
 {
   TRACE("OMWeakReferenceSetIterator<ReferencedObject>::copy");
@@ -242,25 +240,6 @@ OMWeakReferenceSetIterator<ReferencedObject>::setValue(
   return result;
 }
 
-  // @mfunc Set the <p ReferencedObject> in the associated
-  //        <c OMWeakReferenceSetProperty> at the position currently
-  //        designated by this <c OMWeakReferenceSetIterator> to 0.
-  //        The previous <p ReferencedObject>, if any, is returned.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The previous <p ReferencedObject> if any, otherwise 0.
-template <typename ReferencedObject>
-ReferencedObject*
-OMWeakReferenceSetIterator<ReferencedObject>::clearValue(void)
-{
-  TRACE("OMWeakReferenceSetIterator<ReferencedObject>::clearValue");
-
-  SetElement& element = _iterator.value();
-
-  ReferencedObject* result = element.setValue(0);
-
-  return result;
-}
-
   // @mfunc Return the <p Key> of the <p ReferencedObject> in the
   //        associated <c OMWeakReferenceSetProperty> at the position
   //        currently designated by this <c OMWeakReferenceSetIterator>.
@@ -274,23 +253,6 @@ OMWeakReferenceSetIterator<ReferencedObject>::identification(void) const
   TRACE("OMWeakReferenceSetIterator<ReferencedObject>::identification");
 
   return _iterator.key();
-}
-
-  // @mfunc Return the <c OMObject> in the associated
-  //        <c OMWeakReferenceSetProperty> at the position currently
-  //        designated by this <c OMWeakReferenceSetIterator>.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The <c OMObject> at the current position.
-  //   @this const
-template <typename ReferencedObject>
-OMObject*
-OMWeakReferenceSetIterator<ReferencedObject>::currentObject(void) const
-{
-  TRACE("OMWeakReferenceSetIterator<ReferencedObject>::currentObject");
-
-  OMObject* result = value();
-
-  return result;
 }
 
   // @mfunc Create an <c OMWeakReferenceSetIterator> given
