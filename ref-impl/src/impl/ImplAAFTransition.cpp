@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -24,8 +24,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
-
 
 #ifndef __ImplAAFOperationGroup_h__
 #include "ImplAAFOperationGroup.h"
@@ -42,8 +40,6 @@
 #ifndef __ImplAAFSourceReference_h__
 #include "ImplAAFSourceReference.h"
 #endif
-
-#include "ImplAAFDictionary.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -68,8 +64,8 @@
 
 
 ImplAAFTransition::ImplAAFTransition ():
-_operationGroup( PID_Transition_OperationGroup, L"OperationGroup"),
-_cutPoint( PID_Transition_CutPoint, L"CutPoint")
+_operationGroup( PID_Transition_OperationGroup, "OperationGroup"),
+_cutPoint( PID_Transition_CutPoint, "CutPoint")
 {
 	_persistentProperties.put(_operationGroup.address());
 	_persistentProperties.put(_cutPoint.address());
@@ -78,7 +74,7 @@ _cutPoint( PID_Transition_CutPoint, L"CutPoint")
 
 ImplAAFTransition::~ImplAAFTransition ()
 {
-	ImplAAFOperationGroup *group = _operationGroup.clearValue();
+	ImplAAFOperationGroup *group = _operationGroup.setValue(0);
 	if (group)
 	{
 	  group->ReleaseReference();
@@ -88,35 +84,23 @@ ImplAAFTransition::~ImplAAFTransition ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-	ImplAAFTransition::Initialize (ImplAAFDataDef * pDataDef,
+	ImplAAFTransition::Create (aafUID_t*				pDatadef,
 							   aafLength_t				length,
 							   aafPosition_t			cutPoint,
 							   ImplAAFOperationGroup*	pOperationGroup)
 {
 	HRESULT		rc = AAFRESULT_SUCCESS;
 
-	if (pOperationGroup == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if (pDataDef == NULL)
+	if (pDatadef == NULL || pOperationGroup == NULL)
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
-		CHECK(SetNewProps(length, pDataDef));
+		CHECK(SetNewProps(length, pDatadef));
 		_cutPoint = cutPoint;
 		if (_operationGroup)
-		{
-		  if( pOperationGroup == _operationGroup )
-			RAISE( AAFRESULT_SUCCESS );
-
 		  _operationGroup->ReleaseReference();
-		  _operationGroup = 0;
-		}
-
-		if (pOperationGroup->attached())
-			RAISE(  AAFRESULT_OBJECT_ALREADY_ATTACHED );
-
+		_operationGroup = 0;
 		_operationGroup = pOperationGroup;
 		if (pOperationGroup)
 			pOperationGroup->AcquireReference();
@@ -175,16 +159,8 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	
 	if (_operationGroup)
-	{
-	  if( pEffObj == _operationGroup )
-		return AAFRESULT_SUCCESS;
-
 	  _operationGroup->ReleaseReference();
-	  _operationGroup = 0;
-	}
-
-	if( pEffObj->attached() )
-		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+	_operationGroup = 0;
 
 	_operationGroup = pEffObj;
 	_operationGroup->AcquireReference();
@@ -193,18 +169,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFTransition, AUID_AAFTransition);
 
-
-AAFRESULT ImplAAFTransition::ChangeContainedReferences(aafMobID_constref from,
-													aafMobID_constref to)
-{
-	ImplAAFSegment	*seg;
-	
-	seg = _operationGroup;
-
-	if(seg != NULL)
-		seg->ChangeContainedReferences(from, to);
-
-	return AAFRESULT_SUCCESS;
-}
 
