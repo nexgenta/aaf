@@ -34,6 +34,25 @@ AD_CLASS_UUID(AD1BB855, DBB2, 11d2, 80, 9C, 00, 60, 08, 14, 3E, 6F)
 
 AD_DEFAULT_UUID(AD1BB856, DBB2, 11d2, 80, 9C, 00, 60, 08, 14, 3E, 6F)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_XMETHOD3(Initialize,
+		   [in\, ref],
+		   objPass,
+		   aafUID_constref,
+		   id,
+		   AUID for new DeObject,
+		   [in\, string],
+		   objPass,
+		   aafCharacter_constptr,
+		   pName,
+		   Name for new DefObject,
+		   [in\, string],
+		   objPass,
+		   aafCharacter_constptr,
+		   pDescription,
+		   Description for new DefObject,
+		   Init all fields of a definition object.)
+
+
 AD_XMETHOD2(IsEssenceKindSupported,
 			[in],
 			  objIn,
@@ -42,7 +61,7 @@ AD_XMETHOD2(IsEssenceKindSupported,
 			  The essence kind,
 			[out\,retval],
 			  objPass,
-			  aafBool*,
+			  aafBoolean_t*,
 			  pIsSupported,
 			  Is this type supported,
 			Returns AAFTrue if the given codec support transfers to essence
@@ -173,7 +192,7 @@ AD_XMETHOD1(GetEssenceKinds,
 AD_XMETHOD1(AreThereFlavours,
 			[out\,retval],
 			  objPass,
-			  aafBool *,
+			  aafBoolean_t *,
 			  pResult,
 			  True if there are flavours of this codec,
      Find out whether its worth iterating over flavours.  Flavours are
