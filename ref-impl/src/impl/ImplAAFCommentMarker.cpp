@@ -44,7 +44,7 @@
 
 
 ImplAAFCommentMarker::ImplAAFCommentMarker () :
-  _annotation(PID_CommentMarker_Annotation, "Annotation")
+  _annotation(PID_CommentMarker_Annotation, L"Annotation")
 {
   _persistentProperties.put(_annotation.address());
 }
@@ -53,7 +53,7 @@ ImplAAFCommentMarker::ImplAAFCommentMarker () :
 ImplAAFCommentMarker::~ImplAAFCommentMarker ()
 {
   // Cleanup references to contained objects.
-  ImplAAFSourceReference *annotation = _annotation.setValue(0);
+  ImplAAFSourceReference *annotation = _annotation.clearValue();
   if (annotation)
 	{
 	  annotation->ReleaseReference();
@@ -87,13 +87,22 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFCommentMarker::SetAnnotation (
       ImplAAFSourceReference * pAnnotation)
 {
-	ImplAAFSourceReference *oldValue = _annotation.setValue(0);
+	if( pAnnotation == NULL )
+		return AAFRESULT_NULL_PARAM;
+
+	ImplAAFSourceReference *oldValue = _annotation;
 	if (oldValue)
 	  {
+		if( oldValue == pAnnotation )
+			return AAFRESULT_SUCCESS;
+
 		oldValue->ReleaseReference();
 		oldValue = 0;
 	  }
-	
+
+	if( pAnnotation->attached() )
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
 	_annotation = pAnnotation;
 	
 	if (pAnnotation)
