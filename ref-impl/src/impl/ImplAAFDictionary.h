@@ -3,32 +3,14 @@
 #ifndef __ImplAAFDictionary_h__
 #define __ImplAAFDictionary_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/************************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\************************************************/
 
 
 class ImplAAFBuiltinClasses;
@@ -334,6 +316,11 @@ public:
         (ImplEnumAAFPluginDescriptors ** ppEnum);
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFDictionary)
+
+public:
 
   //
   // Internal to the SDK
@@ -356,8 +343,8 @@ public:
   virtual AAFRESULT
     GetNthContainerDef (aafInt32 index, ImplAAFContainerDef **ppEnum);
 
-  AAFRESULT LookupPropTypeByOMPid (OMPropertyId opid,
-								   ImplAAFTypeDef ** ppTypeDef) const;
+  AAFRESULT LookupComplexPropTypeByOMPid (OMPropertyId opid,
+										  ImplAAFTypeDef ** ppTypeDef) const;
 
   AAFRESULT LookupPropDefByOMPid (OMPropertyId opid,
 								  ImplAAFPropertyDef ** ppd) const;
@@ -407,19 +394,15 @@ public:
   // Initializes the built-in types critical to building the dictionary.
   void pvtInitCriticalBuiltins (void);
 
-  // Register the given object to be initialized "at the right time".
-  // If that time is now, will init immediately.  If not ready yet,
-  // will put obj on queue to be initialized when everything's ready.
-  void pvtInitObjectProperties (ImplAAFObject * pObj) const;
 
 private:
 
-  // Like the non-private LookupPropTypeByOMPid(), except will
+  // Like the non-private LookupComplexPropTypeByOMPid(), except will
   // only look at types currently registered in this dictionary; will
   // not attempt to look at builtins which may have not already been
   // entered into the dict.
-  AAFRESULT pvtLookupPropTypeByOMPid (OMPropertyId opid,
-									  ImplAAFTypeDef ** ppTypeDef) const;
+  AAFRESULT pvtLookupComplexPropTypeByOMPid (OMPropertyId opid,
+											 ImplAAFTypeDef ** ppTypeDef) const;
 
 
   // Like the non-private LookupPropDefByOMPid(), except will only
@@ -428,7 +411,6 @@ private:
   // entered into the dict.
   AAFRESULT pvtLookupPropDefByOMPid (OMPropertyId opid,
 									 ImplAAFPropertyDef ** ppd) const;
-
 
 
   ImplAAFBuiltinClasses * _pBuiltinClasses;
@@ -443,34 +425,6 @@ private:
   // objects.
   aafBool                 _OKToInitProps;
 
-
-
-  //
-  // Private class to keep a FIFO of objects
-  //
-  struct pvtObjFifo
-  {
-	pvtObjFifo ();
-
-	ImplAAFObjectSP GetNext (void);
-
-	void Append (ImplAAFObject * obj);
-
-  private:
-	enum {
-	  kPvtMaxInitObjs = 200
-	};
-	ImplAAFObjectSP _objs[kPvtMaxInitObjs];
-	aafUInt32 _putIdx;
-	aafUInt32 _getIdx;
-  };
-
-  //
-  // Fifo of objects which will require initialization
-  //
-  pvtObjFifo _objsToInit;
-
-
   OMStrongReferenceVectorProperty<ImplAAFCodecDef>         _codecDefinitions;
   OMStrongReferenceVectorProperty<ImplAAFContainerDef>     _containerDefinitions;
   OMStrongReferenceVectorProperty<ImplAAFOperationDef>     _operationDefinitions;
@@ -480,19 +434,6 @@ private:
   OMStrongReferenceVectorProperty<ImplAAFInterpolationDef> _interpolationDefinitions;
   OMStrongReferenceVectorProperty<ImplAAFDataDef>          _dataDefinitions;
   OMStrongReferenceVectorProperty<ImplAAFPluginDescriptor> _pluginDefinitions;
-
-  aafInt32 _lastGeneratedPid;	// must be signed!
 };
-
-//
-// smart pointer
-//
-
-#ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
-#include "ImplAAFSmartPointer.h"
-#endif
-
-typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 
 #endif // ! __ImplAAFDictionary_h__
