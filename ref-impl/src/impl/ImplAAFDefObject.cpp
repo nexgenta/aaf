@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -81,7 +81,7 @@ ImplAAFDefObject::~ImplAAFDefObject ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::Initialize (
+    ImplAAFDefObject::pvtInitialize (
       const aafUID_t & id,
 	  const aafWChar * pName,
 	  const aafWChar * pDesc)
@@ -98,6 +98,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	return AAFRESULT_SUCCESS;
 }
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetName (
       const aafCharacter *  pName)
@@ -235,6 +237,8 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUID_t	*tmp, newUID;
 	aafInt32	oldCount;
 	aafInt32	newCount;
+	static const aafUID_t nullID = { 0 };
+
 
 //!!!	if(pPluginDescriptor == NULL)
 //		return AAFRESULT_NULL_PARAM;
@@ -242,17 +246,17 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		oldCount = _descriptors.count();
-        if (oldCount == 1) {
-          aafUID_t first;
-          _descriptors.getValueAt(&first, 0);
-		  if(EqualAUID(&first, &NilMOBID))	//!!! Handle non-optional props
-		  {									//!!!
-			oldCount = 0;					//!!!
-		  }									//!!!
+		if (oldCount == 1) {
+			aafUID_t first;
+			_descriptors.getValueAt(&first, 0);
+		  	if(EqualAUID(&first, &nullID))	//!!! Handle non-optional props
+		  	{									//!!!
+				oldCount = 0;					//!!!
+			}									//!!!
 		}
 		newCount = oldCount + 1;
 		if(pPluginDescriptor == NULL)	//!!!
-			newUID = NilMOBID;			//!!!
+			newUID = nullID;			//!!!
 		else
 		{
 			CHECK(pPluginDescriptor->GetAUID(&newUID));
@@ -398,4 +402,11 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_BADINDEX;
 
   return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+const OMUniqueObjectIdentification&
+  ImplAAFDefObject::identification(void) const
+{
+  const aafUID_t& r =_identification.reference();
+  return reinterpret_cast<const OMUniqueObjectIdentification&>(r);
 }
