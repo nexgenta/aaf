@@ -1,6 +1,6 @@
 
 /*
- * $Id: AAFDotInstanceMapper.cpp,v 1.10 2004/04/01 09:12:42 philipn Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.cpp,v 1.11 2004/06/02 10:55:44 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -822,9 +822,9 @@ AAFDotInstanceMapper::MapAAFPropertyValueGeneric( AxTypeDef &axTypeDef,
 	 size = _profile.GetMaxAttributeLength() / 2;
       }
 
-      aafMemPtr_t buffer = new unsigned char[size];
+      aafMemPtr_t buffer = new unsigned char[(unsigned int)size];
       aafUInt32 readSize;
-      CHECK_HRESULT(spTypeDefStream->Read(propValue, size, buffer, &readSize));
+      CHECK_HRESULT(spTypeDefStream->Read(propValue, (aafUInt32)size, buffer, &readSize));
       
       string streamValue = "0x";
       for (aafUInt32 i=0; i<readSize; i++)
