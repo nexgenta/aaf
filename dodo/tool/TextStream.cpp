@@ -11,11 +11,6 @@
 #include "TextStream.h"
 #endif
 
-
-#if defined(macintosh)
-#include <CursorCtl.h>
-#endif
-
 #include <string.h>
 
 
@@ -65,32 +60,6 @@ TextStream::TextStream
 }
 
 
-//
-// Utility method to reduce size of memory allocated.
-//
-const static int kCompressLimit = 1000;
-//
-void TextStream::compress ()
-{
-  if (! _pData || ! _pStorage)
-    return;
-
-  if ((_pData - _pStorage) < kCompressLimit)
-    // not enough to bother
-    return;
-
-#if DEBUG
-  fprintf (stderr, "Diff is %d; compressing.\n", (int)(_pData - _pStorage));
-#endif
-  char * newStorage = new char[strlen(_pData) + 1];
-  assert (newStorage);
-  strcpy (newStorage, _pData);
-  _pData = newStorage;
-  delete[] _pStorage;
-  _pStorage = newStorage;
-}
-
-
 TextStream TextStream::operator=
 (const TextStream & src)
 {
@@ -102,7 +71,7 @@ TextStream TextStream::operator=
 	  _numAllocated = 0;
 	  _cachedLen = src._cachedLen;
 	  _startSi = src._startSi;
-	  if (src._cachedLen)
+	  if (_cachedLen)
 		{
 		  _numAllocated = _cachedLen + 1;
 		  assert (_numAllocated > 0);
@@ -179,18 +148,6 @@ void TextStream::Append
   _pData[_cachedLen] = c;
   _cachedLen++;
   _pData[_cachedLen] = '\0';
-  
-  
-#if defined(macintosh)
-  static long int counter = 0;
-  if (counter++ % 1024 == 0)
-  {
-    // Release time to the operating system (pre-MacOS X).
-    SpinCursor(-1);
-  }
-#endif
-  
-  
 }
 
 
@@ -244,7 +201,6 @@ bool TextStream::Consume
 	{
 	  _startSi = SourceInfo (_startSi.GetFileName(), _startSi.GetLineNumber() + 1);
 	}
-  compress ();
   return true;
 }
 
@@ -260,7 +216,6 @@ bool TextStream::Expect
   _pData += key.GetLength();
   _cachedLen -= key.GetLength();
   assert (_cachedLen >= 0);
-  compress ();
   return true;
 }
 
@@ -309,19 +264,6 @@ void TextStream::SetCurSourceInfo (const SourceInfo & si)
 }
 
 
-const char * TextStream::GetCString () const
-{
-  if (_pData && *_pData)
-	{
-	  return _pData;
-	}
-  else
-	{
-	  return 0;
-	}
-}
-
-
 void TextStream::dump (FILE* fp) const
 {
   TextStream tmp = *this;
@@ -330,15 +272,5 @@ void TextStream::dump (FILE* fp) const
   while (tmp.Consume (c))
 	{
 	  fputc (c, fp);
-	  
-#if defined(macintosh)
-      static long int counter = 0;
-      if (counter++ % 256 == 0)
-      {
-        // Release time to the operating system (pre-MacOS X).
-        SpinCursor(1);
-      }
-#endif
-
 	}
 }

@@ -128,14 +128,6 @@ struct TextStream
   //********
 
 
-  const char * GetCString () const;
-  //
-  // Returns a pointer to a null-terminated const string representing
-  // this streams contents.  Returns NULL if empty.
-  //
-  //********
-
-
   void dump (FILE* fp) const;
   //
   // Dumps contents of this thing to given file.
@@ -151,11 +143,6 @@ struct TextStream
 
 
 private:
-
-  void compress ();
-  //
-  // Helper function to reduce memory usage.  If consumption is great
-  // enough, will re-allocate smaller storage.
 
   char *		_pStorage;
   int			_numAllocated;
