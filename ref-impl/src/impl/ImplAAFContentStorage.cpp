@@ -1,11 +1,30 @@
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAFTypes.h"
@@ -104,7 +123,7 @@ ImplAAFContentStorage::~ImplAAFContentStorage ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFContentStorage::LookupMob (aafUID_t *mobID,
+    ImplAAFContentStorage::LookupMob (const aafUID_t & mobID,
                            ImplAAFMob **ppMob)
 {
 	ImplAAFMob			*tmpMob;
@@ -112,7 +131,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	  {
 		/* Get the mob out of the mob hash table */
-		tmpMob = (ImplAAFMob *)TableUIDLookupPtr(_mobIndex, *mobID);
+		tmpMob = (ImplAAFMob *)TableUIDLookupPtr(_mobIndex, mobID);
 
 		if (tmpMob)
 			{
@@ -267,7 +286,7 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(pMob->GetMobID(&mobID));
 
 		// JeffB: Test is a throwaway, so don't bump the refcount
-		if(LookupMob (&mobID, &test) == AAFRESULT_MOB_NOT_FOUND)
+		if(LookupMob (mobID, &test) == AAFRESULT_MOB_NOT_FOUND)
 		{
 			_mobs.appendValue(pMob);
 			// trr - We are saving a copy of pointer in _mobs so we need
@@ -309,7 +328,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT
-    ImplAAFContentStorage::ChangeIndexedMobID (ImplAAFMob *pMob, aafUID_t *newID)
+    ImplAAFContentStorage::ChangeIndexedMobID (ImplAAFMob *pMob, const aafUID_t & newID)
 {
 	aafUID_t	mobID;
 	if (NULL == pMob)
@@ -318,7 +337,7 @@ AAFRESULT
 	XPROTECT()
 	{
 		CHECK(pMob->GetMobID(&mobID));
-		CHECK(TableAddUID(_mobIndex, *newID, pMob, kAafTableDupError));
+		CHECK(TableAddUID(_mobIndex, newID, pMob, kAafTableDupError));
 		CHECK(TableRemoveUID(_mobIndex, mobID));
 	} /* XPROTECT */
 	XEXCEPT
@@ -345,7 +364,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFContentStorage::IsEssenceDataPresent (aafUID_t *pFileMobID,
+    ImplAAFContentStorage::IsEssenceDataPresent (const aafUID_t & fileMobID,
                            aafFileFormat_t fmt,
                            aafBool *pResult)
 {
@@ -362,7 +381,7 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 			CHECK(GetNthEssenceData(n, &testData));
 			CHECK(testData->GetFileMobID (&testMobID));
-			if(EqualAUID(pFileMobID, &testMobID))
+			if(EqualAUID(&fileMobID, &testMobID))
 			{
 				*pResult = AAFTrue;
 			}
@@ -385,7 +404,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 //Internal function only.  Not exposed through the COM API
 AAFRESULT
-    ImplAAFContentStorage::LookupEssence (aafUID_t *pFileMobID,
+    ImplAAFContentStorage::LookupEssence (const aafUID_t & fileMobID,
                            ImplAAFEssenceData **ppEssence)
 {
 	aafUInt32		numEssence, n;
@@ -401,7 +420,7 @@ AAFRESULT
 		{
 			CHECK(GetNthEssenceData(n, &testData));
 			CHECK(testData->GetFileMobID (&testMobID));
-			if(EqualAUID(pFileMobID, &testMobID))
+			if(EqualAUID(&fileMobID, &testMobID))
 			{
 				found = AAFTrue;
 				*ppEssence = testData;
@@ -476,7 +495,7 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(pEssenceData->GetFileMobID(&mobID));
 
 		// Make sure the mob id matches an existing mob.
-		CHECK(LookupMob (&mobID, &pMatchingMob));
+		CHECK(LookupMob (mobID, &pMatchingMob));
 
 
 		_essenceData.appendValue(pEssenceData);
@@ -553,7 +572,7 @@ AAFRESULT ImplAAFContentStorage::LoadMobTables(void)
 	return (AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFContentStorage::UnlinkMobID(aafUID_t mobID)
+AAFRESULT ImplAAFContentStorage::UnlinkMobID(const aafUID_t & mobID)
 {
 	XPROTECT()
 	{

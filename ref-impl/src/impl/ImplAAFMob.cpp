@@ -1,11 +1,30 @@
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -280,15 +299,12 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::SetMobID (aafUID_t *newMobID)
+    ImplAAFMob::SetMobID (const aafUID_t & newMobID)
 {
 	AAFRESULT				hr = AAFRESULT_SUCCESS;
 	ImplAAFMob				*mobPtr = NULL;
 	ImplAAFHeader			*head = NULL;
 	ImplAAFContentStorage	*cstore = NULL;
-
-	if(newMobID == NULL)
-		return(AAFRESULT_NULL_PARAM);
 
 	XPROTECT()
 	{
@@ -310,7 +326,7 @@ AAFRESULT STDMETHODCALLTYPE
 				}	
 				else if(hr== AAFRESULT_MOB_NOT_FOUND)
 				{
-					_mobID = *newMobID;
+					_mobID = newMobID;
 					CHECK(cstore->ChangeIndexedMobID (this, newMobID));
 				}
 				else
@@ -327,7 +343,7 @@ AAFRESULT STDMETHODCALLTYPE
 			RAISE(hr);
 	  }
     else
-		 _mobID = *newMobID;
+		 _mobID = newMobID;
 
 	} /* XPROTECT */
 	XEXCEPT
@@ -432,10 +448,10 @@ AAFRESULT STDMETHODCALLTYPE
 //
 AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::AppendNewTimelineSlot
-        (aafRational_t  editRate,   //@parm [in] Edit rate property value
+        (const aafRational_t &editRate,   //@parm [in] Edit rate property value
 		 ImplAAFSegment * segment,   //@parm [in] Segment to append as slot component
 		 aafSlotID_t  slotID,   //@parm [in] The Slot ID
-         aafWChar *  slotName,   //@parm [in] Slot Name (optional)
+         const aafWChar *  slotName,   //@parm [in] Slot Name (optional)
 		 aafPosition_t  origin,
 		 ImplAAFTimelineMobSlot ** newSlot)  //@parm [out] Newly created slot
 {
@@ -461,7 +477,7 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(aSlot->SetSegment(segment));
 		CHECK(aSlot->SetSlotID(slotID));
 		CHECK(aSlot->SetName(slotName));
-		CHECK(aSlot->SetEditRate(&editRate));
+		CHECK(aSlot->SetEditRate(editRate));
 		CHECK(aSlot->SetOrigin(origin));
 
 		/* Append new slot to mob */
@@ -525,7 +541,6 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	aafWChar					oldTagName[64];
 	aafBool						commentFound = AAFFalse;
-	aafUID_t					stringTypeUID = CLSID_AAFTypeDefString;
 	aafUInt32					numComments = 0;
 	ImplAAFDictionary *pDictionary = NULL;
 	
@@ -569,7 +584,7 @@ AAFRESULT STDMETHODCALLTYPE
 			pTaggedValue = (ImplAAFTaggedValue *)pDictionary->CreateImplObject(AUID_AAFTaggedValue);
 			pDictionary->ReleaseReference();
 			pDictionary = NULL;
-			CHECK(pTaggedValue->Initialize(pTagName, &stringTypeUID));
+			CHECK(pTaggedValue->Initialize(pTagName, CLSID_AAFTypeDefString));
 			CHECK(pTaggedValue->SetValue((wcslen(pComment)*sizeof(aafWChar)+2), (aafDataValue_t)pComment));
 			_userComments.appendValue(pTaggedValue);
 		}
@@ -768,7 +783,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::FindSlotBySlotID (aafSlotID_t	slotID,
                            ImplAAFMobSlot **destSlot)
 {
-	aafInt32		loop, numSlots;
+	aafUInt32		loop;
+	aafNumSlots_t	numSlots;
 	ImplAAFMobSlot	*tmpSlot = NULL;
 	aafSlotID_t	tmpSlotID;
 	aafBool			foundSlot = AAFFalse;
@@ -851,10 +867,9 @@ AAFRESULT STDMETHODCALLTYPE
 			* datakind of the slot segment.
 			*/
 			CHECK(seg->GetDataDef(&datakind));
-			CHECK(dict->LookupDataDefintion(&datakind, &dataDef));
-			aafUID_t	uid = DDEF_Timecode;
+			CHECK(dict->LookupDataDefinition(datakind, &dataDef));
 			aafBool		isTimecode;
-			CHECK(dataDef->IsDataDefOf(&uid, &isTimecode));
+			CHECK(dataDef->IsDataDefOf(DDEF_Timecode, &isTimecode));
 			if (isTimecode)
 			{
 				/* Assume found at this point, so finish generating result */
@@ -1080,8 +1095,8 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::ChangeRef (aafUID_t *oldMobID,
-                           aafUID_t *newMobID)
+    ImplAAFMob::ChangeRef (const aafUID_t & oldMobID,
+                           const aafUID_t & newMobID)
 {
 	ImplEnumAAFMobSlots		*iter = NULL;
 	ImplAAFMobSlot			*slot = NULL;
@@ -1275,7 +1290,7 @@ AAFRESULT STDMETHODCALLTYPE
 ImplAAFMob::AddPhysSourceRef (aafAppendOption_t  addType,
 							  aafRational_t  editrate,
 							  aafSlotID_t  aMobSlot,
-							  aafUID_t *pEssenceKind,
+							  const aafUID_t & essenceKind,
 							  aafSourceRef_t  ref,
 							  aafLength_t  srcRefLength)
 {
@@ -1300,7 +1315,7 @@ ImplAAFMob::AddPhysSourceRef (aafAppendOption_t  addType,
 			RAISE(AAFRESULT_NOMEMORY);
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
-		CHECK(sclp->Initialize(pEssenceKind, &srcRefLength, ref));
+		CHECK(sclp->Initialize(essenceKind, srcRefLength, ref));
 				
 		status = FindSlotBySlotID(aMobSlot, &slot);
 		if (status == AAFRESULT_SUCCESS)
