@@ -36,9 +36,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -374,7 +377,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	
 		// NOTE: The elements in the summary structure need to be byte swapped
 		//       on Big Endian system (i.e. the MAC).
-		SWAPSUMMARY(summary)
+	// Result depends upon format of the file AND the current machine, not just the current machine.
+		if(summary.formChunk.ckID[0] != 'F')
+		{
+			SwapSummary(summary);
+		}
 
 		checkExpression((strncmp(summary.commChunk.ckID, "COMM", 4) == 0) &&
 						(strncmp(summary.formChunk.ckID, "FORM", 4) == 0) &&
@@ -415,20 +422,27 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFAIFCDescriptor_test()
+extern "C" HRESULT CAAFAIFCDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFAIFCDescriptor_test(testMode_t mode)
 {
 	aafWChar*	pFileName = L"AAFAIFCDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
+			
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFAIFCDescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFAIFCDescriptor_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;
