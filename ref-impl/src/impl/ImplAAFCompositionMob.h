@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCompositionMob.h,v 1.18 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCompositionMob.h,v 1.18.2.1 2004/06/04 16:54:31 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -116,11 +116,60 @@ public:
     aafMobKind_t *  pMobKind
   );
 
+  //***********************************************************
+  // METHOD NAME: SetRendering()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFCompositionMob2 | SetRendering |
+  // set the MobID of a rendering of this CompositionMob.
+
+  // This method will return the following code:
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  SetRendering (
+    // @parm [in, ref] aafMobID_constref | mobID | Rendering MobID
+    aafMobID_constref  mobID
+  );
+
+  //***********************************************************
+  // METHOD NAME: GetRendering()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFCompositionMob2 | GetRendering |
+  // return the MobID of a rendering of this CompositionMob.
+
+  // Succeeds if all of the following are true:
+  // - the pMobID pointer is valid.
+  //
+  // If this method fails nothing will be written to *pMobID.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pMobID arg is NULL.
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  GetRendering (
+    // @parm [out] aafMobID_t * | pMobID | Rendering MobID
+    aafMobID_t *  pMobID
+  );
+
 
 private:
 	OMFixedSizeProperty<aafLength_t>	_defaultFadeLen;
 	OMFixedSizeProperty<aafFadeType_t>	_defaultFadeType;
 	OMFixedSizeProperty<aafRational_t>	_defaultFadeEditUnit;
+	OMFixedSizeProperty<aafMobID_t>		_rendering;
+
 };
 
 #endif // ! __ImplAAFCompositionMob_h__
