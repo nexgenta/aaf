@@ -1,0 +1,24 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
+#startm .this-module 0
+AAFContext\
+#endm
+#startm .parent-module 0
+AAFRoot\
+#endm
+AD_HEAD
+
+AD_FORWARD_DECLARATION(AAFFile)
+
+AD_CLASS_UUID(1B5D0F20, FCC5, 11d2, BF, BC,00, 10, 4B, C9, 15, 6D}
+
+AD_DEFAULT_UUID(1B5D0F21, FCC5, 11d2, BF, BC,00, 10, 4B, C9, 15, 6D}
+AD_XCLASS_BEGIN(Concrete, Transient)
+
+
+AD_XCLASS_END(Concrete, Transient)

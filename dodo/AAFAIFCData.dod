@@ -1,3 +1,17 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFAIFCData\
 #endm
@@ -6,7 +20,7 @@ AAFAIFCData\
 AAFEssenceData\
 #endm
 #c
-#import ./AAFEssenceData.exp
+#c #import ./AAFEssenceData.exp
 AD_HEAD
 
 
@@ -15,7 +29,6 @@ AD_HEAD
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 

@@ -1,0 +1,42 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
+#startm .this-module 0
+AAFWindowsLocator\
+#endm
+#c
+#startm .parent-module 0
+AAFLocator\
+#endm
+#c
+AD_HEAD
+
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
+AD_CLASS_UUID(5CE12671, 2B21, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
+
+AD_DEFAULT_UUID(5CE12672, 2B21, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
+																 
+
+AD_XCLASS_BEGIN(Concrete, StoredObject)
+
+  //@access Public Members
+
+AD_METHOD2(GetShortcut,
+		   [in],aafInt32,shortCutLen,Length of the buffer in bytes,
+		   [out],aafDataBuffer_t ,shortCutBuf,A Windows shortcut,
+		   Get the windows shortcut.)
+
+AD_METHOD2(SetShortcut,
+		   [in],aafInt32,shortCutLen,Length of the buffer in bytes,
+		   [in],aafDataBuffer_t ,shortCutBuf,A Windows shortcut,
+		   Set the windows shortcut.)
+
+AD_XCLASS_END(Concrete, StoredObject)

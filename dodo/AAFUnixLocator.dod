@@ -6,28 +6,23 @@
 #c*													*
 #c\*************************************************/
 #startm .this-module 0
-AAFImageData\
+AAFUnixLocator\
 #endm
 #c
 #startm .parent-module 0
-AAFEssenceData\
+AAFLocator\
 #endm
 #c
-#c #import ./AAFEssenceData.exp
 AD_HEAD
 
-
- 
 /***********************************************\
-*  Stub only.   Implementation not yet added    *
+*	Stub only.   Implementation not yet added	*
 \***********************************************/
 
 
+AD_CLASS_UUID(A5F642B1, 2B1C, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
+AD_DEFAULT_UUID(A5F642B2, 2B1C, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
 
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 
-AD_CLASS_UUID(e684d777, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
-
-AD_DEFAULT_UUID(e684d778, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
-AD_XCLASS_BEGIN(Abstract, StoredObject)
-
-AD_XCLASS_END(Abstract, StoredObject)
+AD_XCLASS_END(Concrete, StoredObject)

@@ -6,14 +6,14 @@
 #c*													*
 #c\*************************************************/
 #startm .this-module 0
-AAFImageData\
+AAFDOSLocator\
 #endm
 #c
 #startm .parent-module 0
-AAFEssenceData\
+AAFLocator\
 #endm
 #c
-#c #import ./AAFEssenceData.exp
+#c #import ./AAFLocator.exp
 AD_HEAD
 
 
@@ -25,9 +25,9 @@ AD_HEAD
 
 
 
-AD_CLASS_UUID(e684d777, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
+AD_CLASS_UUID(e684d769, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 
-AD_DEFAULT_UUID(e684d778, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
-AD_XCLASS_BEGIN(Abstract, StoredObject)
+AD_DEFAULT_UUID(e684d76a, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 
-AD_XCLASS_END(Abstract, StoredObject)
+AD_XCLASS_END(Concrete, StoredObject)
