@@ -41,7 +41,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.3.2.5 2004/09/03 17:13:13 phil_tudor Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.3.2.6 2004/09/07 16:29:22 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -363,6 +363,20 @@ enum _aafSignalStandard_e
 	kAAFSignalS296M	= 5,
 	kAAFSignalS349M	= 6
     }	aafSignalStandard_e;
+
+typedef aafInt32 aafScanningDirection_t;
+
+typedef 
+enum _aafScanningDirection_e
+    {	kAAFScanningLeftToRightTopToBottom	= 0,
+	kAAFScanningRightToLeftTopToBottom	= 1,
+	kAAFScanningLeftToRightBottomToTop	= 2,
+	kAAFScanningRightToLeftBottomToTop	= 3,
+	kAAFScanningTopToBottomLeftToRight	= 4,
+	kAAFScanningTopToBottomRightToLeft	= 5,
+	kAAFScanningBottomToTopLeftToRight	= 6,
+	kAAFScanningBottomToTopRightToLeft	= 7
+    }	aafScanningDirection_e;
 
 typedef aafInt32 aafColorSiting_t;
 
@@ -1046,6 +1060,8 @@ typedef aafPulldownDir_t aafPulldownDirectionType_t;
 typedef aafPulldownKind_t aafPulldownKindType_t;
 
 typedef aafSignalStandard_t aafSignalStandardType_t;
+
+typedef aafScanningDirection_t aafScanningDirectionType_t;
 
 /**************************/
 #ifndef STDMETHODCALLTYPE

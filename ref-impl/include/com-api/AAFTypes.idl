@@ -3,7 +3,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAFTypes.idl,v 1.2.10.5 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $")
+cpp_quote("// $Id: AAFTypes.idl,v 1.2.10.6 2004/09/07 16:29:22 phil_tudor Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \"License\"); You may not use this file")
@@ -307,6 +307,31 @@ typedef enum _aafElectroSpatialFormulation_e
 	kAAFEsStereoRightChannelDoubleSamplingFrequencyMode = 9,
 	kAAFEsMultiChannelMode = 15
 } aafElectroSpatialFormulation_e;
+	
+typedef aafInt32 aafSignalStandard_t;
+typedef enum _aafSignalStandard_e
+{
+	kAAFSignalNone = 0,
+	kAAFSignalS125MInterlace = 1,
+	kAAFSignalS125MProgressive = 2,
+	kAAFSignalS347M = 3,
+	kAAFSignalS274M = 4,
+	kAAFSignalS296M = 5,
+	kAAFSignalS349M = 6
+} aafSignalStandard_e;
+	
+typedef aafInt32 aafScanningDirection_t;
+typedef enum _aafScanningDirection_e
+{
+	kAAFScanningLeftToRightTopToBottom = 0,
+	kAAFScanningRightToLeftTopToBottom = 1,
+	kAAFScanningLeftToRightBottomToTop = 2,
+	kAAFScanningRightToLeftBottomToTop = 3,
+	kAAFScanningTopToBottomLeftToRight = 4,
+	kAAFScanningTopToBottomRightToLeft = 5,
+	kAAFScanningBottomToTopLeftToRight = 6,
+	kAAFScanningBottomToTopRightToLeft = 7
+} aafScanningDirection_e;
 	
 typedef aafInt32 aafColorSiting_t;
 typedef enum _aafColorSiting_e
@@ -1012,6 +1037,8 @@ typedef aafFrameLayout_t        aafLayoutType_t;
 typedef aafTimecodeSourceType_t aafTCSource_t;
 typedef aafPulldownDir_t        aafPulldownDirectionType_t;
 typedef aafPulldownKind_t       aafPulldownKindType_t;
+typedef aafSignalStandard_t     aafSignalStandardType_t;
+typedef aafScanningDirection_t  aafScanningDirectionType_t;
 
 
 cpp_quote("/**************************/") 
