@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.101 2004/12/09 18:13:27 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.102 2005/01/11 09:28:40 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2005,7 +2005,8 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 	aafBool					isMask = kAAFFalse, reverse = kAAFFalse;
 	aafSourceRef_t			sourceRef;
 	ImplAAFMob				*nextMob = NULL;
-  aafMobID_t				nullMobID = { 0 };		// Need "isNIL" utility
+	aafMobID_t			nullMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},
+					0,0,0,0,{0,0,0,{0,0,0,0,0,0,0,0}}}; // Need "isNIL" utility
 	ImplAAFMobSlot 			*nextTrack = NULL;
 	aafSlotID_t				tmpTrackID, nextTrackID;
 	aafPosition_t			tmpPos, convertPos;

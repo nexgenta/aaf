@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.cpp,v 1.28 2004/03/06 00:00:48 tbingham Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.cpp,v 1.29 2005/01/11 09:26:17 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,8 @@
 #include "AAFResult.h"
 
 
-const aafMobID_t kNullMobID = {0};
+const aafMobID_t kNullMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+	{0,0,0,{0,0,0,0,0,0,0,0}}};
 
 ImplAAFEssenceData::ImplAAFEssenceData () :
   _fileMobID(PID_EssenceData_MobID,	L"MobID"),

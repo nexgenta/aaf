@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.92 2004/12/17 22:12:40 akharkev Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.93 2005/01/11 09:27:07 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -86,7 +86,7 @@ typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
 
 extern "C" const aafClassID_t CLSID_EnumAAFIdentifications;
 
-const aafUID_t NIL_UID = { 0 };
+const aafUID_t NIL_UID = { 0,0,0,{0,0,0,0,0,0,0,0} };
 
 
 ImplAAFHeader::ImplAAFHeader ()
@@ -685,7 +685,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
 {
-	aafTimeStamp_t	now = { 0 };
+	aafTimeStamp_t	now = { {0,0,0}, {0,0,0,0} };
 
 	AAFGetDateTime(&now);
 	_lastModified = now;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.cpp,v 1.47 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.cpp,v 1.48 2005/01/11 09:27:52 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -298,7 +298,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSourceClip::SetSourceReference (aafSourceRef_t  sourceRef)
 {
 	AAFRESULT   aafError = AAFRESULT_SUCCESS;
-	static const aafMobID_t nullMobID = {0};
+	static const aafMobID_t nullMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+					{0,0,0,{0,0,0,0,0,0,0,0}}};
 	
 	/* If MobID is NUL - make the rest of the fields 0 too. */
 	if(memcmp(&sourceRef.sourceID, &nullMobID, sizeof(sourceRef.sourceID)) == 0)

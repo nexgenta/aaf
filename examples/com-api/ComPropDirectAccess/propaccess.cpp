@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: propaccess.cpp,v 1.25 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
+// $Id: propaccess.cpp,v 1.26 2005/01/11 09:25:03 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -185,7 +185,7 @@ const aafUID_t AUID_PropertyComponentOdor =
 static const aafMobID_t SRC_MobID = {
 {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
 0x13, 0x00, 0x00, 0x00, 
-{0x6d800930, 0x9bcd, 0x11d4, 0x9f, 0x7f, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}};
+{0x6d800930, 0x9bcd, 0x11d4, {0x9f, 0x7f, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}}};
 
 
 #define PROPAGATE_RESULT(condition) \
