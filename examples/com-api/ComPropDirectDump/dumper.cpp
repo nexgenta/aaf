@@ -394,7 +394,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				checkResult(pTDI->GetInteger(pPVal, (aafMemPtr_t) &val, sizeof (val)));
 				
 				os << "value: ";
-				aafInt32 hi = (aafUInt32) ((val & 0xffffffff00000000) >> 32);
+				aafInt32 hi = (aafUInt32) ((val & AAFCONSTINT64(0xffffffff00000000)) >> 32);
 				aafInt32 lo = (aafInt32) val & 0xffffffff;
 				if (hi && ((hi != ~0) || (lo >= 0)))
 				{
@@ -1159,19 +1159,6 @@ static bool dumpFile (aafCharacter * pwFileName,
 }
 
 
-struct CComInitialize
-{
-	CComInitialize()
-	{
-		CoInitialize(NULL);
-	}
-	
-	~CComInitialize()
-	{
-		CoUninitialize();
-	}
-};
-
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
 {
@@ -1208,7 +1195,6 @@ int main(int argc, char* argv[])
 	ofstream filestream;
 	bool file_opened = false;
 	
-	CComInitialize comInit;
 	CAAFInitialize aafInit;
 	
 	// If only two args are (correctly) given:
