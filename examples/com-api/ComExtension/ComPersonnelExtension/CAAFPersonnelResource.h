@@ -1,24 +1,3 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
 #ifndef __CAAFPersonnelResource_h__
 #define __CAAFPersonnelResource_h__
 
@@ -45,7 +24,6 @@
 class CAAFPersonnelResource : 
   public IAAFPersonnelResource,
   public IAAFPlugin,
-  public IAAFClassExtension,
   public CAAFUnknown
 {
 protected:
@@ -123,31 +101,31 @@ public:
   // IAAFPlugin interface methods
 	//
 
-  STDMETHOD (CountDefinitions)
-	  (/*[out]*/ aafUInt32 *pDefCount);
+  STDMETHOD (Start)
+     (void);
+
+  STDMETHOD (Finish)
+     (void);
+
+  STDMETHOD (GetNumDefinitions)
+	  (/*[out]*/ aafInt32 *pDefCount);
 
   STDMETHOD (GetIndexedDefinitionID)
-	  (/*[in] */ aafUInt32 index, 
+	  (/*[in] */ aafInt32 index, 
 		 /*[out]*/ aafUID_t *result);
 
   STDMETHOD (GetPluginDescriptorID)
 	  (/*[out]*/ aafUID_t *result);
 
   STDMETHOD (GetIndexedDefinitionObject)
-	  (/*[in] */ aafUInt32 index, 
+	  (/*[in] */ aafInt32 index, 
 		 /*[in] */ IAAFDictionary *dict, 
 		 /*[out]*/ IAAFDefObject **def);
 
   STDMETHOD (CreateDescriptor)
 	  (/*[in] */ IAAFDictionary *dict,
-		 /*[out]*/ IAAFPluginDef **desc);
+		 /*[out]*/ IAAFPluginDescriptor **desc);
 
-  //
-  // IAAFClassExtension interface methods
-	//
-
-  STDMETHOD (RegisterDefinitions)
-    (/*[in] */ IAAFDictionary *pDictionary);
 
 
 protected:
