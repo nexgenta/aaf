@@ -213,7 +213,8 @@ static void RegisterNewClass (IAAFDictionary * pDictionary)
 							  (IUnknown **)&pNewFillClass));
   checkResult (pNewFillClass->Initialize (kClassAUID_NewFill,
 										  pFillClass,
-										  L"New Filler"));
+										  L"New Filler",
+										  kAAFTrue));
 
   // Get type def for uint32
   IAAFTypeDefSP ptd;
@@ -1011,8 +1012,9 @@ extern "C" HRESULT CAAFDictionary_test()
 	}
   catch (...)
 	{
-	  cerr << "CAAFDictionary_test...Caught general C++ exception!" << endl; 
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+	  cerr << "CAAFDictionary_test..."
+		   << "Caught general C++ exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
 	}
 
   return hr;

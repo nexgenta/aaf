@@ -32,11 +32,10 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
+
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -207,19 +206,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 }
  
 
-extern "C" HRESULT CAAFSourceReference_test(testMode_t mode);
-extern "C" HRESULT CAAFSourceReference_test(testMode_t mode)
+extern "C" HRESULT CAAFSourceReference_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"AAFSourceReferenceTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
-			
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

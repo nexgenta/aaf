@@ -34,7 +34,6 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -90,6 +89,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFEssenceDescriptor *edesc = NULL;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
+	aafRational_t	audioRate = { 44100, 1 };
 
 
 	aafProductVersion_t v;
@@ -134,17 +134,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetName(L"SourceMOBTest"));
 		
 		// Create a concrete subclass of EssenceDescriptor
-		checkResult(defs.cdAIFCDescriptor()->
+		checkResult(defs.cdHTMLDescriptor()->
 					CreateInstance(IID_IAAFEssenceDescriptor, 
 								   (IUnknown **)&edesc));
 										
-
-		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
-		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-		pAIFCDesc->Release();
-		pAIFCDesc = NULL;
-
  		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
 			// Verify that there are no locators
@@ -230,11 +223,23 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFMob			*aMob = NULL;
 	aafUInt32					numLocators;
 	aafUInt32					readLen;
+	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafWChar					readBuf[1024];
 	bool bFileOpen = false;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"AAFNetworkLocator. NOT!";
+	ProductInfo.productVersion = &v;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.platform = NULL;
 
 	try
 	{	  

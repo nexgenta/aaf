@@ -119,13 +119,15 @@ extern "C" HRESULT CAAFEvent_test()
   aafWChar * pFileName = L"AAFEventTest.aaf";
 
   // Initialize the product info for this module test
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFEvent Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kAAFVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -148,7 +150,8 @@ extern "C" HRESULT CAAFEvent_test()
   }
   catch (...)
   {
-    cerr << "CAAFEventMobSlot_test...Caught general C++ exception!" << endl;
+    cerr << "CAAFEventMobSlot_test..."
+		 << "Caught general C++ exception!" << endl;
     hr = AAFRESULT_TEST_FAILED;
   }
 
@@ -271,9 +274,8 @@ void EventTest::CreateEvent()
 	  hr = pDataDef->Initialize (DDEF_TEST, L"Test", L"Test data");
 	  hr = _pDictionary->RegisterDataDef (pDataDef);
 
-	  // Create an event (note: this will be replaced by a concrete event in a
-    // later version after such an event is implemented.)
-    checkResult(defs.cdEvent()->
+	// Create a concrete subclass of event
+    checkResult(defs.cdCommentMarker()->
 				CreateInstance(IID_IAAFEvent, 
 							   (IUnknown **)&pEvent));
     checkResult(pEvent->SetPosition(_position));
