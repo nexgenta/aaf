@@ -1,3 +1,30 @@
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
+
 // @doc OMINTERNAL
 #ifndef OMASSERTIONS_H
 #define OMASSERTIONS_H
@@ -85,6 +112,30 @@ void trace(const char* routineName);
 
 #endif
 
+#if defined(OM_ENABLE_OBSOLETE)
+
+  // @func Output a message indicating that the <p routineName>
+  //       is obsolete and that <p newRoutineName> should be used instead
+  //   @parm The name of the obsolete routine.
+  //   @parm The name of the routine that should be called instead.
+void obsolete(const char* routineName, const char* newRoutineName);
+
+  // @func Print a message (when enabled with OM_ENABLE_DEBUG and
+  //       OM_ENABLE_OBSOLETE) indicating that the current routine
+  //       is obsolete and that <p newRoutineName> should be used instead.
+  //       OBSOLETE is provided to aid clients in migrating from one
+  //       Object Manager version to the next. Routines are made obsolete
+  //       before they are removed. 
+  //   @parm The name of the routine that should be called instead.
+#define OBSOLETE(newRoutineName) \
+  obsolete(currentRoutineName, newRoutineName);
+
+#else
+
+#define OBSOLETE(newRoutineName)
+
+#endif
+
   // @func Assert (when enabled with OM_ENABLE_DEBUG) that the
   //       precondition described by <p name> and <p expression> is
   //       true. An invocation of this macro must be preceeded by an
@@ -152,9 +203,35 @@ void trace(const char* routineName);
 #define IMPLIES(a, b) \
   (!(a) || (b))
 
+  // @func Evaluate <p expression> for each element,
+  //       <p start> .. <p elementCount> of a collection. Use
+  //       <p index> as the name of the index. The <p expression>
+  //       is most usefully one of the assertion macros such as
+  //       <f PRECONDITION>, <f POSTCONDITION> or <f ASSERT>.
+  //   @parm The index name.
+  //   @parm The starting index.
+  //   @parm The number of elements.
+  //   @parm The expression to evaluate for each element.
+#define FOREACH(index, start, elementCount, expression) \
+  { for (size_t index = start; index < start + elementCount; index++) \
+    {expression;} }
+
+  // @func Universal quantifier. Evaluate <p expression> for all
+  //       elements, 0 .. <p elementCount> of a collection. Use
+  //       <p index> as the name of the index. The <p expression>
+  //       is most usefully one of the assertion macros such as
+  //       <f PRECONDITION>, <f POSTCONDITION> or <f ASSERT>.
+  //   @parm The index name.
+  //   @parm The number of elements in the collection.
+  //   @parm The expression to evaluate for each element.
+#define FORALL(index, elementCount, expression) \
+        FOREACH(index, 0, elementCount, expression) 
+
 #else
 
 #define TRACE(name)
+
+#define OBSOLETE(newRoutineName)
 
 #define PRECONDITION(name, expression)
 
@@ -165,6 +242,10 @@ void trace(const char* routineName);
 #define INVARIANT()
 
 #define IMPLIES(a, b)
+
+#define FOREACH(index, start, elementCount, expression)
+
+#define FORALL(index, elementCount, expression)
 
 #endif
 
