@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.h,v 1.2.2.5 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
+// $Id: CAAFEnumValidation.h,v 1.2.2.6 2004/09/02 17:14:01 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -83,6 +83,7 @@ bool Is_aafRGBAComponentKind_t_Valid(aafRGBAComponentKind_t param);
 bool Is_aafReferenceType_t_Valid(aafReferenceType_t param);
 bool Is_aafSearchDictionaryTag_t_Valid(aafSearchDictionaryTag_t param);
 bool Is_aafSearchTag_t_Valid(aafSearchTag_t param);
+bool Is_aafSignalStandard_t_Valid(aafSignalStandard_t param);
 bool Is_aafSwapNeeded_t_Valid(aafSwapNeeded_t param);
 bool Is_aafTapeCaseType_t_Valid(aafTapeCaseType_t param);
 bool Is_aafTapeFormatType_t_Valid(aafTapeFormatType_t param);
