@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataDef.cpp,v 1.23 2004/10/27 16:52:57 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDataDef.cpp,v 1.24 2004/11/17 18:09:33 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -178,10 +178,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDataDef::IsDescriptiveKind (
-      aafBool *bIsDescriptiveKind)
+    ImplAAFDataDef::IsDescriptiveMetadataKind (
+      aafBool *bIsDescriptiveMetadataKind)
 {
-	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddkAAFDescriptive(), bIsDescriptiveKind));
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddkAAFDescriptiveMetadata(), bIsDescriptiveMetadataKind));
 }
 
 

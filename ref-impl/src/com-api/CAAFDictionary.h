@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDictionary.h,v 1.5 2004/10/22 13:55:40 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDictionary.h,v 1.6 2004/11/17 18:09:32 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1157,11 +1157,11 @@ public:
   );
 
   //***********************************************************
-  // METHOD NAME: LookupDescriptiveDataDef()
+  // METHOD NAME: LookupDescriptiveMetadataDataDef()
   //
   // DESCRIPTION:
-  // @mfunc AAFRESULT | AAFDictionary2 | LookupDescriptiveDataDef |
-  // Return the Descriptive Data Definition Object.
+  // @mfunc AAFRESULT | AAFDictionary2 | LookupDescriptiveMetadataDataDef |
+  // Return the Descriptive Metadata Data Definition Object.
   // 
   // Succeeds if:
   // - The ppDataDef pointer is valid.
@@ -1177,7 +1177,7 @@ public:
   //   - ppDataDef arg is NULL.
   // @end
   // 
-  STDMETHOD (LookupDescriptiveDataDef)
+  STDMETHOD (LookupDescriptiveMetadataDataDef)
    (
     // @parm [out,retval] AAFDataDef | ppDataDef | Data Definition Object
     IAAFDataDef ** ppDataDef

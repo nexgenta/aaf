@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDataDef.cpp,v 1.11 2004/10/27 17:04:03 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDataDef.cpp,v 1.12 2004/11/17 18:09:32 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -654,7 +654,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDataDef::IsDescriptiveKind (aafBoolean_t *  bIsDescriptiveKind)
+    CAAFDataDef::IsDescriptiveMetadataKind (aafBoolean_t *  bIsDescriptiveMetadataKind)
 {
   HRESULT hr;
 
@@ -668,7 +668,7 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->IsDescriptiveKind (bIsDescriptiveKind);
+      hr = ptr->IsDescriptiveMetadataKind (bIsDescriptiveMetadataKind);
     }
   catch (OMException& e)
     {

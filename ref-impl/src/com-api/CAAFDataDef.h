@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDataDef.h,v 1.9 2004/10/27 17:04:10 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDataDef.h,v 1.10 2004/11/17 18:09:32 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -205,17 +205,17 @@ public:
 
 
   //***********************************************************
-  // METHOD NAME: IsDescriptiveKind()
+  // METHOD NAME: IsDescriptiveMetadataKind()
   //
   // DESCRIPTION:
-  // @mfunc AAFRESULT | AAFDataDef3 | IsDescriptiveKind |
-  // Sets return value to TRUE if DataDef is descriptive.
+  // @mfunc AAFRESULT | AAFDataDef3 | IsDescriptiveMetadataKind |
+  // Sets return value to TRUE if DataDef is descriptive metadata.
   // @end
   // 
-  STDMETHOD (IsDescriptiveKind)
+  STDMETHOD (IsDescriptiveMetadataKind)
    (
-    // @parm [retval,out] aafBoolean_t * | bIsDescriptiveKind | pointer to the return value
-    aafBoolean_t *  bIsDescriptiveKind
+    // @parm [retval,out] aafBoolean_t * | bIsDescriptiveMetadataKind | pointer to the return value
+    aafBoolean_t *  bIsDescriptiveMetadataKind
   );
 
   //***********************************************************

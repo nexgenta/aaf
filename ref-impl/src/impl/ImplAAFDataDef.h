@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataDef.h,v 1.15 2004/10/27 16:52:57 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDataDef.h,v 1.16 2004/11/17 18:09:33 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -146,12 +146,12 @@ public:
         (aafBool *  bIsAuxiliaryKind);
 
   //****************
-  // IsDescriptiveKind()
+  // IsDescriptiveMetadataKind()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    IsDescriptiveKind
+    IsDescriptiveMetadataKind
         // @parm [retval,out] pointer to the return value
-        (aafBool *  bIsDescriptiveKind);
+        (aafBool *  bIsDescriptiveMetadataKind);
 
 
 private:

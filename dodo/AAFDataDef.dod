@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef.dod,v 1.27 2004/10/27 16:48:29 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef.dod,v 1.28 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -159,7 +159,7 @@ AD_COM_METH(.method-IsTimecodeKind)
 #c
 #c DataDef3 methods
 #c
-AD_COM_METH(.method-IsDescriptiveKind)
+AD_COM_METH(.method-IsDescriptiveMetadataKind)
 AD_COM_METH(.method-IsAuxiliaryKind)
 
 AD_COM_EXT2_CLASS_END(AAFDataDef2, AAFDataDef3)

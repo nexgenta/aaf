@@ -2,7 +2,7 @@
 #define __CAAFBuiltinDefs_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBuiltinDefs.h,v 1.3 2004/10/22 13:33:37 phil_tudor Exp $ $Name:  $
+// $Id: CAAFBuiltinDefs.h,v 1.4 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -251,7 +251,7 @@ public:
 
   // defines ddkAAFXXX() which use AAF v1.1 values
   DATA_DEF_METHOD(Auxiliary);
-  DATA_DEF_METHOD(Descriptive);
+  DATA_DEF_METHOD(DescriptiveMetadata);
   DATA_DEF_METHOD(Edgecode);
   DATA_DEF_METHOD(Matte);
   DATA_DEF_METHOD(Picture);

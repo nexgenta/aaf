@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef3.dod,v 1.1 2004/10/27 16:47:13 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef3.dod,v 1.2 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -178,12 +178,12 @@ AD_XMETHOD1(IsAuxiliaryKind,
 		   pointer to the return value, 
 		   Sets return value to TRUE if DataDef is auxiliary.)
 
-AD_XMETHOD1(IsDescriptiveKind,
+AD_XMETHOD1(IsDescriptiveMetadataKind,
 		   [retval\,out],
 		   objPass,
 		   aafBoolean_t *,
-		   bIsDescriptiveKind,
+		   bIsDescriptiveMetadataKind,
 		   pointer to the return value, 
-		   Sets return value to TRUE if DataDef is descriptive.)
+		   Sets return value to TRUE if DataDef is descriptive metadata.)
 
 AD_XCLASS_END(Concrete, StoredObject)

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.68 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.69 2004/11/17 18:09:33 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -684,10 +684,10 @@ public:
         (ImplAAFDataDef ** ppDataDef);
 
   //****************
-  // LookupDescriptiveDataDef()
+  // LookupDescriptiveMetadataDataDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupDescriptiveDataDef
+    LookupDescriptiveMetadataDataDef
         // @parm [out,retval] Data Definition Object
         (ImplAAFDataDef ** ppDataDef);
 

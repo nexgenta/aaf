@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFInfo.cpp,v 1.44 2004/11/02 15:57:51 phil_tudor Exp $ $Name:  $
+// $Id: AAFInfo.cpp,v 1.45 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -404,8 +404,8 @@ static void ReadAAFFile(aafWChar * pFileName)
             printf("\"%s\" (recognized as Edgecode)\n", chName);
           else if (memcmp( &id, &kAAFDataDef_Auxiliary, sizeof(id)) == 0)
             printf("\"%s\" (recognized as Auxiliary)\n", chName);
-          else if (memcmp( &id, &kAAFDataDef_Descriptive, sizeof(id)) == 0)
-            printf("\"%s\" (recognized as Descriptive)\n", chName);
+          else if (memcmp( &id, &kAAFDataDef_DescriptiveMetadata, sizeof(id)) == 0)
+            printf("\"%s\" (recognized as DescriptiveMetadata)\n", chName);
           else if (memcmp( &id, &kAAFDataDef_Matte, sizeof(id)) == 0)
             printf("\"%s\" (recognized as Matte)\n", chName);
           else

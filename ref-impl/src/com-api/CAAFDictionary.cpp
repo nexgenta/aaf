@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDictionary.cpp,v 1.8 2004/10/22 13:55:40 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDictionary.cpp,v 1.9 2004/11/17 18:09:32 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3897,7 +3897,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDictionary::LookupDescriptiveDataDef (IAAFDataDef ** ppDataDef)
+    CAAFDictionary::LookupDescriptiveMetadataDataDef (IAAFDataDef ** ppDataDef)
 {
   HRESULT hr;
 
@@ -3920,7 +3920,7 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->LookupDescriptiveDataDef (pinternalppDataDef);
+      hr = ptr->LookupDescriptiveMetadataDataDef (pinternalppDataDef);
     }
   catch (OMException& e)
     {
