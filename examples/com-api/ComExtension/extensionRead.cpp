@@ -28,9 +28,11 @@
 
 #include "extensionRead.h"
 #include "extensionUtils.h"
+#include "AAFResult.h"
 
 #include <iostream.h>
 #include <assert.h>
+
 
 //
 // This example code is intended to show how AAF may be extended to
@@ -62,43 +64,74 @@ bool extensionRead (const aafCharacter * filename)
   IAAFClassDef *pcd=NULL;
 
   cout << "Verifying role enum type has been registered." << endl;
-  check (pDict->LookupType ((aafUID_t*) &kTypeID_eRole, &ptd));
+  check (pDict->LookupType (kTypeID_eRole, &ptd));
   ptd->Release();
   ptd=NULL;
 
   cout << "Verifying PersonnelResource class has been registered." << endl;
-  check (pDict->LookupClass ((aafUID_t*) &kClassID_PersonnelResource, &pcd));
+  check (pDict->LookupClass (kClassID_PersonnelResource, &pcd));
   pcd->Release();
   pcd=NULL;
 
   cout << "Verifying PersonnelMob class has been registered." << endl;
-  check (pDict->LookupClass ((aafUID_t*) &kClassID_PersonnelMob, &pcd));
+  check (pDict->LookupClass (kClassID_PersonnelMob, &pcd));
   pcd->Release();
   pcd=NULL;
 
   cout << "Verifying PersonnelResourceReference type has been"
 	   << " registered." << endl;
-  check (pDict->LookupType ((aafUID_t*) &kTypeID_PersonnelResourceStrongReference,
+  check (pDict->LookupType (kTypeID_PersonnelResourceStrongReference,
 							&ptd));
   ptd->Release();
   ptd=NULL;
 
   cout << "Verifying PersonnelResourceReferenceVector type has been"
 	   << " registered." << endl; 
-  check (pDict->LookupType ((aafUID_t*) &kTypeID_PersonnelResourceStrongReferenceVector,
+  check (pDict->LookupType (kTypeID_PersonnelResourceStrongReferenceVector,
 							&ptd));
   ptd->Release();
   ptd=NULL;
 
-  cout << "Verifying PersonnelMob instance has been created and added" 
+  cout << "Verifying AdminMob instance has been created and added" 
 	   << " to header." << endl;
+  // Need to find AdminMob, temp iterate through Mobs to find one.
+  IEnumAAFMobs*	pMobIter = NULL;
   IAAFMob *pMob=NULL;
-  check (pHead->LookupMob ((aafUID_t*) &kMobID_Personnel,
-						   &pMob));
+  bool foundAdmin=false;
+  check(pHead->EnumAAFAllMobs(NULL, &pMobIter));
+  while(!foundAdmin && (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob)))
+  {
+	//Check if Mob is a Admin Mob
+	IAAFObject *pObject;
+	check(pMob->QueryInterface(IID_IAAFObject,(void **)&pObject));
+	IAAFClassDef *pMobCD=NULL;
+	check (pObject->GetDefinition(&pMobCD));
+	pObject->Release();
+	pObject=NULL;
+	if (classDefinitionIsA(pMobCD, kClassID_PersonnelMob))
+	{
+		foundAdmin = true;
+	} else
+	{
+		// will need to release pMob when it is not the right mob
+		pMob->Release();
+		pMob=NULL;
+	}
+ 	pMobCD->Release();
+	pMobCD=NULL;
+  }
 
-  cout << "Printing contents of PersonnelMob." << endl;
-  PrintPersonnelResources (pDict, pMob);
 
+  if (foundAdmin) 
+  {
+	  cout << "Printing contents of Admin Mob." << endl;
+	  PrintPersonnelResources (pDict, pMob);
+	  pMob->Release();
+	  pMob=NULL;
+  } else
+  {
+	  cout << "Did not find Admin Mob" << endl;
+  }
   // done.
   pFile->Close ();
   pFile->Release();
@@ -107,7 +140,7 @@ bool extensionRead (const aafCharacter * filename)
   pHead=NULL;
   pDict->Release();
   pDict=NULL;
-  pMob->Release();
-  pMob=NULL;
+  pMobIter->Release();
+  pMobIter=NULL;
   return true;
 }
