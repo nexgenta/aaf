@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMDescriptorTest.cpp,v 1.6 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMDescriptorTest.cpp,v 1.7 2005/01/11 10:35:59 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -63,8 +63,8 @@ static const CAAFPCMDescriptorTestFixture  gTestData =
         0x01, 0x00, 0x10, 0x00 },
       0x13, 0x00, 0x00, 0x00,
       { 0xf6d43ded, 0xa5aa, 0x4a05,
-        0xa2, 0x84, 0x37, 0x8f,
-        0x94, 0x16, 0xd0, 0x56 } }, // sourceMobID
+      {  0xa2, 0x84, 0x37, 0x8f,
+        0x94, 0x16, 0xd0, 0x56 } } }, // sourceMobID
 
     8976,   // blockAlign;
     51,     // sequenceOffset;

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFScopeReferenceTest.cpp,v 1.15 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
+// $Id: CAAFScopeReferenceTest.cpp,v 1.16 2005/01/11 10:38:44 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -104,7 +104,7 @@ static void RemoveTestFile(const wchar_t* pFileName)
 static const aafMobID_t	kTestMobID = 
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xf41d3e80, 0x4939, 0x11d4, 0x92, 0x1e, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d }};
+{0xf41d3e80, 0x4939, 0x11d4, {0x92, 0x1e, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d }}};
 
 static const aafUInt32 kTestRelativeScope=0,kTestRelativeSlot=1;
 

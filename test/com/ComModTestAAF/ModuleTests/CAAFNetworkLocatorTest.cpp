@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFNetworkLocator
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFNetworkLocatorTest.cpp,v 1.30 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFNetworkLocatorTest.cpp,v 1.31 2005/01/11 10:31:31 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,7 +46,7 @@ using namespace std;
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xe4b74fbe, 0x0403, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0xe4b74fbe, 0x0403, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
 // Cross-platform utility to delete a file.
