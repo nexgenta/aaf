@@ -8,131 +8,153 @@
 \******************************************/
 
 
+#ifndef __ImplAAFPropValData_h__
+#include "ImplAAFPropValData.h"
+#endif
 
-
-
-#include "AAFStoredObjectIDs.h"
+#ifndef __ImplAAFPropValWeakRefVect_h__
+#include "ImplAAFPropValWeakRefVect.h"
+#endif
 
 #ifndef __ImplAAFTypeDefVariableArray_h__
 #include "ImplAAFTypeDefVariableArray.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+#include "ImplAAFObjectCreation.h"
+
 #include <assert.h>
 #include <string.h>
 
+extern "C" const aafClassID_t CLSID_AAFPropertyValue;
 
 ImplAAFTypeDefVariableArray::ImplAAFTypeDefVariableArray ()
-{}
+  : _ElementType  ( PID_TypeDefinitionVariableArray_ElementType,  "Element Type")
+{
+  _persistentProperties.put(_ElementType.address());
+}
+
 
 
 ImplAAFTypeDefVariableArray::~ImplAAFTypeDefVariableArray ()
 {}
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::Initialize (
-      aafUID_t *  /*pID*/,
-      ImplAAFTypeDef * /*pTypeDef*/,
-      wchar_t *  /*pTypeName*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefVariableArray::GetType (
-      ImplAAFTypeDef ** /*ppTypeDef*/)
+      ImplAAFTypeDef ** ppTypeDef)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
+  *ppTypeDef = _ElementType;
+  (*ppTypeDef)->AcquireReference ();
+
+  return AAFRESULT_SUCCESS;
 }
 
+
+
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFTypeDefVariableArray::Initialize (
+      aafUID_t *  pID,
+      ImplAAFTypeDef * pTypeDef,
+      wchar_t *  pTypeName)
+{
+  if (! pTypeName) return AAFRESULT_NULL_PARAM;
+  if (! pTypeDef)  return AAFRESULT_NULL_PARAM;
+  if (! pID)       return AAFRESULT_NULL_PARAM;
+
+  HRESULT hr;
+  hr = SetName (pTypeName);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  hr = SetAUID (pID);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  _ElementType = pTypeDef;
+
+  return AAFRESULT_SUCCESS;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefVariableArray::GetCount (
-      ImplAAFPropertyValue * /*pPropVal*/,
-      aafUInt32 *  /*pCount*/)
+      ImplAAFPropertyValue * pPropVal,
+      aafUInt32 *  pCount)
+{
+  ImplAAFTypeDef * ptd = NULL;
+  AAFRESULT hr;
+
+  if (! pPropVal) return AAFRESULT_NULL_PARAM;
+  if (! pCount) return AAFRESULT_NULL_PARAM;
+  hr = GetType (&ptd);
+  if (AAFRESULT_FAILED(hr)) return hr;
+  assert (ptd);
+  assert (ptd->IsFixedSize());
+  aafUInt32 elemSize = ptd->PropValSize();
+  ptd->ReleaseReference ();
+  aafUInt32 propSize;
+  assert (pPropVal);
+
+  ImplAAFPropValData * pvd = NULL;
+  pvd = dynamic_cast<ImplAAFPropValData *>(pPropVal);
+
+  assert (pvd);
+  hr = pvd->GetBitsSize (&propSize);
+  if (AAFRESULT_FAILED(hr)) return hr;
+  assert (pCount);
+  *pCount = propSize / elemSize;
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+// Override from AAFTypeDef
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTypeDefVariableArray::GetTypeCategory (eAAFTypeCategory_t *  pTid)
+{
+  if (!pTid) return AAFRESULT_NULL_PARAM;
+  *pTid = kAAFTypeCatVariableArray;
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTypeDefVariableArray::AppendElement
+(
+ ImplAAFPropertyValue * /*pInPropVal*/,
+ ImplAAFPropertyValue * /*pMemberPropVal*/
+)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::AppendElement (
-      ImplAAFPropertyValue * /*pInPropVal*/,
-      ImplAAFPropertyValue * /*pMemberPropVal*/)
+aafUInt32 ImplAAFTypeDefVariableArray::pvtCount
+(
+ ImplAAFPropertyValue * pInPropVal
+)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  assert (pInPropVal);
+  AAFRESULT hr;
+  aafUInt32 retval;
+  hr = GetCount (pInPropVal, &retval);
+  assert (AAFRESULT_SUCCEEDED(hr));
+  return retval;
 }
 
 
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::CreateValueFromValues (
-      ImplAAFPropertyValue ** /*ppElementValues*/,
-      aafUInt32  /*numElements*/,
-      ImplAAFPropertyValue ** /*ppPropVal*/)
+aafBool ImplAAFTypeDefVariableArray::IsFixedSize (void)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFFalse;
 }
 
 
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::CreateValueFromCArray (
-      aafMemPtr_t  /*pInitData*/,
-      aafUInt32  /*initDataSize*/,
-      ImplAAFPropertyValue ** /*ppPropVal*/)
+size_t ImplAAFTypeDefVariableArray::PropValSize (void)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::GetElementValue (
-      ImplAAFPropertyValue * /*pInPropVal*/,
-      aafUInt32  /*index*/,
-      ImplAAFPropertyValue ** /*ppOutPropVal*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::GetCArray (
-      ImplAAFPropertyValue * /*pPropVal*/,
-      aafMemPtr_t  /*pData*/,
-      aafUInt32  /*dataSize*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::SetElementValue (
-      ImplAAFPropertyValue * /*pPropVal*/,
-      aafUInt32  /*index*/,
-      ImplAAFPropertyValue * /*pMemberPropVal*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefVariableArray::SetCArray (
-      ImplAAFPropertyValue * /*pPropVal*/,
-      aafMemPtr_t  /*pData*/,
-      aafUInt32  /*dataSize*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
+  assert (0);
+  return 0; // not reached!
 }
 
 
 OMDEFINE_STORABLE(ImplAAFTypeDefVariableArray, AUID_AAFTypeDefVariableArray);
-
-
