@@ -1,16 +1,16 @@
 #c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
+#c*                                                 *
+#c* Advanced Authoring Format                       *
+#c*                                                 *
+#c* Copyright (c) 1998-2000 Avid Technology, Inc.   *
+#c*                                                 *
 #c\*************************************************/
 #startm .this-module 0
 AAFClassDef\
 #endm
 #c
 #startm .parent-module 0
-AAFDefObject\
+AAFMetaDefinition\
 #endm
 #c
 AD_HEAD
@@ -22,7 +22,7 @@ AD_IDL(//
 AD_STD_COMMENT_IFC_HEADER)
 AD_FORWARD_DECLARATION(EnumAAFPropertyDefs)
 AD_FORWARD_DECLARATION(AAFPropertyDef)
-AD_FORWARD_DECLARATION(AAFDefObject)
+AD_FORWARD_DECLARATION(AAFMetaDefinition)
 AD_FORWARD_DECLARATION(AAFTypeDef)
 AD_CLASS_UUID(dfbd6526, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
 
@@ -240,6 +240,23 @@ AD_XMETHOD1(GetParent,
 			AAFClassDef,
 			ppClassDef,
 			parent class definition,
+
+     Gets the Parent class for this object.  If there is no parent\,
+  // returns the result AAFRESULT_NO_PARENT.  The only class which has no parent will
+  // be AAFObject.
+  // 
+  // Succeeds if:
+  // - The ppClassDef pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pClassDef\))
+
+
+AD_XMETHOD1(IsRoot,
+			[out\, retval],
+			objPass,
+			aafBool*,
+			isRoot,
+			Is this a root \(base\) class,
 
      Gets the Parent class for this object.  If there is no parent\,
   // returns the NULL AUID.  The only class which has no parent will
