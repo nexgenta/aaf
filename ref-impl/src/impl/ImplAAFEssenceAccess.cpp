@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFMasterMob_h__
 #include "ImplAAFMasterMob.h"
@@ -310,7 +329,7 @@ ImplAAFEssenceAccess::Create (	  ImplAAFMasterMob *masterMob,
 			plug = NULL;
 			
 			CHECK(container->CreateEssenceStream(nameBuf, &fileMobUID, &_stream));
-			delete nameBuf;
+			delete [] nameBuf;
 			nameBuf = NULL;			
 			container->Release();
 			container = NULL;
@@ -387,7 +406,7 @@ ImplAAFEssenceAccess::Create (	  ImplAAFMasterMob *masterMob,
 		  implData->ReleaseReference();
 		implData = 0;
 		if(nameBuf != NULL)
-			delete nameBuf;
+			delete [] nameBuf;
 		if(edStream != NULL)
 			edStream->Release();
 		if(iAccess != NULL)
@@ -608,7 +627,7 @@ AAFRESULT STDMETHODCALLTYPE
 				plug = NULL;
 				
 				CHECK(container->CreateEssenceStream(nameBuf, &fileMobUID, &_stream));
-				delete nameBuf;
+				delete [] nameBuf;
 				nameBuf = NULL;			
 				container->Release();
 				container = NULL;
@@ -687,7 +706,7 @@ AAFRESULT STDMETHODCALLTYPE
 		  implData->ReleaseReference();
 		implData = 0;
 		if(nameBuf != NULL)
-			delete nameBuf;
+			delete [] nameBuf;
 		if(edStream != NULL)
 			edStream->Release();
 		if(iAccess != NULL)
@@ -781,7 +800,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 		plugins = ImplAAFContext::GetInstance()->GetPluginManager();
 		CHECK(plugins->MakeCodecFromEssenceDesc(essenceDescClass, &_codec));
-
+	
+		// Inialize the codec
+		CHECK(_codec->SetCompressionEnabled((kSDKCompressionEnable == compEnable) ? AAFTrue : AAFFalse));
 
 		iUnk = static_cast<IUnknown *> (this->GetContainer());
 		CHECK(iUnk->QueryInterface(IID_IAAFEssenceAccess, (void **)&iAccess));
@@ -919,7 +940,7 @@ AAFRESULT STDMETHODCALLTYPE
 					plug = NULL;
 				}
 
-				delete nameBuf;
+				delete [] nameBuf;
 				nameBuf = NULL;
 				pLoc->ReleaseReference();
 				pLoc = NULL;
@@ -1255,7 +1276,7 @@ AAFRESULT STDMETHODCALLTYPE
 					plug = NULL;
 				}
 
-				delete nameBuf;
+				delete [] nameBuf;
 				nameBuf = NULL;
 				pLoc->ReleaseReference();
 				pLoc = NULL;
