@@ -208,6 +208,7 @@ static void ReadAAFFile(aafWChar * pFileName)
 
 
   hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
+  check(hr);
   if (SUCCEEDED(hr))
   {
     IAAFHeader * pHeader = NULL;
@@ -238,7 +239,7 @@ static void ReadAAFFile(aafWChar * pFileName)
           pIdent = NULL;
         }
 
-        hr = pHeader->CountMobs(kAllMob, &numMobs);
+        hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
         check(hr); // display error message
         if (FAILED(hr))
           numMobs = 0;
@@ -250,7 +251,7 @@ static void ReadAAFFile(aafWChar * pFileName)
         if (SUCCEEDED(hr))
         {
           //!!!  aafSearchCrit_t    criteria;
-          //!!!  criteria.searchTag = kNoSearch;
+          //!!!  criteria.searchTag = kAAFNoSearch;
           hr = pHeader->GetMobs (NULL, &mobIter);
           check(hr); // display error message
         }
@@ -424,7 +425,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFHeader *        pHeader = NULL;
   IAAFDictionary *pDictionary = NULL;
   aafProductIdentification_t  ProductInfo;
-  //aafMobID_t          newMobID;
+  aafMobID_t          newMobID;
   
   // delete any previous test file before continuing...
   char chFileName[1000];
@@ -432,19 +433,21 @@ static void CreateAAFFile(aafWChar * pFileName)
   remove(chFileName);
 
   // Create a new file...
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
+
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"Make AVR Example";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
   
   check(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
-  #if 0
   check(pFile->GetHeader(&pHeader));
 
   // Get the AAF Dictionary so that we can create valid AAF objects.
@@ -466,33 +469,31 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFEssenceDescriptor *essenceDesc = NULL;
   aafRational_t  audioRate = { 44100, 1 };
   IAAFLocator    *pLocator = NULL;
+	IAAFComponent*		pComponent = NULL;
 
   for(test = 0; test < 5; test++)
   {
      // Create a source Mob with a FileDescriptor attached
-    check(pDictionary->CreateInstance(
-                defs.cdSourceMob(),
-                IID_IAAFSourceMob, 
-                (IUnknown **)&smob));
+    check(defs.cdSourceMob()->
+		  CreateInstance(IID_IAAFSourceMob, 
+						 (IUnknown **)&smob));
     check(smob->QueryInterface (IID_IAAFMob, (void **)&pMob));
     check(CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
     //newMobID.Data1 = test;
     check(pMob->SetMobID(newMobID));
     check(pMob->SetName(names[test]));
 
-    check(pDictionary->CreateInstance(
-              defs.cdFileDescriptor(),
-              IID_IAAFFileDescriptor, 
-              (IUnknown **)&fileDesc));
+    check(defs.cdFileDescriptor()->
+		  CreateInstance(IID_IAAFFileDescriptor, 
+						 (IUnknown **)&fileDesc));
     check(fileDesc->SetSampleRate(audioRate));
     check(fileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&essenceDesc));
 
     {
       HRESULT stat;
-      stat = pDictionary->CreateInstance(
-                  defs.cdNetworkLocator(),
-                  IID_IAAFLocator, 
-                  (IUnknown **)&pLocator);
+      stat = defs.cdNetworkLocator()->
+		CreateInstance(IID_IAAFLocator, 
+					   (IUnknown **)&pLocator);
       check (stat);
     }
     check(fileDesc->SetSampleRate(audioRate));
@@ -503,9 +504,13 @@ static void CreateAAFFile(aafWChar * pFileName)
     // Add some slots
     for(testSlot = 0; testSlot < 3; testSlot++)
     {
-       check(pDictionary->CreateInstance(defs.cdSourceClip(),
-               IID_IAAFSourceClip, 
-               (IUnknown **)&sclp));
+       check(defs.cdSourceClip()->
+			 CreateInstance(IID_IAAFSourceClip, 
+							(IUnknown **)&sclp));
+		 check(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 check(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
       check(pMob->AppendNewTimelineSlot
 			(editRate,
@@ -551,9 +556,11 @@ static void CreateAAFFile(aafWChar * pFileName)
   pDictionary->Release();
   pDictionary = NULL;
 
+	if (pComponent)
+		pComponent->Release();
+
   pHeader->Release();
   pHeader = NULL;
-  #endif
   check(pFile->Save());
   check(pFile->Close());
   if (pFile)
@@ -592,7 +599,7 @@ struct CAAFInitialize
 };
 
 
-main()
+int main()
 {
   CComInitialize comInit;
   CAAFInitialize aafInit;
@@ -602,8 +609,8 @@ main()
 
   printf("***Creating file %s\n", pFileName);
   CreateAAFFile(pwFileName);
-  // printf("***Re-opening file %s\n", pFileName);
-  // ReadAAFFile(pwFileName);
+  printf("***Re-opening file %s\n", pFileName);
+  ReadAAFFile(pwFileName);
   
   printf("Done\n");
   return(0);
