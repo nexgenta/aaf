@@ -3,32 +3,13 @@
 #ifndef __CAAFJPEGCodec_h__
 #define __CAAFJPEGCodec_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1999 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 // Include the interfaces that our plugin needs to support.
@@ -38,17 +19,91 @@
 #include "CAAFUnknown.h"
 
 
-#ifndef __CAAFJPEGDescriptorHelper_h__
-#include "CAAFJPEGDescriptorHelper.h"
-#endif
-
-#include "AAFUtils.h" // AAFByteOrder
-
-
-
 // ID for this Plugin's CoClass.
 EXTERN_C const CLSID CLSID_AAFJPEGCodec;
 
+
+class CJPEGDescriptorHelper
+{
+public:
+	CJPEGDescriptorHelper();
+	~CJPEGDescriptorHelper();
+	
+	HRESULT Initialize(IAAFSourceMob *filemob);
+	void Clear(void);
+
+	bool operator==(const CJPEGDescriptorHelper& rhs);
+	bool operator!=(const CJPEGDescriptorHelper& rhs);
+
+	//
+	// EssenceDescriptor methods:
+	//
+	STDMETHOD (GetNumLocators) (aafInt32 *  pCount);
+	STDMETHOD (AppendLocator) (IAAFLocator * pLocator);
+	STDMETHOD (PrependLocator) (IAAFLocator * pLocator);
+	STDMETHOD (EnumAAFAllLocators) (IEnumAAFLocators ** ppEnum);
+	//
+	// FileDescriptor methods:
+	//
+	STDMETHOD (SetLength) (aafLength_t  length);
+	STDMETHOD (GetLength) (aafLength_t *  pLength);
+	STDMETHOD (SetIsInContainer) (aafBool  isAAF);
+	STDMETHOD (GetIsInContainer) (aafBool *  pIsAAF);
+	STDMETHOD (SetSampleRate) (aafRational_t *  pRate);
+	STDMETHOD (GetSampleRate) (aafRational_t*  pRate);
+	STDMETHOD (SetContainerFormat) (aafUID_t *  pFormat);
+	STDMETHOD (GetContainerFormat) (aafUID_t *  pFormat);
+	//
+	// DigitalImageDescriptor methods:
+	//
+	STDMETHOD (SetCompression) (aafUID_t *  pCodecID);
+	STDMETHOD (GetCompression) (aafUID_t *  pCompression);
+	STDMETHOD (SetStoredView) (aafUInt32  StoredHeight, aafUInt32  StoredWidth);
+	STDMETHOD (GetStoredView) (aafUInt32 *  pStoredHeight, aafUInt32 *  pStoredWidth);
+	STDMETHOD (SetSampledView) (aafUInt32  SampledHeight, aafUInt32  SampledWidth, aafInt32  SampledXOffset, aafInt32  SampledYOffset);
+	STDMETHOD (GetSampledView) (aafUInt32 *  pSampledHeight, aafUInt32 *  pSampledWidth, aafInt32 *  pSampledXOffset, aafInt32 *  pSampledYOffset);
+	STDMETHOD (SetDisplayView) (aafUInt32  DisplayHeight, aafUInt32  DisplayWidth, aafInt32  DisplayXOffset, aafInt32  DisplayYOffset);
+	STDMETHOD (GetDisplayView) (aafUInt32 *  pDisplayHeight, aafUInt32 *  pDisplayWidth, aafInt32 *  pDisplayXOffset, aafInt32 *  pDisplayYOffset);
+	STDMETHOD (SetFrameLayout) (aafFrameLayout_t  FrameLayout);
+	STDMETHOD (GetFrameLayout) (aafFrameLayout_t *  pFrameLayout);
+	STDMETHOD (SetVideoLineMap) (aafUInt32  numberElements, aafInt32 *  pVideoLineMap);
+	STDMETHOD (GetVideoLineMap) (aafUInt32  numberElements, aafInt32 *  pVideoLineMap);
+	STDMETHOD (GetVideoLineMapSize) (aafUInt32 *  pNumberElements);
+	STDMETHOD (SetImageAspectRatio) (aafRational_t  ImageAspectRatio);
+	STDMETHOD (GetImageAspectRatio) (aafRational_t *  pImageAspectRatio);
+	STDMETHOD (SetAlphaTransparency) (aafAlphaTransparency_t  AlphaTransparency);
+	STDMETHOD (GetAlphaTransparency) (aafAlphaTransparency_t *  pAlphaTransparency);
+	STDMETHOD (SetGamma) (aafRational_t  Gamma);
+	STDMETHOD (GetGamma) (aafRational_t *  pGamma);
+	STDMETHOD (SetImageAlignmentFactor) (aafInt32  ImageAlignmentFactor);
+	STDMETHOD (GetImageAlignmentFactor) (aafInt32 *  pImageAlignmentFactor);
+	//
+	// CDCIDescriptor methods:
+	//
+	STDMETHOD (SetComponentWidth) (aafInt32  ComponentWidth);
+	STDMETHOD (GetComponentWidth) (aafInt32 *  pComponentWidth);
+	STDMETHOD (SetHorizontalSubsampling) (aafUInt32  HorizontalSubsampling);
+	STDMETHOD (GetHorizontalSubsampling) (aafUInt32 *  pHorizontalSubsampling);
+	STDMETHOD (SetColorSiting) (aafColorSiting_t  ColorSiting);
+	STDMETHOD (GetColorSiting) (aafColorSiting_t *  pColorSiting);
+	STDMETHOD (SetBlackReferenceLevel) (aafUInt32  BlackReferenceLevel);
+	STDMETHOD (GetBlackReferenceLevel) (aafUInt32 *  pBlackReferenceLevel);
+	STDMETHOD (SetWhiteReferenceLevel) (aafUInt32  WhiteReferenceLevel);
+	STDMETHOD (GetWhiteReferenceLevel) (aafUInt32 *  pWhiteReferenceLevel);
+	STDMETHOD (SetColorRange) (aafUInt32  ColorRange);
+	STDMETHOD (GetColorRange) (aafUInt32 *  pColorRange);
+	STDMETHOD (SetPaddingBits) (aafInt16  PaddingBits);
+	STDMETHOD (GetPaddingBits) ( aafInt16 *  pPaddingBits);
+
+
+private:
+	IUnknown *_filemob_unk; // used for equality testing.
+	IAAFSourceMob *_filemob;
+	IAAFEssenceDescriptor *_edes;
+	IAAFFileDescriptor *_filedes;
+	IAAFDigitalImageDescriptor *_dides;
+	IAAFCDCIDescriptor *_cdcides;  // Compressed digital image descriptor
+};
 
 
 
@@ -312,62 +367,12 @@ public:
 
 private:
 	void SetEssenceStream(IAAFEssenceStream *stream);
-	void SetNumberOfSamples(const aafLength_t& numberOfSamples);
-	void SetCurrentIndex(aafUInt32 currentIndex);
-	void SetWriteIndex(aafUInt32 writeIndex);
-
-	typedef struct _aafCompressionParams
-	{
-		aafUInt32 imageWidth;
-		aafUInt32 imageHeight;
-
-		aafColorSpace_t colorSpace;
-		aafUInt32 horizontalSubsampling;
-		aafUInt32 verticalSubsampling;
-
-		aafUInt32 blackReferenceLevel;
-		aafUInt32 whiteReferenceLevel;
-		aafUInt32 colorRange;
-
-		int quality; 
-
-		aafUInt32 rowBytes;
-		aafDataBuffer_t buffer;
-		aafUInt32 bufferSize;
-
-	} aafCompressionParams;
-
-	// Compress a single image data from the given buffer. Return the actual
-	// number of bytes written.
-	HRESULT CompressImage(const aafCompressionParams& param);
-
-	// Decompress a single image from the current position in the stream returning
-	// the image data in buffer and the actual number of bytes written. Note: bufLen must
-	// be large enough to hold all of the decompressed data
-	HRESULT DecompressImage(aafCompressionParams& param);
-
-	// Utility to get the current offset in the stream and add
-	// it the the sample index
-	void AddNewCompressedSample(); // throw HRESULT
-
-	// SampleIndex access methods : may be temporary. We need these methods
-	// to read/write the index because the SampleIndex property in EssenceData
-	// is not implemented. Also, these methods will allow all essence streams
-	// to be treated the sample, whether in an AAF file or not.
-
-	HRESULT ReadNumberOfSamples(IAAFEssenceStream *stream,
-		                         aafLength_t& numberOfSamples);
-	HRESULT AllocateSampleIndex(const aafLength_t& numberOfSamples);
-	HRESULT ReadSampleIndex();
-	HRESULT WriteSampleIndex();
 
 private:
-	AAFByteOrder		_nativeByteOrder;
-
 	IAAFEssenceAccess	*_access;
 	IAAFEssenceStream	*_stream; // stream for jpeg sample data.
 
-	CAAFJPEGDescriptorHelper _descriptorHelper;
+	CJPEGDescriptorHelper _descriptorHelper;
 
 	aafMediaOpenMode_t _openMode; // Either read-only or for append.
 	aafCompressEnable_t _compressEnable;   // if true then should receive and deliver uncompressed data.
@@ -398,7 +403,7 @@ private:
 	aafFrameLayout_t _frameLayout;
 
 	aafUInt32 _videoLineMapSize; // s/b 2, VideoLineMap
-	aafVideoLineMap_t  _videoLineMap;
+	aafInt32  _videoLineMap[2];
 
 	aafRational_t _imageAspectRatio;
 	aafAlphaTransparency_t _alphaTransparency;
@@ -416,18 +421,11 @@ private:
 	aafInt16 _paddingBits;
 
 	// Misc. data copied from omf codec
-	aafUInt32 _imageHeight; 
-	aafUInt32 _imageWidth;
 	aafUInt32 _fileBytesPerSample;
 	aafBool _descriptorFlushed;
-	aafUInt32 _startingIndex; // index that we cannot write before...
-	aafUInt32 _currentIndex;
-	aafUInt32 _writeIndex;
+	aafInt32 _currentIndex;
 	aafUInt32 _maxIndex;
-	aafPosition_t *_sampleIndex;
-
-	aafColorSpace_t _pixelFormat;
-	aafCompArray_t _compArray;
+	aafPosition_t *_frameIndex;
 
 	//jpeg_tables     compressionTables[3];
 	//aafBool _customTables;
@@ -437,11 +435,6 @@ private:
 	aafInt16 _bitsPerPixelAvg;
 	aafInt32 _memBytesPerSample;
 	aafUInt32 _bitsPerSample;
-
-	// Copied from WaveCodec...(may be renamed...)
-	aafLength_t	_numberOfSamples; /* was _sampleFrames in WaveCodec) */
-
-	aafUInt16 _padBytesPerRow;
 
 
 	bool _headerLoaded; // has the jpeg header been loaded?
