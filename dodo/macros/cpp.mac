@@ -95,8 +95,8 @@
 #c Argument: class name
 #c
 #startm AD_FORWARD_DECLARATION 01
-#ifndef _%01_h_
-#include "%01.h";
+#ifndef __%01_h__
+#include "%01.h"
 #endif
 #endm
 
@@ -133,16 +133,26 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c AAFTypes support for IDL
+#c
+#c Arguments: none
+#c
+#startm AD_TYPES_HEAD 00
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Starts a class definition
 #c
 #c Arguments: none
 #c
 #startm AD_CLASS_BEGIN 00
-#ifndef _.this-module_h_
+#ifndef __.this-module_h__
 #include ".this-module.h"
 #endif
 
-#ifndef _Impl.this-module_h_
+#ifndef __Impl.this-module_h__
 #include "Impl.this-module.h"
 #endif
 
@@ -183,11 +193,11 @@
 #c Arguments: none
 #c
 #startm AD_ROOT_CLASS_BEGIN 00
-#ifndef _.this-module_h_
+#ifndef __.this-module_h__
 #include ".this-module.h"
 #endif
 
-#ifndef _Impl.this-module_h_
+#ifndef __Impl.this-module_h__
 #include "Impl.this-module.h"
 #endif
 
@@ -1000,6 +1010,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
+%01-cpp(.this-module)
 #endm
 
 
@@ -1048,8 +1059,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 11: method description
 #c
 #startm AD_XCONSTRUCTOR2 11
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::.this-module (%03 .%02-indirection %04,
+.this-module::.this-module (%03 .%02-indirection %04,
 								%08 .%07-indirection %09)
 {
 #ifdef BOB_TEST
@@ -1085,8 +1095,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 16: method description
 #c
 #startm AD_XCONSTRUCTOR3 16
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::.this-module (%03 .%02-indirection %04,
+.this-module::.this-module (%03 .%02-indirection %04,
 								%08 .%07-indirection %09,
 								%13 .%12-indirection %14)
 {
@@ -1127,8 +1136,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c Macro Arg 21: method description
 #c
 #startm AD_XCONSTRUCTOR4 21
-AAFRESULT STDMETHODCALLTYPE
-    .this-module::.this-module (%03 .%02-indirection %04,
+.this-module::.this-module (%03 .%02-indirection %04,
 								%08 .%07-indirection %09,
 								%13 .%12-indirection %14,
 								%18 .%17-indirection %19)

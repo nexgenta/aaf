@@ -26,7 +26,7 @@
 #c Argument: Base filename
 #c
 #startm AD_INCLUDE 01
-#ifndef _%01_h_
+#ifndef __%01_h__
 #include "%01.h"
 #endif
 #endm
@@ -43,6 +43,8 @@
 #c TomR:980716: Added
 #c
 #startm AD_TYPES_BEGIN 11
+#ifndef __.this-module_h__
+#define __.this-module_h__
 #endm
 
 
@@ -55,7 +57,7 @@
 #c Arguments: none
 #c
 #startm AD_TYPES_END 00
-#endif // _.this-module_h_
+#endif // __.this-module_h__
 #endm
 
 
@@ -93,7 +95,7 @@ class %01; \
 #c Argument: class name
 #c
 #startm AD_FORWARD_DECLARATION 01
-	class %01;
+class %01;
 #endm
 
 #ccccccccccccccccccccccccccc
@@ -123,8 +125,18 @@ class %01; \
 #startm AD_HEAD 00
 //@doc
 //@class    .this-module | Implementation class for .this-module
-#ifndef _.this-module_h_
-#define _.this-module_h_
+#ifndef __.this-module_h__
+#define __.this-module_h__
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c AAFTypes support for IDL
+#c
+#c Arguments: none
+#c
+#startm AD_TYPES_HEAD 00
 #endm
 
 
@@ -135,7 +147,7 @@ class %01; \
 #c Arguments: none
 #c
 #startm AD_CLASS_BEGIN 00
-#ifndef _.parent-module_h_
+#ifndef __.parent-module_h__
 #include ".parent-module.h"
 #endif
 
@@ -164,6 +176,10 @@ class .this-module : public .parent-module
 #c Arguments: none
 #c
 #startm AD_ROOT_CLASS_BEGIN 00
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
+#endif
+
 //
 // Forward declaration
 //
@@ -615,9 +631,13 @@ public:
 #c Arguments: none
 #c
 #startm AD_CLASS_END 00
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/.this-moduleTest.cpp.
+  static AAFRESULT test();
 };
 
-#endif // ! _.this-module_h_
+#endif // ! __.this-module_h__
 #endm
 
 
@@ -628,6 +648,11 @@ public:
 #c Arguments: none
 #c
 #startm AD_ROOT_CLASS_END 00
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/.this-moduleTest.cpp.
+  static AAFRESULT test();
+
 protected:
 
   Impl.this-module * GetRepObject ();
@@ -640,7 +665,7 @@ private:
 
 };
 
-#endif // ! _.this-module_h_
+#endif // ! __.this-module_h__
 #endm
 
 
@@ -651,7 +676,7 @@ private:
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
-%01
+%01-h
 #endm
 
 
