@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPluginUtil.h,v 1.7 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxPluginUtil.h,v 1.7.2.1 2004/07/14 14:43:42 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -88,16 +88,9 @@ public:
 	}											\
 	return S_OK;
 
-#endif
-
 
 #define AX_PLUGIN_CHECK_NULL_PARAM( PNTR ) \
 { if ( !(PNTR) ) { CHECK_HRESULT( AAFRESULT_NULL_PARAM ) } }
 
 
-
-
-
-
-
-
+#endif // __AxPluginUtil_h__
