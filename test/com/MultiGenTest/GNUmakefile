@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2004/03/24 03:35:32 creederickson Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -57,7 +57,7 @@ all : $(AAFSDKBINDIR)/MultiGenTest$(EXE)
 # $(AAFSDKBINDIR)/MultiGenTest$(EXE) : $(CXXOBJS) MultiGenTests
 $(AAFSDKBINDIR)/MultiGenTest$(EXE) : $(CXXOBJS) $(CXXOBJS2)
 	$(LD) $(CXXOBJS) $(CXXOBJS2) \
-	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
+	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
 
 
 #.PHONY : MultiGenTests

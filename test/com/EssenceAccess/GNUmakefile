@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.7 2004/03/18 18:41:56 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.8 2004/03/24 03:35:07 creederickson Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,7 +42,7 @@ all : $(OBJDIR) $(AAFSDKBINDIR)/EssenceAccess$(EXE)
 
 
 $(AAFSDKBINDIR)/EssenceAccess$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid -o $@
+	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) -o $@
 
 
 .PHONY : clean

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2004/03/24 03:34:18 creederickson Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,7 @@ all : $(AAFSDKBINDIR)/ComModAAF$(EXE)
 # $(AAFSDKBINDIR)/ComModAAF$(EXE) : $(CXXOBJS) ModuleTests
 $(AAFSDKBINDIR)/ComModAAF$(EXE) : $(CXXOBJS) $(CXXOBJS2)
 	$(LD) $(CXXOBJS) $(CXXOBJS2) \
-	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
+	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
 
 
 #.PHONY : ModuleTests
