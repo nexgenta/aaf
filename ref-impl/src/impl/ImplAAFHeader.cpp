@@ -249,9 +249,11 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFContentStorage *cstore = NULL;
 
     if (! pMob)
-	  {
 		return AAFRESULT_NULL_PARAM;
-	  }
+	  
+ 	if (! pMob->attached())
+		return AAFRESULT_MOB_NOT_FOUND;	
+
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
@@ -357,9 +359,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
     ImplAAFContentStorage *cstore = NULL;
 	if (! pEssenceData)
-	{
 		return AAFRESULT_NULL_PARAM;
-	}
+	
+	if (! pEssenceData->attached())
+		return AAFRESULT_ESSENCE_NOT_FOUND;
+
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
@@ -685,11 +689,6 @@ AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 	return (AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFHeader::LoadMobTables(void)
-{
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->LoadMobTables());
-}
 
 // trr - NOTE: Eventhough this method returns a reference counted object it
 // does NOT bump the reference count. Currently only other file that calls
