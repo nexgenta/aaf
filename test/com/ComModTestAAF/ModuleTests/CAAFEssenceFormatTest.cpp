@@ -31,6 +31,7 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -330,8 +331,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader*		pHeader = NULL;
-	IAAFMob*		pMob = NULL;
-	IAAFMasterMob*		pMasterMob = NULL;
 	HRESULT			hr = S_OK;
 	
 	
@@ -376,7 +375,9 @@ extern "C" HRESULT CAAFEssenceFormat_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFEssenceFormat_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFEssenceFormat_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 	
 	// When all of the functionality of this class is tested, we can return success.
