@@ -27,13 +27,16 @@
 
 // @doc OMINTERNAL
 
+#include "OMAssertions.h"
+
 // class OMVectorElement<ReferencedObject>
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMVectorElement
 
   // @mfunc Constructor.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
 template <typename ReferencedObject>
 OMVectorElement<ReferencedObject>::OMVectorElement(void)
-  : _pointer(0)
+: _pointer(0)
 {
   TRACE("OMVectorElement<ReferencedObject>::OMVectorElement");
 }
@@ -44,7 +47,7 @@ OMVectorElement<ReferencedObject>::OMVectorElement(void)
 template <typename ReferencedObject>
 OMVectorElement<ReferencedObject>::OMVectorElement(
                                                const ReferencedObject* pointer)
-  : _pointer(const_cast<ReferencedObject*>(pointer))
+: _pointer(const_cast<ReferencedObject*>(pointer))
 {
   TRACE("OMVectorElement<ReferencedObject>::OMVectorElement");
 }
@@ -82,7 +85,7 @@ OMVectorElement<ReferencedObject>::operator= (
   TRACE("OMVectorElement<ReferencedObject>::operator=");
 
   if (*this == rhs) {
-	return *this; // early return !
+    return *this; // early return !
   }
 
   _pointer = rhs._pointer;
@@ -150,6 +153,7 @@ ReferencedObject* OMVectorElement<ReferencedObject>::pointer(void) const
 }
 
 // class OMSetElement<UniqueIdentification, ReferencedObject>
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMSetElement
 
   // @mfunc Constructor.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
@@ -207,7 +211,7 @@ OMSetElement<UniqueIdentification, ReferencedObject>::operator= (
   TRACE("OMSetElement<UniqueIdentification, ReferencedObject>::operator=");
 
   if (*this == rhs) {
-	return *this; // early return !
+    return *this; // early return !
   }
 
   OMVectorElement<ReferencedObject>::operator=(rhs);
@@ -247,6 +251,7 @@ OMSetElement<UniqueIdentification, ReferencedObject>::identification(
 }
 
 // class OMContainerElement<ObjectReference, ReferencedObject>
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMContainerElement
 
   // @mfunc Constructor.
   //   @tcarg class | ObjectReference | The type of the contained object
@@ -321,7 +326,7 @@ OMContainerElement<ObjectReference, ReferencedObject>::operator= (
   TRACE("OMContainerElement<ObjectReference, ReferencedObject>::operator=");
 
   if (*this == rhs) {
-	return *this; // early return !
+    return *this; // early return !
   }
 
   _reference = rhs._reference;
@@ -453,7 +458,15 @@ OMContainerElement<ObjectReference, ReferencedObject>::getValue(void) const
   TRACE("OMContainerElement<ObjectReference, ReferencedObject>::getValue");
   OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
 
-  return _reference.getValue();
+  OMStorable* p = _reference.getValue();
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
+  return result;
 }
 
   // @mfunc Set the value of this <c OMContainerElement>.
@@ -471,7 +484,15 @@ OMContainerElement<ObjectReference, ReferencedObject>::setValue(
   TRACE("OMContainerElement<ObjectReference, ReferencedObject>::setValue");
   OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
 
-  return _reference.setValue(value);
+  OMStorable* p = _reference.setValue(value);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
+  return result;
 }
 
   // @mfunc The value of this <c OMContainerElement> as a pointer.
@@ -489,7 +510,15 @@ OMContainerElement<ObjectReference, ReferencedObject>::pointer(void) const
   TRACE("OMContainerElement<ObjectReference, ReferencedObject>::pointer");
   OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
 
-  return _reference.pointer();
+  OMStorable* p = _reference.pointer();
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
+  return result;
 }
 
 // class OMStrongReferenceVectorElement<ReferencedObject>
@@ -500,8 +529,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::pointer(void) const
 template <typename ReferencedObject>
 OMStrongReferenceVectorElement<ReferencedObject>::
                                            OMStrongReferenceVectorElement(void)
-  : OMContainerElement<OMStrongObjectReference<ReferencedObject>,
-                       ReferencedObject>(), _localKey(0)
+: OMContainerElement<OMStrongObjectReference, ReferencedObject>(),
+  _localKey(0)
 {
   TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
                                              "OMStrongReferenceVectorElement");
@@ -521,10 +550,9 @@ OMStrongReferenceVectorElement<ReferencedObject>::
                                                           OMProperty* property,
                                                           const wchar_t* name,
                                                           OMUInt32 localKey)
-  : OMContainerElement<OMStrongObjectReference<ReferencedObject>,
-                       ReferencedObject>(
-                    OMStrongObjectReference<ReferencedObject>(property, name)),
-    _localKey(localKey)
+: OMContainerElement<OMStrongObjectReference, ReferencedObject>(
+                                      OMStrongObjectReference(property, name)),
+  _localKey(localKey)
 {
   TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
                                              "OMStrongReferenceVectorElement");
@@ -538,8 +566,8 @@ template <typename ReferencedObject>
 OMStrongReferenceVectorElement<ReferencedObject>::
                                                 OMStrongReferenceVectorElement(
                    const OMStrongReferenceVectorElement<ReferencedObject>& rhs)
-  : OMContainerElement<OMStrongObjectReference<ReferencedObject>,
-                       ReferencedObject>(rhs), _localKey(rhs._localKey)
+: OMContainerElement<OMStrongObjectReference, ReferencedObject>(rhs),
+  _localKey(rhs._localKey)
 {
   TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
                                              "OMStrongReferenceVectorElement");
@@ -572,10 +600,10 @@ OMStrongReferenceVectorElement<ReferencedObject>::operator= (
   TRACE("OMStrongReferenceVectorElement<ReferencedObject>::operator=");
 
   if (*this == rhs) {
-	return *this; // early return !
+    return *this; // early return !
   }
 
-  OMContainerElement<OMStrongObjectReference<ReferencedObject>,
+  OMContainerElement<OMStrongObjectReference,
                      ReferencedObject>::operator=(rhs);
   _localKey = rhs._localKey;
   return *this;
@@ -594,7 +622,7 @@ bool OMStrongReferenceVectorElement<ReferencedObject>::operator== (
 {
   TRACE("OMStrongReferenceVectorElement<ReferencedObject>::operator==");
 
-  bool result = OMContainerElement<OMStrongObjectReference<ReferencedObject>,
+  bool result = OMContainerElement<OMStrongObjectReference,
                                    ReferencedObject>::operator==(rhs);
   if (result) {
     if (_localKey != rhs._localKey) {
@@ -709,7 +737,7 @@ OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
                                                                   "operator=");
 
   if (*this == rhs) {
-	return *this; // early return !
+    return *this; // early return !
   }
 
   OMStrongReferenceVectorElement<ReferencedObject>::operator=(rhs);
@@ -866,7 +894,7 @@ OMWeakReferenceVectorElement<ReferencedObject>::operator= (
   TRACE("OMWeakReferenceVectorElement<ReferencedObject>::operator=");
 
   if (*this == rhs) {
-	return *this; // early return !
+    return *this; // early return !
   }
 
   OMContainerElement<OMWeakObjectReference<ReferencedObject>,
@@ -983,7 +1011,7 @@ OMWeakReferenceSetElement<ReferencedObject>::operator= (
   TRACE("OMWeakReferenceSetElement<ReferencedObject>::operator=");
 
   if (*this == rhs) {
-	return *this; // early return !
+    return *this; // early return !
   }
 
   OMContainerElement<OMWeakObjectReference<ReferencedObject>,
