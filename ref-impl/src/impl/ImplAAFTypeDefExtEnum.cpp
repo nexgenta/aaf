@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying 
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted, 
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -40,6 +35,10 @@
 #include "ImplAAFDictionary.h"
 #endif
 
+#ifndef __ImplAAFPropertyValue_h__
+#include "ImplAAFPropertyValue.h"
+#endif
+
 #ifndef __AAFTypeDefUIDs_h__
 #include "AAFTypeDefUIDs.h"
 #endif
@@ -48,11 +47,7 @@
 
 #include <assert.h>
 #include <string.h>
-
-
-#if defined(_MAC) || defined(macintosh)
-#include <wstring.h>
-#endif
+#include <wchar.h>
 
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
@@ -190,6 +185,7 @@ ImplAAFTypeDefExtEnum::CreateValueFromName (
 	return hr;
 }
 
+// Note: The type of input pValue is validated in GetAUIDValue().
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefExtEnum::GetNameFromValue (
 										 ImplAAFPropertyValue * pValue,
@@ -203,8 +199,11 @@ ImplAAFTypeDefExtEnum::GetNameFromValue (
 		return AAFRESULT_NULL_PARAM;
 	
 	//Extract the AUID value from the PV;  use existing method on AUID!
+	// pValue type is validated in GetAUIDValue().
 	aafUID_t val = {0};
-	GetAUIDValue(pValue, &val);
+	HRESULT	 hr = GetAUIDValue(pValue, &val);
+	if( AAFRESULT_FAILED( hr ) )
+	    return hr;
 	
 	//Use an existing method on AUID, to find out the name!!! 
 	return (GetNameFromAUID(val, pName, bufSize));	
@@ -212,6 +211,7 @@ ImplAAFTypeDefExtEnum::GetNameFromValue (
 
 
 
+// Note: The type of input pValue is validated in GetAUIDValue().
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefExtEnum::GetNameBufLenFromValue (
 											   ImplAAFPropertyValue * pValue,
@@ -223,9 +223,12 @@ ImplAAFTypeDefExtEnum::GetNameBufLenFromValue (
 	if (! pLen)
 		return AAFRESULT_NULL_PARAM;
 	
-	//Extract the AUID value from the PV; use existing method on AUID!
+	//Extract the AUID value from the PV;  use existing method on AUID!
+	// pValue type is validated in GetAUIDValue().
 	aafUID_t val = {0};
-	GetAUIDValue(pValue, &val);
+	HRESULT	 hr = GetAUIDValue(pValue, &val);
+	if( AAFRESULT_FAILED( hr ) )
+	    return hr;
 	
 	//Use an existing method on AUID, to find out the Buffer Length!!! 
 	return (GetNameBufLenFromAUID(val, pLen));
@@ -332,6 +335,15 @@ ImplAAFTypeDefExtEnum::GetAUIDValue (
 	if (! pValueOut)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	spPropType;
+	if( AAFRESULT_FAILED( pPropValIn->GetType( &spPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (spPropType);
+	if( (ImplAAFTypeDef *)spPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
 	AAFRESULT hr;
 	aafUID_t retval;
 	
@@ -364,6 +376,16 @@ ImplAAFTypeDefExtEnum::SetAUIDValue (
 	if (! pPropValToSet)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	spPropType;
+	if( AAFRESULT_FAILED( pPropValToSet->GetType( &spPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (spPropType);
+	if( (ImplAAFTypeDef *)spPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
+
 	AAFRESULT hr;
 	
 	// Call this method to find out if this is a legal value
