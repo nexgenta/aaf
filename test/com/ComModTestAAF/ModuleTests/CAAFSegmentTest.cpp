@@ -1,31 +1,12 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFSegment
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #include "AAF.h"
 
@@ -36,8 +17,6 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 #include "AAFUtils.h"
-
-#include "CAAFBuiltinDefs.h"
 
 static aafWChar *slotName = L"SLOT1";
 static aafInt32 fadeInLen  = 1000;
@@ -83,12 +62,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*  pDictionary = NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFMob*					pReferencedMob = NULL;
-	IAAFTimelineMobSlot*		newSlot = NULL;
+	IAAFMobSlot*				newSlot = NULL;
 	IAAFSegment*				seg = NULL;
 	aafRational_t				audioRate = { 44100, 1 };
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID, referencedMobID;
+	aafUID_t					newMobID, referencedMobID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -104,51 +83,44 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	try
 	{
-	    // Remove the previous test file if any.
-	    RemoveTestFile(pFileName);
+    // Remove the previous test file if any.
+    RemoveTestFile(pFileName);
 
-		// Create the file
+    // Create the file
 		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
  
-		// We can't really do anthing in AAF without the header.
+    // We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 
-		// Get the AAF Dictionary so that we can create valid AAF objects.
-		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
+    // Get the AAF Dictionary so that we can create valid AAF objects.
+    checkResult(pHeader->GetDictionary(&pDictionary));
  		
 		//Make the MOB to be referenced
-		checkResult(pDictionary->CreateInstance(defs.cdMasterMob(),
+		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
 								 IID_IAAFMob, 
 								 (IUnknown **)&pReferencedMob));
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
-		checkResult(pReferencedMob->SetMobID(referencedMobID));
+		checkResult(pReferencedMob->SetMobID(&referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
 
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(defs.cdCompositionMob(),
+		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
 								 IID_IAAFMob, 
 								 (IUnknown **)&pMob));
 		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(pMob->SetMobID(&newMobID));
 		checkResult(pMob->SetName(L"AAFSourceClipTest"));
 
 		// Create a SourceClip
-		checkResult(pDictionary->CreateInstance(defs.cdSourceClip(),
+		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
 								 IID_IAAFSegment, 
 								 (IUnknown **)&seg));
 								 		
-		aafRational_t editRate = { 0, 1};
-		checkResult(pMob->AppendNewTimelineSlot (editRate,
-												 seg,
-												 1,
-												 slotName,
-												 0,
-												 &newSlot));
+		checkResult(pMob->AppendNewSlot (seg, 1, slotName, &newSlot));
 
-		checkResult(pHeader->AddMob(pMob));
-		checkResult(pHeader->AddMob(pReferencedMob));
+		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pHeader->AppendMob(pReferencedMob));
 	}
   catch (HRESULT& rResult)
   {
@@ -226,19 +198,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
 		checkExpression(2 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over all Composition Mobs
 		criteria.searchTag = kByMobKind;
 		criteria.tags.mobKind = kCompMob;
-		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
+		checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
 		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
-			checkResult(pMob->CountSlots(&numSlots));
+			checkResult(pMob->GetNumSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
 
-			checkResult(pMob->GetSlots(&pSlotIter));
+			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
 			while (AAFRESULT_SUCCESS == pSlotIter->NextOne(&pSlot))
 			{
 				// The segment should be a source clip...
