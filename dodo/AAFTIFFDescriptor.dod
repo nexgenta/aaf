@@ -1,9 +1,16 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTIFFDescriptor\
 #endm
 #c
 #startm .parent-module 0
-AAFDigitalImageDescriptor\
+AAFFileDescriptor\
 #endm
 #c
 #c #import ./AAFDigitalImageDescriptor.exp
@@ -15,7 +22,6 @@ AD_INCLUDE(AAFTypes)
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
