@@ -1,31 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDefinitionObject
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -36,14 +18,13 @@
 
 
 
-#include "AAF.h"
-#include "AAFResult.h"
+#include "CAAFCDCIDescriptor.h"
+#include "CAAFCDCIDescriptor.h"
+#ifndef __CAAFCDCIDescriptor_h__
+#error - improperly defined include guard
+#endif
 
 #include <iostream.h>
-#include <stdio.h>
-
-#include "AAFStoredObjectIDs.h"
-#include "AAFDefUIDs.h"
 
 // Default testing values for CDCI
 #define kCWTest		8
@@ -113,19 +94,6 @@ static HRESULT SetDigitalImageDescProps(IAAFCDCIDescriptor* pDesc)
 	return AAFRESULT_SUCCESS;
 }
 
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
-
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
 						   IAAFFile**			ppFile,
@@ -135,26 +103,35 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFCDCIDescriptor Test";
+	ProductInfo.productName = L"Make AVR Example";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	*ppFile = NULL;
+	hr = CoCreateInstance(CLSID_AAFFile,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFFile, 
+						   (void **)ppFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+    hr = (*ppFile)->Initialize();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	switch (mode)
 	{
 	case kMediaOpenReadOnly:
-		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
+		hr = (*ppFile)->OpenExistingRead(pFileName, 0);
 		break;
 
 	case kMediaOpenAppend:
-		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
+		hr = (*ppFile)->OpenNewModify(pFileName, 0, &ProductInfo);
 		break;
 
 	default:
@@ -164,11 +141,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
@@ -187,94 +161,84 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
-	IAAFDictionary*	pDictionary = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
 	aafUID_t		newUID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
-
-
-  // Remove the previous test file if any.
-  RemoveTestFile(pFileName);
 
 	// Create the AAF file
 	hr = OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader);
 	if (FAILED(hr))
 		return hr;
 
-  // Get the AAF Dictionary so that we can create valid AAF objects.
-  hr = pHeader->GetDictionary(&pDictionary);
+	// Create a source mob
+	hr = CoCreateInstance(CLSID_AAFSourceMob,
+						NULL, 
+						CLSCTX_INPROC_SERVER, 
+						IID_IAAFSourceMob, 
+						(void **)&pSourceMob);
 	if (SUCCEEDED(hr))
-  {
-	  // Create a source mob
-	  hr = pDictionary->CreateInstance(&AUID_AAFSourceMob,
-						  IID_IAAFSourceMob, 
-						  (IUnknown **)&pSourceMob);
-	  if (SUCCEEDED(hr))
-	  {
-		  IAAFMob*	pMob = NULL;
+	{
+		IAAFMob*	pMob = NULL;
 
-		  hr = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
-		  if (SUCCEEDED(hr))
-		  {
-			  IAAFCDCIDescriptor*	pCDCIDesc = NULL;
+		hr = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
+		if (SUCCEEDED(hr))
+		{
+			IAAFCDCIDescriptor*	pCDCIDesc = NULL;
 
-			  CoCreateGuid((GUID *)&newUID);
-			  pMob->SetMobID(&newUID);
-			  pMob->SetName(L"CDCIDescriptorTest");
-			  hr = pDictionary->CreateInstance(&AUID_AAFCDCIDescriptor,
-									  IID_IAAFCDCIDescriptor, 
-									  (IUnknown **)&pCDCIDesc);		
-			  if (SUCCEEDED(hr))
-			  {
-				  // Add all CDCI properties
-				  hr = pCDCIDesc->SetComponentWidth(kCWTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetHorizontalSubsampling(kHSTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetColorSiting(kCSTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetBlackReferenceLevel(kBRLTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetWhiteReferenceLevel(kWRLTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetColorRange(kCRTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetPaddingBits(kPBTest);
-				  if (SUCCEEDED(hr)) hr = SetDigitalImageDescProps(pCDCIDesc);
+			CoCreateGuid((GUID *)&newUID);
+			pMob->SetMobID(&newUID);
+			pMob->SetName(L"CDCIDescriptorTest");
+			hr = CoCreateInstance(CLSID_AAFCDCIDescriptor,
+									NULL, 
+									CLSCTX_INPROC_SERVER, 
+									IID_IAAFCDCIDescriptor, 
+									(void **)&pCDCIDesc);		
+			if (SUCCEEDED(hr))
+			{
+				// Add all CDCI properties
+				hr = pCDCIDesc->SetComponentWidth(kCWTest);
+				if (SUCCEEDED(hr)) hr = pCDCIDesc->SetHorizontalSubsampling(kHSTest);
+				if (SUCCEEDED(hr)) hr = pCDCIDesc->SetColorSiting(kCSTest);
+				if (SUCCEEDED(hr)) hr = pCDCIDesc->SetBlackReferenceLevel(kBRLTest);
+				if (SUCCEEDED(hr)) hr = pCDCIDesc->SetWhiteReferenceLevel(kWRLTest);
+				if (SUCCEEDED(hr)) hr = pCDCIDesc->SetColorRange(kCRTest);
+				if (SUCCEEDED(hr)) hr = pCDCIDesc->SetPaddingBits(kPBTest);
+				if (SUCCEEDED(hr)) hr = SetDigitalImageDescProps(pCDCIDesc);
 
-				  if (SUCCEEDED(hr))
-				  {
-					  IAAFEssenceDescriptor*	pEssDesc = NULL;
+				if (SUCCEEDED(hr))
+				{
+					IAAFEssenceDescriptor*	pEssDesc = NULL;
 
-					  hr = pCDCIDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc);
-					  if (SUCCEEDED(hr))
-					  {
-						  hr = pSourceMob->SetEssenceDescriptor(pEssDesc);
-						  if (SUCCEEDED(hr))
-						  {
-						  }
-						  pEssDesc->Release();
-						  pEssDesc = NULL;
-					  }
-				  }
-				  pCDCIDesc->Release();
-				  pCDCIDesc = NULL;
-			  }
+					hr = pCDCIDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc);
+					if (SUCCEEDED(hr))
+					{
+						hr = pSourceMob->SetEssenceDescriptor(pEssDesc);
+						if (SUCCEEDED(hr))
+						{
+						}
+						pEssDesc->Release();
+						pEssDesc = NULL;
+					}
+				}
+				pCDCIDesc->Release();
+				pCDCIDesc = NULL;
+			}
 
-			  // Add the MOB to the file
-			  if (SUCCEEDED(hr))
-				  hr = pHeader->AppendMob(pMob);
+			// Add the MOB to the file
+			if (SUCCEEDED(hr))
+				hr = pHeader->AppendMob(pMob);
 
-			  pMob->Release();
-			  pMob = NULL;
-		  }
-		  pSourceMob->Release();
-		  pSourceMob = NULL;
-	  }
-
-    pDictionary->Release();
-    pDictionary = NULL;
-  }
+			pMob->Release();
+			pMob = NULL;
+		}
+		pSourceMob->Release();
+		pSourceMob = NULL;
+	}
 
 	if (pHeader) pHeader->Release();
 
 	if (pFile)
 	{
-		pFile->Save();
 		pFile->Close();
 		pFile->Release();
 	}
@@ -392,7 +356,7 @@ Cleanup:
 	return hr;
 }
 
-extern "C" HRESULT CAAFCDCIDescriptor_test()
+HRESULT CAAFCDCIDescriptor::test()
 {
 	aafWChar*	pFileName = L"AAFCDCIDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
@@ -405,7 +369,7 @@ extern "C" HRESULT CAAFCDCIDescriptor_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFCDCIDescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFCDCIDescriptor::test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
