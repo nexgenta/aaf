@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -102,5 +101,4 @@ AAFRESULT ImplAAFSourceReference::ChangeContainedReferences(aafUID_t *from, aafU
 }
 
 
-OMDEFINE_STORABLE(ImplAAFSourceReference, AUID_AAFSourceReference);
 
