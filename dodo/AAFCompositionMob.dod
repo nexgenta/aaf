@@ -1,145 +1,61 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
 #startm .this-module 0
 AAFCompositionMob\
 #endm
 #c
 #startm .parent-module 0
-AAFMob\
+AAFObject\
 #endm
 #c
-#c #import ./AAFMob.exp
-AD_HEAD
-AD_IDL(//
-// The IAAFCompositionMob interface is implemented on objects which
-// can specify how to combine content data elements into a sequence\,
-// how to modify content data elements\, and how to synchronize content
-// data elements.	   
-//
-// In addition to the specific error results listed for each method\,
-// all methods in this interface may also return one of the following
-// values:
-// 
-// AAFRESULT_NOMEMORY
-//   - insufficient system memory is available to perform the
-//     operation.
-//)
-AD_CLASS_UUID(91920d64, 2a2e, 11D2, bf, A3, 00, 60, 97, 11, 62, 12)
+#c#import ./AAFUnitTest.exp
 
-AD_DEFAULT_UUID(91920d63, 2a2e, 11D2, bf, A3, 00, 60, 97, 11, 62, 12)
-AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_XMETHOD1(Initialize,
-			[in\, string],
-			objPass,
-			aafCharacter_constptr,
-			pName,
-			Mob name [optional],
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-			Initializes this object with the given name.
-  // 
-  // Succeeds if all of the following are true:
-  // - this object has not yet been initialized.
-  // - the pName pointer is valid.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize\(\) has already been called on this object.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pName argument is NULL.)
+AD_CLASS_BEGIN()
 
+//@access Public Members
+AD_METHOD1(AAFCompositionMob,[in],OMLObject,obj,hi jeff, Constructor from persistant store.)
 
-AD_XMETHOD1(GetDefaultFade,
-			[out],
-			objPass,
-			aafDefaultFade_t *,
-			pResult,
-			a default fade struct,
-			Get the default fade for this composition.  If there is no
-  // default fade\, this function returns with no error\, but the VALID
-  // field of the structure is false.  This allows you to pass this
-  // struct to SourceClip::GetFade\(\) in all cases.
-  //
-  // Succeeds if all of the following are true:
-  // - this object has already been initialized.
-  // - the pResult pointer is valid.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pResult argument is NULL.)
+AD_METHOD2(AAFCompositionMob,\
+[in],AAFString *,name,Mob name [optional],\
+[in],aafBool,isPrimary,Whether or not the mob is a primary mob,\
+Constructor given name and primary mob status.)
+//@rdesc Error code [see below].
 	
+AD_METHOD1(IsMobKind,\
+[in],omfMobKind_t,mobKind,One of the defined mob kinds,\
+Ask if mob is of a particular AAFMobKind_t.)
+	//@comm<tab>ex:	kCompMob, kMasterMob, kFileMob, kTapeMob, kFilmMob,
+	//<tab>		kPrimaryMob, kAllMob	//@rdesc TRUE if mob is the requested mob kind.
+	//@comm Override
 
-AD_XMETHOD3(SetDefaultFade,
-			[in],
-			objPass,
-			aafLength_t,
-			fadeLength,
-			Default fade length,
+AD_METHOD1(GetDefaultFade,\
+[out],AAFDefaultFade_t *,result,a default fade struct,\
+Get the default fade for this composition.)
+	//@rdesc Error code [see below].
+	//@comm If there is no default fade, this function returns with no error,
+	// but the VALID field of the structure is false.  This allows you to
+	// pass this struct to omfiSourceClipGetFade() in all cases.
+	//@comm Maps to omfiMobGetDefaultFade
+	
+AD_METHOD3(SetDefaultFade,\
+[in],omfLength_t,fadeLength,Default fade length,\
+[in],omfFadeType_t,fadeType,default fade type,\
+[in],omfRational_t,fadeEditUnit,default fade edit unit,\
+Adds the default crossfade properties to the Mob.)
+	//@rdesc Error code [see below].
+	//@comm Maps to omfiMobSetDefaultFade
 
-			[in],
-			enumIn,
-			aafFadeType_t,
-			fadeType,
-			default fade type,
+  //
+  // IAAFUnitTest interface method overrides
+  //
+.method-Test
 
-			[in],
-			objPass,
-			aafRational_t,
-			fadeEditUnit,
-			default fade edit unit,
 
-			Adds the default crossfade properties to the Mob.
-  //
-  // Succeeds if all of the following are true:
-  // - this object has already been initialized.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
-  // AAFRESULT_BAD_TYPE
-  //   - invalid fadeType.
-  //
-  // AAFRESULT_BAD_LENGTH
-  //   - invalid fadeLength.)
-AD_XCLASS_END(Concrete, StoredObject)
+AD_CLASS_END
