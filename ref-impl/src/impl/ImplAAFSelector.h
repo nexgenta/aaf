@@ -42,6 +42,8 @@ class ImplEnumAAFSegments;
 #include "ImplAAFSegment.h"
 #endif
 
+#include "OMStrongRefProperty.h"
+#include "OMStrongRefVectorProperty.h"
 
 class ImplAAFSelector : public ImplAAFSegment
 {
@@ -82,6 +84,12 @@ public:
         // @parm [in] Segment to append to the Alternate list of segments
         (ImplAAFSegment * pSegment);
 
+  //****************
+  // RemoveAlternateSegment()
+  //
+	virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveAlternateSegment
+		(ImplAAFSegment* pSegment);
 
   //****************
   // GetNumAlternateSegments()

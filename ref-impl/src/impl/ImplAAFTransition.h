@@ -43,6 +43,8 @@ class ImplAAFDataDef;
 #include "ImplAAFComponent.h"
 #endif
 
+#include "OMStrongRefProperty.h"
+
 #ifndef __ImplAAFOperationGroup_h__
 #include "ImplAAFOperationGroup.h"
 #endif
@@ -62,12 +64,12 @@ protected:
 public:
 
   //****************
-  // Create()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Create
+    Initialize
         (// @parm [in] Data Definition Object
-         aafUID_t * pDatadef,
+         ImplAAFDataDef * pDataDef,
 
 		 // @parm [in] Length property value
          aafLength_t  length,

@@ -37,6 +37,7 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefRename : public ImplAAFTypeDef
 {
@@ -58,13 +59,13 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in] type to which this is an alias
          ImplAAFTypeDef * pBaseType,
 
          // @parm [in, string] friendly name of this type definition
-         wchar_t *  pTypeName);
+         const aafCharacter * pTypeName);
 
 
   //****************
@@ -123,18 +124,36 @@ public:
   aafBool IsRegistered (void) const;
   size_t NativeSize (void) const;
 
-  // Override this one, not the ...MBS() one...
   OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-						 const aafCharacter * name) const;
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
+
+  //****************
+  // GetTypeCategory()
+  //
+  // (override from ImplAAFTypeDef)
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetTypeCategory
+        // @parm [out] Returned type category
+        (eAAFTypeCategory_t *  pTid);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RawAccessType
+        (ImplAAFTypeDef ** ppRawTypeDef);
+
+public:
+  // Overrides from ImplAAFTypeDef
+  virtual bool IsAggregatable () const;
+  virtual bool IsStreamable () const;
+  virtual bool IsFixedArrayable () const;
+  virtual bool IsVariableArrayable () const;
+  virtual bool IsStringable () const;
 
 private:
   ImplAAFTypeDefSP BaseType () const;
 
-  // OMWeakReferenceProperty<ImplAAFTypeDef> _RenamedType;
-  OMFixedSizeProperty<aafUID_t>           _RenamedType;
-
-  ImplAAFTypeDefSP _cachedBaseType;
+   OMWeakReferenceProperty<ImplAAFTypeDef> _RenamedType;
 };
 
 //
