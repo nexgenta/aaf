@@ -7,10 +7,6 @@
 *                                          *
 \******************************************/
 
-
-
-
-
 #include "AAFStoredObjectIDs.h"
 
 #ifndef __ImplAAFTypeDefFixedArray_h__
@@ -19,6 +15,10 @@
 
 #ifndef __ImplAAFPropertyValue_h__
 #include "ImplAAFPropertyValue.h"
+#endif
+
+#ifndef __ImplAAFHeader_h_
+#include "ImplAAFHeader.h"
 #endif
 
 #include "AAFPropertyIDs.h"
@@ -46,15 +46,45 @@ ImplAAFTypeDefFixedArray::ImplAAFTypeDefFixedArray ()
 ImplAAFTypeDefFixedArray::~ImplAAFTypeDefFixedArray ()
 {}
 
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefFixedArray::GetType (
       ImplAAFTypeDef ** ppTypeDef)
 {
   if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
-  *ppTypeDef = _ElementType;
-  (*ppTypeDef)->AcquireReference ();
 
-  return AAFRESULT_SUCCESS;
+  ImplAAFHeader * pHead = NULL;
+  ImplAAFDictionary * pDict = NULL;
+  AAFRESULT rReturned = AAFRESULT_SUCCESS;
+  try
+	{
+	  AAFRESULT hr;
+	  hr = MyHeadObject(&pHead);
+	  if (AAFRESULT_FAILED(hr))
+		throw hr;
+	  assert (pHead);
+	  hr = (pHead->GetDictionary(&pDict));
+	  if (AAFRESULT_FAILED(hr))
+		throw hr;
+	  assert (pDict);
+
+	  ImplAAFTypeDef * ptd = NULL;
+	  aafUID_t id = _ElementType;
+	  hr = pDict->LookupType (&id, &ptd);
+	  if (AAFRESULT_FAILED(hr))
+		throw hr;
+
+	  *ppTypeDef = ptd;
+	  (*ppTypeDef)->AcquireReference ();
+	}
+  catch (AAFRESULT &rCaught)
+	{
+	  rReturned = rCaught;
+	}
+  RELEASE_IF_SET (pHead);
+  RELEASE_IF_SET (pDict);
+
+  return rReturned;
 }
 
 
@@ -77,7 +107,12 @@ AAFRESULT STDMETHODCALLTYPE
   hr = SetAUID (pID);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _ElementType = pTypeDef;
+  aafUID_t id;
+  assert (pTypeDef);
+  hr = pTypeDef->GetAUID(&id);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  _ElementType = id;
+
   _ElementCount = nElements;
 
   return AAFRESULT_SUCCESS;
@@ -87,7 +122,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefFixedArray::GetCount (
-      aafUInt32 *  pCount)
+      aafUInt32 *  pCount) const
 {
   if (! pCount) return AAFRESULT_NULL_PARAM;
   *pCount = _ElementCount;
@@ -108,18 +143,23 @@ ImplAAFTypeDefFixedArray::GetTypeCategory (eAAFTypeCategory_t *  pTid)
 aafUInt32 ImplAAFTypeDefFixedArray::pvtCount
 (
  ImplAAFPropertyValue * /*pInPropVal*/ /*arg unused*/
-)
+) const
 {
   return _ElementCount;
 }
 
 
-aafBool ImplAAFTypeDefFixedArray::IsFixedSize (void)
+aafBool ImplAAFTypeDefFixedArray::IsFixedSize (void) const
 {
   aafBool result;
   ImplAAFTypeDef * elemType = NULL;
   AAFRESULT hr;
-  hr = GetType (&elemType);
+  // BobT semi-hack: make non-const 'this' ptr so we can call
+  // GetType().  We know we're not munging the typedef we get back, so
+  // we know it'll be OK...
+  ImplAAFTypeDefArray * pNonConstThis =
+	(ImplAAFTypeDefArray *) this;
+  hr = pNonConstThis->GetType (&elemType);
   assert (AAFRESULT_SUCCEEDED(hr));
   assert (elemType);
   result = elemType->IsFixedSize();
@@ -127,12 +167,17 @@ aafBool ImplAAFTypeDefFixedArray::IsFixedSize (void)
   return result;
 }
 
-size_t ImplAAFTypeDefFixedArray::PropValSize (void)
+size_t ImplAAFTypeDefFixedArray::PropValSize (void) const
 {
   size_t result;
   ImplAAFTypeDef * elemType = NULL;
   AAFRESULT hr;
-  hr = GetType (&elemType);
+  // BobT semi-hack: make non-const 'this' ptr so we can call
+  // GetType().  We know we're not munging the typedef we get back, so
+  // we know it'll be OK...
+  ImplAAFTypeDefArray * pNonConstThis =
+	(ImplAAFTypeDefArray *) this;
+  hr = pNonConstThis->GetType (&elemType);
   assert (AAFRESULT_SUCCEEDED(hr));
   assert (elemType);
   result = elemType->PropValSize() * _ElementCount;
@@ -141,12 +186,17 @@ size_t ImplAAFTypeDefFixedArray::PropValSize (void)
 }
 
 
-aafBool ImplAAFTypeDefFixedArray::IsRegistered (void)
+aafBool ImplAAFTypeDefFixedArray::IsRegistered (void) const
 {
   // true if underlying type is registered
   ImplAAFTypeDef * elemType = NULL;
   AAFRESULT hr;
-  hr = GetType (&elemType);
+  // BobT semi-hack: make non-const 'this' ptr so we can call
+  // GetType().  We know we're not munging the typedef we get back, so
+  // we know it'll be OK...
+  ImplAAFTypeDefArray * pNonConstThis =
+	(ImplAAFTypeDefArray *) this;
+  hr = pNonConstThis->GetType (&elemType);
   assert (AAFRESULT_SUCCEEDED(hr));
   assert (elemType);
   aafBool result = elemType->IsRegistered();
@@ -155,14 +205,19 @@ aafBool ImplAAFTypeDefFixedArray::IsRegistered (void)
 }
 
 
-size_t ImplAAFTypeDefFixedArray::NativeSize (void)
+size_t ImplAAFTypeDefFixedArray::NativeSize (void) const
 {
   assert (IsRegistered());
 
   size_t result;
   ImplAAFTypeDef * elemType = NULL;
   AAFRESULT hr;
-  hr = GetType (&elemType);
+  // BobT semi-hack: make non-const 'this' ptr so we can call
+  // GetType().  We know we're not munging the typedef we get back, so
+  // we know it'll be OK...
+  ImplAAFTypeDefArray * pNonConstThis =
+	(ImplAAFTypeDefArray *) this;
+  hr = pNonConstThis->GetType (&elemType);
   assert (AAFRESULT_SUCCEEDED(hr));
   assert (elemType);
   result = elemType->NativeSize() * _ElementCount;
