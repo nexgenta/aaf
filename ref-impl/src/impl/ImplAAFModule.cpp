@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -138,7 +138,7 @@ STDAPI ImplAAFFileOpenExistingRead (
   // Null-terminated string containing name of filesystem file to be
   // opened for reading.  Filename must be in a form that would be
   // acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ wchar_t *  pFileName,
+  /*[in, string]*/ const aafCharacter *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -171,16 +171,27 @@ STDAPI ImplAAFFileOpenExistingRead (
 		hr = AAFRESULT_NOMEMORY;
   else
   {
-    // Make sure the file is initialized (not open yet...)
-    hr = pFile->Initialize();
-    if (SUCCEEDED(hr))
+    try
     {
-      // Attempt to open the file read only.
-      hr = pFile->OpenExistingRead(pFileName, modeFlags);
+      // Make sure the file is initialized (not open yet...)
+      hr = pFile->Initialize();
       if (SUCCEEDED(hr))
       {
-       *ppFile = pFile;
+        // Attempt to open the file read only.
+        hr = pFile->OpenExistingRead(pFileName, modeFlags);
+        if (SUCCEEDED(hr))
+        {
+         *ppFile = pFile;
+         pFile = NULL;
+        }
       }
+    }
+    catch (...)
+    {
+      // Cleanup the file if it could not be initialized and opened.
+      if (pFile)
+        pFile->ReleaseReference();
+      throw;
     }
   }
 
@@ -249,7 +260,7 @@ STDAPI ImplAAFFileOpenExistingModify (
   // Null-terminated string containing name of filesystem file to be
   // opened for modification.  Filename must be in a form that would
   // be acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ wchar_t *  pFileName,
+  /*[in, string]*/ const aafCharacter *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -287,16 +298,27 @@ STDAPI ImplAAFFileOpenExistingModify (
 		hr = AAFRESULT_NOMEMORY;
   else
   {
-    // Make sure the file is initialized (not open yet...)
-    hr = pFile->Initialize();
-    if (SUCCEEDED(hr))
+    try
     {
-      // Attempt to open the file for modification.
-      hr = pFile->OpenExistingModify(pFileName, modeFlags, pIdent);
+      // Make sure the file is initialized (not open yet...)
+      hr = pFile->Initialize();
       if (SUCCEEDED(hr))
       {
-        *ppFile = pFile;
+        // Attempt to open the file for modification.
+        hr = pFile->OpenExistingModify(pFileName, modeFlags, pIdent);
+        if (SUCCEEDED(hr))
+        {
+          *ppFile = pFile;
+          pFile = NULL;
+        }
       }
+    }
+    catch (...)
+    {
+      // Cleanup the file if it could not be initialized and opened.
+      if (pFile)
+        pFile->ReleaseReference();
+      throw;
     }
   }
 
@@ -356,7 +378,7 @@ STDAPI ImplAAFFileOpenNewModify (
   // Null-terminated string containing name of filesystem file to be
   // opened for modification.  Filename must be in a form that would
   // be acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ wchar_t *  pFileName,
+  /*[in, string]*/ const aafCharacter *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -394,16 +416,27 @@ STDAPI ImplAAFFileOpenNewModify (
 		hr = AAFRESULT_NOMEMORY;
   else
   {
-    // Make sure the file is initialized (not open yet...)
-    hr = pFile->Initialize();
-    if (SUCCEEDED(hr))
+    try
     {
-      // Attempt to open a new file for modification.
-      hr = pFile->OpenNewModify(pFileName, modeFlags, pIdent);
+      // Make sure the file is initialized (not open yet...)
+      hr = pFile->Initialize();
       if (SUCCEEDED(hr))
       {
-        *ppFile = pFile;
+        // Attempt to open a new file for modification.
+        hr = pFile->OpenNewModify(pFileName, modeFlags, pIdent);
+        if (SUCCEEDED(hr))
+        {
+          *ppFile = pFile;
+          pFile = NULL;
+        }
       }
+    }
+    catch (...)
+    {
+      // Cleanup the file if it could not be initialized and opened.
+      if (pFile)
+        pFile->ReleaseReference();
+      throw;
     }
   }
 
@@ -477,16 +510,27 @@ STDAPI ImplAAFFileOpenTransient (
 		hr = AAFRESULT_NOMEMORY;
   else
   {
-    // Make sure the file is initialized (not open yet...)
-    hr = pFile->Initialize();
-    if (SUCCEEDED(hr))
+    try
     {
-      // Attempt to open a new transient file.
-      hr = pFile->OpenTransient(pIdent);
+      // Make sure the file is initialized (not open yet...)
+      hr = pFile->Initialize();
       if (SUCCEEDED(hr))
       {
-        *ppFile = pFile;
+        // Attempt to open a new transient file.
+        hr = pFile->OpenTransient(pIdent);
+        if (SUCCEEDED(hr))
+        {
+          *ppFile = pFile;
+          pFile = NULL;
+        }
       }
+    }
+    catch (...)
+    {
+      // Cleanup the file if it could not be initialized and opened.
+      if (pFile)
+        pFile->ReleaseReference();
+      throw;
     }
   }
 
@@ -523,6 +567,9 @@ STDAPI ImplAAFGetPluginManager (
 	*ppManager = NULL;
 	
 	implMgr = ImplAAFPluginManager::GetPluginManager();
+  if (NULL == implMgr)
+    hr = AAFRESULT_NOMEMORY;
+  else
     *ppManager = implMgr;
 	
 	return hr;
