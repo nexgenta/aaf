@@ -1,41 +1,35 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "CAAFBasicInterp.h"
 
 #include <assert.h>
+#include <string.h>
 #include "AAFResult.h"
 
 #include "AAF.h"
 
 #include "aafErr.h"
-#include "aafUtils.h"
-#include "aafCvt.h"
-#include "aafDefUIDs.h"
+#include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFRational.h"
 #include "AAFInterpolatorDefs.h"
@@ -49,6 +43,12 @@ const CLSID CLSID_AAFBasicInterp = { 0x5B6C85A1, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0
 
 const aafUID_t BASIC_INTERP_PLUGIN = { 0x5B6C85A2, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
+
+static bool EqualAUID(const aafUID_t *id1, const aafUID_t * id2)
+{
+  assert (id1 && id2);
+  return (0 == memcmp(id1, id2, sizeof(aafUID_t)));
+}
 
 HRESULT STDMETHODCALLTYPE
     CAAFBasicInterp::CountDefinitions (aafUInt32 *pDefCount)
@@ -78,7 +78,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFBasicInterp::GetIndexedDefinitionObject (aafUInt32 /* index */, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	IAAFInterpolationDef	*interpDef = NULL;
 	IAAFDefObject	*obj = NULL;
@@ -179,7 +179,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
-CAAFBasicInterp::CAAFBasicInterp (IUnknown * pControllingUnknown, aafBool doInit)
+CAAFBasicInterp::CAAFBasicInterp (IUnknown * pControllingUnknown)
   : CAAFUnknown (pControllingUnknown)
 {
 	_typeDef = NULL;
@@ -362,7 +362,7 @@ HRESULT STDMETHODCALLTYPE
 HRESULT CAAFBasicInterp::InterpolateMany(
 	/* [in] */ aafRational_t *  pStartInputValue,
     /* [in] */ aafRational_t *  pInputStep,
-    /* [in] */ aafUInt32  pGenerateCount,
+    /* [in] */ aafUInt32  /* pGenerateCount */,
     /* [out] */aafMemPtr_t pOutputValue,
     /* [out] */aafUInt32 *  pResultCount)
 {
@@ -501,6 +501,10 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 //
 // 
 // 
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFBasicInterp::InternalQueryInterface
 (
     REFIID riid,
@@ -512,13 +516,13 @@ HRESULT CAAFBasicInterp::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IClassFactory interface 
-    if (riid == IID_IAAFInterpolator)
+    if (EQUAL_UID(riid,IID_IAAFInterpolator))
     { 
         *ppvObj = (IAAFInterpolator *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
@@ -533,3 +537,9 @@ HRESULT CAAFBasicInterp::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFBasicInterp)
+
+
+
+
+
+

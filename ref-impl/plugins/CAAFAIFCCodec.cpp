@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying 
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted, 
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 #include "CAAFAIFCCodec.h"
 
 #include <assert.h>
@@ -76,6 +71,8 @@ CAAFAIFCCodec::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
 {
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	
 	*uid = kAAFCODEC_AIFC;		// UID of the AIFC codec definition
 	return AAFRESULT_SUCCESS;
@@ -113,6 +110,8 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 	
 	if((dict == NULL) || (def == NULL))
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	
 	XPROTECT()
 	{
@@ -249,7 +248,7 @@ CAAFAIFCCodec::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
 }
 
 
-CAAFAIFCCodec::CAAFAIFCCodec (IUnknown * pControllingUnknown, aafBoolean_t doInit)
+CAAFAIFCCodec::CAAFAIFCCodec (IUnknown * pControllingUnknown)
 : CAAFUnknown (pControllingUnknown)
 {
 	_headerLoaded = kAAFFalse;
@@ -310,6 +309,8 @@ CAAFAIFCCodec::GetIndexedFlavourID (aafUInt32  index,
 {
 	if(pFlavour == NULL)
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	*pFlavour = kAAFNilCodecFlavour;
 	return AAFRESULT_SUCCESS;
 }
@@ -324,7 +325,7 @@ CAAFAIFCCodec::CountDataDefinitions (aafUInt32 *pDefCount)
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::GetIndexedDataDefinition (aafUInt32  index,
+CAAFAIFCCodec::GetIndexedDataDefinition (aafUInt32  /*index*/,
 										 aafUID_t * pDataDefID)
 {
 	if (! pDataDefID)
@@ -351,7 +352,7 @@ CAAFAIFCCodec::GetMaxCodecDisplayNameLength (
 }	
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::GetCodecDisplayName (aafUID_constref flavour,
+CAAFAIFCCodec::GetCodecDisplayName (aafUID_constref /*flavour*/,	// No flavors
 									aafCharacter *  pName,
 									aafUInt32  bufSize)
 {
@@ -363,7 +364,7 @@ CAAFAIFCCodec::GetCodecDisplayName (aafUID_constref flavour,
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::CountChannels (IAAFSourceMob *fileMob,
+CAAFAIFCCodec::CountChannels (IAAFSourceMob * /*fileMob*/,
 							  aafUID_constref essenceKind,
 							  IAAFEssenceStream *stream,
 							  aafUInt16 *  pNumChannels)
@@ -393,7 +394,7 @@ CAAFAIFCCodec::CountChannels (IAAFSourceMob *fileMob,
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::GetSelectInfo (IAAFSourceMob *fileMob,
+CAAFAIFCCodec::GetSelectInfo (IAAFSourceMob * /*fileMob*/,
 							  IAAFEssenceStream *stream,
 							  aafSelectInfo_t *  pSelectInfo)
 {
@@ -444,13 +445,13 @@ CAAFAIFCCodec::CountSamples (
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::ValidateEssence (IAAFSourceMob *fileMob,
-								IAAFEssenceStream *stream,
-								aafCheckVerbose_t  verbose,
-								aafCheckWarnings_t warning,
-								aafUInt32  bufSize,
-								wchar_t *  pName,
-								aafUInt32  *bytesWritten)
+CAAFAIFCCodec::ValidateEssence (IAAFSourceMob * /*fileMob*/,
+								IAAFEssenceStream * /*stream*/,
+								aafCheckVerbose_t   /*verbose*/,
+								aafCheckWarnings_t  /*warning*/,
+								aafUInt32   /*bufSize*/,
+								wchar_t *   /*pName*/,
+								aafUInt32  * /*bytesWritten*/)
 {
 	return HRESULT_NOT_IMPLEMENTED;
 }
@@ -621,8 +622,8 @@ CAAFAIFCCodec::WriteBlocks (aafDeinterleave_t  inter,
 				
 				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 				
-				resultBlock->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				resultBlock->samplesXfered += xfer->numSamples / _bytesPerFrame;
+				resultBlock->bytesXfered = bytesWritten;
+				resultBlock->samplesXfered += (bytesWritten / _bytesPerFrame);
 			}
 		}
 		else if(_numCh == 1)
@@ -639,8 +640,8 @@ CAAFAIFCCodec::WriteBlocks (aafDeinterleave_t  inter,
 				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 				
 				
-				result->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				result->samplesXfered += xfer->numSamples / _bytesPerFrame;
+				result->bytesXfered = bytesWritten;
+				result->samplesXfered += (bytesWritten / _bytesPerFrame);
 			}
 		}
 		else
@@ -925,12 +926,12 @@ HRESULT STDMETHODCALLTYPE
 CAAFAIFCCodec::Seek (aafPosition_t  sampleFrame)
 {
 	aafInt64          nBytes;
-	aafInt64          temp, offset, one;
+	aafInt64          temp, offset, zero;
 	aafUInt32           bytesPerFrame;
 	
 	XPROTECT()
 	{
-		CvtInt32toInt64(1, &one);
+		CvtInt32toInt64(0, &zero);
 		temp = _sampleFrames;
 		CHECK(AddInt32toInt64(1, &temp));
 		if (Int64Greater(sampleFrame, temp))
@@ -938,10 +939,8 @@ CAAFAIFCCodec::Seek (aafPosition_t  sampleFrame)
 		
 		nBytes = sampleFrame;
 		
-		/* Make the result zero-based (& check for bad frame numbers as well). */
-		if(Int64Less(nBytes, one))
+		if(Int64Less(nBytes, zero))
 			RAISE(AAFRESULT_BADSAMPLEOFFSET);
-		CHECK(SubInt64fromInt64(one, &nBytes));
 		bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 		CHECK(MultInt32byInt64(bytesPerFrame, nBytes, &nBytes));
 		offset = _dataStartOffset;
@@ -959,7 +958,8 @@ CAAFAIFCCodec::Seek (aafPosition_t  sampleFrame)
 HRESULT STDMETHODCALLTYPE
 CAAFAIFCCodec::CompleteWrite (IAAFSourceMob *fileMob)
 {
-	aafInt64	byteLen, sampleLen;
+	aafInt64		sampleLen;
+	aafUInt32		AIFCDataLen;
 	IAAFEssenceDescriptor	*essenceDesc = NULL;
 	IAAFFileDescriptor		*fileDesc = NULL;
 	IAAFAIFCDescriptor		*AIFCDesc = NULL;
@@ -967,17 +967,20 @@ CAAFAIFCCodec::CompleteWrite (IAAFSourceMob *fileMob)
 	
 	XPROTECT()
 	{
-		CHECK(_stream->GetLength (&byteLen));
-		sampleLen = byteLen / _bytesPerFrame;
+		if(!_readOnly && _sampleDataHeaderWritten)
+			CHECK(CreateAudioDataEnd());	// Don't do this for raw calls?
+		//		_stream = NULL;
+		
+
+		CHECK(_stream->Seek(_dataSizeOffset));
+		CHECK(GetAIFCData(sizeof(AIFCDataLen), &AIFCDataLen));	// Read the AIFC data length
+		sampleLen = AIFCDataLen / _bytesPerFrame;
 		CHECK(_mdes->QueryInterface(IID_IAAFFileDescriptor, (void **)&fileDesc));
 		CHECK(fileDesc->SetLength(sampleLen));
 		fileDesc->Release();
 		fileDesc = NULL;
 		
-		if(!_readOnly && _sampleDataHeaderWritten)
-			CHECK(CreateAudioDataEnd());	// Don't do this for raw calls?
-		//		_stream = NULL;
-		
+
 		if(_interleaveBuf != NULL)
 			delete _interleaveBuf;
 		
@@ -1031,6 +1034,8 @@ CAAFAIFCCodec::WriteRawData (aafUInt32 nSamples, aafDataBuffer_t  buffer,
 							 aafUInt32  buflen)
 {
 	aafUInt32 bytesWritten;
+  	if(buflen < (nSamples * _bytesPerFrame))
+  		return AAFRESULT_SMALLBUF;
 	return _stream->Write (nSamples * _bytesPerFrame, buffer, &bytesWritten);
 }
 
@@ -1066,8 +1071,8 @@ CAAFAIFCCodec::ReadRawData (aafUInt32 nSamples,
 
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::CreateDescriptorFromStream (IAAFEssenceStream * pStream,
-										   IAAFSourceMob *fileMob)
+CAAFAIFCCodec::CreateDescriptorFromStream (IAAFEssenceStream *  /*pStream*/,
+										   IAAFSourceMob * /*fileMob*/)
 {
 	return(AAFRESULT_NOT_IMPLEMENTED);
 }
@@ -1130,6 +1135,7 @@ CAAFAIFCCodec::PutEssenceFormat (IAAFEssenceFormat * pFormat)
 			{
 				XASSERT(bytesRead == sizeof(valueUInt32), AAFRESULT_INVALID_PARM_SIZE);
 				memcpy(&valueUInt32, buf, bytesRead);
+				XASSERT(valueUInt32 > 0, AAFRESULT_ZERO_SAMPLESIZE);
 				_bitsPerSample = (aafUInt16)valueUInt32;
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 			}
@@ -1143,6 +1149,7 @@ CAAFAIFCCodec::PutEssenceFormat (IAAFEssenceFormat * pFormat)
 			{
 				XASSERT(bytesRead == sizeof(valueUInt32), AAFRESULT_INVALID_PARM_SIZE);
 				memcpy(&valueUInt32, buf, bytesRead);
+				XASSERT(valueUInt32 > 0, AAFRESULT_CODEC_CHANNELS);
 				_numCh = (aafUInt16)valueUInt32;
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 			}
@@ -1293,7 +1300,7 @@ CAAFAIFCCodec::GetLargestSampleSize (aafUID_constref dataDefID,
 
 HRESULT STDMETHODCALLTYPE
 CAAFAIFCCodec::MultiCreate (IAAFSourceMob *unk,
-							aafUID_constref flavour,
+							aafUID_constref /*flavour*/,
 							IAAFEssenceStream * stream,
 							aafCompressEnable_t compEnable,
 							aafUInt32 numParms,
