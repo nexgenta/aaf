@@ -6,6 +6,7 @@ AAFSegment\
 AAFComponent\
 #endm
 #c
+#import ./AAFUnitTest.exp
 #import ./AAFComponent.exp
 AD_HEAD
 /******************************************\
@@ -16,97 +17,72 @@ AD_HEAD
 * Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
+class AAFSourceClip;
+class AAFPulldown;
+class AAFTimecode;
+class AAFSequence;
 
- 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-AD_IDL(//
-// The IAAFSegment interface is implemented by objects which represent
-// a component that is independent of any other components which may
-// surround it in a sequence.
-//
-// In addition to the specific error results listed for each method\,
-// all methods in this interface may also return one of the following
-// values:
-// 
-// AAFRESULT_NOMEMORY
-//   - insufficient system memory is available to perform the
-//     operation.
-//
-// AAFRESULT_NOT_INITIALIZED
-//   - This object has not yet had Initialize\(\) called on it through
-//     this object's primary interface.
-//)
-AD_CLASS_UUID(7a2f0571, 1ba3, 11D2, bf, aa, 00, 60, 97, 11, 62, 12)
-
-AD_DEFAULT_UUID(7a2f0570, 1ba3, 11D2, bf, aa, 00, 60, 97, 11, 62, 12)
 AD_CLASS_BEGIN
-AD_METHOD2(SegmentOffsetToTC,				  
-		   [in],
-				aafPosition_t *, 
-				pOffset,
-				Pointer to a Segment Offset to be convert to Timecode,
-		   [out],
-				aafTimecode_t *,					   
-				pTimecode,
-				The converted timecode to be returned,
-		   Converts the given Segment offset to timecode.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pOffset pointer is valid.
-  // - the pTimeCode pointer is valid.
-  // 
-  // If this method fails the value of pTimecode is left unchanged.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\\\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \\\(This is the only code indicating success.\\\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - any arg is NULL.
-  //
-  // AAFRESULT_TIMECODE_NOT_FOUND
-  //   - the given offset is not available in this segment.)
 
+AD_CONSTRUCTOR2([in],AAFFile *,file, ,
+				[in],OMLObject,obj, ,
+				Creates one of these from a file and an object)
 
-AD_METHOD3(SegmentTCToOffset,
-		   [in],
-				aafTimecode_t *,
-				pTimecode,
-				Pointer to a timecode to be converted to Offset,
-		   [in],
-				aafRational_t *,
-				pEditRate,
-				The edit rate for the given timecode ,
-		   [out],
-				aafFrameOffset_t *,
-				pOffset,
-				Frame Offset to be returned if found,
-		   Converts the given Timecode to an Offset.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pTimeCode pointer is valid.
-  // - the pEditRate pointer is valid
-  // - the pFrameOffset pointer is valid.
-  // 
-  // If this method fails the value of pOffset is left unchanged.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\\\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \\\(This is the only code indicating success.\\\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - any arg is NULL.
-  //
-  // AAFRESULT_TIMECODE_NOT_FOUND
-  //   - the given timecode is not available in this segment.)
+AD_METHOD1(AccumulateLength,
+		   [in],omfLength_t *,length,,
+		   )
+
+AD_METHOD3(SegmentOffsetToTC,
+		   [in],omfPosition_t, offset,,
+		   [out],omfTimecode_t *,tc,,
+		   [out],aafBool *,found,,
+		   Converts the given offset to timecode.)
+
+AD_METHOD4(SegmentTCToOffset,
+		   [in],omfTimecode_t,tc,,
+		   [in],omfRational_t,editRate,,
+		   [out],omfFrameOffset_t *,offset,,
+		   [out],aafBool *,found,,
+		   )
+
+AD_METHOD4(FindSubSegment,
+		   [in],omfPosition_t,offset,,
+		   [out],omfPosition_t *,sequPosPtr,,
+		   [out],AAFSegment **,subseg,,
+		   [out],aafBool *,found,,
+		   )
+
+AD_METHOD6(TraverseToClip,
+		   [in],omfLength_t,length,,
+		   [out],AAFSegment **,sclp,,
+		   [out],AAFPulldown **,pulldownObj,,
+		   [out],aafInt32 *,pulldownPhase,,
+		   [out],omfLength_t *,sclpLen,,
+		   [out],aafBool *,isMask,,
+		   )
+
+AD_METHOD3(OffsetToTimecodeClip,
+		   [in],omfPosition_t,offset,,
+		   [out],AAFTimecode **,result,,
+		   [out],omfPosition_t *,tcStartPos,,
+		   )
+
+AD_METHOD1(NumRepresentations,
+		   [out],aafInt32 *,count,,
+		   )
+
+AD_GETOBJ_METHOD1(GenerateSequence,
+				  [out],AAFSequence,seq,,
+				  )
+
+AD_METHOD1(Load,
+		   [in],AAFFile *,file,,
+		   )
+
+AD_METHOD1(Save,
+		   [in],AAFFile *,file,,
+		   )
+
+AD_OVERRIDE(.method-Test)
+
 AD_CLASS_END
