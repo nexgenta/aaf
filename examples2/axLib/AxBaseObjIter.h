@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxBaseObjIter.h,v 1.5 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxBaseObjIter.h,v 1.6 2004/11/30 10:29:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -86,9 +86,7 @@ public:
 			ret = apObj;
 			return true;
 		}
-		else {
-		        return false;
-		}
+		return false;
 	}
 
 	virtual void Reset()
