@@ -37,6 +37,7 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -63,11 +64,16 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-static char				testPattern[] = "ATestBuffer Pattern";
 static aafRational_t	testSpeed = { 2997, 100 };
 static aafUInt32		userData1 = 0x526F626E;
 static aafUInt32		userData2 = 0x42656361;
 static aafUInt32		userData3 = 0x53617261;
+
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x58c52650, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
@@ -83,25 +89,23 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSegment					*pSeg = NULL;
 	IAAFComponent*		pComponent = NULL;
 
-	aafMobID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
-	aafLength_t					zero;
 	aafTimecode_t				startTC;
 	aafUInt32					n;
 
-	zero = 0;
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTimecodeStream12M Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
-
 
 	try
 	{
@@ -127,8 +131,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		// Get a MOB interface
 		checkResult(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(pMob->SetMobID(TEST_MobID));
 		
 		checkResult(pCompMob->Initialize(L"COMPMOB01"));
 		
@@ -253,38 +256,26 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-    // IAAFSession *				pSession = NULL;
-	IAAFFile *					pFile = NULL;
-	bool bFileOpen = false;
-	IAAFHeader *				pHeader = NULL;
-	IEnumAAFMobs*				pMobIter = NULL;
-	IEnumAAFMobSlots*			pEnum = NULL;
-	IAAFMob*					pMob = NULL;
-	IAAFMobSlot*				pMobSlot = NULL;
-	IAAFSegment*				pSeg = NULL;
-	IAAFTimecodeStream12M*		pTimecodeStream12M = NULL;
-	IAAFTimecodeStream*			pTimecodeStream = NULL;
-	aafTimecode_t				startTC;
-	aafTimecodeSourceType_t		checkType;
-	aafRational_t				checkSpeed, testRate;
-	aafUInt32					checkSampleSize, checkUserData;
-	// aafUInt32				checkUserDataLen;
-	aafPosition_t				offset;
-	AAFRESULT					status;
-	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t				numMobs;
-	HRESULT						hr = S_OK;
-
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFTimecodeStream12M Test. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
-
+  // IAAFSession *				pSession = NULL;
+  IAAFFile *					pFile = NULL;
+  bool bFileOpen = false;
+  IAAFHeader *				pHeader = NULL;
+  IEnumAAFMobs*				pMobIter = NULL;
+  IEnumAAFMobSlots*			pEnum = NULL;
+  IAAFMob*					pMob = NULL;
+  IAAFMobSlot*				pMobSlot = NULL;
+  IAAFSegment*				pSeg = NULL;
+  IAAFTimecodeStream12M*		pTimecodeStream12M = NULL;
+  IAAFTimecodeStream*			pTimecodeStream = NULL;
+  aafTimecode_t				startTC;
+  aafTimecodeSourceType_t		checkType;
+  aafRational_t				checkSpeed, testRate;
+  aafUInt32					checkSampleSize, checkUserData;
+  // aafUInt32				checkUserDataLen;
+  aafPosition_t				offset;
+  AAFRESULT					status;
+  aafNumSlots_t				numMobs;
+  HRESULT						hr = S_OK;
 
   try
   {
@@ -487,7 +478,7 @@ extern "C" HRESULT CAAFTimecodeStream12M_test()
 	catch (...)
 	{
 	  cerr << "CAAFTimecodeStream12M::test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
