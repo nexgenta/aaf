@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000y Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -321,7 +321,7 @@ Value OMRedBlackTreeIterator<Key, Value>::setValue(Value newValue)
   //   @rdesc The <p Key> at the current position.
   //   @this const
 template <typename Key, typename Value>
-const Key OMRedBlackTreeIterator<Key, Value>::key(void) const
+Key OMRedBlackTreeIterator<Key, Value>::key(void) const
 {
   TRACE("OMRedBlackTreeIterator<Key, Value>::key");
 

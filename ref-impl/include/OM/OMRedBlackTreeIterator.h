@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -133,7 +133,7 @@ public:
     // @cmember Return the <p Key> of the <p Value> in the associated
     //          <c OMRedBlackTree> at the position currently designated by this
     //          <c OMRedBlackTreeIterator>.
-   const Key key(void) const;
+   Key key(void) const;
 
 private:
 

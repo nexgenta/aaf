@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -234,7 +234,7 @@ Element OMSetIterator<Key, Element>::setValue(Element newElement)
   //   @rdesc The <p Key> at the current position.
   //   @this const
 template <typename Key, typename Element>
-const Key OMSetIterator<Key, Element>::key(void) const
+Key OMSetIterator<Key, Element>::key(void) const
 {
   TRACE("OMSetIterator<Key, Element>::key");
 
