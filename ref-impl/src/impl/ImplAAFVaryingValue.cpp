@@ -68,10 +68,10 @@ ImplAAFVaryingValue::ImplAAFVaryingValue ()
 ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 {
 	// Release all of the locator pointers.
-	size_t size = _controlPoints.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _controlPoints.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFControlPoint *pControl = _controlPoints.setValueAt(0, i);
+		ImplAAFControlPoint *pControl = _controlPoints.clearValueAt(i);
 		if (pControl)
 		{
 		  pControl->ReleaseReference();
@@ -155,8 +155,12 @@ AAFRESULT STDMETHODCALLTYPE
 		
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_controlPoints));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFControlPoint>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFControlPoint>(_controlPoints);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFControlPoints, this, iter));
+		
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -178,7 +182,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if(! pResult) return(AAFRESULT_NULL_PARAM);
 
-  *pResult = _controlPoints.getSize();
+  *pResult = _controlPoints.count();
 
   return AAFRESULT_SUCCESS;
 }

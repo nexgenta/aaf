@@ -218,7 +218,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (!_Properties.isPresent())
 	*pCount = 0;
 
-  else  *pCount = _Properties.getSize ();
+  else  *pCount = _Properties.count ();
 	
   return AAFRESULT_SUCCESS;
 }
@@ -531,7 +531,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::IsUniquelyIdentified (
       aafBoolean_t * isUniquelyIdentified)
 {
-  AAFRESULT hr = AAFRESULT_SUCCESS;
 	if (! isUniquelyIdentified)
     return AAFRESULT_NULL_PARAM;
 	
@@ -551,7 +550,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetUniqueIdentifier (
       ImplAAFPropertyDef ** ppUniqueIdentifier)
 {
-  AAFRESULT hr = AAFRESULT_SUCCESS;
 	if (! ppUniqueIdentifier)
     return AAFRESULT_NULL_PARAM;
 
