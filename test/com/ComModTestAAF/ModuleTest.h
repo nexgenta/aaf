@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTest.h,v 1.5 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: ModuleTest.h,v 1.5.2.1 2004/03/17 18:02:44 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,13 +32,7 @@ typedef enum unitTestMode
 {
 	kAAFUnitTestReadWrite, kAAFUnitTestReadOnly
 } testMode_t;
-#endif
 
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 
@@ -73,6 +67,5 @@ bool DR4TestSupported(aafProductVersion_constref toolkitVersion);
 bool RC1TestSupported(aafProductVersion_constref toolkitVersion);
 
 
-#ifdef __cplusplus
-}
-#endif
+
+#endif  // MODULE_TEST_COMMON_H
