@@ -1,6 +1,6 @@
 ; --------------------------------------------------------------------------
 ;
-; $Id: AAFCOM.DEF,v 1.12 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+; $Id: AAFCOM.DEF,v 1.13 2004/05/06 17:55:47 asuraparaju Exp $ $Name:  $
 ;
 ; The contents of this file are subject to the AAF SDK Public
 ; Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,7 @@ EXPORTS		DllGetClassObject private
 EXPORTS		AAFFileOpenExistingRead
 EXPORTS		AAFFileOpenExistingModify
 EXPORTS		AAFFileOpenNewModify
+EXPORTS		AAFFileOpenNewModifyEx
 EXPORTS		AAFFileOpenTransient
 EXPORTS		AAFFileIsAAFFile
 EXPORTS		AAFGetPluginManager
