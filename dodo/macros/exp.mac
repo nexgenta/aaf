@@ -1,12 +1,10 @@
-#c /******************************************\
-#c *                                          *
-#c * Advanced Authoring Format                *
-#c *                                          *
-#c * Copyright (c) 1998 Avid Technology, Inc. *
-#c * Copyright (c) 1998 Microsoft Corporation *
-#c *                                          *
-#c \******************************************/
-
+#c /***********************************************\
+#c *                                               *
+#c * Advanced Authoring Format                     *
+#c *                                               *
+#c * Copyright (c) 1998-1999 Avid Technology, Inc. *
+#c *                                               *
+#c \***********************************************/
 
 
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -87,18 +85,15 @@
 AD_CLASS_BEGIN\
 #endm
 
-
 #ccccccccccccccccccccccccccc
 #c
-#c Ends a class definition for classes which support more than the
-#c primary COM interface.
+#c Starts a class definition
 #c
-#c Arguments: additional interface name
+#c Arguments: none
 #c
-#startm AD_COM_EXT_CLASS_BEGIN 00
-AD_CLASS_BEGIN
+#startm AD_COM_EXT2_CLASS_BEGIN 02
+AD_CLASS_BEGIN\
 #endm
-
 
 #ccccccccccccccccccccccccccc
 #c
@@ -1012,7 +1007,7 @@ HRESULT STDMETHODCALLTYPE
   // @end
   // 
   STDMETHOD (%01)
-  %01 (
+   (
     // @parm %02 %04 | %05 | %06
     .%03-adornment%04 .%03-indirection %05,
 
@@ -3393,6 +3388,17 @@ HRESULT STDMETHODCALLTYPE
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT_CLASS_END 01
+AD_CLASS_END\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT2_CLASS_END 02
 AD_CLASS_END\
 #endm
 
