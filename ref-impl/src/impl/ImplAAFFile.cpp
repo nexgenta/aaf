@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.139 2004/11/04 17:55:08 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.140 2004/11/04 18:55:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1554,9 +1554,11 @@ void ImplAAFFile::registerFactories(void)
                                                        L"AAF-M4K",
                                                        L"AAF Microsoft 4K"));
 
-#elif defined( OS_DARWIN ) || defined( OS_IRIX ) || defined( OS_LINUX ) || defined( OS_SOLARIS )
+#elif defined( OS_UNIX )
 
+// libgsf is available on all UNIX platforms
 #ifdef USE_LIBGSF
+
 	// If LIBGSF support is explicitly requested, GSF SS 512 is the default
 	assert( equalUID( kAAFFileKind_Aaf512Binary, kAAFFileKind_AafG512Binary));
 	assert( equalUID( kAAFFileKind_Aaf4KBinary, kAAFFileKind_AafG4KBinary));
@@ -1572,10 +1574,13 @@ void ImplAAFFile::registerFactories(void)
                                                        L"AAF-G4K",
                                                        L"AAF GSF 4K"));
 #else
+
+// The Schemasoft precompiled library is only available on these platforms
+#if defined( OS_DARWIN ) || defined( OS_IRIX ) || defined( OS_LINUX ) || defined( OS_SOLARIS )
+
 	// DEFAULT is SchemaSoft 512
 	assert( equalUID( kAAFFileKind_Aaf512Binary, kAAFFileKind_AafS512Binary));
 	assert( equalUID( kAAFFileKind_Aaf4KBinary, kAAFFileKind_AafS4KBinary));
-#endif // USE_LIBGSF
 
 	OMFile::registerFactory(AAFS512Encoding, 
                           new OMSS_SSStoredObjectFactory(AAFS512Encoding,
@@ -1587,12 +1592,11 @@ void ImplAAFFile::registerFactories(void)
                                                        Signature_SSBin_4K,
                                                        L"AAF-S4K",
                                                        L"AAF Schemasoft 4K"));
-
-#elif defined( OS_FREEBSD )
-// No SS implementations ported as yet
-#error No SS implementation available on platform
-
 #else
-#error Unknown platform
-#endif
+#error No SS implementation available on platform
+#endif // list of SchemaSoft library platforms
+
+#endif // USE_LIBGSF
+
+#endif // OS_WINDOWS,OS_UNIX
 }
