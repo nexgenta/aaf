@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -41,69 +41,49 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMStoredSetIndex(size_t capacity, OMPropertyId keyPid, OMKeySize keySize);
+  OMStoredSetIndex(size_t capacity);
 
     // @cmember Destructor.
   ~OMStoredSetIndex(void);
 
-    // @cmember The first free key in the set of local keys assigned to
+    // @cmember The high water mark in the set of names assigned to
     //          this <c OMStoredSetIndex>.
-  OMUInt32 firstFreeKey(void) const;
-
-    // @cmember Set the first free key in the set of local keys assigned to
-    //          this <c OMStoredSetIndex>.
-  void setFirstFreeKey(OMUInt32 firstFreeKey);
-
-    // @cmember The last free key in the set of local keys assigned to
-    //          this <c OMStoredSetIndex>.
-  OMUInt32 lastFreeKey(void) const;
-
-    // @cmember Set the last free key in the set of local keys assigned to
-    //          this <c OMStoredSetIndex>.
-  void setLastFreeKey(OMUInt32 lastFreeKey);
-
-  size_t keySize(void) const;
-
-  OMPropertyId keyPropertyId(void) const;
+  OMUInt32 highWaterMark(void) const;
 
     // @cmember Insert a new element in this <c OMStoredSetIndex>.
-    //          The local key of an element is an integer.
-    //          The local key is used to derive the name of the storage
-    //          on which an element is saved. Local keys are assigned
+    //          The name of an element is an integer. Names are assigned
     //          such that the names of existing elements do not have to
     //          change when other elements are added to or removed from
-    //          the associated <c OMStrongReferenceSet>. The local key is
+    //          the associated <c OMStrongReferenceSet>. The name is
     //          independent of the element's logical or physical position
-    //          within the associated <c OMStrongReferenceSet>. The local
-    //          key is also independent of the element's unique key.
+    //          within the associated <c OMStrongReferenceSet>. The name is
+    //          also independent of the element's key.
   void insert(size_t position,
-              OMUInt32 localKey,
+              OMUInt32 name,
               OMUInt32 referenceCount,
-              void* key);
+              const OMUniqueObjectIdentification& key);
 
     // @cmember The number of elements in this <c OMStoredSetIndex>.
+    // @this const
   size_t entries(void) const;
 
     // @cmember Iterate over the elements in this <c OMStoredSetIndex>.
   void iterate(size_t& context,
-               OMUInt32& localKey,
+               OMUInt32& name,
                OMUInt32& referenceCount,
-               void* key) const;
+               OMUniqueObjectIdentification& key) const;
 
     // @cmember Is this <c OMStoredSetIndex> valid ?
   bool isValid(void) const;
 
 private:
 
-  OMUInt32 _firstFreeKey;
-  OMUInt32 _lastFreeKey;
+  OMUInt32 _highWaterMark;
   size_t _capacity;
   size_t _entries;
-  OMPropertyId _keyPropertyId; // Id of property that is the key
-  OMKeySize _keySize; // The size of a key
-  OMUInt32* _localKeys;
+  OMUInt32* _names;
   OMUInt32* _referenceCounts;
-  OMByte* _keys;
+  OMUniqueObjectIdentification* _keys;
 };
 
 #endif
