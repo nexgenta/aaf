@@ -1,58 +1,54 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
-
 #ifndef __CAAFModuleTest_h__
 #define __CAAFModuleTest_h__
 
-#include "AAFTypes.h"
-#include "ModuleTest.h"
+#ifndef __CAAFUnknown_h__
+#include "CAAFUnknown.h"
+#endif
 
-class CAAFModuleTest
+
+#ifndef __AAFModuleTest_h__
+#include "AAFModuleTest.h"
+#endif
+
+// Forward declaration for test method
+class ostream;
+
+class CAAFModuleTest : 
+	public IAAFModuleTest,
+	public CAAFUnknown
 {
-public:
-  CAAFModuleTest();
-  ~CAAFModuleTest();
+protected:
+	CAAFModuleTest(IUnknown *pUnkOuter);
+	virtual ~CAAFModuleTest();
     
-  //
-  // Print out a list of AAF class names, one per line, in the order that 
-  // the tests will be run.
-  //
-  void List(void);
+public:
+	// Declare the factory for this class.
+	AAF_DECLARE_CONCRETE();
 
-  //
-  // Call  Module test functions.
-  //
-  HRESULT Test(testMode_t mode,
-               bool filter = false, 
-               int argc = 0, 
-               const char **argv = NULL);
+	// Declare the module test method. The implementation of the will be be
+	// in /test/CAAFObjectTest.cpp.
+	static HRESULT test(ostream& stream);
 
+
+	// IAAFModuleTest methods
+	//
+    STDMETHOD(Test)(unsigned char *pClassName);
+
+protected:
+	// CAAFUnknown override
+	//
+    virtual HRESULT InternalQueryInterface(REFIID riid, void **ppv);
+
+private:
 };
 
+
+// Redefine the end object map macro to include the module test
+// object.
+#ifdef AAF_END_OBJECT_MAP
+#undef AAF_END_OBJECT_MAP
+#define AAF_END_OBJECT_MAP() AAF_OBJECT_ENTRY(AAFModuleTest) { NULL, NULL, NULL } };
+#endif
 
 
 #endif // __CAAFModuleTest_h__
