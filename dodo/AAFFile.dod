@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFFile.dod,v 1.22 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c $Id: AAFFile.dod,v 1.23 2004/11/02 16:00:59 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -166,7 +166,10 @@ AD_XMETHOD1(GetRevision,
   //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
-  //   - the revision pointer arg is NULL.)
+  //   - the revision pointer arg is NULL.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not open.)
 
 
 AD_METHOD0(Save,
