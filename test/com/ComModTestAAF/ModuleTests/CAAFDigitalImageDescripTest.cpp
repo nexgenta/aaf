@@ -32,9 +32,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -187,8 +190,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pMob->SetName(L"DigitalImageDescriptorTest"));
 
 
-    // Create a digitial image descriptor.
-    checkResult(defs.cdDigitalImageDescriptor()->
+    // Create a concrete subclass of DigitialImageDescriptor.
+    checkResult(defs.cdRGBADescriptor()->
 				CreateInstance(IID_IAAFDigitalImageDescriptor, 
 							   (IUnknown **)&pDIDesc));		
 
@@ -388,20 +391,26 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFDigitalImageDescriptor_test()
+extern "C" HRESULT CAAFDigitalImageDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFDigitalImageDescriptor_test(testMode_t mode)
 {
 	aafWChar*	pFileName = L"AAFDigitalImageDescripTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFDigitalImageDescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFDigitalImageDescriptor_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;
