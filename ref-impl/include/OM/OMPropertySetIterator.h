@@ -36,8 +36,7 @@
 class OMProperty;
 class OMPropertySet;
 
-  // @class Iterators over <c OMPropertySet>s.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+// @class Iterators over <c OMPropertySet>s.
 class OMPropertySetIterator {
 public:
   // @access Public members.
