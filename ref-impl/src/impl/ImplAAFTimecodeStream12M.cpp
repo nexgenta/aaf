@@ -1,29 +1,19 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
 
 /***********************************************\
 *	Stub only.   Implementation not yet added	*
@@ -83,7 +73,7 @@ typedef struct
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
-#include "AAFUtils.h"
+#include "aafUtils.h"
 
 ImplAAFTimecodeStream12M::ImplAAFTimecodeStream12M ()
 {}
@@ -122,7 +112,7 @@ AAFRESULT STDMETHODCALLTYPE
 		minutes = (((fmt.bits40_47 >> 5L) & 0x07) * 10) + ((fmt.bits32_39 >> 4L) & 0x0F);
 		seconds = (((fmt.bits24_31 >> 5L) & 0x07) * 10) + ((fmt.bits16_23 >> 4L) & 0x0F);
 		frames = (((fmt.bits8_15 >> 6L) & 0x03) * 10) + ((fmt.bits0_7 >> 4L) & 0x0F);
-		tc->drop = ((fmt.bits8_15 >> 5L) & 0x01 ? kAAFTcDrop : kAAFTcNonDrop);
+		tc->drop = ((fmt.bits8_15 >> 5L) & 0x01 ? kTcDrop : kTcNonDrop);
 		CHECK(PvtTimecodeToOffset((aafInt16)fps, hours, minutes, seconds, frames, tc->drop, &tc->startFrame));
 	}
 	XEXCEPT
@@ -156,7 +146,7 @@ AAFRESULT STDMETHODCALLTYPE
 		fmt.bits40_47 = (fmt.bits40_47 & ~0xE0) | (((minutes / 10) << 5L) & 0xE0);
 		fmt.bits48_55 = (fmt.bits48_55 & ~0xF0) | (((hours % 10) << 4L) & 0xF0);
 		fmt.bits56_63 = (fmt.bits56_63 & ~0xC0) | (((hours / 10) << 6L) & 0xC0);
-		fmt.bits8_15 = (fmt.bits8_15 & ~0x20)	| (tc->drop == kAAFTcDrop ? 0x20 : 0x00);
+		fmt.bits8_15 = (fmt.bits8_15 & ~0x20)	| (tc->drop == kTcDrop ? 0x20 : 0x00);
 		memcpy(buffer, (aafUInt8 *)&fmt, sizeof(smpte_12MFormat_t));
 	}
 	XEXCEPT
@@ -213,5 +203,6 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+OMDEFINE_STORABLE(ImplAAFTimecodeStream12M, AUID_AAFTimecodeStream12M);
 
 
