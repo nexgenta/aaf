@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2004/02/27 15:43:02 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@ GEN_H_DIR=./include
 EXE=
 OBJ=.o
 COMPILE=c++
-COMPILEFLAGS=-I.. -I../../AAFi686LinuxSDK/g++/include
+COMPILEFLAGS=-I.. -I../../ref-impl/include/ref-api -I../../ref-impl/include
 LINK=c++
 
 PROGS=classDefUid$(EXE) \
