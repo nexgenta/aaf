@@ -38,24 +38,55 @@
   // @mfunc Constructor.
   //   @parm The property id.
   //   @parm The name of this <c OMWeakReferenceVectorProperty>.
-  //   @parm The name of the the <c OMProperty> instance (a set property)
-  //         in which the objects referenced by the elements of this
-  //         <c OMWeakReferenceVectorProperty> reside.
+  //   @parm The name (as a string) of the the <c OMProperty> instance
+  //         (a set property) in which the objects referenced by the
+  //         elements of this <c OMWeakReferenceVectorProperty> reside.
+  //   @parm The id of the property by which the <p ReferencedObject>s
+  //         are uniquely identified (the key).
 template <typename ReferencedObject>
 OMWeakReferenceVectorProperty<ReferencedObject>::
                 OMWeakReferenceVectorProperty(const OMPropertyId propertyId,
                                               const wchar_t* name,
                                               const wchar_t* targetName,
                                               const OMPropertyId keyPropertyId)
-: OMContainerProperty<ReferencedObject>(propertyId,
-                                        SF_WEAK_OBJECT_REFERENCE_VECTOR,
-                                        name),
+: OMReferenceVectorProperty(propertyId,
+                            SF_WEAK_OBJECT_REFERENCE_VECTOR,
+                            name),
   _targetTag(nullOMPropertyTag),
   _targetName(targetName),
+  _targetPropertyPath(0),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
                                               "OMWeakReferenceVectorProperty");
+}
+
+  // @mfunc Constructor.
+  //   @parm The property id.
+  //   @parm The name of this <c OMWeakReferenceVectorProperty>.
+  //   @parm The name (as a string) of the the <c OMProperty> instance
+  //         (a set property) in which the objects referenced by the
+  //         elements of this <c OMWeakReferenceVectorProperty> reside.
+  //   @parm The id of the property by which the <p ReferencedObject>s
+  //         are uniquely identified (the key).
+template <typename ReferencedObject>
+OMWeakReferenceVectorProperty<ReferencedObject>::OMWeakReferenceVectorProperty(
+                                        const OMPropertyId propertyId,
+                                        const wchar_t* name,
+                                        const OMPropertyId keyPropertyId,
+                                        const OMPropertyId* targetPropertyPath)
+: OMReferenceVectorProperty(propertyId,
+                            SF_WEAK_OBJECT_REFERENCE_VECTOR,
+                            name),
+  _targetTag(nullOMPropertyTag),
+  _targetName(0),
+  _targetPropertyPath(0),
+  _keyPropertyId(keyPropertyId)
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
+                                              "OMWeakReferenceVectorProperty");
+
+  _targetPropertyPath = savePropertyPath(targetPropertyPath);
 }
 
   // @mfunc Destructor.
@@ -65,6 +96,8 @@ OMWeakReferenceVectorProperty<ReferencedObject>::
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
                                              "~OMWeakReferenceVectorProperty");
+
+  delete [] _targetPropertyPath;
 }
 
   // @mfunc Save this <c OMWeakReferenceVectorProperty>.
@@ -176,7 +209,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::restore(
 
   // restore the index
   //
-  OMUniqueObjectIdentification* vectorIndex = 0;
+  const OMUniqueObjectIdentification* vectorIndex = 0;
   size_t entries;
   OMPropertyTag tag;
   OMPropertyId keyPropertyId;
@@ -440,6 +473,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::insertAt(
   PRECONDITION("Source container object and target object in same file",
                                         container()->file() == object->file());
 #endif
+
   OMUniqueObjectIdentification key = object->identification();
   VectorElement newElement(this, key, _targetTag);
 #if defined(OM_VALIDATE_WEAK_REFERENCES)
@@ -807,6 +841,91 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::setBits(
 
 }
 
+  // @mfunc Insert <p object> into this
+  //        <c OMWeakReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @parm The <c OMObject> to insert.
+template <typename ReferencedObject>
+void
+OMWeakReferenceVectorProperty<ReferencedObject>::insert(const OMObject* object)
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::insert");
+
+  PRECONDITION("Valid object", object != 0);
+
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  insert(p);
+}
+
+  // @mfunc Does this <c OMWeakReferenceVectorProperty> contain
+  //        <p object> ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @parm The <c OMObject> for which to search.
+  //   @rdesc True if <p object> is present, false otherwise.
+  //   @this const
+template <typename ReferencedObject>
+bool
+OMWeakReferenceVectorProperty<ReferencedObject>::containsValue(
+                                                  const OMObject* object) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::containsValue");
+
+  PRECONDITION("Valid object", object != 0);
+
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  return containsValue(p);
+}
+
+  // @mfunc Remove <p object> from this
+  //        <c OMWeakReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @parm The <c OMObject> to remove.
+template <typename ReferencedObject>
+void
+OMWeakReferenceVectorProperty<ReferencedObject>::removeValue(
+                                                        const OMObject* object)
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::removeValue");
+
+  PRECONDITION("Valid object", object != 0);
+
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  removeValue(p);
+}
+
+  // @mfunc Create an <c OMReferenceContainerIterator> over this
+  //        <c OMWeakReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @rdesc An <c OMReferenceContainerIterator> over this
+  //          <c OMWeakReferenceVectorProperty>.
+  //   @this const
+template <typename ReferencedObject>
+OMReferenceContainerIterator*
+OMWeakReferenceVectorProperty<ReferencedObject>::createIterator(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::createIterator");
+
+  OMWeakReferenceVectorIterator<ReferencedObject>* result =
+          new OMWeakReferenceVectorIterator<ReferencedObject>(*this, OMBefore);
+  ASSERT("Valid heap pointer", result != 0);
+
+  return result;
+}
+
 template<typename ReferencedObject>
 OMPropertyTag
 OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
@@ -819,10 +938,41 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
             const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
   if (_targetTag == nullOMPropertyTag) {
     nonConstThis->_targetTag =
-                           file()->referencedProperties()->insert(_targetName);
+                  file()->referencedProperties()->insert(targetPropertyPath());
   }
   POSTCONDITION("Valid target property tag", _targetTag != nullOMPropertyTag);
   return _targetTag;
+}
+
+template<typename ReferencedObject>
+OMPropertyId*
+OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath");
+
+  PRECONDITION("Valid target name", validWideString(_targetName));
+
+  if (_targetPropertyPath == 0) {
+    OMWeakReferenceVectorProperty<ReferencedObject>* nonConstThis =
+            const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
+    nonConstThis->_targetPropertyPath = file()->path(_targetName);
+  }
+  POSTCONDITION("Valid result", _targetPropertyPath != 0);
+  return _targetPropertyPath;
+}
+
+template<typename ReferencedObject>
+void
+OMWeakReferenceVectorProperty<ReferencedObject>::clearTargetTag(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::clearTargetTag");
+
+  OMWeakReferenceVectorProperty<ReferencedObject>* nonConstThis =
+            const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
+
+  nonConstThis->_targetTag = nullOMPropertyTag;
+  delete [] nonConstThis->_targetPropertyPath;
+  nonConstThis->_targetPropertyPath = 0;
 }
 
 #endif
