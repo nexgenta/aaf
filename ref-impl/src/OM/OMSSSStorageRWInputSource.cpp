@@ -8,24 +8,11 @@
 *  Copyright (C) 2002 - 2003 Schema Software, Inc. All rights reserved.
 *  Portions Copyright (C) 2003 Metaglue Corparation. All rights reserved.
 *
-*  $Revision: 1.5 $
-*  $Date: 2004/09/10 17:13:10 $
+*  $Revision: 1.6 $
+*  $Date: 2004/12/01 21:37:18 $
 *  
 \******************************************************************************/
 #include "OMSSSStorageRWInputSource.h"
-
-
-//Type definitiosn taken from the schemasoft source
-
-typedef unsigned long UINT4;
-
-#ifdef _MSC_VER /* If this is Visual C++ */
-typedef signed __int64 SINT8;
-#else /* _MSC_VER */
-typedef signed long long SINT8;
-#endif /* _MSC_VER */
-
-typedef signed long SINT4;
 
 
 #ifdef DEBUG
