@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000y Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,7 +26,6 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRedBlackTreeIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMRedBlackTreeIterator> over the given
@@ -145,21 +144,6 @@ bool OMRedBlackTreeIterator<Key, Value>::after(void) const
     result = false;
   }
   return result;
-}
-
-  // @mfunc The number of <p Value>s in the associated
-  //        <c OMRedBlackTree>.
-  //   @tcarg class | Key | The type of the unique key that identifies
-  //          the contained values.
-  //   @tcarg class | Value | The type of the contained values.
-  //   @rdesc The number of <p Value>s.
-  //   @this const
-template <typename Key, typename Value>
-size_t OMRedBlackTreeIterator<Key, Value>::count(void) const
-{
-  TRACE("OMRedBlackTreeIterator<Key, Value>::count");
-
-  return _tree->count();
 }
 
   // @mfunc Advance this <c OMRedBlackTreeIterator> to the next <p Value>,
@@ -296,17 +280,16 @@ Value& OMRedBlackTreeIterator<Key, Value>::value(void) const
   //   @tcarg class | Key | The type of the unique key that identifies
   //          the contained values.
   //   @tcarg class | Value | The type of the contained values.
-  //   @parm The key <p Key>.
   //   @parm The new <p Value>.
   //   @rdesc The previous <p Value>.
 template <typename Key, typename Value>
-Value OMRedBlackTreeIterator<Key, Value>::setValue(const Key k,
-                                                   Value newValue)
+Value OMRedBlackTreeIterator<Key, Value>::setValue(Value newValue)
 {
   TRACE("OMRedBlackTreeIterator<Key, Value>::setValue");
 
   PRECONDITION("Valid iterator", valid());
-  PRECONDITION("Matching keys", k == key());
+
+  // tjb how do we check that the old and new keys match ?
 
   Value result = _current->_value;
   _current->_value = newValue;
@@ -323,7 +306,7 @@ Value OMRedBlackTreeIterator<Key, Value>::setValue(const Key k,
   //   @rdesc The <p Key> at the current position.
   //   @this const
 template <typename Key, typename Value>
-Key OMRedBlackTreeIterator<Key, Value>::key(void) const
+const Key OMRedBlackTreeIterator<Key, Value>::key(void) const
 {
   TRACE("OMRedBlackTreeIterator<Key, Value>::key");
 

@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,7 +26,6 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMSetIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMSetIterator> over the given
@@ -121,21 +120,6 @@ bool OMSetIterator<Key, Element>::after(void) const
   return _iterator.after();
 }
 
-  // @mfunc The number of <p Elements>s in the associated
-  //        <c OMSet>.
-  //   @tcarg class | Key | The type of the unique key that identifies
-  //          the contained elements.
-  //   @tcarg class | Element | The type of the contained elements.
-  //   @rdesc The number of <p Elements>s
-  //   @this const
-template <typename Key, typename Element>
-size_t OMSetIterator<Key, Element>::count(void) const
-{
-  TRACE("OMSetIterator<Key, Element>::count");
-
-  return _iterator.count();
-}
-
   // @mfunc Advance this <c OMSetIterator> to the next <p Element>,
   //        if any.
   //        If the end of the associated <c OMSet> is not
@@ -213,19 +197,17 @@ Element& OMSetIterator<Key, Element>::value(void) const
   //   @tcarg class | Key | The type of the unique key that identifies
   //          the contained elements.
   //   @tcarg class | Element | The type of the contained elements.
-  //   @parm The <p Key>.
   //   @parm The new <p Element>.
   //   @rdesc The previous <p Element>.
 template <typename Key, typename Element>
-Element OMSetIterator<Key, Element>::setValue(const Key k,
-                                              Element newElement)
+Element OMSetIterator<Key, Element>::setValue(Element newElement)
 {
   TRACE("OMSetIterator<Key, Element>::setValue");
 
   PRECONDITION("Valid iterator", _iterator.valid());
-  PRECONDITION("Matching keys", k == key());
+  PRECONDITION("Matching keys", newElement.identification() == key());
 
-  return _iterator.setValue(k, newElement);
+  return _iterator.setValue(newElement);
 }
 
   // @mfunc Return the <p Key> of the <p Element> in the associated
@@ -237,7 +219,7 @@ Element OMSetIterator<Key, Element>::setValue(const Key k,
   //   @rdesc The <p Key> at the current position.
   //   @this const
 template <typename Key, typename Element>
-Key OMSetIterator<Key, Element>::key(void) const
+const Key OMSetIterator<Key, Element>::key(void) const
 {
   TRACE("OMSetIterator<Key, Element>::key");
 

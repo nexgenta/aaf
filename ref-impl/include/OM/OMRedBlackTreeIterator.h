@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,21 +29,14 @@
 #ifndef OMREDBLACKTREEITERATOR_H
 #define OMREDBLACKTREEITERATOR_H
 
-#if defined (_MSC_VER)
-  // - 'identifier' : identifier was truncated to 'number' characters in
-  //   the debug information
-#pragma warning(disable:4786) // Gak !
-#endif
-
 #include "OMContainerIterator.h"
 #include "OMRedBlackTree.h"
 
-  // @class Iterators over <c OMRedBlackTree>s.
-  //   @tcarg class | Key | The type of the unique key that identifies
-  //          the contained values.
-  //   @tcarg class | Value | The type of the contained values.
-  //   @base public | <c OMContainerIterator>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+// @class Iterators over <c OMRedBlackTree>s.
+//   @tcarg class | Key | The type of the unique key that identifies
+//          the contained values.
+//   @tcarg class | Value | The type of the contained values.
+//   @base public | <c OMContainerIterator>
 template <typename Key, typename Value>
 class OMRedBlackTreeIterator : public OMContainerIterator<Value> {
 public:
@@ -66,7 +59,7 @@ public:
                          OMIteratorPosition initialPosition);
 
     // @cmember Destroy this <c OMRedBlackTreeIterator>.
-  virtual ~OMRedBlackTreeIterator(void);
+  ~OMRedBlackTreeIterator(void);
 
     // @cmember Reset this <c OMRedBlackTreeIterator> to the given
     //          <p initialPosition>.
@@ -80,19 +73,15 @@ public:
     //          <c OMRedBlackTreeIterator> is made ready to traverse the
     //          associated <c OMRedBlackTree> in the reverse direction
     //          (decreasing <p Key>s).
-  virtual void reset(OMIteratorPosition initialPosition);
+   virtual void reset(OMIteratorPosition initialPosition);
 
     // @cmember Is this <c OMRedBlackTreeIterator> positioned before the first
     //          <p Value> ?
-  virtual bool before(void) const;
+   virtual bool before(void) const;
 
     // @cmember Is this <c OMRedBlackTreeIterator> positioned after the last
     //          <p Value> ?
-  virtual bool after(void) const;
-
-    // @cmember The number of <p Value>s in the associated
-    //          <c OMRedBlackTree>.
-  virtual size_t count(void) const;
+   virtual bool after(void) const;
 
     // @cmember Advance this <c OMRedBlackTreeIterator> to the next <p Value>,
     //          if any.
@@ -104,7 +93,7 @@ public:
     //          then the result is <e bool.false>,
     //          <mf OMRedBlackTreeIterator::valid> becomes <e bool.false> and
     //          <mf OMRedBlackTreeIterator::after> becomes <e bool.true>. 
-  virtual bool operator++();
+   virtual bool operator++();
 
     // @cmember Retreat this <c OMRedBlackTreeIterator> to the previous
     //          <p Value>, if any.
@@ -116,12 +105,12 @@ public:
     //          reached then the result is <e bool.false>,
     //          <mf OMRedBlackTreeIterator::valid> becomes <e bool.false> and
     //          <mf OMRedBlackTreeIterator::before> becomes <e bool.true>. 
-  virtual bool operator--();
+   virtual bool operator--();
 
     // @cmember Return the <p Value> in the associated <c OMRedBlackTree>
     //          at the position currently designated by this
     //          <c OMRedBlackTreeIterator>.
-  virtual Value& value(void) const;
+   virtual Value& value(void) const;
 
     // @cmember Set the <p Value> in the associated <c OMRedBlackTree> at the
     //          position currently designated by this
@@ -129,12 +118,12 @@ public:
     //          <p Value> is returned. To preserve the ordering of
     //          <p Key>s, the <p Key> of <p newValue> must be the same as
     //          that of the existing <p Value>.
-  virtual Value setValue(const Key k, Value newValue);
+   virtual Value setValue(Value newValue);
 
     // @cmember Return the <p Key> of the <p Value> in the associated
     //          <c OMRedBlackTree> at the position currently designated by this
     //          <c OMRedBlackTreeIterator>.
-  Key key(void) const;
+   const Key key(void) const;
 
 private:
 

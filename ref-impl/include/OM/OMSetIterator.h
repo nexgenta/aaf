@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -35,12 +35,11 @@
 template <typename Key, typename Element>
 class OMSet;
 
-  // @class Iterators over <c OMSet>s.
-  //   @tcarg class | Key | The type of the unique key that identifies
-  //          the contained elements.
-  //   @tcarg class | Element | The type of the contained elements.
-  //   @base public | <c OMContainerIterator>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+// @class Iterators over <c OMSet>s.
+//   @tcarg class | Key | The type of the unique key that identifies
+//          the contained elements.
+//   @tcarg class | Element | The type of the contained elements.
+//   @base public | <c OMContainerIterator>
 template <typename Key, typename Element>
 class OMSetIterator : public OMContainerIterator<Element> {
 public:
@@ -63,7 +62,7 @@ public:
                 OMIteratorPosition initialPosition);
 
     // @cmember Destroy this <c OMSetIterator>.
-  virtual ~OMSetIterator(void);
+  ~OMSetIterator(void);
 
     // @cmember Reset this <c OMSetIterator> to the given
     //          <p initialPosition>.
@@ -77,19 +76,15 @@ public:
     //          <c OMSetIterator> is made ready to traverse the
     //          associated <c OMSet> in the reverse direction
     //          (decreasing <p Key>s).
-  virtual void reset(OMIteratorPosition initialPosition);
+   virtual void reset(OMIteratorPosition initialPosition);
 
     // @cmember Is this <c OMSetIterator> positioned before the first
     //          <p Element> ?
-  virtual bool before(void) const;
+   virtual bool before(void) const;
 
     // @cmember Is this <c OMSetIterator> positioned after the last
     //          <p Element> ?
-  virtual bool after(void) const;
-
-    // @cmember The number of <p Elements>s in the associated
-    //          <c OMSet>.
-  virtual size_t count(void) const;
+   virtual bool after(void) const;
 
     // @cmember Advance this <c OMSetIterator> to the next <p Element>,
     //          if any.
@@ -101,7 +96,7 @@ public:
     //          then the result is <e bool.false>,
     //          <mf OMSetIterator::valid> becomes <e bool.false> and
     //          <mf OMSetIterator::after> becomes <e bool.true>. 
-  virtual bool operator++();
+   virtual bool operator++();
 
     // @cmember Retreat this <c OMSetIterator> to the previous
     //          <p Element>, if any.
@@ -113,12 +108,12 @@ public:
     //          reached then the result is <e bool.false>,
     //          <mf OMSetIterator::valid> becomes <e bool.false> and
     //          <mf OMSetIterator::before> becomes <e bool.true>. 
-  virtual bool operator--();
+   virtual bool operator--();
 
     // @cmember Return the <p Element> in the associated <c OMSet>
     //          at the position currently designated by this
     //          <c OMSetIterator>.
-  virtual Element& value(void) const;
+   virtual Element& value(void) const;
 
     // @cmember Set the <p Element> in the associated <c OMSet> at the
     //          position currently designated by this
@@ -126,12 +121,12 @@ public:
     //          <p Element> is returned. To preserve the ordering of
     //          <p Key>s, the <p Key> of <p newElement> must be the same as
     //          that of the existing <p Element>.
-  virtual Element setValue(const Key k, Element newElement);
+   virtual Element setValue(Element newElement);
 
     // @cmember Return the <p Key> of the <p Element> in the associated
     //          <c OMSet> at the position currently designated by this
     //          <c OMSetIterator>.
-  Key key(void) const;
+   const Key key(void) const;
 
 private:
 
