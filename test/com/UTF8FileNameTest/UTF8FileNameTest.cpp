@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: UTF8FileNameTest.cpp,v 1.4 2004/09/22 14:50:40 bakerian Exp $ $Name:  $
+// $Id: UTF8FileNameTest.cpp,v 1.5 2004/09/22 15:00:22 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -490,7 +490,6 @@ int main(int argc, char* argv[])
 
 		// Write the AAF file and the external essence file
 		cout << "  Writing" << endl;
-		RemoveTestFile(UnicodeExtName);
 		if (simpleFileIO)
 			checkResult(WriteAAFFile(pFile, L"external.wav"));
 		else
