@@ -1,7 +1,7 @@
 #!/bin/sh
 ###############################################################################
 #
-# $Id: runaaftest.sh,v 1.2 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: runaaftest.sh,v 1.3 2004/05/27 17:03:31 asuraparaju Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -68,7 +68,7 @@ runtest()
 			then
 				filen=$numEss$ext.aaf
 			fi
-			if [ $arg == "-eagerLoad" ]
+			if [ $arg == "-lazyLoad" ]
 			then
 				cmd="$exename $arg $AAF_TEST_DIR/$filen"
 			else
@@ -199,11 +199,11 @@ then
 	echo "InfoDumper on files with netloc"
 	runLoop "InfoDumper" "-netloc"
 	echo ""
-	echo "InfoDumper -eagerLoad"
-	runLoop "InfoDumper" "-eagerLoad"
+	echo "InfoDumper -lazyLoad"
+	runLoop "InfoDumper" "-lazyLoad"
 	echo ""
-	echo "InfoDumper -eagerLoad on files with netloc"
-	runLoop "InfoDumper" "-eagerLoad" "-netloc"
+	echo "InfoDumper -lazyLoad on files with netloc"
+	runLoop "InfoDumper" "-lazyLoad" "-netloc"
 	echo ""
 fi
 

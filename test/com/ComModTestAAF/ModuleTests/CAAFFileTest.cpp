@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFile
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.37 2004/05/06 12:44:16 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.38 2004/05/27 17:03:31 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,7 +114,7 @@ static HRESULT checkModeFlags ()
 {
   HRESULT temphr;
 
-  temphr = checkModeFlag (AAF_FILE_MODE_EAGER_LOADING,
+  temphr = checkModeFlag (AAF_FILE_MODE_LAZY_LOADING,
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 

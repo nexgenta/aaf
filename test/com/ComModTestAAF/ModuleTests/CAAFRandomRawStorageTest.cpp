@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomRawStorageTest.cpp,v 1.17 2004/04/08 12:00:48 bakerian Exp $ $Name:  $
+// $Id: CAAFRandomRawStorageTest.cpp,v 1.18 2004/05/27 17:03:31 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -115,7 +115,7 @@ static HRESULT checkModeFlags ()
 {
   HRESULT temphr;
 
-  temphr = checkModeFlag (AAF_FILE_MODE_EAGER_LOADING,
+  temphr = checkModeFlag (AAF_FILE_MODE_LAZY_LOADING,
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 
