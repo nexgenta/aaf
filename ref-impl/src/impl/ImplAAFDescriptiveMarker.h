@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFDescriptiveMarker.h,v 1.1.2.1 2004/05/08 22:14:24 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDescriptiveMarker.h,v 1.1.2.2 2004/05/09 03:37:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,8 @@
 #ifndef __ImplAAFCommentMarker_h__
 #include "ImplAAFCommentMarker.h"
 #endif
+
+#include "ImplAAFSourceReference.h"
 
 #include "OMStrongRefProperty.h"
 
