@@ -1,7 +1,13 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFModule\
 #endm
-#c
 AD_IDL(\  //***********************************************************
   //
   // Global functions for AAF files:
