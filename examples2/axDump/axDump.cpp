@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axDump.cpp,v 1.10 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
+// $Id: axDump.cpp,v 1.11 2005/01/11 09:22:20 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -308,7 +308,7 @@ int main( int argc, char* argv[] )
 		// Second command line argument is the filename
 		AxCmdLineArgs args( argc, argv );
 
-		pair<bool, const char*> fileArg = args.get(1);
+		// pair<bool, const char*> fileArg = args.get(1);
 
 		pair<bool, int> fileOpArg = args.get( "-file" );
 		if ( !fileOpArg.first ) {
