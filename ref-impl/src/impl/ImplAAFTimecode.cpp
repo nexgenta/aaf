@@ -1,56 +1,40 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
 
 #ifndef __ImplAAFTimecode_h__
 #include "ImplAAFTimecode.h"
 #endif
-
-#include "ImplAAFDictionary.h"
-#include "ImplAAFBuiltinDefs.h"
-
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
 
 #include <assert.h>
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "AAFUtils.h"
-#include "AAFDataDefs.h"
+#include "aafUtils.h"
+#include "AAFDefUIDs.h"
 
 ImplAAFTimecode::ImplAAFTimecode ():
-_start(	PID_Timecode_Start,	L"Start"),
-_FPS(	PID_Timecode_FPS,	L"FPS"),
-_drop(	PID_Timecode_Drop,	L"Drop")
+_timecode(	PID_TIMECODE_TC,	"timecode")
 {
-	_persistentProperties.put(_start.address());
-	_persistentProperties.put(_FPS.address());
-	_persistentProperties.put(_drop.address());
+	_persistentProperties.put(_timecode.address());
 }
 
 ImplAAFTimecode::~ImplAAFTimecode ()
@@ -58,41 +42,19 @@ ImplAAFTimecode::~ImplAAFTimecode ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTimecode::Initialize (aafLength_t length,
+    ImplAAFTimecode::InitTimecode (aafLength_t length,
                            aafTimecode_t *timecode)
 {
+	aafUID_t	tcddef = DDEF_Timecode;
+	
 	XPROTECT()
 	{
-		if (isInitialized ()) 
-		{
-			return AAFRESULT_ALREADY_INITIALIZED;
-		}
-
+		CHECK(SetNewProps(length, &tcddef));
 		if (timecode == NULL)
 		{
 			return AAFRESULT_NULL_PARAM;
 		}
-		if ((timecode->drop != kAAFTcDrop) && (timecode->drop != kAAFTcNonDrop))
-		{
-			return AAFRESULT_INVALID_TIMECODE;
-		}
-
-		ImplAAFDictionarySP pDict;
-		CHECK(GetDictionary (&pDict));
-		CHECK(SetNewProps(length,
-						  pDict->GetBuiltinDefs()->ddTimecode()));
-		_start = timecode->startFrame;
-		if (timecode->drop == kAAFTcDrop)
-		{
-		  _drop = kAAFTrue;
-		}
-		else
-		{
-		  _drop = kAAFFalse;
-		}
-		_FPS = timecode->fps;
-		
-		setInitialized ();
+		_timecode = *timecode;
 	}
 	XEXCEPT
 	XEND;
@@ -105,27 +67,12 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::GetTimecode (aafTimecode_t *timecode)
 {
-	if ( !isInitialized ()) 
-	{
-		return AAFRESULT_NOT_INITIALIZED;
-	}
-
 	if (timecode == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 
-	timecode->startFrame = _start;
-
-	if (kAAFTrue == _drop)
-	{
-		timecode->drop = kAAFTcDrop;
-	}
-	else
-	{
-		timecode->drop = kAAFTcNonDrop;
-	}
-	timecode->fps = _FPS;
+	*timecode = _timecode;
 	return(AAFRESULT_SUCCESS);
 }
 
@@ -134,29 +81,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::SetTimecode (aafTimecode_t  *timecode)
 {
-	if ( !isInitialized ()) 
-	{
-		return AAFRESULT_NOT_INITIALIZED;
-	}
 	if (timecode == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-	if ((timecode->drop != kAAFTcDrop) && (timecode->drop != kAAFTcNonDrop))
-	{
-		return AAFRESULT_INVALID_TIMECODE;
-	}
-	_start = timecode->startFrame;
-	if (timecode->drop == kAAFTcDrop)
-	{
-		_drop = kAAFTrue;
-	}
-	else
-	{
-		_drop = kAAFFalse;
-	}
-	_FPS = timecode->fps;
-
+	_timecode = *timecode;
 	return(AAFRESULT_SUCCESS);
 }
 
@@ -185,7 +114,7 @@ AAFRESULT STDMETHODCALLTYPE
     }
   XEND;
 
-  return(AAFRESULT_SUCCESS);
+  return(OM_ERR_NONE);
 }
 
   // Override from AAFSegment
@@ -218,17 +147,13 @@ AAFRESULT STDMETHODCALLTYPE
 // CHECK(AAFConvertEditRate(_editRate, oldStart,
 //		  							*pEditRate , kRoundFloor, &newStart));
 //!!!		CHECK(TruncInt64toInt32(_offset, &frameOffset));	/* OK FRAMEOFFSET */
-		// BobT 3/26/99: change aafFrameOffset_t to 64-bit, so we need to use a
-		// 32-bit temp for this function call.
-		aafUInt32 offset32;
-		CHECK(TruncInt64toUInt32(oldStart, &offset32));		/* OK FRAMEOFFSET */
-		*pOffset = offset32;
+		CHECK(TruncInt64toUInt32(oldStart, pOffset));		/* OK FRAMEOFFSET */
 
 	   /* check for out of bound timecode */
 	   if (pTimecode->startFrame < startTC.startFrame) 
 	   {
 			  /* out of left bound */
-		    RAISE(AAFRESULT_BADSAMPLEOFFSET);
+		    RAISE(OM_ERR_BADSAMPLEOFFSET);
 	   }
 	   else
 	   {
@@ -237,7 +162,7 @@ AAFRESULT STDMETHODCALLTYPE
 		    if (pTimecode->startFrame > (startTC.startFrame + len))
 		    {
 					/* out of right bound */
-			     RAISE(AAFRESULT_BADSAMPLEOFFSET);
+			     RAISE(OM_ERR_BADSAMPLEOFFSET);
 		    }
 	   }
 	 }
@@ -246,19 +171,99 @@ AAFRESULT STDMETHODCALLTYPE
 	}
   XEND;
   
-  return(AAFRESULT_SUCCESS);
+  return(OM_ERR_NONE);
 
 }
 
 
-aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t /* offset !!!*/, ImplAAFTimecode **result,
+aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t offset, ImplAAFTimecode **result,
 												aafPosition_t *tcStartPos)
 {
-  	if(result == NULL)
-		return(AAFRESULT_NULL_PARAM);
 	*result = this;
 	CvtInt32toInt64(0, tcStartPos);
-	return(AAFRESULT_SUCCESS);
+	return(OM_ERR_NONE);
+}
+
+extern "C" const aafClassID_t CLSID_AAFTimecode;
+
+OMDEFINE_STORABLE(ImplAAFTimecode, CLSID_AAFTimecode);
+
+#if FULL_TOOLKIT
+/*************************************************************************
+ * Function: omfiTimecodeNew()
+ *
+ *      This function creates a new timecode clip with the given
+ *      property values.  The timecode value is represented with an
+ *      aafTimecode_t struct consisting of startFrame, drop, and fps.
+ *
+ *      This function supports both 1.x and 2.x files.
+ *
+ * Argument Notes:
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ *************************************************************************/
+AAFTimecode::AAFTimecode(AAFFile *file, OMLObject obj)
+{
+	Init(file, obj);
+}
+
+AAFTimecode::AAFTimecode(
+    AAFFile * file,               /* IN - File Handle */
+	aafLength_t length,          /* IN - Length Property Value */
+	aafTimecode_t timecode)      /* IN - Timecode Value (startFrame,
+								  *      drop, fps)
+								  */
+{
+	AAFObject * tmpTCClip = NULL;
+	AAFDataKind * datakind = NULL;
+	aafErr_t aafError = OM_ERR_NONE;
+	
+	XPROTECT(_file)
+	  {
+		CreatePersistant(file, "TCCP");
+
+		/* Set datakind object for timecode from cache */
+		if (!_head->DatakindLookup(TIMECODEKIND, &datakind, &aafError))
+		  {
+			RAISE(OM_ERR_INVALID_DATAKIND);
+		  }
+
+		CHECK(SetNewProps(length, datakind));
+		_timecode = timecode;
+	  }
+
+	XEXCEPT
+	  {
+	  }
+	XEND_VOID;
+}
+
+/*************************************************************************
+ * Function: omfiTimecodeGetInfo()
+ *************************************************************************/
+aafErr_t AAFTimecode::GetTimecode(
+	aafTimecode_t *timecode)  /* OUT - Timecode (startFrame, drop, fps) */
+{
+	aafAssertValidFHdl(_file);
+	aafAssert(timecode != NULL, _file, OM_ERR_NULL_PARAM);
+
+	*timecode = _timecode;
+
+	return(OM_ERR_NONE);
+}
+
+aafErr_t AAFTimecode::SegmentOffsetToTC(aafPosition_t offset, aafTimecode_t *tc, aafBool *found)
+{
 }
 
 
+aafErr_t AAFTimecode::SegmentTCToOffset(aafTimecode_t tc, aafRational_t editRate, aafFrameOffset_t *offset, aafBool *found)
+{
+}
+
+
+#endif
