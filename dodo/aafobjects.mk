@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.3 2004/03/24 00:36:42 jptrainor Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.4 2004/04/07 13:08:27 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,7 @@ AAFCOMINTERFACESONLY="\
 	AAFTypeDefVariableArrayEx \
 	AAFMasterMobEx \
 	AAFMob2 \
+	AAFTimelineMobSlot2 \
 	AAFComponent2 "
 
 
