@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.24.2.3 2005/01/09 05:49:17 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.24.2.4 2005/01/21 14:25:24 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -401,6 +401,8 @@ private:
   // Merge class defs that exist in _classDefinitions but not in
   // _fileClassDefinition into _fileClassDefinition.
   AAFRESULT PvtMergeFileClassDefsToBuiltin();
+
+  AAFRESULT PvtClearFileClassSet();
 
   //
   // Persistent data members.
