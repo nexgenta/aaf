@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMVectorIteratorT.h,v 1.10.2.1 2004/06/08 13:45:41 stuart_hc Exp $ $Name:  $
+// $Id: OMVectorIteratorT.h,v 1.10.2.2 2004/07/23 15:19:58 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -196,7 +196,8 @@ bool OMVectorIterator<Element>::operator++()
   POSTCONDITION("Consistent result", IMPLIES(!result,  after()));
   POSTCONDITION("Consistent result", IMPLIES( result,  this->valid()));
   POSTCONDITION("Consistent result", IMPLIES(!result, !this->valid()));
-  POSTCONDITION("Valid index", IMPLIES(this->valid(), _index < _vector->count()));
+  POSTCONDITION("Valid index",
+                            IMPLIES(this->valid(), _index < _vector->count()));
   return result;
 }
 
@@ -248,7 +249,8 @@ bool OMVectorIterator<Element>::operator--()
   POSTCONDITION("Consistent result", IMPLIES(!result,  before()));
   POSTCONDITION("Consistent result", IMPLIES( result,  this->valid()));
   POSTCONDITION("Consistent result", IMPLIES(!result, !this->valid()));
-  POSTCONDITION("Valid index", IMPLIES(this->valid(), _index < _vector->count()));
+  POSTCONDITION("Valid index",
+                            IMPLIES(this->valid(), _index < _vector->count()));
   return result;
 }
 
