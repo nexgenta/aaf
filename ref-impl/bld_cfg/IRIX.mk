@@ -15,18 +15,21 @@ OBJ = o${PTFM_SUFX}
 AAF_LIB = a${PTFM_SUFX}
 EXE = x${PTFM_SUFX}
 
-CC = CC
-LD = CC
+CC = gcc
+LD = gcc
 AAF_CMD_LINK = ld
 
-AAF_LINK_FLAGS =
+AAF_LINK_FLAGS = -n32 -r
 AAF_LINK_OUTPUT_FLAG = -o
 LFLAGS = -Olimit 1026
-CFLAGS = -Olimit 1026 -exceptions ${MAINWINCCPPFLAGS}
+# CFLAGS = -Wall -Werror
+CFLAGS = -Werror
 ARFLAGS = -r
 OBJFILE = -o $*.${OBJ}
 EXEFILE = -o unittest.${EXE}
 CP = cp
+MAKE_SUFFIX =
+
 UNICODE = 1
 SH_PREFIX = 
 SH_SUFFIX =
