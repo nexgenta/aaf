@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. |
@@ -42,7 +37,6 @@ OMStoredPropertySetIndex::OMStoredPropertySetIndex(size_t capacity)
   ASSERT("Valid heap pointer", _table != 0);
 
   for (size_t i = 0; i < _capacity; i++) {
-    _table[i]._valid = false;
     _table[i]._propertyId = 0;
     _table[i]._storedForm = 0;
     _table[i]._length = 0;
@@ -73,21 +67,14 @@ void OMStoredPropertySetIndex::insert(OMPropertyId propertyId,
 {
   TRACE("OMStoredPropertySetIndex::insert");
 
-  IndexEntry* entry = find(propertyId);
-
-  ASSERT("New index entry", entry == 0);
-  if (entry == 0 ) {
-    entry = find();
-    ASSERT("Found space for new entry", entry != 0);
-    _entries++;
-  }
-  ASSERT("Valid index entry", entry != 0);
+  ASSERT("Space for new entry", _entries < _capacity);
+  _entries++;
+  IndexEntry* entry = &_table[_entries - 1];
 
   entry->_propertyId = propertyId;
   entry->_storedForm = storedForm;
   entry->_offset = offset;
   entry->_length = length;
-  entry->_valid = true;
 }
 
   // @mfunc The number of properties in this <c OMStoredPropertySetIndex>.
@@ -116,26 +103,15 @@ void OMStoredPropertySetIndex::iterate(size_t& context,
 {
   TRACE("OMStoredPropertySetIndex::iterate");
 
-  OMStoredPropertySetIndex::IndexEntry* entry = 0;
-  size_t start = context;
-  size_t found = 0;
+  PRECONDITION("Valid context", context < _entries);
+  OMStoredPropertySetIndex::IndexEntry* entry = &_table[context];
 
-  for (size_t i = start; i < _capacity; i++) {
-    if (_table[i]._valid) {
-      entry = &_table[i];
-      found = i;
-      break;
-    }
-  }
-  if (entry != 0) {
-    propertyId = entry->_propertyId;
-    storedForm = entry->_storedForm;
-    offset = entry->_offset;
-    length = entry->_length;
-    context = ++found;
-  } else {
-    context = 0;
-  }
+  propertyId = entry->_propertyId;
+  storedForm = entry->_storedForm;
+  offset = entry->_offset;
+  length = entry->_length;
+
+  context = context + 1;
 }
 
   // @mfunc Find the property with property id <p propertyId> in this
@@ -187,43 +163,25 @@ bool OMStoredPropertySetIndex::isValid(OMPropertyOffset baseOffset) const
   size_t position = baseOffset;
 
   for (size_t i = 0; i < _capacity; i++) {
-    if (_table[i]._valid) {
-      entries++; // count valid entries
-      currentOffset = _table[i]._offset;
-      currentLength = _table[i]._length;
-      if (currentLength == 0) {
-        result = false; // entry has invalid length
-        break;
-      }
-      if (currentOffset != position) {
-        result = false;  // gap or overlap
-        break;
-      }
-      // this entry is valid, calculate the expected next position
-      position = position + currentLength;
+    entries++; // count valid entries
+    currentOffset = _table[i]._offset;
+    currentLength = _table[i]._length;
+    if (currentLength == 0) {
+      result = false; // entry has invalid length
+      break;
     }
+    if (currentOffset != position) {
+      result = false;  // gap or overlap
+      break;
+    }
+    // calculate the expected next position
+    position = position + currentLength;
   }
 
   if (entries != _entries) {
     result = false;
   }
 
-  return result;
-}
-
-OMStoredPropertySetIndex::IndexEntry* OMStoredPropertySetIndex::find(
-                                                                    void) const
-{
-  TRACE("OMStoredPropertySetIndex::find");
-
-  OMStoredPropertySetIndex::IndexEntry* result = 0;
-
-  for (size_t i = 0; i < _capacity; i++) {
-    if (!_table[i]._valid) {
-      result = &_table[i];
-      break;
-    }
-  }
   return result;
 }
 
@@ -235,13 +193,10 @@ OMStoredPropertySetIndex::IndexEntry* OMStoredPropertySetIndex::find(
   OMStoredPropertySetIndex::IndexEntry* result = 0;
 
   for (size_t i = 0; i < _capacity; i++) {
-    if (_table[i]._valid) {
-      if (_table[i]._propertyId == propertyId) {
-        result = &_table[i];
-        break;
-      }
+    if (_table[i]._propertyId == propertyId) {
+      result = &_table[i];
+      break;
     }
   }
   return result;
-
 }
