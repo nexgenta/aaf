@@ -58,13 +58,13 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in] type to which this is an alias
          ImplAAFTypeDef * pBaseType,
 
          // @parm [in, string] friendly name of this type definition
-         wchar_t *  pTypeName);
+         const aafCharacter * pTypeName);
 
 
   //****************
@@ -152,10 +152,7 @@ public:
 private:
   ImplAAFTypeDefSP BaseType () const;
 
-  // OMWeakReferenceProperty<ImplAAFTypeDef> _RenamedType;
-  OMFixedSizeProperty<aafUID_t>           _RenamedType;
-
-  ImplAAFTypeDefSP _cachedBaseType;
+   OMWeakReferenceProperty<ImplAAFTypeDef> _RenamedType;
 };
 
 //
