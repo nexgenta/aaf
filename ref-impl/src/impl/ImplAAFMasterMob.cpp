@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -44,6 +44,10 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFEssenceGroup.h"
+#include "ImplAAFBuiltinDefs.h"
+
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
 
 extern "C" const aafClassID_t CLSID_AAFEssenceAccess;
 
@@ -109,14 +113,14 @@ ImplAAFMasterMob::Initialize ()
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::AddMasterSlot (const aafUID_t &	dataDef,
+    ImplAAFMasterMob::AddMasterSlot (ImplAAFDataDef *   pDataDef,
 									 aafSlotID_t		sourceSlotID,
 									 ImplAAFSourceMob*	pSourceMob,
 									 aafSlotID_t		masterSlotID,
 									 const aafWChar*	pSlotName)
 {
 	aafLength_t	slotLength;
-	aafUID_t	sourceMobID;
+	aafMobID_t	sourceMobID;
 	HRESULT		hr = AAFRESULT_SUCCESS;
 	ImplAAFMobSlot*	pMobSlot;
 	ImplAAFTimelineMobSlot* pTimelineMobSlot = NULL;
@@ -149,11 +153,15 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(pMobSlot->GetSegment(&pSegment));
 
 		pSegment->GetLength(&slotLength);
-		pSegment->GetDataDef(&segDataDef);
+		ImplAAFDataDefSP pSegDataDef;
+		pSegment->GetDataDef(&pSegDataDef);
+		pSegDataDef->GetAUID(&segDataDef);
 		pSegment->ReleaseReference();
 		pSegment = NULL;
 
 		// Make sure the slot contains the expected media type.
+		aafUID_t dataDef;
+		CHECK(pDataDef->GetAUID(&dataDef));
 		if (!EqualAUID(&segDataDef, &dataDef))
 			RAISE(AAFRESULT_INVALID_DATADEF);
 
@@ -167,13 +175,13 @@ AAFRESULT STDMETHODCALLTYPE
 		ref.sourceSlotID = sourceSlotID;
 		ref.startTime = zeroPos;
 		CHECK(GetDictionary(&pDictionary));
-		pSrcClip = (ImplAAFSourceClip *)pDictionary->CreateImplObject(AUID_AAFSourceClip);
-		if(pSrcClip == NULL)
-			RAISE(E_FAIL);
+		CHECK(pDictionary->GetBuiltinDefs()->cdSourceClip()->
+			  CreateInstance((ImplAAFObject**) &pSrcClip));
+
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
 
-		CHECK(pSrcClip->Initialize(dataDef, slotLength, ref));
+		CHECK(pSrcClip->Initialize(pDataDef, slotLength, ref));
 		CHECK(AppendNewTimelineSlot(editRate,pSrcClip, masterSlotID, pSlotName, 
 									zeroPos,&pNewTimelineSlot));
 
@@ -244,7 +252,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMasterMob::GetTapeName (aafInt32		masterSlotID,
 								   aafWChar*	pTapeName,
-								   aafInt32		bufSize)
+								   aafUInt32	bufSize)
 {
 	ImplAAFFindSourceInfo	*info = NULL;
 	ImplAAFMob				*mob = NULL;
@@ -306,7 +314,7 @@ AAFRESULT STDMETHODCALLTYPE
 // 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMasterMob::GetTapeNameBufLen (aafInt32	masterSlotID,
-										 aafInt32*  pLen)
+										 aafUInt32*  pLen)
 {
 	ImplAAFFindSourceInfo	*info = NULL;
 	ImplAAFMob				*mob = NULL;
@@ -458,7 +466,7 @@ AAFRESULT STDMETHODCALLTYPE
 			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
 			if(pGroup == NULL)
 				return(AAFRESULT_INCONSISTANCY);
-			hr = pGroup->GetIndexedChoice (index, ppSourceClip);
+			hr = pGroup->GetChoiceAt (index, ppSourceClip);
 			pGroup->ReleaseReference();
 			pGroup = NULL;
 			pSegment->ReleaseReference();
@@ -611,10 +619,15 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMasterMob::NewPhysSourceRef (const aafRational_t & editrate,
 										aafSlotID_t  aMobSlot,
-										const aafUID_t & essenceKind,
+										ImplAAFDataDef * pEssenceKind,
 										aafSourceRef_t  ref,
 										aafLength_t  srcRefLength)
 {
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+	aafUID_t essenceKind;
+	AAFRESULT hr = pEssenceKind->GetAUID(&essenceKind);
+	if (AAFRESULT_FAILED (hr))return hr;
 	return(ImplAAFMob::AddPhysSourceRef(kAAFForceOverwrite,
 										editrate,
 										aMobSlot,
@@ -629,10 +642,15 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMasterMob::AppendPhysSourceRef (const aafRational_t & editrate,
 										   aafSlotID_t  aMobSlot,
-										   const aafUID_t & essenceKind,
+										   ImplAAFDataDef * pEssenceKind,
 										   aafSourceRef_t  ref,
 										   aafLength_t  srcRefLength)
 {
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+	aafUID_t essenceKind;
+	AAFRESULT hr = pEssenceKind->GetAUID(&essenceKind);
+	if (AAFRESULT_FAILED (hr))return hr;
 	return(ImplAAFMob::AddPhysSourceRef(kAAFAppend,
 										editrate,
 										aMobSlot,
@@ -679,17 +697,17 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 		/* Adjust the SCLP length from the master mob to the length of
 		 * the file mob, in the units of the master mob
 		 */
-		CHECK(EnumAAFAllMobSlots (&slotIter));
-		CHECK(GetNumSlots(&numSlots));
+		CHECK(GetSlots (&slotIter));
+		CHECK(CountSlots(&numSlots));
 		for (loop = 1; loop <= numSlots; loop++)
 		{
 			CHECK(slotIter->NextOne(&slot));
 			CHECK(slot->GetSegment(&seg));
 			CHECK(((ImplAAFSourceClip *)seg)->ResolveRef( &fileMob));
-			CHECK(fileMob->GetNumSlots(&fileNumSlots));
+			CHECK(fileMob->CountSlots(&fileNumSlots));
 			if(fileNumSlots >= 1)
 			{
-				CHECK(fileMob->EnumAAFAllMobSlots (&fileSlotIter));
+				CHECK(fileMob->GetSlots (&fileSlotIter));
 				CHECK(fileSlotIter->NextOne(&fileSlot));
 				CHECK(fileSlot->GetSegment(&fileSeg));
 				CHECK(fileSeg->GetLength(&endPos));
@@ -743,7 +761,7 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 /****/
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFMasterMob::CreateEssence (aafSlotID_t		masterSlotID,
-								aafUID_t			mediaKind,
+								ImplAAFDataDef * pMediaKind,
 								aafUID_t			codecID,
 								aafRational_t	editRate,
 								aafRational_t	sampleRate,
@@ -752,11 +770,16 @@ ImplAAFMasterMob::CreateEssence (aafSlotID_t		masterSlotID,
 								aafUID_t			fileFormat,
 								ImplAAFEssenceAccess **result)
 {
-	ImplAAFEssenceAccess	*access = NULL;
+  ImplAAFEssenceAccess	*access = NULL;
 
   if (NULL == result)
     return AAFRESULT_NULL_PARAM;
 
+  if (! pMediaKind)
+	return AAFRESULT_NULL_PARAM;
+  aafUID_t mediaKind;
+  AAFRESULT hr = pMediaKind->GetAUID(&mediaKind);
+  if (AAFRESULT_FAILED (hr))return hr;
 
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
 
@@ -851,12 +874,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFMasterMob::GetNumChannels (
                            aafSlotID_t  slotID,
                            aafMediaCriteria_t *essenceCrit,
-                           aafUID_t essenceKind,
+                           ImplAAFDataDef * pEssenceKind,
                            aafInt16 *numCh)
 {
-	ImplAAFEssenceAccess	*access = NULL;
-  
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+	aafUID_t essenceKind;
+	AAFRESULT hr = pEssenceKind->GetAUID(&essenceKind);
+	if (AAFRESULT_FAILED (hr))return hr;
 
+	ImplAAFEssenceAccess	*access = NULL;
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
 
 	XPROTECT()
