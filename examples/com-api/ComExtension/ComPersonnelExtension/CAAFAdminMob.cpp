@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 #include "CAAFAdminMob.h"
 
 #include <assert.h>
@@ -33,8 +28,8 @@
 
 #include "extensionUtils.h"
 
-#include "aafDataDefs.h"
-#include "aafDefUIDs.h"
+#include "AAFDataDefs.h"
+#include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -43,13 +38,11 @@
 
 
 // Both plugins currently only support a single definition
-const aafInt32 kSupportedDefinitions = 1;
+const aafUInt32 kSupportedDefinitions = 1;
 
 
 const wchar_t kAdminMobDisplayName[] = L"Example AAF Admin Mob Class Extension";
 const wchar_t kAdminMobDescription[] = L"Handles Access to Personnel Mob AAF objects";
-
-const aafProductVersion_t kAAFPluginVersion = {1, 0, 0, 1, kAAFVersionBeta};
 
 //
 // Plugin Descriptor information
@@ -61,7 +54,6 @@ static const aafUID_t AVID_PERSONNELMOB_PLUGIN =
 
 static wchar_t *kManufURL = L"http://www.avid.com";
 static wchar_t *kDownloadURL = L"ftp://ftp.avid.com/pub/";
-static aafVersionType_t samplePluginVersion = { 0, 1 };
 
 static wchar_t *kManufName = L"Avid Technology, Inc.";
 static wchar_t *kManufRev = L"Rev 0.1";
@@ -69,8 +61,6 @@ static wchar_t *kManufRev = L"Rev 0.1";
 // Should be shared by all built-in plugins created by AVID. /* TRR */
 const aafUID_t MANUF_AVID_PLUGINS = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
-
-const aafUID_t NULL_ID = {0};
 
 // local function for simplifying error handling.
 inline void checkResult(AAFRESULT r)
@@ -300,19 +290,7 @@ CAAFAdminMob::GetPersonnelResourceAt
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFAdminMob::Start (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFAdminMob::Finish (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFAdminMob::GetNumDefinitions (aafInt32 *pDefCount)
+    CAAFAdminMob::CountDefinitions (aafUInt32 *pDefCount)
 {
 	if(NULL == pDefCount)
 		return AAFRESULT_NULL_PARAM;
@@ -323,7 +301,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFAdminMob::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
+    CAAFAdminMob::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
 {
 	if(NULL == uid)
 		return AAFRESULT_NULL_PARAM;
@@ -345,7 +323,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE CAAFAdminMob::GetIndexedDefinitionObject(
-    aafInt32 index, 
+    aafUInt32 index, 
     IAAFDictionary *pDictionary, 
     IAAFDefObject **pDef)
 {
@@ -362,28 +340,8 @@ HRESULT STDMETHODCALLTYPE CAAFAdminMob::GetIndexedDefinitionObject(
 
 	try
 	{
-		//!!!Later, add in dataDefs supported & filedescriptor class
-
-    // Register the extensible enumeration describing Position in the
-    // dictionary.
-    CreateAndRegisterPositionEnum (pDictionary);
-
-    // Create a class definition describing PesonnelResource objects and
-    // register it in the dictionary.
-    CreateAndRegisterPersonnelResource (pDictionary);
-
-    // Create a type definition describing references to
-    // PersonnelResource objects, and register it.
-    CreateAndRegisterPersonnelResourceReference (pDictionary);
-
-    // Create a type definition describing vectors of references to
-    // PersonnelResource objects, and register it.
-    CreateAndRegisterPersonnelResourceReferenceVector (pDictionary);
-
-    // Create a class definition describing AdminMob objects, and
-    // register it.
-    CreateAndRegisterAdminMob (pDictionary);
-
+    // Make sure all of the definitions are registered.
+		checkResult(RegisterDefinitions(pDictionary));
 
     checkResult(pDictionary->LookupClassDef(kClassID_AdminMob, &pClassDef));
     checkResult(pClassDef->QueryInterface(IID_IAAFDefObject, (void **)pDef));
@@ -408,10 +366,10 @@ HRESULT STDMETHODCALLTYPE CAAFAdminMob::GetIndexedDefinitionObject(
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFAdminMob::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
+    CAAFAdminMob::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
 {
 	HRESULT hr = S_OK;
-	IAAFPluginDescriptor	*desc = NULL;
+	IAAFPluginDef			*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
  	IAAFNetworkLocator		*pNetLoc = NULL;
 	
@@ -425,8 +383,8 @@ HRESULT STDMETHODCALLTYPE
 	{
 	    CAAFBuiltinDefs defs (dict);
 
-		checkResult(defs.cdPluginDescriptor()->
-					CreateInstance(IID_IAAFPluginDescriptor, 
+		checkResult(defs.cdPluginDef()->
+					CreateInstance(IID_IAAFPluginDef, 
 								   (IUnknown **)&desc));
 
 		checkResult(desc->Initialize(AVID_PERSONNELMOB_PLUGIN,
@@ -490,33 +448,89 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
+HRESULT STDMETHODCALLTYPE
+    CAAFAdminMob::RegisterDefinitions (IAAFDictionary *pDictionary)
+{
+	HRESULT hr = S_OK;
+
+  
+	if (pDictionary == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	try
+	{
+		//!!!Later, add in dataDefs supported & filedescriptor class
+
+    // Register the extensible enumeration describing Position in the
+    // dictionary.
+    CreateAndRegisterPositionEnum (pDictionary);
+
+    // Create a class definition describing PesonnelResource objects and
+    // register it in the dictionary.
+    CreateAndRegisterPersonnelResource (pDictionary);
+
+    // Create a type definition describing references to
+    // PersonnelResource objects, and register it.
+    CreateAndRegisterPersonnelResourceReference (pDictionary);
+
+    // Create a type definition describing vectors of references to
+    // PersonnelResource objects, and register it.
+    CreateAndRegisterPersonnelResourceReferenceVector (pDictionary);
+
+    // Create a class definition describing AdminMob objects, and
+    // register it.
+    CreateAndRegisterAdminMob (pDictionary);
+  }
+	catch (HRESULT& rhr)
+	{
+		hr = rhr; // return thrown error code.
+	}
+	catch (...)
+	{
+		// We CANNOT throw an exception out of a COM interface method!
+		// Return a reasonable exception code.
+		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+	}
+
+	return hr;
+}
+
 //
 // COM Infrastructure
 // 
 
 // What interfaces does this plugin support
 // Override of CAAFUnknown method.
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFAdminMob::InternalQueryInterface
 (
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 
     // We support the IAAFAdminMob interface 
-    if (riid == IID_IAAFAdminMob) 
+    if (EQUAL_UID(riid,IID_IAAFAdminMob)) 
     { 
         *ppvObj = (IAAFAdminMob *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
 		// and the IAAFPlugin interface.
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+		// and the IAAFClassExtension interface.
+    else if (EQUAL_UID(riid,IID_IAAFClassExtension)) 
+    { 
+        *ppvObj = (IAAFClassExtension *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
