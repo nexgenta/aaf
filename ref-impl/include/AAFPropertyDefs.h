@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.11 2005/03/17 18:02:29 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.12 2005/03/19 20:16:17 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

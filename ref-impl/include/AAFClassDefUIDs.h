@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassDefUIDs.h,v 1.13 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFClassDefUIDs.h,v 1.14 2005/03/19 20:16:17 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFExtEnum.h,v 1.7 2005/03/17 18:02:27 phil_tudor Exp $ $Name:  $
+// $Id: AAFExtEnum.h,v 1.8 2005/03/19 20:16:17 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
