@@ -455,6 +455,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefEnum.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefExtEnum.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefFixedArray.cpp"
 # End Source File
 # Begin Source File
@@ -551,7 +555,7 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFIdentifications.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFInterpolationDefs.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFInterpolateDefs.cpp"
 # End Source File
 # Begin Source File
 
@@ -568,6 +572,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFMobs.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFMobSlots.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFObjects.cpp"
 # End Source File
 # Begin Source File
 
