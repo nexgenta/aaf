@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9.2.3 2004/07/07 13:01:07 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9.2.4 2004/07/14 11:22:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -51,6 +51,8 @@ INCLUDES = -I. \
 # Optional libgsf support is enabled by LIBGSF_PATH variable
 # E.g. "make LIBGSF_PATH=/usr/local"
 ifndef LIBGSF_PATH
+DEPS:=$(filter-out %/OMGSFStructuredStorage.d,$(DEPS))
+DEPS:=$(filter-out %/OMGSFxMSSStoredObjectFactory.d,$(DEPS))
 CXXOBJS:=$(filter-out %/OMGSFStructuredStorage.o,$(CXXOBJS))
 CXXOBJS:=$(filter-out %/OMGSFxMSSStoredObjectFactory.o,$(CXXOBJS))
 endif
