@@ -4,27 +4,32 @@
 #define __ImplAAFMasterMob_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 class ImplAAFSourceClip;
 
@@ -90,7 +95,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeName
         (// @parm [in] SlotID of the Master Mob slot
-		 aafUInt32  masterSlotID,
+		 aafInt32  masterSlotID,
 
 		 // @parm [out, size_is(bufSize), string] The returned name
 		 aafWChar *  pTapeName,
@@ -105,7 +110,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeNameBufLen
         (// @parm [in] SlotID of the Master Mob slot
-		 aafUInt32  masterSlotID,
+		 aafInt32  masterSlotID,
 
 		 // @parm [out] required buffer length
          aafUInt32 *  pLen);
@@ -127,30 +132,30 @@ public:
   // GetRepresentationSourceClip()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetRepresentation
+    GetRepresentationSourceClip
         (// @parm [in] Slot ID
 		 aafSlotID_t  slotID,
 
 		 // @parm [in] Index of requested representation
 		 aafUInt32  index,
 
-		 // @parm [out] Requested Segment
-         ImplAAFSegment ** ppSegment);
+		 // @parm [out] Requested Source Clip
+         ImplAAFSourceClip ** ppSourceClip);
 
 
   //****************
   // GetCriteriaSourceClip()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetCriteriaSegment
+    GetCriteriaSourceClip
         (// @parm [in] Slot ID
 		 aafSlotID_t  slotID,
 
 		 // @parm [in] Index of requested representation
 		 aafMediaCriteria_t *  pCriteria,
 
-		 // @parm [out] Requested Segment
-         ImplAAFSegment ** ppSegment);
+		 // @parm [out] Requested Source Clip
+         ImplAAFSourceClip ** ppSourceClip);
 
 
   //***********************************************************
@@ -318,7 +323,7 @@ public:
     CreateMultiEssence
         (
  							aafUID_t codecID,
-                          aafUInt16  /*arrayElemCount*/,
+                          aafInt16  /*arrayElemCount*/,
                            aafmMultiCreate_t *  /*mediaArray*/,
                            aafCompressEnable_t  /*Enable*/,
 							ImplAAFLocator		*destination,
@@ -395,10 +400,10 @@ public:
 
   /****/
   //****************
-  // CountChannels()
+  // GetNumChannels()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountChannels
+    GetNumChannels
         (// @parm [in] On this slot
          aafSlotID_t  slotID,
 
@@ -409,7 +414,7 @@ public:
          ImplAAFDataDef * pMediaKind,
 
          // @parm [out] How many channels?
-         aafUInt16*  numCh);
+         aafInt16*  numCh);
 	//@comm Returns the number of interleaved essence channels of a given type in the essence stream referenced by the given file mob
 	//@comm If the data format is not interleaved, then the answer will
 	// always be zero or one.  This function correctly returns zero
