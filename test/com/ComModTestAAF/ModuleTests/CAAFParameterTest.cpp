@@ -143,7 +143,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDictionary*		pDictionary = NULL;
 	IAAFOperationDef*		pOperationDef = NULL;
 	IAAFParameterDef*	pParamDef = NULL;
-	IAAFDefObject*		pDefObject = NULL;
 	IAAFOperationGroup			*pOperationGroup = NULL;
 	IAAFMob				*pMob = NULL;
 	IAAFSegment			*pSeg = NULL;
@@ -179,21 +178,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
 		CAAFBuiltinDefs defs (pDictionary);
     
-		checkResult(pDictionary->CreateInstance(defs.cdOperationDef(),
-							  IID_IAAFOperationDef, 
-							  (IUnknown **)&pOperationDef));
+		checkResult(defs.cdOperationDef()->
+					CreateInstance(IID_IAAFOperationDef, 
+								   (IUnknown **)&pOperationDef));
     
-		checkResult(pDictionary->CreateInstance(defs.cdParameterDef(),
-							  IID_IAAFParameterDef, 
-							  (IUnknown **)&pParamDef));
+		checkResult(defs.cdParameterDef()->
+					CreateInstance(IID_IAAFParameterDef, 
+								   (IUnknown **)&pParamDef));
 
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
-		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
+		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
 		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
@@ -205,10 +201,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
+		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
 
 
 		//Make the first mob
@@ -216,9 +209,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		aafRational_t	videoRate = { 2997, 100 };
 
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(defs.cdCompositionMob(),
-							  IID_IAAFMob, 
-							  (IUnknown **)&pMob));
+		checkResult(defs.cdCompositionMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pMob));
 
 //		checkResult(CoCreateGuid((GUID *)&newUID));
 //		checkResult(pMob->SetMobID(newUID));
@@ -227,13 +220,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// Add some slots
 		for(test = 0; test < 2; test++)
 		{
- 			checkResult(pDictionary->CreateInstance(defs.cdOperationGroup(),
-							     IID_IAAFOperationGroup, 
-							     (IUnknown **)&pOperationGroup));
+ 			checkResult(defs.cdOperationGroup()->
+						CreateInstance(IID_IAAFOperationGroup, 
+									   (IUnknown **)&pOperationGroup));
 			
-			checkResult(pDictionary->CreateInstance(defs.cdFiller(),
-							     IID_IAAFSegment, 
-							     (IUnknown **)&pFiller));
+			checkResult(defs.cdFiller()->
+						CreateInstance(IID_IAAFSegment, 
+									   (IUnknown **)&pFiller));
 			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
 			checkResult(pComponent->SetLength(effectLen));
 			CAAFBuiltinDefs defs (pDictionary);
@@ -242,9 +235,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 													TEST_EFFECT_LEN,
 													pOperationDef));
 
-			checkResult(pDictionary->CreateInstance(defs.cdConstantValue(),
-							  IID_IAAFConstantValue, 
-							  (IUnknown **)&pConstValue));
+			checkResult(defs.cdConstantValue()->
+						CreateInstance(IID_IAAFConstantValue, 
+									   (IUnknown **)&pConstValue));
 			checkResult(pConstValue->SetValue(sizeof(testLevel), (aafDataBuffer_t)&testLevel));
 			checkResult(pConstValue->QueryInterface (IID_IAAFParameter, (void **)&pParm));
 			checkResult(pParm->SetParameterDefinition (pParamDef));
@@ -256,9 +249,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			pFiller = NULL;
 
 			checkResult(pOperationGroup->SetBypassOverride (1));
-			checkResult(pDictionary->CreateInstance(defs.cdSourceClip(),
-							  IID_IAAFSourceClip, 
-							  (IUnknown **)&pSourceClip));
+			checkResult(defs.cdSourceClip()->
+						CreateInstance(IID_IAAFSourceClip, 
+									   (IUnknown **)&pSourceClip));
 			aafSourceRef_t	sourceRef;
 			sourceRef.sourceID = zeroMobID;
 			sourceRef.sourceSlotID = 0;
@@ -308,8 +301,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSourceRef->Release();
 	if(pSourceClip)
 		pSourceClip->Release();
-	if (pDefObject)
-		pDefObject->Release();
 	if (pOperationGroup)
 		pOperationGroup->Release();
 	if (pMob)
