@@ -1,14 +1,32 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #ifndef _TextStream_h_
 #include "TextStream.h"
+#endif
+
+
+#if defined(macintosh)
+#include <CursorCtl.h>
 #endif
 
 #include <string.h>
@@ -60,6 +78,32 @@ TextStream::TextStream
 }
 
 
+//
+// Utility method to reduce size of memory allocated.
+//
+const static int kCompressLimit = 1000;
+//
+void TextStream::compress ()
+{
+  if (! _pData || ! _pStorage)
+    return;
+
+  if ((_pData - _pStorage) < kCompressLimit)
+    // not enough to bother
+    return;
+
+#if DEBUG
+  fprintf (stderr, "Diff is %d; compressing.\n", (int)(_pData - _pStorage));
+#endif
+  char * newStorage = new char[strlen(_pData) + 1];
+  assert (newStorage);
+  strcpy (newStorage, _pData);
+  _pData = newStorage;
+  delete[] _pStorage;
+  _pStorage = newStorage;
+}
+
+
 TextStream TextStream::operator=
 (const TextStream & src)
 {
@@ -71,7 +115,7 @@ TextStream TextStream::operator=
 	  _numAllocated = 0;
 	  _cachedLen = src._cachedLen;
 	  _startSi = src._startSi;
-	  if (_cachedLen)
+	  if (src._cachedLen)
 		{
 		  _numAllocated = _cachedLen + 1;
 		  assert (_numAllocated > 0);
@@ -114,6 +158,20 @@ int TextStream::GetLength () const
 void TextStream::Append
 (char c)
 {
+  // If the following assertion triggers we are probably running on Macintosh and
+  // '\r' is not being mapped to '\n' on input. Some ways that this can happen are
+  //
+  // 1) the file was opened in binary mode instead of text mode, or
+  // 2) the program was linked to a library that doesn't perform
+  //    the mapping even for files opened in text mode, or
+  // 3) the CodeWarrior C++ Language setting "Map newlines to CR" is
+  //    not checked (this enables '\n' -> '\r' on output and
+  //    maps '\r' -> '\n' on input).
+  //
+  // If this assertion would have failed but is disabled '#c' will incorrectly
+  // appear in the output - tjb 03/19/02.
+  //
+  assert(c != '\r');
   if (! _numAllocated)
 	{
 	  // If we don't have any allocated, allocate it!
@@ -148,6 +206,18 @@ void TextStream::Append
   _pData[_cachedLen] = c;
   _cachedLen++;
   _pData[_cachedLen] = '\0';
+  
+  
+#if defined(macintosh)
+  static long int counter = 0;
+  if (counter++ % 1024 == 0)
+  {
+    // Release time to the operating system (pre-MacOS X).
+    SpinCursor(-1);
+  }
+#endif
+  
+  
 }
 
 
@@ -201,6 +271,7 @@ bool TextStream::Consume
 	{
 	  _startSi = SourceInfo (_startSi.GetFileName(), _startSi.GetLineNumber() + 1);
 	}
+  compress ();
   return true;
 }
 
@@ -216,6 +287,7 @@ bool TextStream::Expect
   _pData += key.GetLength();
   _cachedLen -= key.GetLength();
   assert (_cachedLen >= 0);
+  compress ();
   return true;
 }
 
@@ -285,5 +357,15 @@ void TextStream::dump (FILE* fp) const
   while (tmp.Consume (c))
 	{
 	  fputc (c, fp);
+	  
+#if defined(macintosh)
+      static long int counter = 0;
+      if (counter++ % 256 == 0)
+      {
+        // Release time to the operating system (pre-MacOS X).
+        SpinCursor(1);
+      }
+#endif
+
 	}
 }
