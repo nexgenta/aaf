@@ -58,11 +58,11 @@ extern "C" const aafClassID_t CLSID_AAFPropertyValue;
 
 ImplAAFTypeDefFixedArray::ImplAAFTypeDefFixedArray ()
   : _ElementType  ( PID_TypeDefinitionFixedArray_ElementType,  
-                    "ElementType", 
-                    "/Dictionary/TypeDefinitions", 
+                    L"ElementType", 
+                    L"/MetaDictionary/TypeDefinitions", 
                     PID_MetaDefinition_Identification),
     _ElementCount ( PID_TypeDefinitionFixedArray_ElementCount, 
-                    "ElementCount")
+                    L"ElementCount")
 {
   _persistentProperties.put(_ElementType.address());
   _persistentProperties.put(_ElementCount.address());
@@ -327,9 +327,9 @@ size_t ImplAAFTypeDefFixedArray::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
 
@@ -448,3 +448,25 @@ bool ImplAAFTypeDefFixedArray::IsVariableArrayable () const
 
 bool ImplAAFTypeDefFixedArray::IsStringable () const
 { return false; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefFixedArray::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefFixedArray));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefFixedArray::onSave(void* clientContext) const
+{
+  ImplAAFTypeDefArray::onSave(clientContext);
+}
+
+void ImplAAFTypeDefFixedArray::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDefArray::onRestore(clientContext);
+}

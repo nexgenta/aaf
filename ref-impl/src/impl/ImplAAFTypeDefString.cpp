@@ -57,8 +57,8 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefString::ImplAAFTypeDefString ()
   : _ElementType  ( PID_TypeDefinitionString_ElementType,
-                    "ElementType", 
-                    "/Dictionary/TypeDefinitions", 
+                    L"ElementType",
+                    L"/MetaDictionary/TypeDefinitions", 
                     PID_MetaDefinition_Identification)
 {
   _persistentProperties.put(_ElementType.address());
@@ -464,9 +464,9 @@ size_t ImplAAFTypeDefString::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefString::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefString::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
 
@@ -543,3 +543,25 @@ bool ImplAAFTypeDefString::IsVariableArrayable () const
 
 bool ImplAAFTypeDefString::IsStringable () const
 { return false; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefString::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefString));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefString::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefString::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}

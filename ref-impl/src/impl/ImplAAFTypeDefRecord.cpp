@@ -56,11 +56,11 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
   : _memberTypes ( PID_TypeDefinitionRecord_MemberTypes, 
-                   "MemberTypes", 
-                   "/Dictionary/TypeDefinitions", 
+                   L"MemberTypes", 
+                   L"/MetaDictionary/TypeDefinitions", 
                    PID_MetaDefinition_Identification),
     _memberNames ( PID_TypeDefinitionRecord_MemberNames, 
-                   "MemberNames"),
+                   L"MemberNames"),
 	_registeredOffsets (0),
 	_registeredSize (0),
 	_internalSizes (0),
@@ -1034,9 +1034,9 @@ size_t ImplAAFTypeDefRecord::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefRecord::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefRecord::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
   size_t elemSize = PropValSize ();
@@ -1069,3 +1069,25 @@ bool ImplAAFTypeDefRecord::IsVariableArrayable () const
 
 bool ImplAAFTypeDefRecord::IsStringable () const
 { return false; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefRecord::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefRecord));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefRecord::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefRecord::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
