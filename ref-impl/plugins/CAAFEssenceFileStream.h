@@ -3,27 +3,32 @@
 #ifndef __CAAFEssenceFileStream_h__
 #define __CAAFEssenceFileStream_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -73,10 +78,9 @@ public:
   //
 
   // Write some number of bytes to the stream exactly and with no formatting or compression.
-  STDMETHOD(Write)
-    (/*[in]*/ aafUInt32  bytes, // write this many bytes
-     /*[out, size_is(bytes), length_is(*bytesWritten)]*/ aafDataBuffer_t  buffer, // here is the buffer
-     /*[out,ref]*/ aafUInt32 *  bytesWritten); // return bytes actually written.
+  STDMETHOD (Write)
+    (/*[in,size_is(buflen)]*/ aafDataBuffer_t  buffer, // to a buffer
+     /*[in]*/ aafInt32  buflen); // of this size 
 
   // Read some number of bytes from the stream exactly and with no formatting or compression.
   STDMETHOD (Read)
@@ -86,24 +90,24 @@ public:
 
   // Seek to the absolute byte offset into the stream.
   STDMETHOD (Seek)
-    (/*[in]*/ aafPosition_t  byteOffset); // The absolute byte offset into the stream. 
+    (/*[in]*/ aafInt64  byteOffset); // The absolute byte offset into the stream. 
 
   // Seek forward or backward the given byte count.
   STDMETHOD (SeekRelative)
     (/*[in]*/ aafInt32  byteOffset); // The relative byte offset into the stream. 
 
-  // Returns kAAFTrue if the byte offset is within the stream.
+  // Returns AAFTrue if the byte offset is within the stream.
   STDMETHOD (IsPosValid)
-    (/*[in]*/ aafPosition_t  byteOffset, // The absolute byte offset into the stream.
-     /*[out]*/ aafBoolean_t *  isValid); // The result. 
+    (/*[in]*/ aafInt64  byteOffset, // The absolute byte offset into the stream.
+     /*[out]*/ aafBool *  isValid); // The result. 
 
   // Returns the position within the stream.
   STDMETHOD (GetPosition)
-    (/*[out]*/ aafPosition_t *  position); // The position within the stream. 
+    (/*[out]*/ aafInt64 *  position); // The position within the stream. 
 
   // Returns the length of the stream.
   STDMETHOD (GetLength)
-    (/*[out]*/ aafLength_t *  position); // The length of the stream. 
+    (/*[out]*/ aafInt64 *  position); // The length of the stream. 
 
   // Ensure that all bits are written.
   STDMETHOD (FlushCache)
@@ -113,7 +117,7 @@ public:
   // Sets the size of the cache buffer used for further operations.
 			// Destroys the current contents of the cache.
   STDMETHOD (SetCacheSize)
-    (/*[in]*/ aafUInt32  itsSize); // The size of the cache buffer. 
+    (/*[in]*/ aafInt32  itsSize); // The size of the cache buffer. 
 
 
 
@@ -132,7 +136,7 @@ public:
   //   - the given path already points to a file-system file.
   STDMETHOD (Create)
     (/*[in,string]*/ const aafCharacter * pFilePath, // The local file-system path to a file
-     /*[in]*/ aafMobID_constptr pMobID); // Optional mobID identifying the external media 
+     /*[in]*/ const aafUID_t * pMobID); // Optional mobID identifying the external media 
 
   // Attempt to open an essence file stream for reading.
   // Returns one of the following:
@@ -145,7 +149,7 @@ public:
   //   - file is write-only, cannot be opened for reading.
   STDMETHOD (OpenRead)
     (/*[in,string]*/ const aafCharacter * pFilePath, // The local file-system path to a file
-     /*[in]*/ aafMobID_constptr pMobID); // Optional mobID identifying the external media 
+     /*[in]*/ const aafUID_t * pMobID); // Optional mobID identifying the external media 
 
   // Attempt to open an essence file stream for appending.
   // Returns one of the following:
@@ -158,7 +162,7 @@ public:
   //   - file is read-only, cannot be opened for writing.
   STDMETHOD (OpenAppend)
     (/*[in,string]*/ const aafCharacter * pFilePath, // The local file-system path to a file
-     /*[in]*/ aafMobID_constptr pMobID); // Optional mobID identifying the external media 
+     /*[in]*/ const aafUID_t * pMobID); // Optional mobID identifying the external media 
 
 
 
@@ -167,7 +171,7 @@ protected:
   // Declare the QI that implements for the interfaces
   // for this module. This will be called by CAAFUnknown::QueryInterface().
   // 
-  STDMETHOD(InternalQueryInterface)(REFIID riid, void **ppvObjOut);
+  virtual HRESULT InternalQueryInterface(REFIID riid, void **ppvObjOut);
 
 
 public:
@@ -201,7 +205,7 @@ public :
   //   - succeeded.  (This is the only code indicating success.)
   STDMETHOD (Init)
     (/*[in,string]*/ const aafCharacter * pFilePath, // The local file-system path to a file
-     /*[in]*/ aafMobID_constptr pMobID); // Optional mobID identifying the external media 
+     /*[in]*/ const aafUID_t * pMobID); // Optional mobID identifying the external media 
 
   // Cleanup any internally allocated buffers.
   void CleanupBuffers(void);
@@ -250,7 +254,7 @@ public :
   wchar_t *_pwPath;
   //
   // Optional mobID identifying the external media
-  aafMobID_t *_pMobID;
+  aafUID_t *_pMobID;
   //
   // Ascii character path
   char *_pPath;
