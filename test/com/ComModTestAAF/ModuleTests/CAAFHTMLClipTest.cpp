@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -42,6 +42,8 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 
 
@@ -89,7 +91,7 @@ private:
   bool _bWritableFile;
   IAAFHeader *_pHeader;
   IAAFDictionary *_pDictionary;
-  aafUID_t _referencedMobID; // save id for validation in the open test...
+  aafMobID_t _referencedMobID; // save id for validation in the open test...
   static const wchar_t *_beginAnchor; // sample anchor values for validation.
   static const wchar_t *_endAnchor;
 };
@@ -108,7 +110,7 @@ extern "C" HRESULT CAAFHTMLClip_test()
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -240,22 +242,23 @@ void HTMLClipTest::CreateHTMLClip()
   IAAFCompositionMob *pCompositionMob = NULL;
   IAAFMob *pReferencingMob = NULL;
   IAAFSegment *pSegment = NULL;
-  IAAFMobSlot *pMobSlot = NULL;
+  IAAFTimelineMobSlot *pMobSlot = NULL;
 
+  CAAFBuiltinDefs defs (_pDictionary);
 
   try
   {
     //Make the MOB to be referenced
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFMasterMob,
-					    IID_IAAFMasterMob, 
-					    (IUnknown **)&pMasterMob));
+    checkResult(defs.cdMasterMob()->
+				CreateInstance(IID_IAAFMasterMob, 
+							   (IUnknown **)&pMasterMob));
   
     checkResult(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pReferencedMob));
     checkResult(pReferencedMob->GetMobID(&_referencedMobID));
     checkResult(pReferencedMob->SetName(L"HTMLClipTest::ReferencedMob"));
 
     // Save the master mob.
-    checkResult(_pHeader->AppendMob(pReferencedMob));
+    checkResult(_pHeader->AddMob(pReferencedMob));
 
     // Use EssenceAccess to write some html essence
       // Create a file mob for the html essence.
@@ -264,9 +267,9 @@ void HTMLClipTest::CreateHTMLClip()
 
 
     // Create a HTMLClip
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFHTMLClip,
-					    IID_IAAFHTMLClip, 
-					    (IUnknown **)&pHTMLClip));
+    checkResult(defs.cdHTMLClip()->
+				CreateInstance(IID_IAAFHTMLClip, 
+							   (IUnknown **)&pHTMLClip));
     checkResult(pHTMLClip->SetBeginAnchor(const_cast<wchar_t *>(_beginAnchor)));
     checkResult(pHTMLClip->SetEndAnchor(const_cast<wchar_t *>(_endAnchor)));
 
@@ -277,20 +280,26 @@ void HTMLClipTest::CreateHTMLClip()
     checkResult(pSourceReference->SetSourceMobSlotID(0));
 
     // Create a composition mob to hold the html clip.
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFCompositionMob,
-					    IID_IAAFCompositionMob, 
-					    (IUnknown **)&pCompositionMob));
+    checkResult(defs.cdCompositionMob()->
+				CreateInstance(IID_IAAFCompositionMob, 
+							   (IUnknown **)&pCompositionMob));
     checkResult(pCompositionMob->QueryInterface(IID_IAAFMob, (void **)&pReferencingMob));
     checkResult(pReferencingMob->SetName(L"CompositionMob_HTMLClipTest"));
  
   
     checkResult(pHTMLClip->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
     IAAFMobSlot *pSlot = NULL;
-    checkResult(pReferencingMob->AppendNewSlot(pSegment, 1, L"HTMLClipTest", &pMobSlot));
+	aafRational_t editRate = { 0, 1};
+    checkResult(pReferencingMob->AppendNewTimelineSlot(editRate,
+													   pSegment,
+													   1,
+													   L"HTMLClipTest",
+													   0,
+													   &pMobSlot));
 
 
     // Save the referencing mob.
-    checkResult(_pHeader->AppendMob(pReferencingMob));
+    checkResult(_pHeader->AddMob(pReferencingMob));
   }
   catch (HRESULT& rHR)
   {
@@ -373,7 +382,7 @@ void HTMLClipTest::OpenHTMLClip()
   wchar_t *pBeginAnchor = NULL;
   wchar_t *pEndAnchor = NULL;
   IAAFSourceReference *pSourceReference = NULL;
-  aafUID_t masterMobID = {0};
+  aafMobID_t masterMobID = {0};
   IAAFMasterMob *pMasterMob = NULL;
   IAAFMob *pReferencedMob = NULL;
 
@@ -381,21 +390,21 @@ void HTMLClipTest::OpenHTMLClip()
   try
   {
     // Get the number of composition mobs in the file (should be one)
-    checkResult(_pHeader->GetNumMobs(kCompMob, &compositionMobs));
+    checkResult(_pHeader->CountMobs(kAAFCompMob, &compositionMobs));
     checkExpression(1 == compositionMobs, AAFRESULT_TEST_FAILED);
 
     // Get the composition mob. There should only be one.
     aafSearchCrit_t criteria;
-    criteria.searchTag = kByMobKind;
-    criteria.tags.mobKind = kCompMob;
-    checkResult(_pHeader->EnumAAFAllMobs(&criteria, &pEnumMobs));
+    criteria.searchTag = kAAFByMobKind;
+    criteria.tags.mobKind = kAAFCompMob;
+    checkResult(_pHeader->GetMobs(&criteria, &pEnumMobs));
     checkResult(pEnumMobs->NextOne(&pReferencingMob));
     checkResult(pReferencingMob->QueryInterface(IID_IAAFCompositionMob, (void **)&pCompositionMob));
 
     // Get the html clip in the slot. There should be only one.
-    checkResult(pReferencingMob->GetNumSlots(&mobSlots));
+    checkResult(pReferencingMob->CountSlots(&mobSlots));
     checkExpression(1 == mobSlots, AAFRESULT_TEST_FAILED);
-    checkResult(pReferencingMob->EnumAAFAllMobSlots(&pEnumSlots));
+    checkResult(pReferencingMob->GetSlots(&pEnumSlots));
     checkResult(pEnumSlots->NextOne(&pMobSlot));
     checkResult(pMobSlot->GetSegment(&pSegment));
     checkResult(pSegment->QueryInterface(IID_IAAFHTMLClip, (void **)&pHTMLClip));
@@ -424,7 +433,7 @@ void HTMLClipTest::OpenHTMLClip()
     checkResult(pHTMLClip->QueryInterface(IID_IAAFSourceReference, (void **)&pSourceReference));  
     checkResult(pSourceReference->GetSourceID(&masterMobID));
     checkExpression(0 == memcmp(&masterMobID, &_referencedMobID, sizeof(masterMobID)), AAFRESULT_TEST_FAILED);
-    checkResult(_pHeader->LookupMob(&masterMobID, &pReferencedMob));
+    checkResult(_pHeader->LookupMob(masterMobID, &pReferencedMob));
     checkResult(pReferencedMob->QueryInterface(IID_IAAFMasterMob, (void **)&pMasterMob));
 
     
