@@ -106,6 +106,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsFixedArrayable())
 	return AAFRESULT_BAD_TYPE;
 
+  // Check if specified type definition is in the dictionary.
+  if( !aafLookupTypeDef( this, pTypeDef ) )
+	return AAFRESULT_TYPE_NOT_FOUND;
+
   return pvtInitialize (id, pTypeDef, nElements, pTypeName);
 }
 
@@ -404,20 +408,6 @@ ImplAAFTypeDefFixedArray::ValidateInputParams (
 	return AAFRESULT_SUCCESS;
 
 }//ValidateInputParams()
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFTypeDefFixedArray::CreateValueFromValues (
-													ImplAAFPropertyValue ** ppElementValues,
-													aafUInt32  numElements,
-													ImplAAFPropertyValue ** ppPropVal)
-{
-
-	//simply defer to base impl.
-	return ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues,numElements,
-												ppPropVal);
-}
 
 
 AAFRESULT STDMETHODCALLTYPE

@@ -80,6 +80,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsStringable())
 	return AAFRESULT_BAD_TYPE;
 
+  // Check if specified type definition is in the dictionary.
+  if( !aafLookupTypeDef( this, pTypeDef ) )
+	return AAFRESULT_TYPE_NOT_FOUND;
+
   return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
@@ -139,7 +143,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED(hr)) return hr;
   assert (ptd);
   assert (ptd->IsFixedSize());
-  aafUInt32 elemSize = ptd->PropValSize();
+  aafUInt32 elemSize = ptd->NativeSize();
   aafUInt32 propSize;
   assert (pPropVal);
 
@@ -181,6 +185,10 @@ AAFRESULT STDMETHODCALLTYPE
   assert (1 == refCount);
 
   AAFRESULT hr;
+  hr = pvd->Initialize(this);
+  if (! AAFRESULT_SUCCEEDED (hr))
+	return hr;
+
   hr = SetCString (pvd, pInitData, initDataSize);
   if (AAFRESULT_FAILED (hr))
 	return hr;
@@ -245,12 +253,128 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+template <class T1, class T2>
+aafBoolean_t  AreUnksSame(T1& cls1, T2& cls2)
+{
+	IUnknown	*pUnk1=NULL, *pUnk2=NULL;
+	
+	pUnk1 = static_cast<IUnknown *> (cls1->GetContainer());
+	assert (pUnk1);
+
+	pUnk2 = static_cast<IUnknown *> (cls2->GetContainer());
+	assert (pUnk2);
+	
+	if (pUnk1 == pUnk2)
+		return kAAFTrue;
+	else
+		return kAAFFalse;
+
+}
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::AppendElements (
-      ImplAAFPropertyValue * /*pInPropVal*/,
-      aafMemPtr_t  /*pElements*/)
+      ImplAAFPropertyValue * pInPropVal,
+      aafMemPtr_t  pElements)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (! pInPropVal)
+		return AAFRESULT_NULL_PARAM;
+	
+	if (! pElements)
+		return AAFRESULT_NULL_PARAM;
+	
+	if (! IsRegistered ())
+		return AAFRESULT_NOT_REGISTERED;
+	
+	AAFRESULT hr;
+	
+	ImplAAFTypeDefSP  pIncomingType;
+	hr = GetType (&pIncomingType);
+	
+	ImplAAFTypeDefSP  pBaseType;
+	hr = GetType (&pBaseType);
+	
+	//compare types ... make sure there're the same
+	if (!AreUnksSame(pIncomingType, pBaseType))
+		return AAFRESULT_ILLEGAL_VALUE;
+	
+	//do the size thing ...
+	
+	assert (pBaseType->IsFixedSize ());
+	pBaseType->AttemptBuiltinRegistration ();
+	assert (pBaseType->IsRegistered ());
+	// Size of individual elements
+	aafUInt32 elementSize = pBaseType->NativeSize ();
+	
+	// Get the current size of the property
+    aafUInt32 originalDataSize;
+	
+	ImplAAFPropValDataSP pvd;
+	pvd = dynamic_cast<ImplAAFPropValData *>(pInPropVal);
+	assert (pvd);
+	hr = pvd->GetBitsSize (&originalDataSize);
+	
+	//get the data
+	aafMemPtr_t pOriginalData = NULL;
+	hr = pvd->GetBits (&pOriginalData);
+	assert(hr == AAFRESULT_SUCCESS);
+		
+	/////
+	//Now, find out what additional size we need based on the new data coming in.
+	
+	//first, see how many elements we have
+	aafMemPtr_t pNewData = pElements;
+	
+	aafUInt32 newElemCount =0;
+	
+	//outer loop of the entire memory buffer passed in ...
+	while (pNewData)
+	{
+		aafUInt32 count_of_zeroes = 0;
+
+		//inner loop - chunking in size of elementSize
+		for (aafUInt32 i=0; i<elementSize; i++, pNewData++)
+			if (*pNewData == 0)
+				count_of_zeroes++;
+		
+		if (count_of_zeroes == elementSize)
+			//we have a null! ... done!
+			break;
+		
+		//otherwise, increment new element count, and move on
+		newElemCount++;
+		
+	}//while
+	
+	
+	//At this point, our newElemCount holds a count of new elements to be added 
+	//and the new size of bits is:
+	aafUInt32 newsize = (newElemCount+1/*don't forget EOS*/) * elementSize;
+	
+	//Add this "newsize" to the original originalDataSize to get the new Total buffer size
+	aafUInt32 TotalSize = originalDataSize + newsize;
+	
+	//Save the orginal buffer, before we re-allocate
+	aafMemPtr_t tmp_buffer = new aafUInt8[originalDataSize+1];
+	memcpy(tmp_buffer, pOriginalData, originalDataSize);
+	
+	//Allocate the grand total # of bits (orginal + the new stuff) ...
+	aafMemPtr_t pBits = 0;
+	hr = pvd->AllocateBits (TotalSize, &pBits);
+	if (AAFRESULT_FAILED (hr))
+		return hr;
+	assert (pBits);
+	
+	//copy over the first part
+	memcpy (pBits, tmp_buffer, originalDataSize);
+	pBits += originalDataSize;
+	
+	//copy over the second part
+	memcpy (pBits, pElements, newsize);
+	
+	//delete our tmp_buffer
+	delete [] tmp_buffer;
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -331,7 +455,7 @@ void ImplAAFTypeDefString::reorder(OMByte* externalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::externalSize(OMByte* internalBytes,
+size_t ImplAAFTypeDefString::externalSize(OMByte* /*internalBytes*/,
 										  size_t internalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
@@ -360,11 +484,9 @@ void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
   aafUInt32 intElemSize = ptd->NativeSize ();
-  // aafUInt32 intElemSize = ptd->NativeSize ();
-  // aafUInt32 extElemSize = ptd->PropValSize ();
   aafUInt32 numElems = internalBytesSize / intElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafInt32 intNumBytesLeft = internalBytesSize;
+  aafInt32 extNumBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
 
   for (elem = 0; elem < numElems; elem++)
@@ -384,7 +506,7 @@ void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::internalSize(OMByte* externalBytes,
+size_t ImplAAFTypeDefString::internalSize(OMByte* /*externalBytes*/,
 										  size_t externalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
@@ -416,8 +538,8 @@ void ImplAAFTypeDefString::internalize(OMByte* externalBytes,
   // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   // aafUInt32 extElemSize = ptd->externalSize (0, 0);
   aafUInt32 numElems = externalBytesSize / extElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafInt32 intNumBytesLeft = internalBytesSize;
+  aafInt32 extNumBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
 
   for (elem = 0; elem < numElems; elem++)
@@ -491,8 +613,7 @@ OMProperty * ImplAAFTypeDefString::pvtCreateOMProperty
 	  {
 	    // element is integral type
 	    aafUInt32 intSize;
-	    AAFRESULT hr;
-	    hr = ptdi->GetSize (&intSize);
+	    ptdi->GetSize (&intSize);
 	    switch (intSize)
 		  {
 		  case 1:
