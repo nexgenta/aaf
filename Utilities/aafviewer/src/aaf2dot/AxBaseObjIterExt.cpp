@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxBaseObjIterExt.cpp,v 1.4 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+// $Id: AxBaseObjIterExt.cpp,v 1.4.2.1 2004/07/16 16:10:22 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,9 @@
 //
 //=---------------------------------------------------------------------=
 
+#ifdef _MSC_VER
 #pragma warning (disable:4786)
+#endif
 
 
 #include <AxBaseObjIterExt.h>
