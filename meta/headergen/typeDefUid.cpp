@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: typeDefUid.cpp,v 1.11 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: typeDefUid.cpp,v 1.12 2004/02/27 15:41:23 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,7 @@
 // Author : Tim Bingham (Tim_Bingham@avid.com) - after an initial
 // implementation by Bob Tillman.
 
-#include <iostream.h>
+#include <iostream>
 #include <assert.h>
 #include <stdlib.h>
 
