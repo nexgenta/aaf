@@ -36,8 +36,8 @@
 
 // Persistent Property IDs
 
-const int PID_SOURCEREFERENCE_SOURCEID		= 1;
-const int PID_SOURCEREFERENCE_SRCMOBSLOTID	= 2;
+const int PID_SOURCEREFERENCE_SOURCEID		= 2;
+const int PID_SOURCEREFERENCE_SOURCEMOBSLOTID	= 3;
 
 class ImplAAFSourceReference : public ImplAAFSegment
 {
@@ -73,7 +73,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetSourceMobSlotID
 		// @parm [retval][out] Place to put source mob slot ID
-        (aafTrackID_t *  pMobSlotID);
+        (aafSlotID_t *  pMobSlotID);
 
   //****************
   // SetSourceMobSlotID()
@@ -81,14 +81,14 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetSourceMobSlotID
 		// @parm [in] Source Mob ID to set
-        (aafTrackID_t   mobSlotID);
+        (aafSlotID_t   mobSlotID);
 
 
 
 public:
   // Declare this class to be storable.
   //
-  OMDECLARE_STORABLE(ImplAAFSourceReference);
+  OMDECLARE_STORABLE(ImplAAFSourceReference)
 
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFSourceReferenceTest.cpp.
