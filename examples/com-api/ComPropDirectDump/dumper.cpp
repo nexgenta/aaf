@@ -34,6 +34,7 @@
 
 
 #include "AAF.h"
+#include "AAFTypes.h"
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFTypeDefUIDs.h"
@@ -49,11 +50,11 @@
 #include "AAFSmartPointer.h"
 #endif
 
-#if defined(macintosh) || defined(_MAC)
+#if defined( OS_MACOS )
 #include "DataInput.h"
 #endif
 
-#if defined(__MWERKS__)
+#if defined( COMPILER_MWERKS )
 #if defined(__MSL_CPP__) && (__MSL_CPP__ >= 0x5300)
 #define IOS_FMT_FLAGS ios_base::fmtflags
 #else
@@ -90,15 +91,17 @@ typedef IAAFSmartPointer<IAAFFile>                 IAAFFileSP;
 typedef IAAFSmartPointer<IAAFHeader>               IAAFHeaderSP;
 typedef IAAFSmartPointer<IEnumAAFProperties>       IEnumAAFPropertiesSP;
 typedef IAAFSmartPointer<IAAFTypeDefCharacter>       IAAFTypeDefCharacterSP;
+typedef IAAFSmartPointer<IEnumAAFPropertyValues>   IEnumAAFPropertyValuesSP;
+typedef IAAFSmartPointer<IAAFTypeDefSet>           IAAFTypeDefSetSP;
 
 
 // convenient error handlers.
-inline void checkResult(HRESULT r)
+/*inline*/ static void checkResult(HRESULT r)
 {
 	if (FAILED(r))
 		throw r;
 }
-inline void checkExpression(bool expression, HRESULT r)
+/*inline*/ static void checkExpression(bool expression, HRESULT r)
 {
 	if (!expression)
 		throw r;
@@ -213,8 +216,11 @@ static void printTimeStamp (const aafTimeStamp_t & ts,
 	}
 	else
 	{
+		// I replaced assert(month_index >= 0) 2 lines below
+		// with this one because the value is unsigned and will
+		// never be negative. - Alex, 11-Sep-00
+		assert (ts.date.month > 0 );
 		aafUInt8 month_index = ts.date.month-1;
-		assert (month_index >= 0);
 		assert (month_index < (sizeof (monthNames) / sizeof (monthNames[0])));
 		strcpy (monthNameBuf, monthNames[month_index]);
 	}
@@ -253,6 +259,15 @@ static HRESULT dumpPropertyValue
 static HRESULT dumpRawStreamPropertyValue
 (
  IAAFPropertyValue * pPVal,
+ IAAFTypeDef *pTD,
+ IAAFDictionary * pDict,  // dictionary for this file
+ int indent,
+ ostream & os
+ );
+
+static HRESULT dumpPropertyValues
+(
+ IEnumAAFPropertyValues* pPVEnum,
  IAAFTypeDef *pTD,
  IAAFDictionary * pDict,  // dictionary for this file
  int indent,
@@ -380,7 +395,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				checkResult(pTDI->GetInteger(pPVal, (aafMemPtr_t) &val, sizeof (val)));
 				
 				os << "value: ";
-				aafInt32 hi = (aafUInt32) ((val & 0xffffffff00000000) >> 32);
+				aafInt32 hi = (aafUInt32) ((val & AAFCONSTINT64(0xffffffff00000000)) >> 32);
 				aafInt32 lo = (aafInt32) val & 0xffffffff;
 				if (hi && ((hi != ~0) || (lo >= 0)))
 				{
@@ -584,7 +599,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				checkResult(pTDVA->GetCount(pPVal, &numElems));
 				
 				os << "Value: variably-sized array[" << numElems << "]:" << endl;
-				
+
 				aafUInt32 i;
 				for (i = 0; i < numElems; i++)
 				{
@@ -597,7 +612,24 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 						indent+1,
 						os));
 				}
+				break;
+			}
+			
+		case kAAFTypeCatSet:
+			{
+				// Print out elements of array.
+				IAAFTypeDefSetSP pTDSet;
+				checkResult(pTD->QueryInterface(IID_IAAFTypeDefSet, (void**)&pTDSet));
 				
+				// Get number of elements
+				aafUInt32 numElems;
+				checkResult(pTDSet->GetCount(pPVal, &numElems));
+				
+				os << "Value: set[" << numElems << "]:" << endl;
+
+				IEnumAAFPropertyValuesSP pPVEnum;
+				checkResult(pTDSet->GetElements(pPVal, &pPVEnum));
+				checkResult(dumpPropertyValues(pPVEnum, pTD, pDict, indent, os));
 				break;
 			}
 			
@@ -1062,6 +1094,34 @@ HRESULT dumpRawStreamPropertyValue
 }
 
 
+
+HRESULT dumpPropertyValues
+(
+ IEnumAAFPropertyValues* pPVEnum,
+ IAAFTypeDef * /*pTD*/,
+ IAAFDictionary * pDict,  // dictionary for this file
+ int indent,
+ ostream & os
+ )
+{
+	HRESULT result = S_OK;
+	aafUInt32 i = 0;
+	IAAFPropertyValueSP pElemPropVal;
+	while (SUCCEEDED(pPVEnum->NextOne(&pElemPropVal)))
+	{
+		printIndent (indent, os);
+		os << "[" << i << "]: ";
+		result = dumpPropertyValue (pElemPropVal,
+			pDict,
+			indent+1,
+			os);
+		++i;
+	}
+	
+	return result;
+}
+
+
 //
 // Dumps the given file.  Returns true if successful; returns false if
 // an error was encountered.
@@ -1100,19 +1160,6 @@ static bool dumpFile (aafCharacter * pwFileName,
 }
 
 
-struct CComInitialize
-{
-	CComInitialize()
-	{
-		CoInitialize(NULL);
-	}
-	
-	~CComInitialize()
-	{
-		CoUninitialize();
-	}
-};
-
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
 {
@@ -1149,7 +1196,6 @@ int main(int argc, char* argv[])
 	ofstream filestream;
 	bool file_opened = false;
 	
-	CComInitialize comInit;
 	CAAFInitialize aafInit;
 	
 	// If only two args are (correctly) given:
