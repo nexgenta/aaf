@@ -62,27 +62,26 @@ ImplAAFTypeDefRename::~ImplAAFTypeDefRename ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRename::Initialize (
-      const aafUID_t * pID,
+      const aafUID_t & id,
       ImplAAFTypeDef * pBaseType,
-      wchar_t * pTypeName)
+      const aafCharacter * pTypeName)
 {
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
   if (! pBaseType)  return AAFRESULT_NULL_PARAM;
-  if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
 
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  aafUID_t id;
+  aafUID_t baseId;
   assert (pBaseType);
-  hr = pBaseType->GetAUID(&id);
+  hr = pBaseType->GetAUID(&baseId);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  _RenamedType = id;
+  _RenamedType = baseId;
 
   return AAFRESULT_SUCCESS;
 }
@@ -112,8 +111,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	  ImplAAFTypeDefRename * pNonConstThis =
 		  (ImplAAFTypeDefRename *) this;
-	  aafUID_t id = _RenamedType;
-	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedBaseType);
+	  hr = pDict->LookupType (_RenamedType, &pNonConstThis->_cachedBaseType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedBaseType);
@@ -263,12 +261,44 @@ size_t ImplAAFTypeDefRename::NativeSize() const
 }
 
 
-OMProperty * ImplAAFTypeDefRename::pvtCreateOMProperty
+OMProperty * ImplAAFTypeDefRename::pvtCreateOMPropertyMBS
   (OMPropertyId pid,
-   const aafCharacter * name) const
+   const char * name) const
 {
-  return BaseType()->pvtCreateOMProperty (pid, name);
+  return BaseType()->pvtCreateOMPropertyMBS (pid, name);
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefRename::GetTypeCategory (
+      eAAFTypeCategory_t * pTid)
+{
+  if (! pTid)
+	return AAFRESULT_NULL_PARAM;
+
+  *pTid = kAAFTypeCatRename;
+  return AAFRESULT_SUCCESS;
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefRename::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  return BaseType()->RawAccessType (ppRawTypeDef);
+}
 
+
+bool ImplAAFTypeDefRename::IsAggregatable () const
+{ return BaseType()->IsAggregatable(); }
+
+bool ImplAAFTypeDefRename::IsStreamable () const
+{ return BaseType()->IsStreamable(); }
+
+bool ImplAAFTypeDefRename::IsFixedArrayable () const
+{ return BaseType()->IsFixedArrayable(); }
+
+bool ImplAAFTypeDefRename::IsVariableArrayable () const
+{ return BaseType()->IsVariableArrayable(); }
+
+bool ImplAAFTypeDefRename::IsStringable () const
+{ return BaseType()->IsStringable(); }

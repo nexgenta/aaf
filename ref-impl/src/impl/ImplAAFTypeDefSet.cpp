@@ -56,9 +56,9 @@ ImplAAFTypeDefSet::~ImplAAFTypeDefSet ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefSet::Initialize (
-      const aafUID_t *  /*pID*/,
+      const aafUID_t &  /*id*/,
       ImplAAFTypeDef * /*pTypeDef*/,
-      aafCharacter *  /*pTypeName*/)
+      const aafCharacter *  /*pTypeName*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -153,3 +153,17 @@ size_t ImplAAFTypeDefSet::NativeSize (void) const
 }
 
 
+bool ImplAAFTypeDefSet::IsAggregatable () const
+{ return false; }
+
+bool ImplAAFTypeDefSet::IsStreamable () const
+{ return false; }
+
+bool ImplAAFTypeDefSet::IsFixedArrayable () const
+{ return false; }
+
+bool ImplAAFTypeDefSet::IsVariableArrayable () const
+{ return false; }
+
+bool ImplAAFTypeDefSet::IsStringable () const
+{ return false; }
