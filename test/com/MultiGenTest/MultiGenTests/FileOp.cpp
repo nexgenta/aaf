@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileOp.cpp,v 1.11 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
+// $Id: FileOp.cpp,v 1.12 2005/03/13 02:02:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,18 @@ class KindMap {
 public:
   KindMap()
   {
+#if AAF_MAJOR_VERSION == 1 && AAF_MINOR_VERSION == 0
+    
+    #define ADD_KIND( X, Y ) \
+    _kindMap[ string( #X ) ] = aafFileKindAaf##Y;
+
+    ADD_KIND( M512Binary, MSSBinary );
+    ADD_KIND( S512Binary, SSSBinary );
+    ADD_KIND( M4KBinary,  M4KBinary );
+    ADD_KIND( S4KBinary,  M4KBinary );
+
+#elif AAF_MAJOR_VERSION >= 1 && AAF_MINOR_VERSION > 0 
+
     #define ADD_KIND( X ) \
     _kindMap[ string( #X ) ] = kAAFFileKind_Aaf##X;
 
@@ -49,6 +61,10 @@ public:
     ADD_KIND( S512Binary );
     ADD_KIND( M4KBinary );
     ADD_KIND( S4KBinary );
+
+#else
+#error unsupported version
+#endif
   }
 
   ~KindMap()
