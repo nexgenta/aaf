@@ -83,15 +83,15 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     LookupMob
-        (aafUID_t *  mobID,   //@parm [in,ref] The Mob ID
+        (aafMobID_constref  mobID,   //@parm [in,ref] The Mob ID
 		 ImplAAFMob ** ppMob);  //@parm [out,retval] Matching Mob
 
 
   //****************
-  // GetNumMobs()
+  // CountMobs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumMobs
+    CountMobs
         (aafMobKind_t  mobKind,   //@parm [in] The mob kind to count
 		 aafNumSlots_t *  pNumMobs);  //@parm [out,retval] Total number of mobs of kind mobKind
 
@@ -105,10 +105,10 @@ public:
 
 
   //****************
-  // AppendMob()
+  // AddMob()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendMob
+    AddMob
         (ImplAAFMob * pMob);  //@parm [in] Mob to add header
 
 
@@ -121,10 +121,10 @@ public:
 
 
   //****************
-  // GetNumEssenceData()
+  // CountEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumEssenceData
+    CountEssenceData
         (aafUInt32 *  pNumEssenceData);  //@parm [out,retval] Total number of essence data with type
 
 
@@ -134,7 +134,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     IsEssenceDataPresent
         (// @parm [in] A Unique File Mob ID
-		 aafUID_t *  pFileMobID,
+		 aafMobID_constref fileMobID,
 
 		 // @parm [in] The Essence File Format
 		 aafFileFormat_t  fmt,
@@ -153,10 +153,10 @@ public:
 
 
   //****************
-  // AppendEssenceData()
+  // AddEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendEssenceData
+    AddEssenceData
 		// @parm [in] Essence data object to append
         (ImplAAFEssenceData * pEssenceData);
 
@@ -172,10 +172,10 @@ public:
 
 
 	// Interfaces visible inside the toolkit, but not exposed through the API
-	virtual AAFRESULT UnlinkMobID(aafUID_t mobID);
+	virtual AAFRESULT UnlinkMobID(aafMobID_constref mobID);
 
-	AAFRESULT LookupEssence (aafUID_t *pFileMobID, ImplAAFEssenceData **ppEssence);
-	AAFRESULT ChangeIndexedMobID (ImplAAFMob *pMob, aafUID_t *newID);
+	AAFRESULT LookupEssence (aafMobID_constref fileMobID, ImplAAFEssenceData **ppEssence);
+	AAFRESULT ChangeIndexedMobID (ImplAAFMob *pMob, aafMobID_constref newID);
 
 AAFRESULT
     GetNthMob (aafInt32 index, ImplAAFMob **ppEnum);
