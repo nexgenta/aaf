@@ -31,7 +31,6 @@
 
 #include "OMSet.h"
 #include "OMContainerElement.h"
-#include "OMContainerProperty.h"
 
 template <typename ReferencedObject>
 class OMStrongReferenceSetIterator;
@@ -45,8 +44,7 @@ class OMStrongReferenceSetIterator;
   //          <c OMStorable> and of <c OMUnique>.
   //   @base public | <c OMContainerProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceSetProperty :
-                                 public OMContainerProperty<ReferencedObject> {
+class OMStrongReferenceSetProperty : public OMContainerProperty {
 public:
   // @access Public members.
 
@@ -60,11 +58,8 @@ public:
     // @cmember Save this <c OMStrongReferenceSetProperty>.
   virtual void save(void* clientContext) const;
 
-    // @cmember Close this <c OMStrongReferenceSetProperty>.
+    // @cmember Close this <c OMProperty>.
   virtual void close(void);
-
-    // @cmember Detach this <c OMStrongReferenceSetProperty>.
-  virtual void detach(void);
 
     // @cmember Restore this <c OMStrongReferenceSetProperty>, the
     //          external (persisted) size of the
@@ -75,46 +70,11 @@ public:
     //          <c OMStrongReferenceSetProperty>.
   size_t count(void) const;
 
-    // @cmember Get the size of this <c OMStrongReferenceSetProperty>.
-  size_t getSize(void) const;
+  // Set access functions go here
 
-    // @cmember Insert <p object> into this
-    //          <c OMStrongReferenceSetProperty>.
   void insert(const ReferencedObject* object);
 
-    // @cmember Append the given <p ReferencedObject> <p object> to
-    //          this <c OMStrongReferenceSetProperty>.
-  void appendValue(const ReferencedObject* object);
-
-    // @cmember Remove the <p ReferencedObject> identified by
-    //          <p identification> from this <c OMStrongReferenceSetProperty>.
-  ReferencedObject* remove(const OMUniqueObjectIdentification& identification);
-
-    // @cmember Remove <p object> from this
-    //          <c OMStrongReferenceSetProperty>.
-  void removeValue(const ReferencedObject* object);
-
-    // @cmember Does this <c OMStrongReferenceSetProperty> contain
-    //          <p object> ?
-  bool containsValue(const ReferencedObject* object) const;
-
-    // @cmember Does this <c OMStrongReferenceSetProperty> contain a
-    //          <p ReferencedObject> identified by <p identification>?
-  virtual bool contains(
-                     const OMUniqueObjectIdentification& identification) const;
-
-    // @cmember Find the <p ReferencedObject> in this
-    //          <c OMStrongReferenceSetProperty> identified by
-    //          <p identification>.  If the object is found it is returned
-    //          in <p object> and the result is true. If the element is
-    //          not found the result is false.
-  virtual bool find(const OMUniqueObjectIdentification& identification,
-                    ReferencedObject*& object) const;
-
   // Optional property interface
-
-    // @cmember Is this <c OMStrongReferenceSetProperty> void ?
-  virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceSetProperty>.
   virtual void remove(void);
