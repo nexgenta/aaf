@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2005/02/03 18:43:21 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.13 2005/03/18 16:10:33 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@ AAFBASE ?= ../../..
 
 
 .PHONY : all
-all : ComModTestAAF CreateSequence EssenceAccess MultiGenTest ComFileKindTest UTF8FileNameTest OpenExistingModify
+all : ComModTestAAF CreateSequence EssenceAccess MultiGenTest ComFileKindTest UTF8FileNameTest OpenExistingModify ScaleTest
 
 .PHONY : ComModTestAAF
 ComModTestAAF :
@@ -57,6 +57,10 @@ UTF8FileNameTest :
 OpenExistingModify :
 	cd OpenExistingModify && $(MAKE)
 
+.PHONY : ScaleTest
+ScaleTest :
+	cd ScaleTest && $(MAKE)
+
 .PHONY : check
 check :
 	cd ComModTestAAF && $(MAKE) $@
@@ -66,6 +70,7 @@ check :
 	cd ComFileKindTest && $(MAKE) $@
 	cd UTF8FileNameTest && $(MAKE) $@
 	cd OpenExistingModify && $(MAKE) $@
+	cd ScaleTest && $(MAKE) $@
 
 .PHONY : clean
 clean :
@@ -76,6 +81,7 @@ clean :
 	cd ComFileKindTest && $(MAKE) GENDEPS=0 $@
 	cd UTF8FileNameTest && $(MAKE) GENDEPS=0 $@
 	cd OpenExistingModify && $(MAKE) GENDEPS=0 $@
+	cd ScaleTest && $(MAKE) GENDEPS=0 $@
 
 .PHONY : realclean
 realclean :
@@ -86,3 +92,4 @@ realclean :
 	cd ComFileKindTest && $(MAKE) GENDEPS=0 $@
 	cd UTF8FileNameTest && $(MAKE) GENDEPS=0 $@
 	cd OpenExistingModify && $(MAKE) GENDEPS=0 $@
+	cd ScaleTest && $(MAKE) GENDEPS=0 $@
