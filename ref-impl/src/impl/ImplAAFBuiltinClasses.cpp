@@ -110,6 +110,7 @@ ImplAAFBuiltinClasses::NewBuiltinClassDef (const aafUID_t & rClassID,
 		  ImplAAFObject *pObj = _dictionary->pvtCreateBaseClassInstance(&AUID_AAFClassDef);
 		  if (! pObj) return AAFRESULT_NOMEMORY;
 		  pObj->setClassFactory(_dictionary);
+		  pObj->pvtSetSoid (AUID_AAFClassDef);
 
 		  ImplAAFClassDef * pcd = static_cast<ImplAAFClassDef*>(pObj);
 		  assert (pcd);
@@ -133,7 +134,10 @@ ImplAAFBuiltinClasses::NewBuiltinClassDef (const aafUID_t & rClassID,
 								sBuiltinClassTable[i].pName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  if (pParentClass)
-			pParentClass->ReleaseReference ();
+			{
+			  pParentClass->ReleaseReference ();
+			  pParentClass = 0;
+			}
 
 		  assert (ppResult);
 		  *ppResult = pcd;
