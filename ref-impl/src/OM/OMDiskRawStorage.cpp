@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMDiskRawStorage
+
 #include "OMRawStorage.h"
 #include "OMAssertions.h"
 #include "OMUtilities.h"
@@ -98,22 +100,6 @@ OMDiskRawStorage::openNewModify(const wchar_t* fileName)
   return result;
 }
 
-  // @mfunc Constructor.
-  //   @parm The file.
-  //   @parm The access mode.
-OMDiskRawStorage::OMDiskRawStorage(FILE* file,
-                                   OMFile::OMAccessMode accessMode)
-: _file(file),
-  _mode(accessMode)
-{
-  TRACE("OMDiskRawStorage::OMDiskRawStorage");
-
-  PRECONDITION("Valid file", _file != 0);
-  PRECONDITION("Valid mode", (_mode == OMFile::readOnlyMode)  ||
-                             (_mode == OMFile::writeOnlyMode) ||
-                             (_mode == OMFile::modifyMode));
-}
-
   // @mfunc Destructor.
 OMDiskRawStorage::~OMDiskRawStorage(void)
 {
@@ -134,22 +120,6 @@ bool OMDiskRawStorage::isReadable(void) const
 
   bool result;
   if ((_mode == OMFile::modifyMode) || (_mode == OMFile::readOnlyMode)) {
-    result = true;
-  } else {
-    result = false;
-  }
-  return result;
-}
-
-  // @mfunc Is it possible to write to this <c OMDiskRawStorage> ?
-  //  @rdesc True if this <c OMDiskRawStorage> is writable, false otherwise.
-  //  @this const
-bool OMDiskRawStorage::isWritable(void) const
-{
-  TRACE("OMDiskRawStorage::isWritable");
-
-  bool result;
-  if ((_mode == OMFile::modifyMode) || (_mode == OMFile::writeOnlyMode)) {
     result = true;
   } else {
     result = false;
@@ -180,6 +150,22 @@ void OMDiskRawStorage::read(OMByte* bytes,
   read(_file, bytes, byteCount, bytesRead);
 }
 
+  // @mfunc Is it possible to write to this <c OMDiskRawStorage> ?
+  //  @rdesc True if this <c OMDiskRawStorage> is writable, false otherwise.
+  //  @this const
+bool OMDiskRawStorage::isWritable(void) const
+{
+  TRACE("OMDiskRawStorage::isWritable");
+
+  bool result;
+  if ((_mode == OMFile::modifyMode) || (_mode == OMFile::writeOnlyMode)) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
   // @mfunc Attempt to write the number of bytes given by <p byteCount>
   //        to the current position in this <c OMDiskRawStorage>
   //        from the buffer at address <p bytes>.
@@ -204,11 +190,6 @@ void OMDiskRawStorage::write(const OMByte* bytes,
 }
 
   // @mfunc May this <c OMDiskRawStorage> be changed in size ?
-  //        An implementation of <c OMDiskRawStorage> for disk files
-  //        would most probably return true. An implemetation
-  //        for network streams would return false. An implementation
-  //        for fixed size contiguous memory files (avoiding copying)
-  //        would return false.
   //   @rdesc Always <e bool.true>.
   //   @this const
 bool OMDiskRawStorage::isSizeable(void) const
@@ -254,10 +235,6 @@ void OMDiskRawStorage::setSize(OMUInt64 newSize)
 
   // @mfunc May the current position, for <f read()> and <f write()>,
   //        of this <c OMDiskRawStorage> be changed ?
-  //        An implementation of <c OMDiskRawStorage> for disk files
-  //        would most probably return true. An implemetation
-  //        for network streams would return false. An implementation
-  //        for memory files would return true.
   //   @rdesc Always <e bool.true>.
   //   @this const
 bool OMDiskRawStorage::isPositionable(void) const
@@ -297,6 +274,32 @@ void OMDiskRawStorage::setPosition(OMUInt64 newPosition)
   PRECONDITION("Positionable", isPositionable());
 
   setPosition(_file, newPosition);
+}
+
+  // @mfunc Synchronize this <c OMDiskRawStorage> with its external
+  //        representation.
+void OMDiskRawStorage::synchronize(void)
+{
+  TRACE("OMDiskRawStorage::synchronize");
+
+  int status = fflush(_file);
+  ASSERT("Successful flush", status == 0); // tjb - error
+}
+
+  // @mfunc Constructor.
+  //   @parm The file.
+  //   @parm The access mode.
+OMDiskRawStorage::OMDiskRawStorage(FILE* file,
+                                   OMFile::OMAccessMode accessMode)
+: _file(file),
+  _mode(accessMode)
+{
+  TRACE("OMDiskRawStorage::OMDiskRawStorage");
+
+  PRECONDITION("Valid file", _file != 0);
+  PRECONDITION("Valid mode", (_mode == OMFile::readOnlyMode)  ||
+                             (_mode == OMFile::writeOnlyMode) ||
+                             (_mode == OMFile::modifyMode));
 }
 
 void OMDiskRawStorage::read(FILE* file,
