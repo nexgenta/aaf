@@ -10,6 +10,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -118,6 +119,17 @@ public:
     GetFileMobID
 		// @parm [out] the file mob id associated with essence
         (aafUID_t *  pFileMobID);
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFEssenceData)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFEssenceDataTest.cpp.
+  static AAFRESULT test();
 
 private:
   OMFixedSizeProperty<aafUID_t> _fileMobID;
