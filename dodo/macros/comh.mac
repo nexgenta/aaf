@@ -168,8 +168,8 @@ public:
 #include "CAAFUnknown.h"
 #endif
 
-#ifndef __AAFResult_h_
-#include "AAFResult.h"
+#ifndef __AAFRoot_h__
+#include "AAFRoot.h"
 #endif
 
 //
@@ -945,10 +945,6 @@ public:
   AAF_DECLARE_CONCRETE();
   //
   //********
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/C.this-moduleTest.cpp.
-  static HRESULT test();
 };
 
 #endif // ! __C.this-module_h__
@@ -993,10 +989,6 @@ public:
   //
   //********
 
-  // Declare the module test method. The implementation of the will be be
-  // in /test/C.this-moduleTest.cpp.
-  static HRESULT test();
-
   //
   // Return private implementation pointer for delegation.
   // NOTE: This is NOT the pointer to the COM object's implementation
@@ -1015,6 +1007,7 @@ private:
   Impl.this-module * _rep;
 
 };
+
 
 #endif // ! __C.this-module_h__
 #endm
