@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFPlatform.h,v 1.7 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: AAFPlatform.h,v 1.8 2004/03/26 20:45:04 creederickson Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,7 +60,7 @@
  *  Processor:  PowerPC
  *  OS:         Classic MacOS
  */
-#elif defined(__MWERKS__) && defined(__POWERPC__) && defined(macintosh)
+#elif defined(__MWERKS__) && defined(__POWERPC__) && ! defined(PPC_DARWIN)
 #define CPU_POWERPC
 #define OS_MACOS
 #define COMPILER_MWERKS
@@ -144,8 +144,12 @@
  *  OS:         Darwin
  *
  * NOTE: CW support untested/incomplete. (cae 24-Feb-2004)
+ *
+ * NOTE: CW support demands macro PPC_DARWIN be manually defined, usually
+ *       in a prefix header. If this is not done, confusion will result with
+ *       regard to the intended target OS, MacOS or Darwin (cae 25-Mar-2004)
  */
-#elif defined(__MWERKS__) && defined(PPC_DARWIN)
+#elif defined(__MWERKS__) && defined(__POWERPC__) && defined(PPC_DARWIN)
 #define CPU_POWERPC
 #define OS_DARWIN
 #define OS_UNIX
@@ -247,7 +251,9 @@ typedef wchar_t			aafCharacter;
 /*
  *  Linux, FreeBSD, Darwin
  */
-#elif defined(PLATFORM_GCC_INTEL_LINUX) || defined(PLATFORM_GCC_INTEL_FREEBSD) || defined(PLATFORM_GCC_POWERPC_DARWIN) || defined(PLATFORM_GCC_SPARC_SOLARIS)
+#elif defined(PLATFORM_GCC_INTEL_LINUX) || defined(PLATFORM_GCC_INTEL_FREEBSD) \
+           || defined(PLATFORM_GCC_POWERPC_DARWIN) || defined(PLATFORM_GCC_SPARC_SOLARIS) \
+           || defined(PLATFORM_MWERKS_POWERPC_DARWIN)
 typedef signed char		aafInt8;
 typedef signed short int	aafInt16;
 typedef signed long int		aafInt32;
