@@ -1,11 +1,29 @@
-/************************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\************************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAFStoredObjectIDs.h"
@@ -35,19 +53,24 @@
 #include "ImplAAFOperationDef.h"
 #endif
 
+#include "ImplAAFDictionary.h"
+#include "ImplAAFDataDef.h"
+
 #include <assert.h>
 #include <string.h>
 #include "AAFResult.h"
 #include "aafErr.h"
-#include "ImplAAFReferenceValue.h"
+
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 
 extern "C" const aafClassID_t CLSID_EnumAAFOperationDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFParameterDefs;
  
 ImplAAFOperationDef::ImplAAFOperationDef ()
-: _dataDef(			PID_OperationDefinition_DataDefinition,		"DataDefinition"),
+: _dataDef(	PID_OperationDefinition_DataDefinition,	"DataDefinition", "/Dictionary/DataDefinitions"),
   _isTimeWarp(		PID_OperationDefinition_IsTimeWarp,			"IsTimeWarp"),
-//!!!  _degradeTo(	PID_OperationDefinition_DegradeTo,			"DegradeTo"),
+  _degradeTo(		PID_OperationDefinition_DegradeTo,			"DegradeTo"),
   _category(		PID_OperationDefinition_Category,			"Category"),
   _numInputs(		PID_OperationDefinition_NumberInputs,		"NumberInputs"),
   _bypass(			PID_OperationDefinition_Bypass,				"Bypass"),
@@ -55,7 +78,7 @@ ImplAAFOperationDef::ImplAAFOperationDef ()
 {
 	_persistentProperties.put(_dataDef.address());
 	_persistentProperties.put(_isTimeWarp.address());
-//!!!	_persistentProperties.put(_degradeTo.address());
+	_persistentProperties.put(_degradeTo.address());
 	_persistentProperties.put(_category.address());
 	_persistentProperties.put(_numInputs.address());
 	_persistentProperties.put(_bypass.address());
@@ -79,28 +102,54 @@ ImplAAFOperationDef::~ImplAAFOperationDef ()
 //	}
 }
 
-
+  
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetDataDefinitionID(
-      aafUID_t *  pDataDefID)
+    ImplAAFOperationDef::Initialize (
+      const aafUID_t & id,
+	  const aafWChar * pName,
+	  const aafWChar * pDesc)
 {
-	if(pDataDefID == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	*pDataDefID = _dataDef;
-	
+	if (pName == NULL || pDesc == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+	  return pvtInitialize(id, pName, pDesc);
+	}
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::SetDataDefinitionID (
-      aafUID_t  *pDataDefID)
+    ImplAAFOperationDef::GetDataDef(
+      ImplAAFDataDef ** ppDataDef)
 {
-	if(pDataDefID == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	_dataDef = *pDataDefID;
-	
+  if(! ppDataDef)
+	return AAFRESULT_NULL_PARAM;
+
+   if(_dataDef.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFDataDef *pDataDef = _dataDef;
+
+  *ppDataDef = pDataDef;
+  assert (*ppDataDef);
+  (*ppDataDef)->AcquireReference ();
+
 	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::SetDataDef (
+      ImplAAFDataDef * pDataDef)
+{
+  if (! pDataDef)
+	return AAFRESULT_NULL_PARAM;
+
+  _dataDef = pDataDef;
+	
+  return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -109,6 +158,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(bIsTimeWarp == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_isTimeWarp.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*bIsTimeWarp = _isTimeWarp;
 	
 	return AAFRESULT_SUCCESS;
@@ -125,34 +178,28 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::PrependDegradeToOperations (
+    ImplAAFOperationDef::PrependDegradeToOperation (
       ImplAAFOperationDef  *pOperationDef)
 {
-#if 0	//!!!
 	aafUID_t	*tmp = NULL, newUID;
-	aafInt32	oldBufSize;
-	aafInt32	newBufSize;
-	aafInt32	n;
+	aafInt32	oldCount;
+	aafInt32	newCount;
 
 	if(pOperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
-		oldBufSize = _degradeTo.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
+		oldCount = _degradeTo.count();
+		newCount = oldCount + 1;
 		CHECK(pOperationDef->GetAUID(&newUID));
-		tmp = new aafUID_t[newBufSize];
+		tmp = new aafUID_t[newCount];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
-			_degradeTo.copyToBuffer(tmp, oldBufSize);
-		for(n = oldBufSize/sizeof(aafUID_t); n >= 0; n--)
-		{
-			tmp[n+1] = tmp[n];
-		}
+		if(oldCount != 0)
+			_degradeTo.copyToBuffer(&tmp[1], oldCount * sizeof(aafUID_t));
 		tmp[0] = newUID;
-		_degradeTo.setValue(tmp, newBufSize);
+		_degradeTo.setValue(tmp, newCount * sizeof(aafUID_t));
 		delete [] tmp;
 	}
 	XEXCEPT
@@ -163,35 +210,31 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND;
 
 	return AAFRESULT_SUCCESS;
-#else
-	return AAFRESULT_NOT_IMPLEMENTED;
-#endif
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::AppendDegradeToOperations (
+    ImplAAFOperationDef::AppendDegradeToOperation (
       ImplAAFOperationDef  *pOperationDef)
 {
-#if 0	//!!!
 	aafUID_t	*tmp, newUID;
-	aafInt32	oldBufSize;
-	aafInt32	newBufSize;
+	aafInt32	oldCount;
+	aafInt32	newCount;
 
 	if(pOperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
-		oldBufSize = _degradeTo.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
+		oldCount = _degradeTo.count();
+		newCount = oldCount + 1;
 		CHECK(pOperationDef->GetAUID(&newUID));
-		tmp = new aafUID_t[newBufSize];
+		tmp = new aafUID_t[newCount];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
-			_degradeTo.copyToBuffer(tmp, oldBufSize);
-		tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
-		_degradeTo.setValue(tmp, newBufSize);
+		if(oldCount != 0)
+			_degradeTo.copyToBuffer(tmp, oldCount * sizeof(aafUID_t));
+		tmp[newCount - 1] = newUID;
+		_degradeTo.setValue(tmp, newCount * sizeof(aafUID_t));
 		delete [] tmp;
 	}
 	XEXCEPT
@@ -202,16 +245,45 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND;
 
 	return AAFRESULT_SUCCESS;
-#else
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::InsertDegradeToOperationAt (
+	  aafUInt32 index,
+      ImplAAFOperationDef  *pOperationDef)
+{
+  if (! pOperationDef) return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountDegradeToOperations (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::RemoveDegradeToOperationAt (
+	  aafUInt32 index)
+{
+	aafUInt32 count;
+	AAFRESULT hr;
+	hr = CountDegradeToOperations (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+	if (index >= count)
+		return AAFRESULT_BADINDEX;
+	
 	return AAFRESULT_NOT_IMPLEMENTED;
-#endif
+//!!!	_degradeTo.removeAt(index);
+//	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::GetDegradeToOperations (
       ImplEnumAAFOperationDefs  **ppEnum)
 {
-#if 0	//!!!
 	if(ppEnum == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
@@ -221,21 +293,31 @@ AAFRESULT STDMETHODCALLTYPE
 	(*ppEnum)->SetEnumProperty(this, &_degradeTo);
 
 	return(AAFRESULT_SUCCESS);
-#else
-	return AAFRESULT_NOT_IMPLEMENTED;
-#endif
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::CountDegradeToOperations (
+	  aafUInt32 * pResult)
+{
+  if (! pResult) return AAFRESULT_NULL_PARAM;
+
+  *pResult = _degradeTo.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::GetCategory (
-       wchar_t		*pCategory,
-		aafInt32	bufSize)
+       aafCharacter		*pCategory,
+		aafUInt32	bufSize)
 {
 	bool stat;
 
 	if(pCategory == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_category.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
 
 	stat = _category.copyToBuffer(pCategory, bufSize);
 	if (! stat)
@@ -251,17 +333,21 @@ AAFRESULT STDMETHODCALLTYPE
   //
 AAFRESULT STDMETHODCALLTYPE
 	ImplAAFOperationDef::GetCategoryBufLen (
-			aafInt32 *		pLen)
+			aafUInt32 *		pLen)
 {
 	if(pLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_category.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*pLen = _category.size();
 	return(AAFRESULT_SUCCESS); 
 }
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::SetCategory (
-      wchar_t *pCategory)
+      const aafCharacter *pCategory)
 {
 	if(pCategory == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -300,6 +386,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pBypass == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_bypass.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*pBypass = _bypass;
 	
 	return AAFRESULT_SUCCESS;
@@ -316,32 +406,71 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::AddParameterDefs (
+    ImplAAFOperationDef::AddParameterDef (
       ImplAAFParameterDef *pAAFParameterDef)
 {
-	aafUID_t	*tmp, newUID;
-	aafInt32	oldBufSize;
-	aafInt32	newBufSize;
+	aafUID_t					*tmp, newUID, oldUID;
+	aafInt32					oldCount;
+	aafInt32					newCount;
+	ImplAAFParameterDef*		pParmDef = NULL;
+	ImplEnumAAFParameterDefs*	pEnum = NULL;
+	aafBool						parmDefFound = kAAFFalse;
+
+	tmp = NULL;
 
 	if(pAAFParameterDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
-		oldBufSize = _paramDefined.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
 		CHECK(pAAFParameterDef->GetAUID(&newUID));
-		tmp = new aafUID_t[newBufSize];
-		if(tmp == NULL)
-			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
-			_paramDefined.copyToBuffer(tmp, oldBufSize);
-		tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
-		_paramDefined.setValue(tmp, newBufSize);
-		delete [] tmp;
+		CHECK(GetParameterDefs(&pEnum));
+		pEnum->NextOne(&pParmDef);
+		while(pParmDef)
+		{
+			CHECK(pParmDef->GetAUID(&oldUID));
+			if ( memcmp(&newUID, &oldUID, sizeof(aafUID_t)) == 0)
+			{
+				parmDefFound = kAAFTrue;
+				break;
+			}
+			pParmDef->ReleaseReference();
+			pParmDef = NULL;
+			pEnum->NextOne(&pParmDef);
+		}
+		pEnum->ReleaseReference();
+		pEnum = NULL;
+		if (!parmDefFound)
+		{
+			if (!_paramDefined.isPresent())
+				oldCount = 0;			
+			else oldCount = _paramDefined.count();
+
+			newCount = oldCount + 1;
+			tmp = new aafUID_t[newCount];
+			if(tmp == NULL)
+				RAISE(AAFRESULT_NOMEMORY);
+			if(oldCount!= 0)
+				_paramDefined.copyToBuffer(tmp, oldCount * sizeof(aafUID_t));
+			tmp[newCount - 1] = newUID;
+			_paramDefined.setValue(tmp, newCount * sizeof(aafUID_t));
+			delete [] tmp;
+		}
+		else
+		{
+			pParmDef->ReleaseReference();
+			pParmDef = NULL;
+			RAISE(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+		}
 	}
 	XEXCEPT
 	{
+		if (pParmDef)
+		  pParmDef->ReleaseReference();
+		pParmDef = 0;
+		if (pEnum)
+		  pEnum->ReleaseReference();
+		pEnum = 0;
 		if(tmp != NULL)
 			delete [] tmp;
 	}
@@ -351,7 +480,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetParameterDefinitions (
+    ImplAAFOperationDef::GetParameterDefs (
       ImplEnumAAFParameterDefs **ppEnum)
 {
 	if(ppEnum == NULL)
@@ -365,8 +494,23 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::CountParameterDefs (
+      aafUInt32 * pResult)
+{
+	if(pResult == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
+	return(AAFRESULT_NOT_IMPLEMENTED);
+}
 
-OMDEFINE_STORABLE(ImplAAFOperationDef, AUID_AAFOperationDef);
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::LookupParameterDef (
+	  const aafUID_t & /*parameterDefId*/,
+	  ImplAAFParameterDef ** ppParameterDef)
+{
+	if(ppParameterDef == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-
+	return(AAFRESULT_NOT_IMPLEMENTED);
+}
