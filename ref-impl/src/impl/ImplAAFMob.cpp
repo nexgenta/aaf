@@ -31,7 +31,8 @@
 #endif
 
 
-
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
 
 
 
@@ -61,11 +62,11 @@ extern "C" const aafClassID_t CLSID_AAFSourceClip;
 extern "C" const aafClassID_t CLSID_AAFFindSourceInfo;
 
 ImplAAFMob::ImplAAFMob ()
-: _mobID(			PID_MOB_MOBID,			"MobID"),
-  _name(			PID_MOB_NAME,			"Name"),
-  _creationTime(    PID_MOB_CREATE_TIME,	"CreateTime"),
-  _lastModified(    PID_MOB_MOD_TIME,		"ModTime"),
-  _slots(			PID_MOB_SLOTS,			"Slots")
+: _mobID(			PID_Mob_MobID,			"Mob ID"),
+  _name(			PID_Mob_Name,			"Name"),
+  _creationTime(    PID_Mob_CreationTime,	"Creation Time"),
+  _lastModified(    PID_Mob_LastModified,		"Last Modified"),
+  _slots(			PID_Mob_Slots,			"Slots")
 {
 	_persistentProperties.put(_mobID.address());
 	_persistentProperties.put(_name.address());
@@ -90,7 +91,6 @@ ImplAAFMob::~ImplAAFMob ()
 		{
 			pSlot->ReleaseReference();
 			pSlot = NULL;
-			// Set the current value to 0 so that the OM can perform necessary cleanup.
 			_slots.setValueAt(0, i);
 		}
 	}
@@ -266,6 +266,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
+	  if (inFile())
+          {
 		hr = MyHeadObject(&head);
 		if(hr == AAFRESULT_SUCCESS)
 		{			
@@ -293,12 +295,11 @@ AAFRESULT STDMETHODCALLTYPE
 			head->ReleaseReference();
 			head = NULL;
 		}
-		else if (hr == AAFRESULT_NOT_IN_FILE)
-		{
-			_mobID = *newMobID;
-		}
 		else
 			RAISE(hr);
+	  }
+          else
+		 _mobID = *newMobID;
 
 	} /* XPROTECT */
 	XEXCEPT
@@ -952,8 +953,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 static aafBool IsThisSCLP(
-						  AAFFile *file,    /* IN - File Handle */
-						  AAFObject *obj,  /* IN - Object to match */
+						  ImplAAFFile *file,    /* IN - File Handle */
+						  ImplAAFObject *obj,  /* IN - Object to match */
 						  void *data)       /* IN/OUT - Match Data */
 {
 #if FULL_TOOLKIT
@@ -977,8 +978,8 @@ static aafBool IsThisSCLP(
 }
 
 static AAFRESULT LocalChangeRef(
-						  AAFFile *file,    /* IN - File Handle */
-						  AAFObject *obj,  /* IN - Object to execute */
+						  ImplAAFFile *file,    /* IN - File Handle */
+						  ImplAAFObject *obj,  /* IN - Object to execute */
 						  aafInt32 level,   /* IN - Depth level */
 						  void *data)       /* IN/OUT - Execute data */
 {
@@ -1737,9 +1738,8 @@ AAFRESULT ImplAAFMob::ReconcileMobLength(void)
 	return(AAFRESULT_NOT_IMPLEMENTED);	// MUST call one of the subclasses
 }
 
-extern "C" const aafClassID_t CLSID_AAFMob;
 
-OMDEFINE_STORABLE(ImplAAFMob, CLSID_AAFMob);
+OMDEFINE_STORABLE(ImplAAFMob, AUID_AAFMob);
 
 
 
