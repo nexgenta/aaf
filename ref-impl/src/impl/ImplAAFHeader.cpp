@@ -486,7 +486,7 @@ AAFRESULT STDMETHODCALLTYPE
   while (AAFRESULT_SUCCEEDED (pEnumIds->NextOne (&pTestId)))
 	{
 	  aafUID_t testGen;
-	  hr = pTestId->GetGeneration (&testGen);
+	  hr = pTestId->GetGenerationID (&testGen);
 	  if (AAFRESULT_FAILED (hr)) return hr;
 	  if (EqualAUID (&testGen, &generation))
 		{
@@ -528,7 +528,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_identificationList));
+		OMStrongReferenceVectorIterator<ImplAAFIdentification>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFIdentification>(_identificationList);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFIdentifications, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
