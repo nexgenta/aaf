@@ -1,9 +1,9 @@
 #c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
+#c*                                                 *
+#c* Advanced Authoring Format                       *
+#c*                                                 *
+#c* Copyright (c) 1998-2000 Avid Technology, Inc.   *
+#c*                                                 *
 #c\*************************************************/
 #startm .this-module 0
 AAFTaggedValue\
@@ -16,8 +16,8 @@ AAFObject\
 #c #import ./AAFObject.exp
 AD_HEAD
 AD_IDL(//
-// The IAAFTaggedValue interface is implemented by objects that specify an User defined
-// ttag and value.
+// The IAAFTaggedValue interface is implemented by objects that
+// specify an User defined tag and value.
 //
 // In addition to the specific error results listed for each method\,
 // all methods in this interface may also return one of the following
@@ -27,36 +27,36 @@ AD_IDL(//
 //   - insufficient system memory is available to perform the
 //     operation.
 //)
-
-
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\***********************************************/
-
-
 AD_FORWARD_DECLARATION(AAFTypeDef)
-
 AD_CLASS_UUID(e684d761, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 
 AD_DEFAULT_UUID(e684d762, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
-
 AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_XMETHOD4(Initialize,
 
-AD_XMETHOD2(Initialize,
 			[in\, string],
 			objPass,
-			aafCharacter *,
+			aafCharacter_constptr,
 			pName,
-			User defined name of this tagged value object,
+			User defined name \(tag\) of this tagged value object,
+
 			[in],
+			objIn,
+			AAFTypeDef,
+			pTypeDef,
+			Type Definition of the following value data,
+
+			[in], 
 			objPass,
-			aafUID_t *,
-			pDatadef,
-			Data definition of this tagged value object,
+			aafUInt32, 
+			valueSize, 
+			Size of preallocated buffer,
+
+			[in\, size_is\(valueSize\)], 
+			objPass,
+			aafDataBuffer_t, 
+			pValue, 
+			buffer containing value,
 
      Initializes a new tagged value object to be identified with the
   // given the given type\, and with the given human-legible name.
@@ -66,84 +66,27 @@ AD_XMETHOD2(Initialize,
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
-  // - pDatadef is a valid pointer.
   // - pName is a valid pointer.
+  // - pTypeDef is a valid pointer and registered
+  // - pValue is a valid pointer
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pDatadef or pName\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pName or pTypeDef or pValue\)
   // )
 
-AD_XMETHOD2(GetName,
-			[in\,string],
-			objPass,
-			aafCharacter *,
-			pName,
-			Tagged value Name,
 
-			[in],
-			objPass,
-			aafInt32,
-			bufSize,
-			length of the buffer to hold the Tagged value's Name,
+AD_STD_METHOD_STRING_GET_AND_SIZE(Name,
+     the Name string property.)
 
-			Writes the name\, with a trailing null character\, into the
-  // pName buffer.  The buffer is allocated by the caller.  The size
-  // of the buffer is given by bufSize.  If the property name has not
-  // yet been set\, a zero-length string will be written \(that is\,
-  // only the trailing null character\).
-  // 
-  // Caller may call GetNameBufLen\(\) to determine the
-  // required buffer size.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pName pointer is valid.
-  // - bufSize indicates the buffer is large enough to hold the name.
-  // 
-  // If this method fails nothing will be written to *pName.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pName arg is NULL.
-  //
-  // AAFRESULT_SMALLBUF
-  //   - bufSize indicates the buffer is too small to hold the string.)
-
-AD_XMETHOD1(GetNameBufLen,
-			[out],
-			objPass,
-			aafInt32 *,
-			pLen,
-			Name buffer length,
-
-			Returns the length of buffer required for the GetName\(\) method.  
-  // The value is placed into the location
-  // specified by pLen. The value will include space required for the
-  // trailing null character.
-  //
-  // Succeeds if all of the following are true:
-  // - the pLen pointer is valid.
-  //
-  // If this method fails nothing will be written to *pLen.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pLen arg is NULL.)
 
 AD_XMETHOD1(GetTypeDefinition,
-			[out], objOut, AAFTypeDef, ppTypeDef, Type definition object,
-		   Returns the type definition for this invocation.)
+            [out],
+            objOut,
+            AAFTypeDef,
+            ppTypeDef,
+            Type definition object,
+
+		   Returns the type definition for this invocation.
   // 
   // Succeeds if all of the following are true:
   // - the ppTypeDef pointer is valid.
@@ -166,12 +109,27 @@ AD_XMETHOD1(GetTypeDefinition,
   // AAFRESULT_NULL_PARAM
   //   - ppTypeDef arg is NULL.)
 
+
 AD_METHOD3(GetValue,
-			[in],aafUInt32,valueSize,Size of preallocated buffer,
-			[out\\\, size_is\\\(valueSize\\\)\\\,length_is\\\(*bytesRead\\\)],aafDataBuffer_t,pValue,Preallocated buffer to hold value,
-			[out],aafUInt32*,bytesRead,Number of actual bytes read,
-			Writes the value into the pValue buffer.  The buffer is allocated by the caller\\\,
-  // and the size of the buffer is given by valueSize.
+
+			[in],
+            aafUInt32,
+            valueSize,
+            Size of preallocated buffer,
+
+			[out\\\, size_is\\\(valueSize\\\)\\\, length_is\\\(*bytesRead\\\)],
+            aafDataBuffer_t,
+            pValue,
+            Preallocated buffer to hold value,
+
+			[out],
+            aafUInt32 *,
+            bytesRead,
+            Number of actual bytes read,
+
+     Writes the value into the pValue buffer.  The buffer is allocated
+  // by the caller\\\, and the size of the buffer is given by
+  // valueSize.
   // 
   // Caller may call GetValueBufLen\\\(\\\) to determine the
   // required buffer size.
@@ -221,26 +179,36 @@ AD_XMETHOD1(GetValueBufLen,
   // AAFRESULT_NULL_PARAM
   //   - pLen arg is NULL.)
 
-/****/
-AD_METHOD2(SetValue,
-			[in],aafUInt32,valueSize, Size of preallocated buffer,
-			[in\\\, size_is\\\(valueSize\\\)],aafDataBuffer_t,pValue, buffer containing value,
-			The data value is set from a buffer of size valueSize.
+AD_XMETHOD2(SetValue,
+			[in], 
+			objPass,
+			aafUInt32, 
+			valueSize, 
+			Size of preallocated buffer,
+
+			[in\, size_is\(valueSize\)], 
+			objPass,
+			aafDataBuffer_t, 
+			pValue, 
+			buffer containing value,
+
+			The data value is set from a buffer of size valueSize and type.
   //
   // Succeeds if all of the following are true:
+  // - pTypeDef is valid and registered with the object's dictionary.
   // - the pValue pointer is valid.
   // 
   // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\\\, it will return the first one
+  // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \\\(This is the only code indicating success.\\\)
+  //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\\\(\\\) called on it.
+  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pValue is null.)
+  //   - ppTypeDef is null.)
 
 AD_XCLASS_END(Concrete, StoredObject)
