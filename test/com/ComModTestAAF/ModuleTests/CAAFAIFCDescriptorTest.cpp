@@ -14,9 +14,7 @@
 #undef WIN32_LEAN_AND_MEAN
 
 
-#ifndef __CAAFAIFCDescriptor_h__
-#include "CAAFAIFCDescriptor.h"
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -154,6 +152,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
+	*ppFile = NULL;
 
 	switch (mode)
 	{
@@ -172,8 +171,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -287,6 +289,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pSourceMob)
 		pSourceMob->Release();
 
+	if (pDictionary)
+		pDictionary->Release();
+
 	if (pHeader)
 		pHeader->Release();
 
@@ -356,17 +361,20 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	
   
 	// Cleanup and return
-	if (pEssDesc)
-		pEssDesc->Release();
-
 	if (pAIFCDesc)
 		pAIFCDesc->Release();
+
+  if (pEssDesc)
+		pEssDesc->Release();
+
+	if (pSourceMob)
+		pSourceMob->Release();
 
 	if (pMob)
 		pMob->Release();
 
-	if (pSourceMob)
-		pSourceMob->Release();
+	if (pMobIter)
+		pMobIter->Release();
 
 	if (pHeader)
 		pHeader->Release();
@@ -380,7 +388,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-HRESULT CAAFAIFCDescriptor::test()
+extern "C" HRESULT CAAFAIFCDescriptor_test()
 {
 	aafWChar*	pFileName = L"AAFAIFCDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
@@ -393,7 +401,7 @@ HRESULT CAAFAIFCDescriptor::test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFAIFCDescriptor::test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFAIFCDescriptor_test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
