@@ -445,7 +445,7 @@ AAFRESULT
 	}
 	XEND
 	
-	return(OM_ERR_NONE);
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -526,7 +526,8 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pTimeStamp = _lastModified;
+  return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
@@ -534,7 +535,8 @@ AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
 	aafTimeStamp_t	now;
 
 	AAFGetDateTime(&now);
-	return (OM_ERR_NONE);
+	_lastModified = now;
+	return (AAFRESULT_SUCCESS);
 }
 
 void ImplAAFHeader::SetByteOrder(const aafInt16 byteOrder)
@@ -542,10 +544,17 @@ void ImplAAFHeader::SetByteOrder(const aafInt16 byteOrder)
 	_byteOrder = byteOrder;
 }
 
+void ImplAAFHeader::SetDictionary(ImplAAFDictionary *pDictionary)
+{
+	_dictionary = pDictionary;
+  if (pDictionary)
+    pDictionary->AcquireReference();
+}
+
 AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 {
 	_toolkitRev = AAFReferenceImplementationVersion;
-	return (OM_ERR_NONE);
+	return (AAFRESULT_SUCCESS);
 }
 
 AAFRESULT ImplAAFHeader::LoadMobTables(void)
@@ -599,13 +608,7 @@ ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
 ImplAAFDictionary *ImplAAFHeader::GetDictionary()
 {
 	ImplAAFDictionary	*result = _dictionary;
-
-	// Create the dictionary object if it does not exist.
-	if (NULL == result) {
-		result = (ImplAAFDictionary *)CreateImpl(CLSID_AAFDictionary);
-		_dictionary = result;
-	}
-
+  assert(result);
 	return(result);
 }
 
