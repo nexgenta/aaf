@@ -73,21 +73,34 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_persistentProperties.put(_gamma.address());
 	_persistentProperties.put(_imageAlignmentFactor.address());
 
-	aafRational_t zero;
+	aafRational_t	zero;
 	zero.numerator = 0;
 	zero.denominator = 1;
+
+	aafUID_t zeroID;
+	zeroID.Data1 = 0;
+	zeroID.Data2 = 0;
+	zeroID.Data3 = 0;
+	zeroID.Data4[0] = 0;
+	zeroID.Data4[1] = 0;
+	zeroID.Data4[2] = 0;
+	zeroID.Data4[3] = 0;
+	zeroID.Data4[4] = 0;
+	zeroID.Data4[5] = 0;
+	zeroID.Data4[6] = 0;
+	zeroID.Data4[7] = 0;
 	
 	// Initialize Required properties
 	_storedHeight = 0;
 	_storedWidth = 0;
-	_frameLayout = kFullFrame;
+	_frameLayout = kAAFFullFrame;
 	_imageAspectRatio = zero;
 	videoLineMap[0] = 0;
 	videoLineMap[1] = 1;
 	_videoLineMap.setValue(videoLineMap, 2*sizeof(aafInt32));
 	// Initialize Optional properties
 
-	_compression = NoCodec;
+	_compression = kAAFNoCodec;
 	_sampledHeight = 0;
 	_sampledWidth = 0;
 	_sampledXOffset = 0;
@@ -96,8 +109,8 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_displayWidth = 0;
 	_displayXOffset = 0;
 	_displayYOffset = 0;
-	_alphaTransparency = zero;
-	_gamma = zero;
+	_alphaTransparency = kAAFMinValueTransparent;
+	_gamma = zeroID;
 	_imageAlignmentFactor = 0;
 }
 
@@ -106,12 +119,9 @@ ImplAAFDigitalImageDescriptor::~ImplAAFDigitalImageDescriptor ()
 {}
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::SetCompression (aafUID_t*  pCompression)
+    ImplAAFDigitalImageDescriptor::SetCompression (const aafUID_t & compression)
 {
-	if (pCompression == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	_compression = *pCompression;
+	_compression = compression;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -190,31 +200,19 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::SetAlphaTransparency (aafAlphaTransparency_t AlphaTransparency)
 {
-	if ((AlphaTransparency != kMinValueTransparent) && (AlphaTransparency != kMaxValueTransparent))
+	if ((AlphaTransparency != kAAFMinValueTransparent) && (AlphaTransparency != kAAFMaxValueTransparent))
 	{
 		return AAFRESULT_INVALID_TRANSPARENCY;
 	}
 
-	aafRational_t transparency;
-
-	if (AlphaTransparency == kMinValueTransparent)
-	{
-		transparency.numerator = 0;
-		transparency.denominator = 1;
-	}
-	else
-	{
-		transparency.numerator = 1;
-		transparency.denominator = 1;
-	}
-	_alphaTransparency = transparency;
+	_alphaTransparency = AlphaTransparency;
 
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::SetGamma (aafRational_t Gamma)
+    ImplAAFDigitalImageDescriptor::SetGamma (aafUID_t Gamma)
 {
 	_gamma = Gamma;
 
@@ -363,23 +361,14 @@ AAFRESULT STDMETHODCALLTYPE
 	if (!_alphaTransparency.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
 	
-	aafRational_t transparency = _alphaTransparency;
-
-	if (transparency.numerator == 0)
-	{
-		*pAlphaTransparency = kMinValueTransparent;
-	}
-	else
-	{
-		*pAlphaTransparency = kMaxValueTransparent;
-	}
+	*pAlphaTransparency = _alphaTransparency;
 
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::GetGamma (aafRational_t* pGamma)
+    ImplAAFDigitalImageDescriptor::GetGamma (aafUID_t* pGamma)
 {
 	if (pGamma == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -394,7 +383,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::GetImageAlignmentFactor (aafInt32* pImageAlignmentFactor)
+    ImplAAFDigitalImageDescriptor::GetImageAlignmentFactor (aafUInt32* pImageAlignmentFactor)
 {
 	if (pImageAlignmentFactor == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -409,4 +398,3 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFDigitalImageDescriptor, AUID_AAFDigitalImageDescriptor);
