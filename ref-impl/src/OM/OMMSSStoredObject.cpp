@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSSStoredObject.cpp,v 1.63.2.5 2004/07/23 17:35:35 tbingham Exp $ $Name:  $
+// $Id: OMMSSStoredObject.cpp,v 1.63.2.6 2004/07/23 18:30:56 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -396,7 +396,6 @@ void OMMSSStoredObject::save(const OMSimpleProperty& property)
   //   @parm TBS
 void OMMSSStoredObject::save(const OMDataVector& property)
 {
-#if 0 // tjb - Not yet
   TRACE("OMMSSStoredObject::save");
 
   // Save as if this were an OMSimpleProperty
@@ -450,7 +449,6 @@ void OMMSSStoredObject::save(const OMDataVector& property)
   }
   delete it;
   delete [] buffer;
-#endif
 }
 
 void OMMSSStoredObject::save(const OMDataSet& property)
