@@ -9,8 +9,6 @@
 *                                          *
 \******************************************/
 
-
-
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -20,29 +18,52 @@
 *                                          *
 \******************************************/
 
-#ifndef __CAAFSourceClip_h__
-#include "CAAFSourceClip.h"
+
+
+
+
+
+
+
+#include "CAAFEssenceDescriptor.h"
+#include "CAAFEssenceDescriptor.h"
+#ifndef __CAAFEssenceDescriptor_h__
+#error - improperly defined include guard
 #endif
 
 #include <iostream.h>
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
-static aafWChar *slotName = L"SLOT1";
-static aafInt32 fadeInLen  = 1000;
-static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kFadeLinearAmp;
-static aafFadeType_t fadeOutType = kFadeLinearPower;
-static aafSourceRef_t sourceRef; 
+
+
+  //@comm The number of locators may be zero if the essence is in the current file.
+
+
+  //@comm    Use this function to add a locator to be scanned first when searching for
+  // the essence (a new primary location).
+
+
+  //@comm    Use this function to add a locator to be scanned first when searching for
+  // the essence (a secondary location for the essence).
+
+
+
+
+  //@comm The number of locators may be zero if the essence is in the current file.
+
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
+	IAAFLocator	*				pLocator;
 	aafProductIdentification_t	ProductInfo;
 	aafUID_t					newUID;
+	aafInt32					numLocators;
 	HRESULT						hr;
+	aafUID_t					ddef = DDEF_Audio;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"Make AVR Example";
@@ -62,7 +83,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 						   (void **)&pSession);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
-
 	hr = pSession->SetDefaultIdentification(&ProductInfo);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
@@ -75,21 +95,24 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
  	
-	//Make the MOB
+//Make the first mob
+	IAAFSourceMob	*pSourceMob;
 	IAAFMob			*pMob;
-	IAAFMobSlot		*newSlot;
-	IAAFSegment		*seg;
-	IAAFSourceClip	*sclp;
+	IAAFEssenceDescriptor *edesc;
+
 	aafRational_t	audioRate = { 44100, 1 };
 
 	// Create a Mob
-	hr = CoCreateInstance(CLSID_AAFMob,
+	hr = CoCreateInstance(CLSID_AAFSourceMob,
 							NULL, 
 							CLSCTX_INPROC_SERVER, 
-							IID_IAAFMob, 
-							(void **)&pMob);
+							IID_IAAFSourceMob, 
+							(void **)&pSourceMob);
 
 
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	hr = pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
@@ -97,42 +120,50 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	hr = pMob->SetMobID(&newUID);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
-
-	hr = pMob->SetName(L"MOBTest");
+	hr = pMob->SetName(L"EssenceDescriptorTest");
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 	
-	hr = CoCreateInstance(CLSID_AAFSourceClip,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFSourceClip, 
-						   (void **)&sclp);		
+	hr = CoCreateInstance(CLSID_AAFEssenceDescriptor,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFEssenceDescriptor, 
+							(void **)&edesc);		
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+ 	hr = pSourceMob->SetEssenceDescription (edesc);
  	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// Set the properties for the SourceClip
-	hr = sclp->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType);
-	if (AAFRESULT_SUCCESS != hr)
+    // Verify that there are no locators
+	hr = edesc->GetNumLocators(&numLocators);
+ 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
+	if (0 != numLocators)
+		return AAFRESULT_TEST_FAILED;
 
-	sourceRef.sourceID = NilMOBID;
-	sourceRef.sourceSlotID = 0;
-	sourceRef.startTime = 0;
-	hr = sclp->SetRef(sourceRef);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	hr = sclp->QueryInterface (IID_IAAFSegment, (void **)&seg);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	hr = pMob->AppendNewSlot (seg, 1, slotName, &newSlot);
+  
+	// Make a locator, and attach it to the EssenceDescriptor
+	hr = CoCreateInstance(CLSID_AAFLocator,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFLocator, 
+							(void **)&pLocator);		
  	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	seg->Release();
-	newSlot->Release();
+    hr = edesc->AppendLocator(pLocator);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
+	// Verify that there is now one locator
+	hr = edesc->GetNumLocators(&numLocators);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	if (1 != numLocators)
+		return AAFRESULT_TEST_FAILED;
+
+	// Add the source mob into the tree
 	hr = pHeader->AppendMob(pMob);
  	if (AAFRESULT_SUCCESS != hr)
 		return hr;
@@ -157,8 +188,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
+	IAAFEssenceDescriptor		*pEdesc;
+	IAAFSourceMob				*pSourceMob;
+	IEnumAAFLocators *			pEnum;
+	IAAFLocator	*				pLocator;
+	aafInt32					numLocators;
 	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t	numMobs, n, s;
+	aafNumSlots_t	numMobs, n;
 	HRESULT						hr;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
@@ -195,6 +231,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	hr = pHeader->GetNumMobs(kAllMob, &numMobs);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
+	if (1 != numMobs )
+		return AAFRESULT_TEST_FAILED;
 
 	IEnumAAFMobs *mobIter;
 
@@ -207,100 +245,47 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	for(n = 0; n < numMobs; n++)
 	{
 		IAAFMob			*aMob;
-		aafNumSlots_t	numSlots;
-		IEnumAAFMobSlots	*slotIter;
-		IAAFMobSlot		*slot;
-		IAAFSegment		*seg = NULL;
-		IAAFSourceClip	*sclp = NULL;
+		aafWChar		name[500];
+		aafUID_t		mobID;
 
 		hr = mobIter->NextOne (&aMob);
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
-
-		hr = aMob->GetNumSlots (&numSlots);
+		hr = aMob->GetName (name, sizeof(name));
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
+		hr = aMob->GetMobID (&mobID);
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
 
-		if(numSlots != 0)
-		{
-			hr = aMob->EnumAAFAllMobSlots(&slotIter);
-			if (AAFRESULT_SUCCESS != hr)
-				return hr;
+		hr = aMob->QueryInterface (IID_IAAFSourceMob, (void **)&pSourceMob);
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
+		hr = pSourceMob->GetEssenceDescription (&pEdesc);
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
 
-			for(s = 0; s < numSlots; s++)
-			{
-				aafInt32		rFadeInLen;
-				aafInt32		rFadeOutLen;
-				aafFadeType_t	rFadeInType;
-				aafFadeType_t	rFadeOutType;
-				aafSourceRef_t	rSourceRef; 
-				aafBool			fadeInPresent;
-				aafBool			fadeOutPresent;
-				
-				hr = slotIter->NextOne (&slot);
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
+		// Verify that there is now one locator
+		hr = pEdesc->GetNumLocators(&numLocators);
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
+		if (1 != numLocators)
+			return AAFRESULT_TEST_FAILED;
+	
+		hr = pEdesc->EnumAAFAllLocators(&pEnum);
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
 
-				hr = slot->GetSegment(&seg);
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
+		// This should read the one real locator
+		hr = pEnum->NextOne(&pLocator);
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
 
-				hr = seg->QueryInterface(IID_IAAFSourceClip,(void **)&sclp);
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-		 
-				hr = sclp->GetFade( &rFadeInLen, &rFadeInType, &fadeInPresent, 
-									&rFadeOutLen, &rFadeOutType, &fadeOutPresent );
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-				// verify that we read exactly the same thing as we wrote to the file !!
-				if (fadeInPresent)
-				{
-					if (rFadeInLen != fadeInLen ||
-						rFadeInType != fadeInType)
-					{
-						hr = AAFRESULT_TEST_FAILED;
-						return hr;
-					}
-				}
-				else
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-				if (fadeOutPresent)
-				{
-					if (rFadeOutLen != fadeOutLen ||
-						rFadeOutType != fadeOutType)
-					{
-						hr = AAFRESULT_TEST_FAILED;
-						return hr;
-					}
-				}
-				else
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-				
-				hr = sclp->GetRef( &rSourceRef); 
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-
-				if (memcmp(&(rSourceRef.sourceID), &(sourceRef.sourceID), sizeof(sourceRef.sourceID)) != 0) 
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-				if (rSourceRef.sourceSlotID != sourceRef.sourceSlotID ||
-					rSourceRef.startTime != sourceRef.startTime)
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-			}
-		}
-	}
+		// This should run off the end
+		hr = pEnum->NextOne(&pLocator);
+		if (AAFRESULT_NO_MORE_OBJECTS != hr)
+			return hr;
+}
 
 	//!!! Problem deleting, let it leak -- 	delete mobIter;
 	hr = pFile->Close();
@@ -318,25 +303,22 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return 	AAFRESULT_SUCCESS;
 }
  
-
-
-HRESULT CAAFSourceClip::test()
+HRESULT CAAFEssenceDescriptor::test()
 {
-	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	IAAFMob *pObject = NULL;
- 	aafWChar * pFileName = L"SourceClipTest.aaf";
+  HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
+  IAAFEssenceDescriptor *pObject = NULL;
+  aafWChar * pFileName = L"EssenceDescTest.aaf";
 
-	try
+  try
 	{
 		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
-	catch (...)
+  catch (...)
 	{
-	  cerr << "CAAFMob::test...Caught general C++"
+	  cerr << "CAAFEssenceDescriptor::test...Caught general C++"
 		" exception!" << endl; 
-	  hr = AAFRESULT_TEST_FAILED;
 	}
 
   // Cleanup our object if it exists.
@@ -349,25 +331,3 @@ HRESULT CAAFSourceClip::test()
 
 	return hr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

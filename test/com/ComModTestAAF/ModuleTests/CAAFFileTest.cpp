@@ -11,29 +11,14 @@
 
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-#ifndef __CAAFSourceClip_h__
-#include "CAAFSourceClip.h"
+#ifndef __CAAFFile_h__
+#include "CAAFFile.h"
 #endif
 
 #include <iostream.h>
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
 
-static aafWChar *slotName = L"SLOT1";
-static aafInt32 fadeInLen  = 1000;
-static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kFadeLinearAmp;
-static aafFadeType_t fadeOutType = kFadeLinearPower;
-static aafSourceRef_t sourceRef; 
+static aafUID_t		newUID;
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
@@ -41,7 +26,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafUID_t					newUID;
 	HRESULT						hr;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -77,10 +61,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  	
 	//Make the MOB
 	IAAFMob			*pMob;
-	IAAFMobSlot		*newSlot;
-	IAAFSegment		*seg;
-	IAAFSourceClip	*sclp;
-	aafRational_t	audioRate = { 44100, 1 };
 
 	// Create a Mob
 	hr = CoCreateInstance(CLSID_AAFMob,
@@ -101,37 +81,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	hr = pMob->SetName(L"MOBTest");
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
-	
-	hr = CoCreateInstance(CLSID_AAFSourceClip,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFSourceClip, 
-						   (void **)&sclp);		
- 	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	// Set the properties for the SourceClip
-	hr = sclp->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	sourceRef.sourceID = NilMOBID;
-	sourceRef.sourceSlotID = 0;
-	sourceRef.startTime = 0;
-	hr = sclp->SetRef(sourceRef);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	hr = sclp->QueryInterface (IID_IAAFSegment, (void **)&seg);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	hr = pMob->AppendNewSlot (seg, 1, slotName, &newSlot);
- 	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-
-	seg->Release();
-	newSlot->Release();
 
 	hr = pHeader->AppendMob(pMob);
  	if (AAFRESULT_SUCCESS != hr)
@@ -158,8 +107,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t	numMobs, n, s;
+	aafNumSlots_t				numMobs, n;
 	HRESULT						hr;
+	aafWChar					name[500];
+	aafUID_t					mobID;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
 	ProductInfo.productName = L"Make AVR Example. NOT!";
@@ -198,108 +149,26 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 	IEnumAAFMobs *mobIter;
 
-//!!!	aafSearchCrit_t		criteria;
-//!!!	criteria.searchTag = kNoSearch;
-
     hr = pHeader->EnumAAFAllMobs (NULL, &mobIter);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 	for(n = 0; n < numMobs; n++)
 	{
 		IAAFMob			*aMob;
-		aafNumSlots_t	numSlots;
-		IEnumAAFMobSlots	*slotIter;
-		IAAFMobSlot		*slot;
-		IAAFSegment		*seg = NULL;
-		IAAFSourceClip	*sclp = NULL;
 
 		hr = mobIter->NextOne (&aMob);
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
-
-		hr = aMob->GetNumSlots (&numSlots);
+		hr = aMob->GetName (name, sizeof(name));
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
-
-		if(numSlots != 0)
-		{
-			hr = aMob->EnumAAFAllMobSlots(&slotIter);
-			if (AAFRESULT_SUCCESS != hr)
-				return hr;
-
-			for(s = 0; s < numSlots; s++)
-			{
-				aafInt32		rFadeInLen;
-				aafInt32		rFadeOutLen;
-				aafFadeType_t	rFadeInType;
-				aafFadeType_t	rFadeOutType;
-				aafSourceRef_t	rSourceRef; 
-				aafBool			fadeInPresent;
-				aafBool			fadeOutPresent;
-				
-				hr = slotIter->NextOne (&slot);
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-
-				hr = slot->GetSegment(&seg);
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-
-				hr = seg->QueryInterface(IID_IAAFSourceClip,(void **)&sclp);
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-		 
-				hr = sclp->GetFade( &rFadeInLen, &rFadeInType, &fadeInPresent, 
-									&rFadeOutLen, &rFadeOutType, &fadeOutPresent );
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-				// verify that we read exactly the same thing as we wrote to the file !!
-				if (fadeInPresent)
-				{
-					if (rFadeInLen != fadeInLen ||
-						rFadeInType != fadeInType)
-					{
-						hr = AAFRESULT_TEST_FAILED;
-						return hr;
-					}
-				}
-				else
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-				if (fadeOutPresent)
-				{
-					if (rFadeOutLen != fadeOutLen ||
-						rFadeOutType != fadeOutType)
-					{
-						hr = AAFRESULT_TEST_FAILED;
-						return hr;
-					}
-				}
-				else
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-				
-				hr = sclp->GetRef( &rSourceRef); 
-				if (AAFRESULT_SUCCESS != hr)
-					return hr;
-
-				if (memcmp(&(rSourceRef.sourceID), &(sourceRef.sourceID), sizeof(sourceRef.sourceID)) != 0) 
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-				if (rSourceRef.sourceSlotID != sourceRef.sourceSlotID ||
-					rSourceRef.startTime != sourceRef.startTime)
-				{
-					hr = AAFRESULT_TEST_FAILED;
-					return hr;
-				}
-			}
-		}
+		hr = aMob->GetMobID (&mobID);
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
+		if (wcscmp( name, L"MOBTest") != 0)
+			return AAFRESULT_TEST_FAILED;
+		if ( memcmp(&mobID, &newUID, sizeof(mobID)) != 0)
+			return AAFRESULT_TEST_FAILED;
 	}
 
 	//!!! Problem deleting, let it leak -- 	delete mobIter;
@@ -317,14 +186,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 	return 	AAFRESULT_SUCCESS;
 }
- 
 
-
-HRESULT CAAFSourceClip::test()
+HRESULT CAAFFile::test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	IAAFMob *pObject = NULL;
- 	aafWChar * pFileName = L"SourceClipTest.aaf";
+ 	aafWChar * pFileName = L"FileTest.aaf";
 
 	try
 	{
@@ -346,21 +213,8 @@ HRESULT CAAFSourceClip::test()
   	// When all of the functionality of this class is tested, we can return success
 	if(hr == AAFRESULT_SUCCESS)
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-
-	return hr;
+  return hr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
