@@ -14,16 +14,13 @@
 #include "ImplAAFNetworkLocator.h"
 #endif
 
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
-
 #include "AAFResult.h"
 
 #include <assert.h>
 
 
 ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
-: _path(PID_NetworkLocator_URLString, "URLString")
+: _path(PID_NETWORKLOCATOR_URLSTRING, "URLString")
 {
   _persistentProperties.put(_path.address());
   _path = L"";
@@ -32,14 +29,6 @@ ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
 
 ImplAAFNetworkLocator::~ImplAAFNetworkLocator ()
 {}
-
-
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFNetworkLocator::Initialize ()
-{
-  return AAFRESULT_SUCCESS;
-}
-
 
 // Override from AAFLocator
 AAFRESULT STDMETHODCALLTYPE
@@ -69,7 +58,7 @@ ImplAAFNetworkLocator::GetPathBufLen (aafInt32 *  pLen)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  *pLen = _path.size();
+  *pLen = _path.length();
   return AAFRESULT_SUCCESS;
 }
 
@@ -83,12 +72,11 @@ ImplAAFNetworkLocator::SetPath (aafWChar *  pPathBuf)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-
-	_path = pPathBuf;
-
-	return(AAFRESULT_SUCCESS); 
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
+extern "C" const aafClassID_t CLSID_AAFNetworkLocator;
 
-OMDEFINE_STORABLE(ImplAAFNetworkLocator, AUID_AAFNetworkLocator);
+OMDEFINE_STORABLE(ImplAAFNetworkLocator, CLSID_AAFNetworkLocator);
+
