@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.138 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.139 2004/11/04 17:55:08 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,6 +19,9 @@
 // The Initial Developer of the Original Code of this file and the
 // Licensor of the AAF Association is Avid Technology.
 // All rights reserved.
+//
+// Portions created by British Broadcasting Corporation are
+// Copyright 2004, British Broadcasting Corporation.  All rights reserved.
 //
 //=---------------------------------------------------------------------=
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 ###############################################################################
 #
-# $Id: runaaftest.sh,v 1.6 2004/11/04 16:38:00 phil_tudor Exp $ $Name:  $
+# $Id: runaaftest.sh,v 1.7 2004/11/04 17:55:08 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -17,11 +17,13 @@
 # The Original Code of this file is Copyright 1998-2004, Licensor of the
 # AAF Association.
 #
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is British Broadcasting Corporation.
+# All rights reserved.
+#
 ###############################################################################
 #
 #	Shell script for testing scalability.
-#
-#	Copyright (C) 2004 Anuradha Suraparaju <asuraparaju@users.sourceforge.net>
 #
 ###############################################################################
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 ###############################################################################
 #
-# $Id: createtest.sh,v 1.2 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: createtest.sh,v 1.3 2004/11/04 17:55:08 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -17,12 +17,14 @@
 # The Original Code of this file is Copyright 1998-2004, Licensor of the
 # AAF Association.
 #
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is British Broadcasting Corporation.
+# All rights reserved.
+#
 ###############################################################################
 #
 #	Shell script for creating test data for scalability tests.
 #	Requires a sample raw DV file called 1frame.dv to be present.
-#
-#	Copyright (C) 2004 Anuradha Suraparaju <asuraparaju@users.sourceforge.net>
 #
 ###############################################################################
 
