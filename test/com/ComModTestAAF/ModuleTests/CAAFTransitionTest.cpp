@@ -32,6 +32,7 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "aafCvt.h"
@@ -59,6 +60,8 @@ static void RemoveTestFile(const wchar_t* pFileName)
   }
 }
 
+
+#ifndef _DEBUG
 // convenient error handlers.
 inline void checkResult(HRESULT r)
 {
@@ -71,8 +74,33 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
+#else // #ifndef _DEBUG
+
+// convenient error handlers.
+#define checkResult(r)\
+do {\
+  if (FAILED(r))\
+  {\
+    cerr << "FILE:" << __FILE__ << " LINE:" << __LINE__ << " Error code = " << hex << r << dec << endl;\
+    throw (HRESULT)r;\
+  }\
+} while (false)
+
+#define checkExpression(expression, r)\
+do {\
+  if (!(expression))\
+  {\
+    cerr << "FILE:" << __FILE__ << " LINE:" << __LINE__ << " Expression failed = " << #expression << endl;\
+    throw (HRESULT)r;\
+  }\
+} while (false)
+
+#endif // #else // #ifndef _DEBUG
+
+
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -83,6 +111,12 @@ inline void checkExpression(bool expression, HRESULT r)
 
 const aafUID_t kTestEffectID = { 0xD15E7611, 0xFE40, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 const aafUID_t kTestParmID = { 0xC7265931, 0xFE57, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x9c671b5c, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
@@ -105,9 +139,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFOperationDef*				pOperationDef = NULL;
 	IAAFParameter				*pParm = NULL;
 	IAAFParameterDef*			pParamDef = NULL;
-	IAAFDefObject*				pDefObject = NULL;
+	IAAFConstantValue*			pConstantValue = NULL;
 	
-	aafMobID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
 	aafLength_t					transitionLength;
@@ -117,17 +150,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUID_t					parmID = kTestParmID;
 
 	CvtInt32toLength(100, transitionLength);
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTransition Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
-
 
 	try
 	{
@@ -147,36 +181,28 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		CAAFBuiltinDefs defs (pDictionary);
  		
 		// Create the effect and parameter definitions
-		checkResult(pDictionary->CreateInstance(defs.cdOperationDef(),
-							  IID_IAAFOperationDef, 
-							  (IUnknown **)&pOperationDef));
+		checkResult(defs.cdOperationDef()->
+					CreateInstance(IID_IAAFOperationDef, 
+								   (IUnknown **)&pOperationDef));
     
-		checkResult(pDictionary->CreateInstance(defs.cdParameterDef(),
-							  IID_IAAFParameterDef, 
-							  (IUnknown **)&pParamDef));
+		checkResult(defs.cdParameterDef()->
+					CreateInstance(IID_IAAFParameterDef, 
+								   (IUnknown **)&pParamDef));
 
+		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
+		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC, defs.tdRational ()));
+		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
-		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
 
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
-		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
+		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
-		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
-		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
 
 		// ------------------------------------------------------------
 		//	To test a Transition we need to create a Sequence which will 
@@ -186,20 +212,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// ------------------------------------------------------------
 		//
 		// Create a CompositionMob
-		checkResult(pDictionary->CreateInstance(defs.cdCompositionMob(),
-							IID_IAAFCompositionMob, 
-							(IUnknown **)&pCompMob));
+		checkResult(defs.cdCompositionMob()->
+					CreateInstance(IID_IAAFCompositionMob, 
+								   (IUnknown **)&pCompMob));
 
 		checkResult(pCompMob->Initialize(L"Transition Test"));
 		// Get a MOB interface
 		checkResult(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(pMob->SetMobID(TEST_MobID));
 
 		// Create a Sequence
-		checkResult(pDictionary->CreateInstance(defs.cdSequence(),
-												IID_IAAFSequence,
-												(IUnknown **) &pSequence));
+		checkResult(defs.cdSequence()->
+					CreateInstance(IID_IAAFSequence,
+								   (IUnknown **) &pSequence));
 
 		// Get a Segment interface
 		checkResult(pSequence->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
@@ -221,9 +246,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 												&pNewSlot));
 
 		// Create a Filler
-		checkResult(pDictionary->CreateInstance(defs.cdFiller(),
-												IID_IAAFFiller,
-												(IUnknown **) &pFiller));
+		checkResult(defs.cdFiller()->
+					CreateInstance(IID_IAAFFiller,
+								   (IUnknown **) &pFiller));
 
 		// Get a component interface
 		checkResult(pFiller->QueryInterface(IID_IAAFComponent, (void **) &pComponent));
@@ -239,34 +264,48 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pComponent = NULL;
 
 		
-	    checkResult(pDictionary->CreateInstance(defs.cdTransition(),
-												IID_IAAFTransition, 
-												(IUnknown **)&pTransition));
+	    checkResult(defs.cdTransition()->
+					CreateInstance(IID_IAAFTransition, 
+								   (IUnknown **)&pTransition));
 
 		// Create an empty EffectGroup object !!
-		checkResult(pDictionary->CreateInstance(defs.cdOperationGroup(),
-												IID_IAAFOperationGroup,
-												(IUnknown **)&pOperationGroup));
+		checkResult(defs.cdOperationGroup()->
+					CreateInstance(IID_IAAFOperationGroup,
+								   (IUnknown **)&pOperationGroup));
 
-		checkResult(pDictionary->CreateInstance(defs.cdParameter(),
-												IID_IAAFParameter, 
-												(IUnknown **)&pParm));
-		checkResult(pParm->SetParameterDefinition (pParamDef));
- // !!!  ImplAAFParameter::SetTypeDefinition (ImplAAFTypeDef*  pTypeDef)
 		checkResult(pOperationGroup->Initialize(defs.ddPicture(), transitionLength, pOperationDef));
-		checkResult(pOperationGroup->AddParameter (pParm));
-		checkResult(pDictionary->CreateInstance(defs.cdFiller(),
-												IID_IAAFSegment,
-												(IUnknown **) &pEffectFiller));
+
+    // Create a constant value parameter.
+		checkResult(defs.cdConstantValue()->
+					CreateInstance(IID_IAAFConstantValue, 
+								   (IUnknown **)&pConstantValue));
+    aafRational_t testLevel = {1, 2};
+		checkResult(pConstantValue->Initialize (pParamDef, sizeof(testLevel), (aafDataBuffer_t)&testLevel));
+
+    checkResult(pConstantValue->QueryInterface (IID_IAAFParameter, (void **)&pParm));
+    checkResult(pOperationGroup->AddParameter (pParm));
+//    pParm->Release();
+ //	IAAFSegment*				pSegment = NULL;
+   pParm = NULL;
+    pConstantValue->Release();
+    pConstantValue = NULL;
+
+		checkResult(defs.cdFiller()->
+					CreateInstance(IID_IAAFSegment,
+								   (IUnknown **) &pEffectFiller));
+		 checkResult(pEffectFiller->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 		checkResult(pOperationGroup->AppendInputSegment (pEffectFiller));
 		// release the filler
 		pEffectFiller->Release();
 		pEffectFiller  = NULL;
 
 		checkResult(pOperationGroup->SetBypassOverride (1));
-		checkResult(pDictionary->CreateInstance(defs.cdSourceClip(),
-						  IID_IAAFSourceClip, 
-						  (IUnknown **)&pSourceClip));
+		checkResult(defs.cdSourceClip()->
+					CreateInstance(IID_IAAFSourceClip, 
+								   (IUnknown **)&pSourceClip));
 		aafSourceRef_t	sourceRef;
 		sourceRef.sourceID = zeroMobID;
 		sourceRef.sourceSlotID = 0;
@@ -293,9 +332,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pComponent = NULL;
 
 		// Create the second filler 
-		checkResult(pDictionary->CreateInstance(defs.cdFiller(),
-												IID_IAAFFiller,
-												(IUnknown **) &pFiller));
+		checkResult(defs.cdFiller()->
+					CreateInstance(IID_IAAFFiller,
+								   (IUnknown **) &pFiller));
 
 		checkResult(pFiller->QueryInterface(IID_IAAFComponent, (void **) &pComponent));
 		// Set values for the filler
@@ -320,6 +359,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	// Cleanup and return
 	if (pParm)
 		pParm->Release();
+
+  if (pConstantValue)
+		pConstantValue->Release();
 
 	if (pParamDef)
 		pParamDef->Release();
@@ -404,16 +446,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafUInt32					numComponents = 0;
 	HRESULT						hr = S_OK;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
 	ProductInfo.productName = L"AAFTransition Test. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
-
 
 	try
 	{
@@ -425,7 +468,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		checkResult(pHeader->GetMobs( NULL, &pMobIter));
@@ -551,7 +594,7 @@ extern "C" HRESULT CAAFTransition_test()
 	catch (...)
 	{
 	  cerr << "CAAFTransition_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
