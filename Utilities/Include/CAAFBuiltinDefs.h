@@ -27,38 +27,6 @@
  *
  ************************************************************************/
 
-//
-// This class provides a facility to allow clients to access builtin
-// definition objects easily.  When set up, the client simply has to
-// call a method on this function, which returns a pointer to the
-// primary interface of the requested definition object.
-//
-// The returned object is *not* reference counted beyond that
-// maintained by the this class.  Therefore the client must promise
-// that his use of the returned interface will last no longer than the
-// scope of the CAAFBuiltinDefs object from which it was obtained
-// unless he explicitly maintains a reference count of the use of the
-// interface beyond that scope.
-//
-// Usage example:
-//
-// // Creates and returns a Filler object, using the given dictionary.
-// void MyFunc (IAAFDictionary * pDict)
-// {
-//   // Use of ImplAAFBuiltinDefs to obtain a class definition
-//   ImplAAFBuiltinDefs defs (pDict);	// create builtin defs object.
-//   ImplAAFObject * pFiller = 0;
-//   defs.cdFiller()->CreateInstance(&pFiller);
-//   // Note that IAAFClassDef interface returned by cdFiller() is
-//   // only used for the duration of the CreateInstance() function
-//   // call.
-// 
-//   // Use of ImplAAFBuiltinDefs to obtain a data definition
-//   pFiller->Initialize(defs.ddPicture(), 10);
-//   // Note that IAAFDataDef interface returned by ddPicture() is
-//   // only used for the duration of the Initialize() function call.
-// }
-//
 
 #include "AAF.h"  // for IAAFDictionary
 #include "AAFDataDefs.h"
@@ -161,7 +129,6 @@ public:
   CLASS_DEF_METHOD(ContentStorage);
   CLASS_DEF_METHOD(ControlPoint);
   CLASS_DEF_METHOD(DataDef);
-  CLASS_DEF_METHOD(Dictionary);
   CLASS_DEF_METHOD(DigitalImageDescriptor);
   CLASS_DEF_METHOD(Edgecode);
   CLASS_DEF_METHOD(EssenceData);
@@ -175,7 +142,6 @@ public:
   CLASS_DEF_METHOD(HTMLClip);
   CLASS_DEF_METHOD(Identification);
   CLASS_DEF_METHOD(InterpolationDefinition);
-  CLASS_DEF_METHOD(KLVData);
   CLASS_DEF_METHOD(Locator);
   CLASS_DEF_METHOD(MasterMob);
   CLASS_DEF_METHOD(Mob);
@@ -186,10 +152,9 @@ public:
   CLASS_DEF_METHOD(OperationGroup);
   CLASS_DEF_METHOD(Parameter);
   CLASS_DEF_METHOD(ParameterDef);
-  CLASS_DEF_METHOD(PluginDef);
+  CLASS_DEF_METHOD(PluginDescriptor);
   CLASS_DEF_METHOD(PropertyDef);
   CLASS_DEF_METHOD(Pulldown);
-  CLASS_DEF_METHOD(RGBADescriptor);
   CLASS_DEF_METHOD(ScopeReference);
   CLASS_DEF_METHOD(Selector);
   CLASS_DEF_METHOD(Sequence);
@@ -235,20 +200,8 @@ public:
   //
   // Type Def 'get' methods
   //
-  TYPE_DEF_METHOD(Rational);
   TYPE_DEF_METHOD(String);
-  TYPE_DEF_METHOD(Character);
-  TYPE_DEF_METHOD(Indirect);
 
-  // Built-in integer types
-  TYPE_DEF_METHOD(UInt8);
-  TYPE_DEF_METHOD(UInt16);
-  TYPE_DEF_METHOD(UInt32);
-  TYPE_DEF_METHOD(UInt64);
-  TYPE_DEF_METHOD(Int8);
-  TYPE_DEF_METHOD(Int16);
-  TYPE_DEF_METHOD(Int32);
-  TYPE_DEF_METHOD(Int64);
 
 private:
   IAAFDictionary * _pDict;
