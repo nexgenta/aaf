@@ -6,8 +6,8 @@
 * Authors: Bob Sabiston, Yuri Khramov, Mark Ambachtsheer
 ************************************************************************
 
-$Revision: 1.3 $
-$Date: 2004/03/05 16:11:30 $
+$Revision: 1.4 $
+$Date: 2004/03/05 16:16:33 $
 */
 #include <StructuredStorage.h>
 #include "OMRawStorage.h"
@@ -23,4 +23,5 @@ extern "C" int createStructuredStorageInOMRawStorageEx (
     StgMode in_accessMode,
     RootStorage** out_ppRoot,
     unsigned long in_sectorSize);
+
 
