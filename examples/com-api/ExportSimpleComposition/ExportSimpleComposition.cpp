@@ -38,8 +38,8 @@
 // The static variables are here so they can be referenced throughout the whole program.
 
 // Filename variables
-aafWChar *	pwFileName; 
-char *		pFile; 
+static aafWChar *	pwFileName; 
+static char *		pFileName; 
 
 static aafSourceRef_t sourceRef; 
 
@@ -204,9 +204,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	for (i = 0; i<1; i++)
 	{
 		// Get a Master MOB Interface
-		check(pDictionary->CreateInstance( pMasterMobDef,
-			IID_IAAFMasterMob, 
-			(IUnknown **)&pMasterMob));
+		check(pMasterMobDef->
+			  CreateInstance(IID_IAAFMasterMob, 
+							 (IUnknown **)&pMasterMob));
 		// Get a Mob interface and set its variables.
 		check(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 		check(pMob->GetMobID(&masterMobID));
@@ -218,9 +218,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		if(dataFile != NULL)
 		{
 			// Make a locator, and attach it to the EssenceDescriptor
-			check(pDictionary->CreateInstance(pNetworkLocatorDef,
-				IID_IAAFLocator, 
-				(IUnknown **)&pLocator));		
+			check(pNetworkLocatorDef->
+				  CreateInstance(IID_IAAFLocator, 
+								 (IUnknown **)&pLocator));		
 			check(pLocator->SetPath (dataFile->dataFilename));
 			testContainer = dataFile->dataFormat;
 		}
@@ -438,16 +438,16 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
 		check(pHeader->GetMobs(&criteria, &pMobIter));
 
 		/* Create a Composition Mob */
-		check(pDictionary->CreateInstance( pCompositionMobDef,
-										   IID_IAAFMob,
-										   (IUnknown **)&pCompMob));
+		check(pCompositionMobDef->
+			  CreateInstance(IID_IAAFMob,
+							 (IUnknown **)&pCompMob));
 		/* Append the Mob to the Header */
 		check(pHeader->AddMob(pCompMob));
  
 		/* Create a TimelineMobSlot with an audio sequence */
-		check(pDictionary->CreateInstance( pSequenceDef,
-										   IID_IAAFSequence,
-										   (IUnknown **)&pAudioSequence));
+		check(pSequenceDef->
+			  CreateInstance(IID_IAAFSequence,
+							 (IUnknown **)&pAudioSequence));
 		check(pAudioSequence->QueryInterface(IID_IAAFSegment, (void **)&seg));
 
 		check(pAudioSequence->QueryInterface(IID_IAAFComponent,
@@ -524,9 +524,9 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
 						for (j=0; j<10; j++)
 						{
 							/* Create a new Source Clip */
-							check(pDictionary->CreateInstance( pSourceClipDef,
-								IID_IAAFSourceClip,
-								(IUnknown **)&pSourceClip));
+							check(pSourceClipDef->
+								  CreateInstance(IID_IAAFSourceClip,
+												 (IUnknown **)&pSourceClip));
 							// Initialize the Source Clip
 							check(pSourceClip->Initialize( pSoundDef, duration, sourceRef));
 							check(pSourceClip->QueryInterface(IID_IAAFComponent, (void **) &pComponent));
@@ -845,7 +845,7 @@ void usage(void)
 //  NOTE:  defining [0] program name; [1] filename.aaf; 
 //  Specifying that use file ExportSimpleComposition.aaf as default
 //  The specified filename is the name of the file that is created by the program.
-main(int argumentCount, char* argumentVector[])
+int main(int argumentCount, char* argumentVector[])
 {
 	/* console window for mac */
 	#if defined(macintosh) || defined(_MAC)
@@ -865,7 +865,7 @@ main(int argumentCount, char* argumentVector[])
 	{
 		// Initialise filename variables to default settings and inform user
 		pwFileName = L"ExportSimpleComposition.aaf";
-		pFile = "ExportSimpleComposition.aaf";
+		pFileName = "ExportSimpleComposition.aaf";
 
 		printf("No file specified => defaulting to ExportSimpleComposition.aaf\n\n");
 	}
@@ -882,7 +882,7 @@ main(int argumentCount, char* argumentVector[])
 		aafWChar FileNameBuffer[80];
 		mbstowcs(FileNameBuffer,niceFileName,80);
 		pwFileName = FileNameBuffer;
-		pFile = niceFileName;
+		pFileName = niceFileName;
 	}
 	else
 	{
@@ -890,7 +890,7 @@ main(int argumentCount, char* argumentVector[])
 		return 0;
 	}
 	// Access the AAF file with name set from argument or lack thereof
-	printf("Working on file %s using ReadSamples\n", pFile);
+	printf("Working on file %s using ReadSamples\n", pFileName);
 	ProcessAAFFile(pwFileName, testStandardCalls);
 	
 	printf("DONE\n\n");
