@@ -122,6 +122,10 @@ ImplAAFTypeDefVariableArray::Initialize (
 	if (! pTypeDef->IsVariableArrayable())
 		return AAFRESULT_BAD_TYPE;
 	
+	// Check if specified type definition is in the dictionary.
+	if( !aafLookupTypeDef( this, pTypeDef ) )
+		return AAFRESULT_TYPE_NOT_FOUND;
+
 	return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
@@ -157,6 +161,15 @@ ImplAAFTypeDefVariableArray::GetCount (
 	if (! pPropVal) return AAFRESULT_NULL_PARAM;
 	if (! pCount) return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != (ImplAAFTypeDef *)this )
+		return AAFRESULT_BAD_TYPE;
+
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pPropVal);
   if (NULL != pRefArray)
   {
@@ -211,6 +224,15 @@ ImplAAFTypeDefVariableArray::AppendElement
 	if (!pMemberPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
 	AAFRESULT hr;
 	
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
@@ -275,7 +297,7 @@ ImplAAFTypeDefVariableArray::AppendElement
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefVariableArray::ValidateInputParams (
 												  ImplAAFPropertyValue ** ppElementValues,
-												  aafUInt32  numElements)								  
+												  aafUInt32  numElements)
 {
 	//first call base impl.
 	HRESULT hr;
@@ -296,6 +318,16 @@ ImplAAFTypeDefVariableArray::GetElements (
 {
   if (NULL == pInPropVal || NULL == ppEnum)
 	  return AAFRESULT_NULL_PARAM;
+
+  // Get the property value's embedded type and 
+  // check if it's the same as the local type.
+  ImplAAFTypeDefSP	pInPropType;
+  if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) )  )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+  if( (ImplAAFTypeDef *)pInPropType != this )
+	return AAFRESULT_BAD_TYPE;
+
   *ppEnum = NULL;
   
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
@@ -347,11 +379,7 @@ size_t ImplAAFTypeDefVariableArray::externalSize(OMByte* /*internalBytes*/,
 	
 	assert (ptd->IsFixedSize ());
 	aafUInt32 extElemSize = ptd->PropValSize ();
-	aafUInt32 intElemSize;
-	if (ptd->IsRegistered())
-		intElemSize = ptd->NativeSize ();
-	else
-		intElemSize = extElemSize;
+	aafUInt32 intElemSize = ptd->ActualSize ();
 	
 	// aafUInt32 extElemSize = ptd->externalSize (0, 0);
 	// aafUInt32 intElemSize = ptd->internalSize (0, 0);
@@ -371,7 +399,7 @@ void ImplAAFTypeDefVariableArray::externalize(OMByte* internalBytes,
 	assert (ptd);
 	
 	assert (ptd->IsFixedSize ());
-	aafUInt32 intElemSize = ptd->NativeSize ();
+	aafUInt32 intElemSize = ptd->ActualSize ();
 	aafUInt32 extElemSize = ptd->PropValSize ();
 	// aafUInt32 intElemSize = ptd->internalSize (0, 0);
 	// aafUInt32 extElemSize = ptd->externalSize (0, 0);
@@ -414,11 +442,7 @@ size_t ImplAAFTypeDefVariableArray::internalSize(OMByte* /*externalBytes*/,
 	
 	assert (ptd->IsFixedSize ());
 	aafUInt32 extElemSize = ptd->PropValSize ();
-	aafUInt32 intElemSize;
-	if (ptd->IsRegistered())
-		intElemSize = ptd->NativeSize ();
-	else
-		intElemSize = extElemSize;
+	aafUInt32 intElemSize = ptd->ActualSize ();;
 	
 	// aafUInt32 extElemSize = ptd->externalSize (0, 0);
 	// aafUInt32 intElemSize = ptd->internalSize (0, 0);
@@ -439,7 +463,7 @@ void ImplAAFTypeDefVariableArray::internalize(OMByte* externalBytes,
 	
 	assert (ptd->IsFixedSize ());
 	aafUInt32 extElemSize = ptd->PropValSize ();
-	aafUInt32 intElemSize = ptd->NativeSize ();
+	aafUInt32 intElemSize = ptd->ActualSize ();
 	// aafUInt32 intElemSize = ptd->internalSize (0, 0);
 	// aafUInt32 extElemSize = ptd->externalSize (0, 0);
 	if (intElemSize == extElemSize)
@@ -452,8 +476,8 @@ void ImplAAFTypeDefVariableArray::internalize(OMByte* externalBytes,
 	else
 	{
 		aafUInt32 numElems = externalBytesSize / extElemSize;
-		aafInt32 intNumBytesLeft = externalBytesSize;
-		aafInt32 extNumBytesLeft = internalBytesSize;
+		aafInt32 intNumBytesLeft = internalBytesSize;
+		aafInt32 extNumBytesLeft = externalBytesSize;
 		aafUInt32 elem = 0;
 		
 		for (elem = 0; elem < numElems; elem++)
@@ -759,6 +783,15 @@ ImplAAFTypeDefVariableArray::PrependElement(
 	if (!pMemberPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
 	AAFRESULT hr;
 	
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
@@ -830,6 +863,15 @@ ImplAAFTypeDefVariableArray::RemoveElement(
 	if (!pInPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
   if (NULL != pRefArray)
   {
@@ -850,7 +892,7 @@ ImplAAFTypeDefVariableArray::RemoveElement(
 	if (!inPvd)
 		return AAFRESULT_BAD_TYPE;
 	
-	aafUInt32 elemSize = BaseType()->NativeSize();
+	aafUInt32 elemSize = BaseType()->ActualSize();
 	
 	aafUInt32 oldSize = 0;
 	hr = inPvd->GetBitsSize (&oldSize);
@@ -911,6 +953,14 @@ ImplAAFTypeDefVariableArray::InsertElement(
 	if (!pMemberPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
 		
 	//CASE 1 -- if the Insert is at "0" postition - this implies a prepend, 
 	//			SO - delegate to PrependElement() routine
