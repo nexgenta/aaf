@@ -9,11 +9,7 @@
 *												*
 \************************************************/
 
-#include "CEnumAAFOperationDefs.h"
-#include "CEnumAAFOperationDefs.h"
-#ifndef __CEnumAAFOperationDefs_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -23,6 +19,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
 // Cross-platform utility to delete a file.
@@ -67,15 +64,17 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFMasterMob Test";
+	ProductInfo.productName = L"EnumAAFOperationDefs Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
+	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -84,8 +83,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -111,7 +113,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
 	long				n;
-	aafUID_t			testDataDef = DDEF_Video;
+	aafUID_t			testDataDef = DDEF_Picture;
 /*	long				test;
 */
 
@@ -146,13 +148,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pDef->Release();
 		pDef = NULL;
 		
-		//!!!Not testing the SetAUID on AAFDefObject
+		//!!!Not testing the INIT on AAFDefObject
 		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
 		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDefs (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
+		// !!!Added circular definitions because we don't have optional properties
+		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
 		
 		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
 		checkResult(pDef->SetName (TEST_PARAM_NAME));
@@ -343,7 +347,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CEnumAAFOperationDefs::test()
+extern "C" HRESULT CEnumAAFOperationDefs_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFOperationDefsTest.aaf";
@@ -356,7 +360,7 @@ HRESULT CEnumAAFOperationDefs::test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFOperationDefs::test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFOperationDefs_test...Caught general C++ exception!" << endl; 
 	}
 	return hr;
 }

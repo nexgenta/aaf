@@ -9,11 +9,7 @@
 *												*
 \************************************************/
 
-#include "CEnumAAFContainerDefs.h"
-#include "CEnumAAFContainerDefs.h"
-#ifndef __CEnumAAFContainerDefs_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -65,15 +61,17 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFMasterMob Test";
+	ProductInfo.productName = L"EnumAAFContainerDefs Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
+	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -82,8 +80,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -325,7 +326,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CEnumAAFContainerDefs::test()
+extern "C" HRESULT CEnumAAFContainerDefs_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFContainerDefsTest.aaf";
@@ -338,7 +339,7 @@ HRESULT CEnumAAFContainerDefs::test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFContainerDefs::test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFContainerDefs_test...Caught general C++ exception!" << endl; 
 	}
 	return hr;
 }
