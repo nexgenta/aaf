@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -27,14 +27,6 @@
 
 
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-
-
-
 #include "AAFStoredObjectIDs.h"
 
 #ifndef __ImplAAFDataDef_h__
@@ -46,19 +38,43 @@
 #include "AAFDataDefs.h"
 #include "aafUtils.h"
 
+#include "ImplAAFBuiltinDefs.h"
+
 ImplAAFDataDef::ImplAAFDataDef ()
-{}
+  : _pCachedDict (0)
+{
+}
 
 
 ImplAAFDataDef::~ImplAAFDataDef ()
-{}
+{
+  // _pCachedDict is *NOT* reference counted!
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDataDef::Initialize (
+      const aafUID_t & id,
+	  const aafWChar * pName,
+	  const aafWChar * pDesc)
+{
+	if (pName == NULL || pDesc == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+	  return pvtInitialize(id, pName, pDesc);
+	}
+	return AAFRESULT_SUCCESS;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataDef::IsPictureKind (
       aafBool *bIsPictureKind)
 {
-	return(IsDataDefOf(DDEF_Picture, bIsPictureKind));
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddPicture(), bIsPictureKind));
 }
 
 
@@ -66,7 +82,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataDef::IsMatteKind (
       aafBool *bIsMatteKind)
 {
-	return(IsDataDefOf(DDEF_Matte, bIsMatteKind));
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddMatte(), bIsMatteKind));
 }
 
 
@@ -74,7 +90,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataDef::IsPictureWithMatteKind (
       aafBool *bIsPictureWithMatteKind)
 {
-	return(IsDataDefOf(DDEF_PictureWithMatte, bIsPictureWithMatteKind));
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddPictureWithMatte(), bIsPictureWithMatteKind));
 }
 
 
@@ -82,23 +98,28 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataDef::IsSoundKind (
       aafBool *bIsSoundKind)
 {
-	return(IsDataDefOf(DDEF_Sound, bIsSoundKind));
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddSound(), bIsSoundKind));
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataDef::DoesDataDefConvertTo (
-      const aafUID_t & id,
+      ImplAAFDataDef * pDataDef,
       aafBool *bDoesConvertTo)
 {
 	if(bDoesConvertTo == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if(pDataDef == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	
 	XPROTECT()
 	{
 		aafBool	result;
+		aafUID_t id;
+		CHECK (pDataDef->GetAUID (&id));
 		
-		CHECK(IsDataDefOf (id, &result));
+		CHECK(IsDataDefOf (pDataDef, &result));
 		if(result == AAFFalse)
 		{
 			aafBool	isPWM;
@@ -118,17 +139,26 @@ AAFRESULT STDMETHODCALLTYPE
 		   
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataDef::IsDataDefOf (
-      const aafUID_t & id,
+      ImplAAFDataDef * pDataDef,
       aafBool *bIsDataDefOf)
 {
-	aafUID_t	uid;
+	aafUID_t	thisUid;
+	aafUID_t	otherUid;
 	AAFRESULT	hr;
 
-	if(bIsDataDefOf == NULL)
-		return AAFRESULT_NULL_PARAM;
+	if ( ! pDataDef)
+	  return AAFRESULT_NULL_PARAM;
+
+	if(! bIsDataDefOf)
+	  return AAFRESULT_NULL_PARAM;
 	
-	hr = GetAUID(&uid);
-	*bIsDataDefOf = EqualAUID(&id, &uid);
+	hr = GetAUID(&thisUid);
+	if (AAFRESULT_FAILED (hr)) return hr;
+
+	hr = pDataDef->GetAUID(&otherUid);
+	if (AAFRESULT_FAILED (hr)) return hr;
+
+	*bIsDataDefOf = EqualAUID(&thisUid, &otherUid);
 
 	return hr;
 }
@@ -136,22 +166,26 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataDef::DoesDataDefConvertFrom (
-      const aafUID_t & id,
+      ImplAAFDataDef * pDataDef,
       aafBool * bDoesConvertFrom)
 {
-	if(bDoesConvertFrom == NULL)
-		return(AAFRESULT_NULL_PARAM);
+  if (! bDoesConvertFrom)
+	return(AAFRESULT_NULL_PARAM);
+  if (! pDataDef)
+	return(AAFRESULT_NULL_PARAM);
 	
 	XPROTECT()
 	{
 		aafBool	result;
 		
-		CHECK(IsDataDefOf (id, &result));
+		CHECK(IsDataDefOf (pDataDef, &result));
 		if(result == AAFFalse)
 		{
 			aafBool		isPict;
 			aafUID_t	pictureMatte = DDEF_PictureWithMatte;
 			CHECK(IsPictureKind (&isPict));
+			aafUID_t id;
+			CHECK(pDataDef->GetAUID (&id));
 			if((isPict == AAFTrue) && EqualAUID(&pictureMatte, &id))
 				result = AAFTrue;
 		}
@@ -164,6 +198,16 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-
-
-
+ImplAAFDictionary * ImplAAFDataDef::GetDict()
+{
+  if (! _pCachedDict)
+	{
+	  AAFRESULT hr = GetDictionary (&_pCachedDict);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  // _pCachedDict is *NOT* reference counted here, so release the
+	  // newly-added reference.
+	  _pCachedDict->ReleaseReference();
+	}
+  assert (_pCachedDict);
+  return _pCachedDict;
+}
