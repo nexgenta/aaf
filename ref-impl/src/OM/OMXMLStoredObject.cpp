@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObject.cpp,v 1.35.2.3 2004/07/23 18:25:07 tbingham Exp $ $Name:  $
+// $Id: OMXMLStoredObject.cpp,v 1.35.2.4 2004/07/23 18:56:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -366,7 +366,6 @@ void OMXMLStoredObject::save(const OMDataVector& property)
 
 void OMXMLStoredObject::save(const OMDataSet& property)
 {
-#if 0 // tjb - Not yet
   TRACE("OMXMLStoredObject::save(OMDataSet)");
   const OMType* propertyType = property.type();
   ASSERT("Valid property type", propertyType != 0);
@@ -421,7 +420,6 @@ void OMXMLStoredObject::save(const OMDataSet& property)
   _stream << beginl;
   _stream << "</data-set>" << endl;
   _stream << outdent;
-#endif
 }
 
   // @mfunc Save the <c OMStrongReference> <p singleton> in this
