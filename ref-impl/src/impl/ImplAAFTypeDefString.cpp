@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFPropValData_h__
 #include "ImplAAFPropValData.h"
@@ -15,19 +33,22 @@
 #include "ImplAAFTypeDefString.h"
 #endif
 
+#ifndef __ImplAAFHeader_h_
+#include "ImplAAFHeader.h"
+#endif
+
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 #include <string.h>
 
 
-#define RELEASE_IF_SET(obj) \
-    if (obj) { obj->ReleaseReference(); obj = NULL; }
-
+extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefString::ImplAAFTypeDefString ()
-  : _ElementType  ( PID_TypeDefinitionString_ElementType,  "Element Type")
+  : _ElementType  ( PID_TypeDefinitionString_ElementType,  "ElementType")
 {
   _persistentProperties.put(_ElementType.address());
 }
@@ -38,12 +59,30 @@ ImplAAFTypeDefString::~ImplAAFTypeDefString ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::Initialize (
-      aafUID_t * pID,
+      const aafUID_t * pID,
       ImplAAFTypeDef * pTypeDef,
       wchar_t * pTypeName)
 {
-  if (! pTypeName) return AAFRESULT_NULL_PARAM;
   if (! pTypeDef)  return AAFRESULT_NULL_PARAM;
+
+  aafUID_t id;
+  assert (pTypeDef);
+  AAFRESULT hr = pTypeDef->GetAUID(&id);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  return pvtInitialize (pID, &id, pTypeName);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefString::pvtInitialize (
+      const aafUID_t * pID,
+	  const aafUID_t * pTypeId,
+      wchar_t * pTypeName)
+{
+  if (! pTypeName) return AAFRESULT_NULL_PARAM;
+  if (! pTypeId)   return AAFRESULT_NULL_PARAM;
   if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
@@ -53,7 +92,8 @@ AAFRESULT STDMETHODCALLTYPE
   hr = SetAUID (pID);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _ElementType = pTypeDef;
+  assert (pTypeId);
+  _ElementType = *pTypeId;
 
   return AAFRESULT_SUCCESS;
 }
@@ -62,10 +102,31 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::GetType (
-      ImplAAFTypeDef ** ppTypeDef)
+      ImplAAFTypeDef ** ppTypeDef) const
 {
   if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
-  *ppTypeDef = _ElementType;
+
+  if (!_cachedBaseType)
+	{
+	  ImplAAFDictionarySP pDict;
+
+	  AAFRESULT hr;
+	  hr = GetDictionary(&pDict);
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (pDict);
+
+	  ImplAAFTypeDefString * pNonConstThis =
+		  (ImplAAFTypeDefString *) this;
+	  aafUID_t id = _ElementType;
+	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedBaseType);
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (_cachedBaseType);
+	}
+  assert (ppTypeDef);
+  *ppTypeDef = _cachedBaseType;
+  assert (*ppTypeDef);
   (*ppTypeDef)->AcquireReference ();
 
   return AAFRESULT_SUCCESS;
@@ -78,7 +139,7 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * pPropVal,
       aafUInt32 *  pCount)
 {
-  ImplAAFTypeDef * ptd = NULL;
+  ImplAAFTypeDefSP ptd;
   AAFRESULT hr;
 
   if (! pPropVal) return AAFRESULT_NULL_PARAM;
@@ -88,11 +149,10 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptd);
   assert (ptd->IsFixedSize());
   aafUInt32 elemSize = ptd->PropValSize();
-  ptd->ReleaseReference ();
   aafUInt32 propSize;
   assert (pPropVal);
 
-  ImplAAFPropValData * pvd = NULL;
+  ImplAAFPropValDataSP pvd;
   pvd = dynamic_cast<ImplAAFPropValData *>(pPropVal);
 
   assert (pvd);
@@ -104,6 +164,93 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefString::CreateValueFromCString (
+	  aafMemPtr_t  pInitData,
+	  aafUInt32  initDataSize,
+	  ImplAAFPropertyValue ** ppPropVal)
+{
+  if (! pInitData)
+	return AAFRESULT_NULL_PARAM;
+
+  if (! ppPropVal)
+	return AAFRESULT_NULL_PARAM;
+
+  ImplAAFPropValDataSP pvd;
+  ImplAAFPropValData * tmp;
+  tmp = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+  if (!tmp) return AAFRESULT_NOMEMORY;
+  pvd = tmp;
+  // the pvd smart pointer will maintain a reference for us...
+  aafUInt32 refCount;
+  refCount = tmp->ReleaseReference ();
+  // ...make sure it really does
+  assert (1 == refCount);
+
+  AAFRESULT hr;
+  hr = SetCString (pvd, pInitData, initDataSize);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
+  assert (ppPropVal);
+  *ppPropVal = pvd;
+  assert (*ppPropVal);
+  (*ppPropVal)->AcquireReference ();
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefString::SetCString (
+      ImplAAFPropertyValue * pPropVal,
+      aafMemPtr_t pData,
+      aafUInt32 dataSize)
+{
+  if (! pPropVal)
+	return AAFRESULT_NULL_PARAM;
+
+  if (! pData)
+	return AAFRESULT_NULL_PARAM;
+
+  if (! IsRegistered ())
+	return AAFRESULT_NOT_REGISTERED;
+
+  AAFRESULT hr;
+  ImplAAFTypeDefSP pBaseType;
+  hr = GetType (&pBaseType);
+
+  assert (pBaseType->IsFixedSize ());
+  assert (pBaseType->IsRegistered ());
+  // Size of individual elements
+  aafUInt32 elemSize = pBaseType->NativeSize ();
+  // number of elements in input data.  If this is not an integral
+  // number, this will round down and the test below will fail.
+  aafUInt32 elemCount = dataSize / elemSize;
+  // The size of the new property, calculated from number of elements
+  // and the size of each element.
+  aafUInt32 propSize = elemSize * elemCount;
+
+  // If the given dataSize was not an integral multiple of the size of
+  // each element, then we'll signal an error.
+  if (propSize != dataSize)
+	return AAFRESULT_BAD_SIZE;
+
+  ImplAAFPropValData * pvd = 0;
+  assert (pPropVal);
+  pvd = dynamic_cast<ImplAAFPropValData*> (pPropVal);
+  assert (pvd);
+
+  aafMemPtr_t pBits = 0;
+  hr = pvd->AllocateBits (propSize, &pBits);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+  assert (pBits);
+
+  memcpy (pBits, pData, propSize);
+  return AAFRESULT_SUCCESS;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -122,44 +269,31 @@ AAFRESULT STDMETHODCALLTYPE
       aafMemPtr_t pBuffer,
       aafUInt32 bufferSize)
 {
-  AAFRESULT rReturned = AAFRESULT_SUCCESS;
-  ImplAAFTypeDef * ptd = NULL;
+  AAFRESULT hr;
 
-  try
-	{
-	  AAFRESULT hr;
+  if (! pInPropVal) return AAFRESULT_NULL_PARAM;
+  if (! pBuffer) return AAFRESULT_NULL_PARAM;
 
-	  if (! pInPropVal) throw AAFRESULT_NULL_PARAM;
-	  if (! pBuffer) throw AAFRESULT_NULL_PARAM;
+  ImplAAFPropValDataSP pvd;
+  pvd = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
+  if (!pvd) return AAFRESULT_BAD_TYPE;
 
-	  ImplAAFPropValData * pvd = NULL;
-	  pvd = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
-	  if (!pvd) throw AAFRESULT_BAD_TYPE;
+  aafUInt32 propBitsSize;
+  hr = pvd->GetBitsSize(&propBitsSize);
+  if (AAFRESULT_FAILED(hr)) return hr;
+  if (bufferSize < propBitsSize)
+	return AAFRESULT_SMALLBUF;
 
-	  aafUInt32 propBitsSize;
-	  hr = pvd->GetBitsSize(&propBitsSize);
-	  if (AAFRESULT_FAILED(hr)) throw hr;
-	  if (bufferSize < propBitsSize)
-		throw AAFRESULT_SMALLBUF;
+  aafMemPtr_t pBits = NULL;
+  hr = pvd->GetBits (&pBits);
+  if (AAFRESULT_FAILED(hr)) return hr;
+  assert (pBits);
 
-	  aafMemPtr_t pBits = NULL;
-	  hr = pvd->GetBits (&pBits);
-	  if (AAFRESULT_FAILED(hr)) return hr;
-	  assert (pBits);
+  assert (pBuffer);
+  assert (propBitsSize <= bufferSize);
+  memcpy (pBuffer, pBits, propBitsSize);
 
-	  assert (pBuffer);
-	  assert (propBitsSize <= bufferSize);
-	  memcpy (pBuffer, pBits, propBitsSize);
-	}
-  catch (HRESULT &rCaught)
-	{
-	  rReturned = rCaught;
-	}
-  RELEASE_IF_SET (ptd);
-  // Don't release this! It's a dynamically-casted pInPropVal.
-  // RELEASE_IF_SET (pvd);
-
-  return rReturned;
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -174,4 +308,179 @@ ImplAAFTypeDefString::GetTypeCategory (/*[out]*/ eAAFTypeCategory_t * pTid)
 }
 
 
-OMDEFINE_STORABLE(ImplAAFTypeDefString, AUID_AAFTypeDefString);
+ImplAAFTypeDefSP ImplAAFTypeDefString::BaseType() const
+{
+  ImplAAFTypeDefSP result;
+  AAFRESULT hr = GetType (&result);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (result);
+  return result;
+}
+
+
+void ImplAAFTypeDefString::reorder(OMByte* externalBytes,
+								   size_t externalBytesSize) const
+{
+  ImplAAFTypeDefSP ptd = BaseType();
+  assert (ptd);
+
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 numElems = externalBytesSize / extElemSize;
+  aafInt32 numBytesLeft = externalBytesSize;
+  aafUInt32 elem = 0;
+
+  for (elem = 0; elem < numElems; elem++)
+	{
+	  ptd->reorder (externalBytes, extElemSize);
+	  externalBytes += extElemSize;
+	  numBytesLeft -= extElemSize;
+	  assert (numBytesLeft >= 0);
+	}
+}
+
+
+size_t ImplAAFTypeDefString::externalSize(OMByte* internalBytes,
+										  size_t internalBytesSize) const
+{
+  ImplAAFTypeDefSP ptd = BaseType();
+  assert (ptd);
+
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 extElemSize = ptd->externalSize (0, 0);
+  // aafUInt32 intElemSize = ptd->internalSize (0, 0);
+  assert (intElemSize);
+  aafUInt32 numElems = internalBytesSize / intElemSize;
+  return numElems * extElemSize;
+}
+
+
+void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
+									   size_t internalBytesSize,
+									   OMByte* externalBytes,
+									   size_t externalBytesSize,
+									   OMByteOrder byteOrder) const
+{
+  ImplAAFTypeDefSP ptd = BaseType();
+  assert (ptd);
+
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 numElems = internalBytesSize / intElemSize;
+  aafInt32 intNumBytesLeft = externalBytesSize;
+  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafUInt32 elem = 0;
+
+  for (elem = 0; elem < numElems; elem++)
+	{
+	  ptd->externalize (internalBytes,
+						intElemSize,
+						externalBytes,
+						extElemSize,
+						byteOrder);
+	  internalBytes += intElemSize;
+	  externalBytes += extElemSize;
+	  intNumBytesLeft -= intElemSize;
+	  extNumBytesLeft -= extElemSize;
+	  assert (intNumBytesLeft >= 0);
+	  assert (extNumBytesLeft >= 0);
+	}
+}
+
+
+size_t ImplAAFTypeDefString::internalSize(OMByte* externalBytes,
+										  size_t externalBytesSize) const
+{
+  ImplAAFTypeDefSP ptd = BaseType();
+  assert (ptd);
+
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 extElemSize = ptd->externalSize (0, 0);
+  // aafUInt32 intElemSize = ptd->internalSize (0, 0);
+  assert (intElemSize);
+  aafUInt32 numElems = externalBytesSize / extElemSize;
+  return numElems * intElemSize;
+}
+
+
+void ImplAAFTypeDefString::internalize(OMByte* externalBytes,
+									   size_t externalBytesSize,
+									   OMByte* internalBytes,
+									   size_t internalBytesSize,
+									   OMByteOrder byteOrder) const
+{
+  ImplAAFTypeDefSP ptd = BaseType();
+  assert (ptd);
+
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 intElemSize = ptd->internalSize (0, 0);
+  // aafUInt32 extElemSize = ptd->externalSize (0, 0);
+  aafUInt32 numElems = externalBytesSize / extElemSize;
+  aafInt32 intNumBytesLeft = externalBytesSize;
+  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafUInt32 elem = 0;
+
+  for (elem = 0; elem < numElems; elem++)
+	{
+	  ptd->internalize (externalBytes,
+						extElemSize,
+						internalBytes,
+						intElemSize,
+						byteOrder);
+	  internalBytes += intElemSize;
+	  externalBytes += extElemSize;
+	  intNumBytesLeft -= intElemSize;
+	  extNumBytesLeft -= extElemSize;
+	  assert (intNumBytesLeft >= 0);
+	  assert (extNumBytesLeft >= 0);
+	}
+}
+
+
+aafBool ImplAAFTypeDefString::IsFixedSize (void) const
+{
+  return AAFFalse;
+}
+
+
+size_t ImplAAFTypeDefString::PropValSize (void) const
+{
+  assert (0);
+  return 0; // not reached!
+}
+
+
+aafBool ImplAAFTypeDefString::IsRegistered (void) const
+{
+  // Only depends on registration of basic type.
+  return BaseType()->IsRegistered ();
+}
+
+
+size_t ImplAAFTypeDefString::NativeSize (void) const
+{
+  assert (0);
+  return 0; // not reached!
+}
+
+
+OMProperty * ImplAAFTypeDefString::pvtCreateOMPropertyMBS
+  (OMPropertyId pid,
+   const char * name) const
+{
+  assert (name);
+  // Don't specify size for variably-sized properties
+  OMProperty * result = new OMSimpleProperty (pid, name);
+  assert (result);
+  return result;
+}
+
+
