@@ -1,10 +1,29 @@
-/***********************************************\
-*                                               *
-* Advanced Authoring Format                     *
-*                                               *
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*                                               *
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFTypeDefRecord_h__
 #include "ImplAAFTypeDefRecord.h"
@@ -42,7 +61,8 @@ ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
 	_registeredSize (0),
 	_internalSizes (0),
 	_cachedCount ((aafUInt32) -1),
-	_cachedMemberTypes (0)
+	_cachedMemberTypes (0),
+	_registrationAttempted (AAFFalse)
 {
   _persistentProperties.put(_memberTypes.address());
   _persistentProperties.put(_memberNames.address());
@@ -706,7 +726,7 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 		  // We know it's not the last member, so it's safe to index
 		  // to the next element in pOffsets array.
-		  _internalSizes[i] = pOffsets[i+1] = pOffsets[i];
+		  _internalSizes[i] = pOffsets[i+1] - pOffsets[i];
 		}
 	}
 
@@ -900,6 +920,17 @@ size_t ImplAAFTypeDefRecord::PropValSize (void) const
 
 aafBool ImplAAFTypeDefRecord::IsRegistered (void) const
 {
+  if (!_registeredOffsets)
+	{
+	  if (! _registrationAttempted)
+		{
+		  ImplAAFDictionarySP pDict;
+		  AAFRESULT hr = GetDictionary(&pDict);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  pDict->pvtAttemptBuiltinSizeRegistration ((ImplAAFTypeDefRecord*) this);
+		  ((ImplAAFTypeDefRecord*)this)->_registrationAttempted = AAFTrue;
+		}
+	}
   return (_registeredOffsets ? AAFTrue : AAFFalse);
 }
 
