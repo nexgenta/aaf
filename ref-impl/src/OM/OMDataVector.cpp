@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataVector.cpp,v 1.1.2.1 2004/07/06 20:19:19 tbingham Exp $ $Name:  $
+// $Id: OMDataVector.cpp,v 1.1.2.2 2004/07/23 17:20:04 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,17 +48,14 @@ OMDataVector::~OMDataVector(void)
 void OMDataVector::save(void) const
 {
   TRACE("OMDataVector::save");
-#if 0 // tjb - Not yet
   store()->save(*this);
-#endif
 }
 
 void OMDataVector::restore(size_t externalSize)
 {
   TRACE("OMDataVector::restore");
-#if 0 // tjb - Not yet
+
   // tjb -- resize ?
   store()->restore(*this, externalSize);
   setPresent();
-#endif
 }
