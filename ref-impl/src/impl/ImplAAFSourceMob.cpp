@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceMob.cpp,v 1.65 2005/01/19 16:39:25 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFSourceMob.cpp,v 1.66 2005/01/20 09:53:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -129,22 +129,14 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pEdes == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-
-	ImplAAFEssenceDescriptor *pOldEdes = _essenceDesc;
-	if (pOldEdes)
-	{
-	  if (pOldEdes == pEdes)
-      return AAFRESULT_SUCCESS;
-	  
-	  pOldEdes->ReleaseReference();
-	  pOldEdes = 0;
-	}
-
 	if (pEdes->attached())
 		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
-	_essenceDesc = pEdes;
-	
+	ImplAAFEssenceDescriptor *pOldEdes = _essenceDesc.setValue(pEdes);
+
+	if (pOldEdes)
+	  pOldEdes->ReleaseReference();
+
 	if (pEdes)
 		pEdes->AcquireReference();
 
