@@ -3,8 +3,6 @@
 #ifndef __ImplAAFSourceClip_h__
 #define __ImplAAFSourceClip_h__
 
-#include "OMStorable.h"
-
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -14,22 +12,11 @@
 *                                          *
 \******************************************/
 
+#include "OMStorable.h"
 
 class ImplAAFDataDef;
 
 class ImplAAFMob;
-
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
 
 #ifndef __ImplAAFSourceReference_h__
 #include "ImplAAFSourceReference.h"
@@ -39,15 +26,7 @@ class ImplAAFMob;
 #include "OMProperty.h"
 
 
-// Persistent Property IDs
-
-const int PID_SOURCECLIP_FADEINLEN	= 4;
-const int PID_SOURCECLIP_FADEINTYPE	= 5;
-const int PID_SOURCECLIP_FADEINPRESENT	= 6;
-const int PID_SOURCECLIP_FADEOUTLEN	= 7;
-const int PID_SOURCECLIP_FADEOUTTYPE	= 8;
-const int PID_SOURCECLIP_FADEOUTPRESENT	= 9;
-const int PID_SOURCECLIP_STARTTIME		= 10;
+#include "AAFPropertyIDs.h"
 
 
 class ImplAAFSourceClip : public ImplAAFSourceReference
@@ -65,12 +44,11 @@ public:
   virtual ~ImplAAFSourceClip ();
 
 
-
   //****************
-  // InitializeSourceClip()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    InitializeSourceClip
+    Initialize
         (// @parm [in] Data Definition object
 		 aafUID_t * pDatadef  ,
 
@@ -112,10 +90,10 @@ public:
         (ImplAAFMob ** mob);
 
   //****************
-  // GetRef()
+  // GetSourceReference()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetRef
+    GetSourceReference
 		// @parm [out] Source Reference
         (aafSourceRef_t *  sourceRef);
 
@@ -137,10 +115,10 @@ public:
 		 aafFadeType_t  fadeOutType);
 
   //****************
-  // SetRef()
+  // SetSourceReference()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetRef
+    SetSourceReference
 		// @parm [in] Source Reference
         (aafSourceRef_t  sourceRef);
 
@@ -151,7 +129,14 @@ public:
   // in /test/ImplAAFSourceClipTest.cpp.
   static AAFRESULT test();
 
-  // Return this objects stored object class.
+	virtual AAFRESULT TraverseToClip(aafLength_t length,
+					ImplAAFSegment **sclp,
+					 ImplAAFPulldown **pulldownObj,
+					 aafInt32 *pulldownPhase,
+					 aafLength_t *sclpLen,
+					 aafBool *isMask);
+
+	// Return this objects stored object class.
   virtual AAFRESULT STDMETHODCALLTYPE
 	GetObjectClass(aafUID_t * pClass);
 
@@ -163,7 +148,6 @@ private:
 	OMFixedSizeProperty<aafFadeType_t>	_fadeOutType;
 	OMFixedSizeProperty<aafBool>		_fadeOutPresent;
 	OMFixedSizeProperty<aafPosition_t>	_startTime;
-
 };
 
 #endif // ! __ImplAAFSourceClip_h__
