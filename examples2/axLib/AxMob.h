@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMob.h,v 1.12 2004/09/10 17:12:11 stuart_hc Exp $ $Name:  $
+// $Id: AxMob.h,v 1.13 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,7 +139,7 @@ public:
 		aafCompressEnable_t	compEnable );	// optionally decompressing
 	
 	void AddMasterSlot(
-		IAAFDataDefSP		spDataDef,		// Data kind of new slot. (Probably DDEF_Picture or DDEF_Sound)
+		IAAFDataDefSP		spDataDef,		// Data kind of new slot. (Probably kAAFDataDef_Picture or kAAFDataDef_Sound)
 		aafSlotID_t			sourceSlotID,	// Slot ID of the Source Mob slot to be added to the Master Mob
 		IAAFSourceMobSP		spSourceMob,	// Source Mob containing the slot to be added to the Master Mob
 		aafSlotID_t			masterSlotID,	// SlotID assigned to the new Master Mob slot

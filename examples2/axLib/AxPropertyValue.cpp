@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPropertyValue.cpp,v 1.5 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxPropertyValue.cpp,v 1.6 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -148,11 +148,11 @@ void AxPropertyValue::Process( AxPropertyValuePrtcl& prtcl )
 			// distinquished from encrypted using only the process() argument type?
 			break;
 		case kAAFTypeCatEncrypted:
-			// FIXME - see kAAFTypeCatUnkown above.
+			// FIXME - see kAAFTypeCatUnknown above.
 			break;
 
 		default:
-			throw AxExBadImp( L"unkown type category" );
+			throw AxExBadImp( L"unknown type category" );
 	}
 }
 

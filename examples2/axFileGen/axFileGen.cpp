@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.cpp,v 1.13 2004/06/18 02:59:36 jptrainor Exp $ $Name:  $
+// $Id: axFileGen.cpp,v 1.14 2004/10/22 14:31:29 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -388,7 +388,7 @@ void CheckCommand( AxString opName, int argC )
 		  AxFGOpFactoryRegistry::GetInstance();
 
       if ( !registry.IsKnown( opName ) ) {
-  	    AxString anError( L"Unkown operation: " + opName );
+  	    AxString anError( L"Unknown operation: " + opName );
 		throw anError;
       }
 

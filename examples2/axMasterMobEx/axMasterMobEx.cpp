@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axMasterMobEx.cpp,v 1.13 2004/06/03 13:24:43 stuart_hc Exp $ $Name:  $
+// $Id: axMasterMobEx.cpp,v 1.14 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -236,7 +236,7 @@ public:
 	VideoSampleSource(	int width, int height, int bytesPerPixel, aafRational_t rate,
 						int numFramesToWrite,
 					    aafCompressEnable_t compression )
-		: SampleSource( DDEF_Picture,
+		: SampleSource( kAAFDataDef_Picture,
 						rate,
 						compression,
 						bytesPerPixel * width * height,
@@ -313,7 +313,7 @@ public:
 	AudioSampleSource(	int bitsPerSample, int bytesPerSample, aafRational_t rate,
 						aafInt64 numSamplesToWrite,
 					    aafCompressEnable_t compression )
-		: SampleSource( DDEF_Sound,
+		: SampleSource( kAAFDataDef_Sound,
 						rate,
 						compression,
 						bytesPerSample,

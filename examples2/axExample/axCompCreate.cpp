@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axCompCreate.cpp,v 1.10 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
+// $Id: axCompCreate.cpp,v 1.11 2004/10/22 14:31:29 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -172,11 +172,11 @@ void AxCreateCompositionExample( AxFile& axFile,
 	// Create one sequence for each time line (i.e. track).
 	//
 
-	AxDataDef axAudioDataDef( axDictionary.LookupDataDef( DDEF_Sound ) );
+	AxDataDef axAudioDataDef( axDictionary.LookupDataDef( kAAFDataDef_Sound ) );
 	AxSequence axAudioSequence(	AxCreateInstance<IAAFSequence>( axDictionary ) );
 	axAudioSequence.Initialize( axAudioDataDef );
 
-	AxDataDef axVideoDataDef( axDictionary.LookupDataDef( DDEF_Picture ) );
+	AxDataDef axVideoDataDef( axDictionary.LookupDataDef( kAAFDataDef_Picture ) );
 	AxSequence axVideoSequence(	AxCreateInstance<IAAFSequence>( axDictionary ) );
 	axVideoSequence.Initialize( axVideoDataDef );
 

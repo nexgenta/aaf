@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAxClassFactory.h,v 1.8 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
+// $Id: CAxClassFactory.h,v 1.9 2004/10/22 14:31:31 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,7 +65,7 @@ private:
 
 
 // CAxClassFactory implements IClassFactory for the template class
-// ComObjectType.  ComObjectType should be derived from CAxUnkown.
+// ComObjectType.  ComObjectType should be derived from CAxUnknown.
 //
 // The CAxClassFactoryCounters is used to implement a CAxClassFactory<>
 // instance count, and to implement the LockServer() method.

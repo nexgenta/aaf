@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxImplPlugin.h,v 1.4 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxImplPlugin.h,v 1.5 2004/10/22 14:31:31 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@
 // be created by the SDK and attached to the SourceMob that represents the
 // essence processed by the codec.
 
-// dataDefID - One of DDEF_Picture, or DDEF_Sound.
+// dataDefID - One of kAAFDataDef_Picture, or kAAFDataDef_Sound.
 
 
 class AxImplPlugin
@@ -135,7 +135,7 @@ public:
 	private:
 		aafUID_t _codecDefID;     // e.g. AAFCodecCDCI
 		aafUID_t _descriptorAUID; // e.g. AUID_AAFCDCIDescriptor
-		aafUID_t _dataDefID;      // e.g. DDEF_Picture
+		aafUID_t _dataDefID;      // e.g. kAAFDataDef_Picture
 		AxString _name;
 		AxString _desc;
 	};

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxImplNullEssenceCodec.cpp,v 1.9 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxImplNullEssenceCodec.cpp,v 1.10 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,11 +49,11 @@
 
 AxImplNullEssenceCodec::AxImplNullEssenceCodec()
 :	_descriptorAUID( AUID_AAFCDCIDescriptor ),
-	_dataDefID( DDEF_Picture ),
+	_dataDefID( kAAFDataDef_Picture ),
 	_codecName( L"AxNullEssenceCodec" ),
 	_codecDesc( L"AAF Example Codec" ),
 	_essenceDataAUID( AUID_AAFEssenceData ),
-	_essenceDataDefID( DDEF_Picture ),
+	_essenceDataDefID( kAAFDataDef_Picture ),
 	_categoryClassAUID( AUID_AAFCodecDef ),
 	_pAccess( 0 ),
 	_numSamples( 0 )

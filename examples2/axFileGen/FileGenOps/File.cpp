@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: File.cpp,v 1.6 2004/09/10 17:12:11 stuart_hc Exp $ $Name:  $
+// $Id: File.cpp,v 1.7 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -259,7 +259,7 @@ void CreateAAFFileOnRawStorage::Execute( const std::vector<AxString>& argv )
 	CHECK_HRESULT( AAFCreateAAFFileOnRawStorage( spRawStorage,
 												 kAAFFileExistence_new,
 												 kAAFFileAccess_write,
-												 &aafFileKindAaf4KBinary,
+												 &kAAFFileKind_Aaf4KBinary,
 												 0,
 												 ident.getProductId(),
 												 &spFile ) );

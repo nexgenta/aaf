@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.cpp,v 1.16 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxUtil.cpp,v 1.17 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,7 @@
 
 namespace {
 
-AxString catUnkownStr( L"unkown" );
+AxString catUnknownStr( L"unknown" );
 
 };
 
@@ -85,7 +85,7 @@ const AxString& AxTypeCatMap::getStr( eAAFTypeCategory_t cat ) const
 	std::map<eAAFTypeCategory_t,AxString>::const_iterator iter = _map.find( cat );
 	
 	if ( iter == _map.end() ) {
-		return catUnkownStr;
+		return catUnknownStr;
 	}
 
 	return iter->second;
