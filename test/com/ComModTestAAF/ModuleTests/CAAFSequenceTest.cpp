@@ -40,8 +40,10 @@
 
 #include "CAAFBuiltinDefs.h"
 
-#define kNumComponents	5
-
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x75529074, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -63,13 +65,11 @@ inline void checkResult(HRESULT r)
   if (FAILED(r))
     throw r;
 }
-inline void checkExpression(bool expression, HRESULT r)
+inline void checkExpression(bool expression, HRESULT r=AAFRESULT_TEST_FAILED)
 {
   if (!expression)
     throw r;
 }
-
-
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
@@ -79,17 +79,18 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFSequence Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
-
 
 	switch (mode)
 	{
@@ -127,6 +128,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	return hr;
 }
 
+#define COMPONENT_TEST_LENGTH 10
+
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile*		pFile = NULL;
@@ -137,7 +140,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSequence*	pSequence = NULL;
 	IAAFSegment*	pSegment = NULL;
 	IAAFComponent*	pComponent = NULL;
-	aafMobID_t		NewMobID;
 	aafUInt32		numComponents;
 	int				i;
 	HRESULT			hr = S_OK;
@@ -161,8 +163,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				  CreateInstance(IID_IAAFMob, 
 								 (IUnknown **)&pMob));
 
-	  checkResult(CoCreateGuid((GUID *)&NewMobID));
-	  checkResult(pMob->SetMobID(NewMobID));
+	  checkResult(pMob->SetMobID(TEST_MobID));
 	  checkResult(pMob->SetName(L"AAFSequenceTest"));
 	  
 	  // Add mob slot w/ sequence
@@ -171,31 +172,49 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 								 (IUnknown **)&pSequence));		
 	  checkResult(pSequence->Initialize(defs.ddSound()));
 
-	  //
-	  //	Add some segments.  Need to test failure conditions
-	  //	(i.e. starting/ending w/ transition, two trans back
-	  //	to bacl).
-	  //
-	  for(i = 0; i < kNumComponents + 1; i++)	// Add one more for delete below
+	  // Append two components onto sequence
+	  for(i = 0; i < 2; i++)
 	  {
 		  aafLength_t		len = 10;
-
+		  
 		  checkResult(defs.cdFiller()->
-					  CreateInstance(IID_IAAFComponent, 
-									 (IUnknown **)&pComponent));
-
+			  CreateInstance(IID_IAAFComponent, 
+			  (IUnknown **)&pComponent));
+		  
 		  checkResult(pComponent->SetDataDef(defs.ddSound()));
-		  checkResult(pComponent->SetLength(len));
+		  checkResult(pComponent->SetLength(COMPONENT_TEST_LENGTH+i+2));
 		  checkResult(pSequence->AppendComponent(pComponent));
-
+		  
 		  pComponent->Release();
-      pComponent = NULL;
+		  pComponent = NULL;
 	  }
 		checkResult(pSequence->CountComponents (&numComponents));
-		checkExpression(kNumComponents + 1 == numComponents, AAFRESULT_TEST_FAILED);
-		checkResult(pSequence->RemoveComponentAt(kNumComponents));
+		checkExpression(2 == numComponents, AAFRESULT_TEST_FAILED);
+		checkResult(pSequence->RemoveComponentAt(1));
 		checkResult(pSequence->CountComponents (&numComponents));
-		checkExpression(kNumComponents == numComponents, AAFRESULT_TEST_FAILED);
+		checkExpression(1 == numComponents, AAFRESULT_TEST_FAILED);
+
+		// Now prepend a component
+		checkResult(defs.cdFiller()->CreateInstance(IID_IAAFComponent, 
+			(IUnknown **)&pComponent));
+		checkResult(pComponent->SetDataDef(defs.ddSound()));
+		checkResult(pComponent->SetLength(COMPONENT_TEST_LENGTH));
+		checkResult(pSequence->PrependComponent(pComponent));
+		pComponent->Release();
+		pComponent = NULL;
+		
+		// Now insert a component in the middle
+		checkResult(defs.cdFiller()->CreateInstance(IID_IAAFComponent, 
+			(IUnknown **)&pComponent));
+		checkResult(pComponent->SetDataDef(defs.ddSound()));
+		checkResult(pComponent->SetLength(COMPONENT_TEST_LENGTH+1));
+		checkResult(pSequence->InsertComponentAt(1,pComponent));
+		pComponent->Release();
+		pComponent = NULL;
+
+		// Component count should now be 3
+		checkResult(pSequence->CountComponents (&numComponents));
+		checkExpression(3 == numComponents, AAFRESULT_TEST_FAILED);
 
 		checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
 
@@ -304,15 +323,15 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				checkResult(pSegment->QueryInterface(IID_IAAFSequence, (void **) &pSequence));
 
 				checkResult(pSequence->CountComponents(&numCpnts));
-				checkExpression(numCpnts == kNumComponents, AAFRESULT_TEST_FAILED);
+				checkExpression(numCpnts == 3, AAFRESULT_TEST_FAILED);
 
+				// Verify components using enumerator
 			    checkResult(pSequence->GetComponents(&pCompIter));
 				numCpnts = 0;
+				aafLength_t	len;
+				aafUID_t	dataDef;
 				while (pCompIter && pCompIter->NextOne(&pComp) == AAFRESULT_SUCCESS)
 				{
-					aafLength_t	len;
-					aafUID_t	dataDef;
-
 					numCpnts++;
 
 					checkResult(pComp->GetDataDef(&pDataDef));
@@ -326,14 +345,33 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 					                AAFRESULT_TEST_FAILED);
 
 					checkResult(pComp->GetLength(&len));
-					checkExpression(len == 10, AAFRESULT_TEST_FAILED);
+					checkExpression(len == COMPONENT_TEST_LENGTH+numCpnts-1);
 
 					pComp->Release();
 					pComp = NULL;
 				}
+				checkExpression(numCpnts == 3);
 
+				// Verify components using GetComponentAt()
+				for(aafUInt32 n=0;n<3;n++)
+				{
+					checkResult(pSequence->GetComponentAt(n,&pComp));
+					checkResult(pComp->GetDataDef(&pDataDef));
+					checkResult(pDataDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObj));
+					pDataDef->Release();
+					pDataDef = 0;
+					checkResult(pDefObj->GetAUID(&dataDef));
+					pDefObj->Release();
+					pDefObj = 0;
+					checkExpression(memcmp(&DDEF_Sound, &dataDef, sizeof(aafUID_t)) == 0,
+					                AAFRESULT_TEST_FAILED);
 
-        checkExpression(numCpnts == kNumComponents, AAFRESULT_TEST_FAILED);
+					checkResult(pComp->GetLength(&len));
+					checkExpression(len == COMPONENT_TEST_LENGTH+n);
+
+					pComp->Release();
+					pComp = NULL;
+				}
 
 				pCompIter->Release();
         pCompIter = NULL;
@@ -452,18 +490,9 @@ extern "C" HRESULT CAAFSequence_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFSequence_test...Caught general C++ exception!" << endl; 
-	}
-
-	// When all of the functionality of this class is tested, we can return success.
-	// When a method and its unit test have been implemented, remove it from the list.
-	if (SUCCEEDED(hr))
-	{
-		cout << "The following AAFSequence methods have not been implemented:" << endl; 
-//		cout << "     RemoveComponent" << endl; 
-		cout << "     SegmentOffsetToTC - needs unit test" << endl; 
-		cout << "     SegmentTCToOffset - needs unit test" << endl; 
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+		cerr << "CAAFSequence_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;
