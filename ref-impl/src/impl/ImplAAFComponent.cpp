@@ -40,7 +40,6 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
-#include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 #include "AAFResult.h"
@@ -51,38 +50,18 @@
 #include "ImplAAFSmartPointer.h"
 typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
-extern "C" const aafClassID_t CLSID_EnumAAFKLVData;
 
 ImplAAFComponent::ImplAAFComponent ():
-  _dataDef( PID_Component_DataDefinition,
-            L"DataDefinition", 
-            L"/Header/Dictionary/DataDefinitions",
-            PID_DefinitionObject_Identification),
-  _length( PID_Component_Length,
-           L"Length"),
-  _KLVData( PID_Component_KLVData,
-            L"KLVData")
+	_dataDef(	PID_Component_DataDefinition,	"DataDefinition"),
+	_length(	PID_Component_Length,	"Length")
 {
 	_persistentProperties.put(   _dataDef.address());
 	_persistentProperties.put(   _length.address());
-	_persistentProperties.put(   _KLVData.address());
 }
 
 
 ImplAAFComponent::~ImplAAFComponent ()
-{
-	if(_KLVData.isPresent())
-	{
-		size_t size = _KLVData.count();
-		for (size_t j = 0; j < size; j++)
-		{
-			ImplAAFKLVData* pKLVData = _KLVData.setValueAt(0, j);
-			if (pKLVData)
-			  pKLVData->ReleaseReference();
-			pKLVData = 0;
-		}
-	}
-}
+{}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -130,14 +109,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFComponent::SetDataDef (ImplAAFDataDef * pDataDef)
 {
   if (! pDataDef)
-    return AAFRESULT_NULL_PARAM;
-  if (!pDataDef->attached())
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
+	return AAFRESULT_NULL_PARAM;
 
-  _dataDef = pDataDef;
+  aafUID_t auid;
+  AAFRESULT hr;
+  assert (pDataDef);
+  hr = pDataDef->GetAUID (&auid);
+  assert (AAFRESULT_SUCCEEDED (hr));
 
+  _dataDef = auid;
   return AAFRESULT_SUCCESS;
-//	assert(_dataDef.isVoid());
 }
 
 
@@ -147,9 +128,13 @@ AAFRESULT STDMETHODCALLTYPE
   if (! ppDataDef)
 	return AAFRESULT_NULL_PARAM;
 
-   if(_dataDef.isVoid())
-		return AAFRESULT_OBJECT_NOT_FOUND;
-  ImplAAFDataDef *pDataDef = _dataDef;
+  ImplAAFDictionarySP pDict;
+  AAFRESULT hr;
+  hr = GetDictionary (&pDict);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  ImplAAFDataDefSP pDataDef;
+  hr = pDict->LookupDataDef (_dataDef, &pDataDef);
+  assert (AAFRESULT_SUCCEEDED (hr));
 
   *ppDataDef = pDataDef;
   assert (*ppDataDef);
@@ -157,100 +142,6 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::AppendKLVData (ImplAAFKLVData * pData)
-{
-	if (NULL == pData)
-		return AAFRESULT_NULL_PARAM;
-  if (pData->attached ())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-	_KLVData.appendValue(pData);
-	pData->AcquireReference();
-	return AAFRESULT_SUCCESS;
-}
-
-//****************
-// RemoveKLVData()
-//
-AAFRESULT STDMETHODCALLTYPE
-	ImplAAFComponent::RemoveKLVData
-        (ImplAAFKLVData * pData)
-{
-	if (! pData)
-		return AAFRESULT_NULL_PARAM;
-  if (!pData->attached ()) // object could not possibly be in container.
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
-	if(!_KLVData.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-	
-  size_t index;
-  if (_KLVData.findIndex (pData, index))
-  {
-	  _KLVData.removeAt(index);
-    // We have removed an element from a "stong reference container" so we must
-    // decrement the objects reference count. This will not delete the object
-    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
-    pData->ReleaseReference ();
-  }
-  else
-  {
-    return AAFRESULT_OBJECT_NOT_FOUND;
-  }
-
-	return(AAFRESULT_SUCCESS);
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::CountKLVData (aafUInt32*  pNumComments)
-{
-	if (pNumComments == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if(!_KLVData.isPresent())
-	{	// If the userComments property is not present then
-		// number of user comments is zero!
-		*pNumComments = 0; //return AAFRESULT_PROP_NOT_PRESENT;
-	}
-	else
-	{
-		*pNumComments = _KLVData.count();
-	}
-		
-	return(AAFRESULT_SUCCESS);
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::GetKLVData (ImplEnumAAFKLVData** ppEnum)
-{
-  if (NULL == ppEnum)
-	return AAFRESULT_NULL_PARAM;
-  *ppEnum = 0;
-	
-  ImplEnumAAFKLVData *theEnum = (ImplEnumAAFKLVData *)CreateImpl (CLSID_EnumAAFKLVData);
-	
-  XPROTECT()
-	{
-		OMStrongReferenceVectorIterator<ImplAAFKLVData>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFKLVData>(_KLVData);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
-	  *ppEnum = theEnum;
-	}
-  XEXCEPT
-	{
-	  if (theEnum)
-		{
-		  theEnum->ReleaseReference();
-		  theEnum = 0;
-		}
-	  return(XCODE());
-	}
-  XEND;
-	
-  return(AAFRESULT_SUCCESS);
-}
 /*************************************************************************
  * Private Function: SetNewProps()
  *
@@ -276,12 +167,17 @@ AAFRESULT ImplAAFComponent::SetNewProps(
 	if (! pDataDef)
 	  return AAFRESULT_NULL_PARAM;
 
-	if ( length < 0 )
-	  aafError = AAFRESULT_BAD_LENGTH;
-	else
+	aafUID_t dataDef;
+	aafError = pDataDef->GetAUID (&dataDef);
+	if (AAFRESULT_SUCCEEDED (aafError))
 	  {
-		_length	= length;
-		_dataDef = pDataDef;
+		if ( length < 0 )
+		  aafError = AAFRESULT_BAD_LENGTH;
+		else
+		  {
+			_length	= length;
+			_dataDef = dataDef;
+		  }
 	  }
 	return aafError;
 }
