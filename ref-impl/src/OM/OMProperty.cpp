@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMProperty.cpp,v 1.92 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMProperty.cpp,v 1.92.2.1 2004/08/06 20:33:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,8 +75,6 @@ void OMProperty::initialize(const OMPropertyDefinition* definition)
   // Temporary consistency checks
   ASSERT("Consistent property id",
                             _propertyId == _definition->localIdentification());
-  ASSERT("Consistent property name",
-                           compareWideString(_name, _definition->name()) == 0);
   // ASSERT("Consistent property optionality",
   //                                 _isOptional == _definition->isOptional());
   _isOptional = _definition->isOptional();
