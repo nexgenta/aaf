@@ -118,7 +118,7 @@ ImplAAFClassDef::~ImplAAFClassDef ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPropertyDef>propertyDefinitions(_Properties);
 	while(++propertyDefinitions)
 	{
-		ImplAAFPropertyDef *pProperty = propertyDefinitions.setValue(0);
+		ImplAAFPropertyDef *pProperty = propertyDefinitions.clearValue();
 		if (pProperty)
 		{
 		  pProperty->ReleaseReference();
@@ -531,7 +531,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::IsUniquelyIdentified (
       aafBoolean_t * isUniquelyIdentified)
 {
-  AAFRESULT hr = AAFRESULT_SUCCESS;
 	if (! isUniquelyIdentified)
     return AAFRESULT_NULL_PARAM;
 	
@@ -551,7 +550,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetUniqueIdentifier (
       ImplAAFPropertyDef ** ppUniqueIdentifier)
 {
-  AAFRESULT hr = AAFRESULT_SUCCESS;
 	if (! ppUniqueIdentifier)
     return AAFRESULT_NULL_PARAM;
 
