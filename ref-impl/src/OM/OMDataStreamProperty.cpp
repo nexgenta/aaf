@@ -28,6 +28,8 @@
 // @doc OMEXTERNAL
 #include "OMDataStreamProperty.h"
 
+#include "OMAssertions.h"
+
 #include "OMPropertySet.h"
 #include "OMStorable.h"
 #include "OMStoredObject.h"
@@ -43,8 +45,9 @@ OMDataStreamProperty::~OMDataStreamProperty(void)
 }
 
   // @mfunc Save this <c OMDataStreamProperty>.
+  //   @parm Client context for callbacks.
   //   @this const
-void OMDataStreamProperty::save(void) const
+void OMDataStreamProperty::save(void* /* clientContext */) const
 {
   TRACE("OMDataStreamProperty::save");
 
@@ -286,6 +289,20 @@ void OMDataStreamProperty::getBits(OMByte* bits, size_t size) const
   PRECONDITION("Valid size", size >= bitsSize());
 
   memcpy(bits, &_stream, bitsSize());
+}
+
+  // @mfunc Set the raw bits of this <c OMDataStreamProperty>. The raw
+  //         bits are copied from the buffer at address <p bits> which
+  //         is <p size> bytes in size.
+  //   @parm The address of the buffer from which the raw bits are copied.
+  //   @parm The size of the buffer.
+void OMDataStreamProperty::setBits(const OMByte* bits, size_t size)
+{
+  TRACE("OMDataStreamProperty::setBits");
+  PRECONDITION("Valid bits", bits != 0);
+  PRECONDITION("Valid size", size >= bitsSize());
+
+  ASSERT("Unimplemented code not reached", false);
 }
 
 
