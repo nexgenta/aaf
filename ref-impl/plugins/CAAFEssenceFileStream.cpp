@@ -29,6 +29,8 @@
 #include "CAAFEssenceFileContainer.h"
 
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 #include "AAFResult.h"
 
 #include <errno.h>
@@ -38,19 +40,18 @@
 
 
 
-
 //
 // NOTE: The following two routines will have to be rewritten
-// if fpos_t is defined to be a structure or aafInt64 is a 
+// if fpos_t is defined to be a structure or aafPosition_t is a 
 // structure.
 //
-/*inline*/ bool AafPos2AnsiPos(fpos_t *ansiPos, const aafInt64 *aafPos)
+/*inline*/ bool AafPos2AnsiPos(fpos_t *ansiPos, const aafPosition_t *aafPos)
 {
   // For first version just assume that platform an perform conversion.
-  if (sizeof(fpos_t) < sizeof(aafInt64))
+  if (sizeof(fpos_t) < sizeof(aafPosition_t))
   {
     // The following test assumes 64 bit arithematic!
-    aafInt64 trunPos = (0x00000000FFFFFFFF & *aafPos);
+    aafPosition_t trunPos = (0x00000000FFFFFFFF & *aafPos);
     if (trunPos != *aafPos && 0xFFFFFFFFFFFFFFFF != *aafPos)
       return false;
 
@@ -63,7 +64,7 @@
 }
 
 
-/*inline*/ bool AnsiPos2AafPos(aafInt64 *aafPos, const fpos_t *ansiPos)
+/*inline*/ bool AnsiPos2AafPos(aafPosition_t *aafPos, const fpos_t *ansiPos)
 {
   // For first version just assume that platform an perform conversion.
   *aafPos = *ansiPos;
@@ -162,8 +163,8 @@ void CAAFEssenceFileStream::RemoveFileStreamFromContainer()
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Init (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::Init (const aafCharacter * pFilePath,
+        aafMobID_constptr pMobID)
 {
   if (NULL == pFilePath)
     return E_INVALIDARG;
@@ -184,7 +185,7 @@ HRESULT STDMETHODCALLTYPE
   charCount = i + 1; // include the terminating null.
 
   // Copy the wide character path name.
-  _pwPath = (wchar_t *)CoTaskMemAlloc(charCount * sizeof(wchar_t));
+  _pwPath = new wchar_t[charCount];
   if (NULL == _pwPath)
     return AAFRESULT_NOMEMORY;
   for (i = 0; i < charCount; ++i)
@@ -194,7 +195,7 @@ HRESULT STDMETHODCALLTYPE
   // Allocate the maximum possible multibyte string for the current
   // locale.
   size_t byteCount = (MB_CUR_MAX * (charCount - 1)) + 1;
-  _pPath = (char *)CoTaskMemAlloc(byteCount);
+  _pPath = new char[byteCount];
   if (NULL == _pPath)
     return AAFRESULT_NOMEMORY;
   size_t convertedBytes = wcstombs( _pPath, _pwPath, byteCount);
@@ -205,10 +206,10 @@ HRESULT STDMETHODCALLTYPE
   // Copy the optional mobID it it exists.
   if (pMobID)
   {
-    _pMobID = (aafUID_t *)CoTaskMemAlloc(sizeof(aafUID_t));
-    if (NULL == _pwPath)
+    _pMobID = new aafMobID_t;
+    if (NULL == _pMobID)
       return AAFRESULT_NOMEMORY;
-    memcpy(_pMobID, pMobID, sizeof(aafUID_t));
+    memcpy(_pMobID, pMobID, sizeof(aafMobID_t));
   }
 
 
@@ -221,19 +222,19 @@ void CAAFEssenceFileStream::CleanupBuffers(void)
 {
   if (_pwPath)
   {
-    CoTaskMemFree((void *)_pwPath);
+    delete [] _pwPath;
     _pwPath = NULL;
   }
 
   if (_pMobID)
   {
-    CoTaskMemFree((void *)_pMobID);
+    delete _pMobID;
     _pMobID = NULL;
   }
 
   if (_pPath)
   {
-    CoTaskMemFree((void *)_pPath);
+    delete [] _pPath;
     _pPath = NULL;
   }
 }
@@ -314,8 +315,8 @@ CAAFEssenceFileStream::FileStreamOp CAAFEssenceFileStream::SetStreamOp(FileStrea
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Create (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::Create (const aafCharacter *  pFilePath,
+        aafMobID_constptr  pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -343,8 +344,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::OpenRead (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::OpenRead (const aafCharacter * pFilePath,
+        aafMobID_constptr pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -367,8 +368,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::OpenAppend (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::OpenAppend (const aafCharacter * pFilePath,
+        aafMobID_constptr  pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -418,14 +419,16 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Write (aafDataBuffer_t  buffer,
-        aafInt32  buflen)
+    CAAFEssenceFileStream::Write (
+      aafUInt32 bytes,
+      aafDataBuffer_t  buffer,
+      aafUInt32 * bytesWritten)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
-  if (NULL == buffer)
+  if (NULL == buffer || NULL == bytesWritten)
     return E_INVALIDARG;
-  if (0 > buflen)
+  if (0 > bytes)
     return E_INVALIDARG;
   if (openRead == _streamMode)
     return AAFRESULT_NOT_WRITEABLE;
@@ -449,8 +452,8 @@ HRESULT STDMETHODCALLTYPE
   // Write the given data to the file at the current file
   // position.
   errno = 0;
-  size_t bytesWritten = fwrite(buffer, 1, buflen, _pFile);
-  if (bytesWritten != (size_t)buflen)
+  *bytesWritten = fwrite(buffer, 1, bytes, _pFile);
+  if (*bytesWritten != (size_t)bytes)
   { // What error code should we return?
     long err = errno;
 
@@ -508,7 +511,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Seek (aafInt64  byteOffset)
+    CAAFEssenceFileStream::Seek (aafPosition_t  byteOffset)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -558,7 +561,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::IsPosValid (aafInt64  byteOffset,
+    CAAFEssenceFileStream::IsPosValid (aafPosition_t  byteOffset,
         aafBool *  isValid)
 {
   if (NULL == _pFile) 
@@ -566,18 +569,18 @@ HRESULT STDMETHODCALLTYPE
   if (NULL == isValid)
     return E_INVALIDARG;
   
-  *isValid = AAFFalse;
+  *isValid = kAAFFalse;
 
   if (0 < byteOffset)
   {
-    aafInt64 length = 0;
+    aafLength_t length = 0;
     HRESULT hr = GetLength(&length);
     if (AAFRESULT_SUCCESS != hr)
       return hr;
 
     if (byteOffset < length)
     {
-      *isValid = AAFTrue;
+      *isValid = kAAFTrue;
     }
     else if (byteOffset == length)
     {
@@ -586,7 +589,7 @@ HRESULT STDMETHODCALLTYPE
         // we don't know whether or not the next
         // file operation will be a read or a write
         // so we just return true.
-        *isValid = AAFTrue;
+        *isValid = kAAFTrue;
       }
     }
   }
@@ -596,7 +599,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::GetPosition (aafInt64 *  position)
+    CAAFEssenceFileStream::GetPosition (aafPosition_t *  position)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -631,7 +634,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::GetLength (aafInt64 *  position)
+    CAAFEssenceFileStream::GetLength (aafLength_t *  position)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -675,7 +678,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::SetCacheSize (aafInt32  itsSize)
+    CAAFEssenceFileStream::SetCacheSize (aafUInt32  itsSize)
 {
   // PRE-CONDITION
   // Ansi states that setvbuf should be called before the first read or write
@@ -706,6 +709,10 @@ HRESULT STDMETHODCALLTYPE
 //
 // 
 // 
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFEssenceFileStream::InternalQueryInterface
 (
     REFIID riid,
@@ -717,13 +724,13 @@ HRESULT CAAFEssenceFileStream::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IAAFEssenceStream interface
-    if (riid == IID_IAAFEssenceStream) 
+    if (EQUAL_UID(riid,IID_IAAFEssenceStream)) 
     { 
         *ppvObj = (IAAFEssenceStream *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();

@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFCommentMarker
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -15,12 +33,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <memory.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "CAAFBuiltinDefs.h"
+
 
 
 // Cross-platform utility to delete a file.
@@ -36,7 +55,6 @@ static void RemoveTestFile(const wchar_t* pFileName)
 	}
 }
 
-
 // convenient error handlers.
 inline void checkResult(HRESULT r)
 {
@@ -48,6 +66,10 @@ inline void checkExpression(bool expression, HRESULT r)
 	if (!expression)
 		throw r;
 }
+
+// {81831639-EDF4-11d3-A353-009027DFCA6A}
+static const aafUID_t DDEF_TEST = 
+{ 0x81831639, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 
 class CommentMarkerTest
@@ -68,7 +90,7 @@ private:
 	bool _bWritableFile;
 	IAAFHeader *_pHeader;
 	IAAFDictionary *_pDictionary;
-	aafUID_t _compositionMobID;
+	static const aafMobID_t _compositionMobID;
 	
 	// MobSlot static data
 	static const wchar_t* _slotName;
@@ -89,13 +111,15 @@ extern "C" HRESULT CAAFCommentMarker_test()
 	aafWChar * pFileName = L"AAFCommentMarkerTest.aaf";
 	
 	// Initialize the product info for this module test
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFCommentMarker Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -118,7 +142,8 @@ extern "C" HRESULT CAAFCommentMarker_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFCommentMarker_test...Caught general C++ exception!" << endl;
+		cerr << "CAAFCommentMarker_test..."
+			 << "Caught general C++ exception!" << endl;
 		hr = AAFRESULT_TEST_FAILED;
 	}
 	
@@ -136,6 +161,11 @@ extern "C" HRESULT CAAFCommentMarker_test()
 const aafRational_t CommentMarkerTest::_editRate = { 2997, 100 };
 const aafPosition_t CommentMarkerTest::_position = 0;
 const wchar_t *CommentMarkerTest::_eventComment = L"Event::Comment:This is a test event";
+const aafMobID_t CommentMarkerTest::_compositionMobID = 
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x3e2db3b8, 0x0a61, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 
 CommentMarkerTest::CommentMarkerTest() :
 _pFile(NULL),
@@ -143,7 +173,8 @@ _bWritableFile(false),
 _pHeader(NULL),
 _pDictionary(NULL)
 {
-	memset(&_compositionMobID, 0, sizeof(_compositionMobID));
+	//--cf no need ... memset(&_compositionMobID, 0, sizeof(_compositionMobID));
+	;
 }
 
 CommentMarkerTest::~CommentMarkerTest()
@@ -236,18 +267,38 @@ void CommentMarkerTest::CreateEvent()
 	IAAFSegment *pSegment = NULL;
 	IAAFMobSlot *pMobSlot = NULL;
 	IAAFMob *pMob = NULL;
+	IAAFDataDef *pDataDef = NULL;
+	IAAFComponent *pComp = NULL;
 	
 	
+	CAAFBuiltinDefs defs (_pDictionary);
+
 	try
 	{
-		// Create an event (note: this will be replaced by a concrete event in a
+	  // not already in dictionary
+		checkResult(defs.cdDataDef()->
+					CreateInstance (IID_IAAFDataDef,
+									(IUnknown **)&pDataDef));
+	  hr = pDataDef->Initialize (DDEF_TEST, L"Test", L"Test data");
+	  hr = _pDictionary->RegisterDataDef (pDataDef);
+
+	  // Create an event (note: this will be replaced by a concrete event in a
 		// later version after such an event is implemented.)
-		checkResult(_pDictionary->CreateInstance(&AUID_AAFCommentMarker,
-			IID_IAAFCommentMarker, 
-			(IUnknown **)&pMarker));
-		checkResult(_pDictionary->CreateInstance(&AUID_AAFSourceClip,
-			IID_IAAFSourceReference, 
-			(IUnknown **)&pClip));
+		checkResult(defs.cdCommentMarker()->
+					CreateInstance(IID_IAAFCommentMarker, 
+								   (IUnknown **)&pMarker));
+		checkResult(pMarker->QueryInterface(IID_IAAFComponent, (void **)&pComp));
+		checkResult(pComp->SetDataDef(pDataDef));
+		pComp->Release();
+		pComp = NULL;
+
+		checkResult(defs.cdSourceClip()->
+					CreateInstance(IID_IAAFSourceReference, 
+								   (IUnknown **)&pClip));
+		checkResult(pClip->QueryInterface(IID_IAAFComponent, (void **)&pComp));
+		checkResult(pComp->SetDataDef(pDataDef));
+		pComp->Release();
+		pComp = NULL;
 
 		checkResult(pMarker->SetAnnotation(pClip));
 		pClip->Release();
@@ -262,9 +313,9 @@ void CommentMarkerTest::CreateEvent()
 		checkResult(pEvent->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 		
 		// Create and initialize an EventMobSlot
-		checkResult(_pDictionary->CreateInstance(&AUID_AAFEventMobSlot,
-			IID_IAAFEventMobSlot, 
-			(IUnknown **)&pEventMobSlot));
+		checkResult(defs.cdEventMobSlot()->
+					CreateInstance(IID_IAAFEventMobSlot, 
+								   (IUnknown **)&pEventMobSlot));
 		checkResult(pEventMobSlot->SetEditRate(const_cast<aafRational_t *>(&_editRate)));
 		
 		// Get the mob slot interface so that we can add the event segment.
@@ -274,20 +325,18 @@ void CommentMarkerTest::CreateEvent()
 		checkResult(pMobSlot->SetSegment(pSegment));
 		
 		// Create the mob to hold the new event mob slot.
-		checkResult(_pDictionary->CreateInstance(&AUID_AAFCompositionMob,
-			IID_IAAFMob, 
-			(IUnknown **)&pMob));
+		checkResult(defs.cdCompositionMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pMob));
 		checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));
+		checkResult(pMob->SetMobID(_compositionMobID)); //--cf
 		
 		// Append event slot to the composition mob.
 		checkResult(pMob->AppendSlot(pMobSlot));
 		
 		// Attach the mob to the header...
-		checkResult(_pHeader->AppendMob(pMob));
+		checkResult(_pHeader->AddMob(pMob));
 		
-		// Save the id of the composition mob that contains our test
-		// event mob slot.
-		checkResult(pMob->GetMobID(&_compositionMobID));
 	}
 	catch (HRESULT& rHR)
 	{
@@ -366,10 +415,10 @@ void CommentMarkerTest::OpenEvent()
 	try
 	{
 		// Get the composition mob that we created to hold the
-		checkResult(_pHeader->LookupMob(&_compositionMobID, &pMob));
+		checkResult(_pHeader->LookupMob(_compositionMobID, &pMob));
 		
 		// Get the first mob slot and check that it is an event mob slot.
-		checkResult(pMob->EnumAAFAllMobSlots(&pEnumSlots));
+		checkResult(pMob->GetSlots(&pEnumSlots));
 		checkResult(pEnumSlots->NextOne(&pMobSlot));
 		checkResult(pMobSlot->QueryInterface(IID_IAAFEventMobSlot, (void **)&pEventMobSlot));
 		checkResult(pEventMobSlot->GetEditRate(&editRate));
@@ -388,7 +437,7 @@ void CommentMarkerTest::OpenEvent()
 		
 		// Validate the comment buffer size.
 		aafUInt32 expectedLen = wcslen(_eventComment) + 1;
-		aafUInt32 expectedSize = expectedLen * 2;
+		aafUInt32 expectedSize = expectedLen * sizeof(wchar_t);
 		aafUInt32 commentBufSize = 0;
 		checkResult(pEvent->GetCommentBufLen(&commentBufSize));
 		checkExpression(commentBufSize == expectedSize, AAFRESULT_TEST_FAILED);
