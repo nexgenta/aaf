@@ -47,10 +47,7 @@
 
 #include <assert.h>
 #include <string.h>
-
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <wchar.h>
 
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
@@ -66,7 +63,8 @@ ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
 	_internalSizes (0),
 	_cachedCount ((aafUInt32) -1),
 	_cachedMemberTypes (0),
-	_registrationAttempted (kAAFFalse)
+	_registrationAttempted (kAAFFalse),
+	_defaultRegistrationUsed (kAAFFalse)
 {
   _persistentProperties.put(_memberTypes.address());
   _persistentProperties.put(_memberNames.address());
@@ -123,13 +121,15 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32 numMembers,
       const aafCharacter * pTypeName)
 {
+  if (isInitialized ()) return AAFRESULT_ALREADY_INITIALIZED;
+
   if (!ppMemberTypes && !pMemberNames && !pTypeName)
     return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
 
   hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
-	if (AAFRESULT_FAILED (hr))
+  if (AAFRESULT_FAILED (hr))
     return hr;
 
   _cachedCount = numMembers;
@@ -165,7 +165,7 @@ AAFRESULT STDMETHODCALLTYPE
   for (i = 0; i < numMembers; i++)
 	{
 	  assert (ppMemberTypes[i]);
-	  _memberTypes.setValueAt(ppMemberTypes[i], i);
+	  _memberTypes.insertAt(ppMemberTypes[i], i);
 //	  aafUID_t typeUID;
 //	  AAFRESULT hr = ppMemberTypes[i]->GetAUID(&typeUID);
 //	  assert (AAFRESULT_SUCCEEDED(hr));
@@ -186,6 +186,8 @@ AAFRESULT STDMETHODCALLTYPE
 //  delete[] buf;
   _memberNames.setValue (namesBuf, totalNameSize * sizeof(aafCharacter));
   delete[] namesBuf;
+
+  setInitialized ();
 
   return AAFRESULT_SUCCESS;
 }
@@ -240,7 +242,7 @@ AAFRESULT STDMETHODCALLTYPE
   for (i = 0; i < numMembers; i++)
 	{
 //	  buf[i] = *pMemberTypeIDs[i];
-	  _memberTypes.setValueAt(pMemberTypes[i], i);
+	  _memberTypes.insertAt(pMemberTypes[i], i);
 
 	  wcscpy(tmpNamePtr, pMemberNames[i]);
 	  // +1 to go past embedded null
@@ -263,6 +265,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   AAFRESULT hr;
   aafUInt32 count;
+
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
 
   if (!ppTypeDef) return AAFRESULT_NULL_PARAM;
   
@@ -314,6 +318,8 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   aafUInt32 indexIntoProp;
   aafUInt32 currentIndex;
+
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
 
   if (!pName) return AAFRESULT_NULL_PARAM;
   
@@ -379,6 +385,8 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 indexIntoProp;
   aafUInt32 currentIndex;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
+
   if (!pLen) return AAFRESULT_NULL_PARAM;
   
   hr = GetCount(&count);
@@ -443,6 +451,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   aafUInt32 count;
   AAFRESULT hr;
+
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
 
   if (!pMemberValues) return AAFRESULT_NULL_PARAM;
   if (!ppPropVal) return AAFRESULT_NULL_PARAM;
@@ -519,6 +529,8 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32 initDataSize,
       ImplAAFPropertyValue ** ppPropVal)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
+
   if (! pInitData)
 	return AAFRESULT_NULL_PARAM;
   if (! ppPropVal)
@@ -571,6 +583,7 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   AAFRESULT hr;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pInPropVal)   return AAFRESULT_NULL_PARAM;
   if (!ppOutPropVal) return AAFRESULT_NULL_PARAM;
 
@@ -589,7 +602,7 @@ AAFRESULT STDMETHODCALLTYPE
 	  hr = GetMemberType (i, &ptd);
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (ptd);
-	  offset += ptd->PropValSize();
+	  offset += ptd->NativeSize();
 	}
 
   // offset now points into prop storage
@@ -615,7 +628,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   hr = pvdOut->AllocateFromPropVal (pvdIn,
 									offset,
-									ptd->PropValSize(),
+									ptd->NativeSize(),
 									NULL);
   if (AAFRESULT_FAILED(hr)) return hr;
   assert (ppOutPropVal);
@@ -633,6 +646,7 @@ AAFRESULT STDMETHODCALLTYPE
       aafMemPtr_t pData,
       aafUInt32 dataSize)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (! pPropVal)
 	return AAFRESULT_NULL_PARAM;
   if (! pData)
@@ -674,6 +688,7 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   AAFRESULT hr;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pPropVal)   return AAFRESULT_NULL_PARAM;
   if (!pMemberPropVal) return AAFRESULT_NULL_PARAM;
 
@@ -733,6 +748,7 @@ AAFRESULT STDMETHODCALLTYPE
       aafMemPtr_t pData,
       aafUInt32 dataSize)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (! pPropVal)
 	return AAFRESULT_NULL_PARAM;
   if (! pData)
@@ -748,7 +764,7 @@ AAFRESULT STDMETHODCALLTYPE
   hr = pvd->GetBitsSize (&bitsSize);
   if (AAFRESULT_FAILED(hr))
 	return hr;
-  if (dataSize > bitsSize)
+  if (dataSize != bitsSize)
 	return AAFRESULT_ILLEGAL_VALUE;
 
   aafMemPtr_t pBits;
@@ -767,6 +783,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::GetCount (
       aafUInt32 *  pCount) const
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pCount) return AAFRESULT_NULL_PARAM;
   if (_cachedCount == ((aafUInt32) -1))
 	((ImplAAFTypeDefRecord*)this)->_cachedCount =
@@ -787,12 +804,33 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   AAFRESULT hr;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
+
   if (! pOffsets) return AAFRESULT_NULL_PARAM;
 
   hr = GetCount (&count);
   if (AAFRESULT_FAILED(hr)) return hr;
 
   if (numMembers != count) return AAFRESULT_ILLEGAL_VALUE;
+
+
+  if (_defaultRegistrationUsed)
+	{
+	  return AAFRESULT_DEFAULT_ALREADY_USED;
+	}
+
+  aafUInt32 i;
+  for (i = 0; i < numMembers; i++)
+	{
+	  ImplAAFTypeDefSP ptd;
+	  hr = GetMemberType (i, &ptd);
+	  if (AAFRESULT_FAILED (hr))
+		return hr;
+	  if (! ptd->IsRegistered())
+		{
+		  return AAFRESULT_NOT_REGISTERED;
+		}
+	}
 
   if (_registeredOffsets) delete[] _registeredOffsets;
   _registeredOffsets = new aafUInt32[numMembers];
@@ -801,7 +839,7 @@ AAFRESULT STDMETHODCALLTYPE
   pvtInitInternalSizes ();
   assert (_internalSizes);
 
-  for (aafUInt32 i = 0; i < numMembers; i++)
+  for (i = 0; i < numMembers; i++)
 	{
 	  _registeredOffsets[i] = pOffsets[i];
 	  if ((numMembers-1) == i)
@@ -827,6 +865,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefRecord::GetTypeCategory (eAAFTypeCategory_t *  pTid)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pTid) return AAFRESULT_NULL_PARAM;
   *pTid = kAAFTypeCatRecord;
   return AAFRESULT_SUCCESS;
@@ -900,18 +939,27 @@ void ImplAAFTypeDefRecord::externalize(OMByte* internalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  internalMemberSize = _internalSizes[member];
+	  //internalMemberSize = _internalSizes[member];
+          internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
+
 	  ptdm->externalize (internalBytes,
 						 internalMemberSize,
 						 externalBytes,
 						 externalMemberSize,
 						 byteOrder);
 	  externalBytes += externalMemberSize;
-	  internalBytes += internalMemberSize;
+	  internalBytes += _internalSizes[member]; //internalMemberSize;
 	  externalNumBytesLeft -= externalMemberSize;
-	  internalNumBytesLeft -= internalMemberSize;
+	  internalNumBytesLeft -= _internalSizes[member]; //internalMemberSize;
 	  assert (externalNumBytesLeft >= 0);
 	  assert (internalNumBytesLeft >= 0);
+	}
+
+  if (! _defaultRegistrationUsed && (! IsRegistered ()))
+	{
+	  // cast away const-ness
+	  ((ImplAAFTypeDefRecord*)this)->
+		_defaultRegistrationUsed = kAAFTrue;
 	}
 }
 
@@ -955,7 +1003,8 @@ void ImplAAFTypeDefRecord::internalize(OMByte* externalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  internalMemberSize = _internalSizes[member];
+	  //internalMemberSize = _internalSizes[member];
+          internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
 
 	  ptdm->internalize (externalBytes,
 						 externalMemberSize,
@@ -963,11 +1012,18 @@ void ImplAAFTypeDefRecord::internalize(OMByte* externalBytes,
 						 internalMemberSize,
 						 byteOrder);
 	  externalBytes += externalMemberSize;
-	  internalBytes += internalMemberSize;
+	  internalBytes += _internalSizes[member]; //internalMemberSize;
 	  externalNumBytesLeft -= externalMemberSize;
-	  internalNumBytesLeft -= internalMemberSize;
+	  internalNumBytesLeft -= _internalSizes[member]; //internalMemberSize;
 	  assert (externalNumBytesLeft >= 0);
 	  assert (internalNumBytesLeft >= 0);
+	}
+
+  if (! _defaultRegistrationUsed && (! IsRegistered ()))
+	{
+	  // cast away const-ness
+	  ((ImplAAFTypeDefRecord*)this)->
+		_defaultRegistrationUsed = kAAFTrue;
 	}
 }
 
@@ -1050,6 +1106,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::RawAccessType (
       ImplAAFTypeDef ** ppRawTypeDef)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   // Return variable array of unsigned char
   return pvtGetUInt8Array8Type (ppRawTypeDef);
 }
