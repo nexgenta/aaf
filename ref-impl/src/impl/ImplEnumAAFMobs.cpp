@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplEnumAAFMobs.cpp,v 1.33.2.1 2004/06/16 19:00:54 jptrainor Exp $ $Name:  $
+// $Id: ImplEnumAAFMobs.cpp,v 1.33.2.2 2004/07/14 19:54:53 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,10 @@
 
 #include "ImplEnumAAFMobs.h"
 #include "AAFUtils.h"
+
+#include "ImplAAFMasterMob.h"
+#include "ImplAAFSourceMob.h"
+#include "ImplAAFCompositionMob.h"
 
 ImplEnumAAFMobs::ImplEnumAAFMobs()
 {
@@ -158,8 +162,42 @@ AAFRESULT STDMETHODCALLTYPE
 		  break;
 
 		case kAAFByUsageCode:
-		  
+
 		  if ( pCandidate->IsUsageCodeEqual( &_criteria.tags.usageCode ) ) {
+		    *ppMob = pCandidate;
+		    return AAFRESULT_SUCCESS;
+		  }
+		  pCandidate->ReleaseReference();
+		  pCandidate = NULL;
+
+		  break;
+
+		case kAAFByMasterMobUsageCode:
+		  
+		  if ( pCandidate->IsUsageCodeEqual( &_criteria.tags.usageCode ) &&
+		       dynamic_cast<ImplAAFMasterMob*>(pCandidate) ) {
+		    *ppMob = pCandidate;
+		    return AAFRESULT_SUCCESS;
+		  }
+		  pCandidate->ReleaseReference();
+		  pCandidate = NULL;
+		  break;
+
+		case kAAFBySourceMobUsageCode:
+
+		  if ( pCandidate->IsUsageCodeEqual( &_criteria.tags.usageCode ) &&
+		       dynamic_cast<ImplAAFSourceMob*>(pCandidate) ) {
+		    *ppMob = pCandidate;
+		    return AAFRESULT_SUCCESS;
+		  }
+		  pCandidate->ReleaseReference();
+		  pCandidate = NULL;
+		  break;
+
+		case kAAFByCompositionMobUsageCode:
+
+		  if ( pCandidate->IsUsageCodeEqual( &_criteria.tags.usageCode ) &&
+		       dynamic_cast<ImplAAFCompositionMob*>(pCandidate) ) {
 		    *ppMob = pCandidate;
 		    return AAFRESULT_SUCCESS;
 		  }

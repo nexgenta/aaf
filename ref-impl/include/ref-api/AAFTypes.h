@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.3.2.3 2004/06/16 18:56:23 jptrainor Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.3.2.4 2004/07/14 19:54:53 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -791,7 +791,10 @@ typedef enum _aafSearchTag_e
 	kAAFByClass = 4, 
 	kAAFByDataDef = 5,
 	kAAFByMediaCrit = 6,
-	kAAFByUsageCode = 7
+	kAAFByUsageCode = 7,
+	kAAFByMasterMobUsageCode = 8,
+	kAAFBySourceMobUsageCode = 9,
+	kAAFByCompositionMobUsageCode = 10
 } aafSearchTag_e;
 
 

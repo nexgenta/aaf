@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.h,v 1.2.2.3 2004/06/16 18:56:23 jptrainor Exp $ $Name:  $
+// $Id: CAAFEnumValidation.h,v 1.2.2.4 2004/07/14 19:54:53 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
