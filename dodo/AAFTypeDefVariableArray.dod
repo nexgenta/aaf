@@ -33,7 +33,7 @@ AD_XMETHOD3(Initialize,
 
 			[in],
 			objPass,
-			aafCharacter *,
+			wchar_t *,
 			pTypeName,
 			friendly name of this type definition,
 
