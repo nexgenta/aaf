@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.cpp,v 1.14.2.1 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.cpp,v 1.14.2.2 2004/08/03 18:29:54 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -292,6 +292,9 @@ ImplAAFMetaDefinition::bootstrapTypeWeakReference(
     h = pDictionary->LookupTypeDef(id, &result);
     assert(h == 0);
     pDictionary->ReleaseReference();
+
+    // The return value is not reference-counted.
+    result->ReleaseReference();
   }
   assert(result);
   return result;
@@ -314,6 +317,9 @@ ImplAAFMetaDefinition::bootstrapTypeWeakReferenceVectorElement(
     h = pDictionary->LookupTypeDef(id, &result);
     assert(h == 0);
     pDictionary->ReleaseReference();
+
+    // The return value is not reference-counted.
+    result->ReleaseReference();
   }
   assert(result);
   return result;
@@ -335,6 +341,9 @@ ImplAAFMetaDefinition::bootstrapClassWeakReference(
     h = pDictionary->LookupClassDef(id, &result);
     assert(h == 0);
     pDictionary->ReleaseReference();
+
+    // The return value is not reference-counted.
+    result->ReleaseReference();
   }
   assert(result);
   return result;
