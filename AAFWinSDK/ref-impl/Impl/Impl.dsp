@@ -94,6 +94,10 @@ SOURCE="..\..\..\ref-impl\aaflib\aaflibwin32.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\AAFObjectModel.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\aafTable.cpp"
 # End Source File
 # Begin Source File
@@ -254,7 +258,7 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFInterpolationDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFIntraFrameMarker.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFKLVData.cpp"
 # End Source File
 # Begin Source File
 
@@ -266,7 +270,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMasterMob.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMIDIFileDescriptor.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMetaDefinition.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMetaDictionary.cpp"
 # End Source File
 # Begin Source File
 
@@ -310,7 +318,7 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFParameterDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginDescriptor.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginDef.cpp"
 # End Source File
 # Begin Source File
 
@@ -382,6 +390,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStaticMobSlot.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStreamPropertyValue.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTaggedValue.cpp"
 # End Source File
 # Begin Source File
@@ -430,6 +442,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefArray.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefCharacter.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefEnum.cpp"
 # End Source File
 # Begin Source File
@@ -451,6 +467,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefInt.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefObjectRef.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefOpaque.cpp"
 # End Source File
 # Begin Source File
 
@@ -534,6 +554,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFInterpolateDefs.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFKLVData.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFLoadedPlugins.cpp"
 # End Source File
 # Begin Source File
@@ -562,7 +586,7 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFParameters.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPluginDesc.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPluginDefs.cpp"
 # End Source File
 # Begin Source File
 
