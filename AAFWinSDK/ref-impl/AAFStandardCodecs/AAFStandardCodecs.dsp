@@ -1,8 +1,8 @@
 # Microsoft Developer Studio Project File - Name="AAFStandardCodecs" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 6.00
+# Microsoft Developer Studio Generated Build File, Format Version 5.00
 # ** DO NOT EDIT **
 
-# TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
+# TARGTYPE "Win32 (x86) Static Library" 0x0104
 
 CFG=AAFStandardCodecs - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
@@ -17,17 +17,16 @@ CFG=AAFStandardCodecs - Win32 Debug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "AAFStandardCodecs - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "AAFStandardCodecs - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "AAFStandardCodecs - Win32 Release" (based on\
+ "Win32 (x86) Static Library")
+!MESSAGE "AAFStandardCodecs - Win32 Debug" (based on\
+ "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
-# PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
 
 !IF  "$(CFG)" == "AAFStandardCodecs - Win32 Release"
 
@@ -38,22 +37,17 @@ RSC=rc.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "../../Release/RefImpl"
+# PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
-# PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /WX /GR /GX /O2 /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../include/comidl" /I "../../../ref-impl/include/ref-api" /I "../../../ref-impl/include" /I "../../../ref-impl/libjpeg" /I "../../../Utilities/Include" /D "NDEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /YX /FD /c
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
-# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /d "NDEBUG"
+# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /D "NDEBUG" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "BOB_TEST" /YX /FD /c
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /nodefaultlib:"msvcrtd.lib" /out:"../../Release/RefImpl/aafext/AAFPGAPI.dll" /libpath:"..\..\Release\aafsdk\lib"
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
 
 !ELSEIF  "$(CFG)" == "AAFStandardCodecs - Win32 Debug"
 
@@ -64,24 +58,17 @@ LINK32=link.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "../../Debug/RefImpl"
+# PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GR /GX /ZI /Od /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../include/comidl" /I "../../../ref-impl/include/ref-api" /I "../../../ref-impl/include" /I "../../../ref-impl/libjpeg" /I "../../../Utilities/Include" /D "_DEBUG" /D "OM_ENABLE_DEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /YX /FD /c
-# SUBTRACT CPP /Fr
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
+# ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /Z7 /Od /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /D "_DEBUG" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "BOB_TEST" /YX /FD /c
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"msvcrt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /out:"../../Debug/RefImpl/aafext/AAFPGAPI.dll" /pdbtype:sept
-# SUBTRACT LINK32 /verbose /pdb:none
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
 
 !ENDIF 
 
@@ -91,71 +78,22 @@ LINK32=link.exe
 # Name "AAFStandardCodecs - Win32 Debug"
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\aafCvt.cpp"
-# End Source File
-# Begin Source File
+SOURCE="..\..\..\ref-impl\plugins\CAAFDefaultCodec.cpp"
 
-SOURCE="..\..\..\ref-impl\plugins\AAFPluginCOM.cpp"
-# End Source File
-# Begin Source File
+!IF  "$(CFG)" == "AAFStandardCodecs - Win32 Release"
 
-SOURCE="..\..\..\ref-impl\plugins\AafPlugincom.def"
-# End Source File
-# Begin Source File
+# ADD CPP /I "../../../ref-impl/plugins"
 
-SOURCE="..\..\..\ref-impl\src\impl\AAFUtils.cpp"
-# End Source File
-# Begin Source File
+!ELSEIF  "$(CFG)" == "AAFStandardCodecs - Win32 Debug"
 
-SOURCE="..\..\..\ref-impl\plugins\CAAFAIFCCodec.cpp"
-# End Source File
-# Begin Source File
+# ADD CPP /I "../../../../ref-impl/include/Om" /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/src/com-api/com-dll" /I "../../../ref-impl/plugins"
 
-SOURCE="..\..\..\ref-impl\src\com-api\com-dll\CAAFClassFactory.cpp"
-# End Source File
-# Begin Source File
+!ENDIF 
 
-SOURCE="..\..\..\ref-impl\plugins\CAAFEssenceDataStream.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\plugins\CAAFEssenceFileContainer.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\plugins\CAAFEssenceFileStream.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\com-dll\CAAFInProcServer.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\plugins\CAAFJPEGCodec.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\plugins\CAAFJPEGDescriptorHelper.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\com-dll\CAAFServer.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\com-dll\CAAFUnknown.cpp"
 # End Source File
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\plugins\CAAFWAVECodec.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\plugins\jpegesdatadst.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\plugins\jpegesdatasrc.cpp"
 # End Source File
 # End Target
 # End Project
