@@ -39,7 +39,7 @@
 #include <assert.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -461,7 +461,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if (SUCCEEDED(hr))
 		{
 			hr = pSegment->NumRepresentations(&numReps);
-			if(index < 0 || index >= numReps)
+			if(index >= numReps)
 				return(AAFRESULT_BADINDEX);
 			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
 			if(pGroup != NULL)
