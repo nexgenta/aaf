@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFInterpolationDef
+// @com This file implements the module test for CAAFDefinitionObject
 /***********************************************\
 *												*
 * Advanced Authoring Format						*
@@ -9,7 +9,11 @@
 *												*
 \***********************************************/
 
-#include "AAF.h"
+#include "CAAFInterpolationDef.h"
+#include "CAAFInterpolationDef.h"
+#ifndef __CAAFInterpolationDef_h__
+#error - improperly defined include guard
+#endif
 
 
 #include <iostream.h>
@@ -59,17 +63,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFInterpolationDef Test";
+	ProductInfo.productName = L"AAFMasterMob Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
-
-	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -78,11 +80,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
@@ -161,8 +160,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
-	IEnumAAFInterpolationDefs *pPlug = NULL;
-	IAAFInterpolationDef		*pPlugDef = NULL;
+//@!!!	IEnumAAFInterpolationDefs *pPlug = NULL;
+//	IAAFPluggableDef		*pPlugDef = NULL;
 	IAAFInterpolationDef		*pInterpolationDef = NULL;
 	bool bFileOpen = false;
 	HRESULT			hr = S_OK;
@@ -175,9 +174,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetInterpolationDefinitions(&pPlug));
-		checkResult(pPlug->NextOne (&pPlugDef));
-		checkResult(pPlugDef->QueryInterface (IID_IAAFInterpolationDef, (void **)&pInterpolationDef));
+//!!!		checkResult(pDictionary->GetPluggableDefinitions(&pPlug));
+//!!!		checkResult(pPlug->NextOne (&pPlugDef));
+//!!!		checkResult(pPlugDef->QueryInterface (IID_IAAFInterpolationDef, (void **)&pInterpolationDef));
+//!!!		checkResult(pInterpolationDef->EssenceIsIdentified (&testBool));
+//!!!		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 	}
 	catch (HRESULT& rResult)
 	{
@@ -188,11 +189,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pInterpolationDef)
 		pInterpolationDef->Release();
 
-	if (pPlugDef)
-		pPlugDef->Release();
+//!!!	if (pPlugDef)
+//		pPlugDef->Release();
 
-	if (pPlug)
-		pPlug->Release();
+//!!!	if (pPlug)
+//		pPlug->Release();
 
   if (pDictionary)
 		pDictionary->Release();
@@ -211,10 +212,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFInterpolationDef_test()
+HRESULT CAAFInterpolationDef::test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"AAFInterpolationDefTest.aaf";
+	aafWChar * pFileName = L"InterpolationDefTest.aaf";
 
 	try
 	{
@@ -224,7 +225,7 @@ extern "C" HRESULT CAAFInterpolationDef_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFInterpolationDef_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFInterpolationDef::test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
