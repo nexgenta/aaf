@@ -25,6 +25,9 @@
  *
  ************************************************************************/
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "AAF.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -120,7 +123,7 @@ typedef IAAFSmartPointer<IAAFClassDef>          IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFDictionary>        IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFEssenceDescriptor> IAAFEssenceDescriptorSP;
 typedef IAAFSmartPointer<IAAFFile>              IAAFFileSP;
-typedef IAAFSmartPointer<IAAFHTMLDescriptor>    IAAFHTMLDescriptorSP;
+typedef IAAFSmartPointer<IAAFAIFCDescriptor>    IAAFAIFCDescriptorSP;
 typedef IAAFSmartPointer<IAAFFiller>            IAAFFillerSP;
 typedef IAAFSmartPointer<IAAFHeader>            IAAFHeaderSP;
 typedef IAAFSmartPointer<IAAFMob>               IAAFMobSP;
@@ -648,6 +651,15 @@ static void ReadAAFFile(aafWChar * pFileName,
   IAAFHeaderSP spHeader;
   check (spFile->GetHeader(&spHeader));
 
+  IAAFDictionarySP spDictionary;
+  check (spHeader->GetDictionary(&spDictionary));
+   
+  // This registration needs to be done, even though offsets were
+  // registered when file was written.  Note that if it is to be done
+  // at all, it has to be done before any attempt to read any object
+  // containing a property of this type is done.
+  check (registerRational16StructOffsets (spDictionary));
+
   IAAFMobSP spMob;
   check (spHeader->LookupMob (createdMobID, &spMob));
 
@@ -671,13 +683,6 @@ static void ReadAAFFile(aafWChar * pFileName,
   IAAFFillerSP spFiller;
   check (spSegment->QueryInterface(IID_IAAFFiller,
 								   (void**)&spFiller));
-
-  IAAFDictionarySP spDictionary;
-  check (spHeader->GetDictionary(&spDictionary));
-   
-  // This registration needs to be done, even though offsets were
-  // registered when file was written.
-  check (registerRational16StructOffsets (spDictionary));
 
   // We do the checking in this function.
   check (checkStinkyFiller (spDictionary, spFiller));
@@ -746,14 +751,15 @@ static void CreateAAFFile(aafWChar * pFileName,
   check (spMob->SetMobID(newMobID));
   check (spMob->SetName(L"a Source Mob"));
 
-  IAAFHTMLDescriptorSP  spHTMLDesc;
-  check (defs.cdHTMLDescriptor()->
-		 CreateInstance(IID_IAAFHTMLDescriptor, 
-						(IUnknown **) &spHTMLDesc));
+  IAAFAIFCDescriptorSP  spAIFCDesc;
+  check (defs.cdAIFCDescriptor()->
+		 CreateInstance(IID_IAAFAIFCDescriptor, 
+						(IUnknown **) &spAIFCDesc));
   aafRational_t  audioRate = { 44100, 1 };
 
   IAAFEssenceDescriptorSP spEssenceDesc;
-  check (spHTMLDesc->QueryInterface (IID_IAAFEssenceDescriptor,
+  check(spAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+  check (spAIFCDesc->QueryInterface (IID_IAAFEssenceDescriptor,
 								   (void **)&spEssenceDesc));
   check (smob->SetEssenceDescriptor (spEssenceDesc));
 

@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying 
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted, 
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 #if defined(macintosh)
 // Make sure we have defined IID_IUnknown and IID_IClassFactory.
@@ -29,7 +34,6 @@
 
 
 #include "AAF.h"
-#include "AAFTypes.h"
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFTypeDefUIDs.h"
@@ -45,11 +49,11 @@
 #include "AAFSmartPointer.h"
 #endif
 
-#if defined( OS_MACOS )
+#if defined(macintosh) || defined(_MAC)
 #include "DataInput.h"
 #endif
 
-#if defined( COMPILER_MWERKS )
+#if defined(__MWERKS__)
 #if defined(__MSL_CPP__) && (__MSL_CPP__ >= 0x5300)
 #define IOS_FMT_FLAGS ios_base::fmtflags
 #else
@@ -61,7 +65,6 @@
 
 
 // handy smart pointer typedefs
-typedef IAAFSmartPointer<IUnknown>                 IUnknownSP;
 typedef IAAFSmartPointer<IAAFObject>               IAAFObjectSP;
 typedef IAAFSmartPointer<IAAFPropertyValue>        IAAFPropertyValueSP;
 typedef IAAFSmartPointer<IAAFProperty>             IAAFPropertySP;
@@ -87,17 +90,15 @@ typedef IAAFSmartPointer<IAAFFile>                 IAAFFileSP;
 typedef IAAFSmartPointer<IAAFHeader>               IAAFHeaderSP;
 typedef IAAFSmartPointer<IEnumAAFProperties>       IEnumAAFPropertiesSP;
 typedef IAAFSmartPointer<IAAFTypeDefCharacter>       IAAFTypeDefCharacterSP;
-typedef IAAFSmartPointer<IEnumAAFPropertyValues>   IEnumAAFPropertyValuesSP;
-typedef IAAFSmartPointer<IAAFTypeDefSet>           IAAFTypeDefSetSP;
 
 
 // convenient error handlers.
-/*inline*/ static void checkResult(HRESULT r)
+inline void checkResult(HRESULT r)
 {
 	if (FAILED(r))
 		throw r;
 }
-/*inline*/ static void checkExpression(bool expression, HRESULT r)
+inline void checkExpression(bool expression, HRESULT r)
 {
 	if (!expression)
 		throw r;
@@ -212,11 +213,8 @@ static void printTimeStamp (const aafTimeStamp_t & ts,
 	}
 	else
 	{
-		// I replaced assert(month_index >= 0) 2 lines below
-		// with this one because the value is unsigned and will
-		// never be negative. - Alex, 11-Sep-00
-		assert (ts.date.month > 0 );
 		aafUInt8 month_index = ts.date.month-1;
+		assert (month_index >= 0);
 		assert (month_index < (sizeof (monthNames) / sizeof (monthNames[0])));
 		strcpy (monthNameBuf, monthNames[month_index]);
 	}
@@ -244,12 +242,6 @@ static HRESULT dumpObject
  ostream & os
  );
 
-HRESULT dumpWeakObject(IUnknown * pContainer,
-           IAAFClassDef * pClassDef,
-				   IAAFDictionary * pDict,
-				   int indent,
-				   ostream & os);
-
 static HRESULT dumpPropertyValue
 (
  IAAFPropertyValueSP pPVal,
@@ -261,15 +253,6 @@ static HRESULT dumpPropertyValue
 static HRESULT dumpRawStreamPropertyValue
 (
  IAAFPropertyValue * pPVal,
- IAAFTypeDef *pTD,
- IAAFDictionary * pDict,  // dictionary for this file
- int indent,
- ostream & os
- );
-
-static HRESULT dumpPropertyValues
-(
- IEnumAAFPropertyValues* pPVEnum,
  IAAFTypeDef *pTD,
  IAAFDictionary * pDict,  // dictionary for this file
  int indent,
@@ -347,86 +330,6 @@ HRESULT dumpObject(IAAFObjectSP pContainer,
 }
 
 
-HRESULT dumpWeakObject(IUnknown * pContainer,
-           IAAFClassDef * pClassDef,
-           IAAFDictionary * pDict,
-           int indent,
-           ostream & os)
-{
-  HRESULT returnHr = AAFRESULT_SUCCESS;
-
-  IAAFObjectSP pObject;
-  IAAFMetaDefinitionSP pMetaDefinition;
-  IAAFPropertyDefSP pPDef;
-  IAAFPropertyValueSP pPVal;
-  char *mbBuf = NULL;
-  aafCharacter * classNameBuf = NULL;
-  
-  try
-  {  
-    //os << endl;
-    printIndent (indent, os);
-    os << "Weak Reference to Class: ";
-
-    aafUInt32 bufClassNameSize;
-    checkResult(pClassDef->GetNameBufLen (&bufClassNameSize));
-    classNameBuf = new aafCharacter[bufClassNameSize];
-    assert (classNameBuf);
-    checkResult(pClassDef->GetName(classNameBuf, bufClassNameSize));
-    mbBuf = make_mbstring(bufClassNameSize, classNameBuf); // create an ansi/asci
-    checkExpression(NULL != mbBuf, AAFRESULT_NOMEMORY);
-    os << mbBuf << "; ";
-    delete[] mbBuf;
-    mbBuf = NULL; // clear for safe error handling...
-    delete[] classNameBuf;
-    classNameBuf = NULL; // clear for safe error handling...
-
-    if (pContainer)
-    {
-      if (SUCCEEDED(pContainer->QueryInterface(IID_IAAFMetaDefinition, (void **)&pMetaDefinition)))
-      {
-        // Create a property value for the definition's auid
-        // so that it can be "dumped" the same as the identifier
-        // for weak references to objects.
-        aafUID_t auid;
-        IAAFTypeDefSP pType;
-        IAAFTypeDefRecordSP pRecordType;
-
-        checkResult(pMetaDefinition->GetAUID(&auid));
-        checkResult(pDict->LookupTypeDef(kAAFTypeID_AUID, &pType));
-        checkResult(pType->QueryInterface(IID_IAAFTypeDefRecord, (void **)&pRecordType));
-        checkResult(pRecordType->CreateValueFromStruct((aafMemPtr_t)&auid, sizeof(auid), &pPVal));
-      }
-      else if (SUCCEEDED(pContainer->QueryInterface(IID_IAAFObject, (void **)&pObject)))
-      {
-        checkResult(pClassDef->GetUniqueIdentifier(&pPDef));
-        checkResult(pObject->GetPropertyValue(pPDef, &pPVal));
-      }
-      else
-      {
-        os << "*** ERROR: Invalid weak reference! ***" << endl;
-        checkResult(AAFRESULT_INVALID_OBJ);
-      }
-
-      // Dump the unique identifier (to use as a cross reference).
-      //printIndent (indent, os);
-      os << "Unique Identifier; ";
-      checkResult (dumpPropertyValue (pPVal, pDict, indent+1, os));    
-    }
-  }
-  catch (HRESULT &caught)
-  {
-    os << endl << "*** dumpWeakObject: Caught hresult 0x" << hex << caught << "***" << endl;
-    returnHr = caught;
-
-    delete[] mbBuf;
-    delete[] classNameBuf;
-  }
-  
-  return returnHr;
-}
-
-
 HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 						   IAAFDictionary * pDict,
 						   int indent,
@@ -477,7 +380,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				checkResult(pTDI->GetInteger(pPVal, (aafMemPtr_t) &val, sizeof (val)));
 				
 				os << "value: ";
-				aafInt32 hi = (aafUInt32) ((val & AAFCONSTINT64(0xffffffff00000000)) >> 32);
+				aafInt32 hi = (aafUInt32) ((val & 0xffffffff00000000) >> 32);
 				aafInt32 lo = (aafInt32) val & 0xffffffff;
 				if (hi && ((hi != ~0) || (lo >= 0)))
 				{
@@ -531,6 +434,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				break;	
 			}
 			
+#if 0
 		case kAAFTypeCatWeakObjRef:
 			{
 				// weak object reference; only dump summary info (not
@@ -538,26 +442,18 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				IAAFTypeDefObjectRefSP pTDO;
 				checkResult(pTD->QueryInterface(IID_IAAFTypeDefObjectRef,
 					(void**)&pTDO));
-
-				os << "Value: weak reference to object:" << endl;
-				IAAFClassDefSP pClassDef;
-				checkResult(pTDO->GetObjectType(&pClassDef));
 				
-				IUnknownSP pUnk;
-				HRESULT wkResult = pTDO->GetObject(pPVal, IID_IUnknown, (IUnknown **)&pUnk);
-				if (AAFRESULT_NULLOBJECT == wkResult)
-				{
-					// This should be an error but the toolkit does NOT enforce this requirement!
-					os << "*** WARNING: Weak reference is NULL! ***" << endl;
-					wkResult = S_OK;
-				}
-				checkResult(wkResult);
+				IAAFObjectSP pObj;
+				checkResult(pTDO->GetObject(pPVal, &pObj));
+				IAAFClassDefSP pClassDef;
+				checkResult(pObj->GetDefinition(&pClassDef));
 				
 				// Here is where you print the class def's name, etc. and any
 				// other summary info
-				checkResult (dumpWeakObject (pUnk, pClassDef, pDict, indent+1, os));
+				
 				break;	
 			}
+#endif // 0
 			
 		case kAAFTypeCatRename:
 			{
@@ -688,7 +584,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				checkResult(pTDVA->GetCount(pPVal, &numElems));
 				
 				os << "Value: variably-sized array[" << numElems << "]:" << endl;
-
+				
 				aafUInt32 i;
 				for (i = 0; i < numElems; i++)
 				{
@@ -701,24 +597,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 						indent+1,
 						os));
 				}
-				break;
-			}
-			
-		case kAAFTypeCatSet:
-			{
-				// Print out elements of array.
-				IAAFTypeDefSetSP pTDSet;
-				checkResult(pTD->QueryInterface(IID_IAAFTypeDefSet, (void**)&pTDSet));
 				
-				// Get number of elements
-				aafUInt32 numElems;
-				checkResult(pTDSet->GetCount(pPVal, &numElems));
-				
-				os << "Value: set[" << numElems << "]:" << endl;
-
-				IEnumAAFPropertyValuesSP pPVEnum;
-				checkResult(pTDSet->GetElements(pPVal, &pPVEnum));
-				checkResult(dumpPropertyValues(pPVEnum, pTD, pDict, indent, os));
 				break;
 			}
 			
@@ -1183,34 +1062,6 @@ HRESULT dumpRawStreamPropertyValue
 }
 
 
-
-HRESULT dumpPropertyValues
-(
- IEnumAAFPropertyValues* pPVEnum,
- IAAFTypeDef * /*pTD*/,
- IAAFDictionary * pDict,  // dictionary for this file
- int indent,
- ostream & os
- )
-{
-	HRESULT result = S_OK;
-	aafUInt32 i = 0;
-	IAAFPropertyValueSP pElemPropVal;
-	while (SUCCEEDED(pPVEnum->NextOne(&pElemPropVal)))
-	{
-		printIndent (indent, os);
-		os << "[" << i << "]: ";
-		result = dumpPropertyValue (pElemPropVal,
-			pDict,
-			indent+1,
-			os);
-		++i;
-	}
-	
-	return result;
-}
-
-
 //
 // Dumps the given file.  Returns true if successful; returns false if
 // an error was encountered.
@@ -1249,6 +1100,19 @@ static bool dumpFile (aafCharacter * pwFileName,
 }
 
 
+struct CComInitialize
+{
+	CComInitialize()
+	{
+		CoInitialize(NULL);
+	}
+	
+	~CComInitialize()
+	{
+		CoUninitialize();
+	}
+};
+
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
 {
@@ -1285,6 +1149,7 @@ int main(int argc, char* argv[])
 	ofstream filestream;
 	bool file_opened = false;
 	
+	CComInitialize comInit;
 	CAAFInitialize aafInit;
 	
 	// If only two args are (correctly) given:
