@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSetFileBits.cpp,v 1.3 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSetFileBits.cpp,v 1.4 2004/10/25 13:16:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -86,7 +86,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // BobT Hack!  Some implementations may not understand 64-bit
   // integer sizes, so we'll only allow 32-bit sizes...
-  if (size > ((unsigned long) ~0))
+  if (size > ((aafUInt32) ~0))
 	return AAFRESULT_DATA_SIZE;
 
   _rep->extend (size);
