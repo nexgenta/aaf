@@ -9,7 +9,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -72,19 +71,8 @@ public:
          aafDataValue_t  pSummary);
 
 
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFAIFCDescriptor)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFAIFCDescriptorTest.cpp.
-  static AAFRESULT test();
-
-  // Persistent Properties
 private:
+  // Persistent Properties
 	OMVariableSizeProperty<aafUInt8> _summary;
 
 };

@@ -1,38 +1,17 @@
 #ifndef __ImplAAFDigitalImageDescriptor_h__
 #define __ImplAAFDigitalImageDescriptor_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFFileDescriptor_h__
 #include "ImplAAFFileDescriptor.h"
 #endif
-
-#include "OMVariableSizeProperty.h"
 
 class ImplAAFDigitalImageDescriptor : public ImplAAFFileDescriptor
 {
@@ -53,7 +32,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetCompression
 		// @parm [in] Identifies the compression and format of compression information
-        (const aafUID_t & compression);
+        (aafUID_t *  pCompression);
 
   //****************
   // SetStoredView()
@@ -141,7 +120,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetGamma
 		// @parm [in] Optional
-        (aafUID_t  Gamma);
+        (aafRational_t  Gamma);
 
   //****************
   // SetImageAlignmentFactor()
@@ -253,7 +232,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetGamma
 		// @parm [out] Optional.
-        (aafUID_t *  pGamma);
+        (aafRational_t *  pGamma);
 
   //****************
   // GetImageAlignmentFactor()
@@ -261,7 +240,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetImageAlignmentFactor
 		// @parm [out] Optional.
-        (aafUInt32 *  pImageAlignmentFactor);
+        (aafInt32 *  pImageAlignmentFactor);
 
 protected:
 	OMFixedSizeProperty<aafUID_t>				_compression;
@@ -278,8 +257,8 @@ protected:
 	OMFixedSizeProperty<aafFrameLayout_t>		_frameLayout;
 	OMVariableSizeProperty<aafInt32>			_videoLineMap;
 	OMFixedSizeProperty<aafRational_t>			_imageAspectRatio;
-	OMFixedSizeProperty<aafAlphaTransparency_t>	_alphaTransparency;
-	OMFixedSizeProperty<aafUID_t>				_gamma;
+	OMFixedSizeProperty<aafRational_t>			_alphaTransparency;
+	OMFixedSizeProperty<aafRational_t>			_gamma;
 	OMFixedSizeProperty<aafUInt32>				_imageAlignmentFactor;
 };
 
