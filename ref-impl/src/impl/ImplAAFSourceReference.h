@@ -36,8 +36,8 @@
 
 // Persistent Property IDs
 
-const int PID_SOURCEREFERENCE_SOURCEID		= 1;
-const int PID_SOURCEREFERENCE_SRCMOBSLOTID	= 2;
+const int PID_SOURCEREFERENCE_SOURCEID		= 2;
+const int PID_SOURCEREFERENCE_SRCMOBSLOTID	= 3;
 
 class ImplAAFSourceReference : public ImplAAFSegment
 {
@@ -88,7 +88,7 @@ public:
 public:
   // Declare this class to be storable.
   //
-  OMDECLARE_STORABLE(AAFSourceReference);
+  OMDECLARE_STORABLE(ImplAAFSourceReference);
 
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFSourceReferenceTest.cpp.
