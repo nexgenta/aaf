@@ -9,6 +9,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -17,6 +18,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -64,16 +66,6 @@ public:
     
 /****/
   //****************
-  // GetStillFrame()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetStillFrame
-        // @parm [out] Still Frame source clip 
-        (ImplAAFSourceClip **stillFrame);
-    //@comm Essence group choices should be added with the AddChoice() function.
-    
-/****/
-  //****************
   // AddChoice()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -83,22 +75,27 @@ public:
 
 /****/
   //****************
-  // GetNumChoices()
+  // GetNumRepresentations()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumChoices
+    GetNumRepresentations
         (aafUInt32  *result);
 
   //****************
-  // GetIndexedChoice()
+  // GetIndexedRepresentation()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIndexedChoice
+    GetIndexedRepresentation
         (// @parm [in] The 0-based index into the array
          aafUInt32  index,
 
          // @parm [out] The representation at that index
          ImplAAFSourceClip  ** result);
+
+//	private:
+//		AAFSourceClip			*_stillFrame;
+//		vector<AAFSourceClip *>	_choices;
+
 
 public:
 	//SDK-private methods
@@ -114,10 +111,15 @@ public:
 										ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
 										ImplAAFComponent **foundObj, aafBool *foundTransition);
 
-	AAFRESULT GetCriteriaSourceClip(
-			aafMediaCriteria_t *criteria,
-			ImplAAFSourceClip		**retSrcClip);
 
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFEssenceGroup)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFEssenceGroupTest.cpp.
+  static AAFRESULT test();
 private:
 	OMStrongReferenceVectorProperty<ImplAAFSourceClip>	_choices;
 	OMStrongReferenceProperty<ImplAAFSourceClip>		_stillFrame;
