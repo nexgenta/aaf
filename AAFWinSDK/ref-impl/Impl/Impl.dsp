@@ -39,7 +39,7 @@ CPP=cl.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GR /GX /O2 /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /D "NDEBUG" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "_WIN32" /D "BOB_TEST" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GR /GX /O2 /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /D "NDEBUG" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "_WIN32" /D "BOB_TEST" /YX /FD /c
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -60,7 +60,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MTd /W3 /GR /GX /Z7 /Od /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WIN32" /D "_WINDOWS" /D "_DEBUG" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "BOB_TEST" /D "OM_ENABLE_DEBUG" /FR /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /GR /GX /Z7 /Od /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WIN32" /D "_WINDOWS" /D "_DEBUG" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "BOB_TEST" /D "OM_ENABLE_DEBUG" /FR /YX /FD /c
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -88,8 +88,11 @@ SOURCE="..\..\..\ref-impl\src\impl\aafErr.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\aafTable.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\AAFUtils.cpp"
-# ADD CPP /I "../include/comidl"
 # End Source File
 # Begin Source File
 
@@ -114,6 +117,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFCompositionMob.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFConstValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFContentStorage.cpp"
 # End Source File
 # Begin Source File
 
@@ -149,7 +156,15 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEffectInvocation.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEssenceDescriptor.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFFile.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFFileDescriptor.cpp"
 # End Source File
 # Begin Source File
 
@@ -186,14 +201,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMasterMob.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMedia.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMediaDescriptor.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMediaFileDescriptor.cpp"
 # End Source File
 # Begin Source File
 
