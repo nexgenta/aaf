@@ -36,11 +36,12 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -67,13 +68,12 @@ inline void checkResult(HRESULT r)
 	if (FAILED(r))
 		throw r;
 }
-inline void checkExpression(bool expression, HRESULT r)
+inline void checkExpression(bool expression, HRESULT r=AAFRESULT_TEST_FAILED)
 {
 	if (!expression)
 		throw r;
 }
 
-#define TEST_NUM_INPUTS		1
 static const aafUID_t TEST_CATEGORY = 
 { 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
@@ -163,10 +163,28 @@ static HRESULT verifyParams(IAAFOperationGroup * const pOperationGroup )
 	IAAFDefObjectSP spDefObject;
 
 
+  // Attempt to load the parameters into an array.
 	aafUInt32 num_fetched = 0;
+  aafUInt32 num_released = 0;
 	//make sure 2 parameters can be fetched
-	checkResult(spEnumParams->Next(2, &spParameter, &num_fetched));
+  IAAFParameter * parameterArray[2] = {0};
+	checkResult(spEnumParams->Next(2, parameterArray, &num_fetched));
+  if (parameterArray[0])
+  {
+    parameterArray[0]->Release();
+    parameterArray[0] = NULL;
+    ++num_released;
+  }
+  if (parameterArray[1])
+  {
+    parameterArray[1]->Release();
+    parameterArray[1] = NULL;
+    ++num_released;
+  }
+
 	checkExpression(num_fetched == 2, AAFRESULT_TEST_FAILED);
+	checkExpression(num_released == 2, AAFRESULT_TEST_FAILED);
+
 	//so far, so good.  Reset
 	spEnumParams->Reset();
 
@@ -219,10 +237,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceReference *pSourceRef = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	aafLength_t			effectLen = TEST_EFFECT_LEN;
 	aafUID_t			effectID = kTestEffectID;
 	aafUID_t			parmID = kTestParmID;
-	aafInt32			numSegments;
+	aafUInt32			numSegments;
 	aafRational_t		testLevel = kTestLevel;
 	
 	try
@@ -263,7 +280,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
 		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
-		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
+		checkResult(pOperationDef->SetNumberInputs (3));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
 		
@@ -294,11 +311,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFSegment, 
 				(IUnknown **)&pFiller));
 			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
-			checkResult(pComponent->SetLength(effectLen));
+			checkResult(pComponent->SetLength(TEST_EFFECT_LEN+2));
 			checkResult(pComponent->SetDataDef(defs.ddPicture()));
 			checkResult(pOperationGroup->Initialize(defs.ddPicture(),
 				TEST_EFFECT_LEN,
 				pOperationDef));
+
+      pComponent->Release();
+      pComponent = NULL;
 			
 			checkResult(defs.cdConstantValue()->
 				CreateInstance(IID_IAAFConstantValue, 
@@ -326,6 +346,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(pOperationGroup->AddParameter (pParm));			
 			pConstValue->Release ();
 			pConstValue = NULL;
+			pParm->Release();
+			pParm = NULL;
 
 
 			// filler ....
@@ -338,18 +360,42 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFSegment, 
 				(IUnknown **)&pFiller));
 			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
-			checkResult(pComponent->SetLength(effectLen));
+			checkResult(pComponent->SetLength(TEST_EFFECT_LEN+3));
 			checkResult(pComponent->SetDataDef(defs.ddPicture()));
 			checkResult(pOperationGroup->AppendInputSegment (pFiller));
 			pFiller->Release();
 			pFiller = NULL;
+      pComponent->Release();
+      pComponent = NULL;
+
 			checkResult(pOperationGroup->CountSourceSegments (&numSegments));
 			checkExpression(2 == numSegments, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationGroup->RemoveInputSegmentAt (1));
 			checkResult(pOperationGroup->CountSourceSegments (&numSegments));
 			checkExpression(1 == numSegments, AAFRESULT_TEST_FAILED);
-			
-			
+
+			// Now try prepending an input segment
+			checkResult(defs.cdFiller()->
+				CreateInstance(IID_IAAFSegment, 
+				(IUnknown **)&pFiller));
+			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
+			checkResult(pComponent->SetLength(TEST_EFFECT_LEN));
+			checkResult(pComponent->SetDataDef(defs.ddPicture()));
+			checkResult(pOperationGroup->PrependInputSegment (pFiller));
+			pFiller->Release();
+			pFiller = NULL;
+
+			// Now insert one in the middle
+			checkResult(defs.cdFiller()->
+				CreateInstance(IID_IAAFSegment, 
+				(IUnknown **)&pFiller));
+			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
+			checkResult(pComponent->SetLength(TEST_EFFECT_LEN+1));
+			checkResult(pComponent->SetDataDef(defs.ddPicture()));
+			checkResult(pOperationGroup->InsertInputSegmentAt(1,pFiller));
+			pFiller->Release();
+			pFiller = NULL;
+
 			checkResult(pOperationGroup->SetBypassOverride (1));
 			checkResult(defs.cdSourceClip()->
 				CreateInstance(IID_IAAFSourceClip, 
@@ -359,7 +405,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			sourceRef.sourceSlotID = 0;
 			sourceRef.startTime = 0;
 			checkResult(pSourceClip->Initialize (defs.ddPicture(),
-				effectLen,
+				TEST_EFFECT_LEN,
 				sourceRef));
 			checkResult(pSourceClip->QueryInterface (IID_IAAFSourceReference, (void **)&pSourceRef));
 			checkResult(pOperationGroup->SetRender (pSourceRef));
@@ -375,10 +421,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			
 			pOperationGroup->Release();
 			pOperationGroup = NULL;
-			pParm->Release();
-			pParm = NULL;
-			pComponent->Release();
-			pComponent = NULL;
 			pSourceRef->Release();
 			pSourceRef = NULL;
 			pSourceClip->Release();
@@ -464,8 +506,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	bool				bFileOpen = false;
 	aafMobID_t			readSourceID;
 	aafBool				readIsTimeWarp;
-	aafInt32			checkNumInputs, testNumSources, testNumParam;
-	aafUInt32			checkBypass;
+	aafUInt32			checkBypass, testNumSources, testNumParam;
+	aafInt32			checkNumInputs;
 	HRESULT				hr = S_OK;
 	wchar_t				checkName[256];
 	aafUID_t			checkCat;
@@ -497,7 +539,27 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			pSeg = NULL;
 			
 			checkResult(pOperationGroup->CountSourceSegments(&testNumSources));
-			checkExpression(testNumSources == TEST_NUM_INPUTS, AAFRESULT_TEST_FAILED);
+			checkExpression(testNumSources == 3, AAFRESULT_TEST_FAILED);
+
+			// Verify each source segment
+
+			IAAFComponent *pComponent;
+
+			for(aafUInt32 n=0;n<3;n++)
+			{
+				checkResult(pOperationGroup->GetInputSegmentAt (n, &pSeg));
+				checkResult(pSeg->QueryInterface(IID_IAAFFiller,(void**)&pFill));
+				checkResult(pSeg->QueryInterface(IID_IAAFComponent,
+					(void**)&pComponent));
+				aafLength_t Length;
+				checkResult(pComponent->GetLength(&Length));
+				checkExpression(Length==TEST_EFFECT_LEN+n);
+				pFill->Release();
+				pFill=NULL;
+				pComponent->Release();
+				pComponent=NULL;
+			}
+
 			checkResult(pOperationGroup->CountParameters(&testNumParam));
 			checkExpression(testNumParam == 2, AAFRESULT_TEST_FAILED);
 			
@@ -509,10 +571,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			
 			checkResult(pOperationGroup->IsValidTranOperation (&readValidTransition));
 			checkExpression(readValidTransition == kAAFFalse, AAFRESULT_TEST_FAILED);
-			/**/
-			checkResult(pOperationGroup->GetInputSegmentAt (0, &pSeg));
-			checkResult(pSeg->QueryInterface(IID_IAAFFiller, (void **) &pFill));
-			/**/
 
 			//--cf  Get and Check  Parameters
 			verifyParams(pOperationGroup);
@@ -531,7 +589,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkResult(pOperationDef->GetBypass (&checkBypass));
 			checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
-			checkExpression(checkNumInputs == TEST_NUM_INPUTS, AAFRESULT_TEST_FAILED);
+			checkExpression(checkNumInputs == 3, AAFRESULT_TEST_FAILED);
 			pOperationDef->Release();
 			pOperationDef = NULL;
 			/**/
@@ -544,8 +602,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			pSlot = NULL;
 			pSeg->Release();
 			pSeg = NULL;
-			pFill->Release();
-			pFill = NULL;
 			pSourceRef->Release();
 			pSourceRef = NULL;
 		}
@@ -633,8 +689,10 @@ extern "C" HRESULT CAAFOperationGroup_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFOperationGroup_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFOperationGroup_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
-	
+
 	return hr;
 }

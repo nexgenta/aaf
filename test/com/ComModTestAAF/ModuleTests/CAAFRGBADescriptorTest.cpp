@@ -32,6 +32,7 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -228,7 +229,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 //!!!    checkResult(pDIDesc->SetGamma(ratio));
 
     checkResult(pRGBADesc->SetPixelLayout(NUM_TEST_ELEMENTS, testElements));
-    checkResult(pRGBADesc->SetPallete(sizeof(bogusPalette), bogusPalette));
+    checkResult(pRGBADesc->SetPalette(sizeof(bogusPalette), bogusPalette));
     checkResult(pRGBADesc->SetPaletteLayout(NUM_TEST_ELEMENTS, testElements2));
   
 	// Save the initialized descriptor with the source mob.
@@ -453,7 +454,9 @@ extern "C" HRESULT CAAFRGBADescriptor_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFRGBADescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFRGBADescriptor_test..."
+			 << "Caught general C++ exception!" << endl;
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
