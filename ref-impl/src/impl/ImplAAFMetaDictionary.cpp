@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.6 2005/01/21 14:25:24 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.7 2005/01/21 17:03:16 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1422,17 +1422,23 @@ AAFRESULT ImplAAFMetaDictionary::PvtClearFileClassSet()
     iter( _fileClassDefinitions );
 
   int idCount = iter.count();
-  OMUniqueObjectIdentification pIds[ idCount ];
+  OMUniqueObjectIdentification ids[ idCount ];
 
   int i = 0;
   while( ++iter ) {
     assert ( i < idCount );
-    pIds[i] = iter.identification();
+    ids[i] = iter.identification();
     ++i;
   }
 
   for( i = 0 ; i < idCount; ++i ) {
-    _fileClassDefinitions.remove( pIds[i] );
+    
+    ImplAAFClassDef* pDef = _fileClassDefinitions.remove( ids[i] );
+    assert(pDef);
+    if (pDef) {
+      pDef->ReleaseReference();
+      pDef = 0;
+    }
   }
 
   return result;
@@ -1508,15 +1514,15 @@ AAFRESULT ImplAAFMetaDictionary::PvtMergePropDefs( ImplAAFClassDef* pSrcClassDef
 
   AAFRESULT hr = AAFRESULT_SUCCESS;
 
-  ImplEnumAAFPropertyDefs* pEnumSrcPropDefs = 0; 
+  ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> pEnumSrcPropDefs; 
   hr = pSrcClassDef->GetPropertyDefs(&pEnumSrcPropDefs); 
 
   if (AAFRESULT_SUCCEEDED(hr)) { 
-    ImplAAFPropertyDef* pSrcPropDef; 
+    ImplAAFSmartPointer<ImplAAFPropertyDef> pSrcPropDef; 
     while (AAFRESULT_SUCCEEDED(pEnumSrcPropDefs->NextOne(&pSrcPropDef))) { 
       aafUID_t puid; 
       pSrcPropDef->GetAUID(&puid); 
-      ImplAAFPropertyDef* pDstPropDef = 0; 
+      ImplAAFSmartPointer<ImplAAFPropertyDef> pDstPropDef; 
       AAFRESULT tmpHr = pDstClassDef->LookupPropertyDef(puid, &pDstPropDef); 
       if (AAFRESULT_FAILED(tmpHr)) { 
 
@@ -1572,7 +1578,7 @@ AAFRESULT ImplAAFMetaDictionary::PvtSyncCommonClassDefs()
     OMUniqueObjectIdentification id = iter.identification(); 
     ImplAAFClassDef* pFileClassDef = iter.value(); 
     aafUID_t* uid = reinterpret_cast<aafUID_t*>(&id); 
-    ImplAAFClassDef* pBuiltinClassDef = 0; 
+    ImplAAFSmartPointer<ImplAAFClassDef> pBuiltinClassDef;
     HRESULT hr = dataDictionary()->LookupClassDef(*uid, &pBuiltinClassDef); 
 
     if (AAFRESULT_SUCCEEDED(hr)) {
