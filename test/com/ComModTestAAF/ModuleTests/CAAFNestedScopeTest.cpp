@@ -36,6 +36,7 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -147,7 +148,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafFadeType_t		fadeInType = kFadeLinearAmp;
 	aafFadeType_t		fadeOutType = kFadeLinearPower;
 	aafSourceRef_t		sourceRef; 
-	aafUID_t			fillerUID = DDEF_Picture;
 	aafLength_t			fillerLength = 3200;
 
 	HRESULT				hr = AAFRESULT_SUCCESS;
@@ -163,11 +163,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
  		
 		// Create a mob to be referenced by the source clip
-		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
-								 IID_IAAFMob, 
-								 (IUnknown **)&pReferencedMob));
+		checkResult(defs.cdMasterMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pReferencedMob));
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
 		checkResult(pReferencedMob->SetMobID(referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
@@ -176,9 +177,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pReferencedMob = NULL;
 
 		// Create a Composition Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
-											  IID_IAAFCompositionMob, 
-											  (IUnknown **)&pCompMob));
+		checkResult(defs.cdCompositionMob()->
+					CreateInstance(IID_IAAFCompositionMob, 
+								   (IUnknown **)&pCompMob));
 
 	    // get a IAAFMob interface
 		checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
@@ -187,9 +188,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetName(L"AAFNestedScopeTest"));
 	  
 		// Create a Source clip 
- 		checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
-						     IID_IAAFSourceClip, 
-						     (IUnknown **)&pSourceClip));		
+ 		checkResult(defs.cdSourceClip()->
+					CreateInstance(IID_IAAFSourceClip, 
+								   (IUnknown **)&pSourceClip));		
 
 		// Set the properties for the SourceClip
 		checkResult(pSourceClip->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
@@ -199,16 +200,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSourceClip->SetSourceReference(sourceRef));
 
 		// create a filler 
-	    checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
-												IID_IAAFFiller, 
-												(IUnknown **)&pFiller));
+	    checkResult(defs.cdFiller()->
+					CreateInstance(IID_IAAFFiller, 
+								   (IUnknown **)&pFiller));
 		// Set its properties.
-	    checkResult(pFiller->Initialize(fillerUID, fillerLength));
+	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
 
 		// Now create a selector 
-	    checkResult(pDictionary->CreateInstance(AUID_AAFNestedScope,
-												IID_IAAFNestedScope, 
-												(IUnknown **)&pNestedScope));
+	    checkResult(defs.cdNestedScope()->
+					CreateInstance(IID_IAAFNestedScope, 
+								   (IUnknown **)&pNestedScope));
 
 		// Get a segment interface from the source clip
 		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
@@ -440,19 +441,3 @@ extern "C" HRESULT CAAFNestedScope_test()
 //	}
 	return hr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
