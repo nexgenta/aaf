@@ -88,13 +88,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
     // Create the file
-		checkResult(CoCreateInstance(CLSID_AAFFile,
-								 NULL, 
-								 CLSCTX_INPROC_SERVER, 
-								 IID_IAAFFile, 
-								 (void **)&pFile));
-		checkResult(pFile->Initialize());
-		checkResult(pFile->OpenNewModify(pFileName, 0, &ProductInfo));
+		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
  
     // We can't really do anthing in AAF without the header.
@@ -160,7 +154,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pFile) 
 	{
 		if (bFileOpen)
+		  {
+			pFile->Save();
 			pFile->Close();
+		  }
 		pFile->Release();
 	}
 
@@ -174,7 +171,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFFile *					pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 	IEnumAAFMobSlots*			pEnum = NULL;
 	IAAFMob*					pMob = NULL;
@@ -202,13 +198,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   try
   {
     // Open the file
-		checkResult(CoCreateInstance(CLSID_AAFFile,
-								 NULL, 
-								 CLSCTX_INPROC_SERVER, 
-								 IID_IAAFFile, 
-								 (void **)&pFile));
-		checkResult(pFile->Initialize());
-		checkResult(pFile->OpenExistingRead(pFileName, 0));
+		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
  
     // We can't really do anthing in AAF without the header.
@@ -234,7 +224,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
         checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
+
+        pTimecode->Release();
+        pTimecode = NULL;
+
+        pSeg->Release();
+        pSeg = NULL;
       }
+
+      pEnum->Release();
+      pEnum = NULL;
 
       pMob->Release();
       pMob = NULL;
@@ -262,8 +261,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (pMob)
 		pMob->Release();
 
-	if (pDictionary)
-		pDictionary->Release();
+	if (pMobIter)
+		pMobIter->Release();
 
 	if (pHeader)
 		pHeader->Release();
