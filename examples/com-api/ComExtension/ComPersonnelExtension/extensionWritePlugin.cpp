@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -33,19 +33,9 @@
 #include "extensionUtils.h"
 #include "extensionWritePlugin.h"
 #include "AAFResult.h"
-#include "AAFTypes.h"
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
-
-#if defined( OS_WINDOWS ) || defined( OS_MACOS )
-#define AAFPERSONNELEXTENSION_DLLNAME L"AAFPersonnelExtension.dll"
-#elif defined( OS_UNIX )
-#define AAFPERSONNELEXTENSION_DLLNAME L"libAAFPersonnelExtension.so"
-#else
-#error Unknown operating system
-#endif
 
 //
 // This example code is intended to show how AAF may be extended to
@@ -130,14 +120,14 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
 {
   HRESULT rc = S_OK;
   IAAFPluginManager *pPluginManager = NULL;
-  IAAFClassExtension *pClassExtension = NULL;
+  IAAFPlugin *pPlugin = NULL;
   IAAFFile *pFile=NULL;
   IAAFHeader *pHead=NULL;
   IAAFDictionary *pDict=NULL;
+  IAAFDefObject *pDefObject = NULL;
   IAAFAdminMob *pAdminMob=NULL;
   IAAFMob *pMob=NULL;
   IAAFPersonnelResource *pPersResource=NULL;
-  IAAFClassDef * pcd = 0;
 
 
   cout << "***Creating file " << filename << " with plugin interface***" << endl;
@@ -147,7 +137,7 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
   {
     // Load our plugin.
     check(AAFGetPluginManager(&pPluginManager));
-    rc = pPluginManager->RegisterPluginFile(AAFPERSONNELEXTENSION_DLLNAME);
+    rc = pPluginManager->RegisterPluginFile(L"AAFPersonnelExtension.dll");
     if (AAFRESULT_PLUGIN_ALREADY_REGISTERED == rc)
       rc = S_OK;
     check (rc);
@@ -161,15 +151,13 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
 
     // Create a new file...
     static const aafUID_t NULL_UID = { 0 };
-    aafProductVersion_t v;
-    v.major = 1;
-    v.minor = 0;
-    v.tertiary = 0;
-    v.patchLevel = 0;
-    v.type = kAAFVersionUnknown;
     ProductInfo.companyName = L"AAF Developers Desk";
     ProductInfo.productName = L"AAF extension example";
-    ProductInfo.productVersion = &v;
+    ProductInfo.productVersion.major = 1;
+    ProductInfo.productVersion.minor = 0;
+    ProductInfo.productVersion.tertiary = 0;
+    ProductInfo.productVersion.patchLevel = 0;
+    ProductInfo.productVersion.type = kVersionUnknown;
     ProductInfo.productVersionString = 0;
     ProductInfo.productID = NULL_UID;
     ProductInfo.platform = 0;
@@ -183,22 +171,28 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
     check (pHead->GetDictionary(&pDict));
 
     // Ask the plugins to register and initialize all necessary defintions.
-    check (pPluginManager->CreateInstance(CLSID_AAFAdminMob, NULL, IID_IAAFClassExtension, (void **)&pClassExtension));
-    check (pClassExtension->RegisterDefinitions(pDict));
-    pClassExtension->Release();
-    pClassExtension = NULL;
+    check (pPluginManager->CreateInstance(CLSID_AAFAdminMob, NULL, IID_IAAFPlugin, (void **)&pPlugin));
+
+    aafInt32 defCount = 0;
+    check (pPlugin->GetNumDefinitions(&defCount));
+    for (aafInt32 i = 0; i < defCount; ++i)
+    {
+      check (pPlugin->GetIndexedDefinitionObject(i, pDict, &pDefObject));
+      pDefObject->Release();
+      pDefObject = NULL;
+    }
+
+    pPlugin->Release();
+    pPlugin = NULL;
       
     pPluginManager->Release();
     pPluginManager = NULL;
 
  
     // Instantiate a AdministrativeMob object.
-	check (pDict->LookupClassDef (kClassID_AdminMob, &pcd))
-    check (pcd->CreateInstance (IID_IAAFMob,
-								(IUnknown**) &pMob));
-	pcd->Release ();
-	pcd = 0;
-
+    check (pDict->CreateInstance (kClassID_AdminMob,
+								  IID_IAAFMob,
+								  (IUnknown**) &pMob));
     check (pMob->SetName (L"Administrative Information"));
     check (pMob->QueryInterface(IID_IAAFAdminMob, (void **)&pAdminMob));
 
@@ -207,11 +201,9 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
 
     // Add several PersonnelResource objects to the AdminMob.
     // Instantiate the PersonnelResource object.
-	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
-    check (pcd->CreateInstance (IID_IAAFPersonnelResource,
-								(IUnknown**) &pPersResource));
-	pcd->Release ();
-	pcd = 0;
+    check (pDict->CreateInstance (kClassID_PersonnelResource,
+								  IID_IAAFPersonnelResource,
+								  (IUnknown**) &pPersResource));
 
     check (pPersResource->Initialize(
 							     L"Morgan",
@@ -222,11 +214,9 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
     pPersResource=NULL;
 
   // Instantiate the PersonnelResource object.
-	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
-    check (pcd->CreateInstance (IID_IAAFPersonnelResource,
-								(IUnknown**) &pPersResource));
-	pcd->Release ();
-	pcd = 0;
+    check (pDict->CreateInstance (kClassID_PersonnelResource,
+								  IID_IAAFPersonnelResource,
+								  (IUnknown**) &pPersResource));
 
     check (pPersResource->Initialize(
 							     L"Ohanian",
@@ -238,11 +228,9 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
     pPersResource->Release();
     pPersResource=NULL;
   // Instantiate the PersonnelResource object.
-    check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
-    check (pcd->CreateInstance (IID_IAAFPersonnelResource,
-								(IUnknown**) &pPersResource));
-	pcd->Release ();
-	pcd = 0;
+    check (pDict->CreateInstance (kClassID_PersonnelResource,
+								  IID_IAAFPersonnelResource,
+								  (IUnknown**) &pPersResource));
 
     check (pPersResource->Initialize(
 							     L"Oldman",
@@ -264,18 +252,15 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
     pAdminMob->Release();
   if (pMob)
     pMob->Release();
-  if (pClassExtension)
-    pClassExtension->Release();
+  if (pPlugin)
+    pPlugin->Release();
+  if (pDefObject)
+    pDefObject->Release();
   if (pDict)
     pDict->Release();
   if (pHead)
     pHead->Release();
   // Save the file and close it.
-  if (pcd)
-	{
-	  pcd->Release ();
-	  pcd = 0;
-	}
   if (pFile)
   {
     check (pFile->Save());

@@ -30,21 +30,11 @@
 
 #include "extensionReadPlugin.h"
 #include "extensionUtils.h"
-#include "AAFTypes.h"
 #include "AAFResult.h"
 
 
 #include <iostream.h>
 #include <assert.h>
-
-
-#if defined( OS_WINDOWS ) || defined( OS_MACOS )
-#define AAFPERSONNELEXTENSION_DLLNAME L"AAFPersonnelExtension.dll"
-#elif defined( OS_UNIX )
-#define AAFPERSONNELEXTENSION_DLLNAME L"libAAFPersonnelExtension.so"
-#else
-#error Unknown operating system
-#endif
 
 
 //
@@ -78,7 +68,7 @@ HRESULT extensionReadPlugin (const aafCharacter * filename)
 
     // Load our plugin.
     check(AAFGetPluginManager(&pPluginManager));
-    rc = pPluginManager->RegisterPluginFile(AAFPERSONNELEXTENSION_DLLNAME);
+    rc = pPluginManager->RegisterPluginFile(L"AAFPersonnelExtension.dll");
     if (AAFRESULT_PLUGIN_ALREADY_REGISTERED == rc)
       rc = S_OK;
     check (rc);
@@ -95,8 +85,35 @@ HRESULT extensionReadPlugin (const aafCharacter * filename)
     check (pFile->GetHeader(&pHead));
     check (pHead->GetDictionary(&pDict));
 
-    VerifyResourceClassExtensions(pDict);
 
+    cout << "Verifying position enum type has been registered." << endl;
+    check (pDict->LookupTypeDef (kTypeID_ePosition, &ptd));
+    ptd->Release();
+    ptd=NULL;
+
+    cout << "Verifying PersonnelResource class has been registered." << endl;
+    check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
+    pcd->Release();
+    pcd=NULL;
+
+    cout << "Verifying AdminMob class has been registered." << endl;
+    check (pDict->LookupClassDef (kClassID_AdminMob, &pcd));
+    pcd->Release();
+    pcd=NULL;
+
+    cout << "Verifying PersonnelResourceReference type has been"
+	     << " registered." << endl;
+    check (pDict->LookupTypeDef (kTypeID_PersonnelResourceStrongReference,
+							  &ptd));
+    ptd->Release();
+    ptd=NULL;
+
+    cout << "Verifying PersonnelResourceReferenceVector type has been"
+	     << " registered." << endl; 
+    check (pDict->LookupTypeDef (kTypeID_PersonnelResourceStrongReferenceVector,
+							  &ptd));
+    ptd->Release();
+    ptd=NULL;
 
     cout << "Verifying AdminMob instance has been created and added" 
 	     << " to header." << endl;

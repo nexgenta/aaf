@@ -36,10 +36,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __AAFTypes_h__
-#include "AAFTypes.h"
-#endif
-
 #ifndef __CAAFServer_h__
 #include "CAAFServer.h"
 #endif
@@ -55,7 +51,6 @@
 #include "CAAFAdminMob.h"
 #endif
 
-#include <string.h>
 
 // Structure to define 
 typedef struct tagAAFPluginObjectInfo_t
@@ -126,18 +121,9 @@ CAAFServer* g_pAAFServer = &g_AAFPluginServer;
 #include "AAFStoredObjectIDs.h"
 #undef INIT_AUID
 
-//
-// Define plugin constants.
-//
-#include "AAFPlugin_i.c"
-
-//
-// Define Personnel Extension constants.
-//
-#include "AAFPersonnelExtension_i.c"
 
 
-#if defined( OS_MACOS )
+#if defined(_MAC)
 
 // Make sure we have defined IID_IUnknown and IID_IClassFactory.
 #include <initguid.h>
@@ -181,11 +167,11 @@ void pascal DllTerminationRoutine();
 
 
 #pragma export on
-#endif // #if defined( OS_MACOS )
+#endif // #if defined(_MAC)
 
 
 
-#if defined( OS_WINDOWS )
+#if defined(WIN32) || defined(_WIN32)
 // Include the entry point for the windows dll.
 /////////////////////////////////////////////////////////////////////////////
 // DLL Entry Point
@@ -207,7 +193,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 	return TRUE;    // ok
 }
 
-#endif  // OS_WINDOWS
+#endif
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -265,7 +251,7 @@ STDAPI AAFGetClassObjectID(ULONG index, CLSID *pClassID)
 
 
 
-#if defined( OS_MACOS )
+#if defined(_MAC)
 //
 //  DllGetVersion
 //
@@ -324,7 +310,7 @@ DllInitializationRoutine(CFragInitBlockPtr initBlkPtr)
 	__initialize(initBlkPtr);
 
 	// Initialize the inproc server object with a copy of the contents of the initBlkPtr.
-	g_AAFPluginServer.Init((HINSTANCE)&DllData.InitBlock);
+	g_AAFPluginServer.Init(AAFPluginObjectMap, (HINSTANCE)&DllData.InitBlock);
 
 	if (!DllData.Inited && DllData.InitBlock.fragLocator.where == kDataForkCFragLocator)
 	{
@@ -398,7 +384,7 @@ DllTerminationRoutine()
 
 
 #pragma export off
-#endif // #if defined(OS_MACOS)
+#endif // #if defined(_MAC)
 
 
 
@@ -446,7 +432,7 @@ HRESULT CAAFPluginServer::GetClassObject
   AAFPluginObjectInfo_t *pResult = NULL;
   for (aafUInt32 i = 0; i < GetClassCount(); ++i)
   {
-    if (!memcmp(&rclsid,AAFPluginObjectMap[i].pCLSID,sizeof(rclsid)))
+    if (rclsid == *AAFPluginObjectMap[i].pCLSID)
     {
       pResult = &AAFPluginObjectMap[i];
       break;
