@@ -150,6 +150,32 @@ void OMDiskRawStorage::read(OMByte* bytes,
   read(_file, bytes, byteCount, bytesRead);
 }
 
+  // @mfunc Attempt to read the number of bytes given by <p byteCount>
+  //        from offset <p position> in this <c OMDiskRawStorage>
+  //        into the buffer at address <p bytes>.
+  //        The actual number of bytes read is returned in <p bytesRead>.
+  //        Reading from positions greater than
+  //        <mf OMDiskRawStorage::size> causes <p bytesRead> to be less
+  //        than <p byteCount>. Reading bytes that have never been written
+  //        returns undefined data in <p bytes>.
+  //   @parm The position from which the bytes are to be read.
+  //   @parm The buffer into which the bytes are to be read.
+  //   @parm The number of bytes to read.
+  //   @parm The number of bytes actually read.
+  //   @this const
+void OMDiskRawStorage::readAt(OMUInt64 position,
+                              OMByte* bytes,
+                              OMUInt32 byteCount,
+                              OMUInt32& bytesRead) const
+{
+  TRACE("OMDiskRawStorage::readAt");
+  PRECONDITION("Readable", isReadable());
+  PRECONDITION("Readable", isPositionable());
+
+  setPosition(position);
+  read(bytes, byteCount, bytesRead);
+}
+
   // @mfunc Is it possible to write to this <c OMDiskRawStorage> ?
   //  @rdesc True if this <c OMDiskRawStorage> is writable, false otherwise.
   //  @this const
@@ -189,28 +215,55 @@ void OMDiskRawStorage::write(const OMByte* bytes,
   write(_file, bytes, byteCount, bytesWritten);
 }
 
+  // @mfunc Attempt to write the number of bytes given by <p byteCount>
+  //        to offset <p position> in this <c OMDiskRawStorage>
+  //        from the buffer at address <p bytes>.
+  //        The actual number of bytes written is returned in
+  //        <p bytesWritten>.
+  //        Writing to positions greater than
+  //        <mf OMDiskRawStorage::size> causes this <c OMDiskRawStorage>
+  //        to be extended, however such extension can fail, causing
+  //        <p bytesWritten> to be less than <p byteCount>.
+  //   @parm The position to which the bytes are to be written.
+  //   @parm The buffer from which the bytes are to be written.
+  //   @parm The number of bytes to write.
+  //   @parm The actual number of bytes written.
+void OMDiskRawStorage::writeAt(OMUInt64 position,
+                               const OMByte* bytes,
+                               OMUInt32 byteCount,
+                               OMUInt32& bytesWritten)
+{
+  TRACE("OMDiskRawStorage::writeAt");
+
+  PRECONDITION("Writable", isWritable());
+  PRECONDITION("Readable", isPositionable());
+
+  setPosition(position);
+  write(bytes, byteCount, bytesWritten);
+}
+
   // @mfunc May this <c OMDiskRawStorage> be changed in size ?
   //   @rdesc Always <e bool.true>.
   //   @this const
-bool OMDiskRawStorage::isSizeable(void) const
+bool OMDiskRawStorage::isExtendible(void) const
 {
-  TRACE("OMDiskRawStorage::isSizeable");
+  TRACE("OMDiskRawStorage::isExtendible");
 
   return true;
 }
 
-  // @mfunc The current size of this <c OMDiskRawStorage> in bytes.
-  //        precondition - isSizeable()
-  //   @rdesc The current size of this <c OMDiskRawStorage> in bytes.
+  // @mfunc The current extent of this <c OMDiskRawStorage> in bytes.
+  //        precondition - isPositionable()
+  //   @rdesc The current extent of this <c OMDiskRawStorage> in bytes.
   //   @this const
-OMUInt64 OMDiskRawStorage::size(void) const
+OMUInt64 OMDiskRawStorage::extent(void) const
 {
-  TRACE("OMDiskRawStorage::size");
+  TRACE("OMDiskRawStorage::extent");
 
-  PRECONDITION("Sizeable", isSizeable());
+  PRECONDITION("Positionable", isPositionable());
 
-  OMUInt64 result = size(_file);
-  return result;
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+  return 0;
 }
 
   // @mfunc Set the size of this <c OMDiskRawStorage> to <p newSize> bytes.
@@ -220,17 +273,31 @@ OMUInt64 OMDiskRawStorage::size(void) const
   //        <c OMDiskRawStorage> is truncated. Truncation may also result
   //        in the current position for <f read()> and <f write()>
   //        being set to <mf OMDiskRawStorage::size>.
-  //        precondition - isSizeable()
+  //        precondition - isExtendible()
   //   @parm The new size of this <c OMDiskRawStorage> in bytes.
   //   @devnote There is no ISO/ANSI way of truncating a file in place.
-void OMDiskRawStorage::setSize(OMUInt64 newSize)
+void OMDiskRawStorage::extend(OMUInt64 newSize)
 {
-  TRACE("OMDiskRawStorage::setSize");
+  TRACE("OMDiskRawStorage::extend");
 
-  PRECONDITION("Sizeable", isSizeable());
+  PRECONDITION("Extendible", isExtendible());
   PRECONDITION("Writable", isWritable());
 
   setSize(_file, newSize);
+}
+
+  // @mfunc The current size of this <c OMDiskRawStorage> in bytes.
+  //        precondition - isPositionable()
+  //   @rdesc The current size of this <c OMDiskRawStorage> in bytes.
+  //   @this const
+OMUInt64 OMDiskRawStorage::size(void) const
+{
+  TRACE("OMDiskRawStorage::size");
+
+  PRECONDITION("Positionable", isPositionable());
+
+  OMUInt64 result = size(_file);
+  return result;
 }
 
   // @mfunc May the current position, for <f read()> and <f write()>,
@@ -242,38 +309,6 @@ bool OMDiskRawStorage::isPositionable(void) const
   TRACE("OMDiskRawStorage::isPositionable");
 
   return true;
-}
-
-  // @mfunc The current position for <f read()> and <f write()>, as an
-  //        offset in bytes from the beginning of this
-  //        <c OMDiskRawStorage>.
-  //        precondition - isPositionable()
-  //   @rdesc The current position for <f read()> and <f write()>.
-  //   @this const
-OMUInt64 OMDiskRawStorage::position(void) const
-{
-  TRACE("OMDiskRawStorage::position");
-
-  PRECONDITION("Positionable", isPositionable());
-
-  OMUInt64 result = position(_file);
-  return result;
-}
-
-  // @mfunc Set the current position for <f read()> and <f write()>, as an
-  //        offset in bytes from the beginning of this
-  //        <c OMDiskRawStorage>.
-  //        precondition - isPositionable()
-  //   @parm The new position.
-  //   @devnote fseek takes a long int for offset this may not be sufficient
-  //            for 64-bit offsets.
-void OMDiskRawStorage::setPosition(OMUInt64 newPosition)
-{
-  TRACE("OMDiskRawStorage::setPosition");
-
-  PRECONDITION("Positionable", isPositionable());
-
-  setPosition(_file, newPosition);
 }
 
   // @mfunc Synchronize this <c OMDiskRawStorage> with its external
@@ -300,6 +335,39 @@ OMDiskRawStorage::OMDiskRawStorage(FILE* file,
   PRECONDITION("Valid mode", (_mode == OMFile::readOnlyMode)  ||
                              (_mode == OMFile::writeOnlyMode) ||
                              (_mode == OMFile::modifyMode));
+}
+
+  // @mfunc The current position for <f read()> and <f write()>, as an
+  //        offset in bytes from the beginning of this
+  //        <c OMDiskRawStorage>.
+  //        precondition - isPositionable()
+  //   @rdesc The current position for <f read()> and <f write()>.
+  //   @this const
+OMUInt64 OMDiskRawStorage::position(void) const
+{
+  TRACE("OMDiskRawStorage::position");
+
+  PRECONDITION("Positionable", isPositionable());
+
+  OMUInt64 result = position(_file);
+  return result;
+}
+
+  // @mfunc Set the current position for <f read()> and <f write()>, as an
+  //        offset in bytes from the beginning of this
+  //        <c OMDiskRawStorage>.
+  //        precondition - isPositionable()
+  //   @parm The new position.
+  //   @this const
+  //   @devnote fseek takes a long int for offset this may not be sufficient
+  //            for 64-bit offsets.
+void OMDiskRawStorage::setPosition(OMUInt64 newPosition) const
+{
+  TRACE("OMDiskRawStorage::setPosition");
+
+  PRECONDITION("Positionable", isPositionable());
+
+  setPosition(_file, newPosition);
 }
 
 void OMDiskRawStorage::read(FILE* file,
@@ -380,7 +448,7 @@ OMUInt64 OMDiskRawStorage::position(FILE* file) const
   return result;
 }
 
-void OMDiskRawStorage::setPosition(FILE* file, OMUInt64 newPosition)
+void OMDiskRawStorage::setPosition(FILE* file, OMUInt64 newPosition) const
 {
   TRACE("OMDiskRawStorage::setPosition");
 
