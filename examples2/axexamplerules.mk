@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: axexamplerules.mk,v 1.6 2004/05/05 16:04:37 stuart_hc Exp $ $Name:  $
+# $Id: axexamplerules.mk,v 1.7 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,8 +37,7 @@ endif
 include $(AAFBASE)/build/common.mk
 
 # Include directories
-INCLUDES = -I../../ref-impl/include \
-		-I../../ref-impl/include/ref-api \
+INCLUDES = -I$(AAFSDKINCLUDEDIR) \
 		-I../axLib
 
 BINTARGET = $(AAFSDKBINDIR)/$(PROGNAME)$(EXE)

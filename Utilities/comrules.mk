@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: comrules.mk,v 1.1 2004/11/22 12:59:50 stuart_hc Exp $ $Name:  $
+# $Id: comrules.mk,v 1.2 2005/03/07 16:55:59 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,7 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I../../ref-impl/include -I../../ref-impl/include/ref-api
+INCLUDES = -I$(AAFSDKINCLUDEDIR)
 
 
 BINTARGET = $(AAFSDKBINDIR)/$(UTILITY)$(EXE)

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2004/09/28 14:11:47 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2005/03/07 16:56:01 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,9 +32,10 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I../../../ref-impl/include \
-	   -I../../../ref-impl/include/ref-api \
-	   -I../../../ref-impl/include/com-api
+# utf8.h is temporarily included from ref-impl (once the code duplication
+# problem is solved this include will be removed).
+INCLUDES = -I$(AAFSDKINCLUDEDIR) \
+			-I../../../ref-impl/include
 
 
 .PHONY : all
