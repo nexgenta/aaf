@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.h,v 1.44.2.3 2004/06/16 19:00:53 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMob.h,v 1.44.2.4 2004/07/16 15:23:13 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,10 @@
 
 #ifndef __ImplAAFTimelineMobSlot_h__
 #include "ImplAAFTimelineMobSlot.h"
+#endif
+
+#ifndef __ImplAAFStaticMobSlot_h__
+#include "ImplAAFStaticMobSlot.h"
 #endif
 
 #ifndef __ImplAAFTaggedValue_h__

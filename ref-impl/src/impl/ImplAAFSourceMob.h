@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceMob.h,v 1.23.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceMob.h,v 1.23.2.2 2004/07/16 15:23:13 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -102,6 +102,16 @@ public:
 		 // @parm [in] Edit rate of the new slot
 		 const aafRational_t & editRate);
 
+ //****************
+ // AddStaticNilReference()
+ //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddStaticNilReference
+        (// @parm [in] SlotID to be assigned to the new slot
+		 aafSlotID_t  slotID,
+
+		 // @parm [in] Data kind of the new slot
+         ImplAAFDataDef * pDataDef);
 
   //****************
   // AppendTimecodeSlot()
