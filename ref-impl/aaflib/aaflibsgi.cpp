@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflibsgi.cpp,v 1.8 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: aaflibsgi.cpp,v 1.9 2004/03/24 00:47:16 creederickson Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -107,11 +107,19 @@ AAFRDLIRESULT AAFFindLibrary(
    // Default implementation will just continue to use a hard-coded list
 	// of shared libaries.
    
+#if defined( OS_DARWIN )
+   const char *pluginFileNames[] =  {
+		"libaafpgapi.dylib",
+		"libaafintp.dylib",
+      0
+   };
+#else
    const char *pluginFileNames[] =  {
 		"libaafpgapi.so",
 		"libaafintp.so",
       0
    };
+#endif
    
    AAFRDLIRESULT rc = AAFRESULT_SUCCESS;
    
