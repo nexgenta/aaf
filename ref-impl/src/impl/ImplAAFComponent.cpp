@@ -54,9 +54,14 @@ typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
 extern "C" const aafClassID_t CLSID_EnumAAFKLVData;
 
 ImplAAFComponent::ImplAAFComponent ():
-	_dataDef(	PID_Component_DataDefinition,	"DataDefinition", "/Dictionary/DataDefinitions", PID_DefinitionObject_Identification),
-	_length(	PID_Component_Length,	"Length"),
-	_KLVData(	PID_Component_KLVData, "KLVData")
+  _dataDef( PID_Component_DataDefinition,
+            L"DataDefinition", 
+            L"/Header/Dictionary/DataDefinitions",
+            PID_DefinitionObject_Identification),
+  _length( PID_Component_Length,
+           L"Length"),
+  _KLVData( PID_Component_KLVData,
+            L"KLVData")
 {
 	_persistentProperties.put(   _dataDef.address());
 	_persistentProperties.put(   _length.address());
@@ -230,7 +235,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceVectorIterator<ImplAAFKLVData>(_KLVData);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFKLVData, this, iter));
 	  *ppEnum = theEnum;
 	}
   XEXCEPT
@@ -309,6 +314,7 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 	{
 		*foundTransition = kAAFFalse;
 		*found = this;
+    AcquireReference(); // We are returning a reference so bump the reference count!
 		CHECK(GetLength(&tmpMinLen));
 		if (Int64Less(tmpMinLen, rootLen))
 		{
