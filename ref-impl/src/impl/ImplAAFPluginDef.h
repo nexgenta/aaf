@@ -1,44 +1,23 @@
 //@doc
 //@class    AAFPluginDescriptor | Implementation class for AAFPluginDescriptor
-#ifndef __ImplAAFPluginDef_h__
-#define __ImplAAFPluginDef_h__
+#ifndef __ImplAAFPluginDescriptor_h__
+#define __ImplAAFPluginDescriptor_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/************************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\************************************************/
 
-template <class T> 
-class ImplAAFEnumerator;
-class ImplAAFLocator;
-typedef ImplAAFEnumerator<ImplAAFLocator> ImplEnumAAFPluginLocators;
+class ImplAAFPluggableCode;
 
-#include "OMStrongRefProperty.h"
-#include "OMStrongRefVectorProperty.h"
-#include "OMWideStringProperty.h"
+class ImplEnumAAFPluginLocators;
+
+
 
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
@@ -47,27 +26,20 @@ typedef ImplAAFEnumerator<ImplAAFLocator> ImplEnumAAFPluginLocators;
 #include "ImplAAFLocator.h"
 #include "ImplAAFNetworkLocator.h"
 
-class ImplAAFPluginDef : public ImplAAFDefObject
+class ImplAAFPluginDescriptor : public ImplAAFDefObject
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFPluginDef ();
+  ImplAAFPluginDescriptor ();
 
 protected:
-  virtual ~ImplAAFPluginDef ();
+  virtual ~ImplAAFPluginDescriptor ();
 
 public:
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        // @parm [in] Pointer to an AUID reference
-        (const aafUID_t & pAuid,
-		 const aafCharacter * name,
-		 const aafCharacter * description);
+
 
   //****************
   // GetCategoryClass()
@@ -84,8 +56,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetCategoryClass
         // @parm [in] The Category Class
-        (const aafUID_t & categoryClass);
-
+        (aafUID_t *  pCategoryClass);
 
   //****************
   // GetPluginVersion()
@@ -93,16 +64,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPluginVersion
         // @parm [out] The Plugin Version
-        (aafVersionType_t *  pVersion);
-
-
-  //****************
-  // SetPluginVersion()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetPluginVersion
-        (aafVersionType_t *  pVersion);
-
+        (aafProductVersion_t *  pVersion);
 
   //****************
   // GetPluginVersionString()
@@ -110,20 +72,19 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPluginVersionString
         (// @parm [in,string] Plugin version string
-         aafCharacter *  pVersionString,
+         wchar_t *  pVersionString,
 
          // @parm [in] length of the buffer to hold plugin version string
-         aafUInt32  bufSize);
+         aafInt32  bufSize);
 
 
   //****************
   // GetProductVersionStringLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPluginVersionStringBufLen
+    GetProductVersionStringLen
         // @parm [out] Mob Name
-        (aafUInt32 *  pLen);
-
+        (aafInt32 *  pLen);
 
   //****************
   // SetPluginVersionString()
@@ -131,8 +92,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPluginVersionString
         // @parm [in, string] Plugin version
-        (const aafCharacter * pVersionString);
-
+        (wchar_t *  pVersionString);
 
   //****************
   // GetPluginManufacturerName()
@@ -140,20 +100,19 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPluginManufacturerName
         (// @parm [in,string] Plugin Manufacturer Name
-         aafCharacter *  pManufacturerName,
+         wchar_t *  pManufacturerName,
 
          // @parm [in] length of the buffer to hold plugin Manufacturer Name
-         aafUInt32  bufSize);
+         aafInt32  bufSize);
 
 
   //****************
-  // GetPluginManufacturerNameBufLen()
+  // GetProductManufacturerNameLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPluginManufacturerNameBufLen
+    GetProductManufacturerNameLen
         // @parm [out] Manufacturer Name
-        (aafUInt32 *  pLen);
-
+        (aafInt32 *  pLen);
 
   //****************
   // SetPluginManufacturerName()
@@ -161,8 +120,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPluginManufacturerName
         // @parm [in, string] Plugin Manufacturer
-        (const aafCharacter * pManufacturerName);
-
+        (wchar_t *  pManufacturerName);
 
   //****************
   // GetManufacturerInfo()
@@ -172,7 +130,6 @@ public:
         // @parm [out,retval] ManufacturerInfo property value
         (ImplAAFNetworkLocator ** ppResult);
 
-
   //****************
   // SetManufacturerInfo()
   //
@@ -180,7 +137,6 @@ public:
     SetManufacturerInfo
         // @parm [in] ManufacturerInfo property value
         (ImplAAFNetworkLocator * pManufacturerInfo);
-
 
   //****************
   // GetManufacturerID()
@@ -197,8 +153,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetManufacturerID
         // @parm [in] The Category Class
-        (const aafUID_t & manufacturerID);
-
+        (aafUID_t *  pManufacturerID);
 
   //****************
   // GetHardwarePlatform()
@@ -208,14 +163,13 @@ public:
         // @parm [out] The HardwarePlatform
         (aafHardwarePlatform_t *  pHardwarePlatform);
 
-
   //****************
   // SetHardwarePlatform()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetHardwarePlatform
         // @parm [in] The Category Class
-        (aafHardwarePlatform_constref  hardwarePlatform);
+        (aafHardwarePlatform_t  hardwarePlatform);
 
 
   //****************
@@ -224,11 +178,10 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPlatformVersionRange
         (// @parm [out] The Minimum Platform Version
-         aafVersionType_t *  pMinVersion,
+         aafProductVersion_t *  pMinVersion,
 
          // @parm [out] The Maximum Platform Version
-         aafVersionType_t *  pMaxVersion);
-
+         aafProductVersion_t *  pMaxVersion);
 
   //****************
   // SetPlatformMinimumVersion()
@@ -236,8 +189,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPlatformMinimumVersion
         // @parm [in] The Minimum Platform Version
-        (const aafVersionType_t & minVersion);
-
+        (aafProductVersion_t *  pMinVersion);
 
   //****************
   // SetPlatformMaximumVersion()
@@ -245,8 +197,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPlatformMaximumVersion
         // @parm [in] The Maximum Platform Version
-        (const aafVersionType_t & maxVersion);
-
+        (aafProductVersion_t *  pMaxVersion);
 
   //****************
   // GetEngine()
@@ -263,7 +214,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetEngine
         // @parm [in] The software engine
-        (aafEngine_constref engine);
+        (aafEngine_t  engine);
 
 
   //****************
@@ -272,10 +223,10 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetEngineVersionRange
         (// @parm [out] The Minimum Engine Version
-         aafVersionType_t *  pMinVersion,
+         aafProductVersion_t *  pMinVersion,
 
          // @parm [out] The Maximum Engine Version
-         aafVersionType_t *  pMaxVersion);
+         aafProductVersion_t *  pMaxVersion);
 
 
   //****************
@@ -284,7 +235,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetEngineMinimumVersion
         // @parm [in] The Minimum Engine Version
-        (const aafVersionType_t & minVersion);
+        (aafProductVersion_t *  pMinVersion);
 
 
   //****************
@@ -293,7 +244,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetEngineMaximumVersion
         // @parm [in] The Minimum Engine Version
-        (const aafVersionType_t & maxVersion);
+        (aafProductVersion_t *  pMaxVersion);
 
 
   //****************
@@ -311,7 +262,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPluginAPI
         // @parm [in] The Category Class
-        (aafPluginAPI_constref  pluginAPI);
+        (aafPluginAPI_t  pluginAPI);
 
 
   //****************
@@ -320,10 +271,10 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPluginAPIVersionRange
         (// @parm [out] The Minimum Plugin API Version
-         aafVersionType_t *  pMinVersion,
+         aafProductVersion_t *  pMinVersion,
 
          // @parm [out] The Maximum Plugin API Version
-         aafVersionType_t *  pMaxVersion);
+         aafProductVersion_t *  pMaxVersion);
 
 
   //****************
@@ -332,8 +283,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPluginAPIMinimumVersion
         // @parm [out] The Minimum Plugin API Version
-        (const aafVersionType_t & minVersion);
-
+        (aafProductVersion_t *  pMinVersion);
 
   //****************
   // SetPluginAPIMaximumVersion()
@@ -341,8 +291,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPluginAPIMaximumVersion
         // @parm [in] The Maximum Plugin API Version
-        (const aafVersionType_t & maxVersion);
-
+        (aafProductVersion_t *  pMaxVersion);
 
   //****************
   // IsSoftwareOnly()
@@ -383,7 +332,6 @@ public:
         // @parm [in] The isAccelerated flag
         (aafBool  isAccelerated);
 
-
   //****************
   // SupportsAuthentication()
   //
@@ -401,12 +349,19 @@ public:
         // @parm [in] The SupportsAuthentication flag
         (aafBool  SupportsAuthentication);
 
-
   //****************
-  // CountLocators()
+  // GetPluggableCode()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountLocators
+    GetPluggableCode
+        // @parm [out] An interface pointer to the pluggable code object
+        (ImplAAFPluggableCode ** pCode);
+
+  //****************
+  // GetNumLocators()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetNumLocators
         // @parm [out] Returns the number of locators
         (aafUInt32 *  pCount);
 
@@ -430,38 +385,12 @@ public:
 
 
   //****************
-  // InsertLocatorAt()
+  // IsPluginLocal()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    InsertLocatorAt
-        // @parm [in] index to place new locator
-        (aafUInt32 index,
-
-        // @parm [in] Locator to insert
-		ImplAAFLocator * pLocator);
-
-
-  //****************
-  // GetLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetLocatorAt
-        // @parm [in] index to place new locator
-        (aafUInt32 index,
-
-        // @parm [out, retval] returned Locator
-		ImplAAFLocator ** ppLocator);
-
-
-  //****************
-  // RemoveLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveLocatorAt
-        // @parm [in] index of locator to remove
-        (aafUInt32 index);
-
-
+    IsPluginLocal
+        // @parm [out] Returns AAFTrue if the plugin is local
+        (aafBool *  pIsLocal);
 
   //****************
   // GetPluginDescriptorID()
@@ -482,58 +411,54 @@ public:
   
 
   //****************
-  // GetLocators()
+  // EnumPluginLocators()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetLocators
+    EnumPluginLocators
         // @parm [out, retval] Plugin Locator Enumeration
         (ImplEnumAAFPluginLocators ** ppEnum);
 
-  //****************
-  // SetDefinitionObject()
+
+
+
+
+public:
+  // Declare this class to be storable.
   //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetDefinitionObjectID
-        (aafUID_t def);  //@parm [in] Def of this object
+  OMDECLARE_STORABLE(ImplAAFPluginDescriptor)
 
-
-  //****************
-  // GetDataDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-   GetDefinitionObjectID
-        (aafUID_t *pDef);  //@parm [retval][out] Def of this object
-
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFPluginDescriptorTest.cpp.
+  static AAFRESULT test();
 
 public:
 	virtual AAFRESULT
 		GetNthLocator (aafInt32 index, ImplAAFLocator **ppLocator);
-  //	virtual AAFRESULT
-  //		 GetNumLocators (aafInt32 *  pCount);
+	virtual AAFRESULT
+		 GetNumLocators (aafInt32 *  pCount);
 
 private:
 	OMFixedSizeProperty<aafUID_t>					_categoryClass;
-	OMFixedSizeProperty<aafVersionType_t>			_pluginVersion;
+  // StructuredProperty<aafProductVersion_t>		_pluginVersion;
 	OMWideStringProperty                            _pluginVersionString;
 	OMWideStringProperty                            _pluginManufacturerName;
 	OMStrongReferenceProperty<ImplAAFNetworkLocator> _manufacturerURL;
 	OMFixedSizeProperty<aafUID_t>					_pluginManufacturerID;
 	OMFixedSizeProperty<aafUID_t>					_platform;
-	OMFixedSizeProperty<aafVersionType_t>			_minPlatformVersion;
-	OMFixedSizeProperty<aafVersionType_t>			_maxPlatformVersion;
+  // StructuredProperty<aafProductVersion_t>		_minPlatformVersion;
+  // StructuredProperty<aafProductVersion_t>		_maxPlatformVersion;
 	OMFixedSizeProperty<aafUID_t>					_engine;
-	OMFixedSizeProperty<aafVersionType_t>			_minEngineVersion;
-	OMFixedSizeProperty<aafVersionType_t>			_maxEngineVersion;
+  // StructuredProperty<aafProductVersion_t>		_minEngineVersion;
+  // StructuredProperty<aafProductVersion_t>		_maxEngineVersion;
 	OMFixedSizeProperty<aafUID_t>					_pluginAPI;
-	OMFixedSizeProperty<aafVersionType_t>			_minPluginAPIVersion;
-	OMFixedSizeProperty<aafVersionType_t>			_maxPluginAPIVersion;
+  // StructuredProperty<aafProductVersion_t>		_minPluginAPIVersion;
+  // StructuredProperty<aafProductVersion_t>		_maxPluginAPIVersion;
 	OMFixedSizeProperty<aafBool>					_softwareOnly;
 	OMFixedSizeProperty<aafBool>					_accelerator;
     OMStrongReferenceVectorProperty<ImplAAFLocator> _locators;
 	OMFixedSizeProperty<aafBool>					_authentication;
-	OMFixedSizeProperty<aafUID_t>					_defObj;
 };
 
-#endif // ! __ImplAAFPluginDef_h__
+#endif // ! __ImplAAFPluginDescriptor_h__
 
 
