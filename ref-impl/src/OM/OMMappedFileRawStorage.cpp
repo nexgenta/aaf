@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMMappedFileRawStorage
@@ -128,17 +123,18 @@ void OMMappedFileRawStorage::read(OMByte* /* bytes */,
 }
 
   // @mfunc Attempt to read the number of bytes given by <p byteCount>
-  //        from the current position in this <c OMMappedFileRawStorage>
+  //        from offset <p position> in this <c OMMappedFileRawStorage>
   //        into the buffer at address <p bytes>.
   //        The actual number of bytes read is returned in <p bytesRead>.
   //        Reading from positions greater than
   //        <mf OMMappedFileRawStorage::size> causes <p bytesRead> to be less
   //        than <p byteCount>. Reading bytes that have never been written
   //        returns undefined data in <p bytes>.
-  //   @parm TBS
-  //   @parm The buffer into which the bytes are to be read.
-  //   @parm The number of bytes to read.
-  //   @parm The number of bytes actually read.
+  //   @parm OMUInt64 | position | The position from which the bytes are
+  //         to be read.
+  //   @parm OMByte* | bytes | The buffer into which the bytes are to be read.
+  //   @parm OMUInt32 | byteCount | The number of bytes to read.
+  //   @parm OMUInt32& | bytesRead | The number of bytes actually read.
   //   @this const
 void OMMappedFileRawStorage::readAt(OMUInt64 /* position */,
                                     OMByte* /* bytes */,
@@ -187,24 +183,53 @@ void OMMappedFileRawStorage::write(const OMByte* /* bytes */,
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
+  // @mfunc Attempt to write the number of bytes given by <p byteCount>
+  //        to offset <p position> in this <c OMMappedFileRawStorage>
+  //        from the buffer at address <p bytes>.
+  //        The actual number of bytes written is returned in
+  //        <p bytesWritten>.
+  //        Writing to positions greater than
+  //        <mf OMMappedFileRawStorage::size> causes this
+  //        <c OMMappedFileRawStorage> to be extended, however such
+  //        extension can fail, causing <p bytesWritten> to be less
+  //        than <p byteCount>.
+  //   @parm OMUInt64 | position | The position to which the bytes are
+  //         to be written.
+  //   @parm OMByte* | bytes | The buffer from which the bytes are to be
+  //         written.
+  //   @parm OMUInt32 | byteCount | The number of bytes to write.
+  //   @parm OMUInt32& | bytesWritten | The actual number of bytes written.
+void OMMappedFileRawStorage::writeAt(OMUInt64 /* position */,
+                                     const OMByte* /* bytes */,
+                                     OMUInt32 /* byteCount */,
+                                     OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMMappedFileRawStorage::writeAt");
+
+  PRECONDITION("Writable", isWritable());
+  PRECONDITION("Readable", isPositionable());
+
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+}
+
   // @mfunc May this <c OMMappedFileRawStorage> be changed in size ?
   //   @rdesc Always <e bool.true>.
   //   @this const
-bool OMMappedFileRawStorage::isSizeable(void) const
+bool OMMappedFileRawStorage::isExtendible(void) const
 {
-  TRACE("OMMappedFileRawStorage::isSizeable");
+  TRACE("OMMappedFileRawStorage::isExtendible");
 
   ASSERT("Unimplemented code not reached", false); // tjb TBS
   return false;
 }
 
-  // @mfunc The current size of this <c OMMappedFileRawStorage> in bytes.
-  //        precondition - isSizeable()
-  //   @rdesc The current size of this <c OMMappedFileRawStorage> in bytes.
+  // @mfunc The current extent of this <c OMMappedFileRawStorage> in bytes.
+  //        precondition - isPositionable()
+  //   @rdesc The current extent of this <c OMMappedFileRawStorage> in bytes.
   //   @this const
-OMUInt64 OMMappedFileRawStorage::size(void) const
+OMUInt64 OMMappedFileRawStorage::extent(void) const
 {
-  TRACE("OMMappedFileRawStorage::size");
+  TRACE("OMMappedFileRawStorage::extent");
 
   ASSERT("Unimplemented code not reached", false); // tjb TBS
   return 0;
@@ -219,14 +244,25 @@ OMUInt64 OMMappedFileRawStorage::size(void) const
   //        Truncation may also result in the current position for
   //        <f read()> and <f write()> being set to
   //        <mf OMMappedFileRawStorage::size>.
-  //        precondition - isSizeable()
+  //        precondition - isExtendible()
   //   @parm The new size of this <c OMMappedFileRawStorage> in bytes.
-  //   @devnote There is no ISO/ANSI way of truncating a file in place.
-void OMMappedFileRawStorage::setSize(OMUInt64 /* newSize */)
+void OMMappedFileRawStorage::extend(OMUInt64 /* newSize */)
 {
-  TRACE("OMMappedFileRawStorage::setSize");
+  TRACE("OMMappedFileRawStorage::extend");
 
   ASSERT("Unimplemented code not reached", false); // tjb TBS
+}
+
+  // @mfunc The current size of this <c OMMappedFileRawStorage> in bytes.
+  //        precondition - isPositionable()
+  //   @rdesc The current size of this <c OMMappedFileRawStorage> in bytes.
+  //   @this const
+OMUInt64 OMMappedFileRawStorage::size(void) const
+{
+  TRACE("OMMappedFileRawStorage::size");
+
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+  return 0;
 }
 
   // @mfunc May the current position, for <f read()> and <f write()>,
@@ -239,6 +275,15 @@ bool OMMappedFileRawStorage::isPositionable(void) const
 
   ASSERT("Unimplemented code not reached", false); // tjb TBS
   return false;
+}
+
+  // @mfunc Synchronize this <c OMMappedFileRawStorage> with its external
+  //        representation.
+void OMMappedFileRawStorage::synchronize(void)
+{
+  TRACE("OMMappedFileRawStorage::synchronize");
+
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
   // @mfunc The current position for <f read()> and <f write()>, as an
@@ -260,20 +305,10 @@ OMUInt64 OMMappedFileRawStorage::position(void) const
   //        <c OMMappedFileRawStorage>.
   //        precondition - isPositionable()
   //   @parm The new position.
-  //   @devnote fseek takes a long int for offset this may not be sufficient
-  //            for 64-bit offsets.
-void OMMappedFileRawStorage::setPosition(OMUInt64 /* newPosition */)
+  //   @this const
+void OMMappedFileRawStorage::setPosition(OMUInt64 /* newPosition */) const
 {
   TRACE("OMMappedFileRawStorage::setPosition");
-
-  ASSERT("Unimplemented code not reached", false); // tjb TBS
-}
-
-  // @mfunc Synchronize this <c OMMappedFileRawStorage> with its external
-  //        representation.
-void OMMappedFileRawStorage::synchronize(void)
-{
-  TRACE("OMMappedFileRawStorage::synchronize");
 
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
