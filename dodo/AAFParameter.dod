@@ -7,62 +7,142 @@ AAFObject\
 #endm
 #c
 AD_HEAD
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
+AD_IDL(//
+// The IAAFParameter interface is implemented by objects that specify an
+// Instantiation of an operation parameter.  It is an abstract class\, so you should use
+// AAFConstantValue or AAFVaryingValue.
+//
+// In addition to the specific error results listed for each method\,
+// all methods in this interface may also return one of the following
+// values:
+// 
+// AAFRESULT_NOMEMORY
+//   - insufficient system memory is available to perform the
+//     operation.
+//)
 
 /***********************************************\
-*	Stub only.   Implementation not yet added	*
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
 \***********************************************/
 
-
 AD_INCLUDE(AAFTypes)
-AD_FORWARD_DECLARATION(AAFDataDef)
+AD_FORWARD_DECLARATION(AAFParameterDef)
+AD_FORWARD_DECLARATION(AAFTypeDef)
 
 AD_CLASS_UUID(9c568a82, 2096, 11d2, bf, 98, 00, 60, 97, 11, 62, 1) 
 
 AD_DEFAULT_UUID(9c568a81, 2096, 11d2, bf, 98, 00, 60, 97, 11, 62, 12)
 AD_XCLASS_BEGIN(Abstract, StoredObject)
 
-AD_METHOD1(SetLength,
+AD_XMETHOD1(SetParameterDefinition,
 		   [in],
-		   aafLength_t,
-		   length,
-		   Length of this object,
-		   sets the length property values on the input component object.)
+		   objIn,
+		   AAFParameterDef,
+		   pParmDef,
+		   New parameter definition,
+			Sets the parameter definition property value on the input component object.
+  // The length of an operation parameter is in the same edit units and has the
+  // same value as the IAAFOperationGroup enclosing this parameter.
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\) )
 
-AD_METHOD1(GetLength,
-		   [out\\\,retval],
-		   aafLength_t *,
-		   length,
-		   Length of this component,
-		   Gets the starting time and places it into the pStartTime
-		   // argument.  This function returns the length of a component.  It
-		   // supports both 1.x and 2.x component objects.  Length is not
-		   // stored as an implicit property on 1.x objects\\\, so this routine
-		   // recursively calculates the length.)
+
+AD_XMETHOD1(GetParameterDefinition,
+		   [out\,retval],
+		   objOut,
+		   AAFParameterDef,
+		   ppParmDef,
+		   New parameter definition,
+			Places the parameter definition of the operation parameter into the
+  // *ppParmDef argument.  The length of an operation parameter is in the same
+  // edit units and has the same value as the IAAFOperationGroup enclosing this parameter.
+  //
+  // Succeeds if all of the following are true:
+  // - the ppParmDef pointer is valid.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppParmDef is null.)
 	
-AD_XMETHOD1(SetDataDef,
+
+AD_XMETHOD1(SetTypeDefinition,
 			[in],
 			objIn,
-			AAFDataDef,
-			datadef,
-			Data Definition of this object,
-			sets the DataDef property values on the input component object.)
+			AAFTypeDef,
+			pTypeDef,
+			Type Definition of the data value inside of this object,
+			Sets the IAAFTypeDefinition of the data value inside this parameter to be the given one.
+  // The data value is the value of the parameter.  It is often an integer
+  // or rational\, and may change over time.  An example of a value would be the \"level\" parameter
+  // of a video dissolve\, which has control points with a value of zero \(0 percent B material\) at the
+  // start\, to one \(100 percent B material\) at the end.  The data value will actually be stored
+  // in either AAFConstantValue or one of the AAFControlPoints inside of an AAFVaryingValue.
+  //
+  // Succeeds if all of the following are true:
+  // - the pTypeDef pointer is valid.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pTypeDef is null.)
 
-AD_XMETHOD1(GetDataDef,
+AD_XMETHOD1(GetTypeDefinition,
 			[out\,retval],
 			objOut,
-			AAFDataDef,
-			datadef,
-			Data Definition of this object,
-			returns DataDef definition object)
+			AAFTypeDef,
+			ppTypeDef,
+			Type Definition of the data value inside of this object,
+			Places the IAAFTypeDefinition of the data value inside this parameter into the
+  // *ppTypeDef argument.  The data value is the value of the parameter.  It is often an integer
+  // or rational\, and may change over time.  An example of a value would be the \"level\" parameter
+  // of a video dissolve\, which has control points with a value of zero \(0 percent B material\) at the
+  // start\, to one \(100 percent B material\) at the end.  The data value will actually be stored
+  // in either AAFConstantValue or one of the AAFControlPoints inside of an AAFVaryingValue.
+  //
+  // The definition is stored in the base class because it should be constant
+  // for all control points inside of a varying value.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppTypeDef is null.)
+
 
 AD_XCLASS_END(Abstract, StoredObject)
 
