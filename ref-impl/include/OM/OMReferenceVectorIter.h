@@ -39,7 +39,8 @@ class OMReferenceVector;
 // @class Iterators over <c OMReferenceVector>s.
 //   @tcarg class | ReferencedObject | The type of the contained objects.
 template <typename ReferencedObject>
-class OMReferenceVectorIterator : public OMReferenceContainerIterator {
+class OMReferenceVectorIterator :
+                        public OMReferenceContainerIterator<ReferencedObject> {
 public:
   // @access Public members.
 
@@ -61,7 +62,7 @@ public:
                              OMIteratorPosition initialPosition = OMBefore);
 
     // @cmember Create a copy of this <c OMReferenceVectorIterator>.
-  virtual OMReferenceContainerIterator* copy(void) const;
+  virtual OMReferenceContainerIterator<ReferencedObject>* copy(void) const;
 
     // @cmember Destroy this <c OMReferenceVectorIterator>.
   virtual ~OMReferenceVectorIterator(void);
@@ -78,15 +79,15 @@ public:
     //          <c OMReferenceVectorIterator> is made ready to traverse
     //          the associated <c OMReferenceVector> in the
     //          reverse direction (decreasing indexes).
-  virtual void reset(OMIteratorPosition initialPosition = OMBefore);
+   virtual void reset(OMIteratorPosition initialPosition = OMBefore);
 
     // @cmember Is this <c OMReferenceVectorIterator> positioned before
     //          the first <p ReferencedObject> ?
-  virtual bool before(void) const;
+   virtual bool before(void) const;
 
     // @cmember Is this <c OMReferenceVectorIterator> positioned after
     //          the last <p ReferencedObject> ?
-  virtual bool after(void) const;
+   virtual bool after(void) const;
 
     // @cmember Is this <c OMReferenceVectorIterator> validly
     //          positioned on a <p ReferencedObject> ?
@@ -110,7 +111,7 @@ public:
     //          becomes <e bool.false> and
     //          <mf OMReferenceVectorIterator::after> becomes
     //          <e bool.true>. 
-  virtual bool operator++();
+   virtual bool operator++();
 
     // @cmember Retreat this <c OMReferenceVectorIterator> to the
     //          previous <p ReferencedObject>, if any.
@@ -126,30 +127,25 @@ public:
     //          becomes <e bool.false> and
     //          <mf OMReferenceVectorIterator::before> becomes
     //          <e bool.true>. 
-  virtual bool operator--();
+   virtual bool operator--();
 
     // @cmember Return the <p ReferencedObject> in the associated
     //          <c OMReferenceVector> at the position currently
     //          designated by this <c OMReferenceVectorIterator>.
-  virtual ReferencedObject* value(void) const;
+   virtual ReferencedObject* value(void) const;
 
     // @cmember Set the <p ReferencedObject> in the associated
     //          <c OMReferenceVector> at the position currently
     //          designated by this <c OMReferenceVectorIterator> to
     //          <p newObject>. The previous <p ReferencedObject>, if any,
     //          is returned.
-  virtual ReferencedObject* setValue(const ReferencedObject* newObject);
-
-    // @cmember Return the <p OMObject> in the associated
-    //          reference container at the position currently
-    //          designated by this <c OMReferenceVectorIterator>.
-  virtual OMObject* currentObject(void) const;
+   virtual ReferencedObject* setValue(const ReferencedObject* newObject);
 
     // @cmember Return the index of the <p ReferencedObject> in the
     //          associated <c OMReferenceVector> at the position
     //          currently designated by this
     //          <c OMReferenceVectorIterator>.
-  virtual size_t index(void) const;
+   virtual size_t index(void) const;
 
 protected:
 
