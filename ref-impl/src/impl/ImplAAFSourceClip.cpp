@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -47,10 +47,6 @@
 #include "AAFDefUIDs.h"
 #include "ImplAAFHeader.h"
 
-#include "ImplAAFSmartPointer.h"
-typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
-typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
-
 ImplAAFSourceClip::ImplAAFSourceClip ():
 	_fadeInLength(		PID_SourceClip_FadeInLength,		"FadeInLength"),
 	_fadeInType(	PID_SourceClip_FadeInType,		"FadeInType"),
@@ -72,26 +68,32 @@ ImplAAFSourceClip::~ImplAAFSourceClip ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceClip::Initialize(ImplAAFDataDef *       pDataDef,
-								  const aafLength_t &    length,
-								  const aafSourceRef_t & sourceRef)
+    ImplAAFSourceClip::Initialize(aafUID_t*		pDatadef,
+								  aafLength_t*	pLength,
+								  aafSourceRef_t	sourceRef)
 {
-  if (! pDataDef)
-	return AAFRESULT_NULL_PARAM;
+    AAFRESULT aafError = AAFRESULT_SUCCESS;
+	if (pDatadef == NULL ||
+		pLength == NULL)
+	{
+		aafError = AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+		SetDataDef( pDatadef );
+		SetLength( pLength );
+		SetSourceID( sourceRef.sourceID );
+		SetSourceMobSlotID( sourceRef.sourceSlotID );
+		_startTime = sourceRef.startTime;
 
-  SetDataDef( pDataDef );
-  SetLength( length );
-  SetSourceID( sourceRef.sourceID );
-  SetSourceMobSlotID( sourceRef.sourceSlotID );
-  _startTime = sourceRef.startTime;
-
-  _fadeInLength		= 0;
-  _fadeInType		= kAAFFadeNone;
+		_fadeInLength		= 0;
+		_fadeInType		= kFadeNone;
 	
-  _fadeOutLength		= 0;
-  _fadeOutType	= kAAFFadeNone;
+		_fadeOutLength		= 0;
+		_fadeOutType	= kFadeNone;
+}
 
-  return AAFRESULT_SUCCESS;
+	return aafError;
 }
 
 
@@ -132,22 +134,22 @@ AAFRESULT STDMETHODCALLTYPE
 		*fadeInType		= _fadeInType;
 		if (_fadeInLength > 0)
 		{
-			*fadeInPresent	= kAAFTrue;
+			*fadeInPresent	= AAFTrue;
 		}
 		else
 		{
-			*fadeInPresent = kAAFFalse;
+			*fadeInPresent = AAFFalse;
 		}
 
 		*fadeOutLen		= _fadeOutLength;
 		*fadeOutType	= _fadeOutType;
 		if (_fadeOutLength > 0)
 		{
-			*fadeOutPresent	= kAAFTrue;
+			*fadeOutPresent	= AAFTrue;
 		}
 		else
 		{
-			*fadeOutPresent = kAAFFalse;
+			*fadeOutPresent = AAFFalse;
 		}
 	}
 
@@ -195,7 +197,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 		CHECK(GetSourceReference(&sourceRef));
 		CHECK(MyHeadObject(&head));
-		CHECK(head->LookupMob(sourceRef.sourceID, mob));
+		CHECK(head->LookupMob(&sourceRef.sourceID, mob));
 
 		head->ReleaseReference();
 		head = NULL;
@@ -233,7 +235,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSourceClip::GetSourceReference (aafSourceRef_t*	pSourceRef)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
-	aafMobID_t	sourceID;
+	aafUID_t	sourceID;
 	aafSlotID_t slotID;
 
 	XPROTECT()
@@ -292,10 +294,19 @@ AAFRESULT STDMETHODCALLTYPE
     aafInt32	tmp1xSourcePosition = 0;
 	aafInt16	tmp1xTrackNum = 0;
 	AAFRESULT   aafError = AAFRESULT_SUCCESS;
-  static const aafMobID_t nullMobID = {0};
 	
-	/* If MobID is NUL - make the rest of the fields 0 too. */
-	if(memcmp(&sourceRef.sourceID, &nullMobID, sizeof(sourceRef.sourceID)) == 0)
+	/* If UID is NUL - make the rest of the fields 0 too. */
+	if( (sourceRef.sourceID.Data1 == NilMOBID.Data1) && 
+		(sourceRef.sourceID.Data2 == NilMOBID.Data2) &&
+		(sourceRef.sourceID.Data3 == NilMOBID.Data3) &&
+		(sourceRef.sourceID.Data4[0] == NilMOBID.Data4[0]) &&
+		(sourceRef.sourceID.Data4[1] == NilMOBID.Data4[1]) &&
+		(sourceRef.sourceID.Data4[2] == NilMOBID.Data4[2]) &&
+		(sourceRef.sourceID.Data4[3] == NilMOBID.Data4[3]) &&
+		(sourceRef.sourceID.Data4[4] == NilMOBID.Data4[4]) &&
+		(sourceRef.sourceID.Data4[5] == NilMOBID.Data4[5]) &&
+		(sourceRef.sourceID.Data4[6] == NilMOBID.Data4[6]) &&
+		(sourceRef.sourceID.Data4[7] == NilMOBID.Data4[7]) 	)
 	{
 		sourceRef.sourceSlotID = 0;
 		CvtInt32toPosition(0, sourceRef.startTime);	
@@ -335,3 +346,6 @@ AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 	
 	return(AAFRESULT_SUCCESS);
 }
+
+
+

@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFPluginDescriptor
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAF.h"
@@ -132,9 +150,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*	pDictionary = NULL;
   IAAFDefObject*	pPlugDef = NULL;
   IAAFCodecDef*		pCodecDef = NULL;
-  IAAFPluginDescriptor *pDesc;
-  IAAFNetworkLocator *pNetLoc, *pNetLoc2, *pNetLoc3;
-  IAAFLocator		*pLoc, *pLoc2, *pLoc3;
+  IAAFPluginDescriptor *pDesc = NULL;
+  IAAFNetworkLocator *pNetLoc = NULL, *pNetLoc2 = NULL, *pNetLoc3 = NULL;
+  IAAFLocator		*pLoc = NULL, *pLoc2 = NULL, *pLoc3 = NULL;
   aafUID_t			category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
   bool				bFileOpen = false;
   aafUID_t			uid;
@@ -229,8 +247,32 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
   // Cleanup and return
+  if (pDesc)
+    pDesc->Release();
+
   if (pPlugDef)
     pPlugDef->Release();
+
+  if (pNetLoc)
+    pNetLoc->Release();
+
+  if (pNetLoc2)
+    pNetLoc2->Release();
+
+  if (pNetLoc3)
+    pNetLoc3->Release();
+
+  if (pLoc)
+    pLoc->Release();
+
+  if (pLoc2)
+    pLoc2->Release();
+
+  if (pLoc3)
+    pLoc3->Release();
+
+  if (pCodecDef)
+    pCodecDef->Release();
 
   if (pDictionary)
     pDictionary->Release();
@@ -309,6 +351,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
                                           (void **)&pLoc));
 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		pNetLoc->Release();
+		pNetLoc = NULL;
+		pLoc->Release();
+		pLoc = NULL;
 		checkExpression (wcscmp(testString, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
 		checkResult(pPlugin->GetManufacturerID(&testUID));
 		checkExpression(EqualAUID(&testUID, &manufacturer) == AAFTrue, AAFRESULT_TEST_FAILED);
@@ -339,8 +385,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkExpression (count == 2, AAFRESULT_TEST_FAILED);
 		checkResult(pPlugin->EnumPluginLocators(&pEnumLoc));
 
-		pLoc->Release(); // this local variable was already has a reference that must be released!
-		pLoc = NULL;
 		checkResult(pEnumLoc->NextOne (&pLoc));
  		checkResult(pLoc->GetPath (testString, sizeof(testString)));
 		checkExpression (wcscmp(testString, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
@@ -366,6 +410,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	// Cleanup and return
 	if (pEnumLoc)
 		pEnumLoc->Release();
+
+	if (pEnumPluggable)
+		pEnumPluggable->Release();
 
 	if (pLoc)
 		pLoc->Release();
@@ -419,13 +466,13 @@ extern "C" HRESULT CAAFPluginDescriptor_test()
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
-	if (SUCCEEDED(hr))
-	{
-		cout << "The following IAAFPluginDescriptor methods have not been implemented:" << endl;       
-		cout << "     GetPluggableCode" << endl; 
-		cout << "     IsPluginLocal" << endl; 
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-	}
+//	if (SUCCEEDED(hr))
+//	{
+//		cout << "The following IAAFPluginDescriptor methods have not been implemented:" << endl;       
+//		cout << "     GetPluggableCode" << endl; 
+//		cout << "     IsPluginLocal" << endl; 
+//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+//	}
 
 	return hr;
 }
