@@ -248,37 +248,6 @@ size_t OMWeakReferenceVectorProperty<ReferencedObject>::count(void) const
   return _vector.count();
 }
 
-  // @mfunc Get the size of this <c OMWeakReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @parm The size of this <c OMWeakReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-void OMWeakReferenceVectorProperty<ReferencedObject>::getSize(
-                                                            size_t& size) const
-{
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMWeakReferenceVectorProperty<ReferencedObject>::count");
-
-  size = count();
-}
-
-  // @mfunc Get the size of this <c OMWeakReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @rdesc The size of this <c OMWeakReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-size_t OMWeakReferenceVectorProperty<ReferencedObject>::getSize(void) const
-{
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMWeakReferenceVectorProperty<ReferencedObject>::count");
-
-  return count();
-}
-
   // @mfunc Set the value of this <c OMWeakReferenceVectorProperty>
   //        at position <p index> to <p object>.
   //   @tcarg class | ReferencedObject | The type of the referenced
@@ -296,7 +265,7 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt");
 
-  PRECONDITION("Valid index", index <= count());
+  PRECONDITION("Valid index", index < count());
   PRECONDITION("Valid object", object != 0);
 #if defined(OM_VALIDATE_WEAK_REFERENCES)
   PRECONDITION("Source container object attached to file",
@@ -305,12 +274,6 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
   PRECONDITION("Source container object and target object in same file",
                                         container()->file() == object->file());
 #endif
-  if (index == count()) {
-    // This is an append, make sure the new element is defined.
-    OMUniqueObjectIdentification key = object->identification();
-    VectorElement newElement(this, key, _targetTag);
-    _vector.append(newElement);
-  }
 
   // Set the vector to contain the new object
   //
@@ -440,7 +403,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::appendValue(
 
   PRECONDITION("Valid object", object != 0);
 
-  setValueAt(object, count());
+  insertAt(object, count());
 
 }
 
@@ -868,12 +831,16 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::setBits(
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  size_t count = size / sizeof(ReferencedObject*);
+  size_t elementCount = size / sizeof(ReferencedObject*);
   ReferencedObject** p = (ReferencedObject**)bits;
 
-  for (size_t i = 0; i < count; i++) {
+  for (size_t i = 0; i < elementCount; i++) {
     ReferencedObject* object = p[i];
-    setValueAt(object, i);
+    if (i < count()) {
+      setValueAt(object, i);
+    } else {
+      appendValue(object);
+    }
   }
 
 }
