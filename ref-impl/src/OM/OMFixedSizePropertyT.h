@@ -26,10 +26,12 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMFixedSizeProperty
 #ifndef OMFIXEDSIZEPROPERTYT_H
 #define OMFIXEDSIZEPROPERTYT_H
 
 #include "OMAssertions.h"
+#include "OMStoredObject.h"
 
 template <typename PropertyType>
 OMFixedSizeProperty<PropertyType>::OMFixedSizeProperty(
@@ -144,7 +146,8 @@ void OMFixedSizeProperty<PropertyType>::restore(size_t externalSize)
 {
   TRACE("OMFixedSizeProperty<PropertyType>::restore");
 
-  read(externalSize);
+  store()->restore(*this, externalSize);
+  setPresent();
 }
 
 #endif

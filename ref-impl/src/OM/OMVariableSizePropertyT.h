@@ -26,12 +26,14 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMVariableSizeProperty
 #ifndef OMVARIABLESIZEPROPERTYT_H
 #define OMVARIABLESIZEPROPERTYT_H
 
 #include "OMAssertions.h"
 #include "OMPropertySet.h"
 #include "OMStorable.h"
+#include "OMStoredObject.h"
 
 template <typename PropertyType>
 OMVariableSizeProperty<PropertyType>::OMVariableSizeProperty(
@@ -263,7 +265,11 @@ void OMVariableSizeProperty<PropertyType>::restore(size_t externalSize)
 {
   TRACE("OMVariableSizeProperty<PropertyType>::restore");
 
-  read(externalSize);
+  // The code to resize this property if necessary should go here,
+  // it is currently in OMStoredObject::restore() which is also used
+  // for fixed size properties - tjb.
+  store()->restore(*this, externalSize);
+  setPresent();
 }
 
   // @mfunc The number of items in this this <c OMVariableSizeProperty>.
