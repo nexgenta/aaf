@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../include/comidl" /I "../../../ref-impl/include/ref-api" /I "../../../ref-impl/include" /FI"stdafx.h" /D "NDEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "WIN32_LEAN_AND_MEAN" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /MD /W3 /WX /GR /GX /O2 /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../include/comidl" /I "../../../ref-impl/include/ref-api" /I "../../../ref-impl/include" /FI"stdafx.h" /D "NDEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "WIN32_LEAN_AND_MEAN" /Yu"stdafx.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -105,10 +105,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\com-dll\AAFCOM.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\com-dll\AAFCOM.DEF"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\AAFModule.cpp"
 # End Source File
 # Begin Source File
 
@@ -206,19 +202,11 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFEssenceGroup.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFEssencePlugin.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFEvent.cpp"
 # End Source File
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFEventMobSlot.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\test\CAAFEventTest.cpp"
 # End Source File
 # Begin Source File
 
@@ -294,6 +282,10 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFMobSlot.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\com-api\CAAFModule.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFNestedScope.cpp"
 # End Source File
 # Begin Source File
@@ -351,10 +343,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFPropValData.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFPulldown.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFReferenceValue.cpp"
 # End Source File
 # Begin Source File
 
@@ -490,10 +478,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefStrongObjRef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\test\CAAFTypeDefTest.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefVariableArray.cpp"
 # End Source File
 # Begin Source File
@@ -542,10 +526,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFDataDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFDefs.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFEssenceData.cpp"
 # End Source File
 # Begin Source File
@@ -574,10 +554,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFMobSlots.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFObjects.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFOperationDefs.cpp"
 # End Source File
 # Begin Source File
@@ -603,10 +579,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFPropertyDefs.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFPropertyValues.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFReferenceValues.cpp"
 # End Source File
 # Begin Source File
 

@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /FI"stdafx.h" /D "NDEBUG" /D "COM_NO_WINDOWS_H" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /MD /W3 /WX /GR /GX /O2 /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /I "../../../ref-impl/aaflib/" /FI"stdafx.h" /D "NDEBUG" /D "COM_NO_WINDOWS_H" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /Yu"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /GR /GX /ZI /Od /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /FI"stdafx.h" /D "_DEBUG" /D "OM_ENABLE_DEBUG" /D "COM_NO_WINDOWS_H" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /MDd /W3 /WX /GR /GX /ZI /Od /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /I "../../../ref-impl/aaflib/" /FI"stdafx.h" /D "_DEBUG" /D "OM_ENABLE_DEBUG" /D "COM_NO_WINDOWS_H" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /Yu"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -90,6 +90,10 @@ SOURCE="..\..\..\ref-impl\src\impl\aafErr.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\aaflib\aaflibwin32.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\aafTable.cpp"
 # End Source File
 # Begin Source File
@@ -106,7 +110,15 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBaseClassFactory.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltins.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinClasses.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinProps.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinTypes.cpp"
 # End Source File
 # Begin Source File
 
@@ -194,10 +206,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEssenceGroup.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEssencePlugin.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEvent.cpp"
 # End Source File
 # Begin Source File
@@ -274,6 +282,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMobSlot.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFModule.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFNestedScope.cpp"
 # End Source File
 # Begin Source File
@@ -310,6 +322,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginDescriptor.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginFile.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginManager.cpp"
 # End Source File
 # Begin Source File
@@ -331,10 +347,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPropValData.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPulldown.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFReferenceValue.cpp"
 # End Source File
 # Begin Source File
 
@@ -514,10 +526,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDataDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDefs.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFEssenceData.cpp"
 # End Source File
 # Begin Source File
@@ -546,10 +554,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFMobSlots.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFObjects.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFOperationDefs.cpp"
 # End Source File
 # Begin Source File
@@ -575,10 +579,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPropertyDefs.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPropertyValues.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFReferenceValues.cpp"
 # End Source File
 # Begin Source File
 
