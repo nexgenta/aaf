@@ -1,8 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFHeader.
 //=---------------------------------------------------------------------=
 //
-// $Id: StructuredStorage.h,v 1.3 2004/04/07 16:02:46 bakerian Exp $ $Name:  $
+// $Id: StructuredStorage.h,v 1.4 2004/06/16 22:49:17 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,8 +33,8 @@
 * Authors: Bob Sabiston, Yuri Khramov, Mark Ambachtsheer
 ************************************************************************
 
-$Revision: 1.3 $
-$Date: 2004/04/07 16:02:46 $
+$Revision: 1.4 $
+$Date: 2004/06/16 22:49:17 $
 */
 #ifndef _StructuredStorage_h
 #define _StructuredStorage_h
