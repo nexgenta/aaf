@@ -1,28 +1,30 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 
 /*
  * Name: omAcces.c
@@ -138,6 +140,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #if PORT_SYS_MAC
 #include <memory.h>		/* For AAFMalloc() and AAFFree() */
@@ -247,26 +250,21 @@ aafBool isObjFunc(ImplAAFFile * file,       /* IN - File Handle */
  * Possible Errors:
  *		Standard errors (see top of file).
  */
-void AAFGetDateTime(aafTimeStamp_t *time)
+void AAFGetDateTime(aafTimeStamp_t *ts)
 {
-#if defined(_MAC) || defined(macintosh)
-	unsigned long tmpTime;
-	GetDateTime(&tmpTime);
-	time->TimeVal = tmpTime;
-	time->IsGMT = FALSE;
-#elif  defined(_WIN32)
-	time->TimeVal = (long) clock();
-	time->IsGMT = FALSE;
-#else
-	{
-		struct timeval  tv;
-		struct timezone tz;
+	assert (ts);
 
-		gettimeofday(&tv, &tz);
-		time->TimeVal = tv.tv_sec;
-		time->IsGMT = false;
-	}
-#endif
+	const time_t t = time(0);
+	const struct tm * ansitime = gmtime (&t);
+	assert (ansitime);
+
+	ts->date.year   = ansitime->tm_year+1900;
+	ts->date.month  = ansitime->tm_mon+1;  // AAF months are 1-based
+	ts->date.day    = ansitime->tm_mday;   // tm_mday already 1-based
+	ts->time.hour   = ansitime->tm_hour;
+	ts->time.minute = ansitime->tm_min;
+	ts->time.second = ansitime->tm_sec;
+	ts->time.fraction = 0;            // not implemented yet!
 }
 
 aafErr_t AAFConvertEditRate(
@@ -517,7 +515,16 @@ AAFRESULT aafMobIDNew(
 	aafTimeStamp_t	timestamp;
 	
 	AAFGetDateTime(&timestamp);
-	major = (aafUInt32)timestamp.TimeVal;	// Will truncate
+	// major = (aafUInt32)timestamp.TimeVal;	// Will truncate
+	assert (sizeof (aafTimeStruct_t) == sizeof (aafUInt32));
+	union
+	{
+	  aafTimeStruct_t time;
+	  aafUInt32       seconds;
+	} time_to_int;
+	time_to_int.time = timestamp.time;
+	major = time_to_int.seconds;
+
 #if defined(_MAC) || defined(macintosh)
 	minor = TickCount();
 #else
