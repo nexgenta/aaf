@@ -173,6 +173,41 @@ public:
 
 
 
+  // non-published overrides from AAFTypeDef
+  aafBool IsFixedSize (void) const;
+  size_t PropValSize (void) const;
+  aafBool IsRegistered (void) const;
+  size_t NativeSize (void) const;
+
+
+  //*************************************************************
+  //
+  // Overrides from OMType, via inheritace through ImplAAFTypeDef
+  //
+  //*************************************************************
+
+  virtual void reorder(OMByte* externalBytes,
+                       size_t externalBytesSize) const;
+
+  virtual size_t externalSize(OMByte* internalBytes,
+                              size_t internalBytesSize) const;
+
+  virtual void externalize(OMByte* internalBytes,
+                           size_t internalBytesSize,
+                           OMByte* externalBytes,
+                           size_t externalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+  virtual size_t internalSize(OMByte* externalBytes,
+                              size_t externalBytesSize) const;
+
+  virtual void internalize(OMByte* externalBytes,
+                           size_t externalBytesSize,
+                           OMByte* internalBytes,
+                           size_t internalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+
 private:
   // OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
   OMFixedSizeProperty<aafUID_t>   _ElementType;
@@ -196,6 +231,8 @@ private:
     GetElementName (aafUInt32 index,
 					wchar_t * pName,
 					aafUInt32  bufSize);
+
+  ImplAAFTypeDef * GetBaseType (void);
 
 public:
   // Declare this class to be storable.

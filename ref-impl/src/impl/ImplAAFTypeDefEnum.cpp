@@ -25,6 +25,10 @@
 #include <assert.h>
 #include <string.h>
 
+#if defined(_MAC) || defined(macintosh)
+#include <wstring.h>
+#endif
+
 
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
@@ -647,6 +651,147 @@ ImplAAFTypeDefEnum::GetElementNameBufLen (
   assert (pLen);
   *pLen = nameLength;
   return AAFRESULT_SUCCESS;
+}
+
+
+ImplAAFTypeDef * ImplAAFTypeDefEnum::GetBaseType (void)
+{
+  AAFRESULT hr;
+  ImplAAFTypeDef * pBaseType = 0;
+  hr = GetElementType (&pBaseType);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (pBaseType);
+  return pBaseType;
+}
+
+void ImplAAFTypeDefEnum::reorder(OMByte* externalBytes,
+								 size_t externalBytesSize) const
+{
+  // BobT hack: need non-const this pointer in order to call
+  // GetBaseType(), and to do ReleaseReference() later.  Since we know
+  // we're not changing this object for real, we don't *really* mind
+  // cheating a bit on const-ness...
+  ImplAAFTypeDefEnum * pNonConstThis =
+	(ImplAAFTypeDefEnum *) this;
+  ImplAAFTypeDef * ptd = pNonConstThis->GetBaseType ();
+  ptd->reorder (externalBytes, externalBytesSize);
+  ptd->ReleaseReference ();
+}
+
+
+size_t ImplAAFTypeDefEnum::externalSize(OMByte* internalBytes,
+										size_t internalBytesSize) const
+{
+  // BobT hack: need non-const this pointer in order to call
+  // GetBaseType(), and to do ReleaseReference() later.  Since we know
+  // we're not changing this object for real, we don't *really* mind
+  // cheating a bit on const-ness...
+  ImplAAFTypeDefEnum * pNonConstThis =
+	(ImplAAFTypeDefEnum *) this;
+  ImplAAFTypeDef * ptd = pNonConstThis->GetBaseType ();
+  size_t result = ptd->externalSize (internalBytes, internalBytesSize);
+  ptd->ReleaseReference ();
+  return result;
+}
+
+
+void ImplAAFTypeDefEnum::externalize(OMByte* internalBytes,
+									 size_t internalBytesSize,
+									 OMByte* externalBytes,
+									 size_t externalBytesSize,
+									 OMByteOrder byteOrder) const
+{
+  // BobT hack: need non-const this pointer in order to call
+  // GetBaseType(), and to do ReleaseReference() later.  Since we know
+  // we're not changing this object for real, we don't *really* mind
+  // cheating a bit on const-ness...
+  ImplAAFTypeDefEnum * pNonConstThis =
+	(ImplAAFTypeDefEnum *) this;
+  ImplAAFTypeDef * ptd = pNonConstThis->GetBaseType ();
+  ptd->externalize (internalBytes,
+					internalBytesSize,
+					externalBytes,
+					externalBytesSize,
+					byteOrder);
+  ptd->ReleaseReference ();
+}
+
+
+size_t ImplAAFTypeDefEnum::internalSize(OMByte* externalBytes,
+										size_t externalBytesSize) const
+{
+  // BobT hack: need non-const this pointer in order to call
+  // GetBaseType(), and to do ReleaseReference() later.  Since we know
+  // we're not changing this object for real, we don't *really* mind
+  // cheating a bit on const-ness...
+  ImplAAFTypeDefEnum * pNonConstThis =
+	(ImplAAFTypeDefEnum *) this;
+  ImplAAFTypeDef * ptd = pNonConstThis->GetBaseType ();
+  size_t result = ptd->internalSize (externalBytes, externalBytesSize);
+  ptd->ReleaseReference ();
+  return result;
+}
+
+
+void ImplAAFTypeDefEnum::internalize(OMByte* externalBytes,
+									 size_t externalBytesSize,
+									 OMByte* internalBytes,
+									 size_t internalBytesSize,
+									 OMByteOrder byteOrder) const
+{
+  // BobT hack: need non-const this pointer in order to call
+  // GetBaseType(), and to do ReleaseReference() later.  Since we know
+  // we're not changing this object for real, we don't *really* mind
+  // cheating a bit on const-ness...
+  ImplAAFTypeDefEnum * pNonConstThis =
+	(ImplAAFTypeDefEnum *) this;
+  ImplAAFTypeDef * ptd = pNonConstThis->GetBaseType ();
+  ptd->internalize (externalBytes,
+					externalBytesSize,
+					internalBytes,
+					internalBytesSize,
+					byteOrder);
+  ptd->ReleaseReference ();
+}
+
+
+
+aafBool ImplAAFTypeDefEnum::IsFixedSize (void) const
+{
+  return AAFTrue;
+}
+
+
+size_t ImplAAFTypeDefEnum::PropValSize (void) const
+{
+  ImplAAFTypeDef * pBaseType = 0;
+  ImplAAFTypeDefEnum * pNonConstThis =
+	(ImplAAFTypeDefEnum *) this;
+  AAFRESULT hr = pNonConstThis->GetElementType (&pBaseType);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (pBaseType);
+  size_t retval = pBaseType->PropValSize ();
+  pBaseType->ReleaseReference ();
+  return retval;
+}
+
+aafBool ImplAAFTypeDefEnum::IsRegistered (void) const
+{
+  // enum types are registered by default
+  return AAFTrue;
+}
+
+size_t ImplAAFTypeDefEnum::NativeSize (void) const
+{
+  ImplAAFTypeDef * pBaseType = 0;
+  ImplAAFTypeDefEnum * pNonConstThis =
+	(ImplAAFTypeDefEnum *) this;
+  AAFRESULT hr = pNonConstThis->GetElementType (&pBaseType);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (pBaseType);
+  size_t retval = pBaseType->NativeSize ();
+  pBaseType->ReleaseReference ();
+  return retval;
 }
 
 
