@@ -67,6 +67,12 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFIdentification>
+    ImplAAFIdentificationSP;
+typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
+    ImplEnumAAFIdentificationsSP;
+
 #include <assert.h>
 
 #if defined(__MWERKS__)
@@ -115,6 +121,7 @@ ImplAAFHeader::ImplAAFHeader ()
 	_toolkitRev.patchLevel = 0;
 //!!!	_byteOrder;
 //!!!	_lastModified;
+	_file = NULL;
 }
 
 
@@ -445,7 +452,29 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+
+  AAFRESULT hr;
+
+  ImplEnumAAFIdentificationsSP pEnumIds;
+  hr = GetIdentifications (&pEnumIds);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  ImplAAFIdentificationSP pTestId;
+  while (AAFRESULT_SUCCEEDED (pEnumIds->NextOne (&pTestId)))
+	{
+	  aafUID_t testGen;
+	  hr = pTestId->GetGeneration (&testGen);
+	  if (AAFRESULT_FAILED (hr)) return hr;
+	  if (EqualAUID (&testGen, &generation))
+		{
+		  assert (ppIdentification);
+		  *ppIdentification = pTestId;
+		  assert (*ppIdentification);
+		  (*ppIdentification)->AcquireReference ();
+		  return AAFRESULT_SUCCESS;
+		}
+	}
+  return AAFRESULT_OBJECT_NOT_FOUND;
 }
 
 
@@ -505,24 +534,18 @@ ImplAAFHeader::GetIdentificationAt
   if (index >= max)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
+  ImplAAFIdentification * pId = 0;
+  _identificationList.getValueAt(pId, index);
+  assert (pId);
+  pId->AcquireReference ();
 
-
-/*
-AAFRESULT 
-    ImplAAFHeader::CountIdentifications (aafInt32 *pCount)
-{
-  if (! pCount)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-	size_t size;
-  _identificationList.getSize(size);
-	*pCount = size;
+  assert (ppIdentification);
+  *ppIdentification = pId;
+  // Let the ref count pass from pId to *ppIdentification.
   return AAFRESULT_SUCCESS;
 }
-*/
+
+
 
 AAFRESULT 
     ImplAAFHeader::AddIdentificationObject (aafProductIdentification_t *pIdent)
@@ -541,11 +564,7 @@ AAFRESULT
 			fiction.productVersionString = (aafWChar*)NULL;
 			fiction.productID = NIL_UID;
 			fiction.platform = (aafWChar*)NULL;
-			fiction.productVersion.major = 0;
-			fiction.productVersion.minor = 0;
-			fiction.productVersion.tertiary = 0;
-			fiction.productVersion.patchLevel = 0;
-			fiction.productVersion.type = kAAFVersionUnknown;
+			fiction.productVersion = 0;
 			pIdent = &fiction;
 			dummyIDNT = kAAFTrue;
 		}
@@ -567,10 +586,10 @@ AAFRESULT
 		  CreateInstance((ImplAAFObject **)&identObj));
     if (NULL == identObj)
       CHECK(AAFRESULT_NOMEMORY);
-    CHECK(identObj->SetCompanyName(pIdent->companyName));
-    CHECK(identObj->SetProductName(pIdent->productName));
-    CHECK(identObj->SetProductVersionString(pIdent->productVersionString));
-	CHECK(identObj->SetProductID(pIdent->productID));
+	CHECK(identObj->Initialize(pIdent->companyName,
+							   pIdent->productName,
+							   pIdent->productVersionString,
+							   pIdent->productID));
 
     _identificationList.appendValue(identObj);
  
@@ -597,17 +616,6 @@ AAFRESULT
 	pIdent->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT 
-    ImplAAFHeader::RemoveIdentification (ImplAAFIdentification * pIdent)
-{
-  if (! pIdent)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -677,11 +685,6 @@ AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 	return (AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFHeader::LoadMobTables(void)
-{
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->LoadMobTables());
-}
 
 // trr - NOTE: Eventhough this method returns a reference counted object it
 // does NOT bump the reference count. Currently only other file that calls
