@@ -201,8 +201,8 @@ static void pvtZeroFill (const aafMemPtr_t inVal,
 
 
 ImplAAFTypeDefInt::ImplAAFTypeDefInt ()
-  : _size     ( PID_TypeDefinitionInteger_Size,     "Size"),
-    _isSigned ( PID_TypeDefinitionInteger_IsSigned, "IsSigned")
+  : _size     ( PID_TypeDefinitionInteger_Size,     L"Size"),
+    _isSigned ( PID_TypeDefinitionInteger_IsSigned, L"IsSigned")
 {
   _persistentProperties.put(_size.address());
   _persistentProperties.put(_isSigned.address());
@@ -365,16 +365,12 @@ AAFRESULT STDMETHODCALLTYPE
 
   // determine if the property value's embedded type is compatible
   // with this one for reading.  For now, we'll only allow integral
-  // type properties to be read by this integral type def.
+  // and enumeration type properties to be read by this integral type def.
   //
-  // BobT 6/2/1999: allow all types to be read as an integral type
-  // (made necessary in order to read Enum types as integral types.)
-  // assert (pPropType);
-  // if (! dynamic_cast<ImplAAFTypeDefInt *>(pPropType))
-  //	{
-  //	  return AAFRESULT_BAD_TYPE;
-  //	}
-  assert (pPropType);
+  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
+  pPropType->GetTypeCategory( &type_category );
+  if( type_category != kAAFTypeCatInt && type_category != kAAFTypeCatEnum )
+	return AAFRESULT_BAD_TYPE;
 
   // current impl only allows 1, 2, 4, and 8-bit ints.
   if ((1 != valSize) &&
@@ -455,15 +451,16 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return hr;
 	}
+  assert (pPropType);
 
   // determine if the property value's embedded type is compatible
   // with this one for reading.  For now, we'll only allow integral
-  // type properties to be read by this integral type def.
-  assert (pPropType);
-  if (! dynamic_cast<ImplAAFTypeDefInt *>((ImplAAFTypeDef*) pPropType))
-	{
-	  return AAFRESULT_BAD_TYPE;
-	}
+  // and enumeration type properties to be read by this integral type def.
+  //
+  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
+  pPropType->GetTypeCategory( &type_category );
+  if( type_category != kAAFTypeCatInt && type_category != kAAFTypeCatEnum )
+	return AAFRESULT_BAD_TYPE;
 
   // current impl only allows 1, 2, 4, and 8-bit ints.
   if ((1 != valSize) &&
@@ -668,9 +665,9 @@ size_t ImplAAFTypeDefInt::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefInt::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefInt::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
   size_t elemSize = PropValSize ();
@@ -703,3 +700,25 @@ bool ImplAAFTypeDefInt::IsVariableArrayable () const
 
 bool ImplAAFTypeDefInt::IsStringable () const
 { return true; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefInt::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefInt));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefInt::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefInt::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
