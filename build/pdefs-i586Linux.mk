@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i586Linux.mk,v 1.8 2004/10/19 13:27:48 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i586Linux.mk,v 1.9 2004/10/25 14:08:32 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -103,7 +103,7 @@ endif
 
 # For GNU/Linux the UUID library is provided by e2fsprogs
 ifndef UUIDLIB
-    UUIDLIB_PATH := $(shell for f in /usr/local/lib /usr/lib /lib; do test -e $$f/libuuid.a && echo $$f && break; done)
+    UUIDLIB_PATH := $(shell for f in /usr/local/lib /usr/lib /lib /usr/lib64 /lib64; do test -e $$f/libuuid.a && echo $$f && break; done)
     ifeq "$(UUIDLIB_PATH)" ""
         $(error Required library libuuid.a not found - install the e2fsprogs development libraries)
     endif
