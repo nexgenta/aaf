@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.12 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.12.2.1 2004/06/09 17:21:25 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -322,30 +322,30 @@ struct {
     L"CFKT-Default.aaf",
 		true,
 		true,
-    &aafFileKindAafSSBinary,
+    &aafFileKindAaf4KBinary,
     "SSS",
     true,
-    &aafFileKindAafSSBinary,
+    &aafFileKindAaf4KBinary,
     "SSS"
   },
   {
     L"CFKT-Default-2.aaf",
 		true,
 		false,
-    &aafFileKindAafSSSBinary,
+    &aafFileKindAafS4KBinary,
     "SSS",
     true,
-    &aafFileKindAafSSSBinary,
+    &aafFileKindAafS4KBinary,
     "SSS"
   },
   {
-    L"CFKT-SSS.aaf",
+    L"CFKT-S512.aaf",
 		true,
 		true,
-    &aafFileKindAafSSSBinary,
+    &aafFileKindAafS512Binary,
     "SSS",
     true,
-    &aafFileKindAafSSSBinary,
+    &aafFileKindAafS512Binary,
     "SSS"
   },
   {
@@ -389,13 +389,13 @@ struct {
 			"M4K"
 	},
   {
-    L"CFKT-SSS.aaf",
+    L"CFKT-S512.aaf",
 		true,
 		true,
-    &aafFileKindAafSSSBinary,
+    &aafFileKindAafS512Binary,
     "SSS",
     true,
-    &aafFileKindAafMSSBinary,
+    &aafFileKindAafM512Binary,
     "MSS"
   }
 };

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CreateSequence.cpp,v 1.44 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CreateSequence.cpp,v 1.44.2.1 2004/06/09 17:21:26 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -606,7 +606,7 @@ STDAPI MemoryFileOpenNewModify (
     rs,
     kAAFFileExistence_new,
     kAAFFileAccess_write,
-    &aafFileKindAafSSBinary,
+    &aafFileKindAaf4KBinary,
     modeFlags,
     pIdent,
     ppFile);

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: File.cpp,v 1.5 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: File.cpp,v 1.5.2.1 2004/06/09 17:21:24 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -239,7 +239,7 @@ AXFG_OP(
   L"CreateAAFFileOnRawStorage",
   L"Create an IAAFile out of an IAAFRawStorage",
   L"FileName StorageName",
-  L"existence = new, access = writable, kind = SSBinary, ident = AxProductItentification, mode flags = 0",
+  L"existence = new, access = writable, kind = SSBin512, ident = AxProductItentification, mode flags = 0",
   3,
   3 ) 
 
@@ -259,7 +259,7 @@ void CreateAAFFileOnRawStorage::Execute( const std::vector<AxString>& argv )
 	CHECK_HRESULT( AAFCreateAAFFileOnRawStorage( spRawStorage,
 												 kAAFFileExistence_new,
 												 kAAFFileAccess_write,
-												 &aafFileKindAafSSBinary,
+												 &aafFileKindAaf4KBinary,
 												 0,
 												 ident.getProductId(),
 												 &spFile ) );

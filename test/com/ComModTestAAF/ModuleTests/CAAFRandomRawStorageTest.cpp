@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomRawStorageTest.cpp,v 1.16.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
+// $Id: CAAFRandomRawStorageTest.cpp,v 1.16.2.2 2004/06/09 17:21:25 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -131,7 +131,7 @@ static HRESULT checkModeFlags ()
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 
-  temphr = checkModeFlag (AAF_FILE_MODE_USE_LARGE_SS_SECTORS,
+  temphr = checkModeFlag (AAF_FILE_MODE_USE_SMALL_SS_SECTORS,
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 
@@ -244,7 +244,7 @@ static HRESULT localOpenFileDiskStgWrite
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
 								   kAAFFileAccess_modify,
-								   &aafFileKindAafSSBinary,
+								   &aafFileKindAaf4KBinary,
 								   0,
 								   &sIdent,
 								   ppFile));
@@ -312,7 +312,7 @@ static HRESULT localOpenFileCachedDiskStgWrite
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
 								   kAAFFileAccess_modify,
-								   &aafFileKindAafSSBinary,
+								   &aafFileKindAaf4KBinary,
 								   0,
 								   &sIdent,
 								   ppFile));
@@ -375,7 +375,7 @@ static HRESULT localOpenFileMemStgWrite
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
 								   kAAFFileAccess_modify,
-								   &aafFileKindAafSSBinary,
+								   &aafFileKindAaf4KBinary,
 								   0,
 								   &sIdent,
 								   ppFile));
@@ -664,7 +664,7 @@ static HRESULT localOpenFileCustomStgWrite
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
 								   kAAFFileAccess_modify,
-								   &aafFileKindAafSSBinary,
+								   &aafFileKindAaf4KBinary,
 								   0,
 								   &sIdent,
 								   ppFile));

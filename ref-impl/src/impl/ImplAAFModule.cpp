@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.27 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.27.2.1 2004/06/09 17:21:25 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -180,11 +180,17 @@ STDAPI ImplAAFFileOpenExistingRead (
 	 &pRawStg);
   if (AAFRESULT_SUCCEEDED (hr))
 	{
+	  const aafUID_t* pFileKind;
+	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
+	  	pFileKind = &aafFileKindAaf512Binary;
+      else
+	  	pFileKind = &aafFileKindAaf4KBinary;
+
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
 		 kAAFFileExistence_existing,
 		 kAAFFileAccess_read,
-		 &aafFileKindAafSSBinary,
+		 pFileKind,
 		 modeFlags,
 		 0,
 		 ppFile);
@@ -344,13 +350,20 @@ STDAPI ImplAAFFileOpenExistingModify (
 	 kAAFFileExistence_existing,
 	 kAAFFileAccess_modify,
 	 &pRawStg);
+
   if (AAFRESULT_SUCCEEDED (hr))
 	{
+	  const aafUID_t* pFileKind;
+	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
+	  	pFileKind = &aafFileKindAaf512Binary;
+      else
+	  	pFileKind = &aafFileKindAaf4KBinary;
+
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
 		 kAAFFileExistence_existing,
 		 kAAFFileAccess_modify,
-		 &aafFileKindAafSSBinary,
+		 pFileKind,
 		 modeFlags,
 		 pIdent,
 		 ppFile);
@@ -499,11 +512,17 @@ STDAPI ImplAAFFileOpenNewModify (
 	 &pRawStg);
   if (AAFRESULT_SUCCEEDED (hr))
 	{
+	  const aafUID_t* pFileKind;
+	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
+	  	pFileKind = &aafFileKindAaf512Binary;
+      else
+	  	pFileKind = &aafFileKindAaf4KBinary;
+
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
 		 kAAFFileExistence_new,
 		 kAAFFileAccess_modify,
-		 &aafFileKindAafSSBinary,
+		 pFileKind,
 		 modeFlags,
 		 pIdent,
 		 ppFile);
@@ -679,11 +698,17 @@ STDAPI ImplAAFFileOpenTransient (
 	 &pRawStg);
   if (AAFRESULT_SUCCEEDED (hr))
 	{
+	  const aafUID_t* pFileKind;
+	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
+	  	pFileKind = &aafFileKindAaf512Binary;
+      else
+	  	pFileKind = &aafFileKindAaf4KBinary;
+
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
 		 kAAFFileExistence_new,
 		 kAAFFileAccess_modify,
-		 &aafFileKindAafSSBinary,
+		 pFileKind,
 		 0,
 		 pIdent,
 		 ppFile);

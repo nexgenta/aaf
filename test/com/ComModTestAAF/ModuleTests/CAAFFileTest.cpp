@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFile
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.36.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.36.2.2 2004/06/09 17:21:25 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -130,7 +130,7 @@ static HRESULT checkModeFlags ()
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 
-  temphr = checkModeFlag (AAF_FILE_MODE_USE_LARGE_SS_SECTORS,
+  temphr = checkModeFlag (AAF_FILE_MODE_USE_SMALL_SS_SECTORS,
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 
@@ -200,7 +200,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool useEx )
 
 	  // Create the file.
 	  if ( useEx ) {
-	    aafUID_t fileKind = aafFileKindAafSSBinary;
+	    aafUID_t fileKind = aafFileKindAaf4KBinary;
 	    checkResult(AAFFileOpenNewModifyEx(pFileName, &fileKind, 0, &ProductInfo, &pFile));
 	  }
 	  else {

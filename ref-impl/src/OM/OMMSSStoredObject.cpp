@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSSStoredObject.cpp,v 1.63.2.1 2004/06/08 13:45:40 stuart_hc Exp $ $Name:  $
+// $Id: OMMSSStoredObject.cpp,v 1.63.2.2 2004/06/09 17:21:24 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,7 +71,7 @@
 // AAF files encoded as structured storage (binary).
 // the signature actually stored in all AAF SS (512) files
 // note this is not a properly-formed SMPTE label, but this is legacy
-const OMUniqueObjectIdentification aafSignature_Aaf_SSBinary = 
+const OMUniqueObjectIdentification aafSignature_Aaf_SSBin_512 = 
 {0x42464141, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
 
 // the signature actually stored in all AAF SS (4096) files
@@ -2812,7 +2812,7 @@ OMMSSStoredObject* OMMSSStoredObject::createFile(const wchar_t* fileName,
 
 	// choose sector size based on signature from factory
 	unsigned long sectorSize=0;
-	if( aafSignature_Aaf_SSBinary == signature ) sectorSize=512;
+	if( aafSignature_Aaf_SSBin_512 == signature ) sectorSize=512;
 	else if( aafSignature_Aaf_SSBin_4K == signature ) sectorSize=4096;
 	PRECONDITION("Valid Signature", sectorSize!=0 );
 
@@ -2955,7 +2955,7 @@ OMMSSStoredObject* OMMSSStoredObject::createFile(OMRawStorage* rawStorage,
 
 	// choose sector size based on signature from factory
 	unsigned long sectorSize=0;
-	if( aafSignature_Aaf_SSBinary == signature ) sectorSize=512;
+	if( aafSignature_Aaf_SSBin_512 == signature ) sectorSize=512;
 	else if( aafSignature_Aaf_SSBin_4K == signature ) sectorSize=4096;
 	PRECONDITION("Valid Signature", sectorSize!=0 );
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomFileTest.cpp,v 1.8.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
+// $Id: CAAFRandomFileTest.cpp,v 1.8.2.2 2004/06/09 17:21:25 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -97,7 +97,7 @@ static HRESULT TestGetSetFileBits ()
 	(AAFCreateAAFFileOnRawStorage (pWriteStg,
 								   kAAFFileExistence_new,
 								   kAAFFileAccess_modify,
-								   &aafFileKindAafSSBinary,
+								   &aafFileKindAaf4KBinary,
 								   0,
 								   &sIdent,
 								   &pWriteFile));
