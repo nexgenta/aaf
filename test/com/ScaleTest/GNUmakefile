@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2005/04/01 02:58:14 jptrainor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2005/04/01 10:19:05 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -58,7 +58,10 @@ endif
 # Create a 30 minute DV clip (requires 6GB disk space!)
 .PHONY : check
 check : $(AAFSDKBINDIR)/ScaleTest$(EXE)
-	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/ScaleTest$(EXE) -q
+	@echo "*** Testing EssenceData API ***"
+	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/ScaleTest$(EXE) -q -d
+	@echo "*** Testing EssenceAccess API (Plugin codecs) ***"
+	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/ScaleTest$(EXE) -q -c -d
 
 
 .PHONY : clean
