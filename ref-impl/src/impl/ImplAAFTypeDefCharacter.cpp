@@ -50,7 +50,6 @@
 #include "AAFTypeDefUIDs.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 
 // We only support two byte unicode characters.
@@ -87,7 +86,9 @@ AAFRESULT STDMETHODCALLTYPE
       aafCharacter  character,
       ImplAAFPropertyValue ** ppCharacterValue)
 {
-    if (! ppCharacterValue)
+  TRACE("ImplAAFTypeDefCharacter::CreateValueFromCharacter");
+  
+  if (! ppCharacterValue)
 		return AAFRESULT_NULL_PARAM;
 	
 	aafUInt32 cbChar = NativeSize();
@@ -110,7 +111,7 @@ AAFRESULT STDMETHODCALLTYPE
 	check_hr ( pv->AllocateBits (cbChar, &pBits) );
 	
 	//Set the bits to incoming character
-	assert (pBits);
+	ASSERT("Valid bits", pBits != 0);
 	memcpy (pBits, &character, cbChar);
 	
 	*ppCharacterValue = pv;
@@ -124,6 +125,8 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * pCharacterValue,
       aafCharacter  character)
 {
+  TRACE("ImplAAFTypeDefCharacter::SetCharacter");
+  
 	if (! pCharacterValue)
 		return AAFRESULT_NULL_PARAM;
 	
@@ -135,7 +138,6 @@ AAFRESULT STDMETHODCALLTYPE
 	// get the property value's embedded type
 	ImplAAFTypeDefSP pPropType;
 	check_hr ( pvd->GetType (&pPropType) );
-	assert (pPropType);
 	//Make sure the TD of the pv passed in, matches that of the ImplAAFTypeDefCharacter
 	if ((ImplAAFTypeDef *)pPropType != this) // call operator ImplAAFTypeDef *
 		return AAFRESULT_BAD_TYPE;
@@ -154,7 +156,7 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	aafMemPtr_t pBits = NULL;
 	check_hr ( pvd->GetBits (&pBits)  );
-	assert (pBits);
+	ASSERT("Valid bits", pBits != 0);
 	
 	memcpy (pBits, &character, cbChar);
 	
@@ -168,6 +170,8 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * pCharacterValue,
       aafCharacter *  pCharacter)
 {
+  TRACE("ImplAAFTypeDefCharacter::GetCharacter");
+  
 	if (! pCharacterValue)
 		return AAFRESULT_NULL_PARAM;
 	
@@ -182,7 +186,6 @@ AAFRESULT STDMETHODCALLTYPE
 	// get the property value's embedded type
 	ImplAAFTypeDefSP pPropType;
 	check_hr ( pvd->GetType (&pPropType) );
-	assert (pPropType);
 	//Make sure the TD of the pv passed in, matches that of the ImplAAFTypeDefCharacter
 	if ((ImplAAFTypeDef *)pPropType != this) // call operator ImplAAFTypeDef *
 		return AAFRESULT_BAD_TYPE;
@@ -200,7 +203,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	aafMemPtr_t pBits = NULL;
 	check_hr ( pvd->GetBits (&pBits) );
-	assert (pBits);
+	ASSERT("Valid bits", pBits != 0);
 	
 	memcpy (pCharacter, pBits, cbChar);
 	
@@ -225,7 +228,7 @@ AAFRESULT STDMETHODCALLTYPE
 // class ImplAAFTypeDefCharacter
 
 void ImplAAFTypeDefCharacter::reorder(OMByte* externalBytes,
-                             size_t externalBytesSize) const
+                             size_t ANAME(externalBytesSize)) const
 {
   TRACE("ImplAAFTypeDefCharacter::reorder");
   PRECONDITION("Valid external bytes", externalBytes != 0);
@@ -234,10 +237,10 @@ void ImplAAFTypeDefCharacter::reorder(OMByte* externalBytes,
   reorderInteger(externalBytes, kExternalCharacterSize);
 }
 
-size_t ImplAAFTypeDefCharacter::externalSize(OMByte* internalBytes,
-                                    size_t internalBytesSize) const
+size_t ImplAAFTypeDefCharacter::externalSize(OMByte* ANAME(internalBytes),
+                                    size_t ANAME(internalBytesSize)) const
 {
-  TRACE("WideStringType::externalSize");
+  TRACE("ImplAAFTypeDefCharacter::externalSize");
 
   PRECONDITION("Valid internal bytes", internalBytes != 0);
   PRECONDITION("Valid internal bytes size", internalBytesSize >= kExternalCharacterSize);
@@ -246,12 +249,12 @@ size_t ImplAAFTypeDefCharacter::externalSize(OMByte* internalBytes,
 }
 
 void ImplAAFTypeDefCharacter::externalize(OMByte* internalBytes,
-                                 size_t internalBytesSize,
+                                 size_t ANAME(internalBytesSize),
                                  OMByte* externalBytes,
                                  size_t externalBytesSize,
                                  OMByteOrder byteOrder) const
 {
-  TRACE("WideStringType::externalize");
+  TRACE("ImplAAFTypeDefCharacter::externalize");
   PRECONDITION("Valid internal bytes", internalBytes != 0);
   PRECONDITION("Valid internal bytes size",
           internalBytesSize >= internalSize(externalBytes, externalBytesSize));
@@ -265,8 +268,8 @@ void ImplAAFTypeDefCharacter::externalize(OMByte* internalBytes,
     contract(internalBytes, sizeof(aafCharacter), externalBytes, kExternalCharacterSize, byteOrder);
 }
 
-size_t ImplAAFTypeDefCharacter::internalSize(OMByte* externalBytes,
-                                    size_t externalBytesSize) const
+size_t ImplAAFTypeDefCharacter::internalSize(OMByte* ANAME(externalBytes),
+                                    size_t ANAME(externalBytesSize)) const
 {
   TRACE("ImplAAFTypeDefCharacter::internalSize");
 
@@ -277,7 +280,7 @@ size_t ImplAAFTypeDefCharacter::internalSize(OMByte* externalBytes,
 }
 
 void ImplAAFTypeDefCharacter::internalize(OMByte* externalBytes,
-                                 size_t externalBytesSize,
+                                 size_t ANAME(externalBytesSize),
                                  OMByte* internalBytes,
                                  size_t internalBytesSize,
                                  OMByteOrder byteOrder) const
@@ -330,7 +333,8 @@ aafBool ImplAAFTypeDefCharacter::IsRegistered (void) const
 
 size_t ImplAAFTypeDefCharacter::NativeSize (void) const
 {
-  assert( (2 == sizeof(aafCharacter)) || (4 == sizeof(aafCharacter)));
+  TRACE("ImplAAFTypeDefCharacter::NativeSize");
+  ASSERT("Valid character size", (2 == sizeof(aafCharacter)) || (4 == sizeof(aafCharacter)));
   return (sizeof(aafCharacter));
 }
 
@@ -339,13 +343,14 @@ OMProperty * ImplAAFTypeDefCharacter::pvtCreateOMProperty
   (OMPropertyId pid,
    const wchar_t * name) const
 {
-  assert (name);
+  TRACE("ImplAAFTypeDefCharacter::pvtCreateOMProperty");
+  PRECONDITION("Valid name", name != 0);
 
   OMProperty * result = 0;
 
 	result = new OMFixedSizeProperty<aafCharacter> (pid, name);
 
-  assert (result); // need better error handling!
+  POSTCONDITION("Valid property allocated", result != 0); // need better error handling!
   return result;
 }
 
