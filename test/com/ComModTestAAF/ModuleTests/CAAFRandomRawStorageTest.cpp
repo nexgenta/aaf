@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomRawStorageTest.cpp,v 1.16 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFRandomRawStorageTest.cpp,v 1.17 2004/04/08 12:00:48 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -243,7 +243,7 @@ static HRESULT localOpenFileDiskStgWrite
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
+								   kAAFFileAccess_modify,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,
@@ -311,7 +311,7 @@ static HRESULT localOpenFileCachedDiskStgWrite
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
+								   kAAFFileAccess_modify,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,
@@ -374,7 +374,7 @@ static HRESULT localOpenFileMemStgWrite
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
+								   kAAFFileAccess_modify,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,
@@ -663,7 +663,7 @@ static HRESULT localOpenFileCustomStgWrite
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
 								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
+								   kAAFFileAccess_modify,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSetFileBitsTest.cpp,v 1.6 2004/04/08 11:03:40 bakerian Exp $ $Name:  $
+// $Id: CAAFSetFileBitsTest.cpp,v 1.7 2004/04/08 12:00:51 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,7 +70,7 @@ static HRESULT SetFileBitsTest ()
 	(AAFCreateAAFFileOnRawStorage (pReadStg,
 								   kAAFFileExistence_existing,
 								   kAAFFileAccess_read,
-								   &aafFileKindAafSSBinary,
+								   0,
 								   0,
 								   0,
 								   &pReadFile));
