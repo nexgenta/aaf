@@ -2,7 +2,7 @@
 #define __headerGenUtils_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: headerGenUtils.h,v 1.13 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: headerGenUtils.h,v 1.14 2005/03/18 16:09:08 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -72,6 +72,13 @@ void printDefinition(const char* type,
                      const char* name,
                      const char* suffix,
                      const char* string,
+                     ostream& s);
+
+void printAlias(	 const char* type,
+					 const char* alias,
+                     const char* prefix,
+                     const char* name,
+                     const char* suffix,
                      ostream& s);
 
 // print a macro invocation like this -

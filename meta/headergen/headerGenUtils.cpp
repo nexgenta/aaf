@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: headerGenUtils.cpp,v 1.15 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: headerGenUtils.cpp,v 1.16 2005/03/18 16:09:08 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -219,6 +219,22 @@ void printDefinition(const char* type,
   s << string << "\";" << endl;
 }
 
+void printAlias(	 const char* type,
+					 const char* alias,
+                     const char* prefix,
+                     const char* name,
+                     const char* suffix,
+                     ostream& s)
+{
+  s << type;
+  s << " ";
+  s << alias;
+  s << " = ";
+  s << prefix;
+  s << name;
+  s << suffix;
+  s << ";" << endl;
+}
 
 
 // print a macro invocation like this -
