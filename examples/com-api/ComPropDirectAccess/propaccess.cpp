@@ -120,7 +120,7 @@ typedef IAAFSmartPointer<IAAFClassDef>          IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFDictionary>        IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFEssenceDescriptor> IAAFEssenceDescriptorSP;
 typedef IAAFSmartPointer<IAAFFile>              IAAFFileSP;
-typedef IAAFSmartPointer<IAAFFileDescriptor>    IAAFFileDescriptorSP;
+typedef IAAFSmartPointer<IAAFHTMLDescriptor>    IAAFHTMLDescriptorSP;
 typedef IAAFSmartPointer<IAAFFiller>            IAAFFillerSP;
 typedef IAAFSmartPointer<IAAFHeader>            IAAFHeaderSP;
 typedef IAAFSmartPointer<IAAFMob>               IAAFMobSP;
@@ -213,9 +213,9 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
 
   // Allocate a new typedef which will represent a 16-bit rational
   IAAFTypeDefRecordSP pTDRational16;
-  PROPAGATE_RESULT(defs.cdTypeDefRecord()->
-				   CreateInstance(IID_IAAFTypeDefRecord,
-								  (IUnknown **) &pTDRational16));
+  PROPAGATE_RESULT(pDict->CreateMetaInstance(AUID_AAFTypeDefRecord,
+                                             IID_IAAFTypeDefRecord,
+                                             (IUnknown **) &pTDRational16));
   PROPAGATE_RESULT(pTDRational16->Initialize(AUID_TypeRational16,
 											 memberTypes,
 											 memberNames,
@@ -243,9 +243,9 @@ HRESULT createRenamedRational16 (IAAFDictionary * pDict)
 										&pTDRational16));
 
   // create new (rename) type
-  PROPAGATE_RESULT(defs.cdTypeDefRename()->
-				   CreateInstance(IID_IAAFTypeDefRename,
-								  (IUnknown **) &pRenamedRational16));
+  PROPAGATE_RESULT(pDict->CreateMetaInstance(AUID_AAFTypeDefRename,
+                                             IID_IAAFTypeDefRename,
+                                             (IUnknown **) &pRenamedRational16));
 
   // connect 'em up
   PROPAGATE_RESULT(pRenamedRational16->Initialize(AUID_TypeRenamedRational16,
@@ -746,15 +746,14 @@ static void CreateAAFFile(aafWChar * pFileName,
   check (spMob->SetMobID(newMobID));
   check (spMob->SetName(L"a Source Mob"));
 
-  IAAFFileDescriptorSP  spFileDesc;
-  check (defs.cdFileDescriptor()->
-		 CreateInstance(IID_IAAFFileDescriptor, 
-						(IUnknown **) &spFileDesc));
+  IAAFHTMLDescriptorSP  spHTMLDesc;
+  check (defs.cdHTMLDescriptor()->
+		 CreateInstance(IID_IAAFHTMLDescriptor, 
+						(IUnknown **) &spHTMLDesc));
   aafRational_t  audioRate = { 44100, 1 };
-  check (spFileDesc->SetSampleRate(audioRate));
 
   IAAFEssenceDescriptorSP spEssenceDesc;
-  check (spFileDesc->QueryInterface (IID_IAAFEssenceDescriptor,
+  check (spHTMLDesc->QueryInterface (IID_IAAFEssenceDescriptor,
 								   (void **)&spEssenceDesc));
   check (smob->SetEssenceDescriptor (spEssenceDesc));
 
