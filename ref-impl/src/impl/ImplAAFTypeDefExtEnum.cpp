@@ -57,8 +57,8 @@
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefExtEnum::ImplAAFTypeDefExtEnum ()
-  :	_ElementNames  ( PID_TypeDefinitionExtendibleEnumeration_ElementNames,  "ElementNames"),
-	_ElementValues ( PID_TypeDefinitionExtendibleEnumeration_ElementValues, "ElementValues")
+  :	_ElementNames  ( PID_TypeDefinitionExtendibleEnumeration_ElementNames,  L"ElementNames"),
+	_ElementValues ( PID_TypeDefinitionExtendibleEnumeration_ElementValues, L"ElementValues")
 {
   _persistentProperties.put(_ElementNames.address());
   _persistentProperties.put(_ElementValues.address());
@@ -77,10 +77,10 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
-  hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  hr = SetAUID (id);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
   return AAFRESULT_SUCCESS;
 }
@@ -526,7 +526,7 @@ ImplAAFTypeDefSP ImplAAFTypeDefExtEnum::BaseType () const
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (pDict);
 
-	  hr = pDict->LookupType (kAAFTypeID_AUID, &((ImplAAFTypeDefExtEnum*)this)->_cachedBaseType);
+	  hr = pDict->LookupTypeDef (kAAFTypeID_AUID, &((ImplAAFTypeDefExtEnum*)this)->_cachedBaseType);
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (_cachedBaseType);
 	}
@@ -585,7 +585,7 @@ void ImplAAFTypeDefExtEnum::internalize(OMByte* externalBytes,
 
 aafBool ImplAAFTypeDefExtEnum::IsFixedSize (void) const
 {
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
@@ -607,9 +607,9 @@ size_t ImplAAFTypeDefExtEnum::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefExtEnum::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefExtEnum::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
   size_t elemSize = PropValSize ();
@@ -633,3 +633,25 @@ bool ImplAAFTypeDefExtEnum::IsVariableArrayable () const
 
 bool ImplAAFTypeDefExtEnum::IsStringable () const
 { return true; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefExtEnum::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefExtEnum));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefExtEnum::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefExtEnum::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
