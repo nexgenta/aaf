@@ -8,7 +8,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -41,7 +40,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         aafUID_t *  pID,
+         const aafUID_t *  pID,
 
          // @parm [in, size_is(numMembers)] array of member types to
 		 // be represented in this record type
@@ -124,7 +123,7 @@ public:
     CreateValueFromStruct
         (// @parm [in, size_is(initDataSize)] pointer to compile-time
 		 // struct containing data to use
-         aafMemPtr_t *  pInitData,
+         aafMemPtr_t pInitData,
 
          // @parm [in] size of data in pInitData
          aafUInt32  initDataSize,
@@ -203,7 +202,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetCount
         // @parm [out] count of members in this record type
-        (aafUInt32 *  pCount);
+        (aafUInt32 *  pCount) const;
 
 
   //****************
@@ -226,7 +225,39 @@ public:
     GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
 
 
+  //*************************************************************
+  //
+  // Overrides from OMType, via inheritace through ImplAAFTypeDef
+  //
+  //*************************************************************
+
+  virtual void reorder(OMByte* externalBytes,
+                       size_t externalBytesSize) const;
+
+  virtual size_t externalSize(OMByte* internalBytes,
+							  size_t internalBytesSize) const;
+
+  virtual void externalize(OMByte* internalBytes,
+                           size_t internalBytesSize,
+                           OMByte* externalBytes,
+                           size_t externalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+  virtual size_t internalSize(OMByte* externalBytes,
+							  size_t externalBytesSize) const;
+
+  virtual void internalize(OMByte* externalBytes,
+                           size_t externalBytesSize,
+                           OMByte* internalBytes,
+                           size_t internalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+
 private:
+
+  void pvtInitInternalSizes (void) const;
+
+
   // types of members in this record
   //
   // BobT Note!!! This should be weak reference vector property...
@@ -236,34 +267,48 @@ private:
   // with embedded nulls
   OMVariableSizeProperty<wchar_t> _memberNames;
 
-  // Pointer to array of ints with registered offsets of each field
+  // when registered, will point to array of ints with registered
+  // offsets of each field
   aafUInt32 * _registeredOffsets;
 
   // when registered, will contain native size of this record
   aafUInt32 _registeredSize;
 
+  // will contain internal (native) size of each data member.  If
+  // registered, will be determined from registered offsets.  If not
+  // registered, will be determined from PropValSize()s.
+  aafUInt32 * _internalSizes;
+
+  ImplAAFTypeDefSP * _cachedMemberTypes;
+
+  aafUInt32          _cachedCount;
+
+  aafInt32           _cachedPropValSize;
+  aafBool            _propValSizeIsCached;
+
 public:
+
+  // overrides from ImplAAFTypeDef
   //
-  // non-published methods
-  //
+  aafBool IsFixedSize (void) const;
+  size_t PropValSize (void) const;
+  aafBool IsRegistered (void) const;
+  size_t NativeSize (void) const;
 
-  // Returns true if property values of this type are of a fixed size.
-  virtual aafBool IsFixedSize (void);
-
-  // If this->IsFixedSize(), then will return the size of property
-  // values of this type.  If not fixed size, will assert().
-  virtual size_t PropValSize (void);
-
-  // Returns true if offsets have been registered for this type def.
-  aafBool IsRegistered (void);
-
-  // If this->IsRegistered(), then will return the native size of
-  // this type.  If not registered, will assert().
-  size_t NativeSize (void);
-
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTypeDefRecord)
+  virtual OMProperty * 
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFTypeDefRecord> ImplAAFTypeDefRecordSP;
 
 #endif // ! __ImplAAFTypeDefRecord_h__
