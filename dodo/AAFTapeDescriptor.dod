@@ -21,30 +21,15 @@ AD_IDL(//
 // AAFRESULT_NOMEMORY
 //   - insufficient system memory is available to perform the
 //     operation.
+//
+// AAFRESULT_NOT_INITIALIZED
+//   - This object has not yet had Initialize\(\) called on it through
+//     this object's primary interface.
 //)
 AD_CLASS_UUID(e58a856a, 2a3e, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(e58a8569, 2a3e, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
 AD_CLASS_BEGIN
-AD_METHOD0(Initialize,
-		   Initializes a newly allocated\, empty
-  // IAAFTapeDescriptor-supporting object.  This method must be called
-  // after allocation\, and before any other method can be called.
-  //
-  // Succeeds if:
-  // - Initialize\(\) has not yet been called on this object.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize\(\) has already been called on this object.)
-
-
 AD_XMETHOD1(SetTapeManufacturer,
 			[in\,string],
 			objPass,
@@ -69,9 +54,6 @@ AD_XMETHOD1(SetTapeManufacturer,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - pName arg is NULL.)
@@ -112,9 +94,6 @@ AD_XMETHOD2(GetTapeManufacturer,
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
@@ -148,9 +127,6 @@ AD_XMETHOD1(GetTapeManBufLen,
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
   // AAFRESULT_NULL_PARAM
   //   - pLen arg is NULL.)
 
@@ -179,9 +155,6 @@ AD_XMETHOD1(SetTapeModel,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - pName arg is NULL.)
@@ -223,9 +196,6 @@ AD_XMETHOD2(GetTapeModel,
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
   // AAFRESULT_NULL_PARAM
   //   - pName arg is NULL.
   //
@@ -257,9 +227,6 @@ AD_XMETHOD1(GetTapeModelBufLen,
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
   // AAFRESULT_NULL_PARAM
   //   - pLen arg is NULL.)
 
@@ -283,9 +250,6 @@ AD_XMETHOD1(SetTapeFormFactor,
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
   // AAFRESULT_BAD_TYPE
   //	- formFactor is invalid.)
 
@@ -307,9 +271,6 @@ AD_XMETHOD1(GetTapeFormFactor,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - pFormFactor arg is NULL.)
@@ -333,9 +294,6 @@ AD_XMETHOD1(SetSignalType,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \\\(This is the only code indicating success.\\\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_BAD_TYPE
   //	- videoSignal is invalid.)
@@ -362,9 +320,6 @@ AD_XMETHOD1(GetSignalType,
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
   // AAFRESULT_NULL_PARAM
   //   - pVideoSignal arg is NULL.)
 
@@ -387,9 +342,6 @@ AD_XMETHOD1(SetTapeFormat,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_BAD_TYPE
   //	- tapeFormat is invalid.)
@@ -417,9 +369,6 @@ AD_XMETHOD1(GetTapeFormat,
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
   // AAFRESULT_NULL_PARAM
   //   - pTapeFormat arg is NULL.)
 
@@ -441,9 +390,6 @@ AD_XMETHOD1(SetTapeLength,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_BAD_LENGTH
   //	- tapeLength is negative.)
@@ -469,9 +415,6 @@ AD_XMETHOD1(GetTapeLength,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - pTapeLength arg is NULL.)
