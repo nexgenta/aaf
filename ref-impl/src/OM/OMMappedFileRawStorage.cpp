@@ -26,7 +26,6 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMMappedFileRawStorage
 #include "OMMappedFileRawStorage.h"
 
   // @mfunc Create an <c OMMappedFileRawStorage> object by opening
