@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.64.2.4 2004/05/24 19:06:20 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.64.2.5 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -806,6 +806,9 @@ bool PvtIsTypePresent (
   // have been initialized. This should be called after the file has been opened.
   void InitializeMetaDefinitions(void);
 
+  // Merge class definitions, their property definitions and their
+  // dependencies to the destination dictionary.
+  virtual AAFRESULT MergeTo( ImplAAFDictionary* pDestDictionary );
 
 private:
   bool pvtLookupAxiomaticClassDef (const aafUID_t & classID,

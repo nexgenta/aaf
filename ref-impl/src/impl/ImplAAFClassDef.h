@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.h,v 1.36 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFClassDef.h,v 1.36.2.1 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -308,6 +308,20 @@ public:
   // If this method fails the class is removed from the MetaDictionary and the
   // registration method will fail.
   virtual HRESULT CompleteClassRegistration(void);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	InitOMPropertiesForObject(ImplAAFObject *obj);
+
+  // Merge this class definition to the destination dictionary.
+  // If the class definition doesn't exist in the destination
+  // it will be created.
+  virtual AAFRESULT MergeTo( ImplAAFDictionary* pDestDictionary );
+
+
+protected:
+
+  AAFRESULT MergePropertyDefsTo( ImplAAFClassDef* pDestClassDef );
+
 
 private:
 

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.h,v 1.24 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.h,v 1.24.2.1 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,6 +98,10 @@ public:
   // size of this type.  If not registered, will PropValSize.
   virtual size_t ActualSize (void) const;
 
+  // Create a copy of this type definition in the destination
+  // dictionary.
+  virtual AAFRESULT MergeTo( ImplAAFDictionary* pDestDictionary );
+
   //*************************************************************
   //
   // Overrides from OMType, via inheritace through ImplAAFTypeDef
@@ -169,6 +173,7 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
+  virtual void onCopy(void* clientContext) const;
 
 protected:
   // Helper function to return the raw type of UInt8Array (if
