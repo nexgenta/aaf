@@ -4,9 +4,6 @@
 #define __ImplAAFMobSlot_h__
 
 #include "ImplAAFObject.h"
-#ifndef __ImplAAFSegment_h__
-#include "ImplAAFSegment.h"
-#endif
 #include "OMProperty.h"
 
 /******************************************\
@@ -25,14 +22,17 @@
 // aafRational_t,
 // AAFSegment,
 // aafPosition_t,
-// aafSlotID_t,
+// aafTrackID_t,
 // aafUInt32,
 // AAFDataDef
 
+const int CLSID_AAFMOBSLOT = 129;
+
 const int PID_MOBSLOT_NAME				= 0;
-const int PID_MOBSLOT_TRACKID			= 1;
-const int PID_MOBSLOT_PHYSICAL_TRACK	= 2;
-const int PID_MOBSLOT_SEGMENT			= 3;
+const int PID_MOBSLOT_ORIGIN			= 1;
+const int PID_MOBSLOT_TRACKID			= 2;
+const int PID_MOBSLOT_PHYSICAL_TRACK	= 3;
+const int PID_MOBSLOT_SEGMENT			= 4;
 
 class ImplAAFSegment;
 
@@ -59,7 +59,15 @@ public:
   ImplAAFMobSlot ();
   ~ImplAAFMobSlot ();
 
-  OMDECLARE_STORABLE(ImplAAFMobSlot)
+
+  //****************
+  // IsATrack()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsATrack
+        (aafBool *  retval);  //@parm [out,retval] True if slot is a track
+
+
   //****************
   // GetSegment()
   //
@@ -67,36 +75,13 @@ public:
     GetSegment
         (ImplAAFSegment ** result);  //@parm [out,retval] Segment property value
 
+
   //****************
-  // SetSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetSegment
-        (ImplAAFSegment *value);  //@parm [in] Segment property value
-
-
- //****************
   // GetName()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetName
-        (aafWChar *  name,  //@parm [in] buffer provided by client to hold the Mob Slot Name
-		aafInt32	bufsize);	//@parm [in] length of the buffer provided to hold the slot name
-
-  //****************
-  // GetNameBufLen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetNameBufLen
-		(aafInt32	*bufsize);	//@parm [in] length of the buffer provided to hold the slot name
-							// including the terminator
-
-  //****************
-  // SetName()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetName
-        (aafWChar *  name);  //@parm [in] Mob Slot Name
+        (aafString_t *  name);  //@parm [in,out] Mob Slot Name
 
 
   //****************
@@ -119,51 +104,18 @@ public:
   // GetDataKind()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetDataDef
-        (aafUID_t *result);  //@parm [out,retval] Data Definition UUID
+    GetDataKind
+        (ImplAAFDataDef ** result);  //@parm [out,retval] Data Definition object
 
-  //***********************************************************
-  // METHOD NAME: GetSlotID()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-  GetSlotID (
-    // @parm [out,retval] aafSlotID_t * | result | Slot id of the Mob Slot
-    aafSlotID_t *  result
-  );
-
-  //***********************************************************
-  // METHOD NAME: SetSlotID()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-  SetSlotID (
-    // @parm [in] aafSlotID_t | value | Slot id of the Mob Slot
-    aafSlotID_t value
-  );
-
-public:
-// Internal to the SDK, but available to other SDK internal code.
-  virtual AAFRESULT FindSegment(aafPosition_t offset,
-										  ImplAAFSegment **segment,
-										  aafRational_t *srcRate,
-										  aafPosition_t *diffPos);
-  virtual AAFRESULT ConvertToEditRate(aafPosition_t tmpPos,
-										aafRational_t destRate,
-										aafPosition_t *convertPos);
-  virtual AAFRESULT ConvertToMyRate(aafPosition_t tmpPos,
-										  ImplAAFMobSlot *srcSlot,
-										aafPosition_t *convertPos);
 
 public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFMobSlotTest.cpp.
   static AAFRESULT test();
 
-  // Return this objects stored object class.
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
-
 protected:
-	OMWideStringProperty				_name;
+	OMStringProperty					_name;
+	OMFixedSizeProperty<aafPosition_t>	_origin;
 	OMFixedSizeProperty<aafUInt32>		_trackID;
 	OMFixedSizeProperty<aafUInt32>		_physicalTrackNum;
 	OMStrongReferenceProperty<ImplAAFSegment> _segment;
