@@ -17,9 +17,7 @@ AD_HEAD
 AD_IDL(//
 // This interface is used to define C-like structured types used in
 // AAF persistent objects.
-//
-AD_STD_COMMENT_IFC_HEADER
-AD_STD_COMMENT_IFC_STUB)
+AD_STD_COMMENT_IFC_HEADER)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_FORWARD_DECLARATION(EnumAAFPropertyValues)
 AD_CLASS_UUID(809c8ca5, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
@@ -27,10 +25,10 @@ AD_CLASS_UUID(809c8ca5, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
 AD_DEFAULT_UUID(809c8ca6, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_X2METHOD5(Initialize,
-			 [in],
+			 [in\, ref],
 			 objPass,
-			 aafUID_t *,
-			 pID,
+			 aafUID_constref,
+			 id,
 			 auid to be used to identify this type,
 			 ,
 
@@ -59,24 +57,36 @@ AD_X2METHOD5(Initialize,
 
 			 [in],
 			 objPass,
-			 aafCharacter *,
+			 aafCharacter_constptr,
 			 pTypeName,
 			 friendly name of this type definition,
 			 ,
 
      Initializes this type def to be identified by the given guid\, and
   // to contain the given members \(types and names\).  It is considered
-  // an error if multiple members have the same name.
+  // an error if multiple members have the same name.  Note that it is
+  // only possible to use certain types as member types.  Those
+  // permissible types include:
+  // - AAFTypeDefInt
+  // - AAFTypeDefRecord
+  // - AAFTypeDefEnum
+  // - AAFTypeDefExtEnum
+  // - AAFTypeDefFixedArray
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
   // - pID is a valid pointer.
-  // - pMemberInfo is a valid pointer.
+  // - pMemberTypes is a valid pointer.
+  // - pMemberNames is a valid pointer.
   // - pTypeName is a valid pointer.
+  // - all specified member types are permissible for use in a Record.
   // - all member names are unique.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pID\\\, pMemberInfo\\\, or pTypeName\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pMemberTypes\\\, pMemberNames\\\, or pTypeName\)
+  //
+  // AAFRESULT_BAD_TYPE
+  //   - an illegal member type was given.
   //
   // AAFRESULT_DUPLICATE
   //   - a duplicate member name was given.)
@@ -240,7 +250,7 @@ AD_X2METHOD3(CreateValueFromValues,
 AD_XMETHOD3(CreateValueFromStruct,
 			[in\, size_is\(initDataSize\)],
 			objPass,
-			aafMemPtr_t *,
+			aafMemPtr_t,
 			pInitData,
 			pointer to compile-time struct containing data to use,
 
