@@ -8,7 +8,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -59,7 +58,6 @@ public:
   ImplAAFContentStorage ();
   ~ImplAAFContentStorage ();
 
-	OMDECLARE_STORABLE(ImplAAFContentStorage)
 
   //****************
   // LookupMob()
