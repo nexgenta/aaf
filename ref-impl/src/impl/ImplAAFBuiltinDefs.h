@@ -34,39 +34,6 @@
 #include "AAFTypeDefUIDs.h"
 #include "AAFResult.h"
 
-//
-// This class provides a facility to allow clients to access builtin
-// definition objects easily.  When set up, the client simply has to
-// call a method on this function, which returns a pointer to the
-// requested definition object.
-//
-// The returned object is *not* reference counted beyond that
-// maintained by the this class; furthermore, this class maintains no
-// reference count of any object beyond that of the associated
-// dictionary.  Therefore the client must promise that his use of the
-// returned definition object will last no longer than the scope of
-// the dictionary with which this ImplAAFBuiltinDefs object is
-// created, unless he explicitly maintains a reference count of the
-// use of that object beyond that scope.
-//
-// Usage example:
-//
-// void MyFunc (ImplAAFDictionary * pDict)
-// {
-//   // Use of CAAFBuiltinDefs to obtain a class definition
-//   CAAFBuiltinDefs defs (pDict);	// create builtin defs object.
-//   IAAFFiller * pFiller = 0;
-//   defs.cdFiller()->CreateInstance(IID_IAAFFiller, (IAAFObject**) &pFiller);
-//   // Note that ImplAAFClassDef returned by cdFiller() is only used
-//   // for the duration of the CreateInstance() function call.
-// 
-//   // Use of CAAFBuiltinDefs to obtain a data definition
-//   pFiller->Initialize(defs.ddPicture(), 10);
-//   // Note that ImplAAFDataDef returned by ddPicture() is only used
-//   // for the duration of the Initialize() function call.
-// }
-//
-
 // To avoid including assert.h in a header file (this one)
 #ifndef AAF_BUILTIN_DEFS_ASSERT
 #define AAF_BUILTIN_DEFS_ASSERT(condition) \
@@ -137,28 +104,26 @@ private: \
    TYPE_DEF_METHOD_DECL(td##name, kAAFTypeID_##name)
 
 
-
-//
-// Private dumb pointer template to make default pointer
-// declarations be initialized to zero.  No reference counting done
-// here.
-//
-template <typename T>
-class ImplAAFDumbPointer
-{
-public:
-  ImplAAFDumbPointer (T * init = 0) : _rep (init) {}
-  operator T * () { return _rep; }
-  T ** operator & () { return &_rep; }
-  T * operator -> () { return _rep; }
-private:
-  T * _rep;
-};
-
-
-
 class ImplAAFBuiltinDefs
 {
+private:
+  // Private dumb pointer template to make default pointer
+  // declarations be initialized to zero.  No reference counting done
+  // here.
+  //
+  template <typename T>
+  class ImplAAFDumbPointer
+  {
+  public:
+	ImplAAFDumbPointer (T * init = 0) : _rep (init) {}
+	operator T * () { return _rep; }
+	T ** operator & () { return &_rep; }
+	T * operator -> () { return _rep; }
+  private:
+	T * _rep;
+  };
+
+
 public:
   ImplAAFBuiltinDefs(ImplAAFDictionary * pDict)
   {
@@ -183,7 +148,6 @@ public:
   CLASS_DEF_METHOD(ContentStorage);
   CLASS_DEF_METHOD(ControlPoint);
   CLASS_DEF_METHOD(DataDef);
-  CLASS_DEF_METHOD(Dictionary);
   CLASS_DEF_METHOD(DigitalImageDescriptor);
   CLASS_DEF_METHOD(Edgecode);
   CLASS_DEF_METHOD(EssenceData);
@@ -195,7 +159,6 @@ public:
   CLASS_DEF_METHOD(Filler);
   CLASS_DEF_METHOD(FilmDescriptor);
   CLASS_DEF_METHOD(HTMLClip);
-  CLASS_DEF_METHOD(HTMLDescriptor);
   CLASS_DEF_METHOD(Identification);
   CLASS_DEF_METHOD(InterpolationDefinition);
   CLASS_DEF_METHOD(Locator);
@@ -208,7 +171,7 @@ public:
   CLASS_DEF_METHOD(OperationGroup);
   CLASS_DEF_METHOD(Parameter);
   CLASS_DEF_METHOD(ParameterDef);
-  CLASS_DEF_METHOD(PluginDef);
+  CLASS_DEF_METHOD(PluginDescriptor);
   CLASS_DEF_METHOD(PropertyDef);
   CLASS_DEF_METHOD(Pulldown);
   CLASS_DEF_METHOD(ScopeReference);
@@ -217,7 +180,6 @@ public:
   CLASS_DEF_METHOD(SourceClip);
   CLASS_DEF_METHOD(SourceMob);
   CLASS_DEF_METHOD(SourceReference);
-  CLASS_DEF_METHOD(StaticMobSlot);
   CLASS_DEF_METHOD(TIFFDescriptor);
   CLASS_DEF_METHOD(TaggedValue);
   CLASS_DEF_METHOD(TapeDescriptor);
@@ -232,13 +194,9 @@ public:
   CLASS_DEF_METHOD(TypeDefEnum);
   CLASS_DEF_METHOD(TypeDefExtEnum);
   CLASS_DEF_METHOD(TypeDefFixedArray);
-  CLASS_DEF_METHOD(TypeDefCharacter);
-  CLASS_DEF_METHOD(TypeDefIndirect);
-  CLASS_DEF_METHOD(TypeDefOpaque);
   CLASS_DEF_METHOD(TypeDefInt);
   CLASS_DEF_METHOD(TypeDefRecord);
   CLASS_DEF_METHOD(TypeDefRename);
-  CLASS_DEF_METHOD(TypeDefStream);
   CLASS_DEF_METHOD(TypeDefString);
   CLASS_DEF_METHOD(TypeDefStrongObjRef);
   CLASS_DEF_METHOD(TypeDefVariableArray);
@@ -261,8 +219,6 @@ public:
   //
   // Type Def 'get' methods
   //
-  TYPE_DEF_METHOD(Indirect);
-  TYPE_DEF_METHOD(Character);
   TYPE_DEF_METHOD(String);
 
 
