@@ -8,7 +8,6 @@
 * Advanced Authoring Format                     *
 *                                               *
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *                                               *
 \***********************************************/
 
@@ -194,12 +193,12 @@ protected:
   // Initializes the given OM property.
 
 private:
+
   // private method
   AAFRESULT InitProperties ();
 
   ImplPropertyCollection * _pProperties;
 
-  // Didn't use shorthand here in an attempt to avoid including ClassDef header.
   ImplAAFClassDef * _cachedDefinition;
 
   aafBool                  _OMPropsInited;
