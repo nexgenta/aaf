@@ -1,3 +1,6 @@
+#ifndef __jpegesdata_h__
+#define __jpegesdata_h__
+
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -20,24 +23,17 @@
 //
 //=---------------------------------------------------------------------=
 
-//
-// Include the appropriate header files:
-//
-#include "CAAFEssenceDataStream.h"
-#include "CAAFEssenceFileContainer.h"
-#include "CAAFAIFCCodec.h"
-#include "CAAFWAVECodec.h"
-#include "CAAFJPEGCodec.h"
-#include "CAAFCDCICodec.h"
+/* Include the definition for IAAFEssenceStream */
+#include "AAFPlugin.h"
 
-//
-// Include all objects in the following table:
-//
-AAF_BEGIN_OBJECT_MAP(AAFPluginObjectMap)
-	AAF_OBJECT_ENTRY(AAFEssenceDataStream)
-	AAF_OBJECT_ENTRY(AAFEssenceFileContainer)
-	AAF_OBJECT_ENTRY(AAFAIFCCodec)
-	AAF_OBJECT_ENTRY(AAFWaveCodec)
-	AAF_OBJECT_ENTRY(AAFJPEGCodec)
-	AAF_OBJECT_ENTRY(AAFCDCICodec)
-AAF_END_OBJECT_MAP()
+/* this is not a core library module, so it doesn't define JPEG_INTERNALS */
+#include "jinclude.h"
+#include "jpeglib.h"
+
+/* Standard data source and destination managers: stdio streams. */
+/* Caller is responsible for opening the file before and closing after. */
+EXTERN(void) jpeg_essencestream_dest JPP((j_compress_ptr cinfo, IAAFEssenceStream * outstream));
+EXTERN(void) jpeg_essencestream_src JPP((j_decompress_ptr cinfo, IAAFEssenceStream * instream, aafUInt32 samplesize));
+EXTERN(void) jpeg_essencestream_srcCleanup JPP((j_decompress_ptr cinfo));
+
+#endif // #ifndef __jpegesdata_h__

@@ -1,3 +1,8 @@
+//@doc
+//@class    EnumAAFProperties | Implementation class for EnumAAFProperties
+#ifndef __ImplEnumAAFProperties_h__
+#define __ImplEnumAAFProperties_h__
+
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -20,24 +25,11 @@
 //
 //=---------------------------------------------------------------------=
 
-//
-// Include the appropriate header files:
-//
-#include "CAAFEssenceDataStream.h"
-#include "CAAFEssenceFileContainer.h"
-#include "CAAFAIFCCodec.h"
-#include "CAAFWAVECodec.h"
-#include "CAAFJPEGCodec.h"
-#include "CAAFCDCICodec.h"
 
-//
-// Include all objects in the following table:
-//
-AAF_BEGIN_OBJECT_MAP(AAFPluginObjectMap)
-	AAF_OBJECT_ENTRY(AAFEssenceDataStream)
-	AAF_OBJECT_ENTRY(AAFEssenceFileContainer)
-	AAF_OBJECT_ENTRY(AAFAIFCCodec)
-	AAF_OBJECT_ENTRY(AAFWaveCodec)
-	AAF_OBJECT_ENTRY(AAFJPEGCodec)
-	AAF_OBJECT_ENTRY(AAFCDCICodec)
-AAF_END_OBJECT_MAP()
+#include "ImplAAFEnumerator.h"
+
+#include "ImplAAFProperty.h"
+
+typedef ImplAAFEnumerator<ImplAAFProperty> ImplEnumAAFProperties;
+
+#endif // ! __ImplEnumAAFProperties_h__

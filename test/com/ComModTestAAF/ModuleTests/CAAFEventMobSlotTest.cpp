@@ -1,31 +1,26 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFEventMobSlot
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAF.h"
 
@@ -34,11 +29,15 @@
 #include <stdio.h>
 #include <assert.h>
 #include <memory.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 
 // Cross-platform utility to delete a file.
@@ -67,6 +66,8 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
+static const aafUID_t DDEF_TEST = 
+{ 0x81831639, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 class EventMobSlotTest
 {
@@ -93,8 +94,6 @@ private:
   bool _bWritableFile;
   IAAFHeader *_pHeader;
   IAAFDictionary *_pDictionary;
-  aafUID_t _eventMobID1;
-  aafUID_t _eventMobID2;
 
   // EventMobSlot static data
   static const aafRational_t _editRate;
@@ -103,21 +102,44 @@ private:
   static const wchar_t* _slotName;
 };
 
+//{060c2b340205110101001000-13-00-00-00-{f827fde6-8d6f-11d4-a380-009027dfca6a}}
 
-extern "C" HRESULT CAAFEventMobSlot_test()
+static const aafMobID_t gEventMobID1 = {
+
+{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+
+0x13, 0x00, 0x00, 0x00, 
+
+{0xf827fde6, 0x8d6f, 0x11d4, 0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+
+//{060c2b340205110101001000-13-00-00-00-{f8d86bea-8d6f-11d4-a380-009027dfca6a}}
+
+static const aafMobID_t gEventMobID2 = {
+
+{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+
+0x13, 0x00, 0x00, 0x00, 
+
+{0xf8d86bea, 0x8d6f, 0x11d4, 0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+
+
+extern "C" HRESULT CAAFEventMobSlot_test(testMode_t mode);
+extern "C" HRESULT CAAFEventMobSlot_test(testMode_t mode)
 {
   HRESULT hr = S_OK;
   aafProductIdentification_t	ProductInfo = {0};
   aafWChar * pFileName = L"AAFEventMobSlotTest.aaf";
 
   // Initialize the product info for this module test
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFEventMobSlot Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -129,7 +151,8 @@ extern "C" HRESULT CAAFEventMobSlot_test()
   try
   {
     // Attempt to create a test file
-    test.Create(pFileName, &ProductInfo);
+	if(mode == kAAFUnitTestReadWrite)
+  	  test.Create(pFileName, &ProductInfo);
 
     // Attempt to read the test file.
     test.Open(pFileName);
@@ -140,7 +163,8 @@ extern "C" HRESULT CAAFEventMobSlot_test()
   }
   catch (...)
   {
-    cerr << "CAAFEventMobSlot_test...Caught general C++ exception!" << endl;
+    cerr << "CAAFEventMobSlot_test..."
+		 << "Caught general C++ exception!" << endl;
     hr = AAFRESULT_TEST_FAILED;
   }
 
@@ -149,7 +173,7 @@ extern "C" HRESULT CAAFEventMobSlot_test()
 
 // Test edit rate for the event mob slot.
 const aafRational_t EventMobSlotTest::_editRate = { 2997, 100 };
-const aafPosition_t _position = 0;
+const aafPosition_t EventMobSlotTest::_position = 0;
 const wchar_t *_eventComment = L"Event::Comment:This is a test event";
 
 EventMobSlotTest::EventMobSlotTest() :
@@ -158,8 +182,6 @@ EventMobSlotTest::EventMobSlotTest() :
   _pHeader(NULL),
   _pDictionary(NULL)
 {
-  memset(&_eventMobID1, 0, sizeof(_eventMobID1));
-  memset(&_eventMobID2, 0, sizeof(_eventMobID1));
 }
 
 EventMobSlotTest::~EventMobSlotTest()
@@ -255,24 +277,38 @@ IAAFEvent *EventMobSlotTest::CreateAnEvent(aafPosition_t* position,
 
   IAAFEvent *pEvent = NULL;
   IAAFComponent *pComponent = NULL;
-  aafUID_t		uid;
+  IAAFDataDef *pDataDef = NULL;
+  IAAFComponent *pComp = NULL;
+
+  CAAFBuiltinDefs defs (_pDictionary);
 
   try
   {
-    // Create an event (note: this will be replaced by a concrete event in a
-    // later version after such an event is implemented.)
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFEvent,
-                                             IID_IAAFEvent, 
-                                             (IUnknown **)&pEvent));
+	  // not already in dictionary
+		checkResult(defs.cdDataDef()->
+					CreateInstance (IID_IAAFDataDef,
+									(IUnknown **)&pDataDef));
+	  pDataDef->Initialize (DDEF_TEST, L"Test", L"Test data");
+	  _pDictionary->RegisterDataDef (pDataDef);
+	// Create a concrete subclass of event
+    checkResult(defs.cdCommentMarker()->
+				CreateInstance(IID_IAAFEvent, 
+							   (IUnknown **)&pEvent));
     checkResult(pEvent->SetPosition(*position));
-    checkResult(pEvent->SetComment(L"Event::Comment:This is a test event"));
+    checkResult(pEvent->SetComment(comment));
+	checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pComp));
+	checkResult(pComp->SetDataDef(defs.ddPicture()));
+	pComp->Release();
+	pComp = NULL;
+	pDataDef->Release();
+	pDataDef = NULL;
 
     if (NULL != pSequence)
     {
       // Get the segment inteface to add to the mob slot
       checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-      uid = DDEF_Picture;	// Give a valid but nonsense kind
-	  checkResult(pComponent->SetDataDef(&uid));
+	  CAAFBuiltinDefs defs (_pDictionary);
+	  checkResult(pComponent->SetDataDef(defs.ddPicture()));
 
       // Add the event to the sequence.
       checkResult(pSequence->AppendComponent(pComponent));
@@ -293,6 +329,12 @@ IAAFEvent *EventMobSlotTest::CreateAnEvent(aafPosition_t* position,
       pEvent->Release();
       pEvent = NULL;
     }
+
+    if (pDataDef)
+    {
+      pDataDef->Release();
+      pDataDef = NULL;
+    }
     
     throw;
   }
@@ -304,15 +346,14 @@ void EventMobSlotTest::CreateEventMobSlot()
 {
   assert(_pHeader && _pDictionary);
 
-  HRESULT hr = S_OK;
   aafPosition_t position;
   IAAFEvent *pEvent = NULL;
-  IAAFComponent *pComponent = NULL;
   IAAFSegment *pSegment = NULL;
   IAAFEventMobSlot *pEventMobSlot = NULL;
   IAAFMobSlot *pMobSlot = NULL;
   IAAFMob *pMob = NULL;
 
+  CAAFBuiltinDefs defs (_pDictionary);
 
   try
   {
@@ -327,9 +368,9 @@ void EventMobSlotTest::CreateEventMobSlot()
     pEvent = NULL;
 
     // Create and initialize an EventMobSlot
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFEventMobSlot,
-                                             IID_IAAFEventMobSlot, 
-                                             (IUnknown **)&pEventMobSlot));
+    checkResult(defs.cdEventMobSlot()->
+				CreateInstance(IID_IAAFEventMobSlot, 
+							   (IUnknown **)&pEventMobSlot));
     checkResult(pEventMobSlot->SetEditRate(const_cast<aafRational_t *>(&_editRate)));
 
     // Get the mob slot interface so that we can add the event segment.
@@ -343,9 +384,9 @@ void EventMobSlotTest::CreateEventMobSlot()
     pSegment = NULL;
 
     // Create the mob to hold the new event mob slot.
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFCompositionMob,
-                                             IID_IAAFMob, 
-                                             (IUnknown **)&pMob));
+    checkResult(defs.cdCompositionMob()->
+				CreateInstance(IID_IAAFMob, 
+							   (IUnknown **)&pMob));
     checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));
 
     // Append event slot to the composition mob.
@@ -353,12 +394,13 @@ void EventMobSlotTest::CreateEventMobSlot()
     pMobSlot->Release();
     pMobSlot = NULL;
 
-    // Attach the mob to the header...
-    checkResult(_pHeader->AppendMob(pMob));
-
     // Save the id of the composition mob that contains our test
     // event mob slot.
-    checkResult(pMob->GetMobID(&_eventMobID1));
+    checkResult(pMob->SetMobID(gEventMobID1));
+
+    // Attach the mob to the header...
+    checkResult(_pHeader->AddMob(pMob));
+
     pMob->Release();
     pMob = NULL;
   }
@@ -405,7 +447,6 @@ void EventMobSlotTest::OpenEventMobSlot()
 {
   assert(_pHeader);
 
-  HRESULT hr = S_OK;
   IAAFMob *pMob = NULL;
   IEnumAAFMobSlots *pEnumSlots = NULL;
   IAAFMobSlot *pMobSlot = NULL;
@@ -418,10 +459,10 @@ void EventMobSlotTest::OpenEventMobSlot()
   try
   {
     // Get the composition mob that we created to hold the
-    checkResult(_pHeader->LookupMob(&_eventMobID1, &pMob));
+    checkResult(_pHeader->LookupMob(gEventMobID1, &pMob));
 
     // Get the first mob slot and check that it is an event mob slot.
-    checkResult(pMob->EnumAAFAllMobSlots(&pEnumSlots));
+    checkResult(pMob->GetSlots(&pEnumSlots));
     checkResult(pEnumSlots->NextOne(&pMobSlot));
     checkResult(pMobSlot->QueryInterface(IID_IAAFEventMobSlot, (void **)&pEventMobSlot));
     checkResult(pEventMobSlot->GetEditRate(&editRate));
@@ -493,7 +534,6 @@ void EventMobSlotTest::CreateEventSequenceMobSlot()
 {
   assert(_pHeader && _pDictionary);
 
-  HRESULT hr = S_OK;
   aafPosition_t position;
   IAAFSequence *pSequence = NULL;
   IAAFEvent *pEvent = NULL;
@@ -502,17 +542,18 @@ void EventMobSlotTest::CreateEventSequenceMobSlot()
   IAAFEventMobSlot *pEventMobSlot = NULL;
   IAAFMobSlot *pMobSlot = NULL;
   IAAFMob *pMob = NULL;
-  aafUID_t	uid;
 
   try
   {
+	CAAFBuiltinDefs defs (_pDictionary);
+
     // Create a sequence to hold our list of events.
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFSequence,
-                                             IID_IAAFSequence, 
-                                             (IUnknown **)&pSequence));
+    checkResult(defs.cdSequence()->
+				CreateInstance(IID_IAAFSequence, 
+							   (IUnknown **)&pSequence));
      checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-     uid = DDEF_Picture;	// Give a valid but nonsense kind
-	 checkResult(pComponent->SetDataDef(&uid));
+
+	 checkResult(pComponent->SetDataDef(defs.ddPicture()));
 	 pComponent->Release();
 	 pComponent = NULL;
 
@@ -547,9 +588,9 @@ void EventMobSlotTest::CreateEventSequenceMobSlot()
     pSequence = NULL;
 
     // Create and initialize an EventMobSlot
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFEventMobSlot,
-                                             IID_IAAFEventMobSlot, 
-                                             (IUnknown **)&pEventMobSlot));
+    checkResult(defs.cdEventMobSlot()->
+				CreateInstance(IID_IAAFEventMobSlot, 
+							   (IUnknown **)&pEventMobSlot));
     checkResult(pEventMobSlot->SetEditRate(const_cast<aafRational_t *>(&_editRate)));
 
     // Get the mob slot interface so that we can add the event segment.
@@ -563,9 +604,9 @@ void EventMobSlotTest::CreateEventSequenceMobSlot()
     pSegment = NULL;
 
     // Create the mob to hold the new event mob slot.
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFCompositionMob,
-                                             IID_IAAFMob, 
-                                             (IUnknown **)&pMob));
+    checkResult(defs.cdCompositionMob()->
+				CreateInstance(IID_IAAFMob, 
+							   (IUnknown **)&pMob));
     checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));
 
     // Append event slot to the composition mob.
@@ -573,12 +614,13 @@ void EventMobSlotTest::CreateEventSequenceMobSlot()
     pMobSlot->Release();
     pMobSlot = NULL;
 
-    // Attach the mob to the header...
-    checkResult(_pHeader->AppendMob(pMob));
-
     // Save the id of the composition mob that contains our test
     // event mob slot.
-    checkResult(pMob->GetMobID(&_eventMobID2));
+    checkResult(pMob->SetMobID(gEventMobID2));
+
+    // Attach the mob to the header...
+    checkResult(_pHeader->AddMob(pMob));
+
     pMob->Release();
     pMob = NULL;
   }
@@ -637,7 +679,6 @@ void EventMobSlotTest::OpenEventSequenceMobSlot()
 {
   assert(_pHeader);
 
-  HRESULT hr = S_OK;
   IAAFMob *pMob = NULL;
   IEnumAAFMobSlots *pEnumSlots = NULL;
   IAAFMobSlot *pMobSlot = NULL;
@@ -650,10 +691,10 @@ void EventMobSlotTest::OpenEventSequenceMobSlot()
   try
   {
     // Get the composition mob that we created to hold the
-    checkResult(_pHeader->LookupMob(&_eventMobID2, &pMob));
+    checkResult(_pHeader->LookupMob(gEventMobID2, &pMob));
 
     // Get the first mob slot and check that it is an event mob slot.
-    checkResult(pMob->EnumAAFAllMobSlots(&pEnumSlots));
+    checkResult(pMob->GetSlots(&pEnumSlots));
     checkResult(pEnumSlots->NextOne(&pMobSlot));
     checkResult(pMobSlot->QueryInterface(IID_IAAFEventMobSlot, (void **)&pEventMobSlot));
     checkResult(pEventMobSlot->GetEditRate(&editRate));
