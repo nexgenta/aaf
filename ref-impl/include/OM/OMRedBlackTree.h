@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMINTERNAL
 #ifndef OMREDBLACKTREE_H
@@ -40,12 +45,11 @@ class OMRedBlackTreeIterator;
   //        balanced binary search tree providing O(lg N) performance
   //        for the dynamic set operations. Items in the tree are
   //        uniquely identified by key and carry an associated value.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
   //          <c OMRedBlackTree> item. This type must support operator =.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Key, typename Value>
 class OMRedBlackTree {
 public:
@@ -55,13 +59,10 @@ public:
   OMRedBlackTree(void);
 
     // @cmember Destructor.
-  virtual ~OMRedBlackTree(void);
+  ~OMRedBlackTree(void);
 
     // @cmember Insert the <p Value> <p v> into this
     //          <c OMRedBlackTree> and associate it with <p Key> <p k>.
-    //          If this the first instance of an item identified
-    //          by <p Key> <p k> in this <c OMRedBlackTree>, the result
-    //          is true, otherwise the result is false.
   bool insert(const Key k, Value v);
 
     // @cmember Find the item in this <c OMRedBlackTree> identified
@@ -83,9 +84,6 @@ public:
     // @cmember Remove the item assciated with <p Key> k from this
     //          <c OMRedBlackTree>.
   bool remove(const Key k);
-
-    // @cmember Remove all items from this <c OMRedBlackTree>.
-  virtual void clear(void);
 
     // @cmember The number of items in this <c OMRedBlackTree>.
     //          <mf OMRedBlackTree::count> returns the actual number
@@ -132,7 +130,7 @@ private:
   void leftRotate(Node* n);
 
   void rightRotate(Node* n);
-
+ 
   void rebalance(Node* x);
 
   void traverseInOrder(
