@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFCDCIDescriptor.h,v 1.3.2.2 2004/06/08 13:45:41 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCIDescriptor.h,v 1.3.2.3 2004/08/13 13:49:56 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,7 @@
 
 
 
+
 #ifndef __CAAFDigitalImageDescriptor_h__
 #include "CAAFDigitalImageDescriptor.h"
 #endif
@@ -46,6 +47,7 @@
 
 class CAAFCDCIDescriptor
   : public IAAFCDCIDescriptor,
+    public IAAFCDCIDescriptor2,
     public CAAFDigitalImageDescriptor
 {
 protected:
@@ -621,6 +623,62 @@ public:
     // Address to store the number of bits. 
     /*[out]*/ aafInt16 *  pPaddingBits);
 
+  //***********************************************************
+  // METHOD NAME: SetAlphaSamplingWidth()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFCDCIDescriptor2 | SetAlphaSamplingWidth |
+  // Sets the AlphaSamplingWidth property.
+  //
+  // Succeeds if all of the following are true:
+  //
+  // If this method fails, the FieldStartOffset property will not be
+  // changed.
+  //
+  // This method will return the following codes:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  // @end
+  // 
+  STDMETHOD (SetAlphaSamplingWidth)
+   (
+    // @parm [in] aafUInt32 | alphaSamplingWidth | Optional.
+    aafUInt32  alphaSamplingWidth
+  );
+
+  //***********************************************************
+  // METHOD NAME: GetAlphaSamplingWidth()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFCDCIDescriptor2 | GetAlphaSamplingWidth |
+  // Gets the AlphaSamplingWidth property.
+  //
+  // Succeeds if all of the following are true:
+  // - pAlphaSamplingWidth is a valid pointer
+  //
+  // If this method fails, pAlphaSamplingWidth will not be changed.
+  //
+  // This method will return the following codes:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pAlphaSamplingWidth is NULL.
+  //
+  // AAFRESULT_PROP_NOT_PRESENT
+  //   - the property is not present.
+  // @end
+  // 
+  STDMETHOD (GetAlphaSamplingWidth)
+   (
+    // @parm [out] aafUInt32 * | pAlphaSamplingWidth | Optional.
+    aafUInt32 *  pAlphaSamplingWidth
+  );
+
+
+
 protected:
   // 
   // Declare the QI that implements for the interfaces
@@ -641,5 +699,4 @@ public:
 };
 
 #endif // ! __CAAFCDCIDescriptor_h__
-
 

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCDCIDescriptor.h,v 1.15 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCDCIDescriptor.h,v 1.15.2.1 2004/08/13 13:51:24 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -173,6 +173,23 @@ public:
 		// @parm [out] Address to store the number of bits.
         (aafInt16 *  pPaddingBits);
 
+  //****************
+  // SetAlphaSamplingWidth()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetAlphaSamplingWidth
+        // @parm [in] Optional.
+        (aafUInt32  alphaSamplingWidth);
+
+  //****************
+  // GetAlphaSamplingWidth()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetAlphaSamplingWidth
+        // @parm [out] Optional.
+        (aafUInt32 *  pAlphaSamplingWidth);
+
+
 protected:
 	OMFixedSizeProperty<aafInt32>			_componentWidth;
 	OMFixedSizeProperty<aafUInt32>			_horizontalSubsampling;
@@ -182,6 +199,7 @@ protected:
 	OMFixedSizeProperty<aafUInt32>			_whiteReferenceLevel;
 	OMFixedSizeProperty<aafUInt32>			_colorRange;
 	OMFixedSizeProperty<aafInt16>			_paddingBits;
+	OMFixedSizeProperty<aafUInt32>			_alphaSamplingWidth;
 };
 
 #endif // ! __ImplAAFCDCIDescriptor_h__
