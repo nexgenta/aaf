@@ -3,6 +3,7 @@
 #ifndef __ImplAAFCodecDef_h__
 #define __ImplAAFCodecDef_h__
 
+
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -14,7 +15,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -31,8 +32,11 @@
  ************************************************************************/
 
 
+
 class ImplAAFClassDef;
+
 class ImplEnumAAFCodecFlavours;
+
 
 
 #ifndef __ImplAAFDefObject_h__
@@ -62,7 +66,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     IsEssenceKindSupported
         (// @parm [in,ref] The essence kind
-         ImplAAFDataDef * pEssenceKind,
+         const aafUID_t & essenceKind,
 
          // @parm [out,retval] Is this type supported
          aafBool*  pIsSupported);
@@ -74,7 +78,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AddEssenceKind
         // @parm [in] The essence kind
-        (ImplAAFDataDef * pEssenceKind);
+        (const aafUID_t & essenceKind);
 
 
 
@@ -84,7 +88,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     RemoveEssenceKind
         // @parm [in] The essence kind to remove
-        (ImplAAFDataDef * pEssenceKind);
+        (const aafUID_t & essenceKind);
 
 
 
