@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 #include "ImplAAFDigitalImageDescriptor.h"
 
 #include "AAFStoredObjectIDs.h"
@@ -16,23 +35,23 @@
 #include <string.h>
 
 ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
-:	_compression(PID_DigitalImageDescriptor_Compression,					"Compression"),
-	_storedHeight(PID_DigitalImageDescriptor_StoredHeight,					"StoredHeight"),
-	_storedWidth(PID_DigitalImageDescriptor_StoredWidth,					"StoredWidth"),
-	_sampledHeight(PID_DigitalImageDescriptor_SampledHeight,				"SampledHeight"),
-	_sampledWidth(PID_DigitalImageDescriptor_SampledWidth,					"SampledWidth"),
-	_sampledXOffset(PID_DigitalImageDescriptor_SampledXOffset,				"SampledXOffset"),
-	_sampledYOffset(PID_DigitalImageDescriptor_SampledYOffset,				"SampledYOffset"),
-	_displayHeight(PID_DigitalImageDescriptor_DisplayHeight,				"DisplayHeight"),
-	_displayWidth(PID_DigitalImageDescriptor_DisplayWidth,					"DisplayWidth"),
-	_displayXOffset(PID_DigitalImageDescriptor_DisplayXOffset,				"DisplayXOffset"),
-	_displayYOffset(PID_DigitalImageDescriptor_DisplayYOffset,				"DisplayYOffset"),
-	_frameLayout(PID_DigitalImageDescriptor_FrameLayout,					"FrameLayout"),
-	_videoLineMap(PID_DigitalImageDescriptor_VideoLineMap,					"VideoLineMap"),
-	_imageAspectRatio(PID_DigitalImageDescriptor_ImageAspectRatio,			"ImageAspectRatio"),
-	_alphaTransparency(PID_DigitalImageDescriptor_AlphaTransparency,		"AlphaTransparency"),
-	_gamma(PID_DigitalImageDescriptor_Gamma,								"Gamma"),
-	_imageAlignmentFactor(PID_DigitalImageDescriptor_ImageAlignmentFactor,	"ImageAlignmentFactor")
+:	_compression(PID_DigitalImageDescriptor_Compression,					L"Compression"),
+	_storedHeight(PID_DigitalImageDescriptor_StoredHeight,					L"StoredHeight"),
+	_storedWidth(PID_DigitalImageDescriptor_StoredWidth,					L"StoredWidth"),
+	_sampledHeight(PID_DigitalImageDescriptor_SampledHeight,				L"SampledHeight"),
+	_sampledWidth(PID_DigitalImageDescriptor_SampledWidth,					L"SampledWidth"),
+	_sampledXOffset(PID_DigitalImageDescriptor_SampledXOffset,				L"SampledXOffset"),
+	_sampledYOffset(PID_DigitalImageDescriptor_SampledYOffset,				L"SampledYOffset"),
+	_displayHeight(PID_DigitalImageDescriptor_DisplayHeight,				L"DisplayHeight"),
+	_displayWidth(PID_DigitalImageDescriptor_DisplayWidth,					L"DisplayWidth"),
+	_displayXOffset(PID_DigitalImageDescriptor_DisplayXOffset,				L"DisplayXOffset"),
+	_displayYOffset(PID_DigitalImageDescriptor_DisplayYOffset,				L"DisplayYOffset"),
+	_frameLayout(PID_DigitalImageDescriptor_FrameLayout,					L"FrameLayout"),
+	_videoLineMap(PID_DigitalImageDescriptor_VideoLineMap,					L"VideoLineMap"),
+	_imageAspectRatio(PID_DigitalImageDescriptor_ImageAspectRatio,			L"ImageAspectRatio"),
+	_alphaTransparency(PID_DigitalImageDescriptor_AlphaTransparency,		L"AlphaTransparency"),
+	_gamma(PID_DigitalImageDescriptor_Gamma,								L"Gamma"),
+	_imageAlignmentFactor(PID_DigitalImageDescriptor_ImageAlignmentFactor,	L"ImageAlignmentFactor")
 {
 	aafInt32	videoLineMap[2];
 
@@ -54,21 +73,34 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_persistentProperties.put(_gamma.address());
 	_persistentProperties.put(_imageAlignmentFactor.address());
 
-	aafRational_t zero;
+	aafRational_t	zero;
 	zero.numerator = 0;
 	zero.denominator = 1;
+
+	aafUID_t zeroID;
+	zeroID.Data1 = 0;
+	zeroID.Data2 = 0;
+	zeroID.Data3 = 0;
+	zeroID.Data4[0] = 0;
+	zeroID.Data4[1] = 0;
+	zeroID.Data4[2] = 0;
+	zeroID.Data4[3] = 0;
+	zeroID.Data4[4] = 0;
+	zeroID.Data4[5] = 0;
+	zeroID.Data4[6] = 0;
+	zeroID.Data4[7] = 0;
 	
 	// Initialize Required properties
 	_storedHeight = 0;
 	_storedWidth = 0;
-	_frameLayout = kFullFrame;
+	_frameLayout = kAAFFullFrame;
 	_imageAspectRatio = zero;
 	videoLineMap[0] = 0;
 	videoLineMap[1] = 1;
 	_videoLineMap.setValue(videoLineMap, 2*sizeof(aafInt32));
 	// Initialize Optional properties
 
-	_compression = NoCodec;
+	_compression = kAAFNoCodec;
 	_sampledHeight = 0;
 	_sampledWidth = 0;
 	_sampledXOffset = 0;
@@ -77,8 +109,8 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_displayWidth = 0;
 	_displayXOffset = 0;
 	_displayYOffset = 0;
-	_alphaTransparency = zero;
-	_gamma = zero;
+	_alphaTransparency = kAAFMinValueTransparent;
+	_gamma = zeroID;
 	_imageAlignmentFactor = 0;
 }
 
@@ -87,12 +119,9 @@ ImplAAFDigitalImageDescriptor::~ImplAAFDigitalImageDescriptor ()
 {}
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::SetCompression (aafUID_t*  pCompression)
+    ImplAAFDigitalImageDescriptor::SetCompression (const aafUID_t & compression)
 {
-	if (pCompression == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	_compression = *pCompression;
+	_compression = compression;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -171,31 +200,19 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::SetAlphaTransparency (aafAlphaTransparency_t AlphaTransparency)
 {
-	if ((AlphaTransparency != kMinValueTransparent) && (AlphaTransparency != kMaxValueTransparent))
+	if ((AlphaTransparency != kAAFMinValueTransparent) && (AlphaTransparency != kAAFMaxValueTransparent))
 	{
 		return AAFRESULT_INVALID_TRANSPARENCY;
 	}
 
-	aafRational_t transparency;
-
-	if (AlphaTransparency == kMinValueTransparent)
-	{
-		transparency.numerator = 0;
-		transparency.denominator = 1;
-	}
-	else
-	{
-		transparency.numerator = 1;
-		transparency.denominator = 1;
-	}
-	_alphaTransparency = transparency;
+	_alphaTransparency = AlphaTransparency;
 
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::SetGamma (aafRational_t Gamma)
+    ImplAAFDigitalImageDescriptor::SetGamma (aafUID_t Gamma)
 {
 	_gamma = Gamma;
 
@@ -344,23 +361,14 @@ AAFRESULT STDMETHODCALLTYPE
 	if (!_alphaTransparency.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
 	
-	aafRational_t transparency = _alphaTransparency;
-
-	if (transparency.numerator == 0)
-	{
-		*pAlphaTransparency = kMinValueTransparent;
-	}
-	else
-	{
-		*pAlphaTransparency = kMaxValueTransparent;
-	}
+	*pAlphaTransparency = _alphaTransparency;
 
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::GetGamma (aafRational_t* pGamma)
+    ImplAAFDigitalImageDescriptor::GetGamma (aafUID_t* pGamma)
 {
 	if (pGamma == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -375,7 +383,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::GetImageAlignmentFactor (aafInt32* pImageAlignmentFactor)
+    ImplAAFDigitalImageDescriptor::GetImageAlignmentFactor (aafUInt32* pImageAlignmentFactor)
 {
 	if (pImageAlignmentFactor == NULL)
 		return(AAFRESULT_NULL_PARAM);

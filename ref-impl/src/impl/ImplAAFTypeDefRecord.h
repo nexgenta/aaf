@@ -38,6 +38,7 @@ class ImplEnumAAFPropertyValues;
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMWeakRefVectorProperty.h"
 
 class ImplAAFTypeDefRecord : public ImplAAFTypeDef
 {
@@ -282,7 +283,7 @@ public:
 
          // @parm [in, size_is(numMembers)] array of member types to
 		 // be represented in this record type
-         aafUID_t ** pMemberTypeIDs,
+         ImplAAFTypeDef ** pMemberTypeIDs,
 
          // @parm [in, size_is(numMembers)] array of member names to
 		 // be represented in this enumerated  type
@@ -303,7 +304,8 @@ private:
   // types of members in this record
   //
   // BobT Note!!! This should be weak reference vector property...
-  OMVariableSizeProperty<aafUID_t> _memberTypes;
+  //OMVariableSizeProperty<aafUID_t> _memberTypes;
+  OMWeakReferenceVectorProperty<ImplAAFTypeDef> _memberTypes;
 
   // names of members in this record; stored as single aafCharacter
   // array with embedded nulls
@@ -337,10 +339,11 @@ public:
   size_t PropValSize (void) const;
   aafBool IsRegistered (void) const;
   size_t NativeSize (void) const;
+  void AttemptBuiltinRegistration (void);
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
   virtual AAFRESULT STDMETHODCALLTYPE
     RawAccessType

@@ -99,6 +99,28 @@ public:
          ImplAAFPropertyValue ** ppOutPropVal);
 
   //****************
+  // GetActualSize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetActualSize
+        (// @parm [in] indirect property value to read
+         ImplAAFPropertyValue * pPropVal,
+         
+         // @parm [out] actual data size
+         aafUInt32 * dataSize);
+
+  //****************
+  // GetActualType()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetActualType
+        (// @parm [in] indirect property value to read
+         ImplAAFPropertyValue * pPropVal,
+         
+         // @parm [out] actual data type
+         ImplAAFTypeDef ** ppActualType);
+
+  //****************
   // GetActualData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -156,7 +178,7 @@ public:
   // pvtInitialize() 
   //   Called when we initialize as one of the "builtin" types.
   //
-  virtual AAFRESULT STDMETHODCALLTYPE
+  AAFRESULT
     pvtInitialize
         (// @parm [in, ref] auid to be used to identify this type
          aafUID_constref  id,
@@ -190,6 +212,10 @@ public:
 	  const OMProperty & property,
 	  ImplAAFTypeDef ** pActualType); // REFERENCE COUNTED!
 
+  static AAFRESULT GetActualPropertyTypeID (
+	  const OMProperty & property,
+	  aafUID_t * pTypeID);
+
 
 
   // Called internally by the dm because there is NO OM property to hide this
@@ -205,8 +231,8 @@ public:
   virtual size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
   virtual bool IsAggregatable () const;
   virtual bool IsStreamable () const;
@@ -214,22 +240,26 @@ public:
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
 
-private:
+protected:
   // Utility (possibly temporary) that returns true if the given 
   // actual type can be used in an indirect type property.
   bool supportedActualType (ImplAAFTypeDef *pActualType, aafUInt32 level = 0);
 
-  
+  // Find the actual type definition from the dictionary.
+  virtual AAFRESULT LookupActualType (aafUID_constref typeID, ImplAAFTypeDef ** ppActualType) const;
+
 	// Utility to extract common information from the given indirect value.
   AAFRESULT GetIndirectValueInfo (
       ImplAAFPropertyValue * pIndirectValue,
 			aafUInt32 & indirectValueSize,
 			aafMemPtr_t & pIndirectValueDataBits,
-      ImplAAFTypeDef ** ppActualType);
+      ImplAAFTypeDef ** ppActualType,
+			aafUInt32 * actualValueSize = NULL,
+      aafUID_t *actualTypeID = NULL);
 
 
 
-private:
+protected:
   bool _initialized;
   ImplAAFDictionary *_dictionary;
   ImplAAFTypeDef *_typeDefAUID;
