@@ -1,37 +1,18 @@
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "aafTable.h"
 #include "aafErr.h"
-#include "AAFUtils.h"
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
@@ -41,8 +22,8 @@
 #include "ImplEnumAAFMobs.h"
 #endif
 
-#ifndef __ImplEnumAAFEssenceData_h__
-#include "ImplEnumAAFEssenceData.h"
+#ifndef __ImplEnumAAFMedia_h__
+#include "ImplEnumAAFMedia.h"
 #endif
 
 #ifndef __ImplAAFDictionary_h__
@@ -62,19 +43,26 @@
 #endif
 
 #include "ImplAAFFile.h"
-#include "ImplAAFBuiltinDefs.h"
-
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
-
-#include "ImplAAFSmartPointer.h"
-typedef ImplAAFSmartPointer<ImplAAFIdentification>
-    ImplAAFIdentificationSP;
-typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
-    ImplEnumAAFIdentificationsSP;
 
 #include <assert.h>
-#include <wchar.h>
+
+#if defined(__MWERKS__)
+// Since the ansi standard does not define wcslen and the other wide
+// string functions are not normally placed in string.h along with the
+// single-byte string functions, as is done with VC++, CodeWarrior
+// places all of the "wide-string" functions in wstring.h.
+#include <wstring.h>
+#endif
+
+// BobT 11-Sept-1998: Changed '#if 0' to '#if FULL_TOOLKIT'.
+#if FULL_TOOLKIT
+#include <stdio.h>
+#include <string.h>
+#include "aafCvt.h"
+#include "aafTable.h"
+#include "AAFPrivate.h"
+#include "AAFUtils.h"
+#endif
 
 #include "ImplAAFObjectCreation.h"
 
@@ -83,347 +71,185 @@ typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
 #define DEFAULT_NUM_DATAKIND_DEFS	100
 #define DEFAULT_NUM_EFFECT_DEFS		100
 
-extern "C" const aafClassID_t CLSID_EnumAAFIdentifications;
 
-const aafUID_t NIL_UID = { 0 };
-
+// This is temporary and will be replaced when sequence
+// factory method is available.
+extern "C" const aafClassID_t CLSID_AAFIdentification;
+extern "C" const aafClassID_t	CLSID_AAFContentStorage;
 
 ImplAAFHeader::ImplAAFHeader ()
-: _byteOrder(         PID_Header_ByteOrder,          L"ByteOrder"),
-  _lastModified(      PID_Header_LastModified,       L"LastModified"),
-  _identificationList(PID_Header_IdentificationList, L"IdentificationList"),
-  _contentStorage(		PID_Header_Content,	L"Content"),
-  _dictionary(PID_Header_Dictionary,	L"Dictionary"),
-  _fileRev(PID_Header_Version,		L"Version"),
-  _objectModelVersion(PID_Header_ObjectModelVersion, L"ObjectModelVersion")
+: _byteOrder(         PID_HEADER_BYTEORDER,          "byteOrder"),
+  _lastModified(      PID_HEADER_LASTMODIFIED,       "lastModified"),
+  _identificationList(PID_HEADER_IDENTIFICATIONLIST, "identificationList"),
+  _contentStorage(		PID_HEADER_CONTENTSTORAGE,	"contentStorage")
 {
+  ImplAAFContentStorage		*cstore;
+  
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
   _persistentProperties.put(_identificationList.address());
   _persistentProperties.put(_contentStorage.address());
-  _persistentProperties.put(_dictionary.address());
-  _persistentProperties.put(_fileRev.address());
-  _persistentProperties.put(_objectModelVersion.address());
 
   //!!!	_head = this;
 //	file->InternalSetHead(this);
+#if FULL_TOOLKIT
+	_mobs = (omTable_t *)NULL;
+	_dataObjs = (omTable_t *)NULL;
+#endif
+	_fileRev.major = 0;
+	_fileRev.minor = 0;
 	_toolkitRev.major = 0;
 	_toolkitRev.minor = 0;
 	_toolkitRev.tertiary = 0;
-	_toolkitRev.type = kAAFVersionUnknown;
+	_toolkitRev.type = kVersionUnknown;
 	_toolkitRev.patchLevel = 0;
 //!!!	_byteOrder;
 //!!!	_lastModified;
-	_file = NULL;
+	cstore = (ImplAAFContentStorage *)CreateImpl(CLSID_AAFContentStorage);
+	_contentStorage = cstore;
 }
 
 
 ImplAAFHeader::~ImplAAFHeader ()
-{
-	// Release all of the id pointers in the id list.
-	//
-	size_t size = _identificationList.getSize();
-	for (size_t i = 0; i < size; i++) {
-		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
-
-		if (pIdent) {
-		  pIdent->ReleaseReference();
-		  pIdent = 0;
-		}
-	}
-
-	// Release the content storage pointer.
-	ImplAAFContentStorage *contentStorage = _contentStorage.setValue(0);
-	if (contentStorage) {
-	  contentStorage->ReleaseReference();
-	  contentStorage = 0;
-	}
-
-	// Release the dictionary pointer.
-	ImplAAFDictionary *dictionary = _dictionary.setValue(0);
-	if (dictionary) {
-	  dictionary->ReleaseReference();
-	  dictionary = 0;
-	}
-}
+{}
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::LookupMob (aafMobID_constref mobID,
+    ImplAAFHeader::LookupMob (aafUID_t *pMobID,
                            ImplAAFMob **ppMob)
 {
-    ImplAAFContentStorage *cstore = NULL;
-
-    if (! ppMob)
+    if ((! pMobID) || (! ppMob))
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->LookupMob(mobID, ppMob));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->LookupMob(pMobID, ppMob));
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::CountMobs (aafMobKind_t mobKind,
+    ImplAAFHeader::GetNumMobs (aafMobKind_t mobKind,
                            aafNumSlots_t *pNumMobs)
 {
-    ImplAAFContentStorage *cstore = NULL;
-
     if (! pNumMobs)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->CountMobs(mobKind, pNumMobs));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->GetNumMobs(mobKind, pNumMobs));
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetMobs (aafSearchCrit_t *pSearchCriteria,
-                           ImplEnumAAFMobs **ppEnum)
+    ImplAAFHeader::EnumAAFPrimaryMobs (ImplEnumAAFMobs **ppEnum)
 {
-    ImplAAFContentStorage *cstore = NULL;
     if (! ppEnum)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->GetMobs(pSearchCriteria, ppEnum));
-	}
-	XEXCEPT
-	{
-	}
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->GetPrimaryMobs(ppEnum));
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::AddMob (ImplAAFMob *pMob)
+    ImplAAFHeader::EnumAAFAllMobs (aafSearchCrit_t *pSearchCriteria,
+                           ImplEnumAAFMobs **ppEnum)
 {
-    ImplAAFContentStorage *cstore = NULL;
+    if (! ppEnum)
+	  {
+		return AAFRESULT_NULL_PARAM;
+	  }
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->GetMobs(pSearchCriteria, ppEnum));
+}
 
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::AppendMob (ImplAAFMob *pMob)
+{
     if (! pMob)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->AddMob(pMob));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->AppendMob(pMob));
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::RemoveMob (ImplAAFMob *pMob)
 {
-    ImplAAFContentStorage *cstore = NULL;
-
     if (! pMob)
+	  {
 		return AAFRESULT_NULL_PARAM;
-	  
- 	if (! pMob->attached())
-		return AAFRESULT_MOB_NOT_FOUND;	
-
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->RemoveMob(pMob));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	  }
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->RemoveMob(pMob));
 }
 
 
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::CountEssenceData(aafUInt32 *  pNumEssenceData)
-{
-    ImplAAFContentStorage *cstore = NULL;
-
-	if(pNumEssenceData == NULL)
-		 return AAFRESULT_NULL_PARAM;
-
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->CountEssenceData(pNumEssenceData));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
-}
-
-
-// Implementer note:
-// based on omfmIsMediaDataPresent
-//
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::IsEssenceDataPresent (aafMobID_constref fileMobID,
+    ImplAAFHeader::IsMediaDataPresent (aafUID_t *pFileMobID,
                            aafFileFormat_t fmt,
                            aafBool *pResult)
 {
-    ImplAAFContentStorage *cstore = NULL;
-    if ((! pResult))
+    if ((! pFileMobID) || (! pResult))
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->IsEssenceDataPresent(fileMobID, fmt, pResult));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->IsMediaDataPresent(pFileMobID, fmt, pResult));
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::EnumEssenceData (ImplEnumAAFEssenceData **ppEnum)
+    ImplAAFHeader::EnumAAFMediaObjects (aafMediaCriteria_t *pMediaCriteria,
+                           ImplEnumAAFMedia **ppEnum)
 {
-    ImplAAFContentStorage *cstore = NULL;
-	
-	if (! ppEnum)
+    if ((! pMediaCriteria) || (! ppEnum))
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->EnumEssenceData(ppEnum));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->GetMedia(pMediaCriteria, ppEnum));
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::AddEssenceData (ImplAAFEssenceData * pEssenceData)
+    ImplAAFHeader::AppendMedia (ImplAAFMedia * pMedia)
 {
-    ImplAAFContentStorage *cstore = NULL;
-	if (! pEssenceData)
-	{
-		 return AAFRESULT_NULL_PARAM;
-	}
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->AddEssenceData(pEssenceData));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::RemoveEssenceData (ImplAAFEssenceData * pEssenceData)
-{
-    ImplAAFContentStorage *cstore = NULL;
-	if (! pEssenceData)
-		return AAFRESULT_NULL_PARAM;
-	
-	if (! pEssenceData->attached())
-		return AAFRESULT_ESSENCE_NOT_FOUND;
-
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->RemoveEssenceData(pEssenceData));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::LookupEssenceData (aafMobID_constref mobID,
-                           ImplAAFEssenceData **ppEssenceData)
-{
-    ImplAAFContentStorage *cstore = NULL;
-
-    if (! ppEssenceData)
-	  {
-		return AAFRESULT_NULL_PARAM;
-	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->LookupEssenceData(mobID, ppEssenceData));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetContentStorage (ImplAAFContentStorage ** ppContentStorage)
-{
-  if (! ppContentStorage)
+  if (! pMedia)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-
-	*ppContentStorage = GetContentStorage(); // does not increment reference!
-	if (*ppContentStorage) {
-		(*ppContentStorage)->AcquireReference();
-		return AAFRESULT_SUCCESS;
-	} else {
-		return AAFRESULT_NULLOBJECT; // trr - is there a better error code?
-	}
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetDictionary (ImplAAFDictionary ** ppDictionary) const
+    ImplAAFHeader::RemoveMedia (ImplAAFMedia * pMedia)
+{
+  if (! pMedia)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::GetDictionary (ImplAAFDictionary ** ppDictionary)
 {
   if (! ppDictionary)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-
-  *ppDictionary = GetDictionary();
-  if (*ppDictionary)
-  {
-    (*ppDictionary)->AcquireReference();
-    return AAFRESULT_SUCCESS;
-  }
-  else
-    return AAFRESULT_NULLOBJECT;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -444,137 +270,52 @@ AAFRESULT STDMETHODCALLTYPE
     // For size entries the valid positions are 0 .. size - 1
     // get the last one in the vector.
     _identificationList.getValueAt(*ppIdentification, size - 1);
-
-		// We are returning a non-null reference.
-		if (*ppIdentification) {
-			(*ppIdentification)->AcquireReference();
-			result = AAFRESULT_SUCCESS;
-		} else {
-			result = AAFRESULT_NO_MORE_OBJECTS; // trr - is there a better error code?
-		}
+    result = AAFRESULT_SUCCESS;
   } else {
     *ppIdentification = 0;
-    result = AAFRESULT_INCONSISTANCY;
+    result = AAFRESULT_NOT_IMPLEMENTED; // tjb - Should be AAFRESULT_FAILURE
   }
   return result;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::LookupIdentification (const aafUID_t & generation,
+    ImplAAFHeader::GetIdentificationByGen (aafUID_t * pGeneration,
                            ImplAAFIdentification ** ppIdentification)
 {
-  if ((! ppIdentification))
+  if ((! pGeneration) || (! ppIdentification))
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-
-  AAFRESULT hr;
-
-  ImplEnumAAFIdentificationsSP pEnumIds;
-  hr = GetIdentifications (&pEnumIds);
-  if (AAFRESULT_FAILED (hr)) return hr;
-
-  ImplAAFIdentificationSP pTestId;
-  while (AAFRESULT_SUCCEEDED (pEnumIds->NextOne (&pTestId)))
-	{
-	  aafUID_t testGen;
-	  hr = pTestId->GetGenerationID (&testGen);
-	  if (AAFRESULT_FAILED (hr)) return hr;
-	  if (EqualAUID (&testGen, &generation))
-		{
-		  assert (ppIdentification);
-		  *ppIdentification = pTestId;
-		  assert (*ppIdentification);
-		  (*ppIdentification)->AcquireReference ();
-		  return AAFRESULT_SUCCESS;
-		}
-	}
-  return AAFRESULT_OBJECT_NOT_FOUND;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFHeader::CountIdentifications
-(aafUInt32 *  pNumIdents)
+    ImplAAFHeader::EnumAAFIdents (ImplEnumAAFIdentifications ** ppEnum)
 {
- 	size_t	siz;
-	if (! pNumIdents)
+  if (! ppEnum)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
-		
-	_identificationList.getSize(siz);
-	*pNumIdents = siz;
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetIdentifications (ImplEnumAAFIdentifications ** ppEnum)
+AAFRESULT 
+    ImplAAFHeader::GetNumIdentifications (aafInt32 * /*pCount*/)
 {
-	if (NULL == ppEnum)
-		return AAFRESULT_NULL_PARAM;
-	*ppEnum = 0;
-	
-	ImplEnumAAFIdentifications *theEnum = (ImplEnumAAFIdentifications *)CreateImpl (CLSID_EnumAAFIdentifications);
-	
-	XPROTECT()
-	{
-		OMStrongReferenceVectorIterator<ImplAAFIdentification>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFIdentification>(_identificationList);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFIdentifications, this, iter));
-		*ppEnum = theEnum;
-	}
-	XEXCEPT
-	{
-		if (theEnum)
-		  theEnum->ReleaseReference();
-		theEnum = 0;
-		return(XCODE());
-	}
-	XEND;
-	
-	return(AAFRESULT_SUCCESS);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
-
-
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFHeader::GetIdentificationAt
-(aafUInt32 index,
- ImplAAFIdentification ** ppIdentification)
-{
-  if (! ppIdentification)
-	return AAFRESULT_NULL_PARAM;
-
-  aafUInt32 max;
-  CountIdentifications(&max);
-  if (index >= max)
-	return AAFRESULT_BADINDEX;
-
-  ImplAAFIdentification * pId = 0;
-  _identificationList.getValueAt(pId, index);
-  assert (pId);
-  pId->AcquireReference ();
-
-  assert (ppIdentification);
-  *ppIdentification = pId;
-  // Let the ref count pass from pId to *ppIdentification.
-  return AAFRESULT_SUCCESS;
-}
-
-
 
 AAFRESULT 
     ImplAAFHeader::AddIdentificationObject (aafProductIdentification_t *pIdent)
 {
 	ImplAAFIdentification *		identObj;
 	aafProductIdentification_t	fiction;
-	aafBool						dummyIDNT = kAAFFalse;
+	aafBool						dummyIDNT = AAFFalse;
 	aafProductVersion_t			dummyVersion;
 	
+//!!!	aafAssertValidFHdl(_file);
 	XPROTECT()
 	{		
 		if(pIdent == (aafProductIdentification_t *)NULL)
@@ -582,39 +323,45 @@ AAFRESULT
 			fiction.companyName = L"Unknown";
 			fiction.productName = L"Unknown";
 			fiction.productVersionString = (aafWChar*)NULL;
-			fiction.productID = NIL_UID;
+			fiction.productID = -1;
 			fiction.platform = (aafWChar*)NULL;
-			fiction.productVersion = 0;
+			fiction.productVersion.major = 0;
+			fiction.productVersion.minor = 0;
+			fiction.productVersion.tertiary = 0;
+			fiction.productVersion.patchLevel = 0;
+			fiction.productVersion.type = kVersionUnknown;
 			pIdent = &fiction;
-			dummyIDNT = kAAFTrue;
+			dummyIDNT = AAFTrue;
 		}
 		
-	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
+	XASSERT(pIdent != NULL, OM_ERR_NEED_PRODUCT_IDENT);
     if (pIdent->productVersionString == 0) {
       pIdent->productVersionString = L"Unknown version";
     }
     if (pIdent->platform == 0) {
       pIdent->platform = L"Windows NT";
     }
-    
-    // Get the dictionary so that we can use the factory
-    // method to create the identification.
-    ImplAAFDictionary *pDictionary = GetDictionary();
-    if (NULL == pDictionary)
-      CHECK(AAFRESULT_NOMEMORY);
-    CHECK(pDictionary->GetBuiltinDefs()->cdIdentification()->
-		  CreateInstance((ImplAAFObject **)&identObj));
+
+#if 0
+    identObj = new ImplAAFIdentification(
+      pIdent->companyName,
+      pIdent->productName,
+      &pIdent->productVersion,
+      pIdent->productVersionString,
+      // productID,
+      _lastModified,
+      &AAFToolkitVersion,
+      pIdent->platform
+      // generation
+      );
+#else
+    identObj = static_cast<ImplAAFIdentification *>(CreateImpl(CLSID_AAFIdentification));
     if (NULL == identObj)
       CHECK(AAFRESULT_NOMEMORY);
-	CHECK(identObj->Initialize(pIdent->companyName,
-							   pIdent->productName,
-							   pIdent->productVersionString,
-							   pIdent->productID));
-
-	if (pIdent->productVersion)
-	  {
-		CHECK (identObj->SetProductVersion (*pIdent->productVersion));
-	  }
+    CHECK(identObj->SetCompanyName(pIdent->companyName));
+    CHECK(identObj->SetProductName(pIdent->productName));
+    CHECK(identObj->SetProductVersionString(pIdent->productVersionString));
+#endif
 
     _identificationList.appendValue(identObj);
  
@@ -625,22 +372,29 @@ AAFRESULT
 	}
 	XEND
 	
-	return(AAFRESULT_SUCCESS);
+	return(OM_ERR_NONE);
 }
 
 
 AAFRESULT 
     ImplAAFHeader::AppendIdentification (ImplAAFIdentification * pIdent)
 {
-	if (! pIdent)
+  if (! pIdent)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
-	_identificationList.appendValue(pIdent);
-	pIdent->AcquireReference();
 
-	return AAFRESULT_SUCCESS;
+AAFRESULT 
+    ImplAAFHeader::RemoveIdentification (ImplAAFIdentification * pIdent)
+{
+  if (! pIdent)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -663,14 +417,30 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  *pRevision = _fileRev;
-  return (AAFRESULT_SUCCESS);
+#if FULL_TOOLKIT
+	XPROTECT(_file)
+	{
+		if (IsPropertyPresent(OMVersion, OMVersionType))
+		  {
+			if ((_fileRev.major == 1) && (_fileRev.minor == 0))
+			  *pRevision = kAAFRev1;
+			else
+				RAISE(OM_ERR_FILEREV_NOT_SUPP);
+		  }
+		else
+			RAISE(OM_ERR_FILEREV_NOT_SUPP);
+	}
+	XEXCEPT
+	{
+	}
+	XEND;
+
+	return (OM_ERR_NONE);
+#else
+  return AAFRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
-void ImplAAFHeader::SetFileRevision (aafVersionType_t revision)
-{
-  _fileRev = revision;
-}
 	
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::GetLastModified (aafTimeStamp_t * pTimeStamp)
@@ -679,143 +449,109 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  *pTimeStamp = _lastModified;
-  return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
-{
-	aafTimeStamp_t	now = { 0 };
-
-	AAFGetDateTime(&now);
-	_lastModified = now;
-	return (AAFRESULT_SUCCESS);
-}
-
-void ImplAAFHeader::SetByteOrder(const aafInt16 byteOrder)
-{
-	_byteOrder = byteOrder;
-}
-
-void ImplAAFHeader::SetDictionary(ImplAAFDictionary *pDictionary)
-{
-  _dictionary = pDictionary;
-  if (pDictionary)
-    pDictionary->AcquireReference();
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 {
-	_toolkitRev = AAFReferenceImplementationVersion;
-	return (AAFRESULT_SUCCESS);
+	_toolkitRev = AAFToolkitVersion;
+	return (OM_ERR_NONE);
 }
 
+AAFRESULT ImplAAFHeader::LoadMobTables(void)
+{
+	ImplAAFContentStorage *cstore = _contentStorage;
+	return(cstore->LoadMobTables());
+}
 
-// trr - NOTE: Eventhough this method returns a reference counted object it
-// does NOT bump the reference count. Currently only other file that calls
-// this method is ImplAAFMob.cpp. There is another version the conforms to our other API guidlines:
-// AAFRESULT GetContentStorage(ImplAAFContentStorage **ppContentStorage);
-// 
+/************************
+ * Function: BuildMediaCache (INTERNAL)
+ *
+ * 		This function is a callback from the openFile and createFile
+ *		group of functions.  This callback exists in order to allow the
+ *		media layer to be independant, and yet have information of its
+ *		own in the opaque file handle.
+ *
+ * Argument Notes:
+ *		<none>.
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ */
+AAFRESULT ImplAAFHeader::BuildMediaCache(void)
+{
+#if FULL_TOOLKIT
+	aafInt32						siz, n, dataObjTableSize;
+	AAFObject *				obj;
+	aafUID_t					uid;
+	
+	XPROTECT(_file)
+	{
+		{
+		   siz = GetObjRefArrayLength(OMHEADMediaData);
+			dataObjTableSize = (siz < DEFAULT_NUM_DATAOBJ ? 
+									  DEFAULT_NUM_DATAOBJ : siz);
+			CHECK(NewUIDTable(_file, dataObjTableSize, &(_dataObjs)));
+			for(n = 1; n <= siz; n++)
+			  {
+				 CHECK(ReadNthObjRefArray(OMHEADMediaData, 
+													  &obj, n));
+				 CHECK(obj->ReadUID(OMMDATMobID, &uid));
+				 CHECK(TableAddUID(_dataObjs, uid,obj,kOmTableDupAddDup));
+			  }
+		 }
+	}
+	XEXCEPT
+	XEND
+#endif
+	
+	return(OM_ERR_NONE);
+}
+
+AAFRESULT ImplAAFHeader::AppendDataObject(aafUID_t mobID,      /* IN - Mob ID */
+						  ImplAAFObject *dataObj)    /* IN - Input Mob */ 
+{
+#if FULL_TOOLKIT
+	XPROTECT(_file)
+	  {
+		CHECK(AppendObjRefArray(OMHEADMediaData, dataObj));
+		CHECK(TableAddUID(_dataObjs, mobID, dataObj, kOmTableDupError));
+	  } /* XPROTECT */
+	XEXCEPT
+	  {
+		return(XCODE());
+	  }
+	XEND;
+#endif
+	
+	return(OM_ERR_NONE);
+}
+
+AAFRESULT ImplAAFHeader::IsValidHeadObject(void)
+{
+#if FULL_TOOLKIT
+	aafClassID_t  		omfiID;
+
+	if (GetClassID(omfiID) != OM_ERR_NONE)
+		  return(OM_ERR_NOTAAFFILE);
+	if (!streq(omfiID, "HEAD"))
+	  return(OM_ERR_NOTAAFFILE);
+	return(OM_ERR_NONE);
+#else
+  return AAFRESULT_NOT_IMPLEMENTED;
+#endif
+}
+
 ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
 {
-  ImplAAFContentStorage	*result = _contentStorage;
-
-  // Create the content storage object if it does not exist.
-  if (NULL == result)
-  { // Get the dictionary so that we can use the factory
-    // method to create the identification.
-    ImplAAFDictionary *pDictionary = GetDictionary();
-    if (NULL != pDictionary)
-	  {
-		pDictionary->GetBuiltinDefs()->cdContentStorage()->
-		  CreateInstance ((ImplAAFObject **)&result);
-		_contentStorage = result;
-	  }
-  }
-
-  return(result);
+	ImplAAFContentStorage	*result = _contentStorage;
+	return(result);
 }
 
-// Fill in when dictionary property is supported.
-ImplAAFDictionary *ImplAAFHeader::GetDictionary() const
-{
-  ImplAAFDictionary	*result = _dictionary;
+extern "C" const aafClassID_t CLSID_AAFHeader;
 
-  // Note - in the case where this is the first GetDictionary() on
-  // Header (in order to initialize the OM properties on the
-  // newly-created Header object), the _dictionary property won't be
-  // set up yet.  If that's the case, get the dictionary the
-  // old-fashioned way (through AAFObject).
-  if (! result)
-	{
-	  AAFRESULT hr = ImplAAFObject::GetDictionary(&result);
-	  assert (AAFRESULT_SUCCEEDED (hr));
-	  assert (result);
-	  // clients of GetDictionary(void) expect the dictionary to *not*
-	  // be reference-counted.
-	  aafUInt32 refcnt = result->ReleaseReference ();
-	  // make sure at least one reference remains.
-	  assert (refcnt > 0);
-	}
-  return(result);
-}
+OMDEFINE_STORABLE(ImplAAFHeader, CLSID_AAFHeader);
 
-
-bool ImplAAFHeader::IsObjectModelVersionPresent () const
-{
-  return _objectModelVersion.isPresent ();
-}
-
-
-aafUInt32 ImplAAFHeader::GetObjectModelVersion () const
-{
-  assert (IsObjectModelVersionPresent());
-  return _objectModelVersion;
-}
-
-
-void ImplAAFHeader::SetObjectModelVersion (aafUInt32 version)
-{
-  _objectModelVersion = version;
-  assert (IsObjectModelVersionPresent());
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetStoredByteOrder (eAAFByteOrder_t *  pOrder)
-{
-  if (!pOrder)
-    return AAFRESULT_NULL_PARAM;
-
-  if (_byteOrder == 0x4d4d) // 'MM'
-  {
-    *pOrder = kAAFByteOrderBig;
-  }
-  else  // 'II'
-  {
-    *pOrder = kAAFByteOrderLittle;
-  }
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetNativeByteOrder (eAAFByteOrder_t *  pOrder)
-{
-  if (!pOrder)
-    return AAFRESULT_NULL_PARAM;
-
-	OMByteOrder byteOrder = hostByteOrder();
-	if (byteOrder == littleEndian)
-  {
-		*pOrder = kAAFByteOrderLittle;
-	} 
-  else 
-  {
-		*pOrder = kAAFByteOrderBig;
-	}
-
-  return AAFRESULT_SUCCESS;
-}
