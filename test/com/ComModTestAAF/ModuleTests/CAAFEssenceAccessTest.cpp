@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.37.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.37.2.2 2004/07/01 22:50:55 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,13 @@
 #include <iostream>
 using namespace std;
 
+#include "AAFPlatform.h"
+
+#if !defined(COMPILER_MSC)
+#include <unistd.h>
+#else
+#include <direct.h>
+#endif
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
