@@ -32,20 +32,8 @@
  ************************************************************************/
 
 
+
 class ImplAAFClassDef;
-
-
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\***********************************************/
-
-
-
-
 
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
@@ -63,16 +51,6 @@ public:
 
 protected:
   virtual ~ImplAAFInterpolationDef();
-
-public:
-
-  
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFInterpolationDef)
 };
 
 #endif // ! __ImplAAFInterpolationDef_h__
