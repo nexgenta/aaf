@@ -29,11 +29,11 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <stdlib.h>
+#include <wchar.h>
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFSmartPointer.h"
 #include "AAFStoredObjectIDs.h"
 #include "CAAFBuiltinDefs.h"
@@ -382,13 +382,15 @@ static void ReadTypeDefObjectRefFile(aafWChar *pFilename)
 	pFile->Close();
 }
 
-extern "C" HRESULT CAAFTypeDefObjectRef_test()
+extern "C" HRESULT CAAFTypeDefObjectRef_test(testMode_t mode);
+extern "C" HRESULT CAAFTypeDefObjectRef_test(testMode_t mode)
 {
 	aafWChar *pTestFilename=L"TypeDefObjectRefTest.aaf";
 
 	try
 	{
-		CreateTypeDefObjectRefFile(pTestFilename);
+		if(mode == kAAFUnitTestReadWrite)
+			CreateTypeDefObjectRefFile(pTestFilename);
 		ReadTypeDefObjectRefFile(pTestFilename);
 	}
 	catch(HRESULT& rResult)
