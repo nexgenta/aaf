@@ -1,34 +1,41 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFContainerDef
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+// @com This file implements the module test for CAAFDefinitionObject
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-#include "AAF.h"
 
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+ 
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
+
+
+#include "CAAFContainerDef.h"
+#include "CAAFContainerDef.h"
+#ifndef __CAAFContainerDef_h__
+#error - improperly defined include guard
+#endif
+
+// Temporarily necessary global declarations.
+extern "C" const CLSID CLSID_AAFContainerDef; // generated
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -39,9 +46,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
-#include "AAFContainerDefs.h"
 
-#include "CAAFBuiltinDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -76,33 +81,26 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFContainerDef Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productName = L"AAFMasterMob Test";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	*ppFile = NULL;
-
-	if(mode == kAAFMediaOpenAppend)
+	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
@@ -120,11 +118,10 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile*		pFile = NULL;
-	IAAFHeader *        pHeader = NULL;
-	IAAFDictionary*  pDictionary = NULL;
-	IAAFContainerDef*	pContainerDef = NULL;
-	bool bFileOpen = false;
-	aafUID_t		uid = ContainerFile;
+  IAAFHeader *        pHeader = NULL;
+  IAAFDictionary*  pDictionary = NULL;
+  IAAFContainerDef*	pContainerDef = NULL;
+  bool bFileOpen = false;
 	HRESULT			hr = S_OK;
 /*	long			test;
 */
@@ -136,22 +133,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
     
-		CAAFBuiltinDefs defs (pDictionary);
-		checkResult(defs.cdContainerDef()->
-					CreateInstance(IID_IAAFContainerDef, 
-								   (IUnknown **)&pContainerDef));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFContainerDef,
+							  IID_IAAFContainerDef, 
+							  (IUnknown **)&pContainerDef));
     
-		checkResult(pContainerDef->Initialize(uid, L"Test Container", L"Test Container Definition"));
+		checkResult(pContainerDef->SetEssenceIsIdentified (AAFTrue));
 
-		checkResult(pContainerDef->SetEssenceIsIdentified (kAAFTrue));
-
-		checkResult(pDictionary->RegisterContainerDef(pContainerDef));
+		checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -187,8 +181,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
-	IEnumAAFContainerDefs *pPlug = NULL;
-	IAAFContainerDef		*pPlugDef = NULL;
+//@!!!	IEnumAAFContainerDefs *pPlug = NULL;
+//	IAAFPluggableDef		*pPlugDef = NULL;
 	IAAFContainerDef		*pContainerDef = NULL;
 	bool bFileOpen = false;
 	aafBool			testBool;
@@ -197,16 +191,16 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetContainerDefs(&pPlug));
-		checkResult(pPlug->NextOne (&pPlugDef));
-		checkResult(pPlugDef->QueryInterface (IID_IAAFContainerDef, (void **)&pContainerDef));
-		checkResult(pContainerDef->EssenceIsIdentified (&testBool));
-		checkExpression(testBool == kAAFTrue, AAFRESULT_TEST_FAILED);
+//!!!		checkResult(pDictionary->GetPluggableDefinitions(&pPlug));
+//!!!		checkResult(pPlug->NextOne (&pPlugDef));
+//!!!		checkResult(pPlugDef->QueryInterface (IID_IAAFContainerDef, (void **)&pContainerDef));
+//!!!		checkResult(pContainerDef->EssenceIsIdentified (&testBool));
+//!!!		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 	}
 	catch (HRESULT& rResult)
 	{
@@ -217,11 +211,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pContainerDef)
 		pContainerDef->Release();
 
-	if (pPlugDef)
-		pPlugDef->Release();
+//!!!	if (pPlugDef)
+//		pPlugDef->Release();
 
-	if (pPlug)
-		pPlug->Release();
+//!!!	if (pPlug)
+//		pPlug->Release();
 
   if (pDictionary)
 		pDictionary->Release();
@@ -240,10 +234,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFContainerDef_test()
+HRESULT CAAFContainerDef::test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"AAFContainerDefTest.aaf";
+	aafWChar * pFileName = L"ContainerDefTest.aaf";
 
 	try
 	{
@@ -253,7 +247,7 @@ extern "C" HRESULT CAAFContainerDef_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFContainerDef_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFContainerDef::test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
