@@ -30,11 +30,84 @@
  *
  ************************************************************************/
 
-#include "ImplAAFEnumerator.h"
+class ImplAAFContainerDef;
 
-#include "ImplAAFContainerDef.h"
 
-typedef ImplAAFEnumerator<ImplAAFContainerDef> ImplEnumAAFContainerDefs;
+#ifndef __ImplAAFObject_h__
+#include "ImplAAFObject.h"
+#endif
+#include "OMReferenceContainerIter.h"
+
+class ImplEnumAAFContainerDefs : public ImplAAFRoot
+{
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  ImplEnumAAFContainerDefs ();
+
+protected:
+  virtual ~ImplEnumAAFContainerDefs ();
+
+public:
+
+
+  //****************
+  // NextOne()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    NextOne
+        // @parm [out,retval] The Next container Definition
+        (ImplAAFContainerDef ** ppPluggableDef);
+
+  //****************
+  // Next()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Next
+        (// @parm [in] number of Pluggable definitions requested
+         aafUInt32  count,
+
+         // @parm [out, size_is(count), length_is(*pFetched)] array to receive container definitions
+         ImplAAFContainerDef ** ppContainerDefs,
+
+         // @parm [out,ref] number of actual container definitions fetched into ppContainerDefs array
+         aafUInt32 *  pFetched);
+
+  //****************
+  // Skip()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Skip
+        // @parm [in] Number of elements to skip
+        (aafUInt32  count);
+
+  //****************
+  // Reset()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Reset ();
+
+
+  //****************
+  // Clone()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Clone
+        // @parm [out,retval] new enumeration
+        (ImplEnumAAFContainerDefs ** ppEnum);
+
+public:
+  // SDK Internal 
+  virtual AAFRESULT STDMETHODCALLTYPE
+	  SetIterator(ImplAAFObject *pObj,
+				OMReferenceContainerIterator<ImplAAFContainerDef>* iterator);
+
+private:
+	ImplAAFObject*	_enumObj;
+	OMReferenceContainerIterator<ImplAAFContainerDef>*	_iterator;
+};
 
 #endif // ! __ImplEnumAAFContainerDefs_h__
 
