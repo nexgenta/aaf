@@ -3,6 +3,8 @@
 
 #include "OMPortability.h"
 
+#include <stddef.h>
+
 #define SUCCESS (1)
 #define FAILURE (2)
 
@@ -20,12 +22,12 @@ void reportAssertionFailure(char* kind,
 #if defined(OM_ENABLE_TRACE)
 
 #define TRACE(routine) \
-  currentRoutineName = routine; \
+  char* currentRoutineName = routine; \
   cerr << "Enter \"" << currentRoutineName << "\"." << endl;
 
 #else
 
-#define TRACE(routine) currentRoutineName = routine;
+#define TRACE(routine) char* currentRoutineName = routine;
 
 #endif
 
@@ -68,5 +70,7 @@ void reportAssertionFailure(char* kind,
 #endif
 
 bool validString(const char* string);
+
+bool validWideString(const wchar_t* string);
 
 #endif
