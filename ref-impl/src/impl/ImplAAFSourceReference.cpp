@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.cpp,v 1.25.2.4 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.cpp,v 1.25.2.5 2004/08/12 20:55:23 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -120,6 +120,9 @@ AAFRESULT STDMETHODCALLTYPE
   if( NULL == pChannelIDs ) {
     return AAFRESULT_NULL_PARAM;
   }
+  if( (numberElements * sizeof(aafUInt32)) > OMPROPERTYSIZE_MAX ) {
+    return AAFRESULT_BAD_SIZE;
+  }
 
   _channelIDs.setValue(pChannelIDs, numberElements);
   
@@ -177,6 +180,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if( NULL == pMonoSourceSlotIDs ) {
     return AAFRESULT_NULL_PARAM;
+  }
+  if( (numberElements * sizeof(aafUInt32)) > OMPROPERTYSIZE_MAX ) {
+    return AAFRESULT_BAD_SIZE;
   }
 
   _monoSourceSlotIDs.setValue(pMonoSourceSlotIDs, numberElements);
