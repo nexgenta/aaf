@@ -37,6 +37,11 @@ class ImplAAFLocator;
 class ImplEnumAAFLocators;
 
 
+
+
+
+
+
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
 #endif
@@ -104,13 +109,6 @@ public:
         (ImplEnumAAFLocators ** ppEnum);
   //@comm The number of locators may be zero if the essence is in the current file.
 
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFEssenceDescriptor)
 
 public:
 	// Functions internal to the toolkit
