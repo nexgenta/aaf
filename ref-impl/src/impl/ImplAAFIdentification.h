@@ -63,7 +63,7 @@ public:
          wchar_t *  pName,
 
 		 // @parm [in] The size of the pName buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -72,7 +72,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetCompanyNameBufLen
 		// @parm [out] required buffer length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -93,7 +93,7 @@ public:
          wchar_t *  pName,
 
 		 // @parm [in] The size of the pName buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -102,7 +102,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetProductNameBufLen
 		// @parm [out] Returned length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -123,7 +123,7 @@ public:
          wchar_t *  pVersionString,
 
 		 // @parm [in] The size of the pVersionString buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -132,7 +132,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetProductVersionStringBufLen
 		// @parm [out] required buffer length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -207,7 +207,7 @@ public:
          wchar_t *  pPlatform,
 
 		 // @parm [in] The size of the pPlatform buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -216,7 +216,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPlatformBufLen
 		// @parm [out] Returned length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -233,14 +233,14 @@ public:
   static AAFRESULT test();
 
 private:
-  OMWideStringProperty                             _companyName;
-  OMWideStringProperty                             _productName;
-  // StructuredProperty<aafProductVersion_t> _productVersion;
-  OMWideStringProperty                             _productVersionString;
+  OMWideStringProperty                      _companyName;
+  OMWideStringProperty						_productName;
+  OMFixedSizeProperty<aafProductVersion_t>	_productVersion;
+  OMWideStringProperty                      _productVersionString;
   // FixedSizeProperty<AUID>                 _productId;
-  OMFixedSizeProperty<aafTimeStamp_t>          _date;
-  // StructuredProperty<aafProductVersion_t> _toolkitVersion;
-  OMWideStringProperty                             _platform;
+  OMFixedSizeProperty<aafTimeStamp_t>        _date;
+  OMFixedSizeProperty<aafProductVersion_t>	_toolkitVersion;
+  OMWideStringProperty                        _platform;
   // FixedSizeProperty<AUID>                 _generation;
 };
 
