@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMDataStreamProperty
+
 #include "OMDataStreamProperty.h"
 
 #include "OMAssertions.h"
@@ -33,10 +35,13 @@
 #include "OMPropertySet.h"
 #include "OMStorable.h"
 #include "OMStoredObject.h"
+#include "OMType.h"
+#include "OMUtilities.h"
 
 OMDataStreamProperty::OMDataStreamProperty(const OMPropertyId propertyId,
-                                           const char* name)
-  : OMProperty(propertyId, SF_DATA_STREAM, name),_stream(0)
+                                           const wchar_t* name)
+  : OMProperty(propertyId, SF_DATA_STREAM, name),_stream(0),
+    _byteOrder(unspecified)
 {
 }
 
@@ -50,16 +55,10 @@ void OMDataStreamProperty::save(void) const
 {
   TRACE("OMDataStreamProperty::save");
 
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
   // Use the property name as the stream name
   //
-  const char* streamName = name();
-  store->write(_propertyId,
-               _storedForm,
-               (void*)streamName,
-               strlen(streamName) + 1);
+  const wchar_t* name = storedName();
+  store()->saveStream(_propertyId, _storedForm, name, _byteOrder);
 
   // The stream has never been written to but we want the stream to
   // exist in the file, create it.
@@ -71,24 +70,26 @@ void OMDataStreamProperty::save(void) const
 }
 
   // @mfunc Restore this <c OMDataStreamProperty>, the size of the
-  //        <c OMDataStreamProperty> is <p size>.
+  //        <c OMDataStreamProperty> is <p externalSize>.
   //   @parm The size of the <c OMDataStreamProperty>.
-void OMDataStreamProperty::restore(size_t size)
+void OMDataStreamProperty::restore(size_t ANAME(externalSize))
 {
   TRACE("OMDataStreamProperty::restore");
 
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
+  size_t characterCount = lengthOfWideString(storedName()) + 1;
+  size_t size = (characterCount * sizeof(OMCharacter)) + 1;
+  ASSERT("Consistent property size", size == externalSize);
 
-  char* streamName = new char[size];
-  ASSERT("Valid heap pointer", streamName != 0);
-  store->read(_propertyId,
-              _storedForm,
-              streamName,
-              size);
-  ASSERT("Consistent property size", size == strlen(streamName) + 1);
-  ASSERT("Consistent property name", strcmp(streamName, name()) == 0);
-  delete [] streamName;
+  wchar_t* name = 0;
+  OMByteOrder bo;
+  store()->restoreStream(_propertyId, _storedForm, size, &name, &bo);
+  ASSERT("Consistent property name",
+                                   compareWideString(name, storedName()) == 0);
+  ASSERT("Valid stored byte order", ((bo == littleEndian) ||
+                                     (bo == bigEndian) ||
+                                     (bo == unspecified)));
+  _byteOrder = bo;
+  delete [] name;
 
   open();
   setPresent();
@@ -112,9 +113,8 @@ OMUInt64 OMDataStreamProperty::size(void) const
   ASSERT("Valid stream", _stream != 0);
 
   OMUInt64 result;
-  OMStoredObject* s = _propertySet->container()->store();
-  result = s->streamSize(_stream);
- 
+  result = store()->streamSize(_stream);
+
   return result;
 }
 
@@ -131,9 +131,7 @@ void OMDataStreamProperty::setSize(const OMUInt64 newSize)
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
- 
-  s->streamSetSize(_stream, newSize);
+  store()->streamSetSize(_stream, newSize);
 
   POSTCONDITION("Size properly set", size() == newSize);
 }
@@ -153,11 +151,9 @@ OMUInt64 OMDataStreamProperty::position(void) const
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
- 
-  OMUInt64 result = s->streamPosition(_stream);
+  OMUInt64 result = store()->streamPosition(_stream);
 
-  POSTCONDITION("Valid position", (result >= 0) && (result <= size()));
+  POSTCONDITION("Valid position", result <= size());
   return result;
 }
 
@@ -177,9 +173,7 @@ void OMDataStreamProperty::setPosition(const OMUInt64 offset) const
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
- 
-  s->streamSetPosition(_stream, offset);
+  store()->streamSetPosition(_stream, offset);
 
   POSTCONDITION("Position properly set", position() == offset);
 }
@@ -189,8 +183,7 @@ void OMDataStreamProperty::open(void)
   TRACE("OMDataStreamProperty::open");
   PRECONDITION("Stream not already opened", _stream == 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  _stream = s->openStream(name());
+  _stream = store()->openStream(storedName());
 
   POSTCONDITION("Stream opened", _stream != 0);
 }
@@ -200,8 +193,7 @@ void OMDataStreamProperty::create(void)
   TRACE("OMDataStreamProperty::create");
   PRECONDITION("Stream not already created", _stream == 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  _stream = s->createStream(name());
+  _stream = store()->createStream(storedName());
 
   POSTCONDITION("Stream opened", _stream != 0);
 }
@@ -211,8 +203,7 @@ void OMDataStreamProperty::close(void)
   TRACE("OMDataStreamProperty::close");
   PRECONDITION("Stream not already closed", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  s->closeStream(_stream);
+  store()->closeStream(_stream);
 
   POSTCONDITION("Stream closed", _stream == 0);
 }
@@ -231,14 +222,17 @@ void OMDataStreamProperty::read(OMByte* buffer,
 {
   TRACE("OMDataStreamProperty::read");
 
+  PRECONDITION("Optional property is present",
+                                           IMPLIES(isOptional(), isPresent()));
+
   if (_stream == 0) {
     OMDataStreamProperty* p = const_cast<OMDataStreamProperty*>(this);
     p->create();
   }
 
   ASSERT("Valid stream", _stream != 0);
-  OMStoredObject* s = _propertySet->container()->store();
-  s->readFromStream(_stream, buffer, bytes, bytesRead);
+
+  store()->readFromStream(_stream, buffer, bytes, bytesRead);
 }
 
   // @mfunc  Attempt to write the number of bytes given by <p bytes>
@@ -259,8 +253,132 @@ void OMDataStreamProperty::write(const OMByte* buffer,
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  s->writeToStream(_stream, buffer, bytes, bytesWritten);
+  store()->writeToStream(_stream, buffer, bytes, bytesWritten);
+  setPresent();
+}
+
+  // @mfunc Attempt to read the number of elements given by
+  //        <p elementCount> and described by <p elementType> and
+  //        <p externalElementSize> from the data stream into the buffer
+  //        at address <p elements>. The actual number of elements read
+  //        is returned in <p elementsRead>.
+  //   @parm The element type
+  //   @parm The external element size
+  //   @parm The address of the buffer into which the elements should be read.
+  //   @parm The number of elements to read.
+  //   @parm The actual number of elements that were read.
+  //   @this const
+void OMDataStreamProperty::readTypedElements(const OMType* elementType,
+                                             size_t externalElementSize,
+                                             OMByte* elements,
+                                             OMUInt32 elementCount,
+                                             OMUInt32& elementsRead) const
+{
+  TRACE("OMDataStreamProperty::readTypedElements");
+
+  PRECONDITION("Optional property is present",
+                                           IMPLIES(isOptional(), isPresent()));
+  PRECONDITION("Valid element type", elementType != 0);
+  PRECONDITION("Valid element size", externalElementSize!= 0);
+  PRECONDITION("Valid buffer", elements != 0);
+  PRECONDITION("Valid element count", elementCount > 0);
+  PRECONDITION("Stream byte order is known", hasByteOrder());
+
+  bool reorder = false;
+  if (byteOrder() != hostByteOrder()) {
+    reorder = true;
+  }
+
+  // Allocate buffer for one element
+  OMByte* buffer = new OMByte[externalElementSize];
+
+  for (size_t i = 0; i < elementCount; i++) {
+
+    // Read an element of the property value
+    OMUInt32 actualByteCount;
+    read(buffer, externalElementSize, actualByteCount);
+    ASSERT("All bytes read", actualByteCount == externalElementSize);
+
+    // Reorder an element of the property value
+    if (reorder) {
+      elementType->reorder(buffer, externalElementSize);
+    }
+
+    // Internalize an element of the property value
+    size_t requiredBytesSize = elementType->internalSize(buffer,
+                                                         externalElementSize);
+
+    elementType->internalize(buffer,
+                             externalElementSize,
+                             &elements[i * requiredBytesSize],
+                             requiredBytesSize,
+                             hostByteOrder());
+  }
+  delete [] buffer;
+  elementsRead = elementCount;
+}
+
+
+  // @mfunc Attempt to write the number of elements given by
+  //        <p elementCount> and described by <p elementType> and
+  //        <p internalElementSize> to the data stream from the buffer
+  //        at address <p elements>. The actual number of elements written
+  //        is returned in <p elementsWritten>.
+  //   @parm The element type
+  //   @parm The internal element size
+  //   @parm The address of the buffer from which the elements should
+  //         be written.
+  //   @parm The number of elements to write.
+  //   @parm The actual number of elements that were written.
+void OMDataStreamProperty::writeTypedElements(const OMType* elementType,
+                                              size_t internalElementSize,
+                                              const OMByte* elements,
+                                              OMUInt32 elementCount,
+                                              OMUInt32& elementsWritten)
+{
+  TRACE("OMDataStreamProperty::writeTypedElements");
+
+  PRECONDITION("Valid element type", elementType != 0);
+  PRECONDITION("Valid element size", internalElementSize!= 0);
+  PRECONDITION("Valid buffer", elements != 0);
+  PRECONDITION("Valid element count", elementCount > 0);
+  PRECONDITION("Stream byte order is known", hasByteOrder());
+
+  bool reorder = false;
+  if (byteOrder() != hostByteOrder()) {
+    reorder = true;
+  }
+
+  // Allocate buffer for one element
+  size_t externalBytesSize = elementType->externalSize(
+                                                 const_cast<OMByte*>(elements),
+                                                 internalElementSize);
+
+  OMByte* buffer = new OMByte[externalBytesSize];
+
+  for (size_t i = 0; i < elementCount; i++) {
+
+    // Externalize an element of the property value
+    elementType->externalize(
+                       const_cast<OMByte*>(&elements[i * internalElementSize]),
+                       internalElementSize,
+                       buffer,
+                       externalBytesSize,
+                       hostByteOrder());
+
+    // Reorder an element of the property value
+    if (reorder) {
+      elementType->reorder(buffer, externalBytesSize);
+    }
+
+    // Write an element of the property value
+    OMUInt32 actualByteCount;
+    write(buffer, externalBytesSize, actualByteCount);
+    ASSERT("All bytes written", actualByteCount == externalBytesSize);
+  }
+  delete [] buffer;
+  elementsWritten = elementCount;
+  setPresent();
 }
 
   // @mfunc The size of the raw bits of this
@@ -306,5 +424,64 @@ void OMDataStreamProperty::setBits(const OMByte* ANAME(bits),
   ASSERT("Unimplemented code not reached", false);
 }
 
+  // @mfunc Is a byte order specifed for this stream ?
+bool OMDataStreamProperty::hasByteOrder(void) const
+{
+  TRACE("OMDataStreamProperty::hasByteOrder");
 
+  bool result;
+  if ((_byteOrder == littleEndian) || (_byteOrder == bigEndian)) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
 
+  // @mfunc Specify a byte order for this stream.
+void OMDataStreamProperty::setByteOrder(OMByteOrder byteOrder)
+{
+  TRACE("OMDataStreamProperty::setByteOrder");
+
+  PRECONDITION("Valid byte order",
+                      (byteOrder == littleEndian) || (byteOrder == bigEndian));
+  PRECONDITION("No existing byte order", !hasByteOrder());
+  PRECONDITION("Stream is empty", size() == 0);
+
+  _byteOrder = byteOrder;
+
+  POSTCONDITION("Byte order properly set", hasByteOrder());
+}
+
+  // @mfunc The byte order of this stream.
+OMByteOrder OMDataStreamProperty::byteOrder(void) const
+{
+  TRACE("OMDataStreamProperty::byteOrder");
+
+  PRECONDITION("Byte order set", hasByteOrder());
+
+  return _byteOrder;
+}
+
+  // @mfunc Clear the byte order of this stream
+void OMDataStreamProperty::clearByteOrder(void)
+{
+  TRACE("OMDataStreamProperty::clearByteOrder");
+
+  PRECONDITION("Byte order set", hasByteOrder());
+
+  _byteOrder = unspecified;
+
+  POSTCONDITION("Byte order properly cleared", !hasByteOrder());
+}
+
+const wchar_t* OMDataStreamProperty::storedName(void) const
+{
+  TRACE("OMDataStreamProperty::storedName");
+
+  if (_storedName == 0) {
+    OMDataStreamProperty* p = const_cast<OMDataStreamProperty*>(this);
+    p->_storedName = OMStoredObject::streamName(_name, propertyId());
+  }
+  return _storedName;
+}
