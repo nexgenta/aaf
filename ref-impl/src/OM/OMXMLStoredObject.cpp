@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObject.cpp,v 1.35.2.2 2004/07/23 17:35:35 tbingham Exp $ $Name:  $
+// $Id: OMXMLStoredObject.cpp,v 1.35.2.3 2004/07/23 18:25:07 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -307,7 +307,6 @@ void OMXMLStoredObject::save(const OMSimpleProperty& property)
   //   @parm The <c OMDataVector> to save.
 void OMXMLStoredObject::save(const OMDataVector& property)
 {
-#if 0 // tjb - Not yet
   TRACE("OMXMLStoredObject::save(OMDataVector)");
 
   const OMType* propertyType = property.type();
@@ -363,7 +362,6 @@ void OMXMLStoredObject::save(const OMDataVector& property)
   _stream << beginl;
   _stream << "</data-vector>" << endl;
   _stream << outdent;
-#endif
 }
 
 void OMXMLStoredObject::save(const OMDataSet& property)
