@@ -333,9 +333,7 @@ struct  tagPROPVARIANT
         short iVal;
         USHORT uiVal;
         VARIANT_BOOL boolVal;
-#if !defined( __GNUC__ ) && !defined( __sgi ) /* in GCC and in sgi CC this
-                                                 obsolete member causes
-                                                 conflicts */
+#ifndef __GNUC__	    /* in GCC this obsolete member causes conflicts */
         _VARIANT_BOOL bool;
 #endif
         long lVal;

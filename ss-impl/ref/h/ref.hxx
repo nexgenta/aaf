@@ -95,10 +95,6 @@ typedef unsigned long long int ULONGLONG;
 typedef __int64 LONGLONG;
 typedef unsigned __int64 ULONGLONG;
 #endif
-#ifdef __sgi
-typedef long long LONGLONG;
-typedef unsigned long long ULONGLONG;
-#endif
 
 typedef void *LPVOID;
 typedef char *LPSTR;
@@ -251,13 +247,8 @@ EXTERN_C STDAPI_(BOOL) IsEqualGUID(REFGUID rguid1, REFGUID rguid2);
 #define CLSID_NULL GUID_NULL
 
 // Use these to 'refer' to the formal parameters that we are not using
-#ifndef __sgi
-#define UNREFERENCED_PARM(x)    (x)
 #define UNIMPLEMENTED_PARM(x)   (x)
-#else
-#define UNREFERENCED_PARM(x)    (void) x
-#define UNIMPLEMENTED_PARM(x)   (void) x
-#endif
+#define UNREFERENCED_PARM(x)    (x)
 
 /************** Debugging Stuff  *******************************************/
 
