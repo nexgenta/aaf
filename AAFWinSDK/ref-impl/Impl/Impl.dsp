@@ -175,19 +175,7 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFDigitalImageDescrip.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFDOSLocator.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEdgecode.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEffect.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEffectDef.cpp"
 # End Source File
 # Begin Source File
 
@@ -275,10 +263,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFLocator.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMacLocator.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMasterMob.cpp"
 # End Source File
 # Begin Source File
@@ -319,6 +303,14 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFObject.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFOperationDef.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFOperationGroup.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFParameter.cpp"
 # End Source File
 # Begin Source File
@@ -328,10 +320,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFParameterDef.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluggableCode.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluggableDef.cpp"
 # End Source File
 # Begin Source File
 
@@ -507,10 +495,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefWeakObjRef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFUnixLocator.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFVaryingValue.cpp"
 # End Source File
 # Begin Source File
@@ -523,11 +507,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWAVEDescriptor.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWindowsLocator.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFClassDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFClassDefs.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFCodecDefs.cpp"
 # End Source File
 # Begin Source File
 
@@ -536,6 +520,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFCodecFlavours.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFComponents.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFContainerDefs.cpp"
 # End Source File
 # Begin Source File
 
@@ -548,10 +536,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDataDefs.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDefs.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFEffectDefs.cpp"
 # End Source File
 # Begin Source File
 
@@ -583,11 +567,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFMobSlots.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFParameterDefs.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFOperationDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPluggableDefs.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFParameterDefs.cpp"
 # End Source File
 # Begin Source File
 
@@ -616,6 +600,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFReferenceValues.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFSegments.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFTaggedValues.cpp"
 # End Source File
 # Begin Source File
 
