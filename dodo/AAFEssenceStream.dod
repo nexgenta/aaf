@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*	                                            *
-#c* Advanced Authoring Format	                    *
-#c*                                                 *
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.   *
-#c*                                                 *
-#c\*************************************************/
 #startm .this-module 0
 AAFEssenceStream\
 #endm
@@ -13,6 +6,7 @@ AAFEssenceStream\
 AAFRoot\
 #endm
 #c
+#c #import ./AAFObject.exp
 AD_HEAD
 
 AD_IDL(//
@@ -39,16 +33,15 @@ AD_CLASS_UUID(83402901, 9146, 11d2, 80, 88, 00, 60, 08, 14, 3e, 6f)
 AD_DEFAULT_UUID(83402902, 9146, 11d2, 80, 88, 00, 60, 08, 14, 3e, 6f)
 AD_XCLASS_BEGIN(Abstract, Transient)
 
-AD_METHOD3(Write,
+AD_METHOD2(Write,
+			[in\\\,size_is\\\(buflen\\\)],
+			aafDataBuffer_t,
+			buffer,
+			to a buffer,
 			[in],
-			aafUInt32, 
-			bytes, the number of bytes to write,
-			[out\\\, size_is\\\(bytes\\\)],
-			aafDataBuffer_t, buffer, 
-			the buffer that contains at least bytes,
-			[out\\\,ref],
-			aafUInt32 *,
-			bytesWritten, the number of bytes actually written from the buffer,
+			aafInt32,
+			buflen,
+			of this size,
 			Write some number of bytes to the stream exactly and with no formatting or compression.
 	// 
 	// This method should return only the following codes.  If more than one of
@@ -64,7 +57,6 @@ AD_METHOD3(Write,
 	// AAFRESULT_STREAM_FULL
 	//   - The essence can not be written because of a fault such as a disk full error in the
 	// underlying operating system.)
-
 
 AD_METHOD3(Read,
 			[in],
@@ -97,7 +89,7 @@ AD_METHOD3(Read,
 
 AD_METHOD1(Seek,
 			[in],
-			aafPosition_t,
+			aafInt64,
 			byteOffset,
 			The absolute byte offset into the stream.,
 			Seek to the absolute byte offset into the stream.)
@@ -131,7 +123,7 @@ AD_METHOD1(SeekRelative,
 
 AD_METHOD1(GetPosition,
 			[out],
-			aafPosition_t *,
+			aafInt64 *,
 			pPosition,
 			The position within the stream.,
 			Returns the position within the stream.
@@ -148,7 +140,7 @@ AD_METHOD1(GetPosition,
 
 AD_METHOD1(GetLength,
 			[out],
-			aafLength_t *,
+			aafInt64 *,
 			pLength,
 			The length of the stream.,
 			Returns the length of the stream.
@@ -186,7 +178,7 @@ AD_METHOD0(FlushCache, Ensure that all bits are written.  The caller of this int
 
 AD_METHOD1(SetCacheSize,
 			[in],
-			aafUInt32,
+			aafInt32,
 			itsSize,
 			The size of the cache buffer.  Zero is a valid size\\\, and means to turn caching off,
 			Sets the size of the cache buffer used for further operations.
