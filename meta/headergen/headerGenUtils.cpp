@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: headerGenUtils.cpp,v 1.12 2004/02/27 15:41:23 phil_tudor Exp $ $Name:  $
+// $Id: headerGenUtils.cpp,v 1.13 2004/02/27 18:14:57 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -54,6 +54,8 @@ void printCopyright (ostream & s)
 "//=---------------------------------------------------------------------=\n"
 "//\n"
 "// This file was GENERATED for the AAF SDK\n"
+"//\n"
+"// $""Id$ $""Name$\n"
 "//\n"
 "// The contents of this file are subject to the AAF SDK Public\n"
 "// Source License Agreement (the \"License\"); You may not use this file\n"
