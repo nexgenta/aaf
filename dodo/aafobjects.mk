@@ -48,7 +48,7 @@ AAFPERSISTENTOBJECTS = \
 # These are all of the other non-persistent objects:
 AAFNONPERSISTENTOBJECTS = \
 	AAFRoot \
-	AAFEssenceAccess \
+	AAFEssenceFormat \
 	EnumAAFAttributes \
 	EnumAAFClassDefs \
 	EnumAAFControlCodeDefs \
@@ -80,6 +80,7 @@ HUMAN_TYPED_IMPL = \
 	AAFComponent \
 	AAFCompositionMob \
 	AAFContentStorage \
+	AAFEssenceAccess \
 	AAFEssenceData \
 	AAFEssenceDescriptor \
 	AAFFile \
@@ -128,3 +129,17 @@ AAFOBJECTS = \
 AUTO_GEN_IMPL = \
 	$(AAFPERSISTENTOBJECTS) \
 	$(AAFNONPERSISTENTOBJECTS)
+
+#---------------------------------------------
+# Build the list of all objects which are built into plugin.idl and
+# NOT into AAF.idl.
+
+PLUGIN_OBJECTS = \
+	AAFEssenceFormat \
+	AAFPluginTypes \
+	AAFPlugin \
+	AAFEssenceStream \
+	AAFEssenceCodec
+
+# objects in PLUGIN_OBJECTS are NOT built into the main interface IDL
+#---------------------------------------------
