@@ -39,7 +39,7 @@
 
 #include "ImplAAFDictionary.h"
 #include "ImplAAFDataDef.h"
-#include "ImplAAFTypeDefOpaque.h"
+#include "ImplAAFTypeDefIndirect.h"
 #include "ImplAAFTypeDefRename.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFBuiltinDefs.h"
@@ -52,7 +52,7 @@
 extern "C" const aafClassID_t CLSID_AAFTypeDefRename;
 
 ImplAAFKLVData::ImplAAFKLVData ():
-	_value(		PID_KLVData_Value,		L"Value"),
+	_value(		PID_KLVData_Value,		"Value"),
   _initialized(false),
   _cachedRenameTypeDef(NULL)
 {
@@ -71,9 +71,10 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFKLVData::Initialize (
       aafUID_t keyUID, 
       aafUInt32 valueSize, 
-      aafDataBuffer_t pValue)
+      aafDataBuffer_t pValue,
+	  ImplAAFTypeDef *underlyingType)
 {
-	ImplAAFDictionary		*pDict = NULL;
+	ImplAAFDictionary		*pDict = NULL, *pDict2/*DEBUG ONLY*/;
 	ImplAAFTypeDef			*pDef = NULL;
 	ImplAAFTypeDefRename	*pRenameDef = NULL;
 	if (!pValue)
@@ -85,14 +86,20 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	// Save the type so that SetValue will know the type of the value data.
 		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->LookupOpaqueTypeDef(keyUID, &pDef));
-		_cachedRenameTypeDef = dynamic_cast<ImplAAFTypeDefRename*>(pDef);
+		if(pDict->LookupTypeDef(keyUID, &pDef) == AAFRESULT_SUCCESS)
+			_cachedRenameTypeDef = dynamic_cast<ImplAAFTypeDefRename*>(pDef);
+		else
+		{
+			CHECK(pDict->GetBuiltinDefs()->cdTypeDefRename()->
+				CreateInstance((ImplAAFObject**)&pRenameDef));
+			CHECK(pRenameDef->Initialize (keyUID, underlyingType, L"KLV Data"));
+			CHECK(pDict->RegisterTypeDef(pRenameDef));
+			_cachedRenameTypeDef = pRenameDef;
+			CHECK(pRenameDef->GetDictionary(&pDict2));
+		}
 		assert(_cachedRenameTypeDef);
 		CHECK(SetValue (valueSize, pValue));
 		_initialized = true;
-		if(pDict)
-		  pDict->ReleaseReference();
-		pDict = 0;
 	}
 	XEXCEPT
 	{
@@ -113,13 +120,20 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFKLVData::GetKey (aafUID_t* pKey)
 {
 	AAFRESULT		hr = AAFRESULT_SUCCESS;
+	ImplAAFTypeDef	*tmp = NULL;
 
 	if(pKey == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	// Validate the property and get the actual type id from the
+	// Validate the property and get the actual type definition from the
   // indirect value.
-	hr = ImplAAFTypeDefIndirect::GetActualPropertyTypeID (_value, pKey);
+	hr = ImplAAFTypeDefIndirect::GetActualPropertyType (_value, &tmp);
+	if(hr == AAFRESULT_SUCCESS)
+	{
+		tmp->GetAUID(pKey);
+		tmp->ReleaseReference();
+		tmp = 0;
+	}
 
 	return hr;
 }
@@ -149,22 +163,8 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFKLVData::GetValue (aafUInt32 valueSize, aafDataBuffer_t pValue, aafUInt32* bytesRead)
 {
-	ImplAAFDictionary	*pDict;
-	ImplAAFTypeDef		*pType;
-	AAFRESULT			hr;
-	aafUID_t			theKey;
-
 	if (pValue == NULL || bytesRead == NULL)
 		return AAFRESULT_NULL_PARAM;
-
-	GetKey(&theKey);
-	GetDictionary(&pDict);
-	hr = pDict->LookupOpaqueTypeDef(theKey, &pType);
-	if(pDict)
-	  pDict->ReleaseReference();
-	pDict = 0;
-	if(hr != AAFRESULT_SUCCESS)
-		return hr;
 
 //	if (_value.size() > valueSize)
 //	  return AAFRESULT_SMALLBUF;
