@@ -43,20 +43,14 @@ class ImplAAFFile;
 
 #include "aafErr.h"
 #include "ImplAAFObject.h"
-//#include "ImplAAFSession.h"
 #include "ImplAAFIdentification.h"
 #include "ImplAAFContentStorage.h"
+#include "ImplAAFDictionary.h"
 
-#include "OMProperty.h"
 
 class AAFDataKind;
-class AAFEffectDef;
-class ImplAAFSession;
+class AAFOperationDef;
 
-const int PID_HEADER_BYTEORDER          = 0;
-const int PID_HEADER_LASTMODIFIED       = 1;
-const int PID_HEADER_IDENTIFICATIONLIST = 2;
-const int PID_HEADER_CONTENTSTORAGE		= 3;
 
 class ImplAAFHeader : public ImplAAFObject
 {
@@ -89,16 +83,6 @@ public:
     GetNumMobs
         (aafMobKind_t  mobKind,   //@parm [in] The mob kind to count
 		 aafNumSlots_t *  pNumMobs);  //@parm [out,retval] Total number of mobs of kind mobKind
-
-
-  //****************
-  // EnumAAFPrimaryMobs()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    EnumAAFPrimaryMobs
-		// @parm [out,retval] Mob Enumeration
-        (ImplEnumAAFMobs ** ppEnum);
-
 
   //****************
   // EnumAAFAllMobs()
@@ -282,51 +266,27 @@ public:
   // in /test/ImplAAFHeaderTest.cpp.
   static AAFRESULT test();
 
-  // Return this objects stored object class.
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
-
 public:
 	// Interfaces visible inside the toolkit, but not exposed through the API
-	AAFRESULT AppendDataObject(aafUID_t mobID,      /* IN - Mob ID */
-						  ImplAAFObject *dataObj) ;    /* IN - Input Mob */ 
 
 AAFRESULT SetToolkitRevisionCurrent(void);
-AAFRESULT IsValidHeadObject(void);
-
 AAFRESULT GetNumIdentifications (aafInt32 * /*pCount*/);
 
 AAFRESULT AddIdentificationObject (aafProductIdentification_t * /*pIdent*/);
-AAFRESULT BuildMediaCache(void);
 AAFRESULT LoadMobTables(void);
+AAFRESULT SetModified(void);		// To NOW
+
+  void SetByteOrder(const aafInt16 byteOrder);
+  void SetDictionary(ImplAAFDictionary *pDictionary);
 
 private:
 	// These are private accessor methods.
 	ImplAAFContentStorage *GetContentStorage(void);
 	ImplAAFDictionary *GetDictionary(void);
 
-public:
-#if FULL_TOOLKIT
-AAFRESULT ReadToolkitRevision(aafProductVersion_t *revision);
-AAFRESULT WriteToolkitRevision(aafProductVersion_t revision);
-AAFRESULT FinishCreation(void);
-AAFRESULT BuildDatakindCache(void);
-AAFRESULT BuildEffectDefCache(void);
-AAFRESULT UpdateLocalCLSD(void);
-AAFRESULT CreateTables(void);
-AAFRESULT UpdateFileCLSD(void);
-AAFRESULT CreateDatakindCache(void);
-#endif
-
 private:
 
 		ImplAAFFile		*_file;
-#if FULL_TOOLKIT
-		aafTable_t       *_dataObjs;
-		aafTable_t       *_datadefs;
-		aafTable_t       *_effectDefs;
-		aafTable_t       *_mobs;
-#endif
 
 		// Non-table instance variables
 		aafVersionType_t	_fileRev;
@@ -338,6 +298,7 @@ private:
 		OMFixedSizeProperty<aafTimeStamp_t>                _lastModified;
     OMStrongReferenceVectorProperty<ImplAAFIdentification> _identificationList;
 		OMStrongReferenceProperty<ImplAAFContentStorage>	_contentStorage;
+		OMStrongReferenceProperty<ImplAAFDictionary>	_dictionary;
 };
 
 #endif // ! __ImplAAFHeader_h__
