@@ -32,6 +32,15 @@
  ************************************************************************/
 
 
+
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/ 
+
 class ImplAAFDataDef;
 
 
@@ -43,7 +52,6 @@ class ImplAAFDataDef;
 #include "ImplAAFObject.h"
 #endif
 
-class ImplAAFVaryingValue;
 class ImplAAFTypeDef;
 
 class ImplAAFControlPoint : public ImplAAFObject
@@ -54,23 +62,6 @@ public:
   //
   //********
   ImplAAFControlPoint ();
-
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (// @parm [in] // Varying value for this object (this determines the type of the constant value)
-         ImplAAFVaryingValue * pVaryingValue,
-
-         // @parm [in] Control Point time
-         aafRational_constref  time,
-         
-         // @parm [in] Size of preallocated buffer
-         aafUInt32  valueSize,
-
-         // @parm [in, size_is(valueSize)] buffer containing value
-         aafDataBuffer_t  pValue);
 
 protected:
   virtual ~ImplAAFControlPoint ();
@@ -156,16 +147,18 @@ public:
          aafDataBuffer_t  pValue);
 
   virtual AAFRESULT STDMETHODCALLTYPE
+    SetTypeDefinition (
+      ImplAAFTypeDef*  pTypeDef);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeDefinition (
       ImplAAFTypeDef **ppTypeDef);
 
 private:
+	OMFixedSizeProperty<aafUID_t>		_type;
 	OMFixedSizeProperty<aafRational_t>	_time;
 	OMVariableSizeProperty<aafUInt8>	_value;
-	OMFixedSizeProperty<aafEditHint_t>	_hint;
-
-  bool _initialized;
-  ImplAAFTypeDef * _cachedTypeDef;
+	OMFixedSizeProperty<aafUInt16>		_hint;
 };
 
 #endif // ! __ImplAAFControlPoint_h__
