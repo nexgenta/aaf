@@ -112,6 +112,30 @@ void trace(const char* routineName);
 
 #endif
 
+#if defined(OM_ENABLE_OBSOLETE)
+
+  // @func Output a message indicating that the <p routineName>
+  //       is obsolete and that <p newRoutineName> should be used instead
+  //   @parm The name of the obsolete routine.
+  //   @parm The name of the routine that should be called instead.
+void obsolete(const char* routineName, const char* newRoutineName);
+
+  // @func Print a message (when enabled with OM_ENABLE_DEBUG and
+  //       OM_ENABLE_OBSOLETE) indicating that the current routine
+  //       is obsolete and that <p newRoutineName> should be used instead.
+  //       OBSOLETE is provided to aid clients in migrating from one
+  //       Object Manager version to the next. Routines are made obsolete
+  //       before they are removed. 
+  //   @parm The name of the routine that should be called instead.
+#define OBSOLETE(newRoutineName) \
+  obsolete(currentRoutineName, newRoutineName);
+
+#else
+
+#define OBSOLETE(newRoutineName)
+
+#endif
+
   // @func Assert (when enabled with OM_ENABLE_DEBUG) that the
   //       precondition described by <p name> and <p expression> is
   //       true. An invocation of this macro must be preceeded by an
@@ -203,9 +227,39 @@ void trace(const char* routineName);
 #define FORALL(index, elementCount, expression) \
         FOREACH(index, 0, elementCount, expression) 
 
+  // @func Define a name only when assertions are enabled. Use to
+  //       avoid compiler warnings.
+  //   @parm The name to (conditionally) define.
+#define ANAME(name) \
+  name
+
+  // @func Save the value of a variable on entry to a routine for
+  //       later retrieval in the postcondition with <f OLD>.
+  //   @parm The name of the variable to save.
+  //   @parm The type of the variable.
+#define SAVE(name, type) \
+  SAVE_EXPRESSION(name, name, type)
+
+  // @func Save the value of an expression on entry to a routine for
+  //       later retrieval in the postcondition with <f OLD>.
+  //   @parm The name of the saved expression.
+  //   @parm The expression to save.
+  //   @parm The type of the expression.
+#define SAVE_EXPRESSION(name, expression, type) \
+  type oldValueOf##name = expression
+
+  // @func Retrieve the value of a variable or expression saved on
+  //       entry to a routine with <f SAVE> or with <f SAVE_EXPRESSION>.
+  //       For use in postconditions.
+  //   @parm The name of the saved variable or expression.
+#define OLD(name) \
+  oldValueOf##name
+
 #else
 
 #define TRACE(name)
+
+#define OBSOLETE(newRoutineName)
 
 #define PRECONDITION(name, expression)
 
@@ -220,6 +274,14 @@ void trace(const char* routineName);
 #define FOREACH(index, start, elementCount, expression)
 
 #define FORALL(index, elementCount, expression)
+
+#define ANAME(name)
+
+#define SAVE(name, type)
+
+#define SAVE_EXPRESSION(name, expression, type)
+
+#define OLD(name)
 
 #endif
 
