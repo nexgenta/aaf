@@ -68,7 +68,9 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Effects"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730b, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
+
 #define TEST_BYPASS			1
 #define TEST_PARAM_NAME		L"A TestEffect parameter"
 #define TEST_PARAM_DESC		L"A longer description of the TestEffect parameter"
@@ -195,8 +197,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
-		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 		
 		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
 		checkResult(pDef->SetName (TEST_PARAM_NAME));
@@ -405,7 +405,9 @@ extern "C" HRESULT CEnumAAFOperationDefs_test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFOperationDefs_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFOperationDefs_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 	return hr;
 }

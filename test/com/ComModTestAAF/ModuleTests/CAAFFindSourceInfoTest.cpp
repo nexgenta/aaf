@@ -53,7 +53,7 @@ static aafWChar* Model = L"MyModel";
 static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
 static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
 static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
-static aafLength_t TapeLength = 3200 ;
+static aafUInt32 TapeLength = 3200 ;
 
 //static aafMobID_t		NewMobID;
 //--cf  This will require some work!!! 
@@ -585,7 +585,9 @@ extern "C" HRESULT CAAFFindSourceInfo_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFFindSourceInfo_test...Caught general C++ exception!" << endl; 
+	  cerr << "CAAFFindSourceInfo_test..."
+		   << "Caught general C++ exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
 	}
 	
 	if (SUCCEEDED(hr))

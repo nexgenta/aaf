@@ -189,7 +189,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->AddMob(pMob));
 		checkResult(pMasterMob->CreateEssence (1,
 											   defs.ddSound(),
-											   CodecWave,
+											   kAAFCodecWAVE,
 											   rate,
 											   rate,
 											   kAAFCompressionDisable,
@@ -376,7 +376,9 @@ extern "C" HRESULT CAAFEssenceFormat_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFEssenceFormat_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFEssenceFormat_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 	
 	// When all of the functionality of this class is tested, we can return success.

@@ -53,7 +53,7 @@ static aafWChar* Model = L"MyModel";
 static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
 static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
 static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
-static aafLength_t TapeLength = 3200 ;
+static aafUInt32 TapeLength = 3200 ;
 
 static aafMobID_t		NewMobID;
 #define TAPE_MOB_OFFSET	10
@@ -414,7 +414,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		  checkExpression(wcscmp(name, MobName) == 0, AAFRESULT_TEST_FAILED);
 
 		  checkResult(pMob->GetMobID(&mobID));
-		  checkExpression(0 == memcmp(&mobID, &NewMobID, sizeof(mobID)), AAFRESULT_TEST_FAILED);
+		  checkExpression(0 == memcmp(&mobID, &TEST_Master_MobID, sizeof(mobID)), AAFRESULT_TEST_FAILED);
 
 		  checkResult(pMob->CountSlots(&numSlots));
 		  checkExpression(NumMobSlots == numSlots, AAFRESULT_TEST_FAILED);
@@ -517,7 +517,9 @@ extern "C" HRESULT CAAFMasterMob_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFMasterMob_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFMasterMob_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.

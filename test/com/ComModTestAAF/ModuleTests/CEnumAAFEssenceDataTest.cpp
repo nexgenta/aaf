@@ -64,6 +64,7 @@ struct EnumEssenceDataTest
 
   // Shared member data:
   HRESULT _hr;
+  aafProductVersion_t _productVersion;
   aafProductIdentification_t _productInfo;
   IAAFFile *_pFile;
   bool _bFileOpen;
@@ -98,7 +99,8 @@ extern "C" HRESULT CEnumAAFEssenceData_test()
   catch (...)
   {
     cerr << "CAAFEssenceData_test...Caught general C++"
-    " exception!" << endl; 
+		 << " exception!" << endl; 
+	hr = AAFRESULT_TEST_FAILED;
   }
 
   // Cleanup our object if it exists.
@@ -152,15 +154,14 @@ EnumEssenceDataTest::EnumEssenceDataTest():
   _pEnumEssenceData(NULL),
   _pEssenceData(NULL)
 {
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
+  _productVersion.major = 1;
+  _productVersion.minor = 0;
+  _productVersion.tertiary = 0;
+  _productVersion.patchLevel = 0;
+  _productVersion.type = kAAFVersionUnknown;
   _productInfo.companyName = L"AAF Developers Desk";
   _productInfo.productName = L"EnumAAFEssenceData Module Test";
-  _productInfo.productVersion = &v;
+  _productInfo.productVersion = &_productVersion;
   _productInfo.productVersionString = NULL;
   _productInfo.productID = UnitTestProductID;
   _productInfo.platform = NULL;

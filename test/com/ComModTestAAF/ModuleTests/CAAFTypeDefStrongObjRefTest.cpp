@@ -38,7 +38,7 @@
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFClassDef>         IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFComponent>        IAAFComponentSP;
-typedef IAAFSmartPointer<IAAFDefObject>        IAAFDefObjectSP;
+typedef IAAFSmartPointer<IAAFMetaDefinition>   IAAFMetaDefinitionSP;
 typedef IAAFSmartPointer<IAAFDictionary>       IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFFile>             IAAFFileSP;
 typedef IAAFSmartPointer<IAAFFiller>           IAAFFillerSP;
@@ -49,6 +49,8 @@ typedef IAAFSmartPointer<IAAFPropertyDef>      IAAFPropertyDefSP;
 typedef IAAFSmartPointer<IAAFPropertyValue>    IAAFPropertyValueSP;
 typedef IAAFSmartPointer<IAAFTypeDef>          IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefObjectRef> IAAFTypeDefObjectRefSP;
+typedef IAAFSmartPointer<IAAFTypeDefStrongObjRef>
+    IAAFTypeDefStrongObjRefSP;
 typedef IAAFSmartPointer<IEnumAAFMobs>         IEnumAAFMobsSP;
 
 #include "CAAFBuiltinDefs.h"
@@ -216,9 +218,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult (pDictionary->LookupClassDef (AUID_AAFComponent, &cdComp));
 
 	  // init our new type def strong obj ref
-	  checkResult (tdor->Initialize (kTestTypeID_ObjRef,
-									 cdComp,
-									 L"StrongRefToComponent"));
+	  IAAFTypeDefStrongObjRefSP tdsor;
+	  checkResult (tdor->QueryInterface (IID_IAAFTypeDefStrongObjRef,
+										  (void **)&tdsor));
+	  checkResult (tdsor->Initialize (kTestTypeID_ObjRef,
+									  cdComp,
+									  L"StrongRefToComponent"));
 
 	  // Blast it into the dictionary.  To do so, we'll need to use
 	  // the TypeDef interface.
@@ -234,7 +239,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	  // get the existing class def describing comp mob
 	  IAAFClassDefSP cdCompMob;
-	  checkResult (pDictionary->LookupClassDef (AUID_AAFCompositionMob, &cdCompMob));
+	  checkResult (pDictionary->
+				   LookupClassDef (AUID_AAFCompositionMob, &cdCompMob));
 
 	  // append the new prop defs to it
 	  IAAFPropertyDefSP pd1; // remember this for later use
@@ -388,8 +394,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 	  // Compare this class def with one from the dict, using GUIDs
 	  // First, get the referenced object class def
-	  IAAFDefObjectSP refdDef;
-	  checkResult (refdObjClass->QueryInterface (IID_IAAFDefObject,
+	  IAAFMetaDefinitionSP refdDef;
+	  checkResult (refdObjClass->QueryInterface (IID_IAAFMetaDefinition,
 												 (void **)&refdDef));
 	  aafUID_t refdObjID;
 	  checkResult (refdDef->GetAUID (&refdObjID));
@@ -398,8 +404,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	  IAAFClassDefSP dictClass;
 	  checkResult (dict->LookupClassDef (AUID_AAFComponent,
 									  &dictClass));
-	  IAAFDefObjectSP dictDef;
-	  checkResult (dictClass->QueryInterface (IID_IAAFDefObject,
+	  IAAFMetaDefinitionSP dictDef;
+	  checkResult (dictClass->QueryInterface (IID_IAAFMetaDefinition,
 											  (void **)&dictDef));
 	  aafUID_t dictObjID;
 	  checkResult (dictDef->GetAUID (&dictObjID));
@@ -464,7 +470,8 @@ extern "C" HRESULT CAAFTypeDefStrongObjRef_test()
 	}
   catch (...)
 	{
-	  cerr << "CAAFTypeDefStrongObjRef_test...Caught general C++ exception!" << endl; 
+	  cerr << "CAAFTypeDefStrongObjRef_test..."
+		   << "Caught general C++ exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

@@ -84,6 +84,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
+	IAAFContainerDef*  pContainer = NULL;
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
 	IAAFEssenceDescriptor *edesc = NULL;
@@ -147,9 +148,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 								   (IUnknown **)&edesc));		
 		checkResult(edesc->QueryInterface(IID_IAAFFileDescriptor, (void **) &pFileDesc));
 		checkResult(pFileDesc->SetSampleRate (checkSampleRate));
-		checkResult(pFileDesc->SetContainerFormat (checkContainer));
+		checkResult(pDictionary->LookupContainerDef(checkContainer, &pContainer));
+		checkResult(pFileDesc->SetContainerFormat (pContainer));
+		pContainer->Release();
+		pContainer = NULL;
+
 		checkResult(pFileDesc->SetLength (checkLength));
-		checkResult(pFileDesc->SetIsInContainer (kAAFTrue));
+//		checkResult(pFileDesc->SetIsInContainer (kAAFTrue));
 		
 		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 		
@@ -198,6 +203,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
 	IEnumAAFMobs *mobIter = NULL;
+	IAAFContainerDef*  pContainer = NULL;
+	IAAFDefObject	*  pDef = NULL;
 	IAAFEssenceDescriptor		*pEdesc = NULL;
 	IAAFSourceMob				*pSourceMob = NULL;
 	IAAFMob			*aMob = NULL;
@@ -210,7 +217,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafRational_t				testSampleRate;
 	aafUID_t					testContainer;
 	aafLength_t					testLength;
-	aafBool						testBool;
+//	aafBool						testBool;
 	
 	aafProductVersion_t v;
 	v.major = 1;
@@ -272,12 +279,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(pFileDesc->GetSampleRate (&testSampleRate));
 			checkExpression(testSampleRate.numerator == checkSampleRate.numerator, AAFRESULT_TEST_FAILED);
 			checkExpression(testSampleRate.denominator == checkSampleRate.denominator, AAFRESULT_TEST_FAILED);
-			checkResult(pFileDesc->GetContainerFormat (&testContainer));
+			checkResult(pFileDesc->GetContainerFormat (&pContainer));
+			checkResult(pContainer->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
+			checkResult(pDef->GetAUID(&testContainer));
+			pContainer->Release();
+			pContainer = NULL;
+			pDef->Release();
+			pDef = NULL;
 			checkExpression(memcmp(&testContainer, &checkContainer, sizeof(testContainer)) == 0, AAFRESULT_TEST_FAILED);
 			checkResult(pFileDesc->GetLength (&testLength));
 			checkExpression(checkLength == testLength, AAFRESULT_TEST_FAILED);
-			checkResult(pFileDesc->GetIsInContainer (&testBool));
-			checkExpression(testBool == kAAFTrue, AAFRESULT_TEST_FAILED);
+//			checkResult(pFileDesc->GetIsInContainer (&testBool));
+//			checkExpression(testBool == kAAFTrue, AAFRESULT_TEST_FAILED);
 			
 			pEdesc->Release();
 			pEdesc = NULL;
@@ -345,7 +358,8 @@ extern "C" HRESULT CAAFFileDescriptor_test()
 	catch (...)
 	{
 		cerr << "CAAFFileDescriptor_test...Caught general C++"
-			" exception!" << endl; 
+			 << " exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 	
 	return hr;
