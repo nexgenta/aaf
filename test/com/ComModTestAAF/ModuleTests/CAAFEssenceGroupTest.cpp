@@ -35,6 +35,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFUtils.h"
@@ -323,23 +324,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFComponent*				pComponent = NULL;
 	aafLength_t					readLength;
 	bool bFileOpen = false;
-	aafProductIdentification_t	ProductInfo;
 	aafSearchCrit_t				criteria;
 	aafNumSlots_t				numMobs, numSlots;
 	aafUInt32					readNumChoices;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFEssenceGroup Test. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 
 	try
 	{ 
@@ -459,14 +448,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
  
 
 
-extern "C" HRESULT CAAFEssenceGroup_test()
+extern "C" HRESULT CAAFEssenceGroup_test(testMode_t mode);
+extern "C" HRESULT CAAFEssenceGroup_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"AAFEssenceGroupTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
