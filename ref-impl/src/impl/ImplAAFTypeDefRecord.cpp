@@ -1,10 +1,29 @@
-/***********************************************\
-*                                               *
-* Advanced Authoring Format                     *
-*                                               *
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*                                               *
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFTypeDefRecord_h__
 #include "ImplAAFTypeDefRecord.h"
@@ -36,13 +55,14 @@
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
-  : _memberTypes ( PID_TypeDefinitionRecord_MemberTypes, "Member Types"),
-	_memberNames ( PID_TypeDefinitionRecord_MemberNames, "Member Names"),
+  : _memberTypes ( PID_TypeDefinitionRecord_MemberTypes, "MemberTypes"),
+	_memberNames ( PID_TypeDefinitionRecord_MemberNames, "MemberNames"),
 	_registeredOffsets (0),
 	_registeredSize (0),
 	_internalSizes (0),
 	_cachedCount ((aafUInt32) -1),
-	_cachedMemberTypes (0)
+	_cachedMemberTypes (0),
+	_registrationAttempted (kAAFFalse)
 {
   _persistentProperties.put(_memberTypes.address());
   _persistentProperties.put(_memberNames.address());
@@ -57,6 +77,7 @@ ImplAAFTypeDefRecord::~ImplAAFTypeDefRecord ()
   if (_internalSizes)
 	delete[] _internalSizes;
 
+  // these weren't ref counted here
   if (_cachedMemberTypes)
 	delete[] _cachedMemberTypes;
 }
@@ -92,21 +113,19 @@ void ImplAAFTypeDefRecord::pvtInitInternalSizes (void) const
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::Initialize (
-      const aafUID_t * pID,
+      const aafUID_t & id,
       ImplAAFTypeDef ** ppMemberTypes,
       aafString_t * pMemberNames,
       aafUInt32 numMembers,
-      wchar_t * pTypeName)
+      const aafCharacter * pTypeName)
 {
-  if (!pID)
-	return AAFRESULT_NULL_PARAM;
-  if (!pTypeName)
+  if (!ppMemberTypes && !pMemberNames && !pTypeName)
     return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   _cachedCount = numMembers;
@@ -119,25 +138,38 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	  if ( !ppMemberTypes[i])
 		return AAFRESULT_NULL_PARAM;
+	  if (! ppMemberTypes[i]->IsAggregatable())
+		return AAFRESULT_BAD_TYPE;
 
 	  totalNameSize += (wcslen (pMemberNames[i]) + 1);
 	}
 
-  wchar_t * namesBuf = new wchar_t[totalNameSize];
+  aafCharacter * namesBuf = new aafCharacter[totalNameSize];
   if (!namesBuf)
 	return AAFRESULT_NOMEMORY;
   // make it an empty string
   *namesBuf = 0;
-  wchar_t * tmpNamePtr = namesBuf;
+  aafCharacter * tmpNamePtr = namesBuf;
 
   assert (0 == _memberTypes.count());
-  aafUID_t * buf = new aafUID_t[numMembers*sizeof(aafUID_t)];
+  aafUID_t * buf = new aafUID_t[numMembers];
+  if (!buf)
+  {
+    delete[] namesBuf;
+    return AAFRESULT_NOMEMORY;
+  }
   for (i = 0; i < numMembers; i++)
 	{
 	  assert (ppMemberTypes[i]);
 	  aafUID_t typeUID;
 	  AAFRESULT hr = ppMemberTypes[i]->GetAUID(&typeUID);
 	  assert (AAFRESULT_SUCCEEDED(hr));
+    if (AAFRESULT_FAILED(hr))
+    {
+      delete[] buf;
+      delete[] namesBuf;
+      return hr;
+    }
 	  buf[i] = typeUID;
 
 	  assert (pMemberNames[i]);
@@ -147,7 +179,70 @@ AAFRESULT STDMETHODCALLTYPE
 	}
   _memberTypes.setValue(buf, numMembers*sizeof(aafUID_t));
   delete[] buf;
-  _memberNames.setValue (namesBuf, totalNameSize * sizeof(wchar_t));
+  _memberNames.setValue (namesBuf, totalNameSize * sizeof(aafCharacter));
+  delete[] namesBuf;
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefRecord::pvtInitialize (
+      const aafUID_t & id,
+      aafUID_t ** pMemberTypeIDs,
+      aafString_t * pMemberNames,
+      aafUInt32 numMembers,
+      const aafCharacter * pTypeName)
+{
+  if (!pMemberTypeIDs && !pMemberNames && !pTypeName)
+    return AAFRESULT_NULL_PARAM;
+
+  AAFRESULT hr;
+  hr = SetName (pTypeName);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = SetAUID (id);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  _cachedCount = numMembers;
+
+  aafUInt32 i;
+  aafUInt32 totalNameSize = 0;
+  for (i = 0; i < numMembers; i++)
+	{
+	  if ( !pMemberNames[i])
+		return AAFRESULT_NULL_PARAM;
+	  if ( !pMemberTypeIDs[i])
+		return AAFRESULT_NULL_PARAM;
+
+	  totalNameSize += (wcslen (pMemberNames[i]) + 1);
+	}
+
+  aafCharacter * namesBuf = new aafCharacter[totalNameSize];
+  if (!namesBuf)
+	return AAFRESULT_NOMEMORY;
+  // make it an empty string
+  *namesBuf = 0;
+  aafCharacter * tmpNamePtr = namesBuf;
+
+  assert (0 == _memberTypes.count());
+  aafUID_t * buf = new aafUID_t[numMembers];
+  if (!buf)
+  {
+    delete[] namesBuf;
+    return AAFRESULT_NOMEMORY;
+  }
+  for (i = 0; i < numMembers; i++)
+	{
+	  buf[i] = *pMemberTypeIDs[i];
+
+	  wcscpy(tmpNamePtr, pMemberNames[i]);
+	  // +1 to go past embedded null
+	  tmpNamePtr += wcslen (pMemberNames[i]) + 1;
+	}
+  _memberTypes.setValue(buf, numMembers*sizeof(aafUID_t));
+  delete[] buf;
+  _memberNames.setValue (namesBuf, totalNameSize * sizeof(aafCharacter));
   delete[] namesBuf;
 
   return AAFRESULT_SUCCESS;
@@ -173,9 +268,12 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (! _cachedMemberTypes)
 	{
-	  _cachedMemberTypes = new ImplAAFTypeDefSP[count];
+	  _cachedMemberTypes = new ImplAAFTypeDef *[count];
 	  if (! _cachedMemberTypes)
 		return AAFRESULT_NOMEMORY;
+	  aafUInt32 i;
+	  for (i = 0; i < count; i++)
+		_cachedMemberTypes[i] = 0;
 	}
 
   if (! _cachedMemberTypes[index])
@@ -187,7 +285,7 @@ AAFRESULT STDMETHODCALLTYPE
 	  hr = GetDictionary (&pDict);
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (pDict);
-	  hr = pDict->LookupType(&memberUID, &pMemberType);
+	  hr = pDict->LookupTypeDef (memberUID, &pMemberType);
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (pMemberType);
 	  _cachedMemberTypes[index] = pMemberType;
@@ -204,7 +302,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::GetMemberName (
       aafUInt32 index,
-      wchar_t * pName,
+      aafCharacter * pName,
       aafUInt32  bufSize)
 {
   AAFRESULT hr;
@@ -219,7 +317,14 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (index >= count) return AAFRESULT_ILLEGAL_VALUE;
 
-  wchar_t c;
+  aafUInt32 requiredSize;
+  hr = GetMemberNameBufLen (index, &requiredSize);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+  if (bufSize < requiredSize)
+	return AAFRESULT_SMALLBUF;
+
+  aafCharacter c;
   size_t numChars = _memberNames.count();
   indexIntoProp = 0;
   currentIndex = 0;
@@ -250,12 +355,8 @@ AAFRESULT STDMETHODCALLTYPE
   // into the client's buffer.
   do
 	{
-	  if (! bufSize) return AAFRESULT_SMALLBUF;
 	  _memberNames.getValueAt(&c, indexIntoProp++);
-	  // BobT Note!!! We're cheating here, modifying client data
-	  // before we're sure this method will succeed.
 	  *pName++ = c;
-	  bufSize--;
 	}
   while (c);
   return AAFRESULT_SUCCESS;
@@ -280,7 +381,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (index >= count) return AAFRESULT_ILLEGAL_VALUE;
 
-  wchar_t c;
+  aafCharacter c;
   size_t numChars = _memberNames.count();
   indexIntoProp = 0;
   currentIndex = 0;
@@ -321,7 +422,9 @@ AAFRESULT STDMETHODCALLTYPE
   nameLength++;
 
   assert (pLen);
-  *pLen = nameLength;
+  // nameLength is in number of aafCharacters; returned length must be
+  // in bytes
+  *pLen = (nameLength * sizeof (aafCharacter)) / sizeof (aafUInt8);
   return AAFRESULT_SUCCESS;
 }
 
@@ -365,6 +468,11 @@ AAFRESULT STDMETHODCALLTYPE
   pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
   if (!pvd) return AAFRESULT_NOMEMORY;
 
+  // Bobt: Hack bugfix! SmartPointer operator= will automatically
+  // AddRef; CreateImpl *also* will addref, so we've got one too
+  // many.  Put us back to normal.
+  pvd->ReleaseReference ();
+
   hr = pvd->Initialize (this);
   if (AAFRESULT_FAILED(hr)) return hr;
 
@@ -402,11 +510,49 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::CreateValueFromStruct (
-      aafMemPtr_t * /*pInitData*/,
-      aafUInt32 /*initDataSize*/,
-      ImplAAFPropertyValue ** /*ppPropVal*/)
+      aafMemPtr_t pInitData,
+      aafUInt32 initDataSize,
+      ImplAAFPropertyValue ** ppPropVal)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (! pInitData)
+	return AAFRESULT_NULL_PARAM;
+  if (! ppPropVal)
+	return AAFRESULT_NULL_PARAM;
+  if (! IsRegistered ())
+	return AAFRESULT_NOT_REGISTERED;
+  if (initDataSize != NativeSize())
+	return AAFRESULT_ILLEGAL_VALUE;
+
+  ImplAAFPropValData * pvd = 0;
+  pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+  if (!pvd) return AAFRESULT_NOMEMORY;
+
+  ImplAAFPropValDataSP spPvd;
+  spPvd = pvd;
+  // Bobt: Hack bugfix! SmartPointer operator= will automatically
+  // AddRef; CreateImpl *also* will addref, so we've got one too
+  // many.  Put us back to normal.
+  pvd->ReleaseReference ();
+  pvd = 0;
+
+  AAFRESULT hr;
+  hr = spPvd->Initialize (this);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  aafMemPtr_t pBits = 0;
+  hr = spPvd->AllocateBits (initDataSize, &pBits);
+  if (AAFRESULT_FAILED(hr)) return hr;
+  assert (pBits);
+
+  // Simply copy struct bits into property value.
+  memcpy (pBits, pInitData, initDataSize);
+
+  assert (ppPropVal);
+  *ppPropVal = spPvd;
+  assert (*ppPropVal);
+  (*ppPropVal)->AcquireReference ();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -446,6 +592,11 @@ AAFRESULT STDMETHODCALLTYPE
   pvdOut = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
   if (!pvdOut) return AAFRESULT_NOMEMORY;
 
+  // Bobt: Hack bugfix! SmartPointer operator= will automatically
+  // AddRef; CreateImpl *also* will addref, so we've got one too
+  // many.  Put us back to normal.
+  pvdOut->ReleaseReference ();
+
   hr = GetMemberType (index, &ptd);
   assert (AAFRESULT_SUCCEEDED (hr));
   assert (ptd);
@@ -481,8 +632,11 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_NULL_PARAM;
   if (! pData)
 	return AAFRESULT_NULL_PARAM;
+  if (! IsRegistered ())
+	return AAFRESULT_NOT_REGISTERED;
+  if (dataSize != NativeSize())
+	return AAFRESULT_ILLEGAL_VALUE;
 
-  // Bobt hack implementation! Not platform-independent!
   aafUInt32 bitsSize = 0;
   ImplAAFPropValData * pvd = 0;
   assert (pPropVal);
@@ -500,8 +654,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED(hr))
 	return hr;
 
-  // Bobt hack!!! should be registered size, not bitsSize.
-  memcpy (pData, pBits, bitsSize);
+  memcpy (pData, pBits, dataSize);
   return AAFRESULT_SUCCESS;
 }
 
@@ -656,7 +809,7 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 		  // We know it's not the last member, so it's safe to index
 		  // to the next element in pOffsets array.
-		  _internalSizes[i] = pOffsets[i+1] = pOffsets[i];
+		  _internalSizes[i] = pOffsets[i+1] - pOffsets[i];
 		}
 	}
 
@@ -817,7 +970,7 @@ void ImplAAFTypeDefRecord::internalize(OMByte* externalBytes,
 
 aafBool ImplAAFTypeDefRecord::IsFixedSize (void) const
 {
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
@@ -832,8 +985,7 @@ size_t ImplAAFTypeDefRecord::PropValSize (void) const
 
   for (aafUInt32 i = 0; i < count; i++)
 	{
-	  ImplAAFTypeDef * pMemType;
-	  pMemType = 0;
+	  ImplAAFTypeDefSP pMemType;
 	  // Bobt semi-hack: need non-const this in order to call
 	  // non-const GetMemberType. We know we aren't mangling it, so it
 	  // technically is OK...
@@ -849,14 +1001,29 @@ size_t ImplAAFTypeDefRecord::PropValSize (void) const
 }
 
 
+void ImplAAFTypeDefRecord::AttemptBuiltinRegistration (void)
+{
+  if (! _registrationAttempted)
+	{
+	  ImplAAFDictionarySP pDict;
+	  AAFRESULT hr = GetDictionary(&pDict);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  pDict->pvtAttemptBuiltinSizeRegistration (this);
+	  _registrationAttempted = kAAFTrue;
+	}
+}
+
+
 aafBool ImplAAFTypeDefRecord::IsRegistered (void) const
 {
-  return (_registeredOffsets ? AAFTrue : AAFFalse);
+  ((ImplAAFTypeDefRecord*)this)->AttemptBuiltinRegistration ();
+  return (_registeredOffsets ? kAAFTrue : kAAFFalse);
 }
 
 
 size_t ImplAAFTypeDefRecord::NativeSize (void) const
 {
+  ((ImplAAFTypeDefRecord*)this)->AttemptBuiltinRegistration ();
   assert (IsRegistered());
   return _registeredSize;
 }
@@ -874,4 +1041,26 @@ OMProperty * ImplAAFTypeDefRecord::pvtCreateOMPropertyMBS
 }
 
 
-OMDEFINE_STORABLE(ImplAAFTypeDefRecord, AUID_AAFTypeDefRecord);
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefRecord::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  // Return variable array of unsigned char
+  return pvtGetUInt8Array8Type (ppRawTypeDef);
+}
+
+
+bool ImplAAFTypeDefRecord::IsAggregatable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsStreamable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsFixedArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsVariableArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsStringable () const
+{ return false; }
