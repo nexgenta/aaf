@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 2000 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFStreamPropertyValue.h"
 
@@ -52,6 +57,10 @@ ImplAAFStreamPropertyValue::~ImplAAFStreamPropertyValue ()
 
 
 
+
+
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFStreamPropertyValue::GetSize (
       aafInt64 *  pSize)
@@ -74,7 +83,7 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NOT_INITIALIZED;
   if (0 > newSize) // TEMP: need unsigned aafUInt64!
     return AAFRESULT_INVALID_PARAM;
-
+  
   // *** Structured Storage PATCH! *** transdel:2000-JUN-20
   // Save the old position so that we can detect whether
   // or not the stream is being truncated.
@@ -142,10 +151,6 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NOT_INITIALIZED;
   if (NULL == pData || NULL == bytesRead)
     return AAFRESULT_NULL_PARAM;
-
-  // Cannot read from an optional property unless it is present.
-  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
-    return AAFRESULT_PROP_NOT_PRESENT;
     
   // Read the bytes from the data stream.
   _streamProperty->read(pData, dataSize, *bytesRead);
@@ -192,7 +197,7 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NOT_INITIALIZED;
   if (NULL == pData)
     return AAFRESULT_NULL_PARAM;
-
+      
   // Set the position to the size of the stream.
   _streamProperty->setPosition(_streamProperty->size());
        
@@ -254,7 +259,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFStreamPropertyValue::SetStoredByteOrder (
       eAAFByteOrder_t  byteOrder)
-{      
+{
   // Cannot set the byte order if there is an existing byte order.
   if (_streamProperty->hasByteOrder())
     return AAFRESULT_INVALID_BYTEORDER;
@@ -274,7 +279,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFStreamPropertyValue::ClearStoredByteOrder (void)
-{      
+{
   // Cannot clear the byte order if it has never been set.
   if (!_streamProperty->hasByteOrder())
     return AAFRESULT_NOBYTEORDER;
@@ -321,10 +326,6 @@ AAFRESULT STDMETHODCALLTYPE
   assert (0 < externalElementSize);
   if (0 == externalElementSize)
      return AAFRESULT_INVALID_PARAM; 
-
-  // Cannot read from an optional property unless it is present.
-  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
-    return AAFRESULT_PROP_NOT_PRESENT;
   
   // Read the elements from the data stream.
   OMUInt32 elementsRead;
@@ -464,20 +465,6 @@ AAFRESULT ImplAAFStreamPropertyValue::Initialize (
   assert (streamProperty);
   if (NULL == streamProperty)
     return AAFRESULT_INVALID_PARAM;
-  
-  // Make sure the stream is valid and attached to a persisted storable.
-  const OMPropertySet *propertySet = streamProperty->propertySet();
-  assert(propertySet);
-  if (!propertySet)
-    return AAFRESULT_INVALID_PARAM;
-  OMStorable * container = propertySet->container();
-  assert(container);
-  if (!container)
-    return AAFRESULT_INVALID_PARAM;
-
-  // Cannot access the data property if it is NOT associated with a file.
-  if (!container->persistent())
-    return AAFRESULT_OBJECT_NOT_PERSISTENT;
 
   result = ImplAAFPropertyValue::Initialize(streamType, streamProperty);
   if (AAFRESULT_SUCCEEDED(result))

@@ -1,31 +1,37 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+*  prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 #ifndef __CAAFInProcServer_h__
 #include "CAAFInProcServer.h"
 #endif
 
-#ifndef __AAFTypes_h__
-#include "AAFTypes.h"
+#if defined(macintosh) || defined(_MAC)
+// Temporary.
+#include "aafrdli.h"
 #endif
 
 #include <assert.h>
@@ -33,16 +39,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined( OS_MACOS )
+#if ! defined (__sgi) && ! defined (__FreeBSD__)
 #include <olectl.h> // need ole control header for SELFREG_E_CLASS definition
-#include "aafrdli.h" // Temporary.
-
-#elif defined( OS_WINDOWS )
-#include <olectl.h> // need ole control header for SELFREG_E_CLASS definition
-
 #endif
 
-#if defined( OS_WINDOWS )
+#if defined(_WIN32) || defined(WIN32)
 # undef __TCHAR_DEFINED // why is this necessary!
 # include <tchar.h>
 #else
@@ -251,7 +252,7 @@ enum eAAFRegFlag
   AAF_REG_SUB_CLSID = 2,
   AAF_REG_SUB_CLASSNAME = 3,
   AAF_REG_SUB_MODULE = 4
-#if defined( OS_MACOS )
+#if defined(_MAC)
   ,AAF_REG_SUB_ALIAS = 5
 #endif
 };
@@ -264,7 +265,7 @@ const AAFRegEntry g_AAFRegEntry[][3] =
     { AAF_REG_SUB_SKIP, 0 }, 
     { AAF_REG_SUB_CLASSNAME, OLESTR("%s Class") }
   },
-#if defined( OS_MACOS ) 
+#if defined(_MAC) 
   {  // [1]
     { AAF_REG_SUB_CLSID, OLESTR("CLSID\\%s\\InprocServer") },
     { AAF_REG_SUB_SKIP, 0 },
@@ -345,7 +346,7 @@ static int FormatRegBuffer
       pParam = pFileName;
       break;
     
-#if defined( OS_MACOS )
+#if defined(_MAC)
     case AAF_REG_SUB_ALIAS:
 #endif
     case AAF_REG_SUB_SKIP:
@@ -397,7 +398,165 @@ HRESULT CAAFInProcServer::RegisterServer
   BOOL /*bRegTypeLib*/
 )
 {
-  return S_OK;
+  HRESULT hr = S_OK;
+
+#ifndef __sgi
+#if defined(_MAC)
+  // In the MAC version we store the fragment block pointer in the HINSTANCE member.
+  CFragInitBlockPtr initBlkPtr = static_cast<CFragInitBlockPtr>(_hInstance);
+  assert(initBlkPtr);
+  
+  // Create the alias that we will be storing in the registry instead of the module path.
+  AliasHandle hAlias = 0;
+  AliasPtr pAlias = 0;
+  unsigned long aliasLength = 0;
+  ::NewAlias (0, initBlkPtr->fragLocator.u.onDisk.fileSpec, &hAlias);
+  
+  // Alias could not be created: signal failure.
+  if (!hAlias)
+    return SELFREG_E_CLASS;
+  
+  aliasLength = GetHandleSize((Handle)hAlias);
+  OSErr err = MemError();
+  if (noErr != err)
+  {
+    DisposeHandle((Handle)hAlias);
+    hr = E_UNEXPECTED; // need better error code.
+    return hr;
+  }
+  HLock((Handle)hAlias);
+  err = MemError();
+  if (noErr != err)
+  {
+    DisposeHandle((Handle)hAlias);
+    hr = E_UNEXPECTED; // need better error code.
+    return hr;
+  }
+  pAlias = *hAlias;
+  
+  // Copy the file name as the "frag name"
+  OLECHAR fileName[64];
+  memcpy(fileName, &(initBlkPtr->fragLocator.u.onDisk.fileSpec->name[1]), (initBlkPtr->fragLocator.u.onDisk.fileSpec->name[0]));
+  fileName[(initBlkPtr->fragLocator.u.onDisk.fileSpec->name[0])] = 0;
+#else
+  // For the following code to work either _UNICODE and UNICODE
+  // must be defined and OLE2ANSI must NOT be defined or every symbol must be undefined 
+  // or OLE2ANSI defined but _UNICODE and UNICODE are undefined.
+  assert(sizeof(OLECHAR) == sizeof(TCHAR));
+
+
+  // All of our objects need to register there module location.
+  // NOTE: This code may be platform dependent.
+  TCHAR fileName[MAX_PATH];
+
+  int fileNameLength = (int)GetModuleFileName(_hInstance, fileName, MAX_PATH);
+  if (0 == fileNameLength)
+    return GetLastError();  // TODO: convert to HRESULT!  
+#endif  
+
+  // Buffer for string version of each object's class id.
+  const int MAX_CLSID_SIZE = 40;
+  OLECHAR pCLSIDbuffer[MAX_CLSID_SIZE];
+  int clsidLength;
+
+  
+  // Allocate the buffers for the key, value name and value data.
+  const int MAX_REG_BUFFER = 128;
+  OLECHAR pRegBuffer[3][MAX_REG_BUFFER];
+  int regLength[3];
+  LPOLESTR pKeyName = pRegBuffer[0];
+  LPOLESTR pValueName = pRegBuffer[1];
+  LPOLESTR pValue= pRegBuffer[2];
+
+  // Use g_AAFRegEntry data to register each object in the object info table.
+  // Search the object table for the given class id.
+  long int objectIndex = 0;
+  while (kInvalidObjectIndex != (objectIndex = GetRegisterIndex(objectIndex)))
+  {
+    // Convert the object's class id into a string suitable for the 
+    // registry.
+    clsidLength = StringFromGUID2(*_pObjectInfo[objectIndex].pCLSID,
+                    pCLSIDbuffer, 
+                    MAX_CLSID_SIZE);
+    // Note: The returned length includes the NULL character.
+    if (0 == clsidLength)
+    {
+      hr = E_UNEXPECTED; // need better error code.
+      break;
+    }
+    
+
+    // Now run through the AAF Reg Entries and create the corresponding
+    // entries in the registry.
+    int nEntries = sizeof(g_AAFRegEntry)/sizeof(*g_AAFRegEntry);
+    for (int keyIndex = 0; keyIndex < nEntries; ++keyIndex)
+    {
+      for (int formatIndex = 0; formatIndex < 3; ++formatIndex)
+      {
+        regLength[formatIndex] = FormatRegBuffer (
+          pRegBuffer[formatIndex],
+          g_AAFRegEntry[keyIndex][formatIndex],
+          pCLSIDbuffer,
+          _pObjectInfo[objectIndex].pClassName,
+          fileName);
+      }
+
+      // Create the Key
+      HKEY hkey;
+      long err = RegCreateKey(HKEY_CLASSES_ROOT, pKeyName, &hkey);
+      if (ERROR_SUCCESS == err)
+      {
+#if defined(_MAC) 
+        // Set the value. Note: we need to include the null character
+        // but tell the registry the actual number of bytes we are
+        // writing. (Mac wintypes.h defines BYTE as unsigned char.)
+        err = RegSetValueEx(hkey, pValueName, 0, 
+            REG_SZ, (const char*)pValue,
+            (regLength[2] + 1) * sizeof(OLECHAR));
+
+        // The second key need to include an alias on the Macintosh.
+        if (1 == keyIndex)
+        {
+          // Set the value. Note: 
+          err = RegSetValueEx(hkey, OLESTR("Alias"), 0, 
+              REG_BINARY, (const char*)pAlias,
+              aliasLength);
+        }
+#else
+        // Set the value. Note: we need to include the null character
+        // but tell the registry the actual number of bytes we are
+        // writing. (windows defines BYTE as signed char.)
+        err = RegSetValueEx(hkey, pValueName, 0, 
+            REG_SZ, (const BYTE*)pValue,
+            (regLength[2] + 1) * sizeof(TCHAR));
+#endif
+
+        RegCloseKey(hkey);
+      }
+      
+      if (ERROR_SUCCESS != err)
+      {
+        // If we could not add a key or value then back out and fail.
+        UnregisterServer();
+        hr = SELFREG_E_CLASS; // self registration failed!
+      }
+    }
+
+    
+    // Next object in the table...
+    ++objectIndex;
+  }
+
+#if defined(_MAC)
+  if (hAlias)
+  {
+    if (pAlias)
+      HUnlock((Handle)hAlias);
+    DisposeHandle((Handle)hAlias);
+  }
+#endif
+#endif // #ifndef __sgi
+  return hr;
 }
 
 HRESULT CAAFInProcServer::UnregisterServer
@@ -405,6 +564,57 @@ HRESULT CAAFInProcServer::UnregisterServer
   void
 )
 {
+#ifndef __sgi
+  HRESULT hr = S_OK;
+
+  // Buffer for string version of each object's class id.
+  const int MAX_CLSID_SIZE = 40;
+  OLECHAR pCLSIDbuffer[MAX_CLSID_SIZE];
+  int clsidLength;
+
+  // Allocate the buffers for the key, value name and value data.
+  const int MAX_REG_BUFFER = 128;
+  OLECHAR pRegBuffer[MAX_REG_BUFFER];
+  int regLength;
+  LPOLESTR pKeyName = pRegBuffer;
+
+  // Use g_AAFRegEntry data to register each object in the object info table.
+  // Search the object table for the given class id.
+  long int objectIndex = 0;
+  while (_pObjectInfo[objectIndex].pCLSID)
+  {
+    // Convert the object's class id into a string suitable for the 
+    // registry.
+    clsidLength = StringFromGUID2(*_pObjectInfo[objectIndex].pCLSID,
+                    pCLSIDbuffer, 
+                    MAX_CLSID_SIZE);
+    // Note: The returned length includes the NULL character.
+    if (0 == clsidLength)
+      return E_UNEXPECTED; // need better error code.
+    
+
+    // Now run through the AAF Reg Entries and create the corresponding
+    // entries in the registry.
+    int nEntries = sizeof(g_AAFRegEntry)/sizeof(*g_AAFRegEntry);
+    for (int keyIndex = nEntries - 1; keyIndex >= 0; --keyIndex)
+    {
+      regLength = FormatRegBuffer (
+          pRegBuffer,
+          g_AAFRegEntry[keyIndex][0],
+          pCLSIDbuffer,
+          _pObjectInfo[objectIndex].pClassName,
+          0);
+
+      // Delete the Key
+      long err = RegDeleteKey(HKEY_CLASSES_ROOT, pKeyName);
+      if (ERROR_SUCCESS != err)
+        hr = S_FALSE; // intensionally overwrite error.        
+    }
+    
+    // Next object in the table...
+    ++objectIndex;
+  }
+#endif // #ifndef __sgi
   return S_OK;
 }
 
@@ -448,7 +658,7 @@ const char* CAAFInProcServer::GetServerDirectory() const
 // AAFGetLibraryInfo()
 // Implemented for each platform to get platform specific path information.
 //
-#if defined( OS_WINDOWS )
+#if defined(WIN32) || defined(_WIN32)
 
 HRESULT AAFGetLibraryInfo(HINSTANCE hInstance, char **pServerPath, char **pServerDirectory)
 {
@@ -493,7 +703,7 @@ HRESULT AAFGetLibraryInfo(HINSTANCE hInstance, char **pServerPath, char **pServe
 	return rc;
 }
 
-#elif defined( OS_MACOS )
+#elif defined(macintosh) || defined(_MAC)
 
 HRESULT AAFGetLibraryInfo(HINSTANCE hInstance, char **pServerPath, char **pServerDirectory)
 {
@@ -553,7 +763,7 @@ HRESULT AAFGetLibraryInfo(HINSTANCE hInstance, char **pServerPath, char **pServe
 	return rc;
 }
 
-#elif defined( OS_UNIX )
+#elif defined( __sgi )
 
 HRESULT AAFGetLibraryInfo(
    HINSTANCE hInstance,
@@ -584,12 +794,11 @@ HRESULT AAFGetLibraryInfo(
    return rc;
 }
 
-#else // other platform?
+#else // other Unix?
 
 HRESULT AAFGetLibraryInfo(HINSTANCE hInstance, char **pServerPath, char **pServerDirectory)
 {
 	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-#endif  // OS_WINDOWS
-
+#endif

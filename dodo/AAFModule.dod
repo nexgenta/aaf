@@ -8,7 +8,6 @@
 #startm .this-module 0
 AAFModule\
 #endm
-#c
 AD_IDL(\  //***********************************************************
   //
   // Global functions for AAF files:
@@ -39,7 +38,7 @@ AD_XFUNCTION1(AAFLoad,
 			objPass,
 			const char *,
 			dllname,
-			Pointer to the name of AAF dll to load.
+       Pointer to the name of AAF dll to load.
     // If this pointer is NULL the function will attempt to load the
     // default AAF dll.,
 
@@ -63,9 +62,9 @@ AD_XFUNCTION3(AAFFileOpenExistingRead,
 
 			[in\, string],
 			objPass,
-			aafCharacter *,
+			aafCharacter_constptr,
 			pFileName,
-			Null-terminated string containing name of filesystem file to be
+       Null-terminated string containing name of filesystem file to be
     // opened for reading.  Filename must be in a form that would be
     // acceptable to StgOpenStorage\(\) for this platform.,
 
@@ -73,8 +72,8 @@ AD_XFUNCTION3(AAFFileOpenExistingRead,
 			objPass,
 			aafUInt32,
 			modeFlags,
-			File open mode flags.  May be any of the following ORed together.
-    // All other bits must be set to zero.
+       File open mode flags.  May be any of the following ORed
+    // together.  All other bits must be set to zero.
     //  - kAAFFileModeUnbuffered - to indicate buffered mode.  Default
     //    is buffered.,
 
@@ -85,9 +84,9 @@ AD_XFUNCTION3(AAFFileOpenExistingRead,
 			Pointer to buffer to receive pointer to new file.,
 
 
-			Creates an object associated with with an existing
-  // filesystem file that contains data which is only to be read.
-  // Does the following:
+     Creates an object associated with with an existing filesystem
+  // file that contains data which is only to be read.  Does the
+  // following:
   // - Opens the existing named file in the filesystem for reading.
   // - Associates an object with that filesystem file.
   // - Places the object into the Open-read-only state.
@@ -135,7 +134,7 @@ AD_XFUNCTION4(AAFFileOpenExistingModify,
 
 			[in\, string],
 			objPass,
-			aafCharacter *,
+			aafCharacter_constptr,
 			pFileName,
 			Null-terminated string containing name of filesystem file to be
     // opened for modification.  Filename must be in a form that would
@@ -223,7 +222,7 @@ AD_XFUNCTION4(AAFFileOpenNewModify,
 
 			[in\, string],
 			objPass,
-			aafCharacter *,
+			aafCharacter_constptr,
 			pFileName,
 			Null-terminated string containing name of filesystem file to be
     // opened for modification.  Filename must be in a form that would
@@ -342,8 +341,47 @@ AD_XFUNCTION2(AAFFileOpenTransient,
   // AAFRESULT_NULL_PARAM
   //   - the pIdent pointer argument is NULL.)
 
+AD_XFUNCTION3(AAFFileIsAAFFile,
 
-  AD_XFUNCTION1(AAFGetPluginManager,
+			[in\, string],
+			objPass,
+			aafCharacter_constptr,
+			pFileName,
+			Null-terminated string containing name of filesystem file.,
+
+			[out],
+			objPass,
+			aafUID_t *,
+			pAAFFileKind,
+			Pointer to an AUID indicating the file kind,
+
+			[out\,retval],
+			objPass,
+			aafBool *,
+			pFileIsAAFFile,
+			Returns AAFTrue if the given file is an AAF file\, returns AAFFalse otherwise.,
+
+			Is the named file an AAF file ?
+  //
+  // Note that the function result is returned via the pFileIsAAFFile argument.
+  // If this function succeeds it returns AAFRESULT_SUCCESS even if the named
+  // file is not an AAF file.
+  //
+  // This function will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - at least one of the pointer arguments is NULL.
+  //
+  // AAFRESULT_FILE_NOT_FOUND
+  //   - the file named by pFileName cannot be found.)
+
+
+AD_XFUNCTION1(AAFGetPluginManager,
 			[out],
 			objOut,
 			AAFPluginManager,
