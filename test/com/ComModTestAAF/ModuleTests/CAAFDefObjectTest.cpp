@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -51,7 +51,10 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
+#include "AAFContainerDefs.h"
 #include "aafUtils.h"
+
+#include "CAAFBuiltinDefs.h"
 
 // Some handy smart pointers
 #include "AAFSmartPointer.h"
@@ -127,14 +130,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -179,81 +182,80 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Create the AAF file
-	checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+	checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
     bFileOpen = true;
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
-    
-	checkResult(pDictionary->CreateInstance(&AUID_AAFContainerDef,
-							  IID_IAAFContainerDef, 
-							  (IUnknown **)&pContainerDef));
+	CAAFBuiltinDefs defs (pDictionary);
+
+	checkResult(defs.cdContainerDef()->
+				CreateInstance(IID_IAAFContainerDef, 
+							   (IUnknown **)&pContainerDef));
     
 	checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-	checkResult(pDef->SetName(sName));
-	checkResult(pDef->SetDescription(sDescription));
-
-	checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
+	checkResult(pContainerDef->Initialize (ContainerAAF, sName, sDescription));
+	checkResult(pDictionary->RegisterContainerDef(pContainerDef));
 
 	//
 	// Test GetAUID() using a type def
 	//
 	IAAFTypeDefIntSP pTypeDef;
-	checkResult (pDictionary->CreateInstance (&AUID_AAFTypeDefInt,
-											  IID_IAAFTypeDefInt,
-											  (IUnknown **)&pTypeDef));
-	checkResult (pTypeDef->Initialize ((aafUID_t*) &kTestTypeId,
+	checkResult (defs.cdTypeDefInt()->
+				 CreateInstance (IID_IAAFTypeDefInt,
+								 (IUnknown **)&pTypeDef));
+	checkResult (pTypeDef->Initialize (kTestTypeId,
 									   1,
-									   AAFFalse,
+									   kAAFFalse,
 									   L"Test Unsigned Byte"));
 
 	//
 	// test Append, Prepend, and enum plugin descriptor using same type def
 	//
 	IAAFPluginDescriptorSP pd1;
-	checkResult (pDictionary->CreateInstance (&AUID_AAFPluginDescriptor,
-											  IID_IAAFPluginDescriptor,
-											  (IUnknown **)&pd1));
-	checkResult (pd1->Init ((aafUID_t*) &kTestPluginDescID1,
+	checkResult (defs.cdPluginDescriptor()->
+				 CreateInstance (IID_IAAFPluginDescriptor,
+								 (IUnknown **)&pd1));
+	checkResult (pd1->Initialize (kTestPluginDescID1,
 							L"PluginDesc1",
 							L"Plugin Descriptor 1 description"));
-	checkResult (pDictionary->RegisterPluginDescriptor (pd1));
+	checkResult (pDictionary->RegisterPluginDef (pd1));
 
 	IAAFPluginDescriptorSP pd2;
-	checkResult (pDictionary->CreateInstance (&AUID_AAFPluginDescriptor,
-											  IID_IAAFPluginDescriptor,
-											  (IUnknown **)&pd2));
-	checkResult (pd2->Init ((aafUID_t*) &kTestPluginDescID2,
+	checkResult (defs.cdPluginDescriptor()->
+				 CreateInstance (IID_IAAFPluginDescriptor,
+								 (IUnknown **)&pd2));
+	checkResult (pd2->Initialize (kTestPluginDescID2,
 							L"PluginDesc2",
 							L"Plugin Descriptor 2 description"));
-	checkResult (pDictionary->RegisterPluginDescriptor (pd2));
+	checkResult (pDictionary->RegisterPluginDef (pd2));
 
 	IAAFPluginDescriptorSP pd3;
-	checkResult (pDictionary->CreateInstance (&AUID_AAFPluginDescriptor,
-											  IID_IAAFPluginDescriptor,
-											  (IUnknown **)&pd3));
-	checkResult (pd3->Init ((aafUID_t*) &kTestPluginDescID3,
+	checkResult (defs.cdPluginDescriptor()->
+				 CreateInstance (IID_IAAFPluginDescriptor,
+								 (IUnknown **)&pd3));
+	checkResult (pd3->Initialize (kTestPluginDescID3,
 							L"PluginDesc3",
 							L"Plugin Descriptor 3 description"));
-	checkResult (pDictionary->RegisterPluginDescriptor (pd3));
+	checkResult (pDictionary->RegisterPluginDef (pd3));
 
 	IAAFDefObjectSP pDefObj;
 	checkResult(pTypeDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDefObj));
 
 	// pd2 will eventually be second one
-	checkResult (pDefObj->AppendPluginDescriptor (pd2));
+	checkResult (pDefObj->AppendPluginDef (pd2));
 	// pd3 will eventually be third one
-	checkResult (pDefObj->AppendPluginDescriptor (pd3));
+	checkResult (pDefObj->AppendPluginDef (pd3));
 	// pd1 will be first one
-	checkResult (pDefObj->PrependPluginDescriptor (pd1));
+	checkResult (pDefObj->PrependPluginDef (pd1));
 
 	IAAFTypeDefSP ptd;
 	checkResult(pTypeDef->QueryInterface (IID_IAAFTypeDef,
                                           (void **)&ptd));
-	checkResult (pDictionary->RegisterType (ptd));
+	checkResult (pDictionary->RegisterTypeDef (ptd));
 
   }
   catch (HRESULT& rResult)
@@ -303,12 +305,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetContainerDefinitions(&pPlug));
+		checkResult(pDictionary->GetContainerDefs(&pPlug));
 		checkResult(pPlug->NextOne(&pContainerDef));
 		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
@@ -329,7 +331,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 						 AAFRESULT_TEST_FAILED);
 
 		IAAFTypeDefSP pTypeDef;
-		checkResult (pDictionary->LookupType ((aafUID_t*) &kTestTypeId, &pTypeDef));
+		checkResult (pDictionary->LookupTypeDef (kTestTypeId, &pTypeDef));
 
 		IAAFDefObjectSP pDefObj;
 		checkResult(pTypeDef->QueryInterface (IID_IAAFDefObject,
@@ -340,7 +342,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkExpression (0 != EqualAUID (&id, &kTestTypeId), AAFRESULT_TEST_FAILED);
 
 		IEnumAAFPluginDescriptorsSP epd;
-		checkResult (pDefObj->EnumPluginDescriptors (&epd));
+		checkResult (pDefObj->GetPluginDefs (&epd));
 
 		IAAFPluginDescriptorSP pd;
 		// Check that plugin descriptors are entered in order.
