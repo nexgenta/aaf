@@ -29,6 +29,33 @@
 #startm AD_INCLUDE 01
 #endm
 
+#ccccccccccccccccccccccccccc
+#c
+#c Generate a forward declaration of a class.
+#c
+#c Argument: class name
+#c
+#startm AD_FORWARD_DECLARATION 01
+	class %01;
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Class UUID.
+#c
+#c Argument: Pieces of UUID
+#c
+#startm AD_CLASS_UUID 11
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Default UUID.
+#c
+#c Argument: Pieces of UUID
+#c
+#startm AD_DEFAULT_UUID 11
+#endm
 
 #ccccccccccccccccccccccccccc
 #c
@@ -61,15 +88,15 @@
 : .parent-module (AAFFalse)
 {
   if (doInit)
-	{
+    {
 #ifdef BOB_TEST
-	  Impl.this-module * newRep;
-	  newRep = new Impl.this-module;
-	  assert (newRep);
-	  InitRep (newRep);
-	  newRep->InitCppParent (this);
+      Impl.this-module * newRep;
+      newRep = new Impl.this-module;
+      assert (newRep);
+      InitRep (newRep);
+      newRep->InitCppParent (this);
 #endif
-	}
+    }
 }
 
 
@@ -106,15 +133,15 @@
 .this-module::.this-module (aafBool doInit)
 {
   if (doInit)
-	{
+    {
 #ifdef BOB_TEST
-	  Impl.this-module * newRep;
-	  newRep = new Impl.this-module;
-	  assert (newRep);
-	  InitRep (newRep);
-	  newRep->InitCppParent (this);
+      Impl.this-module * newRep;
+      newRep = new Impl.this-module;
+      assert (newRep);
+      InitRep (newRep);
+      newRep->InitCppParent (this);
 #endif
-	}
+    }
 }
 
 
@@ -145,7 +172,7 @@ Impl.this-module * .this-module::GetRepObject ()
   assert (_rep);
   return _rep;
 #else
-	return ((Impl.this-module *)NULL);
+    return ((Impl.this-module *)NULL);
 #endif
 }
 #endm
@@ -171,7 +198,7 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptr);
   return ptr->%01();
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -201,7 +228,7 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptr);
   return ptr->%01 (%04);
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -235,7 +262,7 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptr);
   return ptr->%01 (%04,%08);
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -262,7 +289,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_METHOD3 14
 AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%03 %04, %07 %08, %11, %12)
+    .this-module::%01 (%03 %04, %07 %08, %11 %12)
 {
 #ifdef BOB_TEST
   Impl.this-module * ptr;
@@ -273,7 +300,7 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptr);
   return ptr->%01 (%04,%08,%12);
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -304,7 +331,7 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_METHOD4 18
 AAFRESULT STDMETHODCALLTYPE
-    .this-module::%01 (%03 %04, %07 %08, %11 %12, %15, %16)
+    .this-module::%01 (%03 %04, %07 %08, %11 %12, %15 %16)
 {
 #ifdef BOB_TEST
   Impl.this-module * ptr;
@@ -315,7 +342,7 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptr);
   return ptr->%01 (%04,%08,%12,%16);
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -361,7 +388,7 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptr);
   return ptr->%01 (%04,%08,%12,%16,%20);
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -411,7 +438,60 @@ AAFRESULT STDMETHODCALLTYPE
   assert (ptr);
   return ptr->%01 (%04,%08,%12,%16,%20,%24);
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
+#endif
+}
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a method which takes seven arguments.
+#c
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: argument modifiers (e.g. [in])
+#c Argument7: argument type
+#c Argument8: argument name
+#c Argument9: argument comment
+#c Argument10: argument modifiers (e.g. [in])
+#c Argument11: argument type
+#c Argument12: argument name
+#c Argument13: argument comment
+#c Argument14: argument modifiers (e.g. [in])
+#c Argument15: argument type
+#c Argument16: argument name
+#c Argument17: argument comment
+#c Argument18: argument modifiers (e.g. [in])
+#c Argument19: argument type
+#c Argument20: argument name
+#c Argument21: argument comment
+#c Argument22: argument modifiers (e.g. [in])
+#c Argument23: argument type
+#c Argument24: argument name
+#c Argument25: argument comment
+#c Argument26: argument modifiers (e.g. [in])
+#c Argument27: argument type
+#c Argument28: argument name
+#c Argument29: argument comment
+#c Argument30: method description
+#c
+#startm AD_METHOD7 30
+AAFRESULT STDMETHODCALLTYPE
+    .this-module::%01 (%03 %04, %07 %08, %11 %12, %15 %16, %19 %20, %23 %24, %27 %28)
+{
+#ifdef BOB_TEST
+  Impl.this-module * ptr;
+  ImplAAFObject * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<Impl.this-module*> (pO);
+  assert (ptr);
+  return ptr->%01 (%04,%08,%12,%16,%20,%24,%28);
+#else
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -520,8 +600,8 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_CONSTRUCTOR3 13
 .this-module::.this-module (%02 %03,
-							%06 %07,
-							%10 %11)
+                            %06 %07,
+                            %10 %11)
 {
 #ifdef BOB_TEST
   Impl.this-module * newRep;
@@ -558,9 +638,9 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_CONSTRUCTOR4 17
 .this-module::.this-module (%02 %03,
-							%06 %07,
-							%10 %11,
-							%14 %15)
+                            %06 %07,
+                            %10 %11,
+                            %14 %15)
 {
 #ifdef BOB_TEST
   Impl.this-module * newRep;
@@ -605,16 +685,16 @@ AAFRESULT STDMETHODCALLTYPE
 
   stat = pThisO->%01 (&repObj);
   if (FAILED (stat))
-	{
-	  return stat;
-	}
+    {
+      return stat;
+    }
   assert (repObj);
   retObj = repObj->GetCppParent();
   assert (retObj);
   assert (%04);
   *%04 = retObj;
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
@@ -659,7 +739,7 @@ AAFRESULT STDMETHODCALLTYPE
   stat = pThisO->%01 (repObj);
   return stat;
 #else
-	return AAFRESULT_NOT_IMPLEMENTED;
+    return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
 #endm
