@@ -1,11 +1,24 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #ifndef _MacroSet_h_
 #include "MacroSet.h"
@@ -15,15 +28,44 @@
 #include "SourceInfo.h"
 #endif
 
+#if !defined(macintosh)
+#ifndef _bld_cfg_h_
+#include "bld_cfg.h"
+#endif
+
 #include <assert.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
 
+#if AAF_BUILD_CONFIG_EXPLICIT_TEMPLATES
+template class Vector<MacroDef>;
+#endif
+
+MacroSet::MacroSet ()
+{
+  _nameInitials[0] = '\0';
+}
+
 void MacroSet::Append
 (const MacroDef & src)
 {
+  char initial = src.GetInitial();
+  char * tmp;
   _macs.Append (src);
+  for (tmp = _nameInitials;
+       *tmp;
+       tmp++)
+	{
+	  if (*tmp == initial)
+		return;
+	}
+  // Made it here without finding our initial.  Add it.
+  assert ((tmp - _nameInitials) < sizeof (_nameInitials));
+  *tmp++ = initial;
+  *tmp = '\0';
 }
 
 
@@ -46,8 +88,22 @@ bool MacroSet::SearchMacroName
 (TextStream & input,
  MacroDef & foundMacro) const
 {
-  int i;
-  for (i = 0; i < GetNumMacros(); i++)
+  const char * pInitial = input.GetCString();
+  const char * tmp;
+  for (tmp = _nameInitials;
+	   *tmp;
+	   tmp++)
+	{
+	  if (*tmp == *pInitial)
+		break;
+	}
+  if (*tmp != *pInitial)
+	{
+	  // Did't find it in our cached initials.  Bail out.
+	  return false;
+	}
+
+  for (int i = 0; i < GetNumMacros(); i++)
     {
       if (GetMacro(i).IsMacro(input))
 		{
@@ -64,8 +120,40 @@ void MacroSet::import
  bool ignoreText)
 {
   char filename[100];
-  unsigned int i;
+  unsigned int i = 0;
 
+#if defined(macintosh)
+  // Path separator should start with a ':' on the mac.
+  filename[0] = ':';
+  for (i = 1; i < sizeof (filename); )
+  {
+    char c;
+    bool stat;
+    stat = input.Consume (c);
+    if (! stat)
+    {
+      err_exit ("Expecting end of line after filename.", input);
+    }
+    assert (c);
+    if ('\n' == c)
+    {
+      filename[i] = '\0';
+      break;
+    }
+    else if ('\/' == c)
+    {
+      if (2 == i && '.' == filename[1])
+      {
+  	i = 0; // reset and skip over the first "./"
+  	continue;
+      }
+      // On the mac we need to begin with a partial path.
+      c = ':';
+    }
+    filename[i] = c;
+    i++;
+  }
+#else
   for (i = 0; i < sizeof (filename); i++)
 	{
 	  char c;
@@ -83,6 +171,7 @@ void MacroSet::import
 		}
 	  filename[i] = c;
 	}
+#endif
   if (sizeof (filename) == i)
 	{
 	  err_exit ("Filename too long.", input);
@@ -399,7 +488,7 @@ void MacroSet::err_exit1
  const char * msg2,
  const TextStream & lineInfo)
 {
-  int size = strlen(msg1) + strlen(msg2) + 1;
+  size_t size = strlen(msg1) + strlen(msg2) + 1;
   char * buf = new char[size];
   assert (buf);
   sprintf (buf, msg1, msg2);
@@ -451,7 +540,7 @@ bool MacroSet::ApplyMacros
 			  discardLine (input);
 			}
 
-		  if (atNewline && input.Expect ("#import "))
+		  else if (atNewline && input.Expect ("#import "))
 			{
 			  discardLine (input);
 			}
