@@ -140,22 +140,8 @@ HRESULT CAAFEssenceFileContainer::CheckExistingStreams(
 }
 
 
-// Set up the plugin.
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::Start(void)
-{
-  return S_OK;
-}
-
-// Tear down the plugin.
-HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::Finish(void)
-{
-  return S_OK;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetNumDefinitions (aafInt32 *pDefCount)
+    CAAFEssenceFileContainer::CountDefinitions (aafUInt32 *pDefCount)
 {
 	if(pDefCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -165,7 +151,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
+    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
 {
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -183,25 +169,25 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	aafUID_t			uid;
 	IAAFContainerDef	*container = NULL;
-	IAAFDefObject		*obj = NULL;
+    IAAFClassDef        *pcd = 0;
+
 	if((dict == NULL) || (def == NULL))
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
-		CHECK(dict->CreateInstance(AUID_AAFContainerDef,
-							IID_IAAFContainerDef, 
-							(IUnknown **)&container));
+		CHECK(dict->LookupClassDef(AUID_AAFContainerDef, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFContainerDef, 
+								  (IUnknown **)&container));
+		pcd->Release();
+		pcd = 0;
 		uid = ContainerFile;
-		CHECK(container->SetEssenceIsIdentified(AAFFalse));
-		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)&obj));
-		CHECK(obj->Initialize(uid, L"Raw file Container", L"Essence is in a non-container file."));
-		obj->Release();
-		obj = NULL;
+		CHECK(container->SetEssenceIsIdentified(kAAFFalse));
+		CHECK(container->Initialize(uid, L"Raw file Container", L"Essence is in a non-container file."));
 		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)def));
 		container->Release();
 		container = NULL;
@@ -209,9 +195,15 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(container != NULL)
+		  {
 			container->Release();
-		if(obj != NULL)
-			obj->Release();
+			container = 0;
+		  }
+		if (pcd)
+		  {
+			pcd->Release();
+			pcd = 0;
+		  }
 	}
 	XEND
 
@@ -233,20 +225,23 @@ HRESULT STDMETHODCALLTYPE
 	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
 	IAAFNetworkLocator		*pNetLoc = NULL;
+	IAAFClassDef            *pcd = 0;
 	
 	XPROTECT()
 	{
-		CHECK(dict->CreateInstance(AUID_AAFPluginDescriptor,
-			IID_IAAFPluginDescriptor, 
-			(IUnknown **)&desc));
+	    CHECK(dict->LookupClassDef(AUID_AAFPluginDescriptor, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFPluginDescriptor, 
+								  (IUnknown **)&desc));
+		pcd->Release();
+		pcd = 0;
 		*descPtr = desc;
 		CHECK(desc->Initialize(EXAMPLE_FILE_PLUGIN, L"Essence File Container", L"Handles non-container files."));
 
 		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
 		CHECK(desc->SetPluginVersionString(manufRev));
-		CHECK(dict->CreateInstance(AUID_AAFNetworkLocator,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (manufURL));
 		CHECK(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		CHECK(desc->SetManufacturerInfo(pNetLoc));
@@ -257,14 +252,15 @@ HRESULT STDMETHODCALLTYPE
 
 		CHECK(desc->SetManufacturerID(MANUF_JEFFS_PLUGINS));
 		CHECK(desc->SetPluginManufacturerName(manufName));
-		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
-		CHECK(desc->SetIsAccelerated(AAFFalse));
-		CHECK(desc->SetSupportsAuthentication(AAFFalse));
+		CHECK(desc->SetIsSoftwareOnly(kAAFTrue));
+		CHECK(desc->SetIsAccelerated(kAAFFalse));
+		CHECK(desc->SetSupportsAuthentication(kAAFFalse));
 		
 		/**/
-		CHECK(dict->CreateInstance(AUID_AAFNetworkLocator,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
+		pcd->Release ();
+		pcd = 0;
 		CHECK(pLoc->SetPath (downloadURL));
 		CHECK(desc->AppendLocator(pLoc));
 		desc->Release();
@@ -275,11 +271,25 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(desc != NULL)
+		  {
 			desc->Release();
+			desc = 0;
+		  }
 		if(pLoc != NULL)
+		  {
 			pLoc->Release();
+			pLoc = 0;
+		  }
 		if(pNetLoc != NULL)
+		  {
 			pNetLoc->Release();
+			pNetLoc = 0;
+		  }
+		if (pcd)
+		  {
+			pcd->Release ();
+			pcd = 0;
+		  }
 	}
 	XEND
 
@@ -288,7 +298,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileContainer::CreateEssenceStream (const aafCharacter * pName,
-		const aafUID_t * pMobID,
+		aafMobID_constptr pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   HRESULT hr = S_OK;
@@ -331,7 +341,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileContainer::CreateEssenceStreamWriteOnly (const aafCharacter * pName,
-        const aafUID_t * pMobID,
+        aafMobID_constptr pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   return HRESULT_NOT_IMPLEMENTED;
@@ -340,7 +350,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileContainer::OpenEssenceStreamReadOnly (const aafCharacter * pName,
-        const aafUID_t * pMobID,
+        aafMobID_constptr pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   HRESULT hr = S_OK;
@@ -382,7 +392,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileContainer::OpenEssenceStreamAppend (const aafCharacter * pName,
-        const aafUID_t * pMobID,
+        aafMobID_constptr pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   HRESULT hr = S_OK;
