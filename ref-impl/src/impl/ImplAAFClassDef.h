@@ -150,6 +150,15 @@ public:
         (ImplAAFClassDef ** ppClassDef);
 
 
+  //****************
+  // CreateInstance()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateInstance
+        // @parm [out, retval] newly created object
+        (ImplAAFObject ** ppobject);
+
+
 public:
 
   //
@@ -214,6 +223,8 @@ public:
   // has been loaded into memory.
   void AssurePropertyTypesLoaded ();
 
+  void InitOMProperties (ImplAAFObject * pObj);
+
 private:
 
   //
@@ -225,7 +236,7 @@ private:
   class pvtPropertyIdentifier
   {
   public:
-	// Returns AAFTrue if this property identifier matches the given
+	// Returns kAAFTrue if this property identifier matches the given
 	// property definition.
 	virtual aafBool DoesMatch
     (const ImplAAFPropertyDef * pTestPropDef) const = 0;
@@ -276,7 +287,7 @@ private:
   // OMWeakReferenceProperty<ImplAAFClassDef> _ParentClass;
   OMFixedSizeProperty<aafUID_t>                       _ParentClass;
 
-  OMStrongReferenceVectorProperty<ImplAAFPropertyDef> _Properties;
+  OMStrongReferenceSetProperty<ImplAAFPropertyDef> _Properties;
 
   // didn't use shorthand here in an attempt to avoid circular references
   ImplAAFSmartPointer<ImplAAFClassDef> _cachedParentClass;
