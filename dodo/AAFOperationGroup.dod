@@ -6,7 +6,6 @@ AAFEffectInvocation\
 AAFSegment\
 #endm
 #c
-#import ./AAFUnitTest.exp
 #import ./AAFSegment.exp
 AD_HEAD
 
@@ -16,6 +15,8 @@ AD_FORWARD_DECLARATION(AAFDataDefinition)
 AD_FORWARD_DECLARATION(AAFEffectDefinition)
 AD_FORWARD_DECLARATION(AAFParameter)
 AD_FORWARD_DECLARATION(AAFParameterSlot)
+AD_FORWARD_DECLARATION(EnumAAFEffectDefinitions)
+AD_FORWARD_DECLARATION(EnumAAFControlCodeDefinitions)
 
 /******************************************\
 *                                          *
@@ -117,7 +118,4 @@ AD_XMETHOD2(GetIndexedInputSegment,
 		   [out], objOut, AAFSegment, inputSegment, Input segment,
 		   Given an index\, returns the corresponding input segment.)
 
-AD_OVERRIDE(.method-Test)
-
 AD_CLASS_END
-
