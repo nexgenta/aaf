@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.5 2004/09/10 17:13:02 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.6 2004/10/25 17:39:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,13 +46,13 @@
 
 #if ((!defined(MIDL_PASS) || defined(__midl)) && (!defined(_M_IX86) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64)))
 
-typedef signed char		aafInt8;
+typedef signed char			aafInt8;
 typedef signed short int	aafInt16;
-typedef signed long int		aafInt32;
+typedef signed int			aafInt32;
 
 typedef unsigned char		aafUInt8;
 typedef unsigned short int	aafUInt16;
-typedef unsigned long int	aafUInt32;
+typedef unsigned int		aafUInt32;
 
 typedef hyper			aafInt64;
 typedef unsigned hyper		aafUInt64;

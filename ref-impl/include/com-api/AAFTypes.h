@@ -41,7 +41,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.4 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.5 2004/10/25 17:39:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,13 +82,13 @@ typedef signed char aafInt8;
 
 typedef short aafInt16;
 
-typedef long aafInt32;
+typedef int aafInt32;
 
 typedef unsigned char aafUInt8;
 
 typedef unsigned short aafUInt16;
 
-typedef unsigned long aafUInt32;
+typedef unsigned int aafUInt32;
 
 typedef hyper aafInt64;
 

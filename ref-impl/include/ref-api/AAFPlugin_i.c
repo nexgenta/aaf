@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPlugin_i.c,v 1.4 2004/09/10 17:13:02 stuart_hc Exp $ $Name:  $
+// $Id: AAFPlugin_i.c,v 1.5 2004/10/25 17:39:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,7 +43,7 @@ extern "C"{
 
 typedef struct _IID
 {
-    unsigned long x;
+    unsigned int x;
     unsigned short s1;
     unsigned short s2;
     unsigned char  c[8];
