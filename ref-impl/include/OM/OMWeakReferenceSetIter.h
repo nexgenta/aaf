@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,15 +31,17 @@
 
 #include "OMSetIterator.h"
 #include "OMReferenceContainerIter.h"
+#include "OMContainerElement.h"
 
 template <typename ReferencedObject>
 class OMWeakReferenceSetProperty;
 
-// @class Iterators over <c OMWeakReferenceSetProperty>s.
-//   @tcarg class | ReferencedObject | The type of the contained objects.
+  // @class Iterators over <c OMWeakReferenceSetProperty>s.
+  //   @tcarg class | ReferencedObject | The type of the contained objects.
+  //   @base public | <c OMReferenceContainerIterator>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
-class OMWeakReferenceSetIterator :
-                        public OMReferenceContainerIterator<ReferencedObject> {
+class OMWeakReferenceSetIterator : public OMReferenceContainerIterator {
 public:
   // @access Public members.
 
@@ -64,7 +66,7 @@ public:
   virtual ~OMWeakReferenceSetIterator(void);
 
     // @cmember Create a copy of this <c OMWeakReferenceSetIterator>.
-  virtual OMReferenceContainerIterator<ReferencedObject>* copy(void) const;
+  virtual OMReferenceContainerIterator* copy(void) const;
 
     // @cmember Reset this <c OMWeakReferenceSetIterator> to the given
     //          <p initialPosition>.
@@ -78,15 +80,15 @@ public:
     //          <c OMWeakReferenceSetIterator> is made ready to traverse the
     //          associated <c OMWeakReferenceSetProperty> in the reverse
     //          direction (decreasing <p Key>s).
-   virtual void reset(OMIteratorPosition initialPosition = OMBefore);
+  virtual void reset(OMIteratorPosition initialPosition = OMBefore);
 
     // @cmember Is this <c OMWeakReferenceSetIterator> positioned before
     //          the first <p ReferencedObject> ?
-   virtual bool before(void) const;
+  virtual bool before(void) const;
 
     // @cmember Is this <c OMWeakReferenceSetIterator> positioned after
     //          the last <p ReferencedObject> ?
-   virtual bool after(void) const;
+  virtual bool after(void) const;
 
     // @cmember Is this <c OMWeakReferenceSetIterator> validly
     //          positioned on a <p ReferencedObject> ?
@@ -110,7 +112,7 @@ public:
     //          becomes <e bool.false> and
     //          <mf OMWeakReferenceSetIterator::after> becomes
     //          <e bool.true>. 
-   virtual bool operator++();
+  virtual bool operator++();
 
     // @cmember Retreat this <c OMWeakReferenceSetIterator> to the previous
     //          <p ReferencedObject>, if any.
@@ -126,12 +128,12 @@ public:
     //          becomes <e bool.false> and
     //          <mf OMWeakReferenceSetIterator::before> becomes
     //          <e bool.true>. 
-   virtual bool operator--();
+  virtual bool operator--();
 
     // @cmember Return the <p ReferencedObject> in the associated
     //          <c OMWeakReferenceSetProperty> at the position currently
     //          designated by this <c OMWeakReferenceSetIterator>.
-   virtual ReferencedObject* value(void) const;
+  virtual ReferencedObject* value(void) const;
 
     // @cmember Set the <p ReferencedObject> in the associated
     //          <c OMWeakReferenceSetProperty> at the position currently
@@ -140,25 +142,37 @@ public:
     //          is returned. To preserve the ordering of <p Key>s, the
     //          <p Key> of <p newObject> must be the same as that of the
     //          existing <p ReferencedObject>.
-   virtual ReferencedObject* setValue(const ReferencedObject* newObject);
+  virtual ReferencedObject* setValue(const ReferencedObject* newObject);
+
+    // @cmember Set the <p ReferencedObject> in the associated
+    //          <c OMWeakReferenceSetProperty> at the position currently
+    //          designated by this <c OMWeakReferenceSetIterator> to 0.
+    //          The previous <p ReferencedObject>, if any, is returned.
+  virtual ReferencedObject* clearValue(void);
 
     // @cmember Return the <p Key> of the <p ReferencedObject> in the
     //          associated <c OMWeakReferenceSetProperty> at the position
     //          currently designated by this <c OMWeakReferenceSetIterator>.
-   OMUniqueObjectIdentification identification(void) const;
+  OMUniqueObjectIdentification identification(void) const;
+
+    // @cmember Return the <p OMObject> in the associated
+    //          reference container property at the position currently
+    //          designated by this <c OMWeakReferenceSetIterator>.
+  virtual OMObject* currentObject(void) const;
 
 protected:
 
+  typedef OMWeakReferenceSetElement SetElement;
+
+  typedef OMSetIterator<OMUniqueObjectIdentification, SetElement> SetIterator;
+
     // @cmember Create an <c OMWeakReferenceSetIterator> given
     //          an underlying <c OMSetIterator>.
-  OMWeakReferenceSetIterator(
-      const OMSetIterator<OMUniqueObjectIdentification,
-	                      OMWeakReferenceSetElement<ReferencedObject> >& iter);
+  OMWeakReferenceSetIterator(const SetIterator& iter);
 
 private:
 
-  OMSetIterator<OMUniqueObjectIdentification,
-	            OMWeakReferenceSetElement<ReferencedObject> > _iterator;
+  SetIterator _iterator;
 
 };
 
