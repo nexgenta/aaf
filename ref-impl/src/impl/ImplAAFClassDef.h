@@ -8,13 +8,13 @@
 * Advanced Authoring Format                     *
 *                                               *
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *                                               *
 \***********************************************/
 
 class ImplEnumAAFPropertyDefs;
 class ImplAAFDefObject;
 class ImplAAFTypeDef;
+class ImplAAFPropertyDef;
 
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
@@ -23,7 +23,6 @@ class ImplAAFTypeDef;
 #ifndef __ImplAAFPropertyDef_h__
 #include "ImplAAFPropertyDef.h"
 #endif
-
 
 class ImplAAFClassDef : public ImplAAFDefObject
 {
@@ -40,7 +39,7 @@ protected:
 public:
 
   //****************
-  // GetPropertyDefs()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
@@ -120,7 +119,7 @@ public:
          aafUID_t *  pPropID,
 
          // @parm [out] resulting property definition
-         ImplAAFPropertyDef ** ppPropDef);
+         ImplAAFPropertyDef ** ppPropDef) const;
 
 
   //****************
@@ -160,9 +159,21 @@ public:
          ImplAAFPropertyDef ** ppPropDef);
 
 
-  // Declare this class to be storable.
+  //****************
+  // LookupPropertyDefbyOMPid()
   //
-  OMDECLARE_STORABLE(ImplAAFClassDef)
+  virtual AAFRESULT STDMETHODCALLTYPE
+    LookupPropertyDefbyOMPid
+        (// @parm [in] pid reprepresenting property to look up
+         OMPropertyId omPid,
+
+         // @parm [out] resulting property definition
+         ImplAAFPropertyDef ** ppPropDef) const;
+
+
+  // Returns the AUID of the parent class.  Returns the NULL auid if
+  // this is the end of the line.
+  void pvtGetParentAUID (aafUID_t & result);
 
 
 private:
@@ -179,10 +190,81 @@ private:
          ImplAAFPropertyDef ** ppPropDef);
 
 
+  //
+  // Private implementation classes to share lookup code between
+  // methods which lookup by auid, and ones which look up by OMPid.
+  //
+  // Abstract base class which allows comparison of a property
+  // identifier to a property definition.
+  class pvtPropertyIdentifier
+  {
+  public:
+	// Returns AAFTrue if this property identifier matches the given
+	// property definition.
+	virtual aafBool DoesMatch
+    (const ImplAAFPropertyDef * pTestPropDef) const = 0;
+  };
+
+  //
+  // Concrete class implementing property identifier as OM PID
+  //
+  class pvtPropertyIdentifierOMPid : public pvtPropertyIdentifier
+  {
+  public:
+	pvtPropertyIdentifierOMPid (const OMPropertyId & id)
+	  : _id (id) {}
+
+	aafBool DoesMatch (const ImplAAFPropertyDef * pTestPropDef) const;
+	
+  private:
+	OMPropertyId _id;
+  };
+
+  //
+  // Concrete class implementing property identifier as a Property ID
+  // AUID.
+  //
+  class pvtPropertyIdentifierAUID : public pvtPropertyIdentifier
+  {
+  public:
+	pvtPropertyIdentifierAUID (const aafUID_t & id)
+	  : _id (id) {}
+
+	aafBool DoesMatch (const ImplAAFPropertyDef * pTestPropDef) const;
+
+  private:
+	aafUID_t _id;
+  };
+
+
+  //
+  // The generalized lookup method which uses a pvtPropertyIdentifier
+  // as the property ID.
+  //
+  AAFRESULT STDMETHODCALLTYPE
+    generalLookupPropertyDef (
+      const pvtPropertyIdentifier & propId,
+      ImplAAFPropertyDef ** ppPropDef);
+
+
   // OMWeakReferenceProperty<ImplAAFClassDef> _ParentClass;
   OMFixedSizeProperty<aafUID_t>                       _ParentClass;
 
   OMStrongReferenceVectorProperty<ImplAAFPropertyDef> _Properties;
+
+  // didn't use shorthand here in an attempt to avoid circular references
+  ImplAAFSmartPointer<ImplAAFClassDef> _cachedParentClass;
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFClassDef> ImplAAFClassDefSP;
 
 #endif // ! __ImplAAFClassDef_h__
