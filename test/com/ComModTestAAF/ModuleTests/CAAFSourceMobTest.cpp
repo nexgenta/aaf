@@ -139,9 +139,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  }
 
 	  // Create a concrete subclass of EssenceDescriptor
- 	  checkResult(defs.cdHTMLDescriptor()->
+ 	  checkResult(defs.cdAIFCDescriptor()->
 				  CreateInstance(IID_IAAFEssenceDescriptor, 
 								 (IUnknown **)&edesc));		
+
+		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
+
  	  checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 	  checkResult(pHeader->AddMob(pMob));
@@ -320,9 +327,20 @@ extern "C" HRESULT CAAFSourceMob_test()
 	}
 
 
-	// When all of the functionality of this class is tested, we can return success
-	if(hr == AAFRESULT_SUCCESS)
+	// When all of the functionality of this class is tested, we can return success.
+	// When a method and its unit test have been implemented, remove it from the list.
+	if (SUCCEEDED(hr))
+	{
+		cout << "The following AAFSourceMob methods have not been implemented:" << endl; 
+		cout << "     Initialize" << endl; 
+		cout << "     AppendTimecodeSlot - needs unit test" << endl; 
+		cout << "     AppendEdgecodeSlot" << endl; 
+		cout << "     AppendPhysSourceRef - needs unit test" << endl; 
+		cout << "     SpecifyValidCodeRange" << endl; 
+		cout << "     NewPhysSourceRef" << endl; 
+		cout << "     AddPulldownRef - needs unit test" << endl; 
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+	}
 	  
 	return hr;
 }
