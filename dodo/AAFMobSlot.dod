@@ -6,7 +6,7 @@ AAFMobSlot\
 AAFObject\
 #endm
 #c
-#import ./AAFObject.exp
+#c #import ./AAFObject.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFMobSlot interface is implemented by objects which represent
@@ -44,7 +44,7 @@ AD_FORWARD_DECLARATION(AAFDataDef)
 AD_CLASS_UUID(B1A21377, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21376, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Abstract, StoredObject)
 AD_XMETHOD1(GetSegment,
 			[out\,retval],
 			objOut,
@@ -193,7 +193,7 @@ AD_XMETHOD1(GetDataDef,
 
 			This method will return the AUID of the Data Definition object
   // associated with the segment in this Mob Slot.  Common
-  // DataDefinition UIDs are DDEF_Video\, DDEF_Audio\, DDEF_Timecode\,
+  // DataDefinition UIDs are DDEF_Picture\, DDEF_Sound\, DDEF_Timecode\,
   // and DDEF_Edgecode.
   //
   // Succeeds if all of the following are true:
@@ -336,4 +336,4 @@ AD_XMETHOD1(SetSlotID,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\))
-AD_CLASS_END
+AD_XCLASS_END(Abstract, StoredObject)
