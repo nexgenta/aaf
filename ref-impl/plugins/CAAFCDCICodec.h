@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.h,v 1.5 2004/09/10 17:13:02 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.h,v 1.6 2005/02/04 17:01:41 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,9 +53,10 @@ EXTERN_C const CLSID CLSID_AAFCDCICodec;
 
 
 class CAAFCDCICodec
-  : public IAAFEssenceCodec,
-	  public IAAFPlugin,
-    public CAAFUnknown
+  : public IAAFEssenceCodec2,
+	public IAAFEssenceCodec,
+	public IAAFPlugin,
+	public CAAFUnknown
 {
 protected:
 
@@ -131,7 +132,11 @@ public:
     (/*[in] */ aafUID_constref  flavour, // which flavour of the codec to use
      /*[in,string]*/ aafCharacter *  pName, // Human-readable name of the flavour
      /*[in] */ aafUInt32  bufSize); // length of the buffer to hold flavour Name 
-	
+
+	// Switches the codec into the specified flavour.
+  STDMETHOD (SetFlavour)
+    (/*[in]*/ aafUID_constref flavour);
+
   // Returns the number of channels which this codec can handle
 			// of the given essence kind
   STDMETHOD (CountChannels)
@@ -281,6 +286,9 @@ private:
 	// CompleteWrite and Create methods.
 	void UpdateDescriptor (CAAFCDCIDescriptorHelper& descriptorHelper);
 
+	// Prepares codec internals for writing samples
+	void SetCodecState(void);
+
 	// Routine to keep calculated member data up-to-date.
 	void UpdateCalculatedData(void);
 
@@ -295,7 +303,6 @@ private:
 
 
 	aafMediaOpenMode_t _openMode; // Either read-only or for append.
-
 
 	// Data from/to FileDescriptor
 	aafLength_t _length; // total size of file (informational?)

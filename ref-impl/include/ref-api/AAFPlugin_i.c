@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPlugin_i.c,v 1.5 2004/10/25 17:39:04 stuart_hc Exp $ $Name:  $
+// $Id: AAFPlugin_i.c,v 1.6 2005/02/04 17:01:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -69,6 +69,9 @@ const IID IID_IAAFEssenceDataStream = {0xCDDB6AB1,0x98DC,0x11d2,{0x80,0x8a,0x00,
 
 
 const IID IID_IAAFEssenceCodec = {0x3631F7A2,0x9121,0x11d2,{0x80,0x88,0x00,0x60,0x08,0x14,0x3e,0x6f}};
+
+
+const IID IID_IAAFEssenceCodec2 = {0x8888F7A2,0x9121,0x11d2,{0x80,0x88,0x00,0x60,0x08,0x14,0x3e,0x6f}};
 
 
 const IID IID_IAAFMultiEssenceCodec = {0x7F93992D,0xDDA3,0x11d3,{0x80,0x08,0x00,0x10,0x4b,0xc9,0x15,0x6d}};
