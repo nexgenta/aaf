@@ -39,8 +39,6 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
-
 #define TEST_PATH	L"AnotherFile.aaf"
 
 
@@ -83,7 +81,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
 	IAAFEssenceDescriptor *edesc = NULL;
-	aafMobID_t					newMobID;
+	aafUID_t					newUID;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafRational_t	audioRate = { 44100, 1 };
@@ -95,7 +93,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -103,36 +101,34 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	try
 	{
-	    // Remove the previous test file if any.
-	    RemoveTestFile(pFileName);
+    // Remove the previous test file if any.
+    RemoveTestFile(pFileName);
 
 
-		// Create the file.
+    // Create the file.
 		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
  
-		// We can't really do anthing in AAF without the header.
+    // We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 
-		// Get the AAF Dictionary so that we can create valid AAF objects.
-		checkResult(pHeader->GetDictionary(&pDictionary));
+    // Get the AAF Dictionary so that we can create valid AAF objects.
+    checkResult(pHeader->GetDictionary(&pDictionary));
  		
-		CAAFBuiltinDefs defs (pDictionary);
-
-		//Make the first mob
+	  //Make the first mob
 		// Create a Mob
-		checkResult(defs.cdSourceMob()->
-					CreateInstance(IID_IAAFSourceMob, 
-								   (IUnknown **)&pSourceMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
+								IID_IAAFSourceMob, 
+								(IUnknown **)&pSourceMob));
 
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(CoCreateGuid((GUID *)&newUID));
+		checkResult(pMob->SetMobID(newUID));
 		checkResult(pMob->SetName(L"SourceMOBTest"));
 		
-		checkResult(defs.cdEssenceDescriptor()->
-					CreateInstance(IID_IAAFEssenceDescriptor, 
-								   (IUnknown **)&edesc));
+		checkResult(pDictionary->CreateInstance(AUID_AAFEssenceDescriptor,
+								IID_IAAFEssenceDescriptor, 
+								(IUnknown **)&edesc));
 										
  		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
@@ -142,9 +138,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
   
 		// Make a locator, and attach it to the EssenceDescriptor
-		checkResult(defs.cdNetworkLocator()->
-					CreateInstance(IID_IAAFNetworkLocator, 
-								   (IUnknown **)&pNetLocator));		
+		checkResult(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
+								IID_IAAFNetworkLocator, 
+								(IUnknown **)&pNetLocator));		
 		checkResult(pNetLocator->QueryInterface (IID_IAAFLocator, (void **)&pLocator));
 
 		checkResult(pLocator->SetPath (TEST_PATH));
@@ -218,7 +214,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IEnumAAFMobs *mobIter = NULL;
 	IAAFMob			*aMob = NULL;
 	aafUInt32					numLocators;
-	aafUInt32					readLen;
+	aafInt32					readLen;
 	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n;
 	HRESULT						hr = AAFRESULT_SUCCESS;
@@ -231,7 +227,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
@@ -243,19 +239,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		if (1 != numMobs )
 			checkResult(AAFRESULT_TEST_FAILED);
 
 
 	//!!!	aafSearchCrit_t		criteria;
-	//!!!	criteria.searchTag = kAAFNoSearch;
+	//!!!	criteria.searchTag = kNoSearch;
 
 		checkResult(pHeader->GetMobs (NULL, &mobIter));
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500];
-			aafMobID_t		mobID;
+			aafUID_t		mobID;
 
 			checkResult(mobIter->NextOne (&aMob));
 			checkResult(aMob->GetName (name, sizeof(name)));

@@ -37,11 +37,6 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
-
-#include "AAFSmartPointer.h"
-typedef IAAFSmartPointer<IAAFDataDef> IAAFDataDefSP;
-
 #define	MobName			L"MasterMOBTest"
 #define	NumMobSlots		3
 
@@ -50,12 +45,12 @@ static const aafUID_t *	slotDDefs[NumMobSlots] = {&DDEF_Picture, &DDEF_Sound, &D
 static aafRational_t	slotRates[NumMobSlots] = { {297,1}, {44100, 1}, {44100, 1}};
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
-static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
-static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
+static aafTapeCaseType_t FormFactor = kVHSVideoTape;
+static aafVideoSignalType_t VideoSignalType = kPALSignal;
+static aafTapeFormatType_t TapeFormat = kVHSFormat;
 static aafLength_t TapeLength = 3200 ;
 
-static aafMobID_t		NewMobID;
+static GUID		NewMobID;	// NOTE: this should really be aafUID_t, but problems w/ IsEqualGUID()
 #define TAPE_MOB_OFFSET	10
 #define TAPE_MOB_LENGTH	60
 #define TAPE_MOB_NAME	L"A Tape Mob"
@@ -99,7 +94,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -108,11 +103,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
+	case kMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kAAFMediaOpenAppend:
+	case kMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -157,7 +152,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	HRESULT			hr = S_OK;
 	long			test;
 	aafSourceRef_t	ref;
-	aafMobID_t		tapeMobID;
+	aafUID_t		tapeMobID;
 	IAAFEssenceDescriptor*		pEssDesc = NULL;
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 
@@ -169,35 +164,34 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-
-		CAAFBuiltinDefs defs (pDictionary);
-				
+		
+		
 		// Create a Master Mob
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMob, 
-								   (IUnknown **)&pMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
+			IID_IAAFMob, 
+			(IUnknown **)&pMob));
 		
 		// Set the IAAFMob properties
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		aafMobID_t mobID;
-		memcpy (&mobID, &NewMobID, sizeof (mobID));
-		checkResult(pMob->SetMobID(mobID));
+		aafUID_t NewMobAUID;
+		memcpy (&NewMobAUID, &NewMobID, sizeof (aafUID_t));
+		checkResult(pMob->SetMobID(NewMobAUID));
 		checkResult(pMob->SetName(MobName));
 		
 		checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
 		
 		// Create source mob to associate with our MasterMob.
-		checkResult(defs.cdSourceMob()->
-					CreateInstance(IID_IAAFSourceMob, 
+		checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
+			IID_IAAFSourceMob, 
 			(IUnknown **)&pTapeMob));		
-		hr = defs.cdTapeDescriptor()->
-		  CreateInstance(IID_IAAFTapeDescriptor, 
-						 (IUnknown **)&pTapeDesc);		
+		hr = pDictionary->CreateInstance(AUID_AAFTapeDescriptor,
+												IID_IAAFTapeDescriptor, 
+												(IUnknown **)&pTapeDesc);		
 		if (AAFRESULT_SUCCESS == hr)
 		{
 			hr = pTapeDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc);
@@ -234,9 +228,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		}
 		for (test = 0; test < NumMobSlots; test++)
 		{
-		  IAAFDataDefSP pDataDef;
-		  checkResult (pDictionary->LookupDataDef (*slotDDefs[test], &pDataDef));
-		  checkResult(pTapeMob->AddNilReference (test, TAPE_MOB_LENGTH, pDataDef, slotRates[test]));
+			checkResult(pTapeMob->AddNilReference (test, TAPE_MOB_LENGTH, *slotDDefs[test], slotRates[test]));
 		}
 		checkResult(pTapeMob->QueryInterface(IID_IAAFMob, (void **) &pTempMob));
 		checkResult(pTempMob->SetName(TAPE_MOB_NAME));
@@ -249,30 +241,25 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		for (test = 0; test < NumMobSlots; test++)
 		{
 			// Create source mob to associate with our MasterMob.
-			checkResult(defs.cdSourceMob()->
-						CreateInstance(IID_IAAFSourceMob, 
-									   (IUnknown **)&pSrcMob));		
+			checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
+				IID_IAAFSourceMob, 
+				(IUnknown **)&pSrcMob));		
 			
 			ref.sourceID = tapeMobID;
 			ref.sourceSlotID = test;
 			ref.startTime = TAPE_MOB_OFFSET;
-			IAAFDataDefSP pDDef;
-			checkResult(pDictionary->LookupDataDef(*slotDDefs[test], &pDDef));
-			checkResult(pSrcMob->AppendPhysSourceRef (slotRates[test],
-													  test,
-													  pDDef,
-													  ref,
-													  TAPE_MOB_LENGTH));
+			checkResult(pSrcMob->AppendPhysSourceRef (slotRates[test], test,
+				*slotDDefs[test], ref, TAPE_MOB_LENGTH));
 			
-			checkResult(defs.cdEssenceDescriptor()->
-						CreateInstance(IID_IAAFEssenceDescriptor, 
-									   (IUnknown **)&pDesc));	
+			checkResult(pDictionary->CreateInstance(AUID_AAFEssenceDescriptor,
+				IID_IAAFEssenceDescriptor, 
+				(IUnknown **)&pDesc));		
 			checkResult(pSrcMob->SetEssenceDescriptor(pDesc));
 			pDesc->Release();
 			pDesc = NULL;
 			
 			// Append source MOB to header
-			aafMobID_t				TempUID;
+			aafUID_t				TempUID;
 			checkResult(pSrcMob->QueryInterface(IID_IAAFMob, (void **) &pTempMob));
 			checkResult(CoCreateGuid((GUID *)&TempUID));
 			checkResult(pTempMob->SetMobID(TempUID));
@@ -282,9 +269,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			pTempMob->Release();
 			pTempMob = NULL;
 			
-			IAAFDataDefSP pDataDef;
-			checkResult (pDictionary->LookupDataDef (*slotDDefs[test], &pDataDef));
-			checkResult(pMasterMob->AddMasterSlot(pDataDef, test, pSrcMob, test+1, slotNames[test]));
+			checkResult(pMasterMob->AddMasterSlot(*slotDDefs[test], test, pSrcMob, test+1, slotNames[test]));
 			
 			pSrcMob->Release();
 			pSrcMob = NULL;
@@ -364,22 +349,22 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
   try
   {
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
     bFileOpen = true;
 
     // Validate that there is on one master mob in the test file.
-	  checkResult(pHeader->CountMobs(kAAFMasterMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kMasterMob, &numMobs));
     checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 	  // Enumerate over Master MOBs
-	  criteria.searchTag = kAAFByMobKind;
-	  criteria.tags.mobKind = kAAFMasterMob;
+	  criteria.searchTag = kByMobKind;
+	  criteria.tags.mobKind = kMasterMob;
     checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 	  while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 	  {
 		  aafWChar			name[500];
 		  aafNumSlots_t		numSlots = 0;
-		  aafMobID_t				mobID;
+		  GUID				mobID;
 
 		  // TODO: Test Master MOB specific methods here
 		  checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
@@ -387,8 +372,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		  checkResult(pMob->GetName(name, sizeof(name)));
 		  checkExpression(wcscmp(name, MobName) == 0, AAFRESULT_TEST_FAILED);
 
-		  checkResult(pMob->GetMobID(&mobID));
-		  checkExpression(0 == memcmp(&mobID, &NewMobID, sizeof(mobID)), AAFRESULT_TEST_FAILED);
+		  checkResult(pMob->GetMobID((aafUID_t *)&mobID));
+		  checkExpression(0 != IsEqualGUID(mobID, NewMobID), AAFRESULT_TEST_FAILED);
 
 		  checkResult(pMob->CountSlots(&numSlots));
 		  checkExpression(NumMobSlots == numSlots, AAFRESULT_TEST_FAILED);
@@ -405,7 +390,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				aafWChar			slotName[500];
 				aafSlotID_t			slotID;
 				aafNumSlots_t		numReps;
-				aafUInt32			bufSize = 0;
+				aafInt32			bufSize = 0;
 
         // Validate the slot name
 				checkResult(pSlot->GetName(slotName, sizeof(slotName)));

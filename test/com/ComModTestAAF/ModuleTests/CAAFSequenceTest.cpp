@@ -38,8 +38,6 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
-
 #define kNumComponents	5
 
 
@@ -85,7 +83,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -93,11 +91,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
+	case kMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kAAFMediaOpenAppend:
+	case kMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -137,38 +135,37 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSequence*	pSequence = NULL;
 	IAAFSegment*	pSegment = NULL;
 	IAAFComponent*	pComponent = NULL;
-	aafMobID_t		NewMobID;
+	aafUID_t		NewMobID;
 	int				i;
 	HRESULT			hr = S_OK;
 
 
   try
   {  
-      // Remove the previous test file if any.
-      RemoveTestFile(pFileName);
+    // Remove the previous test file if any.
+    RemoveTestFile(pFileName);
 
 
 	  // Create the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader));
 
-	  // Get the AAF Dictionary so that we can create valid AAF objects.
-	  checkResult(pHeader->GetDictionary(&pDictionary));
-	  CAAFBuiltinDefs defs (pDictionary);
+    // Get the AAF Dictionary so that we can create valid AAF objects.
+    checkResult(pHeader->GetDictionary(&pDictionary));
  		
 	  // Create a Composition Mob
-	  checkResult(defs.cdCompositionMob()->
-				  CreateInstance(IID_IAAFMob, 
-								 (IUnknown **)&pMob));
+	  checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
+							  IID_IAAFMob, 
+							  (IUnknown **)&pMob));
 
 	  checkResult(CoCreateGuid((GUID *)&NewMobID));
 	  checkResult(pMob->SetMobID(NewMobID));
 	  checkResult(pMob->SetName(L"AAFSequenceTest"));
 	  
 	  // Add mob slot w/ sequence
- 	  checkResult(defs.cdSequence()->
-				  CreateInstance(IID_IAAFSequence, 
-								 (IUnknown **)&pSequence));		
-	  checkResult(pSequence->Initialize(defs.ddSound()));
+ 	  checkResult(pDictionary->CreateInstance(AUID_AAFSequence,
+						     IID_IAAFSequence, 
+						     (IUnknown **)&pSequence));		
+	  checkResult(pSequence->Initialize(DDEF_Sound));
 
 	  //
 	  //	Add some segments.  Need to test failure conditions
@@ -179,11 +176,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  {
 		  aafLength_t		len = 10;
 
-		  checkResult(defs.cdFiller()->
-					  CreateInstance(IID_IAAFComponent, 
-									 (IUnknown **)&pComponent));
+		  checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
+								  IID_IAAFComponent, 
+								  (IUnknown **)&pComponent));
 
-		  checkResult(pComponent->SetDataDef(defs.ddSound()));
+		  checkResult(pComponent->SetDataDef(DDEF_Sound));
 		  checkResult(pComponent->SetLength(len));
 		  checkResult(pSequence->AppendComponent(pComponent));
 
@@ -261,8 +258,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFSegment*		pSegment = NULL;
 	IAAFSequence*		pSequence = NULL;
 	IEnumAAFComponents*	pCompIter = NULL;
-	IAAFDataDef*        pDataDef = 0;
-	IAAFDefObject*      pDefObj = 0;
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
 	HRESULT			hr = S_OK;
@@ -271,15 +266,15 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
   try
   {
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 
     // Validate that there is only one composition mob.
-	  checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kCompMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 	  // Enumerate over Composition MOBs
-	  criteria.searchTag = kAAFByMobKind;
-	  criteria.tags.mobKind = kAAFCompMob;
+	  criteria.searchTag = kByMobKind;
+	  criteria.tags.mobKind = kCompMob;
     checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 	  while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 	  {
@@ -309,13 +304,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 					numCpnts++;
 
-					checkResult(pComp->GetDataDef(&pDataDef));
-					checkResult(pDataDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObj));
-					pDataDef->Release();
-					pDataDef = 0;
-					checkResult(pDefObj->GetAUID(&dataDef));
-					pDefObj->Release();
-					pDefObj = 0;
+					checkResult(pComp->GetDataDef(&dataDef));
 					checkExpression(memcmp(&DDEF_Sound, &dataDef, sizeof(aafUID_t)) == 0,
 					                AAFRESULT_TEST_FAILED);
 
@@ -353,82 +342,42 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	}
 	catch (HRESULT& rResult)
 	{
-	  hr = rResult;
+    hr = rResult;
 	}
 
 	// Cleanup object references
-	if (pComp)
-	  {
-		pComp->Release();
-		pComp = 0;
-	  }
+  if (pComp)
+    pComp->Release();
 
-	if (pCompIter)
-	  {
-		pCompIter->Release();
-		pCompIter = 0;
-	  }
+  if (pCompIter)
+    pCompIter->Release();
 
-	if (pSequence)
-	  {
-		pSequence->Release();
-		pSequence = 0;
-	  }
+  if (pSequence)
+    pSequence->Release();
 
-	if (pSegment)
-	  {
-		pSegment->Release();
-		pSegment = 0;
-	  }
+  if (pSegment)
+    pSegment->Release();
 
-	if (pSlot)
-	  {
-		pSlot->Release();
-		pSlot = 0;
-	  }
+  if (pSlot)
+    pSlot->Release();
 
-	if (pSlotIter)
-	  {
-		pSlotIter->Release();
-		pSlotIter = 0;
-	  }
+  if (pSlotIter)
+    pSlotIter->Release();
 
-	if (pMob)
-	  {
-		pMob->Release();
-		pMob = 0;
-	  }
+  if (pMob)
+    pMob->Release();
 
 	if (pMobIter)
-	  {
 		pMobIter->Release();
-		pMobIter = 0;
-	  }
 
-	if (pHeader)
-	  {
-		pHeader->Release();
-		pHeader = 0;
-	  }
-
-	if (pDataDef)
-	  {
-		pDataDef->Release();
-		pDataDef = 0;
-	  }
-
-	if (pDefObj)
-	  {
-		pDefObj->Release();
-		pDefObj = 0;
-	  }
+	if (pHeader) pHeader->Release();
 
 	if (pFile)
-	  {
+	{
 		pFile->Close();
 		pFile->Release();
-		pFile = 0;
-	  }
+	}
+
 
 	return 	hr;
 }

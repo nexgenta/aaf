@@ -36,13 +36,11 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
-
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
-static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
-static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
+static aafTapeCaseType_t FormFactor = kVHSVideoTape;
+static aafVideoSignalType_t VideoSignalType = kPALSignal;
+static aafTapeFormatType_t TapeFormat = kVHSFormat;
 static aafLength_t TapeLength = 3200 ;
 
 
@@ -85,7 +83,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
+	aafUID_t					newUID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 
@@ -95,7 +93,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -115,21 +113,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			{
 				// Create a source mob
 
-			  CAAFBuiltinDefs defs (pDictionary);
-				hr = defs.cdSourceMob()->
-				  CreateInstance(IID_IAAFSourceMob, 
-								 (IUnknown **)&pSourceMob);
+				hr = pDictionary->CreateInstance(AUID_AAFSourceMob,
+										IID_IAAFSourceMob, 
+										(IUnknown **)&pSourceMob);
 				if (AAFRESULT_SUCCESS == hr)
 				{
 					hr = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
 					if (AAFRESULT_SUCCESS == hr)
 					{
-						CoCreateGuid((GUID *)&newMobID);
-						pMob->SetMobID(newMobID);
+						CoCreateGuid((GUID *)&newUID);
+						pMob->SetMobID(newUID);
 						pMob->SetName(L"TapeDescriptorTest");
-						hr = defs.cdTapeDescriptor()->
-						  CreateInstance(IID_IAAFTapeDescriptor, 
-										 (IUnknown **)&pTapeDesc);		
+						hr = pDictionary->CreateInstance(AUID_AAFTapeDescriptor,
+												IID_IAAFTapeDescriptor, 
+												(IUnknown **)&pTapeDesc);		
  						if (AAFRESULT_SUCCESS == hr)
 						{
 							hr = pTapeDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc);
@@ -214,7 +211,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafVideoSignalType_t		readVideoSignalType;
 	aafTapeFormatType_t			readTapeFormat;
 	aafLength_t					readTapeLength ;
-	aafUInt32					length;
+	aafInt32					length;
 
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
@@ -224,7 +221,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
@@ -235,7 +232,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		hr = pFile->GetHeader(&pHeader);
 		if (AAFRESULT_SUCCESS == hr)
 		{
-			hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
+			hr = pHeader->CountMobs(kAllMob, &numMobs);
 			if (AAFRESULT_SUCCESS == hr)
 			{
 				if (1 == numMobs )
@@ -257,7 +254,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 									hr = pEssDesc->QueryInterface(IID_IAAFTapeDescriptor, (void **) &pTapeDesc);
 									if (AAFRESULT_SUCCESS == hr)
 									{
-										hr = pTapeDesc->GetTapeManufacturerBufLen(&length);
+										hr = pTapeDesc->GetTapeManBufLen(&length);
 										if (AAFRESULT_SUCCESS == hr)
 										{
 											hr = pTapeDesc->GetTapeManufacturer(readManufacturer, length);

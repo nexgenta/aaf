@@ -36,7 +36,6 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -86,7 +85,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -95,11 +94,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
+	case kMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kAAFMediaOpenAppend:
+	case kMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -142,12 +141,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSegment*		pSegment = NULL;
 	IAAFPulldown*		pPulldown = NULL;
 	IAAFCompositionMob*	pCompMob = NULL;
-	aafMobID_t			NewMobID, referencedMobID;
+	aafUID_t			NewMobID, referencedMobID;
 	aafInt32			fadeInLen  = 1000;
 	aafInt32			fadeOutLen = 2000;
-	aafFadeType_t		fadeInType = kAAFFadeLinearAmp;
-	aafFadeType_t		fadeOutType = kAAFFadeLinearPower;
+	aafFadeType_t		fadeInType = kFadeLinearAmp;
+	aafFadeType_t		fadeOutType = kFadeLinearPower;
 	aafSourceRef_t		sourceRef; 
+	aafUID_t			fillerUID = DDEF_Picture;
 	aafLength_t			fillerLength = 3200;
 
 	HRESULT				hr = AAFRESULT_SUCCESS;
@@ -159,16 +159,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader));
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
  		
 		// Create a mob to be referenced by the source clip
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMob, 
-								   (IUnknown **)&pReferencedMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
+								 IID_IAAFMob, 
+								 (IUnknown **)&pReferencedMob));
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
 		checkResult(pReferencedMob->SetMobID(referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
@@ -177,9 +176,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pReferencedMob = NULL;
 
 		// Create a Composition Mob
-		checkResult(defs.cdCompositionMob()->
-					CreateInstance(IID_IAAFCompositionMob, 
-								   (IUnknown **)&pCompMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
+											  IID_IAAFCompositionMob, 
+											  (IUnknown **)&pCompMob));
 
 	    // get a IAAFMob interface
 		checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
@@ -188,9 +187,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetName(L"AAFPulldownTest"));
 	  
 		// Create a Source clip 
- 		checkResult(defs.cdSourceClip()->
-					CreateInstance(IID_IAAFSourceClip, 
-								   (IUnknown **)&pSourceClip));		
+ 		checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
+						     IID_IAAFSourceClip, 
+						     (IUnknown **)&pSourceClip));		
 
 		// Set the properties for the SourceClip
 		checkResult(pSourceClip->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
@@ -200,16 +199,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSourceClip->SetSourceReference(sourceRef));
 
 		// create a filler 
-	    checkResult(defs.cdFiller()->
-					CreateInstance(IID_IAAFFiller, 
-								   (IUnknown **)&pFiller));
+	    checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
+												IID_IAAFFiller, 
+												(IUnknown **)&pFiller));
 		// Set its properties.
-	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
+	    checkResult(pFiller->Initialize( fillerUID, fillerLength));
 
 		// Now create a selector 
-	    checkResult(defs.cdPulldown()->
-					CreateInstance(IID_IAAFPulldown, 
-								   (IUnknown **)&pPulldown));
+	    checkResult(pDictionary->CreateInstance(AUID_AAFPulldown,
+												IID_IAAFPulldown, 
+												(IUnknown **)&pPulldown));
 
 		// Get a segment interface from the source clip
 		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
@@ -305,15 +304,15 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 
 		// Validate that there is only one composition mob.
-		checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
+		checkResult(pHeader->CountMobs(kCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over Composition MOBs
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFCompMob;
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kCompMob;
 		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 		{

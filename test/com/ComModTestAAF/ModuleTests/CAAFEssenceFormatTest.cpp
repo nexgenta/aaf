@@ -40,19 +40,17 @@
 #include "AAFDefUIDs.h"
 #include "AAFEssenceFormats.h"
 
-#include "CAAFBuiltinDefs.h"
-
 #define	MobName			L"MasterMOBTest"
 //#define	NumMobSlots		3
 
 //static aafWChar* Manufacturer = L"Sony";
 //static aafWChar* Model = L"MyModel";
-//static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
-//static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
-//static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
+//static aafTapeCaseType_t FormFactor = kVHSVideoTape;
+//static aafVideoSignalType_t VideoSignalType = kPALSignal;
+//static aafTapeFormatType_t TapeFormat = kVHSFormat;
 //static aafLength_t TapeLength = 3200 ;
 
-static aafMobID_t		NewMobID;
+static GUID		NewMobID;	// NOTE: this should really be aafUID_t, but problems w/ IsEqualGUID()
 //#define TAPE_MOB_OFFSET	10
 //#define TAPE_MOB_LENGTH	60
 //#define TAPE_MOB_NAME	L"A Tape Mob"
@@ -96,7 +94,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -105,11 +103,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
+	case kMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 		
-	case kAAFMediaOpenAppend:
+	case kMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 		
@@ -162,37 +160,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
-				
+		
+		
 		// Create a Master Mob
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMob, 
-								   (IUnknown **)&pMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
+			IID_IAAFMob, 
+			(IUnknown **)&pMob));
 		
 		// Set the IAAFMob properties
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		aafMobID_t NewMobAUID;
-		memcpy (&NewMobAUID, &NewMobID, sizeof (NewMobID));
+		aafUID_t NewMobAUID;
+		memcpy (&NewMobAUID, &NewMobID, sizeof (aafUID_t));
 		checkResult(pMob->SetMobID(NewMobAUID));
 		checkResult(pMob->SetName(MobName));
 		
 		checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
 		// Add the master mob to the file BEFORE creating the essence
 		checkResult(pHeader->AddMob(pMob));
-		checkResult(pMasterMob->CreateEssence (1,
-											   defs.ddSound(),
-											   CodecWave,
-											   rate,
-											   rate,
-											   kAAFCompressionDisable,
-											   NULL,
-											   ContainerAAF,
-											   &pAccess));
+		checkResult(pMasterMob->CreateEssence (1, DDEF_Sound, CodecWave, rate, rate,
+												kSDKCompressionDisable, NULL, ContainerAAF, &pAccess));
 		
 		// Fianlly! Get an essence format to test
 		checkResult(pAccess->GetEmptyFileFormat(&pFormat));
@@ -336,7 +327,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 		
 	}

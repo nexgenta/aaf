@@ -36,8 +36,6 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
-
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -81,7 +79,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFEssenceDescriptor *edesc = NULL;
 	aafRational_t	audioRate = { 44100, 1 };
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
+	aafUID_t					newUID;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	bool bFileOpen = false;
@@ -93,7 +91,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -112,24 +110,23 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
-	CAAFBuiltinDefs defs (pDictionary);
  		
 		//Make the first mob
 		// Create a Mob
-		checkResult(defs.cdSourceMob()->
-					CreateInstance(IID_IAAFSourceMob, 
-								   (IUnknown **)&pSourceMob));
+		checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
+								IID_IAAFSourceMob, 
+								(IUnknown **)&pSourceMob));
 		
 		// Initialize mob properties:
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(CoCreateGuid((GUID *)&newUID));
+		checkResult(pMob->SetMobID(newUID));
 		checkResult(pMob->SetName(L"EssenceDescriptorTest"));
 		
 		// Create the descriptor:
-		checkResult(defs.cdEssenceDescriptor()->
-					CreateInstance(IID_IAAFEssenceDescriptor, 
-								   (IUnknown **)&edesc));		
+		checkResult(pDictionary->CreateInstance(AUID_AAFEssenceDescriptor,
+								IID_IAAFEssenceDescriptor, 
+								(IUnknown **)&edesc));		
  		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 			// Verify that there are no locators
@@ -138,9 +135,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
   
 		// Make a locator, and attach it to the EssenceDescriptor
-		checkResult(defs.cdNetworkLocator()->
-					CreateInstance(IID_IAAFLocator, 
-								   (IUnknown **)&pLocator));		
+		checkResult(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
+								IID_IAAFLocator, 
+								(IUnknown **)&pLocator));		
 		checkResult(pLocator->SetPath (locator1));
 		checkResult(edesc->AppendLocator(pLocator));
 		pLocator->Release();
@@ -151,9 +148,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkExpression(1 == numLocators, AAFRESULT_TEST_FAILED);
 
 		// Make a second ocator, and attach it to the EssenceDescriptor
-		checkResult(defs.cdNetworkLocator()->
-					CreateInstance(IID_IAAFLocator, 
-								   (IUnknown **)&pLocator));		
+		checkResult(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
+								IID_IAAFLocator, 
+								(IUnknown **)&pLocator));		
 		checkResult(pLocator->SetPath (locator2));
 		checkResult(edesc->AppendLocator(pLocator));
 		pLocator->Release();
@@ -229,7 +226,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
@@ -243,14 +240,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		checkResult(pHeader->GetMobs (NULL, &mobIter));
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500];
-			aafMobID_t		mobID;
+			aafUID_t		mobID;
 
 			checkResult(mobIter->NextOne (&aMob));
 			checkResult(aMob->GetName (name, sizeof(name)));
