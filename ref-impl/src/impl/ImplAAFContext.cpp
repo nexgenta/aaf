@@ -17,8 +17,6 @@
 #include "ImplAAFSession.h"
 #endif
 
-#include "OMUtilities.h"
-
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFFile.h"
 #include "AAFResult.h"
@@ -30,6 +28,19 @@
 #endif
 
 extern "C" const aafClassID_t CLSID_AAFFile;
+
+// single instance of this class; initialized by first call to GetInstance().
+/*static*/ ImplAAFSession * ImplAAFSession::_singleton; // = 0;
+
+/*static*/ ImplAAFSession * ImplAAFSession::GetInstance ()
+{
+  if (! _singleton)
+	{
+	  _singleton = new ImplAAFSession;
+	}
+  return _singleton;
+}
+
 
 ImplAAFSession::ImplAAFSession ()
 {}
@@ -54,7 +65,6 @@ ImplAAFSession::CreateFile (aafWChar *  pwFilePath,
 							ImplAAFFile ** ppFile)
 {
   ImplAAFRoot	*pRoot;
-  char *  pbFilePath;
 
   if (! pwFilePath)
 	{
@@ -73,13 +83,7 @@ ImplAAFSession::CreateFile (aafWChar *  pwFilePath,
 	}
 
   *ppFile = static_cast<ImplAAFFile*>(pRoot);
-
-  assert (pwFilePath);
-  pbFilePath = new char [wcslen (pwFilePath) + 1];
-  assert (pbFilePath);
-  OMUwc2sb(pbFilePath, pwFilePath);
-  (*ppFile)->Create((unsigned char *) pbFilePath, this, rev);
-  delete[] pbFilePath;
+  (*ppFile)->Create(pwFilePath, this, rev);
 
   return(AAFRESULT_SUCCESS);
 }
@@ -93,7 +97,6 @@ ImplAAFSession::OpenReadFile(aafWChar *  pwFilePath,
 							 ImplAAFFile ** ppFile)
 {
   ImplAAFRoot	*pRoot;
-  char *  pbFilePath;
 
   if (! pwFilePath)
 	{
@@ -111,13 +114,8 @@ ImplAAFSession::OpenReadFile(aafWChar *  pwFilePath,
 	  return(0x80004005L);	// TODO: change this to AAFRESULT_FAILED
 	}
 
-  assert (pwFilePath);
   *ppFile = static_cast<ImplAAFFile*>(pRoot);
-  pbFilePath = new char [wcslen (pwFilePath) + 1];
-  assert (pbFilePath);
-  OMUwc2sb(pbFilePath, pwFilePath);
-  (*ppFile)->OpenRead((unsigned char *) pbFilePath, this);
-  delete[] pbFilePath;
+  (*ppFile)->OpenRead(pwFilePath, this);
 
   return(AAFRESULT_SUCCESS);
 }
@@ -132,7 +130,6 @@ ImplAAFSession::OpenModifyFile (aafWChar *  pwFilePath,
 {
   AAFRESULT hr;
   ImplAAFRoot	*pRoot;
-  char *  pbFilePath;
 
   if (! pwFilePath)
 	{
@@ -151,12 +148,7 @@ ImplAAFSession::OpenModifyFile (aafWChar *  pwFilePath,
 	}
 
   *ppFile = static_cast<ImplAAFFile*>(pRoot);
-  assert (pwFilePath);
-  pbFilePath = new char [wcslen (pwFilePath) + 1];
-  assert (pbFilePath);
-  OMUwc2sb(pbFilePath, pwFilePath);
-  hr = (*ppFile)->OpenModify((unsigned char *) pbFilePath, this);
-  delete[] pbFilePath;
+  hr = (*ppFile)->OpenModify(pwFilePath, this);
 
   return(hr);
 }
@@ -199,20 +191,6 @@ ImplAAFSession::SetDefaultIdentification (aafProductIdentification_t * pIdent)
 
   _defaultIdent = pIdent;
 
-  if ((_defaultIdent != 0) && (_defaultIdent->productName != 0))
-	{
-	  size_t size = wcslen (_defaultIdent->productName) + 1;
-	  char * pbProgramName = new char [size];
-	  assert (pbProgramName);
-	  OMUwc2sb(pbProgramName, _defaultIdent->productName);
-	  setProgramName(pbProgramName);
-	  delete[] pbProgramName;
-	}
-  else
-	{
-	  setProgramName("Unknown");
-	}
-
   return(AAFRESULT_SUCCESS);
 }
 
@@ -246,6 +224,9 @@ ImplAAFSession::BeginSession (
   return SetDefaultIdentification(ident);
 }
 
-extern "C" const aafClassID_t CLSID_AAFSession;
+// extern "C" const aafClassID_t CLSID_AAFSession;
+// CLSID for AAFSession
+// {F0C10891-3073-11D2-804A-006008143E6F
+const CLSID CLSID_AAFSession = { 0xF0C10891, 0x3073, 0x11D2, { 0x80, 0x4A, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
 OMDEFINE_STORABLE(ImplAAFSession, CLSID_AAFSession);
