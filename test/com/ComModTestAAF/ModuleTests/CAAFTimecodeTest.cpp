@@ -1,367 +1,286 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFTimecode
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+// @com This file implements the module test for CAAFDefinitionObject
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
-#include "AAF.h"
+
+
+#include "CAAFTimecode.h"
+#include "CAAFTimecode.h"
+#ifndef __CAAFTimecode_h__
+#error - improperly defined include guard
+#endif
 
 #include <iostream.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "AAFStoredObjectIDs.h"
-//#include "aafCvt.h"
+#include "aafCvt.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
-#include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
-
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x72e4ca72, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
-
-// convenient error handlers.
-inline void checkResult(HRESULT r)
-{
-  if (FAILED(r))
-    throw r;
-}
-inline void checkExpression(bool expression, HRESULT r)
-{
-  if (!expression)
-    throw r;
-}
-
-
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
+	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
-	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
-	IAAFCompositionMob*			pCompMob=NULL;
-	IAAFMob						*pMob = NULL;
-	IAAFTimelineMobSlot			*pNewSlot = NULL;
-	IAAFTimecode				*pTimecode = NULL;
-	IAAFSegment					*pSeg = NULL;
-
 	aafProductIdentification_t	ProductInfo;
-	HRESULT						hr = S_OK;
+	HRESULT						hr;
 	aafLength_t					zero;
 	aafTimecode_t				startTC;
 
-//	CvtInt32toLength(0, zero);
-    zero = 0;
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
+	IAAFCompositionMob*			pCompMob=NULL;
+	IAAFMob						*pMob;
+	IAAFMobSlot					*newSlot;
+	IAAFTimecode				*timecode;
+	IAAFSegment					*seg;
+
+	CvtInt32toLength(0, zero);
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFTimecode Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productName = L"Make AVR Example";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	try
-	{
-      // Remove the previous test file if any.
-      RemoveTestFile(pFileName);
+	hr = CoCreateInstance(CLSID_AAFSession,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSession, 
+						   (void **)&pSession);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	  // Create the file
-	  checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
-	  bFileOpen = true;
- 
-	  // We can't really do anthing in AAF without the header.
-	  checkResult(pFile->GetHeader(&pHeader));
-
-	  // Get the AAF Dictionary so that we can create valid AAF objects.
-	  checkResult(pHeader->GetDictionary(&pDictionary));
-	  CAAFBuiltinDefs defs (pDictionary);
- 		
-	  // Create a CompositionMob
-	  checkResult(defs.cdCompositionMob()->
-				  CreateInstance(IID_IAAFCompositionMob, 
-								 (IUnknown **)&pCompMob));
-
-	  // Get a MOB interface
-	  checkResult(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-	  checkResult(pMob->SetMobID(TEST_MobID));
-
-	  checkResult(pCompMob->Initialize(L"COMPMOB01"));
-		
-	  checkResult(defs.cdTimecode()->
-				  CreateInstance(IID_IAAFTimecode, 
-								 (IUnknown **)&pTimecode));		
-
-	  // try Get and Set before its been initialized
-	  checkExpression(pTimecode->GetTimecode(&startTC) == AAFRESULT_NOT_INITIALIZED,
-	  																AAFRESULT_TEST_FAILED);
-	  checkExpression(pTimecode->SetTimecode(&startTC) == AAFRESULT_NOT_INITIALIZED,
-	  																AAFRESULT_TEST_FAILED);
-	  
-	  startTC.startFrame = 0;	// midnight
-	  startTC.drop = kAAFTcNonDrop;
-	  startTC.fps = 24;
-
-	  // Initialize()
-	  // Test Initialize with a NULL timecode
-	  checkExpression(pTimecode->Initialize (zero, NULL) == AAFRESULT_NULL_PARAM,
-	  																AAFRESULT_TEST_FAILED);
-	  // test initialize with bogus drop value
-	  startTC.drop = 2; 
-	  checkExpression(pTimecode->Initialize (zero, &startTC) == AAFRESULT_INVALID_TIMECODE,
-	  																AAFRESULT_TEST_FAILED);
-	  // Set drop to valid value
-	  startTC.drop = kAAFTcDrop;
-	  checkResult(pTimecode->Initialize (zero, &startTC));
-	  
-	  // Make sure it can't be intialized again
-	  checkExpression(pTimecode->Initialize (zero, &startTC) == AAFRESULT_ALREADY_INITIALIZED,
-	  																AAFRESULT_TEST_FAILED);
-
-       checkResult(pTimecode->GetTimecode (&startTC));
-
-       // Check results !!
-       checkExpression(startTC.startFrame == 0, AAFRESULT_TEST_FAILED);
-       checkExpression(startTC.drop == kAAFTcDrop, AAFRESULT_TEST_FAILED);
-       checkExpression(startTC.fps == 24, AAFRESULT_TEST_FAILED);
-
-	  // SetTimecode()
-	  startTC.startFrame = 108000;	// One hour
-	  startTC.drop = kAAFTcNonDrop;
-	  startTC.fps = 30;
-
-	  // Test SetTimecode with a NULL timecode
-	  checkExpression(pTimecode->SetTimecode(NULL) == AAFRESULT_NULL_PARAM,
-	  												AAFRESULT_TEST_FAILED);
-	  // test SetTimecode with bogus drop value
-	  startTC.drop = 2; 
-	  checkExpression(pTimecode->SetTimecode (&startTC) == AAFRESULT_INVALID_TIMECODE,
-	  															AAFRESULT_TEST_FAILED);
-	  startTC.drop = kAAFTcNonDrop;
-	  checkResult(pTimecode->SetTimecode(&startTC));
-
-	  checkResult(pTimecode->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
-
-	  aafRational_t editRate = { 0, 1};
-	  checkResult(pMob->AppendNewTimelineSlot (editRate,
-											   pSeg,
-											   0,
-											   L"timecode",
-											   0,
-											   &pNewSlot));
-		
-	  checkResult(pHeader->AddMob(pMob));
-	}
-  catch (HRESULT& rResult)
-  {
-    hr = rResult;
-  }
+	hr = pSession->CreateFile(pFileName, kAAFRev1, &pFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+  
+  	hr = pFile->GetHeader(&pHeader);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+	// Create a CompositionMob
+	hr = CoCreateInstance(CLSID_AAFCompositionMob,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFCompositionMob, 
+							(void **)&pCompMob);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 	
+	hr = pCompMob->SetInitialValues(L"COMPMOB01", AAFFalse);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	// Cleanup and return
-	if (pNewSlot)
-		pNewSlot->Release();
+	// Get a MOB interface
+	hr = pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	if (pSeg)
-		pSeg->Release();
+	hr = CoCreateInstance(CLSID_AAFMobSlot,
+							NULL, 
+							CLSCTX_INPROC_SERVER, 
+							IID_IAAFMobSlot, 
+							(void **)&newSlot);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-  if (pTimecode)
-		pTimecode->Release();
+	hr = CoCreateInstance(CLSID_AAFTimecode,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFTimecode, 
+						   (void **)&timecode);		
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	if (pMob)
-		pMob->Release();
+	startTC.startFrame = 108000;	// One hour
+	startTC.drop = kTcNonDrop;
+	startTC.fps = 30;
+	hr = timecode->InitTimecode (zero, &startTC);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	if (pCompMob)
-		pCompMob->Release();
+	hr = timecode->QueryInterface (IID_IAAFSegment, (void **)&seg);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	if (pDictionary)
-		pDictionary->Release();
+	hr = pMob->AppendNewSlot (seg, 0, L"timecode", &newSlot);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	if (pHeader)
-		pHeader->Release();
+	seg->Release();
+	newSlot->Release();
 
-	if (pFile) 
-	{
-		if (bFileOpen)
-		  {
-			pFile->Save();
-			pFile->Close();
-		  }
-		pFile->Release();
-	}
+	hr = pHeader->AppendMob(pMob);
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	return hr;
+	hr = pFile->Close();
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pSession->EndSession();
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	pCompMob->Release();
+	if (pFile) pFile->Release();
+	if (pSession) pSession->Release();
+
+	return AAFRESULT_SUCCESS;
 }
 
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-  // IAAFSession *				pSession = NULL;
-  IAAFFile *					pFile = NULL;
-  bool bFileOpen = false;
-  IAAFHeader *				pHeader = NULL;
-  IEnumAAFMobs*				pMobIter = NULL;
-  IEnumAAFMobSlots*			pEnum = NULL;
-  IAAFMob*					pMob = NULL;
-  IAAFMobSlot*				pMobSlot = NULL;
-  IAAFSegment*				pSeg = NULL;
-  IAAFTimecode*				pTimecode = NULL;
-  aafTimecode_t				startTC;
+	IAAFSession *				pSession = NULL;
+	IAAFFile *					pFile = NULL;
+	IAAFHeader *				pHeader = NULL;
+	aafProductIdentification_t	ProductInfo;
+	aafNumSlots_t				numMobs, n;
+	HRESULT						hr;
 
-  aafNumSlots_t				numMobs;
-  HRESULT						hr = S_OK;
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.productID = -1;
+	ProductInfo.platform = NULL;
+	  
+	hr = CoCreateInstance(CLSID_AAFSession,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSession, 
+						   (void **)&pSession);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-  try
-  {
-    // Open the file
-		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
-		bFileOpen = true;
- 
-    // We can't really do anthing in AAF without the header.
-		checkResult(pFile->GetHeader(&pHeader));
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
-		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
+	hr = pSession->OpenReadFile(pFileName, &pFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+  
+  	hr = pFile->GetHeader(&pHeader);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-    checkResult(pHeader->GetMobs( NULL, &pMobIter));
-		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
-		{
-      checkResult(pMob->GetSlots (&pEnum));
+	hr = pHeader->GetNumMobs( kAllMob, &numMobs );
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-      while (AAFRESULT_SUCCESS == pEnum->NextOne (&pMobSlot))
-      {
-        checkResult(pMobSlot->GetSegment (&pSeg));
-        // Get a Timecode interface 
-        checkResult(pSeg->QueryInterface (IID_IAAFTimecode, (void **)&pTimecode));
-        checkResult(pTimecode->GetTimecode (&startTC));
-        checkExpression(pTimecode->GetTimecode (NULL) == AAFRESULT_NULL_PARAM,
-        													 AAFRESULT_TEST_FAILED);
-        // Check results !!
-        checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
-
-        pTimecode->Release();
-        pTimecode = NULL;
-
-        pSeg->Release();
-        pSeg = NULL;
-      }
-
-      pEnum->Release();
-      pEnum = NULL;
-
-      pMob->Release();
-      pMob = NULL;
-	  }
-	}
-  catch (HRESULT& rResult)
-  {
-    hr = rResult;
-  }
-	
-
-	// Cleanup and return
-  if (pTimecode)
-		pTimecode->Release();
-
-	if (pSeg)
-		pSeg->Release();
-
-  if (pMobSlot)
-		pMobSlot->Release();
-
-  if (pEnum)
-    pEnum->Release();
-
-	if (pMob)
-		pMob->Release();
-
-	if (pMobIter)
-		pMobIter->Release();
-
-	if (pHeader)
-		pHeader->Release();
-
-	if (pFile) 
+	if (numMobs > 0)
 	{
-		if (bFileOpen)
-			pFile->Close();
-		pFile->Release();
+		IEnumAAFMobs*		mobIter;
+		IEnumAAFMobSlots	*pEnum;
+		IAAFMob*			pMob = NULL;
+		IAAFCompositionMob*	pCompMob = NULL;
+		IAAFMobSlot			*pMobSlot;
+		IAAFSegment			*pSeg;
+		IAAFTimecode		*pTimecode;
+		aafTimecode_t		startTC;
+
+		hr = pHeader->EnumAAFAllMobs( NULL, &mobIter );
+		if (AAFRESULT_SUCCESS != hr)
+			return hr;
+
+		for (n = 0; n < numMobs; n++)
+		{
+			hr = mobIter->NextOne( &pMob );
+			if (AAFRESULT_SUCCESS != hr)
+				return hr;
+
+			hr = pMob->EnumAAFAllMobSlots (&pEnum);
+			if (AAFRESULT_SUCCESS != hr)
+				return hr;
+			
+			hr = pEnum->NextOne (&pMobSlot);
+			if (AAFRESULT_SUCCESS != hr)
+				return hr;
+
+			hr = pMobSlot->GetSegment (&pSeg);
+			if (AAFRESULT_SUCCESS != hr)
+				return hr;
+
+			hr = pSeg->QueryInterface (IID_IAAFTimecode, (void **)&pTimecode);
+ 			if (AAFRESULT_SUCCESS != hr)
+				return hr;
+
+			hr = pTimecode->GetTimecode (&startTC);
+ 			if (AAFRESULT_SUCCESS != hr)
+				return hr;
+
+			if(startTC.startFrame != 108000)
+				return AAFRESULT_TEST_FAILED;
+			if(startTC.drop != kTcNonDrop)
+				return AAFRESULT_TEST_FAILED;
+			if(startTC.fps != 30)
+				return AAFRESULT_TEST_FAILED;
+		}
 	}
 
-	return hr;
+
+	hr = pFile->Close();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	hr = pSession->EndSession();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+
+	if (pHeader) pHeader->Release();
+	if (pFile) pFile->Release();
+	if (pSession) pSession->Release();
+
+	return 	AAFRESULT_SUCCESS;
 }
 
-extern "C" HRESULT CAAFTimecode_test(testMode_t mode);
-extern "C" HRESULT CAAFTimecode_test(testMode_t mode)
+HRESULT CAAFTimecode::test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"AAFTimecodeTest.aaf";
+	aafWChar * pFileName = L"TimecodeTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
-	  cerr << "CAAFTimecodeMob_test...Caught general C++"
-		   << " exception!" << endl; 
+	  cerr << "CAAFTimecodeMob::test...Caught general C++"
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
+
+  	// When all of the functionality of this class is tested, we can return success
+	if(hr == AAFRESULT_SUCCESS)
+		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 
 	// Cleanup our object if it exists.
 	return hr;
