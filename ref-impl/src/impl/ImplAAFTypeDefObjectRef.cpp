@@ -55,29 +55,30 @@ ImplAAFTypeDefObjectRef::~ImplAAFTypeDefObjectRef ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::Initialize (
-      const aafUID_t *  pID,
+      const aafUID_t & id,
       ImplAAFClassDef * pObjType,
-      wchar_t *  pTypeName)
+      const aafCharacter * pTypeName)
 {
   AAFRESULT hr;
-  aafUID_t id;
+  aafUID_t typeId;
 
   if (! pObjType)  return AAFRESULT_NULL_PARAM;
-  hr = pObjType->GetAUID(&id);
+  hr = pObjType->GetAUID(&typeId);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  return pvtInitialize (pID, &id, pTypeName);
+  return pvtInitialize (id, typeId, pTypeName);
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::pvtInitialize (
-      const aafUID_t *  pID,
-      const aafUID_t * pRefdObjID,
-      wchar_t *  pTypeName)
+      const aafUID_t & /*pID*/,
+      const aafUID_t & /*pRefdObjID*/,
+      const aafCharacter * /*pTypeName*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  // This is a virtual function should be implemented in a derived class.
+  return AAFRESULT_INTERNAL_ERROR;
 }
 
 
@@ -87,7 +88,8 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFObject * /*pObj*/,
       ImplAAFPropertyValue ** /*ppPropVal*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  // This is a virtual function should be implemented in a derived class.
+  return AAFRESULT_INTERNAL_ERROR;
 }
 
 
@@ -96,7 +98,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::GetObjectType (
       ImplAAFClassDef ** /*ppObjType*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  // This is a virtual function should be implemented in a derived class.
+  return AAFRESULT_INTERNAL_ERROR;
 }
 
 
@@ -106,7 +109,8 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * /*pPropVal*/,
       ImplAAFObject ** /*ppObject*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  // This is a virtual function should be implemented in a derived class.
+  return AAFRESULT_INTERNAL_ERROR;
 }
 
 
@@ -116,7 +120,8 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * /*pPropVal*/,
       ImplAAFObject * /*ppObject*/)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  // This is a virtual function should be implemented in a derived class.
+  return AAFRESULT_INTERNAL_ERROR;
 }
 
 
@@ -161,3 +166,19 @@ void ImplAAFTypeDefObjectRef::internalize(OMByte* externalBytes,
   assert (internalBytesSize >= externalBytesSize);
   copy (externalBytes, internalBytes, externalBytesSize);
 }
+
+
+bool ImplAAFTypeDefObjectRef::IsAggregatable () const
+{ return false; }
+
+bool ImplAAFTypeDefObjectRef::IsStreamable () const
+{ return false; }
+
+bool ImplAAFTypeDefObjectRef::IsFixedArrayable () const
+{ return false; }
+
+bool ImplAAFTypeDefObjectRef::IsVariableArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefObjectRef::IsStringable () const
+{ return false; }
