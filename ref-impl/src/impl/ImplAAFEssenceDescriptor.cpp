@@ -52,7 +52,7 @@
 extern "C" const aafClassID_t CLSID_EnumAAFLocators;
 
 ImplAAFEssenceDescriptor::ImplAAFEssenceDescriptor ()
-: _locators(         PID_EssenceDescriptor_Locator,          "Locator")
+: _locators(         PID_EssenceDescriptor_Locator,          L"Locator")
 {
   _persistentProperties.put(_locators.address());
 }
@@ -64,7 +64,7 @@ ImplAAFEssenceDescriptor::~ImplAAFEssenceDescriptor ()
 	size_t size = _locators.getSize();
 	for (size_t i = 0; i < size; i++)
 	{
-		ImplAAFLocator *pLocator = _locators.setValueAt(0, i);
+		ImplAAFLocator *pLocator = _locators.clearValueAt(i);
 		if (pLocator)
 		{
 		  pLocator->ReleaseReference();
@@ -202,8 +202,11 @@ AAFRESULT STDMETHODCALLTYPE
 		
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_locators));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFLocator>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFLocator>(_locators);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFLocators, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT

@@ -67,15 +67,14 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFIdentification>
+    ImplAAFIdentificationSP;
+typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
+    ImplEnumAAFIdentificationsSP;
 
-#if defined(__MWERKS__)
-// Since the ansi standard does not define wcslen and the other wide
-// string functions are not normally placed in string.h along with the
-// single-byte string functions, as is done with VC++, CodeWarrior
-// places all of the "wide-string" functions in wstring.h.
-#include <wstring.h>
-#endif
+#include <assert.h>
+#include <wchar.h>
 
 #include "ImplAAFObjectCreation.h"
 
@@ -90,13 +89,13 @@ const aafUID_t NIL_UID = { 0 };
 
 
 ImplAAFHeader::ImplAAFHeader ()
-: _byteOrder(         PID_Header_ByteOrder,          "ByteOrder"),
-  _lastModified(      PID_Header_LastModified,       "LastModified"),
-  _identificationList(PID_Header_IdentificationList, "IdentificationList"),
-  _contentStorage(		PID_Header_Content,	"Content"),
-  _dictionary(PID_Header_Dictionary,	"Dictionary"),
-  _fileRev(PID_Header_Version,		"Version"),
-  _objectModelVersion(PID_Header_ObjectModelVersion, "ObjectModelVersion")
+: _byteOrder(         PID_Header_ByteOrder,          L"ByteOrder"),
+  _lastModified(      PID_Header_LastModified,       L"LastModified"),
+  _identificationList(PID_Header_IdentificationList, L"IdentificationList"),
+  _contentStorage(		PID_Header_Content,	L"Content"),
+  _dictionary(PID_Header_Dictionary,	L"Dictionary"),
+  _fileRev(PID_Header_Version,		L"Version"),
+  _objectModelVersion(PID_Header_ObjectModelVersion, L"ObjectModelVersion")
 {
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
@@ -115,6 +114,7 @@ ImplAAFHeader::ImplAAFHeader ()
 	_toolkitRev.patchLevel = 0;
 //!!!	_byteOrder;
 //!!!	_lastModified;
+	_file = NULL;
 }
 
 
@@ -124,7 +124,7 @@ ImplAAFHeader::~ImplAAFHeader ()
 	//
 	size_t size = _identificationList.getSize();
 	for (size_t i = 0; i < size; i++) {
-		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
+		ImplAAFIdentification *pIdent = _identificationList.clearValueAt(i);
 
 		if (pIdent) {
 		  pIdent->ReleaseReference();
@@ -133,14 +133,14 @@ ImplAAFHeader::~ImplAAFHeader ()
 	}
 
 	// Release the content storage pointer.
-	ImplAAFContentStorage *contentStorage = _contentStorage.setValue(0);
+	ImplAAFContentStorage *contentStorage = _contentStorage.clearValue();
 	if (contentStorage) {
 	  contentStorage->ReleaseReference();
 	  contentStorage = 0;
 	}
 
 	// Release the dictionary pointer.
-	ImplAAFDictionary *dictionary = _dictionary.setValue(0);
+	ImplAAFDictionary *dictionary = _dictionary.clearValue();
 	if (dictionary) {
 	  dictionary->ReleaseReference();
 	  dictionary = 0;
@@ -242,9 +242,11 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFContentStorage *cstore = NULL;
 
     if (! pMob)
-	  {
 		return AAFRESULT_NULL_PARAM;
-	  }
+	  
+ 	if (! pMob->attached())
+		return AAFRESULT_MOB_NOT_FOUND;	
+
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
@@ -350,9 +352,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
     ImplAAFContentStorage *cstore = NULL;
 	if (! pEssenceData)
-	{
 		return AAFRESULT_NULL_PARAM;
-	}
+	
+	if (! pEssenceData->attached())
+		return AAFRESULT_ESSENCE_NOT_FOUND;
+
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
@@ -364,7 +368,26 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::LookupEssenceData (aafMobID_constref mobID,
+                           ImplAAFEssenceData **ppEssenceData)
+{
+    ImplAAFContentStorage *cstore = NULL;
 
+    if (! ppEssenceData)
+	  {
+		return AAFRESULT_NULL_PARAM;
+	  }
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->LookupEssenceData(mobID, ppEssenceData));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::GetContentStorage (ImplAAFContentStorage ** ppContentStorage)
@@ -445,7 +468,29 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+
+  AAFRESULT hr;
+
+  ImplEnumAAFIdentificationsSP pEnumIds;
+  hr = GetIdentifications (&pEnumIds);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  ImplAAFIdentificationSP pTestId;
+  while (AAFRESULT_SUCCEEDED (pEnumIds->NextOne (&pTestId)))
+	{
+	  aafUID_t testGen;
+	  hr = pTestId->GetGenerationID (&testGen);
+	  if (AAFRESULT_FAILED (hr)) return hr;
+	  if (EqualAUID (&testGen, &generation))
+		{
+		  assert (ppIdentification);
+		  *ppIdentification = pTestId;
+		  assert (*ppIdentification);
+		  (*ppIdentification)->AcquireReference ();
+		  return AAFRESULT_SUCCESS;
+		}
+	}
+  return AAFRESULT_OBJECT_NOT_FOUND;
 }
 
 
@@ -476,7 +521,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_identificationList));
+		OMStrongReferenceVectorIterator<ImplAAFIdentification>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFIdentification>(_identificationList);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFIdentifications, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -505,24 +554,18 @@ ImplAAFHeader::GetIdentificationAt
   if (index >= max)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
+  ImplAAFIdentification * pId = 0;
+  _identificationList.getValueAt(pId, index);
+  assert (pId);
+  pId->AcquireReference ();
 
-
-/*
-AAFRESULT 
-    ImplAAFHeader::CountIdentifications (aafInt32 *pCount)
-{
-  if (! pCount)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-	size_t size;
-  _identificationList.getSize(size);
-	*pCount = size;
+  assert (ppIdentification);
+  *ppIdentification = pId;
+  // Let the ref count pass from pId to *ppIdentification.
   return AAFRESULT_SUCCESS;
 }
-*/
+
+
 
 AAFRESULT 
     ImplAAFHeader::AddIdentificationObject (aafProductIdentification_t *pIdent)
@@ -541,11 +584,7 @@ AAFRESULT
 			fiction.productVersionString = (aafWChar*)NULL;
 			fiction.productID = NIL_UID;
 			fiction.platform = (aafWChar*)NULL;
-			fiction.productVersion.major = 0;
-			fiction.productVersion.minor = 0;
-			fiction.productVersion.tertiary = 0;
-			fiction.productVersion.patchLevel = 0;
-			fiction.productVersion.type = kAAFVersionUnknown;
+			fiction.productVersion = 0;
 			pIdent = &fiction;
 			dummyIDNT = kAAFTrue;
 		}
@@ -567,10 +606,15 @@ AAFRESULT
 		  CreateInstance((ImplAAFObject **)&identObj));
     if (NULL == identObj)
       CHECK(AAFRESULT_NOMEMORY);
-    CHECK(identObj->SetCompanyName(pIdent->companyName));
-    CHECK(identObj->SetProductName(pIdent->productName));
-    CHECK(identObj->SetProductVersionString(pIdent->productVersionString));
-	CHECK(identObj->SetProductID(pIdent->productID));
+	CHECK(identObj->Initialize(pIdent->companyName,
+							   pIdent->productName,
+							   pIdent->productVersionString,
+							   pIdent->productID));
+
+	if (pIdent->productVersion)
+	  {
+		CHECK (identObj->SetProductVersion (*pIdent->productVersion));
+	  }
 
     _identificationList.appendValue(identObj);
  
@@ -666,16 +710,10 @@ AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 	return (AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFHeader::LoadMobTables(void)
-{
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->LoadMobTables());
-}
 
 // trr - NOTE: Eventhough this method returns a reference counted object it
 // does NOT bump the reference count. Currently only other file that calls
-// this method is ImplAAFMob.cpp. We should probably make this method protected
-// or private and create an new version the conforms to our other API guidlines:
+// this method is ImplAAFMob.cpp. There is another version the conforms to our other API guidlines:
 // AAFRESULT GetContentStorage(ImplAAFContentStorage **ppContentStorage);
 // 
 ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
@@ -740,4 +778,44 @@ void ImplAAFHeader::SetObjectModelVersion (aafUInt32 version)
 {
   _objectModelVersion = version;
   assert (IsObjectModelVersionPresent());
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::GetStoredByteOrder (eAAFByteOrder_t *  pOrder)
+{
+  if (!pOrder)
+    return AAFRESULT_NULL_PARAM;
+
+  if (_byteOrder == 0x4d4d) // 'MM'
+  {
+    *pOrder = kAAFByteOrderBig;
+  }
+  else  // 'II'
+  {
+    *pOrder = kAAFByteOrderLittle;
+  }
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::GetNativeByteOrder (eAAFByteOrder_t *  pOrder)
+{
+  if (!pOrder)
+    return AAFRESULT_NULL_PARAM;
+
+	OMByteOrder byteOrder = hostByteOrder();
+	if (byteOrder == littleEndian)
+  {
+		*pOrder = kAAFByteOrderLittle;
+	} 
+  else 
+  {
+		*pOrder = kAAFByteOrderBig;
+	}
+
+  return AAFRESULT_SUCCESS;
 }
