@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. |
@@ -302,7 +297,9 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   SetElement* element = 0;
   bool result = _set.find(identification, &element);
   if (result) {
-    element->setValue(0);
+    UniqueIdentification nullUniqueIdentification;
+    memset(&nullUniqueIdentification, 0, sizeof(UniqueIdentification));
+    element->setValue(&nullUniqueIdentification, 0);
     _set.remove(identification);
   }
 
@@ -849,6 +846,35 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 }
 
 template <typename UniqueIdentification, typename ReferencedObject>
+ReferencedObject*
+OMStrongReferenceSetProperty<UniqueIdentification,
+                             ReferencedObject>::replace(
+                                                const ReferencedObject* object)
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification,"
+                                     "ReferencedObject>::replace");
+
+  PRECONDITION("Valid object", object != 0);
+  UniqueIdentification identification = object->identification();
+  PRECONDITION("Object already present", contains(identification));
+
+  SetElement* element = 0;
+  bool found = _set.find(identification, &element);
+  ASSERT("Object found", found);
+  OMStrongObjectReference& reference = element->reference();
+
+  ReferencedObject* result =  0;
+  OMStorable* oldObject = reference.setValue(object);
+  if (oldObject != 0) {
+    result = dynamic_cast<ReferencedObject*>(oldObject);
+    ASSERT("Object is correct type", result != 0);
+  }
+  POSTCONDITION("Object inserted", contains(identification));
+  POSTCONDITION("Object inserted", containsValue(object));
+  return result;
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
 OMKeySize OMStrongReferenceSetProperty<UniqueIdentification,
                                        ReferencedObject>::keySize(void) const
 {
@@ -878,6 +904,44 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   ReferencedObject* p = 0;
   find(*reinterpret_cast<UniqueIdentification*>(key), p);
   object = p;
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+void OMStrongReferenceSetProperty<UniqueIdentification,
+                                  ReferencedObject>::shallowCopyTo(
+                                            OMProperty* /* destination */)const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::shallowCopyTo");
+  // Nothing to do - this is a shallow copy
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+void OMStrongReferenceSetProperty<UniqueIdentification,
+                                  ReferencedObject>::deepCopyTo(
+                                                     OMProperty* destination,
+                                                     void* clientContext) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::deepCopyTo");
+  PRECONDITION("Valid destination", destination != 0);
+
+  typedef OMStrongReferenceSetProperty<UniqueIdentification,
+                                       ReferencedObject> Property;
+  Property* dest = dynamic_cast<Property*>(destination);
+  ASSERT("Destination is correct type", dest != 0);
+  ASSERT("Valid destination", dest != this);
+
+  ASSERT("Destination set is void", dest->isVoid());
+  SetIterator iterator(_set, OMBefore);
+  while (++iterator) {
+    SetElement& element = iterator.value();
+    OMStorable* source = element.getValue();
+    OMStorable* d = source->shallowCopy();
+    dest->insertObject(d);
+    d->onCopy(clientContext);
+    source->deepCopyTo(d, clientContext);
+  }
 }
 
 #endif
