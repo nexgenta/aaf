@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -35,7 +35,7 @@
 #include "OMStoredObject.h"
 
 OMDataStreamProperty::OMDataStreamProperty(const OMPropertyId propertyId,
-                                           const char* name)
+                                           const wchar_t* name)
   : OMProperty(propertyId, SF_DATA_STREAM, name),_stream(0)
 {
 }
@@ -45,22 +45,18 @@ OMDataStreamProperty::~OMDataStreamProperty(void)
 }
 
   // @mfunc Save this <c OMDataStreamProperty>.
-  //   @parm Client context for callbacks.
   //   @this const
-void OMDataStreamProperty::save(void* /* clientContext */) const
+void OMDataStreamProperty::save(void) const
 {
   TRACE("OMDataStreamProperty::save");
-
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
 
   // Use the property name as the stream name
   //
   const char* streamName = name();
-  store->write(_propertyId,
-               _storedForm,
-               (void*)streamName,
-               strlen(streamName) + 1);
+  store()->write(_propertyId,
+                 _storedForm,
+                 (void*)streamName,
+                 strlen(streamName) + 1);
 
   // The stream has never been written to but we want the stream to
   // exist in the file, create it.
@@ -78,15 +74,12 @@ void OMDataStreamProperty::restore(size_t size)
 {
   TRACE("OMDataStreamProperty::restore");
 
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
   char* streamName = new char[size];
   ASSERT("Valid heap pointer", streamName != 0);
-  store->read(_propertyId,
-              _storedForm,
-              streamName,
-              size);
+  store()->read(_propertyId,
+                _storedForm,
+                streamName,
+                size);
   ASSERT("Consistent property size", size == strlen(streamName) + 1);
   ASSERT("Consistent property name", strcmp(streamName, name()) == 0);
   delete [] streamName;
@@ -113,8 +106,7 @@ OMUInt64 OMDataStreamProperty::size(void) const
   ASSERT("Valid stream", _stream != 0);
 
   OMUInt64 result;
-  OMStoredObject* s = _propertySet->container()->store();
-  result = s->streamSize(_stream);
+  result = store()->streamSize(_stream);
  
   return result;
 }
@@ -132,9 +124,7 @@ void OMDataStreamProperty::setSize(const OMUInt64 newSize)
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
- 
-  s->streamSetSize(_stream, newSize);
+  store()->streamSetSize(_stream, newSize);
 
   POSTCONDITION("Size properly set", size() == newSize);
 }
@@ -154,9 +144,7 @@ OMUInt64 OMDataStreamProperty::position(void) const
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
- 
-  OMUInt64 result = s->streamPosition(_stream);
+  OMUInt64 result = store()->streamPosition(_stream);
 
   POSTCONDITION("Valid position", (result >= 0) && (result <= size()));
   return result;
@@ -178,9 +166,7 @@ void OMDataStreamProperty::setPosition(const OMUInt64 offset) const
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
- 
-  s->streamSetPosition(_stream, offset);
+  store()->streamSetPosition(_stream, offset);
 
   POSTCONDITION("Position properly set", position() == offset);
 }
@@ -190,8 +176,7 @@ void OMDataStreamProperty::open(void)
   TRACE("OMDataStreamProperty::open");
   PRECONDITION("Stream not already opened", _stream == 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  _stream = s->openStream(name());
+  _stream = store()->openStream(name());
 
   POSTCONDITION("Stream opened", _stream != 0);
 }
@@ -201,8 +186,7 @@ void OMDataStreamProperty::create(void)
   TRACE("OMDataStreamProperty::create");
   PRECONDITION("Stream not already created", _stream == 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  _stream = s->createStream(name());
+  _stream = store()->createStream(name());
 
   POSTCONDITION("Stream opened", _stream != 0);
 }
@@ -212,8 +196,7 @@ void OMDataStreamProperty::close(void)
   TRACE("OMDataStreamProperty::close");
   PRECONDITION("Stream not already closed", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  s->closeStream(_stream);
+  store()->closeStream(_stream);
 
   POSTCONDITION("Stream closed", _stream == 0);
 }
@@ -238,8 +221,8 @@ void OMDataStreamProperty::read(OMByte* buffer,
   }
 
   ASSERT("Valid stream", _stream != 0);
-  OMStoredObject* s = _propertySet->container()->store();
-  s->readFromStream(_stream, buffer, bytes, bytesRead);
+
+  store()->readFromStream(_stream, buffer, bytes, bytesRead);
 }
 
   // @mfunc  Attempt to write the number of bytes given by <p bytes>
@@ -260,8 +243,7 @@ void OMDataStreamProperty::write(const OMByte* buffer,
   }
   ASSERT("Valid stream", _stream != 0);
 
-  OMStoredObject* s = _propertySet->container()->store();
-  s->writeToStream(_stream, buffer, bytes, bytesWritten);
+  store()->writeToStream(_stream, buffer, bytes, bytesWritten);
 }
 
   // @mfunc The size of the raw bits of this
