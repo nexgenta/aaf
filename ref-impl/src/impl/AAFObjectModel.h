@@ -3,27 +3,32 @@
 #ifndef __AAFObjectModel_h__
 #define __AAFObjectModel_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAFTypes.h"
 
@@ -104,7 +109,6 @@ private:
   void SortTypeDefinitions(void);
   void SortDefinitions(void);
   void InitializeClassDefinitions(void);
-  void InitializePrivateClassDefinitions(void);
   void InitializePropertyDefinitions(void);
   void InitializeTypeDefinitions(void);
   void InitializeAxiomaticDefinitions(void);
@@ -130,8 +134,8 @@ public:
     _axiomatic(false),
     _cyclic(false),
     _containsCycles(false),
-    _createDefinitionProc(0),
-    _initializeDefinitionProc(0)
+    _createDefinitionProc(NULL),
+    _initializeDefinitionProc(NULL)
   {}
 
   aafUID_constptr id(void) const { return _id; }
@@ -202,9 +206,8 @@ public:
                   aafUInt32 propertyCount,
                   PropertyDefinition ** propertyDefinitions) :
     Definition (name, id, concrete),
-    _privateClass(false),
     _parentId(parentId),
-    _parentClass(0),
+    _parentClass(NULL),
     _propertyCount(propertyCount),
     _propertyDefinitions(propertyDefinitions)
   {}
@@ -212,9 +215,7 @@ public:
   virtual void Initialize (void); // only the member data of this object
   virtual const ClassDefinition *classDefinition(void) const;
   virtual void makeAxiomatic (void) const; // override
-  void makePrivateClass(void) const;
 
-  bool privateClass(void) const { return _privateClass; }
   aafUID_constptr parentId(void) const { return _parentId; }
   const ClassDefinition * parentClass (void) const { return _parentClass; }
 
@@ -251,10 +252,8 @@ public:
 
 private:
   void makePropertiesAxiomatic(void) const;
-  void setPrivateClass (bool privateClass) { _privateClass = privateClass; }
 
 private:
-  bool _privateClass; // true if this class if private to the reference implementation
   aafUID_constptr _parentId;
   const ClassDefinition *_parentClass;
 
@@ -284,8 +283,8 @@ public:
     _required(required),
     _uid(uid),
     _classId(classId),
-    _typeDefinition(0),
-    _container(0)
+    _typeDefinition(NULL),
+    _container(NULL)
   {}
 
   virtual void Initialize (void); // only the member data of this object
@@ -387,7 +386,7 @@ public:
                         DefinitionEnumerationMember **members) :
     TypeDefinition (name, id, true /*always concrete*/),
     _typeId(typeId),
-    _typeDefinition(0),
+    _typeDefinition(NULL),
     _memberCount(memberCount),
     _members(members)
   {}
@@ -458,7 +457,7 @@ public:
                         aafUID_constptr elementTypeId) :
     TypeDefinition (name, id, true /*always concrete*/),
     _elementTypeId(elementTypeId),
-    _elementType(0)
+    _elementType(NULL)
   {}
 
   virtual void Initialize (void); // only the member data of this object
@@ -562,7 +561,7 @@ public:
     _typeId(typeId),
     _containerId(containerId),
     _fieldOffset(fieldOffset),
-    _typeDefinition(0)
+    _typeDefinition(NULL)
   {}
 
   virtual void Initialize (void); // only the member data of this object
@@ -594,7 +593,7 @@ public:
                        aafUID_constptr renamedTypeId) :
     TypeDefinition (name, id, true /*always concrete*/),
     _renamedTypeId(renamedTypeId),
-    _renamedType(0)
+    _renamedType(NULL)
   {}
 
   virtual void Initialize (void); // only the member data of this object
@@ -646,7 +645,7 @@ public:
                        aafUID_constptr stringTypeId) :
     TypeDefinition (name, id, true /*always concrete*/),
     _stringTypeId(stringTypeId),
-    _stringType(0)
+    _stringType(NULL)
   {}
 
   virtual void Initialize (void); // only the member data of this object
@@ -745,7 +744,7 @@ protected:
                        bool concrete) :
     TypeDefinition (name, id, concrete),
     _elementTypeId(elementTypeId),
-    _elementType(0)
+    _elementType(NULL)
   {}
 
 public:
@@ -783,7 +782,7 @@ protected:
                        bool concrete) :
     TypeDefinition (name, id, concrete),
     _targetId(targetId),
-    _target(0)
+    _target(NULL)
   {}
 
 public:
@@ -864,31 +863,13 @@ class TypeDefinitionWeakReference : public TypeDefinitionObjectReference
 public:
   TypeDefinitionWeakReference(aafCharacter_constptr name, 
                        aafUID_constptr id,
-                       aafUID_constptr targetId,
-                       aafUInt32 targetSetCount,
-                       aafUID_constptr * targetSet) :
-    TypeDefinitionObjectReference (name, id, targetId, true /*always concrete*/),
-    _targetSetCount(targetSetCount),
-    _targetSet(targetSet)
+                       aafUID_constptr targetId) :
+    TypeDefinitionObjectReference (name, id, targetId, true /*always concrete*/)
   {}
 
-  virtual void Initialize (void);
   virtual const ClassDefinition *classDefinition(void) const;
   virtual eAAFTypeCategory_e category(void) const { return kAAFTypeCatWeakObjRef; }
-
-  virtual void makeAxiomatic (void) const;
-
-  aafUInt32 targetSetCount(void) const { return _targetSetCount; }
-  aafUID_constptr targetAt(aafUInt32 index) const;
-  
-  
-private:
-  aafUInt32 _targetSetCount;
-  aafUID_constptr *_targetSet;
 };
-
-
-
 
 //
 // class for all of weak reference sets
@@ -930,10 +911,10 @@ class TypeDefinitionStream : public TypeDefinition
 public:
   TypeDefinitionStream(aafCharacter_constptr name, 
                        aafUID_constptr id,
-                       aafUID_constptr elementTypeId = 0) :
+                       aafUID_constptr elementTypeId = NULL) :
     TypeDefinition (name, id, true /*always concrete*/),
     _elementTypeId(elementTypeId),
-    _elementType(0)
+    _elementType(NULL)
   {}
 
   virtual void Initialize (void); // only the member data of this object
