@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -78,8 +79,8 @@ struct EssenceDataTest
 
   void cleanupReferences();
   void setBufferSize(aafUInt32 bufferSize);
-  void check(HRESULT hr);
-  void checkExpression(bool expression, HRESULT hr);
+  inline void check(HRESULT hr);
+  inline void checkExpression(bool expression, HRESULT hr);
   const char * convert(const wchar_t* pwcName);
 
   // Shared member data:
@@ -107,7 +108,7 @@ struct EssenceDataTest
 extern "C" HRESULT CAAFEssenceData_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t fileName[] = L"AAFEssenceDataTest.aaf";
+  wchar_t *fileName = L"AAFEssenceDataTest.aaf";
   EssenceDataTest edt;
 
   try
