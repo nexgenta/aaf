@@ -47,6 +47,8 @@
 #include "ImplAAFHeader.h"
 #endif
 
+#include "ImplEnumAAFPropertyValues.h"
+
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
 
@@ -59,7 +61,7 @@ extern "C" const aafClassID_t CLSID_AAFPropertyValue;
 ImplAAFTypeDefFixedArray::ImplAAFTypeDefFixedArray ()
   : _ElementType  ( PID_TypeDefinitionFixedArray_ElementType,  
                     L"ElementType", 
-                    L"/Dictionary/TypeDefinitions", 
+                    L"/MetaDictionary/TypeDefinitions", 
                     PID_MetaDefinition_Identification),
     _ElementCount ( PID_TypeDefinitionFixedArray_ElementCount, 
                     L"ElementCount")
@@ -104,6 +106,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsFixedArrayable())
 	return AAFRESULT_BAD_TYPE;
 
+  // Check if specified type definition is in the dictionary.
+  if( !aafLookupTypeDef( this, pTypeDef ) )
+	return AAFRESULT_TYPE_NOT_FOUND;
+
   return pvtInitialize (id, pTypeDef, nElements, pTypeName);
 }
 
@@ -141,6 +147,13 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT
+ImplAAFTypeDefFixedArray::GetElements (
+								ImplAAFPropertyValue * /*pInPropVal*/,
+								ImplEnumAAFPropertyValues ** /*ppEnum*/)
+{
+	return AAFRESULT_NOT_IN_CURRENT_VERSION;
+}
 
 // Override from AAFTypeDef
 AAFRESULT STDMETHODCALLTYPE
@@ -178,7 +191,7 @@ void ImplAAFTypeDefFixedArray::reorder(OMByte* externalBytes,
   aafUInt32 elem = 0;
 
   ImplAAFTypeDefSP ptd = BaseType ();
-  aafUInt32 elemSize = ptd->NativeSize ();
+  aafUInt32 elemSize = ptd->PropValSize ();
   aafInt32 numBytesLeft = externalBytesSize;
 
   for (elem = 0; elem < numElems; elem++)
@@ -212,7 +225,7 @@ void ImplAAFTypeDefFixedArray::externalize(OMByte* internalBytes,
   aafUInt32 elem = 0;
 
   ImplAAFTypeDefSP ptd = BaseType ();
-  aafUInt32 internalSize = ptd->NativeSize ();
+  aafUInt32 internalSize = ptd->ActualSize ();
   aafUInt32 externalSize = ptd->PropValSize ();
   if (internalSize == externalSize)
 	{
@@ -249,7 +262,7 @@ size_t ImplAAFTypeDefFixedArray::internalSize(OMByte* /*externalBytes*/,
   ImplAAFTypeDefSP ptd = BaseType ();
   assert (ptd->IsFixedSize ());
   // size_t result = _ElementCount * ptd->internalSize (0, 0);
-  size_t result = _ElementCount * ptd->NativeSize ();
+  size_t result = _ElementCount * ptd->ActualSize ();
   return result;
 }
 
@@ -265,7 +278,7 @@ void ImplAAFTypeDefFixedArray::internalize(OMByte* externalBytes,
 
   ImplAAFTypeDefSP ptd = BaseType ();
   assert (ptd->IsFixedSize ());
-  aafUInt32 internalElemSize = ptd->NativeSize ();
+  aafUInt32 internalElemSize = ptd->ActualSize ();
   aafUInt32 externalElemSize = ptd->PropValSize ();
   if (internalElemSize == externalElemSize)
 	{
@@ -367,15 +380,20 @@ OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMProperty
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefFixedArray::CreateValueFromValues (
-      ImplAAFPropertyValue ** ppElementValues,
-      aafUInt32  numElements,
-      ImplAAFPropertyValue ** ppPropVal)
+ImplAAFTypeDefFixedArray::ValidateInputParams (
+												  ImplAAFPropertyValue ** ppElementValues,
+												  aafUInt32  numElements)
+												  
 {
-	AAFRESULT hr;
+	//first call base impl.
+	HRESULT hr;
+	hr = ImplAAFTypeDefArray::ValidateInputParams(ppElementValues, numElements);
+	if (AAFRESULT_FAILED (hr)) 
+		return hr;
 
-	//first validate params + basic stuff ...
-	if (!ppElementValues || !ppPropVal)
+	//Next, do some additional specific checking for Fixed Array ...
+
+	if (!ppElementValues)
 		return AAFRESULT_NULL_PARAM;
 
 	//verify count
@@ -385,45 +403,12 @@ AAFRESULT STDMETHODCALLTYPE
 		return hr;
 	if (numElements != internalCount)
 		return AAFRESULT_DATA_SIZE;
+	
 
-	//verify that all the individual elem types are the same as each other,
-	// AND that each of them is FIXED Arrayable ...
+	return AAFRESULT_SUCCESS;
 
-	//get Base TD and size
-	ImplAAFTypeDefSP spTargetTD;
-	hr = GetType(&spTargetTD); //gets base elem type
-	if (AAFRESULT_FAILED (hr)) 
-		return hr;
-	aafUInt32 targetElemSize = spTargetTD->NativeSize();
+}//ValidateInputParams()
 
-	for (aafUInt32 i=0; i<numElements; i++)
-	{
-		//get  source size
-		ImplAAFTypeDefSP  spSourceTD;
-		hr = ppElementValues[i]->GetType (&spSourceTD);
-		if (AAFRESULT_FAILED (hr)) 
-			return hr;
-
-		//verify FIXED Arrayable
-		if (! spSourceTD->IsFixedArrayable())
-			return AAFRESULT_BAD_TYPE;
-
-		//verify that spTargetTD == spSourceTD
-		if (spSourceTD != spTargetTD )
-			return AAFRESULT_BAD_TYPE;
-
-		//verify that the target elem size is equal to that of source 
-		aafUInt32 sourceSize = spSourceTD->NativeSize();	
-		if (sourceSize != targetElemSize )
-			return AAFRESULT_BAD_SIZE;
-
-	}//for each elem
-
-	// All params validated; proceed ....
-
-	//... just defer to Base-Class Array implementation:
-	return ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues, numElements, ppPropVal);
-}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefFixedArray::RawAccessType (
@@ -449,6 +434,8 @@ bool ImplAAFTypeDefFixedArray::IsVariableArrayable () const
 bool ImplAAFTypeDefFixedArray::IsStringable () const
 { return false; }
 
+bool ImplAAFTypeDefFixedArray::IsArrayable(ImplAAFTypeDef * pSourceTypeDef) const
+{ return pSourceTypeDef->IsFixedArrayable(); }
 
 
 

@@ -41,23 +41,24 @@
 #include "ImplAAFDictionary.h"
 #endif
 
+#ifndef __ImplAAFTypeDefExtEnum_h__
+#include "ImplAAFTypeDefExtEnum.h"
+#endif
+
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 #include <string.h>
-
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <wchar.h>
 
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
   : _memberTypes ( PID_TypeDefinitionRecord_MemberTypes, 
                    L"MemberTypes", 
-                   L"/Dictionary/TypeDefinitions", 
+                   L"/MetaDictionary/TypeDefinitions", 
                    PID_MetaDefinition_Identification),
     _memberNames ( PID_TypeDefinitionRecord_MemberNames, 
                    L"MemberNames"),
@@ -66,7 +67,8 @@ ImplAAFTypeDefRecord::ImplAAFTypeDefRecord ()
 	_internalSizes (0),
 	_cachedCount ((aafUInt32) -1),
 	_cachedMemberTypes (0),
-	_registrationAttempted (kAAFFalse)
+	_registrationAttempted (kAAFFalse),
+	_defaultRegistrationUsed (kAAFFalse)
 {
   _persistentProperties.put(_memberTypes.address());
   _persistentProperties.put(_memberNames.address());
@@ -123,13 +125,15 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32 numMembers,
       const aafCharacter * pTypeName)
 {
+  if (isInitialized ()) return AAFRESULT_ALREADY_INITIALIZED;
+
   if (!ppMemberTypes && !pMemberNames && !pTypeName)
     return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
 
   hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
-	if (AAFRESULT_FAILED (hr))
+  if (AAFRESULT_FAILED (hr))
     return hr;
 
   _cachedCount = numMembers;
@@ -144,6 +148,10 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	  if (! ppMemberTypes[i]->IsAggregatable())
 		return AAFRESULT_BAD_TYPE;
+
+	  // Check if specified type definition is in the dictionary.
+	  if( !aafLookupTypeDef( this, ppMemberTypes[i] ) )
+		return AAFRESULT_TYPE_NOT_FOUND;
 
 	  totalNameSize += (wcslen (pMemberNames[i]) + 1);
 	}
@@ -165,7 +173,7 @@ AAFRESULT STDMETHODCALLTYPE
   for (i = 0; i < numMembers; i++)
 	{
 	  assert (ppMemberTypes[i]);
-	  _memberTypes.setValueAt(ppMemberTypes[i], i);
+	  _memberTypes.insertAt(ppMemberTypes[i], i);
 //	  aafUID_t typeUID;
 //	  AAFRESULT hr = ppMemberTypes[i]->GetAUID(&typeUID);
 //	  assert (AAFRESULT_SUCCEEDED(hr));
@@ -186,6 +194,8 @@ AAFRESULT STDMETHODCALLTYPE
 //  delete[] buf;
   _memberNames.setValue (namesBuf, totalNameSize * sizeof(aafCharacter));
   delete[] namesBuf;
+
+  setInitialized ();
 
   return AAFRESULT_SUCCESS;
 }
@@ -240,7 +250,7 @@ AAFRESULT STDMETHODCALLTYPE
   for (i = 0; i < numMembers; i++)
 	{
 //	  buf[i] = *pMemberTypeIDs[i];
-	  _memberTypes.setValueAt(pMemberTypes[i], i);
+	  _memberTypes.insertAt(pMemberTypes[i], i);
 
 	  wcscpy(tmpNamePtr, pMemberNames[i]);
 	  // +1 to go past embedded null
@@ -263,6 +273,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   AAFRESULT hr;
   aafUInt32 count;
+
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
 
   if (!ppTypeDef) return AAFRESULT_NULL_PARAM;
   
@@ -314,6 +326,8 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   aafUInt32 indexIntoProp;
   aafUInt32 currentIndex;
+
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
 
   if (!pName) return AAFRESULT_NULL_PARAM;
   
@@ -379,6 +393,8 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 indexIntoProp;
   aafUInt32 currentIndex;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
+
   if (!pLen) return AAFRESULT_NULL_PARAM;
   
   hr = GetCount(&count);
@@ -443,6 +459,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   aafUInt32 count;
   AAFRESULT hr;
+
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
 
   if (!pMemberValues) return AAFRESULT_NULL_PARAM;
   if (!ppPropVal) return AAFRESULT_NULL_PARAM;
@@ -519,6 +537,8 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32 initDataSize,
       ImplAAFPropertyValue ** ppPropVal)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
+
   if (! pInitData)
 	return AAFRESULT_NULL_PARAM;
   if (! ppPropVal)
@@ -571,10 +591,49 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   AAFRESULT hr;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pInPropVal)   return AAFRESULT_NULL_PARAM;
   if (!ppOutPropVal) return AAFRESULT_NULL_PARAM;
 
-  hr = GetCount (&count);
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow record
+  // and extendable enumeration type properties to be read by this 
+  // type def.
+  eAAFTypeCategory_t        type_category = kAAFTypeCatUnknown;
+  ImplAAFTypeDefRecordSP    pActualRecordType;
+
+  pInPropType->GetTypeCategory( &type_category );
+
+  if( type_category == kAAFTypeCatExtEnum )
+  {
+      // Cast input prop value type to ExtEnum.
+      ImplAAFTypeDefExtEnum	*pExtEnumType = 
+	  dynamic_cast<ImplAAFTypeDefExtEnum*>( (ImplAAFTypeDef*)pInPropType );
+      if( !pExtEnumType )
+	return AAFRESULT_BAD_TYPE;
+
+      // Now get base type of ExtEnum and cast it to Record.
+      ImplAAFTypeDefSP	pBaseType;
+      pBaseType = pExtEnumType->BaseType();
+      pActualRecordType = dynamic_cast<ImplAAFTypeDefRecord*>( (ImplAAFTypeDef*)pBaseType );
+      if( pActualRecordType == NULL )
+	  return AAFRESULT_BAD_TYPE;
+  }
+  else if( type_category == kAAFTypeCatRecord )
+  {
+      pActualRecordType = this;
+  }
+  else
+      return AAFRESULT_BAD_TYPE;
+
+
+  hr = pActualRecordType->GetCount (&count);
   if (AAFRESULT_FAILED(hr)) return hr;
   if (index >= count) return AAFRESULT_ILLEGAL_VALUE;
 
@@ -586,10 +645,13 @@ AAFRESULT STDMETHODCALLTYPE
   // add up offsets of previous items
   for (aafUInt32 i = 0; i < index; i++)
 	{
-	  hr = GetMemberType (i, &ptd);
+	  hr = pActualRecordType->GetMemberType (i, &ptd);
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (ptd);
-	  offset += ptd->PropValSize();
+	  if(pActualRecordType->IsRegistered())
+		  offset += ptd->NativeSize();
+	  else
+		  offset += ptd->PropValSize();
 	}
 
   // offset now points into prop storage
@@ -602,7 +664,7 @@ AAFRESULT STDMETHODCALLTYPE
   // many.  Put us back to normal.
   pvdOut->ReleaseReference ();
 
-  hr = GetMemberType (index, &ptd);
+  hr = pActualRecordType->GetMemberType (index, &ptd);
   assert (AAFRESULT_SUCCEEDED (hr));
   assert (ptd);
 
@@ -613,10 +675,21 @@ AAFRESULT STDMETHODCALLTYPE
   pvdIn = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
   assert (pvdIn);
 
-  hr = pvdOut->AllocateFromPropVal (pvdIn,
+
+  if(pActualRecordType->IsRegistered())
+  {
+	  hr = pvdOut->AllocateFromPropVal (pvdIn,
+									offset,
+									ptd->NativeSize(),
+									NULL);
+  }
+  else
+  {
+	  hr = pvdOut->AllocateFromPropVal (pvdIn,
 									offset,
 									ptd->PropValSize(),
 									NULL);
+  }
   if (AAFRESULT_FAILED(hr)) return hr;
   assert (ppOutPropVal);
   *ppOutPropVal = pvdOut;
@@ -633,6 +706,7 @@ AAFRESULT STDMETHODCALLTYPE
       aafMemPtr_t pData,
       aafUInt32 dataSize)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (! pPropVal)
 	return AAFRESULT_NULL_PARAM;
   if (! pData)
@@ -641,6 +715,22 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_NOT_REGISTERED;
   if (dataSize != NativeSize())
 	return AAFRESULT_ILLEGAL_VALUE;
+
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow integral
+  // and enumeration type properties to be read by this integral type def.
+  //
+  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
+  pInPropType->GetTypeCategory( &type_category );
+  if( type_category != kAAFTypeCatExtEnum  &&  
+      type_category != kAAFTypeCatRecord )
+	return AAFRESULT_BAD_TYPE;
 
   aafUInt32 bitsSize = 0;
   ImplAAFPropValData * pvd = 0;
@@ -674,10 +764,48 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   AAFRESULT hr;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pPropVal)   return AAFRESULT_NULL_PARAM;
   if (!pMemberPropVal) return AAFRESULT_NULL_PARAM;
 
-  hr = GetCount (&count);
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow integral
+  // and enumeration type properties to be read by this integral type def.
+  //
+  eAAFTypeCategory_t        type_category = kAAFTypeCatUnknown;
+  ImplAAFTypeDefRecordSP    pActualRecordType;
+
+  pInPropType->GetTypeCategory( &type_category );
+
+  if( type_category == kAAFTypeCatExtEnum )
+  {
+      // Cast input prop value type to ExtEnum.
+      ImplAAFTypeDefExtEnum	*pExtEnumType = 
+	  dynamic_cast<ImplAAFTypeDefExtEnum*>( (ImplAAFTypeDef*)pInPropType );
+      if( !pExtEnumType )
+	return AAFRESULT_BAD_TYPE;
+
+      // Now get base type of ExtEnum and cast it to Record.
+      ImplAAFTypeDefSP	pBaseType;
+      pBaseType = pExtEnumType->BaseType();
+      pActualRecordType = dynamic_cast<ImplAAFTypeDefRecord*>( (ImplAAFTypeDef*)pBaseType );
+      if( pActualRecordType == NULL )
+	  return AAFRESULT_BAD_TYPE;
+  }
+  else if( type_category == kAAFTypeCatRecord )
+  {
+      pActualRecordType = this;
+  }
+  else
+      return AAFRESULT_BAD_TYPE;
+
+  hr = pActualRecordType->GetCount (&count);
   if (AAFRESULT_FAILED(hr)) return hr;
   if (index <= count) return AAFRESULT_ILLEGAL_VALUE;
 
@@ -689,7 +817,7 @@ AAFRESULT STDMETHODCALLTYPE
   // add up offsets of previous items
   for (aafUInt32 i = 0; i < index; i++)
 	{
-	  hr = GetMemberType (i, &ptd);
+	  hr = pActualRecordType->GetMemberType (i, &ptd);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  assert (ptd);
 	  offset += ptd->PropValSize();
@@ -697,7 +825,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // offset now points into prop storage
 
-  hr = GetMemberType (index, &ptd);
+  hr = pActualRecordType->GetMemberType (index, &ptd);
   assert (AAFRESULT_SUCCEEDED (hr));
   assert (ptd);
 
@@ -733,10 +861,27 @@ AAFRESULT STDMETHODCALLTYPE
       aafMemPtr_t pData,
       aafUInt32 dataSize)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (! pPropVal)
 	return AAFRESULT_NULL_PARAM;
   if (! pData)
 	return AAFRESULT_NULL_PARAM;
+
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow integral
+  // and enumeration type properties to be read by this integral type def.
+  //
+  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
+  pInPropType->GetTypeCategory( &type_category );
+  if( type_category != kAAFTypeCatExtEnum  &&  
+      type_category != kAAFTypeCatRecord )
+	return AAFRESULT_BAD_TYPE;
 
   // Bobt hack implementation! Not platform-independent!
   aafUInt32 bitsSize = 0;
@@ -748,7 +893,7 @@ AAFRESULT STDMETHODCALLTYPE
   hr = pvd->GetBitsSize (&bitsSize);
   if (AAFRESULT_FAILED(hr))
 	return hr;
-  if (dataSize > bitsSize)
+  if (dataSize != bitsSize)
 	return AAFRESULT_ILLEGAL_VALUE;
 
   aafMemPtr_t pBits;
@@ -767,6 +912,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::GetCount (
       aafUInt32 *  pCount) const
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pCount) return AAFRESULT_NULL_PARAM;
   if (_cachedCount == ((aafUInt32) -1))
 	((ImplAAFTypeDefRecord*)this)->_cachedCount =
@@ -787,12 +933,33 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 count;
   AAFRESULT hr;
 
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
+
   if (! pOffsets) return AAFRESULT_NULL_PARAM;
 
   hr = GetCount (&count);
   if (AAFRESULT_FAILED(hr)) return hr;
 
   if (numMembers != count) return AAFRESULT_ILLEGAL_VALUE;
+
+
+  if (_defaultRegistrationUsed)
+	{
+	  return AAFRESULT_DEFAULT_ALREADY_USED;
+	}
+
+  aafUInt32 i;
+  for (i = 0; i < numMembers; i++)
+	{
+	  ImplAAFTypeDefSP ptd;
+	  hr = GetMemberType (i, &ptd);
+	  if (AAFRESULT_FAILED (hr))
+		return hr;
+	  if (! ptd->IsRegistered())
+		{
+		  return AAFRESULT_NOT_REGISTERED;
+		}
+	}
 
   if (_registeredOffsets) delete[] _registeredOffsets;
   _registeredOffsets = new aafUInt32[numMembers];
@@ -801,7 +968,7 @@ AAFRESULT STDMETHODCALLTYPE
   pvtInitInternalSizes ();
   assert (_internalSizes);
 
-  for (aafUInt32 i = 0; i < numMembers; i++)
+  for (i = 0; i < numMembers; i++)
 	{
 	  _registeredOffsets[i] = pOffsets[i];
 	  if ((numMembers-1) == i)
@@ -827,6 +994,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefRecord::GetTypeCategory (eAAFTypeCategory_t *  pTid)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   if (!pTid) return AAFRESULT_NULL_PARAM;
   *pTid = kAAFTypeCatRecord;
   return AAFRESULT_SUCCESS;
@@ -900,18 +1068,27 @@ void ImplAAFTypeDefRecord::externalize(OMByte* internalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  internalMemberSize = _internalSizes[member];
+	  //internalMemberSize = _internalSizes[member];
+          internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
+
 	  ptdm->externalize (internalBytes,
 						 internalMemberSize,
 						 externalBytes,
 						 externalMemberSize,
 						 byteOrder);
 	  externalBytes += externalMemberSize;
-	  internalBytes += internalMemberSize;
+	  internalBytes += _internalSizes[member]; //internalMemberSize;
 	  externalNumBytesLeft -= externalMemberSize;
-	  internalNumBytesLeft -= internalMemberSize;
+	  internalNumBytesLeft -= _internalSizes[member]; //internalMemberSize;
 	  assert (externalNumBytesLeft >= 0);
 	  assert (internalNumBytesLeft >= 0);
+	}
+
+  if (! _defaultRegistrationUsed && (! IsRegistered ()))
+	{
+	  // cast away const-ness
+	  ((ImplAAFTypeDefRecord*)this)->
+		_defaultRegistrationUsed = kAAFTrue;
 	}
 }
 
@@ -955,7 +1132,8 @@ void ImplAAFTypeDefRecord::internalize(OMByte* externalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  internalMemberSize = _internalSizes[member];
+	  //internalMemberSize = _internalSizes[member];
+          internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
 
 	  ptdm->internalize (externalBytes,
 						 externalMemberSize,
@@ -963,11 +1141,18 @@ void ImplAAFTypeDefRecord::internalize(OMByte* externalBytes,
 						 internalMemberSize,
 						 byteOrder);
 	  externalBytes += externalMemberSize;
-	  internalBytes += internalMemberSize;
+	  internalBytes += _internalSizes[member]; //internalMemberSize;
 	  externalNumBytesLeft -= externalMemberSize;
-	  internalNumBytesLeft -= internalMemberSize;
+	  internalNumBytesLeft -= _internalSizes[member]; //internalMemberSize;
 	  assert (externalNumBytesLeft >= 0);
 	  assert (internalNumBytesLeft >= 0);
+	}
+
+  if (! _defaultRegistrationUsed && (! IsRegistered ()))
+	{
+	  // cast away const-ness
+	  ((ImplAAFTypeDefRecord*)this)->
+		_defaultRegistrationUsed = kAAFTrue;
 	}
 }
 
@@ -1050,6 +1235,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::RawAccessType (
       ImplAAFTypeDef ** ppRawTypeDef)
 {
+  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
   // Return variable array of unsigned char
   return pvtGetUInt8Array8Type (ppRawTypeDef);
 }

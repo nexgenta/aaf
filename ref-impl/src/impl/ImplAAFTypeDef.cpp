@@ -39,10 +39,7 @@
 
 #include <assert.h>
 #include <string.h>
-
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <wchar.h>
 
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
@@ -156,6 +153,15 @@ size_t ImplAAFTypeDef::NativeSize (void) const
   // Should be implemented in derived class.
   assert (0);
   return 0; // not reached!
+}
+
+
+size_t ImplAAFTypeDef::ActualSize (void) const
+{
+  if (IsRegistered())
+    return NativeSize();
+  else
+    return PropValSize();
 }
 
 

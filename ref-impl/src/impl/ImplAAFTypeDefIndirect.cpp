@@ -25,6 +25,10 @@
 *
 ************************************************************************/
 
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
+#endif
+
 #ifndef __ImplAAFTypeDefIndirect_h__
 #include "ImplAAFTypeDefIndirect.h"
 #endif
@@ -91,7 +95,7 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 static void formatError(DWORD errorCode)
 {
-#if defined(_WIN32) || defined(WIN32)
+#if defined( OS_WINDOWS )
   char message[256];
 
   int status = FormatMessageA(
@@ -112,9 +116,11 @@ static void formatError(DWORD errorCode)
   } else {
     cerr << "Error code = " << hex << errorCode << dec << endl;
   }
+
 #else
   cerr << "Error code = " << hex << errorCode << dec << endl;
-#endif
+
+#endif  // OS_WINDOWS
 }
 
 static void checkResult(AAFRESULT resultCode)
@@ -177,14 +183,15 @@ static AAFRESULT GetPropertyInfo (
   
 	// Compute the actual data size.
 	//
-  actualValueSize = indirectProperty.bitsSize();
+	actualValueSize = indirectProperty.bitsSize();
 	if (0 < actualValueSize)
 	{
-    actualValueSize -= pIndirectType->GetIndirectValueOverhead ();
-    assert (0 <= actualValueSize);
-		if (0 > actualValueSize)
-			return (AAFRESULT_INVALID_OBJ);
-  }
+	    aafUInt32	valueOverhead = pIndirectType->GetIndirectValueOverhead ();
+	    assert (actualValueSize >= valueOverhead);
+	    if (actualValueSize < valueOverhead)
+		return (AAFRESULT_INVALID_OBJ);
+	    actualValueSize -= valueOverhead;
+	}
 
   if (ppObject)
 		*ppObject = pObject;
@@ -778,6 +785,9 @@ AAFRESULT STDMETHODCALLTYPE
   if (!supportedActualType (pActualType))
     return AAFRESULT_INVALID_PARAM;
 
+  // Any padding and offsets must be registered to use this method.
+  if (!pActualType->IsRegistered())
+    return AAFRESULT_NOT_REGISTERED;
 
   // If this type is registered then this type's id will be written into the
   // new indirect type value (*pPropVal).
@@ -1123,6 +1133,11 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED(result))
     return result;
 
+
+  // Any padding and offsets must be registered to use this method.
+  if (!pActualType->IsRegistered())
+    return AAFRESULT_NOT_REGISTERED;
+
   //
   // Now we are ready to copy the bits from remaining bits of the
   // indirect value into the given data pointer.
@@ -1185,7 +1200,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 
 void ImplAAFTypeDefIndirect::reorder(OMByte* externalBytes,
-                       size_t externalBytesSize) const
+                       size_t ANAME(externalBytesSize)) const
 {
   TRACE("ImplAAFTypeDefIndirect::reorder");
   PRECONDITION("Object has been initialized", _initialized);
@@ -1238,10 +1253,10 @@ size_t ImplAAFTypeDefIndirect::externalSize(OMByte* internalBytes,
 
 void ImplAAFTypeDefIndirect::externalize(
   OMByte* internalBytes,
-  size_t internalBytesSize,
+  size_t ANAME(internalBytesSize),
   OMByte* externalBytes,
   size_t externalBytesSize,
-  OMByteOrder byteOrder) const
+  OMByteOrder NNAME(byteOrder)) const
 {
   TRACE("ImplAAFTypeDefIndirect::externalize");
   PRECONDITION("Object has been initialized", _initialized);
@@ -1308,8 +1323,8 @@ void ImplAAFTypeDefIndirect::internalize(
   OMByte* externalBytes,
   size_t externalBytesSize,
   OMByte* internalBytes,
-  size_t internalBytesSize,
-  OMByteOrder byteOrder) const
+  size_t ANAME(internalBytesSize),
+  OMByteOrder ANAME(byteOrder)) const
 {
   TRACE("ImplAAFTypeDefIndirect::internalize");
   PRECONDITION("Object has been initialized", _initialized);
