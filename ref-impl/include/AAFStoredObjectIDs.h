@@ -33,13 +33,12 @@
 #define AUID_AAFDataDefinition AUID_AAFDataDef
 #define AUID_AAFDefinitionObject AUID_AAFDefObject
 #define AUID_AAFEdgeCode AUID_AAFEdgecode
-#define AUID_AAFEffectDefinition AUID_AAFEffectDef
+#define AUID_AAFOperationDefinition AUID_AAFOperationDef
 #define AUID_AAFEssenceGroup AUID_AAFMediaGroup
 #define AUID_AAFFilmDescriptor AUID_AAFMediaFilmDescriptor
 #define AUID_AAFInterchangeObject AUID_AAFObject
 #define AUID_AAFJPEGImageData AUID_AAFJPEGData
 #define AUID_AAFMIDIFileData AUID_AAFMIDIData
-#define AUID_AAFMIDIFileDescriptor AUID_AAFMIDIDescriptor
 #define AUID_AAFParameterDefinition AUID_AAFParameterDef
 #define AUID_AAFPropertyDefinition AUID_AAFPropertyDef
 #define AUID_AAFTypeDefinition AUID_AAFTypeDef
