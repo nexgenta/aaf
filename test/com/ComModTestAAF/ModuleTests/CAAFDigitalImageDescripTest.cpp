@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFDigitalImageDescriptor
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDigitalImageDescripTest.cpp,v 1.28 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFDigitalImageDescripTest.cpp,v 1.29 2004/04/08 09:35:45 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,6 +67,10 @@ static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
 {0x4b8a7f32, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
+
+static const aafUID_t kAAFTEST_Gamma =
+{ 0xf866a603, 0xf254, 0x4f71, { 0x8e, 0x5a, 0x93, 0x32, 0xae, 0x5d, 0x8b, 0x66 } };
 
 
 // Cross-platform utility to delete a file.
@@ -215,9 +219,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal));
     checkResult(pDIDesc->SetImageAlignmentFactor(kImageAlignmentFactorTestVal));
 
-//!!!    ratio.numerator = kGammaNumTestVal;
-//    ratio.denominator = kGammaDenTestVal;
-//    checkResult(pDIDesc->SetGamma(ratio));
+    checkResult(pDIDesc->SetGamma(kAAFTEST_Gamma));
 
     // Save the initialized descriptor with the source mob.
     checkResult(pDIDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc));
@@ -352,9 +354,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
                     AAFRESULT_TEST_FAILED);
 
 		checkResult(pDIDesc->GetGamma(&gamma));
-//!!!		checkExpression(ratio.numerator == kGammaNumTestVal &&
-//			              ratio.denominator == kGammaDenTestVal,
- //                   AAFRESULT_TEST_FAILED);
+				checkResult(pDIDesc->GetGamma(&gamma));
+		checkExpression(memcmp(&gamma,&kAAFTEST_Gamma, sizeof(kAAFTEST_Gamma))==0,AAFRESULT_TEST_FAILED);
+
   }
   catch (HRESULT& rResult)
   {
