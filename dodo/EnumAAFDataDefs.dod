@@ -2,6 +2,7 @@
 EnumAAFDataDefinitions\
 #endm
 #c
+#import ./AAFUnitTest.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -32,7 +33,7 @@ AD_XMETHOD3(Next,
 			objOut, AAFDataDefinition, ppDataDefinition, array to receive data definitions,
 			[out\,ref], objPass, aafUInt32 *, pFetched,
 			number of actual DataDefinition fetched into ppDataDefinition array,
-			Enumerates the next count elements \(AAFDataDefinition pointers\) in 
+			Enumerates the next count elements \(AD_AAFTYPES\(AAFDataDefinition\) pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
   // properly releasing the returned pointers.)
@@ -40,7 +41,7 @@ AD_XMETHOD3(Next,
 AD_METHOD1(Skip,
 		   [in], aafUInt32, count, Number of elements to skip,
 		   Instructs the enumerator to skip the next count elements in the enumeration so that 
-  // the next call to EnumAAFDataDefinition::Next will not return 
+  // the next call to AD_AAFTYPES\(EnumAAFDataDefinition\)::Next will not return 
   // those elements.)
 
 AD_METHOD0(Reset,
@@ -50,11 +51,13 @@ Instructs the enumerator to position itself at the beginning of the list of elem
   // the same order. The exact behavior depends on the collection being enumerated.)
 
 AD_XMETHOD1(Clone,
-			[out\,retval], objOut, EnumAAFDataDefinitions, ppEnum, new enumeration,
+			[out\,retval], objOut, EnumAAFDataDefinition, ppEnum, new enumeration,
 			Creates another data definition enumerator with the same state as the current 
   // enumerator to iterate over the same list. This method makes it possible to 
   // record a point in the enumeration sequence in order to return to that point 
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
+
+AD_OVERRIDE(.method-Test)
 
 AD_ROOT_CLASS_END

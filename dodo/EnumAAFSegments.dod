@@ -2,6 +2,7 @@
 EnumAAFSegments\
 #endm
 #c
+#import ./AAFUnitTest.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -36,7 +37,7 @@ AD_XMETHOD3(Next,
 			objOut, AAFSegment, ppSegments, array to receive segments,
 			[out\,ref], objPass, aafUInt32 *, pFetched,
 			number of actual Segments fetched into ppSegments array,
-			Enumerates the next count elements \(AAFSegment pointers\) in 
+			Enumerates the next count elements \(AD_AAFTYPES\(AAFSegment\) pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
   // properly releasing the returned pointers.)
@@ -44,7 +45,7 @@ AD_XMETHOD3(Next,
 AD_METHOD1(Skip,
 		   [in], aafUInt32, count, Number of elements to skip,
 		   Instructs the enumerator to skip the next count elements in the enumeration so that 
-  // the next call to EnumAAFSegments::Next will not return 
+  // the next call to AD_AAFTYPES\(EnumAAFSegments\)::Next will not return 
   // those elements.)
 
 AD_METHOD0(Reset,
@@ -64,5 +65,7 @@ AD_XMETHOD1(Clone,
   // record a point in the enumeration sequence in order to return to that point 
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
+
+AD_OVERRIDE(.method-Test)
 
 AD_ROOT_CLASS_END
