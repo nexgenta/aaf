@@ -1,73 +1,109 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
 #startm .this-module 0
-AAFTypeDef\
+AAFTypeDefinition\
 #endm
 #c
 #startm .parent-module 0
-AAFMetaDefinition\
+AAFDefinitionObject\
 #endm
 #c
 AD_HEAD
-AD_IDL(//
-// This interface is used to define types used in AAF persistent
-// objects.
-AD_STD_COMMENT_IFC_HEADER
-AD_STD_COMMENT_IFC_INIT)
+
+AD_INCLUDE(AAFTypes)
+AD_FORWARD_DECLARATION(AAFReferenceValue)
+AD_FORWARD_DECLARATION(EnumAAFReferenceValues)
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/*************************************************************************
+ * 
+ * @class AAFTypeDefinition | AAFTypeDefinition defines a property type.
+ *
+ * @base public | AAFDefinitionObject
+ *
+ *************************************************************************/
 AD_CLASS_UUID(dfbd6524, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(dfbd6523, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
-AD_XCLASS_BEGIN(Abstract, StoredObject)
-AD_XMETHOD1(GetTypeCategory,
-			[out],
-			objPass,
-			eAAFTypeCategory_t *,
-			pTid,
-			Returned type category,
-			Returns the type category to which this type definition	belongs.
-  // 
-  // Succeeds if:
-  // - The pTid argument is valid
-  AD_STD_COMMENT_METH_ERR_HEADER
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pTid\))
+AD_CLASS_BEGIN
 
+AD_METHOD1(GetName,
+		   [retval][out],
+		   aafString_t *,
+		   pstrName,
+		   Pointer to name,
+		   Gets the unique name that identifies this datakind object.)
 
-AD_NO_EXPORT(
-AD_XMETHOD1(RawAccessType\,
-			[out]\,
-			objOut\,
-			AAFTypeDef\,
-			ppRawTypeDef\,
-			the raw access type definition\,
+AD_METHOD1(GetMinVersion,
+		   [retval][out],
+		   aafVersionType_t *,
+		   pMinVersion,
+		   Pointer to the minimum version ,
+		   Gets the Minimum AAF Version for this type object.)
 
-     This method returns the type def through which values of this
-  // type may be accessed if the client wishes to access the value as
-  // as raw data.
-  AD_STD_COMMENT_METH_STUB
-  // 
-  // Succeeds if:
-  // - The ppRawTYPEDEF argument is valid
-  AD_STD_COMMENT_METH_ERR_HEADER
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\\\(ppRawTypeDef\\\)\))
+AD_METHOD1(SetMinVersion,
+		   [in],
+		   aafVersionType_t,
+		   MinVersion,
+		   Minimum AAF Version,
+		   Sets the Minimum AAF Version for type definition.)
 
+AD_METHOD1(GetMaxVersion,
+		   [retval][out],
+		   aafVersionType_t *,
+		   pMaxVersion,
+		   Pointer to the maximum version ,
+		   Gets the Maximum AAF Version for this type object.)
 
-AD_XCLASS_END(Abstract, StoredObject)
+AD_METHOD1(SetMaxVersion,
+		   [in],
+		   aafVersionType_t,
+		   MaxVersion,
+		   Maximum AAF Version,
+		   Sets the Maximum AAF Version for type definition.)
+
+AD_METHOD1(GetSwapNeeded,
+		   [retval][out],
+		   aafSwapNeeded_t,
+		   SwapNeeded,
+		   Specifies wheter the bytes in this type need to be swapped,
+		   Gets the swap information for this object.)
+
+AD_METHOD1(SetSwapNeeded,
+		   [in],
+		   aafSwapNeeded_t,
+		   SwapNeeded,
+		   Specifies wheter the bytes in this type need to be swapped,
+		   Sets the swap information for this object.)
+
+AD_XMETHOD1(AppendRefValue,
+			[in\,ref],
+			objIn,
+			AAFReferenceValue,
+			pRefValue, 
+			Ref value to be added,
+			Add the reference value  to the property definition.)
+
+AD_XMETHOD1(RemoveRefValue,
+			[in\,ref],
+			objIn,
+			AAFReferenceValue,
+			pRefValue, 
+			Ref value to be removed,
+			Remove the reference value from the property definition.)
+
+AD_XMETHOD1(GetRefValues,
+			[out\,retval],
+			objOut,
+			EnumAAFReferenceValues,
+			ppEnum, 
+			Reference value Enumeration,
+			Return an enumerator for the reference values.)
+
+AD_CLASS_END
