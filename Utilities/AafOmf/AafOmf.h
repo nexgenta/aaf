@@ -1,5 +1,3 @@
-#ifndef _AAF_OMF_
-#define _AAF_OMF_	1
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -50,21 +48,8 @@
 #include "AAFParameterDefs.h"
 #include "AAFInterpolatorDefs.h"
 #include "AAFTypeDefUIDs.h"
-#include "StreamLogger.h"
-
-//#ifndef _INCLUDED_OMF2_
-//#define _INCLUDED_OMF2_
-//namespace OMF2
-//{
-//#include "omPublic.h"
-//#include "omMedia.h"
-//}
-//#endif
 
 const int MAX_INDENT = 8;
-const unsigned	kLogError = 0; 	// Error level.
-const unsigned	kLogWarn 	= 1;  // Warning level.
-const unsigned	kLogInfo  = 2; 	// Informational level.
 
 // ============================================================================
 // simple helper class to initialize and cleanup COM library.
@@ -115,13 +100,10 @@ typedef struct _AafOmfGlobals
 	char			sOutFileName[256];
 	char			sLogFileName[256];
 	char*			pProgramName;
-	StreamLogger*		pLogger;
 
 	// MC Private Properties
 	OMF2::omfProperty_t		pvtEffectIDProp;
 	OMF2::omfProperty_t		pvtAppCode;
-	OMF2::omfProperty_t		pvtAttributes;
-	OMF2::omfProperty_t		pvtDataAttribute;
 
 	// Codec Properties
 	OMF2::omfProperty_t		omCDCIComponentWidth;
@@ -131,7 +113,6 @@ typedef struct _AafOmfGlobals
 	OMF2::omfProperty_t		omCDCIWhiteReferenceLevel;
 	OMF2::omfProperty_t		omCDCIColorRange;
 	OMF2::omfProperty_t		omCDCIPaddingBits;
-	~_AafOmfGlobals( void )		{ delete pLogger; }
 } AafOmfGlobals;
 
 int deleteFile( char* fileName );
@@ -143,10 +124,97 @@ AAFRESULT aafMobIDFromMajorMinor(
 		aafUInt32	minor,
 		aafUID_t *mobID);     /* OUT - Newly created Mob ID */
 void RegisterCodecProperties(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession);
+void RegisterOMFMCPrivate(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession);
+void RegisterAAFMCPrivate(IAAFDictionary * dict);
+HRESULT SetIntegerPropOnObject(IAAFObject* pObj, aafUID_t* pClassID, aafUID_t* pPropID, const aafUID_t* pIntTypeID,
+							   aafMemPtr_t pValue, aafUInt32 ValueSize, IAAFDictionary *dict);
 
+HRESULT GetIntegerPropFromObject(IAAFObject* pObj, const aafUID_t* pClassID, aafUID_t* pPropID,
+								 const aafUID_t* pIntTypeID, aafMemPtr_t pValue, aafUInt32 ValueSize, IAAFDictionary *dict);
 
-#define COMMON_ERR_BASE		(AAFRESULT)0xE0000000
-#define AAF2OMF_ERR_BASE	(AAFRESULT)0xE0001000
-#define OMF2AAF_ERR_BASE	(AAFRESULT)0xE0006000
-#define AAFRESULT_FILE_NOT_OMF (OMF2AAF_ERR_BASE + 1)
-#endif
+const aafUID_t AUID_PropertyMobAppCode = { 0x96c46992, 0x4f62, 0x11d3, { 0xa0, 0x22, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
+
+#define MAX_EFFECT_COLORS		16
+
+typedef	unsigned long	AvFixed30;
+typedef	unsigned long	AvFixed16;
+
+typedef struct
+	{
+	unsigned char 		hue;
+	unsigned char 		sat;
+	unsigned char 		lum;
+	unsigned char		dep;
+	} hsl8Color_t, **hsl8ColorHdl;
+
+typedef	struct
+	{
+	AvFixed16	top;
+	AvFixed16	left;
+	AvFixed16	bottom;
+	AvFixed16	right;
+	unsigned char		Lvl2Xscale;
+	unsigned char		Lvl2Yscale;
+	unsigned char		Lvl2Xpos;
+	unsigned char		Lvl2Ypos;
+	} OMFIPvtFixedRect;
+
+typedef struct
+	{
+	long		cookie;
+	long		revision;
+	long	    selected;			// Boolean would have struct alignment problems x-platform
+	AvFixed30	percentTime;
+	AvFixed30	level;
+	AvFixed16	posX;
+	AvFixed16	XFloor;
+	AvFixed16	XCeiling;
+	AvFixed16	posY;
+	AvFixed16	YFloor;
+	AvFixed16	YCeiling;
+	AvFixed16	Xscale;
+	AvFixed16	Yscale;
+
+	AvFixed16	cropLeft;
+	AvFixed16	cropRight;
+	AvFixed16	cropTop;
+	AvFixed16	cropBottom;
+	
+	OMFIPvtFixedRect	Box;
+	long				borderWidth;
+	long				borderSoft;
+	long				nColors;
+	
+	short				secondGain;
+	short				spillGain;
+	
+	short				secondSoft;
+	short				spillSoft;
+
+	char				enableKeyFlags;
+	char				pad1;
+
+	hsl8Color_t 		colors[MAX_EFFECT_COLORS];
+
+// userParamSize must ALWAYS be the last field of this structure.  It doesn't have to
+// be the last one written to the domain, but it must be the last one here.  userParamSize
+// must always remain a long because people are using it to determine the position of the
+// userParams which is glommed on the end.  POC.
+
+	long				userParamSize;
+// the userParams are just glommed onto the end of this structure at this position.  POC.
+
+	} OMFIPvtKFInfo_t;
+
+typedef struct
+	{
+	long				cookie;
+	long				rev;
+	long				kfCurrent;
+	long				kfSmooth;
+	short				colorItem;
+	short				quality;
+	unsigned char		isReversed;
+	unsigned char		ScalesDetached;
+	} OMFIPvtGlobalInfo_t;
+
