@@ -3,7 +3,7 @@
 //=---------------------------------------------------------------------=
 //
 
-// $Id: CAAFMobTest.cpp,v 1.55.2.4 2004/07/16 15:23:59 bakerian Exp $ $Name:  $
+// $Id: CAAFMobTest.cpp,v 1.55.2.5 2004/07/22 23:21:15 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -695,6 +695,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  const aafCharacter *copy_name = L"Name of Copied Mob";
 	  IAAFMobSP spCopiedMob;
 	  checkResult(pMob->Copy(copy_name, &spCopiedMob));
+	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+	  checkExpression(numMobs == 2, AAFRESULT_TEST_FAILED);
+	  checkResult(pHeader->RemoveMob(spCopiedMob));
+	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+	  checkExpression(numMobs == 1, AAFRESULT_TEST_FAILED);
 
 	  //try CloneExternal
 	  IAAFMobSP spClonedMob;
