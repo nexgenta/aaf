@@ -45,8 +45,8 @@ extern "C"
 #define IsInt64Positive(a) ((a) >= 0)
 #define CvtInt32toLength(in, out)		((out) = (in))
 #define CvtInt32toPosition(in, out)		((out) = (in))
-#define CvtInt32toInt64(in, out)		(*out = (in), AAFRESULT_SUCCESS)
-#define CvtUInt32toInt64(in, out)		(*out = (in), AAFRESULT_SUCCESS)
+#define CvtInt32toInt64(in, out)		(*out = (in), OM_ERR_NONE)
+#define CvtUInt32toInt64(in, out)		(*out = (in), OM_ERR_NONE)
 #else
 #define IsInt64Positive(a) (((aafInt16)(a).words[0]) >= 0)
 #define CvtInt32toLength(in, out)		\
@@ -151,12 +151,12 @@ void			testUint64(void);
 aafErr_t TimecodeToString(
 	aafTimecode_t timeCode,   /* IN - Timecode Value */
 	aafInt32 strLen,          /* IN - Length of string to hold timecode */
-	wchar_t *tcString);      /* IN/OUT - Pre-allocated buffer to hold
+	aafString_t tcString);      /* IN/OUT - Pre-allocated buffer to hold
 				   *          timecode string
 				   */
 
 aafErr_t StringToTimecode(
-	const wchar_t *timecodeString, /* IN - Timecode String */
+	aafString_t timecodeString, /* IN - Timecode String */
 	aafRational_t frameRate,  /* IN - Frame Rate */
 	aafTimecode_t *timecode); /* OUT - Timecode Value */
 
