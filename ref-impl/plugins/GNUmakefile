@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11.2.3 2004/07/19 13:56:21 bakerian Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11.2.4 2004/07/21 23:58:43 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -53,8 +53,7 @@ CXXFILES = AAFPluginCOM.cpp \
 		CAAFWAVECodec.cpp \
 		CAAFAIFCCodec.cpp \
 		jpegesdatadst.cpp \
-		jpegesdatasrc.cpp \
-		utf8.cpp
+		jpegesdatasrc.cpp
 
 
 SUPOBJS = $(OBJDIR)/aafCvt$(OBJ) \
