@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFFiller\
 #endm
@@ -13,61 +6,44 @@ AAFFiller\
 AAFSegment\
 #endm
 #c
-#c #import ./AAFSegment.exp
+#import ./AAFUnitTest.exp
+#import ./AAFSegment.exp
 AD_HEAD
-AD_IDL(//
-// The IAAFFiller interface is supported by objects which serve as
-// placeholders for an unknown values for the component duration.
-// Typically\, a Filler object is used in a Sequence to allow
-// positioning of a Segment whem not all of the preceding material has
-// been specified.  If a Filler object is played\, applications can
-// choose any appropiate blank media to play.
-//
-// In addition to the specific error results listed for each method\,
-// all methods in this interface may also return one of the following
-// values:
-// 
-// AAFRESULT_NOMEMORY
-//   - insufficient system memory is available to perform the
-//     operation.
-//)
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
 AD_INCLUDE(AAFTypes)
-AD_FORWARD_DECLARATION(AAFDataDef)
-AD_CLASS_UUID(38e6f8a8, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
-AD_DEFAULT_UUID(38e6f8a9, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
+AD_FORWARD_DECLARATION(AAFDataDefinition)
 
-AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_XMETHOD2(Initialize,
-			[in],
-			objPass,
-			aafUID_constref,
-			dataDef,
-			Data Definition Object,
+AD_CLASS_BEGIN
 
-			[in],
-			objPass,
-			aafLength_t,
-			length,
-			Length Property Value,
+AD_CONSTRUCTOR3([in],AAFFile *    ,file    ,File Handle,
+				[in],AAFDataDefinition *,datadef,Data Definition Object,
+				[in],aafLength_t  ,length  ,Length Property Value,
+  // This function will create a new filler object with the given
+  // property values.)
 
-			This function will create a new filler object with the given
-  // property values.  Length is specified in units of the edit rate
-  // of the containing timeline mob slot.
-  // 
-  // Succeeds if all of the following are true:
-  // - this object has not yet been initialized.
-  // - the length is valid.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize\(\) has already been called on this object.
-  //
-  // AAFRESULT_BAD_LENGTH
-  //   - length is negative.)
-AD_XCLASS_END(Concrete, StoredObject)
+AD_METHOD6(TraverseToClip,
+		   [in] ,aafLength_t   ,length       ,,
+		   [out],AAFSegment ** ,sclp         ,,
+		   [out],AAFPulldown **,pulldownObj  ,,
+		   [out],aafInt32 *    ,pulldownPhase,,
+		   [out],aafLength_t * ,sclpLen      ,,
+		   [out],aafBool *     ,isMask       ,,
+  // This set of functions returns the required property values for
+  // the object identified by XXX.  If a value is not requested\, a
+  // NULL should be passed into the parameter corresponding to that
+  // property.  For example -- 
+  //         omfiMobSlotInfo\(file\, slotObj\, NULL\, &segment\);
+  // would not return the editRate property from a mob slot.
+  // Additional functions are provided to return optional properties.)
+		   
+AD_OVERRIDE(.method-Test)
+
+AD_CLASS_END
