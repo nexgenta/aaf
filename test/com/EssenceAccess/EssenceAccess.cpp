@@ -12,7 +12,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -49,8 +49,14 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
+#if USE_TIMER_LIB
 // Include this for the purpose of timing the data read/write
 #include "UtlConsole.h"
+#endif
+
+#if defined(macintosh) || defined(_MAC)
+#include <console.h> /* Mac command line window */
+#endif
 
 // This static variables are here so they can be referenced 
 // throughout the whole program.
@@ -205,7 +211,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
   // Get a Master MOB Interface
-	check(pDictionary->CreateInstance( &AUID_AAFMasterMob,
+	check(pDictionary->CreateInstance(AUID_AAFMasterMob,
 						   IID_IAAFMasterMob, 
 						   (IUnknown **)&pMasterMob));
 	// Get a Mob interface and set its variables.
@@ -221,7 +227,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	if(dataFile != NULL)
 	{
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+		check(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
 								IID_IAAFLocator, 
 								(IUnknown **)&pLocator));		
 		check(pLocator->SetPath (dataFile->dataFilename));
@@ -293,9 +299,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		pFormat->Release();
 		pFormat = NULL;
 	 
+#if USE_TIMER_LIB
 		//  start the write timer here
 		aafUInt32 timerID, elapsedtime;
 		moduleErrorTmp = UTLStartPeriod(&timerID);
+#endif
 
 		aafUInt32 dataWritten =0;
 		aafUInt32 dataWriteRate = 0;
@@ -354,6 +362,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		//  end of the loop
 		}
 
+#if USE_TIMER_LIB
 		//  stop the timer here
 		moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
 
@@ -366,6 +375,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 			externalkind = "";
 
 		printf("Write rate (%s%s %s) = %ld kb/sec KBytes = %ld\n",externalkind, location, kind, dataWriteRate,dataWritten/1024);
+#endif
 		
 		// close essence data file
 		fclose(pWavFile);
@@ -561,6 +571,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					bytesToRead = samplesToRead * (sampleBits+7)/8;
 					AAFDataBuf = (unsigned char *)new char[bytesToRead];
 
+#if USE_TIMER_LIB
 					// start the read timer here
 
 					aafUInt32 timerID, elapsedtime;
@@ -568,6 +579,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 					aafUInt32 dataRead =0;
 					aafUInt32 dataReadRate = 0;
+#endif
 
 					// Read the Raw Data from the AAF file
 					if(testType == testRawCalls)
@@ -613,6 +625,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					}
 
 						
+#if USE_TIMER_LIB
 					//  stop the timer here
 					moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
 					
@@ -627,6 +640,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					wcstombs(niceFileName,pFileName,80);
 									
 					printf("File = %s KBytes = %ld Time(ms) = %ld Rate = %ld kb/sec\n",niceFileName,dataRead/1024,elapsedtime,dataReadRate);
+#endif
 
 #if 0
 					// Now compare the data read from the AAF file to the actual WAV file
@@ -897,6 +911,14 @@ void usage(void)
 //  NOTE:  defining [0] program name; [1] Number N of wave files
 int main(int argumentCount, char *argumentVector[])
 {
+
+	/* console window for mac */
+
+	#if defined(macintosh) || defined(_MAC)
+	argumentCount = ccommand(&argumentVector);
+	#endif
+
+
 	//  First checking for correct number of arguments 
 
 	if (argumentCount != 2)
@@ -919,8 +941,10 @@ int main(int argumentCount, char *argumentVector[])
 		return 0;
 	}
 	
+#if USE_TIMER_LIB
 	//  Initialise timers
 	UTLInitTimers(1000);
+#endif
 
 	CComInitialize comInit;
 	CAAFInitialize aafInit;
