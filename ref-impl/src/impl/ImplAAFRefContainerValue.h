@@ -32,22 +32,27 @@
  ************************************************************************/
 
 
-class OMObject;
-class OMProperty;
-class OMContainerProperty;
-
-
-class ImplAAFStorable;
-class ImplAAFTypeDef;
-class ImplEnumAAFPropertyValues;
-class ImplAAFTypeDefObjectRef;
+class ImplAAFRoot;
 
 #ifndef __ImplAAFPropertyValue_h__
 #include "ImplAAFPropertyValue.h"
 #endif
 
-class ImplAAFRefContainerValue : public ImplAAFPropertyValue // TBD:
+#ifndef __ImplAAFPropValData_h__
+#include "ImplAAFPropValData.h"
+#endif
+
+class ImplAAFTypeDef;
+
+class OMProperty;
+//class OMContainerProperty; // TBD: the base class for reference containers
+
+
+//class ImplAAFRefContainerValue : public ImplAAFPropertyValue // TBD:
+class ImplAAFRefContainerValue : public ImplAAFPropValData
 {
+public:
+
 protected:
   //
   // Constructor/destructor
@@ -58,64 +63,15 @@ protected:
 
   // non-published method to initialize this object.
   // NOTE: The given property's type must be a reference type.
-  AAFRESULT Initialize (const ImplAAFTypeDef *containerType,
+  AAFRESULT Initialize (const ImplAAFTypeDef *referenceType,
                         OMProperty *property);
-  
-  // Retrieve the property as an OMContainerProperty.
-  OMContainerProperty * containerProperty(void) const;
+public:
 
-  // Utility for converting the a property value (parameter) into an object.
-  static ImplAAFStorable * GetStorableFromPropertyValue(ImplAAFPropertyValue* pPropertyValue, AAFRESULT & result);
-  
-  // Utility to release an old OMObject from the container.
-  void ReleaseOldObject(OMObject *object);
-  
-  //
-  // Methods that must be overridden by subclasses of reference containers.
-  //
-public:  
-  // Return the type of object references in the container.
-  virtual ImplAAFTypeDefObjectRef * GetElementType(void) const = 0; // the result is NOT reference counted.
-  
-public:
-  // Perform specialized validation for an object before it is added
-  // to a container.
-  virtual AAFRESULT ValidateNewObject(ImplAAFStorable *pNewObject) const = 0;
-  
-  // Perform any specialized cleanup of any object after it has been removed
-  // from the container.
-  virtual bool usesReferenceCounting(void) const = 0;
-  
-public:
-  // Override of ImplAAFPropertyValue (just validates input property).
   virtual AAFRESULT STDMETHODCALLTYPE WriteTo(OMProperty* pOmProp);
-
   
-  // Insert the given object into this contain property.
-  virtual AAFRESULT STDMETHODCALLTYPE InsertObject(ImplAAFStorable* pObject);
-
-  // Is the given object in the container property.
-  virtual AAFRESULT STDMETHODCALLTYPE ContainsObject(ImplAAFStorable* pObject, aafBoolean_t* pResult);
-  
-  // Remove the given object from the container property.
-  virtual AAFRESULT STDMETHODCALLTYPE RemoveObject(ImplAAFStorable* pObject);
-
-
-  
-  // Insert the given object into this contain property.
-  virtual AAFRESULT STDMETHODCALLTYPE InsertElement(ImplAAFPropertyValue* pPropertyValue);
-
-  // Is the given object in the container property.
-  virtual AAFRESULT STDMETHODCALLTYPE ContainsElement(ImplAAFPropertyValue* pPropertyValue, aafBoolean_t* pResult);
-
-  // The number of objects in the container property
-  virtual AAFRESULT STDMETHODCALLTYPE Count(aafUInt32* pCount);
-  
-  // Remove the given object from the container property.
-  virtual AAFRESULT STDMETHODCALLTYPE RemoveElement(ImplAAFPropertyValue* pPropertyValue);
-
-  // Get an enumerator for the given container property
-  virtual AAFRESULT STDMETHODCALLTYPE GetElements(ImplEnumAAFPropertyValues** ppEnum);
+private:
+  OMProperty * _containerProperty; // TBD: the base class for singleton references
+	ImplAAFRoot * _propertyContainer; // save reference to owning container.
 };
 
 //
