@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFMobSlot.dod,v 1.24 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c $Id: AAFMobSlot.dod,v 1.25 2004/10/22 13:37:28 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -148,8 +148,8 @@ AD_XMETHOD1(GetDataDef,
 
 			This method will return the Data Definition object
   // associated with the segment in this Mob Slot.  Common
-  // DataDefinitions are DDEF_Picture\, DDEF_Sound\, DDEF_Timecode\,
-  // and DDEF_Edgecode.
+  // DataDefinitions are kAAFDataDef_Picture\, kAAFDataDef_Sound\, kAAFDataDef_Timecode\,
+  // and kAAFDataDef_Edgecode.
   //
   // Succeeds if all of the following are true:
   // - the ppResult pointer is valid.

@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDictionary.dod,v 1.35 2004/09/10 17:12:09 stuart_hc Exp $ $Name:  $
+#c $Id: AAFDictionary.dod,v 1.36 2004/10/22 13:37:27 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -864,5 +864,18 @@ AD_COM_METH(.method-RegisterTaggedValueDef)
 AD_COM_METH(.method-LookupTaggedValueDef)
 AD_COM_METH(.method-GetTaggedValueDefs)
 AD_COM_METH(.method-CountTaggedValueDefs)
+
+AD_COM_METH(.method-LookupAuxiliaryDataDef)
+AD_COM_METH(.method-LookupDescriptiveDataDef)
+AD_COM_METH(.method-LookupEdgecodeDataDef)
+AD_COM_METH(.method-LookupLegacyPictureDataDef)
+AD_COM_METH(.method-LookupLegacySoundDataDef)
+AD_COM_METH(.method-LookupLegacyTimecodeDataDef)
+AD_COM_METH(.method-LookupMatteDataDef)
+AD_COM_METH(.method-LookupPictureDataDef)
+AD_COM_METH(.method-LookupPictureWithMatteDataDef)
+AD_COM_METH(.method-LookupSoundDataDef)
+AD_COM_METH(.method-LookupTimecodeDataDef)
+
 
 AD_COM_EXT_CLASS_END(AAFDictionary2)
