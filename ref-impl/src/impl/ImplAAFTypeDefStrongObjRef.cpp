@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -25,6 +25,7 @@
  *
  ************************************************************************/
 
+
 #ifndef __ImplAAFPropValData_h__
 #include "ImplAAFPropValData.h"
 #endif
@@ -37,19 +38,23 @@
 #include "ImplAAFTypeDefStrongObjRef.h"
 #endif
 
-#ifndef __ImplAAFHeader_h_
-#include "ImplAAFHeader.h"
-#endif
-
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "ImplAAFObjectCreation.h"
+#include "ImplAAFDictionary.h"
+
 
 #include <assert.h>
 #include <string.h>
 
 
+extern "C" const aafClassID_t CLSID_AAFPropValData;
+
 ImplAAFTypeDefStrongObjRef::ImplAAFTypeDefStrongObjRef ()
-  : _referencedType (PID_TypeDefinitionStrongObjectReference_ReferencedType, "ReferencedType")
+  : _referencedType ( PID_TypeDefinitionStrongObjectReference_ReferencedType,
+                      L"ReferencedType",
+                      L"/Dictionary/ClassDefinitions",
+                      PID_MetaDefinition_Identification)
 {
   _persistentProperties.put(_referencedType.address());
 }
@@ -58,26 +63,36 @@ ImplAAFTypeDefStrongObjRef::ImplAAFTypeDefStrongObjRef ()
 ImplAAFTypeDefStrongObjRef::~ImplAAFTypeDefStrongObjRef ()
 {}
 
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefStrongObjRef::Initialize (
+      const aafUID_t & id,
+      ImplAAFClassDef * pObjType,
+      const aafCharacter * pTypeName)
+{
+  if (! pObjType)  return AAFRESULT_NULL_PARAM;
+  if (! pTypeName)  return AAFRESULT_NULL_PARAM;
+
+  return pvtInitialize (id, pObjType, pTypeName);
+}
+
+
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStrongObjRef::pvtInitialize (
-      const aafUID_t *  pID,
-      const aafUID_t * pRefdObjID,
-      wchar_t *  pTypeName)
+      const aafUID_t & id,
+      const ImplAAFClassDef * pClassDef,
+      const aafCharacter * pTypeName)
 {
-  if (! pID)       return AAFRESULT_NULL_PARAM;
-  if (! pRefdObjID)  return AAFRESULT_NULL_PARAM;
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
 
-  hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
-  _referencedType = *pRefdObjID;
-
-  hr = SetAUID (pID);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  _referencedType = pClassDef;
 
   return AAFRESULT_SUCCESS;
 }
@@ -152,46 +167,56 @@ ImplAAFTypeDefStrongObjRef::GetObject (ImplAAFPropertyValue * pPropVal,
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefStrongObjRef::GetObjectType (ImplAAFClassDef ** ppObjType) const
+    ImplAAFTypeDefStrongObjRef::GetObjectType (ImplAAFClassDef ** ppObjType)
 {
-  if (! ppObjType) return AAFRESULT_NULL_PARAM;
+  if (! ppObjType)
+	return AAFRESULT_NULL_PARAM;
 
-  if (! _cachedObjType)
-	{
-	  ImplAAFHeaderSP pHead;
-	  ImplAAFDictionarySP pDict;
+   if(_referencedType.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFClassDef *pClassDef = _referencedType;
 
-	  AAFRESULT hr;
-	  hr = MyHeadObject(&pHead);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pHead);
-	  hr = (pHead->GetDictionary(&pDict));
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pDict);
-
-	  ImplAAFTypeDefStrongObjRef * pNonConstThis =
-		  (ImplAAFTypeDefStrongObjRef*) this;
-	  aafUID_t id = _referencedType;
-	  hr = pDict->LookupClass (&id, &pNonConstThis->_cachedObjType);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (_cachedObjType);
-	}
-  assert (ppObjType);
-  *ppObjType = _cachedObjType;
+  *ppObjType = pClassDef;
   assert (*ppObjType);
   (*ppObjType)->AcquireReference ();
   return AAFRESULT_SUCCESS;
+
 }
 
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefStrongObjRef::CreateValue (/*[in]*/ ImplAAFObject * /*pObj*/,
-      /*[out]*/ ImplAAFPropertyValue ** /*ppPropVal*/)
+    ImplAAFTypeDefStrongObjRef::CreateValue (/*[in]*/ ImplAAFObject * pObj,
+      /*[out]*/ ImplAAFPropertyValue ** ppPropVal)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (! pObj)
+	return AAFRESULT_NULL_PARAM;
+  if (! ppPropVal)
+	return AAFRESULT_NULL_PARAM;
+
+  ImplAAFPropValData * pvd = 0;
+  pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+  if (!pvd) return AAFRESULT_NOMEMORY;
+
+  ImplAAFPropValDataSP spPvd;
+  spPvd = pvd;
+  // SmartPointer operator= will automatically
+  // AddRef; CreateImpl *also* will addref, so we've got one too
+  // many.  Put us back to normal.
+  pvd->ReleaseReference ();
+  pvd = 0;
+
+  AAFRESULT hr;
+  hr = spPvd->Initialize (this);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  hr = SetObject (spPvd, pObj);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+  assert (ppPropVal);
+  *ppPropVal = spPvd;
+  assert (*ppPropVal);
+  (*ppPropVal)->AcquireReference ();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -208,7 +233,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 aafBool ImplAAFTypeDefStrongObjRef::IsFixedSize (void) const
 {
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
@@ -220,7 +245,7 @@ size_t ImplAAFTypeDefStrongObjRef::PropValSize (void) const
 
 aafBool ImplAAFTypeDefStrongObjRef::IsRegistered (void) const
 {
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
@@ -230,9 +255,9 @@ size_t ImplAAFTypeDefStrongObjRef::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefStrongObjRef::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefStrongObjRef::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
   OMProperty * result =
@@ -240,6 +265,3 @@ OMProperty * ImplAAFTypeDefStrongObjRef::pvtCreateOMPropertyMBS
   assert (result);
   return result;
 }
-
-
-OMDEFINE_STORABLE(ImplAAFTypeDefStrongObjRef, AUID_AAFTypeDefStrongObjRef);
