@@ -1,22 +1,57 @@
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
+
 // @doc OMEXTERNAL
 #ifndef OMPROPERTY_H
 #define OMPROPERTY_H
 
 #include "OMPortability.h"
-#include "OMTypes.h"
+#include "OMDataTypes.h"
 
 #include <stddef.h>
 
-const int TID_DATA                           = 0;
-const int TID_STRONG_OBJECT_REFERENCE        = 1;
-const int TID_STRONG_OBJECT_REFERENCE_VECTOR = 2;
-const int TID_WEAK_OBJECT_REFERENCE          = 3;
-const int TID_WEAK_OBJECT_REFERENCE_VECTOR   = 5;
-const int TID_DATA_STREAM                    = 4;
+// The following stored form values are used to denote the on-disk
+// representation of a given property.
+//
+const int SF_DATA                           = 0;
+const int SF_DATA_STREAM                    = 1;
+const int SF_STRONG_OBJECT_REFERENCE        = 2;
+const int SF_STRONG_OBJECT_REFERENCE_VECTOR = 3;
+const int SF_STRONG_OBJECT_REFERENCE_SET    = 4;
+const int SF_WEAK_OBJECT_REFERENCE          = 5;
+const int SF_WEAK_OBJECT_REFERENCE_VECTOR   = 6;
+const int SF_WEAK_OBJECT_REFERENCE_SET      = 7;
+
 
 class OMStoredObject;
 class OMStorable;
 class OMPropertySet;
+class OMPropertyDefinition;
+class OMType;
 
   // @class Abstract base class for persistent properties supported by
   //        the Object Manager.
@@ -25,7 +60,20 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMProperty(const OMPropertyId propertyId, const int type, const char* name);
+  OMProperty(const OMPropertyId propertyId,
+             const int storedForm,
+             const char* name);
+
+    // @cmember Temporary pseudo-constructor for clients which provide
+    //          a type definition.
+  void initialize(const OMPropertyId propertyId,
+                  const char* name,
+                  OMType* type,
+                  const bool isOptional = false);
+
+    // @cmember Temporary pseudo-constructor for clients which provide
+    //          a property definition.
+  void initialize(const OMPropertyDefinition* definition);
 
     // @cmember Destructor.
   virtual ~OMProperty(void);
@@ -37,9 +85,13 @@ public:
     // @cmember Close this <c OMProperty>.
   virtual void close(void);
 
-    // @cmember Restore this <c OMProperty>, the size of the <c OMProperty>
-    //          is <p size>.
-  virtual void restore(size_t size) = 0;
+    // @cmember Restore this <c OMProperty>, the external (persisted)
+    //          size of the <c OMProperty> is <p externalSize>.
+  virtual void restore(size_t externalSize) = 0;
+
+    // @cmember The <c OMPropertyDefinition> defining this <c OMProperty>.
+    // @this const 
+  const OMPropertyDefinition* definition(void) const;
 
     // @cmember The name of this <c OMProperty>.
     // @this const 
@@ -47,7 +99,7 @@ public:
 
     // @cmember The property id of this <c OMProperty>.
     // @this const
-  const OMPropertyId propertyId(void) const;
+  OMPropertyId propertyId(void) const;
 
     // @cmember Inform this <c OMProperty> that it is a member of
     //          the <c OMPropertySet> <p propertySet>.
@@ -62,6 +114,19 @@ public:
     //          the given <p key>.
   virtual void detach(const OMStorable* object, const size_t key);
 
+  // Optional property interface
+
+    // @cmember Is this an optional property ? 
+    //   @this const
+  bool isOptional(void) const;
+
+    // @cmember Is this optional property present ?
+    //   @this const
+  bool isPresent(void) const;
+
+    // @cmember Remove this optional <c OMProperty>.
+  virtual void remove(void);
+
   // Direct property access interface
 
     // @cmember The size of the raw bits of this <c OMProperty>. The
@@ -73,17 +138,56 @@ public:
     //          <p size> bytes in size.
   virtual void getBits(OMByte* bits, size_t size) const = 0;
 
-  // Temporary - get the type id of this OMProperty
-
-  int typeId(void) const;
+    // @cmember Set the raw bits of this <c OMProperty>. The raw
+    //          bits are copied from the buffer at address <p bits> which
+    //          is <p size> bytes in size.
+  virtual void setBits(const OMByte* bits, size_t size) = 0;
 
 protected:
-  int _propertyId;
-  int _type;
+  // @access Protected members.
+
+    // @cmember Write this property to persistent store, performing
+    //          any necessary externalization and byte reordering.
+    //   @this const
+  void write(OMPropertyId propertyId,
+             int storedForm,
+             OMByte* internalBytes,
+             size_t internalBytesSize) const;
+
+    // @cmember Read this property from persistent store, performing
+    //          any necessary byte reordering and internalization.
+    //   @this const
+  void read(OMPropertyId propertyId,
+            int storedForm,
+            OMByte* internalBytes,
+            size_t internalBytesSize,
+            size_t externalBytesSize);
+
+    // @cmember Set the bit that indicates that this optional <c OMProperty>
+    //          is present.
+  void setPresent(void);
+
+    // @cmember Clear the bit that indicates that this optional <c OMProperty>
+    //          is present.
+  void clearPresent(void);
+
+  OMPropertyId _propertyId;
+  int _storedForm; // The on-disk representation used (one of the SF_* values)
   const char* _name;
-  // The PropertySet that contains this property
-  //
-  const OMPropertySet* _propertySet;
+  const OMPropertySet* _propertySet; // The PropertySet that contains
+                                     // this property
+  // The _definition member is set by clients which pass a definition
+  // to initialize().  It is preferred over the _type member, which is
+  // set by clients which pass a type to initialize().  Only one can
+  // be set.
+  const OMPropertyDefinition* _definition;
+  const OMType* _type;
+
+private:
+
+  bool _isOptional;
+  bool _isPresent;
+
 };
 
 // @doc OMINTERNAL
@@ -100,14 +204,14 @@ public:
 
     // @cmember Constructor.
   OMReferenceProperty(const OMPropertyId propertyId,
-                      const int type,
+                      const int storedForm,
                       const char* name);
 
     // @cmember Destructor.
   virtual ~OMReferenceProperty(void);
 
     // @cmember Set the value of this <c OMReferenceProperty>.
-  virtual void setValue(const ReferencedObject*& object);
+  virtual ReferencedObject* setValue(const ReferencedObject* object);
 
     // @cmember Get the value of this <c OMReferenceProperty>.
     //   @this const
@@ -124,10 +228,42 @@ public:
     //          which is <p size> bytes in size.
   virtual void getBits(OMByte* bits, size_t size) const;
 
+    // @cmember Set the raw bits of this <c OMReferenceProperty>. The raw
+    //          bits are copied from the buffer at address <p bits> which
+    //          is <p size> bytes in size.
+  virtual void setBits(const OMByte* bits, size_t size);
+
 protected:
+  // @access Protected members.
+
+    // @cmember Load the persisted representation of this
+    //          <c OMReferenceProperty> into memory.
+  virtual void load(void) = 0;
+
+    // @cmember Is the persisted representation of this
+    //          <c OMReferenceProperty> loaded ?
+    // @this const
+  virtual bool isLoaded(void) const;
+
+    // @cmember Set the bit that indicates that the persisted
+    //          representation of this <c OMReferenceProperty> is loaded.
+  virtual void setLoaded(void);
+
+    // @cmember Clear the bit that indicates that the persisted
+    //          representation of this <c OMReferenceProperty> is loaded.
+  virtual void clearLoaded(void);
+
   virtual ReferencedObject* pointer(void) const;
 
   ReferencedObject* _pointer; // The referenced object
+
+private:
+
+    // False if a persisted representation exists that has not yet
+    // been loaded, true otherwise.
+    //
+  bool _loaded;
+
 };
 
   // @class Persistent strong reference (contained object)
@@ -153,7 +289,7 @@ public:
   virtual void getValue(ReferencedObject*& object) const;
 
     // @cmember Set the value of this <c OMStrongReferenceProperty>.
-  virtual void setValue(const ReferencedObject*& object);
+  virtual ReferencedObject* setValue(const ReferencedObject* object);
 
     // @cmember Assignment operator.
   OMStrongReferenceProperty<ReferencedObject>& operator =
@@ -169,7 +305,7 @@ public:
     //          <c OMStrongReferenceProperty> into a pointer to the
     //          referenced (contained) <p ReferencedObject>.
     //   @this const
-  operator ReferencedObject*(void) const;
+  operator ReferencedObject*() const;
 
     // @cmember Save this <c OMStrongReferenceProperty>.
     // @this const
@@ -178,15 +314,35 @@ public:
     // @cmember Close this <c OMProperty>.
   virtual void close(void);
 
-    // @cmember Restore this <c OMStrongReferenceProperty>, the size of
-    //          the <c OMStrongReferenceProperty> is <p size>.
-  virtual void restore(size_t size);
+    // @cmember Restore this <c OMStrongReferenceProperty>, the external
+    //          (persisted) size of the <c OMStrongReferenceProperty>
+    //          is <p externalSize>.
+  virtual void restore(size_t externalSize);
 
     // @cmember Detach the <c OMStorable> object with the given
     //          <p key> from this <c OMStrongReferenceProperty>. This
     //          <c OMStrongReferenceProperty> must no longer attempt
     //          to access the <c OMStorable> with the given <p key>.
   virtual void detach(const OMStorable* object, const size_t key);
+
+  // Optional property interface
+
+    // @cmember Remove this optional <c OMStrongReferenceProperty>.
+  virtual void remove(void);
+
+protected:
+  // @access Protected members.
+
+    // @cmember Load the persisted representation of this
+    //          <c OMStrongReferenceProperty> into memory.
+  virtual void load(void);
+
+private:
+
+    // The name of the storage containing the persisted representation
+    // of the referenced object.
+    //
+  char* _storageName;
 
 };
 
@@ -212,7 +368,7 @@ public:
   virtual void getValue(ReferencedObject*& object) const;
 
     // @cmember set the value of this <c OMWeakReferenceProperty>.
-  virtual void setValue(const ReferencedObject*& object);
+  virtual ReferencedObject* setValue(const ReferencedObject* object);
 
     // @cmember Assignment operator.
   OMWeakReferenceProperty<ReferencedObject>& operator =
@@ -228,7 +384,7 @@ public:
     //          <c OMWeakReferenceProperty> into a pointer to the
     //          referenced (pointed to) <p ReferencedObject>.
     //   @this const
-  operator ReferencedObject*(void) const;
+  operator ReferencedObject*() const;
 
     // @cmember Save this <c OMWeakReferenceProperty>.
     // @this const
@@ -237,15 +393,23 @@ public:
     // @cmember close this <c OMWeakReferenceProperty>.
   virtual void close(void);
 
-    // @cmember Restore this <c OMWeakReferenceProperty>, the size of
-    //          the <c OMWeakReferenceProperty> is <p size>.
-  virtual void restore(size_t size);
+    // @cmember Restore this <c OMWeakReferenceProperty>, the external
+    //          (persisted) size of the <c OMWeakReferenceProperty> is
+    //          <p externalSize>.
+  virtual void restore(size_t externalSize);
 
     // @cmember Detach the <c OMStorable> object with the given
     //          <p key> from this <c OMWeakReferenceProperty>. This
     //          <c OMWeakReferenceProperty> must no longer attempt
     //          to access the <c OMStorable> with the given <p key>.
   virtual void detach(const OMStorable* object, const size_t key);
+
+protected:
+  // @access Protected members.
+
+    // @cmember Load the persisted representation of this
+    //          <c OMWeakReferenceProperty> into memory.
+  virtual void load(void);
 
 private:
   char* _pathName;
@@ -273,9 +437,9 @@ public:
     //   @this const
   virtual void save(void) const;
 
-    // @cmember Restore this <c OMSimpleProperty>, the size of
-    //          the <c OMSimpleProperty> is <p size>.
-  virtual void restore(size_t size);
+    // @cmember Restore this <c OMSimpleProperty>, the external (persisted)
+    //          size of the <c OMSimpleProperty> is <p externalSize>.
+  virtual void restore(size_t externalSize);
 
     // @cmember The size of this <c OMSimpleProperty>.
     //   @this const
@@ -291,6 +455,11 @@ public:
     //          bits are copied to the buffer at address <p bits> which
     //          is <p size> bytes in size.
   virtual void getBits(OMByte* bits, size_t size) const;
+
+    // @cmember Set the raw bits of this <c OMSimpleProperty>. The raw
+    //          bits are copied from the buffer at address <p bits> which
+    //          is <p size> bytes in size.
+  virtual void setBits(const OMByte* bits, size_t size);
 
 protected:
   void get(void* value, size_t valueSize) const;
@@ -330,14 +499,15 @@ public:
     // @cmember Type conversion. Convert an <c OMFixedSizeProperty>
     //          into a <p PropertyType>.
     //   @this const
-  operator PropertyType(void) const;
+  operator PropertyType() const;
 
     // @cmember "Address of" operator.
   PropertyType* operator &(void);
 
-    // @cmember Restore this <c OMFixedSizeProperty>, the size of the
-    //          <c OMFixedSizeProperty> is <p size>.
-  virtual void restore(size_t size);
+    // @cmember Restore this <c OMFixedSizeProperty>, the external
+    //          (persisted) size of the <c OMFixedSizeProperty> is
+    //          <p externalSize>.
+  virtual void restore(size_t externalSize);
 
 };
 
@@ -366,7 +536,20 @@ public:
     //          address <p value> into the <c OMVariableSizeProperty>.
   void setValue(const PropertyType* value, size_t valueSize);
 
-    // @cmember Get the value of this <c OMvariableSizeProperty>.  The
+    // @cmember Get the value of the item at position <p index> in this
+    //          <c OMVariableSizeProperty>. The value is obtained by copying
+    //          a single item of type PropertyType from this
+    //          <c OMVariableSizeProperty> at position <p index>.
+    //   @this const
+  void getValueAt(PropertyType* value, const size_t index) const;
+
+    // @cmember Set the value of the item at position <p index> in this
+    //          <c OMVariableSizeProperty>. The value is set by copying
+    //          a single item of type PropertyType into this
+    //          <c OMVariableSizeProperty> at position <p index>.
+  void setValueAt(const PropertyType* value, const size_t index);
+
+    // @cmember Get the value of this <c OMVariableSizeProperty>.  The
     //          value is obtained by copying the value from the
     //          <c OMVariableSizeProperty>. The buffer is at address
     //          <p buffer> and is <p bufferSize> bytes in size.
@@ -374,9 +557,14 @@ public:
     //   @this const
   bool copyToBuffer(PropertyType* buffer, size_t bufferSize) const;
 
-    // @cmember Restore this <c OMVariableSizeProperty>, the size of
-    //          the <c OMVariableSizeProperty> is <p size>.
-  virtual void restore(size_t size);
+    // @cmember Restore this <c OMVariableSizeProperty>, the external
+    //          (persisted) size of the <c OMVariableSizeProperty> is
+    //          <p externalSize>.
+  virtual void restore(size_t externalSize);
+
+    // @cmember The number of items in this this <c OMVariableSizeProperty>.
+    //   @this const 
+  size_t count(void) const;
 
 };
 
@@ -389,7 +577,7 @@ public:
 
     // @cmember Constructor.
   OMCollectionProperty(const OMPropertyId propertyId,
-                       const int type,
+                       const int storedForm,
                        const char* name);
 
     // @cmember Destructor.
@@ -423,8 +611,9 @@ public:
   virtual void close(void);
 
     // @cmember Restore this <c OMStrongReferenceVectorProperty>, the
-    //          size of the <c OMStrongReferenceVectorProperty> is <p size>.
-  virtual void restore(size_t size);
+    //          external (persisted) size of the
+    //          <c OMStrongReferenceVectorProperty> is <p externalSize>.
+  virtual void restore(size_t externalSize);
 
     // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
     //   @this const
@@ -434,18 +623,19 @@ public:
     //   @this const
   size_t getSize(void) const;
 
-    // @cmember Set the value of the <p OMReferencedObject> at
+    // @cmember Set the value of the <p ReferencedObject> at
     //          position <p index> in this
     //          <c OMStrongReferenceVectorProperty>.
-  void setValueAt(const ReferencedObject* value, const size_t index);
+  ReferencedObject* setValueAt(const ReferencedObject* value,
+                               const size_t index);
 
-    // @cmember Get the value of the <p OMReferencedObject> at
+    // @cmember Get the value of the <p ReferencedObject> at
     //          position <p index> in this
     //          <c OMStrongReferenceVectorProperty>.
     //   @this const
   void getValueAt(ReferencedObject*& value, const size_t index) const;
 
-    // @cmember Appened the given <p OMReferencedObject> <p value> to
+    // @cmember Append the given <p ReferencedObject> <p value> to
     //          this <c OMStrongReferenceVectorProperty>.
   void appendValue(const ReferencedObject*& value);
 
@@ -454,6 +644,11 @@ public:
     //          This <c OMStrongReferenceVectorProperty> must no longer
     //          attempt to access the <c OMStorable> with the given <p key>.
   virtual void detach(const OMStorable* object, const size_t key);
+
+  // Optional property interface
+
+    // @cmember Remove this optional <c OMStrongReferenceVectorProperty>.
+  virtual void remove(void);
 
   // Direct property access interface
 
@@ -468,6 +663,48 @@ public:
     //          <p size> bytes in size.
   virtual void getBits(OMByte* bits, size_t size) const;
 
+    // @cmember Set the raw bits of this
+    //          <c OMStrongReferenceVectorProperty>. The raw bits are
+    //          copied from the buffer at address <p bits> which is
+    //          <p size> bytes in size.
+  virtual void setBits(const OMByte* bits, size_t size);
+
+protected:
+  // @access Protected members.
+
+    // @cmember Load the persisted representation of the element of
+    //          this <c OMStrongReferenceVectorProperty> given by <p index>
+    //          into memory.
+  virtual void loadElement(const size_t index);
+
+    // @cmember Is the persisted representation of the element of this
+    //          <c OMStrongReferenceVectorProperty> given by <p index>
+    //          loaded ?
+    // @this const
+  virtual bool isElementLoaded(const size_t index) const;
+
+    // @cmember Set the bit that indicates that the persisted
+    //          representation of the element of this
+    //          <c OMStrongReferenceVectorProperty> given by <p index>
+    //          is loaded.
+  virtual void setElementLoaded(const size_t index);
+
+    // @cmember Clear the bit that indicates that the persisted
+    //          representation of the element of this
+    //          <c OMStrongReferenceVectorProperty> given by <p index>
+    //          is loaded.
+  virtual void clearElementLoaded(const size_t index);
+
+    // @cmember The key of the element of this
+    //          <c OMStrongReferenceVectorProperty> given by <p index>.
+    // @this const
+  virtual OMUInt32 elementKey(const size_t key) const;
+
+    // @cmember Set the key of the element of this
+    //          <c OMStrongReferenceVectorProperty> given by <p index>
+    //          to <p key>.
+  virtual void setElementKey(const size_t index, const OMUInt32 key);
+
 private:
 
   void grow(size_t additionalElements);
@@ -477,6 +714,22 @@ private:
   const ReferencedObject** _vector;
   size_t _sizeOfVector; // Actual size
   size_t _size;         // Number of elements in use
+
+    // _loaded[i] is false if a persisted representation of _vector[i]
+    // exists that has not yet been loaded, true otherwise.
+    //
+  bool* _loaded;
+
+    // _keys[i] is the key for _vector[i].
+    //
+  OMUInt32* _keys;
+
+    // The name of the index describing the persisted representation
+    // of _vector. Also the prefix for the storages containing the
+    // persisted representation of the objects within _vector.
+    //
+  char* _propertyName;
+
 };
 
   // @class Abstract base class for persistent character string
@@ -499,13 +752,13 @@ public:
     // @cmember Type conversion. Convert an
     //          <c OMCharacterStringProperty> into a
     //          string of <p CharacterType> characters.
-  operator const CharacterType* (void);
+  operator const CharacterType* ();
 
     // @cmember Type conversion. Convert an
     //          <c OMCharacterStringProperty> into a
     //          string of <p CharacterType> characters.
     //   @this const
-  operator const CharacterType* (void) const;
+  operator const CharacterType* () const;
 
     // @cmember Assign the string <p characterString> to this
     //          <c OMCharacterStringProperty>.
@@ -556,7 +809,7 @@ public:
   virtual ~OMWideStringProperty(void);
 
     // @cmember Assignment operator.
-  OMWideStringProperty& operator = (const wchar_t* value);
+  OMWideStringProperty& operator = (const wchar_t * value);
 
 };
 
