@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFDigitalImageDescriptor
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDigitalImageDescripTest.cpp,v 1.28.2.2 2004/08/13 12:04:43 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDigitalImageDescripTest.cpp,v 1.28.2.3 2004/08/13 13:46:46 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,7 +60,7 @@ using namespace std;
 #define kDisplayYOffsetTestVal			8
 #define kAlphaTransparencyTestVal		kAAFMaxValueTransparent
 #define kImageAlignmentFactorTestVal	0
-#define kFieldDominanceTestVal	1
+#define kFieldDominanceTestVal	kAAFFieldOne
 #define kFieldStartOffsetTestVal	128
 #define kFieldEndOffsetTestVal	512
 
