@@ -33,10 +33,13 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
+#include "AAFFileMode.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -60,10 +63,96 @@ inline void checkResult(HRESULT r)
   if (FAILED(r))
     throw r;
 }
-inline void checkExpression(bool expression, HRESULT r)
+inline void checkExpression(bool expression, HRESULT r=AAFRESULT_TEST_FAILED)
 {
   if (!expression)
     throw r;
+}
+
+// Function to compare COM interface pointers, taken from 
+// CAAFTypeDefFixedArrayTest.cpp.
+template <class T1, class T2>
+aafBoolean_t  AreUnksSame(T1& cls1, T2& cls2)
+{
+	IAAFSmartPointer<IUnknown>    spUnk1, spUnk2;
+	
+	checkResult(cls1->QueryInterface(IID_IUnknown, (void **)&spUnk1));
+	checkResult(cls2->QueryInterface(IID_IUnknown, (void **)&spUnk2));
+	
+	if (spUnk1 == spUnk2)
+		return kAAFTrue;
+	else
+		return kAAFFalse;
+}
+
+static HRESULT checkModeFlag (aafUInt32 modeFlags,
+							  HRESULT expectedResult)
+{
+  // Check mod flags
+  aafProductIdentification_t	ProductInfo = { 0 };
+  HRESULT temphr;
+  IAAFFile * pFile = 0;
+  temphr = AAFFileOpenNewModify(L"foo",
+								modeFlags,
+								&ProductInfo,
+								&pFile);
+  if (expectedResult != temphr)
+	{
+	  return AAFRESULT_TEST_FAILED;
+	}
+  if (pFile)
+	{
+	  return AAFRESULT_TEST_FAILED;
+	}
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+static HRESULT checkModeFlags ()
+{
+  HRESULT temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_EAGER_LOADING,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_REVERTABLE,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_UNBUFFERED,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_RECLAIMABLE,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_USE_LARGE_SS_SECTORS,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_CLOSE_FAIL_DIRTY,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_DEBUG0_ON,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  temphr = checkModeFlag (AAF_FILE_MODE_DEBUG1_ON,
+						  AAFRESULT_NOT_IN_CURRENT_VERSION);
+  if (AAFRESULT_FAILED (temphr)) return temphr;
+
+  aafUInt32 i;
+  for (i = 4; i < 28; i++)
+	{
+	  temphr = checkModeFlag ((1 << i),
+							  AAFRESULT_BAD_FLAGS);
+	  if (AAFRESULT_FAILED (temphr)) return temphr;
+	}
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -105,6 +194,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
       // Remove the previous test file if any.
       RemoveTestFile(pFileName);
 
+	  // Check for illegal mode flags.
+	  checkModeFlags ();
 
 	  // Create the file.
 	  checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
@@ -114,7 +205,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult(pFile->GetHeader(&pHeader));
 
 	  // Get the AAF Dictionary so that we can create valid AAF objects.
-	  checkResult(pHeader->GetDictionary(&pDictionary));
+	  checkResult(pFile->GetDictionary(&pDictionary));
+
+      // Make sure the header returns us the same dictionary as the file
+	  IAAFDictionarySP pDictionaryFromHeader;
+	  checkResult(pHeader->GetDictionary(&pDictionaryFromHeader));
+	  checkExpression(AreUnksSame(pDictionary,pDictionaryFromHeader)==kAAFTrue);
 
 	  CAAFBuiltinDefs defs (pDictionary);
  	  
@@ -178,6 +274,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   HRESULT						hr = S_OK;
   aafWChar					name[500];
   aafMobID_t					mobID;
+  aafFileRev_t					testRev;
 
   aafProductVersion_t v;
   v.major = 1;
@@ -219,7 +316,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  mobIter->Release();
 	  mobIter = NULL;
 
-	  checkResult(pFile->Close());
+	checkResult(pFile->GetRevision(&testRev));
+    checkExpression(kAAFRev1 == testRev, AAFRESULT_TEST_FAILED);
+
+	checkResult(pFile->Close());
     bFileOpen = false;
 
   }
@@ -262,24 +362,17 @@ extern "C" HRESULT CAAFFile_test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFMob_test...Caught general C++"
+	  cerr << "CAAFFile_test...Caught general C++"
 		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
+	if (SUCCEEDED(hr))
+	{
+		// Open() and SaveCopyAs() method were not in the current version
+		// of the toolkit at the time this module test was written.
+		hr = AAFRESULT_NOT_IN_CURRENT_VERSION;
+	}
 
-  	// When all of the functionality of this class is tested, we can return success
-	if(hr == AAFRESULT_SUCCESS)
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-  return hr;
+	return hr;
 }
-
-
-
-
-
-
-
-
-
-

@@ -1,28 +1,30 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 /*
  * Name: omCvt.c
  *
@@ -74,12 +76,9 @@
 
 //#include "masterhd.h"
 #include <string.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
 #include <ctype.h>
 #include <stdlib.h> 
-
+#include <wchar.h>
 
 //#include "omPublic.h"
 #include "AAFTypes.h"
@@ -673,7 +672,7 @@ aafErr_t Int64ToString(
 	aafInt64		workval, zero;
 	char			tmpBuf[64];
 	aafInt32		numDigits, remainder, src, dest;
-	aafBool			negative = AAFFalse;
+	aafBool			negative = kAAFFalse;
 	
 	if(buf == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -693,7 +692,7 @@ aafErr_t Int64ToString(
 			if(Int64Less(workval, zero))
 			{
 				NegateInt64(&workval);
-				negative = AAFTrue;
+				negative = kAAFTrue;
 			}
 			while(Int64Greater(workval, zero))
 			{
@@ -776,9 +775,9 @@ aafBool Int64Equal(
 	for(n = 0; n <= 3; n++)
 	{
 		if(a.words[n] != b.words[n])
-			return AAFFalse;
+			return kAAFFalse;
 	}
-	return(AAFTrue);
+	return(kAAFTrue);
 }
 
 /*****/
@@ -1038,7 +1037,7 @@ aafErr_t TimecodeToString(
 		  RAISE(AAFRESULT_INTERN_TOO_SMALL);
 		}
 
-	  if (timeCode.drop == kTcDrop)
+	  if (timeCode.drop == kAAFTcDrop)
 		wcscpy(tcString, L"00;00;00;00");
 	  else 
 		wcscpy(tcString, L"00:00:00:00");
@@ -1110,7 +1109,7 @@ static aafInt32 roundFrameRate(aafRational_t frameRate)
  * Function: StringToTimecode()
  *************************************************************************/
 aafErr_t StringToTimecode(
-	wchar_t *timecodeString, /* IN - Timecode String */
+	const wchar_t *timecodeString, /* IN - Timecode String */
 	aafRational_t frameRate,  /* IN - Frame Rate */
 	aafTimecode_t *timecode)  /* OUT - Timecode Value */
 {
@@ -1138,11 +1137,11 @@ aafErr_t StringToTimecode(
 		}
 		
 		/* Prescan for drop/nondrop */
-		drop = kTcNonDrop;
+		drop = kAAFTcNonDrop;
 		for (c = &tcString[len-1]; c >= tcString; c--)
 			if (*c == ';')
 			{
-				drop = kTcDrop;
+				drop = kAAFTcDrop;
 				break;
 			}
 			
@@ -1150,7 +1149,7 @@ aafErr_t StringToTimecode(
 			if (intFRate == 25)
 			{
 				multiplier = PALnondropTbl;
-				drop = kTcNonDrop;
+				drop = kAAFTcNonDrop;
 			}
 			
 			for (c = &tcString[len-1]; c >= tcString; c--)
@@ -1180,9 +1179,9 @@ aafErr_t StringToTimecode(
 			}
 			
 			if (!drop)
-				(*timecode).drop = kTcNonDrop;
+				(*timecode).drop = kAAFTcNonDrop;
 			else 
-				(*timecode).drop = kTcDrop;
+				(*timecode).drop = kAAFTcDrop;
 			
 			(*timecode).fps = (aafUInt16)intFRate;
 			(*timecode).startFrame = total;
