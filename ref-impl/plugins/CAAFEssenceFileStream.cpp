@@ -29,10 +29,11 @@
 #include "CAAFEssenceFileContainer.h"
 
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 #include "AAFResult.h"
 
 #include <errno.h>
-
 
 
 
@@ -50,8 +51,8 @@
   if (sizeof(fpos_t) < sizeof(aafPosition_t))
   {
     // The following test assumes 64 bit arithematic!
-    aafPosition_t trunPos = (0x00000000FFFFFFFF & *aafPos);
-    if (trunPos != *aafPos && 0xFFFFFFFFFFFFFFFF != *aafPos)
+    aafPosition_t trunPos = (AAFCONSTINT64(0x00000000FFFFFFFF) & *aafPos);
+    if (trunPos != *aafPos && AAFCONSTINT64(0xFFFFFFFFFFFFFFFF) != *aafPos)
       return false;
 
     *ansiPos = *aafPos;
@@ -708,6 +709,10 @@ HRESULT STDMETHODCALLTYPE
 //
 // 
 // 
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFEssenceFileStream::InternalQueryInterface
 (
     REFIID riid,
@@ -719,13 +724,13 @@ HRESULT CAAFEssenceFileStream::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IAAFEssenceStream interface
-    if (riid == IID_IAAFEssenceStream) 
+    if (EQUAL_UID(riid,IID_IAAFEssenceStream)) 
     { 
         *ppvObj = (IAAFEssenceStream *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
