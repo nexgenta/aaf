@@ -31,7 +31,8 @@
 #endif
 
 
-
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
 
 
 
@@ -61,11 +62,11 @@ extern "C" const aafClassID_t CLSID_AAFSourceClip;
 extern "C" const aafClassID_t CLSID_AAFFindSourceInfo;
 
 ImplAAFMob::ImplAAFMob ()
-: _mobID(			PID_MOB_MOBID,			"MobID"),
-  _name(			PID_MOB_NAME,			"Name"),
-  _creationTime(    PID_MOB_CREATE_TIME,	"CreateTime"),
-  _lastModified(    PID_MOB_MOD_TIME,		"ModTime"),
-  _slots(			PID_MOB_SLOTS,			"Slots")
+: _mobID(			PID_Mob_MobID,			"MobID"),
+  _name(			PID_Mob_Name,			"Name"),
+  _creationTime(    PID_Mob_CreationTime,	"CreationTime"),
+  _lastModified(    PID_Mob_LastModified,		"LastModified"),
+  _slots(			PID_Mob_Slots,			"Slots")
 {
 	_persistentProperties.put(_mobID.address());
 	_persistentProperties.put(_name.address());
@@ -90,7 +91,6 @@ ImplAAFMob::~ImplAAFMob ()
 		{
 			pSlot->ReleaseReference();
 			pSlot = NULL;
-			// Set the current value to 0 so that the OM can perform necessary cleanup.
 			_slots.setValueAt(0, i);
 		}
 	}
@@ -110,10 +110,13 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::AppendSlot
         (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
 {
+	AAFRESULT aafError = AAFRESULT_SUCCESS;
+
 	if (NULL == pSlot)
 		return AAFRESULT_NULL_PARAM;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+	_slots.appendValue(pSlot);
+	return aafError;
 }
 
 //****************
@@ -266,6 +269,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
+	  if (inFile())
+          {
 		hr = MyHeadObject(&head);
 		if(hr == AAFRESULT_SUCCESS)
 		{			
@@ -293,12 +298,11 @@ AAFRESULT STDMETHODCALLTYPE
 			head->ReleaseReference();
 			head = NULL;
 		}
-		else if (hr == AAFRESULT_NOT_IN_FILE)
-		{
-			_mobID = *newMobID;
-		}
 		else
 			RAISE(hr);
+	  }
+          else
+		 _mobID = *newMobID;
 
 	} /* XPROTECT */
 	XEXCEPT
@@ -952,8 +956,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 static aafBool IsThisSCLP(
-						  AAFFile *file,    /* IN - File Handle */
-						  AAFObject *obj,  /* IN - Object to match */
+						  ImplAAFFile *file,    /* IN - File Handle */
+						  ImplAAFObject *obj,  /* IN - Object to match */
 						  void *data)       /* IN/OUT - Match Data */
 {
 #if FULL_TOOLKIT
@@ -977,8 +981,8 @@ static aafBool IsThisSCLP(
 }
 
 static AAFRESULT LocalChangeRef(
-						  AAFFile *file,    /* IN - File Handle */
-						  AAFObject *obj,  /* IN - Object to execute */
+						  ImplAAFFile *file,    /* IN - File Handle */
+						  ImplAAFObject *obj,  /* IN - Object to execute */
 						  aafInt32 level,   /* IN - Depth level */
 						  void *data)       /* IN/OUT - Execute data */
 {
@@ -1282,7 +1286,7 @@ ImplAAFMob::AddPhysSourceRef (aafAppendOption_t  addType,
 	{
 		CvtInt32toInt64(0, &zeroPos);
 		sclp = (ImplAAFSourceClip *)CreateImpl(CLSID_AAFSourceClip);
-		sclp->InitializeSourceClip(pEssenceKind, &srcRefLength, ref);
+		sclp->Initialize(pEssenceKind, &srcRefLength, ref);
 				
 		status = FindSlotBySlotID(aMobSlot, &slot);
 		if (status == AAFRESULT_SUCCESS)
@@ -1361,7 +1365,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 	aafSlotID_t				nextTrackID;
 	ImplAAFFindSourceInfo	*sourceInfo;
 	ImplAAFComponent		*leafObj = NULL;
-	ImplAAFEffectInvocation	*effeObject;
+	ImplAAFGroup	*effeObject;
 	
 	if(ppSourceInfo == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -1455,7 +1459,7 @@ AAFRESULT ImplAAFMob::MobFindLeaf(ImplAAFMobSlot *track,
 								  ImplAAFComponent **foundObj,
 								  aafLength_t *minLength,
 								  aafBool *foundTransition,
-								  ImplAAFEffectInvocation **effeObject,
+								  ImplAAFGroup **effeObject,
 								  aafInt32	*nestDepth,
 								  aafPosition_t *diffPos)
 {
@@ -1596,7 +1600,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 	ImplAAFPulldown			*pulldownObj = NULL;
 	ImplAAFSegment			*rootObj = NULL;
 	ImplAAFComponent		*leafObj = NULL;
-	ImplAAFEffectInvocation	*effeObject = NULL;
+	ImplAAFGroup	*effeObject = NULL;
 	ImplAAFMob				*nextMob = NULL;
 	aafSlotID_t				foundTrackID;
 	aafBool					nextFoundSource = AAFFalse, foundTransition = AAFFalse;
@@ -1731,9 +1735,14 @@ AAFRESULT ImplAAFMob::MobFindSource(
 	
 	return(OM_ERR_NONE);
 }
-extern "C" const aafClassID_t CLSID_AAFMob;
 
-OMDEFINE_STORABLE(ImplAAFMob, CLSID_AAFMob);
+AAFRESULT ImplAAFMob::ReconcileMobLength(void)
+{
+	return(AAFRESULT_NOT_IMPLEMENTED);	// MUST call one of the subclasses
+}
+
+
+OMDEFINE_STORABLE(ImplAAFMob, AUID_AAFMob);
 
 
 
