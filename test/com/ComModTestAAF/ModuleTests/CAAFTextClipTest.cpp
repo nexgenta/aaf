@@ -98,13 +98,15 @@ extern "C" HRESULT CAAFTextClip_test()
   aafWChar * pFileName = L"AAFTextClipTest.aaf";
 
   // Initialize the product info for this module test
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFTextClip Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kAAFVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -127,7 +129,8 @@ extern "C" HRESULT CAAFTextClip_test()
   }
   catch (...)
   {
-    cerr << "CAAFTextClip_test...Caught general C++ exception!" << endl;
+    cerr << "CAAFTextClip_test..."
+		 << "Caught general C++ exception!" << endl;
     hr = AAFRESULT_TEST_FAILED;
   }
 
@@ -258,8 +261,8 @@ void TextClipTest::CreateTextClip()
     // Write some text essence.
 
 
-  // Create a TextClip
-  checkResult(defs.cdTextClip()->
+  // Create a concrete subclass of TextClip
+  checkResult(defs.cdHTMLClip()->
 			  CreateInstance(IID_IAAFTextClip, 
 							 (IUnknown **)&pTextClip));
   checkResult(pTextClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
