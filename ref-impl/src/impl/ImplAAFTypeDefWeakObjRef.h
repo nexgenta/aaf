@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.h,v 1.27.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.h,v 1.27.2.2 2004/08/09 22:13:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,7 +35,9 @@ class ImplAAFClassDef;
 #ifndef __ImplAAFTypeDefObjectRef_h__
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
+#include "AAFUtils.h"
 #include "OMWeakRefProperty.h"
+#include "OMArrayProperty.h"
 
 
 class ImplAAFTypeDefWeakObjRef : public ImplAAFTypeDefObjectRef
@@ -153,7 +155,7 @@ public:
 private:
   // Persistent member properties
   OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
-  OMVariableSizeProperty<aafUID_t> _targetSet; // array of property definition ids
+  OMArrayProperty<aafUID_t> _targetSet; // array of property definition ids
   
   // Transient members
   OMPropertyId * _targetPids;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.48.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.48.2.2 2004/08/09 22:13:50 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -334,6 +334,14 @@ void ImplAAFTypeDefFixedArray::internalize(const OMByte* externalBytes,
 	}
 }
 
+OMType* ImplAAFTypeDefFixedArray::elementType(void) const
+{
+  ImplAAFTypeDef* result = 0;
+  AAFRESULT hr = GetType(&result);
+  assert(hr == 0);
+  result->ReleaseReference();
+  return result;
+}
 
 aafBool ImplAAFTypeDefFixedArray::IsFixedSize (void) const
 {

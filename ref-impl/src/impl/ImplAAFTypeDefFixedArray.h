@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.h,v 1.30.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.h,v 1.30.2.2 2004/08/09 22:13:50 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -140,6 +140,8 @@ public:
                            OMByte* internalBytes,
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
+
+  virtual OMType* elementType(void) const;
 
   //****************
   // pvtInitialize()

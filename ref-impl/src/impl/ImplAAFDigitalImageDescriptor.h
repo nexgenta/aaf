@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescriptor.h,v 1.16 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescriptor.h,v 1.16.2.1 2004/08/09 22:13:50 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,7 @@
 #include "ImplAAFFileDescriptor.h"
 #endif
 
-#include "OMVariableSizeProperty.h"
+#include "OMArrayProperty.h"
 
 class ImplAAFDigitalImageDescriptor : public ImplAAFFileDescriptor
 {
@@ -273,7 +273,7 @@ protected:
 	OMFixedSizeProperty<aafInt32>				_displayXOffset;
 	OMFixedSizeProperty<aafInt32>				_displayYOffset;
 	OMFixedSizeProperty<aafFrameLayout_t>		_frameLayout;
-	OMVariableSizeProperty<aafInt32>			_videoLineMap;
+	OMArrayProperty<aafInt32>			_videoLineMap;
 	OMFixedSizeProperty<aafRational_t>			_imageAspectRatio;
 	OMFixedSizeProperty<aafAlphaTransparency_t>	_alphaTransparency;
 	OMFixedSizeProperty<aafUID_t>				_gamma;

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.h,v 1.28.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.h,v 1.28.2.2 2004/08/09 22:13:50 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,7 @@
 #endif
 
 #include "OMWeakRefProperty.h"
+#include "OMArrayProperty.h"
 
 class ImplAAFPropertyValue;
 
@@ -312,7 +313,7 @@ private:
   OMVariableSizeProperty<wchar_t> _ElementNames;
 
   // array of values for elements.
-  OMVariableSizeProperty<aafInt64> _ElementValues;
+  OMArrayProperty<aafInt64> _ElementValues;
 
   aafBool          _isRegistered;
   aafBool          _registrationAttempted;
