@@ -11,6 +11,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "AAFDefUIDs.h"
+#include "AAFCodecDefs.h"
 
 #include <assert.h>
 #include <string.h>
@@ -247,8 +248,12 @@ AAFRESULT STDMETHODCALLTYPE
 	if ((pSampledHeight == NULL) || (pSampledWidth == NULL) ||
 		(pSampledXOffset == NULL) || (pSampledYOffset == NULL))
 		return(AAFRESULT_NULL_PARAM);
-
-	*pSampledHeight = _sampledHeight;
+	
+	if (!_sampledHeight.isPresent()  || !_sampledWidth.isPresent()   || 
+		!_sampledXOffset.isPresent() ||	!_sampledYOffset.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+		
+		*pSampledHeight = _sampledHeight;
 	*pSampledWidth = _sampledWidth;
 	*pSampledXOffset = _sampledXOffset;
 	*pSampledYOffset = _sampledYOffset;
@@ -263,9 +268,13 @@ AAFRESULT STDMETHODCALLTYPE
 												  aafInt32*  pDisplayXOffset,
 												  aafInt32* pDisplayYOffset)
 {
-	if ((pDisplayHeight == NULL) || (pDisplayWidth == NULL) ||
+	if ((pDisplayHeight == NULL)  || (pDisplayWidth == NULL) ||
 		(pDisplayXOffset == NULL) || (pDisplayYOffset == NULL))
 		return(AAFRESULT_NULL_PARAM);
+	
+	if (!_displayHeight.isPresent()	 || !_displayWidth.isPresent()	 ||
+		!_displayXOffset.isPresent() || !_displayXOffset.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pDisplayHeight = _displayHeight;
 	*pDisplayWidth = _displayWidth;
@@ -333,6 +342,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pAlphaTransparency == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if (!_alphaTransparency.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
 	aafRational_t transparency = _alphaTransparency;
 
 	if (transparency.numerator == 0)
@@ -353,6 +365,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (pGamma == NULL)
 		return(AAFRESULT_NULL_PARAM);
+	
+	if (!_gamma.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pGamma = _gamma;
 
@@ -366,6 +381,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pImageAlignmentFactor == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if (!_imageAlignmentFactor.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
 	*pImageAlignmentFactor = _imageAlignmentFactor;
 
 	return AAFRESULT_SUCCESS;

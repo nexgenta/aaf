@@ -7,25 +7,8 @@
 *                                          *
 \******************************************/
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
- 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-
-
 #include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIds.h"
+#include "AAFPropertyIDs.h"
 
 #ifndef __ImplAAFEdgecode_h__
 #include "ImplAAFEdgecode.h"
@@ -38,8 +21,8 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "aafUtils.h"
-#include "AAFDefUIDs.h"
+#include "AAFUtils.h"
+#include "AAFDataDefs.h"
 
 
 ImplAAFEdgecode::ImplAAFEdgecode ():
