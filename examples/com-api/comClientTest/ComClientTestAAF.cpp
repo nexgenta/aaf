@@ -1,81 +1,53 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1996 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
  *
  ************************************************************************/
-
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-// Include the AAF interface declarations.
-#include "AAF.h"
 #include "AAFTypes.h"
 
-
-// Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
-#include "AAFStoredObjectIDs.h"
-
-#include "CAAFBuiltinDefs.h"
-
-#if defined( OS_MACOS )
-#include "DataInput.h"
+#if defined(_MAC) || defined(macintosh)
+#include <initguid.h> // define all of the AAF guids.
+#include "AAF.h"
+#else
+#include "AAF.h"
+// TODO: This should not be here, I added them for now to get a good link.
+const CLSID CLSID_AAFFile = { 0x9346ACD2, 0x2713, 0x11d2, { 0x80, 0x35, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 #endif
 
-static const aafMobID_t TEST_MobID[5] = {
 
-//{060c2b340205110101001000-13-00-00-00-{fcd55620-9bca-11d4-9f7f-080036210804}}
-{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00, 
-{0xfcd55620, 0x9bca, 0x11d4, 0x9f, 0x7f, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
+// Include the defintions for the AAF Stored Object identifiers.
+#define INIT_AUID
+#include "AAFStoredObjectIDs.h"
 
-//{060c2b340205110101001000-13-00-00-00-{5cf19020-9f89-11d4-9f82-080036210804}}
-{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
-0x13, 0x00, 0x00, 0x00, 
-{0x5cf19020, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
-
-//{060c2b340205110101001000-13-00-00-00-{5de486f0-9f89-11d4-9f82-080036210804}}
-{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
-0x13, 0x00, 0x00, 0x00, 
-{0x5de486f0, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
-
-//{060c2b340205110101001000-13-00-00-00-{5e8e24c0-9f89-11d4-9f82-080036210804}}
-{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
-0x13, 0x00, 0x00, 0x00, 
-{0x5e8e24c0, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
-
-//{060c2b340205110101001000-13-00-00-00-{5f37c290-9f89-11d4-9f82-080036210804}}
-{ {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
-0x13, 0x00, 0x00, 0x00, 
-{0x5f37c290, 0x9f89, 0x11d4, 0x9f, 0x82, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}},
-
-}; // TEST_MobID[]
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
 {
-  printf("\nError '%0x' returned at line %d in %s\n", errcode, line, file);
+  printf("Error '%0x' returned at line %d in %s\n", errcode, line, file);
   exit(1);
 }
 
@@ -87,7 +59,7 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 }
 
 #define assert(b, msg) \
-  if (!(b)) {fprintf(stderr, "\nASSERT: %s\n\n", msg); exit(1);}
+  if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
 
 static void convert(wchar_t* wcName, size_t length, const char* name)
@@ -98,7 +70,7 @@ static void convert(wchar_t* wcName, size_t length, const char* name)
   
   size_t status = mbstowcs(wcName, name, length);
   if (status == (size_t)-1) {
-    fprintf(stderr, "\nError : Failed to convert'%s' to a wide character string.\n\n", name);
+    fprintf(stderr, "Error : Failed to convert'%s' to a wide character string.\n\n", name);
     exit(1);  
   }
 }
@@ -111,7 +83,7 @@ static void convert(char* cName, size_t length, const wchar_t* name)
 
   size_t status = wcstombs(cName, name, length);
   if (status == (size_t)-1) {
-    fprintf(stderr, "\nError : Conversion failed.\n\n");
+    fprintf(stderr, ": Error : Conversion failed.\n\n");
     exit(1);  
   }
 }
@@ -126,7 +98,7 @@ static void convert(char* cName, size_t length, const char* name)
   if (sourceLength < length - 1) {
     strncpy(cName, name, length);
   } else {
-    fprintf(stderr, "\nError : Failed to copy '%s'.\n\n", name);
+    fprintf(stderr, "Error : Failed to copy '%s'.\n\n", name);
     exit(1);  
   }
 }
@@ -145,50 +117,16 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
     while (*wName++ = *name++)
       ;
   } else {
-    fprintf(stderr, "\nError : Failed to copy string.\n\n");
+    fprintf(stderr, "Error : Failed to copy '%s'.\n\n", name);
     exit(1);  
   }
 }
-
-#if defined( OS_UNIX )
-
-static const unsigned char guidMap[] =
-{ 3, 2, 1, 0, '-', 5, 4, '-', 7, 6, '-', 8, 9, '-', 10, 11, 12, 13, 14, 15 }; 
-static const wchar_t digits[] = L"0123456789ABCDEF"; 
-
-#define GUIDSTRMAX 38 
-
-typedef OLECHAR OMCHAR;
-
-int StringFromGUID2(const GUID& guid, OMCHAR* buffer, int bufferSize) 
-{
-  const unsigned char* ip = (const unsigned char*) &guid; // input pointer
-  OMCHAR* op = buffer;                                    // output pointer
-
-  *op++ = L'{'; 
- 
-  for (size_t i = 0; i < sizeof(guidMap); i++) { 
-
-    if (guidMap[i] == '-') { 
-      *op++ = L'-'; 
-    } else { 
-      *op++ = digits[ (ip[guidMap[i]] & 0xF0) >> 4 ]; 
-      *op++ = digits[ (ip[guidMap[i]] & 0x0F) ]; 
-    } 
-  } 
-  *op++ = L'}'; 
-  *op = L'\0'; 
- 
-  return GUIDSTRMAX; 
-} 
-
-#endif
 
 // The maximum number of characters in the formated CLSID.
 // (as returned by StringFromGUID2).
 const size_t MAX_CLSID_BUFFER = 40;
 
-static void formatMobID(char *cBuffer, size_t length, aafMobID_t *pMobID)
+static void formatMobID(char *cBuffer, size_t length, aafUID_t *pMobID)
 {
   assert(pMobID, "Valid input mobID");
   assert(cBuffer != 0, "Valid output buffer");
@@ -201,10 +139,47 @@ static void formatMobID(char *cBuffer, size_t length, aafMobID_t *pMobID)
   if (0 < bytesCopied) {
     convert(cBuffer, length, wCLSID);
   } else {
-    fprintf(stderr, "\nError : formatMobID failed.\n\n");
+    fprintf(stderr, "Error : formatMobID failed.\n\n");
     exit(1);  
   }
 }
+
+#if defined(_MAC) || defined(macintosh)
+// For some reason the CoCreateGuid() function is not implemented in the 
+// Microsoft Component Library...so we define something that should be
+// fairly unique on the mac.
+
+#include <Events.h>
+#include <time.h>
+
+STDAPI CoCreateGuid(GUID  *pguid)
+{
+  // {1994bd00-69de-11d2-b6bc-fcab70ff7331}
+  static GUID sTemplate = 
+    { 0x1994bd00, 0x69de, 0x11d2, { 0xb6, 0xbc, 0xfc, 0xab, 0x70, 0xff, 0x73, 0x31 } };
+
+  static bool sInitializedTemplate = false;
+  
+  if (NULL == pguid)
+    return E_INVALIDARG;
+    
+  if (!sInitializedTemplate)
+  {
+    time_t timer = time(NULL);
+    UInt32 ticks = TickCount();
+   
+    sTemplate.Data1 += timer + ticks;
+    
+    sInitializedTemplate = true;
+  }
+  
+  // Just bump the first member of the guid to emulate GUIDGEN behavior.
+  ++sTemplate.Data1;
+  
+  *pguid = sTemplate;
+}
+
+#endif
 
 static void printIdentification(IAAFIdentification* pIdent)
 {
@@ -232,219 +207,262 @@ static void printIdentification(IAAFIdentification* pIdent)
 static void ReadAAFFile(aafWChar * pFileName)
 {
   HRESULT hr = S_OK;
+  // IAAFSession * pSession = NULL;
   IAAFFile * pFile = NULL;
 
-
-  hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
-  check(hr);
+  /*
+  CoCreateInstance(CLSID_AAFSession,
+               NULL, 
+               CLSCTX_INPROC_SERVER, 
+               IID_IAAFSession, 
+               (void **)&pSession);
+  */
+  CoCreateInstance(CLSID_AAFFile,
+               NULL, 
+               CLSCTX_INPROC_SERVER, 
+               IID_IAAFFile, 
+               (void **)&pFile);
+  check(hr); // display error message
   if (SUCCEEDED(hr))
   {
-    IAAFHeader * pHeader = NULL;
+    aafProductIdentification_t  ProductInfo;
 
 
-    hr = pFile->GetHeader(&pHeader);
-    check(hr); // display error message
-    if (SUCCEEDED(hr))
+    ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+    ProductInfo.productName = L"Make AVR Example. NOT!";
+    ProductInfo.productVersion.major = 1;
+    ProductInfo.productVersion.minor = 0;
+    ProductInfo.productVersion.tertiary = 0;
+    ProductInfo.productVersion.patchLevel = 0;
+    ProductInfo.productVersion.type = kVersionUnknown;
+    ProductInfo.productVersionString = NULL;
+    ProductInfo.productID = -1;
+    ProductInfo.platform = NULL;
+
+    // hr = pSession->SetDefaultIdentification(&ProductInfo);
+    // check(hr); // display error message
+    // if (SUCCEEDED(hr))
     {
-      IAAFDictionary * pDictionary = NULL;
+      // IAAFFile * pFile = NULL;
 
-      hr = pHeader->GetDictionary(&pDictionary);
+      // hr = pSession->OpenReadFile(pFileName, &pFile);
+      hr = pFile->Initialize();
+      check(hr); // display error message
+      hr = pFile->OpenExistingRead(pFileName, 0);
       check(hr); // display error message
       if (SUCCEEDED(hr))
       {
-        IAAFIdentification *pIdent = NULL;
-        aafNumSlots_t numMobs = 0;
+        IAAFHeader * pHeader = NULL;
 
 
-        hr = pHeader->GetLastIdentification(&pIdent);
+        hr = pFile->GetHeader(&pHeader);
         check(hr); // display error message
         if (SUCCEEDED(hr))
         {
-          printf("LastIdentification\n");
-          printIdentification(pIdent);
+          IAAFDictionary * pDictionary = NULL;
 
-          pIdent->Release();
-          pIdent = NULL;
-        }
-
-        hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
-        check(hr); // display error message
-        if (FAILED(hr))
-          numMobs = 0;
-        printf("Number of Mobs = %ld\n", numMobs);
-
-
-        IEnumAAFMobs      *mobIter = NULL;
-
-        if (SUCCEEDED(hr))
-        {
-          //!!!  aafSearchCrit_t    criteria;
-          //!!!  criteria.searchTag = kAAFNoSearch;
-          hr = pHeader->GetMobs (NULL, &mobIter);
+          hr = pHeader->GetDictionary(&pDictionary);
           check(hr); // display error message
-        }
-        if (SUCCEEDED(hr)) // EnumAAFAllMobs && GetNumMobs SUCCEEDED
-        {
-          aafUInt32 n = 0;
-
-
-          for(n = 0; n < numMobs; n++)
+          if (SUCCEEDED(hr))
           {
-            // Buffer for string version of each object's class id.
-            IAAFMob *aMob = NULL;
-            aafWChar name[500], slotName[500];
-            char chName[1000], chMobID[MAX_CLSID_BUFFER];
-            aafNumSlots_t  numSlots;
-            aafMobID_t    mobID = {0};
-            aafSlotID_t    trackID;
-            aafRational_t  rate;
+            IAAFIdentification *pIdent = NULL;
+            aafInt32 numMobs = 0;
 
-            hr = mobIter->NextOne (&aMob);
+
+            hr = pHeader->GetLastIdentification(&pIdent);
             check(hr); // display error message
             if (SUCCEEDED(hr))
             {
-              IAAFSourceMob      *smob = NULL;
+              printf("LastIdentification\n");
+              printIdentification(pIdent);
 
-              hr = aMob->GetName (name, sizeof(slotName));
-              check(hr); // display error message
-              if (SUCCEEDED(hr))
-                convert(chName, sizeof(chName), name);
-              else
-                strcpy(chName, "<mob name not available>");
+              pIdent->Release();
+              pIdent = NULL;
+            }
 
-              hr = aMob->GetMobID (&mobID);
-              check(hr); // display error message
-              if (SUCCEEDED(hr))
-                formatMobID(chMobID, MAX_CLSID_BUFFER, &mobID);
-              else
-                strcpy(chMobID, "<mob id not available>");
-            
-              printf("Mob %ld: (ID %s) is named '%s'\n", n, chMobID, chName);
+            hr = pHeader->GetNumMobs(kAllMob, &numMobs);
+            check(hr); // display error message
+            if (FAILED(hr))
+              numMobs = 0;
+            printf("Number of Mobs = %ld\n", numMobs);
 
-              hr = aMob->CountSlots (&numSlots);
-              check(hr); // display error message
-              if (FAILED(hr))
-                numSlots = 0;
-              printf("Found %ld slots\n", numSlots);
 
-              hr = aMob->QueryInterface (IID_IAAFSourceMob, (void **)&smob);
+            IEnumAAFMobs      *mobIter = NULL;
+
+            if (SUCCEEDED(hr))
+            {
+              //!!!  aafSearchCrit_t    criteria;
+              //!!!  criteria.searchTag = kNoSearch;
+              hr = pHeader->EnumAAFAllMobs (NULL, &mobIter);
               check(hr); // display error message
-              if(SUCCEEDED(hr))
+            }
+            if (SUCCEEDED(hr)) // EnumAAFAllMobs && GetNumMobs SUCCEEDED
+            {
+              aafInt32 n = 0;
+
+
+              for(n = 0; n < numMobs; n++)
               {
-                IAAFEssenceDescriptor  *essenceDesc = NULL;
-                aafUInt32 numLocators;
+                // Buffer for string version of each object's class id.
+                IAAFMob *aMob = NULL;
+                aafWChar name[500], slotName[500];
+                char chName[1000], chMobID[MAX_CLSID_BUFFER];
+                aafNumSlots_t  numSlots;
+                aafUID_t    mobID = {0};
+                aafSlotID_t    trackID;
+                aafRational_t  rate;
 
-
-                hr = smob->GetEssenceDescriptor(&essenceDesc);
+                hr = mobIter->NextOne (&aMob);
                 check(hr); // display error message
                 if (SUCCEEDED(hr))
                 {
-                  IAAFFileDescriptor *fileDesc = NULL;
+                  IAAFSourceMob      *smob = NULL;
 
-
-                  hr = essenceDesc->QueryInterface (IID_IAAFFileDescriptor, (void **)&fileDesc);
+                  hr = aMob->GetName (name, sizeof(slotName));
                   check(hr); // display error message
-                  if(SUCCEEDED(hr))
-                  {
-                    hr = fileDesc->GetSampleRate(&rate);
-                    check(hr); // display error message
-                    if(SUCCEEDED(hr))
-                    {
-                      printf("    It is a file source mob of sample rate %ld/%ld.\n",
-                             rate.numerator, rate.denominator);
-                    }
-                    // cleanup references...
-                    fileDesc->Release();
-                    fileDesc = NULL;
-                  }
+                  if (SUCCEEDED(hr))
+                    convert(chName, sizeof(chName), name);
                   else
-                    printf("    It is a source mob, but not a file source mob\n");
+                    strcpy(chName, "<mob name not available>");
 
-                  numLocators = -1;
-                  hr = essenceDesc->CountLocators(&numLocators);
+                  hr = aMob->GetMobID (&mobID);
+                  check(hr); // display error message
+                  if (SUCCEEDED(hr))
+                    formatMobID(chMobID, MAX_CLSID_BUFFER, &mobID);
+                  else
+                    strcpy(chMobID, "<mob id not available>");
+                
+                  printf("Mob %ld: (ID %s) is named '%s'\n", n, chMobID, chName);
+
+                  hr = aMob->GetNumSlots (&numSlots);
+                  check(hr); // display error message
+                  if (FAILED(hr))
+                    numSlots = 0;
+                  printf("Found %ld slots\n", numSlots);
+
+                  hr = aMob->QueryInterface (IID_IAAFSourceMob, (void **)&smob);
                   check(hr); // display error message
                   if(SUCCEEDED(hr))
                   {
-                    printf ("    It has %d locator%s attached.\n",
-                            numLocators,
-                            numLocators==1 ? "" : "s");
+                    IAAFEssenceDescriptor  *essenceDesc = NULL;
+                    aafInt32 numLocators;
+
+
+                    hr = smob->GetEssenceDescriptor(&essenceDesc);
+                    check(hr); // display error message
+                    if (SUCCEEDED(hr))
+                    {
+                      IAAFFileDescriptor *fileDesc = NULL;
+
+
+                      hr = essenceDesc->QueryInterface (IID_IAAFFileDescriptor, (void **)&fileDesc);
+                      check(hr); // display error message
+                      if(SUCCEEDED(hr))
+                      {
+                        hr = fileDesc->GetSampleRate(&rate);
+                        check(hr); // display error message
+                        if(SUCCEEDED(hr))
+                        {
+                          printf("    It is a file source mob of sample rate %ld/%ld.\n",
+                                 rate.numerator, rate.denominator);
+                        }
+                        // cleanup references...
+                        fileDesc->Release();
+                        fileDesc = NULL;
+                      }
+                      else
+                        printf("    It is a source mob, but not a file source mob\n");
+
+                      numLocators = -1;
+                      hr = essenceDesc->GetNumLocators(&numLocators);
+                      check(hr); // display error message
+                      if(SUCCEEDED(hr))
+                      {
+                        assert ((numLocators >= 0), "numLocators written");
+                        printf ("    It has %d locator%s attached.\n",
+                                numLocators,
+                                numLocators==1 ? "" : "s");
+                      }
+
+                      // cleanup references...
+                      essenceDesc->Release();
+                      essenceDesc = NULL;
+                    }
+
+                    smob->Release();
+                    smob = NULL;
                   }
 
-                  // cleanup references...
-                  essenceDesc->Release();
-                  essenceDesc = NULL;
-                }
-
-                smob->Release();
-                smob = NULL;
-              }
-
-              if(numSlots != 0)
-              {
-                IEnumAAFMobSlots  *slotIter = NULL;
-
-
-                hr = aMob->GetSlots(&slotIter);
-                check(hr); // display error message
-                if(SUCCEEDED(hr))
-                {
-                  IAAFMobSlot    *slot = NULL;
-                  aafUInt32 s;
-
-
-                  for(s = 0; s < numSlots; s++)
+                  if(numSlots != 0)
                   {
-                    hr = slotIter->NextOne (&slot);
+                    IEnumAAFMobSlots  *slotIter = NULL;
+
+
+                    hr = aMob->EnumAAFAllMobSlots(&slotIter);
                     check(hr); // display error message
                     if(SUCCEEDED(hr))
                     {
-                      check(slot->GetName (slotName, sizeof(slotName)));
-                      check(slot->GetSlotID(&trackID));
-                      convert(chName, sizeof(chName), slotName);
-                      printf("    Slot %ld: (ID %ld), is named '%s'\n",
-                            s, trackID, chName);
-    
+                      IAAFMobSlot    *slot = NULL;
+                      aafInt32 s;
+
+
+                      for(s = 0; s < numSlots; s++)
+                      {
+                        hr = slotIter->NextOne (&slot);
+                        check(hr); // display error message
+                        if(SUCCEEDED(hr))
+                        {
+                          check(slot->GetName (slotName, sizeof(slotName)));
+                          check(slot->GetSlotID(&trackID));
+                          convert(chName, sizeof(chName), slotName);
+                          printf("    Slot %ld: (ID %ld), is named '%s'\n",
+                                s, trackID, chName);
+        
+                          // cleanup references
+                          slot->Release();
+                          slot = NULL;
+                        } // NextOne
+                      } // for
+
                       // cleanup references
-                      slot->Release();
-                      slot = NULL;
-                    } // NextOne
-                  } // for
+                      slotIter->Release();
+                      slotIter = NULL;
+                    } // SUCCEEDED(EnumAAFAllMobSlots)
+                  } // if(numSlots != 0)
 
                   // cleanup references
-                  slotIter->Release();
-                  slotIter = NULL;
-                } // SUCCEEDED(EnumAAFAllMobSlots)
-              } // if(numSlots != 0)
+                  aMob->Release();
+                  aMob = NULL;
+                }
+              }
+
 
               // cleanup references
-              aMob->Release();
-              aMob = NULL;
-            }
+              mobIter->Release();
+              mobIter = NULL;
+            } // EnumAAFAllMobs && GetNumMobs SUCCEEDED
+            
+            pDictionary->Release();
+            pDictionary = NULL;
           }
 
+          pHeader->Release();
+          pHeader = NULL;
+        }
 
-          // cleanup references
-          mobIter->Release();
-          mobIter = NULL;
-        } // EnumAAFAllMobs && GetNumMobs SUCCEEDED
-        
-        pDictionary->Release();
-        pDictionary = NULL;
+        check(pFile->Close());
+
+        pFile->Release();
+        pFile = NULL;
       }
-
-      pHeader->Release();
-      pHeader = NULL;
     }
 
-    check(pFile->Close());
+    // check(pSession->EndSession());
 
-    pFile->Release();
-    pFile = NULL;
-
+    // pSession->Release();
+    // pSession = NULL;
   }
 }
-
-const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 static void CreateAAFFile(aafWChar * pFileName)
 {
@@ -452,40 +470,44 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFHeader *        pHeader = NULL;
   IAAFDictionary *pDictionary = NULL;
   aafProductIdentification_t  ProductInfo;
- 
+  aafUID_t          newUID;
+  
   // delete any previous test file before continuing...
   char chFileName[1000];
   convert(chFileName, sizeof(chFileName), pFileName);
   remove(chFileName);
 
-  // Create a new file...
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"Make AVR Example";
-  ProductInfo.productVersion = &v;
+  ProductInfo.productVersion.major = 1;
+  ProductInfo.productVersion.minor = 0;
+  ProductInfo.productVersion.tertiary = 0;
+  ProductInfo.productVersion.patchLevel = 0;
+  ProductInfo.productVersion.type = kVersionUnknown;
   ProductInfo.productVersionString = NULL;
-  ProductInfo.productID = NIL_UID;
+  ProductInfo.productID = -1;
   ProductInfo.platform = NULL;
+
+  check(CoCreateInstance(CLSID_AAFFile,
+               NULL, 
+               CLSCTX_INPROC_SERVER, 
+               IID_IAAFFile, 
+               (void **)&pFile));
+    
+  check(pFile->Initialize());
+  check(pFile->OpenNewModify(pFileName, 0, &ProductInfo));
   
-  check(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
   check(pFile->GetHeader(&pHeader));
 
   // Get the AAF Dictionary so that we can create valid AAF objects.
   check(pHeader->GetDictionary(&pDictionary));
-  CAAFBuiltinDefs defs (pDictionary);
    
 //Make the first mob
   IAAFMob            *pMob = NULL;
   long  test;
   aafWChar    *names[5] = { L"FOOBAR1", L"FOOBAR2", L"FOOBAR3", L"FOOBAR4", L"FOOBAR5" };
   aafRational_t  editRate = { 2997, 100 };
-  IAAFTimelineMobSlot    *newSlot = NULL;
+  IAAFMobSlot    *newSlot = NULL;
   IAAFSegment    *seg = NULL;
   IAAFSourceClip  *sclp = NULL;
   IAAFSourceMob  *smob = NULL;
@@ -495,38 +517,36 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFEssenceDescriptor *essenceDesc = NULL;
   aafRational_t  audioRate = { 44100, 1 };
   IAAFLocator    *pLocator = NULL;
-	IAAFComponent*		pComponent = NULL;
-	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
 
   for(test = 0; test < 5; test++)
   {
      // Create a source Mob with a FileDescriptor attached
-    check(defs.cdSourceMob()->
-		  CreateInstance(IID_IAAFSourceMob, 
-						 (IUnknown **)&smob));
+    check(pDictionary->CreateInstance(
+                &AUID_AAFSourceMob, 
+                IID_IAAFSourceMob, 
+                (IUnknown **)&smob));
     check(smob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-    check(pMob->SetMobID( TEST_MobID[ test ] ));
+    check(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
+    //newUID.Data1 = test;
+    check(pMob->SetMobID(&newUID));
     check(pMob->SetName(names[test]));
 
-	// Create a concrete subclass of FileDescriptor
-    check(defs.cdAIFCDescriptor()->
-		  CreateInstance(IID_IAAFFileDescriptor, 
-						 (IUnknown **)&fileDesc));
-    check(fileDesc->SetSampleRate(audioRate));
+    check(pDictionary->CreateInstance(
+              &AUID_AAFFileDescriptor,
+              IID_IAAFFileDescriptor, 
+              (IUnknown **)&fileDesc));
+    check(fileDesc->SetSampleRate(&audioRate));
     check(fileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&essenceDesc));
-	check(fileDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-	check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-	pAIFCDesc->Release();
-	pAIFCDesc = NULL;
 
     {
       HRESULT stat;
-      stat = defs.cdNetworkLocator()->
-		CreateInstance(IID_IAAFLocator, 
-					   (IUnknown **)&pLocator);
+      stat = pDictionary->CreateInstance(
+                  &AUID_AAFNetworkLocator,
+                  IID_IAAFLocator, 
+                  (IUnknown **)&pLocator);
       check (stat);
     }
-    check(fileDesc->SetSampleRate(audioRate));
+    check(fileDesc->SetSampleRate(&audioRate));
 
     check(essenceDesc->AppendLocator (pLocator));
     check(smob->SetEssenceDescriptor(essenceDesc));
@@ -534,21 +554,11 @@ static void CreateAAFFile(aafWChar * pFileName)
     // Add some slots
     for(testSlot = 0; testSlot < 3; testSlot++)
     {
-       check(defs.cdSourceClip()->
-			 CreateInstance(IID_IAAFSourceClip, 
-							(IUnknown **)&sclp));
-		 check(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 check(pComponent->SetDataDef(defs.ddPicture()));
-		pComponent->Release();
-		pComponent = NULL;
+       check(pDictionary->CreateInstance(&AUID_AAFSourceClip,
+               IID_IAAFSourceClip, 
+               (IUnknown **)&sclp));
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
-      check(pMob->AppendNewTimelineSlot
-			(editRate,
-			 seg,
-			 testSlot+1,
-			 slotNames[testSlot],
-			 0,
-			 &newSlot));
+      check(pMob->AppendNewSlot (seg, testSlot+1, slotNames[testSlot], &newSlot));
       
       // Cleanup references...
       newSlot->Release();
@@ -562,7 +572,7 @@ static void CreateAAFFile(aafWChar * pFileName)
     }
     
     // Add the newly created and initialized Mob to the end of the mob index.
-    check(pHeader->AddMob(pMob));
+    check(pHeader->AppendMob(pMob));
     
     
     // Cleanup references...
@@ -586,40 +596,32 @@ static void CreateAAFFile(aafWChar * pFileName)
   pDictionary->Release();
   pDictionary = NULL;
 
-	if (pComponent)
-		pComponent->Release();
-
   pHeader->Release();
   pHeader = NULL;
-  check(pFile->Save());
+  
   check(pFile->Close());
   if (pFile)
     pFile->Release();
 
 }
 
-
-// simple helper class to initialize and cleanup AAF library.
-struct CAAFInitialize
+// simple helper class to initialize and cleanup COM library.
+struct CComInitialize
 {
-  CAAFInitialize(const char *dllname = NULL)
+  CComInitialize()
   {
-  	printf("Attempting to load the AAF dll...\n");
-    check(AAFLoad(dllname));
-    printf("DONE\n");
+    CoInitialize(NULL);
   }
 
-  ~CAAFInitialize()
+  ~CComInitialize()
   {
-    AAFUnload();
+    CoUninitialize();
   }
 };
 
-
-int main(int argc, char *argv[])
+main()
 {
-  CAAFInitialize aafInit;
-
+  CComInitialize comInit;
   aafWChar * pwFileName = L"Foo.aaf";
   const char * pFileName = "Foo.aaf";
 
@@ -627,8 +629,10 @@ int main(int argc, char *argv[])
   CreateAAFFile(pwFileName);
   printf("***Re-opening file %s\n", pFileName);
   ReadAAFFile(pwFileName);
-  
+
   printf("Done\n");
+
+
   return(0);
 }
 
