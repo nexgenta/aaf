@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.64.2.5 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.64.2.6 2004/07/23 19:40:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -106,10 +106,6 @@ public:
 
   // Return true if "classId" is registered.
   virtual bool isRegistered(const OMClassId& classId) const;
-
-  // Copy the class definition identified by "id" to the destination
-  // class factory.
-  virtual void cloneClassDef(const OMClassId& id, OMClassFactory* dstFactory);
 
   // Create an instance of the appropriate derived class, given the
   // class id.  Initializes the OM properties.

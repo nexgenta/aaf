@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.115.2.4 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.115.2.5 2004/07/23 19:40:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -296,11 +296,6 @@ ImplAAFDictionary *ImplAAFDictionary::CreateDictionary(void)
   pDictionary->pvtSetSoid (AUID_AAFDictionary);
 
   return pDictionary;
-}
-
-void ImplAAFDictionary::cloneClassDef( const OMClassId& id, OMClassFactory* pDstFactory )
-{
-  metaDictionary()->cloneClassDef( id, pDstFactory );
 }
 
 bool ImplAAFDictionary::isRegistered(const OMClassId& classId ) const

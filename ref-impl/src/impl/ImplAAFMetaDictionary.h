@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.23 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.23.2.1 2004/07/23 19:40:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -104,8 +104,6 @@ public:
   static ImplAAFMetaDictionary *CreateMetaDictionary(void);
 
   virtual bool isRegistered(const OMClassId& classId) const;
-
-  virtual void cloneClassDef(const OMClassId& id, OMClassFactory* dstFactory);
 
   //
   // Create an instance of the appropriate derived class, given the

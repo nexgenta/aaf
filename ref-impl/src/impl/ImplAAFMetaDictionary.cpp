@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.31.2.1 2004/07/22 23:19:11 akharkev Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.31.2.2 2004/07/23 19:40:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -201,11 +201,6 @@ bool ImplAAFMetaDictionary::isRegistered(const OMClassId& classId ) const
 {
 	assert( sizeof(OMClassId) == sizeof(aafUID_t) );
 	return containsClass( reinterpret_cast<const aafUID_t&>(classId) );
-}
-
-void ImplAAFMetaDictionary::cloneClassDef( const OMClassId& id, OMClassFactory* pDstFactory )
-{
-  ImplAAFCloneResolver::CloneClassDef(id, pDstFactory, this);
 }
 
 //
