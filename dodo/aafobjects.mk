@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.2 2004/03/11 18:58:32 stuart_hc Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.3 2004/03/24 00:36:42 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,8 @@ AAFCOMINTERFACESONLY="\
 	AAFEssenceMultiAccess \
 	AAFTypeDefVariableArrayEx \
 	AAFMasterMobEx \
-	AAFMob2 "
+	AAFMob2 \
+	AAFComponent2 "
 
 
 # These are the impl files that are typed by humans.  Be sure to

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFComponent.h,v 1.3.2.1 2004/03/11 18:58:38 stuart_hc Exp $ $Name:  $
+// $Id: CAAFComponent.h,v 1.3.2.2 2004/03/24 00:36:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,7 @@
 
 class CAAFComponent
   : public IAAFComponent,
+    public IAAFComponent2,
     public CAAFObject
 {
 protected:
@@ -62,7 +63,6 @@ protected:
   virtual ~CAAFComponent ();
 
 public:
-
 
   //***********************************************************
   //
@@ -285,6 +285,126 @@ public:
   STDMETHOD (RemoveKLVData) (
     // KLV data object to remove 
     /*[in]*/ IAAFKLVData * pData);
+
+
+  //***********************************************************
+  // METHOD NAME: AppendComment()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | AppendComment |
+  // Append and attribute name/value pair to the attribute list. 
+  // @end
+  // 
+  STDMETHOD (AppendComment)
+   (
+    // @parm [in] aafCharacter_constptr | pName | The attribute name.
+    aafCharacter_constptr  pName,
+
+    // @parm [in] aafCharacter_constptr | pValue | The attribute value.
+    aafCharacter_constptr  pValue
+  );
+
+  //***********************************************************
+  // METHOD NAME: CountComments()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | CountComments |
+  // Return the number of comments contained by this component 
+  // @end
+  // 
+  STDMETHOD (CountComments)
+   (
+    // @parm [out] aafUInt32* | pNumComments | Pointer to comment count.
+    aafUInt32*  pNumComments
+  );
+
+  //***********************************************************
+  // METHOD NAME: GetComments()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | GetComments |
+  // Return a comment enumerator for this component. 
+  // @end
+  // 
+  STDMETHOD (GetComments)
+   (
+    // @parm [out] EnumAAFTaggedValues | ppEnum | Pointer to the new enumerator object created by this method.
+    IEnumAAFTaggedValues ** ppEnum
+  );
+
+  //***********************************************************
+  // METHOD NAME: RemoveComment()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | RemoveComment |
+  // Remove a comment (tagged value).
+  // @end
+  // 
+  STDMETHOD (RemoveComment)
+   (
+    // @parm [in] AAFTaggedValue | pComment | Pointer to the tagged value comment.
+    IAAFTaggedValue * pComment
+  );
+
+  //***********************************************************
+  // METHOD NAME: AppendAttribute()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | AppendAttribute |
+  // Append and attribute name/value pair to the attribute list. 
+  // @end
+  // 
+  STDMETHOD (AppendAttribute)
+   (
+    // @parm [in] aafCharacter_constptr | pName | The attribute name.
+    aafCharacter_constptr  pName,
+
+    // @parm [in] aafCharacter_constptr | pValue | The attribute value.
+    aafCharacter_constptr  pValue
+  );
+
+  //***********************************************************
+  // METHOD NAME: CountAttributes()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | CountAttributes |
+  // Return the number of attributes contained by this component 
+  // @end
+  // 
+  STDMETHOD (CountAttributes)
+   (
+    // @parm [out] aafUInt32* | pNumAttributes | Pointer to attribute count.
+    aafUInt32*  pNumAttributes
+  );
+
+  //***********************************************************
+  // METHOD NAME: GetAttributes()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | GetAttributes |
+  // Return an attribute enumerator for this component. 
+  // @end
+  // 
+  STDMETHOD (GetAttributes)
+   (
+    // @parm [out] EnumAAFTaggedValues | ppEnum | Pointer to the new enumerator object created by this method.
+    IEnumAAFTaggedValues ** ppEnum
+  );
+
+  //***********************************************************
+  // METHOD NAME: RemoveAttribute()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFComponent2 | RemoveAttribute |
+  // Remove an attribute (tagged value).
+  // @end
+  // 
+  STDMETHOD (RemoveAttribute)
+   (
+    // @parm [in] AAFTaggedValue | pAttribute | Pointer to the tagged value attribute.
+    IAAFTaggedValue * pAttribute
+  );
+
 
 
 protected:
