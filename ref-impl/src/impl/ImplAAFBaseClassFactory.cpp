@@ -1,201 +1,406 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
-
-
-#include "ImplAAFBaseClassFactory.h"
-
+#include "Container.h"
 #include "ImplAAFObject.h"
+#include "AAFUtils.h"
+#include "aafansic.h"
+#include "aafCvt.h"
+
+#include "ImplAAFHeader.h"
 #include "OMFile.h"
 #include "OMClassFactory.h"
+#include "ImplAAFIdentification.h"
+#include "ImplAAFContentStorage.h"
 
 #include "ImplAAFObjectCreation.h"
 
-
-#include <assert.h>
-
-
-//
-// Initialize the AUID's.
-#define INIT_AUID
-#include "AAFStoredObjectIDs.h"
-#undef INIT_AUID
-
-//
-// Declare the corresponding CLSID's external.
-#define AAF_CLASS(name, dataid, parent, concrete)\
-  extern "C" aafClassID_t CLSID_AAF##name;
-
-// The AAF reference implementation is still not quite in sync with SMPTE
-// so we have to alias some of the SMPTE names to their corresponding
-// name in AAF.
-//
-#define CLSID_AAFClassDefinition CLSID_AAFClassDef
-#define CLSID_AAFDataDefinition CLSID_AAFDataDef
-#define CLSID_AAFDefinitionObject CLSID_AAFDefObject
-#define CLSID_AAFEdgeCode CLSID_AAFEdgecode
-#define CLSID_AAFOperationDefinition CLSID_AAFOperationDef
-#define CLSID_AAFInterchangeObject CLSID_AAFObject
-#define CLSID_AAFJPEGImageData CLSID_AAFJPEGData
-#define CLSID_AAFMIDIFileData CLSID_AAFMIDIData
-#define CLSID_AAFParameterDefinition CLSID_AAFParameterDef
-#define CLSID_AAFPropertyDefinition CLSID_AAFPropertyDef
-#define CLSID_AAFTypeDefinition CLSID_AAFTypeDef
-#define CLSID_AAFTypeDefinitionEnumeration CLSID_AAFTypeDefEnum
-#define CLSID_AAFTypeDefinitionExtendibleEnumeration CLSID_AAFTypeDefExtEnum
-#define CLSID_AAFTypeDefinitionFixedArray CLSID_AAFTypeDefFixedArray
-#define CLSID_AAFTypeDefinitionInteger CLSID_AAFTypeDefInt
-#define CLSID_AAFTypeDefinitionRecord CLSID_AAFTypeDefRecord
-#define CLSID_AAFTypeDefinitionRename CLSID_AAFTypeDefRename
-#define CLSID_AAFTypeDefinitionSet CLSID_AAFTypeDefSet
-#define CLSID_AAFTypeDefinitionStream CLSID_AAFTypeDefStream
-#define CLSID_AAFTypeDefinitionString CLSID_AAFTypeDefString
-#define CLSID_AAFTypeDefinitionStrongObjectReference CLSID_AAFTypeDefStrongObjRef
-#define CLSID_AAFTypeDefinitionVariableArray CLSID_AAFTypeDefVariableArray
-#define CLSID_AAFTypeDefinitionWeakObjectReference CLSID_AAFTypeDefWeakObjRef
-#define CLSID_AAFUNIXLocator CLSID_AAFUnixLocator
-#define CLSID_AAFCodecDefinition CLSID_AAFCodecDef
-#define CLSID_AAFContainerDefinition CLSID_AAFContainerDef
-#define CLSID_AAFInterpolationDefinition CLSID_AAFInterpolationDef
-
-//
-// Include the AAF macro invocations.
-#include "AAFMetaDictionary.h"
-
-
-
-//
-// Initialize the AUID to CLSID class table.
-typedef struct tagAAFObjectEntry_t
+// Later: These two functions set a global alignment in the
+//file for writing properties.  Used only for media data
+aafInt32 OMContainer::GetValueAlignment(void)
 {
-	const char * pClassName;
-	const aafUID_t* pAUID;
-	const aafClassID_t* pClassID;
-} AAFObjectEntry_t;
-
-#define AAF_TABLE_BEGIN() static AAFObjectEntry_t gAAFObjectTable[] = {
-
-#define AAF_CLASS(name, id, parent, concrete)\
-{ #name, &AUID_AAF##name, &CLSID_AAF##name }
-
-#define AAF_CLASS_SEPARATOR() ,
-
-#define AAF_TABLE_END() };
-//
-// Include the AAF macro invocations.
-// This will define all of the entries in the gAAFObjectTable.
-#include "AAFMetaDictionary.h"
-
-// Define a table of pointers to entries on the gAAFObjectTable. We use 
-// this table to sort and search for AUID's in the gAAFObjectTable.
-const size_t kTotalAUIDCount = sizeof(gAAFObjectTable)/sizeof(AAFObjectEntry_t);
-static AAFObjectEntry_t * g_AUIDTable[kTotalAUIDCount] = {0};
-
-
-// Declare a global instance of the factory so that the initialization
-// code will only be called once.
-static ImplAAFBaseClassFactory s_AAFBaseClassFactory;
-
-
-// Compare proc for sort and search.
-static int CompareTableEntries(const AAFObjectEntry_t **elem1,
-                               const AAFObjectEntry_t **elem2)
-{
-  const aafUID_t &auid1 = *((**elem1).pAUID);
-  const aafUID_t &auid2 = *((**elem2).pAUID);
-
-  // Compare the unsigned long member
-  if (auid1.Data1 < auid2.Data1)
-    return -1;
-  else if (auid1.Data1 > auid2.Data1)
-    return 1;
-  // Compare the first unsigned short member
-  else if (auid1.Data2 < auid2.Data2)
-    return -1;
-  else if (auid1.Data2 > auid2.Data2)
-    return 1;
-  // Compare the second unsigned short member
-  else if (auid1.Data3 < auid2.Data3)
-    return -1;
-  else if (auid1.Data3 > auid2.Data3)
-    return 1;
-  else
-  // Compare the last 8 bytes.
-    return memcmp(auid1.Data4, auid2.Data4, 8);
+	return(0);
 }
 
-static void InitializeAUIDTable(void)
+void OMContainer::SetValueAlignment(aafInt32 alignment)
 {
-  for (size_t i = 0; kTotalAUIDCount > i; ++i)
-  {
-    g_AUIDTable[i] = &gAAFObjectTable[i];
+}
+
+// Later:  
+aafInt16 OMContainer::GetDefaultByteOrder(void)
+{
+#if FULL_TOOLKIT
+	return(OMNativeByteOrder);
+#else
+	return(0);
+#endif
+}
+void OMContainer::SetDefaultByteOrder(aafInt16 byteOrder)
+{
+}
+
+// Close and save the file
+void OMContainer::OMLCloseContainer(void)
+{
+  if (_mode == writeMode) {
+    *_file << *_head;
   }
-
-  // Now sort the table.
-  qsort(g_AUIDTable, kTotalAUIDCount, sizeof(AAFObjectEntry_t *),
-        (int (*)(const void*, const void*))CompareTableEntries); 
+  _file->close();
 }
 
-
-ImplAAFBaseClassFactory::ImplAAFBaseClassFactory(void)
-{
-  // Initialize our lookup table for the built-in base class auids.
-  if (0 == g_AUIDTable[0])
-    InitializeAUIDTable();
-}
-
-ImplAAFBaseClassFactory::~ImplAAFBaseClassFactory(void)
+// Close without saving the file
+void OMContainer::OMLAbortContainer(void)
 {
 }
 
-
-
-// Global function that looksup the built-in code class id for the corresponding
-// auid.
-const aafClassID_t* ImplAAFBaseClassFactory::LookupClassID(const aafUID_t & auid)
+// Utility function for creating objects. This function hides the type
+// "aafClassID_t" from the OM.
+//
+static OMStorable* createObject(const OMClassId& classId)
 {
-  // Return NULL if the given AUID cannot be found.
-  const aafClassID_t *pClassID = NULL;
+  const aafClassID_t* id = reinterpret_cast<const aafClassID_t*>(&classId);
 
-  // Lookup the class id in the predefined "base class" table.
-  AAFObjectEntry_t **ppResult = NULL;
-  AAFObjectEntry_t key = {"KEY", &auid, NULL};
-  AAFObjectEntry_t *pKey = &key;
-  
-  // Use standard library's binary search routine.
-  ppResult = (AAFObjectEntry_t **)bsearch(&pKey, g_AUIDTable, kTotalAUIDCount,
-               sizeof(AAFObjectEntry_t *),
-               (int (*)(const void*, const void*))CompareTableEntries);
-
-  // Return the corresponding class id.
-  if (NULL != ppResult)
-    pClassID = (**ppResult).pClassID;
-
-  return (pClassID);
+  OMStorable* result = dynamic_cast<OMStorable*>(CreateImpl(*id));
+  return result;
 }
+
+// Class ids
+//
+extern "C" const aafClassID_t CLSID_AAFHeader;
+extern "C" const aafClassID_t CLSID_AAFIdentification;
+extern "C" const aafClassID_t CLSID_AAFFile;
+extern "C" const aafClassID_t CLSID_AAFSession;
+extern "C" const aafClassID_t CLSID_AAFHeader;
+extern "C" const aafClassID_t CLSID_AAFIdentification;
+extern "C" const aafClassID_t CLSID_AAFComponent;
+extern "C" const aafClassID_t CLSID_AAFMob;
+extern "C" const aafClassID_t CLSID_AAFSegment;
+extern "C" const aafClassID_t CLSID_AAFMobSlot;
+extern "C" const aafClassID_t CLSID_AAFContentStorage;
+extern "C" const aafClassID_t CLSID_AAFSourceReference;
+extern "C" const aafClassID_t CLSID_AAFSourceClip;
+
+// Utility function for registering a given class id as legal in a
+// given file.This function hides the type "aafClassID_t" from the OM.
+//
+static void registerClass(OMFile* file, const aafClassID_t& classId)
+{
+  file->classFactory()->add((const OMClassId&)(classId),
+                            createObject);
+}
+
+// Open a file
+void OMContainer::OMLOpenContainer(OMLSession sessionData,
+                                 OMLRefCon attributes,
+                                 OMLconst_OMLGlobalName typeName, 
+                                 OMLContainerUseMode useFlags,
+                                 ImplAAFHeader*& header)
+{
+  _mode = readMode;
+  char *pathname = GetFileName(attributes);
+  _file = OMFile::openRead(pathname);
+
+  registerClass(_file, CLSID_AAFHeader);
+  registerClass(_file, CLSID_AAFIdentification);
+  registerClass(_file, CLSID_AAFFile);
+  registerClass(_file, CLSID_AAFSession);
+  registerClass(_file, CLSID_AAFHeader);
+  registerClass(_file, CLSID_AAFIdentification);
+  registerClass(_file, CLSID_AAFComponent);
+  registerClass(_file, CLSID_AAFMob);
+  registerClass(_file, CLSID_AAFSegment);
+  registerClass(_file, CLSID_AAFMobSlot);
+  registerClass(_file, CLSID_AAFContentStorage);
+  registerClass(_file, CLSID_AAFSourceReference);
+  registerClass(_file, CLSID_AAFSourceClip);
+
+  OMStorable* head = OMStorable::restoreFrom(_file, "head", *(_file->root()));
+  header = dynamic_cast<ImplAAFHeader *>(head);
+}
+
+//Will remove this!
+void OMContainer::OMLSetContainerVersion1(void)
+{
+}
+
+//Create a file
+void OMContainer::OMLOpenNewContainer(OMLSession sessionData,
+                                  OMLRefCon attributes,
+                                  OMLconst_OMLGlobalName typeName, 
+                                  OMLContainerUseMode useFlags,
+                                  OMLGeneration generation,
+                                  OMLContainerFlags containerFlags, ...)
+{
+  _mode = writeMode;
+  char *pathname = GetFileName(attributes);
+  _file = OMFile::createModify(pathname);
+}
+
+// OML Revision number
+aafInt32 OMContainer::GetBentoMajorRevision(void)
+{
+	return 0; 		//!!!
+}
+
+// Submerge
+OMLCount32 OMContainer::OMLCountValues(OMLObject object, OMLProperty property, OMLType type)
+{
+	return(0);
+}
+
+// Submerge
+OMLValue OMContainer::OMLUseValue(OMLObject object, OMLProperty property, OMLType type)
+{
+	return(NULL);
+}
+
+// Submerge
+OMLSize OMContainer::OMLGetValueDataOffset(OMLValue value, OMLCount offset, short *errVal)
+{
+	aafInt64	tmp;
+	
+	CvtInt32toInt64(0, &tmp);
+	return(tmp);
+}
+
+// Submerge
+// Size of a property in bytes
+OMLSize OMContainer::OMLGetValueSize(OMLValue value)
+{
+	aafInt64	tmp;
+	
+	CvtInt32toInt64(0, &tmp);
+	return(tmp);
+}
+
+// Property read
+OMLSize32 OMContainer::OMLReadValueData(OMLValue value, OMLPtr buffer, OMLCount offset, OMLSize32 maxSize)
+{
+	return(0);
+}
+
+// Submerge : Bento needs to create a value for each property
+OMLValue OMContainer::OMLNewValue(OMLObject object, OMLProperty property, OMLType type, ...)
+{
+	return(0);
+}
+
+// Property write
+void OMContainer::OMLWriteValueData(OMLValue value, OMLPtr buffer, OMLCount offset, OMLSize32 size)
+{
+}
+
+// Object delete
+void OMContainer::OMLDeleteObject(OMLObject theObject)
+{
+}
+
+// Delete property
+void OMContainer::OMLDeleteObjectProperty(OMLObject theObject, OMLProperty theProperty)
+{
+}
+
+// Follow objref (given an in-file object ref, turn into ptr to object
+OMLObject  OMContainer::OMLGetReferencedObject(OMLValue value, OMLReference  theReferenceData)
+{
+	return(0);
+}
+
+// Iterate over properties on an objects
+OMLProperty OMContainer::OMLGetNextObjectProperty(OMLObject theObject, OMLProperty currProperty)
+{
+	return(0);
+}
+
+//Submerge
+void OMContainer::OMLGetValueInfo(OMLValue value, OMLObject *object, OMLProperty *property, OMLType *type)
+{
+}
+
+//Creatre a reference
+OMLReference  *  OMContainer::OMLNewReference(OMLValue value,
+                                                 OMLObject referencedObject,
+                                                 OMLReference  theReferenceData)
+{
+	return(0);
+}
+
+//Property delete
+void OMContainer::OMLDeleteValueData(OMLValue value, OMLCount offset, OMLSize size)
+{
+}
+
+// Register a type (by name)  Will need to change to take a AUID
+OMLType OMContainer::OMLRegisterType(OMLconst_OMLGlobalName name)
+{
+	return(0);
+}
+
+// Register a property (by name)  Will need to change to take a AUID
+OMLProperty OMContainer::OMLRegisterProperty(OMLconst_OMLGlobalName name)
+{
+	return(0);
+}
+
+//??
+OMLGlobalName OMContainer::OMLGetGlobalName(OMLObject theObject)
+{
+	return(0);
+}
+
+// DEcrement the reference count
+void OMContainer::OMLReleaseObject(OMLObject theObject)
+{
+}
+
+//Used to iterate over types defined in container, pass in NULL to start
+OMLType OMContainer::OMLGetNextType(OMLType currType)
+{
+	return(0);
+}
+
+//Used to iterate over properties defined in container, pass in NULL to start
+OMLProperty OMContainer::OMLGetNextProperty(OMLProperty currProperty)
+{
+	return(0);
+}
+
+//Bento uses these as internal per-file-unique object IDs.  I think that only the dumper
+//uses these.
+aafInt32 OMContainer::GetObjectID(OMLObject obj)
+{
+	return(0);
+}
+
+// Given an internal object ID, return the object.  I don't know WHO would use this.
+TOCObjectPtr OMContainer::cmFindObject(const OMLObjectID id)
+{
+	return(0);
+}
+
+// 'Nuff said
+void * OMLMalloc(OMLContainer container, OMLSize32 size, OMLSession sessionData)
+{
+	return(malloc(size));
+}
+
+// 'Nuff said
+void OMLFree(OMContainer * container, OMLPtr ptr, OMLSession sessionData)
+{
+	free(ptr);
+}
+
+// 'Nuff said
+void aafOMLError(OMLSession sessionData, OMLErrorString message, ...)
+{
+}
+
+// In Bento, you create an object, then WE add a field to say classID
+OMLObject OMContainer::OMLNewObject(void)
+{
+	return(0);
+}
+
+// Iterate over values on a property.  Bento allows >1, but never used in 2.0 files.
+OMLValue OMContainer::OMLGetNextValue(OMLObject object, OMLProperty property, OMLValue currValue)
+{
+	return(0);
+}
+
+#if FULL_TOOLKIT
+// Get the file from an object pointer
+OMLContainer OMContainer::OMLGetObjectContainer(AAFObject *theObject)
+{
+	return(0);
+}
+
+// Types and properties in Bento are objects
+aafBool OMContainer::OMLIsType(AAFObject *theObject)
+{
+	return(0);
+}
+// Types and properties in Bento are objects
+aafBool OMContainer::OMLIsProperty(AAFObject *theObject)
+{
+	return(0);
+}
+
+// Iterate over all objects in a file, pass in NULL to start.
+AAFObject *OMContainer::OMLGetNextObject(AAFObject *currObject)
+{
+	return(0);
+}
+#endif
+
+// May not need to implement.  These functions together tell how property values
+// exist in the file (absolute file positions).  A segment (ouch..) is a section of a 
+// property which is contiguous.
+aafInt32 OMContainer::GetNumSegments(OMLObject	object,
+			OMLProperty    	cprop,
+			OMLType         	ctype)
+{
+	return(0);
+}
+
+// May not need to implement.  These functions together tell how property values
+// exist in the file (absolute file positions).  A segment (ouch..) is a section of a 
+// property which is contiguous.
+void OMContainer::GetSegmentSizeLen(OMLObject	object,
+			OMLProperty    	cprop,
+			OMLType         	ctype,
+			aafInt32		index,
+			aafPosition_t	*startPos,	/* OUT -- where tdoe sthe segment begin, */
+			aafLength_t		*length)	/* OUT -- and how long is it? */
+{
+}
+
+#if FULL_TOOLKIT
+void OMContainer::SetHead(const AAFHeader* head)
+{
+  _head = head;
+}
+#endif
+
+/*****/
+// Called once at program start for your real globals
+OMLSession OMLStartSession(OMLMetaHandler metaHandler, OMLRefCon sessionRefCon)
+{
+	return(0);
+}
+
+// Called once at client program exit, to clean up.
+void OMLEndSession(OMLSession sessionData, aafBool closeOpenContainers)
+{
+}
+
+//Bail at end of program, no cleaning up
+void OMLAbortSession(OMLSession sessionData)
+{
+}
+
+// These functions are used to set particular handlers to aafansic.c
+OMLHandlerAddr OMLSetMetaHandler(OMLSession sessionData,
+                                            OMLconst_OMLGlobalName typeName,
+                                            OMLMetaHandler metaHandler)
+{
+	return(0);
+}
+
+// These functions are used to set particular handlers to aafansic.c
+MetaHandlerPtr OMLLookupMetaHandler(const unsigned char *typeName,
+                                   struct SessionGlobalData *sessionData)
+{
+	return(0);
+}
+
+// 'Nuff said
+OMLErrorString OMLVGetErrorString(OMLErrorString errorString, OMLSize32 maxLength, 
+                                             OMLErrorNbr errorNumber, va_list inserts)
+{
+	return(0);
+}
+
+void OMContainer::SetHead(const ImplAAFHeader* head)
+{
+  _head = head;
+}
+
