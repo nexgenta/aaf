@@ -1,18 +1,52 @@
+/***********************************************************************
+*
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
+
 // @doc OMEXTERNAL
+
 #include "OMProperty.h"
 
 #include "OMStorable.h"
 #include "OMType.h"
 #include "OMUtilities.h"
+#include "OMPropertyDefinition.h"
 
 #include <memory.h>
 
 // class OMProperty
 
+  // @mfunc Constructor.
+  //   @parm The property id.
+  //   @parm The stored form of this <c OMProperty>.
+  //   @parm The name of this <c OMProperty>.
 OMProperty::OMProperty(const OMPropertyId propertyId,
-                       const int storedForm,
-                       const char* name)
-: _propertyId(propertyId), _storedForm(storedForm), _name(name), _type(0),
+                       const OMStoredForm storedForm,
+                       const wchar_t* name)
+: _propertyId(propertyId), _storedForm(storedForm), _name(name), _cName(0),
+  _propertySet(0), _definition(0),
   // _isOptional(false),
   // BobT: make optional by default, to hack around problem where
   // props may be restored before they're initialized by DM.
@@ -20,29 +54,36 @@ OMProperty::OMProperty(const OMPropertyId propertyId,
   _isPresent(false)
 {
   TRACE("OMProperty::OMProperty");
+
+  PRECONDITION("Valid name", validWideString(_name)); 
 }
 
-void OMProperty::initialize(const OMPropertyId propertyId,
-                            const char* name,
-                            OMType* type,
-                            const bool isOptional)
+  // @mfunc Temporary pseudo-constructor for clients which provide
+  //        a property definition.
+  //   @parm The definition of this <c OMProperty>.
+void OMProperty::initialize(const OMPropertyDefinition* definition)
 {
   TRACE("OMProperty::initialize");
 
-  PRECONDITION("Valid property name", validString(name));
-  // PRECONDITION("Valid type", type != 0);
+  PRECONDITION("Valid property definition", definition != 0);
+  _definition = definition;
 
   // Temporary consistency checks
-  ASSERT("Consistent property id", propertyId == OMProperty::propertyId());
-  ASSERT("Consistent property name", strcmp(name, OMProperty::name()) == 0);
-
-  _type = type;
-  _isOptional = isOptional;
+  ASSERT("Consistent property id",
+                            _propertyId == _definition->localIdentification());
+  ASSERT("Consistent property name",
+                           compareWideString(_name, _definition->name()) == 0);
+  // ASSERT("Consistent property optionality",
+  //                                 _isOptional == _definition->isOptional());
+  _isOptional = _definition->isOptional();
 }
 
+  // @mfunc Destructor.
 OMProperty::~OMProperty(void)
 {
   TRACE("OMProperty::~OMProperty");
+
+  delete [] _cName;
 }
 
   // @mfunc Close this <c OMProperty>.
@@ -53,6 +94,26 @@ void OMProperty::close(void)
   // nothing to do for most descendants of OMProperty
 }
 
+  // @mfunc Detach this <c OMProperty>.
+void OMProperty::detach(void)
+{
+  TRACE("OMProperty::detach");
+
+  // nothing to do for most descendants of OMProperty
+}
+
+  // @mfunc The <c OMPropertyDefinition> defining this <c OMProperty>.
+  //   @rdesc The defining <c OMPropertyDefinition>.
+  //   @this const 
+const OMPropertyDefinition* OMProperty::definition(void) const
+{
+  TRACE("OMProperty::definition");
+
+  const OMPropertyDefinition* result = _definition;
+  POSTCONDITION("Valid result", result != 0);
+  return result;
+}
+
   // @mfunc The name of this <c OMProperty>.
   //   @rdesc The property name.
   //   @this const
@@ -60,7 +121,11 @@ const char* OMProperty::name(void) const
 {
   TRACE("OMProperty::name");
 
-  return _name;
+  if (_cName == 0) {
+    OMProperty* nonConstThis = const_cast<OMProperty*>(this);
+    nonConstThis->_cName = convertWideString(_name);
+  }
+  return _cName;
 }
 
   // @mfunc The property id of this <c OMProperty>.
@@ -71,6 +136,16 @@ OMPropertyId OMProperty::propertyId(void) const
   TRACE("OMProperty::propertyId");
 
   return _propertyId;
+}
+
+  // @mfunc The <c OMPropertySet> containing this <c OMProperty>.
+  //   @rdesc The containing <c OMPropertySet>.
+  //   @this const
+const OMPropertySet* OMProperty::propertySet(void) const
+{
+  TRACE("OMProperty::propertySet");
+
+  return _propertySet;
 }
 
   // @mfunc Inform this <c OMProperty> that it is a member of
@@ -98,142 +173,6 @@ OMProperty* OMProperty::address(void)
   return this;
 }
 
-  // @mfunc Detach the <c OMStorable> object with the given
-  //        <p key> from this <c OMProperty>. This
-  //        <c OMProperty> must no longer attempt
-  //        to access the <c OMStorable> with the given <p key>.
-  //   @parm The <c OMStoredObject> to detach from this
-  //         <c OMProperty>.
-  //   @parm A key identifying the <c OMStorable>.
-void OMProperty::detach(const OMStorable* object, const size_t key)
-{
-  TRACE("OMProperty::detach");
-
-  PRECONDITION("Valid object", object != 0);
-  PRECONDITION("Valid key", key == 0);
-  // nothing to do for most descendants of OMProperty
-}
-
-  // @mfunc Write this property to persistent store, performing
-  //        any necessary externalization and byte reordering.
-  //   @parm The property id.
-  //   @parm The stored form to use for this property.
-  //   @parm The bytes of this property in internal (in memory) form.
-  //   @parm The actual size of the bytes of this property.
-  //   @this const
-void OMProperty::write(OMPropertyId propertyId,
-                       int storedForm,
-                       OMByte* internalBytes,
-                       size_t internalBytesSize) const
-{
-  TRACE("OMProperty::write");
-
-  PRECONDITION("Valid internal bytes", internalBytes != 0);
-  PRECONDITION("Valid internal bytes size", internalBytesSize > 0);
-
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* store = container->store();
-  ASSERT("Valid stored object", store != 0);
-
-  if (_type != 0) { // tjb - temporary, should be PRECONDITION below
-
-    PRECONDITION("Valid property type", _type != 0);
-
-    // Allocate buffer for property value
-    size_t externalBytesSize = _type->externalSize(internalBytes,
-                                                   internalBytesSize);
-    OMByte* buffer = new OMByte[externalBytesSize];
-    ASSERT("Valid heap pointer", buffer != 0);
-
-    // Externalize property value
-    _type->externalize(internalBytes,
-                       internalBytesSize,
-                       buffer,
-                       externalBytesSize,
-                       store->byteOrder());
-  
-    // Reorder property value
-    if (store->byteOrder() != hostByteOrder()) {
-      _type->reorder(buffer, externalBytesSize);
-    }
-
-    // Write property value
-    store->write(propertyId, storedForm, buffer, externalBytesSize);
-    delete [] buffer;
-
-  } else {
-    // tjb - temporary, no type information, do it the old way
-    //
-    store->write(propertyId, storedForm, internalBytes, internalBytesSize);
-  }
-}
-
-  // @mfunc Read this property from persistent store, performing
-  //        any necessary byte reordering and internalization.
-  //   @parm The property id.
-  //   @parm The stored from to use for this property.
-  //   @parm The buffer in which to place the internal (in memory)
-  //         form of the bytes of this property.
-  //   @parm The size of the buffer in which to place the internal
-  //         (in memory) form of the bytes of this property.
-  //   @parm The size of the external (on disk) form of the bytes of
-  //         this propery.
-  //   @this const
-void OMProperty::read(OMPropertyId propertyId,
-                      int storedForm,
-                      OMByte* internalBytes,
-                      size_t internalBytesSize,
-                      size_t externalBytesSize)
-{
-  TRACE("OMProperty::read");
-
-  PRECONDITION("Valid internal bytes", internalBytes != 0);
-  PRECONDITION("Valid internal bytes size", internalBytesSize > 0);
-  PRECONDITION("Valid external bytes size", externalBytesSize > 0);
-
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  if (_type != 0) { // tjb - temporary, should be PRECONDITION below
-
-    PRECONDITION("Valid property type", _type != 0);
-
-    // Allocate buffer for property value
-    OMByte* buffer = new OMByte[externalBytesSize];
-    ASSERT("Valid heap pointer", buffer != 0);
-
-    // Read property value
-    store->read(propertyId, storedForm, buffer, externalBytesSize);
-
-    // Reorder property value
-    if (store->byteOrder() != hostByteOrder()) {
-      _type->reorder(buffer, externalBytesSize);
-    }
-
-    // Internalize property value
-    size_t requiredBytesSize = _type->internalSize(buffer, externalBytesSize);
-    ASSERT("Property value buffer large enough",
-                                       internalBytesSize >= requiredBytesSize);
-
-    _type->internalize(buffer,
-                       externalBytesSize,
-                       internalBytes,
-                       requiredBytesSize,
-                       hostByteOrder());
-    delete [] buffer;
-  } else {
-    // tjb - temporary, no type information, do it the old way
-    //
-    ASSERT("Property value buffer large enough",
-                                       internalBytesSize >= externalBytesSize);
-    store->read(propertyId, storedForm, internalBytes, externalBytesSize);
-  }
-  setPresent();
-}
-
   // @mfunc Set the bit that indicates that this optional <c OMProperty>
   //        is present.
 void OMProperty::setPresent(void)
@@ -253,37 +192,57 @@ void OMProperty::clearPresent(void)
   _isPresent = false;
 }
 
-// @doc OMINTERNAL
+  // @mfunc The type of this <c OMProperty>.
+  //   @rdesc The type.
+  //   @this const
+const OMType* OMProperty::type(void) const
+{
+  TRACE("OMProperty::type");
+
+  // PRECONDITION("Valid property definition", _definition != 0);
+
+  const OMType* result = 0;
+  if (_definition != 0) {
+    result = _definition->type();
+  }
+  return result;
+}
 
 // class OMSimpleProperty
 
+  // @mfunc Constructor.
+  //   @parm The property id.
+  //   @parm The name of this <c OMSimpleProperty>.
 OMSimpleProperty::OMSimpleProperty(const OMPropertyId propertyId,
-                                   const char* name)
+                                   const wchar_t* name)
 : OMProperty(propertyId, SF_DATA, name), _size(0), _bits(0)
 {
   TRACE("OMSimpleProperty::OMSimpleProperty");
 }
 
+  // @mfunc Constructor.
+  //   @parm The property id.
+  //   @parm The name of this <c OMSimpleProperty>.
+  //   @parm The size of this <c OMSimpleProperty>.
 OMSimpleProperty::OMSimpleProperty(const OMPropertyId propertyId,
-                                   const char* name,
+                                   const wchar_t* name,
                                    size_t valueSize)
 : OMProperty(propertyId, SF_DATA, name),
-  _size(valueSize),
+  _size(0),
   _bits(0)
 {
   TRACE("OMSimpleProperty::OMSimpleProperty");
   PRECONDITION("Valid size", (valueSize > 0));
 
-  _bits = new unsigned char[valueSize];
-  ASSERT("Valid heap pointer", _bits != 0);
-
-  for (size_t i = 0; i < valueSize; i++) {
+  setSize(valueSize);
+  for (size_t i = 0; i < _size; i++) {
     _bits[i] = 0;
   }
 
   POSTCONDITION("Valid bits", _bits != 0 );
 }
 
+  // @mfunc Destructor.
 OMSimpleProperty::~OMSimpleProperty(void)
 {
   TRACE("OMSimpleProperty::~OMSimpleProperty");
@@ -291,6 +250,9 @@ OMSimpleProperty::~OMSimpleProperty(void)
   delete [] _bits;
 }
 
+  // @mfunc The size of this <c OMSimpleProperty>.
+  //   @rdesc The property size in bytes.
+  //   @this const
 size_t OMSimpleProperty::size(void) const
 {
   TRACE("OMSimpleProperty::size");
@@ -298,7 +260,134 @@ size_t OMSimpleProperty::size(void) const
   return _size;
 }
 
-void OMSimpleProperty::get(void* value, size_t valueSize) const
+  // @mfunc Set the size of this <c OMSimpleProperty> to <p newSize> bytes.
+  //   @parm The new property size in bytes.
+void OMSimpleProperty::setSize(size_t newSize)
+{
+  TRACE("OMSimpleProperty::setSize");
+
+  PRECONDITION("Valid size", newSize > 0);
+
+  if (newSize != _size) {
+    delete [] _bits;
+    _bits = 0; // for BoundsChecker
+    _bits = new unsigned char[newSize];
+    ASSERT("Valid heap pointer", _bits != 0);
+    _size = newSize;
+  }
+}
+
+  // @mfunc Write this property to persistent store, performing
+  //        any necessary externalization and byte reordering.
+  //   @this const
+void OMSimpleProperty::write(void) const
+{
+  TRACE("OMSimpleProperty::write");
+
+  PRECONDITION("Valid internal bytes", _bits != 0);
+  PRECONDITION("Valid internal bytes size", _size > 0);
+
+  ASSERT("Valid property set", _propertySet != 0);
+  OMStorable* container = _propertySet->container();
+  ASSERT("Valid container", container != 0);
+  ASSERT("Container is persistent", container->persistent());
+  OMStoredObject* store = container->store();
+  ASSERT("Valid stored object", store != 0);
+
+  const OMType* propertyType = type();
+
+  if (propertyType != 0) { // tjb - temporary, should be ASSERTION below
+
+    ASSERT("Valid property type", propertyType != 0);
+ 
+    // Allocate buffer for property value
+    size_t externalBytesSize = propertyType->externalSize(_bits,
+                                                          _size);
+    OMByte* buffer = new OMByte[externalBytesSize];
+    ASSERT("Valid heap pointer", buffer != 0);
+
+    // Externalize property value
+    propertyType->externalize(_bits,
+                              _size,
+                              buffer,
+                              externalBytesSize,
+                              store->byteOrder());
+  
+    // Reorder property value
+    if (store->byteOrder() != hostByteOrder()) {
+      propertyType->reorder(buffer, externalBytesSize);
+    }
+
+    // Write property value
+    store->write(_propertyId, _storedForm, buffer, externalBytesSize);
+    delete [] buffer;
+
+  } else {
+    // tjb - temporary, no type information, do it the old way
+    //
+    store->write(_propertyId, _storedForm, _bits, _size);
+  }
+}
+
+  // @mfunc Read this property from persistent store, performing
+  //        any necessary byte reordering and internalization.
+  //   @parm The size of the external (on disk) form of the bytes of
+  //         this propery.
+  //   @this const
+void OMSimpleProperty::read(size_t externalBytesSize)
+{
+  TRACE("OMSimpleProperty::read");
+
+  PRECONDITION("Valid external bytes size", externalBytesSize > 0);
+
+  OMStoredObject* store = _propertySet->container()->store();
+  ASSERT("Valid store", store != 0);
+
+  const OMType* propertyType = type();
+
+  if (propertyType != 0) { // tjb - temporary, should be ASSERTION below
+
+    ASSERT("Valid property type", propertyType != 0);
+
+    // Allocate buffer for property value
+    OMByte* buffer = new OMByte[externalBytesSize];
+    ASSERT("Valid heap pointer", buffer != 0);
+
+    // Read property value
+    store->read(_propertyId, _storedForm, buffer, externalBytesSize);
+
+    // Reorder property value
+    if (store->byteOrder() != hostByteOrder()) {
+      propertyType->reorder(buffer, externalBytesSize);
+    }
+
+    // Internalize property value
+    size_t requiredBytesSize = propertyType->internalSize(buffer,
+                                                          externalBytesSize);
+    setSize(requiredBytesSize);
+    ASSERT("Property value buffer large enough", _size >= requiredBytesSize);
+
+    propertyType->internalize(buffer,
+                              externalBytesSize,
+                              _bits,
+                              requiredBytesSize,
+                              hostByteOrder());
+    delete [] buffer;
+  } else {
+    // tjb - temporary, no type information, do it the old way
+    //
+    setSize(externalBytesSize);
+    ASSERT("Property value buffer large enough", _size >= externalBytesSize);
+    store->read(_propertyId, _storedForm, _bits, externalBytesSize);
+  }
+  setPresent();
+}
+
+  // @mfunc Get the value of this <c OMSimpleProperty>.
+  //   @parm The buffer to receive the property value.
+  //   @parm size_t | valueSize | The size of the buffer.
+  //   @this const
+void OMSimpleProperty::get(void* value, size_t ANAME(valueSize)) const
 {
   TRACE("OMSimpleProperty::get");
   PRECONDITION("Valid data buffer", value != 0);
@@ -309,19 +398,17 @@ void OMSimpleProperty::get(void* value, size_t valueSize) const
   memcpy(value, _bits, _size);
 }
 
+  // @mfunc Set the value of this <c OMSimpleProperty>.
+  //   @parm The address of the property value.
+  //   @parm The size of the value.
+  //   @this const
 void OMSimpleProperty::set(const void* value, size_t valueSize) 
 {
   TRACE("OMSimpleProperty::set");
   PRECONDITION("Valid data buffer", value != 0);
   PRECONDITION("Valid size", valueSize > 0);
 
-  if (valueSize != _size) {
-    delete [] _bits;
-    _bits = 0; // for BoundsChecker
-    _bits = new unsigned char[valueSize];
-    ASSERT("Valid heap pointer", _bits != 0);
-    _size = valueSize;
-  }
+  setSize(valueSize);
   memcpy(_bits, value, _size);
   setPresent();
 }
@@ -334,7 +421,7 @@ void OMSimpleProperty::save(void) const
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  write(_propertyId, _storedForm, _bits, _size);
+  write();
 }
 
   // @mfunc Restore this <c OMSimpleProperty>, the external (persisted)
@@ -345,10 +432,7 @@ void OMSimpleProperty::restore(size_t externalSize)
   TRACE("OMSimpleProperty::restore");
   ASSERT("Sizes match", externalSize == _size);
 
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  read(_propertyId, _storedForm, _bits, _size, externalSize);
+  read(externalSize);
 }
 
   // @mfunc Is this an optional property ? 
@@ -371,6 +455,17 @@ bool OMProperty::isPresent(void) const
   return _isPresent;
 }
 
+  // @mfunc Is this <c OMProperty> void ?
+  //   @rdesc True if this <c OMProperty> is void, false otherwise.
+  //   @this const
+bool OMProperty::isVoid(void) const
+{
+  TRACE("OMProperty::isVoid");
+
+  // most descendants of OMProperty are always void
+  return true;
+}
+
   // @mfunc Remove this optional <c OMProperty>.
 void OMProperty::remove(void)
 {
@@ -379,6 +474,18 @@ void OMProperty::remove(void)
   PRECONDITION("Optional property is present", isPresent());
   clearPresent();
   POSTCONDITION("Optional property no longer present", !isPresent());
+}
+
+  // @mfunc The value of this <c OMProperty> as an <c OMStorable>.
+  //        If this <c OMProperty> does not represent an <c OMStorable>
+  //        then the value returned is 0.
+  //   @rdesc Always 0.
+  //   @this const
+OMStorable* OMProperty::storable(void) const
+{
+  TRACE("OMProperty::storable");
+
+  return 0;
 }
 
   // @mfunc The size of the raw bits of this
@@ -397,9 +504,9 @@ size_t OMSimpleProperty::bitsSize(void) const
   //        The raw bits are copied to the buffer at address <p bits> which
   //        is <p size> bytes in size.
   //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm The size of the buffer.
+  //   @parm size_t | bitsSize | The size of the buffer.
   //   @this const
-void OMSimpleProperty::getBits(OMByte* bits, size_t bitsSize) const
+void OMSimpleProperty::getBits(OMByte* bits, size_t ANAME(bitsSize)) const
 {
   TRACE("OMSimpleProperty::getBits");
   PRECONDITION("Optional property is present",
@@ -410,66 +517,16 @@ void OMSimpleProperty::getBits(OMByte* bits, size_t bitsSize) const
   memcpy(bits, _bits, _size);
 }
 
-// class OMCollectionProperty
-
-OMCollectionProperty::OMCollectionProperty(const OMPropertyId propertyId,
-                                           const int storedForm,
-                                           const char* name)
-: OMProperty(propertyId, storedForm, name)
+  // @mfunc Set the raw bits of this <c OMSimpleProperty>.
+  //        The raw bits are copied from the buffer at address <p bits> which
+  //        is <p size> bytes in size.
+  //   @parm The address of the buffer from which the raw bits are copied.
+  //   @parm The size of the buffer.
+void OMSimpleProperty::setBits(const OMByte* bits, size_t size)
 {
-  TRACE("OMCollectionProperty::OMCollectionProperty");
-  PRECONDITION("Valid name", validString(name));
-}
+  TRACE("OMSimpleProperty::setBits");
+  PRECONDITION("Valid bits", bits != 0);
+  PRECONDITION("Valid size", size > 0);
 
-OMCollectionProperty::~OMCollectionProperty(void)
-{
-  TRACE("OMCollectionProperty::~OMCollectionProperty");
-}
-
-// class OMStringProperty
-
-OMStringProperty::OMStringProperty(const OMPropertyId propertyId,
-                                   const char* name)
-: OMCharacterStringProperty<char>(propertyId, name)
-{
-  TRACE("OMStringProperty::OMStringProperty");
-  PRECONDITION("Valid name", validString(name));
-}
-
-OMStringProperty::~OMStringProperty(void)
-{
-  TRACE("OMStringProperty::~OMStringProperty");
-}
-
-OMStringProperty& OMStringProperty::operator = (const char* value)
-{
-  TRACE("OMStringProperty::operator =");
-  PRECONDITION("Valid value", value != 0);
-
-  assign(value);
-  return *this;
-}
-
-// class OMWideStringProperty
-
-OMWideStringProperty::OMWideStringProperty(const OMPropertyId propertyId,
-                                           const char* name)
-: OMCharacterStringProperty<wchar_t>(propertyId, name)
-{
-  TRACE("OMWideStringProperty::OMWideStringProperty");
-  PRECONDITION("Valid name", validString(name));
-}
-
-OMWideStringProperty::~OMWideStringProperty(void)
-{
-  TRACE("OMWideStringProperty::~OMWideStringProperty");
-}
-
-OMWideStringProperty& OMWideStringProperty::operator = (const wchar_t* value)
-{
-  TRACE("OMWideStringProperty::operator =");
-  PRECONDITION("Valid string", validWideString(value));
-
-  assign(value);
-  return *this;
+  set(bits, size);
 }
