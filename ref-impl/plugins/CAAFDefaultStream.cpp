@@ -1,119 +1,274 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-#include "CAAFDefaultStream.h"
+#include "CAAFEssenceStream.h"
+#include "ImplAAFEssenceStream.h"
 
 #include <assert.h>
-#include "AAFResult.h"
 
-const CLSID CLSID_AAFDefaultStream = { 0x83402901, 0x9146, 0x11d2, { 0x80, 0x88, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
 
-// Default Interface for AAFDefaultStream 
+#if AS_PLUGIN
+// CLSID for AAFEssenceStream 
+// {83402901-9146-11d2-8088-006008143e6f}
+const CLSID CLSID_AAFEssenceStream = { 0x83402901, 0x9146, 0x11d2, { 0x80, 0x88, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
+
+
+// Default Interface for AAFEssenceStream 
 // {83402902-9146-11d2-8088-006008143e6f}
 const IID IID_IAAFEssenceStream = { 0x83402902, 0x9146, 0x11d2, { 0x80, 0x88, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
+#else
+extern const CLSID CLSID_AAFEssenceStream;
+extern const IID IID_IAAFEssenceStream;
+#endif
 
 
-CAAFDefaultStream::CAAFDefaultStream (IUnknown * pControllingUnknown, aafBool doInit)
-  : CAAFUnknown (pControllingUnknown)
+CAAFEssenceStream::CAAFEssenceStream (IUnknown * pControllingUnknown, aafBool doInit)
+  : CAAFRoot (pControllingUnknown, AAFFalse)
 {
+  if (doInit)
+    {
+#ifdef BOB_TEST
+      ImplAAFEssenceStream * newRep;
+      newRep = new ImplAAFEssenceStream;
+      assert (newRep);
+      InitRep (newRep);
+#endif
+    }
 }
 
 
-CAAFDefaultStream::~CAAFDefaultStream ()
+CAAFEssenceStream::~CAAFEssenceStream ()
 {
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::Write (aafDataBuffer_t  buffer,
+    CAAFEssenceStream::Write (aafDataBuffer_t  buffer,
         aafInt32  buflen)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+
+  hr = ptr->Write (buffer,
+    buflen);
+
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::Read (aafUInt32  buflen,
+    CAAFEssenceStream::Read (aafUInt32  buflen,
         aafDataBuffer_t  buffer,
         aafUInt32 *  bytesRead)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+
+
+  hr = ptr->Read (buflen,
+    buffer,
+    bytesRead);
+
+
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::Seek (aafInt64  byteOffset)
+    CAAFEssenceStream::Seek (aafUInt32  byteOffset)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->Seek (byteOffset);
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::SeekRelative (aafInt32  byteOffset)
+    CAAFEssenceStream::SeekRelative (aafInt32  byteOffset)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->SeekRelative (byteOffset);
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::IsPosValid (aafInt64  byteOffset,
+    CAAFEssenceStream::IsPosValid (aafUInt32  byteOffset,
         aafBool *  isValid)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+
+  hr = ptr->IsPosValid (byteOffset,
+    isValid);
+
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::GetPosition (aafInt64 *  position)
+    CAAFEssenceStream::GetPosition (aafInt64 *  position)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->GetPosition (position);
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::GetLength (aafInt64 *  position)
+    CAAFEssenceStream::GetLength (aafInt64 *  position)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->GetLength (position);
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::omcFlushCache ()
+    CAAFEssenceStream::omcFlushCache ()
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+  return ptr->omcFlushCache();
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDefaultStream::SetCacheSize (aafInt32  itsSize)
+    CAAFEssenceStream::SetCacheSize (aafInt32  itsSize)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+#ifdef BOB_TEST
+  HRESULT hr;
+
+  ImplAAFEssenceStream * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceStream*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->SetCacheSize (itsSize);
+
+  return hr;
+#else
+  return HRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 //
 // 
 // 
-HRESULT CAAFDefaultStream::InternalQueryInterface
+HRESULT CAAFEssenceStream::InternalQueryInterface
 (
     REFIID riid,
     void **ppvObj)
@@ -132,22 +287,11 @@ HRESULT CAAFDefaultStream::InternalQueryInterface
     }
 
     // Always delegate back to base implementation.
-    return CAAFUnknown::InternalQueryInterface(riid, ppvObj);
+    return CAAFRoot::InternalQueryInterface(riid, ppvObj);
 }
 
 //
 // Define the contrete object support implementation.
 // 
-//
-// Define the contrete object support implementation.
-// 
-HRESULT CAAFDefaultStream::COMCreate(IUnknown *pUnkOuter, void **ppvObjOut)
-{
-	*ppvObjOut = NULL;
- 	CAAFDefaultStream *pAAFDefaultStream = new CAAFDefaultStream(pUnkOuter);
- 	if (NULL == pAAFDefaultStream)
- 		return E_OUTOFMEMORY;
- 	*ppvObjOut = static_cast<IAAFEssenceStream *>(pAAFDefaultStream);
- 	((IUnknown *)(*ppvObjOut))->AddRef();
- 	return S_OK;
- }
+AAF_DEFINE_FACTORY(AAFEssenceStream)
+
