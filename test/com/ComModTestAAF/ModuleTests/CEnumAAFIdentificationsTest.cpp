@@ -38,6 +38,7 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+static aafUID_t		newUID;
 
 
 // Cross-platform utility to delete a file.
