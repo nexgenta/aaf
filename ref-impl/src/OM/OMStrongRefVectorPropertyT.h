@@ -32,7 +32,6 @@
 #define OMSTRONGREFVECTORPROPERTYT_H
 
 #include "OMAssertions.h"
-#include "OMStoredVectorIndex.h"
 #include "OMStrongReferenceVectorIter.h"
 #include "OMStoredObject.h"
 
@@ -71,43 +70,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::save(void) const
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  // create a vector index
-  //
-  size_t count = _vector.count();
-  OMStoredVectorIndex* index = new OMStoredVectorIndex(count);
-  ASSERT("Valid heap pointer", index != 0);
-  index->setFirstFreeKey(localKey());
-  size_t position = 0;
-
-  // Iterate over the vector saving each element
-  //
-  VectorIterator iterator(_vector, OMBefore);
-  while (++iterator) {
-
-    VectorElement& element = iterator.value();
-
-    // enter into the index
-    //
-    index->insert(position, element.localKey());
-
-    // save the object
-    //
-    element.save();
-
-    position = position + 1;
-
-  }
-
-  // save the vector index
-  //
-  ASSERT("Valid vector index", index->isValid());
-  store()->save(index, storedName());
-  delete index;
-
-  // make an entry in the property index
-  //
-  saveName();
-
+  store()->save(*this);
 }
 
   // @mfunc Close this <c OMStrongReferenceVectorProperty>.
@@ -153,35 +116,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::restore");
 
-  // get the name of the vector index stream
-  //
-  restoreName(externalSize);
-
-  // restore the index
-  //
-  OMStoredVectorIndex* vectorIndex = 0;
-  store()->restore(vectorIndex, storedName());
-  ASSERT("Valid vector index", vectorIndex->isValid());
-  setLocalKey(vectorIndex->firstFreeKey());
-
-  // Iterate over the index restoring the elements of the vector
-  //
-  size_t entries = vectorIndex->entries();
-  if (entries > 0) {
-    grow(entries); // Set the vector size
-    size_t context = 0;
-    OMUInt32 localKey;
-    for (size_t i = 0; i < entries; i++) {
-      vectorIndex->iterate(context, localKey);
-      wchar_t* name = elementName(localKey);
-      VectorElement newElement(this, name, localKey);
-      newElement.restore();
-      _vector.setAt(newElement, i);
-      delete [] name;
-      name = 0; // for BoundsChecker
-    }
-  }
-  delete vectorIndex;
+  store()->restore(*this, externalSize);
   setPresent();
 }
 
@@ -248,11 +183,16 @@ OMStrongReferenceVectorProperty<ReferencedObject>::clearValueAt(
   PRECONDITION("Valid index", index < count());
 
   VectorElement& element = _vector.getAt(index);
-  ReferencedObject* oldObject = element.setValue(0);
 
+  ReferencedObject* result = 0;
+  OMStorable* p = element.setValue(0);
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  }
   POSTCONDITION("Object properly cleared",
                                          _vector.getAt(index).getValue() == 0);
-  return oldObject;
+  return result;
 }
 
   // @mfunc The value of this <c OMStrongReferenceVectorProperty>
@@ -1009,6 +949,29 @@ OMStrongReferenceVectorProperty<ReferencedObject>::insertObjectAt(
   ASSERT("Object is correct type", p != 0);
 
   insertAt(p, index);
+}
+
+template <typename ReferencedObject>
+OMContainerIterator<OMStrongReferenceVectorElement>*
+OMStrongReferenceVectorProperty<ReferencedObject>::iterator(void) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::iterator");
+
+  OMVectorIterator<VectorElement>* result =
+                        new OMVectorIterator<VectorElement>(_vector, OMBefore);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
+}
+
+template <typename ReferencedObject>
+void
+OMStrongReferenceVectorProperty<ReferencedObject>::insert(
+                                 const size_t index,
+                                 const OMStrongReferenceVectorElement& element)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insert");
+
+  _vector.setAt(element, index);
 }
 
 #endif
