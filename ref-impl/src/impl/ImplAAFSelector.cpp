@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFSegment_h__
@@ -47,7 +65,8 @@ ImplAAFSelector::~ImplAAFSelector ()
 	ImplAAFSegment *selected = _selected.setValue(0);
 	if (selected != NULL)
 	{
-		selected->ReleaseReference();
+	  selected->ReleaseReference();
+	  selected = 0;
 	}
 
 	size_t size = _alternates.getSize();
@@ -56,7 +75,8 @@ ImplAAFSelector::~ImplAAFSelector ()
 		ImplAAFSegment* pSegment = _alternates.setValueAt(0, i);
 		if (pSegment)
 		{
-			pSegment->ReleaseReference();
+		  pSegment->ReleaseReference();
+		  pSegment = 0;
 		}
 	}
 }
@@ -102,7 +122,8 @@ AAFRESULT STDMETHODCALLTYPE
 		pPrevSelected = _selected;
 		if (pPrevSelected)
 		{
-			pPrevSelected->ReleaseReference();
+		  pPrevSelected->ReleaseReference();
+		  pPrevSelected = 0;
 		}
 		_selected = pSelSegment;
 		_selected->AcquireReference();
@@ -135,6 +156,16 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
 	return hr;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSelector::RemoveAlternateSegment (ImplAAFSegment* pSegment)
+{
+	if (!_alternates.containsValue(pSegment))
+	  return AAFRESULT_SEGMENT_NOT_FOUND;
+
+	_alternates.removeValue(pSegment);
+	return AAFRESULT_SUCCESS;
 }
 
 //***********************************************************
@@ -209,37 +240,15 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::EnumAlternateSegments (ImplEnumAAFSegments** ppEnum)
 {
-	ImplEnumAAFSegments*	theEnum = NULL;
-	HRESULT					hr = AAFRESULT_SUCCESS;
+	if(ppEnum == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-	if (ppEnum == NULL)
-	{
-		hr = AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		theEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
-		if (theEnum == NULL)
-		{
-			hr = E_FAIL;
-		}
-		else
-		{
-			hr = theEnum->SetEnumSelector(this);
-			if (SUCCEEDED(hr))
-			{
-				theEnum->Reset();
-				*ppEnum = theEnum;
-			}
-			else
-			{
-				theEnum->ReleaseReference();
-				*ppEnum = NULL;
-			}
-		}
-	}
+	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumStrongProperty(this, &_alternates);
 
-	return hr;
+	return(AAFRESULT_SUCCESS);
 }
 
 //***********************************************************
@@ -333,64 +342,6 @@ AAFRESULT
 
   return(AAFRESULT_SUCCESS);
 }
-#if 0
-aafErr_t ImplAAFSelector::Verify(char *buf, validateData_t *result)
-{
 
-	AAFSegment * slot = NULL;
-	aafLength_t parentLen, slotLen, selectedLen;
-	char	 parentLenBuf[32], slotLenBuf[32], selectedLenBuf[32];
-	aafInt32 numSlots, loop;
-	
-	AAFIterate	*iter;
-	
-	XPROTECT(_file)
-	{
-		/* Verify length of slots == length of parent */
-			CHECK(GetLength(&parentLen));
-			CHECK(GetLength(&selectedLen));
-		if (Int64NotEqual(selectedLen, parentLen))
-		{
-		      CHECK(Int64ToString(selectedLen, 10, sizeof(selectedLenBuf), selectedLenBuf));  
-		      CHECK(Int64ToString(parentLen, 10, sizeof(parentLenBuf), parentLenBuf));  
-			fprintf(result->textOut, "*** ERROR: %s Selector length (%s) != length of selected slot (%s)\n", 
-				buf, selectedLenBuf, parentLenBuf);
-			result->numErrors++;
-		}
-
-		iter = new AAFIterate(_file);
-		CHECK(GetNumAltSlots(&numSlots));
-		for (loop = 1; loop <= numSlots; loop++)
-		{
-			CHECK(iter->SelectorGetNextAltSlot(this, NULL, &slot));
-			if (slot)
-			{
-			    CHECK(slot->GetLength(&slotLen));
-				if (Int64NotEqual(parentLen, slotLen))
-				{
-		      		CHECK(Int64ToString(parentLen, 10, sizeof(parentLenBuf), parentLenBuf));  
-		      		CHECK(Int64ToString(slotLen, 10, sizeof(slotLenBuf), slotLenBuf));  
-					fprintf(result->textOut, "*** ERROR: %s Selector length (%s) != length of Selector Alternate slot (%s)\n", 
-						buf, parentLenBuf, slotLenBuf);
-					result->numErrors++;
-				}
-			}
-		} /* for */
-
-		delete iter;
-		iter = NULL;
-	 	} /* XPROTECT */
-  XEXCEPT
-	{
-	  if (iter)
-		delete iter;
-	}
-  XEND;
-
-  return(AAFRESULT_SUCCESS);
-}
-#endif
-
-OMDEFINE_STORABLE(ImplAAFSelector, AUID_AAFSelector);
 
 
