@@ -57,8 +57,12 @@ extern "C" const aafClassID_t CLSID_AAFPropertyValue;
 
 
 ImplAAFTypeDefFixedArray::ImplAAFTypeDefFixedArray ()
-  : _ElementType  ( PID_TypeDefinitionFixedArray_ElementType,  "ElementType"),
-    _ElementCount ( PID_TypeDefinitionFixedArray_ElementCount, "ElementCount")
+  : _ElementType  ( PID_TypeDefinitionFixedArray_ElementType,  
+                    L"ElementType", 
+                    L"/Dictionary/TypeDefinitions", 
+                    PID_MetaDefinition_Identification),
+    _ElementCount ( PID_TypeDefinitionFixedArray_ElementCount, 
+                    L"ElementCount")
 {
   _persistentProperties.put(_ElementType.address());
   _persistentProperties.put(_ElementCount.address());
@@ -73,31 +77,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefFixedArray::GetType (
       ImplAAFTypeDef ** ppTypeDef) const
 {
-  if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
+  if (! ppTypeDef)
+	return AAFRESULT_NULL_PARAM;
 
-  if (!_cachedBaseType)
-	{
-	  ImplAAFTypeDefFixedArray * pNonConstThis =
-		  (ImplAAFTypeDefFixedArray *) this;
+   if(_ElementType.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFTypeDef *pTypeDef = _ElementType;
 
-	  ImplAAFDictionarySP pDict;
-
-	  AAFRESULT hr;
-	  hr = GetDictionary(&pDict);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pDict);
-
-	  hr = pDict->LookupTypeDef (_ElementType, &pNonConstThis->_cachedBaseType);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (_cachedBaseType);
-	}
-  assert (ppTypeDef);
-  *ppTypeDef = _cachedBaseType;
+  *ppTypeDef = pTypeDef;
   assert (*ppTypeDef);
   (*ppTypeDef)->AcquireReference ();
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -115,11 +104,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsFixedArrayable())
 	return AAFRESULT_BAD_TYPE;
 
-  aafUID_t typeId;
-  AAFRESULT hr = pTypeDef->GetAUID(&typeId);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  return pvtInitialize (id, typeId, nElements, pTypeName);
+  return pvtInitialize (id, pTypeDef, nElements, pTypeName);
 }
 
 
@@ -127,7 +112,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefFixedArray::pvtInitialize (
       const aafUID_t & id,
-      const aafUID_t & typeId,
+      const ImplAAFTypeDef * pTypeDef,
       aafUInt32  nElements,
       const aafCharacter * pTypeName)
 {
@@ -139,7 +124,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if (AAFRESULT_FAILED (hr))
     return hr;
 
-  _ElementType = typeId;
+  _ElementType = pTypeDef;
   _ElementCount = nElements;
 
   return AAFRESULT_SUCCESS;
@@ -342,9 +327,9 @@ size_t ImplAAFTypeDefFixedArray::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
 
