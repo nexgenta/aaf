@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFContainerDef
 /***********************************************\
 *												*
 * Advanced Authoring Format						*
@@ -9,14 +9,8 @@
 *												*
 \***********************************************/
 
-#include "CAAFContainerDef.h"
-#include "CAAFContainerDef.h"
-#ifndef __CAAFContainerDef_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_AAFContainerDef; // generated
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -162,8 +156,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
-//@!!!	IEnumAAFContainerDefs *pPlug = NULL;
-//	IAAFPluggableDef		*pPlugDef = NULL;
+	IEnumAAFContainerDefs *pPlug = NULL;
+	IAAFContainerDef		*pPlugDef = NULL;
 	IAAFContainerDef		*pContainerDef = NULL;
 	bool bFileOpen = false;
 	aafBool			testBool;
@@ -177,11 +171,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-//!!!		checkResult(pDictionary->GetPluggableDefinitions(&pPlug));
-//!!!		checkResult(pPlug->NextOne (&pPlugDef));
-//!!!		checkResult(pPlugDef->QueryInterface (IID_IAAFContainerDef, (void **)&pContainerDef));
-//!!!		checkResult(pContainerDef->EssenceIsIdentified (&testBool));
-//!!!		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkResult(pDictionary->GetContainerDefinitions(&pPlug));
+		checkResult(pPlug->NextOne (&pPlugDef));
+		checkResult(pPlugDef->QueryInterface (IID_IAAFContainerDef, (void **)&pContainerDef));
+		checkResult(pContainerDef->EssenceIsIdentified (&testBool));
+		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 	}
 	catch (HRESULT& rResult)
 	{
@@ -215,7 +209,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CAAFContainerDef::test()
+extern "C" HRESULT CAAFContainerDef_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"ContainerDefTest.aaf";
@@ -228,7 +222,7 @@ HRESULT CAAFContainerDef::test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFContainerDef::test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFContainerDef_test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
