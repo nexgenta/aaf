@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.8 2005/01/23 03:01:08 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.9 2005/01/23 16:17:47 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1466,13 +1466,7 @@ AAFRESULT ImplAAFMetaDictionary::PvtSyncCommonClassDefs()
 
 AAFRESULT ImplAAFMetaDictionary::SyncMetaDictionaries()
 { 
-  AAFRESULT hr = AAFRESULT_SUCCESS;
-
-  if ( AAFRESULT_SUCCESS == (hr = PvtSyncCommonClassDefs()) ) {
-    // intentional noop
-  }
-
-  return hr;
+  return PvtSyncCommonClassDefs();
 }
 
 
