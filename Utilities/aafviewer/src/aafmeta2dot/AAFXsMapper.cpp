@@ -1,5 +1,5 @@
 /*
- * $Id: AAFXsMapper.cpp,v 1.5 2004/06/02 11:02:53 philipn Exp $ $Name:  $
+ * $Id: AAFXsMapper.cpp,v 1.6 2004/06/17 19:28:42 jptrainor Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -23,6 +23,7 @@
 
 #ifdef WIN32
 #pragma warning (disable:4786)
+#pragma warning (disable:4800)
 #endif
 
 #include <iostream>
