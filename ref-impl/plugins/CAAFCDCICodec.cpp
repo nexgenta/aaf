@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.9.2.1 2004/09/08 13:47:00 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.9.2.2 2004/09/08 17:45:20 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1620,11 +1620,12 @@ void CAAFCDCICodec::UpdateDescriptor (CAAFCDCIDescriptorHelper& descriptorHelper
 	checkResult(descriptorHelper.SetVideoLineMap(_videoLineMapSize, _videoLineMap));
 	checkResult(descriptorHelper.SetImageAspectRatio(_imageAspectRatio));
 	checkResult(descriptorHelper.SetAlphaTransparency(_alphaTransparency));
-	checkResult(descriptorHelper.SetGamma(_gamma));
 	checkResult(descriptorHelper.SetImageAlignmentFactor(_imageAlignmentFactor));
 	checkResult(descriptorHelper.SetFieldDominance(_fieldDominance));
 	checkResult(descriptorHelper.SetFieldStartOffset(_fieldStartOffset));
 	checkResult(descriptorHelper.SetFieldEndOffset(_fieldEndOffset));
+	if (_gamma != NULL_UID)
+		checkResult(descriptorHelper.SetGamma(_gamma));
 
 	// CDCIDescriptor methods:
 	checkResult(descriptorHelper.SetComponentWidth(_componentWidth));
