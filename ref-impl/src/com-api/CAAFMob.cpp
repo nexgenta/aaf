@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMob.cpp,v 1.10 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFMob.cpp,v 1.11 2004/11/26 17:21:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2750,8 +2750,6 @@ HRESULT CAAFMob::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFComponent.cpp,v 1.7 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFComponent.cpp,v 1.8 2004/11/26 17:21:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1120,8 +1120,6 @@ HRESULT CAAFComponent::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 

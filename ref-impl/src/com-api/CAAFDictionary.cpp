@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDictionary.cpp,v 1.9 2004/11/17 18:09:32 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDictionary.cpp,v 1.10 2004/11/26 17:21:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -4670,8 +4670,6 @@ HRESULT CAAFDictionary::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 

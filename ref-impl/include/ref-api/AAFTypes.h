@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.7 2004/11/02 11:30:11 phil_tudor Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.8 2004/11/26 17:21:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -255,7 +255,7 @@ typedef enum _aafJPEGcomponent_e
 {
 kAAFJcLuminance = 0, 
 kAAFJcChrominance = 1
-#if ! STANDARD_JPEG_Q
+#if ! defined(STANDARD_JPEG_Q)
 , kAAFJcLuminanceFP16 = 2, 
 kAAFJcChrominanceFP16 = 3
 #endif
