@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying 
 * documentation, and to distribute and sublicense application software
@@ -33,6 +33,10 @@
 
 #ifndef __ImplAAFPropValData_h__
 #include "ImplAAFPropValData.h"
+#endif
+
+#ifndef __ImplAAFRefArrayValue_h__
+#include "ImplAAFRefArrayValue.h"
 #endif
 
 #include "AAFPropertyIDs.h"
@@ -115,8 +119,7 @@ ImplAAFTypeDefArray::CreateValue(ImplAAFPropertyValue ** ppPropVal,
 	if (!tmp) return AAFRESULT_NOMEMORY;
 	pvd = tmp;
 	// the pvd smart pointer will maintain a reference for us...
-	aafUInt32 refCount;
-	refCount = tmp->ReleaseReference ();
+	tmp->ReleaseReference ();
 	
 	//Initialize pvd to this type
 	HRESULT hr = pvd->Initialize(this);
@@ -301,6 +304,12 @@ ImplAAFTypeDefArray::GetElementValue (
 	if (! pInPropVal) return AAFRESULT_NULL_PARAM;
 	if (! ppOutPropVal) return AAFRESULT_NULL_PARAM;
 	
+  ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
+  if (NULL != pRefArray)
+  {
+    return pRefArray->GetElementAt(index, ppOutPropVal);
+  }
+
 	if (index >= pvtCount (pInPropVal))
 		return AAFRESULT_BADINDEX;
 	
@@ -409,6 +418,12 @@ ImplAAFTypeDefArray::SetElementValue (
 	//Ensure our input pointers are valid
 	if (!pPropVal || !pMemberPropVal)
 		return AAFRESULT_NULL_PARAM;
+
+  ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pPropVal);
+  if (NULL != pRefArray)
+  {
+    return pRefArray->SetElementAt(pMemberPropVal, index);
+  }
 	
 	//Ensure index is within range
 	if (index >= pvtCount(pPropVal))  //if index is > 0..n-1
