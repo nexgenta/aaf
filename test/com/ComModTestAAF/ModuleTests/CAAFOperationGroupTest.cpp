@@ -100,14 +100,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -140,7 +140,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDictionary*		pDictionary = NULL;
 	IAAFOperationDef*		pOperationDef = NULL;
 	IAAFParameterDef*	pParamDef = NULL;
-	IAAFDefObject*		pDefObject = NULL;
 	IAAFOperationGroup			*pOperationGroup = NULL;
 	IAAFMob				*pMob = NULL;
 	IAAFSegment			*pSeg = NULL;
@@ -165,7 +164,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
@@ -184,13 +183,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
-		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
+		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
-		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
+		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
@@ -199,10 +195,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
+		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
 
 
 		//Make the first mob
@@ -294,8 +287,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSourceRef->Release();
 	if(pSourceClip)
 		pSourceClip->Release();
-	if (pDefObject)
-		pDefObject->Release();
 	if (pOperationGroup)
 		pOperationGroup->Release();
 	if (pMob)
@@ -372,11 +363,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 		
 		aafSearchCrit_t		criteria;
-		criteria.searchTag = kNoSearch;
+		criteria.searchTag = kAAFNoSearch;
 		checkResult(pHeader->GetMobs (&criteria, &mobIter));
 				
 		checkResult(mobIter->NextOne (&pMob));			
@@ -397,13 +388,13 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkExpression(testNumSources == 1, AAFRESULT_TEST_FAILED);
 
 			checkResult(pOperationGroup->IsATimeWarp (&readIsTimeWarp));
-			checkExpression(readIsTimeWarp == AAFFalse, AAFRESULT_TEST_FAILED);
+			checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
 
 			checkResult(pOperationGroup->GetBypassOverride (&readOverride));
 			checkExpression(readOverride == 1, AAFRESULT_TEST_FAILED);
 
 			checkResult(pOperationGroup->IsValidTranOperation (&readValidTransition));
-			checkExpression(readValidTransition == AAFFalse, AAFRESULT_TEST_FAILED);
+			checkExpression(readValidTransition == kAAFFalse, AAFRESULT_TEST_FAILED);
 			/**/
 			checkResult(pOperationGroup->GetInputSegmentAt (0, &pSeg));
  			checkResult(pSeg->QueryInterface(IID_IAAFFiller, (void **) &pFill));
