@@ -25,8 +25,6 @@
  *
  ************************************************************************/
 
-#include <stdlib.h>
-
 #include "AAF.h"
 
 #include "extensionUtils.h"
@@ -81,9 +79,10 @@
 
 void main ()
 {
-  const aafWChar * filename = L"extension.aaf";
+  const aafWChar * filename = L"foo";
 
   extensionWrite (filename);
+
   bool status = extensionRead (filename);
   if (! status)
 	{
@@ -96,6 +95,5 @@ void main ()
   else
 	{
 	  cout << "Succeeded." << endl;
-    exit (0);
 	}
 }

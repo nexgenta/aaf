@@ -25,14 +25,12 @@
  *
  ************************************************************************/
 
-#include <stdlib.h>
-
 #include "extensionRead.h"
 #include "extensionUtils.h"
 
 void main ()
 {
-  const aafWChar * filename = L"extension.aaf";
+  const aafWChar * filename = L"foo";
 
   bool status = extensionRead (filename);
   if (! status)
@@ -42,9 +40,5 @@ void main ()
 		   << "." << endl;
 
 	  exit (1);
-	}
-  else
-	{
-	  cout << "Succeeded." << endl;
 	}
 }

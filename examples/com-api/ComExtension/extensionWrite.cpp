@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -45,10 +45,10 @@
 //
 // Specifically, this is what we'll do:
 //
-// - The ePosition enumeration will be an extensible enumeration describing
-//   that person's position in the project:
+// - The eRole enumeration will be an extensible enumeration describing
+//   that person's role in the project:
 //
-//  extensibleEnum ePosition 
+//  extensibleEnum eRole 
 //  { 
 //    Producer, 
 //  	Editor, 
@@ -64,21 +64,19 @@
 //   PersonnelResource : subclass of InterchangeObject 
 //   { 
 //     // mandatory properties 
-//     String       givenName; 
-//	   String		familyName;
-//     ePosition        position; 
+//     String       name; 
+//     eRole        role; 
 //
 //     // contract ID is optional
 //     bool         cid_present;
 //     contractID_t cid;
-//	   String		part; optional for actors
 //   };
 //
 //
 // - We will extend Mob to contain a collection of these
 //   PersonnelResource objects:
 //
-//   AdminMob : subclass of Mob 
+//   PersonnelMob : subclass of Mob 
 //   { 
 //     // mandatory property 
 //     StrongRefVector<Person> personnel;
@@ -86,10 +84,6 @@
 //
 
 
-//
-// Utility to convert wide  strings to single-byte-character
-// strings.
-//
 static void convert(char* cName, size_t length, const wchar_t* name)
 {
   assert (name);
@@ -105,162 +99,286 @@ static void convert(char* cName, size_t length, const wchar_t* name)
 }
 
 
+//
+// Creates a type definition to describe eRole enumerations, and
+// registers it in the dictionary.
+//
+static void CreateAndRegisterRoleEnum (IAAFDictionary * pDict)
+{
+  assert (pDict);
+
+  IAAFTypeDefExtEnumSP ptde;
+
+  check (pDict->CreateInstance (&AUID_AAFTypeDefExtEnum,
+								IID_IAAFTypeDefExtEnum,
+								(IUnknown**) &ptde));
+
+  check (ptde->Initialize ((aafUID_t*) &kTypeID_eRole,
+						  L"PersonnelRole"));
+
+  check (ptde->AppendElement ((aafUID_t*) &kRole_Producer,     L"Producer"));
+  check (ptde->AppendElement ((aafUID_t*) &kRole_Editor,       L"Editor"));
+  check (ptde->AppendElement ((aafUID_t*) &kRole_FloorManager, L"FloorManager"));
+
+  IAAFTypeDefSP ptd;
+  check (ptde->QueryInterface (IID_IAAFTypeDef, (void **)&ptd));
+  check (pDict->RegisterType (ptd));
+}
 
 
 //
-// - Creates an AAF file with the given name.
-// - Registers extensions that we'll use in the file's dictionary.
-// - Creates a AdminMob and adds it to the file's header.
-// - Creates several PersonnelRecord objects and appends them to the
-//   AdminMob.
-// - Saves the file.
+// Creates a class definition to describe PersonnelResource objects,
+// and registers it in the dictionary.
 //
+static void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
+{
+  assert (pDict);
+
+  IAAFClassDefSP pcd;
+
+  check (pDict->CreateInstance (&AUID_AAFClassDef,
+								IID_IAAFClassDef,
+								(IUnknown**) &pcd));
+
+  IAAFClassDefSP pcd_Object;
+  check (pDict->LookupClass (&AUID_AAFObject, &pcd_Object));
+
+  check (pcd->Initialize ((aafUID_t*) &kClassID_PersonnelResource,
+						  pcd_Object,
+						  L"PersonnelResource"));
+
+  IAAFPropertyDefSP pd_unused;
+
+  IAAFTypeDefSP ptd_String;
+  check (pDict->LookupType ((aafUID_t*) &kAAFTypeID_String, &ptd_String));
+  check (pcd->AppendNewPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_Name,
+									L"Name",
+									ptd_String,
+									AAFFalse,
+									&pd_unused));
+
+  IAAFTypeDefSP ptd_Role;
+  check (pDict->LookupType ((aafUID_t*) &kTypeID_eRole, &ptd_Role));
+  check (pcd->AppendNewPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_Role,
+									L"Role",
+									ptd_Role,
+									AAFFalse,
+									&pd_unused));
+
+  IAAFTypeDefSP ptd_ui32;
+  check (pDict->LookupType ((aafUID_t*) &kAAFTypeID_UInt32, &ptd_ui32));
+  check (pcd->AppendNewPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_ContractID,
+									L"ContractID",
+									ptd_ui32,
+									AAFFalse,
+									&pd_unused));
+
+  check (pDict->RegisterClass (pcd));
+}
+
+
+
+static void
+CreateAndRegisterPersonnelResourceReference
+(IAAFDictionary * pDict)
+{
+  assert (pDict);
+
+  IAAFClassDefSP pcd;
+  check (pDict->LookupClass ((aafUID_t*) &kClassID_PersonnelResource,
+							 &pcd));
+
+  IAAFTypeDefObjectRefSP ptdr;
+  check (pDict->CreateInstance (&AUID_AAFTypeDefStrongObjRef,
+								IID_IAAFTypeDefObjectRef,
+								(IUnknown**) &ptdr));
+
+  check (ptdr->Initialize ((aafUID_t*) &kTypeID_PersonnelResourceStrongReference,
+						   pcd,
+						   L"PersonnelResourceStrongReference"));
+
+  IAAFTypeDefSP ptd;
+  check (ptdr->QueryInterface (IID_IAAFTypeDef, (void **)&ptd));
+
+  check (pDict->RegisterType (ptd));
+}
+
+
+static void
+CreateAndRegisterPersonnelResourceReferenceVector
+(IAAFDictionary * pDict)
+{
+  assert (pDict);
+
+  IAAFTypeDefVariableArraySP ptdv;
+  check (pDict->CreateInstance (&AUID_AAFTypeDefVariableArray,
+								IID_IAAFTypeDefVariableArray,
+								(IUnknown**) &ptdv));
+
+  IAAFTypeDefSP ptdr;
+  check (pDict->LookupType ((aafUID_t*) &kTypeID_PersonnelResourceStrongReference,
+							&ptdr));
+
+  check (ptdv->Initialize ((aafUID_t*) &kTypeID_PersonnelResourceStrongReferenceVector,
+						   ptdr,
+						   L"PersonnelResourceStrongReferenceVector"));
+
+  IAAFTypeDefSP ptd;
+  check (ptdv->QueryInterface (IID_IAAFTypeDef, (void **)&ptd));
+
+  check (pDict->RegisterType (ptd));
+}
+
+
+//
+// Creates a class definition to describe PersonnelMob objects, and
+// registers it in the dictionary.
+//
+static void CreateAndRegisterPersonnelMob (IAAFDictionary * pDict)
+{
+  assert (pDict);
+
+  IAAFClassDefSP pcd;
+
+  check (pDict->CreateInstance (&AUID_AAFClassDef,
+								IID_IAAFClassDef,
+								(IUnknown**) &pcd));
+
+  IAAFClassDefSP pcd_Mob;
+  check (pDict->LookupClass (&AUID_AAFMob, &pcd_Mob));
+
+  check (pcd->Initialize ((aafUID_t*) &kClassID_PersonnelMob,
+						  pcd_Mob,
+						  L"PersonnelMob"));
+
+  IAAFPropertyDefSP pd_unused;
+
+  IAAFTypeDefSP ptd_PersonnelVector;
+  check (pDict->LookupType ((aafUID_t*) &kTypeID_PersonnelResourceStrongReferenceVector,
+							&ptd_PersonnelVector));
+  check (pcd->AppendNewPropertyDef ((aafUID_t*) &kPropID_PersonnelMob_Personnel,
+									L"Personnel",
+									ptd_PersonnelVector,
+									AAFFalse,
+									&pd_unused));
+
+  check (pDict->RegisterClass (pcd));
+}
+
+
+static void CreatePersonnelMob (IAAFDictionary * pDict,
+								IAAFMob ** ppMob)
+{
+  assert (pDict);
+  assert (ppMob);
+
+  IAAFMob * pMob = 0;
+  check (pDict->CreateInstance ((aafUID_t*) &kClassID_PersonnelMob,
+								IID_IAAFMob,
+								(IUnknown**) &pMob));
+  assert (pMob);
+  check (pMob->SetMobID ((aafUID_t*) &kMobID_Personnel));
+  check (pMob->SetName (L"Personnel"));
+  
+  assert (ppMob);
+  *ppMob = pMob;
+}
+
+
+static void AppendResource (IAAFDictionary * pDict,
+							IAAFMob *pMob,
+							const PersonnelResource & info)
+{
+  assert (pMob);
+  assert (info.name);
+
+  IAAFObjectSP pObj;
+  check (pDict->CreateInstance ((aafUID_t*) &kClassID_PersonnelResource,
+								IID_IAAFObject,
+								(IUnknown**) &pObj));
+
+  PersonnelRecordSetInfo (pObj, info);
+
+  // append record to mob
+
+  // Get existing size of array.
+  aafUInt32 oldSize = 
+	PersonnelMobGetArraySize (pMob);
+  // Make room in new array for new entry
+  aafUInt32 newSize = oldSize + 1;
+  IAAFObject ** personnelArray = 0;
+  personnelArray = new IAAFObject*[newSize];
+  assert (personnelArray);
+  aafUInt32 i;
+  for (i = 0; i < newSize; i++)
+	personnelArray[i] = 0;
+
+  // get the existing array, if not empty.
+  if (oldSize)
+	PersonnelMobGetArray (pMob, personnelArray, oldSize);
+  // copy in our new one
+  personnelArray[newSize-1] = pObj;
+  // Write out the new array.
+  PersonnelMobSetArray (pMob, personnelArray, newSize);
+}
+
+
 void extensionWrite (const aafCharacter * filename)
 {
-  IAAFFile *pFile=NULL;
-  IAAFHeader *pHead=NULL;
-  IAAFDictionary *pDict=NULL;
-  IAAFMob *pAdminMob=NULL;
-  IAAFObject *pPersResource=NULL;
-  IAAFClassDef *pcd = 0;
+  cout << "***Creating file " << filename << "***" << endl;
+
+  aafProductIdentification_t  ProductInfo;
   
+  // delete any previous test file before continuing...
+  char chFileName[1000];
+  convert(chFileName, sizeof(chFileName), filename);
+  remove(chFileName);
 
-  try
-  {
-    cout << "***Creating file " << filename << "***" << endl;
-
-    aafProductIdentification_t  ProductInfo;
+  // Create a new file...
+  static const aafUID_t NULL_UID = { 0 };
+  ProductInfo.companyName = L"AAF Developers Desk";
+  ProductInfo.productName = L"AAF extension example";
+  ProductInfo.productVersion.major = 1;
+  ProductInfo.productVersion.minor = 0;
+  ProductInfo.productVersion.tertiary = 0;
+  ProductInfo.productVersion.patchLevel = 0;
+  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersionString = 0;
+  ProductInfo.productID = NULL_UID;
+  ProductInfo.platform = 0;
   
-    // delete any previous test file before continuing...
-    char chFileName[1000];
-    convert(chFileName, sizeof(chFileName), filename);
-    remove(chFileName);
-
-    // Create a new file...
-    static const aafUID_t NULL_UID = { 0 };
-    ProductInfo.companyName = L"AAF Developers Desk";
-    ProductInfo.productName = L"AAF extension example";
-    ProductInfo.productVersion.major = 1;
-    ProductInfo.productVersion.minor = 0;
-    ProductInfo.productVersion.tertiary = 0;
-    ProductInfo.productVersion.patchLevel = 0;
-    ProductInfo.productVersion.type = kAAFVersionUnknown;
-    ProductInfo.productVersionString = 0;
-    ProductInfo.productID = NULL_UID;
-    ProductInfo.platform = 0;
+  IAAFFileSP pFile;
+  check (AAFFileOpenNewModify ((aafCharacter*) filename,
+							   0,
+							   &ProductInfo,
+							   &pFile));
   
-    check (AAFFileOpenNewModify ((aafCharacter*) filename,
-							     0,
-							     &ProductInfo,
-							     &pFile));
-  
-    check (pFile->GetHeader(&pHead));
-    check (pHead->GetDictionary(&pDict));
+  IAAFHeaderSP pHead;
+  check (pFile->GetHeader(&pHead));
 
-    DefineResourceClassExtensions(pDict);
+  IAAFDictionarySP pDict;
+  check (pHead->GetDictionary(&pDict));
 
- 
-    // Instantiate a AdministrativeMob object.
-	check (pDict->LookupClassDef (kClassID_AdminMob, &pcd));
-    check (pcd->CreateInstance (IID_IAAFMob,
-								(IUnknown**) &pAdminMob));
-	pcd->Release();
-	pcd = 0;
-    check (pAdminMob->SetName (L"Administrative Information"));
- 
+  CreateAndRegisterRoleEnum (pDict);
+  CreateAndRegisterPersonnelResource (pDict);
+  CreateAndRegisterPersonnelResourceReference (pDict);
+  CreateAndRegisterPersonnelResourceReferenceVector (pDict);
+  CreateAndRegisterPersonnelMob (pDict);
 
-    // Add the new AdministrativeMob object to the file's header.
-    check (pHead->AddMob (pAdminMob));
+  IAAFMobSP pMob;
+  CreatePersonnelMob (pDict, &pMob);
+  check (pHead->AppendMob (pMob));
 
-    // Add several PersonnelResource objects to the AdminMob.
-    // Instantiate the PersonnelResource object.
-	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
-    check (pcd->CreateInstance (IID_IAAFObject,
-								(IUnknown**) &pPersResource));
-	pcd->Release();
-	pcd = 0;
+  /*
+  AppendResource (pDict, pMob,
+				  FormatResource (L"Peter Vechtor", kRole_Producer,    42));
+  AppendResource (pDict, pMob,
+				  FormatResource (L"Oliver Morgan", kRole_FloorManager, 6 ));
+  AppendResource (pDict, pMob,
+				  FormatResource (L"Tom Ohanian",   kRole_Editor));
+  */
 
-    PersonnelResourceInitialize (pPersResource,
-							     L"Morgan",
-							     L"Oliver",
-							     kPosition_FloorManager);
-    AdminMobAppendResource (pDict,
-						    pAdminMob,
-						    pPersResource);
-    pPersResource->Release();
-    pPersResource=NULL;
-
-  // Instantiate the PersonnelResource object.
-	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
-    check (pcd->CreateInstance (IID_IAAFObject,
-								(IUnknown**) &pPersResource));
-	pcd->Release ();
-	pcd = 0;
-
-    PersonnelResourceInitialize (pPersResource,
-							     L"Ohanian",
-							     L"Tom",
-							     kPosition_Editor);
-    PersonnelResourceSetContractID(pPersResource, 299);
-
-    AdminMobAppendResource (pDict,
-						    pAdminMob,
-						    pPersResource);
-    pPersResource->Release();
-    pPersResource=NULL;
-  // Instantiate the PersonnelResource object.
-	check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd))
-    check (pcd->CreateInstance (IID_IAAFObject,
-								(IUnknown**) &pPersResource));
-	pcd->Release();
-	pcd = 0;
-
-    PersonnelResourceInitialize (pPersResource,
-							     L"Oldman",
-							     L"Arianna",
-							     kPosition_Actor);
-    PersonnelResourceSetActorRole(pPersResource, L"Lucy");
-    PersonnelResourceSetContractID(pPersResource, 735);
-    AdminMobAppendResource (pDict,
-						    pAdminMob,
-						    pPersResource);
-    pPersResource->Release();
-    pPersResource=NULL;
-    pAdminMob->Release();
-    pAdminMob=NULL;
-    pDict->Release();
-    pDict=NULL;
-    pHead->Release();
-    pHead=NULL;
-    // Save the file and close it.
-    check (pFile->Save());
-    check (pFile->Close());
-    pFile->Release();
-    pFile=NULL;
-  }
-  catch (...)
-  {
-    // cleanup on error...
-    if (pPersResource)
-      pPersResource->Release();
-    if (pAdminMob)
-      pAdminMob->Release();
-    if (pDict)
-      pDict->Release();
-    if (pHead)
-      pHead->Release();
-	if (pcd)
-	  {
-		pcd->Release();
-		pcd = 0;
-	  }
-
-    if (pFile)
-    {
-      pFile->Close();
-      pFile->Release();
-    }
-
-    throw;
-  }
+  // save and exit.
+  check (pFile->Save());
+  check (pFile->Close());
 }
