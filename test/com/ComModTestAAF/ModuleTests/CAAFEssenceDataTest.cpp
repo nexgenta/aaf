@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceData
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDataTest.cpp,v 1.31 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceDataTest.cpp,v 1.32 2004/02/27 18:46:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -211,7 +211,7 @@ void EssenceDataTest::cleanupReferences()
 
   if (NULL != _buffer)
   {
-    delete _buffer;
+    delete [] _buffer;
     _buffer = NULL;
   }
 
@@ -277,7 +277,7 @@ void EssenceDataTest::setBufferSize(aafUInt32 bufferSize)
   // Allocate the buffer.
   if (NULL != _buffer && bufferSize > _bufferSize)
   {
-    delete _buffer;
+    delete [] _buffer;
     _buffer = NULL;
   }
 

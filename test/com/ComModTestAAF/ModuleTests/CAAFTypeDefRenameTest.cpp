@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefRename
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefRenameTest.cpp,v 1.15 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefRenameTest.cpp,v 1.16 2004/02/27 18:46:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -322,7 +322,7 @@ static void ReadTypeDefRenameFile(aafWChar *pFilename)
 	aafWChar *pNameBuf=new aafWChar[iNameLen/sizeof(aafWChar)];
 	checkResult(pWordMetaDefinition->GetName(pNameBuf,iNameLen));
 	checkExpression(!wcscmp(pNameBuf,gpAliasName));
-	delete(pNameBuf);
+	delete [] pNameBuf;
 
 	// Look up definition of known base type (UInt16)
 	IAAFTypeDefSP pUInt16TypeDef;

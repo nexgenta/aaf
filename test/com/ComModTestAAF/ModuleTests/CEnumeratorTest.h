@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumeratorTest.h,v 1.7 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumeratorTest.h,v 1.8 2004/02/27 18:46:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -222,7 +222,7 @@ void CEnumeratorTest<TEnum,TItem>::Run(testMode_t mode)
 			}
 		}
 		checkExpression(iEnumeratedItems==iItemsCount);
-		delete(ppCurItems);
+		delete [] ppCurItems;
 	}
 
 	for(aafUInt32 iSkipSize=1;iSkipSize<=iItemsCount-1;iSkipSize++)
@@ -284,7 +284,7 @@ void CEnumeratorTest<TEnum,TItem>::Run(testMode_t mode)
 		checkExpression(pClone->NextOne(&pCurItem)==AAFRESULT_NO_MORE_OBJECTS);
 	}
 	
-	delete(pEnumeratedAUIDs);
+	delete [] pEnumeratedAUIDs;
 
 	pFile->Save();
 	pFile->Close();
