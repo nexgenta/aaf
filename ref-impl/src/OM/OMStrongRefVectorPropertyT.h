@@ -205,9 +205,9 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
       vectorIndex->iterate(context, localKey);
       char* name = elementName(localKey);
       OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                      ReferencedObject> element(this, name, localKey);
-      element.restore();
-      _vector.setAt(element, i);
+                      ReferencedObject> newElement(this, name, localKey);
+      newElement.restore();
+      _vector.setAt(newElement, i);
       delete [] name;
       name = 0; // for BoundsChecker
     }
@@ -519,6 +519,25 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::grow(
                     ReferencedObject> voidElement;
     _vector.insert(voidElement);
   }
+}
+
+  // @mfunc Is this <c OMStrongReferenceVectorProperty> void ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @rdesc True if this <c OMStrongReferenceVectorProperty> is void,
+  //          false otherwise. 
+  //   @this const
+template <typename ReferencedObject>
+bool OMStrongReferenceVectorProperty<ReferencedObject>::isVoid(void) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::isVoid");
+
+  bool result = false;
+
+  ASSERT("Unimplemented code not reached", false);
+
+  return result;
 }
 
   // @mfunc Remove this optional <c OMStrongReferenceVectorProperty>.
