@@ -1,17 +1,18 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 EnumAAFSegments\
 #endm
+#startm .parent-module 0
+AAFRoot\
+#endm
 #c
-#import ./AAFUnitTest.exp
 AD_HEAD
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
 
 AD_FORWARD_DECLARATION(AAFSegment)
 
@@ -19,7 +20,7 @@ AD_FORWARD_DECLARATION(AAFSegment)
 AD_CLASS_UUID(B1A213A3, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A213A2, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_ROOT_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, Transient)
 
 AD_XMETHOD1(NextOne,
 			[out\,retval],
@@ -31,12 +32,12 @@ AD_XMETHOD1(NextOne,
   // properly releasing the returned pointer when it is no longer needed.
   // @comm This is a just simplified version of the Next method. )
 
-AD_XMETHOD3(Next,
-			[in], objPass, aafUInt32, count, number of segments requested,
+AD_X2METHOD3(Next,
+			[in], objPass, aafUInt32, count, number of segments requested,xxx,
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOut, AAFSegment, ppSegments, array to receive segments,
+			objOutArray, AAFSegment, ppSegments, array to receive segments,count,
 			[out\,ref], objPass, aafUInt32 *, pFetched,
-			number of actual Segments fetched into ppSegments array,
+			number of actual Segments fetched into ppSegments array,xxx,
 			Enumerates the next count elements \(AAFSegment pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
@@ -66,6 +67,4 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_OVERRIDE(.method-Test)
-
-AD_ROOT_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
