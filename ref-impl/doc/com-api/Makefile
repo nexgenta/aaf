@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: Makefile,v 1.8 2005/02/15 19:16:51 heydowns Exp $ $Name:  $
+# $Id: Makefile,v 1.9 2005/02/15 19:41:30 heydowns Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,6 @@ DOXYGEN = doxygen
 ZIP = zip
 TAR = tar
 
-# XXX - Not yet used
 # Only used for building the 'chm' (Windows Help file)
 HTMLHELP_WORKSHOP = C:/Program\ Files/HTML\ Help\ Workshop
 
