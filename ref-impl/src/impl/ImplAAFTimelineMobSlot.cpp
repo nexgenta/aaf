@@ -5,7 +5,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -140,12 +139,14 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 		(*diffPos) = offset;
 		CHECK(SubInt64fromInt64(begPos, diffPos));
 		tmpSegment->ReleaseReference();
+		tmpSegment = 0;
 		
 	} /* XPROTECT */
 	XEXCEPT
 	{
 		if (tmpSegment)	
-			tmpSegment->ReleaseReference();
+		  tmpSegment->ReleaseReference();
+		tmpSegment = 0;
 	}
 	XEND;
 	return(AAFRESULT_SUCCESS);
