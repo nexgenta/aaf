@@ -21,6 +21,7 @@
 #include <assert.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
+#include "aafUtils.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -54,8 +55,8 @@ ImplAAFMasterMob::Initialize ()
 // The pDataDef parameter requires a data kind valid for a media
 // stream. Valid data kinds are:
 //
-// - DDEF_Video
-// - DDEF_Audio
+// - DDEF_Picture
+// - DDEF_Sound
 //
 // Note: If pSlotName is passed in with zero length, then the
 // slot is not assigned a name.  Slot names are not used by the
@@ -127,7 +128,7 @@ AAFRESULT STDMETHODCALLTYPE
 		pSegment = NULL;
 
 		// Make sure the slot contains the expected media type.
-		if (memcmp(&DataDef, pDataDef, sizeof(aafUID_t)) != 0)
+		if (!EqualAUID(&DataDef, pDataDef))
 			RAISE(AAFRESULT_INVALID_DATADEF);
 
 		pMobSlot->ReleaseReference();
