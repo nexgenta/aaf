@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.10 2004/05/18 17:03:02 stuart_hc Exp $ $Name:  $
+# $Id: common.mk,v 1.11 2004/06/02 13:33:12 asuraparaju Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -188,13 +188,6 @@ STORAGE_LIBS += $(AAFBUILDDIR)/sss-impl/libSSRW2C$(LIB)
 LINK_STG += -L$(AAFBUILDDIR)/sss-impl -lSSRW2C
 else
 endif
-
-# check for MS reference implementation librefstg.a
-ifeq ($(wildcard $(AAFBUILDDIR)/ss-impl/librefstg$(LIB)),$(AAFBUILDDIR)/ss-impl/librefstg$(LIB))
-STORAGE_LIBS += $(AAFBUILDDIR)/ss-impl/librefstg$(LIB)
-LINK_STG += -L$(AAFBUILDDIR)/ss-impl -lrefstg
-endif
-
 
 #----------------------------------------------------------
 # STATIC_LINK_LINE - Link line used for static builds
