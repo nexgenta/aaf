@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFMetaDictionary.h,v 1.106.2.7 2004/05/03 01:26:02 jptrainor Exp $ $Name:  $
+// $Id: AAFMetaDictionary.h,v 1.106.2.8 2004/05/05 19:58:42 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3477,7 +3477,7 @@ AAF_CLASS(AuxiliaryDescriptor,
     AAF_LITERAL_AUID(0x04090200,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x07),
-    0x3a08,
+    0x4e11,
     AAF_TYPE(String),
     true,
     false,
@@ -3487,7 +3487,7 @@ AAF_CLASS(AuxiliaryDescriptor,
     AAF_LITERAL_AUID(0x04090300,
       0x0000, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x08),
-    0x3a08,
+    0x4e12,
     AAF_TYPE(String),
     false,
     false,
@@ -3515,7 +3515,7 @@ AAF_CLASS(TaggedValueDefinition,
     AAF_LITERAL_AUID(0x06010104,
       0x0305, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x07),
-    0x4c01,
+    0x4c11,
     AAF_REFERENCE_TYPE(WeakReferenceSet, PropertyDefinition),
     true,
     false,
@@ -3543,7 +3543,7 @@ AAF_CLASS(KLVDataDefinition,
     AAF_LITERAL_AUID(0x06010104,
       0x0304, 0x0000,
       0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x07),
-    0x4d01,
+    0x4d12,
     AAF_REFERENCE_TYPE(WeakReferenceSet, PropertyDefinition),
     true,
     false,
