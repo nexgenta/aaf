@@ -943,11 +943,14 @@ AD_ROOT_CLASS_END\
 #c (first version defined backwords compatibility)
 
 #startm .begin-Abstract-StoredObjectBase 00
+#include "AAFStoredObjectIDs.h"
+
 AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Abstract-StoredObjectBase 00
-AD_CLASS_END\
+
+OMDEFINE_STORABLE(Impl.this-module, AUID_.this-module);
 #endm
 
 
@@ -960,7 +963,6 @@ AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Abstract-Transient 00
-AD_CLASS_END\
 #endm
 
 
@@ -969,11 +971,13 @@ AD_CLASS_END\
 #c (first version defined backwords compatibility)
 
 #startm .begin-Abstract-StoredObject 00
+#include "AAFStoredObjectIDs.h"
+
 AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Abstract-StoredObject 00
-AD_CLASS_END\
+OMDEFINE_STORABLE(Impl.this-module, AUID_.this-module);
 #endm
 
 
@@ -986,7 +990,6 @@ AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Concrete-Transient 00
-AD_CLASS_END\
 #endm
 
 
@@ -996,9 +999,58 @@ AD_CLASS_END\
 #c (first version defined backwords compatibility)
 
 #startm .begin-Concrete-StoredObject 00
+#include "AAFStoredObjectIDs.h"
+
 AD_CLASS_BEGIN\
 #endm
 
 #startm .end-Concrete-StoredObject 00
-AD_CLASS_END\
+
+OMDEFINE_STORABLE(Impl.this-module, AUID_.this-module);
+#endm
+
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c IMPLC 
+#c Declaration for the dictionary's factory method.
+#c
+#startm AD_DICTIONARY_FACTORY 02
+
+#ifndef __ImplAAFBaseClassFactory_h__
+#include "ImplAAFBaseClassFactory.h"
+#endif
+
+// %02
+AAFRESULT STDMETHODCALLTYPE 
+  Impl.this-module::%01 (
+    // Class identifier (AUID) of the stored object. This is the
+    // corresponding SMPTE identifier (as a GUID) for all predefined
+    // built-in classes.
+    aafUID_t * pAUID,
+
+    // Address of output variable that receives the 
+    // object pointer requested in pAUID
+    ImplAAFObject ** ppvObject)
+{
+  if (NULL == pAUID || NULL == ppvObject)
+    return AAFRESULT_NULL_PARAM;
+  
+  // Look for the object in the built-in base class factory.
+  *ppvObject = ImplAAFBaseClassFactory::CreateInstance(pAUID);
+
+  if (NULL == *ppvObject)
+  {
+    // TBD:
+    // Search the rest of the dictionary for extension classes.
+    // 
+  }
+  
+
+  if (NULL == *ppvObject)
+    return AAFRESULT_INVALID_CLASS_ID;
+  else
+    return AAFRESULT_SUCCESS;
+}
 #endm
