@@ -2,7 +2,7 @@
 #define __AAFFileKinds_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFFileKinds.h,v 1.19 2004/11/04 18:28:15 stuart_hc Exp $ $Name:  $
+// $Id: AAFFileKinds.h,v 1.19.4.1 2005/03/31 10:01:15 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,6 +75,11 @@ const aafUID_t kAAFFileKind_AafG4KBinary = kAAFFileKind_AafG4KBinary_Value;
 { 0xc59ef56f, 0x5cb4, 0x4cb8, { 0xbd, 0xe3, 0x8d, 0x7c, 0xd9, 0x25, 0x8e, 0x18 } }
 const aafUID_t kAAFFileKind_AafXmlText = kAAFFileKind_AafXmlText_Value;
 
+// AAF-XML prototype 
+#define kAAFFileKind_AafXmlTextPrototype_Value \
+{ 0xefc451aa, 0x230c, 0x44ed, { 0xb3, 0x49, 0x76, 0x75, 0xb5, 0x70, 0xfb, 0x3f } }
+const aafUID_t kAAFFileKind_AafXmlTextPrototype = kAAFFileKind_AafXmlTextPrototype_Value;
+
 
 // MXF files encoded as SMPTE KLV (binary).
 //
@@ -126,6 +131,11 @@ const aafUID_t kAAFSignature_Aaf512Binary = kAAFSignature_Aaf512Binary_Value;
 #define kAAFSignature_Aaf4KBinary_Value \
 {0x0d010201, 0x0200, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x03, 0x02, 0x01, 0x01}};
 const aafUID_t kAAFSignature_Aaf4KBinary = kAAFSignature_Aaf4KBinary_Value;
+
+// no signature is required for AAF-XML, hence it is set to null 
+#define kAAFSignature_AafXmlTextPrototype_Value \
+{0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+const aafUID_t kAAFSignature_AafXmlTextPrototype = kAAFSignature_AafXmlTextPrototype_Value;
 
 
 // Deprecated symbols, which may be removed in a future release
