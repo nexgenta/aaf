@@ -1,21 +1,23 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFTIFFDescriptor\
 #endm
 #c
 #startm .parent-module 0
-AAFFileDescriptor\
+AAFDigitalImageDescriptor\
 #endm
 #c
 #c #import ./AAFDigitalImageDescriptor.exp
 AD_HEAD
 AD_INCLUDE(AAFTypes)
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 AD_IDL(//
 // The IAAFTIFFDescriptor interface is implemented by objects which
@@ -40,7 +42,7 @@ AD_XMETHOD1(SetIsUniform,
 			aafBool,
 			IsUniform,
 			Sets the IsUniform flag value,
-     Set to TRUE if essence data has the same number of rows per strip
+  // Set to TRUE if essence data has the same number of rows per strip
   // throughout.
   //
   // Always succeeds.
@@ -59,8 +61,8 @@ AD_XMETHOD1(GetIsUniform,
 			aafBool *,
 			pIsUniform,
 			Gets the IsUniform flag value,
-     Places TRUE into *pIsUniform if the data has the same number of
-  // rows per strip throughout.
+  // Places TRUE into *pIsUniform if the data has the same number of rows 
+  // per strip throughout.
   //
   // Succeeds if all of the following are true:
   // - the pIsUniform pointer is valid.
@@ -77,14 +79,13 @@ AD_XMETHOD1(GetIsUniform,
   // AAFRESULT_NULL_PARAM
   //   - pIsUniform arg is NULL.)
 
-
 AD_XMETHOD1(SetIsContiguous,
 			[in],
 			objPass,
 			aafBool,
 			IsContiguous,
-			is data stores in contiguous bytes,
-     Set to TRUE if essence data is stored in contiguous bytes.
+			is data stores in contiguous bytes ,
+  // Set to TRUE if essence data is stored in contiguous bytes.
   // 
   // Always succeeds.
   // 
@@ -102,8 +103,7 @@ AD_XMETHOD1(GetIsContiguous,
 			aafBool *,
 			pIsContiguous,
 			is this data stored in contiguous bytes,
-     Places TRUE into *pIsContiguous if essence data is stored in
-  // contiguous bytes.
+  // Places TRUE into *pIsContiguous if essence data is stored in contiguous bytes.
   //
   // Succeeds if all of the following are true:
   // - the pIsContiguous pointer is valid.
@@ -120,14 +120,13 @@ AD_XMETHOD1(GetIsContiguous,
   // AAFRESULT_NULL_PARAM
   //   - pIsContiguous arg is NULL.)
 
-
 AD_XMETHOD1(SetLeadingLines,
 			[in],
 			objPass,
 			aafInt32,
 			LeadingLines,
 			Number of leading lines to be thrown away Optional,
-     Sets the number of leading lines in the TIFF image file.
+			Sets the number of leading lines in the TIFF image file
   // 
   // This method succeeds if all of the following are true:
   // - LeadingLines is  equal or greater than 0\(zero\).
@@ -140,8 +139,9 @@ AD_XMETHOD1(SetLeadingLines,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.)
-
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // )
 
 AD_XMETHOD1(GetLeadingLines,
 			[out],
@@ -169,7 +169,6 @@ AD_XMETHOD1(GetLeadingLines,
   // AAFRESULT_NULL_PARAM
   //   - pLeadingLines arg is NULL.)
 
-
 AD_XMETHOD1(SetTrailingLines,
 			[in],
 			objPass,
@@ -189,8 +188,9 @@ AD_XMETHOD1(SetTrailingLines,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.)
-
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // )
 
 AD_XMETHOD1(GetTrailingLines,
 			[out],
@@ -218,7 +218,6 @@ AD_XMETHOD1(GetTrailingLines,
   // AAFRESULT_NULL_PARAM
   //   - pTrailingLines arg is NULL.)
 
-
 AD_XMETHOD1(SetJPEGTableID,
 			[in],
 			objPass,
@@ -234,8 +233,9 @@ AD_XMETHOD1(SetJPEGTableID,
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\))
-
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // )
 
 AD_XMETHOD1(GetJPEGTableID,
 			[out],
@@ -263,7 +263,6 @@ AD_XMETHOD1(GetJPEGTableID,
   // AAFRESULT_NULL_PARAM
   //   - pJPEGTableID arg is NULL.)
 
-
 AD_XMETHOD2(GetSummary,
 			[in],
 				objPass,
@@ -275,12 +274,11 @@ AD_XMETHOD2(GetSummary,
 				aafDataValue_t,
 				pSummary,
 				Preallocated buffer to hold the TIFF IFD file information,
-     Gets a copy of the TIFF IFD file information without the media.
+			Gets a copy of the TIFF IFD file information without the media.
   // 
   // Succeeds if all of the following are true:
   // - pSummary is a valid pointer.
-  // - The size of the buffer is large enough to hold the TIFF IFD
-  //   file information. 
+  // - The size of the buffer is large enough to hold the TIFF IFD file information.
   // 
   // If this method fails pSummary will not be changed.
   // 
@@ -293,8 +291,8 @@ AD_XMETHOD2(GetSummary,
   //   - pSummary arg is NULL.
   //
   // AAFRESULT_SMALLBUF
-  //   - The buffer is too small to hold the WAVE file information.)
-
+  //   - The buffer is too small to hold the WAVE file information.
+  //)
 
 AD_XMETHOD1(GetSummaryBufferSize,
 			[out],
@@ -316,8 +314,8 @@ AD_XMETHOD1(GetSummaryBufferSize,
   //   - succeeded.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSize arg is NULL.)
-
+  //   - pSize arg is NULL.
+  //)
 
 AD_XMETHOD2(SetSummary,
 			[in],
@@ -344,5 +342,7 @@ AD_XMETHOD2(SetSummary,
   //   - succeeded.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSummary arg is NULL.)
+  //   - pSummary arg is NULL.
+  //)
+
 AD_XCLASS_END(Concrete, StoredObject)
