@@ -230,6 +230,12 @@ public:
     // @cmember The access mode of this <c OMFile>.
   OMAccessMode accessMode(void) const;
 
+    // @cmember Is it possible to read from this <c OMFile> ?
+  bool isReadable(void) const;
+
+    // @cmember Is it possible to write to this <c OMFile> ?
+  bool isWritable(void) const;
+
     // @cmember Is this file recognized by the Object Manager ?
   bool isOMFile(void) const;
 
@@ -271,17 +277,9 @@ public:
 private:
   // @access Private members.
 
-    // @cmember Write the signature to the given file.
-  static void writeSignature(const wchar_t* fileName,
-                             const OMFileSignature& signature);
-
     // @cmember Read the signature from the given file.
   static void readSignature(const wchar_t* fileName,
                             OMFileSignature& signature);
-
-    // @cmember Write the signature to the given raw storage.
-  static void writeSignature(OMRawStorage* rawStorage,
-                             const OMFileSignature& signature);
 
     // @cmember Read the signature from the given raw storage.
   static void readSignature(OMRawStorage* rawStorage,
