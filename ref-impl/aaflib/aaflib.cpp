@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2001 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 
@@ -408,6 +403,17 @@ static aafBool isRecognizedSignature(unsigned char* signature,
 
 static const size_t maxSignatureSize = 256; //signatureSize();
 
+// _wfopen() is in the W32 API on Windows 95, 98 and ME but with an
+// implementation that always fails. By default we use _wfopen() when
+// compiled on/for the W32 API, this can be overridden by defining
+// NO_W32_FOPEN.
+
+#if !defined(NO_W32_FOPEN)
+#if defined(OS_WINDOWS)
+#define W32_WFOPEN
+#endif
+#endif
+
 // Just like fopen() except for wchar_t* file names.
 //
 FILE* wfopen(const wchar_t* fileName, const wchar_t* mode)
@@ -417,7 +423,7 @@ FILE* wfopen(const wchar_t* fileName, const wchar_t* mode)
   ASSERT("Valid mode", mode != 0);
 
   FILE* result = 0;
-#if defined( OS_WINDOWS )
+#if defined(W32_WFOPEN)
   result = _wfopen(fileName, mode);
 #else
   char cFileName[FILENAME_MAX];
