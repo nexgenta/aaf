@@ -837,20 +837,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFObject::GetStoredByteOrder (eAAFByteOrder_t *  /*pOrder*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFObject::GetNativeByteOrder (eAAFByteOrder_t *  /*pOrder*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
 //************
 // Interfaces ivisible inside the toolkit, but not exposed through the API
 
@@ -964,8 +950,6 @@ void ImplAAFObject::pvtSetSoid (const aafUID_t & id)
 //   if elem type is WkRef  VariableData(sizeof auid)
 //   if elem is fixed data  VariableData(sizeof elem)
 //   else                   <not yet supported; maybe never!>
-//
-// AAFTypeDefStream			<not yet supported>
 //
 // AAFTypeDefString			VariableData(sizeof elem)
 //
