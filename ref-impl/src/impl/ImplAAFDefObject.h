@@ -3,44 +3,56 @@
 #ifndef __ImplAAFDefObject_h__
 #define __ImplAAFDefObject_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
 
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+ 
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
+/*************************************************************************
+ * 
+ * @module AAFDefObject | AAFDefObject is an abstract class
+ *		  that defines an item to be referenced in the AAF file. 
+ *		  AAFDefObject specifies the AUID unique identifier.
+ *
+ * @base public | AAFObject
+ *
+ *************************************************************************/
+
+
+
+
+
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
 #endif
 
-#include "OMWideStringProperty.h"
-
-class ImplAAFDictionary;
 
 class ImplAAFDefObject : public ImplAAFObject
 {
@@ -56,21 +68,6 @@ protected:
 
 public:
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
-        // @parm [in] Pointer to an AUID reference
-        (const aafUID_t & id,
-		 const wchar_t *name,
-		 const wchar_t *description);
-
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        // @parm [in] Pointer to an AUID reference
-        (const aafUID_t & id,
-		 const aafCharacter *name);
 
 
   //****************
@@ -79,23 +76,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetAUID
         // @parm [retval,out] Pointer to an AUID reference
-        (aafUID_t * pAuid) const;
+        (aafUID_t *  pAuid);
 
   //****************
   // SetAUID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetAUID
-        // @parm [in] AUID by which this object is to be identified
-        (const aafUID_t & id);
-
-
-  //****************
-  // SetName()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetName
-        (const aafCharacter *  name);  //@parm [in, ref] Definition Name
+        // @parm [in] Pointer to an AUID reference
+        (aafUID_t *  pAuid);
 
 
   //****************
@@ -103,28 +92,20 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetName
-        (// @parm [out, string, size_is(bufSize)] buffer into which Name is to be written
-         wchar_t *  pName,
-
-         // @parm [in] size of *pName buffer in bytes
-         aafUInt32  bufSize);
-
-
+        (aafWChar *  name,  //@parm [in] Definition Name
+		aafInt32 bufSize);	  //@parm [in] size of the buffer required to hold Definition Name + terminator
   //****************
   // GetNameBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetNameBufLen
-        (aafUInt32 *  nameLen);  //@parm [in,out] Definition Name length
-
-
+        (aafInt32 *  nameLen);  //@parm [in,out] Definition Name length
   //****************
-  // SetDescription()
+  // SetName()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetDescription
-        (const aafCharacter * description);  //@parm [in, ref] Definition description
-
+    SetName
+        (aafWChar *  name);  //@parm [in, ref] Definition Name
 
   //****************
   // GetDescription()
@@ -132,38 +113,35 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetDescription
         (aafWChar *  description,  //@parm [in] Definition Description
-		 aafUInt32 bufSize);	  //@parm [in] size of the buffer required to hold Definition Description + terminator
-
-
+		aafInt32 bufSize);	  //@parm [in] size of the buffer required to hold Definition Description + terminator
   //****************
   // GetDescriptionBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetDescriptionBufLen
-        (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
+        (aafInt32 *  descriptionLen);  //@parm [in,out] Definition description length
+  //****************
+  // SetDescription()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetDescription
+        (aafWChar *  description);  //@parm [in, ref] Definition description
 
-  virtual const OMUniqueObjectIdentification& identification(void) const;
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFDefObject)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFDefObjectTest.cpp.
+  static AAFRESULT test();
 
 private:
-  // friendly name of this definition
-  OMWideStringProperty          _name;
-
-  // brief text description of this definition
-  OMWideStringProperty          _description;
-
-  // auid to be used to identify this definition
-  OMFixedSizeProperty<aafUID_t> _identification;
+	OMFixedSizeProperty<aafUID_t>		_ID;
+	OMWideStringProperty				_name;
+	OMWideStringProperty				_description;
 };
 
-//
-// smart pointer
-//
-
-#ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
-#include "ImplAAFSmartPointer.h"
-#endif
-
-typedef ImplAAFSmartPointer<ImplAAFDefObject> ImplAAFPropDefObjectSP;
-
 #endif // ! __ImplAAFDefObject_h__
+
+
