@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -41,6 +41,10 @@
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
+
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
+typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 
 
 extern "C" const aafClassID_t CLSID_EnumAAFComponents;
@@ -90,9 +94,12 @@ ImplAAFSequence::~ImplAAFSequence ()
 //   - pDatadef is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::Initialize (const aafUID_t & datadef)
+    ImplAAFSequence::Initialize (ImplAAFDataDef * pDataDef)
 {
-	return (SetDataDef(datadef));
+  if (! pDataDef)
+	return AAFRESULT_NULL_PARAM;
+
+  return (SetDataDef(pDataDef));
 }
 
 //***********************************************************
@@ -151,12 +158,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	size_t			numCpnts;
 	aafLength_t		sequLen, cpntLen, prevLen;
-	aafUID_t		sequDataDef, cpntDataDef;
-	aafBool			isPrevTran = AAFFalse, willConvert;
+	ImplAAFDataDefSP sequDataDef, cpntDataDef;
+	aafBool			isPrevTran = kAAFFalse, willConvert;
 	aafErr_t		aafError = AAFRESULT_SUCCESS;
 	implCompType_t	type;
 	ImplAAFDictionary	*pDict = NULL;
-	ImplAAFDataDef	*pDef = NULL;
 	AAFRESULT		status, sclpStatus;
 
 	if (pComponent == NULL)
@@ -170,16 +176,9 @@ AAFRESULT STDMETHODCALLTYPE
 		// Verify that component's datadef converts to sequence's datadef
 		GetDataDef(&sequDataDef);
 		pComponent->GetDataDef(&cpntDataDef);
+		CHECK(cpntDataDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
 		
-		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->LookupDataDef(cpntDataDef, &pDef));
-		pDict->ReleaseReference();
-		pDict = NULL;
-		CHECK(pDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
-		pDef->ReleaseReference();
-		pDef = NULL;
-		
-		if (willConvert == AAFFalse)
+		if (willConvert == kAAFFalse)
 			RAISE(AAFRESULT_INVALID_DATADEF);
 		
 		status = GetLength(&sequLen);
@@ -221,7 +220,7 @@ AAFRESULT STDMETHODCALLTYPE
 				CHECK(pPrevCpnt->GetLength(&prevLen));
 				pPrevCpnt->GetComponentType(&type);
 				if (type == kTransition)
-					isPrevTran = AAFTrue;
+					isPrevTran = kAAFTrue;
 			}
 			
 			// Is the newly appended component a transition?
@@ -274,12 +273,6 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
-		if(pDict != NULL)
-		  pDict->ReleaseReference();
-		pDict = 0;
-		if(pDef != NULL)
-		  pDef->ReleaseReference();
-		pDef = 0;
 	}
 	XEND;
 
@@ -546,7 +539,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 	ImplAAFTimecode*	pTC;
 	aafFrameOffset_t	begPos, endPos;
 	aafPosition_t		sequPos;
-	aafBool				found = AAFFalse;
+	aafBool				found = kAAFFalse;
 	aafLength_t			junk;
 
 	if (pOffset == NULL || pTimecode == NULL || pEditRate == NULL)
@@ -592,7 +585,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 					pComponent->AccumulateLength(&sequPos);
   					TruncInt64toInt32(sequPos, &segStart);	// OK FRAMEOFFSET
 					pTC->GetLength(&tcLen);
-					found = AAFTrue;
+					found = kAAFTrue;
 					break;
 				}
 			}

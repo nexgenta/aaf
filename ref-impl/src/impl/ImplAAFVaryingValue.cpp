@@ -9,35 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
-
-
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -68,7 +40,6 @@
 #endif
 
 #include "ImplAAFControlPoint.h"
-#include "ImplAAFHeader.h"
 #include "ImplAAFDictionary.h"
 #include "ImplAAFPluginManager.h"
 #include "AAFPlugin.h"
@@ -84,10 +55,21 @@ extern "C" const aafClassID_t CLSID_EnumAAFControlPoints;
 
 ImplAAFVaryingValue::ImplAAFVaryingValue ()
 : _controlPoints(         PID_VaryingValue_PointList,          "PointList"),
-  _interpolation(         PID_VaryingValue_Interpolation,      "Interpolation")
+  _interpolation(         PID_VaryingValue_Interpolation,      "Interpolation"),
+  _value(				PID_VaryingValue_Value,					"Value"),
+  _displayValue(         PID_VaryingValue_DisplayValue,      "DisplayValue"),
+  _significance(         PID_VaryingValue_Significance,      "Significance")
 {
-	  _persistentProperties.put(_interpolation.address());
+	  aafReferenceType_t	ref = kAAFRefLimitMinimum;
+	 aafInt32				zero = 0;
+	 
 	  _persistentProperties.put(_controlPoints.address());
+	  _persistentProperties.put(_interpolation.address());
+	  _persistentProperties.put(_value.address());
+	  _persistentProperties.put(_displayValue.address());
+	  _persistentProperties.put(_significance.address());
+	_value.setValue((unsigned char *)&zero, sizeof(zero));	//!!!
+	_significance = ref;									//!!!
 }
 
 
@@ -108,16 +90,16 @@ ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFVaryingValue::AppendPoint (
+    ImplAAFVaryingValue::AddControlPoint (
       ImplAAFControlPoint *pPoint)
 {
-	if(pPoint == NULL)
-		return(AAFRESULT_NULL_PARAM);
+  if(pPoint == NULL)
+	return(AAFRESULT_NULL_PARAM);
 
-	_controlPoints.appendValue(pPoint);
-	pPoint->AcquireReference();
+  _controlPoints.appendValue(pPoint);
+  pPoint->AcquireReference();
 
-	return(AAFRESULT_SUCCESS);
+  return(AAFRESULT_SUCCESS);
 }
 
 
@@ -148,11 +130,58 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
+    ImplAAFVaryingValue::CountControlPoints (
+      aafUInt32 * pResult)
+{
+  if(! pResult) return(AAFRESULT_NULL_PARAM);
+
+  *pResult = _controlPoints.getSize();
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFVaryingValue::GetControlPointAt (
+      aafUInt32 index,
+	  ImplAAFControlPoint ** ppControlPoint)
+{
+  if(! ppControlPoint) return(AAFRESULT_NULL_PARAM);
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountControlPoints (& count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFVaryingValue::RemoveControlPointAt (
+      aafUInt32 index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountControlPoints (& count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+	return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
     ImplAAFVaryingValue::SetInterpolationDefinition (
       ImplAAFInterpolationDef *pDef)
 {
 	aafUID_t			newUID;
-	ImplAAFHeader		*head = NULL;
 	ImplAAFDictionary	*dict = NULL;
 
 	if(pDef == NULL)
@@ -161,24 +190,18 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		CHECK(pDef->GetAUID(&newUID));
-		CHECK(pDef->MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
+		CHECK(GetDictionary(&dict));
 // This is a weak reference, not yet counted
 //		if(dict->LookupParameterDef(&newUID, &def) == AAFRESULT_SUCCESS)
 //			def->ReleaseReference();
 
 		_interpolation = newUID;
 //		pDef->AcquireReference();
-		head->ReleaseReference();
-		head = NULL;
 		dict->ReleaseReference();
 		dict = NULL;
 	}
 	XEXCEPT
 	{
-		if(head)
-		  head->ReleaseReference();
-		head = 0;
 		if(dict)
 		  dict->ReleaseReference();
 		dict = 0;
@@ -192,7 +215,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFVaryingValue::GetInterpolationDefinition (
       ImplAAFInterpolationDef **ppDef)
 {
-	ImplAAFHeader		*head = NULL;
 	ImplAAFDictionary	*dict = NULL;
 	aafUID_t			interpID;
 
@@ -201,21 +223,15 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		CHECK(MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
 		interpID = _interpolation;
-		CHECK(dict->LookupInterpolationDefinition(&interpID, ppDef));
+		CHECK(GetDictionary(&dict));
+		CHECK(dict->LookupInterpolationDef(interpID, ppDef));
 //		(*ppDef)->AcquireReference();
-		head->ReleaseReference();
-		head = NULL;
 		dict->ReleaseReference();
 		dict = NULL;
 	}
 	XEXCEPT
 	{
-		if(head)
-		  head->ReleaseReference();
-		head = 0;
 		if(dict)
 		  dict->ReleaseReference();
 		dict = 0;
@@ -309,10 +325,10 @@ AAFRESULT STDMETHODCALLTYPE
 		intDef = NULL;
 		iParm->Release();
 		iParm = NULL;
-		plugin->Release();
-		plugin = NULL;
 		iInterp->Release();
 		iInterp = NULL;
+		plugin->Release();
+		plugin = NULL;
 		mgr->ReleaseReference();
 		mgr = NULL;
 		interpDef->ReleaseReference();
@@ -320,17 +336,21 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
-		if(plugin)
-			plugin->Release();
-		if(iUnk)
-			iUnk->Release();
-		if(iInterp)
-			iInterp->Release();
+		if (iTypeDef)
+			iTypeDef->Release();
+		if (intDef)
+			intDef->ReleaseReference();
 		if(iParm)
 			iParm->Release();
+		if(iInterp)
+			iInterp->Release();
+		if(plugin)
+			plugin->Release();
 		if(mgr)
 		  mgr->ReleaseReference();
 		mgr = 0;
+		if (interpDef)
+			interpDef->ReleaseReference();
 	}
 	XEND;
 	
