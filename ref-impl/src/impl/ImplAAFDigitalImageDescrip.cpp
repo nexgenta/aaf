@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 #include "ImplAAFDigitalImageDescriptor.h"
 
 #include "AAFStoredObjectIDs.h"
@@ -35,23 +30,23 @@
 #include <string.h>
 
 ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
-:	_compression(PID_DigitalImageDescriptor_Compression,					"Compression"),
-	_storedHeight(PID_DigitalImageDescriptor_StoredHeight,					"StoredHeight"),
-	_storedWidth(PID_DigitalImageDescriptor_StoredWidth,					"StoredWidth"),
-	_sampledHeight(PID_DigitalImageDescriptor_SampledHeight,				"SampledHeight"),
-	_sampledWidth(PID_DigitalImageDescriptor_SampledWidth,					"SampledWidth"),
-	_sampledXOffset(PID_DigitalImageDescriptor_SampledXOffset,				"SampledXOffset"),
-	_sampledYOffset(PID_DigitalImageDescriptor_SampledYOffset,				"SampledYOffset"),
-	_displayHeight(PID_DigitalImageDescriptor_DisplayHeight,				"DisplayHeight"),
-	_displayWidth(PID_DigitalImageDescriptor_DisplayWidth,					"DisplayWidth"),
-	_displayXOffset(PID_DigitalImageDescriptor_DisplayXOffset,				"DisplayXOffset"),
-	_displayYOffset(PID_DigitalImageDescriptor_DisplayYOffset,				"DisplayYOffset"),
-	_frameLayout(PID_DigitalImageDescriptor_FrameLayout,					"FrameLayout"),
-	_videoLineMap(PID_DigitalImageDescriptor_VideoLineMap,					"VideoLineMap"),
-	_imageAspectRatio(PID_DigitalImageDescriptor_ImageAspectRatio,			"ImageAspectRatio"),
-	_alphaTransparency(PID_DigitalImageDescriptor_AlphaTransparency,		"AlphaTransparency"),
-	_gamma(PID_DigitalImageDescriptor_Gamma,								"Gamma"),
-	_imageAlignmentFactor(PID_DigitalImageDescriptor_ImageAlignmentFactor,	"ImageAlignmentFactor")
+:	_compression(PID_DigitalImageDescriptor_Compression,					L"Compression"),
+	_storedHeight(PID_DigitalImageDescriptor_StoredHeight,					L"StoredHeight"),
+	_storedWidth(PID_DigitalImageDescriptor_StoredWidth,					L"StoredWidth"),
+	_sampledHeight(PID_DigitalImageDescriptor_SampledHeight,				L"SampledHeight"),
+	_sampledWidth(PID_DigitalImageDescriptor_SampledWidth,					L"SampledWidth"),
+	_sampledXOffset(PID_DigitalImageDescriptor_SampledXOffset,				L"SampledXOffset"),
+	_sampledYOffset(PID_DigitalImageDescriptor_SampledYOffset,				L"SampledYOffset"),
+	_displayHeight(PID_DigitalImageDescriptor_DisplayHeight,				L"DisplayHeight"),
+	_displayWidth(PID_DigitalImageDescriptor_DisplayWidth,					L"DisplayWidth"),
+	_displayXOffset(PID_DigitalImageDescriptor_DisplayXOffset,				L"DisplayXOffset"),
+	_displayYOffset(PID_DigitalImageDescriptor_DisplayYOffset,				L"DisplayYOffset"),
+	_frameLayout(PID_DigitalImageDescriptor_FrameLayout,					L"FrameLayout"),
+	_videoLineMap(PID_DigitalImageDescriptor_VideoLineMap,					L"VideoLineMap"),
+	_imageAspectRatio(PID_DigitalImageDescriptor_ImageAspectRatio,			L"ImageAspectRatio"),
+	_alphaTransparency(PID_DigitalImageDescriptor_AlphaTransparency,		L"AlphaTransparency"),
+	_gamma(PID_DigitalImageDescriptor_Gamma,								L"Gamma"),
+	_imageAlignmentFactor(PID_DigitalImageDescriptor_ImageAlignmentFactor,	L"ImageAlignmentFactor")
 {
 	aafInt32	videoLineMap[2];
 
@@ -98,20 +93,6 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	videoLineMap[0] = 0;
 	videoLineMap[1] = 1;
 	_videoLineMap.setValue(videoLineMap, 2*sizeof(aafInt32));
-	// Initialize Optional properties
-
-	_compression = kAAFNoCodec;
-	_sampledHeight = 0;
-	_sampledWidth = 0;
-	_sampledXOffset = 0;
-	_sampledYOffset = 0;
-	_displayHeight = 0;
-	_displayWidth = 0;
-	_displayXOffset = 0;
-	_displayYOffset = 0;
-	_alphaTransparency = kAAFMinValueTransparent;
-	_gamma = zeroID;
-	_imageAlignmentFactor = 0;
 }
 
 
@@ -233,7 +214,10 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::GetCompression (aafUID_t* pCompression)
 {
 	if (pCompression == NULL)
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
+
+	if (!_compression.isPresent())
+	  return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pCompression = _compression;
 
