@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSSStoredStream.cpp,v 1.5 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMSSSStoredStream.cpp,v 1.6 2004/03/05 16:00:01 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -100,7 +100,11 @@ void OMSSSStoredStream::write(const OMByte* data,
   TRACE("OMSSSStoredStream::write");
   PRECONDITION("Valid stream", _stream != 0);
   PRECONDITION("Valid data", data != 0);
-  PRECONDITION("Valid size", bytes > 0);
+  //Ian Baker 3.Mar.2004
+  //precondition removed as a 0 length property is allowed and 
+  //with the SS library actually writing a 0 length property 
+  //prevents an exception with requried properites. 
+ // PRECONDITION("Valid size", bytes > 0);
 
 	bytesWritten = bytes;
   sresult resultCode = streamWrite( _stream, data, &bytesWritten);
