@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -48,10 +48,10 @@ public:
     //          it (by copying) into the table and return its tag,
     //          otherwise just return its tag. Tags are allocated
     //          sequentially.
-  OMPropertyTag insert(const char* propertyName);
+  OMPropertyTag insert(const wchar_t* propertyName);
 
     // @cmember The property name corresponding to <p tag> in the table.
-  const char* valueAt(OMPropertyTag tag) const;
+  const wchar_t* valueAt(OMPropertyTag tag) const;
 
     // @cmember The count of entries in the table.
   size_t count(void) const;
@@ -61,7 +61,7 @@ public:
 
 private:
 
-  OMVector<char*> _vector;
+  OMVector<wchar_t*> _vector;
 
 };
 
