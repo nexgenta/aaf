@@ -3,10 +3,10 @@ AAFTIFFDescriptor\
 #endm
 #c
 #startm .parent-module 0
-AAFDigitalImageDescriptor\
+AAFFileDescriptor\
 #endm
 #c
-#import ./AAFDigitalImageDescriptor.exp
+#c #import ./AAFDigitalImageDescriptor.exp
 AD_HEAD
 AD_INCLUDE(AAFTypes)
 
