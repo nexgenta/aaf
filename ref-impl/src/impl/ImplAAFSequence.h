@@ -3,33 +3,16 @@
 #ifndef __ImplAAFSequence_h__
 #define __ImplAAFSequence_h__
 
+#include "OMStorable.h"
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 class ImplAAFTimecode;
 
@@ -50,6 +33,8 @@ class ImplEnumAAFComponents;
 #endif
 
 
+const int PID_SEQUENCE_COMPONENTS	= 30;
+
 class ImplAAFSequence : public ImplAAFSegment
 {
 public:
@@ -67,7 +52,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
 		// @parm [in] Data Definition object
-        (ImplAAFDataDef * pDataDef);
+        (aafUID_t * pDatadef);
 
 
   //****************
@@ -80,70 +65,28 @@ public:
 
 
   //****************
-  // PrependComponent()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    PrependComponent
-		// @parm [in] Component to prepend to the sequence
-        (ImplAAFComponent * pComponent);
-
-
-  //****************
-  // InsertComponentAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    InsertComponentAt
-		// @parm [in] index to insert component
-        (aafUInt32 index,
-
-		 // @parm [in] Component to insert into the sequence
-		 ImplAAFComponent * pComponent);
-
-
-  //****************
-  // GetComponentAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetComponentAt
-		// @parm [in] index of component to retrieve
-        (aafUInt32 index,
-
-		 // @parm [out, retval] retrieved component
-		 ImplAAFComponent ** ppComponent);
-
-
-  //****************
-  // RemoveComponentAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveComponentAt
-		// @parm [in] index of component to remove
-        (aafUInt32 index);
-
-
-  //****************
   // RemoveComponent()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     RemoveComponent
-		// @parm [in] Component to remove from the sequence
+		// @parm [in] Component to append to the sequence
         (ImplAAFComponent * pComponent);
 
 
   //****************
-  // CountComponents()
+  // GetNumComponents()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountComponents
-		// @parm [out, retval] Component Enumeration
-        (aafUInt32 * pResult);
+    GetNumComponents
+		// @parm [out] Number of components
+        (aafInt32 *  pNumCpnts);
 
 
   //****************
-  // GetComponents()
+  // EnumComponents()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetComponents
+    EnumComponents
 		// @parm [out, retval] Component Enumeration
         (ImplEnumAAFComponents ** ppEnum);
 
@@ -162,13 +105,16 @@ public:
 
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFSequence)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFSequenceTest.cpp.
+  static AAFRESULT test();
 
   // Interfaces visible inside the toolkit, but not exposed through the API
   AAFRESULT GetNthComponent(aafUInt32 index, ImplAAFComponent **ppComponent);
-	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
-												aafMobID_constref to);
-  AAFRESULT
-    SetNthComponent (aafUInt32 index, ImplAAFComponent* pComponent);
 
 private:
 	OMStrongReferenceVectorProperty<ImplAAFComponent> _components;
