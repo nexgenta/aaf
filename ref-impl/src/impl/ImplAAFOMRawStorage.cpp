@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAF.h"
 #include "AAFResult.h"
@@ -34,7 +29,8 @@
 
 ImplAAFOMRawStorage::ImplAAFOMRawStorage (IAAFRawStorage * rep)
   : _rep (rep),
-	_randRep (0)
+    _randRep (0),
+    _position(0)
 {
   assert (rep);
   _rep->AddRef ();
@@ -77,8 +73,23 @@ void ImplAAFOMRawStorage::read(OMByte* bytes,
 {
   assert (_rep);
   AAFRESULT hr;
-  hr = _rep->Read (bytes, byteCount, &bytesRead);
+
+  // If raw storage is positionable (is IAAFRandomRawStorage) read bytes
+  // at the position specified by the _position member. Otherwise read
+  // at the current storage position which in this case always matches
+  // the _position value.
+  if (_randRep)
+  {
+    hr = _randRep->ReadAt (_position, bytes, byteCount, &bytesRead);
+  }
+  else
+  {
+    hr = _rep->Read (bytes, byteCount, &bytesRead);
+  }
   assert (AAFRESULT_SUCCEEDED (hr));
+
+  ImplAAFOMRawStorage* nonConstThis = const_cast<ImplAAFOMRawStorage*>(this);
+  nonConstThis->_position += bytesRead;
 }
 
 
@@ -92,6 +103,9 @@ void ImplAAFOMRawStorage::readAt(OMUInt64 position,
   AAFRESULT hr;
   hr = _randRep->ReadAt (position, bytes, byteCount, &bytesRead);
   assert (AAFRESULT_SUCCEEDED (hr));
+
+  ImplAAFOMRawStorage* nonConstThis = const_cast<ImplAAFOMRawStorage*>(this);
+  nonConstThis->_position = position + bytesRead;
 }
 
 
@@ -112,8 +126,21 @@ void ImplAAFOMRawStorage::write(const OMByte* bytes,
 {
   assert (_rep);
   AAFRESULT hr;
-  hr = _rep->Write (bytes, byteCount, &bytesWritten);
+
+  // If raw storage is positionable (is IAAFRandomRawStorage) write bytes
+  // at the position specified by the _position member. Otherwise write
+  // at the current storage position which in this case always matches
+  // the _position value.
+  if (_randRep)
+  {
+    hr = _randRep->WriteAt (_position, bytes, byteCount, &bytesWritten);
+  }
+  else
+  {
+    hr = _rep->Write (bytes, byteCount, &bytesWritten);
+  }
   assert (AAFRESULT_SUCCEEDED (hr));
+  _position += bytesWritten;
 }
 
 
@@ -127,6 +154,7 @@ void ImplAAFOMRawStorage::writeAt(OMUInt64 position,
   AAFRESULT hr;
   hr = _randRep->WriteAt (position, bytes, byteCount, &bytesWritten);
   assert (AAFRESULT_SUCCEEDED (hr));
+  _position = position + bytesWritten;
 }
 
 
@@ -185,6 +213,24 @@ bool ImplAAFOMRawStorage::isPositionable(void) const
 	return true;
   else
 	return false;
+}
+
+
+OMUInt64 ImplAAFOMRawStorage::position(void) const
+{
+  assert (_rep);
+  return _position;
+}
+
+
+void ImplAAFOMRawStorage::setPosition(OMUInt64 newPosition) const
+{
+  assert (_randRep);
+
+  // The _position value is used by read() and write() methods to
+  // adjust the storage current position before reading or writing.
+  ImplAAFOMRawStorage* nonConstThis = const_cast<ImplAAFOMRawStorage*>(this);
+  nonConstThis->_position = newPosition;
 }
 
 
