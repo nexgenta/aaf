@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.13 2004/03/10 14:13:11 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -231,6 +231,8 @@ const int PID_Mob_LastModified                                   = 0x4404;
 const int PID_Mob_CreationTime                                   = 0x4405;
 const int PID_Mob_UserComments                                   = 0x4406;
 const int PID_Mob_KLVData                                        = 0x4407;
+const int PID_Mob_UsageCode                                      = 0x4408;
+const int PID_Mob_Attributes                                     = 0x4409;
 const int PID_CompositionMob_DefaultFadeLength                   = 0x4501;
 const int PID_CompositionMob_DefFadeType                         = 0x4502;
 const int PID_CompositionMob_DefFadeEditUnit                     = 0x4503;
