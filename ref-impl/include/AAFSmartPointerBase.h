@@ -5,7 +5,6 @@
 * Advanced Authoring Format                     *
 *                                               *
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *                                               *
 \***********************************************/
 
@@ -194,7 +193,10 @@ operator=
   (const AAFSmartPointerBase<ReferencedType, RefCountType> & src)
 {
   if (_rep)
-	release (_rep);
+	{
+	  release (_rep);
+	  _rep = 0;
+	}
 
   _rep = src._rep;
   if (_rep)
