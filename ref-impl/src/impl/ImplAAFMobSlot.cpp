@@ -4,7 +4,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -54,7 +53,8 @@ ImplAAFMobSlot::~ImplAAFMobSlot ()
 	ImplAAFSegment *segment = _segment.setValue(0);
 	if (segment)
 	{
-		segment->ReleaseReference();
+	  segment->ReleaseReference();
+	  segment = 0;
 	}
 }
 
@@ -76,7 +76,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFMobSlot::SetSegment (ImplAAFSegment *value)
 {
 	if (_segment)
-		_segment->ReleaseReference();
+	  _segment->ReleaseReference();
+	_segment = 0;
 
 	_segment = value;
 
@@ -97,6 +98,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if(!_name.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	stat = _name.copyToBuffer(pName, size);
 	if (! stat)
 	{
@@ -116,6 +120,10 @@ ImplAAFMobSlot::GetNameBufLen
 {
 	if(pSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_name.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*pSize = _name.size();
 
 	return(AAFRESULT_SUCCESS); 
@@ -138,6 +146,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(result == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_physicalTrackNum.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*result = _physicalTrackNum;
 	return AAFRESULT_SUCCESS;
 }
@@ -184,7 +196,6 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-OMDEFINE_STORABLE(ImplAAFMobSlot, AUID_AAFMobSlot);
 
 
 AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
@@ -218,12 +229,14 @@ AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
 		*/
 		*diffPos = offset;
 		tmpSegment->ReleaseReference();
+		tmpSegment = 0;
 		
 	} /* XPROTECT */
 	XEXCEPT
 	{
 		if (tmpSegment)	
-			tmpSegment->ReleaseReference();
+		  tmpSegment->ReleaseReference();
+		tmpSegment = 0;
 	}
 	XEND;
 	return(AAFRESULT_SUCCESS);

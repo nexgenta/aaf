@@ -1,29 +1,10 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 
@@ -72,7 +53,7 @@ ImplAAFCodecDef::~ImplAAFCodecDef ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::IsEssenceKindSupported (
-      const aafUID_t & essenceKind,
+      aafUID_t *pEssenceKind,
       aafBool* pIsSupported)
 {
 	ImplEnumAAFDataDefs	*dataEnum = NULL;
@@ -85,7 +66,7 @@ AAFRESULT STDMETHODCALLTYPE
 		while((dataEnum->NextOne(&aVal) == AAFRESULT_SUCCESS)
 		   && (result == AAFFalse))
 		{
-			CHECK(aVal->IsDataDefOf(essenceKind, &result));
+			CHECK(aVal->IsDataDefOf(pEssenceKind, &result));
 			aVal->ReleaseReference();
 			aVal = NULL;
 		}
@@ -115,18 +96,21 @@ AAFRESULT STDMETHODCALLTYPE
  
  AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::AppendEssenceKind (
-      const aafUID_t & essenceKind)
+      aafUID_t *pEssenceKind)
 {
 	aafUID_t	*tmp, newUID;
 	aafInt32	oldBufSize;
 	aafInt32	newBufSize;
 
+	if(pEssenceKind == NULL)
+		return AAFRESULT_NULL_PARAM;
+	
 	XPROTECT()
 	{
 		oldBufSize = _dataDefs.size();
 		newBufSize = oldBufSize + sizeof(aafUID_t);
 		tmp = new aafUID_t[newBufSize];
-		newUID = essenceKind;
+		newUID = *pEssenceKind;
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
 		if(oldBufSize != 0)
@@ -223,7 +207,7 @@ AAFRESULT STDMETHODCALLTYPE
 		classID = _fileDescClass;
 		status = GetDictionary(&pDict);
 		if(status == AAFRESULT_SUCCESS)
-			status = pDict->LookupClass(classID, ppClass);
+			status = pDict->LookupClass(&classID, ppClass);
 	}
 
 	return status;

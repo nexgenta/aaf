@@ -1,24 +1,19 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
 
 #ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
@@ -35,6 +30,7 @@
 #endif
 
 #include "ImplAAFControlPoint.h"
+#include "ImplAAFHeader.h"
 #include "ImplAAFDictionary.h"
 #include "ImplAAFPluginManager.h"
 #include "AAFPlugin.h"
@@ -49,21 +45,21 @@
 extern "C" const aafClassID_t CLSID_EnumAAFControlPoints;
 
 ImplAAFVaryingValue::ImplAAFVaryingValue ()
-: _controlPoints(         PID_VaryingValue_PointList,          L"PointList"),
-  _interpolation(         PID_VaryingValue_Interpolation,      L"Interpolation", L"/Header/Dictionary/InterpolationDefinitions", PID_DefinitionObject_Identification)
+: _controlPoints(         PID_VaryingValue_PointList,          "PointList"),
+  _interpolation(         PID_VaryingValue_Interpolation,      "Interpolation")
 {
-	  _persistentProperties.put(_controlPoints.address());
 	  _persistentProperties.put(_interpolation.address());
+	  _persistentProperties.put(_controlPoints.address());
 }
 
 
 ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 {
 	// Release all of the locator pointers.
-	size_t count = _controlPoints.count();
-	for (size_t i = 0; i < count; i++)
+	size_t size = _controlPoints.getSize();
+	for (size_t i = 0; i < size; i++)
 	{
-		ImplAAFControlPoint *pControl = _controlPoints.clearValueAt(i);
+		ImplAAFControlPoint *pControl = _controlPoints.setValueAt(0, i);
 		if (pControl)
 		{
 		  pControl->ReleaseReference();
@@ -74,66 +70,16 @@ ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFVaryingValue::Initialize
-    (// @parm [in] // Parameter definition for this object (this determines the type of the constant value)
-     ImplAAFParameterDef * pParameterDef,
-     
-     // @parm [in] Interpolation definition for this object
-     ImplAAFInterpolationDef * pInterpolationDef)
-{
-  AAFRESULT result = AAFRESULT_SUCCESS;
-
-  if (!pParameterDef || !pInterpolationDef)
-    return (AAFRESULT_NULL_PARAM);
-
-  result = SetParameterDefinition (pParameterDef);
-  if (AAFRESULT_SUCCEEDED (result))
-    result = SetInterpolationDefinition (pInterpolationDef);
-
-  return result;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFVaryingValue::AddControlPoint (
+    ImplAAFVaryingValue::AppendPoint (
       ImplAAFControlPoint *pPoint)
 {
-  ImplAAFTypeDef *parameterType = NULL;
-  ImplAAFTypeDef *controlPointsType = NULL;
-  if(pPoint == NULL)
-	return(AAFRESULT_NULL_PARAM);
+	if(pPoint == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-	if (pPoint->attached())
-		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+	_controlPoints.appendValue(pPoint);
+	pPoint->AcquireReference();
 
-  XPROTECT()
-	{
-    // Validate the the control point has been initialized with the same
-    // type as this varying value.
-    CHECK (GetTypeDefinition (&parameterType));
-    CHECK (pPoint->GetTypeDefinition (&controlPointsType));
-    // We should be able to compare object pointers.
-    if (parameterType != controlPointsType)
-      RAISE (AAFRESULT_TYPE_SEMANTIC);
-    controlPointsType->ReleaseReference();
-    controlPointsType = NULL;
-    parameterType->ReleaseReference();
-    parameterType = NULL;
-
-    _controlPoints.appendValue(pPoint);
-    pPoint->AcquireReference();
-	}
-	XEXCEPT
-	{
-		if (controlPointsType)
-		  controlPointsType->ReleaseReference();
-		if (parameterType)
-		  parameterType->ReleaseReference();
-	}
-	XEND;
-
-  return(AAFRESULT_SUCCESS);
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -146,12 +92,8 @@ AAFRESULT STDMETHODCALLTYPE
 		
 	XPROTECT()
 	{
-		OMStrongReferenceVectorIterator<ImplAAFControlPoint>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFControlPoint>(_controlPoints);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFControlPoints, this, iter));
-		
+		CHECK(theEnum->SetEnumStrongProperty(this, &_controlPoints));
+		CHECK(theEnum->Reset());
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -159,6 +101,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
+		return(XCODE());
 	}
 	XEND;
 	
@@ -167,81 +110,42 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFVaryingValue::CountControlPoints (
-      aafUInt32 * pResult)
-{
-  if(! pResult) return(AAFRESULT_NULL_PARAM);
-
-  *pResult = _controlPoints.count();
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFVaryingValue::GetControlPointAt (
-      aafUInt32 index,
-	  ImplAAFControlPoint ** ppControlPoint)
-{
-  if(! ppControlPoint) return(AAFRESULT_NULL_PARAM);
-
-  aafUInt32 count;
-  AAFRESULT ar;
-  ar = CountControlPoints (& count);
-  if (AAFRESULT_FAILED (ar)) return ar;
-  if (index >= count)
-	return AAFRESULT_BADINDEX;
-
-  ImplAAFControlPoint *pPoint;
-  _controlPoints.getValueAt(pPoint,index);
-
-  assert(pPoint);
-  pPoint->AcquireReference();
-  (*ppControlPoint)=pPoint;
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFVaryingValue::RemoveControlPointAt (
-      aafUInt32 index)
-{
-  aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountControlPoints (& count);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  if (index >= count)
-	return AAFRESULT_BADINDEX;
-
-	ImplAAFControlPoint *pPoint = NULL;
-	pPoint = 	_controlPoints.removeAt(index);
-	if (pPoint)
-	{
-		// We have removed an element from a "stong reference container" so we must
-		// decrement the objects reference count. This will not delete the object
-		// since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
-		pPoint->ReleaseReference ();
-	}
-	return AAFRESULT_SUCCESS;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
     ImplAAFVaryingValue::SetInterpolationDefinition (
       ImplAAFInterpolationDef *pDef)
 {
+	aafUID_t			newUID;
+	ImplAAFHeader		*head = NULL;
+	ImplAAFDictionary	*dict = NULL;
+
 	if(pDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	// Check if given definition is in the dict.
-	if( !aafLookupInterpolationDef( this, pDef ) )
-		return AAFRESULT_INVALID_OBJ;
+	XPROTECT()
+	{
+		CHECK(pDef->GetAUID(&newUID));
+		CHECK(pDef->MyHeadObject(&head));
+		CHECK(head->GetDictionary(&dict));
+// This is a weak reference, not yet counted
+//		if(dict->LookupParameterDef(&newUID, &def) == AAFRESULT_SUCCESS)
+//			def->ReleaseReference();
 
-	_interpolation = pDef;
+		_interpolation = newUID;
+//		pDef->AcquireReference();
+		head->ReleaseReference();
+		head = NULL;
+		dict->ReleaseReference();
+		dict = NULL;
+	}
+	XEXCEPT
+	{
+		if(head)
+		  head->ReleaseReference();
+		head = 0;
+		if(dict)
+		  dict->ReleaseReference();
+		dict = 0;
+	}
+	XEND
 
 	return AAFRESULT_SUCCESS;
 }
@@ -250,11 +154,35 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFVaryingValue::GetInterpolationDefinition (
       ImplAAFInterpolationDef **ppDef)
 {
+	ImplAAFHeader		*head = NULL;
+	ImplAAFDictionary	*dict = NULL;
+	aafUID_t			interpID;
+
 	if(ppDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	*ppDef = _interpolation;
-	(*ppDef)->AcquireReference();
+	XPROTECT()
+	{
+		CHECK(MyHeadObject(&head));
+		CHECK(head->GetDictionary(&dict));
+		interpID = _interpolation;
+		CHECK(dict->LookupInterpolationDefinition(&interpID, ppDef));
+//		(*ppDef)->AcquireReference();
+		head->ReleaseReference();
+		head = NULL;
+		dict->ReleaseReference();
+		dict = NULL;
+	}
+	XEXCEPT
+	{
+		if(head)
+		  head->ReleaseReference();
+		head = 0;
+		if(dict)
+		  dict->ReleaseReference();
+		dict = 0;
+	}
+	XEND;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -328,7 +256,7 @@ AAFRESULT STDMETHODCALLTYPE
 		iUnk = static_cast<IUnknown *> (this->GetContainer());
 		CHECK(iUnk->QueryInterface(IID_IAAFParameter, (void **)&iParm));
 		CHECK(iInterp->SetParameter(iParm));
-		CHECK(GetTypeDefinition(&intDef));
+		CHECK(GetTypeDef(&intDef));
 
 		iUnk = static_cast<IUnknown *> (intDef->GetContainer());
 		CHECK(iUnk->QueryInterface(IID_IAAFTypeDef, (void **)&iTypeDef));
@@ -343,10 +271,10 @@ AAFRESULT STDMETHODCALLTYPE
 		intDef = NULL;
 		iParm->Release();
 		iParm = NULL;
-		iInterp->Release();
-		iInterp = NULL;
 		plugin->Release();
 		plugin = NULL;
+		iInterp->Release();
+		iInterp = NULL;
 		mgr->ReleaseReference();
 		mgr = NULL;
 		interpDef->ReleaseReference();
@@ -354,24 +282,40 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
-		if (iTypeDef)
-			iTypeDef->Release();
-		if (intDef)
-			intDef->ReleaseReference();
-		if(iParm)
-			iParm->Release();
-		if(iInterp)
-			iInterp->Release();
 		if(plugin)
 			plugin->Release();
+		if(iUnk)
+			iUnk->Release();
+		if(iInterp)
+			iInterp->Release();
+		if(iParm)
+			iParm->Release();
 		if(mgr)
 		  mgr->ReleaseReference();
 		mgr = 0;
-		if (interpDef)
-			interpDef->ReleaseReference();
 	}
 	XEND;
 	
 	return AAFRESULT_SUCCESS;
 }
 
+
+// SDK-private methods
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFVaryingValue::GetTypeDef(ImplAAFTypeDef **ppTypeDef)
+{
+	if(ppTypeDef == NULL)
+		return(AAFRESULT_NULL_PARAM);		// Assumes that all types are equal, can we assume this?
+
+	ImplAAFControlPoint	*obj = NULL;
+	_controlPoints.getValueAt(obj, 0);
+	if (obj)
+	{
+		obj->GetTypeDefinition(ppTypeDef);
+//		obj->AcquireReference();
+	}
+	else
+		return AAFRESULT_NO_MORE_OBJECTS; // AAFRESULT_BADINDEX ???
+
+	return AAFRESULT_SUCCESS;
+}
