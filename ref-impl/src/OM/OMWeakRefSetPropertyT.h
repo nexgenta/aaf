@@ -26,8 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. |
-//         OMWeakReferenceSetProperty
 #ifndef OMWEAKREFSETPROPERTYT_H
 #define OMWEAKREFSETPROPERTYT_H
 
@@ -39,51 +37,24 @@
   // @mfunc Constructor.
   //   @parm The property id.
   //   @parm The name of this <c OMWeakReferenceSetProperty>.
-  //   @parm The name (as a string) of the the <c OMProperty> instance
-  //         (a set property) in which the objects referenced by the
-  //         elements of this <c OMWeakReferenceSetProperty> reside.
-  //   @parm The id of the property by which the <p ReferencedObject>s
-  //         are uniquely identified (the key).
+  //   @parm The name of the the <c OMProperty> instance (a set property)
+  //         in which the objects referenced by the elements of this
+  //         <c OMWeakReferenceSetProperty> reside.
 template <typename ReferencedObject>
 OMWeakReferenceSetProperty<ReferencedObject>::
                    OMWeakReferenceSetProperty(const OMPropertyId propertyId,
                                               const wchar_t* name,
                                               const wchar_t* targetName,
                                               const OMPropertyId keyPropertyId)
-: OMWeakReferenceSet(propertyId, name),
+: OMContainerProperty<ReferencedObject>(propertyId,
+                                        SF_WEAK_OBJECT_REFERENCE_SET,
+                                        name),
   _targetTag(nullOMPropertyTag),
-  _targetName(targetName),
-  _targetPropertyPath(0),
+  _targetName(convertWideString(targetName)),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::"
                                                  "OMWeakReferenceSetProperty");
-}
-
-  // @mfunc Constructor.
-  //   @parm The property id.
-  //   @parm The name of this <c OMWeakReferenceSetProperty>.
-  //   @parm The id of the property by which the <p ReferencedObject>s
-  //         are uniquely identified (the key).
-  //   @parm The name (as a list of pids) of the the <c OMProperty> instance
-  //         (a set property) in which the objects referenced by the
-  //         elements of this <c OMWeakReferenceSetProperty> reside.
-template <typename ReferencedObject>
-OMWeakReferenceSetProperty<ReferencedObject>::OMWeakReferenceSetProperty(
-                                        const OMPropertyId propertyId,
-                                        const wchar_t* name,
-                                        const OMPropertyId keyPropertyId,
-                                        const OMPropertyId* targetPropertyPath)
-: OMWeakReferenceSet(propertyId, name),
-  _targetTag(nullOMPropertyTag),
-  _targetName(0),
-  _targetPropertyPath(0),
-  _keyPropertyId(keyPropertyId)
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::"
-                                                 "OMWeakReferenceSetProperty");
-
-  _targetPropertyPath = savePropertyPath(targetPropertyPath);
 }
 
   // @mfunc Destructor.
@@ -92,8 +63,7 @@ OMWeakReferenceSetProperty<ReferencedObject>::~OMWeakReferenceSetProperty(void)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::"
                                                 "~OMWeakReferenceSetProperty");
-
-  delete [] _targetPropertyPath;
+  delete [] _targetName;
 }
 
   // @mfunc Save this <c OMWeakReferenceSetProperty>.
@@ -109,7 +79,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  OMPropertyTag tag = targetTag();
+  OMPropertyTag tag = file()->referencedProperties()->insert(_targetName);
 
   // create a set index
   //
@@ -143,18 +113,15 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
 
   // save the set index
   //
-  store()->save(storedName(),
+  const char* propertyName = name();
+  store()->save(_propertyId,
+                _storedForm,
+                propertyName,
                 index,
                 count,
                 tag,
                 _keyPropertyId);
   delete [] index;
-
-  // make an entry in the property index
-  //
-  saveName();
-
-  clearTargetTag();
 }
 
   // @mfunc Close this <c OMWeakReferenceSetProperty>.
@@ -203,9 +170,12 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::restore");
 
+  PRECONDITION("Consistent property size", externalSize == strlen(name()) + 1);
+
   // get the name of the set index stream
   //
-  restoreName(externalSize);
+  char* propertyName = new char[externalSize];
+  ASSERT("Valid heap pointer", propertyName != 0);
 
   // restore the index
   //
@@ -213,7 +183,10 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
   size_t entries;
   OMPropertyTag tag;
   OMPropertyId keyPropertyId;
-  store()->restore(storedName(),
+  store()->restore(_propertyId,
+                   _storedForm,
+                   propertyName,
+                   externalSize,
                    setIndex,
                    entries,
                    tag,
@@ -222,7 +195,9 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
   ASSERT("Valid set index", IMPLIES(entries != 0, setIndex != 0));
   ASSERT("Valid set index", IMPLIES(entries == 0, setIndex == 0));
   ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
+  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
   _targetTag = tag;
+  delete [] propertyName;
 
   // Iterate over the index restoring the elements of the set.
   // Since the index entries are stored on disk in order of their
@@ -236,7 +211,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
     OMUniqueObjectIdentification key = setIndex[i];
     SetElement newElement(this, key, _targetTag);
     newElement.restore();
-    _set.insert(key, newElement);
+    _set.insert(newElement);
    }
   delete [] setIndex;
   setPresent();
@@ -253,6 +228,21 @@ size_t OMWeakReferenceSetProperty<ReferencedObject>::count(void) const
   return _set.count();
 }
 
+  // @mfunc Get the size of this <c OMWeakReferenceSetProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //     @rdesc The size of this <c OMWeakReferenceSetProperty>.
+  //     @this const
+template <typename ReferencedObject>
+size_t OMWeakReferenceSetProperty<ReferencedObject>::getSize(void) const
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::getSize");
+  OBSOLETE("OMWeakReferenceSetProperty<ReferencedObject>::count");
+
+  return count();
+}
+
   // @mfunc Insert <p object> into this
   //        <c OMWeakReferenceSetProperty>.
   //   @tcarg class | ReferencedObject | The type of the referenced
@@ -267,22 +257,13 @@ void OMWeakReferenceSetProperty<ReferencedObject>::insert(
 
   PRECONDITION("Valid object", object != 0);
   PRECONDITION("Object is not present", !containsValue(object));
-#if defined(OM_VALIDATE_WEAK_REFERENCES)
-  PRECONDITION("Source container object attached to file",
-                                                        container()->inFile());
-  PRECONDITION("Target object attached to file", object->inFile());
-  PRECONDITION("Source container object and target object in same file",
-                                        container()->file() == object->file());
-#endif
+
   // Set the set to contain the new object
   //
   OMUniqueObjectIdentification key = object->identification();
   SetElement newElement(this, key, _targetTag);
-#if defined(OM_VALIDATE_WEAK_REFERENCES)
-  newElement.reference().setTargetTag(targetTag());
-#endif
   newElement.setValue(object);
-  _set.insert(key, newElement);
+  _set.insert(newElement);
   setPresent();
 
   POSTCONDITION("Object is present", containsValue(object));
@@ -551,9 +532,9 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::isVoid(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable> and <c OMUnique>.
 template <typename ReferencedObject>
-void OMWeakReferenceSetProperty<ReferencedObject>::removeProperty(void)
+void OMWeakReferenceSetProperty<ReferencedObject>::remove(void)
 {
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::removeProperty");
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::remove");
 
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
@@ -569,11 +550,10 @@ void OMWeakReferenceSetProperty<ReferencedObject>::removeProperty(void)
   //   @rdesc The size of the raw bits of this
   //          <c OMWeakReferenceSetProperty> in bytes.
   //   @this const
-template <typename ReferencedObject>
+template<typename ReferencedObject>
 size_t OMWeakReferenceSetProperty<ReferencedObject>::bitsSize(void) const
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::bitsSize");
-  OBSOLETE("methods on class OMReferenceSetProperty");
 
   return sizeof(ReferencedObject*) * count();
 }
@@ -587,13 +567,11 @@ size_t OMWeakReferenceSetProperty<ReferencedObject>::bitsSize(void) const
   //   @parm The address of the buffer into which the raw bits are copied.
   //   @parm The size of the buffer.
   //   @this const
-template <typename ReferencedObject>
-void OMWeakReferenceSetProperty<ReferencedObject>::getBits(
-                                                      OMByte* bits,
-                                                      size_t ANAME(size)) const
+template<typename ReferencedObject>
+void OMWeakReferenceSetProperty<ReferencedObject>::getBits(OMByte* bits,
+                                                             size_t size) const
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::getBits");
-  OBSOLETE("methods on class OMReferenceSetProperty");
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
@@ -618,12 +596,11 @@ void OMWeakReferenceSetProperty<ReferencedObject>::getBits(
   //          <c OMStorable> and <c OMUnique>.
   //   @parm The address of the buffer from which the raw bits are copied.
   //   @parm The size of the buffer.
-template <typename ReferencedObject>
+template<typename ReferencedObject>
 void OMWeakReferenceSetProperty<ReferencedObject>::setBits(const OMByte* bits,
                                                            size_t size)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::setBits");
-  OBSOLETE("methods on class OMReferenceSetProperty");
 
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
@@ -636,248 +613,6 @@ void OMWeakReferenceSetProperty<ReferencedObject>::setBits(const OMByte* bits,
     insert(object);
   }
 
-}
-
-  // @mfunc Insert <p object> into this
-  //        <c OMWeakReferenceSetProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-  //   @parm The <c OMObject> to insert.
-template <typename ReferencedObject>
-void
-OMWeakReferenceSetProperty<ReferencedObject>::insertObject(
-                                                        const OMObject* object)
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::insertObject");
-
-  PRECONDITION("Valid object", object != 0);
-
-  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
-  ASSERT("Object is correct type", p != 0);
-
-  insert(p);
-}
-
-  // @mfunc Does this <c OMWeakReferenceSetProperty> contain
-  //        <p object> ?
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-  //   @parm The <c OMObject> for which to search.
-  //   @rdesc True if <p object> is present, false otherwise.
-  //   @this const
-template <typename ReferencedObject>
-bool
-OMWeakReferenceSetProperty<ReferencedObject>::containsObject(
-                                                  const OMObject* object) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::containsObject");
-
-  PRECONDITION("Valid object", object != 0);
-
-  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
-  ASSERT("Object is correct type", p != 0);
-
-  return containsValue(p);
-}
-
-  // @mfunc Remove <p object> from this
-  //        <c OMWeakReferenceSetProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-  //   @parm The <c OMObject> to remove.
-template <typename ReferencedObject>
-void
-OMWeakReferenceSetProperty<ReferencedObject>::removeObject(
-                                                        const OMObject* object)
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::removeObject");
-
-  PRECONDITION("Valid object", object != 0);
-
-  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
-  ASSERT("Object is correct type", p != 0);
-
-  removeValue(p);
-}
-
-  // @mfunc Remove all objects from this <c OMWeakReferenceSetProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-template <typename ReferencedObject>
-void OMWeakReferenceSetProperty<ReferencedObject>::removeAllObjects(void)
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::removeAllObjects");
-
-  _set.clear();
-  POSTCONDITION("All objects removed", count() == 0);
-}
-
-  // @mfunc Create an <c OMReferenceContainerIterator> over this
-  //        <c OMWeakReferenceSetProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-  //   @rdesc An <c OMReferenceContainerIterator> over this
-  //          <c OMWeakReferenceSetProperty>.
-  //   @this const
-template <typename ReferencedObject>
-OMReferenceContainerIterator*
-OMWeakReferenceSetProperty<ReferencedObject>::createIterator(void) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::createIterator");
-
-  OMWeakReferenceSetIterator<ReferencedObject>* result =
-             new OMWeakReferenceSetIterator<ReferencedObject>(*this, OMBefore);
-  ASSERT("Valid heap pointer", result != 0);
-
-  return result;
-}
-
-  // @mfunc Remove the <c OMObject> identified by <p identification>
-  //        from this <c OMWeakReferenceSetProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-  //   @parm The unique identification of the object to remove.
-  //   @rdesc The object that was removed.
-template <typename ReferencedObject>
-OMObject*
-OMWeakReferenceSetProperty<ReferencedObject>::remove(void* identification)
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::remove");
-
-  PRECONDITION("Valid identification", identification != 0);
-
-  OMUniqueObjectIdentification* id =
-               reinterpret_cast<OMUniqueObjectIdentification*>(identification);
-  return remove(*id);
-}
-
-  // @mfunc Does this <c OMWeakReferenceSetProperty> contain an
-  //        <c OMObject> identified by <p identification> ?
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-  //   @parm The unique identification of the object for which to search.
-  //   @rdesc True if the object was found, false otherwise.
-  //   @this const
-template <typename ReferencedObject>
-bool
-OMWeakReferenceSetProperty<ReferencedObject>::contains(
-                                                    void* identification) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::containsObject");
-
-
-  PRECONDITION("Valid identification", identification != 0);
-
-  OMUniqueObjectIdentification* id =
-               reinterpret_cast<OMUniqueObjectIdentification*>(identification);
-  return contains(*id);
-}
-
-  // @mfunc Find the <c OMObject> in this <c OMWeakReferenceSetProperty>
-  //        identified by <p identification>.  If the object is found
-  //        it is returned in <p object> and the result is < e bool.true>.
-  //        If the object is not found the result is <e bool.false>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable> and <c OMUnique>.
-  //   @parm The unique identification of the object for which to search. 
-  //   @parm The object.
-  //   @rdesc True if the object was found, false otherwise.
-  //   @this const
-template <typename ReferencedObject>
-bool
-OMWeakReferenceSetProperty<ReferencedObject>::findObject(
-                                                      void* identification,
-                                                       OMObject*& object) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::findObject");
-
-  PRECONDITION("Valid identification", identification != 0);
-
-  OMUniqueObjectIdentification* id =
-               reinterpret_cast<OMUniqueObjectIdentification*>(identification);
-
-  ReferencedObject* obj = 0;
-
-  bool result = find(*id, obj);
-
-  object = obj;
-  return result;
-}
-
-template <typename ReferencedObject>
-OMPropertyTag
-OMWeakReferenceSetProperty<ReferencedObject>::targetTag(void) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::targetTag");
-
-  PRECONDITION("Property is attached to file", container()->inFile());
-
-  OMWeakReferenceSetProperty<ReferencedObject>* nonConstThis =
-               const_cast<OMWeakReferenceSetProperty<ReferencedObject>*>(this);
-  if (_targetTag == nullOMPropertyTag) {
-    nonConstThis->_targetTag =
-                  file()->referencedProperties()->insert(targetPropertyPath());
-  }
-  POSTCONDITION("Valid target property tag", _targetTag != nullOMPropertyTag);
-  return _targetTag;
-}
-
-template <typename ReferencedObject>
-void
-OMWeakReferenceSetProperty<ReferencedObject>::setTargetTag(
-                                                       OMPropertyTag targetTag)
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::setTargetTag");
-
-  _targetTag = targetTag;
-}
-
-template <typename ReferencedObject>
-OMPropertyId
-OMWeakReferenceSetProperty<ReferencedObject>::keyPropertyId(void) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::keyPropertyId");
-
-  return _keyPropertyId;
-}
-
-template <typename ReferencedObject>
-OMPropertyId*
-OMWeakReferenceSetProperty<ReferencedObject>::targetPropertyPath(void) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::targetPropertyPath");
-
-  PRECONDITION("Valid target name", validWideString(_targetName));
-
-  if (_targetPropertyPath == 0) {
-    OMWeakReferenceSetProperty<ReferencedObject>* nonConstThis =
-               const_cast<OMWeakReferenceSetProperty<ReferencedObject>*>(this);
-    nonConstThis->_targetPropertyPath = file()->path(_targetName);
-  }
-  POSTCONDITION("Valid result", _targetPropertyPath != 0);
-  return _targetPropertyPath;
-}
-
-template <typename ReferencedObject>
-void
-OMWeakReferenceSetProperty<ReferencedObject>::clearTargetTag(void) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::clearTargetTag");
-
-  OMWeakReferenceSetProperty<ReferencedObject>* nonConstThis =
-               const_cast<OMWeakReferenceSetProperty<ReferencedObject>*>(this);
-
-  nonConstThis->_targetTag = nullOMPropertyTag;
-  delete [] nonConstThis->_targetPropertyPath;
-  nonConstThis->_targetPropertyPath = 0;
 }
 
 #endif

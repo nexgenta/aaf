@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,21 +31,24 @@
 
 #include "OMAssertions.h"
 #include "OMPropertyTable.h"
+#include "OMUtilities.h"
 
 template<typename ReferencedObject>
 OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
                                               const OMPropertyId propertyId,
-                                              const char* name,
-                                              const char* targetName,
+                                              const wchar_t* name,
+                                              const wchar_t* targetName,
                                               const OMPropertyId keyPropertyId)
 : OMReferenceProperty<ReferencedObject>(propertyId,
                                         SF_WEAK_OBJECT_REFERENCE,
-                                        name), _reference(this),
+                                        name), _reference(),
   _targetTag(nullOMPropertyTag),
-  _targetName(saveString(targetName)),
+  _targetName(convertWideString(targetName)),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty");
+
+  _reference = OMWeakObjectReference<ReferencedObject>(this);
 }
 
 template<typename ReferencedObject>
@@ -90,6 +93,7 @@ ReferencedObject* OMWeakReferenceProperty<ReferencedObject>::setValue(
   TRACE("OMWeakReferenceProperty<ReferencedObject>::setValue");
 
   ReferencedObject* result = _reference.setValue(object);
+  setPresent();
   return result;
 }
 
@@ -154,28 +158,20 @@ OMWeakReferenceProperty<ReferencedObject>::operator ReferencedObject* () const
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (pointed to) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @parm Client context for callbacks.
   //   @this const
 template<typename ReferencedObject>
-void OMWeakReferenceProperty<ReferencedObject>::save(void* clientContext) const
+void OMWeakReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::save");
 
   PRECONDITION("Non-void weak reference", !_reference.isVoid());
 
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* store = container->store();
-
-  OMFile* file = container->file();
-  OMPropertyTag tag = file->referencedProperties()->insert(_targetName);
+  OMPropertyTag tag = file()->referencedProperties()->insert(_targetName);
 
   const OMUniqueObjectIdentification& id = _reference.identification();
-  store->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
+  store()->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
 
-  _reference.save(clientContext);
+  _reference.save();
 }
 
   // @mfunc Close this <c OMWeakReferenceProperty>.
@@ -201,24 +197,17 @@ void OMWeakReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::restore");
 
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* store = container->store();
-  ASSERT("Valid store", store != 0);
-
   OMUniqueObjectIdentification id;
   OMPropertyTag tag;
   ASSERT("Sizes match", (sizeof(tag) + sizeof(OMPropertyId) +
                          sizeof(OMKeySize) + sizeof(id)) == externalSize);
   OMPropertyId keyPropertyId;
-  store->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
+  store()->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
   ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
   _targetTag = tag;
   _reference = OMWeakObjectReference<ReferencedObject>(this, id, _targetTag);
   _reference.restore();
-
+  setPresent();
 }
 
   // @mfunc  Is this <c OMWeakReferenceProperty> void ?
