@@ -1,32 +1,27 @@
 // @com Executable test program by Chris Morgan, intern for Avid Technology, Tewksbury 
 // @com This is used for scalability testing of AAF code.  Last modified on 7/23/99.
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include <stdio.h>
 #include <string.h>
@@ -46,8 +41,8 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
-#if defined(macintosh) || defined(_MAC)
-#include <console.h> /* Mac command line window */
+#if defined( OS_MACOS )
+#include "DataInput.h"
 #endif
 
 // There are differences in the microsoft and other compilers in the "Length" specifier
@@ -55,7 +50,7 @@
 //
 // NOTE: If your compiler does not support 64 bit integers then this example will NOT
 // print out the correct lengths.
-#ifdef _MSC_VER
+#if defined( COMPILER_MSC )
 #define L64 "I64"
 #else
 #define L64 "ll"
@@ -63,20 +58,15 @@
 
 // MAX is used for arrays when converting between types - set here for debugging. 
 const int MAX = 80;
-static char* programName;
 static char* niceFileName;
 static void usage(void);
 static aafWChar* slotName = L"SLOT1";
-static aafInt32 fadeInLen  = 1000;
-static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kFadeLinearAmp;
-static aafFadeType_t fadeOutType = kFadeLinearPower;
+//static aafInt32 fadeInLen  = 1000;
+//static aafInt32 fadeOutLen = 2000;
+//static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
+//static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
 static aafSourceRef_t sourceRef; 
 
-static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
-{
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
-}
 
 #define TAPE_LENGTH			1L * 60L *60L * 30L
 #define FILE1_LENGTH		60L * 30L
@@ -108,13 +98,6 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
      exit(1);\
 }
 
-static void AUIDtoString(aafUID_t *uid, char *buf)
-{
-	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
-			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
-			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
-}
 
 
 static HRESULT convert(char* cName, size_t length, const wchar_t* name)
@@ -136,7 +119,6 @@ const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 {
-	HRESULT hr = S_OK;
 	IAAFFile*					pFile = NULL;
 	IAAFHeader*					pHeader = NULL;
 	IAAFDictionary*					pDictionary = NULL;
@@ -149,6 +131,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	IAAFSequence*				pSequence = NULL;
 	IAAFComponent*				aComponent = NULL;
 	IAAFFileDescriptor*			pFileDesc = NULL;
+	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 	IAAFTimelineMobSlot*		newSlot = NULL;
 	IAAFSegment*				seg = NULL;
@@ -158,31 +141,42 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	IAAFComponent*				compFill = NULL;
 	IAAFLocator*				pLocator = NULL;
 	IAAFNetworkLocator*			pNetLocator = NULL;
+	IAAFClassDef *              pCDCompositionMob = 0;
+	IAAFClassDef *              pCDSequence = 0;
+	IAAFClassDef *              pCDSourceMob = 0;
+	IAAFClassDef *              pCDTapeDescriptor = 0;
+	IAAFClassDef *              pCDAIFCDescriptor = 0;
+	IAAFClassDef *              pCDNetworkLocator = 0;
+	IAAFClassDef *              pCDMasterMob = 0;
+	IAAFClassDef *              pCDSourceClip = 0;
+	IAAFClassDef *              pCDFiller = 0;
+	IAAFDataDef *               pDdefPicture = 0;
 	aafRational_t				videoRate = { 30000, 1001 };
-	aafUID_t					tapeMobID, fileMobID, masterMobID;
-	aafTimecode_t				tapeTC = { 108000, kTcNonDrop, 30};
+	aafMobID_t					tapeMobID, fileMobID, masterMobID;
+	aafTimecode_t				tapeTC = { 108000, kAAFTcNonDrop, 30};
 	aafLength_t					fileLen = FILE1_LENGTH;
 	aafLength_t					fillLen = FILL_LENGTH;
 	aafLength_t					segLen = SEG_LENGTH;
 	aafProductIdentification_t	ProductInfo;
 	long int i = 0;
 
-  moduleErrorTmp = S_OK;
-
+	moduleErrorTmp = S_OK;
+	
 
 	// delete any previous test file before continuing...
 	char chFileName[1000];
 	convert(chFileName, sizeof(chFileName), pFileName);
 	remove(chFileName);
 
-
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"Company Name";
 	ProductInfo.productName = L"Scalability Test 1:";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -194,23 +188,43 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	// Get the AAF Dictionary so that we can create valid AAF objects.
 	check(pHeader->GetDictionary(&pDictionary));
 
+	check(pDictionary->LookupClassDef(AUID_AAFCompositionMob,
+									  &pCDCompositionMob));
+	check(pDictionary->LookupClassDef(AUID_AAFSequence,
+									  &pCDSequence));
+	check(pDictionary->LookupClassDef(AUID_AAFSourceMob,
+									  &pCDSourceMob));
+	check(pDictionary->LookupClassDef(AUID_AAFTapeDescriptor,
+									  &pCDTapeDescriptor));
+	check(pDictionary->LookupClassDef(AUID_AAFAIFCDescriptor,
+									  &pCDAIFCDescriptor));
+	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
+									  &pCDNetworkLocator));
+	check(pDictionary->LookupClassDef(AUID_AAFMasterMob,
+									  &pCDMasterMob));
+	check(pDictionary->LookupClassDef(AUID_AAFSourceClip,
+									  &pCDSourceClip));
+	check(pDictionary->LookupClassDef(AUID_AAFFiller,
+									  &pCDFiller));
+	check(pDictionary->LookupDataDef(DDEF_Picture,
+									  &pDdefPicture));
 
 // IMPORTANT: major remodification is from this point onwards...
 
 	// sequence creation code pulled out of the subsequent loop.
 	// Create a Composition Mob
-	check(pDictionary->CreateInstance(AUID_AAFCompositionMob,
-							 IID_IAAFMob, 
-							 (IUnknown **)&pCompMob));
+	check(pCDCompositionMob->
+		  CreateInstance(IID_IAAFMob, 
+						 (IUnknown **)&pCompMob));
 
-	check(pDictionary->CreateInstance(AUID_AAFSequence,
-				 IID_IAAFSequence, 
-				 (IUnknown **)&pSequence));		
+	check(pCDSequence->
+		  CreateInstance(IID_IAAFSequence, 
+						 (IUnknown **)&pSequence));		
 	check(pSequence->QueryInterface (IID_IAAFSegment, (void **)&seg));
 
 	check(pSequence->QueryInterface(IID_IAAFComponent, (void **)&aComponent));
 
-	check(aComponent->SetDataDef(DDEF_Picture));
+	check(aComponent->SetDataDef(pDdefPicture));
 	aComponent->Release();
 	aComponent = NULL;
 
@@ -231,11 +245,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	for (i=0; i<N; i++)
 		{
 		//Make the Tape MOB
- 		check(pDictionary->CreateInstance(AUID_AAFSourceMob,
-							 IID_IAAFSourceMob, 
+ 		check(pCDSourceMob->
+			  CreateInstance(IID_IAAFSourceMob, 
 							 (IUnknown **)&pTapeMob));
-		check(pDictionary->CreateInstance(AUID_AAFTapeDescriptor,
-							 IID_IAAFTapeDescriptor, 
+		check(pCDTapeDescriptor->
+			  CreateInstance(IID_IAAFTapeDescriptor, 
 							 (IUnknown **)&pTapeDesc));
 		check(pTapeDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&aDesc));
 		check(pTapeMob->SetEssenceDescriptor(aDesc));
@@ -245,7 +259,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		pTapeDesc = NULL;
 			
 		check(pTapeMob->AppendTimecodeSlot (videoRate, 0, tapeTC, TAPE_LENGTH));
-		check(pTapeMob->AddNilReference (1,TAPE_LENGTH, DDEF_Picture, videoRate));
+		check(pTapeMob->AddNilReference (1,TAPE_LENGTH, pDdefPicture, videoRate));
 		check(pTapeMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		pTapeMob->Release();
 		pTapeMob = NULL;
@@ -266,18 +280,22 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		pMob = NULL;
 
 		// Make a FileMob
-		check(pDictionary->CreateInstance(AUID_AAFSourceMob,
-							 IID_IAAFSourceMob, 
+		check(pCDSourceMob->
+			  CreateInstance(IID_IAAFSourceMob, 
 							 (IUnknown **)&pFileMob));
-		check(pDictionary->CreateInstance(AUID_AAFFileDescriptor,
-							 IID_IAAFFileDescriptor, 
+		check(pCDAIFCDescriptor->
+			  CreateInstance(IID_IAAFFileDescriptor, 
 							 (IUnknown **)&pFileDesc));
 		check(pFileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&aDesc));
+		check(pFileDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
 
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
-							IID_IAAFNetworkLocator, 
-							(IUnknown **)&pNetLocator));		
+		check(pCDNetworkLocator->
+			  CreateInstance(IID_IAAFNetworkLocator, 
+							 (IUnknown **)&pNetLocator));		
 		check(pNetLocator->QueryInterface (IID_IAAFLocator, (void **)&pLocator));
 			
 		
@@ -299,7 +317,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		sourceRef.sourceSlotID = 1;
 		sourceRef.startTime = 0;
 		check(pFileMob->NewPhysSourceRef (videoRate,
-													 1, DDEF_Picture, sourceRef, fileLen));
+													 1, pDdefPicture, sourceRef, fileLen));
 
 		check(pFileMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		check(pMob->GetMobID (&fileMobID));
@@ -308,14 +326,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		pMob = NULL;
 
 		//Make the Master MOB
-		check(pDictionary->CreateInstance(AUID_AAFMasterMob,
-							 IID_IAAFMasterMob, 
+		check(pCDMasterMob->
+			  CreateInstance(IID_IAAFMasterMob, 
 							 (IUnknown **)&pMasterMob));
 
 		sourceRef.sourceID = fileMobID;
 		sourceRef.sourceSlotID = 1;
 		sourceRef.startTime = 0;
-		check(pMasterMob->NewPhysSourceRef (videoRate, 1, DDEF_Picture, sourceRef, fileLen));
+		check(pMasterMob->NewPhysSourceRef (videoRate, 1, pDdefPicture, sourceRef, fileLen));
 		check(pMasterMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		check(pMob->GetMobID (&masterMobID));
 		
@@ -336,8 +354,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		
 
 		// Create a SourceClip
-		check(pDictionary->CreateInstance(AUID_AAFSourceClip,
-							 IID_IAAFSourceClip, 
+		check(pCDSourceClip->
+			  CreateInstance(IID_IAAFSourceClip, 
 							 (IUnknown **)&compSclp));		
 
 		sourceRef.sourceID = masterMobID;
@@ -345,18 +363,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		sourceRef.startTime = 0;
 		check(compSclp->SetSourceReference (sourceRef));
 		check(compSclp->QueryInterface (IID_IAAFComponent, (void **)&aComponent));
-		check(aComponent->SetDataDef(DDEF_Picture));
+		check(aComponent->SetDataDef(pDdefPicture));
 		check(aComponent->SetLength (segLen));
 		check(pSequence->AppendComponent (aComponent));
 	
 		// Create a filler - Get the component interface only (IID_IAAFComponent)
-		check(pDictionary->CreateInstance(AUID_AAFFiller,
-										 IID_IAAFComponent, 
-										 (IUnknown **)&compFill));		
+		check(pCDFiller->
+			  CreateInstance(IID_IAAFComponent, 
+							 (IUnknown **)&compFill));		
 
 		check(compFill->SetLength (fillLen));
 
-		check(compFill->SetDataDef(DDEF_Picture));
+		check(compFill->SetDataDef(pDdefPicture));
 		check(pSequence->AppendComponent (compFill));
 
 		compFill->Release();
@@ -442,6 +460,66 @@ cleanup:
 	if (pHeader)
 		pHeader->Release();
 
+	if (pCDCompositionMob)
+	  {
+		pCDCompositionMob->Release();
+		pCDCompositionMob = 0;
+	  }
+
+	if (pCDSequence)
+	  {
+		pCDSequence->Release();
+		pCDSequence = 0;
+	  }
+
+	if (pCDSourceMob)
+	  {
+		pCDSourceMob->Release();
+		pCDSourceMob = 0;
+	  }
+
+	if (pCDTapeDescriptor)
+	  {
+		pCDTapeDescriptor->Release();
+		pCDTapeDescriptor = 0;
+	  }
+
+	if (pCDAIFCDescriptor)
+	  {
+		pCDAIFCDescriptor->Release();
+		pCDAIFCDescriptor = 0;
+	  }
+
+	if (pCDNetworkLocator)
+	  {
+		pCDNetworkLocator->Release();
+		pCDNetworkLocator = 0;
+	  }
+
+	if (pCDMasterMob)
+	  {
+		pCDMasterMob->Release();
+		pCDMasterMob = 0;
+	  }
+
+	if (pCDSourceClip)
+	  {
+		pCDSourceClip->Release();
+		pCDSourceClip = 0;
+	  }
+
+	if (pCDFiller)
+	  {
+		pCDFiller->Release();
+		pCDFiller = 0;
+	  }
+
+	if (pDdefPicture)
+	  {
+		pDdefPicture->Release();
+		pDdefPicture = 0;
+	  }
+
 	if (pFile) 
 	{
 #if USE_TIMER_LIB
@@ -462,19 +540,6 @@ cleanup:
 	
 	return moduleErrorTmp;
 }
-// simple helper class to initialize and cleanup COM library.
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
 
 // now need the reading functionality
 static HRESULT ReadAAFFile(aafWChar * pFileName)
@@ -516,15 +581,7 @@ void usage(void)
 //  Main adapted to use command-line arguments with argument checking
 //  NOTE:  defining [0] program name; [1] Number N of components; [2] filename.aaf; 
 int main(int argumentCount, char *argumentVector[])
-{
-	/* console window for mac */
-
-	#if defined(macintosh) || defined(_MAC)
-	argumentCount = ccommand(&argumentVector);
-	#endif
-
-	programName = argumentVector[0];
-	
+{	
 	//  First check for correct number of arguments
 	//  printf("%ld\n",argumentCount);
 	if ((argumentCount < 2) || (argumentCount > 3))
@@ -565,13 +622,11 @@ int main(int argumentCount, char *argumentVector[])
 #if USE_TIMER_LIB
 	UTLInitTimers(1000);
 #endif
-	CComInitialize comInit;
 	
 	aafWChar FileNameBuffer[MAX];
 	mbstowcs(FileNameBuffer,niceFileName,MAX);
 	
 	aafWChar * pwFileName = FileNameBuffer;
-	const char * pFileName = niceFileName;
 
 	//  Give a nice output here too...
 	printf("Creating file %s with %ld components...\n\n",niceFileName,N);
