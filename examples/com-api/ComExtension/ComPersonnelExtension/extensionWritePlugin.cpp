@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionWritePlugin.cpp,v 1.12 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+// $Id: extensionWritePlugin.cpp,v 1.12.2.1 2004/06/08 13:45:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -253,6 +253,12 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
   {
     rc = rhr;
   }
+  catch (...)
+  {
+    // We CANNOT throw an exception out of a COM interface method!
+    // Return a reasonable exception code.
+  	rc =  AAFRESULT_UNEXPECTED_EXCEPTION;
+  }
 
 
   if (pPersResource)
@@ -273,12 +279,27 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
 	  pcd->Release ();
 	  pcd = 0;
 	}
+
   if (pFile)
   {
-    check (pFile->Save());
-    check (pFile->Close());
-    pFile->Release();
+  	try
+	{
+    	check (pFile->Save());
+   	    check (pFile->Close());
+        pFile->Release();
+	}
+    catch (HRESULT& rhr)
+    {
+    rc = rhr;
+    }
+    catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+    	rc =  AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
   }
+
   if (pPluginManager)
     pPluginManager->Release();
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxInit.cpp,v 1.3 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxInit.cpp,v 1.3.2.1 2004/06/08 13:45:23 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,22 +33,31 @@ bool AxInit::once = false;
 
 AxInit::AxInit()
 {
-	if ( once ) {
-		throw AxEx( L"Multiple AxInit instances not permited." );
-	}
-	
-	// Force the AxHrMap singleton to init to that it doesn't happen
-	// the first time an exception is handled.
-	AxHrMap::getInstance();
+  Init( getenv("AX_AAF_COMAPI") );
+}
 
-	const char *dllname = getenv("AX_AAF_COMAPI");
 
-	CHECK_HRESULT( AAFLoad( dllname ) );
+AxInit::AxInit(const char* dllname)
+{
+  Init( dllname );
+}
 
-	AxPluginMgr mgr;
-	mgr.RegisterSharedPlugins();
- 
-	once = true;
+void AxInit::Init( const char* dllname )
+{  
+  if ( once ) {
+    throw AxEx( L"Multiple AxInit instances not permited." );
+  }
+  
+  // Force the AxHrMap singleton to init so that it doesn't happen
+  // the first time an exception is handled.
+  AxHrMap::getInstance();
+  
+  CHECK_HRESULT( AAFLoad( dllname ) );
+  
+  AxPluginMgr mgr;
+  mgr.RegisterSharedPlugins();
+  
+  once = true;
 }
 
 AxInit::~AxInit()

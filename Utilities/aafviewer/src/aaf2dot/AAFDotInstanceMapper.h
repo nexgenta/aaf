@@ -2,7 +2,7 @@
 #define __AAFDOTINSTANCEMAPPER_H__
 
 /*
- * $Id: AAFDotInstanceMapper.h,v 1.5 2004/03/08 15:38:32 philipn Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.h,v 1.4.2.1 2004/06/08 13:45:02 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *

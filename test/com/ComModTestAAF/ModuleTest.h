@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTest.h,v 1.5.2.3 2004/03/22 18:06:46 akharkev Exp $ $Name:  $
+// $Id: ModuleTest.h,v 1.5.2.4 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,6 +35,9 @@ typedef enum unitTestMode
 
 
 
+#ifdef _cplusplus
+extern "C" {
+#endif
 
 //
 // Feature support
@@ -66,7 +69,9 @@ bool DR4TestSupported(aafProductVersion_constref toolkitVersion);
 // Return true is greater than DR4 (a.k.a. RC1)
 bool RC1TestSupported(aafProductVersion_constref toolkitVersion);
 
-
+#ifdef _cplusplus
+}
+#endif
 
 //
 // Comparison operators

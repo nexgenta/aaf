@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFVaryingValue.h,v 1.4.2.1 2004/03/11 18:58:44 stuart_hc Exp $ $Name:  $
+// $Id: CAAFVaryingValue.h,v 1.4.2.2 2004/06/08 13:46:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

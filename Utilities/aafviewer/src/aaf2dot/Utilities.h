@@ -2,7 +2,7 @@
 #define __UTILITIES_H__
 
 /*
- * $Id: Utilities.h,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: Utilities.h,v 1.3.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -50,7 +50,7 @@ inline void ErasePointerVector( std::vector< T > &theVector )
 
 std::string AxStringToString( AxString axString );
 
-std::string ProcessStringForQuoting( std::string s );
+std::string ProcessRecordString( std::string s );
 
 std::string LimitAttributeSize( std::string name, int maxLength, int maxWidth );
 

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefRecord
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefRecordTest.cpp,v 1.12 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefRecordTest.cpp,v 1.12.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@ using namespace std;
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "AAFFileMode.h"
 #include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 #include "AAFClassDefUIDs.h"
@@ -464,7 +465,9 @@ static HRESULT ReadRecord (const aafWChar * pFileName)
   try 
 	{
 	  // Open the file, and get the dictionary.
-	  checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
+	  // Test fails when openened in default loading mode. So set mode to
+	  // lazy loading
+	  checkResult(AAFFileOpenExistingRead(pFileName, AAF_FILE_MODE_LAZY_LOADING, &pFile));
 	  IAAFHeaderSP pHeader;
 	  checkResult(pFile->GetHeader(&pHeader));
 	  IAAFDictionarySP pDict;

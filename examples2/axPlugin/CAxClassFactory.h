@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAxClassFactory.h,v 1.7 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: CAxClassFactory.h,v 1.7.2.1 2004/06/08 13:45:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,7 +56,7 @@ private:
 
 // Credits:
 //
-// The CAxClassFactory::CreateInstance() implementation is a slighly
+// The CAxClassFactory::CreateInstance() implementation is a slightly
 // modified version of the IClassFactory::CreateInstance() implementation
 // presented in: "Inside COM", Dale Rogerson, Microsoft Press.
 // This implementation uses a template to identify the type of COM object
@@ -71,7 +71,7 @@ private:
 // instance count, and to implement the LockServer() method.
 
 // gcc3 complains that CAxClassFactory has a private destructor
-// and now friends.  This prevents the warning.
+// and no friends.  This prevents the warning.
 class CAxClassFactoryFriend_nonexistant;
 
 template <class ComObjectType>
@@ -142,10 +142,22 @@ public:
 		  return E_INVALIDARG;
 		}
 
-		// Create the new component instance.
-		ComObjectType* pObj = new ComObjectType( pUnkOuter );
+		// Create the new component instance.  Pessimistic try
+		// catch block in the event new throws and exception.
+		// MSVC doesn't by default (which is wrong), but
+		// others may.  It wouldn't cause problems in the
+		// relm of AAF because the AAF com interfaces would
+		// catch the exception... but stil.
+
+		ComObjectType* pObj;
+		try {
+		  pObj = new ComObjectType( pUnkOuter );
+		}
+		catch(...) {
+		  pObj = 0;
+		}
 		if ( !pObj ) {
-			return E_OUTOFMEMORY;
+		  return E_OUTOFMEMORY;
 		}
 
 		// Initialize the new component;

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.h,v 1.51 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFHeader.h,v 1.51.2.1 2004/06/08 13:46:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,7 +58,6 @@ typedef ImplAAFEnumerator<ImplAAFIdentification> ImplEnumAAFIdentifications;
 #include "ImplAAFFile.h"
 
 
-class AAFDataKind;
 class AAFOperationDef;
 
 

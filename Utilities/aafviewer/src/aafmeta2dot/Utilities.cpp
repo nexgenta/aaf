@@ -1,5 +1,5 @@
 /*
- * $Id: Utilities.cpp,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: Utilities.cpp,v 1.3.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -38,25 +38,9 @@ using namespace std;
 string
 AxStringToString( AxString axString )
 {
-	string name;
-	
-	AxString::iterator iter;
-	for ( iter=axString.begin(); iter!=axString.end(); iter++ )
-	{
-		name += *iter;
-	}
-
-	return name;
+   return AxStringUtil::wctomb(axString);
 }
 
-
-//-----------------------------------------------------------------------------
-/*string 
-UIDToString( aafUID_t &uid )
-{
-	return AxStringUtil::wctomb( AxStringUtil::uid2Str( uid ) );
-}
-*/
 
 //-----------------------------------------------------------------------------
 string 

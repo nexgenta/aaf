@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceAccess.h,v 1.36 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEssenceAccess.h,v 1.36.2.1 2004/06/08 13:46:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,6 @@ class ImplAAFContainerDef;
 class ImplAAFDataDef;
 class ImplAAFDictionary;
 class ImplAAFEssenceFormat;
-class ImplAAFEssenceSampleStream;
 class ImplAAFEssenceStream;
 class ImplAAFFile;
 class ImplAAFFileDescriptor;

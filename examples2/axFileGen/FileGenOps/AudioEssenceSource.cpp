@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AudioEssenceSource.cpp,v 1.5 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AudioEssenceSource.cpp,v 1.5.2.1 2004/06/08 13:45:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,14 +30,15 @@
 
 namespace {
 
-// The tone generator can generate a single cycle and repeat it, or 
+// The tone generator can generate a single cycle and repeat it, or
 // generate every sample.  The single cycle approach is efficient, but
-// suffers as the tone frequency approaches the nyquist frequence because
-// we can only generate tones that are integer multiples of the
-// sample_freq/tone_freq.  The error introduced by this grows as the tone_freq
-// increases.  Since, in general we assume nothing about the sample frequency
-// or the tone frequency values, we choose the more accurate approach and
-// generate every sample at the expense of a bit of cpu time.
+// suffers as the tone frequency approaches the nyquist frequency
+// because we can only generate tones that are integer multiples of
+// the sample_freq/tone_freq.  The error introduced by this grows as
+// the tone_freq increases.  Since, in general we assume nothing about
+// the sample frequency or the tone frequency values, we choose the
+// more accurate approach and generate every sample at the expense of
+// a bit of cpu time.
 
 class ToneGenerator {
 public:

@@ -1,5 +1,5 @@
 /*
- * $Id: AAFXsMapper.cpp,v 1.4 2004/03/02 12:02:37 philipn Exp $ $Name:  $
+ * $Id: AAFXsMapper.cpp,v 1.3.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -197,7 +197,7 @@ AAFXsMapper::MapAAFTypeDef( AxTypeDef &axTypeDef )
   else if ( axTypeDef.GetTypeCategory() == kAAFTypeCatInt )
     {
       AxTypeDefInt axTypeDefInt( AxQueryInterface< IAAFTypeDef, IAAFTypeDefInt >( axTypeDef ) );
-      typeDef = new AAFTypeDefinitionInt( name, uid, description, axTypeDefInt.GetSize(), 
+      typeDef = new AAFTypeDefinitionInt( name, uid, description, (aafUInt8)axTypeDefInt.GetSize(), 
 					      axTypeDefInt.IsSigned() );
       _defHome->AddDefinition( typeDef );
     }

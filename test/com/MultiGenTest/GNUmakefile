@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3.2.1 2004/06/08 13:46:08 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,8 +38,9 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
-	   -I../../../ref-impl/src/com-api
+INCLUDES = -I../../../ref-impl/include \
+		-I../../../ref-impl/include/ref-api \
+		-I../../../ref-impl/src/com-api
 
 
 # CXXFILES2 is declared just to get the list of object files
@@ -55,9 +56,14 @@ all : $(AAFSDKBINDIR)/MultiGenTest$(EXE)
 
 
 # $(AAFSDKBINDIR)/MultiGenTest$(EXE) : $(CXXOBJS) MultiGenTests
+ifeq ($(AAFTARGET),Debug-static)
+$(AAFSDKBINDIR)/MultiGenTest$(EXE) : $(CXXOBJS) $(CXXOBJS2)
+	$(LD) $(CXXOBJS) $(CXXOBJS2) $(STATIC_LINK_LINE) -o $@
+else
 $(AAFSDKBINDIR)/MultiGenTest$(EXE) : $(CXXOBJS) $(CXXOBJS2)
 	$(LD) $(CXXOBJS) $(CXXOBJS2) \
-	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
+	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
+endif
 
 
 #.PHONY : MultiGenTests

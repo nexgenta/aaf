@@ -1,5 +1,5 @@
 /*
- * $Id: DotRecordNode.cpp,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotRecordNode.cpp,v 1.3.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -68,7 +68,7 @@ DotRecordNodeAttribute::GetWidth( DotProfile &profile )
       if ( newPos == -1 )
       {
 	 done = true;
-	 if ( ( ltdAttributeString.size() - pos ) > maxWidth )
+	 if ( ( (int)ltdAttributeString.size() - pos ) > maxWidth )
 	 {
 	    maxWidth = ltdAttributeString.size() - pos;
 	 }
@@ -90,10 +90,11 @@ DotRecordNodeAttribute::GetWidth( DotProfile &profile )
 string
 DotRecordNodeAttribute::GetAttributeString()
 {
-   ostringstream attributeString;
-   attributeString << _name << " = " << _value;
+   string attributeString = ProcessRecordString(_name);
+   attributeString.append(" = ");
+   attributeString.append(ProcessRecordString(_value));
 
-   return ProcessStringForQuoting( attributeString.str() );
+   return attributeString;
 }
 
 
@@ -125,7 +126,7 @@ DotRecordNodeClassAttribute::GetWidth( DotProfile &profile )
       if ( newPos == -1 )
       {
 	 done = true;
-	 if ( ( ltdAttributeString.size() - pos ) > maxWidth )
+	 if ( ( (int)ltdAttributeString.size() - pos ) > maxWidth )
 	 {
 	    maxWidth = ltdAttributeString.size() - pos;
 	 }
@@ -147,10 +148,11 @@ DotRecordNodeClassAttribute::GetWidth( DotProfile &profile )
 string
 DotRecordNodeClassAttribute::GetAttributeString()
 {
-   ostringstream attributeString;
-   attributeString << _name << ": " << _typeName;
-
-   return ProcessStringForQuoting( attributeString.str() );
+   string attributeString = ProcessRecordString(_name);
+   attributeString.append(": ");
+   attributeString.append(ProcessRecordString(_typeName));
+   
+   return attributeString;
 }
 
 
@@ -186,7 +188,7 @@ DotRecordNode::Write( ofstream &dotFile, DotProfile &profile )
       fontSize = atoi( fontSizeString.c_str() );
    }
 
-   float fontSizeFactor = 0.013 * fontSize;
+   float fontSizeFactor = 0.013F * fontSize;
    float nodeWidth = maxWidth * fontSizeFactor;
 
    ostringstream widthString;

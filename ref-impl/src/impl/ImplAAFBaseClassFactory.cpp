@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFBaseClassFactory.cpp,v 1.61 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFBaseClassFactory.cpp,v 1.61.2.1 2004/06/08 13:46:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,8 +59,6 @@
 #define CLSID_AAFEdgeCode CLSID_AAFEdgecode
 #define CLSID_AAFOperationDefinition CLSID_AAFOperationDef
 #define CLSID_AAFInterchangeObject CLSID_AAFObject
-#define CLSID_AAFJPEGImageData CLSID_AAFJPEGData
-#define CLSID_AAFMIDIFileData CLSID_AAFMIDIData
 #define CLSID_AAFParameterDefinition CLSID_AAFParameterDef
 #define CLSID_AAFPropertyDefinition CLSID_AAFPropertyDef
 #define CLSID_AAFTypeDefinition CLSID_AAFTypeDef
@@ -79,7 +77,6 @@
 #define CLSID_AAFTypeDefinitionStrongObjectReference CLSID_AAFTypeDefStrongObjRef
 #define CLSID_AAFTypeDefinitionVariableArray CLSID_AAFTypeDefVariableArray
 #define CLSID_AAFTypeDefinitionWeakObjectReference CLSID_AAFTypeDefWeakObjRef
-#define CLSID_AAFUNIXLocator CLSID_AAFUnixLocator
 #define CLSID_AAFCodecDefinition CLSID_AAFCodecDef
 #define CLSID_AAFContainerDefinition CLSID_AAFContainerDef
 #define CLSID_AAFPluginDefinition CLSID_AAFPluginDef

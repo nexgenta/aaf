@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFCompositionMob.h,v 1.3.2.2 2004/06/04 16:54:01 phil_tudor Exp $ $Name:  $
+// $Id: CAAFCompositionMob.h,v 1.3.2.3 2004/06/08 13:45:42 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -162,10 +162,7 @@ public:
   // @mfunc AAFRESULT | AAFCompositionMob2 | SetRendering |
   // set the MobID of a rendering of this CompositionMob.
 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  //
+  // This method will return the following codes:
   // AAFRESULT_SUCCESS
   //   - succeeded.  (This is the only code indicating success.)
   // @end

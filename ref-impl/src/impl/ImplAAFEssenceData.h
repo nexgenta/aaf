@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.h,v 1.19 2004/03/06 00:00:48 tbingham Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.h,v 1.18.2.1 2004/06/08 13:46:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

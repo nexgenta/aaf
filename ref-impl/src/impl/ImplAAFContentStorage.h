@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFContentStorage.h,v 1.30 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFContentStorage.h,v 1.30.2.1 2004/06/08 13:46:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,7 +53,6 @@ typedef ImplAAFEnumerator<ImplAAFEssenceData> ImplEnumAAFEssenceData;
 #include "OMStrongRefSetProperty.h"
 #include "OMDataTypes.h"
 
-class AAFDataKind;
 class AAFOperationDef;
 
 

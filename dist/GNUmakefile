@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.6 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6.2.1 2004/06/08 13:45:04 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,7 @@
 
 # Mac Notes:
 #
-# The top level make target does not currently work under Max (OS 9, OS X).
+# The top level make target does not currently work under Mac OS 9.
 # Instead, run the following from this directory:
 #
 #   mkdir -p ../AAFMacSDK/Dist
@@ -74,8 +74,13 @@ ifeq ($(AAFPLATFORM),Mac)
 RELEASE_FILES_SRC = ./release-files.Mac
 SDK_FILES_SRC = ./sdk-files.mac
 else
+ifeq ($(AAFPLATFORM),PPCDarwin)
+RELEASE_FILES_SRC = ./release-files.darwin
+SDK_FILES_SRC = ./sdk-files.darwin
+else
 RELEASE_FILES_SRC = ./release-files.unix
 SDK_FILES_SRC = ./sdk-files.unix
+endif
 endif
 endif
 

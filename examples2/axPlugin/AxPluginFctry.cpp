@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPluginFctry.cpp,v 1.3 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxPluginFctry.cpp,v 1.3.2.1 2004/06/08 13:45:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,5 +18,5 @@
 //
 //=---------------------------------------------------------------------=
 
-// Single include present to independenty verify AxPluginFctry.h compiles.
+// Single include present to independently verify AxPluginFctry.h compiles.
 #include "AxPluginFctry.h"

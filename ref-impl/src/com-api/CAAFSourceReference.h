@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFSourceReference.h,v 1.3.2.3 2004/05/03 01:20:41 jptrainor Exp $ $Name:  $
+// $Id: CAAFSourceReference.h,v 1.3.2.4 2004/06/08 13:46:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -229,9 +229,6 @@ public:
 //
 // AAFRESULT_NULL_PARAM
 //   - pChannelIDs is null
-//
-// AAFRESULT_PROP_NOT_PRESENT
-//   - the property is not present
   // @end
   // 
   STDMETHOD (GetChannelIDsSize)
@@ -311,9 +308,6 @@ public:
 //
 // AAFRESULT_NULL_PARAM
 //   - pMonoSourceSlotIDs is null
-//
-// AAFRESULT_PROP_NOT_PRESENT
-//   - the property is not present
   // @end
   // 
   STDMETHOD (GetMonoSourceSlotIDsSize)

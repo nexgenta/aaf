@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSSStoredStream.cpp,v 1.6 2004/03/05 16:00:01 bakerian Exp $ $Name:  $
+// $Id: OMSSSStoredStream.cpp,v 1.5.2.1 2004/06/08 13:45:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -100,11 +100,7 @@ void OMSSSStoredStream::write(const OMByte* data,
   TRACE("OMSSSStoredStream::write");
   PRECONDITION("Valid stream", _stream != 0);
   PRECONDITION("Valid data", data != 0);
-  //Ian Baker 3.Mar.2004
-  //precondition removed as a 0 length property is allowed and 
-  //with the SS library actually writing a 0 length property 
-  //prevents an exception with requried properites. 
- // PRECONDITION("Valid size", bytes > 0);
+  PRECONDITION("Valid size", bytes > 0);
 
 	bytesWritten = bytes;
   sresult resultCode = streamWrite( _stream, data, &bytesWritten);
@@ -203,8 +199,24 @@ void OMSSSStoredStream::close(void)
   TRACE("OMSSSStoredStream::close");
   PRECONDITION("Valid stream", _stream != 0);
 
+
+  	sresult status = SSTG_OK;
+
+	// save position for later test
+	OMUInt64 p = position();
+
+	// seek to the end of the stream
+	// SchemaSoft resizes the stream upon close
+	status = streamSeek64( _stream, 0, STG_END );
+
+	// test position
+	OMUInt64 sz = position();
+
+	if( p != sz )
+		OMUInt64 err = sz-p;
+
 #if defined(OM_DEBUG)
-  sresult status = closeStream( &_stream );
+   status = closeStream( &_stream );
   ASSERT("Reference count is 0.", status == 0);
 #else
   closeStream( &_stream );

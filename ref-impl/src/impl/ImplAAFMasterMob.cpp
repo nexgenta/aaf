@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.cpp,v 1.56.2.1 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.cpp,v 1.56.2.2 2004/06/08 13:46:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -690,6 +690,7 @@ AAFRESULT STDMETHODCALLTYPE
  */
 AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 {
+	ImplAAFSourceClip	*sourceClip = NULL;
 	ImplAAFMob			*fileMob = NULL;
 	ImplEnumAAFMobSlots	*slotIter = NULL, *fileSlotIter = NULL;
 	ImplAAFMobSlot		*fileSlot = NULL, *slot = NULL;
@@ -714,32 +715,39 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 			fileSeq = dynamic_cast<ImplAAFSequence*>(seg);
 			if (fileSeq == NULL) 
 			{
-				CHECK(((ImplAAFSourceClip *)seg)->ResolveRef( &fileMob));
-				CHECK(fileMob->CountSlots(&fileNumSlots));
-				if(fileNumSlots >= 1)
+				// If it's not a Sequence, make sure it's
+				// a SourceClip.
+				sourceClip = dynamic_cast<ImplAAFSourceClip *>(seg);
+				if (sourceClip != NULL)
 				{
-					CHECK(fileMob->GetSlots (&fileSlotIter));
-					CHECK(fileSlotIter->NextOne(&fileSlot));
-					CHECK(fileSlot->GetSegment(&fileSeg));
-					CHECK(fileSeg->GetLength(&endPos));
-					fileSeg->ReleaseReference();
-					fileSeg = NULL;
-					fileSlotIter->ReleaseReference();
-					fileSlotIter = NULL;
+					CHECK(sourceClip->ResolveRef(&fileMob));
+					CHECK(fileMob->CountSlots(&fileNumSlots));
+					if(fileNumSlots >= 1)
+					{
+						CHECK(fileMob->GetSlots (&fileSlotIter));
+						CHECK(fileSlotIter->NextOne(&fileSlot));
+						CHECK(fileSlot->GetSegment(&fileSeg));
+						CHECK(fileSeg->GetLength(&endPos));
+						fileSeg->ReleaseReference();
+						fileSeg = NULL;
+						fileSlotIter->ReleaseReference();
+						fileSlotIter = NULL;
+					}
+					else
+						fileSlot = NULL;
+					fileMob->ReleaseReference();
+					fileMob = NULL;
+					CHECK(slot->ConvertToMyRate(endPos, fileSlot, &endPos));
+					if(fileSlot != NULL)
+					{
+						fileSlot->ReleaseReference();
+						fileSlot = NULL;
+					}
+					CHECK(seg->SetLength(endPos));
 				}
-				else
-					fileSlot = NULL;
-				fileMob->ReleaseReference();
-				fileMob = NULL;
-				CHECK(slot->ConvertToMyRate(endPos, fileSlot, &endPos));
-				if(fileSlot != NULL)
-				{
-					fileSlot->ReleaseReference();
-					fileSlot = NULL;
-				}
+
 				slot->ReleaseReference();
 				slot = NULL; 
-				CHECK(seg->SetLength(endPos));
 				seg->ReleaseReference();
 				seg = NULL;
 			} else {

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDictionary.h,v 1.3.2.2 2004/04/17 20:55:32 jptrainor Exp $ $Name:  $
+// $Id: CAAFDictionary.h,v 1.3.2.3 2004/06/08 13:45:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1002,8 +1002,8 @@ public:
   // 
   STDMETHOD (LookupKLVDataDef)
    (
-    // @parm [in, ref] aafUID_constref | parameterId | Parameter Unique ID
-    aafUID_constref  parameterId,
+    // @parm [in, ref] aafUID_constref | defId | KLV data definition Unique ID
+    aafUID_constref  defId,
 
     // @parm [out,retval] AAFKLVDataDefinition | ppDef | KLVData descriptor object
     IAAFKLVDataDefinition ** ppDef
@@ -1077,8 +1077,8 @@ public:
   // 
   STDMETHOD (LookupTaggedValueDef)
    (
-    // @parm [in, ref] aafUID_constref | parameterId | Parameter Unique ID
-    aafUID_constref  parameterId,
+    // @parm [in, ref] aafUID_constref | defId | tagged value definition ID
+    aafUID_constref  defId,
 
     // @parm [out,retval] AAFTaggedValueDefinition | ppDef | tagged value descriptor object
     IAAFTaggedValueDefinition ** ppDef

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxImplPlugin.cpp,v 1.5 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxImplPlugin.cpp,v 1.5.2.1 2004/06/08 13:45:23 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,7 @@
 
 #include <AxTypes.h>
 #include <AxEssence.h>
+#include <AxDefObject.h>
 #include <AxDictionary.h>
 
 #include <AAFCodecDefs.h>

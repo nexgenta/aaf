@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPulldown.cpp,v 1.20 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPulldown.cpp,v 1.20.2.1 2004/06/08 13:46:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -277,7 +277,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			  if (maskBits)
 				{
 				  revolutions = abs(offset32) / masksize;
-				  remainder = offset32 % masksize;
+				  remainder = (char)(offset32 % masksize);
 				  if(srcPhase != NULL)
 				  	*srcPhase = remainder;
 				  
@@ -296,7 +296,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			  if (maskBits)
 				{
 				  revolutions = abs(offset32) / maskones;
-				  remainder = offset32 % maskones;
+				  remainder = (char)(offset32 % maskones);
 				  if(srcPhase != NULL)
 				  	*srcPhase = remainder;
 

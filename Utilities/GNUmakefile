@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.6 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6.2.1 2004/06/08 13:45:02 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,15 +37,18 @@ eli2aaf:
 .PHONY : aafviewer
 aafviewer:
 	cd aafviewer/src/aaf2dot && $(MAKE)
+	cd aafviewer/src/aafmeta2dot && $(MAKE)
 
 .PHONY : clean
 clean :
 	cd AafOmf && $(MAKE) GENDEPS=0 $@
 	cd eli2aaf && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aaf2dot && $(MAKE) GENDEPS=0 $@
+	cd aafviewer/src/aafmeta2dot && $(MAKE) GENDEPS=0 $@
 
 .PHONY : realclean
 realclean :
 	cd AafOmf && $(MAKE) GENDEPS=0 $@
 	cd eli2aaf && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aaf2dot && $(MAKE) GENDEPS=0 $@
+	cd aafviewer/src/aafmeta2dot && $(MAKE) GENDEPS=0 $@

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefStream
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.15 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.15.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -136,12 +136,12 @@ extern "C"
   // Main test function.
   HRESULT CAAFTypeDefStream_test(testMode_t mode);
 
+}
   // Create the test file.
   void CAAFTypeDefStream_create (aafCharacter_constptr pFileName); // throw HRESULT
 
   // Open the test file read only and validate the data.
   void CAAFTypeDefStream_read (aafCharacter_constptr pFileName); // throw HRESULT
-}
 
 
 HRESULT CAAFTypeDefStream_test(testMode_t mode)

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMContainerElementT.h,v 1.35 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMContainerElementT.h,v 1.35.2.1 2004/06/08 13:45:39 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -242,7 +242,7 @@ OMSetElement<UniqueIdentification, ReferencedObject>::identification(
 {
   TRACE("OMSetElement<UniqueIdentification, ReferencedObject>::"
                                                              "identification");
-  ReferencedObject* object = getValue();
+  ReferencedObject* object = this->getValue();
   ASSERT("Valid object", object!= 0);
   return object->identification();
 }

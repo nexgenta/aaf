@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4.2.1 2004/04/05 09:10:37 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4.2.2 2004/06/08 13:45:24 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,8 +38,9 @@ endif
 include $(AAFBASE)/build/common.mk
 
 INCLUDES = -I. \
-	   -I../axLib \
-	   -I$(AAFSDKINCLUDEDIR)
+		-I../axLib \
+		-I../../ref-impl/include \
+		-I../../ref-impl/include/ref-api
 
 .PHONY : all
 all : axPlugin

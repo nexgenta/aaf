@@ -1,5 +1,5 @@
 /*
- * $Id: InstanceMapperProfile.cpp,v 1.3 2004/03/02 11:06:17 philipn Exp $ $Name:  $
+ * $Id: InstanceMapperProfile.cpp,v 1.2.2.1 2004/06/08 13:45:02 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *

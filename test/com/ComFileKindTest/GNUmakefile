@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3.2.1 2004/04/05 09:35:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3.2.2 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,8 +42,13 @@ INCLUDES = -I../../../ref-impl/include \
 all : $(OBJDIR) $(AAFSDKBINDIR)/ComFileKindTest$(EXE)
 
 
+ifeq ($(AAFTARGET),Debug-static)
+$(AAFSDKBINDIR)/ComFileKindTest$(EXE) : $(CXXOBJS)
+	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@ 
+else
 $(AAFSDKBINDIR)/ComFileKindTest$(EXE) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@ 
+endif
 
 
 .PHONY : clean
@@ -59,4 +64,3 @@ realclean : clean
 
 
 include $(AAFBASE)/build/rules.mk
-

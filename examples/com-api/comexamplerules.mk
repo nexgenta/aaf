@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: comexamplerules.mk,v 1.7.2.1 2004/04/05 09:35:15 stuart_hc Exp $ $Name:  $
+# $Id: comexamplerules.mk,v 1.7.2.2 2004/06/08 13:45:05 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
+INCLUDES = -I../../../ref-impl/include -I../../../ref-impl/include/ref-api \
 			-I../../../ref-impl/src/com-api
 
 
@@ -42,10 +42,14 @@ BINTARGET = $(AAFSDKBINDIR)/$(EXAMPLE)$(EXE)
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET)
 
-
+ifeq ($(AAFTARGET),Debug-static)
+$(BINTARGET) : $(CXXOBJS)
+	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
+else
 $(BINTARGET) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) $(RPATH_OPT) \
 	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
+endif
 
 
 .PHONY : clean

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAxNullEssenceCodec.h,v 1.5 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: CAxNullEssenceCodec.h,v 1.5.2.1 2004/06/08 13:45:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,15 +62,15 @@ public:
 	STDMETHOD(QueryInterface)(const IID& iid, void** ppv)    
 	{	                                                     
 		return GetOuterUnknown()->QueryInterface(iid,ppv) ;  
-	} ;	                                                     
+	}
 	STDMETHOD_(ULONG, AddRef)()	                             
 	{	                                                     
 		return GetOuterUnknown()->AddRef() ;                 
-	} ;	                                                     
+	}	                                                     
 	STDMETHOD_(ULONG, Release)() 	                         
 	{	                                                     
 		return GetOuterUnknown()->Release() ;               
-	} ;
+	}
 
 	
 	// Override CAxUnknown::NondelegatingQueryInterface() in order to add

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxTypes.cpp,v 1.7 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxTypes.cpp,v 1.7.2.1 2004/06/08 13:45:23 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -183,11 +183,19 @@ bool operator<( const aafUID_t& uidL, const aafUID_t& uidR )
 	return 0 > ::memcmp( &uidL, &uidR, sizeof( aafUID_t ) );
 }
 
+#if !defined(DISABLE_DYNAMIC_LOADING)
+// These two operators are also defined in ImplAAFCloneResolver.cpp
+// so only build if this is not a static build to avoid a clash.
 bool operator==( const aafUID_t& uidL, const aafUID_t& uidR )
 {
 	return 0 == ::memcmp( &uidL, &uidR, sizeof( aafUID_t ) );
 }
 
+bool operator==( const aafMobID_t& lhs, const aafMobID_t& rhs )
+{
+  return 0 == ::memcmp( &lhs, &rhs, sizeof( aafMobID_t ) );
+}
+#endif
 
 #if !(defined(OS_WINDOWS) || defined(OS_MACOS))
 bool operator==( const tagGUID& uidL, const tagGUID& uidR )
@@ -196,3 +204,7 @@ bool operator==( const tagGUID& uidL, const tagGUID& uidR )
 }
 #endif
 
+bool operator<( const aafMobID_t& lhs, const aafMobID_t& rhs )
+{
+  return 0 > ::memcmp( &lhs, &rhs, sizeof( aafMobID_t ) );
+}

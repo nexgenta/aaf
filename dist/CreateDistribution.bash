@@ -1,7 +1,7 @@
 #! /bin/bash
 ###############################################################################
 #
-# $Id: CreateDistribution.bash,v 1.5 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: CreateDistribution.bash,v 1.5.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,21 @@ create_unix_distribution ()
 	FileList=`grep -v \# $3`;
 	tar cvf - ${FileList} | gzip -c > ${filename}
 }
+
+create_darwin_distribution ()
+{
+        echo create_darwin_distribution $1 $2 $3 $5;
+	AAFSDK="$1"
+	DIST_FILE_NAME="$2"
+	DIST_LIST="$3"
+	AAFSDKBUILD_H="$4"
+	RELEASE_TYPE="$5"
+
+	$AAFSDK/Scripts/mkDistRoot "$AAFSDK" "$DIST_LIST"
+	$AAFSDK/Scripts/mkDistPackage "$AAFSDK" "$DIST_FILE_NAME" "$AAFSDKBUILD_H" "$RELEASE_TYPE"
+	$AAFSDK/Scripts/rmDistRoot "$AAFSDK"
+}
+
 
 create_macos9_distribution ()
 {
@@ -137,6 +152,8 @@ case ${AAFPLATFORM} in
 	Win       ) create_win_distribution $AAFSDK $DIST_FILE_NAME $DIST_LIST  ;;
 
 	Mac       ) create_macos9_distribution $AAFSDK $DIST_FILE_NAME $DIST_LIST  ;;
+
+	PPCDarwin ) create_darwin_distribution "$AAFSDK" "$DIST_FILE_NAME" "$DIST_LIST" "$AAFSDKBUILD_H" $1 ;;
 
 	*         ) usage;;
 esac

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.cpp,v 1.32 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: aaflib.cpp,v 1.32.2.1 2004/06/08 13:45:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,11 +41,18 @@
 #define DEFAULT_AAFDLL_NAME "AAFCOAPI.dll"
 #elif defined( OS_MACOS )
 #define DEFAULT_AAFDLL_NAME "AAFCOAPI.DLL (PPC)"
+#elif defined( OS_DARWIN )
+#define DEFAULT_AAFDLL_NAME "libcom-api.dylib"
 #elif defined( OS_UNIX )
 #define DEFAULT_AAFDLL_NAME "libcom-api.so"
 #else
 #error Unknown operating system
 #endif
+
+
+
+// Dynamic loading can be disabled using the Debug-static build.
+#ifndef DISABLE_DYNAMIC_LOADING
 
 
 //
@@ -60,8 +67,6 @@
 // Initialize static singleton data.
 //
 AAFDLL * AAFDLL::_singleton = NULL;
-
-
 
 
 //
@@ -941,3 +946,16 @@ HRESULT AAFDLL::CreateAAFFileOnRawStorage (
 	 pIdent,
 	 ppNewFile);
 }
+
+#else
+
+// Static builds.
+//
+// AAFLoad not needed since it is defined in CAAFModule.cpp
+// But AAFUnload is not.
+STDAPI AAFUnload()
+{
+  return S_OK;
+}
+
+#endif // DISABLE_DYNAMIC_LOADING

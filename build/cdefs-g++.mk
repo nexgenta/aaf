@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-g++.mk,v 1.9 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: cdefs-g++.mk,v 1.9.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -60,6 +60,10 @@ CCVERSION = g++ -v 2>&1 | tail -1
 #------------------------------------------------------------------------------
 DBG_FLAGS = -g 
 
+#------------------------------------------------------------------------------
+# Optimisation flags when building a Release
+#------------------------------------------------------------------------------
+REL_FLAGS = -O2
 
 #------------------------------------------------------------------------------
 # Compiler flags
@@ -87,5 +91,3 @@ XL = -Xlinker
 # Static library linker command
 #------------------------------------------------------------------------------
 #LD_STAT_LIB = ar -cr
-
-

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OpDef.cpp,v 1.2 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: OpDef.cpp,v 1.2.2.1 2004/06/08 13:45:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,7 @@
 
 #include <AxDictionary.h>
 #include <AxEssence.h>
+#include <AxDefObject.h>
 
 namespace {
 

@@ -1,5 +1,5 @@
 /*
- * $Id: AAFPropertyDefinition.cpp,v 1.4 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: AAFPropertyDefinition.cpp,v 1.4.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -157,7 +157,7 @@ AAFPropertyDefinition::BuildDot( AAFDotHome *dotHome, DotFactory *factory, DotGr
       }
       if ( _isUniqueIdentifier )
       {
-	 name += "\\<\\<ID\\>\\> ";
+	 name += "<<ID>> ";
       }
       name += _name;
       DotRecordNodeClassAttribute classAttribute( name, _typeDef->GetName() );

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axPluginInfo.cpp,v 1.6 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: axPluginInfo.cpp,v 1.6.2.1 2004/06/08 13:45:24 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,8 @@
 #include <AxDictionary.h>
 #include <AxPluginMgr.h>
 #include <AxEssence.h>
+#include <AxDefObject.h>
+#include <AxDefObject.h>
 #include <AxIterator.h>
 #include <AxMacMain.h>
 

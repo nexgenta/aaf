@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTaggedValueDefinition.h,v 1.1.2.4 2004/05/24 18:56:58 jptrainor Exp $ $Name:  $
+// $Id: CAAFTaggedValueDefinition.h,v 1.1.2.5 2004/06/08 13:46:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

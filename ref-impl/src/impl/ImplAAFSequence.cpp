@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.cpp,v 1.58 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSequence.cpp,v 1.58.2.1 2004/06/08 13:46:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -956,10 +956,19 @@ AAFRESULT ImplAAFSequence::CheckTypeSemantics( ImplAAFEvent* pEvent )
 	// get with times here and use type_info equality to verify
 	// concrete type identity.
 
+// Ugly workaround for x86 optimisation bug in gcc-3.3.x
+// The bug is not present in gcc-3.2.x or gcc-3.4.x
+#if defined(__i386__) && __GNUC__ == 3 && __GNUC_MINOR__ == 3
+	const char *comp_name = typeid(*GetLastComponent()).name();
+	const char *event_name = typeid(*pEvent).name();
+	if ( strcmp(comp_name, event_name) != 0 ) {
+		return AAFRESULT_EVENT_SEMANTICS;
+	}
+#else
 	if ( typeid( *GetLastComponent() ) != typeid( *pEvent) ) {
 		return AAFRESULT_EVENT_SEMANTICS;
 	}
-
+#endif
 	return AAFRESULT_SUCCESS;
 }
 

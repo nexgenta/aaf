@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTimelineMobSlot.h,v 1.3.2.2 2004/04/07 13:14:50 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTimelineMobSlot.h,v 1.3.2.3 2004/06/08 13:46:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

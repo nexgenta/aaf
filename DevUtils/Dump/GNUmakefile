@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11.2.1 2004/04/05 08:59:55 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11.2.2 2004/06/08 13:45:02 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,43 +26,18 @@ PACKAGE = DevUtils
 
 AAFBASE ?= ../..
 
+# With the removal of the Microsoft Structured Storage reference implementation
+# (librefstg.a) dump cannot be built on the GNUMakefile-supported platforms.
 
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-
-# Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
-	   -I../../ss-impl/ref
-
-
-ifeq ($(AAFPLATFORM),SparcSolaris)
 .PHONY : all
-else
-ifeq ($(AAFPLATFORM),PPCDarwin)
-.PHONY : all
-else
 
-all : $(OBJDIR) $(AAFSDKBINDIR)/dump$(EXE)
-
-$(AAFSDKBINDIR)/dump$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) -L$(AAFSDKLIBDIR) $(LIBCIO) -o $@ \
-	$(AAFBUILDDIR)/ss-impl/librefstg$(LIB)
-
-endif 
-endif 
+all :
 
 .PHONY : clean
-clean :
-	@$(RM) $(CXXOBJS)
-	@$(RM) $(DEPS)
-	@$(RM) $(AAFSDKBINDIR)/dump$(EXE)
-	@$(RMDIR) $(OBJDIR)/ii_files
 
+clean :
 
 .PHONY : realclean
-realclean : clean
 
-
-include $(AAFBASE)/build/rules.mk
+realclean :
 

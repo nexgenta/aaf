@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafCvt.cpp,v 1.17 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: aafCvt.cpp,v 1.17.2.1 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -694,7 +694,7 @@ aafErr_t Int64ToString(
 			while(Int64Greater(workval, zero))
 			{
 				CHECK(DivideInt64byInt32(workval, base, &workval, &remainder));
-				tmpBuf[numDigits++] = remainder + '0';
+				tmpBuf[numDigits++] = (char)(remainder + '0');
 			}
 			if(negative)
 				tmpBuf[numDigits++] = '-';

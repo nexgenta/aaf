@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-MIPSpro.mk,v 1.7 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: cdefs-MIPSpro.mk,v 1.7.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -57,6 +57,10 @@ CCVERSION = CC -version
 #------------------------------------------------------------------------------
 DBG_FLAGS = -g 
 
+#------------------------------------------------------------------------------
+# Optimisation flags when building a Release
+#------------------------------------------------------------------------------
+REL_FLAGS = -O2
 
 #------------------------------------------------------------------------------
 # Compiler flags

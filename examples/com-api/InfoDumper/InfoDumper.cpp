@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.19 2004/03/01 18:44:31 stuart_hc Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.18.2.1 2004/06/08 13:45:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,7 +79,7 @@ typedef struct _dumpFlags
   bool showSMPTE;
   bool showEssence;
   bool identifybyname;
-  bool eagerLoad;
+  bool lazyLoad;
   aafUInt64 maxCount;
   char *showOnlyClasses;
 } dumpFlags_t;
@@ -2549,7 +2549,7 @@ HRESULT dumpRawStreamPropertyValue
 		if (bytesLeft > kStreamReadSize)
 		  bytes = kStreamReadSize;
 		else
-		  bytes = bytesLeft;
+		  bytes = (aafUInt32)bytesLeft;
 		
 		streamResult = pStreamType->Read(pPVal, bytes, streamBuffer, &bytesRead);
 		if (AAFRESULT_FAILED(streamResult))
@@ -2563,7 +2563,7 @@ HRESULT dumpRawStreamPropertyValue
 		os << " /*" << dec << setw(kOffsetWidth) << ostream_int64(offset) << " */";  
 		offset += kStreamBytesPerLine;    
 		
-		aafUInt64 i;
+		aafUInt32 i;
 		char savedFill = os.fill();
 		for (i = 0; (i < kStreamBytesPerLine) && (i < bytesRead);)
 		  {
@@ -2628,10 +2628,10 @@ static bool dumpFile (aafCharacter * pwFileName,
 	HRESULT          hr;
 	int indent=0;
 
-	// eagerLoad support
+	// lazyLoad support
 	aafUInt32 mode = 0;
-	if (dumpFlags.eagerLoad)
-		mode |= AAF_FILE_MODE_EAGER_LOADING;
+	if (dumpFlags.lazyLoad)
+		mode |= AAF_FILE_MODE_LAZY_LOADING;
 	hr = AAFFileOpenExistingRead (pwFileName, mode, &pFile);
 
 	if (! SUCCEEDED (hr))
@@ -2764,7 +2764,7 @@ static void usage (const char * progname)
 	cerr << endl;
 	cerr << "Where option is:" << endl;
 	cerr << "  [-o <output-filename>    ]      Specifies output filename (default stdout)" << endl;
-	cerr << "  [-[no]eagerLoad          ]      Use eager loading mode(default=no)" << endl;
+	cerr << "  [-[no]lazyLoad           ]      Use lazyLoad loading mode(default=no)" << endl;
 	cerr << "  [-[no]dict               ]      Displays the dictionary (default=no)" << endl;
 	cerr << "  [-[no]meta               ]      Displays the metadictionary (default=no)" << endl;
 	cerr << "  [-[no]allheader          ]      Displays all Header properties (default=no)"<< endl;
@@ -2805,7 +2805,7 @@ int main(int argc, char* argv[])
 	dumpFlags.maxCount=79;
 	dumpFlags.showOnlyClasses=NULL; 
 	dumpFlags.identifybyname=true;
-	dumpFlags.eagerLoad=false;
+	dumpFlags.lazyLoad=false;
 	
 
 	// Process command line args
@@ -2891,12 +2891,12 @@ int main(int argc, char* argv[])
 		} else if (!strcmp("-h", argv[comArg]))
 		{
 		  usage (argv[0]);
-		} else if (!strcmp("-eagerLoad", argv[comArg]) && (comArg < (argc-1)))
+		} else if (!strcmp("-lazyLoad", argv[comArg]) && (comArg < (argc-1)))
 		{
-			dumpFlags.eagerLoad = true;
-		} else if (!strcmp("-noeagerLoad", argv[comArg]) && (comArg < (argc-1)))
+			dumpFlags.lazyLoad = true;
+		} else if (!strcmp("-nolazyLoad", argv[comArg]) && (comArg < (argc-1)))
 		{
-			dumpFlags.eagerLoad = false;
+			dumpFlags.lazyLoad = false;
 		} else
 		{
 			cerr << "Unprocessed command argument: " << argv[comArg] << endl;

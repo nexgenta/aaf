@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataDef.cpp,v 1.19 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDataDef.cpp,v 1.19.2.1 2004/06/08 13:46:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -96,6 +96,22 @@ AAFRESULT STDMETHODCALLTYPE
       aafBool *bIsSoundKind)
 {
 	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddSound(), bIsSoundKind));
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDataDef::IsTimecodeKind (
+      aafBool *bIsTimecodeKind)
+{
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddTimecode(), bIsTimecodeKind));
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDataDef::IsEdgecodeKind (
+      aafBool *bIsEdgecodeKind)
+{
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddEdgecode(), bIsEdgecodeKind));
 }
 
 

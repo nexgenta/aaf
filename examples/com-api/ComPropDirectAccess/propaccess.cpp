@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: propaccess.cpp,v 1.21 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+// $Id: propaccess.cpp,v 1.21.2.1 2004/06/08 13:45:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "AAF.h"
+#include "AAFFileMode.h"
 
 
 #include "CAAFBuiltinDefs.h"
@@ -612,7 +613,7 @@ static void ReadAAFFile(aafWChar * pFileName,
 						/*[in]*/ aafMobID_constref createdMobID)
 {
   IAAFFileSP spFile;
-  check (AAFFileOpenExistingRead(pFileName, 0, &spFile));
+  check (AAFFileOpenExistingRead(pFileName, AAF_FILE_MODE_LAZY_LOADING, &spFile));
 
   IAAFHeaderSP spHeader;
   check (spFile->GetHeader(&spHeader));

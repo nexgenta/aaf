@@ -1,14 +1,14 @@
 #ifndef __AAFResult_h__
 #define __AAFResult_h__
 
-#if defined(_MAC) || defined(macintosh)
+#if ((defined(_MAC) || defined(macintosh)) && ! defined(PPC_DARWIN))
 // Make sure SEVERITY_ERROR and FACILITY_ITF are defined.
 #include <scode.h>
 #endif
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.61 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.61.2.1 2004/06/08 13:45:25 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
