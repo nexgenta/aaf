@@ -3,27 +3,13 @@
 #ifndef __ImplAAFTypeDefInt_h__
 #define __ImplAAFTypeDefInt_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 #ifndef __ImplAAFTypeDef_h__
@@ -52,7 +38,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
+         const aafUID_t *  pID,
 
          // @parm [in] the size of this integer type in bytes
          aafUInt8  intSize,
@@ -61,7 +47,7 @@ public:
          aafBool  isSigned,
 
          // @parm [in, string] friendly name of this type definition
-         const aafCharacter * pTypeName);
+         wchar_t *  pTypeName);
 
 
   //****************
@@ -168,6 +154,9 @@ public:
 
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFTypeDefInt)
 
   // overrides from ImplAAFTypeDef
   //
@@ -177,29 +166,9 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RawAccessType
-        (ImplAAFTypeDef ** ppRawTypeDef);
-
-
-public:
-  // Overrides from ImplAAFTypeDef
-  virtual bool IsAggregatable () const;
-  virtual bool IsStreamable () const;
-  virtual bool IsFixedArrayable () const;
-  virtual bool IsVariableArrayable () const;
-  virtual bool IsStringable () const;
-
-
-  // override from OMStorable.
-  virtual const OMClassId& classId(void) const;
-
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
 
 private:
   // the size of this integer type in bytes

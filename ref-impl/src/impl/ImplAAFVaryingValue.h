@@ -4,45 +4,25 @@
 #define __ImplAAFVaryingValue_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
 
 class ImplAAFDataDef;
 class ImplAAFControlPoint;
+class ImplEnumAAFControlPoints;
+class ImplAAFInterpolationDef;
 
-template <class T> 
-class ImplAAFEnumerator;
-typedef ImplAAFEnumerator<ImplAAFControlPoint> ImplEnumAAFControlPoints;
+
+
 
 #ifndef __ImplAAFParameter_h__
 #include "ImplAAFParameter.h"
 #endif
-
-#ifndef __ImplAAFInterpolationDef_h__
-#include "ImplAAFInterpolationDef.h"
-#endif
-
-#include "OMWeakRefProperty.h"
-#include "OMStrongRefVectorProperty.h"
 
 #include "ImplEnumAAFControlPoints.h"
 
@@ -54,20 +34,6 @@ public:
   //
   //********
   ImplAAFVaryingValue ();
-
-
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (// @parm [in] // Parameter definition for this object (this determines the type of the constant value)
-         ImplAAFParameterDef * pParameterDef,
-         
-         // @parm [in] Interpolation definition for this object
-         ImplAAFInterpolationDef * pInterpolationDef);
-
-
 
 protected:
   virtual ~ImplAAFVaryingValue ();
@@ -90,11 +56,11 @@ public:
     GetInterpolationDefinition
         (ImplAAFInterpolationDef ** ppDef);
 
-  //****************
-  // AddControlPoint()
+    //****************
+  // AppendPoint()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddControlPoint
+    AppendPoint
         // @parm [in] pointer to IAAFControlPoint object
         (ImplAAFControlPoint * pPoint);
 
@@ -106,35 +72,6 @@ public:
     GetControlPoints
         // @parm [out,retval] Parameter definition enumeration
         (ImplEnumAAFControlPoints ** ppEnum);
-
-  //****************
-  // CountControlPoints()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountControlPoints
-        // @parm [out,retval] Parameter definition enumeration
-        (aafUInt32 * pResult);
-
-
-  //****************
-  // GetControlPointAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetControlPointAt
-        // @parm [in] index of control point to retrieve
-        (aafUInt32 index,
-		 // @parm [out,retval] retrieved control point
-		 ImplAAFControlPoint ** ppControlPoint);
-
-
-  //****************
-  // RemoveControlPointAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveControlPointAt
-        // @parm [in] index of control point to remove
-        (aafUInt32 index);
-
 
   //****************
   // GetValueBufLen()
@@ -163,13 +100,17 @@ public:
 
 public:
 	// SDK-private methods
+	virtual AAFRESULT STDMETHODCALLTYPE
+		GetTypeDef(ImplAAFTypeDef **ppTypeDef);
 
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFVaryingValue)
 private:
-	OMWeakReferenceProperty<ImplAAFInterpolationDef>		_interpolation;
-  OMStrongReferenceVectorProperty<ImplAAFControlPoint> _controlPoints;
-
-  ImplAAFTypeDef * _cachedTypeDef; // NOT REFERENCE COUNTED!
-};	
+	OMFixedSizeProperty<aafUID_t>						 _interpolation;
+    OMStrongReferenceVectorProperty<ImplAAFControlPoint> _controlPoints;
+};
 
 #endif // ! __ImplAAFVaryingValue_h__
 

@@ -4,49 +4,91 @@
 #define __ImplEnumAAFMobs_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
-#include "ImplAAFEnumerator.h"
 
-#include "ImplAAFMob.h"
+class ImplAAFMob;
 
-class ImplEnumAAFMobs: public ImplAAFEnumerator<ImplAAFMob>
+
+
+
+
+
+
+#ifndef __ImplAAFRoot_h__
+#include "ImplAAFRoot.h"
+#endif
+
+#include "ImplAAFContentStorage.h"
+
+class ImplEnumAAFMobs : public ImplAAFRoot
 {
 public:
-	ImplEnumAAFMobs ();
+  //
+  // Constructor/destructor
+  //
+  //********
+  ImplEnumAAFMobs ();
+  ~ImplEnumAAFMobs ();
 
-	virtual AAFRESULT STDMETHODCALLTYPE NextOne(ImplAAFMob ** ppMob);
-	virtual AAFRESULT STDMETHODCALLTYPE Next(
-		aafUInt32  count,
-		ImplAAFMob ** ppMobs,
-		aafUInt32 *  pFetched);
-	virtual AAFRESULT STDMETHODCALLTYPE Skip(aafUInt32  count);
-	// Clone() wrapper for pointer compatibility
-	virtual AAFRESULT STDMETHODCALLTYPE Clone(ImplEnumAAFMobs ** ppEnum);
 
-    AAFRESULT SetCriteria(aafSearchCrit_t *pCriteria);
+  //****************
+  // NextOne()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    NextOne
+        (ImplAAFMob ** ppMob);  //@parm [out,retval] The Next Mob
+
+
+  //****************
+  // Next()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Next
+        (aafUInt32  count,   //@parm [in] number of mobs requested
+		 ImplAAFMob ** ppMobs,   //@parm [out, size_is(count), length_is(*pFetched)] array to receive mobs
+         aafUInt32 *  pFetched);  //@parm [out,ref] number of actual Mobs fetched into ppMobs array
+
+
+  //****************
+  // Skip()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Skip
+        (aafUInt32  count);  //@parm [in] Number of elements to skip
+
+
+  //****************
+  // Reset()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Reset ();
+
+
+  //****************
+  // Clone()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Clone
+        (ImplEnumAAFMobs ** ppEnum);  //@parm [out,retval] new enumeration
+
+public:
+// Internal to the toolkit
+AAFRESULT
+    SetContentStorage(ImplAAFContentStorage *pCStore);
+AAFRESULT
+    SetCriteria(aafSearchCrit_t *pCriteria);
+
 private:
-	aafSearchCrit_t	_criteria;
+	aafInt32				_current;
+	ImplAAFContentStorage	*_cStorage;
+	aafSearchCrit_t			_criteria;
 };
 
 #endif // ! __ImplEnumAAFMobs_h__

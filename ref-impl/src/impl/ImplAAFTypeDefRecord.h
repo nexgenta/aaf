@@ -3,27 +3,13 @@
 #ifndef __ImplAAFTypeDefRecord_h__
 #define __ImplAAFTypeDefRecord_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 class ImplAAFPropertyValue;
 
@@ -33,7 +19,6 @@ class ImplEnumAAFPropertyValues;
 #include "ImplAAFTypeDef.h"
 #endif
 
-#include "OMWeakRefVectorProperty.h"
 
 class ImplAAFTypeDefRecord : public ImplAAFTypeDef
 {
@@ -55,7 +40,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
+         const aafUID_t *  pID,
 
          // @parm [in, size_is(numMembers)] array of member types to
 		 // be represented in this record type
@@ -69,7 +54,7 @@ public:
          aafUInt32  numMembers,
 
          // @parm [in] friendly name of this type definition
-         const aafCharacter *  pTypeName);
+         wchar_t *  pTypeName);
 
 
   //****************
@@ -96,7 +81,7 @@ public:
 
          // @parm [out, size_is(bufSize), string] buffer into which
 		 // the member name is written
-         aafCharacter *  pName,
+         wchar_t *  pName,
 
          // @parm [in] The size of the pName buffer, in bytes
          aafUInt32  bufSize);
@@ -138,7 +123,7 @@ public:
     CreateValueFromStruct
         (// @parm [in, size_is(initDataSize)] pointer to compile-time
 		 // struct containing data to use
-         aafMemPtr_t pInitData,
+         aafMemPtr_t *  pInitData,
 
          // @parm [in] size of data in pInitData
          aafUInt32  initDataSize,
@@ -268,29 +253,6 @@ public:
                            OMByteOrder byteOrder) const;
 
 
-  //****************
-  // pvtInitialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
-        (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
-
-         // @parm [in, size_is(numMembers)] array of member types to
-		 // be represented in this record type
-         ImplAAFTypeDef ** pMemberTypeIDs,
-
-         // @parm [in, size_is(numMembers)] array of member names to
-		 // be represented in this enumerated  type
-         aafString_t *  pMemberNames,
-
-         // @parm [in] number of members in pMemberInfo array
-         aafUInt32  numMembers,
-
-         // @parm [in] friendly name of this type definition
-         const aafCharacter *  pTypeName);
-
-
 private:
 
   void pvtInitInternalSizes (void) const;
@@ -299,12 +261,11 @@ private:
   // types of members in this record
   //
   // BobT Note!!! This should be weak reference vector property...
-  //OMVariableSizeProperty<aafUID_t> _memberTypes;
-  OMWeakReferenceVectorProperty<ImplAAFTypeDef> _memberTypes;
+  OMVariableSizeProperty<aafUID_t> _memberTypes;
 
-  // names of members in this record; stored as single aafCharacter
-  // array with embedded nulls
-  OMVariableSizeProperty<aafCharacter> _memberNames;
+  // names of members in this record; stored as single wchar_t array
+  // with embedded nulls
+  OMVariableSizeProperty<wchar_t> _memberNames;
 
   // when registered, will point to array of ints with registered
   // offsets of each field
@@ -318,17 +279,14 @@ private:
   // registered, will be determined from PropValSize()s.
   aafUInt32 * _internalSizes;
 
-  ImplAAFTypeDef **  _cachedMemberTypes;
+  ImplAAFTypeDefSP * _cachedMemberTypes;
 
   aafUInt32          _cachedCount;
 
-  aafInt32           _cachedPropValSize;
-  aafBool            _propValSizeIsCached;
-  aafBool            _registrationAttempted;
-
-  aafBool            _defaultRegistrationUsed;
-
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFTypeDefRecord)
 
   // overrides from ImplAAFTypeDef
   //
@@ -336,32 +294,10 @@ public:
   size_t PropValSize (void) const;
   aafBool IsRegistered (void) const;
   size_t NativeSize (void) const;
-  void AttemptBuiltinRegistration (void);
 
   virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RawAccessType
-        (ImplAAFTypeDef ** ppRawTypeDef);
-
-public:
-  // Overrides from ImplAAFTypeDef
-  virtual bool IsAggregatable () const;
-  virtual bool IsStreamable () const;
-  virtual bool IsFixedArrayable () const;
-  virtual bool IsVariableArrayable () const;
-  virtual bool IsStringable () const;
-
-
-
-  // override from OMStorable.
-  virtual const OMClassId& classId(void) const;
-
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
 };
 
 //

@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 
 #ifndef __ImplAAFTextLocator_h__
 #include "ImplAAFTextLocator.h"
@@ -33,7 +19,7 @@
 
 
 ImplAAFTextLocator::ImplAAFTextLocator () :
-	_name(PID_TextLocator_Name,		L"Name")
+	_name(PID_TextLocator_Name,		"Text Locator")
 {
 	_persistentProperties.put(_name.address());
 	_name = L"";
@@ -51,7 +37,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTextLocator::GetName (aafCharacter* pNameBuf, aafUInt32  bufSize)
+    ImplAAFTextLocator::GetName (wchar_t* pNameBuf, aafInt32  bufSize)
 {
 	bool stat;
 	if (! pNameBuf)
@@ -70,7 +56,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTextLocator::GetNameBufLen (aafUInt32* pLen)
+    ImplAAFTextLocator::GetNameBufLen (aafInt32* pLen)
 {
 	if (! pLen)
 	{
@@ -84,7 +70,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTextLocator::SetName (const aafCharacter* pNameBuf)
+    ImplAAFTextLocator::SetName (wchar_t* pNameBuf)
 {
 	if (! pNameBuf)
 	{
@@ -97,5 +83,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFTextLocator, AUID_AAFTextLocator);
 
 

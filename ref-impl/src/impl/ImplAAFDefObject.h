@@ -3,27 +3,13 @@
 #ifndef __ImplAAFDefObject_h__
 #define __ImplAAFDefObject_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
@@ -33,9 +19,10 @@
 #include "ImplAAFObject.h"
 #endif
 
-#include "OMWideStringProperty.h"
-
 class ImplAAFDictionary;
+
+#include "ImplAAFPluginDescriptor.h"
+#include "ImplEnumAAFPluginDescriptors.h"
 
 class ImplAAFDefObject : public ImplAAFObject
 {
@@ -51,24 +38,14 @@ protected:
 
 public:
 
+  // SetAUID()
+  //
   virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
+    Init
         // @parm [in] Pointer to an AUID reference
-        (const aafUID_t & id,
+        (const aafUID_t *  pAuid,
 		 const wchar_t *name,
 		 const wchar_t *description);
-
-  //****************
-  // Initialize()
-  //
-  AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        // @parm [in] Pointer to an AUID reference
-        (const aafUID_t & id,
-		 const aafCharacter *name,
-		 const aafCharacter *description = NULL);
-
-
   //****************
   // GetAUID()
   //
@@ -82,8 +59,8 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetAUID
-        // @parm [in] AUID by which this object is to be identified
-        (const aafUID_t & id);
+        // @parm [in] Pointer to an AUID reference
+        (const aafUID_t *  pAuid);
 
 
   //****************
@@ -91,7 +68,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetName
-        (const aafCharacter *  name);  //@parm [in, ref] Definition Name
+        (const wchar_t *  name);  //@parm [in, ref] Definition Name
 
 
   //****************
@@ -119,7 +96,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetDescription
-        (const aafCharacter * description);  //@parm [in, ref] Definition description
+        (aafWChar *  description);  //@parm [in, ref] Definition description
 
 
   //****************
@@ -138,7 +115,39 @@ public:
     GetDescriptionBufLen
         (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
 
-  virtual const OMUniqueObjectIdentification& identification(void) const;
+  //****************
+  // AppendPluginDescriptor()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AppendPluginDescriptor
+        // @parm [in] PluginDescriptor to append
+        (ImplAAFPluginDescriptor * pPluginDescriptor);
+
+
+  //****************
+  // PrependPluginDescriptor()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    PrependPluginDescriptor
+        // @parm [in] PluginDescriptor to append
+        (ImplAAFPluginDescriptor * pPluginDescriptor);
+
+  //****************
+  // EnumPluginDescriptors()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    EnumPluginDescriptors
+        // @parm [out, retval] AAFPluginDescriptor Enumeration
+        (ImplEnumAAFPluginDescriptors ** ppEnum);
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFDefObject)
+
+public:
+	// Functions internal to the toolkit
 
 private:
   // friendly name of this definition
@@ -149,6 +158,7 @@ private:
 
   // auid to be used to identify this definition
   OMFixedSizeProperty<aafUID_t> _identification;
+  OMVariableSizeProperty<aafUID_t> _descriptors;
 };
 
 //

@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 //@doc
 //@class    AAFTextLocator | Implementation class for AAFTextLocator
 #ifndef __ImplAAFTextLocator_h__
@@ -27,8 +13,6 @@
 #ifndef __ImplAAFLocator_h__
 #include "ImplAAFLocator.h"
 #endif
-
-#include "OMWideStringProperty.h"
 
 
 class ImplAAFTextLocator : public ImplAAFLocator
@@ -58,10 +42,10 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetName
         (// @parm [out, size_is(bufSize), string] buffer into which Name is written
-         aafCharacter *  pNameBuf,
+         wchar_t *  pNameBuf,
 
          // @parm [in] The size of the pNameBuf buffer
-         aafUInt32  bufSize);
+         aafInt32  bufSize);
 
 
   //****************
@@ -70,7 +54,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetNameBufLen
         // @parm [out] required buffer length
-        (aafUInt32 *  pLen);
+        (aafInt32 *  pLen);
 
 
   //****************
@@ -79,8 +63,14 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetName
         // @parm [in, string] the new Name
-        (const aafCharacter *  pNameBuf);
+        (wchar_t *  pNameBuf);
 
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFTextLocator)
 
   // Persistent data
 private:

@@ -1,26 +1,12 @@
 #ifndef __AAFSmartPointerBase_h__
 #define __AAFSmartPointerBase_h__
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 
 //
 // This is a smart pointer template class for use as a reference to
@@ -108,8 +94,8 @@ template <typename ReferencedObject>
 struct AAFCountedReference
 {
 protected:
-  virtual aafUInt32 acquire (ReferencedObject * pObj) = 0;
-  virtual aafUInt32 release (ReferencedObject * pObj) = 0;
+  virtual void acquire (ReferencedObject * pObj) = 0;
+  virtual void release (ReferencedObject * pObj) = 0;
 };
 
 
@@ -133,7 +119,7 @@ struct AAFSmartPointerBase : public RefCountType
   AAFSmartPointerBase (const AAFSmartPointerBase<ReferencedType, RefCountType> & src);
   
   // dtor
-  virtual ~AAFSmartPointerBase ();
+  ~AAFSmartPointerBase ();
 
   // assignment operator
   AAFSmartPointerBase<ReferencedType, RefCountType> & operator=
@@ -179,7 +165,7 @@ AAFSmartPointerBase ()
 
 template <typename ReferencedType, typename RefCountType>
 AAFSmartPointerBase<ReferencedType, RefCountType>::
-AAFSmartPointerBase
+AAFSmartPointerBase\
   (const AAFSmartPointerBase<ReferencedType, RefCountType> & src)
 	: _rep (src._rep)
 {
@@ -194,7 +180,6 @@ AAFSmartPointerBase<ReferencedType, RefCountType>::
 {
   if (_rep)
 	{
-	  aafUInt32 refCnt =
 	  release (_rep);
 	  _rep = 0;
 	}
@@ -208,10 +193,7 @@ operator=
   (const AAFSmartPointerBase<ReferencedType, RefCountType> & src)
 {
   if (_rep)
-	{
-	  release (_rep);
-	  _rep = 0;
-	}
+	release (_rep);
 
   _rep = src._rep;
   if (_rep)

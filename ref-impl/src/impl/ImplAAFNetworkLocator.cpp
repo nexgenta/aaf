@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -23,7 +22,7 @@
 
 
 ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
-: _path(PID_NetworkLocator_URLString, "URL String")
+: _path(PID_NetworkLocator_URLString, "URLString")
 {
   _persistentProperties.put(_path.address());
   _path = L"";

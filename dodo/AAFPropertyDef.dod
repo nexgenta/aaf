@@ -1,30 +1,16 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFPropertyDef\
 #endm
 #c
 #startm .parent-module 0
-AAFMetaDefinition\
+AAFDefObject\
 #endm
 #c
 AD_HEAD
@@ -78,7 +64,7 @@ AD_STD_METHOD_STRING_GET_AND_SIZE(Name, the human-legible name.)
 AD_XMETHOD1(GetIsOptional,
 			[out\, retval],
 			objPass,
-			aafBoolean_t *,
+			aafBool *,
 			pIsOptional,
 			pointer to the result, 
 
@@ -99,18 +85,19 @@ AD_XMETHOD1(GetIsOptional,
   // AAFRESULT_NULL_PARAM
   //   - The pIsOptional pointer is NULL.)
 
-AD_XMETHOD1(GetIsUniqueIdentifier,
+
+AD_XMETHOD1(GetIsSearchable,
 			[out\, retval],
 			objPass,
-			aafBoolean_t *,
-			pIsUniqueIdentifier,
+			aafBool *,
+			pIsSearchable,
 			pointer to the result, 
 
-     Sets *pIsUniqueIdentifier to AAFTrue for properties that are optional.
-  // Sets it to AAFFalse for properties that are mandatory.
+			Sets *pIsSearchable to AAFTrue for properties that can contain
+  // user-searchable data.  Sets it to AAFFalse otherwise.
   //
   // Succeeds if:
-  // - The pIsUniqueIdentifier pointer is valid.
+  // - The pIsSearchable pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -121,12 +108,85 @@ AD_XMETHOD1(GetIsUniqueIdentifier,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - The pIsUniqueIdentifier pointer is NULL.)
+  //   - The pIsSearchable pointer is NULL.)
 
 
+AD_XMETHOD1(SetIsSearchable,
+			[in],
+			objPass,
+			aafBool,
+			IsSearchable,
+			is searchable value, 
+
+			Sets the user-searchable boolean\, which will indicate
+  // whether or not this property can contain user-searchable data.
+  // Set it to AAFTrue if it can contain user-searchable data; set it
+  // to AAFFalse otherwise.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(Description,
 		 the description of the property definition.)
+
+
+AD_XMETHOD1(GetDefaultValue,
+			[out\, retval],
+			objOut,
+            AAFPropertyValue,
+			ppDataValue,
+			Pointer to default data value,
+
+			Gets the default data value of this property definition.
+  // 
+  // Succeeds if all of the following are true:
+  // - the ppDataValue pointer is valid.
+  // 
+  // If this method fails *ppDataValue will not be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppDataValue arg is NULL.)
+
+
+AD_XMETHOD1(SetDefaultValue,
+			[in],
+			objIn,
+			AAFPropertyValue,
+			pDataValue,
+			default data value,
+
+		   Sets the default data value of this property definition.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pDataValue pointer is valid.
+  // 
+  // If this method fails the Default Value property will not be
+  // changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pDataValue arg is NULL.)
+
 
 AD_XCLASS_END(Concrete, StoredObject)

@@ -4,33 +4,104 @@
 #define __ImplEnumAAFSegments_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
-#include "ImplAAFEnumerator.h"
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
-#include "ImplAAFSegment.h"
+class ImplAAFSegment;
+class ImplAAFSelector;
 
-typedef ImplAAFEnumerator<ImplAAFSegment> ImplEnumAAFSegments;
+
+#ifndef __ImplAAFObject_h__
+#include "ImplAAFObject.h"
+#endif
+
+typedef OMStrongReferenceVectorProperty<ImplAAFSegment> SegmentStrongRefArrayProp_t;
+
+
+class ImplEnumAAFSegments : public ImplAAFRoot
+{
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  ImplEnumAAFSegments ();
+
+protected:
+  virtual ~ImplEnumAAFSegments ();
+
+public:
+
+
+  //****************
+  // NextOne()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    NextOne
+        // @parm [out,retval] The Next Segment
+        (ImplAAFSegment ** ppSegment);
+
+  //****************
+  // Next()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Next
+        (// @parm [in] number of segments requested
+         aafUInt32  count,
+
+         // @parm [out, size_is(count), length_is(*pFetched)] array to receive segments
+         ImplAAFSegment ** ppSegments,
+
+         // @parm [out,ref] number of actual Segments fetched into ppSegments array
+         aafUInt32 *  pFetched);
+
+  //****************
+  // Skip()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Skip
+        // @parm [in] Number of elements to skip
+        (aafUInt32  count);
+
+  //****************
+  // Reset()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Reset ();
+
+
+  //****************
+  // Clone()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Clone
+        // @parm [out,retval] new enumeration
+        (ImplEnumAAFSegments ** ppEnum);
+
+
+public:
+  // SDK Internal 
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEnumStrongProperty( ImplAAFObject *pObj, SegmentStrongRefArrayProp_t *pProp);
+
+private:
+	aafUInt32					_current;
+	ImplAAFObject				*_enumObj;
+	SegmentStrongRefArrayProp_t	*_enumStrongProp;
+};
 
 #endif // ! __ImplEnumAAFSegments_h__
 

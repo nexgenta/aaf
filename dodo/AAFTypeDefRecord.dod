@@ -1,24 +1,10 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefRecord\
 #endm
@@ -31,7 +17,9 @@ AD_HEAD
 AD_IDL(//
 // This interface is used to define C-like structured types used in
 // AAF persistent objects.
-AD_STD_COMMENT_IFC_HEADER)
+//
+AD_STD_COMMENT_IFC_HEADER
+AD_STD_COMMENT_IFC_STUB)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_FORWARD_DECLARATION(EnumAAFPropertyValues)
 AD_CLASS_UUID(809c8ca5, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
@@ -39,13 +27,12 @@ AD_CLASS_UUID(809c8ca5, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
 AD_DEFAULT_UUID(809c8ca6, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_X2METHOD5(Initialize,
-			 [in\, ref],
+			 [in],
 			 objPass,
-			 aafUID_constref,
-			 id,
+			 aafUID_t *,
+			 pID,
 			 auid to be used to identify this type,
-			 xxx1,
-			 xxx2,
+			 ,
 
 			 [in\, size_is\(numMembers\)],
 			 objInArray,
@@ -54,7 +41,6 @@ AD_X2METHOD5(Initialize,
        array of member types to be represented in this record
     // type,
 			 numMembers,
-			 xxx4,
 
 			 [in\, size_is\(numMembers\)],
 			 objPass,
@@ -62,50 +48,35 @@ AD_X2METHOD5(Initialize,
 			 pMemberNames,
        array of member names to be represented in this enumerated
     // type,
-			 xxx5,
-			 xxx6,
+			 ,
 
 			 [in],
 			 objPass,
 			 aafUInt32,
 			 numMembers,
 			 number of members in pMemberInfo array,
-			 xxx7,
-			 xxx8,
+			 ,
 
 			 [in],
 			 objPass,
-			 aafCharacter_constptr,
+			 aafCharacter *,
 			 pTypeName,
 			 friendly name of this type definition,
-			 xxx9,
-			 xxx10,
+			 ,
 
      Initializes this type def to be identified by the given guid\, and
   // to contain the given members \(types and names\).  It is considered
-  // an error if multiple members have the same name.  Note that it is
-  // only possible to use certain types as member types.  Those
-  // permissible types include:
-  // - AAFTypeDefInt
-  // - AAFTypeDefRecord
-  // - AAFTypeDefEnum
-  // - AAFTypeDefExtEnum
-  // - AAFTypeDefFixedArray
+  // an error if multiple members have the same name.
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
   // - pID is a valid pointer.
-  // - pMemberTypes is a valid pointer.
-  // - pMemberNames is a valid pointer.
+  // - pMemberInfo is a valid pointer.
   // - pTypeName is a valid pointer.
-  // - all specified member types are permissible for use in a Record.
   // - all member names are unique.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pMemberTypes\\\, pMemberNames\\\, or pTypeName\)
-  //
-  // AAFRESULT_BAD_TYPE
-  //   - an illegal member type was given.
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pID\\\, pMemberInfo\\\, or pTypeName\)
   //
   // AAFRESULT_DUPLICATE
   //   - a duplicate member name was given.)
@@ -230,7 +201,6 @@ AD_X2METHOD3(CreateValueFromValues,
        array of property values for members of record value which
     // is to be created.,
 			 numMembers,
-			 ,
 
 			 [in],
 			 objPass,
@@ -238,14 +208,12 @@ AD_X2METHOD3(CreateValueFromValues,
 			 numMembers,
 			 size of pMemberValues array.,
 			 ,
-			 ,
 
 			 [out],
 			 objOut,
 			 AAFPropertyValue,
 			 ppPropVal,
 			 newly-created property value,
-			 ,
 			 ,
 
      Creates a property value which contains a record type.  The
@@ -272,7 +240,7 @@ AD_X2METHOD3(CreateValueFromValues,
 AD_XMETHOD3(CreateValueFromStruct,
 			[in\, size_is\(initDataSize\)],
 			objPass,
-			aafMemPtr_t,
+			aafMemPtr_t *,
 			pInitData,
 			pointer to compile-time struct containing data to use,
 
@@ -521,22 +489,12 @@ AD_XMETHOD3(RegisterMembers,
   // - Initialize\(\) has already been called on this object.
   // - pOffsets is a valid pointer.
   // - numMembers matches the number of members defined for this
-  //   record type.
-  // - all types of the fields in this record already have their
-  //   offsets registered.
+  //   record type. 
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pOffsets\)
   //
   // AAFRESULT_ILLEGAL_VALUE
   //   - numMembers does not match number of members in this record
-  //     type.
-  //
-  // AAFRESULT_NOT_REGISTERED
-  //   - The type of any field in this record has not yet had its
-  //     offsets registered.
-  //
-  // AAFRESULT_DEFAULT_ALREADY_USED
-  //   - The default registration for this type has already been used
-  //     to persist or unpersist a property containing this type.)
+  //     type.)
 AD_XCLASS_END(Concrete, StoredObject)

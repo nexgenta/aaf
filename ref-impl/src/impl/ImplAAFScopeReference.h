@@ -4,27 +4,13 @@
 #define __ImplAAFScopeReference_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 #ifndef __AAFTypes_h__
@@ -62,21 +48,6 @@ protected:
 
 public:
 
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (
-		 // @parm [in] Data definition for referenced slot
-		 ImplAAFDataDef *pDataDef,
-
-		 // @parm [in] Number of nested scopes to pass to find the Nested Scope slot
-         aafUInt32  RelativeScope,
-
-         // @parm [in] Number of slots that preced the slot containing the Scope Reference
-         aafUInt32  RelativeSlot);
-
 
   //****************
   // Create()
@@ -108,6 +79,9 @@ public:
 
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFScopeReference)
 
   // Persistent Properties
   OMFixedSizeProperty<aafUInt32>	_relativeScope;

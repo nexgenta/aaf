@@ -4,43 +4,27 @@
 #define __ImplAAFEssenceAccess_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
-class ImplAAFContainerDef;
-class ImplAAFDataDef;
-class ImplAAFDictionary;
-class ImplAAFEssenceFormat;
-class ImplAAFEssenceSampleStream;
-class ImplAAFEssenceStream;
-class ImplAAFFile;
-class ImplAAFFileDescriptor;
-class ImplAAFHeader;
-class ImplAAFLocator;
 class ImplAAFMasterMob;
-class ImplAAFPluginDef;
-class ImplAAFSourceClip;
 class ImplAAFSourceMob;
-class ImplAAFEssenceSampleIndex;
+class ImplAAFSourceClip;
+class ImplAAFEssenceFormat;
+class ImplAAFEssenceStream;
+class ImplAAFEssenceSampleStream;
+class ImplAAFFileDescriptor;
+class ImplAAFFile;
+class ImplAAFLocator;
+class ImplAAFContainerDef;
+class ImplAAFPluginDescriptor;
+class ImplAAFHeader;
+class ImplAAFDictionary;
 
 #ifndef __ImplAAFRoot_h__
 #include "ImplAAFRoot.h"
@@ -52,10 +36,10 @@ class ImplAAFEssenceSampleIndex;
 
 typedef struct
 {
-  aafUID_t mediaKind;
-  aafUInt32 trackID;
-  aafUInt16 physicalOutChan;	/* 1->N */
-} aafSubChannel_t;
+	aafUID_t		mediaKind;
+	aafInt32		trackID;
+	aafInt16		physicalOutChan;	/* 1->N */
+}               aafSubChannel_t;
 
 typedef enum { kAAFCreated, kAAFAppended, kAAFReadOnly } aafOpenType_t;
 
@@ -92,14 +76,14 @@ public:
     Create
         (ImplAAFMasterMob *masterMob,
 		// @parm [in] 
-		 aafSlotID_t masterSlotID,
+         aafSlotID_t  masterSlotID,
 
          // @parm [in] create essence of this type
-         const aafUID_t & mediaKind,
+         aafUID_t	mediaKind,
 
- 		 const aafUID_t & codecID,
-		 const aafRational_t & editRate,
-		 const aafRational_t & sampleRate,
+ 		 aafUID_t			codecID,
+		 aafRational_t	editRate,
+		 aafRational_t	sampleRate,
 
          // @parm [in] optionally compressing it
          aafCompressEnable_t  Enable);
@@ -123,8 +107,8 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     MultiCreate
         (					ImplAAFMasterMob *masterMob,
- 							aafUID_constref codecID,
-                          aafUInt16  /*arrayElemCount*/,
+ 							aafUID_t codecID,
+                          aafInt16  /*arrayElemCount*/,
                            aafmMultiCreate_t *  /*mediaArray*/,
                            aafCompressEnable_t  /*Enable*/t);
 	//@comm The essence handle from this call can be used with
@@ -203,7 +187,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     WriteMultiSamples
         (// @parm [in] Do this many transfers
-         aafUInt16  arrayElemCount,
+         aafInt16  arrayElemCount,
 
          // @parm [out,size_is(arrayElemCount)] referencing this array
          aafmMultiXfer_t *  xferArray, aafmMultiResult_t *resultArray);
@@ -222,18 +206,11 @@ public:
         (// @parm [in] write this many samples
          aafUInt32  nSamples,
 
-         // @parm [in] of this size
-         aafUInt32  buflen,
-
          // @parm [in,size_is(buflen)] to a buffer
          aafDataBuffer_t  buffer,
 
-         // @parm [out] samples actually written
-         aafUInt32 * samplesWritten,
-
-         // @parm [out] bytes actually written
-         aafUInt32 * bytesWritten);
-
+         // @parm [in] of this size
+         aafUInt32  buflen);
 	//@comm Takes a essence handle, so the essence must have been opened or created.
 	// A single video frame is ONE sample.
 	// Buflen must be large enough to hold nSamples * the maximum sample size.
@@ -243,6 +220,69 @@ public:
 	// OM_ERR_BADDATAADDRESS -- The buffer must not be a NULL pointer.
 	//@comm Replaces omfmWriteDataSamples
 
+/****/
+  //****************
+  // WriteRawData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteRawData
+        (// @parm [in] write this many samples
+         aafUInt32  nSamples,
+
+         // @parm [in, size_is(nSamples * sampleSize)] to a buffer
+         aafDataBuffer_t  buffer,
+
+         // @parm [in] of this size
+         aafUInt32  sampleSize);
+	//@comm A single video frame is ONE sample.
+	//@comm Buflen must be large enough to hold
+	// nSamples * the maximum sample size.
+	//@comm Possible Errors:
+	// Standard errors (see top of file).
+	// OM_ERR_BADDATAADDRESS -- The buffer must not be a NULL pointer.
+	//@comm Replaces omfmWriteRawData
+	
+/****/
+  //****************
+  // ReadRawData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadRawData
+        (// @parm [in] write this many samples
+         aafUInt32  nSamples,
+
+         // @parm [in] to a buffer of this size
+         aafUInt32  buflen,
+
+         // @parm [out, size_is(buflen), length_is(*bytesRead)] here is the buffer
+         aafDataBuffer_t  buffer,
+
+         // @parm [out,ref] 
+         aafUInt32 *  samplesRead,
+
+         // @parm [out,ref] 
+         aafUInt32 *  bytesRead);
+	//@comm A single video frame is ONE sample.
+	//@comm Buflen must be large enough to hold nSamples * the maximum sample size.
+	//@comm Possible Errors:
+	// Standard errors (see top of file).
+	// OM_ERR_BADDATAADDRESS -- The buffer must not be a NULL pointer.
+	//@comm Replaces omfmReadRawData
+	
+/****/
+  //****************
+  // WriteDataLines()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteFractionalSample
+        (// @parm [in] 
+         aafUInt32  nBytes,
+
+         // @parm [in, size_is(nLines * nBytesPerLine)] from a buffer
+         aafDataBuffer_t  buffer,
+
+         // @parm [out,ref] of this size
+         aafUInt32 *  bytesWritten);
 	
 /****/
   //****************
@@ -257,10 +297,10 @@ public:
 
 /****/
   //****************
-  // CountChannels()
+  // GetNumChannels()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountChannels
+    GetNumChannels
         (// @parm [in] In this master mob
          ImplAAFMasterMob * masterMob,
 
@@ -274,7 +314,7 @@ public:
          aafUID_t mediaKind,
 
          // @parm [out] How many channels?
-         aafUInt16*  numCh);
+         aafInt16*  numCh);
 	//@comm Returns the number of interleaved essence channels of a given type in the essence stream referenced by the given file mob
 	//@comm If the data format is not interleaved, then the answer will
 	// always be zero or one.  This function correctly returns zero
@@ -294,7 +334,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetLargestSampleSize
         (// @parm [in] and this essence type
-         ImplAAFDataDef * pMediaKind,
+         aafUID_t mediaKind,
 
          // @parm [out] the largest sample size
          aafLength_t*  maxSize);
@@ -309,9 +349,9 @@ public:
   // GetSampleFrameSize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIndexedSampleSize
+    GetSampleFrameSize
         (// @parm [in] and this essence type
-         ImplAAFDataDef *  pMediaKind,
+         aafUID_t  mediaKind,
 
          // @parm [in] for this [1-based] sample frame number
          aafPosition_t  frameNum,
@@ -341,12 +381,12 @@ public:
 
 /****/
   //****************
-  // CountSamples()
+  // GetSampleCount()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountSamples
+    GetSampleCount
         (// @parm [in] and this essence type
-         ImplAAFDataDef * pMediaKind,
+         aafUID_t mediaKind,
 
         // @parm [out] 
         aafLength_t *  result);
@@ -386,7 +426,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     ReadMultiSamples
         (// @parm [in] 
-         aafUInt16  elemCount,
+         aafInt16  elemCount,
 
          // @parm [out, size_is(elemCount)] 
          aafmMultiXfer_t *  xferArray, aafmMultiResult_t *resultArray);
@@ -396,6 +436,20 @@ public:
 	// doing the transfer.
 	//@comm Replaces omfmReadMultiSamples
 	
+/****/
+  //****************
+  // ReadDataLines()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadFractionalSample
+        (aafUInt32  bufLen,
+
+         // @parm [out, size_is(bufLen),length_is(*bytesRead)] 
+         aafDataBuffer_t  buffer,
+
+         // @parm [out,ref] 
+         aafUInt32*  bytesRead);
+
 /****/
   //****************
   // GotoFrameNumber()
@@ -500,50 +554,114 @@ public:
 	//@comm The name will be truncated to fit within "buflen" bytes.
 	//@comm Replaces omfmMediaGetCodecID */
 
+/****/
+  //****************
+  // AddSampleIndexEntry()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddSampleIndexEntry
+        // @parm [in] add a frame offset to it's frame index
+        (aafInt64  frameOffset);
+	//@comm This function should NOT be called when essence is passed to
+	//the reference implementation in an uncompressed format.
+	//@comm Possible Errors:<nl>
+	//	Standard errors (see top of file).<nl>
+	//	OM_ERR_INVALID_OP_CODEC -- This kind of essence doesn't have a frame index<nl>
+	//	OM_ERR_MEDIA_OPENMODE -- The essence is open for read-only.
+	//@comm Replaces omfmAddFrameIndexEntry */
+
+
+  //***********************************************************
+  // METHOD NAME: GetStoredByteOrder()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEndian | GetStoredByteOrder |
+  // Returns the "Endian-ness" in which the current object was or will
+  // be stored.  If this is a transient object (i.e., one which has
+  // not been persisted) then it will return the native byte order of
+  // the platform on which this is running.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pOrder pointer is valid.
+  // 
+  // If this method fails nothing is written to *pOrder.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pOrder is null.
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  GetStoredByteOrder (
+    // @parm [out] eAAFByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    eAAFByteOrder_t *  pOrder
+  );
+
+
+
+  //***********************************************************
+  // METHOD NAME: GetNativeByteOrder()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEndian | GetNativeByteOrder |
+  // Returns the native "Endian-ness" of the platform on which this is
+  // running.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pOrder pointer is valid.
+  // 
+  // If this method fails nothing is written to *pOrder.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pOrder is null.
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  GetNativeByteOrder (
+    // @parm [out] eAAFByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    eAAFByteOrder_t *  pOrder
+  );
+
 
 
 public:
 	//Toolkit private functions
 	AAFRESULT MakeAAFContainerDef(ImplAAFHeader *head, ImplAAFContainerDef **result);
 	AAFRESULT CreateContainerDef (ImplAAFHeader *head);
-	AAFRESULT CreateCodecDef(ImplAAFHeader *head,
-							 const aafUID_t & codecDef,
-							 IAAFPluginDef **newDesc);
-	AAFRESULT CreateEssenceFileFromLocator (ImplAAFHeader *srcHead,
-											ImplAAFLocator *loc,
-											ImplAAFFile **result);
-	AAFRESULT ModifyEssenceFileFromLocator (ImplAAFHeader *srcHead,
-											ImplAAFLocator *loc,
-											ImplAAFFile **result);
-	AAFRESULT CreateFileMob (ImplAAFHeader *newHead,
-							 aafBool addSlots,
-							 aafSlotID_t slotID,
-							 aafMobID_constptr newMobID, /* optional */
-							 const aafUID_t & mediaKind,
-							 const aafUID_t &	   codecID,
-							 const aafRational_t & editRate,
-							 const aafRational_t & sampleRate,
-							 ImplAAFLocator *addLocator,
-							 ImplAAFSourceMob **result);
-
-  AAFRESULT InstallEssenceAccessIntoCodec();
+	AAFRESULT CreateCodecDef(ImplAAFHeader *head, aafUID_t codecDef, IAAFPluginDescriptor **newDesc);
+	AAFRESULT CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, ImplAAFLocator *loc, ImplAAFFile **result);
+	AAFRESULT ModifyEssenceFileFromLocator (ImplAAFHeader *srcHead, ImplAAFLocator *loc, ImplAAFFile **result);
+	AAFRESULT CreateFileMob (ImplAAFHeader *newHead, aafBool addSlots, aafSlotID_t slotID, aafUID_t *newMobID,
+							aafUID_t mediaKind, aafRational_t editRate,aafRational_t sampleRate,
+							ImplAAFLocator *addLocator, ImplAAFSourceMob **result);
 
 private:
 	aafUID_t				_codecID;
-	aafUID_t				_flavour;
+	aafUID_t				_variety;
 	ImplAAFLocator			*_destination;
-	aafUID_t				_containerDefID;
+	aafUID_t				_fileFormat;
 	ImplAAFSourceMob		*_compFileMob;
-	aafUInt32				_numChannels;
+	aafInt32				_numChannels;
 	aafSubChannel_t			*_channels;
 	ImplAAFMasterMob		*_masterMob;
 	ImplAAFFileDescriptor	*_mdes;
 	IAAFEssenceCodec		*_codec;
-  IAAFMultiEssenceCodec *_multicodec;
-  IAAFEssenceData *_internalEssenceData;
 	IAAFEssenceStream		*_stream;
 	aafOpenType_t			_openType;
-	IAAFPluginDef		*_codecDescriptor;
+	IAAFPluginDescriptor	*_codecDescriptor;
 	ImplAAFFile				*_dataFile;
 	ImplAAFSourceMob		*_dataFileMob;
 };

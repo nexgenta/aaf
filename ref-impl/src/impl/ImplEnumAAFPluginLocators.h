@@ -4,33 +4,114 @@
 #define __ImplEnumAAFPluginLocators_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
-#include "ImplAAFEnumerator.h"
 
-#include "ImplAAFLocator.h"
 
-typedef ImplAAFEnumerator<ImplAAFLocator> ImplEnumAAFPluginLocators;
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
+class ImplAAFLocator;
+
+
+
+
+
+
+#ifndef __ImplAAFRoot_h__
+#include "ImplAAFRoot.h"
+#endif
+
+#include "ImplAAFPluginDescriptor.h"
+
+class ImplEnumAAFPluginLocators : public ImplAAFRoot
+{
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  ImplEnumAAFPluginLocators ();
+
+protected:
+  virtual ~ImplEnumAAFPluginLocators ();
+
+public:
+
+
+  //****************
+  // NextOne()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    NextOne
+        // @parm [out,retval] The Next AAFLocator
+        (ImplAAFLocator ** ppAAFLocator);
+
+  //****************
+  // Next()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Next
+        (// @parm [in] number of AAFLocators requested
+         aafUInt32  count,
+
+         // @parm [out, size_is(count), length_is(*pFetched)] array to receive AAFLocators
+         ImplAAFLocator ** ppAAFLocators,
+
+         // @parm [out,ref] number of actual AAFLocators fetched into ppAAFLocators array
+         aafUInt32 *  pFetched);
+
+  //****************
+  // Skip()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Skip
+        // @parm [in] Number of elements to skip
+        (aafUInt32  count);
+
+  //****************
+  // Reset()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Reset ();
+
+
+  //****************
+  // Clone()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Clone
+        // @parm [out,retval] new enumeration
+        (ImplEnumAAFPluginLocators ** ppEnum);
+
+
+
+public:
+// Internal to the toolkit
+AAFRESULT
+    SetPluginDescriptor(ImplAAFPluginDescriptor *pEDesc);
+
+private:
+	aafInt32					_current;
+	ImplAAFPluginDescriptor	*_cPluginDesc;
+};
 
 #endif // ! __ImplEnumAAFPluginLocators_h__
 

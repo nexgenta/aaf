@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 #include "AAFStoredObjectIDs.h"
@@ -33,12 +19,12 @@
 
 
 ImplAAFTIFFDescriptor::ImplAAFTIFFDescriptor ():
-_isUniform(PID_TIFFDescriptor_IsUniform,	L"IsUniform"),
-_isContiguous(PID_TIFFDescriptor_IsContiguous,	L"IsContiguous"),
-_leadingLines(PID_TIFFDescriptor_LeadingLines,	L"LeadingLines"),
-_trailingLines(PID_TIFFDescriptor_TrailingLines,	L"TrailingLines"),
-_jpegTableID(PID_TIFFDescriptor_JPEGTableID,	L"JPEGTableID"),
-_summary(PID_TIFFDescriptor_Summary,	L"Summary")
+_isUniform(PID_TIFFDescriptor_IsUniform,	"Is Uniform"),
+_isContiguous(PID_TIFFDescriptor_IsContiguous,	"Is Contiguous"),
+_leadingLines(PID_TIFFDescriptor_LeadingLines,	"Leading Lines"),
+_trailingLines(PID_TIFFDescriptor_TrailingLines,	"Trailing Lines"),
+_jpegTableID(PID_TIFFDescriptor_JPEGTableID,	"JPEGTableID"),
+_summary(PID_TIFFDescriptor_Summary,	"Summary")
 {
 	_persistentProperties.put(_isUniform.address());
 	_persistentProperties.put(_isContiguous.address());
@@ -47,8 +33,8 @@ _summary(PID_TIFFDescriptor_Summary,	L"Summary")
 	_persistentProperties.put(_jpegTableID.address());
 	_persistentProperties.put(_summary.address());
 
-	_isUniform = kAAFFalse;
-	_isContiguous = kAAFFalse;
+	_isUniform = AAFFalse;
+	_isContiguous = AAFFalse;
 	_leadingLines = 0;
 	_trailingLines = 0;
 	_jpegTableID = 0;
@@ -223,5 +209,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFTIFFDescriptor, AUID_AAFTIFFDescriptor);
 
 

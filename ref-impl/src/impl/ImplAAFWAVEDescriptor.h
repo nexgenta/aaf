@@ -6,7 +6,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -67,10 +66,6 @@ public:
   // Declare this class to be storable.
   //
   OMDECLARE_STORABLE(ImplAAFWAVEDescriptor)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFWAVEDescriptorTest.cpp.
-  static AAFRESULT test();
 
 private:
 	OMVariableSizeProperty<aafUInt8> _summary;

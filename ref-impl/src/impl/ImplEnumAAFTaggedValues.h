@@ -3,33 +3,99 @@
 #ifndef __ImplEnumAAFTaggedValues_h__
 #define __ImplEnumAAFTaggedValues_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
 
-#include "ImplAAFEnumerator.h"
+class ImplAAFTaggedValue;
 
-#include "ImplAAFTaggedValue.h"
 
-typedef ImplAAFEnumerator<ImplAAFTaggedValue> ImplEnumAAFTaggedValues;
+#ifndef __ImplAAFRoot_h__
+#include "ImplAAFRoot.h"
+#endif
+
+#ifndef __ImplAAFObject_h__
+#include "ImplAAFObject.h"
+#endif
+
+typedef OMStrongReferenceVectorProperty<ImplAAFTaggedValue> taggedValueStrongRefArrayProp_t;
+
+class ImplEnumAAFTaggedValues : public ImplAAFRoot
+{
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  ImplEnumAAFTaggedValues ();
+
+protected:
+  virtual ~ImplEnumAAFTaggedValues ();
+
+public:
+
+
+  //****************
+  // NextOne()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    NextOne
+        // @parm [out,retval] The Next Tagged Value
+        (ImplAAFTaggedValue ** ppTaggedValue);
+
+  //****************
+  // Next()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Next
+        (// @parm [in] number of Tagged Values requested
+         aafUInt32  count,
+
+         // @parm [out, size_is(count), length_is(*pFetched)] array to receive container definitions
+         ImplAAFTaggedValue ** ppTaggedValues,
+
+         // @parm [out,ref] number of actual Tagged Values fetched into ppTaggedValues array
+         aafUInt32 *  pFetched);
+
+  //****************
+  // Skip()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Skip
+        // @parm [in] Number of elements to skip
+        (aafUInt32  count);
+
+  //****************
+  // Reset()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Reset ();
+
+
+  //****************
+  // Clone()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Clone
+        // @parm [out,retval] new enumeration
+        (ImplEnumAAFTaggedValues ** ppEnum);
+
+public:
+  // SDK Internal 
+	virtual AAFRESULT STDMETHODCALLTYPE
+		SetEnumStrongProperty( ImplAAFObject *pObj, taggedValueStrongRefArrayProp_t *pProp);
+
+
+private:
+	aafUInt32						_current;
+	ImplAAFObject					*_enumObj;
+	taggedValueStrongRefArrayProp_t	*_enumStrongProp;
+
+};
 
 #endif // ! __ImplEnumAAFTaggedValues_h__
 

@@ -3,47 +3,28 @@
 #ifndef __ImplAAFCodecDef_h__
 #define __ImplAAFCodecDef_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+
+
+class ImplAAFClassDef;
 
 class ImplEnumAAFCodecFlavours;
+
 
 
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
 #endif
 
-#ifndef __ImplAAFClassDef_h__
-#include "ImplAAFClassDef.h"
-#endif
-
-#include "OMReferenceContainerIter.h"
-#include "OMWeakRefProperty.h"
-
 #include "ImplEnumAAFDataDefs.h"
-
-#include "OMWeakRefVectorProperty.h"
-typedef OMWeakReferenceVectorProperty<ImplAAFDataDef> DataDefWeakRefArrayProp_t;
 
 class ImplAAFCodecDef : public ImplAAFDefObject
 {
@@ -53,17 +34,6 @@ public:
   //
   //********
   ImplAAFCodecDef ();
-
-
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        // @parm [in] Pointer to an AUID reference
-        (const aafUID_t & id,
-		 const aafCharacter *name,
-		 const aafCharacter *description);
 
 protected:
   virtual ~ImplAAFCodecDef ();
@@ -77,48 +47,19 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     IsEssenceKindSupported
         (// @parm [in,ref] The essence kind
-         ImplAAFDataDef * pEssenceKind,
+         aafUID_t *pEssenceKind,
 
          // @parm [out,retval] Is this type supported
          aafBool*  pIsSupported);
  
-
-  //****************
-  // AddEssenceKind()
+   //****************
+  // AppendEssenceKind()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddEssenceKind
+    AppendEssenceKind
         // @parm [in] The essence kind
-        (ImplAAFDataDef * pEssenceKind);
+        (aafUID_t *  pEssenceKind);
 
-
-
-  //****************
-  // RemoveEssenceKind()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveEssenceKind
-        // @parm [in] The essence kind to remove
-        (ImplAAFDataDef * pEssenceKind);
-
-
-
-  //****************
-  // CountEssenceKinds()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountEssenceKinds
-        // @parm [out, retval] The returned number of essece kinds
-        (aafUInt32 * pResult);
-
-
-  //****************
-  // GetEssenceKinds()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetEssenceKinds
-        // @parm [out, retval] The enumerator over essence kinds
-        (ImplEnumAAFDataDefs ** ppEnum);
 
 
   //****************
@@ -157,9 +98,24 @@ public:
         (ImplEnumAAFCodecFlavours ** ppEnum);
   
 
+public:
+	// SDK-private
+  //****************
+  // GetParameterDefinitions()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDataDefinitions
+        // @parm [out,retval] Parameter definition enumeration
+        (ImplEnumAAFDataDefs ** ppEnum);
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFCodecDef)
+
 private:
 	DataDefWeakRefArrayProp_t			_dataDefs;
-	OMWeakReferenceProperty<ImplAAFClassDef> _fileDescClass;
+	OMFixedSizeProperty<aafUID_t>		_fileDescClass;
 };
 
 #endif // ! __ImplAAFCodecDef_h__

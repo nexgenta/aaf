@@ -4,34 +4,31 @@
 #define __ImplAAFEssenceDescriptor_h__
 
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 class ImplAAFLocator;
 
-template <class T> 
-class ImplAAFEnumerator;
-typedef ImplAAFEnumerator<ImplAAFLocator> ImplEnumAAFLocators;
+class ImplEnumAAFLocators;
+
+
+
+
+
+
 
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
@@ -40,7 +37,6 @@ typedef ImplAAFEnumerator<ImplAAFLocator> ImplEnumAAFLocators;
 #include "ImplAAFLocator.h"
 #endif
 
-#include "OMStrongRefVectorProperty.h"
 
 
 class ImplAAFEssenceDescriptor : public ImplAAFObject
@@ -56,12 +52,12 @@ public:
 
 
   //****************
-  // CountLocators()
+  // GetNumLocators()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountLocators
+    GetNumLocators
 		// @parm [out] Returns the number of locators
-        (aafUInt32 *  pCount);
+        (aafInt32 *  pCount);
   //@comm The number of locators may be zero if the essence is in the current file.
 
   //****************
@@ -84,38 +80,6 @@ public:
   //@comm    Use this function to add a locator to be scanned first when searching for
   // the essence (a secondary location for the essence).
 
-
-  //****************
-  // InsertLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    InsertLocatorAt
-		// @parm [in] place to insert locator
-        (aafUInt32 index,
-		// @parm [in] Locator to insert
-		 ImplAAFLocator * pLocator);
-
-
-  //****************
-  // GetLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetLocatorAt
-		// @parm [in] index of locator to get
-        (aafUInt32 index,
-		// @parm [in] returned locator
-		 ImplAAFLocator ** ppLocator);
-
-
-  //****************
-  // GetLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveLocatorAt
-		// @parm [in] index of locator to remove
-        (aafUInt32 index);
-
-
   //****************
   // RemoveLocator()
   //
@@ -125,14 +89,21 @@ public:
         (ImplAAFLocator * pLocator);
 
   //****************
-  // GetLocators()
+  // EnumAAFAllLocators()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetLocators
+    EnumAAFAllLocators
 		// @parm [out] An enumerator to the locators on this essence descriptor
         (ImplEnumAAFLocators ** ppEnum);
   //@comm The number of locators may be zero if the essence is in the current file.
 
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFEssenceDescriptor)
 
 public:
 	// Functions internal to the toolkit

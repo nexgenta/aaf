@@ -3,33 +3,98 @@
 #ifndef __ImplEnumAAFInterpolationDefs_h__
 #define __ImplEnumAAFInterpolationDefs_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
 
-#include "ImplAAFEnumerator.h"
+class ImplAAFInterpolationDef;
 
-#include "ImplAAFInterpolationDef.h"
+#ifndef __ImplAAFObject_h__
+#include "ImplAAFObject.h"
+#endif
 
-typedef ImplAAFEnumerator<ImplAAFInterpolationDef> ImplEnumAAFInterpolationDefs;
+typedef OMVariableSizeProperty<aafUID_t> interpDefWeakRefArrayProp_t;
+typedef OMStrongReferenceVectorProperty<ImplAAFInterpolationDef> interpDefStrongRefArrayProp_t;
+
+
+class ImplEnumAAFInterpolationDefs : public ImplAAFRoot
+{
+public:
+  //
+  // Constructor/destructor
+  //
+  //********
+  ImplEnumAAFInterpolationDefs ();
+
+protected:
+  virtual ~ImplEnumAAFInterpolationDefs ();
+
+public:
+
+
+  //****************
+  // NextOne()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    NextOne
+        // @parm [out,retval] The Next PluggableDefinition
+        (ImplAAFInterpolationDef ** ppPluggableDef);
+
+  //****************
+  // Next()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Next
+        (// @parm [in] number of Pluggable definitions requested
+         aafUInt32  count,
+
+         // @parm [out, size_is(count), length_is(*pFetched)] array to receive Pluggable definitions
+         ImplAAFInterpolationDef ** ppPluggableDefs,
+
+         // @parm [out,ref] number of actual PluggableDefs fetched into ppPluggableDefs array
+         aafUInt32 *  pFetched);
+
+  //****************
+  // Skip()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Skip
+        // @parm [in] Number of elements to skip
+        (aafUInt32  count);
+
+  //****************
+  // Reset()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Reset ();
+
+
+  //****************
+  // Clone()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Clone
+        // @parm [out,retval] new enumeration
+        (ImplEnumAAFInterpolationDefs ** ppEnum);
+
+
+public:
+  // SDK Internal 
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEnumProperty( ImplAAFObject *pObj, interpDefWeakRefArrayProp_t *pProp);
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEnumStrongProperty( ImplAAFObject *pObj, interpDefStrongRefArrayProp_t *pProp);
+
+private:
+	aafUInt32						_current;
+	ImplAAFObject					*_enumObj;
+	interpDefWeakRefArrayProp_t		*_enumProp;
+	interpDefStrongRefArrayProp_t		*_enumStrongProp;
+};
 
 #endif // ! __ImplEnumAAFInterpolationDefs_h__
 
