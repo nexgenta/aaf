@@ -1,35 +1,16 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFCDCIDescriptor_h__
 #include "ImplAAFCDCIDescriptor.h"
 #endif
 
-#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
 #include <assert.h>
@@ -37,13 +18,13 @@
 
 
 ImplAAFCDCIDescriptor::ImplAAFCDCIDescriptor ()
-:	_componentWidth(PID_CDCIDescriptor_ComponentWidth,	"ComponentWidth"),
-	_horizontalSubsampling(PID_CDCIDescriptor_HorizontalSubsampling,	"HorizontalSubsampling"),
-	_colorSiting(PID_CDCIDescriptor_ColorSiting,	"ColorSiting"),
-	_blackReferenceLevel(PID_CDCIDescriptor_BlackReferenceLevel,	"BlackReferenceLevel"),
-	_whiteReferenceLevel(PID_CDCIDescriptor_WhiteReferenceLevel,	"WhiteReferenceLevel"),
-	_colorRange(PID_CDCIDescriptor_ColorRange,	"ColorRange"),
-	_paddingBits(PID_CDCIDescriptor_PaddingBits,	"PaddingBits")
+:	_componentWidth(PID_CDCI_DESC_COMPPONENTWIDTH,	"Component Width"),
+	_horizontalSubsampling(PID_CDCI_DESC_HORIZONTALSUBSAMPLING,	"Horizontal Subsampling"),
+	_colorSiting(PID_CDCI_DESC_COLORSITING,	"Color Siting"),
+	_blackReferenceLevel(PID_CDCI_DESC_BLACKREFERENCELEVEL,	"Black Reference Level"),
+	_whiteReferenceLevel(PID_CDCI_DESC_WHITEREFERENCELEVEL,	"White Reference Level"),
+	_colorRange(PID_CDCI_DESC_COLORRANGE,	"Color Range"),
+	_paddingBits(PID_CDCI_DESC_PADDINGBITS,	"Padding Bits")
 {
 	_persistentProperties.put(_componentWidth.address());
 	_persistentProperties.put(_horizontalSubsampling.address());
@@ -54,14 +35,14 @@ ImplAAFCDCIDescriptor::ImplAAFCDCIDescriptor ()
 	_persistentProperties.put(_paddingBits.address());
 
 	// Initialize Required properties
-	_componentWidth = 8;	// valid values are 8, 10, and 16 ?
-	_horizontalSubsampling = 1; // valid values are 1 and 2?
+	//_componentWidth = 0;	// valid values are 8, 10, and 16 ?
+	//_horizontalSubsampling = 0; // valid values are 1 and 2?
 
 	// Initialize Optional properties
 	_colorSiting = kCoSiting;
 	_blackReferenceLevel = 0;
-	_whiteReferenceLevel = 255;
-	_colorRange = 255;
+	//_whiteReferenceLevel = 255;
+	//_colorRange = 255;
 	_paddingBits = 0;
 }
 
@@ -196,9 +177,6 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pColorSiting == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	if(!_colorSiting.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
 	*pColorSiting = _colorSiting;
 
 	return AAFRESULT_SUCCESS;
@@ -210,9 +188,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (pBlackReferenceLevel == NULL)
 		return AAFRESULT_NULL_PARAM;
-
-	if(!_blackReferenceLevel.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pBlackReferenceLevel = _blackReferenceLevel;
 
@@ -226,9 +201,6 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pWhiteReferenceLevel == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	if(!_whiteReferenceLevel.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-	
 	*pWhiteReferenceLevel = _whiteReferenceLevel;
 
 	return AAFRESULT_SUCCESS;
@@ -241,9 +213,6 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pColorRange == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	if(!_colorRange.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-	
 	*pColorRange = _colorRange;
 
 	return AAFRESULT_SUCCESS;
@@ -256,10 +225,27 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pPaddingBits == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	if(!_paddingBits.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-	
 	*pPaddingBits = _paddingBits;
 
 	return AAFRESULT_SUCCESS;
 }
+
+
+
+extern "C" const aafClassID_t CLSID_AAFCDCIDescriptor;
+
+OMDEFINE_STORABLE(ImplAAFCDCIDescriptor, CLSID_AAFCDCIDescriptor);
+
+// Cheat!  We're using this object's CLSID instead of object class...
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFCDCIDescriptor::GetObjectClass(aafUID_t * pClass)
+{
+	if (! pClass)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	memcpy (pClass, &CLSID_AAFCDCIDescriptor, sizeof (aafClassID_t));
+	return AAFRESULT_SUCCESS;
+}
+
+
