@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTimelineMobSlot
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTimelineMobSlotTest.cpp,v 1.26.2.3 2004/06/08 13:46:07 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTimelineMobSlotTest.cpp,v 1.26.2.4 2004/06/09 15:23:47 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,11 +26,11 @@
 
 #include "AAF.h"
 
-#if !defined( COMPILER_MSC )
-#define __STDC_CONSTANT_MACROS // enables INT64_C macro in stdint.h
-#include <inttypes.h>
-#else
+#if defined( _MSC_VER )
 #define INT64_C(c) c
+#else
+#define __STDC_CONSTANT_MACROS		// needed in C++ to enable macros like INT64_C
+#include <inttypes.h>				// provides INT64_C macro
 #endif
 
 
