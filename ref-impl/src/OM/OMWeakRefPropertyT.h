@@ -466,4 +466,38 @@ OMWeakReferenceProperty<ReferencedObject>::clearTargetTag(void) const
   nonConstThis->_targetPropertyPath = 0;
 }
 
+template <typename ReferencedObject>
+void OMWeakReferenceProperty<ReferencedObject>::shallowCopyTo(
+                                                 OMProperty* destination) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::shallowCopyTo");
+  PRECONDITION("Valid destination", destination != 0);
+
+  typedef OMWeakReferenceProperty Property;
+  Property* dest = dynamic_cast<Property*>(destination);
+  ASSERT("Destination is correct type", dest != 0);
+  ASSERT("Valid destination", dest != this);
+
+  dest->_reference = _reference;
+  dest->_targetTag = _targetTag;
+  dest->_targetName = _targetName;
+  delete [] dest->_targetPropertyPath;
+  dest->_targetPropertyPath = 0; // for BoundsChecker
+  if (_targetPropertyPath != 0) {
+    dest->_targetPropertyPath = savePropertyPath(_targetPropertyPath);
+  } else {
+    dest->_targetPropertyPath = 0;
+  }
+  dest->_keyPropertyId = _keyPropertyId;
+}
+
+template <typename ReferencedObject>
+void OMWeakReferenceProperty<ReferencedObject>::deepCopyTo(
+                                               OMProperty* /* destination */,
+                                               void* /* clientContext */) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::deepCopyTo");
+  // Nothing to do - this is a deep copy
+}
+
 #endif
