@@ -1,3 +1,13 @@
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -24,7 +34,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
 #ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
 #endif
@@ -69,4 +78,3 @@ AAFRESULT ImplAAFFiller::TraverseToClip(aafLength_t length,
 	return ( AAFRESULT_FILL_FOUND );
 }
 
-OMDEFINE_STORABLE(ImplAAFFiller, AUID_AAFFiller);
