@@ -3,39 +3,48 @@
 #ifndef __ImplAAFTapeDescriptor_h__
 #define __ImplAAFTapeDescriptor_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+#include "OMStorable.h"
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
+
+
 #ifndef __ImplAAFEssenceDescriptor_h__
 #include "ImplAAFEssenceDescriptor.h"
 #endif
 
-#include "OMWideStringProperty.h"
+#include "OMProperty.h"
 
+// Persistent Property IDs
+
+const int PID_TAPEDESCRIPTOR_FORMFACTOR		= 1;
+const int PID_TAPEDESCRIPTOR_VIDEOSIGNAL	= 2;
+const int PID_TAPEDESCRIPTOR_TAPEFORMAT		= 3;
+const int PID_TAPEDESCRIPTOR_LENGTH			= 4;
+const int PID_TAPEDESCRIPTOR_MANUFACTURER	= 5;
+const int PID_TAPEDESCRIPTOR_MODEL			= 6;
 
 
 class ImplAAFTapeDescriptor : public ImplAAFEssenceDescriptor
@@ -49,9 +58,6 @@ public:
   virtual ~ImplAAFTapeDescriptor ();
 
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize ();
-
 
   //****************
   // SetTapeManufacturer()
@@ -59,62 +65,62 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeManufacturer
 		// @parm [in,string] Manufacturers name
-        (const aafCharacter*  pName);
+        (aafWChar*  pName);
   //****************
   // GetTapeManufacturer()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeManufacturer
 	    (// @parm [in,string] pass in a buffer which is cleared and filled.
-         aafCharacter*  pName,
+         aafWChar*  pName,
 
 		 // @parm [in] Length of the buffer to hold the Manufacturers name
-		 aafUInt32  buflen);
+		 aafInt32  buflen);
   //****************
-  // GetTapeManufacturerBufLen()
+  // GetManufacturerNameLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTapeManufacturerBufLen
+    GetManufacturerNameLen
 		// @parm [out] Manufacturers Name length
-        (aafUInt32 *  pLen);
+        (aafInt32 *  pLen);
   //****************
   // SetTapeModel()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeModel
 		// @parm [in,string] Tape Manufacturers Brand name
-        (const aafCharacter*  pModelName);
+        (aafWChar*  pModelName);
   //****************
   // GetTapeModel()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeModel
 	    (// @parm [in,string] pass in a buffer which is cleared and filled.
-         aafCharacter*  pModelName,
+         aafWChar*  pModelName,
 
 		 // @parm [in] Length of the buffer to hold the Manufacturers Brand name
-		 aafUInt32  buflen);
+		 aafInt32  buflen);
   //****************
-  // GetTapeModelBufLen()
+  // GetTapeModelLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTapeModelBufLen
+    GetTapeModelLen
 		// @parm [out] Model length
-        (aafUInt32 *  pLen);
+        (aafInt32 *  pLen);
 
   //****************
   // SetTapeFormFactor()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeFormFactor
-		// @parm [in] ex: kAAFVHSVideoTape,kDATCartridge 
+		// @parm [in] ex: kVHSVideoTape,kDATCartridge 
         (aafTapeCaseType_t  formFactor);
   //****************
   // GetTapeFormFactor()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeFormFactor
-		// @parm [out] ex: kAAFVHSVideoTape,kDATCartridge
+		// @parm [out] ex: kVHSVideoTape,kDATCartridge
         (aafTapeCaseType_t*  formFactor);
 
   //****************
@@ -154,28 +160,31 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeLength
 		// @parm [in] The length of the tape in minutes.
-        (aafUInt32  tapeLength);
+        (aafLength_t  pTapeLength);
   //****************
   // GetTapeLength()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeLength
 		// @parm [out] The length of the tape in minutes.
-        (aafUInt32*  pTapeLength);
+        (aafLength_t*  pTapeLength);
 
 
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFTapeDescriptor)
 
-  virtual AAFRESULT	STDMETHODCALLTYPE
-		GetOwningMobKind (aafMobKind_t *pMobKind);
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFTapeDescriptorTest.cpp.
+  static AAFRESULT test();
 
 	// Persistent properties
 private:
 	OMFixedSizeProperty<aafTapeCaseType_t>		_formFactor;
 	OMFixedSizeProperty<aafVideoSignalType_t>	_videoSignalType;
-	OMFixedSizeProperty<aafTapeFormatType_t>	_tapeFormat;
-	OMFixedSizeProperty<aafUInt32>				_tapeLength;
+	OMFixedSizeProperty<aafLength_t>			_tapeLength;
 	OMWideStringProperty						_manufacturer;
 	OMWideStringProperty						_model;
 };
