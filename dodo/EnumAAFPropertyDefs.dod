@@ -1,5 +1,5 @@
 #startm .this-module 0
-EnumAAFMobSlots\
+EnumAAFPropertyDefinitions\
 #endm
 #c
 #import ./AAFUnitTest.exp
@@ -13,31 +13,33 @@ AD_HEAD
 *                                          *
 \******************************************/
 
-AD_FORWARD_DECLARATION(AAFMobSlot)
+
+AD_FORWARD_DECLARATION(AAFPropertyDefinition)
 
 
-AD_CLASS_UUID(B1A21389, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
+AD_CLASS_UUID(B1A21387, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
-AD_DEFAULT_UUID(B1A21388, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
+AD_DEFAULT_UUID(B1A21386, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 AD_ROOT_CLASS_BEGIN
 
 AD_XMETHOD1(NextOne,
 			[out\,retval],
 			objOut,
-			AAFMobSlot,
-			ppMobSlot,
-			The Next MobSlot,
+			AAFPropertyDefinition,
+			ppPropertyDefinition,
+			The Next PropertyDefinition,
 			Enumerates to the next element in the enumerators list. The caller is responsible for 
   // properly releasing the returned pointer when it is no longer needed.
   // @comm This is a just simplified version of the Next method. )
 
 AD_XMETHOD3(Next,
-			[in], objPass, aafUInt32, count, number of mob slots requested,
+			[in], objPass, aafUInt32, count, number of property definitions requested,
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOut, AAFMobSlot, ppMobSlots, array to receive mob slots,
-			[out\,ref], objPass, aafUInt32 *, pFetched,
-			number of actual MobSlots fetched into ppMobSlots array,
-			Enumerates the next count elements \(AD_AAFTYPES\(AAFMobSlot\) pointers\) in 
+			objOut, AD_AAFTYPES\(AAFPropertyDefinition\) **, ppPropertyDefinitions,
+			array to receive property definitions,
+			[out\,ref],objPass, aafUInt32 *, pFetched,
+			number of actual PropertyDefinitions fetched into ppPropertyDefinitions array,
+			Enumerates the next count elements \(AD_AAFTYPES\(AAFPropertyDefinition\) pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
   // properly releasing the returned pointers.)
@@ -45,7 +47,7 @@ AD_XMETHOD3(Next,
 AD_METHOD1(Skip,
 		   [in], aafUInt32, count, Number of elements to skip,
 		   Instructs the enumerator to skip the next count elements in the enumeration so that 
-  // the next call to AD_AAFTYPES\(EnumAAFMobSlots\)::Next will not return 
+  // the next call to AD_AAFTYPES\(EnumAAFPropertyDefinitions\)::Next will not return 
   // those elements.)
 
 AD_METHOD0(Reset,
@@ -57,14 +59,24 @@ Instructs the enumerator to position itself at the beginning of the list of elem
 AD_XMETHOD1(Clone,
 			[out\,retval],
 			objOut,
-			EnumAAFMobSlots,
+			EnumAAFPropertyDefinitions,
 			ppEnum,
 			new enumeration,
-			Creates another mob slot enumerator with the same state as the current 
+			Creates another property definition enumerator with the same state as the current 
   // enumerator to iterate over the same list. This method makes it possible to 
   // record a point in the enumeration sequence in order to return to that point 
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
+
+AD_XMETHOD1(NextOne,
+			[out\,retval],
+			objOut,
+			AAFPropertyDefinition,
+			ppPropertyDefinition,
+			The Next PropertyDefinition,
+			Enumerates to the next element in the enumerators list. The caller is responsible for 
+  // properly releasing the returned pointer when it is no longer needed.
+  // @comm This is a just simplified version of the Next method. )
 
 
 AD_OVERRIDE(.method-Test)

@@ -1,64 +1,39 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
-EnumAAFDefs\
-#endm
-#startm .parent-module 0
-AAFRoot\
+EnumAAFDefinitions\
 #endm
 #c
+#import ./AAFUnitTest.exp
 AD_HEAD
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-AD_FORWARD_DECLARATION(AAFDefObject)
+AD_FORWARD_DECLARATION(AAFDefinition)
 
 
 AD_CLASS_UUID(B1A2138B, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A2138A, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_XCLASS_BEGIN(Concrete, Transient)
+AD_ROOT_CLASS_BEGIN
 
 AD_XMETHOD1(NextOne,
-			[out\,retval], objOut, AAFDefObject, ppDef, The Next Definition,
+			[out\,retval], objOut, AAFDefinition, ppDefinition, The Next Definition,
 			Enumerates to the next element in the enumerators list. The caller is responsible for 
   // properly releasing the returned pointer when it is no longer needed.
   // @comm This is a just simplified version of the Next method. )
 
-AD_X2METHOD3(Next,
-			 [in],
-			 objPass,
-			 aafUInt32,
-			 count,
-			 number of definitions requested,
-			 xxx,
-			 xxx,
-
-			 [out\, size_is\(count\)\, length_is\(*pFetched\)],
-			 objOutArray,
-			 AAFDefObject,
-			 ppDef,
-			 array to receive definitions,
-			 count,
-			 pFetched
-
-			 [out\,ref],
-			 objPass,
-			 aafUInt32 *,
-			 pFetched,
-			 number of actual Definition fetched into ppDef array,
-			 xxx,
-			 xxx,
-
-			Enumerates the next count elements \(AAFDefObject pointers\) in 
+AD_XMETHOD3(Next,
+			[in], objPass, aafUInt32, count, number of definitions requested,
+			[out\, size_is\(count\)\, length_is\(*pFetched\)],
+			objOut, AAFDefinition, ppDefinition, array to receive definitions,
+			[out\,ref], objPass, aafUInt32 *, pFetched,
+			number of actual Definition fetched into ppDefinition array,
+			Enumerates the next count elements \(AD_AAFTYPES\(AAFDefinition\) pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
   // properly releasing the returned pointers.)
@@ -66,7 +41,7 @@ AD_X2METHOD3(Next,
 AD_METHOD1(Skip,
 		   [in], aafUInt32, count, Number of elements to skip,
 		   Instructs the enumerator to skip the next count elements in the enumeration so that 
-  // the next call to EnumAAFDefs::Next will not return 
+  // the next call to AD_AAFTYPES\(EnumAAFDefinition\)::Next will not return 
   // those elements.)
 
 AD_METHOD0(Reset,
@@ -78,7 +53,7 @@ Instructs the enumerator to position itself at the beginning of the list of elem
 AD_XMETHOD1(Clone,
 			[out\,retval],
 			objOut,
-			EnumAAFDefs,
+			EnumAAFDefinition,
 			ppEnum,
 			new enumeration,
 			Creates another definition enumerator with the same state as the current 
@@ -87,4 +62,6 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_XCLASS_END(Concrete, Transient)
+AD_OVERRIDE(.method-Test)
+
+AD_ROOT_CLASS_END
