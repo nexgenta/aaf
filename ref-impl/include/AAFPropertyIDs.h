@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.8 2004/05/08 22:18:45 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.9 2004/06/07 15:33:42 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -267,6 +267,7 @@ const int PID_Mob_UsageCode                                      = 0x4408;
 const int PID_CompositionMob_DefaultFadeLength                   = 0x4501;
 const int PID_CompositionMob_DefFadeType                         = 0x4502;
 const int PID_CompositionMob_DefFadeEditUnit                     = 0x4503;
+const int PID_CompositionMob_Rendering                           = 0x4504;
 const int PID_SourceMob_EssenceDescription                       = 0x4701;
 const int PID_MobSlot_SlotID                                     = 0x4801;
 const int PID_MobSlot_SlotName                                   = 0x4802;
