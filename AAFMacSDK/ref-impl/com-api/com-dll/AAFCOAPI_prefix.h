@@ -41,17 +41,14 @@
 #define GUID_DEFINED
 #endif // GUID_DEFINED
 
+// Conditional debugging and ansi assertions disabled
+#ifndef NDEBUG
+#define NDEBUG
+#endif
 
-// Define to enable the module testing of the shared library.
-#define AAF_MODULE_TEST
-
-//#ifndef _DEBUG
-//#define _DEBUG
-//#endif
-
-
-// AAF OM symbols
+// Enable PRECONDITION, POSTCONDITION, ASSERT, INVARIANT and IMPLIES macros.
 //#define OM_ENABLE_DEBUG
-//#define OM_ENABLE_TRACE
 
-#define BOB_TEST
+// Uncomment the following line if you want to see an exhausted list
+// of the calling sequence within the Object Manager.
+//#define OM_ENABLE_TRACE
