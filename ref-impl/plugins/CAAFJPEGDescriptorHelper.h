@@ -60,7 +60,7 @@ public:
 	//
 	// EssenceDescriptor methods:
 	//
-	STDMETHOD (GetNumLocators) (aafInt32 *  pCount);
+	STDMETHOD (GetNumLocators) (aafUInt32 *  pCount);
 	STDMETHOD (AppendLocator) (IAAFLocator * pLocator);
 	STDMETHOD (PrependLocator) (IAAFLocator * pLocator);
 	STDMETHOD (EnumAAFAllLocators) (IEnumAAFLocators ** ppEnum);
@@ -69,16 +69,16 @@ public:
 	//
 	STDMETHOD (SetLength) (aafLength_t  length);
 	STDMETHOD (GetLength) (aafLength_t *  pLength);
-	STDMETHOD (SetIsInContainer) (aafBool  isAAF);
-	STDMETHOD (GetIsInContainer) (aafBool *  pIsAAF);
-	STDMETHOD (SetSampleRate) (aafRational_t *  pRate);
+	STDMETHOD (SetCodecDef) (const aafUID_t & codecDef);
+	STDMETHOD (GetCodecDef) (aafUID_t *  pCodecDef);
+	STDMETHOD (SetSampleRate) (const aafRational_t & rate);
 	STDMETHOD (GetSampleRate) (aafRational_t*  pRate);
-	STDMETHOD (SetContainerFormat) (aafUID_t *  pFormat);
+	STDMETHOD (SetContainerFormat) (const aafUID_t & format);
 	STDMETHOD (GetContainerFormat) (aafUID_t *  pFormat);
 	//
 	// DigitalImageDescriptor methods:
 	//
-	STDMETHOD (SetCompression) (aafUID_t *  pCodecID);
+	STDMETHOD (SetCompression) (const aafUID_t & codecID);
 	STDMETHOD (GetCompression) (aafUID_t *  pCompression);
 	STDMETHOD (SetStoredView) (aafUInt32  StoredHeight, aafUInt32  StoredWidth);
 	STDMETHOD (GetStoredView) (aafUInt32 *  pStoredHeight, aafUInt32 *  pStoredWidth);
@@ -95,10 +95,10 @@ public:
 	STDMETHOD (GetImageAspectRatio) (aafRational_t *  pImageAspectRatio);
 	STDMETHOD (SetAlphaTransparency) (aafAlphaTransparency_t  AlphaTransparency);
 	STDMETHOD (GetAlphaTransparency) (aafAlphaTransparency_t *  pAlphaTransparency);
-	STDMETHOD (SetGamma) (aafRational_t  Gamma);
-	STDMETHOD (GetGamma) (aafRational_t *  pGamma);
-	STDMETHOD (SetImageAlignmentFactor) (aafInt32  ImageAlignmentFactor);
-	STDMETHOD (GetImageAlignmentFactor) (aafInt32 *  pImageAlignmentFactor);
+	STDMETHOD (SetGamma) (aafUID_t  Gamma);
+	STDMETHOD (GetGamma) (aafUID_t *  pGamma);
+	STDMETHOD (SetImageAlignmentFactor) (aafUInt32  ImageAlignmentFactor);
+	STDMETHOD (GetImageAlignmentFactor) (aafUInt32 *  pImageAlignmentFactor);
 	//
 	// CDCIDescriptor methods:
 	//
