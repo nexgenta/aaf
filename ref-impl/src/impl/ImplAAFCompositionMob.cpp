@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -12,7 +11,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -22,13 +20,16 @@
 #include "ImplAAFCompositionMob.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+
 #include <assert.h>
 #include "AAFResult.h"
 
 ImplAAFCompositionMob::ImplAAFCompositionMob ():
-	_defaultFadeLen(	PID_COMPOSITIONMOB_DEFAULTFADELENGTH,		"defaultFadeLength"),
-	_defaultFadeType(	PID_COMPOSITIONMOB_DEFAULTFADETYPE,			"defaultFadeType"),
-	_defaultFadeEditUnit(PID_COMPOSITIONMOB_DEFAULTFADEEDITUNIT,	"defaultFadeEditUnit")
+	_defaultFadeLen(	PID_CompositionMob_DefaultFadeLength,		"DefaultFadeLength"),
+	_defaultFadeType(	PID_CompositionMob_DefFadeType,			"DefFadeType"),
+	_defaultFadeEditUnit(PID_CompositionMob_DefFadeEditUnit,	"DefFadeEditUnit")
 {
 	_persistentProperties.put(		_defaultFadeLen.address());
 	_persistentProperties.put(		_defaultFadeType.address());
@@ -36,18 +37,13 @@ ImplAAFCompositionMob::ImplAAFCompositionMob ():
 	
 }
 
-
-
-
 ImplAAFCompositionMob::~ImplAAFCompositionMob ()
 {}
 
 
   //@access Public Members
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCompositionMob::SetInitialValues (aafWChar	*pName,
-											 aafBool	isPrimary
-											 )
+    ImplAAFCompositionMob::Initialize (aafWChar	*pName)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	if (pName == NULL)
@@ -57,8 +53,6 @@ AAFRESULT STDMETHODCALLTYPE
 	else
 	{
 		aafError = SetName( pName );
-		if (aafError == AAFRESULT_SUCCESS)
-			aafError = SetPrimary( isPrimary );
 	}
 
 	return aafError;
@@ -82,14 +76,21 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		if (_defaultFadeType == kFadeNone)
-			pResult->valid = AAFFalse;
+		if (!_defaultFadeLen.isPresent() ||
+			!_defaultFadeType.isPresent() ||
+			!_defaultFadeEditUnit.isPresent())
+			aafError = AAFRESULT_PROP_NOT_PRESENT;
 		else
 		{
-			pResult->fadeLength = _defaultFadeLen;
-			pResult->fadeType = _defaultFadeType;
-			pResult->fadeEditUnit = _defaultFadeEditUnit;
-			pResult->valid = AAFTrue;
+			if (_defaultFadeType == kFadeNone)
+				pResult->valid = AAFFalse;
+			else
+			{
+				pResult->fadeLength = _defaultFadeLen;
+				pResult->fadeType = _defaultFadeType;
+				pResult->fadeEditUnit = _defaultFadeEditUnit;
+				pResult->valid = AAFTrue;
+			}
 		}
 	}
 	return aafError;
@@ -104,11 +105,17 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-	if (fadeLength > 0) 
+	if (fadeLength >= 0) 
 	{
-		_defaultFadeLen = fadeLength;
-		_defaultFadeType = fadeType;
-		_defaultFadeEditUnit = fadeEditUnit;
+		if (fadeType >= kFadeNone ||
+			fadeType <= kFadeLinearPower)
+		{
+			_defaultFadeLen = fadeLength;
+			_defaultFadeType = fadeType;
+			_defaultFadeEditUnit = fadeEditUnit;
+		}
+		else
+			aafError = AAFRESULT_BAD_TYPE;
 	}
 	else
 		aafError = AAFRESULT_BAD_LENGTH;
@@ -129,7 +136,4 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-extern "C" const aafClassID_t CLSID_AAFCompositionMob;
-
-OMDEFINE_STORABLE(ImplAAFCompositionMob, CLSID_AAFCompositionMob);
-
+OMDEFINE_STORABLE(ImplAAFCompositionMob, AUID_AAFCompositionMob);

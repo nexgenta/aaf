@@ -1,29 +1,10 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 #include "ImplAAFDigitalImageDescriptor.h"
 
 #include "AAFStoredObjectIDs.h"
@@ -73,27 +54,14 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_persistentProperties.put(_gamma.address());
 	_persistentProperties.put(_imageAlignmentFactor.address());
 
-	aafRational_t	zero;
+	aafRational_t zero;
 	zero.numerator = 0;
 	zero.denominator = 1;
-
-	aafUID_t zeroID;
-	zeroID.Data1 = 0;
-	zeroID.Data2 = 0;
-	zeroID.Data3 = 0;
-	zeroID.Data4[0] = 0;
-	zeroID.Data4[1] = 0;
-	zeroID.Data4[2] = 0;
-	zeroID.Data4[3] = 0;
-	zeroID.Data4[4] = 0;
-	zeroID.Data4[5] = 0;
-	zeroID.Data4[6] = 0;
-	zeroID.Data4[7] = 0;
 	
 	// Initialize Required properties
 	_storedHeight = 0;
 	_storedWidth = 0;
-	_frameLayout = kAAFFullFrame;
+	_frameLayout = kFullFrame;
 	_imageAspectRatio = zero;
 	videoLineMap[0] = 0;
 	videoLineMap[1] = 1;
@@ -109,8 +77,8 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_displayWidth = 0;
 	_displayXOffset = 0;
 	_displayYOffset = 0;
-	_alphaTransparency = kAAFMinValueTransparent;
-	_gamma = zeroID;
+	_alphaTransparency = zero;
+	_gamma = zero;
 	_imageAlignmentFactor = 0;
 }
 
@@ -119,9 +87,12 @@ ImplAAFDigitalImageDescriptor::~ImplAAFDigitalImageDescriptor ()
 {}
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::SetCompression (const aafUID_t & compression)
+    ImplAAFDigitalImageDescriptor::SetCompression (aafUID_t*  pCompression)
 {
-	_compression = compression;
+	if (pCompression == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	_compression = *pCompression;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -200,19 +171,31 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::SetAlphaTransparency (aafAlphaTransparency_t AlphaTransparency)
 {
-	if ((AlphaTransparency != kAAFMinValueTransparent) && (AlphaTransparency != kAAFMaxValueTransparent))
+	if ((AlphaTransparency != kMinValueTransparent) && (AlphaTransparency != kMaxValueTransparent))
 	{
 		return AAFRESULT_INVALID_TRANSPARENCY;
 	}
 
-	_alphaTransparency = AlphaTransparency;
+	aafRational_t transparency;
+
+	if (AlphaTransparency == kMinValueTransparent)
+	{
+		transparency.numerator = 0;
+		transparency.denominator = 1;
+	}
+	else
+	{
+		transparency.numerator = 1;
+		transparency.denominator = 1;
+	}
+	_alphaTransparency = transparency;
 
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::SetGamma (aafUID_t Gamma)
+    ImplAAFDigitalImageDescriptor::SetGamma (aafRational_t Gamma)
 {
 	_gamma = Gamma;
 
@@ -361,14 +344,23 @@ AAFRESULT STDMETHODCALLTYPE
 	if (!_alphaTransparency.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
 	
-	*pAlphaTransparency = _alphaTransparency;
+	aafRational_t transparency = _alphaTransparency;
+
+	if (transparency.numerator == 0)
+	{
+		*pAlphaTransparency = kMinValueTransparent;
+	}
+	else
+	{
+		*pAlphaTransparency = kMaxValueTransparent;
+	}
 
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::GetGamma (aafUID_t* pGamma)
+    ImplAAFDigitalImageDescriptor::GetGamma (aafRational_t* pGamma)
 {
 	if (pGamma == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -383,7 +375,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDigitalImageDescriptor::GetImageAlignmentFactor (aafUInt32* pImageAlignmentFactor)
+    ImplAAFDigitalImageDescriptor::GetImageAlignmentFactor (aafInt32* pImageAlignmentFactor)
 {
 	if (pImageAlignmentFactor == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -398,3 +390,4 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFDigitalImageDescriptor, AUID_AAFDigitalImageDescriptor);
