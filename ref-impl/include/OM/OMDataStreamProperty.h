@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,19 +31,20 @@
 
 #include "OMDataTypes.h"
 
-#include "OMPropertyBase.h"
+#include "OMProperty.h"
 
 struct IStream;
 
   // @class Persistent data stream properties supported by the Object
   //        Manager.
   //   @base | public <c OMProperty>.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMDataStreamProperty : public OMProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMDataStreamProperty(const OMPropertyId propertyId, const char* name);
+  OMDataStreamProperty(const OMPropertyId propertyId, const wchar_t* name);
 
     // @cmember Destructor.
   virtual ~OMDataStreamProperty(void);
@@ -52,8 +53,8 @@ public:
   virtual void save(void) const;
 
     // @cmember Restore this <c OMDataStreamProperty>, the size of the
-    //          <c OMDataStreamProperty> is <p size>.
-  virtual void restore(size_t size);
+    //          <c OMDataStreamProperty> is <p externalSize>.
+  virtual void restore(size_t externalSize);
 
     // @cmember Close this  <c OMDataStreamProperty>.
   virtual void close(void);
@@ -74,6 +75,8 @@ public:
     //          offset in bytes from the begining of the data stream.
   void setPosition(const OMUInt64 offset) const;
 
+  // Raw access interface - these functions do not use the OMType interface
+
     // @cmember Attempt to read the number of bytes given by <p bytes>
     //          from the data stream into the buffer at address
     //          <p buffer>. The actual number of bytes read is returned
@@ -89,6 +92,31 @@ public:
   void write(const OMByte* buffer,
              const OMUInt32 bytes,
              OMUInt32& bytesWritten);
+
+  // Typed access interface - these functions use the OMType interface
+
+    // @cmember Attempt to read the number of elements given by
+    //          <p elementCount> and described by <p elementType> and
+    //          <p externalElementSize> from the data stream into the buffer
+    //          at address <p elements>. The actual number of elements read
+    //          is returned in <p elementsRead>.
+  void readTypedElements(const OMType* elementType,
+                         size_t externalElementSize,
+                         OMByte* elements,
+                         OMUInt32 elementCount,
+                         OMUInt32& elementsRead) const;
+
+
+    // @cmember Attempt to write the number of elements given by
+    //          <p elementCount> and described by <p elementType> and
+    //          <p internalElementSize> to the data stream from the buffer
+    //          at address <p elements>. The actual number of elements written
+    //          is returned in <p elementsWritten>.
+  void writeTypedElements(const OMType* elementType,
+                          size_t internalElementSize,
+                          const OMByte* elements,
+                          OMUInt32 elementCount,
+                          OMUInt32& elementsWritten);
 
   // Direct property access interface
 
@@ -106,12 +134,29 @@ public:
     //          is <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
+    // @cmember Is a byte order specifed for this stream ?
+  virtual bool hasByteOrder(void) const;
+
+    // @cmember Specify a byte order for this stream.
+  virtual void setByteOrder(OMByteOrder byteOrder);
+
+    // @cmember The byte order of this stream.
+  virtual OMByteOrder byteOrder(void) const;
+
+    // @cmember Clear the byte order of this stream
+  virtual void clearByteOrder(void);
+
+protected:
+
+  virtual const wchar_t* storedName(void) const;
+
 private:
 
   void open(void);
   void create(void);
 
   IStream* _stream;
+  OMByteOrder _byteOrder;
 
 };
 

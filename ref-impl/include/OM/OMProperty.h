@@ -29,7 +29,6 @@
 #ifndef OMPROPERTY_H
 #define OMPROPERTY_H
 
-#include "OMPortability.h"
 #include "OMDataTypes.h"
 
 #include <stddef.h>
@@ -58,6 +57,7 @@ class OMType;
 
   // @class Abstract base class for persistent properties supported by
   //        the Object Manager.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMProperty {
 public:
   // @access Public members.
@@ -118,7 +118,7 @@ public:
   bool isPresent(void) const;
 
     // @cmember Remove this optional <c OMProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
   // Direct property access interface
 
@@ -194,6 +194,7 @@ private:
   // @class Abstract base class for simple (data) persistent
   //        properties supported by the Object Manager.
   //   @base public | <c OMProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMSimpleProperty : public OMProperty {
 public:
   // @access Public members. 

@@ -40,6 +40,7 @@
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @base public | <c OMReferenceProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMStrongReferenceProperty : public OMReferenceProperty {
 public:
@@ -57,6 +58,9 @@ public:
 
     // @cmember Set the value of this <c OMStrongReferenceProperty>.
   virtual ReferencedObject* setValue(const ReferencedObject* object);
+
+    // @cmember Clear the value of this <c OMStrongReferenceProperty>.
+  virtual ReferencedObject* clearValue(void);
 
     // @cmember Assignment operator.
   OMStrongReferenceProperty<ReferencedObject>& operator =
@@ -93,7 +97,7 @@ public:
   virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
     // @cmember Get the raw bits of this <c OMStrongReferenceProperty>. The
     //          raw bits are copied to the buffer at address <p bits>
