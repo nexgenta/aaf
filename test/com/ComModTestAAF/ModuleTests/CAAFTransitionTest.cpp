@@ -59,6 +59,8 @@ static void RemoveTestFile(const wchar_t* pFileName)
   }
 }
 
+
+#ifndef _DEBUG
 // convenient error handlers.
 inline void checkResult(HRESULT r)
 {
@@ -70,6 +72,30 @@ inline void checkExpression(bool expression, HRESULT r)
   if (!expression)
     throw r;
 }
+
+#else // #ifndef _DEBUG
+
+// convenient error handlers.
+#define checkResult(r)\
+do {\
+  if (FAILED(r))\
+  {\
+    cerr << "FILE:" << __FILE__ << " LINE:" << __LINE__ << " Error code = " << hex << r << dec << endl;\
+    throw (HRESULT)r;\
+  }\
+} while (false)
+
+#define checkExpression(expression, r)\
+do {\
+  if (!(expression))\
+  {\
+    cerr << "FILE:" << __FILE__ << " LINE:" << __LINE__ << " Expression failed = " << #expression << endl;\
+    throw (HRESULT)r;\
+  }\
+} while (false)
+
+#endif // #else // #ifndef _DEBUG
+
 
 #define TEST_NUM_INPUTS		1
 #define TEST_CATEGORY		L"Test Parameters"
@@ -105,6 +131,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFOperationDef*				pOperationDef = NULL;
 	IAAFParameter				*pParm = NULL;
 	IAAFParameterDef*			pParamDef = NULL;
+	IAAFConstantValue*			pConstantValue = NULL;
 	
 	aafMobID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
@@ -116,17 +143,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUID_t					parmID = kTestParmID;
 
 	CvtInt32toLength(100, transitionLength);
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTransition Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
-
 
 	try
 	{
@@ -154,10 +182,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFParameterDef, 
 								   (IUnknown **)&pParamDef));
 
+		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
+		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC, defs.tdRational ()));
+		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
-		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
 		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
@@ -168,8 +198,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// !!!Added circular definitions because we don't have optional properties
 		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
-		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
 
 		// ------------------------------------------------------------
 		//	To test a Transition we need to create a Sequence which will 
@@ -241,16 +269,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFOperationGroup,
 								   (IUnknown **)&pOperationGroup));
 
-		checkResult(defs.cdParameter()->
-					CreateInstance(IID_IAAFParameter, 
-								   (IUnknown **)&pParm));
-		checkResult(pParm->SetParameterDefinition (pParamDef));
- // !!!  ImplAAFParameter::SetTypeDefinition (ImplAAFTypeDef*  pTypeDef)
 		checkResult(pOperationGroup->Initialize(defs.ddPicture(), transitionLength, pOperationDef));
-		checkResult(pOperationGroup->AddParameter (pParm));
+
+    // Create a constant value parameter.
+		checkResult(defs.cdConstantValue()->
+					CreateInstance(IID_IAAFConstantValue, 
+								   (IUnknown **)&pConstantValue));
+    aafRational_t testLevel = {1, 2};
+		checkResult(pConstantValue->Initialize (pParamDef, sizeof(testLevel), (aafDataBuffer_t)&testLevel));
+
+    checkResult(pConstantValue->QueryInterface (IID_IAAFParameter, (void **)&pParm));
+    checkResult(pOperationGroup->AddParameter (pParm));
+//    pParm->Release();
+ //	IAAFSegment*				pSegment = NULL;
+   pParm = NULL;
+    pConstantValue->Release();
+    pConstantValue = NULL;
+
 		checkResult(defs.cdFiller()->
 					CreateInstance(IID_IAAFSegment,
 								   (IUnknown **) &pEffectFiller));
+		 checkResult(pEffectFiller->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 		checkResult(pOperationGroup->AppendInputSegment (pEffectFiller));
 		// release the filler
 		pEffectFiller->Release();
@@ -313,6 +355,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	// Cleanup and return
 	if (pParm)
 		pParm->Release();
+
+  if (pConstantValue)
+		pConstantValue->Release();
 
 	if (pParamDef)
 		pParamDef->Release();
@@ -397,16 +442,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafUInt32					numComponents = 0;
 	HRESULT						hr = S_OK;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
 	ProductInfo.productName = L"AAFTransition Test. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
-
 
 	try
 	{

@@ -83,6 +83,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTimelineMobSlot			*pNewSlot = NULL;
 	IAAFTimecodeStream			*pTimecodeStream = NULL;
 	IAAFSegment					*pSeg = NULL;
+	IAAFComponent*		pComponent = NULL;
 	
 	aafMobID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
@@ -90,13 +91,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafLength_t					zero;
 	
 	CvtInt32toLength(0, zero);
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTimecodeStream Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -133,6 +136,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdTimecodeStream()->
 					CreateInstance(IID_IAAFTimecodeStream, 
 								   (IUnknown **)&pTimecodeStream));		
+		 checkResult(pTimecodeStream->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 				
 		checkResult(pTimecodeStream->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
 		aafRational_t editRate = { 0, 1};
@@ -173,6 +180,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pMob)
 		pMob->Release();
 	
+	if (pComponent)
+		pComponent->Release();
+
 	if (pCompMob)
 		pCompMob->Release();
 	
@@ -217,16 +227,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafNumSlots_t				numMobs;
 	HRESULT						hr = S_OK;
 	
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
 	ProductInfo.productName = L"AAFTimecodeStream Test. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
-	
 	
 	try
 	{
