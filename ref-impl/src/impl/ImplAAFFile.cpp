@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.120.2.4 2004/07/23 19:08:27 akharkev Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.120.2.5 2004/07/23 19:27:50 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,7 +49,6 @@
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFBuiltinDefs.h"
 #include "ImplAAFOMRawStorage.h"
-#include "ImplAAFCloneResolver.h"
 
 #include "AAFFileMode.h"
 #include "AAFFileKinds.h"
@@ -1230,9 +1229,7 @@ ImplAAFFile::SaveCopyAs (ImplAAFFile * pDestFile)
       
       spDstHeader->SetContentStorage( pNewDstStorage );
 
-      ImplAAFCloneResolver resolver(pDestFile);
-      pNewDstStorage->onCopy(&resolver);
-      spSrcContentStore->deepCopyTo( pNewDstStorable, &resolver );
+      spSrcContentStore->deepCopyTo( pNewDstStorable, 0 );
     }
 
     // Clone the ident list.
@@ -1254,18 +1251,13 @@ ImplAAFFile::SaveCopyAs (ImplAAFFile * pDestFile)
 	
 	checkResult( spDstHeader->AppendIdentification( pNewDstIdent ) );
 
-	ImplAAFCloneResolver resolver(pDestFile);
-	pNewDstIdent->onCopy(&resolver);
-       	spSrcIdent->deepCopyTo( pNewDstIdent, &resolver );
+       	spSrcIdent->deepCopyTo( pNewDstIdent, 0 );
       }
     }
 
   }
   catch( const HRESULT& ex ) {
     return ex;
-  }
-  catch( const ImplAAFCloneResolverEx& ex ) {
-    return ex.GetHResult();
   }
 
   return pDestFile->Save();
