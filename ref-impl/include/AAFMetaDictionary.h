@@ -1,3 +1,30 @@
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
+
 //
 // Meta definition of the AAF object model.
 //
@@ -23,8 +50,8 @@
 //
 // DictP18-277-1847BMaster.csv 
 //
-// This file was generated on Thu Aug  5 17:32:29 EDT 1999
-// by user tbingham on system TBINGHAMPC.
+// This file was generated on Tue Sep  7 15:52:58 EDT 1999
+// by user btillman on system BTILLMANPC.
 //
 // Key to macros.
 //
@@ -3522,6 +3549,15 @@ AAF_TYPE_DEFINITION_FIXED_ARRAY(UInt8Array8,
   AAF_TYPE(UInt8), 8)
 AAF_TYPE_SEPARATOR()
 
+// UInt8Array
+//
+AAF_TYPE_DEFINITION_VARYING_ARRAY(UInt8Array, 
+  AAF_LITERAL_AUID(0x0C030100,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(UInt8))
+AAF_TYPE_SEPARATOR()
+
 // Int32Array
 //
 AAF_TYPE_DEFINITION_VARYING_ARRAY(Int32Array, 
@@ -3622,7 +3658,7 @@ AAF_TYPE_DEFINITION_RECORD(ProductVersion,
     ProductVersion)
   AAF_TYPE_DEFINITION_RECORD_FIELD(tertiary, AAF_TYPE(UInt16),
     ProductVersion)
-  AAF_TYPE_DEFINITION_RECORD_FIELD(patchLevel, AAF_TYPE(Uint16),
+  AAF_TYPE_DEFINITION_RECORD_FIELD(patchLevel, AAF_TYPE(UInt16),
     ProductVersion)
   AAF_TYPE_DEFINITION_RECORD_FIELD(type, AAF_TYPE(ProductReleaseType),
     ProductVersion)
@@ -3838,6 +3874,196 @@ AAF_TYPE_DEFINITION_STRONG_REFERENCE(
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(SourceReference))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<ClassDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, ClassDefinition), 
+  AAF_LITERAL_AUID(0x0C0B0008,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(ClassDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<CodecDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, CodecDefinition), 
+  AAF_LITERAL_AUID(0x0C0B0009,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(CodecDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<Component>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, Component), 
+  AAF_LITERAL_AUID(0x0C0B000A,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(Component))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<ContainerDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, ContainerDefinition), 
+  AAF_LITERAL_AUID(0x0C0B000B,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(ContainerDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<ControlPoint>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, ControlPoint), 
+  AAF_LITERAL_AUID(0x0C0B000C,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(ControlPoint))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<DataDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, DataDefinition), 
+  AAF_LITERAL_AUID(0x0C0B000D,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(DataDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<EssenceData>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, EssenceData), 
+  AAF_LITERAL_AUID(0x0C0B000E,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(EssenceData))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<Identification>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, Identification), 
+  AAF_LITERAL_AUID(0x0C0B000F,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(Identification))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<InterpolationDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, InterpolationDefinition), 
+  AAF_LITERAL_AUID(0x0C0B0010,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(InterpolationDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<Locator>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, Locator), 
+  AAF_LITERAL_AUID(0x0C0B0011,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(Locator))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<Mob>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, Mob), 
+  AAF_LITERAL_AUID(0x0C0B0012,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(Mob))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<MobSlot>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, MobSlot), 
+  AAF_LITERAL_AUID(0x0C0B0013,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(MobSlot))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<OperationDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, OperationDefinition), 
+  AAF_LITERAL_AUID(0x0C0B0014,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(OperationDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<Parameter>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, Parameter), 
+  AAF_LITERAL_AUID(0x0C0B0015,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(Parameter))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<ParameterDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, ParameterDefinition), 
+  AAF_LITERAL_AUID(0x0C0B0016,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(ParameterDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<PluginDescriptor>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, PluginDescriptor), 
+  AAF_LITERAL_AUID(0x0C0B0017,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(PluginDescriptor))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<PropertyDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, PropertyDefinition), 
+  AAF_LITERAL_AUID(0x0C0B0018,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(PropertyDefinition))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<TaggedValue>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, TaggedValue), 
+  AAF_LITERAL_AUID(0x0C0B0019,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(TaggedValue))
+AAF_TYPE_SEPARATOR()
+
+// StrongReference<TypeDefinition>
+//
+AAF_TYPE_DEFINITION_STRONG_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(StrongReference, TypeDefinition), 
+  AAF_LITERAL_AUID(0x0C0B001A,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(TypeDefinition))
 AAF_TYPE_SEPARATOR()
 
 // StrongReferenceSet<ClassDefinition>
@@ -4168,6 +4394,16 @@ AAF_TYPE_DEFINITION_WEAK_REFERENCE(
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
   AAF_TYPE(TypeDefinition))
+AAF_TYPE_SEPARATOR()
+
+// WeakReference<PluginDescriptor>
+//
+AAF_TYPE_DEFINITION_WEAK_REFERENCE(
+  AAF_REFERENCE_TYPE_NAME(WeakReference, PluginDescriptor), 
+  AAF_LITERAL_AUID(0x0C0B030A,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x0C),
+  AAF_TYPE(PluginDescriptor))
 AAF_TYPE_SEPARATOR()
 
 // WeakReferenceSet<DataDefinition>
