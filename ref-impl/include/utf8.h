@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: utf8.h,v 1.2 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: utf8.h,v 1.3 2004/09/22 14:50:17 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,6 @@
 #define __UTF8_h__
 
 #include <wchar.h>
-
 
 // UTF8 versions of mbs/wcs libc functions
 // (because MSFT and GNU take different approaches from each other)

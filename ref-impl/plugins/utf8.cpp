@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: utf8.cpp,v 1.2 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
+// $Id: utf8.cpp,v 1.3 2004/09/22 14:50:18 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,7 +79,7 @@ int wcsu8slen( const wchar_t *pw )
 	while( w=*pw++ )
 	{
 		if( !(w&~0x7f) ) len+=1;
-		if( !(w&~0x7ff) ) len+=2;
+		else if( !(w&~0x7ff) ) len+=2;
 		else if( !(w&~0xffff) ) len+=3;
 		else if( !(w&~0x1fffff) ) len+=4;
 		else /* error: add width of null character entity &#x00; */ len+=6;

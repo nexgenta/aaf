@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.cpp,v 1.57 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
+// $Id: OMUtilities.cpp,v 1.58 2004/09/22 14:50:18 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -237,7 +237,7 @@ void convertWideStringToString(char*  result,
   PRECONDITION("Valid output buffer", result != 0);
   PRECONDITION("Valid output buffer size", resultSize > 0);
 
-  size_t length = lengthOfWideString(string);
+  size_t length = wcsu8slen(string);
   if (length > (resultSize - 1)) {
     length = resultSize - 1;
   }
