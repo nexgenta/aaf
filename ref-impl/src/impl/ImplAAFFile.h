@@ -12,9 +12,8 @@
 *                                          *
 \******************************************/
 
-#ifndef __AAFTypes_h__
 #include "AAFTypes.h"
-#endif
+#include "ImplAAFRoot.h"
 
 #include "Container.h"
 
@@ -35,7 +34,7 @@ struct IAAFSession;
 class ImplAAFSession;
 class ImplAAFDataDefinition;
 
-class ImplAAFFile
+class ImplAAFFile : public ImplAAFRoot
 {
 public:
   //
@@ -74,10 +73,6 @@ public:
   // in /test/ImplAAFFileTest.cpp.
   static AAFRESULT test();
 
-  void InitContainer (void * pContainer);
-
-  void * GetContainer ();
-
 AAFRESULT Create(
 			aafDataBuffer_t		stream, 
 			ImplAAFSession *	session, 
@@ -94,8 +89,6 @@ private:
 								   ImplAAFSession * session,
 								   OMLContainerUseMode useMode, 
 								   openType_t type);
-
-	void * _pContainer;
 
 		aafInt32       	_cookie;
 		aafFileFormat_t _fmt;
