@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -29,18 +29,27 @@
 
 
 
-#include "AAFStoredObjectIDs.h"
 
 #ifndef __ImplAAFTypeDefStream_h__
 #include "ImplAAFTypeDefStream.h"
 #endif
+
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+
 
 #include <assert.h>
 #include <string.h>
 
 
 ImplAAFTypeDefStream::ImplAAFTypeDefStream ()
-{}
+  : _elementType  (PID_TypeDefinitionStream_ElementType,
+                   "ElementType", 
+                   "/Dictionary/TypeDefinitions", 
+                   PID_DefinitionObject_Identification)
+{
+  _persistentProperties.put(_elementType.address());
+}
 
 
 ImplAAFTypeDefStream::~ImplAAFTypeDefStream ()
@@ -49,22 +58,24 @@ ImplAAFTypeDefStream::~ImplAAFTypeDefStream ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::Initialize (
-      const aafUID_t * pID,
+      const aafUID_t & id,
       ImplAAFTypeDef * pTypeDef,
-      wchar_t * pTypeName)
+      const aafCharacter * pTypeName)
 {
-  if (! pID)
-	return AAFRESULT_NULL_PARAM;
   if (! pTypeDef)
 	return AAFRESULT_NULL_PARAM;
   if (! pTypeName)
 	return AAFRESULT_NULL_PARAM;
+  if (!pTypeDef->attached())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
   assert (pTypeDef);
-  if (! pTypeDef->IsStreamable())
+  if (! pTypeDef->IsStreamable() || !pTypeDef->IsFixedSize())
 	return AAFRESULT_BAD_TYPE;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  _elementType = pTypeDef;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -76,7 +87,11 @@ AAFRESULT STDMETHODCALLTYPE
   if (! ppTypeDef)
 	return AAFRESULT_NULL_PARAM;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *ppTypeDef = _elementType;
+  if (*ppTypeDef)
+    (*ppTypeDef)->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
