@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStream.h,v 1.6 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMStream.h,v 1.7 2005/03/30 16:41:26 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,7 +64,7 @@ public:
              OMUInt32 byteCount,
              OMUInt32& bytesWritten);
 
-  OMUInt64 size(void) ;
+  OMUInt64 size(void) const ;
 
   void setSize(OMUInt64 newSize);
 
