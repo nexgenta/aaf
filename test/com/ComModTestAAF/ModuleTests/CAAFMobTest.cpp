@@ -270,7 +270,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CAAFMob_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
- 	aafWChar * pFileName = L"MOBTest.aaf";
+ 	aafWChar * pFileName = L"AAFMobTest.aaf";
 
 	try
 	{
@@ -287,72 +287,28 @@ extern "C" HRESULT CAAFMob_test()
 
   // Cleanup our object if it exists.
 
-  	// When all of the functionality of this class is tested, we can return success
-	if(hr == AAFRESULT_SUCCESS)
+	// When all of the functionality of this class is tested, we can return success.
+	// When a method and its unit test have been implemented, remove it from the list.
+	if (SUCCEEDED(hr))
+	{
+		cout << "The following AAFMob methods have not been implemented:" << endl; 
+		cout << "     GetNameBufLen" << endl; 
+		cout << "     AppendSlot" << endl; 
+		cout << "     EnumAAFAllMobSlots - needs unit test" << endl; 
+		cout << "     GetModTime - needs unit test" << endl; 
+		cout << "     SetModTime" << endl; 
+		cout << "     GetCreateTime - needs unit test" << endl; 
+		cout << "     AppendComment - needs unit test" << endl; 
+		cout << "     GetNumComments" << endl; 
+		cout << "     EnumAAFAllMobComments - needs unit test" << endl; 
+		cout << "     AppendNewTimelineSlot" << endl; 
+		cout << "     GetMobInfo - needs unit test" << endl; 
+		cout << "     OffsetToMobTimecode - needs unit test" << endl; 
+		cout << "     ChangeRef - needs unit test" << endl; 
+		cout << "     CloneExternal - needs unit test" << endl; 
+		cout << "     Copy - needs unit test" << endl; 
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+	}
 
   return hr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
