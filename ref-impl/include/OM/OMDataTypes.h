@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.39 2004/10/21 17:13:17 stuart_hc Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.40 2004/10/25 14:27:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,12 +41,12 @@
 #if defined(OM_COMPILER_MSC_INTEL_WINDOWS)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
-typedef long int               OMInt32;
+typedef int                    OMInt32;
 typedef __int64                OMInt64;
 
 typedef unsigned char          OMUInt8;
 typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
+typedef unsigned int           OMUInt32;
 typedef unsigned __int64       OMUInt64;
 
 #elif defined(OM_COMPILER_MWERKS_PPC_MACOS)
@@ -85,67 +85,67 @@ typedef unsigned long long int OMUInt64;
 #elif defined(OM_COMPILER_GCC_MIPS_SGI)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
-typedef long int               OMInt32;
+typedef int                    OMInt32;
 typedef long long int          OMInt64;
 
 typedef unsigned char          OMUInt8;
 typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
+typedef unsigned int           OMUInt32;
 typedef unsigned long long int OMUInt64;
 
-#elif defined(OM_COMPILER_GCC_INTEL_LINUX)
+#elif defined(OM_COMPILER_GCC_INTEL_LINUX) || defined(OM_COMPILER_GCC_X86_64_LINUX)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
-typedef long int               OMInt32;
+typedef int                    OMInt32;
 typedef long long int          OMInt64;
 
 typedef unsigned char          OMUInt8;
 typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
+typedef unsigned int           OMUInt32;
 typedef unsigned long long int OMUInt64;
 
 #elif defined(OM_COMPILER_GCC_INTEL_FREEBSD)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
-typedef long int               OMInt32;
+typedef int                    OMInt32;
 typedef long long int          OMInt64;
 
 typedef unsigned char          OMUInt8;
 typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
+typedef unsigned int           OMUInt32;
 typedef unsigned long long int OMUInt64;
 
 #elif defined(OM_COMPILER_GCC_INTEL_CYGWIN)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
-typedef long int               OMInt32;
+typedef int                    OMInt32;
 typedef long long int          OMInt64;
 
 typedef unsigned char          OMUInt8;
 typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
+typedef unsigned int           OMUInt32;
 typedef unsigned long long int OMUInt64;
 
 #elif defined(OM_COMPILER_SGICC_MIPS_SGI)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
-typedef long int               OMInt32;
+typedef int                    OMInt32;
 typedef long long int          OMInt64;
 
 typedef unsigned char          OMUInt8;
 typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
+typedef unsigned int           OMUInt32;
 typedef unsigned long long int OMUInt64;
 
 #elif defined(OM_COMPILER_GCC_SPARC_SUNOS)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
-typedef long int               OMInt32;
+typedef int                    OMInt32;
 typedef long long int          OMInt64;
 
 typedef unsigned char          OMUInt8;
 typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
+typedef unsigned int           OMUInt32;
 typedef unsigned long long int OMUInt64;
 
 #else
