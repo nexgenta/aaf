@@ -1,29 +1,10 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -62,26 +43,27 @@ ImplAAFTypeDefRename::~ImplAAFTypeDefRename ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRename::Initialize (
-      const aafUID_t & id,
+      const aafUID_t * pID,
       ImplAAFTypeDef * pBaseType,
-      const aafCharacter * pTypeName)
+      wchar_t * pTypeName)
 {
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
   if (! pBaseType)  return AAFRESULT_NULL_PARAM;
+  if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
 
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (id);
+  hr = SetAUID (pID);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  aafUID_t baseId;
+  aafUID_t id;
   assert (pBaseType);
-  hr = pBaseType->GetAUID(&baseId);
+  hr = pBaseType->GetAUID(&id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  _RenamedType = baseId;
+  _RenamedType = id;
 
   return AAFRESULT_SUCCESS;
 }
@@ -111,7 +93,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 	  ImplAAFTypeDefRename * pNonConstThis =
 		  (ImplAAFTypeDefRename *) this;
-	  hr = pDict->LookupType (_RenamedType, &pNonConstThis->_cachedBaseType);
+	  aafUID_t id = _RenamedType;
+	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedBaseType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedBaseType);
@@ -261,44 +244,12 @@ size_t ImplAAFTypeDefRename::NativeSize() const
 }
 
 
-OMProperty * ImplAAFTypeDefRename::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefRename::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const aafCharacter * name) const
 {
-  return BaseType()->pvtCreateOMPropertyMBS (pid, name);
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefRename::GetTypeCategory (
-      eAAFTypeCategory_t * pTid)
-{
-  if (! pTid)
-	return AAFRESULT_NULL_PARAM;
-
-  *pTid = kAAFTypeCatRename;
-  return AAFRESULT_SUCCESS;
+  return BaseType()->pvtCreateOMProperty (pid, name);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefRename::RawAccessType (
-      ImplAAFTypeDef ** ppRawTypeDef)
-{
-  return BaseType()->RawAccessType (ppRawTypeDef);
-}
 
-
-bool ImplAAFTypeDefRename::IsAggregatable () const
-{ return BaseType()->IsAggregatable(); }
-
-bool ImplAAFTypeDefRename::IsStreamable () const
-{ return BaseType()->IsStreamable(); }
-
-bool ImplAAFTypeDefRename::IsFixedArrayable () const
-{ return BaseType()->IsFixedArrayable(); }
-
-bool ImplAAFTypeDefRename::IsVariableArrayable () const
-{ return BaseType()->IsVariableArrayable(); }
-
-bool ImplAAFTypeDefRename::IsStringable () const
-{ return BaseType()->IsStringable(); }
