@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/09/28 10:18:21 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2004/11/22 12:59:50 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -24,13 +24,17 @@
 
 
 .PHONY : all
-all : aafomf eli2aaf aafviewer
+all : aafextract aafomf eli2aaf aafviewer
 
 # AafOmf depends upon OMF development libraries which are no longer distributed
 # with the SDK.  They are available from http://aafassociation.org/download/
 .PHONY : aafomf
 aafomf:
 	@if [ -r ../OMF/Include/omDefs.h ] ; then cd AafOmf && $(MAKE); else echo; echo "OMF libraries not present - AafOmf will not be built"; echo; fi
+
+.PHONY : aafextract
+aafextract:
+	cd aafextract && $(MAKE)
 
 .PHONY : eli2aaf
 eli2aaf:
@@ -44,6 +48,7 @@ aafviewer:
 .PHONY : clean
 clean :
 	cd AafOmf && $(MAKE) GENDEPS=0 $@
+	cd aafextract && $(MAKE) GENDEPS=0 $@
 	cd eli2aaf && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aaf2dot && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aafmeta2dot && $(MAKE) GENDEPS=0 $@
@@ -51,6 +56,7 @@ clean :
 .PHONY : realclean
 realclean :
 	cd AafOmf && $(MAKE) GENDEPS=0 $@
+	cd aafextract && $(MAKE) GENDEPS=0 $@
 	cd eli2aaf && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aaf2dot && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aafmeta2dot && $(MAKE) GENDEPS=0 $@
