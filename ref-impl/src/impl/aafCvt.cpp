@@ -1,30 +1,28 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1996 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
  *
  ************************************************************************/
-
 /*
  * Name: omCvt.c
  *
@@ -675,7 +673,7 @@ aafErr_t Int64ToString(
 	aafInt64		workval, zero;
 	char			tmpBuf[64];
 	aafInt32		numDigits, remainder, src, dest;
-	aafBool			negative = kAAFFalse;
+	aafBool			negative = AAFFalse;
 	
 	if(buf == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -695,7 +693,7 @@ aafErr_t Int64ToString(
 			if(Int64Less(workval, zero))
 			{
 				NegateInt64(&workval);
-				negative = kAAFTrue;
+				negative = AAFTrue;
 			}
 			while(Int64Greater(workval, zero))
 			{
@@ -778,9 +776,9 @@ aafBool Int64Equal(
 	for(n = 0; n <= 3; n++)
 	{
 		if(a.words[n] != b.words[n])
-			return kAAFFalse;
+			return AAFFalse;
 	}
-	return(kAAFTrue);
+	return(AAFTrue);
 }
 
 /*****/
@@ -1040,7 +1038,7 @@ aafErr_t TimecodeToString(
 		  RAISE(AAFRESULT_INTERN_TOO_SMALL);
 		}
 
-	  if (timeCode.drop == kAAFTcDrop)
+	  if (timeCode.drop == kTcDrop)
 		wcscpy(tcString, L"00;00;00;00");
 	  else 
 		wcscpy(tcString, L"00:00:00:00");
@@ -1140,11 +1138,11 @@ aafErr_t StringToTimecode(
 		}
 		
 		/* Prescan for drop/nondrop */
-		drop = kAAFTcNonDrop;
+		drop = kTcNonDrop;
 		for (c = &tcString[len-1]; c >= tcString; c--)
 			if (*c == ';')
 			{
-				drop = kAAFTcDrop;
+				drop = kTcDrop;
 				break;
 			}
 			
@@ -1152,7 +1150,7 @@ aafErr_t StringToTimecode(
 			if (intFRate == 25)
 			{
 				multiplier = PALnondropTbl;
-				drop = kAAFTcNonDrop;
+				drop = kTcNonDrop;
 			}
 			
 			for (c = &tcString[len-1]; c >= tcString; c--)
@@ -1182,9 +1180,9 @@ aafErr_t StringToTimecode(
 			}
 			
 			if (!drop)
-				(*timecode).drop = kAAFTcNonDrop;
+				(*timecode).drop = kTcNonDrop;
 			else 
-				(*timecode).drop = kAAFTcDrop;
+				(*timecode).drop = kTcDrop;
 			
 			(*timecode).fps = (aafUInt16)intFRate;
 			(*timecode).startFrame = total;

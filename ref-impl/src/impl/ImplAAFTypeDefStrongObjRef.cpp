@@ -1,29 +1,10 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 #ifndef __ImplAAFPropValData_h__
@@ -38,17 +19,16 @@
 #include "ImplAAFTypeDefStrongObjRef.h"
 #endif
 
+#ifndef __ImplAAFHeader_h_
+#include "ImplAAFHeader.h"
+#endif
+
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
-#include "ImplAAFObjectCreation.h"
-#include "ImplAAFDictionary.h"
-
 
 #include <assert.h>
 #include <string.h>
 
-
-extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefStrongObjRef::ImplAAFTypeDefStrongObjRef ()
   : _referencedType (PID_TypeDefinitionStrongObjectReference_ReferencedType, "ReferencedType")
@@ -63,10 +43,12 @@ ImplAAFTypeDefStrongObjRef::~ImplAAFTypeDefStrongObjRef ()
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStrongObjRef::pvtInitialize (
-      const aafUID_t & id,
-      const aafUID_t & refdObjID,
-      const aafCharacter * pTypeName)
+      const aafUID_t *  pID,
+      const aafUID_t * pRefdObjID,
+      wchar_t *  pTypeName)
 {
+  if (! pID)       return AAFRESULT_NULL_PARAM;
+  if (! pRefdObjID)  return AAFRESULT_NULL_PARAM;
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
@@ -74,9 +56,9 @@ AAFRESULT STDMETHODCALLTYPE
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _referencedType = refdObjID;
+  _referencedType = *pRefdObjID;
 
-  hr = SetAUID (id);
+  hr = SetAUID (pID);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
@@ -152,21 +134,29 @@ ImplAAFTypeDefStrongObjRef::GetObject (ImplAAFPropertyValue * pPropVal,
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefStrongObjRef::GetObjectType (ImplAAFClassDef ** ppObjType)
+    ImplAAFTypeDefStrongObjRef::GetObjectType (ImplAAFClassDef ** ppObjType) const
 {
   if (! ppObjType) return AAFRESULT_NULL_PARAM;
 
   if (! _cachedObjType)
 	{
+	  ImplAAFHeaderSP pHead;
 	  ImplAAFDictionarySP pDict;
 
 	  AAFRESULT hr;
-	  hr = (GetDictionary(&pDict));
+	  hr = MyHeadObject(&pHead);
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (pHead);
+	  hr = (pHead->GetDictionary(&pDict));
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (pDict);
 
-	  hr = pDict->LookupClassDef (_referencedType, &_cachedObjType);
+	  ImplAAFTypeDefStrongObjRef * pNonConstThis =
+		  (ImplAAFTypeDefStrongObjRef*) this;
+	  aafUID_t id = _referencedType;
+	  hr = pDict->LookupClass (&id, &pNonConstThis->_cachedObjType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedObjType);
@@ -180,38 +170,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefStrongObjRef::CreateValue (/*[in]*/ ImplAAFObject * pObj,
-      /*[out]*/ ImplAAFPropertyValue ** ppPropVal)
+    ImplAAFTypeDefStrongObjRef::CreateValue (/*[in]*/ ImplAAFObject * /*pObj*/,
+      /*[out]*/ ImplAAFPropertyValue ** /*ppPropVal*/)
 {
-  if (! pObj)
-	return AAFRESULT_NULL_PARAM;
-  if (! ppPropVal)
-	return AAFRESULT_NULL_PARAM;
-
-  ImplAAFPropValData * pvd = 0;
-  pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
-  if (!pvd) return AAFRESULT_NOMEMORY;
-
-  ImplAAFPropValDataSP spPvd;
-  spPvd = pvd;
-  // SmartPointer operator= will automatically
-  // AddRef; CreateImpl *also* will addref, so we've got one too
-  // many.  Put us back to normal.
-  pvd->ReleaseReference ();
-  pvd = 0;
-
-  AAFRESULT hr;
-  hr = spPvd->Initialize (this);
-  if (AAFRESULT_FAILED (hr)) return hr;
-
-  hr = SetObject (spPvd, pObj);
-  if (AAFRESULT_FAILED (hr))
-	return hr;
-  assert (ppPropVal);
-  *ppPropVal = spPvd;
-  assert (*ppPropVal);
-  (*ppPropVal)->AcquireReference ();
-  return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -228,7 +190,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 aafBool ImplAAFTypeDefStrongObjRef::IsFixedSize (void) const
 {
-  return kAAFTrue;
+  return AAFTrue;
 }
 
 
@@ -240,7 +202,7 @@ size_t ImplAAFTypeDefStrongObjRef::PropValSize (void) const
 
 aafBool ImplAAFTypeDefStrongObjRef::IsRegistered (void) const
 {
-  return kAAFTrue;
+  return AAFTrue;
 }
 
 
