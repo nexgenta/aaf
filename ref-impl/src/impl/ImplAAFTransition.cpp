@@ -26,7 +26,7 @@
 #endif
 
 #include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIds.h"
+#include "AAFPropertyIDs.h"
 
 #include <assert.h>
 #include <string.h>
@@ -35,7 +35,7 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 
 
@@ -150,7 +150,11 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pEffObj == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
+	if (_effect)
+		_effect->ReleaseReference();
+
 	_effect = pEffObj;
+	_effect->AcquireReference();
 	return AAFRESULT_SUCCESS; 
 }
 
