@@ -73,6 +73,8 @@ inline void checkExpression(bool expression, HRESULT r)
 #define TEST_NUM_INPUTS		1
 #define TEST_CATEGORY		L"Test Parameters"
 #define TEST_BYPASS			1
+static const aafUID_t TEST_EFFECT_AUID = 
+{ 0x12684769, 0xcd02, 0x11d3, { 0xa3, 0xf4, 0x0, 0x4, 0xac, 0x96, 0xa9, 0x37 } };
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
 #define TEST_PARAM_NAME1	L"A TestEffect parameter"
@@ -98,14 +100,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -138,7 +140,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDictionary*		pDictionary = NULL;
 	IAAFOperationDef*		pOperationDef = NULL;
 	IAAFParameterDef*	pParamDef = NULL;
-	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
 /*	long				test;
@@ -151,55 +152,45 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
 		CAAFBuiltinDefs defs (pDictionary);
     
-		checkResult(pDictionary->CreateInstance(defs.cdOperationDef(),
-							  IID_IAAFOperationDef, 
-							  (IUnknown **)&pOperationDef));
+		checkResult(defs.cdOperationDef()->
+					CreateInstance(IID_IAAFOperationDef, 
+								   (IUnknown **)&pOperationDef));
   		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
-		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
+		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
-		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->SetName (TEST_EFFECT_NAME));
-		checkResult(pDefObject->SetDescription (TEST_EFFECT_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
+		checkResult(pOperationDef->Initialize(TEST_EFFECT_AUID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 
 		// !!!Added circular definitions because we don't have optional properties
 		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		// Add two parameter defs, so that we can test all functions
-		checkResult(pDictionary->CreateInstance(defs.cdParameterDef(),
-							  IID_IAAFParameterDef, 
-							  (IUnknown **)&pParamDef));
+		checkResult(defs.cdParameterDef()->
+					CreateInstance(IID_IAAFParameterDef, 
+								   (IUnknown **)&pParamDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (TestParamUID1, TEST_PARAM_NAME1, TEST_PARAM_DESC1));
-		pDefObject->Release();
-		pDefObject = NULL;
+		checkResult(pParamDef->Initialize (TestParamUID1, TEST_PARAM_NAME1, TEST_PARAM_DESC1));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		pParamDef->Release();
 		pParamDef = NULL;
 
-		checkResult(pDictionary->CreateInstance(defs.cdParameterDef(),
-							  IID_IAAFParameterDef, 
-							  (IUnknown **)&pParamDef));
+		checkResult(defs.cdParameterDef()->
+					CreateInstance(IID_IAAFParameterDef, 
+								   (IUnknown **)&pParamDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (TestParamUID2, TEST_PARAM_NAME2, TEST_PARAM_DESC2));
-		pDefObject->Release();
-		pDefObject = NULL;
+		checkResult(pParamDef->Initialize (TestParamUID2, TEST_PARAM_NAME2, TEST_PARAM_DESC2));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		pParamDef->Release();
@@ -212,9 +203,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Cleanup and return
-	if (pDefObject)
-		pDefObject->Release();
-
 	if (pOperationDef)
 		pOperationDef->Release();
 
@@ -266,7 +254,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
@@ -284,11 +272,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		pDefObject->Release();
 		pDefObject = NULL;
 		
-		aafBool bResult = AAFFalse;
+		aafBool bResult = kAAFFalse;
 		checkResult(pReadDataDef->IsDataDefOf(defs.ddPicture(), &bResult));
-		checkExpression(bResult == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkExpression(bResult == kAAFTrue, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->IsTimeWarp (&readIsTimeWarp));
-		checkExpression(readIsTimeWarp == AAFFalse, AAFRESULT_TEST_FAILED);
+		checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetCategoryBufLen (&catLen));
 		testLen = wcslen(TEST_CATEGORY);
 		checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));

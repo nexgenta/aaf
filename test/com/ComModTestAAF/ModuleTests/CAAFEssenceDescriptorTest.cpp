@@ -90,7 +90,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -114,9 +114,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		//Make the first mob
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(defs.cdSourceMob(),
-								IID_IAAFSourceMob, 
-								(IUnknown **)&pSourceMob));
+		checkResult(defs.cdSourceMob()->
+					CreateInstance(IID_IAAFSourceMob, 
+								   (IUnknown **)&pSourceMob));
 		
 		// Initialize mob properties:
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
@@ -125,9 +125,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetName(L"EssenceDescriptorTest"));
 		
 		// Create the descriptor:
-		checkResult(pDictionary->CreateInstance(defs.cdEssenceDescriptor(),
-								IID_IAAFEssenceDescriptor, 
-								(IUnknown **)&edesc));		
+		checkResult(defs.cdEssenceDescriptor()->
+					CreateInstance(IID_IAAFEssenceDescriptor, 
+								   (IUnknown **)&edesc));		
  		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 			// Verify that there are no locators
@@ -136,9 +136,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
   
 		// Make a locator, and attach it to the EssenceDescriptor
-		checkResult(pDictionary->CreateInstance(defs.cdLocator(),
-								IID_IAAFLocator, 
-								(IUnknown **)&pLocator));		
+		checkResult(defs.cdLocator()->
+					CreateInstance(IID_IAAFLocator, 
+								   (IUnknown **)&pLocator));		
 
 		checkResult(edesc->AppendLocator(pLocator));
 
@@ -211,7 +211,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
@@ -225,7 +225,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		checkResult(pHeader->GetMobs (NULL, &mobIter));
