@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. |
+//         OMStrongReferenceProperty
 #ifndef OMSTRONGREFPROPERTYT_H
 #define OMSTRONGREFPROPERTYT_H
 
@@ -35,15 +37,13 @@ template <typename ReferencedObject>
 OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
                                                  const OMPropertyId propertyId,
                                                  const wchar_t* name)
-: OMReferenceProperty(propertyId,
-                      SF_STRONG_OBJECT_REFERENCE,
-                      name),
+: OMStrongReference(propertyId, name),
   _reference()
 {
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
 
-  _reference = OMStrongObjectReference<ReferencedObject>(this, storedName());
+  _reference = OMStrongObjectReference(this, storedName());
 }
 
 template <typename ReferencedObject>
@@ -68,9 +68,14 @@ void OMStrongReferenceProperty<ReferencedObject>::getValue(
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  ReferencedObject* result = _reference.getValue();
-
-  object = result;
+  OMStorable* p = _reference.getValue();
+  if (p != 0) {
+    ReferencedObject* result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+    object = result;
+  } else {
+    object = 0;
+  }
 }
 
   // @mfunc Set the value of this <c OMStrongReferenceProperty>.
@@ -87,7 +92,16 @@ ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::setValue(
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::setValue");
 
-  ReferencedObject* result = _reference.setValue(object);
+  // tjb - PRECONDITION("Valid object", object != 0);
+
+  OMStorable* p = _reference.setValue(object);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
   setPresent();
   return result;
 }
@@ -104,8 +118,14 @@ ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::clearValue(void)
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::clearValue");
 
-  ReferencedObject* result = _reference.setValue(0);
-
+  OMStorable* p = _reference.setValue(0);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
   return result;
 }
 
@@ -135,7 +155,17 @@ template <typename ReferencedObject>
 ReferencedObject*
 OMStrongReferenceProperty<ReferencedObject>::operator -> (void)
 {
-  return _reference.getValue();
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::operator ->");
+
+  OMStorable* p = _reference.getValue();
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
+  return result;
 }
 
   // @mfunc Dereference operator.
@@ -245,7 +275,7 @@ void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
   //   @rdesc True if this <c OMStrongReferenceProperty> is void, false
   //          otherwise
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 bool OMStrongReferenceProperty<ReferencedObject>::isVoid(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::isVoid");
@@ -265,10 +295,10 @@ bool OMStrongReferenceProperty<ReferencedObject>::isVoid(void) const
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-template<typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::remove(void)
+template <typename ReferencedObject>
+void OMStrongReferenceProperty<ReferencedObject>::removeProperty(void)
 {
-  TRACE("OMStrongReferenceProperty<ReferencedObject>::remove");
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::removeProperty");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
   PRECONDITION("Property is void", isVoid());
@@ -284,12 +314,14 @@ void OMStrongReferenceProperty<ReferencedObject>::remove(void)
   //   @parm The address of the buffer into which the raw bits are copied.
   //   @parm size_t | size | The size of the buffer.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::getBits(
                                                       OMByte* bits,
                                                       size_t ANAME(size)) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
+  OBSOLETE("methods on class OMReferenceProperty");
+
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid bits", bits != 0);
@@ -308,11 +340,13 @@ void OMStrongReferenceProperty<ReferencedObject>::getBits(
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The address of the buffer into which the raw bits are copied.
   //   @parm size_t | size | The size of the buffer.
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
                                                           size_t ANAME(size))
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
+  OBSOLETE("methods on class OMReferenceProperty");
+
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
@@ -326,7 +360,7 @@ void OMStrongReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
   //          <c OMStorable>.
   //   @rdesc A pointer to an <c OMObject>.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 OMObject*
 OMStrongReferenceProperty<ReferencedObject>::getObject(void) const
 {
@@ -366,7 +400,7 @@ OMObject* OMStrongReferenceProperty<ReferencedObject>::setObject(
   //   @rdesc The <c OMStorable> represented by this
   //          <c OMStrongReferenceProperty>
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 OMStorable* OMStrongReferenceProperty<ReferencedObject>::storable(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::storable");

@@ -31,7 +31,7 @@
 
 #include "OMDataTypes.h"
 #include "OMProperty.h"
-#include "OMRefProperty.h"
+#include "OMStrongReference.h"
 #include "OMObjectReference.h"
 
   // @class Persistent strong reference (contained object)
@@ -39,9 +39,10 @@
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @base public | <c OMReferenceProperty>
+  //   @base public | <c OMStrongReference>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
-class OMStrongReferenceProperty : public OMReferenceProperty {
+class OMStrongReferenceProperty : public OMStrongReference {
 public:
   // @access Public members.
 
@@ -96,7 +97,7 @@ public:
   virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
     // @cmember Get the raw bits of this <c OMStrongReferenceProperty>. The
     //          raw bits are copied to the buffer at address <p bits>
@@ -120,7 +121,7 @@ public:
 
 private:
 
-  OMStrongObjectReference<ReferencedObject> _reference;
+  OMStrongObjectReference _reference;
 
 };
 
