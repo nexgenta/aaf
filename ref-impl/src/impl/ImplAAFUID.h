@@ -33,7 +33,6 @@
 #include "AAFTypes.h"
 #endif
 
-#include <string.h>
 
 //
 // Intended to be a simple class wrapping an aafUID_t, allowing
