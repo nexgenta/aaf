@@ -112,10 +112,11 @@ private:
   {
 	wchar_t *        name;
 	aafUID_t         id;
-	aafUInt32        tag;
+	OMPropertyId     tag;
 	const aafUID_t * pTypeGuid;
 	const aafUID_t * pOwnerClassGuid;
 	bool             mandatory;
+  bool             uid; // this property is a unique identifier for the class
 	ImplAAFOMPropertyCreateFunc_t omPropCreateFunc;
 	PropTblEntry *   nextProp;  // null if this is the last one
   };
@@ -170,6 +171,8 @@ private:
 
 
   // Returns the number of axiomatic properties.
+  aafUInt32 _numAxProps;
+  bool      _numAxPropsInited;
   aafUInt32 countAxProps () const;
 
   // Returns the axiomatic property definition corresponding to the
