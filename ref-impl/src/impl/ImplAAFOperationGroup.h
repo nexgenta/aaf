@@ -38,19 +38,12 @@
 
 
 class ImplAAFDataDef;
-
 class ImplAAFOperationDef;
-
 class ImplAAFParameter;
-
 class ImplEnumAAFOperationDefs;
-
 class ImplEnumAAFParameterDefs;
-
 class ImplAAFSegment;
-
 class ImplAAFSourceReference;
-
 class ImplEnumAAFParameters;
 
 #ifndef __ImplAAFParameter_h__
@@ -87,7 +80,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] Data Definition Object
-         const aafUID_t & datadef,
+         ImplAAFDataDef * pDataDef,
 
 
          // @parm [in] Length property value
@@ -266,7 +259,7 @@ public:
 private:
 	OMFixedSizeProperty<aafUID_t>						_operationDefinition;
 	OMStrongReferenceVectorProperty<ImplAAFSegment>		_inputSegments;
-	OMStrongReferenceVectorProperty<ImplAAFParameter>	_parameters;
+	OMStrongReferenceSetProperty<ImplAAFParameter>		_parameters;
 	OMFixedSizeProperty<aafUInt32>						_bypassOverride;
 	OMStrongReferenceProperty<ImplAAFSourceReference>	_rendering;
 };
