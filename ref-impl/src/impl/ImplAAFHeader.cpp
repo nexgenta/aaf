@@ -96,13 +96,13 @@ const aafUID_t NIL_UID = { 0 };
 
 
 ImplAAFHeader::ImplAAFHeader ()
-: _byteOrder(         PID_Header_ByteOrder,          "ByteOrder"),
-  _lastModified(      PID_Header_LastModified,       "LastModified"),
-  _identificationList(PID_Header_IdentificationList, "IdentificationList"),
-  _contentStorage(		PID_Header_Content,	"Content"),
-  _dictionary(PID_Header_Dictionary,	"Dictionary"),
-  _fileRev(PID_Header_Version,		"Version"),
-  _objectModelVersion(PID_Header_ObjectModelVersion, "ObjectModelVersion")
+: _byteOrder(         PID_Header_ByteOrder,          L"ByteOrder"),
+  _lastModified(      PID_Header_LastModified,       L"LastModified"),
+  _identificationList(PID_Header_IdentificationList, L"IdentificationList"),
+  _contentStorage(		PID_Header_Content,	L"Content"),
+  _dictionary(PID_Header_Dictionary,	L"Dictionary"),
+  _fileRev(PID_Header_Version,		L"Version"),
+  _objectModelVersion(PID_Header_ObjectModelVersion, L"ObjectModelVersion")
 {
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
@@ -375,7 +375,26 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::LookupEssenceData (aafMobID_constref mobID,
+                           ImplAAFEssenceData **ppEssenceData)
+{
+    ImplAAFContentStorage *cstore = NULL;
 
+    if (! ppEssenceData)
+	  {
+		return AAFRESULT_NULL_PARAM;
+	  }
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->LookupEssenceData(mobID, ppEssenceData));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::GetContentStorage (ImplAAFContentStorage ** ppContentStorage)
@@ -697,8 +716,7 @@ AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 
 // trr - NOTE: Eventhough this method returns a reference counted object it
 // does NOT bump the reference count. Currently only other file that calls
-// this method is ImplAAFMob.cpp. We should probably make this method protected
-// or private and create an new version the conforms to our other API guidlines:
+// this method is ImplAAFMob.cpp. There is another version the conforms to our other API guidlines:
 // AAFRESULT GetContentStorage(ImplAAFContentStorage **ppContentStorage);
 // 
 ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
