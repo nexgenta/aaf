@@ -1,24 +1,10 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFInterpolator\
 #endm
@@ -63,7 +49,7 @@ AD_IDL(//
 AD_XMETHOD1(GetNumTypesSupported,
 		   [out],
 		   objPass,
-		   aafUInt32*,
+		   aafInt32*,
 		   pCount,
 		   Number of data types supported,
 			 Each interpolator plugin will support a given number of interpolator
@@ -88,7 +74,7 @@ AD_XMETHOD1(GetNumTypesSupported,
 AD_XMETHOD2(GetIndexedSupportedType,
 		   [in],
 		   objPass,
-		   aafUInt32,
+		   aafInt32,
 		   index,
 		   Which flavour to get the ID for,
 		   [out],
@@ -270,52 +256,42 @@ AD_X2METHOD5(InterpolateMany,
 			pStartInputValue,
 			Input values are from 0 \(effect start\)\, to 1 \(effect end\) inclusive.,
 			xxx,
-			xxx,
-
 			[in],
 			objPass,
 			aafRational_t *,
 			pInputStep,
 			Amount to add to *pStartInputValue to get the next point to interpolate,
 			xxx,
-			xxx,
-
 			[in],
 			objPass,
-			aafUInt32,
-			generateCount,
+			aafInt32,
+			pGenerateCount,
 			The number of points to interpolate,
 			xxx,
-			xxx,
-
 			[out],
 			objPass,
 			aafMemPtr_t,
 			pOutputValue,
 			an array of generated control points,
 			pGenerateCount,
-			*pResultCount,
-
 			[out],
 			objPass,
 			aafUInt32 *,
-			pResultCount,
+			ppResultCount,
 			The number of points actually generated,
 			xxx,
-			xxx,
-
 			Interpolates between known control points on the value\, and
 	// creates an array of new AAFControlPoint which which can be imagined to exist
 	// at the given inputValue.  While InterpolateOne\(\) generates a single point\,
 	// this function starts at a given offset and generates interpolations until either
-	// generateCount is reached\, or the next result would have an input value
+	// pGenerateCount is reached\, or the next result would have an input value
 	// of greater than one. 
   //
   // Succeeds if all of the following are true:
   // - the pInputValue pointer is valid.
   // - the pInputStep pointer is valid.
   // - the ppOutputValue pointer is valid.
-  // - the pResultCount pointer is valid.
+  // - the ppResultCount pointer is valid.
   // - The input value is between 0 \(effect start\)\, to 1 \(effect end\) inclusive.
   // 
   // This method will return the following codes.  If more than one of
@@ -329,5 +305,7 @@ AD_X2METHOD5(InterpolateMany,
   //   - The input value must be between 0 and 1\, inclusive.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pInputValue or ppOutputValue or pInputStep or pResultCount is null.)
+  //   - pInputValue or ppOutputValue or pInputStep or ppResultCount is null.)
+
+
 AD_XCLASS_END(Abstract, Transient)

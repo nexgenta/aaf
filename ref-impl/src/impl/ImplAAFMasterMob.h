@@ -9,7 +9,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -27,7 +26,7 @@ class ImplAAFEssenceAccess;
 
 class ImplAAFLocator;
 
-
+#include "AAF.h"
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
@@ -310,7 +309,7 @@ public:
                            aafCompressEnable_t  /*Enable*/,
 							ImplAAFLocator		*destination,
 							aafUID_t			fileFormat,
-							ImplAAFEssenceAccess **result);
+							IAAFEssenceMultiAccess **result);
 	//@comm The essence handle from this call can be used with
 	// WriteDataSamples or WriteMultiSamples but NOT with 
 	// or WriteDataLines.
@@ -367,7 +366,7 @@ public:
 
          // @parm [in] optionally decompressing
          aafCompressEnable_t  compEnable,
-		ImplAAFEssenceAccess **result);
+		IAAFEssenceMultiAccess **result);
 	//@comm This routine
 	// follows the locator, and may call the locator failure callback if
 	// the essence can not be found.  If the failure callback finds the essence,
@@ -409,13 +408,8 @@ public:
   //
   OMDECLARE_STORABLE(ImplAAFMasterMob)
 
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFMasterMobTest.cpp.
-  static AAFRESULT test();
-
   // Internal to the SDK
   virtual AAFRESULT ReconcileMobLength(void);
-
 };
 
 #endif // ! __ImplAAFMasterMob_h__

@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 EnumAAFIdentifications\
 #endm
@@ -6,30 +13,23 @@ AAFRoot\
 #endm
 #c
 AD_HEAD
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
- 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
 AD_IDL(//
 // This interfaces allows access to individual
 // IAAFIdentification-supporting objects within a collection.
+//
+// In addition to the specific error results listed for each method\,
+// all methods in this interface may also return one of the following
+// values:
+// 
+// AAFRESULT_NOMEMORY
+//   - insufficient system memory is available to perform the
+//     operation.
 //)
 AD_FORWARD_DECLARATION(AAFIdentification)
 AD_CLASS_UUID(B1A21385, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21384, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, Transient)
 AD_XMETHOD1(NextOne,
 			[out\, retval],
 			objOut,
@@ -60,22 +60,25 @@ AD_XMETHOD1(NextOne,
   //   - no Identifications remaining to be returned.)
 
 
-AD_XMETHOD3(Next,
+AD_X2METHOD3(Next,
 			[in],
 			  objPass,
-			  aafInt32,
+			  aafUInt32,
 			  count,
 			  number of identifications requested,
+			  xxx,
 			[out\, size_is\(count\)\, length_is\(*pNumFetched\)],
-			  objOut,
+			  objOutArray,
 			  AAFIdentification,
 			  ppIdentifications,
 			  array to receive identification objects,
+			  count,
 			[out],
 			  objPass,
-			  aafInt32 *,
+			  aafUInt32 *,
 			  pNumFetched,
 			  number of actual Identifications fetched into ppIdentifications array,
+			  xxx,
   // Enumerates the next count elements \(AAFIdentification pointers\)
   // in the enumerator's list\, returning them in the given array
   // along with the actual number of enumerated elements in
@@ -126,12 +129,15 @@ AD_XMETHOD1(Skip,
 
 
 AD_METHOD0(Reset,
-  // Instructs the enumerator to position itself at the beginning of
-  // the list of elements.  There is no guarantee that the same set of
-  // elements will be enumerated on each pass through the list\, nor
-  // will the elements necessarily be enumerated in the same
-  // order. The exact behavior depends on the collection being
-  // enumerated.)
+		   Instructs the enumerator to position itself at the beginning of
+  // the list of elements.
+  // 
+  // Always succeeds.
+  // 
+  // This method will return the following code:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_XMETHOD1(Clone,
@@ -160,4 +166,4 @@ AD_XMETHOD1(Clone,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-AD_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
