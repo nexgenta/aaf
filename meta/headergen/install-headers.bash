@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: install-headers.bash,v 1.3 2004/02/27 18:32:41 stuart_hc Exp $ $Name:  $
+# $Id: install-headers.bash,v 1.4 2005/03/18 14:44:47 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,6 +38,16 @@ AAFStoredObjectIDs.h \
 AAFExtEnum.h \
 AAFPropertyIDs.h \
 AAFTypeDefUIDs.h \
+AAFOperationDefs.h \
+AAFParameterDefs.h \
+AAFDataDefs.h \
+AAFContainerDefs.h \
+AAFInterpolatorDefs.h \
+AAFOPDefs.h \
+AAFKLVDataDefs.h \
+AAFTaggedValueDefs.h \
+AAFPluginDefs.h \
+AAFCompressionDefs.h \
 "
 
 SOURCE=./include
