@@ -6,7 +6,6 @@ AAFWindowsLocator\
 AAFLocator\
 #endm
 #c
-#import ./AAFLocator.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -17,18 +16,29 @@ AD_HEAD
 *                                          *
 \******************************************/
 
+
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
+AD_CLASS_UUID(5CE12671, 2B21, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
+
+AD_DEFAULT_UUID(5CE12672, 2B21, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
+																 
+
 AD_CLASS_BEGIN
 
   //@access Public Members
 
 AD_METHOD2(GetShortcut,
 		   [in],aafInt32,shortCutLen,Length of the buffer in bytes,
-		   [out],char *  ,shortCutBuf,A Windows shortcut,
+		   [out],aafDataBuffer_t ,shortCutBuf,A Windows shortcut,
 		   Get the windows shortcut.)
 
 AD_METHOD2(SetShortcut,
 		   [in],aafInt32,shortCutLen,Length of the buffer in bytes,
-		   [in],char *  ,shortCutBuf,A Windows shortcut,
+		   [in],aafDataBuffer_t ,shortCutBuf,A Windows shortcut,
 		   Set the windows shortcut.)
 
 AD_CLASS_END
