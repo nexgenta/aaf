@@ -29,10 +29,12 @@ public:
     // @cmember Destructor.
   virtual ~OMProperty(void);
 
-    // @cmember Save this <c OMProperty> to the <c OMStoredObject>
-    //          <p s>.
+    // @cmember Save this <c OMProperty>.
     // @this const
-  virtual void saveTo(OMStoredObject& s) const = 0;
+  virtual void save(void) const = 0;
+
+    // @cmember Close this <c OMProperty>.
+  virtual void close(void);
 
     // @cmember Restore this <c OMProperty> from the
     //          <c OMStoredObject> <p s>, the size of the <c OMProperty>
@@ -54,7 +56,11 @@ public:
     // @cmember The address of this <c OMProperty> object.
   OMProperty* address(void);
 
-  virtual void detach(const OMStorable* object, const size_t index);
+    // @cmember Detach the <c OMStorable> object with the given
+    //          <p key> from this <c OMProperty>. This <c OMProperty>
+    //          must no longer attempt to access the <c OMStorable> with
+    //          the given <p key>.
+  virtual void detach(const OMStorable* object, const size_t key);
 
 protected:
   int _propertyId;
@@ -96,7 +102,6 @@ protected:
   virtual ReferencedObject* pointer(void) const;
 
   ReferencedObject* _pointer; // The referenced object
-  char* _pathName;  // needed by both strong and weak references ?
 };
 
   // @class Persistent strong reference (contained object)
@@ -140,17 +145,23 @@ public:
     //   @this const
   operator ReferencedObject*(void) const;
 
-    // @cmember Save this <c OMStrongReferenceProperty> to the
-    //          <c OMStoredObject> <p s>.
+    // @cmember Save this <c OMStrongReferenceProperty>.
     // @this const
-  virtual void saveTo(OMStoredObject& s) const;
+  virtual void save(void) const;
+
+    // @cmember Close this <c OMProperty>.
+  virtual void close(void);
 
     // @cmember Restore this <c OMStrongReferenceProperty> from the
     //          <c OMStoredObject> <p s>, the size of the
     //          <c OMStrongReferenceProperty> is <p size>.
   virtual void restoreFrom(OMStoredObject& s, size_t size);
 
-  virtual void detach(const OMStorable* object, const size_t index);
+    // @cmember Detach the <c OMStorable> object with the given
+    //          <p key> from this <c OMStrongReferenceProperty>. This
+    //          <c OMStrongReferenceProperty> must no longer attempt
+    //          to access the <c OMStorable> with the given <p key>.
+  virtual void detach(const OMStorable* object, const size_t key);
 
 };
 
@@ -175,6 +186,9 @@ public:
     //   @this const
   virtual void getValue(ReferencedObject*& object) const;
 
+    // @cmember set the value of this <c OMWeakReferenceProperty>.
+  virtual void setValue(const ReferencedObject*& object);
+
     // @cmember Assignment operator.
   OMWeakReferenceProperty<ReferencedObject>& operator =
                                               (const ReferencedObject* value);
@@ -191,16 +205,26 @@ public:
     //   @this const
   operator ReferencedObject*(void) const;
 
-    // @cmember Save this <c OMWeakReferenceProperty> to the
-    //          <c OMStoredObject> <p s>.
+    // @cmember Save this <c OMWeakReferenceProperty>.
     // @this const
-  virtual void saveTo(OMStoredObject& s) const;
+  virtual void save(void) const;
+
+    // @cmember close this <c OMWeakReferenceProperty>.
+  virtual void close(void);
 
     // @cmember Restore this <c OMWeakReferenceProperty> from the
     //          <c OMStoredObject> <p s>, the size of the
     //          <c OMWeakReferenceProperty> is <p size>.
   virtual void restoreFrom(OMStoredObject& s, size_t size);
 
+    // @cmember Detach the <c OMStorable> object with the given
+    //          <p key> from this <c OMWeakReferenceProperty>. This
+    //          <c OMWeakReferenceProperty> must no longer attempt
+    //          to access the <c OMStorable> with the given <p key>.
+  virtual void detach(const OMStorable* object, const size_t key);
+
+private:
+  char* _pathName;
 };
 
   // @class Abstract base class for simple (data) persistent
@@ -221,10 +245,11 @@ public:
     // @cmember Destructor.
   virtual ~OMSimpleProperty(void);
 
-    // @cmember Save this <c OMSimpleProperty> to the
-    //          <c OMStoredObject> <p s>.
+    // @cmember Save this <c OMSimpleProperty>.
     //   @this const
-  virtual void saveTo(OMStoredObject& s) const;
+  virtual void save(void) const;
+
+  virtual void restoreFrom(OMStoredObject& s, size_t size);
 
     // @cmember The size of this <c OMSimpleProperty>.
     //   @this const
@@ -355,10 +380,12 @@ public:
     // @cmember Destructor.
   virtual ~OMStrongReferenceVectorProperty(void);
 
-    // @cmember Save this <c OMStrongReferenceVectorProperty> to the
-    //          <c OMStoredObject> <p s>.
+    // @cmember Save this <c OMStrongReferenceVectorProperty>.
     // @this const
-  virtual void saveTo(OMStoredObject& s) const;
+  virtual void save(void) const;
+
+    // @cmember Close this <c OMProperty>.
+  virtual void close(void);
 
     // @cmember Restore this <c OMStrongReferenceVectorProperty> from
     //          the <c OMStoredObject> <p s>, the size of the
@@ -388,7 +415,11 @@ public:
     //          this <c OMStrongReferenceVectorProperty>.
   void appendValue(const ReferencedObject*& value);
 
-  virtual void detach(const OMStorable* object, const size_t index);
+    // @cmember Detach the <c OMStorable> object with the given
+    //          <p key> from this <c OMStrongReferenceVectorProperty>.
+    //          This <c OMStrongReferenceVectorProperty> must no longer
+    //          attempt to access the <c OMStorable> with the given <p key>.
+  virtual void detach(const OMStorable* object, const size_t key);
 
 private:
 
@@ -440,7 +471,7 @@ public:
 
     // @cmember Utility function for computing the length, in
     //          characters, of the string of <p CharacterType>
-   //           characters <p characterString>.
+    //          characters <p characterString>.
   static size_t stringLength(const CharacterType* characterString);
 
 private:
