@@ -1,28 +1,20 @@
 #ifndef OMUTILITIES_H
 #define OMUTILITIES_H
 
-#include <stdlib.h>
+#include "OMDataTypes.h"
 
-#include "OMPortability.h"
+#include <stddef.h>
 
 void setProgramName(const char* name);
 
-void convert(wchar_t* wcName, size_t length, const char* name);
+const char* getProgramName(void);
 
-void convert(char* cName, size_t length, wchar_t* name);
+OMByteOrder hostByteOrder(void);
 
-void formatError(DWORD errorCode);
+size_t wideStringLength(const wchar_t* string);
 
-void printError(const char* prefix, const char* type);
-
-void printName(const char* name);
-
-int check(HRESULT resultCode);
-
-int checkFile(HRESULT resultCode, const char* fileName);
-
-int checkStream(HRESULT resultCode, const char* streamName);
-
-int checkStorage(HRESULT resultCode, const char* storageName);
+wchar_t* wideStringCopy(wchar_t* destination,
+                        const wchar_t* source,
+                        const size_t length);
 
 #endif
