@@ -1,24 +1,3 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
 #startm .this-module 0
 AAFTapeDescriptor\
 #endm
@@ -66,17 +45,228 @@ AD_METHOD0(Initialize,
   //   - Initialize\(\) has already been called on this object.)
 
 
-AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(TapeManufacturer,
-     the Tape Manufacturer string property.)
+AD_XMETHOD1(SetTapeManufacturer,
+			[in\,string],
+			objPass,
+			aafCharacter *,
+			pName,
+			Manufacturers name,
+
+			Sets the name of the company which manufactured the tape to the
+  // value specified in pName.  A copy is made of the data so the
+  // caller retains ownership of the *pName buffer and is responsible
+  // for de-allocating it.
+  // 
+  // This method succeeds if all of the following are true:
+  // - the pName pointer is valid.
+  // 
+  // If this method fails the Product Name property will not be
+  // changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pName arg is NULL.)
 
 
-AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(TapeModel,
-     the Tape Model string property.)
+AD_XMETHOD2(GetTapeManufacturer,
+			[out\, size_is\(bufSize\)\, string],
+			objPass,
+			aafCharacter *,
+			pName,
+			buffer into which the string is written,
+
+			[in],
+			objPass,
+			aafInt32,
+			bufSize,
+			The size of the pName buffer,
+
+			Writes the name of the company which manufactured the tape\, with
+  // a trailing null character\, into the pName buffer.  The buffer is
+  // allocated by the caller.  The size of the buffer is given by
+  // bufSize.  If the property name has not yet been set\, a
+  // zero-length string will be written \(that is\, only the trailing
+  // null character\).
+  // 
+  // Caller may call GetTapeManBufLen\(\) to determine the
+  // required buffer size.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pName pointer is valid.
+  // - bufSize indicates the buffer is large enough to hold the name.
+  // 
+  // If this method fails nothing will be written to
+  // *pName.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pName arg is NULL.
+  //
+  // AAFRESULT_SMALLBUF
+  //   - bufSize indicates the buffer is too small to hold the string.)
+
+
+AD_XMETHOD1(GetTapeManBufLen,
+			[out],
+			objPass,
+			aafInt32 *,
+			pLen,
+			Size of buffer for Manufacturers Name string,
+
+			Returns the length of buffer required for the
+  // GetTapeManufacturer\(\) method.  The value is placed into the
+  // location specified by pLen. The value will include space required
+  // for the trailing null character.
+  //
+  // Succeeds if all of the following are true:
+  // - the pLen pointer is valid.
+  //
+  // If this method fails nothing will be written to *pLen.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pLen arg is NULL.)
+
+
+AD_XMETHOD1(SetTapeModel,
+			[in\,string],
+			objPass,
+			aafCharacter *,
+			pName,
+			Tape Manufacturers Brand name,
+
+			Sets the brand or model of the tape to the value specified in
+  // pName.  A copy is made of the data so the caller retains
+  // ownership of the *pName buffer and is responsible for
+  // de-allocating it.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pName pointer is valid.
+  // 
+  // If this method fails the Product Name property will not be
+  // changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pName arg is NULL.)
+
+
+AD_XMETHOD2(GetTapeModel,
+			[out\, size_is\(bufSize\)\, string],
+			objPass,
+			aafCharacter *,
+			pName,
+			buffer into which the string is written,
+
+			[in],
+			objPass,
+			aafInt32,
+			bufSize,
+			The size of the pName buffer,
+
+			Writes the brand or model of the tape\, with a trailing null
+  // character\, into the pName buffer.  The buffer is allocated by
+  // the caller.  The size of the buffer is given by bufSize.  If the
+  // property name has not yet been set\, a zero-length string will be
+  // written \(that is\, only the trailing null character\).
+  // 
+  // Caller may call GetTapeModelBufLen\(\) to determine the
+  // required buffer size.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pName pointer is valid.
+  // - bufSize indicates the buffer is large enough to hold the name.
+  // 
+  // If this method fails nothing will be written to
+  // *pName.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pName arg is NULL.
+  //
+  // AAFRESULT_SMALLBUF
+  //   - bufSize indicates the buffer is too small to hold the string.)
+
+
+AD_XMETHOD1(GetTapeModelBufLen,
+			[out],
+			objPass,
+			aafInt32 *,
+			pLen,
+			Size of buffer for Model string,
+
+			Returns the length of buffer required for the GetTapeModel\(\)
+  // method.  The value is placed into the location specified by
+  // pLen. The value will include space required for the trailing null
+  // character.
+  //
+  // Succeeds if all of the following are true:
+  // - the pLen pointer is valid.
+  //
+  // If this method fails nothing will be written to *pLen.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pLen arg is NULL.)
 
 
 AD_XMETHOD1(SetTapeFormFactor,
 			[in],
-			enumIn,
+			objPass,
 			aafTapeCaseType_t,
 			formFactor,
 		    ex: kVHSVideoTape\, kDATCartridge ,
@@ -127,7 +317,7 @@ AD_XMETHOD1(GetTapeFormFactor,
 
 AD_XMETHOD1(SetSignalType,
 			[in],
-			enumIn,
+			objPass,
 			aafVideoSignalType_t,
 			videoSignal,
 		    ex: kNTSCSignal,
@@ -181,7 +371,7 @@ AD_XMETHOD1(GetSignalType,
 
 AD_XMETHOD1(SetTapeFormat,
 			[in],
-			enumIn,
+			objPass,
 			aafTapeFormatType_t,
 			tapeFormat,
 		    ex: kBetacamFormat\, kBetacamSPFormat,
@@ -237,10 +427,10 @@ AD_XMETHOD1(GetTapeFormat,
 AD_XMETHOD1(SetTapeLength,
 			[in],
 			objPass,
-			aafUInt32,
+			aafLength_t,
 			tapeLength,
 			The length of the tape in minutes.,
-			Sets the length of the tape in minutes.
+			Sets the length of the tape.
   // 
   // This method succeeds if all of the following are true:
   // - tapeLength is a positive number.
@@ -262,11 +452,11 @@ AD_XMETHOD1(SetTapeLength,
 AD_XMETHOD1(GetTapeLength,
 			[out],
 			objPass,
-			aafUInt32 *,
+			aafLength_t *,
 			pTapeLength,
 			The length of the tape in minutes.,
 
-			Gets the length of the tape in minutes.
+			Gets the length of the tape.
   //
   // This method succeeds if all of the following are true:
   // - the pTapeLength pointer is valid.
