@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.140.2.2 2004/12/19 03:51:26 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.140.2.3 2005/01/15 21:42:54 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1000,7 +1000,15 @@ ImplAAFFile::CreateAAFFileOnRawStorage
 												loadMode,
 												aafFileEncoding,
 												_metafactory);
+
+			  // Sync the file's dictionary with the built in
+			  // dictionary before proceeding further.
+			  ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(_metafactory);
+			  assert(d);
+			  checkResult( d->SyncMetaDictionaries() );
+
 			}
+
 		} // endif new/existing
 	  else
 		{
@@ -1059,6 +1067,10 @@ ImplAAFFile::Open ()
 		ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(mf);
 		assert(d);
 		d->InstantiateAxiomaticDefinitions();
+
+		// Sync the file's dictionary with the built in
+		// dictionary before proceeding further.
+		checkResult( d->SyncMetaDictionaries() );
 
 		  // Get the byte order
 		  OMByteOrder byteOrder = _file->byteOrder();
