@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTransition
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -24,7 +42,7 @@
 // This values are used for testing purposes
 static aafUID_t    fillerUID = DDEF_Picture;
 static aafLength_t  fillerLength = 3200;
-static aafUID_t	zeroID = { 0 };
+static aafMobID_t	zeroMobID = { 0 };
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -72,7 +90,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDictionary*				pDictionary = NULL;
 	IAAFCompositionMob*			pCompMob=NULL;
 	IAAFMob*					pMob = NULL;
-	IAAFMobSlot*				pNewSlot = NULL;
+	IAAFTimelineMobSlot*		pNewSlot = NULL;
 	IAAFSourceClip*				pSourceClip = NULL;
 	IAAFSourceReference*		pSourceRef = NULL;
 	IAAFTransition*				pTransition = NULL;
@@ -87,7 +105,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFParameterDef*			pParamDef = NULL;
 	IAAFDefObject*				pDefObject = NULL;
 	
-	aafUID_t					newMobID;
+	aafMobID_t					newMobID;
 	aafUID_t					datadef = DDEF_Picture;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
@@ -128,34 +146,34 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
  		
 		// Create the effect and parameter definitions
-		checkResult(pDictionary->CreateInstance(&AUID_AAFOperationDef,
+		checkResult(pDictionary->CreateInstance(AUID_AAFOperationDef,
 							  IID_IAAFOperationDef, 
 							  (IUnknown **)&pOperationDef));
     
-		checkResult(pDictionary->CreateInstance(&AUID_AAFParameterDef,
+		checkResult(pDictionary->CreateInstance(AUID_AAFParameterDef,
 							  IID_IAAFParameterDef, 
 							  (IUnknown **)&pParamDef));
 
-		checkResult(pDictionary->RegisterOperationDefinition(pOperationDef));
-		checkResult(pDictionary->RegisterParameterDefinition(pParamDef));
+		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
+		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
 		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Init (&effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
+		checkResult(pDefObject->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 		pDefObject->Release();
 		pDefObject = NULL;
 
-		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
+		checkResult(pOperationDef->SetDataDefinitionID (testDataDef));
 		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
-		checkResult(pOperationDef->AddParameterDefs (pParamDef));
+		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
 		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
+		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
 		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Init (&parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
+		checkResult(pDefObject->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
 		pDefObject->Release();
 		pDefObject = NULL;
 
@@ -167,7 +185,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// ------------------------------------------------------------
 		//
 		// Create a CompositionMob
-		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
 							IID_IAAFCompositionMob, 
 							(IUnknown **)&pCompMob));
 
@@ -175,10 +193,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// Get a MOB interface
 		checkResult(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 
 		// Create a Sequence
-		checkResult(pDictionary->CreateInstance(&AUID_AAFSequence,
+		checkResult(pDictionary->CreateInstance(AUID_AAFSequence,
 												IID_IAAFSequence,
 												(IUnknown **) &pSequence));
 
@@ -187,70 +205,76 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// Get a component interface and 
 		checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
 		// set the Data definition for it !
-		checkResult(pComponent->SetDataDef(&fillerUID));
+		checkResult(pComponent->SetDataDef(fillerUID));
 		// Release the component - because we need to reuse the pointer later
 		pComponent->Release();
 		pComponent = NULL;
 
 		// Create a new Mob Slot that will contain the sequence
-		checkResult(pMob->AppendNewSlot(pSegment, 1, L"Transition", &pNewSlot));
-
+		aafRational_t editRate = { 0, 1};
+		checkResult(pMob->AppendNewTimelineSlot(editRate,
+												pSegment,
+												1,
+												L"Transition",
+												0,
+												&pNewSlot));
 
 		// Create a Filler
-		checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
+		checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
 												IID_IAAFFiller,
 												(IUnknown **) &pFiller));
 
 		// Get a component interface
 		checkResult(pFiller->QueryInterface(IID_IAAFComponent, (void **) &pComponent));
 		// Set values for the filler
-	    checkResult(pFiller->Initialize( &fillerUID, fillerLength));
+	    checkResult(pFiller->Initialize(fillerUID, fillerLength));
 		// append the filler to the sequence
 		checkResult(pSequence->AppendComponent(pComponent));
 
 		// Release the component - because we need to reuse the pointer later
+		pFiller->Release();
+		pFiller = NULL;
 		pComponent->Release();
 		pComponent = NULL;
 
 		
-	    checkResult(pDictionary->CreateInstance(&AUID_AAFTransition,
+	    checkResult(pDictionary->CreateInstance(AUID_AAFTransition,
 												IID_IAAFTransition, 
 												(IUnknown **)&pTransition));
 
 		// Create an empty EffectGroup object !!
-		checkResult(pDictionary->CreateInstance(&AUID_AAFOperationGroup,
+		checkResult(pDictionary->CreateInstance(AUID_AAFOperationGroup,
 												IID_IAAFOperationGroup,
 												(IUnknown **)&pOperationGroup));
 
-		checkResult(pDictionary->CreateInstance(&AUID_AAFParameter,
+		checkResult(pDictionary->CreateInstance(AUID_AAFParameter,
 												IID_IAAFParameter, 
 												(IUnknown **)&pParm));
 		checkResult(pParm->SetParameterDefinition (pParamDef));
  // !!!  ImplAAFParameter::SetTypeDefinition (ImplAAFTypeDef*  pTypeDef)
-		checkResult(pOperationGroup->Initialize(&datadef, transitionLength, pOperationDef));
-		checkResult(pOperationGroup->AddNewParameter (pParm));
-		checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
-												IID_IAAFFiller,
+		checkResult(pOperationGroup->Initialize(datadef, transitionLength, pOperationDef));
+		checkResult(pOperationGroup->AddParameter (pParm));
+		checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
+												IID_IAAFSegment,
 												(IUnknown **) &pEffectFiller));
-		checkResult(pOperationGroup->AppendNewInputSegment (pEffectFiller));
+		checkResult(pOperationGroup->AppendInputSegment (pEffectFiller));
 		// release the filler
 		pEffectFiller->Release();
-		pFiller->Release();
-		pFiller = NULL;
+		pEffectFiller  = NULL;
 
 		checkResult(pOperationGroup->SetBypassOverride (1));
-		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
+		checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
 						  IID_IAAFSourceClip, 
 						  (IUnknown **)&pSourceClip));
 		aafSourceRef_t	sourceRef;
-		sourceRef.sourceID = zeroID;
+		sourceRef.sourceID = zeroMobID;
 		sourceRef.sourceSlotID = 0;
 		sourceRef.startTime = 0;
-		checkResult(pSourceClip->Initialize (&testDataDef,&effectLen, sourceRef));
+		checkResult(pSourceClip->Initialize (testDataDef, effectLen, sourceRef));
 		checkResult(pSourceClip->QueryInterface (IID_IAAFSourceReference, (void **)&pSourceRef));
 		checkResult(pOperationGroup->SetRender (pSourceRef));
 
-		checkResult(pTransition->Create (&datadef, transitionLength, cutPoint, pOperationGroup));
+		checkResult(pTransition->Create (datadef, transitionLength, cutPoint, pOperationGroup));
 		checkResult(pTransition->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
 
 		// now append the transition
@@ -261,18 +285,22 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pComponent = NULL;
 
 		// Create the second filler 
-		checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
+		checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
 												IID_IAAFFiller,
 												(IUnknown **) &pFiller));
 
 		checkResult(pFiller->QueryInterface(IID_IAAFComponent, (void **) &pComponent));
 		// Set values for the filler
-	    checkResult(pFiller->Initialize( &fillerUID, fillerLength));
+	    checkResult(pFiller->Initialize(fillerUID, fillerLength));
 		// append the filler to the sequence
 		checkResult(pSequence->AppendComponent(pComponent));
+		pComponent->Release();
+		pComponent = NULL;
+		pFiller->Release();
+		pFiller = NULL;
 
 		// Now, we append the composition mob to the file	
-		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pHeader->AddMob(pMob));
 		// and we are done !
 	}
 	catch (HRESULT& rResult)
@@ -282,6 +310,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	
 
 	// Cleanup and return
+	if (pParm)
+		pParm->Release();
+
+	if (pParamDef)
+		pParamDef->Release();
+
+	if (pSourceClip)
+		pSourceClip->Release();
+
+	if (pSourceRef)
+		pSourceRef->Release();
+
 	if (pNewSlot)
 		pNewSlot->Release();
 
@@ -354,11 +394,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs;
-	aafInt32					numComponents = 0;
+	aafUInt32					numComponents = 0;
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"AAFTransition Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -378,13 +418,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
-		checkResult(pHeader->EnumAAFAllMobs( NULL, &pMobIter));
+		checkResult(pHeader->GetMobs( NULL, &pMobIter));
 		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
-			checkResult(pMob->EnumAAFAllMobSlots (&pEnum));
+			checkResult(pMob->GetSlots (&pEnum));
 
 			while (AAFRESULT_SUCCESS == pEnum->NextOne (&pMobSlot))
 			{
@@ -392,10 +432,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 				// Check to see if Segment is a Sequence
 				checkResult(pSegment->QueryInterface(IID_IAAFSequence, (void **) &pSequence));
 				// It is, so get a Component Iterator
-				checkResult(pSequence->GetNumComponents(&numComponents));
+				checkResult(pSequence->CountComponents(&numComponents));
 				// Verify that all 3 components(Filler, Transition, Filler) are present
 				checkExpression(numComponents == 3,  AAFRESULT_TEST_FAILED);
-				checkResult(pSequence->EnumComponents(&pCompIter));
+				checkResult(pSequence->GetComponents(&pCompIter));
 				// Now visit each and every one of the components.
 				while(AAFRESULT_SUCCESS == pCompIter->NextOne(&pComponent))
 				{
@@ -409,13 +449,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 						// Check results !!
 						checkExpression(cutPoint == 0, AAFRESULT_TEST_FAILED);
 						checkExpression(transitionLength == 100, AAFRESULT_TEST_FAILED);
+						pTransition->Release();
+						pTransition = NULL;
 					}
 					else
 					{
 						// validate that the other segments are Fillers
 						checkResult(pComponent->QueryInterface(IID_IAAFFiller, (void **)&pFiller));
+						pFiller->Release();
+						pFiller = NULL;
 					}
+					pComponent->Release();
+					pComponent = NULL;
 				}
+				pSegment->Release();
+				pSegment = NULL;
+				pSequence->Release();
+				pSequence = NULL;
+				pCompIter->Release();
+				pCompIter = NULL;
 			}
 
 			pMob->Release();
@@ -459,6 +511,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (pMob)
 		pMob->Release();
 
+	if (pMobIter)
+		pMobIter->Release();
+
 	if (pDictionary)
 		pDictionary->Release();
 
@@ -478,7 +533,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CAAFTransition_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"TransitionTest.aaf";
+	aafWChar * pFileName = L"AAFTransitionTest.aaf";
 
 	try
 	{
