@@ -26,6 +26,7 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-#include "OMIOStream.h"
-
+#ifndef OMIOSTREAM_H
+#define OMIOSTREAM_H
 // Nothing yet
+#endif
