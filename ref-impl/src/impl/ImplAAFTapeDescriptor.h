@@ -3,24 +3,48 @@
 #ifndef __ImplAAFTapeDescriptor_h__
 #define __ImplAAFTapeDescriptor_h__
 
+#include "OMStorable.h"
+
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
-
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
+
+
 #ifndef __ImplAAFEssenceDescriptor_h__
 #include "ImplAAFEssenceDescriptor.h"
 #endif
 
+#include "OMProperty.h"
 
+// Persistent Property IDs
+
+const int PID_TAPEDESCRIPTOR_FORMFACTOR		= 1;
+const int PID_TAPEDESCRIPTOR_VIDEOSIGNAL	= 2;
+const int PID_TAPEDESCRIPTOR_TAPEFORMAT		= 3;
+const int PID_TAPEDESCRIPTOR_LENGTH			= 4;
+const int PID_TAPEDESCRIPTOR_MANUFACTURER	= 5;
+const int PID_TAPEDESCRIPTOR_MODEL			= 6;
 
 
 class ImplAAFTapeDescriptor : public ImplAAFEssenceDescriptor
@@ -33,9 +57,6 @@ public:
   ImplAAFTapeDescriptor ();
   virtual ~ImplAAFTapeDescriptor ();
 
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize ();
 
 
   //****************
@@ -155,8 +176,9 @@ public:
   //
   OMDECLARE_STORABLE(ImplAAFTapeDescriptor)
 
-  virtual AAFRESULT	STDMETHODCALLTYPE
-		GetOwningMobKind (aafMobKind_t *pMobKind);
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFTapeDescriptorTest.cpp.
+  static AAFRESULT test();
 
 	// Persistent properties
 private:

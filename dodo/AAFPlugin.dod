@@ -29,48 +29,17 @@ AD_XCLASS_BEGIN(Abstract, Transient)
 AD_METHOD0(Start, Set up a codec.)
 AD_METHOD0(Finish, Tear down a codec.)
 
-AD_XMETHOD1(GetNumDefinitions,
-			[out],
-			objPass,
-			aafInt32 *,
-			pDefCount,
-			The number of definitions associated with this plugin,
-
-			This method returns the number of subclasses of AAFDefObject associated with this plugin.
-	// This value will equal to the number of codecs\, operation groups\, classes\, types\, containers\, etc..
-	// implemented by the current plugin.  This method will be called once at startup by the plugin manager.
-  //
-  // If this method fails nothing will be written to *pDefCount.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pDefCount arg is NULL.)
-
-AD_XMETHOD2(GetIndexedDefinitionID,
-			[in],
-			objPass,
-			aafInt32,
-			index,
-			An index from 0 to the number of definitions - 1,
+AD_XMETHOD1(GetPluggableID,
 			[out],
 			objPass,
 			aafUID_t *,
 			pPluginID,
 			The unique media object id,
 
-			This method returns the unique ID of the AAFDefObject associated with this Plugin. 
- 	// This range of indices will be from 0 to one less than the total number of codecs\,
-	// operation groups\, classes\, types\, containers\, etc.. implemented by this plugin.
- //
+			This method returns the unique ID of the AAFPluggableDef associated with this Plugin.
+  //
   // Succeeds if all of the following are true:
   // - the pPluginID pointer is valid.
-  // - Index is within range.
   // 
   // If this method fails nothing will be written to *pPluginID.
   // 
@@ -82,10 +51,7 @@ AD_XMETHOD2(GetIndexedDefinitionID,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - pPluginID arg is NULL.
-  //
-  // AAFRESULT_INDEX_RANGE
-  //   - The index value is out of range)
+  //   - pPluginID arg is NULL.)
 
 AD_XMETHOD1(GetPluginDescriptorID,
 			[out],
@@ -111,12 +77,7 @@ AD_XMETHOD1(GetPluginDescriptorID,
   // AAFRESULT_NULL_PARAM
   //   - pPluginID arg is NULL.)
 
-AD_XMETHOD3(GetIndexedDefinitionObject,
-			[in],
-			objPass,
-			aafInt32,
-			index,
-			An index from 0 to the number of definitions - 1,
+AD_XMETHOD2(GetPluggableDefinition,
 			[in],
 			objIn,
 			AAFDictionary,
@@ -124,18 +85,18 @@ AD_XMETHOD3(GetIndexedDefinitionObject,
 			The dictionary to use when creating the definition,
 			[out],
 			objOut,
-			AAFDefObject,
-			pDefObject,
+			AAFPluggableDef,
+			pPluggableDef,
 			The interface of the pluggable definition,
 
-			This method manufactures a definition object of the correct
+			This method manufactures a pluggable definition of the correct
   // class for this plugin\, and fills in the values.  You must call QueryInterface
-  // on the result in order to find the correct interface.
+  // on the result in order to find the corret interface.
   //
   // Succeeds if all of the following are true:
-  // - the pDefObject pointer is valid.
+  // - the pPluggableDef pointer is valid.
   // 
-  // If this method fails nothing will be written to *pDefObject.
+  // If this method fails nothing will be written to *pPluggableDef.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -145,9 +106,9 @@ AD_XMETHOD3(GetIndexedDefinitionObject,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - pDefObject arg is NULL.)
+  //   - pPluggableDef arg is NULL.)
 
-AD_XMETHOD2(CreateDescriptor,
+AD_XMETHOD2(GetDescriptor,
 			[in],
 			objIn,
 			AAFDictionary,
