@@ -45,11 +45,12 @@ class OMRedBlackTreeIterator;
   //        balanced binary search tree providing O(lg N) performance
   //        for the dynamic set operations. Items in the tree are
   //        uniquely identified by key and carry an associated value.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
   //          <c OMRedBlackTree> item. This type must support operator =.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Key, typename Value>
 class OMRedBlackTree {
 public:
@@ -59,7 +60,7 @@ public:
   OMRedBlackTree(void);
 
     // @cmember Destructor.
-  ~OMRedBlackTree(void);
+  virtual ~OMRedBlackTree(void);
 
     // @cmember Insert the <p Value> <p v> into this
     //          <c OMRedBlackTree> and associate it with <p Key> <p k>.
@@ -87,6 +88,9 @@ public:
     // @cmember Remove the item assciated with <p Key> k from this
     //          <c OMRedBlackTree>.
   bool remove(const Key k);
+
+    // @cmember Remove all items from this <c OMRedBlackTree>.
+  virtual void clear(void);
 
     // @cmember The number of items in this <c OMRedBlackTree>.
     //          <mf OMRedBlackTree::count> returns the actual number
