@@ -98,7 +98,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
                                                  _keyPropertyId,
                                                  keySize);
   ASSERT("Valid heap pointer", index != 0);
-  index->setHighWaterMark(localKey());
+  index->setFirstFreeKey(localKey());
   size_t position = 0;
 
   // Iterate over the set saving each element. The index entries
@@ -216,7 +216,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
                           setIndex->keySize() == sizeof(UniqueIdentification));
   ASSERT("Consistent key property ids",
                                   setIndex->keyPropertyId() == _keyPropertyId);
-  setLocalKey(setIndex->highWaterMark());
+  setLocalKey(setIndex->firstFreeKey());
 
   // Iterate over the index restoring the elements of the set.
   // Since the index entries are stored on disk in order of their
@@ -300,8 +300,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   const size_t localKey = nextLocalKey();
   char* name = elementName(localKey);
   UniqueIdentification key = object->identification();
-  // ASSERT("Valid object identification",
-  //                                  key != nullOMUniqueObjectIdentification);
+  ASSERT("Valid identification", isValidIdentification(key));
 
   SetElement newElement(this, name, localKey, 1/*tjb*/, key);
   newElement.setValue(object);
@@ -701,6 +700,27 @@ OMStrongReferenceSetProperty<UniqueIdentification,
     insert(object);
   }
 
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+bool
+OMStrongReferenceSetProperty<UniqueIdentification,
+                             ReferencedObject>::isValidIdentification(
+                                                UniqueIdentification& id) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::"
+                                                      "isValidIdentification");
+
+  bool result = false;
+  OMByte* p = reinterpret_cast<OMByte*>(&id);
+  for (size_t i = 0; i < sizeof(UniqueIdentification); i++) {
+    if (p[i] != 0) {
+      result = true;
+      break;
+    }
+  }
+  return result;
 }
 
 #endif

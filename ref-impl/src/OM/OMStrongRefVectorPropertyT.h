@@ -55,12 +55,6 @@ OMStrongReferenceVectorProperty<ReferencedObject>::
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::"
                                            "~OMStrongReferenceVectorProperty");
-  size_t count = _vector.count();
-  for (size_t i = 0; i < count; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
-    element.setValue(0);
-  }
 }
 
   // @mfunc Save this <c OMStrongReferenceVectorProperty>.
@@ -90,18 +84,15 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::save(
   size_t count = _vector.count();
   OMStoredVectorIndex* index = new OMStoredVectorIndex(count);
   ASSERT("Valid heap pointer", index != 0);
-  index->setHighWaterMark(localKey());
+  index->setFirstFreeKey(localKey());
   size_t position = 0;
 
   // Iterate over the vector saving each element
   //
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
 
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
 
     // enter into the index
     //
@@ -139,8 +130,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::close(void)
 {
   size_t count = _vector.count();
   for (size_t i = 0; i < count; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
+    VectorElement& element = _vector.getAt(i);
     element.close();
   }
 }
@@ -155,8 +145,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::detach(void)
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::detach");
   size_t count = _vector.count();
   for (size_t i = 0; i < count; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
+    VectorElement& element = _vector.getAt(i);
     element.detach();
   }
 }
@@ -174,6 +163,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
                                                            size_t externalSize)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::restore");
+
   PRECONDITION("Consistent property size", externalSize == strlen(name()) + 1);
 
   // get the name of the vector index stream
@@ -192,7 +182,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
   OMStoredVectorIndex* vectorIndex = 0;
   store->restore(vectorIndex, name());
   ASSERT("Valid vector index", vectorIndex->isValid());
-  setLocalKey(vectorIndex->highWaterMark());
+  setLocalKey(vectorIndex->firstFreeKey());
 
   // Iterate over the index restoring the elements of the vector
   //
@@ -204,8 +194,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
     for (size_t i = 0; i < entries; i++) {
       vectorIndex->iterate(context, localKey);
       char* name = elementName(localKey);
-      OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                      ReferencedObject> newElement(this, name, localKey);
+      VectorElement newElement(this, name, localKey);
       newElement.restore();
       _vector.setAt(newElement, i);
       delete [] name;
@@ -279,16 +268,14 @@ ReferencedObject*
     // This is an append, make sure the new element is defined.
     OMUInt32 localKey = nextLocalKey();
     char* name = elementName(localKey);
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> newElement(this, name, localKey);
+    VectorElement newElement(this, name, localKey);
     _vector.append(newElement);
     delete [] name;
   }
 
   // Set the vector to contain the new object
   //
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject>& element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
   ReferencedObject* oldObject = element.setValue(object);
   setPresent();
 
@@ -314,8 +301,7 @@ ReferencedObject* OMStrongReferenceVectorProperty<ReferencedObject>::valueAt(
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid index", ((index >= 0) && (index < count())));
 
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject>& element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
 
   ReferencedObject* result = element.getValue();
   return result;
@@ -340,8 +326,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getValueAt(
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid index", ((index >= 0) && (index < count())));
 
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject>& element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
 
   object = element.getValue();
 
@@ -440,8 +425,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::insertAt(
   
   OMUInt32 localKey = nextLocalKey();
   char* name = elementName(localKey);
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject> newElement(this, name, localKey);
+  VectorElement newElement(this, name, localKey);
   newElement.setValue(object);
   _vector.insertAt(newElement, index);
   delete [] name;
@@ -463,18 +447,14 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::containsValue(
                                           const ReferencedObject* object) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::containsValue");
+
   PRECONDITION("Valid object", object != 0);
 
   bool result = false;
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       result = true;
       break;
     }
@@ -579,15 +559,10 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue(
 
   size_t result;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       result = iterator.index();
       break;
     }
@@ -610,17 +585,13 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::countOfValue(
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::countOfValue");
 
   PRECONDITION("Valid object", object != 0);
+
   size_t result = 0;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       result = result + 1;
     }
   }
@@ -667,15 +638,10 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::findIndex(
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::findIndex");
   bool result = false;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       index = iterator.index();
       result = true;
       break;
@@ -702,8 +668,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::grow(
 
   // Make sure the new elements are defined.
   for (size_t i = oldCount; i < capacity; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> voidElement;
+    VectorElement voidElement;
     _vector.insert(voidElement);
   }
 }
@@ -722,12 +687,9 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::isVoid(void) const
 
   bool result = true;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     ReferencedObject* object = element.getValue();
     if (object != 0) {
       result = false;
@@ -791,12 +753,9 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
 
   const ReferencedObject** p = (const ReferencedObject**)bits;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     *p++ = element.getValue();
   }
 }
