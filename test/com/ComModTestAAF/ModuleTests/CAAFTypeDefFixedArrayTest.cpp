@@ -64,7 +64,9 @@ typedef IAAFSmartPointer<IAAFMobSlot>           IAAFMobSlotSP;
 	
 //Fixed Array
 #define									TEST_FA_NAME	L"FA type Name"
-static  aafUID_t						TEST_FA_TYPE_ID =  {0}; //use CoCreateGuid() 
+static  const aafUID_t				TEST_FA_TYPE_ID =
+{ 0x47240c2c, 0x19d, 0x11d4, { 0x8e, 0x3d, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x7c } };
+
 
 static const aafUInt32					TEST_FA_COUNT =  5;
 #define		 TEST_ELEM_t				aafInt16
@@ -73,10 +75,15 @@ static const TEST_ELEM_t				TEST_FA_VALUES [TEST_FA_COUNT] = {-27, 3000, -50, 94
 
 // Fixed Array Property
 #define									TEST_PROP_NAME	L"FA Property Name"
-static  aafUID_t						TEST_PROP_ID = {0};  //use CoCreateGuid() 
+static  const aafUID_t				TEST_PROP_ID =
+{ 0x47240c2d, 0x19d, 0x11d4, { 0x8e, 0x3d, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x7c } };
+
 
 // Mob id
-static  aafMobID_t						TEST_MobID = {0};
+static  aafMobID_t						TEST_MobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0xaea357b8, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 // Slot id
 static const aafSlotID_t				TEST_SLOT_ID = 7;
@@ -146,7 +153,6 @@ static HRESULT  createFAType (IAAFDictionary * const pDict)
 		CreateInstance (IID_IAAFTypeDefFixedArray, (IUnknown **) &spFA));
 	
 	//IAAFTypeDefFixedArray::Initialize
-	checkResult(CoCreateGuid((GUID *)&TEST_FA_TYPE_ID)); // Could use a better/more accurate UID generator
 	checkResult(spFA->Initialize(TEST_FA_TYPE_ID, spTD_elem, TEST_FA_COUNT, TEST_FA_NAME));
 	
 	//  Register our new FA type def :
@@ -171,9 +177,6 @@ static HRESULT addFATypeToComponent(IAAFDictionary * const pDict)
 	//Lookup the TEST_FA_TYPE_ID we just created!
 	IAAFTypeDefSP spTD;
 	checkResult(pDict->LookupTypeDef (TEST_FA_TYPE_ID, &spTD));
-	
-	//Create a UID for the Property
-	checkResult(CoCreateGuid((GUID *)&TEST_PROP_ID)); // Could use a better/more accurate UID generator
 	
 	//	Register the Property
 	IAAFPropertyDefSP spPropDef;
@@ -432,7 +435,6 @@ static HRESULT CreateAAFFile(aafWChar *  pFileName )
 			CreateInstance(IID_IAAFMob, 
 			(IUnknown **)&spMob));
 		
-		checkResult(CoCreateGuid((GUID *)&TEST_MobID)); // Could use a better/more accurate UID generator
 		checkResult(spMob->SetMobID(TEST_MobID));
 		checkResult(spMob->SetName(L"Some Mob"));
 		
