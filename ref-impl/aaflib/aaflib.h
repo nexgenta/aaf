@@ -1,33 +1,36 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 
 #ifndef __aaflib_h__
 #define __aaflib_h__
 
 #include "AAF.h"
+#include "AAFTypes.h"
 #include "aafrdli.h"
 
 
@@ -37,21 +40,24 @@
 // Define function prototypes in a manner consistent with the 
 // ActiveX and OLE SDK's.
 
-#if !defined(_MSC_VER)
+#if !defined( COMPILER_MSC )
+//
+// Compiler other than MS Visual C++
+//
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGREAD)(
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     IAAFFile ** ppFile);
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGMODIFY)(
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENNEWMODIFY)(
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
@@ -63,21 +69,41 @@ typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENTRANSIENT)(
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETPLUGINMANAGER)(
     IAAFPluginManager ** ppPluginManager);
 
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATERAWSTORAGEMEMORY)(
+	aafFileAccess_e  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATERAWSTORAGEDISK)(
+    aafCharacter_constptr  pFilename,
+    aafFileExistence_e  existence,
+	aafFileAccess_e  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
+    IAAFRawStorage * pRawStorage,
+	aafUID_constptr  pFileKind,
+	aafUInt32  modeFlags,
+	aafProductIdentification_constptr  pIdent,
+	IAAFFile ** ppNewFile);
+
 #else
+//
+// MS Visual C++ compiler
+//
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGREAD)(
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     IAAFFile ** ppFile);
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGMODIFY)(
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENNEWMODIFY)(
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
@@ -88,6 +114,23 @@ typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENTRANSIENT)(
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETPLUGINMANAGER)(
     IAAFPluginManager ** ppPluginManager);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATERAWSTORAGEMEMORY)(
+	aafFileAccess_e  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATERAWSTORAGEDISK)(
+    aafCharacter_constptr  pFilename,
+    aafFileExistence_e  existence,
+	aafFileAccess_e  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
+    IAAFRawStorage * pRawStorage,
+	aafUID_constptr  pFileKind,
+	aafUInt32  modeFlags,
+	aafProductIdentification_constptr  pIdent,
+	IAAFFile ** ppNewFile);
 
 #endif
 
@@ -136,18 +179,18 @@ public:
   // Wrapper functions for calling member entry points.
   //
   HRESULT OpenExistingRead (
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     IAAFFile ** ppFile);
   
   HRESULT OpenExistingModify (
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
 
   HRESULT OpenNewModify (
-    wchar_t *  pFileName,
+    const wchar_t *  pFileName,
     aafUInt32  modeFlags,
     aafProductIdentification_t *  pIdent,
     IAAFFile ** ppFile);
@@ -159,7 +202,23 @@ public:
   HRESULT GetPluginManager (
     IAAFPluginManager ** ppPluginManager);
   
+  HRESULT CreateRawStorageMemory (
+	aafFileAccess_e  access,
+	IAAFRawStorage ** ppNewRawStorage);
   
+  HRESULT CreateRawStorageDisk (
+    aafCharacter_constptr  pFilename,
+    aafFileExistence_e  existence,
+	aafFileAccess_e  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+  HRESULT CreateAAFFileOnRawStorage (
+    IAAFRawStorage * pRawStorage,
+	aafUID_constptr  pFileKind,
+	aafUInt32  modeFlags,
+	aafProductIdentification_constptr  pIdent,
+	IAAFFile ** ppNewFile);
+
 protected:
   //
   // The single instance of the dll wrapper.
@@ -175,11 +234,14 @@ protected:
   // Callback function member data loaded by overridden versions
   // of the Load() method:
   //
-  LPFNAAFFILEOPENEXISTINGREAD   _pfnOpenExistingRead;
-  LPFNAAFFILEOPENEXISTINGMODIFY _pfnOpenExistingModify;
-  LPFNAAFFILEOPENNEWMODIFY      _pfnOpenNewModify;
-  LPFNAAFFILEOPENTRANSIENT      _pfnOpenTransient;
-  LPFNAAFGETPLUGINMANAGER       _pfnGetPluginManager;
+  LPFNAAFFILEOPENEXISTINGREAD      _pfnOpenExistingRead;
+  LPFNAAFFILEOPENEXISTINGMODIFY    _pfnOpenExistingModify;
+  LPFNAAFFILEOPENNEWMODIFY         _pfnOpenNewModify;
+  LPFNAAFFILEOPENTRANSIENT         _pfnOpenTransient;
+  LPFNAAFGETPLUGINMANAGER          _pfnGetPluginManager;
+  LPFNAAFCREATERAWSTORAGEMEMORY    _pfnCreateRawStorageMemory;
+  LPFNAAFCREATERAWSTORAGEDISK      _pfnCreateRawStorageDisk;
+  LPFNAAFCREATEAAFFILEONRAWSTORAGE _pfnCreateAAFFileOnRawStorage;
 };
 
 
@@ -231,3 +293,4 @@ void reportAssertionFailure(char* kind,
 
 
 #endif /* __aaflib_h__ */
+
