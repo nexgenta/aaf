@@ -26,8 +26,8 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-#ifndef OMPROPERTYBASE_H
-#define OMPROPERTYBASE_H
+#ifndef OMPROPERTY_H
+#define OMPROPERTY_H
 
 #include "OMPortability.h"
 #include "OMDataTypes.h"
@@ -91,7 +91,7 @@ public:
   const OMPropertyDefinition* definition(void) const;
 
     // @cmember The name of this <c OMProperty>.
-  const char* name(void) const;
+  const wchar_t* name(void) const;
 
     // @cmember The property id of this <c OMProperty>.
   OMPropertyId propertyId(void) const;
@@ -174,13 +174,15 @@ protected:
     //          Read (and check) the property name.
   void restoreName(size_t size);
 
+  virtual const wchar_t* storedName(void) const;
+
   OMPropertyId _propertyId;
   OMStoredForm _storedForm;
+  wchar_t* _storedName;
+  const wchar_t* _name;
 
 private:
 
-  const wchar_t* _name;
-  char* _cName;
   const OMPropertySet* _propertySet; // The PropertySet that contains
                                      // this property
   const OMPropertyDefinition* _definition;
