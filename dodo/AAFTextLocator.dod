@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTextLocator\
 #endm
@@ -7,15 +14,6 @@ AAFLocator\
 #endm
 #c
 #c #import ./AAFLocator.exp
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-AD_HEAD
 AD_IDL(//
 // The IAAFTextLocator interface is implemented by objects which
 // provide information to help find a file containing essence data
