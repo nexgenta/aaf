@@ -8,8 +8,8 @@
 * Portions Copyright (C) 2003 Metaglue Corparation. All rights reserved.
 ************************************************************************
 
-$Revision: 1.1 $
-$Date: 2003/11/06 19:09:59 $
+$Revision: 1.1.2.1 $
+$Date: 2003/11/07 15:34:40 $
 */
 #ifndef _StructuredStorage_h
 #define _StructuredStorage_h
