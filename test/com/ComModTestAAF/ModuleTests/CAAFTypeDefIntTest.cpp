@@ -1,19 +1,33 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+// @com This file implements the module test for CAAFTypeDefInt
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
-#include "CAAFTypeDefInt.h"
-#include "CAAFTypeDefInt.h"
-#ifndef __CAAFTypeDefInt_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
@@ -21,6 +35,9 @@
 #include <iostream.h>
 #include <assert.h>
 #include <stdio.h>
+#include "AAFDefUIDs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 // Temporarily necessary global declarations.
 extern "C" const CLSID CLSID_AAFTypeDefInt; // generated
@@ -88,28 +105,35 @@ static void RemoveTestFile(const wchar_t* pFileName)
 
 
 static HRESULT CreateOneTypeDef (IAAFDictionary *  pDict,
-								 aafUInt32         intSize,
+								 aafUInt8          intSize,
 								 aafBool           isSigned,
-								 aafUID_t *        pID,
-								 wchar_t *         name,
+								 const aafUID_t &  id,
+								 const wchar_t *   name,
 								 IAAFTypeDefInt ** ppTD)
 {
   assert (pDict);
-  assert (pID);
   assert (name);
   assert (ppTD);
 
-  HRESULT hr = E_FAIL;
+  HRESULT hr = S_OK;
   IAAFTypeDefInt * pTD = NULL;
 
-  checkResult (pDict->CreateInstance (&AUID_AAFTypeDefInt,
-									  IID_IAAFTypeDefInt,
-									  (IUnknown **) &pTD));
+  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefInt,
+                                  IID_IAAFTypeDefInt,
+                                  (IUnknown **) &pTD);
+  if (FAILED(hr))
+    return (hr);
+
   assert (pTD);
-  checkResult (pTD->Initialize (pID, intSize, isSigned, name));
+  hr = pTD->Initialize (id, intSize, isSigned, name);
+  if (FAILED(hr))
+  {
+    pTD->Release();
+    return (hr);
+  }
 
   *ppTD = pTD;
-  return AAFRESULT_SUCCESS;
+  return hr;
 } 
 
 
@@ -167,7 +191,7 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 		{
 		  if (ppv)
 			ppv->Release();
-		  throw AAFRESULT_TEST_FAILED;
+		  return AAFRESULT_TEST_FAILED;
 		}
 	  // good, the creation failed.  Let's let's create one that
 	  // *will* work, and make sure it fails when we try to 'set' it.
@@ -176,7 +200,7 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 		{
 		  if (ppv)
 			ppv->Release();
-		  throw AAFRESULT_TEST_FAILED;
+		  return AAFRESULT_TEST_FAILED;
 		}
       assert (ppv);
 
@@ -185,14 +209,14 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 		{
 		  if (ppv)
 			ppv->Release();
-		  throw AAFRESULT_TEST_FAILED;
+		  return AAFRESULT_TEST_FAILED;
 		}
 
 	  // OK, it failed where it should have.  Make sure we return the
 	  // 'bad size' err code
 	  if (ppv)
 		ppv->Release();
-	  throw AAFRESULT_BAD_SIZE;
+	  return AAFRESULT_BAD_SIZE;
 	}
 
   // OK, the creation should succeed.
@@ -227,7 +251,7 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 	{
 	  if (ppv)
 		ppv->Release();
-	  throw hr;
+	  return hr;
 	}
 
   // OK, ppv is created.  Let's try to get the value.
@@ -244,13 +268,13 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 		{
 		  if (ppv)
 			ppv->Release();
-		  throw AAFRESULT_TEST_FAILED;
+		  return AAFRESULT_TEST_FAILED;
 		}
 
 	  // this is what we were expecting.
 	  if (ppv)
 		ppv->Release();
-	  throw AAFRESULT_BAD_SIZE;
+	  return AAFRESULT_BAD_SIZE;
 	}
 
   v8 = v4 = v2 = v1 = -1;
@@ -290,13 +314,19 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 	{
 	  if (ppv)
 		ppv->Release();
-	  throw hr;
+	  return hr;
 	}
-  if (getVal != setData)
+
+  aafUInt32 compareSize =
+	getDataSize < setDataSize ? getDataSize : setDataSize;
+  aafInt64 compareMask = ~0;
+  if (compareSize < 8)
+	compareMask = (((aafInt64)1) << (compareSize*8))-1;
+  if ((getVal&compareMask) != (setData&compareMask))
 	{
 	  if (ppv)
 		ppv->Release();
-	  throw AAFRESULT_TEST_FAILED;
+	  return AAFRESULT_TEST_FAILED;
 	}
 
   // Now let's try a set/get cycle again.
@@ -335,7 +365,7 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 	{
 	  if (ppv)
 		ppv->Release();
-	  throw hr;
+	  return hr;
 	}
 
   v8 = v4 = v2 = v1 = -1;
@@ -376,8 +406,8 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 
   checkResult (hr);
 
-  if (getVal != setData)
-	throw AAFRESULT_TEST_FAILED;
+  if ((getVal&compareMask) != (setData&compareMask))
+	return AAFRESULT_TEST_FAILED;
 
   return AAFRESULT_SUCCESS;
 }
@@ -404,16 +434,18 @@ static HRESULT TestTypeDefInt ()
 
   try
 	{
+	  aafProductVersion_t v;
+	  v.major = 1;
+	  v.minor = 0;
+	  v.tertiary = 0;
+	  v.patchLevel = 0;
+	  v.type = kAAFVersionUnknown;
 
 	  ProductInfo.companyName = L"AAF Developers Desk";
 	  ProductInfo.productName = L"AAFTypeDefInt Test";
-	  ProductInfo.productVersion.major = 1;
-	  ProductInfo.productVersion.minor = 0;
-	  ProductInfo.productVersion.tertiary = 0;
-	  ProductInfo.productVersion.patchLevel = 0;
-	  ProductInfo.productVersion.type = kVersionUnknown;
+	  ProductInfo.productVersion = &v;
 	  ProductInfo.productVersionString = NULL;
-	  ProductInfo.productID = -1;
+	  ProductInfo.productID = UnitTestProductID;
 	  ProductInfo.platform = NULL;
 
 	  RemoveTestFile (testFileName);
@@ -431,8 +463,8 @@ static HRESULT TestTypeDefInt ()
 	  // 1-byte signed
 	  checkResult (CreateOneTypeDef (pDict,
 									 1,                 // 1-byte (8-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt8,
+									 kAAFTrue,           // signed
+									 TypeID_LocalInt8,
 									 L"Local 8-bit signed int",
 									 &ptds8));
 	  assert (ptds8);
@@ -440,8 +472,8 @@ static HRESULT TestTypeDefInt ()
   // 2-byte signed
 	  checkResult (CreateOneTypeDef (pDict,
 									 2,                 // 2-byte (16-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt16,
+									 kAAFTrue,           // signed
+									 TypeID_LocalInt16,
 									 L"Local 8-bit signed int",
 									 &ptds16));
 	  assert (ptds16);
@@ -449,8 +481,8 @@ static HRESULT TestTypeDefInt ()
   // 4-byte signed
 	  checkResult (CreateOneTypeDef (pDict,
 									 4,                 // 4-byte (32-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt32,
+									 kAAFTrue,           // signed
+									 TypeID_LocalInt32,
 									 L"Local 32-bit signed int",
 									 &ptds32));
 	  assert (ptds32);
@@ -458,8 +490,8 @@ static HRESULT TestTypeDefInt ()
   // 8-byte signed
 	  checkResult (CreateOneTypeDef (pDict,
 									 8,                 // 8-byte (64-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt64,
+									 kAAFTrue,           // signed
+									 TypeID_LocalInt64,
 									 L"Local 64-bit signed int",
 									 &ptds64));
 	  assert (ptds64);
@@ -467,8 +499,8 @@ static HRESULT TestTypeDefInt ()
   // 1-byte unsigned
 	  checkResult (CreateOneTypeDef (pDict,
 									 1,                 // 1-byte (8-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt8,
+									 kAAFFalse,          // unsigned
+									 TypeID_LocalUInt8,
 									 L"Local 8-bit unsigned int",
 									 &ptdu8));
 	  assert (ptdu8);
@@ -476,8 +508,8 @@ static HRESULT TestTypeDefInt ()
   // 2-byte unsigned
 	  checkResult (CreateOneTypeDef (pDict,
 									 2,                 // 2-byte (16-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt16,
+									 kAAFFalse,          // unsigned
+									 TypeID_LocalUInt16,
 									 L"Local 8-bit unsigned int",
 									 &ptdu16));
 	  assert (ptdu16);
@@ -485,8 +517,8 @@ static HRESULT TestTypeDefInt ()
   // 4-byte unsigned
 	  checkResult (CreateOneTypeDef (pDict,
 									 4,                 // 4-byte (32-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt32,
+									 kAAFFalse,          // unsigned
+									 TypeID_LocalUInt32,
 									 L"Local 32-bit unsigned int",
 									 &ptdu32));
 	  assert (ptdu32);
@@ -494,8 +526,8 @@ static HRESULT TestTypeDefInt ()
   // 8-byte unsigned
 	  checkResult (CreateOneTypeDef (pDict,
 									 8,                 // 8-byte (64-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt64,
+									 kAAFFalse,          // unsigned
+									 TypeID_LocalUInt64,
 									 L"Local 64-bit unsigned int",
 									 &ptdu64));
 	  assert (ptdu64);
@@ -503,8 +535,10 @@ static HRESULT TestTypeDefInt ()
 	  const aafUInt32 sizeTable[4] = {1, 2, 4, 8};
 	  IAAFTypeDefInt *typeDefTable[4][2] =
 	  {
-		ptdu8, ptdu16, ptdu32, ptdu64,
-		ptds8, ptds16, ptds32, ptds64
+		ptdu8, ptds8,
+		ptdu16, ptds16,
+		ptdu32, ptds32,
+		ptdu64, ptds64
 	  };
 
 	  aafUInt32  setSize;
@@ -522,14 +556,14 @@ static HRESULT TestTypeDefInt ()
 				{
 				  IAAFTypeDefInt * td;
 
-				  pvSize = 1 << pvIndex;
+				  pvSize = sizeTable[pvIndex];
 
 				  if ((1 == pvSize) ||
 					  (2 == pvSize) ||
 					  (4 == pvSize) ||
 					  (8 == pvSize))
 					{
-					  td = typeDefTable[pvSize][sign];
+					  td = typeDefTable[pvIndex][sign];
 					}
 				  else
 					continue;	// skip rest of the loop
@@ -539,8 +573,8 @@ static HRESULT TestTypeDefInt ()
 				  hr = TestOneValue (setSize,
 									 setData,
 									 getSize,
-									 pvIndex,
-									 sign? AAFTrue : AAFFalse,
+									 pvSize,
+									 sign? kAAFTrue : kAAFFalse,
 									 td);
 
 				  //
@@ -555,7 +589,7 @@ static HRESULT TestTypeDefInt ()
 						throw AAFRESULT_TEST_FAILED;
 					}
 
-				  if ((getSize != 1) &&
+				  else if ((getSize != 1) &&
 					  (getSize != 2) &&
 					  (getSize != 4) &&
 					  (getSize != 8))
@@ -564,15 +598,18 @@ static HRESULT TestTypeDefInt ()
 						throw AAFRESULT_TEST_FAILED;
 					}
 
-				  if ((setSize > pvSize) ||
+				  else if ((setSize > pvSize) ||
 					  (pvSize > getSize))
 					{
 					  if (AAFRESULT_BAD_SIZE != hr)
 						throw AAFRESULT_TEST_FAILED;
 					}
 
-				  // if we're here, it should pass.
-				  checkResult (hr);
+				  else
+					{
+					  // if we're here, it should pass.
+					  checkResult (hr);
+					}
 				}
 	}
   catch (HRESULT & rResult)
@@ -580,23 +617,44 @@ static HRESULT TestTypeDefInt ()
 	  caughtHr = rResult;
 	}
 
-  ptds8->Release();
-  ptds16->Release();
-  ptds32->Release();
-  ptds64->Release();
-  ptdu8->Release();
-  ptdu16->Release();
-  ptdu32->Release();
-  ptdu64->Release();
-  pDict->Release();
-  pHeader->Release();
-  pFile->Release();
+  if (ptds8)
+    ptds8->Release();
+  if (ptds16)
+    ptds16->Release();
+  if (ptds32)
+    ptds32->Release();
+  if (ptds64)
+    ptds64->Release();
+  if (ptdu8)
+    ptdu8->Release();
+  if (ptdu16)
+    ptdu16->Release();
+  if (ptdu32)
+  	ptdu32->Release();
+  if (ptdu64)
+  	ptdu64->Release();
+  if (pDict)
+    pDict->Release();
+  if (pHeader)
+  	pHeader->Release();
+  if (pFile)
+  {
+	hr = pFile->Save();
+	if (! SUCCEEDED (hr))
+	{  
+	  pFile->Release();
+	  return hr;
+	}
+	hr = pFile->Close();
+	pFile->Release();
+  }
 
-  return AAFRESULT_SUCCESS;
+  
+  return (caughtHr != AAFRESULT_SUCCESS) ? caughtHr : hr;
 }
 
 
-HRESULT CAAFTypeDefInt::test()
+extern "C" HRESULT CAAFTypeDefInt_test()
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 
@@ -606,8 +664,9 @@ HRESULT CAAFTypeDefInt::test()
 	}
   catch (...)
     {
-      cerr << "CAAFTypeDefInt::test...Caught general C++"
-        " exception!" << endl; 
+      cerr << "CAAFTypeDefInt_test...Caught general C++"
+		   << " exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
     }
   return hr;
 }

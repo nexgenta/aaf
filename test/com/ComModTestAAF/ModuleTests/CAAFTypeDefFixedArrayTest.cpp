@@ -141,16 +141,13 @@ static void RemoveTestFile(const wchar_t* pFileName)
 
 static HRESULT  createFAType (IAAFDictionary * const pDict)
 {
-	CAAFBuiltinDefs defs(pDict);
-	
 	//Look up the Type def based on 16-bit signed integer
 	IAAFTypeDefSP spTD_elem;
 	checkResult(pDict->LookupTypeDef (TEST_ELEM_TYPE_ID, &spTD_elem));
 	
 	//Create a Fixed Array
 	IAAFTypeDefFixedArraySP spFA;
-	checkResult(defs.cdTypeDefFixedArray()->
-		CreateInstance (IID_IAAFTypeDefFixedArray, (IUnknown **) &spFA));
+	checkResult(pDict->CreateMetaInstance (AUID_AAFTypeDefFixedArray, IID_IAAFTypeDefFixedArray, (IUnknown **) &spFA));
 	
 	//IAAFTypeDefFixedArray::Initialize
 	checkResult(spFA->Initialize(TEST_FA_TYPE_ID, spTD_elem, TEST_FA_COUNT, TEST_FA_NAME));
@@ -474,9 +471,9 @@ static HRESULT CreateAAFFile(aafWChar *  pFileName )
 		checkResult(addFATypeToComponent (pDict));
 		///////////
 		
-		//Create a mob 
+		//Create a concrete subclass of mob 
 		IAAFMobSP spMob;
-		checkResult(defs.cdMob()->
+		checkResult(defs.cdMasterMob()->
 			CreateInstance(IID_IAAFMob, 
 			(IUnknown **)&spMob));
 		
@@ -496,9 +493,9 @@ static HRESULT CreateAAFFile(aafWChar *  pFileName )
 		IAAFSegmentSP spSeg;
 		checkResult(spFill->QueryInterface (IID_IAAFSegment, (void **)&spSeg));
 		
-		//Create a mob slot				
+		//Create a concrete subclass of mob slot
 		IAAFMobSlotSP spMobSlot;
-		checkResult(defs.cdMobSlot()->
+		checkResult(defs.cdStaticMobSlot()->
 			CreateInstance(IID_IAAFMobSlot, 
 									   (IUnknown **)&spMobSlot));		
 		
@@ -597,7 +594,7 @@ extern "C" HRESULT CAAFTypeDefFixedArray_test()
 	catch (...)
 	{
 		cerr << "CAAFTypeDefFixedArray_test...Caught general C++"
-			" exception!" << endl; 
+			 << " exception!" << endl; 
 		hr = AAFRESULT_TEST_FAILED;
 	}
 	
