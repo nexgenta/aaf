@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFKLVDataDefinition.cpp,v 1.1.2.4 2004/05/24 19:06:20 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFKLVDataDefinition.cpp,v 1.1.2.5 2004/05/24 19:17:35 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,6 @@
 #endif
 
 #include "ImplAAFDictionary.h"
-#include "ImplAAFWeakRefSetUtil.h"
 
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
