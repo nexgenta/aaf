@@ -3,7 +3,6 @@
 #ifndef __ImplEnumAAFLocators_h__
 #define __ImplEnumAAFLocators_h__
 
-#include "OMStorable.h"
 
 /******************************************\
 *                                          *
@@ -36,6 +35,8 @@ class ImplAAFLocator;
 #endif
 
 #include "ImplAAFEssenceDescriptor.h"
+
+typedef OMStrongReferenceVectorProperty<ImplAAFLocator> locatorStrongRefArrayProp_t;
 
 class ImplEnumAAFLocators : public ImplAAFRoot
 {
@@ -97,23 +98,19 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplEnumAAFLocators)
-
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplEnumAAFLocatorsTest.cpp.
   static AAFRESULT test();
 
 public:
 // Internal to the toolkit
-AAFRESULT
-    SetEssenceDesc(ImplAAFEssenceDescriptor *pEDesc);
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEnumStrongProperty( ImplAAFObject *pObj, locatorStrongRefArrayProp_t *pProp);
 
 private:
-	aafInt32					_current;
-	ImplAAFEssenceDescriptor	*_cEssenceDesc;
-
+	aafUInt32						_current;
+	ImplAAFObject					*_enumObj;
+	locatorStrongRefArrayProp_t		*_enumStrongProp;
 };
 
 #endif // ! __ImplEnumAAFLocators_h__
