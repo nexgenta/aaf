@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFWAVEDescriptor
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -10,15 +10,12 @@
 \******************************************/
 
 
-
+#if defined(WIN32) || defined(_WIN32)
 #undef WIN32_LEAN_AND_MEAN
-
-
-#include "CAAFWAVEDescriptor.h"
-#include "CAAFWAVEDescriptor.h"
-#ifndef __CAAFWAVEDescriptor_h__
-#error - improperly defined include guard
 #endif
+
+
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -135,9 +132,10 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
+	*ppFile = NULL;
 
 	switch (mode)
 	{
@@ -156,8 +154,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -250,6 +251,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   if (pSourceMob)
     pSourceMob->Release();
 
+  if (pDictionary)
+    pDictionary->Release();
+
 	if (pHeader)
     pHeader->Release();
 
@@ -332,6 +336,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   if (pMob)
     pMob->Release();
 
+  if (pMobIter)
+    pMobIter->Release();
+
   if (pSourceMob)
     pSourceMob->Release();
 
@@ -347,7 +354,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-HRESULT CAAFWAVEDescriptor::test()
+extern "C" HRESULT CAAFWAVEDescriptor_test()
 {
 	aafWChar*	pFileName = L"AAFWAVEDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
@@ -360,7 +367,7 @@ HRESULT CAAFWAVEDescriptor::test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFWAVEDescriptor::test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFWAVEDescriptor_test...Caught general C++ exception!" << endl; 
 	}
 
 	return hr;
