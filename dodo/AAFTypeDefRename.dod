@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefRename\
 #endm
@@ -19,21 +26,17 @@ AD_IDL(//
 // AAFRESULT_NOMEMORY
 //   - insufficient system memory is available to perform the
 //     operation.
-//
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-)
+//)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_CLASS_UUID(307e9e69, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(307e9e6a, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD3(Initialize,
-			[in],
+			[in\, ref],
 			objPass,
-			aafUID_t *,
-			pID,
+			aafUID_constref,
+			id,
 			auid to be used to identify this type,
 
 			[in],
@@ -44,7 +47,7 @@ AD_XMETHOD3(Initialize,
 
 			[in\, string],
 			objPass,
-			aafCharacter *,
+			aafCharacter_constptr,
 			pTypeName,
 			friendly name of this type definition,
 
@@ -57,6 +60,7 @@ AD_XMETHOD3(Initialize,
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
   // - pBaseType is a valid pointer.
+  // - pTypeName is a valid pointer.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -66,7 +70,7 @@ AD_XMETHOD3(Initialize,
   //   - succeeded.  \(This is the only code indicating success.\)
   // 
   // AAFRESULT_NULL_PARAM
-  //   - pBaseType is null.
+  //   - pBaseType or pTypeName is null.
   //
   // AAFRESULT_ALREADY_INITIALIZED
   //   - Initialize\(\) has already been called on this object.)
@@ -99,7 +103,7 @@ AD_XMETHOD1(GetBaseType,
   //   - ppBaseType pointer is NULL.)
 
 
-AD_XMETHOD2(GetValue,
+AD_XMETHOD2(GetBaseValue,
 			[in],
 			objIn,
 			AAFPropertyValue,
@@ -133,6 +137,39 @@ AD_XMETHOD2(GetValue,
   // AAFRESULT_NULL_PARAM
   //   - pInPropVal or ppOutPropVal is NULL.)
 
+AD_XMETHOD2(GetValue,
+			[in],
+			objIn,
+			AAFPropertyValue,
+			pInPropVal,
+			property value from which value is to be read,
+
+			[out],
+			objOut,
+			AAFPropertyValue,
+			ppOutPropVal,
+			pointer to property value represented by rename type,
+
+  // Gets the property value of the typedef type from the given property
+  // value of the base type and places a pointer to the base type's
+  // property value into *ppOutPropVal.
+  //
+  // Succeeds if:
+  // - The pInPropVal pointer is valid.
+  // - The ppOutPropVal pointer is valid.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pInPropVal or ppOutPropVal is NULL.)
 
 AD_OVERRIDE(.method-GetTypeCategory)
 AD_XCLASS_END(Concrete, StoredObject)
