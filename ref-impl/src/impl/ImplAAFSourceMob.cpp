@@ -27,8 +27,7 @@
 #include "ImplAAFSegment.h"
 #endif
 
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
+
 
 
 #ifndef __ImplAAFSourceMob_h__
@@ -40,97 +39,51 @@
 #include "ImplAAFSourceClip.h"
 #include "aafCvt.h"
 #include "aafErr.h"
-#include "AAFResult.h"
+#include "aafresult.h"
 #include "ImplAAFObjectCreation.h"
-#include "AAFDefUIDs.h"
-#include "AAFUtils.h"
-#include "ImplEnumAAFMobSlots.h"
-#include "ImplAAFSequence.h"
-#include "ImplEnumAAFComponents.h"
-#include "ImplAAFTimecode.h"
-#include "ImplAAFFileDescriptor.h"
-#include "ImplAAFFiller.h"
-#include "ImplAAFEdgecode.h"
 
 extern "C" const aafClassID_t	CLSID_AAFSourceClip;
-extern "C" const aafClassID_t	CLSID_AAFSequence;
-extern "C" const aafClassID_t	CLSID_AAFTimecode;
-extern "C" const aafClassID_t	CLSID_AAFFiller;
-extern "C" const aafClassID_t	CLSID_AAFEdgecode;
 
 ImplAAFSourceMob::ImplAAFSourceMob ()
-: _essenceDesc(        PID_SourceMob_EssenceDescription,          "EssenceDescription")
+: _essenceDesc(         PID_SOURCEMOB_EDESC,          "essenceDescriptor")
 {
   _persistentProperties.put(_essenceDesc.address());
 }
 
 ImplAAFSourceMob::~ImplAAFSourceMob ()
-{
-	ImplAAFEssenceDescriptor *essenceDesc = _essenceDesc.setValue(0);
-	if (essenceDesc)
-	{
-		essenceDesc->ReleaseReference();
-	}
-}
-
+{}
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFSourceMob::Initialize ()
+    ImplAAFSourceMob::GetEssenceDescription (ImplAAFEssenceDescriptor **ppEdes)
 {
+  *ppEdes = _essenceDesc;
   return AAFRESULT_SUCCESS;
 }
 
 
-//****************
-// GetEssenceDescriptor()
-//
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::GetEssenceDescriptor (ImplAAFEssenceDescriptor **ppEdes)
+    ImplAAFSourceMob::SetEssenceDescription (ImplAAFEssenceDescriptor *pEdes)
 {
-	if (ppEdes == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	*ppEdes = _essenceDesc;
-	// !!!Handle case where essence descriptor may not
-	// exist, return  AAFRESULT_NO_ESSENCE_DESC.
-
-  if (*ppEdes)
-    (*ppEdes)->AcquireReference();
-
-	return AAFRESULT_SUCCESS;
+  _essenceDesc = pEdes;
+  return AAFRESULT_SUCCESS;
 }
 
 
 
-//****************
-// SetEssenceDescriptor()
-//
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::SetEssenceDescriptor (ImplAAFEssenceDescriptor *pEdes)
+    ImplAAFSourceMob::Setup (aafWChar *  /*pName*/,
+                           aafClassID_t *  /*pMdesClass*/)
 {
-	if (pEdes == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	ImplAAFEssenceDescriptor *pOldEdes = _essenceDesc;
-	if (pOldEdes)
-		pOldEdes->ReleaseReference();
-
-	_essenceDesc = pEdes;
-	
-	if (pEdes)
-		pEdes->AcquireReference();
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
-//****************
-// AddNilReference()
-//
-AAFRESULT STDMETHODCALLTYPE
+
+ AAFRESULT STDMETHODCALLTYPE
    ImplAAFSourceMob::AddNilReference (aafSlotID_t slotID,
                            aafLength_t  length,
-                           aafUID_t *dataDef,
+                           ImplAAFDataDef *dataDef,
                            aafRational_t  editRate)
 {
 	ImplAAFSourceClip *		sub = NULL;
@@ -139,30 +92,29 @@ AAFRESULT STDMETHODCALLTYPE
 	aafSourceRef_t	sourceRef;
 	ImplAAFTimelineMobSlot *	newSlot = NULL;		// Need version for non-timeline slots!!!
 	
-	if (editRate.denominator == 0)
-		return AAFRESULT_BADRATE;
+	aafAssert(editRate.denominator != 0, _file, OM_ERR_BADRATE);
 	
 	XPROTECT()
 	{
- 		sourceRef.sourceID = NilMOBID;
+ 		sourceRef.sourceID.Data1 = 0;
+		sourceRef.sourceID.Data2 = 0;
+		sourceRef.sourceID.Data3 = 0;
+		sourceRef.sourceID.Data4[0] = 0;
+		sourceRef.sourceID.Data4[1] = 0;
+		sourceRef.sourceID.Data4[2] = 0;
+		sourceRef.sourceID.Data4[3] = 0;
+		sourceRef.sourceID.Data4[4] = 0;
+		sourceRef.sourceID.Data4[5] = 0;
+		sourceRef.sourceID.Data4[6] = 0;
+		sourceRef.sourceID.Data4[7] = 0;
 		sourceRef.sourceSlotID = 0;
 		CvtInt32toPosition(0, sourceRef.startTime);
 		sub = (ImplAAFSourceClip *)CreateImpl(CLSID_AAFSourceClip);
-		if(sub == NULL)
-			return(E_FAIL);
-		CHECK(sub->Initialize (dataDef, &length, sourceRef));
-		CHECK(AppendNewTimelineSlot(editRate, sub, slotID, L"Test", zeroPos, 
+		CHECK(sub->InitializeSourceClip (dataDef, length, sourceRef));
+		CHECK(AppendNewTimelineSlot(editRate, sub, slotID, NULL, zeroPos, 
 												&newSlot));
-		newSlot->ReleaseReference();
-		sub->ReleaseReference();
 	}
 	XEXCEPT
-	{
-		if(sub != NULL)
-			sub->ReleaseReference();
-		if(newSlot != NULL)
-			newSlot->ReleaseReference();
-	}
 	XEND;
 
 	return(AAFRESULT_SUCCESS);
@@ -170,168 +122,193 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-//****************
-// AddTimecodeClip()
-//
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFSourceMob::AppendTimecodeSlot (aafRational_t editrate,
+ AAFRESULT STDMETHODCALLTYPE
+   ImplAAFSourceMob::AddTimecodeClip (aafRational_t editrate,
                            aafInt32 slotID,
-						   aafTimecode_t startTC,
+                           aafTimecode_t startTC,
                            aafFrameLength_t length32)
 {
+#if FULL_TOOLKIT
+	 ImplAAFSegment *slotComponent= NULL;
 	ImplAAFTimecode *tccp = NULL;
+	ImplAAFFiller *fill = NULL;
+	ImplAAFSegment *     aSubComponent = NULL;
 	ImplAAFSequence	*aSequ = NULL;
-	aafInt32         zeroL = 0L;
+	ImplAAFFiller *     filler1 = NULL, *filler2 = NULL;
+	aafInt32         zeroL = 0L, sub, numSub;
 	aafFrameLength_t maxLength;
-	aafUID_t		 timecodeKind = DDEF_Timecode;
+	aafClassID_t	tag;
+	ImplAAFDataKind *	timecodeKind = NULL;
+	ImplAAFObject		*tmp;
 	AAFRESULT			aafError = AAFRESULT_SUCCESS;
 	aafPosition_t	zeroPos;
-	aafLength_t		length, zeroLen;
-	ImplAAFTimelineMobSlot *	newSlot = NULL, *mobSlot = NULL;
-	aafBool			fullLength = AAFFalse;
+	aafLength_t		length, zeroLen, sequLen;
+	ImplAAFMobSlot *	newSlot = NULL;
+	aafBool			fullLength = FALSE;
+	aafProperty_t	sequProp;
+	
+	{
+		sequProp = OMSEQUComponents;
+	}
 
-	//!!!Validate tape mobs only, return AAFRESULT_TAPE_DESC_ONLY
 	if(length32 == FULL_LENGTH)
 	  {
-		 fullLength = AAFTrue;
+		 fullLength = TRUE;
 		 length32 = 1;
 	  }
 	else
-	  fullLength = AAFFalse;
+	  fullLength = FALSE;
 	
 	CvtInt32toPosition(0, zeroPos);
 	CvtInt32toLength(0, zeroLen);
  	CvtInt32toLength(length32, length);
 
 	XPROTECT()
-	{
-		tccp = (ImplAAFTimecode *)CreateImpl(CLSID_AAFTimecode);
-		tccp->Initialize(length, &startTC);		 
- 		if (FindSlotBySlotID(slotID, (ImplAAFMobSlot **)&mobSlot) == AAFRESULT_SUCCESS)
-		{
-			aSequ = (ImplAAFSequence *)CreateImpl(CLSID_AAFSequence);
-			if(aSequ == NULL)
-				RAISE(E_FAIL);
-			CHECK(aSequ->Initialize(&timecodeKind));
-			CHECK(aSequ->AppendComponent(tccp));
-			CHECK(mobSlot->SetSegment(aSequ));
-
-		} /* FindTimecodeSlot */
-		else
-		{
-			aSequ = (ImplAAFSequence *)CreateImpl(CLSID_AAFSequence);
-			if(aSequ == NULL)
-				RAISE(E_FAIL);
-			CHECK(aSequ->Initialize(&timecodeKind));
-			CHECK(aSequ->AppendComponent(tccp));
-			CHECK(AppendNewTimelineSlot(editrate, aSequ, slotID,
-										L"Timecode", zeroPos, &newSlot));
-		}
-
-		if(fullLength)
-		{
-			CHECK(PvtTimecodeToOffset(startTC.fps, 24, 0, 0, 0, 
-											 startTC.drop, &maxLength));
+	  {
+		 tccp = CreateImpl(CLSID_AAFTimecode);
+		 (_file, length, startTC);		 
+		 if (FindTimecodeSlot(&slotComponent) == AAFRESULT_SUCCESS)
 			{
-				CvtInt32toLength(maxLength, length);
-				CHECK(tccp->SetLength(&length) );
-				/* NOTE: What if the sequence already existed? */
-				CHECK(aSequ->SetLength(&length) );
+			  CHECK(slotComponent->GetClassID(tag));
+			  if (strcmp(tag, "SEQU") == 0)
+				 {
+					numSub = slotComponent->GetObjRefArrayLength(sequProp);
+					for (sub = numSub; sub >= 1; sub--)
+					  {
+						 CHECK(slotComponent->ReadNthObjRefArray(sequProp, &tmp, sub));
+						 aSubComponent = (ImplAAFSegment *)tmp;
+						 CHECK(aSubComponent->GetClassID(tag));
+						 if (strcmp(tag, "FILL") != 0)
+							{
+
+							  CHECK(slotComponent->WriteNthObjRefArray(sequProp, tccp, sub + 1));
+								  {
+									CHECK(slotComponent->GetLength(&sequLen));
+									AddInt64toInt64(length, &sequLen);
+									CHECK(slotComponent->WriteLength(OMCPNTLength, sequLen));
+								  }
+							  if (sub != numSub)	/* At least one FILL
+														 * found at the end */
+								 {
+									fill = CreateImpl(CLSID_AAFFiller);
+									(_file, timecodeKind, zeroLen);	
+									CHECK(slotComponent->WriteNthObjRefArray(sequProp, fill, sub + 2));
+								 }
+							  break;
+							}
+					  }
+				 }
+			  else
+				 RAISE(OM_ERR_NOT_IMPLEMENTED);
+			} /* FindTimecodeSlot */
+		 else
+			{
+			  aSequ = CreateImpl(CLSID_AAFSequence);
+			  (_file, timecodeKind);
+			  filler1 = CreateImpl(CLSID_AAFFiller);
+			  (_file, timecodeKind, zeroLen);	
+			  CHECK(aSequ->AppendCpnt(filler1));
+			  CHECK(aSequ->AppendCpnt(tccp));
+			  filler2 = CreateImpl(CLSID_AAFFiller);
+			  (_file, timecodeKind, zeroLen);	
+			  CHECK(aSequ->AppendCpnt(filler2));
+			  CHECK(AppendNewSlot(editrate, aSequ, zeroPos,
+										slotID, NULL, &newSlot));
 			}
-		}
-		if(newSlot != NULL)
-			newSlot->ReleaseReference();
-		if(aSequ != NULL)
-			aSequ->ReleaseReference();
-		if(tccp != NULL)
-			tccp->ReleaseReference();
-	} /* XPROTECT */
+
+		 /* Release Bento reference, so the useCount is decremented */
+		 if (slotComponent)
+			{
+			  slotComponent->ReleaseObject();	
+			}
+
+		 if(fullLength)
+			{
+			  CHECK(PvtTimecodeToOffset(startTC.fps, 24, 0, 0, 0, 
+											 startTC.drop, &maxLength));
+				 {
+					CvtInt32toLength(maxLength, length);
+					CHECK(tccp->WriteLength(OMCPNTLength, length) );
+					/* NOTE: What if the sequence already existed? */
+					CHECK(aSequ->WriteLength(OMCPNTLength, length) );
+				 }
+			}
+	  } /* XPROTECT */
 	XEXCEPT
-	{
-		if(newSlot != NULL)
-			newSlot->ReleaseReference();
-		if(aSequ != NULL)
-			aSequ->ReleaseReference();
-		if(tccp != NULL)
-			tccp->ReleaseReference();
-	}
 	XEND;
 									
 	return (AAFRESULT_SUCCESS);
+#else
+	return AAFRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 
-//****************
-// AddEdgecodeClip()
-//
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::AppendEdgecodeSlot (aafRational_t  editrate,
-                           aafInt32  slotID,
-                          aafFrameOffset_t  startEC,
-                           aafFrameLength_t  length32,
-                           aafFilmType_t  filmKind,
-                           aafEdgeType_t  codeFormat,
-                           aafEdgecodeHeader_t  header)
+    ImplAAFSourceMob::AddEdgecodeClip (aafRational_t  /*editrate*/,
+                           aafInt32  /*slotID*/,
+                           aafFrameOffset_t  /*startEC*/,
+                           aafFrameLength_t  /*length32*/,
+                           aafFilmType_t  /*filmKind*/,
+                           aafEdgeType_t  /*codeFormat*/,
+                           aafEdgecodeHeader_t  /*header*/)
 {
-#if 1
-	ImplAAFFiller *     filler1= NULL, *filler2 = NULL;
+#if FULL_TOOLKIT
+AAFRESULT AAFSourceMob::AddEdgecodeClip(
+				aafRational_t		editrate,	/* IN -- */
+				aafInt32				slotID,	/* IN -- */
+				aafFrameOffset_t	startEC,		/* IN -- */
+				aafFrameLength_t	length32,	/* IN -- */
+				aafFilmType_t		filmKind,	/* IN -- */
+				aafEdgeType_t		codeFormat,
+				char 					*header)		/* IN -- */
+{
+	ImplAAFFiller *     filler1, *filler2;
 	ImplAAFSequence *ecSequence;
 	ImplAAFEdgecode *edgecodeClip;
-	AAFRESULT			aafError = AAFRESULT_SUCCESS;
+	ImplAAFRESULT			aafError = AAFRESULT_SUCCESS;
 	aafPosition_t	startPos, zeroPos;
 	aafLength_t		length, zeroLen;
-	ImplAAFTimelineMobSlot *	newSlot;
+	ImplAAFMobSlot *	newSlot;
+	ImplAAFDataKind *	edgecodeKind;
 	aafEdgecode_t	edge;
-	aafUID_t		edgekind = DDEF_Edgecode;
-
-	// Validate film mobs only, return AAFRESULT_FILM_DESC_ONLY
+	
 	CvtInt32toPosition(0, zeroPos);
 	CvtInt32toLength(0, zeroLen);
-	XPROTECT()
+	XPROTECT(_file)
 	{
-		filler1 = (ImplAAFFiller *)CreateImpl(CLSID_AAFFiller);
-		CHECK(filler1->Initialize(&edgekind, zeroLen));	
-		filler2 = (ImplAAFFiller *)CreateImpl(CLSID_AAFFiller);
-		CHECK(filler2->Initialize(&edgekind, zeroLen));	
-		if(filler1 == NULL || filler2 == NULL)
-			RAISE(E_FAIL);
+		_head->DatakindLookup(EDGECODEKIND, &edgecodeKind, &aafError);
+		if (aafError != AAFRESULT_SUCCESS)
+		{
+			RAISE(aafError);
+		}
 
-		ecSequence = (ImplAAFSequence *)CreateImpl(CLSID_AAFSequence);
-		if(ecSequence == NULL)
-			RAISE(E_FAIL);
-		CHECK(ecSequence->Initialize(&edgekind));	
+		filler1 = CreateImpl(CLSID_AAFFiller);
+		(_file, edgecodeKind, zeroLen);	
+		filler2 = CreateImpl(CLSID_AAFFiller);
+		(_file, edgecodeKind, zeroLen);	
+
+		ecSequence = CreateImpl(CLSID_AAFSequence);
+		(_file, edgecodeKind);
 
 		CvtInt32toLength(length32, length);
 		CvtInt32toPosition(startEC, startPos);
 		edge.startFrame = startPos;
 		edge.filmKind = filmKind;
 		edge.codeFormat = codeFormat;
-		strncpy((char *)&edge.header, (char *)&header, 8);
+		strncpy((char *)edge.header, header, 8);
 		
-		edgecodeClip = (ImplAAFEdgecode *)CreateImpl(CLSID_AAFEdgecode);
-		if(edgecodeClip == NULL)
-			RAISE(E_FAIL);
-		CHECK(edgecodeClip->Create(length, edge));	
+		edgecodeClip = CreateImpl(CLSID_AAFEdgecode);
+		(_file, length, edge);
 		
-		CHECK(ecSequence->AppendComponent(filler1));
-		CHECK(ecSequence->AppendComponent(edgecodeClip));
-		CHECK(ecSequence->AppendComponent(filler2));
-		CHECK(AppendNewTimelineSlot(editrate, ecSequence, slotID,
-									NULL, zeroPos, &newSlot));
-
-		if(filler1 != NULL)
-			filler1->ReleaseReference();
-		if(filler2 != NULL)
-			filler2->ReleaseReference();
+		CHECK(ecSequence->AppendCpnt(filler1));
+		CHECK(ecSequence->AppendCpnt(edgecodeClip));
+		CHECK(ecSequence->AppendCpnt(filler2));
+		CHECK(AppendNewSlot(editrate, ecSequence, zeroPos,
+											slotID, NULL, &newSlot));
 	} /* XPROTECT */
 	XEXCEPT
-	{
-		if(filler1 != NULL)
-			filler1->ReleaseReference();
-		if(filler2 != NULL)
-			filler2->ReleaseReference();
-	}
 	XEND;
 
 	return (AAFRESULT_SUCCESS);
@@ -343,19 +320,23 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-//****************
-// ValidateTimecodeRange()
-//
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::SpecifyValidCodeRange (ImplAAFDataDef * /*pEssenceKind*/,
+    ImplAAFSourceMob::ValidateTimecodeRange (ImplAAFDataDef * /*pEssenceKind*/,
                            aafSlotID_t  /*slotID*/,
                            aafRational_t  /*editrate*/,
                            aafFrameOffset_t  /*startOffset*/,
                            aafFrameLength_t  /*length32*/)
 {
 #if FULL_TOOLKIT
-	ImplAAFSourceClip		*sclp = NULL;
-	ImplAAFTimecode			*timecodeClip = NULL;
+AAFRESULT AAFSourceMob::ValidateTimecodeRange(
+				AAFDataKind *  		mediaKind,	/* IN -- */
+				aafSlotID_t		slotID,		/* IN -- */
+				aafRational_t 		editrate,	/* IN -- */
+				aafFrameOffset_t	startOffset,/* IN -- */
+				aafFrameLength_t	length32)	/* IN -- */
+{
+	ImplAAFSourceClip	 *sclp;
+	ImplAAFTimecode *timecodeClip;
 	ImplAAFSequence *aSequ, *segSequ;
 	ImplAAFFiller *filler1, *filler2;
 	ImplAAFSegment *seg;
@@ -369,7 +350,7 @@ AAFRESULT STDMETHODCALLTYPE
   	aafTimecode_t	timecode;
   	aafProperty_t	prop;
   	aafInt32		sequLoop, numSegs;
-    ImplAAFIterate *		sequIter = NULL;
+  ImplAAFIterate *		sequIter = NULL;
   	AAFRESULT		aafError;
   	
 	XPROTECT(_file)
@@ -403,8 +384,6 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 			aSequ  = CreateImpl(CLSID_AAFSequence(_file, mediaKind);
 			filler1 = CreateImpl(CLSID_AAFFiller(_file, mediaKind, pos);	
-			if(aSequ == NULL || filler1 == NULL)
-				RAISE(E_FAIL);
 			CHECK(aSequ->AppendCpnt(filler1));
 			CHECK(aSequ->AppendCpnt(sclp));
 			filler2 = CreateImpl(CLSID_AAFFiller(_file, mediaKind, endFillLen);	
@@ -461,31 +440,21 @@ AAFRESULT STDMETHODCALLTYPE
 						break;
 					}
 					else
-						RAISE(AAFRESULT_NOT_IMPLEMENTED);
+						RAISE(OM_ERR_NOT_IMPLEMENTED);
 				}
 			} /* for */
 			delete sequIter;
 			sequIter = NULL;
 			
-//!!!			/* Release reference, so the useCount is decremented */
-//			if (subSegment)
-//			  {
-//				 subSegment->ReleaseObject();	
-//				 subSegment = NULL;
-//			  }
+			/* Release Bento reference, so the useCount is decremented */
+			if (subSegment)
+			  {
+				 subSegment->ReleaseObject();	
+				 subSegment = NULL;
+			  }
 		}
-		if(sclp!= NULL)
-			sclp->ReleaseReference();
-		if(timecodeClip!= NULL)
-			timecodeClip->ReleaseReference();
 	}
 	XEXCEPT
-	{
-		if(sclp!= NULL)
-			sclp->ReleaseReference();
-		if(timecodeClip!= NULL)
-			timecodeClip->ReleaseReference();
-	}
 	XEND;
 
 	return (AAFRESULT_SUCCESS);
@@ -496,51 +465,110 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-//****************
-// NewPhysSourceRef()
-//
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::NewPhysSourceRef (aafRational_t  editrate,
-                           aafSlotID_t  aMobSlot,
-                           aafUID_t *pEssenceKind,
-							aafSourceRef_t  ref,
-                           aafLength_t  srcRefLength)
-{
-	return(ImplAAFMob::AddPhysSourceRef(kAAFForceOverwrite, editrate, aMobSlot,
-							pEssenceKind, ref, srcRefLength));
-}
-
-//****************
-// AppendPhysSourceRef()
-//
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::AppendPhysSourceRef (aafRational_t  editrate,
-                           aafSlotID_t  aMobSlot,
-                           aafUID_t *pEssenceKind,
-							aafSourceRef_t  ref,
-                           aafLength_t  srcRefLength)
-{
-	return(ImplAAFMob::AddPhysSourceRef(kAAFAppend, editrate, aMobSlot,
-							pEssenceKind, ref, srcRefLength));
-}
-
-
-
-//****************
-// AddPulldownRef()
-//
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::AddPulldownRef (aafAppendOption_t  addType,
-							aafRational_t  /*editrate*/,
+    ImplAAFSourceMob::AddPhysSourceRef (aafRational_t  /*editrate*/,
                            aafSlotID_t  /*aMobSlot*/,
-                           aafUID_t * /*pEssenceKind*/,
-							aafSourceRef_t  ref,
+                           ImplAAFDataDef * /*pEssenceKind*/,
+                           ImplAAFSegment * /*pSourceRefObj*/,
+                           aafPosition_t  /*srcRefOffset*/,
+                           aafInt32  /*srcRefSlot*/,
+                           aafLength_t  /*srcRefLength*/)
+{
+#if FULL_TOOLKIT
+AAFRESULT AAFSourceMob::AddPhysSourceRef(
+				aafRational_t	editrate,	/* IN -- */
+				aafSlotID_t	aMobSlot,
+				ImplAAFDataKind *	mediaKind,
+				ImplAAFSegment *		sourceRefObj,
+				aafPosition_t	srcRefOffset,
+				aafInt32			srcRefSlot,
+				aafLength_t		srcRefLength)
+{
+	ImplAAFSegment	*seg = NULL;
+	ImplAAFMobSlot *slot = NULL;
+	AAFRESULT	status = AAFRESULT_SUCCESS;
+	aafSourceRef_t	ref;
+	aafPosition_t	zeroPos;
+	aafSlotID_t tmpSlotID;
+	ImplAAFSourceClip *		sclp = NULL;
+	ImplAAFMobSlot *trkd = NULL;
+	
+	aafAssertValidFHdl(_file);
+	
+	XPROTECT(_file)
+	{
+		if (sourceRefObj)
+		{
+			CvtInt32toPosition(0, zeroPos);
+			CHECK(sourceRefObj->ReadUID(OMMOBJMobID, &ref.sourceID));
+			ref.sourceSlotID = srcRefSlot;
+			ref.startTime = srcRefOffset;
+				
+			status = FindSlotBySlotID(aMobSlot, &slot);
+			if (status == AAFRESULT_SUCCESS)
+			{
+				CHECK(slot->GetSlotID(&tmpSlotID));
+				CHECK(slot->GetSegment(&seg));
+				if(seg->IsTypeOf("SEQU", &status))
+				{
+					
+//!!!					CHECK(MobFindCpntByPosition(aMobSlot, seg, zeroPos, zeroPos,
+//!!!														NULL, &foundPos, &seg, &foundLen));
+				}
+				XASSERT(seg->IsTypeOf("SCLP", &status), OM_ERR_NOT_SOURCE_CLIP);	/* OK Assertion */
+				CHECK(((ImplAAFSourceClip *)seg)->SetRef(ref));
+			}
+			else
+			{
+				sclp = CreateImpl(CLSID_AAFSourceClip(_file, mediaKind, srcRefLength, ref);
+				CHECK(AppendNewSlot(editrate, sclp,
+									zeroPos, aMobSlot, NULL, &trkd) );
+			}
+
+		}
+		else
+		{
+			CHECK(AddNilReference(aMobSlot, 
+										  srcRefLength, mediaKind,  editrate));
+		}
+	} /* XPROTECT */
+	XEXCEPT
+	XEND;
+
+	return (AAFRESULT_SUCCESS);
+#else
+	return AAFRESULT_NOT_IMPLEMENTED;
+#endif
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSourceMob::AddPulldownRef (aafRational_t  /*editrate*/,
+                           aafSlotID_t  /*aMobSlot*/,
+                           ImplAAFDataDef * /*pEssenceKind*/,
+                           ImplAAFSegment * /*pSourceRefObj*/,
+                           aafPosition_t  /*srcRefOffset*/,
+                           aafInt32  /*srcRefSlot*/,
                            aafLength_t  /*srcRefLength*/,
                            aafPulldownKind_t  /*pulldownKind*/,
                            aafPhaseFrame_t  /*phaseFrame*/,
                            aafPulldownDir_t  /*direction*/)
 {
 #if FULL_TOOLKIT
+AAFRESULT AAFSourceMob::AddPulldownRef(
+				aafRational_t		editrate,			/* IN -- */
+				aafSlotID_t		aMobSlot,
+				ImplAAFDataKind *		mediaKind,
+				ImplAAFSegment *			sourceRefObj,
+				aafPosition_t		srcRefOffset,
+				aafInt32			srcRefSlot,
+				aafLength_t			srcRefLength,
+				aafPulldownKind_t	pulldownKind,
+				aafPhaseFrame_t		phaseFrame,
+				aafPulldownDir_t	direction
+				)
+{
 	ImplAAFSourceClip		*sclp = NULL;
 	ImplAAFMobSlot		*trkd = NULL;
 	aafSourceRef_t	ref;
@@ -563,9 +591,9 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT(_file)
 	{
 		CvtInt32toInt64(0, &zero);
-		XASSERT(sourceRefObj != NULL, AAFRESULT_NULLOBJECT);
+		XASSERT(sourceRefObj != NULL, OM_ERR_NULLOBJECT);
 		XASSERT(direction == kAAFFilmToTapeSpeed || direction == kAAFTapeToFilmSpeed,
-				AAFRESULT_PULLDOWN_DIRECTION);
+				OM_ERR_PULLDOWN_DIRECTION);
 
 		CvtInt32toPosition(0, zeroPos);
 		CHECK(sourceRefObj->ReadUID(OMMOBJMobID, &ref.sourceID));
@@ -642,7 +670,7 @@ AAFRESULT STDMETHODCALLTYPE
 				sclp = (AAFSourceClip *)seg;		//!!CASTING
 			}
 			
-			XASSERT(sclp->IsTypeOf("SCLP", &status), AAFRESULT_NOT_SOURCE_CLIP);
+			XASSERT(sclp->IsTypeOf("SCLP", &status), OM_ERR_NOT_SOURCE_CLIP);
 			CHECK(sclp->SetRef(ref));
 			CHECK(sclp->WriteLength(subProp, srcRefLength));
 		}
@@ -678,57 +706,43 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-//****************
-// SearchSource()
-//
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::SearchSource (aafSlotID_t slotID,
-                           aafPosition_t  offset,
-                           aafMobKind_t  mobKind,
-                           aafMediaCriteria_t *pMediaCrit,
-                           aafOperationChoice_t *pOperationChoice,
-                           ImplAAFFindSourceInfo **ppSourceInfo)
+    ImplAAFSourceMob::SearchSource (aafSlotID_t  /*slotID*/,
+                           aafPosition_t  /*offset*/,
+                           aafMobKind_t  /*mobKind*/,
+                           aafMediaCriteria_t *  /*pMediaCrit*/,
+                           aafEffectChoice_t *  /*pEffectChoice*/,
+                           ImplAAFComponent ** /*ppThisCpnt*/,
+                           ImplAAFFindSourceInfo ** /*ppSourceInfo*/)
 {
-	return(InternalSearchSource(slotID, offset, mobKind, pMediaCrit, pOperationChoice,
-										   ppSourceInfo));
+#if FULL_TOOLKIT
+AAFRESULT AAFSourceMob::SearchSource(	
+    aafSlotID_t slotID,             /* IN */
+	aafPosition_t offset,             /* IN */
+	aafMobKind_t mobKind,             /* IN */
+	aafMediaCriteria_t *mediaCrit,    /* IN */
+	aafEffectChoice_t *effectChoice,  /* IN */  /* NOTE: take this arg out? */
+	ImplAAFComponent **thisCpnt,           /* OUT */
+	aafFindSourceInfo_t *sourceInfo)  /* OUT */
+{
+	return(InternalMobSearchSource(slotID, offset, mobKind, mediaCrit,
+								effectChoice, thisCpnt, sourceInfo));
+#else
+	return AAFRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
 
 
-//****************
-// GetMobKind()
-//
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::GetMobKind (aafMobKind_t *pMobKind)
+    ImplAAFSourceMob::GetMobKind (aafMobKind_t *  /*pMobKind*/)
 {
-	ImplAAFEssenceDescriptor	*edesc = NULL;
-	
-	if(pMobKind == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	XPROTECT()
-	{
-		CHECK(GetEssenceDescriptor (&edesc));
-		if(edesc != NULL)
-		{
-			CHECK(edesc->GetOwningMobKind(pMobKind));
-			edesc->ReleaseReference();
-		}
-		else
-			*pMobKind = kAllMob;
-	}
-	XEXCEPT
-	{
-		if(edesc != NULL)
-			edesc->ReleaseReference();
-	}
-	XEND;
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-//************************
-// Function:  FindTimecodeClip	(INTERNAL)
-//
+/************************
+ * Function:  FindTimecodeClip	(INTERNAL)
+ */
 AAFRESULT ImplAAFSourceMob::FindTimecodeClip(
 				aafFrameOffset_t	position,
 				ImplAAFTimecode 		**result,
@@ -736,13 +750,14 @@ AAFRESULT ImplAAFSourceMob::FindTimecodeClip(
 				aafLength_t			*tcSlotLen)
 {
 #if FULL_TOOLKIT
-	ImplAAFSegment *	seg = NULL;
-	aafPosition_t		offset;
-	AAFRESULT			status = AAFRESULT_SUCCESS;
-	aafLength_t			zeroLen;
-	aafPosition_t		sequPos;
+	AAFSegment *		seg = NULL;
+	AAFIterate *	sequIter = NULL;
+	aafPosition_t	offset;
+	AAFRESULT		status = AAFRESULT_SUCCESS;
+	aafLength_t		zeroLen;
+	aafPosition_t	sequPos;
 	
-	XPROTECT()
+	XPROTECT(_file)
 	{
 		CvtInt32toInt64(position, &offset);
 		CvtInt32toInt64(0, &zeroLen);
@@ -751,99 +766,95 @@ AAFRESULT ImplAAFSourceMob::FindTimecodeClip(
 		CHECK(FindTimecodeSlot(&seg));
 		CHECK(seg->GetLength(tcSlotLen));
 		CHECK(seg->OffsetToTimecodeClip(offset, result, &sequPos));
-		*tcStartPos = sequPos;
+		CHECK(TruncInt64toUInt32(sequPos, tcStartPos));		/* OK FRAMEOFFSET */
 	} /* XPROTECT */
 	XEXCEPT
 	{
-		if(XCODE() == AAFRESULT_NO_MORE_OBJECTS)
-			RERAISE(AAFRESULT_NO_TIMECODE);
+		if(XCODE() == OM_ERR_NO_MORE_OBJECTS)
+			RERAISE(OM_ERR_NO_TIMECODE);
 		*result = NULL;
 	}
 	XEND;
 
 	return(AAFRESULT_SUCCESS);
 #else
-	return(AAFRESULT_NOT_IMPLEMENTED);
+	return AAFRESULT_NOT_IMPLEMENTED;
 #endif
 }
-
 /************************
- * Function: omfsReconcileMobLength (INTERNAL)
+ * Function:  FindTimecodeSlot	(INTERNAL)
  *
- * 	Given a master mob or file mob, make sure that all fields
- *		which contain the length of the mob are in agreement.  Currently
- *		only makes sure that mob length references are >= each of
- *		the track lengths.
+ *    Search a slot group for the timecode slot, and return a TCCP object.
+ *    This routine will search for the first nonzero length subcomponent
+ *    of a SEQU, because MC5.0 has zero length filler clips and
+ *    transitions on the timecode slots.  NULL is returned if there is
+ *    not a valid timecode object present.
  *
  * Argument Notes:
- *		<none>.
+ *		StuffNeededBeyondNotesInDefinition.labelNumber
  *
  * ReturnValue:
  *		Error code (see below).
  *
  * Possible Errors:
- *		Standard errors (see top of file).
- */
-AAFRESULT ImplAAFSourceMob::ReconcileMobLength(void)
+ * Standard errors (see top of file).  */
+AAFRESULT ImplAAFSourceMob::FindTimecodeSlot(
+				ImplAAFSegment **result)
 {
-	aafInt32					numSlots, loop;
-	aafLength_t					len;
-	ImplAAFTimelineMobSlot		*slot = NULL;	//!!! Assuming timeline
-	ImplAAFSegment				*seg = NULL;
-	ImplEnumAAFMobSlots			*slotIter = NULL;
-	aafRational_t				srcRate, destRate;
-	ImplAAFFileDescriptor		*physMedia = NULL;
-		
-	XPROTECT()
+#if FULL_TOOLKIT
+	AAFSegment *			seg = NULL;
+	AAFIterate *		slotIter = NULL;
+	aafNumSlots_t		numSlots;
+	aafInt32				loop;
+	AAFMobSlot *		slot = NULL;
+	aafBool				found = FALSE;
+	AAFDataKind *      datakind = NULL;
+	AAFRESULT          tmpError = AAFRESULT_SUCCESS;
+	
+	XPROTECT(_file)
 	{
-		CHECK(GetEssenceDescriptor((ImplAAFEssenceDescriptor **)&physMedia));	//!!!
+		slotIter = CreateImpl(CLSID_AAFIterate(_file);
+		CHECK(GetNumSlots(&numSlots));
+		for (loop = 1; loop <= numSlots; loop++)
 		{
-			CHECK(EnumAAFAllMobSlots (&slotIter));
-			CHECK(GetNumSlots(&numSlots));
-			for (loop = 1; loop <= numSlots; loop++)
-			{
-				CHECK(slotIter->NextOne((ImplAAFMobSlot **)&slot));	//!!! Assuming timeline
-				CHECK(slot->GetSegment(&seg));
-				CHECK(slot->GetEditRate(&destRate));
-				slot->ReleaseReference();
-				slot = NULL;
-				CHECK(physMedia->GetLength(&len));
-				CHECK(physMedia->GetSampleRate(&srcRate));
-				physMedia->ReleaseReference();
-				physMedia = NULL;
-
-//!!!				CHECK(slot->ConvertToEditRate(len,
-//										aafRational_t destRate,
-//										aafPosition_t *convertPos);
-				if((srcRate.numerator != destRate.numerator) ||
-				   (srcRate.denominator != destRate.denominator))
-				{
-					CHECK(AAFConvertEditRate(	srcRate, len, destRate, kRoundFloor, &len));
-				}
-				CHECK(seg->SetLength(&len));
-				seg->ReleaseReference();
-				seg = NULL;
-			}			
-			slotIter->ReleaseReference();
-			slotIter = NULL;
-		}
-	}
+			CHECK(slotIter->MobGetNextSlot(this, NULL, &slot));
+			CHECK(slot->GetSegment(&seg));
+			CHECK(seg->GetDatakind(&datakind));
+			if (datakind->IsTimecodeKind(kExactMatch, &tmpError))
+			  {
+				 *result = seg;
+				 found = TRUE;
+				 break;
+			  }
+			/* Release Bento reference, so the useCount is decremented */
+			if (slot)
+			  {
+				 slot->ReleaseObject();	
+				 slot = NULL;
+			  }
+		 } /* for */
+		delete slotIter;
+		slotIter = NULL;
+		if(!found)
+			RAISE(OM_ERR_NO_TIMECODE);
+	} /* XPROTECT */
 	XEXCEPT
 	{
-		if (slot)
-			slot->ReleaseReference();
-		if (physMedia)
-			physMedia->ReleaseReference();
-		if (seg)
-			seg->ReleaseReference();
-		if (slotIter)
-			slotIter->ReleaseReference();
+		if(XCODE() == OM_ERR_NO_MORE_OBJECTS)
+			RERAISE(OM_ERR_NO_TIMECODE);
+		if(slotIter != NULL)
+			delete slotIter;
+		*result = NULL;
 	}
-	XEND
-		
-	return (AAFRESULT_SUCCESS);
+	XEND;
+
+	return(AAFRESULT_SUCCESS);
+#else
+	return AAFRESULT_NOT_IMPLEMENTED;
+#endif
 }
 
+extern "C" const aafClassID_t CLSID_AAFSourceMob;
 
-OMDEFINE_STORABLE(ImplAAFSourceMob, AUID_AAFSourceMob);
+OMDEFINE_STORABLE(ImplAAFSourceMob, CLSID_AAFSourceMob);
 
