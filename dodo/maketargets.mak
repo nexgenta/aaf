@@ -13,259 +13,101 @@ include $(BLD_CFG_DIR)/common.mk
 DODO = dodo.$(EXE)
 
 dodo-app:
-	cd tool ;  $(MAKE)
+	$(SH_PREFIX) cd tool ;  $(MAKE) $(SH_SUFFIX)
 
 test_only:
-	cd tool ; $(MAKE) test_only
+	$(SH_PREFIX) cd tool ; $(MAKE) test_only $(SH_SUFFIX)
 
 run:
-	 cd tool ; $(MAKE) run
+	 $(SH_PREFIX) cd tool ; $(MAKE) run $(SH_SUFFIX)
 
-.SUFFIXES: .cpp .h .comc .comcx .comh .dod .exp .idl .fidl .implc .implh .comt .cppt .refh .frefh
+.SUFFIXES: .cpp .h .comc .comh .dod .exp .idl .implc .implh .comt .cppt
 
 # This file contains the list of all of the targets to be built...								   
 include targets.mk
-include aafobjects.mk
 
 
-INCLUDE_DIR = ../ref-impl/include
-
-targets: $(DODO_TARGETS) $(INCLUDE_DIR)/com-api/AAF.idl $(INCLUDE_DIR)/ref-api/AAF.h
-
-$(INCLUDE_DIR)/com-api/AAF.idl : $(FIDL_TARGETS)
-	@ echo Generating AAF.idl...
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.idl
-	@ ( echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
-	    echo "cpp_quote(\"// (C) Copyright 1998 Avid Technology.\")" ; \
-	    echo "cpp_quote(\"// (C) Copyright 1998 Microsoft Corporation.\")" ; \
-	    echo "cpp_quote(\"//\")" ; \
-	    echo "cpp_quote(\"// THIS CODE AND INFORMATION IS PROVIDED 'AS IS' WITHOUT WARRANTY OF\")" ; \
-	    echo "cpp_quote(\"// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO\")" ; \
-	    echo "cpp_quote(\"// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A\")" ; \
-	    echo "cpp_quote(\"// PARTICULAR PURPOSE.\")" ; \
-	    echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
-	    echo "cpp_quote(\"// AAF Interfaces.\")" ; \
-	    echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
-	    echo "cpp_quote(\"//\")" ; \
-	    echo "" ; \
-	    echo \#ifndef DO_NO_IMPORTS ; \
-	    echo import \"unknwn.idl\"\; ; \
-	    echo \#endif ; \
-	    echo "" ; \
-	    echo \#ifndef DO_NO_IMPORTS ; \
-	    echo import \"objidl.idl\"\; ; \
-	    echo \#endif ; \
-	    echo "" ; \
-	    echo \#ifndef DO_NO_IMPORTS ; \
-	    echo import \"AAFTypes.idl\"\; ; \
-	    echo \#endif ; \
-	    echo "" ; \
-	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
-	    	echo interface I$$class\;; \
-	    done ; \
-	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
-	    	echo ""; \
-	    	echo ""; \
-	    	cat $$class.fidl; \
-	    done ; \
-	) > $(INCLUDE_DIR)/com-api/AAF.idl
-	chmod -w $(INCLUDE_DIR)/com-api/AAF.idl
-
-$(INCLUDE_DIR)/ref-api/AAF.h : $(FREFH_TARGETS)
-	@ echo Generating reference AAF.h...
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAF.h
-	@ ( echo "//=--------------------------------------------------------------------------=" ; \
-	    echo "// (C) Copyright 1998 Avid Technology." ; \
-	    echo "// (C) Copyright 1998 Microsoft Corporation." ; \
-	    echo "//" ; \
-	    echo "// THIS CODE AND INFORMATION IS PROVIDED 'AS IS' WITHOUT WARRANTY OF" ; \
-	    echo "// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO" ; \
-	    echo "// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A" ; \
-	    echo "// PARTICULAR PURPOSE." ; \
-	    echo "//=--------------------------------------------------------------------------=" ; \
-	    echo "// AAF Interfaces." ; \
-	    echo "//=--------------------------------------------------------------------------=" ; \
-	    echo "//" ; \
-	    echo \#ifndef __AAF_h__ ; \
-	    echo \#define __AAF_h__ ; \
-	    echo "" ; \
-	    echo \#ifndef __AAFCOMPlatform_h__ ; \
-	    echo \#include \"AAFCOMPlatform.h\" ; \
-	    echo \#endif ; \
-	    echo "" ; \
-	    echo \#ifndef __AAFTypes_h__ ; \
-	    echo \#include \"AAFTypes.h\" ; \
-	    echo \#endif ; \
-	    echo "" ; \
-	    echo \#ifdef __cplusplus ; \
-	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
-	    	echo interface I$$class\;; \
-	    done ; \
-	    echo \#else ; \
-	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
-	    	echo typedef interface I$$class I$$class\;;  \
-	    done ; \
-	    echo \#endif ; \
-	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
-	    	echo ""; \
-	    	echo "// I$$class"; \
-	    	echo ""; \
-	    	cat $$class.frefh; \
-	    done ; \
-	    echo "" ; \
-	    echo \#endif // __AAF_h__ ; \
-	) > $(INCLUDE_DIR)/ref-api/AAF.h
-	chmod -w $(INCLUDE_DIR)/ref-api/AAF.h
+targets: $(DODO_TARGETS)
 
 SRC_DIR = ../ref-impl/src
 
+INCLUDE_DIR = ../ref-impl/include
+
 .dod.exp :
-	$(RM) -f $*.exp
-	./tool/$(DODO) -f macros/exp.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.exp
-	chmod -w $*.exp
+	$(SH_PREFIX) $(RM) -f $*.exp $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/exp.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.exp $(SH_SUFFIX)
 
 .dod.h :
-	$(RM) -f $*.h
-	./tool/$(DODO) -f macros/h.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.h
-	chmod -w $*.h
-	cp -f $*.h $(INCLUDE_DIR)/cpp-api/
-	chmod -w $(INCLUDE_DIR)/cpp-api/$*.h
+	$(SH_PREFIX) $(RM) -f $*.h $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/h.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.h $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.h $(INCLUDE_DIR)/cpp-api/ $(SH_SUFFIX)
 
 .dod.cppt :
-	$(RM) -f $*.cppt
-	./tool/$(DODO) -f macros/cppt.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.cppt
-	chmod -w $*.cppt
-	cp -f $*.cppt $(SRC_DIR)/cpp-api/test/$*Test.cpp
-	chmod -w $(SRC_DIR)/cpp-api/test/$*Test.cpp
+	$(SH_PREFIX) $(RM) -f $*.cppt $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/cppt.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.cppt $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.cppt $(SRC_DIR)/cpp-api/test/$*Test.cpp $(SH_SUFFIX)
 
 .dod.comh :
-	$(RM) -f $*.comh
-	./tool/$(DODO) -f macros/comh.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.comh
-	chmod -w $*.comh
-	cp -f $*.comh $(SRC_DIR)/com-api/C$*.h
-	chmod -w $(SRC_DIR)/com-api/C$*.h
+	$(SH_PREFIX) $(RM) -f $*.comh $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/comh.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.comh $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.comh $(SRC_DIR)/com-api/C$*.h $(SH_SUFFIX)
 
 .dod.comc :
-	$(RM) -f $*.comc
-	./tool/$(DODO) -f macros/comc.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.comc
-	chmod -w $*.comc
-	cp -f $*.comc $(SRC_DIR)/com-api/C$*.cpp
-	chmod -w $(SRC_DIR)/com-api/C$*.cpp
-
-.dod.comcx :
-	$(RM) -f $*.comcx
-	./tool/$(DODO) -f macros/comcx.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.comcx
-	chmod -w $*.comcx
-	cp -f $*.comcx $(SRC_DIR)/com-api/C$*.cpp
-	chmod -w $(SRC_DIR)/com-api/C$*.cpp
+	$(SH_PREFIX) $(RM) -f $*.comc $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/comc.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.comc $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.comc $(SRC_DIR)/com-api/C$*.cpp $(SH_SUFFIX)
 
 .dod.comt :
-	$(RM) -f $*.comt
-	./tool/$(DODO) -f macros/comt.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.comt
-	chmod -w $*.comt
-	cp -f $*.comt $(SRC_DIR)/com-api/test/C$*Test.cpp
-	chmod -w $(SRC_DIR)/com-api/test/C$*Test.cpp
+	$(SH_PREFIX) $(RM) -f $*.comt $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/comt.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.comt $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.comt $(SRC_DIR)/com-api/test/C$*Test.cpp $(SH_SUFFIX)
 
 .dod.implh :
-	$(RM) -f $*.implh ;
-	./tool/$(DODO) -f macros/implh.mac < $*.dod > $*.tmp ;
-	mv $*.tmp $*.implh ;
-	chmod -w $*.implh ;
-	cp -f $*.implh $(SRC_DIR)/impl/Impl$*.h ;
-	chmod -w $(SRC_DIR)/impl/Impl$*.h ;
+	$(SH_PREFIX) $(RM) -f $*.implh $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/implh.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.implh $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.implh $(SRC_DIR)/impl/Impl$*.h $(SH_SUFFIX)
 
 .dod.implc :
-	$(RM) -f $*.implc ;
-	./tool/$(DODO) -f macros/implc.mac < $*.dod > $*.tmp ;
-	mv $*.tmp $*.implc ;
-	chmod -w $*.implc ;
-	cp -f $*.implc $(SRC_DIR)/impl/Impl$*.cpp ;
-	chmod -w $(SRC_DIR)/impl/Impl$*.cpp ;
+	$(SH_PREFIX) $(RM) -f $*.implc $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/implc.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.implc $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.implc $(SRC_DIR)/impl/Impl$*.cpp $(SH_SUFFIX)
 
 .dod.cpp :
-	$(RM) -f $*.cpp
-	./tool/$(DODO) -f macros/cpp.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.cpp
-	chmod -w $*.cpp
-	cp -f $*.cpp $(SRC_DIR)/cpp-api
-	chmod -w $(SRC_DIR)/cpp-api/$*.cpp
+	$(SH_PREFIX) $(RM) -f $*.cpp $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/cpp.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.cpp $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.cpp $(SRC_DIR)/cpp-api $(SH_SUFFIX)
 
 .dod.idl :
-	$(RM) -f $*.idl
-	./tool/$(DODO) -f macros/idl.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.idl
-	chmod -w $*.idl
-	cp -f $*.idl $(INCLUDE_DIR)/com-api/
-	chmod -w $(INCLUDE_DIR)/com-api/$*.idl
-
-.dod.fidl :
-	$(RM) -f $*.fidl
-	./tool/$(DODO) -f macros/fidl.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.fidl
-	chmod -w $*.fidl
-
-.dod.refh :
-	$(RM) -f $*.refh
-	./tool/$(DODO) -f macros/refh.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.refh
-	chmod -w $*.refh
-	cp -f $*.refh $(INCLUDE_DIR)/ref-api/$*.h
-	chmod -w $(INCLUDE_DIR)/ref-api/$*.h
-
-.dod.frefh :
-	$(RM) -f $*.frefh
-	./tool/$(DODO) -f macros/frefh.mac < $*.dod > $*.tmp
-	mv $*.tmp $*.frefh
-	chmod -w $*.frefh
+	$(SH_PREFIX) $(RM) -f $*.idl $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/idl.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.idl $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.idl $(INCLUDE_DIR)/com-api/ $(SH_SUFFIX)
 
 
 
 clean:
-	cd tool ; $(MAKE) clean
-	$(RM) -f *.cpp *.cppt *.h *.idl *.fidl *.exp
-	$(RM) -f *.comc *.comcx *.comh *.comt *.refh *.frefh
-	$(RM) -f *.implc *.implh
-	$(RM) -f core
-	@for file in $(AAFOBJECTS) ; do \
-		echo $(RM) -f $(SRC_DIR)/cpp-api/$$file.cpp ; \
-		$(RM) -f $(SRC_DIR)/cpp-api/$$file.cpp ; \
-		echo $(RM) -f $(SRC_DIR)/com-api/C$$file.h ; \
-		$(RM) -f $(SRC_DIR)/com-api/C$$file.h ; \
-		echo $(RM) -f $(SRC_DIR)/com-api/C$$file.cpp ; \
-		$(RM) -f $(SRC_DIR)/com-api/C$$file.cpp ; \
-		echo $(RM) -f $(INCLUDE_DIR)/cpp-api/$$file.h ; \
-		$(RM) -f $(INCLUDE_DIR)/cpp-api/$$file.h ; \
-		echo $(RM) -f $(INCLUDE_DIR)/ref-api/$$file.h ; \
-		$(RM) -f $(INCLUDE_DIR)/ref-api/$$file.h ; \
-	done
-	$(RM) -f $(SRC_DIR)/cpp-api/test/AAF*Test.cpp
-	$(RM) -f $(SRC_DIR)/cpp-api/test/EnumAAF*Test.cpp
-#	$(RM) -f $(SRC_DIR)/com-api/test/CAAF*Test.cpp
-#	$(RM) -f $(SRC_DIR)/com-api/test/CEnumAAF*Test.cpp
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.h
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAFTypes.h
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAFModuleTest.h
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.idl
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAFTypes.idl
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAFModuleTest.idl
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAF.h
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFTypes.h
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFModuleTest.h
-	@for file in $(AUTO_GEN_IMPL) ; do \
-		echo $(RM) -f $(SRC_DIR)/impl/Impl$$file.cpp ; \
-		$(RM) -f $(SRC_DIR)/impl/Impl$$file.cpp ; \
-		echo $(RM) -f $(SRC_DIR)/impl/Impl$$file.h ; \
-		$(RM) -f $(SRC_DIR)/impl/Impl$$file.h ; \
-		echo $(RM) -f $(SRC_DIR)/com-api/test/C$${file}Test.cpp ; \
-		$(RM) -f $(SRC_DIR)/com-api/test/C$${file}Test.cpp ; \
-	done
+	$(SH_PREFIX) cd tool ; $(MAKE) clean $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf *.cpp *.h *.idl *.exp $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf *.comc *.comh *.comt $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf *.implc *.implh $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(SRC_DIR)/cpp-api/*.cpp $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(SRC_DIR)/com-api/*.h $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(SRC_DIR)/com-api/*.cpp $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(SRC_DIR)/impl/*.h $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(SRC_DIR)/impl/*.cpp $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(INCLUDE_DIR)/com-api/*.h $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(INCLUDE_DIR)/com-api/*.idl $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf $(INCLUDE_DIR)/cpp-api/*.h $(SH_SUFFIX)
+
 
 # This file contains the list of all dependents...
 include depend.mk
