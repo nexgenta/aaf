@@ -36,7 +36,12 @@ protected:
 	//
     virtual HRESULT InternalQueryInterface(REFIID riid, void **ppv);
 
-private:
+public:
+  //
+  // Return private implementation pointer for delegation.
+  // NOTE: This is NOT the pointer to the COM object's implementation
+  // object!
+  STDMETHOD(GetImplRep)(/*[retval, out]*/ void **);
 };
 
 
@@ -44,7 +49,7 @@ private:
 // object.
 #ifdef AAF_END_OBJECT_MAP
 #undef AAF_END_OBJECT_MAP
-#define AAF_END_OBJECT_MAP() AAF_OBJECT_ENTRY(AAFModuleTest) { NULL, NULL, NULL } };
+#define AAF_END_OBJECT_MAP() AAF_OBJECT_ENTRYX(AAFModuleTest, true) AAF_LAST_ENTRY() };
 #endif
 
 
