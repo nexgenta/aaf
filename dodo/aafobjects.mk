@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.4 2004/04/07 13:08:27 phil_tudor Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.5 2004/04/17 18:31:00 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -21,13 +21,10 @@
 # All rights reserved.
 #
 ###############################################################################
-AAFPERSISTENTOBJECTS="\
-	 "
-
+AAFPERSISTENTOBJECTS=""
 
 # These are all of the other non-persistent objects:
-AAFNONPERSISTENTOBJECTS="\
-	 "
+AAFNONPERSISTENTOBJECTS=""
 
 
 # These are files which specify COM interfaces, but which are
@@ -40,7 +37,8 @@ AAFCOMINTERFACESONLY="\
 	AAFMasterMobEx \
 	AAFMob2 \
 	AAFTimelineMobSlot2 \
-	AAFComponent2 "
+	AAFComponent2 \
+	AAFDictionary2 "
 
 
 # These are the impl files that are typed by humans.  Be sure to
@@ -170,7 +168,12 @@ HUMAN_TYPED_IMPL="\
 	AAFRandomRawStorage \
 	AAFGetFileBits \
 	AAFSetFileBits \
-	AAFRandomFile "
+	AAFRandomFile \
+	AAFTaggedValueDefinition \
+	AAFKLVDataDefinition \
+	EnumAAFTaggedValueDefs \
+	EnumAAFKLVDataDefs "
+
 
 # Defered interfaces
 #	AAFIntraFrameMarker \
