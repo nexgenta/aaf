@@ -37,7 +37,7 @@ OMVectorElement<ReferencedObject>::OMVectorElement(void)
 {
   TRACE("OMVectorElement<ReferencedObject>::OMVectorElement");
 }
-  
+
   // @mfunc Constructor.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
   //   @parm A pointer to a <p ReferencedObject>.
@@ -73,7 +73,7 @@ OMVectorElement<ReferencedObject>::~OMVectorElement(void)
   //        This operator provides value semantics for <c OMVector>.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
   //   @parm The <c OMVectorElement> to be assigned.
-  //   @rdesc The <c OMVectorElement> resulting from the assignment. 
+  //   @rdesc The <c OMVectorElement> resulting from the assignment.
 template <typename ReferencedObject>
 OMVectorElement<ReferencedObject>&
 OMVectorElement<ReferencedObject>::operator= (
@@ -93,7 +93,7 @@ OMVectorElement<ReferencedObject>::operator= (
   //        This operator provides value semantics for <c OMVector>.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
   //   @parm The <c OMVectorElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise. 
+  //   @rdesc True if the values are the same, false otherwise.
 template <typename ReferencedObject>
 bool OMVectorElement<ReferencedObject>::operator== (
                             const OMVectorElement<ReferencedObject>& rhs) const
@@ -193,11 +193,11 @@ OMSetElement<UniqueIdentification, ReferencedObject>::~OMSetElement(void)
 
   // @mfunc Assignment.
   //        This operator provides value semantics for <c OMSet>.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced object.
   //   @parm The <c OMSetElement> to be assigned.
-  //   @rdesc The <c OMSetElement> resulting from the assignment. 
+  //   @rdesc The <c OMSetElement> resulting from the assignment.
 template <typename UniqueIdentification, typename ReferencedObject>
 OMSetElement<UniqueIdentification, ReferencedObject>&
 OMSetElement<UniqueIdentification, ReferencedObject>::operator= (
@@ -218,7 +218,7 @@ OMSetElement<UniqueIdentification, ReferencedObject>::operator= (
   //        This operator provides value semantics for <c OMSet>.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
   //   @parm The <c OMSetElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise. 
+  //   @rdesc True if the values are the same, false otherwise.
 template <typename UniqueIdentification, typename ReferencedObject>
 bool OMSetElement<UniqueIdentification, ReferencedObject>::operator== (
                                const OMSetElement<UniqueIdentification,
@@ -249,8 +249,8 @@ OMSetElement<UniqueIdentification, ReferencedObject>::identification(
 // class OMContainerElement<ObjectReference, ReferencedObject>
 
   // @mfunc Constructor.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
 template <typename ObjectReference, typename ReferencedObject>
@@ -262,8 +262,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::OMContainerElement(void)
 }
 
   // @mfunc Constructor.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <p ObjectReference> for this <c OMContainerElement>.
@@ -277,8 +277,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::OMContainerElement(
 }
 
   // @mfunc Copy constructor.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMContainerElement> to copy.
@@ -292,8 +292,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::OMContainerElement(
 }
 
   // @mfunc Destructor.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
 template <typename ObjectReference, typename ReferencedObject>
@@ -307,12 +307,12 @@ OMContainerElement<ObjectReference, ReferencedObject>::~OMContainerElement(
   // @mfunc Assignment.
   //        This operator provides value semantics for <c OMContainer>.
   //        This operator does not provide assignment of object references.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMContainerElement> to be assigned.
-  //   @rdesc The <c OMContainerElement> resulting from the assignment. 
+  //   @rdesc The <c OMContainerElement> resulting from the assignment.
 template <typename ObjectReference, typename ReferencedObject>
 OMContainerElement<ObjectReference, ReferencedObject>&
 OMContainerElement<ObjectReference, ReferencedObject>::operator= (
@@ -331,12 +331,12 @@ OMContainerElement<ObjectReference, ReferencedObject>::operator= (
   // @mfunc Equality.
   //        This operator provides value semantics for <c OMContainer>.
   //        This operator does not provide equality of object references.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMContainerElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise. 
+  //   @rdesc True if the values are the same, false otherwise.
 template <typename ObjectReference, typename ReferencedObject>
 bool OMContainerElement<ObjectReference, ReferencedObject>::operator== (
         const OMContainerElement<ObjectReference, ReferencedObject>& rhs) const
@@ -353,8 +353,8 @@ bool OMContainerElement<ObjectReference, ReferencedObject>::operator== (
 }
 
   // @mfunc The contained ObjectReference.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @rdesc The contained <p ObjectReference>.
@@ -368,8 +368,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::reference(void)
 }
 
   // @mfunc Set the contained ObjectReference.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The new contained <p ObjectReference>.
@@ -384,8 +384,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::setReference(
 }
 
   // @mfunc Save this <c OMContainerElement>.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
 template <typename ObjectReference, typename ReferencedObject>
@@ -398,8 +398,8 @@ void OMContainerElement<ObjectReference, ReferencedObject>::save(void)
 }
 
   // @mfunc Close this <c OMContainerElement>.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
 template <typename ObjectReference, typename ReferencedObject>
@@ -412,8 +412,8 @@ void OMContainerElement<ObjectReference, ReferencedObject>::close(void)
 }
 
   // @mfunc Detach this <c OMContainerElement>.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
 template <typename ObjectReference, typename ReferencedObject>
@@ -426,8 +426,8 @@ void OMContainerElement<ObjectReference, ReferencedObject>::detach(void)
 }
 
   // @mfunc Restore this <c OMContainerElement>.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
 template <typename ObjectReference, typename ReferencedObject>
@@ -440,8 +440,8 @@ void OMContainerElement<ObjectReference, ReferencedObject>::restore(void)
 }
 
   // @mfunc Get the value of this <c OMContainerElement>.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @rdesc A pointer to the <p ReferencedObject>.
@@ -457,8 +457,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::getValue(void) const
 }
 
   // @mfunc Set the value of this <c OMContainerElement>.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm A pointer to the new <p ReferencedObject>.
@@ -477,8 +477,8 @@ OMContainerElement<ObjectReference, ReferencedObject>::setValue(
   // @mfunc The value of this <c OMContainerElement> as a pointer.
   //        This function provides low-level access. If the object exits
   //        but has not yet been loaded then the value returned is 0.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @rdesc A pointer to the <p ReferencedObject>, if loaded.
@@ -506,7 +506,7 @@ OMStrongReferenceVectorElement<ReferencedObject>::
   TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
                                              "OMStrongReferenceVectorElement");
 }
-  
+
   // @mfunc Constructor.
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
@@ -563,7 +563,7 @@ OMStrongReferenceVectorElement<ReferencedObject>::
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMStrongReferenceVectorElement> to be assigned.
   //   @rdesc The <c OMStrongReferenceVectorElement> resulting from
-  //          the assignment. 
+  //          the assignment.
 template <typename ReferencedObject>
 OMStrongReferenceVectorElement<ReferencedObject>&
 OMStrongReferenceVectorElement<ReferencedObject>::operator= (
@@ -587,7 +587,7 @@ OMStrongReferenceVectorElement<ReferencedObject>::operator= (
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMStrongReferenceVectorElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise. 
+  //   @rdesc True if the values are the same, false otherwise.
 template <typename ReferencedObject>
 bool OMStrongReferenceVectorElement<ReferencedObject>::operator== (
              const OMStrongReferenceVectorElement<ReferencedObject>& rhs) const
@@ -691,13 +691,13 @@ OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
   // @mfunc Assignment.
   //        This operator provides value semantics for <c OMSet>.
   //        This operator does not provide assignment of object references.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMStrongReferenceSetElement> to be assigned.
   //   @rdesc The <c OMStrongReferenceSetElement> resulting from
-  //          the assignment. 
+  //          the assignment.
 template <typename UniqueIdentification, typename ReferencedObject>
 OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>&
 OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
@@ -725,7 +725,7 @@ OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMStrongReferenceSetElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise. 
+  //   @rdesc True if the values are the same, false otherwise.
 template <typename UniqueIdentification, typename ReferencedObject>
 bool
 OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
@@ -851,13 +851,13 @@ OMWeakReferenceVectorElement<ReferencedObject>::
   // @mfunc Assignment.
   //        This operator provides value semantics for <c OMVector>.
   //        This operator does not provide assignment of object references.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMWeakReferenceVectorElement> to be assigned.
   //   @rdesc The <c OMWeakReferenceVectorElement> resulting from
-  //          the assignment. 
+  //          the assignment.
 template <typename ReferencedObject>
 OMWeakReferenceVectorElement<ReferencedObject>&
 OMWeakReferenceVectorElement<ReferencedObject>::operator= (
@@ -880,7 +880,7 @@ OMWeakReferenceVectorElement<ReferencedObject>::operator= (
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMWeakReferenceVectorElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise. 
+  //   @rdesc True if the values are the same, false otherwise.
 template <typename ReferencedObject>
 bool OMWeakReferenceVectorElement<ReferencedObject>::operator== (
                const OMWeakReferenceVectorElement<ReferencedObject>& rhs) const
@@ -968,13 +968,13 @@ OMWeakReferenceSetElement<ReferencedObject>::~OMWeakReferenceSetElement(void)
   // @mfunc Assignment.
   //        This operator provides value semantics for <c OMSet>.
   //        This operator does not provide assignment of object references.
-  //   @tcarg class | ObjectReference  | The type of the contained object
-  //          reference 
+  //   @tcarg class | ObjectReference | The type of the contained object
+  //          reference
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMWeakReferenceSetElement> to be assigned.
   //   @rdesc The <c OMWeakReferenceSetElement> resulting from
-  //          the assignment. 
+  //          the assignment.
 template <typename ReferencedObject>
 OMWeakReferenceSetElement<ReferencedObject>&
 OMWeakReferenceSetElement<ReferencedObject>::operator= (
@@ -997,7 +997,7 @@ OMWeakReferenceSetElement<ReferencedObject>::operator= (
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMWeakReferenceSetElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise. 
+  //   @rdesc True if the values are the same, false otherwise.
 template <typename ReferencedObject>
 bool OMWeakReferenceSetElement<ReferencedObject>::operator== (
                 const OMWeakReferenceSetElement<ReferencedObject>& rhs) const
