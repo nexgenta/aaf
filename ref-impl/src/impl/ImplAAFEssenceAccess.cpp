@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceAccess.cpp,v 1.86 2004/03/16 21:18:46 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFEssenceAccess.cpp,v 1.87 2004/04/29 01:16:55 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -197,8 +197,10 @@ ImplAAFEssenceAccess::~ImplAAFEssenceAccess ()
 			i.value().fileMob->ReleaseReference();
 		if (i.value().mdes)
 			i.value().mdes->ReleaseReference();
-		if (i.value().dataFile)
+		if (i.value().dataFile) {
+			i.value().dataFile->Close();
 			i.value().dataFile->ReleaseReference();
+		}
 		if (i.value().codec)
 			i.value().codec->Release();
 		if (i.value().multicodec) 
