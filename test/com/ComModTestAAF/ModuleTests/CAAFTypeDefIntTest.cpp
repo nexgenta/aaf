@@ -1,46 +1,44 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTypeDefInt
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAF.h"
 
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
 
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
 
 // Foward declaration.
-extern "C" HRESULT CAAFTypeDefInt_test();
+extern "C" HRESULT CAAFTypeDefInt_test(testMode_t mode);
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)
@@ -369,7 +367,7 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 
 
 
-static HRESULT TestTypeDefInt ()
+static HRESULT TestTypeDefInt (testMode_t mode)
 {
   HRESULT hr = E_FAIL;
   HRESULT caughtHr = AAFRESULT_SUCCESS;
@@ -403,8 +401,16 @@ static HRESULT TestTypeDefInt ()
 	  ProductInfo.productID = UnitTestProductID;
 	  ProductInfo.platform = NULL;
 
-	  RemoveTestFile (testFileName);
-	  checkResult (AAFFileOpenNewModify(testFileName, 0, &ProductInfo, &pFile));
+	  if(mode == kAAFUnitTestReadWrite)
+	  {
+		  RemoveTestFile (testFileName);
+	  	 checkResult (AAFFileOpenNewModify(testFileName, 0, &ProductInfo, &pFile));
+	  }
+	  else
+	  {
+	  	 checkResult (AAFFileOpenExistingRead(testFileName, 0, &pFile));
+	  }
+	  
       assert (pFile);
 	  checkResult (pFile->GetHeader (&pHeader));
 	  assert (pHeader);
@@ -554,11 +560,14 @@ static HRESULT TestTypeDefInt ()
   	pHeader->Release();
   if (pFile)
   {
-	hr = pFile->Save();
-	if (! SUCCEEDED (hr))
-	{  
-	  pFile->Release();
-	  return hr;
+  	if(mode == kAAFUnitTestReadWrite)
+	{
+		hr = pFile->Save();
+		if (! SUCCEEDED (hr))
+		{  
+	  	pFile->Release();
+	  	return hr;
+	  	}
 	}
 	hr = pFile->Close();
 	pFile->Release();
@@ -569,13 +578,14 @@ static HRESULT TestTypeDefInt ()
 }
 
 
-HRESULT CAAFTypeDefInt_test()
+HRESULT CAAFTypeDefInt_test(testMode_t mode);
+HRESULT CAAFTypeDefInt_test(testMode_t mode)
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 
   try
     {
-      hr =  TestTypeDefInt();
+      hr =  TestTypeDefInt(mode);
 	}
   catch (...)
     {

@@ -1,31 +1,54 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTextLocator interface
-/************************************************\
-*                                                *
-* Advanced Authoring Format                      * 
-*                                                *
-* Copyright (c) 1998-1999 Avid Technology, Inc.  *
-* Copyright (c) 1998-1999 Microsoft Corporation  * 
-*                                                *
-\************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAF.h"
 
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 #define TEST_NAME	L"This is a text locator"
 
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafTapeCaseType_t FormFactor = kVHSVideoTape;
-static aafVideoSignalType_t VideoSignalType = kPALSignal;
-static aafTapeFormatType_t TapeFormat = kVHSFormat;
-static aafLength_t TapeLength = 3200 ;
+static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
+static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
+static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
+static aafUInt32 TapeLength = 3200 ;
+
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x4c649116, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 // Temporarily necessary global declarations.
 extern "C" const CLSID CLSID_AAFTextLocator; // generated
@@ -68,23 +91,22 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob						*pMob = NULL;
 	IAAFEssenceDescriptor		*edesc = NULL;
 	IAAFTapeDescriptor*			pTapeDescriptor = NULL;
-	aafUID_t					newUID;
-	aafInt32					numLocators;
+	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
-	aafRational_t	audioRate = { 44100, 1 };
 
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTextLocator Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
-
 
 	try
 	{
@@ -101,21 +123,21 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
  		
 		//Make the first mob
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
-								IID_IAAFSourceMob, 
-								(IUnknown **)&pSourceMob));
+		checkResult(defs.cdSourceMob()->
+					CreateInstance(IID_IAAFSourceMob, 
+								   (IUnknown **)&pSourceMob));
 
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newUID));
-		checkResult(pMob->SetMobID(&newUID));
+		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(L"TextLocatorTestSourceMOB"));
 		
-		checkResult(pDictionary->CreateInstance(&AUID_AAFTapeDescriptor,
-								IID_IAAFTapeDescriptor, 
-								(IUnknown **)&pTapeDescriptor));
+		checkResult(defs.cdTapeDescriptor()->
+					CreateInstance(IID_IAAFTapeDescriptor, 
+								   (IUnknown **)&pTapeDescriptor));
 		
 		checkResult(pTapeDescriptor->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&edesc));
 		// Set tape properties
@@ -129,14 +151,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
 			// Verify that there are no locators
-		checkResult(edesc->GetNumLocators(&numLocators));
+		checkResult(edesc->CountLocators(&numLocators));
 		checkExpression(0 == numLocators, AAFRESULT_TEST_FAILED);
 
   
 		// Make a locator, and attach it to the EssenceDescriptor
-		checkResult(pDictionary->CreateInstance(&AUID_AAFTextLocator,
-								IID_IAAFTextLocator, 
-								(IUnknown **)&pTextLocator));		
+		checkResult(defs.cdTextLocator()->
+					CreateInstance(IID_IAAFTextLocator, 
+								   (IUnknown **)&pTextLocator));		
 		checkResult(pTextLocator->QueryInterface (IID_IAAFLocator, (void **)&pLocator));
 
 		checkResult(pTextLocator->SetName (TEST_NAME));
@@ -145,11 +167,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 		// Verify that there is now one locator
-		checkResult(edesc->GetNumLocators(&numLocators));
+		checkResult(edesc->CountLocators(&numLocators));
 		checkExpression(1 == numLocators, AAFRESULT_TEST_FAILED);
 
 		// Add the source mob into the tree
-		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pHeader->AddMob(pMob));
 
 	}
 	catch (HRESULT& rResult)
@@ -212,7 +234,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFTextLocator*		pTextLocator = NULL;
 	IEnumAAFMobs*			pMobIter = NULL;
 	IAAFMob*				pMob = NULL;
-	aafInt32				numLocators, readLen;
+	aafUInt32				numLocators;
+	aafUInt32				readLen;
 	aafNumSlots_t			numMobs, n;
 
 	HRESULT					hr = AAFRESULT_SUCCESS;
@@ -228,16 +251,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
   		checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		if (1 != numMobs )
 			checkResult(AAFRESULT_TEST_FAILED);
 
 
-		checkResult(pHeader->EnumAAFAllMobs (NULL, &pMobIter));
+		checkResult(pHeader->GetMobs (NULL, &pMobIter));
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500];
-			aafUID_t		mobID;
+			aafMobID_t		mobID;
 
 			checkResult(pMobIter->NextOne (&pMob));
 			checkResult(pMob->GetName (name, sizeof(name)));
@@ -247,11 +270,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(pSourceMob->GetEssenceDescriptor (&pEdesc));
 
 			// Verify that there is now one locator
-			checkResult(pEdesc->GetNumLocators(&numLocators));
+			checkResult(pEdesc->CountLocators(&numLocators));
 			if (1 != numLocators)
 				checkResult(AAFRESULT_TEST_FAILED);
 		
-			checkResult(pEdesc->EnumAAFAllLocators(&pEnum));
+			checkResult(pEdesc->GetLocators(&pEnum));
 
 			// This should read the one real locator
 			checkResult(pEnum->NextOne(&pLocator));
@@ -322,14 +345,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return 	hr;
 }
  
-extern "C" HRESULT CAAFTextLocator_test()
+extern "C" HRESULT CAAFTextLocator_test(testMode_t mode);
+extern "C" HRESULT CAAFTextLocator_test(testMode_t mode)
 {
   HRESULT	hr = AAFRESULT_NOT_IMPLEMENTED;
-  aafWChar*	pFileName = L"TextLocatorTest.aaf";
+  aafWChar*	pFileName = L"AAFTextLocatorTest.aaf";
 
   try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
 		hr = ReadAAFFile( pFileName );
@@ -337,7 +364,8 @@ extern "C" HRESULT CAAFTextLocator_test()
   catch (...)
 	{
 	  cerr << "CAAFTextLocator_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
 	}
 
 

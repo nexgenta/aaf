@@ -1,31 +1,26 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFPluginDef
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #include "AAF.h"
@@ -35,7 +30,8 @@ static wchar_t *manuf1URL = L"www.microsoft.com";
 static wchar_t *manuf2URL = L"www.avid.com";
 static wchar_t *manuf3URL = L"www.softimage.com";
 
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -221,6 +217,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(pDesc->SetPluginAPI(kAAFEssencePluginAPI));
     checkResult(pDesc->SetPluginAPIMinimumVersion(sampleMinAPIVersion));
     checkResult(pDesc->SetPluginAPIMaximumVersion(sampleMaxAPIVersion));
+    pLoc->Release();
+    pLoc = NULL;
+    pNetLoc->Release();
+    pNetLoc = NULL;
 
 	checkResult(pDictionary->RegisterPluginDef (	pDesc));
 
@@ -234,6 +234,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDesc->AppendLocator(pLoc));
 	/**/
 	checkResult(pDesc->SetDefinitionObjectID(CODEC_DEF_ID));
+	pLoc->Release();
+	pLoc = NULL;
+	pNetLoc->Release();
+	pNetLoc = NULL;
+
 
 	
 	checkResult(pPlugDef->QueryInterface (IID_IAAFCodecDef,
@@ -253,6 +258,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDesc->PrependLocator(pLoc));
 	pLoc->Release();
 	pLoc = NULL;
+	pNetLoc->Release();
+	pNetLoc = NULL;
+
+
 	// Create a third locator, check for three locators, then delete it and recheck for two.
 	checkResult(defs.cdNetworkLocator()->
 				CreateInstance(IID_IAAFNetworkLocator, 
@@ -263,6 +272,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDesc->AppendLocator(pLoc));
 	pLoc->Release();
 	pLoc = NULL;
+	pNetLoc->Release();
+	pNetLoc = NULL;
+
     checkResult(pDesc->CountLocators (&numLocators));
 	checkExpression(3 == numLocators, AAFRESULT_TEST_FAILED);
     checkResult(pDesc->RemoveLocatorAt(2));
@@ -277,6 +289,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
                                           (void **)&pLoc));
 	checkResult(pLoc->SetPath (manuf2URL));
     checkResult(pDesc->InsertLocatorAt(1,pLoc));
+	pLoc->Release();
+	pLoc = NULL;
+	pNetLoc->Release();
+	pNetLoc = NULL;
   }
   catch (HRESULT& rResult)
   {
