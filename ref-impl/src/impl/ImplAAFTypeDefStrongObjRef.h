@@ -3,13 +3,32 @@
 #ifndef __ImplAAFTypeDefStrongObjRef_h__
 #define __ImplAAFTypeDefStrongObjRef_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 class ImplAAFPropertyValue;
@@ -20,6 +39,8 @@ class ImplAAFClassDef;
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
+#include "OMWeakRefVectorProperty.h"
+#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefStrongObjRef : public ImplAAFTypeDefObjectRef
 {
@@ -35,6 +56,21 @@ protected:
 
 public:
 
+  //****************
+  // Initialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Initialize
+        (// @parm [in] auid to be used to identify this type
+         const aafUID_t & id,
+
+         // @parm [in] class def of objects permitted to be referenced
+         ImplAAFClassDef * pObjType,
+
+         // @parm [in, string] friendly name of this type definition
+         const aafCharacter * pTypeName);
+
+
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     SetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
@@ -47,7 +83,7 @@ public:
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType) const;
+    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -64,9 +100,9 @@ public:
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
-        (const aafUID_t *  pID,
-         const aafUID_t * pRefdObjID,
-         wchar_t *  pTypeName);
+        (const aafUID_t & id,
+         const ImplAAFClassDef *pType,
+         const aafCharacter * pTypeName);
 
   // overrides from ImplAAFTypeDef
   //
@@ -76,16 +112,12 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
 
 private:
-  // OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
-  OMFixedSizeProperty<aafUID_t> _referencedType;
-
-  // avoid shortcut typedef in an effort to not include other headers
-  ImplAAFSmartPointer<ImplAAFClassDef> _cachedObjType;
+  OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
 };
 
 
