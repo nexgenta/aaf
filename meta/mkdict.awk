@@ -1,29 +1,24 @@
-#/***********************************************************************
-#*
-#*              Copyright (c) 1998-2000 Avid Technology, Inc.
-#*
-#* Permission to use, copy and modify this software and accompanying
-#* documentation, and to distribute and sublicense application software
-#* incorporating this software for any purpose is hereby granted,
-#* provided that (i) the above copyright notice and this permission
-#* notice appear in all copies of the software and related documentation,
-#* and (ii) the name Avid Technology, Inc. may not be used in any
-#* advertising or publicity relating to the software without the specific,
-#* prior written permission of Avid Technology, Inc.
-#*
-#* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-#* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-#* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-#* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-#* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-#* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-#* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-#* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-#* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-#* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-#* LIABILITY.
-#*
-#************************************************************************/
+#=---------------------------------------------------------------------=
+#
+# The contents of this file are subject to the AAF SDK Public
+# Source License Agreement (the "License"); You may not use this file
+# except in compliance with the License.  The License is available in
+# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+# Association or its successor.
+# 
+# Software distributed under the License is distributed on an "AS IS"
+# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+# the License for the specific language governing rights and limitations
+# under the License.
+# 
+# The Original Code of this file is Copyright 1998-2001, Licensor of the
+# AAF Association.
+# 
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is Avid Technology.
+# All rights reserved.
+#
+#=---------------------------------------------------------------------=
 #
 # Generate an AAF meta dictionary from a .csv spreadsheet.
 #
@@ -210,11 +205,15 @@ BEGIN {
   printf("//     concrete  = true if the class is concrete\n");
   printf("//                 false if the class is abstract\n");
   printf("//\n");
-  printf("// AAF_CLASS_END(name)\n");
+  printf("// AAF_CLASS_END(name, id, parent, concrete)\n");
   printf("//\n");
   printf("//   End an AAF class definition.\n");
   printf("//\n");
   printf("//     name      = the name of the class\n");
+  printf("//     id        = the auid used to identify the class [*]\n");
+  printf("//     parent    = the immediate ancestor class\n");
+  printf("//     concrete  = true if the class is concrete\n");
+  printf("//                 false if the class is abstract\n");
   printf("//\n");
   printf("// AAF_CLASS_SEPARATOR()\n");
   printf("//\n");
@@ -288,11 +287,13 @@ BEGIN {
   printf("//     value     = the value of this enumeration member\n");
   printf("//     container = the name of the containing enumerated type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_ENUMERATION_END(name)\n");
+  printf("// AAF_TYPE_DEFINITION_ENUMERATION_END(name, id, type)\n");
   printf("//\n");
   printf("//   End an AAF enumerated type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
+  printf("//     id        = the auid used to identify the type [*]\n");
+  printf("//     type      = the type of each enumeration element [*]\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_RECORD(name, id)\n");
   printf("//\n");
@@ -309,11 +310,12 @@ BEGIN {
   printf("//     type      = the type of the field [*]\n");
   printf("//     container = the name of the containing record type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_RECORD_END(name)\n");
+  printf("// AAF_TYPE_DEFINITION_RECORD_END(name, id)\n");
   printf("//\n");
   printf("//   End an AAF record type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
+  printf("//     id        = the auid used to identify the type [*]\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_VARYING_ARRAY(name, id, type)\n");
   printf("//\n");
@@ -364,11 +366,12 @@ BEGIN {
   printf("//     auid      = the auid of this enumeration member [*]\n");
   printf("//     container = the name of the containing extendible enumerated type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name)\n");
+  printf("// AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name, id)\n");
   printf("//\n");
   printf("//   End an AAF extendible enumerated type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
+  printf("//     id        = the auid used to identify the type [*]\n");
   printf("//\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_CHARACTER(name, id)\n");
@@ -440,11 +443,13 @@ BEGIN {
   printf("//     parent    = the parent property for member [*]\n");
   printf("//     container = the name of the containing weak reference type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name)\n");
+  printf("// AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name, id, type)\n");
   printf("//\n");
   printf("//   End an AAF extendible enumerated type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
+  printf("//     id        = the auid used to identify the type [*]\n");
+  printf("//     type      = the target type [*]\n");
   printf("//\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET(name, id, type)\n");
@@ -492,7 +497,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_CLASS_END\n");
-  printf("#define AAF_CLASS_END(name)\n");
+  printf("#define AAF_CLASS_END(name, id, parent, concrete)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_CLASS_SEPARATOR\n");
@@ -536,7 +541,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_ENUMERATION_END\n");
-  printf("#define AAF_TYPE_DEFINITION_ENUMERATION_END(name)\n");
+  printf("#define AAF_TYPE_DEFINITION_ENUMERATION_END(name, id, type)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_RECORD\n");
@@ -548,7 +553,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_RECORD_END\n");
-  printf("#define AAF_TYPE_DEFINITION_RECORD_END(name)\n");
+  printf("#define AAF_TYPE_DEFINITION_RECORD_END(name, id)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_VARYING_ARRAY\n");
@@ -576,7 +581,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END\n");
-  printf("#define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name)\n");
+  printf("#define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name, id)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_CHARACTER\n");
@@ -616,7 +621,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_WEAK_REFERENCE_END\n");
-  printf("#define AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name)\n");
+  printf("#define AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name, id, type)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET\n");
@@ -661,7 +666,8 @@ BEGIN {
       if ($elementNameC != class) { # This is a new class
         if (class != "" ) {
           # end the old one
-          printf("AAF_CLASS_END(%s)\n", class);
+          printf("AAF_CLASS_END(%s,%s,\n  %s,\n  %s)\n",
+                 class, cguid, parent, concrete);
           printf("AAF_CLASS_SEPARATOR()\n");
           parent = $parentC;
         } else {
@@ -701,7 +707,8 @@ BEGIN {
     } else if ($typeNameC == "type" ) {
       # a type
       if (firstType) {
-        printf("AAF_CLASS_END(%s)\n", class);
+        printf("AAF_CLASS_END(%s,%s,\n  %s,\n  %s)\n",
+               class, cguid, parent, concrete);
         printf("\n");
         printf("AAF_TABLE_END()\n");
         printf("\n");
@@ -713,13 +720,13 @@ BEGIN {
       } else {
         # end the previous type
         if (kind == "enumeration" ) {
-          printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s)\n", typeName);
+          printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s, %s, AAF_TYPE(%s))\n", typeName, tguid, etype);
         } else if (kind == "record") {
-          printf("AAF_TYPE_DEFINITION_RECORD_END(%s)\n", typeName);
+          printf("AAF_TYPE_DEFINITION_RECORD_END(%s, %s)\n", typeName, tguid);
         } else if (kind == "extendible") {
-          printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s)\n", typeName);
+          printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s, %s)\n", typeName, tguid);
         } else if ((kind == "reference") && (qualif == "weak")) {
-          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(AAF_REFERENCE_TYPE_NAME(%s, %s))\n", typeName, targetType);
+          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, tguid, targetType);
         }
         printf("AAF_TYPE_SEPARATOR()\n");
       }
@@ -744,7 +751,8 @@ BEGIN {
       if        (kind == "integer") {
         printf("AAF_TYPE_DEFINITION_INTEGER(%s, %s, %s, %s)\n", typeName, tguid, $qualifC, $elementTypeC);
       } else if (kind == "enumeration" ) {
-        printf("AAF_TYPE_DEFINITION_ENUMERATION(%s, %s, AAF_TYPE(%s))\n", typeName, tguid, $qualifC);
+        etype = $qualifC;
+        printf("AAF_TYPE_DEFINITION_ENUMERATION(%s, %s, AAF_TYPE(%s))\n", typeName, tguid, etype);
       } else if (kind == "array") {
         elementType = $elementTypeC;
         if ($qualifC == "varying") {
@@ -903,13 +911,13 @@ BEGIN {
 END {
   if (errors == 0 ){
     if (kind == "enumeration" ) {
-      printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s)\n", typeName);
+      printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s, %s, AAF_TYPE(%s))\n", typeName, tguid, etype);
     } else if (kind == "record") {
-      printf("AAF_TYPE_DEFINITION_RECORD_END(%s)\n", typeName);
+      printf("AAF_TYPE_DEFINITION_RECORD_END(%s, %s)\n", typeName, tguid);
     } else if (kind == "extendible") {
-      printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s)\n", typeName);
+      printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s, %s)\n", typeName, tguid);
     } else if ((kind == "reference") && (qualif == "weak")) {
-      printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(AAF_REFERENCE_TYPE_NAME(%s, %s))\n", typeName, targetType);
+      printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, tguid, targetType);
     }
     printf("\n");
     printf("AAF_TYPE_TABLE_END()\n");
