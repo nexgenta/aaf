@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplAAFMetaDictionary_h__
@@ -53,6 +48,7 @@
 #include "AAFPropertyIDs.h"
 
 #include "OMReferenceSetIter.h"
+#include "OMPropertySetIterator.h"
 
 #include "ImplAAFObjectCreation.h"
 #include "aafErr.h"
@@ -563,7 +559,7 @@ AAFRESULT STDMETHODCALLTYPE
   
   // Make sure that we have connected all of the OMProperties
   // to the correct ImplAAFPropertyDefs.
-  (*ppMetaObject)->InitOMProperties(pClassDef);
+  (*ppMetaObject)->InitializeOMStorable(pClassDef);
 
 
   return hr;
@@ -952,16 +948,20 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NULL_PARAM;
   *ppEnum = 0;
 
-#if 0
-  ImplEnumAAFTypeDefs *theEnum = (ImplEnumAAFTypeDefs *)CreateImpl (CLSID_EnumAAFTypeDefs);
+  if (NULL == ppEnum)
+    return AAFRESULT_NULL_PARAM;
+  *ppEnum = 0;
+  
+  ImplEnumAAFTypeDefs *theEnum = (ImplEnumAAFTypeDefs *)CreateImpl (
+	  CLSID_EnumAAFTypeDefs);
   
   XPROTECT()
   {
-    OMSetIterator<OMUniqueObjectIdentification, ImplAAFMetaDictionary::OpaqueTypeDefinition>* iter = 
-      new OMSetIterator<OMUniqueObjectIdentification, ImplAAFMetaDictionary::OpaqueTypeDefinition>(_opaqueTypeDefinitions, OMBefore);
+    OMReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef>* iter = 
+      new OMReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef>(_opaqueTypeDefinitions);
     if(iter == 0)
       RAISE(AAFRESULT_NOMEMORY);
-	CHECK(theEnum->Initialize(&CLSID_EnumAAFTypeDefs,this, iter));
+	CHECK(theEnum->Initialize(&CLSID_EnumAAFTypeDefs,this,iter));
     *ppEnum = theEnum;
   }
   XEXCEPT
@@ -974,8 +974,7 @@ AAFRESULT STDMETHODCALLTYPE
   }
   XEND;
   
-#endif
-  return (AAFRESULT_NOT_IMPLEMENTED);
+  return(AAFRESULT_SUCCESS);
 }
 
 //****************
@@ -1155,7 +1154,7 @@ void ImplAAFMetaDictionary::RegisterAxiomaticProperties(void)
 
 
 // Initialize all of the OMProperties for each aximatic definition.
-void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
+void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
 {
   ImplAAFClassDef *pClassDef;
  
@@ -1174,7 +1173,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
     if (!pClass)
       throw AAFRESULT_INVALID_OBJ;
 
-    pClass->InitOMProperties(pClassDef);
+    pClass->InitializeOMStorable(pClassDef);
   }
 
  
@@ -1193,7 +1192,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
     if (!pProperty)
       throw AAFRESULT_INVALID_OBJ;
 
-    pProperty->InitOMProperties(pClassDef);
+    pProperty->InitializeOMStorable(pClassDef);
   }
 
 
@@ -1227,8 +1226,15 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
     if (!pType)
       throw AAFRESULT_CLASS_NOT_FOUND;
 
-    pType->InitOMProperties(pClassDef);
+    pType->InitializeOMStorable(pClassDef);
   }
+  
+   
+  // Handle special case of initializition the meta dictionary's 
+  // OM propreties. TODO: Add InitializeOMStorable method to ImplAAFMetaDictionary.
+  pClassDef = findAxiomaticClassDefinition(AUID_AAFMetaDictionary);
+  assert (pClassDef);
+  InitializeOMStorable(pClassDef);
 }
 
 
@@ -1269,7 +1275,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticDefinitions(void)
   InitializeAxiomaticProperties();
 
   RegisterAxiomaticProperties();
-  InitializeAxiomaticOMProperties();
+  InitializeAxiomaticOMDefinitions();
 }
 
 // Create and initialize all of the axiomatic definitions.
@@ -1292,191 +1298,41 @@ AAFRESULT ImplAAFMetaDictionary::InstantiateAxiomaticDefinitions(void)
 }
 
 
+
+
 //
-// Meta definition factory methods:
+// Methods that would be inherited or overriden from ImplAAFStrorable
 //
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMetaDictionary::CreateClassDef (
-      aafUID_constref /*classID*/,
-      aafCharacter_constptr pClassName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFClassDef * pParentClass,
-      ImplAAFClassDef **ppNewClass)
+// Associate OMClassDefinition and OMPropertyDefinitions with this object.
+void ImplAAFMetaDictionary::InitializeOMStorable(ImplAAFClassDef * pClassDef)
 {
-  if (!pClassName || ! pParentClass || !ppNewClass) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
+  assert (NULL != pClassDef);
+  
+  // Install the class definition for this storable.
+  setDefinition(pClassDef);
+  
+  // Make sure all of the properties exist and have property definitions.
+  InitOMProperties(pClassDef);
 }
 
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefVariableArray (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefVariableArray ** ppNewVariableArray)
+// Associate the existing OMProperties with corresponding property definitions from
+// the given class definition. NOTE: This call is recursive, it calls itself again
+// for the parent class of the given class until current class is a "root" class.
+void ImplAAFMetaDictionary::InitOMProperties (ImplAAFClassDef * pClassDef)
 {
-  if (!pTypeName || !pElementType || !ppNewVariableArray) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
+  assert (NULL != pClassDef);
+  
+  OMPropertySetIterator iter(*propertySet(), OMBefore);
+  while (++iter)
+  {
+    ImplAAFPropertyDefSP pPropertyDef;
+    pClassDef->LookupPropertyDefbyOMPid(iter.propertyId(), &pPropertyDef);
+    OMPropertyDefinition * propertyDefinition = static_cast<OMPropertyDefinition *>((ImplAAFPropertyDef *)pPropertyDef);
+    assert(propertyDefinition);
+    OMProperty *property = iter.property();
+    property->initialize(propertyDefinition);
+  }
 }
 
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefFixedArray (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDef *pElementType,
-      aafUInt32  /*nElements*/,
-      ImplAAFTypeDefFixedArray **pNewFixedArray)
-{
-  if (!pTypeName || !pElementType || !pNewFixedArray) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMetaDictionary::CreateTypeDefRecord (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDef ** ppMemberTypes,
-      aafCharacter_constptr * pMemberNames,
-      aafUInt32 /*numMembers*/,
-      ImplAAFTypeDefRecord ** ppNewRecord)
-{
-  if (!pTypeName || !ppMemberTypes || !pMemberNames || !ppNewRecord) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMetaDictionary::CreateTypeDefRename (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDef *pBaseType,
-      ImplAAFTypeDefRename ** ppNewRename)
-{
-  if (!pTypeName || !pBaseType || !ppNewRename) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefString (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefString ** ppNewString)
-{
-  if (!pTypeName || !pElementType || !ppNewString) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefStrongObjRef (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFClassDef * pTargetObjType,
-      ImplAAFTypeDefStrongObjRef ** ppNewStrongObjRef)
-{
-  if (!pTypeName || !pTargetObjType || !ppNewStrongObjRef) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefWeakObjRef (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFClassDef * pTargetObjType,
-      aafUID_constptr * pTargetHint,
-      aafUInt32 /*targetHintCount*/,
-      ImplAAFTypeDefWeakObjRef ** ppNewWeakObjRef)
-{
-  if (!pTypeName || !pTargetObjType || !pTargetHint || !ppNewWeakObjRef) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefStrongObjRefVector (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewStrongObjRefVector)
-{
-  if (!pTypeName || !pStrongObjRef || !ppNewStrongObjRefVector) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefWeakObjRefVector (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewWeakObjRefVector)
-{
-  if (!pTypeName || !pWeakObjRef || !ppNewWeakObjRefVector) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefStrongObjRefSet (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefSet ** ppNewStrongObjRefSet)
-{
-  if (!pTypeName || !pStrongObjRef || !ppNewStrongObjRefSet) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFMetaDictionary::CreateTypeDefWeakObjRefSet (
-      aafUID_constref /*typeID*/,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr /*pDescription*/,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefSet ** ppNewWeakObjRefSet)
-{
-  if (!pTypeName || !pWeakObjRef || !ppNewWeakObjRefSet) 
-    return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
 
