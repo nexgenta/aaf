@@ -30,6 +30,7 @@
 #define OMSTRONGREFPROPERTY_H
 
 #include "OMObjectReference.h"
+#include "OMPropertyBase.h"
 
   // @class Persistent strong reference (contained object)
   //        properties supported by the Object Manager.
@@ -71,7 +72,7 @@ public:
   operator ReferencedObject*() const;
 
     // @cmember Save this <c OMStrongReferenceProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember Close this <c OMProperty>.
   virtual void close(void);
