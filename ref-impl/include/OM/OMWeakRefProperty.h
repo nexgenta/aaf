@@ -29,6 +29,12 @@
 #ifndef OMWEAKREFPROPERTY_H
 #define OMWEAKREFPROPERTY_H
 
+#if defined (_MSC_VER)
+  // - 'this' : used in base member initializer list
+  //
+#pragma warning(disable:4355) // Gak !
+#endif
+
 #include "OMDataTypes.h"
 #include "OMPropertyBase.h"
 #include "OMObjectReference.h"
@@ -47,7 +53,8 @@ public:
     // @cmember Constructor.
   OMWeakReferenceProperty(const OMPropertyId propertyId,
                           const char* name,
-                          const char* targetName);
+                          const char* targetName,
+                          const OMPropertyId keyPropertyId);
 
     // @cmember Destructor.
   virtual ~OMWeakReferenceProperty(void);
@@ -74,7 +81,7 @@ public:
   operator ReferencedObject*() const;
 
     // @cmember Save this <c OMWeakReferenceProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember close this <c OMWeakReferenceProperty>.
   virtual void close(void);
