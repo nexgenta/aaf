@@ -20,6 +20,10 @@
 #include "ImplAAFObject.h"
 #endif
 
+class ImplAAFDictionary;
+
+#include "ImplAAFPluginDescriptor.h"
+#include "ImplEnumAAFPluginDescriptors.h"
 
 class ImplAAFDefObject : public ImplAAFObject
 {
@@ -110,6 +114,31 @@ public:
     GetDescriptionBufLen
         (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
 
+  //****************
+  // AppendPluginDescriptor()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AppendPluginDescriptor
+        // @parm [in] PluginDescriptor to append
+        (ImplAAFPluginDescriptor * pPluginDescriptor);
+
+
+  //****************
+  // PrependPluginDescriptor()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    PrependPluginDescriptor
+        // @parm [in] PluginDescriptor to append
+        (ImplAAFPluginDescriptor * pPluginDescriptor);
+
+  //****************
+  // EnumPluginDescriptors()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    EnumPluginDescriptors
+        // @parm [out, retval] AAFPluginDescriptor Enumeration
+        (ImplEnumAAFPluginDescriptors ** ppEnum);
+
 
 public:
   // Declare this class to be storable.
@@ -120,6 +149,23 @@ public:
   // in /test/ImplAAFDefObjectTest.cpp.
   static AAFRESULT test();
 
+public:
+	// Functions internal to the toolkit
+
+	virtual AAFRESULT
+		GetNumDescriptors (aafInt32 *  pCount);
+	virtual AAFRESULT
+		GetNthDescriptor (aafInt32 index, ImplAAFPluginDescriptor **ppDescriptor);
+
+  // non-published method to set the containing dictionary for this
+  // object.
+  void SetDict (ImplAAFDictionary * pDict);
+
+protected:
+  // Returns a pointer to the dictionary containing this object.  Will
+  // assert() if not yet set.
+  ImplAAFDictionary * GetDict ();
+
 private:
   // friendly name of this definition
   OMWideStringProperty          _name;
@@ -129,6 +175,10 @@ private:
 
   // auid to be used to identify this definition
   OMFixedSizeProperty<aafUID_t> _identification;
+  OMStrongReferenceVectorProperty<ImplAAFPluginDescriptor> _descriptors;
+
+  // pointer to dict containing this object
+  ImplAAFDictionary *           _pDict;
 };
 
 #endif // ! __ImplAAFDefObject_h__
