@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -33,6 +52,9 @@
 #include "AafUtils.h"
 #include "ImplAAFDictionary.h"
 
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
+
 extern "C" const aafClassID_t CLSID_EnumAAFDataDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFCodecFlavours;
 
@@ -53,16 +75,22 @@ ImplAAFCodecDef::~ImplAAFCodecDef ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::IsEssenceKindSupported (
-      aafUID_t *pEssenceKind,
+      ImplAAFDataDef * pEssenceKind,
       aafBool* pIsSupported)
 {
 	ImplEnumAAFDataDefs	*dataEnum = NULL;
 	ImplAAFDataDef		*aVal = NULL;
 	aafBool				result = AAFFalse;
 
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+
+	if (! pIsSupported)
+	  return AAFRESULT_NULL_PARAM;
+
 	XPROTECT()
 	{
-		CHECK(GetDataDefinitions (&dataEnum));
+		CHECK(GetEssenceKinds (&dataEnum));
 		while((dataEnum->NextOne(&aVal) == AAFRESULT_SUCCESS)
 		   && (result == AAFFalse))
 		{
@@ -94,23 +122,23 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
  
- AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCodecDef::AppendEssenceKind (
-      aafUID_t *pEssenceKind)
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCodecDef::AddEssenceKind (
+      ImplAAFDataDef * pEssenceKind)
 {
 	aafUID_t	*tmp, newUID;
 	aafInt32	oldBufSize;
 	aafInt32	newBufSize;
 
-	if(pEssenceKind == NULL)
-		return AAFRESULT_NULL_PARAM;
-	
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+
 	XPROTECT()
 	{
 		oldBufSize = _dataDefs.size();
 		newBufSize = oldBufSize + sizeof(aafUID_t);
 		tmp = new aafUID_t[newBufSize];
-		newUID = *pEssenceKind;
+		CHECK(pEssenceKind->GetAUID(&newUID));
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
 		if(oldBufSize != 0)
@@ -129,6 +157,28 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCodecDef::RemoveEssenceKind (
+      ImplAAFDataDef * pEssenceKind)
+{
+  if (! pEssenceKind)
+	return AAFRESULT_NULL_PARAM;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCodecDef::CountEssenceKinds (
+      aafUInt32 * pResult)
+{
+  if (! pResult) return AAFRESULT_NULL_PARAM;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
 
 
@@ -207,7 +257,7 @@ AAFRESULT STDMETHODCALLTYPE
 		classID = _fileDescClass;
 		status = GetDictionary(&pDict);
 		if(status == AAFRESULT_SUCCESS)
-			status = pDict->LookupClass(&classID, ppClass);
+			status = pDict->LookupClassDef(classID, ppClass);
 	}
 
 	return status;
@@ -295,7 +345,7 @@ AAFRESULT STDMETHODCALLTYPE
   
 // SDK-private
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCodecDef::GetDataDefinitions (
+    ImplAAFCodecDef::GetEssenceKinds (
       ImplEnumAAFDataDefs  **ppEnum)
 {
 	if(ppEnum == NULL)
@@ -309,6 +359,5 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
-OMDEFINE_STORABLE(ImplAAFCodecDef, AUID_AAFCodecDef);
 
 

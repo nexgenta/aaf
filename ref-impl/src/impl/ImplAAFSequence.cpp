@@ -1,10 +1,29 @@
-/***********************************************\
-*                                               *
-* Advanced Authoring Format                     *
-*                                               *
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*                                               *
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFTimecode.h"
 #include "ImplAAFComponent.h"
@@ -22,6 +41,10 @@
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
+
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
+typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 
 
 extern "C" const aafClassID_t CLSID_EnumAAFComponents;
@@ -71,9 +94,12 @@ ImplAAFSequence::~ImplAAFSequence ()
 //   - pDatadef is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::Initialize (aafUID_t * pDatadef)
+    ImplAAFSequence::Initialize (ImplAAFDataDef * pDataDef)
 {
-	return (SetDataDef(pDatadef));
+  if (! pDataDef)
+	return AAFRESULT_NULL_PARAM;
+
+  return (SetDataDef(pDataDef));
 }
 
 //***********************************************************
@@ -132,12 +158,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	size_t			numCpnts;
 	aafLength_t		sequLen, cpntLen, prevLen;
-	aafUID_t		sequDataDef, cpntDataDef;
+	ImplAAFDataDefSP sequDataDef, cpntDataDef;
 	aafBool			isPrevTran = AAFFalse, willConvert;
 	aafErr_t		aafError = AAFRESULT_SUCCESS;
 	implCompType_t	type;
 	ImplAAFDictionary	*pDict = NULL;
-	ImplAAFDataDef	*pDef = NULL;
 	AAFRESULT		status, sclpStatus;
 
 	if (pComponent == NULL)
@@ -151,14 +176,7 @@ AAFRESULT STDMETHODCALLTYPE
 		// Verify that component's datadef converts to sequence's datadef
 		GetDataDef(&sequDataDef);
 		pComponent->GetDataDef(&cpntDataDef);
-		
-		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->LookupDataDefintion(&cpntDataDef, &pDef));
-		pDict->ReleaseReference();
-		pDict = NULL;
-		CHECK(pDef->DoesDataDefConvertTo(&sequDataDef, &willConvert));
-		pDef->ReleaseReference();
-		pDef = NULL;
+		CHECK(cpntDataDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
 		
 		if (willConvert == AAFFalse)
 			RAISE(AAFRESULT_INVALID_DATADEF);
@@ -229,7 +247,7 @@ AAFRESULT STDMETHODCALLTYPE
 				}
 				
 				SubInt64fromInt64(cpntLen, &sequLen);
-				CHECK(SetLength(&sequLen));
+				CHECK(SetLength(sequLen));
 			}
 			else // Not a transition
 			{
@@ -244,7 +262,7 @@ AAFRESULT STDMETHODCALLTYPE
 				
 				// Add length of component to sequence, if not transition
 				AddInt64toInt64(cpntLen, &sequLen);
-				CHECK(SetLength(&sequLen));
+				CHECK(SetLength(sequLen));
 			}
 		}
 		// Else handle case #2
@@ -255,17 +273,69 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
-		if(pDict != NULL)
-		  pDict->ReleaseReference();
-		pDict = 0;
-		if(pDef != NULL)
-		  pDef->ReleaseReference();
-		pDef = 0;
 	}
 	XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::PrependComponent (ImplAAFComponent* pComponent)
+{
+  if (! pComponent) return AAFRESULT_NULL_PARAM;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::InsertComponentAt (aafUInt32 index,
+										ImplAAFComponent* pComponent)
+{
+  if (! pComponent) return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountComponents (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::GetComponentAt (aafUInt32 index,
+									 ImplAAFComponent ** ppComponent)
+{
+  if (! ppComponent) return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountComponents (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::RemoveComponentAt (aafUInt32 index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountComponents (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
 
 //***********************************************************
 //
@@ -298,7 +368,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 //***********************************************************
 //
-// GetNumComponents()
+// CountComponents()
 //
 // This function returns the number of components in the sequence.
 // 
@@ -318,8 +388,10 @@ AAFRESULT STDMETHODCALLTYPE
 //   - pNumCpnts is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::GetNumComponents (aafInt32*  pNumCpnts)
+    ImplAAFSequence::CountComponents (aafUInt32 * pNumCpnts)
 {
+  if (! pNumCpnts) return AAFRESULT_NULL_PARAM;
+
 	size_t	numCpnts;
 
 	_components.getSize(numCpnts);
@@ -330,7 +402,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 //***********************************************************
 //
-// EnumComponents()
+// GetComponents()
 //
 // Places an IEnumAAFComponents enumerator for the components contained in the sequence
 // into the *ppEnum argument.
@@ -355,7 +427,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::EnumComponents (ImplEnumAAFComponents ** ppEnum)
+    ImplAAFSequence::GetComponents (ImplEnumAAFComponents ** ppEnum)
 {
 	if(ppEnum == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -592,14 +664,15 @@ AAFRESULT
 	return hr;
 }
 
-AAFRESULT ImplAAFSequence::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+AAFRESULT ImplAAFSequence::ChangeContainedReferences(aafMobID_constref from,
+													 aafMobID_constref to)
 {
-	aafInt32			n, count;
+	aafUInt32			n, count;
 	ImplAAFComponent	*comp = NULL;
 	
 	XPROTECT()
 	{
-		CHECK(GetNumComponents (&count));
+		CHECK(CountComponents (&count));
 		for(n = 0; n < count; n++)
 		{
 			CHECK(GetNthComponent (n, &comp));
@@ -639,4 +712,3 @@ AAFRESULT
 	return hr;
 }
 
-OMDEFINE_STORABLE(ImplAAFSequence, AUID_AAFSequence);

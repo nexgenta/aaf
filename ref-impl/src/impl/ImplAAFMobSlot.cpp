@@ -10,7 +10,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -25,6 +25,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 ////////////////////////////////////////////////////////////////////////////////
 // Types required by this module:
 //
@@ -108,7 +109,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMobSlot::GetName
-        (aafWChar *  pName,  //@parm [in] buffer provided by client to hold the Mob Slot Name
+        (aafCharacter *  pName,  //@parm [in] buffer provided by client to hold the Mob Slot Name
 		aafInt32	size)	//@parm [in] length of the buffer provided to hold the slot name
 {
 	bool stat;
@@ -133,7 +134,7 @@ AAFRESULT STDMETHODCALLTYPE
   //
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFMobSlot::GetNameBufLen
-		(aafInt32	*pSize)	//@parm [in] length of the buffer provided to hold the slot name
+		(aafUInt32	*pSize)	//@parm [in] length of the buffer provided to hold the slot name
 							// including the terminator
 {
 	if(pSize == NULL)
@@ -148,7 +149,7 @@ ImplAAFMobSlot::GetNameBufLen
 }
   
  AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMobSlot::SetName (aafWChar *pName)
+    ImplAAFMobSlot::SetName (const aafCharacter *pName)
 {
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -182,7 +183,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMobSlot::GetDataDef (aafUID_t *result)
+    ImplAAFMobSlot::GetDataDef (ImplAAFDataDef ** result)
 {
 	ImplAAFSegment	*seg = _segment;
 	if(result == NULL)
@@ -214,7 +215,6 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-OMDEFINE_STORABLE(ImplAAFMobSlot, AUID_AAFMobSlot);
 
 
 AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
@@ -281,7 +281,8 @@ AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
 	return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT ImplAAFMobSlot::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+AAFRESULT ImplAAFMobSlot::ChangeContainedReferences(aafMobID_constref from,
+													aafMobID_constref to)
 {
 	ImplAAFSegment	*seg;
 	
