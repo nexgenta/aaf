@@ -18,7 +18,6 @@
 
 class ImplAAFParameterDef;
 class ImplAAFTypeDef;
-class ImplAAFReferenceValue;
 
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
@@ -58,10 +57,6 @@ public:
   // Declare this class to be storable.
   //
   OMDECLARE_STORABLE(ImplAAFParameter)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFParameterTest.cpp.
-  static AAFRESULT test();
 
 private:
 
