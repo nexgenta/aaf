@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-MipsIrix.mk,v 1.10 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-MipsIrix.mk,v 1.11 2004/10/19 13:28:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -60,6 +60,9 @@ MIPS_ABI = n32
 
 #------------------------------------------------------------------------------
 # Compiler-specific definitions
+# 
+# g++ is supported in addition to MIPSpro which is the default compiler.
+# To select g++ use "make COMPILER=g++"
 #------------------------------------------------------------------------------
 COMPILER ?= MIPSpro
 include $(AAFBASE)/build/cdefs-$(COMPILER).mk
@@ -111,6 +114,14 @@ ifndef UUIDLIB
     UUIDLIB =
 endif
 
+#-------------------------------------------------------
+# g++ specific overrides when invoked with COMPILER=g++
+#-------------------------------------------------------
+ifeq "$(COMPILER)" "g++"
+    PLATFORM_CFLAGS = -fPIC
+    LD_DYN_LIB = $(CC) -Xlinker -LD_LAYOUT:lgot_buffer=50 -fPIC -shared -g
+    LIBCIO =
+endif
 
 #------------------------------------------------------------------------------
 # Select UNICODE or ansi API's:
@@ -135,4 +146,3 @@ DLL ?= .so
 # BYTE_ORDER = -DLITTLEENDIAN=1
 #------------------------------------------------------------------------------
 BYTE_ORDER = -DBIGENDIAN=1
-
