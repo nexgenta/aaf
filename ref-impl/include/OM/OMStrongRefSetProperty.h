@@ -36,7 +36,6 @@
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetIterator;
 
-template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetElement;
 
   // @class Persistent sets of uniquely identified strongly referenced
@@ -198,6 +197,12 @@ public:
 
   bool isValidIdentification(UniqueIdentification& id) const;
 
+  virtual OMContainerIterator<OMStrongReferenceSetElement>*
+                                                          iterator(void) const;
+
+  virtual void insert(void* key,
+                      const OMStrongReferenceSetElement& element);
+
   virtual OMKeySize keySize(void) const;
 
   virtual OMPropertyId keyPropertyId(void) const;
@@ -206,8 +211,7 @@ public:
 
 private:
 
-  typedef OMStrongReferenceSetElement<UniqueIdentification,
-                                      ReferencedObject> SetElement;
+  typedef OMStrongReferenceSetElement SetElement;
 
   typedef OMSetIterator<UniqueIdentification, SetElement> SetIterator;
 
@@ -220,6 +224,14 @@ private:
     // @cmember The id of the property whose value is the unique
     //          identifier of objects in this set.
   OMPropertyId _keyPropertyId;
+
+    // OMStrongReferenceSetProperty can't be assigned - declare but
+    // don't define
+  OMStrongReferenceSetProperty& operator = (
+                                      const OMStrongReferenceSetProperty& rhs);
+
+    // OMStrongReferenceSetProperty can't be copied - declare but don't define
+  OMStrongReferenceSetProperty(const OMStrongReferenceSetProperty& rhs);
 
 };
 

@@ -26,10 +26,9 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-#ifndef OMPROPERTYBASE_H
-#define OMPROPERTYBASE_H
+#ifndef OMPROPERTY_H
+#define OMPROPERTY_H
 
-#include "OMPortability.h"
 #include "OMDataTypes.h"
 
 #include <stddef.h>
@@ -58,6 +57,7 @@ class OMType;
 
   // @class Abstract base class for persistent properties supported by
   //        the Object Manager.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMProperty {
 public:
   // @access Public members.
@@ -91,7 +91,7 @@ public:
   const OMPropertyDefinition* definition(void) const;
 
     // @cmember The name of this <c OMProperty>.
-  const char* name(void) const;
+  const wchar_t* name(void) const;
 
     // @cmember The property id of this <c OMProperty>.
   OMPropertyId propertyId(void) const;
@@ -118,7 +118,7 @@ public:
   bool isPresent(void) const;
 
     // @cmember Remove this optional <c OMProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
   // Direct property access interface
 
@@ -141,6 +141,12 @@ public:
     //          then the value returned is 0.
   virtual OMStorable* storable(void) const;
 
+    // @cmember The stored form of this <c OMProperty>.
+  OMStoredForm storedForm(void) const;
+
+    // @cmember The type of this <c OMProperty>.
+  const OMType* type(void) const;
+
 protected:
   // @access Protected members.
 
@@ -151,9 +157,6 @@ protected:
     // @cmember Clear the bit that indicates that this optional <c OMProperty>
     //          is present.
   void clearPresent(void);
-
-    // @cmember The type of this <c OMProperty>.
-  const OMType* type(void) const;
 
     // @cmember The <c OMStorable> that contains this <c OMProperty>.
   OMStorable* container(void) const;
@@ -166,14 +169,6 @@ protected:
     //          representation of this <c OMProperty>.
   OMFile* file(void) const;
 
-    // @cmember The persisted value of this property is its name.
-    //          Write the property name and enter it into the property index.
-  void saveName(void) const;
-
-    // @cmember The persisted value of this property is its name.
-    //          Read (and check) the property name.
-  void restoreName(size_t size);
-
   virtual const wchar_t* storedName(void) const;
 
   OMPropertyId _propertyId;
@@ -183,44 +178,24 @@ protected:
 
 private:
 
-  char* _cName;
   const OMPropertySet* _propertySet; // The PropertySet that contains
                                      // this property
   const OMPropertyDefinition* _definition;
   bool _isOptional;
   bool _isPresent;
 
-};
+    // OMProperty can't be assigned - declare but don't define
+  OMProperty& operator = (const OMProperty& rhs);
 
-  // @class Abstract base class for persistent reference properties
-  //        supported by the Object Manager.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @base public | <c OMProperty>
-template <typename ReferencedObject>
-class OMReferenceProperty : public OMProperty {
-public:
-  // @access Public members.
-
-    // @cmember Constructor.
-  OMReferenceProperty(const OMPropertyId propertyId,
-                      const OMStoredForm storedForm,
-                      const wchar_t* name);
-
-    // @cmember Destructor.
-  virtual ~OMReferenceProperty(void);
-
-  // Direct property access interface
-
-    // @cmember The size of the raw bits of this
-    //          <c OMReferenceProperty>. The size is given in bytes.
-  virtual size_t bitsSize(void) const;
+    // OMProperty can't be copied - declare but don't define
+  OMProperty(const OMProperty& rhs);
 
 };
 
   // @class Abstract base class for simple (data) persistent
   //        properties supported by the Object Manager.
   //   @base public | <c OMProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMSimpleProperty : public OMProperty {
 public:
   // @access Public members. 
@@ -252,6 +227,9 @@ public:
     //          <c OMSimpleProperty>. The size is given in bytes.
   virtual size_t bitsSize(void) const;
 
+    // @cmember The raw bits of this <c OMSimpleProperty>.
+  virtual OMByte* bits(void) const;
+
     // @cmember Get the raw bits of this <c OMSimpleProperty>. The raw
     //          bits are copied to the buffer at address <p bits> which
     //          is <p size> bytes in size.
@@ -262,19 +240,11 @@ public:
     //          is <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
-protected:
-  // @access Protected members.
-
     // @cmember Set the size of this <c OMSimpleProperty> to <p newSize> bytes.
   void setSize(size_t newSize);
 
-    // @cmember Write this property to persistent store, performing
-    //          any necessary externalization and byte reordering.
-  void write(void) const;
-
-    // @cmember Read this property from persistent store, performing
-    //          any necessary byte reordering and internalization.
-  void read(size_t externalBytesSize);
+protected:
+  // @access Protected members.
 
     // @cmember Get the value of this <c OMSimpleProperty>.
   void get(void* value, size_t valueSize) const;
@@ -284,8 +254,15 @@ protected:
 
   size_t _size;
   unsigned char* _bits;
-};
 
-#include "OMPropertyT.h"
+private:
+
+    // OMSimpleProperty can't be assigned - declare but don't define
+  OMSimpleProperty& operator = (const OMSimpleProperty& rhs);
+
+    // OMSimpleProperty can't be copied - declare but don't define
+  OMSimpleProperty(const OMSimpleProperty& rhs);
+
+};
 
 #endif

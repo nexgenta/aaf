@@ -119,9 +119,17 @@ public:
     //          as an <c OMStorable>.
   virtual OMStorable* storable(void) const;
 
+  virtual OMStrongObjectReference& reference(void) const;
+
 private:
 
-  OMStrongObjectReference<ReferencedObject> _reference;
+  OMStrongObjectReference _reference;
+
+    // OMStrongReferenceProperty can't be assigned - declare but don't define
+  OMStrongReferenceProperty& operator = (const OMStrongReferenceProperty& rhs);
+
+    // OMStrongReferenceProperty can't be copied - declare but don't define
+  OMStrongReferenceProperty(const OMStrongReferenceProperty& rhs);
 
 };
 
