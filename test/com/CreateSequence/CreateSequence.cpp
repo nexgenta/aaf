@@ -66,10 +66,10 @@ const int MAX = 80;
 static char* niceFileName;
 static void usage(void);
 static aafWChar* slotName = L"SLOT1";
-static aafInt32 fadeInLen  = 1000;
-static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
-static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
+//static aafInt32 fadeInLen  = 1000;
+//static aafInt32 fadeOutLen = 2000;
+//static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
+//static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
 static aafSourceRef_t sourceRef; 
 
 
@@ -124,7 +124,6 @@ const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 {
-	HRESULT hr = S_OK;
 	IAAFFile*					pFile = NULL;
 	IAAFHeader*					pHeader = NULL;
 	IAAFDictionary*					pDictionary = NULL;
@@ -546,19 +545,6 @@ cleanup:
 	
 	return moduleErrorTmp;
 }
-// simple helper class to initialize and cleanup COM library.
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
 
 // now need the reading functionality
 static HRESULT ReadAAFFile(aafWChar * pFileName)
@@ -641,13 +627,11 @@ int main(int argumentCount, char *argumentVector[])
 #if USE_TIMER_LIB
 	UTLInitTimers(1000);
 #endif
-	CComInitialize comInit;
 	
 	aafWChar FileNameBuffer[MAX];
 	mbstowcs(FileNameBuffer,niceFileName,MAX);
 	
 	aafWChar * pwFileName = FileNameBuffer;
-	const char * pFileName = niceFileName;
 
 	//  Give a nice output here too...
 	printf("Creating file %s with %ld components...\n\n",niceFileName,N);

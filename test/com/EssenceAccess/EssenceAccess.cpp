@@ -36,7 +36,7 @@
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "AAFDefUIDS.h"
+#include "AAFDefUIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
 #include "AAFContainerDefs.h"
@@ -743,19 +743,6 @@ cleanup:
 }
 
 
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
-
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
 {
@@ -982,7 +969,6 @@ int main(int argumentCount, char *argumentVector[])
 	UTLInitTimers(1000);
 #endif
 
-	CComInitialize comInit;
 	CAAFInitialize aafInit;
 
   // Make sure all of our required plugins have been registered.
