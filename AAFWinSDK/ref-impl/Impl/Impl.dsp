@@ -83,10 +83,6 @@ LIB32=link.exe -lib
 # Name "Impl - Win32 Debug"
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\aafansic.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\aafCvt.cpp"
 # End Source File
 # Begin Source File
@@ -112,6 +108,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFAIFCDescriptor.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBaseClassFactory.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltins.cpp"
 # End Source File
 # Begin Source File
 
@@ -152,6 +152,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFContainerDef.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFContentStorage.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFContext.cpp"
 # End Source File
 # Begin Source File
 
@@ -355,6 +359,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPropertyValue.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPropValData.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPulldown.cpp"
 # End Source File
 # Begin Source File
@@ -384,10 +392,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSelector.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSequence.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSession.cpp"
 # End Source File
 # Begin Source File
 
@@ -452,6 +456,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTransition.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDef.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefArray.cpp"
 # End Source File
 # Begin Source File
 
@@ -616,10 +624,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFSegments.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFTypeDefs.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltins.cpp"
 # End Source File
 # End Target
 # End Project
