@@ -5,17 +5,6 @@
 
 #include "OMStorable.h"
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -42,6 +31,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 
 #ifndef __ImplAAFComponent_h__
 #include "ImplAAFComponent.h"
@@ -91,10 +81,6 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFSegment)
-
 
 	virtual AAFRESULT NumRepresentations(aafInt32 *  pCount);
 
