@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -37,41 +37,10 @@
 #include <stdio.h>
 #include "AAFDefUIDs.h"
 
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_AAFTypeDefInt; // generated
+#include "CAAFBuiltinDefs.h"
 
-// {C3930DDA-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalInt64 = 
-{ 0xc3930dda, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-// {C3930DD7-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalInt32 = 
-{ 0xc3930dd7, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-// {C3930DD8-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalInt16 = 
-{ 0xc3930dd8, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-// {C3930DD9-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalInt8 = 
-{ 0xc3930dd9, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-// {C3930DDB-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalUInt64 = 
-{ 0xc3930ddb, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-// {C3930DDC-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalUInt32 = 
-{ 0xc3930ddc, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-// {C3930DDD-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalUInt16 = 
-{ 0xc3930ddd, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-// {C3930DDE-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalUInt8 = 
-{ 0xc3930dde, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
+// Foward declaration.
+extern "C" HRESULT CAAFTypeDefInt_test();
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)
@@ -102,29 +71,24 @@ static void RemoveTestFile(const wchar_t* pFileName)
 }
 
 
-static HRESULT CreateOneTypeDef (IAAFDictionary *  pDict,
-								 aafUInt8          intSize,
-								 aafBool           isSigned,
-								 aafUID_t *        pID,
-								 wchar_t *         name,
+static HRESULT GetOneTypeDef (IAAFDictionary *  pDict,
+								 const aafUID_t &  id,
 								 IAAFTypeDefInt ** ppTD)
 {
   assert (pDict);
-  assert (pID);
-  assert (name);
   assert (ppTD);
 
-  HRESULT hr = E_FAIL;
-  IAAFTypeDefInt * pTD = NULL;
+  HRESULT hr = S_OK;
+  IAAFTypeDef * pTypeDef = NULL;
 
-  checkResult (pDict->CreateInstance (&AUID_AAFTypeDefInt,
-									  IID_IAAFTypeDefInt,
-									  (IUnknown **) &pTD));
-  assert (pTD);
-  checkResult (pTD->Initialize (pID, intSize, isSigned, name));
+  hr = pDict->LookupTypeDef(id, &pTypeDef);
+  if (SUCCEEDED(hr))
+  {
+    hr = pTypeDef->QueryInterface (IID_IAAFTypeDefInt, (void **) ppTD);
+    pTypeDef->Release();
+  }
 
-  *ppTD = pTD;
-  return AAFRESULT_SUCCESS;
+  return hr;
 } 
 
 
@@ -425,14 +389,16 @@ static HRESULT TestTypeDefInt ()
 
   try
 	{
+	  aafProductVersion_t v;
+	  v.major = 1;
+	  v.minor = 0;
+	  v.tertiary = 0;
+	  v.patchLevel = 0;
+	  v.type = kAAFVersionUnknown;
 
 	  ProductInfo.companyName = L"AAF Developers Desk";
 	  ProductInfo.productName = L"AAFTypeDefInt Test";
-	  ProductInfo.productVersion.major = 1;
-	  ProductInfo.productVersion.minor = 0;
-	  ProductInfo.productVersion.tertiary = 0;
-	  ProductInfo.productVersion.patchLevel = 0;
-	  ProductInfo.productVersion.type = kVersionUnknown;
+	  ProductInfo.productVersion = &v;
 	  ProductInfo.productVersionString = NULL;
 	  ProductInfo.productID = UnitTestProductID;
 	  ProductInfo.platform = NULL;
@@ -450,75 +416,35 @@ static HRESULT TestTypeDefInt ()
 	  // test GetSize() and IsSigned()
 
 	  // 1-byte signed
-	  checkResult (CreateOneTypeDef (pDict,
-									 1,                 // 1-byte (8-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt8,
-									 L"Local 8-bit signed int",
-									 &ptds8));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_Int8,  &ptds8));
 	  assert (ptds8);
 
   // 2-byte signed
-	  checkResult (CreateOneTypeDef (pDict,
-									 2,                 // 2-byte (16-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt16,
-									 L"Local 8-bit signed int",
-									 &ptds16));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_Int16, &ptds16));
 	  assert (ptds16);
 
   // 4-byte signed
-	  checkResult (CreateOneTypeDef (pDict,
-									 4,                 // 4-byte (32-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt32,
-									 L"Local 32-bit signed int",
-									 &ptds32));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_Int32, &ptds32));
 	  assert (ptds32);
 
   // 8-byte signed
-	  checkResult (CreateOneTypeDef (pDict,
-									 8,                 // 8-byte (64-bit) int
-									 AAFTrue,           // signed
-									 &TypeID_LocalInt64,
-									 L"Local 64-bit signed int",
-									 &ptds64));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_Int64, &ptds64));
 	  assert (ptds64);
 
   // 1-byte unsigned
-	  checkResult (CreateOneTypeDef (pDict,
-									 1,                 // 1-byte (8-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt8,
-									 L"Local 8-bit unsigned int",
-									 &ptdu8));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_UInt8, &ptdu8));
 	  assert (ptdu8);
 
   // 2-byte unsigned
-	  checkResult (CreateOneTypeDef (pDict,
-									 2,                 // 2-byte (16-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt16,
-									 L"Local 8-bit unsigned int",
-									 &ptdu16));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_UInt16, &ptdu16));
 	  assert (ptdu16);
 
   // 4-byte unsigned
-	  checkResult (CreateOneTypeDef (pDict,
-									 4,                 // 4-byte (32-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt32,
-									 L"Local 32-bit unsigned int",
-									 &ptdu32));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_UInt32, &ptdu32));
 	  assert (ptdu32);
 
   // 8-byte unsigned
-	  checkResult (CreateOneTypeDef (pDict,
-									 8,                 // 8-byte (64-bit) int
-									 AAFFalse,          // unsigned
-									 &TypeID_LocalUInt64,
-									 L"Local 64-bit unsigned int",
-									 &ptdu64));
+	  checkResult (GetOneTypeDef (pDict, kAAFTypeID_UInt64, &ptdu64));
 	  assert (ptdu64);
 
 	  const aafUInt32 sizeTable[4] = {1, 2, 4, 8};
@@ -563,7 +489,7 @@ static HRESULT TestTypeDefInt ()
 									 setData,
 									 getSize,
 									 pvSize,
-									 sign? AAFTrue : AAFFalse,
+									 sign? kAAFTrue : kAAFFalse,
 									 td);
 
 				  //
@@ -643,7 +569,7 @@ static HRESULT TestTypeDefInt ()
 }
 
 
-extern "C" HRESULT CAAFTypeDefInt_test()
+HRESULT CAAFTypeDefInt_test()
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 
@@ -654,7 +580,8 @@ extern "C" HRESULT CAAFTypeDefInt_test()
   catch (...)
     {
       cerr << "CAAFTypeDefInt_test...Caught general C++"
-        " exception!" << endl; 
+		   << " exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
     }
   return hr;
 }
