@@ -66,22 +66,6 @@ const unsigned	kLogError = 0; 	// Error level.
 const unsigned	kLogWarn 	= 1;  // Warning level.
 const unsigned	kLogInfo  = 2; 	// Informational level.
 
-// ============================================================================
-// simple helper class to initialize and cleanup COM library.
-// ============================================================================
-struct CComInitialize
-{
-	CComInitialize()
-	{
-		CoInitialize(NULL);
-	}
-
-	~CComInitialize()
-	{
-		CoUninitialize();
-	}
-};
-
 typedef struct _AafOmfGlobals
 {
 	aafInt16		numIndents;
@@ -118,29 +102,56 @@ typedef struct _AafOmfGlobals
 	StreamLogger*		pLogger;
 
 	// MC Private Properties
-	OMF2::omfProperty_t		pvtEffectIDProp;
-	OMF2::omfProperty_t		pvtAppCode;
+	omfProperty_t		pvtEffectIDProp;
+	omfProperty_t		pvtAppCode;
+	omfProperty_t		pvtAttributes;
+	omfProperty_t		pvtDataAttribute;
 
 	// Codec Properties
-	OMF2::omfProperty_t		omCDCIComponentWidth;
-	OMF2::omfProperty_t		omCDCIHorizontalSubsampling;
-	OMF2::omfProperty_t		omCDCIColorSiting;
-	OMF2::omfProperty_t		omCDCIBlackReferenceLevel;
-	OMF2::omfProperty_t		omCDCIWhiteReferenceLevel;
-	OMF2::omfProperty_t		omCDCIColorRange;
-	OMF2::omfProperty_t		omCDCIPaddingBits;
+	omfProperty_t		omCDCIComponentWidth;
+	omfProperty_t		omCDCIHorizontalSubsampling;
+	omfProperty_t		omCDCIColorSiting;
+	omfProperty_t		omCDCIBlackReferenceLevel;
+	omfProperty_t		omCDCIWhiteReferenceLevel;
+	omfProperty_t		omCDCIColorRange;
+	omfProperty_t		omCDCIPaddingBits;
 	~_AafOmfGlobals( void )		{ delete pLogger; }
 } AafOmfGlobals;
+
+
+// ============================================================================
+// simple helper class to initialize and cleanup COM library.
+// ============================================================================
+struct CComInitialize
+{
+	CComInitialize()
+	{
+		CoInitialize(NULL);
+	}
+
+	~CComInitialize()
+	{
+		CoUninitialize();
+	}
+};
+
 
 int deleteFile( char* fileName );
 void IncIndentLevel( void );
 void DecIndentLevel( void );
 void AUIDtoString(aafUID_t *uid, char *buf);
+void MobIDtoString(aafMobID_constref uid, char *buf);
 AAFRESULT aafMobIDFromMajorMinor(
+        aafUInt32	prefix,
         aafUInt32	major,
 		aafUInt32	minor,
-		aafUID_t *mobID);     /* OUT - Newly created Mob ID */
-void RegisterCodecProperties(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession);
+		aafUInt8	UMIDType,
+		aafMobID_t *mobID);     /* OUT - Newly created Mob ID */
+void RegisterCodecProperties(AafOmfGlobals *globals, omfSessionHdl_t OMFSession);
+HRESULT InitGlobalVars( void );
+HRESULT IsOMFFile (char * pFileName );
+
+extern AafOmfGlobals*	gpGlobals;
 
 
 #define COMMON_ERR_BASE		(AAFRESULT)0xE0000000
