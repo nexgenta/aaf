@@ -95,6 +95,10 @@ typedef unsigned long long int ULONGLONG;
 typedef __int64 LONGLONG;
 typedef unsigned __int64 ULONGLONG;
 #endif
+#ifdef __sgi
+typedef long long LONGLONG;
+typedef unsigned long long ULONGLONG;
+#endif
 
 typedef void *LPVOID;
 typedef char *LPSTR;
@@ -109,7 +113,9 @@ typedef const char *LPCSTR;
 #endif // _WIN32
 
 const ULONG MAX_ULONG = 0xFFFFFFFF;
+#if !defined(USHRT_MAX)
 const USHORT USHRT_MAX = 0xFFFF;
+#endif
 #define MAXULONG MAX_ULONG
 #define MAX_PATH _MAX_PATH
 
@@ -247,8 +253,13 @@ EXTERN_C STDAPI_(BOOL) IsEqualGUID(REFGUID rguid1, REFGUID rguid2);
 #define CLSID_NULL GUID_NULL
 
 // Use these to 'refer' to the formal parameters that we are not using
-#define UNIMPLEMENTED_PARM(x)   (x)
+#ifndef __sgi
 #define UNREFERENCED_PARM(x)    (x)
+#define UNIMPLEMENTED_PARM(x)   (x)
+#else
+#define UNREFERENCED_PARM(x)    (void) x
+#define UNIMPLEMENTED_PARM(x)   (void) x
+#endif
 
 /************** Debugging Stuff  *******************************************/
 
