@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEdgecode.cpp,v 1.18 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFEdgecode.cpp,v 1.19 2005/01/19 16:39:24 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -78,7 +78,7 @@ AAFRESULT STDMETHODCALLTYPE
 		ImplAAFDictionarySP pDict;
 		CHECK(GetDictionary(&pDict));
 		CHECK(SetNewProps(length,
-						  pDict->GetBuiltinDefs()->ddkAAFEdgecode()));
+						  pDict->GetBuiltinDefs()->ddEdgecode()));
 		_start = edgecode.startFrame;
 		if (edgecode.filmKind < kAAFFtNull || edgecode.filmKind > kAAFFt65MM)
 			return AAFRESULT_INVALID_FILMTYPE;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceMob.cpp,v 1.64 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFSourceMob.cpp,v 1.65 2005/01/19 16:39:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -300,7 +300,7 @@ AAFRESULT STDMETHODCALLTYPE
 				  CreateInstance((ImplAAFObject**) &aSequ));
 			CHECK(aSequ->Initialize(pDictionary->
 									GetBuiltinDefs()->
-									ddkAAFTimecode()));
+									ddTimecode()));
 			CHECK(aSequ->AppendComponent(tccp));
 			CHECK(mobSlot->SetSegment(aSequ));
 
@@ -311,7 +311,7 @@ AAFRESULT STDMETHODCALLTYPE
 				  CreateInstance ((ImplAAFObject**) &aSequ));
 			CHECK(aSequ->Initialize(pDictionary->
 									GetBuiltinDefs()->
-									ddkAAFTimecode()));
+									ddTimecode()));
 			CHECK(aSequ->AppendComponent(tccp));
 			CHECK(AppendNewTimelineSlot(editrate, aSequ, slotID,
 										L"Timecode", zeroPos, &newSlot));
@@ -394,18 +394,18 @@ AAFRESULT STDMETHODCALLTYPE
 			  CreateInstance((ImplAAFObject**) &filler1));
 		CHECK(filler1->Initialize(pDictionary->
 								  GetBuiltinDefs()->
-								  ddkAAFEdgecode(), zeroLen));	
+								  ddEdgecode(), zeroLen));	
 		CHECK(pDictionary->GetBuiltinDefs()->cdFiller()->
 			  CreateInstance ((ImplAAFObject**) &filler2));
 		CHECK(filler2->Initialize(pDictionary->
 								  GetBuiltinDefs()->
-								  ddkAAFEdgecode(), zeroLen));	
+								  ddEdgecode(), zeroLen));	
 
 		CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
 			  CreateInstance ((ImplAAFObject**) &ecSequence));
 		CHECK(ecSequence->Initialize(pDictionary->
 									 GetBuiltinDefs()->
-									 ddkAAFEdgecode()));	
+									 ddEdgecode()));	
 
 		CvtInt32toLength(length32, length);
 		CvtInt32toPosition(startEC, startPos);
