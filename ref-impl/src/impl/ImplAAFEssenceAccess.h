@@ -4,32 +4,27 @@
 #define __ImplAAFEssenceAccess_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 class ImplAAFContainerDef;
 class ImplAAFDataDef;
@@ -55,6 +50,14 @@ class ImplAAFEssenceSampleIndex;
 #include "AAFPlugin.h"
 #endif
 
+#ifndef OMVECTOR_H
+#include "OMVector.h"
+#endif
+
+#ifndef OMVECTORITERATOR_H
+#include "OMVectorIterator.h"
+#endif
+
 typedef struct
 {
   aafUID_t mediaKind;
@@ -64,6 +67,26 @@ typedef struct
 
 typedef enum { kAAFCreated, kAAFAppended, kAAFReadOnly } aafOpenType_t;
 
+#include <vector>
+#include <iterator>
+
+typedef struct _tagAccessor_t
+{
+	ImplAAFSourceMob 	    *fileMob;
+	ImplAAFFileDescriptor	*mdes;
+	IAAFEssenceCodec		*codec;
+	IAAFMultiEssenceCodec *multicodec;
+	IAAFEssenceData			 *internalEssenceData;
+	IAAFEssenceStream		*stream;
+	ImplAAFFile					 *dataFile;
+	aafUID_t					 containerDefID;
+	aafPosition_t				offset, pos;
+	aafLength_t					length;
+	bool operator ==(_tagAccessor_t accessor)
+	{
+		return 0 == memcmp(this, &accessor, sizeof(_tagAccessor_t));
+	}
+} aafAccessor_t;
 
 class ImplAAFEssenceAccess : public ImplAAFRoot
 {
@@ -171,6 +194,55 @@ public:
 	// object, which must be closed on file close.
 	//@comm Replaces omfmMediaOpen*/
 	
+  //****************
+  // Append()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Append
+        (ImplAAFMasterMob *masterMob,
+		// @parm [in] 
+		 aafSlotID_t masterSlotID,
+
+         // @parm [in] create essence of this type
+         const aafUID_t & mediaKind,
+
+ 		 const aafUID_t & codecID,
+		 const aafRational_t & editRate,
+		 const aafRational_t & sampleRate,
+
+         // @parm [in] optionally compressing it
+         aafCompressEnable_t  Enable);
+	//@comm Appends a single channel stream of essence.  Convenience functions
+	// exist to create audio or video essence, and a separate call
+	// (MultiAppend) exists to create interleaved audio and
+	// video data.
+	//@comm The essence handle from this call can be used with
+	// WriteDataSamples  and possibly WriteDataLines, but NOT with
+	// WriteMultiSamples.
+	//@comm If you are creating the essence, and then attaching it to a master
+	// mob, then the "masterMob" field may be left NULL.
+	// For video, the sampleRate should be the edit rate of the file mob.
+	// For audio, the sample rate should be the actual samples per second.
+	//@comm Replaces omfmMediaCreate
+
+/****/
+  //****************
+  // MultiAppend()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    MultiAppend
+        (					ImplAAFMasterMob *masterMob,
+ 							aafUID_constref codecID,
+                          aafUInt16  /*arrayElemCount*/,
+                           aafmMultiCreate_t *  /*mediaArray*/,
+                           aafCompressEnable_t  /*Enable*/t);
+	//@comm The essence handle from this call can be used with
+	// WriteDataSamples or WriteMultiSamples but NOT with 
+	// or WriteDataLines.
+	//@comm If you are creating the essence, and then attaching it to a master
+	// mob, then the "masterMob" field may be left NULL.
+	//@comm Replaces omfmMediaMultiCreate
+
 /****/
   //****************
   // MultiOpen()
@@ -551,6 +623,8 @@ private:
 	IAAFPluginDef		*_codecDescriptor;
 	ImplAAFFile				*_dataFile;
 	ImplAAFSourceMob		*_dataFileMob;
+	OMVector<aafAccessor_t> _codecList;
+	OMVectorIterator<aafAccessor_t> _cur;
 };
 
 #endif // ! __ImplAAFEssenceAccess_h__
