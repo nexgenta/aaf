@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImportAudioExample.cpp,v 1.17 2004/05/05 15:48:40 stuart_hc Exp $ $Name:  $
+// $Id: ImportAudioExample.cpp,v 1.18 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -191,7 +191,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	check(pHeader->GetDictionary(&pDictionary));
 
 	/* Lookup any necessary data definitions. */
-	check(pDictionary->LookupDataDef(DDEF_Sound, &pSoundDef));
+	check(pDictionary->LookupDataDef(kAAFDataDef_Sound, &pSoundDef));
 
 	// Here we check on the number of mobs in the file. 
 	// Get the number of master mobs in the file (must not be zero)

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: propaccess.cpp,v 1.22 2004/05/27 17:06:49 asuraparaju Exp $ $Name:  $
+// $Id: propaccess.cpp,v 1.23 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -353,7 +353,7 @@ HRESULT createStinkyFiller (IAAFDictionary * pDict,
 				   CreateInstance(IID_IAAFFiller,
 								  (IUnknown **) &pFill));
   assert (pFill);
-  PROPAGATE_RESULT (pFill->Initialize(defs.ddSound(), 10));
+  PROPAGATE_RESULT (pFill->Initialize(defs.ddkAAFSound(), 10));
 
   IAAFObjectSP pObj;
   PROPAGATE_RESULT (pFill->QueryInterface(IID_IAAFObject,

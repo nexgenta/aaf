@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComEssenceDataTest.cpp,v 1.62 2004/05/05 16:01:39 stuart_hc Exp $ $Name:  $
+// $Id: ComEssenceDataTest.cpp,v 1.63 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -225,7 +225,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 									  &pCDMasterMob));
 	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
 									  &pCDNetworkLocator));
-	check(pDictionary->LookupDataDef(DDEF_Sound,
+	check(pDictionary->LookupDataDef(kAAFDataDef_Sound,
 									 &pDdefSound));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence

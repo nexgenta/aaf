@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportSimpleComposition.cpp,v 1.21 2004/05/05 15:48:40 stuart_hc Exp $ $Name:  $
+// $Id: ExportSimpleComposition.cpp,v 1.22 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -229,7 +229,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
   check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator, &pNetworkLocatorDef));
 
   /* Lookup any necessary data definitions. */
-  check(pDictionary->LookupDataDef(DDEF_Sound, &pSoundDef));
+  check(pDictionary->LookupDataDef(kAAFDataDef_Sound, &pSoundDef));
 	
 	/* Create a Mastermob */
 
@@ -457,7 +457,7 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
   check(pDictionary->LookupClassDef(AUID_AAFSourceClip, &pSourceClipDef));
 
   /* Lookup any necessary data definitions. */
-  check(pDictionary->LookupDataDef(DDEF_Sound, &pSoundDef));
+  check(pDictionary->LookupDataDef(kAAFDataDef_Sound, &pSoundDef));
   
 
 	// Get the number of master mobs in the existing file (must not be zero)

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComClientTestAAF.cpp,v 1.53 2004/02/27 14:26:37 stuart_hc Exp $ $Name:  $
+// $Id: ComClientTestAAF.cpp,v 1.54 2004/10/22 15:23:21 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -535,7 +535,7 @@ static void CreateAAFFile(aafWChar * pFileName)
 			 CreateInstance(IID_IAAFSourceClip, 
 							(IUnknown **)&sclp));
 		 check(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 check(pComponent->SetDataDef(defs.ddPicture()));
+		 check(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		pComponent->Release();
 		pComponent = NULL;
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
