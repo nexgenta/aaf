@@ -10,6 +10,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -18,6 +19,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -32,6 +34,10 @@
 #include "ImplAAFObject.h"
 #include "OMProperty.h"
 
+// Persistent Property IDs
+
+const int PID_SOURCEREFERENCE_SOURCEID		= 1;
+const int PID_SOURCEREFERENCE_SRCMOBSLOTID	= 2;
 
 class ImplAAFSourceReference : public ImplAAFSegment
 {
@@ -67,7 +73,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetSourceMobSlotID
 		// @parm [retval][out] Place to put source mob slot ID
-        (aafSlotID_t *  pMobSlotID);
+        (aafTrackID_t *  pMobSlotID);
 
   //****************
   // SetSourceMobSlotID()
@@ -75,13 +81,18 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetSourceMobSlotID
 		// @parm [in] Source Mob ID to set
-        (aafSlotID_t   mobSlotID);
+        (aafTrackID_t   mobSlotID);
+
+
 
 public:
-	//SDK-private
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFSourceReference);
 
-	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
-
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFSourceReferenceTest.cpp.
+  static AAFRESULT test();
 private:
 	OMFixedSizeProperty<aafUID_t>	_sourceID;
 	OMFixedSizeProperty<aafInt32>	_sourceMobSlotId;
