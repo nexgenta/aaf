@@ -136,6 +136,7 @@ OMStorable* OMObjectReference::pointer(void) const
 }
 
 // class OMStrongObjectReference
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMStrongObjectReference
 
   // @mfunc Constructor.
 OMStrongObjectReference::OMStrongObjectReference(void)
@@ -337,7 +338,7 @@ OMStorable* OMStrongObjectReference::getValue(void) const
   TRACE("OMStrongObjectReference::getValue");
 
   OMStrongObjectReference* nonConstThis =
-                  const_cast<OMStrongObjectReference*>(this);
+                                    const_cast<OMStrongObjectReference*>(this);
 
   if (!isLoaded()) {
     nonConstThis->load();
@@ -350,7 +351,7 @@ OMStorable* OMStrongObjectReference::getValue(void) const
 }
 
   // @mfunc Set the value of this <c OMStrongObjectReference>.
-  //        The value is a pointer to the <c OMStorable>.
+  //        The value is a pointer to the referenced <c OMStorable>.
   //   @parm A pointer to the new <c OMStorable>.
   //   @rdesc A pointer to previous <c OMStorable>, if any.
 OMStorable* OMStrongObjectReference::setValue(const OMStorable* value)
@@ -380,6 +381,13 @@ OMStorable* OMStrongObjectReference::setValue(const OMStorable* value)
   setLoaded();
   POSTCONDITION("Element properly set", _pointer == newObject);
   return oldObject;
+}
+
+const wchar_t* OMStrongObjectReference::name(void) const
+{
+  TRACE("OMStrongObjectReference::name");
+
+  return _name;
 }
 
   // @mfunc Is this <c OMStrongObjectReference> in the loaded state. If false
@@ -450,6 +458,7 @@ void OMStrongObjectReference::load(void)
 }
 
 // class OMWeakObjectReference
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMWeakObjectReference
 
   // @mfunc Constructor.
 OMWeakObjectReference::OMWeakObjectReference(void)
@@ -610,7 +619,7 @@ OMStorable* OMWeakObjectReference::getValue(void) const
 }
 
   // @mfunc Set the value of this <c OMWeakObjectReference>.
-  //        The value is a pointer to the <c OMStorable>.
+  //        The value is a pointer to the referenced <c OMStorable>.
   //   @parm TBS
   //   @parm A pointer to the new <c OMStorable>.
   //   @rdesc A pointer to previous <c OMStorable>, if any.
@@ -629,11 +638,11 @@ OMStorable* OMWeakObjectReference::setValue(
 
   OMStorable* oldObject = _pointer;
   _pointer = const_cast<OMStorable*>(value);
- _identification = identification;
+  _identification = identification;
 
- #if defined(OM_VALIDATE_WEAK_REFERENCES)
+#if defined(OM_VALIDATE_WEAK_REFERENCES)
   ASSERT("Consistent source and target",
-                     IMPLIES(_pointer != 0, set()->contains(_identification)));
+                    IMPLIES(_pointer != 0, set()->contains(&_identification)));
 #endif
 
   POSTCONDITION("Element properly set", _pointer == value);
