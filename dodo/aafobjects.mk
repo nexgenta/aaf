@@ -11,6 +11,8 @@ AAFPERSISTENTOBJECTS = \
 	AAFAIFCData \
 	AAFAIFCDescriptor \
 	AAFClassDef \
+	AAFCodecDef \
+	AAFContainerDef \
 	AAFDictionary \
 	AAFCommentMarker \
 	AAFConstValue \
@@ -37,6 +39,10 @@ AAFPERSISTENTOBJECTS = \
 	AAFNestedScope\
 	AAFParameter \
 	AAFParameterDef \
+	AAFPluggableCode \
+	AAFPluggableDef \
+	AAFPluginManager \
+	AAFPluginDescriptor \
 	AAFPulldown \
 	AAFPropertyDef \
 	AAFReferenceValue \
@@ -73,14 +79,18 @@ AAFNONPERSISTENTOBJECTS = \
 	AAFProperty \
 	AAFPropertyValue \
 	EnumAAFClassDefs \
+	EnumAAFCodecFlavours \
 	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFDefs \
 	EnumAAFEffectDefs \
 	EnumAAFIdentifications \
+	EnumAAFLoadedPlugins \
 	EnumAAFMobComments \
 	EnumAAFObjects \
 	EnumAAFParameterDefs \
+	EnumAAFPluginDescriptors \
+	EnumAAFPluginLocators \
 	EnumAAFPropertyDefs \
 	EnumAAFPropertyValues \
 	EnumAAFProperties \
