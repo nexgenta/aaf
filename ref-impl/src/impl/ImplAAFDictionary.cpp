@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.126 2005/03/18 18:18:55 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.127 2005/04/01 16:44:21 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1492,9 +1492,9 @@ void ImplAAFDictionary::InitBuiltins()
   InitDataDef (kAAFDataDef_Timecode, L"Timecode", L"Timecode data");
 
   // Legacy definitions
-  InitDataDef (kAAFDataDef_LegacyPicture, L"Picture", L"Picture data (legacy)");
-  InitDataDef (kAAFDataDef_LegacySound, L"Sound", L"Sound data (legacy)");
-  InitDataDef (kAAFDataDef_LegacyTimecode, L"Timecode", L"Timecode data (legacy)");
+  InitDataDef (kAAFDataDef_LegacyPicture, L"Picture", L"Picture data");
+  InitDataDef (kAAFDataDef_LegacySound, L"Sound", L"Sound data");
+  InitDataDef (kAAFDataDef_LegacyTimecode, L"Timecode", L"Timecode data");
 
   //**********************
 
