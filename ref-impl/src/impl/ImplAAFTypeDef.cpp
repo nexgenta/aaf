@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -31,18 +31,12 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFTypeDefUIDs.h"
 
-#ifndef __ImplAAFPropValData_h__
-#include "ImplAAFPropValData.h"
-#endif
-
-#include "ImplAAFObjectCreation.h"
-
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
-extern "C" const aafClassID_t CLSID_AAFPropValData;
-
+#if defined(macintosh) || defined(_MAC)
+#include <wstring.h>
+#endif
 
 ImplAAFTypeDef::ImplAAFTypeDef ()
 {}
@@ -123,7 +117,7 @@ aafBool ImplAAFTypeDef::IsFixedSize (void) const
 {
   // Should be implemented in derived class.
   assert (0);
-  return kAAFFalse; // not reached!
+  return AAFFalse; // not reached!
 }
 
 
@@ -139,12 +133,7 @@ aafBool ImplAAFTypeDef::IsRegistered (void) const
 {
   // Should be implemented in derived class.
   assert (0);
-  return kAAFFalse; // not reached!
-}
-
-void ImplAAFTypeDef::AttemptBuiltinRegistration (void)
-{
-  // Default: will not attempt to register.
+  return AAFFalse; // not reached!
 }
 
 
@@ -156,82 +145,34 @@ size_t ImplAAFTypeDef::NativeSize (void) const
 }
 
 
+/*
 OMProperty * ImplAAFTypeDef::pvtCreateOMProperty
+  (OMPropertyId pid,
+   const aafCharacter * name) const
+{
+  assert (name);
+  size_t wNameLen = wcslen (name) + 1;
+
+  // Convert the prop name
+  char * nameBuf = new char [wNameLen];
+  assert (nameBuf);
+  wcstombs (nameBuf, name, wNameLen);
+
+  OMProperty * result = pvtCreateOMPropertyMBS (pid, nameBuf);
+  delete[] nameBuf;
+  return result;
+}
+*/
+
+OMProperty * ImplAAFTypeDef::pvtCreateOMPropertyMBS
   (OMPropertyId /*pid*/,
-   const wchar_t * /*name*/) const
+   const char * /*name*/) const
 {
   // Should be implemented in derived class.
   assert (0);
   return 0; // not reached!
 }
 
-
-
-
-// Allocate and initialize the correct subclass of ImplAAFPropertyValue 
-// for the given OMProperty.
-AAFRESULT STDMETHODCALLTYPE
-  ImplAAFTypeDef::CreatePropertyValue(
-    OMProperty *property,
-    ImplAAFPropertyValue ** ppPropertyValue ) const
-{
-  AAFRESULT result = AAFRESULT_SUCCESS;
-  assert (property && ppPropertyValue);
-  if (NULL == property || NULL == ppPropertyValue)
-    return AAFRESULT_NULL_PARAM;
-  *ppPropertyValue = NULL; // initialize out parameter
-  assert (property->definition());
-  if (NULL == property->definition())
-    return AAFRESULT_INVALID_PARAM;
-  const OMType *type = property->definition()->type();
-  assert (type);
-  ImplAAFTypeDef *ptd = const_cast<ImplAAFTypeDef *>
-                          (dynamic_cast<const ImplAAFTypeDef *>(type));
-  assert (ptd);
-  if (NULL == ptd)
-    return AAFRESULT_INVALID_PARAM;
- 
-  ImplAAFPropValData *pvd = NULL;
-  pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
-  if (!pvd) 
-    return AAFRESULT_NOMEMORY;
-
-  result = pvd->Initialize (ptd);
-  if (AAFRESULT_SUCCEEDED(result))
-  {
-    // set the storage in the prop value
-    size_t bitsSize;
-    assert (property);
-    bitsSize = property->bitsSize ();
-    aafMemPtr_t pBits = NULL;
-    // Bobt hack! This should be removed once we have proper
-    // integration with OM property def support.
-    if (! property->isOptional() || property->isPresent ())
-    {
-      result = pvd->AllocateBits (bitsSize, &pBits);
-      if (AAFRESULT_SUCCEEDED (result))
-      {
-	if (bitsSize)
-        {
-          assert (pBits);
-          property->getBits (pBits, bitsSize);
-        }
-      }
-    }
-  }
-
-  if (AAFRESULT_SUCCEEDED(result))
-  {
-    *ppPropertyValue = pvd; // ref count is already 1.
-    pvd = NULL;
-  }
-  else
-  {
-    pvd->ReleaseReference(); // delete the new object.
-  }
-
-  return (result) ;
-}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDef::pvtGetUInt8Array8Type (
@@ -244,7 +185,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT hr = GetDictionary(&pDict);
   if (AAFRESULT_FAILED (hr)) return hr;
   
-  return pDict->LookupTypeDef (kAAFTypeID_UInt8Array, ppRawTypeDef);
+  return pDict->LookupType (kAAFTypeID_UInt8Array, ppRawTypeDef);
 }
 
 
@@ -264,26 +205,3 @@ bool ImplAAFTypeDef::IsVariableArrayable () const
 
 bool ImplAAFTypeDef::IsStringable () const
 { assert (0); return false; }
-
-
-
-
-
-
-// override from OMStorable.
-const OMClassId& ImplAAFTypeDef::classId(void) const
-{
-  // This should be overridden by each specific type definition.
-  return ImplAAFMetaDefinition::classId();
-}
-
-// Override callbacks from OMStorable
-void ImplAAFTypeDef::onSave(void* clientContext) const
-{
-  ImplAAFMetaDefinition::onSave(clientContext);
-}
-
-void ImplAAFTypeDef::onRestore(void* clientContext) const
-{
-  ImplAAFMetaDefinition::onRestore(clientContext);
-}
