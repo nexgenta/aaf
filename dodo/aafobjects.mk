@@ -40,9 +40,7 @@ AAFPERSISTENTOBJECTS = \
 	AAFReferenceValue \
 	AAFScopeReference \
 	AAFSequence \
-	AAFSourceClip \
 	AAFSourceMob \
-	AAFSourceReference \
 	AAFStringAttribute \
 	AAFTimecode \
 	AAFTimecodeStream \
@@ -80,6 +78,12 @@ AAFNONPERSISTENTOBJECTS = \
 	EnumAAFTypeDefs 
 
 
+# These are files which specify COM interfaces, but which are
+# implemented in other objects.
+AAFCOMINTERFACESONLY = \
+	AAFEndian
+
+
 # These are the impl files that are typed by humans.  Be sure to
 # remove them from the other list.  As you check each one in, just add
 # its name here and remove it from either list above where it occurs.
@@ -94,6 +98,8 @@ HUMAN_TYPED_IMPL = \
 	AAFSegment \
 	AAFMobSlot \
 	AAFTimelineMobSlot \
+	AAFSourceReference \
+	AAFSourceClip \
 	AAFSession
 
 
