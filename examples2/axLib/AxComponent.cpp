@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.cpp,v 1.18 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxComponent.cpp,v 1.19 2004/08/29 18:19:42 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -339,6 +339,11 @@ void AxOperationGroup::Initialize( IAAFDataDefSP spIaafDataDef,
 void AxOperationGroup::AppendInputSegment( IAAFSegmentSP spIaafSegment )
 {
 	CHECK_HRESULT( _spIaafOperationGroup->AppendInputSegment( spIaafSegment ) );
+}
+
+void AxOperationGroup::AddParameter( IAAFParameterSP spIaafParameter )
+{
+	CHECK_HRESULT( _spIaafOperationGroup->AddParameter( spIaafParameter ) );
 }
 
 IAAFOperationDefSP AxOperationGroup::GetOperationDef()
