@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefsGen.h,v 1.15 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefsGen.h,v 1.16 2004/12/14 20:52:47 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -341,70 +341,6 @@ static TypeString s_AAFAllTypeStrings [] = {
 
 #define AAF_TYPE_DEFINITION_STRING(name, id, type) \
   {L"aaf" L###name, id, (aafUID_t *)& AAF_TYPE(type), 1},
-
-#define AAF_TYPE_TABLE_END()  \
-0 };
-
-#include "AAFMetaDictionary.h"
-
-//
-// Pass 13a:  Do stuff for character types.
-//
-#define AAF_TYPE_TABLE_BEGIN()  \
-struct TypeCharacter            \
-{                               \
-  const wchar_t * typeName;     \
-  aafUID_t        typeID;       \
-  aafUInt8        size;         \
-  int             isValid;      \
-};                              \
-                                \
-static TypeCharacter s_AAFAllTypeCharacters [] = {
-
-#define AAF_TYPE_DEFINITION_CHARACTER(name, id) \
-  {L"aaf" L###name, id, 2, 1},
-
-#define AAF_TYPE_TABLE_END()  \
-0 };
-
-#include "AAFMetaDictionary.h"
-
-//
-// Pass 13b:  Do stuff for indirect types. (there should be only one!)
-//
-#define AAF_TYPE_TABLE_BEGIN()  \
-struct TypeIndirect             \
-{                               \
-  const wchar_t * typeName;     \
-  aafUID_t        typeID;       \
-  int             isValid;      \
-};                              \
-                                \
-static TypeIndirect s_AAFAllTypeIndirects [] = {
-
-#define AAF_TYPE_DEFINITION_INDIRECT(name, id) \
-  {L"aaf" L###name, id, 1},
-
-#define AAF_TYPE_TABLE_END()  \
-0 };
-
-#include "AAFMetaDictionary.h"
-
-//
-// Pass 13c:  Do stuff for opaque types. (there should be only one!)
-//
-#define AAF_TYPE_TABLE_BEGIN()  \
-struct TypeOpaque             \
-{                               \
-  const wchar_t * typeName;     \
-  aafUID_t        typeID;       \
-  int             isValid;      \
-};                              \
-                                \
-static TypeOpaque s_AAFAllTypeOpaques [] = {
-
-#define AAF_TYPE_DEFINITION_OPAQUE(name, id) \
-  {L"aaf" L###name, id, 1},
 
 #define AAF_TYPE_TABLE_END()  \
 0 };
