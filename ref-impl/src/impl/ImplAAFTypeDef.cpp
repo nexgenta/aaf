@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -17,6 +16,9 @@
 #include <assert.h>
 #include <string.h>
 
+#if defined(macintosh) || defined(_MAC)
+#include <wstring.h>
+#endif
 
 ImplAAFTypeDef::ImplAAFTypeDef ()
 {}
