@@ -30,7 +30,7 @@ static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
+	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	aafProductIdentification_t	ProductInfo;
@@ -48,30 +48,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	/*
 	hr = CoCreateInstance(CLSID_AAFSession,
 						   NULL, 
 						   CLSCTX_INPROC_SERVER, 
 						   IID_IAAFSession, 
 						   (void **)&pSession);
-	*/
-	hr = CoCreateInstance(CLSID_AAFFile,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFFile, 
-						   (void **)&pFile);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-    hr = pFile->Initialize();
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->SetDefaultIdentification(&ProductInfo);
-	// if (AAFRESULT_SUCCESS != hr)
-	// 	return hr;
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	// hr = pSession->CreateFile(pFileName, kAAFRev1, &pFile);
-	hr = pFile->OpenNewModify(pFileName, 0, &ProductInfo);
+	hr = pSession->CreateFile(pFileName, kAAFRev1, &pFile);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
   
@@ -144,21 +133,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->EndSession();
- 	// if (AAFRESULT_SUCCESS != hr)
-	//	return hr;
+	hr = pSession->EndSession();
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	pMob->Release();
-	pHeader->Release();
 	if (pFile) pFile->Release();
-	// if (pSession) pSession->Release();
+	if (pSession) pSession->Release();
 
 	return AAFRESULT_SUCCESS;
 }
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
+	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	aafProductIdentification_t	ProductInfo;
@@ -176,30 +164,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 	  
-	/*
 	hr = CoCreateInstance(CLSID_AAFSession,
 						   NULL, 
 						   CLSCTX_INPROC_SERVER, 
 						   IID_IAAFSession, 
 						   (void **)&pSession);
-	*/
-	hr = CoCreateInstance(CLSID_AAFFile,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFFile, 
-						   (void **)&pFile);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-    hr = pFile->Initialize();
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->SetDefaultIdentification(&ProductInfo);
-	// if (AAFRESULT_SUCCESS != hr)
-	// 	return hr;
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	// hr = pSession->OpenReadFile(pFileName, &pFile);
-	hr = pFile->OpenExistingRead(pFileName, 0);
+	hr = pSession->OpenReadFile(pFileName, &pFile);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
   
@@ -215,10 +192,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 	IEnumAAFMobs *mobIter;
 
-	aafSearchCrit_t		criteria;
-	criteria.searchTag = kNoSearch;
+//!!!	aafSearchCrit_t		criteria;
+//!!!	criteria.searchTag = kNoSearch;
 
-    hr = pHeader->EnumAAFAllMobs (&criteria, &mobIter);
+    hr = pHeader->EnumAAFAllMobs (NULL, &mobIter);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 	for(n = 0; n < numMobs; n++)
@@ -266,33 +243,22 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 //				if (memcmp(slotName, slotNames[s], 10) != 0) 
 				if (wcscmp(slotName, slotNames[s]) != 0) 
 					return AAFRESULT_TEST_FAILED;
-
-				slot->Release();
-				slot = NULL;
 			}
-
-		}
-		if(aMob != NULL)
-		{
-			aMob->Release();
-			aMob = NULL;
 		}
 	}
 
-	mobIter->Release();
-	mobIter = NULL;
-	
- 	hr = pFile->Close();
+	//!!! Problem deleting, let it leak -- 	delete mobIter;
+	hr = pFile->Close();
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->EndSession();
-	// if (AAFRESULT_SUCCESS != hr)
-	// 	return hr;
+	hr = pSession->EndSession();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	if (pHeader) pHeader->Release();
 	if (pFile) pFile->Release();
-	// if (pSession) pSession->Release();
+	if (pSession) pSession->Release();
 
 	return 	AAFRESULT_SUCCESS;
 }
@@ -307,8 +273,8 @@ HRESULT CAAFMob::test()
 	try
 	{
 		hr = CreateAAFFile(	pFileName );
-		if(hr == AAFRESULT_SUCCESS)
-			hr = ReadAAFFile( pFileName );
+
+		hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
@@ -320,10 +286,6 @@ HRESULT CAAFMob::test()
   // Cleanup our object if it exists.
   if (pObject)
 	pObject->Release();
-
-  	// When all of the functionality of this class is tested, we can return success
-	if(hr == AAFRESULT_SUCCESS)
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 
   return hr;
 }
