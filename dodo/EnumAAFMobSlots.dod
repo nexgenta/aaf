@@ -22,7 +22,7 @@ AD_FORWARD_DECLARATION(AAFMobSlot)
 AD_CLASS_UUID(B1A21389, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21388, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_XCLASS_BEGIN(Concrete, Transient)
+AD_CLASS_BEGIN
 AD_XMETHOD1(NextOne,
 			[out\,retval],
 			objOut,
@@ -53,28 +53,25 @@ AD_XMETHOD1(NextOne,
   //   - Hit the end of the list of slots being enumerated over.)
 
 
-AD_X2METHOD3(Next,
+AD_XMETHOD3(Next,
 
 			[in],
 			objPass,
 			aafUInt32,
 			count,
 			number of mob slots requested,
-			xxx,
 
 			[out\, size_is\(count\)\, length_is\(*pNumFetched\)],
-			objOutArray,
+			objOut,
 			AAFMobSlot,
 			ppMobSlots,
 			array to receive mob slots,
-			count,
 
 			[out\,ref],
 			objPass,
 			aafUInt32 *,
 			pNumFetched,
 			number of actual MobSlots fetched into ppMobSlots array,
-			xxx,
 
 			Enumerates the next count elements \(AAFMobSlot pointers\) in 
   // the enumerator's list\, returning them in the given array along
@@ -161,4 +158,4 @@ AD_XMETHOD1(Clone,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-AD_XCLASS_END(Concrete, Transient)
+AD_CLASS_END

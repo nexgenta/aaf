@@ -25,7 +25,7 @@ AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_CLASS_UUID(809c8ca9, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(809c8caa, 9884, 11d2, 84, 1f, 00, 60, 08, 32, ac, b8)
-AD_XCLASS_BEGIN(Concrete, Transient)
+AD_CLASS_BEGIN
 AD_XMETHOD1(NextOne,
 			[out\,retval],
 			objOut,
@@ -56,20 +56,18 @@ AD_XMETHOD1(NextOne,
   //   - no Components remaining to be returned.)
 
 
-AD_X2METHOD3(Next,
+AD_XMETHOD3(Next,
 			[in],
 			objPass,
 			aafUInt32,
 			count,
 			number of objects requested,
-			xxx,
 
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOutArray,
+			objOut,
 			AAFPropertyValue,
 			ppPropertyValues,
 			array to receive Property Values,
-			count,
 
 			[out\,ref],
 			objPass,
@@ -77,7 +75,7 @@ AD_X2METHOD3(Next,
 			pFetched,
 			number of actual Property Values fetched into ppPropertyValues
 	// array,
-			xxx,
+
 			Enumerates the next count elements \(AAFPropertyValue pointers\)
   // in the enumerator's list\, returning them in the given array
   // along with the actual number of enumerated elements in
@@ -168,4 +166,4 @@ AD_XMETHOD1(Clone,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-AD_XCLASS_END(Concrete, Transient)
+AD_CLASS_END
