@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFAuxiliaryDescriptor.h,v 1.1.2.2 2004/05/03 01:17:56 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFAuxiliaryDescriptor.h,v 1.1.2.3 2004/05/11 02:17:52 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -125,9 +125,9 @@ public:
   AAFRESULT SetString (aafCharacter_constptr  pCharSet,
 		       OMWideStringProperty& theStoredString );
   AAFRESULT GetString( aafCharacter *  pCharSet, aafUInt32 bufSize,
-		       OMWideStringProperty& theStoredString );
+		       bool isOptional, OMWideStringProperty& theStoredString );
   AAFRESULT GetStringBufLen( aafUInt32 *  pBufSize,
-			     OMWideStringProperty& theStoredString );
+			     bool isOptional, OMWideStringProperty& theStoredString );
     
   OMWideStringProperty _mimeType;
   OMWideStringProperty _charSet;

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFDescriptiveMarker.cpp,v 1.1.2.1 2004/05/08 22:14:24 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDescriptiveMarker.cpp,v 1.1.2.2 2004/05/11 02:17:52 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,13 +47,19 @@ ImplAAFDescriptiveMarker::ImplAAFDescriptiveMarker ()
 
 
 ImplAAFDescriptiveMarker::~ImplAAFDescriptiveMarker ()
-{}
+{
+  ImplAAFDescriptiveFramework* pFramework = _descriptiveFramework.clearValue();
+  if ( pFramework ) {
+    pFramework->ReleaseReference();
+    pFramework = 0;
+  }
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDescriptiveMarker::Initialize ()
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_SUCCESS;
 }
 
 

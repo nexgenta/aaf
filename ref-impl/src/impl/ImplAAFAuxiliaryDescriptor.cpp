@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFAuxiliaryDescriptor.cpp,v 1.1.2.2 2004/05/03 01:17:56 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFAuxiliaryDescriptor.cpp,v 1.1.2.3 2004/05/11 02:17:52 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,17 +23,6 @@
 // All rights reserved.
 //
 //=---------------------------------------------------------------------=
-
-
-
-
-
-
-
-
-
-
-
 
 #include "AAFStoredObjectIDs.h"
 
@@ -80,7 +69,7 @@ AAFRESULT STDMETHODCALLTYPE
       aafCharacter *  pMimeType,
       aafUInt32  bufSize)
 {
-  return GetString( pMimeType, bufSize, _mimeType );
+  return GetString( pMimeType, bufSize, false, _mimeType );
 }
 
 
@@ -89,7 +78,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFAuxiliaryDescriptor::GetMimeTypeBufLen (
       aafUInt32 *  pBufSize)
 {
-  return GetStringBufLen( pBufSize, _mimeType );
+  return GetStringBufLen( pBufSize, false, _mimeType );
 }
 
 
@@ -107,7 +96,7 @@ AAFRESULT STDMETHODCALLTYPE
       aafCharacter *  pCharSet,
       aafUInt32  bufSize)
 {
-  return GetString( pCharSet, bufSize, _charSet );
+  return GetString( pCharSet, bufSize, true, _charSet );
 }
 
 
@@ -116,7 +105,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFAuxiliaryDescriptor::GetCharSetBufLen (
       aafUInt32 *  pBufSize)
 {
-  return GetStringBufLen( pBufSize, _charSet );
+  return GetStringBufLen( pBufSize, true, _charSet );
 }
 
 
@@ -136,6 +125,7 @@ AAFRESULT ImplAAFAuxiliaryDescriptor::SetString (aafCharacter_constptr  pString,
 }
 
 AAFRESULT ImplAAFAuxiliaryDescriptor::GetString( aafCharacter* pString, aafUInt32 bufSize,
+						 bool isOptional,
 						 OMWideStringProperty& theStoredString )
 {
   bool stat;
@@ -143,7 +133,7 @@ AAFRESULT ImplAAFAuxiliaryDescriptor::GetString( aafCharacter* pString, aafUInt3
   if(pString == NULL)
     return(AAFRESULT_NULL_PARAM);
   
-  if(!theStoredString.isPresent())
+  if( isOptional && !theStoredString.isPresent())
     return AAFRESULT_PROP_NOT_PRESENT;
   else
     stat = theStoredString.copyToBuffer(pString, bufSize);
@@ -158,12 +148,13 @@ AAFRESULT ImplAAFAuxiliaryDescriptor::GetString( aafCharacter* pString, aafUInt3
 
 
 AAFRESULT ImplAAFAuxiliaryDescriptor::GetStringBufLen( aafUInt32 *  pBufSize,
+						       bool isOptional,
 						       OMWideStringProperty& theStoredString )
 {
   if(pBufSize == NULL)
     return(AAFRESULT_NULL_PARAM);
   
-  if(!theStoredString.isPresent())
+  if( isOptional && !theStoredString.isPresent())
     return AAFRESULT_PROP_NOT_PRESENT;
   else {
     *pBufSize = theStoredString.size();
