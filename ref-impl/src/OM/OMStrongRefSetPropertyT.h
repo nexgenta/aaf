@@ -93,7 +93,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   // create a set index
   //
   size_t count = _set.count();
-  OMUInt32 keySize = sizeof(OMUniqueObjectIdentification);
+  OMUInt32 keySize = sizeof(UniqueIdentification);
   OMStoredSetIndex* index = new OMStoredSetIndex(count,
                                                  _keyPropertyId,
                                                  keySize);
@@ -300,8 +300,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   const size_t localKey = nextLocalKey();
   char* name = elementName(localKey);
   UniqueIdentification key = object->identification();
-  // ASSERT("Valid object identification",
-  //                                  key != nullOMUniqueObjectIdentification);
+  ASSERT("Valid identification", isValidIdentification(key));
 
   SetElement newElement(this, name, localKey, 1/*tjb*/, key);
   newElement.setValue(object);
@@ -701,6 +700,27 @@ OMStrongReferenceSetProperty<UniqueIdentification,
     insert(object);
   }
 
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+bool
+OMStrongReferenceSetProperty<UniqueIdentification,
+                             ReferencedObject>::isValidIdentification(
+                                                UniqueIdentification& id) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::"
+                                                      "isValidIdentification");
+
+  bool result = false;
+  OMByte* p = reinterpret_cast<OMByte*>(&id);
+  for (size_t i = 0; i < sizeof(UniqueIdentification); i++) {
+    if (p[i] != 0) {
+      result = true;
+      break;
+    }
+  }
+  return result;
 }
 
 #endif
