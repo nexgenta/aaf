@@ -1,21 +1,35 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFEssenceData
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
-#include "CEnumAAFEssenceData.h"
-#include "CEnumAAFEssenceData.h"
-#ifndef __CEnumAAFEssenceData_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -24,6 +38,10 @@
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
+#include "AAFResult.h"
+#include "AAFDefUIDs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 
 // Utility class to implement the test.
@@ -46,6 +64,7 @@ struct EnumEssenceDataTest
 
   // Shared member data:
   HRESULT _hr;
+  aafProductVersion_t _productVersion;
   aafProductIdentification_t _productInfo;
   IAAFFile *_pFile;
   bool _bFileOpen;
@@ -61,10 +80,10 @@ struct EnumEssenceDataTest
   static const aafUInt32 _maxMobCount;
 };
 
-HRESULT CEnumAAFEssenceData::test()
+extern "C" HRESULT CEnumAAFEssenceData_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t fileName[] = L"EnumEssenceDataTest.aaf";
+  wchar_t fileName[] = L"EnumAAFEssenceDataTest.aaf";
   EnumEssenceDataTest edt;
 
   try
@@ -74,12 +93,12 @@ HRESULT CEnumAAFEssenceData::test()
   }
   catch (HRESULT& ehr)
   {
-    // thrown by EnumEssenceDataTest::check() method.
+    // thrown by EnumEssenceDataTest_check() method.
     hr = ehr;
   }
   catch (...)
   {
-    cerr << "CAAFEssenceData::test...Caught general C++"
+    cerr << "CAAFEssenceData_test...Caught general C++"
     " exception!" << endl; 
   }
 
@@ -90,6 +109,35 @@ HRESULT CEnumAAFEssenceData::test()
 
 
 const aafUInt32 EnumEssenceDataTest::_maxMobCount = 5;
+
+static const 	aafMobID_t	TEST_MobIDs[EnumEssenceDataTest::_maxMobCount] =
+{//start mobid block
+	//first id
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+		0x13, 0x00, 0x00, 0x00,
+	{0xb1b11414, 0x040e, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
+	
+	//second id
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0xc1a2cdf4, 0x040e, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
+	
+	//third id
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0xc8681b8a, 0x040e, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
+	
+	//fourth id
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0xceaf0c7e, 0x040e, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
+	
+	//fifth id
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0xd755f518, 0x040e, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}
+	
+}; //end mobid block
 
 
 EnumEssenceDataTest::EnumEssenceDataTest():
@@ -105,15 +153,16 @@ EnumEssenceDataTest::EnumEssenceDataTest():
   _pEnumEssenceData(NULL),
   _pEssenceData(NULL)
 {
+  _productVersion.major = 1;
+  _productVersion.minor = 0;
+  _productVersion.tertiary = 0;
+  _productVersion.patchLevel = 0;
+  _productVersion.type = kAAFVersionUnknown;
   _productInfo.companyName = L"AAF Developers Desk";
-  _productInfo.productName = L"EnumEssenceData Module Test";
-  _productInfo.productVersion.major = 1;
-  _productInfo.productVersion.minor = 0;
-  _productInfo.productVersion.tertiary = 0;
-  _productInfo.productVersion.patchLevel = 0;
-  _productInfo.productVersion.type = kVersionUnknown;
+  _productInfo.productName = L"EnumAAFEssenceData Module Test";
+  _productInfo.productVersion = &_productVersion;
   _productInfo.productVersionString = NULL;
-  _productInfo.productID = -1;
+  _productInfo.productID = UnitTestProductID;
   _productInfo.platform = NULL;
 }
 
@@ -207,13 +256,7 @@ void EnumEssenceDataTest::createFile(wchar_t *pFileName)
   removeTestFile(pFileName);
 
 
-  check(CoCreateInstance(CLSID_AAFFile,
-                         NULL, 
-                         CLSCTX_INPROC_SERVER, 
-                         IID_IAAFFile, 
-                         (void **)&_pFile));
-  check(_pFile->Initialize());
-  check(_pFile->OpenNewModify(pFileName, 0, &_productInfo));
+  check(AAFFileOpenNewModify(pFileName, 0, &_productInfo, &_pFile));
   _bFileOpen = true;
   check(_pFile->GetHeader(&_pHeader));
   check(_pHeader->GetDictionary(&_pDictionary));
@@ -221,18 +264,14 @@ void EnumEssenceDataTest::createFile(wchar_t *pFileName)
   for (aafUInt32 item = 0; item < _maxMobCount; ++item)
     createFileMob(item);
  
+  check(_pFile->Save());
+
   cleanupReferences();
 }
 
 void EnumEssenceDataTest::openFile(wchar_t *pFileName)
 {
-  check(CoCreateInstance(CLSID_AAFFile,
-                         NULL, 
-                         CLSCTX_INPROC_SERVER, 
-                         IID_IAAFFile, 
-                         (void **)&_pFile));
-  check(_pFile->Initialize());
-  check(_pFile->OpenExistingRead(pFileName, 0));
+  check(AAFFileOpenExistingRead(pFileName, 0, &_pFile));
   _bFileOpen = true;
   check(_pFile->GetHeader(&_pHeader));
 
@@ -259,27 +298,26 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
     check(AAFRESULT_INTERNAL_ERROR);
 
 
+  CAAFBuiltinDefs defs (_pDictionary);
   // Create a Mob
-  check(_pDictionary->CreateInstance(&AUID_AAFSourceMob,
-              IID_IAAFSourceMob, 
-              (IUnknown **)&_pSourceMob));
+  check(defs.cdSourceMob()->
+		CreateInstance(IID_IAAFSourceMob, 
+					   (IUnknown **)&_pSourceMob));
 
   check(_pSourceMob->QueryInterface (IID_IAAFMob, (void **)&_pMob));
   
-  aafUID_t newUID = {0};
-  check(CoCreateGuid((GUID *)&newUID));
-  check(_pMob->SetMobID(&newUID));
+  check(_pMob->SetMobID(TEST_MobIDs[itemNumber]));
   check(_pMob->SetName(wcBuffer));
   
-  check(_pDictionary->CreateInstance(&AUID_AAFFileDescriptor,
-              IID_IAAFEssenceDescriptor, 
-              (IUnknown **)&_pFileDescriptor));
+  check(defs.cdFileDescriptor()->
+		CreateInstance(IID_IAAFEssenceDescriptor, 
+					   (IUnknown **)&_pFileDescriptor));
 
   check(_pFileDescriptor->QueryInterface (IID_IAAFEssenceDescriptor,
                                           (void **)&_pEssenceDescriptor));
   check(_pSourceMob->SetEssenceDescriptor (_pEssenceDescriptor));
 
-  check(_pHeader->AppendMob(_pMob));
+  check(_pHeader->AddMob(_pMob));
 
   createEssenceData(_pSourceMob);
 
@@ -303,14 +341,15 @@ void EnumEssenceDataTest::createEssenceData(IAAFSourceMob *pSourceMob)
   assert(pSourceMob);
   assert(NULL == _pEssenceData);
 
+  CAAFBuiltinDefs defs (_pDictionary);
 
   // Attempt to create an AAFEssenceData.
-  check(_pDictionary->CreateInstance(&AUID_AAFEssenceData,
-                         IID_IAAFEssenceData,
-                         (IUnknown **)&_pEssenceData));
+  check(defs.cdEssenceData()->
+		CreateInstance(IID_IAAFEssenceData,
+					   (IUnknown **)&_pEssenceData));
 
   check(_pEssenceData->SetFileMob(pSourceMob));
-  check(_pHeader->AppendEssenceData(_pEssenceData));
+  check(_pHeader->AddEssenceData(_pEssenceData));
   
   _pEssenceData->Release();
   _pEssenceData = NULL;
@@ -324,7 +363,7 @@ void EnumEssenceDataTest::openEssenceData()
   assert(NULL == _pSourceMob);
 
   aafUInt32 essenceDataCount = 0;
-  check(_pHeader->GetNumEssenceData(&essenceDataCount));
+  check(_pHeader->CountEssenceData(&essenceDataCount));
   if (_maxMobCount != essenceDataCount)
     check(AAFRESULT_TEST_FAILED);
  
