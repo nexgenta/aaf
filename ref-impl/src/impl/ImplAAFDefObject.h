@@ -8,7 +8,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -44,14 +43,16 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Init
         // @parm [in] Pointer to an AUID reference
-        (aafUID_t *  pAuid, wchar_t *name, wchar_t *description);
+        (const aafUID_t *  pAuid,
+		 const wchar_t *name,
+		 const wchar_t *description);
   //****************
   // GetAUID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetAUID
         // @parm [retval,out] Pointer to an AUID reference
-        (aafUID_t *  pAuid);
+        (aafUID_t * pAuid) const;
 
   //****************
   // SetAUID()
@@ -59,7 +60,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetAUID
         // @parm [in] Pointer to an AUID reference
-        (aafUID_t *  pAuid);
+        (const aafUID_t *  pAuid);
 
 
   //****************
@@ -67,7 +68,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetName
-        (aafWChar *  name);  //@parm [in, ref] Definition Name
+        (const wchar_t *  name);  //@parm [in, ref] Definition Name
 
 
   //****************
@@ -139,28 +140,6 @@ public:
         // @parm [out, retval] AAFPluginDescriptor Enumeration
         (ImplEnumAAFPluginDescriptors ** ppEnum);
 
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFDefObject)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFDefObjectTest.cpp.
-  static AAFRESULT test();
-
-public:
-	// Functions internal to the toolkit
-
-  // non-published method to set the containing dictionary for this
-  // object.
-  void SetDict (ImplAAFDictionary * pDict);
-
-protected:
-  // Returns a pointer to the dictionary containing this object.  Will
-  // assert() if not yet set.
-  ImplAAFDictionary * GetDict ();
-
 private:
   // friendly name of this definition
   OMWideStringProperty          _name;
@@ -171,9 +150,17 @@ private:
   // auid to be used to identify this definition
   OMFixedSizeProperty<aafUID_t> _identification;
   OMVariableSizeProperty<aafUID_t> _descriptors;
-
-  // pointer to dict containing this object
-  ImplAAFDictionary *           _pDict;
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFDefObject> ImplAAFPropDefObjectSP;
 
 #endif // ! __ImplAAFDefObject_h__
