@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -80,13 +80,13 @@ bool validString(const char* string);
   //   @rdesc True if the wchar_t string is valid, false otherwise.
 bool validWideString(const wchar_t* string);
 
-  // @func Is the given OMWideCharacter string valid ? Use
-  //       <f validOMWideString> in expressions passed to the
+  // @func Is the given OMCharacter string valid ? Use
+  //       <f validOMString> in expressions passed to the
   //       assertion macros <f PRECONDITION>, <f POSTCONDITION>
   //       and <f ASSERT>.
-  //   @parm The OMWideCharacter string to check for validity.
-  //   @rdesc True if the OMWideCharacter string is valid, false otherwise.
-bool validOMWideString(const OMWideCharacter* string);
+  //   @parm The OMCharacter string to check for validity.
+  //   @rdesc True if the OMCharacter string is valid, false otherwise.
+bool validOMString(const OMCharacter* string);
 
 #if defined(OM_ENABLE_TRACE)
 
@@ -227,6 +227,34 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define FORALL(index, elementCount, expression) \
         FOREACH(index, 0, elementCount, expression) 
 
+  // @func Define a name only when assertions are enabled. Use to
+  //       avoid compiler warnings.
+  //   @parm The name to (conditionally) define.
+#define ANAME(name) \
+  name
+
+  // @func Save the value of a variable on entry to a routine for
+  //       later retrieval in the postcondition with <f OLD>.
+  //   @parm The name of the variable to save.
+  //   @parm The type of the variable.
+#define SAVE(name, type) \
+  SAVE_EXPRESSION(name, name, type)
+
+  // @func Save the value of an expression on entry to a routine for
+  //       later retrieval in the postcondition with <f OLD>.
+  //   @parm The name of the saved expression.
+  //   @parm The expression to save.
+  //   @parm The type of the expression.
+#define SAVE_EXPRESSION(name, expression, type) \
+  type oldValueOf##name = expression
+
+  // @func Retrieve the value of a variable or expression saved on
+  //       entry to a routine with <f SAVE> or with <f SAVE_EXPRESSION>.
+  //       For use in postconditions.
+  //   @parm The name of the saved variable or expression.
+#define OLD(name) \
+  oldValueOf##name
+
 #else
 
 #define TRACE(name)
@@ -246,6 +274,14 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define FOREACH(index, start, elementCount, expression)
 
 #define FORALL(index, elementCount, expression)
+
+#define ANAME(name)
+
+#define SAVE(name, type)
+
+#define SAVE_EXPRESSION(name, expression, type)
+
+#define OLD(name)
 
 #endif
 
