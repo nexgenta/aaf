@@ -25,6 +25,9 @@
  *
  ************************************************************************/
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "AAF.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -786,22 +789,6 @@ static void CreateAAFFile(aafWChar * pFileName,
 
 
 //
-// simple helper class to initialize and cleanup COM library.
-//
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
-
-//
 // simple helper class to initialize and cleanup AAF library.
 //
 struct CAAFInitialize
@@ -822,7 +809,6 @@ struct CAAFInitialize
 
 main()
 {
-  CComInitialize comInit;
   CAAFInitialize aafInit;
 
   aafWChar * pwFileName = L"PropAccess.aaf";
