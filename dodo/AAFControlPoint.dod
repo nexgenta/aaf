@@ -1,3 +1,11 @@
+#c/***********************************************\
+#c*                                               *
+#c* Advanced Authoring Format                     *
+#c*                                               *
+#c* Copyright (c) 1998-1999 Avid Technology, Inc. *
+#c* Copyright (c) 1998-1999 Microsoft Corporation *
+#c*                                               *
+#c\***********************************************/
 #startm .this-module 0
 AAFControlPoint\
 #endm
@@ -9,9 +17,9 @@ AAFObject\
 AD_HEAD
 AD_IDL(//
 // The IAAFControlPoint interface is implemented by objects that an individual point value
-// of a parameter whose value changes during the effect.  IAAFControlPoints must be added to
-// and IAAFVaryingValue\, which is then added to the IAAFGroup.  For parameters which are
-// constant in value during the effect\, use IAAFConstValue.
+// of a parameter whose value changes during the operation group.  IAAFControlPoints must be added to
+// and IAAFVaryingValue\, which is then added to the IAAFOperationGroup.  For parameters which are
+// constant in value during the operation group\, use IAAFConstantValue.
 //
 // In addition to the specific error results listed for each method\,
 // all methods in this interface may also return one of the following
@@ -22,16 +30,9 @@ AD_IDL(//
 //     operation.
 //)
 
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/ 
 
 AD_FORWARD_DECLARATION(AAFDataDef)
+AD_FORWARD_DECLARATION(AAFTypeDef)
 
 AD_CLASS_UUID(86192db2, 2a23, 11D2, BF, a3, 00, 60, 97, 11, 62, 12)
 
@@ -43,7 +44,7 @@ AD_METHOD1(GetTime,
 			aafRational_t *,
 			pTime,
 			Pointer to an aafRational_t,
-	Returns the position of the control point within an effect\\\, expressed as a rational
+	Returns the position of the control point within an operation group\\\, expressed as a rational
   // running from 0 to 1.
   // 
   // Succeeds if all of the following are true:
@@ -73,7 +74,7 @@ AD_METHOD1(GetEditHint,
 			pEditHint,
 			Pointer to an aafEditHint_t,
 			Returns the edit hint of the control point\\\, which describes how to alter the
-  // position if the AAFGroup is made longer or shorter.
+  // position if the AAFOperationGroup is made longer or shorter.
   //
   // Succeeds if all of the following are true:
   // - the pEditHint pointer is valid.
@@ -95,35 +96,6 @@ AD_METHOD1(GetEditHint,
   //
   // AAFRESULT_NULL_PARAM
   //   - pEditHint arg is NULL.)
-
-AD_XMETHOD1(GetDataDefID,
-			[out\,retval],
-			objPass,
-			aafUID_t *,
-			pDatadefID,
-			Pointer to a Data Definition ID,
-			Returns the Data Definition ID of the control point.
-  //
-  // Succeeds if all of the following are true:
-  // - the pDatadefID pointer is valid.
-  // 
-  // If this method fails nothing will be written to *pDatadefID.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
-  // AAFRESULT_PROP_NOT_PRESENT
-  //   - This property does not exist in the file.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pDatadefID arg is NULL.)
 
 AD_XMETHOD1(GetValueBufLen,
 			[out],
@@ -181,7 +153,7 @@ AD_METHOD3(GetValue,
 
 AD_METHOD1(SetTime,
 		   [in], aafRational_t, pTime,Control Point time,
-			Sets the position of the control point within an effect\\\, expressed as a rational
+			Sets the position of the control point within an operation group\\\, expressed as a rational
   // running from 0 to 1.
   // 
   // This method will return the following codes.  If more than one of
@@ -197,7 +169,7 @@ AD_METHOD1(SetTime,
 AD_METHOD1(SetEditHint,
 		   [in], aafEditHint_t, editHint,Control Point Edit hint,
 		   Sets the control point Edit hint value\\\, which describes how to alter the
-  // position if the AAFGroup is made longer or shorter.
+  // position if the AAFOperationGroup is made longer or shorter.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\\\, it will return the first one
@@ -209,22 +181,51 @@ AD_METHOD1(SetEditHint,
   // AAFRESULT_NOT_INITIALIZED
   //   - This object has not yet had Initialize\\\(\\\) called on it.)
 
-AD_METHOD1(SetDataDefID,
-			[in], aafUID_t *, pDatadefID,Control Point data definition ID,
-			Sets the control point Data Definition ID.
+AD_XMETHOD1(SetTypeDefinition,
+			[in],
+			objIn,
+			AAFTypeDef,
+			pTypeDef,
+			Type Definition of the dataval inside of this object,
+			Sets the IAAFTypeDefinition of the dataval inside this parameter to be the given one.
   //
+  // Succeeds if all of the following are true:
+  // - the pTypeDef pointer is valid.
+  // 
   // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\\\, it will return the first one
+  // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \\\(This is the only code indicating success.\\\)
+  //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\\\(\\\) called on it.
+  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pDatadefID arg is NULL.)
+  //   - pTypeDef is null.)
+
+AD_XMETHOD1(GetTypeDefinition,
+			[out\,retval],
+			objOut,
+			AAFTypeDef,
+			ppTypeDef,
+			Type Definition of the dataval inside of this object,
+			Places the IAAFTypeDefinition of the dataval inside this parameter into the
+  // *ppTypeDef argument.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppTypeDef is null.)
 
 AD_METHOD2(SetValue,
 			[in],aafUInt32,valueSize, Size of preallocated buffer,
