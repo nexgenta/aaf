@@ -44,9 +44,11 @@
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @parm The <c OMStrongReferenceSet> over which to iterate.
   //   @parm The initial position for this <c OMStrongReferenceSetIterator>.
-template <typename ReferencedObject>
-OMStrongReferenceSetIterator<ReferencedObject>::OMStrongReferenceSetIterator(
-                     const OMStrongReferenceSetProperty<ReferencedObject>& set,
+template <typename UniqueIdentification, typename ReferencedObject>
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::OMStrongReferenceSetIterator(
+                     const OMStrongReferenceSetProperty<UniqueIdentification,
+                                                        ReferencedObject>& set,
                      OMIteratorPosition initialPosition)
   : _iterator(set._set, initialPosition)
 {
@@ -54,10 +56,30 @@ OMStrongReferenceSetIterator<ReferencedObject>::OMStrongReferenceSetIterator(
 
   // @mfunc Destroy this <c OMStrongReferenceSetIterator>.
   //   @tcarg class | ReferencedObject | The type of the contained objects.
-template <typename ReferencedObject>
-OMStrongReferenceSetIterator<ReferencedObject>::~OMStrongReferenceSetIterator(
+template <typename UniqueIdentification, typename ReferencedObject>
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::~OMStrongReferenceSetIterator(
                                                                           void)
 {
+}
+
+  // @mfunc Create a copy of this <c OMStrongReferenceSetIterator>.
+  //   @tcarg class | ReferencedObject | The type of the contained objects.
+  //   @rdesc The new <c OMStrongReferenceSetIterator>.
+  //   @this const
+template <typename UniqueIdentification, typename ReferencedObject>
+OMReferenceContainerIterator<ReferencedObject>*
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::copy(void) const
+{
+  TRACE("OMStrongReferenceSetIterator<UniqueIdentification, "
+                                     "ReferencedObject>::copy");
+
+  OMStrongReferenceSetIterator<UniqueIdentification, ReferencedObject>*
+        result = new OMStrongReferenceSetIterator<UniqueIdentification,
+                                                  ReferencedObject>(_iterator);
+
+  return result;
 }
 
   // @mfunc Reset this <c OMStrongReferenceSetIterator> to the given
@@ -75,8 +97,10 @@ OMStrongReferenceSetIterator<ReferencedObject>::~OMStrongReferenceSetIterator(
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @parm The position to which this <c OMStrongReferenceSetIterator>
   //         should be reset.
-template <typename ReferencedObject>
-void OMStrongReferenceSetIterator<ReferencedObject>::reset(
+template <typename UniqueIdentification, typename ReferencedObject>
+void
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::reset(
                                             OMIteratorPosition initialPosition)
 {
   _iterator.reset(initialPosition);
@@ -89,8 +113,10 @@ void OMStrongReferenceSetIterator<ReferencedObject>::reset(
   //          positioned before the first <p ReferencedObject>, <e bool.false>
   //          otherwise.
   //   @this const
-template <typename ReferencedObject>
-bool OMStrongReferenceSetIterator<ReferencedObject>::before(void) const
+template <typename UniqueIdentification, typename ReferencedObject>
+bool
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::before(void) const
 {
   return _iterator.before();
 }
@@ -102,10 +128,40 @@ bool OMStrongReferenceSetIterator<ReferencedObject>::before(void) const
   //          positioned after the last <p ReferencedObject>, <e bool.false>
   //          otherwise.
   //   @this const
-template <typename ReferencedObject>
-bool OMStrongReferenceSetIterator<ReferencedObject>::after(void) const
+template <typename UniqueIdentification, typename ReferencedObject>
+bool
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::after(void) const
 {
   return _iterator.after();
+}
+
+  // @mfunc Is this <c OMStrongReferenceSetIterator> validly
+  //        positioned on a <p ReferencedObject> ?
+  //   @tcarg class | ReferencedObject | The type of the contained objects.
+  //   @rdesc <e bool.true> if this <c OMStrongReferenceSetIterator> is
+  //          positioned on a <p ReferencedObject>, <e bool.false>
+  //          otherwise.
+  //   @this const
+template <typename UniqueIdentification, typename ReferencedObject>
+bool
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::valid(void) const
+{
+  return _iterator.valid();
+}
+
+  // @mfunc The number of <p ReferencedObject>s in the associated
+  //        <c OMStrongReferenceSetProperty>.
+  //   @tcarg class | ReferencedObject | The type of the contained objects.
+  //   @rdesc The number of <p ReferencedObject>s
+  //   @this const
+template <typename UniqueIdentification, typename ReferencedObject>
+size_t
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::count(void) const
+{
+  return _iterator.count();
 }
 
   // @mfunc Advance this <c OMStrongReferenceSetIterator> to the next
@@ -125,8 +181,10 @@ bool OMStrongReferenceSetIterator<ReferencedObject>::after(void) const
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @rdesc <e bool.false> if this <c OMStrongReferenceSetIterator> has
   //          passed the last <p ReferencedObject>, <e bool.true> otherwise.
-template <typename ReferencedObject>
-bool OMStrongReferenceSetIterator<ReferencedObject>::operator++()
+template <typename UniqueIdentification, typename ReferencedObject>
+bool
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::operator++()
 {
   return ++_iterator;
 }
@@ -148,8 +206,10 @@ bool OMStrongReferenceSetIterator<ReferencedObject>::operator++()
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @rdesc <e bool.false> if this <c OMStrongReferenceSetIterator> has
   //          passed the first <p ReferencedObject>, <e bool.true> otherwise.
-template <typename ReferencedObject>
-bool OMStrongReferenceSetIterator<ReferencedObject>::operator--()
+template <typename UniqueIdentification, typename ReferencedObject>
+bool
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::operator--()
 {
   return --_iterator;
 }
@@ -160,13 +220,15 @@ bool OMStrongReferenceSetIterator<ReferencedObject>::operator--()
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @rdesc The <p ReferencedObject> at the current position.
   //   @this const
-template <typename ReferencedObject>
+template <typename UniqueIdentification, typename ReferencedObject>
 ReferencedObject*
-OMStrongReferenceSetIterator<ReferencedObject>::value(void) const
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::value(void) const
 {
-  TRACE("OMStrongReferenceSetIterator<ReferencedObject>::value");
+  TRACE("OMStrongReferenceSetIterator<UniqueIdentification, "
+                                     "ReferencedObject>::value");
 
-  const OMSetElement<OMStrongObjectReference<ReferencedObject>, ReferencedObject>& element = _iterator.value();
+  const SetElement& element = _iterator.value();
 
   ReferencedObject* result = element.getValue();
 
@@ -184,17 +246,19 @@ OMStrongReferenceSetIterator<ReferencedObject>::value(void) const
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @parm The new <p ReferencedObject>.
   //   @rdesc The previous <p ReferencedObject> if any, otherwise 0.
-template <typename ReferencedObject>
+template <typename UniqueIdentification, typename ReferencedObject>
 ReferencedObject*
-OMStrongReferenceSetIterator<ReferencedObject>::setValue(
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::setValue(
                                              const ReferencedObject* newObject)
 {
-  TRACE("OMStrongReferenceSetIterator<ReferencedObject>::setValue");
+  TRACE("OMStrongReferenceSetIterator<UniqueIdentification, "
+                                     "ReferencedObject>::setValue");
 
   PRECONDITION("Matching keys",
     IMPLIES(newObject != 0 , newObject->identification() == identification()));
 
-  OMSetElement<OMStrongObjectReference<ReferencedObject>, ReferencedObject>& element = _iterator.value();
+  SetElement& element = _iterator.value();
 
   ReferencedObject* result = element.setValue(newObject);
 
@@ -207,11 +271,25 @@ OMStrongReferenceSetIterator<ReferencedObject>::setValue(
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @rdesc The <p Key> at the current position.
   //   @this const
-template <typename ReferencedObject>
-OMUniqueObjectIdentification
-OMStrongReferenceSetIterator<ReferencedObject>::identification(void) const
+template <typename UniqueIdentification, typename ReferencedObject>
+UniqueIdentification
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::identification(void) const
 {
-  TRACE("OMStrongReferenceSetIterator<ReferencedObject>::identification");
+  TRACE("OMStrongReferenceSetIterator<UniqueIdentification, "
+                                     "ReferencedObject>::identification");
 
   return _iterator.key();
+}
+
+  // @mfunc Create an <c OMStrongReferenceSetIterator> given
+  //        an underlying <c OMSetIterator>.
+  //   @tcarg class | ReferencedObject | The type of the contained objects.
+  //   @parm The underlying <c OMSetIterator>.
+template <typename UniqueIdentification, typename ReferencedObject>
+OMStrongReferenceSetIterator<UniqueIdentification,
+                             ReferencedObject>::OMStrongReferenceSetIterator(
+                                                       const SetIterator& iter)
+  : _iterator(iter) // probably bitwise
+{
 }
