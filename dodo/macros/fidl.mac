@@ -23,7 +23,7 @@
 
 #ccccccccccccccccccccccccccc
 #c
-#c Pass through argument if for idl otherwise just comment the arg.
+#c Pass through argument if for idl otherwise omit it.
 #c 
 #c This macro is generally used to specify IDL options that would
 #c make since to emit to c++.
@@ -56,6 +56,11 @@
 #c Arguments: none
 #c
 #startm AD_HEAD 00
+// ************************
+//
+// Interface I.this-module
+//
+// ************************\
 #endm
 
 #ccccccccccccccccccccccccccc
@@ -101,6 +106,18 @@ interface I.this-module : IUnknown
 
 #ccccccccccccccccccccccccccc
 #c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_BEGIN 01
+AD_CLASS_BEGIN\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Starts a class definition with no parent class
 #c
 #c Arguments: none
@@ -133,8 +150,8 @@ AD_CLASS_BEGIN\
 #c
 #startm AD_TYPES_BEGIN 11
 [
-	uuid(%01-%02-%03-%04%05-%06%07%08%09%10%11),
-	pointer_default(unique)
+    uuid(%01-%02-%03-%04%05-%06%07%08%09%10%11),
+    pointer_default(unique)
 ]
 
 interface I.this-module
@@ -164,7 +181,12 @@ interface I.this-module
 #c Argument2: method description
 #c
 #startm AD_METHOD0 02
+  //***********************************************************
+  //
+  // %01()
+  //
   // %02
+  // 
   HRESULT %01 ();\
 #endm
 
@@ -184,9 +206,15 @@ interface I.this-module
 #c Macro Arg 07: method description
 #c
 #startm AD_XMETHOD1 07
+  //***********************************************************
+  //
+  // %01()
+  //
   // %07
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05);\
 #endm
 
 
@@ -206,10 +234,18 @@ interface I.this-module
 #c Macro Arg 12: method description
 #c
 #startm AD_XMETHOD2 12
+  //***********************************************************
+  //
+  // %01()
+  //
   // %12
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10);\
 #endm
 
 
@@ -230,11 +266,21 @@ interface I.this-module
 #c Macro Arg 17: method description
 #c
 #startm AD_XMETHOD3 17
+  //***********************************************************
+  //
+  // %01()
+  //
   // %17
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15);\
 #endm
 
 
@@ -256,12 +302,24 @@ interface I.this-module
 #c Macro Arg 22: method description
 #c
 #startm AD_XMETHOD4 22
+  //***********************************************************
+  //
+  // %01()
+  //
   // %22
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20);\
 #endm
 
 
@@ -284,13 +342,27 @@ interface I.this-module
 #c Macro Arg 27: method description
 #c
 #startm AD_XMETHOD5 27
+  //***********************************************************
+  //
+  // %01()
+  //
   // %27
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20,
-	%22 .%23-adornment%24 .%23-indirection %25);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20,
+
+    // %26
+    %22 .%23-adornment%24 .%23-indirection %25);\
 #endm
 
 
@@ -314,14 +386,30 @@ interface I.this-module
 #c Macro Arg 32: method description
 #c
 #startm AD_XMETHOD6 32
+  //***********************************************************
+  //
+  // %01()
+  //
   // %32
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20,
-	%22 .%23-adornment%24 .%23-indirection %25,
-	%27 .%28-adornment%29 .%28-indirection %30);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20,
+
+    // %26
+    %22 .%23-adornment%24 .%23-indirection %25,
+
+    // %31
+    %27 .%28-adornment%29 .%28-indirection %30);\
 #endm
 
 
@@ -346,15 +434,33 @@ interface I.this-module
 #c Macro Arg 37: method description
 #c
 #startm AD_XMETHOD7 37
+  //***********************************************************
+  //
+  // %01()
+  //
   // %37
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20,
-	%22 .%23-adornment%24 .%23-indirection %25,
-	%27 .%28-adornment%29 .%28-indirection %30,
-	%32 .%33-adornment%34 .%33-indirection %35);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20,
+
+    // %26
+    %22 .%23-adornment%24 .%23-indirection %25,
+
+    // %31
+    %27 .%28-adornment%29 .%28-indirection %30,
+
+    // %36
+    %32 .%33-adornment%34 .%33-indirection %35);\
 #endm
 
 
@@ -380,16 +486,36 @@ interface I.this-module
 #c Macro Arg 42: method description
 #c
 #startm AD_XMETHOD8 42
+  //***********************************************************
+  //
+  // %01()
+  //
   // %42
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20,
-	%22 .%23-adornment%24 .%23-indirection %25,
-	%27 .%28-adornment%29 .%28-indirection %30,
-	%32 .%33-adornment%34 .%33-indirection %35,
-	%37 .%38-adornment%39 .%38-indirection %40);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20,
+
+    // %26
+    %22 .%23-adornment%24 .%23-indirection %25,
+
+    // %31
+    %27 .%28-adornment%29 .%28-indirection %30,
+
+    // %36
+    %32 .%33-adornment%34 .%33-indirection %35,
+
+    // %41
+    %37 .%38-adornment%39 .%38-indirection %40);\
 #endm
 
 
@@ -416,17 +542,39 @@ interface I.this-module
 #c Macro Arg 47: method description
 #c
 #startm AD_XMETHOD9 47
+  //***********************************************************
+  //
+  // %01()
+  //
   // %47
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20,
-	%22 .%23-adornment%24 .%23-indirection %25,
-	%27 .%28-adornment%29 .%28-indirection %30,
-	%32 .%33-adornment%34 .%33-indirection %35,
-	%37 .%38-adornment%39 .%38-indirection %40,
-	%42 .%43-adornment%44 .%43-indirection %45);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20,
+
+    // %26
+    %22 .%23-adornment%24 .%23-indirection %25,
+
+    // %31
+    %27 .%28-adornment%29 .%28-indirection %30,
+
+    // %36
+    %32 .%33-adornment%34 .%33-indirection %35,
+
+    // %41
+    %37 .%38-adornment%39 .%38-indirection %40,
+
+    // %46
+    %42 .%43-adornment%44 .%43-indirection %45);\
 #endm
 
 
@@ -454,18 +602,42 @@ interface I.this-module
 #c Macro Arg 52: method description
 #c
 #startm AD_XMETHOD_10 52
+  //***********************************************************
+  //
+  // %01()
+  //
   // %52
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20,
-	%22 .%23-adornment%24 .%23-indirection %25,
-	%27 .%28-adornment%29 .%28-indirection %30,
-	%32 .%33-adornment%34 .%33-indirection %35,
-	%37 .%38-adornment%39 .%38-indirection %40,
-	%42 .%43-adornment%44 .%43-indirection %45,
-	%47 .%48-adornment%49 .%48-indirection %50);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20,
+
+    // %26
+    %22 .%23-adornment%24 .%23-indirection %25,
+
+    // %31
+    %27 .%28-adornment%29 .%28-indirection %30,
+
+    // %36
+    %32 .%33-adornment%34 .%33-indirection %35,
+
+    // %41
+    %37 .%38-adornment%39 .%38-indirection %40,
+
+    // %46
+    %42 .%43-adornment%44 .%43-indirection %45,
+
+    // %51
+    %47 .%48-adornment%49 .%48-indirection %50);\
 #endm
 
 
@@ -494,19 +666,45 @@ interface I.this-module
 #c Macro Arg 57: method description
 #c
 #startm AD_XMETHOD_11 57
+  //***********************************************************
+  //
+  // %01()
+  //
   // %57
+  // 
   HRESULT %01 (
-	%02 .%03-adornment%04 .%03-indirection %05,
-	%07 .%08-adornment%09 .%08-indirection %10,
-	%12 .%13-adornment%14 .%13-indirection %15,
-	%17 .%18-adornment%19 .%18-indirection %20,
-	%22 .%23-adornment%24 .%23-indirection %25,
-	%27 .%28-adornment%29 .%28-indirection %30,
-	%32 .%33-adornment%34 .%33-indirection %35,
-	%37 .%38-adornment%39 .%38-indirection %40,
-	%42 .%43-adornment%44 .%43-indirection %45,
-	%47 .%48-adornment%49 .%48-indirection %50,
-	%52 .%53-adornment%54 .%53-indirection %55);\
+    // %06
+    %02 .%03-adornment%04 .%03-indirection %05,
+
+    // %11
+    %07 .%08-adornment%09 .%08-indirection %10,
+
+    // %16
+    %12 .%13-adornment%14 .%13-indirection %15,
+
+    // %21
+    %17 .%18-adornment%19 .%18-indirection %20,
+
+    // %26
+    %22 .%23-adornment%24 .%23-indirection %25,
+
+    // %31
+    %27 .%28-adornment%29 .%28-indirection %30,
+
+    // %36
+    %32 .%33-adornment%34 .%33-indirection %35,
+
+    // %41
+    %37 .%38-adornment%39 .%38-indirection %40,
+
+    // %46
+    %42 .%43-adornment%44 .%43-indirection %45,
+
+    // %51
+    %47 .%48-adornment%49 .%48-indirection %50,
+
+    // %56
+    %52 .%53-adornment%54 .%53-indirection %55);\
 #endm
 
 
@@ -544,11 +742,11 @@ interface I.this-module
 #c
 #startm AD_DEFAULT_UUID 11
 [
-	object,
-	uuid(%01-%02-%03-%04%05-%06%07%08%09%10%11),
-	helpstring("I.this-module Interface"),
-	pointer_default(unique)
-]
+    object,
+    uuid(%01-%02-%03-%04%05-%06%07%08%09%10%11),
+    helpstring("I.this-module Interface"),
+    pointer_default(unique)
+]\
 #endm
 
 
@@ -556,7 +754,7 @@ interface I.this-module
 #c
 #c Defining the Class "Factory" UUID.
 #c NOTE: should be placed before AD_DEFAULT_UUID or after
-#c AD_CLASS_END
+#c AD_CLASS_UUID
 #c
 #c GUID
 #c Argument01: hex long  0-3[leading 0's w/o leading 0x]
@@ -575,9 +773,10 @@ interface I.this-module
 #c AD_CLASS_UUID(b1a21373, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
 #c
 #c TomR:980713: Added
+#c TomR:990303: Removed
+#c cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
 #c
 #startm AD_CLASS_UUID 11
-cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
 #endm
 
 
@@ -588,13 +787,19 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
 #c Arguments: none
 #c
 #startm AD_CLASS_END 00
-  //
-  // Return private implementation pointer for delegation.
-  // NOTE: This is NOT the pointer to the COM object's implementation
-  // object!
-  //
-  [local] HRESULT GetImplRep([out, retval] void **);
 }\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_END 01
+AD_CLASS_END\
 #endm
 
 
@@ -622,6 +827,16 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
 #c Argument: method declaration
 #c
 #startm AD_OVERRIDE 01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Specifies a method in a separate COM interface.
+#c
+#c Argument: method declaration
+#c
+#startm AD_COM_METH 01
 #endm
 
 
@@ -716,7 +931,7 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
 #startm AD_GETOBJ_METHOD1 06
   // %06
   HRESULT %01 (
-	%02 %03 ** I%04);\
+    %02 %03 ** I%04);\
 #endm
 
 
@@ -737,7 +952,7 @@ cpp_quote("EXTERN_C const CLSID CLSID_.this-module;")
 #startm AD_SETOBJ_METHOD1 06
   // %06
   HRESULT %01 (
-	%02 %03 * I%04);\
+    %02 %03 * I%04);\
 #endm
 
 
@@ -829,4 +1044,185 @@ I\
 
 #startm .objOut-adornment 00
 I\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Hack to quote the .this-module macro and keep it out of export
+#c files.  Do not define this macro in exp.mac!!!
+#c
+#startm AD_EXPORT_THIS_MODULE 00
+.this-module\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Starts a class definition
+#c
+#c Argument1: Abstract or Concrete
+#c Argument2: Transient or StoredObject
+#c            special cases:CommonBase and StoredObjectBase
+#c
+#c Note: Concrete-StoredObject means Persistent. In other words
+#c Concrete-StoredObject objects (and derived objects) are the 
+#c only types of objects that should ever be found in an AAF
+#c file.
+#c
+#c Valid combiniations:          examples
+#c -----------------------       ---------------
+#c   Abstract-CommonBase         AAFRoot 
+#c   Abstract-Transient          ????
+#c   Abstract-StoredObjectBase   AAFObject
+#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
+#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
+#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
+#c
+#startm AD_XCLASS_BEGIN 02
+.begin-%01-%02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition
+#c
+#c Argument1: Abstract or Concrete
+#c Argument2: Transient or StoredObject
+#c            special cases:CommonBase and StoredObjectBase
+#c
+#c Note: Concrete-StoredObject means Persistent. In other words
+#c Concrete-StoredObject objects (and derived objects) are the 
+#c only types of objects that should ever be found in an AAF
+#c file.
+#c
+#c Valid combiniations:          examples
+#c -----------------------       ---------------
+#c   Abstract-CommonBase         AAFRoot 
+#c   Abstract-Transient          ????
+#c   Abstract-StoredObjectBase   AAFObject
+#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
+#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
+#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
+#c
+#startm AD_XCLASS_END 02
+.end-%01-%02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c The following macros implement all of the allowable
+#c combinations of the AD_XCLASS_BEGIN and AD_XCLASS_END
+#c
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-CommonBase
+#c Special case for the common base class for all AAF objects,
+#c Transient and StoredObject classes.
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-CommonBase 00
+AD_ROOT_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-CommonBase 00
+AD_ROOT_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-StoredObjectBase
+#c Special case for the base class for all AAF stored objects
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-StoredObjectBase 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-StoredObjectBase 00
+AD_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-Transient
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-Transient 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-Transient 00
+AD_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-StoredObject
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-StoredObject 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-StoredObject 00
+AD_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Concrete-Transient
+#c (first version defined backwords compatibility)
+
+#startm .begin-Concrete-Transient 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Concrete-Transient 00
+AD_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Concrete-StoredObject
+#c Note: These are the persistent classes.
+#c (first version defined backwords compatibility)
+
+#startm .begin-Concrete-StoredObject 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Concrete-StoredObject 00
+AD_CLASS_END\
+#endm
+
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c IDL 
+#c Declaration for the dictionary's factory method.
+#c
+#startm AD_DICTIONARY_FACTORY 02
+  //***********************************************************
+  //
+  // %01()
+  //
+  // %02 
+  // 
+  HRESULT %01(
+    // Class identifier (AUID) of the stored object. This is the
+    // corresponding SMPTE identifier (as a GUID) for all predefined
+    // built-in classes.
+    [in, ref] aafUID_t * pAUID,
+
+    // Reference to the identifier of the interface
+    [in, ref] REFIID riid,
+
+    // Address of output variable that receives the 
+    // interface pointer requested in riid
+    [out, iid_is(riid)] IUnknown ** ppvObject);
 #endm
