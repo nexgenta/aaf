@@ -50,6 +50,17 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c Includes another file in implementation (not header).
+#c
+#c Argument: Base filename
+#c
+#startm AD_CPPINCLUDE 01
+#include "%01.h"
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Goes at the head of the file.
 #c
 #c Arguments: none
@@ -241,7 +252,8 @@ AD_CLASS_BEGIN\
 
 
 Impl.this-module::Impl.this-module ()
-: _pContainer (0)
+: _pContainer (0),
+  _isInitialized (false)
 {}
 
 
@@ -840,6 +852,19 @@ void * Impl.this-module::GetContainer ()
 {
   assert (_pContainer);
   return _pContainer;
+}
+
+
+bool Impl.this-module::isInitialized () const
+{
+  return _isInitialized;
+}
+
+
+void Impl.this-module::setInitialized ()
+{
+  _isInitialized = true;
+  assert (isInitialized());
 }
 #endm
 

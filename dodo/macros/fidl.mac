@@ -50,6 +50,16 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c Includes another file in implementation (not header).
+#c
+#c Argument: Base filename
+#c
+#startm AD_CPPINCLUDE 01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Goes at the head of the file.
 #c
 #c Arguments: none
@@ -1034,6 +1044,14 @@ AD_CLASS_END\
   // object!
   //
   [local] HRESULT GetImplRep([out, retval] void **);
+
+  //
+  // Intialize class extensions. This method is called after the
+  // contained Impl object has been completely initialized. This
+  // allows the aggregated extension object access to all of the
+  // interfaces and property data of its controlling unknown.
+  //
+  [local] HRESULT InitializeExtension(REFCLSID clsid);
 }\
 #endm
 
