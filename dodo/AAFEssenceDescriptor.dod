@@ -6,7 +6,7 @@ AAFEssenceDescriptor\
 AAFObject\
 #endm
 #c
-#import ./AAFObject.exp
+#c #import ./AAFObject.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFEssenceDescriptor interface is implemented by objects which
@@ -34,7 +34,7 @@ AD_FORWARD_DECLARATION(EnumAAFLocators)
 AD_CLASS_UUID(94659784, 2a3c, 11D2, bf, A4, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(94659783, 2a3c, 11D2, bf, A4, 00, 60, 97, 11, 62, 12)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Abstract, StoredObject)
 AD_XMETHOD1(GetNumLocators,
 			[out],
 			objPass,
@@ -96,7 +96,7 @@ AD_XMETHOD1(PrependLocator,
 			pLocator,
 			Locator to append,
 
-			Append another locator to this essence descriptor.  Use this
+			Prepend another locator to this essence descriptor.  Use this
   // function to add a locator to be scanned first when searching for
   // the essence \(a new primary location for the essence\).
   // 
@@ -140,4 +140,4 @@ AD_XMETHOD1(EnumAAFAllLocators,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-AD_CLASS_END
+AD_XCLASS_END(Abstract, StoredObject)
