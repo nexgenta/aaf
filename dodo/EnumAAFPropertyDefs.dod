@@ -1,10 +1,8 @@
 #startm .this-module 0
-EnumAAFPropertyDefs\
-#endm
-#startm .parent-module 0
-AAFRoot\
+EnumAAFPropertyDefinitions\
 #endm
 #c
+#import ./AAFUnitTest.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -15,19 +13,21 @@ AD_HEAD
 *                                          *
 \******************************************/
 
-AD_FORWARD_DECLARATION(AAFPropertyDef)
+AD_INCLUDE(AAFTypes)
+
+AD_FORWARD_DECLARATION(AAFPropertyDefinition)
 
 
-AD_CLASS_UUID(245343C2, 2D59, 11D2, BF, 80, 00, 10, 4B, C9, 15, 6D)
+AD_CLASS_UUID(B1A21387, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
-AD_DEFAULT_UUID(245343C1, 2D59, 11D2, BF, 80, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_DEFAULT_UUID(B1A21386, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
+AD_ROOT_CLASS_BEGIN
 
 AD_XMETHOD1(NextOne,
 			[out\,retval],
 			objOut,
-			AAFPropertyDef,
-			ppPropertyDef,
+			AAFPropertyDefinition,
+			ppPropertyDefinition,
 			The Next PropertyDefinition,
 			Enumerates to the next element in the enumerators list. The caller is responsible for 
   // properly releasing the returned pointer when it is no longer needed.
@@ -36,11 +36,11 @@ AD_XMETHOD1(NextOne,
 AD_XMETHOD3(Next,
 			[in], objPass, aafUInt32, count, number of property definitions requested,
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOut, AAFPropertyDef, ppPropertyDefs,
+			objOut, AAFPropertyDefinition, ppPropertyDefinitions,
 			array to receive property definitions,
 			[out\,ref],objPass, aafUInt32 *, pFetched,
-			number of actual PropertyDefs fetched into ppPropertyDefs array,
-			Enumerates the next count elements \(AAFPropertyDef pointers\) in 
+			number of actual PropertyDefinitions fetched into ppPropertyDefinitions array,
+			Enumerates the next count elements \(AAFPropertyDefinition pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
   // properly releasing the returned pointers.)
@@ -48,7 +48,7 @@ AD_XMETHOD3(Next,
 AD_METHOD1(Skip,
 		   [in], aafUInt32, count, Number of elements to skip,
 		   Instructs the enumerator to skip the next count elements in the enumeration so that 
-  // the next call to EnumAAFPropertyDefs::Next will not return 
+  // the next call to EnumAAFPropertyDefinitions::Next will not return 
   // those elements.)
 
 AD_METHOD0(Reset,
@@ -60,7 +60,7 @@ Instructs the enumerator to position itself at the beginning of the list of elem
 AD_XMETHOD1(Clone,
 			[out\,retval],
 			objOut,
-			EnumAAFPropertyDefs,
+			EnumAAFPropertyDefinitions,
 			ppEnum,
 			new enumeration,
 			Creates another property definition enumerator with the same state as the current 
@@ -69,4 +69,6 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_CLASS_END
+AD_OVERRIDE(.method-Test)
+
+AD_ROOT_CLASS_END
