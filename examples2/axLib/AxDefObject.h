@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDefObject.h,v 1.3 2004/06/04 15:33:46 stuart_hc Exp $ $Name:  $
+// $Id: AxDefObject.h,v 1.4 2004/08/30 14:57:19 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,6 +60,9 @@ public:
 			 const AxString& name,
 			 const AxString& desc );
 
+	inline operator IAAFContainerDefSP ()
+	{ return _spIaafContainerDef; }
+
 private:
 	IAAFContainerDefSP _spIaafContainerDef;
 };
@@ -74,6 +77,9 @@ public:
 	void Initialize( const aafUID_t& uid,
 			 const AxString& name,
 			 const AxString& desc );
+
+	inline operator IAAFInterpolationDefSP ()
+	{ return _spIaafInterpolationDef; }
 
 private:
 	IAAFInterpolationDefSP _spIaafInterpolationDef;
@@ -90,6 +96,9 @@ public:
 			 const AxString& name,
 			 const AxString& desc,
 			 IAAFTypeDefSP spIaafTypeDef );
+
+	inline operator IAAFParameterDefSP ()
+	{ return _spIaafParameterDef; }
 
 private:
 	IAAFParameterDefSP _spIaafParameterDef;
@@ -114,6 +123,9 @@ public:
 	void SetIsAccelerated( bool isAccel );
 	void SetSupportsAuthentication( bool supportsAuth );
 	void SetManufacturerInfo( IAAFNetworkLocatorSP manuInfo );
+
+	inline operator IAAFPluginDefSP ()
+	{ return _spIaafPluginDef; }
 
 private:
 	IAAFPluginDefSP _spIaafPluginDef;
@@ -144,6 +156,9 @@ public:
 	aafBoolean_t AreThereFlavours();
 
 	IEnumAAFCodecFlavoursSP EnumCodecFlavours();
+
+	inline operator IAAFCodecDefSP ()
+	{ return _spIaafCodecDef; }
 
 private:
 	AxCodecDef();
