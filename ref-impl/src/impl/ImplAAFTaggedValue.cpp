@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
@@ -20,7 +38,7 @@
 #endif
 
 #include "ImplAAFDictionary.h"
-#include "ImplAAFHeader.h"
+#include "ImplAAFDataDef.h"
 
 #include <assert.h>
 #include <string.h>
@@ -44,14 +62,21 @@ ImplAAFTaggedValue::~ImplAAFTaggedValue ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::Initialize (wchar_t* pName, aafUID_t*  pDataDef)
+    ImplAAFTaggedValue::Initialize (const aafCharacter * pName,
+									ImplAAFTypeDef * pTypeDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
 
-	if (pName == NULL || pDataDef == NULL)
+	if (pName == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	_type = *pDataDef;
+	if (! pTypeDef)
+	  return AAFRESULT_NULL_PARAM;
+	aafUID_t typeDef;
+	AAFRESULT hr = pTypeDef->GetAUID(&typeDef);
+	if (AAFRESULT_FAILED (hr))return hr;
+
+	_type = typeDef;
 	_name = pName;
 
 	return rc;
@@ -59,7 +84,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::GetName (wchar_t* pName, aafInt32 bufSize)
+    ImplAAFTaggedValue::GetName (aafCharacter * pName, aafInt32 bufSize)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 	bool		status;
@@ -80,7 +105,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::GetNameBufLen (aafInt32* pLen)
+    ImplAAFTaggedValue::GetNameBufLen (aafUInt32* pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -102,7 +127,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	aafUID_t			defUID;
 	ImplAAFDictionary	*dict = NULL;
-	ImplAAFHeader		*head = NULL;
 
 	if(ppTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -110,16 +134,14 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		defUID = _type;
-		CHECK(MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
-		CHECK(dict->LookupType(&defUID, ppTypeDef));
+		CHECK(GetDictionary(&dict));
+		CHECK(dict->LookupTypeDef(defUID, ppTypeDef));
 	}
 	XEXCEPT
 	{
 		if(dict != NULL)
-			dict->ReleaseReference();
-		if(head != NULL)
-			head->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 	}
 	XEND;
 
@@ -191,6 +213,5 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFTaggedValue, AUID_AAFTaggedValue);
 
 
