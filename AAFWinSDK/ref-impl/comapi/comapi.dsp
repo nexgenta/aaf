@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /WX /GR /GX /O2 /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../../../ref-impl/include" /FI"stdafx.h" /D "NDEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "WIN32_LEAN_AND_MEAN" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../include/comidl" /I "../../../ref-impl/include/ref-api" /I "../../../ref-impl/include" /FI"stdafx.h" /D "NDEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "WIN32_LEAN_AND_MEAN" /Yu"stdafx.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -54,6 +54,11 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
 # ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /nodefaultlib:"msvcrtd.lib" /out:"../../Release/RefImpl/AAFCOAPI.dll"
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Desc=Registering DLL...
+PostBuild_Cmds=regsvr32 /s ../../Release/RefImpl/AAFCOAPI.dll
+# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "comapi - Win32 Debug"
 
@@ -69,7 +74,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /WX /GR /GX /ZI /Od /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../../../ref-impl/include" /FI"stdafx.h" /D "_DEBUG" /D "OM_ENABLE_DEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "WIN32_LEAN_AND_MEAN" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /MDd /W3 /WX /GR /GX /ZI /Od /I "../../../ref-impl/src/com-api" /I "../../../ref-impl/plugins" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/impl" /I "../../../ref-impl/src/Om" /I "../../../ref-impl/include/OM" /I "../../../ref-impl/src/com-api/com-dll" /I "../include/comidl" /I "../../../ref-impl/include/ref-api" /I "../../../ref-impl/include" /FI"stdafx.h" /D "_DEBUG" /D "OM_ENABLE_DEBUG" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "WIN32_LEAN_AND_MEAN" /Yu"stdafx.h" /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -81,6 +86,11 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"msvcrt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /out:"../../Debug/RefImpl/AAFCOAPI.dll" /pdbtype:sept
 # SUBTRACT LINK32 /incremental:no /map /nodefaultlib
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Desc=Registering DLL...
+PostBuild_Cmds=regsvr32 /s ../../Debug/RefImpl/AAFCOAPI.dll
+# End Special Build Tool
 
 !ENDIF 
 
@@ -95,6 +105,10 @@ SOURCE="..\..\..\ref-impl\src\com-api\com-dll\AAFCOM.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\com-dll\AAFCOM.DEF"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\com-api\AAFModule.cpp"
 # End Source File
 # Begin Source File
 
@@ -170,10 +184,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFEdgecode.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFEnumValidation.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFEssenceAccess.cpp"
 # ADD CPP /I "../../../ref-impl/plugins/"
 # End Source File
@@ -196,11 +206,19 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFEssenceGroup.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\com-api\CAAFEssencePlugin.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFEvent.cpp"
 # End Source File
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFEventMobSlot.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\com-api\test\CAAFEventTest.cpp"
 # End Source File
 # Begin Source File
 
@@ -221,10 +239,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFFilmDescriptor.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFFindSourceInfo.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFGetFileBits.cpp"
 # End Source File
 # Begin Source File
 
@@ -256,7 +270,7 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFInterpolationDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFKLVData.cpp"
+SOURCE="..\..\..\ref-impl\src\com-api\CAAFIntraFrameMarker.cpp"
 # End Source File
 # Begin Source File
 
@@ -268,11 +282,7 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFMasterMob.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFMetaDefinition.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFMetaDictionary.cpp"
+SOURCE="..\..\..\ref-impl\src\com-api\CAAFMIDIFileDescriptor.cpp"
 # End Source File
 # Begin Source File
 
@@ -281,10 +291,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFMob.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFMobSlot.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFModule.cpp"
 # End Source File
 # Begin Source File
 
@@ -316,7 +322,11 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFParameterDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFPluginDef.cpp"
+SOURCE="..\..\..\ref-impl\src\com-api\CAAFPluggableCode.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\com-api\CAAFPluginDescriptor.cpp"
 # End Source File
 # Begin Source File
 
@@ -344,15 +354,7 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFPulldown.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFRandomFile.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFRandomRawStorage.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFRawStorage.cpp"
+SOURCE="..\..\..\ref-impl\src\com-api\CAAFReferenceValue.cpp"
 # End Source File
 # Begin Source File
 
@@ -384,10 +386,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\com-dll\CAAFServer.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFSetFileBits.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFSourceClip.cpp"
 # End Source File
 # Begin Source File
@@ -401,22 +399,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFSourceReference.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFStaticMobSlot.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFStreamPropertyValue.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFStrongRefArrayValue.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFStrongRefSetValue.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFStrongRefValue.cpp"
 # End Source File
 # Begin Source File
 
@@ -464,10 +446,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefCharacter.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefEnum.cpp"
 # End Source File
 # Begin Source File
@@ -480,19 +458,11 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefFixedArray.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefIndirect.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefInt.cpp"
 # End Source File
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefObjectRef.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefOpaque.cpp"
 # End Source File
 # Begin Source File
 
@@ -520,6 +490,10 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefStrongObjRef.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\com-api\test\CAAFTypeDefTest.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFTypeDefVariableArray.cpp"
 # End Source File
 # Begin Source File
@@ -537,18 +511,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CAAFVaryingValue.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CAAFWAVEDescriptor.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFWeakRefArrayValue.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFWeakRefSetValue.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CAAFWeakRefValue.cpp"
 # End Source File
 # Begin Source File
 
@@ -580,6 +542,10 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFDataDefs.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFDefs.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFEssenceData.cpp"
 # End Source File
 # Begin Source File
@@ -589,10 +555,6 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFIdentifications.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFInterpolationDefs.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFKLVData.cpp"
 # End Source File
 # Begin Source File
 
@@ -612,6 +574,10 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFMobSlots.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFObjects.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFOperationDefs.cpp"
 # End Source File
 # Begin Source File
@@ -620,11 +586,7 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFParameterDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFParameters.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFPluginDefs.cpp"
+SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFPluginDescriptors.cpp"
 # End Source File
 # Begin Source File
 
@@ -644,11 +606,11 @@ SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFPropertyValues.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFSegments.cpp"
+SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFReferenceValues.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFStorablePropVals.cpp"
+SOURCE="..\..\..\ref-impl\src\com-api\CEnumAAFSegments.cpp"
 # End Source File
 # Begin Source File
 
