@@ -52,8 +52,8 @@
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
 ImplAAFSelector::ImplAAFSelector () :
-	_selected(		PID_Selector_Selected,		"Selected"),
-	_alternates(	PID_Selector_Alternates,	"Alternates")
+	_selected(		PID_Selector_Selected,		L"Selected"),
+	_alternates(	PID_Selector_Alternates,	L"Alternates")
 {
 	_persistentProperties.put(_selected.address());
 	_persistentProperties.put(_alternates.address());
@@ -62,17 +62,17 @@ ImplAAFSelector::ImplAAFSelector () :
 
 ImplAAFSelector::~ImplAAFSelector ()
 {
-	ImplAAFSegment *selected = _selected.setValue(0);
+	ImplAAFSegment *selected = _selected.clearValue();
 	if (selected != NULL)
 	{
 	  selected->ReleaseReference();
 	  selected = 0;
 	}
 
-	size_t size = _alternates.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _alternates.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFSegment* pSegment = _alternates.setValueAt(0, i);
+		ImplAAFSegment* pSegment = _alternates.clearValueAt(i);
 		if (pSegment)
 		{
 		  pSegment->ReleaseReference();
@@ -161,9 +161,13 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::RemoveAlternateSegment (ImplAAFSegment* pSegment)
 {
-	HRESULT				hr = AAFRESULT_NOT_IMPLEMENTED;
+	if (!_alternates.containsValue(pSegment))
+	  return AAFRESULT_SEGMENT_NOT_FOUND;
 
-	return hr;
+	_alternates.removeValue(pSegment);
+	pSegment->ReleaseReference();
+
+	return AAFRESULT_SUCCESS;
 }
 
 //***********************************************************
@@ -192,7 +196,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::GetNumAlternateSegments (aafInt32* pNumSegments)
 {
 	HRESULT	hr = AAFRESULT_SUCCESS;
-	size_t	numSegments;
 
 	if (pNumSegments == NULL)
 	{
@@ -200,7 +203,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		_alternates.getSize(numSegments);
+		size_t	numSegments = _alternates.count();
 		*pNumSegments = numSegments;
 	}
 
@@ -244,7 +247,22 @@ AAFRESULT STDMETHODCALLTYPE
 	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
 	if(*ppEnum == NULL)
 		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumStrongProperty(this, &_alternates);
+
+	XPROTECT()
+	{
+		OMStrongReferenceVectorIterator<ImplAAFSegment>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFSegment>(_alternates);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK((*ppEnum)->Initialize(&CLSID_EnumAAFSegments, this, iter));
+	}
+	XEXCEPT
+	{
+		if (*ppEnum)
+		  (*ppEnum)->ReleaseReference();
+		(*ppEnum) = 0;
+	}
+	XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
@@ -266,10 +284,9 @@ AAFRESULT
     ImplAAFSelector::GetNthSegment (aafUInt32 index, ImplAAFSegment** ppSegment)
 {
 	ImplAAFSegment*	obj;
-	size_t			numSegments;
 	HRESULT			hr;
 
-	_alternates.getSize(numSegments);
+	size_t numSegments = _alternates.count();
 	if (index < numSegments)
 	{
 		_alternates.getValueAt(obj, index);
@@ -343,3 +360,37 @@ AAFRESULT
 
 
 
+AAFRESULT ImplAAFSelector::ChangeContainedReferences(aafMobID_constref from,
+													aafMobID_constref to)
+{
+	aafInt32			n, count;
+	ImplAAFSegment		*seg = NULL;
+	ImplAAFComponent	*selected;
+	
+	XPROTECT()
+	{
+		CHECK(GetNumAlternateSegments (&count));
+		for(n = 0; n < count; n++)
+		{
+			CHECK(GetNthSegment (n, &seg));
+			CHECK(seg->ChangeContainedReferences(from, to));
+			seg->ReleaseReference();
+			seg = NULL;
+		}
+
+		selected = _selected;
+		if(selected != NULL)
+		{
+			CHECK(selected->ChangeContainedReferences(from, to));
+		}
+	}
+	XEXCEPT
+	{
+		if(seg != NULL)
+		  seg->ReleaseReference();
+		seg = 0;
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
