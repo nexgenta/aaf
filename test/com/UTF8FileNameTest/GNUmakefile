@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2004/09/21 15:21:55 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2004/09/23 13:34:40 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -60,7 +60,7 @@ check : $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(AAFSDKBINDIR)/ComFileKindTest$(EXE)
+	@$(RM) $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 
