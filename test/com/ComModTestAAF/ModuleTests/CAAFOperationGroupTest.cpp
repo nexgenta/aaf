@@ -90,7 +90,7 @@ const aafString_t  TEST_PARAM_DESC [2]	=	{L"A longer description of the TestEffe
 												L"An aproximation of PI"};
 const aafString_t  TEST_PARAM_UNITS[2]	=   {L"Furlongs per Fortnight", L"PI fractional members"};
 
-aafUID_t kTestParm2ID = {0};
+aafUID_t kTestParm2ID = {0x14b66cc5, 0x1a1, 0x11d4, { 0x80, 0x46, 0x8, 0x0, 0x36, 0x21, 0x8, 0x4 } };
 
 typedef IAAFSmartPointer<IAAFParameterDef>					IAAFParameterDefSP;
 typedef IAAFSmartPointer<IEnumAAFParameters>				IEnumAAFParametersSP;
@@ -105,13 +105,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFOperationGroup Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -249,8 +251,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		//add 2nd param
 		IAAFParameterDefSP spParam2Def;
 		checkResult(defs.cdParameterDef()->
-			CreateInstance(IID_IAAFParameterDef, (IUnknown **)&spParam2Def));	
-		checkResult(CoCreateGuid((GUID*)&kTestParm2ID));
+			CreateInstance(IID_IAAFParameterDef, (IUnknown **)&spParam2Def));
 		checkResult(spParam2Def->Initialize (kTestParm2ID, TEST_PARAM_NAME[1], TEST_PARAM_DESC[1], defs.tdRational()));
 		checkResult(spParam2Def->SetDisplayUnits(TEST_PARAM_UNITS[1]));
 		checkResult(pDictionary->RegisterParameterDef(spParam2Def));
