@@ -1,29 +1,139 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-// This module has been made obsolete by the implementation of a common enumerator
-// template class.
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+#ifndef __ImplAAFLocator_h__
+#include "ImplAAFLocator.h"
+#endif
+
+
+
+
+
+
+#ifndef __ImplEnumAAFLocators_h__
+#include "ImplEnumAAFLocators.h"
+#endif
+
+#include <assert.h>
+#include "aafErr.h"
+#include "AAFResult.h"
+#include "ImplAAFObjectCreation.h"
+
+extern "C" const aafClassID_t CLSID_EnumAAFLocators;
+
+ImplEnumAAFLocators::ImplEnumAAFLocators ()
+{
+	_current = 0;
+	_cEssenceDesc = NULL;
+}
+
+
+ImplEnumAAFLocators::~ImplEnumAAFLocators ()
+{
+	if (_cEssenceDesc)
+	{
+		_cEssenceDesc->ReleaseReference();
+		_cEssenceDesc = NULL;
+	}
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFLocators::NextOne (ImplAAFLocator **ppLocator)
+{
+	aafNumSlots_t	cur = _current, siz;
+
+    XPROTECT()
+	{
+		CHECK(_cEssenceDesc->GetNumLocators (&siz));
+		if(cur < siz)
+		{
+			CHECK(_cEssenceDesc->GetNthLocator (cur, ppLocator));
+			_current = ++cur;
+		}
+		else
+			RAISE(AAFRESULT_NO_MORE_OBJECTS);
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFLocators::Next (aafUInt32  /*count*/,
+                           ImplAAFLocator ** /*ppLocators*/,
+                           aafUInt32 *  /*pFetched*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFLocators::Skip (aafUInt32  /*count*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFLocators::Reset ()
+{
+	_current = 0;
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFLocators::Clone (ImplEnumAAFLocators **ppEnum)
+{
+	ImplEnumAAFLocators		*result;
+	AAFRESULT		hr;
+
+	result = (ImplEnumAAFLocators *)CreateImpl(CLSID_EnumAAFLocators);
+	if (result == NULL)
+		return E_FAIL;
+
+	hr = result->SetEssenceDesc(_cEssenceDesc);
+	if (SUCCEEDED(hr))
+	{
+		result->_current = _current;
+		*ppEnum = result;
+	}
+	else
+	{
+		result->ReleaseReference();
+		*ppEnum = NULL;
+	}
+	
+	return hr;
+}
+
+AAFRESULT
+    ImplEnumAAFLocators::SetEssenceDesc(ImplAAFEssenceDescriptor *pEDesc)
+{
+	if (_cEssenceDesc)
+		_cEssenceDesc->ReleaseReference();
+
+	_cEssenceDesc = pEDesc;
+
+	if (pEDesc)
+		pEDesc->AcquireReference();
+	return AAFRESULT_SUCCESS;
+}
