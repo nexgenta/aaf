@@ -34,6 +34,9 @@ class ImplAAFPropertyValue;
 #include "ImplAAFTypeDefArray.h"
 #endif
 
+#include "OMWeakRefProperty.h"
+
+class ImplEnumAAFPropertyValues;
 
 class ImplAAFTypeDefVariableArray : public ImplAAFTypeDefArray
 {
@@ -62,13 +65,13 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in] type of each element to be contained in this array
          ImplAAFTypeDef * pTypeDef,
 
          // @parm [in] friendly name of this type definition
-         wchar_t *  pTypeName);
+         const aafCharacter * pTypeName);
 
 
   //****************
@@ -103,6 +106,29 @@ public:
         (// @parm [out] newly-created property empty value,
          ImplAAFPropertyValue ** ppPropVal);
 			 
+  //****************
+  // CreateValueFromValues() 
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateValueFromValues
+        (// @parm [in, size_is(numElements)] array of property values for elements of array value which
+    // is to be created.
+         ImplAAFPropertyValue ** ppElementValues,
+
+         // @parm [in] size of pElementValues array.
+         aafUInt32  numElements,
+
+         // @parm [out] newly-created property value
+         ImplAAFPropertyValue ** ppPropVal);
+
+
+  //****************
+  // GetElements() 
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+		GetElements (
+								ImplAAFPropertyValue *pInPropVal,
+								ImplEnumAAFPropertyValues **ppEnum);
 
   // Override from AAFTypeDef
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -144,17 +170,45 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in] type of each element to be contained in this array
-         const aafUID_t * pTypeID,
+         const ImplAAFTypeDef *pType,
 
          // @parm [in] friendly name of this type definition
-         wchar_t *  pTypeName);
+         const aafCharacter * pTypeName);
 
-
+  /**********************************
+	   EX - METHODS
+	   ***********************************************/
+  
+  virtual AAFRESULT STDMETHODCALLTYPE
+	  PrependElement(
+	  // property value corresponding to array to which element is prepended, [in]
+	  ImplAAFPropertyValue * pInPropVal, 
+	  // value to be prepended to this array,  [in]
+	  ImplAAFPropertyValue * pMemberPropVal );
+  
+  virtual AAFRESULT STDMETHODCALLTYPE
+	  RemoveElement(
+	  // property value corresponding to array;  [in] 
+	  ImplAAFPropertyValue * pInPropVal,
+	  // zero-based index into elements in this array type; [in] 
+	  aafUInt32  index);
+  
+  virtual AAFRESULT STDMETHODCALLTYPE  
+	  InsertElement(
+	  // property value corresponding to array; [in] 
+	  ImplAAFPropertyValue * pInPropVal,
+	  // zero-based index into elements in this array type;  [in]
+	  aafUInt32  index,
+	  // value to be inserted into this array; [in]
+	  ImplAAFPropertyValue * pMemberPropVal);
+  
+  /////////////////////////////////////////////////////////
+  
 protected:
-  // override from ImplAAFTypeDefArray
+	// override from ImplAAFTypeDefArray
   virtual aafUInt32 pvtCount (ImplAAFPropertyValue * pInPropVal) const;
 
 
@@ -168,9 +222,12 @@ public:
   virtual size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RawAccessType
+        (ImplAAFTypeDef ** ppRawTypeDef);
 
 public:
   // Overrides from ImplAAFTypeDef
@@ -180,11 +237,16 @@ public:
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
 
-private:
-  // OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
-  OMFixedSizeProperty<aafUID_t>           _ElementType;
 
-  ImplAAFTypeDefSP _cachedElemType;
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
+
+private:
+   OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
 
   ImplAAFTypeDefSP BaseType (void) const;
 };
