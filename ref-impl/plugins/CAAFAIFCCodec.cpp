@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.10 2004/10/22 14:04:10 phil_tudor Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.11 2004/10/27 17:15:01 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -382,7 +382,7 @@ CAAFAIFCCodec::CountChannels (IAAFSourceMob * /*fileMob*/,
 	XPROTECT()
 	{
 		if(EqualAUID(&essenceKind, &kAAFDataDef_Sound)
-			|| EqualAUID(&essenceKind, &DDEF_Sound))
+			|| EqualAUID(&essenceKind, &kAAFDataDef_LegacySound))
 		{
 			if(!_headerLoaded)
 			{
@@ -446,7 +446,7 @@ CAAFAIFCCodec::CountSamples (
 							 aafLength_t *  pNumSamples)
 {
 	if(EqualAUID(&essenceKind, &kAAFDataDef_Sound)
-		|| EqualAUID(&essenceKind, &DDEF_Sound))
+		|| EqualAUID(&essenceKind, &kAAFDataDef_LegacySound))
 	{
 		*pNumSamples = _sampleFrames;
 	}
@@ -1293,7 +1293,7 @@ CAAFAIFCCodec::GetIndexedSampleSize
 		return(AAFRESULT_EOF);
 	
 	if(EqualAUID(&dataDefID, &kAAFDataDef_Sound)
-		|| EqualAUID(&dataDefID, &DDEF_Sound))
+		|| EqualAUID(&dataDefID, &kAAFDataDef_LegacySound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);
@@ -1309,7 +1309,7 @@ CAAFAIFCCodec::GetLargestSampleSize (aafUID_constref dataDefID,
 		return(AAFRESULT_NULL_PARAM);
 	
 	if(EqualAUID(&dataDefID, &kAAFDataDef_Sound)
-		|| EqualAUID(&dataDefID, &DDEF_Sound))
+		|| EqualAUID(&dataDefID, &kAAFDataDef_LegacySound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);

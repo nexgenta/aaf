@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFInfo.cpp,v 1.41 2004/10/27 14:07:16 stuart_hc Exp $ $Name:  $
+// $Id: AAFInfo.cpp,v 1.42 2004/10/27 17:13:56 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -397,15 +397,15 @@ static void ReadAAFFile(aafWChar * pFileName)
           check( pDefObject->GetName(wchName, sizeof (wchName)) );
           convert(chName, sizeof(chName), wchName);
 
-          if (memcmp( &id, &DDEF_Picture, sizeof(id)) == 0)
+          if (memcmp( &id, &kAAFDataDef_LegacyPicture, sizeof(id)) == 0)
             printf("\"%s\" (recognized as LegacyPicture)\n", chName);
           else if (memcmp( &id, &kAAFDataDef_Picture, sizeof(id)) == 0)
             printf("\"%s\" (recognized as Picture)\n", chName);
-          else if (memcmp( &id, &DDEF_Sound, sizeof(id)) == 0)
+          else if (memcmp( &id, &kAAFDataDef_LegacySound, sizeof(id)) == 0)
             printf("\"%s\" (recognized as LegacySound)\n", chName);
           else if (memcmp( &id, &kAAFDataDef_Sound, sizeof(id)) == 0)
             printf("\"%s\" (recognized as Sound)\n", chName);
-          else if (memcmp( &id, &DDEF_Timecode, sizeof(id)) == 0)
+          else if (memcmp( &id, &kAAFDataDef_LegacyTimecode, sizeof(id)) == 0)
             printf("\"%s\" (recognized as LegacyTimecode)\n", chName);
           else if (memcmp( &id, &kAAFDataDef_Timecode, sizeof(id)) == 0)
             printf("\"%s\" (recognized as Timecode)\n", chName);

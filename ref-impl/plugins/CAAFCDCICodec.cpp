@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.12 2004/10/22 14:04:10 phil_tudor Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.13 2004/10/27 17:15:01 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -682,7 +682,7 @@ HRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 
 	if(EqualAUID(&essenceKind, &kAAFDataDef_Picture)
-		|| EqualAUID(&essenceKind, &DDEF_Picture))
+		|| EqualAUID(&essenceKind, &kAAFDataDef_LegacyPicture))
 	{
 		*pNumChannels = 1;
 	}
@@ -826,7 +826,7 @@ HRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 
 	if(EqualAUID(&essenceKind, &kAAFDataDef_Picture)
-		|| EqualAUID(&essenceKind, &DDEF_Picture))
+		|| EqualAUID(&essenceKind, &kAAFDataDef_LegacyPicture))
 	{
 		*pNumSamples = _numberOfSamples;
 	}
@@ -890,7 +890,7 @@ CAAFCDCICodec::Create (IAAFSourceMob *p_srcmob,
     {
 	    // Check essence kind
 		checkExpression( kAAFTrue == EqualAUID(&essenceKind, &kAAFDataDef_Picture)
-			|| kAAFTrue == EqualAUID(&essenceKind, &DDEF_Picture),
+			|| kAAFTrue == EqualAUID(&essenceKind, &kAAFDataDef_LegacyPicture),
 			AAFRESULT_INVALID_DATADEF );
 
 		// Sets whether or not to compress samples as they are written
@@ -2785,7 +2785,7 @@ HRESULT STDMETHODCALLTYPE CAAFCDCICodec::GetLargestSampleSize(
 	try
 	{
 		if(EqualAUID(&dataDefID, &kAAFDataDef_Picture)
-			|| EqualAUID(&dataDefID, &DDEF_Picture))
+			|| EqualAUID(&dataDefID, &kAAFDataDef_LegacyPicture))
 		{ 
 			// The samples will be uncompressed so return the 
 			// previously computed value for a single 

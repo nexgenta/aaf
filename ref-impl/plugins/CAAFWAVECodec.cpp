@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.60 2004/10/25 13:29:08 stuart_hc Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.61 2004/10/27 17:15:02 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -380,7 +380,7 @@ HRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		if(EqualAUID(&essenceKind, &kAAFDataDef_Sound)
-			|| EqualAUID(&essenceKind, &DDEF_Sound))
+			|| EqualAUID(&essenceKind, &kAAFDataDef_LegacySound))
 		{
 			if(!_headerLoaded)
 			{
@@ -444,7 +444,7 @@ HRESULT STDMETHODCALLTYPE
         aafLength_t *  pNumSamples)
 {
 	if(EqualAUID(&essenceKind, &kAAFDataDef_Sound)
-		|| EqualAUID(&essenceKind, &DDEF_Sound))
+		|| EqualAUID(&essenceKind, &kAAFDataDef_LegacySound))
 	{
 		*pNumSamples = _sampleFrames;
 	}
@@ -1278,7 +1278,7 @@ HRESULT STDMETHODCALLTYPE
 		return(AAFRESULT_EOF);
 
 	if(EqualAUID(&dataDefID, &kAAFDataDef_Sound)
-		|| EqualAUID(&dataDefID, &DDEF_Sound))
+		|| EqualAUID(&dataDefID, &kAAFDataDef_LegacySound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);
@@ -1294,7 +1294,7 @@ HRESULT STDMETHODCALLTYPE
 		return(AAFRESULT_NULL_PARAM);
 
 	if(EqualAUID(&dataDefID, &kAAFDataDef_Sound)
-		|| EqualAUID(&dataDefID, &DDEF_Sound))
+		|| EqualAUID(&dataDefID, &kAAFDataDef_LegacySound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);
