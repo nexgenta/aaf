@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -34,11 +34,18 @@
 
 class OMStorable;
 
+// @class Abstract base class decribing the class factory used by
+//        the Object Manager and provided by Object Manager clients.
+//
 class OMClassFactory {
 public:
+  // @access Public members.
 
-  // Create an instance of the appropriate derived class, given the class id.
-  //
+    //@cmember Destructor.
+  virtual ~OMClassFactory(void) {}
+
+    // @cmember Create an instance of the appropriate derived class,
+    //          given the class id.
   virtual OMStorable* create(const OMClassId& classId) const = 0;
 
 };
