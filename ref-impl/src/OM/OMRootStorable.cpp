@@ -26,17 +26,17 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRootStorable
-
 #include "OMRootStorable.h"
-
-#include "OMStoredObject.h"
 
 OMRootStorable::OMRootStorable(void)
 : _clientRoot(0x0002, L"Header"),
   _dictionary(0x0001, L"MetaDictionary")
 {
-  initialize(0, 0);
+  _persistentProperties.put(_clientRoot.address());
+  _persistentProperties.put(_dictionary.address());
+
+  _clientRoot = 0;
+  _dictionary = 0;
 }
 
 OMRootStorable::OMRootStorable(OMStorable* clientRoot,
@@ -44,7 +44,11 @@ OMRootStorable::OMRootStorable(OMStorable* clientRoot,
 : _clientRoot(0x0002, L"Header"),
   _dictionary(0x0001, L"MetaDictionary")
 {
-  initialize(clientRoot, dictionary);
+  _persistentProperties.put(_clientRoot.address());
+  _persistentProperties.put(_dictionary.address());
+
+  _clientRoot = clientRoot;
+  _dictionary = dictionary;
 }
 
 OMRootStorable::~OMRootStorable(void)
@@ -65,16 +69,8 @@ void OMRootStorable::save(void) const
 {
   TRACE("OMRootStorable::save");
 
-  OMRootStorable* nonConstThis = const_cast<OMRootStorable*>(this);
-  store()->save(*nonConstThis);
-}
-
-  // @mfunc Close this <c OMRootStorable>.
-void OMRootStorable::close(void)
-{
-  TRACE("OMRootStorable::close");
-
-  OMStorable::close(); // call base class close() for now
+  store()->save(classId());
+  store()->save(_persistentProperties);
 }
 
   // @mfunc Restore the contents of an <c OMRootStorable>.
@@ -93,18 +89,4 @@ OMStorable* OMRootStorable::clientRoot(void) const
 OMDictionary* OMRootStorable::dictionary(void) const
 {
   return _dictionary;
-}
-
-void OMRootStorable::initialize(OMStorable* clientRoot,
-                                OMDictionary* dictionary)
-{
-  _persistentProperties.put(_clientRoot.address());
-  _persistentProperties.put(_dictionary.address());
-
-  _clientRoot = clientRoot;
-  _dictionary = dictionary;
-
-  _clientRoot.initialize(OMDictionary::find(0x0002));
-  _dictionary.initialize(OMDictionary::find(0x0001));
-
 }
