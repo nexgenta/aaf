@@ -18,10 +18,11 @@
 #include "AAFStoredObjectIDs.h"
 #include "aafCvt.h"
 #include "AAFResult.h"
+#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
 // This values are used for testing purposes
-static aafUID_t    fillerUID = DDEF_Video;
+static aafUID_t    fillerUID = DDEF_Picture;
 static aafLength_t  fillerLength = 3200;
 static aafUID_t	zeroID = { 0 };
 
@@ -87,12 +88,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDefObject*				pDefObject = NULL;
 	
 	aafUID_t					newMobID;
-	aafUID_t					datadef = DDEF_Video;
+	aafUID_t					datadef = DDEF_Picture;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
 	aafLength_t					transitionLength;
 	aafPosition_t				cutPoint = 0;
-	aafUID_t					testDataDef = DDEF_Video;
+	aafUID_t					testDataDef = DDEF_Picture;
 	aafLength_t					effectLen = TEST_EFFECT_LEN;
 	aafUID_t					effectID = kTestEffectID;
 	aafUID_t					parmID = kTestParmID;
@@ -106,7 +107,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 
@@ -364,7 +365,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
