@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.cpp,v 1.5 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStoredObject.cpp,v 1.6 2004/11/24 18:23:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -882,9 +882,10 @@ OMRootStorable* OMSSStoredObject::restore(OMFile& file)
   root->restoreContents();
 
 #if defined(OM_DEBUG)
-  OMDictionary *metaDictionary = root->dictionary();
-  ASSERT("Consistent dictionaries", metaDictionary == file.dictionary());
+  OMDictionary *metaDictionary =
 #endif
+  root->dictionary();
+  ASSERT("Consistent dictionaries", metaDictionary == file.dictionary());
   root->setClassFactory(file.classFactory());
 
   file.setLoadMode(savedLoadMode);
