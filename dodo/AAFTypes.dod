@@ -53,11 +53,14 @@ AD_CPP_QUOTE(#endif // ndef _MAC)
 AD_CPP_QUOTE(#ifdef __MWERKS__)
 AD_CPP_QUOTE(#if !__option\(wchar_type\))
 AD_CPP_QUOTE(typedef aafUInt16 	aafWChar;)
+AD_CPP_QUOTE(typedef aafUInt16 	aafCharacter;)
 AD_CPP_QUOTE(#else //!__option\(wchar_type\))
 AD_CPP_QUOTE(typedef wchar_t 	aafWChar;)
+AD_CPP_QUOTE(typedef wchar_t 	aafCharacter;)
 AD_CPP_QUOTE(#endif //!__option\(wchar_type\))
 AD_CPP_QUOTE(#else // __MWERKS__)
 typedef wchar_t		aafWChar;
+typedef wchar_t		aafCharacter;
 AD_CPP_QUOTE(#endif // __MWERKS__)
 
 typedef aafInt32		AAFRESULT;
@@ -147,9 +150,9 @@ AD_CPP_QUOTE(#endif)
 
 
 AD_CPP_QUOTE(#if 0)
-typedef [string] aafWChar * aafString_t;
+typedef [string] aafCharacter * aafString_t;
 AD_CPP_QUOTE(#endif)
-AD_CPP_QUOTE(typedef aafWChar * aafString_t;)
+AD_CPP_QUOTE(typedef aafCharacter * aafString_t;)
 
 AD_CPP_QUOTE(/************************************************************)
 AD_CPP_QUOTE(\ *)
@@ -513,11 +516,11 @@ typedef struct _aafProductVersion_t
 
 typedef struct _aafProductIdentification_t
 {
-	aafWChar				*companyName;
-	aafWChar				*productName;
-	aafWChar				*productVersionString;
+	aafCharacter				*companyName;
+	aafCharacter				*productName;
+	aafCharacter				*productVersionString;
 	aafInt32			productID;
-	aafWChar				*platform;
+	aafCharacter				*platform;
 	aafProductVersion_t	productVersion;
 } aafProductIdentification_t;
 
@@ -875,18 +878,19 @@ AD_CPP_QUOTE(} aafSearchDictionaryCrit_t;)
 
 typedef enum _eAAFTypeCategory_t
 {
-  kAAFTypeCatUnknown       = 0, // can only occur in damaged files
-  kAAFTypeCatInt           = 1, // any integral type
-  kAAFTypeCatStrongObjRef  = 2, // strong object reference
-  kAAFTypeCatWeakObjRef    = 3, // weak object reference
-  kAAFTypeCatRename        = 4, // renamed type
-  kAAFTypeCatEnum          = 5, // enumerated type
-  kAAFTypeCatFixedArray    = 6, // fixed-size array
-  kAAFTypeCatVariableArray = 7, // variably-sized array
-  kAAFTypeCatRecord        = 8, // a structured type
-  kAAFTypeCatStream        = 9, // potentially huge amount of data
-  kAAFTypeCatString        = 10 // null-terminated variably-sized
-								// array
+  kAAFTypeCatUnknown       = 0,  // can only occur in damaged files
+  kAAFTypeCatInt           = 1,  // any integral type
+  kAAFTypeCatStrongObjRef  = 2,  // strong object reference
+  kAAFTypeCatWeakObjRef    = 3,  // weak object reference
+  kAAFTypeCatRename        = 4,  // renamed type
+  kAAFTypeCatEnum          = 5,  // enumerated type
+  kAAFTypeCatFixedArray    = 6,  // fixed-size array
+  kAAFTypeCatVariableArray = 7,  // variably-sized array
+  kAAFTypeCatRecord        = 8,  // a structured type
+  kAAFTypeCatStream        = 9,  // potentially huge amount of data
+  kAAFTypeCatString        = 10, // null-terminated variably-sized
+								 // array
+  kAAFTypeCatExtEnum       = 11  // extendible enumerated type
 } eAAFTypeCategory_t;
 
 
