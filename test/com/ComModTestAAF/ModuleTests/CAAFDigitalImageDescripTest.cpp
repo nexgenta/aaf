@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFDigitalImageDescriptor
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDigitalImageDescripTest.cpp,v 1.31 2004/09/16 15:09:09 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDigitalImageDescripTest.cpp,v 1.32 2004/11/02 12:05:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -69,7 +69,7 @@ using namespace std;
 #define kDisplayF2OffsetTestVal			1
 #define kStoredF2OffsetTestVal			-1
 #define kActiveFormatDescriptorTestVal	3
-#define kSignalStandardTestVal			kAAFSignalS125MProgressive
+#define kSignalStandardTestVal			kAAFSignalITU1358
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
