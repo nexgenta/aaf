@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -81,7 +81,7 @@ ImplAAFDefObject::~ImplAAFDefObject ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::Initialize (
+    ImplAAFDefObject::pvtInitialize (
       const aafUID_t & id,
 	  const aafWChar * pName,
 	  const aafWChar * pDesc)
@@ -98,6 +98,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	return AAFRESULT_SUCCESS;
 }
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetName (
       const aafCharacter *  pName)
@@ -233,36 +235,41 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPluginDescriptor *pPluginDescriptor)
 {
 	aafUID_t	*tmp, newUID;
-	aafInt32	oldBufSize;
-	aafInt32	newBufSize;
+	aafInt32	oldCount;
+	aafInt32	newCount;
+	static const aafUID_t nullID = { 0 };
+
 
 //!!!	if(pPluginDescriptor == NULL)
 //		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
-		oldBufSize = _descriptors.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
+		oldCount = _descriptors.count();
+		if (oldCount == 1) {
+			aafUID_t first;
+			_descriptors.getValueAt(&first, 0);
+		  	if(EqualAUID(&first, &nullID))	//!!! Handle non-optional props
+		  	{									//!!!
+				oldCount = 0;					//!!!
+			}									//!!!
+		}
+		newCount = oldCount + 1;
 		if(pPluginDescriptor == NULL)	//!!!
-			newUID = NilMOBID;			//!!!
+			newUID = nullID;			//!!!
 		else
 		{
 			CHECK(pPluginDescriptor->GetAUID(&newUID));
 		}
-		tmp = new aafUID_t[newBufSize];
+		tmp = new aafUID_t[newCount];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
+		if(oldCount != 0)
 		{
-			_descriptors.copyToBuffer(tmp, oldBufSize);
-			if(EqualAUID(tmp, &NilMOBID))		//!!! Handle non-optional props
-			{									//!!!
-				oldBufSize = 0;					//!!!
-				newBufSize -= sizeof(aafUID_t);	//!!!
-			}									//!!!
+			_descriptors.copyToBuffer(tmp, oldCount * sizeof(aafUID_t));
 		}
-		tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
-		_descriptors.setValue(tmp, newBufSize);
+		tmp[newCount - 1] = newUID;
+		_descriptors.setValue(tmp, newCount * sizeof(aafUID_t));
 		delete [] tmp;
 	}
 	XEXCEPT
@@ -282,29 +289,24 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPluginDescriptor *pPluginDescriptor)
 {
 	aafUID_t	*tmp = NULL, newUID;
-	aafInt32	oldBufSize;
-	aafInt32	newBufSize;
-	aafInt32	n;
+	aafInt32	oldCount;
+	aafInt32	newCount;
 
 	if(pPluginDescriptor == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
-		oldBufSize = _descriptors.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
+		oldCount = _descriptors.count();
+		newCount = oldCount + 1;
 		CHECK(pPluginDescriptor->GetAUID(&newUID));
-		tmp = new aafUID_t[newBufSize];
+		tmp = new aafUID_t[newCount];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
-			_descriptors.copyToBuffer(tmp, oldBufSize);
-		for(n = oldBufSize/sizeof(aafUID_t); n >= 0; n--)
-		{
-			tmp[n+1] = tmp[n];
-		}
+		if(oldCount != 0)
+			_descriptors.copyToBuffer(&tmp[1], oldCount * sizeof(aafUID_t));
 		tmp[0] = newUID;
-		_descriptors.setValue(tmp, newBufSize);
+		_descriptors.setValue(tmp, newCount * sizeof(aafUID_t));
 		delete [] tmp;
 	}
 	XEXCEPT
