@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.13 2004/07/02 17:17:03 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.14 2004/09/23 13:54:51 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -76,7 +76,7 @@ test : install
 
 .PHONY : check
 check : test
-	cd test/com/ComModTestAAF && $(MAKE) check
+	cd test && $(MAKE) $@
 
 #
 # Binary distributions
