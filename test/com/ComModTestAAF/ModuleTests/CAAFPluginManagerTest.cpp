@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPluginManagerTest.cpp,v 1.18 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPluginManagerTest.cpp,v 1.19 2004/05/05 16:03:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,8 +38,13 @@ using namespace std;
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
 #include "AAF.h"
+
 #include "AAFPlugin.h"
+#ifndef DISABLE_DYNAMIC_LOADING
+// AAFPlugin_i.c's definitions conflict with the definitions instantiated in ImplAAFPluginManager.cpp
+// So don't include it for static builds
 #include "AAFPlugin_i.c"
+#endif
 
 const CLSID CLSID_AAFBasicInterp = { 0x5B6C85A1, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
 
