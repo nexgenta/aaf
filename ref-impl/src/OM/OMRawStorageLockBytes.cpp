@@ -26,18 +26,12 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRawStorageLockBytes
-
 #include "OMRawStorageLockBytes.h"
 
 #include "OMAssertions.h"
 #include "OMMSStructuredStorage.h"
 
 #include "OMRawStorage.h"
-
-// The Object Manager expects only one thread per file.
-// This implementation of the ILockBytes interface is designed for
-// single process (aka in proc) and single thread use only.
 
 HRESULT STDMETHODCALLTYPE
 OMRawStorageLockBytes::QueryInterface(REFIID /* riid */,
@@ -100,11 +94,11 @@ OMRawStorageLockBytes::ReadAt(ULARGE_INTEGER ulOffset,
 {
   TRACE("OMRawStorageLockBytes::ReadAt");
 
+  _rawStorage->setPosition(toOMUInt64(ulOffset));
   OMUInt32 bytesRead = 0;
-  _rawStorage->readAt(toOMUInt64(ulOffset),
-                      static_cast<OMByte*>(pv),
-                      cb,
-                      bytesRead);
+  _rawStorage->read(static_cast<OMByte*>(pv),
+                    cb,
+                    bytesRead);
   *pcbRead = bytesRead;
   return NOERROR;
 }
@@ -118,11 +112,11 @@ OMRawStorageLockBytes::WriteAt(ULARGE_INTEGER ulOffset,
 {
   TRACE("OMRawStorageLockBytes::WriteAt");
 
+  _rawStorage->setPosition(toOMUInt64(ulOffset));
   OMUInt32 bytesWritten = 0;
-  _rawStorage->writeAt(toOMUInt64(ulOffset),
-                       static_cast<const OMByte*>(pv),
-                       cb,
-                       bytesWritten);
+  _rawStorage->write(static_cast<const OMByte*>(pv),
+                     cb,
+                     bytesWritten);
   *pcbWritten = bytesWritten;
   return NOERROR;
 }
@@ -134,7 +128,7 @@ OMRawStorageLockBytes::Flush(void)
 {
   TRACE("OMRawStorageLockBytes::Flush");
 
-  _rawStorage->synchronize();
+  // TBS
   return NOERROR;
 }
 
@@ -145,7 +139,7 @@ OMRawStorageLockBytes::SetSize(ULARGE_INTEGER cb)
 {
   TRACE("OMRawStorageLockBytes::SetSize");
 
-  _rawStorage->extend(toOMUInt64(cb));
+  _rawStorage->setSize(toOMUInt64(cb));
   return NOERROR;
 }
 
@@ -157,7 +151,7 @@ OMRawStorageLockBytes::LockRegion(ULARGE_INTEGER /* libOffset */,
 {
   TRACE("OMRawStorageLockBytes::LockRegion");
 
-  // Function not supported.
+  // TBS
   return E_FAIL;
 }
 
@@ -169,7 +163,7 @@ OMRawStorageLockBytes::UnlockRegion(ULARGE_INTEGER /* libOffset */,
 {
   TRACE("OMRawStorageLockBytes::UnlockRegion");
 
-  // Function not supported.
+  // TBS
   return E_FAIL;
 }
 
@@ -180,7 +174,7 @@ OMRawStorageLockBytes::Stat(STATSTG *pstatstg,
 {
   TRACE("OMRawStorageLockBytes::Stat");
 
-  // TBS tjb
+  // TBS
   memset(pstatstg, 0, sizeof(STATSTG));
   return NOERROR;
 }
