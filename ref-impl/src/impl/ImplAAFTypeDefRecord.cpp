@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #ifndef __ImplAAFTypeDefRecord_h__
 #include "ImplAAFTypeDefRecord.h"
@@ -39,6 +34,10 @@
 
 #ifndef __ImplAAFDictionary_h__
 #include "ImplAAFDictionary.h"
+#endif
+
+#ifndef __ImplAAFTypeDefExtEnum_h__
+#include "ImplAAFTypeDefExtEnum.h"
 #endif
 
 #include "AAFStoredObjectIDs.h"
@@ -144,6 +143,10 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	  if (! ppMemberTypes[i]->IsAggregatable())
 		return AAFRESULT_BAD_TYPE;
+
+	  // Check if specified type definition is in the dictionary.
+	  if( !aafLookupTypeDef( this, ppMemberTypes[i] ) )
+		return AAFRESULT_TYPE_NOT_FOUND;
 
 	  totalNameSize += (wcslen (pMemberNames[i]) + 1);
 	}
@@ -587,7 +590,45 @@ AAFRESULT STDMETHODCALLTYPE
   if (!pInPropVal)   return AAFRESULT_NULL_PARAM;
   if (!ppOutPropVal) return AAFRESULT_NULL_PARAM;
 
-  hr = GetCount (&count);
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow record
+  // and extendable enumeration type properties to be read by this 
+  // type def.
+  eAAFTypeCategory_t        type_category = kAAFTypeCatUnknown;
+  ImplAAFTypeDefRecordSP    pActualRecordType;
+
+  pInPropType->GetTypeCategory( &type_category );
+
+  if( type_category == kAAFTypeCatExtEnum )
+  {
+      // Cast input prop value type to ExtEnum.
+      ImplAAFTypeDefExtEnum	*pExtEnumType = 
+	  dynamic_cast<ImplAAFTypeDefExtEnum*>( (ImplAAFTypeDef*)pInPropType );
+      if( !pExtEnumType )
+	return AAFRESULT_BAD_TYPE;
+
+      // Now get base type of ExtEnum and cast it to Record.
+      ImplAAFTypeDefSP	pBaseType;
+      pBaseType = pExtEnumType->BaseType();
+      pActualRecordType = dynamic_cast<ImplAAFTypeDefRecord*>( (ImplAAFTypeDef*)pBaseType );
+      if( pActualRecordType == NULL )
+	  return AAFRESULT_BAD_TYPE;
+  }
+  else if( type_category == kAAFTypeCatRecord )
+  {
+      pActualRecordType = this;
+  }
+  else
+      return AAFRESULT_BAD_TYPE;
+
+
+  hr = pActualRecordType->GetCount (&count);
   if (AAFRESULT_FAILED(hr)) return hr;
   if (index >= count) return AAFRESULT_ILLEGAL_VALUE;
 
@@ -599,10 +640,10 @@ AAFRESULT STDMETHODCALLTYPE
   // add up offsets of previous items
   for (aafUInt32 i = 0; i < index; i++)
 	{
-	  hr = GetMemberType (i, &ptd);
+	  hr = pActualRecordType->GetMemberType (i, &ptd);
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (ptd);
-	  if(IsRegistered())
+	  if(pActualRecordType->IsRegistered())
 		  offset += ptd->NativeSize();
 	  else
 		  offset += ptd->PropValSize();
@@ -618,7 +659,7 @@ AAFRESULT STDMETHODCALLTYPE
   // many.  Put us back to normal.
   pvdOut->ReleaseReference ();
 
-  hr = GetMemberType (index, &ptd);
+  hr = pActualRecordType->GetMemberType (index, &ptd);
   assert (AAFRESULT_SUCCEEDED (hr));
   assert (ptd);
 
@@ -629,7 +670,8 @@ AAFRESULT STDMETHODCALLTYPE
   pvdIn = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
   assert (pvdIn);
 
-  if(IsRegistered())
+
+  if(pActualRecordType->IsRegistered())
   {
 	  hr = pvdOut->AllocateFromPropVal (pvdIn,
 									offset,
@@ -669,6 +711,22 @@ AAFRESULT STDMETHODCALLTYPE
   if (dataSize != NativeSize())
 	return AAFRESULT_ILLEGAL_VALUE;
 
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow integral
+  // and enumeration type properties to be read by this integral type def.
+  //
+  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
+  pInPropType->GetTypeCategory( &type_category );
+  if( type_category != kAAFTypeCatExtEnum  &&  
+      type_category != kAAFTypeCatRecord )
+	return AAFRESULT_BAD_TYPE;
+
   aafUInt32 bitsSize = 0;
   ImplAAFPropValData * pvd = 0;
   assert (pPropVal);
@@ -705,7 +763,44 @@ AAFRESULT STDMETHODCALLTYPE
   if (!pPropVal)   return AAFRESULT_NULL_PARAM;
   if (!pMemberPropVal) return AAFRESULT_NULL_PARAM;
 
-  hr = GetCount (&count);
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow integral
+  // and enumeration type properties to be read by this integral type def.
+  //
+  eAAFTypeCategory_t        type_category = kAAFTypeCatUnknown;
+  ImplAAFTypeDefRecordSP    pActualRecordType;
+
+  pInPropType->GetTypeCategory( &type_category );
+
+  if( type_category == kAAFTypeCatExtEnum )
+  {
+      // Cast input prop value type to ExtEnum.
+      ImplAAFTypeDefExtEnum	*pExtEnumType = 
+	  dynamic_cast<ImplAAFTypeDefExtEnum*>( (ImplAAFTypeDef*)pInPropType );
+      if( !pExtEnumType )
+	return AAFRESULT_BAD_TYPE;
+
+      // Now get base type of ExtEnum and cast it to Record.
+      ImplAAFTypeDefSP	pBaseType;
+      pBaseType = pExtEnumType->BaseType();
+      pActualRecordType = dynamic_cast<ImplAAFTypeDefRecord*>( (ImplAAFTypeDef*)pBaseType );
+      if( pActualRecordType == NULL )
+	  return AAFRESULT_BAD_TYPE;
+  }
+  else if( type_category == kAAFTypeCatRecord )
+  {
+      pActualRecordType = this;
+  }
+  else
+      return AAFRESULT_BAD_TYPE;
+
+  hr = pActualRecordType->GetCount (&count);
   if (AAFRESULT_FAILED(hr)) return hr;
   if (index <= count) return AAFRESULT_ILLEGAL_VALUE;
 
@@ -717,7 +812,7 @@ AAFRESULT STDMETHODCALLTYPE
   // add up offsets of previous items
   for (aafUInt32 i = 0; i < index; i++)
 	{
-	  hr = GetMemberType (i, &ptd);
+	  hr = pActualRecordType->GetMemberType (i, &ptd);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  assert (ptd);
 	  offset += ptd->PropValSize();
@@ -725,7 +820,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // offset now points into prop storage
 
-  hr = GetMemberType (index, &ptd);
+  hr = pActualRecordType->GetMemberType (index, &ptd);
   assert (AAFRESULT_SUCCEEDED (hr));
   assert (ptd);
 
@@ -766,6 +861,22 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_NULL_PARAM;
   if (! pData)
 	return AAFRESULT_NULL_PARAM;
+
+  // Get the property value's embedded type
+  ImplAAFTypeDefSP pInPropType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+
+  // determine if the property value's embedded type is compatible
+  // with this one for reading.  For now, we'll only allow integral
+  // and enumeration type properties to be read by this integral type def.
+  //
+  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
+  pInPropType->GetTypeCategory( &type_category );
+  if( type_category != kAAFTypeCatExtEnum  &&  
+      type_category != kAAFTypeCatRecord )
+	return AAFRESULT_BAD_TYPE;
 
   // Bobt hack implementation! Not platform-independent!
   aafUInt32 bitsSize = 0;
@@ -916,14 +1027,14 @@ void ImplAAFTypeDefRecord::reorder(OMByte* externalBytes,
 }
 
 
-size_t ImplAAFTypeDefRecord::externalSize(OMByte* /*internalBytes*/,
+size_t ImplAAFTypeDefRecord::externalSize(const OMByte* /*internalBytes*/,
 										  size_t /*internalBytesSize*/) const
 {
   return PropValSize ();
 }
 
 
-void ImplAAFTypeDefRecord::externalize(OMByte* internalBytes,
+void ImplAAFTypeDefRecord::externalize(const OMByte* internalBytes,
 									   size_t internalBytesSize,
 									   OMByte* externalBytes,
 									   size_t externalBytesSize,
@@ -977,7 +1088,7 @@ void ImplAAFTypeDefRecord::externalize(OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefRecord::internalSize(OMByte* /*externalBytes*/,
+size_t ImplAAFTypeDefRecord::internalSize(const OMByte* /*externalBytes*/,
 										  size_t /*externalBytesSize*/) const
 {
   if (IsRegistered ())
@@ -987,7 +1098,7 @@ size_t ImplAAFTypeDefRecord::internalSize(OMByte* /*externalBytes*/,
 }
 
 
-void ImplAAFTypeDefRecord::internalize(OMByte* externalBytes,
+void ImplAAFTypeDefRecord::internalize(const OMByte* externalBytes,
 									   size_t externalBytesSize,
 									   OMByte* internalBytes,
 									   size_t internalBytesSize,

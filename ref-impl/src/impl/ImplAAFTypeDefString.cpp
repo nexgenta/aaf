@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #ifndef __ImplAAFPropValData_h__
 #include "ImplAAFPropValData.h"
@@ -80,6 +75,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsStringable())
 	return AAFRESULT_BAD_TYPE;
 
+  // Check if specified type definition is in the dictionary.
+  if( !aafLookupTypeDef( this, pTypeDef ) )
+	return AAFRESULT_TYPE_NOT_FOUND;
+
   return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
@@ -130,16 +129,26 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * pPropVal,
       aafUInt32 *  pCount)
 {
+  ImplAAFTypeDefSP pIncomingType;
   ImplAAFTypeDefSP ptd;
   AAFRESULT hr;
 
   if (! pPropVal) return AAFRESULT_NULL_PARAM;
   if (! pCount) return AAFRESULT_NULL_PARAM;
+
+  // Get the property value's embedded type and 
+  // check if it's the same as the base type.
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pIncomingType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pIncomingType);
+  if( (ImplAAFTypeDef *)pIncomingType != this )
+	return AAFRESULT_BAD_TYPE;
+
   hr = GetType (&ptd);
   if (AAFRESULT_FAILED(hr)) return hr;
   assert (ptd);
   assert (ptd->IsFixedSize());
-  aafUInt32 elemSize = ptd->PropValSize();
+  aafUInt32 elemSize = ptd->ActualSize();
   aafUInt32 propSize;
   assert (pPropVal);
 
@@ -168,6 +177,9 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (! ppPropVal)
 	return AAFRESULT_NULL_PARAM;
+
+  if (! IsRegistered ())
+	return AAFRESULT_NOT_REGISTERED;
 
   ImplAAFPropValDataSP pvd;
   ImplAAFPropValData * tmp;
@@ -211,6 +223,15 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (! IsRegistered ())
 	return AAFRESULT_NOT_REGISTERED;
+
+  // Get the property value's embedded type and 
+  // check if it's the same as the base type.
+  ImplAAFTypeDefSP pIncomingType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pIncomingType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pIncomingType);
+  if( (ImplAAFTypeDef *)pIncomingType != this )
+	return AAFRESULT_BAD_TYPE;
 
   AAFRESULT hr;
   ImplAAFTypeDefSP pBaseType;
@@ -283,15 +304,17 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	AAFRESULT hr;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the base type.
 	ImplAAFTypeDefSP  pIncomingType;
-	hr = GetType (&pIncomingType);
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pIncomingType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pIncomingType);
+	if( (ImplAAFTypeDef *)pIncomingType != this )
+		return AAFRESULT_BAD_TYPE;
 	
 	ImplAAFTypeDefSP  pBaseType;
 	hr = GetType (&pBaseType);
-	
-	//compare types ... make sure there're the same
-	if (!AreUnksSame(pIncomingType, pBaseType))
-		return AAFRESULT_ILLEGAL_VALUE;
 	
 	//do the size thing ...
 	
@@ -386,6 +409,18 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pInPropVal) return AAFRESULT_NULL_PARAM;
   if (! pBuffer) return AAFRESULT_NULL_PARAM;
 
+  if (! IsRegistered ())
+	return AAFRESULT_NOT_REGISTERED;
+
+  // Get the property value's embedded type and 
+  // check if it's the same as the base type.
+  ImplAAFTypeDefSP pIncomingType;
+  if( AAFRESULT_FAILED( pInPropVal->GetType( &pIncomingType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pIncomingType);
+  if( (ImplAAFTypeDef *)pIncomingType != this )
+	return AAFRESULT_BAD_TYPE;
+
   ImplAAFPropValDataSP pvd;
   pvd = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
   if (!pvd) return AAFRESULT_BAD_TYPE;
@@ -451,7 +486,7 @@ void ImplAAFTypeDefString::reorder(OMByte* externalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::externalSize(OMByte* internalBytes,
+size_t ImplAAFTypeDefString::externalSize(const OMByte* /*internalBytes*/,
 										  size_t internalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
@@ -459,7 +494,7 @@ size_t ImplAAFTypeDefString::externalSize(OMByte* internalBytes,
 
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
-  aafUInt32 intElemSize = ptd->NativeSize ();
+  aafUInt32 intElemSize = ptd->ActualSize ();
   // aafUInt32 extElemSize = ptd->externalSize (0, 0);
   // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   assert (intElemSize);
@@ -468,7 +503,7 @@ size_t ImplAAFTypeDefString::externalSize(OMByte* internalBytes,
 }
 
 
-void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
+void ImplAAFTypeDefString::externalize(const OMByte* internalBytes,
 									   size_t internalBytesSize,
 									   OMByte* externalBytes,
 									   size_t externalBytesSize,
@@ -479,12 +514,10 @@ void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
 
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
-  aafUInt32 intElemSize = ptd->NativeSize ();
-  // aafUInt32 intElemSize = ptd->NativeSize ();
-  // aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->ActualSize ();
   aafUInt32 numElems = internalBytesSize / intElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafInt32 intNumBytesLeft = internalBytesSize;
+  aafInt32 extNumBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
 
   for (elem = 0; elem < numElems; elem++)
@@ -504,7 +537,7 @@ void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::internalSize(OMByte* externalBytes,
+size_t ImplAAFTypeDefString::internalSize(const OMByte* /*externalBytes*/,
 										  size_t externalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
@@ -512,7 +545,7 @@ size_t ImplAAFTypeDefString::internalSize(OMByte* externalBytes,
 
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
-  aafUInt32 intElemSize = ptd->NativeSize ();
+  aafUInt32 intElemSize = ptd->ActualSize ();
   // aafUInt32 extElemSize = ptd->externalSize (0, 0);
   // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   assert (intElemSize);
@@ -521,7 +554,7 @@ size_t ImplAAFTypeDefString::internalSize(OMByte* externalBytes,
 }
 
 
-void ImplAAFTypeDefString::internalize(OMByte* externalBytes,
+void ImplAAFTypeDefString::internalize(const OMByte* externalBytes,
 									   size_t externalBytesSize,
 									   OMByte* internalBytes,
 									   size_t internalBytesSize,
@@ -532,12 +565,12 @@ void ImplAAFTypeDefString::internalize(OMByte* externalBytes,
 
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
-  aafUInt32 intElemSize = ptd->NativeSize ();
+  aafUInt32 intElemSize = ptd->ActualSize ();
   // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   // aafUInt32 extElemSize = ptd->externalSize (0, 0);
   aafUInt32 numElems = externalBytesSize / extElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafInt32 intNumBytesLeft = internalBytesSize;
+  aafInt32 extNumBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
 
   for (elem = 0; elem < numElems; elem++)
@@ -611,8 +644,7 @@ OMProperty * ImplAAFTypeDefString::pvtCreateOMProperty
 	  {
 	    // element is integral type
 	    aafUInt32 intSize;
-	    AAFRESULT hr;
-	    hr = ptdi->GetSize (&intSize);
+	    ptdi->GetSize (&intSize);
 	    switch (intSize)
 		  {
 		  case 1:
