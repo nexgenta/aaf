@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -34,14 +34,25 @@
 #include <fstream.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 
-#ifdef WIN32
+#ifndef __AAF_h__
+#include "AAF.h"
+#endif
+
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
+#endif
+
+
+#if defined( OS_WINDOWS )
+#include <winbase.h>
 #include <unknwn.h>
 #include <objbase.h>
 #endif
 
-#if defined(macintosh)
+#if defined( OS_MACOS )
 #define _MAC
 
 // Make sure we have defined IID_IUnknown and IID_IClassFactory.
@@ -61,21 +72,13 @@
 #include "dispatch.h"
 #include "wintypes.h"
 #include <olectl.h>
-#endif
 
-
-#ifndef __AAF_h__
-#include "AAF.h"
-#endif
+#endif  // OS_MACOS
 
 
 #include "CAAFModuleTest.h"
 #include "ModuleTest.h"
 
-#ifdef WIN32
-#include <winbase.h>
-//#include <tchar.h>
-#endif
 
 typedef AAFRESULT (*AAFModuleTestProc)();
 
@@ -88,7 +91,7 @@ static void formatError(DWORD errorCode)
 {
   cerr << "RESULT = " << (long)errorCode << " (0x" << hex << errorCode << dec << ")" << endl;
 
-#ifdef WIN32
+#if defined( OS_WINDOWS )
   CHAR buffer[256];
 
   int status = FormatMessageA(
@@ -106,7 +109,7 @@ static void formatError(DWORD errorCode)
     }
     cerr << buffer << endl;
   }
-#endif
+#endif // OS_WINDOWS
 
 	cerr << endl;
 }
@@ -119,13 +122,6 @@ static void throwIfError(HRESULT hr)
     throw hr;
 	}
 }
-
-// helper class
-struct CComInitialize
-{
-	CComInitialize() { CoInitialize(NULL); }
-	~CComInitialize() { CoUninitialize(); }
-};
 
 
 // simple helper class to initialize and cleanup AAF library.
@@ -194,20 +190,11 @@ int main(int argc, char* argv[])
 	testMode_t	testMode = kAAFUnitTestReadWrite;
 
 
-	// Initialize com library for this process.
-	CComInitialize comInit;
-
 	// Create the module test object.
 	CAAFModuleTest AAFModuleTest;
 	try
 	{
 		HRESULT hr = S_OK;
-
-		// Make sure the dll can be loaded and initialized.
-		CAAFInitialize aafInit;
-
-		// Make sure the shared plugins can be loaded and registered.
-   		CAAFInitializePlugins aafInitPlugins;
 
 		/* Check arguments to see if help was requested */
 
@@ -226,13 +213,31 @@ int main(int argc, char* argv[])
 			return(0);
 		}
 
+		/* List the AAF class names, one per line, in the order that the tests will be run. */
+		/* This can be used for more selective automated testing... */
+		if ( argc > 1 &&
+			(0 == strncmp(argv[1],"-l",2) ||
+			 0 == strncmp(argv[1],"-L",2) )	)
+		{
+			AAFModuleTest.List();
+			return(0);
+		}
+
 		if ( argc > 1 &&
 			(0 == strncmp(argv[1],"-r",2) ||
-			 0 == strncmp(argv[1],"-r",2) )	)
+			 0 == strncmp(argv[1],"-R",2) )	)
 		{
 			testMode = kAAFUnitTestReadOnly;
 			startArg++;
 		}
+
+
+
+		// Make sure the dll can be loaded and initialized.
+		CAAFInitialize aafInit;
+
+		// Make sure the shared plugins can be loaded and registered.
+   		CAAFInitializePlugins aafInitPlugins;
 
 		/* Print Header */
 		cout<< "\n\n"<< endl;
