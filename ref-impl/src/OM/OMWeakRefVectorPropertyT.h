@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefVectorPropertyT.h,v 1.75 2004/11/30 21:59:38 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefVectorPropertyT.h,v 1.76 2004/11/30 22:04:52 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1221,6 +1221,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::shallowCopyTo(
   delete [] dest->_targetPropertyPath;
   dest->_targetPropertyPath = 0;
   dest->_keyPropertyId = _keyPropertyId;
+  dest->setPresent();
 }
 
 template <typename ReferencedObject>

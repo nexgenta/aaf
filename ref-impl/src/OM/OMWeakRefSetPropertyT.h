@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefSetPropertyT.h,v 1.63 2004/11/30 21:59:38 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefSetPropertyT.h,v 1.64 2004/11/30 22:04:52 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -927,6 +927,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::shallowCopyTo(
   delete [] dest->_targetPropertyPath;
   dest->_targetPropertyPath = 0;
   dest->_keyPropertyId = _keyPropertyId;
+  dest->setPresent();
 }
 
 template <typename ReferencedObject>
