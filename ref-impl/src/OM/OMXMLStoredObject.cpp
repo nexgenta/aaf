@@ -28,16 +28,13 @@
 // @doc OMINTERNAL
 #include "OMXMLStoredObject.h"
 
-#include "OMRawStorage.h"
-
   // @mfunc Open the root <c OMXMLStoredObject> in the raw storage
   //        <p rawStorage> for reading only.
   //   @parm The raw storage in which to open the file.
   //   @rdesc An <c OMXMLStoredObject> representing the root object.
-OMXMLStoredObject* OMXMLStoredObject::openRead(OMRawStorage* ANAME(rawStorage))
+OMXMLStoredObject* OMXMLStoredObject::openRead(OMRawStorage* /* rawStorage */)
 {
   TRACE("OMXMLStoredObject::openRead");
-  PRECONDITION("Compatible raw storage", rawStorage->isReadable());
   ASSERT("Unimplemented code not reached", false); // tjb TBS
   return 0;
 }
@@ -47,11 +44,9 @@ OMXMLStoredObject* OMXMLStoredObject::openRead(OMRawStorage* ANAME(rawStorage))
   //   @rdesc An <c OMXMLStoredObject> representing the root object.
   //        <p rawStorage> for modification.
 OMXMLStoredObject* OMXMLStoredObject::openModify(
-                                               OMRawStorage* ANAME(rawStorage))
+                                                OMRawStorage* /* rawStorage */)
 {
   TRACE("OMXMLStoredObject::openModify");
-  PRECONDITION("Compatible raw storage",
-                         rawStorage->isReadable() && rawStorage->isWritable());
   ASSERT("Unimplemented code not reached", false); // tjb TBS
   return 0;
 }
@@ -62,31 +57,13 @@ OMXMLStoredObject* OMXMLStoredObject::openModify(
   //   @parm The raw storage in which to create the file.
   //   @parm The desired byte ordering for the new file.
   //   @rdesc An <c OMXMLStoredObject> representing the root object.
-OMXMLStoredObject* OMXMLStoredObject::createWrite(OMRawStorage* rawStorage,
-                                                  const OMByteOrder byteOrder)
-{
-  TRACE("OMXMLStoredObject::createWrite");
-  PRECONDITION("Compatible raw storage", rawStorage->isWritable());
-  OMXMLStoredObject* result = new OMXMLStoredObject(rawStorage, byteOrder);
-  ASSERT("Valid heap pointer", result != 0);
-  return result;
-}
-
-  // @mfunc Create a new root <c OMXMLStoredObject> in the raw storage
-  //        <p rawStorage>. The byte order of the newly created root
-  //        is given by <p byteOrder>.
-  //   @parm The raw storage in which to create the file.
-  //   @parm The desired byte ordering for the new file.
-  //   @rdesc An <c OMXMLStoredObject> representing the root object.
-OMXMLStoredObject* OMXMLStoredObject::createModify(OMRawStorage* rawStorage,
-                                                   const OMByteOrder byteOrder)
+OMXMLStoredObject* OMXMLStoredObject::createModify(
+                                             OMRawStorage* /* rawStorage */,
+                                             const OMByteOrder /* byteOrder */)
 {
   TRACE("OMXMLStoredObject::createModify");
-  PRECONDITION("Compatible raw storage",
-                         rawStorage->isReadable() && rawStorage->isWritable());
-  OMXMLStoredObject* result = new OMXMLStoredObject(rawStorage, byteOrder);
-  ASSERT("Valid heap pointer", result != 0);
-  return result;
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+  return 0;
 }
 
   // @mfunc Destructor.
@@ -127,7 +104,7 @@ void OMXMLStoredObject::close(void)
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
-void OMXMLStoredObject::close(OMFile& /* file */)
+void OMXMLStoredObject::close(OMFile& file)
 {
   TRACE("OMXMLStoredObject::close");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -143,13 +120,13 @@ OMByteOrder OMXMLStoredObject::byteOrder(void) const
   return unspecified;
 }
 
-void OMXMLStoredObject::save(OMFile& /* file */)
+void OMXMLStoredObject::save(OMFile& file)
 {
   TRACE("OMXMLStoredObject::save(OMFile)");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
-void OMXMLStoredObject::save(OMStorable& /* object */)
+void OMXMLStoredObject::save(OMStorable& object)
 {
   TRACE("OMXMLStoredObject::save(OMFile)");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -394,10 +371,8 @@ OMStoredStream* OMXMLStoredObject::createStoredStream(
 
   // @mfunc Constructor.
   //   @parm The <c OMRawStorage> on which this <c OMXMLStoredObject> resides.
-  //   @parm TBS
-OMXMLStoredObject::OMXMLStoredObject(OMRawStorage* s, OMByteOrder byteOrder)
-: _store(s),
-  _byteOrder(byteOrder)
+OMXMLStoredObject::OMXMLStoredObject(OMRawStorage* s)
+: _store(s)
 {
   TRACE("OMXMLStoredObject::OMXMLStoredObject");
 }
