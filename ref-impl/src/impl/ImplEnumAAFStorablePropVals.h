@@ -1,7 +1,7 @@
 //@doc
-//@class    EnumAAFLoadedPlugins | Implementation class for EnumAAFLoadedPlugins
-#ifndef __ImplEnumAAFLoadedPlugins_h__
-#define __ImplEnumAAFLoadedPlugins_h__
+//@class    EnumAAFStorablePropVals | Implementation class for EnumAAFStorablePropVals
+#ifndef __ImplEnumAAFStorablePropVals_h__
+#define __ImplEnumAAFStorablePropVals_h__
 
 
 //=---------------------------------------------------------------------=
@@ -27,52 +27,67 @@
 //=---------------------------------------------------------------------=
 
 
-class ImplAAFPluginDef;
 
-#ifndef __ImplAAFRoot_h__
-#include "ImplAAFRoot.h"
+
+
+
+
+
+class ImplAAFRefContainerValue;
+class ImplAAFTypeDefObjectRef;
+class OMReferenceContainerIterator;
+
+#ifndef __ImplEnumAAFPropertyValues_h__
+#include "ImplEnumAAFPropertyValues.h"
 #endif
 
-#include "aafTable.h"
 
-class ImplAAFPluginManager;
-
-class ImplEnumAAFLoadedPlugins : public ImplAAFRoot
+class ImplEnumAAFStorablePropVals : public ImplEnumAAFPropertyValues
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplEnumAAFLoadedPlugins ();
+  ImplEnumAAFStorablePropVals ();
 
 protected:
-  virtual ~ImplEnumAAFLoadedPlugins ();
+  virtual ~ImplEnumAAFStorablePropVals ();
 
 public:
-
-
+  
+  //****************
+  // Initialize()
+  //
+  AAFRESULT STDMETHODCALLTYPE
+    Initialize
+      (ImplAAFRefContainerValue* pContainerValue,
+       OMReferenceContainerIterator* containerIterator);
+  
   //****************
   // NextOne()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     NextOne
-        // @parm [out,retval] The Next AAFPluginDescriptor
-        (aafUID_t * ppAAFPluginDescriptor);
+        // @parm [out,retval] The Next Property Value
+        (ImplAAFPropertyValue ** ppPropertyValue);
+
 
   //****************
   // Next()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Next
-        (// @parm [in] number of AAFPluginDef requested
+        (// @parm [in] number of objects requested
          aafUInt32  count,
 
-         // @parm [out, size_is(count), length_is(*pFetched)] array to receive AAFPluginDescriptors
-         aafUID_t *ppAAFPluginDesc,
+         // @parm [out, size_is(count), length_is(*pFetched)] array to receive Property Values
+         ImplAAFPropertyValue ** ppPropertyValues,
 
-         // @parm [out,ref] number of actual AAFPluginDescriptor fetched into ppAAFPluginDesc array
+         // @parm [out,ref] number of actual Property Values fetched into ppPropertyValues
+	// array
          aafUInt32 *  pFetched);
+
 
   //****************
   // Skip()
@@ -82,11 +97,13 @@ public:
         // @parm [in] Number of elements to skip
         (aafUInt32  count);
 
+
   //****************
   // Reset()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Reset ();
+
 
 
   //****************
@@ -95,20 +112,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Clone
         // @parm [out,retval] new enumeration
-        (ImplEnumAAFLoadedPlugins ** ppEnum);
-
-
-public:
-// Private to the SDK
-	virtual AAFRESULT SetCategory(aafUID_t *category);
-
-private:
-	aafUID_t				_category;
-	ImplAAFPluginManager	*_manager;
-	aafTableIterate_t		_tableIter;
-	aafBool					_isFirst;
+        (ImplEnumAAFPropertyValues ** ppEnum);
+        
+        
+protected:
+  ImplAAFRefContainerValue* _containerValue;
+  ImplAAFTypeDefObjectRef* _elementType;
+	OMReferenceContainerIterator* _containerIterator;
 };
 
-#endif // ! __ImplEnumAAFLoadedPlugins_h__
+#endif // ! __ImplEnumAAFStorablePropVals_h__
 
 

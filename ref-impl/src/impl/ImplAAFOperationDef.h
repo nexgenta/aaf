@@ -3,45 +3,47 @@
 #ifndef __ImplAAFOperationDef_h__
 #define __ImplAAFOperationDef_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
-class ImplAAFDataDef;
 class ImplAAFLocator;
 class ImplAAFParameterDef;
-class ImplEnumAAFLocators;
-class ImplEnumAAFOperationDefs;
-class ImplEnumAAFParameterDefs;
- 
+class ImplAAFOperationDef;
+template <class T> 
+class ImplAAFEnumerator;
+typedef ImplAAFEnumerator<ImplAAFLocator> ImplEnumAAFLocators;
+typedef ImplAAFEnumerator<ImplAAFOperationDef> ImplEnumAAFOperationDefs;
+typedef ImplAAFEnumerator<ImplAAFParameterDef> ImplEnumAAFParameterDefs;
+
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
 #endif
 
+#include "OMWeakRefProperty.h"
+#include "OMWeakRefVectorProperty.h"
+#include "OMWeakRefSetProperty.h"
+
+#include "ImplAAFDataDef.h"
 #include "ImplAAFParameterDef.h"
 #include "ImplEnumAAFOperationDefs.h"
 #include "ImplEnumAAFParameterDefs.h"
@@ -55,6 +57,18 @@ public:
   //
   //********
   ImplAAFOperationDef ();
+
+
+  //****************
+  // Initialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Initialize
+        // @parm [in] Pointer to an AUID reference
+        (const aafUID_t & id,
+		 const aafCharacter *name,
+		 const aafCharacter *description);
+
 
 protected:
   virtual ~ImplAAFOperationDef ();
@@ -148,15 +162,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetCategory (
-        aafCharacter		*pCategory,
-		aafUInt32	bufSize);
-
-  //****************
-  // GetCategoryBufLen()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetCategoryBufLen (
-			aafUInt32 *		pLen);
+        aafUID_t		*pCategory);
 
 			//****************
   // SetCategory()
@@ -164,7 +170,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetCategory
         // @parm [in] category
-        (const aafCharacter *category);
+        (const aafUID_t category);
 
   //****************
   // GetNumberInputs()
@@ -233,13 +239,13 @@ public:
 		 ImplAAFParameterDef ** ppParameterDef);
 
 private:
-	OMFixedSizeProperty<aafUID_t>					_dataDef;
+	OMWeakReferenceProperty<ImplAAFDataDef>			_dataDef;
 	OMFixedSizeProperty<aafBool>					_isTimeWarp;
-	OperationDefWeakRefArrayProp_t						_degradeTo;
-	OMWideStringProperty                            _category;
+	OMWeakReferenceVectorProperty<ImplAAFOperationDef>	_degradeTo;
+	OMFixedSizeProperty<aafUID_t>                   _category;
 	OMFixedSizeProperty<aafInt32>					_numInputs;
 	OMFixedSizeProperty<aafUInt32>					_bypass;
-	parmDefWeakRefArrayProp_t						_paramDefined;
+	OMWeakReferenceSetProperty<ImplAAFParameterDef>	_paramDefined;
 };
 
 #endif // ! __ImplAAFOperationDef_h__
