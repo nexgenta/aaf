@@ -1,49 +1,23 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFMasterMob
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
-
-#include "AAFSmartPointer.h"
-typedef IAAFSmartPointer<IAAFDataDef> IAAFDataDefSP;
 
 #define	MobName			L"MasterMOBTest"
 #define	NumMobSlots		3
@@ -53,43 +27,15 @@ static const aafUID_t *	slotDDefs[NumMobSlots] = {&DDEF_Picture, &DDEF_Sound, &D
 static aafRational_t	slotRates[NumMobSlots] = { {297,1}, {44100, 1}, {44100, 1}};
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
-static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
-static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
-static aafUInt32 TapeLength = 3200 ;
+static aafTapeCaseType_t FormFactor = kVHSVideoTape;
+static aafVideoSignalType_t VideoSignalType = kPALSignal;
+static aafTapeFormatType_t TapeFormat = kVHSFormat;
+static aafLength_t TapeLength = 3200 ;
 
+static GUID		NewMobID;	// NOTE: this should really be aafUID_t, but problems w/ IsEqualGUID()
 #define TAPE_MOB_OFFSET	10
 #define TAPE_MOB_LENGTH	60
 #define TAPE_MOB_NAME	L"A Tape Mob"
-
-//--cf  This will require some work!!! 
-static const 	aafMobID_t	TEST_Master_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x07c01e92, 0x0403, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-static const 	aafMobID_t	TEST_Source_MobIDs[NumMobSlots] =
-{	//start mobid block
-	
-	//first id
-	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-		0x13, 0x00, 0x00, 0x00,
-	{0x11ee08d4, 0x0403, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
-	
-	//second id
-	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-	0x13, 0x00, 0x00, 0x00,
-	{0x7f0b27bc, 0x0403, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
-	
-	//third id
-	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-	0x13, 0x00, 0x00, 0x00,
-	{0x8d6c568c, 0x0403, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}
-	
-};	//end mobid block
-
-
-
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -124,15 +70,13 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFMasterMob Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -141,11 +85,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
+	case kMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kAAFMediaOpenAppend:
+	case kMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -190,7 +134,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	HRESULT			hr = S_OK;
 	long			test;
 	aafSourceRef_t	ref;
-	aafMobID_t		tapeMobID;
+	aafUID_t		tapeMobID;
 	IAAFEssenceDescriptor*		pEssDesc = NULL;
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 
@@ -202,33 +146,32 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-
-		CAAFBuiltinDefs defs (pDictionary);
-				
+		
+		
 		// Create a Master Mob
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMob, 
-								   (IUnknown **)&pMob));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
+			IID_IAAFMob, 
+			(IUnknown **)&pMob));
 		
 		// Set the IAAFMob properties
-		checkResult(pMob->SetMobID(TEST_Master_MobID));
+		checkResult(CoCreateGuid((GUID *)&NewMobID));
+		checkResult(pMob->SetMobID((aafUID_t *)&NewMobID));
 		checkResult(pMob->SetName(MobName));
 		
 		checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
-		checkResult(pMasterMob->Initialize());
 		
 		// Create source mob to associate with our MasterMob.
-		checkResult(defs.cdSourceMob()->
-					CreateInstance(IID_IAAFSourceMob, 
+		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
+			IID_IAAFSourceMob, 
 			(IUnknown **)&pTapeMob));		
-		hr = defs.cdTapeDescriptor()->
-		  CreateInstance(IID_IAAFTapeDescriptor, 
-						 (IUnknown **)&pTapeDesc);		
+		hr = pDictionary->CreateInstance(&AUID_AAFTapeDescriptor,
+												IID_IAAFTapeDescriptor, 
+												(IUnknown **)&pTapeDesc);		
 		if (AAFRESULT_SUCCESS == hr)
 		{
 			hr = pTapeDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc);
@@ -265,14 +208,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		}
 		for (test = 0; test < NumMobSlots; test++)
 		{
-		  IAAFDataDefSP pDataDef;
-		  checkResult (pDictionary->LookupDataDef (*slotDDefs[test], &pDataDef));
-		  checkResult(pTapeMob->AddNilReference (test, TAPE_MOB_LENGTH, pDataDef, slotRates[test]));
+			checkResult(pTapeMob->AddNilReference (test, TAPE_MOB_LENGTH, (aafUID_t *)slotDDefs[test], slotRates[test]));
 		}
 		checkResult(pTapeMob->QueryInterface(IID_IAAFMob, (void **) &pTempMob));
 		checkResult(pTempMob->SetName(TAPE_MOB_NAME));
 		checkResult(pTempMob->GetMobID(&tapeMobID));
-		checkResult(pHeader->AddMob(pTempMob));
+		checkResult(pHeader->AppendMob(pTempMob));
 		pTempMob->Release();
 		pTempMob = NULL;
 		
@@ -280,66 +221,42 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		for (test = 0; test < NumMobSlots; test++)
 		{
 			// Create source mob to associate with our MasterMob.
-			checkResult(defs.cdSourceMob()->
-						CreateInstance(IID_IAAFSourceMob, 
-									   (IUnknown **)&pSrcMob));		
+			checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
+				IID_IAAFSourceMob, 
+				(IUnknown **)&pSrcMob));		
 			
 			ref.sourceID = tapeMobID;
 			ref.sourceSlotID = test;
 			ref.startTime = TAPE_MOB_OFFSET;
-			IAAFDataDefSP pDDef;
-			checkResult(pDictionary->LookupDataDef(*slotDDefs[test], &pDDef));
-			if(test == 0)
-			{
-				checkResult(pSrcMob->NewPhysSourceRef (slotRates[test],
-													  test,
-													  pDDef,
-													  ref,
-													  TAPE_MOB_LENGTH));
-			}
-			else
-			{
-				checkResult(pSrcMob->AppendPhysSourceRef (slotRates[test],
-													  test,
-													  pDDef,
-													  ref,
-													  TAPE_MOB_LENGTH));
-			}
+			checkResult(pSrcMob->AppendPhysSourceRef (slotRates[test], test,
+				(aafUID_t *)slotDDefs[test], ref, TAPE_MOB_LENGTH));
 			
-			// Create concrete subclass of EssenceDescriptor
-			checkResult(defs.cdAIFCDescriptor()->
-						CreateInstance(IID_IAAFEssenceDescriptor, 
-									   (IUnknown **)&pDesc));	
-
-			IAAFAIFCDescriptor*			pAIFCDesc = NULL;
-			checkResult(pDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-			checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-			pAIFCDesc->Release();
-			pAIFCDesc = NULL;
-
+			checkResult(pDictionary->CreateInstance(&AUID_AAFEssenceDescriptor,
+				IID_IAAFEssenceDescriptor, 
+				(IUnknown **)&pDesc));		
 			checkResult(pSrcMob->SetEssenceDescriptor(pDesc));
 			pDesc->Release();
 			pDesc = NULL;
 			
 			// Append source MOB to header
+			aafUID_t				TempUID;
 			checkResult(pSrcMob->QueryInterface(IID_IAAFMob, (void **) &pTempMob));
-			checkResult(pTempMob->SetMobID(TEST_Source_MobIDs[test]));
+			checkResult(CoCreateGuid((GUID *)&TempUID));
+			checkResult(pTempMob->SetMobID(&TempUID));
 			checkResult(pTempMob->SetName(L"source mob"));
 			
-			checkResult(pHeader->AddMob(pTempMob));
+			checkResult(pHeader->AppendMob(pTempMob));
 			pTempMob->Release();
 			pTempMob = NULL;
 			
-			IAAFDataDefSP pDataDef;
-			checkResult (pDictionary->LookupDataDef (*slotDDefs[test], &pDataDef));
-			checkResult(pMasterMob->AddMasterSlot(pDataDef, test, pSrcMob, test+1, slotNames[test]));
+			checkResult(pMasterMob->AddMasterSlot((aafUID_t *)slotDDefs[test], test, pSrcMob, test+1, slotNames[test]));
 			
 			pSrcMob->Release();
 			pSrcMob = NULL;
 		}
 		
 		// Add the master mob to the file and cleanup
-		checkResult(pHeader->AddMob(pMob));
+		checkResult(pHeader->AppendMob(pMob));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -399,7 +316,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IEnumAAFMobs*	pMobIter = NULL;
 	IAAFMob*		pMob = NULL;
-	IAAFSegment*		pSeg = NULL;
 	IAAFMasterMob*		pMasterMob = NULL;
 	IEnumAAFMobSlots*	pSlotIter = NULL;
 	IAAFMobSlot*		pSlot;
@@ -407,28 +323,28 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
 	HRESULT			hr = S_OK;
-	aafMediaCriteria_t	mediaCriteria;
+
 
 
   try
   {
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
     bFileOpen = true;
 
     // Validate that there is on one master mob in the test file.
-	  checkResult(pHeader->CountMobs(kAAFMasterMob, &numMobs));
+	  checkResult(pHeader->GetNumMobs(kMasterMob, &numMobs));
     checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 	  // Enumerate over Master MOBs
-	  criteria.searchTag = kAAFByMobKind;
-	  criteria.tags.mobKind = kAAFMasterMob;
-    checkResult(pHeader->GetMobs(&criteria, &pMobIter));
+	  criteria.searchTag = kByMobKind;
+	  criteria.tags.mobKind = kMasterMob;
+    checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
 	  while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 	  {
 		  aafWChar			name[500];
 		  aafNumSlots_t		numSlots = 0;
-		  aafMobID_t				mobID;
+		  GUID				mobID;
 
 		  // TODO: Test Master MOB specific methods here
 		  checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
@@ -436,10 +352,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		  checkResult(pMob->GetName(name, sizeof(name)));
 		  checkExpression(wcscmp(name, MobName) == 0, AAFRESULT_TEST_FAILED);
 
-		  checkResult(pMob->GetMobID(&mobID));
-		  checkExpression(0 == memcmp(&mobID, &TEST_Master_MobID, sizeof(mobID)), AAFRESULT_TEST_FAILED);
+		  checkResult(pMob->GetMobID((aafUID_t *)&mobID));
+		  checkExpression(0 != IsEqualGUID(mobID, NewMobID), AAFRESULT_TEST_FAILED);
 
-		  checkResult(pMob->CountSlots(&numSlots));
+		  checkResult(pMob->GetNumSlots(&numSlots));
 		  checkExpression(NumMobSlots == numSlots, AAFRESULT_TEST_FAILED);
 
 //AAFRESULT STDMETHODCALLTYPE
@@ -448,13 +364,13 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			unsigned long	s = 0;
 
 			// Enumerate over all MOB slots for this MOB
-			checkResult(pMob->GetSlots(&pSlotIter));
+			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
 			while (pSlotIter && pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS)
 			{
 				aafWChar			slotName[500];
 				aafSlotID_t			slotID;
 				aafNumSlots_t		numReps;
-				aafUInt32			bufSize = 0;
+				aafInt32			bufSize = 0;
 
         // Validate the slot name
 				checkResult(pSlot->GetName(slotName, sizeof(slotName)));
@@ -470,23 +386,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 					pTapeName = new aafWChar [bufSize];
 					checkExpression(NULL != pTapeName, E_OUTOFMEMORY);
 
-					checkResult(pMasterMob->GetTapeName(slotID, pTapeName, bufSize));
-					delete [] pTapeName;
+          checkResult(pMasterMob->GetTapeName(slotID, pTapeName, bufSize));
 				}
 
 				checkResult(pMasterMob->GetNumRepresentations(slotID, &numReps));
 				checkExpression (numReps == 1, AAFRESULT_TEST_FAILED);
 
-				checkResult(pMasterMob->GetRepresentation (slotID, 0, &pSeg));
-				pSeg->Release();
-				pSeg = NULL;
-
-				mediaCriteria.type = kAAFAnyRepresentation;
-				checkResult(pMasterMob->GetCriteriaSegment (slotID, &mediaCriteria, &pSeg));
-
-				pSeg->Release();
-				pSeg = NULL;
-				
 				pSlot->Release();
 				pSlot = NULL;
 				s++;
@@ -508,8 +413,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 
   // Cleanup and return
-//  if (pTapeName)
-//		delete [] pTapeName;
+  if (pTapeName)
+		delete [] pTapeName;
 
   if (pSlot)
     pSlot->Release();
@@ -537,39 +442,44 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFMasterMob_test(testMode_t mode);
-extern "C" HRESULT CAAFMasterMob_test(testMode_t mode)
+extern "C" HRESULT CAAFMasterMob_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFMasterMobTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(pFileName);
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFMasterMob_test..."
-			 << "Caught general C++ exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CAAFMasterMob_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
-//	if (SUCCEEDED(hr))
-//	{
-//		cout << "The following IAAFMasterMob tests have not been implemented:" << endl; 
-//		cout << "     GetCriteriaSegment" << endl; 
-//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-//	}
+	if (SUCCEEDED(hr))
+	{
+		cout << "The following IAAFMasterMob tests have not been implemented:" << endl; 
+		cout << "     GetRepresentationSourceClip" << endl; 
+		cout << "     GetCriteriaSourceClip" << endl; 
+		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+	}
 
 	return hr;
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
