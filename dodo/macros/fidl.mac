@@ -1,10 +1,24 @@
-#c /***********************************************\
-#c *                                               *
-#c * Advanced Authoring Format                     *
-#c *                                               *
-#c * Copyright (c) 1998-1999 Avid Technology, Inc. *
-#c *                                               *
-#c \***********************************************/
+#c *********************************************************************
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c 
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c 
+#c The Original Code of this file is Copyright 1998-2001, Licensor of the
+#c AAF Association.
+#c 
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 
 
 
@@ -50,6 +64,28 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c Includes another file in implementation (not header).
+#c
+#c Argument: Base filename
+#c
+#startm AD_CPPINCLUDE 01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Adds quoted header include statement to idl file
+#c
+#c Argument1: Filename file to be included.
+#c
+#c
+#startm AD_CPP_QUOTE_INCLUDE 01
+cpp_quote("#include \\"%01\\"")
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Goes at the head of the file.
 #c
 #c Arguments: none
@@ -69,33 +105,6 @@
 #c Arguments: none
 #c
 #startm AD_TYPES_HEAD 00
-cpp_quote("/***********************************************************************")
-cpp_quote("*")
-cpp_quote("*              Copyright (c) 1998-1999 Avid Technology, Inc.")
-cpp_quote("*")
-cpp_quote("* Permission to use, copy and modify this software and accompanying")
-cpp_quote("* documentation, and to distribute and sublicense application software")
-cpp_quote("* incorporating this software for any purpose is hereby granted,")
-cpp_quote("* provided that (i) the above copyright notice and this permission")
-cpp_quote("* notice appear in all copies of the software and related documentation,")
-cpp_quote("* and (ii) the name Avid Technology, Inc. may not be used in any")
-cpp_quote("* advertising or publicity relating to the software without the specific,")
-cpp_quote("*  prior written permission of Avid Technology, Inc.")
-cpp_quote("*")
-cpp_quote("* THE SOFTWARE IS PROVIDED 'AS-IS' AND WITHOUT WARRANTY OF ANY KIND,")
-cpp_quote("* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY")
-cpp_quote("* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.")
-cpp_quote("* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,")
-cpp_quote("* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR")
-cpp_quote("* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF")
-cpp_quote("* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND")
-cpp_quote("* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES")
-cpp_quote("* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT")
-cpp_quote("* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF")
-cpp_quote("* LIABILITY.")
-cpp_quote("*")
-cpp_quote("************************************************************************/")
-
 
 #ifndef DO_NO_IMPORTS
 import "wtypes.idl";
@@ -1635,6 +1644,7 @@ AD_CLASS_END\
   //
   // %02
   //
+  // STDAPI %01 ();
  
 cpp_quote("STDAPI %01 ();")
 cpp_quote("")\
@@ -1790,6 +1800,118 @@ cpp_quote("          .%03-adornment%04 .%03-indirection %05,")
 cpp_quote("          .%08-adornment%09 .%08-indirection %10,")
 cpp_quote("          .%13-adornment%14 .%13-indirection %15,")
 cpp_quote("          .%18-adornment%19 .%18-indirection %20);")
+cpp_quote("")\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a function which takes five arguments.
+#c
+#c Macro Arg 01: function name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
+#c ----------   ----------   ---------   ----    ----    --------
+#c metharg 1    02           03          04      05      06
+#c metharg 2    07           08          09      10      11
+#c metharg 3    12           13          14      15      16
+#c metharg 4    17           18          19      20      21
+#c metharg 5    22           23          24      25      26
+#c
+#c Macro Arg 27: function description
+#c
+#startm AD_XFUNCTION5 27
+  //***********************************************************
+  //
+  // %01()
+  //
+  // %27
+  // 
+  // STDAPI %01 (
+    //  %06
+    //  %02 .%03-adornment%04 .%03-indirection %05,
+    //
+    //  %11
+    //  %07 .%08-adornment%09 .%08-indirection %10,
+    //
+    //  %16
+    //  %12 .%13-adornment%14 .%13-indirection %15,
+    //
+    //  %21
+    //  %17 .%18-adornment%19 .%18-indirection %20,
+    //
+    //  %26
+    //  %22 .%23-adornment%24 .%23-indirection %25);
+
+cpp_quote("STDAPI %01 (")
+cpp_quote("          .%03-adornment%04 .%03-indirection %05,")
+cpp_quote("          .%08-adornment%09 .%08-indirection %10,")
+cpp_quote("          .%13-adornment%14 .%13-indirection %15,")
+cpp_quote("          .%18-adornment%19 .%18-indirection %20,")
+cpp_quote("          .%23-adornment%24 .%23-indirection %25);")
+cpp_quote("")\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a function which takes seven arguments.
+#c
+#c Macro Arg 01: function name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
+#c ----------   ----------   ---------   ----    ----    --------
+#c metharg 1    02           03          04      05      06
+#c metharg 2    07           08          09      10      11
+#c metharg 3    12           13          14      15      16
+#c metharg 4    17           18          19      20      21
+#c metharg 5    22           23          24      25      26
+#c metharg 6    27           28          29      30      31
+#c metharg 7    32           33          34      35      36
+#c
+#c Macro Arg 37: function description
+#c
+#startm AD_XFUNCTION7 37
+  //***********************************************************
+  //
+  // %01()
+  //
+  // %37
+  // 
+  // STDAPI %01 (
+    //  %06
+    //  %02 .%03-adornment%04 .%03-indirection %05,
+    //
+    //  %11
+    //  %07 .%08-adornment%09 .%08-indirection %10,
+    //
+    //  %16
+    //  %12 .%13-adornment%14 .%13-indirection %15,
+    //
+    //  %21
+    //  %17 .%18-adornment%19 .%18-indirection %20,
+    //
+    //  %26
+    //  %22 .%23-adornment%24 .%23-indirection %25,
+    //
+    //  %31
+    //  %27 .%28-adornment%20 .%28-indirection %30,
+    //
+    //  %36
+    //  %32 .%33-adornment%25 .%33-indirection %35);
+
+cpp_quote("STDAPI %01 (")
+cpp_quote("          .%03-adornment%04 .%03-indirection %05,")
+cpp_quote("          .%08-adornment%09 .%08-indirection %10,")
+cpp_quote("          .%13-adornment%14 .%13-indirection %15,")
+cpp_quote("          .%18-adornment%19 .%18-indirection %20,")
+cpp_quote("          .%23-adornment%24 .%23-indirection %25,")
+cpp_quote("          .%28-adornment%29 .%28-indirection %30,")
+cpp_quote("          .%33-adornment%34 .%33-indirection %35);")
 cpp_quote("")\
 #endm
 
