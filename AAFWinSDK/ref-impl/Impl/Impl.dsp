@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /D "NDEBUG" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "_WIN32" /D "BOB_TEST" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /WX /GR /GX /O2 /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../../../ref-impl/include/" /I "../../../ref-impl/aaflib" /FI"stdafx.h" /D "NDEBUG" /D "COM_NO_WINDOWS_H" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /Yu"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -64,8 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /Z7 /Od /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../include/comidl" /I "../../../ref-impl/include/" /I "../../../ref-impl/plugins/" /D "COM_NO_WINDOWS_H" /D "AAF_MODULE_TEST" /D "_WIN32" /D "_WINDOWS" /D "_DEBUG" /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "BOB_TEST" /D "OM_ENABLE_DEBUG" /YX /FD /c
-# SUBTRACT CPP /Fr
+# ADD CPP /nologo /MDd /W3 /WX /GR /GX /ZI /Od /I "../../../ref-impl/src/Impl" /I "../../../ref-impl/include/Om" /I "../../../ref-impl/include/com-api/" /I "../../../ref-impl/src/OM" /I "../../../ref-impl/include/" /I "../../../ref-impl/aaflib" /FI"stdafx.h" /D "_DEBUG" /D "OM_ENABLE_DEBUG" /D "COM_NO_WINDOWS_H" /D "_WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "WIN32" /Yu"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -91,15 +90,23 @@ SOURCE="..\..\..\ref-impl\src\impl\aafErr.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\aaflib\aaflibwin32.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\AAFObjectModel.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\AAFObjectModelProcs.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\aafTable.cpp"
 # End Source File
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\AAFUtils.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFAIFCData.cpp"
 # End Source File
 # Begin Source File
 
@@ -111,7 +118,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBaseClassFactory.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltins.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinClasses.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinTypes.cpp"
 # End Source File
 # Begin Source File
 
@@ -199,10 +210,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEssenceGroup.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEssencePlugin.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFEvent.cpp"
 # End Source File
 # Begin Source File
@@ -231,6 +238,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFFindSourceInfo.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFGetFileBits.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFGPITrigger.cpp"
 # End Source File
 # Begin Source File
@@ -243,10 +254,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFHTMLClip.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFHTMLData.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFHTMLDescriptor.cpp"
 # End Source File
 # Begin Source File
@@ -255,19 +262,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFIdentification.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFImageData.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFInterpolationDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFIntraFrameMarker.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFJPEGData.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFKLVData.cpp"
 # End Source File
 # Begin Source File
 
@@ -279,11 +278,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMasterMob.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMIDIData.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMetaDefinition.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMIDIFileDescriptor.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMetaDictionary.cpp"
 # End Source File
 # Begin Source File
 
@@ -292,6 +291,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMob.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMobSlot.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFModule.cpp"
 # End Source File
 # Begin Source File
 
@@ -304,6 +307,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFNetworkLocator.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFObject.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFOMRawStorage.cpp"
 # End Source File
 # Begin Source File
 
@@ -323,11 +330,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFParameterDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluggableCode.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginDescriptor.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginFile.cpp"
 # End Source File
 # Begin Source File
 
@@ -355,7 +362,31 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPulldown.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFReferenceValue.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFRandomFile.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFRandomRawStorage.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFRawStorage.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFRefArrayValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFRefContainerValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFRefSetValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFRefValue.cpp"
 # End Source File
 # Begin Source File
 
@@ -383,6 +414,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSequence.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSetFileBits.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSourceClip.cpp"
 # End Source File
 # Begin Source File
@@ -399,6 +434,26 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStaticMobSlot.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStorable.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStreamPropertyValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStrongRefArrayValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStrongRefSetValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFStrongRefValue.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTaggedValue.cpp"
 # End Source File
 # Begin Source File
@@ -412,10 +467,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTextClip.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTextLocator.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTIFFData.cpp"
 # End Source File
 # Begin Source File
 
@@ -451,6 +502,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefArray.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefCharacter.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefEnum.cpp"
 # End Source File
 # Begin Source File
@@ -463,11 +518,19 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefFixedArray.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefIndirect.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefInt.cpp"
 # End Source File
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefObjectRef.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefOpaque.cpp"
 # End Source File
 # Begin Source File
 
@@ -507,11 +570,19 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFVaryingValue.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWAVEData.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWAVEDescriptor.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWAVEDescriptor.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWeakRefArrayValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWeakRefSetValue.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFWeakRefValue.cpp"
 # End Source File
 # Begin Source File
 
@@ -543,10 +614,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDataDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDefs.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFEssenceData.cpp"
 # End Source File
 # Begin Source File
@@ -556,6 +623,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFIdentifications.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFInterpolateDefs.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFKLVData.cpp"
 # End Source File
 # Begin Source File
 
@@ -583,7 +654,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFParameterDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPluginDesc.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFParameters.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPluginDefs.cpp"
 # End Source File
 # Begin Source File
 
@@ -603,11 +678,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFPropertyValues.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFReferenceValues.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFSegments.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFSegments.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFStorablePropVals.cpp"
 # End Source File
 # Begin Source File
 
@@ -616,6 +691,11 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFTaggedValues.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFTypeDefs.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE=.\stdafx.cpp
+# ADD CPP /Yc"StdAfx.h"
 # End Source File
 # End Target
 # End Project
