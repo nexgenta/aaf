@@ -215,12 +215,11 @@ ImplAAFTypeDefInt::~ImplAAFTypeDefInt ()
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefInt::Initialize (
-      const aafUID_t *  pID,
+      const aafUID_t & id,
       aafUInt8  intSize,
       aafBool  isSigned,
-      wchar_t *  pTypeName)
+      const aafCharacter * pTypeName)
 {
-  assert (pID);
   assert (intSize > 0);
   assert (pTypeName);
 
@@ -230,12 +229,14 @@ AAFRESULT STDMETHODCALLTYPE
 	  (8 != intSize))
 	return AAFRESULT_BAD_SIZE;
 
+  AAFRESULT hr;
+
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
+
   _size = intSize;
   _isSigned = isSigned;
-  AAFRESULT hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  hr = SetAUID (pID);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
 }
@@ -643,7 +644,7 @@ void ImplAAFTypeDefInt::internalize(OMByte* externalBytes,
 
 aafBool ImplAAFTypeDefInt::IsFixedSize (void) const
 {
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
@@ -656,7 +657,7 @@ size_t ImplAAFTypeDefInt::PropValSize (void) const
 aafBool ImplAAFTypeDefInt::IsRegistered (void) const
 {
   // int types are registered by default
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
