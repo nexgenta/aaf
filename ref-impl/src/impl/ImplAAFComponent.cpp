@@ -28,8 +28,8 @@
 #include "aafCvt.h"
 
 ImplAAFComponent::ImplAAFComponent ():
-	_dataDef(	PID_COMPONENT_DATADEF,	"dataDef"),
-	_length(	PID_COMPONENT_LENGTH,	"length")
+	_dataDef(	PID_Component_DataDefinition,	"Data Definition"),
+	_length(	PID_Component_Length,	"Length")
 {
 	_persistentProperties.put(   _dataDef.address());
 	_persistentProperties.put(   _length.address());
@@ -125,7 +125,7 @@ AAFRESULT STDMETHODCALLTYPE
  * Private Function: SetNewProps()
  *
  *      This is an internal function that is called by functions that
- *      create new components.  It sets the length and datakind property
+ *      create new components.  It sets the length and data definition property
  *      values on the input component object.
  *
  *      This function supports both 1.x and 2.x files.
