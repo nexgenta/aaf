@@ -32,6 +32,7 @@
 #define OMSTRONGREFPROPERTYT_H
 
 #include "OMAssertions.h"
+#include "OMStoredObject.h"
 
 template <typename ReferencedObject>
 OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
@@ -43,7 +44,7 @@ OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
 
-  _reference = OMStrongObjectReference<ReferencedObject>(this, storedName());
+  _reference = OMStrongObjectReference(this, storedName());
 }
 
 template <typename ReferencedObject>
@@ -212,12 +213,7 @@ void OMStrongReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::save");
 
-  // Write the index entry.
-  //
-  saveName();
-
-  _reference.save();
-
+  store()->save(*this);
 }
 
   // @mfunc Close this <c OMStrongReferenceProperty>.
@@ -258,14 +254,8 @@ void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::restore");
 
-  // retrieve sub-storage name
-  //
-  restoreName(externalSize);
-
-  _reference.restore();
-
+  store()->restore(*this, externalSize);
   setPresent();
-
 }
 
   // @mfunc  Is this <c OMStrongReferenceProperty> void ?
@@ -412,6 +402,15 @@ OMStorable* OMStrongReferenceProperty<ReferencedObject>::storable(void) const
     result = dynamic_cast<OMStorable*>(pointer);
   }
   return result;
+}
+
+template <typename ReferencedObject>
+OMStrongObjectReference&
+OMStrongReferenceProperty<ReferencedObject>::reference(void) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::storable");
+
+  return const_cast<OMStrongObjectReference&>(_reference);
 }
 
 #endif
