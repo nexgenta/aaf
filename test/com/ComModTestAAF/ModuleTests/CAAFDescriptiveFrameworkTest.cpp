@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveFrameworkTest.cpp,v 1.1.2.1 2004/05/08 22:32:55 jptrainor Exp $ $Name:  $
+// $Id: CAAFDescriptiveFrameworkTest.cpp,v 1.1.2.2 2004/05/14 22:01:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,24 +26,33 @@
 //
 //=---------------------------------------------------------------------=
 
-
-
-
-
-
-
-
-
+#include <ModuleTest.h>
 
 #include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
 
-// Required function prototype.
-extern "C" HRESULT CAAFDescriptiveFramework_test(void);
+// Test routine defined in CAAFDescriptiveMarkerTest.cpp
+HRESULT DescriptiveMarkerAndFrameworkTest( aafCharacter* pFileName,
+					   aafCharacter* pTestName,
+					   testMode_t mode );
 
-HRESULT CAAFDescriptiveFramework_test()
+// Required function prototype.
+extern "C" HRESULT CAAFDescriptiveFramework_test(testMode_t mode);
+
+HRESULT CAAFDescriptiveFramework_test(testMode_t mode)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  // DescriptiveFramework is an abstract base class.  By itself, there
+  // is nothing to test other than that a concrete instance of a
+  // DescriptiveFramework can be correctly contained by a
+  // DescriptiveMarker.  This is tested in
+  // CAAFDescriptiveMarkerTest.cpp and there is little point in
+  // repeating the code here.  The test is re-executed here to ensure
+  // "ComModAAF AAFDescriptiveFramework" executes a meaningful test in
+  // the event it is run on its own.
+
+  return DescriptiveMarkerAndFrameworkTest( L"AAFDescriptiveFrameworkTest.aaf",
+					    L"CAAFDescriptiveFramework_test",
+					    mode );
 }
 
 
