@@ -6,19 +6,28 @@ OMStoredVectorIndex::OMStoredVectorIndex(size_t size)
 {
   TRACE("OMStoredVectorIndex::OMStoredVectorIndex");
 
-  _names = new size_t[_size];
+  _names = new OMUInt32[_size];
+  ASSERT("Valid heap pointer", _names != 0);
   for (size_t i = 0; i < _size; i++) {
     _names[i] = 0;
   }
 }
 
-size_t OMStoredVectorIndex::highWaterMark(void) const
+OMStoredVectorIndex::~OMStoredVectorIndex(void)
+{
+  TRACE("OMStoredVectorIndex::~OMStoredVectorIndex");
+
+  delete [] _names;
+  _names = 0;
+}
+
+OMUInt32 OMStoredVectorIndex::highWaterMark(void) const
 {
   TRACE("OMStoredVectorIndex::highWaterMark");
   return _highWaterMark;
 }
 
-void OMStoredVectorIndex::insert(size_t position, size_t name)
+void OMStoredVectorIndex::insert(size_t position, OMUInt32 name)
 {
   TRACE("OMStoredVectorIndex::insert");
   PRECONDITION("Valid position", position < _size);
@@ -33,7 +42,7 @@ size_t OMStoredVectorIndex::entries(void) const
   return _entries;
 }
 
-void OMStoredVectorIndex::iterate(size_t& context, size_t& name) const
+void OMStoredVectorIndex::iterate(size_t& context, OMUInt32& name) const
 {
   TRACE("OMStoredVectorIndex::iterate");
   PRECONDITION("Valid context", context < _size);
