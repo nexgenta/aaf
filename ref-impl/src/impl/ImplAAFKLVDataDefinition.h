@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.3 2004/04/29 03:52:53 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.4 2004/05/09 03:15:50 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -113,7 +113,7 @@ public:
         (ImplAAFTypeDef * pTypeDef);
 
  private:
-  OMWeakReferenceSetProperty<ImplAAFPropertyDef> _parentProperties;
+  
   OMWeakReferenceProperty<ImplAAFTypeDef> _klvDataTypeDef;
     
 };
