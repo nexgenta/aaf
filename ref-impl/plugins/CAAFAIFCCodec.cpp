@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.14 2005/02/08 14:32:31 stuart_hc Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.15 2005/03/21 13:59:15 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -528,6 +528,7 @@ CAAFAIFCCodec::WriteSamples (aafUInt32  nSamples,
 	if (0 == nSamples)
 		return AAFRESULT_INVALID_PARAM;
 
+	// AIFC format is limited to 2GB filesize
 	aafPosition_t offset;
 	checkResult(_stream->GetPosition(&offset));
 	if ( offset + buflen >  (aafPosition_t)2*1024*1024*1024-1 ) {

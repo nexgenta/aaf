@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.66 2005/02/08 14:32:32 stuart_hc Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.67 2005/03/21 13:59:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -524,6 +524,8 @@ HRESULT STDMETHODCALLTYPE
   if (0 == nSamples)
     return AAFRESULT_INVALID_PARAM;
 
+  // A WAVE file is limited to 4GB officially, but in practice many
+  // applications treat WAVE as limited to 2GB.
   aafPosition_t offset;
   checkResult(_stream->GetPosition(&offset));
   if ( offset + buflen > (aafPosition_t)2*1024*1024*1024-1 ) {
