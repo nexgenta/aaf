@@ -26,7 +26,6 @@
  ************************************************************************/
 
 
-
 #ifndef __ImplAAFClassDef_h__
 #include "ImplAAFClassDef.h"
 #endif
@@ -62,5 +61,6 @@ ImplAAFInterpolationDef::~ImplAAFInterpolationDef ()
 
   
 
+OMDEFINE_STORABLE(ImplAAFInterpolationDef, AUID_AAFInterpolationDefinition);
 
 

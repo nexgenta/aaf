@@ -24,7 +24,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
 #ifndef __ImplAAFSourceMob_h__
 #include "ImplAAFSourceMob.h"
 #endif
@@ -236,7 +235,7 @@ AAFRESULT STDMETHODCALLTYPE
  // move to ImplAAFContentStorage::AppendEssenceData().
     // Does a mob with the ID already exist?  If not, return error
     CHECK(pFileMob->MyHeadObject(&pHeader));
-    CHECK(pHeader->LookupMob(mobID, &pMob));
+    CHECK(pHeader->LookupMob(&mobID, &pMob));
 
 
     // Make sure the mob is a valid File source mob???
@@ -305,7 +304,7 @@ AAFRESULT STDMETHODCALLTYPE
     // NOTE: Will return AAFRESULT_OBJECT_NOT_PERSISTENT if this object has
     // not been appended to to the file.
     CHECK(MyHeadObject(&pHeader));
-    CHECK(pHeader->LookupMob(mobID, &pMob));
+    CHECK(pHeader->LookupMob(&mobID, &pMob));
 
     // This should be a valid file mob which is a file mob.
     pSourceMob = dynamic_cast<ImplAAFSourceMob *>(pMob);
@@ -363,3 +362,4 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFEssenceData, AUID_AAFEssenceData);
