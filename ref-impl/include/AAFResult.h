@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.64 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.65 2004/10/28 15:13:44 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -315,9 +315,9 @@
 /* Testing Error Codes */
 #define AAFRESULT_TEST_FAILED               MAKE_AAFHRESULT(0x01F4)
 #define AAFRESULT_TEST_PARTIAL_SUCCESS      MAKE_AAFHRESULT(0x01F5)
-#define AAFRESULT_NOT_IMPLEMENTED                           0x80004001L
+#define AAFRESULT_NOT_IMPLEMENTED                           ((HRESULT)0x80004001L)
 #define AAFRESULT_SUCCESS                                   0
-#define HRESULT_NOT_IMPLEMENTED                             0x80004001L
+#define HRESULT_NOT_IMPLEMENTED                             ((HRESULT)0x80004001L)
 #define HRESULT_SUCCESS                                     0
 
 /* Property access error codes */
