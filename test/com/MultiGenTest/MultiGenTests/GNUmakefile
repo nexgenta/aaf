@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2004/03/18 18:41:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -39,8 +39,7 @@ include $(AAFBASE)/build/common.mk
 # Include directories
 INCLUDES = -I.. \
 	   -I. \
-	   -I$(AAFSDKINCLUDEDIR) \
-	   -I../../../../Utilities/Include
+	   -I$(AAFSDKINCLUDEDIR)
 
 
 .PHONY : all
