@@ -1,38 +1,23 @@
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types required by this module:
 //
+// aafBool,
 // aafRational_t,
 // aafPosition_t,
+// aafTrackID_t,
+
 
 
 
@@ -40,21 +25,15 @@
 #include "ImplAAFTimelineMobSlot.h"
 #endif
 
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
-
 #include <assert.h>
 #include <AAFResult.h>
 #include "aafCvt.h" 
-#include "AAFUtils.h"
+
 
 ImplAAFTimelineMobSlot::ImplAAFTimelineMobSlot ():
-	_editRate(	PID_TimelineMobSlot_EditRate,	L"EditRate"),
-	_origin(	PID_TimelineMobSlot_Origin,		L"Origin")
-
+	_editRate(	PID_TIMELINEMOBSLOT_EDITRATE,	"EditRate")
 {
 	_persistentProperties.put( _editRate.address());
-	_persistentProperties.put( _origin.address());
 
 }
 
@@ -64,143 +43,114 @@ ImplAAFTimelineMobSlot::~ImplAAFTimelineMobSlot ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFTimelineMobSlot::Initialize ()
-{
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimelineMobSlot::GetEditRate (aafRational_t *editRate)
 {
-	if (editRate == NULL)
-		return AAFRESULT_NULL_PARAM;
-
+    AAFRESULT aafError = AAFRESULT_SUCCESS;
 	*editRate = _editRate;
-	return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTimelineMobSlot::SetEditRate (const aafRational_t & editRate)
-{
-	_editRate = editRate;
-	return AAFRESULT_SUCCESS;
+	return aafError;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimelineMobSlot::GetOrigin (aafPosition_t *origin)
 {
-	if (origin == NULL)
-		return AAFRESULT_NULL_PARAM;
+    AAFRESULT aafError = AAFRESULT_SUCCESS;
+	ImplAAFSegment * tmpSegment = NULL;
 
-	*origin = _origin;
+	assert(origin != NULL);
 
-	return AAFRESULT_SUCCESS;
+	XPROTECT( )
+	  {
+		CHECK(GetTrackDesc(0, NULL, origin, NULL));
+	  }
+
+	XEXCEPT
+	  {
+		return(XCODE());
+	  }
+	XEND;
+
+	return aafError;
 }
+
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTimelineMobSlot::SetOrigin (aafPosition_t origin)
+    ImplAAFTimelineMobSlot::GetTrackID (aafTrackID_t *  /*result*/)
 {
-	_origin = origin;
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
-					  ImplAAFSegment **segment,
-					  aafRational_t *srcRate,
-					  aafPosition_t *diffPos)
+
+  // Override from AAFMobSlot
+  AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTimelineMobSlot::IsATrack (/*[out,retval]*/ aafBool *  /*retval*/)
+  {
+    return AAFRESULT_NOT_IMPLEMENTED;
+  }
+
+/*************************************************************************
+ * Private Function: MobSlotGetTrackDesc()
+ *
+ * 		This function returns the requested information (non-NULL
+ *      parameters) identifying a track.  For 1.x, the information is
+ *      taken from the TRAK object.  For 2.x, it is taken from the
+ *      TRKD object associated with the input mob slot object.
+ *
+ * Argument Notes:
+ *      NULL should be passed for any argument that is not requested.
+ *      The name buffer must be a preallocated buffer of size nameSize.
+ *      If the name is longer than the buffer provided, it will truncate
+ *      the string to fit into the buffer.
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ *************************************************************************/
+AAFRESULT  ImplAAFTimelineMobSlot::
+			GetTrackDesc(aafInt32 nameSize,		// IN - Size of name buffer
+						aafString_t *name,		// IN/OUT preallocated buffer to return name
+						aafPosition_t *origin,	// OUT - Origin property value
+						aafTrackID_t *trackID)	// OUT - ttrack id property value
+
 {
-	aafBool					foundClip = kAAFFalse;
-	ImplAAFMobSlot			*tmpTrack = NULL;
-	aafPosition_t begPos = CvtInt32toPosition(0, begPos);
-	aafRational_t tmpSrcRate;
-	aafPosition_t origin = 0;
-	aafSlotID_t tmpTrackID;
-	ImplAAFSegment	*tmpSegment = NULL;
+//    ImplAAFObject *tmp1xTrackCpnt = NULL;
+	aafInt16 tmp1xTrackID = 0;
+	aafInt16 tmp1xTrackType = 0;
+	aafInt32 tmp1xStartPosition = 0;
+	AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-	if(diffPos == NULL || segment == NULL || srcRate == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	XPROTECT()
+//	XPROTECT( )
 	{
-		/* Initialize return parameters */
-		*segment = NULL;
-				
-		CHECK(GetEditRate(&tmpSrcRate));
-		CHECK(GetOrigin(&origin));
-		CHECK(GetSlotID(&tmpTrackID));
-		CHECK(GetSegment(&tmpSegment));
-		*srcRate = tmpSrcRate;
-		
-		/* Normalize the requested position on the track by adding
-		* the StartPosition (1.x) or Origin (2.x) to it.  The origin
-		* was acquired above with omfiTrackGetInfo().
-		* The StartPosition/Origin will usually be 0.  It may be 
-		* negative, if more data before the original "origin" was 
-		* digitized later.
-		*/
-		if (!IsInt64Positive(origin))
-			MultInt32byInt64(-1, origin, &origin);
-		AddInt64toInt64(origin, &offset);
-		
-		CHECK(tmpSegment->FindSubSegment(offset, &begPos, segment, &foundClip));
-		if(!foundClip)
-			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
-
-		/* Calculate diffPos - difference between requested offset and
-		* the beginning of clip that contains it. 
-		*/
-		(*diffPos) = offset;
-		CHECK(SubInt64fromInt64(begPos, diffPos));
-		tmpSegment->ReleaseReference();
-		tmpSegment = 0;
-		
+		/* Initialize values if not found (mob slot doesn't have descriptor */
+		if (trackID)
+		  *trackID = 0;
+		if (origin)
+		  CvtInt32toPosition(0, (*origin));
+		  
+		{
+			if (name)
+			{
+				GetName( name );
+			}
+			if (origin)
+			{
+				GetOrigin(origin);
+			 }
+			if (trackID)
+			{	
+				GetTrackID(trackID);
+			}
+		} /* OmfRev2x */
 	} /* XPROTECT */
-	XEXCEPT
+
+//	XEXCEPT
 	{
-		if (tmpSegment)	
-		  tmpSegment->ReleaseReference();
-		tmpSegment = 0;
+//		return(XCODE());
 	}
-	XEND;
-	return(AAFRESULT_SUCCESS);
-}
-
-AAFRESULT ImplAAFTimelineMobSlot::ConvertToEditRate(aafPosition_t srcPos,
-										aafRational_t destRate,
-										aafPosition_t *convertPos)
-{
-	aafRational_t	srcRate;
-
-	XPROTECT()
-	{
-		CHECK(GetEditRate(&srcRate));
-		CHECK(AAFConvertEditRate(srcRate, srcPos,
-						destRate, kRoundFloor, convertPos));
-	}
-	XEXCEPT
-	XEND;
-
-	return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT ImplAAFTimelineMobSlot::ConvertToMyRate(aafPosition_t srcPos,
-										  ImplAAFMobSlot *srcSlot,
-										aafPosition_t *convertPos)
-{
-	aafRational_t	destRate;
-	
-	XPROTECT()
-	{
-		CHECK(GetEditRate(&destRate));
-		CHECK(srcSlot->ConvertToEditRate(srcPos, destRate, convertPos));
-	}
-	XEXCEPT
-	XEND;
-
-	return AAFRESULT_SUCCESS;
+//	XEND;
+	return aafError;
 }
 
 
