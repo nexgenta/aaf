@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -64,23 +64,17 @@ public:
   virtual void insert(const Element value);
 
     // @cmember Does this <c OMSet> contain <p value> ?
-  virtual bool containsValue(const Element value) const;
+  virtual bool contains(const Element value) const;
 
     // @cmember Does this <c OMSet> contain an <p Element>
     //          identified by <p key>?
-  virtual bool contains(const Key key) const;
+  virtual bool containsKey(const Key key) const;
 
     // @cmember Find the <p Element> in this <c OMSet> identified by
     //          <p key>.  If the element is found it is returned in
     //          <p value> and the result is true. If the element is
     //          not found the result is false.
   virtual bool find(const Key key, Element& value) const;
-
-    // @cmember Find the <p Element> in this <c OMSet> identified by
-    //          <p key>.  If the element is found it is returned in
-    //          <p value> and the result is true. If the element is
-    //          not found the result is false.
-  virtual bool find(const Key key, Element** value) const;
 
     // @cmember The number of elements in this <c OMSet>.
     //          <mf OMSet::count> returns the actual number
@@ -91,12 +85,8 @@ public:
     //          this <c OMSet>.
   void append(const Element value);
 
-    // @cmember Remove the <p Element> with <p Key> <p key>
-    //          from this <c OMSet>.
-  virtual void remove(const Key key);
-
     // @cmember Remove <p value> from this <c OMSet>.
-  virtual void removeValue(const Element value);
+  virtual void remove(const Element value);
 
 private:
   // @access Private members.
