@@ -15,9 +15,10 @@ AAFDefObject\
 #c
 AD_HEAD
 AD_IDL(//
-// The IAAFOperationDef interface is implemented by objects that specify an
-// operation definition.  Operation definitions specify which parameters are possible
-// on an operation\, while an AAFOperationGroup specifies specific parameters and input segments
+// The IAAFOperationDef interface is implemented by objects that
+// specify an operation definition.  Operation definitions specify
+// which parameters are possible on an operation\, while an
+// AAFOperationGroup specifies specific parameters and input segments
 // for a particular operation invocation.
 //
 // In addition to the specific error results listed for each method\,
@@ -38,17 +39,17 @@ AD_CLASS_UUID(14035d92, 1ff5, 11d2, bf, 97, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(14035d91, 1ff5, 11d2, bf, 97, 00, 60, 97, 11, 62, 12)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_XMETHOD1(GetDataDefinitionID,
+AD_XMETHOD1(GetDataDef,
 
 			[out],
-			objPass,
-			aafUID_t *,
-			ppDataDefID,
+			objOut,
+			AAFDataDef,
+			ppDataDef,
 			Returned DataDefinition object,
 
-	Places the ID of the DataDefinition object attached to this
+	Places the DataDefinition object attached to this
   // IAAFOperationDef into the *ppDataDef argument.  The data
-  // definition ID will be one of the AUIDs in the file
+  // definition will match one of the AUIDs in the file
   // AAFDataDefs.h\, \(which includes DDEF_PICTURE\, and
   // DDEF_SOUND\)\, and indicates what type of data the operation will
   // be performed upon.  For example\, a video dissolve will have the
@@ -80,16 +81,16 @@ AD_XMETHOD1(GetDataDefinitionID,
   //     kind for this to be a valid operation definition.)
 
 
-AD_XMETHOD1(SetDataDefinitionID,
+AD_XMETHOD1(SetDataDef,
 
-			[in\, ref],
-			objPass,
-			aafUID_constref,
-			dataDef,
+			[in],
+			objIn,
+			AAFDataDef,
+			pDataDef,
 			Essence Descriptor object,
      Sets the IAAFDataDefinition of this IAAFOperationDef to be the
-  // given one\, by looking up the given AUID in the dictionary.  The
-  // data definition ID will be one of the AUIDs in the file
+  // given one.  The
+  // data definition will match one of the AUIDs in the file
   // AAFDataDefs.h\, \(which includes DDEF_PICTURE\, and
   // DDEF_SOUND\)\, and indicates what type of data the operation will
   // be performed upon.  For example\, a video dissolve will have the
@@ -105,6 +106,9 @@ AD_XMETHOD1(SetDataDefinitionID,
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pDataDef is null.
   //
   // AAFRESULT_NOT_INITIALIZED
   //   - This object has not yet had Initialize\(\) called on it.)
@@ -154,7 +158,7 @@ AD_METHOD1(SetIsTimeWarp,
   //   - succeeded.  \\\(This is the only code indicating success.\\\))
 
 
-AD_XMETHOD1(PrependDegradeToOperations,
+AD_XMETHOD1(PrependDegradeToOperation,
 			[in],
 			objIn,
 			AAFOperationDef,
@@ -182,7 +186,7 @@ AD_XMETHOD1(PrependDegradeToOperations,
   //   - pOperationDef is null.)
 
 
-AD_XMETHOD1(AppendDegradeToOperations,
+AD_XMETHOD1(AppendDegradeToOperation,
 			[in],
 			objIn,
 			AAFOperationDef,
@@ -208,6 +212,78 @@ AD_XMETHOD1(AppendDegradeToOperations,
   //
   // AAFRESULT_NULL_PARAM
   //   - pOperationDef is null.)
+
+
+AD_XMETHOD2(InsertDegradeToOperationAt,
+
+			[in],
+			objPass,
+			aafUInt32,
+			index, 
+			index where operation def is to be inserted,
+
+			[in],
+			objIn,
+			AAFOperationDef,
+			pOperationDef, 
+			Degrade To operation Definition Object,
+
+     Insert an operation definition into the DegradeTo list of
+  // definitions at the given index.  Operation definitions already
+  // existing at the given and higher indices will be moved up to the
+  // next higher index to accommodate.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pOperationDef pointer is valid.
+  // - index is less than or equal to the value returned by
+  //   CountDegradeToOperations\(\).
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pOperationDef is null.
+  //
+  // AAFRESULT_BADINDEX
+  //   - index is greater than the value returned by
+  //     CountDegradeToOperations\(\).)
+
+
+AD_XMETHOD1(RemoveDegradeToOperationAt,
+
+			[in],
+			objPass,
+			aafUInt32,
+			index, 
+			index where operation def is to be inserted,
+
+     Removes the indexed operation definition from the DegradeTo list
+  // of definitions.  Operation definitions already existing at
+  // indices higher than the given index will be moved down to the
+  // next lower index to accommodate.
+  // 
+  // Succeeds if all of the following are true:
+  // - index is less than the value returned by
+  //   CountDegradeToOperations\(\).
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_BADINDEX
+  //   - index is greater or equal to than the value returned by
+  //     CountDegradeToOperations\(\).)
 
 
 AD_XMETHOD1(GetDegradeToOperations,
@@ -236,34 +312,21 @@ AD_XMETHOD1(GetDegradeToOperations,
   //   - ppEnum is null.)
 
 
-AD_XMETHOD2(GetCategory,
-			[in\, string],
-			objPass,
-			aafCharacter *,
-			pCategory,
-			Category Name,
+AD_XMETHOD1(CountDegradeToOperations,
 
-			[in],
+			[out\, retval],
 			objPass,
-			aafInt32,
-			bufSize,
-			length of the buffer to hold Category Name,
+			aafUInt32 *,
+			pResult,
+			resulting count of Degrade To operations,
 
-			Writes the category name\, with a trailing null character\, into the
-  // pCategory buffer.  The buffer is allocated by the caller.  The size
-  // of the buffer is given by bufSize.  If the property name has not
-  // yet been set\, a zero-length string will be written \(that is\,
-  // only the trailing null character\).  Standard categories may be found in
-  // the file AAFOperationCategories.h.
-  // 
-  // Caller may call GetCategoryBufLen\(\) to determine the
-  // required buffer size.
+     Retrieves the number of Degrade To operations currently present
+  // and places that number in *pResult.
   // 
   // Succeeds if all of the following are true:
-  // - the pCategory pointer is valid.
-  // - bufSize indicates the buffer is large enough to hold the name.
+  // - the pResult pointer is valid.
   // 
-  // If this method fails nothing will be written to *pCategory.
+  // If this method fails nothing will be written to *pResult.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -273,67 +336,11 @@ AD_XMETHOD2(GetCategory,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - pCategory arg is NULL.
-  //
-  // AAFRESULT_SMALLBUF
-  //   - bufSize indicates the buffer is too small to hold the string.)
+  //   - pResult is null.)
 
 
-AD_XMETHOD1(GetCategoryBufLen,
-			[out],
-			objPass,
-			aafInt32 *,
-			pLen,
-			Category Name,
-
-     Returns the length of buffer required for the GetCategory\(\)
-  // method.  The value is placed into the location specified by
-  // pLen. The value will include space required for the trailing null
-  // character.
-  //
-  // Succeeds if all of the following are true:
-  // - the pLen pointer is valid.
-  //
-  // If this method fails nothing will be written to *pLen.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pLen arg is NULL.)
-
-
-AD_XMETHOD1(SetCategory,
-			[in\, string],
-			objPass,
-			aafCharacter *,
-			pCategory,
-			Category Name,
-
-     Sets the category of the operation definition. Category is a name
-  // that describes  a group of operations.  A copy is made of the
-  // data so the caller retains ownership of the *pCategory buffer and
-  // is responsible for de-allocating it.  Standard categories may be
-  // found in the file AAFOperationCategories.h.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pCategory pointer is valid.
-  // 
-  // If this method fails no state will be changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pCategory arg is NULL.)
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(Category,
+     the Category string property.)
 
 
 AD_METHOD1(GetNumberInputs,
@@ -436,11 +443,11 @@ AD_METHOD1(SetBypass,
   //   - This object has not yet had Initialize\\\(\\\) called on it.)
 
 
-AD_XMETHOD1(AddParameterDefs,
+AD_XMETHOD1(AddParameterDef,
 			[in],
 			objIn,
 			AAFParameterDef,
-			pAAFParameterDef, 
+			pParameterDef, 
 			Parameter definition Object,
 
 	 Add the Parameter Definition object to the unordered list of
@@ -467,7 +474,7 @@ AD_XMETHOD1(AddParameterDefs,
   //	- pAAFParameterDef is already in this OperationDef)
 
 
-AD_XMETHOD1(GetParameterDefinitions,
+AD_XMETHOD1(GetParameterDefs,
 			[out\,retval], 
 			objOut,
 			EnumAAFParameterDefs,
@@ -491,4 +498,66 @@ AD_XMETHOD1(GetParameterDefinitions,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
+
+
+AD_XMETHOD1(CountParameterDefs,
+			[out],
+			objPass,
+			aafUInt32 *,
+			pResult,
+			Number of parameter defs,
+
+			This method returns the number of parameter defs.
+  //
+  // Succeeds if all of the following are true:
+  // - the pResult pointer is valid.
+  // 
+  // If this method fails nothing will be written to *pResult.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pResult arg is NULL.)
+
+
+AD_XMETHOD2(LookupParameterDef,
+
+			[in],
+			objPass,
+			aafUID_constref,
+			parameterDefId,
+			ID of parameter def to look up,
+
+			[out],
+			objOut,
+			AAFParameterDef,
+			ppParameterDef,
+			resulting parameter def,
+
+     This method looks up the parameter def corresponding to the given
+  // ID.
+  //
+  // Succeeds if all of the following are true:
+  // - the given ID corresponds to a known parameter def
+  // - the ppParameterDef pointer is valid.
+  // 
+  // If this method fails nothing will be written to *ppParameterDef.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pParameterDef arg is NULL.
+  //
+  // AAFRESULT_OBJECT_NOT_FOUND
+  //   - given ID does not correspond to a known parameter def.)
 AD_XCLASS_END(Concrete, StoredObject)
