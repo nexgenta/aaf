@@ -207,6 +207,14 @@ public:
 
 
   //****************
+  // GetNumIdents()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetNumIdents
+        (aafUInt32 *  pNumIdents);  //@parm [out,retval] Total number of identifications
+
+
+  //****************
   // EnumAAFIdents()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -264,6 +272,10 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFHeaderTest.cpp.
   static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 
 public:
 	// Interfaces visible inside the toolkit, but not exposed through the API
