@@ -350,7 +350,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::prependValue(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::prependValue");
 
-  ASSERT("Unimplemented code not reached", false);
+  insertAt(object, 0);
 }
 
   // @mfunc Insert <p object> into this
@@ -380,11 +380,23 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::insert(
   //   @parm The position at which to insert the <p ReferencedObject>.
 template <typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::insertAt(
-                             const ReferencedObject* value, const size_t index)
+                            const ReferencedObject* object, const size_t index)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insertAt");
 
-  ASSERT("Unimplemented code not reached", false);
+  PRECONDITION("Valid index", (index >= 0) && (index <= count()));
+  
+  OMUInt32 localKey = nextLocalKey();
+  char* name = elementName(localKey);
+  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                  ReferencedObject> newElement(this, name, localKey);
+  newElement.setValue(object);
+  _vector.insertAt(newElement, index);
+  delete [] name;
+  setPresent();
+
+  POSTCONDITION("Object properly inserted",
+                                    _vector.getAt(index).getValue() == object);
 }
 
   // @mfunc Does this <c OMStrongReferenceVectorProperty> contain
@@ -400,9 +412,20 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::containsValue(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::containsValue");
 
-  ASSERT("Unimplemented code not reached", false);
-
   bool result = false;
+  OMVectorIterator<
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject> > iterator(_vector, OMBefore);
+  // This loop causes objects to be loaded but the one we are
+  // looking for must already be loaded.
+  while (++iterator) {
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject>& element = iterator.value();
+    if (element.getValue() == object) {
+      result = true;
+      break;
+    }
+  }
   return result;
 }
 
@@ -418,7 +441,10 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::removeValue(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeValue");
 
-  ASSERT("Unimplemented code not reached", false);
+  PRECONDITION("Object is present", containsValue(object));
+
+  size_t index = indexOfValue(object);
+  removeAt(index);
 }
 
   // @mfunc Remove the object from this
@@ -439,9 +465,9 @@ OMStrongReferenceVectorProperty<ReferencedObject>::removeAt(const size_t index)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeLast");
 
-  ASSERT("Unimplemented code not reached", false);
-
-  return 0;
+  ReferencedObject* result = setValueAt(0, index);
+  _vector.removeAt(index);
+  return result;
 }
 
   // @mfunc Remove the last (index == count() - 1) object
@@ -493,8 +519,24 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue");
 
-  ASSERT("Unimplemented code not reached", false);
-  return 0;
+  PRECONDITION("Object is present", containsValue(object));
+
+  size_t result;
+
+  OMVectorIterator<
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject> > iterator(_vector, OMBefore);
+  // This loop causes objects to be loaded but the one we are
+  // looking for must already be loaded.
+  while (++iterator) {
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject>& element = iterator.value();
+    if (element.getValue() == object) {
+      result = iterator.index();
+      break;
+    }
+  }
+  return result;
 }
 
   // @mfunc Increase the capacity of this
@@ -588,24 +630,28 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm The size of the buffer.
+  //   @parm size_t | size | The size of the buffer.
   //   @this const
 template<typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
-                                                         OMByte* bits,
-                                                         size_t size) const
+                                                      OMByte* bits,
+                                                      size_t ANAME(size)) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getBits");
+
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
   const ReferencedObject** p = (const ReferencedObject**)bits;
-  size_t count = _vector.count();
-  for (size_t i = 0; i < count; i++) {
+
+  OMVectorIterator<
     OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
+                    ReferencedObject> > iterator(_vector, OMBefore);
+  while (++iterator) {
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject>& element = iterator.value();
     *p++ = element.getValue();
   }
 }
@@ -618,22 +664,26 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @parm The address of the buffer from which the raw bits are copied.
-  //   @parm The size of the buffer.
+  //   @parm size_t | size | The size of the buffer.
 template<typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
-                                                         const OMByte* bits,
-                                                         size_t size)
+                                                            const OMByte* bits,
+                                                            size_t ANAME(size))
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::setBits");
+
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  size_t count = size / sizeof(ReferencedObject*);
   ReferencedObject** p = (ReferencedObject**)bits;
 
-  for (size_t i = 0; i < count; i++) {
-    ReferencedObject* object = p[i];
-    setValueAt(object, i);
+  OMVectorIterator<
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject> > iterator(_vector, OMBefore);
+  while (++iterator) {
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject>& element = iterator.value();
+    element.setValue(*p++);
   }
 }
 
