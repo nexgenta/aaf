@@ -1,31 +1,27 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMReferenceVector
 #ifndef OMREFERENCEVECTORT_H
 #define OMREFERENCEVECTORT_H
 
@@ -68,7 +64,7 @@ ReferencedObject* OMReferenceVector<ReferencedObject>::setValueAt(
 {
   TRACE("OReferenceVector<ReferencedObject>::setValueAt");
   PRECONDITION("Valid index", index <= count());
-  
+
   if (index == count()) {
     // This is an append, make sure the new element is defined.
     VectorElement newElement(object);
@@ -96,7 +92,7 @@ OMReferenceVector<ReferencedObject>::clearValueAt(const size_t index)
 {
   TRACE("OReferenceVector<ReferencedObject>::clearValueAt");
   PRECONDITION("Valid index", index < count());
-  
+
   VectorElement& element = _vector.getAt(index);
   ReferencedObject* oldObject = element.setValue(0);
 
@@ -221,7 +217,7 @@ void OMReferenceVector<ReferencedObject>::insertAt(
   TRACE("OMReferenceVector<ReferencedObject>::insertAt");
 
   PRECONDITION("Valid index", index <= count());
-  
+
   VectorElement newElement(object);
   _vector.insertAt(newElement, index);
 
@@ -440,6 +436,163 @@ void OMReferenceVector<ReferencedObject>::grow(const size_t capacity)
     VectorElement voidElement;
     _vector.insert(voidElement);
   }
+}
+
+  // @mfunc Insert <p object> into this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::insertObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::insertObject");
+  appendObject(object);
+}
+
+  // @mfunc Does this <c OMReferenceVector> contain <p object> ?
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+bool
+OMReferenceVector<ReferencedObject>::containsObject(
+                                                  const OMObject* object) const
+{
+  TRACE("OMReferenceVector<ReferencedObject>::containsObject");
+
+  const ReferencedObject* obj = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", obj != 0);
+  return containsValue(obj);
+}
+
+  // @mfunc Remove <p object> from this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::removeObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::removeObject");
+
+  const ReferencedObject* obj = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", obj != 0);
+  removeValue(obj);
+}
+
+  // @mfunc Remove all objects from this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::removeAllObjects(void)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::removeAllObjects");
+
+  _vector.clear();
+  POSTCONDITION("All objects removed", count() == 0);
+}
+
+  // @mfunc Create an <c OMReferenceContainerIterator> over this
+  //        <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMReferenceContainerIterator*
+OMReferenceVector<ReferencedObject>::createIterator(void) const
+{
+  TRACE("OMReferenceVector<ReferencedObject>::createIterator");
+
+  OMReferenceVectorIterator<ReferencedObject>* result =
+              new OMReferenceVectorIterator<ReferencedObject>(*this, OMBefore);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
+}
+
+  // @mfunc Set the value of this <c OMReferenceVector>
+  //        at position <p index> to <p object>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMObject*
+OMReferenceVector<ReferencedObject>::setObjectAt(const OMObject* object,
+                                                 const size_t index)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::setObjectAt");
+
+  const ReferencedObject* obj = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", obj != 0);
+  return setValueAt(obj, index);
+}
+
+  // @mfunc The value of this <c OMReferenceVector>
+  //        at position <p index>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMObject*
+OMReferenceVector<ReferencedObject>::getObjectAt(const size_t index) const
+{
+  TRACE("OMReferenceVector<ReferencedObject>::getObjectAt");
+
+  return valueAt(index);
+}
+
+  // @mfunc Append the given <p OMObject> <p object> to
+  //        this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::appendObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::appendObject");
+
+  insertObjectAt(object, count());
+}
+
+  // @mfunc Prepend the given <p OMObject> <p object> to
+  //        this <c OMReferenceVector>.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+template <typename ReferencedObject>
+void OMReferenceVector<ReferencedObject>::prependObject(const OMObject* object)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::prependObject");
+
+  insertObjectAt(object, 0);
+}
+
+  // @mfunc Remove the object from this
+  //        <c OMReferenceVector> at position <p index>.
+  //        Existing objects in this <c OMReferenceVector>
+  //        at <p index> + 1 and higher are shifted down one index
+  //        position.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @rdesc TBS
+template <typename ReferencedObject>
+OMObject*
+OMReferenceVector<ReferencedObject>::removeObjectAt(const size_t index)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::removeObjectAt");
+
+  return removeAt(index);
+}
+
+  // @mfunc Insert <p object> into this <c OMReferenceVector>
+  //        at position <p index>. Existing objects at <p index> and
+  //        higher are shifted up one index position.
+  //   @tcarg class | ReferencedObject | The type of the referenced objects.
+  //   @parm TBS
+  //   @parm TBS
+template <typename ReferencedObject>
+void
+OMReferenceVector<ReferencedObject>::insertObjectAt(const OMObject* object,
+                                                    const size_t index)
+{
+  TRACE("OMReferenceVector<ReferencedObject>::insertObjectAt");
+
+  const ReferencedObject* obj = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", obj != 0);
+  ReferencedObject* o = const_cast<ReferencedObject*>(obj);
+  insertAt(o, index);
 }
 
 #endif
