@@ -116,7 +116,8 @@ extern "C" HRESULT CAAFContentStorage_test()
 	catch (...)
 	{
 		cerr << "CAAFContentStorage_test...Caught general C++"
-			" exception!" << endl; 
+			 << " exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 	
 	// Cleanup our object if it exists.
@@ -421,8 +422,9 @@ void ContentStorageTest::createFileMob(aafMobID_constref newMobID)
 	check(_pMob->SetMobID(newMobID));
 	check(_pMob->SetName(L"ContentStorageTest File Mob"));
 	
-	check(defs.cdFileDescriptor()->
-		  CreateInstance(IID_IAAFEssenceDescriptor, 
+	// instantiate a concrete subclass of FileDescriptor
+	check(defs.cdHTMLDescriptor()->
+		  CreateInstance(IID_IAAFFileDescriptor, 
 						 (IUnknown **)&_pFileDescriptor));
 	
 	check(_pFileDescriptor->QueryInterface (IID_IAAFEssenceDescriptor,
