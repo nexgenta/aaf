@@ -26,12 +26,14 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMWeakReferenceProperty
 #ifndef OMWEAKREFPROPERTYT_H
 #define OMWEAKREFPROPERTYT_H
 
 #include "OMAssertions.h"
 #include "OMPropertyTable.h"
 #include "OMUtilities.h"
+#include "OMStoredObject.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -47,9 +49,8 @@ OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
                                               const wchar_t* name,
                                               const wchar_t* targetName,
                                               const OMPropertyId keyPropertyId)
-: OMReferenceProperty(propertyId,
-                      SF_WEAK_OBJECT_REFERENCE,
-                      name), _reference(),
+: OMWeakReference(propertyId, name),
+  _reference(),
   _targetTag(nullOMPropertyTag),
   _targetName(targetName),
   _targetPropertyPath(0),
@@ -57,7 +58,7 @@ OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty");
 
-  _reference = OMWeakObjectReference<ReferencedObject>(this);
+  _reference = OMWeakObjectReference(this);
 }
 
   // @mfunc Constructor.
@@ -74,9 +75,8 @@ OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
                                         const wchar_t* name,
                                         const OMPropertyId keyPropertyId,
                                         const OMPropertyId* targetPropertyPath)
-: OMReferenceProperty(propertyId,
-                      SF_WEAK_OBJECT_REFERENCE,
-                      name), _reference(),
+: OMWeakReference(propertyId, name),
+  _reference(),
   _targetTag(nullOMPropertyTag),
   _targetName(0),
   _targetPropertyPath(0),
@@ -84,7 +84,7 @@ OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty");
 
-  _reference = OMWeakObjectReference<ReferencedObject>(this);
+  _reference = OMWeakObjectReference(this);
   _targetPropertyPath = savePropertyPath(targetPropertyPath);
 }
 
@@ -110,10 +110,14 @@ void OMWeakReferenceProperty<ReferencedObject>::getValue(
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  ReferencedObject* result = _reference.getValue();
-
-  object = result;
-
+  OMStorable* p = _reference.getValue();
+  if (p != 0) {
+    ReferencedObject* result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+    object = result;
+  } else {
+    object = 0;
+  }
 }
 
   // @mfunc Set the value of this <c OMWeakReferenceProperty>.
@@ -140,7 +144,14 @@ ReferencedObject* OMWeakReferenceProperty<ReferencedObject>::setValue(
 
   _reference.setTargetTag(targetTag());
 #endif
-  ReferencedObject* result = _reference.setValue(object);
+  OMStorable* p = _reference.setValue(object->identification(), object);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
   setPresent();
   return result;
 }
@@ -157,8 +168,14 @@ ReferencedObject* OMWeakReferenceProperty<ReferencedObject>::clearValue(void)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::clearValue");
 
-  ReferencedObject* result = _reference.setValue(0);
-
+  OMStorable* p = _reference.setValue(nullOMUniqueObjectIdentification, 0);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
   return result;
 }
 
@@ -233,10 +250,7 @@ void OMWeakReferenceProperty<ReferencedObject>::save(void) const
 
   OMPropertyTag tag = targetTag();
 
-  const OMUniqueObjectIdentification& id = _reference.identification();
-  store()->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
-
-  _reference.save();
+  store()->save(*this);
 }
 
   // @mfunc Close this <c OMWeakReferenceProperty>.
@@ -263,16 +277,7 @@ void OMWeakReferenceProperty<ReferencedObject>::restore(
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::restore");
 
-  OMUniqueObjectIdentification id;
-  OMPropertyTag tag;
-  ASSERT("Sizes match", (sizeof(tag) + sizeof(OMPropertyId) +
-                         sizeof(OMKeySize) + sizeof(id)) == externalSize);
-  OMPropertyId keyPropertyId;
-  store()->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
-  ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
-  _targetTag = tag;
-  _reference = OMWeakObjectReference<ReferencedObject>(this, id, _targetTag);
-  _reference.restore();
+  store()->restore(*this, externalSize);
   setPresent();
 }
 
@@ -386,6 +391,33 @@ OMObject* OMWeakReferenceProperty<ReferencedObject>::setObject(
   ASSERT("Object is correct type", p != 0);
 
   return setValue(p);
+}
+
+template <typename ReferencedObject>
+OMWeakObjectReference&
+OMWeakReferenceProperty<ReferencedObject>::reference(void) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::reference");
+
+  return const_cast<OMWeakObjectReference&>(_reference);
+}
+
+template <typename ReferencedObject>
+OMPropertyId
+OMWeakReferenceProperty<ReferencedObject>::keyPropertyId(void) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::keyPropertyId");
+
+  return _keyPropertyId;
+}
+
+template <typename ReferencedObject>
+void OMWeakReferenceProperty<ReferencedObject>::setTargetTag(
+                                                       OMPropertyTag targetTag)
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::setTargetTag");
+
+  _targetTag = targetTag;
 }
 
 template <typename ReferencedObject>
