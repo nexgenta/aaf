@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFWeakRefSetUtil.h,v 1.1.2.1 2004/04/17 20:39:59 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFWeakRefSetUtil.h,v 1.1.2.2 2004/04/29 03:52:53 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,8 +45,8 @@
 // This code was factored out of ImplAAFOperationDef.  The were the
 // original the methods that accessed ImplAAFOperationDef::_paramDefined
 
-class AAFWeakRefSetUtil {
- public:
+namespace AAFWeakRefSetUtil {
+
 
   // Requires specialized implementations.
   // Implementations currentl exist for:

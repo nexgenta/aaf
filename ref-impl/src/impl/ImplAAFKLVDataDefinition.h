@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.2 2004/04/17 20:47:21 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.3 2004/04/29 03:52:53 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,9 +33,9 @@
 
 
 
-class ImplAAFTypeDef;
+#include "ImplAAFTypeDef.h"
 
-class ImplAAFPropertyDef;
+#include "ImplAAFPropertyDef.h"
 
 template <class T> class ImplAAFEnumerator;
 typedef ImplAAFEnumerator<ImplAAFPropertyDef> ImplEnumAAFPropertyDefs;
