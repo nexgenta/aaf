@@ -1,32 +1,34 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMEXTERNAL
 #ifndef OMSTRONGREFPROPERTY_H
 #define OMSTRONGREFPROPERTY_H
 
-#include "OMDataTypes.h"
-#include "OMProperty.h"
-#include "OMStrongReference.h"
 #include "OMObjectReference.h"
 
   // @class Persistent strong reference (contained object)
@@ -34,16 +36,15 @@
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @base public | <c OMStrongReference>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+  //   @base public | <c OMReferenceProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceProperty : public OMStrongReference {
+class OMStrongReferenceProperty :
+                                 public OMReferenceProperty<ReferencedObject> {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMStrongReferenceProperty(const OMPropertyId propertyId,
-                            const wchar_t* name);
+  OMStrongReferenceProperty(const OMPropertyId propertyId, const char* name);
 
     // @cmember Destructor.
   virtual ~OMStrongReferenceProperty(void);
@@ -53,9 +54,6 @@ public:
 
     // @cmember Set the value of this <c OMStrongReferenceProperty>.
   virtual ReferencedObject* setValue(const ReferencedObject* object);
-
-    // @cmember Clear the value of this <c OMStrongReferenceProperty>.
-  virtual ReferencedObject* clearValue(void);
 
     // @cmember Assignment operator.
   OMStrongReferenceProperty<ReferencedObject>& operator =
@@ -73,13 +71,10 @@ public:
   operator ReferencedObject*() const;
 
     // @cmember Save this <c OMStrongReferenceProperty>.
-  virtual void save(void) const;
+  virtual void save(void* clientContext) const;
 
     // @cmember Close this <c OMProperty>.
   virtual void close(void);
-
-    // @cmember Detach this <c OMProperty>.
-  virtual void detach(void);
 
     // @cmember Restore this <c OMStrongReferenceProperty>, the external
     //          (persisted) size of the <c OMStrongReferenceProperty>
@@ -88,11 +83,8 @@ public:
 
   // Optional property interface
 
-    // @cmember Is this <c OMStrongReferenceProperty> void ?
-  virtual bool isVoid(void) const;
-
     // @cmember Remove this optional <c OMStrongReferenceProperty>.
-  virtual void removeProperty(void);
+  virtual void remove(void);
 
     // @cmember Get the raw bits of this <c OMStrongReferenceProperty>. The
     //          raw bits are copied to the buffer at address <p bits>
@@ -104,34 +96,9 @@ public:
     //          is <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
-    // @cmember Get the value of this <c OMStrongReferenceProperty>.
-  virtual OMObject* getObject(void) const;
-
-    // @cmember set the value of this <c OMStrongReferenceProperty>.
-  virtual OMObject* setObject(const OMObject* object);
-
-    // @cmember The value of this <c OMStrongReferenceProperty>
-    //          as an <c OMStorable>.
-  virtual OMStorable* storable(void) const;
-
-  virtual OMStrongObjectReference& reference(void) const;
-
-  // Copying.
-
-  virtual void shallowCopyTo(OMProperty* destination) const;
-
-  virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const;
-
 private:
 
-  OMStrongObjectReference _reference;
-
-    // OMStrongReferenceProperty can't be assigned - declare but don't define
-  OMStrongReferenceProperty& operator = (const OMStrongReferenceProperty& rhs);
-
-    // OMStrongReferenceProperty can't be copied - declare but don't define
-  OMStrongReferenceProperty(const OMStrongReferenceProperty& rhs);
+  OMStrongObjectReference<ReferencedObject> _reference;
 
 };
 

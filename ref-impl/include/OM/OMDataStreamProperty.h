@@ -31,7 +31,9 @@
 
 #include "OMDataTypes.h"
 
-#include "OMProperty.h"
+#include "OMPropertyBase.h"
+
+struct IStream;
 
   // @class Persistent data stream properties supported by the Object
   //        Manager.
@@ -47,7 +49,7 @@ public:
   virtual ~OMDataStreamProperty(void);
 
     // @cmember Save this <c OMDataStreamProperty>.
-  virtual void save(void) const;
+  virtual void save(void* clientContext) const;
 
     // @cmember Restore this <c OMDataStreamProperty>, the size of the
     //          <c OMDataStreamProperty> is <p size>.
