@@ -3,37 +3,28 @@
 #ifndef __ImplAAFContentStorage_h__
 #define __ImplAAFContentStorage_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+
 
 class ImplAAFMob;
-class ImplAAFEssenceData;
-class ImplAAFDictionary;
-class ImplAAFFile;
 
 class ImplEnumAAFMobs;
-template <class T> 
-class ImplAAFEnumerator;
-typedef ImplAAFEnumerator<ImplAAFEssenceData> ImplEnumAAFEssenceData;
+
+class ImplAAFEssenceData;
+
+class ImplEnumAAFEssenceData;
+
+class ImplAAFDictionary;
+
+class ImplAAFFile;
+
 
 
 
@@ -43,13 +34,15 @@ typedef ImplAAFEnumerator<ImplAAFEssenceData> ImplEnumAAFEssenceData;
 #include "ImplAAFObject.h"
 #endif
 
+#include "aafTable.h"
+
 #include "aafErr.h"
 #include "ImplAAFObject.h"
 #include "ImplAAFMob.h"
 #include "ImplAAFEssenceData.h"
 
-#include "OMStrongRefSetProperty.h"
-#include "OMDataTypes.h"
+#include "OMProperty.h"
+
 
 class AAFDataKind;
 class AAFOperationDef;
@@ -65,21 +58,22 @@ public:
   ImplAAFContentStorage ();
   ~ImplAAFContentStorage ();
 
+	OMDECLARE_STORABLE(ImplAAFContentStorage)
 
   //****************
   // LookupMob()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     LookupMob
-        (aafMobID_constref  mobID,   //@parm [in,ref] The Mob ID
+        (aafUID_t *  mobID,   //@parm [in,ref] The Mob ID
 		 ImplAAFMob ** ppMob);  //@parm [out,retval] Matching Mob
 
 
   //****************
-  // CountMobs()
+  // GetNumMobs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountMobs
+    GetNumMobs
         (aafMobKind_t  mobKind,   //@parm [in] The mob kind to count
 		 aafNumSlots_t *  pNumMobs);  //@parm [out,retval] Total number of mobs of kind mobKind
 
@@ -93,10 +87,10 @@ public:
 
 
   //****************
-  // AddMob()
+  // AppendMob()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddMob
+    AppendMob
         (ImplAAFMob * pMob);  //@parm [in] Mob to add header
 
 
@@ -109,10 +103,10 @@ public:
 
 
   //****************
-  // CountEssenceData()
+  // GetNumEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountEssenceData
+    GetNumEssenceData
         (aafUInt32 *  pNumEssenceData);  //@parm [out,retval] Total number of essence data with type
 
 
@@ -122,7 +116,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     IsEssenceDataPresent
         (// @parm [in] A Unique File Mob ID
-		 aafMobID_constref fileMobID,
+		 aafUID_t *  pFileMobID,
 
 		 // @parm [in] The Essence File Format
 		 aafFileFormat_t  fmt,
@@ -141,10 +135,10 @@ public:
 
 
   //****************
-  // AddEssenceData()
+  // AppendEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddEssenceData
+    AppendEssenceData
 		// @parm [in] Essence data object to append
         (ImplAAFEssenceData * pEssenceData);
 
@@ -160,12 +154,23 @@ public:
 
 
 	// Interfaces visible inside the toolkit, but not exposed through the API
-	AAFRESULT LookupEssenceData (aafMobID_constref fileMobID, ImplAAFEssenceData **ppEssence);
-	AAFRESULT ChangeIndexedMobID (ImplAAFMob *pMob, aafMobID_constref newID);
+	virtual AAFRESULT UnlinkMobID(aafUID_t mobID);
+
+	AAFRESULT LookupEssence (aafUID_t *pFileMobID, ImplAAFEssenceData **ppEssence);
+	AAFRESULT ChangeIndexedMobID (ImplAAFMob *pMob, aafUID_t *newID);
+
+AAFRESULT
+    GetNthMob (aafInt32 index, ImplAAFMob **ppEnum);
+
+AAFRESULT
+    GetNthEssenceData (aafInt32 index, ImplAAFEssenceData **ppEnum);
+
+AAFRESULT LoadMobTables(void);
 
 private:
-    OMStrongReferenceSetProperty<OMUniqueMaterialIdentification, ImplAAFMob> _mobs;
-    OMStrongReferenceSetProperty<OMUniqueMaterialIdentification, ImplAAFEssenceData> _essenceData;
+	aafTable_t		*_mobIndex;		// Non-persistant
+    OMStrongReferenceVectorProperty<ImplAAFMob> _mobs;
+    OMStrongReferenceVectorProperty<ImplAAFEssenceData> _essenceData;
 };
 
 #endif // ! __ImplAAFHeader_h__
