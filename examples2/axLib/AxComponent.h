@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.h,v 1.17 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxComponent.h,v 1.17.2.1 2004/09/02 13:37:42 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,6 +82,8 @@ public:
 
 	aafPosition_t GetCutPoint();
 	void SetCutPoint( aafPosition_t cutPoint );
+
+	IAAFOperationGroupSP GetOperationGroup();
 
 	operator IAAFTransitionSP ()
 	{ return _spIaafTransition; }
@@ -241,6 +243,7 @@ public:
 	void Initialize( IAAFDataDefSP, aafLength_t, IAAFOperationDefSP );
 
 	void AppendInputSegment( IAAFSegmentSP );
+	void AddParameter( IAAFParameterSP );
 
 	IAAFOperationDefSP GetOperationDef();
 	aafUInt32 CountSourceSegments();

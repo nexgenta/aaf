@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.cpp,v 1.9.2.1 2004/06/08 13:45:23 stuart_hc Exp $ $Name:  $
+// $Id: AxDictionary.cpp,v 1.9.2.2 2004/09/02 13:37:42 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,6 +64,23 @@ bool AxDictionary::isKnownOperationDef( const aafUID_t& opId )
 	// AAFRESULT_SUCCESS (known).  Anything else throws.
 
 	// FIXME - This is not a documented return value!  (FIXDOCS)
+	if ( AAFRESULT_NO_MORE_OBJECTS == hr ) {
+		result = false;
+	}
+	else if ( AAFRESULT_SUCCESS != hr ) {
+		CHECK_HRESULT( hr );
+	}
+
+	return result;
+}
+
+bool AxDictionary::isKnownParameterDef( const aafUID_t& paramId )
+{
+	IAAFParameterDefSP spIaafParameterDef;
+
+	HRESULT hr = _spIaafDictionary->LookupParameterDef( paramId, &spIaafParameterDef );
+
+	bool result = true;
 	if ( AAFRESULT_NO_MORE_OBJECTS == hr ) {
 		result = false;
 	}
@@ -210,6 +227,11 @@ void AxDictionary::RegisterKLVDataKey( const aafUID_t& uuid,
 void AxDictionary::RegisterOperationDef( IAAFOperationDefSP spIaafOperationDef )
 {
 	CHECK_HRESULT( _spIaafDictionary->RegisterOperationDef( spIaafOperationDef ) );
+}
+
+void AxDictionary::RegisterParameterDef( IAAFParameterDefSP spIaafParameterDef )
+{
+	CHECK_HRESULT( _spIaafDictionary->RegisterParameterDef( spIaafParameterDef ) );
 }
 
 void AxDictionary::RegisterCodecDef( IAAFCodecDefSP spIaafCodecDef)

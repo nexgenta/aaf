@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.cpp,v 1.18 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxComponent.cpp,v 1.18.2.1 2004/09/02 13:37:42 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,6 +98,13 @@ aafPosition_t AxTransition::GetCutPoint()
 void AxTransition::SetCutPoint( aafPosition_t cutPoint )
 {
 	CHECK_HRESULT( _spIaafTransition->SetCutPoint( cutPoint ) );
+}
+
+IAAFOperationGroupSP AxTransition::GetOperationGroup()
+{
+  IAAFOperationGroupSP spOpGroup;
+  CHECK_HRESULT( _spIaafTransition->GetOperationGroup( &spOpGroup ) );
+  return spOpGroup;
 }
 
 //=---------------------------------------------------------------------=
@@ -339,6 +346,11 @@ void AxOperationGroup::Initialize( IAAFDataDefSP spIaafDataDef,
 void AxOperationGroup::AppendInputSegment( IAAFSegmentSP spIaafSegment )
 {
 	CHECK_HRESULT( _spIaafOperationGroup->AppendInputSegment( spIaafSegment ) );
+}
+
+void AxOperationGroup::AddParameter( IAAFParameterSP spIaafParameter )
+{
+	CHECK_HRESULT( _spIaafOperationGroup->AddParameter( spIaafParameter ) );
 }
 
 IAAFOperationDefSP AxOperationGroup::GetOperationDef()
