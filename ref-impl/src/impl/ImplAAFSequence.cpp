@@ -159,7 +159,7 @@ AAFRESULT STDMETHODCALLTYPE
 	size_t			numCpnts;
 	aafLength_t		sequLen, cpntLen, prevLen;
 	ImplAAFDataDefSP sequDataDef, cpntDataDef;
-	aafBool			isPrevTran = AAFFalse, willConvert;
+	aafBool			isPrevTran = kAAFFalse, willConvert;
 	aafErr_t		aafError = AAFRESULT_SUCCESS;
 	implCompType_t	type;
 	ImplAAFDictionary	*pDict = NULL;
@@ -174,12 +174,16 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		// Verify that component's datadef converts to sequence's datadef
-		GetDataDef(&sequDataDef);
-		pComponent->GetDataDef(&cpntDataDef);
-		CHECK(cpntDataDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
+		if(GetDataDef(&sequDataDef) == AAFRESULT_SUCCESS)
+		{
+			pComponent->GetDataDef(&cpntDataDef);
+			CHECK(cpntDataDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
 		
-		if (willConvert == AAFFalse)
-			RAISE(AAFRESULT_INVALID_DATADEF);
+			if (willConvert == kAAFFalse)
+				RAISE(AAFRESULT_INVALID_DATADEF);
+		}
+		else
+			SetDataDef(cpntDataDef);
 		
 		status = GetLength(&sequLen);
 		if(status == AAFRESULT_PROP_NOT_PRESENT /*AAFRESULT_BAD_PROP ???*/)
@@ -220,7 +224,7 @@ AAFRESULT STDMETHODCALLTYPE
 				CHECK(pPrevCpnt->GetLength(&prevLen));
 				pPrevCpnt->GetComponentType(&type);
 				if (type == kTransition)
-					isPrevTran = AAFTrue;
+					isPrevTran = kAAFTrue;
 			}
 			
 			// Is the newly appended component a transition?
@@ -333,7 +337,8 @@ AAFRESULT STDMETHODCALLTYPE
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+	_components.removeAt(index);
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -363,7 +368,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::RemoveComponent (ImplAAFComponent* pComponent)
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	if (!_components.containsValue(pComponent))
+	  return AAFRESULT_BADINDEX;
+
+	_components.removeValue(pComponent);
+	return AAFRESULT_SUCCESS;
 }
 
 //***********************************************************
@@ -539,7 +548,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 	ImplAAFTimecode*	pTC;
 	aafFrameOffset_t	begPos, endPos;
 	aafPosition_t		sequPos;
-	aafBool				found = AAFFalse;
+	aafBool				found = kAAFFalse;
 	aafLength_t			junk;
 
 	if (pOffset == NULL || pTimecode == NULL || pEditRate == NULL)
@@ -585,7 +594,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 					pComponent->AccumulateLength(&sequPos);
   					TruncInt64toInt32(sequPos, &segStart);	// OK FRAMEOFFSET
 					pTC->GetLength(&tcLen);
-					found = AAFTrue;
+					found = kAAFTrue;
 					break;
 				}
 			}
