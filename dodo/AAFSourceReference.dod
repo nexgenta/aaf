@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFSourceReference.dod,v 1.15.2.1 2004/05/01 02:10:42 jptrainor Exp $ $Name:  $
+#c $Id: AAFSourceReference.dod,v 1.15.2.2 2004/05/03 01:14:36 jptrainor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -156,5 +156,8 @@ AD_XMETHOD1(SetSourceMobSlotID,
 AD_COM_METH(.method-SetChannelIDs)
 AD_COM_METH(.method-GetChannelIDs)
 AD_COM_METH(.method-GetChannelIDsSize)
+AD_COM_METH(.method-SetMonoSourceSlotIDs)
+AD_COM_METH(.method-GetMonoSourceSlotIDs)
+AD_COM_METH(.method-GetMonoSourceSlotIDsSize)
 
 AD_COM_EXT_CLASS_END(AAFSourceReference2)

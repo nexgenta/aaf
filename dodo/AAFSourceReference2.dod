@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFSourceReference2.dod,v 1.1.2.1 2004/04/30 15:53:37 jptrainor Exp $ $Name:  $
+#c $Id: AAFSourceReference2.dod,v 1.1.2.2 2004/05/03 01:14:36 jptrainor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -228,6 +228,78 @@ AD_XMETHOD1(GetChannelIDsSize,
 //
 // AAFRESULT_NULL_PARAM
 //   - pChannelIDs is null
+//
+// AAFRESULT_PROP_NOT_PRESENT
+//   - the property is not present)
+
+AD_XMETHOD2(SetMonoSourceSlotIDs,
+		[in],
+		objPass,
+		aafUInt32,
+		numberElements,
+		Number of elements in the pMonoSourceSlotIDs array,
+		[in],
+		objPass,
+		aafUInt32*,
+		pMonoSourceSlotIDs,
+		Array of slot IDs,
+
+	   For reference from a multi-channel MobSlot to multiple mono MobSlots.
+// pMonoSourceSlotIDs identifies the mono slots referenced by this SourceReference
+// object.
+
+// 
+// Return codes:
+//
+// AAFRESULT_SUCCESS
+//   - succeeded
+//
+// AAFRESULT_NULL_PARAM
+//   - pMonoSourceSlotIDs is null )
+
+
+AD_XMETHOD2(GetMonoSourceSlotIDs,
+		[in],
+		objPass,
+		aafUInt32,
+		numberElements,
+		Number of elements in the pMonoSourceSlotIDs array,
+		[in],
+		objPass,
+		aafUInt32*,
+		pMonoSourceSlotIDs,
+		Array of channel IDs,
+
+// Get the mono slot IDs that are referenced by this object.  Refer to
+// SetMonoSourceSlotIDs for a description of pMonoSourceSlotIDs.
+// Return codes:
+//
+// AAFRESULT_SUCCESS
+//   - succeeded
+//
+// AAFRESULT_NULL_PARAM
+//   - pMonoSourceSlotIDs is null
+//
+// AAFRESULT_PROP_NOT_PRESENT
+//   - the property is not present
+//
+// AAFRESULT_SMALLBUF
+//   - pMonoSourceSlotIDs is too small)
+
+AD_XMETHOD1(GetMonoSourceSlotIDsSize,
+		[out],
+		objPass,
+		aafUInt32 *,
+		numberElements,
+		Number of elements in the pMonoSourceSlotIDs array,
+
+// Get the number of mono slot IDs stored by this SourceReference.
+//
+// AAFRESULT_SUCCESS
+//   - succeeded
+//
+// AAFRESULT_NULL_PARAM
+//   - pMonoSourceSlotIDs is null
 //
 // AAFRESULT_PROP_NOT_PRESENT
 //   - the property is not present)
