@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEssence.cpp,v 1.23 2004/04/10 14:20:31 jptrainor Exp $ $Name:  $
+// $Id: AxEssence.cpp,v 1.24 2004/04/10 23:21:56 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -231,6 +231,15 @@ AxFileDescriptor::AxFileDescriptor( IAAFFileDescriptorSP sp )
 
 AxFileDescriptor::~AxFileDescriptor()
 {}
+
+aafLength_t AxFileDescriptor::GetLength()
+{
+	aafLength_t length;
+
+	CHECK_HRESULT( _spIaafFileDescriptor->GetLength(&length) );
+
+	return length;
+}
 
 aafRational_t AxFileDescriptor::GetSampleRate()
 {
