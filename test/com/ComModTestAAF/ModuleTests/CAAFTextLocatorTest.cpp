@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTextLocator interface
-/************************************************\
-*                                                *
-* Advanced Authoring Format                      * 
-*                                                *
-* Copyright (c) 1998-1999 Avid Technology, Inc.  *
-* Copyright (c) 1998-1999 Microsoft Corporation  * 
-*                                                *
-\************************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -68,8 +86,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob						*pMob = NULL;
 	IAAFEssenceDescriptor		*edesc = NULL;
 	IAAFTapeDescriptor*			pTapeDescriptor = NULL;
-	aafUID_t					newUID;
-	aafInt32					numLocators;
+	aafMobID_t					newMobID;
+	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafRational_t	audioRate = { 44100, 1 };
 
@@ -104,16 +122,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		
 		//Make the first mob
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
+		checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
 								IID_IAAFSourceMob, 
 								(IUnknown **)&pSourceMob));
 
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newUID));
-		checkResult(pMob->SetMobID(&newUID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"TextLocatorTestSourceMOB"));
 		
-		checkResult(pDictionary->CreateInstance(&AUID_AAFTapeDescriptor,
+		checkResult(pDictionary->CreateInstance(AUID_AAFTapeDescriptor,
 								IID_IAAFTapeDescriptor, 
 								(IUnknown **)&pTapeDescriptor));
 		
@@ -129,12 +147,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
 			// Verify that there are no locators
-		checkResult(edesc->GetNumLocators(&numLocators));
+		checkResult(edesc->CountLocators(&numLocators));
 		checkExpression(0 == numLocators, AAFRESULT_TEST_FAILED);
 
   
 		// Make a locator, and attach it to the EssenceDescriptor
-		checkResult(pDictionary->CreateInstance(&AUID_AAFTextLocator,
+		checkResult(pDictionary->CreateInstance(AUID_AAFTextLocator,
 								IID_IAAFTextLocator, 
 								(IUnknown **)&pTextLocator));		
 		checkResult(pTextLocator->QueryInterface (IID_IAAFLocator, (void **)&pLocator));
@@ -145,11 +163,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 		// Verify that there is now one locator
-		checkResult(edesc->GetNumLocators(&numLocators));
+		checkResult(edesc->CountLocators(&numLocators));
 		checkExpression(1 == numLocators, AAFRESULT_TEST_FAILED);
 
 		// Add the source mob into the tree
-		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pHeader->AddMob(pMob));
 
 	}
 	catch (HRESULT& rResult)
@@ -212,7 +230,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFTextLocator*		pTextLocator = NULL;
 	IEnumAAFMobs*			pMobIter = NULL;
 	IAAFMob*				pMob = NULL;
-	aafInt32				numLocators, readLen;
+	aafUInt32				numLocators;
+	aafInt32				readLen;
 	aafNumSlots_t			numMobs, n;
 
 	HRESULT					hr = AAFRESULT_SUCCESS;
@@ -228,16 +247,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
   		checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		if (1 != numMobs )
 			checkResult(AAFRESULT_TEST_FAILED);
 
 
-		checkResult(pHeader->EnumAAFAllMobs (NULL, &pMobIter));
+		checkResult(pHeader->GetMobs (NULL, &pMobIter));
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500];
-			aafUID_t		mobID;
+			aafMobID_t		mobID;
 
 			checkResult(pMobIter->NextOne (&pMob));
 			checkResult(pMob->GetName (name, sizeof(name)));
@@ -247,11 +266,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(pSourceMob->GetEssenceDescriptor (&pEdesc));
 
 			// Verify that there is now one locator
-			checkResult(pEdesc->GetNumLocators(&numLocators));
+			checkResult(pEdesc->CountLocators(&numLocators));
 			if (1 != numLocators)
 				checkResult(AAFRESULT_TEST_FAILED);
 		
-			checkResult(pEdesc->EnumAAFAllLocators(&pEnum));
+			checkResult(pEdesc->GetLocators(&pEnum));
 
 			// This should read the one real locator
 			checkResult(pEnum->NextOne(&pLocator));

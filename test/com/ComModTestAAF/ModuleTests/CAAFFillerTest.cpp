@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFFiller
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -61,10 +79,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFCompositionMob*      pCompMob = NULL;
   IAAFMob*          pMob = NULL;
   IAAFFiller*          pFiller = NULL;
-  IAAFMobSlot*        pSlot = NULL;
+  IAAFTimelineMobSlot*        pSlot = NULL;
   IAAFSegment*        pSegment = NULL;
   aafProductIdentification_t  ProductInfo;
-  aafUID_t          newMobID;
+  aafMobID_t          newMobID;
   HRESULT            hr = AAFRESULT_SUCCESS;
 
 
@@ -98,29 +116,35 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
      
      
     // Create a Composition mob - it should work !!
-    checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+    checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
                 IID_IAAFCompositionMob, 
                 (IUnknown **)&pCompMob));
     // get a IAAFMob interface
     checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
     // Initialize the CompMob
     checkResult(CoCreateGuid((GUID *)&newMobID));
-    checkResult(pMob->SetMobID(&newMobID));
+    checkResult(pMob->SetMobID(newMobID));
     checkResult(pMob->SetName(L"AAFFillerTest"));
 
     // Create a AAFFiller - since it is the first time we will check the error code
-    checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
+    checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
                 IID_IAAFFiller, 
                 (IUnknown **)&pFiller));
     // Get a IAAFSegment interface for it
     checkResult(pFiller->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
     // Set filler properties
-    checkResult(pFiller->Initialize( &fillerUID, fillerLength));
+    checkResult(pFiller->Initialize( fillerUID, fillerLength));
     // append the filler to the MOB tree
-    checkResult(pMob->AppendNewSlot(pSegment, 1, L"FillerSlot", &pSlot)); 
+	aafRational_t editRate = { 0, 1};
+    checkResult(pMob->AppendNewTimelineSlot(editRate,
+											pSegment,
+											1,
+											L"FillerSlot",
+											0,
+											&pSlot)); 
 
     // Add the Mob to the file
-    checkResult(pHeader->AppendMob(pMob));
+    checkResult(pHeader->AddMob(pMob));
   }
   catch (HRESULT& rResult)
   {
@@ -205,19 +229,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
     // Enumerate over all Composition Mobs
     criteria.searchTag = kByMobKind;
     criteria.tags.mobKind = kCompMob;
-    checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
+    checkResult(pHeader->GetMobs(&criteria, &pMobIter));
     while (pMobIter && (pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS))
     {
-      checkResult(pMob->GetNumSlots(&numSlots));
+      checkResult(pMob->CountSlots(&numSlots));
       checkExpression (1 == numSlots, AAFRESULT_TEST_FAILED);
 
-      checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
+      checkResult(pMob->GetSlots(&pSlotIter));
       while (pSlotIter && (pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS))
       {
         checkResult(pSlot->GetSegment(&pSegment));

@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFEssenceData
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -62,7 +80,7 @@ struct EnumEssenceDataTest
 extern "C" HRESULT CEnumAAFEssenceData_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t fileName[] = L"EnumEssenceDataTest.aaf";
+  wchar_t fileName[] = L"EnumAAFEssenceDataTest.aaf";
   EnumEssenceDataTest edt;
 
   try
@@ -104,7 +122,7 @@ EnumEssenceDataTest::EnumEssenceDataTest():
   _pEssenceData(NULL)
 {
   _productInfo.companyName = L"AAF Developers Desk";
-  _productInfo.productName = L"EnumEssenceData Module Test";
+  _productInfo.productName = L"EnumAAFEssenceData Module Test";
   _productInfo.productVersion.major = 1;
   _productInfo.productVersion.minor = 0;
   _productInfo.productVersion.tertiary = 0;
@@ -248,18 +266,18 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
 
 
   // Create a Mob
-  check(_pDictionary->CreateInstance(&AUID_AAFSourceMob,
+  check(_pDictionary->CreateInstance(AUID_AAFSourceMob,
               IID_IAAFSourceMob, 
               (IUnknown **)&_pSourceMob));
 
   check(_pSourceMob->QueryInterface (IID_IAAFMob, (void **)&_pMob));
   
-  aafUID_t newUID = {0};
-  check(CoCreateGuid((GUID *)&newUID));
-  check(_pMob->SetMobID(&newUID));
+  aafMobID_t newMobID = {0};
+  check(CoCreateGuid((GUID *)&newMobID));
+  check(_pMob->SetMobID(newMobID));
   check(_pMob->SetName(wcBuffer));
   
-  check(_pDictionary->CreateInstance(&AUID_AAFFileDescriptor,
+  check(_pDictionary->CreateInstance(AUID_AAFFileDescriptor,
               IID_IAAFEssenceDescriptor, 
               (IUnknown **)&_pFileDescriptor));
 
@@ -267,7 +285,7 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
                                           (void **)&_pEssenceDescriptor));
   check(_pSourceMob->SetEssenceDescriptor (_pEssenceDescriptor));
 
-  check(_pHeader->AppendMob(_pMob));
+  check(_pHeader->AddMob(_pMob));
 
   createEssenceData(_pSourceMob);
 
@@ -293,12 +311,12 @@ void EnumEssenceDataTest::createEssenceData(IAAFSourceMob *pSourceMob)
 
 
   // Attempt to create an AAFEssenceData.
-  check(_pDictionary->CreateInstance(&AUID_AAFEssenceData,
+  check(_pDictionary->CreateInstance(AUID_AAFEssenceData,
                          IID_IAAFEssenceData,
                          (IUnknown **)&_pEssenceData));
 
   check(_pEssenceData->SetFileMob(pSourceMob));
-  check(_pHeader->AppendEssenceData(_pEssenceData));
+  check(_pHeader->AddEssenceData(_pEssenceData));
   
   _pEssenceData->Release();
   _pEssenceData = NULL;
@@ -312,7 +330,7 @@ void EnumEssenceDataTest::openEssenceData()
   assert(NULL == _pSourceMob);
 
   aafUInt32 essenceDataCount = 0;
-  check(_pHeader->GetNumEssenceData(&essenceDataCount));
+  check(_pHeader->CountEssenceData(&essenceDataCount));
   if (_maxMobCount != essenceDataCount)
     check(AAFRESULT_TEST_FAILED);
  

@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDataDef
-/***********************************************\
-*                                               *
-* Advanced Authoring Format                     *
-*                                               *
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*                                               *
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -113,11 +131,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
 	IAAFMob*		pMob = NULL;
-	IAAFMobSlot*	pMobSlot = NULL;
+	IAAFTimelineMobSlot*	pMobSlot = NULL;
 	IAAFSequence*	pSequence = NULL;
 	IAAFSegment*	pSegment = NULL;
 	IAAFComponent*	pComponent = NULL;
-	aafUID_t		NewMobID;
+	aafMobID_t		NewMobID;
 	int				i;
 	HRESULT			hr = S_OK;
 	
@@ -135,19 +153,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
 		
 		// Create a Composition Mob
-		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
 			IID_IAAFMob, 
 			(IUnknown **)&pMob));
 		
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		checkResult(pMob->SetMobID(&NewMobID));
+		checkResult(pMob->SetMobID(NewMobID));
 		checkResult(pMob->SetName(L"AAFDataDefTest"));
 		
 		// Add mob slot w/ Sequence
-		checkResult(pDictionary->CreateInstance(&AUID_AAFSequence,
+		checkResult(pDictionary->CreateInstance(AUID_AAFSequence,
 			IID_IAAFSequence, 
 			(IUnknown **)&pSequence));		
-		checkResult(pSequence->Initialize((aafUID_t*)&DDEF_Picture));
+		checkResult(pSequence->Initialize(DDEF_Picture));
 		
 		//
 		//	Add some segments.  Need to test failure conditions
@@ -158,20 +176,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		{
 			aafLength_t		len = 10;
 			
-			checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
+			checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
 				IID_IAAFComponent, 
 				(IUnknown **)&pComponent));
 			
 			if(i == 0)
 			{
-				checkResult(pComponent->SetDataDef((aafUID_t*)&DDEF_PictureWithMatte));
+				checkResult(pComponent->SetDataDef(DDEF_PictureWithMatte));
 			}
 			else
 			{
-				checkResult(pComponent->SetDataDef((aafUID_t*)&DDEF_Picture));
+				checkResult(pComponent->SetDataDef(DDEF_Picture));
 			}
 
-			checkResult(pComponent->SetLength(&len));
+			checkResult(pComponent->SetLength(len));
 			checkResult(pSequence->AppendComponent(pComponent));
 			
 			pComponent->Release();
@@ -180,7 +198,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
 		
-		checkResult(pMob->AppendNewSlot(pSegment, 1, L"AAF Test Sequence", &pMobSlot));
+		aafRational_t editRate = { 0, 1};
+		checkResult(pMob->AppendNewTimelineSlot(editRate,
+												pSegment,
+												1,
+												L"AAF Test Sequence",
+												0,
+												&pMobSlot));
 		
 		pMobSlot->Release();
 		pMobSlot = NULL;
@@ -189,7 +213,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSegment = NULL;
 		
 		// Add the master mob to the file and cleanup
-		pHeader->AppendMob(pMob);
+		pHeader->AddMob(pMob);
 		
 	}
 	catch (HRESULT& rResult)
@@ -256,7 +280,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		
 		// Validate that there is only one composition mob.
-		checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
+		checkResult(pHeader->CountMobs(kCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
@@ -265,39 +289,38 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		// Enumerate over Composition MOBs
 		criteria.searchTag = kByMobKind;
 		criteria.tags.mobKind = kCompMob;
-		checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
+		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 		{
 			aafNumSlots_t		numSlots = 0;
 			
-			checkResult(pMob->GetNumSlots(&numSlots));
+			checkResult(pMob->CountSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
 			
 			// Enumerate over all MOB slots for this MOB
-			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
+			checkResult(pMob->GetSlots(&pSlotIter));
 			while (pSlotIter && pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS)
 			{
-				aafInt32			numCpnts;
+				aafUInt32			numCpnts;
 				
 				checkResult(pSlot->GetSegment(&pSegment));
 				checkResult(pSegment->QueryInterface(IID_IAAFSequence, (void **) &pSequence));
 				
-				checkResult(pSequence->GetNumComponents(&numCpnts));
+				checkResult(pSequence->CountComponents(&numCpnts));
 				checkExpression(numCpnts == kNumComponents, AAFRESULT_TEST_FAILED);
 				
-				checkResult(pSequence->EnumComponents(&pCompIter));
+				checkResult(pSequence->GetComponents(&pCompIter));
 				numCpnts = 0;
 				index = 0;
 				while (pCompIter && pCompIter->NextOne(&pComp) == AAFRESULT_SUCCESS)
 				{
-					aafUID_t	dataDef, pictureID = DDEF_Picture, pwmID = DDEF_PictureWithMatte;
-					aafUID_t	soundID = DDEF_Sound;
+					aafUID_t	dataDef;
 					aafBool		testBool;
 
 					numCpnts++;
 					
 					checkResult(pComp->GetDataDef(&dataDef));
-					checkResult(pDictionary->LookupDataDefintion(&dataDef, &pDataDef));
+					checkResult(pDictionary->LookupDataDef (dataDef, &pDataDef));
 					checkResult(pDataDef->IsSoundKind(&testBool));
 					checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 					checkResult(pDataDef->IsMatteKind(&testBool));
@@ -305,29 +328,29 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 					if(index == 0)	// First segment is Picture with Matte, converts to picture
 					{
-						checkResult(pDataDef->IsDataDefOf(&pwmID, &testBool));
+						checkResult(pDataDef->IsDataDefOf(DDEF_PictureWithMatte, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureKind(&testBool));
 						checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureWithMatteKind(&testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
-						checkResult(pDataDef->DoesDataDefConvertTo (&pictureID, &testBool));
+						checkResult(pDataDef->DoesDataDefConvertTo (DDEF_Picture, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 					}
 					else		// First segment is Picture, converts from picture with Matte
 					{
-						checkResult(pDataDef->IsDataDefOf(&pictureID, &testBool));
+						checkResult(pDataDef->IsDataDefOf(DDEF_Picture, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureKind(&testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureWithMatteKind(&testBool));
 						checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
-						checkResult(pDataDef->DoesDataDefConvertFrom (&pwmID, &testBool));
+						checkResult(pDataDef->DoesDataDefConvertFrom (DDEF_PictureWithMatte, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 					}
-					checkResult(pDataDef->DoesDataDefConvertTo (&soundID, &testBool));
+					checkResult(pDataDef->DoesDataDefConvertTo (DDEF_Sound, &testBool));
 					checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
-					checkResult(pDataDef->DoesDataDefConvertFrom (&soundID, &testBool));
+					checkResult(pDataDef->DoesDataDefConvertFrom (DDEF_Sound, &testBool));
 					checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 					
 					pComp->Release();

@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFEvent
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -75,7 +93,7 @@ private:
   bool _bWritableFile;
   IAAFHeader *_pHeader;
   IAAFDictionary *_pDictionary;
-  aafUID_t _compositionMobID;
+  aafMobID_t _compositionMobID;
 
   // MobSlot static data
   static const wchar_t* _slotName;
@@ -87,7 +105,7 @@ private:
   static const wchar_t* _eventComment;
 };
 
-const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+const aafUID_t NIL_UID = { 0 };
 
 extern "C" HRESULT CAAFEvent_test()
 {
@@ -240,7 +258,7 @@ void EventTest::CreateEvent()
   {
     // Create an event (note: this will be replaced by a concrete event in a
     // later version after such an event is implemented.)
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFEvent,
+    checkResult(_pDictionary->CreateInstance(AUID_AAFEvent,
                                              IID_IAAFEvent, 
                                              (IUnknown **)&pEvent));
     checkResult(pEvent->SetPosition(_position));
@@ -250,7 +268,7 @@ void EventTest::CreateEvent()
     checkResult(pEvent->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 
     // Create and initialize an EventMobSlot
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFEventMobSlot,
+    checkResult(_pDictionary->CreateInstance(AUID_AAFEventMobSlot,
                                              IID_IAAFEventMobSlot, 
                                              (IUnknown **)&pEventMobSlot));
     checkResult(pEventMobSlot->SetEditRate(const_cast<aafRational_t *>(&_editRate)));
@@ -262,7 +280,7 @@ void EventTest::CreateEvent()
     checkResult(pMobSlot->SetSegment(pSegment));
 
     // Create the mob to hold the new event mob slot.
-    checkResult(_pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+    checkResult(_pDictionary->CreateInstance(AUID_AAFCompositionMob,
                                              IID_IAAFMob, 
                                              (IUnknown **)&pMob));
     checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));
@@ -271,7 +289,7 @@ void EventTest::CreateEvent()
     checkResult(pMob->AppendSlot(pMobSlot));
 
     // Attach the mob to the header...
-    checkResult(_pHeader->AppendMob(pMob));
+    checkResult(_pHeader->AddMob(pMob));
 
     // Save the id of the composition mob that contains our test
     // event mob slot.
@@ -340,10 +358,10 @@ void EventTest::OpenEvent()
   try
   {
     // Get the composition mob that we created to hold the
-    checkResult(_pHeader->LookupMob(&_compositionMobID, &pMob));
+    checkResult(_pHeader->LookupMob(_compositionMobID, &pMob));
 
     // Get the first mob slot and check that it is an event mob slot.
-    checkResult(pMob->EnumAAFAllMobSlots(&pEnumSlots));
+    checkResult(pMob->GetSlots(&pEnumSlots));
     checkResult(pEnumSlots->NextOne(&pMobSlot));
     checkResult(pMobSlot->QueryInterface(IID_IAAFEventMobSlot, (void **)&pEventMobSlot));
     checkResult(pEventMobSlot->GetEditRate(&editRate));

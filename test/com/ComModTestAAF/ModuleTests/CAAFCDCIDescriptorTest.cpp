@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDefinitionObject
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -80,7 +98,7 @@ static HRESULT SetDigitalImageDescProps(IAAFCDCIDescriptor* pDesc)
 	pDIDesc->SetImageAspectRatio(ratio);
 
 	// Optional Properties
-	pDIDesc->SetCompression(&compression);
+	pDIDesc->SetCompression(compression);
 	pDIDesc->SetSampledView(kSampledHeightTestVal, kSampledWidthTestVal, kSampledXOffsetTestVal, kSampledYOffsetTestVal);
 	pDIDesc->SetDisplayView(kDisplayHeightTestVal, kDisplayWidthTestVal, kDisplayXOffsetTestVal, kDisplayYOffsetTestVal);
 	pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal);
@@ -171,7 +189,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*	pDictionary = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
-	aafUID_t		newUID;
+	aafMobID_t		newMobID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -188,7 +206,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (SUCCEEDED(hr))
   {
 	  // Create a source mob
-	  hr = pDictionary->CreateInstance(&AUID_AAFSourceMob,
+	  hr = pDictionary->CreateInstance(AUID_AAFSourceMob,
 						  IID_IAAFSourceMob, 
 						  (IUnknown **)&pSourceMob);
 	  if (SUCCEEDED(hr))
@@ -200,10 +218,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		  {
 			  IAAFCDCIDescriptor*	pCDCIDesc = NULL;
 
-			  CoCreateGuid((GUID *)&newUID);
-			  pMob->SetMobID(&newUID);
+			  CoCreateGuid((GUID *)&newMobID);
+			  pMob->SetMobID(newMobID);
 			  pMob->SetName(L"CDCIDescriptorTest");
-			  hr = pDictionary->CreateInstance(&AUID_AAFCDCIDescriptor,
+			  hr = pDictionary->CreateInstance(AUID_AAFCDCIDescriptor,
 									  IID_IAAFCDCIDescriptor, 
 									  (IUnknown **)&pCDCIDesc);		
 			  if (SUCCEEDED(hr))
@@ -239,7 +257,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 			  // Add the MOB to the file
 			  if (SUCCEEDED(hr))
-				  hr = pHeader->AppendMob(pMob);
+				  hr = pHeader->AddMob(pMob);
 
 			  pMob->Release();
 			  pMob = NULL;
@@ -277,14 +295,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (FAILED(hr))
 		return hr;
 
-	hr = pHeader->GetNumMobs(kAllMob, &numMobs);
+	hr = pHeader->CountMobs(kAllMob, &numMobs);
 	if (1 != numMobs)
 	{
 		hr = AAFRESULT_TEST_FAILED;
 		goto Cleanup;
 	}
 
-	hr = pHeader->EnumAAFAllMobs(NULL, &pMobIter);
+	hr = pHeader->GetMobs(NULL, &pMobIter);
 	if (SUCCEEDED(hr))
 	{
 		IAAFMob*	pMob = NULL;
