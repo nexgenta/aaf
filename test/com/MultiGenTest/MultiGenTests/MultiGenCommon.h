@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MultiGenCommon.h,v 1.3 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+// $Id: MultiGenCommon.h,v 1.4 2004/05/26 11:55:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,7 @@
 
 #include <sstream>
 
-class CmdState;
+#include "MultiGenTest.h"	// for CmdState class
 
 const int MULTI_GEN_AUDIO_SAMPLE_BPP  =      16;
 const int MULTI_GEN_VIDEO_WIDTH       = (720/4);
