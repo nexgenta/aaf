@@ -1,5 +1,5 @@
 /*
- * $Id: DotRecordNode.cpp,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotRecordNode.cpp,v 1.4 2004/06/01 13:43:00 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -68,9 +68,9 @@ DotRecordNodeAttribute::GetWidth( InstanceMapperProfile &profile )
       if ( newPos == -1 )
       {
 	 done = true;
-	 if ( ( ltdAttributeString.size() - pos ) > maxWidth )
+	 if ( ( (int)ltdAttributeString.size() - pos ) > maxWidth )
 	 {
-	    maxWidth = ltdAttributeString.size() - pos;
+	    maxWidth = (int)ltdAttributeString.size() - pos;
 	 }
       }
       else
@@ -120,8 +120,8 @@ DotRecordNode::Write( ofstream &dotFile, InstanceMapperProfile &profile )
       fontSize = atoi( fontSizeString.c_str() );
    }
 
-   float fontSizeFactor = 0.013 * fontSize;
-   float nodeWidth = maxWidth * fontSizeFactor;
+   double fontSizeFactor = 0.013 * fontSize;
+   double nodeWidth = maxWidth * fontSizeFactor;
 
    ostringstream widthString;
    widthString << nodeWidth;
