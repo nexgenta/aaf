@@ -173,10 +173,10 @@ bool CAAFJPEGDescriptorHelper::operator!=(const CAAFJPEGDescriptorHelper& rhs)
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetNumLocators (aafInt32 *  pCount)
+    CAAFJPEGDescriptorHelper::GetNumLocators (aafUInt32 *  pCount)
 {
 	checkAssertion(NULL != _edes);
-	return _edes->GetNumLocators(pCount);
+	return _edes->CountLocators(pCount);
 }
 
 
@@ -200,7 +200,7 @@ HRESULT STDMETHODCALLTYPE
     CAAFJPEGDescriptorHelper::EnumAAFAllLocators (IEnumAAFLocators ** ppEnum)
 {
 	checkAssertion(NULL != _edes);
-	return _edes->EnumAAFAllLocators (ppEnum);
+	return _edes->GetLocators (ppEnum);
 }
 
 
@@ -237,10 +237,10 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetSampleRate (aafRational_t *  pRate)
+    CAAFJPEGDescriptorHelper::SetSampleRate (const aafRational_t & rate)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->SetSampleRate (pRate);
+	return _filedes->SetSampleRate (rate);
 }
 
 
@@ -253,10 +253,10 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetContainerFormat (aafUID_t *  pFormat)
+    CAAFJPEGDescriptorHelper::SetContainerFormat (const aafUID_t & format)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->SetContainerFormat (pFormat);
+	return _filedes->SetContainerFormat (format);
 }
 
 
@@ -270,10 +270,10 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetCompression (aafUID_t *  pCodecID)
+    CAAFJPEGDescriptorHelper::SetCompression (const aafUID_t & codecID)
 {
   checkAssertion(NULL != _dides);
-	return _dides->SetCompression (pCodecID);
+	return _dides->SetCompression (codecID);
 }
 
 
@@ -438,7 +438,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetGamma (aafRational_t  Gamma)
+    CAAFJPEGDescriptorHelper::SetGamma (aafUID_t  Gamma)
 {
   checkAssertion(NULL != _dides);
 	return _dides->SetGamma (Gamma);
@@ -447,7 +447,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetGamma (aafRational_t *  pGamma)
+    CAAFJPEGDescriptorHelper::GetGamma (aafUID_t *  pGamma)
 {
   checkAssertion(NULL != _dides);
 	return _dides->GetGamma (pGamma);
@@ -456,7 +456,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetImageAlignmentFactor (aafInt32  ImageAlignmentFactor)
+    CAAFJPEGDescriptorHelper::SetImageAlignmentFactor (aafUInt32  ImageAlignmentFactor)
 {
   checkAssertion(NULL != _dides);
 	return _dides->SetImageAlignmentFactor (ImageAlignmentFactor);
@@ -465,7 +465,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetImageAlignmentFactor (aafInt32 *  pImageAlignmentFactor)
+    CAAFJPEGDescriptorHelper::GetImageAlignmentFactor (aafUInt32 *  pImageAlignmentFactor)
 {
   checkAssertion(NULL != _dides);
 	return _dides->GetImageAlignmentFactor (pImageAlignmentFactor);
