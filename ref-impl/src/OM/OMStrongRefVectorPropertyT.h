@@ -193,37 +193,6 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::count(void) const
   return _vector.count();
 }
 
-  // @mfunc Get the size of this <c OMStrongReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @parm The size of this <c OMStrongReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-void OMStrongReferenceVectorProperty<ReferencedObject>::getSize(
-                                                            size_t& size) const
-{
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMStrongReferenceVectorProperty<ReferencedObject>::count");
-
-  size = count();
-}
-
-  // @mfunc Get the size of this <c OMStrongReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @rdesc The size of this <c OMStrongReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-size_t OMStrongReferenceVectorProperty<ReferencedObject>::getSize(void) const
-{
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMStrongReferenceVectorProperty<ReferencedObject>::count");
-
-  return count();
-}
-
   // @mfunc Set the value of this <c OMStrongReferenceVectorProperty>
   //        at position <p index> to <p object>.
   //   @tcarg class | ReferencedObject | The type of the referenced
@@ -241,17 +210,8 @@ ReferencedObject*
                                                 const size_t index)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::setValueAt");
-  PRECONDITION("Valid index", index <= count());
+  PRECONDITION("Valid index", index < count());
   PRECONDITION("Valid object", object != 0);
-
-  if (index == count()) {
-    // This is an append, make sure the new element is defined.
-    OMUInt32 localKey = nextLocalKey();
-    wchar_t* name = elementName(localKey);
-    VectorElement newElement(this, name, localKey);
-    _vector.append(newElement);
-    delete [] name;
-  }
 
   // Set the vector to contain the new object
   //
@@ -378,7 +338,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::appendValue(
 
   PRECONDITION("Valid object", object != 0);
 
-  setValueAt(object, count());
+  insertAt(object, count());
 
 }
 
@@ -719,9 +679,9 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::isVoid(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
 template <typename ReferencedObject>
-void OMStrongReferenceVectorProperty<ReferencedObject>::remove(void)
+void OMStrongReferenceVectorProperty<ReferencedObject>::removeProperty(void)
 {
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::remove");
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeProperty");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
   PRECONDITION("Property is void", isVoid());
@@ -797,12 +757,16 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  size_t count = size / sizeof(ReferencedObject*);
+  size_t elementCount = size / sizeof(ReferencedObject*);
   ReferencedObject** p = (ReferencedObject**)bits;
 
-  for (size_t i = 0; i < count; i++) {
+  for (size_t i = 0; i < elementCount; i++) {
     ReferencedObject* object = p[i];
-    setValueAt(object, i);
+    if (i < count()) {
+      setValueAt(object, i);
+    } else {
+      appendValue(object);
+    }
   }
 
 }

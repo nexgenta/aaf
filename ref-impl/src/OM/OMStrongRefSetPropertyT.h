@@ -240,25 +240,6 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   return _set.count();
 }
 
-  // @mfunc Get the size of this <c OMStrongReferenceSetProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @rdesc The size of this <c OMStrongReferenceSetProperty>.
-  //     @this const
-template <typename UniqueIdentification, typename ReferencedObject>
-size_t
-OMStrongReferenceSetProperty<UniqueIdentification,
-                             ReferencedObject>::getSize(void) const
-{
-  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
-                                     "ReferencedObject>::getSize");
-  OBSOLETE("OMStrongReferenceSetProperty<UniqueIdentification, "
-                                        "ReferencedObject>::count");
-
-  return count();
-}
-
   // @mfunc Insert <p object> into this
   //        <c OMStrongReferenceSetProperty>.
   //   @tcarg class | ReferencedObject | The type of the referenced
@@ -594,10 +575,10 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 template <typename UniqueIdentification, typename ReferencedObject>
 void
 OMStrongReferenceSetProperty<UniqueIdentification,
-                             ReferencedObject>::remove(void)
+                             ReferencedObject>::removeProperty(void)
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
-                                     "ReferencedObject>::remove");
+                                     "ReferencedObject>::removeProperty");
 
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
@@ -620,6 +601,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::bitsSize");
+  OBSOLETE("methods on class OMReferenceSetProperty");
 
   return sizeof(ReferencedObject*) * count();
 }
@@ -642,6 +624,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::getBits");
+  OBSOLETE("methods on class OMReferenceSetProperty");
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
@@ -674,6 +657,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::setBits");
+  OBSOLETE("methods on class OMReferenceSetProperty");
 
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
@@ -799,8 +783,11 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::remove");
 
-  // TBS
-  return 0;
+  PRECONDITION("Valid identification", identification != 0);
+
+  UniqueIdentification* id =
+                       reinterpret_cast<UniqueIdentification*>(identification);
+  return remove(*id);
 }
 
   // @mfunc Does this <c OMStrongReferenceSetProperty> contain an
@@ -820,8 +807,11 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::containsObject");
 
-  // TBS
-  return false;
+  PRECONDITION("Valid identification", identification != 0);
+
+  UniqueIdentification* id =
+                       reinterpret_cast<UniqueIdentification*>(identification);
+  return contains(*id);
 }
 
   // @mfunc Find the <c OMObject> in this <c OMStrongReferenceSetProperty>
@@ -845,8 +835,17 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::findObject");
 
-  // TBS
-  return false;
+  PRECONDITION("Valid identification", identification != 0);
+
+  UniqueIdentification* id =
+                       reinterpret_cast<UniqueIdentification*>(identification);
+
+  ReferencedObject* obj = 0;
+
+  bool result = find(*id, obj);
+
+  object = obj;
+  return result;
 }
 
 template <typename UniqueIdentification, typename ReferencedObject>
