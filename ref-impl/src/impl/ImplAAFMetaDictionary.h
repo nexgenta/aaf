@@ -37,141 +37,13 @@
 //#include "OMClassFactory.h"
 
 #include "ImplAAFObject.h"
-#include "OMStrongRefSetProperty.h"
 
 class ImplAAFMetaDefinition;
 class ImplAAFClassDef;
 class ImplAAFTypeDef;
-class ImplAAFMetaDefinition;
-class ImplAAFTypeDefVariableArray;
-class ImplAAFTypeDefFixedArray;
-class ImplAAFTypeDefRecord;
-class ImplAAFTypeDefRename;
-class ImplAAFTypeDefStream;
-class ImplAAFTypeDefString;
-class ImplAAFTypeDefStrongObjRef;
-class ImplAAFTypeDefWeakObjRef;
-class ImplAAFTypeDefSet;
 
 class ImplEnumAAFClassDefs;
 class ImplEnumAAFTypeDefs;
-
-
-
-// TEMPORARY class to be replaced by new non-persistent OM classes.
-// Template class to store different types of non-persistent
-// elements in an OMSet.
-template <typename Element>
-class TempSetElement
-{
-public:
-TempSetElement();
-TempSetElement(const TempSetElement& rhs);
-TempSetElement(Element * value);
-
-// coersion operator to "transparently" extract the type
-// definition pointer. This will be called when the enumerator
-// attempts to assign an OpaqueTypeDefinition to an ImplAAFTypeDef *.
-operator Element * () const;
-
-// Methods required by OMSet
-const OMUniqueObjectIdentification identification(void) const;
-TempSetElement& operator= (const TempSetElement& rhs);
-bool operator== (const TempSetElement& rhs);
-
-private:
-aafUID_t _id;
-Element * _value;
-};
-
-
-
-
-
-
-// Template class to store different types of non-persistent
-template <typename Element>
-TempSetElement<Element>::TempSetElement() :
-  _value(NULL)
-{
-  memset(&_id, 0, sizeof(_id));
-}
-
-template <typename Element>
-TempSetElement<Element>::TempSetElement(const TempSetElement<Element> & rhs)
-{
-  _id = rhs._id;
-  _value = rhs._value;
-}
-
-template <typename Element>
-TempSetElement<Element>::TempSetElement(Element *value) :
-  _value(value)
-{
-  AAFRESULT result = AAFRESULT_NULL_PARAM;
-  if (_value)
-  {
-    result = value->GetAUID(&_id);
-  }
-  if (AAFRESULT_FAILED(result))
-  {
-    memset(&_id, 0, sizeof(_id));
-  }
-}
-
-
-// coersion operator to "transparently" extract the element
-// pointer. 
-template <typename Element>
-TempSetElement<Element>::operator Element * () const
-{
-  return _value;
-}
-
-
-template <typename Element>
-const OMUniqueObjectIdentification 
-  TempSetElement<Element>::identification(void) const
-{
-  return (*reinterpret_cast<const OMUniqueObjectIdentification *>(&_id));
-}
-
-template <typename Element>
-TempSetElement<Element> & TempSetElement<Element>::operator= (const TempSetElement<Element>& rhs)
-{
-  if (&rhs != this)
-  {
-    _id = rhs._id;
-    _value = rhs._value;
-  }
-  return *this;
-}
-
-template <typename Element>
-bool TempSetElement<Element>::operator== (const TempSetElement<Element>& rhs)
-{
-  if (&rhs == this)
-  {
-    return true;
-  }
-  else
-  {
-    // Test the value first since it is the more efficient comparison.
-    if (_value == rhs._value)
-    {
-      return true;
-    }
-    else
-    {
-      // Compare the ids.
-      return (0 == memcmp(&_id, &rhs._id, sizeof(_id)));
-    }
-  }
-}
-
-
-
-
 
 class ImplAAFMetaDictionary :
   public ImplAAFObject
@@ -356,158 +228,48 @@ public:
         // @parm [out, retval] Total number of type definition objects
         (aafUInt32 * pResult);
 
-
-  //
-  // Meta definition factory methods:
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateClassDef (
-      aafUID_constref classID,
-      aafCharacter_constptr pClassName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pParentClass,
-      ImplAAFClassDef ** ppNewClass);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefVariableArray (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefVariableArray ** ppNewVariableArray);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateTypeDefFixedArray (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      aafUInt32  nElements,
-      ImplAAFTypeDefFixedArray **pNewFixedArray);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateTypeDefRecord (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef ** ppMemberTypes,
-      aafCharacter_constptr * pMemberNames,
-      aafUInt32 numMembers,
-      ImplAAFTypeDefRecord ** ppNewRecord);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateTypeDefRename (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pBaseType,
-      ImplAAFTypeDefRename ** ppNewRename);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStream (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefStream ** ppNewStream);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefString (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefString ** ppNewString);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStrongObjRef (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pTargetObjType,
-      ImplAAFTypeDefStrongObjRef ** ppNewStrongObjRef);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefWeakObjRef (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pTargetObjType,
-      aafUID_constptr * pTargetHint,
-      aafUInt32 targetHintCount,
-      ImplAAFTypeDefWeakObjRef ** ppNewWeakObjRef);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStrongObjRefVector (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewStrongObjRefVector);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefWeakObjRefVector (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewWeakObjRefVector);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStrongObjRefSet (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefSet ** ppNewStrongObjRefSet);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefWeakObjRefSet (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefSet ** ppNewWeakObjRefSet);
-
 public:
   // These are low-level OMSet tests for containment.
   bool containsClass(aafUID_constref classId);
   bool containsType(aafUID_constref typeId);
-  bool containsForwardClassReference(aafUID_constref classId);
 
+
+  bool hasForwardClassReference(aafUID_constref classId);
   // If the given classId fromt the set of forward references.
   void RemoveForwardClassReference(aafUID_constref classId);
 
-  // Find the opaque type definition associated with the given type id.
-  ImplAAFTypeDef * findOpaqueTypeDefinition(aafUID_constref typeId); // NOT REFERENCE COUNTED!
 
-  // Find the aximatic class definition associated with the given class id.
-  ImplAAFClassDef * findAxiomaticClassDefinition(aafUID_constref classId); // NOT REFERENCE COUNTED!
-
-  // Find the aximatic property definition associated with the given property id.
-  ImplAAFPropertyDef * findAxiomaticPropertyDefinition(aafUID_constref propertyId); // NOT REFERENCE COUNTED!
-
-  // Find the aximatic type definition associated with the given type id.
-  ImplAAFTypeDef * findAxiomaticTypeDefinition(aafUID_constref typeId); // NOT REFERENCE COUNTED!
+  ImplAAFTypeDef * findOpaqueTypeDefinition(aafUID_constref typeId);
 
 
 
 private:
-
-  //
-  // Persistent data members.
-  //
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFTypeDef> _typeDefinitions;
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFClassDef> _classDefinitions;
 
+  // Private class that represents an opaque class definition in an OMSet.
+  class OpaqueTypeDefinition
+  {
+  public:
+    OpaqueTypeDefinition();
+    OpaqueTypeDefinition(const OpaqueTypeDefinition& rhs);
+    OpaqueTypeDefinition(ImplAAFTypeDef * opaqueTypeDef);
 
-  //
-  // Non-persistent data members.
-  //
-  OMSet<OMUniqueObjectIdentification, TempSetElement<ImplAAFTypeDef> > _opaqueTypeDefinitions;
-  OMSet<OMUniqueObjectIdentification, TempSetElement<ImplAAFClassDef> > _axiomaticClassDefinitions;
-  OMSet<OMUniqueObjectIdentification, TempSetElement<ImplAAFPropertyDef> > _axiomaticPropertyDefinitions;
-  OMSet<OMUniqueObjectIdentification, TempSetElement<ImplAAFTypeDef> > _axiomaticTypeDefinitions;
+    // coersion operator to "transparently" extract the type
+    // definition pointer. This will be called when the enumerator
+    // attempts to assign an OpaqueTypeDefinition to an ImplAAFTypeDef *.
+    operator ImplAAFTypeDef * () const;
+
+    // Methods required by OMSet
+    const OMUniqueObjectIdentification identification(void) const;
+    OpaqueTypeDefinition& operator= (const OpaqueTypeDefinition& rhs);
+    bool operator== (const OpaqueTypeDefinition& rhs);
+
+  private:
+    ImplAAFTypeDef * _opaqueTypeDef;
+  };
+
+  OMSet<OMUniqueObjectIdentification, OpaqueTypeDefinition> _opaqueTypeDefinitions;
 
   // Private class that represents a forward class reference.
   class ForwardClassReference
@@ -530,5 +292,6 @@ private:
 
 
 };
+
 
 #endif // #ifndef __ImplAAFMetaDictionary_h__
