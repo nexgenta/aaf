@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,15 +26,11 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMVector
 #ifndef OMVECTORT_H
 #define OMVECTORT_H
 
 #include "OMAssertions.h"
 
-  // @mfunc Constructor.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
 template <typename Element>
 OMVector<Element>::OMVector()
 : _vector(0), _capacity(0), _count(0)
@@ -42,9 +38,6 @@ OMVector<Element>::OMVector()
   TRACE("OMVector<Element>::OMVector");
 }
 
-  // @mfunc Destructor.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
 template <typename Element>
 OMVector<Element>::~OMVector(void)
 {
@@ -72,9 +65,9 @@ void OMVector<Element>::insert(const Element value)
   //   @parm The Element to search for. A value of type <p Element> by value.
   //   @this const 
 template <typename Element>
-bool OMVector<Element>::containsValue(const Element value) const
+bool OMVector<Element>::contains(const Element value) const
 {
-  TRACE("OMVector<Element>::containsValue");
+  TRACE("OMVector<Element>::contains");
 
   bool result = false;
 
@@ -100,25 +93,6 @@ size_t OMVector<Element>::count(void) const
   TRACE("OMVector<Element>::count");
 
   return _count;
-}
-
-  // @mfunc Remove <p value> from this <c OMVector>.
-  //        In the case of duplicate values, the one with the lowest
-  //        index is removed.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
-  //  @parm The Element to remove. A value of type <p Element> by value. 
-template <typename Element>
-void OMVector<Element>::removeValue(const Element value)
-{
-  TRACE("OMVector<Element>::removeValue");
-
-  PRECONDITION("Value is present", containsValue(value));
-
-  size_t index = indexOfValue(value);
-
-  removeAt(index);
-
 }
 
   // @mfunc The capacity of this <c OMVector>.
@@ -192,6 +166,7 @@ void OMVector<Element>::shrink(size_t capacity)
   // Calculate the new capacity
   //
   size_t newCapacity = nextHigherCapacity(capacity);
+  size_t oldCapacity = _capacity;
 
   if (newCapacity < _capacity) {
 
@@ -222,7 +197,7 @@ void OMVector<Element>::shrink(size_t capacity)
     //
     delete [] oldVector;
   }
-  // POSTCONDITION("Size properly decreased", _capacity <= oldCapacity);
+  POSTCONDITION("Size properly decreased", _capacity <= oldCapacity);
 }
 
   // @mfunc Is this <c OMVector> full ?
@@ -233,8 +208,6 @@ void OMVector<Element>::shrink(size_t capacity)
 template <typename Element>
 bool OMVector<Element>::full(void) const
 {
-  TRACE("OMVector<Element>::full");
-
   bool result;
   if (count() == capacity()) {
     result = true;
@@ -252,8 +225,6 @@ bool OMVector<Element>::full(void) const
 template <typename Element>
 bool OMVector<Element>::empty(void) const
 {
-  TRACE("OMVector<Element>::empty");
-
   bool result;
   if (count() == 0) {
     result = true;
@@ -274,7 +245,7 @@ template <typename Element>
 void OMVector<Element>::setAt(const Element value, const size_t index)
 {
   TRACE("OMVector<Element>::setAt");
-  PRECONDITION("Valid index", index <  _count);
+  PRECONDITION("Valid index", (index >= 0) && (index <  _count));
 
   _vector[index] = value;
 
@@ -292,7 +263,7 @@ template <typename Element>
 void OMVector<Element>::getAt(Element& value, const size_t index) const
 {
   TRACE("OMVector<Element>::getAt");
-  PRECONDITION("Valid index", index < _count);
+  PRECONDITION("Valid index", ((index >= 0) && (index < _count)));
 
   value = _vector[index];
 }
@@ -302,27 +273,12 @@ void OMVector<Element>::getAt(Element& value, const size_t index) const
   //   @tcarg class | Element | The type of an <c OMVector> element.
   //          This type must support operator = and operator ==.
   //   @parm The index.
-  //   @this const
+  //   @parm The value by reference.
 template <typename Element>
-Element& OMVector<Element>::getAt(const size_t index) const
+Element& OMVector<Element>::getAt(const size_t index)
 {
   TRACE("OMVector<Element>::getAt");
-  PRECONDITION("Valid index", index < _count);
-
-  return _vector[index];
-}
-
-  // @mfunc The value of the <p Element> at
-  //        position <p index> in this <c OMVector>.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
-  //   @parm The index.
-  //   @this const
-template <typename Element>
-Element& OMVector<Element>::valueAt(const size_t index) const
-{
-  TRACE("OMVector<Element>::valueAt");
-  PRECONDITION("Valid index", index < _count);
+  PRECONDITION("Valid index", ((index >= 0) && (index < _count)));
 
   return _vector[index];
 }
@@ -339,8 +295,7 @@ template <typename Element>
 void OMVector<Element>::insertAt(const Element value, const size_t index)
 {
   TRACE("OMVector<Element>::insertAt");
-  PRECONDITION("Valid index", index <= _count);
-  SAVE(_count, size_t);
+  PRECONDITION("Valid index", (index >= 0) && (index <= _count));
 
   // Make space for at least one more element
   //
@@ -356,7 +311,6 @@ void OMVector<Element>::insertAt(const Element value, const size_t index)
   _count = _count + 1;
 
   POSTCONDITION("Element properly inserted", _vector[index] == value);
-  POSTCONDITION("One more element", _count == OLD(_count) + 1);
 }
 
   // @mfunc Append the given <p Element> <p value> to
@@ -378,8 +332,6 @@ void OMVector<Element>::append(const Element value)
   //        the first element currently in this <c OMVector>.
   //        Existing values in this <c OMVector> are shifted
   //        up one index position.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
   //   @parm The value to prepend.
 template <typename Element>
 void OMVector<Element>::prepend(const Element value)
@@ -393,15 +345,10 @@ void OMVector<Element>::prepend(const Element value)
   //        position <p index>. Existing values in this
   //        <c OMVector> at <p index> + 1 and higher are
   //        shifted down on index position.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
-  //   @parm The index of the value to be removed.
 template <typename Element>
 void OMVector<Element>::removeAt(const size_t index)
 {
   TRACE("OMVector<Element>::removeAt");
-  PRECONDITION("Valid index", index < _count);
-  SAVE(_count, size_t);
 
   // Shuffle down existing elements
   //
@@ -414,14 +361,10 @@ void OMVector<Element>::removeAt(const size_t index)
   // Trim execss capacity
   //
   shrink(_count);
-
-  POSTCONDITION("One less element", _count == OLD(_count) - 1);
 }
 
   // @mfunc Remove the last (index == count() - 1) element
   //         from this <c OMVector>.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
 template <typename Element>
 void OMVector<Element>::removeLast(void)
 {
@@ -434,8 +377,6 @@ void OMVector<Element>::removeLast(void)
   // @mfunc Remove the first (index == 0) element
   //        from this <c OMVector>. Existing values in this
   //        <c OMVector> are shifted down one index position.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
 template <typename Element>
 void OMVector<Element>::removeFirst(void)
 {
@@ -445,71 +386,7 @@ void OMVector<Element>::removeFirst(void)
   removeAt(0);
 }
 
-  // @mfunc Remove all elements from this <c OMVector>.
-  //        from this <c OMVector>. Existing values in this
-  //        <c OMVector> are shifted down one index position.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
-template <typename Element>
-void OMVector<Element>::clear(void)
-{
-  TRACE("OMVector<Element>::clear");
-
-  size_t elementCount = count();
-  for (size_t i = 0; i < elementCount; i++) {
-    removeLast();
-  }
-  POSTCONDITION("All elements removed", count() == 0);
-  POSTCONDITION("Empty", capacity() == 0);
-}
-
-  // @mfunc The index of the element with value <p value>.
-  //        In the case of duplicate values, lowest index is returned.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
-  //   @parm The value for which the index is to be found.
-  //   @this const
-template <typename Element>
-size_t OMVector<Element>::indexOfValue(const Element value) const
-{
-  TRACE("OMVector<Element>::indexOfValue");
-
-  PRECONDITION("Value is present", containsValue(value));
-
-  size_t result;
-
-  for (size_t i = 0; i < _count; i++) {
-    if (_vector[i] == value) {
-      result = i;
-      break;
-    }
-  }
-  return result;
-}
-
-  // @mfunc The number of elements with value <p value>.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
-  //   @parm The value for which the index is to be found.
-  //   @this const
-template <typename Element>
-size_t OMVector<Element>::countValue(const Element value) const
-{
-  TRACE("OMVector<Element>::countValue");
-
-  size_t result = 0;
-
-  for (size_t i = 0; i < _count; i++) {
-    if (_vector[i] == value) {
-      result = result + 1;
-    }
-  }
-  return result;
-}
-
   // @mfunc Calculate the next valid capacity higher than <p capacity>.
-  //   @tcarg class | Element | The type of an <c OMVector> element.
-  //          This type must support operator = and operator ==.
   //   @parm The desired capaciy.
 template <typename Element>
 size_t OMVector<Element>::nextHigherCapacity(size_t capacity)
