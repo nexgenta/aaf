@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.cpp,v 1.17 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMDictionary.cpp,v 1.18 2004/09/27 17:35:57 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -99,7 +99,7 @@ bool OMDictionary::contains(const OMPropertyId propertyId)
   return result;
 }
 
-struct {
+struct _properties_t {
   OMPropertyId _pid;
   wchar_t* _name;
 } _properties[] = {
