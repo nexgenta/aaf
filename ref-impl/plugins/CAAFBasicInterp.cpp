@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -43,7 +43,7 @@
 
 #include "CAAFBuiltinDefs.h"
 
-const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kVersionBeta};
+const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kAAFVersionBeta};
 
 const CLSID CLSID_AAFBasicInterp = { 0x5B6C85A1, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
 
@@ -102,12 +102,12 @@ HRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 	    CAAFBuiltinDefs defs (dict);
-		CHECK(dict->CreateInstance(defs.cdInterpolationDefinition(),
-							IID_IAAFInterpolationDef, 
-							(IUnknown **)&interpDef));
+		CHECK(defs.cdInterpolationDefinition()->
+			  CreateInstance(IID_IAAFInterpolationDef, 
+							 (IUnknown **)&interpDef));
 		uid = LinearInterpolator;
 		CHECK(interpDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
-		CHECK(obj->Initialize(uid, L"Basic Plugins", L"Handles step and linear interpolation."));
+		CHECK(interpDef->Initialize(uid, L"Basic Plugins", L"Handles step and linear interpolation."));
 		*def = obj;
 		interpDef->Release();
 		interpDef = NULL;
@@ -140,17 +140,17 @@ HRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 	    CAAFBuiltinDefs defs (dict);
-		CHECK(dict->CreateInstance(defs.cdPluginDescriptor(),
-			IID_IAAFPluginDescriptor, 
-			(IUnknown **)&desc));
+		CHECK(defs.cdPluginDescriptor()->
+			  CreateInstance(IID_IAAFPluginDescriptor, 
+							 (IUnknown **)&desc));
 		*descPtr = desc;
 		desc->AddRef();
 		CHECK(desc->Initialize(BASIC_INTERP_PLUGIN, L"Example interpolators", L"Handles step and linear interpolation."));
 		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
 		CHECK(desc->SetPluginVersionString(manufRev));
-		CHECK(dict->CreateInstance(defs.cdNetworkLocator(),
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(defs.cdNetworkLocator()->
+			  CreateInstance(IID_IAAFLocator, 
+							 (IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (manufURL));
 		CHECK(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		CHECK(desc->SetManufacturerInfo(pNetLoc));
@@ -161,14 +161,14 @@ HRESULT STDMETHODCALLTYPE
 
 		CHECK(desc->SetManufacturerID(MANUF_AVID_TECH));
 		CHECK(desc->SetPluginManufacturerName(manufName));
-		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
-		CHECK(desc->SetIsAccelerated(AAFFalse));
-		CHECK(desc->SetSupportsAuthentication(AAFFalse));
+		CHECK(desc->SetIsSoftwareOnly(kAAFTrue));
+		CHECK(desc->SetIsAccelerated(kAAFFalse));
+		CHECK(desc->SetSupportsAuthentication(kAAFFalse));
 		
 		/**/
-		CHECK(dict->CreateInstance(defs.cdNetworkLocator(),
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(defs.cdNetworkLocator()->
+			  CreateInstance(IID_IAAFLocator, 
+							 (IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (downloadURL));
 		CHECK(desc->AppendLocator(pLoc));
 		desc->Release();	// We have addRefed for the return value
@@ -419,7 +419,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 
 			prevTime = zero;
 			CHECK(pVaryingValue->GetControlPoints(&theEnum));
-			found = AAFFalse;
+			found = kAAFFalse;
 			prevPoint = NULL;
 			while(!found && (theEnum->NextOne(&testPoint) == AAFRESULT_SUCCESS))
 			{

@@ -48,7 +48,7 @@
 #define STD_HDRSIZE_DATA		42
 #define STD_HDRSIZE_NODATA		36
 
-const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kVersionBeta};
+const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kAAFVersionBeta};
 const aafRational_t		defaultRate = { 44100, 1 };
 const aafInt32			defaultSampleWidth = 8;
 const aafInt32			defaultNumCh = 1;
@@ -129,14 +129,13 @@ HRESULT STDMETHODCALLTYPE
 	{
 		//!!!Later, add in dataDefs supported & filedescriptor class
 	  	CHECK(dict->LookupClassDef(AUID_AAFCodecDef, &pcd));
-		CHECK(dict->CreateInstance(pcd,
-							IID_IAAFCodecDef, 
-							(IUnknown **)&codecDef));
+		CHECK(pcd->CreateInstance(IID_IAAFCodecDef, 
+								  (IUnknown **)&codecDef));
 		pcd->Release ();
 		pcd = 0;
 		uid = CodecWave;
 		CHECK(codecDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
-		CHECK(obj->Initialize(uid, L"WAVE Codec", L"Handles RIFF WAVE data."));
+		CHECK(codecDef->Initialize(uid, L"WAVE Codec", L"Handles RIFF WAVE data."));
 		CAAFBuiltinDefs defs (dict);
 		CHECK(codecDef->AddEssenceKind (defs.ddSound()));
 		*def = obj;
@@ -185,9 +184,8 @@ HRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 	    CHECK(dict->LookupClassDef(AUID_AAFPluginDescriptor, &pcd));
-		CHECK(dict->CreateInstance(pcd,
-			IID_IAAFPluginDescriptor, 
-			(IUnknown **)&desc));
+		CHECK(pcd->CreateInstance(IID_IAAFPluginDescriptor, 
+								  (IUnknown **)&desc));
 		pcd->Release ();
 		pcd = 0;
 		*descPtr = desc;
@@ -197,9 +195,8 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
-		CHECK(dict->CreateInstance(pcd,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (manufURL));
 		CHECK(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		CHECK(desc->SetManufacturerInfo(pNetLoc));
@@ -210,14 +207,13 @@ HRESULT STDMETHODCALLTYPE
 
 		CHECK(desc->SetManufacturerID(MANUF_JEFFS_PLUGINS));
 		CHECK(desc->SetPluginManufacturerName(manufName));
-		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
-		CHECK(desc->SetIsAccelerated(AAFFalse));
-		CHECK(desc->SetSupportsAuthentication(AAFFalse));
+		CHECK(desc->SetIsSoftwareOnly(kAAFTrue));
+		CHECK(desc->SetIsAccelerated(kAAFFalse));
+		CHECK(desc->SetSupportsAuthentication(kAAFFalse));
 		
 		/**/
-		CHECK(dict->CreateInstance(pcd,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
 		pcd->Release ();
 		pcd = 0;
 		CHECK(pLoc->SetPath (downloadURL));
@@ -259,7 +255,7 @@ HRESULT STDMETHODCALLTYPE
 CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown, aafBool doInit)
   : CAAFUnknown (pControllingUnknown)
 {
-	_headerLoaded = AAFFalse;
+	_headerLoaded = kAAFFalse;
 	_nativeByteOrder = GetNativeByteOrder();
 	_sampleRate = defaultRate;
 	_bitsPerSample = defaultSampleWidth;
@@ -269,11 +265,11 @@ CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown, aafBool doInit)
 	_interleaveBuf = NULL;
 	_dataStartOffset = 0;
 	_dataSizeOffset = 0;
-	_readOnly = AAFFalse;
+	_readOnly = kAAFFalse;
 	_stream = NULL;
 	_access = NULL;
-	_sampleDataHeaderWritten = AAFFalse;
-	_initialSeekPerformed = AAFFalse;
+	_sampleDataHeaderWritten = kAAFFalse;
+	_initialSeekPerformed = kAAFFalse;
 	_mdes = NULL;
 	_interleaveBuf = NULL;
 }
@@ -424,13 +420,13 @@ HRESULT STDMETHODCALLTYPE
 			}
 			CHECK(loadWAVEHeader());
 		}
-		pSelectInfo->willHandleMDES = AAFTrue;
+		pSelectInfo->willHandleMDES = kAAFTrue;
 #if PORT_BYTESEX_LITTLE_ENDIAN
-		pSelectInfo->isNative = AAFTrue;
+		pSelectInfo->isNative = kAAFTrue;
 #else
-		pSelectInfo->isNative = AAFFalse;
+		pSelectInfo->isNative = kAAFFalse;
 #endif
-		pSelectInfo->hwAssisted = AAFFalse;
+		pSelectInfo->hwAssisted = kAAFFalse;
 		pSelectInfo->relativeLoss = 0;
 		pSelectInfo->avgBitsPerSec =
 			(_bitsPerSample *
@@ -490,7 +486,7 @@ HRESULT STDMETHODCALLTYPE
 		_stream = stream;
 		_stream->AddRef();
 	}
-	_readOnly = AAFFalse;
+	_readOnly = kAAFFalse;
 	XPROTECT()
 	{
 		_sampleRate = createParms[0].sampleRate;	// !!!Assumes all sample rates are the same
@@ -540,7 +536,7 @@ HRESULT STDMETHODCALLTYPE
 		_stream = stream;
 		_stream->AddRef();
 	}
-	_readOnly = openMode == kMediaOpenReadOnly ? AAFTrue : AAFFalse;
+	_readOnly = openMode == kAAFMediaOpenReadOnly ? kAAFTrue : kAAFFalse;
 	XPROTECT()
 	{
 		aafError = (unk->QueryInterface(IID_IAAFSourceMob, (void **)&fileMob));
@@ -594,7 +590,7 @@ HRESULT STDMETHODCALLTYPE
 			CHECK(CreateWAVEheader(header, STD_HDRSIZE_NODATA, _numCh));
 
 			_stream->Seek(0);
-			_sampleDataHeaderWritten = AAFTrue;
+			_sampleDataHeaderWritten = kAAFTrue;
 			// The next four lines won't work for raw writes
 			_stream->Write(header, STD_HDRSIZE_NODATA);
 			_stream->Write((aafUInt8 *)"data", 4);
@@ -608,7 +604,7 @@ HRESULT STDMETHODCALLTYPE
 			resultBlock[n].samplesXfered = 0;
 		}
 		
-		if(inter == leaveInterleaved)
+		if(inter == kAAFleaveInterleaved)
 		{
 			for (n = 0; n < xferBlockCount; n++)
 			{
@@ -728,7 +724,7 @@ HRESULT STDMETHODCALLTYPE
 		if(!_initialSeekPerformed)
 		{
 			CHECK(_stream->Seek(_dataStartOffset));	// Not compatible with raw read
-			_initialSeekPerformed = AAFTrue;
+			_initialSeekPerformed = kAAFTrue;
 		}
 
 		XASSERT(_bitsPerSample != 0, AAFRESULT_ZERO_SAMPLESIZE);
@@ -738,7 +734,7 @@ HRESULT STDMETHODCALLTYPE
 			resultBlock[n].bytesXfered = 0;
 		}
 		
-		if(inter == leaveInterleaved)
+		if(inter == kAAFleaveInterleaved)
 		{
 			for (n = 0; n < xferBlockCount; n++)
 			{
@@ -989,7 +985,7 @@ HRESULT STDMETHODCALLTYPE
 			CHECK(CreateWAVEheader(header, STD_HDRSIZE_NODATA, _numCh));
 
 			_stream->Seek(0);
-			_sampleDataHeaderWritten = AAFTrue;
+			_sampleDataHeaderWritten = kAAFTrue;
 			// The next four lines won't work for raw writes
 			_stream->Write(header, STD_HDRSIZE_NODATA);
 			_stream->Write((aafUInt8 *)"data", 4);
@@ -1018,7 +1014,7 @@ HRESULT STDMETHODCALLTYPE
 		if(!_initialSeekPerformed)
 		{
 			CHECK(_stream->Seek(_dataStartOffset));	// Not compatible with raw read
-			_initialSeekPerformed = AAFTrue;
+			_initialSeekPerformed = kAAFTrue;
 		}
 		CHECK(_stream->Read (buflen, buffer, bytesRead));
 	}
@@ -1054,7 +1050,7 @@ HRESULT STDMETHODCALLTYPE
 		if(!_initialSeekPerformed)
 		{
 			CHECK(_stream->Seek(0L));
-			_initialSeekPerformed = AAFTrue;
+			_initialSeekPerformed = kAAFTrue;
 		}
 
 		CHECK(_stream->Read (nSamples * _bytesPerFrame, buffer, bytesRead));
@@ -1156,7 +1152,7 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(_mdes->SetSummary (STD_HDRSIZE_NODATA, header));
 		
 		// This will output the header on the next non-raw write
-		_sampleDataHeaderWritten = AAFFalse;
+		_sampleDataHeaderWritten = kAAFFalse;
 	}
 	XEXCEPT
 	XEND
@@ -1225,7 +1221,7 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(_mdes->SetSummary (STD_HDRSIZE_NODATA, header));
 		
 		// This will output the header on the next non-raw write
-		_sampleDataHeaderWritten = AAFFalse;
+		_sampleDataHeaderWritten = kAAFFalse;
 	}
 	XEXCEPT
 	XEND
@@ -1474,7 +1470,7 @@ AAFRESULT CAAFWaveCodec::loadWAVEHeader(void)
 	aafInt16			pcm_format;
 	aafUInt8            chunkID[4];
 	aafUInt32			chunkSize, bytesRead;
-	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
+	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
  	aafInt32			junk32, rate;
 	aafInt64			savePos;
 #if DEBUG_READ
@@ -1534,14 +1530,14 @@ AAFRESULT CAAFWaveCodec::loadWAVEHeader(void)
 	
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 	
-				fmtFound = AAFTrue;
+				fmtFound = kAAFTrue;
 			} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 			{
 				CvtInt32toInt64(chunkSize / _bytesPerFrame, &_sampleFrames);
 				/* Positioned at beginning of audio data */
 				CHECK(_stream->GetPosition(&_dataStartOffset));
 	
-				dataFound = AAFTrue;
+				dataFound = kAAFTrue;
 			}
 			CHECK(TruncInt64toInt32(chunkStart64, &chunkStart));	// OK - 32-bit format
 			offset = chunkStart + chunkSize;
@@ -1552,7 +1548,7 @@ AAFRESULT CAAFWaveCodec::loadWAVEHeader(void)
 				break;
 			CHECK(_stream->Seek(offset));
 		}
-		_headerLoaded = AAFTrue;
+		_headerLoaded = kAAFTrue;
 		CHECK(_stream->Seek (savePos));
 	}
 	XEXCEPT
