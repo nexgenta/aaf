@@ -3,6 +3,7 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \************************************************/
 
@@ -151,9 +152,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = NULL;
+		result->ReleaseReference();
+		*ppEnum = NULL;
 	}
 	
 	return hr;
@@ -165,8 +165,7 @@ AAFRESULT
     ImplEnumAAFPluginLocators::SetPluginDescriptor(ImplAAFPluginDescriptor *pPDesc)
 {
 	if (_cPluginDesc)
-	  _cPluginDesc->ReleaseReference();
-	_cPluginDesc = 0;
+		_cPluginDesc->ReleaseReference();
 
 	_cPluginDesc = pPDesc;
 
