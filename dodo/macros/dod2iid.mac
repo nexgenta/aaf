@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: dod2iid.mac,v 1.17 2004/02/27 14:26:19 stuart_hc Exp $ $Name:  $
+#c $Id: dod2iid.mac,v 1.17.2.1 2004/05/01 02:05:40 jptrainor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -59,6 +59,9 @@
 #endm
 
 #startm AD_COM_EXT2_CLASS_BEGIN 02
+#endm
+
+#startm AD_COM_EXT3_CLASS_BEGIN 03
 #endm
 
 #startm AD_ROOT_CLASS_BEGIN 00
@@ -122,6 +125,9 @@
 #endm
 
 #startm AD_COM_EXT2_CLASS_END 02
+#endm
+
+#startm AD_COM_EXT3_CLASS_END 03
 #endm
 
 #startm AD_ROOT_CLASS_END 00

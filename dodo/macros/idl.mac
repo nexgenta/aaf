@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: idl.mac,v 1.43 2004/02/27 14:26:34 stuart_hc Exp $ $Name:  $
+#c $Id: idl.mac,v 1.43.2.1 2004/05/01 02:05:40 jptrainor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -159,6 +159,17 @@ AD_CLASS_BEGIN\
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT2_CLASS_BEGIN 02
+AD_CLASS_BEGIN\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT3_CLASS_BEGIN 03
 AD_CLASS_BEGIN\
 #endm
 
@@ -819,6 +830,17 @@ AD_CLASS_END\
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT2_CLASS_END 02
+AD_CLASS_END\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT3_CLASS_END 03
 AD_CLASS_END\
 #endm
 
