@@ -50,8 +50,8 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefRename::ImplAAFTypeDefRename ()
   : _RenamedType  ( PID_TypeDefinitionRename_RenamedType, 
-                    "RenamedType", 
-                    "/Dictionary/TypeDefinitions", 
+                    L"RenamedType", 
+                    L"/Dictionary/TypeDefinitions", 
                     PID_MetaDefinition_Identification)
 {
   _persistentProperties.put(_RenamedType.address());
@@ -236,11 +236,11 @@ size_t ImplAAFTypeDefRename::NativeSize() const
 }
 
 
-OMProperty * ImplAAFTypeDefRename::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefRename::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
-  return BaseType()->pvtCreateOMPropertyMBS (pid, name);
+  return BaseType()->pvtCreateOMProperty (pid, name);
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -277,3 +277,25 @@ bool ImplAAFTypeDefRename::IsVariableArrayable () const
 
 bool ImplAAFTypeDefRename::IsStringable () const
 { return BaseType()->IsStringable(); }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefRename::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefRename));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefRename::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefRename::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
