@@ -17,12 +17,15 @@
 #include "ImplAAFSession.h"
 #endif
 
-#include "OMUtilities.h"
-
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFFile.h"
+#include "AAFResult.h"
 
 #include <assert.h>
+
+#if defined(__MWERKS__)
+#include <wstring.h>	// include wcslen declaration.
+#endif
 
 extern "C" const aafClassID_t CLSID_AAFFile;
 
@@ -40,67 +43,102 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
-  //****************
-  // CreateFile()
-  //
-  AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSession::CreateFile
-        (aafDataBuffer_t  filePath,   //@parm [in] File path [replace with object later]
-		 aafFileRev_t  rev,   //@parm [in] File revision to create
-         ImplAAFFile ** file)  //@parm [out] Current AAF file
-  {
-	ImplAAFRoot	*pRoot;
+//****************
+// CreateFile()
+//
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFSession::CreateFile (aafWChar *  pwFilePath,
+							aafFileRev_t  rev,
+							ImplAAFFile ** ppFile)
+{
+  ImplAAFRoot	*pRoot;
 
-	pRoot = CreateImpl(CLSID_AAFFile);
-	if (!pRoot)
-		return(0x80004005L);	// TODO: change this to AAFRESULT_FAILED
+  if (! pwFilePath)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
 
-	*file = static_cast<ImplAAFFile*>(pRoot);
-	(*file)->Create(filePath, this, rev);
+  if (! ppFile)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
 
-	return(AAFRESULT_SUCCESS);
-  }
+  pRoot = CreateImpl(CLSID_AAFFile);
+  if (!pRoot)
+	{
+	  return(0x80004005L);	// TODO: change this to AAFRESULT_FAILED
+	}
 
-  //****************
-  // OpenReadFile()
-  //
-  AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSession::OpenReadFile
-        (aafDataBuffer_t  filePath,   //@parm [in] File path [replace with object later]
-		 ImplAAFFile ** file)  //@parm [out] Current AAF file
-  {
-	ImplAAFRoot	*pRoot;
+  *ppFile = static_cast<ImplAAFFile*>(pRoot);
+  (*ppFile)->Create(pwFilePath, this, rev);
 
-	pRoot = CreateImpl(CLSID_AAFFile);
-	if (!pRoot)
-		return(0x80004005L);	// TODO: change this to AAFRESULT_FAILED
+  return(AAFRESULT_SUCCESS);
+}
 
-	*file = static_cast<ImplAAFFile*>(pRoot);
-	(*file)->OpenRead(filePath, this);
 
-	return(AAFRESULT_SUCCESS);
-  }
+//****************
+// OpenReadFile()
+//
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFSession::OpenReadFile(aafWChar *  pwFilePath,
+							 ImplAAFFile ** ppFile)
+{
+  ImplAAFRoot	*pRoot;
 
-  //****************
-  // OpenModifyFile()
-  //
-  AAFRESULT STDMETHODCALLTYPE
-	  ImplAAFSession::OpenModifyFile
-        (aafDataBuffer_t  filePath,   //@parm [in] File path [replace with object later]
-		 ImplAAFFile ** file)  //@parm [out] Current AAF file
-  {
-	AAFRESULT hr;
-	ImplAAFRoot	*pRoot;
+  if (! pwFilePath)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
 
-	pRoot = CreateImpl(CLSID_AAFFile);
-	if (!pRoot)
-		return(0x80004005L);	// TODO: change this to AAFRESULT_FAILED
+  if (! ppFile)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
 
-	*file = static_cast<ImplAAFFile*>(pRoot);
-	hr = (*file)->OpenModify(filePath, this);
+  pRoot = CreateImpl(CLSID_AAFFile);
+  if (!pRoot)
+	{
+	  return(0x80004005L);	// TODO: change this to AAFRESULT_FAILED
+	}
 
-	return(hr);
-  }
+  *ppFile = static_cast<ImplAAFFile*>(pRoot);
+  (*ppFile)->OpenRead(pwFilePath, this);
+
+  return(AAFRESULT_SUCCESS);
+}
+
+
+//****************
+// OpenModifyFile()
+//
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFSession::OpenModifyFile (aafWChar *  pwFilePath,
+								ImplAAFFile ** ppFile)
+{
+  AAFRESULT hr;
+  ImplAAFRoot	*pRoot;
+
+  if (! pwFilePath)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (! ppFile)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+  pRoot = CreateImpl(CLSID_AAFFile);
+  if (!pRoot)
+	{
+	  return(0x80004005L);	// TODO: change this to AAFRESULT_FAILED
+	}
+
+  *ppFile = static_cast<ImplAAFFile*>(pRoot);
+  hr = (*ppFile)->OpenModify(pwFilePath, this);
+
+  return(hr);
+}
 
 ImplAAFFile *ImplAAFSession::GetTopFile()
 {
@@ -131,31 +169,27 @@ aafProductIdentification_t *ImplAAFSession::GetDefaultIdent(void)
   // @end
   // 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFSession::SetDefaultIdentification (
-    // @parm aafProductIdentification | ident | [in] a struct from which it is initialized
-    aafProductIdentification_t  *ident
-  )
-  {
-	  _defaultIdent = ident;
+ImplAAFSession::SetDefaultIdentification (aafProductIdentification_t * pIdent)
+{
+  if (! pIdent)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
 
-    if ((_defaultIdent != 0) && (_defaultIdent->productName != 0)) {
-      setProgramName((const char *)_defaultIdent->productName);
-    } else {
-      setProgramName("Unknown");
-    }
+  _defaultIdent = pIdent;
 
-	  return(AAFRESULT_SUCCESS);
-  }
+  return(AAFRESULT_SUCCESS);
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFSession::GetIdentification (
-    aafProductIdentification_t  *ident)
+ImplAAFSession::GetIdentification (aafProductIdentification_t * pIdent)
 {
-  // BobT: this should check for null, and return the appropriate
-  // error code.
-  assert (ident);
-  
+  if (! pIdent)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
   //
   // BobT: Horrible hack! We want to return the identification to the
   // user, but our aafProductIdentification_t struct only contains
@@ -163,10 +197,11 @@ ImplAAFSession::GetIdentification (
   // internal data (DANGEROUS!) to the caller...
   //
   assert (_defaultIdent);
-  *ident = *_defaultIdent;
+  *pIdent = *_defaultIdent;
 
   return (AAFRESULT_SUCCESS);
 }
+
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFSession::BeginSession (
@@ -178,4 +213,4 @@ ImplAAFSession::BeginSession (
 
 extern "C" const aafClassID_t CLSID_AAFSession;
 
-OMDEFINE_STORABLE(AAFSession, CLSID_AAFSession);
+OMDEFINE_STORABLE(ImplAAFSession, CLSID_AAFSession);
