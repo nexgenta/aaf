@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFPropertyDef\
 #endm
@@ -23,10 +30,7 @@ AD_IDL(//
 // AAFRESULT_NOMEMORY
 //   - insufficient system memory is available to perform the
 //     operation.
-//
-/***********************************************\
-*	Stub only.   Implementation not yet added.	*
-\***********************************************/)
+//)
 AD_FORWARD_DECLARATION(EnumAAFPropertyValues)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_FORWARD_DECLARATION(AAFTypeDef)
@@ -54,171 +58,38 @@ AD_XMETHOD1(GetTypeDef,
   //   - pResult is null.)
 
 
-AD_XMETHOD2(GetPropertyName,
-			[out\, size_is\(bufSize\)\, string],
-			  objPass,
-			  wchar_t *,
-			  pStrName,
-			  buffer into which the string is written,
-			[in],
-			  objPass,
-			  aafInt32,
-			  bufSize,
-			  The size of the pStrName buffer,
-
-			Writes the human-legible name that identifies this property
-  // definition\, with a trailing null character\, into the pName
-  // buffer.  The buffer is allocated by the caller.  The size of the
-  // buffer is given by bufSize.
-  // 
-  // Caller may call GetNameBufLen\(\) to determine the required
-  // buffer size.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pName pointer is valid.
-  // - bufSize indicates the buffer is large enough to hold the name.
-  // 
-  // If this method fails nothing will be written to
-  // *pName.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pName arg is NULL.
-  //
-  // AAFRESULT_SMALLBUF
-  //   - bufSize indicates the buffer is too small to hold the string.)
+AD_STD_METHOD_STRING_GET_AND_SIZE(Name, the human-legible name.)
 
 
-AD_XMETHOD1(GetPropertyNameBufLen,
-			[out],
-			objPass,
-			aafInt32 *,
-			pLen,
-			required buffer length\, in bytes,
-
-			Returns the length of buffer required for the
-  // GetName\(\) method.  The value is placed into the
-  // location specified by pLen. The value will include space required
-  // for the trailing null character.
-  //
-  // Succeeds if all of the following are true:
-  // - the pLen pointer is valid.
-  //
-  // If this method fails nothing will be written to *pLen.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pLen arg is NULL.)
-
-
-AD_XMETHOD1(GetMinVersion,
+AD_XMETHOD1(GetIsOptional,
 			[out\, retval],
 			objPass,
-			aafVersionType_t *,
-			pMinVersion,
-			Pointer to the minimum version ,
+			aafBoolean_t *,
+			pIsOptional,
+			pointer to the result, 
 
-			Gets the Minimum AAF Version for this property definition.
+     Sets *pIsOptional to AAFTrue for properties that are optional.
+  // Sets it to AAFFalse for properties that are mandatory.
   //
   // Succeeds if:
-  // - The pMinVersion pointer is valid.
+  // - The pIsOptional pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - The pMinVersion pointer is NULL.)
-
-
-AD_XMETHOD1(SetMinVersion,
-			[in],
-			objPass,
-			aafVersionType_t *,
-			pMinVersion,
-			Pointer to the minimum AAF Version,
-
-			Sets the Minimum AAF Version for property definition.
-  //
-  // Succeeds if:
-  // - The pMinVersion pointer is valid.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - The pMinVersion pointer is NULL.)
-
-
-AD_XMETHOD1(GetMaxVersion,
-			[out\, retval],
-			objPass,
-			aafVersionType_t *,
-			pMaxVersion,
-			Pointer to the maximum version ,
-
-			Gets the Maximum AAF Version for this property definition.
-  //
-  // Succeeds if:
-  // - The pMaxVersion pointer is valid.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - The pMaxVersion pointer is NULL.)
-
-
-AD_XMETHOD1(SetMaxVersion,
-			[in],
-			objPass,
-			aafVersionType_t *,
-			pMaxVersion,
-			Pointer to the maximum AAF Version,
-
-			Sets the Maximum AAF Version for property definition.
-  //
-  // Succeeds if:
-  // - The pMaxVersion pointer is valid.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - The pMaxVersion pointer is NULL.)
+  //   - The pIsOptional pointer is NULL.)
 
 
 AD_XMETHOD1(GetIsSearchable,
 			[out\, retval],
 			objPass,
-			aafBool *,
+			aafBoolean_t *,
 			pIsSearchable,
 			pointer to the result, 
 
@@ -231,6 +102,7 @@ AD_XMETHOD1(GetIsSearchable,
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
@@ -241,8 +113,8 @@ AD_XMETHOD1(GetIsSearchable,
 
 AD_XMETHOD1(SetIsSearchable,
 			[in],
-			objPass,
-			aafBool,
+			enumIn,
+			aafBoolean_t,
 			IsSearchable,
 			is searchable value, 
 
@@ -254,109 +126,14 @@ AD_XMETHOD1(SetIsSearchable,
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\))
 
 
-AD_XMETHOD2(GetDescription,
-			[out\, size_is\(bufSize\)\, string],
-			objPass,
-			wchar_t *,
-			pStrDescription,
-			Pointer to description,
-
-			[in],
-			objPass,
-			aafInt32,
-			bufSize,
-			The size of the pstrDescription buffer,
-
-			Writes the description of the property definition\, with a
-  // trailing null character\, into the pStrDescription buffer.  The buffer
-  // is allocated by the caller.  The size of the buffer is given by
-  // bufSize.  If the description has not yet been set\, a zero-length
-  // string will be written \(that is\, only the trailing null
-  // character\).
-  // 
-  // Caller may call GetDescriptionBufLen\(\) to determine the
-  // required buffer size.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pstrDescription pointer is valid.
-  // - bufSize indicates the buffer is large enough to hold the name.
-  // 
-  // If this method fails nothing will be written to
-  // *pStrDescription .
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pStrDescription arg is NULL.
-  //
-  // AAFRESULT_SMALLBUF
-  //   - bufSize indicates the buffer is too small to hold the string.)
-
-
-AD_XMETHOD1(GetDescriptionBufLen,
-			[out],
-			objPass,
-			aafInt32 *,
-			pLen,
-			required buffer length,
-
-			Returns the length of buffer required for the
-  // GetDescription\(\) method.  The value is placed into the
-  // location specified by pLen. The value will include space required
-  // for the trailing null character.
-  //
-  // Succeeds if all of the following are true:
-  // - the pLen pointer is valid.
-  //
-  // If this method fails nothing will be written to *pLen.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pLen arg is NULL.)
-
-
-AD_XMETHOD1(SetDescription,
-			[in\, string],
-			objPass,
-			wchar_t *,
-			pStrDescription,
-			description,
-
-			Sets the description of the property definition.  A copy is made
-  // of the data so the caller retains ownership of the
-  // *pStrDescription buffer and is responsible for de-allocating it.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pStrDescription pointer is valid.
-  // 
-  // If this method fails the Description property will not be
-  // changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pStrDescription arg is NULL.)
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(Description,
+		 the description of the property definition.)
 
 
 AD_XMETHOD1(GetDefaultValue,
@@ -376,6 +153,7 @@ AD_XMETHOD1(GetDefaultValue,
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
@@ -402,6 +180,7 @@ AD_XMETHOD1(SetDefaultValue,
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
+  AD_STD_COMMENT_METH_STUB
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
@@ -410,59 +189,4 @@ AD_XMETHOD1(SetDefaultValue,
   //   - pDataValue arg is NULL.)
 
 
-AD_XMETHOD1(GetRefValues,
-			[out\,retval],
-			objOut,
-			EnumAAFPropertyValues,
-			ppEnum, 
-			Reference value Enumeration,
-
-			Places an enumerator for the reference values into the *ppEnum
-  // argument.
-  // 
-  // The returned enumerator is AddRef\(\)ed before it is returned.
-  // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
-  // Succeeds if all of the following are true:
-  // - the ppEnum pointer is valid.
-  // 
-  // If this method fails nothing will be written to *ppEnum.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - ppEnum is null.)
-
-
-AD_XMETHOD1(GetTypeAUID,
-			[out\, retval],
-			objPass,
-			aafUID_t *,
-			pTypeAuid,
-			Pointer to the Type Definitions AUID,
-
-			Gets the Type Definition's AUID associated with this object.
-  //
-  // Succeeds if:
-  // - This object has already been Initialize\(\)d.
-  // - The pTypeAuid pointer is valid.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\(\) called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - The pTypeAuid pointer is NULL.)
 AD_XCLASS_END(Concrete, StoredObject)
