@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObjectFactory.cpp,v 1.1 2004/09/28 11:57:08 phil_tudor Exp $ $Name:  $
+// $Id: OMSSStoredObjectFactory.cpp,v 1.2 2005/03/23 04:47:51 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -85,7 +85,7 @@ OMSSStoredObjectFactory::openModify(OMRawStorage* rawStorage)
                                          rawStorage->isExtendible());
 
   writeSignature(rawStorage, nullOMUniqueObjectIdentification);
-  return openFile(rawStorage, OMFile::readOnlyMode);
+  return openFile(rawStorage, OMFile::modifyMode);
 }
 
   // @mfunc Create a new root <c OMSSStoredObject> in the raw storage
