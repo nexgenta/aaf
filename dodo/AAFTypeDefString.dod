@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefString\
 #endm
@@ -33,7 +40,7 @@ AD_XMETHOD3(Initialize,
 
 			[in],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pTypeName,
 			friendly name of this type definition,
 
@@ -93,6 +100,78 @@ AD_XMETHOD2(GetCount,
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pPropVal or pCount\))
+
+
+AD_XMETHOD3(CreateValueFromCString,
+			[in\, size_is\(initDataSize\)],
+			objPass,
+			aafMemPtr_t,
+			pInitData,
+			pointer to compile-time C string containing data to use,
+
+			[in],
+			objPass,
+			aafUInt32,
+			initDataSize,
+			size of data in pInitData\, in bytes,
+
+			[out],
+			objOut,
+			AAFPropertyValue,
+			ppPropVal,
+			newly created property value,
+
+     Creates a property value which contains a string type.  The
+  // string in the property value are initialized from data in a C
+  // string which is pointed to by pInitData.  Returns the
+  // newly-created property value in ppPropVal.  The size of the
+  // newly-created string property value will be determined by the
+  // size of the initialization C array\, as communicated by
+  // initDataSize.
+  //
+  // Succeeds if all of the following are true:
+  // - the pInitData pointer is valid.
+  // - the ppPropVal pointer is valid.
+  //
+  // If this method fails nothing will be written to *ppPropVal.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInitData or ppPropVal\))
+
+
+AD_XMETHOD3(SetCString,
+			[in],
+			objIn,
+			AAFPropertyValue,
+			pPropVal,
+			property value to write,
+
+			[in\, size_is\(dataSize\)],
+			objPass,
+			aafMemPtr_t,
+			pData,
+			buffer from which C string data should be read,
+
+			[in],
+			objPass,
+			aafUInt32,
+			dataSize,
+			size of pData buffer in bytes,
+
+     Copies all the string data contained in the C array pointed to by
+  // pData into the given property value\, interpreting the data as a
+  // string of this type.  If dataSize indicates an array size
+  // different from the size currently in the indicated array property
+  // value\, that array property value will be resized.
+  //
+  // Succeeds if all of the following are true:
+  // - the pPropVal pointer is valid.
+  // - the pData pointer is valid.
+  //
+  // If this method fails nothing will be written to *ppPropVal.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pPropVal or pData\))
 
 
 AD_XMETHOD2(AppendElements,
