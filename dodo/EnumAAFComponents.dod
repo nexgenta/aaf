@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 EnumAAFComponents\
 #endm
@@ -22,7 +29,7 @@ AD_FORWARD_DECLARATION(AAFComponent)
 AD_CLASS_UUID(B1A21395, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21394, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, Transient)
 AD_XMETHOD1(NextOne,
 			[out\,retval],
 			  objOut,
@@ -53,22 +60,28 @@ AD_XMETHOD1(NextOne,
   //   - no Components remaining to be returned.)
 
 
-AD_XMETHOD3(Next,
+AD_X2METHOD3(Next,
 			[in],
 			  objPass,
 			  aafUInt32,
 			  count,
 			  number of components requested,
+			  xxx,
+			  xxx,
 			[out\, size_is\(count\)\, length_is\(*pNumFetched\)],
-			  objOut,
+			  objOutArray,
 			  AAFComponent,
 			  ppComponents,
 			  array to receive components,
+			  count,
+			  *pNumFetched,
 			[out\,ref],
 			  objPass,
 			  aafUInt32 *,
 			  pNumFetched,
 			  number of actual Components fetched into ppComponents array,
+			  xxx,
+			  xxx,
 
 			Enumerates the next count elements \(AAFComponent pointers\) in the
   // enumerator's list\, returning them in the given array along with
@@ -155,4 +168,4 @@ AD_XMETHOD1(Clone,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-AD_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
