@@ -37,14 +37,17 @@
 // The following stored form values are used to denote the on-disk
 // representation of a given property.
 //
-const int SF_DATA                           = 0;
-const int SF_DATA_STREAM                    = 1;
-const int SF_STRONG_OBJECT_REFERENCE        = 2;
-const int SF_STRONG_OBJECT_REFERENCE_VECTOR = 3;
-const int SF_STRONG_OBJECT_REFERENCE_SET    = 4;
-const int SF_WEAK_OBJECT_REFERENCE          = 5;
-const int SF_WEAK_OBJECT_REFERENCE_VECTOR   = 6;
-const int SF_WEAK_OBJECT_REFERENCE_SET      = 7;
+const int SF_DATA                                   =  0;
+const int SF_DATA_STREAM                            =  1;
+const int SF_STRONG_OBJECT_REFERENCE                =  2;
+const int SF_STRONG_OBJECT_REFERENCE_VECTOR         =  3;
+const int SF_STRONG_OBJECT_REFERENCE_SET            =  4;
+const int SF_WEAK_OBJECT_REFERENCE                  =  5;
+const int SF_WEAK_OBJECT_REFERENCE_VECTOR           =  6;
+const int SF_WEAK_OBJECT_REFERENCE_SET              =  7;
+const int SF_WEAK_OBJECT_REFERENCE_STORED_OBJECT_ID =  8;
+const int SF_UNIQUE_OBJECT_ID                       =  9;
+const int SF_OPAQUE_STREAM                          = 10;
 
 
 class OMStoredObject;
@@ -138,6 +141,11 @@ public:
     //          <p size> bytes in size.
   virtual void getBits(OMByte* bits, size_t size) const = 0;
 
+    // @cmember Set the raw bits of this <c OMProperty>. The raw
+    //          bits are copied from the buffer at address <p bits> which
+    //          is <p size> bytes in size.
+  virtual void setBits(const OMByte* bits, size_t size) = 0;
+
 protected:
   // @access Protected members.
 
@@ -222,6 +230,11 @@ public:
     //          raw bits are copied to the buffer at address <p bits>
     //          which is <p size> bytes in size.
   virtual void getBits(OMByte* bits, size_t size) const;
+
+    // @cmember Set the raw bits of this <c OMReferenceProperty>. The raw
+    //          bits are copied from the buffer at address <p bits> which
+    //          is <p size> bytes in size.
+  virtual void setBits(const OMByte* bits, size_t size);
 
 protected:
   // @access Protected members.
@@ -652,6 +665,12 @@ public:
     //          copied to the buffer at address <p bits> which is
     //          <p size> bytes in size.
   virtual void getBits(OMByte* bits, size_t size) const;
+
+    // @cmember Set the raw bits of this
+    //          <c OMStrongReferenceVectorProperty>. The raw bits are
+    //          copied from the buffer at address <p bits> which is
+    //          <p size> bytes in size.
+  virtual void setBits(const OMByte* bits, size_t size);
 
 protected:
   // @access Protected members.
