@@ -3,14 +3,32 @@
 #ifndef __ImplAAFDefObject_h__
 #define __ImplAAFDefObject_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
@@ -20,8 +38,9 @@
 #include "ImplAAFObject.h"
 #endif
 
-class ImplAAFDictionary;
+#include "OMWideStringProperty.h"
 
+class ImplAAFDictionary;
 
 class ImplAAFDefObject : public ImplAAFObject
 {
@@ -37,27 +56,38 @@ protected:
 
 public:
 
-  // SetAUID()
+  virtual AAFRESULT STDMETHODCALLTYPE
+    pvtInitialize
+        // @parm [in] Pointer to an AUID reference
+        (const aafUID_t & id,
+		 const wchar_t *name,
+		 const wchar_t *description);
+
+  //****************
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Init
+    Initialize
         // @parm [in] Pointer to an AUID reference
-        (aafUID_t *  pAuid, wchar_t *name, wchar_t *description);
+        (const aafUID_t & id,
+		 const aafCharacter *name);
+
+
   //****************
   // GetAUID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetAUID
         // @parm [retval,out] Pointer to an AUID reference
-        (aafUID_t *  pAuid);
+        (aafUID_t * pAuid) const;
 
   //****************
   // SetAUID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetAUID
-        // @parm [in] Pointer to an AUID reference
-        (aafUID_t *  pAuid);
+        // @parm [in] AUID by which this object is to be identified
+        (const aafUID_t & id);
 
 
   //****************
@@ -65,7 +95,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetName
-        (aafWChar *  name);  //@parm [in, ref] Definition Name
+        (const aafCharacter *  name);  //@parm [in, ref] Definition Name
 
 
   //****************
@@ -93,7 +123,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetDescription
-        (aafWChar *  description);  //@parm [in, ref] Definition description
+        (const aafCharacter * description);  //@parm [in, ref] Definition description
 
 
   //****************
@@ -112,24 +142,7 @@ public:
     GetDescriptionBufLen
         (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
 
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFDefObject)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFDefObjectTest.cpp.
-  static AAFRESULT test();
-
-  // non-published method to set the containing dictionary for this
-  // object.
-  void SetDict (ImplAAFDictionary * pDict);
-
-protected:
-  // Returns a pointer to the dictionary containing this object.  Will
-  // assert() if not yet set.
-  ImplAAFDictionary * GetDict ();
+  virtual const OMUniqueObjectIdentification& identification(void) const;
 
 private:
   // friendly name of this definition
@@ -140,9 +153,17 @@ private:
 
   // auid to be used to identify this definition
   OMFixedSizeProperty<aafUID_t> _identification;
-
-  // pointer to dict containing this object
-  ImplAAFDictionary *           _pDict;
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFDefObject> ImplAAFPropDefObjectSP;
 
 #endif // ! __ImplAAFDefObject_h__

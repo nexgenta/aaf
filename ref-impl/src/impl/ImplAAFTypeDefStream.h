@@ -40,6 +40,7 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefStream : public ImplAAFTypeDef
 {
@@ -186,6 +187,9 @@ public:
   virtual bool IsFixedArrayable () const;
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
+
+private:
+	OMWeakReferenceProperty<ImplAAFTypeDef>		_elementType;
 };
 
 #endif // ! __ImplAAFTypeDefStream_h__
