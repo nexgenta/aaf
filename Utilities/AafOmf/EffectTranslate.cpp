@@ -43,35 +43,9 @@ namespace OMF2
 
 #include "AafOmf.h"
 #include "EffectTranslate.h"
-#include "AAFDomainUtils.h"
-#include "OMFDomainUtils.h"
-#include "AAFClassDefUIDs.h"
-#include "AAFException.h"
 
-#define CHECKAAF
 #define CompareUUID(a, b) (memcmp((char *)&a, (char *)&b, sizeof(aafUID_t)) == 0)
 
-
-static bool LookupAAFIDInTable(aafUID_t					&AAFEffectID,
-							aafUInt32				numEntries,
-							effectXlate_t			*table,
-							OMF2::omfUniqueNamePtr_t effectID,
-							OMF2::omfUniqueNamePtr_t ExtendedEffectID);
-static void AddDirectionalPart(IAAFOperationGroup *effect,
-									  OMF2::omfUniqueNamePtr_t ExtendedEffectID);
-static void BuildWipeEffectID(IAAFOperationGroup *effect,
-									  OMF2::omfUniqueNamePtr_t ExtendedEffectID);
-
-EffectTranslate::EffectTranslate()
-{
-}
-
-// ============================================================================
-// Destructor
-// ============================================================================
-EffectTranslate::~EffectTranslate()
-{
-}
 // ============================================================================
 // GetEffectIDsFromAUID
 //
@@ -83,8 +57,14 @@ EffectTranslate::~EffectTranslate()
 //			the whole OMF name.!!
 // ============================================================================
 
+typedef struct
+{
+	const aafUID_t	*aafID;
+	const char		*omfEffectID;
+	const char		*MCEffectID;
+} effectXlate_t;
 
-	effectXlate_t stdXlateTable[] = {
+	effectXlate_t xlateTable[] = {
 	{ &kAAFEffectVideoDissolve, "SimpleVideoDissolve", "BLEND_DISSOLVE" },
 	{ &kAAFEffectVideoFadeToBlack, "VideoFadeToBlack", "BLEND_FADE_DOWN" },
 	{ &kAAFEffectVideoSpeedControl, "VideoSpeedControl", "EFF_TIMEWARP.MOTION_CTL" },
@@ -94,36 +74,252 @@ EffectTranslate::~EffectTranslate()
 	{ &kAAFEffectMonoAudioPan, "MonoAudioPan","Audio Pan Volume" },
 	{ &kAAFEffectMonoAudioGain, "MonoAudioGain","Audio Pan Volume" },
 	{ &kAAFEffectStereoAudioDissolve, "StereoAudioDissolve" },
+	{ &kAAFEffectStereoAudioGain, "StereoAudioGain" },
 	{ &kAAFEffectSMPTEVideoWipe, "SMPTEVideoWipe", NULL },
-	{ &kAAFEffectStereoAudioGain, "StereoAudioGain" } };
-	long numStdEntries = sizeof(stdXlateTable)/sizeof(effectXlate_t);
+	{ &kEffBlendPIPUUID, NULL, "EFF_BLEND_PIP" },
+	{ &kEffBlendSuperUUID, NULL, "BLEND_SUPER" },
+	{ &kEffBlendFadeUpUUID, NULL, "BLEND_FADE_UP" },
+	{ &kEffBlendDipUUID, NULL, "BLEND_DIP" },
+	{ &kEffXRotate, NULL, "EFF_BLEND_ROTATE_XROTATE" },
+	{ &kEffYRotate, NULL,"EFF_BLEND_ROTATE_YROTATE" },
+	{ &kEffZRotate, NULL,"EFF_BLEND_ROTATE_ZROTATE" },
+	{ &kEffSqueezeZoom, NULL,"EFF_BLEND_SQUEEZE_ZOOM" },
+	{ &kEffSqueezeHorz, NULL,"EFF_BLEND_SQUEEZE_HORZ" },
+	{ &kEffSqueezeVert, NULL,"EFF_BLEND_SQUEEZE_VERT" },
+	{ &kEffSqueezeBottomCenter, NULL,"EFF_BLEND_SQUEEZE_BOTTOMCENTER" },
+	{ &kEffSqueezeRightCenter, NULL,"EFF_BLEND_SQUEEZE_RIGHTCENTER" },
+	{ &kEffSqueezeTopCenter, NULL,"EFF_BLEND_SQUEEZE_TOPCENTER" },
+	{ &kEffSqueezeLeftCenter, NULL,"EFF_BLEND_SQUEEZE_LEFTCENTER" },
+	{ &kEffSqueezeTop, NULL,"EFF_BLEND_SQUEEZETOP" },
+	{ &kEffSqueezeBottom, NULL,"EFF_BLEND_SQUEEZEBOTTOM" },
+	{ &kEffSqueezeLeft, NULL,"EFF_BLEND_SQUEEZELEFT" },
+	{ &kEffSqueezeRight, NULL,"EFF_BLEND_SQUEEZERIGHT" },
+	{ &kEffSqueezeBottomLeft, NULL,"EFF_BLEND_SQUEEZE_BOTTOMLEFT" },
+	{ &kEffSqueezeTopRight, NULL,"EFF_BLEND_SQUEEZE_TOPRIGHT" },
+	{ &kEffSqueezeBottomRight, NULL,"EFF_BLEND_SQUEEZE_BOTTOMRIGHT" },
+	{ &kEffSqueezeTopLeft, NULL,"EFF_BLEND_SQUEEZE_TOPLEFT" },
+	{ &kEffAudioPanvol, NULL,"EFF_AUDIO_PANVOL" },
+	{ &kEffAudioEQ, NULL,"EFF_AUDIO_EQMB" },
+	{ &kEffAudioSuite, NULL,"EFF_AUDIO_AS_PLUG_IN" },
+	{ &kEffTimeWarp, NULL,"EFF_TIMEWARP" },
+	{ &kEffMotionStrobe, NULL,"EFF_TIMEWARP.STROBE" },
+	{ &kEffAudioWarp, NULL,"EFF_TIMEWARP.AUDIO_TIME_WARP" },
+	{ &kEffMask166, NULL,"EFF_BLEND_MASK_166" },
+	{ &kEffMask185, NULL,"EFF_BLEND_MASK_185" },
+	{ &kEffMask235, NULL,"EFF_BLEND_MASK_235" },
+	{ &kEffMask177, NULL,"EFF_BLEND_MASK_177" },
+	{ &kEffVDissolveLin, NULL,"BLEND_DISSOLVE_LIN" },
+	{ &kEffVDissolveLog, NULL,"BLEND_DISSOLVE_LOG" },
+	{ &kEffBlowUp, NULL,"EFF_BLOW_UP" },
+	{ &kEffBlendMask, NULL,"EFF_BLEND_MASK" },
+	{ &kEffColorCorrect, NULL,"EFF_COLORCORRECT" },
+	{ &kEffRGBColorCorrect, NULL, "EFF_RGB_COLOR_CORRECTION" },
+	{ &kEffFlipVert, NULL,"EFF_BLEND_FLIP_VERT" },
+	{ &kEffFlipBoth, NULL,"EFF_BLEND_FLIP_BOTH" },
+	{ &kEffFlipHoriz, NULL,"EFF_BLEND_FLIP_HORZ" },
+	{ &kEffMaskImage, NULL,"EFF_BLEND_MASK_IMAGE" },
+	{ &kEffPaint, NULL,"EFF_PAINT" },
+	{ &kEffPaintMosaic, NULL,"EFF_PAINT_MOSAIC" },
+	{ &kEffPaintSpotColor, NULL,"EFF_PAINT_SPOT_COLOR" },
+	{ &kEffPaintMPEGOutline, NULL,"EFF_PAINT_MPEG_OUTLINE" },
+	{ &kEffPaintScratch, NULL,"EFF_PAINT_SCRATCH" },
+	{ &kEffPaintResize, NULL,"EFF_BLEND_RESIZE" },
+	{ &kEffPanScan, NULL,"EFF_PAN_SCAN" },
+	{ &kEffSubmaster, NULL,"EFF_SUBMASTER" },
+	{ &kEffAnimatte, NULL,"EFF_ANIMATTE" },
+	{ &kEffLumaKey, NULL,"EFF_BLEND_LUMAKEY" },
+	{ &kEffMatteKey, NULL,"EFF_BLEND_MATTE_KEY" },
+	{ &kEffYUVChromaKey, NULL,"EFF_BLEND_YUV_CHROMAKEY" },
+	{ &kEffSimpleLumaKey, NULL,"EFF_BLEND_SIMPLE_LUMAKEY" },
+	{ &kEffSimpleChromaKey, NULL,"EFF_BLEND_SIMPLE_CHROMAKEY" },
+	{ &kEffChromaKey, NULL,"EFF_BLEND_CHROMAKEY" },
+	{ &kEffToucanChromaKey, NULL,"EFF_BLEND_TOUCAN_CHROMAKEY" },
+	{ &kEff2DMatteKey, NULL,"EFF_2DMATTE" },
+	{ &kEffConceal, NULL,"EFF_BLEND_CONCEAL" },
+	{ &kEffLConceal, NULL,"EFF_BLEND_LCONCEAL" },
+	{ &kEffPeel, NULL,"EFF_BLEND_PEEL" },
+	{ &kEffPush, NULL,"EFF_BLEND_PUSH" },
+	{ &kEffSBlend, NULL,"EFF_SBLEND" },
+	{ &kEff3DPIP, NULL,"EFF_3DPIP" },
+	{ &kEff3DPageCurl, NULL,"EFF_3DSHAPE_PAGE_CURL" },
+	{ &kEff3DQuadCurl, NULL,"EFF_3DSHAPE_QUAD_CURL" },
+	{ &kEff3DShapeArrow, NULL,"EFF_3DSHAPE_ARROW" },
+	{ &kEff3DShapeSlats, NULL,"EFF_3DSHAPE_SLATS" },
+	{ &kEff3DShapeMultiWave, NULL,"EFF_3DSHAPE_MULTI_WAVE" },
+	{ &kEff3DShapeCenterBurst, NULL,"EFF_3DSHAPE_CENTER_BURST" },
+	{ &kEff3DShapeSineWave, NULL,"EFF_3DSHAPE_SINE_WAVE" },
+	{ &kEff3DShapeBall, NULL,"EFF_3DSHAPE_BALL" },
+	{ &kEff3DShapePageFold, NULL,"EFF_3DSHAPE_PAGE_FOLD" },
+	{ &kEff3DShapeBumps, NULL,"EFF_3DSHAPE_BUMPS" },
+	{ &kEff3DTitle, NULL,"EFF_3DTITLE" },
+	{ &kEff3DMatteKey, NULL,"EFF_3DMATTE" },
+	{ &kEffRollingTitle, NULL,"EFF_ROLLING_TITLE" },
+	{ &kEffRolling2dMatte, NULL,"EFF_ROLLING_2DMATTE" },
+	{ &kEffCrawlingTitle, NULL,"EFF_CRAWLING_TITLE" },
+	{ &kEffCrawling2DMatte, NULL,"EFF_CRAWLING_2DMATTE" },
+	{ &kEffTestOneTrack, NULL,"EFF_TEST_ONE_TRACK" },
+	{ &kEffTestTwoTrack, NULL,"EFF_TEST_TWO_TRACK" },
+	{ &kEffTestThreeTrack, NULL,"EFF_TEST_THREE_TRACK" }
+	};
 
+typedef struct
+{
+	aafUInt32	wipeCode;
+	char		*effectName;
+} wipeTable_t;
 
+static wipeTable_t wipeTable[] = {
+	{ 24, "EFF_BLEND_WIPE_RBOX" },
+	{ 23, "EFF_BLEND_WIPE_TBOX" },
+	{ 26, "EFF_BLEND_WIPE_LBOX_ID" },
+	{ 25, "EFF_BLEND_WIPE_BBOX_ID" },
+	{ 5, "EFF_BLEND_WIPE_LR_ID" },
+	{ 6, "EFF_BLEND_WIPE_LL_ID" },
+	{ 4, "EFF_BLEND_WIPE_UR_ID" },
+	{ 3, "EFF_BLEND_WIPE_UL_ID" },
+	{ 21, "EFF_BLEND_WIPE_VOPEN_ID" },
+	{ 22, "EFF_BLEND_WIPE_HOPEN_ID" },
+	{ 1, "EFF_BLEND_WIPE_VERT_ID" },
+	{ 2, "EFF_BLEND_WIPE_HORZ_ID" },
+	{ 41, "EFF_BLEND_WIPE_LRLDIAG_ID" },
+	{ 42, "EFF_BLEND_WIPE_LLRDIAG_ID" },
+	{ 42, "EFF_BLEND_WIPE_URLDIAG_ID" },
+	{ 41, "EFF_BLEND_WIPE_ULRDIAG_ID" },
+	{ 317, "EFF_BLEND_WIPE_SPIRAL_ID" },
+	{ 8, "EFF_BLEND_WIPE_GRID_ID" },
+	{ 352, "EFF_BLEND_WIPE_1ROW_ID" },
+	{ 409, "EFF_BLEND_WIPE_SPECKLE_ID" },
+	{ 301, "EFF_BLEND_WIPE_ZIG_ZAG_ID" },
+	{ 71, "EFF_BLEND_WIPE_VOPEN_SAW_ID" },
+	{ 72, "EFF_BLEND_WIPE_HOPEN_SAW_ID" },
+	{ 73, "EFF_BLEND_WIPE_VSAW_ID" },
+	{ 74, "EFF_BLEND_WIPE_HSAW_ID" },
+	{ 7, "EFF_BLEND_WIPE_4CORNER_ID" },
+	{ 101, "EFF_BLEND_WIPE_BOX_ID" },
+	{ 119, "EFF_BLEND_WIPE_CIRCLE_ID" },
+	{ 201, "EFF_BLEND_WIPE_RADAR_ID" },
+	{ 102, "EFF_BLEND_WIPE_DIAMOND_ID" },
+	{ 120, "EFF_BLEND_WIPE_ELLIPSE_ID" }
+};
 
-	HRESULT EffectTranslate::GetEffectIDs(IAAFOperationGroup *effect,
+HRESULT GetEffectIDs(IAAFOperationGroup *effect,
 									   OMF2::omfUniqueNamePtr_t effectID,
-									   OMF2::omfUniqueNamePtr_t ExtendedEffectID)
+									   OMF2::omfUniqueNamePtr_t MCEffectID)
 {
 	IAAFOperationDef		*pOpDef = NULL;
 	IAAFDefObject			*pDef = NULL;
-	long					numStdEntries = sizeof(stdXlateTable)/sizeof(effectXlate_t);
+	IAAFParameter			*pParameter = NULL;
+	IAAFConstantValue		*pCVal = NULL;
+	HRESULT					rc = AAFRESULT_SUCCESS;
+	long					n, numEntries = sizeof(xlateTable)/sizeof(effectXlate_t);
+	long					x, numWipeEntries = sizeof(wipeTable)/sizeof(wipeTable_t);
+	aafUInt32				wipeNumber;
+	aafUInt32				bytesRead;
 	bool					found = false;
-	aafUID_t				AAFEffectID;
+	aafUID_t				AAFEffectID, direction;
 
-	try
+    rc = effect->GetOperationDefinition(&pOpDef);
+	if(SUCCEEDED(rc))
 	{
-		AAFCheck rc;
-		effectID[0] = '\0';
-		ExtendedEffectID[0] = '\0';
-		
-		rc = effect->GetOperationDefinition(&pOpDef);
 		rc = pOpDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef);
-		rc = pDef->GetAUID(&AAFEffectID);
+	}
 
+	if(SUCCEEDED(rc))
+	{
+        rc = pDef->GetAUID(&AAFEffectID);
+	}
+	
+	if(SUCCEEDED(rc))
+	{
 
-		found = LookupAAFIDInTable(AAFEffectID, numStdEntries,
-							stdXlateTable, effectID, ExtendedEffectID);
+		for(n = 0; (n < numEntries) && !found; n++)
+		{
+			if ( CompareUUID(AAFEffectID, *(xlateTable[n].aafID)))
+			{
+				if(xlateTable[n].omfEffectID != NULL)
+				{
+					strcpy(effectID, "omfi:effect:");
+					strcat(effectID, xlateTable[n].omfEffectID);
+				}
+				else if(xlateTable[n].MCEffectID != NULL)
+					strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
+				
+				if(xlateTable[n].MCEffectID != NULL)
+					strcpy(MCEffectID, xlateTable[n].MCEffectID);
+				else
+					MCEffectID[0] = '\0';
 
+				if (CompareUUID(effectID, kEffConceal) ||
+				    CompareUUID(effectID, kEffLConceal) ||
+				    CompareUUID(effectID, kEffPeel) ||
+				    CompareUUID(effectID, kEffPush))
+				{
+					(void)effect->GetParameterByArgID(kAAFParamID_AvidDirection,
+														&pParameter);
+					if(pParameter->QueryInterface(IID_IAAFConstantValue, (void **) &pCVal) == AAFRESULT_SUCCESS)
+					{
+						// Determine effect ID from direction
+						(void)pCVal->GetValue(sizeof(direction),(unsigned char*)&direction,&bytesRead);
+						// if bytesRead != sizeof(direction) error
+						if (CompareUUID(direction, kEffDirBottomLeft))
+							strcat(MCEffectID, "_BOTTOM_LEFT");
+						else if (CompareUUID(direction, kEffDirBottomRight))
+							strcat(MCEffectID, "_BOTTOM_RIGHT");
+						else if (CompareUUID(direction, kEffDirTopRight))
+							strcat(MCEffectID, "_TOP_RIGHT");
+						else if (CompareUUID(direction, kEffDirTopLeft))
+							strcat(MCEffectID, "_TOP_LEFT");
+						else if (CompareUUID(direction, kEffDirTop))
+							strcat(MCEffectID, "_TOP");
+						else if (CompareUUID(direction, kEffDirBottom))
+							strcat(MCEffectID, "_BOTTOM");
+						else if (CompareUUID(direction, kEffDirLeft))
+							strcat(MCEffectID, "_LEFT");
+						else if (CompareUUID(direction, kEffDirRight))
+							strcat(MCEffectID, "_RIGHT");
+						// else error
+						pCVal->Release();
+						pCVal = NULL;
+					}
+					// else error
+
+					pParameter->Release();
+					pParameter = NULL;
+				}
+				else if (CompareUUID(effectID, kAAFEffectSMPTEVideoWipe))
+				{
+					(void)effect->GetParameterByArgID(kAAFParameterDefSMPTEWipeNumber,
+														&pParameter);
+					if(pParameter->QueryInterface(IID_IAAFConstantValue, (void **) &pCVal) == AAFRESULT_SUCCESS)
+					{
+						// Determine effect ID from direction
+						(void)pCVal->GetValue(sizeof(wipeNumber),(unsigned char*)&wipeNumber,&bytesRead);
+						// if bytesRead != sizeof(wipeNumber) error
+						// Determine effectID from wipe code	
+						bool foundWipe = false;
+						for(x = 0; (n < numWipeEntries) && !foundWipe; x++)
+						{
+							if (wipeNumber == wipeTable[x].wipeCode)
+							{							
+								if(wipeTable[x].effectName != NULL)
+									strcpy(MCEffectID, wipeTable[x].effectName);
+								// else error
+								foundWipe = true;
+							}
+						}
+						pCVal->Release();
+						pCVal = NULL;
+					}
+					// else error
+
+					pParameter->Release();
+					pParameter = NULL;
+				}
+
+				found = true;
+			}
+		}
+		
 		if(!found)
 		{
 			//		AUIDtoString(&Datadef, szAUID);
@@ -131,103 +327,69 @@ EffectTranslate::~EffectTranslate()
 			//		fprintf(stderr,"%sInvalid DataDef Found in sequence AUID : %s\n", gpGlobals->indentLeader, szAUID);
 			rc = AAFRESULT_INVALID_DATADEF;
 		}
-	}	// end try
-	catch( ExceptionBase &e )
-	{
-		return e.Code();
 	}
 
-	return AAFRESULT_SUCCESS;
+	return rc;
 }
 
-static bool LookupAAFIDInTable(aafUID_t					&AAFEffectID,
-							aafUInt32				numEntries,
-							effectXlate_t			*xlateTable,
-							OMF2::omfUniqueNamePtr_t effectID,
-							OMF2::omfUniqueNamePtr_t ExtendedEffectID)
+HRESULT GetAAFEffectID(	OMF2::omfUniqueNamePtr_t OMFEffectIDPtr,
+						OMF2::omfUniqueNamePtr_t MCEffectIDPtr,
+						aafUID_t	*aafUID)
 {
-	bool		found = false;
-	aafUInt32	n;
+	IAAFOperationDef		*pOpDef = NULL;
+	IAAFDefObject			*pDef = NULL;
+	IAAFParameter			*pParameter = NULL;
+	IAAFConstantValue		*pCVal = NULL;
+	HRESULT					rc = AAFRESULT_SUCCESS;
+	long					n, numEntries = sizeof(xlateTable)/sizeof(effectXlate_t);
+	bool					found = false;
+	OMF2::omfUniqueName_t	OMFEffectID;
+	OMF2::omfUniqueName_t	MCEffectID;
+	char					*dirStr;
+
+	strcpy(OMFEffectID, OMFEffectIDPtr);
+	strcpy(MCEffectID, MCEffectIDPtr);
+	if (strncmp(MCEffectID, "EFF_BLEND_CONCEAL", 17) == 0 ||
+		strncmp(MCEffectID, "EFF_BLEND_LCONCEAL", 18) == 0 ||
+		strncmp(MCEffectID, "EFF_BLEND_PEEL", 14) == 0 ||
+		strncmp(MCEffectID, "EFF_BLEND_PUSH", 14) == 0 )
+		{
+			// Truncate off direction part of the effect ID before convert
+			dirStr = strstr(MCEffectID, "_BOTTOM_LEFT");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+			dirStr = strstr(MCEffectID, "_BOTTOM_RIGHT");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+			dirStr = strstr(MCEffectID, "_TOP_RIGHT");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+			dirStr = strstr(MCEffectID, "_TOP_LEFT");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+			dirStr = strstr(MCEffectID, "_TOP");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+			dirStr = strstr(MCEffectID, "_BOTTOM");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+			dirStr = strstr(MCEffectID, "_LEFT");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+			dirStr = strstr(MCEffectID, "_RIGHT");
+			if(dirStr != NULL)
+				*dirStr = '\0';	
+		}
 
 	for(n = 0; (n < numEntries) && !found; n++)
 	{
-		if ( CompareUUID(AAFEffectID, *(xlateTable[n].aafID)))
-		{
-			if(xlateTable[n].omfEffectID != NULL)
-			{
-				strcpy(effectID, "omfi:effect:");
-				strcat(effectID, xlateTable[n].omfEffectID);
-			}
-			else if(xlateTable[n].ExtendedEffectID != NULL)
-				strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-				
-			if(xlateTable[n].ExtendedEffectID != NULL)
-				strcpy(ExtendedEffectID, xlateTable[n].ExtendedEffectID);
-			else
-				ExtendedEffectID[0] = '\0';
-			found = true;
-		}
-	}
-
-	return(found);
-}
-
-
-bool EffectTranslate::isPrivateEffect(aafUID_t& uid)
-{
-	long	n, numStdEntries = sizeof(stdXlateTable)/sizeof(effectXlate_t);
-	bool	found = false;
-	bool	result = true;
-
-	for(n = 0; (n < numStdEntries) && !found; n++)
-	{
-		if ( CompareUUID(uid, *(stdXlateTable[n].aafID)))
-		{
-			result = (stdXlateTable[n].omfEffectID == NULL);
-			found = true;
-		}
-	}
-
-	return result;
-}
-
-HRESULT EffectTranslate::GetAAFEffectID(	OMF2::omfUniqueNamePtr_t OMFEffectIDPtr,
-						OMF2::omfUniqueNamePtr_t ExtendedEffectIDPtr,
-						aafUID_t	*aafUID)
-{
-	IAAFOperationDef	*pOpDef = NULL;
-	IAAFDefObject		*pDef = NULL;
-	IAAFParameter		*pParameter = NULL;
-	IAAFConstantValue	*pCVal = NULL;
-	HRESULT				rc = AAFRESULT_SUCCESS;
-	long				n, numStdEntries = sizeof(stdXlateTable)/sizeof(effectXlate_t);
-	bool				found = false;
-	OMF2::omfUniqueName_t	OMFEffectID;
-	OMF2::omfUniqueName_t	ExtendedEffectID;
-	char				*init = (char *)aafUID;
-	char				*effectPrefix = "omfi:effect:";
-	long				prefixLen = strlen(effectPrefix);
-
-	for(n = 0; n < sizeof(aafUID_t); n++)
-		init[n] = 0;
-
-	if(strncmp(OMFEffectIDPtr, effectPrefix, prefixLen) == 0)
-		strcpy(OMFEffectID, OMFEffectIDPtr+prefixLen);
-	else
-		strcpy(OMFEffectID, OMFEffectIDPtr);
-	if(ExtendedEffectIDPtr != NULL)
-		strcpy(ExtendedEffectID, ExtendedEffectIDPtr);
-	else
-		ExtendedEffectID[0] = '\0';
-	for(n = 0; (n < numStdEntries) && !found; n++)
-	{
-		if(stdXlateTable[n].omfEffectID != NULL)
-			found = (strcmp(OMFEffectID, stdXlateTable[n].omfEffectID) == 0);
+		if(xlateTable[n].omfEffectID != NULL)
+			found = (strcmp(OMFEffectID, xlateTable[n].omfEffectID) == 0);
 		else
-			found = (strcmp(ExtendedEffectID, stdXlateTable[n].ExtendedEffectID) == 0);
+			found = (strcmp(MCEffectID, xlateTable[n].MCEffectID) == 0);
 		if (found)
 		{
-			*aafUID = *(stdXlateTable[n].aafID);			
+			*aafUID = *(xlateTable[n].aafID);			
 		}
 	}
 	if(!found)
@@ -237,11 +399,17 @@ HRESULT EffectTranslate::GetAAFEffectID(	OMF2::omfUniqueNamePtr_t OMFEffectIDPtr
 		//		fprintf(stderr,"%sInvalid DataDef Found in sequence AUID : %s\n", gpGlobals->indentLeader, szAUID);
 		rc = AAFRESULT_INVALID_DATADEF;
 	}
-
+	
 	return rc;
 }
 
-bool EffectTranslate::RequiresNestedScope(aafUID_t &effectDefAUID)
-{
-	return isPrivateEffect(effectDefAUID);
-}
+
+#if 0
+#define EFF_EMPTY_EFFECT				"EFF_EMPTY_EFFECT"	//	This is the ID for the effect 
+															//	that is returned when the requested 
+															//	effect is not available
+#define EFF_BLEND_VDISSOLVE				"BLEND_DISSOLVE"
+#define EFF_BLEND_TITLE					"EFF_BLEND_GRAPHIC"
+#define BLEND_DISSOLVE_LIN				"BLEND_DISSOLVE_LIN"		// film fade
+#define BLEND_DISSOLVE_LOG				"BLEND_DISSOLVE_LOG"		// film dissolve
+#endif
