@@ -1,10 +1,29 @@
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
@@ -36,11 +55,14 @@
 #include "ImplAAFEssenceAccess.h"
 #include "ImplAAFSourceMob.h"
 
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
+
 extern "C" const aafClassID_t CLSID_AAFEssenceAccess;
 
 ImplAAFEssenceGroup::ImplAAFEssenceGroup ()
-:   _choices(	PID_EssenceGroup_Choices,		"Choices"),
-  _stillFrame(	PID_EssenceGroup_StillFrame,    "StillFrame")
+:   _choices(	PID_EssenceGroup_Choices,		L"Choices"),
+  _stillFrame(	PID_EssenceGroup_StillFrame,    L"StillFrame")
 {
 	_persistentProperties.put(_choices.address());
 	_persistentProperties.put(_stillFrame.address());
@@ -51,7 +73,7 @@ ImplAAFEssenceGroup::~ImplAAFEssenceGroup ()
 {
 	size_t size = _choices.getSize();
 	for (size_t i = 0; i < size; i++) {
-		ImplAAFSourceClip *pClip = _choices.setValueAt(0, i);
+		ImplAAFSegment *pClip = _choices.setValueAt(0, i);
 
 		if (pClip) {
 		  pClip->ReleaseReference();
@@ -66,12 +88,12 @@ ImplAAFEssenceGroup::~ImplAAFEssenceGroup ()
 	}
 }
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::SetStillFrame (
       ImplAAFSourceClip *stillFrame)
 {
-	aafUID_t	newDataDef, groupDataDef;
+	aafUID_t	newDataDef;
 	aafLength_t	oneLength, stillLength;
 	ImplAAFDictionary	*pDict = NULL;
 	ImplAAFDataDef	*pDef = NULL;
@@ -83,17 +105,22 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		/* Verify that groups's datakind converts to still's datakind */
-		CHECK(stillFrame->GetDataDef(&newDataDef));
-		CHECK(GetDataDef(&groupDataDef));
+	    ImplAAFDataDefSP pNewDataDef;
+		CHECK(stillFrame->GetDataDef(&pNewDataDef));
+		CHECK(pNewDataDef->GetAUID(&newDataDef));
+
+	    ImplAAFDataDefSP pGroupDataDef;
+		CHECK(GetDataDef(&pGroupDataDef));
+
 		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->LookupDataDefintion(&newDataDef, &pDef));
+		CHECK(pDict->LookupDataDef(newDataDef, &pDef));
 		pDict->ReleaseReference();
 		pDict = NULL;
-		CHECK(pDef->DoesDataDefConvertTo(&groupDataDef, &willConvert));
+		CHECK(pDef->DoesDataDefConvertTo(pGroupDataDef, &willConvert));
 		pDef->ReleaseReference();
 		pDef = NULL;
 
-		if (willConvert == AAFFalse)
+		if (willConvert == kAAFFalse)
 			RAISE(AAFRESULT_INVALID_DATADEF);
 		
 		/* Verify that length of still frame is 1 */
@@ -130,7 +157,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::GetStillFrame (
       ImplAAFSourceClip **stillFrame)
@@ -151,12 +178,12 @@ AAFRESULT STDMETHODCALLTYPE
 
     //@comm Essence group choices should be added with the AddChoice() function.
     
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::AppendChoice (
-      ImplAAFSourceClip *choice)
+      ImplAAFSegment *choice)
 {
-	aafUID_t	newDataDef, groupDataDef;
+    // aafUID_t	newDataDef;
 	aafLength_t	groupLength, newLength;
 	ImplAAFDictionary	*pDict = NULL;
 	ImplAAFDataDef	*pDef = NULL;
@@ -167,18 +194,23 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(choice->GetDataDef(&newDataDef));
-		CHECK(GetDataDef(&groupDataDef));
+	    ImplAAFDataDefSP pNewDataDef;
+		CHECK(choice->GetDataDef(&pNewDataDef));
+		// CHECK(pNewDataDef->GetAUID(&newDataDef));
+
+	    ImplAAFDataDefSP pGroupDataDef;
+		CHECK(GetDataDef(&pGroupDataDef));
+
 		/* Verify that groups's datakind converts to still's datakind */
 		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->LookupDataDefintion(&newDataDef, &pDef));
+		// CHECK(pDict->LookupDataDef(newDataDef, &pDef));
 		pDict->ReleaseReference();
 		pDict = NULL;
-		CHECK(pDef->DoesDataDefConvertTo(&groupDataDef, &willConvert));
-		pDef->ReleaseReference();
-		pDef = NULL;
+		CHECK(pNewDataDef->DoesDataDefConvertTo(pGroupDataDef, &willConvert));
+		// pDef->ReleaseReference();
+		// pDef = NULL;
 
-		if (willConvert == AAFFalse)
+		if (willConvert == kAAFFalse)
 			RAISE(AAFRESULT_INVALID_DATADEF);
 		
 		/* Verify that length of choice matches length of group */
@@ -197,9 +229,9 @@ AAFRESULT STDMETHODCALLTYPE
 		if(pDict != NULL)
 		  pDict->ReleaseReference();
 		pDict = 0;
-		if(pDef != NULL)
-		  pDef->ReleaseReference();
-		pDef = 0;
+		// if(pDef != NULL)
+		//   pDef->ReleaseReference();
+		// pDef = 0;
 	}
 	XEND;
 	
@@ -207,9 +239,42 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFEssenceGroup::GetNumChoices (
+    ImplAAFEssenceGroup::PrependChoice (
+      ImplAAFSegment *choice)
+{
+  if (! choice)
+	return AAFRESULT_NULL_PARAM;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFEssenceGroup::InsertChoiceAt (
+	  aafUInt32 index,
+      ImplAAFSegment *choice)
+{
+  if (! choice)
+	return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountChoices (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFEssenceGroup::CountChoices (
       aafUInt32  *result)
 {
 	size_t	numClips;
@@ -220,13 +285,13 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFEssenceGroup::GetIndexedChoice (
+    ImplAAFEssenceGroup::GetChoiceAt (
       aafUInt32  index,
-      ImplAAFSourceClip  **result)
+      ImplAAFSegment  **result)
 {
-	ImplAAFSourceClip	*obj;
+	ImplAAFSegment	*obj;
 
 	XPROTECT()
 	{
@@ -243,6 +308,29 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFEssenceGroup::RemoveChoiceAt (
+      aafUInt32  index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  ImplAAFSegment	*pSeg;
+  
+  hr = CountChoices (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+	pSeg = _choices.removeAt(index);
+	if(pSeg)
+		pSeg->ReleaseReference();
+
+	return AAFRESULT_SUCCESS;
+}
+
+
 AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
 										ImplAAFMob *mob, ImplAAFMobSlot *track,
 										aafMediaCriteria_t *mediaCrit,
@@ -256,7 +344,7 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 										ImplAAFComponent **foundObj, aafBool *foundTransition)
 {
   aafMediaCriteria_t criteriaStruct, *ptrCriteriaStruct;
-  ImplAAFSourceClip	*critClip = NULL;
+  ImplAAFSegment	*critClip = NULL;
   aafSlotID_t trackID;
   ImplAAFComponent	*tmpFound = NULL;
   aafLength_t tmpMinLen;
@@ -272,7 +360,7 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 		  else
 			criteriaStruct.type = kAAFAnyRepresentation;
 		  ptrCriteriaStruct = &criteriaStruct;
-		  CHECK(((ImplAAFMasterMob *)this)->GetCriteriaSourceClip(trackID,
+		  CHECK(((ImplAAFMasterMob *)this)->GetCriteriaSegment(trackID,
 											  ptrCriteriaStruct, &critClip));
 
 		  if (critClip)
@@ -305,15 +393,16 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 	return(AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFEssenceGroup::GetCriteriaSourceClip(
+AAFRESULT ImplAAFEssenceGroup::GetCriteriaSegment(
 			aafMediaCriteria_t *criteria,
-			ImplAAFSourceClip		**retSrcClip)
+			ImplAAFSegment		**retSrcClip)
 {
 	aafInt32				score, highestScore;
 	aafUInt32				n, numReps;
 	ImplAAFMob				*mob = NULL;
 	ImplAAFSourceMob		*fileMob = NULL;
-	ImplAAFSourceClip		*highestScoreSourceClip = NULL, *sourceClip = NULL;
+	ImplAAFSegment			*highestScoreSourceClip = NULL, *sourceClip = NULL;
+	ImplAAFSourceClip		*sclp;
 	aafSelectInfo_t			selectInfo;
 	ImplAAFEssenceAccess	*access;
 
@@ -325,16 +414,20 @@ AAFRESULT ImplAAFEssenceGroup::GetCriteriaSourceClip(
 		
 	XPROTECT()
 	{
-		CHECK(GetNumChoices(&numReps));
+		CHECK(CountChoices(&numReps));
 		for(n = 0; n < numReps; n++)
 		{
-			CHECK(GetIndexedChoice(n, &sourceClip));
+			CHECK(GetChoiceAt(n, &sourceClip));
 			if(numReps == 0)
 			{
 				highestScoreSourceClip = sourceClip;
 				break;
 			}
-			CHECK(sourceClip->ResolveRef(&mob));
+			sclp = dynamic_cast<ImplAAFSourceClip*>(sourceClip);
+			if(sclp == 0)
+				RAISE(AAFRESULT_INVALID_LINKAGE);
+
+			CHECK(sclp->ResolveRef(&mob));
 			fileMob = dynamic_cast<ImplAAFSourceMob*>(mob);
 			if(fileMob == NULL)
 				RAISE(AAFRESULT_INCONSISTANCY);
@@ -388,6 +481,3 @@ AAFRESULT ImplAAFEssenceGroup::GetCriteriaSourceClip(
 	*retSrcClip = highestScoreSourceClip;
 	return(AAFRESULT_SUCCESS);
 }
-
-OMDEFINE_STORABLE(ImplAAFEssenceGroup, AUID_AAFEssenceGroup);
-

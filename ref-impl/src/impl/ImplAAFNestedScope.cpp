@@ -65,7 +65,7 @@ extern "C" const aafClassID_t CLSID_AAFSegment;
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
 ImplAAFNestedScope::ImplAAFNestedScope ()
-:  _slots( PID_NestedScope_Slots, "Slots")
+:  _slots( PID_NestedScope_Slots, L"Slots")
 {
 	_persistentProperties.put(_slots.address());
 }
@@ -134,10 +134,17 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFNestedScope::CountSegments (aafUInt32 * pResult)
 {
-  if(pResult == NULL)
-	return(AAFRESULT_NULL_PARAM);
+  // Validate input pointer...
+  if (NULL == pResult)
+    return (AAFRESULT_NULL_PARAM);
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  size_t numSegments;
+
+	_slots.getSize(numSegments);
+	
+	*pResult = numSegments;
+
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -164,15 +171,21 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFNestedScope::RemoveSegmentAt (
       aafUInt32 index)
 {
-  aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountSegments (&count);
-  if (AAFRESULT_FAILED (hr)) return hr;
+	aafUInt32 count;
+	AAFRESULT hr;
+	ImplAAFSegment	*pSeg;
+	
+	hr = CountSegments (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+	
+	if (index >= count)
+		return AAFRESULT_BADINDEX;
+	
+	pSeg = _slots.removeAt(index);
+	if(pSeg)
+		pSeg->ReleaseReference();
 
-  if (index >= count)
-	return AAFRESULT_BADINDEX;
-
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	return AAFRESULT_SUCCESS;
 }
 
 

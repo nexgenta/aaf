@@ -52,8 +52,8 @@
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
 ImplAAFSelector::ImplAAFSelector () :
-	_selected(		PID_Selector_Selected,		"Selected"),
-	_alternates(	PID_Selector_Alternates,	"Alternates")
+	_selected(		PID_Selector_Selected,		L"Selected"),
+	_alternates(	PID_Selector_Alternates,	L"Alternates")
 {
 	_persistentProperties.put(_selected.address());
 	_persistentProperties.put(_alternates.address());
@@ -156,6 +156,18 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
 	return hr;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSelector::RemoveAlternateSegment (ImplAAFSegment* pSegment)
+{
+	if (!_alternates.containsValue(pSegment))
+	  return AAFRESULT_SEGMENT_NOT_FOUND;
+
+	_alternates.removeValue(pSegment);
+	pSegment->ReleaseReference();
+
+	return AAFRESULT_SUCCESS;
 }
 
 //***********************************************************
