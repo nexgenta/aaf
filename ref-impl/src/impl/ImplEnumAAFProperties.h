@@ -1,7 +1,9 @@
+
 //@doc
 //@class    EnumAAFProperties | Implementation class for EnumAAFProperties
 #ifndef __ImplEnumAAFProperties_h__
 #define __ImplEnumAAFProperties_h__
+
 
 /******************************************\
 *                                          *
@@ -15,8 +17,7 @@
 class ImplAAFProperty;
 
 
-template <typename T> class ImplAAFCollection;
-template <typename T> class ImplAAFEnumerator;
+
 
 
 #ifndef __ImplAAFRoot_h__
@@ -89,11 +90,11 @@ public:
 
 
 public:
-  AAFRESULT Initialize (ImplAAFCollection<ImplAAFProperty*> * pProperties);
-
-private:
-  ImplAAFEnumerator<ImplAAFProperty*> * _rep;
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplEnumAAFPropertiesTest.cpp.
+  static AAFRESULT test();
 };
 
-
 #endif // ! __ImplEnumAAFProperties_h__
+
+
