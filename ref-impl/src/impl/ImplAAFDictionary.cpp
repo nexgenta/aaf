@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.118 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.119 2004/10/26 14:21:49 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1441,7 +1441,44 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
+void ImplAAFDictionary::InitDataDef(const aafUID_t & dataDefinitionID,
+                                    const aafCharacter *name,
+		                            const aafCharacter *description)
+{
+  ImplAAFDataDef		*dataDef = NULL;
+  AAFRESULT		hr;
 
+  hr = LookupDataDef (dataDefinitionID, &dataDef);
+  if (AAFRESULT_FAILED (hr))
+	{
+	  // not already in dictionary
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
+	  hr = dataDef->Initialize (dataDefinitionID, name, description);
+	  hr = RegisterDataDef (dataDef);
+	}
+  dataDef->ReleaseReference();
+  dataDef = NULL;
+}
+
+void ImplAAFDictionary::InitContainerDef(const aafUID_t & defID,
+                                         const aafCharacter *name,
+				                         const aafCharacter *description)
+{
+  ImplAAFContainerDef	*containerDef = NULL;
+  AAFRESULT		hr;
+  hr = LookupContainerDef (defID, &containerDef);
+  if (AAFRESULT_FAILED (hr))
+	{
+	  // not already in dictionary
+	  hr = GetBuiltinDefs()->cdContainerDef()->
+		CreateInstance ((ImplAAFObject **)&containerDef);
+	  hr = containerDef->Initialize (defID, name, description);
+	  hr = RegisterContainerDef (containerDef);
+	}
+  containerDef->ReleaseReference();
+  containerDef = NULL;
+}
 
 void ImplAAFDictionary::InitBuiltins()
 {
