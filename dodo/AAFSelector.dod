@@ -1,24 +1,3 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
 #startm .this-module 0
 AAFSelector\
 #endm
@@ -47,19 +26,21 @@ AD_IDL(//
 //)
 AD_FORWARD_DECLARATION(AAFSegment)
 AD_FORWARD_DECLARATION(EnumAAFSegments)
+
 AD_CLASS_UUID(e684d787, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 
 AD_DEFAULT_UUID(e684d788, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
+
 AD_XMETHOD1(GetSelectedSegment,
 			[out],
 			objOut,
 			AAFSegment,
 			ppSelSegment,
 			Returned the selected Segment object,
-     Places the Selected Segment object in this Selector into the
-  // *ppSelSegment argument.  If none exists yet\, NULL is placed into
-  // the *ppSelSegment argument.
+			Places the Selected Segment object in this Selector into the
+  // *ppSelSegment argument.  If none exists yet\, NULL is placed into the
+  // *ppSelSegment argument.
   //
   // The returned essence descriptor object\, if it exists\, is
   // AddRef\(\)ed before it is returned.
@@ -79,8 +60,9 @@ AD_XMETHOD1(GetSelectedSegment,
   //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
-  //   - ppSelSegment is null.)
-
+  //   - ppSelSegment is null.
+  //
+  // )
 
 AD_XMETHOD1(SetSelectedSegment,
 			[in],
@@ -88,7 +70,7 @@ AD_XMETHOD1(SetSelectedSegment,
 			AAFSegment,
 			pSelSegment,
 			A Segment object,
-			Sets the Selected segment.
+			Sets the Selected segment .
   //
   // Succeeds if all of the following are true:
   // - the pSelSegment pointer is valid.
@@ -106,21 +88,19 @@ AD_XMETHOD1(SetSelectedSegment,
   // AAFRESULT_NULL_PARAM
   //   - pSelSegment is null.)
 
-
 AD_XMETHOD1(AppendAlternateSegment,
 			[in],
 			objIn,
 			AAFSegment,
 			pSegment,
 			Segment to append to the Alternate list of segments,
-     This function appends the input segment to the alternate segment
-  // list\, the alternate list of segments represents unused
-  // alternative segments. 
+			This function appends the input segment to the alternate segment list\,
+  // the alternate list of segments represents unused alternative segments. 
   //
   // This method will AddRef\(\) the segment if it succeeds.
   //
-  // If the segment is successfully appended to the set of
-  // alternates\, the reference count of the segment is incremented.
+  // If the segment is successfully appended to the set of alternates\, the
+  // reference count of the segment is incremented.
   // 
   // Succeeds if all of the following are true:
   // - this object has already been initialized.
@@ -139,7 +119,8 @@ AD_XMETHOD1(AppendAlternateSegment,
   //   - Initialize\(\) has already been called on this object.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSegment is null.)
+  //   - pSegment is null.
+  // )
 
 
 AD_XMETHOD1(GetNumAlternateSegments,
@@ -169,14 +150,13 @@ AD_XMETHOD1(GetNumAlternateSegments,
   // AAFRESULT_NULL_PARAM
   //   - pNumSegments is null.)
 
-
 AD_XMETHOD1(EnumAlternateSegments,
 			[out\, retval],
 			objOut,
 			EnumAAFSegments,
 			ppEnum,
 			Segment Enumeration,
-     Places an IEnumAAFSegments enumerator for the alterante segments
+			Places an IEnumAAFSegments enumerator for the alterante segments
   // contained in the selector into the *ppEnum argument.
   // 
   // The returned enumerator is AddRef\(\)ed before it is returned.
@@ -202,33 +182,5 @@ AD_XMETHOD1(EnumAlternateSegments,
   //
   // E_FAIL
   //   - Failed to create the enumerator.)
-
-AD_XMETHOD1(RemoveAlternateSegment,
-			[in],
-			objIn,
-			AAFSegment,
-			pSegment,
-			Segment to remove,
-
-  // Removes the given Segment from the selector.
-  //
-  // Succeeds if all of the following are true:
-  // - the v pointer is valid.
-  // - the given segment is currently in the collection.
-  // 
-  // If this method fails no state will be changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pEssenceData is null.
-  //
-  // AAFRESULT_SEGMENT_NOT_FOUND
-  //   - the given segment is not already contained.)
 
 AD_XCLASS_END(Concrete, StoredObject)
