@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -41,7 +23,7 @@
 
 ImplAAFEssenceFormat::ImplAAFEssenceFormat ()
 {
-	_elements = 0;
+	_elements = NULL;
 	_elemUsed = 0;
 	_elemAllocated = 0;
 }
@@ -53,10 +35,9 @@ ImplAAFEssenceFormat::~ImplAAFEssenceFormat ()
 
 	for(n = 0; n < _elemUsed; n++)
 	{
-		if(_elements[n].parmValue != 0)
-			delete [] _elements[n].parmValue;
+		delete _elements[n].parmValue;
 	}
-	delete [] _elements;
+	delete _elements;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -69,7 +50,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUInt32		n;
 
 	parm = Lookup(essenceFormatCode);
-	if(parm == 0)	// New format spec
+	if(parm == NULL)	// New format spec
 	{
 		if(_elemUsed >= _elemAllocated)	// Allocate more memory
 		{
@@ -78,8 +59,8 @@ AAFRESULT STDMETHODCALLTYPE
 			_elemAllocated += CHUNK_SIZE;
 			for(n = 0; n < _elemUsed; n++)
 				_elements[n] = tempParm[n];
-			if(tempParm != 0)
-				delete [] tempParm;
+			if(tempParm != NULL)
+				delete tempParm;
 		}
 		
 		parm = _elements + _elemUsed;
@@ -89,8 +70,6 @@ AAFRESULT STDMETHODCALLTYPE
 			parm->parmValue = new unsigned char[valueSize];
 			memcpy(parm->parmValue, value, valueSize);
 		}
-		else
-			parm->parmValue = 0;
 		parm->valueSize = valueSize;
 		parm->allocSize = valueSize;
 		parm->parmName = essenceFormatCode;
@@ -105,15 +84,12 @@ AAFRESULT STDMETHODCALLTYPE
 				parm->parmValue = new unsigned char[valueSize];
 				memcpy(parm->parmValue, temp, valueSize);
 			}
-			else
-				parm->parmValue = 0;
 			parm->allocSize = valueSize;
 			
-			if(temp != 0)
-				delete [] temp;
+			if(temp != NULL)
+				delete temp;
 		}
-		if(parm->parmValue != 0 && valueSize != 0)
-			memcpy(parm->parmValue, value, valueSize);	//!!!
+		memcpy(parm->parmValue, value, valueSize);
 		parm->valueSize = valueSize;
 	}
 
@@ -135,13 +111,12 @@ AAFRESULT STDMETHODCALLTYPE
 	oneParm_t	*parm;
 	
 	parm = Lookup(essenceFormatCode);
-	if(parm == 0)
+	if(parm == NULL)
 		return(AAFRESULT_FORMAT_NOT_FOUND);
 	if((aafUInt32)bufSize < parm->valueSize)
 		return(AAFRESULT_SMALLBUF);
 
-	if(parm->parmValue != 0 && parm->valueSize != 0)
-		memcpy(value, parm->parmValue, parm->valueSize);//!!!
+	memcpy(value, parm->parmValue, parm->valueSize);
 	*bytesRead = parm->valueSize;
 
 	return AAFRESULT_SUCCESS;
@@ -167,17 +142,12 @@ AAFRESULT STDMETHODCALLTYPE
                            aafInt32*  bytesRead)
 {	
 	if((aafUInt32)index >= _elemUsed)
-		return(AAFRESULT_FORMAT_BOUNDS);
+	if((aafUInt32)bufSize < _elements[index].valueSize)
+		return(AAFRESULT_SMALLBUF);
 
 	*essenceFormatCode = _elements[index].parmName;
-	if(bufSize != 0)
-	{
-		if((aafUInt32)bufSize < _elements[index].valueSize)
-			return(AAFRESULT_SMALLBUF);
-		if(_elements[index].valueSize != 0)
-			memcpy(value, _elements[index].parmValue, _elements[index].valueSize);
-		*bytesRead = _elements[index].valueSize;
-	}		
+	memcpy(value, _elements[index].parmValue, _elements[index].valueSize);
+	*bytesRead = _elements[index].valueSize;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -195,7 +165,7 @@ oneParm_t	*ImplAAFEssenceFormat::Lookup(aafUID_t lookup)
 			return(_elements+n);
 	}
 
-	return(0);
+	return(NULL);
 }
 
 
