@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFSourceReference.cpp,v 1.6.2.2 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
+// $Id: CAAFSourceReference.cpp,v 1.6.2.3 2004/05/03 01:20:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -331,6 +331,70 @@ HRESULT STDMETHODCALLTYPE
 
 
   hr = ptr->GetChannelIDsSize (numberElements);
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFSourceReference::SetMonoSourceSlotIDs (aafUInt32  numberElements,
+        aafUInt32*  pMonoSourceSlotIDs)
+{
+  HRESULT hr;
+
+  ImplAAFSourceReference * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFSourceReference*> (pO);
+  assert (ptr);
+
+
+
+  hr = ptr->SetMonoSourceSlotIDs (numberElements,
+    pMonoSourceSlotIDs);
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFSourceReference::GetMonoSourceSlotIDs (aafUInt32  numberElements,
+        aafUInt32*  pMonoSourceSlotIDs)
+{
+  HRESULT hr;
+
+  ImplAAFSourceReference * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFSourceReference*> (pO);
+  assert (ptr);
+
+
+
+  hr = ptr->GetMonoSourceSlotIDs (numberElements,
+    pMonoSourceSlotIDs);
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFSourceReference::GetMonoSourceSlotIDsSize (aafUInt32 *  numberElements)
+{
+  HRESULT hr;
+
+  ImplAAFSourceReference * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFSourceReference*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->GetMonoSourceSlotIDsSize (numberElements);
 
   return hr;
 }
