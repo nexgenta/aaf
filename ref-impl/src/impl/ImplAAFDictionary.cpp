@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.116 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.117 2004/10/05 09:29:16 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1516,6 +1516,30 @@ void ImplAAFDictionary::InitBuiltins()
 	  hr = GetBuiltinDefs()->cdDataDef()->
 		CreateInstance ((ImplAAFObject **)&dataDef);
 	  hr = dataDef->Initialize (DDEF_PictureWithMatte, L"PictureWithMatte", L"PictureWithMatte data");
+	  hr = RegisterDataDef (dataDef);
+	}
+  dataDef->ReleaseReference();
+  dataDef = NULL;
+
+  hr = LookupDataDef (DDEF_Auxiliary, &dataDef);
+  if (AAFRESULT_FAILED (hr))
+	{
+	  // not already in dictionary
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
+	  hr = dataDef->Initialize (DDEF_Auxiliary, L"Auxiliary", L"Auxiliary data");
+	  hr = RegisterDataDef (dataDef);
+	}
+  dataDef->ReleaseReference();
+  dataDef = NULL;
+
+  hr = LookupDataDef (DDEF_DescriptiveMetadata, &dataDef);
+  if (AAFRESULT_FAILED (hr))
+	{
+	  // not already in dictionary
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
+	  hr = dataDef->Initialize (DDEF_DescriptiveMetadata, L"DescriptiveMetadata", L"Descriptive metadata");
 	  hr = RegisterDataDef (dataDef);
 	}
   dataDef->ReleaseReference();
