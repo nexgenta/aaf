@@ -3,6 +3,7 @@
 #ifndef __ImplAAFFileDescriptor_h__
 #define __ImplAAFFileDescriptor_h__
 
+#include "OMStorable.h"
 
 /******************************************\
 *                                          *
@@ -18,7 +19,12 @@
 #include "ImplAAFEssenceDescriptor.h"
 #endif
 
+#include "OMProperty.h"
 
+const int PID_FILE_DESC_SAMPLERATE      = 1;
+const int PID_FILE_DESC_LENGTH		    = 2;
+const int PID_FILE_DESC_INCONTAINER     = 3;
+const int PID_FILE_DESC_CONTAINERFMT    = 4;
 
 class ImplAAFFileDescriptor : public ImplAAFEssenceDescriptor
 {
@@ -116,6 +122,14 @@ public:
   //
   OMDECLARE_STORABLE(ImplAAFFileDescriptor)
 
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFFileDescriptorTest.cpp.
+  static AAFRESULT test();
+
+  // Return this object's stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
+
 public:
 	// Functions internal to the toolkit
 	virtual AAFRESULT STDMETHODCALLTYPE
@@ -126,6 +140,7 @@ private:
 	OMFixedSizeProperty<aafLength_t>	_length;
 	OMFixedSizeProperty<aafBool>        _isInContainer;
 	OMFixedSizeProperty<aafUID_t>       _containerFmt;
+	aafBool								_initialized;
 };
 
 #endif // ! __ImplAAFFileDescriptor_h__
