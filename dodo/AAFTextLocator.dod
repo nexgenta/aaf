@@ -12,7 +12,6 @@ AAFLocator\
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 AD_HEAD
@@ -59,7 +58,7 @@ AD_METHOD0(Initialize,
 AD_XMETHOD2(GetName,
 			[out\, size_is\(bufSize\)\, string],
 			  objPass,
-			  wchar_t *,
+			  aafCharacter *,
 			  pNameBuf,
 			  buffer into which Name is written,
 			[in],
@@ -126,7 +125,7 @@ AD_XMETHOD1(GetNameBufLen,
 AD_XMETHOD1(SetName,
 			[in\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pNameBuf,
 			the new Name,
 			Set the Name property to the value specified in pNameBuf.  A
