@@ -96,6 +96,11 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetEnumStrongProperty( ImplAAFObject *pObj, codecDefStrongRefArrayProp_t *pProp);
 
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplEnumAAFCodecDefsTest.cpp.
+  static AAFRESULT test();
 private:
 	aafUInt32						_current;
 	ImplAAFObject					*_enumObj;
