@@ -1,27 +1,36 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
-
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFTimecode_h__
 #include "ImplAAFTimecode.h"
 #endif
+
+#include "ImplAAFDictionary.h"
+#include "ImplAAFBuiltinDefs.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -32,12 +41,12 @@
 #include "aafErr.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 
 ImplAAFTimecode::ImplAAFTimecode ():
-_start(	PID_Timecode_Start,	"Start"),
-_FPS(	PID_Timecode_FPS,	"FPS"),
-_drop(	PID_Timecode_Drop,	"Drop")
+_start(	PID_Timecode_Start,	L"Start"),
+_FPS(	PID_Timecode_FPS,	L"FPS"),
+_drop(	PID_Timecode_Drop,	L"Drop")
 {
 	_persistentProperties.put(_start.address());
 	_persistentProperties.put(_FPS.address());
@@ -52,30 +61,38 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::Initialize (aafLength_t length,
                            aafTimecode_t *timecode)
 {
-	aafUID_t	tcddef = DDEF_Timecode;
-	
 	XPROTECT()
 	{
+		if (isInitialized ()) 
+		{
+			return AAFRESULT_ALREADY_INITIALIZED;
+		}
+
 		if (timecode == NULL)
 		{
 			return AAFRESULT_NULL_PARAM;
 		}
-		if ((timecode->drop != kTcDrop) && (timecode->drop != kTcNonDrop))
+		if ((timecode->drop != kAAFTcDrop) && (timecode->drop != kAAFTcNonDrop))
 		{
 			return AAFRESULT_INVALID_TIMECODE;
 		}
 
-		CHECK(SetNewProps(length, &tcddef));
+		ImplAAFDictionarySP pDict;
+		CHECK(GetDictionary (&pDict));
+		CHECK(SetNewProps(length,
+						  pDict->GetBuiltinDefs()->ddTimecode()));
 		_start = timecode->startFrame;
-		if (timecode->drop == kTcDrop)
+		if (timecode->drop == kAAFTcDrop)
 		{
-		  _drop = AAFTrue;
+		  _drop = kAAFTrue;
 		}
 		else
 		{
-		  _drop = AAFFalse;
+		  _drop = kAAFFalse;
 		}
 		_FPS = timecode->fps;
+		
+		setInitialized ();
 	}
 	XEXCEPT
 	XEND;
@@ -88,6 +105,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::GetTimecode (aafTimecode_t *timecode)
 {
+	if ( !isInitialized ()) 
+	{
+		return AAFRESULT_NOT_INITIALIZED;
+	}
+
 	if (timecode == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
@@ -95,13 +117,13 @@ AAFRESULT STDMETHODCALLTYPE
 
 	timecode->startFrame = _start;
 
-	if (AAFTrue == _drop)
+	if (kAAFTrue == _drop)
 	{
-		timecode->drop = kTcDrop;
+		timecode->drop = kAAFTcDrop;
 	}
 	else
 	{
-		timecode->drop = kTcNonDrop;
+		timecode->drop = kAAFTcNonDrop;
 	}
 	timecode->fps = _FPS;
 	return(AAFRESULT_SUCCESS);
@@ -112,22 +134,26 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::SetTimecode (aafTimecode_t  *timecode)
 {
+	if ( !isInitialized ()) 
+	{
+		return AAFRESULT_NOT_INITIALIZED;
+	}
 	if (timecode == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-	if ((timecode->drop != kTcDrop) && (timecode->drop != kTcNonDrop))
+	if ((timecode->drop != kAAFTcDrop) && (timecode->drop != kAAFTcNonDrop))
 	{
 		return AAFRESULT_INVALID_TIMECODE;
 	}
 	_start = timecode->startFrame;
-	if (timecode->drop == kTcDrop)
+	if (timecode->drop == kAAFTcDrop)
 	{
-		_drop = AAFTrue;
+		_drop = kAAFTrue;
 	}
 	else
 	{
-		_drop = AAFFalse;
+		_drop = kAAFFalse;
 	}
 	_FPS = timecode->fps;
 
@@ -225,7 +251,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t offset, ImplAAFTimecode **result,
+aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t /* offset !!!*/, ImplAAFTimecode **result,
 												aafPosition_t *tcStartPos)
 {
   	if(result == NULL)
@@ -236,4 +262,3 @@ aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t offset, ImplAAFTime
 }
 
 
-OMDEFINE_STORABLE(ImplAAFTimecode, AUID_AAFTimecode);
