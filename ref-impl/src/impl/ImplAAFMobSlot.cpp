@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMobSlot.cpp,v 1.44 2005/01/06 11:09:06 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFMobSlot.cpp,v 1.45 2005/01/20 10:14:41 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,24 +89,21 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMobSlot::SetSegment (ImplAAFSegment *value)
+    ImplAAFMobSlot::SetSegment (ImplAAFSegment *pSeg)
 {
-	if( value == NULL )
+	if( pSeg == NULL )
 	    return AAFRESULT_NULL_PARAM;
 
-	if (_segment)
-	{
-	  if( _segment == value )
-		return AAFRESULT_SUCCESS;
-		ImplAAFSegment *segment = _segment.clearValue();
-	  segment->ReleaseReference();
-	}
-
-	if( value->attached() )
+	if( pSeg->attached() )
 	    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
-	_segment = value;
-	_segment->AcquireReference();
+	ImplAAFSegment *pOldSeg = _segment.setValue(pSeg);
+
+	if (pOldSeg)
+		pOldSeg->ReleaseReference();
+
+	if (pSeg)
+		pSeg->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
 }
