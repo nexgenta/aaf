@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -57,14 +57,13 @@ protected:
 
 public:
 
-  // SetAUID()
-  //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Init
+    pvtInitialize
         // @parm [in] Pointer to an AUID reference
-        (const aafUID_t *  pAuid,
+        (const aafUID_t & id,
 		 const wchar_t *name,
 		 const wchar_t *description);
+
   //****************
   // GetAUID()
   //
@@ -78,8 +77,8 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetAUID
-        // @parm [in] Pointer to an AUID reference
-        (const aafUID_t *  pAuid);
+        // @parm [in] AUID by which this object is to be identified
+        (const aafUID_t & id);
 
 
   //****************
@@ -87,7 +86,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetName
-        (const wchar_t *  name);  //@parm [in, ref] Definition Name
+        (const aafCharacter *  name);  //@parm [in, ref] Definition Name
 
 
   //****************
@@ -115,7 +114,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetDescription
-        (aafWChar *  description);  //@parm [in, ref] Definition description
+        (const aafCharacter * description);  //@parm [in, ref] Definition description
 
 
   //****************
@@ -135,29 +134,68 @@ public:
         (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
 
   //****************
-  // AppendPluginDescriptor()
+  // AppendPluginDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendPluginDescriptor
-        // @parm [in] PluginDescriptor to append
-        (ImplAAFPluginDescriptor * pPluginDescriptor);
+    AppendPluginDef
+        // @parm [in] PluginDef to append
+        (ImplAAFPluginDescriptor * pPluginDef);
 
 
   //****************
-  // PrependPluginDescriptor()
+  // PrependPluginDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    PrependPluginDescriptor
-        // @parm [in] PluginDescriptor to append
-        (ImplAAFPluginDescriptor * pPluginDescriptor);
+    PrependPluginDef
+        // @parm [in] PluginDef to append
+        (ImplAAFPluginDescriptor * pPluginDef);
 
   //****************
-  // EnumPluginDescriptors()
+  // GetPluginDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    EnumPluginDescriptors
-        // @parm [out, retval] AAFPluginDescriptor Enumeration
+    GetPluginDefs
+        // @parm [out, retval] AAFPluginDef Enumeration
         (ImplEnumAAFPluginDescriptors ** ppEnum);
+
+  //****************
+  // CountPluginDefs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountPluginDefs
+        // @parm [out, retval] Total number of plugin descriptor objects
+        (aafUInt32 * pResult);
+
+  //****************
+  // InsertPluginDefAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    InsertPluginDefAt
+         // @parm [in] Index where plugin descriptor is to be inserted
+        (aafUInt32 index,
+
+		 // @parm [in] Plugin descriptor to insert
+		 ImplAAFPluginDescriptor * pPluginDef);
+
+  //****************
+  // GetPluginDefAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetPluginDefAt
+         // @parm [in] Index of plugin descriptor to retrieve
+        (aafUInt32 index,
+
+		 // @parm [out] Retrieved plugin descriptor
+		 ImplAAFPluginDescriptor ** ppPluginDef);
+
+  //****************
+  // RemovePluginDefAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemovePluginDefAt
+         // @parm [in] Index of plugin descriptor to be removed
+        (aafUInt32 index);
+
 
 private:
   // friendly name of this definition
