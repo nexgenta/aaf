@@ -1,26 +1,12 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFInterpolationDefs object
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/************************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\************************************************/
 
 #include "AAF.h"
 
@@ -29,14 +15,10 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -68,12 +50,6 @@ static wchar_t *sDescription1 = L"Test Descriptor Description1";
 static wchar_t *sName2 = L"Test Descriptor Name2";
 static wchar_t *sDescription2 = L"Test Descriptor Description2";
 
-// {81831636-EDF4-11d3-A353-009027DFCA6A}
-static const aafUID_t InterpDef1 = 
-{ 0x81831636, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
-// {81831637-EDF4-11d3-A353-009027DFCA6A}
-static const aafUID_t InterpDef2 = 
-{ 0x81831637, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
@@ -83,22 +59,20 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"EnumAAFInterpolationDefs Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kAAFMediaOpenAppend)
+	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -143,36 +117,37 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Create the AAF file
-	checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+	checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
     bFileOpen = true;
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
-	CAAFBuiltinDefs defs (pDictionary);
     
-	checkResult(defs.cdInterpolationDefinition()->
-				CreateInstance(IID_IAAFInterpolationDef, 
-							   (IUnknown **)&pInterpolationDef));
+	checkResult(pDictionary->CreateInstance(&AUID_AAFInterpolationDefinition,
+							  IID_IAAFInterpolationDef, 
+							  (IUnknown **)&pInterpolationDef));
     
 	checkResult(pInterpolationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-	checkResult(pInterpolationDef->Initialize(InterpDef1, sName1, sDescription1));
-	checkResult(pDictionary->RegisterInterpolationDef(pInterpolationDef));
+	checkResult(pDef->SetName(sName1));
+	checkResult(pDef->SetDescription(sDescription1));
+	checkResult(pDictionary->RegisterInterpolationDefinition(pInterpolationDef));
 	pDef->Release();
 	pDef = NULL;
 	pInterpolationDef->Release();
 	pInterpolationDef = NULL;
-	checkResult(defs.cdInterpolationDefinition()->
-				CreateInstance(IID_IAAFInterpolationDef, 
-							   (IUnknown **)&pInterpolationDef));
+	checkResult(pDictionary->CreateInstance(&AUID_AAFInterpolationDefinition,
+							  IID_IAAFInterpolationDef, 
+							  (IUnknown **)&pInterpolationDef));
     
 	checkResult(pInterpolationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-	checkResult(pInterpolationDef->Initialize(InterpDef2, sName2, sDescription2));
+	checkResult(pDef->SetName(sName2));
+	checkResult(pDef->SetDescription(sDescription2));
 
-	checkResult(pDictionary->RegisterInterpolationDef(pInterpolationDef));
+	checkResult(pDictionary->RegisterInterpolationDefinition(pInterpolationDef));
   }
   catch (HRESULT& rResult)
   {
@@ -225,12 +200,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetInterpolationDefs(&pPlug));
+		checkResult(pDictionary->GetInterpolationDefinitions(&pPlug));
 		/* Read and check the first element */
 		checkResult(pPlug->NextOne(&pInterpolationDef));
 		checkResult(pInterpolationDef->QueryInterface (IID_IAAFDefObject,
@@ -353,26 +328,20 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFInterpolationDefs_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFInterpolationDefs_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFInterpolationDefs_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFInterpolateDefsTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(pFileName);
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFInterpolationDefs_test..."
-			 << "Caught general C++ exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CEnumAAFInterpolationDefs_test...Caught general C++ exception!" << endl; 
 	}
 	return hr;
 }

@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFPulldown
+// @com This file implements the module test for CEnumAAFSegments
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -8,21 +8,15 @@
 *                                          *
 \******************************************/
 
-
-
 #include "AAF.h"
 
-#include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
-#include "AAFDefUIDs.h"
-
-
 #include <iostream.h>
 #include <stdio.h>
 
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_AAFPulldown; // generated
+#include "AAFStoredObjectIDs.h"
+#include "AAFDefUIDs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -50,7 +44,6 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 
-
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
 						   // IAAFSession**		ppSession,
@@ -61,7 +54,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFPulldown Test";
+	ProductInfo.productName = L"EnumAAFSegments Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -120,7 +113,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceClip*		pSourceClip = NULL;
 	IAAFFiller*			pFiller = NULL;
 	IAAFSegment*		pSegment = NULL;
-	IAAFPulldown*		pPulldown = NULL;
+	IAAFSelector*		pSelector = NULL;
 	IAAFCompositionMob*	pCompMob = NULL;
 	aafUID_t			NewMobID, referencedMobID;
 	aafInt32			fadeInLen  = 1000;
@@ -152,10 +145,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
 		checkResult(pReferencedMob->SetMobID(&referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
-		checkResult(pHeader->AppendMob(pReferencedMob));
 		pReferencedMob->Release();
 		pReferencedMob = NULL;
-
 		// Create a Composition Mob
 		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
 											  IID_IAAFCompositionMob, 
@@ -165,7 +156,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
 		checkResult(pMob->SetMobID(&NewMobID));
-		checkResult(pMob->SetName(L"AAFPulldownTest"));
+		checkResult(pMob->SetName(L"AAFSelectorTest"));
 	  
 		// Create a Source clip 
  		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
@@ -187,23 +178,23 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	    checkResult(pFiller->Initialize( &fillerUID, fillerLength));
 
 		// Now create a selector 
-	    checkResult(pDictionary->CreateInstance(&AUID_AAFPulldown,
-												IID_IAAFPulldown, 
-												(IUnknown **)&pPulldown));
+	    checkResult(pDictionary->CreateInstance(&AUID_AAFSelector,
+												IID_IAAFSelector, 
+												(IUnknown **)&pSelector));
 
 		// Get a segment interface from the source clip
 		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
 		// -----------------------------------------------------------------
 		// Set all properties on the Selector
 		//	Set the selected segment on the Selector
-		checkResult(pPulldown->SetInputSegment(pSegment));
-		checkResult(pPulldown->SetPulldownKind(kAAFTwoThreePD));
-		checkResult(pPulldown->SetPulldownDirection(kAAFTapeToFilmSpeed));
-		checkResult(pPulldown->SetPhaseFrame(0));
-
+		checkResult(pSelector->SetSelectedSegment(pSegment));
 		// Release the intreface so we can reuse the pointer
 		pSegment->Release();
-		checkResult(pPulldown->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
+		checkResult(pFiller->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
+		checkResult(pSelector->AppendAlternateSegment(pSegment));
+		// Release the intreface so we can reuse the pointer
+		pSegment->Release();
+		checkResult(pSelector->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 	    // append the Selector to the MOB tree
 		checkResult(pMob->AppendNewSlot(pSegment, 1, L"SelectorSlot", &pMobSlot)); 
 		
@@ -229,8 +220,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pSegment)
 		pSegment->Release();
 
-	if (pPulldown)
-		pPulldown->Release();
+	if (pSelector)
+		pSelector->Release();
 
 	if (pCompMob)
 		pCompMob->Release();
@@ -254,7 +245,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-static HRESULT ReadAAFFile(aafWChar* pFileName)
+static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
 	IAAFFile*			pFile = NULL;
 	IAAFHeader*			pHeader = NULL;
@@ -264,17 +255,19 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFMobSlot*		pSlot = NULL;
 	IAAFCompositionMob*	pCompMob = NULL;
 	IAAFSegment*		pSegment = NULL;
+	IAAFSegment*		pSelSegment = NULL;
+	IAAFSegment*		pAltSegment = NULL;
 	IAAFFiller*			pFiller = NULL;
-	IAAFPulldown*		pPulldown = NULL;
+	IAAFSelector*		pSelector = NULL;
 	IAAFSourceClip*		pSourceClip = NULL;
+	IEnumAAFSegments*	pAlternateSegIter = NULL;
 
 	aafNumSlots_t		numMobs;
+	aafInt32			numAlternateSegs;
 
 	aafSearchCrit_t		criteria;
 	HRESULT				hr = AAFRESULT_SUCCESS;
-	aafPulldownKind_t	readPulldownKind;
-	aafPulldownDir_t	readDir;
-	aafPhaseFrame_t		readPhase;
+
 
 	try
 	{
@@ -302,28 +295,40 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			{
 				checkResult(pSlot->GetSegment(&pSegment));
 				// See if it is a Selector
-				checkResult(pSegment->QueryInterface(IID_IAAFPulldown, (void **) &pPulldown));
-				pSegment->Release();
-				pSegment = NULL;
+				checkResult(pSegment->QueryInterface(IID_IAAFSelector, (void **) &pSelector));
 
-				// -----------------------------------------------------------				
-				// Enumerate slots
-				checkResult(pPulldown->GetInputSegment(&pSegment));
-				checkResult(pSegment->QueryInterface(IID_IAAFSourceClip, (void **)&pSourceClip));
+				// -----------------------------------------------------------
+				// Get Selector Properties
+				checkResult(pSelector->GetNumAlternateSegments(&numAlternateSegs));
+				checkExpression(1 == numAlternateSegs, AAFRESULT_TEST_FAILED);
+
+				checkResult(pSelector->GetSelectedSegment(&pSelSegment));
+				// Make sure it is a Source clip
+				checkResult(pSelSegment->QueryInterface(IID_IAAFSourceClip, (void **)&pSourceClip));
+				
+				// Enumerate alternates
+				checkResult(pSelector->EnumAlternateSegments(&pAlternateSegIter));
+				while (pAlternateSegIter && pAlternateSegIter->NextOne(&pAltSegment) == AAFRESULT_SUCCESS)
+				{
+					// Make sure Alternate segment is a filler
+					checkResult(pAltSegment->QueryInterface(IID_IAAFFiller, (void **)&pFiller));
+					pFiller->Release();
+					pFiller = NULL;
+				}
+				pAlternateSegIter->Release();
+				pAlternateSegIter = NULL;
+
 				pSourceClip->Release();
 				pSourceClip = NULL;
-				checkResult(pPulldown->GetPulldownKind(&readPulldownKind));
-				checkExpression(kAAFTwoThreePD == readPulldownKind, AAFRESULT_TEST_FAILED);
-				checkResult(pPulldown->GetPulldownDirection(&readDir));
-				checkExpression(kAAFTapeToFilmSpeed == readDir, AAFRESULT_TEST_FAILED);
-				checkResult(pPulldown->GetPhaseFrame(&readPhase));
-				checkExpression(0 == readPhase, AAFRESULT_TEST_FAILED);
 
-				pPulldown->Release();
-				pPulldown = NULL;
+				pSelSegment->Release();
+				pSelSegment = NULL;
 
 				pSegment->Release();
 				pSegment = NULL;
+
+				pSelector->Release();
+				pSelector = NULL;
 
 				pSlot->Release();
 				pSlot = NULL;
@@ -350,6 +355,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pSegment)
 		pSegment->Release();
 
+	if (pSelSegment)
+		pSelSegment->Release();
+
+	if (pAltSegment)
+		pAltSegment->Release();
+
 	if (pSlot)
 		pSlot->Release();
 
@@ -361,6 +372,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 	if (pMobIter)
 		pMobIter->Release();
+
+	if (pAlternateSegIter)
+		pAlternateSegIter->Release();
 
 	if (pFiller)
 		pFiller->Release();
@@ -377,31 +391,38 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	return 	hr;
 }
 
-extern "C" HRESULT CAAFPulldown_test()
+extern "C" HRESULT CEnumAAFSegments_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"AAFPulldownTest.aaf";
+ 	aafWChar * pFileName = L"EnumAAFSegmentsTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
-		if (SUCCEEDED(hr))
-		
-			hr = ReadAAFFile(pFileName);
+		hr = CreateAAFFile(	pFileName );
+		if(hr == AAFRESULT_SUCCESS)
+			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
-		cerr << "CAAFPulldown_test...Caught general C++ exception!" << endl; 
+	  cerr << "CEnumAAFSegments_test...Caught general C++"
+		" exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
 	}
 
-	// When all of the functionality of this class is tested, we can return success.
-	// When a method and its unit test have been implemented, remove it from the list.
-//	if (SUCCEEDED(hr))
-//	{
-//		cout << "The following AAFPulldown tests have not been implemented:" << endl; 
-//		cout << "     GetPhaseFrame" << endl; 
-//		cout << "     SetPhaseFrame" << endl; 
-//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-//	}
 	return hr;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

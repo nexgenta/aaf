@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFEventMobSlot_h__
 #include "ImplAAFEventMobSlot.h"
@@ -40,17 +26,16 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "AAFUtils.h"
+#include "aafUtils.h"
+
+
 
 #include <assert.h>
 #include <string.h>
 
-#include "ImplAAFSmartPointer.h"
-typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
-
 
 ImplAAFEventMobSlot::ImplAAFEventMobSlot ():
-  _editRate(PID_EventMobSlot_EditRate,	L"EditRate")
+  _editRate(PID_EventMobSlot_EditRate,	"EditRate")
 {
   _persistentProperties.put(_editRate.address());
 }
@@ -96,7 +81,7 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
   ImplAAFEvent *pEvent = NULL;
   ImplAAFComponent *pComponent = NULL;
   ImplAAFDictionary *pDict = NULL;
-  ImplAAFDataDefSP pComponentDataDef;
+  ImplAAFDataDef *pDef = NULL;
   aafBool	willConvert;
 
   if (NULL == pSegment)
@@ -121,17 +106,16 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
     pSequence = dynamic_cast<ImplAAFSequence *>(pSegment);
     if (NULL != pSequence)
     {
-      aafUInt32 i;
-	  aafUInt32 numberOfComponents = 0;
+      aafUID_t sequDataDef, componentDataDef;
+      aafInt32 i, numberOfComponents = 0;
       aafPosition_t previousPosition;
       
       
       // Save the sequences data definition guid.
-	  ImplAAFDataDefSP pSequDataDef;
-      CHECK(pSequence->GetDataDef(&pSequDataDef));
+      CHECK(pSequence->GetDataDef(&sequDataDef));
 
       // There must be at least one component in the sequence.
-      CHECK(pSequence->CountComponents(&numberOfComponents));
+      CHECK(pSequence->GetNumComponents(&numberOfComponents));
       if (0 >= numberOfComponents)
         RAISE(AAFRESULT_OBJECT_SEMANTIC);
 
@@ -140,10 +124,17 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
       CHECK(pSequence->GetNthComponent(0, &pComponent));
       
       // The component must have the same data definition [id] as the sequence.
-      CHECK(pComponent->GetDataDef(&pComponentDataDef));
-	  CHECK(pComponentDataDef->DoesDataDefConvertTo(pSequDataDef,
-													&willConvert));
-	  if (willConvert == kAAFFalse)
+      CHECK(pComponent->GetDataDef(&componentDataDef));
+ 
+	  CHECK(GetDictionary(&pDict));
+	  CHECK(pDict->LookupDataDefintion(&componentDataDef, &pDef));
+	  pDict->ReleaseReference();
+	  pDict = NULL;
+	  CHECK(pDef->DoesDataDefConvertTo(&sequDataDef, &willConvert));
+	  pDef->ReleaseReference();
+	  pDef = NULL;
+
+	  if (willConvert == AAFFalse)
 		  RAISE(AAFRESULT_OBJECT_SEMANTIC);
 
       // Get the runtime type info for validation.
@@ -171,9 +162,15 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
 
         // The component must have the same data definition [id] as the
         // sequence.
-		CHECK(pComponentDataDef->DoesDataDefConvertTo(pSequDataDef,
-													  &willConvert));
-		if (willConvert == kAAFFalse)
+		CHECK(GetDictionary(&pDict));
+		CHECK(pDict->LookupDataDefintion(&componentDataDef, &pDef));
+		pDict->ReleaseReference();
+		pDict = NULL;
+		CHECK(pDef->DoesDataDefConvertTo(&sequDataDef, &willConvert));
+		pDef->ReleaseReference();
+		pDef = NULL;
+
+		if (willConvert == AAFFalse)
 			RAISE(AAFRESULT_INVALID_DATADEF);
 
         // Validate that this event is the "same" type of event as the
@@ -217,12 +214,18 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
   {
     if (NULL != pComponent)
       pComponent->ReleaseReference();
-	pComponent = 0;
     if (NULL != pDict)
       pDict->ReleaseReference();
-	pDict = 0;
+    if (NULL != pDef)
+      pDef->ReleaseReference();
   }
   XEND;
 
   return(AAFRESULT_SUCCESS);
 }
+
+
+
+OMDEFINE_STORABLE(ImplAAFEventMobSlot, AUID_AAFEventMobSlot);
+
+

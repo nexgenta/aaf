@@ -1,24 +1,10 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefVariableArray\
 #endm
@@ -28,23 +14,22 @@ AAFTypeDef\
 #endm
 #c
 #import ./AAFTypeDef.exp
-#import ./AAFTypeDefVariableArrayEx.exp
 AD_HEAD
 AD_IDL(//
 // This interface is used to define variably-sized Array types used in
 // AAF persistent objects.
-AD_STD_COMMENT_IFC_HEADER)
+AD_STD_COMMENT_IFC_HEADER
+AD_STD_COMMENT_IFC_STUB)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
-AD_FORWARD_DECLARATION(EnumAAFPropertyValues)
 AD_CLASS_UUID(307e9e65, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(307e9e66, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
-AD_COM_EXT_CLASS_BEGIN(public IAAFTypeDefVariableArrayEx)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD3(Initialize,
-			[in\, ref],
+			[in],
 			objPass,
-			aafUID_constref,
-			id,
+			aafUID_t *,
+			pID,
 			auid to be used to identify this type,
 
 			[in],
@@ -55,35 +40,21 @@ AD_XMETHOD3(Initialize,
 
 			[in],
 			objPass,
-			aafCharacter_constptr,
+			aafCharacter *,
 			pTypeName,
 			friendly name of this type definition,
 
      Initializes this type def to contain elements of the given type.
-  // Note that it is only possible to use certain types as the element
-  // type.  Those permissible types include:
-  // - AAFTypeDefInt
-  // - AAFTypeDefRecord
-  // - AAFTypeDefEnum
-  // - AAFTypeDefExtEnum
-  // - AAFTypeDefFixedArray
-  // - AAFTypeDefObjectRef
   //
   // This method must be called after allocation\, and before
   // any other method can be called.
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
-  // - pID is a valid pointer.
   // - pTypeDef is a valid pointer.
-  // - pTypeName is a valid pointer.
-  // - element type is permissible for use in a VariableArray.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pTypeDef or pTypeName\)
-  //
-  // AAFRESULT_BAD_TYPE
-  //   - an illegal element type was given.)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pTypeDef or pTypeName\))
 
 
 AD_XMETHOD1(GetType,
@@ -152,27 +123,6 @@ AD_XMETHOD2(AppendElement,
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pInPropVal or pMemberPropVal\))
 
 
-AD_XMETHOD1(CreateEmptyValue,
-
-			 [out],
-			 objOut,
-			 AAFPropertyValue,
-			 ppPropVal,
-			 newly-created empty property value,
-
-     Creates an empty property value which contains a variable array
-  // type that initially is empty \(that is\, contains no elements
-  // yet\).
-  //
-  // Succeeds if all of the following are true:
-  // - the ppPropVal pointer is valid.
-  //
-  // If this method fails nothing will be written to *ppPropVal.
-  AD_STD_COMMENT_METH_ERR_HEADER
-  AD_STD_COMMENT_METH_ERR_NO_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppPropVal\))
-
-
 AD_X2METHOD3(CreateValueFromValues,
 
 			 [in\, size_is\(numElements\)],
@@ -182,7 +132,6 @@ AD_X2METHOD3(CreateValueFromValues,
        array of property values for elements of array value which
     // is to be created.,
 			 numElements,
-			 ,
 
 			 [in],
 			 objPass,
@@ -190,14 +139,12 @@ AD_X2METHOD3(CreateValueFromValues,
 			 numElements,
 			 size of pElementValues array.,
 			 ,
-			 ,
 
 			 [out],
 			 objOut,
 			 AAFPropertyValue,
 			 ppPropVal,
 			 newly-created property value,
-			 ,
 			 ,
 
      Creates a property value which contains a variable array type.
@@ -421,33 +368,4 @@ AD_XMETHOD3(SetCArray,
 
 
 AD_OVERRIDE(.method-GetTypeCategory)
-
-AD_XMETHOD2(GetElements,
-			[in],
-			objIn,
-			AAFPropertyValue,
-			PSetPropVal,
-			property value to read,
-
-			[out],
-			objOut,
-			EnumAAFPropertyValues,
-			ppEnum,
-			enumerator across property values,
-
-     Returns an enumerator across elements in this set.
-  // 
-  // Succeeds if:
-  // - Initialize\(\) has already been called on this object.
-  // - The PSetPropVal pointer is valid.
-  // - The ppEnum pointer is valid.
-  //
-  AD_STD_COMMENT_METH_ERR_HEADER
-  AD_STD_COMMENT_METH_ERR_NO_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either PSetPropVal or ppEnum\))
-
-AD_COM_METH(.method-PrependElement)
-AD_COM_METH(.method-RemoveElement)
-AD_COM_METH(.method-InsertElement)
-
-AD_COM_EXT_CLASS_END(AAFTypeDefVariableArrayEx)
+AD_XCLASS_END(Concrete, StoredObject)

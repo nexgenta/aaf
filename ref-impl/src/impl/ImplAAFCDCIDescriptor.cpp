@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFCDCIDescriptor_h__
 #include "ImplAAFCDCIDescriptor.h"
@@ -32,18 +18,16 @@
 
 
 ImplAAFCDCIDescriptor::ImplAAFCDCIDescriptor ()
-:	_componentWidth(PID_CDCIDescriptor_ComponentWidth,	L"ComponentWidth"),
-	_horizontalSubsampling(PID_CDCIDescriptor_HorizontalSubsampling,	L"HorizontalSubsampling"),
-	_verticalSubsampling(PID_CDCIDescriptor_VerticalSubsampling,	L"VerticalSubsampling"),
-	_colorSiting(PID_CDCIDescriptor_ColorSiting,	L"ColorSiting"),
-	_blackReferenceLevel(PID_CDCIDescriptor_BlackReferenceLevel,	L"BlackReferenceLevel"),
-	_whiteReferenceLevel(PID_CDCIDescriptor_WhiteReferenceLevel,	L"WhiteReferenceLevel"),
-	_colorRange(PID_CDCIDescriptor_ColorRange,	L"ColorRange"),
-	_paddingBits(PID_CDCIDescriptor_PaddingBits,	L"PaddingBits")
+:	_componentWidth(PID_CDCIDescriptor_ComponentWidth,	"ComponentWidth"),
+	_horizontalSubsampling(PID_CDCIDescriptor_HorizontalSubsampling,	"HorizontalSubsampling"),
+	_colorSiting(PID_CDCIDescriptor_ColorSiting,	"ColorSiting"),
+	_blackReferenceLevel(PID_CDCIDescriptor_BlackReferenceLevel,	"BlackReferenceLevel"),
+	_whiteReferenceLevel(PID_CDCIDescriptor_WhiteReferenceLevel,	"WhiteReferenceLevel"),
+	_colorRange(PID_CDCIDescriptor_ColorRange,	"ColorRange"),
+	_paddingBits(PID_CDCIDescriptor_PaddingBits,	"PaddingBits")
 {
 	_persistentProperties.put(_componentWidth.address());
 	_persistentProperties.put(_horizontalSubsampling.address());
-	_persistentProperties.put(_verticalSubsampling.address());
 	_persistentProperties.put(_colorSiting.address());
 	_persistentProperties.put(_blackReferenceLevel.address());
 	_persistentProperties.put(_whiteReferenceLevel.address());
@@ -53,10 +37,9 @@ ImplAAFCDCIDescriptor::ImplAAFCDCIDescriptor ()
 	// Initialize Required properties
 	_componentWidth = 8;	// valid values are 8, 10, and 16 ?
 	_horizontalSubsampling = 1; // valid values are 1 and 2?
-	_verticalSubsampling = 1; // valid values are 1 and 2?
 
 	// Initialize Optional properties
-	_colorSiting = kAAFCoSiting;
+	_colorSiting = kCoSiting;
 	_blackReferenceLevel = 0;
 	_whiteReferenceLevel = 255;
 	_colorRange = 255;
@@ -96,38 +79,18 @@ ImplAAFCDCIDescriptor::Initialize ()
 }
 
 
-
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCDCIDescriptor::SetHorizontalSubsampling (aafUInt32 HorizontalSubsampling)
 {
 	AAFRESULT	hr;
+
+  AAFRESULT stat = AAFRESULT_INTERNAL_ERROR;
 
 	switch (HorizontalSubsampling)
 	{
 	case 1:
 	case 2:
 		_horizontalSubsampling = HorizontalSubsampling;
-		hr = AAFRESULT_SUCCESS;
-		break;
-
-	default:
-		hr = AAFRESULT_BAD_PROP;
-	}
-
-	return hr;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCDCIDescriptor::SetVerticalSubsampling (aafUInt32 VerticalSubsampling)
-{
-	AAFRESULT	hr;
-
-	switch (VerticalSubsampling)
-	{
-	case 1:
-	case 2:
-		_verticalSubsampling = VerticalSubsampling;
 		hr = AAFRESULT_SUCCESS;
 		break;
 
@@ -207,17 +170,6 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCDCIDescriptor::GetVerticalSubsampling (aafUInt32* pVerticalSubsampling)
-{
-	if (pVerticalSubsampling == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	*pVerticalSubsampling = _verticalSubsampling;
-
-	return AAFRESULT_SUCCESS;
-}
-
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCDCIDescriptor::GetColorSiting (aafColorSiting_t* pColorSiting)
@@ -292,3 +244,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	return AAFRESULT_SUCCESS;
 }
+
+
+
+OMDEFINE_STORABLE(ImplAAFCDCIDescriptor, AUID_AAFCDCIDescriptor);

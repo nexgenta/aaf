@@ -1,29 +1,12 @@
-
-#if(0)
-
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTextClip
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 
 #include "AAF.h"
 
@@ -36,8 +19,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 
 // Cross-platform utility to delete a file.
@@ -85,7 +66,7 @@ private:
   bool _bWritableFile;
   IAAFHeader *_pHeader;
   IAAFDictionary *_pDictionary;
-  aafMobID_t _referencedMobID; // save id for validation in the open test...
+  aafUID_t _referencedMobID; // save id for validation in the open test...
 };
 
 
@@ -96,15 +77,13 @@ extern "C" HRESULT CAAFTextClip_test()
   aafWChar * pFileName = L"AAFTextClipTest.aaf";
 
   // Initialize the product info for this module test
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFTextClip Test";
-  ProductInfo.productVersion = &v;
+  ProductInfo.productVersion.major = 1;
+  ProductInfo.productVersion.minor = 0;
+  ProductInfo.productVersion.tertiary = 0;
+  ProductInfo.productVersion.patchLevel = 0;
+  ProductInfo.productVersion.type = kVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -127,8 +106,7 @@ extern "C" HRESULT CAAFTextClip_test()
   }
   catch (...)
   {
-    cerr << "CAAFTextClip_test..."
-		 << "Caught general C++ exception!" << endl;
+    cerr << "CAAFTextClip_test...Caught general C++ exception!" << endl;
     hr = AAFRESULT_TEST_FAILED;
   }
 
@@ -234,24 +212,22 @@ void TextClipTest::CreateTextClip()
   IAAFCompositionMob *pCompositionMob = NULL;
   IAAFMob *pReferencingMob = NULL;
   IAAFSegment *pSegment = NULL;
-  IAAFTimelineMobSlot *pMobSlot = NULL;
-	IAAFComponent*		pComponent = NULL;
+  IAAFMobSlot *pMobSlot = NULL;
+
 
   try
   {
-	CAAFBuiltinDefs defs (_pDictionary);
-
-	//Make the MOB to be referenced
-	checkResult(defs.cdMasterMob()->
-				CreateInstance(IID_IAAFMasterMob, 
-							   (IUnknown **)&pMasterMob));
+  //Make the MOB to be referenced
+  checkResult(_pDictionary->CreateInstance(&AUID_AAFMasterMob,
+					  IID_IAAFMasterMob, 
+					  (IUnknown **)&pMasterMob));
   
   checkResult(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pReferencedMob));
   checkResult(pReferencedMob->GetMobID(&_referencedMobID));
   checkResult(pReferencedMob->SetName(L"TextClipTest::ReferencedMob"));
 
   // Save the master mob.
-  checkResult(_pHeader->AddMob(pReferencedMob));
+  checkResult(_pHeader->AppendMob(pReferencedMob));
 
   // Use EssenceAccess to write some text essence
     // Create a file mob for the text essence.
@@ -259,14 +235,10 @@ void TextClipTest::CreateTextClip()
     // Write some text essence.
 
 
-  // Create a concrete subclass of TextClip
-  checkResult(defs.cdHTMLClip()->
-			  CreateInstance(IID_IAAFTextClip, 
-							 (IUnknown **)&pTextClip));
-  checkResult(pTextClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-  checkResult(pComponent->SetDataDef(defs.ddPicture()));
-  pComponent->Release();
-  pComponent = NULL;
+  // Create a TextClip
+  checkResult(_pDictionary->CreateInstance(&AUID_AAFTextClip,
+					  IID_IAAFTextClip, 
+					  (IUnknown **)&pTextClip));
 
   // Initialize the source reference data.
   checkResult(pTextClip->QueryInterface(IID_IAAFSourceReference, (void **)&pSourceReference));
@@ -274,26 +246,20 @@ void TextClipTest::CreateTextClip()
   checkResult(pSourceReference->SetSourceMobSlotID(0));
 
   // Create a composition mob to hold the text clip.
-  checkResult(defs.cdCompositionMob()->
-			  CreateInstance(IID_IAAFCompositionMob, 
-							 (IUnknown **)&pCompositionMob));
+  checkResult(_pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+					  IID_IAAFCompositionMob, 
+					  (IUnknown **)&pCompositionMob));
   checkResult(pCompositionMob->QueryInterface(IID_IAAFMob, (void **)&pReferencingMob));
   checkResult(pReferencingMob->SetName(L"CompositionMob_TextClipTest"));
  
   
   checkResult(pTextClip->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
   IAAFMobSlot *pSlot = NULL;
-  aafRational_t editRate = { 0, 1};
-  checkResult(pReferencingMob->AppendNewTimelineSlot(editRate,
-													 pSegment,
-													 1,
-													 L"TextClipTest",
-													 0,
-													 &pMobSlot));
+  checkResult(pReferencingMob->AppendNewSlot(pSegment, 1, L"TextClipTest", &pMobSlot));
 
 
   // Save the referencing mob.
-  checkResult(_pHeader->AddMob(pReferencingMob));
+  checkResult(_pHeader->AppendMob(pReferencingMob));
   }
   catch (HRESULT& rHR)
   {
@@ -312,12 +278,6 @@ void TextClipTest::CreateTextClip()
   {
     pSegment->Release();
     pSegment = NULL;
-  }
-
-  if (pComponent)
-  {
-    pComponent->Release();
-    pComponent = NULL;
   }
 
   if (pReferencingMob)
@@ -367,17 +327,17 @@ void TextClipTest::OpenTextClip()
   assert(_pHeader);
 
   HRESULT hr = S_OK;
-  aafNumSlots_t compositionMobs = 0;
+  aafInt32 compositionMobs = 0;
   IEnumAAFMobs *pEnumMobs = NULL;
   IAAFMob *pReferencingMob = NULL;
   IAAFCompositionMob *pCompositionMob = NULL;
-  aafNumSlots_t mobSlots = 0;
+  aafInt32 mobSlots = 0;
   IEnumAAFMobSlots *pEnumSlots = NULL;
   IAAFMobSlot *pMobSlot = NULL;
   IAAFSegment *pSegment = NULL;
   IAAFTextClip *pTextClip = NULL;
   IAAFSourceReference *pSourceReference = NULL;
-  aafMobID_t masterMobID = {0};
+  aafUID_t masterMobID = {0};
   IAAFMasterMob *pMasterMob = NULL;
   IAAFMob *pReferencedMob = NULL;
 
@@ -385,21 +345,21 @@ void TextClipTest::OpenTextClip()
   try
   {
     // Get the number of composition mobs in the file (should be one)
-    checkResult(_pHeader->CountMobs(kAAFCompMob, &compositionMobs));
+    checkResult(_pHeader->GetNumMobs(kCompMob, &compositionMobs));
     checkExpression(1 == compositionMobs, AAFRESULT_TEST_FAILED);
 
     // Get the composition mob. There should only be one.
     aafSearchCrit_t criteria;
-    criteria.searchTag = kAAFByMobKind;
-    criteria.tags.mobKind = kAAFCompMob;
-    checkResult(_pHeader->GetMobs(&criteria, &pEnumMobs));
+    criteria.searchTag = kByMobKind;
+    criteria.tags.mobKind = kCompMob;
+    checkResult(_pHeader->EnumAAFAllMobs(&criteria, &pEnumMobs));
     checkResult(pEnumMobs->NextOne(&pReferencingMob));
     checkResult(pReferencingMob->QueryInterface(IID_IAAFCompositionMob, (void **)&pCompositionMob));
 
     // Get the text clip in the slot. There should be only one.
-    checkResult(pReferencingMob->CountSlots(&mobSlots));
+    checkResult(pReferencingMob->GetNumSlots(&mobSlots));
     checkExpression(1 == mobSlots, AAFRESULT_TEST_FAILED);
-    checkResult(pReferencingMob->GetSlots(&pEnumSlots));
+    checkResult(pReferencingMob->EnumAAFAllMobSlots(&pEnumSlots));
     checkResult(pEnumSlots->NextOne(&pMobSlot));
     checkResult(pMobSlot->GetSegment(&pSegment));
     checkResult(pSegment->QueryInterface(IID_IAAFTextClip, (void **)&pTextClip));
@@ -408,7 +368,7 @@ void TextClipTest::OpenTextClip()
     checkResult(pTextClip->QueryInterface(IID_IAAFSourceReference, (void **)&pSourceReference));  
     checkResult(pSourceReference->GetSourceID(&masterMobID));
     checkExpression(0 == memcmp(&masterMobID, &_referencedMobID, sizeof(masterMobID)), AAFRESULT_TEST_FAILED);
-    checkResult(_pHeader->LookupMob(masterMobID, &pReferencedMob));
+    checkResult(_pHeader->LookupMob(&masterMobID, &pReferencedMob));
     checkResult(pReferencedMob->QueryInterface(IID_IAAFMasterMob, (void **)&pMasterMob));
 
     
@@ -487,5 +447,3 @@ void TextClipTest::OpenTextClip()
   // Propogate the error if necessary.
   checkResult(hr);
 }
-
-#endif

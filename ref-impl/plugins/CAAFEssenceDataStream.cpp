@@ -1,31 +1,16 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #include "CAAFEssenceDataStream.h"
 
 #include "AAF.h" // need declaration for IAAFEssenceData.
 
 #include <assert.h>
-#include <string.h>
 #include "AAFResult.h"
 
 const CLSID CLSID_AAFEssenceDataStream = { 0x42A63FE1, 0x968A, 0x11d2, { 0x80, 0x89, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
@@ -60,17 +45,15 @@ CAAFEssenceDataStream::Init(
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::Write (
-    aafUInt32 bytes,
-    aafDataBuffer_t  buffer,
-    aafUInt32  *pBytesWritten)
+    CAAFEssenceDataStream::Write (aafDataBuffer_t  buffer,
+        aafInt32  buflen)
 {
   if (NULL == _data)
     return AAFRESULT_NOT_INITIALIZED;
-  else if (NULL == buffer || NULL == pBytesWritten)
-    return AAFRESULT_NULL_PARAM;
 
-  return(_data->Write (bytes, buffer, pBytesWritten));
+	aafUInt32	written;
+
+	return(_data->Write (buflen, buffer, &written));
 }
 
 
@@ -81,16 +64,13 @@ HRESULT STDMETHODCALLTYPE
 {
   if (NULL == _data)
     return AAFRESULT_NOT_INITIALIZED;
-  else if (NULL == buffer || NULL == bytesRead)
-    return AAFRESULT_NULL_PARAM;
-
 
 	return(_data->Read (buflen, buffer, bytesRead));
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::Seek (aafPosition_t  byteOffset)
+    CAAFEssenceDataStream::Seek (aafInt64  byteOffset)
 {
 	HRESULT		hr = S_OK;
 	aafBool		valid;
@@ -121,11 +101,11 @@ HRESULT STDMETHODCALLTYPE    CAAFEssenceDataStream::SeekRelative (aafInt32  byte
 
   // Get the current position and then just add the given offset 
   // and attempt to set the new position.
-  aafPosition_t pos;
+  aafInt64 pos;
   hr = GetPosition(&pos);
   if (SUCCEEDED(hr))
   {
-    aafPosition_t newPos = pos + byteOffset;
+    aafInt64 newPos = pos + byteOffset;
     hr = Seek(newPos);
   }
 
@@ -134,7 +114,7 @@ HRESULT STDMETHODCALLTYPE    CAAFEssenceDataStream::SeekRelative (aafInt32  byte
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::IsPosValid (aafPosition_t  byteOffset,
+    CAAFEssenceDataStream::IsPosValid (aafInt64  byteOffset,
         aafBool *  isValid)
 {
   if (NULL == _data)
@@ -142,18 +122,18 @@ HRESULT STDMETHODCALLTYPE
   if (NULL == isValid)
     return E_INVALIDARG;
   
-  *isValid = kAAFFalse;
+  *isValid = AAFFalse;
 
   if (0 <= byteOffset)
   {
-    aafLength_t length = 0;
+    aafInt64 length = 0;
     HRESULT hr = GetLength(&length);
     if (AAFRESULT_SUCCESS != hr)
       return hr;
 
     if (byteOffset < length)
     {
-      *isValid = kAAFTrue;
+      *isValid = AAFTrue;
     }
     else if (byteOffset == length)
     {
@@ -161,7 +141,7 @@ HRESULT STDMETHODCALLTYPE
       // we don't know whether or not the next
       // file operation will be a read or a write
       // so we just return true.
-      *isValid = kAAFTrue;
+      *isValid = AAFTrue;
     }
   }
 
@@ -170,7 +150,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::GetPosition (aafPosition_t *  position)
+    CAAFEssenceDataStream::GetPosition (aafInt64 *  position)
 {
   if (NULL == _data)
     return AAFRESULT_NOT_INITIALIZED;
@@ -180,7 +160,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::GetLength (aafLength_t *  position)
+    CAAFEssenceDataStream::GetLength (aafInt64 *  position)
 {
   if (NULL == _data)
     return AAFRESULT_NOT_INITIALIZED;
@@ -202,7 +182,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::SetCacheSize (aafUInt32  itsSize)
+    CAAFEssenceDataStream::SetCacheSize (aafInt32  itsSize)
 {
   return S_OK; //AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -211,10 +191,6 @@ HRESULT STDMETHODCALLTYPE
 //
 // 
 // 
-inline int EQUAL_UID(const GUID & a, const GUID & b)
-{
-  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
-}
 HRESULT CAAFEssenceDataStream::InternalQueryInterface
 (
     REFIID riid,
@@ -226,19 +202,19 @@ HRESULT CAAFEssenceDataStream::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IID_IAAFEssenceDataStream interface 
-    if (EQUAL_UID(riid,IID_IAAFEssenceDataStream)) 
+    if (riid == IID_IAAFEssenceDataStream) 
     { 
         *ppvObj = (IAAFEssenceDataStream *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (EQUAL_UID(riid,IID_IAAFEssenceStream)) 
+    else if (riid == IID_IAAFEssenceStream) 
     { 
         *ppvObj = (IAAFEssenceStream *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
+    else if (riid == IID_IAAFPlugin) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
@@ -252,4 +228,16 @@ HRESULT CAAFEssenceDataStream::InternalQueryInterface
 //
 // Define the contrete object support implementation.
 // 
-AAF_DEFINE_FACTORY(AAFEssenceDataStream)
+//
+// Define the contrete object support implementation.
+// 
+HRESULT CAAFEssenceDataStream::COMCreate(IUnknown *pUnkOuter, void **ppvObjOut)
+{
+	*ppvObjOut = NULL;
+ 	CAAFEssenceDataStream *pAAFEssenceDataStream = new CAAFEssenceDataStream(pUnkOuter);
+ 	if (NULL == pAAFEssenceDataStream)
+ 		return E_OUTOFMEMORY;
+ 	*ppvObjOut = static_cast<IAAFEssenceStream *>(pAAFEssenceDataStream);
+ 	((IUnknown *)(*ppvObjOut))->AddRef();
+ 	return S_OK;
+ }

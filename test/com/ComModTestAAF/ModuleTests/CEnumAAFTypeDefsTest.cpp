@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFFindSourceInfo
+// @com This file implements the module test for CEnumAAFTypeDefs
 /***********************************************\
 *                                               *
 * Advanced Authoring Format                     *
@@ -16,10 +16,12 @@
 *                                          *
 \******************************************/
 
- 
+
 /***********************************************\
 *	Stub only.   Implementation not yet added	*
 \***********************************************/
+
+
 
 
 
@@ -30,10 +32,21 @@
 #include "AAFResult.h"
 
 
-extern "C" HRESULT CAAFFindSourceInfo_test()
+extern "C" HRESULT CEnumAAFTypeDefs_test()
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

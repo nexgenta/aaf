@@ -1,59 +1,37 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFEssenceFormat
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFCodecDefs.h"
 #include "AAFContainerDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFEssenceFormats.h"
 
-#include "CAAFBuiltinDefs.h"
-
 #define	MobName			L"MasterMOBTest"
 //#define	NumMobSlots		3
 
 //static aafWChar* Manufacturer = L"Sony";
 //static aafWChar* Model = L"MyModel";
-//static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
-//static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
-//static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
+//static aafTapeCaseType_t FormFactor = kVHSVideoTape;
+//static aafVideoSignalType_t VideoSignalType = kPALSignal;
+//static aafTapeFormatType_t TapeFormat = kVHSFormat;
 //static aafLength_t TapeLength = 3200 ;
 
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xafc51ab6, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
+static GUID		NewMobID;	// NOTE: this should really be aafUID_t, but problems w/ IsEqualGUID()
 //#define TAPE_MOB_OFFSET	10
 //#define TAPE_MOB_LENGTH	60
 //#define TAPE_MOB_NAME	L"A Tape Mob"
@@ -91,15 +69,13 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFEssenceFormat Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -108,11 +84,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
+	case kMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 		
-	case kAAFMediaOpenAppend:
+	case kMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 		
@@ -165,34 +141,28 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
-				
+		
+		
 		// Create a Master Mob
-		checkResult(defs.cdMasterMob()->
-					CreateInstance(IID_IAAFMob, 
-								   (IUnknown **)&pMob));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
+			IID_IAAFMob, 
+			(IUnknown **)&pMob));
 		
 		// Set the IAAFMob properties
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&NewMobID));
+		checkResult(pMob->SetMobID((aafUID_t *)&NewMobID));
 		checkResult(pMob->SetName(MobName));
 		
 		checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
 		// Add the master mob to the file BEFORE creating the essence
-		checkResult(pHeader->AddMob(pMob));
-		checkResult(pMasterMob->CreateEssence (1,
-											   defs.ddSound(),
-											   kAAFCodecWAVE,
-											   rate,
-											   rate,
-											   kAAFCompressionDisable,
-											   NULL,
-											   ContainerAAF,
-											   &pAccess));
+		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pMasterMob->CreateEssence (1, DDEF_Sound, CodecWave, rate, rate,
+												kSDKCompressionDisable, NULL, ContainerAAF, &pAccess));
 		
 		// Fianlly! Get an essence format to test
 		checkResult(pAccess->GetEmptyFileFormat(&pFormat));
@@ -327,6 +297,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader*		pHeader = NULL;
+	IAAFMob*		pMob = NULL;
+	IAAFMasterMob*		pMasterMob = NULL;
 	HRESULT			hr = S_OK;
 	
 	
@@ -334,7 +306,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 		
 	}
@@ -358,27 +330,20 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
 
 
-extern "C" HRESULT CAAFEssenceFormat_test(testMode_t mode);
-extern "C" HRESULT CAAFEssenceFormat_test(testMode_t mode)
+extern "C" HRESULT CAAFEssenceFormat_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFEssenceFormatTest.aaf";
 	
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
-			
+		hr = CreateAAFFile(pFileName);
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFEssenceFormat_test..."
-			 << "Caught general C++ exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CAAFEssenceFormat_test...Caught general C++ exception!" << endl; 
 	}
 	
 	// When all of the functionality of this class is tested, we can return success.

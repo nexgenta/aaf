@@ -1,26 +1,12 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFNetworkLocator
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 
@@ -29,21 +15,13 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 #define TEST_PATH	L"AnotherFile.aaf"
 
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xe4b74fbe, 0x0403, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -84,19 +62,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
 	IAAFEssenceDescriptor *edesc = NULL;
-	aafUInt32					numLocators;
+	aafUID_t					newUID;
+	aafInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
+	aafRational_t	audioRate = { 44100, 1 };
 
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFNetworkLocator Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -104,54 +82,46 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	try
 	{
-	    // Remove the previous test file if any.
-	    RemoveTestFile(pFileName);
+    // Remove the previous test file if any.
+    RemoveTestFile(pFileName);
 
 
-		// Create the file.
+    // Create the file.
 		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
  
-		// We can't really do anthing in AAF without the header.
+    // We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 
-		// Get the AAF Dictionary so that we can create valid AAF objects.
-		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
+    // Get the AAF Dictionary so that we can create valid AAF objects.
+    checkResult(pHeader->GetDictionary(&pDictionary));
  		
-		//Make the first mob
+	  //Make the first mob
 		// Create a Mob
-		checkResult(defs.cdSourceMob()->
-					CreateInstance(IID_IAAFSourceMob, 
-								   (IUnknown **)&pSourceMob));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
+								IID_IAAFSourceMob, 
+								(IUnknown **)&pSourceMob));
 
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&newUID));
+		checkResult(pMob->SetMobID(&newUID));
 		checkResult(pMob->SetName(L"SourceMOBTest"));
 		
-		// Create a concrete subclass of EssenceDescriptor
-		checkResult(defs.cdAIFCDescriptor()->
-					CreateInstance(IID_IAAFEssenceDescriptor, 
-								   (IUnknown **)&edesc));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFEssenceDescriptor,
+								IID_IAAFEssenceDescriptor, 
+								(IUnknown **)&edesc));
 										
-
-		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
-		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-		pAIFCDesc->Release();
-		pAIFCDesc = NULL;
-
  		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
 			// Verify that there are no locators
-		checkResult(edesc->CountLocators(&numLocators));
+		checkResult(edesc->GetNumLocators(&numLocators));
 		checkExpression(0 == numLocators, AAFRESULT_TEST_FAILED);
 
   
 		// Make a locator, and attach it to the EssenceDescriptor
-		checkResult(defs.cdNetworkLocator()->
-					CreateInstance(IID_IAAFNetworkLocator, 
-								   (IUnknown **)&pNetLocator));		
+		checkResult(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+								IID_IAAFNetworkLocator, 
+								(IUnknown **)&pNetLocator));		
 		checkResult(pNetLocator->QueryInterface (IID_IAAFLocator, (void **)&pLocator));
 
 		checkResult(pLocator->SetPath (TEST_PATH));
@@ -160,11 +130,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 		// Verify that there is now one locator
-		checkResult(edesc->CountLocators(&numLocators));
+		checkResult(edesc->GetNumLocators(&numLocators));
 		checkExpression(1 == numLocators, AAFRESULT_TEST_FAILED);
 
 		// Add the source mob into the tree
-		checkResult(pHeader->AddMob(pMob));
+		checkResult(pHeader->AppendMob(pMob));
 
 	}
   catch (HRESULT& rResult)
@@ -224,13 +194,22 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFLocator	*				pLocator = NULL;
 	IEnumAAFMobs *mobIter = NULL;
 	IAAFMob			*aMob = NULL;
-	aafUInt32					numLocators;
-	aafUInt32					readLen;
+	aafInt32					numLocators, readLen;
+	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafWChar					readBuf[1024];
 	bool bFileOpen = false;
 
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"AAFNetworkLocator. NOT!";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.platform = NULL;
 
 	try
 	{	  
@@ -240,19 +219,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
 		if (1 != numMobs )
 			checkResult(AAFRESULT_TEST_FAILED);
 
 
 	//!!!	aafSearchCrit_t		criteria;
-	//!!!	criteria.searchTag = kAAFNoSearch;
+	//!!!	criteria.searchTag = kNoSearch;
 
-		checkResult(pHeader->GetMobs (NULL, &mobIter));
+		checkResult(pHeader->EnumAAFAllMobs (NULL, &mobIter));
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500];
-			aafMobID_t		mobID;
+			aafUID_t		mobID;
 
 			checkResult(mobIter->NextOne (&aMob));
 			checkResult(aMob->GetName (name, sizeof(name)));
@@ -262,11 +241,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(pSourceMob->GetEssenceDescriptor (&pEdesc));
 
 			// Verify that there is now one locator
-			checkResult(pEdesc->CountLocators(&numLocators));
+			checkResult(pEdesc->GetNumLocators(&numLocators));
 			if (1 != numLocators)
 				checkResult(AAFRESULT_TEST_FAILED);
 		
-			checkResult(pEdesc->GetLocators(&pEnum));
+			checkResult(pEdesc->EnumAAFAllLocators(&pEnum));
 
 			// This should read the one real locator
 			checkResult(pEnum->NextOne(&pLocator));
@@ -332,18 +311,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return 	hr;
 }
  
-extern "C" HRESULT CAAFNetworkLocator_test(testMode_t mode);
-extern "C" HRESULT CAAFNetworkLocator_test(testMode_t mode)
+extern "C" HRESULT CAAFNetworkLocator_test()
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
   aafWChar * pFileName = L"AAFNetworkLocatorTest.aaf";
 
   try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
 		hr = ReadAAFFile( pFileName );
@@ -351,8 +326,7 @@ extern "C" HRESULT CAAFNetworkLocator_test(testMode_t mode)
   catch (...)
 	{
 	  cerr << "CAAFNetworkLocator_test...Caught general C++"
-		   << " exception!" << endl; 
-	  hr = AAFRESULT_TEST_FAILED;
+		" exception!" << endl; 
 	}
 
 

@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFTypeDefStream
+// @com This file implements the module test for CEnumAAFPropertyDefs
 /***********************************************\
 *                                               *
 * Advanced Authoring Format                     *
@@ -8,30 +8,16 @@
 *                                               *
 \***********************************************/
 
-
-
-
-
-
 #include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
 
+// Required function prototype.
+extern "C" HRESULT CEnumAAFPropertyDefs_test(void);
 
-extern "C" HRESULT CAAFTypeDefStream_test()
+HRESULT CEnumAAFPropertyDefs_test()
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFSourceReference_h__
 #include "ImplAAFSourceReference.h"
@@ -29,11 +15,11 @@
 
 #include <assert.h>
 #include "AAFResult.h"
-#include "AAFUtils.h"
+#include "aafUtils.h"
 
 ImplAAFSourceReference::ImplAAFSourceReference ():
-	_sourceID(			PID_SourceReference_SourceID,		L"SourceID"),
-	_sourceMobSlotId(	PID_SourceReference_SourceMobSlotID,	L"SourceMobSlotID")
+	_sourceID(			PID_SourceReference_SourceID,		"SourceID"),
+	_sourceMobSlotId(	PID_SourceReference_SourceMobSlotID,	"SourceMobSlotID")
 {
 	_persistentProperties.put(		_sourceID.address());
 	_persistentProperties.put(		_sourceMobSlotId.address());
@@ -45,7 +31,7 @@ ImplAAFSourceReference::~ImplAAFSourceReference ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceReference::GetSourceID (aafMobID_t*	pSourceID)
+    ImplAAFSourceReference::GetSourceID (aafUID_t*	pSourceID)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	if (pSourceID == NULL)
@@ -66,7 +52,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceReference::SetSourceID (aafMobID_constref	sourceID)
+    ImplAAFSourceReference::SetSourceID (aafUID_t	sourceID)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
@@ -104,16 +90,16 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-AAFRESULT ImplAAFSourceReference::ChangeContainedReferences(aafMobID_constref from,
-															aafMobID_constref to)
+AAFRESULT ImplAAFSourceReference::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
 {
-	aafMobID_t			myID = _sourceID;
+	aafUID_t			myID;
 
-	if(memcmp(&myID, &from, sizeof(aafMobID_t)) == 0)
-		SetSourceID(to);
+	if(EqualAUID(&myID, from))
+		SetSourceID(*to);
 
 	return AAFRESULT_SUCCESS;
 }
 
 
+OMDEFINE_STORABLE(ImplAAFSourceReference, AUID_AAFSourceReference);
 

@@ -1,52 +1,29 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTapeDescriptor
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
-static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
-static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
-static aafUInt32 TapeLength = 3200 ;
+static aafTapeCaseType_t FormFactor = kVHSVideoTape;
+static aafVideoSignalType_t VideoSignalType = kPALSignal;
+static aafTapeFormatType_t TapeFormat = kVHSFormat;
+static aafLength_t TapeLength = 3200 ;
 
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x37c13606, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -87,51 +64,50 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 
 	aafProductIdentification_t	ProductInfo;
+	aafUID_t					newUID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTapeDescriptor Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
-	// Remove the previous test file if any.
-	RemoveTestFile(pFileName);
+  // Remove the previous test file if any.
+  RemoveTestFile(pFileName);
 
-	hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile);
+  hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile);
 
 	if (AAFRESULT_SUCCESS == hr)
 	{
 		hr = pFile->GetHeader(&pHeader);
 		if (AAFRESULT_SUCCESS == hr)
 		{
-		  hr = pHeader->GetDictionary(&pDictionary);
-		  if (AAFRESULT_SUCCESS == hr)
+      hr = pHeader->GetDictionary(&pDictionary);
+			if (AAFRESULT_SUCCESS == hr)
 			{
 				// Create a source mob
 
-			  CAAFBuiltinDefs defs (pDictionary);
-				hr = defs.cdSourceMob()->
-				  CreateInstance(IID_IAAFSourceMob, 
-								 (IUnknown **)&pSourceMob);
+				hr = pDictionary->CreateInstance(&AUID_AAFSourceMob,
+										IID_IAAFSourceMob, 
+										(IUnknown **)&pSourceMob);
 				if (AAFRESULT_SUCCESS == hr)
 				{
 					hr = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
 					if (AAFRESULT_SUCCESS == hr)
 					{
-						pMob->SetMobID(TEST_MobID);
+						CoCreateGuid((GUID *)&newUID);
+						pMob->SetMobID(&newUID);
 						pMob->SetName(L"TapeDescriptorTest");
-						hr = defs.cdTapeDescriptor()->
-						  CreateInstance(IID_IAAFTapeDescriptor, 
-										 (IUnknown **)&pTapeDesc);		
+						hr = pDictionary->CreateInstance(&AUID_AAFTapeDescriptor,
+												IID_IAAFTapeDescriptor, 
+												(IUnknown **)&pTapeDesc);		
  						if (AAFRESULT_SUCCESS == hr)
 						{
 							hr = pTapeDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc);
@@ -169,7 +145,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 						// Add the MOB to the file
 						if (AAFRESULT_SUCCESS == hr)
-							hr = pHeader->AddMob(pMob);
+							hr = pHeader->AppendMob(pMob);
 
 						pMob->Release();
 						pMob = NULL;
@@ -207,6 +183,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 
+	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs;
 
 	aafWChar					readManufacturer[256];
@@ -214,24 +191,34 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafTapeCaseType_t			readFormFactor;
 	aafVideoSignalType_t		readVideoSignalType;
 	aafTapeFormatType_t			readTapeFormat;
-	aafUInt32					readTapeLength ;
-	aafUInt32					length;
+	aafLength_t					readTapeLength ;
+	aafInt32					length;
 
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
+	ProductInfo.companyName = L"AAF Developers Desk";
+	ProductInfo.productName = L"AAFTapeDescriptor Test";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.platform = NULL;
+
+  hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
 
 	if (AAFRESULT_SUCCESS == hr)
 	{
 		hr = pFile->GetHeader(&pHeader);
 		if (AAFRESULT_SUCCESS == hr)
 		{
-			hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
+			hr = pHeader->GetNumMobs(kAllMob, &numMobs);
 			if (AAFRESULT_SUCCESS == hr)
 			{
 				if (1 == numMobs )
 				{
-					hr = pHeader->GetMobs(NULL, &pMobIter);
+					hr = pHeader->EnumAAFAllMobs(NULL, &pMobIter);
 					if (AAFRESULT_SUCCESS == hr)
 					{
 						hr = pMobIter->NextOne(&pMob);
@@ -248,7 +235,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 									hr = pEssDesc->QueryInterface(IID_IAAFTapeDescriptor, (void **) &pTapeDesc);
 									if (AAFRESULT_SUCCESS == hr)
 									{
-										hr = pTapeDesc->GetTapeManufacturerBufLen(&length);
+										hr = pTapeDesc->GetTapeManBufLen(&length);
 										if (AAFRESULT_SUCCESS == hr)
 										{
 											hr = pTapeDesc->GetTapeManufacturer(readManufacturer, length);
@@ -314,26 +301,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTapeDescriptor_test(testMode_t mode);
-extern "C" HRESULT CAAFTapeDescriptor_test(testMode_t mode)
+extern "C" HRESULT CAAFTapeDescriptor_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFTapeDescriptorTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile( pFileName );
 		if (hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 		cerr << "CAAFTapeDescriptor_test...Caught general C++"
-			 << " exception!" << endl; 
-		hr = AAFRESULT_TEST_FAILED;
+			" exception!" << endl; 
 	}
 
 	return hr;

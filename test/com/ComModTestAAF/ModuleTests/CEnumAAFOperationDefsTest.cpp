@@ -18,6 +18,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
 // Cross-platform utility to delete a file.
@@ -45,11 +46,13 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-static wchar_t *sName1 = L"Test Descriptor Name1";
-static wchar_t *sDescription1 = L"Test Descriptor Description1";
-static wchar_t *sName2 = L"Test Descriptor Name2";
-static wchar_t *sDescription2 = L"Test Descriptor Description2";
-
+#define TEST_NUM_INPUTS		1
+#define TEST_CATEGORY		L"Test Effects"
+#define TEST_BYPASS			1
+#define TEST_PARAM_NAME		L"A TestEffect parameter"
+#define TEST_PARAM_DESC		L"A longer description of the TestEffect parameter"
+static wchar_t *sName[2] = { L"Test Descriptor Name1", L"Test Descriptor Name2" };
+static wchar_t *sDescription[2] = { L"Test Descriptor Description1", L"Test Descriptor Description2" };
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
@@ -60,7 +63,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFContainerDefs Test";
+	ProductInfo.productName = L"EnumAAFOperationDefs Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -104,9 +107,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader *		pHeader = NULL;
 	IAAFDictionary*		pDictionary = NULL;
 	IAAFDefObject*		pDef = NULL;
-	IAAFContainerDef*	pContainerDef = NULL;
+	IAAFOperationDef*	pOperationDef = NULL;
+	IAAFParameterDef*	pParamDef = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
+	long				n;
+	aafUID_t			testDataDef = DDEF_Picture;
 /*	long				test;
 */
 
@@ -123,31 +129,45 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
     
-	checkResult(pDictionary->CreateInstance(&AUID_AAFContainerDef,
-							  IID_IAAFContainerDef, 
-							  (IUnknown **)&pContainerDef));
-    
-	checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
-                                          (void **)&pDef));
-
-	checkResult(pDef->SetName(sName1));
-	checkResult(pDef->SetDescription(sDescription1));
-	checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
-	pDef->Release();
-	pDef = NULL;
-	pContainerDef->Release();
-	pContainerDef = NULL;
-	checkResult(pDictionary->CreateInstance(&AUID_AAFContainerDef,
-							  IID_IAAFContainerDef, 
-							  (IUnknown **)&pContainerDef));
-    
-	checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
-                                          (void **)&pDef));
-
-	checkResult(pDef->SetName(sName2));
-	checkResult(pDef->SetDescription(sDescription2));
-
-	checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
+	for(n = 0; n < 2; n++)
+	{
+		checkResult(pDictionary->CreateInstance(&AUID_AAFOperationDef,
+			IID_IAAFOperationDef, 
+			(IUnknown **)&pOperationDef));    
+				checkResult(pDictionary->CreateInstance(&AUID_AAFParameterDef,
+									  IID_IAAFParameterDef, 
+									  (IUnknown **)&pParamDef));
+		
+		checkResult(pDictionary->RegisterOperationDefinition(pOperationDef));
+		checkResult(pDictionary->RegisterParameterDefinition(pParamDef));
+		
+		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
+		checkResult(pDef->SetName (sName[n]));
+		checkResult(pDef->SetDescription (sDescription[n]));
+		pDef->Release();
+		pDef = NULL;
+		
+		//!!!Not testing the INIT on AAFDefObject
+		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
+		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
+		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
+		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
+		checkResult(pOperationDef->AddParameterDefs (pParamDef));
+		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
+		// !!!Added circular definitions because we don't have optional properties
+		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
+		
+		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
+		checkResult(pDef->SetName (TEST_PARAM_NAME));
+		checkResult(pDef->SetDescription (TEST_PARAM_DESC));
+		pDef->Release();
+		pDef = NULL;
+		pParamDef->Release();
+		pParamDef = NULL;
+		
+		pOperationDef->Release();
+		pOperationDef = NULL;
+	}
   }
   catch (HRESULT& rResult)
   {
@@ -159,8 +179,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   if (pDef)
     pDef->Release();
 
-  if (pContainerDef)
-    pContainerDef->Release();
+  if (pOperationDef)
+    pOperationDef->Release();
+
+  if (pParamDef)
+    pParamDef->Release();
 
   if (pDictionary)
     pDictionary->Release();
@@ -186,12 +209,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*			pFile = NULL;
 	IAAFHeader*			pHeader = NULL;
 	IAAFDictionary*		pDictionary = NULL;
-	IEnumAAFContainerDefs *pPlug = NULL;
-	IEnumAAFContainerDefs *pClonePlug = NULL;
+	IEnumAAFOperationDefs *pPlug = NULL;
+	IEnumAAFOperationDefs *pClonePlug = NULL;
 	IAAFDefObject*		pDef = NULL;
-	IAAFContainerDef*	pContainerDef = NULL;
-	IAAFContainerDef*	pArray[2] = { NULL, NULL };
-	IAAFContainerDef**	pArrayDef = pArray;
+	IAAFOperationDef*	pOperationDef = NULL;
+	IAAFOperationDef*	pArray[2] = { NULL, NULL };
+	IAAFOperationDef**	pArrayDef = pArray;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
 	wchar_t				testString[256];
@@ -205,86 +228,86 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetContainerDefinitions(&pPlug));
+		checkResult(pDictionary->GetOperationDefinitions(&pPlug));
 		/* Read and check the first element */
-		checkResult(pPlug->NextOne(&pContainerDef));
-		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
+		checkResult(pPlug->NextOne(&pOperationDef));
+		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName1) == 0, AAFRESULT_TEST_FAILED);
-		pContainerDef->Release();
-		pContainerDef = NULL;
+		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
+		pOperationDef->Release();
+		pOperationDef = NULL;
 		pDef->Release();
 		pDef = NULL;
 
 		/* Read and check the second element */
-		checkResult(pPlug->NextOne(&pContainerDef));
-		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
+		checkResult(pPlug->NextOne(&pOperationDef));
+		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName2) == 0, AAFRESULT_TEST_FAILED);
-		pContainerDef->Release();
-		pContainerDef = NULL;
+		checkExpression (wcscmp(testString, sName[1]) == 0, AAFRESULT_TEST_FAILED);
+		pOperationDef->Release();
+		pOperationDef = NULL;
 		pDef->Release();
 		pDef = NULL;
 		/* Reset, and check the first element again*/
 		checkResult(pPlug->Reset());
-		checkResult(pPlug->NextOne(&pContainerDef));
-		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
+		checkResult(pPlug->NextOne(&pOperationDef));
+		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName1) == 0, AAFRESULT_TEST_FAILED);
-		pContainerDef->Release();
-		pContainerDef = NULL;
+		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
+		pOperationDef->Release();
+		pOperationDef = NULL;
 		pDef->Release();
 		pDef = NULL;
 		/* Reset, Skip, and check the second element again*/
 		checkResult(pPlug->Reset());
 		checkResult(pPlug->Skip(1));
-		checkResult(pPlug->NextOne(&pContainerDef));
-		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
+		checkResult(pPlug->NextOne(&pOperationDef));
+		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName2) == 0, AAFRESULT_TEST_FAILED);
-		pContainerDef->Release();
-		pContainerDef = NULL;
+		checkExpression (wcscmp(testString, sName[1]) == 0, AAFRESULT_TEST_FAILED);
+		pOperationDef->Release();
+		pOperationDef = NULL;
 		pDef->Release();
 		pDef = NULL;
 		/* Reset, and read both elements */
 		checkResult(pPlug->Reset());
-		checkResult(pPlug->Next (2, (IAAFContainerDef **)&pArray, &resultCount));
+		checkResult(pPlug->Next (2, (IAAFOperationDef **)&pArray, &resultCount));
 		checkExpression (resultCount == 2, AAFRESULT_TEST_FAILED);
 		checkResult(pArrayDef[0]->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName1) == 0, AAFRESULT_TEST_FAILED);
+		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
 		pDef->Release();
 		pDef = NULL;
 		checkResult(pArrayDef[1]->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName2) == 0, AAFRESULT_TEST_FAILED);
+		checkExpression (wcscmp(testString, sName[1]) == 0, AAFRESULT_TEST_FAILED);
 		pDef->Release();
 		pDef = NULL;
 		/* Read one past to make sure that it fails */
-		checkExpression(pPlug->NextOne(&pContainerDef) != AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED);
+		checkExpression(pPlug->NextOne(&pOperationDef) != AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED);
 		/* Clone the enumerator, and read one element */
 		checkResult(pPlug->Clone(&pClonePlug));
 		checkResult(pClonePlug->Reset());
-		checkResult(pClonePlug->NextOne(&pContainerDef));
-		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
+		checkResult(pClonePlug->NextOne(&pOperationDef));
+		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName1) == 0, AAFRESULT_TEST_FAILED);
-		pContainerDef->Release();
-		pContainerDef = NULL;
+		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
+		pOperationDef->Release();
+		pOperationDef = NULL;
 		pDef->Release();
 		pDef = NULL;
 	}
@@ -297,9 +320,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pHeader)
 		pHeader->Release();
       
-	if (pDictionary)
-		pDictionary->Release();
-      
 	if (pPlug)
 		pPlug->Release();
 
@@ -309,14 +329,17 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pDef)
 		pDef->Release();
       
-	if (pContainerDef)
-		pContainerDef->Release();
+	if (pOperationDef)
+		pOperationDef->Release();
             
 	if (pArray[0])
 		pArray[0]->Release();
 	if (pArray[1])
 		pArray[1]->Release();
             
+	if (pDictionary)
+		pDictionary->Release();
+
 	if (pFile)
 	{  // Close file
 		if (bFileOpen)
@@ -328,10 +351,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFContainerDefs_test()
+extern "C" HRESULT CEnumAAFOperationDefs_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"EnumAAFContainerDefsTest.aaf";
+	aafWChar * pFileName = L"EnumAAFOperationDefsTest.aaf";
 
 	try
 	{
@@ -341,7 +364,7 @@ extern "C" HRESULT CEnumAAFContainerDefs_test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFContainerDefs_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFOperationDefs_test...Caught general C++ exception!" << endl; 
 	}
 	return hr;
 }

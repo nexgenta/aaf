@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 
@@ -36,7 +22,7 @@
 
 ImplAAFEssenceFormat::ImplAAFEssenceFormat ()
 {
-	_elements = 0;
+	_elements = NULL;
 	_elemUsed = 0;
 	_elemAllocated = 0;
 }
@@ -48,10 +34,10 @@ ImplAAFEssenceFormat::~ImplAAFEssenceFormat ()
 
 	for(n = 0; n < _elemUsed; n++)
 	{
-		if(_elements[n].parmValue != 0)
-			delete [] _elements[n].parmValue;
+		if(_elements[n].parmValue != NULL)
+			delete _elements[n].parmValue;
 	}
-	delete [] _elements;
+	delete _elements;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -64,7 +50,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUInt32		n;
 
 	parm = Lookup(essenceFormatCode);
-	if(parm == 0)	// New format spec
+	if(parm == NULL)	// New format spec
 	{
 		if(_elemUsed >= _elemAllocated)	// Allocate more memory
 		{
@@ -73,8 +59,8 @@ AAFRESULT STDMETHODCALLTYPE
 			_elemAllocated += CHUNK_SIZE;
 			for(n = 0; n < _elemUsed; n++)
 				_elements[n] = tempParm[n];
-			if(tempParm != 0)
-				delete [] tempParm;
+			if(tempParm != NULL)
+				delete tempParm;
 		}
 		
 		parm = _elements + _elemUsed;
@@ -85,7 +71,7 @@ AAFRESULT STDMETHODCALLTYPE
 			memcpy(parm->parmValue, value, valueSize);
 		}
 		else
-			parm->parmValue = 0;
+			parm->parmValue = NULL;
 		parm->valueSize = valueSize;
 		parm->allocSize = valueSize;
 		parm->parmName = essenceFormatCode;
@@ -101,13 +87,13 @@ AAFRESULT STDMETHODCALLTYPE
 				memcpy(parm->parmValue, temp, valueSize);
 			}
 			else
-				parm->parmValue = 0;
+				parm->parmValue = NULL;
 			parm->allocSize = valueSize;
 			
-			if(temp != 0)
-				delete [] temp;
+			if(temp != NULL)
+				delete temp;
 		}
-		if(parm->parmValue != 0 && valueSize != 0)
+		if(parm->parmValue != NULL && valueSize != 0)
 			memcpy(parm->parmValue, value, valueSize);	//!!!
 		parm->valueSize = valueSize;
 	}
@@ -130,12 +116,12 @@ AAFRESULT STDMETHODCALLTYPE
 	oneParm_t	*parm;
 	
 	parm = Lookup(essenceFormatCode);
-	if(parm == 0)
+	if(parm == NULL)
 		return(AAFRESULT_FORMAT_NOT_FOUND);
 	if((aafUInt32)bufSize < parm->valueSize)
 		return(AAFRESULT_SMALLBUF);
 
-	if(parm->parmValue != 0 && parm->valueSize != 0)
+	if(parm->parmValue != NULL && parm->valueSize != 0)
 		memcpy(value, parm->parmValue, parm->valueSize);//!!!
 	*bytesRead = parm->valueSize;
 
@@ -190,7 +176,7 @@ oneParm_t	*ImplAAFEssenceFormat::Lookup(aafUID_t lookup)
 			return(_elements+n);
 	}
 
-	return(0);
+	return(NULL);
 }
 
 

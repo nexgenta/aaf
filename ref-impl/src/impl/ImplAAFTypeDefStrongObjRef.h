@@ -3,27 +3,13 @@
 #ifndef __ImplAAFTypeDefStrongObjRef_h__
 #define __ImplAAFTypeDefStrongObjRef_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 class ImplAAFPropertyValue;
@@ -34,8 +20,6 @@ class ImplAAFClassDef;
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
-#include "OMWeakRefVectorProperty.h"
-#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefStrongObjRef : public ImplAAFTypeDefObjectRef
 {
@@ -51,38 +35,23 @@ protected:
 
 public:
 
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
-
-         // @parm [in] class def of objects permitted to be referenced
-         ImplAAFClassDef * pObjType,
-
-         // @parm [in, string] friendly name of this type definition
-         const aafCharacter * pTypeName);
-
-
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     SetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[in]*/ ImplAAFRoot * ppObject);
+      /*[in]*/ ImplAAFObject * ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[out]*/ ImplAAFRoot ** ppObject);
+      /*[out]*/ ImplAAFObject ** ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
+    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType) const;
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
-    CreateValue (/*[in]*/ ImplAAFRoot * pObj,
+    CreateValue (/*[in]*/ ImplAAFObject * pObj,
       /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
 
   // Override from AAFTypeDef
@@ -91,13 +60,17 @@ public:
 
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFTypeDefStrongObjRef)
+
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
-        (const aafUID_t & id,
-         const ImplAAFClassDef *pType,
-         const aafCharacter * pTypeName);
+        (const aafUID_t *  pID,
+         const aafUID_t * pRefdObjID,
+         wchar_t *  pTypeName);
 
   // overrides from ImplAAFTypeDef
   //
@@ -107,26 +80,16 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
 
-  // Allocate and initialize the correct subclass of ImplAAFPropertyValue 
-  // for the given OMProperty.
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreatePropertyValue(OMProperty *property, 
-                        ImplAAFPropertyValue ** pPropertyValue) const;
-
-
-
-  // override from OMStorable.
-  virtual const OMClassId& classId(void) const;
-
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
 
 private:
-  OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
+  // OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
+  OMFixedSizeProperty<aafUID_t> _referencedType;
+
+  // avoid shortcut typedef in an effort to not include other headers
+  ImplAAFSmartPointer<ImplAAFClassDef> _cachedObjType;
 };
 
 

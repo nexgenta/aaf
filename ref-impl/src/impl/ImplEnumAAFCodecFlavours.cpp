@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
 
 #ifndef __ImplEnumAAFCodecFlavours_h__
 #include "ImplEnumAAFCodecFlavours.h"
@@ -34,7 +20,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFCodecFlavours;
 ImplEnumAAFCodecFlavours::ImplEnumAAFCodecFlavours ()
 {
 	_current = 0;
-	_codec = 0;
+	_codec = NULL;
 }
 
 
@@ -43,7 +29,7 @@ ImplEnumAAFCodecFlavours::~ImplEnumAAFCodecFlavours ()
 	if (_codec)
 	{
 		_codec->Release();
-		_codec = 0;
+		_codec = NULL;
 	}
 }
 
@@ -52,15 +38,15 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFCodecFlavours::NextOne (
       aafUID_t *pAAFCodecFlavour)
 {
-	aafUInt32			numElem;
+	aafInt32			numElem;
 
 	XPROTECT()
 	{
-		CHECK(_codec->CountFlavours(&numElem))
-		if(pAAFCodecFlavour == 0)
+		CHECK(_codec->GetFlavourCount(&numElem))
+		if(pAAFCodecFlavour == NULL)
 			RAISE(AAFRESULT_NULL_PARAM);
 		if(_current >= numElem)
-			RAISE(AAFRESULT_NO_MORE_FLAVOURS);
+			RAISE(AAFRESULT_NO_MORE_OBJECTS);
 		CHECK(_codec->GetIndexedFlavourID (_current, pAAFCodecFlavour));
 
 		_current++;
@@ -84,7 +70,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUInt32			numDefs;
 	HRESULT				hr;
 
-	if ((!pFetched && count != 1) || (pFetched && count == 1))
+	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
 		return E_INVALIDARG;
 
 	// Point at the first component in the array.
@@ -114,10 +100,10 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32  count)
 {
 	AAFRESULT	hr;
-	aafUInt32	newCurrent;
-	aafUInt32	numElem;
+	aafInt32	newCurrent;
+	aafInt32	numElem;
 
-	hr = _codec->CountFlavours(&numElem);
+	hr = _codec->GetFlavourCount(&numElem);
 	if(hr != AAFRESULT_SUCCESS)
 		return hr;
 
@@ -130,7 +116,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		hr = AAFRESULT_NO_MORE_FLAVOURS;
+		hr = E_FAIL;
 	}
 
 	return hr;
@@ -153,7 +139,7 @@ AAFRESULT STDMETHODCALLTYPE
 	AAFRESULT				hr;
 
 	result = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
-	if (!result)
+	if (result == NULL)
 		return E_FAIL;
 
 	hr = result->SetEnumCodec(_codec);
@@ -165,9 +151,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = 0;
+		result->ReleaseReference();
+		*ppEnum = NULL;
 	}
 	
 	return hr;

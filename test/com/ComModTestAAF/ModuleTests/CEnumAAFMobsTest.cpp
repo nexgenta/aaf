@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFSourceMob
+// @com This file implements the module test for CEnumAAFMobs
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -10,17 +10,12 @@
 
 #include "AAF.h"
 
-#include <stdio.h>
 #include <iostream.h>
+#include <stdio.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-
-static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
-
-
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -51,20 +46,20 @@ inline void checkExpression(bool expression, HRESULT r)
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
+	// IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
   IAAFDictionary*  pDictionary = NULL;
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
-  IAAFEssenceDescriptor *edesc = NULL;
-
+	IAAFEssenceDescriptor *edesc = NULL;
 	aafProductIdentification_t	ProductInfo;
 	aafUID_t					newUID;
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFSourceMob Test";
+	ProductInfo.productName = L"EnumAAFMobs Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -73,6 +68,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
 
   try
   {
@@ -91,47 +87,69 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pHeader->GetDictionary(&pDictionary));
  		
     //Make the first mob
-	  long			test;
-	  aafUID_t		ddef = DDEF_Sound;
 
-	  aafRational_t	audioRate = { 44100, 1 };
-
-	  // Create a Mob
+	  // Create a FileMob
 	  checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
-							  IID_IAAFSourceMob, 
-							  (IUnknown **)&pSourceMob));
+							IID_IAAFSourceMob, 
+							(IUnknown **)&pSourceMob));
 
 	  checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 
-		checkResult(CoCreateGuid((GUID *)&newUID));
+	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
 	  checkResult(pMob->SetMobID(&newUID));
-	  checkResult(pMob->SetName(L"SourceMOBTest"));
-	  
-	  // Add some slots
-	  for(test = 0; test < 2; test++)
-	  {
-		  checkResult(pSourceMob->AddNilReference (test+1, 0, &ddef, audioRate));
-	  }
+	  checkResult(pMob->SetName(L"File Mob"));
+	
+ 	  checkResult(pDictionary->CreateInstance(&AUID_AAFFileDescriptor,
+							IID_IAAFFileDescriptor, 
+							(IUnknown **)&edesc));		
 
- 	  checkResult(pDictionary->CreateInstance(&AUID_AAFEssenceDescriptor,
-							  IID_IAAFEssenceDescriptor, 
-							  (IUnknown **)&edesc));		
- 	  checkResult(pSourceMob->SetEssenceDescriptor (edesc));
+    checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 	  checkResult(pHeader->AppendMob(pMob));
 
-  }
+    // Reusing local variable so we need to release the inteface.
+    pMob->Release();
+    pMob = NULL;
+
+	  // Create a MasterMob
+	  checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
+							IID_IAAFMob, 
+							(IUnknown **)&pMob));
+
+	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
+	  checkResult(pMob->SetMobID(&newUID));
+	  checkResult(pMob->SetName(L"Master Mob"));
+
+	  checkResult(pHeader->AppendMob(pMob));
+
+    // Reusing local variable so we need to release the inteface.
+    pMob->Release();
+    pMob = NULL;
+
+	  // Create a CompositionMob
+	  checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+							  IID_IAAFMob, 
+							  (IUnknown **)&pMob));
+
+	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
+	  checkResult(pMob->SetMobID(&newUID));
+  	checkResult(pMob->SetName(L"Composition Mob"));
+
+	  checkResult(pHeader->AppendMob(pMob));
+	}
   catch (HRESULT& rResult)
   {
     hr = rResult;
   }
 	
+
+  // Cleanup and return
   if (edesc)
-	  edesc->Release();
+    edesc->Release();
 
   if (pMob)
     pMob->Release();
-
+  
   if (pSourceMob)
     pSourceMob->Release();
 
@@ -156,34 +174,27 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-	IEnumAAFMobs *mobIter = NULL;
-	IAAFEssenceDescriptor		*pEdesc = NULL;
-	IAAFSourceMob				*pSourceMob = NULL;
-	IAAFMob			*aMob = NULL;
-	IEnumAAFMobSlots	*slotIter = NULL;
-	IAAFMobSlot		*slot = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t	numMobs, n, s;
+	aafNumSlots_t	numMobs;
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFSourceMob Test. NOT!";
+	ProductInfo.productName = L"EnumAAFMobs Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 	  
 
-
-	try
-	{ 
+  try
+  {
     // Open the file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
@@ -191,79 +202,29 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 
-		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
-		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
+	  // Make sure that we have one master, one file, and one composition (three total)
+	  checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+	  checkExpression (3 == numMobs, AAFRESULT_TEST_FAILED);
 
+	  checkResult(pHeader->GetNumMobs(kMasterMob, &numMobs));
+	  checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
-    checkResult(pHeader->EnumAAFAllMobs (NULL, &mobIter));
-	  for(n = 0; n < numMobs; n++)
-	  {
-		  aafWChar		name[500];
-		  aafNumSlots_t	numSlots;
-		  aafUID_t		mobID;
-		  aafSlotID_t		trackID;
+	  checkResult(pHeader->GetNumMobs(kFileMob, &numMobs));
+	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
-		  checkResult(mobIter->NextOne (&aMob));
-		  checkResult(aMob->GetName (name, sizeof(name)));
-		  checkResult(aMob->GetMobID (&mobID));
-
-		  checkResult(aMob->GetNumSlots (&numSlots));
-		  if (2 != numSlots)
-			  return AAFRESULT_TEST_FAILED;
-		  if(numSlots != 0)
-		  {
-			  checkResult(aMob->EnumAAFAllMobSlots(&slotIter));
-
-			  for(s = 0; s < numSlots; s++)
-			  {
-				  checkResult(slotIter->NextOne (&slot));
-				  checkResult(slot->GetSlotID(&trackID));
-
-				  slot->Release();
-				  slot = NULL;
-			  }
-		  }
-		  checkResult(aMob->QueryInterface (IID_IAAFSourceMob, (void **)&pSourceMob));
-		  checkResult(pSourceMob->GetEssenceDescriptor (&pEdesc));
-
-		  pEdesc->Release();
-		  pEdesc = NULL;
-
-		  pSourceMob->Release();
-		  pSourceMob = NULL;
-
-		  aMob->Release();
-		  aMob = NULL;
-    }
+	  checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
+	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 	}
   catch (HRESULT& rResult)
   {
     hr = rResult;
   }
+	
 
-  
-  // Cleanup and return
-  if (slot)
-    slot->Release();
-
-  if (slotIter)
-    slotIter->Release();
-
-  if (pEdesc)
-    pEdesc->Release();
-
-  if (pSourceMob)
-    pSourceMob->Release();
-
-  if (aMob)
-    aMob->Release();
-
-	if(mobIter)
-		mobIter->Release();
+	// Cleanup and return
 
 	if (pHeader)
-    pHeader->Release();
+		pHeader->Release();
 
 	if (pFile) 
 	{
@@ -275,15 +236,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
  
-extern "C" HRESULT CAAFSourceMob_test()
+extern "C" HRESULT CEnumAAFMobs_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-  aafWChar * pFileName = L"AAFSourceMobTest.aaf";
+ 	aafWChar * pFileName = L"EnumAAFMobsTest.aaf";
 
   try
 	{
 		hr = CreateAAFFile(	pFileName );
-		if(hr == AAFRESULT_SUCCESS)
+		if(AAFRESULT_SUCCESS == hr)
 			hr = ReadAAFFile( pFileName );
 	}
   catch (...)
@@ -293,9 +254,23 @@ extern "C" HRESULT CAAFSourceMob_test()
 	}
 
 
-	// When all of the functionality of this class is tested, we can return success
+  	// When all of the functionality of this class is tested, we can return success
 	if(hr == AAFRESULT_SUCCESS)
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-	  
+
 	return hr;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

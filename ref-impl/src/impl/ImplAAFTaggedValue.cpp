@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
@@ -26,15 +12,14 @@
 
 
 #include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
+#include "AAFPropertyIds.h"
 
 #ifndef __ImplAAFTaggedValue_h__
 #include "ImplAAFTaggedValue.h"
 #endif
 
 #include "ImplAAFDictionary.h"
-#include "ImplAAFDataDef.h"
-#include "ImplAAFTypeDefIndirect.h"
+#include "ImplAAFHeader.h"
 
 #include <assert.h>
 #include <string.h>
@@ -43,60 +28,37 @@
 
 
 ImplAAFTaggedValue::ImplAAFTaggedValue ():
-	_name(		PID_TaggedValue_Name,		L"Name"),
-	_value(		PID_TaggedValue_Value,		L"Value"),
-  _initialized(false),
-  _cachedTypeDef(NULL)
+	_name(		PID_TaggedValue_Name,		"Name"),
+	_type(		PID_TaggedValue_Type,		"Type"),
+	_value(		PID_TaggedValue_Value,		"Value")
 {
 	_persistentProperties.put(_name.address());
+	_persistentProperties.put(_type.address());
 	_persistentProperties.put(_value.address());
 }
 
 
 ImplAAFTaggedValue::~ImplAAFTaggedValue ()
-{
-  if (_cachedTypeDef)
-    _cachedTypeDef->ReleaseReference ();
-}
+{}
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::Initialize (
-      const aafCharacter * pName,
-      ImplAAFTypeDef * pType, 
-      aafUInt32 valueSize, 
-      aafDataBuffer_t pValue)
+    ImplAAFTaggedValue::Initialize (wchar_t* pName, aafUID_t*  pDataDef)
 {
-  AAFRESULT	result = AAFRESULT_SUCCESS;
-	if (!pName || !pType || !pValue)
-		return AAFRESULT_NULL_PARAM;
-  if (_initialized)
-    return AAFRESULT_ALREADY_INITIALIZED;
+	HRESULT					rc = AAFRESULT_SUCCESS;
 
+	if (pName == NULL || pDataDef == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	_type = *pDataDef;
 	_name = pName;
 
-  // Save the type so that SetValue will know the type of the value data.
-  _cachedTypeDef = pType;
-  _cachedTypeDef->AcquireReference ();
-
-	result = SetValue (valueSize, pValue);
-  if (AAFRESULT_SUCCEEDED (result))
-  {
-    _initialized = true;
-  }
-  else
-  {
-    _cachedTypeDef->ReleaseReference ();
-    _cachedTypeDef = NULL;
-  }
-
-
-  return result;
+	return rc;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::GetName (aafCharacter * pName, aafInt32 bufSize)
+    ImplAAFTaggedValue::GetName (wchar_t* pName, aafInt32 bufSize)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 	bool		status;
@@ -117,7 +79,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::GetNameBufLen (aafUInt32* pLen)
+    ImplAAFTaggedValue::GetNameBufLen (aafInt32* pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -137,12 +99,30 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTaggedValue::GetTypeDefinition (ImplAAFTypeDef** ppTypeDef)
 {
+	aafUID_t			defUID;
+	ImplAAFDictionary	*dict = NULL;
+	ImplAAFHeader		*head = NULL;
+
 	if(ppTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	// Validate the property and get the actual type definition from the
-  // indirect value.
-	return (ImplAAFTypeDefIndirect::GetActualPropertyType (_value, ppTypeDef));
+	XPROTECT()
+	{
+		defUID = _type;
+		CHECK(MyHeadObject(&head));
+		CHECK(head->GetDictionary(&dict));
+		CHECK(dict->LookupType(&defUID, ppTypeDef));
+	}
+	XEXCEPT
+	{
+		if(dict != NULL)
+			dict->ReleaseReference();
+		if(head != NULL)
+			head->ReleaseReference();
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
 }
 
   // 
@@ -173,16 +153,13 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pValue == NULL || bytesRead == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-//	if (_value.size() > valueSize)
-//	  return AAFRESULT_SMALLBUF;
+	if (_value.size() > valueSize)
+	  return AAFRESULT_SMALLBUF;
 
-//	_value.copyToBuffer(pValue, valueSize);
-//	*bytesRead  = _value.size();
-	*bytesRead = 0;
+	_value.copyToBuffer(pValue, valueSize);
+	*bytesRead  = _value.size();
 
-	// Validate the property and get the property definition and type definition, 
-	// and the actual length of the data
-	return (ImplAAFTypeDefIndirect::GetActualPropertyValue (_value, pValue, valueSize, bytesRead));
+	return AAFRESULT_SUCCESS; 
 }
 
 
@@ -193,10 +170,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pLen == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-//	*pLen = _value.size();
+	*pLen = _value.size();
 
-	// Validate the property and get the actual length of the data
-	return (ImplAAFTypeDefIndirect::GetActualPropertySize (_value, pLen)); 
+	return AAFRESULT_SUCCESS; 
 }
 
 
@@ -204,25 +180,16 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTaggedValue::SetValue (aafUInt32 valueSize, aafDataBuffer_t pValue)
 {
-	if (!pValue)
+	if(pValue == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-//	_value.setValue(pValue, valueSize);
-  if (!_cachedTypeDef)
-  {
-    // Lookup the type definition from this constrol point. If it fails
-    // then the control point is invalid!
-    AAFRESULT result = GetTypeDefinition (&_cachedTypeDef);
-    if (AAFRESULT_FAILED (result))
-      return result;
-  }
+	_value.setValue(pValue, valueSize);
 
-  // Validate the property and get the property definition and type definition, 
-	// and the actual length of the data
-  return (ImplAAFTypeDefIndirect::SetActualPropertyValue (_value, _cachedTypeDef, pValue, valueSize));
+	return AAFRESULT_SUCCESS; 
 }
 
 
 
+OMDEFINE_STORABLE(ImplAAFTaggedValue, AUID_AAFTaggedValue);
 
 
