@@ -31,6 +31,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 class ImplAAFSourceMob;
 
 
@@ -136,13 +137,6 @@ public:
     GetFileMobID
 		// @parm [out] the file mob id associated with essence
         (aafUID_t *  pFileMobID);
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFEssenceData)
 
 private:
   OMFixedSizeProperty<aafUID_t> _fileMobID;

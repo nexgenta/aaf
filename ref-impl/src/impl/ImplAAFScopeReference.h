@@ -31,6 +31,7 @@
  *
  ************************************************************************/
 
+
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
@@ -97,9 +98,6 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFScopeReference)
 
   // Persistent Properties
   OMFixedSizeProperty<aafUInt32>	_relativeScope;

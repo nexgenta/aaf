@@ -26,6 +26,7 @@
  ************************************************************************/
 
 
+
 /*************************************************************************
  * 
  * @class AAFScopeReference | AAFScopeReference refers to a section in the 
@@ -98,6 +99,5 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFScopeReference, AUID_AAFScopeReference);
 
 
