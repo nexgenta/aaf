@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFPropValData_h__
@@ -38,7 +57,7 @@ extern "C" const aafClassID_t CLSID_AAFPropertyValue;
 
 
 ImplAAFTypeDefVariableArray::ImplAAFTypeDefVariableArray ()
-  : _ElementType  ( PID_TypeDefinitionVariableArray_ElementType,  "Element Type")
+  : _ElementType  ( PID_TypeDefinitionVariableArray_ElementType,  "ElementType")
 {
   _persistentProperties.put(_ElementType.address());
 }
@@ -89,8 +108,25 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFTypeDef * pTypeDef,
       wchar_t *  pTypeName)
 {
-  if (! pTypeName) return AAFRESULT_NULL_PARAM;
   if (! pTypeDef)  return AAFRESULT_NULL_PARAM;
+
+  aafUID_t id;
+  assert (pTypeDef);
+  AAFRESULT hr = pTypeDef->GetAUID(&id);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  return pvtInitialize (pID, &id, pTypeName);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFTypeDefVariableArray::pvtInitialize (
+      const aafUID_t *  pID,
+      const aafUID_t * pTypeId,
+      wchar_t *  pTypeName)
+{
+  if (! pTypeName) return AAFRESULT_NULL_PARAM;
+  if (! pTypeId)   return AAFRESULT_NULL_PARAM;
   if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
@@ -100,11 +136,8 @@ AAFRESULT STDMETHODCALLTYPE
   hr = SetAUID (pID);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  aafUID_t id;
-  assert (pTypeDef);
-  hr = pTypeDef->GetAUID(&id);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  _ElementType = id;
+  assert (pTypeId);
+  _ElementType = *pTypeId;
 
   return AAFRESULT_SUCCESS;
 }
@@ -183,7 +216,8 @@ void ImplAAFTypeDefVariableArray::reorder(OMByte* externalBytes,
   ImplAAFTypeDefSP ptd = BaseType ();
   assert (ptd);
 
-  aafUInt32 extElemSize = PropValSize ();
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
   aafUInt32 numElems = externalBytesSize / extElemSize;
   aafInt32 numBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
@@ -204,10 +238,11 @@ size_t ImplAAFTypeDefVariableArray::externalSize(OMByte* internalBytes,
   ImplAAFTypeDefSP ptd = BaseType ();
   assert (ptd);
 
-  // aafUInt32 extElemSize = ptd->PropValSize ();
-  // aafUInt32 intElemSize = ptd->NativeSize ();
-  aafUInt32 extElemSize = ptd->externalSize (0, 0);
-  aafUInt32 intElemSize = ptd->internalSize (0, 0);
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 extElemSize = ptd->externalSize (0, 0);
+  // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   assert (intElemSize);
   aafUInt32 numElems = internalBytesSize / intElemSize;
   return numElems * extElemSize;
@@ -223,26 +258,38 @@ void ImplAAFTypeDefVariableArray::externalize(OMByte* internalBytes,
   ImplAAFTypeDefSP ptd = BaseType ();
   assert (ptd);
 
-  aafUInt32 intElemSize = ptd->internalSize (0, 0);
-  aafUInt32 extElemSize = ptd->externalSize (0, 0);
-  aafUInt32 numElems = internalBytesSize / intElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
-  aafUInt32 elem = 0;
-
-  for (elem = 0; elem < numElems; elem++)
+  assert (ptd->IsFixedSize ());
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  // aafUInt32 intElemSize = ptd->internalSize (0, 0);
+  // aafUInt32 extElemSize = ptd->externalSize (0, 0);
+  if (intElemSize == extElemSize)
 	{
-	  ptd->externalize (internalBytes,
-						intElemSize,
-						externalBytes,
-						extElemSize,
-						byteOrder);
-	  internalBytes += intElemSize;
-	  externalBytes += extElemSize;
-	  intNumBytesLeft -= intElemSize;
-	  extNumBytesLeft -= extElemSize;
-	  assert (intNumBytesLeft >= 0);
-	  assert (extNumBytesLeft >= 0);
+	  copy (internalBytes,
+			externalBytes,
+			externalBytesSize);
+	}
+  else
+	{
+	  aafUInt32 numElems = internalBytesSize / intElemSize;
+	  aafInt32 intNumBytesLeft = externalBytesSize;
+	  aafInt32 extNumBytesLeft = internalBytesSize;
+	  aafUInt32 elem = 0;
+
+	  for (elem = 0; elem < numElems; elem++)
+		{
+		  ptd->externalize (internalBytes,
+							intElemSize,
+							externalBytes,
+							extElemSize,
+							byteOrder);
+		  internalBytes += intElemSize;
+		  externalBytes += extElemSize;
+		  intNumBytesLeft -= intElemSize;
+		  extNumBytesLeft -= extElemSize;
+		  assert (intNumBytesLeft >= 0);
+		  assert (extNumBytesLeft >= 0);
+		}
 	}
 }
 
@@ -253,10 +300,11 @@ size_t ImplAAFTypeDefVariableArray::internalSize(OMByte* externalBytes,
   ImplAAFTypeDefSP ptd = BaseType ();
   assert (ptd);
 
-  // aafUInt32 extElemSize = ptd->PropValSize ();
-  // aafUInt32 intElemSize = ptd->NativeSize ();
-  aafUInt32 extElemSize = ptd->externalSize (0, 0);
-  aafUInt32 intElemSize = ptd->internalSize (0, 0);
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 extElemSize = ptd->externalSize (0, 0);
+  // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   assert (intElemSize);
   aafUInt32 numElems = externalBytesSize / extElemSize;
   return numElems * intElemSize;
@@ -272,26 +320,38 @@ void ImplAAFTypeDefVariableArray::internalize(OMByte* externalBytes,
   ImplAAFTypeDefSP ptd = BaseType ();
   assert (ptd);
 
-  aafUInt32 intElemSize = ptd->internalSize (0, 0);
-  aafUInt32 extElemSize = ptd->externalSize (0, 0);
-  aafUInt32 numElems = externalBytesSize / extElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
-  aafUInt32 elem = 0;
-
-  for (elem = 0; elem < numElems; elem++)
+  assert (ptd->IsFixedSize ());
+  aafUInt32 extElemSize = ptd->PropValSize ();
+  aafUInt32 intElemSize = ptd->NativeSize ();
+  // aafUInt32 intElemSize = ptd->internalSize (0, 0);
+  // aafUInt32 extElemSize = ptd->externalSize (0, 0);
+  if (intElemSize == extElemSize)
 	{
-	  ptd->internalize (externalBytes,
-						extElemSize,
-						internalBytes,
-						intElemSize,
-						byteOrder);
-	  internalBytes += intElemSize;
-	  externalBytes += extElemSize;
-	  intNumBytesLeft -= intElemSize;
-	  extNumBytesLeft -= extElemSize;
-	  assert (intNumBytesLeft >= 0);
-	  assert (extNumBytesLeft >= 0);
+	  copy (externalBytes,
+			internalBytes,
+			internalBytesSize);
+	}
+  else
+	{
+	  aafUInt32 numElems = externalBytesSize / extElemSize;
+	  aafInt32 intNumBytesLeft = externalBytesSize;
+	  aafInt32 extNumBytesLeft = internalBytesSize;
+	  aafUInt32 elem = 0;
+
+	  for (elem = 0; elem < numElems; elem++)
+		{
+		  ptd->internalize (externalBytes,
+							extElemSize,
+							internalBytes,
+							intElemSize,
+							byteOrder);
+		  internalBytes += intElemSize;
+		  externalBytes += extElemSize;
+		  intNumBytesLeft -= intElemSize;
+		  extNumBytesLeft -= extElemSize;
+		  assert (intNumBytesLeft >= 0);
+		  assert (extNumBytesLeft >= 0);
+		}
 	}
 }
 
@@ -374,6 +434,3 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMPropertyMBS
   assert (result);
   return result;
 }
-
-
-OMDEFINE_STORABLE(ImplAAFTypeDefVariableArray, AUID_AAFTypeDefVariableArray);
