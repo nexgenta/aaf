@@ -23,7 +23,7 @@ AD_IDL(//
 AD_CLASS_UUID(92B88036, 2B2B, 11d2, BF, 7E, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(92B88035, 2B2B, 11d2, BF, 7E, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD2(Initialize,
 			[in],
 			objPass,
@@ -38,7 +38,8 @@ AD_XMETHOD2(Initialize,
 			Timecode Value \(startFrame\, drop\, fps\),
 
 			Initializes this object with the given length and timecode
-  // values.
+  // values.  Length is specified in units of the edit rate of the
+  // containing timeline mob slot.
   // 
   // Succeeds if all of the following are true:
   // - this object has not yet been initialized.
@@ -116,4 +117,4 @@ AD_XMETHOD1(SetTimecode,
 
 AD_OVERRIDE(.method-SegmentOffsetToTC)
 AD_OVERRIDE(.method-SegmentTCToOffset)
-AD_CLASS_END
+AD_XCLASS_END(Concrete, StoredObject)
