@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -99,7 +99,7 @@ public:
          const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         wchar_t *  pName,
+         const aafCharacter *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -120,7 +120,7 @@ public:
          const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         wchar_t *  pName,
+         const aafCharacter *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -150,11 +150,36 @@ public:
         (ImplAAFClassDef ** ppClassDef);
 
 
+  //****************
+  // CreateInstance()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateInstance
+        // @parm [out, retval] newly created object
+        (ImplAAFObject ** ppobject);
+
+  //****************
+  // IsRoot()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsRoot
+        (aafBool* isRootClass);
+
 public:
 
+  //****************
+  // SetParent()
   //
-  // Non-published methods
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetParent
+        (ImplAAFClassDef *pClassDef);
+
+  //****************
+  // SetBootstrapParent()
   //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetBootstrapParent
+        (ImplAAFClassDef *pClassDef);
 
   //****************
   // pvtInitialize()
@@ -168,7 +193,7 @@ public:
         (const aafUID_t & classID,
 
 		// Inheritance parent of this class
-		const aafUID_t * pParentClassId,
+		const ImplAAFClassDef * pParentClassId,
 
 		// Human-legible name
 		const aafCharacter * pClassName);
@@ -180,7 +205,7 @@ public:
   AAFRESULT STDMETHODCALLTYPE
     pvtRegisterPropertyDef
         (const aafUID_t & id,
-         wchar_t *  pName,
+         const aafCharacter *  pName,
          const aafUID_t & typeId,
          aafBool  isOptional,
          ImplAAFPropertyDef ** ppPropDef);
@@ -204,15 +229,11 @@ public:
          // @parm [out] resulting property definition
          ImplAAFPropertyDef ** ppPropDef) const;
 
-
-  // Returns the AUID of the parent class.  Returns the NULL auid if
-  // this is the end of the line.
-  void pvtGetParentAUID (aafUID_t & result);
-
-
   // Make sure that the type definition of each property definition
   // has been loaded into memory.
   void AssurePropertyTypesLoaded ();
+
+  void InitOMProperties (ImplAAFObject * pObj);
 
 private:
 
@@ -225,7 +246,7 @@ private:
   class pvtPropertyIdentifier
   {
   public:
-	// Returns AAFTrue if this property identifier matches the given
+	// Returns kAAFTrue if this property identifier matches the given
 	// property definition.
 	virtual aafBool DoesMatch
     (const ImplAAFPropertyDef * pTestPropDef) const = 0;
@@ -263,23 +284,31 @@ private:
   };
 
 
+  // Provide two level property search routines that are overloaded.
+
+  // Low-level recursive methods the OM find method instead of a linear search
+  // that will necessarily load all of the property definitions for the class
+  // definition instance.
+  AAFRESULT
+    generalLookupPropertyDef (
+      aafUID_constref propId,
+      ImplAAFPropertyDef ** ppPropDef);
+
   //
   // The generalized lookup method which uses a pvtPropertyIdentifier
   // as the property ID.
   //
-  AAFRESULT STDMETHODCALLTYPE
+  AAFRESULT 
     generalLookupPropertyDef (
       const pvtPropertyIdentifier & propId,
       ImplAAFPropertyDef ** ppPropDef);
 
-
   // OMWeakReferenceProperty<ImplAAFClassDef> _ParentClass;
-  OMFixedSizeProperty<aafUID_t>                       _ParentClass;
+  OMWeakReferenceProperty<ImplAAFClassDef>         _ParentClass;
 
-  OMStrongReferenceVectorProperty<ImplAAFPropertyDef> _Properties;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPropertyDef> _Properties;
 
-  // didn't use shorthand here in an attempt to avoid circular references
-  ImplAAFSmartPointer<ImplAAFClassDef> _cachedParentClass;
+  ImplAAFClassDef	*_BootstrapParent;
 
   bool _propTypesLoaded;
 };

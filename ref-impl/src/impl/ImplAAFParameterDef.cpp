@@ -39,7 +39,7 @@
 #include "ImplAAFDictionary.h"
 
 ImplAAFParameterDef::ImplAAFParameterDef ()
-: _typeDef(			PID_ParameterDefinition_Type,					"Type"),
+: _typeDef(			PID_ParameterDefinition_Type,					"Type", "/Dictionary/TypeDefinitions", PID_DefinitionObject_Identification),
   _displayUnits(	PID_ParameterDefinition_DisplayUnits,			"DisplayUnits")
 {
 	_persistentProperties.put(_typeDef.address());
@@ -53,32 +53,42 @@ ImplAAFParameterDef::~ImplAAFParameterDef ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFParameterDef::GetTypeDef (
+    ImplAAFParameterDef::Initialize (
+      const aafUID_t & id,
+	  const aafWChar * pName,
+	  const aafWChar * pDesc,
+    ImplAAFTypeDef * pType)
+{
+  AAFRESULT result = AAFRESULT_SUCCESS;
+	if (pName == NULL || pDesc == NULL || pType == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+    AAFRESULT result = pvtInitialize(id, pName, pDesc);
+	  if (AAFRESULT_SUCCEEDED (result))
+      result = SetTypeDef (pType);
+	}
+	return result;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFParameterDef::GetTypeDefinition (
       ImplAAFTypeDef **ppTypeDef)
 {
-	aafUID_t			uid;
-	ImplAAFDictionary	*dict = NULL;
+  if (! ppTypeDef)
+	return AAFRESULT_NULL_PARAM;
 
-	if(ppTypeDef == NULL)
-		return AAFRESULT_NULL_PARAM;
+   if(_typeDef.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFTypeDef *pTypeDef = _typeDef;
 
-	XPROTECT()
-	{
-		uid = _typeDef;
-		CHECK(GetDictionary(&dict));
-		CHECK(dict->LookupTypeDef (_typeDef, ppTypeDef));
-		dict->ReleaseReference();
-		dict = NULL;
-	}
-	XEXCEPT
-	{
-		if(dict != NULL)
-		  dict->ReleaseReference();
-		dict = 0;
-	}
-	XEND;
-	
-	return AAFRESULT_SUCCESS;
+  *ppTypeDef = pTypeDef;
+  assert (*ppTypeDef);
+  (*ppTypeDef)->AcquireReference ();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -86,17 +96,12 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameterDef::SetTypeDef (
       ImplAAFTypeDef * pTypeDef)
 {
-	aafUID_t	uid;
-	AAFRESULT	hr;
-
 	if(pTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	hr = pTypeDef->GetAUID(&uid);
-	if(hr == AAFRESULT_SUCCESS)
-		_typeDef = uid;
+	_typeDef = pTypeDef;
 
-	return hr;
+	return AAFRESULT_SUCCESS;
 }
 
 
