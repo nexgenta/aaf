@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredStream.cpp,v 1.1 2004/09/28 11:57:08 phil_tudor Exp $ $Name:  $
+// $Id: OMSSStoredStream.cpp,v 1.2 2004/10/25 13:01:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,7 @@ void OMSSStoredStream::read(void* data, size_t size) const
   PRECONDITION("Valid data buffer", data != 0);
   PRECONDITION("Valid size", size > 0);
 
-  unsigned long bytesRead;
+  OMUInt32 bytesRead;
   HRESULT result = _stream->Read(data, size, &bytesRead);
   checkStatus(result);
   ASSERT("Succeeded", SUCCEEDED(result));
@@ -81,7 +81,7 @@ void OMSSStoredStream::write(void* data, size_t size)
   PRECONDITION("Valid data", data != 0);
   PRECONDITION("Valid size", size > 0);
 
-  unsigned long bytesWritten;
+  OMUInt32 bytesWritten;
   HRESULT resultCode = _stream->Write(data, size, &bytesWritten);
   checkStatus(resultCode);
   ASSERT("Succeeded", SUCCEEDED(resultCode));
