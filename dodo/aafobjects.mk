@@ -11,6 +11,8 @@ AAFPERSISTENTOBJECTS = \
 	AAFAIFCData \
 	AAFAIFCDescriptor \
 	AAFClassDef \
+	AAFCodecDef \
+	AAFContainerDef \
 	AAFDictionary \
 	AAFCommentMarker \
 	AAFConstValue \
@@ -37,6 +39,10 @@ AAFPERSISTENTOBJECTS = \
 	AAFNestedScope\
 	AAFParameter \
 	AAFParameterDef \
+	AAFPluggableCode \
+	AAFPluggableDef \
+	AAFPluginManager \
+	AAFPluginDescriptor \
 	AAFPulldown \
 	AAFPropertyDef \
 	AAFReferenceValue \
@@ -52,13 +58,15 @@ AAFPERSISTENTOBJECTS = \
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTypeDef \
-	AAFTypeDefArray \
 	AAFTypeDefInt \
-	AAFTypeDefEssence \
-	AAFTypeDefObject \
-	AAFTypeDefObjectVector \
-	AAFTypeDefStruct \
-	AAFTypeDefUInt \
+	AAFTypeDefRename \
+	AAFTypeDefEnum \
+	AAFTypeDefFixedArray \
+	AAFTypeDefVariableArray \
+	AAFTypeDefStream \
+	AAFTypeDefString \
+	AAFTypeDefObjectRef \
+	AAFTypeDefComposite \
 	AAFUnixLocator \
 	AAFVaryingValue \
 	AAFWAVEData \
@@ -71,17 +79,20 @@ AAFNONPERSISTENTOBJECTS = \
 	AAFProperty \
 	AAFPropertyValue \
 	EnumAAFClassDefs \
+	EnumAAFCodecFlavours \
 	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFDefs \
 	EnumAAFEffectDefs \
 	EnumAAFIdentifications \
-	EnumAAFMobComments \
+	EnumAAFLoadedPlugins \
 	EnumAAFObjects \
 	EnumAAFParameterDefs \
+	EnumAAFPluginDescriptors \
+	EnumAAFPluginLocators \
 	EnumAAFPropertyDefs \
-	EnumAAFProperties \
 	EnumAAFPropertyValues \
+	EnumAAFProperties \
 	EnumAAFReferenceValues \
 	EnumAAFSegments \
 	EnumAAFTypeDefs 
