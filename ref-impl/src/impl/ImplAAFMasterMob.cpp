@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
-
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 #include "ImplAAFSourceClip.h"
 #include "ImplAAFSourceMob.h"
 #include "ImplAAFComponent.h"
@@ -100,12 +118,14 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUID_t	sourceMobID;
 	HRESULT		hr = AAFRESULT_SUCCESS;
 	ImplAAFMobSlot*	pMobSlot;
+	ImplAAFTimelineMobSlot* pTimelineMobSlot = NULL;
 	aafUID_t	DataDef;
 	ImplAAFSegment*	pSegment = NULL;
 	ImplAAFSourceClip*	pSrcClip = NULL;
 	aafSourceRef_t		ref;
 	aafPosition_t		zeroPos;
-	ImplAAFMobSlot	*pNewSlot = NULL;
+	ImplAAFTimelineMobSlot	*pNewTimelineSlot = NULL;
+	aafRational_t  editRate;
   ImplAAFDictionary *pDictionary = NULL;
 
 
@@ -119,6 +139,11 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(pSourceMob->GetMobID(&sourceMobID));
 
 		CHECK(pSourceMob->FindSlotBySlotID(sourceSlotID, &pMobSlot));
+		pTimelineMobSlot = dynamic_cast<ImplAAFTimelineMobSlot *>(pMobSlot);
+		if (NULL == pTimelineMobSlot)
+			RAISE(AAFRESULT_SLOT_NOT_FOUND); // please use the correct error code!
+//		CHECK(pMobSlot->QueryInterface(IID_IAAFTimelineMobSlot,(void **) &pTimelineMobSlot));
+		CHECK(pTimelineMobSlot->GetEditRate(&editRate));
 
 		CHECK(pMobSlot->GetSegment(&pSegment));
 
@@ -148,21 +173,23 @@ AAFRESULT STDMETHODCALLTYPE
 		pDictionary = NULL;
 
 		CHECK(pSrcClip->Initialize(pDataDef, &slotLength, ref));
-		CHECK(AppendNewSlot(pSrcClip, masterSlotID, pSlotName, &pNewSlot));
+		CHECK(AppendNewTimelineSlot(editRate,pSrcClip, masterSlotID, pSlotName, 
+									zeroPos,&pNewTimelineSlot));
 
-		pNewSlot->ReleaseReference();
-		pNewSlot = NULL;
+		pNewTimelineSlot->ReleaseReference();
+		pNewTimelineSlot = NULL;
 
-		if(pSrcClip)
-			pSrcClip->ReleaseReference();
+		pSrcClip->ReleaseReference();
 		pSrcClip = NULL;
 	}
 	XEXCEPT
 	{
+		if(pNewTimelineSlot != NULL)
+			pNewTimelineSlot->ReleaseReference();
 		if(pSegment != NULL)
 			pSegment->ReleaseReference();
-		if(pNewSlot != NULL)
-			pNewSlot->ReleaseReference();
+		if(pMobSlot != NULL)
+			pMobSlot->ReleaseReference();
 		if(pSrcClip != NULL)
 			pSrcClip->ReleaseReference();
 		if(pDictionary != NULL)
