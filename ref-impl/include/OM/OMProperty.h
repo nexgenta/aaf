@@ -57,6 +57,7 @@ class OMType;
 
   // @class Abstract base class for persistent properties supported by
   //        the Object Manager.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMProperty {
 public:
   // @access Public members.
@@ -140,6 +141,12 @@ public:
     //          then the value returned is 0.
   virtual OMStorable* storable(void) const;
 
+    // @cmember The stored form of this <c OMProperty>.
+  OMStoredForm storedForm(void) const;
+
+    // @cmember The type of this <c OMProperty>.
+  const OMType* type(void) const;
+
 protected:
   // @access Protected members.
 
@@ -150,9 +157,6 @@ protected:
     // @cmember Clear the bit that indicates that this optional <c OMProperty>
     //          is present.
   void clearPresent(void);
-
-    // @cmember The type of this <c OMProperty>.
-  const OMType* type(void) const;
 
     // @cmember The <c OMStorable> that contains this <c OMProperty>.
   OMStorable* container(void) const;
@@ -193,6 +197,7 @@ private:
   // @class Abstract base class for simple (data) persistent
   //        properties supported by the Object Manager.
   //   @base public | <c OMProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMSimpleProperty : public OMProperty {
 public:
   // @access Public members. 
@@ -224,6 +229,9 @@ public:
     //          <c OMSimpleProperty>. The size is given in bytes.
   virtual size_t bitsSize(void) const;
 
+    // @cmember The raw bits of this <c OMSimpleProperty>.
+  virtual OMByte* bits(void) const;
+
     // @cmember Get the raw bits of this <c OMSimpleProperty>. The raw
     //          bits are copied to the buffer at address <p bits> which
     //          is <p size> bytes in size.
@@ -234,11 +242,11 @@ public:
     //          is <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
-protected:
-  // @access Protected members.
-
     // @cmember Set the size of this <c OMSimpleProperty> to <p newSize> bytes.
   void setSize(size_t newSize);
+
+protected:
+  // @access Protected members.
 
     // @cmember Write this property to persistent store, performing
     //          any necessary externalization and byte reordering.
