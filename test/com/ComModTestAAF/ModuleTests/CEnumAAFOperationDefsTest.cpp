@@ -9,11 +9,7 @@
 *												*
 \************************************************/
 
-#include "CEnumAAFOperationDefs.h"
-#include "CEnumAAFOperationDefs.h"
-#ifndef __CEnumAAFOperationDefs_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -23,7 +19,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -111,7 +107,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
 	long				n;
-	aafUID_t			testDataDef = DDEF_Video;
+	aafUID_t			testDataDef = DDEF_Picture;
 /*	long				test;
 */
 
@@ -345,7 +341,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CEnumAAFOperationDefs::test()
+extern "C" HRESULT CEnumAAFOperationDefs_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFOperationDefsTest.aaf";
@@ -358,7 +354,7 @@ HRESULT CEnumAAFOperationDefs::test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFOperationDefs::test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFOperationDefs_test...Caught general C++ exception!" << endl; 
 	}
 	return hr;
 }
