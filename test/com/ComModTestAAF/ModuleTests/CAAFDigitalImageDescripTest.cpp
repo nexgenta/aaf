@@ -17,6 +17,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFDefUIDs.h"
 
 
 // default test values
@@ -84,7 +85,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
@@ -360,7 +361,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 extern "C" HRESULT CAAFDigitalImageDescriptor_test()
 {
-	aafWChar*	pFileName = L"AAFDigitalImageDescTest.aaf";
+	aafWChar*	pFileName = L"AAFDigitalImageDescripTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try

@@ -23,6 +23,7 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "aafUtils.h"
+#include "AAFCodecDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -58,14 +59,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFMasterMob Test";
+	ProductInfo.productName = L"EnumAAFCodecFlavours Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
@@ -183,7 +184,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafUID_t		codecID = CodecWave;
 	// aafUID_t		testMatte = DDEF_Matte;
 	aafUID_t		testPicture = DDEF_Picture;
-	aafUID_t		checkFlavour = NilCodecVariety;
+	aafUID_t		checkFlavour = NilCodecFlavour;
 	aafUID_t		testFlavour;
 	HRESULT			hr = S_OK;
 
@@ -235,7 +236,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 extern "C" HRESULT CEnumAAFCodecFlavours_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"CodecDefTest.aaf";
+	aafWChar * pFileName = L"EnumAAFCodecFlavoursTest.aaf";
 
 	try
 	{
@@ -245,14 +246,14 @@ extern "C" HRESULT CEnumAAFCodecFlavours_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFCodecDef_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFCodecFlavours_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
 	if (SUCCEEDED(hr))
 	{
-		cout << "The following IAAFCodecDef methods have not been implemented:" << endl; 
+		cout << "The following IEnumAAFCodecFlavours methods have not been implemented:" << endl; 
 		cout << "     Next" << endl; 
 		cout << "     Skip" << endl; 
 		cout << "     Reset" << endl; 
