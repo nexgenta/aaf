@@ -1,24 +1,11 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -39,15 +26,17 @@
 #include <string.h>
 #include "AAFResult.h"
 #include "aafErr.h"
-#include "ImplAAFDictionary.h"
+#include "ImplAAFHeader.h"
 #include "ImplAAFTypeDef.h"
 #include "ImplAAFParameterDef.h"
 #include "ImplAAFTypeDef.h"
 
 ImplAAFParameter::ImplAAFParameter ()
-: _parmDef(			PID_Parameter_Definition,	L"Definition")
+: _parmDef(			PID_Parameter_Definition,	"Definition"),
+  _typeDef(			PID_Parameter_Type,			"Type")
 {
 	_persistentProperties.put(_parmDef.address());
+	_persistentProperties.put(_typeDef.address());
 }
 
 
@@ -61,7 +50,9 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFParameterDef *pParmDef)
 {
 	aafUID_t			newUID;
-	ImplAAFDictionary	*dict = NULL;
+	ImplAAFHeader		*head;
+	ImplAAFDictionary	*dict;
+	ImplAAFPluggableDef	*def;
 
 	if(pParmDef == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -69,22 +60,15 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		CHECK(pParmDef->GetAUID(&newUID));
-		CHECK(GetDictionary(&dict));
-// This is a weak reference, not yet counted
-//		if(dict->LookupParameterDef(&newUID, &def) == AAFRESULT_SUCCESS)
-//			def->ReleaseReference();
+		CHECK(pParmDef->MyHeadObject(&head));
+		CHECK(head->GetDictionary(&dict));
+		if(dict->LookupPluggableDef(&newUID, &def) == AAFRESULT_SUCCESS)
+			def->ReleaseReference();
 
 		_parmDef = newUID;
-//		pParmDef->AcquireReference();
-		dict->ReleaseReference();
-		dict = NULL;
+		pParmDef->AcquireReference();
 	}
 	XEXCEPT
-	{
-		if(dict)
-		  dict->ReleaseReference();
-		dict = 0;
-	}
 	XEND
 
 	return AAFRESULT_SUCCESS;
@@ -96,25 +80,20 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameter::GetParameterDefinition (
       ImplAAFParameterDef **ppParmDef)
 {
-	ImplAAFDictionary	*dict = NULL;
+	ImplAAFHeader		*head;
+	ImplAAFDictionary	*dict;
 
 	if(ppParmDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
-	  CHECK(GetDictionary(&dict));
-		CHECK(dict->LookupParameterDef(_parmDef, ppParmDef));
-//		(*ppParmDef)->AcquireReference();
-		dict->ReleaseReference();
-		dict = NULL;
+		CHECK(MyHeadObject(&head));
+		CHECK(head->GetDictionary(&dict));
+		CHECK(dict->LookupPluggableDef(&_parmDef, (ImplAAFPluggableDef **)ppParmDef) == AAFRESULT_SUCCESS);
+		(*ppParmDef)->AcquireReference();
 	}
 	XEXCEPT
-	{
-		if(dict)
-		  dict->ReleaseReference();
-		dict = 0;
-	}
 	XEND;
 
 	return AAFRESULT_SUCCESS;
@@ -122,42 +101,62 @@ AAFRESULT STDMETHODCALLTYPE
 
 	
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFParameter::SetTypeDefinition (
+      ImplAAFTypeDef*  pTypeDef)
+{
+	aafUID_t			newUID;
+	ImplAAFHeader		*head;
+	ImplAAFDictionary	*dict;
+	ImplAAFPluggableDef	*def;
+
+	if(pTypeDef == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		CHECK(pTypeDef->GetAUID(&newUID));
+		CHECK(pTypeDef->MyHeadObject(&head));
+		CHECK(head->GetDictionary(&dict));
+		if(dict->LookupPluggableDef(&newUID, &def) == AAFRESULT_SUCCESS)
+			def->ReleaseReference();
+
+		_typeDef = newUID;
+		pTypeDef->AcquireReference();
+	}
+	XEXCEPT
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameter::GetTypeDefinition (
       ImplAAFTypeDef **ppTypeDef)
 {
-	ImplAAFParameterDef	*pParameterDef = NULL;
+	ImplAAFHeader		*head;
+	ImplAAFDictionary	*dict;
 
 	if(ppTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
-	  CHECK(GetParameterDefinition(&pParameterDef));
-		CHECK(pParameterDef->GetTypeDefinition (ppTypeDef));
-		pParameterDef->ReleaseReference();
-		pParameterDef = NULL;
+		CHECK(MyHeadObject(&head));
+		CHECK(head->GetDictionary(&dict));
+		CHECK(dict->LookupPluggableDef(&_typeDef, (ImplAAFPluggableDef **)ppTypeDef) == AAFRESULT_SUCCESS);
+		(*ppTypeDef)->AcquireReference();
 	}
 	XEXCEPT
-	{
-		if(pParameterDef)
-		  pParameterDef->ReleaseReference();
-		pParameterDef = 0;
-	}
 	XEND;
 
 	return AAFRESULT_SUCCESS;
 }
 
-const OMUniqueObjectIdentification&
-  ImplAAFParameter::identification(void) const
-{
-  return *reinterpret_cast<const OMUniqueObjectIdentification*>(&_parmDef.reference());
-}
 
 
+OMDEFINE_STORABLE(ImplAAFParameter, AUID_AAFParameter);
 
 
 
