@@ -54,7 +54,7 @@ AD_XMETHOD6(Initialize,
 
 			[in],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pTypeName,
 			friendly name of this type definition,
 
@@ -146,6 +146,7 @@ AD_XMETHOD2(GetElementValue,
   // - index is less than CountElements\(\).
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pOutValue\)
   //
   // AAFRESULT_BADINDEX
   //   - index is not less than CountElements\(\).)
@@ -160,7 +161,7 @@ AD_XMETHOD3(GetNameFromValue,
 
 			[out\, size_is\(bufSize\)\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			buffer into which the element name is written,
 
@@ -240,7 +241,7 @@ AD_XMETHOD3(GetNameFromInteger,
 
 			[out\, size_is\(bufSize\)\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			buffer into which the element name is written,
 
