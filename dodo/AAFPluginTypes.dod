@@ -1,0 +1,45 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
+#startm .this-module 0
+AAFPluginTypes\
+#endm
+#c
+AD_TYPES_HEAD
+AD_INCLUDE(AAFTypes)
+
+AD_TYPES_BEGIN(410ED8B1, 912B, 11D2, 80, 88, 00, 60, 08, 14, 3e, 6f)
+
+typedef enum _aafDeinterleave_t
+{
+	deinterleave,
+	leaveInterleaved
+} aafDeinterleave_t;
+
+typedef enum _aafCheckVerbose_t
+{
+	kAAFCheckVerbose, 
+	kCheckQuiet
+} aafCheckVerbose_t;
+
+typedef enum _aafCheckWarnings_t 
+{
+	kAAFCheckPrintWarnings, 
+	kAAFCheckNoWarnings
+} aafCheckWarnings_t;
+
+typedef struct _aafSelectInfo_t
+{
+	aafBool         	hwAssisted;
+	aafBool				isNative;
+	aafBool        		willHandleMDES;
+	aafInt16			relativeLoss;
+	aafUInt32			avgBitsPerSec;
+} aafSelectInfo_t;
+
+AD_TYPES_END
+

@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFFilmDescriptor\
 #endm
@@ -26,7 +33,6 @@ AD_IDL(//
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
@@ -43,7 +49,7 @@ AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD1(SetFilmManufacturer,
 			[in\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			Film manufacturer name,
 
@@ -71,7 +77,7 @@ AD_XMETHOD1(SetFilmManufacturer,
 AD_XMETHOD2(GetFilmManufacturer,
 			[in\,string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pManufacturer,
 			Film manufacturer name,
 
@@ -142,7 +148,7 @@ AD_XMETHOD1(GetFilmManufacturerBufLen,
 AD_XMETHOD1(SetFilmModel,
 			[in\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			Film model name,
 
@@ -169,7 +175,7 @@ AD_XMETHOD1(SetFilmModel,
 AD_XMETHOD2(GetFilmModel,
 			[in\,string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			Film manufacturer name,
 

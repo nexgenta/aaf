@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTIFFDescriptor\
 #endm
@@ -9,14 +16,6 @@ AAFFileDescriptor\
 #c #import ./AAFDigitalImageDescriptor.exp
 AD_HEAD
 AD_INCLUDE(AAFTypes)
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
 
 AD_IDL(//
 // The IAAFTIFFDescriptor interface is implemented by objects which

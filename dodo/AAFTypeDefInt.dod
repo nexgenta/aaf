@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefInt\
 #endm
@@ -26,7 +33,7 @@ AD_XMETHOD4(Initialize,
 
 			[in],
 			objPass,
-			aafUInt32,
+			aafUInt8,
 			intSize,
 			the size of this integer type in bytes,
 

@@ -1,12 +1,38 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFSearchSource\
 #endm
 #c
 AD_HEAD
+AD_IDL(//
+// The IAAFSearchSource interface is used to return source information
+// for some mob slots.
+//
+// In addition to the specific error results listed for each method\,
+// all methods in this interface may also return one of the following
+// values:
+// 
+// AAFRESULT_NOMEMORY
+//   - insufficient system memory is available to perform the
+//     operation.
+//
+// AAFRESULT_NOT_INITIALIZED
+//   - This object has not yet had Initialize\(\) called on it through
+//     this object's primary interface.  Note that IAAFSearchSource is
+//     not a primary interface for a concrete class\, so it is not
+//     appropriate for the Initialize\(\) method to exist in this
+//     interface.  The Initialize\(\) method is available through the
+//     concrete object's primary interface.
+//)
 AD_DEFAULT_UUID(332CBDD0, 5425, 11D2, AA, 7A, 10, 00, 3D, 00, 00, 00)
-AD_CLASS_BEGIN
-
-AD_XMETHOD7(SearchSource,
+AD_XCLASS_BEGIN(Abstract, Transient)
+AD_XMETHOD6(SearchSource,
 			[in],
 			  objPass,
 			  aafSlotID_t,
@@ -29,14 +55,9 @@ AD_XMETHOD7(SearchSource,
 			  Media Criteria,
 			[in],
 			  objPass,
-			  aafEffectChoice_t *,
-			  pEffectChoice,
-			  Effect Choice,
-			[out],
-			  objOut,
-			  AAFComponent,
-			  ppThisCpnt,
-			  The found component,
+			  aafOperationChoice_t *,
+			  pOperationChoice,
+			  Operation Choice,
 			[out],
 			  objOut,
 			  AAFFindSourceInfo,
@@ -51,11 +72,12 @@ AD_XMETHOD7(SearchSource,
   // MobGetThisSource\, and MobCloseSearch functions for those
   // purposes. 
   //
+  // The returned component and find source info are AddRef\(\)ed
+  // before they are returned.
+  //
   // Succeeds if all of the following are true:
-  // - the ppThisCpnt pointer is valid.
-  // \(other conditions here\)
-  // 
-  // If this method fails nothing is written to *ppThisCpnt.
+  // - ppSourceInfo is non-NULL
+  // - a Mob of the requested kind is found
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -67,5 +89,10 @@ AD_XMETHOD7(SearchSource,
   // AAFRESULT_NULL_PARAM
   //   - ppCpnt is null.
   //
-  // \(other codes here.\))
-AD_CLASS_END
+  // OM_ERR_INVALID_MOBTYPE
+  //	- The enumerator is out of range \(bad cast\, or writing
+  //      toolkit newer than reader\)
+  //
+  // OM_ERR_TRAVERSAL_NOT_POSS
+  //	- Can not find a mob of the given kind.)
+AD_XCLASS_END(Abstract, Transient)
