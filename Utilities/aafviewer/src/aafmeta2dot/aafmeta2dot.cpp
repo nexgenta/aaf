@@ -1,5 +1,5 @@
 /*
- * $Id: aafmeta2dot.cpp,v 1.4 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: aafmeta2dot.cpp,v 1.5 2005/01/24 16:18:03 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -187,7 +187,7 @@ int main(int argc, char** argv)
    }
    catch (const AxEx& ex) 
    {
-      wcout << ex.what() << endl;
+      cout << ex.what() << endl;
       Logging::DebugLogStream() << "Export failed." << endl;
    }
    catch (...)
