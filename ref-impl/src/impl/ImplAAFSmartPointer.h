@@ -1,31 +1,13 @@
 #ifndef __ImplAAFSmartPointer_h__
 #define __ImplAAFSmartPointer_h__
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*                                               *
+\***********************************************/
 
 // Define smart pointer assertions before including the base header.
 #ifndef AAF_SMART_POINTER_ASSERT
@@ -106,16 +88,33 @@ template <typename ReferencedType>
 struct ImplAAFSmartPointer
   : public AAFSmartPointerBase <ReferencedType, AAFCountedImplReference>
 {
+  // Occasionally it might be necessary to set the value of this ptr;
+  // however we'd prefer that clients would find other means.  The
+  // only case I've seen its utility is when it is necessary to
+  // dynamically cast an Impl object to another Impl object, e.g.:
+  //
+  // (where DerivedClass inherits from BaseClass):
+  // ImplAAFSmartPointer<BaseClass> baseSP = [...something];
+  // ImplAAFSmartPointer<DerivedClass> derivedSP;
+  // derivedSP.SetPtr (dynamic_cast<DerivedClass>(baseSP));
+  //
+  // In other words, the dynamic_cast has to be done on the referenced
+  // type, not on the smart pointer type.
+  //
+  void SetPtr (ReferencedType * ptr);
+
   // operator =
   ImplAAFSmartPointer<ReferencedType> & operator =
-  (ReferencedType * src) ;
+  (ReferencedType * src) { SetPtr (src); return *this; }
 };
 
 
 template <class ReferencedType>
-ImplAAFSmartPointer<ReferencedType> &
-ImplAAFSmartPointer<ReferencedType>::operator = (ReferencedType * ptr)
+void ImplAAFSmartPointer<ReferencedType>::SetPtr (ReferencedType * ptr)
 {
+  // in case something changed since last time
+  updateRefCounts ();
+
   // Hack! get a pointer to the rep of this object
   ReferencedType ** ppRep = this->operator&();
   AAF_SMART_POINTER_ASSERT (ppRep);
@@ -123,10 +122,14 @@ ImplAAFSmartPointer<ReferencedType>::operator = (ReferencedType * ptr)
   // set the pointer
   *ppRep = ptr;
 
+  // BobT 1999-07-07: Bug! See comment in
+  // AAFSmartPointerBase::updateRefCounts() to see why we need to
+  // addref this one explicitly.
   if (*ppRep)
 	acquire(*ppRep);
 
-  return *this;
+  // put us back in sync
+  updateRefCounts ();
 }
 
 
