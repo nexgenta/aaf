@@ -1,95 +1,66 @@
 //@doc
-//@class    AAFOperationDef | Implementation class for AAFOperationDef
-#ifndef __ImplAAFOperationDef_h__
-#define __ImplAAFOperationDef_h__
+//@class    AAFEffectDef | Implementation class for AAFEffectDef
+#ifndef __ImplAAFEffectDef_h__
+#define __ImplAAFEffectDef_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
 
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
+
+
+class ImplAAFParameterDef;
 
 class ImplAAFLocator;
-class ImplAAFParameterDef;
-class ImplAAFOperationDef;
-template <class T> 
-class ImplAAFEnumerator;
-typedef ImplAAFEnumerator<ImplAAFLocator> ImplEnumAAFLocators;
-typedef ImplAAFEnumerator<ImplAAFOperationDef> ImplEnumAAFOperationDefs;
-typedef ImplAAFEnumerator<ImplAAFParameterDef> ImplEnumAAFParameterDefs;
 
+class ImplEnumAAFLocators;
+
+class ImplEnumAAFParameterDefs;
+
+class ImplEnumAAFEffectDefs;
+ 
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
 #endif
 
-#include "OMWeakRefProperty.h"
-#include "OMWeakRefVectorProperty.h"
-#include "OMWeakRefSetProperty.h"
-
-#include "ImplAAFDataDef.h"
-#include "ImplAAFParameterDef.h"
-#include "ImplEnumAAFOperationDefs.h"
+#include "ImplEnumAAFEffectDefs.h"
 #include "ImplEnumAAFParameterDefs.h"
 
 
-class ImplAAFOperationDef : public ImplAAFDefObject
+class ImplAAFEffectDef : public ImplAAFDefObject
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFOperationDef ();
-
-
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        // @parm [in] Pointer to an AUID reference
-        (const aafUID_t & id,
-		 const aafCharacter *name,
-		 const aafCharacter *description);
-
+  ImplAAFEffectDef ();
 
 protected:
-  virtual ~ImplAAFOperationDef ();
+  virtual ~ImplAAFEffectDef ();
 
 public:
 
   //****************
-  // GetDataDef()
+  // GetDataDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetDataDef
+    GetDataDefinitionID
         // @parm [out,retval] pointer to the return value
-        (ImplAAFDataDef ** ppDataDef);
+        (aafUID_t *pDataDefID);
 
   //****************
-  // SetDataDef()
+  // SetDataDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetDataDef
+    SetDataDefinitionID
         // @parm [in] Pointer to the new data Definition Object
-        (ImplAAFDataDef * pDataDef);
+        (aafUID_t  *pDataDefID);
 
   //****************
   // IsTimeWarp()
@@ -104,65 +75,47 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetIsTimeWarp
-        // @parm [in] Degrade To Operation Definition Object
+        // @parm [in] Degrade To Effect Definition Object
         (aafBool  IsTimeWarp);
 
   //****************
-  // PrependDegradeToOperation()
+  // PrependDegradeToEffects()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    PrependDegradeToOperation (
+    PrependDegradeToEffects (
         // @parm [in] is timewarp value
-      ImplAAFOperationDef  *pOperationDef);
+      ImplAAFEffectDef  *pEffectDef);
 
   //****************
-  // AppendDegradeToOperation()
+  // AppendDegradeToEffects()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendDegradeToOperation (
+    AppendDegradeToEffects (
         // @parm [in] is timewarp value
-      ImplAAFOperationDef  *pOperationDef);
+      ImplAAFEffectDef  *pEffectDef);
 
   //****************
-  // InsertDegradeToOperationAt()
+  // GetDegradeToEffects()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    InsertDegradeToOperationAt (
-        // @parm [in] index to insert
-      aafUInt32 index,
-        // @parm [in] operation def to insert
-      ImplAAFOperationDef  *pOperationDef);
-
-  //****************
-  // RemoveDegradeToOperationAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveDegradeToOperationAt (
-        // @parm [in] index of operation def to remove
-      aafUInt32 index);
-
-  //****************
-  // GetDegradeToOperations()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetDegradeToOperations (
-        // @parm [out] Operation Definition Enumeration
-      ImplEnumAAFOperationDefs  **ppEnum);
-
-  //****************
-  // CountDegradeToOperations()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountDegradeToOperations (
-        // @parm [out, retval] result
-      aafUInt32 * pResult);
+    GetDegradeToEffects (
+        // @parm [out] Effect Definition Enumeration
+      ImplEnumAAFEffectDefs  **ppEnum);
 
   //****************
   // GetCategory()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetCategory (
-        aafUID_t		*pCategory);
+        wchar_t		*pCategory,
+		aafInt32	bufSize);
+
+  //****************
+  // GetCategoryBufLen()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetCategoryBufLen (
+			aafInt32 *		pLen);
 
 			//****************
   // SetCategory()
@@ -170,7 +123,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetCategory
         // @parm [in] category
-        (const aafUID_t category);
+        (wchar_t *category);
 
   //****************
   // GetNumberInputs()
@@ -208,7 +161,7 @@ public:
   // AppendParameterDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddParameterDef
+    AddParameterDefs
         // @parm [in] Parameter definition Object
         (ImplAAFParameterDef * pAAFParameterDef);
 
@@ -216,38 +169,28 @@ public:
   // GetParameterDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetParameterDefs
+    GetParameterDefinitions
         // @parm [out,retval] Parameter definition enumeration
         (ImplEnumAAFParameterDefs ** ppEnum);
 
-  //****************
-  // CountParameterDefinitions()
+public:
+  // Declare this class to be storable.
   //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountParameterDefs
-        // @parm [out,retval] count of Parameter definitions
-        (aafUInt32 * pResult);
+  OMDECLARE_STORABLE(ImplAAFEffectDef)
 
-  //****************
-  // LookupParameterDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    LookupParameterDef
-        // @parm [in] id to look up
-        (const aafUID_t & parameterDefId,
-        // @parm [out, retval] returned parameter def
-		 ImplAAFParameterDef ** ppParameterDef);
-
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFEffectDefTest.cpp.
+  static AAFRESULT test();
 private:
-	OMWeakReferenceProperty<ImplAAFDataDef>			_dataDef;
+	OMFixedSizeProperty<aafUID_t>					_dataDef;
 	OMFixedSizeProperty<aafBool>					_isTimeWarp;
-	OMWeakReferenceVectorProperty<ImplAAFOperationDef>	_degradeTo;
-	OMFixedSizeProperty<aafUID_t>                   _category;
+	effectDefWeakRefArrayProp_t						_degradeTo;
+	OMWideStringProperty                            _category;
 	OMFixedSizeProperty<aafInt32>					_numInputs;
 	OMFixedSizeProperty<aafUInt32>					_bypass;
-	OMWeakReferenceSetProperty<ImplAAFParameterDef>	_paramDefined;
+	parmDefWeakRefArrayProp_t						_paramDefined;
 };
 
-#endif // ! __ImplAAFOperationDef_h__
+#endif // ! __ImplAAFEffectDef_h__
 
 
