@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTimelineMobSlot.cpp,v 1.6.2.1 2004/03/11 18:58:43 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTimelineMobSlot.cpp,v 1.6.2.2 2004/04/07 13:14:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,7 +62,6 @@ CAAFTimelineMobSlot::CAAFTimelineMobSlot (IUnknown * pControllingUnknown, aafBoo
 CAAFTimelineMobSlot::~CAAFTimelineMobSlot ()
 {
 }
-
 
 HRESULT STDMETHODCALLTYPE
     CAAFTimelineMobSlot::Initialize ()
@@ -319,6 +318,115 @@ HRESULT STDMETHODCALLTYPE
   return hr;
 }
 
+HRESULT STDMETHODCALLTYPE
+    CAAFTimelineMobSlot::SetMarkIn (aafPosition_t  value)
+{
+  HRESULT hr;
+
+  ImplAAFTimelineMobSlot * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFTimelineMobSlot*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->SetMarkIn (value);
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFTimelineMobSlot::GetMarkIn (aafPosition_t *  result)
+{
+  HRESULT hr;
+
+  ImplAAFTimelineMobSlot * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFTimelineMobSlot*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->GetMarkIn (result);
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFTimelineMobSlot::SetMarkOut (aafPosition_t  value)
+{
+  HRESULT hr;
+
+  ImplAAFTimelineMobSlot * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFTimelineMobSlot*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->SetMarkOut (value);
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFTimelineMobSlot::GetMarkOut (aafPosition_t *  result)
+{
+  HRESULT hr;
+
+  ImplAAFTimelineMobSlot * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFTimelineMobSlot*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->GetMarkOut (result);
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFTimelineMobSlot::SetUserPos (aafPosition_t  value)
+{
+  HRESULT hr;
+
+  ImplAAFTimelineMobSlot * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFTimelineMobSlot*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->SetUserPos (value);
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFTimelineMobSlot::GetUserPos (aafPosition_t *  result)
+{
+  HRESULT hr;
+
+  ImplAAFTimelineMobSlot * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFTimelineMobSlot*> (pO);
+  assert (ptr);
+
+
+  hr = ptr->GetUserPos (result);
+
+  return hr;
+}
+
+
 //
 // 
 // 
@@ -331,6 +439,8 @@ HRESULT CAAFTimelineMobSlot::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
+    HRESULT hr = S_OK;
+
     if (NULL == ppvObj)
         return E_INVALIDARG;
 
@@ -338,6 +448,13 @@ HRESULT CAAFTimelineMobSlot::InternalQueryInterface
     if (EQUAL_UID(riid,IID_IAAFTimelineMobSlot)) 
     { 
         *ppvObj = (IAAFTimelineMobSlot *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+
+    if (EQUAL_UID(riid,IID_IAAFTimelineMobSlot2)) 
+    { 
+        *ppvObj = (IAAFTimelineMobSlot2 *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
@@ -350,4 +467,3 @@ HRESULT CAAFTimelineMobSlot::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFTimelineMobSlot)
-
