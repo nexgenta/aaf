@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFBaseClassFactory.cpp,v 1.62 2004/06/04 12:39:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFBaseClassFactory.cpp,v 1.63 2004/10/25 13:13:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -128,7 +128,7 @@ static int CompareTableEntries(const AAFObjectEntry_t **elem1,
   const aafUID_t &auid1 = *((**elem1).pAUID);
   const aafUID_t &auid2 = *((**elem2).pAUID);
 
-  // Compare the unsigned long member
+  // Compare the unsigned int member
   if (auid1.Data1 < auid2.Data1)
     return -1;
   else if (auid1.Data1 > auid2.Data1)

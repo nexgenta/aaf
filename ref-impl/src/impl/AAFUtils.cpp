@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.56 2004/10/20 09:12:30 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.57 2004/10/25 13:11:36 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -732,7 +732,7 @@ void AAFByteSwap16(
 /************************
  * Function: AAFByteSwap32		(INTERNAL)
  *
- * 	Byte swap a long value to convert between big-endian and
+ * 	Byte swap a 32-bit int value to convert between big-endian and
  *		little-endian formats.
  *
  * Argument Notes:
@@ -761,7 +761,7 @@ void AAFByteSwap32(
 /************************
  * Function: AAFByteSwap64		(INTERNAL)
  *
- * 	Byte swap a long value to convert between big-endian and
+ * 	Byte swap a 32-bit int value to convert between big-endian and
  *		little-endian formats.
  *
  * Argument Notes:
