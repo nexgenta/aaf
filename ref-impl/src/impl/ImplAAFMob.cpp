@@ -86,11 +86,8 @@
 #include "ImplEnumAAFMobSlots.h"
 #include "ImplEnumAAFComponents.h"
 
-#if defined(_MAC) || defined(macintosh)
-#include <wstring.h>
-#endif
-
 #include <assert.h>
+#include <wchar.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
@@ -134,7 +131,7 @@ ImplAAFMob::~ImplAAFMob ()
 	size_t size = _slots.getSize();
 	for (size_t i = 0; i < size; i++)
 	{
-		ImplAAFMobSlot *pSlot = _slots.setValueAt(0, i);
+		ImplAAFMobSlot *pSlot = _slots.clearValueAt(i);
 		if (pSlot)
 		{
 		  pSlot->ReleaseReference();
@@ -147,7 +144,7 @@ ImplAAFMob::~ImplAAFMob ()
 		size = _userComments.getSize();
 		for (size_t j = 0; j < size; j++)
 		{
-			ImplAAFTaggedValue* pTaggedValue = _userComments.setValueAt(0, j);
+			ImplAAFTaggedValue* pTaggedValue = _userComments.clearValueAt(j);
 			if (pTaggedValue)
 			  pTaggedValue->ReleaseReference();
 			pTaggedValue = 0;
@@ -158,7 +155,7 @@ ImplAAFMob::~ImplAAFMob ()
 		size = _KLVData.getSize();
 		for (size_t j = 0; j < size; j++)
 		{
-			ImplAAFKLVData* pKLVData = _KLVData.setValueAt(0, j);
+			ImplAAFKLVData* pKLVData = _KLVData.clearValueAt(j);
 			if (pKLVData)
 			  pKLVData->ReleaseReference();
 			pKLVData = 0;
@@ -759,7 +756,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if (commentFound)
 		{
 			// Update existing comment
-			CHECK(pTaggedValue->SetValue((wcslen(pComment)*sizeof(aafCharacter)+2), (aafDataValue_t)pComment));
+			CHECK(pTaggedValue->SetValue((wcslen(pComment)+1)*sizeof(aafCharacter), (aafDataValue_t)pComment));
 			pTaggedValue->ReleaseReference();
 			pTaggedValue = 0;
 		}
@@ -769,7 +766,7 @@ AAFRESULT STDMETHODCALLTYPE
 			CHECK(pTaggedValueClass->CreateInstance ((ImplAAFObject**) &pTaggedValue));
 			CHECK(pTaggedValue->Initialize(pTagName,
 										   pTaggedValueType,
-                       (wcslen(pComment)*sizeof(aafCharacter)+2), 
+                       ((wcslen(pComment)+1)*sizeof(aafCharacter)), 
                        (aafDataValue_t)pComment));
 			_userComments.appendValue(pTaggedValue);
 		}
