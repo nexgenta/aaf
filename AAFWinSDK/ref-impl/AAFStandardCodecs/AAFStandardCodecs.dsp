@@ -23,8 +23,8 @@ CFG=AAFStandardCodecs - Win32 Debug
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
-# PROP Scc_ProjName ""
-# PROP Scc_LocalPath ""
+# PROP Scc_ProjName "AAFStandardCodecs"
+# PROP Scc_LocalPath "..\..\.."
 CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /nodefaultlib:"msvcrtd.lib" /out:"../../Release/RefImpl/AAFPGAPI.dll" /libpath:"..\..\Release\aafsdk\lib"
+# ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /nodefaultlib:"msvcrtd.lib" /out:"../../Release/RefImpl/aafext/AAFPGAPI.dll" /libpath:"..\..\Release\aafsdk\lib"
 
 !ELSEIF  "$(CFG)" == "AAFStandardCodecs - Win32 Debug"
 
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"msvcrt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /out:"../../Debug/RefImpl/AAFPGAPI.dll" /pdbtype:sept
+# ADD LINK32 kernel32.lib advapi32.lib ole32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"msvcrt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /out:"../../Debug/RefImpl/aafext/AAFPGAPI.dll" /pdbtype:sept
 # SUBTRACT LINK32 /verbose /pdb:none
 
 !ENDIF 
@@ -108,6 +108,14 @@ SOURCE="..\..\..\ref-impl\src\impl\AAFUtils.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\plugins\CAAFAIFCCodec.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\plugins\CAAFCDCICodec.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\plugins\CAAFCDCIDescriptorHelper.cpp"
 # End Source File
 # Begin Source File
 
