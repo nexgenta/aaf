@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.10 2004/08/12 15:58:54 akharkev Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.11 2004/08/13 12:00:15 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -30,21 +30,22 @@ AAFNONPERSISTENTOBJECTS=""
 # These are files which specify COM interfaces, but which are
 # implemented in other objects.
 AAFCOMINTERFACESONLY="\
+	AAFComponent2 \
+	AAFCompositionMob2 \
 	AAFDataDef2 \
+	AAFDictionary2 \
+	AAFDigitalImageDescriptor2 \
 	AAFEndian \
-	AAFHeader2 \
-	AAFSearchSource \
 	AAFEssenceDataEx \
 	AAFEssenceMultiAccess \
-	AAFTypeDefVariableArrayEx \
+	AAFHeader2 \
+	AAFMasterMob2 \
 	AAFMasterMobEx \
 	AAFMob2 \
-	AAFTimelineMobSlot2 \
-	AAFComponent2 \
-	AAFDictionary2 \
+	AAFSearchSource \
 	AAFSourceReference2 \
-	AAFMasterMob2 \
-	AAFCompositionMob2 "
+	AAFTimelineMobSlot2 \
+	AAFTypeDefVariableArrayEx "
 
 # These are the impl files that are typed by humans.  Be sure to
 # remove them from the other list.  As you check each one in, just add
