@@ -66,10 +66,10 @@ extern "C" const aafClassID_t CLSID_AAFSegment;
 const aafUID_t kNullID = {0};
 
 ImplAAFGroup::ImplAAFGroup ()
-//_effectDefinition( PID_Group_EffectDefinition, "Effect Definition"),
-//_inputSegments( PID_Group_InputSegments, "Input Segments"),
+//_effectDefinition( PID_Group_EffectDefinition, "EffectDefinition"),
+//_inputSegments( PID_Group_InputSegments, "InputSegments"),
 //_parameters( PID_Group_Parameters, "Parameters"),
-//_bypassOverride( PID_Group_BypassOverride, "Bypass Override"),
+//_bypassOverride( PID_Group_BypassOverride, "BypassOverride"),
 //_rendering( PID_Group_Rendering, "Rendering")
 {
 //	_persistentProperties.put(_effectDefinition.address());
@@ -160,7 +160,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 	//@comm If this property does not exist the error
-	// OM_ERR_PROP_NOT_PRESENT will be returned.
+	// AAFRESULT_PROP_NOT_PRESENT will be returned.
 	//@comm Working and final renderings are handled by using
 	// a media group as the segment.
 	//@comm Replaces omfiEffectGetFinalRender and omfiEffectGetWorkingRender
@@ -180,7 +180,7 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-	//@comm If the property does not exist, the error OM_ERR_PROP_NOT_PRESENT will be returned.)
+	//@comm If the property does not exist, the error AAFRESULT_PROP_NOT_PRESENT will be returned.)
 	//@comm Replaces omfiEffectGetBypassOverride
 
 AAFRESULT STDMETHODCALLTYPE
