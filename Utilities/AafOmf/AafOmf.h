@@ -1,3 +1,5 @@
+#ifndef _AAF_OMF_
+#define _AAF_OMF_	1
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -48,8 +50,21 @@
 #include "AAFParameterDefs.h"
 #include "AAFInterpolatorDefs.h"
 #include "AAFTypeDefUIDs.h"
+#include "StreamLogger.h"
+
+//#ifndef _INCLUDED_OMF2_
+//#define _INCLUDED_OMF2_
+//namespace OMF2
+//{
+//#include "omPublic.h"
+//#include "omMedia.h"
+//}
+//#endif
 
 const int MAX_INDENT = 8;
+const unsigned	kLogError = 0; 	// Error level.
+const unsigned	kLogWarn 	= 1;  // Warning level.
+const unsigned	kLogInfo  = 2; 	// Informational level.
 
 // ============================================================================
 // simple helper class to initialize and cleanup COM library.
@@ -100,6 +115,7 @@ typedef struct _AafOmfGlobals
 	char			sOutFileName[256];
 	char			sLogFileName[256];
 	char*			pProgramName;
+	StreamLogger*		pLogger;
 
 	// MC Private Properties
 	OMF2::omfProperty_t		pvtEffectIDProp;
@@ -113,6 +129,7 @@ typedef struct _AafOmfGlobals
 	OMF2::omfProperty_t		omCDCIWhiteReferenceLevel;
 	OMF2::omfProperty_t		omCDCIColorRange;
 	OMF2::omfProperty_t		omCDCIPaddingBits;
+	~_AafOmfGlobals( void )		{ delete pLogger; }
 } AafOmfGlobals;
 
 int deleteFile( char* fileName );
@@ -124,13 +141,10 @@ AAFRESULT aafMobIDFromMajorMinor(
 		aafUInt32	minor,
 		aafUID_t *mobID);     /* OUT - Newly created Mob ID */
 void RegisterCodecProperties(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession);
-void RegisterOMFMCPrivate(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession);
-void RegisterAAFMCPrivate(IAAFDictionary * dict);
-HRESULT SetIntegerPropOnObject(IAAFObject* pObj, aafUID_t* pClassID, aafUID_t* pPropID, const aafUID_t* pIntTypeID,
-							   aafMemPtr_t pValue, aafUInt32 ValueSize, IAAFDictionary *dict);
 
-HRESULT GetIntegerPropFromObject(IAAFObject* pObj, const aafUID_t* pClassID, aafUID_t* pPropID,
-								 const aafUID_t* pIntTypeID, aafMemPtr_t pValue, aafUInt32 ValueSize, IAAFDictionary *dict);
 
-const aafUID_t AUID_PropertyMobAppCode = { 0x96c46992, 0x4f62, 0x11d3, { 0xa0, 0x22, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
-
+#define COMMON_ERR_BASE		(AAFRESULT)0xE0000000
+#define AAF2OMF_ERR_BASE	(AAFRESULT)0xE0001000
+#define OMF2AAF_ERR_BASE	(AAFRESULT)0xE0006000
+#define AAFRESULT_FILE_NOT_OMF (OMF2AAF_ERR_BASE + 1)
+#endif

@@ -1,3 +1,5 @@
+#ifndef _OMF2AAF_
+#define _OMF2AAF_ 1
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -24,6 +26,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+#include "EffectTranslate.h"
 
 /************************************************************************
  *
@@ -41,36 +44,36 @@ public:
 	~Omf2Aaf();
 
 public:
-	HRESULT ConvertFile( void );
-	HRESULT OpenOutputFile( void );
-	HRESULT OMFFileOpen( char* pFileName );
+	void ConvertFile( void );
+	void OpenOutputFile( void );
+	void OMFFileOpen( char* pFileName );
 	HRESULT	TOCFileCreate( void ); 
 	void OMFFileClose( void );
-	HRESULT AAFFileOpen( char* pFileName );
+	void AAFFileOpen( char* pFileName );
 	HRESULT AAFDefinitionFileOpen( void );
 	void AAFFileClose(void );
-	HRESULT OMFFileRead( void );
-	HRESULT ConvertOMFHeader( void );
-	HRESULT ConvertOMFDataDefinitionObject( OMF2::omfObject_t obj);
-	HRESULT ConvertOMFClassDictionaryObject( OMF2::omfObject_t obj);
-	HRESULT ConvertOMFMediaDataObject( OMF2::omfObject_t obj, OMF2::omfUID_t inMediaID);
-	HRESULT ConvertOMFDatakind(OMF2::omfDDefObj_t datakind, aafUID_t* pDatadef);
+	void OMFFileRead( void );
+	void ConvertOMFHeader( void );
+	void ConvertOMFDataDefinitionObject( OMF2::omfObject_t obj);
+	void ConvertOMFClassDictionaryObject( OMF2::omfObject_t obj);
+	void ConvertOMFMediaDataObject( OMF2::omfObject_t obj, OMF2::omfUID_t inMediaID);
+	void ConvertOMFDatakind(OMF2::omfDDefObj_t datakind, aafUID_t* pDatadef);
 //	HRESULT ConvertUniqueNameToAUID(OMF2::omfUniqueName_t datakindName, aafUID_t* pDatadef);
-	HRESULT ConvertOMFMOBObject( OMF2::omfObject_t obj, IAAFMob* pMob );
-	HRESULT ConvertOMFCompositionObject( OMF2::omfObject_t obj,IAAFCompositionMob* pCompMob );
+	void ConvertOMFMOBObject( OMF2::omfObject_t obj, IAAFMob* pMob );
+	void ConvertOMFCompositionObject( OMF2::omfObject_t obj,IAAFCompositionMob* pCompMob );
 	HRESULT ConvertOMFMasterMob( OMF2::omfObject_t obj, IAAFMasterMob* pMasterMob );
 	HRESULT ConvertOMFSourceMob( OMF2::omfObject_t obj, IAAFSourceMob* pSourceMob );
-	HRESULT TraverseOMFMob( OMF2::omfObject_t obj, IAAFMob* pMob );
-	HRESULT ProcessOMFComponent( OMF2::omfObject_t obj, IAAFComponent** ppComponent );
-	HRESULT TraverseOMFSequence( OMF2::omfObject_t obj, IAAFSequence* pSequence );
-	HRESULT	ConvertOMFSequence( OMF2::omfObject_t sequence, IAAFSequence* pSequence);
+	void TraverseOMFMob( OMF2::omfObject_t obj, IAAFMob* pMob );
+	void ProcessOMFComponent( OMF2::omfObject_t obj, IAAFComponent** ppComponent );
+	void TraverseOMFSequence( OMF2::omfObject_t obj, IAAFSequence* pSequence );
+	void	ConvertOMFSequence( OMF2::omfObject_t sequence, IAAFSequence* pSequence);
 	HRESULT ConvertOMFSourceClip( OMF2::omfObject_t sourceclip, IAAFSourceClip* pSourceClip);
 	HRESULT ConvertOMFComponentProperties(OMF2::omfObject_t sequence, IAAFComponent* pComponent);
 	HRESULT ConvertOMFTransition(OMF2::omfObject_t transition, IAAFTransition* pTransition);
-	HRESULT ConvertOMFSelector(OMF2::omfObject_t selector, IAAFSelector* pSelector);
-	HRESULT ConvertOMFLocator(OMF2::omfObject_t locator, IAAFEssenceDescriptor* pEssenceDesc);
+	void ConvertOMFSelector(OMF2::omfObject_t selector, IAAFSelector* pSelector);
+	void ConvertOMFLocator(OMF2::omfObject_t locator, IAAFEssenceDescriptor* pEssenceDesc);
 	HRESULT ConvertOMFCDCIDescriptorLocator(OMF2::omfObject_t mediaDescriptor, IAAFCDCIDescriptor* pAAFDescriptor);
-	HRESULT ConvertOMFEffects(OMF2::omfEffObj_t effect, IAAFOperationGroup* pEffect);
+	virtual HRESULT ConvertOMFEffects(OMF2::omfEffObj_t effect, IAAFOperationGroup* pEffect);
 	HRESULT ConvertOMFEffectDefinition(OMF2::omfDDefObj_t effectDef, OMF2::omfObject_t effect, IAAFOperationDef** ppEffectDef);
 	HRESULT GetAAFOperationDefinition(OMF2::omfUniqueName_t datakindName, OMF2::omfUniqueName_t MCEffectID,
 										char* defName, char* defDescription, aafUInt32 bypassOverride, aafBool isTimeWarp,
@@ -78,11 +81,10 @@ public:
 	HRESULT GetParameterDefinition(aafUID_t* pDefUID, IAAFTypeDef* pTypeDef,	aafWChar* pwName, aafWChar* pwDesc, aafWChar* pwDisplayUnits, IAAFParameterDef** ppParameterDef);
 	HRESULT	ConvertOMFConstValue(OMF2::omfSegObj_t segment, IAAFConstantValue* pConstValue);
 	HRESULT	ConvertOMFVaryingValue(OMF2::omfSegObj_t segment, IAAFVaryingValue* pVaryingValue);
-	HRESULT	ConvertMCSpecialVaryingValue(OMF2::omfSegObj_t segment, aafUID_t AAFEffectID, IAAFOperationGroup* pEffect);
-	HRESULT	ConvertOMFNestedScope(OMF2::omfSegObj_t segment, IAAFNestedScope* pNestedScope);
+	void	ConvertOMFNestedScope(OMF2::omfSegObj_t segment, IAAFNestedScope* pNestedScope);
 	HRESULT	ConvertOMFScopeRef(OMF2::omfSegObj_t segment, IAAFScopeReference* pScopeRef);
 
-private:
+protected:
 
     OMF2::omfSessionHdl_t	OMFSession;
 	OMF2::omfHdl_t			OMFFileHdl;
@@ -91,4 +93,10 @@ private:
 	IAAFFile*				pFile;
 	IAAFHeader*				pHeader;
 	IAAFDictionary*			pDictionary;
+
+	AAFDomainUtils			*pAAF;
+	OMFDomainUtils			*pOMF;
+	EffectTranslate			*pEffectTranslate;
 };
+
+#endif

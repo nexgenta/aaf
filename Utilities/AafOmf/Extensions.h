@@ -32,7 +32,7 @@
 class ExtendedAaf2Omf : public Aaf2Omf
 {
 public:
-	ExtendedAaf2Omf(AAFDomainUtils *aafDomainUtils, OMFDomainUtils *omfDomainUtils, EffectTranslate *effectTranslate );
+	ExtendedAaf2Omf();
 	virtual ~ExtendedAaf2Omf();
 
 public:
@@ -42,11 +42,10 @@ private:
 class ExtendedOmf2Aaf : public Omf2Aaf
 {
 public:
-	ExtendedOmf2Aaf( AAFDomainUtils *aafDomainUtils, OMFDomainUtils *omfDomainUtils, EffectTranslate *effectTranslate );
+	ExtendedOmf2Aaf();
 	virtual ~ExtendedOmf2Aaf();
 
 public:
-	virtual void FinishUpMob(omfMobObj_t  /*pOMFMob*/, IAAFMob*  /*pMob*/) { };
 private:
 };
 
