@@ -78,22 +78,22 @@ public:
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
+    CreateValue (/*[in]*/ ImplAAFRoot * pObj,
+      /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
+
+  // Override from AAFTypeDefObjectRef
+  virtual AAFRESULT STDMETHODCALLTYPE
     SetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[in]*/ ImplAAFObject * ppObject);
+      /*[in]*/ ImplAAFRoot * ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[out]*/ ImplAAFObject ** ppObject);
+      /*[out]*/ ImplAAFRoot ** ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
-
-  // Override from AAFTypeDefObjectRef
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateValue (/*[in]*/ ImplAAFObject * pObj,
-      /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
 
   // Override from AAFTypeDef
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -103,19 +103,25 @@ public:
 private:
   // Synchronize the array of OM pids with the current TargetSet property.
   AAFRESULT SyncTargetPidsFromTargetSet(void);
-  
-  // Synchronize the TargetSet property from the current targetPids OM pid array.
-  AAFRESULT SyncTargetSetFromTargetPids(void);
 
 public:
 
 
   // Override from AAFTypeDefObjectRef
-  virtual AAFRESULT STDMETHODCALLTYPE
+  AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
         (const aafUID_t & id,
          const ImplAAFClassDef *pType,
-         const aafCharacter * pTypeName);
+         const aafCharacter * pTypeName,
+         aafUInt32  ids,
+         aafUID_constptr  pTargetSet,
+         OMPropertyId * _targetPids = NULL,
+         OMPropertyId _uniqueIdentifierPid = 0);
+
+  aafUInt32 GetTargetPidCount(void) const;
+  const OMPropertyId * GetTargetPids(void) const;
+  OMPropertyId GetUniqueIdentifierPid(void) const;
+
 
   // overrides from ImplAAFTypeDef
   //
@@ -128,6 +134,11 @@ public:
     pvtCreateOMProperty (OMPropertyId pid,
 							const wchar_t * name) const;
 
+  // Allocate and initialize the correct subclass of ImplAAFPropertyValue 
+  // for the given OMProperty.
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreatePropertyValue(OMProperty *property, 
+                        ImplAAFPropertyValue ** pPropertyValue) const;
 
 
   // override from OMStorable.
@@ -136,6 +147,11 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
+
+  // Method is called after class has been added to MetaDictionary.
+  // If this method fails the class is removed from the MetaDictionary and the
+  // registration method will fail.
+  virtual HRESULT CompleteClassRegistration(void);
 
 private:
   // Persistent member properties
