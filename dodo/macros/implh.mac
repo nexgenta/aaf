@@ -141,7 +141,6 @@ class Impl%01;
 #ifndef __Impl.this-module_h__
 #define __Impl.this-module_h__
 
-#include "OMStorable.h"
 
 /******************************************\\
 *                                          *
@@ -280,7 +279,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-		// @parm %02 %06
+        // @parm %02 %06
         (.%03-adornment%04 .%03-indirection %05);\
 #endm
 
@@ -306,11 +305,11 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	    (// @parm %02 %06
+        (// @parm %02 %06
          .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10);\
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10);\
 #endm
 
 
@@ -337,12 +336,12 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15);\
 #endm
 
@@ -371,16 +370,16 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20);\
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20);\
 #endm
 
 
@@ -409,18 +408,18 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20,
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
 
-		 // @parm %22 %26
+         // @parm %22 %26
          .%23-adornment%24 .%23-indirection %25);\
 #endm
 
@@ -451,22 +450,22 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20,
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
 
-		 // @parm %22 %26
+         // @parm %22 %26
          .%23-adornment%24 .%23-indirection %25,
 
-		 // @parm %27 %31
-		 .%28-adornment%29 .%28-indirection %30);\
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30);\
 #endm
 
 
@@ -497,24 +496,24 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20,
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
 
-		 // @parm %22 %26
+         // @parm %22 %26
          .%23-adornment%24 .%23-indirection %25,
 
-		 // @parm %27 %31
-		 .%28-adornment%29 .%28-indirection %30,
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
 
-		 // @parm %32 %36
+         // @parm %32 %36
          .%33-adornment%34 .%33-indirection %35);\
 #endm
 
@@ -547,28 +546,28 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20,
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
 
-		 // @parm %22 %26
+         // @parm %22 %26
          .%23-adornment%24 .%23-indirection %25,
 
-		 // @parm %27 %31
-		 .%28-adornment%29 .%28-indirection %30,
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
 
-		 // @parm %32 %36
+         // @parm %32 %36
          .%33-adornment%34 .%33-indirection %35,
 
-		 // @parm %37 %41
-		 .%38-adornment%39 .%38-indirection %40);\
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40);\
 #endm
 
 
@@ -601,30 +600,30 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20,
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
 
-		 // @parm %22 %26
+         // @parm %22 %26
          .%23-adornment%24 .%23-indirection %25,
 
-		 // @parm %27 %31
-		 .%28-adornment%29 .%28-indirection %30,
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
 
-		 // @parm %32 %36
+         // @parm %32 %36
          .%33-adornment%34 .%33-indirection %35,
 
-		 // @parm %37 %41
-		 .%38-adornment%39 .%38-indirection %40,
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40,
 
-		 // @parm %42 %46
+         // @parm %42 %46
          .%43-adornment%44 .%43-indirection %45);\
 #endm
 
@@ -659,34 +658,34 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20,
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
 
-		 // @parm %22 %26
+         // @parm %22 %26
          .%23-adornment%24 .%23-indirection %25,
 
-		 // @parm %27 %31
-		 .%28-adornment%29 .%28-indirection %30,
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
 
-		 // @parm %32 %36
+         // @parm %32 %36
          .%33-adornment%34 .%33-indirection %35,
 
-		 // @parm %37 %41
-		 .%38-adornment%39 .%38-indirection %40,
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40,
 
-		 // @parm %42 %46
+         // @parm %42 %46
          .%43-adornment%44 .%43-indirection %45,
 
-		 // @parm %47 %51
-		 .%48-adornment%49 .%48-indirection %50);\
+         // @parm %47 %51
+         .%48-adornment%49 .%48-indirection %50);\
 #endm
 
 
@@ -721,36 +720,36 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
         (// @parm %02 %06
-		 .%03-adornment%04 .%03-indirection %05,
+         .%03-adornment%04 .%03-indirection %05,
 
-		 // @parm %07 %11
-		 .%08-adornment%09 .%08-indirection %10,
+         // @parm %07 %11
+         .%08-adornment%09 .%08-indirection %10,
 
-		 // @parm %12 %16
+         // @parm %12 %16
          .%13-adornment%14 .%13-indirection %15,
 
-		 // @parm %17 %21
-		 .%18-adornment%19 .%18-indirection %20,
+         // @parm %17 %21
+         .%18-adornment%19 .%18-indirection %20,
 
-		 // @parm %22 %26
+         // @parm %22 %26
          .%23-adornment%24 .%23-indirection %25,
 
-		 // @parm %27 %31
-		 .%28-adornment%29 .%28-indirection %30,
+         // @parm %27 %31
+         .%28-adornment%29 .%28-indirection %30,
 
-		 // @parm %32 %36
+         // @parm %32 %36
          .%33-adornment%34 .%33-indirection %35,
 
-		 // @parm %37 %41
-		 .%38-adornment%39 .%38-indirection %40,
+         // @parm %37 %41
+         .%38-adornment%39 .%38-indirection %40,
 
-		 // @parm %42 %46
+         // @parm %42 %46
          .%43-adornment%44 .%43-indirection %45,
 
-		 // @parm %47 %51
-		 .%48-adornment%49 .%48-indirection %50,
+         // @parm %47 %51
+         .%48-adornment%49 .%48-indirection %50,
 
-		 // @parm %52 %56
+         // @parm %52 %56
          .%53-adornment%54 .%53-indirection %55);\
 #endm
 
@@ -775,7 +774,7 @@ public:
 
   // Return this objects stored object class.
   virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
+    GetObjectClass(aafUID_t * pClass);
 };
 
 #endif // ! __Impl.this-module_h__
@@ -1090,4 +1089,201 @@ Impl\
 #c
 #startm AD_EXPORT_THIS_MODULE 00
 .this-module\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Starts a class definition
+#c
+#c Argument1: Abstract or Concrete
+#c Argument2: Transient or StoredObject
+#c            special cases:CommonBase and StoredObjectBase
+#c
+#c Note: Concrete-StoredObject means Persistent. In other words
+#c Concrete-StoredObject objects (and derived objects) are the 
+#c only types of objects that should ever be found in an AAF
+#c file.
+#c
+#c Valid combiniations:          examples
+#c -----------------------       ---------------
+#c   Abstract-CommonBase         AAFRoot 
+#c   Abstract-Transient          ????
+#c   Abstract-StoredObjectBase   AAFObject
+#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
+#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
+#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
+#c
+#startm AD_XCLASS_BEGIN 02
+.begin-%01-%02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition
+#c
+#c Argument1: Abstract or Concrete
+#c Argument2: Transient or StoredObject
+#c            special cases:CommonBase and StoredObjectBase
+#c
+#c Note: Concrete-StoredObject means Persistent. In other words
+#c Concrete-StoredObject objects (and derived objects) are the 
+#c only types of objects that should ever be found in an AAF
+#c file.
+#c
+#c Valid combiniations:          examples
+#c -----------------------       ---------------
+#c   Abstract-CommonBase         AAFRoot 
+#c   Abstract-Transient          ????
+#c   Abstract-StoredObjectBase   AAFObject
+#c   Abstract-StoredObject       AAFSourceReference, AAFComponent, ...
+#c   Concrete-Transient          EnumAAFMobs, EnumAAFMobSlots, ...
+#c   Concrete-StoredObject       AAFSegment, AAFSourceClip, ...
+#c
+#startm AD_XCLASS_END 02
+.end-%01-%02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c The following macros implement all of the allowable
+#c combinations of the AD_XCLASS_BEGIN and AD_XCLASS_END
+#c
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-CommonBase
+#c Special case for the common base class for all AAF objects,
+#c Transient and StoredObject classes.
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-CommonBase 00
+AD_ROOT_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-CommonBase 00
+AD_ROOT_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-StoredObjectBase
+#c Special case for the base class for all AAF stored objects
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-StoredObjectBase 00
+#include "OMStorable.h"
+
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-StoredObjectBase 00
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(Impl.this-module)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-Transient
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-Transient 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-Transient 00
+
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Abstract-StoredObject
+#c (first version defined backwords compatibility)
+
+#startm .begin-Abstract-StoredObject 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Abstract-StoredObject 00
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(Impl.this-module)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Concrete-Transient
+#c (first version defined backwords compatibility)
+
+#startm .begin-Concrete-Transient 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Concrete-Transient 00
+
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Concrete-StoredObject
+#c Note: These are the persistent classes.
+#c (first version defined backwords compatibility)
+
+#startm .begin-Concrete-StoredObject 00
+AD_CLASS_BEGIN\
+#endm
+
+#startm .end-Concrete-StoredObject 00
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(Impl.this-module)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/Impl.this-moduleTest.cpp.
+  static AAFRESULT test();
+};
+
+#endif // ! __Impl.this-module_h__
 #endm
