@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFSourceMob_h__
 #include "ImplAAFSourceMob.h"
@@ -47,18 +29,18 @@
 #include "AAFResult.h"
 
 
-const aafMobID_t kNullMobID = {0};
+const aafUID_t kNullID = {0};
 
 ImplAAFEssenceData::ImplAAFEssenceData () :
-  _fileMobID(PID_EssenceData_MobID,	"MobID"),
-  _mediaData(PID_EssenceData_Data,	"Data")
+  _fileMobID(PID_EssenceData_MobID, "MobID"),
+  _mediaData(PID_ESSENCEDATA_MEDIADATA, "Essence Data")
 {
   // Add the properties into the property set.
   _persistentProperties.put(_fileMobID.address());
   _persistentProperties.put(_mediaData.address());
 
   // Initial default property values.
-  _fileMobID = kNullMobID;
+  _fileMobID = kNullID;
 }
 
 
@@ -73,17 +55,28 @@ ImplAAFEssenceData::~ImplAAFEssenceData ()
                            aafDataBuffer_t buffer,
                            aafUInt32 *bytesWritten)
 {
+  AAFRESULT result = AAFRESULT_SUCCESS;
+
   if (NULL == buffer || NULL == bytesWritten)
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_OBJECT_NOT_PERSISTENT;
+    return AAFRESULT_NOT_IN_FILE;
   
-  _mediaData.write(buffer, bytes, *bytesWritten);
-  if (0 < bytes && 0 == *bytesWritten)
-    return AAFRESULT_CONTAINERWRITE;
-
-  return AAFRESULT_SUCCESS;
+  try
+  {
+    _mediaData.write(buffer, bytes, *bytesWritten);
+    if (0 < bytes && 0 == *bytesWritten)
+      result = AAFRESULT_NOT_IMPLEMENTED;
+  }
+  //catch (OMException& ome)
+  //{
+  //}
+  catch(...)
+  {
+    result = AAFRESULT_INTERNAL_ERROR;
+  }
+  return result;
 }
 
 
@@ -93,17 +86,28 @@ ImplAAFEssenceData::~ImplAAFEssenceData ()
                            aafDataBuffer_t  buffer,
                            aafUInt32 *bytesRead)
 {
+  AAFRESULT result = AAFRESULT_SUCCESS;
+
   if (NULL == buffer || NULL == bytesRead)
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_OBJECT_NOT_PERSISTENT;
+    return AAFRESULT_NOT_IN_FILE;
   
-  _mediaData.read(buffer, bytes, *bytesRead);
-  if (0 < bytes && 0 == *bytesRead)
-    return AAFRESULT_END_OF_DATA;
-
-  return AAFRESULT_SUCCESS;
+  try
+  {
+    _mediaData.read(buffer, bytes, *bytesRead);
+    if (0 < bytes && 0 == *bytesRead)
+      result = AAFRESULT_NOT_IMPLEMENTED;
+  }
+  //catch (OMException& ome)
+  //{
+  //}
+  catch(...)
+  {
+    result = AAFRESULT_INTERNAL_ERROR;
+  }
+  return result;
 }
 
 
@@ -114,12 +118,22 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT result = AAFRESULT_SUCCESS;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_OBJECT_NOT_PERSISTENT;
+    return AAFRESULT_NOT_IN_FILE;
 
-  OMUInt64 tmpOffset = offset;
-  _mediaData.setPosition(tmpOffset);
+  try
+  {
+    OMUInt64 tmpOffset = offset;
+    _mediaData.setPosition(tmpOffset);
+  }
+  //catch (OMException& ome)
+  //{
+  //}
+  catch(...)
+  {
+    result = AAFRESULT_INTERNAL_ERROR;
+  }
 
-  return AAFRESULT_SUCCESS;
+  return result;
 }
 
 
@@ -127,17 +141,29 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceData::GetPosition (aafPosition_t  *pOffset)
 {
+  AAFRESULT result = AAFRESULT_SUCCESS;
+
   if (NULL == pOffset)
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_OBJECT_NOT_PERSISTENT;
+    return AAFRESULT_NOT_IN_FILE;
 
-  OMUInt64 tmpOffset;
-  tmpOffset = _mediaData.position();
-  *pOffset = tmpOffset;
+  try
+  {
+    OMUInt64 tmpOffset;
+    tmpOffset = _mediaData.position();
+    *pOffset = tmpOffset;
+  }
+  //catch (OMException& ome)
+  //{
+  //}
+  catch(...)
+  {
+    result = AAFRESULT_INTERNAL_ERROR;
+  }
 
-  return AAFRESULT_SUCCESS;
+  return result;
 }
 
 
@@ -149,11 +175,24 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NULL_PARAM;
   // Cannot access the data property if it is NOT associated with a file.
   if (!persistent())
-    return AAFRESULT_OBJECT_NOT_PERSISTENT;
+    return AAFRESULT_NOT_IN_FILE;
 
-  *pSize = _mediaData.size();
 
-  return AAFRESULT_SUCCESS;
+  AAFRESULT result = AAFRESULT_SUCCESS;
+
+  try
+  {
+    *pSize = _mediaData.size();
+  }
+  //catch (OMException& ome)
+  //{
+  //}
+  catch(...)
+  {
+    result = AAFRESULT_INTERNAL_ERROR;
+  }
+
+  return result;
 }
 
 
@@ -167,7 +206,7 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFEssenceDescriptor *pEssenceDescriptor = NULL;
   ImplAAFFileDescriptor *pFileDescriptor = NULL;
   ImplAAFHeader *pHeader = NULL;
-  aafMobID_t mobID;
+  aafUID_t mobID;
 
   if(NULL == pFileMob)
     return(AAFRESULT_NULL_PARAM);
@@ -179,7 +218,7 @@ AAFRESULT STDMETHODCALLTYPE
  // move to ImplAAFContentStorage::AppendEssenceData().
     // Does a mob with the ID already exist?  If not, return error
     CHECK(pFileMob->MyHeadObject(&pHeader));
-    CHECK(pHeader->LookupMob(mobID, &pMob));
+    CHECK(pHeader->LookupMob(&mobID, &pMob));
 
 
     // Make sure the mob is a valid File source mob???
@@ -202,7 +241,6 @@ AAFRESULT STDMETHODCALLTYPE
   XEXCEPT
   {  // save the error code.
     result = (XCODE());
-	NO_PROPAGATE();
   }
   XEND;
 
@@ -235,7 +273,7 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFSourceMob *pSourceMob = NULL;
   ImplAAFEssenceDescriptor *pEssenceDescriptor = NULL;
   ImplAAFHeader *pHeader = NULL;
-  aafMobID_t mobID;
+  aafUID_t mobID;
 
   if(NULL == ppFileMob)
     return(AAFRESULT_NULL_PARAM);
@@ -245,10 +283,10 @@ AAFRESULT STDMETHODCALLTYPE
     CHECK(GetFileMobID(&mobID));
 
     // Does a mob with the ID already exist?  If not, return error.
-    // NOTE: Will return AAFRESULT_OBJECT_NOT_PERSISTENT if this object has
+    // NOTE: Will return AAFRESULT_NOT_IN_FILE if this object has
     // not been appended to to the file.
     CHECK(MyHeadObject(&pHeader));
-    CHECK(pHeader->LookupMob(mobID, &pMob));
+    CHECK(pHeader->LookupMob(&mobID, &pMob));
 
     // This should be a valid file mob which is a file mob.
     pSourceMob = dynamic_cast<ImplAAFSourceMob *>(pMob);
@@ -267,7 +305,6 @@ AAFRESULT STDMETHODCALLTYPE
   XEXCEPT
   {  // save the error code.
     result = (XCODE());
-	NO_PROPAGATE();
   }
   XEND;
 
@@ -295,7 +332,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 /****/
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFEssenceData::GetFileMobID (aafMobID_t *  pFileMobID)
+    ImplAAFEssenceData::GetFileMobID (aafUID_t *  pFileMobID)
 {
   if (NULL == pFileMobID)
     return AAFRESULT_NULL_PARAM;
@@ -306,3 +343,4 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFEssenceData, AUID_AAFEssenceData);
