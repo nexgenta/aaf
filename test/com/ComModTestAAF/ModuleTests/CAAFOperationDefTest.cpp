@@ -10,14 +10,7 @@
 *												*
 \************************************************/
 
-#include "CAAFOperationDef.h"
-#include "CAAFOperationDef.h"
-#ifndef __CAAFOperationDef_h__
-#error - improperly defined include guard
-#endif
-
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_AAFOperationDef; // generated
+#include "AAF.h"
 
 
 #include <iostream.h>
@@ -28,7 +21,7 @@ extern "C" const CLSID CLSID_AAFOperationDef; // generated
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 #include "aafUtils.h"
 
 // Cross-platform utility to delete a file.
@@ -128,7 +121,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	aafUID_t			testDataDef = DDEF_Video, testParmID = kParmID;
+	aafUID_t			testDataDef = DDEF_Picture, testParmID = kParmID;
 	aafInt32			index;
 	IAAFOperationDef	*pOperationDef = NULL, *defResults[3] = { NULL, NULL, NULL };
 
@@ -238,7 +231,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFParameterDef	*pParmDef = NULL;
 	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
-	aafUID_t			readDataDef, checkDataDef = DDEF_Video;
+	aafUID_t			readDataDef, checkDataDef = DDEF_Picture;
 	aafBool				readIsTimeWarp;
 	aafInt32			catLen, checkNumInputs;
 	aafUInt32			checkBypass, testLen;
@@ -357,7 +350,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CAAFOperationDef::test()
+extern "C" HRESULT CAAFOperationDef_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"OperationDefTest.aaf";
@@ -370,7 +363,7 @@ HRESULT CAAFOperationDef::test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFOperationDef::test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFOperationDef_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.

@@ -10,14 +10,7 @@
 *												*
 \************************************************/
 
-#include "CAAFParameterDef.h"
-#include "CAAFParameterDef.h"
-#ifndef __CAAFParameterDef_h__
-#error - improperly defined include guard
-#endif
-
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_AAFParameterDef; // generated
+#include "AAF.h"
 
 
 #include <iostream.h>
@@ -28,7 +21,7 @@ extern "C" const CLSID CLSID_AAFParameterDef; // generated
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 #include "aafUtils.h"
 
 // Cross-platform utility to delete a file.
@@ -117,7 +110,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	aafUID_t			testDataDef = DDEF_Video;
+	aafUID_t			testDataDef = DDEF_Picture;
 /*	long				test;
 */
 
@@ -214,7 +207,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFParameterDef	*pParmDef = NULL;
 	IAAFDefObject*		pDefObject = NULL;
 	bool				bFileOpen = false;
-	aafUID_t			readDataDef, checkDataDef = DDEF_Video;
+	aafUID_t			readDataDef, checkDataDef = DDEF_Picture;
 	aafBool				readIsTimeWarp;
 	aafInt32			catLen, checkNumInputs;
 	aafUInt32			checkBypass, testLen;
@@ -308,7 +301,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CAAFParameterDef::test()
+extern "C" HRESULT CAAFParameterDef_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"ParameterDefTest.aaf";
@@ -321,7 +314,7 @@ HRESULT CAAFParameterDef::test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFParameterDef::test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFParameterDef_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
