@@ -17,17 +17,36 @@ include aafobjects.mk
 
 
 targets.mk : aafobjects.mk
-	@echo Creating targets.mk ...
-	@rm -f targets.mk
-	@echo # This file automatically generated make. > targets.mk
-	@echo # Special case AAFTypes since no object is to be built only headers... > depend.mk
-	@echo # special case the utility classes since they will not be exposed by com > depend.mk
-	@echo DODO_TARGETS = AAFTypes.all \>> targets.mk
-	$(SH_PREFIX) for base in $(DODO_TARGET_NAMES) ;  do \
-		echo \\t$$base.all \\>> targets.mk ; \
-	done $(SH_SUFFIX)
-	@echo "Done with targets.mk."
+	@ echo Creating targets.mk ...
+	@ rm -f targets.tmp
+	@ echo "#" This file automatically generated make. > targets.tmp
+	@ echo "#" Special case AAFTypes since no object is to be built only headers... >> targets.tmp
+	@ echo "#" special case the utility classes since they will not be exposed by com >> targets.tmp 
+	@ echo DODO_TARGETS = '\' >> targets.tmp 
+	@ echo '	'AAFTypes.all' \' >> targets.tmp 
+	@ echo '	'AAFModuleTest.all \\\c>> targets.tmp 
+	@ for base in $(AAFOBJECTS) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.all \\\c>> targets.tmp ; \
+	  done
+	@ echo '' >> targets.tmp
+	@ echo '' >> targets.tmp
+	@ echo FIDL_TARGETS = \\\c >> targets.tmp 
+	@ for base in $(AAFOBJECTS) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.fidl \\\c>> targets.tmp ; \
+	  done
+	@ echo '' >> targets.tmp
+	@ echo '' >> targets.tmp
+	@ echo FREFH_TARGETS = \\\c >> targets.tmp 
+	@ for base in $(AAFOBJECTS) ;  do \
+		echo '\' >> targets.tmp ; \
+		echo '	'$$base.frefh \\\c>> targets.tmp ; \
+	  done
+	@ echo '' >> targets.tmp
+	@ mv targets.tmp targets.mk
+	@ echo "Done with targets.mk."
 
 
 clean :
-	$(SH_PREFIX) $(RM) -rf targets.mk $(SH_SUFFIX)
+	$(RM) -rf targets.mk
