@@ -32,11 +32,9 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -225,12 +223,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal));
     checkResult(pDIDesc->SetImageAlignmentFactor(kImageAlignmentFactorTestVal));
 
- //   ratio.numerator = kGammaNumTestVal;
-//!!!    ratio.denominator = kGammaDenTestVal;
-//!!!    checkResult(pDIDesc->SetGamma(ratio));
+    ratio.numerator = kGammaNumTestVal;
+    ratio.denominator = kGammaDenTestVal;
+    checkResult(pDIDesc->SetGamma(ratio));
 
     checkResult(pRGBADesc->SetPixelLayout(NUM_TEST_ELEMENTS, testElements));
-    checkResult(pRGBADesc->SetPalette(sizeof(bogusPalette), bogusPalette));
+    checkResult(pRGBADesc->SetPallete(sizeof(bogusPalette), bogusPalette));
     checkResult(pRGBADesc->SetPaletteLayout(NUM_TEST_ELEMENTS, testElements2));
   
 	// Save the initialized descriptor with the source mob.
@@ -314,12 +312,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  checkResult(pEssDesc->QueryInterface(IID_IAAFRGBADescriptor, (void **) &pRGBADesc));
 
     // TODO: test for expected DigitalImage properties
-	  aafUInt32				val1, val2, resultElements, iaf;
+	  aafUInt32				val1, val2, resultElements;
 	  aafInt32				val3, val4;
 	  aafFrameLayout_t		framelayout;
 	  aafAlphaTransparency_t	alphaTrans;
 	  aafRational_t			ratio;
-		aafUID_t			gamma;
 	  aafInt32				VideoLineMap[kVideoLineMapMaxElement];
 	  aafUID_t				compression;
 	  aafUID_t				compTestVal;
@@ -367,14 +364,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkExpression(alphaTrans == kAlphaTransparencyTestVal,
                     AAFRESULT_TEST_FAILED);
 
-		checkResult(pDIDesc->GetImageAlignmentFactor(&iaf));
-		checkExpression(iaf == kImageAlignmentFactorTestVal,
+		checkResult(pDIDesc->GetImageAlignmentFactor(&val3));
+		checkExpression(val3 == kImageAlignmentFactorTestVal,
                     AAFRESULT_TEST_FAILED);
 
-		checkResult(pDIDesc->GetGamma(&gamma));
-//!!!		checkExpression(ratio.numerator == kGammaNumTestVal &&
-//			              ratio.denominator == kGammaDenTestVal,
- //                   AAFRESULT_TEST_FAILED);
+		checkResult(pDIDesc->GetGamma(&ratio));
+		checkExpression(ratio.numerator == kGammaNumTestVal &&
+			              ratio.denominator == kGammaDenTestVal,
+                    AAFRESULT_TEST_FAILED);
 
 		checkResult(pRGBADesc->CountPixelLayoutElements (&resultElements));
 		checkExpression(resultElements == NUM_TEST_ELEMENTS, AAFRESULT_TEST_FAILED);
@@ -441,8 +438,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode);
-extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode)
+extern "C" HRESULT CAAFRGBADescriptor_test()
 {
 	aafWChar*	pFileName = L"AAFRGBADescripTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
@@ -450,18 +446,13 @@ extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode)
 
    	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(pFileName);
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFRGBADescriptor_test..."
-			 << "Caught general C++ exception!" << endl;
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CAAFRGBADescriptor_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
