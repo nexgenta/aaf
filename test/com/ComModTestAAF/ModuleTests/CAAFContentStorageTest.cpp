@@ -77,7 +77,8 @@ struct ContentStorageTest
 	
 	// Shared member data:
 	HRESULT _hr;
-	aafProductIdentification_t _productInfo;
+	aafProductVersion_t _productVersion;
+  aafProductIdentification_t _productInfo;
 	IAAFFile *_pFile;
 	bool _bFileOpen;
 	IAAFHeader *_pHeader;
@@ -183,16 +184,17 @@ _pEssenceData(NULL),
 _buffer(NULL),
 _bufferSize(0)
 {
-	_productInfo.companyName = L"AAF Developers Desk";
-	_productInfo.productName = L"AAFContentStorage Test";
-	_productInfo.productVersion.major = 1;
-	_productInfo.productVersion.minor = 0;
-	_productInfo.productVersion.tertiary = 0;
-	_productInfo.productVersion.patchLevel = 0;
-	_productInfo.productVersion.type = kAAFVersionUnknown;
-	_productInfo.productVersionString = NULL;
-	_productInfo.productID = UnitTestProductID;
-	_productInfo.platform = NULL;
+  _productVersion.major = 1;
+  _productVersion.minor = 0;
+  _productVersion.tertiary = 0;
+  _productVersion.patchLevel = 0;
+  _productVersion.type = kAAFVersionUnknown;
+  _productInfo.companyName = L"AAF Developers Desk";
+  _productInfo.productName = L"AAFContentStorage Test";
+  _productInfo.productVersion = &_productVersion;
+  _productInfo.productVersionString = NULL;
+  _productInfo.productID = UnitTestProductID;
+  _productInfo.platform = NULL;
 }
 
 ContentStorageTest::~ContentStorageTest()
