@@ -36,6 +36,11 @@
 #define AAFRESULT_FAILED(Status) ((AAFRESULT)(Status)<0)
 #define AAFRESULT_SUCCEEDED(Status) (!(AAFRESULT_FAILED(Status)))
 
+#ifndef MAKE_HRESULT
+#define MAKE_HRESULT(sev,fac,code) \
+    ((HRESULT) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | ((unsigned long)(code))) )
+#endif
+
 // #define _FACILITY_AAF    FACILITY_ITF
 #define _FACILITY_AAF 0x12
 #define MAKE_AAFHRESULT( code ) MAKE_HRESULT( SEVERITY_ERROR, _FACILITY_AAF, code )
@@ -73,6 +78,7 @@
 #define AAFRESULT_UNSAVED_CHANGES            MAKE_AAFHRESULT(0x002D)
 #define AAFRESULT_NOT_REVERTABLE             MAKE_AAFHRESULT(0x002E)
 #define AAFRESULT_MEDIA_NOT_REVERTABLE       MAKE_AAFHRESULT(0x002F)
+#define AAFRESULT_OPERATION_NOT_PERMITTED    MAKE_AAFHRESULT(0x0030)
 
 /* MEDIA Error Codes */
 #define AAFRESULT_DESCSAMPRATE              MAKE_AAFHRESULT(0x0064)
