@@ -107,12 +107,38 @@ AAFRESULT STDMETHODCALLTYPE
 	if(ppEnum == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-//	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
-//	if(*ppEnum == NULL)
-//		return(AAFRESULT_NOMEMORY);
-//	(*ppEnum)->SetEnumProperty(this, &_slots);
+	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumStrongProperty(this, &_slots);
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	return(AAFRESULT_SUCCESS);
+}
+
+AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+{
+	ImplAAFComponent	*comp = NULL;
+	
+	XPROTECT()
+	{
+		size_t count = _slots.getSize();
+		for (size_t n = 0; n < count; n++)
+		{
+			ImplAAFSegment	*pSegment;
+			_slots.getValueAt(pSegment, n);
+			CHECK(pSegment->ChangeContainedReferences(from, to));
+			pSegment->ReleaseReference();
+			pSegment = NULL;
+		}
+	}
+	XEXCEPT
+	{
+		if(comp != NULL)
+			comp->ReleaseReference();
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
 }
 
 
