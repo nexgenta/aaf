@@ -48,6 +48,7 @@ class OMSetIterator;
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable> and of <c OMUnique>.
   //   @base public | <c OMReferenceSetProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMWeakReferenceSetProperty : public OMReferenceSetProperty {
 public:
@@ -177,6 +178,10 @@ public:
     // @cmember Remove <p object> from this
     //          <c OMWeakReferenceSetProperty>.
   virtual void removeObject(const OMObject* object);
+
+    // @cmember Remove all objects from this
+    //          <c OMWeakReferenceSetProperty>.
+  virtual void removeAllObjects(void);
 
     // @cmember Create an <c OMReferenceContainerIterator> over this
     //          <c OMWeakReferenceSetProperty>.

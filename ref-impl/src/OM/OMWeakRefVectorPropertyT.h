@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. |
+//         OMWeakReferenceVectorProperty
 #ifndef OMWEAKREFVECTORPROPERTYT_H
 #define OMWEAKREFVECTORPROPERTYT_H
 
@@ -771,7 +773,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::removeProperty(void)
   //   @rdesc The size of the raw bits of this
   //          <c OMWeakReferenceVectorProperty> in bytes.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 size_t OMWeakReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::bitsSize");
@@ -789,7 +791,7 @@ size_t OMWeakReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
   //   @parm The address of the buffer into which the raw bits are copied.
   //   @parm size_t | size | The size of the buffer.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMWeakReferenceVectorProperty<ReferencedObject>::getBits(
                                                       OMByte* bits,
                                                       size_t ANAME(size)) const
@@ -820,7 +822,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::getBits(
   //          <c OMStorable>.
   //   @parm The address of the buffer from which the raw bits are copied.
   //   @parm The size of the buffer.
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMWeakReferenceVectorProperty<ReferencedObject>::setBits(
                                                             const OMByte* bits,
                                                             size_t size)
@@ -908,6 +910,19 @@ OMWeakReferenceVectorProperty<ReferencedObject>::removeObject(
   ASSERT("Object is correct type", p != 0);
 
   removeValue(p);
+}
+
+  // @mfunc Remove all objects from this <c OMWeakReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+template <typename ReferencedObject>
+void OMWeakReferenceVectorProperty<ReferencedObject>::removeAllObjects(void)
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::removeAllObjects");
+
+  _vector.clear();
+  POSTCONDITION("All objects removed", count() == 0);
 }
 
   // @mfunc Create an <c OMReferenceContainerIterator> over this
@@ -1058,7 +1073,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::insertObjectAt(
   insertAt(p, index);
 }
 
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 OMPropertyTag
 OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
 {
@@ -1076,7 +1091,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
   return _targetTag;
 }
 
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 OMPropertyId*
 OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath(void) const
 {
@@ -1093,7 +1108,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath(void) const
   return _targetPropertyPath;
 }
 
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void
 OMWeakReferenceVectorProperty<ReferencedObject>::clearTargetTag(void) const
 {

@@ -48,6 +48,7 @@ class OMVectorIterator;
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @base public | <c OMReferenceVectorProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMWeakReferenceVectorProperty : public OMReferenceVectorProperty {
 public:
@@ -211,6 +212,10 @@ public:
     // @cmember Remove <p object> from this
     //          <c OMWeakReferenceVectorProperty>.
   virtual void removeObject(const OMObject* object);
+
+    // @cmember Remove all objects from this
+    //          <c OMWeakReferenceVectorProperty>.
+  virtual void removeAllObjects(void);
 
     // @cmember Create an <c OMReferenceContainerIterator> over this
     //          <c OMWeakReferenceVectorProperty>.
