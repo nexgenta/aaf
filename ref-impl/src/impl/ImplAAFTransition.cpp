@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 
@@ -38,8 +24,6 @@
 #include "ImplAAFSourceReference.h"
 #endif
 
-#include "ImplAAFDictionary.h"
-
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -54,6 +38,15 @@
 #include "AAFDefUIDs.h"
 
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+
 #ifndef __ImplAAFTransition_h__
 #include "ImplAAFTransition.h"
 #endif
@@ -63,8 +56,8 @@
 
 
 ImplAAFTransition::ImplAAFTransition ():
-_operationGroup( PID_Transition_OperationGroup, L"OperationGroup"),
-_cutPoint( PID_Transition_CutPoint, L"CutPoint")
+_operationGroup( PID_Transition_OperationGroup, "OperationGroup"),
+_cutPoint( PID_Transition_CutPoint, "CutPoint")
 {
 	_persistentProperties.put(_operationGroup.address());
 	_persistentProperties.put(_cutPoint.address());
@@ -73,45 +66,31 @@ _cutPoint( PID_Transition_CutPoint, L"CutPoint")
 
 ImplAAFTransition::~ImplAAFTransition ()
 {
-	ImplAAFOperationGroup *group = _operationGroup.clearValue();
+	ImplAAFOperationGroup *group = _operationGroup.setValue(0);
 	if (group)
 	{
-	  group->ReleaseReference();
-	  group = 0;
+		group->ReleaseReference();
 	}
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-	ImplAAFTransition::Initialize (ImplAAFDataDef * pDataDef,
+	ImplAAFTransition::Create (aafUID_t*				pDatadef,
 							   aafLength_t				length,
 							   aafPosition_t			cutPoint,
 							   ImplAAFOperationGroup*	pOperationGroup)
 {
 	HRESULT		rc = AAFRESULT_SUCCESS;
 
-	if (pOperationGroup == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if (pDataDef == NULL)
+	if (pDatadef == NULL || pOperationGroup == NULL)
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
-		CHECK(SetNewProps(length, pDataDef));
+		CHECK(SetNewProps(length, pDatadef));
 		_cutPoint = cutPoint;
 		if (_operationGroup)
-		{
-		  if( pOperationGroup == _operationGroup )
-			RAISE( AAFRESULT_SUCCESS );
-
-		  _operationGroup->ReleaseReference();
-		  _operationGroup = 0;
-		}
-
-		if (pOperationGroup->attached())
-			RAISE(  AAFRESULT_OBJECT_ALREADY_ATTACHED );
-
+			_operationGroup->ReleaseReference();
 		_operationGroup = pOperationGroup;
 		if (pOperationGroup)
 			pOperationGroup->AcquireReference();
@@ -170,16 +149,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	
 	if (_operationGroup)
-	{
-	  if( pEffObj == _operationGroup )
-		return AAFRESULT_SUCCESS;
-
-	  _operationGroup->ReleaseReference();
-	  _operationGroup = 0;
-	}
-
-	if( pEffObj->attached() )
-		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+		_operationGroup->ReleaseReference();
 
 	_operationGroup = pEffObj;
 	_operationGroup->AcquireReference();
@@ -188,18 +158,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFTransition, AUID_AAFTransition);
 
-
-AAFRESULT ImplAAFTransition::ChangeContainedReferences(aafMobID_constref from,
-													aafMobID_constref to)
-{
-	ImplAAFSegment	*seg;
-	
-	seg = _operationGroup;
-
-	if(seg != NULL)
-		seg->ChangeContainedReferences(from, to);
-
-	return AAFRESULT_SUCCESS;
-}
 

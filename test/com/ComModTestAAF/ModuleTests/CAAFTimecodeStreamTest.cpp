@@ -5,13 +5,12 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
 
-#ifndef __CAAFTimecodeStream_h__
-#include "CAAFTimecodeStream.h"
+#ifndef __AAF_h__
+#include "AAF.h"
 #endif
 
 #include <iostream.h>
@@ -20,6 +19,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "aafCvt.h"
 #include "AAFResult.h"
+#include "AAFDefUIDs.h"
 
 
 
@@ -77,7 +77,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 	
 	try
@@ -190,14 +190,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT						hr = S_OK;
 	
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"AAFTimecodeStream Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 	
 	
@@ -301,7 +300,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CAAFTimecodeStream_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"TimecodeStreamTest.aaf";
+	aafWChar * pFileName = L"AAFTimecodeStreamTest.aaf";
 
 	try
 	{

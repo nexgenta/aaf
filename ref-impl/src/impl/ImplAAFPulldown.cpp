@@ -1,24 +1,10 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*												*
+\***********************************************/
 
 #include "AAFStoredObjectIDs.h"
 
@@ -27,7 +13,6 @@
 #endif
 
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
 #include "aafErr.h"
 #include "aafCvt.h"
@@ -36,10 +21,10 @@
 #include "ImplAAFTimecode.h"
 
 ImplAAFPulldown::ImplAAFPulldown ()
-: _inputSegment(        PID_Pulldown_InputSegment,          L"InputSegment"),
-  _pulldownKind(        PID_Pulldown_PulldownKind,          L"PulldownKind"),
-  _pulldownDirection(   PID_Pulldown_PulldownDirection,     L"PulldownDirection"),
-  _phaseFrame(			PID_Pulldown_PhaseFrame,	        L"PhaseFrame")
+: _inputSegment(        PID_Pulldown_InputSegment,          "InputSegment"),
+  _pulldownKind(        PID_Pulldown_PulldownKind,          "PulldownKind"),
+  _pulldownDirection(   PID_Pulldown_PulldownDirection,     "PulldownDirection"),
+  _phaseFrame(			PID_Pulldown_PhaseFrame,	        "PhaseFrame")
 {
 	_persistentProperties.put(_inputSegment.address());
 	_persistentProperties.put(_pulldownKind.address());
@@ -50,11 +35,10 @@ ImplAAFPulldown::ImplAAFPulldown ()
 
 ImplAAFPulldown::~ImplAAFPulldown ()
 {
-	ImplAAFSegment *seg = _inputSegment.clearValue();
+	ImplAAFSegment *seg = _inputSegment.setValue(0);
 	if (seg)
 	{
-	  seg->ReleaseReference();
-	  seg = 0;
+		seg->ReleaseReference();
 	}
 }
 
@@ -86,16 +70,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	ImplAAFSegment *pOldSeg = _inputSegment;
 	if (pOldSeg)
-	{
-	  if( pOldSeg == pInputSegment )
-		return AAFRESULT_SUCCESS;
-
-	  pOldSeg->ReleaseReference();
-	  pOldSeg = 0;
-	}
-
-	if (pInputSegment->attached())
-		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+		pOldSeg->ReleaseReference();
 
 	_inputSegment = pInputSegment;
 	
@@ -191,7 +166,7 @@ AAFRESULT STDMETHODCALLTYPE
   // Override from AAFSegment
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPulldown::SegmentTCToOffset (aafTimecode_t *pTimecode,
-      aafRational_t * /*pEditRate*/,
+      aafRational_t *pEditRate,
       aafFrameOffset_t *pOffset)
 {
 	ImplAAFTimecode	*pdwnInput;
@@ -216,7 +191,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if((offset < 0) || (offset >= length))
 			RAISE(AAFRESULT_TIMECODE_NOT_FOUND);
 
-		CHECK(MapOffset(offset, kAAFTrue, pOffset, NULL));
+		CHECK(MapOffset(offset, AAFTrue, pOffset, NULL));
     }
 	XEXCEPT
     {
@@ -231,6 +206,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			   aafLength_t *numFrames,
 			   aafInt32 *srcPhase)
 {
+  ImplAAFSegment*	pulldownCVAL = NULL;
   aafUInt32     maskBits;
   aafBool       drop;
   aafUInt32     phaseOffset = 0;
@@ -246,7 +222,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 		{
 			phaseOffset = (aafUInt32)_phaseFrame;
 			
-			drop = (_pulldownDirection == kAAFTapeToFilmSpeed ? kAAFTrue : kAAFFalse);
+			drop = (_pulldownDirection == kAAFTapeToFilmSpeed ? AAFTrue : AAFFalse);
 			CHECK(aafPvtGetPulldownMask(_pulldownKind, &maskBits, &maskLen, &oneToOne));
 		}
 
@@ -258,7 +234,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 	  else
 	  {		
 		  if (reverse)
-			  drop = (drop ? kAAFFalse : kAAFTrue);
+			  drop = (drop ? AAFFalse : AAFTrue);
 
 		  CvtInt32toPosition(0, zeroPos);
 		  if (Int64Less(offset, zeroPos))
@@ -420,7 +396,7 @@ AAFRESULT ImplAAFPulldown::aafPvtGetPulldownMask(
 		case kAAFTwoThreePD:
 			*outMask = 0xD8000000;	/* 3623878656 decimal */
 			*maskLen = 5;
-			*isOneToOne = kAAFFalse;
+			*isOneToOne = AAFFalse;
 			break;
 		/* PAL pullown pattern is:
 		 *		AA BB CC DD EE FF GG HH II JJ KK LL MM MN NO OP PQ QR RS ST TU UV VW WX XY YY
@@ -430,12 +406,12 @@ AAFRESULT ImplAAFPulldown::aafPvtGetPulldownMask(
 		case kAAFPALPD:
 			*outMask = 0xFFF7FF80;
 			*maskLen = 25;
-			*isOneToOne = kAAFFalse;
+			*isOneToOne = AAFFalse;
 			break;
 			
 		case kAAFOneToOneNTSC:
 		case kAAFOneToOnePAL:
-			*isOneToOne = kAAFTrue;
+			*isOneToOne = AAFTrue;
 			
 		default:
 			return(AAFRESULT_PULLDOWN_KIND);
@@ -454,8 +430,8 @@ AAFRESULT ImplAAFPulldown::intSegmentOffsetToTC(aafPosition_t offset, aafTimecod
     {
 		pdwnInput = _inputSegment;
 		CHECK(((ImplAAFTimecode *)pdwnInput)->GetTimecode(tc));
-		*found = kAAFTrue;
-		  CHECK(MapOffset(offset, kAAFFalse, &newStart, NULL));
+		*found = AAFTrue;
+		  CHECK(MapOffset(offset, AAFFalse, &newStart, NULL));
 		  CHECK(TruncInt64toInt32(newStart, &start32));
 		  tc->startFrame += start32;
     }
@@ -480,7 +456,7 @@ AAFRESULT ImplAAFPulldown::TraverseToClip(aafLength_t length,
   
   XPROTECT()
     {
-	  *isMask = kAAFTrue;
+	  *isMask = AAFTrue;
 	  /* Get the (assumed) source clip out of the mask */
 	  *sclp = _inputSegment;
 //!!!	  if (!(*sclp)->IsTypeOf("SCLP", &aafError));
@@ -489,7 +465,7 @@ AAFRESULT ImplAAFPulldown::TraverseToClip(aafLength_t length,
 //		}
 	  tmpLen = length;
 	  CHECK((*sclp)->GetLength(sclpLen));
-	  CHECK(MapOffset(tmpLen, kAAFFalse, &length, &phase));
+	  CHECK(MapOffset(tmpLen, AAFFalse, &length, &phase));
 	  if(pulldownObj != NULL)
 	  	*pulldownObj = (ImplAAFPulldown *)this;
 	  if(pulldownPhase != NULL)
@@ -508,17 +484,6 @@ AAFRESULT ImplAAFPulldown::TraverseToClip(aafLength_t length,
   return(AAFRESULT_SUCCESS);
 }
 
+OMDEFINE_STORABLE(ImplAAFPulldown, AUID_AAFPulldown);
 
 
-AAFRESULT ImplAAFPulldown::ChangeContainedReferences(aafMobID_constref from,
-													aafMobID_constref to)
-{
-	ImplAAFSegment	*seg;
-	
-	seg = _inputSegment;
-
-	if(seg != NULL)
-		seg->ChangeContainedReferences(from, to);
-
-	return AAFRESULT_SUCCESS;
-}
