@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -37,7 +37,7 @@
   //   @parm The name of this <c OMStreamProperty>.
 template <typename Element>
 OMStreamProperty<Element>::OMStreamProperty(const OMPropertyId propertyId,
-                                            const char* name)
+                                            const wchar_t* name)
   : OMDataStreamProperty(propertyId, name)
 {
 }
@@ -141,9 +141,6 @@ void OMStreamProperty<Element>::readElements(OMUInt32 elementCount,
   PRECONDITION("Valid element count", elementCount > 0);
   PRECONDITION("Valid buffer", elements != 0);
 
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
   const OMType* elementType = type(); // Temporary, _element_ type !
   ASSERT("Valid element type", elementType != 0);
 
@@ -161,7 +158,7 @@ void OMStreamProperty<Element>::readElements(OMUInt32 elementCount,
     ASSERT("All bytes read", actualByteCount == externalBytesSize);
 
     // Reorder an element of the property value
-    if (store->byteOrder() != hostByteOrder()) {
+    if (store()->byteOrder() != hostByteOrder()) {
       elementType->reorder(buffer, sizeof(Element));
     }
 
@@ -194,9 +191,6 @@ void OMStreamProperty<Element>::writeElements(OMUInt32 elementCount,
   PRECONDITION("Valid element count", elementCount > 0);
   PRECONDITION("Valid buffer", elements != 0);
 
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
   const OMType* elementType = type();
   ASSERT("Valid element type", elementType != 0);
 
@@ -217,10 +211,10 @@ void OMStreamProperty<Element>::writeElements(OMUInt32 elementCount,
                              sizeof(Element),
                              buffer,
                              externalBytesSize,
-                             store->byteOrder());
+                             store()->byteOrder());
 
     // Reorder an element of the property value
-    if (store->byteOrder() != hostByteOrder()) {
+    if (store()->byteOrder() != hostByteOrder()) {
       elementType->reorder(buffer, externalBytesSize);
     }
 
