@@ -31,8 +31,8 @@
 #endif
 
 
-#ifndef __ImplAAFOperationDef_h__
-#include "ImplAAFOperationDef.h"
+#ifndef __ImplAAFEffectDef_h__
+#include "ImplAAFEffectDef.h"
 #endif
 
 #include <assert.h>
@@ -40,17 +40,16 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 
-extern "C" const aafClassID_t CLSID_EnumAAFOperationDefs;
-extern "C" const aafClassID_t CLSID_EnumAAFParameterDefs;
+extern "C" const aafClassID_t CLSID_EnumAAFEffectDefs;
  
-ImplAAFOperationDef::ImplAAFOperationDef ()
-: _dataDef(			PID_OperationDefinition_DataDefinition,		"DataDefinition"),
-  _isTimeWarp(		PID_OperationDefinition_IsTimeWarp,			"IsTimeWarp"),
-  _degradeTo(		PID_OperationDefinition_DegradeTo,			"DegradeTo"),
-  _category(		PID_OperationDefinition_Category,			"Category"),
-  _numInputs(		PID_OperationDefinition_NumberInputs,		"NumberInputs"),
-  _bypass(			PID_OperationDefinition_Bypass,				"Bypass"),
-  _paramDefined(	PID_OperationDefinition_ParametersDefined,	"ParametersDefined")
+ImplAAFEffectDef::ImplAAFEffectDef ()
+: _dataDef(			PID_EffectDefinition_DataDefinition,	"DataDefinition"),
+  _isTimeWarp(		PID_EffectDefinition_IsTimeWarp,		"IsTimeWarp"),
+  _degradeTo(	PID_EffectDefinition_DegradeTo,				"DegradeTo"),
+  _category(		PID_EffectDefinition_Category,			"Category"),
+  _numInputs(		PID_EffectDefinition_NumberInputs,		"NumberInputs"),
+  _bypass(			PID_EffectDefinition_Bypass,			"Bypass"),
+  _paramDefined(	PID_EffectDefinition_ParametersDefined,	"ParametersDefined")
 {
 	_persistentProperties.put(_dataDef.address());
 	_persistentProperties.put(_isTimeWarp.address());
@@ -62,12 +61,13 @@ ImplAAFOperationDef::ImplAAFOperationDef ()
 }
 
 
-ImplAAFOperationDef::~ImplAAFOperationDef ()
+ImplAAFEffectDef::~ImplAAFEffectDef ()
 {
 	aafUID_t	nilUID = { 0 };
 
 //	ImplAAFEssenceDescriptor *dataDef = _dataDef.setValue(nilUID);
 //	ImplAAFEssenceDescriptor *degradeTo = _degradeTo.setValue(0,0);
+//	ImplAAFEssenceDescriptor *paramDefined = _paramDefined.setValue(0);
 //	if (dataDef)
 //	{
 //		dataDef->ReleaseReference();
@@ -76,11 +76,15 @@ ImplAAFOperationDef::~ImplAAFOperationDef ()
 //	{
 //		degradeTo->ReleaseReference();
 //	}
+//	if (paramDefined)
+//	{
+//		paramDefined->ReleaseReference();
+//	}
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetDataDefinitionID(
+    ImplAAFEffectDef::GetDataDefinitionID(
       aafUID_t *  pDataDefID)
 {
 	if(pDataDefID == NULL)
@@ -92,7 +96,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::SetDataDefinitionID (
+    ImplAAFEffectDef::SetDataDefinitionID (
       aafUID_t  *pDataDefID)
 {
 	if(pDataDefID == NULL)
@@ -103,15 +107,11 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::IsTimeWarp (
+    ImplAAFEffectDef::IsTimeWarp (
       aafBool *bIsTimeWarp)
 {
 	if(bIsTimeWarp == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if(!_isTimeWarp.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
 	*bIsTimeWarp = _isTimeWarp;
 	
 	return AAFRESULT_SUCCESS;
@@ -119,7 +119,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::SetIsTimeWarp (
+    ImplAAFEffectDef::SetIsTimeWarp (
       aafBool  bIsTimeWarp)
 {
 	_isTimeWarp = bIsTimeWarp;
@@ -128,27 +128,26 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::PrependDegradeToOperations (
-      ImplAAFOperationDef  *pOperationDef)
+    ImplAAFEffectDef::PrependDegradeToEffects (
+      ImplAAFEffectDef  *pEffectDef)
 {
 	aafUID_t	*tmp = NULL, newUID;
 	aafInt32	oldBufSize;
 	aafInt32	newBufSize;
 	aafInt32	n;
 
-	if(pOperationDef == NULL)
+	if(pEffectDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
 		oldBufSize = _degradeTo.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
-		CHECK(pOperationDef->GetAUID(&newUID));
+		newBufSize = oldBufSize + 1;
+		CHECK(pEffectDef->GetAUID(&newUID));
 		tmp = new aafUID_t[newBufSize];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
-			_degradeTo.copyToBuffer(tmp, oldBufSize);
+		_degradeTo.copyToBuffer(tmp, oldBufSize);
 		for(n = oldBufSize/sizeof(aafUID_t); n >= 0; n--)
 		{
 			tmp[n+1] = tmp[n];
@@ -168,26 +167,25 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::AppendDegradeToOperations (
-      ImplAAFOperationDef  *pOperationDef)
+    ImplAAFEffectDef::AppendDegradeToEffects (
+      ImplAAFEffectDef  *pEffectDef)
 {
 	aafUID_t	*tmp, newUID;
 	aafInt32	oldBufSize;
 	aafInt32	newBufSize;
 
-	if(pOperationDef == NULL)
+	if(pEffectDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
 		oldBufSize = _degradeTo.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
-		CHECK(pOperationDef->GetAUID(&newUID));
+		newBufSize = oldBufSize + 1;
+		CHECK(pEffectDef->GetAUID(&newUID));
 		tmp = new aafUID_t[newBufSize];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
-			_degradeTo.copyToBuffer(tmp, oldBufSize);
+		_degradeTo.copyToBuffer(tmp, oldBufSize);
 		tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
 		_degradeTo.setValue(tmp, newBufSize);
 		delete [] tmp;
@@ -203,13 +201,13 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetDegradeToOperations (
-      ImplEnumAAFOperationDefs  **ppEnum)
+    ImplAAFEffectDef::GetDegradeToEffects (
+      ImplEnumAAFEffectDefs  **ppEnum)
 {
 	if(ppEnum == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	*ppEnum = (ImplEnumAAFOperationDefs *)CreateImpl(CLSID_EnumAAFOperationDefs);
+	*ppEnum = (ImplEnumAAFEffectDefs *)CreateImpl(CLSID_EnumAAFEffectDefs);
 	if(*ppEnum == NULL)
 		return(AAFRESULT_NOMEMORY);
 	(*ppEnum)->SetEnumProperty(this, &_degradeTo);
@@ -219,7 +217,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetCategory (
+    ImplAAFEffectDef::GetCategory (
        wchar_t		*pCategory,
 		aafInt32	bufSize)
 {
@@ -227,9 +225,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if(pCategory == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if(!_category.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
 
 	stat = _category.copyToBuffer(pCategory, bufSize);
 	if (! stat)
@@ -244,21 +239,17 @@ AAFRESULT STDMETHODCALLTYPE
   // GetCategoryBufLen()
   //
 AAFRESULT STDMETHODCALLTYPE
-	ImplAAFOperationDef::GetCategoryBufLen (
+	ImplAAFEffectDef::GetCategoryBufLen (
 			aafInt32 *		pLen)
 {
 	if(pLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if(!_category.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
 	*pLen = _category.size();
 	return(AAFRESULT_SUCCESS); 
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::SetCategory (
+    ImplAAFEffectDef::SetCategory (
       wchar_t *pCategory)
 {
 	if(pCategory == NULL)
@@ -271,7 +262,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetNumberInputs (
+    ImplAAFEffectDef::GetNumberInputs (
       aafInt32 *  pNumberInputs)
 {
 	if(pNumberInputs == NULL)
@@ -283,7 +274,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::SetNumberInputs (
+    ImplAAFEffectDef::SetNumberInputs (
       aafInt32  NumberInputs)
 {
 	_numInputs = NumberInputs;
@@ -293,15 +284,11 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetBypass (
+    ImplAAFEffectDef::GetBypass (
       aafUInt32 *pBypass)
 {
 	if(pBypass == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if(!_bypass.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
 	*pBypass = _bypass;
 	
 	return AAFRESULT_SUCCESS;
@@ -309,7 +296,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::SetBypass (
+    ImplAAFEffectDef::SetBypass (
       aafUInt32  bypass)
 {
 	_bypass = bypass;
@@ -318,69 +305,31 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::AddParameterDefs (
+    ImplAAFEffectDef::AddParameterDefs (
       ImplAAFParameterDef *pAAFParameterDef)
 {
-	aafUID_t					*tmp, newUID, oldUID;
-	aafInt32					oldBufSize;
-	aafInt32					newBufSize;
-	ImplAAFParameterDef*		pParmDef = NULL;
-	ImplEnumAAFParameterDefs*	pEnum = NULL;
-	aafBool						parmDefFound = AAFFalse;
-
-	tmp = NULL;
+	aafUID_t	*tmp, newUID;
+	aafInt32	oldBufSize;
+	aafInt32	newBufSize;
 
 	if(pAAFParameterDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
+		oldBufSize = _paramDefined.size();
+		newBufSize = oldBufSize + 1;
 		CHECK(pAAFParameterDef->GetAUID(&newUID));
-		CHECK(GetParameterDefinitions(&pEnum));
-		pEnum->NextOne(&pParmDef);
-		while(pParmDef)
-		{
-			CHECK(pParmDef->GetAUID(&oldUID));
-			if ( memcmp(&newUID, &oldUID, sizeof(aafUID_t)) == 0)
-			{
-				parmDefFound = AAFTrue;
-				break;
-			}
-			pParmDef->ReleaseReference();
-			pParmDef = NULL;
-			pEnum->NextOne(&pParmDef);
-		}
-		pEnum->ReleaseReference();
-		pEnum = NULL;
-		if (!parmDefFound)
-		{
-			if (!_paramDefined.isPresent())
-				oldBufSize = 0;			
-			else oldBufSize = _paramDefined.size();
-
-			newBufSize = oldBufSize + sizeof(aafUID_t);
-			tmp = new aafUID_t[newBufSize];
-			if(tmp == NULL)
-				RAISE(AAFRESULT_NOMEMORY);
-			if(oldBufSize != 0)
-				_paramDefined.copyToBuffer(tmp, oldBufSize);
-			tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
-			_paramDefined.setValue(tmp, newBufSize);
-			delete [] tmp;
-		}
-		else
-		{
-			pParmDef->ReleaseReference();
-			pParmDef = NULL;
-			RAISE(AAFRESULT_OBJECT_ALREADY_ATTACHED);
-		}
+		tmp = new aafUID_t[newBufSize];
+		if(tmp == NULL)
+			RAISE(AAFRESULT_NOMEMORY);
+		_paramDefined.copyToBuffer(tmp, oldBufSize);
+		tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
+		_paramDefined.setValue(tmp, newBufSize);
+		delete [] tmp;
 	}
 	XEXCEPT
 	{
-		if (pParmDef)
-			pParmDef->ReleaseReference();
-		if (pEnum)
-			pEnum->ReleaseReference();
 		if(tmp != NULL)
 			delete [] tmp;
 	}
@@ -390,22 +339,14 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetParameterDefinitions (
+    ImplAAFEffectDef::GetParameterDefinitions (
       ImplEnumAAFParameterDefs **ppEnum)
 {
-	if(ppEnum == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	*ppEnum = (ImplEnumAAFParameterDefs *)CreateImpl(CLSID_EnumAAFParameterDefs);
-	if(*ppEnum == NULL)
-		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumProperty(this, &_paramDefined);
-
-	return(AAFRESULT_SUCCESS);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 
-OMDEFINE_STORABLE(ImplAAFOperationDef, AUID_AAFOperationDef);
+OMDEFINE_STORABLE(ImplAAFEffectDef, AUID_AAFEffectDef);
 
 
