@@ -29,6 +29,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
@@ -81,8 +82,10 @@ static const aafUID_t			TEST_PROP2_ID =
 { 0x9d92ba41, 0x3641, 0x11d4, { 0x8e, 0x50, 0x0, 0x90, 0x27, 0xdf, 0xcc, 0x26 } };
 static const aafCharacter*		TEST_PROP2_NAME = L"Test Prop2: Name";
 
-#define TEST_BUF_MAX_SIZE  64
-static aafCharacter  TEST_PROP_NAMES[10][TEST_BUF_MAX_SIZE]; //say, 10 Property Names, each having 64 characters max.
+//say , 10 Property Names, each having 128 characters max.
+#define PROPS_MAX_COUNT   10
+#define TEST_BUF_MAX_SIZE  128
+static aafCharacter  TEST_PROP_NAMES[PROPS_MAX_COUNT][TEST_BUF_MAX_SIZE];
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)
@@ -120,8 +123,8 @@ aafBoolean_t  AreUnksSame(T1& cls1, T2& cls2)
 }
 
 
-static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const pDict,
-							   const aafBoolean_t bMinimalTesting)
+static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const /*pDict*/,
+							   const aafBoolean_t /*bMinimalTesting*/)
 							   
 {
 	//CAAFBuiltinDefs defs (pDict);
@@ -163,6 +166,10 @@ static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const 
 		checkResult (pObj->CountProperties (&propCount));
 		//A composition should have at least 5 properties ...
 		checkExpression(propCount>=5, AAFRESULT_TEST_FAILED);
+		// TEST_PROP_NAMES array cannot hold more than PROPS_MAX_COUNT
+		// elements.
+		checkExpression(propCount<=PROPS_MAX_COUNT, 
+			AAFRESULT_TEST_FAILED);
 		
 		//Get Enumeration over properties
 		checkResult (pObj->GetProperties (&pEnum));
@@ -476,7 +483,8 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	
 }
 
-extern "C" HRESULT CEnumAAFProperties_test()
+extern "C" HRESULT CEnumAAFProperties_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFProperties_test(testMode_t mode)
 {
 	
 	HRESULT hr = AAFRESULT_SUCCESS;
@@ -484,7 +492,10 @@ extern "C" HRESULT CEnumAAFProperties_test()
 	
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );		
 		
