@@ -1,9 +1,9 @@
 #ifndef OMUTILITIES_H
 #define OMUTILITIES_H
 
-#include "AAFTypes.h"
-
 #include "OMTypes.h"
+
+#include <stddef.h>
 
 void setProgramName(const char* name);
 
@@ -11,20 +11,10 @@ const char* getProgramName(void);
 
 ByteOrder hostByteOrder(void);
 
-//
-// Converts wide character string (pwString) to a single-byte string
-// (pbString).  It is the caller's responsibility to allocate the
-// destination memory.
-//
-void OMUwc2sb (char * pbString,
-			   const aafWChar * pwString);
+size_t wideStringLength(const wchar_t* string);
 
-//
-// Converts single-byte string (pbString) to a wide character string
-// (pwString).  It is the caller's responsibility to allocate the
-// destination memory.
-//
-void OMUsb2wc (aafWChar * pwString,
-			   const char * pbString);
+wchar_t* wideStringCopy(wchar_t* destination,
+                        const wchar_t* source,
+                        const size_t length);
 
 #endif
