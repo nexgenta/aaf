@@ -8,30 +8,34 @@
 \******************************************/
 #include "ImplAAFDigitalImageDescriptor.h"
 
+#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "AAFDefUIDs.h"
 
 #include <assert.h>
 #include <string.h>
 
 ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 :	_compression(PID_DigitalImageDescriptor_Compression,					"Compression"),
-	_storedHeight(PID_DigitalImageDescriptor_StoredHeight,					"Stored Height"),
-	_storedWidth(PID_DigitalImageDescriptor_StoredWidth,					"Stored Width"),
-	_sampledHeight(PID_DigitalImageDescriptor_SampledHeight,				"Sampled Height"),
-	_sampledWidth(PID_DigitalImageDescriptor_SampledWidth,					"Sampled Width"),
-	_sampledXOffset(PID_DigitalImageDescriptor_SampledXOffset,				"Sampled XOffset"),
-	_sampledYOffset(PID_DigitalImageDescriptor_SampledYOffset,				"Sampled YOffset"),
-	_displayHeight(PID_DigitalImageDescriptor_DisplayHeight,				"Display Height"),
-	_displayWidth(PID_DigitalImageDescriptor_DisplayWidth,					"Display Width"),
-	_displayXOffset(PID_DigitalImageDescriptor_DisplayXOffset,				"Display XOffset"),
-	_displayYOffset(PID_DigitalImageDescriptor_DisplayYOffset,				"Display YOffset"),
-	_frameLayout(PID_DigitalImageDescriptor_FrameLayout,					"Frame Layout"),
-	_videoLineMap(PID_DigitalImageDescriptor_VideoLIneMap,					"Video Line Map"),
-	_imageAspectRatio(PID_DigitalImageDescriptor_ImageAspectRatio,			"Image Aspect Ratio"),
-	_alphaTransparency(PID_DigitalImageDescriptor_AlphaTransparency,		"Alpha Transparency"),
+	_storedHeight(PID_DigitalImageDescriptor_StoredHeight,					"StoredHeight"),
+	_storedWidth(PID_DigitalImageDescriptor_StoredWidth,					"StoredWidth"),
+	_sampledHeight(PID_DigitalImageDescriptor_SampledHeight,				"SampledHeight"),
+	_sampledWidth(PID_DigitalImageDescriptor_SampledWidth,					"SampledWidth"),
+	_sampledXOffset(PID_DigitalImageDescriptor_SampledXOffset,				"SampledXOffset"),
+	_sampledYOffset(PID_DigitalImageDescriptor_SampledYOffset,				"SampledYOffset"),
+	_displayHeight(PID_DigitalImageDescriptor_DisplayHeight,				"DisplayHeight"),
+	_displayWidth(PID_DigitalImageDescriptor_DisplayWidth,					"DisplayWidth"),
+	_displayXOffset(PID_DigitalImageDescriptor_DisplayXOffset,				"DisplayXOffset"),
+	_displayYOffset(PID_DigitalImageDescriptor_DisplayYOffset,				"DisplayYOffset"),
+	_frameLayout(PID_DigitalImageDescriptor_FrameLayout,					"FrameLayout"),
+	_videoLineMap(PID_DigitalImageDescriptor_VideoLineMap,					"VideoLineMap"),
+	_imageAspectRatio(PID_DigitalImageDescriptor_ImageAspectRatio,			"ImageAspectRatio"),
+	_alphaTransparency(PID_DigitalImageDescriptor_AlphaTransparency,		"AlphaTransparency"),
 	_gamma(PID_DigitalImageDescriptor_Gamma,								"Gamma"),
-	_imageAlignmentFactor(PID_DigitalImageDescriptor_ImageAlignmentFactor,	"Image Alignment Factor")
+	_imageAlignmentFactor(PID_DigitalImageDescriptor_ImageAlignmentFactor,	"ImageAlignmentFactor")
 {
+	aafInt32	videoLineMap[2];
+
 	_persistentProperties.put(_compression.address());
 	_persistentProperties.put(_storedHeight.address());
 	_persistentProperties.put(_storedWidth.address());
@@ -50,15 +54,21 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_persistentProperties.put(_gamma.address());
 	_persistentProperties.put(_imageAlignmentFactor.address());
 
+	aafRational_t zero;
+	zero.numerator = 0;
+	zero.denominator = 1;
+	
 	// Initialize Required properties
 	_storedHeight = 0;
 	_storedWidth = 0;
-	//_frameLayout = kFullFrame;
-	//_imageAspectRatio = ;
-	//_videoLineMap =
-
+	_frameLayout = kFullFrame;
+	_imageAspectRatio = zero;
+	videoLineMap[0] = 0;
+	videoLineMap[1] = 1;
+	_videoLineMap.setValue(videoLineMap, 2*sizeof(aafInt32));
 	// Initialize Optional properties
-	//_compression = ;
+
+	_compression = NoCodec;
 	_sampledHeight = 0;
 	_sampledWidth = 0;
 	_sampledXOffset = 0;
@@ -67,8 +77,8 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_displayWidth = 0;
 	_displayXOffset = 0;
 	_displayYOffset = 0;
-	_alphaTransparency = kMinValueTransparent;
-	//_gamma = 0;
+	_alphaTransparency = zero;
+	_gamma = zero;
 	_imageAlignmentFactor = 0;
 }
 
@@ -161,7 +171,24 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::SetAlphaTransparency (aafAlphaTransparency_t AlphaTransparency)
 {
-	_alphaTransparency = AlphaTransparency;
+	if ((AlphaTransparency != kMinValueTransparent) && (AlphaTransparency != kMaxValueTransparent))
+	{
+		return AAFRESULT_INVALID_TRANSPARENCY;
+	}
+
+	aafRational_t transparency;
+
+	if (AlphaTransparency == kMinValueTransparent)
+	{
+		transparency.numerator = 0;
+		transparency.denominator = 1;
+	}
+	else
+	{
+		transparency.numerator = 1;
+		transparency.denominator = 1;
+	}
+	_alphaTransparency = transparency;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -305,8 +332,17 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (pAlphaTransparency == NULL)
 		return(AAFRESULT_NULL_PARAM);
+	
+	aafRational_t transparency = _alphaTransparency;
 
-	*pAlphaTransparency = _alphaTransparency;
+	if (transparency.numerator == 0)
+	{
+		*pAlphaTransparency = kMinValueTransparent;
+	}
+	else
+	{
+		*pAlphaTransparency = kMaxValueTransparent;
+	}
 
 	return AAFRESULT_SUCCESS;
 }
@@ -336,20 +372,5 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-extern "C" const aafClassID_t CLSID_AAFDigitalImageDescriptor;
 
-OMDEFINE_STORABLE(ImplAAFDigitalImageDescriptor, CLSID_AAFDigitalImageDescriptor);
-
-// Cheat!  We're using this object's CLSID instead of object class...
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFDigitalImageDescriptor::GetObjectClass(aafUID_t * pClass)
-{
-  if (! pClass)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  memcpy (pClass, &CLSID_AAFDigitalImageDescriptor, sizeof (aafClassID_t));
-  return AAFRESULT_SUCCESS;
-}
-
-
+OMDEFINE_STORABLE(ImplAAFDigitalImageDescriptor, AUID_AAFDigitalImageDescriptor);
