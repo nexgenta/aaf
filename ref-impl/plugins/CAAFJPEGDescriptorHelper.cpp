@@ -138,7 +138,7 @@ HRESULT CAAFJPEGDescriptorHelper::Initialize(IAAFSourceMob *filemob)
 		// Get the interfaces needed for the rest of the descriptor methods.
 		checkResult(_edes->QueryInterface(IID_IAAFFileDescriptor, (void **)&_filedes));
 		checkResult(_edes->QueryInterface(IID_IAAFDigitalImageDescriptor, (void **)&_dides));
-		checkResult(_edes->QueryInterface(IID_IAAFCDCIDescriptor, (void **)&_cdcides));
+		checkResult(_edes->QueryInterface(IID_IAAFCDCIDescriptor, (void **)&_dides));
 	}
 	catch (HRESULT& rhr)
 	{
@@ -173,10 +173,10 @@ bool CAAFJPEGDescriptorHelper::operator!=(const CAAFJPEGDescriptorHelper& rhs)
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetNumLocators (aafUInt32 *  pCount)
+    CAAFJPEGDescriptorHelper::GetNumLocators (aafInt32 *  pCount)
 {
 	checkAssertion(NULL != _edes);
-	return _edes->CountLocators(pCount);
+	return _edes->GetNumLocators(pCount);
 }
 
 
@@ -200,7 +200,7 @@ HRESULT STDMETHODCALLTYPE
     CAAFJPEGDescriptorHelper::EnumAAFAllLocators (IEnumAAFLocators ** ppEnum)
 {
 	checkAssertion(NULL != _edes);
-	return _edes->GetLocators (ppEnum);
+	return _edes->EnumAAFAllLocators (ppEnum);
 }
 
 
@@ -237,10 +237,10 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetSampleRate (const aafRational_t & rate)
+    CAAFJPEGDescriptorHelper::SetSampleRate (aafRational_t *  pRate)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->SetSampleRate (rate);
+	return _filedes->SetSampleRate (pRate);
 }
 
 
@@ -253,10 +253,10 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetContainerFormat (const aafUID_t & format)
+    CAAFJPEGDescriptorHelper::SetContainerFormat (aafUID_t *  pFormat)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->SetContainerFormat (format);
+	return _filedes->SetContainerFormat (pFormat);
 }
 
 
@@ -270,10 +270,10 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetCompression (const aafUID_t & codecID)
+    CAAFJPEGDescriptorHelper::SetCompression (aafUID_t *  pCodecID)
 {
   checkAssertion(NULL != _dides);
-	return _dides->SetCompression (codecID);
+	return _dides->SetCompression (pCodecID);
 }
 
 
