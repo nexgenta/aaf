@@ -52,6 +52,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::
                                         name),
   _targetTag(nullOMPropertyTag),
   _targetName(targetName),
+  _targetPropertyPath(0),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
@@ -65,6 +66,8 @@ OMWeakReferenceVectorProperty<ReferencedObject>::
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
                                              "~OMWeakReferenceVectorProperty");
+
+  delete [] _targetPropertyPath;
 }
 
   // @mfunc Save this <c OMWeakReferenceVectorProperty>.
@@ -433,9 +436,19 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::insertAt(
 
   PRECONDITION("Valid index", (index >= 0) && (index <= count()));
   PRECONDITION("Valid object", object != 0);
+#if defined(OM_VALIDATE_WEAK_REFERENCES)
+  PRECONDITION("Source container object attached to file",
+                                                        container()->inFile());
+  PRECONDITION("Target object attached to file", object->inFile());
+  PRECONDITION("Source container object and target object in same file",
+                                        container()->file() == object->file());
+#endif
 
   OMUniqueObjectIdentification key = object->identification();
   VectorElement newElement(this, key, _targetTag);
+#if defined(OM_VALIDATE_WEAK_REFERENCES)
+  element.reference().setTargetTag(targetTag());
+#endif
   newElement.setValue(object);
   _vector.insertAt(newElement, index);
   setPresent();
@@ -810,10 +823,27 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
             const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
   if (_targetTag == nullOMPropertyTag) {
     nonConstThis->_targetTag =
-                           file()->referencedProperties()->insert(_targetName);
+                  file()->referencedProperties()->insert(targetPropertyPath());
   }
   POSTCONDITION("Valid target property tag", _targetTag != nullOMPropertyTag);
   return _targetTag;
+}
+
+template<typename ReferencedObject>
+OMPropertyId*
+OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath");
+
+  PRECONDITION("Valid target name", validWideString(_targetName));
+
+  if (_targetPropertyPath == 0) {
+    OMWeakReferenceVectorProperty<ReferencedObject>* nonConstThis =
+            const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
+    nonConstThis->_targetPropertyPath = file()->path(_targetName);
+  }
+  POSTCONDITION("Valid result", _targetPropertyPath != 0);
+  return _targetPropertyPath;
 }
 
 #endif
