@@ -18,18 +18,17 @@ AD_HEAD
 AD_IDL(//
 // This interface is used to define variably-sized Array types used in
 // AAF persistent objects.
-AD_STD_COMMENT_IFC_HEADER
-AD_STD_COMMENT_IFC_STUB)
+AD_STD_COMMENT_IFC_HEADER)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_CLASS_UUID(307e9e65, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(307e9e66, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD3(Initialize,
-			[in],
+			[in\, ref],
 			objPass,
-			aafUID_t *,
-			pID,
+			aafUID_constref,
+			id,
 			auid to be used to identify this type,
 
 			[in],
@@ -40,7 +39,7 @@ AD_XMETHOD3(Initialize,
 
 			[in],
 			objPass,
-			aafCharacter *,
+			aafCharacter_constptr,
 			pTypeName,
 			friendly name of this type definition,
 
@@ -65,7 +64,7 @@ AD_XMETHOD3(Initialize,
   // - element type is permissible for use in a VariableArray.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pID\\\, pTypeDef\\\, or pTypeName\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pTypeDef or pTypeName\)
   //
   // AAFRESULT_BAD_TYPE
   //   - an illegal element type was given.)
@@ -167,6 +166,7 @@ AD_X2METHOD3(CreateValueFromValues,
        array of property values for elements of array value which
     // is to be created.,
 			 numElements,
+			 ,
 
 			 [in],
 			 objPass,
@@ -174,12 +174,14 @@ AD_X2METHOD3(CreateValueFromValues,
 			 numElements,
 			 size of pElementValues array.,
 			 ,
+			 ,
 
 			 [out],
 			 objOut,
 			 AAFPropertyValue,
 			 ppPropVal,
 			 newly-created property value,
+			 ,
 			 ,
 
      Creates a property value which contains a variable array type.
