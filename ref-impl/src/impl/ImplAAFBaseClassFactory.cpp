@@ -76,6 +76,7 @@
 #define CLSID_AAFTypeDefinitionSet CLSID_AAFTypeDefSet
 #define CLSID_AAFTypeDefinitionStream CLSID_AAFTypeDefStream
 #define CLSID_AAFTypeDefinitionString CLSID_AAFTypeDefString
+#define CLSID_AAFTypeDefinitionIndirect CLSID_AAFTypeDefIndirect
 #define CLSID_AAFTypeDefinitionStrongObjectReference CLSID_AAFTypeDefStrongObjRef
 #define CLSID_AAFTypeDefinitionVariableArray CLSID_AAFTypeDefVariableArray
 #define CLSID_AAFTypeDefinitionWeakObjectReference CLSID_AAFTypeDefWeakObjRef
@@ -178,14 +179,14 @@ ImplAAFBaseClassFactory::~ImplAAFBaseClassFactory(void)
 
 // Global function that looksup the built-in code class id for the corresponding
 // auid.
-const aafClassID_t* ImplAAFBaseClassFactory::LookupClassID(const aafUID_t* pAUID)
+const aafClassID_t* ImplAAFBaseClassFactory::LookupClassID(const aafUID_t & auid)
 {
   // Return NULL if the given AUID cannot be found.
   const aafClassID_t *pClassID = NULL;
 
   // Lookup the class id in the predefined "base class" table.
   AAFObjectEntry_t **ppResult = NULL;
-  AAFObjectEntry_t key = {"KEY", pAUID, NULL};
+  AAFObjectEntry_t key = {"KEY", &auid, NULL};
   AAFObjectEntry_t *pKey = &key;
   
   // Use standard library's binary search routine.
