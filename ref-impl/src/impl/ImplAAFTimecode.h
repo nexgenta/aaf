@@ -4,27 +4,14 @@
 #define __ImplAAFTimecode_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #ifndef __ImplAAFSegment_h__
@@ -85,14 +72,24 @@ public:
 	  /*[in]*/ aafRational_t *  pEditRate,
 	  /*[out]*/ aafFrameOffset_t *  pOffset);
 
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFTimecode)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFTimecodeTest.cpp.
+  static AAFRESULT test();
+
 public:
 	// Methods which are internal to the SDK
 virtual AAFRESULT OffsetToTimecodeClip(aafPosition_t offset, ImplAAFTimecode **result,
 												aafPosition_t *tcStartPos);
 private:
-	OMFixedSizeProperty<aafPosition_t>	_start;
-	OMFixedSizeProperty<aafUInt16>	_FPS;
-	OMFixedSizeProperty<aafBool>	_drop;
+	OMFixedSizeProperty<aafTimecode_t>	_timecode;
 };
 
 #endif // ! __ImplAAFTimecode_h__
