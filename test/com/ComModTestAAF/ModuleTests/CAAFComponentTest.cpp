@@ -31,6 +31,7 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -93,7 +94,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFComponent*				comp = NULL;
 	IAAFSegment*				seg = NULL;
 	IAAFDataDef *               pDataDef = 0;
-	aafRational_t				audioRate = { 44100, 1 };
 	aafLength_t					testLength = TEST_LENGTH;
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
@@ -433,7 +433,7 @@ extern "C" HRESULT CAAFComponent_test()
 	catch (...)
 	{
 	  cerr << "CAAFComponent_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
