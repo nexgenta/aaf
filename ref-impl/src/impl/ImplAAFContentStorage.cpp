@@ -1,36 +1,31 @@
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #include "AAFTypes.h"
 #include "aafErr.h"
 #include "AAFResult.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
@@ -87,7 +82,7 @@ ImplAAFContentStorage::~ImplAAFContentStorage ()
 	OMStrongReferenceSetIterator<OMMaterialIdentification, ImplAAFEssenceData>essenceData(_essenceData);
 	while(++essenceData)
 	{
-		ImplAAFEssenceData *pData = essenceData.setValue(0);
+		ImplAAFEssenceData *pData = essenceData.clearValue();
 		if (pData)
 		{
 		  pData->ReleaseReference();
@@ -99,7 +94,7 @@ ImplAAFContentStorage::~ImplAAFContentStorage ()
 	OMStrongReferenceSetIterator<OMMaterialIdentification, ImplAAFMob>mobs(_mobs);
 	while(++mobs)
 	{
-		ImplAAFMob *pMob = mobs.setValue(0);
+		ImplAAFMob *pMob = mobs.clearValue();
 		if (pMob)
 		{
 		  pMob->ReleaseReference();
@@ -200,7 +195,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMMaterialIdentification, ImplAAFMob>(_mobs);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFMobs, this, iter));
 		CHECK(theEnum->SetCriteria(pSearchCriteria));
 	  *ppEnum = theEnum;
 	}
@@ -211,7 +206,6 @@ AAFRESULT STDMETHODCALLTYPE
 		  theEnum->ReleaseReference();
 		  theEnum = 0;
 		}
-	  return(XCODE());
 	}
   XEND;
 	
@@ -226,7 +220,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (NULL == pMob)
 		return AAFRESULT_NULL_PARAM;
-	
+
 	XPROTECT()
 	{
 		CHECK(pMob->GetMobID(&mobID));
@@ -234,6 +228,9 @@ AAFRESULT STDMETHODCALLTYPE
 		// JeffB: Test is a throwaway, so don't bump the refcount
 		if(!_mobs.contains((*reinterpret_cast<const OMMaterialIdentification *>(&mobID))))
 		{
+			if (pMob->attached ())
+				return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+				
 			_mobs.appendValue(pMob);
 			// trr - We are saving a copy of pointer in _mobs so we need
 			// to bump its reference count.
@@ -283,7 +280,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT
-    ImplAAFContentStorage::ChangeIndexedMobID (ImplAAFMob *pMob, aafMobID_constref newID)
+    ImplAAFContentStorage::ChangeIndexedMobID (ImplAAFMob *pMob, aafMobID_constref /*newID*/)
 {
 	aafMobID_t	mobID;
 	if (NULL == pMob)
@@ -292,14 +289,13 @@ AAFRESULT
 	XPROTECT()
 	{
 		CHECK(pMob->GetMobID(&mobID));
-		RAISE(AAFRESULT_NOT_IMPLEMENTED);
 	} /* XPROTECT */
 	XEXCEPT
 	{
 	}
 	XEND;
 	
-	return(AAFRESULT_SUCCESS);
+	return(AAFRESULT_NOT_IN_CURRENT_VERSION);
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -315,16 +311,15 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFContentStorage::IsEssenceDataPresent (aafMobID_constref fileMobID,
-                           aafFileFormat_t fmt,
+                           aafFileFormat_t /*fmt*/,
                            aafBool *pResult)
 {
 	*pResult = _essenceData.contains((*reinterpret_cast<const OMMaterialIdentification *>(&fileMobID)));
 	return AAFRESULT_SUCCESS;
 }
 
-//Internal function only.  Not exposed through the COM API
 AAFRESULT
-    ImplAAFContentStorage::LookupEssence (aafMobID_constref fileMobID,
+    ImplAAFContentStorage::LookupEssenceData (aafMobID_constref fileMobID,
                            ImplAAFEssenceData **ppEssence)
 {
   if (! ppEssence)
@@ -366,7 +361,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMMaterialIdentification, ImplAAFEssenceData>(_essenceData);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFEssenceData, this, iter));
 	  *ppEnum = theEnum;
 	}
   XEXCEPT
@@ -376,7 +371,6 @@ AAFRESULT STDMETHODCALLTYPE
 		  theEnum->ReleaseReference();
 		  theEnum = 0;
 		}
-	  return(XCODE());
 	}
   XEND;
 	
@@ -393,7 +387,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (NULL == pEssenceData)
 		return AAFRESULT_NULL_PARAM;
-	
+
 	XPROTECT()
 	{
 		CHECK(pEssenceData->GetFileMobID(&mobID));
@@ -401,6 +395,9 @@ AAFRESULT STDMETHODCALLTYPE
 		// JeffB: Test is a throwaway, so don't bump the refcount
 		if(!_essenceData.contains((*reinterpret_cast<const OMMaterialIdentification *>(&mobID))))
 		{
+			if (pEssenceData->attached())
+				return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+				
 			_essenceData.appendValue(pEssenceData);
 			// trr - We are saving a copy of pointer in _mobs so we need
 			// to bump its reference count.
@@ -448,9 +445,4 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND;
 	
 	return(AAFRESULT_SUCCESS);
-}
-
-AAFRESULT ImplAAFContentStorage::UnlinkMobID(aafMobID_constref mobID)
-{
-	return(AAFRESULT_NOT_IMPLEMENTED);
 }

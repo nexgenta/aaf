@@ -1,42 +1,40 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
 
 #include "OMProperty.h"
 
+#include "OMAssertions.h"
 #include "OMStorable.h"
 #include "OMType.h"
 #include "OMUtilities.h"
 #include "OMPropertyDefinition.h"
+#include "OMStoredObject.h"
 
 #include <memory.h>
 
 // class OMProperty
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMProperty
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -45,17 +43,18 @@
 OMProperty::OMProperty(const OMPropertyId propertyId,
                        const OMStoredForm storedForm,
                        const wchar_t* name)
-: _propertyId(propertyId), _storedForm(storedForm), _name(name), _cName(0),
-  _propertySet(0), _definition(0),
-  // _isOptional(false),
-  // BobT: make optional by default, to hack around problem where
-  // props may be restored before they're initialized by DM.
-  _isOptional(true),
+: _propertyId(propertyId),
+  _storedForm(storedForm),
+  _storedName(0),
+  _name(name),
+  _propertySet(0),
+  _definition(0),
+  _isOptional(false),
   _isPresent(false)
 {
   TRACE("OMProperty::OMProperty");
 
-  PRECONDITION("Valid name", validWideString(_name)); 
+  PRECONDITION("Valid name", validWideString(_name));
 }
 
   // @mfunc Temporary pseudo-constructor for clients which provide
@@ -83,7 +82,7 @@ OMProperty::~OMProperty(void)
 {
   TRACE("OMProperty::~OMProperty");
 
-  delete [] _cName;
+  delete [] _storedName;
 }
 
   // @mfunc Close this <c OMProperty>.
@@ -104,7 +103,7 @@ void OMProperty::detach(void)
 
   // @mfunc The <c OMPropertyDefinition> defining this <c OMProperty>.
   //   @rdesc The defining <c OMPropertyDefinition>.
-  //   @this const 
+  //   @this const
 const OMPropertyDefinition* OMProperty::definition(void) const
 {
   TRACE("OMProperty::definition");
@@ -117,15 +116,11 @@ const OMPropertyDefinition* OMProperty::definition(void) const
   // @mfunc The name of this <c OMProperty>.
   //   @rdesc The property name.
   //   @this const
-const char* OMProperty::name(void) const
+const wchar_t* OMProperty::name(void) const
 {
   TRACE("OMProperty::name");
 
-  if (_cName == 0) {
-    OMProperty* nonConstThis = const_cast<OMProperty*>(this);
-    nonConstThis->_cName = convertWideString(_name);
-  }
-  return _cName;
+  return _name;
 }
 
   // @mfunc The property id of this <c OMProperty>.
@@ -199,16 +194,65 @@ const OMType* OMProperty::type(void) const
 {
   TRACE("OMProperty::type");
 
-  // PRECONDITION("Valid property definition", _definition != 0);
+  PRECONDITION("Valid property definition", _definition != 0);
 
-  const OMType* result = 0;
-  if (_definition != 0) {
-    result = _definition->type();
-  }
+  const OMType* result = _definition->type();
+
+#if !defined(OM_DISABLE_VALIDATE_DEFINITIONS)
+  POSTCONDITION("Valid result", result != 0);
+#endif
   return result;
 }
 
+  // @mfunc The <c OMStorable> that contains this <c OMProperty>.
+  //   @rdesc The containing <c OMStorable>.
+  //   @this const
+OMStorable* OMProperty::container(void) const
+{
+  TRACE("OMProperty::container");
+
+  ASSERT("Valid property set", _propertySet != 0);
+  OMStorable* result = _propertySet->container();
+
+  POSTCONDITION("Valid result", result != 0);
+  return result;
+}
+
+  // @mfunc The <c OMStoredObject> that contains the persisted
+  //        representation of this <c OMProperty>.
+  //   @rdesc The <c OMStoredObject>.
+  //   @this const
+OMStoredObject* OMProperty::store(void) const
+{
+  TRACE("OMProperty::store");
+
+  return container()->store();
+}
+
+  // @mfunc The <c OMFile> that contains the persisted
+  //        representation of this <c OMProperty>.
+  //   @rdesc The containing <c OMFile>.
+  //   @this const
+OMFile* OMProperty::file(void) const
+{
+  TRACE("OMProperty::file");
+
+  return container()->file();
+}
+
+const wchar_t* OMProperty::storedName(void) const
+{
+  TRACE("OMProperty::storedName");
+
+  if (_storedName == 0) {
+    OMProperty* p = const_cast<OMProperty*>(this);
+    p->_storedName = OMStoredObject::referenceName(_name, propertyId());
+  }
+  return _storedName;
+}
+
 // class OMSimpleProperty
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMSimpleProperty
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -277,110 +321,23 @@ void OMSimpleProperty::setSize(size_t newSize)
   }
 }
 
-  // @mfunc Write this property to persistent store, performing
-  //        any necessary externalization and byte reordering.
-  //   @this const
-void OMSimpleProperty::write(void) const
+void OMSimpleProperty::shallowCopyTo(OMProperty* destination) const
 {
-  TRACE("OMSimpleProperty::write");
-
-  PRECONDITION("Valid internal bytes", _bits != 0);
-  PRECONDITION("Valid internal bytes size", _size > 0);
-
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* store = container->store();
-  ASSERT("Valid stored object", store != 0);
-
-  const OMType* propertyType = type();
-
-  if (propertyType != 0) { // tjb - temporary, should be ASSERTION below
-
-    ASSERT("Valid property type", propertyType != 0);
- 
-    // Allocate buffer for property value
-    size_t externalBytesSize = propertyType->externalSize(_bits,
-                                                          _size);
-    OMByte* buffer = new OMByte[externalBytesSize];
-    ASSERT("Valid heap pointer", buffer != 0);
-
-    // Externalize property value
-    propertyType->externalize(_bits,
-                              _size,
-                              buffer,
-                              externalBytesSize,
-                              store->byteOrder());
+  TRACE("OMSimpleProperty::shallowCopyTo");
+  PRECONDITION("Valid destination", destination != 0);
   
-    // Reorder property value
-    if (store->byteOrder() != hostByteOrder()) {
-      propertyType->reorder(buffer, externalBytesSize);
-    }
+  OMSimpleProperty* dest = dynamic_cast<OMSimpleProperty*>(destination);
+  ASSERT("Destination is corret type", dest != 0);
+  ASSERT("Valid destination", dest != this);
 
-    // Write property value
-    store->write(_propertyId, _storedForm, buffer, externalBytesSize);
-    delete [] buffer;
-
-  } else {
-    // tjb - temporary, no type information, do it the old way
-    //
-    store->write(_propertyId, _storedForm, _bits, _size);
-  }
+  dest->set(_bits, _size);
 }
 
-  // @mfunc Read this property from persistent store, performing
-  //        any necessary byte reordering and internalization.
-  //   @parm The size of the external (on disk) form of the bytes of
-  //         this propery.
-  //   @this const
-void OMSimpleProperty::read(size_t externalBytesSize)
+void OMSimpleProperty::deepCopyTo(OMProperty* /* destination */,
+                                  void* /* clientContext */) const
 {
-  TRACE("OMSimpleProperty::read");
-
-  PRECONDITION("Valid external bytes size", externalBytesSize > 0);
-
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  const OMType* propertyType = type();
-
-  if (propertyType != 0) { // tjb - temporary, should be ASSERTION below
-
-    ASSERT("Valid property type", propertyType != 0);
-
-    // Allocate buffer for property value
-    OMByte* buffer = new OMByte[externalBytesSize];
-    ASSERT("Valid heap pointer", buffer != 0);
-
-    // Read property value
-    store->read(_propertyId, _storedForm, buffer, externalBytesSize);
-
-    // Reorder property value
-    if (store->byteOrder() != hostByteOrder()) {
-      propertyType->reorder(buffer, externalBytesSize);
-    }
-
-    // Internalize property value
-    size_t requiredBytesSize = propertyType->internalSize(buffer,
-                                                          externalBytesSize);
-    setSize(requiredBytesSize);
-    ASSERT("Property value buffer large enough", _size >= requiredBytesSize);
-
-    propertyType->internalize(buffer,
-                              externalBytesSize,
-                              _bits,
-                              requiredBytesSize,
-                              hostByteOrder());
-    delete [] buffer;
-  } else {
-    // tjb - temporary, no type information, do it the old way
-    //
-    setSize(externalBytesSize);
-    ASSERT("Property value buffer large enough", _size >= externalBytesSize);
-    store->read(_propertyId, _storedForm, _bits, externalBytesSize);
-  }
-  setPresent();
+  TRACE("OMSimpleProperty::deepCopyTo");
+  // Nothing to do - this is a deep copy
 }
 
   // @mfunc Get the value of this <c OMSimpleProperty>.
@@ -402,7 +359,7 @@ void OMSimpleProperty::get(void* value, size_t ANAME(valueSize)) const
   //   @parm The address of the property value.
   //   @parm The size of the value.
   //   @this const
-void OMSimpleProperty::set(const void* value, size_t valueSize) 
+void OMSimpleProperty::set(const void* value, size_t valueSize)
 {
   TRACE("OMSimpleProperty::set");
   PRECONDITION("Valid data buffer", value != 0);
@@ -421,7 +378,7 @@ void OMSimpleProperty::save(void) const
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  write();
+  store()->save(*this);
 }
 
   // @mfunc Restore this <c OMSimpleProperty>, the external (persisted)
@@ -432,10 +389,11 @@ void OMSimpleProperty::restore(size_t externalSize)
   TRACE("OMSimpleProperty::restore");
   ASSERT("Sizes match", externalSize == _size);
 
-  read(externalSize);
+  store()->restore(*this, externalSize);
+  setPresent();
 }
 
-  // @mfunc Is this an optional property ? 
+  // @mfunc Is this an optional property ?
   //   @rdesc True if this property is optional, false otherwise.
   //   @this const
 bool OMProperty::isOptional(void) const
@@ -467,9 +425,9 @@ bool OMProperty::isVoid(void) const
 }
 
   // @mfunc Remove this optional <c OMProperty>.
-void OMProperty::remove(void)
+void OMProperty::removeProperty(void)
 {
-  TRACE("OMProperty::remove");
+  TRACE("OMProperty::removeProperty");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
   clearPresent();
@@ -488,6 +446,13 @@ OMStorable* OMProperty::storable(void) const
   return 0;
 }
 
+OMStoredForm OMProperty::storedForm(void) const
+{
+  TRACE("OMProperty::storedForm");
+
+  return _storedForm;
+}
+
   // @mfunc The size of the raw bits of this
   //        <c OMSimpleProperty>. The size is given in bytes.
   //   @rdesc The size of the raw bits of this
@@ -498,6 +463,13 @@ size_t OMSimpleProperty::bitsSize(void) const
   TRACE("OMSimpleProperty::bitsSize");
 
   return _size;
+}
+
+OMByte* OMSimpleProperty::bits(void) const
+{
+  TRACE("OMSimpleProperty::bits");
+
+  return _bits;
 }
 
   // @mfunc Get the raw bits of this <c OMSimpleProperty>.
