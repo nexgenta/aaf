@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.3 2004/03/24 17:45:36 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.4 2004/04/01 13:33:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1006,6 +1006,26 @@ AAFRESULT STDMETHODCALLTYPE
 
   return AAFRESULT_SUCCESS;
 
+}
+
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFMob::AppendNewStaticSlot (ImplAAFSegment * /*pSegment*/,
+                           aafSlotID_t  /*slotID*/,
+                           aafCharacter_constptr  /*pSlotName*/,
+                           ImplAAFStaticMobSlot ** /*ppNewSlot*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFMob::AppendNewEventSlot (aafRational_t  /*editRate*/,
+                           ImplAAFSegment * /*pSegment*/,
+                           aafSlotID_t  /*slotID*/,
+                           aafCharacter_constptr  /*pSlotName*/,
+                           aafPosition_t  /*origin*/,
+                           ImplAAFEventMobSlot ** /*ppNewSlot*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 AAFRESULT STDMETHODCALLTYPE
