@@ -3,7 +3,7 @@
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and accompanying 
+ * Permission to use, copy and modify this software and accopanying 
  * documentation, and to distribute and sublicense application software
  * incorporating this software for any purpose is hereby granted, 
  * provided that (i) the above copyright notice and this permission
@@ -105,15 +105,7 @@ ImplAAFHeader::ImplAAFHeader ()
   _persistentProperties.put(_fileRev.address());
   _persistentProperties.put(_objectModelVersion.address());
 
-  //!!!	_head = this;
-//	file->InternalSetHead(this);
-	_toolkitRev.major = 0;
-	_toolkitRev.minor = 0;
-	_toolkitRev.tertiary = 0;
-	_toolkitRev.type = kAAFVersionUnknown;
-	_toolkitRev.patchLevel = 0;
-//!!!	_byteOrder;
-//!!!	_lastModified;
+	_toolkitRev = AAFReferenceImplementationVersion;
 	_file = NULL;
 }
 
@@ -565,33 +557,35 @@ ImplAAFHeader::GetIdentificationAt
 
 
 AAFRESULT 
-    ImplAAFHeader::AddIdentificationObject (aafProductIdentification_t *pIdent)
+    ImplAAFHeader::AddIdentificationObject
+(aafProductIdentification_constptr pIdent)
 {
 	ImplAAFIdentification *		identObj;
-	aafProductIdentification_t	fiction;
-	aafBool						dummyIDNT = kAAFFalse;
-	aafProductVersion_t			dummyVersion;
-	
+	aafProductIdentification_t ident;
+
 	XPROTECT()
 	{		
 		if(pIdent == (aafProductIdentification_t *)NULL)
 		{
-			fiction.companyName = L"Unknown";
-			fiction.productName = L"Unknown";
-			fiction.productVersionString = (aafWChar*)NULL;
-			fiction.productID = NIL_UID;
-			fiction.platform = (aafWChar*)NULL;
-			fiction.productVersion = 0;
-			pIdent = &fiction;
-			dummyIDNT = kAAFTrue;
+			ident.companyName = L"Unknown";
+			ident.productName = L"Unknown";
+			ident.productVersionString = (aafWChar*)NULL;
+			ident.productID = NIL_UID;
+			ident.platform = (aafWChar*)NULL;
+			ident.productVersion = 0;
+		}
+		else
+		{
+		    ident = *pIdent;
 		}
 		
 	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
-    if (pIdent->productVersionString == 0) {
-      pIdent->productVersionString = L"Unknown version";
+
+    if (ident.productVersionString == 0) {
+      ident.productVersionString = L"Unknown version";
     }
-    if (pIdent->platform == 0) {
-      pIdent->platform = L"Windows NT";
+    if (ident.platform == 0) {
+      ident.platform = L"Windows NT";
     }
     
     // Get the dictionary so that we can use the factory
@@ -603,19 +597,18 @@ AAFRESULT
 		  CreateInstance((ImplAAFObject **)&identObj));
     if (NULL == identObj)
       CHECK(AAFRESULT_NOMEMORY);
-	CHECK(identObj->Initialize(pIdent->companyName,
-							   pIdent->productName,
-							   pIdent->productVersionString,
-							   pIdent->productID));
+	CHECK(identObj->Initialize(ident.companyName,
+							   ident.productName,
+							   ident.productVersionString,
+							   ident.productID));
 
-	if (pIdent->productVersion)
+	if (ident.productVersion)
 	  {
-		CHECK (identObj->SetProductVersion (*pIdent->productVersion));
+		CHECK (identObj->SetProductVersion (*ident.productVersion));
 	  }
 
     _identificationList.appendValue(identObj);
  
-    dummyVersion.major = 0;
 	}
 	XEXCEPT
 	{
@@ -633,6 +626,9 @@ AAFRESULT
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
+
+	if (pIdent->attached())
+	    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_identificationList.appendValue(pIdent);
 	pIdent->AcquireReference();
@@ -696,6 +692,12 @@ void ImplAAFHeader::SetByteOrder(const aafInt16 byteOrder)
 
 void ImplAAFHeader::SetDictionary(ImplAAFDictionary *pDictionary)
 {
+  if( !pDictionary )
+	return; // AAFRESULT_NULL_PARAM
+
+  if( pDictionary->attached() )
+	return; // AAFRESULT_OBJECT_ALREADY_ATTACHED
+
   _dictionary = pDictionary;
   if (pDictionary)
     pDictionary->AcquireReference();
