@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -59,7 +59,7 @@ OMFile::OMFile(const wchar_t* fileName,
                const OMClassFactory* factory,
                OMDictionary* dictionary,
                const OMLoadMode loadMode)
-: _root(0), _rootStoredObject(store),
+: _root(0), _rootStore(store),
   _dictionary(dictionary),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
   _loadMode(loadMode), _fileName(0),
@@ -68,10 +68,11 @@ OMFile::OMFile(const wchar_t* fileName,
   TRACE("OMFile::OMFile");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("Valid dictionary", _dictionary != 0);
   _fileName = saveWideString(fileName);
   setClassFactory(factory);
   readSignature(_fileName);
-  setName("/");
+  setName(L"/");
 }
 
   // @mfunc Constructor. Create an <c OMFile> object representing
@@ -92,7 +93,7 @@ OMFile::OMFile(const wchar_t* fileName,
                const OMClassFactory* factory,
                OMDictionary* dictionary,
                OMStorable* root)
-: _root(root), _rootStoredObject(store),
+: _root(root), _rootStore(store),
   _dictionary(dictionary),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
   _loadMode(lazyLoad), _fileName(0), _signature(signature),
@@ -101,11 +102,12 @@ OMFile::OMFile(const wchar_t* fileName,
   TRACE("OMFile::OMFile");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("Valid dictionary", _dictionary != 0);
   _fileName = saveWideString(fileName);
   setClassFactory(factory);
-  setName("<file>");
-  _root->attach(this, "/");
-  _root->setStore(rootStoredObject());
+  setName(L"<file>");
+  _root->attach(this, L"/");
+  _root->setStore(_rootStore);
 }
 
   // @mfunc Destructor.
@@ -138,6 +140,7 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
   TRACE("OMFile::openExistingRead");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
+  PRECONDITION("Valid dictionary", dictionary != 0);
 
   OMStoredObject* store = OMStoredObject::openRead(fileName);
   OMFile* newFile = new OMFile(fileName,
@@ -169,6 +172,7 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   TRACE("OMFile::openExistingModify");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
+  PRECONDITION("Valid dictionary", dictionary != 0);
 
   OMStoredObject* store = OMStoredObject::openModify(fileName);
   OMFile* newFile = new OMFile(fileName,
@@ -187,12 +191,12 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
   //        <p factory> to create the objects. The file must not already
   //        exist. The byte ordering on the newly created file is given
-  //        by <p byteOrder>. The root <c OMStorable> in the newly
+  //        by <p byteOrder>. The client root <c OMStorable> in the newly
   //        created file is given by <p root>.
   //   @parm The name of the file to create.
   //   @parm The factory to use for creating objects.
   //   @parm The byte order to use for the newly created file.
-  //   @parm The root <c OMStorable> in the newly created file.
+  //   @parm The client root <c OMStorable> in the newly created file.
   //   @rdesc The newly created <c OMFile>.
 OMFile* OMFile::openNewModify(const wchar_t* fileName,
                               const OMClassFactory* factory,
@@ -209,16 +213,12 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
                     ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
   PRECONDITION("Valid root", root != 0);
   PRECONDITION("Valid signature", validSignature(signature));
-  // PRECONDITION("Valid dictionary ", dictionary != 0);
+  PRECONDITION("Valid dictionary ", dictionary != 0);
 
   OMStoredObject* store = OMStoredObject::createModify(fileName, byteOrder);
-  OMStorable* rt = 0;
-  if (dictionary == 0) {
-    rt = root;
-  } else {
-    rt = new OMRootStorable(root, dictionary);
-    ASSERT("Valid heap pointer", rt != 0);
-  }
+  OMStorable* rt = new OMRootStorable(root, dictionary);
+  ASSERT("Valid heap pointer", rt != 0);
+
   OMFile* newFile = new OMFile(fileName,
                                clientOnRestoreContext,
                                signature,
@@ -249,18 +249,18 @@ bool OMFile::validSignature(const OMFileSignature& signature)
 }
 
   // @mfunc Save all changes made to the contents of this
-  //        <c OMFile>. It is not possible to <mf OMFile::save>
+  //        <c OMFile>. It is not possible to save
   //        read-only or transient files.
   //   @parm Client context for callbacks.
-void OMFile::save(void* clientOnSaveContext)
+void OMFile::saveFile(void* clientOnSaveContext)
 {
-  TRACE("OMFile::save");
+  TRACE("OMFile::saveFile");
+
+  _clientOnSaveContext = clientOnSaveContext;
 
   if (_mode == modifyMode) {
-    _clientOnSaveContext = clientOnSaveContext;
-    _root->onSave(_clientOnSaveContext);
     _root->save();
-    _rootStoredObject->save(referencedProperties());
+    _rootStore->save(referencedProperties());
   }
 }
 
@@ -288,30 +288,29 @@ void OMFile::revert(void)
   ASSERT("Unimplemented code not reached", false);
 }
 
-  // @mfunc Restore the root <c OMStorable> object from this <c OMFile>.
-  //   @rdesc The newly restored roo <c OMStorable>.
+  // @mfunc Restore the client root <c OMStorable> object from this <c OMFile>.
+  //   @rdesc The newly restored root <c OMStorable>.
 OMStorable* OMFile::restore(void)
 {
   TRACE("OMFile::restore");
 
-  _rootStoredObject->restore(_referencedProperties);
+  _rootStore->restore(_referencedProperties);
+
   OMClassId id;
-  _rootStoredObject->restore(id);
-  if (id == OMRootStorable::_rootClassId) {
-    ASSERT("Valid dictionary", _dictionary != 0);
-    _root = new OMRootStorable();
-    _root->attach(this, "/");
-    _root->setStore(rootStoredObject());
-    _root->setClassFactory(_dictionary);
+  _rootStore->restore(id);
+  ASSERT("Valid root stored object", id == OMRootStorable::_rootClassId);
 
-    _root->restoreContents();
+  _root = new OMRootStorable();
+  _root->attach(this, L"/");
+  _root->setStore(_rootStore);
+  _root->setClassFactory(_dictionary);
 
-    OMDictionary *metaDictionary = ((OMRootStorable *)_root)->dictionary();
-    ASSERT("Consistent dictionaries", metaDictionary == _dictionary);
-    _root->setClassFactory(classFactory());
-  } else {
-    _root = OMStorable::restoreFrom(this, "/", *rootStoredObject());
-  }
+  _root->restoreContents();
+
+  OMDictionary *metaDictionary = ((OMRootStorable *)_root)->dictionary();
+  ASSERT("Consistent dictionaries", metaDictionary == _dictionary);
+  _root->setClassFactory(classFactory());
+
   return root();
 }
 
@@ -325,34 +324,19 @@ void OMFile::close(void)
     writeSignature(_fileName);
   }
   _root->detach();
-  if (_dictionary != 0) {
-    delete _root;
-    _root = 0;
-  }
+  delete _root;
+  _root = 0;
 }
 
-  // @mfunc Retrieve the root <c OMStorable> from this <c OMFile>.
+  // @mfunc Retrieve the client root <c OMStorable> from this <c OMFile>.
   //   @rdesc The root <c OMStorable>.
 OMStorable* OMFile::root(void)
 {
   TRACE("OMFile::root");
 
   OMStorable* result;
-  if (_dictionary != 0) {
-    result = ((OMRootStorable*)_root)->clientRoot();
-  } else {
-    result = _root;
-  }
+  result = ((OMRootStorable*)_root)->clientRoot();
   return result;
-}
-
-  // @mfunc Retrieve the root <c OMStoredObject> from this <c OMFile>.
-  //   @rdesc The root <c OMStoredObject>.
-OMStoredObject* OMFile::rootStoredObject(void)
-{
-  TRACE("OMFile::rootStoredObject");
-
-  return _rootStoredObject;
 }
 
 OMDictionary* OMFile::dictionary(void) const
@@ -395,8 +379,8 @@ OMByteOrder OMFile::byteOrder(void) const
 {
   TRACE("OMFile::byteOrder");
 
-  ASSERT("Valid root", _rootStoredObject != 0);
-  return _rootStoredObject->byteOrder();
+  ASSERT("Valid root", _rootStore != 0);
+  return _rootStore->byteOrder();
 }
 
   // @mfunc The loading mode (eager or lazy) of this <c OMFile>.
@@ -438,40 +422,107 @@ OMFileSignature OMFile::signature(void) const
   //   @parm The pathname to the desired property.
   //   @rdesc The property instance.
   //   @this const
-OMProperty* OMFile::findPropertyPath(const char* propertyPathName) const
+OMProperty* OMFile::findPropertyPath(const wchar_t* propertyPathName) const
 {
   TRACE("OMFile::findPropertyPath");
-  PRECONDITION("Valid property path name", validString(propertyPathName));
-  PRECONDITION("Path name is absolute", propertyPathName[0] == '/');
+  PRECONDITION("Valid property path name", validWideString(propertyPathName));
+  PRECONDITION("Path name is absolute", propertyPathName[0] == L'/');
   PRECONDITION("Valid root", _root != 0);
 
-  char* path = new char[strlen(propertyPathName) + 1];
-  ASSERT("Valid heap pointer", path != 0);
-  strcpy(path, propertyPathName);
+  wchar_t* path = saveWideString(propertyPathName);
   
-  char* element = path;
+  wchar_t* element = path;
   element++; // skip first '/'
 
   const OMStorable* storable = _root;
   OMProperty* result = 0;
 
-  char* end = strchr(element, '/');
+  wchar_t* end = findWideCharacter(element, L'/');
   
   while (end != 0) {
     *end = 0;
     storable = storable->find(element);
     ASSERT("Valid storable pointer", storable != 0);
     element = ++end;
-    end = strchr(element, '/');
+    end = findWideCharacter(element, L'/');
   }
 
-  if ((element != 0) && (strlen(element) > 0)) {
+  if ((element != 0) && (lengthOfWideString(element) > 0)) {
     result = storable->findProperty(element);
   } else {
     result = 0;
   }
 
   delete [] path;
+  return result;
+}
+
+OMPropertyId* OMFile::path(const wchar_t* propertyPathName) const
+{
+  TRACE("OMFile::path");
+
+  wchar_t delimiter = L'/';
+  PRECONDITION("Valid property path name", validWideString(propertyPathName));
+  PRECONDITION("Path name is absolute", propertyPathName[0] == delimiter);
+  PRECONDITION("Valid root", _root != 0);
+
+  // Allocate result
+  //
+  size_t count = countWideCharacter(propertyPathName, delimiter);
+  OMPropertyId* result = new OMPropertyId[count + 1];
+  ASSERT("Valid heap pointer", result != 0);
+
+  // Parse path name
+  //
+  wchar_t* path = saveWideString(propertyPathName);
+  wchar_t* element = path;
+  element++; // skip first '/'
+  const OMStorable* storable = _root;
+  OMProperty* property = 0;
+
+  size_t index = 0;
+  wchar_t* end = findWideCharacter(element, delimiter);
+
+  while (end != 0) {
+    *end = 0;
+    property = storable->findProperty(element);
+    result[index] = property->propertyId();
+    index = index + 1;
+    storable = storable->find(element);
+    ASSERT("Valid storable pointer", storable != 0);
+    element = ++end;
+    end = findWideCharacter(element, delimiter);
+  }
+
+  if ((element != 0) && (lengthOfWideString(element) > 0)) {
+    property = storable->findProperty(element);
+    result[index] = property->propertyId();
+    index = index + 1;
+  }
+
+  result[index] = 0;
+
+  delete [] path;
+  return result;
+}
+
+OMProperty* OMFile::findProperty(const OMPropertyId* path) const
+{
+  TRACE("OMFile::findProperty");
+
+  PRECONDITION("Valid root", _root != 0);
+
+  size_t count = lengthOfPropertyPath(path);
+  const OMStorable* storable = _root;
+
+  for (size_t index = 0; index < count - 1; index++) {
+    OMPropertyId pid = path[index];
+    storable = storable->find(pid);
+    ASSERT("Valid storable pointer", storable != 0);
+  }
+
+  OMProperty* result = storable->findProperty(path[count - 1]);
+
   return result;
 }
 
