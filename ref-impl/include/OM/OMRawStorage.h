@@ -63,6 +63,9 @@ public:
     // @cmember Destructor.
   virtual ~OMRawStorage(void) {}
 
+    // @cmember Is it possible to write to this <c OMRawStorage> ?
+  virtual bool isWritable(void) const = 0;
+
     // @cmember Attempt to read the number of bytes given by <p byteCount>
     //          from the current position in this <c OMRawStorage>
     //          into the buffer at address <p bytes>.
@@ -121,12 +124,12 @@ public:
   virtual bool isPositionable(void) const = 0;
 
     // @cmember The current position for <f read()> and <f write()>, as an
-    //          offset in bytes from the begining of this <c OMRawStorage>.
+    //          offset in bytes from the beginning of this <c OMRawStorage>.
     //          precondition - isPositionable()
   virtual OMUInt64 position(void) const = 0;
 
     // @cmember Set the current position for <f read()> and <f write()>, as an
-    //          offset in bytes from the begining of this <c OMRawStorage>.
+    //          offset in bytes from the beginning of this <c OMRawStorage>.
     //          precondition - isPositionable()
   virtual void setPosition(OMUInt64 newPosition) = 0;
 
