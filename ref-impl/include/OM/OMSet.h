@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMINTERNAL
 #ifndef OMSET_H
@@ -36,11 +41,14 @@ class OMSetIterator;
   //        are not allowed.
   //   @tcarg class | Element | The type of an <c OMSet> element.
   //          This type must support operator = and operator==.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //          Instances of this type must be able to return a unique
+  //          value of type <p Key> to identify themselves through a
+  //          function with the signature
+  //          const Key Element::identification(void) const.
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @base public | <c OMContainer>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Key, typename Element>
 class OMSet : public OMContainer<Element> {
 public:
@@ -53,39 +61,36 @@ public:
   virtual ~OMSet(void);
 
     // @cmember Insert <p value> into this <c OMSet>.
-  virtual void insert(const Key, const Element value);
+  virtual void insert(const Element value);
+
+    // @cmember Does this <c OMSet> contain <p value> ?
+    //   @this const
+  virtual bool contains(const Element value) const;
 
     // @cmember Does this <c OMSet> contain an <p Element>
     //          identified by <p key>?
-  virtual bool contains(const Key key) const;
+    //   @this const
+  virtual bool containsKey(const Key key) const;
 
     // @cmember Find the <p Element> in this <c OMSet> identified by
     //          <p key>.  If the element is found it is returned in
     //          <p value> and the result is true. If the element is
     //          not found the result is false.
+    //   @this const
   virtual bool find(const Key key, Element& value) const;
-
-    // @cmember Find the <p Element> in this <c OMSet> identified by
-    //          <p key>.  If the element is found it is returned in
-    //          <p value> and the result is true. If the element is
-    //          not found the result is false.
-  virtual bool find(const Key key, Element** value) const;
 
     // @cmember The number of elements in this <c OMSet>.
     //          <mf OMSet::count> returns the actual number
     //          of elements in the <c OMSet>.
+    //   @this const
   size_t count(void) const;
 
     // @cmember Append the given <p Element> <p value> to
     //          this <c OMSet>.
-  void append(const Key, const Element value);
+  void append(const Element value);
 
-    // @cmember Remove the <p Element> with <p Key> <p key>
-    //          from this <c OMSet>.
-  virtual void remove(const Key key);
-
-    // @cmember Remove all elements from this <c OMSet>.
-  virtual void clear(void);
+    // @cmember Remove <p value> from this <c OMSet>.
+  virtual void remove(const Element value);
 
 private:
   // @access Private members.
