@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -63,7 +63,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         // @parm [in] auid to be used to identify this type
-        (const aafUID_t * pID,
+        (const aafUID_t & classID,
 
 		// Inheritance parent of this class
 		ImplAAFClassDef * pParentClass,
@@ -91,15 +91,15 @@ public:
 
 
   //****************
-  // AppendNewPropertyDef()
+  // RegisterNewPropertyDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendNewPropertyDef
+    RegisterNewPropertyDef
         (// @parm [in] auid to be used to identify this property
-         aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         wchar_t *  pName,
+         const aafCharacter *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -112,15 +112,15 @@ public:
 
 
   //****************
-  // AppendOpionalPropertyDef()
+  // RegisterOpionalPropertyDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendOptionalPropertyDef
+    RegisterOptionalPropertyDef
         (// @parm [in] auid to be used to identify this property
-         aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         wchar_t *  pName,
+         const aafCharacter *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -135,7 +135,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     LookupPropertyDef
         (// @parm [in] auid reprepresenting property to look up
-         aafUID_t *  pPropID,
+         const aafUID_t & propID,
 
          // @parm [out] resulting property definition
          ImplAAFPropertyDef ** ppPropDef) const;
@@ -165,7 +165,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
         // @parm [in] auid to be used to identify this type
-        (const aafUID_t * pID,
+        (const aafUID_t & classID,
 
 		// Inheritance parent of this class
 		const aafUID_t * pParentClassId,
@@ -174,21 +174,21 @@ public:
 		const aafCharacter * pClassName);
 
 
-  // Private method to unconditionally append a property def (ignoring
+  // Private method to unconditionally register a property def (ignoring
   // whether or not property is optional or not, or if this class has
   // already been registered).
   AAFRESULT STDMETHODCALLTYPE
-    pvtAppendPropertyDef
-        (aafUID_t *  pID,
-         wchar_t *  pName,
-         const aafUID_t * pTypeId,
+    pvtRegisterPropertyDef
+        (const aafUID_t & id,
+         const aafCharacter *  pName,
+         const aafUID_t & typeId,
          aafBool  isOptional,
          ImplAAFPropertyDef ** ppPropDef);
 
 
   // Appends an existing property def object.
   AAFRESULT STDMETHODCALLTYPE
-    pvtAppendExistingPropertyDef
+    pvtRegisterExistingPropertyDef
         (// PropertyDef to append
 		 ImplAAFPropertyDef * pPropDef);
 
