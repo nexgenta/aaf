@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9.2.4 2004/07/14 11:22:56 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9.2.5 2004/07/16 13:56:16 bakerian Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -46,6 +46,7 @@ endif
 INCLUDES = -I. \
 	   -I../../include/OM \
 	   -I$(AAFBASE)/ss-impl/ref \
+		 -I$(AAFBASE)/ref-impl/include \
        -I$(AAFBASE)/sss-impl/include
 
 # Optional libgsf support is enabled by LIBGSF_PATH variable
