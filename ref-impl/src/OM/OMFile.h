@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -38,6 +38,7 @@ class OMClassFactory;
 class OMObjectDirectory;
 class OMPropertyTable;
 class OMStoredObject;
+class OMDictionary;
 
 // @class Files supported by the Object Manager.
 //
@@ -65,7 +66,9 @@ public:
     //          exist.
   static OMFile* openExistingRead(const wchar_t* fileName,
                                   const OMClassFactory* factory,
-                                  const OMLoadMode loadMode);
+                                  void* clientOnRestoreContext,
+                                  const OMLoadMode loadMode,
+                                  OMDictionary* dictionary = 0);
 
     // @cmember Open an existing <c OMFile> for modify access, the
     //          <c OMFile> is named <p fileName>, use the <c OMClassFactory>
@@ -73,7 +76,9 @@ public:
     //          exist.
   static OMFile* openExistingModify(const wchar_t* fileName,
                                     const OMClassFactory* factory,
-                                    const OMLoadMode loadMode);
+                                    void* clientOnRestoreContext,
+                                    const OMLoadMode loadMode,
+                                    OMDictionary* dictionary = 0);
 
     // @cmember Open a new <c OMFile> for modify access, the
     //          <c OMFile> is named <p fileName>, use the <c OMClassFactory>
@@ -83,9 +88,11 @@ public:
     //          created file is given by <p root>.
   static OMFile* openNewModify(const wchar_t* fileName,
                                const OMClassFactory* factory,
+                               void* clientOnRestoreContext,
                                const OMByteOrder byteOrder,
                                OMStorable* root,
-                               const OMFileSignature& signature);
+                               const OMFileSignature& signature,
+                               OMDictionary* dictionary = 0);
 
      // @cmember Is <p signature> a valid signature for an <c OMFile> ?
   static bool validSignature(const OMFileSignature& signature);
@@ -95,18 +102,22 @@ public:
     // @cmember Constructor. Create an <c OMFile> object representing
     //          an existing external file.
   OMFile(const wchar_t* fileName,
+         void* clientOnRestoreContext,
          const OMAccessMode mode,
          OMStoredObject* store,
          const OMClassFactory* factory,
+         OMDictionary* dictionary,
          const OMLoadMode loadMode);
 
     // @cmember Constructor. Create an <c OMFile> object representing
     //          a new external file.
   OMFile(const wchar_t* fileName,
+         void* clientOnRestoreContext,
          OMFileSignature signature,
          const OMAccessMode mode,
          OMStoredObject* store,
          const OMClassFactory* factory,
+         OMDictionary* dictionary,
          OMStorable* root);
 
     // @cmember Destructor.
@@ -140,6 +151,8 @@ public:
     // @cmember Retrieve the root <c OMStoredObject> from this <c OMFile>.
   OMStoredObject* rootStoredObject(void);
 
+  OMDictionary* dictionary(void) const;
+
     // @cmember Retrieve the <c OMPropertyTable> from this <c OMFile>.
   OMPropertyTable* referencedProperties(void);
 
@@ -160,7 +173,7 @@ public:
 
     // @cmember Find the property instance in this <c OMFile>
     //          named by <p propertyPathName>.
-  virtual OMProperty* findPropertyPath(const char* propertyPathName) const;
+  virtual OMProperty* findPropertyPath(const wchar_t* propertyPathName) const;
 
   // OMStorable overrides.
   //
@@ -174,6 +187,8 @@ public:
 
   void* clientOnSaveContext(void);
 
+  void* clientOnRestoreContext(void);
+
 private:
   // @access Private members.
 
@@ -185,7 +200,8 @@ private:
 
   OMStorable* _root;
   OMStoredObject* _rootStoredObject;
-  
+
+  OMDictionary* _dictionary;
   OMObjectDirectory* _objectDirectory;
   OMPropertyTable* _referencedProperties;
 
@@ -195,6 +211,7 @@ private:
   OMFileSignature _signature;
 
   void* _clientOnSaveContext;
+  void* _clientOnRestoreContext;
 
 };
 

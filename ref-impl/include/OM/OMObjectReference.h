@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMINTERNAL
 #ifndef OMOBJECTREFERENCE_H
@@ -27,10 +32,11 @@
 #include "OMDataTypes.h"
 
 class OMProperty;
-class OMStorable;
 
   // @class Persistent references to persistent objects.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          object. This type must be a descendant of <c OMStorable>.
+template <typename ReferencedObject>
 class OMObjectReference {
 public:
   // @access Public members.
@@ -53,12 +59,13 @@ public:
     // @cmember Assignment.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide assignment of object references.
-  OMObjectReference& operator= (const OMObjectReference& rhs);
+  OMObjectReference<ReferencedObject>& operator=
+                              (const OMObjectReference<ReferencedObject>& rhs);
 
     // @cmember Equality.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide equality of object references.
-  bool operator== (const OMObjectReference& rhs) const;
+  bool operator== (const OMObjectReference<ReferencedObject>& rhs) const;
 
     // @cmember Save this <c OMObjectReference>.
   virtual void save(void) const = 0;
@@ -73,13 +80,17 @@ public:
   virtual void restore(void) = 0;
 
     // @cmember Get the value of this <c OMObjectReference>.
-    //          The value is a pointer to the referenced <c OMStorable>.
-  virtual OMStorable* getValue(void) const = 0;
+    //          The value is a pointer to the <c ReferencedObject>.
+  virtual ReferencedObject* getValue(void) const = 0;
+
+    // @cmember Set the value of this <c OMObjectReference>.
+    //          The value is a pointer to the <c ReferencedObject>.
+  virtual ReferencedObject* setValue(const ReferencedObject* value) = 0;
 
     // @cmember The value of this <c OMObjectReference> as a pointer.
     //          This function provides low-level access. If the object exits
     //          but has not yet been loaded then the value returned is 0.
-  virtual OMStorable* pointer(void) const;
+  virtual ReferencedObject* pointer(void) const;
 
 protected:
   // @access Protected members.
@@ -88,14 +99,16 @@ protected:
   OMProperty* _property;
 
     // @cmember A pointer to the actual object.
-  OMStorable* _pointer;
+  ReferencedObject* _pointer;
 
 };
 
   // @class Persistent strong references to persistent objects.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMObjectReference>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMStrongObjectReference : public OMObjectReference {
+template <typename ReferencedObject>
+class OMStrongObjectReference : public OMObjectReference<ReferencedObject> {
 public:
   // @access Public members.
 
@@ -117,12 +130,13 @@ public:
     // @cmember Assignment.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide assignment of object references.
-  OMStrongObjectReference& operator= (const OMStrongObjectReference& rhs);
+  OMStrongObjectReference<ReferencedObject>& operator=
+                        (const OMStrongObjectReference<ReferencedObject>& rhs);
 
     // @cmember Equality.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide equality of object references.
-  bool operator== (const OMStrongObjectReference& rhs) const;
+  bool operator== (const OMStrongObjectReference<ReferencedObject>& rhs) const;
 
     // @cmember Save this <c OMStrongObjectReference>.
   virtual void save(void) const;
@@ -137,14 +151,12 @@ public:
   virtual void restore(void);
 
     // @cmember Get the value of this <c OMStrongObjectReference>.
-    //          The value is a pointer to the referenced <c OMStorable>.
-  virtual OMStorable* getValue(void) const;
+    //          The value is a pointer to the <c ReferencedObject>.
+  virtual ReferencedObject* getValue(void) const;
 
     // @cmember Set the value of this <c OMStrongObjectReference>.
-    //          The value is a pointer to the referenced <c OMStorable>.
-  virtual OMStorable* setValue(const OMStorable* value);
-
-  virtual const wchar_t* name(void) const;
+    //          The value is a pointer to the <c ReferencedObject>.
+  virtual ReferencedObject* setValue(const ReferencedObject* value);
 
 protected:
   // @access Protected members.
@@ -174,12 +186,15 @@ protected:
 
 };
 
-class OMStrongReferenceSet;
+template <typename UniqueIdentification, typename ReferencedObject>
+class OMStrongReferenceSetProperty;
 
   // @class Persistent weak references to persistent objects.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMObjectReference>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMWeakObjectReference : public OMObjectReference {
+template <typename ReferencedObject>
+class OMWeakObjectReference : public OMObjectReference<ReferencedObject> {
 public:
   // @access Public members.
 
@@ -207,12 +222,13 @@ public:
     // @cmember Assignment.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide assignment of object references.
-  OMWeakObjectReference& operator= (const OMWeakObjectReference& rhs);
+  OMWeakObjectReference<ReferencedObject>& operator=
+                          (const OMWeakObjectReference<ReferencedObject>& rhs);
 
     // @cmember Equality.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide equality of object references.
-  bool operator== (const OMWeakObjectReference& rhs) const;
+  bool operator== (const OMWeakObjectReference<ReferencedObject>& rhs) const;
 
     // @cmember Save this <c OMWeakObjectReference>.
   virtual void save(void) const;
@@ -227,31 +243,28 @@ public:
   virtual void restore(void);
 
     // @cmember Get the value of this <c OMWeakObjectReference>.
-    //          The value is a pointer to the referenced <c OMStorable>.
-  virtual OMStorable* getValue(void) const;
+    //          The value is a pointer to the <c ReferencedObject>.
+  virtual ReferencedObject* getValue(void) const;
 
     // @cmember Set the value of this <c OMWeakObjectReference>.
-    //          The value is a pointer to the referenced <c OMStorable>.
-  virtual OMStorable* setValue(
-                            const OMUniqueObjectIdentification& identification,
-                            const OMStorable* value);
-
-  void setTargetTag(OMPropertyTag targetTag);
-
-  static OMStrongReferenceSet* targetSet(const OMProperty* property,
-                                         OMPropertyTag targetTag);
+    //          The value is a pointer to the <c ReferencedObject>.
+  virtual ReferencedObject* setValue(const ReferencedObject* value);
 
   const OMUniqueObjectIdentification& identification(void) const;
 
 private:
 
-  OMStrongReferenceSet* set(void) const;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification,
+                               ReferencedObject>* set(void) const;
 
   OMUniqueObjectIdentification _identification;
   OMPropertyTag _targetTag;
-  OMStrongReferenceSet* _targetSet;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification,
+                               ReferencedObject>* _targetSet;
 
 };
+
+#include "OMObjectReferenceT.h"
 
 #endif
 
