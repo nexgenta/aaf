@@ -159,7 +159,7 @@ ReferencedObject* OMVectorElement<ReferencedObject>::pointer(void) const
   //   @tcarg class | ReferencedObject | The type of the referenced object.
 template <typename UniqueIdentification, typename ReferencedObject>
 OMSetElement<UniqueIdentification, ReferencedObject>::OMSetElement(void)
-  : OMVectorElement<ReferencedObject>(0)
+: OMVectorElement<ReferencedObject>(0)
 {
   TRACE("OMSetElement<UniqueIdentification, ReferencedObject>::OMSetElement");
 }
@@ -170,7 +170,7 @@ OMSetElement<UniqueIdentification, ReferencedObject>::OMSetElement(void)
 template <typename UniqueIdentification, typename ReferencedObject>
 OMSetElement<UniqueIdentification, ReferencedObject>::OMSetElement(
                                                const ReferencedObject* pointer)
-  : OMVectorElement<ReferencedObject>(pointer)
+: OMVectorElement<ReferencedObject>(pointer)
 {
   TRACE("OMSetElement<UniqueIdentification, ReferencedObject>::OMSetElement");
 }
@@ -182,7 +182,7 @@ template <typename UniqueIdentification, typename ReferencedObject>
 OMSetElement<UniqueIdentification, ReferencedObject>::OMSetElement(
                                      const OMSetElement<UniqueIdentification,
                                                         ReferencedObject>& rhs)
-  : OMVectorElement<ReferencedObject>(rhs)
+: OMVectorElement<ReferencedObject>(rhs)
 {
   TRACE("OMSetElement<UniqueIdentification, ReferencedObject>::OMSetElement");
 }
@@ -250,63 +250,50 @@ OMSetElement<UniqueIdentification, ReferencedObject>::identification(
   return object->identification();
 }
 
-// class OMContainerElement<ObjectReference, ReferencedObject>
+// class OMContainerElement<ObjectReference>
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMContainerElement
 
   // @mfunc Constructor.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ObjectReference, typename ReferencedObject>
-OMContainerElement<ObjectReference, ReferencedObject>::OMContainerElement(void)
-  : _reference()
+template <typename ObjectReference>
+OMContainerElement<ObjectReference>::OMContainerElement(void)
+: _reference()
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::"
-                                                         "OMContainerElement");
+  TRACE("OMContainerElement<ObjectReference>::OMContainerElement");
 }
 
   // @mfunc Constructor.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <p ObjectReference> for this <c OMContainerElement>.
-template <typename ObjectReference, typename ReferencedObject>
-OMContainerElement<ObjectReference, ReferencedObject>::OMContainerElement(
+template <typename ObjectReference>
+OMContainerElement<ObjectReference>::OMContainerElement(
                                               const ObjectReference& reference)
-  : _reference(reference)
+: _reference(reference)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::"
-                                                         "OMContainerElement");
+  TRACE("OMContainerElement<ObjectReference>::OMContainerElement");
 }
 
   // @mfunc Copy constructor.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMContainerElement> to copy.
-template <typename ObjectReference, typename ReferencedObject>
-OMContainerElement<ObjectReference, ReferencedObject>::OMContainerElement(
-              const OMContainerElement<ObjectReference, ReferencedObject>& rhs)
-  : _reference(rhs._reference)
+template <typename ObjectReference>
+OMContainerElement<ObjectReference>::OMContainerElement(
+                                const OMContainerElement<ObjectReference>& rhs)
+: _reference(rhs._reference)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::"
-                                                         "OMContainerElement");
+  TRACE("OMContainerElement<ObjectReference>::OMContainerElement");
 }
 
   // @mfunc Destructor.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ObjectReference, typename ReferencedObject>
-OMContainerElement<ObjectReference, ReferencedObject>::~OMContainerElement(
-                                                                          void)
+template <typename ObjectReference>
+OMContainerElement<ObjectReference>::~OMContainerElement(void)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::"
-                                                        "~OMContainerElement");
+  TRACE("OMContainerElement<ObjectReference>::~OMContainerElement");
 }
 
   // @mfunc Assignment.
@@ -314,16 +301,14 @@ OMContainerElement<ObjectReference, ReferencedObject>::~OMContainerElement(
   //        This operator does not provide assignment of object references.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMContainerElement> to be assigned.
   //   @rdesc The <c OMContainerElement> resulting from the assignment.
-template <typename ObjectReference, typename ReferencedObject>
-OMContainerElement<ObjectReference, ReferencedObject>&
-OMContainerElement<ObjectReference, ReferencedObject>::operator= (
-              const OMContainerElement<ObjectReference, ReferencedObject>& rhs)
+template <typename ObjectReference>
+OMContainerElement<ObjectReference>&
+OMContainerElement<ObjectReference>::operator= (
+                                const OMContainerElement<ObjectReference>& rhs)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::operator=");
+  TRACE("OMContainerElement<ObjectReference>::operator=");
 
   if (*this == rhs) {
     return *this; // early return !
@@ -338,15 +323,13 @@ OMContainerElement<ObjectReference, ReferencedObject>::operator= (
   //        This operator does not provide equality of object references.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMContainerElement> to be compared.
   //   @rdesc True if the values are the same, false otherwise.
-template <typename ObjectReference, typename ReferencedObject>
-bool OMContainerElement<ObjectReference, ReferencedObject>::operator== (
-        const OMContainerElement<ObjectReference, ReferencedObject>& rhs) const
+template <typename ObjectReference>
+bool OMContainerElement<ObjectReference>::operator== (
+                          const OMContainerElement<ObjectReference>& rhs) const
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::operator==");
+  TRACE("OMContainerElement<ObjectReference>::operator==");
 
   bool result;
   if (_reference == rhs._reference) {
@@ -360,14 +343,11 @@ bool OMContainerElement<ObjectReference, ReferencedObject>::operator== (
   // @mfunc The contained ObjectReference.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @rdesc The contained <p ObjectReference>.
-template <typename ObjectReference, typename ReferencedObject>
-ObjectReference&
-OMContainerElement<ObjectReference, ReferencedObject>::reference(void)
+template <typename ObjectReference>
+ObjectReference& OMContainerElement<ObjectReference>::reference(void)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMContainerElement<ObjectReference>::reference");
 
   return _reference;
 }
@@ -375,15 +355,13 @@ OMContainerElement<ObjectReference, ReferencedObject>::reference(void)
   // @mfunc Set the contained ObjectReference.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The new contained <p ObjectReference>.
-template <typename ObjectReference, typename ReferencedObject>
+template <typename ObjectReference>
 void
-OMContainerElement<ObjectReference, ReferencedObject>::setReference(
+OMContainerElement<ObjectReference>::setReference(
                                               const ObjectReference& reference)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::setReference");
+  TRACE("OMContainerElement<ObjectReference>::setReference");
 
   _reference = reference;
 }
@@ -391,13 +369,11 @@ OMContainerElement<ObjectReference, ReferencedObject>::setReference(
   // @mfunc Save this <c OMContainerElement>.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ObjectReference, typename ReferencedObject>
-void OMContainerElement<ObjectReference, ReferencedObject>::save(void)
+template <typename ObjectReference>
+void OMContainerElement<ObjectReference>::save(void)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::save");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMContainerElement<ObjectReference>::save");
+  OBSOLETE("OMContainerElement<ObjectReference>::reference");
 
   _reference.save();
 }
@@ -405,13 +381,11 @@ void OMContainerElement<ObjectReference, ReferencedObject>::save(void)
   // @mfunc Close this <c OMContainerElement>.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ObjectReference, typename ReferencedObject>
-void OMContainerElement<ObjectReference, ReferencedObject>::close(void)
+template <typename ObjectReference>
+void OMContainerElement<ObjectReference>::close(void)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::close");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMContainerElement<ObjectReference>::close");
+  OBSOLETE("OMContainerElement<ObjectReference>::reference");
 
   _reference.close();
 }
@@ -419,13 +393,11 @@ void OMContainerElement<ObjectReference, ReferencedObject>::close(void)
   // @mfunc Detach this <c OMContainerElement>.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ObjectReference, typename ReferencedObject>
-void OMContainerElement<ObjectReference, ReferencedObject>::detach(void)
+template <typename ObjectReference>
+void OMContainerElement<ObjectReference>::detach(void)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::detach");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMContainerElement<ObjectReference>::detach");
+  OBSOLETE("OMContainerElement<ObjectReference>::reference");
 
   _reference.detach();
 }
@@ -433,13 +405,11 @@ void OMContainerElement<ObjectReference, ReferencedObject>::detach(void)
   // @mfunc Restore this <c OMContainerElement>.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ObjectReference, typename ReferencedObject>
-void OMContainerElement<ObjectReference, ReferencedObject>::restore(void)
+template <typename ObjectReference>
+void OMContainerElement<ObjectReference>::restore(void)
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::restore");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMContainerElement<ObjectReference>::restore");
+  OBSOLETE("OMContainerElement<ObjectReference>::reference");
 
   _reference.restore();
 }
@@ -447,25 +417,15 @@ void OMContainerElement<ObjectReference, ReferencedObject>::restore(void)
   // @mfunc Get the value of this <c OMContainerElement>.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @rdesc A pointer to the <p ReferencedObject>.
   //   @this const
-template <typename ObjectReference, typename ReferencedObject>
-ReferencedObject*
-OMContainerElement<ObjectReference, ReferencedObject>::getValue(void) const
+template <typename ObjectReference>
+OMStorable* OMContainerElement<ObjectReference>::getValue(void) const
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::getValue");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMContainerElement<ObjectReference>::getValue");
+  OBSOLETE("OMContainerElement<ObjectReference>::reference");
 
-  OMStorable* p = _reference.getValue();
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  } else {
-    result = 0;
-  }
+  OMStorable* result = _reference.getValue();
   return result;
 }
 
@@ -474,271 +434,93 @@ OMContainerElement<ObjectReference, ReferencedObject>::getValue(void) const
   //        but has not yet been loaded then the value returned is 0.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @rdesc A pointer to the <p ReferencedObject>, if loaded.
-template <typename ObjectReference, typename ReferencedObject>
-ReferencedObject*
-OMContainerElement<ObjectReference, ReferencedObject>::pointer(void) const
+template <typename ObjectReference>
+OMStorable* OMContainerElement<ObjectReference>::pointer(void) const
 {
-  TRACE("OMContainerElement<ObjectReference, ReferencedObject>::pointer");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMContainerElement<ObjectReference>::pointer");
+  OBSOLETE("OMContainerElement<ObjectReference>::reference");
 
-  OMStorable* p = _reference.pointer();
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  } else {
-    result = 0;
-  }
+  OMStorable* result = _reference.pointer();
   return result;
 }
 
-// class OMStrongReferenceVectorElement<ReferencedObject>
+// class OMStrongReferenceSetElement<UniqueIdentification>
 
   // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ReferencedObject>
-OMStrongReferenceVectorElement<ReferencedObject>::
-                                           OMStrongReferenceVectorElement(void)
-: OMContainerElement<OMStrongObjectReference, ReferencedObject>(),
-  _localKey(0)
+template <typename UniqueIdentification>
+OMStrongReferenceSetElement<UniqueIdentification>::OMStrongReferenceSetElement(
+                                                                          void)
+: OMStrongReferenceVectorElement(),
+  _referenceCount(0xffff /* sticky */)
 {
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
-                                             "OMStrongReferenceVectorElement");
-}
-
-  // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMProperty> (a vector property) that contains this
-  //         <c OMStrongReferenceVectorElement>.
-  //   @parm The name of this <c OMStrongReferenceVectorElement>.
-  //   @parm The local key of this <c OMStrongReferenceVectorElement> within
-  //         it's vector.
-template <typename ReferencedObject>
-OMStrongReferenceVectorElement<ReferencedObject>::
-                                                OMStrongReferenceVectorElement(
-                                                          OMProperty* property,
-                                                          const wchar_t* name,
-                                                          OMUInt32 localKey)
-: OMContainerElement<OMStrongObjectReference, ReferencedObject>(
-                                      OMStrongObjectReference(property, name)),
-  _localKey(localKey)
-{
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
-                                             "OMStrongReferenceVectorElement");
-}
-
-  // @mfunc Copy constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMStrongReferenceVectorElement> to copy.
-template <typename ReferencedObject>
-OMStrongReferenceVectorElement<ReferencedObject>::
-                                                OMStrongReferenceVectorElement(
-                   const OMStrongReferenceVectorElement<ReferencedObject>& rhs)
-: OMContainerElement<OMStrongObjectReference, ReferencedObject>(rhs),
-  _localKey(rhs._localKey)
-{
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
-                                             "OMStrongReferenceVectorElement");
-}
-
-  // @mfunc Destructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ReferencedObject>
-OMStrongReferenceVectorElement<ReferencedObject>::
-                                          ~OMStrongReferenceVectorElement(void)
-{
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::"
-                                            "~OMStrongReferenceVectorElement");
-}
-
-  // @mfunc Assignment.
-  //        This operator provides value semantics for <c OMVector>.
-  //        This operator does not provide assignment of object references.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMStrongReferenceVectorElement> to be assigned.
-  //   @rdesc The <c OMStrongReferenceVectorElement> resulting from
-  //          the assignment.
-template <typename ReferencedObject>
-OMStrongReferenceVectorElement<ReferencedObject>&
-OMStrongReferenceVectorElement<ReferencedObject>::operator= (
-                   const OMStrongReferenceVectorElement<ReferencedObject>& rhs)
-{
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::operator=");
-
-  if (*this == rhs) {
-    return *this; // early return !
-  }
-
-  OMContainerElement<OMStrongObjectReference,
-                     ReferencedObject>::operator=(rhs);
-  _localKey = rhs._localKey;
-  return *this;
-}
-
-  // @mfunc Equality.
-  //        This operator provides value semantics for <c OMVector>.
-  //        This operator does not provide equality of object references.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMStrongReferenceVectorElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise.
-template <typename ReferencedObject>
-bool OMStrongReferenceVectorElement<ReferencedObject>::operator== (
-             const OMStrongReferenceVectorElement<ReferencedObject>& rhs) const
-{
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::operator==");
-
-  bool result = OMContainerElement<OMStrongObjectReference,
-                                   ReferencedObject>::operator==(rhs);
-  if (result) {
-    if (_localKey != rhs._localKey) {
-      result = false;
-    }
-  }
-  return result;
-}
-
-  // @mfunc Set the value of this <c OMOMStrongReferenceVectorElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm A pointer to the new <p ReferencedObject>.
-  //   @rdesc A pointer to previous <p ReferencedObject>, if any.
-template <typename ReferencedObject>
-ReferencedObject*
-OMStrongReferenceVectorElement<ReferencedObject>::setValue(
-                                                 const ReferencedObject* value)
-{
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::setValue");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
-
-  OMStorable* p = _reference.setValue(value);
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  } else {
-    result = 0;
-  }
-  return result;
-}
-
-  // @mfunc The local key of this <c OMStrongReferenceVectorElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @rdesc The local key of this <c OMStrongReferenceVectorElement>.
-  //   @this const
-template <typename ReferencedObject>
-OMUInt32
-OMStrongReferenceVectorElement<ReferencedObject>::localKey(void) const
-{
-  TRACE("OMStrongReferenceVectorElement<ReferencedObject>::localKey");
-
-  return  _localKey;
-}
-
-// class OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>
-
-  // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename UniqueIdentification, typename ReferencedObject>
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
-                                              OMStrongReferenceSetElement(void)
-  : OMStrongReferenceVectorElement<ReferencedObject>(),
-    _referenceCount(0xffff /* sticky */)
-{
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::"
                                                 "OMStrongReferenceSetElement");
 
   memset(&_identification, 0, sizeof(_identification));
 }
 
   // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMProperty> (a set property) that contains this
   //         <c OMStrongReferenceSetElement>.
   //   @parm The name of this <c OMStrongReferenceSetElement>.
   //   @parm The local key of this <c OMStrongReferenceSetElement> within
   //         it's set.
   //   @parm The unique key of this <c OMStrongReferenceSetElement>.
-template <typename UniqueIdentification, typename ReferencedObject>
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
-                                                   OMStrongReferenceSetElement(
-                                   OMProperty* property,
-                                   const wchar_t* name,
-                                   OMUInt32 localKey,
-                                   OMUInt32 referenceCount,
-                                   UniqueIdentification identification)
-  : OMStrongReferenceVectorElement<ReferencedObject>(property, name, localKey),
-    _identification(identification),
-    _referenceCount(referenceCount)
+template <typename UniqueIdentification>
+OMStrongReferenceSetElement<UniqueIdentification>::OMStrongReferenceSetElement(
+                                           OMProperty* property,
+                                           const wchar_t* name,
+                                           OMUInt32 localKey,
+                                           OMUInt32 referenceCount,
+                                           UniqueIdentification identification)
+: OMStrongReferenceVectorElement(property, name, localKey),
+  _identification(identification),
+  _referenceCount(referenceCount)
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::"
                                                 "OMStrongReferenceSetElement");
 }
 
   // @mfunc Copy constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMStrongReferenceSetElement> to copy.
-template <typename UniqueIdentification, typename ReferencedObject>
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
-                                                   OMStrongReferenceSetElement(
-                  const OMStrongReferenceSetElement<UniqueIdentification,
-                                                    ReferencedObject>& rhs)
-  : OMStrongReferenceVectorElement<ReferencedObject>(rhs),
-    _identification(rhs._identification),
-    _referenceCount(rhs._referenceCount)
+template <typename UniqueIdentification>
+OMStrongReferenceSetElement<UniqueIdentification>::OMStrongReferenceSetElement(
+                  const OMStrongReferenceSetElement<UniqueIdentification>& rhs)
+: OMStrongReferenceVectorElement(rhs),
+  _identification(rhs._identification),
+  _referenceCount(rhs._referenceCount)
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::"
                                                 "OMStrongReferenceSetElement");
 }
 
   // @mfunc Destructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename UniqueIdentification, typename ReferencedObject>
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
+template <typename UniqueIdentification>
+OMStrongReferenceSetElement<UniqueIdentification>::
                                              ~OMStrongReferenceSetElement(void)
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::"
                                                "~OMStrongReferenceSetElement");
 }
 
   // @mfunc Assignment.
   //        This operator provides value semantics for <c OMSet>.
   //        This operator does not provide assignment of object references.
-  //   @tcarg class | ObjectReference | The type of the contained object
-  //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMStrongReferenceSetElement> to be assigned.
   //   @rdesc The <c OMStrongReferenceSetElement> resulting from
   //          the assignment.
-template <typename UniqueIdentification, typename ReferencedObject>
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>&
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
-                                                                    operator= (
-                  const OMStrongReferenceSetElement<UniqueIdentification,
-                                                    ReferencedObject>& rhs)
+template <typename UniqueIdentification>
+OMStrongReferenceSetElement<UniqueIdentification>&
+OMStrongReferenceSetElement<UniqueIdentification>::operator= (
+                  const OMStrongReferenceSetElement<UniqueIdentification>& rhs)
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
-                                                                  "operator=");
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::operator=");
 
   if (*this == rhs) {
     return *this; // early return !
   }
 
-  OMStrongReferenceVectorElement<ReferencedObject>::operator=(rhs);
+  OMStrongReferenceVectorElement::operator=(rhs);
   _identification = rhs._identification;
   _referenceCount = rhs._referenceCount;
 
@@ -748,19 +530,13 @@ OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
   // @mfunc Equality.
   //        This operator provides value semantics for <c OMSet>.
   //        This operator does not provide equality of object references.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The <c OMStrongReferenceSetElement> to be compared.
   //   @rdesc True if the values are the same, false otherwise.
-template <typename UniqueIdentification, typename ReferencedObject>
-bool
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
-                                                                   operator== (
-            const OMStrongReferenceSetElement<UniqueIdentification,
-                                              ReferencedObject>& rhs) const
+template <typename UniqueIdentification>
+bool OMStrongReferenceSetElement<UniqueIdentification>::operator== (
+            const OMStrongReferenceSetElement<UniqueIdentification>& rhs) const
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
-                                                                 "operator==");
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::operator==");
 
   bool result;
 
@@ -772,344 +548,47 @@ OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
 
   ASSERT("Consistent",
                       IMPLIES(result, _referenceCount == rhs._referenceCount));
-
-#if defined (OM_ENABLE_DEBUG)
-  bool check =
-             OMStrongReferenceVectorElement<ReferencedObject>::operator==(rhs);
-#endif
-  ASSERT("Consistent", IMPLIES(result, check));
+  ASSERT("Consistent",
+             IMPLIES(result, OMStrongReferenceVectorElement::operator==(rhs)));
 
   return result;
 }
 
   // @mfunc Set the value of this <c OMContainerElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @parm A pointer to the new <p ReferencedObject>.
   //   @rdesc A pointer to previous <p ReferencedObject>, if any.
-template <typename UniqueIdentification, typename ReferencedObject>
-ReferencedObject*
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::setValue(
-                                                 const ReferencedObject* value)
+template <typename UniqueIdentification>
+OMStorable*
+OMStrongReferenceSetElement<UniqueIdentification>::setValue(
+                                    const UniqueIdentification& identification,
+                                    const OMStorable* value)
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
-                                                                   "setValue");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::setValue");
+  OBSOLETE("OMContainerElement<ObjectReference>::reference");
 
-  OMStorable* p = _reference.setValue(value);
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  } else {
-    result = 0;
-  }
-  return result;
+  _identification = identification;
+  return _reference.setValue(value);
 }
 
   // @mfunc The unique key of this <c OMStrongReferenceSetElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @rdesc  The unique key of this <c OMStrongReferenceSetElement>.
-template <typename UniqueIdentification, typename ReferencedObject>
+template <typename UniqueIdentification>
 UniqueIdentification
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
-                                                     identification(void) const
+OMStrongReferenceSetElement<UniqueIdentification>::identification(void) const
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
-                                                             "identification");
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::identification");
 
   return _identification;
 }
 
   // @mfunc The count of weak references to this
   //        <c OMStrongReferenceSetElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @rdesc The count of weak references.
-template <typename UniqueIdentification, typename ReferencedObject>
+template <typename UniqueIdentification>
 OMUInt32
-OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::
-                                                     referenceCount(void) const
+OMStrongReferenceSetElement<UniqueIdentification>::referenceCount(void) const
 {
-  TRACE("OMStrongReferenceSetElement<UniqueIdentification, ReferencedObject>::"
-                                                             "referenceCount");
+  TRACE("OMStrongReferenceSetElement<UniqueIdentification>::referenceCount");
 
   return _referenceCount;
-}
-
-// class OMWeakReferenceVectorElement<ReferencedObject>
-
-  // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ReferencedObject>
-OMWeakReferenceVectorElement<ReferencedObject>::
-                                             OMWeakReferenceVectorElement(void)
-: OMContainerElement<OMWeakObjectReference, ReferencedObject>()
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::"
-                                               "OMWeakReferenceVectorElement");
-}
-
-  // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMProperty> (a set property) that contains this
-  //         <c OMWeakReferenceVectorElement>.
-  //   @parm The unique key of this <c OMWeakReferenceVectorElement>.
-  //   @parm A tag identifying the <c OMStrongReferenceVectorProperty>
-  //         in which the target resides.
-template <typename ReferencedObject>
-OMWeakReferenceVectorElement<ReferencedObject>::OMWeakReferenceVectorElement(
-                                   OMProperty* property,
-                                   OMUniqueObjectIdentification identification,
-                                   OMPropertyTag targetTag)
-: OMContainerElement<OMWeakObjectReference, ReferencedObject>(
-  OMWeakObjectReference(property, identification, targetTag))
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::"
-                                               "OMWeakReferenceVectorElement");
-}
-
-  // @mfunc Copy constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMWeakReferenceVectorElement> to copy.
-template <typename ReferencedObject>
-OMWeakReferenceVectorElement<ReferencedObject>::OMWeakReferenceVectorElement(
-                    const OMWeakReferenceVectorElement<ReferencedObject>& rhs)
-: OMContainerElement<OMWeakObjectReference, ReferencedObject>(rhs)
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::"
-                                               "OMWeakReferenceVectorElement");
-}
-
-  // @mfunc Destructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ReferencedObject>
-OMWeakReferenceVectorElement<ReferencedObject>::
-                                            ~OMWeakReferenceVectorElement(void)
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::"
-                                              "~OMWeakReferenceVectorElement");
-}
-
-  // @mfunc Assignment.
-  //        This operator provides value semantics for <c OMVector>.
-  //        This operator does not provide assignment of object references.
-  //   @tcarg class | ObjectReference | The type of the contained object
-  //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMWeakReferenceVectorElement> to be assigned.
-  //   @rdesc The <c OMWeakReferenceVectorElement> resulting from
-  //          the assignment.
-template <typename ReferencedObject>
-OMWeakReferenceVectorElement<ReferencedObject>&
-OMWeakReferenceVectorElement<ReferencedObject>::operator= (
-                     const OMWeakReferenceVectorElement<ReferencedObject>& rhs)
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::operator=");
-
-  if (*this == rhs) {
-    return *this; // early return !
-  }
-
-  OMContainerElement<OMWeakObjectReference, ReferencedObject>::operator=(rhs);
-  return *this;
-}
-
-  // @mfunc Equality.
-  //        This operator provides value semantics for <c OMVector>.
-  //        This operator does not provide equality of object references.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMWeakReferenceVectorElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise.
-template <typename ReferencedObject>
-bool OMWeakReferenceVectorElement<ReferencedObject>::operator== (
-               const OMWeakReferenceVectorElement<ReferencedObject>& rhs) const
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::operator==");
-
-  bool result = OMContainerElement<OMWeakObjectReference,
-                                   ReferencedObject>::operator==(rhs);
-
-  return result;
-}
-
-  // @mfunc Set the value of this <c OMContainerElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm A pointer to the new <p ReferencedObject>.
-  //   @rdesc A pointer to previous <p ReferencedObject>, if any.
-template <typename ReferencedObject>
-ReferencedObject*
-OMWeakReferenceVectorElement<ReferencedObject>::setValue(
-                                                 const ReferencedObject* value)
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::setValue");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
-
-  OMStorable* p = _reference.setValue(value->identification(), value);
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  } else {
-    result = 0;
-  }
-  return result;
-}
-
-  // @mfunc The unique key of this <c OMWeakReferenceVectorElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @rdesc  The unique key of this <c OMWeakReferenceVectorElement>.
-template <typename ReferencedObject>
-OMUniqueObjectIdentification
-OMWeakReferenceVectorElement<ReferencedObject>::identification(void) const
-{
-  TRACE("OMWeakReferenceVectorElement<ReferencedObject>::identification");
-
-  return _reference.identification();
-}
-
-// class OMWeakReferenceSetElement<ReferencedObject>
-
-  // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ReferencedObject>
-OMWeakReferenceSetElement<ReferencedObject>::OMWeakReferenceSetElement(void)
-: OMContainerElement<OMWeakObjectReference, ReferencedObject>()
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::"
-                                                  "OMWeakReferenceSetElement");
-}
-
-  // @mfunc Constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMProperty> (a set property) that contains this
-  //         <c OMWeakReferenceSetElement>.
-  //   @parm The unique key of this <c OMWeakReferenceSetElement>.
-  //   @parm A tag identifying the <c OMStrongReferenceSetProperty>
-  //         in which the target resides.
-template <typename ReferencedObject>
-OMWeakReferenceSetElement<ReferencedObject>::OMWeakReferenceSetElement(
-                                   OMProperty* property,
-                                   OMUniqueObjectIdentification identification,
-                                   OMPropertyTag targetTag)
-: OMContainerElement<OMWeakObjectReference, ReferencedObject>(
-  OMWeakObjectReference(property, identification, targetTag))
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::"
-                                                  "OMWeakReferenceSetElement");
-}
-
-  // @mfunc Copy constructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMWeakReferenceSetElement> to copy.
-template <typename ReferencedObject>
-OMWeakReferenceSetElement<ReferencedObject>::OMWeakReferenceSetElement(
-                    const OMWeakReferenceSetElement<ReferencedObject>& rhs)
-: OMContainerElement<OMWeakObjectReference, ReferencedObject>(rhs)
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::"
-                                                  "OMWeakReferenceSetElement");
-}
-
-  // @mfunc Destructor.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ReferencedObject>
-OMWeakReferenceSetElement<ReferencedObject>::~OMWeakReferenceSetElement(void)
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::"
-                                                 "~OMWeakReferenceSetElement");
-}
-
-  // @mfunc Assignment.
-  //        This operator provides value semantics for <c OMSet>.
-  //        This operator does not provide assignment of object references.
-  //   @tcarg class | ObjectReference | The type of the contained object
-  //          reference
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMWeakReferenceSetElement> to be assigned.
-  //   @rdesc The <c OMWeakReferenceSetElement> resulting from
-  //          the assignment.
-template <typename ReferencedObject>
-OMWeakReferenceSetElement<ReferencedObject>&
-OMWeakReferenceSetElement<ReferencedObject>::operator= (
-                        const OMWeakReferenceSetElement<ReferencedObject>& rhs)
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::operator=");
-
-  if (*this == rhs) {
-    return *this; // early return !
-  }
-
-  OMContainerElement<OMWeakObjectReference, ReferencedObject>::operator=(rhs);
-  return *this;
-}
-
-  // @mfunc Equality.
-  //        This operator provides value semantics for <c OMSet>.
-  //        This operator does not provide equality of object references.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm The <c OMWeakReferenceSetElement> to be compared.
-  //   @rdesc True if the values are the same, false otherwise.
-template <typename ReferencedObject>
-bool OMWeakReferenceSetElement<ReferencedObject>::operator== (
-                const OMWeakReferenceSetElement<ReferencedObject>& rhs) const
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::operator==");
-
-  bool result = OMContainerElement<OMWeakObjectReference,
-                                   ReferencedObject>::operator==(rhs);
-
-  return result;
-}
-
-  // @mfunc Set the value of this <c OMContainerElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @parm A pointer to the new <p ReferencedObject>.
-  //   @rdesc A pointer to previous <p ReferencedObject>, if any.
-template <typename ReferencedObject>
-ReferencedObject*
-OMWeakReferenceSetElement<ReferencedObject>::setValue(
-                                                 const ReferencedObject* value)
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::setValue");
-  OBSOLETE("OMContainerElement<ObjectReference, ReferencedObject>::reference");
-
-  OMStorable* p = _reference.setValue(value->identification(), value);
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  } else {
-    result = 0;
-  }
-  return result;
-}
-
-  // @mfunc The unique key of this <c OMWeakReferenceSetElement>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-  //   @rdesc  The unique key of this <c OMWeakReferenceSetElement>.
-template <typename ReferencedObject>
-OMUniqueObjectIdentification
-OMWeakReferenceSetElement<ReferencedObject>::identification(void) const
-{
-  TRACE("OMWeakReferenceSetElement<ReferencedObject>::identification");
-
-  return _reference.identification();
 }
