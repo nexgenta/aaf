@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -104,6 +104,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
+#include "ImplAAFBuiltinDefs.h"
 
 
 #include <assert.h>
@@ -138,6 +139,7 @@ ImplAAFDictionary::ImplAAFDictionary ()
 
   _pBuiltinClasses (0),
   _pBuiltinTypes (0),
+  _pBuiltinDefs (0),
 
   _lastGeneratedPid (0),
   _axiomaticTypes (0),
@@ -261,9 +263,17 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 
   assert (_pBuiltinClasses);
   delete _pBuiltinClasses;
+  _pBuiltinClasses = 0;
 
   assert (_pBuiltinTypes);
   delete _pBuiltinTypes;
+  _pBuiltinTypes = 0;
+
+  if (_pBuiltinDefs)
+	{
+	  delete _pBuiltinDefs;
+	  _pBuiltinDefs = 0;
+	}
 
   delete [] _axiomaticTypes;
 }
@@ -337,18 +347,39 @@ ImplAAFDictionary *ImplAAFDictionary::CreateDictionary(void)
 //
 OMStorable* ImplAAFDictionary::create(const OMClassId& classId) const
 {
+  AAFRESULT hr;
   const aafUID_t * auid  = reinterpret_cast<const aafUID_t*>(&classId);
-  ImplAAFObject * pNewObject = 0;
-  pNewObject = pvtInstantiate (*auid);
-  if (pNewObject)
-	pNewObject->InitOMProperties ();
+  ImplAAFClassDefSP pcd;
+  ImplAAFDictionary * pNonConstThis = (ImplAAFDictionary*) this;
+  hr = pNonConstThis->LookupClassDef(*auid, &pcd);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  
+  return CreateAndInit (pcd);
+}
 
-  // Attempt to initialize the any class extensions associated with
-  // this object. Only the most derived extension that has an associated
-  // plugin is created.
-  // QUESTION: How should we "deal with" failure? We really need an 
-  // error/warning log file for this kind of information.
-  AAFRESULT result = pNewObject->InitializeExtensions();
+
+ImplAAFObject *
+ImplAAFDictionary::CreateAndInit(ImplAAFClassDef * pClassDef) const
+{
+  assert (pClassDef);
+  AAFRESULT hr;
+  aafUID_t auid;
+  hr = pClassDef->GetAUID(&auid);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  ImplAAFObject * pNewObject = 0;
+  pNewObject = pvtInstantiate (auid);
+  if (pNewObject)
+	{
+	  pClassDef->InitOMProperties (pNewObject);
+
+	  // Attempt to initialize the any class extensions associated
+	  // with this object. Only the most derived extension that has an
+	  // associated  plugin is created.
+	  // QUESTION: How should we "deal with" failure? We really need
+	  // an  error/warning log file for this kind of information.
+	  AAFRESULT result = pNewObject->InitializeExtensions();
+	}
 
   return pNewObject;
 }
@@ -437,10 +468,8 @@ ImplAAFObject* ImplAAFDictionary::pvtInstantiate(const aafUID_t & auid) const
   // with a specified stored object id.
 AAFRESULT STDMETHODCALLTYPE 
   ImplAAFDictionary::CreateInstance (
-    // Class identifier (AUID) of the stored object. This is the
-    // corresponding SMPTE identifier (as a GUID) for all predefined
-    // built-in classes.
-    const aafUID_t & auid,
+    // Stored Object ID of the stored object to be created.
+    aafUID_constref classId,
 
     // Address of output variable that receives the 
     // object pointer requested in auid
@@ -449,11 +478,13 @@ AAFRESULT STDMETHODCALLTYPE
   if (NULL == ppvObject)
     return AAFRESULT_NULL_PARAM;
   
-  // Initialize the out parameter.
-  *ppvObject = NULL;
+  ImplAAFClassDefSP pClassDef;
+  AAFRESULT hr;
+  hr = LookupClassDef (classId, &pClassDef);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
 
-  const OMClassId* classId  = reinterpret_cast<const OMClassId*>(&auid);
-  *ppvObject = static_cast<ImplAAFObject *>(create(*classId));
+  *ppvObject = CreateAndInit (pClassDef);
 
   if (NULL == *ppvObject)
     return AAFRESULT_INVALID_CLASS_ID;
@@ -462,16 +493,16 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-// internal utility factory method to create an ImplAAFObject given an auid.
+// internal utility factory method to create an ImplAAFObject given a classdef.
 // This method was created to make it simpler to replace calls to "Deprecated"
 // call to CreateImpl which should only be used for instanciating transient
 // non-ImplAAFObject classes such as an enumerator.
-ImplAAFObject *ImplAAFDictionary::CreateImplObject(const aafUID_t& auid)
+ImplAAFObject *ImplAAFDictionary::CreateImplObject(aafUID_constref classID)
 {
   ImplAAFObject *pObject = NULL;
   AAFRESULT result = AAFRESULT_SUCCESS;
   
-  result = CreateInstance(auid, &pObject);
+  result = CreateInstance(classID, &pObject);
   assert(AAFRESULT_SUCCEEDED(result));
   return pObject;
 }
@@ -497,13 +528,13 @@ AAFRESULT ImplAAFDictionary::dictLookupClassDef (
 	{
 	  CHECK(GetClassDefs (&classEnum));
 	  status = classEnum->NextOne (&classDef);
-	  defFound = AAFFalse;
+	  defFound = kAAFFalse;
 	  while(status == AAFRESULT_SUCCESS && !defFound)
 		{
 		  CHECK(classDef->GetAUID (&testAUID));
 		  if(EqualAUID(&classID, &testAUID))
 			{
-			  defFound = AAFTrue;
+			  defFound = kAAFTrue;
 			  *ppClassDef = classDef;
 			  classDef->AcquireReference();
 			  break;
@@ -779,13 +810,13 @@ AAFRESULT ImplAAFDictionary::dictLookupTypeDef (
 	{
 	  CHECK(GetTypeDefs (&typeEnum));
 	  status = typeEnum->NextOne (&typeDef);
-	  defFound = AAFFalse;
+	  defFound = kAAFFalse;
 	  while(status == AAFRESULT_SUCCESS && !defFound)
 		{
 		  CHECK(typeDef->GetAUID (&testAUID));
 		  if(EqualAUID(&typeID, &testAUID))
 			{
-			  defFound = AAFTrue;
+			  defFound = kAAFTrue;
 			  *ppTypeDef = typeDef;
 			  typeDef->AcquireReference();
 			  break;
@@ -848,6 +879,7 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_UInt8,
   & kAAFTypeID_UInt8Array8,
   & kAAFTypeID_VersionType,
+  & kAAFTypeID_RGBAComponent,
  
   & kAAFTypeID_ClassDefinitionStrongReference,
   & kAAFTypeID_ClassDefinitionStrongReferenceSet,
@@ -1106,13 +1138,13 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		CHECK(GetDataDefs (&dataEnum));
 		status = dataEnum->NextOne (&dataDef);
-		defFound = AAFFalse;
+		defFound = kAAFFalse;
 		while(status == AAFRESULT_SUCCESS && !defFound)
 		{
 			CHECK(dataDef->GetAUID (&testAUID));
 			if(EqualAUID(&dataDefinitionID, &testAUID))
 			{
-				defFound = AAFTrue;
+				defFound = kAAFTrue;
 				*ppDataDef = dataDef;
 				dataDef->AcquireReference();
 				break;
@@ -1225,13 +1257,13 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		CHECK(GetOperationDefs (&effectEnum));
 		status = effectEnum->NextOne (&effectDef);
-		defFound = AAFFalse;
+		defFound = kAAFFalse;
 		while(status == AAFRESULT_SUCCESS && !defFound)
 		{
 			CHECK(effectDef->GetAUID (&testAUID));
 			if(EqualAUID(&effectID, &testAUID))
 			{
-				defFound = AAFTrue;
+				defFound = kAAFTrue;
 				*ppOperationDef = effectDef;
 				effectDef->AcquireReference();
 				break;
@@ -1342,13 +1374,13 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		CHECK(GetParameterDefs (&parameterEnum));
 		status = parameterEnum->NextOne (&parameterDef);
-		defFound = AAFFalse;
+		defFound = kAAFFalse;
 		while(status == AAFRESULT_SUCCESS && !defFound)
 		{
 			CHECK(parameterDef->GetAUID (&testAUID));
 			if(EqualAUID(&parameterID, &testAUID))
 			{
-				defFound = AAFTrue;
+				defFound = kAAFTrue;
 				*ppParameterDef = parameterDef;
 				parameterDef->AcquireReference();
 				break;
@@ -1491,14 +1523,14 @@ AAFRESULT ImplAAFDictionary::LookupCodecDef
 	{
 		*result = NULL;
 		CHECK(GetNumCodecDefs(&numCodecs));
-		defFound = AAFFalse;
+		defFound = kAAFFalse;
 		for(n = 0; n < numCodecs && !defFound; n++)
 		{
 			CHECK(GetNthCodecDef (n, &codec));
 			CHECK(codec->GetAUID (&testAUID));
 			if(EqualAUID(&defID, &testAUID))
 			{
-				defFound = AAFTrue;
+				defFound = kAAFTrue;
 				*result = codec;
 				codec->AcquireReference();
 				break;
@@ -1600,14 +1632,14 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		*result = NULL;
 		CHECK(GetNumContainerDefs(&numContainers));
-		defFound = AAFFalse;
+		defFound = kAAFFalse;
 		for(n = 0; n < numContainers && !defFound; n++)
 		{
 			CHECK(GetNthContainerDef (n, &container));
 			CHECK(container->GetAUID (&testAUID));
 			if(EqualAUID(&defID, &testAUID))
 			{
-				defFound = AAFTrue;
+				defFound = kAAFTrue;
 				*result = container;
 				container->AcquireReference();
 				break;
@@ -1720,8 +1752,8 @@ void ImplAAFDictionary::InitBuiltins()
   if (AAFRESULT_FAILED (hr))
 	{
 	  // not already in dictionary
-	  hr = CreateInstance (AUID_AAFDataDef,
-						   (ImplAAFObject **)&dataDef);
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
 	  hr = dataDef->Initialize (DDEF_Picture, L"Picture", L"Picture data");
 	  hr = RegisterDataDef (dataDef);
 	}
@@ -1732,8 +1764,8 @@ void ImplAAFDictionary::InitBuiltins()
   if (AAFRESULT_FAILED (hr))
 	{
 	  // not already in dictionary
-	  hr = CreateInstance (AUID_AAFDataDef,
-						   (ImplAAFObject **)&dataDef);
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
 	  hr = dataDef->Initialize (DDEF_Sound, L"Sound", L"Sound data");
 	  hr = RegisterDataDef (dataDef);
 	}
@@ -1744,8 +1776,8 @@ void ImplAAFDictionary::InitBuiltins()
   if (AAFRESULT_FAILED (hr))
 	{
 	  // not already in dictionary
-	  hr = CreateInstance (AUID_AAFDataDef,
-						   (ImplAAFObject **)&dataDef);
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
 	  hr = dataDef->Initialize (DDEF_Timecode, L"Timecode", L"Timecode data");
 	  hr = RegisterDataDef (dataDef);
 	}
@@ -1756,8 +1788,8 @@ void ImplAAFDictionary::InitBuiltins()
   if (AAFRESULT_FAILED (hr))
 	{
 	  // not already in dictionary
-	  hr = CreateInstance (AUID_AAFDataDef,
-						   (ImplAAFObject **)&dataDef);
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
 	  hr = dataDef->Initialize (DDEF_Edgecode, L"Edgecode", L"Edgecode data");
 	  hr = RegisterDataDef (dataDef);
 	}
@@ -1768,8 +1800,8 @@ void ImplAAFDictionary::InitBuiltins()
   if (AAFRESULT_FAILED (hr))
 	{
 	  // not already in dictionary
-	  hr = CreateInstance (AUID_AAFDataDef,
-						   (ImplAAFObject **)&dataDef);
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
 	  hr = dataDef->Initialize (DDEF_Matte, L"Matte", L"Matte data");
 	  hr = RegisterDataDef (dataDef);
 	}
@@ -1780,8 +1812,8 @@ void ImplAAFDictionary::InitBuiltins()
   if (AAFRESULT_FAILED (hr))
 	{
 	  // not already in dictionary
-	  hr = CreateInstance (AUID_AAFDataDef,
-						   (ImplAAFObject **)&dataDef);
+	  hr = GetBuiltinDefs()->cdDataDef()->
+		CreateInstance ((ImplAAFObject **)&dataDef);
 	  hr = dataDef->Initialize (DDEF_PictureWithMatte, L"PictureWithMatte", L"PictureWithMatte data");
 	  hr = RegisterDataDef (dataDef);
 	}
@@ -1848,13 +1880,13 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		CHECK(GetInterpolationDefs (&InterpolationEnum));
 		status = InterpolationEnum->NextOne (&InterpolationDef);
-		defFound = AAFFalse;
+		defFound = kAAFFalse;
 		while(status == AAFRESULT_SUCCESS && !defFound)
 		{
 			CHECK(InterpolationDef->GetAUID (&testAUID));
 			if(EqualAUID(&interpolationID, &testAUID))
 			{
-				defFound = AAFTrue;
+				defFound = kAAFTrue;
 				*ppInterpolationDef = InterpolationDef;
 				InterpolationDef->AcquireReference();
 				break;
@@ -1965,13 +1997,13 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		CHECK(GetPluginDefs (&pEnum));
 		status = pEnum->NextOne (&pDesc);
-		defFound = AAFFalse;
+		defFound = kAAFFalse;
 		while(status == AAFRESULT_SUCCESS && !defFound)
 		{
 			CHECK(pDesc->GetAUID (&testAUID));
 			if(EqualAUID(&interpolationID, &testAUID))
 			{
-				defFound = AAFTrue;
+				defFound = kAAFTrue;
 				*ppPluginDesc = pDesc;
 				pDesc->AcquireReference();
 				break;
@@ -2190,4 +2222,15 @@ bool ImplAAFDictionary::SetEnableDefRegistration (bool isEnabled)
   bool retval = _defRegistrationAllowed;
   _defRegistrationAllowed = isEnabled;
   return retval;
+}
+
+
+ImplAAFBuiltinDefs * ImplAAFDictionary::GetBuiltinDefs ()
+{
+  if (! _pBuiltinDefs)
+	{
+	  _pBuiltinDefs = new ImplAAFBuiltinDefs (this);
+	}
+  assert (_pBuiltinDefs);
+  return _pBuiltinDefs;
 }
