@@ -1,9 +1,9 @@
 #c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
+#c*                                                 *
+#c* Advanced Authoring Format                       *
+#c*                                                 *
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.   *
+#c*                                                 *
 #c\*************************************************/
 #startm .this-module 0
 AAFOperationGroup\
@@ -53,10 +53,10 @@ AD_DEFAULT_UUID(3AE3BA82, 2C98, 11d2, 80, 42, 00, 60, 08, 14, 3E, 6F)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD3(Initialize,
 
-			[in\, ref],
-			objPass,
-			aafUID_constref,
-			datadef,
+			[in],
+			objIn,
+			AAFDataDef,
+			pDataDef,
 			Data Definition Object,
 
 			[in],
@@ -109,6 +109,30 @@ AD_XMETHOD1(GetOperationDefinition,
   // AAFRESULT_NULL_PARAM
   //   - ppOperationDef arg is NULL.)
 
+AD_XMETHOD1(SetOperationDefinition,
+			[in],
+			objIn,
+			AAFOperationDef,
+			pOperationDef,
+			Operation definition object,
+    This function sets the operation definition for the given operation
+  // group.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pOperationDef pointer is valid.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pOperationDef arg is NULL.)
 
 AD_XMETHOD1(GetRender,
 
@@ -147,7 +171,7 @@ AD_XMETHOD1(GetRender,
 AD_METHOD1(IsATimeWarp,
 
 		   [out\\\, retval],
-		   aafBool *,
+		   aafBoolean_t *,
 		   pIsTimeWarp,
 		   Returned boolean value,
 
@@ -233,7 +257,7 @@ AD_METHOD1(CountSourceSegments,
 AD_METHOD1(IsValidTranOperation,
 
 		   [out],
-		   aafBool *,
+		   aafBoolean_t *,
 		   pValidTransition,
 		   TRUE if the operation group is valid in a transition,
 
