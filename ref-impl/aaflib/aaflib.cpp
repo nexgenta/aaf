@@ -33,10 +33,11 @@
 
 #include "AAFResult.h"
 #include "AAFFileKinds.h"
-#include "ImplAAFFileSignatures.h"
+#include "AAFFileSignatures.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 //
 // Define the platform specific default dll name.
@@ -45,6 +46,8 @@
 #define DEFAULT_AAFDLL_NAME "AAFCOAPI.dll"
 #elif defined(macintosh) || defined(_MAC)
 #define DEFAULT_AAFDLL_NAME "AAFCOAPI.DLL (PPC)"
+#elif defined(__sgi)
+#define DEFAULT_AAFDLL_NAME "libcom-api.so"
 #else
 #define DEFAULT_AAFDLL_NAME "aafcoapi.so"
 #endif

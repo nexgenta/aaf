@@ -28,14 +28,15 @@
 #include "CAAFBasicInterp.h"
 
 #include <assert.h>
+#include <string.h>
 #include "AAFResult.h"
 
 #include "AAF.h"
 
 #include "aafErr.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "aafCvt.h"
-#include "aafDefUIDs.h"
+#include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFRational.h"
 #include "AAFInterpolatorDefs.h"
@@ -51,19 +52,7 @@ const aafUID_t BASIC_INTERP_PLUGIN = { 0x5B6C85A2, 0x0EDE, 0x11d3, { 0x80, 0xA9,
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::Start (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::Finish (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetNumDefinitions (aafInt32 *pDefCount)
+    CAAFBasicInterp::CountDefinitions (aafUInt32 *pDefCount)
 {
 	if(pDefCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -72,7 +61,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetIndexedDefinitionID (aafInt32 index, aafUID_t *pUid)
+    CAAFBasicInterp::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *pUid)
 {
 	if(pUid == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -90,7 +79,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFBasicInterp::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	IAAFInterpolationDef	*interpDef = NULL;
 	IAAFDefObject	*obj = NULL;
@@ -131,22 +120,22 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
+    CAAFBasicInterp::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
 {
-	IAAFPluginDescriptor	*desc = NULL;
+	IAAFPluginDef			*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
  	IAAFNetworkLocator		*pNetLoc = NULL;
 	
 	XPROTECT()
 	{
 	    CAAFBuiltinDefs defs (dict);
-		CHECK(defs.cdPluginDescriptor()->
-			  CreateInstance(IID_IAAFPluginDescriptor, 
+		CHECK(defs.cdPluginDef()->
+			  CreateInstance(IID_IAAFPluginDef, 
 							 (IUnknown **)&desc));
 		*descPtr = desc;
 		desc->AddRef();
 		CHECK(desc->Initialize(BASIC_INTERP_PLUGIN, L"Example interpolators", L"Handles step and linear interpolation."));
-		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
+		CHECK(desc->SetCategoryClass(AUID_AAFInterpolationDefinition));
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(defs.cdNetworkLocator()->
 			  CreateInstance(IID_IAAFLocator, 
@@ -209,7 +198,7 @@ CAAFBasicInterp::~CAAFBasicInterp ()
 
 HRESULT STDMETHODCALLTYPE
     CAAFBasicInterp::GetNumTypesSupported(
-		/* [out] */aafInt32*  pCount)
+		/* [out] */aafUInt32*  pCount)
 {
 	if(pCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -219,7 +208,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFBasicInterp::GetIndexedSupportedType(
-		/* [in] */ aafInt32  index,
+		/* [in] */ aafUInt32  index,
 		/* [out] */IAAFTypeDef ** ppType)
 {
 	if(ppType == NULL)
@@ -284,6 +273,7 @@ HRESULT STDMETHODCALLTYPE
 	AAFRational		timeA, timeB;
 	AAFRational		inputTime;
 	IAAFDefObject	*pDef = NULL;
+  IAAFMetaDefinition * pMetaDefinition = NULL;
 	IAAFVaryingValue *pVaryVal = NULL;
 	IAAFInterpolationDef *pInterpDef = NULL;
 	aafUID_t		defID, interpID;
@@ -307,10 +297,10 @@ HRESULT STDMETHODCALLTYPE
 		if(pInputValue->denominator == 0)
 			RAISE(AAFRESULT_ZERO_DIVIDE);
 		inputTime = (AAFRational)*pInputValue;
-		CHECK(_typeDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
-		CHECK(pDef->GetAUID (&defID));
-		pDef->Release();
-		pDef = NULL;
+		CHECK(_typeDef->QueryInterface(IID_IAAFMetaDefinition, (void **)&pMetaDefinition));
+		CHECK(pMetaDefinition->GetAUID (&defID));
+		pMetaDefinition->Release();
+		pMetaDefinition = NULL;
 		if(EqualAUID(&defID, &kAAFTypeID_Int32))
 		{
 			if(bufSize < sizeof(aafUInt32))
@@ -359,6 +349,8 @@ HRESULT STDMETHODCALLTYPE
 	{
 		if(pDef)
 			pDef->Release();
+    if (pMetaDefinition)
+      pMetaDefinition->Release();
 		if(pInterpDef)
 			pInterpDef->Release();
  		if(pVaryVal)
@@ -371,7 +363,7 @@ HRESULT STDMETHODCALLTYPE
 HRESULT CAAFBasicInterp::InterpolateMany(
 	/* [in] */ aafRational_t *  pStartInputValue,
     /* [in] */ aafRational_t *  pInputStep,
-    /* [in] */ aafInt32  pGenerateCount,
+    /* [in] */ aafUInt32  pGenerateCount,
     /* [out] */aafMemPtr_t pOutputValue,
     /* [out] */aafUInt32 *  pResultCount)
 {
@@ -510,6 +502,10 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 //
 // 
 // 
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFBasicInterp::InternalQueryInterface
 (
     REFIID riid,
@@ -521,13 +517,13 @@ HRESULT CAAFBasicInterp::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IClassFactory interface 
-    if (riid == IID_IAAFInterpolator)
+    if (EQUAL_UID(riid,IID_IAAFInterpolator))
     { 
         *ppvObj = (IAAFInterpolator *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
@@ -542,3 +538,9 @@ HRESULT CAAFBasicInterp::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFBasicInterp)
+
+
+
+
+
+
