@@ -6,9 +6,11 @@ AAFNestedScope\
 AAFSegment\
 #endm
 #c
+#import ./AAFUnitTest.exp
 AD_HEAD
 
 AD_INCLUDE(AAFTypes)
+AD_HEAD
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -18,52 +20,36 @@ AD_INCLUDE(AAFTypes)
 *                                          *
 \******************************************/
 
-
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-/*************************************************************************
- * 
- * @class AAFNestedScope | an AAFNestedScope object defines a scope that 
- *			contains an ordered set of AAFSegments and produces the value
- *			specified by the last AAFSegement in the ordered set.
- *
- * @base public | AAFSegment
- *
- *************************************************************************/
-
 AD_FORWARD_DECLARATION(AAFSegment)
 AD_FORWARD_DECLARATION(EnumAAFSegments)
 
 AD_CLASS_UUID(e44be452, 2099, 11d2, bf, 98, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(e44be451, 2099, 11d2, bf, 98, 00, 60, 97, 11, 62, 12)
-AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_CLASS_BEGIN
 
-AD_XMETHOD1(AppendSegment,
-			[in],
-			objIn,
-			AAFSegment,
-			pSegment, 
-			Pointer to segment to be added,
-			Add the Segment to the Slots list.)
+AD_METHOD1(AppendSegment,
+		   [in\,ref],
+		   AD_AAFTYPES\(AAFSegment\) *,
+		   pSegment, 
+		   Pointer to segment to be added,
+		   Add the Segment to the Slots list.)
 
-AD_XMETHOD1(RemoveSegment,
-			[in],
-			objIn,
-			AAFSegment,
-			pSegment, 
-			Pointer to segment to be added,
-			Remove the Segment from the Slots list.)
+AD_METHOD1(RemoveSegment,
+		   [in\,ref],
+		   AD_AAFTYPES\(AAFSegment\) *,
+		   pSegment, 
+		   Pointer to segment to be added,
+		   Remove the Segment from the Slots list.)
 
-AD_XMETHOD1(GetSlots,
-			[retval][out],
-			objOut,
-			EnumAAFSegments,
-			ppEnum,
-			Slots - segment list  enumeration,
-			Returns an enumerator for aaf segment.)
+AD_METHOD1(GetSlots,
+		   [retval][out],
+		   AD_AAFTYPES\{EnumAAFSegments\} **,
+		   ppEnum,
+		   Slots - segment list  enumeration,
+		   Returns an enumerator for aaf segment.)
 
-AD_XCLASS_END(Concrete, StoredObject)
+AD_OVERRIDE(.method-Test)
+
+AD_CLASS_END
+
