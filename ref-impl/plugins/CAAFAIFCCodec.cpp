@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.11 2004/10/27 17:15:01 phil_tudor Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.12 2004/11/22 15:02:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -174,7 +174,6 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 static wchar_t *manufURL = L"http://www.avid.com";
 static wchar_t *downloadURL = L"ftp://ftp.avid.com/pub/";
 const aafUID_t MANUF_JEFFS_PLUGINS = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
-static aafVersionType_t samplePluginVersion = { 0, 1 };
 
 static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
@@ -421,7 +420,7 @@ CAAFAIFCCodec::GetSelectInfo (IAAFSourceMob * /*fileMob*/,
 			CHECK(loadAIFCHeader());
 		}
 		pSelectInfo->willHandleMDES = kAAFTrue;
-#if PORT_BYTESEX_BIG_ENDIAN
+#if defined(PORT_BYTESEX_BIG_ENDIAN)
 		pSelectInfo->isNative = kAAFTrue;
 #else
 		pSelectInfo->isNative = kAAFFalse;
@@ -1523,7 +1522,6 @@ AAFRESULT CAAFAIFCCodec::CreateAIFCheader(aafUInt8		*buffer,
 										  
 {
 	aafInt32           zero = 0, len;
-	aafInt16           pcm_format = 1;
 	aafUInt8			*ptr = buffer, *COMMLenBuf, *FORMLenBuf, *patch;
 	char            	tempstr[12];
 	double      		tempdbl;
@@ -1852,8 +1850,6 @@ HRESULT CAAFAIFCCodec::InternalQueryInterface
  REFIID riid,
  void **ppvObj)
 {
-    HRESULT hr = S_OK;
-	
     if (NULL == ppvObj)
         return E_INVALIDARG;
 	

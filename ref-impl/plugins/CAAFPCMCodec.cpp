@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.4 2004/11/10 18:30:40 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.5 2004/11/22 15:02:45 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -601,7 +601,7 @@ HRESULT STDMETHODCALLTYPE
 		_stream->AddRef();
 	}
 	pSelectInfo->willHandleMDES = kAAFTrue;
-#if PORT_BYTESEX_LITTLE_ENDIAN
+#if defined(PORT_BYTESEX_LITTLE_ENDIAN)
 	pSelectInfo->isNative = kAAFTrue;
 #else
 	pSelectInfo->isNative = kAAFFalse;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGDescriptorHelper.h,v 1.12 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGDescriptorHelper.h,v 1.13 2004/11/22 15:02:45 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,7 @@ class CAAFJPEGDescriptorHelper
 {
 public:
 	CAAFJPEGDescriptorHelper();
-	~CAAFJPEGDescriptorHelper();
+	virtual ~CAAFJPEGDescriptorHelper();
 	
 	// Initialize all of the internal interfaces required by the JPEG Codec.
 	// This method must be called before any other method (except Clear()).

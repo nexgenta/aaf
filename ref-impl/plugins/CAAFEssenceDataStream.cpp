@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDataStream.cpp,v 1.24 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceDataStream.cpp,v 1.25 2004/11/22 15:02:44 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -222,8 +222,6 @@ HRESULT CAAFEssenceDataStream::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 

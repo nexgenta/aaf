@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCIDescriptorHelper.h,v 1.7 2004/09/10 17:13:02 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCIDescriptorHelper.h,v 1.8 2004/11/22 15:02:44 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,7 +57,7 @@ class CAAFCDCIDescriptorHelper
 {
 public:
 	CAAFCDCIDescriptorHelper();
-	~CAAFCDCIDescriptorHelper();
+	virtual ~CAAFCDCIDescriptorHelper();
 	
 	// Initialize all of the internal interfaces required by the CDCI Codec.
 	// This method must be called before any other method (except Clear()).
