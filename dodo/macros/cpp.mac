@@ -22,6 +22,23 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c Pass through argument if for idl otherwise omit it.
+#c 
+#c This macro is generally used to specify IDL options that would
+#c make since to emit to c++.
+#c To allow proper marshalling code generation of a struct: |
+#c typedef struct
+#c {
+#c     aafInt32 length;
+#c     AD_IDL([length_is(length)]) aafWchar *str;
+#c } aafString_t;
+#c
+#startm AD_IDL 01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Includes another file.
 #c
 #c Argument: Base filename
@@ -132,6 +149,14 @@
 #c Arguments: none
 #c
 #startm AD_HEAD 00
+/******************************************\\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\\******************************************/
 #endm
 
 
@@ -186,6 +211,17 @@
   delete rep;
 #endif
 }
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Starts a class definition
+#c
+#c Arguments: none
+#c
+#startm AD_COM_EXT_CLASS_BEGIN 01
+AD_CLASS_BEGIN\
 #endm
 
 
@@ -268,7 +304,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 #ifdef BOB_TEST
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -303,7 +339,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -344,7 +380,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -390,7 +426,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -441,7 +477,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -497,7 +533,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -558,7 +594,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -624,7 +660,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -695,7 +731,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -771,7 +807,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -852,7 +888,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -938,7 +974,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT stat;
 
   Impl.this-module * ptr;
-  void * pO;
+  ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
   ptr = static_cast<Impl.this-module*> (pO);
@@ -1013,6 +1049,17 @@ AAFRESULT STDMETHODCALLTYPE
 #c
 #startm AD_OVERRIDE 01
 %01-cpp(.this-module)
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Specifies a method in a separate COM interface.
+#c
+#c Argument: method declaration
+#c
+#startm AD_COM_METH 01
+%01-com-meth-cpp(.this-module)
 #endm
 
 
@@ -1172,17 +1219,24 @@ AAFRESULT STDMETHODCALLTYPE
 #c session by creating the first session object.
 #c
 #startm AD_BEGIN_SESSION 00
+
+#include "ImplAAFObjectCreation.h"
+
+extern "C" const aafClassID_t CLSID_AAFSession;
+
 AAFRESULT STDMETHODCALLTYPE
     AAFSession::BeginSession (aafProductIdentification_t * pIdent,
         AAFSession ** ppSession)
 {
 #ifdef BOB_TEST
-  AAFSession * pObj;
-  pObj = new AAFSession;
-  assert (pObj);
-  assert (ppSession);
-  *ppSession = pObj;
-  pObj->SetDefaultIdentification(pIdent);
+
+  assert(ppSession);
+  ImplAAFSession* pSession = static_cast<ImplAAFSession*>(CreateImpl(CLSID_AAFSession));
+  assert(pSession);
+  *ppSession = static_cast<AAFSession*>(pSession->GetContainer());
+
+  pSession->BeginSession(pIdent);
+
   return AAFRESULT_SUCCESS;
 
 #else
@@ -1352,4 +1406,14 @@ pinternal%01\
     {
 	  *%02 = (%01*)NULL;
 	}
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Hack to quote the .this-module macro and keep it out of export
+#c files.  Do not define this macro in exp.mac!!!
+#c
+#startm AD_EXPORT_THIS_MODULE 00
+.this-module\
 #endm
