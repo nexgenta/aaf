@@ -201,6 +201,11 @@ public:
     //          If the object is not found the result is <e bool.false>.
   virtual bool findObject(void* identification, OMObject*& object) const;
 
+  virtual OMContainerIterator<OMWeakReferenceSetElement>* iterator(void) const;
+
+  virtual void insert(void* key,
+                      const OMWeakReferenceSetElement& element);
+
   virtual OMPropertyId keyPropertyId(void) const;
 
   virtual OMPropertyTag targetTag(void) const;
@@ -211,7 +216,7 @@ public:
 
 private:
 
-  typedef OMWeakReferenceSetElement<ReferencedObject> SetElement;
+  typedef OMWeakReferenceSetElement SetElement;
 
   typedef OMSetIterator<OMUniqueObjectIdentification, SetElement> SetIterator;
 
@@ -225,6 +230,13 @@ private:
   OMPropertyId _keyPropertyId;
 
   friend class OMWeakReferenceSetIterator<ReferencedObject>;
+
+    // OMWeakReferenceSetProperty can't be assigned - declare but don't define
+  OMWeakReferenceSetProperty& operator = (
+                                        const OMWeakReferenceSetProperty& rhs);
+
+    // OMWeakReferenceSetProperty can't be copied - declare but don't define
+  OMWeakReferenceSetProperty(const OMWeakReferenceSetProperty& rhs);
 
 };
 
