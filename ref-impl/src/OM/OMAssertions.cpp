@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -24,6 +24,9 @@
 * LIABILITY.
 *
 ************************************************************************/
+
+// @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMAssertions
 
 #include "OMAssertions.h"
 
@@ -114,9 +117,9 @@ bool validWideString(const wchar_t* string)
   return (string != 0) /* && (lengthOfWideString(string) > 0) */;
 }
 
-bool validOMWideString(const OMWideCharacter* string)
+bool validOMString(const OMCharacter* string)
 {
-  return (string != 0) /* && (lengthOfOMWideString(string) > 0) */;
+  return (string != 0) /* && (lengthOfOMString(string) > 0) */;
 }
 
 #if defined (OM_ENABLE_TRACE)
@@ -124,6 +127,43 @@ bool validOMWideString(const OMWideCharacter* string)
 void trace(const char* routineName)
 {
   cerr << "Enter \"" << routineName << "\"." << endl;
+}
+
+#endif
+
+#if defined (OM_ENABLE_OBSOLETE)
+
+void obsolete(const char* routineName, const char* newRoutineName)
+{
+  cerr << "The routine \""
+       << routineName
+       << "\" is obsolete. Please use \""
+       << newRoutineName << "\" instead." << endl;
+}
+
+#endif
+
+#if defined(OM_ENABLE_DEBUG)
+
+bool checkTypes(void);
+
+static bool typesChecked = checkTypes();
+
+bool checkTypes(void)
+{
+  TRACE("checkTypes");
+
+  ASSERT("Correct size for OMInt8",   sizeof(OMInt8)   == 1);
+  ASSERT("Correct size for OMInt16",  sizeof(OMInt16)  == 2);
+  ASSERT("Correct size for OMInt32",  sizeof(OMInt32)  == 4);
+  ASSERT("Correct size for OMInt64",  sizeof(OMInt64)  == 8);
+
+  ASSERT("Correct size for OMUInt8",  sizeof(OMUInt8)  == 1);
+  ASSERT("Correct size for OMUInt16", sizeof(OMUInt16) == 2);
+  ASSERT("Correct size for OMUInt32", sizeof(OMUInt32) == 4);
+  ASSERT("Correct size for OMUInt64", sizeof(OMUInt64) == 8);
+
+  return true;
 }
 
 #endif
