@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.51 2005/02/04 17:01:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.52 2005/03/18 18:18:55 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,7 +42,7 @@ using namespace std;
 #include "AAFContainerDefs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
-#include "AAFCompressionIDs.h"
+#include "AAFCompressionDefs.h"
 
 // Include the AAF interface declarations.
 #include "AAF.h"

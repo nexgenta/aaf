@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.7 2005/02/08 14:32:32 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.8 2005/03/18 18:18:55 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1176,7 +1176,7 @@ HRESULT STDMETHODCALLTYPE
 					_sampleRate.numerator / _sampleRate.denominator + 0.5);
 		CHECK(_pcmdes->SetAverageBPS(avBPS));			// aafUInt32 BPS
 
-		if (_containerFormat == ContainerRIFFWAVE)
+		if (_containerFormat == kAAFContainerDef_RIFFWAVE)
 		{
 			CHECK(write_updated_BWF_size());
 		}
@@ -1321,7 +1321,7 @@ HRESULT STDMETHODCALLTYPE
 			}
 		}
 
-		if (_containerFormat == ContainerRIFFWAVE)
+		if (_containerFormat == kAAFContainerDef_RIFFWAVE)
 		{
 			// Write the BWF header and <bext> metadata chunk to the stream
 			// in preparation for writing the PCM samples to the <data> chunk.
@@ -1573,7 +1573,7 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(containerDef->QueryInterface(IID_IAAFDefObject, (void **)&defObj));
 		CHECK(defObj->GetAUID(&_containerFormat));
 
-		if (_containerFormat == ContainerRIFFWAVE)
+		if (_containerFormat == kAAFContainerDef_RIFFWAVE)
 		{
 			CHECK(find_data_chunk_offset());
 		}

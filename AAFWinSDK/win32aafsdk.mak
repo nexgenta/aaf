@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: win32aafsdk.mak,v 1.33 2004/11/04 18:13:57 stuart_hc Exp $ $Name:  $
+# $Id: win32aafsdk.mak,v 1.34 2005/03/18 18:18:43 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -237,7 +237,7 @@ TARGET_H_FILES = \
 	$(AAFSDK_INCLUDE)\AAFCodecDefs.h \
 	$(AAFSDK_INCLUDE)\AAFCOMPlatform.h \
 	$(AAFSDK_INCLUDE)\AAFCOMPlatformTypes.h \
-	$(AAFSDK_INCLUDE)\AAFCompressionIDs.h \
+	$(AAFSDK_INCLUDE)\AAFCompressionDefs.h \
 	$(AAFSDK_INCLUDE)\AAFContainerDefs.h \
 	$(AAFSDK_INCLUDE)\AAFDataDefs.h \
 	$(AAFSDK_INCLUDE)\AAFDefUIDs.h \
@@ -491,8 +491,8 @@ $(AAFSDK_INCLUDE)\AAFCOMPlatform.h : $(TOOLKIT_INCLUDE)\AAFCOMPlatform.h
 $(AAFSDK_INCLUDE)\AAFCOMPlatformTypes.h : $(TOOLKIT_INCLUDE)\AAFCOMPlatformTypes.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFCOMPlatformTypes.h $@
 
-$(AAFSDK_INCLUDE)\AAFCompressionIDs.h : $(TOOLKIT_INCLUDE)\AAFCompressionIDs.h
-	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFCompressionIDs.h $@
+$(AAFSDK_INCLUDE)\AAFCompressionDefs.h : $(TOOLKIT_INCLUDE)\AAFCompressionDefs.h
+	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFCompressionDefs.h $@
 
 $(AAFSDK_INCLUDE)\AAFContainerDefs.h : $(TOOLKIT_INCLUDE)\AAFContainerDefs.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFContainerDefs.h $@

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.19 2005/02/08 14:32:31 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.20 2005/03/18 18:18:45 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
-#include "AAFCompressionIDs.h"
+#include "AAFCompressionDefs.h"
 
 #include "CAAFBuiltinDefs.h"
 #include "utf8.h"

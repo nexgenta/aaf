@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: genDefInstances.cpp,v 1.4 2005/03/18 16:09:49 terabrit Exp $ $Name:  $
+// $Id: genDefInstances.cpp,v 1.5 2005/03/18 18:18:45 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,7 @@
     {#cls, name, desc, id},
 
 #define AAF_INSTANCE_TABLE_END()			\
-    {0,0,0,{0}}								\
+    {0,0,0,0,{0}}								\
   };
 
 // this only does DefinitionObject on AAF_INSTANCE lines

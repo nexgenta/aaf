@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceRIFFWAVEContainer.cpp,v 1.2 2004/11/04 17:32:07 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceRIFFWAVEContainer.cpp,v 1.3 2005/03/18 18:18:54 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -173,7 +173,7 @@ HRESULT STDMETHODCALLTYPE
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	*uid = ContainerRIFFWAVE;		// UID of the DefObject
+	*uid = kAAFContainerDef_RIFFWAVE;		// UID of the DefObject
 	return AAFRESULT_SUCCESS;
 }
 
@@ -206,7 +206,7 @@ HRESULT STDMETHODCALLTYPE
 								  (IUnknown **)&container));
 		pcd->Release();
 		pcd = 0;
-		uid = ContainerRIFFWAVE;
+		uid = kAAFContainerDef_RIFFWAVE;
 		CHECK(container->SetEssenceIsIdentified(kAAFFalse));
 		CHECK(container->Initialize(uid, L"Raw file Container", L"Essence is in a non-container file."));
 		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)def));
