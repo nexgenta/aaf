@@ -83,9 +83,9 @@ public:
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
-        (const aafUID_t *  pID,
-         const aafUID_t * pRefdObjID,
-         wchar_t *  pTypeName);
+        (const aafUID_t & id,
+         const ImplAAFClassDef *pType,
+         const aafCharacter * pTypeName);
 
   // overrides from ImplAAFTypeDef
   //
@@ -100,11 +100,7 @@ public:
 
 
 private:
-  // OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
-  OMFixedSizeProperty<aafUID_t> _referencedType;
-
-  // avoid shortcut typedef in an effort to not include other headers
-  ImplAAFSmartPointer<ImplAAFClassDef> _cachedObjType;
+  OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
 };
 
 
