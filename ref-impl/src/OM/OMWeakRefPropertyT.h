@@ -299,7 +299,7 @@ OMPropertyTag OMWeakReferenceProperty<ReferencedObject>::targetTag(void) const
                   const_cast<OMWeakReferenceProperty<ReferencedObject>*>(this);
   if (_targetTag == nullOMPropertyTag) {
     nonConstThis->_targetTag =
-                           file()->referencedProperties()->insert(_targetName);
+                  file()->referencedProperties()->insert(targetPropertyPath());
   }
   POSTCONDITION("Valid target property tag", _targetTag != nullOMPropertyTag);
   return _targetTag;
@@ -320,6 +320,20 @@ OMWeakReferenceProperty<ReferencedObject>::targetPropertyPath(void) const
   }
   POSTCONDITION("Valid result", _targetPropertyPath != 0);
   return _targetPropertyPath;
+}
+
+template<typename ReferencedObject>
+void
+OMWeakReferenceProperty<ReferencedObject>::clearTargetTag(void) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::clearTargetTag");
+
+  OMWeakReferenceProperty<ReferencedObject>* nonConstThis =
+                  const_cast<OMWeakReferenceProperty<ReferencedObject>*>(this);
+
+  nonConstThis->_targetTag = nullOMPropertyTag;
+  delete [] nonConstThis->_targetPropertyPath;
+  nonConstThis->_targetPropertyPath = 0;
 }
 
 #endif
