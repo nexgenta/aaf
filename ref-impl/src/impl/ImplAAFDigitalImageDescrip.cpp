@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 #include "ImplAAFDigitalImageDescriptor.h"
 
 #include "AAFStoredObjectIDs.h"
@@ -245,16 +263,15 @@ AAFRESULT STDMETHODCALLTYPE
 												  aafInt32* pSampledXOffset,
 												  aafInt32* pSampledYOffset)
 {
+	if ((pSampledHeight == NULL) || (pSampledWidth == NULL) ||
+		(pSampledXOffset == NULL) || (pSampledYOffset == NULL))
+		return(AAFRESULT_NULL_PARAM);
 	
 	if (!_sampledHeight.isPresent()  || !_sampledWidth.isPresent()   || 
 		!_sampledXOffset.isPresent() ||	!_sampledYOffset.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
 		
-	if ((pSampledHeight == NULL) || (pSampledWidth == NULL) ||
-		(pSampledXOffset == NULL) || (pSampledYOffset == NULL))
-		return(AAFRESULT_NULL_PARAM);
-
-	*pSampledHeight = _sampledHeight;
+		*pSampledHeight = _sampledHeight;
 	*pSampledWidth = _sampledWidth;
 	*pSampledXOffset = _sampledXOffset;
 	*pSampledYOffset = _sampledYOffset;
@@ -269,14 +286,13 @@ AAFRESULT STDMETHODCALLTYPE
 												  aafInt32*  pDisplayXOffset,
 												  aafInt32* pDisplayYOffset)
 {
+	if ((pDisplayHeight == NULL)  || (pDisplayWidth == NULL) ||
+		(pDisplayXOffset == NULL) || (pDisplayYOffset == NULL))
+		return(AAFRESULT_NULL_PARAM);
 	
 	if (!_displayHeight.isPresent()	 || !_displayWidth.isPresent()	 ||
 		!_displayXOffset.isPresent() || !_displayXOffset.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
-	 
-	if ((pDisplayHeight == NULL)  || (pDisplayWidth == NULL) ||
-		(pDisplayXOffset == NULL) || (pDisplayYOffset == NULL))
-		return(AAFRESULT_NULL_PARAM);
 
 	*pDisplayHeight = _displayHeight;
 	*pDisplayWidth = _displayWidth;
@@ -341,12 +357,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::GetAlphaTransparency (aafAlphaTransparency_t* pAlphaTransparency)
 {
+	if (pAlphaTransparency == NULL)
+		return(AAFRESULT_NULL_PARAM);
 	
 	if (!_alphaTransparency.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
-	
-	if (pAlphaTransparency == NULL)
-		return(AAFRESULT_NULL_PARAM);
 	
 	aafRational_t transparency = _alphaTransparency;
 
@@ -366,12 +381,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::GetGamma (aafRational_t* pGamma)
 {
+	if (pGamma == NULL)
+		return(AAFRESULT_NULL_PARAM);
 	
 	if (!_gamma.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
-	
-	if (pGamma == NULL)
-		return(AAFRESULT_NULL_PARAM);
 
 	*pGamma = _gamma;
 
@@ -382,12 +396,12 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDigitalImageDescriptor::GetImageAlignmentFactor (aafInt32* pImageAlignmentFactor)
 {
-	if (!_imageAlignmentFactor.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-	
 	if (pImageAlignmentFactor == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if (!_imageAlignmentFactor.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
 	*pImageAlignmentFactor = _imageAlignmentFactor;
 
 	return AAFRESULT_SUCCESS;
