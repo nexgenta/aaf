@@ -3,34 +3,26 @@
 #ifndef __ImplAAFIdentification_h__
 #define __ImplAAFIdentification_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
+
+
 
 
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
 #endif
 
-#include "OMWideStringProperty.h"
+
 
 class ImplAAFIdentification : public ImplAAFObject
 {
@@ -43,11 +35,23 @@ public:
   
   ImplAAFIdentification();
 
+  ImplAAFIdentification(
+    const wchar_t* companyName,
+    const wchar_t* productName,
+    const aafProductVersion_t* productVersion,
+    const wchar_t* productVersionString,
+    // const AUID* productId,
+    const aafTimeStamp_t date,
+    const aafProductVersion_t* toolKitVersion,
+    const wchar_t* platform
+    // const AUID* generation
+    );
+
+  OMDECLARE_STORABLE(ImplAAFIdentification)
+
+
   virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize (aafCharacter_constptr companyName,
-				aafCharacter_constptr productName,
-				aafCharacter_constptr productVersionString,
-				aafUID_constref productID);
+	Initialize ();
 
 
   //****************
@@ -77,7 +81,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetCompanyName
 		// @parm [in, string] The Company Name
-        (const aafCharacter * pName);
+        (wchar_t *  pName);
 
 
   //****************
@@ -107,7 +111,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductName
 		// @parm [in, string] The Product Name
-        (const aafCharacter * pName);
+        (wchar_t *  pName);
 
 
   //****************
@@ -137,7 +141,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductVersionString
 		// @parm [in, string] The Product Version String
-        (const aafCharacter * pVersionString);
+        (wchar_t *  pVersionString);
 
 
   //****************
@@ -155,7 +159,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductVersion
 		// @parm [in] The Product Version
-        (aafProductVersion_constref version);
+        (aafProductVersion_t *  pVersion);
 
 
   //****************
@@ -173,7 +177,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetProductID
 		// @parm [in] The Product ID
-        (const aafUID_t & productID);
+        (aafUID_t *  pProductID);
 
 
   //****************
@@ -219,20 +223,25 @@ public:
   // GetGeneration()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetGenerationID
+    GetGeneration
 		// @parm [out] The unique generation
         (aafUID_t *  pGeneration);
 
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFIdentificationTest.cpp.
+  static AAFRESULT test();
+
 private:
-  OMWideStringProperty                      _companyName;
-  OMWideStringProperty						_productName;
-  OMFixedSizeProperty<aafProductVersion_t>	_productVersion;
-  OMWideStringProperty                      _productVersionString;
-  OMFixedSizeProperty<aafUID_t>             _productId;
-  OMFixedSizeProperty<aafTimeStamp_t>       _date;
-  OMFixedSizeProperty<aafProductVersion_t>	_toolkitVersion;
-  OMWideStringProperty                      _platform;
-  OMFixedSizeProperty<aafUID_t>             _generation;
+  OMWideStringProperty                             _companyName;
+  OMWideStringProperty                             _productName;
+  // StructuredProperty<aafProductVersion_t> _productVersion;
+  OMWideStringProperty                             _productVersionString;
+  // FixedSizeProperty<AUID>                 _productId;
+  OMFixedSizeProperty<aafTimeStamp_t>          _date;
+  // StructuredProperty<aafProductVersion_t> _toolkitVersion;
+  OMWideStringProperty                             _platform;
+  // FixedSizeProperty<AUID>                 _generation;
 };
 
 #endif // ! __ImplAAFIdentification_h__
