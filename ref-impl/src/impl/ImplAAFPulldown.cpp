@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPulldown.cpp,v 1.24 2005/02/07 18:51:04 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPulldown.cpp,v 1.25 2005/02/08 10:38:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -266,7 +266,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			sign = -1;
 		  else 
 			sign = 1;
-		  offset32 = offset;
+		  offset32 = (aafInt32)offset;	// truncate from 64bit to 32bit integer
 
 		  MaskGetBits(maskBits, &maskones);
 		  masksize = (char)maskLen;
