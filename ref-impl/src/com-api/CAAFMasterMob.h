@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMasterMob.h,v 1.6 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFMasterMob.h,v 1.7 2004/10/22 13:55:40 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -147,8 +147,8 @@ public:
   STDMETHOD (AddMasterSlot) (
     // Data kind of new slot.  Requires a data kind valid for a media
 	// stream. Valid data kinds are:
-    // - DDEF_Picture
-    // - DDEF_Sound
+    // - Picture
+    // - Sound
     /*[in]*/ IAAFDataDef * pDataDef,
 
     // Slot ID of the Source Mob slot to be added to the Master Mob

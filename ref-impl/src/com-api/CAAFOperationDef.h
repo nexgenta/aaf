@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFOperationDef.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFOperationDef.h,v 1.4 2004/10/22 13:55:40 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -90,10 +90,10 @@ public:
   // Places the DataDefinition object attached to this
   // IAAFOperationDef into the *ppDataDef argument.  The data
   // definition will match one of the AUIDs in the file
-  // AAFDataDefs.h, (which includes DDEF_PICTURE, and
-  // DDEF_SOUND), and indicates what type of data the operation will
+  // AAFDataDefs.h, (which includes kAAFDataDef_Picture, and
+  // kAAFDataDef_Sound), and indicates what type of data the operation will
   // be performed upon.  For example, a video dissolve will have the
-  // data def DEF_VIDEO.  If a data definition is used which is not
+  // data def kAAFDataDef_Picture.  If a data definition is used which is not
   // from AAFDataDefs.h, then the client is responsible for making
   // sure that a data definition object with that ID exists in the
   // dictionary.  The SDK will take care of creating the standard data
@@ -132,10 +132,10 @@ public:
   // Sets the IAAFDataDefinition of this IAAFOperationDef to be the
   // given one.  The
   // data definition will match one of the AUIDs in the file
-  // AAFDataDefs.h, (which includes DDEF_PICTURE, and
-  // DDEF_SOUND), and indicates what type of data the operation will
+  // AAFDataDefs.h, (which includes kAAFDataDef_Picture, and
+  // kAAFDataDef_Sound), and indicates what type of data the operation will
   // be performed upon.  For example, a video dissolve will have the
-  // data def DEF_VIDEO.  If a data definition is used which is not
+  // data def kAAFDataDef_Picture.  If a data definition is used which is not
   // from AAFDataDefs.h, then the client is responsible for making
   // sure that a data definition object with that ID exists in the
   // dictionary.  The SDK will take care of creating the standard data

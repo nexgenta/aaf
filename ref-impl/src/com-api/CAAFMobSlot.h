@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMobSlot.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFMobSlot.h,v 1.4 2004/10/22 13:55:40 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -242,8 +242,8 @@ public:
   //
   // This method will return the Data Definition object
   // associated with the segment in this Mob Slot.  Common
-  // DataDefinitions are DDEF_Picture, DDEF_Sound, DDEF_Timecode,
-  // and DDEF_Edgecode.
+  // DataDefinitions are kAAFDataDef_Picture, kAAFDataDef_Sound, kAAFDataDef_Timecode,
+  // and kAAFDataDef_Edgecode.
   //
   // Succeeds if all of the following are true:
   // - the ppResult pointer is valid.
