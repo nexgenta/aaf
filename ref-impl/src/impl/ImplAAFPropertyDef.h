@@ -39,10 +39,11 @@ class ImplAAFTypeDef;
 #endif
 
 #include "OMPropertyDefinition.h"
+#include "OMVariableSizeProperty.h"
 
 typedef OMProperty* (*ImplAAFOMPropertyCreateFunc_t)
   (OMPropertyId pid,
-   const char * name);
+   const wchar_t * name);
 
 class ImplAAFPropertyDef : public ImplAAFMetaDefinition,
 						   public OMPropertyDefinition
@@ -85,25 +86,6 @@ public:
       (// @parm [out] pointer to the result
        aafBool * pIsUniqueIdentifier) const;
 
-
-  //****************
-  // GetDefaultValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetDefaultValue
-        // @parm [out, retval] Pointer to default data value
-        (ImplAAFPropertyValue ** ppDataValue);
-
-
-  //****************
-  // SetDefaultValue()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetDefaultValue
-        // @parm [in] default data value
-        (ImplAAFPropertyValue * pDataValue);
-
-
   //
   // Non-published methods (yet still public)
   //
@@ -111,8 +93,7 @@ public:
   //****************
   // pvtInitialize()
   //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
+  AAFRESULT pvtInitialize
        (// @parm [in] auid to be used to identify this property definition
         const aafUID_t & propertyAuid,
 			
@@ -133,6 +114,29 @@ public:
 		  aafBoolean_t isUniqueIdentifier);
 
 
+  //****************
+  // pvtInitialize()
+  //
+  AAFRESULT pvtInitialize
+       (// @parm [in] auid to be used to identify this property definition
+        aafUID_constref propertyAuid,
+			
+        // @parm [in] OM pid (small integer) to be used to identify
+		// this property definition
+        OMPropertyId omPid,
+			
+        // @parm [in, string] friendly name of this property
+	aafCharacter_constptr pPropName,
+	
+        // @parm [in] Type definition of this property definition,
+	ImplAAFTypeDef *pType,
+
+        // @parm [in] Is this property optional? (mandatory, if not)
+	aafBoolean_t isOptional,
+
+        // @parm [in] Is this property a unique identifier
+	aafBoolean_t isUniqueIdentifier);
+
 
   OMPropertyId OmPid (void) const;
   //
@@ -142,7 +146,7 @@ public:
   // Overrides from OMPropertyDefinition
   //
   const OMType* type(void) const;
-  const char* name(void) const;
+  const wchar_t* name(void) const;
   OMPropertyId localIdentification(void) const;
   bool isOptional(void) const;
 
@@ -154,6 +158,14 @@ public:
   // properties.
   void SetOMPropCreateFunc (ImplAAFOMPropertyCreateFunc_t pFunc);
 
+
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
+
 private:
 
   // OMWeakReferenceProperty<ImplAAFTypeDef> _Type;
@@ -163,13 +175,11 @@ private:
 
   OMFixedSizeProperty<OMPropertyId>          _pid;
 
-  OMVariableSizeProperty<aafUInt8>			 _DefaultValue;
-
   OMFixedSizeProperty<aafBool>               _IsUniqueIdentifier;
 
   ImplAAFTypeDef *                           _cachedType;
 
-  char * _bname;  // name in byte-sized characters
+  wchar_t * _wname;  // name in wide characters
 
   ImplAAFOMPropertyCreateFunc_t              _OMPropCreateFunc;
 
