@@ -1,165 +1,101 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+#ifndef __ImplAAFMob_h__
+#include "ImplAAFMob.h"
+#endif
+
+
+
+
+
+
+#ifndef __ImplEnumAAFMobs_h__
 #include "ImplEnumAAFMobs.h"
+#endif
 
-ImplEnumAAFMobs::ImplEnumAAFMobs()
+#include <assert.h>
+#include "AAFResult.h"
+
+ImplEnumAAFMobs::ImplEnumAAFMobs ()
 {
-	_criteria.searchTag = kAAFNoSearch;
+	_current = 0;
+	_cStorage = NULL;
 }
 
-AAFRESULT STDMETHODCALLTYPE 
-	ImplEnumAAFMobs::NextOne(ImplAAFMob ** ppMob)
-{
-	if(ppMob==NULL)
-		return(AAFRESULT_NULL_PARAM);
 
-	AAFRESULT ar;
-	ImplAAFMob *pCandidate = NULL;
-	while((ar=ImplAAFEnumerator<ImplAAFMob>::NextOne(&pCandidate))
-		==AAFRESULT_SUCCESS)
+ImplEnumAAFMobs::~ImplEnumAAFMobs ()
+{}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFMobs::NextOne (ImplAAFMob **ppMob)
+{
+	AAFRESULT		result;
+	aafNumSlots_t	cur = _current, siz;
+
+    _cStorage->GetNumMobs (kAllMob /*!!! */, &siz);
+	if(cur < siz)
 	{
-		// Check for Mob that matches our search criteria
-		switch(_criteria.searchTag)
-		{
-		case kAAFNoSearch:
-			(*ppMob)=pCandidate;
-			return(AAFRESULT_SUCCESS);
-
-		case kAAFByMobKind:
-			aafMobKind_t	kind;
-				
-			ar = pCandidate->GetMobKind (&kind);
-			if(ar != AAFRESULT_SUCCESS)
-			{
-				pCandidate->ReleaseReference();
-				return ar;
-			}
-			if((kind == _criteria.tags.mobKind) 
-				|| (kAAFAllMob == _criteria.tags.mobKind))
-			{
-				(*ppMob)=pCandidate;
-				return(AAFRESULT_SUCCESS);
-			}
-			pCandidate->ReleaseReference();
-			pCandidate = NULL;
-			break;
-
-		default:
-			pCandidate->ReleaseReference();
-			return(AAFRESULT_NOT_IN_CURRENT_VERSION);
-		};
+		result = _cStorage->GetNthMob (cur, ppMob);
+		_current = ++cur;
 	}
-	return(AAFRESULT_NO_MORE_OBJECTS);
-}
-	
-AAFRESULT STDMETHODCALLTYPE 
-	ImplEnumAAFMobs::Next(
-		aafUInt32  count,
-		ImplAAFMob ** ppMobs,
-		aafUInt32 *  pFetched)
-{
-	aafUInt32			numMobs;
-	AAFRESULT			ar=AAFRESULT_SUCCESS;
-
-	if(ppMobs==NULL||pFetched==NULL)
-		return(AAFRESULT_NULL_PARAM);
-	
-	if(count==0)
-		return(AAFRESULT_INVALID_PARAM);
-
-	for (numMobs = 0; numMobs < count; numMobs++)
-	{
-		ar = NextOne(&ppMobs[numMobs]);
-		if (FAILED(ar))
-			break;
-	}
-	
-	if (pFetched)
-		*pFetched=numMobs;
-
-	return(ar);
-}
-
-AAFRESULT STDMETHODCALLTYPE 
-	ImplEnumAAFMobs::Skip(aafUInt32  count)
-{
-	if(count==0)
-		return(AAFRESULT_INVALID_PARAM);
-
-	aafUInt32 n;
-	
-	for(n=1;n<=count;n++)
-	{
-		// Defined behavior of skip is to NOT advance at all if it would push 
-		// us off of the end
-		ImplAAFMob *pMob;
-		AAFRESULT ar = NextOne(&pMob);
-		if (AAFRESULT_SUCCEEDED(ar))
-		{
-			pMob->ReleaseReference();
-		}
-		if(ar==AAFRESULT_NO_MORE_OBJECTS)
-		{
-			// Off the end, decrement n and iterator back to the starting 
-			// position
-			while(n>=1)
-			{
-				--(*_pIterator);
-				n--;
-			}
-			return(ar);
-		}
-		else if(FAILED(ar))
-		{
-			return(ar);
-		}
-	}
-
-	return(AAFRESULT_SUCCESS);
-}
-
-// Clone() wrapper for pointer compatibility
-
-AAFRESULT STDMETHODCALLTYPE 
-	ImplEnumAAFMobs::Clone(ImplEnumAAFMobs ** ppEnum)
-{
-	// MSDEV requires reinterpret_cast here, even though 
-	// ImplAAFEnumerator<ImplAAFMob> is the base class for ImplEnumAAFMobs.
-	return(ImplAAFEnumerator<ImplAAFMob>::Clone(
-		reinterpret_cast<ImplAAFEnumerator<ImplAAFMob>**>(ppEnum)));
-}
-
-AAFRESULT ImplEnumAAFMobs::SetCriteria(aafSearchCrit_t *pCriteria)
-{
-	if(NULL == pCriteria)
-		_criteria.searchTag = kAAFNoSearch;
 	else
-		_criteria = *pCriteria;
+		result = AAFRESULT_NO_MORE_MOBS;
 
+	return result;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFMobs::Next (aafUInt32  /*count*/,
+                           ImplAAFMob ** /*ppMobs*/,
+                           aafUInt32 *  /*pFetched*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFMobs::Skip (aafUInt32  /*count*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFMobs::Reset ()
+{
+	_current = 0;
 	return AAFRESULT_SUCCESS;
 }
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplEnumAAFMobs::Clone (ImplEnumAAFMobs ** /*ppEnum*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+//Internal
+AAFRESULT
+    ImplEnumAAFMobs::SetContentStorage(ImplAAFContentStorage *pCStore)
+{
+	_cStorage = pCStore;
+	return AAFRESULT_SUCCESS;
+}
+
+
+
+extern "C" const CLSID CLSID_EnumAAFMobs;
+
+OMDEFINE_STORABLE(EnumAAFMobs, CLSID_EnumAAFMobs);
+
