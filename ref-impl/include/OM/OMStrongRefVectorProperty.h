@@ -164,7 +164,7 @@ public:
     //          <c OMStrongReferenceVectorProperty> so that it
     //          can contain at least <p capacity> <p ReferencedObject>s
     //          without having to be resized.
-  void grow(const size_t capacity);
+  virtual void grow(const size_t capacity);
 
   // Optional property interface
 
@@ -241,6 +241,12 @@ public:
     //          at position <p index>. Existing objects at <p index> and
     //          higher are shifted up one index position.
   virtual void insertObjectAt(const OMObject* object, const size_t index);
+
+  virtual OMContainerIterator<OMStrongReferenceVectorElement>*
+                                                          iterator(void) const;
+
+  virtual void insert(const size_t index,
+                      const OMStrongReferenceVectorElement& element);
 
 private:
 
