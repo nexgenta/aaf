@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.24.2.5 2004/09/02 16:47:11 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.24.2.6 2004/09/03 17:15:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -602,6 +602,8 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pDisplayF2Offset = _displayF2Offset;
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -639,6 +641,8 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pStoredF2Offset = _storedF2Offset;
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -664,6 +668,8 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pActiveFormatDescriptor = _activeFormatDescriptor;
+
+	return AAFRESULT_SUCCESS;
 }
 
 
