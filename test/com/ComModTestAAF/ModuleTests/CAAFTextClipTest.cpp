@@ -98,13 +98,15 @@ extern "C" HRESULT CAAFTextClip_test()
   aafWChar * pFileName = L"AAFTextClipTest.aaf";
 
   // Initialize the product info for this module test
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFTextClip Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -234,7 +236,7 @@ void TextClipTest::CreateTextClip()
   IAAFMob *pReferencingMob = NULL;
   IAAFSegment *pSegment = NULL;
   IAAFTimelineMobSlot *pMobSlot = NULL;
-
+	IAAFComponent*		pComponent = NULL;
 
   try
   {
@@ -262,6 +264,10 @@ void TextClipTest::CreateTextClip()
   checkResult(defs.cdTextClip()->
 			  CreateInstance(IID_IAAFTextClip, 
 							 (IUnknown **)&pTextClip));
+  checkResult(pTextClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+  checkResult(pComponent->SetDataDef(defs.ddPicture()));
+  pComponent->Release();
+  pComponent = NULL;
 
   // Initialize the source reference data.
   checkResult(pTextClip->QueryInterface(IID_IAAFSourceReference, (void **)&pSourceReference));
@@ -307,6 +313,12 @@ void TextClipTest::CreateTextClip()
   {
     pSegment->Release();
     pSegment = NULL;
+  }
+
+  if (pComponent)
+  {
+    pComponent->Release();
+    pComponent = NULL;
   }
 
   if (pReferencingMob)
@@ -374,13 +386,13 @@ void TextClipTest::OpenTextClip()
   try
   {
     // Get the number of composition mobs in the file (should be one)
-    checkResult(_pHeader->CountMobs(kCompMob, &compositionMobs));
+    checkResult(_pHeader->CountMobs(kAAFCompMob, &compositionMobs));
     checkExpression(1 == compositionMobs, AAFRESULT_TEST_FAILED);
 
     // Get the composition mob. There should only be one.
     aafSearchCrit_t criteria;
-    criteria.searchTag = kByMobKind;
-    criteria.tags.mobKind = kCompMob;
+    criteria.searchTag = kAAFByMobKind;
+    criteria.tags.mobKind = kAAFCompMob;
     checkResult(_pHeader->GetMobs(&criteria, &pEnumMobs));
     checkResult(pEnumMobs->NextOne(&pReferencingMob));
     checkResult(pReferencingMob->QueryInterface(IID_IAAFCompositionMob, (void **)&pCompositionMob));
