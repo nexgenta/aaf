@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.cpp,v 1.14.2.2 2004/08/03 18:29:54 akharkev Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.cpp,v 1.14.2.3 2004/08/03 18:47:03 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -428,6 +428,11 @@ const OMUniqueObjectIdentification&
 }
 
 
+
+const wchar_t* ImplAAFMetaDefinition::name(void) const
+{
+  return _name;
+}
 
 // Private method to install the AAFObjectModel definition associated with
 // this meta definition.

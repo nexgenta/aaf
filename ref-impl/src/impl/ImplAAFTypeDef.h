@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.h,v 1.24.2.2 2004/07/23 18:23:36 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.h,v 1.24.2.3 2004/08/03 18:47:03 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -180,6 +180,10 @@ public:
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
   virtual void onCopy(void* clientContext) const;
+
+  // Overrides from OMDefinition
+  virtual const OMUniqueObjectIdentification& identification(void) const;
+  virtual const wchar_t* name(void) const;
 
 protected:
   // Helper function to return the raw type of UInt8Array (if

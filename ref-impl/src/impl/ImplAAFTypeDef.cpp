@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.cpp,v 1.28.2.2 2004/07/23 18:23:36 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.cpp,v 1.28.2.3 2004/08/03 18:47:03 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,7 @@
 
 #include <assert.h>
 #include <string.h>
+
 #include <wchar.h>
 
 extern "C" const aafClassID_t CLSID_AAFPropValData;
@@ -357,3 +358,14 @@ void ImplAAFTypeDef::onCopy(void* clientContext) const
   pNonConstThis->setInitialized();
 }
 
+const OMUniqueObjectIdentification& ImplAAFTypeDef::identification(void) const
+{
+  // tjb - to prevent ambiguity
+  return ImplAAFMetaDefinition::identification();
+}
+
+const wchar_t* ImplAAFTypeDef::name(void) const
+{
+  // tjb - to prevent ambiguity
+  return ImplAAFMetaDefinition::name();
+}
