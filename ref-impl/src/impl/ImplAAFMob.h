@@ -26,6 +26,7 @@ const int PID_MOB_CREATE_TIME	= 2;
 const int PID_MOB_MOD_TIME		= 3;
 const int PID_MOB_SLOTS			= 4;
 
+
 class ImplAAFSegment;
 
 class ImplAAFMobSlot;
@@ -83,10 +84,10 @@ public:
         (aafWChar *  name,  //@parm [in] Mob Name
 		aafInt32 bufSize);	  //@parm [in] size of the buffer required to hold Mob Name + terminator
   //****************
-  // GetNameLen()
+  // GetNameBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNameLen
+    GetNameBufLen
         (aafInt32 *  nameLen);  //@parm [in,out] Mob Name length
 
   //****************
@@ -181,14 +182,6 @@ public:
 
 // skip virtual aafErr_t Verify(char *buf, validateData_t *result);
 // What doe's this do?
-
-  //****************
-  // IsMobKind()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    IsMobKind
-        (aafMobKind_t  mobKind,   //@parm [in] A valid mob kind.
-		 aafBool *  result);  //@parm [out,retval] True is matches given mobKind
 
 
 
@@ -348,6 +341,21 @@ public:
 	// Interfaces visible inside the toolkit, but not exposed through the API
 AAFRESULT
     GetNthMobSlot (aafInt32 index /* 0-based*/, ImplAAFMobSlot **ppMobSlot);
+  //****************
+  // AddPhysSourceRef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddPhysSourceRef
+        (aafAppendOption_t  addType,
+		 aafRational_t  editrate,
+		 aafSlotID_t  aMobSlot,
+         aafUID_t * pEssenceKind,
+		aafSourceRef_t  ref,
+        aafLength_t  srcRefLength);
+
+
+virtual AAFRESULT STDMETHODCALLTYPE
+    GetMobKind (aafMobKind_t *pMobKind);
 
 	protected:
 	OMFixedSizeProperty<aafUID_t>		_mobID;
