@@ -1,34 +1,37 @@
-#ifndef _AAF2OMF_
-#define _AAF2OMF_ 1
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1996 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
  *
  ************************************************************************/
-
-#include "EffectTranslate.h"
- /************************************************************************
+/************************************************************************
  *
  * Aaf2Omf.h Describes structures and prototypes for the AAF to OMF part 
  *           of the conversion utility.
@@ -40,56 +43,26 @@
 class Aaf2Omf
 {
 public:
-	Aaf2Omf( AAFDomainUtils *aafDomainUtils, OMFDomainUtils *omfDomainUtils, EffectTranslate *effectTranslate );
-	virtual ~Aaf2Omf();
+	Aaf2Omf();
+	~Aaf2Omf();
 
 public:
-	void OpenInputFile( void );
-		
-	void ConvertFile( void );
+	HRESULT OpenInputFile( void );
+	HRESULT OpenOutputFile( void );
 
-protected:
-	void ConvertMobIDtoUID(aafMobID_constptr pMobID, omfUID_t* pOMFMobID);
-	void OpenOutputFile( void );
 	void CloseInputFile( void );
 	void CloseOutputFile(void );
-	void AAFFileRead( void );
-	virtual void ConvertCompositionMob(IAAFCompositionMob* pCompMob, omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
-	void ConvertMasterMob(IAAFMasterMob* pMasterMob, omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
-	void ConvertSourceMob(IAAFSourceMob* pSourceMob, omfMobObj_t* pOMFCompMob, char* pMobName, aafMobID_t* pMobID);
-	void TraverseMob(IAAFMob* pMob, omfMobObj_t* pOMFMob);
-	void ProcessComponent(IAAFComponent* pComponent, omfObject_t* pOMFSegment);
-	void ConvertAAFDatadef(aafUID_t Datadef, omfDDefObj_t* pDatakind);
-	virtual void ConvertAAFTypeIDDatakind(aafUID_t, omfDDefObj_t* pDatakind);
-	void TraverseSequence(IAAFSequence* pSequence, omfObject_t* pOMFSequence );
-	void ConvertSelector(IAAFSelector* pSelector, omfObject_t* pOMFSelector );
-	void ConvertEssenceGroup(IAAFEssenceGroup* pGroup, omfObject_t* pOMFMediaGroup );
-	void ConvertLocator(IAAFEssenceDescriptor* pEssenceDesc, omfMobObj_t*	pOMFSourceMob );
-	void ConvertEssenceDataObject(IAAFEssenceData* pEssenceData);
-	virtual void ConvertEffects(IAAFOperationGroup* pEffect, omfEffObj_t nest, omfEffObj_t*	pOMFEffect);
-	virtual void ConvertParameter(IAAFParameter* pParm,
-		aafUID_t			&effectDefID,
-		omfSegObj_t pOMFEffect,
-		omfInt32 slotNum, omfLength_t effectLen);
-	virtual void	FinishUpMob(IAAFMob* /*pMob*/, omfMobObj_t /*pOMFMob*/) {};
-	omfObject_t LocateSlot(omfEffObj_t pOMFEffect, aafInt32 slotID);
-	virtual void ConvertValueBuf(aafUID_t &typeDefID,
-								aafDataBuffer_t srcValue, aafUInt32 srcValueLen,
-								aafDataBuffer_t *destValue, aafUInt32 *destValueLen,
-								bool *didAllocateNew);
-	virtual void ConvertObjectProps(IAAFObject* pObj, omfObject_t pOMFObject);
-	virtual void ConvertNestedScope(IAAFNestedScope* pNest, omfObject_t* pOMFNest );
-protected:
+		
+	HRESULT ConvertFile( void );
+	HRESULT AAFFileRead( void );
 
-    omfSessionHdl_t	OMFSession;
-	omfHdl_t			OMFFileHdl;
-	omfFileRev_t		OMFFileRev;
+private:
+
+    OMF2::omfSessionHdl_t	OMFSession;
+	OMF2::omfHdl_t			OMFFileHdl;
+	OMF2::omfFileRev_t		OMFFileRev;
+
 	IAAFFile*				pFile;
 	IAAFHeader*				pHeader;
 	IAAFDictionary*			pDictionary;
-
-	AAFDomainUtils			*pAAF;
-	OMFDomainUtils			*pOMF;
-	EffectTranslate			*pEffectTranslate;
 };
-#endif
