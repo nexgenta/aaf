@@ -16,185 +16,37 @@
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 
-#import macros/base.mac
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Pass through argument if for idl otherwise omit it.
-#c 
-#c This macro is generally used to specify IDL options that would
-#c make since to emit to c++.
-#c To allow proper marshalling code generation of a struct: |
-#c typedef struct
-#c {
-#c     aafInt32 length;
-#c     AD_IDL([length_is(length)]) aafWchar *str;
-#c } aafString_t;
-#c
-#startm AD_IDL 01
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Includes another file.
-#c
-#c Argument: Base filename
-#c
-#startm AD_INCLUDE 01
-#ifndef __%01_h__
-#include "%01.h"
-#endif
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Types definitions should only be used by idl and c++ & impl headers
-#c 
-#c Argument: Pieces of UUID
-#c
-#c Example:
-#c AD_TYPES_BEGIN(b1a21372, 1a7d, 11d2, bf, 78, 00, 10, 4b, c9, 15, 6d)
-#c
-#c TomR:980716: Added
-#c
-#startm AD_TYPES_BEGIN 11
-#ifndef __.this-module_h__
-#define __.this-module_h__
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Ends a types definition
-#c
-#c Types definitions should only be used by idl and c++ & impl headers
-#c
-#c Arguments: none
-#c
-#startm AD_TYPES_END 00
-#endif // __.this-module_h__
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Argument1: base name to be converted to output type.
-#c
-#startm AD_AAFTYPES 01
-%01\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Argument1: base name to be converted to output type.
-#c
-#startm AD_DECLARE_FORWARD_AAFTYPES 01
-class %01; \
-#endm
-
-#ccccccccccccccccccccccccccc
-#c
-#c Argument1: text to be quoted.
-#c 
-#c Just pass through the input. 
-#c
-#startm AD_CPP_QUOTE 01
-%01 \
-#endm
-
-#ccccccccccccccccccccccccccc
-#c
-#c Generate a forward declaration of a class.
-#c
-#c Argument: class name
-#c
-#startm AD_FORWARD_DECLARATION 01
-class %01;
-#endm
-
-#ccccccccccccccccccccccccccc
-#c
-#c Class UUID.
-#c
-#c Argument: Pieces of UUID
-#c
-#startm AD_CLASS_UUID 11
-#endm
-
-#ccccccccccccccccccccccccccc
-#c
-#c Default UUID.
-#c
-#c Argument: Pieces of UUID
-#c
-#startm AD_DEFAULT_UUID 11
-#endm
-
-#ccccccccccccccccccccccccccc
-#c
-#c Goes at the head of the file.
-#c
-#c Arguments: none
-#c
-#startm AD_HEAD 00
-//@doc
-//@class    .this-module | Implementation class for .this-module
-#ifndef __.this-module_h__
-#define __.this-module_h__
-
-/******************************************\\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\\******************************************/
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c AAFTypes support for IDL
-#c
-#c Arguments: none
-#c
-#startm AD_TYPES_HEAD 00
-#endm
-
-
 #ccccccccccccccccccccccccccc
 #c
 #c Starts a class definition
 #c
 #c Arguments: none
 #c
-#startm AD_CLASS_BEGIN 00
-#ifndef __.parent-module_h__
+#startm AD_CLASS_BEGIN 0
+#ifndef _.this-module_h_
+#define _.this-module_h_
+
+#ifndef _.parent-module_h_
 #include ".parent-module.h"
 #endif
+
+//@doc
+//@class 	.this-module | Implementation class for .this-module
 
 //
 // Forward declaration
 //
-class Impl.this-module;
+class J.this-module;
 
 
 class .this-module : public .parent-module
 {
-public:
-
-  //***********************************************************
+  .this-module ();
+  ~.this-module ();
+  //
   // Constructor/destructor
   //
-  .this-module (aafBool doInit = AAFTrue);
-  virtual ~.this-module ();
-
-public:\
+  //********
 #endm
 
 
@@ -204,39 +56,27 @@ public:\
 #c
 #c Arguments: none
 #c
-#startm AD_COM_EXT_CLASS_BEGIN 01
-AD_CLASS_BEGIN\
-#endm
+#startm AD_ROOT_CLASS_BEGIN 0
+#ifndef _.this-module_h_
+#define _.this-module_h_
 
-
-#ccccccccccccccccccccccccccc
-#c
-#c Starts a root class definition
-#c
-#c Arguments: none
-#c
-#startm AD_ROOT_CLASS_BEGIN 00
-#ifndef __AAFTypes_h__
-#include "AAFTypes.h"
-#endif
+//@doc
+//@class 	.this-module | Implementation class for .this-module
 
 //
 // Forward declaration
 //
-class Impl.this-module;
+class J.this-module;
 
 
 class .this-module
 {
-public:
-
-  //***********************************************************
+  .this-module ();
+  ~.this-module ();
+  //
   // Constructor/destructor
   //
-  .this-module (aafBool doInit = AAFTrue);
-  virtual ~.this-module ();
-
-public:\
+  //********
 #endm
 
 
@@ -247,16 +87,12 @@ public:\
 #c Argument1: method name
 #c Argument2: method description
 #c
-#startm AD_METHOD0 02
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
+#startm AD_METHOD0 2
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %02
-  // @end
   virtual AAFRESULT STDMETHODCALLTYPE
-    %01 ();\
+    %01 ();
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -264,30 +100,20 @@ public:\
 #c
 #c Inserts declaration for a method which takes one argument.
 #c
-#c Macro Arg 01: method name
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: method description
 #c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c
-#c Macro Arg 07: method description
-#c
-#startm AD_XMETHOD1 07
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %07
-  // @end
-  // 
+#startm AD_METHOD1 06
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %06
   virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05
-  );\
+    %01 (
+		%03 %04); //@parm %02 %05
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -295,34 +121,25 @@ public:\
 #c
 #c Inserts declaration for a method which takes two arguments.
 #c
-#c Macro Arg 01: method name
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: argument modifiers (e.g. [in])
+#c Argument7: argument type
+#c Argument8: argument name
+#c Argument9: argument comment
+#c Argument10: method description
 #c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c
-#c Macro Arg 12: method description
-#c
-#startm AD_XMETHOD2 12
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %12
-  // @end
-  // 
+#startm AD_METHOD2 10
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %10
   virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10
-  );\
+    %01 (
+		%03 %04,  //@parm %02 %05
+		%07 %08); //@parm %06 %09
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -330,38 +147,31 @@ public:\
 #c
 #c Inserts declaration for a method which takes three arguments.
 #c
-#c Macro Arg 01: method name
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: argument modifiers (e.g. [in])
+#c Argument7: argument type
+#c Argument8: argument name
+#c Argument9: argument comment
+#c Argument10: argument modifiers (e.g. [in])
+#c Argument11: argument type
+#c Argument12: argument name
+#c Argument13: argument comment
+#c Argument14: method description
 #c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c
-#c Macro Arg 17: method description
-#c
-#startm AD_XMETHOD3 17
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %17
-  // @end
-  // 
+#startm AD_METHOD3 14
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %14
   virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15
-  );\
+    %01 (
+		%03 %04,  //@parm %02 %05,
+		%07 %08,  //@parm %06 %09,
+		%11 %12); //@parm %10 %13
+		
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -369,42 +179,35 @@ public:\
 #c
 #c Inserts declaration for a method which takes four arguments.
 #c
-#c Macro Arg 01: method name
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: argument modifiers (e.g. [in])
+#c Argument7: argument type
+#c Argument8: argument name
+#c Argument9: argument comment
+#c Argument10: argument modifiers (e.g. [in])
+#c Argument11: argument type
+#c Argument12: argument name
+#c Argument13: argument comment
+#c Argument14: argument modifiers (e.g. [in])
+#c Argument15: argument type
+#c Argument16: argument name
+#c Argument17: argument comment
+#c Argument18: method description
 #c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c
-#c Macro Arg 22: method description
-#c
-#startm AD_XMETHOD4 22
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %22
-  // @end
-  // 
+#startm AD_METHOD4 18
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %14
   virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20
-  );\
+    %01 (
+		%03 %04,  //@parm %02 %05
+		%07 %08,  //@parm %06 %09
+		%11 %12,  //@parm %10 %13
+		%15 %16); //@parm %14 %17
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -412,46 +215,40 @@ public:\
 #c
 #c Inserts declaration for a method which takes five arguments.
 #c
-#c Macro Arg 01: method name
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: argument modifiers (e.g. [in])
+#c Argument7: argument type
+#c Argument8: argument name
+#c Argument9: argument comment
+#c Argument10: argument modifiers (e.g. [in])
+#c Argument11: argument type
+#c Argument12: argument name
+#c Argument13: argument comment
+#c Argument14: argument modifiers (e.g. [in])
+#c Argument15: argument type
+#c Argument16: argument name
+#c Argument17: argument comment
+#c Argument18: argument modifiers (e.g. [in])
+#c Argument19: argument type
+#c Argument20: argument name
+#c Argument21: argument comment
+#c Argument22: method description
 #c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c
-#c Macro Arg 27: method description
-#c
-#startm AD_XMETHOD5 27
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %27
-  // @end
-  // 
+#startm AD_METHOD5 22
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %22
   virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20,
-
-    // @parm %22 %24 | %25 | %26
-    %24 .%23-indirection %25
-  );\
+    %01 (
+		%03 %04,  //@parm %02 %05
+		%07 %08,  //@parm %06 %09
+		%11 %12,  //@parm %10 %13
+		%15 %16,  //@parm %14 %17
+		%19 %20); //@parm %18 %21
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -459,365 +256,45 @@ public:\
 #c
 #c Inserts declaration for a method which takes six arguments.
 #c
-#c Macro Arg 01: method name
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: argument modifiers (e.g. [in])
+#c Argument7: argument type
+#c Argument8: argument name
+#c Argument9: argument comment
+#c Argument10: argument modifiers (e.g. [in])
+#c Argument11: argument type
+#c Argument12: argument name
+#c Argument13: argument comment
+#c Argument14: argument modifiers (e.g. [in])
+#c Argument15: argument type
+#c Argument16: argument name
+#c Argument17: argument comment
+#c Argument18: argument modifiers (e.g. [in])
+#c Argument19: argument type
+#c Argument20: argument name
+#c Argument21: argument comment
+#c Argument22: argument modifiers (e.g. [in])
+#c Argument23: argument type
+#c Argument24: argument name
+#c Argument25: argument comment
+#c Argument26: method description
 #c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c
-#c Macro Arg 32: method description
-#c
-#startm AD_XMETHOD6 32
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %32
-  // @end
-  // 
+#startm AD_METHOD6 26
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %26
   virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20,
-
-    // @parm %22 %24 | %25 | %26
-    %24 .%23-indirection %25,
-
-    // @parm %27 %29 | %30 | %31
-    %29 .%28-indirection %30
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes seven arguments.
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c metharg 7    32           33          34      35      36
-#c
-#c Macro Arg 37: method description
-#c
-#startm AD_XMETHOD7 37
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %37
-  // @end
-  // 
-  virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20,
-
-    // @parm %22 %24 | %25 | %26
-    %24 .%23-indirection %25,
-
-    // @parm %27 %29 | %30 | %31
-    %29 .%28-indirection %30,
-
-    // @parm %32 %34 | %35 | %36
-    %34 .%33-indirection %35
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes eight arguments.
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c metharg 7    32           33          34      35      36
-#c metharg 8    37           38          39      40      41
-#c
-#c Macro Arg 42: method description
-#c
-#startm AD_XMETHOD8 42
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %42
-  // @end
-  // 
-  virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20,
-
-    // @parm %22 %24 | %25 | %26
-    %24 .%23-indirection %25,
-
-    // @parm %27 %29 | %30 | %31
-    %29 .%28-indirection %30,
-
-    // @parm %32 %34 | %35 | %36
-    %34 .%33-indirection %35,
-
-    // @parm %37 %39 | %40 | %41
-    %39 .%38-indirection %40
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes nine arguments.
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c metharg 7    32           33          34      35      36
-#c metharg 8    37           38          39      40      41
-#c metharg 9    42           43          44      45      46
-#c
-#c Macro Arg 47: method description
-#c
-#startm AD_XMETHOD9 47
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %47
-  // @end
-  // 
-  virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20,
-
-    // @parm %22 %24 | %25 | %26
-    %24 .%23-indirection %25,
-
-    // @parm %27 %29 | %30 | %31
-    %29 .%28-indirection %30,
-
-    // @parm %32 %34 | %35 | %36
-    %34 .%33-indirection %35,
-
-    // @parm %37 %39 | %40 | %41
-    %39 .%38-indirection %40,
-
-    // @parm %42 %44 | %45 | %46
-    %44 .%43-indirection %45
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes ten arguments.
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c metharg 7    32           33          34      35      36
-#c metharg 8    37           38          39      40      41
-#c metharg 9    42           43          44      45      46
-#c metharg 10   47           48          49      50      51
-#c
-#c Macro Arg 52: method description
-#c
-#startm AD_XMETHOD_10 52
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %52
-  // @end
-  // 
-  virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20,
-
-    // @parm %22 %24 | %25 | %26
-    %24 .%23-indirection %25,
-
-    // @parm %27 %29 | %30 | %31
-    %29 .%28-indirection %30,
-
-    // @parm %32 %34 | %35 | %36
-    %34 .%33-indirection %35,
-
-    // @parm %37 %39 | %40 | %41
-    %39 .%38-indirection %40,
-
-    // @parm %42 %44 | %45 | %46
-    %44 .%43-indirection %45,
-
-    // @parm %47 %49 | %50 | %51
-    %49 .%48-indirection %50
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a method which takes eleven arguments.
-#c
-#c Macro Arg 01: method name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c metharg 7    32           33          34      35      36
-#c metharg 8    37           38          39      40      41
-#c metharg 9    42           43          44      45      46
-#c metharg 10   47           48          49      50      51
-#c metharg 11   52           53          54      55      56
-#c
-#c Macro Arg 57: method description
-#c
-#startm AD_XMETHOD_11 57
-  //***********************************************************
-  // METHOD NAME: %01()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | .this-module | %01 |
-  // %57
-  // @end
-  // 
-  virtual AAFRESULT STDMETHODCALLTYPE
-  %01 (
-    // @parm %02 %04 | %05 | %06
-    %04 .%03-indirection %05,
-
-    // @parm %07 %09 | %10 | %11
-    %09 .%08-indirection %10,
-
-    // @parm %12 %14 | %15 | %16
-    %14 .%13-indirection %15,
-
-    // @parm %17 %19 | %20 | %21
-    %19 .%18-indirection %20,
-
-    // @parm %22 %24 | %25 | %26
-    %24 .%23-indirection %25,
-
-    // @parm %27 %29 | %30 | %31
-    %29 .%28-indirection %30,
-
-    // @parm %32 %34 | %35 | %36
-    %34 .%33-indirection %35,
-
-    // @parm %37 %39 | %40 | %41
-    %39 .%38-indirection %40,
-
-    // @parm %42 %44 | %45 | %46
-    %44 .%43-indirection %45,
-
-    // @parm %47 %49 | %50 | %51
-    %49 .%48-indirection %50,
-
-    // @parm %52 %54 | %55 | %56
-    %54 .%53-indirection %55
-  );\
+    %01 (
+		%03 %04 /*@parm %02 %05*/,
+		%07 %08,  //@parm %06 %09
+		%11 %12,  //@parm %10 %13
+		%15 %16,  //@parm %14 %17
+		%19 %20,  //@parm %18 %21
+		%23 %24); //@parm %22 %25
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -827,253 +304,10 @@ public:\
 #c
 #c Arguments: none
 #c
-#startm AD_CLASS_END 00
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/.this-moduleTest.cpp.
-  static AAFRESULT test();
-};
-
-#endif // ! __.this-module_h__
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Ends a class definition for AAFRoot
-#c
-#c Arguments: none
-#c
-#startm AD_ROOT_CLASS_END 00
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/.this-moduleTest.cpp.
-  static AAFRESULT test();
-
-  Impl.this-module * GetRepObject ();
-
-protected:
-
-  void InitRep (Impl.this-module * pObj);
-
+#startm AD_CLASS_END 0
 private:
-
-  Impl.this-module * _rep;
-
+  J.this-module * _rep;
 };
 
-#endif // ! __.this-module_h__
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Specifies an overridden method
-#c
-#c Argument: method declaration
-#c
-#startm AD_OVERRIDE 01
-%01-h
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Specifies a method in a separate COM interface.
-#c
-#c Argument: method declaration
-#c
-#startm AD_COM_METH 01
-%01-com-meth-h
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a constructor which takes one argument.
-#c Constructor name is assumed to be .this-module.
-#c
-#c Macro arguments 01+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    01           02          03      04      05
-#c
-#c Macro Arg 06: method description
-#c
-#startm AD_XCONSTRUCTOR1 06
-  //***********************************************************
-  // constructor
-  //
-  // %06
-  .this-module (
-    // @parm %01 %03 | %04 %05
-    %03 .%02-indirection %04
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a constructor which takes two arguments.
-#c Constructor name is assumed to be .this-module.
-#c
-#c Macro arguments 01+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    01           02          03      04      05
-#c metharg 2    06           07          08      09      10
-#c
-#c Macro Arg 11: method description
-#c
-#startm AD_XCONSTRUCTOR2 11
-  //***********************************************************
-  // constructor
-  //
-  // %11
-  .this-module (
-    // @parm %01 %03 | %04 %05
-    %03 .%02-indirection %04,
-
-    // @parm %06 %08 | %09 %10
-    %08 .%07-indirection %09
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a constructor which takes three arguments.
-#c Constructor name is assumed to be .this-module.
-#c
-#c Macro arguments 01+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    01           02          03      04      05
-#c metharg 2    06           07          08      09      10
-#c metharg 3    11           12          13      14      15
-#c
-#c Macro Arg 16: method description
-#c
-#startm AD_XCONSTRUCTOR3 16
-  //***********************************************************
-  // constructor
-  //
-  // %16
-  .this-module (
-    // @parm %01 %03 | %04 %05
-    %03 .%02-indirection %04,
-
-    // @parm %06 %08 | %09 %10
-    %08 .%07-indirection %09,
-
-    // @parm %11 %13 | %14 %15
-    %13 .%12-indirection %14
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a constructor which takes four arguments.
-#c Constructor name is assumed to be .this-module.
-#c
-#c Macro arguments 01+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    01           02          03      04      05
-#c metharg 2    06           07          08      09      10
-#c metharg 3    11           12          13      14      15
-#c metharg 4    16           17          18      19      20
-#c
-#c Macro Arg 21: method description
-#c
-#startm AD_XCONSTRUCTOR4 21
-  //***********************************************************
-  // constructor
-  //
-  // %21
-  .this-module (
-    // @parm %01 %03 | %04 %05
-    %03 .%02-indirection %04,
-
-    // @parm %06 %08 | %09 %10
-    %08 .%07-indirection %09,
-
-    // @parm %11 %13 | %14 %15
-    %13 .%12-indirection %14,
-
-    // @parm %16 %18 | %19 %20
-    %18 .%17-indirection %19
-  );\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Formats a return code comment
-#c
-#c arg1 = return code
-#c arg2 = description
-#c 
-#startm AD_MRETVAL 02
-  // @rvalue %01 | %02\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Formats a method comment
-#c
-#c arg1 = brief method description
-#c arg2 = return value strings
-#c arg3 = lengthy method comments
-#c 
-#startm AD_MCOMMENT 03
-%01
-  // @end
-  //
-  // RETURNS:
-  // @rdesc Returns an AAFResult status code
-  // @rvalue S_OK | The operation succeeded
-%02  // @end
-  //
-  // COMMENTS:
-  // @comm %03\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a static method used to bootstrap an AAF
-#c session by creating the first session object.
-#c
-#startm AD_BEGIN_SESSION 00
-static AAFRESULT STDMETHODCALLTYPE
-    BeginSession (aafProductIdentification_t * pIdent,
-        AAFSession ** ppSession);
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a static method used for a container to create
-#c its contained objects in the cpp API.
-#c
-#startm AD_STATIC_CREATE 00
-static AAFRESULT STDMETHODCALLTYPE
-    CreateObject (.this-module ** result);
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Hack to quote the .this-module macro and keep it out of export
-#c files.  Do not define this macro in exp.mac!!!
-#c
-#startm AD_EXPORT_THIS_MODULE 00
-.this-module\
+#endif // ! _.this-module_h_
 #endm
