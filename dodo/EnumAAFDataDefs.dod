@@ -6,14 +6,14 @@ AAFRoot\
 #endm
 #c
 AD_HEAD
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 19981-999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 AD_FORWARD_DECLARATION(AAFDataDef)
 
@@ -22,7 +22,7 @@ AD_CLASS_UUID(D8000381, 498E, 11D2, 84, 1B, 00, 60, 08, 32, AC, B8)
 
 AD_DEFAULT_UUID(d8000382, 498e, 11d2, 84, 1B, 00, 60, 08, 32, AC, B8)
 
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, Transient)
 
 AD_XMETHOD1(NextOne,
 			[out\,retval], objOut, AAFDataDef, ppDataDef, The Next DataDefinition,
@@ -30,12 +30,12 @@ AD_XMETHOD1(NextOne,
   // properly releasing the returned pointer when it is no longer needed.
   // @comm This is a just simplified version of the Next method. )
 
-AD_XMETHOD3(Next,
-			[in], objPass, aafUInt32, count, number of data definitions requested,
+AD_X2METHOD3(Next,
+			[in], objPass, aafUInt32, count, number of data definitions requested,xxx,
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOut, AAFDataDef, ppDataDef, array to receive data definitions,
+			objOutArray, AAFDataDef, ppDataDef, array to receive data definitions,count,
 			[out\,ref], objPass, aafUInt32 *, pFetched,
-			number of actual DataDefinition fetched into ppDataDefinition array,
+			number of actual DataDefinition fetched into ppDataDefinition array,xxx,
 			Enumerates the next count elements \(AAFDataDef pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
@@ -61,4 +61,4 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
