@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.19 2004/06/04 15:33:46 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.20 2005/04/02 21:13:19 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,13 @@ AAFBASE ?= ../../..
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
+# Irix debug builds require the Cio library in addition
+# to the regular platform libs.
+ifeq ($(AAFPLATFORM),MipsIrix)
+ifeq ($(AAFTARGET),Debug)
+PLATFORMLIBS+=-lCio
+endif
+endif
 
 # Include directories
 INCLUDES = -I../../include/ref-api \
@@ -83,6 +90,7 @@ $(STAT_LIBTARGET) : $(CXXOBJS) $(CXXOBJS2)
 $(DYN_LIBTARGET) : $(CXXOBJS) $(CXXOBJS2) \
 				$(AAFBUILDDIR)/ref-impl/$(AAFTARGETDIR)/libimpl$(LIB) \
 				$(AAFBUILDDIR)/OM/$(AAFTARGETDIR)/libom$(LIB) $(STORAGE_LIBS)
+
 ifeq ($(AAFPLATFORM),PPCDarwin)
 	ranlib -s $(STORAGE_LIBS)
 endif
@@ -92,7 +100,6 @@ endif
 	$(STORAGE_LIBS) \
 	$(AAFBUILDDIR)/aaflib/$(AAFTARGETDIR)/libaaflib$(LIB) \
 	-lm $(UUIDLIB) $(PLATFORMLIBS)
-
 
 .PHONY : clean
 clean:
