@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCloneResolver.cpp,v 1.4.2.1 2004/07/22 18:45:32 tbingham Exp $ $Name:  $
+// $Id: ImplAAFCloneResolver.cpp,v 1.4.2.2 2004/07/23 00:10:37 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -125,16 +125,3 @@ void ImplAAFCloneResolver::CloneClassDef( const OMClassId& id,
 }
 
 //=---------------------------------------------------------------------=
-
-bool operator==( const aafMobID_t& lhs, const aafMobID_t& rhs )
-{
-   return (memcmp( &rhs, &lhs, sizeof(aafMobID_t) ) == 0) ? true : false;
-}
-
-bool operator==( const aafUID_t& lhs, const aafUID_t& rhs )
-{
-   return (memcmp( &rhs, &lhs, sizeof(aafUID_t) ) == 0) ? true : false;
-}
-
-//=---------------------------------------------------------------------=
-

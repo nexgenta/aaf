@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCloneResolver.h,v 1.5 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCloneResolver.h,v 1.5.2.1 2004/07/23 00:10:37 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,7 @@
 #define __ImplAAFCloneResolver_h__
 
 #include "AAFResult.h"
+#include "AAFUtils.h"
 
 #include "ImplAAFDictionary.h"
 #include "ImplAAFMetaDictionary.h"
@@ -91,12 +92,6 @@ template <class Type>
 HRESULT ImplAAFCloneResolverLookupDef( ImplAAFDictionary* pDict, const aafUID_t& auid, Type** pDef );
 template <class Type>
 HRESULT ImplAAFCloneResolverRegisterDef( ImplAAFDictionary* pDict, Type* ppDef );
-
-//=---------------------------------------------------------------------=
-
-// Required for OMVector
-bool operator==( const aafMobID_t& lhs, const aafMobID_t& rhs );
-bool operator==( const aafUID_t& lhs, const aafUID_t& rhs );
 
 //=---------------------------------------------------------------------=
 
