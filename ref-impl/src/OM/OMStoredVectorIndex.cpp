@@ -7,6 +7,7 @@ OMStoredVectorIndex::OMStoredVectorIndex(size_t size)
   TRACE("OMStoredVectorIndex::OMStoredVectorIndex");
 
   _names = new OMUInt32[_size];
+  ASSERT("Valid heap pointer", _names != 0);
   for (size_t i = 0; i < _size; i++) {
     _names[i] = 0;
   }
@@ -47,4 +48,11 @@ void OMStoredVectorIndex::iterate(size_t& context, OMUInt32& name) const
   PRECONDITION("Valid context", context < _size);
   name = _names[context];
   context = context + 1;
+}
+
+bool OMStoredVectorIndex::isValid(void) const
+{
+  // No checks yet.
+  // Possible checks include checking that all of the names are unique
+  return true;
 }
