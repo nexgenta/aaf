@@ -20,11 +20,6 @@
 #include "ImplAAFTimelineMobSlot.h"
 #endif
 
-const int PID_MOB_MOBID			= 0;
-const int PID_MOB_NAME			= 1;
-const int PID_MOB_CREATE_TIME	= 2;
-const int PID_MOB_MOD_TIME		= 3;
-const int PID_MOB_SLOTS			= 4;
 
 
 class ImplAAFSegment;
@@ -41,7 +36,7 @@ class ImplAAFFindSourceInfo;
 
 class ImplAAFScopeStack;
 
-class ImplAAFEffectInvocation;
+class ImplAAFGroup;
 
 
 
@@ -378,7 +373,7 @@ AAFRESULT
 					 ImplAAFComponent **foundObj,
 					 aafLength_t *minLength,
 					 aafBool *foundTransition,
-					 ImplAAFEffectInvocation **effeObject,
+					 ImplAAFGroup **effeObject,
 					 aafInt32	*nestDepth,
 					 aafPosition_t *diffPos);
 
