@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.16 2004/09/23 15:40:42 stuart_hc Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.17 2004/09/24 09:41:25 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -383,7 +383,8 @@ static void SetFilename(aafWChar *filename, const char *api, const char *kind, b
 		// leaving space for terminating null.
 		size_t padlen = FILENAME_MAX - wcslen(full) - 1;
 #else
-		size_t padlen = NAME_MAX - wcslen(filename);
+		// Get the runtime value for NAME_MAX on the current filesystem
+		size_t padlen = pathconf(".", _PC_NAME_MAX) - wcslen(filename);
 #endif
 		// Preserve space for ".aaf" (4 chars)
 		for (int i = 0; i < padlen - 4; i++)
