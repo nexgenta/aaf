@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.11.2.6 2004/07/02 16:23:52 phil_tudor Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.11.2.7 2004/08/09 23:06:56 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -176,6 +176,10 @@ const aafUID_t kAAFTypeID_StringArray =
 //{04010600-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_AUIDArray =
 {0x04010600, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{04030100-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_AUIDSet =
+{0x04030100, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{03010100-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_Rational =
