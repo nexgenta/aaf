@@ -31,13 +31,12 @@
 
 #include "OMProperty.h"
 
-  // @class Abstract base class for persistent container properties
-  //        supported by the Object Manager.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
+class OMObject;
+class OMReferenceContainerIterator;
+
+  // @class Abstract base class for persistent object reference container
+  //        properties supported by the Object Manager.
   //   @base public | <c OMProperty>
-template <typename ReferencedObject>
 class OMContainerProperty : public OMProperty {
 public:
   // @access Public members.
@@ -51,26 +50,30 @@ public:
   virtual ~OMContainerProperty(void);
 
     // @cmember Insert <p object> into this <c OMContainerProperty>.
-  virtual void insert(const ReferencedObject* object) = 0;
+  virtual void insertObject(const OMObject* object) = 0;
 
     // @cmember Does this <c OMContainerProperty> contain <p object> ?
-  virtual bool containsValue(const ReferencedObject* object) const = 0;
+  virtual bool containsObject(const OMObject* object) const = 0;
 
-    // @cmember The number of <p ReferencedObject>s in this
+    // @cmember The number of <p OMObject>s in this
     //          <c OMContainerProperty>. <mf OMContainerProperty::count>
-    //          returns the actual number of <p ReferencedObject>s in the
+    //          returns the actual number of <p OMObject>s in the
     //          <c OMContainerProperty>.
   virtual size_t count(void) const = 0;
 
     // @cmember Remove <p object> from this <c OMContainerProperty>.
-  virtual void removeValue(const ReferencedObject* object) = 0;
+  virtual void removeObject(const OMObject* object) = 0;
+
+    // @cmember Create an <c OMReferenceContainerIterator> over this
+    //          <c OMContainerProperty>.
+  virtual OMReferenceContainerIterator* createIterator(void) const = 0;
 
 protected:
   // @access Protected members.
 
     // @cmember Compute the name of an element in this <c OMContainter>
     //          given the element's <p localKey>.
-  char* elementName(OMUInt32 localKey);
+  wchar_t* elementName(OMUInt32 localKey);
 
     // @cmember Obtain the next available local key.
   OMUInt32 nextLocalKey(void);
@@ -92,7 +95,5 @@ private:
   OMUInt32 _localKey;
 
 };
-
-#include "OMContainerPropertyT.h"
 
 #endif
