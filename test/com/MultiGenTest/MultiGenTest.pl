@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-# $Id: MultiGenTest.pl,v 1.4 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: MultiGenTest.pl,v 1.5 2005/03/17 02:52:41 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -410,6 +410,22 @@ sub LoadTest {
 }
 
 ######################################################################
+sub IsReadableByVersion
+{
+    my ( $createVersion, $readVersion ) = @_;
+
+    my $result;
+
+    if ( $CFG{IncompatibleVersions}{$readVersion} eq $createVersion ) {
+	$result = "false";
+    }
+    else {
+	$result = "true";
+    }
+
+    $result;
+}
+
 
 sub CreateTest {
 
@@ -430,9 +446,22 @@ sub CreateTest {
 
 		$what = "verify $filename by running $T on $Vp using $Vv with file impl $Vf";
 		print "${what}\n";
-		$status = VerifyFile( $Vp, $Vv, $Vf, $T, $filename );
-		TestStatus( $status, $what );
-		print "\n";
+
+		# Exclusion processing
+		my $excluded = 0;
+		if ( IsReadableByVersion( $Cv, $Vv ) eq "false" ) {
+		    print "Excluded: ${Cv} cannot be read by ${Vv}.\n\n";
+		    $excluded = 1;
+		}
+
+		if ( $excluded == 1 ) {
+		    $GlobalState{TestExcludedCount} += 1;
+		}
+		else {
+		    $status = VerifyFile( $Vp, $Vv, $Vf, $T, $filename );
+		    TestStatus( $status, $what );
+		    print "\n";
+		}
 	    } #Vf
 	} #Vv
     } #Vp
@@ -502,6 +531,10 @@ sub ModifyTest {
 		    print "Excluded: $Cp and $Mp byte order mismatch;\n\n";
 		    $exclude = 1;
 		}
+		elsif ( IsReadableByVersion( $Cv, $Mv ) eq "false" ) {
+		    print "Excluded: ${Cv} cannot be read by ${Mv}.\n";
+		    $excluded = 1;
+		}
 		
 		if ( $exclude == 1 ) {
 		    $GlobalState{TestExcludedCount} += 1;
@@ -533,6 +566,7 @@ sub ModifyTest {
 			    }
 			    else {
 				print "${what}\n";
+
 				my( $status ) = VerifyFile( $Vp, $Vv, $Vf, $T, $modify_filename );
 				TestStatus( $status, $what );
 				print "\n";
