@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -91,15 +91,15 @@ public:
 
 
   //****************
-  // RegisterNewPropertyDef()
+  // AppendNewPropertyDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterNewPropertyDef
+    AppendNewPropertyDef
         (// @parm [in] auid to be used to identify this property
          const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         const aafCharacter *  pName,
+         wchar_t *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -112,15 +112,15 @@ public:
 
 
   //****************
-  // RegisterOpionalPropertyDef()
+  // AppendOpionalPropertyDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterOptionalPropertyDef
+    AppendOptionalPropertyDef
         (// @parm [in] auid to be used to identify this property
          const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         const aafCharacter *  pName,
+         wchar_t *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -150,40 +150,11 @@ public:
         (ImplAAFClassDef ** ppClassDef);
 
 
-  //****************
-  // CreateInstance()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateInstance
-        // @parm [out, retval] newly created object
-        (ImplAAFObject ** ppobject);
-
-  //****************
-  // IsRoot()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    IsRoot
-        (aafBool* isRootClass);
-
 public:
 
   //
   // Non-published methods
   //
-
-  //****************
-  // SetParent()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetParent
-        (ImplAAFClassDef *pClassDef);
-
-  //****************
-  // SetBootstrapParent()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetBootstrapParent
-        (ImplAAFClassDef *pClassDef);
 
   //****************
   // pvtInitialize()
@@ -197,19 +168,19 @@ public:
         (const aafUID_t & classID,
 
 		// Inheritance parent of this class
-		const ImplAAFClassDef * pParentClassId,
+		const aafUID_t * pParentClassId,
 
 		// Human-legible name
 		const aafCharacter * pClassName);
 
 
-  // Private method to unconditionally register a property def (ignoring
+  // Private method to unconditionally append a property def (ignoring
   // whether or not property is optional or not, or if this class has
   // already been registered).
   AAFRESULT STDMETHODCALLTYPE
-    pvtRegisterPropertyDef
+    pvtAppendPropertyDef
         (const aafUID_t & id,
-         const aafCharacter *  pName,
+         wchar_t *  pName,
          const aafUID_t & typeId,
          aafBool  isOptional,
          ImplAAFPropertyDef ** ppPropDef);
@@ -217,7 +188,7 @@ public:
 
   // Appends an existing property def object.
   AAFRESULT STDMETHODCALLTYPE
-    pvtRegisterExistingPropertyDef
+    pvtAppendExistingPropertyDef
         (// PropertyDef to append
 		 ImplAAFPropertyDef * pPropDef);
 
@@ -233,11 +204,15 @@ public:
          // @parm [out] resulting property definition
          ImplAAFPropertyDef ** ppPropDef) const;
 
+
+  // Returns the AUID of the parent class.  Returns the NULL auid if
+  // this is the end of the line.
+  void pvtGetParentAUID (aafUID_t & result);
+
+
   // Make sure that the type definition of each property definition
   // has been loaded into memory.
   void AssurePropertyTypesLoaded ();
-
-  void InitOMProperties (ImplAAFObject * pObj);
 
 private:
 
@@ -250,7 +225,7 @@ private:
   class pvtPropertyIdentifier
   {
   public:
-	// Returns kAAFTrue if this property identifier matches the given
+	// Returns AAFTrue if this property identifier matches the given
 	// property definition.
 	virtual aafBool DoesMatch
     (const ImplAAFPropertyDef * pTestPropDef) const = 0;
@@ -299,11 +274,12 @@ private:
 
 
   // OMWeakReferenceProperty<ImplAAFClassDef> _ParentClass;
-  OMWeakReferenceProperty<ImplAAFClassDef>         _ParentClass;
+  OMFixedSizeProperty<aafUID_t>                       _ParentClass;
 
-  OMStrongReferenceSetProperty<ImplAAFPropertyDef> _Properties;
+  OMStrongReferenceVectorProperty<ImplAAFPropertyDef> _Properties;
 
-  ImplAAFClassDef	*_BootstrapParent;
+  // didn't use shorthand here in an attempt to avoid circular references
+  ImplAAFSmartPointer<ImplAAFClassDef> _cachedParentClass;
 
   bool _propTypesLoaded;
 };

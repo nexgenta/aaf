@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFPropValData_h__
@@ -45,12 +64,13 @@ ImplAAFTypeDefWeakObjRef::~ImplAAFTypeDefWeakObjRef ()
 {}
 
 
+/*
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefWeakObjRef::Initialize (
       const aafUID_t *  pID,
       const aafUID_t * pRefdObjID,
-      wchar_t *  pTypeName)
+      const aafCharacter * pTypeName)
 {
   if (! pID)       return AAFRESULT_NULL_PARAM;
   if (! pRefdObjID)  return AAFRESULT_NULL_PARAM;
@@ -68,6 +88,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   return AAFRESULT_SUCCESS;
 }
+*/
 
 
 
@@ -94,7 +115,7 @@ ImplAAFTypeDefWeakObjRef::GetObject (ImplAAFPropertyValue * pPropVal,
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefWeakObjRef::GetObjectType (ImplAAFClassDef ** ppObjType) const
+    ImplAAFTypeDefWeakObjRef::GetObjectType (ImplAAFClassDef ** ppObjType)
 {
   if (! ppObjType) return AAFRESULT_NULL_PARAM;
 
@@ -113,10 +134,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return hr;
 	  assert (pDict);
 
-	  ImplAAFTypeDefWeakObjRef * pNonConstThis =
-		  (ImplAAFTypeDefWeakObjRef *) this;
-	  aafUID_t id = _referencedType;
-	  hr = pDict->LookupClass (&id, &pNonConstThis->_cachedObjType);
+	  hr = pDict->LookupClass (_referencedType, &_cachedObjType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedObjType);
@@ -158,7 +176,7 @@ ImplAAFTypeDefSP ImplAAFTypeDefWeakObjRef::BaseType () const
 
 	  ImplAAFTypeDefWeakObjRef * pNonConstThis =
 		(ImplAAFTypeDefWeakObjRef *) this;
-	  hr = pDict->LookupType (&kAAFTypeID_AUID, &pNonConstThis->_cachedAuidType);
+	  hr = pDict->LookupType (kAAFTypeID_AUID, &pNonConstThis->_cachedAuidType);
 	  assert (AAFRESULT_SUCCEEDED(hr));
 	  assert (_cachedAuidType);
 	}
@@ -174,7 +192,9 @@ aafBool ImplAAFTypeDefWeakObjRef::IsFixedSize (void) const
 
 size_t ImplAAFTypeDefWeakObjRef::PropValSize (void) const
 {
-  return BaseType()->PropValSize();
+  // Temp change: currently weak refs are represented as auids.
+  // return BaseType()->PropValSize();
+  return sizeof (aafUID_t);
 }
 
 
@@ -186,7 +206,9 @@ aafBool ImplAAFTypeDefWeakObjRef::IsRegistered (void) const
 
 size_t ImplAAFTypeDefWeakObjRef::NativeSize (void) const
 {
-  return sizeof (ImplAAFObject*);
+  // Temp change: currently weak refs are represented as auids.
+  // return sizeof (ImplAAFObject*);
+  return sizeof (aafUID_t);
 }
 
 
