@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFOperationDef\
 #endm
@@ -29,14 +36,6 @@ AD_FORWARD_DECLARATION(EnumAAFParameterDefs)
 AD_FORWARD_DECLARATION(EnumAAFOperationDefs)
 AD_FORWARD_DECLARATION(AAFDataDef)
 
-
-/************************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\************************************************/
 
 AD_CLASS_UUID(14035d92, 1ff5, 11d2, bf, 97, 00, 60, 97, 11, 62, 12) 
 
