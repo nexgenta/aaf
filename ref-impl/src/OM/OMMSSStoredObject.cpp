@@ -58,7 +58,6 @@
 #include "OMMSStructuredStorage.h"
 #include "OMMSSStoredStream.h"
 #include "OMType.h"
-#include "OMUniqueObjectIdentType.h"
 
 const OMVersion currentVersion = 32;
 
@@ -154,7 +153,6 @@ OMMSSStoredObject* OMMSSStoredObject::openRead(OMRawStorage* rawStorage)
 {
   TRACE("OMMSSStoredObject::openRead");
   PRECONDITION("Valid raw storage", rawStorage != 0);
-  PRECONDITION("Compatible raw storage", rawStorage->isReadable());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::openFile(
                                                          rawStorage,
@@ -173,8 +171,6 @@ OMMSSStoredObject* OMMSSStoredObject::openModify(OMRawStorage* rawStorage)
   TRACE("OMMSSStoredObject::openModify");
 
   PRECONDITION("Valid raw storage", rawStorage != 0);
-  PRECONDITION("Compatible raw storage",
-                         rawStorage->isReadable() && rawStorage->isWritable());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::openFile(
                                                            rawStorage,
@@ -198,8 +194,6 @@ OMMSSStoredObject* OMMSSStoredObject::createModify(OMRawStorage* rawStorage,
   PRECONDITION("Valid raw storage", rawStorage != 0);
   PRECONDITION("Valid byte order",
                       (byteOrder == littleEndian) || (byteOrder == bigEndian));
-  PRECONDITION("Compatible raw storage",
-                         rawStorage->isReadable() && rawStorage->isWritable());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::createFile(rawStorage);
   newStore->create(byteOrder);
@@ -265,43 +259,11 @@ void OMMSSStoredObject::close(void)
   }
 }
 
-void OMMSSStoredObject::close(OMFile& file)
-{
-  TRACE("OMMSSStoredObject::close");
-
-  close();
-
-  if (file.accessMode() == OMFile::modifyMode) {
-    OMFileSignature signature = file.signature();
-    OMRawStorage* store = file.rawStorage();
-    if (store != 0) {
-      writeSignature(store, signature);
-    } else {
-      const wchar_t* fileName = file.fileName();
-      writeSignature(fileName, signature);
-    }
-  }
-}
-
 OMByteOrder OMMSSStoredObject::byteOrder(void) const
 {
   TRACE("OMMSSStoredObject::byteOrder");
 
   return _byteOrder;
-}
-
-void OMMSSStoredObject::save(OMFile& file)
-{
-  TRACE("OMMSSStoredObject::save(OMFile)");
-  file.root()->save();
-  save(file.referencedProperties());
-}
-
-void OMMSSStoredObject::save(OMStorable& object)
-{
-  TRACE("OMMSSStoredObject::save(OMFile)");
-  save(object.classId());
-  save(*object.propertySet());
 }
 
   // @mfunc Save the <c OMStoredObjectIdentification> <p id>
@@ -932,24 +894,17 @@ void OMMSSStoredObject::restore(OMStrongReferenceSet& set,
 
   for (size_t i = 0; i < entries; i++) {
     setIndex->iterate(context, localKey, count, key);
-    // Restore the object only if it doesn't already exist in the set.
-    // Since the object is uniquely identified by the key, the
-    // external copy is identical to the internal one, so we may
-    // safely ignore the external one.
-    //
-    if (!set.contains(key)) {
-      wchar_t* name = elementName(setName, setId, localKey);
-      OMStrongReferenceSetElement element(&set,
-                                          name,
-                                          localKey,
-                                          count,
-                                          key,
-                                          keySize);
-      element.restore();
-      set.insert(key, element);
-      delete [] name;
-      name = 0; // for BoundsChecker
-    }
+    wchar_t* name = elementName(setName, setId, localKey);
+    OMStrongReferenceSetElement element(&set,
+                                        name,
+                                        localKey,
+                                        count,
+                                        key,
+                                        keySize);
+    element.restore();
+    set.insert(key, element);
+    delete [] name;
+    name = 0; // for BoundsChecker
   }
   delete [] key;
   delete setIndex;
@@ -2772,65 +2727,6 @@ void OMMSSStoredObject::getClass(IStorage* storage, OMClassId& cid)
   check(status);
   ASSERT("IStorage::Stat() succeeded", SUCCEEDED(status));
   memcpy(&cid, &statstg.clsid, sizeof(OMClassId));
-}
-
-  // @mfunc Write the signature to the given raw storage.
-  //   @parm The raw storage.
-  //   @parm The signature.
-void OMMSSStoredObject::writeSignature(OMRawStorage* rawStorage,
-                                       const OMFileSignature& signature)
-{
-  TRACE("OMMSSStoredObject::writeSignature");
-
-  OMFileSignature sig = signature;
-  if (hostByteOrder() != littleEndian) {
-    OMByte* s = reinterpret_cast<OMByte*>(&sig);
-    size_t size = sizeof(OMUniqueObjectIdentification);
-    OMUniqueObjectIdentificationType::instance()->reorder(s, size);
-  }
-
-  OMUInt32 count;
-  rawStorage->writeAt(8,
-                      reinterpret_cast<const OMByte*>(&sig),
-                      sizeof(sig),
-                      count);
-  ASSERT("All bytes written", count == sizeof(sig));
-}
-
-  // @mfunc Write the signature to the given file.
-  //   @parm The file name.
-  //   @parm The signature.
-void OMMSSStoredObject::writeSignature(const wchar_t* fileName,
-                                       const OMFileSignature& signature)
-{
-  TRACE("OMMSSStoredObject::writeSignature");
-
-  PRECONDITION("Valid file name", validWideString(fileName));
-
-  OMFileSignature sig = signature;
-
-  // There's no ANSI function to open a file with a wchar_t* name.
-  // for now convert the name. In future add 
-  // FILE* fopen(const wchar_t* fileName, const wchar_t* mode);
-  //
-  char cFileName[256];
-  size_t status = wcstombs(cFileName, fileName, 256);
-  ASSERT("Convert succeeded", status != (size_t)-1);
-
-  if (hostByteOrder() != littleEndian) {
-    OMByte* s = reinterpret_cast<OMByte*>(&sig);
-    size_t size = sizeof(OMUniqueObjectIdentification);
-    OMUniqueObjectIdentificationType::instance()->reorder(s, size);
-  }
-
-  FILE* f = fopen(cFileName, "rb+");
-  ASSERT("File exists", f != 0);
-  status = fseek(f, 8, SEEK_SET);
-  ASSERT("Seek succeeded", status == 0);
-  status = fwrite(&sig, sizeof(sig), 1, f);
-  ASSERT("Write succeeded", status == 1);
-
-  fclose(f);
 }
 
 static void convert(char* cName, size_t length, const wchar_t* name)
