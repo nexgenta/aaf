@@ -1,40 +1,37 @@
 // >>> © 1998 Avid Technology, Inc.  All rights reserved. <<<
+#define __dest_os	__mac_os
 
-// Include the pre-compiled header that includes AAF.h
-#include "AAFHeaders.h"
+//#define CHECKMEMORYLEAKS // Uncomment this line to turn leak checking on
+
+#define _MAC
+#define NONAMELESSUNION
+
+#include "MacHeaders.h"
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-//
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-//
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-//
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+#if !defined(CDECL) && defined(_MSC_VER)
+#define CDECL	_cdecl
+#endif // CDECL
 
-// Conditional debugging and ansi assertions disabled
-#ifndef NDEBUG
-#define NDEBUG
+#if !defined(FAR)
+#define FAR
+#endif
+
+#include <ole2.h>
+#include "dispatch.h"
+#include "wintypes.h"
+#include <olectl.h>
+
+// Define to enable the module testing of the shared library.
+#define AAF_MODULE_TEST
+//#include "AXControlHeaders.h"
+#ifndef _DEBUG
+#define _DEBUG
 #endif
 
 
-// Enable PRECONDITION, POSTCONDITION, ASSERT, INVARIANT and IMPLIES macros.
+// AAF OM symbols
 //#define OM_ENABLE_DEBUG
-
-// Uncomment the following line if you want to see an exhausted list
-// of the calling sequence within the Object Manager.
 //#define OM_ENABLE_TRACE
+
+#define BOB_TEST
