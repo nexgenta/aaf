@@ -175,8 +175,7 @@ void OMDiskRawStorage::read(OMByte* bytes,
 {
   TRACE("OMDiskRawStorage::read");
 
-  PRECONDITION("Valid mode", (_mode == OMFile::modifyMode) ||
-                             (_mode == OMFile::readOnlyMode));
+  PRECONDITION("Readable", isReadable());
 
   read(_file, bytes, byteCount, bytesRead);
 }
@@ -199,8 +198,7 @@ void OMDiskRawStorage::write(const OMByte* bytes,
 {
   TRACE("OMDiskRawStorage::write");
 
-  PRECONDITION("Valid mode", (_mode == OMFile::modifyMode) ||
-                             (_mode == OMFile::writeOnlyMode));
+  PRECONDITION("Writable", isWritable());
 
   write(_file, bytes, byteCount, bytesWritten);
 }
@@ -249,8 +247,7 @@ void OMDiskRawStorage::setSize(OMUInt64 newSize)
   TRACE("OMDiskRawStorage::setSize");
 
   PRECONDITION("Sizeable", isSizeable());
-  PRECONDITION("Valid mode", (_mode == OMFile::modifyMode) ||
-                             (_mode == OMFile::writeOnlyMode));
+  PRECONDITION("Writable", isWritable());
 
   setSize(_file, newSize);
 }
@@ -300,6 +297,16 @@ void OMDiskRawStorage::setPosition(OMUInt64 newPosition)
   PRECONDITION("Positionable", isPositionable());
 
   setPosition(_file, newPosition);
+}
+
+  // @mfunc Synchronize this <c OMDiskRawStorage> with its external
+  //        representation.
+void OMDiskRawStorage::synchronize(void)
+{
+  TRACE("OMDiskRawStorage::synchronize");
+
+  int status = fflush(_file);
+  ASSERT("Successful flush", status == 0); // tjb - error
 }
 
 void OMDiskRawStorage::read(FILE* file,
