@@ -27,12 +27,13 @@
 
 // @doc OMINTERNAL
 #ifndef OMWEAKREFERENCEVECTOR_H
-#define OMwEAKREFERENCEVECTOR_H
+#define OMWEAKREFERENCEVECTOR_H
 
 #include "OMRefVectorProperty.h"
 
 template <typename Element>
 class OMContainerIterator;
+class OMWeakReferenceVectorElement;
 
   // @class Persistent elastic sequential collections of uniquely identified
   //        weakly referenced (non-contained) objects supported by the
@@ -51,6 +52,12 @@ public:
 
     // @cmember Destructor.
   virtual ~OMWeakReferenceVector(void);
+
+  virtual OMContainerIterator<OMWeakReferenceVectorElement>*
+                                                      iterator(void) const = 0;
+
+  virtual void insert(const size_t index,
+                      const OMWeakReferenceVectorElement& element) = 0;
 
     // @cmember Increase the capacity of this
     //          <c OMWeakReferenceVector> so that it
