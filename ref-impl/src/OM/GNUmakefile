@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.15 2004/10/09 16:18:23 jptrainor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.16 2004/10/12 10:34:00 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,12 +37,6 @@ endif
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
-# Remove OMMSSStoredObject.o fomr CXXOBJS list sine MIPSpro introduces
-# unusal linking behavior when this unused source file is built.
-ifeq ($(COMPILER),MIPSpro)
-CXXOBJS:=$(filter-out %/OMMSSStoredObject.o,$(CXXOBJS))
-endif
-
 INCLUDES = -I. \
 	   -I../../include/OM \
 	   -I$(AAFBASE)/ss-impl/ref \
@@ -53,9 +47,9 @@ INCLUDES = -I. \
 # E.g. "make LIBGSF_PATH=/usr/local"
 ifndef LIBGSF_PATH
 DEPS:=$(filter-out %/OMGSFStructuredStorage.d,$(DEPS))
-DEPS:=$(filter-out %/OMGSFxMSSStoredObjectFactory.d,$(DEPS))
+DEPS:=$(filter-out %/OMGSF_SSStoredObjectFactory.d,$(DEPS))
 CXXOBJS:=$(filter-out %/OMGSFStructuredStorage.o,$(CXXOBJS))
-CXXOBJS:=$(filter-out %/OMGSFxMSSStoredObjectFactory.o,$(CXXOBJS))
+CXXOBJS:=$(filter-out %/OMGSF_SSStoredObjectFactory.o,$(CXXOBJS))
 endif
 
 CFLAGS += -DOM_STACK_TRACE_ON_ASSERT
