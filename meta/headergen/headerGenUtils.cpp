@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: headerGenUtils.cpp,v 1.13 2004/02/27 18:14:57 phil_tudor Exp $ $Name:  $
+// $Id: headerGenUtils.cpp,v 1.13.2.1 2004/03/11 17:32:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,7 +68,7 @@ void printCopyright (ostream & s)
 "// the License for the specific language governing rights and limitations\n"
 "// under the License.\n"
 "//\n"
-"// The Original Code of this file is Copyright 1998-2002, Licensor of the\n"
+"// The Original Code of this file is Copyright 1998-2004, Licensor of the\n"
 "// AAF Association.\n"
 "//\n"
 "// The Initial Developer of the Original Code of this file and the\n"
