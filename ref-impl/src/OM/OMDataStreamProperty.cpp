@@ -1,12 +1,40 @@
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
+
 // @doc OMEXTERNAL
 #include "OMDataStreamProperty.h"
 
 #include "OMPropertySet.h"
 #include "OMStorable.h"
+#include "OMStoredObject.h"
 
 OMDataStreamProperty::OMDataStreamProperty(const OMPropertyId propertyId,
                                            const char* name)
-  : OMProperty(propertyId, TID_DATA_STREAM, name),_stream(0)
+  : OMProperty(propertyId, SF_DATA_STREAM, name),_stream(0)
 {
 }
 
@@ -21,11 +49,13 @@ void OMDataStreamProperty::save(void) const
   TRACE("OMDataStreamProperty::save");
 
   OMStoredObject* store = _propertySet->container()->store();
+  ASSERT("Valid store", store != 0);
+
   // Use the property name as the stream name
   //
   const char* streamName = name();
   store->write(_propertyId,
-               _type,
+               _storedForm,
                (void*)streamName,
                strlen(streamName) + 1);
 
@@ -38,28 +68,28 @@ void OMDataStreamProperty::save(void) const
   }
 }
 
-  // @mfunc Restore this <c OMDataStreamProperty> from the
-  //        <c OMStoredObject> <p s>, the size of the
+  // @mfunc Restore this <c OMDataStreamProperty>, the size of the
   //        <c OMDataStreamProperty> is <p size>.
-  //   @parm The <c OMStoredObject> from which to restore this
-  //         <c OMDataStreamProperty>.
   //   @parm The size of the <c OMDataStreamProperty>.
-void OMDataStreamProperty::restoreFrom(OMStoredObject& s, size_t size)
+void OMDataStreamProperty::restore(size_t size)
 {
-  TRACE("OMDataStreamProperty::restoreFrom");
+  TRACE("OMDataStreamProperty::restore");
 
   OMStoredObject* store = _propertySet->container()->store();
+  ASSERT("Valid store", store != 0);
+
   char* streamName = new char[size];
   ASSERT("Valid heap pointer", streamName != 0);
   store->read(_propertyId,
-              _type,
+              _storedForm,
               streamName,
               size);
-  ASSERT("Consistent stream and property names",
-         strcmp(streamName, name()) == 0);
+  ASSERT("Consistent property size", size == strlen(streamName) + 1);
+  ASSERT("Consistent property name", strcmp(streamName, name()) == 0);
   delete [] streamName;
 
   open();
+  setPresent();
 
   POSTCONDITION("Properly opened stream", _stream != 0);
 }
@@ -206,8 +236,7 @@ void OMDataStreamProperty::read(OMByte* buffer,
 
   ASSERT("Valid stream", _stream != 0);
   OMStoredObject* s = _propertySet->container()->store();
-  s->readFromStream(_stream, buffer, bytes);
-  bytesRead = bytes; // tjb
+  s->readFromStream(_stream, buffer, bytes, bytesRead);
 }
 
   // @mfunc  Attempt to write the number of bytes given by <p bytes>
@@ -229,8 +258,34 @@ void OMDataStreamProperty::write(const OMByte* buffer,
   ASSERT("Valid stream", _stream != 0);
 
   OMStoredObject* s = _propertySet->container()->store();
-  s->writeToStream(_stream, (void*)buffer, bytes);
-  bytesWritten = bytes; // tjb
+  s->writeToStream(_stream, buffer, bytes, bytesWritten);
+}
+
+  // @mfunc The size of the raw bits of this
+  //        <c OMDataStreamProperty>. The size is given in bytes.
+  //   @rdesc The size of the raw bits of this
+  //          <c OMDataStreamProperty> in bytes.
+  //   @this const
+size_t OMDataStreamProperty::bitsSize(void) const
+{
+  TRACE("OMDataStreamProperty::bitsSize");
+
+  return sizeof(IStream*);
+}
+
+  // @mfunc Get the raw bits of this <c OMDataStreamProperty>.
+  //        The raw bits are copied to the buffer at address <p bits> which
+  //        is <p size> bytes in size.
+  //   @parm The address of the buffer into which the raw bits are copied.
+  //   @parm The size of the buffer.
+  //   @this const
+void OMDataStreamProperty::getBits(OMByte* bits, size_t size) const
+{
+  TRACE("OMDataStreamProperty::getBits");
+  PRECONDITION("Valid bits", bits != 0);
+  PRECONDITION("Valid size", size >= bitsSize());
+
+  memcpy(bits, &_stream, bitsSize());
 }
 
 
