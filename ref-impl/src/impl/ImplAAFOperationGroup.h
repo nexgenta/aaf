@@ -38,18 +38,13 @@
 
 
 class ImplAAFDataDef;
-
 class ImplAAFOperationDef;
-
 class ImplAAFParameter;
-
 class ImplEnumAAFOperationDefs;
-
 class ImplEnumAAFParameterDefs;
-
 class ImplAAFSegment;
-
 class ImplAAFSourceReference;
+class ImplEnumAAFParameters;
 
 #ifndef __ImplAAFParameter_h__
 #include "ImplAAFParameter.h"
@@ -85,7 +80,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] Data Definition Object
-         const aafUID_t & datadef,
+         ImplAAFDataDef * pDataDef,
 
 
          // @parm [in] Length property value
@@ -141,20 +136,20 @@ public:
 	//@comm Replaces omfiEffectGetBypassOverride
 
   //****************
-  // GetNumSourceSegments()
+  // CountSourceSegments()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumSourceSegments
+    CountSourceSegments
         // @parm [out] Number of source media segments in the effect
         (aafInt32 *  numSources);
 	//@comm Replaces omfiEffectGetNumSlots
 
 
   //****************
-  // GetNumParameters()
+  // CountParameters()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumParameters
+    CountParameters
         // @parm [out] Number of parameter slots in the effect
         (aafInt32 *  numParameters);
 	//@comm Replaces omfiEffectGetNumSlots
@@ -168,20 +163,40 @@ public:
         (aafBool *  validTransition);
 
   //****************
-  // AddNewParameter()
+  // AddParameter()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddNewParameter
+    AddParameter
         (// @parm [in] Parameter to place in effect slot
          ImplAAFParameter * value);
 	//@comm Replaces part of omfiEffectAddNewSlot
 
   //****************
-  // AddNewInputSegment()
+  // AppendInputSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendNewInputSegment
+    AppendInputSegment
         (// @parm [in] Segment to place in effect
+         ImplAAFSegment * value);
+	//@comm Replaces part of omfiEffectAddNewSlot
+
+  //****************
+  // PrependInputSegment()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    PrependInputSegment
+        (// @parm [in] Segment to place in effect
+         ImplAAFSegment * value);
+	//@comm Replaces part of omfiEffectAddNewSlot
+
+  //****************
+  // PrependInputSegment()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    InsertInputSegmentAt
+        (// @parm [in] index to place segment
+         aafUInt32 index,
+	     // @parm [in] Segment to place in effect
          ImplAAFSegment * value);
 	//@comm Replaces part of omfiEffectAddNewSlot
 
@@ -207,7 +222,7 @@ public:
   // GetParameterByArgID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetParameterByArgID
+    LookupParameter
         (// @parm [in] Arg ID
          aafArgIDType_t  argID,
 
@@ -215,15 +230,31 @@ public:
          ImplAAFParameter ** parameter);
 
   //****************
+  // GetParameters()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetParameters
+        (// @parm [out] enumerator across parameters
+         ImplEnumAAFParameters ** ppEnum);
+
+  //****************
   // GetIndexedInputSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIndexedInputSegment
+    GetInputSegmentAt
         (// @parm [in] 1-based index into the effet inputs
-         aafInt32  index,
+         aafUInt32  index,
 
          // @parm [out] Input segment
          ImplAAFSegment ** inputSegment);
+
+  //****************
+  // GetIndexedInputSegment()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveInputSegmentAt
+        (// @parm [in] 1-based index into the effet inputs
+         aafUInt32  index);
 
 private:
 	OMFixedSizeProperty<aafUID_t>						_operationDefinition;
