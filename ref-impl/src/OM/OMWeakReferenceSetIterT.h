@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,8 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. |
-//         OMWeakReferenceSetIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMWeakReferenceSetIterator> over the given
@@ -66,7 +64,7 @@ OMWeakReferenceSetIterator<ReferencedObject>::~OMWeakReferenceSetIterator(void)
   //   @rdesc The new <c OMWeakReferenceSetIterator>.
   //   @this const
 template <typename ReferencedObject>
-OMReferenceContainerIterator*
+OMReferenceContainerIterator<ReferencedObject>*
                  OMWeakReferenceSetIterator<ReferencedObject>::copy(void) const
 {
   TRACE("OMWeakReferenceSetIterator<ReferencedObject>::copy");
@@ -207,14 +205,10 @@ OMWeakReferenceSetIterator<ReferencedObject>::value(void) const
 {
   TRACE("OMWeakReferenceSetIterator<ReferencedObject>::value");
 
-  const SetElement& element = _iterator.value();
+  const OMWeakReferenceSetElement<ReferencedObject>&
+                                                   element = _iterator.value();
 
-  OMStorable* p = element.getValue();
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  }
+  ReferencedObject* result = element.getValue();
 
   POSTCONDITION("Valid result", result != 0);
   return result;
@@ -240,28 +234,9 @@ OMWeakReferenceSetIterator<ReferencedObject>::setValue(
   PRECONDITION("Matching keys",
     IMPLIES(newObject != 0 , newObject->identification() == identification()));
 
-  SetElement& element = _iterator.value();
+  OMWeakReferenceSetElement<ReferencedObject>& element = _iterator.value();
 
   ReferencedObject* result = element.setValue(newObject);
-
-  return result;
-}
-
-  // @mfunc Set the <p ReferencedObject> in the associated
-  //        <c OMWeakReferenceSetProperty> at the position currently
-  //        designated by this <c OMWeakReferenceSetIterator> to 0.
-  //        The previous <p ReferencedObject>, if any, is returned.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The previous <p ReferencedObject> if any, otherwise 0.
-template <typename ReferencedObject>
-ReferencedObject*
-OMWeakReferenceSetIterator<ReferencedObject>::clearValue(void)
-{
-  TRACE("OMWeakReferenceSetIterator<ReferencedObject>::clearValue");
-
-  SetElement& element = _iterator.value();
-
-  ReferencedObject* result = element.setValue(0);
 
   return result;
 }
@@ -281,30 +256,14 @@ OMWeakReferenceSetIterator<ReferencedObject>::identification(void) const
   return _iterator.key();
 }
 
-  // @mfunc Return the <c OMObject> in the associated
-  //        <c OMWeakReferenceSetProperty> at the position currently
-  //        designated by this <c OMWeakReferenceSetIterator>.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The <c OMObject> at the current position.
-  //   @this const
-template <typename ReferencedObject>
-OMObject*
-OMWeakReferenceSetIterator<ReferencedObject>::currentObject(void) const
-{
-  TRACE("OMWeakReferenceSetIterator<ReferencedObject>::currentObject");
-
-  OMObject* result = value();
-
-  return result;
-}
-
   // @mfunc Create an <c OMWeakReferenceSetIterator> given
   //        an underlying <c OMSetIterator>.
   //   @tcarg class | ReferencedObject | The type of the contained objects.
   //   @parm The underlying <c OMSetIterator>.
 template <typename ReferencedObject>
 OMWeakReferenceSetIterator<ReferencedObject>::OMWeakReferenceSetIterator(
-                                                       const SetIterator& iter)
+       const OMSetIterator<OMUniqueObjectIdentification,
+	                       OMWeakReferenceSetElement<ReferencedObject> >& iter)
   : _iterator(iter) // probably bitwise
 {
 }

@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,8 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. |
-//         OMWeakReferenceVectorIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMWeakReferenceVectorIterator> over the given
@@ -68,7 +66,7 @@ OMWeakReferenceVectorIterator<ReferencedObject>::
   //   @rdesc The new <c OMWeakReferenceVectorIterator>.
   //   @this const
 template <typename ReferencedObject>
-OMReferenceContainerIterator*
+OMReferenceContainerIterator<ReferencedObject>*
               OMWeakReferenceVectorIterator<ReferencedObject>::copy(void) const
 {
   TRACE("OMWeakReferenceVectorIterator<ReferencedObject>::copy");
@@ -209,14 +207,10 @@ OMWeakReferenceVectorIterator<ReferencedObject>::value(void) const
 {
   TRACE("OMWeakReferenceVectorIterator<ReferencedObject>::value");
 
-  const VectorElement& element = _iterator.value();
+  const OMWeakReferenceVectorElement<ReferencedObject>&
+                                                   element = _iterator.value();
 
-  OMStorable* p = element.getValue();
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  }
+  ReferencedObject* result = element.getValue();
 
   POSTCONDITION("Valid result", result != 0);
   return result;
@@ -237,28 +231,9 @@ OMWeakReferenceVectorIterator<ReferencedObject>::setValue(
 {
   TRACE("OMWeakReferenceVectorIterator<ReferencedObject>::setValue");
 
-  VectorElement& element = _iterator.value();
+  OMWeakReferenceVectorElement<ReferencedObject>& element = _iterator.value();
 
   ReferencedObject* result = element.setValue(newObject);
-
-  return result;
-}
-
-  // @mfunc Set the <p ReferencedObject> in the associated
-  //        <c OMWeakReferenceVectorProperty> at the position currently
-  //        designated by this <c OMWeakReferenceVectorIterator> to 0.
-  //        The previous <p ReferencedObject>, if any, is returned.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The previous <p ReferencedObject> if any, otherwise 0.
-template <typename ReferencedObject>
-ReferencedObject*
-OMWeakReferenceVectorIterator<ReferencedObject>::clearValue(void)
-{
-  TRACE("OMWeakReferenceVectorIterator<ReferencedObject>::clearValue");
-
-  VectorElement& element = _iterator.value();
-
-  ReferencedObject* result = element.setValue(0);
 
   return result;
 }
@@ -288,26 +263,10 @@ OMWeakReferenceVectorIterator<ReferencedObject>::identification(void) const
 {
   TRACE("OMWeakReferenceVectorIterator<ReferencedObject>::identification");
 
-  const VectorElement& element = _iterator.value();
+  const OMWeakReferenceVectorElement<ReferencedObject>&
+                                                   element = _iterator.value();
 
   return element.identification();
-}
-
-  // @mfunc Return the <c OMObject> in the associated
-  //        <c OMWeakReferenceVectorProperty> at the position currently
-  //        designated by this <c OMWeakReferenceVectorIterator>.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The <c OMObject> at the current position.
-  //   @this const
-template <typename ReferencedObject>
-OMObject*
-OMWeakReferenceVectorIterator<ReferencedObject>::currentObject(void) const
-{
-  TRACE("OMWeakReferenceVectorIterator<ReferencedObject>::currentObject");
-
-  OMObject* result = value();
-
-  return result;
 }
 
   // @mfunc Create an <c OMWeakReferenceVectorIterator> given
@@ -316,7 +275,8 @@ OMWeakReferenceVectorIterator<ReferencedObject>::currentObject(void) const
   //   @parm The underlying <c OMVectorIterator>.
 template <typename ReferencedObject>
 OMWeakReferenceVectorIterator<ReferencedObject>::OMWeakReferenceVectorIterator(
-                                                    const VectorIterator& iter)
+  const OMVectorIterator<
+                        OMWeakReferenceVectorElement<ReferencedObject> >& iter)
   : _iterator(iter) // probably bitwise
 {
 }
