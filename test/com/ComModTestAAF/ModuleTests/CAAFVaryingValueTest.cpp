@@ -421,8 +421,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafMobID_t			readSourceID;
   aafUID_t  testInterpID, checkInterpID = LinearInterpolator;
 	aafBool				readIsTimeWarp;
-	aafInt32			checkNumInputs, testNumSources, testNumParam;
-	aafUInt32			checkBypass;
+	aafUInt32			checkBypass, testNumSources, testNumParam;
+	aafInt32			checkNumInputs;
 	HRESULT				hr = S_OK;
 	wchar_t				checkName[256];
 	aafUID_t			checkCat;
@@ -671,8 +671,9 @@ extern "C" HRESULT CAAFVaryingValue_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFVaryingValue_test...Caught general C++ exception!" << endl; 
-    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+		cerr << "CAAFVaryingValue_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
