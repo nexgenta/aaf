@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.59 2004/10/22 14:04:11 phil_tudor Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.60 2004/10/25 13:29:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1573,7 +1573,7 @@ AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
 		CHECK(fillSwappedWAVEData(&ptr, 2L, (void *) &numCh));
 	
 		if (_sampleRate.denominator != 0)
-			samplesPerSec = (long) FloatFromRational(_sampleRate);
+			samplesPerSec = (aafInt32) FloatFromRational(_sampleRate);
 		else
 			samplesPerSec = 0;
 		CHECK(fillSwappedWAVEData(&ptr, 4L, (void *) &samplesPerSec));

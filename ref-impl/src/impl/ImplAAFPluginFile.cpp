@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginFile.cpp,v 1.9 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPluginFile.cpp,v 1.10 2004/10/25 13:22:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -105,7 +105,7 @@ aafUInt32 ImplAAFPluginFile::AcquireReference() const
 {  
   ImplAAFPluginFile *nonConstThis = const_cast<ImplAAFPluginFile *>(this);
 #if defined( OS_WINDOWS )
-	return ::InterlockedIncrement(reinterpret_cast<long *>(&nonConstThis->_refCount));
+	return ::InterlockedIncrement(reinterpret_cast<int *>(&nonConstThis->_refCount));
 #else
   ++(nonConstThis->_refCount);
 #endif
@@ -116,7 +116,7 @@ aafUInt32 ImplAAFPluginFile::AcquireReference() const
 aafUInt32 ImplAAFPluginFile::ReleaseReference()
 {
 #if defined( OS_WINDOWS )
-	aafUInt32 count = ::InterlockedDecrement(reinterpret_cast<long *>(&_refCount));
+	aafUInt32 count = ::InterlockedDecrement(reinterpret_cast<int *>(&_refCount));
 #else
 	aafUInt32 count = --(_refCount);
 #endif

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPulldown.cpp,v 1.22 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPulldown.cpp,v 1.23 2004/10/25 13:22:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -326,7 +326,7 @@ AAFRESULT ImplAAFPulldown::GetRemFramesDrop(aafUInt32 maskBits,
 							aafUInt32 masksize,
 							aafInt32 *result)
 {
-  long remMask, maskBitsLeft;
+  int remMask, maskBitsLeft;
   aafInt32 ret;
   unsigned char phasePtr;
 
@@ -359,7 +359,7 @@ AAFRESULT ImplAAFPulldown::GetRemFramesDouble(aafUInt32 maskBits,
 							aafUInt32 masksize,
 							aafInt32 *result)
 {
-  long remMask, maskBitsLeft;
+  int remMask, maskBitsLeft;
   aafInt32 ret;
   aafUInt32 phasePtr;
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFClassFactory.h,v 1.8 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: CAAFClassFactory.h,v 1.9 2004/10/25 13:25:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,7 @@
 
 // We need the following definition for a bool type since
 // the Win32 used BOOL as an int and ActiveX SDK, MacOLE use
-// unsigned long for OLEBOOL.
+// unsigned int for OLEBOOL.
 // NOTE: We may have to move this definition to AAFTypes.h.
 #if defined(_MAC) || defined(_MAC_) || defined(macintosh)
 #define AAFBOOL OLEBOOL

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFServer.cpp,v 1.7 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: CAAFServer.cpp,v 1.8 2004/10/25 13:25:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,7 +82,7 @@ aafUInt32 CAAFServer::GetActiveObjectCount()
 aafUInt32 CAAFServer::InterlockedIncrement(aafUInt32 *value)
 {
 #if defined( OS_WINDOWS )
-	return ::InterlockedIncrement(reinterpret_cast<long *>(value));
+	return ::InterlockedIncrement(reinterpret_cast<int *>(value));
 #else
 	return (++(*value));
 #endif
@@ -90,7 +90,7 @@ aafUInt32 CAAFServer::InterlockedIncrement(aafUInt32 *value)
 aafUInt32 CAAFServer::InterlockedDecrement(aafUInt32 *value)
 {
 #if defined( OS_WINDOWS )
-	return ::InterlockedDecrement(reinterpret_cast<long *>(value));
+	return ::InterlockedDecrement(reinterpret_cast<int *>(value));
 #else
 	return (--(*value));
 #endif

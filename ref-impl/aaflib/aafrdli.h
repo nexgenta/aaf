@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafrdli.h,v 1.8 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: aafrdli.h,v 1.9 2004/10/25 13:30:39 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@
 typedef void * AAFLibraryHandle;
 typedef void * AAFSymbolAddr;
 typedef void * AAFUserData;
-typedef long AAFRDLIRESULT;
+typedef int AAFRDLIRESULT;
 
 
 
