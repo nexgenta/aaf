@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFEssenceSampleStream\
 #endm
@@ -12,8 +5,16 @@ AAFEssenceSampleStream\
 AAFRoot\
 #endm
 #c
-#c #import ./AAFObject.exp
+#import ./AAFObject.exp
 AD_HEAD
+/************************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+* Copyright (c) 1998-1999 Microsoft Corporation	*
+*												*
+\************************************************/
 
 // AAFEssenceSampleStream provides a sample-based stream for accessing essence data in
 // its raw form.   For example to read or write JFIF data as opposed to the decompressed
@@ -44,10 +45,11 @@ Writes pre-interleaved data to a essence stream.)
 	//@comm Possible Errors:
 	// Standard errors (see top of file).
 	// OM_ERR_BADDATAADDRESS -- The buffer must not be a NULL pointer.
+	//@comm Replaces omfmWriteRawData
 	
 /****/
 AD_METHOD5(ReadRawData,
-[in],aafUInt32,nSamples,read this many samples,
+[in],aafUInt32,nSamples,write this many samples,
 [in],aafUInt32,buflen,to a buffer of this size,
 [out\\\, size_is\\\(buflen\\\)\\\, length_is\\\(*bytesRead\\\)],aafDataBuffer_t,buffer,here is the buffer,
 [out\\\,ref],aafUInt32 *,bytesRead,,
@@ -58,5 +60,6 @@ Read pre-interleaved data from a essence stream.)
 	//@comm Possible Errors:
 	// Standard errors (see top of file).
 	// OM_ERR_BADDATAADDRESS -- The buffer must not be a NULL pointer.
+	//@comm Replaces omfmReadRawData
 
 AD_XCLASS_END(Concrete, Transient)
