@@ -1,28 +1,30 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 
 #include <stdio.h>
 #include <string.h>
@@ -31,6 +33,9 @@
 // Include the AAF interface declarations.
 #include "AAF.h"
 
+#if defined(macintosh) || defined(_MAC)
+#include "DataInput.h"
+#endif
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
 {
@@ -52,7 +57,7 @@ static HRESULT moduleErrorTmp = S_OK;/* note usage in macro */
 
 static void convert(wchar_t* wcName, size_t length, const char* name)
 {
-  assert((name && *name), "Valid input name");
+  assert((name /* && *name */), "Valid input name");
   assert(wcName != 0, "Valid output buffer");
   assert(length > 0, "Valid output buffer size");
   
@@ -65,7 +70,7 @@ static void convert(wchar_t* wcName, size_t length, const char* name)
 
 static void convert(char* cName, size_t length, const wchar_t* name)
 {
-  assert((name && *name), "Valid input name");
+  assert((name /* && *name */), "Valid input name");
   assert(cName != 0, "Valid output buffer");
   assert(length > 0, "Valid output buffer size");
 
@@ -78,7 +83,7 @@ static void convert(char* cName, size_t length, const wchar_t* name)
 
 static void convert(char* cName, size_t length, const char* name)
 {
-  assert((name && *name), "Valid input name");
+  assert((name /* && *name */), "Valid input name");
   assert(cName != 0, "Valid output buffer");
   assert(length > 0, "Valid output buffer size");
 
@@ -93,7 +98,7 @@ static void convert(char* cName, size_t length, const char* name)
 
 static void convert(wchar_t* wName, size_t length, const wchar_t* name)
 {
-  assert((name && *name), "Valid input name");
+  assert((name /* && *name */), "Valid input name");
   assert(wName != 0, "Valid output buffer");
   assert(length > 0, "Valid output buffer size");
 
@@ -163,7 +168,7 @@ static void ReadAAFFile(aafWChar * pFileName)
         pIdent = NULL;
 
         aafNumSlots_t n;
-        hr = pHeader->GetNumMobs(kAllMob, &n);
+        hr = pHeader->CountMobs(kAAFAllMob, &n);
         check(hr);
         printf("Number of Mobs       = %d\n", n);
       }
@@ -178,20 +183,6 @@ static void ReadAAFFile(aafWChar * pFileName)
     pFile = NULL;
   }
 }
-
-// simple helper class to initialize and cleanup COM library.
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
 
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
@@ -223,7 +214,6 @@ int main(int argumentCount, char* argumentVector[])
   wchar_t wInputFileName[256];
   convert(wInputFileName, 256, inputFileName);
 
-  CComInitialize comInit;
   CAAFInitialize aafInit;
 
   ReadAAFFile(wInputFileName);

@@ -39,6 +39,10 @@
 
 #include "CAAFBuiltinDefs.h"
 
+#if defined(macintosh) || defined(_MAC)
+#include "DataInput.h"
+#endif
+
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
 {
@@ -112,10 +116,44 @@ static void convert(wchar_t* wName, size_t length, const wchar_t* name)
     while (*wName++ = *name++)
       ;
   } else {
-    fprintf(stderr, "\nError : Failed to copy '%s'.\n\n", name);
+    fprintf(stderr, "\nError : Failed to copy string.\n\n");
     exit(1);  
   }
 }
+
+#if defined(__sgi) || defined(__linux__) || defined (__FreeBSD__)
+
+static const unsigned char guidMap[] =
+{ 3, 2, 1, 0, '-', 5, 4, '-', 7, 6, '-', 8, 9, '-', 10, 11, 12, 13, 14, 15 }; 
+static const wchar_t digits[] = L"0123456789ABCDEF"; 
+
+#define GUIDSTRMAX 38 
+
+typedef OLECHAR OMCHAR;
+
+int StringFromGUID2(const GUID& guid, OMCHAR* buffer, int bufferSize) 
+{
+  const unsigned char* ip = (const unsigned char*) &guid; // input pointer
+  OMCHAR* op = buffer;                                    // output pointer
+
+  *op++ = L'{'; 
+ 
+  for (size_t i = 0; i < sizeof(guidMap); i++) { 
+
+    if (guidMap[i] == '-') { 
+      *op++ = L'-'; 
+    } else { 
+      *op++ = digits[ (ip[guidMap[i]] & 0xF0) >> 4 ]; 
+      *op++ = digits[ (ip[guidMap[i]] & 0x0F) ]; 
+    } 
+  } 
+  *op++ = L'}'; 
+  *op = L'\0'; 
+ 
+  return GUIDSTRMAX; 
+} 
+
+#endif
 
 // The maximum number of characters in the formated CLSID.
 // (as returned by StringFromGUID2).
@@ -208,6 +246,7 @@ static void ReadAAFFile(aafWChar * pFileName)
 
 
   hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
+  check(hr);
   if (SUCCEEDED(hr))
   {
     IAAFHeader * pHeader = NULL;
@@ -238,7 +277,7 @@ static void ReadAAFFile(aafWChar * pFileName)
           pIdent = NULL;
         }
 
-        hr = pHeader->CountMobs(kAllMob, &numMobs);
+        hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
         check(hr); // display error message
         if (FAILED(hr))
           numMobs = 0;
@@ -250,7 +289,7 @@ static void ReadAAFFile(aafWChar * pFileName)
         if (SUCCEEDED(hr))
         {
           //!!!  aafSearchCrit_t    criteria;
-          //!!!  criteria.searchTag = kNoSearch;
+          //!!!  criteria.searchTag = kAAFNoSearch;
           hr = pHeader->GetMobs (NULL, &mobIter);
           check(hr); // display error message
         }
@@ -336,7 +375,6 @@ static void ReadAAFFile(aafWChar * pFileName)
                   check(hr); // display error message
                   if(SUCCEEDED(hr))
                   {
-                    assert ((numLocators >= 0), "numLocators written");
                     printf ("    It has %d locator%s attached.\n",
                             numLocators,
                             numLocators==1 ? "" : "s");
@@ -425,20 +463,23 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary *pDictionary = NULL;
   aafProductIdentification_t  ProductInfo;
   aafMobID_t          newMobID;
-  
+ 
   // delete any previous test file before continuing...
   char chFileName[1000];
   convert(chFileName, sizeof(chFileName), pFileName);
   remove(chFileName);
 
   // Create a new file...
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
+
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"Make AVR Example";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -465,6 +506,8 @@ static void CreateAAFFile(aafWChar * pFileName)
   IAAFEssenceDescriptor *essenceDesc = NULL;
   aafRational_t  audioRate = { 44100, 1 };
   IAAFLocator    *pLocator = NULL;
+	IAAFComponent*		pComponent = NULL;
+	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
 
   for(test = 0; test < 5; test++)
   {
@@ -478,11 +521,16 @@ static void CreateAAFFile(aafWChar * pFileName)
     check(pMob->SetMobID(newMobID));
     check(pMob->SetName(names[test]));
 
-    check(defs.cdFileDescriptor()->
+	// Create a concrete subclass of FileDescriptor
+    check(defs.cdAIFCDescriptor()->
 		  CreateInstance(IID_IAAFFileDescriptor, 
 						 (IUnknown **)&fileDesc));
     check(fileDesc->SetSampleRate(audioRate));
     check(fileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&essenceDesc));
+	check(fileDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+	check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+	pAIFCDesc->Release();
+	pAIFCDesc = NULL;
 
     {
       HRESULT stat;
@@ -502,6 +550,10 @@ static void CreateAAFFile(aafWChar * pFileName)
        check(defs.cdSourceClip()->
 			 CreateInstance(IID_IAAFSourceClip, 
 							(IUnknown **)&sclp));
+		 check(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 check(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
       check(pMob->AppendNewTimelineSlot
 			(editRate,
@@ -547,6 +599,9 @@ static void CreateAAFFile(aafWChar * pFileName)
   pDictionary->Release();
   pDictionary = NULL;
 
+	if (pComponent)
+		pComponent->Release();
+
   pHeader->Release();
   pHeader = NULL;
   check(pFile->Save());
@@ -556,19 +611,6 @@ static void CreateAAFFile(aafWChar * pFileName)
 
 }
 
-// simple helper class to initialize and cleanup COM library.
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
 
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
@@ -587,9 +629,8 @@ struct CAAFInitialize
 };
 
 
-int main()
+int main(int argc, char *argv[])
 {
-  CComInitialize comInit;
   CAAFInitialize aafInit;
 
   aafWChar * pwFileName = L"Foo.aaf";
