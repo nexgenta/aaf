@@ -31,6 +31,8 @@
 #include "ImplAAFSequence.h"
 
 #include "AAFStoredObjectIDs.h"
+#include "AAFClassIDs.h"
+#include "ImplAAFDictionary.h"
 
 
 ImplAAFSegment::ImplAAFSegment ()
@@ -129,6 +131,8 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 		{
 			*found = AAFTrue;
 			*subseg = this;
+			// We are returning a reference to this object so bump the ref count
+			AcquireReference();
 			*sequPosPtr = 0;
 		}
 		else
@@ -158,18 +162,29 @@ AAFRESULT ImplAAFSegment::TraverseToClip(aafLength_t length,
 
 AAFRESULT ImplAAFSegment::GenerateSequence(ImplAAFSequence **seq)
 {
-	ImplAAFSequence	*tmp;
+  ImplAAFDictionary *pDictionary = NULL;
+	ImplAAFSequence	*tmp = NULL;
 // ***	ImplAAFDataDef	*datakind;
 				
 	XPROTECT( )
 	{
 // ***	CHECK(GetDatakind(&datakind));
-		tmp = new ImplAAFSequence();
+    CHECK(GetDictionary(&pDictionary));
+    tmp = (ImplAAFSequence *)pDictionary->CreateImplObject(AUID_AAFSequence);
+    if (NULL == tmp)
+      RAISE(AAFRESULT_NOMEMORY);
+    pDictionary->ReleaseReference();
+    pDictionary = NULL;
+
 		CHECK(tmp->AppendComponent(this));
 		*seq = tmp;
 	} /* XPROTECT */
 	XEXCEPT
 	{
+    if (tmp)
+      tmp->ReleaseReference();
+    if(pDictionary != NULL)
+      pDictionary->ReleaseReference();
 	}
 	XEND;
 

@@ -25,7 +25,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-extern "C" const aafClassID_t CLSID_AAFSourceClip;
 extern "C" const aafClassID_t CLSID_AAFEssenceAccess;
 
 ImplAAFMasterMob::ImplAAFMasterMob ()
@@ -106,6 +105,8 @@ AAFRESULT STDMETHODCALLTYPE
 	aafSourceRef_t		ref;
 	aafPosition_t		zeroPos;
 	ImplAAFMobSlot	*pNewSlot = NULL;
+  ImplAAFDictionary *pDictionary = NULL;
+
 
 	if (!pDataDef || !pSourceMob || !pSlotName)
 		return AAFRESULT_NULL_PARAM;
@@ -138,10 +139,12 @@ AAFRESULT STDMETHODCALLTYPE
 		ref.sourceID = sourceMobID;
 		ref.sourceSlotID = sourceSlotID;
 		ref.startTime = zeroPos;
-
-		pSrcClip = (ImplAAFSourceClip *)CreateImpl(CLSID_AAFSourceClip);
+		CHECK(GetDictionary(&pDictionary));
+		pSrcClip = (ImplAAFSourceClip *)pDictionary->CreateImplObject(AUID_AAFSourceClip);
 		if(pSrcClip == NULL)
 			RAISE(E_FAIL);
+		pDictionary->ReleaseReference();
+		pDictionary = NULL;
 
 		CHECK(pSrcClip->Initialize(pDataDef, &slotLength, ref));
 		CHECK(AppendNewSlot(pSrcClip, masterSlotID, pSlotName, &pNewSlot));
@@ -161,6 +164,8 @@ AAFRESULT STDMETHODCALLTYPE
 			pNewSlot->ReleaseReference();
 		if(pSrcClip != NULL)
 			pSrcClip->ReleaseReference();
+		if(pDictionary != NULL)
+			pDictionary->ReleaseReference();
 	}
 	XEND;
 	return hr;
@@ -451,10 +456,10 @@ AAFRESULT STDMETHODCALLTYPE
 									aafPosition_t			offset,
 									aafMobKind_t			mobKind,
 									aafMediaCriteria_t*		pMediaCrit,
-									aafEffectChoice_t*		pEffectChoice,
+									aafOperationChoice_t*	pOperationChoice,
 									ImplAAFFindSourceInfo**	ppSourceInfo)
 {
-	return(InternalSearchSource(slotID, offset, mobKind, pMediaCrit, pEffectChoice,
+	return(InternalSearchSource(slotID, offset, mobKind, pMediaCrit, pOperationChoice,
 										   ppSourceInfo));
 }
 
