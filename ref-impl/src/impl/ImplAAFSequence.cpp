@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.cpp,v 1.58.2.2 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
+// $Id: ImplAAFSequence.cpp,v 1.58.2.3 2004/08/05 19:58:25 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -656,7 +656,7 @@ AAFRESULT ImplAAFSequence::FindSubSegment(aafPosition_t offset,
 										 aafBool *found)
 {
 	aafLength_t	segLen;
-	aafPosition_t begPos, endPos;
+	aafPosition_t begPos, endPos, zero;
 	aafUInt32 n = 0;
 	ImplAAFSegment* seg = NULL;
 
@@ -664,6 +664,7 @@ AAFRESULT ImplAAFSequence::FindSubSegment(aafPosition_t offset,
 	{
 		CHECK(GetLength(&segLen));
 		CvtInt32toPosition(0, begPos);
+		CvtInt32toPosition(0, zero);
 		endPos = begPos;
 		CHECK(AddInt64toInt64(segLen, &endPos));
 		if (Int64LessEqual(begPos, offset) &&
@@ -696,6 +697,14 @@ AAFRESULT ImplAAFSequence::FindSubSegment(aafPosition_t offset,
 				seg->ReleaseReference();
 				seg = NULL;
 			}
+		}
+		else if (Int64Equal(begPos, endPos) && Int64Equal(offset, zero)) 	//JeffB: Handle zero-length sourceClips
+		{
+			*found = kAAFTrue;
+			*subseg = this;
+			// We are returning a reference to this object so bump the ref count
+			AcquireReference();
+			*sequPosPtr = 0;
 		}
 		else
 		{
