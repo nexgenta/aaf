@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11.2.2 2004/06/08 13:45:39 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11.2.3 2004/07/19 13:56:21 bakerian Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -53,7 +53,8 @@ CXXFILES = AAFPluginCOM.cpp \
 		CAAFWAVECodec.cpp \
 		CAAFAIFCCodec.cpp \
 		jpegesdatadst.cpp \
-		jpegesdatasrc.cpp
+		jpegesdatasrc.cpp \
+		utf8.cpp
 
 
 SUPOBJS = $(OBJDIR)/aafCvt$(OBJ) \
@@ -61,7 +62,8 @@ SUPOBJS = $(OBJDIR)/aafCvt$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFClassFactory$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFServer$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFUnknown$(OBJ) \
-		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFInProcServer$(OBJ)
+		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFInProcServer$(OBJ) \
+		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/utf8$(OBJ)
 
 
 .PHONY : all
