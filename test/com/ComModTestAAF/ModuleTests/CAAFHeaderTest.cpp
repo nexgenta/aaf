@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFHeader.
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFHeaderTest.cpp,v 1.40 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFHeaderTest.cpp,v 1.40.2.1 2004/04/05 11:10:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -631,21 +631,11 @@ void HeaderTest::createFileMob(int itemNumber)
   _pSourceMob = NULL;
 }
 
-  
-#define SZ_ESSENCE 512
 void HeaderTest::createEssenceData(IAAFSourceMob *pSourceMob)
 {
-
   assert(_pFile && _pHeader && _pDictionary);
   assert(pSourceMob);
   assert(NULL == _pEssenceData);
-
-  //prepare dummy essence
-  	char buff[SZ_ESSENCE];
-	aafUInt32 bytesWritten;
-	for(int i=0;i<SZ_ESSENCE;i++)
-		buff[i]=(char)i;
-
 
   CAAFBuiltinDefs defs (_pDictionary);
 
@@ -668,9 +658,6 @@ void HeaderTest::createEssenceData(IAAFSourceMob *pSourceMob)
   // Add it for real this time
   check(_pHeader->AddEssenceData(_pEssenceData));
 
-  check(_pEssenceData->Write(SZ_ESSENCE, (aafDataBuffer_t)buff,&bytesWritten));
-
-  
   _pEssenceData->Release();
   _pEssenceData = NULL;
 }
