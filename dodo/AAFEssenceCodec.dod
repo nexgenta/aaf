@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFEssenceCodec.dod,v 1.29 2005/02/10 17:47:22 heydowns Exp $ $Name:  $
+#c $Id: AAFEssenceCodec.dod,v 1.30 2005/03/09 16:38:03 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,8 @@ AD_HEAD
 AD_FORWARD_DECLARATION(AAFEssenceFormat)
 
 AD_IDL(///
+/// AAFEssenceCodec is DEPRECATED\, please use AAFEssenceCodec2.
+///
 /// The AAFEssenceCodec interface describes the calls of a plugin
 /// which handles encoding media in a particular file format\, with
 /// optional compression.  These methods are used internally by the SDK\,
