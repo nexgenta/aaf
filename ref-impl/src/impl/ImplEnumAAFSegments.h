@@ -26,11 +26,9 @@ class ImplAAFSegment;
 class ImplAAFSelector;
 
 
-#ifndef __ImplAAFObject_h__
-#include "ImplAAFObject.h"
+#ifndef __ImplAAFRoot_h__
+#include "ImplAAFRoot.h"
 #endif
-
-typedef OMStrongReferenceVectorProperty<ImplAAFSegment> SegmentStrongRefArrayProp_t;
 
 
 class ImplEnumAAFSegments : public ImplAAFRoot
@@ -94,20 +92,18 @@ public:
         (ImplEnumAAFSegments ** ppEnum);
 
 
-public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumStrongProperty( ImplAAFObject *pObj, SegmentStrongRefArrayProp_t *pProp);
 
 public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplEnumAAFSegmentsTest.cpp.
 	static AAFRESULT test();
 
+    //Internal
+	AAFRESULT SetEnumSelector(ImplAAFSelector* pSelector);
+
 private:
-	aafUInt32					_current;
-	ImplAAFObject				*_enumObj;
-	SegmentStrongRefArrayProp_t	*_enumStrongProp;
+	aafInt32			_current;
+	ImplAAFSelector*	_pSelector;
 };
 
 #endif // ! __ImplEnumAAFSegments_h__
