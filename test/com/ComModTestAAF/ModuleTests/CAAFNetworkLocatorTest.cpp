@@ -26,7 +26,7 @@
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
+	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	IAAFLocator	*				pLocator;
@@ -48,30 +48,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	/*
 	hr = CoCreateInstance(CLSID_AAFSession,
 						   NULL, 
 						   CLSCTX_INPROC_SERVER, 
 						   IID_IAAFSession, 
 						   (void **)&pSession);
-	*/
-	hr = CoCreateInstance(CLSID_AAFFile,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFFile, 
-						   (void **)&pFile);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
-    hr = pFile->Initialize();
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->SetDefaultIdentification(&ProductInfo);
-	// if (AAFRESULT_SUCCESS != hr)
-	// 	return hr;
-
-	// hr = pSession->CreateFile(pFileName, kAAFRev1, &pFile);
-	hr = pFile->OpenNewModify(pFileName, 0, &ProductInfo);
+	hr = pSession->CreateFile(pFileName, kAAFRev1, &pFile);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
   
@@ -115,7 +103,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 							(void **)&edesc);		
  	if (AAFRESULT_SUCCESS != hr)
 		return hr;
- 	hr = pSourceMob->SetEssenceDescriptor (edesc);
+ 	hr = pSourceMob->SetEssenceDescription (edesc);
  	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
@@ -163,20 +151,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->EndSession();
- 	// if (AAFRESULT_SUCCESS != hr)
-	//	return hr;
+	hr = pSession->EndSession();
+ 	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	pMob->Release();
 	if (pFile) pFile->Release();
-	// if (pSession) pSession->Release();
+	if (pSession) pSession->Release();
 
 	return AAFRESULT_SUCCESS;
 }
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-	// IAAFSession *				pSession = NULL;
+	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	IAAFEssenceDescriptor		*pEdesc;
@@ -200,30 +188,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 	  
-	/*
 	hr = CoCreateInstance(CLSID_AAFSession,
 						   NULL, 
 						   CLSCTX_INPROC_SERVER, 
 						   IID_IAAFSession, 
 						   (void **)&pSession);
-	*/
-	hr = CoCreateInstance(CLSID_AAFFile,
-						   NULL, 
-						   CLSCTX_INPROC_SERVER, 
-						   IID_IAAFFile, 
-						   (void **)&pFile);
-	if (AAFRESULT_SUCCESS != hr)
-		return hr;
-    hr = pFile->Initialize();
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->SetDefaultIdentification(&ProductInfo);
-	// if (AAFRESULT_SUCCESS != hr)
-	//	return hr;
+	hr = pSession->SetDefaultIdentification(&ProductInfo);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
-	// hr = pSession->OpenReadFile(pFileName, &pFile);
-	hr = pFile->OpenExistingRead(pFileName, 0);
+	hr = pSession->OpenReadFile(pFileName, &pFile);
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
   
@@ -264,7 +241,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		hr = aMob->QueryInterface (IID_IAAFSourceMob, (void **)&pSourceMob);
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
-		hr = pSourceMob->GetEssenceDescriptor (&pEdesc);
+		hr = pSourceMob->GetEssenceDescription (&pEdesc);
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
 
@@ -305,13 +282,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (AAFRESULT_SUCCESS != hr)
 		return hr;
 
-	// hr = pSession->EndSession();
-	// if (AAFRESULT_SUCCESS != hr)
-	//	return hr;
+	hr = pSession->EndSession();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	if (pHeader) pHeader->Release();
 	if (pFile) pFile->Release();
-	// if (pSession) pSession->Release();
+	if (pSession) pSession->Release();
 
 	return 	AAFRESULT_SUCCESS;
 }
