@@ -185,16 +185,20 @@ public:
   //
   //********
   Impl.this-module ();
+
+protected:
   virtual ~Impl.this-module ();
 
+public:\
 #endm
 
 
 #ccccccccccccccccccccccccccc
 #c
-#c Starts a class definition
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
 #c
-#c Arguments: none
+#c Arguments: additional interface name
 #c
 #startm AD_COM_EXT_CLASS_BEGIN 01
 AD_CLASS_BEGIN\
@@ -214,7 +218,13 @@ AD_CLASS_BEGIN\
 struct I.this-module;
 class .this-module;
 
+#ifndef __AAFTypes_h__
 #include "AAFTypes.h"
+#endif
+
+#ifndef __AAFResult_h_
+#include "AAFResult.h"
+#endif
 
 class Impl.this-module
 {
@@ -226,6 +236,11 @@ public:
   Impl.this-module ();
   virtual ~Impl.this-module ();
 
+public:
+  // Reference Counting interface
+  virtual aafUInt32 AcquireReference() const;
+  virtual aafUInt32 ReleaseReference();
+  virtual aafUInt32 ReferenceCount() const;
 #endm
 
 
@@ -757,9 +772,25 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/Impl.this-moduleTest.cpp.
   static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 };
 
 #endif // ! __Impl.this-module_h__
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT_CLASS_END 01
+AD_CLASS_END\
 #endm
 
 
@@ -782,7 +813,6 @@ public:
 private:
 
   void * _pContainer;
-
 };
 
 #endif // ! __Impl.this-module_h__
