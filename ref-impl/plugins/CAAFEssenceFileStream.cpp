@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceFileStream.cpp,v 1.22 2004/10/25 13:27:08 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceFileStream.cpp,v 1.23 2004/11/04 16:37:22 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <sys/types.h>		// for off_t
 #include <stdlib.h>
 #include "AAFResult.h"
 

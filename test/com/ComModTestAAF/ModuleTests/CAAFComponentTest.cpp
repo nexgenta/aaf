@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFSegment
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFComponentTest.cpp,v 1.30 2004/10/22 14:20:45 phil_tudor Exp $ $Name:  $
+// $Id: CAAFComponentTest.cpp,v 1.31 2004/11/04 16:35:45 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,7 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"

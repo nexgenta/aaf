@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMDescriptorTest.cpp,v 1.4 2004/10/27 16:55:14 phil_tudor Exp $ $Name:  $
+// $Id: CAAFPCMDescriptorTest.cpp,v 1.5 2004/11/04 16:35:46 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,9 @@
 //
 //=---------------------------------------------------------------------=
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <iostream>
 
 #include "AAF.h"

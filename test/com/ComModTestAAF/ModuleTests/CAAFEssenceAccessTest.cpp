@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.48 2004/11/03 15:44:18 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.49 2004/11/04 16:35:46 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include <iostream>
 using namespace std;
 
