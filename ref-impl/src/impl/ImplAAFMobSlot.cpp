@@ -37,9 +37,9 @@
 #include "aafErr.h"
 
 ImplAAFMobSlot::ImplAAFMobSlot ()
-: _name(			PID_MobSlot_SlotName,			"Slot Name"),
-  _trackID(			PID_MobSlot_SlotID,		"Slot ID"),
-  _physicalTrackNum(PID_MobSlot_PhysicalTrackNumber,	"Physical Track Number"),
+: _name(			PID_MobSlot_SlotName,			"SlotName"),
+  _trackID(			PID_MobSlot_SlotID,		"SlotID"),
+  _physicalTrackNum(PID_MobSlot_PhysicalTrackNumber,	"PhysicalTrackNumber"),
   _segment(			PID_MobSlot_Segment,		"Segment") 
 {
 	_persistentProperties.put(_name.address());
@@ -66,6 +66,8 @@ AAFRESULT STDMETHODCALLTYPE
 	*result = _segment;
 	if (*result)
 		(*result)->AcquireReference();
+	else
+		return (AAFRESULT_NULLOBJECT);
 
   return AAFRESULT_SUCCESS;
 }
@@ -215,10 +217,13 @@ AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
 		* the beginning of clip that contains it. 
 		*/
 		*diffPos = offset;
+		tmpSegment->ReleaseReference();
 		
 	} /* XPROTECT */
 	XEXCEPT
 	{
+		if (tmpSegment)	
+			tmpSegment->ReleaseReference();
 	}
 	XEND;
 	return(AAFRESULT_SUCCESS);
