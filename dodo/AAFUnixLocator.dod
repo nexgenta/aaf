@@ -6,6 +6,7 @@ AAFUnixLocator\
 AAFLocator\
 #endm
 #c
+#import ./AAFLocator.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -16,15 +17,6 @@ AD_HEAD
 *                                          *
 \******************************************/
 
+AD_CLASS_BEGIN
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-AD_CLASS_UUID(A5F642B1, 2B1C, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
-AD_DEFAULT_UUID(A5F642B2, 2B1C, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
-
-AD_XCLASS_BEGIN(Concrete, StoredObject)
-
-AD_XCLASS_END(Concrete, StoredObject)
+AD_CLASS_END
