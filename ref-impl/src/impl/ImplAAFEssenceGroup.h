@@ -4,6 +4,17 @@
 #define __ImplAAFEssenceGroup_h__
 
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -32,11 +43,6 @@
  ************************************************************************/
 
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
 
 class ImplAAFSegment;
 
@@ -48,8 +54,6 @@ class ImplAAFSourceClip;
 #include "ImplAAFSegment.h"
 #endif
 
-#include "OMStrongRefProperty.h"
-#include "OMStrongRefVectorProperty.h"
 
 class ImplAAFEssenceGroup : public ImplAAFSegment
 {
@@ -66,7 +70,7 @@ protected:
 public:
 
 
-
+/****/
   //****************
   // SetStillFrame()
   //
@@ -76,7 +80,7 @@ public:
         (ImplAAFSourceClip * stillFrame);
     //@comm Essence group choices should be added with the AddChoice() function.
     
-
+/****/
   //****************
   // GetStillFrame()
   //
@@ -86,64 +90,33 @@ public:
         (ImplAAFSourceClip **stillFrame);
     //@comm Essence group choices should be added with the AddChoice() function.
     
-
+/****/
   //****************
-  // AppendChoice()
+  // AddChoice()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendChoice
         // @parm [in] Source clip to add as a choice 
-        (ImplAAFSegment * choice);
+        (ImplAAFSourceClip * choice);
 
-
+/****/
   //****************
-  // PrependChoice()
+  // GetNumChoices()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    PrependChoice
-        // @parm [in] Source clip to add as a choice 
-        (ImplAAFSegment * choice);
-
-
-  //****************
-  // InsertChoiceAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    InsertChoiceAt
-        // @parm [in] place to put new choice
-        (aafUInt32 index,
-
-		 // @parm [in] Source clip to add as a choice
-		 ImplAAFSegment * choice);
-
-
-  //****************
-  // CountChoices()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountChoices
+    GetNumChoices
         (aafUInt32  *result);
 
-
   //****************
-  // GetChoiceAt()
+  // GetIndexedChoice()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetChoiceAt
+    GetIndexedChoice
         (// @parm [in] The 0-based index into the array
          aafUInt32  index,
 
          // @parm [out] The representation at that index
-         ImplAAFSegment  ** result);
-
-
-  //****************
-  // RemoveChoiceAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveChoiceAt
-        (// @parm [in] The 0-based index into the array
-         aafUInt32  index);
+         ImplAAFSourceClip  ** result);
 
 public:
 	//SDK-private methods
@@ -159,13 +132,20 @@ public:
 										ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
 										ImplAAFComponent **foundObj, aafBool *foundTransition);
 
-	AAFRESULT GetCriteriaSegment(
+	AAFRESULT GetCriteriaSourceClip(
 			aafMediaCriteria_t *criteria,
-			ImplAAFSegment		**retSrcClip);
+			ImplAAFSourceClip		**retSrcClip);
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFEssenceGroup)
 
 private:
-	OMStrongReferenceVectorProperty<ImplAAFSegment>	_choices;
+	OMStrongReferenceVectorProperty<ImplAAFSourceClip>	_choices;
 	OMStrongReferenceProperty<ImplAAFSourceClip>		_stillFrame;
 };	
 
 #endif // ! __ImplAAFEssenceGroup_h__
+
+

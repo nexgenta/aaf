@@ -28,7 +28,6 @@
 
 
 
-
 #ifndef __ImplAAFEssenceFormat_h__
 #include "ImplAAFEssenceFormat.h"
 #endif

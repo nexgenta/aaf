@@ -24,7 +24,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
 #ifndef __ImplAAFEventMobSlot_h__
 #include "ImplAAFEventMobSlot.h"
 #endif
@@ -126,8 +125,7 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
     if (NULL != pSequence)
     {
       aafUID_t sequDataDef, componentDataDef;
-      aafUInt32 i;
-	  aafUInt32 numberOfComponents = 0;
+      aafInt32 i, numberOfComponents = 0;
       aafPosition_t previousPosition;
       
       
@@ -135,7 +133,7 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
       CHECK(pSequence->GetDataDef(&sequDataDef));
 
       // There must be at least one component in the sequence.
-      CHECK(pSequence->CountComponents(&numberOfComponents));
+      CHECK(pSequence->GetNumComponents(&numberOfComponents));
       if (0 >= numberOfComponents)
         RAISE(AAFRESULT_OBJECT_SEMANTIC);
 
@@ -147,10 +145,10 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
       CHECK(pComponent->GetDataDef(&componentDataDef));
  
 	  CHECK(GetDictionary(&pDict));
-	  CHECK(pDict->LookupDataDef(componentDataDef, &pDef));
+	  CHECK(pDict->LookupDataDefintion(&componentDataDef, &pDef));
 	  pDict->ReleaseReference();
 	  pDict = NULL;
-	  CHECK(pDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
+	  CHECK(pDef->DoesDataDefConvertTo(&sequDataDef, &willConvert));
 	  pDef->ReleaseReference();
 	  pDef = NULL;
 
@@ -183,10 +181,10 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
         // The component must have the same data definition [id] as the
         // sequence.
 		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->LookupDataDef(componentDataDef, &pDef));
+		CHECK(pDict->LookupDataDefintion(&componentDataDef, &pDef));
 		pDict->ReleaseReference();
 		pDict = NULL;
-		CHECK(pDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
+		CHECK(pDef->DoesDataDefConvertTo(&sequDataDef, &willConvert));
 		pDef->ReleaseReference();
 		pDef = NULL;
 
@@ -249,5 +247,6 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
 
 
 
+OMDEFINE_STORABLE(ImplAAFEventMobSlot, AUID_AAFEventMobSlot);
 
 

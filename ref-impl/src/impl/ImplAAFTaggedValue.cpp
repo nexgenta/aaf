@@ -24,7 +24,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
 #endif
@@ -62,15 +61,14 @@ ImplAAFTaggedValue::~ImplAAFTaggedValue ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTaggedValue::Initialize (const aafCharacter * pName,
-									const aafUID_t & dataDef)
+    ImplAAFTaggedValue::Initialize (wchar_t* pName, aafUID_t*  pDataDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
 
-	if (pName == NULL)
+	if (pName == NULL || pDataDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	_type = dataDef;
+	_type = *pDataDef;
 	_name = pName;
 
 	return rc;
@@ -131,7 +129,7 @@ AAFRESULT STDMETHODCALLTYPE
 		defUID = _type;
 		CHECK(MyHeadObject(&head));
 		CHECK(head->GetDictionary(&dict));
-		CHECK(dict->LookupTypeDef(defUID, ppTypeDef));
+		CHECK(dict->LookupType(&defUID, ppTypeDef));
 	}
 	XEXCEPT
 	{
@@ -212,5 +210,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFTaggedValue, AUID_AAFTaggedValue);
 
 
