@@ -1,19 +1,50 @@
-// @doc OMINTERNAL
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
+
+// @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMStorable
+
 #include "OMStorable.h"
 #include "OMStoredObject.h"
 #include "OMFile.h"
 #include "OMClassFactory.h"
 #include "OMObjectDirectory.h"
-#include "OMTypes.h"
+#include "OMDataTypes.h"
 #include "OMProperty.h"
+#include "OMPropertySetIterator.h"
+#include "OMUtilities.h"
 
 #include "OMAssertions.h"
 
 #include <string.h>
 
 OMStorable::OMStorable(void)
-: _persistentProperties(), _containingObject(0), _name(0),
-  _pathName(0), _containingProperty(0), _key(0), _store(0)
+: _persistentProperties(),
+  _container(0),
+  _name(0),
+  _pathName(0),
+  _store(0),
+  _classFactory(0),
+  _definition(0)
 {
   TRACE("OMStorable::OMStorable");
   _persistentProperties.setContainer(this);
@@ -22,10 +53,12 @@ OMStorable::OMStorable(void)
 OMStorable::~OMStorable(void)
 {
   TRACE("OMStorable::~OMStorable");
-  if (_containingProperty != 0) {
-    _containingProperty->detach(this, _key);
-    _containingProperty = 0;
-  }
+
+  // This assertion will trigger if an attempt is made to delete an
+  // object that is still attached. That is, the assertion detects an
+  // attempt to create a dangling strong reference.
+  //
+  PRECONDITION("Object not attached", !attached());
 
   delete [] _name;
   _name = 0;
@@ -33,55 +66,85 @@ OMStorable::~OMStorable(void)
   _pathName = 0;
 }
 
+  // @mfunc Set the <c OMClassDefinition> defining this <c OMStorable>.
+  //   @parm TBS
+void OMStorable::setDefinition(const OMClassDefinition* definition)
+{
+  TRACE("OMStorable::setDefinition");
+  PRECONDITION("Valid definition", definition != 0);
+  PRECONDITION("No previous definition", _definition == 0);
+  _definition = definition;
+}
+
+  // @mfunc The <c OMClassDefinition> defining this <c OMStorable>.
+  //   @rdesc TBS
+const OMClassDefinition* OMStorable::definition(void) const
+{
+  TRACE("OMStorable::definition");
+  const OMClassDefinition* result = _definition;
+#if !defined(OM_DISABLE_VALIDATE_DEFINITIONS)
+  POSTCONDITION("Valid result", result != 0);
+#endif
+  return result;
+}
+
   // @mfunc Save this <c OMStorable>.
   //   @this const
 void OMStorable::save(void) const
 {
   TRACE("OMStorable::save");
-  
-  size_t context = 0;
-  //_file->objectDirectory()->insert(pathName(), this);
-  store()->save(classId());
-  for (size_t i = 0; i < _persistentProperties.count(); i++)
-  {
-    OMProperty* p = 0;
-    _persistentProperties.iterate(context, p);
-    ASSERT("Valid property", p != 0);
-    store()->save(p);
+#if !defined(OM_DISABLE_VALIDATE_DEFINITIONS)
+  PRECONDITION("Valid class definition", definition() != 0);
+#endif
+
+  bool opened = false;
+  if (_store == 0 ) {
+    opened = true;
   }
-  store()->saveIndex();
+
+  OMStorable* nonConstThis = const_cast<OMStorable*>(this);
+  store()->save(*nonConstThis);
+
+  // Temporary brute force solution to the Microsoft Structured
+  // Storage built in limit on the number of open storage elements
+  // (IStorages and IStreams) caused by use of a fixed size internal
+  // heap.
+  // We take care to close _store here only if it was opened above.
+  // We don't want to close any IStreams (or their enclosing IStorages)
+  // that were opened on demand as closing them would lose important
+  // state information, such as the current seek position.
+  //
+  if (opened) {
+    ASSERT("Valid store", _store != 0);
+    _store->close();
+    delete _store;
+    OMStorable* nonConstThis = const_cast<OMStorable*>(this);
+    nonConstThis->_store = 0;
+  }
 }
 
   // @mfunc Close this <c OMStorable>.
 void OMStorable::close(void)
 {
+  TRACE("OMStorable::close");
   PRECONDITION("Object is persistent", persistent());
-  PRECONDITION("Not already closed", _store != 0);
 
-  size_t context = 0;
-  for (size_t i = 0; i < _persistentProperties.count(); i++)
-  {
-    OMProperty* p = 0;
-    _persistentProperties.iterate(context, p);
-    ASSERT("Valid property", p != 0);
-    p->close();
-  }
+  if (_store != 0) {
+    OMPropertySetIterator iterator(_persistentProperties, OMBefore);
+    while (++iterator) {
+      OMProperty* p = iterator.property();
+      ASSERT("Valid property", p != 0);
+      if (!p->isOptional() || p->isPresent()) {
+        p->close();
+      }
+    }
 
-  _store->close();
-  delete _store;
-  _store = 0;
+    _store->close();
+    delete _store;
+    _store = 0;
+  } // else silently ignore unsaved object
 
   POSTCONDITION("Closed", _store == 0);
-}
-
-  // @mfunc Restore the contents of an <c OMStorable> (of unknown
-  //        sub-class) from the stored representation <p s>.
-  //   @parm The <c OMStoredObject> from which to restore this
-  //   <c OMStorable>.
-void OMStorable::restoreContentsFrom(OMStoredObject& s)
-{
-  TRACE("OMStorable::restoreContentsFrom");
-  s.restore(_persistentProperties);
 }
 
   // @mfunc Restore an <c OMStorable> (of unknown sub-class) from
@@ -92,100 +155,128 @@ void OMStorable::restoreContentsFrom(OMStoredObject& s)
   //   @parm The <c OMStoredObject> from which to restore this
   //   <c OMStorable>.
 OMStorable* OMStorable::restoreFrom(const OMStorable* containingObject,
-                                    const char* name,
+                                    const wchar_t* name,
                                     OMStoredObject& s)
 {
   TRACE("OMStorable::restoreFrom");
   OMClassId cid;
   s.restore(cid);
   OMFile* f = containingObject->file();
-  OMStorable* object = f->classFactory()->create(cid);
+  const OMClassFactory* classFactory = containingObject->classFactory();
+  OMStorable* object = classFactory->create(cid);
   ASSERT("Registered class id", object != 0);
-  // give the object a parent, no orphans allowed
-  object->setContainingObject(containingObject);
-  // give the object a name, all new objects need a name and so here
-  // we baptize them
-  object->setName(name);
+  ASSERT("Valid class factory", classFactory == object->classFactory());
+#if !defined(OM_DISABLE_VALIDATE_DEFINITIONS)
+  ASSERT("Valid class definition", object->definition() != 0);
+#endif
+  // Attach the object.
+  object->attach(containingObject, name);
   object->setStore(&s);
+#if defined(OM_ENABLE_DEBUG)
+  // Keep track of each object (debugging only)
   f->objectDirectory()->insert(object->pathName(), object);
-  object->restoreContentsFrom(s);
+#endif
+  object->restoreContents();
   return object;
 }
 
-  // @mfunc  The <c OMStorable> that contains (owns) this
-  //          <c OMStorable>.
-  //   @rdesc The containing <c OMStorable>.
-  //   @this const
-OMStorable* OMStorable::containingObject(void) const
+  // @mfunc Restore the contents of an <c OMStorable> (of unknown
+  //        sub-class).
+void OMStorable::restoreContents(void)
 {
-  TRACE("OMStorable::containingObject");
+  TRACE("OMStorable::restoreContents");
 
-  return const_cast<OMStorable*>(_containingObject);
+  bool opened = false;
+  if (_store == 0 ) {
+    opened = true;
+  }
+
+  store()->restore(_persistentProperties);
+
+  // Temporary brute force solution to the Microsoft Structured
+  // Storage built in limit on the number of open storage elements
+  // (IStorages and IStreams) caused by use of a fixed size internal
+  // heap.
+  // We take care to close _store here only if it was opened above.
+  // We don't want to close any IStreams (or their enclosing IStorages)
+  // that were opened on demand as closing them would lose important
+  // state information, such as the current seek position.
+  //
+  if (opened) {
+    ASSERT("Valid store", _store != 0);
+    _store->close();
+    delete _store;
+    OMStorable* nonConstThis = const_cast<OMStorable*>(this);
+    nonConstThis->_store = 0;
+  }
 }
 
-  // @mfunc Inform this <c OMStorable> that it is contained
-  //        (owned) by the <c OMStorable> <p containingObject>.
-  //   @parm The containing <c OMStorable>.
-void OMStorable::setContainingObject(const OMStorable* containingObject)
+  // @mfunc Attach this <c OMStorable>.
+  //   @parm The containining <c OMStorable>.
+  //   @parm The name to be given to this <c OMStorable>.
+void OMStorable::attach(const OMStorable* container, const wchar_t* name)
 {
-  TRACE("OMStorable::setContainingObject");
-  //PRECONDITION("No valid old containing object", _containingObject == 0);
-  PRECONDITION("Valid new containing object", containingObject != 0);
-  _containingObject = containingObject;
+  TRACE("OMStorable::attach");
+  // tjb PRECONDITION("Not attached", !attached());
+  PRECONDITION("Valid container", container != 0);
+  PRECONDITION("Valid name", validWideString(name));
+
+  _container = container;
+  setName(name);
+
+  POSTCONDITION("Attached", attached());
+}
+
+  // @mfunc Detach this <c OMStorable>.
+void OMStorable::detach(void)
+{
+  TRACE("OMStorable::detach");
+
+  if (_store != 0) {
+    OMPropertySetIterator iterator(_persistentProperties, OMBefore);
+    while (++iterator) {
+      OMProperty* p = iterator.property();
+      ASSERT("Valid property", p != 0);
+      p->detach();
+    }
+
+    // Once incremental saving (dirty bit) is implemented we'll need
+    // to deal with any persisted representation of this unattached
+    // OMStorable.
+
+    _store->close();
+    delete _store;
+    _store = 0;
+  }
+
+  _container = 0;
+
   delete [] _pathName;
   _pathName = 0;
-}
+  delete [] _name;
+  _name = 0;
 
-  // @mfunc Inform this <c OMStorable> that it is no longer contained.
-void OMStorable::clearContainingObject(void)
-{
-  TRACE("OMStorable::clearContainingObject");
-  _containingObject = 0;
-}
-
-  // @mfunc Inform this <c OMStorable> that it is contained
-  //        within the <c OMProperty> <p containingProperty>.
-  //   @parm The containing <c OMProperty>.
-  //   @parm A key used to be used by this <c OMStorable> to identify
-  //         itself in future transactions with the given <c OMProperty>.
-void OMStorable::setContainingProperty(const OMProperty* containingProperty,
-                                       const size_t key)
-{
-  TRACE("OMStorable::setContainingProperty");
-  PRECONDITION("Object not already attached", _containingProperty == 0);
-  PRECONDITION("Valid property", containingProperty != 0);
-
-  _containingProperty = const_cast<OMProperty*>(containingProperty);
-  _key = key;
-
-  POSTCONDITION("Object properly attached", _containingProperty != 0);
-}
-
-  // @mfunc Inform this <c OMStorable> that it is no longer
-  //        contained within any <c OMProperty>.
-void OMStorable::clearContainingProperty(void)
-{
-  _containingProperty = 0;
+  PRECONDITION("Detached", !attached());
 }
 
   // @mfunc The name of this <c OMStorable>.
   //   @rdesc The name of this <c OMStorable>.
   //   @this const
-const char* OMStorable::name(void) const
+const wchar_t* OMStorable::name(void) const
 {
+  TRACE("OMStorable::name");
   return _name;
 }
 
   // @mfunc Give this <c OMStorable> a name.
   //   @parm The name to be given to this <c OMStorable>.
-void OMStorable::setName(const char* name)
+void OMStorable::setName(const wchar_t* name)
 {
   TRACE("OMStorable::setName");
-  PRECONDITION("Valid name", validString(name));
+  PRECONDITION("Valid name", validWideString(name));
   delete [] _name;
   _name = 0; // for BoundsChecker
-  _name = new char[strlen(name) + 1];
-  strcpy(_name, name);
+  _name = saveWideString(name);
   delete [] _pathName;
   _pathName = 0;
 }
@@ -198,11 +289,15 @@ void OMStorable::setName(const char* name)
 OMFile* OMStorable::file(void) const
 {
   TRACE("OMStorable::file");
-  PRECONDITION("Valid containing object", _containingObject != 0);
-  return _containingObject->file();
+  PRECONDITION("Valid containing object", _container != 0);
+  return _container->file();
 }
 
-const char* OMStorable::pathName(void) const
+  // @mfunc The path to this <c OMStorable> from the root of
+  //        the <c OMFile> in which this <c OMStorable> resides.
+  //   @rdesc The path name of this <c OMStorable>.
+  //   @this const
+const wchar_t* OMStorable::pathName(void) const
 {
   TRACE("OMStorable::pathName");
 
@@ -210,8 +305,76 @@ const char* OMStorable::pathName(void) const
     OMStorable* nonConstThis = const_cast<OMStorable*>(this);
     nonConstThis->_pathName = nonConstThis->makePathName();
   }
-  ASSERT("Valid path name", validString(_pathName));
+  ASSERT("Valid path name", validWideString(_pathName));
   return _pathName;
+}
+
+  // @mfunc Find the <c OMStorable> named <p objectName> contained
+  //        within this <c OMStorable>.
+  //   @parm The name of the object.
+  //   @rdesc The object.
+  //   @this const
+OMStorable* OMStorable::find(const wchar_t* objectName) const
+{
+  TRACE("OMStorable::find");
+
+  OMProperty* p = findProperty(objectName);
+  ASSERT("Valid property", p != 0);
+  OMStorable* result = p->storable();
+  ASSERT("Valid object", result != 0);
+  return result;
+}
+
+OMStorable* OMStorable::find(OMPropertyId propertyId) const
+{
+  TRACE("OMStorable::find");
+
+  OMProperty* p = findProperty(propertyId);
+  ASSERT("Valid property", p != 0);
+  OMStorable* result = p->storable();
+  ASSERT("Valid object", result != 0);
+  return result;
+}
+
+  // @mfunc Find the <c OMProperty> named <p propertyName> contained
+  //        within this <c OMStorable>.
+  //   @parm The name of the property.
+  //   @rdesc The property.
+  //   @this const
+OMProperty* OMStorable::findProperty(const wchar_t* propertyName) const
+{
+  TRACE("OMStorable::findProperty");
+
+  OMProperty* result = _persistentProperties.get(propertyName);
+  return result;
+}
+
+OMProperty* OMStorable::findProperty(OMPropertyId propertyId) const
+{
+  TRACE("OMStorable::findProperty");
+
+  OMProperty* result = _persistentProperties.get(propertyId);
+  return result;
+}
+
+  // @mfunc Is this <c OMStorable> the root of the object
+  //        containment hierarchy.
+  //   @rdesc True if this is the root object, false otherwise.
+  //   @this const
+bool OMStorable::isRoot(void) const
+{
+  TRACE("OMStorable::isRoot");
+  PRECONDITION("Valid containing object", _container != 0);
+  bool result;
+
+  // By definition the root object is the one contained directly
+  // within the file.
+  if (_container == file()) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
 }
 
   // @mfunc The stored representation of this <c OMStorable>.
@@ -219,8 +382,10 @@ const char* OMStorable::pathName(void) const
   //   @this const
 OMStoredObject* OMStorable::store(void) const
 {
+  TRACE("OMStorable::store");
+
   if (_store == 0) {
-    OMStorable* container = containingObject();
+    const OMStorable* container = _container;
     ASSERT("Valid container", container != 0);
     OMStorable* nonConstThis = const_cast<OMStorable*>(this);
     nonConstThis->_store = container->store()->create(name());
@@ -235,6 +400,7 @@ OMStoredObject* OMStorable::store(void) const
   //         should be persisted.
 void OMStorable::setStore(OMStoredObject* store)
 {
+  TRACE("OMStorable::setStore");
   PRECONDITION("Valid store", store != 0);
   PRECONDITION("No previous valid store", _store == 0);
   _store = store;
@@ -251,7 +417,7 @@ bool OMStorable::attached(void) const
 
   bool result;
 
-  if (_containingProperty != 0) {
+  if (_container != 0) {
     result = true;
   } else {
     result = false;
@@ -270,9 +436,9 @@ bool OMStorable::inFile(void) const
   //PRECONDITION("object is attached", attached());
 
   bool result;
-  OMStorable* container = containingObject();
-  if (container != 0) {
-    result = container->inFile();
+
+  if (_container != 0) {
+    result = _container->inFile();
   } else {
     result = false;
   }
@@ -291,59 +457,182 @@ bool OMStorable::persistent(void) const
   //PRECONDITION("object is in file", inFile());
 
   bool result;
-  OMStorable* container = containingObject();
-  if (container != 0) {
-    result = container->persistent();
+
+  if (_container != 0) {
+    result = _container->persistent();
   } else {
     result = false;
   }
   return result;
 }
 
-char* OMStorable::makePathName(void)
+  // @mfunc Is this <c OMStorable> dirty ?
+  //        A dirty object is one that has been modified since it
+  //        was last saved or that has never been saved at all.
+bool OMStorable::isDirty(void) const
 {
-  TRACE("OMStorable::makePathName");
-  // Don't need to compute path name each time, should save once computed.
+  TRACE("OMStorable::isDirty");
 
-  // All objects must have a name.
+  // Dirty bit not yet implemented, consider all objects dirty.
   //
-  ASSERT("Object has a name", validString(name()));
+  return true;
+}
 
-  // By definition the root object is the one with no container.
-  // Check that the root object is called "/".
-  //
-  ASSERT("Root object properly named",
-                   IMPLIES(containingObject() == 0, strcmp(name(), "/") == 0));
+  // @mfunc This object's property set.
+  //   @rdesc A pointer to this object's <c OMPropertySet>.
+OMPropertySet* OMStorable::propertySet(void)
+{
+  TRACE("OMStorable::propertySet");
 
-  // Only the root object is called "/".
-  // Check that if the object is called "/" it is the root object (has
-  // no container).
-  //
-  ASSERT("Non-root object properly named",
-                   IMPLIES(strcmp(name(), "/") == 0, containingObject() == 0));
-  
-  char* result = 0;
-  OMStorable* cont = containingObject();
-  if (cont != 0) {
-    if (cont->containingObject() != 0) {
-      // general case
-      result = new char[strlen(cont->pathName()) + strlen(name()) + 1 + 1];
-      strcpy(result, cont->pathName());
-      strcat(result, "/");
-      strcat(result, name());
-    } else {
-      // child of root
-      result = new char[strlen(cont->pathName()) + strlen(name()) + 1];
-      strcpy(result, cont->pathName());
-      strcat(result, name());
+  return &_persistentProperties;
+}
+
+  // @mfunc The <c OMClassFactory> that created this object.
+  //   @rdesc The <c OMClassFactory> that created this object.
+  //   @this const
+OMClassFactory* OMStorable::classFactory(void) const
+{
+  TRACE("OMStorable::classFactory");
+  PRECONDITION("Valid class factory", _classFactory != 0);
+
+  return const_cast<OMClassFactory*>(_classFactory);
+}
+
+  // @mfunc Inform this <c OMStorable> of the <c OMClassFactory>
+  //      that was used to create it.
+  //   @parm The <c OMClassFactory> that was used to create
+  //         this <c OMStorable>.
+void OMStorable::setClassFactory(const OMClassFactory* classFactory)
+{
+  TRACE("OMStorable::setClassFactory");
+  PRECONDITION("Valid class factory", classFactory != 0);
+  //PRECONDITION("No previous valid class factory", _classFactory == 0);
+
+  _classFactory = classFactory;
+
+  POSTCONDITION("Valid class factory", _classFactory != 0);
+}
+
+OMStorable* OMStorable::shallowCopy(void) const
+{
+  TRACE("OMStorable::shallowCopy");
+  const OMStoredObjectIdentification& id = classId();
+  OMStorable* object = classFactory()->create(id);
+  ASSERT("Registered class id", object != 0);
+  ASSERT("Valid class factory", object->classFactory() != 0);
+#if !defined(OM_DISABLE_VALIDATE_DEFINITIONS)
+  ASSERT("Valid class definition", object->definition() != 0);
+#endif
+
+  OMPropertySetIterator iterator(_persistentProperties, OMBefore);
+  while (++iterator) {
+    OMProperty* source = iterator.property();
+    ASSERT("Valid property", source != 0);
+    if (!source->isOptional() || source->isPresent()) {
+      OMPropertyId pid = source->propertyId();
+      OMProperty* dest = object->propertySet()->get(pid);
+      source->shallowCopyTo(dest);
     }
-  } else {
-    // root
-    result = new char[strlen(name()) + 1];
-    strcpy(result, name());
   }
 
-  POSTCONDITION("Valid result", validString(result));
+  POSTCONDITION("Valid result", object != 0);
+  return object;
+}
+
+void OMStorable::deepCopyTo(OMStorable* destination,
+                            void* clientContext) const
+{
+  TRACE("OMStorable::deepCopyTo");
+  OMPropertySetIterator iterator(_persistentProperties, OMBefore);
+  while (++iterator) {
+    OMProperty* source = iterator.property();
+    ASSERT("Valid property", source != 0);
+    if (!source->isOptional() || source->isPresent()) {
+      OMPropertyId pid = source->propertyId();
+      OMProperty* dest = destination->propertySet()->get(pid);
+      source->deepCopyTo(dest, clientContext);
+    }
+  }
+}
+
+  // @mfunc Inform this <c OMStorable> that it is about to be saved.
+  //        The <p clientContext> passed is the one that was specified
+  //        in the currently active call to <mf OMStorable::save>.
+  //   @parm void *| clientContext | A context for the client.
+  //   @this const
+void OMStorable::onSave(void*) const
+{
+  // nothing to do in this default implementation
+}
+
+  // @mfunc Inform this <c OMStorable> that it has just been restored.
+  //        The <p clientContext> passed is the one that was specified
+  //        in the currently active call to <mf OMStorable::restore>.
+  //   @parm void *| clientContext | A context for the client.
+  //   @this const
+void OMStorable::onRestore(void*) const
+{
+  // nothing to do in this default implementation
+}
+
+  // @mfunc Inform this <c OMStorable> that it has just been copied by
+  //        <mf OMStorable::deepCopyTo>. The <p clientContext> passed is
+  //        the one that was specified in the currently active call
+  //        to <mf OMStorable::deepCopyTo>. When <mf OMStorable::onCopy>
+  //        is called only the shallow portion of the deep copy to be
+  //        performed by <mf OMStorable::deepCopyTo> has been completed.
+  //        That is, this <c OMStorable> contains copies of all of the
+  //        properties of the souce <c OMStorable> except for strong
+  //        references (contained objects). Those properties wll be
+  //        copied after <mf OMStorable::onCopy> returns.
+  //   @parm void *| clientContext | A context for the client.
+  //   @this const
+void OMStorable::onCopy(void*) const
+{
+  // nothing to do in this default implementation
+}
+
+const wchar_t* rootName = L"/";
+
+wchar_t* OMStorable::makePathName(void)
+{
+  TRACE("OMStorable::makePathName");
+
+  ASSERT("Object has a name", validWideString(name()));
+  ASSERT("Root object properly named",
+                  IMPLIES(isRoot(), compareWideString(name(), rootName) == 0));
+  ASSERT("Non-root object properly named",
+                  IMPLIES(compareWideString(name(), rootName) == 0, isRoot()));
+  ASSERT("Non-root object has valid container",
+                                          IMPLIES(!isRoot(), _container != 0));
+
+  wchar_t* result = 0;
+  if (isRoot()) {
+    // root
+    result = saveWideString(name());
+  } else {
+    const OMStorable* cont = _container;
+    size_t pathNameLength = lengthOfWideString(cont->pathName());
+    size_t nameLength = lengthOfWideString(name());
+    size_t characterCount = pathNameLength + nameLength;
+
+    if (cont->isRoot()) {
+      // child of root
+      result = new wchar_t[characterCount + 1];
+      ASSERT("Valid heap pointer", result != 0);
+      copyWideString(result, cont->pathName(), pathNameLength + 1);
+      concatenateWideString(result, name(), nameLength);
+    } else {
+      // general case
+      result = new wchar_t[characterCount + 1 + 1];
+      ASSERT("Valid heap pointer", result != 0);
+      copyWideString(result, cont->pathName(), pathNameLength + 1);
+      concatenateWideString(result, rootName, 1);
+      concatenateWideString(result, name(), nameLength);
+    }
+  }
+
+  POSTCONDITION("Valid result", validWideString(result));
   return result;
 
 }
