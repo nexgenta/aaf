@@ -1,28 +1,31 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMPropertyTable
-
 #include "OMPropertyTable.h"
 
 #include "OMAssertions.h"
@@ -42,28 +45,27 @@ OMPropertyTable::~OMPropertyTable(void)
 
   size_t elements = _vector.count();
   for (size_t i = 0; i < elements; i++) {
-    OMPropertyId* p = _vector.valueAt(i);
+    char* p = _vector.valueAt(i);
     delete [] p;
   }
 }
 
-  // @mfunc If <p propertyPath> is not already present then insert
-  //        it (by copying) into the table and return its tag,
-  //        otherwise just return its tag. Tags are allocated
-  //        sequentially.
-  //   @parm The property path to insert.
+  // @mfunc If <p propertyName> is not already present then insert
+  //        it (by copying) into the table and return its index,
+  //        otherwise just return its index.
+  //   @parm The property name to insert.
   //   @rdesc The assigned index.
-OMPropertyTag OMPropertyTable::insert(const OMPropertyId* propertyPath)
+OMUInt32 OMPropertyTable::insert(const char* propertyName)
 {
   TRACE("OMPropertyTable::insert");
 
-  PRECONDITION("Valid property path", validPropertyPath(propertyPath));
+  PRECONDITION("Valid property name", validString(propertyName));
 
-  OMPropertyTag result;
+  OMUInt32 result;
   bool found = false;
   size_t elements = _vector.count();
   for (size_t i = 0; i < elements; i++) {
-    if (comparePropertyPath(_vector.valueAt(i), propertyPath) == 0) {
+    if (strcmp(_vector.valueAt(i), propertyName) == 0) {
      result = i;
      found = true;
      break;
@@ -71,25 +73,23 @@ OMPropertyTag OMPropertyTable::insert(const OMPropertyId* propertyPath)
   }
 
   if (!found) {
-    _vector.append(savePropertyPath(propertyPath));
+    _vector.append(saveString(propertyName));
     result = elements;
   }
 
-  POSTCONDITION("Valid result", isValid(result));
   return result;
 }
 
-  // @mfunc The property path corresponding to <p tag> in the table.
+  // @mfunc The property name at position <p index> in the table.
   //   @parm The index.
-  //   @rdesc The property path.
+  //   @rdesc The property name.
   //   @this const
-const OMPropertyId* OMPropertyTable::valueAt(OMPropertyTag tag) const
+const char* OMPropertyTable::valueAt(OMUInt32 index) const
 {
   TRACE("OMPropertyTable::valueAt");
 
-  PRECONDITION("Valid tag", isValid(tag));
-
-  return _vector.valueAt(tag);
+  PRECONDITION("Valid index", index < _vector.count());
+  return _vector.valueAt(index);
 }
 
   // @mfunc The count of entries in the table.
@@ -97,26 +97,7 @@ const OMPropertyId* OMPropertyTable::valueAt(OMPropertyTag tag) const
   //   @this const
 size_t OMPropertyTable::count(void) const
 {
-  TRACE("OMPropertyTable::count");
+  TRACE("OMPropertyTable::valueAt");
 
   return _vector.count();
-}
-
-  // @mfunc Is <p tag> valid ?
-  //   @parm The tag to check.
-  //   @rdesc True if the tag is valid, false otherwise.
-  //   @this const
-bool OMPropertyTable::isValid(OMPropertyTag tag) const
-{
-  TRACE("OMPropertyTable::isValid");
-
-  bool result;
-
-  if ((tag < count()) && (tag != nullOMPropertyTag)) {
-    result = true;
-  } else {
-    result = false;
-  }
-
-  return result;
 }
