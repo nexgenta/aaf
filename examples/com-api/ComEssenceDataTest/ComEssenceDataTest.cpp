@@ -19,6 +19,9 @@
 #include "AAFDefUIDS.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
+#include "AAFContainerDefs.h"
+#include "AAFCodecDefs.h"
+#include "AAFEssenceFormats.h"
 
 // Include the AAF interface declarations.
 #include "AAF.h"
@@ -114,6 +117,8 @@ typedef struct
 	aafUID_t	dataFormat;
 } testDataFile_t;
 
+const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+
 static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, testType_t testType)
 {
 	IAAFFile*					pFile = NULL;
@@ -161,7 +166,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
 
 	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
