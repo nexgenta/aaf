@@ -11,7 +11,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -270,6 +269,9 @@
 
 /* Reference implementation assertion violation (programming error) */
 #define AAFRESULT_ASSERTION_VIOLATION       MAKE_AAFHRESULT(0x01D0)
+
+/* Reference implementation unexpected C++ exception (programming error) */
+#define AAFRESULT_UNEXPECTED_EXCEPTION      MAKE_AAFHRESULT(0x01D1)
 
 /* Testing Error Codes */
 #define AAFRESULT_TEST_FAILED				MAKE_AAFHRESULT(0x01F4)
