@@ -28,6 +28,33 @@
 #endif
 #endm
 
+#ccccccccccccccccccccccccccc
+#c
+#c Generate a forward declaration of a class.
+#c
+#c Argument: class name
+#c
+#startm AD_FORWARD_DECLARATION 01
+	class %01;
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Class UUID.
+#c
+#c Argument: Pieces of UUID
+#c
+#startm AD_CLASS_UUID 11
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Default UUID.
+#c
+#c Argument: Pieces of UUID
+#c
+#startm AD_DEFAULT_UUID 11
+#endm
 
 #ccccccccccccccccccccccccccc
 #c
@@ -37,7 +64,7 @@
 #c
 #startm AD_HEAD 00
 //@doc
-//@class 	.this-module | Implementation class for .this-module
+//@class    .this-module | Implementation class for .this-module
 #ifndef _Impl.this-module_h_
 #define _Impl.this-module_h_
 #endm
@@ -127,7 +154,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	    (%03 %04);	//@parm %02 %05
+        (%03 %04);  //@parm %02 %05
 #endm
 
 
@@ -152,8 +179,8 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08);	//@parm %06 %09
+       (%03 %04,    //@parm %02 %05
+        %07 %08);   //@parm %06 %09
 #endm
 
 
@@ -182,9 +209,9 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05,
-		%07 %08,	//@parm %06 %09,
-		%11 %12);	//@parm %10 %13
+       (%03 %04,    //@parm %02 %05,
+        %07 %08,    //@parm %06 %09,
+        %11 %12);   //@parm %10 %13
 #endm
 
 
@@ -217,10 +244,10 @@ public:
   // 
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08,	//@parm %06 %09
-		%11 %12,	//@parm %10 %13
-		%15 %16);	//@parm %14 %17
+       (%03 %04,    //@parm %02 %05
+        %07 %08,    //@parm %06 %09
+        %11 %12,    //@parm %10 %13
+        %15 %16);   //@parm %14 %17
 #endm
 
 
@@ -257,11 +284,11 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08,	//@parm %06 %09
-		%11 %12,	//@parm %10 %13
-		%15 %16,	//@parm %14 %17
-		%19 %20);	//@parm %18 %21
+       (%03 %04,    //@parm %02 %05
+        %07 %08,    //@parm %06 %09
+        %11 %12,    //@parm %10 %13
+        %15 %16,    //@parm %14 %17
+        %19 %20);   //@parm %18 %21
 #endm
 
 
@@ -302,14 +329,63 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	   (%03 %04,	//@parm %02 %05
-		%07 %08,	//@parm %06 %09
-		%11 %12,	//@parm %10 %13
-		%15 %16,	//@parm %14 %17
-		%19 %20,	//@parm %18 %21
-		%23 %24);	//@parm %22 %25
+       (%03 %04,    //@parm %02 %05
+        %07 %08,    //@parm %06 %09
+        %11 %12,    //@parm %10 %13
+        %15 %16,    //@parm %14 %17
+        %19 %20,    //@parm %18 %21
+        %23 %24);   //@parm %22 %25
 #endm
 
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a method which takes seven arguments.
+#c
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: argument modifiers (e.g. [in])
+#c Argument7: argument type
+#c Argument8: argument name
+#c Argument9: argument comment
+#c Argument10: argument modifiers (e.g. [in])
+#c Argument11: argument type
+#c Argument12: argument name
+#c Argument13: argument comment
+#c Argument14: argument modifiers (e.g. [in])
+#c Argument15: argument type
+#c Argument16: argument name
+#c Argument17: argument comment
+#c Argument18: argument modifiers (e.g. [in])
+#c Argument19: argument type
+#c Argument20: argument name
+#c Argument21: argument comment
+#c Argument22: argument modifiers (e.g. [in])
+#c Argument23: argument type
+#c Argument24: argument name
+#c Argument25: argument comment
+#c Argument26: argument modifiers (e.g. [in])
+#c Argument27: argument type
+#c Argument28: argument name
+#c Argument29: argument comment
+#c Argument30: method description
+#c
+#startm AD_METHOD7 30
+  //****************
+  // %01()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+       (%03 %04,    //@parm %02 %05
+        %07 %08,    //@parm %06 %09
+        %11 %12,    //@parm %10 %13
+        %15 %16,    //@parm %14 %17
+        %19 %20,    //@parm %18 %21
+        %23 %24,    //@parm %22 %25
+        %27 %28);   //@parm %26 %29
+#endm
 
 #ccccccccccccccccccccccccccc
 #c
@@ -380,7 +456,7 @@ private:
   // constructor
   //
   Impl.this-module
-	    (%02 %03);	//@parm %01 %04
+        (%02 %03);  //@parm %01 %04
 #endm
 
 
@@ -404,8 +480,8 @@ private:
   // constructor
   //
     Impl.this-module
-	   (%02 %03,	//@parm %01 %04
-		%06 %07);	//@parm %05 %08
+       (%02 %03,    //@parm %01 %04
+        %06 %07);   //@parm %05 %08
 #endm
 
 
@@ -433,9 +509,9 @@ private:
   // constructor
   //
     Impl.this-module
-	   (%02 %03,	//@parm %01 %04
-		%06 %07,	//@parm %05 %08
-		%10 %11);	//@parm %09 %12
+       (%02 %03,    //@parm %01 %04
+        %06 %07,    //@parm %05 %08
+        %10 %11);   //@parm %09 %12
 #endm
 
 
@@ -467,10 +543,10 @@ private:
   // constructor
   //
     Impl.this-module
-	   (%02 %03,	//@parm %01 %04
-		%06 %07,	//@parm %05 %08
-		%10 %11,	//@parm %09 %12
-		%14 %15);	//@parm %13 %16
+       (%02 %03,    //@parm %01 %04
+        %06 %07,    //@parm %05 %08
+        %10 %11,    //@parm %09 %12
+        %14 %15);   //@parm %13 %16
 #endm
 
 
@@ -494,7 +570,7 @@ private:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	    (Impl%03 ** %04);	//@parm %02 %05
+        (Impl%03 ** %04);   //@parm %02 %05
 #endm
 
 
@@ -518,5 +594,5 @@ private:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     %01
-	    (Impl%03 * %04);	//@parm %02 %05
+        (Impl%03 * %04);    //@parm %02 %05
 #endm
