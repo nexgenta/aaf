@@ -101,7 +101,7 @@ ImplAAFPluginDef::ImplAAFPluginDef ()
 ImplAAFPluginDef::~ImplAAFPluginDef ()
 {
 	// Release the manufacturer locator
-	ImplAAFNetworkLocator *pNetLocator = _manufacturerURL.setValue(0);
+	ImplAAFNetworkLocator *pNetLocator = _manufacturerURL.clearValue();
 	if (pNetLocator)
 	{
 	  pNetLocator->ReleaseReference();
@@ -109,10 +109,10 @@ ImplAAFPluginDef::~ImplAAFPluginDef ()
 	}
 
 	// Release all of the other locator pointers.
-	size_t size = _locators.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _locators.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFLocator *pLocator = _locators.setValueAt(0, i);
+		ImplAAFLocator *pLocator = _locators.clearValueAt(i);
 		if (pLocator)
 		{
 		  pLocator->ReleaseReference();
@@ -698,13 +698,12 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDef::CountLocators (
       aafUInt32 *pCount)
 {
-	size_t	siz;
 	if (! pCount)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 
-	_locators.getSize(siz);
+	size_t	siz = _locators.count();
 	*pCount = siz;
 	return(AAFRESULT_SUCCESS);
 }
@@ -733,18 +732,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pLocator == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	size_t			siz;
-	long			n;
-	ImplAAFLocator	*obj = NULL;
-
-	_locators.getSize(siz);
-	for(n = siz-1; n >= 0; n--)
-	{
-		_locators.getValueAt(obj, n);
-		_locators.setValueAt(NULL, n);
-		_locators.setValueAt(obj, n+1);
-	}
-	_locators.setValueAt(pLocator, 0);
+	_locators.prependValue(pLocator);
 	pLocator->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
@@ -867,7 +855,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
-		return(XCODE());
 	}
 	XEND;
 	
@@ -921,13 +908,12 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT
     ImplAAFPluginDef::GetNumLocators (aafInt32 *pCount)
 {
-	size_t	siz;
 	if (! pCount)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 
-	_locators.getSize(siz);
+	size_t	siz = _locators.count();
 	*pCount = siz;
 	return(AAFRESULT_SUCCESS);
 }

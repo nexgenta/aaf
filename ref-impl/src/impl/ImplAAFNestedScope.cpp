@@ -74,10 +74,10 @@ ImplAAFNestedScope::ImplAAFNestedScope ()
 ImplAAFNestedScope::~ImplAAFNestedScope ()
 {
 	// Release all of the slot(segments) pointers in the slot list.
-	size_t size = _slots.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _slots.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFSegment* pSegment = _slots.setValueAt(0, i);
+		ImplAAFSegment* pSegment = _slots.clearValueAt(i);
 
 		if (pSegment)
 		{
@@ -108,7 +108,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	_slots.prependValue(pSegment);
+	pSegment->AcquireReference();
+
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -127,7 +130,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+  _slots.insertAt(pSegment,index);
+  pSegment->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -138,9 +144,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (NULL == pResult)
     return (AAFRESULT_NULL_PARAM);
 
-  size_t numSegments;
-
-	_slots.getSize(numSegments);
+	size_t numSegments = _slots.count();
 	
 	*pResult = numSegments;
 
@@ -212,7 +216,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (*ppEnum)
 		  (*ppEnum)->ReleaseReference();
 		(*ppEnum) = 0;
-		return(XCODE());
 	}
 	XEND;
 
@@ -226,7 +229,7 @@ AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafMobID_constref from,
 	
 	XPROTECT()
 	{
-		size_t count = _slots.getSize();
+		size_t count = _slots.count();
 		for (size_t n = 0; n < count; n++)
 		{
 			ImplAAFSegment	*pSegment;
