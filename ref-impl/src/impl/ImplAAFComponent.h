@@ -13,32 +13,27 @@ class ImplAAFOperationDef;
 class ImplAAFOperationGroup;
 class ImplAAFScopeStack;
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 
@@ -47,6 +42,16 @@ class ImplAAFScopeStack;
 #include "ImplAAFObject.h"
 #endif
 
+#include "OMWeakRefProperty.h"
+#include "OMStrongRefVectorProperty.h"
+
+#ifndef __ImplAAFKLVData_h__
+#include "ImplAAFKLVData.h"
+#endif
+
+#ifndef __ImplEnumAAFKLVData_h__
+#include "ImplEnumAAFKLVData.h"
+#endif
 
 typedef 
 enum _implCompType_t
@@ -97,6 +102,34 @@ public:
     GetDataDef
         (ImplAAFDataDef ** ppDataDef);  //@parm [retval][out] DataDef of this object
 
+  //****************
+  // AppendKLVData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AppendKLVData
+        (ImplAAFKLVData * pData);  //@parm [in,ref] Data
+
+  //****************
+  // RemoveKLVData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveKLVData
+        (ImplAAFKLVData * pData);
+
+  //****************
+  // CountKLVData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountKLVData
+        (aafUInt32 *  pNumComments);  //@parm [out,retval] Number  of KLVData
+
+
+  //****************
+  // GetKLVData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetKLVData
+        (ImplEnumAAFKLVData ** ppEnum);  //@parm [out,retval] KLVData
 
 public:
 	AAFRESULT SetNewProps(
@@ -120,9 +153,13 @@ public:
 												aafMobID_constref to);
 
 
+  // OM deep copy notification
+  virtual void onCopy(void* clientContext) const;
+
 private:
 	OMWeakReferenceProperty<ImplAAFDataDef>		_dataDef;
 	OMFixedSizeProperty<aafLength_t>	_length;
+    OMStrongReferenceVectorProperty<ImplAAFKLVData> _KLVData;
 };
 
 #endif // ! __ImplAAFComponent_h__
