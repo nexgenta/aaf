@@ -36,26 +36,65 @@
 #include "AAFCOMPlatformTypes.h"
 #endif
 
-#if defined(_MAC) || defined(_MAC_) || defined(macintosh)
-  // Include files form ActiveX SDK for the Macintosh
-  #include <compobj.h>
-#elif defined(WIN32) || defined(_WIN32)
-  #include <unknwn.h>
-  #include <objbase.h>
-#else
-  // Default to the Structured Storage reference implementation.
-  #include "REF.HXX"
-  
+#if defined( OS_MACOS )
+  // Include files from ActiveX SDK for the Macintosh
+#  include <compobj.h>
+
+
+#elif defined( OS_WINDOWS )
+#  include <unknwn.h>
+#  include <objbase.h>
+
+
+#elif defined( OS_UNIX )
+
+  EXTERN_C STDAPI  DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID FAR* ppv);
+
+#  ifndef INITGUID
+#    define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8)      \
+        EXTERN_C const GUID name                                          
+#  else                                                                     
+#    define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8)      \
+      EXTERN_C const GUID name;                                         \
+      EXTERN_C const GUID name                                          \
+                = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } } 
+#  endif // INITGUID
+
   // Make sure begin/end interface are at least defined. These macros are required
   // for all AAF interface files.
-  #ifndef BEGIN_INTERFACE
-    #define BEGIN_INTERFACE
-  #endif
+#  ifndef BEGIN_INTERFACE
+#    define BEGIN_INTERFACE
+#  endif
   #ifndef END_INTERFACE
     #define END_INTERFACE
-  #endif
+#  endif
+
+  // Stolen from wintype.h (from vc++ 6.0)
+#  define WINAPI
+
+  // Stolen from winbase.h (from vc++ 6.0)
+#  define WINBASEAPI
+
+  WINBASEAPI
+  DWORD
+  WINAPI
+  GetModuleFileNameW(
+      HMODULE hModule,
+      LPWSTR lpFilename,
+      DWORD nSize
+      );
+ 
+# define GetModuleFileName  GetModuleFileNameW
+
+#else
+#error Unknown operating system
+
+
 #endif
 
 
 #endif // __AAFCOMPlatform_h__
+
+
+
 

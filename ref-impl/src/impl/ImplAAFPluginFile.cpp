@@ -1,22 +1,41 @@
-/************************************************\
-*												                         *
-* Advanced Authoring Format						           *
-*												                         *
-* Copyright (c) 1998-1999 Avid Technology, Inc.  *
-* Copyright (c) 1998-1999 Microsoft Corporation  *
-*												                         *
-\************************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFPluginFile.h"
 
 // Include the AAF Runtime Dynamic (Library) Loader Interface  
 #include "aafrdli.h"
 
+#include "AAFTypes.h"
 #include "AAFResult.h"
 #include <assert.h>
 #include <string.h>
 
-#if defined(WIN32)
+#if defined( OS_WINDOWS )
 // Include declarations for InterlockedIncrement() and InterlockcedDecrment().
 #include <winbase.h>
 #endif
@@ -26,7 +45,7 @@
 ImplAAFPluginFile::ImplAAFPluginFile(const char *name) :
   _refCount(1),
   _name(name),
-  _libHandle(NULL)
+  _libHandle(0)
 {
   ClearEntryPoints();
 }
@@ -35,7 +54,7 @@ ImplAAFPluginFile::ImplAAFPluginFile(const char *name) :
 ImplAAFPluginFile::~ImplAAFPluginFile()
 {
   delete[] const_cast<char *>(_name);
-  _name = NULL;
+  _name = 0;
 }
 
 
@@ -47,22 +66,22 @@ HRESULT ImplAAFPluginFile::CreatePluginFile(
   ImplAAFPluginFile** ppPluginFile)
 {
   HRESULT result = S_OK;
-  ImplAAFPluginFile* pPluginFile = NULL;
+  ImplAAFPluginFile* pPluginFile = 0;
 
 
-  if (NULL == name || NULL == ppPluginFile)
+  if (!name || !ppPluginFile)
     return AAFRESULT_NULL_PARAM;
 
   // copy the given name. this will be owned by the plugin file object.
   int len = strlen(name) + 1;
   char *name_copy = new char[len];
-  if (NULL == name_copy)
+  if (!name_copy)
     result = AAFRESULT_NOMEMORY;
   else
   {
     strcpy(name_copy, name);
     pPluginFile = new ImplAAFPluginFile(name_copy);
-    if (NULL == pPluginFile)
+    if (!pPluginFile)
       result = AAFRESULT_NOMEMORY;
     else
     {
@@ -71,13 +90,14 @@ HRESULT ImplAAFPluginFile::CreatePluginFile(
       if (AAFRESULT_SUCCEEDED(result))
       {
         *ppPluginFile = pPluginFile;
-        pPluginFile = NULL;
+        pPluginFile = 0;
       }      
     }
   }
 
   if (pPluginFile)
     pPluginFile->ReleaseReference();
+  pPluginFile = 0;
 
   return result;
 }
@@ -87,7 +107,7 @@ HRESULT ImplAAFPluginFile::CreatePluginFile(
 aafUInt32 ImplAAFPluginFile::AcquireReference() const
 {  
   ImplAAFPluginFile *nonConstThis = const_cast<ImplAAFPluginFile *>(this);
-#if defined(WIN32)
+#if defined( OS_WINDOWS )
 	return ::InterlockedIncrement(reinterpret_cast<long *>(&nonConstThis->_refCount));
 #else
   ++(nonConstThis->_refCount);
@@ -98,7 +118,7 @@ aafUInt32 ImplAAFPluginFile::AcquireReference() const
 // Decrement the object reference count and delete the container.
 aafUInt32 ImplAAFPluginFile::ReleaseReference()
 {
-#if defined(WIN32)
+#if defined( OS_WINDOWS )
 	aafUInt32 count = ::InterlockedDecrement(reinterpret_cast<long *>(&_refCount));
 #else
 	aafUInt32 count = --(_refCount);
@@ -124,10 +144,10 @@ aafUInt32 ImplAAFPluginFile::ReferenceCount() const
 
 void ImplAAFPluginFile::ClearEntryPoints()
 {
-  _pfnCanUnloadNow = NULL;
-  _pfnGetClassObject = NULL;
-  _pfnGetClassCount = NULL;
-  _pfnGetClassObjectID = NULL;
+  _pfnCanUnloadNow = 0;
+  _pfnGetClassObject = 0;
+  _pfnGetClassCount = 0;
+  _pfnGetClassObjectID = 0;
 }
 
 
@@ -189,14 +209,14 @@ HRESULT ImplAAFPluginFile::Unload()
 {
   HRESULT result = AAFRESULT_SUCCESS;
 
-  if (NULL != _libHandle)
+  if (_libHandle)
   {
     result = ::AAFUnloadLibrary((AAFLibraryHandle)_libHandle);
 
     if (AAFRESULT_SUCCEEDED(result))
     {
       ClearEntryPoints();
-      _libHandle = NULL;
+      _libHandle = 0;
     }
 
   }

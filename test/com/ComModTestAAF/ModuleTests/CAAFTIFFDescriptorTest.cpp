@@ -29,12 +29,14 @@
 
 #include "AAF.h"
 
-
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "AAFTypes.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -189,7 +191,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUInt16				numEntries = 2;
 	unsigned long			nOffset;
 
-#if defined(_WIN32) || defined(WIN32)
+#if defined( OS_WINDOWS )
 	tiffHeader.tiff_byteOrder = TIFF_LITTLEENDIAN;
 #else
 	tiffHeader.tiff_byteOrder = TIFF_BIGENDIAN;
@@ -333,11 +335,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkExpression(isUniform == kAAFFalse, AAFRESULT_TEST_FAILED);
 		checkExpression(leadingLines == 10, AAFRESULT_TEST_FAILED);
 		checkExpression(trailingLines == 20, AAFRESULT_TEST_FAILED);
-#if defined(_WIN32) || defined(WIN32)
-		checkExpression(memcmp(summary, "II", 2) == 0, AAFRESULT_TEST_FAILED);
-#else
-		checkExpression(memcmp(summary, "MM", 2) == 0, AAFRESULT_TEST_FAILED);
-#endif
+// The next statement is not true when doing cross-platform tests
+//#if defined( OS_WINDOWS )
+//		checkExpression(memcmp(summary, "II", 2) == 0, AAFRESULT_TEST_FAILED);
+//#else
+//		checkExpression(memcmp(summary, "MM", 2) == 0, AAFRESULT_TEST_FAILED);
+//#endif
 
     // NOTE: The elements in the summary structure need to be byte swapped
 		//       on Big Endian system (i.e. the MAC).
@@ -376,14 +379,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTIFFDescriptor_test()
+extern "C" HRESULT CAAFTIFFDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFTIFFDescriptor_test(testMode_t mode)
 {
 	aafWChar*	pFileName = L"AAFTIFFDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}

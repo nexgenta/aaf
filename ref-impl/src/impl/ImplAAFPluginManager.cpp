@@ -25,6 +25,10 @@
  *
  ************************************************************************/
 
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
+#endif
+
 #ifndef __ImplAAFPluginManager_h__
 #include "ImplAAFPluginManager.h"
 #endif
@@ -43,13 +47,11 @@
 #include "ImplAAFFileDescriptor.h"
 #include "ImplAAFSourceMob.h"
 
-
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 #include <iostream.h>
-#if defined(_MAC) || defined(macintosh)
-#include <wstring.h>
-#endif
 
 #include "AAFUtils.h"
 #include "AAFDefUIDs.h"
@@ -210,7 +212,6 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		if (theEnum)
 			theEnum->ReleaseReference();
-		return(XCODE());
 	}
 	XEND;
 	
@@ -271,12 +272,12 @@ AAFTestLibraryProcData::AAFTestLibraryProcData(ImplAAFPluginManager *pluginMgr, 
 	memset(caseBuffer, 0, kCaseBufferSize);
 }
 
-static AAFRDLIRESULT testPluginProc(const char* path, const char* name, char isDirectory, void * userData)
+static AAFRDLIRESULT testPluginProc(const char *path, const char* name, char isDirectory, void * userData)
 {
-  AAFRESULT rc = AAFRESULT_SUCCESS;
 	AAFTestLibraryProcData *pData = (AAFTestLibraryProcData *)userData;
 	assert(pData && pData->plugins && pData->pluginFiles && pData->currentLibraryPath && pData->pluginPrefix && pData->pluginPrefixSize);
 
+#if defined( OS_MACOS ) || defined( OS_WINDOWS )
   //
   // If the current name is not a directory and not equal to the 
   // path this dll (the reference implementation dll) and 
@@ -288,9 +289,15 @@ static AAFRDLIRESULT testPluginProc(const char* path, const char* name, char isD
     if ( 0 == strncmp(pData->caseBuffer, pData->pluginPrefix, pData->pluginPrefixSize)) 
     { 
       if ( 0 != strcmp(path, pData->currentLibraryPath) )
-        rc = (pData->plugins)->RegisterPluginFile(path);
+        (pData->plugins)->RegisterPluginFile(path);
     }
   }
+#else
+  if(!isDirectory && 0 != strcmp(pData->currentLibraryPath, name))
+  {
+	(pData->plugins)->RegisterPluginFile(name);
+  }
+#endif
 
   // Ignore error results and continue processing plugins...
   return 0;
@@ -298,6 +305,7 @@ static AAFRDLIRESULT testPluginProc(const char* path, const char* name, char isD
 
 static AAFRDLIRESULT registerSharedPluginsProc(const char* path, const char* name, char isDirectory, void * userData)
 {
+#if defined( OS_MACOS ) || defined( OS_WINDOWS )
   AAFRESULT rc = AAFRESULT_SUCCESS;
   AAFTestLibraryProcData *pData = (AAFTestLibraryProcData *)userData;
   assert(pData && pData->plugins && pData->pluginFiles && pData->currentLibraryPath && pData->pluginDirectory);
@@ -316,6 +324,9 @@ static AAFRDLIRESULT registerSharedPluginsProc(const char* path, const char* nam
 
   // Ignore error results and continue processing plugins...
   return 0;
+#else
+  return(testPluginProc(path,name,isDirectory,userData));
+#endif
 }
 
 
@@ -495,7 +506,6 @@ AAFRESULT ImplAAFPluginManager::MakeCodecFromEssenceDesc(
 	CLSID					codecCLSID;
 	aafUID_t				essenceDescClass;
 	IAAFEssenceCodec		*localCodec;
-	aafBool					found = kAAFFalse;
 	aafSelectInfo_t			selectInfo;
 	ImplAAFFileDescriptor	*fileDescriptor;
 	IUnknown				*iUnk;
@@ -826,7 +836,7 @@ AAFRESULT ImplAAFPluginManager::RegisterPlugin(CLSID pluginClass)
 	// HACK: Problem CAAFEssenceDataStream is NOT a plugin! This class
 	// should be INSIDE the reference implementation not in an external
 	// plugin!
-	if (IsEqualCLSID(CLSID_AAFEssenceDataStream, pluginClass))
+	if (aafIsEqualCLSID(CLSID_AAFEssenceDataStream, pluginClass))
 		return AAFRESULT_SUCCESS;
 	
 	

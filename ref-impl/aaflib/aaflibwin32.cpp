@@ -26,12 +26,14 @@
  ************************************************************************/
 
 
+// Declare the public interface that must be implemented.
+#include "aaflib.h"
 
 //
 // Use include guard so that the file can be included in every 
 // platform build without causing any errors in the build.
 //
-#if defined(WIN32) || defined(_WIN32)
+#if defined( OS_WINDOWS )
 
 // Declare the public interface that must be implemented.
 #include "aafrdli.h"
@@ -170,7 +172,7 @@ AAFRDLIRESULT AAFFindLibrary(const char* name, LPFNAAFTESTFILEPROC testProc, voi
 		};
 
 		for (int i = 0; AAFRESULT_SUCCESS == result && pluginFileNames[i]; ++i)
-			result = testProc(pluginFileNames[i], false /* not a directory */, userData);
+			result = testProc(pluginFileNames[i], pluginFileNames[i], false /* not a directory */, userData);
 	}
 	else
 	{
@@ -210,14 +212,16 @@ AAFRDLIRESULT AAFFindLibrary(const char* name, LPFNAAFTESTFILEPROC testProc, voi
 			if (isDirectory)
 			{
 				if (AAFIsValidDirectory(findData.cFileName) && AAFIsValidDirectory(findPath))
-					result = testProc(findPath, isDirectory, userData);
+				{
+					result = testProc(findPath, findData.cFileName, isDirectory, userData);
+				}
 			}
 			else // its a file
 			{
 				// Check for valid AAFLibrary file extensions
 				if (AAFIsValidFile(findPath))
 				{
-					result = testProc(findPath, isDirectory, userData);
+					result = testProc(findPath, findData.cFileName, isDirectory, userData);
 				}
 			}
 
@@ -245,4 +249,5 @@ AAFRDLIRESULT AAFFindLibrary(const char* name, LPFNAAFTESTFILEPROC testProc, voi
 	return result;
 }
 
-#endif /* #if defined(WIN32) || defined(_WIN32) */
+#endif /* #if defined( OS_WINDOWS ) */
+

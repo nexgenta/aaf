@@ -46,7 +46,7 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
-#if defined(macintosh) || defined(_MAC)
+#if defined( OS_MACOS )
 #include "DataInput.h"
 #endif
 
@@ -55,7 +55,7 @@
 //
 // NOTE: If your compiler does not support 64 bit integers then this example will NOT
 // print out the correct lengths.
-#ifdef _MSC_VER
+#if defined( COMPILER_MSC )
 #define L64 "I64"
 #else
 #define L64 "ll"
@@ -545,19 +545,6 @@ cleanup:
 	
 	return moduleErrorTmp;
 }
-// simple helper class to initialize and cleanup COM library.
-struct CComInitialize
-{
-  CComInitialize()
-  {
-    CoInitialize(NULL);
-  }
-
-  ~CComInitialize()
-  {
-    CoUninitialize();
-  }
-};
 
 // now need the reading functionality
 static HRESULT ReadAAFFile(aafWChar * pFileName)
@@ -640,7 +627,6 @@ int main(int argumentCount, char *argumentVector[])
 #if USE_TIMER_LIB
 	UTLInitTimers(1000);
 #endif
-	CComInitialize comInit;
 	
 	aafWChar FileNameBuffer[MAX];
 	mbstowcs(FileNameBuffer,niceFileName,MAX);
