@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,7 +31,7 @@
 
 #include "OMDataTypes.h"
 
-#include "OMPropertyBase.h"
+#include "OMProperty.h"
 
 struct IStream;
 
@@ -49,7 +49,7 @@ public:
   virtual ~OMDataStreamProperty(void);
 
     // @cmember Save this <c OMDataStreamProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember Restore this <c OMDataStreamProperty>, the size of the
     //          <c OMDataStreamProperty> is <p size>.
