@@ -248,12 +248,7 @@ void OMWeakReferenceProperty<ReferencedObject>::save(void) const
 
   PRECONDITION("Non-void weak reference", !_reference.isVoid());
 
-  OMPropertyTag tag = targetTag();
-
-  const OMUniqueObjectIdentification& id = _reference.identification();
-  store()->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
-
-  _reference.save();
+  store()->save(*this);
 }
 
   // @mfunc Close this <c OMWeakReferenceProperty>.
@@ -275,21 +270,11 @@ void OMWeakReferenceProperty<ReferencedObject>::close(void)
   //          <c OMStorable>.
   //   @parm The external (persisted) size of the <c OMWeakReferenceProperty>.
 template <typename ReferencedObject>
-void OMWeakReferenceProperty<ReferencedObject>::restore(
-                                                    size_t ANAME(externalSize))
+void OMWeakReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::restore");
 
-  OMUniqueObjectIdentification id;
-  OMPropertyTag tag;
-  ASSERT("Sizes match", (sizeof(tag) + sizeof(OMPropertyId) +
-                         sizeof(OMKeySize) + sizeof(id)) == externalSize);
-  OMPropertyId keyPropertyId;
-  store()->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
-  ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
-  _targetTag = tag;
-  _reference = OMWeakObjectReference(this, id, _targetTag);
-  _reference.restore();
+  store()->restore(*this, externalSize);
   setPresent();
 }
 
@@ -455,9 +440,10 @@ OMWeakReferenceProperty<ReferencedObject>::targetPropertyPath(void) const
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::targetPropertyPath");
 
-  PRECONDITION("Valid target name", validWideString(_targetName));
-
   if (_targetPropertyPath == 0) {
+
+    ASSERT("Valid target name", validWideString(_targetName));
+
     OMWeakReferenceProperty<ReferencedObject>* nonConstThis =
                   const_cast<OMWeakReferenceProperty<ReferencedObject>*>(this);
     nonConstThis->_targetPropertyPath = file()->path(_targetName);
@@ -478,6 +464,23 @@ OMWeakReferenceProperty<ReferencedObject>::clearTargetTag(void) const
   nonConstThis->_targetTag = nullOMPropertyTag;
   delete [] nonConstThis->_targetPropertyPath;
   nonConstThis->_targetPropertyPath = 0;
+}
+
+template <typename ReferencedObject>
+void OMWeakReferenceProperty<ReferencedObject>::shallowCopyTo(
+                                                 OMProperty* destination) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::shallowCopyTo");
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+}
+
+template <typename ReferencedObject>
+void OMWeakReferenceProperty<ReferencedObject>::deepCopyTo(
+                                               OMProperty* /* destination */,
+                                               void* /* clientContext */) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::deepCopyTo");
+  // Nothing to do - this is a deep copy
 }
 
 #endif

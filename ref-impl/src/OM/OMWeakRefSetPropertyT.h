@@ -35,6 +35,7 @@
 #include "OMWeakReferenceSetIter.h"
 #include "OMPropertyTable.h"
 #include "OMUtilities.h"
+#include "OMStoredObject.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -74,9 +75,7 @@ OMWeakReferenceSetProperty<ReferencedObject>::OMWeakReferenceSetProperty(
                                         const wchar_t* name,
                                         const OMPropertyId keyPropertyId,
                                         const OMPropertyId* targetPropertyPath)
-: OMReferenceSetProperty(propertyId,
-                         SF_WEAK_OBJECT_REFERENCE_SET,
-                         name),
+: OMWeakReferenceSet(propertyId, name),
   _targetTag(nullOMPropertyTag),
   _targetName(0),
   _targetPropertyPath(0),
@@ -111,52 +110,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  OMPropertyTag tag = targetTag();
-
-  // create a set index
-  //
-  size_t count = _set.count();
-  OMUniqueObjectIdentification* index = 0;
-  if (count > 0) {
-    index = new OMUniqueObjectIdentification[count];
-    ASSERT("Valid heap pointer", index != 0);
-  }
-  size_t position = 0;
-
-  // Iterate over the set saving each element. The index entries
-  // are written in order of their unique keys.
-  //
-  SetIterator iterator(_set, OMBefore);
-  while (++iterator) {
-
-    SetElement& element = iterator.value();
-
-    // enter into the index
-    //
-    index[position] = element.identification();
-
-    // save the object
-    //
-    element.save();
-
-    position = position + 1;
-
-  }
-
-  // save the set index
-  //
-  store()->save(storedName(),
-                index,
-                count,
-                tag,
-                _keyPropertyId);
-  delete [] index;
-
-  // make an entry in the property index
-  //
-  saveName();
-
-  clearTargetTag();
+  store()->save(*this);
 }
 
   // @mfunc Close this <c OMWeakReferenceSetProperty>.
@@ -205,42 +159,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::restore");
 
-  // get the name of the set index stream
-  //
-  restoreName(externalSize);
-
-  // restore the index
-  //
-  OMUniqueObjectIdentification* setIndex = 0;
-  size_t entries;
-  OMPropertyTag tag;
-  OMPropertyId keyPropertyId;
-  store()->restore(storedName(),
-                   setIndex,
-                   entries,
-                   tag,
-                   keyPropertyId);
-
-  ASSERT("Valid set index", IMPLIES(entries != 0, setIndex != 0));
-  ASSERT("Valid set index", IMPLIES(entries == 0, setIndex == 0));
-  ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
-  _targetTag = tag;
-
-  // Iterate over the index restoring the elements of the set.
-  // Since the index entries are stored on disk in order of their
-  // unique keys this loop is the worst cast order of insertion. This
-  // code will eventually be replaced by code that inserts the keys in
-  // "binary search" order. That is the middle key is inserted first
-  // then (recursively) all the keys below the middle key followed by
-  // (recursively) all the keys above the middle key.
-  //
-  for (size_t i = 0; i < entries; i++) {
-    OMUniqueObjectIdentification key = setIndex[i];
-    SetElement newElement(this, key, _targetTag);
-    newElement.restore();
-    _set.insert(key, newElement);
-   }
-  delete [] setIndex;
+  store()->restore(*this, externalSize);
   setPresent();
 }
 
@@ -283,7 +202,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::insert(
 #if defined(OM_VALIDATE_WEAK_REFERENCES)
   newElement.reference().setTargetTag(targetTag());
 #endif
-  newElement.setValue(object);
+  newElement.setValue(key, object);
   _set.insert(key, newElement);
   setPresent();
 
@@ -357,7 +276,12 @@ OMWeakReferenceSetProperty<ReferencedObject>::remove(
   SetElement* element = 0;
   bool found = _set.find(identification, &element);
   ASSERT("Object found", found);
-  ReferencedObject* result = element->setValue(0);
+  OMStorable* p = element->setValue(nullOMUniqueObjectIdentification, 0);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  }
   _set.remove(identification);
 
   POSTCONDITION("Object is not present", !contains(identification));
@@ -382,7 +306,7 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::ensureAbsent(
   SetElement* element = 0;
   bool result = _set.find(identification, &element);
   if (result) {
-    element->setValue(0);
+    element->setValue(nullOMUniqueObjectIdentification, 0);
     _set.remove(identification);
   }
 
@@ -487,7 +411,12 @@ ReferencedObject* OMWeakReferenceSetProperty<ReferencedObject>::value(
   SetElement* element = 0;
 
   _set.find(identification, &element);
-  ReferencedObject* result = element->getValue();
+  OMStorable* p = element->getValue();
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  }
 
   POSTCONDITION("Valid result", result != 0);
   return result;
@@ -516,7 +445,13 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::find(
 
   bool result = _set.find(identification, &element);
   if (result) {
-    object = element->getValue();
+    OMStorable* p = element->getValue();
+    if (p != 0) {
+      object = dynamic_cast<ReferencedObject*>(p);
+      ASSERT("Object is correct type", object != 0);
+    } else {
+      object = 0;
+    } 
   }
 
   return result;
@@ -539,7 +474,7 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::isVoid(void) const
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
     SetElement& element = iterator.value();
-    ReferencedObject* object = element.getValue();
+    OMStorable* object = element.getValue();
     if (object != 0) {
       result = false;
       break;
@@ -602,7 +537,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::getBits(
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  const ReferencedObject** p = (const ReferencedObject**)bits;
+  const OMStorable** p = (const OMStorable**)bits;
 
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
@@ -815,6 +750,31 @@ OMWeakReferenceSetProperty<ReferencedObject>::findObject(
 }
 
 template <typename ReferencedObject>
+OMContainerIterator<OMWeakReferenceSetElement>*
+OMWeakReferenceSetProperty<ReferencedObject>::iterator(void) const
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::iterator");
+
+  OMSetIterator<OMUniqueObjectIdentification, SetElement>* result =
+   new OMSetIterator<OMUniqueObjectIdentification, SetElement>(_set, OMBefore);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
+}
+
+template <typename ReferencedObject>
+void
+OMWeakReferenceSetProperty<ReferencedObject>::insert(
+                                      void* key,
+                                      const OMWeakReferenceSetElement& element)
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::insert");
+
+  OMUniqueObjectIdentification* k =
+                          reinterpret_cast<OMUniqueObjectIdentification*>(key);
+  _set.insert(*k, element);
+}
+
+template <typename ReferencedObject>
 OMPropertyTag
 OMWeakReferenceSetProperty<ReferencedObject>::targetTag(void) const
 {
@@ -880,6 +840,23 @@ OMWeakReferenceSetProperty<ReferencedObject>::clearTargetTag(void) const
   nonConstThis->_targetTag = nullOMPropertyTag;
   delete [] nonConstThis->_targetPropertyPath;
   nonConstThis->_targetPropertyPath = 0;
+}
+
+template <typename ReferencedObject>
+void OMWeakReferenceSetProperty<ReferencedObject>::shallowCopyTo(
+                                                 OMProperty* destination) const
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::shallowCopyTo");
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+}
+
+template <typename ReferencedObject>
+void OMWeakReferenceSetProperty<ReferencedObject>::deepCopyTo(
+                                               OMProperty* /* destination */,
+                                               void* /* clientContext */) const
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::deepCopyTo");
+  // Nothing to do - this is a deep copy
 }
 
 #endif
