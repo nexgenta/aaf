@@ -16,11 +16,11 @@
 
 class ImplAAFMob;
 
-class ImplAAFMedia;
+class ImplAAFEssenceData;
 
 class ImplEnumAAFMobs;
 
-class ImplEnumAAFMedia;
+class ImplEnumAAFEssenceData;
 
 class ImplAAFDictionary;
 
@@ -43,20 +43,14 @@ class ImplAAFFile;
 
 #include "aafErr.h"
 #include "ImplAAFObject.h"
-//#include "ImplAAFSession.h"
 #include "ImplAAFIdentification.h"
 #include "ImplAAFContentStorage.h"
+#include "ImplAAFDictionary.h"
 
-#include "OMProperty.h"
 
 class AAFDataKind;
-class AAFEffectDef;
-class ImplAAFSession;
+class AAFOperationDef;
 
-const int PID_HEADER_BYTEORDER          = 0;
-const int PID_HEADER_LASTMODIFIED       = 1;
-const int PID_HEADER_IDENTIFICATIONLIST = 2;
-const int PID_HEADER_CONTENTSTORAGE		= 3;
 
 class ImplAAFHeader : public ImplAAFObject
 {
@@ -128,45 +122,54 @@ public:
         (ImplAAFMob * pMob);  //@parm [in] Mob to remove from header
 
 
-
   //****************
-  // IsMediaDataPresent()
+  // GetNumEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    IsMediaDataPresent
-        (aafUID_t *  pFileMobID,   //@parm [in,ref] A Unique File Mob ID
-		 aafFileFormat_t  fmt,   //@parm [in] The Media File Format
-         aafBool *  result);  //@parm [out,retval] True if the media is found
+    GetNumEssenceData
+        (aafUInt32 *  pNumEssenceData);  //@parm [out,retval] Total number of essence data with type
 
 
   //****************
-  // EnumAAFMediaObjects()
+  // IsEssenceDataPresent()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    EnumAAFMediaObjects
-	    (// @parm [in,ref] Media Criteria for enumeration
-         aafMediaCriteria_t *  pMediaCriteria,
+    IsEssenceDataPresent
+        (// @parm [in] A Unique File Mob ID
+		 aafUID_t *  pFileMobID,
 
-		 // @parm [out,retval] Media Enumeration
-		 ImplEnumAAFMedia ** ppEnum);
+		 // @parm [in] The Essence File Format
+		 aafFileFormat_t  fmt,
+
+		 // @parm [out,retval] True if the essence is found
+         aafBool *  pResult);
 
 
   //****************
-  // AppendMedia()
+  // EnumAAFEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendMedia
-		// @parm [in] Media object to append
-        (ImplAAFMedia * pMedia);
+    EnumEssenceData
+	    ( // @parm [out,retval] Essence Enumeration
+		 ImplEnumAAFEssenceData ** ppEnum);
 
 
   //****************
-  // RemoveMedia()
+  // AppendEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveMedia
-		// @parm [in] Media object to remove
-        (ImplAAFMedia * pMedia);
+    AppendEssenceData
+		// @parm [in] Essence data object to append
+        (ImplAAFEssenceData * pEssenceData);
+
+
+  //****************
+  // RemoveEssenceData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveEssenceData
+		// @parm [in] Essence data object to Remove
+        (ImplAAFEssenceData * pEssenceData);
 
 
   //****************
@@ -275,8 +278,6 @@ public:
 
 public:
 	// Interfaces visible inside the toolkit, but not exposed through the API
-	AAFRESULT AppendDataObject(aafUID_t mobID,      /* IN - Mob ID */
-						  ImplAAFObject *dataObj) ;    /* IN - Input Mob */ 
 
 AAFRESULT SetToolkitRevisionCurrent(void);
 AAFRESULT IsValidHeadObject(void);
@@ -284,36 +285,20 @@ AAFRESULT IsValidHeadObject(void);
 AAFRESULT GetNumIdentifications (aafInt32 * /*pCount*/);
 
 AAFRESULT AddIdentificationObject (aafProductIdentification_t * /*pIdent*/);
-AAFRESULT BuildMediaCache(void);
 AAFRESULT LoadMobTables(void);
+AAFRESULT SetModified(void);		// To NOW
+
+  void SetByteOrder(const aafInt16 byteOrder);
+  void SetDictionary(ImplAAFDictionary *pDictionary);
 
 private:
 	// These are private accessor methods.
 	ImplAAFContentStorage *GetContentStorage(void);
 	ImplAAFDictionary *GetDictionary(void);
 
-public:
-#if FULL_TOOLKIT
-AAFRESULT ReadToolkitRevision(aafProductVersion_t *revision);
-AAFRESULT WriteToolkitRevision(aafProductVersion_t revision);
-AAFRESULT FinishCreation(void);
-AAFRESULT BuildDatakindCache(void);
-AAFRESULT BuildEffectDefCache(void);
-AAFRESULT UpdateLocalCLSD(void);
-AAFRESULT CreateTables(void);
-AAFRESULT UpdateFileCLSD(void);
-AAFRESULT CreateDatakindCache(void);
-#endif
-
 private:
 
 		ImplAAFFile		*_file;
-#if FULL_TOOLKIT
-		aafTable_t       *_dataObjs;
-		aafTable_t       *_datadefs;
-		aafTable_t       *_effectDefs;
-		aafTable_t       *_mobs;
-#endif
 
 		// Non-table instance variables
 		aafVersionType_t	_fileRev;
@@ -325,6 +310,7 @@ private:
 		OMFixedSizeProperty<aafTimeStamp_t>                _lastModified;
     OMStrongReferenceVectorProperty<ImplAAFIdentification> _identificationList;
 		OMStrongReferenceProperty<ImplAAFContentStorage>	_contentStorage;
+		OMStrongReferenceProperty<ImplAAFDictionary>	_dictionary;
 };
 
 #endif // ! __ImplAAFHeader_h__

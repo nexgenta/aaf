@@ -9,48 +9,30 @@
 # aaf object:
 AAFPERSISTENTOBJECTS = \
 	AAFAIFCData \
-	AAFAIFCDescriptor \
-	AAFCommentMarker \
-	AAFConstValue \
-	AAFControlPoint \
 	AAFDataDef \
 	AAFDOSLocator \
-	AAFEffectDef \
-	AAFEvent \
-	AAFEventMobSlot \
-	AAFGPITrigger \
 	AAFJPEGData \
-	AAFHTMLClip \
 	AAFHTMLData \
-	AAFHTMLDescriptor \
 	AAFImageData \
-	AAFIntraFrameMarker \
 	AAFLocator \
 	AAFMacLocator \
 	AAFMediaFilmDescriptor \
 	AAFMediaGroup \
 	AAFMIDIData \
-	AAFMIDIDescriptor \
+	AAFMIDIFileDescriptor \
 	AAFNestedScope\
-	AAFParameter \
-	AAFParameterDef \
 	AAFPluggableCode \
-	AAFPluginManager \
 	AAFPulldown \
 	AAFReferenceValue \
 	AAFRGBADescriptor \
 	AAFScopeReference \
-	AAFStaticMobSlot \
 	AAFTaggedValue \
-	AAFTextClip \
 	AAFTextLocator \
 	AAFTIFFData \
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTypeDefSet \
-	AAFTypeDefRecord \
 	AAFUnixLocator \
-	AAFVaryingValue \
 	AAFWAVEData \
 	AAFWindowsLocator
 
@@ -63,22 +45,19 @@ AAFNONPERSISTENTOBJECTS = \
 	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFDefs \
-	EnumAAFEffectDefs \
 	EnumAAFIdentifications \
-	EnumAAFLoadedPlugins \
 	EnumAAFMobComments \
 	EnumAAFObjects \
-	EnumAAFParameterDefs \
 	EnumAAFPropertyDefs \
 	EnumAAFPropertyValues \
-	EnumAAFReferenceValues \
-	EnumAAFTypeDefs 
+	EnumAAFReferenceValues
 
 
 # These are files which specify COM interfaces, but which are
 # implemented in other objects.
 AAFCOMINTERFACESONLY = \
 	AAFEndian \
+	AAFEssenceSampleStream \
 	AAFSearchSource
 
 # These are the impl files that are typed by humans.  Be sure to
@@ -86,19 +65,26 @@ AAFCOMINTERFACESONLY = \
 # its name here and remove it from either list above where it occurs.
 # Do not add the 'Impl'prefix here.
 HUMAN_TYPED_IMPL = \
+	AAFAIFCDescriptor \
 	AAFClassDef \
 	AAFCodecDef \
+	AAFCommentMarker \
 	AAFComponent \
 	AAFCompositionMob \
+	AAFConstValue \
 	AAFContainerDef \
 	AAFContentStorage \
+	AAFControlPoint \
 	AAFDefObject \
 	AAFDictionary \
 	AAFEdgecode \
+	AAFOperationDef \
 	AAFEssenceAccess \
 	AAFEssenceData \
 	AAFEssenceDescriptor \
 	AAFEssencePlugin \
+	AAFEvent \
+	AAFEventMobSlot \
 	AAFFile \
 	AAFFileDescriptor \
 	AAFDigitalImageDescriptor \
@@ -106,28 +92,37 @@ HUMAN_TYPED_IMPL = \
 	AAFEssenceFormat \
 	AAFFiller \
 	AAFFindSourceInfo \
-	AAFGroup \
+	AAFOperationGroup \
+	AAFGPITrigger \
 	AAFHeader \
+	AAFHTMLClip \
+	AAFHTMLDescriptor \
 	AAFIdentification \
+	AAFIntraFrameMarker \
 	AAFMasterMob \
 	AAFMob  \
 	AAFMobSlot \
 	AAFNetworkLocator \
 	AAFObject \
+	AAFParameter \
+	AAFParameterDef \
 	AAFProperty \
 	AAFPropertyDef \
 	AAFPropertyValue \
-	AAFPluggableDef \
+	AAFPropValData \
 	AAFPluginDescriptor \
+	AAFPluginManager \
 	AAFSegment \
 	AAFSelector \
 	AAFSequence \
 	AAFSourceClip \
 	AAFSourceMob \
 	AAFSourceReference \
+	AAFStaticMobSlot \
 	AAFTimecode \
 	AAFTimelineMobSlot \
 	AAFTapeDescriptor \
+	AAFTextClip \
 	AAFTransition \
 	AAFTIFFDescriptor \
 	AAFTypeDef \
@@ -135,23 +130,30 @@ HUMAN_TYPED_IMPL = \
 	AAFTypeDefRename \
 	AAFTypeDefEnum \
 	AAFTypeDefFixedArray \
+	AAFTypeDefRecord \
 	AAFTypeDefStream \
 	AAFTypeDefString \
 	AAFTypeDefStrongObjRef \
 	AAFTypeDefWeakObjRef \
 	AAFTypeDefObjectRef \
 	AAFTypeDefVariableArray \
+	AAFVaryingValue \
 	AAFWAVEDescriptor \
+	EnumAAFCodecDefs \
 	EnumAAFComponents \
+	EnumAAFContainerDefs \
+	EnumAAFOperationDefs \
 	EnumAAFEssenceData \
+	EnumAAFLoadedPlugins \
 	EnumAAFLocators \
 	EnumAAFMobSlots \
 	EnumAAFMobs \
+	EnumAAFParameterDefs \
 	EnumAAFProperties \
-	EnumAAFPluggableDefs \
 	EnumAAFPluginDescriptors \
 	EnumAAFPluginLocators \
-	EnumAAFSegments 
+	EnumAAFSegments \
+	EnumAAFTypeDefs 
 
 # The list of standard dodo targets.
 # AAFTypes have to be handled separately since no object is to be created.
@@ -181,7 +183,6 @@ AUTO_GEN_IMPL = \
 PLUGIN_OBJECTS = \
 	AAFPlugin \
 	AAFEssenceStream \
-	AAFEssenceSampleStream \
 	AAFEssenceDataStream \
 	AAFEssenceCodec \
 	AAFEssenceContainer
