@@ -53,11 +53,14 @@ AD_CPP_QUOTE(#endif // ndef _MAC)
 AD_CPP_QUOTE(#ifdef __MWERKS__)
 AD_CPP_QUOTE(#if !__option\(wchar_type\))
 AD_CPP_QUOTE(typedef aafUInt16 	aafWChar;)
+AD_CPP_QUOTE(typedef aafUInt16 	aafCharacter;)
 AD_CPP_QUOTE(#else //!__option\(wchar_type\))
 AD_CPP_QUOTE(typedef wchar_t 	aafWChar;)
+AD_CPP_QUOTE(typedef wchar_t 	aafCharacter;)
 AD_CPP_QUOTE(#endif //!__option\(wchar_type\))
 AD_CPP_QUOTE(#else // __MWERKS__)
 typedef wchar_t		aafWChar;
+typedef wchar_t		aafCharacter;
 AD_CPP_QUOTE(#endif // __MWERKS__)
 
 typedef aafInt32		AAFRESULT;
@@ -94,7 +97,7 @@ typedef AAF_INT64_TYPE aafInt64;
 #endif
 AD_CPP_QUOTE(#else)
 
-AD_CPP_QUOTE(#ifdef __MWERKS)
+AD_CPP_QUOTE(#ifdef __MWERKS__)
 AD_CPP_QUOTE(#if \(__MWERKS__ >= 0x1100\))
 AD_CPP_QUOTE(#define AAF_INT64_NATIVE	1)
 AD_CPP_QUOTE(#define AAF_INT64_TYPE		long long)
@@ -147,9 +150,9 @@ AD_CPP_QUOTE(#endif)
 
 
 AD_CPP_QUOTE(#if 0)
-typedef [string] aafWChar * aafString_t;
+typedef [string] aafCharacter * aafString_t;
 AD_CPP_QUOTE(#endif)
-AD_CPP_QUOTE(typedef aafWChar * aafString_t;)
+AD_CPP_QUOTE(typedef aafCharacter * aafString_t;)
 
 AD_CPP_QUOTE(/************************************************************)
 AD_CPP_QUOTE(\ *)
@@ -179,7 +182,7 @@ typedef aafUInt8    	*aafDataValue_t;
 typedef aafUInt8    	*aafDataBuffer_t;
 
 
-AD_CPP_QUOTE(\/*** Types for effects ***/)
+AD_CPP_QUOTE(\/*** Types for operation groups ***/)
 typedef struct _aafUID_t   aafArgIDType_t;
 	
 AD_CPP_QUOTE(\/*** Types for plugins ***/)
@@ -325,6 +328,12 @@ typedef enum _aafSwapNeeded_t
 	kAAFNeverSwap = 1
 } aafSwapNeeded_t;
 
+typedef enum _aafTimecodeSourceType_t
+{
+	kAAFTimecodeLTC = 0,
+	kAAFTimecodeVITC = 1
+} aafTimecodeSourceType_t;
+
 AD_CPP_QUOTE(/************************************************************)
 AD_CPP_QUOTE(\ *)
 AD_CPP_QUOTE(\ * Mob specific data types)
@@ -341,21 +350,21 @@ typedef enum _aafMobKind_t
 	kAllMob = 6
 } aafMobKind_t;
 
-typedef enum _aafEffectChoice_t
+typedef enum _aafOperationChoice_t
 {
   kFindNull = 0,
   kFindIncoming = 1,
   kFindOutgoing = 2,
   kFindRender = 3,
-  kFindEffectSrc1 = 4,
-  kFindEffectSrc2 = 5,
-  kFindEffectSrc3 = 6,
-  kFindEffectSrc4 = 7, 
-  kFindEffectSrc5 = 8,
-  kFindEffectSrc6 = 9,
-  kFindEffectSrc7 = 10,
-  kFindEffectSrc8 = 11
-} aafEffectChoice_t;
+  kFindOperationSrc1 = 4,
+  kFindOperationSrc2 = 5,
+  kFindOperationSrc3 = 6,
+  kFindOperationSrc4 = 7, 
+  kFindOperationSrc5 = 8,
+  kFindOperationSrc6 = 9,
+  kFindOperationSrc7 = 10,
+  kFindOperationSrc8 = 11
+} aafOperationChoice_t;
 
 typedef enum _aafDepend_t
 {
@@ -457,7 +466,7 @@ typedef struct _aafMobComment_t
 
 AD_CPP_QUOTE(/************************************************************)
 AD_CPP_QUOTE(\ *)
-AD_CPP_QUOTE(\ * Effect Types)
+AD_CPP_QUOTE(\ * Operation Group Types)
 AD_CPP_QUOTE(\ *)
 AD_CPP_QUOTE(\ *************************************************************/)	  
 typedef enum _aafInterpKind_t
@@ -507,11 +516,11 @@ typedef struct _aafProductVersion_t
 
 typedef struct _aafProductIdentification_t
 {
-	aafWChar				*companyName;
-	aafWChar				*productName;
-	aafWChar				*productVersionString;
+	aafCharacter				*companyName;
+	aafCharacter				*productName;
+	aafCharacter				*productVersionString;
 	aafInt32			productID;
-	aafWChar				*platform;
+	aafCharacter				*platform;
 	aafProductVersion_t	productVersion;
 } aafProductIdentification_t;
 
@@ -558,12 +567,16 @@ typedef struct _aafmMultiXfer_t
 {
 	aafUID_t *			mediaKind;		/* IN -- */
 	aafInt16			subTrackNum;	/* IN - The physical output channel */
-	aafUInt32           numSamples;	/* IN -- */
-	aafUInt32          	buflen;	/* IN -- */
-	aafDataBuffer_t		buffer;	/* IN/OUT -- */
+	aafUInt32           numSamples;		/* IN -- */
+	aafUInt32          	buflen;			/* IN -- */
+	aafDataBuffer_t		buffer;			/* IN/OUT -- */
+} aafmMultiXfer_t;
+
+typedef struct _aafmMultiResult_t
+{
 	aafUInt32          	bytesXfered;	/* OUT -- */
 	aafUInt32			samplesXfered;	/* OUT */
-} aafmMultiXfer_t;
+} aafmMultiResult_t;
 
 typedef struct _aafmMultiCreate_t
 {
@@ -739,7 +752,7 @@ typedef enum _aafDefinitionKind_t
 	kAAFPropertyDefinition  = 2,
 	kAAFTypeDefinition      = 4,
 	kAAFDataDefinition      = 8,
-	kAAFEffectDefinition    = 16,
+	kAAFOperationDefinition    = 16,
 	kAAFAllDefinitions      = -1
 } aafDefinitionKind_t;
 
