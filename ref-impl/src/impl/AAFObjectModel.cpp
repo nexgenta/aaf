@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModel.cpp,v 1.15 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModel.cpp,v 1.15.2.1 2004/08/03 19:38:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include <wchar.h>
 
 // Needed for the auid of the "Root" class.
 const static aafUID_t NULL3_AUID = { 0 };
@@ -721,6 +720,7 @@ const aafUInt32 kTypeDefinitionCharacterCount =
 
 
 //
+
 // Create an array of all strong reference types.
 //
 
