@@ -173,6 +173,7 @@ public:
   CLASS_DEF_METHOD(Filler);
   CLASS_DEF_METHOD(FilmDescriptor);
   CLASS_DEF_METHOD(HTMLClip);
+  CLASS_DEF_METHOD(HTMLDescriptor);
   CLASS_DEF_METHOD(Identification);
   CLASS_DEF_METHOD(InterpolationDefinition);
   CLASS_DEF_METHOD(KLVData);
@@ -186,7 +187,7 @@ public:
   CLASS_DEF_METHOD(OperationGroup);
   CLASS_DEF_METHOD(Parameter);
   CLASS_DEF_METHOD(ParameterDef);
-  CLASS_DEF_METHOD(PluginDescriptor);
+  CLASS_DEF_METHOD(PluginDef);
   CLASS_DEF_METHOD(PropertyDef);
   CLASS_DEF_METHOD(Pulldown);
   CLASS_DEF_METHOD(RGBADescriptor);
@@ -196,6 +197,7 @@ public:
   CLASS_DEF_METHOD(SourceClip);
   CLASS_DEF_METHOD(SourceMob);
   CLASS_DEF_METHOD(SourceReference);
+  CLASS_DEF_METHOD(StaticMobSlot);
   CLASS_DEF_METHOD(TIFFDescriptor);
   CLASS_DEF_METHOD(TaggedValue);
   CLASS_DEF_METHOD(TapeDescriptor);
