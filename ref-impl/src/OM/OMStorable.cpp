@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStorable.cpp,v 1.85 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStorable.cpp,v 1.86 2004/03/30 14:03:04 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -121,7 +121,12 @@ void OMStorable::save(void) const
   if (opened) {
     ASSERT("Valid store", _store != 0);
     _store->close();
-    delete _store;
+
+	 //There is no refenrce counting in the Schemasoft implmentation
+  //and thus this delete will cause exceptions when the stream is deleted by 
+  //other destructors. Streams shoudl only be deleted by the destructor that owns it.
+ //Ian Baker 20042803
+//    delete _store;
     nonConstThis->_store = 0;
   }
 #endif
@@ -180,7 +185,11 @@ void OMStorable::restoreContents(void)
   //
   ASSERT("Valid store", _store != 0);
   _store->close();
-  delete _store;
+ 	 //There is no refenrce counting in the Schemasoft implmentation
+  //and thus this delete will cause exceptions when the stream is deleted by 
+  //other destructors. Streams shoudl only be deleted by the destructor that owns it.
+ //Ian Baker 20042803
+  // delete _store;
   _store = 0;
   _exists = true;
 }

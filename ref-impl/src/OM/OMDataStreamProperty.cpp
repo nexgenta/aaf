@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.60 2004/03/02 16:34:43 bakerian Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.61 2004/03/30 14:02:49 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,7 +60,9 @@ OMDataStreamProperty::~OMDataStreamProperty(void)
   catch(...)
   {
 	  //close can throw exceptions under limited circustances with schemasoft library.
-	  //This is to ensure that excpetions do not get thrown outside the destructor.
+	  //This is to ensure that exceptions do not get thrown outside the destructor.
+	  _stream=0;
+	  assert(0,"exception in OMDataStreamProperty destructor");
   }
   POSTCONDITION("Stream closed", _stream == 0);
 }
