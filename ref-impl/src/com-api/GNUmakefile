@@ -1,11 +1,14 @@
-
 PACKAGE = com-api
 export PACKAGE
 
 AAFBASE ?= ../../..
 
-include $(AAFBASE)/build/defs.mk
 
+# Common definitions
+include $(AAFBASE)/build/common.mk
+
+
+# Include directories
 INCLUDES = -I../../include/ref-api \
 	   -I../../include/OM \
 	   -I../../src/OM \
@@ -17,28 +20,37 @@ INCLUDES = -I../../include/ref-api \
 	   -I../../../ss-impl/ref/h \
 	   -I../../aaflib
 
-LIBTARGET = $(LIBDIR)/libcom-api$(LIB_SUFFIX)
+
+LIBTARGET = $(LIBDIR)/libcom-api$(DLL)
+
+
+CXXFILES2 = $(wildcard ./com-dll/*.$(CPP_EXTENSION))
+
 
 .PHONY : all
-all : com-dll com-api
-	echo $(CXXOBJS)
+all : com-api
+
+
+.PHONY : com-api
+com-api : $(LIBTARGET)
+
 
 .PHONY : com-dll
 com-dll :
 	cd com-dll && $(MAKE)
 
-.PHONY : com-api
-com-api : $(LIBTARGET)
 
-$(LIBTARGET) : $(OBJDIR) $(LIBDIR) $(CXXOBJS)
-	$(LD_DYN_LIB) $(CC2LDOPT) $(LD_DYN_LIB_PATH_FLAG) $(CC2LDOPT) \
-	$(LIBDIR) $(CC2LDOPT) -shared -L$(LIBDIR) $(CXXOBJS) -o \
-	$@ -limpl -lcom-dll
+$(LIBTARGET) : $(OBJDIR) $(LIBDIR) $(CXXOBJS) com-dll
+	$(LD_DYN_LIB) $(CXXOBJS) $(CXXOBJS2) -L$(LIBDIR) -o $@ \
+	-limpl -lom -lrefstg -lm
+
 
 .PHONY : clean
 clean:
 	cd com-dll && $(MAKE) clean
-	-@rm -rf $(OBJDIR)/*.o
-	-@rm -rf $(LIBTARGET)
+	$(RMDIR) $(OBJDIR)/*
+	$(RM) $(LIBTARGET)
+
 
 include $(AAFBASE)/build/rules.mk
+
