@@ -32,7 +32,6 @@
 #endif
 
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
 #include "aafErr.h"
 #include "aafCvt.h"
@@ -55,7 +54,7 @@ ImplAAFPulldown::ImplAAFPulldown ()
 
 ImplAAFPulldown::~ImplAAFPulldown ()
 {
-	ImplAAFSegment *seg = _inputSegment.clearValue();
+	ImplAAFSegment *seg = _inputSegment.setValue(0);
 	if (seg)
 	{
 	  seg->ReleaseReference();
@@ -88,9 +87,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (pInputSegment == NULL)
 		return AAFRESULT_NULL_PARAM;
-
-	if (pInputSegment->attached())
-		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	ImplAAFSegment *pOldSeg = _inputSegment;
 	if (pOldSeg)
@@ -191,7 +187,7 @@ AAFRESULT STDMETHODCALLTYPE
   // Override from AAFSegment
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPulldown::SegmentTCToOffset (aafTimecode_t *pTimecode,
-      aafRational_t * /*pEditRate*/,
+      aafRational_t *pEditRate,
       aafFrameOffset_t *pOffset)
 {
 	ImplAAFTimecode	*pdwnInput;
@@ -231,6 +227,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			   aafLength_t *numFrames,
 			   aafInt32 *srcPhase)
 {
+  ImplAAFSegment*	pulldownCVAL = NULL;
   aafUInt32     maskBits;
   aafBool       drop;
   aafUInt32     phaseOffset = 0;

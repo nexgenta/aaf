@@ -52,8 +52,8 @@
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
 ImplAAFSelector::ImplAAFSelector () :
-	_selected(		PID_Selector_Selected,		"Selected"),
-	_alternates(	PID_Selector_Alternates,	"Alternates")
+	_selected(		PID_Selector_Selected,		L"Selected"),
+	_alternates(	PID_Selector_Alternates,	L"Alternates")
 {
 	_persistentProperties.put(_selected.address());
 	_persistentProperties.put(_alternates.address());
@@ -248,7 +248,23 @@ AAFRESULT STDMETHODCALLTYPE
 	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
 	if(*ppEnum == NULL)
 		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumStrongProperty(this, &_alternates);
+
+	XPROTECT()
+	{
+		OMStrongReferenceVectorIterator<ImplAAFSegment>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFSegment>(_alternates);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK((*ppEnum)->Initialize(&CLSID_EnumAAFSegments, this, iter));
+	}
+	XEXCEPT
+	{
+		if (*ppEnum)
+		  (*ppEnum)->ReleaseReference();
+		(*ppEnum) = 0;
+		return(XCODE());
+	}
+	XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
@@ -347,3 +363,37 @@ AAFRESULT
 
 
 
+AAFRESULT ImplAAFSelector::ChangeContainedReferences(aafMobID_constref from,
+													aafMobID_constref to)
+{
+	aafInt32			n, count;
+	ImplAAFSegment		*seg = NULL;
+	ImplAAFComponent	*selected;
+	
+	XPROTECT()
+	{
+		CHECK(GetNumAlternateSegments (&count));
+		for(n = 0; n < count; n++)
+		{
+			CHECK(GetNthSegment (n, &seg));
+			CHECK(seg->ChangeContainedReferences(from, to));
+			seg->ReleaseReference();
+			seg = NULL;
+		}
+
+		selected = _selected;
+		if(selected != NULL)
+		{
+			CHECK(selected->ChangeContainedReferences(from, to));
+		}
+	}
+	XEXCEPT
+	{
+		if(seg != NULL)
+		  seg->ReleaseReference();
+		seg = 0;
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
