@@ -36,6 +36,8 @@
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "CAAFBuiltinDefs.h"
 
@@ -253,8 +255,6 @@ static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const 
 							   
 {
 	//CAAFBuiltinDefs defs (pDict);
-	
-	HRESULT hr = 0;
 	
 	/////////////////////////////////////////
 	//  Check the MOb stuff 
@@ -497,8 +497,6 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	IAAFHeader * pHeader = NULL;
 	IAAFDictionary * pDict = NULL;
 	aafBoolean_t  bFileOpen = kAAFFalse;
-	
-	IEnumAAFMobs*				pMobIter = NULL;
 	
 	try
 	{
