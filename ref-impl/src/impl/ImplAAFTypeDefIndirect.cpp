@@ -177,14 +177,15 @@ static AAFRESULT GetPropertyInfo (
   
 	// Compute the actual data size.
 	//
-  actualValueSize = indirectProperty.bitsSize();
+	actualValueSize = indirectProperty.bitsSize();
 	if (0 < actualValueSize)
 	{
-    actualValueSize -= pIndirectType->GetIndirectValueOverhead ();
-    assert (0 <= actualValueSize);
-		if (0 > actualValueSize)
-			return (AAFRESULT_INVALID_OBJ);
-  }
+	    aafUInt32	valueOverhead = pIndirectType->GetIndirectValueOverhead ();
+	    assert (actualValueSize >= valueOverhead);
+	    if (actualValueSize < valueOverhead)
+		return (AAFRESULT_INVALID_OBJ);
+	    actualValueSize -= valueOverhead;
+	}
 
   if (ppObject)
 		*ppObject = pObject;
@@ -417,7 +418,7 @@ ImplAAFTypeDefIndirect::~ImplAAFTypeDefIndirect ()
 //   Called when we initialize as one of the "builtin" types.
 //
 AAFRESULT
-  ImplAAFTypeDefIndirect::pvtInitialize
+  ImplAAFTypeDefIndirect::Initialize
       (// @parm [in, ref] auid to be used to identify this type
        aafUID_constref  id,
 
@@ -439,36 +440,81 @@ AAFRESULT
   //
   // Lookup the type definition for auid and cache this reference.
   // 
-  ImplAAFDictionary *pDictionary = NULL;
+  ImplAAFDictionarySP pDictionary;
   result = GetDictionary (&pDictionary);
-  if (AAFRESULT_SUCCEEDED(result))
-  {
-    result = pDictionary->LookupTypeDef (kAAFTypeID_AUID, &_typeDefAUID);
-    if (AAFRESULT_SUCCEEDED(result))
-    {
-      // We don't want or need to reference count this definition...
-      _typeDefAUID->ReleaseReference();
+  if (AAFRESULT_FAILED (result))
+    return result;
 
-      // Cache thse values so that we do not have to re-compute them
-      // in multiple OMType methods.
-      _internalAUIDSize = sizeof(aafUID_t);
-      _internalIndirectSize = _internalAUIDSize + sizeof(OMByteOrder);
-      _externalAUIDSize = _typeDefAUID->PropValSize ();
-      _externalIndirectSize = _externalAUIDSize + sizeof(OMByteOrder);
+  ImplAAFTypeDefSP pTypeDefAUID;
+  result = pDictionary->LookupTypeDef(kAAFTypeID_AUID, &pTypeDefAUID);
+  if (AAFRESULT_FAILED (result))
+    return result;
 
-      _initialized = true; // 
-    }
-
-    // Do NOT reference count the dictionary since it is the container
-    // of this type indirect instance.
-    if (_initialized)
-      _dictionary = pDictionary;
-
-    pDictionary->ReleaseReference();
-  }
+  result = pvtInitialize(id, pTypeName, pTypeDefAUID, pDictionary);
 
   return result;
 }
+
+//   Called when we initialize as one of the "builtin" types.
+//
+AAFRESULT
+  ImplAAFTypeDefIndirect::pvtInitialize
+      (// @parm [in, ref] auid to be used to identify this type
+       aafUID_constref  id,
+
+       // @parm [in, ref, string] friendly name of this type definition
+       aafCharacter_constptr  pTypeName,
+       
+       // @parm [in] the type definition for kAAFTypeID_AUID.
+       ImplAAFTypeDef *pTypeDefAUID,
+
+       // @parm [in] the dictionary for this instance
+       ImplAAFDictionary *pDictionary)
+{
+  AAFRESULT result = AAFRESULT_SUCCESS;
+
+  if (_initialized)
+    return AAFRESULT_ALREADY_INITIALIZED;
+  if (!pTypeName)
+    return AAFRESULT_NULL_PARAM;
+  if (!pTypeDefAUID)
+    return AAFRESULT_NULL_PARAM;
+  if (!pDictionary)
+    return AAFRESULT_NULL_PARAM;
+
+
+  // Make sure the given type is for an AUID.
+  aafUID_t auid;
+  result = pTypeDefAUID->GetAUID(&auid);
+  if (AAFRESULT_FAILED (result))
+    return result;
+  if (memcmp(&kAAFTypeID_AUID, &auid, sizeof(aafUID_t)))
+    return AAFRESULT_INVALID_PARAM;
+
+  // Initialize the type definition with its unique identifier and name.
+  result = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+  if (AAFRESULT_FAILED (result))
+    return result;
+
+  // Do NOT reference count the dictionary since it is the container
+  // of this type indirect instance.
+  _dictionary = pDictionary;
+  
+  // We don't want or need to reference count this definition...
+  _typeDefAUID = pTypeDefAUID;
+
+  // Cache thse values so that we do not have to re-compute them
+  // in multiple OMType methods.
+  _internalAUIDSize = sizeof(aafUID_t);
+  _internalIndirectSize = _internalAUIDSize + sizeof(OMByteOrder);
+  _externalAUIDSize = _typeDefAUID->PropValSize ();
+  _externalIndirectSize = _externalAUIDSize + sizeof(OMByteOrder);
+
+  _initialized = true; // 
+
+  return result;
+}
+
 
 // Called internally by the dm because there is NO OM property to hide this
 // from the DM.
@@ -1343,9 +1389,9 @@ size_t ImplAAFTypeDefIndirect::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefIndirect::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefIndirect::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
 
@@ -1376,3 +1422,23 @@ bool ImplAAFTypeDefIndirect::IsStringable () const
 { return false; }
 
 
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefIndirect::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefIndirect));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefIndirect::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefIndirect::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
