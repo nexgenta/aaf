@@ -18,14 +18,38 @@
 
 #ccccccccccccccccccccccccccc
 #c
+#c Includes another file.
+#c
+#c Argument: Base filename
+#c
+#startm AD_INCLUDE 01
+#ifndef _%01_h_
+#include "%01.h"
+#endif
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Goes at the head of the file.
+#c
+#c Arguments: none
+#c
+#startm AD_HEAD 00
+//@doc
+//@class 	.this-module | Implementation class for .this-module
+#ifndef _.this-module_h_
+#define _.this-module_h_
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Starts a class definition
 #c
 #c Arguments: none
 #c
-#startm AD_CLASS_BEGIN 0
-#ifndef _.this-module_h_
-#define _.this-module_h_
-
+#startm AD_CLASS_BEGIN 00
 #ifndef _.parent-module_h_
 #include ".parent-module.h"
 #endif
@@ -33,12 +57,37 @@
 //
 // Forward declaration
 //
-class J.this-module;
+class Impl.this-module;
 
 
 class .this-module : public .parent-module
 {
-  .this-module ();
+  .this-module (AAFBool doInit = AAFTrue);
+  ~.this-module ();
+  //
+  // Constructor/destructor
+  //
+  //********
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Starts a class definition
+#c
+#c Arguments: none
+#c
+#startm AD_ROOT_CLASS_BEGIN 00
+//
+// Forward declaration
+//
+class Impl.this-module;
+
+
+class .this-module
+{
+public:
+  .this-module (AAFBool doInit=AAFTrue);
   ~.this-module ();
   //
   // Constructor/destructor
@@ -54,11 +103,15 @@ class .this-module : public .parent-module
 #c Argument1: method name
 #c Argument2: method description
 #c
-#startm AD_METHOD0 2
-  //@mfunc AAFRESULT | %01 | %02 |
+#startm AD_METHOD0 02
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %02
   virtual AAFRESULT STDMETHODCALLTYPE
     %01 ();
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -74,11 +127,18 @@ class .this-module : public .parent-module
 #c Argument6: method description
 #c
 #startm AD_METHOD1 06
-  //@mfunc AAFRESULT | %01 | %02 |
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %06
   virtual AAFRESULT STDMETHODCALLTYPE
-    %01 (%03 %04 /*@parm %02 %05*/ );
+    %01
+	    (%03 %04);	//@parm %02 %05
+  //@rdesc Returns an AAFResult status code
 #endm
+
+
 #ccccccccccccccccccccccccccc
 #c
 #c Inserts declaration for a method which takes two arguments.
@@ -95,10 +155,16 @@ class .this-module : public .parent-module
 #c Argument10: method description
 #c
 #startm AD_METHOD2 10
-  //@mfunc AAFRESULT | %01 | %02 |
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %10
   virtual AAFRESULT STDMETHODCALLTYPE
-    %01 (%03 %04 /*@parm %02 %05*/, %07 %08 /*@parm %06 %09*/ );
+    %01
+	   (%03 %04,	//@parm %02 %05
+		%07 %08);	//@parm %06 %09
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -122,11 +188,20 @@ class .this-module : public .parent-module
 #c Argument14: method description
 #c
 #startm AD_METHOD3 14
-  //@mfunc AAFRESULT | %01 | %02 |
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %14
   virtual AAFRESULT STDMETHODCALLTYPE
-    %01 (%03 %04 /*@parm %02 %05*/, %07 %08 /*@parm %06 %09*/, %11 %12 /*@parm %10 %13*/ );
+    %01
+	   (%03 %04,	//@parm %02 %05,
+		%07 %08,	//@parm %06 %09,
+		%11 %12);	//@parm %10 %13
+		
+  //@rdesc Returns an AAFResult status code
 #endm
+
 
 #ccccccccccccccccccccccccccc
 #c
@@ -152,10 +227,18 @@ class .this-module : public .parent-module
 #c Argument18: method description
 #c
 #startm AD_METHOD4 18
-  //@mfunc AAFRESULT | %01 | %02 |
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %14
   virtual AAFRESULT STDMETHODCALLTYPE
-    %01 (%03 %04 /*@parm %02 %05*/, %07 %08 /*@parm %06 %09*/, %011 %012 /*@parm %10 %13*/, %015 %016 /*@parm %14 %17*/ );
+    %01
+	   (%03 %04,	//@parm %02 %05
+		%07 %08,	//@parm %06 %09
+		%11 %12,	//@parm %10 %13
+		%15 %16);	//@parm %14 %17
+  //@rdesc Returns an AAFResult status code
 #endm
 
 
@@ -187,11 +270,21 @@ class .this-module : public .parent-module
 #c Argument22: method description
 #c
 #startm AD_METHOD5 22
-  //@mfunc AAFRESULT | %01 | %02 |
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %22
   virtual AAFRESULT STDMETHODCALLTYPE
-    %01 (%03 %04 /*@parm %02 %05*/, %07 %08 /*@parm %06 %09*/, %11 %12 /*@parm %10 %13*/, %15 %16 /*@parm %14 %17*/ , %19 %20 /*@parm %18 %21*/ );
+    %01
+	   (%03 %04,	//@parm %02 %05
+		%07 %08,	//@parm %06 %09
+		%11 %12,	//@parm %10 %13
+		%15 %16,	//@parm %14 %17
+		%19 %20);	//@parm %18 %21
+  //@rdesc Returns an AAFResult status code
 #endm
+
 
 #ccccccccccccccccccccccccccc
 #c
@@ -225,11 +318,22 @@ class .this-module : public .parent-module
 #c Argument26: method description
 #c
 #startm AD_METHOD6 26
-  //@mfunc AAFRESULT | %01 | %02 |
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
   // %26
   virtual AAFRESULT STDMETHODCALLTYPE
-    %01 (%03 %04 /*@parm %02 %05*/, %07 %08 /*@parm %06 %09*/, %11 %12 /*@parm %10 %13*/, %15 %16 /*@parm %14 %17*/ , %19 %20 /*@parm %18 %21*/, %23 %24 /*@parm %22 %25*/ );
+    %01
+	   (%03 %04,	//@parm %02 %05
+		%07 %08,	//@parm %06 %09
+		%11 %12,	//@parm %10 %13
+		%15 %16,	//@parm %14 %17
+		%19 %20,	//@parm %18 %21
+		%23 %24);	//@parm %22 %25
+  //@rdesc Returns an AAFResult status code
 #endm
+
 
 #ccccccccccccccccccccccccccc
 #c
@@ -237,10 +341,210 @@ class .this-module : public .parent-module
 #c
 #c Arguments: none
 #c
-#startm AD_CLASS_END 0
-private:
-  J.this-module * _rep;
+#startm AD_CLASS_END 00
 };
 
 #endif // ! _.this-module_h_
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for AAFObject
+#c
+#c Arguments: none
+#c
+#startm AD_ROOT_CLASS_END 00
+protected:
+
+  Impl.this-module * GetRepObject ();
+
+  void InitRep (Impl.this-module * pObj);
+
+private:
+
+  Impl.this-module * _rep;
+
+};
+
+#endif // ! _.this-module_h_
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Specifies an overridden method
+#c
+#c Argument: method declaration
+#c
+#startm AD_OVERRIDE 01
+%01
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a constructor which takes one argument.
+#c Constructor name is assumed to be .this-module.
+#c
+#c Argument1: argument modifiers (e.g. [in])
+#c Argument2: argument type
+#c Argument3: argument name
+#c Argument4: argument comment
+#c Argument5: constructor description
+#c
+#startm AD_CONSTRUCTOR1 05
+  //****************
+  // constructor
+  //
+  // %05
+  .this-module
+	    (%02 %03);	//@parm %01 %04
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a constructor which takes two arguments.
+#c Constructor name is assumed to be .this-module.
+#c
+#c Argument1: argument1 modifiers (e.g. [in])
+#c Argument2: argument1 type
+#c Argument3: argument1 name
+#c Argument4: argument1 comment
+#c Argument5: argument2 modifiers (e.g. [in])
+#c Argument6: argument2 type
+#c Argument7: argument2 name
+#c Argument8: argument2 comment
+#c Argument9: constructor description
+#c
+#startm AD_CONSTRUCTOR2 09
+  //****************
+  // constructor
+  //
+  // %09
+    .this-module
+	   (%02 %03,	//@parm %01 %04
+		%06 %07);	//@parm %05 %08
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a constructor which takes three arguments.
+#c Constructor name is assumed to be .this-module.
+#c
+#c Argument1: argument1 modifiers (e.g. [in])
+#c Argument2: argument1 type
+#c Argument3: argument1 name
+#c Argument4: argument1 comment
+#c Argument5: argument2 modifiers (e.g. [in])
+#c Argument6: argument2 type
+#c Argument7: argument2 name
+#c Argument8: argument2 comment
+#c Argument9: argument3 modifiers (e.g. [in])
+#c Argument10: argument3 type
+#c Argument11: argument3 name
+#c Argument12: argument3 comment
+#c Argument13: constructor description
+#c
+#startm AD_CONSTRUCTOR3 13
+  //****************
+  // constructor
+  //
+  // %13
+    .this-module
+	   (%02 %03,	//@parm %01 %04
+		%06 %07,	//@parm %05 %08
+		%10 %11);	//@parm %09 %12
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a constructor which takes four arguments.
+#c Constructor name is assumed to be .this-module.
+#c
+#c Argument1: argument1 modifiers (e.g. [in])
+#c Argument2: argument1 type
+#c Argument3: argument1 name
+#c Argument4: argument1 comment
+#c Argument5: argument2 modifiers (e.g. [in])
+#c Argument6: argument2 type
+#c Argument7: argument2 name
+#c Argument8: argument2 comment
+#c Argument9: argument3 modifiers (e.g. [in])
+#c Argument10: argument3 type
+#c Argument11: argument3 name
+#c Argument12: argument3 comment
+#c Argument13: argument4 modifiers (e.g. [in])
+#c Argument14: argument4 type
+#c Argument15: argument4 name
+#c Argument16: argument4 comment
+#c Argument17: constructor description
+#c
+#startm AD_CONSTRUCTOR4 17
+  //****************
+  // constructor
+  //
+  // %17
+    .this-module
+	   (%02 %03,	//@parm %01 %04
+		%06 %07,	//@parm %05 %08
+		%10 %11,	//@parm %09 %12
+		%14 %15);	//@parm %13 %16
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a method which takes one argument, which is
+#c a pointer to an AAF object which is to be returned to the caller.
+#c This is different from the normal METHOD macro because the
+#c _rep will probably have the object in a different form.
+#c
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: method description
+#c
+#startm AD_GETOBJ_METHOD1 06
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %06
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+	    (%03 ** %04);	//@parm %02 %05
+  //@rdesc Returns an AAFResult status code
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a method which takes one argument, which is
+#c a pointer to an AAF object which is to be passed in from the caller.
+#c This is different from the normal METHOD macro because the
+#c _rep will probably have the object in a different form.
+#c
+#c Argument1: method name
+#c Argument2: argument modifiers (e.g. [in])
+#c Argument3: argument type
+#c Argument4: argument name
+#c Argument5: argument comment
+#c Argument6: method description
+#c
+#startm AD_SETOBJ_METHOD1 06
+  //****************
+  // %01()
+  //
+  //@mfunc AAFRESULT | .this-module | %01 |
+  // %06
+  virtual AAFRESULT STDMETHODCALLTYPE
+    %01
+	    (%03 * %04);	//@parm %02 %05
+  //@rdesc Returns an AAFResult status code
 #endm
