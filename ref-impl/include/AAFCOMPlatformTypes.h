@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOMPlatformTypes.h,v 1.9 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFCOMPlatformTypes.h,v 1.9.2.1 2004/07/14 16:33:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -63,7 +63,9 @@
   typedef long SCODE;
   typedef long HRESULT;
 
+#ifndef BOOL 
   typedef int BOOL;
+#endif
   typedef unsigned char BYTE;
   typedef BYTE * LPBYTE;
   typedef unsigned short WORD;
@@ -154,7 +156,7 @@ typedef LPCSTR    LPCOLESTR;
 # define IID_ICLASSFACTORY
 # endif
 
-const GUID IID_IUnknown = {0x0,0x0,0x0,{0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};;
+const GUID IID_IUnknown = {0x0,0x0,0x0,{0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};
 
 
   interface IClassFactory : public IUnknown
