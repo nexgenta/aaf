@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStream.cpp,v 1.11 2005/03/30 20:42:51 bakerian Exp $ $Name:  $
+// $Id: OMStream.cpp,v 1.12 2005/03/31 13:46:27 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -171,9 +171,14 @@ TRACE("OMStream::size");
 
 #if defined( OM_OS_UNIX )
 
+#if defined(OM_COMPILER_SGICC_MIPS_SGI)
+	// all POSIX-compliant
+	int status = fseeko64( _file, (off64_t)0, SEEK_END);
+#else
 	// all POSIX-compliant
 	int status = fseeko64( _file, (__off64_t)0, SEEK_END);
-  
+#endif
+
 #elif defined( OM_OS_WINDOWS )
 
 	// we have to rely upon fseek( _file, 0, SEEK_END ) to do the right thing
