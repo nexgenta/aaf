@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFExtEnum.h,v 1.5 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFExtEnum.h,v 1.5.2.1 2004/03/11 18:58:32 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,6 +56,28 @@ const aafUID_t kAAFPluginCatagoryCodec =
 //{0d010102-0101-0400-060e-2b3404010101}
 const aafUID_t kAAFPluginCatagoryInterpolation =
 {0x0d010102, 0x0101, 0x0400, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+// Members of UsageCodeType
+//
+//{0d010102-0101-0500-060e-2b3404010101}
+const aafUID_t kAAFUsage_SubClip =
+{0x0d010102, 0x0101, 0x0500, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+//{0d010102-0101-0600-060e-2b3404010101}
+const aafUID_t kAAFUsage_AdjustedClip =
+{0x0d010102, 0x0101, 0x0600, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+//{0d010102-0101-0700-060e-2b3404010101}
+const aafUID_t kAAFUsage_TopLevel =
+{0x0d010102, 0x0101, 0x0700, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+//{0d010102-0101-0800-060e-2b3404010101}
+const aafUID_t kAAFUsage_LowerLevel =
+{0x0d010102, 0x0101, 0x0800, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+//{0d010102-0101-0900-060e-2b3404010101}
+const aafUID_t kAAFUsage_Template =
+{0x0d010102, 0x0101, 0x0900, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 #endif // ! __AAFExtEnum_h__

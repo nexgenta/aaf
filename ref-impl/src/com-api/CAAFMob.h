@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMob.h,v 1.5.2.1 2004/03/10 18:00:39 jptrainor Exp $ $Name:  $
+// $Id: CAAFMob.h,v 1.5.2.2 2004/03/11 18:58:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

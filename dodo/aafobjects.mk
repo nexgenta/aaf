@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.1 2004/03/10 18:00:37 jptrainor Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.2 2004/03/11 18:58:32 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -80,6 +80,7 @@ HUMAN_TYPED_IMPL="\
 	AAFGPITrigger \
 	AAFHeader \
 	AAFIdentification \
+	AAFImportDescriptor \
 	AAFInterpolationDef \
 	AAFKLVData \
 	AAFLocator \
@@ -90,8 +91,10 @@ HUMAN_TYPED_IMPL="\
 	AAFNestedScope\
 	AAFNetworkLocator \
 	AAFObject \
+	AAFPCMDescriptor \
 	AAFParameter \
 	AAFParameterDef \
+	AAFPhysicalDescriptor \
 	AAFProperty \
 	AAFPropertyDef \
 	AAFPropertyValue \
@@ -102,6 +105,7 @@ HUMAN_TYPED_IMPL="\
 	AAFSegment \
 	AAFSelector \
 	AAFSequence \
+	AAFSoundDescriptor \
 	AAFSourceClip \
 	AAFSourceMob \
 	AAFSourceReference \

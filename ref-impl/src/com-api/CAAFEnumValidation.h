@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.h,v 1.2 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEnumValidation.h,v 1.2.2.1 2004/03/11 18:58:38 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -55,6 +55,7 @@ bool Is_aafDirectionCode_t_Valid(aafDirectionCode_t param);
 bool Is_aafDropType_t_Valid(aafDropType_t param);
 bool Is_aafEdgeType_t_Valid(aafEdgeType_t param);
 bool Is_aafEditHint_t_Valid(aafEditHint_t param);
+bool Is_aafElectroSpatialFormulation_t_Valid(aafElectroSpatialFormulation_t param);
 bool Is_aafFadeType_t_Valid(aafFadeType_t param);
 bool Is_aafFieldDom_t_Valid(aafFieldDom_t param);
 bool Is_aafFieldNumber_t_Valid(aafFieldNumber_t param);

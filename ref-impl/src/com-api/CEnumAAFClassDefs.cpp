@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFClassDefs.cpp,v 1.6 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFClassDefs.cpp,v 1.6.2.1 2004/03/11 18:58:44 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
