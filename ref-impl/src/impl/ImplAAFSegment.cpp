@@ -30,6 +30,8 @@
 #include "ImplAAFTimecode.h"
 #include "ImplAAFSequence.h"
 
+#include "AAFStoredObjectIDs.h"
+
 
 ImplAAFSegment::ImplAAFSegment ()
 {}
@@ -127,6 +129,8 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 		{
 			*found = AAFTrue;
 			*subseg = this;
+			// We are returning a reference to this object so bump the ref count
+			AcquireReference();
 			*sequPosPtr = 0;
 		}
 		else
@@ -174,7 +178,6 @@ AAFRESULT ImplAAFSegment::GenerateSequence(ImplAAFSequence **seq)
 	return(AAFRESULT_SUCCESS);
 }
 
-extern "C" const aafClassID_t CLSID_AAFSegment;
 
-OMDEFINE_STORABLE(ImplAAFSegment, CLSID_AAFSegment);
+OMDEFINE_STORABLE(ImplAAFSegment, AUID_AAFSegment);
 
