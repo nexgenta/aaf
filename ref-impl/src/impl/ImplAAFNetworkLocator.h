@@ -8,6 +8,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -20,7 +21,9 @@
 #endif
 
 
+#include "OMProperty.h"
 
+const int PID_NETWORKLOCATOR_URLSTRING          = 0;
 
 class ImplAAFNetworkLocator : public ImplAAFLocator
 {
@@ -31,10 +34,6 @@ public:
   //********
   ImplAAFNetworkLocator ();
   virtual ~ImplAAFNetworkLocator ();
-
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize ();
 
 
   // Override from AAFLocator
@@ -53,6 +52,19 @@ public:
   // Override from AAFLocator
   virtual AAFRESULT STDMETHODCALLTYPE
     SetPath (/*[in, string]*/ aafWChar *  pPathBuf);
+
+
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFNetworkLocator)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFNetworkLocatorTest.cpp.
+  static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 
 private:
   OMWideStringProperty                             _path;

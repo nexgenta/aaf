@@ -75,12 +75,21 @@ public:
         (ImplAAFSegment *value);  //@parm [in] Segment property value
 
 
-  //****************
+ //****************
   // GetName()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetName
-        (aafWChar *  name);  //@parm [in,out] Mob Slot Name
+        (aafWChar *  name,  //@parm [in] buffer provided by client to hold the Mob Slot Name
+		aafInt32	bufsize);	//@parm [in] length of the buffer provided to hold the slot name
+
+  //****************
+  // GetNameBufLen()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetNameBufLen
+		(aafInt32	*bufsize);	//@parm [in] length of the buffer provided to hold the slot name
+							// including the terminator
 
   //****************
   // SetName()
@@ -136,9 +145,12 @@ public:
   // in /test/ImplAAFMobSlotTest.cpp.
   static AAFRESULT test();
 
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
+
 protected:
-	OMStringProperty					_name;
-//!!!	OMFixedSizeProperty<aafPosition_t>	_origin; Move to TimelineMobSlot
+	OMWideStringProperty				_name;
 	OMFixedSizeProperty<aafUInt32>		_trackID;
 	OMFixedSizeProperty<aafUInt32>		_physicalTrackNum;
 	OMStrongReferenceProperty<ImplAAFSegment> _segment;
