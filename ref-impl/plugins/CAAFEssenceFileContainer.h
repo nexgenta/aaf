@@ -65,14 +65,12 @@ public:
 
   // Tear down the plugin.
   STDMETHOD (Finish)(void);
-  
-  STDMETHOD (GetNumDefinitions)(aafInt32 *pDefCount);
-  STDMETHOD (GetIndexedDefinitionID)(aafInt32 index, aafUID_t *result);
-  STDMETHOD (GetPluginDescriptorID)(aafUID_t *result);
+ 
+  STDMETHOD (GetPluginID)(aafUID_t *result);
 
-  STDMETHOD (GetIndexedDefinitionObject)(aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def);
+  STDMETHOD (GetPluggableDefinition)(IAAFDictionary *dict, IAAFPluggableDef **def);
 
-  STDMETHOD (CreateDescriptor)(IAAFDictionary *dict, IAAFPluginDescriptor **desc);
+  STDMETHOD (GetDescriptor)(IAAFDictionary *dict, IAAFPluginDescriptor **desc);
 
   //
   // IAAFEssenceFileContainer interface methods.
