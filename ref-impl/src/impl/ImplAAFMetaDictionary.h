@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.24 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.24.2.1 2004/12/13 04:34:35 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -329,6 +329,9 @@ public:
   // Create and initialize all of the axiomatic definitions.
   AAFRESULT InstantiateAxiomaticDefinitions(void);
 
+  // Merge the builtin dictionary into the file dictionary.
+  AAFRESULT MergeWithFile();
+
   // Create all of the axiomatic classes as uninitialized objects.
   void CreateAxiomaticClasses(void); // throw AAFRESULT
 
@@ -388,12 +391,12 @@ private:
   // Persistent data members.
   //
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFTypeDef> _typeDefinitions;
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFClassDef> _classDefinitions;
-
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFClassDef> _fileClassDefinitions;
 
   //
   // Non-persistent data members.
   //
+  OMReferenceSet<OMUniqueObjectIdentification, ImplAAFClassDef> _classDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFTypeDef> _opaqueTypeDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFClassDef> _axiomaticClassDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFPropertyDef> _axiomaticPropertyDefinitions;

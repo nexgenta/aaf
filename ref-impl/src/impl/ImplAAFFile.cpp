@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.140 2004/11/04 18:55:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.140.2.1 2004/12/13 04:34:34 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -413,7 +413,10 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 		// Make sure all definitions are present in the meta dictionary
 		ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(mf);
 		assert(d);
-		d->InstantiateAxiomaticDefinitions();
+		checkResult( d->InstantiateAxiomaticDefinitions() );
+
+		// Merge the builtin dictionary into the file dictionary.
+		checkResult( d->MergeWithFile() );
 
 		// Get the byte order
 		OMByteOrder byteOrder = _file->byteOrder();

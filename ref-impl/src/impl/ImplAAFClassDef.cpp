@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.cpp,v 1.60 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFClassDef.cpp,v 1.60.2.1 2004/12/13 04:34:34 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -153,9 +153,14 @@ AAFRESULT STDMETHODCALLTYPE
 {
 //	ImplAAFClassDef	*oldParent;
   if (!pClassName) return AAFRESULT_NULL_PARAM;	
+
+ 
+#if 0
+  // Disable overzealous attached check...
   if (pParentClass && pParentClass != this && !pParentClass->attached())  // a root class has itself as a parent
     return AAFRESULT_OBJECT_NOT_ATTACHED;	
-	
+#endif
+
   HRESULT hr;
   hr = ImplAAFMetaDefinition::Initialize(classID, pClassName, NULL);
   if (AAFRESULT_FAILED (hr))
