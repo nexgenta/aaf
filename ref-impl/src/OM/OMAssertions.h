@@ -47,6 +47,10 @@
   //        when an assertion violation occurs.
 class OMAssertionViolation;
 
+  // @func Never define a name. Use to avoid compiler warnings.
+  //   @parm The name not to define.
+#define NNAME(name)
+
 #if defined (OM_ENABLE_DEBUG)
 
 #include "OMDataTypes.h"
@@ -98,6 +102,8 @@ bool validWideString(const wchar_t* string);
   //   @rdesc True if the OMCharacter string is valid, false otherwise.
 bool validOMString(const OMCharacter* string);
 
+void checkTypes(void);
+
 #if defined(OM_ENABLE_TRACE)
 
   // @func Output routine tracing information.
@@ -116,7 +122,7 @@ void trace(const char* routineName);
 
 #else
 
-inline void noTrace(const char* /* routine */) {}
+inline void noTrace(const char* NNAME(routine)) {}
 
 #define TRACE(routine) \
   char* currentRoutineName; \
