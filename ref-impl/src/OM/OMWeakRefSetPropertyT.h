@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -32,6 +32,7 @@
 #include "OMAssertions.h"
 #include "OMWeakReferenceSetIter.h"
 #include "OMPropertyTable.h"
+#include "OMUtilities.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -42,14 +43,14 @@
 template <typename ReferencedObject>
 OMWeakReferenceSetProperty<ReferencedObject>::
                    OMWeakReferenceSetProperty(const OMPropertyId propertyId,
-                                              const char* name,
-                                              const char* targetName,
+                                              const wchar_t* name,
+                                              const wchar_t* targetName,
                                               const OMPropertyId keyPropertyId)
 : OMContainerProperty<ReferencedObject>(propertyId,
                                         SF_WEAK_OBJECT_REFERENCE_SET,
                                         name),
   _targetTag(nullOMPropertyTag),
-  _targetName(saveString(targetName)),
+  _targetName(convertWideString(targetName)),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::"
@@ -77,16 +78,8 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* s = container->store();
 
-  OMFile* file = container->file();
-  OMPropertyTag tag = file->referencedProperties()->insert(_targetName);
-
-  const char* propertyName = name();
+  OMPropertyTag tag = file()->referencedProperties()->insert(_targetName);
 
   // create a set index
   //
@@ -120,14 +113,23 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
 
   // save the set index
   //
-  s->save(_propertyId,
-          _storedForm,
-          propertyName,
-          index,
-          count,
-          tag,
-          _keyPropertyId);
+  const char* propertyName = name();
+  store()->save(_propertyId,
+                _storedForm,
+                propertyName,
+                index,
+                count,
+                tag,
+                _keyPropertyId);
   delete [] index;
+
+  // make an entry in the property index
+  //
+  store()->write(_propertyId,
+                 _storedForm,
+                 (void *)propertyName,
+                 strlen(propertyName) + 1);
+
 }
 
   // @mfunc Close this <c OMWeakReferenceSetProperty>.
@@ -182,8 +184,9 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
   //
   char* propertyName = new char[externalSize];
   ASSERT("Valid heap pointer", propertyName != 0);
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
+
+  store()->read(_propertyId, _storedForm, propertyName, externalSize);
+  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
 
   // restore the index
   //
@@ -191,19 +194,18 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
   size_t entries;
   OMPropertyTag tag;
   OMPropertyId keyPropertyId;
-  store->restore(_propertyId,
-                 _storedForm,
-                 propertyName,
-                 externalSize,
-                 setIndex,
-                 entries,
-                 tag,
-                 keyPropertyId);
+  store()->restore(_propertyId,
+                   _storedForm,
+                   propertyName,
+                   externalSize,
+                   setIndex,
+                   entries,
+                   tag,
+                   keyPropertyId);
 
   ASSERT("Valid set index", IMPLIES(entries != 0, setIndex != 0));
   ASSERT("Valid set index", IMPLIES(entries == 0, setIndex == 0));
   ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
-  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
   _targetTag = tag;
   delete [] propertyName;
 
