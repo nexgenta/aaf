@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.7 2004/05/08 22:18:45 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.8 2004/06/04 16:50:58 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -940,6 +940,10 @@ const aafUID_t kAAFPropID_CompositionMob_DefFadeType =
 //{05300403-0000-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_CompositionMob_DefFadeEditUnit =
 {0x05300403, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{06010104-010a-0000-060e-2b3401010108}
+const aafUID_t kAAFPropID_CompositionMob_Rendering =
+{0x06010104, 0x010a, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x08}};
 
 //{06010104-0203-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_SourceMob_EssenceDescription =
