@@ -47,7 +47,7 @@
 #include "AAFStoredObjectIDs.h"
 
 #if defined(macintosh) || defined(_MAC)
-#include <console.h> /* Mac command line window */
+#include "DataInput.h"
 #endif
 
 // There are differences in the microsoft and other compilers in the "Length" specifier
@@ -63,14 +63,13 @@
 
 // MAX is used for arrays when converting between types - set here for debugging. 
 const int MAX = 80;
-static char* programName;
 static char* niceFileName;
 static void usage(void);
 static aafWChar* slotName = L"SLOT1";
-static aafInt32 fadeInLen  = 1000;
-static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
-static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
+//static aafInt32 fadeInLen  = 1000;
+//static aafInt32 fadeOutLen = 2000;
+//static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
+//static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
 static aafSourceRef_t sourceRef; 
 
 
@@ -125,7 +124,6 @@ const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 {
-	HRESULT hr = S_OK;
 	IAAFFile*					pFile = NULL;
 	IAAFHeader*					pHeader = NULL;
 	IAAFDictionary*					pDictionary = NULL;
@@ -138,6 +136,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	IAAFSequence*				pSequence = NULL;
 	IAAFComponent*				aComponent = NULL;
 	IAAFFileDescriptor*			pFileDesc = NULL;
+	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 	IAAFTimelineMobSlot*		newSlot = NULL;
 	IAAFSegment*				seg = NULL;
@@ -151,7 +150,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	IAAFClassDef *              pCDSequence = 0;
 	IAAFClassDef *              pCDSourceMob = 0;
 	IAAFClassDef *              pCDTapeDescriptor = 0;
-	IAAFClassDef *              pCDFileDescriptor = 0;
+	IAAFClassDef *              pCDAIFCDescriptor = 0;
 	IAAFClassDef *              pCDNetworkLocator = 0;
 	IAAFClassDef *              pCDMasterMob = 0;
 	IAAFClassDef *              pCDSourceClip = 0;
@@ -174,14 +173,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	convert(chFileName, sizeof(chFileName), pFileName);
 	remove(chFileName);
 
-
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"Company Name";
 	ProductInfo.productName = L"Scalability Test 1:";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -201,8 +201,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 									  &pCDSourceMob));
 	check(pDictionary->LookupClassDef(AUID_AAFTapeDescriptor,
 									  &pCDTapeDescriptor));
-	check(pDictionary->LookupClassDef(AUID_AAFFileDescriptor,
-									  &pCDFileDescriptor));
+	check(pDictionary->LookupClassDef(AUID_AAFAIFCDescriptor,
+									  &pCDAIFCDescriptor));
 	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
 									  &pCDNetworkLocator));
 	check(pDictionary->LookupClassDef(AUID_AAFMasterMob,
@@ -288,10 +288,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		check(pCDSourceMob->
 			  CreateInstance(IID_IAAFSourceMob, 
 							 (IUnknown **)&pFileMob));
-		check(pCDFileDescriptor->
+		check(pCDAIFCDescriptor->
 			  CreateInstance(IID_IAAFFileDescriptor, 
 							 (IUnknown **)&pFileDesc));
 		check(pFileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&aDesc));
+		check(pFileDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
 
 		// Make a locator, and attach it to the EssenceDescriptor
 		check(pCDNetworkLocator->
@@ -485,10 +489,10 @@ cleanup:
 		pCDTapeDescriptor = 0;
 	  }
 
-	if (pCDFileDescriptor)
+	if (pCDAIFCDescriptor)
 	  {
-		pCDFileDescriptor->Release();
-		pCDFileDescriptor = 0;
+		pCDAIFCDescriptor->Release();
+		pCDAIFCDescriptor = 0;
 	  }
 
 	if (pCDNetworkLocator)
@@ -595,15 +599,7 @@ void usage(void)
 //  Main adapted to use command-line arguments with argument checking
 //  NOTE:  defining [0] program name; [1] Number N of components; [2] filename.aaf; 
 int main(int argumentCount, char *argumentVector[])
-{
-	/* console window for mac */
-
-	#if defined(macintosh) || defined(_MAC)
-	argumentCount = ccommand(&argumentVector);
-	#endif
-
-	programName = argumentVector[0];
-	
+{	
 	//  First check for correct number of arguments
 	//  printf("%ld\n",argumentCount);
 	if ((argumentCount < 2) || (argumentCount > 3))
@@ -650,7 +646,6 @@ int main(int argumentCount, char *argumentVector[])
 	mbstowcs(FileNameBuffer,niceFileName,MAX);
 	
 	aafWChar * pwFileName = FileNameBuffer;
-	const char * pFileName = niceFileName;
 
 	//  Give a nice output here too...
 	printf("Creating file %s with %ld components...\n\n",niceFileName,N);
