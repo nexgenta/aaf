@@ -42,6 +42,9 @@
 #include "ImplEnumAAFPropertyDefs.h"
 #endif
 
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
+
 #ifndef __ImplAAFBaseClassFactory_h__
 #include "ImplAAFBaseClassFactory.h"
 #endif
@@ -224,19 +227,8 @@ void ImplPropertyCollection::SetPropertyValue
   //
   assert (pOmProp);
   assert (pNewPropVal);
-  ImplAAFPropValData * pvd = dynamic_cast<ImplAAFPropValData*>(pNewPropVal);
-  assert (pvd);
-  aafMemPtr_t bits = 0;
-  aafUInt32 bitsSize;
-  hr = pvd->GetBits (&bits);
-  assert (bits);
+  hr = pNewPropVal->WriteTo(pOmProp);
   assert (AAFRESULT_SUCCEEDED (hr));
-  hr = pvd->GetBitsSize (&bitsSize);
-  assert (AAFRESULT_SUCCEEDED (hr));
-  // OMSimpleProperty * pSimpleProp = dynamic_cast <OMSimpleProperty*>(pOmProp);
-  // assert (pSimpleProp);
-  // pSimpleProp->setBits (bits, bitsSize);
-  pOmProp->setBits (bits, bitsSize);
 }
 
 
@@ -399,8 +391,7 @@ ImplAAFObject::ImplAAFObject ()
 	_cachedDefinition (0),
 	_apSavedProps (0),
 	_savedPropsSize (0),
-	_savedPropsCount (0),
-	_isInitialized (kAAFFalse)
+	_savedPropsCount (0)
 {
   _persistentProperties.put(_generation.address());
 
@@ -690,11 +681,11 @@ AAFRESULT STDMETHODCALLTYPE
   assert (_pProperties);
   
   ImplEnumAAFProperties * pEnum = NULL;
-  pEnum = (ImplEnumAAFProperties*) CreateImpl (CLSID_EnumAAFProperties);
-  if (! pEnum)
+  pEnum = dynamic_cast<ImplEnumAAFProperties*>(CreateImpl(
+	CLSID_EnumAAFProperties));
+  if (!pEnum)
 	return E_FAIL;
   assert (pEnum);
-  
   AAFRESULT hr = pEnum->Initialize (_pProperties);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
   
@@ -849,20 +840,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFObject::GetStoredByteOrder (eAAFByteOrder_t *  /*pOrder*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFObject::GetNativeByteOrder (eAAFByteOrder_t *  /*pOrder*/)
-{
-  return AAFRESULT_NOT_IMPLEMENTED;
-}
-
 //************
 // Interfaces ivisible inside the toolkit, but not exposed through the API
 
@@ -977,8 +954,6 @@ void ImplAAFObject::pvtSetSoid (const aafUID_t & id)
 //   if elem is fixed data  VariableData(sizeof elem)
 //   else                   <not yet supported; maybe never!>
 //
-// AAFTypeDefStream			<not yet supported>
-//
 // AAFTypeDefString			VariableData(sizeof elem)
 //
 // AAFTypeDefStrongObjRef	OMStrongReferenceProperty<AAFObject>
@@ -1040,8 +1015,8 @@ void ImplAAFObject::InitOMProperties (ImplAAFClassDef * pClassDef)
 		  pProp = ps->get (defPid);
 		}		  
 		else if(defPid != PID_InterchangeObject_ObjClass
-			&& (defPid != PID_InterchangeObject_Generation)
-			&& (defPid != PID_PropertyDefinition_DefaultValue))
+			/* && (defPid != PID_InterchangeObject_Generation)
+			 && (defPid != PID_PropertyDefinition_DefaultValue) */)
 		{
 		  // Defined property wasn't found in OM property set.
 		  // We'll have to install one.
@@ -1056,8 +1031,8 @@ void ImplAAFObject::InitOMProperties (ImplAAFClassDef * pClassDef)
 	  }
 	  
 	if(defPid != PID_InterchangeObject_ObjClass
-			&& (defPid != PID_InterchangeObject_Generation)
-			&& (defPid != PID_PropertyDefinition_DefaultValue))
+	   /* && (defPid != PID_InterchangeObject_Generation)
+	      && (defPid != PID_PropertyDefinition_DefaultValue) */)
 	{
 		  ImplAAFPropertyDef * pPropDef =
 			  (ImplAAFPropertyDef*) propDefSP;
@@ -1199,19 +1174,6 @@ AAFRESULT STDMETHODCALLTYPE
 	  _generation.remove();
 	}
   return AAFRESULT_SUCCESS;
-}
-
-
-aafBool ImplAAFObject::isInitialized () const
-{
-  return _isInitialized;
-}
-
-
-void ImplAAFObject::setInitialized ()
-{
-  _isInitialized = kAAFTrue;
-  assert (isInitialized());
 }
 
 

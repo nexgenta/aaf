@@ -25,93 +25,28 @@
  *
  ************************************************************************/
 
-#ifndef __ImplAAFDictionary_h__
 #include "ImplAAFDictionary.h"
-#endif
-
-#ifndef __ImplAAFMetaDictionary_h__
 #include "ImplAAFMetaDictionary.h"
-#endif
-
-#ifndef __ImplAAFClassDef_h__
 #include "ImplAAFClassDef.h"
-#endif
-
-#ifndef __ImplEnumAAFClassDefs_h__
 #include "ImplEnumAAFClassDefs.h"
-#endif
-
-#ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
-#endif
-
-#ifndef __ImplAAFPropertyDef_h__
 #include "ImplAAFPropertyDef.h"
-#endif
-
-#ifndef __ImplEnumAAFTypeDefs_h__
 #include "ImplEnumAAFTypeDefs.h"
-#endif
-
-#ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
-#endif
-
-#ifndef __ImplEnumAAFDataDefs_h__
 #include "ImplEnumAAFDataDefs.h"
-#endif
-
-#ifndef __ImplAAFOperationDef_h__
 #include "ImplAAFOperationDef.h"
-#endif
-
-#ifndef __ImplAAFParameterDef_h__
 #include "ImplAAFParameterDef.h"
-#endif
-
-#ifndef __ImplEnumAAFOperationDefs_h__
 #include "ImplEnumAAFOperationDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFCodecDefs_h__
 #include "ImplEnumAAFCodecDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFPropertyDefs_h__
 #include "ImplEnumAAFPropertyDefs.h"
-#endif
-
-#ifndef __ImplAAFTypeDefRename_h__
 #include "ImplAAFTypeDefRename.h"
-#endif
-
-#ifndef __ImplEnumAAFContainerDefs_h__
 #include "ImplEnumAAFContainerDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFInterpolationDefs_h__
 #include "ImplEnumAAFInterpolationDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFPluginDefs_h__
 #include "ImplEnumAAFPluginDefs.h"
-#endif
-
-#ifndef __AAFTypeDefUIDs_h__
 #include "AAFTypeDefUIDs.h"
-#endif
-
-#ifndef __ImplAAFBaseClassFactory_h__
 #include "ImplAAFBaseClassFactory.h"
-#endif
-
-#ifndef __ImplAAFBuiltinClasses_h__
 #include "ImplAAFBuiltinClasses.h"
-#endif
-
-#ifndef __ImplAAFBuiltinTypes_h__
 #include "ImplAAFBuiltinTypes.h"
-#endif
 
 #include "ImplAAFMob.h"
 #include "AAFStoredObjectIDs.h"
@@ -121,12 +56,16 @@
 #include "AAFContainerDefs.h"
 #include "AAFClassDefUIDs.h"
 
-
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 #include "AAFUtils.h"
 #include "AAFDataDefs.h"
+
+#include "ImplAAFSmartPointer.h"
+
+typedef ImplAAFSmartPointer<ImplEnumAAFClassDefs> ImplEnumAAFClassDefsSP;
+typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 
 extern "C" const aafClassID_t CLSID_EnumAAFCodecDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFContainerDefs;
@@ -257,13 +196,17 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-  assert (_pBuiltinClasses);
-  delete _pBuiltinClasses;
-  _pBuiltinClasses = 0;
+  if (_pBuiltinClasses)
+	{
+	  delete _pBuiltinClasses;
+	  _pBuiltinClasses = 0;
+	}
 
-  assert (_pBuiltinTypes);
-  delete _pBuiltinTypes;
-  _pBuiltinTypes = 0;
+  if (_pBuiltinTypes)
+	{
+	  delete _pBuiltinTypes;
+	  _pBuiltinTypes = 0;
+	}
 
   if (_pBuiltinDefs)
 	{
@@ -859,6 +802,7 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_UInt8Array8,
   & kAAFTypeID_Indirect,
   & kAAFTypeID_Opaque,
+  & kAAFTypeID_Stream,
   & kAAFTypeID_VersionType,
   & kAAFTypeID_RGBAComponent,
   & kAAFTypeID_MobID,
@@ -877,11 +821,9 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_DataDefinitionWeakReference,
   & kAAFTypeID_DataDefinitionWeakReferenceSet,
   & kAAFTypeID_DefinitionObjectWeakReference,
-  & kAAFTypeID_IdentificationWeakReference,
   & kAAFTypeID_InterpolationDefinitionStrongReference,
   & kAAFTypeID_InterpolationDefinitionStrongReferenceSet,
   & kAAFTypeID_LocatorStrongReference,
-  & kAAFTypeID_LocatorStrongReferenceSet,
   & kAAFTypeID_MobStrongReferenceSet,
   & kAAFTypeID_NetworkLocatorStrongReference,
   & kAAFTypeID_OperationDefinitionStrongReference,
@@ -1217,7 +1159,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFDataDef>(_dataDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFDataDefs,this,iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1505,7 +1447,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFCodecDef>(_codecDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFCodecDefs,this,iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1608,7 +1550,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFContainerDef>(_containerDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFContainerDefs,this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1845,7 +1787,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFInterpolationDef>(_interpolationDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFInterpolationDefs,this,iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1935,7 +1877,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDef>(_pluginDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFPluginDefs, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -2269,19 +2211,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
   // Defer to the meta dictionary.
   return(metaDictionary()->CreateTypeDefRename(typeID, pTypeName, pDescription, pBaseType, ppNewRename));
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefStream (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefStream ** ppNewStream)
-{
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefStream(typeID, pTypeName, pDescription, pElementType, ppNewStream));
 }
 
 

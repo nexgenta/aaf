@@ -58,6 +58,9 @@
 #include "ImplEnumAAFPropertyDefs.h"
 #endif
 
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
+
 //#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -319,8 +322,7 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
       pProp = ps->get (defPid);
     }      
     else if(defPid != PID_InterchangeObject_ObjClass
-      && (defPid != PID_InterchangeObject_Generation)
-      && (defPid != PID_PropertyDefinition_DefaultValue))
+      && (defPid != PID_InterchangeObject_Generation))
     {
       assert (0);
 #if 0
@@ -338,8 +340,7 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
     }
     
   if(defPid != PID_InterchangeObject_ObjClass
-      && (defPid != PID_InterchangeObject_Generation)
-      && (defPid != PID_PropertyDefinition_DefaultValue))
+      && (defPid != PID_InterchangeObject_Generation))
   {
       ImplAAFPropertyDef * pPropDef =
         (ImplAAFPropertyDef*) propDefSP;
@@ -390,14 +391,16 @@ const OMClassId& ImplAAFMetaDefinition::classId(void) const
 }
 
 // Override callbacks from OMStorable
-void ImplAAFMetaDefinition::onSave(void* clientContext) const
+void ImplAAFMetaDefinition::onSave(void* /*clientContext*/) const
 {
-  // TEMPORARY: Parent class will not always be ImplAAFObject!
-//  ImplAAFObject::onSave(clientContext);
+  // MetaDefinitions are not generation-tracked since they are
+  // immutable.
 }
 
-void ImplAAFMetaDefinition::onRestore(void* clientContext) const
+void ImplAAFMetaDefinition::onRestore(void* /*clientContext*/) const
 {
-  // TEMPORARY: Parent class will not always be ImplAAFObject!
-//  ImplAAFObject::onRestore(clientContext);
+  // clientContext currently unused
+
+  // Cast away constness (maintaining logical constness)
+  ((ImplAAFMetaDefinition*) this)->setInitialized ();
 }
