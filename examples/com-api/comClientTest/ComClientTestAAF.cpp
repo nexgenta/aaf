@@ -1,28 +1,30 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 
 #include <stdio.h>
 #include <string.h>
@@ -221,7 +223,7 @@ static void ReadAAFFile(aafWChar * pFileName)
       if (SUCCEEDED(hr))
       {
         IAAFIdentification *pIdent = NULL;
-        aafInt32 numMobs = 0;
+        aafNumSlots_t numMobs = 0;
 
 
         hr = pHeader->GetLastIdentification(&pIdent);
@@ -235,7 +237,7 @@ static void ReadAAFFile(aafWChar * pFileName)
           pIdent = NULL;
         }
 
-        hr = pHeader->GetNumMobs(kAllMob, &numMobs);
+        hr = pHeader->CountMobs(kAllMob, &numMobs);
         check(hr); // display error message
         if (FAILED(hr))
           numMobs = 0;
@@ -248,12 +250,12 @@ static void ReadAAFFile(aafWChar * pFileName)
         {
           //!!!  aafSearchCrit_t    criteria;
           //!!!  criteria.searchTag = kNoSearch;
-          hr = pHeader->EnumAAFAllMobs (NULL, &mobIter);
+          hr = pHeader->GetMobs (NULL, &mobIter);
           check(hr); // display error message
         }
         if (SUCCEEDED(hr)) // EnumAAFAllMobs && GetNumMobs SUCCEEDED
         {
-          aafInt32 n = 0;
+          aafUInt32 n = 0;
 
 
           for(n = 0; n < numMobs; n++)
@@ -289,7 +291,7 @@ static void ReadAAFFile(aafWChar * pFileName)
             
               printf("Mob %ld: (ID %s) is named '%s'\n", n, chMobID, chName);
 
-              hr = aMob->GetNumSlots (&numSlots);
+              hr = aMob->CountSlots (&numSlots);
               check(hr); // display error message
               if (FAILED(hr))
                 numSlots = 0;
@@ -300,7 +302,7 @@ static void ReadAAFFile(aafWChar * pFileName)
               if(SUCCEEDED(hr))
               {
                 IAAFEssenceDescriptor  *essenceDesc = NULL;
-                aafInt32 numLocators;
+                aafUInt32 numLocators;
 
 
                 hr = smob->GetEssenceDescriptor(&essenceDesc);
@@ -329,7 +331,7 @@ static void ReadAAFFile(aafWChar * pFileName)
                     printf("    It is a source mob, but not a file source mob\n");
 
                   numLocators = -1;
-                  hr = essenceDesc->GetNumLocators(&numLocators);
+                  hr = essenceDesc->CountLocators(&numLocators);
                   check(hr); // display error message
                   if(SUCCEEDED(hr))
                   {
@@ -353,12 +355,12 @@ static void ReadAAFFile(aafWChar * pFileName)
                 IEnumAAFMobSlots  *slotIter = NULL;
 
 
-                hr = aMob->EnumAAFAllMobSlots(&slotIter);
+                hr = aMob->GetSlots(&slotIter);
                 check(hr); // display error message
                 if(SUCCEEDED(hr))
                 {
                   IAAFMobSlot    *slot = NULL;
-                  aafInt32 s;
+                  aafUInt32 s;
 
 
                   for(s = 0; s < numSlots; s++)
@@ -452,7 +454,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   long  test;
   aafWChar    *names[5] = { L"FOOBAR1", L"FOOBAR2", L"FOOBAR3", L"FOOBAR4", L"FOOBAR5" };
   aafRational_t  editRate = { 2997, 100 };
-  IAAFMobSlot    *newSlot = NULL;
+  IAAFTimelineMobSlot    *newSlot = NULL;
   IAAFSegment    *seg = NULL;
   IAAFSourceClip  *sclp = NULL;
   IAAFSourceMob  *smob = NULL;
@@ -467,31 +469,31 @@ static void CreateAAFFile(aafWChar * pFileName)
   {
      // Create a source Mob with a FileDescriptor attached
     check(pDictionary->CreateInstance(
-                &AUID_AAFSourceMob, 
+                AUID_AAFSourceMob, 
                 IID_IAAFSourceMob, 
                 (IUnknown **)&smob));
     check(smob->QueryInterface (IID_IAAFMob, (void **)&pMob));
     check(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
     //newUID.Data1 = test;
-    check(pMob->SetMobID(&newUID));
+    check(pMob->SetMobID(newUID));
     check(pMob->SetName(names[test]));
 
     check(pDictionary->CreateInstance(
-              &AUID_AAFFileDescriptor,
+              AUID_AAFFileDescriptor,
               IID_IAAFFileDescriptor, 
               (IUnknown **)&fileDesc));
-    check(fileDesc->SetSampleRate(&audioRate));
+    check(fileDesc->SetSampleRate(audioRate));
     check(fileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&essenceDesc));
 
     {
       HRESULT stat;
       stat = pDictionary->CreateInstance(
-                  &AUID_AAFNetworkLocator,
+                  AUID_AAFNetworkLocator,
                   IID_IAAFLocator, 
                   (IUnknown **)&pLocator);
       check (stat);
     }
-    check(fileDesc->SetSampleRate(&audioRate));
+    check(fileDesc->SetSampleRate(audioRate));
 
     check(essenceDesc->AppendLocator (pLocator));
     check(smob->SetEssenceDescriptor(essenceDesc));
@@ -499,11 +501,17 @@ static void CreateAAFFile(aafWChar * pFileName)
     // Add some slots
     for(testSlot = 0; testSlot < 3; testSlot++)
     {
-       check(pDictionary->CreateInstance(&AUID_AAFSourceClip,
+       check(pDictionary->CreateInstance(AUID_AAFSourceClip,
                IID_IAAFSourceClip, 
                (IUnknown **)&sclp));
       check(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
-      check(pMob->AppendNewSlot (seg, testSlot+1, slotNames[testSlot], &newSlot));
+      check(pMob->AppendNewTimelineSlot
+			(editRate,
+			 seg,
+			 testSlot+1,
+			 slotNames[testSlot],
+			 0,
+			 &newSlot));
       
       // Cleanup references...
       newSlot->Release();
@@ -517,7 +525,7 @@ static void CreateAAFFile(aafWChar * pFileName)
     }
     
     // Add the newly created and initialized Mob to the end of the mob index.
-    check(pHeader->AppendMob(pMob));
+    check(pHeader->AddMob(pMob));
     
     
     // Cleanup references...
