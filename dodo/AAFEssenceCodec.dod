@@ -23,7 +23,7 @@ AD_IDL(//
 AD_CLASS_UUID(3631F7A1, 9121, 11d2, 80, 88, 00, 60, 08, 14, 3e, 6f)
 
 AD_DEFAULT_UUID(3631F7A2, 9121, 11d2, 80, 88, 00, 60, 08, 14, 3e, 6f)
-AD_XCLASS_BEGIN(Abstract, Transient)
+AD_CLASS_BEGIN
 
 AD_IDL(//
 	//**************
@@ -49,14 +49,6 @@ AD_XMETHOD2(GetIndexedVariantID,
 	//)
 
 	
-AD_XMETHOD1(SetCompression,
-		   [in],
-		   objPass,
-		   aafCompressEnable_t,
-		   enableCompression,
-		   isCompressionEnabled,
-		   Sets a value indicating whether the SDK is handling the compression.)
-
 AD_XMETHOD2(GetIndexedDataDefinition,
 		   [in],
 		   objPass,
@@ -99,14 +91,12 @@ AD_XMETHOD3(GetCodecDisplayName,
 			length of the buffer to hold variant Name,
 			Given a variant ID\, return the human readable name)
 
-AD_XMETHOD2(GetSelectInfo,
+AD_METHOD2(GetSelectInfo,
 		   [in],
-		   objIn,
-		   Unknown,
+		   aafUID_t,
 		   fileMobID,
 		   See if the current codec can process data from this file mob,
 		   [out],
-		   objPass,
 		   aafCodecSelectInfo_t *,
 		   pInfo,
 		   The returned meta information about this codec,
@@ -119,19 +109,16 @@ AD_IDL(//
 	// to before the stream is actually opened.
 	//)
 	
-AD_XMETHOD3(GetNumChannels,
+AD_METHOD3(GetNumChannels,
 		   [in],
-		   objIn,
-		   Unknown,
-		   fileMob,
+		   aafUID_t,
+		   fileMobID,
 		   Get the number of processable channels on this file mob,
 		   [in],
-		   objPass,
 		   aafUID_t,
 		   essenceKind,
 		   This is the type of essence to open,
 		   [out],
-		   objPass,
 		   aafInt16 *,
 		   pNumChannels,
 		   The number of channels present,
@@ -140,9 +127,9 @@ AD_XMETHOD3(GetNumChannels,
 
 AD_XMETHOD5(SemanticCheck,
 		   [in],
-			objIn,
-		   Unknown,
-		   fileMob,
+			objPass,
+		   aafUID_t,
+		   fileMobID,
 		   Run a check on this file mob,
 		   [in],
 			objPass,
@@ -152,7 +139,7 @@ AD_XMETHOD5(SemanticCheck,
 		   [out],
 			objPass,
 		   aafCheckWarnings_t *,
-		   outputWarnings,
+		   warning,
 		   This determines whether the output contains warnings,
 			[in\,string],
 			objPass,
@@ -171,9 +158,9 @@ AD_XMETHOD5(SemanticCheck,
 		
 AD_XMETHOD3(Create,
 			[in],
-			objIn,
-			Unknown,
-			fileMob,
+			objPass,
+			aafUID_t,
+			fileMobID,
 			Create the essence attached to this file mob,
 			[in],
 			objPass,
@@ -188,17 +175,12 @@ AD_XMETHOD3(Create,
 			Create a media data object\, and attach the correct type of
 			//EssenceDescriptor to the fileMob)
 
-AD_XMETHOD3(Open,
-			[in],
-			objIn,
-			Unknown,
-			fileMob,
-			Open the essence attached to this file mob,
+AD_XMETHOD2(Open,
 			[in],
 			objPass,
-			aafMediaOpenMode_t,
-			openMode,
-			In this mode,
+			aafUID_t,
+			fileMobID,
+			Open the essence attached to this file mob,
 			[in],
 			objIn,
 			AAFEssenceStream,
@@ -303,11 +285,7 @@ AD_XMETHOD3(ReadFractionalSample,
 
 
 
-AD_METHOD3(WriteRawData,
-			[in],
-			aafUInt32,
-			nSamples,
-			Write this many samples,
+AD_METHOD2(WriteRawData,
 			[in\\\,size_is\\\(buflen\\\)],
 			aafDataBuffer_t,
 			buffer,
@@ -320,11 +298,7 @@ AD_METHOD3(WriteRawData,
 
 
 
-AD_METHOD5(ReadRawData,
-			[in],
-			aafUInt32,
-			nSamples,
-			Read this many samples,
+AD_METHOD3(ReadRawData,
 			[in],
 			aafUInt32,
 			buflen,
@@ -337,10 +311,6 @@ AD_METHOD5(ReadRawData,
 			aafUInt32 *,
 			bytesRead,
 			Return bytes actually read,
-			[out\\\,ref],
-			aafUInt32 *,
-			samplesRead,
-			Return samples actually read,
 			Read some number of bytes from the stream exactly and with no formatting or compression.)
 
 AD_IDL(//
@@ -355,9 +325,9 @@ AD_XMETHOD2(CreateDescriptorFromStream,
 			pStream,
 			A raw file stream,
 			[in],
-			objIn,
-			Unknown,
-			pSourceMob,
+			objPass,
+			aafUID_t,
+			pSourceMobID,
 			Put the finished descriptor on this source mob,
 			Given some raw essence \(like a WAVE file\)\, create
 			// an AAFEssenceDescriptor to match\, with all fields filled in.)
@@ -389,4 +359,4 @@ AD_XMETHOD1(GetEssenceFormat,
 			Supply an essence format object specifying what data is
 			// required\, and it is filled in with the data values.)
 
-AD_XCLASS_END(Abstract, Transient)
+AD_CLASS_END
