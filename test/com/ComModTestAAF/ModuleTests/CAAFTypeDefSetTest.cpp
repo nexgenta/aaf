@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefSet
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefSetTest.cpp,v 1.13 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefSetTest.cpp,v 1.14 2004/05/20 15:36:42 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -315,13 +315,13 @@ static const MyDefRecord kMyWeakRefSetPropData =
 extern "C"
 {
   HRESULT CAAFTypeDefSet_test(testMode_t);
+} 
   void CAAFTypeDefSet_Create(aafCharacter_constptr fileName);
   void CAAFTypeDefSet_Open(aafCharacter_constptr fileName);
   
   void CAAFTypeDefSet_Register(IAAFHeader * pHeader, IAAFDictionary* pDictionary);
   void CAAFTypeDefSet_Write(IAAFHeader* pHeader, IAAFDictionary* pDictionary);
   void CAAFTypeDefSet_Read(IAAFHeader* pHeader, IAAFDictionary* pDictionary);
-} 
 
 extern "C" HRESULT CAAFTypeDefSet_test(testMode_t mode)
 {

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefIndirect
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefIndirectTest.cpp,v 1.14 2004/02/27 18:46:43 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefIndirectTest.cpp,v 1.15 2004/05/20 15:36:42 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,13 +70,12 @@ extern "C"
 {
   // Main test function.
   HRESULT CAAFTypeDefIndirect_test(testMode_t mode);
-
+}
   // Create the test file.
   void CAAFTypeDefIndirect_create (aafCharacter_constptr pFileName); // throw HRESULT
 
   // Open the test file read only and validate the data.
   void CAAFTypeDefIndirect_read (aafCharacter_constptr pFileName); // throw HRESULT
-}
 
 extern "C" HRESULT CAAFTypeDefIndirect_test(testMode_t mode);
 extern "C" HRESULT CAAFTypeDefIndirect_test(testMode_t mode)
