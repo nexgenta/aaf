@@ -28,14 +28,15 @@
 // @doc OMINTERNAL
 #include "OMObjectDirectory.h"
 #include "OMAssertions.h"
-#include "OMPortability.h"
 #include "OMUtilities.h"
 
 #include <string.h>
 #include <iostream.h>
 
-OMObjectDirectory::OMObjectDirectory(int capacity)
-: _capacity(capacity), _current(0)
+#define OM_OBJECT_DIRECTORY_CAPACITY  (5000)
+
+OMObjectDirectory::OMObjectDirectory(void)
+: _capacity(OM_OBJECT_DIRECTORY_CAPACITY), _current(0)
 {
   TRACE("OMObjectDirectory::OMObjectDirectory");
 
@@ -61,7 +62,7 @@ bool OMObjectDirectory::lookup(const wchar_t* name, const OMStorable*& p) const
   TRACE("OMObjectDirectory::lookup");
   PRECONDITION("Valid name to look up", validWideString(name));
   bool result = false;
-  
+
   for (int i = 0; i < _current; i++) {
     int status = compareWideString(name, _table[i]._name);
     if (status == 0) {

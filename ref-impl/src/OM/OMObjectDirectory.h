@@ -29,7 +29,6 @@
 #ifndef OMOBJECTDIRECTORY_H
 #define OMOBJECTDIRECTORY_H
 
-#include "OMPortability.h"
 #include <stddef.h>
 
 class OMStorable;
@@ -37,9 +36,7 @@ class OMStorable;
 class OMObjectDirectory {
 public:
 
-  // Create with space for `capacity' entries.
-  //
-  OMObjectDirectory(int capacity);
+  OMObjectDirectory(void);
 
   ~OMObjectDirectory(void);
 
