@@ -41,7 +41,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.5 2004/10/25 17:39:03 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.6 2004/11/02 11:30:11 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -200,14 +200,15 @@ typedef aafInt32 aafJPEGTableID_t;
 
 /************************************************************
  *
- * Enumerated AAFI types.
+ * Enumerated AAF types.
  *
  *************************************************************/
 typedef aafInt32 aafFileRev_t;
 
 typedef 
 enum _aafFileRev_e
-    {	kAAFRev1	= 0
+    {	kAAFRev1	= 0,
+	kAAFRev2	= 1
     }	aafFileRev_e;
 
 typedef aafInt32 aafMediaOpenMode_t;
@@ -356,12 +357,12 @@ typedef aafInt32 aafSignalStandard_t;
 typedef 
 enum _aafSignalStandard_e
     {	kAAFSignalNone	= 0,
-	kAAFSignalS125MInterlace	= 1,
-	kAAFSignalS125MProgressive	= 2,
-	kAAFSignalS347M	= 3,
-	kAAFSignalS274M	= 4,
-	kAAFSignalS296M	= 5,
-	kAAFSignalS349M	= 6
+	kAAFSignalITU601	= 1,
+	kAAFSignalITU1358	= 2,
+	kAAFSignalSMPTE347M	= 3,
+	kAAFSignalSMPTE274M	= 4,
+	kAAFSignalSMPTE296M	= 5,
+	kAAFSignalSMPTE349M	= 6
     }	aafSignalStandard_e;
 
 typedef aafInt32 aafScanningDirection_t;
