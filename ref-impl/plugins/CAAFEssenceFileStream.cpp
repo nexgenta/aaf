@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "CAAFEssenceFileStream.h"
 #include "CAAFEssenceFileContainer.h"
@@ -143,8 +162,8 @@ void CAAFEssenceFileStream::RemoveFileStreamFromContainer()
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Init (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::Init (const aafCharacter * pFilePath,
+        aafMobID_constptr pMobID)
 {
   if (NULL == pFilePath)
     return E_INVALIDARG;
@@ -165,7 +184,7 @@ HRESULT STDMETHODCALLTYPE
   charCount = i + 1; // include the terminating null.
 
   // Copy the wide character path name.
-  _pwPath = (wchar_t *)CoTaskMemAlloc(charCount * sizeof(wchar_t));
+  _pwPath = new wchar_t[charCount];
   if (NULL == _pwPath)
     return AAFRESULT_NOMEMORY;
   for (i = 0; i < charCount; ++i)
@@ -175,7 +194,7 @@ HRESULT STDMETHODCALLTYPE
   // Allocate the maximum possible multibyte string for the current
   // locale.
   size_t byteCount = (MB_CUR_MAX * (charCount - 1)) + 1;
-  _pPath = (char *)CoTaskMemAlloc(byteCount);
+  _pPath = new char[byteCount];
   if (NULL == _pPath)
     return AAFRESULT_NOMEMORY;
   size_t convertedBytes = wcstombs( _pPath, _pwPath, byteCount);
@@ -186,10 +205,10 @@ HRESULT STDMETHODCALLTYPE
   // Copy the optional mobID it it exists.
   if (pMobID)
   {
-    _pMobID = (aafUID_t *)CoTaskMemAlloc(sizeof(aafUID_t));
-    if (NULL == _pwPath)
+    _pMobID = new aafMobID_t;
+    if (NULL == _pMobID)
       return AAFRESULT_NOMEMORY;
-    memcpy(_pMobID, pMobID, sizeof(aafUID_t));
+    memcpy(_pMobID, pMobID, sizeof(aafMobID_t));
   }
 
 
@@ -202,19 +221,19 @@ void CAAFEssenceFileStream::CleanupBuffers(void)
 {
   if (_pwPath)
   {
-    CoTaskMemFree((void *)_pwPath);
+    delete [] _pwPath;
     _pwPath = NULL;
   }
 
   if (_pMobID)
   {
-    CoTaskMemFree((void *)_pMobID);
+    delete _pMobID;
     _pMobID = NULL;
   }
 
   if (_pPath)
   {
-    CoTaskMemFree((void *)_pPath);
+    delete [] _pPath;
     _pPath = NULL;
   }
 }
@@ -295,8 +314,8 @@ CAAFEssenceFileStream::FileStreamOp CAAFEssenceFileStream::SetStreamOp(FileStrea
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Create (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::Create (const aafCharacter *  pFilePath,
+        aafMobID_constptr  pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -324,8 +343,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::OpenRead (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::OpenRead (const aafCharacter * pFilePath,
+        aafMobID_constptr pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)
@@ -348,8 +367,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::OpenAppend (wchar_t *  pFilePath,
-        aafUID_t *  pMobID)
+    CAAFEssenceFileStream::OpenAppend (const aafCharacter * pFilePath,
+        aafMobID_constptr  pMobID)
 {
   HRESULT hr = Init(pFilePath, pMobID);
   if (AAFRESULT_SUCCESS != hr)

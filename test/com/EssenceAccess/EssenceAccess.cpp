@@ -1,13 +1,32 @@
 // @com Executable test program by Chris Morgan, intern for Avid Technology, Tewksbury 
 // @com This is used for scalability testing of AAF code.  Last modified on 7/23/99.
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -30,8 +49,14 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
+#if USE_TIMER_LIB
 // Include this for the purpose of timing the data read/write
 #include "UtlConsole.h"
+#endif
+
+#if defined(macintosh) || defined(_MAC)
+#include <console.h> /* Mac command line window */
+#endif
 
 // This static variables are here so they can be referenced 
 // throughout the whole program.
@@ -42,10 +67,6 @@ static aafSourceRef_t sourceRef;
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
 
-static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
-{
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
-}
 
 #define TEST_PATH	L"SomeFile.dat"
 
@@ -83,12 +104,12 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
-static void AUIDtoString(aafUID_t *uid, char *buf)
+static void MobIDtoString(aafMobID_constref uid, char *buf)
 {
 	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
-			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
-			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
+			uid.Data1, uid.Data2, uid.Data3, (int)uid.Data4[0],
+			(int)uid.Data4[1], (int)uid.Data4[2], (int)uid.Data4[3], (int)uid.Data4[4],
+			(int)uid.Data4[5], (int)uid.Data4[6], (int)uid.Data4[7]);
 }
 
 typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
@@ -125,6 +146,7 @@ char* externalkind = "";
 char* kind = "";
 char* location = "";
 
+
 //  Note: function modified to take N as an argument
 static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, testType_t testType, long int N)
 {
@@ -141,7 +163,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
 	// !!!Previous revisions of this file contained variables here required to handle external essence
-	aafUID_t					masterMobID;
+	aafMobID_t					masterMobID;
 	aafProductIdentification_t	ProductInfo;
 	aafRational_t				editRate = {44100, 1};
 	aafRational_t				sampleRate = {44100, 1};
@@ -186,7 +208,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
   // Get a Master MOB Interface
-	check(pDictionary->CreateInstance( &AUID_AAFMasterMob,
+	check(pDictionary->CreateInstance(AUID_AAFMasterMob,
 						   IID_IAAFMasterMob, 
 						   (IUnknown **)&pMasterMob));
 	// Get a Mob interface and set its variables.
@@ -195,14 +217,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	check(pMob->SetName(L"A Master Mob"));
 	
 	// Add it to the file 
-	check(pHeader->AppendMob(pMob));
+	check(pHeader->AddMob(pMob));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
 	if(dataFile != NULL)
 	{
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+		check(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
 								IID_IAAFLocator, 
 								(IUnknown **)&pLocator));		
 		check(pLocator->SetPath (dataFile->dataFilename));
@@ -274,9 +296,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		pFormat->Release();
 		pFormat = NULL;
 	 
+#if USE_TIMER_LIB
 		//  start the write timer here
 		aafUInt32 timerID, elapsedtime;
 		moduleErrorTmp = UTLStartPeriod(&timerID);
+#endif
 
 		aafUInt32 dataWritten =0;
 		aafUInt32 dataWriteRate = 0;
@@ -335,6 +359,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		//  end of the loop
 		}
 
+#if USE_TIMER_LIB
 		//  stop the timer here
 		moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
 
@@ -347,9 +372,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 			externalkind = "";
 
 		printf("Write rate (%s%s %s) = %ld kb/sec KBytes = %ld\n",externalkind, location, kind, dataWriteRate,dataWritten/1024);
+#endif
 		
 		// close essence data file
 		fclose(pWavFile);
+    pWavFile = NULL;
 
 		// Finish writing the destination
 		check(pEssenceAccess->CompleteWrite());
@@ -388,6 +415,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 cleanup:
 	// Cleanup and return
+  if (pWavFile)
+    fclose(pWavFile);
+
+  if(pFormat)
+		pFormat->Release();
+
+	if(format)
+		format->Release();
+
+	if(pLocator)
+		pLocator->Release();
+
 	if (pEssenceAccess)
 		pEssenceAccess->Release();
 	
@@ -410,14 +449,11 @@ cleanup:
 		pHeader->Release();
 
 	if (pFile)
-		pFile->Release(); 
+  {
+    pFile->Close();
+		pFile->Release();
+  }
 
-	if(pFormat)
-		pFormat->Release();
-	if(format)
-		format->Release();
-	if(pLocator)
-		pLocator->Release();
 
 	return moduleErrorTmp;
 }
@@ -438,9 +474,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 	aafNumSlots_t				numMobs, numSlots;
 	aafSearchCrit_t				criteria;
-	aafUID_t					mobID, dataID = DDEF_Sound;
+	aafMobID_t					mobID;
+	aafUID_t					dataID = DDEF_Sound;
 	aafWChar					namebuf[1204];
-	unsigned char						*AAFDataBuf;
+	unsigned char						*AAFDataBuf = NULL;
 	aafUInt32					AAFBytesRead, samplesRead;
 	FILE*						pWavFile = NULL;
 //	size_t						WAVBytesRead;
@@ -456,13 +493,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 	// Here we check on the number of mobs in the file. 
 	// Get the number of master mobs in the file (should be one)
-	check(pHeader->GetNumMobs(kMasterMob, &numMobs));
+	check(pHeader->CountMobs(kMasterMob, &numMobs));
 	if (1 == numMobs )
 	{
 		printf("Found %ld Master Mobs\n", numMobs);
 		criteria.searchTag = kByMobKind;
 		criteria.tags.mobKind = kMasterMob;
-		check(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
+		check(pHeader->GetMobs(&criteria, &pMobIter));
 		while(AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
 			char mobIDstr[256];
@@ -472,11 +509,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 			check(pMob->GetMobID (&mobID));
 			check(pMob->GetName (namebuf, sizeof(namebuf)));
 			convert(mobName, sizeof(mobName), namebuf);
-			AUIDtoString(&mobID, mobIDstr);
+			MobIDtoString(mobID, mobIDstr);
 			printf("    MasterMob Name = '%s'\n", mobName);
 			printf("        (mobID %s)\n", mobIDstr);
 			// Make sure we have one slot 
-			check(pMob->GetNumSlots(&numSlots));
+			check(pMob->CountSlots(&numSlots));
 			if (1 == numSlots)
 			{
 				// The essence data is in SlotID 1
@@ -498,6 +535,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					// read in the essence data
 					WAVBytesRead = fread(WAVDataBuf, sizeof(unsigned char), sizeof(WAVDataBuf), pWavFile);
 					fclose(pWavFile);
+          pWavFile = NULL
 					check(loadWAVEHeader(WAVDataBuf,
 										&bitsPerSample,
 										&numCh,
@@ -542,6 +580,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					bytesToRead = samplesToRead * (sampleBits+7)/8;
 					AAFDataBuf = (unsigned char *)new char[bytesToRead];
 
+#if USE_TIMER_LIB
 					// start the read timer here
 
 					aafUInt32 timerID, elapsedtime;
@@ -549,6 +588,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 					aafUInt32 dataRead =0;
 					aafUInt32 dataReadRate = 0;
+#endif
 
 					// Read the Raw Data from the AAF file
 					if(testType == testRawCalls)
@@ -594,6 +634,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					}
 
 						
+#if USE_TIMER_LIB
 					//  stop the timer here
 					moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
 					
@@ -608,6 +649,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					wcstombs(niceFileName,pFileName,80);
 									
 					printf("File = %s KBytes = %ld Time(ms) = %ld Rate = %ld kb/sec\n",niceFileName,dataRead/1024,elapsedtime,dataReadRate);
+#endif
 
 #if 0
 					// Now compare the data read from the AAF file to the actual WAV file
@@ -622,6 +664,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					}
 #endif
 					delete [] AAFDataBuf;
+          AAFDataBuf = NULL;
+
+          if (pWavFile)
+          { // close essence data file
+		        fclose(pWavFile);
+            pWavFile = NULL;
+          }
 #if 0
 				}
 				else
@@ -664,6 +713,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 cleanup:
 	// Cleanup and return
+  if (AAFDataBuf)
+    delete [] AAFDataBuf;
+
+  if (pWavFile)
+    fclose(pWavFile);
 
 	if (pRawEssence)
 		pRawEssence->Release();
@@ -867,6 +921,39 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 }
 
 
+// Make sure all of our required plugins have been registered.
+static HRESULT RegisterRequiredPlugins(void)
+{
+  HRESULT hr = S_OK;
+	IAAFPluginManager	*mgr = NULL;
+
+  // Load the plugin manager 
+  check(AAFGetPluginManager(&mgr));
+
+  // Attempt load and register all of the plugins
+  // in the shared plugin directory.
+  check(mgr->RegisterSharedPlugins());
+
+  // Attempt to register all of the plugin files
+  // in the given directorys:
+  //check(mgr->RegisterPluginDirectory(directory1));
+  //check(mgr->RegisterPluginDirectory(directory2));
+
+
+  // Attempt to register all of the plugins in any
+  // of the given files:
+  //check(mgr->RegisterPluginFile(file1));
+  //check(mgr->RegisterPluginFile(file2));
+  //...
+
+cleanup:
+  if (mgr)
+    mgr->Release();
+
+	return moduleErrorTmp;
+}
+
+
 //  A new usage function to make program more friendly
 void usage(void)
 {
@@ -878,6 +965,14 @@ void usage(void)
 //  NOTE:  defining [0] program name; [1] Number N of wave files
 int main(int argumentCount, char *argumentVector[])
 {
+
+	/* console window for mac */
+
+	#if defined(macintosh) || defined(_MAC)
+	argumentCount = ccommand(&argumentVector);
+	#endif
+
+
 	//  First checking for correct number of arguments 
 
 	if (argumentCount != 2)
@@ -900,11 +995,17 @@ int main(int argumentCount, char *argumentVector[])
 		return 0;
 	}
 	
+#if USE_TIMER_LIB
 	//  Initialise timers
 	UTLInitTimers(1000);
+#endif
 
 	CComInitialize comInit;
 	CAAFInitialize aafInit;
+
+  // Make sure all of our required plugins have been registered.
+  checkFatal(RegisterRequiredPlugins());
+
 
 	//  The new, non-interleaved code to fix the caching issues relating to statistic gathering
 

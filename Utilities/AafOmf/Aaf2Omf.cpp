@@ -44,7 +44,22 @@ namespace OMF2
 
 #include "AafOmf.h"
 
+#include "AAFDomainUtils.h"
+#include "OMFDomainUtils.h"
+#if AVID_SPECIAL
+#include "ConvertAvid.h"
+#include "AAFDomainAvidUtils.h"
+#include "OMFDomainAvidUtils.h"
+#include "AvidEffectTranslate.h"
+#else
+#include "AAFDomainExtensions.h"
+#include "OMFDomainExtensionUtils.h"
+#include "EffectTranslate.h"
+#endif
 #include "Aaf2Omf.h"
+#include "aafCodecdefs.h"
+#include "aafclassdefuids.h"
+//#include "omcAvJPED.h"
 
 static void     LogError(HRESULT errcode, int line, char *file)
 {
@@ -81,6 +96,13 @@ extern AafOmfGlobals* gpGlobals;
 // ============================================================================
 Aaf2Omf::Aaf2Omf() : pFile(NULL), pHeader(NULL), pDictionary(NULL)
 {
+	pAAF = new AAFDomainExtensionUtils;
+	pOMF = new OMFDomainExtensionUtils;
+#if AVID_SPECIAL
+	pEffectTranslate = new AvidEffectTranslate;
+#else
+	pEffectTranslate = new EffectTranslate;
+#endif
 }
 // ============================================================================
 // Destructor
@@ -114,6 +136,7 @@ HRESULT Aaf2Omf::ConvertFile ()
 //			rc = ConvertAAFHeader();
 //			if (SUCCEEDED(rc))
 			{
+				pAAF->SetDictionary(pDictionary);
 				rc = AAFFileRead();
 			}
 		}
@@ -134,11 +157,11 @@ HRESULT Aaf2Omf::ConvertFile ()
 	return (rc);
 }
 // ============================================================================
-// ConvertAUIDtoUID
-//			This function reduces an AUID into an OMF UID.
+// ConvertMobIDtoUID
+//			This function reduces an MobID into an OMF UID.
 //
 // ============================================================================
-void Aaf2Omf::ConvertAUIDtoUID(aafUID_t* pMobID, 
+void Aaf2Omf::ConvertMobIDtoUID(aafMobID_constptr pMobID, 
 							   OMF2::omfUID_t* pOMFMobID)
 {
 	struct SMPTELabel
@@ -156,12 +179,12 @@ void Aaf2Omf::ConvertAUIDtoUID(aafUID_t* pMobID,
 
 	union label
 	{
-		aafUID_t			auid;
+		aafMobID_t			mobID;
 		struct SMPTELabel	smpte;
 	};
 
 	union label aLabel;
-	memcpy((void *)&aLabel.auid, pMobID, sizeof(aafUID_t));
+	memcpy((void *)&aLabel.mobID, pMobID, sizeof(aLabel.mobID));
 
 	pOMFMobID->prefix = aLabel.smpte.MobIDPrefix;
 	pOMFMobID->major = aLabel.smpte.MobIDMajor;
@@ -210,6 +233,8 @@ HRESULT Aaf2Omf::OpenInputFile ()
 		printf("AAF File: %s opened succesfully\n", gpGlobals->sInFileName);
 //		printf("          File Revision %s \n", szFileVersion);
 	}
+
+	pAAF->RegisterAAFProperties(pDictionary);
 
 	gpGlobals->bAAFFileOpen = AAFTrue;
 	delete [] pwFileName;
@@ -341,9 +366,8 @@ HRESULT Aaf2Omf::OpenOutputFile ()
 		goto cleanup;
 	}
 
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither,
-		"AvidPrivateEffectID", OMClassEFFE, OMF2::OMUniqueName,
-		OMF2::kPropOptional, &privateEffectProp);
+	RegisterCodecProperties(gpGlobals, OMFSession);
+	pOMF->RegisterOMFProperties(gpGlobals, OMFSession);
 	
 	bSessionStarted = AAFTrue;
 	OMFError = OMF2::omfmInit(OMFSession);
@@ -353,6 +377,9 @@ HRESULT Aaf2Omf::OpenOutputFile ()
 		rc = AAFRESULT_BAD_SESSION;
 		goto cleanup;
 	}
+
+
+//	OMFError = omfmRegisterCodec(OMFSession, OMF2::omfCodecAvJPED, OMF2::kOMFRegisterLinked);
 
 	OMFError = OMF2::omfsCreateFile((OMF2::fileHandleType)gpGlobals->sOutFileName, OMFSession, OMF2::kOmfRev2x, &OMFFileHdl);
 	if (OMFError != OMF2::OM_ERR_NONE )
@@ -467,19 +494,19 @@ HRESULT Aaf2Omf::AAFFileRead()
 	IAAFEssenceData*		pEssenceData = NULL;
 	aafSearchCrit_t			criteria;
 
-	rc = pHeader->GetNumMobs(kAllMob, &nAAFNumMobs);
+	rc = pHeader->CountMobs(kAllMob, &nAAFNumMobs);
 	if (gpGlobals->bVerboseMode)
 	{
 		printf(" Found: %ld Mobs in the input file\n", nAAFNumMobs);
 	}
 	criteria.searchTag = kByMobKind;
 	criteria.tags.mobKind = kAllMob;
-	rc = pHeader->EnumAAFAllMobs(&criteria, &pMobIter);
+	rc = pHeader->GetMobs(&criteria, &pMobIter);
 	while (pMobIter && (pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS))
 	{
 		aafInt32	nameLength = 0;
 		aafWChar*	pwMobName = NULL;
-		aafUID_t	MobID;
+		aafMobID_t	MobID;
 		char		szMobID[64];
 		char*		pszMobName = NULL;
 
@@ -522,7 +549,7 @@ HRESULT Aaf2Omf::AAFFileRead()
 				}
 				else
 				{
-					AUIDtoString(&MobID, szMobID);
+					MobIDtoString(&MobID, szMobID);
 					printf("Unrecognized Mob kind encountered ID: %s\n", szMobID);
 //					fprintf(stderr,"Unrecognized Mob kind encountered ID: %s\n", szMobID);
 				}
@@ -536,12 +563,12 @@ HRESULT Aaf2Omf::AAFFileRead()
 				// NOw add user comments 
 				aafUInt32	numComments = 0;
 
-				rc = pMob->GetNumComments(&numComments);
+				rc = pMob->CountComments(&numComments);
 				if (SUCCEEDED(rc) && (numComments > 0))
 				{
 					IEnumAAFTaggedValues*	pCommentIterator = NULL;
 					IAAFTaggedValue*		pMobComment = NULL;
-					rc = pMob->EnumAAFAllMobComments(&pCommentIterator);
+					rc = pMob->GetComments(&pCommentIterator);
 					while ( (SUCCEEDED(rc)) && (SUCCEEDED(pCommentIterator->NextOne(&pMobComment))))
 					{
 						char*		pszComment;
@@ -552,16 +579,16 @@ HRESULT Aaf2Omf::AAFFileRead()
 						aafUInt32	bytesRead;
 
 						pMobComment->GetNameBufLen(&textSize);
-						pwcName = new wchar_t [textSize/sizeof(wchar_t)];
+						pwcName = new aafWChar [textSize/sizeof(aafWChar)];
 						pMobComment->GetName(pwcName, textSize);
-						pszCommName =  new char[textSize/sizeof(wchar_t)];
-						wcstombs(pszCommName, pwcName, textSize/sizeof(wchar_t));
+						pszCommName =  new char[textSize/sizeof(aafWChar)];
+						wcstombs(pszCommName, pwcName, textSize/sizeof(aafWChar));
 
 						pMobComment->GetValueBufLen((aafUInt32 *)&textSize);
-						pwcComment = new wchar_t (textSize/sizeof(wchar_t));
+						pwcComment = new aafWChar[textSize/sizeof(aafWChar)];
 						pMobComment->GetValue((aafUInt32)textSize, (aafDataBuffer_t)pwcComment, &bytesRead);
-						pszComment =  new char[textSize/sizeof(wchar_t)];
-						wcstombs(pszComment, pwcComment, textSize/sizeof(wchar_t));
+						pszComment =  new char[textSize/sizeof(aafWChar)];
+						wcstombs(pszComment, pwcComment, textSize/sizeof(aafWChar));
 
 						OMFError = OMF2::omfiMobAppendComment(OMFFileHdl, OMFMob, pszCommName, pszComment);
 						delete [] pszCommName;
@@ -589,7 +616,7 @@ HRESULT Aaf2Omf::AAFFileRead()
 		pMobIter->Release();
 
 	// Now get the media data.
-	rc = pHeader->GetNumEssenceData(&numEssenceData);
+	rc = pHeader->CountEssenceData(&numEssenceData);
 	if (SUCCEEDED(rc) && numEssenceData > 0)
 	{
 		if (gpGlobals->bVerboseMode)
@@ -634,20 +661,20 @@ HRESULT Aaf2Omf::AAFFileRead()
 HRESULT Aaf2Omf::ConvertCompositionMob(IAAFCompositionMob* pCompMob,
 									   OMF2::omfMobObj_t* pOMFCompMob,
 									   char* pMobName,
-									   aafUID_t* pMobID)
+									   aafMobID_t* pMobID)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
 	OMF2::omfErr_t			OMFError = OMF2::OM_ERR_NONE;
 
 	OMF2::omfUID_t			OMFMobID;
 	OMF2::omfDefaultFade_t	OMFFade;
-
+	IAAFMob					*pMob = NULL;
 	aafDefaultFade_t		DefaultFade;
 
 	OMFError = OMF2::omfiCompMobNew(OMFFileHdl, pMobName, (OMF2::omfBool)AAFFalse, pOMFCompMob);
 	if (OMF2::OM_ERR_NONE == OMFError)
 	{
-		ConvertAUIDtoUID(pMobID, &OMFMobID);
+		ConvertMobIDtoUID(pMobID, &OMFMobID);
 		OMFError = OMF2::omfiMobSetIdentity(OMFFileHdl, *pOMFCompMob, OMFMobID);
 		if (OMF2::OM_ERR_NONE == OMFError)
 		{
@@ -675,7 +702,11 @@ HRESULT Aaf2Omf::ConvertCompositionMob(IAAFCompositionMob* pCompMob,
 												 OMFFade.fadeLength, 
 												 OMFFade.fadeType ,
 												 OMFFade.fadeEditUnit);
+
 			}
+
+			rc = pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
+			FinishUpMob(pMob, *pOMFCompMob);
 		}
 	}
 
@@ -698,17 +729,18 @@ HRESULT Aaf2Omf::ConvertCompositionMob(IAAFCompositionMob* pCompMob,
 HRESULT Aaf2Omf::ConvertMasterMob(IAAFMasterMob* pMasterMob,
 								  OMF2::omfMobObj_t* pOMFMasterMob,
 								  char* pMobName,
-								  aafUID_t* pMobID)
+								  aafMobID_t* pMobID)
 {
 	HRESULT				rc = AAFRESULT_SUCCESS;
 	OMF2::omfErr_t			OMFError = OMF2::OM_ERR_NONE;
+	IAAFMob					*pMob = NULL;
 
 	OMF2::omfUID_t		OMFMobID;
 
 	OMFError = OMF2::omfmMasterMobNew(OMFFileHdl, pMobName, (OMF2::omfBool)AAFTrue, pOMFMasterMob);
 	if (OMF2::OM_ERR_NONE == OMFError)
 	{
-		ConvertAUIDtoUID(pMobID, &OMFMobID);
+		ConvertMobIDtoUID(pMobID, &OMFMobID);
 		OMFError = OMF2::omfiMobSetIdentity(OMFFileHdl, *pOMFMasterMob, OMFMobID);
 		if (OMF2::OM_ERR_NONE == OMFError)
 		{
@@ -716,6 +748,9 @@ HRESULT Aaf2Omf::ConvertMasterMob(IAAFMasterMob* pMasterMob,
 				printf("Converted AAF Master MOB to OMF\n");
 		}
 	}
+			
+	rc = pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
+	FinishUpMob(pMob, *pOMFMasterMob);
 
 	if (OMFError != OMF2::OM_ERR_NONE)
 		rc = AAFRESULT_INTERNAL_ERROR;
@@ -737,7 +772,7 @@ HRESULT Aaf2Omf::ConvertMasterMob(IAAFMasterMob* pMasterMob,
 HRESULT Aaf2Omf::ConvertSourceMob(IAAFSourceMob* pSourceMob,
 								  OMF2::omfMobObj_t* pOMFSourceMob,
 								  char* pMobName,
-								  aafUID_t* pMobID)
+								  aafMobID_t* pMobID)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
 	OMF2::omfErr_t			OMFError = OMF2::OM_ERR_NONE;
@@ -751,11 +786,17 @@ HRESULT Aaf2Omf::ConvertSourceMob(IAAFSourceMob* pSourceMob,
 	IAAFTIFFDescriptor*		pTiffDesc = NULL;
 	IAAFWAVEDescriptor*		pWAVEDesc = NULL;
 	IAAFAIFCDescriptor*		pAifcDesc = NULL;
+	IAAFDigitalImageDescriptor* pDIDDDesc = NULL;
 	IAAFCDCIDescriptor*		pCDCIDesc = NULL;
 	IAAFObject*				pAAFObject = NULL;
+	aafInt32				*lineMap = NULL;
+	IAAFMob					*pMob = NULL;
 
 	if (gpGlobals->bVerboseMode)
 		printf("Converting AAF Source MOB to OMF\n");
+
+	rc = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
+	FinishUpMob(pMob, *pOMFSourceMob);
 
 	rc = pSourceMob->GetEssenceDescriptor(&pEssenceDesc);
 	if (FAILED(rc))
@@ -763,7 +804,7 @@ HRESULT Aaf2Omf::ConvertSourceMob(IAAFSourceMob* pSourceMob,
 
 	IncIndentLevel();
 
-	ConvertAUIDtoUID(pMobID, &OMFMobID);
+	ConvertMobIDtoUID(pMobID, &OMFMobID);
 	rc = pEssenceDesc->QueryInterface(IID_IAAFTapeDescriptor,(void **)&pTapeDesc);
 	if (SUCCEEDED(rc))
 	{
@@ -790,20 +831,20 @@ HRESULT Aaf2Omf::ConvertSourceMob(IAAFSourceMob* pSourceMob,
 			pTapeDesc->GetTapeManBufLen(&textSize);
 			if (textSize > 0)
 			{
-				pwManufacturer = new wchar_t[textSize/sizeof(wchar_t)];
+				pwManufacturer = new aafWChar[textSize/sizeof(aafWChar)];
 				pTapeDesc->GetTapeManufacturer(pwManufacturer, textSize);
-				pszManufacturer = new char[textSize/sizeof(wchar_t)];
-				wcstombs(pszManufacturer, pwManufacturer, textSize/sizeof(wchar_t));
+				pszManufacturer = new char[textSize/sizeof(aafWChar)];
+				wcstombs(pszManufacturer, pwManufacturer, textSize/sizeof(aafWChar));
 			}
 			else
 				pszManufacturer = NULL;
 			pTapeDesc->GetTapeModelBufLen(&textSize);
 			if (textSize > 0)
 			{
-				pwModel = new wchar_t[textSize/sizeof(wchar_t)];
+				pwModel = new aafWChar[textSize/sizeof(wchar_t)];
 				pTapeDesc->GetTapeModel(pwModel, textSize);
-				pszModel = new char[textSize/sizeof(wchar_t)];
-				wcstombs(pszModel, pwModel, textSize/sizeof(wchar_t));
+				pszModel = new char[textSize/sizeof(aafWChar)];
+				wcstombs(pszModel, pwModel, textSize/sizeof(aafWChar));
 			}
 			else
 				pszModel = NULL;
@@ -935,6 +976,7 @@ HRESULT Aaf2Omf::ConvertSourceMob(IAAFSourceMob* pSourceMob,
 			OMFError = OMF2::omfmFileMobNew(OMFFileHdl, pMobName, rate, CODEC_WAVE_AUDIO, pOMFSourceMob);
 			OMFError = OMF2::omfiMobSetIdentity(OMFFileHdl, *pOMFSourceMob, OMFMobID);
 			OMFError = OMF2::omfmMobGetMediaDescription(OMFFileHdl, *pOMFSourceMob, &mediaDescriptor);
+			OMFError = OMF2::omfsWriteLength(OMFFileHdl, mediaDescriptor, OMF2::OMMDFLLength, (OMF2::omfLength_t)length); 
 			OMF2::omfiDatakindLookup(OMFFileHdl, "omfi:data:Sound", &datakind, (OMF2::omfErr_t *)&rc);
 			OMFError = OMF2::omfsWriteDataValue(OMFFileHdl,
 										 mediaDescriptor,
@@ -972,9 +1014,120 @@ HRESULT Aaf2Omf::ConvertSourceMob(IAAFSourceMob* pSourceMob,
 		rc = pEssenceDesc->QueryInterface(IID_IAAFCDCIDescriptor, (void **)&pCDCIDesc);
 		if (SUCCEEDED(rc))
 		{
+			aafUInt32				storedWidth, storedHeight, lineMapSize, n;
+			aafUInt32				dispWidth, dispHeight, sampWidth, sampHeight;
+			aafInt32				sampX, sampY, dispX, dispY, align;
+			aafAlphaTransparency_t	alphaTrans;
+			aafFrameLayout_t		layout;
+			OMF2::omfObject_t		mediaDescriptor;
+			aafRational_t			gamma, aspect;
+			OMF2::omfRational_t		OMFGamma, OMFAspect;
+			aafUID_t				compressionID;
+			char					*omfclassID;
+			char					*omfCompression;
+
 			// It is a CDCI file descriptor
-			OMFError = OMF2::omfmFileMobNew(OMFFileHdl, pMobName, rate, CODEC_CDCI_VIDEO, pOMFSourceMob);
+			rc = pEssenceDesc->QueryInterface(IID_IAAFDigitalImageDescriptor, (void **)&pDIDDDesc);//!!!
+			(void)pDIDDDesc->GetCompression(&compressionID);
+			if(memcmp(&compressionID, &CodecJPEG, sizeof(CodecJPEG)) == 0)
+			{
+				omfclassID = "CDCI";		// For now!!! (Get full toolkit w/all codecs later)
+//				omfclassID = "JPED";
+				omfCompression = "JFIF";
+			}
+			else
+			{
+				omfclassID = "CDCI";
+				omfCompression = "";
+			}
+
+			OMFError = OMF2::omfmFileMobNew(OMFFileHdl, pMobName, rate, omfclassID, pOMFSourceMob);
 			OMFError = OMF2::omfiMobSetIdentity(OMFFileHdl, *pOMFSourceMob, OMFMobID);
+			OMFError = OMF2::omfmMobGetMediaDescription(OMFFileHdl, *pOMFSourceMob, &mediaDescriptor);
+			OMFError = OMF2::omfsWriteLength(OMFFileHdl, mediaDescriptor, OMF2::OMMDFLLength, (OMF2::omfLength_t)length); 
+			
+			// Get Digital Image properties and set them
+			// Toolkit still expects signed
+			pDIDDDesc->GetStoredView(&storedWidth, &storedHeight);
+			OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDStoredHeight, storedHeight);
+			OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDStoredWidth, storedWidth);
+
+			if(pDIDDDesc->GetSampledView(&sampHeight, &sampWidth, &sampX, &sampY) == AAFRESULT_SUCCESS)
+			{
+				OMFError = OMF2::omfsWriteUInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDSampledHeight, sampHeight);
+				OMFError = OMF2::omfsWriteUInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDSampledWidth, sampWidth);
+				OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDSampledXOffset, sampX);
+				OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDSampledYOffset, sampY);
+			}
+
+			if(pDIDDDesc->GetDisplayView(&dispHeight, &dispWidth, &dispX, &dispY) == AAFRESULT_SUCCESS)
+			{
+				OMFError = OMF2::omfsWriteUInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDDisplayHeight, dispHeight);
+				OMFError = OMF2::omfsWriteUInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDDisplayWidth, dispWidth);
+				OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDDisplayXOffset, dispX);
+				OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDDisplayYOffset, dispY);
+			}
+			(void)pDIDDDesc->GetFrameLayout(&layout);
+			OMFError = OMF2::omfsWriteLayoutType(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDFrameLayout, (OMF2::omfFrameLayout_t)(layout+1));	// Toolkit used incorrect layout
+
+			if(pDIDDDesc->GetGamma(&gamma) == AAFRESULT_SUCCESS)
+			{
+				OMFGamma.numerator = gamma.numerator;
+				OMFGamma.denominator = gamma.denominator;
+				OMFError = OMF2::omfsWriteRational(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDGamma, OMFGamma);
+			}
+
+			(void)pDIDDDesc->GetVideoLineMapSize(&lineMapSize);
+			lineMap = new aafInt32[lineMapSize];
+			(void)pDIDDDesc->GetVideoLineMap(lineMapSize, lineMap);
+			// Possibly translate old line map #'s into new ones?!!!
+			for(n = 0; n < lineMapSize; n++)
+			{
+				OMFError = OMF2::OMWriteProp(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDVideoLineMap, 
+				n*sizeof(aafInt32), OMF2::OMInt32Array,
+				sizeof(aafInt32), lineMap+n);
+			}
+			delete [] lineMap;
+			lineMap = NULL;
+
+			//
+			OMFError = OMF2::omfsWriteString(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDCompression, omfCompression);
+
+			//
+			if(pDIDDDesc->GetImageAspectRatio(&aspect) == AAFRESULT_SUCCESS)
+			{
+				OMFAspect.numerator = aspect.numerator;
+				OMFAspect.denominator = aspect.denominator;
+				OMFError = OMF2::omfsWriteRational(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDImageAspectRatio, OMFAspect);
+			}
+
+			//
+			if(pDIDDDesc->GetAlphaTransparency(&alphaTrans) == AAFRESULT_SUCCESS)
+			{
+				OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDAlphaTransparency, alphaTrans);
+			}
+			if(pDIDDDesc->GetImageAlignmentFactor(&align) == AAFRESULT_SUCCESS)
+			{
+				OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDFieldAlignment, align);
+			}
+			
+			// retrieve CDCI descriptor properties
+			aafInt32			componentWidth;
+			aafUInt32			horizSubsample;
+			aafColorSiting_t	cositing;
+
+			// Find out which are optional & which must fail!!!
+			(void)pCDCIDesc->GetComponentWidth(&componentWidth);
+			OMFError = OMF2::omfsWriteInt32(OMFFileHdl, mediaDescriptor, gpGlobals->omCDCIComponentWidth, componentWidth); 
+
+			(void)pCDCIDesc->GetHorizontalSubsampling(&horizSubsample);
+			OMFError = OMF2::omfsWriteUInt32(OMFFileHdl, mediaDescriptor, gpGlobals->omCDCIHorizontalSubsampling, horizSubsample); 
+
+			(void)pCDCIDesc->GetColorSiting(&cositing);
+			OMFError = OMF2::OMWriteProp(OMFFileHdl, mediaDescriptor, gpGlobals->omCDCIColorSiting, 
+						  0, OMF2::OMColorSitingType,
+						  sizeof(cositing), (void *)&(cositing));
+
 			if (gpGlobals->bVerboseMode)
 				printf("%sAdded a CDCI Media Descriptor to a Source MOB\n", gpGlobals->indentLeader);
 			goto cleanup;
@@ -990,7 +1143,7 @@ HRESULT Aaf2Omf::ConvertSourceMob(IAAFSourceMob* pSourceMob,
 			IAAFClassDef * classDef = 0;
 			pAAFObject->GetDefinition(&classDef);
 			IAAFDefObject * defObj = 0;
-			pEssenceDesc->QueryInterface(IID_IAAFDefObject, (void **)&defObj);
+			classDef->QueryInterface(IID_IAAFDefObject, (void **)&defObj);
 			defObj->GetAUID (&ObjClass);
 			if (defObj)
 			  {
@@ -1032,6 +1185,10 @@ cleanup:
 
 	if (pCDCIDesc)
 		pCDCIDesc->Release();
+	if (pDIDDDesc)
+		pDIDDDesc->Release();
+	if(lineMap != NULL)
+		delete [] lineMap;
 
 	DecIndentLevel();
 	if (OMFError != OMF2::OM_ERR_NONE)
@@ -1072,11 +1229,11 @@ HRESULT Aaf2Omf::TraverseMob(IAAFMob* pMob,
 //	aafSearchCrit_t			criteria;
 	aafInt32				textSize;
 
-	rc = pMob->GetNumSlots(&numSlots);
+	rc = pMob->CountSlots(&numSlots);
 	if (FAILED(rc))
 		return rc;
 
-	rc = pMob->EnumAAFAllMobSlots(&pSlotIter);
+	rc = pMob->GetSlots(&pSlotIter);
 	if (FAILED(rc))
 		return rc;
 	
@@ -1247,7 +1404,7 @@ HRESULT Aaf2Omf::ProcessComponent(IAAFComponent* pComponent,
 							 &fadeOutLen,
 							 &fadeOutType,
 							 &fadeOutPresent);
-		ConvertAUIDtoUID(&ref.sourceID, &OMFSourceRef.sourceID);
+		ConvertMobIDtoUID(&ref.sourceID, &OMFSourceRef.sourceID);
 		OMFSourceRef.sourceTrackID = (OMF2::omfTrackID_t)ref.sourceSlotID;
 		OMFSourceRef.startTime = (OMF2::omfPosition_t)ref.startTime;
 		// Create OMF Source Clip
@@ -1373,14 +1530,14 @@ HRESULT Aaf2Omf::ProcessComponent(IAAFComponent* pComponent,
 	rc = pComponent->QueryInterface(IID_IAAFOperationGroup, (void **)&pEffect);
 	if (SUCCEEDED(rc))
 	{
-		//Component is an effect
-		OMF2::omfEffObj_t	effect = NULL;
+//		//Component is an effect
+//		OMF2::omfEffObj_t	effect = NULL;
 
 		if (gpGlobals->bVerboseMode)
 		{
 			printf("%sProcessing Effect of length: %ld\n ", gpGlobals->indentLeader, (int)length);
 		}
-		rc = ConvertEffects(pEffect, &effect);
+		rc = ConvertEffects(pEffect, pOMFSegment);
 
 		goto cleanup;
 	}
@@ -1487,330 +1644,6 @@ cleanup:
 	return rc;
 }
 // ============================================================================
-// GetEffectIDsFromAUID
-//
-//			This function converts an AAF effectID into an OMF unique name. 
-//			
-// Returns: AAFRESULT_SUCCESS if datakind is converted succesfully
-//			
-// NOTE :	the buffer passed to this routine should be big enough to accomodate
-//			the whole OMF name.!!
-// ============================================================================
-HRESULT Aaf2Omf::GetEffectIDsFromAUID(aafUID_t Datadef,
-									   OMF2::omfUniqueNamePtr_t effectID,
-									   OMF2::omfUniqueNamePtr_t MCEffectID)
-{
-	HRESULT					rc = AAFRESULT_SUCCESS;
-	// OMF2::omfBool			bFound;
-	char					szAUID[OMUNIQUENAME_SIZE];
-
-	MCEffectID[0] = '\0';
-	if ( memcmp((char *)&Datadef, (char *)&kAAFEffectVideoDissolve, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:SimpleVideoDissolve");
-		strcpy(MCEffectID, "BLEND_DISSOLVE");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectVideoFadeToBlack, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:VideoFadeToBlack");
-		strcpy(MCEffectID, "BLEND_FADE_DOWN");
-	}
-//!!! Wipe will be more complicated to figure out
-//	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectSMPTEVideoWipe, sizeof(aafUID_t)) == 0 )
-//	{
-//		strcpy(effectID, "omfi:effect:SMPTEVideoWipe");
-//		strcpy(MCEffectID, xxxx);
-//	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectVideoSpeedControl, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:VideoSpeedControl");
-		strcpy(MCEffectID, "EFF_TIMEWARP.MOTION_CTL");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectVideoRepeat, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:VideoRepeat");
-		strcpy(MCEffectID, "EFF_TIMEWARP.REPEAT");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectVideoFrameToMask, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:VideoFrameMask");
-		strcpy(MCEffectID, "EFF_TIMEWARP.CAPTURE_MASK");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectMonoAudioDissolve, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:SimpleMonoAudioDissolve");
-		strcpy(MCEffectID, "BLEND_AUDIO_DISSOLVE");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectMonoAudioPan, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:MonoAudioPan");
-		strcpy(MCEffectID, "Audio Pan Volume");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectMonoAudioGain, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:MonoAudioGain");
-		strcpy(MCEffectID, "Audio Pan Volume");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectStereoAudioDissolve, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:StereoAudioDissolve");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kAAFEffectStereoAudioGain, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "omfi:effect:StereoAudioGain");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffBlendPIPUUID, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(MCEffectID, "EFF_BLEND_PIP");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffBlendSuperUUID, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(MCEffectID, "BLEND_SUPER");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffBlendFadeUpUUID, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(MCEffectID, "BLEND_FADE_UP");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffBlendDipUUID, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(MCEffectID, "BLEND_DIP");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffXRotate, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_ROTATE_XROTATE");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffYRotate, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_ROTATE_YROTATE");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffZRotate, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_ROTATE_ZROTATE");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeZoom, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_ZOOM");
-
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeHorz, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_HORZ");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeVert, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_VERT");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeBottomCenter, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_BOTTOMCENTER");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeRightCenter, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_RIGHTCENTER");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeTopCenter, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_TOPCENTER");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeLeftCenter, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_LEFTCENTER");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeTop, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZETOP");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeBottom, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZEBOTTOM");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeLeft, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZELEFT");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeRight, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZERIGHT");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeBottomLeft, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_BOTTOMLEFT");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeTopRight, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_TOPRIGHT");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeBottomRight, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_BOTTOMRIGHT");
-	}
-	else if ( memcmp((char *)&Datadef, (char *)&kEffSqueezeTopLeft, sizeof(aafUID_t)) == 0 )
-	{
-		strcpy(effectID, "OMFI:EFFE:AvidPrivateEffectID");
-		strcpy(MCEffectID, "EFF_BLEND_SQUEEZE_TOPLEFT");
-	}
-	else
-	{
-		AUIDtoString(&Datadef, szAUID);
-		printf("%sInvalid DataDef Found in sequence AUID : %s\n", gpGlobals->indentLeader, szAUID);
-		fprintf(stderr,"%sInvalid DataDef Found in sequence AUID : %s\n", gpGlobals->indentLeader, szAUID);
-		rc = AAFRESULT_INVALID_DATADEF;
-	}
-
-#if 0
-#define EFF_EMPTY_EFFECT				"EFF_EMPTY_EFFECT"	//	This is the ID for the effect 
-															//	that is returned when the requested 
-															//	effect is not available
-#define EFF_AUDIO_PANVOL				
-#define EFF_AUDIO_EQMB					"EFF_AUDIO_EQMB"	// Multiband equalization (ADM-style)
-#define EFF_AUDIO_AS_PLUG_IN			"EFF_AUDIO_AS_PLUG_IN"	// Digi Audio Suite Plug-In
-#define EFF_TIME_WARP					"EFF_TIMEWARP"
-#define EFF_MOTION_STROBE				"EFF_TIMEWARP.STROBE"
-#define EFF_AUDIO_WARP                  "EFF_TIMEWARP.AUDIO_TIME_WARP"
-#define EFF_BASIC_PLUGIN				"EFF_BASIC_PLUGIN"
-#define EFF_PLUGIN_FILTER				"EFF_PLUGIN_FILTER"
-#define EFF_PLUGIN_TRANSITION			"EFF_PLUGIN_TRANSITION"        
-#define EFF_PIP							"EFF_PICTURE_IN_PICTURE"
-#define EFF_BLEND_VDISSOLVE				"BLEND_DISSOLVE"
-#define EFF_BLEND_WIPE_RBOX				"EFF_BLEND_WIPE_RBOX"
-#define EFF_BLEND_WIPE_TBOX				"EFF_BLEND_WIPE_TBOX"
-#define EFF_BLEND_WIPE_LBOX				"EFF_BLEND_WIPE_LBOX"
-#define EFF_BLEND_WIPE_BBOX				"EFF_BLEND_WIPE_BBOX"
-#define EFF_BLEND_WIPE_LR				"EFF_BLEND_WIPE_LR"
-#define EFF_BLEND_WIPE_LL				"EFF_BLEND_WIPE_LL"
-#define EFF_BLEND_WIPE_UR				"EFF_BLEND_WIPE_UR"
-#define EFF_BLEND_WIPE_UL				"EFF_BLEND_WIPE_UL"
-#define EFF_BLEND_WIPE_VOPEN			"EFF_BLEND_WIPE_VOPEN"
-#define EFF_BLEND_WIPE_HOPEN			"EFF_BLEND_WIPE_HOPEN"
-#define EFF_BLEND_WIPE_VERT				"EFF_BLEND_WIPE_VERT"
-#define EFF_BLEND_WIPE_HORZ				"EFF_BLEND_WIPE_HORZ"
-#define EFF_BLEND_WIPE_LRLDIAG			"EFF_BLEND_WIPE_LRLDIAG"
-#define EFF_BLEND_WIPE_LLRDIAG			"EFF_BLEND_WIPE_LLRDIAG"
-#define EFF_BLEND_WIPE_URLDIAG			"EFF_BLEND_WIPE_URLDIAG"
-#define EFF_BLEND_WIPE_ULRDIAG			"EFF_BLEND_WIPE_ULRDIAG"
-#define EFF_BLEND_WIPE_SPIRAL			"EFF_BLEND_WIPE_SPIRAL"
-#define EFF_BLEND_WIPE_GRID				"EFF_BLEND_WIPE_GRID"
-#define EFF_BLEND_WIPE_1ROW				"EFF_BLEND_WIPE_1ROW"
-#define EFF_BLEND_WIPE_SPECKLE			"EFF_BLEND_WIPE_SPECKLE"
-#define EFF_BLEND_WIPE_ZIG_ZAG			"EFF_BLEND_WIPE_ZIG_ZAG"
-#define EFF_BLEND_WIPE_VOPEN_SAW		"EFF_BLEND_WIPE_VOPEN_SAW"
-#define EFF_BLEND_WIPE_HOPEN_SAW		"EFF_BLEND_WIPE_HOPEN_SAW"
-#define EFF_BLEND_WIPE_VSAW				"EFF_BLEND_WIPE_VSAW"
-#define EFF_BLEND_WIPE_HSAW				"EFF_BLEND_WIPE_HSAW"
-#define EFF_BLEND_WIPE_4CORNER			"EFF_BLEND_WIPE_4CORNER"
-#define EFF_BLEND_WIPE_BOX				"EFF_BLEND_WIPE_BOX"
-#define EFF_BLEND_WIPE_CIRCLE			"EFF_BLEND_WIPE_CIRCLE"
-#define EFF_BLEND_WIPE_RADAR			"EFF_BLEND_WIPE_RADAR"
-#define EFF_BLEND_WIPE_DIAMOND			"EFF_BLEND_WIPE_DIAMOND"
-#define EFF_BLEND_WIPE_ELLIPSE			"EFF_BLEND_WIPE_ELLIPSE"
-#define EFF_BLEND_WIPE_2ROW				"EFF_BLEND_WIPE_2ROW"		// horizontal bands
-#define EFF_BLEND_WIPE_HBLIND			"EFF_BLEND_WIPE_HBLIND"
-#define EFF_BLEND_WIPE_VBLIND			"EFF_BLEND_WIPE_VBLIND"
-#define EFF_BLEND_MASK_166				"EFF_BLEND_MASK_166"
-#define EFF_BLEND_MASK_185				"EFF_BLEND_MASK_185"
-#define EFF_BLEND_MASK_235				"EFF_BLEND_MASK_235"
-#define EFF_BLEND_MASK_177				"EFF_BLEND_MASK_177"		// 16x9 Mask
-#define EFF_BLEND_VDISSOLVE_LIN			"BLEND_DISSOLVE_LIN"		// film fade
-#define EFF_BLEND_VDISSOLVE_LOG			"BLEND_DISSOLVE_LOG"		// film dissolve
-#define EFF_BLOW_UP						"EFF_BLOW_UP"
-#define EFF_BLEND_MASK					"EFF_BLEND_MASK"
-#define EFF_COLORCORRECT				"EFF_COLORCORRECT"			// Color Effect
-#define EFF_RGB_COLOR_CORRECTION		"EFF_RGB_COLOR_CORRECTION"	// Chameleon Color Correction
-#define EFF_BLEND_FLIP_VERT				"EFF_BLEND_FLIP_VERT"		// flip
-#define EFF_BLEND_FLIP_BOTH				"EFF_BLEND_FLIP_BOTH"		// flip/flop
-#define EFF_BLEND_FLIP_HORZ				"EFF_BLEND_FLIP_HORZ"		// flop
-#define EFF_BLEND_MASK_IMAGE			"EFF_BLEND_MASK_IMAGE"
-#define EFF_PAINT						"EFF_PAINT"
-#define EFF_PAINT_MOSAIC				"EFF_PAINT_MOSAIC"
-#define EFF_PAINT_SPOT_COLOR				"EFF_PAINT_SPOT_COLOR"
-#define EFF_PAINT_MPEG_OUTLINE				"EFF_PAINT_MPEG_OUTLINE"
-#define EFF_PAINT_SCRATCH               "EFF_PAINT_SCRATCH"
-#define EFF_BLEND_RESIZE				"EFF_BLEND_RESIZE"
-#define EFF_PAN_SCAN					"EFF_PAN_SCAN"
-#define EFF_SUBMASTER					"EFF_SUBMASTER"
-#define EFF_ANIMATTE					"EFF_ANIMATTE"
-#define EFF_BLEND_LUMAKEY				"EFF_BLEND_LUMAKEY"
-#define EFF_BLEND_MATTE_KEY				"EFF_BLEND_MATTE_KEY"			// DSF - the software Matte Key
-#define EFF_BLEND_YUV_CHROMAKEY			"EFF_BLEND_YUV_CHROMAKEY"		// real chroma key - 5.2 and beyond
-#define EFF_BLEND_SIMPLE_LUMAKEY		"EFF_BLEND_SIMPLE_LUMAKEY"
-#define EFF_BLEND_SIMPLE_CHROMAKEY		"EFF_BLEND_SIMPLE_CHROMAKEY"	// for debug only
-#define EFF_BLEND_CHROMAKEY				"EFF_BLEND_CHROMAKEY"			// pre 5.2
-#define EFF_BLEND_TOUCAN_CHROMAKEY		"EFF_BLEND_TOUCAN_CHROMAKEY"	// enhanced chromakey plugin
-#define EFF_2DMATTE_KEY					"EFF_2DMATTE"					// real time static matte
-#define EFF_BLEND_CONCEAL_BOTTOMLEFT	"EFF_BLEND_CONCEAL_BOTTOMLEFT"
-#define EFF_BLEND_CONCEAL_BOTTOMRIGHT	"EFF_BLEND_CONCEAL_BOTTOMRIGHT"
-#define EFF_BLEND_CONCEAL_TOPRIGHT		"EFF_BLEND_CONCEAL_TOPRIGHT"
-#define EFF_BLEND_CONCEAL_TOPLEFT		"EFF_BLEND_CONCEAL_TOPLEFT"
-#define EFF_BLEND_CONCEAL_UP			"EFF_BLEND_CONCEAL_UP"
-#define EFF_BLEND_CONCEAL_DOWN			"EFF_BLEND_CONCEAL_DOWN"
-#define EFF_BLEND_CONCEAL_LEFT			"EFF_BLEND_CONCEAL_LEFT"
-#define EFF_BLEND_CONCEAL_RIGHT			"EFF_BLEND_CONCEAL_RIGHT"
-#define EFF_BLEND_LCONCEAL_BOTTOMLEFT	"EFF_BLEND_LCONCEAL_BOTTOMLEFT"
-#define EFF_BLEND_LCONCEAL_BOTTOMRIGHT	"EFF_BLEND_LCONCEAL_BOTTOMRIGHT"
-#define EFF_BLEND_LCONCEAL_TOPRIGHT		"EFF_BLEND_LCONCEAL_TOPRIGHT"
-#define EFF_BLEND_LCONCEAL_TOPLEFT		"EFF_BLEND_LCONCEAL_TOPLEFT"
-#define EFF_BLEND_PEEL_BOTTOMLEFT		"EFF_BLEND_PEEL_BOTTOMLEFT"
-#define EFF_BLEND_PEEL_BOTTOMRIGHT		"EFF_BLEND_PEEL_BOTTOMRIGHT"
-#define EFF_BLEND_PEEL_TOPRIGHT			"EFF_BLEND_PEEL_TOPRIGHT"
-#define EFF_BLEND_PEEL_TOPLEFT			"EFF_BLEND_PEEL_TOPLEFT"
-#define EFF_BLEND_PEEL_TOP				"EFF_BLEND_PEEL_TOP"
-#define EFF_BLEND_PEEL_BOTTOM			"EFF_BLEND_PEEL_BOTTOM"
-#define EFF_BLEND_PEEL_LEFT				"EFF_BLEND_PEEL_LEFT"
-#define EFF_BLEND_PEEL_RIGHT			"EFF_BLEND_PEEL_RIGHT"
-#define EFF_BLEND_PUSH_BOTTOMLEFT		"EFF_BLEND_PUSH_BOTTOMLEFT"
-#define EFF_BLEND_PUSH_BOTTOMRIGHT		"EFF_BLEND_PUSH_BOTTOMRIGHT"
-#define EFF_BLEND_PUSH_TOPRIGHT			"EFF_BLEND_PUSH_TOPRIGHT"
-#define EFF_BLEND_PUSH_TOPLEFT			"EFF_BLEND_PUSH_TOPLEFT"
-#define EFF_BLEND_PUSH_TOP				"EFF_BLEND_PUSH_TOP"
-#define EFF_BLEND_PUSH_BOTTOM			"EFF_BLEND_PUSH_BOTTOM"
-#define EFF_BLEND_PUSH_LEFT				"EFF_BLEND_PUSH_LEFT"
-#define EFF_BLEND_PUSH_RIGHT			"EFF_BLEND_PUSH_RIGHT"
-#define EFF_SBLEND						"EFF_SBLEND"
-#define EFF_3DPIP						"EFF_3DPIP"						// for MCX
-#define EFF_3DSHAPE_PAGE_CURL			"EFF_3DSHAPE_PAGE_CURL"			// for MCX
-#define EFF_3DSHAPE_QUAD_CURL			"EFF_3DSHAPE_QUAD_CURL"			// for MCX
-#define EFF_3DSHAPE_ARROW				"EFF_3DSHAPE_ARROW"				// for MCX
-#define EFF_3DSHAPE_SLATS				"EFF_3DSHAPE_SLATS"				// for MCX
-#define EFF_3DSHAPE_MULTI_WAVE			"EFF_3DSHAPE_MULTI_WAVE"		// for MCX
-#define EFF_3DSHAPE_CENTER_BURST		"EFF_3DSHAPE_CENTER_BURST"		// for MCX
-#define EFF_3DSHAPE_SINE_WAVE			"EFF_3DSHAPE_SINE_WAVE"			// for MCX
-#define EFF_3DSHAPE_BALL				"EFF_3DSHAPE_BALL"				// for MCX
-#define EFF_3DSHAPE_PAGE_FOLD			"EFF_3DSHAPE_PAGE_FOLD"			// for MCX
-#define EFF_3DSHAPE_BUMPS				"EFF_3DSHAPE_BUMPS"				// for MCX
-#define EFF_3DTITLE						"EFF_3DTITLE"
-#define EFF_3DMATTE_KEY					"EFF_3DMATTE"
-#define EFF_ROLLING_TITLE				"EFF_ROLLING_TITLE"
-#define EFF_ROLLING_2DMATTE				"EFF_ROLLING_2DMATTE"
-#define EFF_CRAWLING_TITLE				"EFF_CRAWLING_TITLE"
-#define EFF_CRAWLING_2DMATTE			"EFF_CRAWLING_2DMATTE"
-#define EFF_BLEND_TITLE					"EFF_BLEND_GRAPHIC"
-#define BLEND_DISSOLVE_LIN				"BLEND_DISSOLVE_LIN"		// film fade
-#define BLEND_DISSOLVE_LOG				"BLEND_DISSOLVE_LOG"		// film dissolve
-#define EFF_TEST_ONE_TRACK				"EFF_TEST_ONE_TRACK"
-#define EFF_TEST_TWO_TRACK				"EFF_TEST_TWO_TRACK"
-#define EFF_TEST_THREE_TRACK			"EFF_TEST_THREE_TRACK"
-#endif
-
-	return rc;
-}
-// ============================================================================
 // ConvertAAFDatadef
 //
 //			This function converts an AAF datadef into an OMF datakind. 
@@ -1886,6 +1719,16 @@ HRESULT Aaf2Omf::ConvertAAFTypeIDDatakind(aafUID_t typeID, OMF2::omfDDefObj_t* p
 		strcpy(datakindName, "omfi:data:Rational");
 		bFound = OMF2::omfiDatakindLookup(OMFFileHdl, datakindName, pDatakind, (OMF2::omfErr_t *) &rc);
 	}
+	else if ( memcmp((char *)&typeID, (char *)&kAAFTypeID_Int32, sizeof(aafUID_t)) == 0 )
+	{
+		strcpy(datakindName, "omfi:data:Int32");
+		bFound = OMF2::omfiDatakindLookup(OMFFileHdl, datakindName, pDatakind, (OMF2::omfErr_t *) &rc);
+	}
+	else if ( memcmp((char *)&typeID, (char *)&kAAFTypeID_Boolean, sizeof(aafUID_t)) == 0 )
+	{
+		strcpy(datakindName, "omfi:data:Boolean");
+		bFound = OMF2::omfiDatakindLookup(OMFFileHdl, datakindName, pDatakind, (OMF2::omfErr_t *) &rc);
+	}
 	else
 	{
 		AUIDtoString(&typeID, szAUID);
@@ -1917,15 +1760,15 @@ HRESULT Aaf2Omf::TraverseSequence(IAAFSequence* pSequence,
 
 	IAAFComponent*			pComponent = NULL;
 	IEnumAAFComponents*		pCompIter = NULL;
-	aafInt32				numComponents;
-	aafInt32				cpntCount;
+	aafUInt32				numComponents;
+	aafUInt32				cpntCount;
 	
 
-	rc = pSequence->GetNumComponents(&numComponents);
+	rc = pSequence->CountComponents(&numComponents);
 	if (FAILED(rc))
 		return rc;
 	
-	rc = pSequence->EnumComponents(&pCompIter);
+	rc = pSequence->GetComponents(&pCompIter);
 	for (cpntCount = 0; cpntCount < numComponents; cpntCount++)
 	{
 		rc = pCompIter->NextOne(&pComponent);
@@ -2043,17 +1886,17 @@ HRESULT Aaf2Omf::ConvertLocator(IAAFEssenceDescriptor* pEssenceDesc,
 	IAAFLocator*			pLocator = NULL;
 	IAAFTextLocator*		pTextLocator = NULL;
 	IEnumAAFLocators*		pLocatorIter = NULL;		
-	aafInt32				numLocators = 0;
+	aafUInt32				numLocators = 0;
     aafWChar*				pwLocatorPath = NULL;
 	aafWChar*				pwName = NULL;
 
 	aafInt32				pathSize = 0;
 	aafUInt32				textSize = 0;
 
-	rc = pEssenceDesc->GetNumLocators(&numLocators);
+	rc = pEssenceDesc->CountLocators(&numLocators);
 	if (SUCCEEDED(rc) && numLocators > 0)
 	{
-		rc = pEssenceDesc->EnumAAFAllLocators(&pLocatorIter);
+		rc = pEssenceDesc->GetLocators(&pLocatorIter);
 		while (SUCCEEDED(rc) && SUCCEEDED(pLocatorIter->NextOne(&pLocator)))
 		{
 			rc = pLocator->QueryInterface(IID_IAAFTextLocator, (void **)&pTextLocator);
@@ -2145,7 +1988,7 @@ HRESULT Aaf2Omf::ConvertEssenceDataObject( IAAFEssenceData* pEssenceData)
 	IAAFMob*				pMob = NULL;
 	IAAFSourceMob*			pSourceMob = NULL;
 	IAAFObject*				pAAFObject = NULL;
-	aafUID_t				mobID;
+	aafMobID_t				mobID;
 	aafBool					bConvertMedia = AAFFalse;
 
 	// get the file mob id
@@ -2164,7 +2007,7 @@ HRESULT Aaf2Omf::ConvertEssenceDataObject( IAAFEssenceData* pEssenceData)
 		return rc;
 	}
 
-	ConvertAUIDtoUID(&mobID, &mediaID);
+	ConvertMobIDtoUID(&mobID, &mediaID);
 	OMFError = OMF2::omfsFindSourceMobByID(OMFFileHdl, mediaID, &OMFSourceMob);
 	if (OMFError != OMF2::OM_ERR_NONE)
 	{
@@ -2432,7 +2275,6 @@ HRESULT Aaf2Omf::ConvertEffects(IAAFOperationGroup* pEffect,
 	char*					pszDesc = NULL;
 	char*					stdName = NULL;
 
-
 	IncIndentLevel();
 
 	rc = pEffect->QueryInterface(IID_IAAFComponent, (void **)&pComponent);
@@ -2442,8 +2284,8 @@ HRESULT Aaf2Omf::ConvertEffects(IAAFOperationGroup* pEffect,
 		pComponent->GetDataDef(&effectAUID);
 		ConvertAAFDatadef(effectAUID, &effectDatakind);
 		pEffect->IsATimeWarp(&isATimeWarp);
-		pEffect->GetNumSourceSegments(&numSources);
-		pEffect->GetNumParameters(&numParameters);
+		pEffect->CountSourceSegments(&numSources);
+		pEffect->CountParameters(&numParameters);
 		rc = pEffect->GetOperationDefinition(&pEffectDef);
 		pEffectDef->GetDataDefinitionID(&datadefAUID);
 		checkAAF(pEffectDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
@@ -2465,7 +2307,7 @@ HRESULT Aaf2Omf::ConvertEffects(IAAFOperationGroup* pEffect,
 		else
 			byPassPtr = NULL;
 
-		GetEffectIDsFromAUID(effectDefAUID, effectID, MCEffectID);
+		pEffectTranslate->GetEffectIDs(pEffect, effectID, MCEffectID);
 		bDefExists = OMF2::omfiEffectDefLookup(OMFFileHdl, effectID, &effectDef, &OMFError);
 		if (OMFError == OMF2::OM_ERR_NONE && !bDefExists)
 		{
@@ -2487,7 +2329,7 @@ HRESULT Aaf2Omf::ConvertEffects(IAAFOperationGroup* pEffect,
 		
 		if(MCEffectID[0] != '\0')
 		{
-			checkOMF(OMF2::omfsWriteUniqueName(OMFFileHdl, (*pOMFEffect), privateEffectProp,
+			checkOMF(OMF2::omfsWriteString(OMFFileHdl, (*pOMFEffect), gpGlobals->pvtEffectIDProp,
 											MCEffectID));
 		}
 
@@ -2514,39 +2356,57 @@ HRESULT Aaf2Omf::ConvertEffects(IAAFOperationGroup* pEffect,
 		}
         
 		aafInt32	n, numSources;
-		checkAAF(pEffect->GetNumSourceSegments(&numSources));
+		checkAAF(pEffect->CountSourceSegments(&numSources));
 		for(n = 0; n < numSources; n++)
 		{
-			checkAAF(pEffect->GetIndexedInputSegment(n, &pSegment));
-			checkAAF(pSourceRef->QueryInterface(IID_IAAFSourceClip,
+			checkAAF(pEffect->GetInputSegmentAt(n, &pSegment));
+			(void)(pSegment->QueryInterface(IID_IAAFSourceClip,
 												(void **) &pComponent));
-			checkAAF(ProcessComponent(pComponent,&pOMFSegment));
-			checkOMF(OMF2::omfiEffectAddNewSlot(OMFFileHdl,(*pOMFEffect),
+
+			if(pComponent != NULL)
+			{
+				checkAAF(ProcessComponent(pComponent,&pOMFSegment));
+				checkOMF(OMF2::omfiEffectAddNewSlot(OMFFileHdl,(*pOMFEffect),
 									-1*(n+1), pOMFSegment, &pOMFEffectSlot));
+				pComponent->Release();
+			}
+			//!!! Else error
+
 			pSegment->Release();
-			pComponent->Release();
 		}
        
 		// If the effect ID is known, map to a apecific OMF effect ID
-		if(pEffect->GetParameterByArgID(kAAFParameterDefLevel, &pParameter) == AAFRESULT_SUCCESS)
+		if(pEffect->LookupParameter(kAAFParameterDefLevel, &pParameter) == AAFRESULT_SUCCESS)
 		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect), -3,
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect), -3,
 										(OMF2::omfLength_t)length));
 		}
+		if(pEffect->LookupParameter(kAAFParameterDefSMPTEWipeNumber, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  1,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParameterDefSMPTEReverse, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  2,
+										(OMF2::omfLength_t)length));
+		}
+#if AVID_SPECIAL
+		if(pEffect->LookupParameter(kAAFParamID_AvidUserParam, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  0,
+										(OMF2::omfLength_t)length));
+		}
+#endif
 #if 0
-		if(pEffect->GetParameterByArgID(kAAFParameterDefAmplitude, &pParameter) == AAFRESULT_SUCCESS)
+		if(pEffect->LookupParameter(kAAFParameterDefAmplitude, &pParameter) == AAFRESULT_SUCCESS)
 		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
 										(OMF2::omfLength_t)length));
 		}
-		if(pEffect->GetParameterByArgID(kAAFParameterDefPan, &pParameter) == AAFRESULT_SUCCESS)
+		if(pEffect->LookupParameter(kAAFParameterDefPan, &pParameter) == AAFRESULT_SUCCESS)
 		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParameterDefSMPTEWipeNumber, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
 										(OMF2::omfLength_t)length));
 		}
 //		kAAFParameterDefSMPTEReverse
@@ -2560,62 +2420,57 @@ HRESULT Aaf2Omf::ConvertEffects(IAAFOperationGroup* pEffect,
 //		kAAFParameterDefSMPTEReplicationH
 //		kAAFParameterDefSMPTEReplicationV
 //		kAAFParameterDefSMPTECheckerboard
-		if(pEffect->GetParameterByArgID(kAAFParameterDefPhaseOffset, &pParameter) == AAFRESULT_SUCCESS)
+		if(pEffect->LookupParameter(kAAFParameterDefPhaseOffset, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParameterDefSpeedRatio, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParamID_AvidBorderWidth, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParamID_AvidBorderSoft, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParamID_AvidXPos, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParamID_AvidYPos, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParamID_AvidCrop, &pParameter) == AAFRESULT_SUCCESS)
+		{
+			checkAAF(ConvertParameter(pParameter, effectDefAUID, (*pOMFEffect),  xxx,
+										(OMF2::omfLength_t)length));
+		}
+		if(pEffect->LookupParameter(kAAFParamID_AvidScale, &pParameter) == AAFRESULT_SUCCESS)
 		{
 			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
 										(OMF2::omfLength_t)length));
 		}
-		if(pEffect->GetParameterByArgID(kAAFParameterDefSpeedRatio, &pParameter) == AAFRESULT_SUCCESS)
+		if(pEffect->LookupParameter(kAAFParamID_AvidSpillSupress, &pParameter) == AAFRESULT_SUCCESS)
 		{
 			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
 										(OMF2::omfLength_t)length));
 		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidBorderWidth, &pParameter) == AAFRESULT_SUCCESS)
+		if(pEffect->LookupParameter(kAAFParamID_AvidBounds, &pParameter) == AAFRESULT_SUCCESS)
 		{
 			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
 										(OMF2::omfLength_t)length));
 		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidBorderSoft, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidXPos, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidYPos, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidCrop, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidScale, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidSpillSupress, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidBounds, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidColor, &pParameter) == AAFRESULT_SUCCESS)
-		{
-			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
-										(OMF2::omfLength_t)length));
-		}
-		if(pEffect->GetParameterByArgID(kAAFParamID_AvidUserParam, &pParameter) == AAFRESULT_SUCCESS)
+		if(pEffect->LookupParameter(kAAFParamID_AvidColor, &pParameter) == AAFRESULT_SUCCESS)
 		{
 			checkAAF(ConvertParameter(pParameter, (*pOMFEffect),  xxx,
 										(OMF2::omfLength_t)length));
@@ -2641,8 +2496,8 @@ cleanup:
 		pParameter->Release();
 	if (pDefObject)
 		pDefObject->Release();
-	if (pSegment)
-		pSegment->Release();
+//	if (pSegment)
+//		pSegment->Release();
 	if (pSourceRef)
 		pSourceRef->Release();
 	if (pFiller)
@@ -2656,6 +2511,7 @@ cleanup:
 }
 
 HRESULT Aaf2Omf::ConvertParameter(	IAAFParameter*		pParm,
+									aafUID_t			&effectDefID,
 								  OMF2::omfSegObj_t		pOMFEffect,
 									OMF2::omfInt32		slotNum,
 									OMF2::omfLength_t	effectLen)
@@ -2665,14 +2521,15 @@ HRESULT Aaf2Omf::ConvertParameter(	IAAFParameter*		pParm,
 	IAAFTypeDef			*pTypeDef = NULL;
 	IAAFDefObject		*pDef = NULL;
 	IAAFInterpolationDef	*pInterpDef = NULL;
+	IAAFParameterDef	*pParmDef = NULL;
 	IAAFControlPoint	*pPoint = NULL;
 	IEnumAAFControlPoints *pointEnum;
-	aafUID_t			typeDefID, interpDefID;
+	aafUID_t			typeDefID, interpDefID, paramDefID;
 	AAFRESULT			rc;
 	aafUInt32			srcValueLen, destValueLen, lenRead;
 	aafDataBuffer_t		srcValue = NULL, destValue = NULL;
 	OMF2::omfInterpKind_t interpKind;
-	OMF2::omfObject_t	vval;
+	OMF2::omfObject_t	vval, kfVVAL = NULL;
 	aafRational_t		aafTime;
 	OMF2::omfRational_t	omfTime;
 	aafEditHint_t		aafEditHint;
@@ -2680,141 +2537,123 @@ HRESULT Aaf2Omf::ConvertParameter(	IAAFParameter*		pParm,
 	OMF2::omfSegObj_t	omfSeg;
 	OMF2::omfObject_t	pOMFEffectSlot;
 	OMF2::omfObject_t	pOMFDatakind;
-	
+	bool				didNew;
+
 	moduleErrorTmp = AAFRESULT_SUCCESS;
     checkAAF(pParm->GetTypeDefinition(&pTypeDef));
 	checkAAF(pTypeDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
     checkAAF(pDef->GetAUID(&typeDefID));
 	pDef->Release();
 	pDef = NULL;
-	checkAAF(ConvertAAFTypeIDDatakind(typeDefID, &pOMFDatakind));
+	//
+    checkAAF(pParm->GetParameterDefinition(&pParmDef));
+	checkAAF(pParmDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
+    checkAAF(pDef->GetAUID(&paramDefID));
+	pParmDef->Release();
+	pParmDef = NULL;
+	pDef->Release();
+	pDef = NULL;
 
-	rc = pParm->QueryInterface(IID_IAAFConstantValue, (void **)&pConstantValue);
-	if (SUCCEEDED(rc))
-    {
-        checkAAF(pConstantValue->GetValueBufLen(&srcValueLen));
-		srcValue = new unsigned char[srcValueLen];
-        checkAAF(pConstantValue->GetValue(srcValueLen, srcValue, &lenRead));
-		if(memcpy(&typeDefID, &kAAFTypeID_Rational, sizeof(typeDefID)) == 0)
-		{
-			destValue = srcValue;
-			destValueLen = srcValueLen;
-		}
-		else // Error!!!
-		{
-			destValue = srcValue;
-			destValueLen = srcValueLen;
-		}
-		checkOMF(OMF2::omfiConstValueNew(OMFFileHdl, pOMFDatakind, effectLen,
-									destValueLen, destValue, &omfSeg));
-		if((destValue != NULL) && (srcValue != destValue))
-			delete [] destValue;
-		delete [] srcValue;
-		destValue = NULL;
-		srcValue = NULL;
-	}
-	else
+	//!!! This one parameter ID has no OMF equivilent.  make a routine which
+	// knows the valid ones to let through.
+#if AVID_SPECIAL
+	if(memcmp(&paramDefID, &kAAFParamID_AvidSelected, sizeof(paramDefID)) != 0 &&
+	   memcmp(&paramDefID, &kAAFParamID_AvidUserParam, sizeof(paramDefID)) != 0)
+#endif
 	{
-		rc = pParm->QueryInterface(IID_IAAFVaryingValue, (void **)&pVaryingValue);
+		checkAAF(ConvertAAFTypeIDDatakind(typeDefID, &pOMFDatakind));
+		
+		rc = pParm->QueryInterface(IID_IAAFConstantValue, (void **)&pConstantValue);
 		if (SUCCEEDED(rc))
 		{
-			checkAAF(pVaryingValue->GetInterpolationDefinition(&pInterpDef));
-			checkAAF(pInterpDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
-			pInterpDef->Release();
-			pInterpDef = NULL;
-			checkAAF(pDef->GetAUID(&interpDefID));
-			pDef->Release();
-			pDef = NULL;
-			if(memcmp(&interpDefID, &LinearInterpolator, sizeof(interpDefID)) == 0)
+			checkAAF(pConstantValue->GetValueBufLen(&srcValueLen));
+			srcValue = new unsigned char[srcValueLen];
+			checkAAF(pConstantValue->GetValue(srcValueLen, srcValue, &lenRead));
+			ConvertValueBuf(typeDefID, srcValue, lenRead, &destValue, &destValueLen, &didNew);
+			checkOMF(OMF2::omfiConstValueNew(OMFFileHdl, pOMFDatakind, effectLen,
+				destValueLen, destValue, &omfSeg));
+			if(didNew)
+				delete [] destValue;
+			delete [] srcValue;
+			destValue = NULL;
+			srcValue = NULL;
+			checkOMF(OMF2::omfiEffectAddNewSlot(OMFFileHdl,pOMFEffect,
+				slotNum, omfSeg, &pOMFEffectSlot));
+		}
+		else
+		{
+			rc = pParm->QueryInterface(IID_IAAFVaryingValue, (void **)&pVaryingValue);
+			if (SUCCEEDED(rc))
 			{
-				interpKind = OMF2::kLinearInterp;
-			}
-			else if(memcmp(&interpDefID, &ConstantInterpolator, sizeof(interpDefID)) == 0)
-			{
-				interpKind = OMF2::kConstInterp;
-			}
-			// else error!!!
-
-			checkOMF(OMF2::omfiVaryValueNew(OMFFileHdl, pOMFDatakind, effectLen,
-											interpKind, &vval));
-			omfSeg = vval;
-
-			checkAAF(pVaryingValue->GetControlPoints(&pointEnum));
-			while(pointEnum->NextOne(&pPoint) == AAFRESULT_SUCCESS)
-			{
-				checkAAF(pPoint->GetTime(&aafTime));
-				omfTime.numerator = aafTime.numerator;
-				omfTime.denominator = aafTime.denominator;
- 				rc = pPoint->GetEditHint(&aafEditHint);
-				if(rc == AAFRESULT_PROP_NOT_PRESENT)
-					aafEditHint = kNoEditHint;
-				else
-					checkAAF(rc);
-				switch(aafEditHint)
+				checkAAF(pVaryingValue->GetInterpolationDefinition(&pInterpDef));
+				checkAAF(pInterpDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
+				pInterpDef->Release();
+				pInterpDef = NULL;
+				checkAAF(pDef->GetAUID(&interpDefID));
+				pDef->Release();
+				pDef = NULL;
+				if(memcmp(&interpDefID, &LinearInterpolator, sizeof(interpDefID)) == 0)
 				{
-				case kNoEditHint:
-					omfEditHint = OMF2::kNoEditHint;
-					break;
-				case kProportional:
-					omfEditHint = OMF2::kProportional;
-					break;
-				case kRelativeLeft:
-					omfEditHint = OMF2::kRelativeLeft;
-					break;
-				case kRelativeRight:
-					omfEditHint = OMF2::kRelativeRight;
-					break;
-				case kRelativeFixed:
-					omfEditHint = OMF2::kRelativeFixed;
-					break;
-				//!!!Handle default case
+					interpKind = OMF2::kLinearInterp;
 				}
-
-				if(memcmp(&typeDefID, &kAAFTypeID_AvidPosition, sizeof(typeDefID)) == 0 ||
-				   memcmp(&typeDefID, &kAAFTypeID_AvidCrop, sizeof(typeDefID)) == 0 ||
-				   memcmp(&typeDefID, &kAAFTypeID_AvidScale, sizeof(typeDefID)) == 0 ||
-				   memcmp(&typeDefID, &kAAFTypeID_AvidSpillSupress, sizeof(typeDefID)) == 0 ||
-				   memcmp(&typeDefID, &kAAFTypeID_AvidBounds, sizeof(typeDefID)) == 0 ||
-				   memcmp(&typeDefID, &kAAFTypeID_AvidEffColor, sizeof(typeDefID)) == 0 ||
-				   memcmp(&typeDefID, &kAAFTypeID_AvidEffUserParam, sizeof(typeDefID)) == 0)
+				else if(memcmp(&interpDefID, &ConstantInterpolator, sizeof(interpDefID)) == 0)
 				{
-					checkAAF(UpdateKeyFrameVVAL(pPoint, vval, omfTime,
-									sizeof(OMFIPvtKFInfo_t),
-									omfEditHint,
-									pOMFDatakind));
+					interpKind = OMF2::kConstInterp;
 				}
-				else
+				// else error!!!
+				
+				checkOMF(OMF2::omfiVaryValueNew(OMFFileHdl, pOMFDatakind, effectLen,
+					interpKind, &vval));
+				omfSeg = vval;
+				
+				checkAAF(pVaryingValue->GetControlPoints(&pointEnum));
+				while(pointEnum->NextOne(&pPoint) == AAFRESULT_SUCCESS)
 				{
+					checkAAF(pPoint->GetTime(&aafTime));
+					omfTime.numerator = aafTime.numerator;
+					omfTime.denominator = aafTime.denominator;
+					rc = pPoint->GetEditHint(&aafEditHint);
+					if(rc == AAFRESULT_PROP_NOT_PRESENT)
+						aafEditHint = kNoEditHint;
+					else
+						checkAAF(rc);
+					switch(aafEditHint)
+					{
+					case kNoEditHint:
+						omfEditHint = OMF2::kNoEditHint;
+						break;
+					case kProportional:
+						omfEditHint = OMF2::kProportional;
+						break;
+					case kRelativeLeft:
+						omfEditHint = OMF2::kRelativeLeft;
+						break;
+					case kRelativeRight:
+						omfEditHint = OMF2::kRelativeRight;
+						break;
+					case kRelativeFixed:
+						omfEditHint = OMF2::kRelativeFixed;
+						break;
+						//!!!Handle default case
+					}
+					
 					checkAAF(pPoint->GetValueBufLen(&srcValueLen));
 					srcValue = new unsigned char[srcValueLen];
 					checkAAF(pPoint->GetValue(srcValueLen, srcValue, &lenRead));
-					destValue = NULL;
-					destValueLen = 0;
-					if(memcmp(&typeDefID, &kAAFTypeID_Rational, sizeof(typeDefID)) == 0)
-					{
-						destValue = srcValue;
-						destValueLen = srcValueLen;
-					}
-					else // Error!!!
-					{
-						destValue = srcValue;
-						destValueLen = srcValueLen;
-					}
-
+					ConvertValueBuf(typeDefID, srcValue, lenRead, &destValue, &destValueLen, &didNew);
 					checkOMF(OMF2::omfiVaryValueAddPoint(OMFFileHdl, vval, omfTime, omfEditHint, pOMFDatakind,
-										destValueLen, destValue));
-					if((destValue != NULL) && (srcValue != destValue))
+						destValueLen, destValue));
+					if(didNew)
 						delete [] destValue;
 					delete [] srcValue;
 					destValue = NULL;
 					srcValue = NULL;
 				}
+				checkOMF(OMF2::omfiEffectAddNewSlot(OMFFileHdl,pOMFEffect,
+					slotNum, omfSeg, &pOMFEffectSlot));
 			}
+			//!!!Else error
 		}
-		//!!!Else error
-
-		checkOMF(OMF2::omfiEffectAddNewSlot(OMFFileHdl,pOMFEffect,
-									slotNum, omfSeg, &pOMFEffectSlot));
 	}
 cleanup:
 	if(pConstantValue != NULL)
@@ -2845,59 +2684,59 @@ cleanup:
 	return(moduleErrorTmp);
 }
 
-HRESULT Aaf2Omf::UpdateKeyFrameVVAL(IAAFControlPoint*		controlPoint,
-									OMF2::omfSegObj_t		vval,
-									OMF2::omfRational_t		time,
-									aafInt32				destValueLen,
-									OMF2::omfEditHint_t		editHint,
-									OMF2::omfDDefObj_t		dataKind)
-{
-	// N^2 problem, we need to optimize this somehow
-	OMF2::omfInt32		numPoints, n, bytesRead;
-	OMF2::omfIterHdl_t	hdl;
-	OMF2::omfCntlPtObj_t ctlp;
-	bool				found = false;
-	OMF2::omfRational_t	ctlpTime;
-	aafDataBuffer_t		value;
 
-	moduleErrorTmp = AAFRESULT_SUCCESS;
-	checkOMF(OMF2::omfiVaryValueGetNumPoints(OMFFileHdl, vval, &numPoints));
-	checkOMF(OMF2::omfiIteratorAlloc(OMFFileHdl, &hdl));
-	value = new unsigned char[destValueLen];
-	for(n = 1; (n <= numPoints) && !found; n++)
+OMF2::omfObject_t Aaf2Omf::LocateSlot(OMF2::omfEffObj_t pOMFEffect, aafInt32 kfSlotNum)
+{
+	OMF2::omfNumSlots_t	numSlots, slotID;
+	OMF2::omfIterHdl_t	slotIter;
+	OMF2::omfESlotObj_t	effectSlot;
+	OMF2::omfObject_t	segment, result = NULL;
+
+	(void)OMF2::omfiEffectGetNumSlots(OMFFileHdl, pOMFEffect, &numSlots);
+	(void)OMF2::omfiIteratorAlloc(OMFFileHdl, &slotIter);
+	while(OMF2::omfiEffectGetNextSlot(slotIter, pOMFEffect, NULL, &effectSlot) == OMF2::OM_ERR_NONE)
 	{
-		checkOMF(OMF2::omfiVaryValueGetNextPoint(hdl, vval, NULL, &ctlp));
-		checkOMF(OMF2::omfsReadRational(OMFFileHdl, vval, OMF2::OMCTLPTime, &ctlpTime));
-		if(ctlpTime.numerator == time.numerator && 
-		   ctlpTime.denominator == time.denominator)
+		(void)OMF2::omfiEffectSlotGetInfo(OMFFileHdl, effectSlot, &slotID, &segment);
+		if(slotID == kfSlotNum)
 		{
-			found = true;
-			// Assert NON-NULL!!!
-			checkOMF(OMF2::omfiControlPtGetInfo(OMFFileHdl, ctlp, &ctlpTime,
-												NULL, NULL, destValueLen,
-												&bytesRead, value));
+			result = segment;
 		}
 	}
-	checkOMF(OMF2::omfiIteratorDispose(OMFFileHdl, hdl));
+	(void)OMF2::omfiIteratorDispose(OMFFileHdl, slotIter);
 
-	// Use the AAF Private definition kind to fill in any new fields
-	// Not Yet DONE!!!
-
-	// Either create the value, or replace the existing value
-	if(found)
-	{
-		checkOMF(OMF2::omfsWriteDataValue(OMFFileHdl, ctlp, OMF2::OMCTLPValue,
-				dataKind, value, 0, destValueLen));
-	}
-	else
-	{
-		checkOMF(OMF2::omfiVaryValueAddPoint(OMFFileHdl, vval, time, editHint,
-											dataKind, destValueLen, value));
-	}
-cleanup:
-	return(moduleErrorTmp);
+	return(result);
 }
 
-
+void Aaf2Omf::ConvertValueBuf(aafUID_t &typeDefID,
+								aafDataBuffer_t srcValue, aafUInt32 srcValueLen,
+								 aafDataBuffer_t *destValue, aafUInt32 *destValueLen,
+								 bool *didAllocateNew)
+{
+	*didAllocateNew = false;
+	if(memcmp(&typeDefID, &kAAFTypeID_Rational, sizeof(typeDefID)) == 0)
+	{
+		*destValue = srcValue;
+		*destValueLen = srcValueLen;
+	}
+	else if(memcmp(&typeDefID, &kAAFTypeID_Int32, sizeof(typeDefID)) == 0)
+	{
+		*destValue = srcValue;
+		*destValueLen = srcValueLen;
+	}
+	else if(memcmp(&typeDefID, &kAAFTypeID_Boolean, sizeof(typeDefID)) == 0)
+	{
+		*destValue = srcValue;
+		*destValueLen = srcValueLen;
+	}
+	else // Error!!!
+	{
+		*destValue = srcValue;
+		*destValueLen = srcValueLen;
+	}
+}
 // OTher idea: Upon hitting ANY of the Avid private params (or level) find a VVAL
 // and assume that all VVALs containing AvidPrivate have identical times
+HRESULT Aaf2Omf::ConvertObjectProps(IAAFObject* pObj, OMF2::omfObject_t	pOMFObject)
+{
+	return AAFRESULT_SUCCESS;
+}

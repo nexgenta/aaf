@@ -1,13 +1,32 @@
 // @com Executable test program by Chris Morgan, intern for Avid Technology, Tewksbury 
 // @com This is used for scalability testing of AAF code.  Last modified on 7/23/99.
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -16,13 +35,20 @@
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
+
+#if USE_TIMER_LIB
 #include "UtlConsole.h"
+#endif
 
 // Include the AAF interface declarations.
 #include "AAF.h"
 
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
+
+#if defined(macintosh) || defined(_MAC)
+#include <console.h> /* Mac command line window */
+#endif
 
 // There are differences in the microsoft and other compilers in the "Length" specifier
 // used in printf for 64bit integers.
@@ -47,10 +73,6 @@ static aafFadeType_t fadeInType = kFadeLinearAmp;
 static aafFadeType_t fadeOutType = kFadeLinearPower;
 static aafSourceRef_t sourceRef; 
 
-static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
-{
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
-}
 
 #define TAPE_LENGTH			1L * 60L *60L * 30L
 #define FILE1_LENGTH		60L * 30L
@@ -69,7 +91,7 @@ static void     LogError(HRESULT errcode, int line, char *file)
 static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 #define check(a)  \
 { moduleErrorTmp = a; \
-	if (!SUCCEEDED(moduleErrorTmp)) \
+	if (FAILED(moduleErrorTmp)) \
 	{ \
 	    LogError(moduleErrorTmp, __LINE__, __FILE__);\
 		goto cleanup; \
@@ -78,17 +100,10 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 
 #define checkFatal(a)  \
 { moduleErrorTmp = a; \
-  if (!SUCCEEDED(moduleErrorTmp)) \
+  if (FAILED(moduleErrorTmp)) \
      exit(1);\
 }
 
-static void AUIDtoString(aafUID_t *uid, char *buf)
-{
-	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
-			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
-			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
-}
 
 
 static HRESULT convert(char* cName, size_t length, const wchar_t* name)
@@ -110,6 +125,7 @@ const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 {
+	HRESULT hr = S_OK;
 	IAAFFile*					pFile = NULL;
 	IAAFHeader*					pHeader = NULL;
 	IAAFDictionary*					pDictionary = NULL;
@@ -123,7 +139,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	IAAFComponent*				aComponent = NULL;
 	IAAFFileDescriptor*			pFileDesc = NULL;
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
-	IAAFMobSlot*				newSlot = NULL;
+	IAAFTimelineMobSlot*		newSlot = NULL;
 	IAAFSegment*				seg = NULL;
 	IAAFSourceClip*				fileSclp = NULL;
 	IAAFSourceClip*				masterSclp = NULL;
@@ -132,8 +148,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	IAAFLocator*				pLocator = NULL;
 	IAAFNetworkLocator*			pNetLocator = NULL;
 	aafRational_t				videoRate = { 30000, 1001 };
-	aafUID_t					videoDef = DDEF_Picture;
-	aafUID_t					tapeMobID, fileMobID, masterMobID;
+	aafMobID_t					tapeMobID, fileMobID, masterMobID;
 	aafTimecode_t				tapeTC = { 108000, kTcNonDrop, 30};
 	aafLength_t					fileLen = FILE1_LENGTH;
 	aafLength_t					fillLen = FILL_LENGTH;
@@ -141,11 +156,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	aafProductIdentification_t	ProductInfo;
 	long int i = 0;
 
-  
-  // delete any previous test file before continuing...
-  char chFileName[1000];
-  convert(chFileName, sizeof(chFileName), pFileName);
-  remove(chFileName);
+  moduleErrorTmp = S_OK;
+
+
+	// delete any previous test file before continuing...
+	char chFileName[1000];
+	convert(chFileName, sizeof(chFileName), pFileName);
+	remove(chFileName);
 
 
 	ProductInfo.companyName = L"Company Name";
@@ -159,58 +176,69 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
 
-  check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
+	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
 
 	check(pFile->GetHeader(&pHeader));
 
-  // Get the AAF Dictionary so that we can create valid AAF objects.
-  check(pHeader->GetDictionary(&pDictionary));
+	// Get the AAF Dictionary so that we can create valid AAF objects.
+	check(pHeader->GetDictionary(&pDictionary));
 
 
 // IMPORTANT: major remodification is from this point onwards...
 
 	// sequence creation code pulled out of the subsequent loop.
-  // Create a Composition Mob
-	check(pDictionary->CreateInstance( &AUID_AAFCompositionMob,
-						   IID_IAAFMob, 
-						   (IUnknown **)&pCompMob));
+	// Create a Composition Mob
+	check(pDictionary->CreateInstance(AUID_AAFCompositionMob,
+							 IID_IAAFMob, 
+							 (IUnknown **)&pCompMob));
 
-	check(pDictionary->CreateInstance( &AUID_AAFSequence,
-			   IID_IAAFSequence, 
-			   (IUnknown **)&pSequence));		
+	check(pDictionary->CreateInstance(AUID_AAFSequence,
+				 IID_IAAFSequence, 
+				 (IUnknown **)&pSequence));		
 	check(pSequence->QueryInterface (IID_IAAFSegment, (void **)&seg));
 
 	check(pSequence->QueryInterface(IID_IAAFComponent, (void **)&aComponent));
 
-	check(aComponent->SetDataDef(&videoDef));
+	check(aComponent->SetDataDef(DDEF_Picture));
+	aComponent->Release();
+	aComponent = NULL;
+
  	check(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-	check(pMob->AppendNewSlot (seg, i, slotName, &newSlot));
+	check(pMob->AppendNewTimelineSlot
+		  (videoRate, seg, i, slotName, 0, &newSlot));
 	pMob->Release();
 	pMob = NULL;
 	newSlot->Release();
 	newSlot = NULL;
+	seg->Release();
+	seg = NULL;
 
-	check(pHeader->AppendMob(pCompMob));
+	check(pHeader->AddMob(pCompMob));
 
 
 	// now looping around the remainder N times to make N components
 	for (i=0; i<N; i++)
 		{
 		//Make the Tape MOB
- 		check(pDictionary->CreateInstance( &AUID_AAFSourceMob,
-						   IID_IAAFSourceMob, 
-						   (IUnknown **)&pTapeMob));
-		check(pDictionary->CreateInstance( &AUID_AAFTapeDescriptor,
-						   IID_IAAFTapeDescriptor, 
-						   (IUnknown **)&pTapeDesc));
+ 		check(pDictionary->CreateInstance(AUID_AAFSourceMob,
+							 IID_IAAFSourceMob, 
+							 (IUnknown **)&pTapeMob));
+		check(pDictionary->CreateInstance(AUID_AAFTapeDescriptor,
+							 IID_IAAFTapeDescriptor, 
+							 (IUnknown **)&pTapeDesc));
 		check(pTapeDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&aDesc));
 		check(pTapeMob->SetEssenceDescriptor(aDesc));
 		aDesc->Release();
 		aDesc = NULL;
+		pTapeDesc->Release();
+		pTapeDesc = NULL;
 			
 		check(pTapeMob->AppendTimecodeSlot (videoRate, 0, tapeTC, TAPE_LENGTH));
-		check(pTapeMob->AddNilReference (1,TAPE_LENGTH, &videoDef, videoRate));
+		check(pTapeMob->AddNilReference (1,TAPE_LENGTH, DDEF_Picture, videoRate));
 		check(pTapeMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
+		pTapeMob->Release();
+		pTapeMob = NULL;
+
 		
 		// NOTE: TapeMob name is updated to change with number of objects requested at cli.
 		// In order to fit with the specification, it is made wide
@@ -221,30 +249,34 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		
 		check(pMob->SetName (TapeMobName));
 		
-		check(pHeader->AppendMob(pMob));
+		check(pHeader->AddMob(pMob));
 		check(pMob->GetMobID (&tapeMobID));
 		pMob->Release();
 		pMob = NULL;
 
 		// Make a FileMob
-		check(pDictionary->CreateInstance( &AUID_AAFSourceMob,
-						   IID_IAAFSourceMob, 
-						   (IUnknown **)&pFileMob));
-		check(pDictionary->CreateInstance( &AUID_AAFFileDescriptor,
-						   IID_IAAFFileDescriptor, 
-						   (IUnknown **)&pFileDesc));
+		check(pDictionary->CreateInstance(AUID_AAFSourceMob,
+							 IID_IAAFSourceMob, 
+							 (IUnknown **)&pFileMob));
+		check(pDictionary->CreateInstance(AUID_AAFFileDescriptor,
+							 IID_IAAFFileDescriptor, 
+							 (IUnknown **)&pFileDesc));
 		check(pFileDesc->QueryInterface (IID_IAAFEssenceDescriptor, (void **)&aDesc));
 
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pDictionary->CreateInstance( &AUID_AAFNetworkLocator,
+		check(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
 							IID_IAAFNetworkLocator, 
 							(IUnknown **)&pNetLocator));		
 		check(pNetLocator->QueryInterface (IID_IAAFLocator, (void **)&pLocator));
-		
-		
+			
 		
 		check(pLocator->SetPath (TEST_PATH));	
 		check(aDesc->AppendLocator(pLocator));
+		pLocator->Release();
+		pLocator = NULL;
+		pNetLocator->Release();
+		pNetLocator = NULL;
+
 
 		check(pFileMob->SetEssenceDescriptor(aDesc));
 		aDesc->Release();
@@ -256,23 +288,23 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		sourceRef.sourceSlotID = 1;
 		sourceRef.startTime = 0;
 		check(pFileMob->NewPhysSourceRef (videoRate,
-                           1, &videoDef, sourceRef, fileLen));
+													 1, DDEF_Picture, sourceRef, fileLen));
 
 		check(pFileMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		check(pMob->GetMobID (&fileMobID));
-		check(pHeader->AppendMob(pMob));
+		check(pHeader->AddMob(pMob));
 		pMob->Release();
 		pMob = NULL;
 
 		//Make the Master MOB
-		check(pDictionary->CreateInstance( &AUID_AAFMasterMob,
-						   IID_IAAFMasterMob, 
-						   (IUnknown **)&pMasterMob));
+		check(pDictionary->CreateInstance(AUID_AAFMasterMob,
+							 IID_IAAFMasterMob, 
+							 (IUnknown **)&pMasterMob));
 
 		sourceRef.sourceID = fileMobID;
 		sourceRef.sourceSlotID = 1;
 		sourceRef.startTime = 0;
-		check(pMasterMob->NewPhysSourceRef (videoRate, 1, &videoDef, sourceRef, fileLen));
+		check(pMasterMob->NewPhysSourceRef (videoRate, 1, DDEF_Picture, sourceRef, fileLen));
 		check(pMasterMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		check(pMob->GetMobID (&masterMobID));
 		
@@ -285,88 +317,101 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 		
 		check(pMob->SetName (MasterMobName));
 
-		check(pHeader->AppendMob(pMob));
+		check(pHeader->AddMob(pMob));
 		pMob->Release();
 		pMob = NULL;
 
 		// the remaining part of the sequence code, adapted for updating slot names
 		
-		// This variable is about to be overwritten so we need to release the old interface.
-
-		aComponent->Release();
-
-		aComponent = NULL;
 
 		// Create a SourceClip
-		check(pDictionary->CreateInstance( &AUID_AAFSourceClip,
-						   IID_IAAFSourceClip, 
-						   (IUnknown **)&compSclp));		
+		check(pDictionary->CreateInstance(AUID_AAFSourceClip,
+							 IID_IAAFSourceClip, 
+							 (IUnknown **)&compSclp));		
 
 		sourceRef.sourceID = masterMobID;
 		sourceRef.sourceSlotID = 1;
 		sourceRef.startTime = 0;
 		check(compSclp->SetSourceReference (sourceRef));
 		check(compSclp->QueryInterface (IID_IAAFComponent, (void **)&aComponent));
-		check(aComponent->SetDataDef(&videoDef));
-		check(aComponent->SetLength (&segLen));
+		check(aComponent->SetDataDef(DDEF_Picture));
+		check(aComponent->SetLength (segLen));
 		check(pSequence->AppendComponent (aComponent));
 	
 		// Create a filler - Get the component interface only (IID_IAAFComponent)
-		check(pDictionary->CreateInstance( &AUID_AAFFiller,
-									   IID_IAAFComponent, 
-									   (IUnknown **)&compFill));		
+		check(pDictionary->CreateInstance(AUID_AAFFiller,
+										 IID_IAAFComponent, 
+										 (IUnknown **)&compFill));		
 
-		check(compFill->SetLength (&fillLen));
+		check(compFill->SetLength (fillLen));
 
-		check(compFill->SetDataDef(&videoDef));
+		check(compFill->SetDataDef(DDEF_Picture));
 		check(pSequence->AppendComponent (compFill));
 
-		cleanup:
-		// Cleanup and return
-		if (pNetLocator)
-			pNetLocator->Release();
+		compFill->Release();
+		compFill = NULL;
 
-		if (pLocator)
-			pLocator->Release();
+		aComponent->Release();
+		aComponent = NULL;
 
-		if (compFill)
-			compFill->Release();
+		compSclp->Release();
+		compSclp = NULL;
 
-		if (compSclp)
-			compSclp->Release();
+		pMasterMob->Release();
+		pMasterMob = NULL;
 
-		if (masterSclp)
-			masterSclp->Release();
+		pFileMob->Release();
+		pFileMob = NULL;
 
-		if (fileSclp)
-			fileSclp->Release();
-
-		if (pTapeDesc)
-			pTapeDesc->Release();
-
-		if (pFileDesc)
-			pFileDesc->Release();
-
-		if (pTapeMob)
-			pTapeMob->Release();
-
-		if (pFileMob)
-			pFileMob->Release();
-
-		if (pMasterMob)
-			pMasterMob->Release();
-
-		if (aDesc)
-			aDesc->Release();
-
-		if (newSlot)
-			newSlot->Release();
-
-		if (pMob)
-			pMob->Release();
 	//  end of loop since only one dictionary and header are needed
 	//  the file is then saved, closed and released after all modifications are complete
 	}
+
+
+cleanup:
+	// Cleanup and return
+	if (pNetLocator)
+		pNetLocator->Release();
+
+	if (pLocator)
+		pLocator->Release();
+
+	if (compFill)
+		compFill->Release();
+
+	if (compSclp)
+		compSclp->Release();
+
+	if (masterSclp)
+		masterSclp->Release();
+
+	if (fileSclp)
+		fileSclp->Release();
+
+	if (pTapeDesc)
+		pTapeDesc->Release();
+
+	if (pFileDesc)
+		pFileDesc->Release();
+
+	if (pTapeMob)
+		pTapeMob->Release();
+
+	if (pFileMob)
+		pFileMob->Release();
+
+	if (pMasterMob)
+		pMasterMob->Release();
+
+	if (aDesc)
+		aDesc->Release();
+
+	if (newSlot)
+		newSlot->Release();
+
+	if (pMob)
+		pMob->Release();
+
 
 	if (pCompMob)
 		pCompMob->Release();
@@ -388,14 +433,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 
 	if (pFile) 
 	{
+#if USE_TIMER_LIB
 		// printing file save time
 		aafUInt32 timerID, elapsedtime;
 		moduleErrorTmp = UTLStartPeriod(&timerID);
+#endif
 		pFile->Save();
+#if USE_TIMER_LIB
 		moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
+#endif
 		pFile->Close();
 		pFile->Release();
+#if USE_TIMER_LIB
 		printf("Save time = %ld\n", elapsedtime);
+#endif
 	}
 	
 	return moduleErrorTmp;
@@ -419,15 +470,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
 	IAAFFile *					pFile = NULL;
   // printing file open time
+#if USE_TIMER_LIB
 	aafUInt32 timerID, elapsedtime;
 
 	moduleErrorTmp = UTLStartPeriod(&timerID);
+#endif
  	check(AAFFileOpenExistingRead ( pFileName, 0, &pFile));
+#if USE_TIMER_LIB
 	moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
+#endif
 	pFile->Close();
 	pFile->Release();
 	pFile=NULL;
+#if USE_TIMER_LIB
 	printf("Open time = %ld\n\n", elapsedtime);
+#endif
 cleanup:
 	if (pFile)
 		{
@@ -449,6 +506,12 @@ void usage(void)
 //  NOTE:  defining [0] program name; [1] Number N of components; [2] filename.aaf; 
 int main(int argumentCount, char *argumentVector[])
 {
+	/* console window for mac */
+
+	#if defined(macintosh) || defined(_MAC)
+	argumentCount = ccommand(&argumentVector);
+	#endif
+
 	programName = argumentVector[0];
 	
 	//  First check for correct number of arguments
@@ -488,7 +551,9 @@ int main(int argumentCount, char *argumentVector[])
 	}
 	//  and then carry on...
 
+#if USE_TIMER_LIB
 	UTLInitTimers(1000);
+#endif
 	CComInitialize comInit;
 	
 	aafWChar FileNameBuffer[MAX];
