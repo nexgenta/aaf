@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,10 +31,13 @@
 
 #include "OMSet.h"
 #include "OMContainerElement.h"
-#include "OMContainerProperty.h"
+#include "OMRefSetProperty.h"
 
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetIterator;
+
+template <typename UniqueIdentification, typename ReferencedObject>
+class OMStrongReferenceSetElement;
 
   // @class Persistent sets of uniquely identified strongly referenced
   //        (contained) objects supported by the Object Manager.
@@ -45,16 +48,15 @@ class OMStrongReferenceSetIterator;
   //          <c OMStorable>.
   //   @tcarg class | UniqueIdentification | The type of the unique key
   //          used to identify the referenced objects. 
-  //   @base public | <c OMContainerProperty>
+  //   @base public | <c OMReferenceSetProperty>
 template <typename UniqueIdentification, typename ReferencedObject>
-class OMStrongReferenceSetProperty :
-                                 public OMContainerProperty<ReferencedObject> {
+class OMStrongReferenceSetProperty : public OMReferenceSetProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
   OMStrongReferenceSetProperty(const OMPropertyId propertyId,
-                               const char* name,
+                               const wchar_t* name,
                                const OMPropertyId keyPropertyId);
 
     // @cmember Destructor.
@@ -161,6 +163,22 @@ public:
     //          copied from the buffer at address <p bits> which is
     //          <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
+
+    // @cmember Insert <p object> into this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual void insert(const OMObject* object);
+
+    // @cmember Does this <c OMStrongReferenceSetProperty> contain
+    //          <p object> ?
+  virtual bool containsValue(const OMObject* object) const;
+
+    // @cmember Remove <p object> from this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual void removeValue(const OMObject* object);
+
+    // @cmember Create an <c OMReferenceContainerIterator> over this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual OMReferenceContainerIterator* createIterator(void) const;
 
   bool isValidIdentification(UniqueIdentification& id) const;
 
