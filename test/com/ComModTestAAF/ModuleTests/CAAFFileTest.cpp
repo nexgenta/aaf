@@ -33,9 +33,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 #include "AAFFileMode.h"
 
@@ -203,7 +206,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult(pFile->GetHeader(&pHeader));
 
 	  // Get the AAF Dictionary so that we can create valid AAF objects.
-	  checkResult(pFile->GetDictionary(&pDictionary));
+	  checkResult(pHeader->GetDictionary(&pDictionary));
 
       // Make sure the header returns us the same dictionary as the file
 	  IAAFDictionarySP pDictionaryFromHeader;
@@ -267,24 +270,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   IAAFHeader *				pHeader = NULL;
   IEnumAAFMobs *mobIter = NULL;
   IAAFMob			*pMob = NULL;
-  aafProductIdentification_t	ProductInfo;
   aafNumSlots_t				numMobs, n;
   HRESULT						hr = S_OK;
   aafWChar					name[500];
   aafMobID_t					mobID;
   aafFileRev_t					testRev;
 
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-  ProductInfo.companyName = L"AAF Developers Desk";
-  ProductInfo.productName = L"AAFFile Test";
-  ProductInfo.productVersion = &v;
-  ProductInfo.productVersionString = NULL;
-  ProductInfo.platform = NULL;
 	  
   try
   {
@@ -347,14 +338,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFFile_test()
+extern "C" HRESULT CAAFFile_test(testMode_t mode);
+extern "C" HRESULT CAAFFile_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"AAFFileTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
