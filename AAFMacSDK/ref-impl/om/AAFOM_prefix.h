@@ -12,14 +12,8 @@
 #include "MacHeaders.h"
 
 
-// Conditional debugging and ansi assertions disabled
-#ifndef NDEBUG
-#define NDEBUG
-#endif
-
-// Enable PRECONDITION, POSTCONDITION, ASSERT, INVARIANT and IMPLIES macros.
-//#define OM_ENABLE_DEBUG
-
-// Uncomment the following line if you want to see an exhausted list
-// of the calling sequence within the Object Manager.
-//#define OM_ENABLE_TRACE
+// Define to enable the module testing of the shared library.
+#define AAF_MODULE_TEST
+//#ifndef _DEBUG
+//#define _DEBUG
+//#endif
