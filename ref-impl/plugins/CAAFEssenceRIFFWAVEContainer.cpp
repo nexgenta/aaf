@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceRIFFWAVEContainer.cpp,v 1.1 2004/11/04 15:49:26 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceRIFFWAVEContainer.cpp,v 1.2 2004/11/04 17:32:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <wchar.h>
 
+const CLSID CLSID_AAFEssenceRIFFWAVEContainer = { 0x914c18d0, 0x39f2, 0x4734, { 0xb0, 0xe7, 0x31, 0x34, 0x30, 0x9d, 0x0d, 0xb4 } };
 const aafUID_t  EXAMPLE_FILE_PLUGIN =	{ 0x4b48d234, 0xd5e6, 0x4e10, { 0xb5, 0xdf, 0x97, 0x82, 0xce, 0x64, 0xc7, 0x5f } };
 
 // convenient error handlers.
