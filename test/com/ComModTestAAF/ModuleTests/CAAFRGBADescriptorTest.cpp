@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFRGBADescriptor
 /***********************************************************************
  *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -32,12 +32,9 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -70,12 +67,6 @@ aafRGBAComponent_t	testElements[NUM_TEST_ELEMENTS] = { {kAAFCompRed,8}, {kAAFCom
 aafRGBAComponent_t	testElements2[NUM_TEST_ELEMENTS] = { {kAAFCompGreen,8}, {kAAFCompBlue,8}, {kAAFCompRed,8} };
 #define TEST_PALETTE_SIZE	16
 aafUInt8	bogusPalette[TEST_PALETTE_SIZE] = { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31 };
-
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x37792fba, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -111,16 +102,13 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFRGBADescriptor Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -173,6 +161,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDigitalImageDescriptor*	pDIDesc = NULL;
 	IAAFRGBADescriptor*	pRGBADesc = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
+	aafMobID_t		newMobID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -194,7 +183,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 							   (IUnknown **)&pSourceMob));
     checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 
-    checkResult(pMob->SetMobID(TEST_MobID));
+    checkResult(CoCreateGuid((GUID *)&newMobID));
+    checkResult(pMob->SetMobID(newMobID));
     checkResult(pMob->SetName(L"RGBADescriptorTest"));
 
 
@@ -226,12 +216,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal));
     checkResult(pDIDesc->SetImageAlignmentFactor(kImageAlignmentFactorTestVal));
 
- //   ratio.numerator = kGammaNumTestVal;
-//!!!    ratio.denominator = kGammaDenTestVal;
-//!!!    checkResult(pDIDesc->SetGamma(ratio));
+    ratio.numerator = kGammaNumTestVal;
+    ratio.denominator = kGammaDenTestVal;
+    checkResult(pDIDesc->SetGamma(ratio));
 
     checkResult(pRGBADesc->SetPixelLayout(NUM_TEST_ELEMENTS, testElements));
-    checkResult(pRGBADesc->SetPalette(sizeof(bogusPalette), bogusPalette));
+    checkResult(pRGBADesc->SetPallete(sizeof(bogusPalette), bogusPalette));
     checkResult(pRGBADesc->SetPaletteLayout(NUM_TEST_ELEMENTS, testElements2));
   
 	// Save the initialized descriptor with the source mob.
@@ -252,9 +242,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
   if (pDIDesc)
     pDIDesc->Release();
-
-  if (pRGBADesc)
-    pRGBADesc->Release();
 
   if (pMob)
     pMob->Release();
@@ -300,7 +287,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  // Open the AAF file
 	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 
-	  // Make sure there is one a single mob in the file.
+    // Make sure there is one a single mob in the file.
 	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
@@ -318,15 +305,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  checkResult(pEssDesc->QueryInterface(IID_IAAFRGBADescriptor, (void **) &pRGBADesc));
 
     // TODO: test for expected DigitalImage properties
-	  aafUInt32				val1, val2, resultElements, iaf;
+	  aafUInt32				val1, val2;
 	  aafInt32				val3, val4;
 	  aafFrameLayout_t		framelayout;
 	  aafAlphaTransparency_t	alphaTrans;
 	  aafRational_t			ratio;
-		aafUID_t			gamma;
 	  aafInt32				VideoLineMap[kVideoLineMapMaxElement];
-	  aafUID_t				compression;
-	  aafUID_t				compTestVal;
+	  aafUID_t				compression, compTestVal;
 
 	  memset(&compTestVal, 0, sizeof(aafUID_t));
 
@@ -371,18 +356,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkExpression(alphaTrans == kAlphaTransparencyTestVal,
                     AAFRESULT_TEST_FAILED);
 
-		checkResult(pDIDesc->GetImageAlignmentFactor(&iaf));
-		checkExpression(iaf == kImageAlignmentFactorTestVal,
+		checkResult(pDIDesc->GetImageAlignmentFactor(&val3));
+		checkExpression(val3 == kImageAlignmentFactorTestVal,
                     AAFRESULT_TEST_FAILED);
 
-		checkResult(pDIDesc->GetGamma(&gamma));
-//!!!		checkExpression(ratio.numerator == kGammaNumTestVal &&
-//			              ratio.denominator == kGammaDenTestVal,
- //                   AAFRESULT_TEST_FAILED);
+		checkResult(pDIDesc->GetGamma(&ratio));
+		checkExpression(ratio.numerator == kGammaNumTestVal &&
+			              ratio.denominator == kGammaDenTestVal,
+                    AAFRESULT_TEST_FAILED);
 
-		checkResult(pRGBADesc->CountPixelLayoutElements (&resultElements));
-		checkExpression(resultElements == NUM_TEST_ELEMENTS, AAFRESULT_TEST_FAILED);
-			
 		checkResult(pRGBADesc->GetPixelLayout(NUM_TEST_ELEMENTS, readElements));
 		for(n = 0; n < NUM_TEST_ELEMENTS; n++)
 		{
@@ -400,9 +382,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			if(readPalette[n] != bogusPalette[n])
 				throw AAFRESULT_TEST_FAILED;
 		}
-
-		checkResult(pRGBADesc->CountPaletteLayoutElements (&resultElements));
-		checkExpression(resultElements == NUM_TEST_ELEMENTS, AAFRESULT_TEST_FAILED);
 		checkResult(pRGBADesc->GetPaletteLayout(NUM_TEST_ELEMENTS, readElements));
 		for(n = 0; n < NUM_TEST_ELEMENTS; n++)
 		{
@@ -420,9 +399,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   // Cleanup and return
   if (pEssDesc)
     pEssDesc->Release();
-
-  if (pRGBADesc)
-    pRGBADesc->Release();
 
   if (pDIDesc)
     pDIDesc->Release();
@@ -448,27 +424,20 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode);
-extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode)
+extern "C" HRESULT CAAFRGBADescriptor_test()
 {
 	aafWChar*	pFileName = L"AAFRGBADescripTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
-
-   	try
+	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(pFileName);
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFRGBADescriptor_test..."
-			 << "Caught general C++ exception!" << endl;
-		hr = AAFRESULT_TEST_FAILED;
+		cerr << "CAAFRGBADescriptor_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
