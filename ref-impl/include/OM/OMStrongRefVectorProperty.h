@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,13 +31,9 @@
 
 #include "OMVector.h"
 #include "OMContainerElement.h"
-#include "OMStrongReferenceVector.h"
 
 template <typename ReferencedObject>
 class OMStrongReferenceVectorIterator;
-
-template <typename Element>
-class OMVectorIterator;
 
   // @class Persistent elastic sequential collections of strongly
   //        referenced (contained) objects supported by the Object Manager.
@@ -46,16 +42,15 @@ class OMVectorIterator;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @base public | <c OMStrongReferenceVector>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+  //   @base public | <c OMContainerProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceVectorProperty : public OMStrongReferenceVector {
+class OMStrongReferenceVectorProperty : public OMContainerProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
   OMStrongReferenceVectorProperty(const OMPropertyId propertyId,
-                                  const wchar_t* name);
+                                  const char* name);
 
     // @cmember Destructor.
   virtual ~OMStrongReferenceVectorProperty(void);
@@ -63,11 +58,8 @@ public:
     // @cmember Save this <c OMStrongReferenceVectorProperty>.
   virtual void save(void) const;
 
-    // @cmember Close this <c OMStrongReferenceVectorProperty>.
+    // @cmember Close this <c OMProperty>.
   virtual void close(void);
-
-    // @cmember Detach this <c OMStrongReferenceVectorProperty>.
-  virtual void detach(void);
 
     // @cmember Restore this <c OMStrongReferenceVectorProperty>, the
     //          external (persisted) size of the
@@ -78,101 +70,37 @@ public:
     //          <c OMStrongReferenceVectorProperty>.
   size_t count(void) const;
 
-    // @cmember Set the value of this <c OMStrongReferenceVectorProperty>
-    //          at position <p index> to <p object>.
-  ReferencedObject* setValueAt(const ReferencedObject* object,
+    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
+  void getSize(size_t& size) const;
+
+    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
+  size_t getSize(void) const;
+
+    // @cmember Set the value of the <p ReferencedObject> at
+    //          position <p index> in this
+    //          <c OMStrongReferenceVectorProperty>.
+  ReferencedObject* setValueAt(const ReferencedObject* value,
                                const size_t index);
 
-    // @cmember Set the value of this <c OMStrongReferenceVectorProperty>
-    //          at position <p index> to 0.
-  ReferencedObject* clearValueAt(const size_t index);
-
-    // @cmember The value of this <c OMStrongReferenceVectorProperty>
-    //          at position <p index>.
-  ReferencedObject* valueAt(const size_t index) const;
-
-    // @cmember Get the value of this <c OMStrongReferenceVectorProperty>
-    //          at position <p index> into <p object>.
-  void getValueAt(ReferencedObject*& object, const size_t index) const;
-
-    // @cmember If <p index> is valid, get the value of this
-    //          <c OMStrongReferenceVectorProperty> at position <p index>
-    //          into <p object> and return true, otherwise return false.
-  bool find(const size_t index, ReferencedObject*& object) const;
-
-    // @cmember Append the given <p ReferencedObject> <p object> to
-    //          this <c OMStrongReferenceVectorProperty>.
-  void appendValue(const ReferencedObject* object);
-
-    // @cmember Prepend the given <p ReferencedObject> <p object> to
-    //          this <c OMStrongReferenceVectorProperty>.
-  void prependValue(const ReferencedObject* object);
-
-    // @cmember Insert <p object> into this
-    //          <c OMStrongReferenceVectorProperty>. This function is
-    //          redefined from <c OMContainerProperty> as
-    //          <mf OMStrongReferenceVectorProperty::appendValue>.
-  void insert(const ReferencedObject* object);
-
-    // @cmember Insert <p object> into this <c OMStrongReferenceVectorProperty>
-    //          at position <p index>. Existing objects at <p index> and
-    //          higher are shifted up one index position.
-  void insertAt(const ReferencedObject* object, const size_t index);
-
-    // @cmember Does this <c OMStrongReferenceVectorProperty> contain
-    //          <p object> ?
-  bool containsValue(const ReferencedObject* object) const;
-
-    // @cmember Remove <p object> from this
+    // @cmember Get the value of the <p ReferencedObject> at
+    //          position <p index> in this
     //          <c OMStrongReferenceVectorProperty>.
-  void removeValue(const ReferencedObject* object);
+  void getValueAt(ReferencedObject*& value, const size_t index) const;
 
-    // @cmember Remove the object from this
-    //          <c OMStrongReferenceVectorProperty> at position <p index>.
-    //          Existing objects in this <c OMStrongReferenceVectorProperty>
-    //          at <p index> + 1 and higher are shifted down one index
-    //          position.
-  ReferencedObject* removeAt(const size_t index);
-
-    // @cmember Remove the last (index == count() - 1) object
-    //          from this <c OMStrongReferenceVectorProperty>.
-  ReferencedObject* removeLast(void);
-
-    // @cmember Remove the first (index == 0) object
-    //          from this <c OMStrongReferenceVectorProperty>. Existing
-    //          objects in this <c OMStrongReferenceVectorProperty> are
-    //          shifted down one index position.
-  ReferencedObject* removeFirst(void);
-
-    // @cmember The index of the <p ReferencedObject*> <p object>.
-  size_t indexOfValue(const ReferencedObject* object) const;
-
-    // @cmember The number of occurrences of <p object> in this
-    //          <c OMStrongReferenceVectorProperty>.
-  size_t countOfValue(const ReferencedObject* object) const;
-
-    // @cmember Does this <c OMStrongReferenceVectorProperty> contain
-    //          <p index> ? Is <p index> valid ?
-  bool containsIndex(const size_t index) const;
-
-    // @cmember If this <c OMStrongReferenceProperty> contains <p object>
-    //          then place its index in <p index> and return true, otherwise
-    //          return false.
-  bool findIndex(const ReferencedObject* object, size_t& index) const;
+    // @cmember Append the given <p ReferencedObject> <p value> to
+    //          this <c OMStrongReferenceVectorProperty>.
+  void appendValue(const ReferencedObject*& value);
 
     // @cmember Increase the capacity of this
-    //          <c OMStrongReferenceVectorProperty> so that it
+    //          <c OMStrongReferemceVectorProperty> so that it
     //          can contain at least <p capacity> <p ReferencedObject>s
     //          without having to be resized.
   void grow(const size_t capacity);
 
   // Optional property interface
 
-    // @cmember Is this <c OMStrongReferenceVectorProperty> void ?
-  virtual bool isVoid(void) const;
-
     // @cmember Remove this optional <c OMStrongReferenceVectorProperty>.
-  virtual void removeProperty(void);
+  virtual void remove(void);
 
   // Direct property access interface
 
@@ -193,69 +121,11 @@ public:
     //          <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
-    // @cmember Insert <p object> into this
-    //          <c OMStrongReferenceVectorProperty>.
-  virtual void insertObject(const OMObject* object);
-
-    // @cmember Does this <c OMStrongReferenceVectorProperty> contain
-    //          <p object> ?
-  virtual bool containsObject(const OMObject* object) const;
-
-    // @cmember Remove <p object> from this
-    //          <c OMStrongReferenceVectorProperty>.
-  virtual void removeObject(const OMObject* object);
-
-    // @cmember Remove all objects from this
-    //          <c OMStrongReferenceVectorProperty>.
-  virtual void removeAllObjects(void);
-
-    // @cmember Create an <c OMReferenceContainerIterator> over this
-    //          <c OMStrongReferenceVectorProperty>.
-  virtual OMReferenceContainerIterator* createIterator(void) const;
-
-    // @cmember Set the value of this <c OMStrongReferenceVectorProperty>
-    //          at position <p index> to <p object>.
-  virtual OMObject* setObjectAt(const OMObject* object,
-                                const size_t index);
-
-    // @cmember The value of this <c OMStrongReferenceVectorProperty>
-    //          at position <p index>.
-  virtual OMObject* getObjectAt(const size_t index) const;
-
-    // @cmember Append the given <p OMObject> <p object> to
-    //          this <c OMStrongReferenceVectorProperty>.
-  virtual void appendObject(const OMObject* object);
-
-    // @cmember Prepend the given <p OMObject> <p object> to
-    //          this <c OMStrongReferenceVectorProperty>.
-  virtual void prependObject(const OMObject* object);
-
-    // @cmember Remove the object from this
-    //          <c OMStrongReferenceVectorProperty> at position <p index>.
-    //          Existing objects in this <c OMStrongReferenceVectorProperty>
-    //          at <p index> + 1 and higher are shifted down one index
-    //          position.
-  virtual OMObject* removeObjectAt(const size_t index);
-
-    // @cmember Insert <p object> into this <c OMStrongReferenceVectorProperty>
-    //          at position <p index>. Existing objects at <p index> and
-    //          higher are shifted up one index position.
-  virtual void insertObjectAt(const OMObject* object, const size_t index);
-
-  virtual OMContainerIterator<OMStrongReferenceVectorElement>*
-                                                          iterator(void) const;
-
-  virtual void insert(const size_t index,
-                      const OMStrongReferenceVectorElement& element);
-
 private:
 
-  typedef OMStrongReferenceVectorElement VectorElement;
-
-  typedef OMVectorIterator<VectorElement> VectorIterator;
-
     // The vector of references.
-  OMVector<VectorElement> _vector;
+  OMVector<OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                           ReferencedObject> > _vector;
 
   friend class OMStrongReferenceVectorIterator<ReferencedObject>;
 
