@@ -1,26 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFEssenceData
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAF.h"
@@ -29,28 +34,10 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
-
-static const 	aafMobID_t	TEST_MobIDs[2] =
-{// begin mobid's ...
-	//first id
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x79a699c8, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}},
-
-	//second if
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xe7824a42, 0x040c, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}
-
-}; // ...end mobid's
 
 
 // Utility class to implement the test.
@@ -62,7 +49,7 @@ struct EssenceDataTest
   void createFile(wchar_t *pFileName);
   void openFile(wchar_t *pFileName);
 
-  void createFileMob(unsigned int mobid_Index);
+  void createFileMob();
   void createEssenceData(IAAFSourceMob *pSourceMob);
   void openEssenceData();
 
@@ -75,13 +62,12 @@ struct EssenceDataTest
 
   void cleanupReferences();
   void setBufferSize(aafUInt32 bufferSize);
-  inline void check(HRESULT hr);
-  inline void checkExpression(bool expression, HRESULT hr);
+  void check(HRESULT hr);
+  void checkExpression(bool expression, HRESULT hr);
   const char * convert(const wchar_t* pwcName);
 
   // Shared member data:
   HRESULT _hr;
-  aafProductVersion_t _prodecutVersion;
   aafProductIdentification_t _productInfo;
   IAAFFile *_pFile;
   bool _bFileOpen;
@@ -101,17 +87,15 @@ struct EssenceDataTest
   static const char _frowney[];
 };
 
-extern "C" HRESULT CAAFEssenceData_test(testMode_t mode);
-extern "C" HRESULT CAAFEssenceData_test(testMode_t mode)
+extern "C" HRESULT CAAFEssenceData_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t *fileName = L"AAFEssenceDataTest.aaf";
+  wchar_t fileName[] = L"AAFEssenceDataTest.aaf";
   EssenceDataTest edt;
 
   try
   {
-	if(mode == kAAFUnitTestReadWrite)
-    	edt.createFile(fileName);
+    edt.createFile(fileName);
     edt.openFile(fileName);
   }
   catch (HRESULT& ehr)
@@ -122,8 +106,7 @@ extern "C" HRESULT CAAFEssenceData_test(testMode_t mode)
   catch (...)
   {
     cerr << "CAAFEssenceData_test...Caught general C++"
-		 << " exception!" << endl; 
-	hr = AAFRESULT_TEST_FAILED;
+    " exception!" << endl; 
   }
 
   // Cleanup our object if it exists.
@@ -185,14 +168,13 @@ EssenceDataTest::EssenceDataTest():
   _buffer(NULL),
   _bufferSize(0)
 {
-  _prodecutVersion.major = 1;
-  _prodecutVersion.minor = 0;
-  _prodecutVersion.tertiary = 0;
-  _prodecutVersion.patchLevel = 0;
-  _prodecutVersion.type = kAAFVersionUnknown;
   _productInfo.companyName = L"AAF Developers Desk";
   _productInfo.productName = L"AAFEssenceData Test";
-  _productInfo.productVersion = &_prodecutVersion;
+  _productInfo.productVersion.major = 1;
+  _productInfo.productVersion.minor = 0;
+  _productInfo.productVersion.tertiary = 0;
+  _productInfo.productVersion.patchLevel = 0;
+  _productInfo.productVersion.type = kVersionUnknown;
   _productInfo.productVersionString = NULL;
   _productInfo.productID = UnitTestProductID;
   _productInfo.platform = NULL;
@@ -208,7 +190,7 @@ void EssenceDataTest::cleanupReferences()
 
   if (NULL != _buffer)
   {
-    delete _buffer;
+    CoTaskMemFree(_buffer);
     _buffer = NULL;
   }
 
@@ -274,7 +256,7 @@ void EssenceDataTest::setBufferSize(aafUInt32 bufferSize)
   // Allocate the buffer.
   if (NULL != _buffer && bufferSize > _bufferSize)
   {
-    delete _buffer;
+    CoTaskMemFree(_buffer);
     _buffer = NULL;
   }
 
@@ -282,7 +264,7 @@ void EssenceDataTest::setBufferSize(aafUInt32 bufferSize)
   if (NULL == _buffer)
   {
     _bufferSize = bufferSize;
-    _buffer = (aafDataBuffer_t)new char[ _bufferSize ];
+    _buffer = static_cast<aafDataBuffer_t>(CoTaskMemAlloc(_bufferSize));
     checkExpression(NULL != _buffer, AAFRESULT_NOMEMORY);
   }
 }
@@ -325,8 +307,8 @@ void EssenceDataTest::createFile(wchar_t *pFileName)
   check(_pFile->GetHeader(&_pHeader));
   check(_pHeader->GetDictionary(&_pDictionary));
 
-  createFileMob(0); //use unique mobid's (without using cocreate guid()
-  createFileMob(1); //use unique mobid's (without using cocreate guid()
+  createFileMob();
+  createFileMob();
 
   check(_pFile->Save());
 
@@ -344,7 +326,7 @@ void EssenceDataTest::openFile(wchar_t *pFileName)
   cleanupReferences();
 }
 
-void EssenceDataTest::createFileMob(unsigned int mobid_Index)
+void EssenceDataTest::createFileMob()
 {
   assert(_pFile && _pHeader && _pDictionary);
   assert(NULL == _pSourceMob);
@@ -353,27 +335,21 @@ void EssenceDataTest::createFileMob(unsigned int mobid_Index)
   assert(NULL == _pEssenceDescriptor);
   assert(NULL == _pSourceMob);
 
-  CAAFBuiltinDefs defs (_pDictionary);
-
   // Create a Mob
-  check(defs.cdSourceMob()->CreateInstance(IID_IAAFSourceMob, 
-										   (IUnknown **)&_pSourceMob));
+  check(_pDictionary->CreateInstance(AUID_AAFSourceMob,
+              IID_IAAFSourceMob, 
+              (IUnknown **)&_pSourceMob));
 
   check(_pSourceMob->QueryInterface (IID_IAAFMob, (void **)&_pMob));
   
-  check(_pMob->SetMobID(TEST_MobIDs[mobid_Index]));
+  aafUID_t newUID = {0};
+  check(CoCreateGuid((GUID *)&newUID));
+  check(_pMob->SetMobID(newUID));
   check(_pMob->SetName(L"EssenceDataTest File Mob"));
   
-  // instantiate a concrete subclass of FileDescriptor
-  check(defs.cdAIFCDescriptor()->
-		CreateInstance(IID_IAAFFileDescriptor,
-					   (IUnknown **)&_pFileDescriptor));
-
-	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
-	check(_pFileDescriptor->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-	check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-	pAIFCDesc->Release();
-	pAIFCDesc = NULL;
+  check(_pDictionary->CreateInstance(AUID_AAFFileDescriptor,
+              IID_IAAFEssenceDescriptor, 
+              (IUnknown **)&_pFileDescriptor));
 
   check(_pFileDescriptor->QueryInterface (IID_IAAFEssenceDescriptor,
                                           (void **)&_pEssenceDescriptor));
@@ -403,12 +379,13 @@ void EssenceDataTest::createEssenceData(IAAFSourceMob *pSourceMob)
   assert(pSourceMob);
   assert(NULL == _pEssenceData);
   
-  CAAFBuiltinDefs defs (_pDictionary);
+
+
 
   // Attempt to create an AAFEssenceData.
-  check(defs.cdEssenceData()->
-		CreateInstance(IID_IAAFEssenceData,
-					   (IUnknown **)&_pEssenceData));
+  check(_pDictionary->CreateInstance(AUID_AAFEssenceData,
+                         IID_IAAFEssenceData,
+                         (IUnknown **)&_pEssenceData));
 
   check(_pEssenceData->SetFileMob(pSourceMob));
   check(_pHeader->AddEssenceData(_pEssenceData));

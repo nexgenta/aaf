@@ -1,29 +1,40 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+// @com This file implements the module test for CEnumAAFMobs
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
-#include "CEnumAAFMobs.h"
-#include "CEnumAAFMobs.h"
-#ifndef __CEnumAAFMobs_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-
-
-
-
+#include "AAFDefUIDs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -61,7 +72,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*  pDictionary = NULL;
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
-	IAAFEssenceDescriptor *edesc;
+	IAAFEssenceDescriptor *edesc = NULL;
 	aafProductIdentification_t	ProductInfo;
 	aafUID_t					newUID;
 	HRESULT						hr = S_OK;
@@ -74,7 +85,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 
@@ -85,13 +96,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
     // Create the file
-		checkResult(CoCreateInstance(CLSID_AAFFile,
-								 NULL, 
-								 CLSCTX_INPROC_SERVER, 
-								 IID_IAAFFile, 
-								 (void **)&pFile));
-		checkResult(pFile->Initialize());
-		checkResult(pFile->OpenNewModify(pFileName, 0, &ProductInfo));
+		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
  
     // We can't really do anthing in AAF without the header.
@@ -103,53 +108,53 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     //Make the first mob
 
 	  // Create a FileMob
-	  checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
+	  checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
 							IID_IAAFSourceMob, 
 							(IUnknown **)&pSourceMob));
 
 	  checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 
 	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
-	  checkResult(pMob->SetMobID(&newUID));
+	  checkResult(pMob->SetMobID(newUID));
 	  checkResult(pMob->SetName(L"File Mob"));
 	
- 	  checkResult(pDictionary->CreateInstance(&AUID_AAFFileDescriptor,
+ 	  checkResult(pDictionary->CreateInstance(AUID_AAFFileDescriptor,
 							IID_IAAFFileDescriptor, 
 							(IUnknown **)&edesc));		
 
     checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
-	  checkResult(pHeader->AppendMob(pMob));
+	  checkResult(pHeader->AddMob(pMob));
 
     // Reusing local variable so we need to release the inteface.
     pMob->Release();
     pMob = NULL;
 
 	  // Create a MasterMob
-	  checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
+	  checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
 							IID_IAAFMob, 
 							(IUnknown **)&pMob));
 
 	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
-	  checkResult(pMob->SetMobID(&newUID));
+	  checkResult(pMob->SetMobID(newUID));
 	  checkResult(pMob->SetName(L"Master Mob"));
 
-	  checkResult(pHeader->AppendMob(pMob));
+	  checkResult(pHeader->AddMob(pMob));
 
     // Reusing local variable so we need to release the inteface.
     pMob->Release();
     pMob = NULL;
 
 	  // Create a CompositionMob
-	  checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+	  checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
 							  IID_IAAFMob, 
 							  (IUnknown **)&pMob));
 
 	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
-	  checkResult(pMob->SetMobID(&newUID));
+	  checkResult(pMob->SetMobID(newUID));
   	checkResult(pMob->SetName(L"Composition Mob"));
 
-	  checkResult(pHeader->AppendMob(pMob));
+	  checkResult(pHeader->AddMob(pMob));
 	}
   catch (HRESULT& rResult)
   {
@@ -176,7 +181,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pFile) 
 	{
 		if (bFileOpen)
+		  {
+			pFile->Save();
 			pFile->Close();
+		  }
 		pFile->Release();
 	}
 
@@ -193,43 +201,37 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"EnumAAFMobs Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 	  
 
   try
   {
     // Open the file
-		checkResult(CoCreateInstance(CLSID_AAFFile,
-								 NULL, 
-								 CLSCTX_INPROC_SERVER, 
-								 IID_IAAFFile, 
-								 (void **)&pFile));
-		checkResult(pFile->Initialize());
-		checkResult(pFile->OpenExistingRead(pFileName, 0));
+		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
  
     // We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 
 	  // Make sure that we have one master, one file, and one composition (three total)
-	  checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 	  checkExpression (3 == numMobs, AAFRESULT_TEST_FAILED);
 
-	  checkResult(pHeader->GetNumMobs(kMasterMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kMasterMob, &numMobs));
 	  checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
-	  checkResult(pHeader->GetNumMobs(kFileMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kFileMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
-	  checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kCompMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 	}
   catch (HRESULT& rResult)
@@ -253,10 +255,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
  
-HRESULT CEnumAAFMobs::test()
+extern "C" HRESULT CEnumAAFMobs_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
- 	aafWChar * pFileName = L"EnumMOBTest.aaf";
+ 	aafWChar * pFileName = L"EnumAAFMobsTest.aaf";
 
   try
 	{
@@ -266,7 +268,7 @@ HRESULT CEnumAAFMobs::test()
 	}
   catch (...)
 	{
-	  cerr << "CAAFSourceMob::test...Caught general C++"
+	  cerr << "CAAFSourceMob_test...Caught general C++"
 		" exception!" << endl; 
 	}
 
