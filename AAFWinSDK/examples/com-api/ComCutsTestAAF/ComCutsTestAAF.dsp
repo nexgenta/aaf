@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="ComAAFInfo" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="ComCutsTestAAF" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=ComAAFInfo - Win32 Debug
+CFG=ComCutsTestAAF - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "ComAAFInfo.mak".
+!MESSAGE NMAKE /f "ComCutsTestAAF.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "ComAAFInfo.mak" CFG="ComAAFInfo - Win32 Debug"
+!MESSAGE NMAKE /f "ComCutsTestAAF.mak" CFG="ComCutsTestAAF - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "ComAAFInfo - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "ComAAFInfo - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "ComCutsTestAAF - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "ComCutsTestAAF - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=ComAAFInfo - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "ComAAFInfo - Win32 Release"
+!IF  "$(CFG)" == "ComCutsTestAAF - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GR /GX /O2 /I "../../../../ref-impl/include/com-api" /I "../../../../ref-impl/include/OM" /I "../../../../ref-impl/src/impl" /I "../../../../ref-impl/src/OM" /I "../../../ref-impl/include/comidl" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "_UNICODE" /D "UNICODE" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GR /GX /O2 /I "../../../../ref-impl/src/impl" /I "../../../../ref-impl/src/OM" /I "../../../../ref-impl/include" /I "../../../../ref-impl/include/com-api" /I "../../../../ref-impl/include/OM" /I "../../../ref-impl/include/comidl" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -51,7 +51,7 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 
-!ELSEIF  "$(CFG)" == "ComAAFInfo - Win32 Debug"
+!ELSEIF  "$(CFG)" == "ComCutsTestAAF - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -62,9 +62,10 @@ LINK32=link.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MTd /W3 /Gm /GR /GX /ZI /Od /I "../../../../ref-impl/include/com-api" /I "../../../../ref-impl/include/OM" /I "../../../ref-impl/include/comidl" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "_UNICODE" /D "UNICODE" /YX /FD /c
+# ADD CPP /nologo /MTd /W3 /GR /GX /ZI /Od /I "../../../../ref-impl/include" /I "../../../../ref-impl/include/com-api" /I "../../../../ref-impl/include/OM" /I "../../../ref-impl/include/comidl" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "OM_ENABLE_DEBUG" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -78,15 +79,15 @@ LINK32=link.exe
 
 # Begin Target
 
-# Name "ComAAFInfo - Win32 Release"
-# Name "ComAAFInfo - Win32 Debug"
+# Name "ComCutsTestAAF - Win32 Release"
+# Name "ComCutsTestAAF - Win32 Debug"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\include\comidl\AAF_i.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\..\examples\com-api\comClientTest\AAFInfo.cpp"
+SOURCE="..\..\..\..\examples\com-api\ComCutsOnlyTest\CutsOnlyExample.cpp"
 # End Source File
 # End Target
 # End Project
