@@ -125,14 +125,37 @@ public:
   virtual bool isPositionable(void) const;
 
     // @cmember The current position for <f read()> and <f write()>, as an
-    //          offset in bytes from the begining of this <c OMDiskRawStorage>.
+    //          offset in bytes from the beginning of this
+    //          <c OMDiskRawStorage>.
     //          precondition - isPositionable()
   virtual OMUInt64 position(void) const;
 
     // @cmember Set the current position for <f read()> and <f write()>, as an
-    //          offset in bytes from the begining of this <c OMDiskRawStorage>.
+    //          offset in bytes from the beginning of this
+    //          <c OMDiskRawStorage>.
     //          precondition - isPositionable()
   virtual void setPosition(OMUInt64 newPosition);
+
+protected:
+  // @access Protected members.
+
+  virtual void read(FILE* file,
+                    OMByte* bytes,
+                    OMUInt32 byteCount,
+                    OMUInt32& bytesRead) const;
+
+  virtual void write(FILE* file,
+                     const OMByte* bytes,
+                     OMUInt32 byteCount,
+                     OMUInt32& bytesWritten);
+
+  virtual OMUInt64 size(FILE* file) const;
+
+  virtual void setSize(FILE* file, OMUInt64 newSize);
+
+  virtual OMUInt64 position(FILE* file) const;
+
+  virtual void setPosition(FILE* file, OMUInt64 newPosition);
 
 private:
   // @access Private members.
