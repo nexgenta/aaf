@@ -7,21 +7,14 @@
 *                                          *
 \******************************************/
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
 
 
 
 #ifndef __ImplAAFFileDescriptor_h__
 #include "ImplAAFFileDescriptor.h"
 #endif
+
+#include "AAFPropertyIDs.h"
 
 #include <assert.h>
 #include "AAFResult.h"
@@ -45,7 +38,13 @@ ImplAAFFileDescriptor::~ImplAAFFileDescriptor ()
 
 //@access Public Members
 
-/****/
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFFileDescriptor::Initialize ()
+{
+  return AAFRESULT_SUCCESS;
+}
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::SetLength (aafLength_t length)
 {
@@ -54,7 +53,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::GetLength (aafLength_t *pLength)
 {
@@ -65,7 +63,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::SetIsInContainer (aafBool isAAF)
 {
@@ -74,7 +71,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::GetIsInContainer (aafBool* pIsAAF)
 {
@@ -85,7 +81,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::SetSampleRate (aafRational_t *pRate)
 {
@@ -96,7 +91,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::GetSampleRate (aafRational_t *pRate)
 {
@@ -107,7 +101,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::SetContainerFormat (aafUID_t *pFormat)
 {
@@ -118,7 +111,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::GetContainerFormat (aafUID_t *pFormat)
 {
@@ -146,11 +138,11 @@ OMDEFINE_STORABLE(ImplAAFFileDescriptor, CLSID_AAFFileDescriptor);
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFileDescriptor::GetObjectClass(aafUID_t * pClass)
 {
-  if (! pClass)
+	if (! pClass)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  memcpy (pClass, &CLSID_AAFFileDescriptor, sizeof (aafClassID_t));
-  return AAFRESULT_SUCCESS;
+	memcpy (pClass, &CLSID_AAFFileDescriptor, sizeof (aafClassID_t));
+	return AAFRESULT_SUCCESS;
 }
 

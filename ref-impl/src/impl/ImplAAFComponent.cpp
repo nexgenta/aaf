@@ -20,13 +20,16 @@
 #include "ImplAAFComponent.h"
 #endif
 
-#include <assert.h>
-#include <AAFResult.h>
+#include "AAFPropertyIDs.h"
 
+#include <assert.h>
+#include "AAFResult.h"
+#include "aafErr.h"
+#include "aafCvt.h"
 
 ImplAAFComponent::ImplAAFComponent ():
-	_dataDef(	PID_IDENTIFICATION_DATADEF,	"dataDef"),
-	_length(	PID_IDENTIFICATION_LENGTH,	"length")
+	_dataDef(	PID_COMPONENT_DATADEF,	"dataDef"),
+	_length(	PID_COMPONENT_LENGTH,	"length")
 {
 	_persistentProperties.put(   _dataDef.address());
 	_persistentProperties.put(   _length.address());
@@ -168,50 +171,46 @@ AAFRESULT ImplAAFComponent::AccumulateLength(aafLength_t *pLength)
 }
 
 AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
-											ImplAAFMob *mob, ImplAAFMobSlot *track,
-											aafMediaCriteria_t *mediaCrit,
-											aafPosition_t currentObjPos,
-											aafEffectChoice_t *effectChoice,
-											ImplAAFComponent	*prevObject,
-											ImplAAFComponent *nextObject,
-#ifdef FULL_TOOLKIT
-											AAFScopeStack *scopeStack,
-#endif
-											aafPosition_t *diffPos, aafLength_t *minLength,
-											ImplAAFEffectDef **effeObject, aafInt32	*nestDepth,
-											ImplAAFComponent **found, aafBool *foundTransition)
+											 ImplAAFMob *mob, ImplAAFMobSlot *track,
+											 aafMediaCriteria_t *mediaCrit,
+											 aafPosition_t currentObjPos,
+											 aafEffectChoice_t *effectChoice,
+											 ImplAAFComponent	*prevObject,
+											 ImplAAFComponent *nextObject,
+											 ImplAAFScopeStack *scopeStack,
+											 aafPosition_t *diffPos, aafLength_t *minLength,
+											 ImplAAFEffectInvocation **effeObject, aafInt32	*nestDepth,
+											 ImplAAFComponent **found, aafBool *foundTransition)
 {
-#ifdef FULL_TOOLKIT
-  aafLength_t	tmpMinLen;
-  
-  XPROTECT(_file)
+	aafLength_t	tmpMinLen;
+	
+	XPROTECT()
 	{
-	  *foundTransition = FALSE;
-	  *found = this;
-	  CHECK(GetLength(&tmpMinLen));
-	  if (Int64Less(tmpMinLen, rootLen))
+		*foundTransition = AAFFalse;
+		*found = this;
+		CHECK(GetLength(&tmpMinLen));
+		if (Int64Less(tmpMinLen, rootLen))
 		{
 			*minLength = tmpMinLen;
 			if(diffPos != NULL)
 			{
-			  /* Figure out diffPos */
-			  *diffPos = rootPos;
-			  SubInt64fromInt64(currentObjPos, diffPos);
+				/* Figure out diffPos */
+				*diffPos = rootPos;
+				SubInt64fromInt64(currentObjPos, diffPos);
 			}
 		}
-	  else
+		else
 		{
 			*minLength = rootLen;
 			if(diffPos != NULL)
-			  CvtInt32toInt64(0, diffPos);
+				CvtInt32toInt64(0, diffPos);
 		}
 	} /* XPROTECT */
-  XEXCEPT
+	XEXCEPT
 	{
 	}
-  XEND;
-#endif
-	return(AAFRESULT_SUCCESS);
+	XEND;
+	return AAFRESULT_SUCCESS;
 }
 
 extern "C" const aafClassID_t CLSID_AAFComponent;
