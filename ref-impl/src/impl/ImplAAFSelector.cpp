@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #ifndef __ImplAAFSegment_h__
@@ -47,7 +29,6 @@
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
-#include "ImplAAFMob.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
@@ -62,21 +43,24 @@ ImplAAFSelector::ImplAAFSelector () :
 
 ImplAAFSelector::~ImplAAFSelector ()
 {
-	ImplAAFSegment *selected = _selected.setValue(0);
-	if (selected != NULL)
+	ImplAAFSegment*		pSegment = NULL;
+	size_t				size;
+
+	if (_selected != NULL)
 	{
-	  selected->ReleaseReference();
-	  selected = 0;
+		_selected->ReleaseReference();
+		_selected = NULL;
 	}
 
-	size_t size = _alternates.getSize();
-	for (size_t i = 0; i < size; i++)
+	_alternates.getSize(size);
+	for (size_t i = 0; i <size; i++)
 	{
-		ImplAAFSegment* pSegment = _alternates.setValueAt(0, i);
+		_alternates.getValueAt(pSegment, i);
 		if (pSegment)
 		{
-		  pSegment->ReleaseReference();
-		  pSegment = 0;
+			pSegment->ReleaseReference();
+			pSegment = NULL;
+			_alternates.setValueAt(pSegment, i);
 		}
 	}
 }
@@ -122,8 +106,7 @@ AAFRESULT STDMETHODCALLTYPE
 		pPrevSelected = _selected;
 		if (pPrevSelected)
 		{
-		  pPrevSelected->ReleaseReference();
-		  pPrevSelected = 0;
+			pPrevSelected->ReleaseReference();
 		}
 		_selected = pSelSegment;
 		_selected->AcquireReference();
@@ -156,16 +139,6 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
 	return hr;
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSelector::RemoveAlternateSegment (ImplAAFSegment* pSegment)
-{
-	if (!_alternates.containsValue(pSegment))
-	  return AAFRESULT_SEGMENT_NOT_FOUND;
-
-	_alternates.removeValue(pSegment);
-	return AAFRESULT_SUCCESS;
 }
 
 //***********************************************************
@@ -240,15 +213,37 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::EnumAlternateSegments (ImplEnumAAFSegments** ppEnum)
 {
-	if(ppEnum == NULL)
-		return(AAFRESULT_NULL_PARAM);
+	ImplEnumAAFSegments*	theEnum = NULL;
+	HRESULT					hr = AAFRESULT_SUCCESS;
 
-	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
-	if(*ppEnum == NULL)
-		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumStrongProperty(this, &_alternates);
+	if (ppEnum == NULL)
+	{
+		hr = AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+		theEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
+		if (theEnum == NULL)
+		{
+			hr = E_FAIL;
+		}
+		else
+		{
+			hr = theEnum->SetEnumSelector(this);
+			if (SUCCEEDED(hr))
+			{
+				theEnum->Reset();
+				*ppEnum = theEnum;
+			}
+			else
+			{
+				theEnum->ReleaseReference();
+				*ppEnum = NULL;
+			}
+		}
+	}
 
-	return(AAFRESULT_SUCCESS);
+	return hr;
 }
 
 //***********************************************************
@@ -287,61 +282,6 @@ AAFRESULT
 
 
 
-AAFRESULT
-	ImplAAFSelector::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
-										ImplAAFMob *mob, ImplAAFMobSlot *track,
-										aafMediaCriteria_t *mediaCrit,
-										aafPosition_t currentObjPos,
-										aafOperationChoice_t *effectChoice,
-										ImplAAFComponent	*prevObject,
-										ImplAAFComponent *nextObject,
-										ImplAAFScopeStack *scopeStack,
-										aafPosition_t *diffPos, aafLength_t *minLength,
-										ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
-										ImplAAFComponent **foundObj, aafBool *foundTransition)
-{  
-	ImplAAFSegment		*selected = NULL;
-	ImplAAFComponent	*tmpFound = NULL;
-	aafLength_t	tmpMinLen;
-	
-	XPROTECT()
-	{
-	*foundObj = NULL;
-	
-	  CHECK(GetSelectedSegment(&selected));
-	  if (selected)
-		{
-		  CHECK(mob->MobFindLeaf(track, mediaCrit, effectChoice,
-							selected, rootPos, rootLen,
-							prevObject, nextObject, 
-							scopeStack, 
-							currentObjPos, &tmpFound, &tmpMinLen, foundTransition,
-							effeObject, nestDepth, diffPos));
-		  if (tmpFound)
-			{
-			  *foundObj = tmpFound;
-			  if (Int64Less(tmpMinLen, rootLen))
-				*minLength = tmpMinLen;
-			  else
-				*minLength = rootLen;
-			}
-		  else
-			{
-			  RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
-			}
-		}
-	  else
-		{
-		  RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
-		}
-	} /* XPROTECT */
-  XEXCEPT
-	{
-	}
-  XEND;
-
-  return(AAFRESULT_SUCCESS);
-}
-
+OMDEFINE_STORABLE(ImplAAFSelector, AUID_AAFSelector);
 
 
