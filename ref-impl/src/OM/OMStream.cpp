@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStream.cpp,v 1.10 2005/03/30 16:40:39 bakerian Exp $ $Name:  $
+// $Id: OMStream.cpp,v 1.11 2005/03/30 20:42:51 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -161,26 +161,6 @@ void OMStream::write(const OMByte* bytes,
 
 OMUInt64 OMStream::size(void) const
 {
-  TRACE("OMStream::size");
-  PRECONDITION("No error on stream", ferror(_file) == 0);
-
-  struct stat fileStat;
-  fflush( _file );
-#if defined(OM_DEBUG)
-  OMInt64 status =
-#endif
-
-  fstat( fileno( _file ), &fileStat );
-  ASSERT( "Successful fstat", status == 0 );
-  OMUInt64 result = fileStat.st_size;
-
-
-  return result;
-}
-
-/*
-OMUInt64 OMStream::size(void) const
-{
 TRACE("OMStream::size");
   PRECONDITION("No error on stream", ferror(_file) == 0);
 	// where are we now?
@@ -218,7 +198,7 @@ TRACE("OMStream::size");
 
 	return result;
 }
-*/
+
 
 void OMStream::setSize(OMUInt64 newSize) 
 {
