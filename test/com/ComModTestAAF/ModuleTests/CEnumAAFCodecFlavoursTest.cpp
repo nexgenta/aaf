@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFCodecFlavours
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -20,10 +38,17 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "aafUtils.h"
 #include "AAFCodecDefs.h"
+
+#include "CAAFBuiltinDefs.h"
+
+static aafBool  EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
+{
+    return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
+}
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -58,20 +83,22 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"EnumAAFCodecFlavours Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -108,7 +135,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFPluginManager *mgr = NULL;
 	bool bFileOpen = false;
 	HRESULT			hr = S_OK;
-	aafUID_t		uid;
 /*	long			test;
 */
 
@@ -119,19 +145,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
     
 		checkResult(AAFGetPluginManager(&mgr));
-		checkResult(mgr->CreatePluginDefinition (CodecWave, pDictionary, &pDef));
+		checkResult(mgr->CreatePluginDefinition (kAAFCodecWAVE, pDictionary, &pDef));
 
-		uid = DDEF_Sound;
 		checkResult(pDef->QueryInterface(IID_IAAFCodecDef, (void **)&pCodecDef));
-		checkResult(pCodecDef->AppendEssenceKind (&uid));
-		checkResult(pDictionary->RegisterCodecDefinition(pCodecDef));
+		checkResult(pCodecDef->AddEssenceKind (defs.ddSound()));
+		checkResult(pDictionary->RegisterCodecDef(pCodecDef));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -179,28 +205,53 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFCodecDef	*pCodec = NULL;
 	IAAFDataDef		*pDataDef = NULL;
 	IEnumAAFCodecFlavours	*pEnum = NULL;
+	IEnumAAFCodecFlavours	*pCloneEnum = NULL;
 	bool bFileOpen = false;
 	aafBool			testResult;
-	aafUID_t		codecID = CodecWave;
+	aafUID_t		codecID = kAAFCodecWAVE;
 	// aafUID_t		testMatte = DDEF_Matte;
-	aafUID_t		testPicture = DDEF_Picture;
-	aafUID_t		checkFlavour = NilCodecFlavour;
+	aafUID_t		checkFlavour = kAAFNilCodecFlavour;
 	aafUID_t		testFlavour;
 	HRESULT			hr = S_OK;
 
 	try
 	{
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		checkResult(pDictionary->LookupCodecDefinition(&codecID, &pCodec));
+		CAAFBuiltinDefs defs (pDictionary);
+		checkResult(pDictionary->LookupCodecDef(codecID, &pCodec));
 
-		checkResult(pCodec->IsEssenceKindSupported (&testPicture, &testResult));
-		checkExpression (testResult == AAFFalse, AAFRESULT_TEST_FAILED);
+		checkResult(pCodec->IsEssenceKindSupported (defs.ddPicture(), &testResult));
+		checkExpression (testResult == kAAFFalse, AAFRESULT_TEST_FAILED);
 		checkResult(pCodec->EnumCodecFlavours (&pEnum));
 		checkResult(pEnum->NextOne (&testFlavour));
+		checkExpression (EqualAUID(&testFlavour, &checkFlavour) ? true : false,
+						 AAFRESULT_TEST_FAILED);
+		checkResult(pEnum->Reset ());
+		checkResult(pEnum->NextOne (&testFlavour));
+		checkExpression (EqualAUID(&testFlavour, &checkFlavour) ? true : false,
+						 AAFRESULT_TEST_FAILED);
+
+		// Test for correct "off end" behavior
+		checkExpression(pEnum->NextOne (&testFlavour) == AAFRESULT_NO_MORE_FLAVOURS, AAFRESULT_TEST_FAILED);
+
+		// Skip1 should also put us off of the end
+		checkResult(pEnum->Reset ());
+		checkExpression(pEnum->Skip (1) == AAFRESULT_NO_MORE_FLAVOURS, AAFRESULT_TEST_FAILED);
+
+		// Check with Next()
+		checkResult(pEnum->Reset ());
+		checkResult(pEnum->Next(1,&testFlavour,NULL));
+		checkExpression (EqualAUID(&testFlavour, &checkFlavour) ? true : false,
+						 AAFRESULT_TEST_FAILED);
+		
+		// Check out clones version
+		checkResult(pEnum->Reset ());
+		checkResult(pEnum->Clone (&pCloneEnum));
+		checkResult(pCloneEnum->Next(1,&testFlavour,NULL));
 		checkExpression (EqualAUID(&testFlavour, &checkFlavour) ? true : false,
 						 AAFRESULT_TEST_FAILED);
 	}
@@ -233,33 +284,37 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFCodecFlavours_test()
+extern "C" HRESULT CEnumAAFCodecFlavours_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFCodecFlavours_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFCodecFlavoursTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFCodecFlavours_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFCodecFlavours_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
-	if (SUCCEEDED(hr))
-	{
-		cout << "The following IEnumAAFCodecFlavours tests have not been implemented:" << endl; 
-		cout << "     Next" << endl; 
-		cout << "     Skip" << endl; 
-		cout << "     Reset" << endl; 
-		cout << "     Clone" << endl; 
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-	}
+//	if (SUCCEEDED(hr))
+//	{
+//		cout << "The following IEnumAAFCodecFlavours tests have not been implemented:" << endl; 
+//		cout << "     Next" << endl; 
+//		cout << "     Clone" << endl; 
+//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+//	}
 
 	return hr;
 }
