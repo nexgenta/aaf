@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.31 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.31.2.1 2004/07/22 23:19:11 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -182,12 +182,8 @@ ImplAAFMetaDictionary *ImplAAFMetaDictionary::CreateMetaDictionary(void)
       // must have a reference to a factory. Since the meta dictionary is not created
       // by the OMClassFactory interface we just set the factory to "itself".
       //
-//
-//      pMetaDictionary->setClassFactory(pMetaDictionary);
 
-      // NOTE: We will probably need to change the previous
-      // line to use a "setMetaClassFactory()" (to be provided by OM)
-      // transdel:2000-APR-11  
+      pMetaDictionary->setClassFactory(pMetaDictionary);
     }
     else
     {
