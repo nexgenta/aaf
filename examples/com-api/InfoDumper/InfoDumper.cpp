@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.18.2.1 2004/06/08 13:45:05 stuart_hc Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.18.2.2 2004/08/27 22:32:29 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2031,7 +2031,21 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 	    checkResult(pTD->QueryInterface(IID_IAAFTypeDefSet, (void**)&pTDSet));
 	    // Get number of elements
 	    aafUInt32 numElems;
+#ifdef PRINT_SETS_OF_NON_OBJECTS
 	    checkResult(pTDSet->GetCount(pPVal, &numElems));
+#else
+	    // Property direct interface doesn't yet work for for sets of non-objects
+            const AAFRESULT hr = pTDSet->GetCount(pPVal, &numElems);
+	    if (hr == AAFRESULT_ELEMENT_NOT_OBJECT)
+	    {
+		os << "*** Unsupported type ***";
+		break;
+	    }
+	    else
+	    {
+		checkResult(hr);
+	    }
+#endif
 				
 	    os << "Set[" << numElems << "] of " ;
 	    IAAFTypeDefSP pElementTD;
