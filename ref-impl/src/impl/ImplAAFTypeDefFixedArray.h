@@ -6,7 +6,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -33,7 +32,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetType
         // @parm [out] type of elements in this array
-        (ImplAAFTypeDef ** ppTypeDef);
+        (ImplAAFTypeDef ** ppTypeDef) const;
 
 
   //****************
@@ -42,7 +41,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         aafUID_t *  pID,
+         const aafUID_t *  pID,
 
          // @parm [in] type of each element to be contained in this array
          ImplAAFTypeDef * pTypeDef,
@@ -101,9 +100,6 @@ protected:
   // returns number of elements in this array
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTypeDefFixedArray)
 
   // overrides from ImplAAFTypeDef
   //
@@ -112,12 +108,30 @@ public:
   aafBool IsRegistered (void) const;
   size_t NativeSize (void) const;
 
+  virtual OMProperty * 
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
+
+
 private:
-  ImplAAFTypeDef * GetBaseType (void);
+  ImplAAFTypeDefSP BaseType (void) const;
 
   // OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
   OMFixedSizeProperty<aafUID_t>           _ElementType;
   OMFixedSizeProperty<aafUInt32>          _ElementCount;
+
+  ImplAAFTypeDefSP _cachedBaseType;
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFTypeDefFixedArray> ImplAAFTypeDefFixedArraySP;
 
 #endif // ! __ImplAAFTypeDefFixedArray_h__
