@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEventMobSlot
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEventMobSlotTest.cpp,v 1.28 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEventMobSlotTest.cpp,v 1.29 2005/01/11 10:05:06 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -113,7 +113,7 @@ static const aafMobID_t gEventMobID1 = {
 
 0x13, 0x00, 0x00, 0x00, 
 
-{0xf827fde6, 0x8d6f, 0x11d4, 0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+{0xf827fde6, 0x8d6f, 0x11d4, {0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}}};
 
 //{060c2b340205110101001000-13-00-00-00-{f8d86bea-8d6f-11d4-a380-009027dfca6a}}
 
@@ -123,7 +123,7 @@ static const aafMobID_t gEventMobID2 = {
 
 0x13, 0x00, 0x00, 0x00, 
 
-{0xf8d86bea, 0x8d6f, 0x11d4, 0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+{0xf8d86bea, 0x8d6f, 0x11d4, {0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}}};
 
 
 extern "C" HRESULT CAAFEventMobSlot_test(testMode_t mode);

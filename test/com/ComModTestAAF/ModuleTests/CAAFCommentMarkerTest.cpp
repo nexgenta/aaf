@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFCommentMarker
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCommentMarkerTest.cpp,v 1.25 2004/10/22 14:20:45 phil_tudor Exp $ $Name:  $
+// $Id: CAAFCommentMarkerTest.cpp,v 1.26 2005/01/11 09:49:43 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -166,7 +166,7 @@ const wchar_t *CommentMarkerTest::_eventComment = L"Event::Comment:This is a tes
 const aafMobID_t CommentMarkerTest::_compositionMobID = 
 	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0x3e2db3b8, 0x0a61, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0x3e2db3b8, 0x0a61, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
 CommentMarkerTest::CommentMarkerTest() :

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEvent
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEventTest.cpp,v 1.24 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEventTest.cpp,v 1.25 2005/01/11 10:05:57 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,7 +48,7 @@ static const aafMobID_t gMobID = {
 
 0x13, 0x00, 0x00, 0x00, 
 
-{0xf5fedc56, 0x8d6f, 0x11d4, 0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+{0xf5fedc56, 0x8d6f, 0x11d4, {0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}}};
 
 
 // Cross-platform utility to delete a file.

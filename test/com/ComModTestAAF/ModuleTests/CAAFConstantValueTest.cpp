@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFConstantValue
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFConstantValueTest.cpp,v 1.36 2004/10/22 14:20:45 phil_tudor Exp $ $Name:  $
+// $Id: CAAFConstantValueTest.cpp,v 1.37 2005/01/11 09:48:41 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,8 @@ using namespace std;
 
 #include "CAAFBuiltinDefs.h"
 
-static aafMobID_t	zeroMobID = { 0 };
+static aafMobID_t	zeroMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+					{0,0,0,{0,0,0,0,0,0,0,0}}};
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 // Cross-platform utility to delete a file.

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceGroup
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceGroupTest.cpp,v 1.30 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEssenceGroupTest.cpp,v 1.31 2005/01/11 10:03:48 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,12 +50,12 @@ static aafWChar *slotName = L"SLOT1";
 static const	aafMobID_t	TEST_MobID = 
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xc2cbfef4, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0xc2cbfef4, 0x03fe, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 static const	aafMobID_t	TEST_referencedMobID = 
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xc6690f5c, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0xc6690f5c, 0x03fe, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
 // Cross-platform utility to delete a file.
@@ -170,7 +170,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSourceClip->Release();
 		pSourceClip = NULL;
 		// Add a source clip alternate
-		aafSourceRef_t sourceRef={0};
+		aafSourceRef_t sourceRef= {{{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+					{0,0,0,{0,0,0,0,0,0,0,0}}},0,0};
 		checkResult(defs.cdSourceClip()->
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&pSourceClip));

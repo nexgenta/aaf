@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFGPITrigger
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFGPITriggerTest.cpp,v 1.14 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
+// $Id: CAAFGPITriggerTest.cpp,v 1.15 2005/01/11 10:13:14 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,7 +81,7 @@ static const aafMobID_t gMobID = {
 
 0x13, 0x00, 0x00, 0x00, 
 
-{0xf9d78788, 0x8d6f, 0x11d4, 0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+{0xf9d78788, 0x8d6f, 0x11d4, {0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}}};
 
 
 class GPITriggerTest
