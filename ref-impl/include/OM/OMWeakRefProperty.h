@@ -115,6 +115,13 @@ public:
     // @cmember set the value of this <c OMWeakReferenceProperty>.
   virtual OMObject* setObject(const OMObject* object);
 
+  virtual OMWeakObjectReference& reference(void) const;
+
+    // @cmember The <c OMStrongReferenceSet> in which the object
+    //          referenced by this <c OMWeakReferenceProperty>
+    //          must reside.
+  virtual OMStrongReferenceSet* targetSet(void) const;
+
   virtual OMPropertyId keyPropertyId(void) const;
 
   virtual OMPropertyTag targetTag(void) const;
@@ -122,6 +129,13 @@ public:
   virtual void setTargetTag(OMPropertyTag targetTag);
 
   virtual void clearTargetTag(void) const;
+
+  // Copying.
+
+  virtual void shallowCopyTo(OMProperty* destination) const;
+
+  virtual void deepCopyTo(OMProperty* destination,
+                          void* clientContext) const;
 
 private:
 
@@ -132,6 +146,13 @@ private:
   const wchar_t* _targetName;
   OMPropertyId* _targetPropertyPath;
   OMPropertyId _keyPropertyId;
+  OMStrongReferenceSet* _targetSet;
+
+    // OMWeakReferenceProperty can't be assigned - declare but don't define
+  OMWeakReferenceProperty& operator = (const OMWeakReferenceProperty& rhs);
+
+    // OMWeakReferenceProperty can't be copied - declare but don't define
+  OMWeakReferenceProperty(const OMWeakReferenceProperty& rhs);
 
 };
 
