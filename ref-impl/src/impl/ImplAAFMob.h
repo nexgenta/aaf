@@ -20,11 +20,8 @@
 #include "ImplAAFTimelineMobSlot.h"
 #endif
 
-const int PID_MOB_MOBID			= 0;
-const int PID_MOB_NAME			= 1;
-const int PID_MOB_CREATE_TIME	= 2;
-const int PID_MOB_MOD_TIME		= 3;
-const int PID_MOB_SLOTS			= 4;
+#include "AAFPropertyIDs.h"
+
 
 class ImplAAFSegment;
 
@@ -36,7 +33,11 @@ class ImplEnumAAFMobSlots;
 
 class ImplEnumAAFMobComments;
 
+class ImplAAFFindSourceInfo;
 
+class ImplAAFScopeStack;
+
+class ImplAAFEffectInvocation;
 
 
 
@@ -83,10 +84,10 @@ public:
         (aafWChar *  name,  //@parm [in] Mob Name
 		aafInt32 bufSize);	  //@parm [in] size of the buffer required to hold Mob Name + terminator
   //****************
-  // GetNameLen()
+  // GetNameBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNameLen
+    GetNameBufLen
         (aafInt32 *  nameLen);  //@parm [in,out] Mob Name length
 
   //****************
@@ -340,9 +341,69 @@ public:
 	// Interfaces visible inside the toolkit, but not exposed through the API
 AAFRESULT
     GetNthMobSlot (aafInt32 index /* 0-based*/, ImplAAFMobSlot **ppMobSlot);
+  //****************
+  // AddPhysSourceRef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddPhysSourceRef
+        (aafAppendOption_t  addType,
+		 aafRational_t  editrate,
+		 aafSlotID_t  aMobSlot,
+         aafUID_t * pEssenceKind,
+		aafSourceRef_t  ref,
+        aafLength_t  srcRefLength);
+
+	virtual AAFRESULT InternalSearchSource(	
+    aafSlotID_t trackID,             /* IN */
+	aafPosition_t offset,             /* IN */
+	aafMobKind_t mobKind,             /* IN */
+	aafMediaCriteria_t *pMediaCrit,    /* IN */
+	aafEffectChoice_t *pEffectChoice,  /* IN */  /* NOTE: take this arg out? */
+	ImplAAFFindSourceInfo **ppSourceInfo);  /* OUT */
+
+	virtual AAFRESULT MobFindLeaf(ImplAAFMobSlot *track,
+					 aafMediaCriteria_t *mediaCrit,
+					 aafEffectChoice_t *effectChoice,
+					 ImplAAFComponent *rootObj,
+					 aafPosition_t rootPos,
+					 aafLength_t rootLen,
+					 ImplAAFComponent	*prevObject,
+					 ImplAAFComponent *nextObject,
+					 ImplAAFScopeStack *scopeStack,
+					 aafPosition_t	currentObjPos,
+					 ImplAAFComponent **foundObj,
+					 aafLength_t *minLength,
+					 aafBool *foundTransition,
+					 ImplAAFEffectInvocation **effeObject,
+					 aafInt32	*nestDepth,
+					 aafPosition_t *diffPos);
+
+	virtual AAFRESULT FindNextMob(ImplAAFMobSlot *track, 
+					 ImplAAFSegment *segment,
+					 aafLength_t length,
+					 aafPosition_t diffPos,
+					 ImplAAFMob **retMob,
+					 aafSlotID_t *retTrackID,
+					 aafPosition_t *retPos,
+					 ImplAAFPulldown **pulldownObj,
+					 aafInt32 *pulldownPhase,
+					 aafLength_t *retLen);
+
+virtual AAFRESULT MobFindSource(
+					   aafSlotID_t trackID,
+					   aafPosition_t offset, /* offset in referenced units */
+					   aafLength_t length,   /* expected length of clip */
+					   aafMobKind_t mobKind,
+					   aafMediaCriteria_t *mediaCrit,
+					   aafEffectChoice_t *effectChoice,
+					   ImplAAFFindSourceInfo *sourceInfo,
+					   aafBool *foundSource);
 
 virtual AAFRESULT STDMETHODCALLTYPE
     GetMobKind (aafMobKind_t *pMobKind);
+
+  // SDK Internal
+  virtual AAFRESULT ReconcileMobLength(void);
 
 	protected:
 	OMFixedSizeProperty<aafUID_t>		_mobID;
