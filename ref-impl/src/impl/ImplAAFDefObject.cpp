@@ -1,24 +1,11 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 /*************************************************************************
  * 
@@ -38,8 +25,8 @@
 #include "ImplAAFDefObject.h"
 #endif
 
-#ifndef __ImplEnumAAFPluginDefs_h__
-#include "ImplEnumAAFPluginDefs.h"
+#ifndef __ImplEnumAAFPluginDescriptors_h__
+#include "ImplEnumAAFPluginDescriptors.h"
 #endif
 
 #ifndef __ImplAAFDictionary_h_
@@ -50,20 +37,23 @@
 #include <string.h>
 #include "ImplAAFObjectCreation.h"
 #include "aafErr.h"
-#include "ImplAAFPluginDef.h"
-#include "AAFUtils.h"
+#include "ImplAAFPluginDescriptor.h"
+#include "aafUtils.h"
 #include "AAFDefUIDs.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFPluginDescriptors;
 
 ImplAAFDefObject::ImplAAFDefObject ()
-: _name           (PID_DefinitionObject_Name,           L"Name"),
-  _description    (PID_DefinitionObject_Description,    L"Description"),
-  _identification (PID_DefinitionObject_Identification, L"Identification")
+: _name           (PID_DefinitionObject_Name,           "Name"),
+  _description    (PID_DefinitionObject_Description,    "Description"),
+  _identification (PID_DefinitionObject_Identification, "Identification"),
+  _descriptors(    PID_DefinitionObject_PluginDescriptors, "PluginDescriptors")
 {
   _persistentProperties.put(_name.address());
   _persistentProperties.put(_description.address());
   _persistentProperties.put(_identification.address());
+  _persistentProperties.put(_descriptors.address());
+		(void)AppendPluginDescriptor (NULL);		// !!! TEMP Until optional properties
 }
 
 
@@ -73,49 +63,26 @@ ImplAAFDefObject::~ImplAAFDefObject ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::pvtInitialize (
-      const aafUID_t & id,
-	  const aafWChar * pName,
-	  const aafWChar * pDesc)
+    ImplAAFDefObject::Init (
+      const aafUID_t *pAuid,
+	  const aafWChar *pName,
+	  const aafWChar *pDesc)
 {
-	if (pName == NULL || pDesc == NULL)
+	if (pAuid == NULL || pName == NULL || pDesc == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 	else
 	{
-		_identification = id;
+		_identification = *pAuid;
 		_name = pName;
 		_description = pDesc;
 	}
 	return AAFRESULT_SUCCESS;
 }
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::Initialize (
-      const aafUID_t & id,
-	  const aafCharacter * pName,
-	  const aafCharacter * pDesc )
-{
-	//validate pName
-	if (pName == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-
-	_identification = id;
-	_name = pName;
-	
-	if (pDesc != NULL)
-		_description = pDesc;
-
-	return AAFRESULT_SUCCESS;
-}
-
-
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetName (
-      const aafCharacter *  pName)
+      const wchar_t *  pName)
 {
   if (! pName)
 	{
@@ -163,7 +130,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetDescription (
-      const aafCharacter * pDescription)
+      wchar_t * pDescription)
 {
   if (! pDescription)
 	{
@@ -181,22 +148,18 @@ AAFRESULT STDMETHODCALLTYPE
       wchar_t * pDescription,
       aafUInt32 bufSize)
 {
-	bool stat;
-	if (! pDescription)
+  bool stat;
+  if (! pDescription)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
-	if (!_description.isPresent())
+  stat = _description.copyToBuffer(pDescription, bufSize);
+  if (! stat)
 	{
-		return AAFRESULT_PROP_NOT_PRESENT;
+	  return AAFRESULT_SMALLBUF;
 	}
-	stat = _description.copyToBuffer(pDescription, bufSize);
-	if (! stat)
-	{
-		return AAFRESULT_SMALLBUF;
-	}
-	
-	return AAFRESULT_SUCCESS;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -204,16 +167,12 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::GetDescriptionBufLen (
       aafUInt32 * pBufSize)  //@parm [in,out] Definition Name length
 {
-	if (! pBufSize)
+  if (! pBufSize)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
-	if (!_description.isPresent())
-		*pBufSize = 0;
-	else
-		*pBufSize = _description.size();
-	
-	return AAFRESULT_SUCCESS;
+  *pBufSize = _description.size();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -236,17 +195,123 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetAUID (
-      const aafUID_t & id)
+      const aafUID_t *pAuid)
 {
-  _identification = id;
-
+  if (pAuid == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  else
+	{
+	  _identification = *pAuid;
+	}
   return AAFRESULT_SUCCESS;
 }
 
-
-
-const OMUniqueObjectIdentification&
-  ImplAAFDefObject::identification(void) const
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::AppendPluginDescriptor (
+      ImplAAFPluginDescriptor *pPluginDescriptor)
 {
-  return *reinterpret_cast<const OMUniqueObjectIdentification*>(&_identification.reference());
+	aafUID_t	*tmp, newUID;
+	aafInt32	oldBufSize;
+	aafInt32	newBufSize;
+
+//!!!	if(pPluginDescriptor == NULL)
+//		return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		oldBufSize = _descriptors.size();
+		newBufSize = oldBufSize + sizeof(aafUID_t);
+		if(pPluginDescriptor == NULL)	//!!!
+			newUID = NilMOBID;			//!!!
+		else
+		{
+			CHECK(pPluginDescriptor->GetAUID(&newUID));
+		}
+		tmp = new aafUID_t[newBufSize];
+		if(tmp == NULL)
+			RAISE(AAFRESULT_NOMEMORY);
+		if(oldBufSize != 0)
+		{
+			_descriptors.copyToBuffer(tmp, oldBufSize);
+			if(EqualAUID(tmp, &NilMOBID))		//!!! Handle non-optional props
+			{									//!!!
+				oldBufSize = 0;					//!!!
+				newBufSize -= sizeof(aafUID_t);	//!!!
+			}									//!!!
+		}
+		tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
+		_descriptors.setValue(tmp, newBufSize);
+		delete [] tmp;
+	}
+	XEXCEPT
+	{
+		if(tmp != NULL)
+			delete [] tmp;
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
 }
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::PrependPluginDescriptor (
+      ImplAAFPluginDescriptor *pPluginDescriptor)
+{
+	aafUID_t	*tmp = NULL, newUID;
+	aafInt32	oldBufSize;
+	aafInt32	newBufSize;
+	aafInt32	n;
+
+	if(pPluginDescriptor == NULL)
+		return AAFRESULT_NULL_PARAM;
+	
+	XPROTECT()
+	{
+		oldBufSize = _descriptors.size();
+		newBufSize = oldBufSize + sizeof(aafUID_t);
+		CHECK(pPluginDescriptor->GetAUID(&newUID));
+		tmp = new aafUID_t[newBufSize];
+		if(tmp == NULL)
+			RAISE(AAFRESULT_NOMEMORY);
+		if(oldBufSize != 0)
+			_descriptors.copyToBuffer(tmp, oldBufSize);
+		for(n = oldBufSize/sizeof(aafUID_t); n >= 0; n--)
+		{
+			tmp[n+1] = tmp[n];
+		}
+		tmp[0] = newUID;
+		_descriptors.setValue(tmp, newBufSize);
+		delete [] tmp;
+	}
+	XEXCEPT
+	{
+		if(tmp != NULL)
+			delete [] tmp;
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::EnumPluginDescriptors (
+      ImplEnumAAFPluginDescriptors **ppEnum)
+{
+	if(ppEnum == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	*ppEnum = (ImplEnumAAFPluginDescriptors *)CreateImpl (CLSID_EnumAAFPluginDescriptors);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumProperty(this, &_descriptors);
+
+	return(AAFRESULT_SUCCESS);
+}
+
+
+OMDEFINE_STORABLE(ImplAAFDefObject, AUID_AAFDefObject);
