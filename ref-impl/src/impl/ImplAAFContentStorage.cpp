@@ -71,8 +71,8 @@ static void ReleaseMobRefs(void *valuePtr)
 }
 
 ImplAAFContentStorage::ImplAAFContentStorage ()
-: _mobs(PID_ContentStorage_Mobs, "Mobs", PID_Mob_MobID),
-  _essenceData(PID_ContentStorage_EssenceData, "EssenceData", PID_EssenceData_MobID)
+: _mobs(PID_ContentStorage_Mobs, L"Mobs", PID_Mob_MobID),
+  _essenceData(PID_ContentStorage_EssenceData, L"EssenceData", PID_EssenceData_MobID)
 {
 	_persistentProperties.put(_mobs.address());
 	_persistentProperties.put(_essenceData.address());
@@ -322,7 +322,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-//Internal function only.  Not exposed through the COM API
+// Renamed to LookupEssenceData() in the COM API
 AAFRESULT
     ImplAAFContentStorage::LookupEssence (aafMobID_constref fileMobID,
                            ImplAAFEssenceData **ppEssence)
