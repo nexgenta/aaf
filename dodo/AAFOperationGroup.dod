@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFOperationGroup\
 #endm
@@ -15,30 +8,9 @@ AAFSegment\
 #c
 #c #import ./AAFSegment.exp
 AD_HEAD
-AD_IDL(//
-// The IAAFOperationGroup interface is implemented by objects describe
-// an operation \(such as an effect\) affecting the interpretation of
-// zero or more input segments.  OperationGroup objects may include
-// any object implementing the IAAFSegment interface as source
-// material\, including another nested OperationGroup object.
-//
-// In addition to the specific error results listed for each method\,
-// all methods in this interface may also return one of the following
-// values:
-// 
-// AAFRESULT_NOMEMORY
-//   - insufficient system memory is available to perform the
-//     operation.
-//
-// AAFRESULT_NOT_INITIALIZED
-//   - This object has not yet had Initialize\(\) called on it through
-//     this object's primary interface.  Note that IAAFMob is a
-//     primary interface for an abstract class\, so it is not
-//     appropriate for the Initialize\(\) method to exist in this
-//     interface.  The Initialize\(\) method is available through the
-//     concrete object's primary interface.
-//)
+
 AD_INCLUDE(AAFTypes)
+
 AD_FORWARD_DECLARATION(AAFDataDef)
 AD_FORWARD_DECLARATION(AAFOperationDef)
 AD_FORWARD_DECLARATION(AAFParameter)
@@ -46,46 +18,36 @@ AD_FORWARD_DECLARATION(AAFSourceReference)
 AD_FORWARD_DECLARATION(EnumAAFOperationDefs)
 AD_FORWARD_DECLARATION(EnumAAFParameterDefs)
 AD_FORWARD_DECLARATION(AAFSegment)
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
 AD_CLASS_UUID(3AE3BA81, 2C98, 11d2, 80, 42, 00, 60, 08, 14, 3E, 6F)
 
 AD_DEFAULT_UUID(3AE3BA82, 2C98, 11d2, 80, 42, 00, 60, 08, 14, 3E, 6F)
+
+
 AD_XCLASS_BEGIN(Concrete, StoredObject)
+
 AD_XMETHOD3(Initialize,
-
-			[in\, ref],
-			objPass,
-			aafUID_constref,
-			datadef,
-			Data Definition Object,
-
-			[in],
-			objPass,
-			aafLength_t,
-			length,
-			Length property value,
-
-			[in],
-			objIn,
-			AAFOperationDef,
-			operationDef,
-			Operation Definition object,
-
-     Initializes an operation group object with the given property
-  // values.
-  //
-  // This function takes an already created operation definition
-  // object as an argument.  To add slots to the operation group\, call
-  // AddNewSlot.  To add renderings\, call SetRender.)
-
+	[in], objPass, aafUID_t *, pDatadef, Data Definition Object,
+	[in], objPass, aafLength_t, length, Length property value,
+	[in], objIn, AAFOperationDef, operationDef, Operation Definition object,
+	Initializes an operation group object with the given property values.)
+	//@comm  This function takes an already created operation definition object as an argument.
+	//@comm  To add slots to the operation group, call AddNewSlot.
+	//@comm  To add renderings, call SetRender.
 
 AD_XMETHOD1(GetOperationDefinition,
-
-			[out],
-			objOut,
-			AAFOperationDef,
-			ppOperationDef,
-			Operation definition object,
-		   Returns the operation definition for this invocation.
+			[out], objOut, AAFOperationDef, ppOperationDef, Operation definition object,
+		   Returns the operation definition for this invocation.)
   // 
   // Succeeds if all of the following are true:
   // - the ppOperationDef pointer is valid.
@@ -110,16 +72,10 @@ AD_XMETHOD1(GetOperationDefinition,
 
 
 AD_XMETHOD1(GetRender,
-
-			[out],
-			objOut,
-			AAFSourceReference,
-			ppSourceRef,
-			Final rendering segment,
-
-	 Returns the segment that represents the optional rendering on an
-  // operation group object.  Working and final renderings are handled
-  // by using an IAAFEssenceGroup as the segment. 
+			[out], objOut, AAFSourceReference, ppSourceRef, Final rendering segment,
+			Returns the segment that represents the optional rendering on an operation group object.
+  // Working and final renderings are handled by using
+  // an IAAFEssenceGroup as the segment.
   // 
   // Succeeds if all of the following are true:
   // - the ppSourceRef pointer is valid.
@@ -142,16 +98,9 @@ AD_XMETHOD1(GetRender,
   // AAFRESULT_NULL_PARAM
   //   - ppSourceRef arg is NULL.)
 
-
 AD_METHOD1(IsATimeWarp,
-
-		   [out\\\, retval],
-		   aafBool *,
-		   pIsTimeWarp,
-		   Returned boolean value,
-
-	 This boolean function returns whether or not an operation group
-  // is a timewarp effect.
+		   [out\\\,retval], aafBool *, pIsTimeWarp, Returned boolean value,
+		   This boolean function returns whether or not an operation group is a timewarp effect.
   // 
   // Succeeds if all of the following are true:
   // - the pIsTimeWarp pointer is valid.
@@ -171,16 +120,9 @@ AD_METHOD1(IsATimeWarp,
   // AAFRESULT_NULL_PARAM
   //   - pIsTimeWarp arg is NULL.)
 
-
 AD_METHOD1(GetBypassOverride,
-
-		   [out],
-		   aafUInt32 *,
-		   pBypassOverride,
-		   Bypass override property value,
-
-     Returns the optional bypass override propertyvalue from the input
-  // operation def object.
+	[out], aafUInt32 *, pBypassOverride, Bypass override property value,
+	Returns the optional bypass override propertyvalue from the input operation def object.
   // 
   // Succeeds if all of the following are true:
   // - the pBypassOverride pointer is valid.
@@ -203,15 +145,9 @@ AD_METHOD1(GetBypassOverride,
   // AAFRESULT_NULL_PARAM
   //   - pBypassOverride arg is NULL.)
 
-
 AD_METHOD1(GetNumSourceSegments,
-
-		   [out],
-		   aafInt32 *,
-		   pNumSources,
-		   Number of source media segments in the operation group,
-
-     Returns the number of media sources to the operation group.
+	[out], aafInt32 *, pNumSources, Number of source media segments in the operation group,
+	Returns the number of media sources to the operation group.
   //
   // Succeeds if all of the following are true:
   // - the pNumSources pointer is valid.
@@ -228,16 +164,9 @@ AD_METHOD1(GetNumSourceSegments,
   // AAFRESULT_NULL_PARAM
   //   - pNumSources arg is NULL.)
 
-
 AD_METHOD1(IsValidTranOperation,
-
-		   [out],
-		   aafBool *,
-		   pValidTransition,
-		   TRUE if the operation group is valid in a transition,
-
-     Verifies that the input operation group object can be used in a
-  // transition.
+	[out], aafBool *, pValidTransition, TRUE if the operation group is valid in a transition,
+	Verifies that the input operation group object can be used in a transition.
   // 
   // Succeeds if all of the following are true:
   // - the pValidTransition pointer is valid.
@@ -257,15 +186,9 @@ AD_METHOD1(IsValidTranOperation,
   // AAFRESULT_NULL_PARAM
   //   - pValidTransition arg is NULL.)
 
-
 AD_METHOD1(GetNumParameters,
-
-		   [out],
-		   aafInt32 *,
-		   pNumParameters,
-		   Number of parameter slots in the operation group,
-
-     Returns the number of parameters in the operation group.
+	[out], aafInt32 *, pNumParameters, Number of parameter slots in the operation group,
+	Returns the number of parameters in the operation group.
   //
   // Succeeds if all of the following are true:
   // - the pNumParameters pointer is valid.
@@ -284,15 +207,8 @@ AD_METHOD1(GetNumParameters,
 
 
 AD_XMETHOD1(AddNewParameter,
-
-			[in],
-			objIn,
-			AAFParameter,
-			pValue,
-			Parameter to place in operation group slot,
-
-     Adds a new parameter object.
-  //
+	[in], objIn, AAFParameter, pValue, Parameter to place in operation group slot,
+	Adds a new parameter object.
   // Succeeds if all of the following are true:
   // - the pValue pointer is valid.
   // 
@@ -309,16 +225,9 @@ AD_XMETHOD1(AddNewParameter,
   // AAFRESULT_NULL_PARAM
   //   - pValue arg is NULL.)
 
-
 AD_XMETHOD1(AppendNewInputSegment,
-
-			[in],
-			objIn,
-			AAFSegment,
-			pSegment,
-			Segment to place in operation group,
-
-     Appends another input segment to an operation group.
+	[in], objIn, AAFSegment, pSegment, Segment to place in operation group,
+	Appends another input segment to an operation group.
   // 
   // Succeeds if all of the following are true:
   // - the pSegment pointer is valid.
@@ -336,19 +245,11 @@ AD_XMETHOD1(AppendNewInputSegment,
   // AAFRESULT_NULL_PARAM
   //   - pSegment arg is NULL.)
 
-
 AD_XMETHOD1(SetRender,
-
-			[in],
-			objIn,
-			AAFSourceReference,
-			ppSourceRef,
-			A segment containing a representation of the rendering,
-
-     This function sets the final rendering for the given operation
-  // group to the input source clip.  Multiple renderings may exist if
-  // the source clip refers to a master mob that contains a Essence
-  // group.)
+	[in], objIn, AAFSourceReference, ppSourceRef, A segment containing a representation of the rendering,
+	This function sets the final rendering for the given operation group
+	//    to the input source clip.  Multiple renderings may exist if the
+	//    source clip refers to a master mob that contains a Essence group.)
   // 
   // Succeeds if all of the following are true:
   // - the ppSourceRef pointer is valid.
@@ -366,44 +267,24 @@ AD_XMETHOD1(SetRender,
   // AAFRESULT_NULL_PARAM
   //   - ppSourceRef arg is NULL.)
 
-
 AD_METHOD1(SetBypassOverride,
-
-		   [in],
-		   aafUInt32,
-		   bypassOverride,
-		   Bypass override,
-
-     This function sets the optional bypass override property on the
-  // given operation group object.
+	[in], aafUInt32, bypassOverride, Bypass override,
+	This function sets the optional bypass override property on the given operation group object.)
   // 
   // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\\\, it will return the first one
+  // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \\\(This is the only code indicating success.\\\)
+  //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize\\\(\\\) called on it.)
-
+  //   - This object has not yet had Initialize\(\) called on it.)
 
 AD_XMETHOD2(GetParameterByArgID,
-
-			[in],
-			objPass,
-			aafArgIDType_t,
-			argID,
-			Arg ID,
-
-			[out],
-			objOut,
-			AAFParameter,
-			ppParameter,
-			Parameter object,
-
-	 Given an argID\, returns the corresponding parameter slot and
-  // parameter slot value.
+		   [in], objPass, aafArgIDType_t, argID, Arg ID,
+		   [out], objOut, AAFParameter, ppParameter, Parameter object,
+		   Given an argID\, returns the corresponding parameter slot and parameter slot value.
   // 
   // Succeeds if all of the following are true:
   // - the ppParameter pointer is valid.
@@ -425,22 +306,11 @@ AD_XMETHOD2(GetParameterByArgID,
 
 
 AD_XMETHOD2(GetIndexedInputSegment,
-
-			[in],
-			objPass,
-			aafInt32,
-			index,
-			1-based index into the effet inputs,
-
-			[out],
-			objOut,
-			AAFSegment,
-			ppInputSegment,
-			Input segment,
-
-     Given an index\, returns the corresponding input segment.
-  // Working and final renderings are handled by using an
-  // IAAFEssenceGroup as the segment.
+		   [in], objPass, aafInt32, index, 1-based index into the effet inputs,
+		   [out], objOut, AAFSegment, ppInputSegment, Input segment,
+		   Given an index\, returns the corresponding input segment.
+  // Working and final renderings are handled by using
+  // an IAAFEssenceGroup as the segment.
   // 
   // Succeeds if all of the following are true:
   // - the ppInputSegment pointer is valid.
@@ -459,4 +329,5 @@ AD_XMETHOD2(GetIndexedInputSegment,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppInputSegment arg is NULL.)
+
 AD_XCLASS_END(Concrete, StoredObject)

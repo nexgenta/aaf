@@ -8,6 +8,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -19,13 +20,7 @@
 #include "ImplAAFTimelineMobSlot.h"
 #endif
 
-#ifndef __ImplAAFTaggedValue_h__
-#include "ImplAAFTaggedValue.h"
-#endif
 
-#ifndef __ImplEnumAAFTaggedValues_h__
-#include "ImplEnumAAFTaggedValues.h"
-#endif
 
 class ImplAAFSegment;
 
@@ -35,13 +30,14 @@ class ImplAAFFile;
 
 class ImplEnumAAFMobSlots;
 
-class ImplEnumAAFTaggedValues;
+class ImplEnumAAFMobComments;
 
 class ImplAAFFindSourceInfo;
 
 class ImplAAFScopeStack;
 
 class ImplAAFOperationGroup;
+
 
 
 
@@ -60,6 +56,15 @@ public:
   //********
   ImplAAFMob ();
   ~ImplAAFMob ();
+
+  OMDECLARE_STORABLE(ImplAAFMob)
+
+  //****************
+  // IsAPrimaryMob()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsAPrimaryMob
+        (aafBool *  retval);  //@parm [retval][out] Set to true if this is a primary mob
 
 
   //****************
@@ -130,12 +135,33 @@ public:
     GetNumSlots
         (aafNumSlots_t *  numSlots);  //@parm [out] Number of slots
 
+
+
+  //****************
+  // SetNewProps()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetNewProps
+        (aafBool  isMasterMob,   //@parm [in] Whether or not this is a Master Mob
+		 aafWChar *  name,   //@parm [in,ref] Mob Name (optional)
+         aafBool  isPrimary);  //@parm [in] Whether or not this is a primary mob
+
+
   //****************
   // SetModTime()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetModTime
         (aafTimeStamp_t *  modTime);  //@parm [in, ref] New Modification Time
+
+
+  //****************
+  // SetPrimary()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetPrimary
+        (aafBool  isPrimary);  //@parm [in] Whether or not the mob is a primary mob
+
 
   //****************
   // SetIdentity()
@@ -210,7 +236,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetNumComments
-        (aafUInt32 *  pNumComments);  //@parm [out,retval] Number  of Mob Comments
+        (aafUInt32 *  pEnum);  //@parm [out,retval] Number  of Mob Comments
 
 
   //****************
@@ -218,7 +244,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     EnumAAFAllMobComments
-        (ImplEnumAAFTaggedValues ** ppEnum);  //@parm [out,retval] Mob Comments
+        (ImplEnumAAFMobComments ** ppEnum);  //@parm [out,retval] Mob Comments
 
 
 
@@ -298,10 +324,19 @@ public:
          ImplAAFFile * destFile,   //@parm [in] Destination AAF File
 		 ImplAAFMob ** destMob);  //@parm [out] Destination Mob
 
+
+  // Override from AAFObject
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Delete ();
+
   // @commDeletes the entire Mob structure \(the MOBJ object and all its contained objects\)
   // and deletes the entry from the Header.
 
 public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFMobTest.cpp.
+  static AAFRESULT test();
+
 	// Interfaces visible inside the toolkit, but not exposed through the API
 AAFRESULT
     GetNthMobSlot (aafInt32 index /* 0-based*/, ImplAAFMobSlot **ppMobSlot);
@@ -377,7 +412,6 @@ virtual AAFRESULT STDMETHODCALLTYPE
 	OMFixedSizeProperty<aafTimeStamp_t>	_lastModified;
 	private:
     OMStrongReferenceVectorProperty<ImplAAFMobSlot> _slots;
-    OMStrongReferenceVectorProperty<ImplAAFTaggedValue> _userComments;
 };
 
 #endif // ! __ImplAAFMob_h__

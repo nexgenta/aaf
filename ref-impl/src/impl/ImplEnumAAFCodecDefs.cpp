@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 
 #ifndef __ImplAAFCodecDef_h__
@@ -83,8 +65,7 @@ AAFRESULT STDMETHODCALLTYPE
 		_enumStrongProp->getSize(siz);
 		numElem = siz;
 	}
-	else
-		return(AAFRESULT_INCONSISTANCY);
+	//!!!Else assert
 
 	if(ppCodecDef == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -97,7 +78,7 @@ AAFRESULT STDMETHODCALLTYPE
 			_enumProp->getValueAt(&value, _current);
 			CHECK(_enumObj->MyHeadObject(&head));
 			CHECK(head->GetDictionary (&dict));
-			CHECK(dict->LookupCodecDefinition(value, ppCodecDef));
+			CHECK(dict->LookupCodecDefinition(&value, ppCodecDef));
 			head->ReleaseReference();
 			head = NULL;
 			dict->ReleaseReference();
@@ -105,8 +86,7 @@ AAFRESULT STDMETHODCALLTYPE
 		}
 		else if(_enumStrongProp != NULL)
 			_enumStrongProp->getValueAt(*ppCodecDef, _current);
-		else
-			RAISE(AAFRESULT_INCONSISTANCY);
+		//!!!Else assert
 		(*ppCodecDef)->AcquireReference();
 		_current++;
 		if (head) {
@@ -121,11 +101,9 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(head)
-		  head->ReleaseReference();
-		head = 0;
+			head->ReleaseReference();
 		if(dict)
-		  dict->ReleaseReference();
-		dict = 0;
+			dict->ReleaseReference();
 	}
 	XEND;
 
@@ -184,8 +162,7 @@ AAFRESULT STDMETHODCALLTYPE
 		_enumStrongProp->getSize(siz);
 		numElem = siz;
 	}
-	else
-		return(AAFRESULT_INCONSISTANCY);
+	//!!!Else assert
 
 	newCurrent = _current + count;
 
@@ -226,9 +203,7 @@ AAFRESULT STDMETHODCALLTYPE
 		hr = result->SetEnumProperty(_enumObj, _enumProp);
 	else if(_enumStrongProp != NULL)
 		hr = result->SetEnumStrongProperty(_enumObj, _enumStrongProp);
-	else
-		return(AAFRESULT_INCONSISTANCY);
-
+	// !!!Else assert
 	if (SUCCEEDED(hr))
 	{
 		result->_current = _current;
@@ -236,9 +211,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = NULL;
+		result->ReleaseReference();
+		*ppEnum = NULL;
 	}
 	
 	return hr;
@@ -248,8 +222,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFCodecDefs::SetEnumProperty( ImplAAFObject *pObj, codecDefWeakRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-	  _enumObj->ReleaseReference();
-	_enumObj = 0;
+		_enumObj->ReleaseReference();
 	_enumObj = pObj;
 
 	if (pObj)
@@ -266,8 +239,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFCodecDefs::SetEnumStrongProperty( ImplAAFObject *pObj, codecDefStrongRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-	  _enumObj->ReleaseReference();
-	_enumObj = 0;
+		_enumObj->ReleaseReference();
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
