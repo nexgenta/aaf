@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxObject.h,v 1.7 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxObject.h,v 1.8 2004/04/10 14:22:54 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,6 +40,8 @@ public:
 	IAAFDictionarySP GetDictionary();
 
 	IEnumAAFPropertiesSP GetProperties();
+
+	IAAFClassDefSP GetDefinition();
 
 	inline operator IAAFObjectSP ()
 	{ return _spIaafObject; }
