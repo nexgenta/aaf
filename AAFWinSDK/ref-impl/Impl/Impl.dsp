@@ -95,10 +95,6 @@ SOURCE="..\..\..\ref-impl\src\impl\aafErr.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\plugins\AAFPluginManager.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\aafTable.cpp"
 # End Source File
 # Begin Source File
@@ -116,6 +112,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFAIFCDescriptor.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBaseClassFactory.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltins.cpp"
 # End Source File
 # Begin Source File
 
@@ -359,6 +359,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPropertyValue.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPropValData.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPulldown.cpp"
 # End Source File
 # Begin Source File
@@ -456,6 +460,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTransition.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDef.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefArray.cpp"
 # End Source File
 # Begin Source File
 
