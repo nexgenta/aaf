@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.61 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.61.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,7 +60,6 @@
 #include "ImplAAFEssenceData.h"
 #endif
 
-#include "ImplAAFCloneResolver.h"
 #include "ImplEnumAAFPropertyValues.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -1077,12 +1076,3 @@ ImplAAFTypeDefVariableArray::InsertElement(
 	return AAFRESULT_SUCCESS;
 }
 	
-void ImplAAFTypeDefVariableArray::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDefArray::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_ElementType);
-  }
-}

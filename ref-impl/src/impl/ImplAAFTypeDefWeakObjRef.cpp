@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.38 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.38.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,6 @@
 #include "AAFClassDefUIDs.h"
 #endif
 
-#include "ImplAAFCloneResolver.h"
 #include "ImplAAFDictionary.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyDefs.h"
@@ -807,14 +806,3 @@ HRESULT ImplAAFTypeDefWeakObjRef::CompleteClassRegistration(void)
 
   return rc;
 }
-
-void ImplAAFTypeDefWeakObjRef::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDefObjectRef::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_referencedType);
-  }
-}
-

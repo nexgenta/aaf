@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFileDescriptor.cpp,v 1.30 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFileDescriptor.cpp,v 1.30.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,6 @@
 #include "ImplAAFFileDescriptor.h"
 #endif
 
-#include "ImplAAFCloneResolver.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -173,13 +172,3 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-void ImplAAFFileDescriptor::onCopy(void* clientContext) const
-{
-  ImplAAFEssenceDescriptor::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_codecDef);
-    pResolver->ResolveWeakReference(_containerFmt);
-  }
-}

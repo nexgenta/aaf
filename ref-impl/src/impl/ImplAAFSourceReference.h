@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.h,v 1.23.2.2 2004/05/03 01:16:19 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.h,v 1.23.2.3 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -150,8 +150,6 @@ public:
 
 	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
 												aafMobID_constref to);
-	// OM deep copy notification
-	virtual void onCopy(void* clientContext) const;
 
 private:
 	OMFixedSizeProperty<aafMobID_t>	_sourceID;

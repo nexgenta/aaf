@@ -18,7 +18,7 @@ class ImplAAFTaggedValue;
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFComponent.h,v 1.32.2.4 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
+// $Id: ImplAAFComponent.h,v 1.32.2.5 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -284,9 +284,6 @@ public:
 	// with the specified visitor.
 	virtual void Accept(AAFComponentVisitor& visitor);
 
-
-  // OM deep copy notification
-  virtual void onCopy(void* clientContext) const;
 
 private:
 	OMWeakReferenceProperty<ImplAAFDataDef>		_dataDef;

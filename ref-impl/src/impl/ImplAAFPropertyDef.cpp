@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.cpp,v 1.34.2.1 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.cpp,v 1.34.2.2 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,7 +43,6 @@
 #include "ImplAAFPropertyDef.h"
 #endif
 
-#include "ImplAAFCloneResolver.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "AAFTypeDefUIDs.h"
@@ -426,16 +425,6 @@ void ImplAAFPropertyDef::onRestore(void* clientContext) const
 #undef AAF_BEGIN_TYPE_PATCHES
 #undef AAF_PATCH_PROPETY_TYPE
 #undef AAF_END_TYPE_PATCHES
-
-void ImplAAFPropertyDef::onCopy(void *clientContext) const
-{
-  ImplAAFMetaDefinition::onCopy(clientContext);
-
-  if (clientContext) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->AddTypeReference( _Type );
-  }
-}
 
 // Method is called after class has been added to MetaDictionary.
 // If this method fails the class is removed from the MetaDictionary and the

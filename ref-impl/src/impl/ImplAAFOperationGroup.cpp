@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOperationGroup.cpp,v 1.58.2.1 2004/07/23 16:16:05 akharkev Exp $ $Name:  $
+// $Id: ImplAAFOperationGroup.cpp,v 1.58.2.2 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,7 +64,6 @@
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
 #include "ImplEnumAAFParameters.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -651,13 +650,3 @@ void ImplAAFOperationGroup::Accept(AAFComponentVisitor& visitor)
 	// visitor.VisitOperationGroup(this);
 }
 
-
-void ImplAAFOperationGroup::onCopy( void* clientContext ) const
-{
-  ImplAAFSegment::onCopy(clientContext);
-
-  if (clientContext) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_operationDefinition);
-  }
-}

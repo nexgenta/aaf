@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFParameterDef.h,v 1.17 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFParameterDef.h,v 1.17.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -111,9 +111,6 @@ public:
     SetDisplayUnits
         // @parm [in, string] DisplayUnits
         (const aafCharacter *  pDisplayUnits);
-
-  // OM deep copy notification
-  virtual void onCopy(void* clientContext) const;
 
 private:
 	OMWeakReferenceProperty<ImplAAFTypeDef>					_typeDef;

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArray.h,v 1.33 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArray.h,v 1.33.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -191,7 +191,6 @@ public:
 	  ImplAAFPropertyValue * pMemberPropVal);
   
   /////////////////////////////////////////////////////////
-
   
 protected:
 	// overrides from ImplAAFTypeDefArray ...
@@ -242,7 +241,6 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
-  virtual void onCopy(void* clientContext) const;
 
 private:
    OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFParameterDef.cpp,v 1.24 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFParameterDef.cpp,v 1.24.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,6 @@
 #endif
 
 #include "ImplAAFDictionary.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -165,12 +164,3 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-void ImplAAFParameterDef::onCopy(void* clientContext) const
-{
-  ImplAAFDefObject::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_typeDef);
-  }
-}

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.cpp,v 1.25.2.3 2004/05/11 02:16:40 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.cpp,v 1.25.2.4 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,6 @@
 #include "ImplAAFSourceReference.h"
 #endif
 
-#include "ImplAAFCloneResolver.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -239,12 +238,5 @@ AAFRESULT ImplAAFSourceReference::ChangeContainedReferences(aafMobID_constref fr
 	return AAFRESULT_SUCCESS;
 }
 
-void ImplAAFSourceReference::onCopy(void* clientContext) const
-{
-   ImplAAFSegment::onCopy(clientContext);
-  
-	if (clientContext) {
-		 ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-		 pResolver->AddSourceReference(_sourceID);
-	}
-}
+
+

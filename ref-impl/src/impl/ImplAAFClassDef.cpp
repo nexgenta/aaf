@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.cpp,v 1.58.2.1 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
+// $Id: ImplAAFClassDef.cpp,v 1.58.2.2 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,7 +62,6 @@ typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFBuiltinDefs.h"
-#include "ImplAAFCloneResolver.h"
 #include "AAFUtils.h"
 
 #include <assert.h>
@@ -1003,16 +1002,6 @@ HRESULT ImplAAFClassDef::CompleteClassRegistration(void)
 	}
 
   return result;
-}
-
-void ImplAAFClassDef::onCopy(void* clientContext) const
-{
-  ImplAAFMetaDefinition::onCopy(clientContext);
-  
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_ParentClass);
-  }
 }
 
 AAFRESULT ImplAAFClassDef::MergeTo(
