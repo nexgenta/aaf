@@ -252,9 +252,13 @@ bool OMStrongReferenceProperty<ReferencedObject>::isVoid(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::isVoid");
 
-  bool result = false;
+  bool result;
 
-  ASSERT("Unimplemented code not reached", false);
+  if (_reference.getValue() == 0) {
+    result = true;
+  } else {
+    result = false;
+  }
 
   return result;
 }
@@ -269,7 +273,7 @@ void OMStrongReferenceProperty<ReferencedObject>::remove(void)
   TRACE("OMStrongReferenceProperty<ReferencedObject>::remove");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
-  PRECONDITION("Property is void", _reference.getValue() == 0);
+  PRECONDITION("Property is void", isVoid());
   clearPresent();
   POSTCONDITION("Optional property no longer present", !isPresent());
 }
@@ -280,11 +284,12 @@ void OMStrongReferenceProperty<ReferencedObject>::remove(void)
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm The size of the buffer.
+  //   @parm size_t | size | The size of the buffer.
   //   @this const
 template<typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::getBits(OMByte* bits,
-                                                          size_t size) const
+void OMStrongReferenceProperty<ReferencedObject>::getBits(
+                                                      OMByte* bits,
+                                                      size_t ANAME(size)) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
   PRECONDITION("Optional property is present",
@@ -304,10 +309,10 @@ void OMStrongReferenceProperty<ReferencedObject>::getBits(OMByte* bits,
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm The size of the buffer.
+  //   @parm size_t | size | The size of the buffer.
 template<typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
-                                                    size_t size)
+                                                          size_t ANAME(size))
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
   PRECONDITION("Valid bits", bits != 0);
@@ -315,6 +320,25 @@ void OMStrongReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
 
   const ReferencedObject* p = *(const ReferencedObject**)bits;
   setValue(p);
+}
+
+  // @mfunc The value of this <c OMStrongReferenceProperty>
+  //        as an <c OMStorable>.
+  //   @rdesc The <c OMStorable> represented by this
+  //          <c OMStrongReferenceProperty>
+  //   @this const
+template<typename ReferencedObject>
+OMStorable* OMStrongReferenceProperty<ReferencedObject>::storable(void) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::storable");
+
+  ReferencedObject* pointer;
+  getValue(pointer);
+  OMStorable* result = 0;
+  if (pointer != 0) {
+    result = dynamic_cast<OMStorable*>(pointer);
+  }
+  return result;
 }
 
 #endif
