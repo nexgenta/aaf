@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <iostream.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -39,8 +40,6 @@
 #include "AAFContainerDefs.h"
 
 #include "CAAFBuiltinDefs.h"
-
-static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
