@@ -1,3 +1,5 @@
+#ifndef _OMF2AAF_
+#define _OMF2AAF_ 1
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -24,6 +26,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+#include "EffectTranslate.h"
 
 /************************************************************************
  *
@@ -54,7 +57,7 @@ public:
 	void ConvertOMFDataDefinitionObject( OMF2::omfObject_t obj);
 	void ConvertOMFClassDictionaryObject( OMF2::omfObject_t obj);
 	void ConvertOMFMediaDataObject( OMF2::omfObject_t obj, OMF2::omfUID_t inMediaID);
-	void ConvertOMFDatakind(OMF2::omfDDefObj_t datakind, aafUID_t* pDatadef);
+	virtual void ConvertOMFDatakind(OMF2::omfDDefObj_t datakind, aafUID_t* pDatadef);
 //	HRESULT ConvertUniqueNameToAUID(OMF2::omfUniqueName_t datakindName, aafUID_t* pDatadef);
 	void ConvertOMFMOBObject( OMF2::omfObject_t obj, IAAFMob* pMob );
 	void ConvertOMFCompositionObject( OMF2::omfObject_t obj,IAAFCompositionMob* pCompMob );
@@ -70,7 +73,7 @@ public:
 	void ConvertOMFSelector(OMF2::omfObject_t selector, IAAFSelector* pSelector);
 	void ConvertOMFLocator(OMF2::omfObject_t locator, IAAFEssenceDescriptor* pEssenceDesc);
 	HRESULT ConvertOMFCDCIDescriptorLocator(OMF2::omfObject_t mediaDescriptor, IAAFCDCIDescriptor* pAAFDescriptor);
-	HRESULT ConvertOMFEffects(OMF2::omfEffObj_t effect, IAAFOperationGroup* pEffect);
+	virtual HRESULT ConvertOMFEffects(OMF2::omfEffObj_t effect, IAAFOperationGroup* pEffect);
 	HRESULT ConvertOMFEffectDefinition(OMF2::omfDDefObj_t effectDef, OMF2::omfObject_t effect, IAAFOperationDef** ppEffectDef);
 	HRESULT GetAAFOperationDefinition(OMF2::omfUniqueName_t datakindName, OMF2::omfUniqueName_t MCEffectID,
 										char* defName, char* defDescription, aafUInt32 bypassOverride, aafBool isTimeWarp,
@@ -78,11 +81,10 @@ public:
 	HRESULT GetParameterDefinition(aafUID_t* pDefUID, IAAFTypeDef* pTypeDef,	aafWChar* pwName, aafWChar* pwDesc, aafWChar* pwDisplayUnits, IAAFParameterDef** ppParameterDef);
 	HRESULT	ConvertOMFConstValue(OMF2::omfSegObj_t segment, IAAFConstantValue* pConstValue);
 	HRESULT	ConvertOMFVaryingValue(OMF2::omfSegObj_t segment, IAAFVaryingValue* pVaryingValue);
-	HRESULT	ConvertMCSpecialVaryingValue(OMF2::omfSegObj_t segment, aafUID_t AAFEffectID, IAAFOperationGroup* pEffect);
 	void	ConvertOMFNestedScope(OMF2::omfSegObj_t segment, IAAFNestedScope* pNestedScope);
 	HRESULT	ConvertOMFScopeRef(OMF2::omfSegObj_t segment, IAAFScopeReference* pScopeRef);
 
-private:
+protected:
 
     OMF2::omfSessionHdl_t	OMFSession;
 	OMF2::omfHdl_t			OMFFileHdl;
@@ -91,4 +93,10 @@ private:
 	IAAFFile*				pFile;
 	IAAFHeader*				pHeader;
 	IAAFDictionary*			pDictionary;
+
+	AAFDomainUtils			*pAAF;
+	OMFDomainUtils			*pOMF;
+	EffectTranslate			*pEffectTranslate;
 };
+
+#endif
