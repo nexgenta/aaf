@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 /*************************************************************************
  * 
@@ -57,6 +52,9 @@
 #ifndef __ImplEnumAAFPropertyDefs_h__
 #include "ImplEnumAAFPropertyDefs.h"
 #endif
+
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 
 //#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -265,18 +263,75 @@ ImplAAFMetaDefinition::GetDictionary(ImplAAFDictionary **ppDictionary) const
 }
 
 
+ImplAAFTypeDef*
+ImplAAFMetaDefinition::bootstrapTypeWeakReference(
+                const OMWeakReferenceProperty<ImplAAFTypeDef>& reference) const
+{
+  ImplAAFTypeDef* result = 0;
+  if (reference.isResolved() || reference.isResolvable()) {
+    result = reference;
+  } else {
+    const aafUID_t id = *reinterpret_cast<const aafUID_t*>(&reference.identification());
+
+    ImplAAFDictionary* pDictionary = 0;
+    HRESULT h = GetDictionary(&pDictionary);
+    assert(h == 0);
+    h = pDictionary->LookupTypeDef(id, &result);
+    assert(h == 0);
+    pDictionary->ReleaseReference();
+  }
+  assert(result);
+  return result;
+}
+
+ImplAAFTypeDef*
+ImplAAFMetaDefinition::bootstrapTypeWeakReferenceVectorElement(
+                   const OMWeakReferenceVectorProperty<ImplAAFTypeDef>& vector,
+                   aafUInt32 index) const
+{
+  ImplAAFTypeDef* result = 0;
+  if (vector.isResolved(index) || vector.isResolvable(index)) {
+    vector.getValueAt(result, index);
+  } else {
+    const aafUID_t id = *reinterpret_cast<const aafUID_t*>(&vector.identification(index));
+
+    ImplAAFDictionary* pDictionary = 0;
+    HRESULT h = GetDictionary(&pDictionary);
+    assert(h == 0);
+    h = pDictionary->LookupTypeDef(id, &result);
+    assert(h == 0);
+    pDictionary->ReleaseReference();
+  }
+  assert(result);
+  return result;
+}
+
+ImplAAFClassDef*
+ImplAAFMetaDefinition::bootstrapClassWeakReference(
+               const OMWeakReferenceProperty<ImplAAFClassDef>& reference) const
+{
+  ImplAAFClassDef* result = 0;
+  if (reference.isResolved() || reference.isResolvable()) {
+    result = reference;
+  } else {
+    const aafUID_t id = *reinterpret_cast<const aafUID_t*>(&reference.identification());
+
+    ImplAAFDictionary* pDictionary = 0;
+    HRESULT h = GetDictionary(&pDictionary);
+    assert(h == 0);
+    h = pDictionary->LookupClassDef(id, &result);
+    assert(h == 0);
+    pDictionary->ReleaseReference();
+  }
+  assert(result);
+  return result;
+}
 
 // Associate the existing OMProperties with corresponding property definitions from
 // the given class definition. NOTE: This call is recursive, it calls itself again
 // for the parent class of the given class until current class is a "root" class.
 void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
 {
-#if 0
-  // Since ImplAAFMetaDefinition is still a subclass of ImplAAFObject we
-  // should just delegate property initialization:
-  ImplAAFObject::InitOMProperties(pClassDef);
-#else //#if 0
-
   assert (pClassDef);
   AAFRESULT hr;
 
@@ -322,18 +377,6 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
       && (defPid != PID_InterchangeObject_Generation))
     {
       assert (0);
-#if 0
-      // Defined property wasn't found in OM property set.
-      // We'll have to install one.
-      pProp = propDefSP->CreateOMProperty ();
-      assert (pProp);
-      
-      // Remember this property so we can delete it later.
-      RememberAddedProp (pProp);
-      
-      // Add the property to the property set.
-      ps->put (pProp);
-#endif
     }
     
   if(defPid != PID_InterchangeObject_ObjClass
@@ -354,7 +397,6 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
     propDefSP = 0;
     pProp = 0;
   }
-#endif // #else // #if 0
 }
 
 const OMUniqueObjectIdentification&
@@ -401,3 +443,31 @@ void ImplAAFMetaDefinition::onRestore(void* /*clientContext*/) const
   // Cast away constness (maintaining logical constness)
   ((ImplAAFMetaDefinition*) this)->setInitialized ();
 }
+
+
+// Overrides of ImplAAFStorable.
+// Return true if this is a meta object
+// NOTE: These objects will eventually owned by the Object Manager.
+bool ImplAAFMetaDefinition::metaObject(void) const
+{
+  return true;
+}
+
+// Return true is this is a data object (Interchange object).
+bool ImplAAFMetaDefinition::dataObject(void) const
+{
+  return false;
+}
+
+
+// Method is called after associated class has been added to MetaDictionary.
+// If this method fails the class is removed from the MetaDictionary and the
+// registration method will fail.
+HRESULT ImplAAFMetaDefinition::CompleteClassRegistration(void)
+{
+  // Default implementation just returns success.
+  return AAFRESULT_SUCCESS;
+}
+
+
+
