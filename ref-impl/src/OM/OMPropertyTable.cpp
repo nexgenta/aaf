@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertyTable.cpp,v 1.10 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMPropertyTable.cpp,v 1.11 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -61,7 +61,7 @@ OMPropertyTag OMPropertyTable::insert(const OMPropertyId* propertyPath)
 
   PRECONDITION("Valid property path", validPropertyPath(propertyPath));
 
-  OMPropertyTag result;
+  OMPropertyTag result = nullOMPropertyTag;
   bool found = false;
   size_t elements = _vector.count();
   for (size_t i = 0; i < elements; i++) {

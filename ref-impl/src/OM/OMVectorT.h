@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMVectorT.h,v 1.16 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMVectorT.h,v 1.17 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -473,7 +473,7 @@ size_t OMVector<Element>::indexOfValue(const Element value) const
 
   PRECONDITION("Value is present", containsValue(value));
 
-  size_t result;
+  size_t result = 0;
 
   for (size_t i = 0; i < _count; i++) {
     if (_vector[i] == value) {

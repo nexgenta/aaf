@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStructuredStorage.cpp,v 1.7 2004/11/05 09:58:13 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStructuredStorage.cpp,v 1.8 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -184,7 +184,7 @@ OMSSIStorage::StgOpenStorageEx( const TCHAR FAR* in_filename,
 	StgMode openMode;
   	if (in_accessMode == OMFile::modifyMode) {
     	openMode = STG_RW;
-  	} else if (in_accessMode == OMFile::readOnlyMode) {
+  	} else {
     	openMode = STG_READ;
   	}
 	RootStorage* rootstorage = 0;
@@ -256,7 +256,7 @@ OMSSIStorage::StgOpenStorageInOMRawStorage(
 	StgMode openMode;
   	if (in_accessMode == OMFile::modifyMode) {
     	openMode = STG_RW;
-  	} else if (in_accessMode == OMFile::readOnlyMode) {
+  	} else {
     	openMode = STG_READ;
   	}
 	RootStorage* rootstorage = 0;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.4 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
+// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.5 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -100,7 +100,7 @@ OMMS_SSStoredObjectFactory::openFile (OMRawStorage* rawStorage,
   DWORD openMode;
   if (mode == OMFile::modifyMode) {
     openMode = STGM_DIRECT | STGM_READWRITE | STGM_SHARE_EXCLUSIVE;
-  } else if (mode == OMFile::readOnlyMode) {
+  } else {
     openMode = STGM_DIRECT | STGM_READ      | STGM_SHARE_DENY_WRITE;
   }
 
@@ -217,7 +217,7 @@ OMMS_SSStoredObjectFactory::openFile (const wchar_t* fileName,
   DWORD openMode;
   if (mode == OMFile::modifyMode) {
     openMode = STGM_DIRECT | STGM_READWRITE | STGM_SHARE_EXCLUSIVE;
-  } else if (mode == OMFile::readOnlyMode) {
+  } else {
     openMode = STGM_DIRECT | STGM_READ      | STGM_SHARE_DENY_WRITE;
   }
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertySet.cpp,v 1.32 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMPropertySet.cpp,v 1.33 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,7 +59,10 @@ OMProperty* OMPropertySet::get(const OMPropertyId propertyId) const
   PRECONDITION("Property is allowed", isAllowed(propertyId));
   PRECONDITION("Property is present", isPresent(propertyId));
 
+#if defined(OM_DEBUG)
   bool status = _set.find(propertyId, result);
+#endif
+  _set.find(propertyId, result);
   ASSERT("Property found", status);
   POSTCONDITION("Valid result", result != 0);
   return result;
