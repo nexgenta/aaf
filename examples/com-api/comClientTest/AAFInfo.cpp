@@ -1,45 +1,40 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include "AAFTypes.h"
-
-#if defined(_MAC) || defined(macintosh)
-#include <initguid.h> // define all of the AAF guids.
-#include "AAF.h"
-#else
+// Include the AAF interface declarations.
 #include "AAF.h"
 
-// TODO: This should not be here, I added them for now to get a good link.
-// const CLSID CLSID_AAFSession = { 0xF0C10891, 0x3073, 0x11d2, { 0x80, 0x4A, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
-const CLSID CLSID_AAFFile = { 0x9346ACD2, 0x2713, 0x11d2, { 0x80, 0x35, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
-
+#if defined(macintosh) || defined(_MAC)
+#include <console.h> /* Mac command line window */
 #endif
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
@@ -147,90 +142,45 @@ static void printIdentification(IAAFIdentification* pIdent)
 static void ReadAAFFile(aafWChar * pFileName)
 {
   HRESULT hr = S_OK;
-  // IAAFSession * pSession = NULL;
   IAAFFile * pFile = NULL;
 
-  /*
-  hr = CoCreateInstance(CLSID_AAFSession,
-                        NULL, 
-                        CLSCTX_INPROC_SERVER, 
-                        IID_IAAFSession, 
-                        (void **)&pSession);
-  */
-  hr = CoCreateInstance(CLSID_AAFFile,
-                        NULL, 
-                        CLSCTX_INPROC_SERVER, 
-                        IID_IAAFFile, 
-                        (void **)&pFile);
+
+  hr = AAFFileOpenExistingRead (pFileName, 0, &pFile);
   check(hr); // display error message
   if (SUCCEEDED(hr))
   {
-    aafProductIdentification_t	ProductInfo;
+    IAAFHeader * pHeader = NULL;
 
-
-    ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-    ProductInfo.productName = L"Make AVR Example. NOT!";
-    ProductInfo.productVersion.major = 1;
-    ProductInfo.productVersion.minor = 0;
-    ProductInfo.productVersion.tertiary = 0;
-    ProductInfo.productVersion.patchLevel = 0;
-    ProductInfo.productVersion.type = kVersionUnknown;
-    ProductInfo.productVersionString = NULL;
-    ProductInfo.productID = -1;
-    ProductInfo.platform = NULL;
-
-    // hr = pSession->SetDefaultIdentification(&ProductInfo);
-    // check(hr); // display error message
+    hr = pFile->GetHeader(&pHeader);
+    check(hr); // display error message
     if (SUCCEEDED(hr))
     {
-      // IAAFFile * pFile = NULL;
-      
-      // hr = pSession->OpenReadFile(pFileName, &pFile);
-      hr = pFile->Initialize();
-      check(hr); // display error message
-      hr = pFile->OpenExistingRead(pFileName, 0);
+      IAAFIdentification *    pIdent = NULL;
+
+      hr = pHeader->GetLastIdentification(&pIdent);
       check(hr); // display error message
       if (SUCCEEDED(hr))
       {
-        IAAFHeader * pHeader = NULL;
+        fprintf(stdout, "LastIdentification\n");
+        printIdentification(pIdent);
 
-        hr = pFile->GetHeader(&pHeader);
-        check(hr); // display error message
-        if (SUCCEEDED(hr))
-        {
-          IAAFIdentification *    pIdent = NULL;
+        pIdent->Release();
+        pIdent = NULL;
 
-          hr = pHeader->GetLastIdentification(&pIdent);
-          check(hr); // display error message
-          if (SUCCEEDED(hr))
-          {
-            fprintf(stdout, "LastIdentification\n");
-            printIdentification(pIdent);
-
-            pIdent->Release();
-            pIdent = NULL;
-
-            aafNumSlots_t n;
-            hr = pHeader->GetNumMobs(kAllMob, &n);
-            check(hr);
-            printf("Number of Mobs       = %d\n", n);
-          }
-          pHeader->Release();
-          pHeader = NULL;
-        }
-        
-        hr = pFile->Close();
+        aafNumSlots_t n;
+        hr = pHeader->GetNumMobs(kAllMob, &n);
         check(hr);
-
-        pFile->Release();
-        pFile = NULL;
+        printf("Number of Mobs       = %d\n", n);
       }
+      pHeader->Release();
+      pHeader = NULL;
     }
 
-    // pSession->EndSession(); // obsolete!
+    hr = pFile->Close();
+    check(hr);
 
-    // pSession->Release();
-    // pSession = NULL;
+    pFile->Release();
+    pFile = NULL;
   }
 }
 
@@ -248,8 +198,32 @@ struct CComInitialize
   }
 };
 
+// simple helper class to initialize and cleanup AAF library.
+struct CAAFInitialize
+{
+  CAAFInitialize(const char *dllname = NULL)
+  {
+  	printf("Attempting to load the AAF dll...\n");
+    check(AAFLoad(dllname));
+    printf("DONE\n");
+  }
+
+  ~CAAFInitialize()
+  {
+    AAFUnload();
+  }
+};
+
+
+
 int main(int argumentCount, char* argumentVector[])
 {
+  /* console window for mac */
+
+  #if defined(macintosh) || defined(_MAC)
+  argumentCount = ccommand(&argumentVector);
+  #endif
+
   if (argumentCount != 2) {
     fprintf(stderr, "Error : wrong number of arguments\n");
     return(1);
@@ -261,6 +235,7 @@ int main(int argumentCount, char* argumentVector[])
   convert(wInputFileName, 256, inputFileName);
 
   CComInitialize comInit;
+  CAAFInitialize aafInit;
 
   ReadAAFFile(wInputFileName);
 
