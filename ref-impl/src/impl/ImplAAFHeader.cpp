@@ -1,11 +1,30 @@
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAFTypes.h"
@@ -43,6 +62,7 @@
 #endif
 
 #include "ImplAAFFile.h"
+#include "ImplAAFBuiltinDefs.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -66,7 +86,7 @@
 
 extern "C" const aafClassID_t CLSID_EnumAAFIdentifications;
 
-const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+const aafUID_t NIL_UID = { 0 };
 
 
 ImplAAFHeader::ImplAAFHeader ()
@@ -75,7 +95,8 @@ ImplAAFHeader::ImplAAFHeader ()
   _identificationList(PID_Header_IdentificationList, "IdentificationList"),
   _contentStorage(		PID_Header_Content,	"Content"),
   _dictionary(PID_Header_Dictionary,	"Dictionary"),
-  _fileRev(PID_Header_Version,		"Version")
+  _fileRev(PID_Header_Version,		"Version"),
+  _objectModelVersion(PID_Header_ObjectModelVersion, "ObjectModelVersion")
 {
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
@@ -83,13 +104,14 @@ ImplAAFHeader::ImplAAFHeader ()
   _persistentProperties.put(_contentStorage.address());
   _persistentProperties.put(_dictionary.address());
   _persistentProperties.put(_fileRev.address());
+  _persistentProperties.put(_objectModelVersion.address());
 
   //!!!	_head = this;
 //	file->InternalSetHead(this);
 	_toolkitRev.major = 0;
 	_toolkitRev.minor = 0;
 	_toolkitRev.tertiary = 0;
-	_toolkitRev.type = kVersionUnknown;
+	_toolkitRev.type = kAAFVersionUnknown;
 	_toolkitRev.patchLevel = 0;
 //!!!	_byteOrder;
 //!!!	_lastModified;
@@ -127,19 +149,19 @@ ImplAAFHeader::~ImplAAFHeader ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::LookupMob (aafUID_t *pMobID,
+    ImplAAFHeader::LookupMob (aafMobID_constref mobID,
                            ImplAAFMob **ppMob)
 {
     ImplAAFContentStorage *cstore = NULL;
 
-    if ((! pMobID) || (! ppMob))
+    if (! ppMob)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->LookupMob(pMobID, ppMob));
+		CHECK(cstore->LookupMob(mobID, ppMob));
 	}
 	XEXCEPT
 	XEND
@@ -149,7 +171,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetNumMobs (aafMobKind_t mobKind,
+    ImplAAFHeader::CountMobs (aafMobKind_t mobKind,
                            aafNumSlots_t *pNumMobs)
 {
     ImplAAFContentStorage *cstore = NULL;
@@ -161,7 +183,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->GetNumMobs(mobKind, pNumMobs));
+		CHECK(cstore->CountMobs(mobKind, pNumMobs));
 	}
 	XEXCEPT
 	XEND
@@ -171,7 +193,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::EnumAAFAllMobs (aafSearchCrit_t *pSearchCriteria,
+    ImplAAFHeader::GetMobs (aafSearchCrit_t *pSearchCriteria,
                            ImplEnumAAFMobs **ppEnum)
 {
     ImplAAFContentStorage *cstore = NULL;
@@ -194,7 +216,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::AppendMob (ImplAAFMob *pMob)
+    ImplAAFHeader::AddMob (ImplAAFMob *pMob)
 {
     ImplAAFContentStorage *cstore = NULL;
 
@@ -205,7 +227,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->AppendMob(pMob));
+		CHECK(cstore->AddMob(pMob));
 	}
 	XEXCEPT
 	XEND
@@ -236,7 +258,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetNumEssenceData(aafUInt32 *  pNumEssenceData)
+    ImplAAFHeader::CountEssenceData(aafUInt32 *  pNumEssenceData)
 {
     ImplAAFContentStorage *cstore = NULL;
 
@@ -246,7 +268,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->GetNumEssenceData(pNumEssenceData));
+		CHECK(cstore->CountEssenceData(pNumEssenceData));
 	}
 	XEXCEPT
 	XEND
@@ -259,19 +281,19 @@ AAFRESULT STDMETHODCALLTYPE
 // based on omfmIsMediaDataPresent
 //
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::IsEssenceDataPresent (aafUID_t *pFileMobID,
+    ImplAAFHeader::IsEssenceDataPresent (aafMobID_constref fileMobID,
                            aafFileFormat_t fmt,
                            aafBool *pResult)
 {
     ImplAAFContentStorage *cstore = NULL;
-    if ((! pFileMobID) || (! pResult))
+    if ((! pResult))
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->IsEssenceDataPresent(pFileMobID, fmt, pResult));
+		CHECK(cstore->IsEssenceDataPresent(fileMobID, fmt, pResult));
 	}
 	XEXCEPT
 	XEND
@@ -303,7 +325,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::AppendEssenceData (ImplAAFEssenceData * pEssenceData)
+    ImplAAFHeader::AddEssenceData (ImplAAFEssenceData * pEssenceData)
 {
     ImplAAFContentStorage *cstore = NULL;
 	if (! pEssenceData)
@@ -313,7 +335,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->AppendEssenceData(pEssenceData));
+		CHECK(cstore->AddEssenceData(pEssenceData));
 	}
 	XEXCEPT
 	XEND
@@ -364,7 +386,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetDictionary (ImplAAFDictionary ** ppDictionary)
+    ImplAAFHeader::GetDictionary (ImplAAFDictionary ** ppDictionary) const
 {
   if (! ppDictionary)
 	{
@@ -416,10 +438,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetIdentificationByGen (aafUID_t * pGeneration,
+    ImplAAFHeader::LookupIdentification (const aafUID_t & generation,
                            ImplAAFIdentification ** ppIdentification)
 {
-  if ((! pGeneration) || (! ppIdentification))
+  if ((! ppIdentification))
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
@@ -428,7 +450,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFHeader::GetNumIdents
+ImplAAFHeader::CountIdentifications
 (aafUInt32 *  pNumIdents)
 {
  	size_t	siz;
@@ -444,7 +466,7 @@ ImplAAFHeader::GetNumIdents
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::EnumAAFIdents (ImplEnumAAFIdentifications ** ppEnum)
+    ImplAAFHeader::GetIdentifications (ImplEnumAAFIdentifications ** ppEnum)
 {
 	if (NULL == ppEnum)
 		return AAFRESULT_NULL_PARAM;
@@ -469,8 +491,27 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFHeader::GetIdentificationAt
+(aafUInt32 index,
+ ImplAAFIdentification ** ppIdentification)
+{
+  if (! ppIdentification)
+	return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 max;
+  CountIdentifications(&max);
+  if (index >= max)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+/*
 AAFRESULT 
-    ImplAAFHeader::GetNumIdentifications (aafInt32 *pCount)
+    ImplAAFHeader::CountIdentifications (aafInt32 *pCount)
 {
   if (! pCount)
 	{
@@ -481,13 +522,14 @@ AAFRESULT
 	*pCount = size;
   return AAFRESULT_SUCCESS;
 }
+*/
 
 AAFRESULT 
     ImplAAFHeader::AddIdentificationObject (aafProductIdentification_t *pIdent)
 {
 	ImplAAFIdentification *		identObj;
 	aafProductIdentification_t	fiction;
-	aafBool						dummyIDNT = AAFFalse;
+	aafBool						dummyIDNT = kAAFFalse;
 	aafProductVersion_t			dummyVersion;
 	
 	XPROTECT()
@@ -503,9 +545,9 @@ AAFRESULT
 			fiction.productVersion.minor = 0;
 			fiction.productVersion.tertiary = 0;
 			fiction.productVersion.patchLevel = 0;
-			fiction.productVersion.type = kVersionUnknown;
+			fiction.productVersion.type = kAAFVersionUnknown;
 			pIdent = &fiction;
-			dummyIDNT = AAFTrue;
+			dummyIDNT = kAAFTrue;
 		}
 		
 	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
@@ -521,13 +563,14 @@ AAFRESULT
     ImplAAFDictionary *pDictionary = GetDictionary();
     if (NULL == pDictionary)
       CHECK(AAFRESULT_NOMEMORY);
-    CHECK(pDictionary->CreateInstance(&AUID_AAFIdentification, (ImplAAFObject **)&identObj));
+    CHECK(pDictionary->GetBuiltinDefs()->cdIdentification()->
+		  CreateInstance((ImplAAFObject **)&identObj));
     if (NULL == identObj)
       CHECK(AAFRESULT_NOMEMORY);
     CHECK(identObj->SetCompanyName(pIdent->companyName));
     CHECK(identObj->SetProductName(pIdent->productName));
     CHECK(identObj->SetProductVersionString(pIdent->productVersionString));
-	CHECK(identObj->SetProductID(&pIdent->productID));
+	CHECK(identObj->SetProductID(pIdent->productID));
 
     _identificationList.appendValue(identObj);
  
@@ -554,17 +597,6 @@ AAFRESULT
 	pIdent->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT 
-    ImplAAFHeader::RemoveIdentification (ImplAAFIdentification * pIdent)
-{
-  if (! pIdent)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -626,10 +658,6 @@ void ImplAAFHeader::SetDictionary(ImplAAFDictionary *pDictionary)
   _dictionary = pDictionary;
   if (pDictionary)
     pDictionary->AcquireReference();
-
-  // If this hasn't been done before, make sure the dictionary has had
-  // its properties initialized.
-  _dictionary->pvtInitCriticalBuiltins ();
 }
 
 AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
@@ -661,8 +689,8 @@ ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
     ImplAAFDictionary *pDictionary = GetDictionary();
     if (NULL != pDictionary)
 	  {
-		pDictionary->CreateInstance (&AUID_AAFContentStorage,
-									 (ImplAAFObject **)&result);
+		pDictionary->GetBuiltinDefs()->cdContentStorage()->
+		  CreateInstance ((ImplAAFObject **)&result);
 		_contentStorage = result;
 	  }
   }
@@ -671,25 +699,45 @@ ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
 }
 
 // Fill in when dictionary property is supported.
-ImplAAFDictionary *ImplAAFHeader::GetDictionary()
+ImplAAFDictionary *ImplAAFHeader::GetDictionary() const
 {
   ImplAAFDictionary	*result = _dictionary;
-  assert(result);
 
-  // If this hasn't been done before, make sure the dictionary has had
-  // its properties initialized.
-  _dictionary->pvtInitCriticalBuiltins ();
-
-  // Make sure that _dictionary member points to the same instance
-  // as the value returned by ImplAAFObject::GetDictionary()!
-  ImplAAFDictionary	*pDictionary = NULL;
-  assert(AAFRESULT_SUCCESS == ImplAAFObject::GetDictionary(&pDictionary));
-  assert(pDictionary);
-  assert(pDictionary == result);
-  aafUInt32 refCount = pDictionary->ReleaseReference();
-  pDictionary = 0;
-  assert(0 != refCount);
-
+  // Note - in the case where this is the first GetDictionary() on
+  // Header (in order to initialize the OM properties on the
+  // newly-created Header object), the _dictionary property won't be
+  // set up yet.  If that's the case, get the dictionary the
+  // old-fashioned way (through AAFObject).
+  if (! result)
+	{
+	  AAFRESULT hr = ImplAAFObject::GetDictionary(&result);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  assert (result);
+	  // clients of GetDictionary(void) expect the dictionary to *not*
+	  // be reference-counted.
+	  aafUInt32 refcnt = result->ReleaseReference ();
+	  // make sure at least one reference remains.
+	  assert (refcnt > 0);
+	}
   return(result);
 }
 
+
+bool ImplAAFHeader::IsObjectModelVersionPresent () const
+{
+  return _objectModelVersion.isPresent ();
+}
+
+
+aafUInt32 ImplAAFHeader::GetObjectModelVersion () const
+{
+  assert (IsObjectModelVersionPresent());
+  return _objectModelVersion;
+}
+
+
+void ImplAAFHeader::SetObjectModelVersion (aafUInt32 version)
+{
+  _objectModelVersion = version;
+  assert (IsObjectModelVersionPresent());
+}
