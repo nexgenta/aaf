@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.13 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.14 2004/09/02 16:59:41 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -175,12 +175,16 @@ const int PID_DigitalImageDescriptor_VideoLineMap                = 0x320D;
 const int PID_DigitalImageDescriptor_ImageAspectRatio            = 0x320E;
 const int PID_DigitalImageDescriptor_AlphaTransparency           = 0x320F;
 const int PID_DigitalImageDescriptor_TransferCharacteristic      = 0x3210;
-const int PID_DigitalImageDescriptor_ColorPrimaries              = 0x3215;
-const int PID_DigitalImageDescriptor_CodingEquations             = 0x3216;
+const int PID_DigitalImageDescriptor_ColorPrimaries              = 0x3219;
+const int PID_DigitalImageDescriptor_CodingEquations             = 0x321A;
 const int PID_DigitalImageDescriptor_ImageAlignmentFactor        = 0x3211;
 const int PID_DigitalImageDescriptor_FieldDominance              = 0x3212;
 const int PID_DigitalImageDescriptor_FieldStartOffset            = 0x3213;
 const int PID_DigitalImageDescriptor_FieldEndOffset              = 0x3214;
+const int PID_DigitalImageDescriptor_SignalStandard              = 0x3215;
+const int PID_DigitalImageDescriptor_StoredF2Offset              = 0x3216;
+const int PID_DigitalImageDescriptor_DisplayF2Offset             = 0x3217;
+const int PID_DigitalImageDescriptor_ActiveFormatDescriptor      = 0x3218;
 const int PID_CDCIDescriptor_ComponentWidth                      = 0x3301;
 const int PID_CDCIDescriptor_HorizontalSubsampling               = 0x3302;
 const int PID_CDCIDescriptor_ColorSiting                         = 0x3303;

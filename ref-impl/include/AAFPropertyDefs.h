@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.12 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.13 2004/09/02 16:59:41 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -596,6 +596,22 @@ const aafUID_t kAAFPropID_DigitalImageDescriptor_FieldStartOffset =
 //{04180103-0000-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_DigitalImageDescriptor_FieldEndOffset =
 {0x04180103, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{04050113-0000-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_DigitalImageDescriptor_SignalStandard =
+{0x04050113, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04010302-0800-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_DigitalImageDescriptor_StoredF2Offset =
+{0x04010302, 0x0800, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04010302-0700-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_DigitalImageDescriptor_DisplayF2Offset =
+{0x04010302, 0x0700, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04010302-0900-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_DigitalImageDescriptor_ActiveFormatDescriptor =
+{0x04010302, 0x0900, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
 
 //{04010503-0a00-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_CDCIDescriptor_ComponentWidth =
