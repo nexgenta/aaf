@@ -125,13 +125,14 @@ ImplAAFBuiltinClasses::PropTblEntry \
 ImplAAFBuiltinClasses::sBuiltinPropTable[] = \
 {
 
-#define AAF_PROPERTY(name, id, tag, type, mandatory, container) \
+#define AAF_PROPERTY(name, id, tag, type, mandatory, uid, container) \
   { L"" L# name L"", \
 	id, \
     tag, \
     &kAAFTypeID_##type, \
     &kAAFClassID_##container, \
     mandatory, \
+    uid, \
 	ImplAAFBuiltinClasses::CreateOMPropType##type, \
     0 \
   },
@@ -383,10 +384,18 @@ ImplAAFBuiltinClasses::InitBuiltinClassDef (const aafUID_t & rClassID,
 			hr = pClass->pvtInitialize (*sBuiltinClassTable[i].pThisId,
 										parent,
 										sBuiltinClassTable[i].pName);
-			hr = pClass->SetBootstrapParent(parent);
-			assert (AAFRESULT_SUCCEEDED (hr));
+			if (AAFRESULT_FAILED (hr))
+				{
+				  status = hr;
+				  break;
+				}
 			
-			assert (AAFRESULT_SUCCEEDED (hr));
+			hr = pClass->SetBootstrapParent(parent);
+			if (AAFRESULT_FAILED (hr))
+				{
+				  status = hr;
+				  break;
+				}
 			
 			RegisterBuiltinProperties (pClass);
 	
@@ -528,7 +537,8 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 			 propInfo->tag,
 			 propInfo->name,
 			 *propInfo->pTypeGuid,
-			 propInfo->mandatory ? kAAFFalse : kAAFTrue);
+			 propInfo->mandatory ? kAAFFalse : kAAFTrue,
+			 propInfo->isUniqueIdentifier ? kAAFTrue : kAAFFalse);
 
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  propDef->SetOMPropCreateFunc (propInfo->omPropCreateFunc);
@@ -717,6 +727,7 @@ void ImplAAFBuiltinClasses::RegisterBuiltinProperties
 				 sBuiltinPropTable[i].name,
 				 *sBuiltinPropTable[i].pTypeGuid,
 				 sBuiltinPropTable[i].mandatory ? kAAFFalse : kAAFTrue,
+				 sBuiltinPropTable[i].isUniqueIdentifier ? kAAFTrue : kAAFFalse,
 				 &pd);
 			  assert (AAFRESULT_SUCCEEDED (hr));
 
