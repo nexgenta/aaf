@@ -1,5 +1,5 @@
 /*
- * $Id: DotUtilities.cpp,v 1.5 2004/06/02 11:03:53 philipn Exp $ $Name:  $
+ * $Id: DotUtilities.cpp,v 1.6 2004/06/04 13:37:16 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
