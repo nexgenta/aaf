@@ -99,7 +99,8 @@ extern "C" HRESULT CEnumAAFEssenceData_test()
   catch (...)
   {
     cerr << "CAAFEssenceData_test...Caught general C++"
-    " exception!" << endl; 
+		 << " exception!" << endl; 
+	hr = AAFRESULT_TEST_FAILED;
   }
 
   // Cleanup our object if it exists.
@@ -309,8 +310,9 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
   check(_pMob->SetMobID(TEST_MobIDs[itemNumber]));
   check(_pMob->SetName(wcBuffer));
   
-  check(defs.cdFileDescriptor()->
-		CreateInstance(IID_IAAFEssenceDescriptor, 
+  // Create a concrete subclass of FileDescriptor
+  check(defs.cdHTMLDescriptor()->
+		CreateInstance(IID_IAAFFileDescriptor, 
 					   (IUnknown **)&_pFileDescriptor));
 
   check(_pFileDescriptor->QueryInterface (IID_IAAFEssenceDescriptor,

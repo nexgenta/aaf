@@ -32,13 +32,10 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
-
-#include "AAFWideString.h"
 
 #include "CAAFBuiltinDefs.h"
 

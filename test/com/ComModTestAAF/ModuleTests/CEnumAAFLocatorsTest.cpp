@@ -31,13 +31,10 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
-
-#include "AAFWideString.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -135,16 +132,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetName(L"EssenceDescriptorTest"));
 		
 		// Create a concrete subclass of the descriptor:
-		checkResult(defs.cdAIFCDescriptor()->
+		checkResult(defs.cdHTMLDescriptor()->
 					CreateInstance(IID_IAAFEssenceDescriptor, 
 								   (IUnknown **)&edesc));		
-
-		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
-		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
-		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-		pAIFCDesc->Release();
-		pAIFCDesc = NULL;
-
  		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 			// Verify that there are no locators
