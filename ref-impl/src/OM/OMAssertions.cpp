@@ -14,18 +14,19 @@
 #endif
 
 
-void reportAssertionFailure(char* kind,
-                            char* name,
-                            char* expressionString,
-                            char* routine,
-                            char* fileName,
-                            size_t lineNumber)
+void reportAssertionViolation(char* assertionKind,
+                              char* assertionName,
+                              char* expressionString,
+                              char* routineName,
+                              char* fileName,
+                              size_t lineNumber)
 {
-  cerr << kind << " \"" << name << "\" failed in routine \""
-       << routine  << "\"." << endl;
-  cerr << "The failure occurred at line " << lineNumber
+  cerr << assertionKind
+       << " \"" << assertionName << "\" violated in routine \""
+       << routineName  << "\"." << endl;
+  cerr << "The violation occurred at line " << lineNumber
        << " in file \"" << fileName << "\"." << endl;
-  cerr << "The condition \"" << expressionString << "\" was violated." << endl;
+  cerr << "The condition \"" << expressionString << "\" was false." << endl;
 
 #if defined(OM_ENABLE_STACK_TRACE)
   printStackTrace(cerr);
@@ -34,7 +35,7 @@ void reportAssertionFailure(char* kind,
 #if defined(OM_ENABLE_ABORT)
   abort();
 #else
-  exit(FAILURE);
+  exit(EXIT_FAILURE);
 #endif
 }
 
@@ -55,9 +56,9 @@ bool validOMWideString(const OMWideCharacter* string)
 
 #if defined (OM_ENABLE_TRACE)
 
-void trace(const char* routine)
+void trace(const char* routineName)
 {
-  cerr << "Enter \"" << routine << "\"." << endl;
+  cerr << "Enter \"" << routineName << "\"." << endl;
 }
 
 #endif
