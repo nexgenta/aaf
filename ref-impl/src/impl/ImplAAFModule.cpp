@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.28 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.29 2004/09/22 18:00:42 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -507,7 +507,7 @@ STDAPI ImplAAFFileOpenNewModify (
   /*[out]*/ ImplAAFFile ** ppFile)
 {
 #if USE_RAW_STORAGE
-  IAAFRawStorage * pRawStg;
+  IAAFRawStorage * pRawStg = 0;
   AAFRESULT hr = AAFCreateRawStorageDisk
 	(pFileName,
 	 kAAFFileExistence_new,
@@ -623,7 +623,7 @@ STDAPI ImplAAFFileOpenNewModifyEx (
   // would require additional method on IAAFFile::OpenNewModifyEx()
   // which is not felt to be worthwhile
   // #if USE_RAW_STORAGE
-  IAAFRawStorage * pRawStg;
+  IAAFRawStorage * pRawStg = 0;
   AAFRESULT hr = AAFCreateRawStorageDisk
     (pFileName,
      kAAFFileExistence_new,
@@ -695,7 +695,7 @@ STDAPI ImplAAFFileOpenTransient (
   /*[out]*/ ImplAAFFile ** ppFile)
 {
 #if USE_RAW_STORAGE
-  IAAFRawStorage * pRawStg;
+  IAAFRawStorage * pRawStg = 0;
   AAFRESULT hr = AAFCreateRawStorageMemory
 	(kAAFFileAccess_modify,
 	 &pRawStg);
