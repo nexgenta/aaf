@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefStream
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.16 2004/05/20 15:36:42 asuraparaju Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.17 2005/01/12 02:53:58 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,12 +70,12 @@ static const aafMobID_t sMobID[] = {
   //{060c2b340205110101001000-13-00-00-00-{78de46cd-4622-11d4-8029-00104bc9156d}}
   {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
   0x13, 0x00, 0x00, 0x00,
-  {0x78de46cd, 0x4622, 0x11d4, 0x80, 0x29, 0x00, 0x10, 0x4b, 0xc9, 0x15, 0x6d}},
+  {0x78de46cd, 0x4622, 0x11d4, {0x80, 0x29, 0x00, 0x10, 0x4b, 0xc9, 0x15, 0x6d}}},
 
   //{060c2b340205110101001000-13-00-00-00-{78de46ce-4622-11d4-8029-00104bc9156d}}
   {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
   0x13, 0x00, 0x00, 0x00, 
-   {0x78de46ce, 0x4622, 0x11d4, 0x80, 0x29, 0x00, 0x10, 0x4b, 0xc9, 0x15, 0x6d}}
+   {0x78de46ce, 0x4622, 0x11d4, {0x80, 0x29, 0x00, 0x10, 0x4b, 0xc9, 0x15, 0x6d}}}
 };
 
 static aafCharacter_constptr sMobName[] = 
@@ -615,7 +615,8 @@ void CAAFTypeDefStream_read (aafCharacter_constptr pFileName) // throw HRESULT
   IEnumAAFEssenceDataSP pEnumEssenceData;
   checkResult(pHeader->EnumEssenceData(&pEnumEssenceData));
   checkResult(pEnumEssenceData->NextOne(&pEssenceData));
-  aafMobID_t testMobID = {0};
+  aafMobID_t testMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+			   {0,0,0,{0,0,0,0,0,0,0,0}}};
   checkResult(pEssenceData->GetFileMobID(&testMobID));
   checkExpression(0 == memcmp(&testMobID, &sMobID[0], sizeof(aafMobID_t)),
                   AAFRESULT_TEST_FAILED);  

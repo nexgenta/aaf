@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFSourceReference
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSourceReferenceTest.cpp,v 1.24 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFSourceReferenceTest.cpp,v 1.25 2005/01/12 03:03:10 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,7 +43,7 @@ using namespace std;
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xc1f142c2, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0xc1f142c2, 0x0404, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
 // Cross-platform utility to delete a file.

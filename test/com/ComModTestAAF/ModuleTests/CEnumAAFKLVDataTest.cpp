@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFKLVData
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFKLVDataTest.cpp,v 1.14 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
+// $Id: CEnumAAFKLVDataTest.cpp,v 1.15 2005/01/12 02:50:32 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -94,7 +94,7 @@ static char* KLVData[3] = { (char*)&KLVsmiley, (char*)&KLVfrowney, (char*)&KLVsm
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xa5691d12, 0x0406, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0xa5691d12, 0x0406, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
 // Cross-platform utility to delete a file.

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefOpaque
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefOpaqueTest.cpp,v 1.11 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTypeDefOpaqueTest.cpp,v 1.12 2005/01/12 02:54:54 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -136,7 +136,7 @@ static const aafUID_t testOpaqueTypeID =
 static const aafMobID_t	testMobID =
 	{{0x07, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 	0x13, 0x00, 0x00, 0x00,
-	{0xfb6feaa0, 0x527a, 0x11d4, 0x92, 0x26, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d}};
+	{0xfb6feaa0, 0x527a, 0x11d4, {0x92, 0x26, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d}}};
 
 static char testSavedOpaqueData[]="Opaque data saved in file";
 

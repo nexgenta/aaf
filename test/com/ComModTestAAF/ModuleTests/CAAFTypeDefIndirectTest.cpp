@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefIndirect
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefIndirectTest.cpp,v 1.16 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTypeDefIndirectTest.cpp,v 1.17 2005/01/12 02:57:05 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -136,7 +136,7 @@ static aafUInt16 kSequenceAnnotation3=5;
 static const 	aafMobID_t	sTestMob =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0x37c13606, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0x37c13606, 0x0405, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 #ifndef _DEBUG
 // convenient error handlers.

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFVaryingValue
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVaryingValueTest.cpp,v 1.43 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
+// $Id: CAAFVaryingValueTest.cpp,v 1.44 2005/01/12 02:52:14 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,8 @@ using namespace std;
 // Temporarily necessary global declarations.
 extern "C" const CLSID CLSID_AAFVaryingValue; // generated
 
-static aafMobID_t	zeroMobID = { 0 };
+static aafMobID_t	zeroMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+				     {0,0,0,{0,0,0,0,0,0,0,0}}};
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 static aafBool  EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)

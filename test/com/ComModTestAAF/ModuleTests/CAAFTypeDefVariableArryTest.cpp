@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefVariableArray
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefVariableArryTest.cpp,v 1.28 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTypeDefVariableArryTest.cpp,v 1.29 2005/01/12 02:53:09 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -93,7 +93,7 @@ static  const aafUID_t						TEST_PROP_ID =
 static  aafMobID_t						TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xda5ab5f4, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0xda5ab5f4, 0x0405, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 // Slot id
 static const aafSlotID_t				TEST_SLOT_ID = 7;

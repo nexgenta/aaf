@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefInt
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefIntTest.cpp,v 1.25 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefIntTest.cpp,v 1.26 2005/01/12 02:56:31 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -458,10 +458,10 @@ static HRESULT TestTypeDefInt (testMode_t mode)
 	  const aafUInt32 sizeTable[4] = {1, 2, 4, 8};
 	  IAAFTypeDefInt *typeDefTable[4][2] =
 	  {
-		ptdu8, ptds8,
-		ptdu16, ptds16,
-		ptdu32, ptds32,
-		ptdu64, ptds64
+		{ptdu8, ptds8},
+		{ptdu16, ptds16},
+		{ptdu32, ptds32},
+		{ptdu64, ptds64}
 	  };
 
 	  aafUInt32  setSize;

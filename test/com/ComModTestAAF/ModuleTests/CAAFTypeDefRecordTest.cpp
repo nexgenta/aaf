@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefRecord
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefRecordTest.cpp,v 1.14 2004/09/16 17:07:47 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefRecordTest.cpp,v 1.15 2005/01/12 02:55:18 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -620,7 +620,7 @@ static HRESULT ReadRecord (const aafWChar * pFileName)
 	  checkResult (pObj->GetPropertyValue (pPdPosC, &pPVc));
 
 	  // Try to read the first one with GetStruct.
-	  rational8pair_t valA = { 0 };
+	  rational8pair_t valA = { {0,0},{0,0} };
 	  checkResult (ptdr8p->GetStruct (pPVa,
 									  (aafMemPtr_t) &valA,
 									  sizeof (valA)));
@@ -700,7 +700,7 @@ static HRESULT ReadRecord (const aafWChar * pFileName)
 	  checkExpression (8 == val, AAFRESULT_TEST_FAILED);
 
 	  // Read the last two with GetStruct just to get it over with. ;)
-	  rational8pair_t valC = { 0 };
+	  rational8pair_t valC = { {0,0},{0,0} };
 	  temphr = ptdr8p->GetStruct (pPVc,
 								  (aafMemPtr_t) &valC,
 								  sizeof (valC)-1);

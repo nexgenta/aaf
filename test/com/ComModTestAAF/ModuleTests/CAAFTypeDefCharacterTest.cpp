@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefCharacter
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefCharacterTest.cpp,v 1.9 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTypeDefCharacterTest.cpp,v 1.10 2005/01/12 02:59:07 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,7 +77,7 @@ static const aafCharacter				TEST_CHAR_VALUE = 'A';
 static  aafMobID_t						TEST_MobID = 
 { {0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0x05eae7ea, 0x4946, 0x11d4, 0x8e, 0x57, 0x00, 0x90, 0x27, 0xdf, 0xcc, 0x26}};
+{0x05eae7ea, 0x4946, 0x11d4, {0x8e, 0x57, 0x00, 0x90, 0x27, 0xdf, 0xcc, 0x26}}};
 
 // Slot id
 static const aafSlotID_t				TEST_SLOT_ID = 7;

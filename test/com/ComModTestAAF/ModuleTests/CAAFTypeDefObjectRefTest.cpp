@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefObjectRef
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefObjectRefTest.cpp,v 1.15 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTypeDefObjectRefTest.cpp,v 1.16 2005/01/12 02:55:33 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -171,7 +171,7 @@ static const aafUID_t AUID_TestProperty =
 static const aafMobID_t	Test_MobID =
 	{{0x07, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 	0x13, 0x00, 0x00, 0x00,
-	{0xffd21460, 0x4e92, 0x11d4, 0x92, 0x26, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d} };	
+	{0xffd21460, 0x4e92, 0x11d4, {0x92, 0x26, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d}} };	
 
 static void CreateTypeDefObjectRefFile(aafWChar *pFilename)
 {

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFStaticMobSlot
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFStaticMobSlotTest.cpp,v 1.25 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
+// $Id: CAAFStaticMobSlotTest.cpp,v 1.26 2005/01/12 03:02:58 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@ static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0xce1b01e6, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0xce1b01e6, 0x0404, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
 // Cross-platform utility to delete a file.
