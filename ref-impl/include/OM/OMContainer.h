@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -34,24 +34,16 @@
   // @class Abstract base class for collections of elements.
   //   @tcarg class | Element | The type of an <c OMContainer> element.
   //          This type must support = and ==.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Element>
 class OMContainer {
 public:
   // @access Public members.
 
-    // @cmember Insert <p value> into this <c OMContainer>.
-  virtual void insert(const Element value) = 0;
-
-    // @cmember Does this <c OMContainer> contain <p value> ?
-  virtual bool containsValue(const Element value) const = 0;
-
     // @cmember The number of elements in this <c OMContainer>.
     //          <mf OMContainer::count> returns the actual number
     //          of elements in the <c OMContainer>.
   virtual size_t count(void) const = 0;
-
-    // @cmember Remove <p value> from this <c OMContainer>.
-  virtual void removeValue(const Element value) = 0;
 
 };
 
