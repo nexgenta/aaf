@@ -33,8 +33,9 @@
 #include "OMObjectReference.h"
 
 class OMProperty;
+class OMStorable;
 
-  // @class Pointer elements of Object Manager vectors.
+  // @class Pointer elements of non-persistent Object Manager vectors.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
@@ -78,7 +79,7 @@ private:
 
 };
 
-  // @class Pointer elements of Object Manager sets.
+  // @class Pointer elements of non-persistent Object Manager sets.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
@@ -118,10 +119,8 @@ public:
   // @class Elements of Object Manager reference containers.
   //   @tcarg class | ObjectReference | The type of the contained object
   //          reference 
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-template <typename ObjectReference, typename ReferencedObject>
+template <typename ObjectReference>
 class OMContainerElement {
 public:
   // @access Public members.
@@ -133,8 +132,7 @@ public:
   OMContainerElement(const ObjectReference& reference);
 
     // @cmember Copy constructor.
-  OMContainerElement(
-             const OMContainerElement<ObjectReference, ReferencedObject>& rhs);
+  OMContainerElement(const OMContainerElement<ObjectReference>& rhs);
 
     // @cmember Destructor.
   ~OMContainerElement(void);
@@ -142,14 +140,13 @@ public:
     // @cmember Assignment.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide assignment of object references.
-  OMContainerElement<ObjectReference, ReferencedObject>& operator=
-            (const OMContainerElement<ObjectReference, ReferencedObject>& rhs);
+  OMContainerElement<ObjectReference>& operator=
+                              (const OMContainerElement<ObjectReference>& rhs);
 
     // @cmember Equality.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide equality of object references.
-  bool operator== (
-       const OMContainerElement<ObjectReference, ReferencedObject>& rhs) const;
+  bool operator== (const OMContainerElement<ObjectReference>& rhs) const;
 
     // @cmember The contained ObjectReference.
   ObjectReference& reference(void);
@@ -172,15 +169,12 @@ public:
   void restore(void);
 
     // @cmember Get the value of this <c OMContainerElement>.
-  ReferencedObject* getValue(void) const;
-
-    // @cmember Set the value of this <c OMContainerElement>.
-  ReferencedObject* setValue(const ReferencedObject* value);
+  OMStorable* getValue(void) const;
 
     // @cmember The value of this <c OMContainerElement> as a pointer.
     //          This function provides low-level access. If the object exits
     //          but has not yet been loaded then the value returned is 0.
-  ReferencedObject* pointer(void) const;
+  OMStorable* pointer(void) const;
 
 protected:
   // @access Protected members.
@@ -191,14 +185,10 @@ protected:
 };
 
   // @class Elements of Object Manager reference vectors.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMContainerElement>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-template <typename ReferencedObject>
 class OMStrongReferenceVectorElement : public
-                 OMContainerElement<OMStrongObjectReference<ReferencedObject>,
-                                                            ReferencedObject> {
+                                  OMContainerElement<OMStrongObjectReference> {
 public:
   // @access Public members.
 
@@ -211,8 +201,7 @@ public:
                                  OMUInt32 localKey);
 
     // @cmember Copy constructor.
-  OMStrongReferenceVectorElement(
-                  const OMStrongReferenceVectorElement<ReferencedObject>& rhs);
+  OMStrongReferenceVectorElement(const OMStrongReferenceVectorElement& rhs);
 
     // @cmember Destructor.
   ~OMStrongReferenceVectorElement(void);
@@ -220,14 +209,16 @@ public:
     // @cmember Assignment.
     //          This operator provides value semantics for <c OMVector>.
     //          This operator does not provide assignment of object references.
-  OMStrongReferenceVectorElement<ReferencedObject>& operator=(
-                  const OMStrongReferenceVectorElement<ReferencedObject>& rhs);
+  OMStrongReferenceVectorElement& operator=(
+                                    const OMStrongReferenceVectorElement& rhs);
 
     // @cmember Equality.
     //          This operator provides value semantics for <c OMVector>.
     //          This operator does not provide equality of object references.
-  bool operator== (
-            const OMStrongReferenceVectorElement<ReferencedObject>& rhs) const;
+  bool operator== (const OMStrongReferenceVectorElement& rhs) const;
+
+    // @cmember Set the value of this <c OMStrongReferenceVectorElement>.
+  OMStorable* setValue(const OMStorable* value);
 
     // @cmember The local key of this <c OMStrongReferenceVectorElement>.
   OMUInt32 localKey(void) const;
@@ -249,8 +240,7 @@ private:
   //   @base public | <c OMContainerElement>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
-class OMStrongReferenceSetElement : public
-                             OMStrongReferenceVectorElement<ReferencedObject> {
+class OMStrongReferenceSetElement : public OMStrongReferenceVectorElement {
 public:
   // @access Public members.
 
@@ -287,6 +277,9 @@ public:
            const OMStrongReferenceSetElement<UniqueIdentification,
                                              ReferencedObject>& rhs) const;
 
+    // @cmember Set the value of this <c OMStrongReferenceSetElement>.
+  ReferencedObject* setValue(const ReferencedObject* value);
+
     // @cmember The unique key of this <c OMStrongReferenceSetElement>.
   UniqueIdentification identification(void) const;
 
@@ -316,8 +309,7 @@ private:
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMWeakReferenceVectorElement : public
-                   OMContainerElement<OMWeakObjectReference<ReferencedObject>,
-                                                            ReferencedObject> {
+                                    OMContainerElement<OMWeakObjectReference> {
 public:
   // @access Public members.
 
@@ -348,6 +340,9 @@ public:
   bool operator== (
               const OMWeakReferenceVectorElement<ReferencedObject>& rhs) const;
 
+    // @cmember Set the value of this <c OMWeakReferenceVectorElement>.
+  ReferencedObject* setValue(const ReferencedObject* value);
+
     // @cmember The unique key of this <c OMWeakReferenceVectorElement>.
   OMUniqueObjectIdentification identification(void) const;
 
@@ -360,8 +355,7 @@ public:
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMWeakReferenceSetElement : public
-                   OMContainerElement<OMWeakObjectReference<ReferencedObject>,
-                                                            ReferencedObject> {
+                                    OMContainerElement<OMWeakObjectReference> {
 public:
   // @access Public members.
 
@@ -391,6 +385,9 @@ public:
     //          This operator does not provide equality of object references.
   bool operator== (
                  const OMWeakReferenceSetElement<ReferencedObject>& rhs) const;
+
+    // @cmember Set the value of this <c OMWeakReferenceSetElement>.
+  ReferencedObject* setValue(const ReferencedObject* value);
 
     // @cmember The unique key of this <c OMWeakReferenceSetElement>.
   OMUniqueObjectIdentification identification(void) const;
