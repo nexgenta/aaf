@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.24 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.25 2005/02/05 18:13:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -328,6 +328,9 @@ public:
 
   // Create and initialize all of the axiomatic definitions.
   AAFRESULT InstantiateAxiomaticDefinitions(void);
+
+  // Sync the builtin dictionary and the file dictionary definitions.
+  AAFRESULT MergeBuiltinClassDefs();
 
   // Create all of the axiomatic classes as uninitialized objects.
   void CreateAxiomaticClasses(void); // throw AAFRESULT
