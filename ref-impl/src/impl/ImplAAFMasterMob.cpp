@@ -39,7 +39,7 @@
 #include <assert.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -175,9 +175,8 @@ AAFRESULT STDMETHODCALLTYPE
 		ref.sourceSlotID = sourceSlotID;
 		ref.startTime = zeroPos;
 		CHECK(GetDictionary(&pDictionary));
-		pSrcClip = (ImplAAFSourceClip *)pDictionary->CreateImplObject(pDictionary->GetBuiltinDefs()->cdSourceClip());
-		if(pSrcClip == NULL)
-			RAISE(E_FAIL);
+		CHECK(pDictionary->GetBuiltinDefs()->cdSourceClip()->
+			  CreateInstance((ImplAAFObject**) &pSrcClip));
 
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
@@ -251,7 +250,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetTapeName (aafInt32		masterSlotID,
+    ImplAAFMasterMob::GetTapeName (aafUInt32		masterSlotID,
 								   aafWChar*	pTapeName,
 								   aafUInt32	bufSize)
 {
@@ -260,7 +259,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		CHECK(SearchSource (masterSlotID, 0, kTapeMob, NULL, NULL,
+		CHECK(SearchSource (masterSlotID, 0, kAAFTapeMob, NULL, NULL,
 									&info));
 		CHECK(info->GetMob(&mob));
 		CHECK(mob->GetName(pTapeName, bufSize));
@@ -314,7 +313,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetTapeNameBufLen (aafInt32	masterSlotID,
+    ImplAAFMasterMob::GetTapeNameBufLen (aafUInt32	masterSlotID,
 										 aafUInt32*  pLen)
 {
 	ImplAAFFindSourceInfo	*info = NULL;
@@ -325,7 +324,7 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(SearchSource (masterSlotID, 0, kTapeMob, NULL, NULL,
+		CHECK(SearchSource (masterSlotID, 0, kAAFTapeMob, NULL, NULL,
 									&info));
 		CHECK(info->GetMob(&mob));
 		CHECK(mob->GetNameBufLen(pLen));
@@ -440,9 +439,9 @@ AAFRESULT STDMETHODCALLTYPE
 //   - TODO: add this to idl
 //
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetRepresentationSourceClip (aafSlotID_t			slotID,
-												   aafUInt32				index,
-												   ImplAAFSourceClip**	ppSourceClip)
+    ImplAAFMasterMob::GetRepresentation (aafSlotID_t			slotID,
+										 aafUInt32				index,
+										 ImplAAFSegment**		ppSegment)
 {
 	ImplAAFMobSlot	*pSlot = NULL;
 	ImplAAFSegment	*pSegment = NULL;
@@ -450,7 +449,7 @@ AAFRESULT STDMETHODCALLTYPE
 	HRESULT			hr;
 	aafNumSlots_t	numReps;
 
-	if (!ppSourceClip)
+	if (!ppSegment)
 		return AAFRESULT_NULL_PARAM;
 
 	numReps = 0;
@@ -465,13 +464,18 @@ AAFRESULT STDMETHODCALLTYPE
 			if(index < 0 || index >= numReps)
 				return(AAFRESULT_BADINDEX);
 			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
-			if(pGroup == NULL)
+			if(pGroup != NULL)
+			{
+				hr = pGroup->GetChoiceAt (index, ppSegment);
+				pGroup->ReleaseReference();
+				pGroup = NULL;
+				pSegment->ReleaseReference();
+				pSegment = NULL;
+			}
+			else if(index == 0)
+				*ppSegment = pSegment;
+			else
 				return(AAFRESULT_INCONSISTANCY);
-			hr = pGroup->GetChoiceAt (index, ppSourceClip);
-			pGroup->ReleaseReference();
-			pGroup = NULL;
-			pSegment->ReleaseReference();
-			pSegment = NULL;
 		}
 		pSlot->ReleaseReference();
 		pSlot = NULL;
@@ -528,9 +532,9 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetCriteriaSourceClip (aafSlotID_t			slotID,
+    ImplAAFMasterMob::GetCriteriaSegment (aafSlotID_t			slotID,
 											 aafMediaCriteria_t*	pCriteria,
-											 ImplAAFSourceClip**	ppSourceClip)
+											 ImplAAFSegment**	ppSourceClip)
 {
 	ImplAAFMobSlot	*pSlot = NULL;
 	ImplAAFSegment	*pSegment = NULL;
@@ -551,13 +555,16 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 			hr = pSegment->NumRepresentations(&numReps);
 			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
-			if(pGroup == NULL)
-				return(AAFRESULT_INCONSISTANCY);
-			hr = pGroup->GetCriteriaSourceClip (pCriteria, ppSourceClip);
-			pGroup->ReleaseReference();
-			pGroup = NULL;
-			pSegment->ReleaseReference();
-			pSegment = NULL;
+			if(pGroup != NULL)
+			{
+				hr = pGroup->GetCriteriaSegment (pCriteria, ppSourceClip);
+				pGroup->ReleaseReference();
+				pGroup = NULL;
+				pSegment->ReleaseReference();
+				pSegment = NULL;
+			}
+			else
+				*ppSourceClip = pSegment;
 		}
 		pSlot->ReleaseReference();
 		pSlot = NULL;
@@ -595,7 +602,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // GetMobKind()
 //
-// Returns kMasterMob in *pMobKind.
+// Returns kAAFMasterMob in *pMobKind.
 // 
 // AAFRESULT_SUCCESS
 //   - succeeded.  (This is the only code indicating success.)
@@ -609,7 +616,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pMobKind == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	*pMobKind = kMasterMob;
+	*pMobKind = kAAFMasterMob;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -824,7 +831,7 @@ ImplAAFMasterMob::CreateEssence (aafSlotID_t		masterSlotID,
 /****/
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMasterMob::CreateMultiEssence (aafUID_t codecID,
-							aafInt16  arrayElemCount,
+							aafUInt16  arrayElemCount,
 							aafmMultiCreate_t *mediaArray,
 							aafCompressEnable_t Enable,
 							ImplAAFLocator		*destination,
@@ -872,11 +879,11 @@ AAFRESULT STDMETHODCALLTYPE
 
 /****/
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetNumChannels (
+    ImplAAFMasterMob::CountChannels (
                            aafSlotID_t  slotID,
                            aafMediaCriteria_t *essenceCrit,
                            ImplAAFDataDef * pEssenceKind,
-                           aafInt16 *numCh)
+                           aafUInt16 *numCh)
 {
 	if (! pEssenceKind)
 	  return AAFRESULT_NULL_PARAM;
@@ -892,7 +899,7 @@ AAFRESULT STDMETHODCALLTYPE
     if (NULL == access)
       RAISE(AAFRESULT_NOMEMORY);
 
-	  CHECK(access->GetNumChannels(this, slotID, essenceCrit, essenceKind, numCh));
+	  CHECK(access->CountChannels(this, slotID, essenceCrit, essenceKind, numCh));
     access->ReleaseReference();
 	}
 	XEXCEPT

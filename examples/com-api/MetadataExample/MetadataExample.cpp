@@ -1,33 +1,36 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 
-#if defined(macintosh) || defined(_MAC)
-#include "DataInput.h"
-#endif
+//#include "AAFPluginManager.h"
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
@@ -56,18 +59,22 @@ static const aafUID_t KLVKey_BinaryBlob1 =
 { 0x6F3C8CE1, 0x6CEF, 0x11D2, { 0x80, 0x7D, 0x20, 0x15, 0x08, 0x45, 0x3E, 0x2a } }; 
 
 // Ascii string
-//static const aafUID_t KLVKey_ASCIIString1 = 
-//{ 0x6F3C8CE1, 0x6CEF, 0x11D2, { 0x80, 0x7D, 0x20, 0x15, 0x08, 0x45, 0x3E, 0x2b } };
+static const aafUID_t KLVKey_ASCIIString1 = 
+{ 0x6F3C8CE1, 0x6CEF, 0x11D2, { 0x80, 0x7D, 0x20, 0x15, 0x08, 0x45, 0x3E, 0x2b } };
 
 // Int32
 static const aafUID_t KLVKey_Int32_1 = 
 { 0x6F3C8CE1, 0x6CEF, 0x11D2, { 0x80, 0x7D, 0x20, 0x15, 0x08, 0x45, 0x3E, 0x2c } };
 
 static const aafUInt8 blobData[]={0x01, 0x02, 0xFF, 0x41, 0x42};
-//static const char ASCIIStringData[]="Action scene with bikes";
+static const char ASCIIStringData[]="Action scene with bikes";
 static const aafInt32 int32Data=2000;
 
 
+// This static variables are here so they can be referenced 
+// thru out the whole program.
+
+static aafSourceRef_t sourceRef; 
 
 #define assert(b, msg) \
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
@@ -112,29 +119,16 @@ static void convert(char* cName, size_t length, const wchar_t* name)
 
 static void MobIDtoString(aafMobID_constref uid, char *buf)
 {
-    sprintf( buf, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x-" \
-		  "%02x-%02x-%02x-%02x-" \
-		  "%08x%04x%04x" \
-		  "%02x%02x%02x%02x%02x%02x%02x%02x",
-
-	(int)uid.SMPTELabel[0], (int)uid.SMPTELabel[1], 
-	(int)uid.SMPTELabel[2], (int)uid.SMPTELabel[3],
-	(int)uid.SMPTELabel[4], (int)uid.SMPTELabel[5], 
-	(int)uid.SMPTELabel[6], (int)uid.SMPTELabel[7],
-	(int)uid.SMPTELabel[8], (int)uid.SMPTELabel[9], 
-	(int)uid.SMPTELabel[10], (int)uid.SMPTELabel[11],
-
-	(int)uid.length, (int)uid.instanceHigh, 
-	(int)uid.instanceMid, (int)uid.instanceLow,
-
-	uid.material.Data1, uid.material.Data2, uid.material.Data3,
-
-	(int)uid.material.Data4[0], (int)uid.material.Data4[1], 
-	(int)uid.material.Data4[2], (int)uid.material.Data4[3],
-	(int)uid.material.Data4[4], (int)uid.material.Data4[5], 
-	(int)uid.material.Data4[6], (int)uid.material.Data4[7] );
+  sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x--%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
+	  (int)uid.SMPTELabel[0], (int)uid.SMPTELabel[1], (int)uid.SMPTELabel[2], (int)uid.SMPTELabel[3], 
+	  (int)uid.SMPTELabel[4], (int)uid.SMPTELabel[5], (int)uid.SMPTELabel[6], (int)uid.SMPTELabel[7], 
+	  (int)uid.SMPTELabel[8], (int)uid.SMPTELabel[8], (int)uid.SMPTELabel[10], (int)uid.SMPTELabel[11], 
+	  (int)uid.length, (int)uid.instanceHigh, (int)uid.instanceMid, (int)uid.instanceLow, 
+	  uid.material.Data1, uid.material.Data2, uid.material.Data3, (int)uid.material.Data4[0],
+	  (int)uid.material.Data4[1], (int)uid.material.Data4[2], (int)uid.material.Data4[3],
+	  (int)uid.material.Data4[4],
+	  (int)uid.material.Data4[5], (int)uid.material.Data4[6], (int)uid.material.Data4[7]);
 }
-
 
 typedef enum { testStandardCalls, testMultiCalls } testType_t;
 
@@ -206,6 +200,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
   aafPosition_t	position=0;
   FILE*	pWavFile = NULL;
   unsigned char	dataBuff[4096], *dataPtr;
+  size_t	bytesRead;
   //	aafUInt32	bytesWritten;
   aafUInt32	dataOffset, dataLen;
   aafUInt16	bitsPerSample, numCh;
@@ -290,7 +285,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
   if (pWavFile)
     {
       // read in the essence data
-      fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
+      bytesRead = fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
       check(loadWAVEHeader(dataBuff,
 			   &bitsPerSample,
 			   &numCh,
@@ -818,6 +813,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 }
 
 
+struct CComInitialize
+{
+  CComInitialize()
+  {
+    CoInitialize(NULL);
+  }
+
+  ~CComInitialize()
+  {
+    CoUninitialize();
+  }
+};
+
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
 {
@@ -975,6 +983,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 // Make sure all of our required plugins have been registered.
 static HRESULT RegisterRequiredPlugins(void)
 {
+  HRESULT hr = S_OK;
   IAAFPluginManager	*mgr = NULL;
 
   // Load the plugin manager 
@@ -1003,8 +1012,9 @@ static HRESULT RegisterRequiredPlugins(void)
   return moduleErrorTmp;
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int main()
 {
+  CComInitialize comInit;
   CAAFInitialize aafInit;
 
   aafWChar* pwFileName = L"MetadataTest.aaf";

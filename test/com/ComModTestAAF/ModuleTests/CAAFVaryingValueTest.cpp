@@ -37,14 +37,16 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "AAFInterpolatorDefs.h"
 #include "AAFTypeDefUIDs.h"
+#include "AAFSmartPointer.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -80,7 +82,9 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+// {9F0E730C-0BF8-11d4-A358-009027DFCA6A}
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -102,20 +106,22 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFVaryingValue Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -158,7 +164,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSegment			*pFiller = NULL;
 	IAAFComponent		*pComponent = NULL;
 	IAAFSourceClip		 *pSourceClip = NULL;
-	IAAFControlPoint	 *pControlPoint = NULL;
+	IAAFSmartPointer<IAAFControlPoint>	pControlPoint1,pControlPoint2,
+		pControlPoint3;
 	IAAFSourceReference *pSourceRef = NULL;
 	IAAFInterpolationDef *pInterpDef = NULL;
 	IAAFPluginManager	*pMgr = NULL;
@@ -170,8 +177,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUID_t			parmID = kTestParmID;
 	aafRational_t		testLevel1 = kTestLevel1;
 	aafRational_t		testLevel2 = kTestLevel2;
-/*	long				test;
-*/
+	aafUInt32			numPoints;
 
 	try
 	{
@@ -180,49 +186,42 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
 		CAAFBuiltinDefs defs (pDictionary);
     
-		checkResult(pDictionary->CreateInstance(defs.cdOperationDef(),
-							  IID_IAAFOperationDef, 
-							  (IUnknown **)&pOperationDef));
+		checkResult(defs.cdOperationDef()->
+					CreateInstance(IID_IAAFOperationDef, 
+								   (IUnknown **)&pOperationDef));
     
-		checkResult(pDictionary->CreateInstance(defs.cdParameterDef(),
-							  IID_IAAFParameterDef, 
-							  (IUnknown **)&pParamDef));
-		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
-
 		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_Rational, &pTypeDef));
+
+    checkResult(defs.cdParameterDef()->
+					CreateInstance(IID_IAAFParameterDef, 
+								   (IUnknown **)&pParamDef));
+		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC, pTypeDef));
+
 		checkResult(AAFGetPluginManager(&pMgr));
 		checkResult(pMgr->CreatePluginDefinition(LinearInterpolator, pDictionary, &pDefObject));
 		checkResult(pDefObject->QueryInterface(IID_IAAFInterpolationDef, (void **) &pInterpDef));
 		pDefObject->Release();
 		pDefObject = NULL;
 
+		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 		checkResult(pDictionary->RegisterInterpolationDef(pInterpDef));
 
-		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
-		checkResult(pDefObject->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
-		pDefObject->Release();
-		pDefObject = NULL;
 
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
-		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
+		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
-		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
 
@@ -231,65 +230,69 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		aafRational_t	videoRate = { 2997, 100 };
 		aafRational_t	startTime = { 0, 1 } , endTime = { 1, 1};
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(defs.cdCompositionMob(),
-							  IID_IAAFMob, 
-							  (IUnknown **)&pMob));
+		checkResult(defs.cdCompositionMob()->
+					CreateInstance(IID_IAAFMob, 
+								   (IUnknown **)&pMob));
 
-//		checkResult(CoCreateGuid((GUID *)&newUID));
-//		checkResult(pMob->SetMobID(newUID));
 		checkResult(pMob->SetName(L"AAFOperationGroupTest"));
 	  
 		// Add some slots
 		for(test = 0; test < 2; test++)
 		{
- 			checkResult(pDictionary->CreateInstance(defs.cdOperationGroup(),
-							     IID_IAAFOperationGroup, 
-							     (IUnknown **)&pOperationGroup));
+ 			checkResult(defs.cdOperationGroup()->
+						CreateInstance(IID_IAAFOperationGroup, 
+									   (IUnknown **)&pOperationGroup));
 			
-			checkResult(pDictionary->CreateInstance(defs.cdFiller(),
-							     IID_IAAFSegment, 
-							     (IUnknown **)&pFiller));
+			checkResult(defs.cdFiller()->
+						CreateInstance(IID_IAAFSegment, 
+									   (IUnknown **)&pFiller));
 			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
 			checkResult(pComponent->SetLength(effectLen));
 			checkResult(pComponent->SetDataDef(defs.ddPicture()));
  			checkResult(pOperationGroup->Initialize(defs.ddPicture(), TEST_EFFECT_LEN, pOperationDef));
 
-			checkResult(pDictionary->CreateInstance(defs.cdVaryingValue(),
-							  IID_IAAFVaryingValue, 
-							  (IUnknown **)&pVaryingValue));
-			checkResult(pVaryingValue->SetInterpolationDefinition(pInterpDef));
+			checkResult(defs.cdVaryingValue()->
+						CreateInstance(IID_IAAFVaryingValue, 
+									   (IUnknown **)&pVaryingValue));
+			checkResult(pVaryingValue->Initialize (pParamDef, pInterpDef));
 
-			checkResult(pDictionary->CreateInstance(defs.cdControlPoint(),
-							  IID_IAAFControlPoint, 
-							  (IUnknown **)&pControlPoint));
-			checkResult(pControlPoint->SetTime(startTime));
-			checkResult(pControlPoint->SetValue(sizeof(testLevel1), (aafDataBuffer_t)&testLevel1));
-			checkResult(pControlPoint->SetTypeDefinition (pTypeDef));
-			checkResult(pVaryingValue->AddControlPoint(pControlPoint));
-			pControlPoint->Release();
-			pControlPoint = NULL;
-			checkResult(pDictionary->CreateInstance(defs.cdControlPoint(),
-							  IID_IAAFControlPoint, 
-							  (IUnknown **)&pControlPoint));
-			checkResult(pControlPoint->SetTypeDefinition (pTypeDef));
-			checkResult(pControlPoint->SetTime(endTime));
-			checkResult(pControlPoint->SetValue(sizeof(testLevel2), (aafDataBuffer_t)&testLevel2));
-			checkResult(pVaryingValue->AddControlPoint(pControlPoint));
-			pControlPoint->Release();
-			pControlPoint = NULL;
+			checkResult(defs.cdControlPoint()->
+						CreateInstance(IID_IAAFControlPoint, 
+									   (IUnknown **)&pControlPoint1));
+			checkResult(pControlPoint1->Initialize (pVaryingValue, startTime, 
+				sizeof(testLevel1), (aafDataBuffer_t)&testLevel1));
+			checkResult(pVaryingValue->AddControlPoint(pControlPoint1));
+			checkResult(defs.cdControlPoint()->
+						CreateInstance(IID_IAAFControlPoint, 
+									   (IUnknown **)&pControlPoint2));
+			checkResult(pControlPoint2->Initialize (pVaryingValue, endTime, 
+				sizeof(testLevel2), (aafDataBuffer_t)&testLevel2));
+			checkResult(pVaryingValue->AddControlPoint(pControlPoint2));
+
+			// Add an extra control point, in order to test delete
+			checkResult(defs.cdControlPoint()->
+						CreateInstance(IID_IAAFControlPoint, 
+									   (IUnknown **)&pControlPoint3));
+			checkResult(pControlPoint3->Initialize (pVaryingValue, endTime, 
+				sizeof(testLevel2), (aafDataBuffer_t)&testLevel2));
+			checkResult(pVaryingValue->AddControlPoint(pControlPoint3));
+			checkResult(pVaryingValue->CountControlPoints (&numPoints));
+ 			checkExpression(3 == numPoints, AAFRESULT_TEST_FAILED);
+
+			checkResult(pVaryingValue->RemoveControlPointAt(2));
+			checkResult(pVaryingValue->CountControlPoints (&numPoints));
+ 			checkExpression(2 == numPoints, AAFRESULT_TEST_FAILED);
 
 			checkResult(pVaryingValue->QueryInterface (IID_IAAFParameter, (void **)&pParm));
-			checkResult(pParm->SetParameterDefinition (pParamDef));
- // !!!  ImplAAFParameter::SetTypeDefinition (ImplAAFTypeDef*  pTypeDef)
 			checkResult(pOperationGroup->AddParameter (pParm));
 			checkResult(pOperationGroup->AppendInputSegment (pFiller));
 			pFiller->Release();
 			pFiller = NULL;
 
 			checkResult(pOperationGroup->SetBypassOverride (1));
-			checkResult(pDictionary->CreateInstance(defs.cdSourceClip(),
-							  IID_IAAFSourceClip, 
-							  (IUnknown **)&pSourceClip));
+			checkResult(defs.cdSourceClip()->
+						CreateInstance(IID_IAAFSourceClip, 
+									   (IUnknown **)&pSourceClip));
 			aafSourceRef_t	sourceRef;
 			sourceRef.sourceID = zeroMobID;
 			sourceRef.sourceSlotID = 0;
@@ -335,8 +338,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	// Cleanup and return
 	if(pSourceRef)
 		pSourceRef->Release();
-	if(pControlPoint)
-		pControlPoint->Release();
 	if(pSourceClip)
 		pSourceClip->Release();
 	if (pDefObject)
@@ -417,11 +418,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafMobID_t			readSourceID;
   aafUID_t  testInterpID, checkInterpID = LinearInterpolator;
 	aafBool				readIsTimeWarp;
-	aafUInt32			catLen;
-	aafInt32			checkNumInputs, testNumSources, testNumParam;
-	aafUInt32			checkBypass;
+	aafUInt32			checkBypass, testNumSources, testNumParam;
+	aafInt32			checkNumInputs;
 	HRESULT				hr = S_OK;
-	wchar_t				checkCat[256], checkName[256];
+	wchar_t				checkName[256];
+	aafUID_t			checkCat;
 	aafNumSlots_t		s;
 	aafNumSlots_t	numSlots;
 	aafUInt32			readOverride;
@@ -430,11 +431,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 		
 		aafSearchCrit_t		criteria;
-		criteria.searchTag = kNoSearch;
+		criteria.searchTag = kAAFNoSearch;
 		checkResult(pHeader->GetMobs (&criteria, &mobIter));
 				
 		checkResult(mobIter->NextOne (&pMob));			
@@ -455,13 +456,13 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkExpression(testNumSources == 1, AAFRESULT_TEST_FAILED);
 
 			checkResult(pOperationGroup->IsATimeWarp (&readIsTimeWarp));
-			checkExpression(readIsTimeWarp == AAFFalse, AAFRESULT_TEST_FAILED);
+			checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
 
 			checkResult(pOperationGroup->GetBypassOverride (&readOverride));
 			checkExpression(readOverride == 1, AAFRESULT_TEST_FAILED);
 
 			checkResult(pOperationGroup->IsValidTranOperation (&readValidTransition));
-			checkExpression(readValidTransition == AAFFalse, AAFRESULT_TEST_FAILED);
+			checkExpression(readValidTransition == kAAFFalse, AAFRESULT_TEST_FAILED);
 			/**/
 			checkResult(pOperationGroup->GetInputSegmentAt (0, &pSeg));
  			checkResult(pSeg->QueryInterface(IID_IAAFFiller, (void **) &pFill));
@@ -475,6 +476,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			aafUInt32		testLen, bytesRead;
 			aafRational_t	sampleValue1 = kTestLevel1, sampleValue2 = kTestLevel2, testValue;
 
+			/* Verify using enumerator */
 			checkResult(pVaryingValue->GetControlPoints(&pEnumCP));
 			checkResult(pEnumCP->NextOne(&pControlPoint));
 			checkResult(pControlPoint->GetValueBufLen (&testLen));
@@ -499,6 +501,27 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			pEnumCP = NULL;
 			/*****/
 
+			/* Verify using GetControlPointAt() */
+			checkResult(pVaryingValue->GetControlPointAt(0,&pControlPoint));
+			checkResult(pControlPoint->GetValueBufLen (&testLen));
+ 			checkExpression(testLen == sizeof(sampleValue1), AAFRESULT_TEST_FAILED);
+			checkResult(pControlPoint->GetValue (sizeof(sampleValue1), (aafDataBuffer_t)&testValue, &bytesRead));
+ 			checkExpression(testValue.numerator == sampleValue1.numerator, AAFRESULT_TEST_FAILED);
+ 			checkExpression(testValue.denominator == sampleValue1.denominator, AAFRESULT_TEST_FAILED);
+ 			checkExpression(bytesRead == sizeof(sampleValue1), AAFRESULT_TEST_FAILED);
+			pControlPoint->Release();
+			pControlPoint = NULL;
+
+			checkResult(pVaryingValue->GetControlPointAt(1,&pControlPoint));
+			checkResult(pControlPoint->GetValueBufLen (&testLen));
+ 			checkExpression(testLen == sizeof(sampleValue2), AAFRESULT_TEST_FAILED);
+			checkResult(pControlPoint->GetValue (sizeof(sampleValue2), (aafDataBuffer_t)&testValue, &bytesRead));
+ 			checkExpression(testValue.numerator == sampleValue2.numerator, AAFRESULT_TEST_FAILED);
+ 			checkExpression(testValue.denominator == sampleValue2.denominator, AAFRESULT_TEST_FAILED);
+ 			checkExpression(bytesRead == sizeof(sampleValue2), AAFRESULT_TEST_FAILED);
+			pControlPoint->Release();
+			pControlPoint = NULL;
+
  			// Test out the interpolation method
 			aafRational_t	oneQuarter = { 1, 4 };
 			aafRational_t	threeQuarters = { 3, 4 };
@@ -513,7 +536,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkResult(pVaryingValue->GetInterpolationDefinition (&pInterpDef));
  			checkResult(pInterpDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
 			checkResult(pDefObject->GetAUID (&testInterpID));
- 			checkExpression(EqualAUID(&testInterpID, &checkInterpID) == AAFTrue, AAFRESULT_TEST_FAILED);
+ 			checkExpression(EqualAUID(&testInterpID, &checkInterpID) == kAAFTrue, AAFRESULT_TEST_FAILED);
 			pInterpDef->Release();
 			pInterpDef = NULL;
 			pDefObject->Release();
@@ -542,11 +565,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			checkExpression(wcscmp(checkName, TEST_EFFECT_DESC) == 0, AAFRESULT_TEST_FAILED);
 			pDefObject->Release();
 			pDefObject = NULL;
-			checkResult(pOperationDef->GetCategoryBufLen (&catLen));
-			testLen = wcslen(TEST_CATEGORY);
-			checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));
-			checkExpression(wcscmp(checkCat, TEST_CATEGORY) == 0, AAFRESULT_TEST_FAILED);
-			checkExpression(testLen == wcslen(checkCat), AAFRESULT_TEST_FAILED);
+			checkResult(pOperationDef->GetCategory (&checkCat));
+			checkExpression(memcmp(&checkCat, &TEST_CATEGORY, sizeof(aafUID_t)) == 0, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetBypass (&checkBypass));
 			checkExpression(checkBypass == TEST_BYPASS, AAFRESULT_TEST_FAILED);
 			checkResult(pOperationDef->GetNumberInputs (&checkNumInputs));
@@ -670,15 +690,10 @@ extern "C" HRESULT CAAFVaryingValue_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFVaryingValue_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFVaryingValue_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
-
-	// When all of the functionality of this class is tested, we can return success.
-	// When a method and its unit test have been implemented, remove it from the list.
-//	if (SUCCEEDED(hr))
-//	{
-//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-//	}
 
 	return hr;
 }

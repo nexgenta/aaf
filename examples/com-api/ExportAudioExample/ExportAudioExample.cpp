@@ -1,27 +1,13 @@
 // @com Executable example program by Chris Morgan, intern for Avid Technology, Tewksbury 
 // @com This is based upon ComEssenceDataTest.cpp  Last modified on 8/4/99.
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1999 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -44,6 +30,10 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
+// This static variables are here so they can be referenced 
+// throughout the whole program.
+
+static aafSourceRef_t sourceRef; 
 
 #define assert(b, msg) \
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
@@ -127,6 +117,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
@@ -136,6 +127,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	aafRational_t				sampleRate = {44100, 1};
 	FILE*						pWavFile = NULL;
 	unsigned char				dataBuff[4096], *dataPtr;
+	size_t						bytesRead;
 	aafUInt32					dataOffset, dataLen;
 	aafUInt16					bitsPerSample, numCh;
 	aafInt32					n, numSpecifiers;
@@ -221,7 +213,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	if (pWavFile)
 	{
 		// Read in the essence data
-		fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
+		bytesRead = fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
 		check(loadWAVEHeader(dataBuff,
 										&bitsPerSample,
 										&numCh,
@@ -365,6 +357,19 @@ cleanup:
 
 	return moduleErrorTmp;
 }
+
+struct CComInitialize
+{
+  CComInitialize()
+  {
+    CoInitialize(NULL);
+  }
+
+  ~CComInitialize()
+  {
+    CoUninitialize();
+  }
+};
 
 // simple helper class to initialize and cleanup AAF library.
 struct CAAFInitialize
@@ -521,6 +526,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 // Make sure all of our required plugins have been registered.
 static HRESULT RegisterRequiredPlugins(void)
 {
+  HRESULT hr = S_OK;
 	IAAFPluginManager	*mgr = NULL;
 
   // Load the plugin manager 
@@ -552,6 +558,7 @@ cleanup:
 
 int main()
 {
+	CComInitialize comInit;
 	CAAFInitialize aafInit;
 	
 	aafWChar *		pwFileName	= L"ExportAudioExample.aaf";

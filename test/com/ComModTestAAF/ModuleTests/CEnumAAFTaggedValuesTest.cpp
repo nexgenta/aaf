@@ -33,7 +33,8 @@
 
 #include <iostream.h>
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -44,6 +45,11 @@
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 static aafWChar* TagNames[3] = { L"TAG01", L"TAG02", L"TAG03" };
 static aafWChar* Comments[3] = { L"Comment 1", L"Comment 2", L"Comment 3"};	
+
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0xa5691d12, 0x0406, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -81,49 +87,49 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTimelineMobSlot	*newSlot = NULL;
 	IAAFSegment		*seg = NULL;
 	IAAFSourceClip	*sclp = NULL;
+	IAAFComponent	*pComponent = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
 	HRESULT						hr = S_OK;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"EnumAAFTaggedValues Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
+	try
+	{
+	  // Remove the previous test file if any.
+	  RemoveTestFile(pFileName);
 
-  try
-  {
-    // Remove the previous test file if any.
-    RemoveTestFile(pFileName);
-
-    // Create the file.
-		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
-		bFileOpen = true;
+	  // Create the file.
+	  checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
+	  bFileOpen = true;
  
-    // We can't really do anthing in AAF without the header.
-		checkResult(pFile->GetHeader(&pHeader));
+	  // We can't really do anthing in AAF without the header.
+	  checkResult(pFile->GetHeader(&pHeader));
 
-    // Get the AAF Dictionary so that we can create valid AAF objects.
-    checkResult(pHeader->GetDictionary(&pDictionary));
-	CAAFBuiltinDefs defs (pDictionary);
+	  // Get the AAF Dictionary so that we can create valid AAF objects.
+	  checkResult(pHeader->GetDictionary(&pDictionary));
+	  CAAFBuiltinDefs defs (pDictionary);
  		
-  //Make the first mob
+	  //Make the first mob
 	  long	test;
 	  aafRational_t	audioRate = { 44100, 1 };
 
-	  // Create a Mob
-	  checkResult(pDictionary->CreateInstance(defs.cdMob(),
-							  IID_IAAFMob, 
-							  (IUnknown **)&pMob));
+	  // Create a concrete subclass of Mob
+	  checkResult(defs.cdMasterMob()->
+				  CreateInstance(IID_IAAFMob, 
+								 (IUnknown **)&pMob));
 
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-	  checkResult(pMob->SetMobID(newMobID));
+	  checkResult(pMob->SetMobID(TEST_MobID));
 	  checkResult(pMob->SetName(L"EnumAAFTaggedValuesTest"));
 		// append some comments to this mob !!
 	  for (test = 0; test < 3; test++)
@@ -133,9 +139,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  // Add some slots
 	  for(test = 0; test < 5; test++)
 	  {
- 		  checkResult(pDictionary->CreateInstance(defs.cdSourceClip(),
-							     IID_IAAFSourceClip, 
-							     (IUnknown **)&sclp));		
+ 		  checkResult(defs.cdSourceClip()->
+					  CreateInstance(IID_IAAFSourceClip, 
+									 (IUnknown **)&sclp));		
+		 checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 
 		  checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 
@@ -170,6 +180,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   if (newSlot)
     newSlot->Release();
 
+	if (pComponent)
+		pComponent->Release();
+
   if (seg)
     seg->Release();
 
@@ -200,33 +213,35 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-	IAAFFile *					pFile = NULL;
+  IAAFFile *					pFile = NULL;
   bool bFileOpen = false;
-	IAAFHeader *				pHeader = NULL;
-	IEnumAAFMobs *mobIter = NULL;
-	IAAFMob			*aMob = NULL;
-	IEnumAAFMobSlots	*slotIter = NULL;
-	IEnumAAFTaggedValues* pCommentIterator = NULL;
-	IEnumAAFTaggedValues* pCloneIterator = NULL;
-	IAAFTaggedValue*		pComment = NULL;
+  IAAFHeader *				pHeader = NULL;
+  IEnumAAFMobs *mobIter = NULL;
+  IAAFMob			*aMob = NULL;
+  IEnumAAFMobSlots	*slotIter = NULL;
+  IEnumAAFTaggedValues* pCommentIterator = NULL;
+  IEnumAAFTaggedValues* pCloneIterator = NULL;
+  IAAFTaggedValue*		pComment = NULL;
 
-	IAAFMobSlot		*slot = NULL;
-	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t	numMobs, n, slt;
-	aafUInt32		numComments, bytesRead, com;
-	HRESULT						hr = S_OK;
-	aafWChar		tag[64];
-	aafWChar		Value[64];
+  IAAFMobSlot		*slot = NULL;
+  aafProductIdentification_t	ProductInfo;
+  aafNumSlots_t	numMobs, n, slt;
+  aafUInt32		numComments, bytesRead, com;
+  HRESULT						hr = S_OK;
+  aafWChar		tag[64];
+  aafWChar		Value[64];
 
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFTaggedValues Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
+  ProductInfo.companyName = L"AAF Developers Desk";
+  ProductInfo.productName = L"EnumAAFTaggedValues Test";
+  ProductInfo.productVersion = &v;
+  ProductInfo.productVersionString = NULL;
+  ProductInfo.platform = NULL;
 
   try
   {
@@ -238,12 +253,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   	checkResult(pFile->GetHeader(&pHeader));
 
 
-	  checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 
 	  aafSearchCrit_t		criteria;
-	  criteria.searchTag = kNoSearch;
+	  criteria.searchTag = kAAFNoSearch;
     checkResult(pHeader->GetMobs (&criteria, &mobIter));
 
     for(n = 0; n < numMobs; n++)
@@ -380,7 +395,7 @@ extern "C" HRESULT CEnumAAFTaggedValues_test()
 	catch (...)
 	{
 	  cerr << "CEnumAAFTaggedValues_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
