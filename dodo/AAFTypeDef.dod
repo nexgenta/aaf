@@ -6,10 +6,8 @@ AAFTypeDefinition\
 AAFDefinitionObject\
 #endm
 #c
-#import ./AAFUnitTest.exp
 AD_HEAD
 
-AD_INCLUDE(AAFTypes)
 AD_FORWARD_DECLARATION(AAFReferenceValue)
 AD_FORWARD_DECLARATION(EnumAAFReferenceValues)
 
@@ -71,7 +69,7 @@ AD_METHOD1(SetMaxVersion,
 
 AD_METHOD1(GetSwapNeeded,
 		   [retval][out],
-		   aafSwapNeeded_t,
+		   aafSwapNeeded_t *,
 		   SwapNeeded,
 		   Specifies wheter the bytes in this type need to be swapped,
 		   Gets the swap information for this object.)
@@ -84,7 +82,7 @@ AD_METHOD1(SetSwapNeeded,
 		   Sets the swap information for this object.)
 
 AD_XMETHOD1(AppendRefValue,
-			[in\,ref],
+			[in],
 			objIn,
 			AAFReferenceValue,
 			pRefValue, 
@@ -92,7 +90,7 @@ AD_XMETHOD1(AppendRefValue,
 			Add the reference value  to the property definition.)
 
 AD_XMETHOD1(RemoveRefValue,
-			[in\,ref],
+			[in],
 			objIn,
 			AAFReferenceValue,
 			pRefValue, 
@@ -106,7 +104,5 @@ AD_XMETHOD1(GetRefValues,
 			ppEnum, 
 			Reference value Enumeration,
 			Return an enumerator for the reference values.)
-
-AD_OVERRIDE(.method-Test)
 
 AD_CLASS_END
