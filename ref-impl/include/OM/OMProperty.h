@@ -57,6 +57,8 @@ public:
     // @cmember The address of this <c OMProperty> object.
   OMProperty* address(void);
 
+  virtual void detach(const OMStorable* object, const size_t index);
+
 protected:
   int _propertyId;
   int _type;
@@ -150,6 +152,8 @@ public:
     //          <c OMStoredObject> <p s>, the size of the
     //          <c OMStrongReferenceProperty> is <p size>.
   virtual void restoreFrom(OMStoredObject& s, size_t size);
+
+  virtual void detach(const OMStorable* object, const size_t index);
 
 };
 
@@ -368,10 +372,14 @@ public:
     //   @this const
   void getSize(size_t& size) const;
 
+    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
+    //   @this const
+  size_t getSize(void) const;
+
     // @cmember Set the value of the <p OMReferencedObject> at
     //          position <p index> in this
     //          <c OMStrongReferenceVectorProperty>.
-  void setValueAt(const ReferencedObject*& value, const size_t index);
+  void setValueAt(const ReferencedObject* value, const size_t index);
 
     // @cmember Get the value of the <p OMReferencedObject> at
     //          position <p index> in this
@@ -382,6 +390,8 @@ public:
     // @cmember Appened the given <p OMReferencedObject> <p value> to
     //          this <c OMStrongReferenceVectorProperty>.
   void appendValue(const ReferencedObject*& value);
+
+  virtual void detach(const OMStorable* object, const size_t index);
 
 private:
 
@@ -426,14 +436,14 @@ public:
     //          <c OMCharacterStringProperty>.
   void assign(const CharacterType* characterString);
 
-    // @cmember The length of this <c OMCharacterStringProperty> (not
-    //          counting the null terminator).
+    // @cmember The length of this <c OMCharacterStringProperty> in
+    //          characters (not counting the null terminating character).
     //   @this const
   size_t length(void) const;
 
-    // @cmember Utility function for computing the length of the
-    //          string of <p CharacterType> characters
-    //          <p characterString>.
+    // @cmember Utility function for computing the length, in
+    //          characters, of the string of <p CharacterType>
+   //           characters <p characterString>.
   static size_t stringLength(const CharacterType* characterString);
 
 private:
