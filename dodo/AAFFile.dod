@@ -1,24 +1,3 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
 #startm .this-module 0
 AAFFile\
 #endm
@@ -29,16 +8,41 @@ AAFRoot\
 AD_HEAD
 AD_IDL(//
 // This interface is used with an object representing an AAF file.
+// An object supporting IAAFFile may be in one of the following
+// states:
+//
+// 1\) Closed.  This object is not associated with any storage.  Even
+//    so\, it may contain transient objects.
+//
+// 2\) Open for Reading.  This object is associated with a storage from
+//    which information is only to be read.
+//
+// 3\) Open for Modification.  This object is associated with a
+//    storage\, potentially containing data which is to be modified.
+//
+// 4\) Open as a Transient File.  This object is not associated with
+//    any storage\, but it may still be used to contain AAF objects.
+//
+// When created and Initialize\(\)d\, objects implementing this interface
+// are initially in the Closed state.
+//
+// Whenever the state of an IAAFFile-implementing object is changed
+// from any of the Open states to Closed\, any changes made since the
+// last Save\(\) are lost.
+//
+// An IAAFFile-implementing object may not be transitioned directly
+// from one Open state to another; it must first be put through the
+// Closed state.
 //
 // Any filesystem file can be opened for reading by multiple
 // IAAFFile-supporting objects.
 //
 // It is not recommended to Close an IAAFFile-implementing object
 // which contains objects to which outstanding references are held in
-// client code.  Nevertheless\, even if that is done\, the Close\(\)
-// method will succeed and all referenced objects will be put into a
-// Detached state in which may cause any methods on such objects to
-// fail with the error status of AAFRESULT_NOT_IN_FILE.
+// client code.  In fact\, the standard Close method will not allow
+// this to happen.  If an emergency Close is required \(such as when
+// references were discarded without releasing them\)\, the ForceClose
+// method can be used.
 //
 // In addition to the specific error results listed for each method\,
 // all methods in this interface may also return one of the following
@@ -48,85 +52,433 @@ AD_IDL(//
 //   - insufficient system memory is available to perform the
 //     operation.
 //)
+AD_INCLUDE(AAFTypes)
 AD_FORWARD_DECLARATION(AAFHeader)
 AD_CLASS_UUID(9346ACD2, 2713, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
 
 AD_DEFAULT_UUID(9346ACD3, 2713, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
-AD_XCLASS_BEGIN(Concrete, Transient)
-AD_METHOD0(Open,
-     Associates this IAAFFile-supporting object with the storage to
-  // which it is to be associated.  It will then be possible to access
-  // objects within this file.
-  //
-  // This method will succeed only if all of the following are true:
-  // - This object has not already been opened.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_ALREADY_OPEN
-  //   - This object has already been Open\(\)ed.)
-
-
-AD_XMETHOD1(SaveCopyAs,
-
-			[in],
-			objIn,
-			AAFFile,
-			pDestFile,
-			File to recieve contents,
-
-     Copies the contents of this file to *pDestFile.  Requires that
-  // *pDestFile be open\, writeable or modifiable\, and not yet
-  // contain any objects.
-  //
-  // NOTE! Stub only.   Implementation not yet added.
+AD_CLASS_BEGIN
+AD_STATIC_CREATE
+AD_METHOD0(Initialize,
+		   Initializes a newly allocated\, empty IAAFFile-supporting object.
+  // The object will be put into the Closed state.  This method must
+  // be called after allocation\, and before any other method can be
+  // called.
   //
   // Succeeds if:
-  // - This object is currently open.
-  // - The named filesystem file is writable.
+  // - Initialize\(\) has not yet been called on this object.
   //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
+  // Returns one of the following:
+  //
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
-  // AAFRESULT_NOT_OPEN
-  //   - This object is not open.
-  //
-  // AAFRESULT_NOT_WRITEABLE
-  //   - The named file cannot be written.)
+  // AAFRESULT_ALREADY_INITIALIZED
+  //   - Initialize\(\) has already been called on this object.)
 
 
-AD_XMETHOD1(GetHeader,
-			[out\, retval],
-			objOut,
-			AAFHeader,
-			ppHeader,
-			Set to header of the current file,
-			Returns the IAAFHeader-supporting object associated with this
-  // file.  If this object has never been associated with a file\, a
-  // new empty IAAFHeader-supporting object will be created and
-  // returned.  The returned header is AddRef\(\)ed before it is
-  // returned.  Note that the header is automatically created when the
-  // file object is created.
+AD_XMETHOD2(OpenExistingRead,
+
+			[in\, string],
+			objPass,
+			wchar_t *,
+			pFileName,
+			Null-terminated string containing name of filesystem file to be
+	// opened for reading.  Filename must be in a form that would be
+	// acceptable to ANSI fopen\(\) for this platform.,
+
+			[in],
+			objPass,
+			aafUInt32,
+			modeFlags,
+			File open mode flags.  May be any of the following ORed together.
+	// All other bits must be set to zero.
+    //  - kAAFFileModeUnbuffered - to indicate buffered mode.  Default
+    //    is buffered.
+    //  - kAAFFileModeAsync - to indicate asynchronous mode.  Default is
+    //    synchronous mode.,
+
+			Associates this IAAFFile-supporting object with an existing
+  // filesystem file that contains data which is only to be read.
+  // Does the following:
+  // - Opens the existing named file in the filesystem for reading.
+  // - Associates this object with that filesystem file.
+  // - Places this object into the Open state.
+  // - This AAFFile object then can be used to refer to all AAF
+  //   objects contained within the file.
   //
   // Succeeds if:
   // - This object has already been Initialize\(\)d.
-  // - This file object is open.
-  // - the given header pointer is valid.
-  // - this object contains a header.
+  // - This object is currently Closed.
+  // - The pFileName argument is valid.
+  // - Valid flags have been specified.
+  // - The named file exists in the filesystem.
+  // - The named filesystem file is readable.
+  // - The named file is a valid AAF file.
   //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_ALREADY_OPEN
+  //   - This object is already open.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - the pFileName pointer arg is NULL.
+  //
+  // AAFRESULT_BAD_FLAGS
+  //   - illegal flags were specified.
+  //
+  // AAFRESULT_FILE_NOT_FOUND
+  //   - The named file does not exist in the filesystem.
+  //
+  // AAFRESULT_NOT_READABLE
+  //   - The named file cannot be read.
+  //
+  // AAFRESULT_NOTAAFFILE
+  //   - The named file is not a valid AAF file.)
+
+
+AD_XMETHOD3(OpenExistingModify,
+
+			[in\, string],
+			objPass,
+			wchar_t *,
+			pFileName,
+			Null-terminated string containing name of filesystem file to be
+	// opened for modification.  Filename must be in a form that would
+	// be acceptable to ANSI fopen\(\) for this platform.,
+
+			[in],
+			objPass,
+			aafUInt32,
+			modeFlags,
+			File open mode flags.  May be any of the following ORed together.
+	// All other bits must be set to zero.
+    //  - kAAFFileModeUnbuffered - to indicate buffered mode.  Default
+    //    is buffered.
+    //  - kAAFFileModeAsync - to indicate asynchronous mode.  Default is
+    //    synchronous mode.
+    //  - kAAFFileModeTransacted - to indicate transacted mode.  Default
+    //    is non-transacted mode.,
+
+			[in],
+			objPass,
+			aafProductIdentification_t *,
+			pIdent,
+			Identification which is to be associated with this file.,
+
+			Associates this IAAFFile-supporting object with an existing
+  // filesystem file that contains data which is to be read and
+  // written.  Associates the given identification with it.
+  // Does the following:
+  // - Opens the existing named file in the filesystem for reading and
+  //   writing.
+  // - Associates this object with that filesystem file.
+  // - Places this object into the Open state.
+  // - This AAFFile object then can be used to refer to all AAF
+  //   objects contained within the file.
+  //
+  // Succeeds if:
+  // - This object has already been Initialize\(\)d.
+  // - This object is currently Closed.
+  // - The pFileName argument is valid.
+  // - The pIdent argument is valid.
+  // - The named file exists in the filesystem.
+  // - The named filesystem file is readable.
+  // - The named filesystem file is writable.
+  // - The named file is a valid AAF file.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_ALREADY_OPEN
+  //   - This object is already open.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - either pFileName or pIdent pointer argument is NULL.
+  //
+  // AAFRESULT_FILE_NOT_FOUND
+  //   - The named file does not exist in the filesystem.
+  //
+  // AAFRESULT_NOT_READABLE
+  //   - The named file cannot be read.
+  //
+  // AAFRESULT_NOT_WRITEABLE
+  //   - The named file cannot be written.
+  //
+  // AAFRESULT_NOTAAFFILE
+  //   - The named file is not a valid AAF file.)
+
+
+AD_XMETHOD3(OpenNewModify,
+
+			[in\, string],
+			objPass,
+			wchar_t *,
+			pFileName,
+			Null-terminated string containing name of filesystem file to be
+	// opened for modification.  Filename must be in a form that would
+	// be acceptable to ANSI fopen\(\) for this platform.,
+
+			[in],
+			objPass,
+			aafUInt32,
+			modeFlags,
+			File open mode flags.  May be any of the following ORed together.
+	// All other bits must be set to zero.
+    //  - kAAFFileModeUnbuffered - to indicate buffered mode.  Default
+    //    is buffered.
+    //  - kAAFFileModeAsync - to indicate asynchronous mode.  Default is
+    //    synchronous mode.
+    //  - kAAFFileModeTransacted - to indicate transacted mode.  Default
+    //    is non-transacted mode.,
+
+			[in],
+			objPass,
+			aafProductIdentification_t *,
+			pIdent,
+			Identification which is to be associated with this file.,
+
+			Associates this IAAFFile-supporting object with a newly-created
+  // filesystem file that contains data which is to be read and
+  // written.  Associates the given identification with it.
+  // Does the following:
+  // - Creates a new file in the filesystem with the given name.
+  // - Opens the filesystem file for reading and writing.
+  // - Associates this object with that filesystem file.
+  // - Places this object into the Open state.
+  // - This AAFFile object then can be used to refer to all AAF
+  //   objects contained within the file.
+  //
+  // Succeeds if:
+  // - This object has already been Initialize\(\)d.
+  // - This object is currently closed.
+  // - The pFileName argument is valid.
+  // - The pIdent argument is valid.
+  // - The named file exists in the filesystem.
+  // - The named filesystem file is readable.
+  // - The named filesystem file is writable.
+  // - The named file is a valid AAF file.
+  // - There is sufficient space in the filesystem to create the file.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_ALREADY_OPEN
+  //   - This object is already open.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - either pFileName or pIdent pointer argument is NULL.
+  //
+  // AAFRESULT_FILE_EXISTS
+  //   - The named file already exists in the filesystem.
+  //
+  // AAFRESULT_NOT_READABLE
+  //   - The named file cannot be read.
+  //
+  // AAFRESULT_NOT_WRITEABLE
+  //   - The named file cannot be written.
+  //
+  // AAFRESULT_INSUFFICIENT_SPACE
+  //   - There is insufficient space in the filesystem to create this
+  //     file.)
+
+
+AD_XMETHOD1(OpenTransient,
+			[in],
+			objPass,
+			aafProductIdentification_t *,
+			pIdent,
+			Identification which is to be associated with this file.,
+
+		   Marks this IAAFFile-supporting object as a transient file\,
+  // meaning that it is not associated with any filesystem file but
+  // may still be used to contain AAF objects as if it was associated
+  // with a filesystem file.  Associates the given identification with
+  // this file.
+  //
+  // Succeeds if:
+  // - This object has already been Initialize\(\)d.
+  // - The pIdent argument is valid.
+  // - This object is currently closed.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_ALREADY_OPEN
+  //   - This object is already open.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - the pIdent pointer argument is NULL.)
+
+
+AD_METHOD0(Close,
+		   Dissociates this IAAFFile-supporting object from its
+  // currently-associated filesystem file\, closing that filesystem
+  // file in the process.  Any AAF objects which were contained within
+  // this object will then be no longer available to the client.
+  //
+  // If the client is maintaining any references to any objects which
+  // are contained in this object\, then this method will fail.
+  //
+  // Note: any unSave\(\)d changes will not be written to the filesystem
+  // file before it is closed.
+  //
+  // This method will succeed only if all of the following are true:
+  // - This object is currently associated with a filesystem file.
+  // - There are no outstanding references to contained objects.
+  // - The associated filesystem file can be successfully closed.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_OUTSTANDING_REFS
+  //   - The client has outstanding references to objects contained in
+  //     this file.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not already associated with any filesystem
+  //     file.)
+
+
+AD_METHOD0(ForceClose,
+		   Dissociates this IAAFFile-supporting object from its
+  // currently-associated filesystem file\, closing that filesystem
+  // file in the process.  Any AAF objects which were contained within
+  // this object will then be no longer available to the client.
+  //
+  // This method will succeed even if the client is maintaining any
+  // references to any objects which are contained in this object.
+  //
+  // Note: any unSave\(\)d changes will not be written to the filesystem
+  // file before it is closed.
+  //
+  // This method will succeed only if all of the following are true:
+  // - This object is currently associated with a filesystem file.
+  // - The associated filesystem file can be successfully closed.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not already associated with any filesystem
+  //     file.)
+
+
+AD_METHOD0(Save,
+		   If this IAAFFile-supporting object is associated with a
+  // filesystem file for writing or modification\, all unsaved changes
+  // made to the contents of this object are saved to that filesystem
+  // file.
+  //
+  // This method will succeed only if all of the following are true:
+  // - This object has already been Initialize\(\)d.
+  // - This object is currently associated with a filesystem file for
+  //   writing or modification.
+  // - Sufficient space remains in the filesystem for the data to be
+  //   written.
+  //
+  // Note: This method guarantees that upon return\, the filesystem
+  // file will always be left in a consistent and valid state.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not associated with an open filesystem file.
+  //
+  // AAFRESULT_WRONG_OPENMODE
+  //   - This object is not open for writing or modification.
+  //
+  // AAFRESULT_INSUFFICIENT_SPACE
+  //   - There is insufficient space in the filesystem to save the
+  //     contents of this object.)
+
+
+AD_XMETHOD2(SaveAs,
+
+			[in\, string],
+			objPass,
+			wchar_t *,
+			pFileName,
+			Null-terminated string containing name of filesystem file to
+	// which this file is to be saved.  Filename must be in a form
+	// that would be acceptable to ANSI fopen\(\) for this platform.,
+
+			[in],
+			objPass,
+			aafUInt32,
+			modeFlags,
+			File open mode flags.  May be any of the following ORed together.
+	// All other bits must be set to zero.
+    //  - kAAFFileModeUnbuffered - to indicate buffered mode.  Default
+    //    is buffered.
+    //  - kAAFFileModeAsync - to indicate asynchronous mode.  Default is
+    //    synchronous mode.
+    //  - kAAFFileModeTransacted - to indicate transacted mode.  Default
+    //    is non-transacted mode.,
+
+			Saves this IAAFFile-supporting object into a newly-created
+  // filesystem file.  This object will then be associated with the
+  // new filesystem file\, and the old filesystem file will be closed
+  // without having any additional changes written to it.
   // 
+  // Does the following:
+  // - Creates a new file in the filesystem with the given name.
+  // - Opens the filesystem file for reading and writing.
+  // - Associates this object with that filesystem file.
+  // - Copies the contents of this object into the new file.
+  // - Closes the old filesystem file.
+  // - This AAFFile object then can be used to refer to all AAF
+  //   objects contained within the file.
+  //
+  // Succeeds if:
+  // - This object has already been Initialize\(\)d.
+  // - This object is currently open.
+  // - The pFileName argument is valid.
+  // - The named file does not exist in the filesystem.
+  // - The named filesystem file is readable.
+  // - The named filesystem file is writable.
+  // - There is sufficient space in the filesystem to create and write
+  //   the file.
+  //
+  // Returns one of the following:
+  //
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
@@ -135,6 +487,76 @@ AD_XMETHOD1(GetHeader,
   //
   // AAFRESULT_NOT_OPEN
   //   - This object is not open.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pFileName pointer argument is NULL.
+  //
+  // AAFRESULT_FILE_EXISTS
+  //   - The named file already exists in the filesystem.
+  //
+  // AAFRESULT_NOT_READABLE
+  //   - The named file cannot be read.
+  //
+  // AAFRESULT_NOT_WRITEABLE
+  //   - The named file cannot be written.
+  //
+  // AAFRESULT_INSUFFICIENT_SPACE
+  //   - There is insufficient space in the filesystem to create this
+  //     file or write its contents.)
+
+
+AD_METHOD0(Revert,
+		   If this IAAFFile-supporting object is associated with a
+  // filesystem file for reading or modification\, all unsaved changes
+  // made to the contents of this object are discarded and the
+  // contents are brought back to reflect the state of the filesystem
+  // file.
+  //
+  // This method will succeed only if all of the following are true:
+  // - This object has already been Initialize\(\)d.
+  // - This object is currently associated with a filesystem file for
+  //   reading or modification.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NOT_OPEN
+  //   - This object is not associated with an open filesystem file.
+  //
+  // AAFRESULT_WRONG_OPENMODE
+  //   - This object is not open for reading or modification.)
+
+
+AD_XMETHOD1(GetHeader,
+			[out\, retval],
+			objOut,
+			AAFHeader,
+			ppHeader,
+			Set to header of the current file,
+  // Returns the IAAFHeader-supporting object associated with this
+  // file.  If this object has never been associated with a file\, a
+  // new empty IAAFHeader-supporting object will be created and
+  // returned.  The returned header is AddRef\(\)ed before it is
+  // returned.  Note that the header is automatically created when the
+  // file object is created.
+  //
+  // Succeeds if:
+  // - This object has already been Initialize\(\)d.
+  // - the given header pointer is valid.
+  // - this object contains a header.
+  //
+  // Returns one of the following:
+  //
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
   //
   // AAFRESULT_NULL_PARAM
   //   - the header pointer arg is NULL.
@@ -155,10 +577,8 @@ AD_XMETHOD1(GetRevision,
   // - This object has already been Initialize\(\)d.
   // - the given revision pointer is valid.
   //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
+  // Returns one of the following:
+  //
   // AAFRESULT_SUCCESS
   //   - succeeded.  \(This is the only code indicating success.\)
   //
@@ -167,85 +587,4 @@ AD_XMETHOD1(GetRevision,
   //
   // AAFRESULT_NULL_PARAM
   //   - the revision pointer arg is NULL.)
-
-
-AD_METHOD0(Save,
-     If this IAAFFile-supporting object is open\, all unsaved changes
-  // made to the contents of this object are saved.
-  //
-  // This method will succeed only if all of the following are true:
-  // - This object is currently open.
-  // - Sufficient space remains in the storage for the data to be
-  //   written.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_OPEN
-  //   - This object is not open.
-  //
-  // AAFRESULT_WRONG_OPENMODE
-  //   - This object is not open for writing or modification.
-  //
-  // AAFRESULT_INSUFFICIENT_SPACE
-  //   - There is insufficient space in the storage to save the
-  //     contents of this object.)
-
-
-AD_METHOD0(Close,
-     Dissociates this IAAFFile-supporting object from its
-  // currently-associated storage.  Any AAF objects which were
-  // contained within this object will then no longer be available to
-  // the client.
-  //
-  // If the client is maintaining any references to any objects which
-  // are contained in this object\, those objects will be marked as
-  // dissociated\, and methods on them will fail.
-  //
-  // Any unsaved changes will be written to the file before the Close
-  // operation is complete.
-  //
-  // This method will succeed only if all of the following are true:
-  // - This object is currently open.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NOT_OPEN
-  //   - This object is not already open.)
-
-AD_XMETHOD1(GetDictionary,
-			[out\, retval],
-			objOut,
-			AAFDictionary,
-			ppDictionary,
-			The AAF Dictionary,
-     Places the dictionary that contains all types of aaf definition
-  // objects into the *ppDictionary argument.  The returned dictionary
-  // is AddRef\(\)ed before it is returned.  Note that the dictionary
-  // is automatically created when the header object is created.
-  // 
-  // Succeeds if all of the following are true:
-  // - the ppDictionary pointer is valid.
-  // 
-  // If this method fails no state will be changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - ppDictionary is null.)
-
-AD_XCLASS_END(Concrete, Transient)
+AD_CLASS_END
