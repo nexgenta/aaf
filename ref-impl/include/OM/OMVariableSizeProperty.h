@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,7 +29,7 @@
 #ifndef OMVARIABLESIZEPROPERTY_H
 #define OMVARIABLESIZEPROPERTY_H
 
-#include "OMProperty.h"
+#include "OMPropertyBase.h"
 
   // @class Variable size simple (data) persistent
   //        properties supported by the Object Manager.
@@ -42,7 +42,7 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMVariableSizeProperty(const OMPropertyId propertyId, const wchar_t* name);
+  OMVariableSizeProperty(const OMPropertyId propertyId, const char* name);
 
     // @cmember Destructor.
   virtual ~OMVariableSizeProperty(void);
