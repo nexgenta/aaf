@@ -16,11 +16,9 @@
 
 class ImplAAFMob;
 
-class ImplAAFEssenceData;
-
 class ImplEnumAAFMobs;
 
-class ImplEnumAAFEssenceData;
+class ImplEnumAAFMedia;
 
 class ImplAAFDictionary;
 
@@ -41,17 +39,6 @@ class ImplAAFFile;
 
 #include "aafTable.h"
 
-#include "aafErr.h"
-#include "ImplAAFObject.h"
-#include "ImplAAFIdentification.h"
-#include "ImplAAFContentStorage.h"
-#include "ImplAAFDictionary.h"
-
-
-class AAFDataKind;
-class AAFOperationDef;
-
-
 class ImplAAFHeader : public ImplAAFObject
 {
 public:
@@ -60,12 +47,8 @@ public:
   //
   //********
   ImplAAFHeader ();
-
-protected:
   ~ImplAAFHeader ();
 
-public:
-  OMDECLARE_STORABLE(ImplAAFHeader)
 
   //****************
   // LookupMob()
@@ -84,16 +67,22 @@ public:
         (aafMobKind_t  mobKind,   //@parm [in] The mob kind to count
 		 aafNumSlots_t *  pNumMobs);  //@parm [out,retval] Total number of mobs of kind mobKind
 
+
   //****************
-  // EnumAAFAllMobs()
+  // GetPrimaryMobs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    EnumAAFAllMobs
-	    (// @parm [in,ref] Search Criteria for enumeration
-         aafSearchCrit_t *  pSearchCriteria,
+    GetPrimaryMobs
+        (ImplEnumAAFMobs ** ppEnum);  //@parm [out,retval] Mob Enumeration
 
-		 // @parm [out,retval] Mob Enumeration
-		 ImplEnumAAFMobs ** ppEnum);
+
+  //****************
+  // GetMobs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetMobs
+        (aafSearchCrit_t *  pSearchCriteria,   //@parm [in,ref] Search Criteria for enumeration
+		 ImplEnumAAFMobs ** ppEnum);  //@parm [out,retval] Mob Enumeration
 
 
   //****************
@@ -112,62 +101,25 @@ public:
         (ImplAAFMob * pMob);  //@parm [in] Mob to remove from header
 
 
-  //****************
-  // GetNumEssenceData()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumEssenceData
-        (aafUInt32 *  pNumEssenceData);  //@parm [out,retval] Total number of essence data with type
-
 
   //****************
-  // IsEssenceDataPresent()
+  // IsMediaDataPresent()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    IsEssenceDataPresent
-        (// @parm [in] A Unique File Mob ID
-		 aafUID_t *  pFileMobID,
-
-		 // @parm [in] The Essence File Format
-		 aafFileFormat_t  fmt,
-
-		 // @parm [out,retval] True if the essence is found
-         aafBool *  pResult);
+    IsMediaDataPresent
+        (aafUID_t *  pFileMobID,   //@parm [in,ref] A Unique File Mob ID
+		 aafFileFormat_t  fmt,   //@parm [in] The Media File Format
+         aafBool *  result);  //@parm [out,retval] True if the media is found
 
 
   //****************
-  // EnumAAFEssenceData()
+  // GetMedia()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    EnumEssenceData
-	    ( // @parm [out,retval] Essence Enumeration
-		 ImplEnumAAFEssenceData ** ppEnum);
+    GetMedia
+        (aafMediaCriteria_t *  pMediaCriteria,   //@parm [in,ref] Media Criteria for enumeration
+		 ImplEnumAAFMedia ** ppEnum);  //@parm [out,retval] Media Enumeration
 
-
-  //****************
-  // AppendEssenceData()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    AppendEssenceData
-		// @parm [in] Essence data object to append
-        (ImplAAFEssenceData * pEssenceData);
-
-
-  //****************
-  // RemoveEssenceData()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveEssenceData
-		// @parm [in] Essence data object to Remove
-        (ImplAAFEssenceData * pEssenceData);
-
-
-  //****************
-  // GetContentStorage()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetContentStorage
-        (ImplAAFContentStorage ** ppContentStorage);  //@parm [out,retval] The AAF ContentStorage
 
 
   //****************
@@ -188,60 +140,29 @@ public:
 
 
   //****************
-  // GetIdentificationByGen()
+  // GetIdentification()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIdentificationByGen
-	    (// @parm [in,ref] Unique Generation ID
-         aafUID_t *  pGeneration,
-
-		 // @parm [out,retval] Indentification Object
-		 ImplAAFIdentification ** ppIdentification);
+    GetIdentification
+        (aafUID_t *  pGeneration,   //@parm [in,ref] Unique Generation ID
+		 ImplAAFIdentification ** ppIdentification);  //@parm [out,retval] Indentification Object
 
 
   //****************
-  // GetNumIdents()
+  // GetIdentificationList()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetNumIdents
-        (aafUInt32 *  pNumIdents);  //@parm [out,retval] Total number of identifications
-
-
-  //****************
-  // EnumAAFIdents()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    EnumAAFIdents
-		// @parm [out,retval] Indentification Enumeration
-        (ImplEnumAAFIdentifications ** ppEnum);
+    GetIdentificationList
+        (ImplEnumAAFIdentifications ** ppEnum);  //@parm [out,retval] Indentification Enumeration
 
 
 
   //****************
-  // AppendIdentification()
+  // GetToolkitVersion()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendIdentification
-		// @parm [in] Identification to append
-        (ImplAAFIdentification * pIdent);
-
-
-  //****************
-  // RemoveIdentification()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveIdentification
-		// @parm [in] Identification to remove
-        (ImplAAFIdentification * pIdent);
-
-
-  //****************
-  // GetRefImplVersion()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetRefImplVersion
-		// @parm [out,retval] The Toolkit Version
-        (aafProductVersion_t *  pToolkitVersion);
+    GetToolkitVersion
+        (aafProductVersion_t *  pToolkitVersion);  //@parm [out,retval] The Toolkit Version
 
 
   //****************
@@ -253,46 +174,66 @@ public:
 
 	
   //****************
+  // GetByteOrder()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetByteOrder
+        (aafInt16 *  pByteOrder);  //@parm [out,retval] The Byte order
+
+
+  //****************
   // GetLastModified()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetLastModified
         (aafTimeStamp_t *  pLastModified);  //@parm [out,retval] The modification date-time stamp
 
+
+
 public:
-	// Interfaces visible inside the toolkit, but not exposed through the API
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFHeaderTest.cpp.
+  static AAFRESULT test();
+
+	aafBool IsMediaDataPresent( 	aafUID_t				fileMobUid,	/* IN -- */
+									aafFileFormat_t	fmt);
+	AAFRESULT AppendDataObject(aafUID_t mobID,      /* IN - Mob ID */
+						  AAFObject *dataObj) ;    /* IN - Input Mob */ 
 
 AAFRESULT SetToolkitRevisionCurrent(void);
+AAFRESULT IsValidHeadObject(void);
+
 AAFRESULT GetNumIdentifications (aafInt32 * /*pCount*/);
 
 AAFRESULT AddIdentificationObject (aafProductIdentification_t * /*pIdent*/);
+AAFRESULT BuildMediaCache(void);
 AAFRESULT LoadMobTables(void);
-AAFRESULT SetModified(void);		// To NOW
 
-  void SetByteOrder(const aafInt16 byteOrder);
-  void SetDictionary(ImplAAFDictionary *pDictionary);
-  void SetFileRevision(aafVersionType_t pRevision);
+#if FULL_TOOLKIT
+AAFRESULT ReadToolkitRevision(aafProductVersion_t *revision);
+AAFRESULT WriteToolkitRevision(aafProductVersion_t revision);
+AAFRESULT FinishCreation(void);
+AAFRESULT BuildDatakindCache(void);
+AAFRESULT BuildEffectDefCache(void);
+AAFRESULT UpdateLocalCLSD(void);
+AAFRESULT CreateTables(void);
+AAFRESULT UpdateFileCLSD(void);
+AAFRESULT CreateDatakindCache(void);
+#endif
 
 private:
-	// These are private accessor methods.
-	ImplAAFContentStorage *GetContentStorage(void);
-	ImplAAFDictionary *GetDictionary(void);
-
-private:
-
 		ImplAAFFile		*_file;
+		omTable_t       *_dataObjs;
+		omTable_t       *_datadefs;
+		omTable_t       *_effectDefs;
+		omTable_t       *_mobs;
 
 		// Non-table instance variables
+		aafVersionType_t	_fileRev;
 		aafProductVersion_t	_toolkitRev;
+		aafInt16			_byteOrder;
+		aafTimeStamp_t		_lastModified;
 
-		// Persistent properties
-    //
-		OMFixedSizeProperty<aafInt16>						_byteOrder;
-		OMFixedSizeProperty<aafTimeStamp_t>					_lastModified;
-		OMStrongReferenceVectorProperty<ImplAAFIdentification> _identificationList;
-		OMStrongReferenceProperty<ImplAAFContentStorage>	_contentStorage;
-		OMStrongReferenceProperty<ImplAAFDictionary>		_dictionary;
-		OMFixedSizeProperty<aafVersionType_t>               _fileRev;
 };
 
 #endif // ! __ImplAAFHeader_h__
