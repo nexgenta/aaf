@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSDKBuild.h,v 1.39.2.1 2004/06/08 13:45:25 stuart_hc Exp $ $Name:  $
+// $Id: AAFSDKBuild.h,v 1.39.2.2 2004/06/09 14:05:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,7 @@
 #define AAF_MINOR_VERSION 1
 #define AAF_MAINT_RELEASE 0
 
-#define AAF_RELEASE_STAGE kAAFVersionReleased
+#define AAF_RELEASE_STAGE kAAFVersionBeta
  
 // these next two lines are monitored/incremented by newbuild.pl
 
