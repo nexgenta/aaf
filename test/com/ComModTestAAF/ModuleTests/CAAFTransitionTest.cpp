@@ -19,6 +19,7 @@
 #include "aafCvt.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
+#include "AAFDefUIDs.h"
 
 // This values are used for testing purposes
 static aafUID_t    fillerUID = DDEF_Picture;
@@ -106,7 +107,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 
@@ -208,6 +209,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSequence->AppendComponent(pComponent));
 
 		// Release the component - because we need to reuse the pointer later
+		pFiller->Release();
+		pFiller = NULL;
 		pComponent->Release();
 		pComponent = NULL;
 
@@ -229,13 +232,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationGroup->Initialize(&datadef, transitionLength, pOperationDef));
 		checkResult(pOperationGroup->AddNewParameter (pParm));
 		checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
-												IID_IAAFFiller,
+												IID_IAAFSegment,
 												(IUnknown **) &pEffectFiller));
 		checkResult(pOperationGroup->AppendNewInputSegment (pEffectFiller));
 		// release the filler
 		pEffectFiller->Release();
-		pFiller->Release();
-		pFiller = NULL;
+		pEffectFiller  = NULL;
 
 		checkResult(pOperationGroup->SetBypassOverride (1));
 		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
@@ -269,6 +271,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	    checkResult(pFiller->Initialize( &fillerUID, fillerLength));
 		// append the filler to the sequence
 		checkResult(pSequence->AppendComponent(pComponent));
+		pComponent->Release();
+		pComponent = NULL;
+		pFiller->Release();
+		pFiller = NULL;
 
 		// Now, we append the composition mob to the file	
 		checkResult(pHeader->AppendMob(pMob));
@@ -281,6 +287,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	
 
 	// Cleanup and return
+	if (pParm)
+		pParm->Release();
+
+	if (pParamDef)
+		pParamDef->Release();
+
+	if (pSourceClip)
+		pSourceClip->Release();
+
+	if (pSourceRef)
+		pSourceRef->Release();
+
 	if (pNewSlot)
 		pNewSlot->Release();
 
@@ -357,14 +375,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"AAFTransition Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -409,13 +426,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 						// Check results !!
 						checkExpression(cutPoint == 0, AAFRESULT_TEST_FAILED);
 						checkExpression(transitionLength == 100, AAFRESULT_TEST_FAILED);
+						pTransition->Release();
+						pTransition = NULL;
 					}
 					else
 					{
 						// validate that the other segments are Fillers
 						checkResult(pComponent->QueryInterface(IID_IAAFFiller, (void **)&pFiller));
+						pFiller->Release();
+						pFiller = NULL;
 					}
+					pComponent->Release();
+					pComponent = NULL;
 				}
+				pSegment->Release();
+				pSegment = NULL;
+				pSequence->Release();
+				pSequence = NULL;
+				pCompIter->Release();
+				pCompIter = NULL;
 			}
 
 			pMob->Release();
@@ -459,6 +488,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (pMob)
 		pMob->Release();
 
+	if (pMobIter)
+		pMobIter->Release();
+
 	if (pDictionary)
 		pDictionary->Release();
 
@@ -478,7 +510,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CAAFTransition_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"TransitionTest.aaf";
+	aafWChar * pFileName = L"AAFTransitionTest.aaf";
 
 	try
 	{
