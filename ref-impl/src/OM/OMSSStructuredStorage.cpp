@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStructuredStorage.cpp,v 1.5 2004/10/29 14:53:26 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStructuredStorage.cpp,v 1.6 2004/11/02 14:16:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -559,18 +559,10 @@ OMSSIStream::Release(void)
 	{
 		if (_stream != 0)
 		{
-			unsigned SSRW_INT64 p, sz;
-			// save position for later test
-			status = streamGetPos64(_stream, &p);
-			// seek to the end of the stream
-			// SchemaSoft resizes the stream upon close
-			status = streamSeek64( _stream, 0, STG_END );
-	
-			// test position
-			status = streamGetPos64(_stream, &sz);
-	
-			if( p != sz )
-				OMUInt64 err = sz-p;
+			// Since SchemaSoft does not maintain a 'highwater mark'
+			// it is necessary to seek to the end of a stream
+			// before closing it otherwise streams can be truncated.
+			streamSeek64( _stream, 0, STG_END );
 	
 			status = ::closeStream(&_stream);
 			_stream = 0;
