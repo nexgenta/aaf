@@ -47,7 +47,7 @@ class OMStrongReferenceSetElement;
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects. 
+  //          used to identify the referenced objects.
   //   @base public | <c OMReferenceSetProperty>
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetProperty : public OMReferenceSetProperty {
@@ -128,7 +128,7 @@ public:
     //          <p identification>.
   ReferencedObject* value(
                      const UniqueIdentification& identification) const;
-  
+
     // @cmember Find the <p ReferencedObject> in this
     //          <c OMStrongReferenceSetProperty> identified by
     //          <p identification>.  If the object is found it is returned
@@ -143,7 +143,7 @@ public:
   virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceSetProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
   // Direct property access interface
 
