@@ -310,10 +310,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFParameterDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluggableCode.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFPluginDescriptor.cpp"
 # End Source File
 # Begin Source File
@@ -431,6 +427,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDef.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefArray.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFTypeDefCharacter.cpp"
 # End Source File
 # Begin Source File
 
