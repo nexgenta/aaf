@@ -1,14 +1,5 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFScopeReference
-/***********************************************\
-*                                               *
-* Advanced Authoring Format                     *
-*                                               *
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*                                               *
-\***********************************************/
-
-
 
 /***********************************************************************
  *
