@@ -44,13 +44,7 @@ ImplEnumAAFLocators::ImplEnumAAFLocators ()
 
 
 ImplEnumAAFLocators::~ImplEnumAAFLocators ()
-{
-	if (_cEssenceDesc)
-	{
-		_cEssenceDesc->ReleaseReference();
-		_cEssenceDesc = NULL;
-	}
-}
+{}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -104,37 +98,23 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFLocators::Clone (ImplEnumAAFLocators **ppEnum)
 {
 	ImplEnumAAFLocators		*result;
-	AAFRESULT		hr;
 
 	result = (ImplEnumAAFLocators *)CreateImpl(CLSID_EnumAAFLocators);
-	if (result == NULL)
-		return E_FAIL;
-
-	hr = result->SetEssenceDesc(_cEssenceDesc);
-	if (SUCCEEDED(hr))
+	if(result != NULL)
 	{
 		result->_current = _current;
+		result->_cEssenceDesc = _cEssenceDesc;
 		*ppEnum = result;
+		return AAFRESULT_SUCCESS;
 	}
 	else
-	{
-		result->ReleaseReference();
-		*ppEnum = NULL;
-	}
-	
-	return hr;
+		return AAFRESULT_NOMEMORY;
 }
 
 AAFRESULT
     ImplEnumAAFLocators::SetEssenceDesc(ImplAAFEssenceDescriptor *pEDesc)
 {
-	if (_cEssenceDesc)
-		_cEssenceDesc->ReleaseReference();
-
 	_cEssenceDesc = pEDesc;
-
-	if (pEDesc)
-		pEDesc->AcquireReference();
 	return AAFRESULT_SUCCESS;
 }
 
