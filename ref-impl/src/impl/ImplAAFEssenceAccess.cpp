@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFMasterMob_h__
 #include "ImplAAFMasterMob.h"
@@ -102,19 +121,35 @@ ImplAAFEssenceAccess::~ImplAAFEssenceAccess ()
 	{
 		_dataFile->Close();		///!!!
 		_dataFile->ReleaseReference();
+		_dataFile = 0;
 	}
 	if(_destination != NULL)
+	  {
 		_destination->ReleaseReference();
+		_destination = 0;
+	  }
 	if(_compFileMob != NULL)
+	  {
 		_compFileMob->ReleaseReference();
+		_compFileMob = 0;
+	  }
 	if(_masterMob != NULL)
+	  {
 		_masterMob->ReleaseReference();
+		_masterMob = 0;
+	  }
 	if(_channels != NULL)
 		delete [] _channels;
 	if(_mdes != NULL)
+	  {
 		_mdes->ReleaseReference();
+		_mdes = 0;
+	  }
 	if(_dataFileMob != NULL)
+	  {
 		_dataFileMob->ReleaseReference();
+		_dataFileMob = 0;
+	  }
 	if(_stream != NULL)
 		_stream->Release();
 	if(_codecDescriptor != NULL)
@@ -356,15 +391,20 @@ ImplAAFEssenceAccess::Create (	  ImplAAFMasterMob *masterMob,
 	XEXCEPT
 	{
 		if(dataDict != NULL)
-			dataDict->ReleaseReference();
+		  dataDict->ReleaseReference();
+		dataDict = 0;
 		if(compHead != NULL)
-			compHead->ReleaseReference();
+		  compHead->ReleaseReference();
+		compHead = 0;
 		if(dataHead != NULL)
-			dataHead->ReleaseReference();
+		  dataHead->ReleaseReference();
+		dataHead = 0;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 		if(implData != NULL)
-			implData->ReleaseReference();
+		  implData->ReleaseReference();
+		implData = 0;
 		if(nameBuf != NULL)
 			delete nameBuf;
 		if(edStream != NULL)
@@ -645,19 +685,26 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(fileMob != NULL)
-			fileMob->ReleaseReference();
+		  fileMob->ReleaseReference();
+		fileMob = 0;
 		if(tmpTrack != NULL)
-			tmpTrack->ReleaseReference();
+		  tmpTrack->ReleaseReference();
+		tmpTrack = 0;
 		if(dataDict != NULL)
-			dataDict->ReleaseReference();
+		  dataDict->ReleaseReference();
+		dataDict = 0;
 		if(compHead != NULL)
-			compHead->ReleaseReference();
+		  compHead->ReleaseReference();
+		compHead = 0;
 		if(dataHead != NULL)
-			dataHead->ReleaseReference();
+		  dataHead->ReleaseReference();
+		dataHead = 0;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 		if(implData != NULL)
-			implData->ReleaseReference();
+		  implData->ReleaseReference();
+		implData = 0;
 		if(nameBuf != NULL)
 			delete nameBuf;
 		if(edStream != NULL)
@@ -935,7 +982,8 @@ AAFRESULT STDMETHODCALLTYPE
 		compHead->ReleaseReference();
 		compHead = NULL;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 	}
 	XEXCEPT
 	{
@@ -943,7 +991,8 @@ AAFRESULT STDMETHODCALLTYPE
 			_dataFile->ReleaseReference();
 		_dataFile = NULL;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 		if(edStream != NULL)
 			edStream->Release();
 		if(iUnk != NULL)
@@ -957,29 +1006,41 @@ AAFRESULT STDMETHODCALLTYPE
 		if(plug != NULL)
 			plug->Release();
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(containerDef != NULL)
-			containerDef->ReleaseReference();
+		  containerDef->ReleaseReference();
+		containerDef = 0;
 		if(cStore != NULL)
-			cStore->ReleaseReference();
+		  cStore->ReleaseReference();
+		cStore = 0;
 		if(slot != NULL)
-			slot->ReleaseReference();
+		  slot->ReleaseReference();
+		slot = 0;
 		if(seg != NULL)
-			seg->ReleaseReference();
+		  seg->ReleaseReference();
+		seg = 0;
 		if(sourceInfo != NULL)
-			sourceInfo->ReleaseReference();
+		  sourceInfo->ReleaseReference();
+		sourceInfo = 0;
 		if(fileMob != NULL)
-			fileMob->ReleaseReference();
+		  fileMob->ReleaseReference();
+		fileMob = 0;
 		if(dataHead != NULL)
-			dataHead->ReleaseReference();
+		  dataHead->ReleaseReference();
+		dataHead = 0;
 		if(essenceData != NULL)
-			essenceData->ReleaseReference();
+		  essenceData->ReleaseReference();
+		essenceData = 0;
 		if(compHead != NULL)
-			compHead->ReleaseReference();
+		  compHead->ReleaseReference();
+		compHead = 0;
 		if(enumLocate != NULL)
-			enumLocate->ReleaseReference();
+		  enumLocate->ReleaseReference();
+		enumLocate = 0;
 		if(pLoc != NULL)
-			pLoc->ReleaseReference();
+		  pLoc->ReleaseReference();
+		pLoc = 0;
 	}
 	XEND
 	
@@ -1257,7 +1318,8 @@ AAFRESULT STDMETHODCALLTYPE
 		compHead->ReleaseReference();
 		compHead = NULL;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 	}
 	XEXCEPT
 	{
@@ -1265,7 +1327,8 @@ AAFRESULT STDMETHODCALLTYPE
 			_dataFile->ReleaseReference();
 		_dataFile = NULL;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 		if(edStream != NULL)
 			edStream->Release();
 		if(iUnk != NULL)
@@ -1279,29 +1342,41 @@ AAFRESULT STDMETHODCALLTYPE
 		if(plug != NULL)
 			plug->Release();
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(containerDef != NULL)
-			containerDef->ReleaseReference();
+		  containerDef->ReleaseReference();
+		containerDef = 0;
 		if(cStore != NULL)
-			cStore->ReleaseReference();
+		  cStore->ReleaseReference();
+		cStore = 0;
 		if(slot != NULL)
-			slot->ReleaseReference();
+		  slot->ReleaseReference();
+		slot = 0;
 		if(seg != NULL)
-			seg->ReleaseReference();
+		  seg->ReleaseReference();
+		seg = 0;
 		if(sourceInfo != NULL)
-			sourceInfo->ReleaseReference();
+		  sourceInfo->ReleaseReference();
+		sourceInfo = 0;
 		if(fileMob != NULL)
-			fileMob->ReleaseReference();
+		  fileMob->ReleaseReference();
+		fileMob = 0;
 		if(dataHead != NULL)
-			dataHead->ReleaseReference();
+		  dataHead->ReleaseReference();
+		dataHead = 0;
 		if(essenceData != NULL)
-			essenceData->ReleaseReference();
+		  essenceData->ReleaseReference();
+		essenceData = 0;
 		if(compHead != NULL)
-			compHead->ReleaseReference();
+		  compHead->ReleaseReference();
+		compHead = 0;
 		if(enumLocate != NULL)
-			enumLocate->ReleaseReference();
+		  enumLocate->ReleaseReference();
+		enumLocate = 0;
 		if(pLoc != NULL)
-			pLoc->ReleaseReference();
+		  pLoc->ReleaseReference();
+		pLoc = 0;
 	}
 	XEND
 	
@@ -1620,11 +1695,13 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(dict)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(stream)
 			stream->Release();
 		if (plugins)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 
 	}
 	XEND
@@ -1668,11 +1745,13 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(dict)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(stream)
 			stream->Release();
 		if (plugins)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 
 	}
 	XEND
@@ -2027,9 +2106,11 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(desc != NULL)
-			desc->ReleaseReference();
+		  desc->ReleaseReference();
+		desc = 0;
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 	}
 	XEND
 	
@@ -2159,14 +2240,17 @@ AAFRESULT ImplAAFEssenceAccess::MakeAAFContainerDef(ImplAAFHeader *head, ImplAAF
 		*result = obj;
 		// Don't bother acquire, as we would immediately release
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 	}
 	XEXCEPT
 	{
 		if(obj != NULL)
-			obj->ReleaseReference();
+		  obj->ReleaseReference();
+		obj = 0;
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 	}
 	XEND
 	
@@ -2221,11 +2305,14 @@ ImplAAFEssenceAccess::CreateContainerDef (ImplAAFHeader *head)
 		if(containerDef != NULL)
 			containerDef->Release();
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 		if(implContainerDef != NULL)
-			implContainerDef->ReleaseReference();
+		  implContainerDef->ReleaseReference();
+		implContainerDef = 0;
 		if(pDef != NULL)
 			pDef->Release();
 	}
@@ -2234,15 +2321,18 @@ ImplAAFEssenceAccess::CreateContainerDef (ImplAAFHeader *head)
 		if(containerDef != NULL)
 			containerDef->Release();
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 		if(plug != NULL)
 			plug->Release();
 		if(dictInterface != NULL)
 			dictInterface->Release();
 		if(implContainerDef != NULL)
-			implContainerDef->ReleaseReference();
+		  implContainerDef->ReleaseReference();
+		implContainerDef = 0;
 	}
 	XEND
 		
@@ -2342,20 +2432,26 @@ ImplAAFEssenceAccess::CreateCodecDef (ImplAAFHeader *head, aafUID_t codecID, IAA
 		plug->Release();
 		plug = NULL;
 		if(codecImpl != NULL)
-			codecImpl->ReleaseReference();
+		  codecImpl->ReleaseReference();
+		codecImpl = 0;
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 	}
 	XEXCEPT
 	{
 		if(codecImpl != NULL)
-			codecImpl->ReleaseReference();
+		  codecImpl->ReleaseReference();
+		codecImpl = 0;
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(plugins != NULL)
-			plugins->ReleaseReference();
+		  plugins->ReleaseReference();
+		plugins = 0;
 		if(plug != NULL)
 			plug->Release();
 		if(codecDef != NULL)
@@ -2382,7 +2478,7 @@ AAFRESULT
 ImplAAFEssenceAccess::CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, ImplAAFLocator *loc, ImplAAFFile **result)
 {
 	ImplAAFIdentification			*xferIdent = NULL;
-	aafProductIdentification_t		identSetup;
+	aafProductIdentification_t		identSetup = { 0 };
 	aafUInt32						length;
 	aafInt32						buflen;
 	wchar_t							*nameBuf = NULL;
@@ -2440,16 +2536,20 @@ ImplAAFEssenceAccess::CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, Impl
 		delete [] identSetup.platform;
 		identSetup.platform = NULL;
 		if(xferIdent != NULL)
-			xferIdent->ReleaseReference();
+		  xferIdent->ReleaseReference();
+		xferIdent = 0;
 		if(theFile != NULL)
-			theFile->ReleaseReference();
+		  theFile->ReleaseReference();
+		theFile = 0;
 	}
 	XEXCEPT
 	{
 		if(theFile != NULL)
-			theFile->ReleaseReference();
+		  theFile->ReleaseReference();
+		theFile = 0;
 		if(xferIdent != NULL)
-			xferIdent->ReleaseReference();
+		  xferIdent->ReleaseReference();
+		xferIdent = 0;
 		if(identSetup.companyName != NULL)
 			delete [] identSetup.companyName;
 		if(identSetup.productName != NULL)
@@ -2526,16 +2626,20 @@ ImplAAFEssenceAccess::ModifyEssenceFileFromLocator (ImplAAFHeader *srcHead, Impl
 		delete [] identSetup.platform;
 		identSetup.platform = NULL;
 		if(xferIdent != NULL)
-			xferIdent->ReleaseReference();
+		  xferIdent->ReleaseReference();
+		xferIdent = 0;
 		if(theFile != NULL)
-			theFile->ReleaseReference();
+		  theFile->ReleaseReference();
+		theFile = 0;
 	}
 	XEXCEPT
 	{
 		if(theFile != NULL)
-			theFile->ReleaseReference();
+		  theFile->ReleaseReference();
+		theFile = 0;
 		if(xferIdent != NULL)
-			xferIdent->ReleaseReference();
+		  xferIdent->ReleaseReference();
+		xferIdent = 0;
 		if(identSetup.companyName != NULL)
 			delete [] identSetup.companyName;
 		if(identSetup.productName != NULL)
@@ -2607,24 +2711,32 @@ ImplAAFEssenceAccess::CreateFileMob (ImplAAFHeader *newHead,
 			CHECK(mdes->SetContainerFormat (&_fileFormat));
 		}
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(tmpSlot != NULL)
-			tmpSlot->ReleaseReference();
+		  tmpSlot->ReleaseReference();
+		tmpSlot = 0;
 		if(mdes != NULL)
-			mdes->ReleaseReference();
+		  mdes->ReleaseReference();
+		mdes = 0;
 		if(fileMob != NULL)
-			fileMob->ReleaseReference();
+		  fileMob->ReleaseReference();
+		fileMob = 0;
 	}
 	XEXCEPT
 	{
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(tmpSlot != NULL)
-			tmpSlot->ReleaseReference();
+		  tmpSlot->ReleaseReference();
+		tmpSlot = 0;
 		if(mdes != NULL)
-			mdes->ReleaseReference();
+		  mdes->ReleaseReference();
+		mdes = 0;
 		if(fileMob != NULL)
-			fileMob->ReleaseReference();
+		  fileMob->ReleaseReference();
+		fileMob = 0;
 	}
 	XEND
 		
