@@ -140,6 +140,8 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	  if ( !ppMemberTypes[i])
 		return AAFRESULT_NULL_PARAM;
+	  if (! ppMemberTypes[i]->IsAggregatable())
+		return AAFRESULT_BAD_TYPE;
 
 	  totalNameSize += (wcslen (pMemberNames[i]) + 1);
 	}
@@ -305,6 +307,13 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (index >= count) return AAFRESULT_ILLEGAL_VALUE;
 
+  aafUInt32 requiredSize;
+  hr = GetMemberNameBufLen (index, &requiredSize);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+  if (bufSize < requiredSize)
+	return AAFRESULT_SMALLBUF;
+
   wchar_t c;
   size_t numChars = _memberNames.count();
   indexIntoProp = 0;
@@ -336,12 +345,8 @@ AAFRESULT STDMETHODCALLTYPE
   // into the client's buffer.
   do
 	{
-	  if (! bufSize) return AAFRESULT_SMALLBUF;
 	  _memberNames.getValueAt(&c, indexIntoProp++);
-	  // BobT Note!!! We're cheating here, modifying client data
-	  // before we're sure this method will succeed.
 	  *pName++ = c;
-	  bufSize--;
 	}
   while (c);
   return AAFRESULT_SUCCESS;
@@ -407,7 +412,9 @@ AAFRESULT STDMETHODCALLTYPE
   nameLength++;
 
   assert (pLen);
-  *pLen = nameLength;
+  // nameLength is in number of aafCharacters; returned length must be
+  // in bytes
+  *pLen = (nameLength * sizeof (aafCharacter)) / sizeof (aafUInt8);
   return AAFRESULT_SUCCESS;
 }
 
@@ -1018,3 +1025,28 @@ OMProperty * ImplAAFTypeDefRecord::pvtCreateOMPropertyMBS
   assert (result);
   return result;
 }
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefRecord::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  // Return variable array of unsigned char
+  return pvtGetUInt8Array8Type (ppRawTypeDef);
+}
+
+
+bool ImplAAFTypeDefRecord::IsAggregatable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsStreamable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsFixedArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsVariableArrayable () const
+{ return true; }
+
+bool ImplAAFTypeDefRecord::IsStringable () const
+{ return false; }
