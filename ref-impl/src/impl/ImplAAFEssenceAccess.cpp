@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceAccess.cpp,v 1.85 2004/03/15 13:33:29 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEssenceAccess.cpp,v 1.86 2004/03/16 21:18:46 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -193,6 +193,8 @@ ImplAAFEssenceAccess::~ImplAAFEssenceAccess ()
 	OMVectorIterator<aafAccessor_t> i(_codecList, OMBefore);
 	++i;
 	while (!i.after()) {
+		if (i.value().fileMob)
+			i.value().fileMob->ReleaseReference();
 		if (i.value().mdes)
 			i.value().mdes->ReleaseReference();
 		if (i.value().dataFile)
