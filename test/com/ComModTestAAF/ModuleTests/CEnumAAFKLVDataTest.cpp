@@ -176,8 +176,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  long	test;
 	  aafRational_t	audioRate = { 44100, 1 };
 
-	  // Create a Mob
-	  checkResult(defs.cdMob()->
+	  // Create a concrete subclass of Mob
+	  checkResult(defs.cdMasterMob()->
 				  CreateInstance(IID_IAAFMob, 
 								 (IUnknown **)&pMob));
 
@@ -450,7 +450,7 @@ extern "C" HRESULT CEnumAAFKLVData_test()
 	catch (...)
 	{
 	  cerr << "CEnumAAFKLVData_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
