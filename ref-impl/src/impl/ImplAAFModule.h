@@ -1,25 +1,3 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
-
 ////////////////////////////////////////////////////////////////////////////////
 // @doc
 //
@@ -29,22 +7,23 @@
 // 
 // @end
 //
+// Copyright (c)1998-1999 Avid Technologies, Inc. All Rights Reserved
+//
 // Tom Ransdell, Avid AAF Development Team
 // Plugin manager call added by Jeffrey Bedell.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "AAFPrivate.h"
+#include "AAFRoot.h"
 #include "AAFResult.h"
 #include "ImplAAFPluginManager.h"
 #include "ImplAAFFile.h"
-#include "ImplAAFRawStorage.h"
-//#include "ImplAAFObjectCreation.h"
+#include "ImplAAFObjectCreation.h"
 
-#include "AAFTypes.h"
+extern "C" const aafClassID_t CLSID_AAFFile;
 
-class ImplAAFFile;
-class ImplAAFPluginManager;
+#include <assert.h>
+
 
 //***********************************************************
 //
@@ -123,7 +102,7 @@ STDAPI ImplAAFFileOpenExistingRead (
   // Null-terminated string containing name of filesystem file to be
   // opened for reading.  Filename must be in a form that would be
   // acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ const aafCharacter *  pFileName,
+  /*[in, string]*/ wchar_t *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -196,7 +175,7 @@ STDAPI ImplAAFFileOpenExistingModify (
   // Null-terminated string containing name of filesystem file to be
   // opened for modification.  Filename must be in a form that would
   // be acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ const aafCharacter *  pFileName,
+  /*[in, string]*/ wchar_t *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -265,7 +244,7 @@ STDAPI ImplAAFFileOpenNewModify (
   // Null-terminated string containing name of filesystem file to be
   // opened for modification.  Filename must be in a form that would
   // be acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ const aafCharacter *  pFileName,
+  /*[in, string]*/ wchar_t *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -325,16 +304,6 @@ STDAPI ImplAAFFileOpenTransient (
   // Pointer to buffer to receive pointer to new file.
   /*[out]*/ ImplAAFFile ** ppFile);
 
-//***********************************************************
-//
-// AAFFileIsAAFFile()
-//
-// Please see AAF.h for comments.
-//
-STDAPI ImplAAFFileIsAAFFile (
-  const aafCharacter *  pFileName,
-  aafUID_t * pAAFFileKind,
-  aafBool *  pFileIsAAFFile);
 
 //***********************************************************
 //
@@ -355,26 +324,3 @@ STDAPI ImplAAFFileIsAAFFile (
 STDAPI ImplAAFGetPluginManager (
   /*[out]*/ ImplAAFPluginManager ** ppManager);
 
-
-STDAPI
-ImplAAFCreateRawStorageMemory
-  (aafFileAccess_t  access,
-   ImplAAFRawStorage ** ppNewRawStorage);
-
-STDAPI
-ImplAAFCreateRawStorageDisk
-  (aafCharacter_constptr  pFilename,
-   aafFileExistence_t  existence,
-   aafFileAccess_t  access,
-   ImplAAFRawStorage ** ppNewRawStorage);
-
-
-STDAPI
-ImplAAFCreateAAFFileOnRawStorage
-  (IAAFRawStorage * pRawStorage,
-   aafFileExistence_t  existence,
-   aafFileAccess_t  access,
-   aafUID_constptr  pFileKind,
-   aafUInt32  modeFlags,
-   aafProductIdentification_constptr  pIdent,
-   ImplAAFFile ** ppNewFile);
