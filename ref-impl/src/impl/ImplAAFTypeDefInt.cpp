@@ -194,7 +194,7 @@ ImplAAFTypeDefInt::~ImplAAFTypeDefInt ()
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefInt::Initialize (
       aafUID_t *  pID,
-      aafUInt32  intSize,
+      aafUInt8  intSize,
       aafBool  isSigned,
       wchar_t *  pTypeName)
 {
@@ -340,11 +340,14 @@ AAFRESULT STDMETHODCALLTYPE
   // determine if the property value's embedded type is compatible
   // with this one for reading.  For now, we'll only allow integral
   // type properties to be read by this integral type def.
-  assert (pPropType);
-  if (! dynamic_cast<ImplAAFTypeDefInt *>(pPropType))
-	{
-	  return AAFRESULT_BAD_TYPE;
-	}
+  //
+  // BobT 6/2/1999: allow all types to be read as an integral type
+  // (made necessary in order to read Enum types as integral types.)
+  // assert (pPropType);
+  // if (! dynamic_cast<ImplAAFTypeDefInt *>(pPropType))
+  //	{
+  //	  return AAFRESULT_BAD_TYPE;
+  //	}
 
   // current impl only allows 1, 2, 4, and 8-bit ints.
   if ((1 != valSize) &&
@@ -501,26 +504,82 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-aafBool ImplAAFTypeDefInt::IsFixedSize (void)
+void ImplAAFTypeDefInt::reorder(OMByte* bytes,
+								size_t bytesSize) const
+
+{
+  assert (IsFixedSize());
+  assert (PropValSize() == bytesSize);
+  assert (bytes);
+  reorderInteger (bytes, bytesSize);
+}
+
+
+size_t ImplAAFTypeDefInt::externalSize(OMByte* /*internalBytes*/,
+									   size_t /*internalBytesSize*/) const
+{
+  assert (IsFixedSize());
+  return PropValSize();
+}
+
+
+void ImplAAFTypeDefInt::externalize(OMByte* internalBytes,
+									size_t internalBytesSize,
+									OMByte* externalBytes,
+									size_t externalBytesSize,
+									OMByteOrder /*byteOrder*/) const
+{
+  assert (internalBytes);
+  assert (externalBytes);
+  assert (internalBytesSize == externalBytesSize);
+  assert (externalBytesSize == PropValSize ());
+
+  memcpy (externalBytes, internalBytes, externalBytesSize);
+}
+
+
+size_t ImplAAFTypeDefInt::internalSize(OMByte* /*externalBytes*/,
+									   size_t /*externalSize*/) const
+{
+  return NativeSize ();
+}
+
+
+void ImplAAFTypeDefInt::internalize(OMByte* externalBytes,
+									size_t externalBytesSize,
+									OMByte* internalBytes,
+									size_t internalBytesSize,
+									OMByteOrder byteOrder) const
+{
+  assert (externalBytes);
+  assert (internalBytes);
+  assert (internalBytesSize == externalBytesSize);
+  assert (internalBytesSize == NativeSize ());
+
+  memcpy (internalBytes, externalBytes, internalBytesSize);
+}
+
+
+aafBool ImplAAFTypeDefInt::IsFixedSize (void) const
 {
   return AAFTrue;
 }
 
 
-size_t ImplAAFTypeDefInt::PropValSize (void)
+size_t ImplAAFTypeDefInt::PropValSize (void) const
 {
   return _size;
 }
 
 
-aafBool ImplAAFTypeDefInt::IsRegistered (void)
+aafBool ImplAAFTypeDefInt::IsRegistered (void) const
 {
   // int types are registered by default
   return AAFTrue;
 }
 
 
-size_t ImplAAFTypeDefInt::NativeSize (void)
+size_t ImplAAFTypeDefInt::NativeSize (void) const
 {
   // same as property value size
   return PropValSize();
