@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -38,19 +20,15 @@
 #include <assert.h>
 #include "AAFResult.h"
 
-// Declare these two functions to avoid including the whole ImplAAFDictionary.h
-aafBoolean_t aafLookupCodecDef( ImplAAFObject *, ImplAAFCodecDef *p_codecdef );
-aafBoolean_t aafLookupContainerDef( ImplAAFObject *,ImplAAFContainerDef * );
-
 ImplAAFFileDescriptor::ImplAAFFileDescriptor ()
-: _sampleRate(			PID_FileDescriptor_SampleRate,		L"SampleRate"),
- _length(				PID_FileDescriptor_Length,			L"Length"),
- _codecDef(				PID_FileDescriptor_CodecDefinition,		L"CodecDefinition", L"/Header/Dictionary/CodecDefinitions", PID_DefinitionObject_Identification),
- _containerFmt(         PID_FileDescriptor_ContainerFormat,	L"ContainerFormat", L"/Header/Dictionary/ContainerDefinitions", PID_DefinitionObject_Identification)
+: _sampleRate(			PID_FileDescriptor_SampleRate,	"SampleRate"),
+ _length(				PID_FileDescriptor_Length,		"Length"),
+ _isInContainer(        PID_FileDescriptor_IsInContainer,	"IsInContainer"),
+ _containerFmt(         PID_FileDescriptor_ContainerFormat,	"ContainerFormat")
 {
   _persistentProperties.put(_sampleRate.address());
   _persistentProperties.put(_length.address());
-  _persistentProperties.put(_codecDef.address());
+  _persistentProperties.put(_isInContainer.address());
   _persistentProperties.put(_containerFmt.address());
 }
 
@@ -87,37 +65,29 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::SetCodecDef (ImplAAFCodecDef *pDef)
+    ImplAAFFileDescriptor::SetIsInContainer (aafBool isAAF)
 {
-  if (! pDef)
-    return AAFRESULT_NULL_PARAM;
-  if (!pDef->attached())
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
-  if (!aafLookupCodecDef( this, pDef ) )
-    return AAFRESULT_INVALID_OBJ;
-
-  _codecDef = pDef;
+	_isInContainer = isAAF;
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::GetCodecDef (ImplAAFCodecDef **ppDef)
+    ImplAAFFileDescriptor::GetIsInContainer (aafBool* pIsAAF)
 {
-	if(ppDef == NULL)
+	if(pIsAAF == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	*ppDef = _codecDef;
-	assert (*ppDef);
-  if (*ppDef)
-	 (*ppDef)->AcquireReference ();
+	*pIsAAF = _isInContainer;
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::SetSampleRate (const aafRational_t & rate)
+    ImplAAFFileDescriptor::SetSampleRate (aafRational_t *pRate)
 {
-	_sampleRate = rate;
+	if(pRate == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	_sampleRate = *pRate;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -133,30 +103,21 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::SetContainerFormat (ImplAAFContainerDef *pDef)
+    ImplAAFFileDescriptor::SetContainerFormat (aafUID_t *pFormat)
 {
-	if( pDef == NULL )
-		return AAFRESULT_NULL_PARAM;
-	if( !aafLookupContainerDef( this, pDef ) )
-		return AAFRESULT_INVALID_OBJ;
-
-	_containerFmt = pDef;
+	if(pFormat == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	_containerFmt = *pFormat;
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::GetContainerFormat (ImplAAFContainerDef **ppDef)
+    ImplAAFFileDescriptor::GetContainerFormat (aafUID_t *pFormat)
 {
-	if(ppDef == NULL)
+	if(pFormat == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if (!_containerFmt.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;	
-	
-	*ppDef = _containerFmt;
-	assert (*ppDef);
-	 (*ppDef)->AcquireReference ();
+	*pFormat = _containerFmt;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -165,8 +126,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pMobKind  == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	*pMobKind = kAAFFileMob;
+	*pMobKind = kFileMob;
 	return(AAFRESULT_SUCCESS);
 }
 
 
+OMDEFINE_STORABLE(ImplAAFFileDescriptor, AUID_AAFFileDescriptor);

@@ -1,48 +1,29 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
 
 #ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
 #endif
 
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
-#endif
-
-#ifndef __ImplAAFOperationDef_h__
-#include "ImplAAFOperationDef.h"
+#ifndef __ImplAAFEffectDef_h__
+#include "ImplAAFEffectDef.h"
 #endif
 
 #ifndef __ImplAAFParameter_h__
 #include "ImplAAFParameter.h"
 #endif
 
-#ifndef __ImplEnumAAFOperationDefs_h__
-#include "ImplEnumAAFOperationDefs.h"
+#ifndef __ImplEnumAAFEffectDefs_h__
+#include "ImplEnumAAFEffectDefs.h"
 #endif
 
 #ifndef __ImplEnumAAFParameterDefs_h__
@@ -57,16 +38,16 @@
 #include "ImplAAFSourceReference.h"
 #endif
 
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
 
-#ifndef __ImplAAFOperationGroup_h__
-#include "ImplAAFOperationGroup.h"
+
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIds.h"
+
+#ifndef __ImplAAFGroup_h__
+#include "ImplAAFGroup.h"
 #endif
 
 #include "ImplAAFObjectCreation.h"
-#include "ImplAAFDictionary.h"
-#include "ImplEnumAAFParameters.h"
 
 #include <assert.h>
 #include <string.h>
@@ -75,569 +56,208 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "AAFUtils.h"
+#include "aafUtils.h"
 #include "AAFDefUIDs.h"
 
 extern "C" const aafClassID_t CLSID_AAFSourceReference;
 extern "C" const aafClassID_t CLSID_AAFParameter;
 extern "C" const aafClassID_t CLSID_AAFSegment;
-extern "C" const aafClassID_t CLSID_EnumAAFParameters;
 
+const aafUID_t kNullID = {0};
 
-ImplAAFOperationGroup::ImplAAFOperationGroup ()
-: _operationDefinition( PID_OperationGroup_OperationDefinition, L"OperationDefinition", L"/Header/Dictionary/OperationDefinitions", PID_DefinitionObject_Identification),
-  _inputSegments( PID_OperationGroup_InputSegments, L"InputSegments"),
-  _parameters( PID_OperationGroup_Parameters, L"Parameters", PID_DefinitionObject_Identification),
-  _bypassOverride( PID_OperationGroup_BypassOverride, L"BypassOverride"),
-  _rendering( PID_OperationGroup_Rendering, L"Rendering")
+ImplAAFGroup::ImplAAFGroup ()
+//_effectDefinition( PID_Group_EffectDefinition, "EffectDefinition"),
+//_inputSegments( PID_Group_InputSegments, "InputSegments"),
+//_parameters( PID_Group_Parameters, "Parameters"),
+//_bypassOverride( PID_Group_BypassOverride, "BypassOverride"),
+//_rendering( PID_Group_Rendering, "Rendering")
 {
-	_persistentProperties.put(_operationDefinition.address());
-	_persistentProperties.put(_inputSegments.address());
-	_persistentProperties.put(_parameters.address());
-	_persistentProperties.put(_bypassOverride.address());
-	_persistentProperties.put(_rendering.address());
+//	_persistentProperties.put(_effectDefinition.address());
+//	_persistentProperties.put(_inputSegments.address());
+//	_persistentProperties.put(_parameters.address());
+//	_persistentProperties.put(_bypassOverride.address());
+//	_persistentProperties.put(_rendering.address());
 }
 
 
-ImplAAFOperationGroup::~ImplAAFOperationGroup ()
-{
-	// Release all of the mob slot pointers.
-	size_t count = _inputSegments.count();
-	for (size_t i = 0; i < count; i++)
-	{
-		ImplAAFSegment *pSeg = _inputSegments.clearValueAt(i);
-		if (pSeg)
-		{
-		  pSeg->ReleaseReference();
-		  pSeg = 0;
-		}
-	}
-	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>parameters(_parameters);
-	while(++parameters)
-	{
-		ImplAAFParameter *pParm = parameters.clearValue();
-		if (pParm)
-		{
-		  pParm->ReleaseReference();
-		  pParm = 0;
-		}
-	}
-	ImplAAFSourceReference *ref = _rendering.clearValue();
-	if (ref)
-	{
-	  ref->ReleaseReference();
-	  ref = 0;
-	}
-}
+ImplAAFGroup::~ImplAAFGroup ()
+{}
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::Initialize(ImplAAFDataDef * pDataDef,
+    ImplAAFGroup::Initialize(aafUID_t*		pDatadef,
 							 aafLength_t    length,
-                             ImplAAFOperationDef* pOperationDef)
+                             ImplAAFEffectDef* pEffectDef)
 {
-	HRESULT					rc = AAFRESULT_SUCCESS;
-//	ImplAAFOperationDef*	pOldOperationDef = NULL;
+	HRESULT		rc = AAFRESULT_SUCCESS;
 
-	if (pOperationDef == NULL)
+//	if (pDatadef == NULL || pEffectDef == NULL)
+//		return AAFRESULT_NULL_PARAM;
+	// Only validate data def for now
+	if (pDatadef == NULL )
 		return AAFRESULT_NULL_PARAM;
 
-	if (pDataDef == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-  // Make sure objects are already attached (to the dictionary).
-  if (!pDataDef->attached() || !pOperationDef->attached())
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
-
-  // Check if given definition is in the dict.
-  if( !aafLookupOperationDef( this, pOperationDef ) )
-    return AAFRESULT_INVALID_OBJ;
-
+	rc = SetNewProps(length, pDatadef);
+/*
 	XPROTECT()
 	{
-		CHECK(SetNewProps(length, pDataDef));
-
-    // The operation definition is a weak reference that is
-    // owned by the dictionary so we do NOT need to reference
-    // count it.
-//    // find out if this OperationDef is already set
-//		if(!_operationDefinition.isVoid())
-//		{
-//			pOldOperationDef = _operationDefinition;
-//			if (pOldOperationDef != 0)
-//				pOldOperationDef->ReleaseReference();
-//		}
-		_operationDefinition = pOperationDef;
-//		pOperationDef->AcquireReference();
+		CHECK(SetNewProps(length, pDatadef));
+		// ***********************************************************************
+		// ************************************************************************
+		// Optional arguments are set here only as a way to NOT 
+		// fail inside the OM during initial development.
+		// Once optional properties are properly supported
+		// this setting instructions MUST BE REMOVED !!!
+		ImplAAFSourceReference*		pSourceRef = NULL;
+		ImplAAFParameter*			pParms = NULL;
+		ImplAAFSegment*				pSeg = NULL;
+														  
+		pSourceRef = (ImplAAFSourceReference *)CreateImpl(CLSID_AAFSourceReference);
+		if (pSourceRef == NULL)
+			return (E_FAIL);
+		pParms = (ImplAAFParameter *)CreateImpl(CLSID_AAFParameter);
+		if (pParms == NULL)
+			return (E_FAIL);
+		pSeg = (ImplAAFSegment *)CreateImpl(CLSID_AAFSegment);
+		if (pSeg == NULL)
+			return (E_FAIL);
+		_inputSegments.appendValue(pSeg);
+		_parameters.appendValue(pParms);
+		pSourceRef->SetSourceID(*pDatadef);				
+		pSourceRef->SetSourceMobSlotID((aafSlotID_t)1); 
+		_bypassOverride = (aafUInt32)1;							
+		_rendering = pSourceRef;
+		// Here we have to find the effect definition auid from the 
+		// Effect definition object pointer we got as an input 
+		// EffectDef is NOT implemented yet - therefore:
+//		_effectDefinition = kNullID;
+		// ************************************************************************
+		// ************************************************************************
 	}
 	XEXCEPT
-	{
-	}
 	XEND;
-
+*/	
 	return rc;
 }
 
-	//@comm  This function takes an already created OperationGroup definition object as an argument.
-	//@comm  To add slots to the OperationGroup, call AddSlot.
+	//@comm  This function takes an already created effect definition object as an argument.
+	//@comm  To add slots to the effect, call AddNewSlot.
 	//@comm  To add renderings, call SetRender.
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::GetOperationDefinition (ImplAAFOperationDef **OperationDef)
+    ImplAAFGroup::GetEffectDefinition (ImplAAFEffectDef ** /*effectDef*/)
 {
-  ImplAAFOperationDef *pOpDef = _operationDefinition;
-  if(!pOpDef)
-		return AAFRESULT_OBJECT_NOT_FOUND;
-
-  *OperationDef = pOpDef;
-  assert (*OperationDef);
-  (*OperationDef)->AcquireReference ();
-
-  return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::SetOperationDefinition (ImplAAFOperationDef *OperationDef)
-{
-	if(OperationDef == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-  // Make sure object is already attached (to the dictionary).
-  if (!OperationDef->attached())
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
-
-  // Check if given definition is in the dict.
-  if( !aafLookupOperationDef( this, OperationDef ) )
-    return AAFRESULT_INVALID_OBJ;
-
-	assert(_operationDefinition.isVoid());
-	_operationDefinition = OperationDef;
-
-	return AAFRESULT_SUCCESS;
-}
-
-	//@comm Replaces part of omfiOperationGroupGetInfo
+	//@comm Replaces part of omfiEffectGetInfo
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::GetRender (ImplAAFSourceReference **sourceRef)
+    ImplAAFGroup::GetRender (ImplAAFSegment ** /*segment*/)
 {
-	if(sourceRef == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if (_rendering.isPresent())
-	{
-		if (_rendering)
-		{
-			*sourceRef = _rendering;
-			_rendering->AcquireReference();
-		}
-		else
-			return AAFRESULT_PROP_NOT_PRESENT;
-	}
-	else
-		return AAFRESULT_PROP_NOT_PRESENT;
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 	//@comm If this property does not exist the error
-	// AAFRESULT_PROP_NOT_PRESENT will be returned.
+	// OM_ERR_PROP_NOT_PRESENT will be returned.
 	//@comm Working and final renderings are handled by using
 	// a media group as the segment.
-	//@comm Replaces omfiOperationGroupGetFinalRender and omfiOperationGroupGetWorkingRender
+	//@comm Replaces omfiEffectGetFinalRender and omfiEffectGetWorkingRender
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::IsATimeWarp (aafBool *isTimeWarp)
+    ImplAAFGroup::IsATimeWarp (aafBool **  /*sourceClip*/)
 {
-	ImplAAFOperationDef	*def = NULL;
-	
-	XPROTECT()
-	{
-		if(isTimeWarp == NULL)
-			RAISE(AAFRESULT_NULL_PARAM);
-		CHECK(GetOperationDefinition(&def));
-		CHECK(def->IsTimeWarp (isTimeWarp));
-		def->ReleaseReference();
-		def = NULL;
-	}
-	XEXCEPT
-	{
-		if(def)
-		  def->ReleaseReference();
-		def = 0;
-	}
-	XEND
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-	//@comm Replaces omfiOperationGroupIsATimeWarp
+	//@comm Replaces omfiEffectIsATimeWarp
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::GetBypassOverride (aafUInt32* pBypassOverride)
+    ImplAAFGroup::GetBypassOverride (aafArgIDType_t *  /*bypassOverride*/)
 {
-	if(pBypassOverride == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if (!_bypassOverride.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
-	*pBypassOverride = _bypassOverride;
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-	//@comm If the property does not exist, the error AAFRESULT_PROP_NOT_PRESENT will be returned.)
-	//@comm Replaces omfiOperationGroupGetBypassOverride
+	//@comm If the property does not exist, the error OM_ERR_PROP_NOT_PRESENT will be returned.)
+	//@comm Replaces omfiEffectGetBypassOverride
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::CountSourceSegments (aafUInt32 *pNumSources)
+    ImplAAFGroup::GetNumSourceSegments (aafInt32 *  /*numSources*/)
 {
-	if(pNumSources == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	size_t numSlots = _inputSegments.count();
-	
-	*pNumSources = numSlots;
-
-	return(AAFRESULT_SUCCESS);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-	//@comm Replaces omfiOperationGroupGetNumSlots
+	//@comm Replaces omfiEffectGetNumSlots
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::CountParameters (aafUInt32 * pNumParameters)
+    ImplAAFGroup::GetNumParameters (aafInt32 *  /*numParameters*/)
 {
-   size_t numSlots;
-
-	if(pNumParameters == NULL)
-		return AAFRESULT_NULL_PARAM;
-	numSlots = _parameters.count();
-	
-	*pNumParameters = numSlots;
-
-	return(AAFRESULT_SUCCESS);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-	//@comm Replaces omfiOperationGroupGetNumSlots
+	//@comm Replaces omfiEffectGetNumSlots
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::IsValidTranOperation (aafBool * validTransition)
+    ImplAAFGroup::IsValidTranEffect (aafBool *  /*validTransition*/)
 {
-	ImplAAFOperationDef	*def = NULL;
-	aafInt32			numInputs;
-	
-	XPROTECT()
-	{
-		if(validTransition == NULL)
-			RAISE(AAFRESULT_NULL_PARAM);
-		CHECK(GetOperationDefinition(&def));
-		CHECK(def->GetNumberInputs (&numInputs));
-		*validTransition = (numInputs == 2 ? kAAFTrue : kAAFFalse);
-		//!!!Must also have a "level" parameter (Need definition for this!)
-		def->ReleaseReference();
-		def = NULL;
-	}
-	XEXCEPT
-	{
-		if(def)
-		  def->ReleaseReference();
-		def = 0;
-	}
-	XEND;
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::AddParameter (ImplAAFParameter *pValue)
+    ImplAAFGroup::AddNewParameter (aafArgIDType_t  /*argID*/,
+                           ImplAAFParameter * /*value*/)
 {
-	if(pValue == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-  // Make sure object is not already attached.
-  if (pValue->attached())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-	_parameters.appendValue(pValue);
-	pValue->AcquireReference();
-
-	return(AAFRESULT_SUCCESS);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-	//@comm Replaces part of omfiOperationGroupAddNewSlot
+	//@comm Replaces part of omfiEffectAddNewSlot
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::AppendInputSegment (ImplAAFSegment * value)
+    ImplAAFGroup::AddNewInputSegment (aafInt32  /*index*/,
+                           ImplAAFSegment * /*value*/)
 {
-	if(value == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-  // Make sure object is not already attached.
-  if (value->attached())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-	_inputSegments.appendValue(value);
-	value->AcquireReference();
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
-	//@comm Replaces part of omfiOperationGroupAddNewSlot
+	//@comm Replaces part of omfiEffectAddNewSlot
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::PrependInputSegment (ImplAAFSegment * value)
+    ImplAAFGroup::SetRender (ImplAAFSegment * /*segment*/)
 {
-  if(value == NULL)
-		return(AAFRESULT_NULL_PARAM);
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
-  // Make sure object is not already attached.
-  if (value->attached())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+	//@comm Replaces omfiEffectSetFinalRender and omfiEffectSetWorkingRender
 
-  _inputSegments.prependValue(value);
-  value->AcquireReference();
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFGroup::SetBypassOverride (aafArgIDType_t  /*bypassOverride*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
-  return AAFRESULT_SUCCESS;
+	//@comm Replaces omfiEffectSetBypassOverride
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFGroup::GetParameterByArgID (aafArgIDType_t  /*argID*/,
+                           ImplAAFParameter ** /*parameter*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::InsertInputSegmentAt
-      (aafUInt32 index,
-	   ImplAAFSegment * value)
+    ImplAAFGroup::GetIndexedInputSegment (aafInt32  /*index*/,
+                           ImplAAFSegment ** /*inputSegment*/)
 {
-  if(value == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-  aafUInt32 count;
-  AAFRESULT ar;
-  ar = CountSourceSegments (&count);
-  if (AAFRESULT_FAILED (ar)) return ar;
-
-  if (index > (aafUInt32)count)
-    return AAFRESULT_BADINDEX;
-
-  // Make sure object is not already attached.
-  if (value->attached())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-  _inputSegments.insertAt(value,index);
-  value->AcquireReference();
-
-  return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::SetRender (ImplAAFSourceReference *sourceRef)
-{
-	if(sourceRef == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-  // Make sure object is not already attached.
-  if (sourceRef->attached())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-	_rendering = sourceRef;
-	_rendering->AcquireReference();
-
-	return AAFRESULT_SUCCESS;
-}
-
-	//@comm Replaces omfiOperationGroupSetFinalRender and omfiOperationGroupSetWorkingRender
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::SetBypassOverride (aafUInt32  bypassOverride)
-{
-	_bypassOverride = bypassOverride;
-
-	return AAFRESULT_SUCCESS;
-}
-
-	//@comm Replaces omfiOperationGroupSetBypassOverride
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::LookupParameter (aafArgIDType_t  argID,
-                           ImplAAFParameter ** ppParameter)
-{
-#if 1
-	if (!ppParameter) return AAFRESULT_NULL_PARAM;
-
-	AAFRESULT result = AAFRESULT_SUCCESS;
-  // NOTE: The following type cast is temporary. It should be removed as soon
-	// as the OM has a declarative sytax to include the type
-	// of the key used in the set. (trr:2000-FEB-29)
-	if (_parameters.find((*reinterpret_cast<const OMObjectIdentification *>(&argID)),
-                             *ppParameter))
-	{
-		assert(NULL != *ppParameter);
-		(*ppParameter)->AcquireReference();
-	}
-	else
-	{
-	// no recognized class guid in dictionary
-		result = AAFRESULT_NO_MORE_OBJECTS;
-	}
-
-	return (result);
-
-#else
-	ImplAAFParameter	*parm = NULL;
-	ImplAAFParameterDef	*parmDef = NULL;
-	aafInt32			numParm, n;
-	aafUID_t			testAUID;
-	aafBool				found;
-
-	XPROTECT()
-	{
-		if(ppParameter == NULL)
-			RAISE(AAFRESULT_NULL_PARAM);
-	
-		found = kAAFFalse;
-		CHECK(CountParameters (&numParm))
-		for(n = 0; n < numParm; n++)
-		{
-			_parameters.getValueAt(parm, n);
-			if (parm)
-			{
-				CHECK(parm->GetParameterDefinition (&parmDef));	
-				CHECK(parmDef->GetAUID(&testAUID));
-				parmDef->ReleaseReference();
-				parmDef = NULL;
-				if(EqualAUID(&testAUID, &argID))
-				{
-					parm->AcquireReference();
-					*ppParameter = parm;
-					found = kAAFTrue;
-					break;
-				}
-
-			}
-		}
-		if(!found)
-			RAISE(AAFRESULT_PARAMETER_NOT_FOUND);
-	}
-	XEXCEPT
-	{
-//		if(parm != NULL)
-//		  parm->ReleaseReference();
-//		parm = 0;
-		if(parmDef != NULL)
-		  parmDef->ReleaseReference();
-		parmDef = 0;
-	}
-	XEND
-
-	return AAFRESULT_SUCCESS;
-#endif
-}
+OMDEFINE_STORABLE(ImplAAFGroup, AUID_AAFGroup);
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::GetParameters
-        (// @parm [out] enumerator across parameters
-         ImplEnumAAFParameters ** ppEnum)
-{
-	if (NULL == ppEnum)
-		return AAFRESULT_NULL_PARAM;
-	*ppEnum = 0;
-	
-	ImplEnumAAFParameters *theEnum = (ImplEnumAAFParameters *)CreateImpl (CLSID_EnumAAFParameters);
-	
-	XPROTECT()
-	{
-		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>* iter = 
-			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>(_parameters);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFParameters, this, iter));
-		*ppEnum = theEnum;
-	}
-	XEXCEPT
-	{
-		if (theEnum)
-		  {
-			theEnum->ReleaseReference();
-			theEnum = 0;
-		  }
-	}
-	XEND;
-	
-	return(AAFRESULT_SUCCESS);
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::GetInputSegmentAt (aafUInt32  index,
-                           ImplAAFSegment ** ppInputSegment)
-{
-	ImplAAFSegment	*obj;
-
-	XPROTECT()
-	{
-		_inputSegments.getValueAt(obj, index);
-		if (obj)
-			obj->AcquireReference();
-		else
-			RAISE(AAFRESULT_NO_MORE_OBJECTS); // AAFRESULT_BADINDEX ???
-		*ppInputSegment = obj;
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::RemoveInputSegmentAt (aafUInt32  index)
-{
-	aafUInt32 count;
-	AAFRESULT hr;
-	ImplAAFSegment	*pSeg;
-	
-	hr = CountSourceSegments (&count);
-	if (AAFRESULT_FAILED (hr)) return hr;
-	if (index >= count)
-		return AAFRESULT_BADINDEX;
-	
-	pSeg = _inputSegments.removeAt(index);
-	if(pSeg)
-		pSeg->ReleaseReference();
-
-	return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT ImplAAFOperationGroup::ChangeContainedReferences(aafMobID_constref from,
-													aafMobID_constref to)
-{
-	aafUInt32			n, count;
-	ImplAAFSegment		*seg = NULL;
-	
-	XPROTECT()
-	{
-		CHECK(CountSourceSegments (&count));
-		for(n = 0; n < count; n++)
-		{
-			CHECK(GetInputSegmentAt (n, &seg));
-			CHECK(seg->ChangeContainedReferences(from, to));
-			seg->ReleaseReference();
-			seg = NULL;
-		}
-	}
-	XEXCEPT
-	{
-		if(seg != NULL)
-		  seg->ReleaseReference();
-		seg = 0;
-	}
-	XEND;
-
-	return AAFRESULT_SUCCESS;
-}
