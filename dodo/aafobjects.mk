@@ -10,15 +10,10 @@
 AAFPERSISTENTOBJECTS = \
 	AAFAIFCData \
 	AAFAIFCDescriptor \
-	AAFClassDef \
-	AAFCodecDef \
-	AAFContainerDef \
-	AAFDictionary \
 	AAFCommentMarker \
 	AAFConstValue \
 	AAFControlPoint \
 	AAFDataDef \
-	AAFDefObject \
 	AAFDOSLocator \
 	AAFEffectDef \
 	AAFEvent \
@@ -40,33 +35,20 @@ AAFPERSISTENTOBJECTS = \
 	AAFParameter \
 	AAFParameterDef \
 	AAFPluggableCode \
-	AAFPluggableDef \
 	AAFPluginManager \
-	AAFPluginDescriptor \
 	AAFPulldown \
-	AAFPropertyDef \
 	AAFReferenceValue \
 	AAFRGBADescriptor \
 	AAFScopeReference \
-	AAFSelector \
 	AAFStaticMobSlot \
 	AAFTaggedValue \
 	AAFTextClip \
 	AAFTextLocator \
 	AAFTIFFData \
-	AAFTIFFDescriptor \
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
-	AAFTypeDef \
-	AAFTypeDefInt \
-	AAFTypeDefRename \
-	AAFTypeDefEnum \
-	AAFTypeDefFixedArray \
-	AAFTypeDefVariableArray \
-	AAFTypeDefStream \
-	AAFTypeDefString \
-	AAFTypeDefObjectRef \
-	AAFTypeDefComposite \
+	AAFTypeDefSet \
+	AAFTypeDefRecord \
 	AAFUnixLocator \
 	AAFVaryingValue \
 	AAFWAVEData \
@@ -76,8 +58,6 @@ AAFPERSISTENTOBJECTS = \
 # These are all of the other non-persistent objects:
 AAFNONPERSISTENTOBJECTS = \
 	AAFRoot \
-	AAFProperty \
-	AAFPropertyValue \
 	EnumAAFClassDefs \
 	EnumAAFCodecFlavours \
 	EnumAAFControlPoints \
@@ -89,13 +69,9 @@ AAFNONPERSISTENTOBJECTS = \
 	EnumAAFMobComments \
 	EnumAAFObjects \
 	EnumAAFParameterDefs \
-	EnumAAFPluginDescriptors \
-	EnumAAFPluginLocators \
 	EnumAAFPropertyDefs \
 	EnumAAFPropertyValues \
-	EnumAAFProperties \
 	EnumAAFReferenceValues \
-	EnumAAFSegments \
 	EnumAAFTypeDefs 
 
 
@@ -110,9 +86,14 @@ AAFCOMINTERFACESONLY = \
 # its name here and remove it from either list above where it occurs.
 # Do not add the 'Impl'prefix here.
 HUMAN_TYPED_IMPL = \
+	AAFClassDef \
+	AAFCodecDef \
 	AAFComponent \
 	AAFCompositionMob \
+	AAFContainerDef \
 	AAFContentStorage \
+	AAFDefObject \
+	AAFDictionary \
 	AAFEdgecode \
 	AAFEssenceAccess \
 	AAFEssenceData \
@@ -133,7 +114,13 @@ HUMAN_TYPED_IMPL = \
 	AAFMobSlot \
 	AAFNetworkLocator \
 	AAFObject \
+	AAFProperty \
+	AAFPropertyDef \
+	AAFPropertyValue \
+	AAFPluggableDef \
+	AAFPluginDescriptor \
 	AAFSegment \
+	AAFSelector \
 	AAFSequence \
 	AAFSourceClip \
 	AAFSourceMob \
@@ -142,12 +129,29 @@ HUMAN_TYPED_IMPL = \
 	AAFTimelineMobSlot \
 	AAFTapeDescriptor \
 	AAFTransition \
+	AAFTIFFDescriptor \
+	AAFTypeDef \
+	AAFTypeDefInt \
+	AAFTypeDefRename \
+	AAFTypeDefEnum \
+	AAFTypeDefFixedArray \
+	AAFTypeDefStream \
+	AAFTypeDefString \
+	AAFTypeDefStrongObjRef \
+	AAFTypeDefWeakObjRef \
+	AAFTypeDefObjectRef \
+	AAFTypeDefVariableArray \
 	AAFWAVEDescriptor \
 	EnumAAFComponents \
 	EnumAAFEssenceData \
 	EnumAAFLocators \
 	EnumAAFMobSlots \
-	EnumAAFMobs
+	EnumAAFMobs \
+	EnumAAFProperties \
+	EnumAAFPluggableDefs \
+	EnumAAFPluginDescriptors \
+	EnumAAFPluginLocators \
+	EnumAAFSegments 
 
 # The list of standard dodo targets.
 # AAFTypes have to be handled separately since no object is to be created.
@@ -175,8 +179,6 @@ AUTO_GEN_IMPL = \
 # NOT into AAF.idl.
 
 PLUGIN_OBJECTS = \
-	AAFRoot \
-	AAFEssenceFormat \
 	AAFPlugin \
 	AAFEssenceStream \
 	AAFEssenceSampleStream \
