@@ -8,7 +8,6 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
@@ -65,7 +64,15 @@ public:
 	virtual AAFRESULT STDMETHODCALLTYPE
 		GetMob(ImplAAFMob **ppMob);
 	virtual AAFRESULT STDMETHODCALLTYPE
-		GetReference(aafSourceRef_t *pSourceRef);
+		GetSourceReference(aafSourceRef_t *pSourceRef);
+	virtual AAFRESULT STDMETHODCALLTYPE
+		GetEditRate(aafRational_t *pEditRate);
+	virtual AAFRESULT STDMETHODCALLTYPE
+		GetLength(aafLength_t *pLength);
+//	virtual AAFRESULT STDMETHODCALLTYPE
+//		GetEnclosingOperationGroup(ImplAAFOperationGroup *pSourceRef);
+//	virtual AAFRESULT STDMETHODCALLTYPE
+//		GetEnclosingComponent(ImplAAFOperationGroup *pSourceRef);
 };
 
 #endif // ! __ImplAAFFindSourceInfo_h__

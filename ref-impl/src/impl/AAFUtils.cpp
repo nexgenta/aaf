@@ -25,7 +25,6 @@
  *
  ************************************************************************/
 
-
 /*
  * Name: omAcces.c
  *
@@ -140,7 +139,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #if PORT_SYS_MAC
 #include <memory.h>		/* For AAFMalloc() and AAFFree() */
@@ -148,12 +146,6 @@
 #endif
 #ifdef _WIN32
 #include <time.h>
-#elif defined (__sgi) || defined (__FreeBSD__)
-  #include <time.h>
-  #include <sys/time.h>
-  #include <unistd.h>
-  #include <sys/types.h>
-  #include <sys/times.h>
 #endif
 
 //#include "omPublic.h"
@@ -163,10 +155,7 @@
 #include "AAFUtils.h"
 #include "aafCvt.h"
 #include "AAFResult.h"
-#ifdef __sgi
-// For CoCreateGuid()
-#include "AAFCOMPlatform.h"
-#endif
+
 
 /* Moved math.h down here to make NEXT's compiler happy */
 #include <math.h>
@@ -179,9 +168,9 @@
 #undef max
 #endif
 
-static aafBool  InitCalled = kAAFFalse;
+static aafBool  InitCalled = AAFFalse;
 
-const aafProductVersion_t AAFReferenceImplementationVersion = {1, 0, 0, 1, kAAFVersionBeta};
+const aafProductVersion_t AAFReferenceImplementationVersion = {1, 0, 0, 1, kVersionBeta};
 
 AAFByteOrder GetNativeByteOrder(void)
 {
@@ -201,12 +190,7 @@ AAFByteOrder GetNativeByteOrder(void)
 
 aafBool	EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
 {
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
-}
-
-aafBool	EqualMobID(aafMobID_constref mobID1, aafMobID_constref mobID2)
-{
-	return(memcmp(&mobID1, &mobID2, sizeof(aafMobID_t)) == 0 ? kAAFTrue : kAAFFalse);
+	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
 }
 
 static aafInt32 powi(
@@ -220,6 +204,31 @@ static aafInt32 powi(
 	 *
 	 *************************************************************/
 
+/*************************************************************************
+ * Private Function: isObjFunc() and set1xEditrate()
+ *
+ *      These are callback functions used by omfiMobAppendNewSlot()
+ *      to recursively attach the CPNT:Editrate property to 1.x
+ *      components.  The callback functions are input to the
+ *      omfiMobMatchAndExecute() function which traverses a
+ *      tree of objects depth first and executes the callbacks.
+ *      They will only be called on 1.x files.
+ *
+ * Argument Notes:
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ *************************************************************************/
+aafBool isObjFunc(ImplAAFFile * file,       /* IN - File Handle */
+				  ImplAAFObject * obj,     /* IN - Object to match */
+				  void *data)          /* IN/OUT - Match Data */
+{
+  /* Match all objects in the subtree */
+  return(AAFTrue);
+}
 
 
 /************************
@@ -239,21 +248,26 @@ static aafInt32 powi(
  * Possible Errors:
  *		Standard errors (see top of file).
  */
-void AAFGetDateTime(aafTimeStamp_t *ts)
+void AAFGetDateTime(aafTimeStamp_t *time)
 {
-	assert (ts);
+#if defined(_MAC) || defined(macintosh)
+	unsigned long tmpTime;
+	GetDateTime(&tmpTime);
+	time->TimeVal = tmpTime;
+	time->IsGMT = FALSE;
+#elif  defined(_WIN32)
+	time->TimeVal = (long) clock();
+	time->IsGMT = FALSE;
+#else
+	{
+		struct timeval  tv;
+		struct timezone tz;
 
-	const time_t t = time(0);
-	const struct tm * ansitime = gmtime (&t);
-	assert (ansitime);
-
-	ts->date.year   = ansitime->tm_year+1900;
-	ts->date.month  = ansitime->tm_mon+1;  // AAF months are 1-based
-	ts->date.day    = ansitime->tm_mday;   // tm_mday already 1-based
-	ts->time.hour   = ansitime->tm_hour;
-	ts->time.minute = ansitime->tm_min;
-	ts->time.second = ansitime->tm_sec;
-	ts->time.fraction = 0;            // not implemented yet!
+		gettimeofday(&tv, &tz);
+		time->TimeVal = tv.tv_sec;
+		time->IsGMT = false;
+	}
+#endif
 }
 
 aafErr_t AAFConvertEditRate(
@@ -430,13 +444,6 @@ static aafInt32 powi(
 #elif defined(_WIN32)
 #include <time.h>
 #define HZ CLK_TCK
-#elif defined (__sgi) || defined (__FreeBSD__)
-#include <time.h>
-#ifdef CLK_TCK
-#define HZ CLK_TCK
-#else
-#define HZ CLOCKS_PER_SEC
-#endif
 #endif
 
 /*
@@ -483,38 +490,24 @@ static aafInt32 powi(
 struct SMPTELabel
 {
 	aafUInt32	MobIDMajor;
-	aafUInt16	MobIDMinorLow;
-	aafUInt16	MobIDMinorHigh;
+	aafUInt32	MobIDMinor;
 	aafUInt8	oid;
 	aafUInt8	size;
 	aafUInt8	ulcode;
 	aafUInt8	SMPTE;
 	aafUInt8	Registry;
 	aafUInt8	unused;
-	aafUInt8	MobIDPrefixLow;
-	aafUInt8	MobIDPrefixHigh;
+	aafUInt16	MobIDPrefix;
 };
 
-
-
-struct OMFMobID
+union label
 {
-    aafUInt8			SMPTELabel[12];		// 12-bytes of label prefix
-	aafUInt8			length;
-    aafUInt8			instanceHigh;
-    aafUInt8			instanceMid;
-    aafUInt8			instanceLow;
-	struct SMPTELabel	material;
-};
-
-union MobIDOverlay
-{
-	aafMobID_t			mobID;
-	struct OMFMobID		OMFMobID;
+	aafUID_t			guid;
+	struct SMPTELabel	smpte;
 };
 
 AAFRESULT aafMobIDNew(
-        aafMobID_t *mobID)     /* OUT - Newly created Mob ID */
+        aafUID_t *mobID)     /* OUT - Newly created Mob ID */
 {
 	aafUInt32	major, minor;
 	static aafUInt32 last_part2 = 0;		// Get rid of this!!!
@@ -525,16 +518,7 @@ AAFRESULT aafMobIDNew(
 	aafTimeStamp_t	timestamp;
 	
 	AAFGetDateTime(&timestamp);
-	// major = (aafUInt32)timestamp.TimeVal;	// Will truncate
-	assert (sizeof (aafTimeStruct_t) == sizeof (aafUInt32));
-	union
-	{
-	  aafTimeStruct_t time;
-	  aafUInt32       seconds;
-	} time_to_int;
-	time_to_int.time = timestamp.time;
-	major = time_to_int.seconds;
-
+	major = (aafUInt32)timestamp.TimeVal;	// Will truncate
 #if defined(_MAC) || defined(macintosh)
 	minor = TickCount();
 #else
@@ -563,108 +547,30 @@ AAFRESULT aafMobIDNew(
 		
 	last_part2 = minor;
 
-	return(aafMobIDFromMajorMinor(42, major, minor, 4, mobID));		// !!!All toolkit generated, all data
+	return(aafMobIDFromMajorMinor(major, minor, mobID));
 }
 
 AAFRESULT aafMobIDFromMajorMinor(
-        aafUInt32	prefix,
         aafUInt32	major,
 		aafUInt32	minor,
-		aafUInt8	UMIDType,
-		aafMobID_t *mobID)     /* OUT - Newly created Mob ID */
+		aafUID_t *mobID)     /* OUT - Newly created Mob ID */
 {
-	union MobIDOverlay		aLabel;
+	union label		aLabel;
 	
-    aLabel.OMFMobID.SMPTELabel[0]	= 0x06;
-    aLabel.OMFMobID.SMPTELabel[1]	= 0x0C;
-    aLabel.OMFMobID.SMPTELabel[2]	= 0x2B;
-    aLabel.OMFMobID.SMPTELabel[3]	= 0x34;
-    aLabel.OMFMobID.SMPTELabel[4]	= 0x02;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[5]	= 0x05;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[6]	= 0x11;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[7]	= 0x01;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[8]	= 0x01;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[9]	= UMIDType;
-    aLabel.OMFMobID.SMPTELabel[10]	= 0x10;			// Still Open
-    aLabel.OMFMobID.SMPTELabel[11]	= 0x00;
-	aLabel.OMFMobID.length			= 0x13;
-    aLabel.OMFMobID.instanceHigh		= 0x00;
-    aLabel.OMFMobID.instanceMid		= 0x00;
-	aLabel.OMFMobID.instanceLow		= 0x00;
-	aLabel.OMFMobID.material.oid				= 0x06;
-	aLabel.OMFMobID.material.size				= 0x0E;
-	aLabel.OMFMobID.material.ulcode			= 0x2B;
-	aLabel.OMFMobID.material.SMPTE				= 0x34;
-	aLabel.OMFMobID.material.Registry			= 0x7F;
-	aLabel.OMFMobID.material.unused			= 0x7F;
-	aLabel.OMFMobID.material.MobIDPrefixHigh	= (aafUInt8)((prefix >> 7L) | 0x80);
-	aLabel.OMFMobID.material.MobIDPrefixLow	= (aafUInt8)(prefix & 0x7F);
+	aLabel.smpte.oid = 0x06;
+	aLabel.smpte.size = 0x0E;
+	aLabel.smpte.ulcode = 0x2B;
+	aLabel.smpte.SMPTE = 0x34;
+	aLabel.smpte.Registry = 0x02;
+	aLabel.smpte.unused = 0;
+	aLabel.smpte.MobIDPrefix = 42;		// Means its an OMF Uid
 
-	aLabel.OMFMobID.material.MobIDMajor		= major;
-	aLabel.OMFMobID.material.MobIDMinorLow		= (aafUInt16)(minor & 0xFFFF);
-	aLabel.OMFMobID.material.MobIDMinorHigh	=  (aafUInt16)((minor >> 16L) & 0xFFFF);
+	aLabel.smpte.MobIDMajor = major;
+	aLabel.smpte.MobIDMinor = minor;
 
-	*mobID = (aafMobID_t)aLabel.mobID;
+	*mobID = aLabel.guid;
 	return(AAFRESULT_SUCCESS);
 }
-
-#if defined(_MAC) || defined(macintosh)
-// For some reason the CoCreateGuid() function is not implemented in the 
-// Microsoft Component Library...so we define something that should be
-// fairly unique on the mac.
-
-#if defined(_MAC) || defined(macintosh)
-#include <Events.h>
-#endif
-#include <time.h>
-
-static void pvtMacCreateGuid(GUID  *pguid)
-{
-  // {1994bd00-69de-11d2-b6bc-fcab70ff7331}
-  static GUID sTemplate = 
-    { 0x1994bd00,
-		0x69de,
-		0x11d2,
-		{ 0xb6, 0xbc, 0xfc, 0xab, 0x70, 0xff, 0x73, 0x31 } };
-  static bool sInitializedTemplate = false;
-  
-  assert (pguid);
-  if (!sInitializedTemplate)
-  {
-    time_t timer = time(NULL);
-#ifndef __sgi // temp
-    aafUInt32 ticks = TickCount();
-    sTemplate.Data1 += timer + ticks;
-#else
-    sTemplate.Data1 += timer;
-#endif
-    sInitializedTemplate = true;
-  }
-  
-  // Just bump the first member of the guid to emulate GUIDGEN behavior.
-  ++sTemplate.Data1;
-  *pguid = sTemplate;
-}
-#endif
-
-
-// Initializes a new auid
-AAFRESULT aafAUIDNew(aafUID_t * auid)
-{
-  if (! auid)
-	 return AAFRESULT_NULL_PARAM;
-  GUID guid;
-#if defined(_MAC) || defined(macintosh)
-  pvtMacCreateGuid (&guid);
-#else
-  HRESULT hr = CoCreateGuid (&guid);
-  if (FAILED (hr))
-	 return hr;
-#endif
-  memcpy (auid, &guid, sizeof (guid));
-  return AAFRESULT_SUCCESS;
-}
-
 
 typedef struct
 	{
@@ -748,12 +654,12 @@ aafErr_t PvtOffsetToTimecode(
 		offset = offset % info.dropFpMin10;
 		if (offset < info.fpMinute)
 		  {
-			 frame_dropped = kAAFFalse;
+			 frame_dropped = AAFFalse;
 			 min1 = 0;
 		  }
 		else
 		  {
-			 frame_dropped = kAAFTrue;
+			 frame_dropped = AAFTrue;
 			 offset -= info.fpMinute;
 			 min1 = (offset / info.dropFpMin) + 1;
 			 offset = offset % info.dropFpMin;
