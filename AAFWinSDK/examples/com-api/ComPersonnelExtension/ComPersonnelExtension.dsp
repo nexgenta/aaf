@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "COMPERSONNELEXTENSION_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "..\..\..\include" /I "..\..\..\..\examples\com-api\ComExtension" /I "..\..\..\..\ref-impl\src\com-api\com-dll" /I "../../../../Utilities/Include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "_USRDLL" /D "COMPERSONNELEXTENSION_EXPORTS" /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "..\..\..\include" /I "..\..\..\..\examples\com-api\ComExtension" /I "..\..\..\..\ref-impl\src\com-api\com-dll" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "_USRDLL" /D "COMPERSONNELEXTENSION_EXPORTS" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "COMPERSONNELEXTENSION_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "..\..\..\include" /I "..\..\..\..\examples\com-api\ComExtension" /I "..\..\..\..\ref-impl\src\com-api\com-dll" /I "../../../../Utilities/Include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "_USRDLL" /D "COMPERSONNELEXTENSION_EXPORTS" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "..\..\..\include" /I "..\..\..\..\examples\com-api\ComExtension" /I "..\..\..\..\ref-impl\src\com-api\com-dll" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "_USRDLL" /D "COMPERSONNELEXTENSION_EXPORTS" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -89,62 +89,9 @@ LINK32=link.exe
 
 # Name "ComPersonnelExtension - Win32 Release"
 # Name "ComPersonnelExtension - Win32 Debug"
-# Begin Group "AAF Libraries"
+# Begin Group "Source Files"
 
-# PROP Default_Filter "lib"
-# Begin Source File
-
-SOURCE=..\..\..\lib\AAF.lib
-
-!IF  "$(CFG)" == "ComPersonnelExtension - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ComPersonnelExtension - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lib\AAFD.lib
-
-!IF  "$(CFG)" == "ComPersonnelExtension - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "ComPersonnelExtension - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lib\AAFIID.lib
-
-!IF  "$(CFG)" == "ComPersonnelExtension - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ComPersonnelExtension - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lib\AAFIIDD.lib
-
-!IF  "$(CFG)" == "ComPersonnelExtension - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "ComPersonnelExtension - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# End Group
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
 SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\AAFPersonnelExtension.cpp"
@@ -152,6 +99,14 @@ SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\AAFPerso
 # Begin Source File
 
 SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\AAFPersonnelExtension.def"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\AAFPersonnelExtension_i.c"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\AAFPlugin_i.c
 # End Source File
 # Begin Source File
 
@@ -177,5 +132,46 @@ SOURCE="..\..\..\..\ref-impl\src\com-api\com-dll\CAAFUnknown.cpp"
 
 SOURCE="..\..\..\..\examples\com-api\ComExtension\extensionUtils.cpp"
 # End Source File
+# End Group
+# Begin Group "Header Files"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\AAFPersonnelExtension.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\CAAFAdminMob.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\ref-impl\src\com-api\com-dll\CAAFClassFactory.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\CAAFPersonnelMob.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\examples\com-api\ComExtension\ComPersonnelExtension\CAAFPersonnelResource.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\ref-impl\src\com-api\com-dll\CAAFServer.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\ref-impl\src\com-api\com-dll\CAAFUnknown.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\..\examples\com-api\ComExtension\extensionUtils.h"
+# End Source File
+# End Group
+# Begin Group "Resource Files"
+
+# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# End Group
 # End Target
 # End Project
