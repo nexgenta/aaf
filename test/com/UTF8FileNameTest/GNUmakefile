@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2004/09/23 13:34:40 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2004/09/28 14:11:47 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -34,8 +34,7 @@ include $(AAFBASE)/build/common.mk
 # Include directories
 INCLUDES = -I../../../ref-impl/include \
 	   -I../../../ref-impl/include/ref-api \
-	   -I../../../ref-impl/include/com-api \
-	   -I../../../ref-impl/src/com-api
+	   -I../../../ref-impl/include/com-api
 
 
 .PHONY : all

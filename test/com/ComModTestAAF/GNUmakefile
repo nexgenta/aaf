@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2004/05/07 17:46:02 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.13 2004/09/28 14:11:46 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,8 +32,11 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
+# NOTE: Client code would never include implementation headers.
+# However, to ensure that all classes are tested, a macro from
+# ref-impl/src/com-api/AAFObjectTable.h is used by ComModAAF.
 INCLUDES = -I../../../ref-impl/include -I../../../ref-impl/include/ref-api \
-	   -I../../../ref-impl/src/com-api
+			-I../../../ref-impl/src/com-api
 
 
 # CXXFILES2 is declared just to get the list of object files
