@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /WX /GR /GX /Zi /O2 /I "..\..\..\include" /I "../../../../ref-impl/src/impl" /I "..\..\..\..\ref-impl\src\com-api" /I "../../../../Utilities/Include" /FI"stdafx.h" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "UNICODE" /D "_UNICODE" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /MD /W3 /WX /GR /GX /Zi /O2 /I "..\..\..\include" /I "../../../../ref-impl/src/impl" /I "..\..\..\..\ref-impl\src\com-api" /FI"stdafx.h" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "UNICODE" /D "_UNICODE" /Yu"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -213,6 +213,14 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFHeaderTest.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFHTMLClipTest.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFHTMLDescriptorTest.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFIdentificationTest.cpp
 # End Source File
 # Begin Source File
@@ -221,7 +229,7 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFInterpolationDefTest.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFKLVDataTest.cpp
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFIntraFrameMarkerTest.cpp
 # End Source File
 # Begin Source File
 
@@ -233,7 +241,7 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFMasterMobTest.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFMetaDefinitionTest.cpp
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFMIDIFileDescriptorTest.cpp
 # End Source File
 # Begin Source File
 
@@ -242,10 +250,6 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFMobSlotTest.cpp
 # Begin Source File
 
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFMobTest.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\test\com\ComModTestAAF\CAAFModuleTest.cpp
 # End Source File
 # Begin Source File
 
@@ -277,7 +281,11 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFParameterTest.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFPluginDefTest.cpp
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFPluggableCodeTest.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFPluginDescriptorTest.cpp
 # End Source File
 # Begin Source File
 
@@ -294,6 +302,10 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFPropertyTest.cpp
 # Begin Source File
 
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFPropertyValueTest.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFPropValDataTest.cpp
 # End Source File
 # Begin Source File
 
@@ -345,6 +357,10 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTapeDescriptorTest.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTextClipTest.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTextLocatorTest.cpp
 # End Source File
 # Begin Source File
@@ -373,10 +389,6 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTransitionTest.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTypeDefCharacterTest.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTypeDefEnumTest.cpp
 # End Source File
 # Begin Source File
@@ -389,19 +401,11 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTypeDefFixedArrayTest.
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTypeDefIndirectTest.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTypeDefIntTest.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTypeDefObjectRefTest.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CAAFTypeDefOpaqueTest.cpp
 # End Source File
 # Begin Source File
 
@@ -489,10 +493,6 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CEnumAAFInterpolateDefsTes
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CEnumAAFKLVDataTest.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CEnumAAFLoadedPluginsTest.cpp
 # End Source File
 # Begin Source File
@@ -514,10 +514,6 @@ SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CEnumAAFOperationDefsTest.
 # Begin Source File
 
 SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CEnumAAFParameterDefsTest.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CEnumAAFParametersTest.cpp
 # End Source File
 # Begin Source File
 
@@ -619,6 +615,14 @@ SOURCE="..\..\..\..\ref-impl\src\impl\aafCvt.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\..\ref-impl\src\impl\AAFUtils.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\test\com\ComModTestAAF\CAAFModuleTest.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\test\com\ComModTestAAF\ModuleTests\CEnumAAFParametersTest.cpp
 # End Source File
 # Begin Source File
 
