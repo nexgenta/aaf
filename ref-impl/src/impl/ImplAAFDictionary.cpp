@@ -171,6 +171,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterClass (
+      aafUID_t * /*pClassAUID*/,
       ImplAAFClassDef * /*pClassDef*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
@@ -188,6 +189,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterType (
+      aafUID_t * /*pTypeAUID*/,
       ImplAAFTypeDef * /*pTypeDef*/)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
@@ -348,6 +350,7 @@ AAFRESULT ImplAAFDictionary::LookupPluggableDef(aafUID_t *defID, ImplAAFPluggabl
 
 	XPROTECT()
 	{
+		*result = NULL;
 		CHECK(GetPluggableDefinitions (&pluggableEnum));
 		status = pluggableEnum->NextOne (&pluggable);
 		defFound = AAFFalse;
@@ -355,7 +358,10 @@ AAFRESULT ImplAAFDictionary::LookupPluggableDef(aafUID_t *defID, ImplAAFPluggabl
 		{
 			CHECK(pluggable->GetAUID (&testAUID));
 			if(EqualAUID(defID, &testAUID))
+			{
 				defFound = AAFTrue;
+				*result = pluggable;
+			}
 			status = pluggableEnum->NextOne (&pluggable);
 		}
 		if(!defFound)
