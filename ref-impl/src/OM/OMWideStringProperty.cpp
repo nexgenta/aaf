@@ -26,8 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMWideStringProperty
-
 #include "OMWideStringProperty.h"
 
 #include "OMAssertions.h"
@@ -36,10 +34,11 @@
   //   @parm The property id.
   //   @parm The name of this <c OMWideStringProperty>.
 OMWideStringProperty::OMWideStringProperty(const OMPropertyId propertyId,
-                                           const wchar_t* name)
+                                           const char* name)
 : OMCharacterStringProperty<wchar_t>(propertyId, name)
 {
   TRACE("OMWideStringProperty::OMWideStringProperty");
+  PRECONDITION("Valid name", validString(name));
 }
 
   // @mfunc Destructor.
