@@ -1,3 +1,26 @@
+#c *********************************************************************
+#c
+#c $Id: AAFPropertyValue.dod,v 1.10 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c
+#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c AAF Association.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFPropertyValue\
 #endm
@@ -12,8 +35,7 @@ AD_IDL(//
 // in AAF persistent objects.  Values may be simple \(e.g. integer\)\,
 // structured \(e.g. aafTimecode_t\)\, other AAF persistent objects\,
 // media\, or arrays of other types.
-AD_STD_COMMENT_IFC_HEADER
-AD_STD_COMMENT_IFC_STUB)
+AD_STD_COMMENT_IFC_HEADER)
 AD_FORWARD_DECLARATION(AAFTypeDef)
 AD_CLASS_UUID(83057d71, 9691, 11d2, aa, 7f, 80, e6, aa, 00, 00, 00)
 
@@ -42,7 +64,7 @@ AD_XMETHOD1(GetType,
 AD_XMETHOD1(IsDefinedType,
 			[out],
 			objPass,
-			aafBool *,
+			aafBoolean_t *,
 			pIsDefined,
 			result,
 

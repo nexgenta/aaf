@@ -3,114 +3,36 @@
 #ifndef __ImplEnumAAFMobSlots_h__
 #define __ImplEnumAAFMobSlots_h__
 
-#include "OMStorable.h"
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplEnumAAFMobSlots.h,v 1.15 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+#include "ImplAAFEnumerator.h"
 
-class ImplAAFMobSlot;
-class ImplAAFMob;
+#include "ImplAAFMobSlot.h"
 
-
-
-
-
-
-#ifndef __ImplAAFRoot_h__
-#include "ImplAAFRoot.h"
-#endif
-
-
-class ImplEnumAAFMobSlots : public ImplAAFRoot
-{
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplEnumAAFMobSlots ();
-  virtual ~ImplEnumAAFMobSlots ();
-
-
-
-  //****************
-  // NextOne()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    NextOne
-		// @parm [out,retval] The Next MobSlot
-        (ImplAAFMobSlot ** ppMobSlot);
-
-  //****************
-  // Next()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Next
-        (// @parm [in] number of mob slots requested
-		 aafUInt32  count,
-
-		 // @parm [out, size_is(count), length_is(*pFetched)] array to receive mob slots
-		 ImplAAFMobSlot ** ppMobSlots,
-
-		 // @parm [out,ref] number of actual MobSlots fetched into ppMobSlots array
-         aafUInt32 *  pFetched);
-
-  //****************
-  // Skip()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Skip
-		// @parm [in] Number of elements to skip
-        (aafUInt32  count);
-
-  //****************
-  // Reset()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Reset ();
-
-
-  //****************
-  // Clone()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Clone
-		// @parm [out,retval] new enumeration
-        (ImplEnumAAFMobSlots ** ppEnum);
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplEnumAAFMobSlots);
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplEnumAAFMobSlotsTest.cpp.
-  static AAFRESULT test();
-
-//Internal
-AAFRESULT SetEnumMob(ImplAAFMob *aMob);
-
-private:
-	aafInt32		_current;
-	ImplAAFMob		*_mob;
-};
+typedef ImplAAFEnumerator<ImplAAFMobSlot> ImplEnumAAFMobSlots;
 
 #endif // ! __ImplEnumAAFMobSlots_h__
 

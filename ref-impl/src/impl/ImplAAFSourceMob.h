@@ -5,14 +5,29 @@
 
 #include "OMStorable.h"
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplAAFSourceMob.h,v 1.23 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 class ImplAAFEssenceDescriptor;
 
@@ -32,9 +47,8 @@ class ImplAAFSegment;
 
 #include "ImplAAFEssenceDescriptor.h"
 
-#include "OMProperty.h"
+#include "OMStrongRefProperty.h"
 
-const int PID_SOURCEMOB_EDESC	= 5;
 
 const int FULL_LENGTH = -1;
 
@@ -47,6 +61,10 @@ public:
   //********
   ImplAAFSourceMob ();
   virtual ~ImplAAFSourceMob ();
+
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	Initialize ();
 
 
   //****************
@@ -76,13 +94,13 @@ public:
 		 aafSlotID_t  slotID,
 
 		 // @parm [in] Duration of the Source Clip to be added to the new slot
-		 aafLength_t  length,
+		 const aafLength_t & length,
 
 		 // @parm [in] Data kind of the new slot
-         aafUID_t * dataDef,
+         ImplAAFDataDef * pDataDef,
 
 		 // @parm [in] Edit rate of the new slot
-		 aafRational_t  editRate);
+		 const aafRational_t & editRate);
 
 
   //****************
@@ -158,15 +176,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     NewPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 aafRational_t  editrate,
+		 const aafRational_t & editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
+         ImplAAFDataDef * pEssenceKind,
 
-		aafSourceRef_t  ref,
+		 aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -177,15 +195,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 aafRational_t  editrate,
+		 const aafRational_t & editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
+         ImplAAFDataDef * pEssenceKind,
 
-		aafSourceRef_t  ref,
+		 aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -198,15 +216,15 @@ public:
         (aafAppendOption_t  addType,
 		
 		// @parm [in] Edit rate of slot to contain reference
-		 aafRational_t  editrate,
+		 const aafRational_t & editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
+         ImplAAFDataDef * pEssenceKind,
 
-		aafSourceRef_t  ref,
+		 aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip in the Source Mob
          aafLength_t  srcRefLength,
@@ -268,8 +286,8 @@ public:
     // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
     aafMediaCriteria_t *  pMediaCrit,
 
-    // @parm [in] aafEffectChoice_t * | pEffectChoice | Effect Choice
-    aafEffectChoice_t *  pEffectChoice,
+    // @parm [in] aafOperationChoice_t * | pOperationChoice | Effect Choice
+    aafOperationChoice_t *  pOperationChoice,
 
     // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
     ImplAAFFindSourceInfo ** ppSourceInfo
@@ -309,13 +327,6 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFSourceMob)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFSourceMobTest.cpp.
-  static AAFRESULT test();
 
   // SDK Internal
   virtual AAFRESULT ReconcileMobLength(void);

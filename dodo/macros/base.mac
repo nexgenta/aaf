@@ -1,10 +1,26 @@
-#c /***********************************************\
-#c *                                               *
-#c * Advanced Authoring Format                     *
-#c *                                               *
-#c * Copyright (c) 1998-1999 Avid Technology, Inc. *
-#c *                                               *
-#c \***********************************************/
+#c *********************************************************************
+#c
+#c $Id: base.mac,v 1.16 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c
+#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c AAF Association.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #c
@@ -21,7 +37,7 @@
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -41,7 +57,7 @@ AD_XMETHOD1(%01, %02, objPass, %03, %04, %05, %06)\
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -65,7 +81,7 @@ AD_XMETHOD2(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -91,7 +107,7 @@ AD_XMETHOD3(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -119,7 +135,7 @@ AD_XMETHOD4(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -149,7 +165,7 @@ AD_XMETHOD5(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -181,7 +197,7 @@ AD_XMETHOD6(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -215,7 +231,7 @@ AD_XMETHOD7(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -251,7 +267,7 @@ AD_XMETHOD8(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -289,7 +305,7 @@ AD_XMETHOD9(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -329,7 +345,7 @@ AD_XMETHOD_10(%01,
 #c Macro Arg 01: method name
 #c
 #c Macro arguments 02+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    02              03          04          05
@@ -369,7 +385,7 @@ AD_XMETHOD_11(%01,
 #c argument.  Constructor name is assumed to be .this-module.
 #c
 #c Macro arguments 01+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    01              02          03          04
@@ -388,7 +404,7 @@ AD_XCONSTRUCTOR1(%01, objPass, %02, %03, %04,
 #c arguments.  Constructor name is assumed to be .this-module.
 #c
 #c Macro arguments 01+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    01              02          03          04
@@ -409,7 +425,7 @@ AD_XCONSTRUCTOR2(%01, objPass, %02, %03, %04,
 #c arguments.  Constructor name is assumed to be .this-module.
 #c
 #c Macro arguments 01+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    01              02          03          04
@@ -432,7 +448,7 @@ AD_XCONSTRUCTOR3(%01, objPass, %02, %03, %04,
 #c arguments.  Constructor name is assumed to be .this-module.
 #c
 #c Macro arguments 01+:
-#c 
+#c
 #c meth arg #   arg modifiers   arg type    arg name    arg comment
 #c ----------   -------------   --------    --------    -----------
 #c metharg 1    01              02          03          04
@@ -531,7 +547,7 @@ AD_XCONSTRUCTOR4(%01, objPass, %02, %03, %04,
 #c
 #c arg1: one-word description of string which is to be gotten
 #c arg2: unique comment for this particular string.
-#c 
+#c
 #c Any clients of this macro must use triple escape characters to
 #c escape commas and close-parens, e.g. "\\\,".
 #c
@@ -629,7 +645,7 @@ AD_XMETHOD1(Set%01,
 #c
 #c arg1: one-word description of string which is to be gotten
 #c arg2: unique comment for this particular string.
-#c 
+#c
 #c Any clients of this macro must use 7x (!) escape characters to
 #c escape commas and close-parens, e.g. "\\\\\\\,".
 #c
@@ -650,7 +666,7 @@ AD_STD_METHOD_STRING_GET_AND_SIZE(%01, %02)\
 #c arg2: Plural version of type of object which is to be enumerated,
 #c       minus leading "AAF" 
 #c arg3: multiple-word description of item.
-#c 
+#c
 #c Any clients of this macro must use triple escape characters to
 #c escape commas and close-parens, e.g. "\\\,".
 #c
@@ -767,4 +783,73 @@ AD_XMETHOD1(Clone,
   // - the ppEnum pointer is valid.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\\(ppEnum\\))\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Shared copyright message for all generated source files.
+#c
+#ccccccccccccccccccccccccccc
+#c
+#startm .copyright-message 00
+//=---------------------------------------------------------------------=
+//
+// This file was GENERATED for the AAF SDK
+//
+// $Id: base.mac,v 1.16 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
+
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Shared copyright message for all generated idl files.
+#c
+#ccccccccccccccccccccccccccc
+#c
+#startm .idl-copyright-message 00
+cpp_quote("//=---------------------------------------------------------------------=")
+cpp_quote("//")
+cpp_quote("// This file was GENERATED for the AAF SDK")
+cpp_quote("//")
+cpp_quote("// The contents of this file are subject to the AAF SDK Public")
+cpp_quote("// Source License Agreement (the \\"License\\"); You may not use this file")
+cpp_quote("// except in compliance with the License.  The License is available in")
+cpp_quote("// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF")
+cpp_quote("// Association or its successor.")
+cpp_quote("//")
+cpp_quote("// Software distributed under the License is distributed on an \\"AS IS\\"")
+cpp_quote("// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See")
+cpp_quote("// the License for the specific language governing rights and limitations")
+cpp_quote("// under the License.")
+cpp_quote("//")
+cpp_quote("// The Original Code of this file is Copyright 1998-2001, Licensor of the")
+cpp_quote("// AAF Association.")
+cpp_quote("//")
+cpp_quote("// The Initial Developer of the Original Code of this file and the")
+cpp_quote("// Licensor of the AAF Association is Avid Technology.")
+cpp_quote("// All rights reserved.")
+cpp_quote("//")
+cpp_quote("//=---------------------------------------------------------------------=")
+
 #endm

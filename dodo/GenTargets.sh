@@ -1,8 +1,26 @@
-#################################################
-#                                               #
-# Copyright (c) 1998-1999 Avid Technology, Inc. #
-#                                               #
-#################################################
+###############################################################################
+#
+# $Id: GenTargets.sh,v 1.5 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#
+# The contents of this file are subject to the AAF SDK Public
+# Source License Agreement (the "License"); You may not use this file
+# except in compliance with the License.  The License is available in
+# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+# Association or its successor.
+#
+# Software distributed under the License is distributed on an "AS IS"
+# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+# the License for the specific language governing rights and limitations
+# under the License.
+#
+# The Original Code of this file is Copyright 1998-2004, Licensor of the
+# AAF Association.
+#
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is Avid Technology.
+# All rights reserved.
+#
+###############################################################################
 
 #
 # Function: output
@@ -27,16 +45,19 @@ function outputln
 }
 
 outputln "#" This file automatically generated make.
-outputln "#" Special case AAFTypes since no object is to be built only headers...
-outputln "#" special case the utility classes since they will not be exposed by com 
 outputln DODO_TARGETS = '\\'
-for base in AAFTypes AAFRoot ${PRIVATE_AAFOBJECTS} ${AAFOBJECTS} ${AAFCOMINTERFACESONLY} ; do
-	outputln '	'$base.all' \\'
+outputln '	'../ref-impl/src/impl/ImplAAFRoot.h' \\'
+outputln '	'../ref-impl/src/impl/ImplAAFRoot.cpp' \\'
+
+for base in AAFRoot ${PRIVATE_AAFOBJECTS} ${AAFOBJECTS} ; do
+	outputln '	'../ref-impl/src/com-api/C$base.cpp' \\'
+	outputln '	'../ref-impl/src/com-api/C$base.h' \\'
 done
-outputln '	'AAFModule.all
+outputln '	'../ref-impl/src/com-api/CAAFModule.cpp
 outputln ''
+
 output   'PRIVATE_FIDL_TARGETS = '
-for base in ${PRIVATE_AAFOBJECTS} ;  do
+for base in AAFRoot ${PRIVATE_AAFOBJECTS} ;  do
 	outputln '\\'
 	output   '	'$base.fidl' '
 done
@@ -65,14 +86,6 @@ done
 outputln '\\'
 outputln '	AAFModule.frefh '
 outputln ''
-outputln 'PLUGIN_TARGETS = \\'
-outputln '	AAFTypes.all \\' 
-output   '	AAFPluginTypes.all '
-for base in ${PLUGIN_OBJECTS} ;  do
-	outputln '\\'
-	output   '	'$base.all' '
-done
-outputln ''
 outputln ''
 output   'PLUGIN_FIDL_TARGETS = '
 for base in ${PLUGIN_OBJECTS} ;  do
@@ -87,3 +100,4 @@ for base in ${PLUGIN_OBJECTS} ;  do
 	output   '	'$base.frefh' '
 done
 outputln ''
+

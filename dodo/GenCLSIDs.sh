@@ -1,35 +1,27 @@
-#################################################
-#                                               #
-# Copyright (c) 1998-1999 Avid Technology, Inc. #
-#                                               #
-#################################################
+###############################################################################
+#
+# $Id: GenCLSIDs.sh,v 1.5 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#
+# The contents of this file are subject to the AAF SDK Public
+# Source License Agreement (the "License"); You may not use this file
+# except in compliance with the License.  The License is available in
+# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+# Association or its successor.
+#
+# Software distributed under the License is distributed on an "AS IS"
+# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+# the License for the specific language governing rights and limitations
+# under the License.
+#
+# The Original Code of this file is Copyright 1998-2004, Licensor of the
+# AAF Association.
+#
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is Avid Technology.
+# All rights reserved.
+#
+###############################################################################
 
-echo "//=--------------------------------------------------------------------------="
-echo "// (C) Copyright 1998-1999 Avid Technology."
-echo "//"
-echo "// This file was GENERATED for the AAF SDK on "
-echo "//  "`date`
-echo "//"
-echo "// Permission to use, copy and modify this software and accompanying "
-echo "// documentation, and to distribute and sublicense application software "
-echo "// incorporating this software for any purpose is hereby granted, "
-echo "// provided that (i) the above copyright notice and this permission "
-echo "// notice appear in all copies of the software and related documentation, "
-echo "// and (ii) the name Avid Technology, Inc. may not be used in any "
-echo "// advertising or publicity relating to the software without the specific, "
-echo "// prior written permission of Avid Technology, Inc. "
-echo "//"
-echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, "
-echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY "
-echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. "
-echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, "
-echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR "
-echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF "
-echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND "
-echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES "
-echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT "
-echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF "
-echo "// LIABILITY. "
 echo "//=--------------------------------------------------------------------------="
 echo "// Declarations for all of the private AAF code class ids"
 echo "// This file is private to the AAF Reference Implementation."
@@ -42,7 +34,7 @@ echo \#ifndef __AAFCOMPlatformTypes_h__
 echo \#include \"AAFCOMPlatformTypes.h\"
 echo \#endif
 echo ""
-for class in ${AAFOBJECTS} ; do \
+for class in ${PRIVATE_AAFOBJECTS} ${AAFOBJECTS} ; do \
 	echo "EXTERN_C const CLSID CLSID_$class;"; \
 done
 echo ""

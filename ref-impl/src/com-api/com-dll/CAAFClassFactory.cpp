@@ -1,10 +1,27 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: CAAFClassFactory.cpp,v 1.9 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
+
 //
 // File: AAFClassFactory.cpp
 // 
@@ -23,13 +40,18 @@
 #include "CAAFServer.h"
 #endif
 
-
+#include <string.h>
 
 // Implementation
 CAAFClassFactory::CAAFClassFactory(AAFCreateComObjectProc pfnCreate)
-	: CAAFUnknown(NULL),
+	: CAAFUnknown(0),
 	  _pfnCreate(pfnCreate)
 {
+}
+
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
 }
 
 HRESULT CAAFClassFactory::InternalQueryInterface 
@@ -39,16 +61,15 @@ HRESULT CAAFClassFactory::InternalQueryInterface
 {
 	HRESULT hr = S_OK;
 
-	if (NULL == ppvObj)
+	if (!ppvObj)
 		return E_INVALIDARG;
 
-    // We only support the IClassFactory interface 
-    if (riid == IID_IClassFactory) 
+    if (EQUAL_UID(riid,IID_IClassFactory)) 
     { 
-        *ppvObj = this; 
+        *ppvObj = (IClassFactory *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
-		return S_OK;
-    } 
+        return S_OK;
+    }
 
 	// Always delegate back to base implementation.
 	return CAAFUnknown::InternalQueryInterface(riid, ppvObj);
@@ -65,37 +86,61 @@ STDMETHODIMP CAAFClassFactory::CreateInstance
 {
 	HRESULT hr = S_OK;
 
-	if (NULL == ppvObj)
+	if (!ppvObj)
 		return E_INVALIDARG;
 
-	*ppvObj = NULL;
+	*ppvObj = 0;
 	
+	// "Note that the nondelegating versions of QueryInteface, 
+	// AddRef, and Relase are used. If a stand-alone identity is
+	// being created, this is certainly appropriate. If an aggregate
+	// is being created, this is necessary to ensure that the inner
+	// object is Addrefed, not the outer object. Also note that 
+	// the outer object must request IUnknown as the initial 
+	// inteface. This is mandated by the COM Specification.
+	// If the outer object could request any initial inteface, then
+	// the inner object would essentially need to keep two duplicate
+	// sets of vptrs, one set that delegated its QueryInterface, 
+	// AddRef, and Release implementations and another set that did
+	// not. By restricting the initial interface to IUnknown, the 
+	// object implementor needs to isolate only the one vptr to act
+	// as the nondelegating IUnknown." (p. 194, "Essensial COM", by
+	// Don Box, Addison Wesley, 2nd Printing Feb. 1998)
+	if (pUnkOuter && !EQUAL_UID(IID_IUnknown,riid))
+		return E_INVALIDARG; //CLASS_E_NOAGGREGATION;
+
 	// Ask the callback function to create the object instance.
-	IUnknown* pUnknown = NULL;
-	hr = _pfnCreate(pUnkOuter, (void **)&pUnknown);
+	CAAFUnknown* pUnknown = 0;
+	hr = CallClassFactoryFunction(pUnkOuter, (void **)&pUnknown);
 	if (FAILED(hr))
 		return hr;
-		
+
+	// Bump the reference count.
+	pUnknown->InternalAddRef();
+	
 	// See if the object implements the requested interface. if 
 	// this call succeeds than the reference count should be two if 
 	// it fails then the reference count will still be one and the 
-	// following spObject release will delete the object.
-	hr = pUnknown->QueryInterface(riid, ppvObj);
+	// following release will delete the object.
+	hr = pUnknown->InternalQueryInterface(riid, ppvObj);
 
-	pUnknown->Release();
+	pUnknown->InternalRelease();
 
 	return hr;
+}
+
+// Wrapper to call the private _pfnCreate proc.
+HRESULT CAAFClassFactory::CallClassFactoryFunction(IUnknown *pUnkOuter, void **ppvObj)
+{
+	return (*_pfnCreate)(pUnkOuter, ppvObj);
 }
 
 
 STDMETHODIMP CAAFClassFactory::LockServer
 (
-	BOOL fLock
+	AAFBOOL fLock
 )
 {
-	g_pAAFServer->Lock(static_cast<aafBool>(fLock));
+  g_pAAFServer->Lock((fLock) ? kAAFTrue : kAAFFalse);
 	return S_OK;
 }
-
-
-

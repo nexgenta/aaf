@@ -4,107 +4,35 @@
 #define __ImplEnumAAFIdentifications_h__
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplEnumAAFIdentifications.h,v 1.11 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
+#include "ImplAAFEnumerator.h"
 
-class ImplAAFIdentification;
+#include "ImplAAFIdentification.h"
 
-
-#ifndef __ImplAAFObject_h__
-#include "ImplAAFObject.h"
-#endif
-
-typedef OMVariableSizeProperty<aafUID_t> identWeakRefArrayProp_t;
-typedef OMStrongReferenceVectorProperty<ImplAAFIdentification> identStrongRefArrayProp_t;
-
-class ImplEnumAAFIdentifications : public ImplAAFRoot
-{
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplEnumAAFIdentifications ();
-
-protected:
-  virtual ~ImplEnumAAFIdentifications ();
-
-public:
-
-  //****************
-  // NextOne()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    NextOne
-        // @parm [out, retval] The Next Identification
-        (ImplAAFIdentification ** ppIdentification);
-
-
-  //****************
-  // Next()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Next
-        (// @parm [in] number of identifications requested
-         aafUInt32  count,
-
-         // @parm [out, size_is(count), length_is(*pNumFetched)] array to receive identification objects
-         ImplAAFIdentification ** ppIdentifications,
-
-         // @parm [out] number of actual Identifications fetched into ppIdentifications array
-         aafUInt32 *  pNumFetched);
-
-
-  //****************
-  // Skip()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Skip
-        // @parm [in] Number of elements to skip
-        (aafUInt32  count);
-
-
-  //****************
-  // Reset()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Reset ();
-
-
-
-  //****************
-  // Clone()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Clone
-        // @parm [out, retval] new enumeration
-        (ImplEnumAAFIdentifications ** ppEnum);
-
-public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumProperty( ImplAAFObject *pObj, identWeakRefArrayProp_t *pProp);
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumStrongProperty( ImplAAFObject *pObj, identStrongRefArrayProp_t *pProp);
-
-
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplEnumAAFIdentificationsTest.cpp.
-  static AAFRESULT test();
-private:
-	aafUInt32						_current;
-	ImplAAFObject					*_enumObj;
-	identWeakRefArrayProp_t			*_enumProp;
-	identStrongRefArrayProp_t		*_enumStrongProp;
-};
+typedef ImplAAFEnumerator<ImplAAFIdentification> ImplEnumAAFIdentifications;
 
 #endif // ! __ImplEnumAAFIdentifications_h__
 

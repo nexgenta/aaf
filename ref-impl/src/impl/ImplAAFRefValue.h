@@ -4,52 +4,48 @@
 #define __ImplAAFRefValue_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplAAFRefValue.h,v 1.5 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
+class OMObject;
+class OMStorable;
 class ImplAAFRoot;
+class ImplAAFStorable;
 
 #ifndef __ImplAAFPropertyValue_h__
 #include "ImplAAFPropertyValue.h"
 #endif
 
-#ifndef __ImplAAFPropValData_h__
-#include "ImplAAFPropValData.h"
-#endif
 
 class ImplAAFTypeDefObjectRef;
 
 class OMProperty;
-//class OMReferenceProperty; // TBD: the base class for singleton references
+class OMReferenceProperty; // The base class for singleton references
 
 
-//class ImplAAFRefValue : public ImplAAFPropertyValue // TBD:
-class ImplAAFRefValue : public ImplAAFPropValData
+class ImplAAFRefValue : public ImplAAFPropertyValue
 {
 public:
 
@@ -61,17 +57,39 @@ protected:
   ImplAAFRefValue ();
   virtual ~ImplAAFRefValue ();
 
+
+  // non-published method to initialize this object.
+  // Initialize an instance from a type definition. This is the "old-style"
+  // "non-direct" access initialization method. 
+  AAFRESULT Initialize (const ImplAAFTypeDefObjectRef *referenceType);
+
   // non-published method to initialize this object.
   // NOTE: The given property's type must be a reference type.
   AAFRESULT Initialize (const ImplAAFTypeDefObjectRef *referenceType,
                         OMProperty *property);
   
   // Return the propertyType as a referenceType.
-  const ImplAAFTypeDefObjectRef *referenceType(void) const;             
+  const ImplAAFTypeDefObjectRef *referenceType(void) const;
+  
+  // Return the instance's property as a reference property.
+  OMReferenceProperty * referenceProperty(void) const;
+  
+  void SetLocalObject(ImplAAFStorable * localObject); // reference counted
+  ImplAAFStorable * GetLocalObject(void) const; // not reference counted
   
 public:
+  virtual AAFRESULT STDMETHODCALLTYPE GetObject(ImplAAFStorable **ppObject) const = 0;
+  virtual AAFRESULT STDMETHODCALLTYPE SetObject(ImplAAFStorable *pObject) = 0;
 
   virtual AAFRESULT STDMETHODCALLTYPE WriteTo(OMProperty* pOmProp);
+  
+  // Conversion utilities
+  static ImplAAFStorable * ConvertOMObjectToRoot(OMObject *object);
+  static ImplAAFStorable * ConvertRootToOMStorable(ImplAAFRoot *object);
+
+private:
+  ImplAAFStorable *_localObject; // Should be NULL if there is an associated property.
+
 };
 
 //

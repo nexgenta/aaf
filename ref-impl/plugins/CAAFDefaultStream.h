@@ -3,14 +3,29 @@
 #ifndef __CAAFDefaultStream_h__
 #define __CAAFDefaultStream_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: CAAFDefaultStream.h,v 1.10 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #ifndef __AAFPlugin_h__
 #include "AAFPlugin.h"
@@ -33,7 +48,7 @@ protected:
   //
   // Constructor/destructor
   //
-  CAAFDefaultStream (IUnknown * pControllingUnknown, aafBool doInit = AAFTrue);
+  CAAFDefaultStream (IUnknown * pControllingUnknown, aafBool doInit = kAAFTrue);
   virtual ~CAAFDefaultStream ();
 
 public:
@@ -58,7 +73,7 @@ public:
   STDMETHOD (SeekRelative)
     (/*[in]*/ aafInt32  byteOffset); // The relative byte offset into the stream. 
 
-  // Returns AAFTrue if the byte offset is within the stream.
+  // Returns kAAFTrue if the byte offset is within the stream.
   STDMETHOD (IsPosValid)
     (/*[in]*/ aafInt64  byteOffset, // The absolute byte offset into the stream.
      /*[out]*/ aafBool *  isValid); // The result. 

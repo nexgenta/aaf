@@ -1,20 +1,26 @@
-/*
- * EssenceStreamDataDst.c
- *
- * based on jdatadst.c
- *
- * Copyright (C) 1994-1996, Thomas G. Lane.
- * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README file.
- *
- * This file contains compression data destination routines for the case of
- * emitting JPEG data to a file (or any stdio stream).  While these routines
- * are sufficient for most applications, some will want to use a different
- * destination manager.
- * IMPORTANT: we assume that fwrite() will correctly transcribe an array of
- * JOCTETs into 8-bit-wide elements on external storage.  If char is wider
- * than 8 bits on your machine, you may need to do some tweaking.
- */
+//=---------------------------------------------------------------------=
+//
+// $Id: jpegesdatadst.cpp,v 1.5 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 /* Include the prototype for jpeg_essencestream_dest */
 #include "jpegesdata.h"
@@ -85,8 +91,9 @@ METHODDEF(boolean)
 empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
+  aafUInt32 bytesWritten;
 
-  HRESULT hr = (dest->outfile)->Write((aafDataBuffer_t)dest->buffer, OUTPUT_BUF_SIZE);
+  HRESULT hr = (dest->outfile)->Write(OUTPUT_BUF_SIZE, (aafDataBuffer_t)dest->buffer, &bytesWritten);
 	if (FAILED(hr))
     ERREXIT(cinfo, JERR_FILE_WRITE);
 
@@ -112,10 +119,11 @@ term_destination (j_compress_ptr cinfo)
 	HRESULT hr = S_OK;
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
   size_t datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
+  aafUInt32 bytesWritten;
 
   /* Write any data remaining in the buffer */
   if (datacount > 0) {
-    hr = (dest->outfile)->Write((aafDataBuffer_t)dest->buffer, datacount);
+    hr = (dest->outfile)->Write(datacount, (aafDataBuffer_t)dest->buffer, &bytesWritten);
 	  if (FAILED(hr))
       ERREXIT(cinfo, JERR_FILE_WRITE);
   }

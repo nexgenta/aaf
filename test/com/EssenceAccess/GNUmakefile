@@ -1,3 +1,27 @@
+###############################################################################
+#
+# $Id: GNUmakefile,v 1.6 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+#
+# The contents of this file are subject to the AAF SDK Public
+# Source License Agreement (the "License"); You may not use this file
+# except in compliance with the License.  The License is available in
+# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+# Association or its successor.
+#
+# Software distributed under the License is distributed on an "AS IS"
+# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+# the License for the specific language governing rights and limitations
+# under the License.
+#
+# The Original Code of this file is Copyright 1998-2004, Licensor of the
+# AAF Association.
+#
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is Avid Technology.
+# All rights reserved.
+#
+###############################################################################
+
 PACKAGE = Test
 
 AAFBASE ?= ../../..
@@ -15,17 +39,23 @@ INCLUDES = -I../../../ref-impl/include \
 
 
 .PHONY : all
-all : $(BINDIR)/EssenceAccess$(EXE)
+all : $(OBJDIR) $(AAFSDKBINDIR)/EssenceAccess$(EXE)
 
 
-$(BINDIR)/EssenceAccess$(EXE) : $(BINDIR) $(OBJDIR) $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(LIBDIR) -laaflib -laafiid -o $@
+$(AAFSDKBINDIR)/EssenceAccess$(EXE) : $(CXXOBJS)
+	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid -o $@
 
 
 .PHONY : clean
 clean :
-	$(RM) $(CXXOBJS)
-	$(RM) $(BINDIR)/EssenceAccess$(EXE)
+	@$(RM) $(CXXOBJS)
+	@$(RM) $(DEPS)
+	@$(RM) $(AAFSDKBINDIR)/EssenceAccess$(EXE)
+	@$(RMDIR) $(OBJDIR)/ii_files
+
+
+.PHONY : realclean
+realclean : clean
 
 
 include $(AAFBASE)/build/rules.mk

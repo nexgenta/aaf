@@ -1,56 +1,55 @@
+//=---------------------------------------------------------------------=
+//
+// $Id: CAAFModuleTest.h,v 1.12 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
+
 #ifndef __CAAFModuleTest_h__
 #define __CAAFModuleTest_h__
 
-#ifndef __CAAFUnknown_h__
-#include "CAAFUnknown.h"
-#endif
+#include "AAFTypes.h"
+#include "ModuleTest.h"
 
-
-#ifndef __AAFModuleTest_h__
-#include "AAFModuleTest.h"
-#endif
-
-
-class CAAFModuleTest : 
-	public IAAFModuleTest,
-	public CAAFUnknown
+class CAAFModuleTest
 {
-protected:
-	CAAFModuleTest(IUnknown *pUnkOuter);
-	virtual ~CAAFModuleTest();
+public:
+  CAAFModuleTest();
+  ~CAAFModuleTest();
     
-public:
-	// Declare the factory for this class.
-	AAF_DECLARE_CONCRETE();
-
-	// Declare the module test method.
-	static HRESULT test();
-
-
-	// IAAFModuleTest methods
-	//
-    STDMETHOD(Test)(unsigned char *pClassName);
-
-protected:
-	// CAAFUnknown override
-	//
-    virtual HRESULT InternalQueryInterface(REFIID riid, void **ppv);
-
-public:
   //
-  // Return private implementation pointer for delegation.
-  // NOTE: This is NOT the pointer to the COM object's implementation
-  // object!
-  STDMETHOD(GetImplRep)(/*[retval, out]*/ void **);
+  // Print out a list of AAF class names, one per line, in the order that 
+  // the tests will be run.
+  //
+  void List(void);
+
+  //
+  // Call  Module test functions.
+  //
+  HRESULT Test(testMode_t mode,
+               bool filter = false, 
+               int argc = 0, 
+               const char **argv = NULL);
+
 };
 
-
-// Redefine the end object map macro to include the module test
-// object.
-#ifdef AAF_END_OBJECT_MAP
-#undef AAF_END_OBJECT_MAP
-#define AAF_END_OBJECT_MAP() AAF_OBJECT_ENTRYX(AAFModuleTest, true) AAF_LAST_ENTRY() };
-#endif
 
 
 #endif // __CAAFModuleTest_h__

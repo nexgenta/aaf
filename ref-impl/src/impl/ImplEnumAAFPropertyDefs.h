@@ -3,112 +3,34 @@
 #ifndef __ImplEnumAAFPropertyDefs_h__
 #define __ImplEnumAAFPropertyDefs_h__
 
-/***********************************************\
-*                                               *
-* Advanced Authoring Format                     *
-*                                               *
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*                                               *
-\***********************************************/
-
-class ImplAAFPropertyDef;
-
-#ifndef __ImplAAFObject_h__
-#include "ImplAAFObject.h"
-#endif
-
-
-typedef OMStrongReferenceVectorProperty<ImplAAFPropertyDef>
-  propertyDefStrongRefArrayProp_t; 
-
-
-class ImplEnumAAFPropertyDefs : public ImplAAFRoot
-{
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplEnumAAFPropertyDefs ();
-
-protected:
-  virtual ~ImplEnumAAFPropertyDefs ();
-
-public:
-
-
-  //****************
-  // NextOne()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    NextOne
-        // @parm [out,retval] The Next PropertyDefinition
-        (ImplAAFPropertyDef ** ppPropertyDef);
-
-  //****************
-  // Next()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Next
-        (// @parm [in] number of property definition definitions
-		 // requested
-         aafUInt32  count,
-
-         // @parm [out, size_is(count), length_is(*pFetched)] array to
-		 // receive property definitions
-         ImplAAFPropertyDef ** ppPropertyDefs,
-
-         // @parm [out,ref] number of actual PropertyDefs fetched into
-		 // ppPropertyDefs array
-         aafUInt32 *  pFetched);
-
-  //****************
-  // Skip()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Skip
-        // @parm [in] Number of elements to skip
-        (aafUInt32  count);
-
-  //****************
-  // Reset()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Reset ();
-
-
-  //****************
-  // Clone()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Clone
-        // @parm [out,retval] new enumeration
-        (ImplEnumAAFPropertyDefs ** ppEnum);
-
-
-
-public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumStrongProperty (ImplAAFObject *pObj,
-						   propertyDefStrongRefArrayProp_t *pProp);
-
-private:
-	aafUInt32                         _current;
-	ImplAAFObject                   * _enumObj;
-	propertyDefStrongRefArrayProp_t * _enumStrongProp;
-};
-
+//=---------------------------------------------------------------------=
 //
-// smart pointer
+// $Id: ImplEnumAAFPropertyDefs.h,v 1.9 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
 //
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
-#ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
-#include "ImplAAFSmartPointer.h"
-#endif
+#include "ImplAAFEnumerator.h"
 
-typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
+#include "ImplAAFPropertyDef.h"
+
+typedef ImplAAFEnumerator<ImplAAFPropertyDef> ImplEnumAAFPropertyDefs;
 
 #endif // ! __ImplEnumAAFPropertyDefs_h__

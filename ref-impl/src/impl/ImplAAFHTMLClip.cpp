@@ -1,30 +1,46 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
-
-
-
-
-
-#include "AAFStoredObjectIDs.h"
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplAAFHTMLClip.cpp,v 1.12 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #ifndef __ImplAAFHTMLClip_h__
 #include "ImplAAFHTMLClip.h"
 #endif
 
+
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+
 #include <assert.h>
 #include <string.h>
 
 
-ImplAAFHTMLClip::ImplAAFHTMLClip ()
-{}
+ImplAAFHTMLClip::ImplAAFHTMLClip () :
+  _beginAnchor(PID_HTMLClip_BeginAnchor, L"BeginAnchor"),
+  _endAnchor(PID_HTMLClip_EndAnchor, L"EndAnchor")
+{
+  _persistentProperties.put(_beginAnchor.address());
+  _persistentProperties.put(_endAnchor.address());
+}
 
 
 ImplAAFHTMLClip::~ImplAAFHTMLClip ()
@@ -32,56 +48,98 @@ ImplAAFHTMLClip::~ImplAAFHTMLClip ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHTMLClip::GetBeginAnchor (
-      wchar_t *  /*pName*/,
-      aafInt32  /*bufSize*/)
+ImplAAFHTMLClip::GetBeginAnchor (aafCharacter *  pName,
+								 aafInt32  bufSize)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == pName)
+		return(AAFRESULT_NULL_PARAM);
+	
+	if (!_beginAnchor.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+	bool stat = _beginAnchor.copyToBuffer(pName, bufSize);
+	if (! stat)
+		return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
+	
+	return (AAFRESULT_SUCCESS);
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHTMLClip::GetBeginAnchorBufLen (
-      aafUInt32 *  /*pLen*/)
+ImplAAFHTMLClip::GetBeginAnchorBufLen (aafUInt32 *  pLen)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == pLen)
+		return (AAFRESULT_NULL_PARAM);
+	
+	if(!_beginAnchor.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
+	*pLen = _beginAnchor.size();
+	
+	return (AAFRESULT_SUCCESS); 
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHTMLClip::SetBeginAnchor (
-      wchar_t *  /*pName*/)
+ImplAAFHTMLClip::SetBeginAnchor (const aafCharacter *  pName)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == pName)
+		return(AAFRESULT_NULL_PARAM);
+	
+	_beginAnchor = pName;
+	
+	return (AAFRESULT_SUCCESS); 
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHTMLClip::GetEndAnchor (
-      wchar_t *  /*pName*/,
-      aafInt32  /*bufSize*/)
+ImplAAFHTMLClip::GetEndAnchor (aafCharacter *  pName,
+							   aafInt32  bufSize)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == pName)
+		return(AAFRESULT_NULL_PARAM);
+	
+	if (!_endAnchor.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
+	bool stat = _endAnchor.copyToBuffer(pName, bufSize);
+	if (! stat)
+		return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
+	
+	return (AAFRESULT_SUCCESS);
 }
+
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHTMLClip::GetEndAnchorBufLen (
-      aafUInt32 *  /*pLen*/)
+ImplAAFHTMLClip::GetEndAnchorBufLen (aafUInt32 *  pLen)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == pLen)
+		return (AAFRESULT_NULL_PARAM);
+	
+	if (!_endAnchor.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+	*pLen = _endAnchor.size();
+	
+	return (AAFRESULT_SUCCESS); 
 }
+
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHTMLClip::SetEndAnchor (
-      wchar_t *  /*pName*/)
+ImplAAFHTMLClip::SetEndAnchor (const aafCharacter *  pName)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == pName)
+		return(AAFRESULT_NULL_PARAM);
+	
+	_endAnchor = pName;
+	
+	return (AAFRESULT_SUCCESS); 
 }
 
 
 
-OMDEFINE_STORABLE(ImplAAFHTMLClip, AUID_AAFHTMLClip);
+
 
 

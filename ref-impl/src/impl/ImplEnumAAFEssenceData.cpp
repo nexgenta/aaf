@@ -1,177 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplEnumAAFEssenceData.cpp,v 1.12 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
-
-#ifndef __ImplAAFEssenceData_h__
-#include "ImplAAFEssenceData.h"
-#endif
-#ifndef __ImplAAFContentStorage_h__
-#include "ImplAAFContentStorage.h"
-#endif
-
-
-
-
-
-
-#ifndef __ImplEnumAAFEssenceData_h__
-#include "ImplEnumAAFEssenceData.h"
-#endif
-
-#include <assert.h>
-#include <string.h>
-#include "AAFResult.h"
-#include "ImplAAFObjectCreation.h"
-
-extern "C" const aafClassID_t CLSID_EnumAAFEssenceData;
-
-
-ImplEnumAAFEssenceData::ImplEnumAAFEssenceData ()
-{
-  _current = 0;
-  _contentStorage = NULL;
-}
-
-
-ImplEnumAAFEssenceData::~ImplEnumAAFEssenceData ()
-{
-  if (_contentStorage)
-  {
-    _contentStorage->ReleaseReference();
-    _contentStorage = NULL;
-  }
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFEssenceData::NextOne (ImplAAFEssenceData ** ppEssenceData)
-{
-  AAFRESULT hr = AAFRESULT_SUCCESS;
-  aafUInt32 cur = _current, siz = 0;
-
-  hr = _contentStorage->GetNumEssenceData (&siz);
-  if (AAFRESULT_SUCCESS == hr)
-  {    
-    if (cur < siz)
-    {
-      hr = _contentStorage->GetNthEssenceData (cur, ppEssenceData);
-      if (AAFRESULT_SUCCESS == hr)
-        _current = ++cur;
-    }
-		else
-			return AAFRESULT_NO_MORE_OBJECTS;
-  }
-  return hr;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFEssenceData::Next (aafUInt32  count,
-                           ImplAAFEssenceData ** ppEssenceData,
-                           aafUInt32 *  pFetched)
-{
-	aafUInt32		numEssenceData = 0;
-	AAFRESULT		result = AAFRESULT_SUCCESS;
-
-	if ((pFetched == NULL) || (NULL == ppEssenceData))
-		return AAFRESULT_NULL_PARAM;
-
-	for (numEssenceData = 0; numEssenceData < count; numEssenceData++)
-	{
-		result = NextOne(&ppEssenceData[numEssenceData]);
-		if (AAFRESULT_SUCCESS != result)
-			break;
-	}
-	
-	*pFetched = numEssenceData;
-
-	return result;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFEssenceData::Skip (aafUInt32  count)
-{
-  AAFRESULT result = AAFRESULT_SUCCESS;
-  aafUInt32 newCurrent = _current + count;
-  aafUInt32 siz = 0;
-
-  result = _contentStorage->GetNumEssenceData(&siz);
-  if (AAFRESULT_SUCCESS == result)
-  {
-    if (newCurrent < siz)
-      _current = newCurrent;
-    else
-      result = AAFRESULT_NO_MORE_OBJECTS;
-  }
-
-  return result;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFEssenceData::Reset ()
-{
-  _current = 0;
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFEssenceData::Clone (ImplEnumAAFEssenceData ** ppEnum)
-{
-	if (NULL == ppEnum)
-		return AAFRESULT_NULL_PARAM;
-	*ppEnum = 0;
-	
-	ImplEnumAAFEssenceData *theEnum = (ImplEnumAAFEssenceData *)CreateImpl (CLSID_EnumAAFEssenceData);
-	
-	XPROTECT()
-	{
-		CHECK(theEnum->SetContentStorage(_contentStorage));
-		CHECK(theEnum->Reset());
-		CHECK(theEnum->Skip(_current));
-		*ppEnum = theEnum;
-	}
-	XEXCEPT
-	{
-		if (theEnum)
-			theEnum->ReleaseReference();
-		return(XCODE());
-	}
-	XEND;
-	
-	return(AAFRESULT_SUCCESS);
-}
-
-
-
-//Internal
-AAFRESULT
-    ImplEnumAAFEssenceData::SetContentStorage(ImplAAFContentStorage *pContentStorage)
-{
-  if (_contentStorage)
-    _contentStorage->ReleaseReference();
-
-  _contentStorage = pContentStorage;
-
-  if (pContentStorage)
-    pContentStorage->AcquireReference();
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-
-
-
-
+// This module has been made obsolete by the implementation of a common enumerator
+// template class.
 
 
 

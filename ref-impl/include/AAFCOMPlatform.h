@@ -1,32 +1,29 @@
 #ifndef __AAFCOMPlatform_h__
 #define __AAFCOMPlatform_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: AAFCOMPlatform.h,v 1.11 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 // Files that contain standard types for windows/com interfaces.
 // Files that contain DECLARE_INTERFACE macros, IUnknown and IClassFactory.
 
@@ -36,13 +33,17 @@
 #include "AAFCOMPlatformTypes.h"
 #endif
 
-#if defined(_MAC) || defined(_MAC_) || defined(macintosh)
+#if defined( OS_MACOS )
   // Include files from ActiveX SDK for the Macintosh
 #  include <compobj.h>
-#elif defined(WIN32) || defined(_WIN32)
+
+
+#elif defined( OS_WINDOWS )
 #  include <unknwn.h>
 #  include <objbase.h>
-#elif defined (__sgi) || defined (__FreeBSD__)
+
+
+#elif defined( OS_UNIX )
 
   EXTERN_C STDAPI  DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID FAR* ppv);
 
@@ -81,18 +82,11 @@
       );
  
 # define GetModuleFileName  GetModuleFileNameW
+
 #else
-  // Default to the Structured Storage reference implementation.
-#  include "REF.HXX"
-  
-  // Make sure begin/end interface are at least defined. These macros are required
-  // for all AAF interface files.
-#  ifndef BEGIN_INTERFACE
-#    define BEGIN_INTERFACE
-#  endif
-#  ifndef END_INTERFACE
-#    define END_INTERFACE
-#  endif
+#error Unknown operating system
+
+
 #endif
 
 

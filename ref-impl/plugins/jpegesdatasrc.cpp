@@ -1,20 +1,26 @@
-/*
- * EssenceStreamDataDst.cpp
- *
- * based on jdatasrc.c
- *
- * Copyright (C) 1994-1996, Thomas G. Lane.
- * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README file.
- *
- * This file contains decompression data source routines for the case of
- * reading JPEG data from a file (or any stdio stream).  While these routines
- * are sufficient for most applications, some will want to use a different
- * source manager.
- * IMPORTANT: we assume that fread() will correctly transcribe an array of
- * JOCTETs from 8-bit-wide elements on external storage.  If char is wider
- * than 8 bits on your machine, you may need to do some tweaking.
- */
+//=---------------------------------------------------------------------=
+//
+// $Id: jpegesdatasrc.cpp,v 1.6 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 /* Include the prototype for jpeg_essencedata_src */
 #include "jpegesdata.h"
@@ -223,7 +229,7 @@ jpeg_essencestream_src (j_decompress_ptr cinfo, IAAFEssenceStream * infile, aafU
 
 	if (NULL == src->buffer) {
     src->buffer = (JOCTET *)
-      (*cinfo->mem->alloc_large) ((j_common_ptr) cinfo, JPOOL_IMAGE,
+      (*cinfo->mem->alloc_large) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
 				  samplesize * SIZEOF(JOCTET));
 		src->bufferSize = samplesize;
 		src->sampleSize = samplesize;

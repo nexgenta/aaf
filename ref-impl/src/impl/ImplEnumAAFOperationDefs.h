@@ -1,124 +1,39 @@
 //@doc
-//@class    EnumAAFEffectDefs | Implementation class for EnumAAFEffectDefs
-#ifndef __ImplEnumAAFEffectDefs_h__
-#define __ImplEnumAAFEffectDefs_h__
+//@class    EnumAAFOperationDefs | Implementation class for EnumAAFOperationDefs
+#ifndef __ImplEnumAAFOperationDefs_h__
+#define __ImplEnumAAFOperationDefs_h__
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplEnumAAFOperationDefs.h,v 1.15 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+#include "ImplAAFEnumerator.h"
 
+#include "ImplAAFOperationDef.h"
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
+typedef ImplAAFEnumerator<ImplAAFOperationDef> ImplEnumAAFOperationDefs;
 
-
-class ImplAAFEffectDef;
-
-
-
-
-
-
-
-#ifndef __ImplAAFObject_h__
-#include "ImplAAFObject.h"
-#endif
-
-typedef OMVariableSizeProperty<aafUID_t> effectDefWeakRefArrayProp_t;
-
-
-class ImplEnumAAFEffectDefs : public ImplAAFRoot
-{
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplEnumAAFEffectDefs ();
-
-protected:
-  virtual ~ImplEnumAAFEffectDefs ();
-
-public:
-
-
-  //****************
-  // NextOne()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    NextOne
-        // @parm [out,retval] The Next EffectDefinition
-        (ImplAAFEffectDef ** ppEffectDef);
-
-  //****************
-  // Next()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Next
-        (// @parm [in] number of effect definitions requested
-         aafUInt32  count,
-
-         // @parm [out, size_is(count), length_is(*pFetched)] array to receive effect definitions
-         ImplAAFEffectDef ** ppEffectDefs,
-
-         // @parm [out,ref] number of actual EffectDefs fetched into ppEffectDefs array
-         aafUInt32 *  pFetched);
-
-  //****************
-  // Skip()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Skip
-        // @parm [in] Number of elements to skip
-        (aafUInt32  count);
-
-  //****************
-  // Reset()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Reset ();
-
-
-  //****************
-  // Clone()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Clone
-        // @parm [out,retval] new enumeration
-        (ImplEnumAAFEffectDefs ** ppEnum);
-
-
-public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumProperty( ImplAAFObject *pObj, effectDefWeakRefArrayProp_t *pProp);
-
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplEnumAAFEffectDefsTest.cpp.
-  static AAFRESULT test();
-private:
-	aafUInt32					_current;
-	ImplAAFObject				*_enumObj;
-	effectDefWeakRefArrayProp_t	*_enumProp;
-};
-
-#endif // ! __ImplEnumAAFEffectDefs_h__
+#endif // ! __ImplEnumAAFOperationDefs_h__
 
 

@@ -1,56 +1,68 @@
+###############################################################################
+#
+# $Id: GNUmakefile,v 1.7 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#
+# The contents of this file are subject to the AAF SDK Public
+# Source License Agreement (the "License"); You may not use this file
+# except in compliance with the License.  The License is available in
+# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+# Association or its successor.
+#
+# Software distributed under the License is distributed on an "AS IS"
+# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+# the License for the specific language governing rights and limitations
+# under the License.
+#
+# The Original Code of this file is Copyright 1998-2004, Licensor of the
+# AAF Association.
+#
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is Avid Technology.
+# All rights reserved.
+#
+###############################################################################
+
+UPDATE = ../update.ksh
+
+.PHONY : all
+all : dodo-app macros/base.mac targets.mk depend.mk targets
 
 AAFBASE ?= ..
 
 include $(AAFBASE)/build/common.mk
 
-INCLUDE_DIR = $(AAFBASE)/ref-impl/include/com-api
-SRC_DIR = $(AAFBASE)/ref-impl/src/com-api
+.PHONY : dodo-app
+dodo-app :
+	@$(ECHO) "\n======== [ dodo/tool ] \n"
+	cd tool && $(MAKE) -f GNUmakefile
 
-.PHONY : all
-all : dodoTool aafObjects targets.mk depend.mk targets
+macros/base.mac : CopyrightMessage.txt sync_copyright.pl
+	@perl sync_copyright.pl -macro macros/base.mac -copyright CopyrightMessage.txt > base.mac.tmp
+	$(UPDATE) base.mac.tmp macros/base.mac
+	@rm -f base.mac.tmp
 
-.PHONY : dodoTool
-dodoTool :
-	@echo "[Building dodo/tool]\n"
-	cd tool && $(MAKE)
-
-.PHONY : aafObjects
-aafObjects : $(INCLUDE_DIR)/aafobjects.mk $(SRC_DIR)/aafobjects.mk
-
-$(INCLUDE_DIR)/aafobjects.mk : aafobjects.mk
-	@echo "[Building $@]\n"
-	-@rm -f $@
-	cp $< $@
-
-$(SRC_DIR)/aafobjects.mk : aafobjects.mk
-	@echo "[Building $@]\n"
-	-@rm -f $@
-	cp $< $@
-
-DODO = $(BINDIR)/dodo
-
-targets.mk : aafobjects.mk
-	@echo "[Building $@]\n"
+targets.mk : aafobjects.mk GenTargets.sh
+	@$(ECHO) "\n======== [ dodo ] \"Building targets.mk\"\n"
 	$(MAKE) -f dodotargets.mak
 
-depend.mk : aafobjects.mk
-	@echo "[Building $@]\n"
+depend.mk : aafobjects.mk GenDepend.sh GenDepend2.sh
+	@$(ECHO) "\n======== [ dodo ] \"Building depend.mk\"\n"
 	$(MAKE) -f dododepend.mak
 
-targets :
-	@echo "[Building $@]\n"
+targets : targets.mk depend.mk
+	@$(ECHO) "\n======== [ dodo ] \"Building targets\"\n"
 	$(MAKE) -f maketargets_gnu.mak
 
-#.PHONY : clean
+.PHONY : clean
 clean :
-	cd tool && $(MAKE) clean
+	cd tool && $(MAKE) -f GNUmakefile GENDEPS=0 clean
 	$(MAKE) -f dodotargets.mak clean
 	$(MAKE) -f dododepend.mak clean
-	touch targets.mk depend.mk
+	$(TOUCH) -t 198101011000 targets.mk depend.mk
 	$(MAKE) -f maketargets_gnu.mak clean
-	-@rm -f targets.mk depend.mk
 
-include $(AAFBASE)/build/rules.mk
-
-
+.PHONY : realclean
+realclean : clean
+	$(MAKE) -f maketargets_gnu.mak $@
+	$(RM) -f targets.mk depend.mk
 

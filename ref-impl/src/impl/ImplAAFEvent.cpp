@@ -1,11 +1,26 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplAAFEvent.cpp,v 1.12 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #ifndef __ImplAAFEvent_h__
 #include "ImplAAFEvent.h"
@@ -22,8 +37,8 @@
 
 
 ImplAAFEvent::ImplAAFEvent ():
-  _position(PID_Event_Position, "Position"),
-  _comment(PID_Event_Comment, "Comment")
+  _position(PID_Event_Position, L"Position"),
+  _comment(PID_Event_Comment, L"Comment")
 {
   _persistentProperties.put(_position.address());
   _persistentProperties.put(_comment.address());
@@ -60,31 +75,33 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEvent::SetComment (
-      wchar_t *  pComment)
+      const aafCharacter * pComment)
 {
-  if (NULL == pComment)
-    return (AAFRESULT_NULL_PARAM);
-
-  _comment = pComment;
-
-  return (AAFRESULT_SUCCESS);
+	if (NULL == pComment)
+		return (AAFRESULT_NULL_PARAM);
+	
+	_comment = pComment;
+	
+	return (AAFRESULT_SUCCESS);
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFEvent::GetComment (
-      wchar_t *  pComment,
-      aafUInt32  bufSize)
+ImplAAFEvent::GetComment (wchar_t *  pComment,
+						  aafUInt32  bufSize)
 {
-  if (NULL == pComment)
-    return(AAFRESULT_NULL_PARAM);
-
-  bool stat = _comment.copyToBuffer(pComment, bufSize);
-  if (!stat)
-    return AAFRESULT_SMALLBUF;
-
-  return (AAFRESULT_SUCCESS); 
+	if (NULL == pComment)
+		return(AAFRESULT_NULL_PARAM);
+	
+	if (!_comment.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+	bool stat = _comment.copyToBuffer(pComment, bufSize);
+	if (!stat)
+		return AAFRESULT_SMALLBUF;
+	
+	return (AAFRESULT_SUCCESS); 
 }
 
 
@@ -93,15 +110,17 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFEvent::GetCommentBufLen (
       aafUInt32 *  pBufSize)
 {
-  if (NULL == pBufSize)
-    return (AAFRESULT_NULL_PARAM);
-  
-  *pBufSize = _comment.size();
-
-  return (AAFRESULT_SUCCESS); 
+	if (NULL == pBufSize)
+		return (AAFRESULT_NULL_PARAM);
+	
+	if (!_comment.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+	*pBufSize = _comment.size();
+	
+	return (AAFRESULT_SUCCESS); 
 }
 
 
-OMDEFINE_STORABLE(ImplAAFEvent, AUID_AAFEvent);
 
 

@@ -1,3 +1,26 @@
+#c *********************************************************************
+#c
+#c $Id: AAFLocator.dod,v 1.19 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c
+#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c AAF Association.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFLocator\
 #endm
@@ -6,7 +29,7 @@ AAFLocator\
 AAFObject\
 #endm
 #c
-#import ./AAFObject.exp
+#c #import ./AAFObject.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFLocator interface is implemented by objects that provide
@@ -31,109 +54,7 @@ AD_IDL(//
 AD_CLASS_UUID(e58a8565, 2a3e, 11D2, bf, A4, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(d4f89061, 69d6, 11d2, 84, 1b, 00, 60, 08, 32, ac, b8)
-AD_CLASS_BEGIN
-AD_XMETHOD2(GetPath,
-			[out\, size_is\(bufSize\)\, string],
-			  objPass,
-			  wchar_t *,
-			  pPathBuf,
-			  buffer into which path is written,
-			[in],
-			  objPass,
-			  aafInt32,
-			  bufSize,
-			  The size of the pPathBuf buffer,
-			Writes the path\, with a trailing null character\,
-  // into the pPathBuf buffer.  The buffer is allocated by the
-  // caller.  The size of the buffer is given by bufSize.  If the
-  // property name has not yet been set\, a zero-length string will be
-  // written \(that is\, only the trailing null character\).
-  // 
-  // Note: the form of the path string will be the same as was given
-  // to SetPath\(\).  It should be of the same form as required by
-  // StgOpenStorage\(\) for this platform.  Note also that each
-  // IAAFLocator-supporting object may also support a
-  // platform-specific interfaces which may have further restrictions
-  // on path specification.
-  // 
-  // Caller may call GetPathBufLen\(\) to determine the required
-  // buffer size.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pPathBuf pointer is valid.
-  // - bufSize indicates the buffer is large enough to hold the name.
-  // 
-  // If this method fails nothing will be written to *pPathBuf.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pPathBuf arg is NULL.
-  //
-  // AAFRESULT_SMALLBUF
-  //   - bufSize indicates the buffer is too small to hold the string.)
-
-
-AD_XMETHOD1(GetPathBufLen,
-			[out],
-			objPass,
-			aafInt32 *,
-			pLen,
-			required buffer length,
-			Returns the length of buffer required for the GetPath\(\)
-  // method.  The value is placed into the location specified by pLen.
-  // The value will include space required for the trailing null
-  // character.
-  //
-  // Succeeds if all of the following are true:
-  // - the pLen pointer is valid.
-  //
-  // If this method fails nothing will be written to *pLen.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pLen arg is NULL.)
-
-
-AD_XMETHOD1(SetPath,
-			[in\, string],
-			objPass,
-			wchar_t *,
-			pPathBuf,
-			the new path,
-			Set the Path property to the value specified in pPathBuf.  A
-  // copy is made of the data so the caller retains ownership of the
-  // *pPathBuf buffer and is responsible for de-allocating it.
-  // 
-  // Note: the form of the path string should be of the same form as
-  // required by StgOpenStorage\(\) for this platform.  Note also that
-  // each IAAFLocator-supporting object may also support a
-  // platform-specific interfaces which may have further restrictions
-  // on path specification.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pPathBuf pointer is valid.
-  // 
-  // If this method fails the Path property will not be changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pPathBuf arg is NULL.)
-AD_CLASS_END
+AD_XCLASS_BEGIN(Abstract, StoredObject)
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(Path,
+     the Path string property.)
+AD_XCLASS_END(Abstract, StoredObject)

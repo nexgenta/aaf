@@ -4,20 +4,36 @@
 #define __ImplAAFPulldown_h__
 
 
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplAAFPulldown.h,v 1.9 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
 #endif
 
+#include "OMStrongRefProperty.h"
 
 class ImplAAFPulldown : public ImplAAFSegment
 {
@@ -130,6 +146,8 @@ public:
 					 aafInt32 *pulldownPhase,
 					 aafLength_t *sclpLen,
 					 aafBool *isMask);
+	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
+												aafMobID_constref to);
 private:
 	AAFRESULT GetRemFramesDrop(aafUInt32 maskBits, 
 							char ones, 
@@ -143,16 +161,6 @@ private:
 							aafUInt32 masksize,
 							aafInt32 *result);
 	AAFRESULT MaskGetBits(aafUInt32 maskBits, char *maskones);
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFPulldown)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFPulldownTest.cpp.
-  static AAFRESULT test();
 
 private:
 	OMStrongReferenceProperty<ImplAAFSegment>	_inputSegment;

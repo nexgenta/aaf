@@ -1,29 +1,26 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplAAFBuiltinTypes.cpp,v 1.28 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplAAFBuiltinTypes_h__
@@ -128,7 +125,6 @@
 #include <assert.h>
 
 
-
 static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 								  ImplAAFDictionary * pDict,
 								  ImplAAFTypeDef ** ppCreatedTypeDef)
@@ -171,7 +167,6 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 	}
   return AAFRESULT_NO_MORE_OBJECTS;
 }
-
 
 //
 // We have the following structures to work with, defined in
@@ -809,176 +804,6 @@ static AAFRESULT CreateNewStringType (const aafUID_t & idToCreate,
 }
 
 
-static AAFRESULT CreateNewCharacterType (const aafUID_t & idToCreate,
-									ImplAAFDictionary * pDict,
-									ImplAAFTypeDef ** ppCreatedTypeDef)
-{
-  assert (pDict);
-  AAFRESULT hr;
-
-  // Go through the character list, attempting to identify the requested
-  // ID.
-  TypeCharacter * curCharacter = s_AAFAllTypeCharacters;
-  while (curCharacter->isValid)
-	{
-	  // Check to see if the current ID matches the ID of the type
-	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curCharacter->typeID, sizeof (aafUID_t)))
-		{		
-      assert(curCharacter->size == 2); // we only persist 2 byte unicode characters.
-
-		  // Yes, this is the one.
-		  // Create an impl typedefinteger object (as yet uninitialized)
-		  ImplAAFTypeDefCharacter * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefCharacter, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
-		  assert (ptd);
-
-		  AAFRESULT hr = ptd->pvtInitialize (curCharacter->typeID,
-										  curCharacter->typeName);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
-		  assert (ppCreatedTypeDef);
-		  *ppCreatedTypeDef = ptd;
-		  (*ppCreatedTypeDef)->AcquireReference ();
-		  ptd->ReleaseReference ();
-		  ptd = 0;
-		  return AAFRESULT_SUCCESS;
-		}
-
-	  curCharacter++;
-	}
-  return AAFRESULT_NO_MORE_OBJECTS;
-}
-
-
-static AAFRESULT CreateNewIndirectType (const aafUID_t & idToCreate,
-									ImplAAFDictionary * pDict,
-									ImplAAFTypeDef ** ppCreatedTypeDef)
-{
-  assert (pDict);
-  AAFRESULT hr;
-
-  // Go through the character list, attempting to identify the requested
-  // ID.
-  TypeIndirect * curIndirect = s_AAFAllTypeIndirects;
-  while (curIndirect->isValid)
-	{
-	  // Check to see if the current ID matches the ID of the type
-	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curIndirect->typeID, sizeof (aafUID_t)))
-		{		
-		  // Yes, this is the one.
-		  // Create an impl typedefinteger object (as yet uninitialized)
-		  ImplAAFTypeDefIndirect * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefIndirect, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
-		  assert (ptd);
-
-		  AAFRESULT hr = ptd->Initialize (curIndirect->typeID, curIndirect->typeName);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
-		  assert (ppCreatedTypeDef);
-		  *ppCreatedTypeDef = ptd;
-		  (*ppCreatedTypeDef)->AcquireReference ();
-		  ptd->ReleaseReference ();
-		  ptd = 0;
-		  return AAFRESULT_SUCCESS;
-		}
-
-	  curIndirect++;
-	}
-  return AAFRESULT_NO_MORE_OBJECTS;
-}
-
-
-static AAFRESULT CreateNewOpaqueType (const aafUID_t & idToCreate,
-									ImplAAFDictionary * pDict,
-									ImplAAFTypeDef ** ppCreatedTypeDef)
-{
-  assert (pDict);
-  AAFRESULT hr;
-
-  // Go through the list, attempting to identify the requested
-  // ID.
-  TypeOpaque * curOpaque = s_AAFAllTypeOpaques;
-  while (curOpaque->isValid)
-	{
-	  // Check to see if the current ID matches the ID of the type
-	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curOpaque->typeID, sizeof (aafUID_t)))
-		{		
-		  // Yes, this is the one.
-		  ImplAAFTypeDefOpaque * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefOpaque, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
-		  assert (ptd);
-
-		  AAFRESULT hr = ptd->Initialize (curOpaque->typeID,
-										  curOpaque->typeName);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
-		  assert (ppCreatedTypeDef);
-		  *ppCreatedTypeDef = ptd;
-		  (*ppCreatedTypeDef)->AcquireReference ();
-		  ptd->ReleaseReference ();
-		  ptd = 0;
-		  return AAFRESULT_SUCCESS;
-		}
-
-	  curOpaque++;
-	}
-  return AAFRESULT_NO_MORE_OBJECTS;
-}
-
-
-static AAFRESULT CreateNewStreamType (const aafUID_t & idToCreate,
-									ImplAAFDictionary * pDict,
-									ImplAAFTypeDef ** ppCreatedTypeDef)
-{
-  assert (pDict);
-  AAFRESULT hr = AAFRESULT_SUCCESS;
-  aafUInt32 index, count;
-  assert (ppCreatedTypeDef);
-
-  // Go through the list, attempting to identify the requested
-  // ID.
-  TypeStream * curStream = &s_AAFAllTypeStreams[0];
-  for (index = 0, count = (sizeof(s_AAFAllTypeStreams) / sizeof(TypeStream)); index < count; ++index)
-  {
-    // Check to see if the current ID matches the ID of the type
-    // def we want to create.
-    if (! memcmp (&idToCreate, curStream->typeID, sizeof (aafUID_t)))
-    {          
-      // Yes, this is the one.
-      ImplAAFTypeDefStream * ptd = 0;
-      hr = pDict->CreateMetaInstance (AUID_AAFTypeDefStream, (ImplAAFMetaDefinition **) &ptd);
-      if (AAFRESULT_FAILED (hr))
-        return hr;
-
-      hr = ptd->pvtInitialize (*curStream->typeID,
-                               curStream->typeName);
-      assert (AAFRESULT_SUCCEEDED (hr));
-      if (AAFRESULT_SUCCEEDED (hr))
-      {
-        *ppCreatedTypeDef = ptd; // refcount is 1.
-        ptd = NULL;
-      }
-      else
-      {
-        ptd->ReleaseReference ();
-      }
-      return hr;
-    }
-
-    curStream++;
-  }
-  return AAFRESULT_NO_MORE_OBJECTS;
-}
-
 
 static AAFRESULT CreateNewStrongRefType (const aafUID_t & idToCreate,
 									ImplAAFDictionary * pDict,
@@ -1387,24 +1212,9 @@ AAFRESULT ImplAAFBuiltinTypes::NewBuiltinTypeDef
 							ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
-  hr = CreateNewCharacterType (idToCreate,
-							   _dictionary,
-							   ppCreatedTypeDef);
-  if (AAFRESULT_SUCCEEDED (hr))	return hr;
-
   hr = CreateNewStringType (idToCreate,
 							_dictionary,
 							ppCreatedTypeDef);
-  if (AAFRESULT_SUCCEEDED (hr))	return hr;
-
-  hr = CreateNewIndirectType (idToCreate,
-							   _dictionary,
-							   ppCreatedTypeDef);
-  if (AAFRESULT_SUCCEEDED (hr))	return hr;
-
-  hr = CreateNewOpaqueType (idToCreate,
-							   _dictionary,
-							   ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
   hr = CreateNewStrongRefType (idToCreate,
@@ -1435,11 +1245,6 @@ AAFRESULT ImplAAFBuiltinTypes::NewBuiltinTypeDef
   hr = CreateNewWeakRefVectorType (idToCreate,
 								   _dictionary,
 								   ppCreatedTypeDef);
-  if (AAFRESULT_SUCCEEDED (hr))	return hr;
-
-  hr = CreateNewStreamType (idToCreate,
-                            _dictionary,
-                            ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
   // all known types failed

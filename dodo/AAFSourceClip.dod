@@ -1,10 +1,26 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
+#c *********************************************************************
+#c
+#c $Id: AAFSourceClip.dod,v 1.27 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c
+#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c AAF Association.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFSourceClip\
 #endm
@@ -35,10 +51,10 @@ AD_CLASS_UUID(38e6f8a5, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
 AD_DEFAULT_UUID(38e6f8a7, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD3(Initialize,
-			[in\, ref],
-				objPass,
-				aafUID_constref,
-				datadef,
+			[in],
+				objIn,
+				AAFDataDef,
+				pDataDef,
 				Data Definition object,
 			[in],
 				objPass,
@@ -65,7 +81,10 @@ AD_XMETHOD3(Initialize,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize\(\) has already been called on this object.)
+  //   - Initialize\(\) has already been called on this object.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pDataDef argument is NULL.)
 
 
 AD_XMETHOD6(GetFade,
@@ -83,7 +102,7 @@ AD_XMETHOD6(GetFade,
 
 			[out],
 			objPass,
-			aafBool *,
+			aafBoolean_t *,
 			pFadeInPresent,
 			Fade In Type,
 
@@ -101,11 +120,11 @@ AD_XMETHOD6(GetFade,
 
 			[out],
 			objPass,
-			aafBool *,
+			aafBoolean_t *,
 			pFadeOutPresent,
 			Fade In Type,
 
-			This function returns the optional fade information from a
+     This function returns the optional fade information from a
   // source clip.  This function only applies to audio source clips.
   // Length units are specified by the containing mob slot's edit
   // rate.
@@ -205,7 +224,7 @@ AD_XMETHOD4(SetFade,
 				fadeInLen,
 				Fade In Length,
 		   [in],
-		   		objPass,
+		   		enumIn,
 				aafFadeType_t,
 				fadeInType,
 				Fade In Type,
@@ -215,16 +234,16 @@ AD_XMETHOD4(SetFade,
 				fadeOutLen,
 				Fade Out Length,
 		   [in],
-		   		objPass,
+		   		enumIn,
 				aafFadeType_t,
 				fadeOutType,
 				Fade Out Type,
 
-  // This function sets the optional fade properties on this source
+     This function sets the optional fade properties on this source
   // clip object.  The fade properties only apply to a source clip of
-  // data definition \(or convertible to a data definition\) of type Sound. All
-  // arguments should be specified.  Length units are specified by the
-  // containing mob slot's edit rate.
+  // data definition \(or convertible to a data definition\) of type
+  // Sound.  All arguments should be specified.  Length units are
+  // specified by the containing mob slot's edit rate.
   // 
   // Succeeds if all of the following are true:
   // - This object has already been Initialize\(\)d.
@@ -246,7 +265,7 @@ AD_METHOD1(SetSourceReference,
 				sourceRef,
 				Source Reference,
 
-				This function sets the source reference of this source clip.
+     This function sets the source reference of this source clip.
   //
   // Note: the  3 properties of a source Clip that make up the "source
   // reference" are sourceID\\\, sourceTrackID\\\, and startTime.

@@ -1,11 +1,29 @@
 #ifndef _aaf_tk_bld_cfg_bld_cfg_h_
 #define _aaf_tk_bld_cfg_bld_cfg_h_
 
-/******************************************\
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: bld_cfg.h,v 1.9 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 /*
  * This file contains macro definitions to be used for cross-platform
@@ -17,10 +35,6 @@
 /*
 
 Macros defined here:
-
-AAF_BUILD_CONFIG_BUILTIN_BOOL
-	- is defined to be non-zero if this platform/compiler supports
-	  a built-in bool type.
 
 AAF_BUILD_CONFIG_ASSY_POWERPC
 	- is defined to be non-zero if this platform supports PowerPC
@@ -52,27 +66,12 @@ AAF_BUILD_CONFIG_EXTERN_C_TRAILER
 	  for shared C and C++ header files.  Should be put at the
 	  bottom of such a header file.
 
+AAF_BUILD_CONFIG_EXPLICIT_TEMPLATES
+	- Evaluates to true if this platform requires explicit template
+	  instantiation.
+
  */
 
-
-/*
- * So far the following compilers don't have bool:
- *  SGI
- *  MS VC++ 4.2 or earlier (_MSC_VER == 1020 for 4.2)
- */
-#if ! (__sgi || (_MSC_VER <= 1020))
-  #define AAF_BUILD_CONFIG_BUILTIN_BOOL	1
-#endif
-
-/*
- * However! some compilers which don't have bool have the infuriating
- * characteristic that they still reserve the bool keyword.  Most
- * notably, this occurs in MSVC++4.2.  Of course, all compilers which
- * _do_ have bool also have the keyword reserved.
- */
-#if ! (__sgi)
-  #define AAF_BUILD_CONFIG_BOOL_RESERVED 1
-#endif
 
 #if __cplusplus
   #define AAF_BUILD_CONFIG_CPLUSPLUS 1
@@ -87,4 +86,22 @@ AAF_BUILD_CONFIG_EXTERN_C_TRAILER
 #endif /* ! AAF_BUILD_CONFIG_CPLUSPLUS */
 
 
+#if __GNUC__
+  #define AAF_BUILD_CONFIG_EXPLICIT_TEMPLATES 1
+#endif
+
 #endif /* ! _aaf_tk_bld_cfg_bld_cfg_h_ */
+
+
+
+///////////////////////////
+// Emacs formatting info //
+///////////////////////////
+
+
+/* INDENT OFF */
+/*
+;;; Local Variables: ***
+;;; tab-width:4 ***
+;;; End: ***
+*/

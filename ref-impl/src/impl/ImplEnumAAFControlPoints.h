@@ -3,101 +3,35 @@
 #ifndef __ImplEnumAAFControlPoints_h__
 #define __ImplEnumAAFControlPoints_h__
 
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+//=---------------------------------------------------------------------=
+//
+// $Id: ImplEnumAAFControlPoints.h,v 1.8 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+//
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+//
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// AAF Association.
+//
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
-class ImplAAFControlPoint;
+#include "ImplAAFEnumerator.h"
 
+#include "ImplAAFControlPoint.h"
 
-#ifndef __ImplAAFObject_h__
-#include "ImplAAFObject.h"
-#endif
-
-
-typedef OMVariableSizeProperty<aafUID_t> ControlPointWeakRefArrayProp_t;
-typedef OMStrongReferenceVectorProperty<ImplAAFControlPoint> ControlPointStrongRefArrayProp_t;
-
-class ImplEnumAAFControlPoints : public ImplAAFRoot
-{
-public:
-  //
-  // Constructor/destructor
-  //
-  //********
-  ImplEnumAAFControlPoints ();
-
-protected:
-  virtual ~ImplEnumAAFControlPoints ();
-
-public:
-
-
-  //****************
-  // NextOne()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    NextOne
-        // @parm [out,retval] The Next container Definition
-        (ImplAAFControlPoint ** ppPluggableDef);
-
-  //****************
-  // Next()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Next
-        (// @parm [in] number of Pluggable definitions requested
-         aafUInt32  count,
-
-         // @parm [out, size_is(count), length_is(*pFetched)] array to receive container definitions
-         ImplAAFControlPoint ** ppControlPoints,
-
-         // @parm [out,ref] number of actual container definitions fetched into ppControlPoints array
-         aafUInt32 *  pFetched);
-
-  //****************
-  // Skip()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Skip
-        // @parm [in] Number of elements to skip
-        (aafUInt32  count);
-
-  //****************
-  // Reset()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Reset ();
-
-
-  //****************
-  // Clone()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Clone
-        // @parm [out,retval] new enumeration
-        (ImplEnumAAFControlPoints ** ppEnum);
-
-public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumStrongProperty( ImplAAFObject *pObj, ControlPointStrongRefArrayProp_t *pProp);
-
-
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplEnumAAFControlPointsTest.cpp.
-  static AAFRESULT test();
-private:
-	aafUInt32							_current;
-	ImplAAFObject						*_enumObj;
-	ControlPointStrongRefArrayProp_t	*_enumStrongProp;
-};
+typedef ImplAAFEnumerator<ImplAAFControlPoint> ImplEnumAAFControlPoints;
 
 #endif // ! __ImplEnumAAFControlPoints_h__
 

@@ -1,8 +1,26 @@
-############################################
-#                                          #
-# Copyright (c) 1998 Avid Technology, Inc. #
-#                                          #
-############################################
+###############################################################################
+#
+# $Id: makefile,v 1.5 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+#
+# The contents of this file are subject to the AAF SDK Public
+# Source License Agreement (the "License"); You may not use this file
+# except in compliance with the License.  The License is available in
+# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+# Association or its successor.
+#
+# Software distributed under the License is distributed on an "AS IS"
+# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+# the License for the specific language governing rights and limitations
+# under the License.
+#
+# The Original Code of this file is Copyright 1998-2004, Licensor of the
+# AAF Association.
+#
+# The Initial Developer of the Original Code of this file and the
+# Licensor of the AAF Association is Avid Technology.
+# All rights reserved.
+#
+###############################################################################
 
 all: tool
 
@@ -28,18 +46,17 @@ DEPEND_INCLUDES = $(INCLUDES) -I/usr/include/CC -I/usr/include/g++
 
 OURCFLAGS = -Dbool=int -Dtrue=1 -Dfalse=0
 
-DODO_COMMON_OBJS = SourceInfo.$(OBJ) TextLine.$(OBJ) TextStream.$(OBJ) ArgDef.$(OBJ) \
+DODO_COMMON_OBJS = SourceInfo.$(OBJ) TextStream.$(OBJ) ArgDef.$(OBJ) \
 	ArgSet.$(OBJ) MacroDef.$(OBJ) MacroSet.$(OBJ)
 
 DODO_APP_OBJS = $(DODO_COMMON_OBJS) DodoMain.$(OBJ)
 
 DODO_TEST_OBJS = $(DODO_COMMON_OBJS) TestMain.$(OBJ) \
-	SourceInfoTest.$(OBJ) TextLineTest.$(OBJ) TextStreamTest.$(OBJ) \
+	SourceInfoTest.$(OBJ) TextStreamTest.$(OBJ) \
 	ArgDefTest.$(OBJ) ArgSetTest.$(OBJ) MacroDefTest.$(OBJ) MacroSetTest.$(OBJ)
 
 DODO_SOURCES = DodoMain.cpp TestMain.cpp \
 	SourceInfo.cpp SourceInfoTest.cpp \
-	TextLine.cpp TextLineTest.cpp \
 	TextStream.cpp TextStreamTest.cpp \
 	ArgDef.cpp ArgDefTest.cpp \
 	ArgSet.cpp ArgSetTest.cpp \

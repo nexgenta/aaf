@@ -1,3 +1,26 @@
+#c *********************************************************************
+#c
+#c $Id: AAFMobPrivate.dod,v 1.6 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c
+#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c AAF Association.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFMobPrivate\
 #endm
@@ -21,7 +44,7 @@ AD_IDL(//
 //)
 
 AD_DEFAULT_UUID(CABC27B1, 57D5, 11D2, 84, 1B, 00, 60, 08, 32, AC, B8)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Abstract, Transient)
 AD_XMETHOD1(GetMobKind,
 			[out],
 			objPass,
@@ -44,4 +67,4 @@ AD_XMETHOD1(GetMobKind,
   //
   // AAFRESULT_NULL_PARAM
   //   - pMobKind is null.)
-AD_CLASS_END
+AD_XCLASS_END(Abstract, Transient)

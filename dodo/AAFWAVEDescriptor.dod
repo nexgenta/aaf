@@ -1,3 +1,26 @@
+#c *********************************************************************
+#c
+#c $Id: AAFWAVEDescriptor.dod,v 1.8 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c
+#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c AAF Association.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFWAVEDescriptor\
 #endm
@@ -6,12 +29,12 @@ AAFWAVEDescriptor\
 AAFFileDescriptor\
 #endm
 #c
-#import ./AAFFileDescriptor.exp
+#c #import ./AAFFileDescriptor.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFWaveDescriptor interface is implemented by objects which
-// describe audio content data formatted according to the RIFF Waveform
-// Audio File Format \(WAVE\).
+// describe audio content data formatted according to the RIFF
+// Waveform Audio File Format \(WAVE\).
 //
 // In addition to the specific error results listed for each method\,
 // all methods in this interface may also return one of the following
@@ -21,11 +44,10 @@ AD_IDL(//
 //   - insufficient system memory is available to perform the
 //     operation.
 //)
-
 AD_CLASS_UUID(4c2e1691, 8ae6, 11d2, 81, 3c, 00, 60, 97, 31, 01, 72)
 
 AD_DEFAULT_UUID(4c2e1692, 8ae6, 11d2, 81, 3c, 00, 60, 97, 31, 01, 72)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_METHOD0(Initialize,
 		   Initializes a newly allocated\, empty
   // IAAFWaveDescriptor-supporting object.  This method must be
@@ -61,7 +83,8 @@ AD_XMETHOD2(GetSummary,
   // 
   // Succeeds if all of the following are true:
   // - pSummary is a valid pointer.
-  // - The size of the buffer is large enough to hold the WAVE file information.
+  // - The size of the buffer is large enough to hold the WAVE file
+  //   information.
   // 
   // If this method fails pSummary will not be changed.
   // 
@@ -74,8 +97,8 @@ AD_XMETHOD2(GetSummary,
   //   - pSummary arg is NULL.
   //
   // AAFRESULT_SMALLBUF
-  //   - The buffer is too small to hold the WAVE file information.
-  //)
+  //   - The buffer is too small to hold the WAVE file information.)
+
 
 AD_XMETHOD1(GetSummaryBufferSize,
 			[out],
@@ -97,8 +120,8 @@ AD_XMETHOD1(GetSummaryBufferSize,
   //   - succeeded.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSize arg is NULL.
-  //)
+  //   - pSize arg is NULL.)
+
 
 AD_XMETHOD2(SetSummary,
 			[in],
@@ -125,7 +148,7 @@ AD_XMETHOD2(SetSummary,
   //   - succeeded.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pSummary arg is NULL.
-  //)
+  //   - pSummary arg is NULL.)
 
-AD_CLASS_END
+
+AD_XCLASS_END(Concrete, StoredObject)

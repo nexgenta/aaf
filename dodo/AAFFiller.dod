@@ -1,3 +1,26 @@
+#c *********************************************************************
+#c
+#c $Id: AAFFiller.dod,v 1.20 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c
+#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c AAF Association.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFFiller\
 #endm
@@ -6,7 +29,7 @@ AAFFiller\
 AAFSegment\
 #endm
 #c
-#import ./AAFSegment.exp
+#c #import ./AAFSegment.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFFiller interface is supported by objects which serve as
@@ -29,11 +52,11 @@ AD_FORWARD_DECLARATION(AAFDataDef)
 AD_CLASS_UUID(38e6f8a8, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
 AD_DEFAULT_UUID(38e6f8a9, 2a2c, 11d2, 84, 11, 00, 60, 08, 32, ac, b8)
 
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD2(Initialize,
 			[in],
-			objPass,
-			aafUID_t *,
+			objIn,
+			AAFDataDef,
 			pDataDef,
 			Data Definition Object,
 
@@ -49,7 +72,6 @@ AD_XMETHOD2(Initialize,
   // 
   // Succeeds if all of the following are true:
   // - this object has not yet been initialized.
-  // - the pDataDef pointer is valid.
   // - the length is valid.
   // 
   // This method will return the following codes.  If more than one of
@@ -63,8 +85,8 @@ AD_XMETHOD2(Initialize,
   //   - Initialize\(\) has already been called on this object.
   //
   // AAFRESULT_NULL_PARAM
-  //   - pDataDef argument is NULL.)
+  //   - pDataDef is null.
   //
   // AAFRESULT_BAD_LENGTH
   //   - length is negative.)
-AD_CLASS_END
+AD_XCLASS_END(Concrete, StoredObject)
