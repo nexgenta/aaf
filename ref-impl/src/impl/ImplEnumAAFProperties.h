@@ -15,8 +15,8 @@
 class ImplAAFProperty;
 
 
-template <typename T> class ImplCollection;
-template <typename T> class ImplEnumerator;
+template <typename T> class ImplAAFCollection;
+template <typename T> class ImplAAFEnumerator;
 
 
 #ifndef __ImplAAFRoot_h__
@@ -89,17 +89,22 @@ public:
 
 
 public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplEnumAAFPropertiesTest.cpp.
-  static AAFRESULT test();
-
-  AAFRESULT Initialize (ImplCollection<ImplAAFProperty*> * pProperties);
+  AAFRESULT Initialize (ImplAAFCollection<ImplAAFProperty*> * pProperties);
 
 private:
-  ImplEnumerator<ImplAAFProperty*> * _rep;
+  ImplAAFEnumerator<ImplAAFProperty*> * _rep;
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplEnumAAFProperties> ImplEnumAAFPropertiesSP;
 
 
 #endif // ! __ImplEnumAAFProperties_h__
-
-
