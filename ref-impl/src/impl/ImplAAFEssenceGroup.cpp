@@ -45,7 +45,7 @@
 #include <string.h>
 #include "ImplAAFSourceClip.h"
 #include "aafErr.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "aafCvt.h"
 #include "ImplAAFMobSlot.h"
 #include "ImplAAFMob.h"
@@ -73,14 +73,14 @@ ImplAAFEssenceGroup::~ImplAAFEssenceGroup ()
 {
 	size_t size = _choices.getSize();
 	for (size_t i = 0; i < size; i++) {
-		ImplAAFSegment *pClip = _choices.setValueAt(0, i);
+		ImplAAFSegment *pClip = _choices.clearValueAt(i);
 
 		if (pClip) {
 		  pClip->ReleaseReference();
 		  pClip = 0;
 		}
 	}
-	ImplAAFSourceClip *pClip = _stillFrame.setValue(0);
+	ImplAAFSourceClip *pClip = _stillFrame.clearValue();
 	if (pClip)
 	{
 	  pClip->ReleaseReference();
