@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,7 +29,7 @@
 #ifndef OMFIXEDSIZEPROPERTY_H
 #define OMFIXEDSIZEPROPERTY_H
 
-#include "OMProperty.h"
+#include "OMPropertyBase.h"
 
   // @class Fixed size simple (data) persistent
   //        properties supported by the Object Manager.
@@ -37,14 +37,13 @@
   //          can be any type with well defined copy and assignment
   //          semantics.
   //   @base public | <c OMSimpleProperty>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename PropertyType>
 class OMFixedSizeProperty : public OMSimpleProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMFixedSizeProperty(const OMPropertyId propertyId, const wchar_t* name);
+  OMFixedSizeProperty(const OMPropertyId propertyId, const char* name);
 
     // @cmember Destructor.
   virtual ~OMFixedSizeProperty(void);
@@ -64,10 +63,6 @@ public:
 
     // @cmember "Address of" operator.
   PropertyType* operator &(void);
-
-    // @cmember Convert this <c OMFixedSizeProperty> into a const
-    //          reference to a <p PropertyType>.
-  const PropertyType& reference(void) const;
 
     // @cmember Restore this <c OMFixedSizeProperty>, the external
     //          (persisted) size of the <c OMFixedSizeProperty> is

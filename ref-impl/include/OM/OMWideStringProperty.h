@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,24 +29,87 @@
 #ifndef OMWIDESTRINGPROPERTY_H
 #define OMWIDESTRINGPROPERTY_H
 
-#include "OMCharacterStringProperty.h"
+#include "OMVariableSizeProperty.h"
+
+  // @class Abstract base class for persistent character string
+  //        properties supported by the Object Manager.
+  //   @tcarg class | CharacterType | The type of the characters that
+  //                                  comprise the string.
+  //   @base public | <c OMVariableSizeProperty>
+template <typename CharacterType>
+class OMCharacterStringProperty :
+                                 public OMVariableSizeProperty<CharacterType> {
+public:
+  // @access Public members.
+
+    // @cmember Constructor.
+  OMCharacterStringProperty(const OMPropertyId propertyId, const char * name);
+
+    // @cmember Destructor.
+  virtual ~OMCharacterStringProperty(void);
+
+    // @cmember Type conversion. Convert an
+    //          <c OMCharacterStringProperty> into a
+    //          string of <p CharacterType> characters.
+  operator const CharacterType* ();
+
+    // @cmember Type conversion. Convert an
+    //          <c OMCharacterStringProperty> into a
+    //          string of <p CharacterType> characters.
+  operator const CharacterType* () const;
+
+    // @cmember Assign the string <p characterString> to this
+    //          <c OMCharacterStringProperty>.
+  void assign(const CharacterType* characterString);
+
+    // @cmember The length of this <c OMCharacterStringProperty> in
+    //          characters (not counting the null terminating character).
+  size_t length(void) const;
+
+    // @cmember Utility function for computing the length, in
+    //          characters, of the string of <p CharacterType>
+    //          characters <p characterString>.
+  static size_t stringLength(const CharacterType* characterString);
+
+private:
+  // hide, declare but don't define
+  operator CharacterType* (void);
+};
+
+  // @class Persistent character strings supported by the Object Manager.
+  //   @base public | <c OMCharacterStringProperty>
+class OMStringProperty : public OMCharacterStringProperty<char> {
+public:
+  // @access Public members.
+
+    // @cmember Constructor.
+  OMStringProperty(const OMPropertyId propertyId, const char* name);
+
+    // @cmember Destructor.
+  virtual ~OMStringProperty(void);
+
+    // @cmember Assignment operator.
+  OMStringProperty& operator = (const char* value);
+
+};
 
   // @class Persistent wide character strings supported by the Object Manager.
   //   @base public | <c OMCharacterStringProperty>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMWideStringProperty : public OMCharacterStringProperty<wchar_t> {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMWideStringProperty(const OMPropertyId propertyId, const wchar_t* name);
+  OMWideStringProperty(const OMPropertyId propertyId, const char* name);
 
     // @cmember Destructor.
   virtual ~OMWideStringProperty(void);
 
     // @cmember Assignment operator.
-  OMWideStringProperty& operator = (const wchar_t* value);
+  OMWideStringProperty& operator = (const wchar_t * value);
 
 };
+
+#include "OMWideStringPropertyT.h"
 
 #endif
