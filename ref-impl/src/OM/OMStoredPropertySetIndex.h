@@ -2,27 +2,31 @@
 #define OMSTOREDPROPERTYSETINDEX_H
 
 #include "OMPortability.h"
+#include "OMTypes.h"
 
 class OMStoredPropertySetIndex {
+private:
+  struct IndexEntry;  
 public:
   
   OMStoredPropertySetIndex(size_t capacity);
 
   ~OMStoredPropertySetIndex(void);
 
-  void insert(int pid, int type, size_t offset, size_t length);
+  void insert(OMPropertyId propertyId,
+              OMUInt32 type,
+              OMUInt32 offset,
+              OMUInt32 length);
   
-  struct IndexEntry;
-  
-  IndexEntry* find(int pid) const;
+  IndexEntry* find(OMPropertyId propertyId) const;
 
   size_t entries(void) const;
 
   void iterate(size_t& context,
-               int& pid,
-               int& type,
-               size_t& offset,
-               size_t& length) const;
+               OMPropertyId& propertyId,
+               OMUInt32& type,
+               OMUInt32& offset,
+               OMUInt32& length) const;
 
   bool isSorted(void);
 
@@ -33,10 +37,10 @@ protected:
 private:
     
   struct IndexEntry {
-    int _pid;
-    int _type;
-    size_t _offset;
-  size_t _length;
+    OMPropertyId _propertyId;
+    OMUInt32 _type;
+    OMUInt32 _offset;
+    OMUInt32 _length;
     bool _valid;
   };
     

@@ -6,7 +6,7 @@ OMStoredPropertySetIndex::OMStoredPropertySetIndex(size_t capacity)
   _table = new IndexEntry[_capacity];
   for (size_t i = 0; i < _capacity; i++) {
     _table[i]._valid = false;
-    _table[i]._pid = 0;
+    _table[i]._propertyId = 0;
     _table[i]._type = 0;
     _table[i]._length = 0;
     _table[i]._offset = 0;
@@ -19,17 +19,17 @@ OMStoredPropertySetIndex::~OMStoredPropertySetIndex(void)
   _table = 0;
 }
 
-void OMStoredPropertySetIndex::insert(int pid,
-                                      int type,
-                                      size_t offset,
-                                      size_t length)
+void OMStoredPropertySetIndex::insert(OMPropertyId propertyId,
+                                      OMUInt32 type,
+                                      OMUInt32 offset,
+                                      OMUInt32 length)
 {
-  IndexEntry* entry = find(pid);
+  IndexEntry* entry = find(propertyId);
 
   if (entry == 0 ) {
     entry = find();
     if (entry != 0) {
-      entry->_pid = pid;
+      entry->_propertyId = propertyId;
       entry->_type = type;
       entry->_offset = offset;
       entry->_length = length;
@@ -45,13 +45,13 @@ void OMStoredPropertySetIndex::insert(int pid,
 }
 
 OMStoredPropertySetIndex::IndexEntry* OMStoredPropertySetIndex::find(
-                                                                 int pid) const
+                                                 OMPropertyId propertyId) const
 {
   OMStoredPropertySetIndex::IndexEntry* result = 0;
 
   for (size_t i = 0; i < _capacity; i++) {
     if (_table[i]._valid) {
-      if (_table[i]._pid == pid) {
+      if (_table[i]._propertyId == propertyId) {
         result = &_table[i];
         break;
       }
@@ -67,10 +67,10 @@ size_t OMStoredPropertySetIndex::entries(void) const
 }
 
 void OMStoredPropertySetIndex::iterate(size_t& context,
-                                       int& pid,
-                                       int& type,
-                                       size_t& offset,
-                                       size_t& length) const
+                                       OMPropertyId& propertyId,
+                                       OMUInt32& type,
+                                       OMUInt32& offset,
+                                       OMUInt32& length) const
 {
   OMStoredPropertySetIndex::IndexEntry* entry = 0;
   size_t start = context;
@@ -84,7 +84,7 @@ void OMStoredPropertySetIndex::iterate(size_t& context,
     }
   }
   if (entry != 0) {
-    pid = entry->_pid;
+    propertyId = entry->_propertyId;
     type = entry->_type;
     offset = entry->_offset;
     length = entry->_length;
