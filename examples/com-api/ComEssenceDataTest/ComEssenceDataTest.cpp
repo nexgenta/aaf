@@ -1,29 +1,10 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -59,6 +40,10 @@ static aafSourceRef_t sourceRef;
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
 
+static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
+{
+	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
+}
 
 #define TEST_PATH	L"SomeFile.dat"
 
@@ -96,12 +81,12 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
-static void MobIDtoString(aafMobID_constref uid, char *buf)
+static void AUIDtoString(aafUID_t *uid, char *buf)
 {
 	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			uid.Data1, uid.Data2, uid.Data3, (int)uid.Data4[0],
-			(int)uid.Data4[1], (int)uid.Data4[2], (int)uid.Data4[3], (int)uid.Data4[4],
-			(int)uid.Data4[5], (int)uid.Data4[6], (int)uid.Data4[7]);
+			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
+			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
+			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
 }
 
 typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
@@ -147,11 +132,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
-	IAAFClassDef                *pCDMasterMob = 0;
-	IAAFClassDef                *pCDNetworkLocator = 0;
-	IAAFDataDef                 *pDdefSound = 0;
 	// !!!Previous revisions of this file contained variables here required to handle external essence
-	aafMobID_t					masterMobID;
+	aafUID_t					masterMobID;
 	aafProductIdentification_t	ProductInfo;
 	aafRational_t				editRate = {44100, 1};
 	aafRational_t				sampleRate = {44100, 1};
@@ -181,7 +163,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -189,38 +171,31 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
 	check(pFile->GetHeader(&pHeader));
 
-	// Get the AAF Dictionary so that we can create valid AAF objects.
-	check(pHeader->GetDictionary(&pDictionary));
-
-	check(pDictionary->LookupClassDef(AUID_AAFMasterMob,
-									  &pCDMasterMob));
-	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
-									  &pCDNetworkLocator));
-	check(pDictionary->LookupDataDef(DDEF_Sound,
-									 &pDdefSound));
+  // Get the AAF Dictionary so that we can create valid AAF objects.
+  check(pHeader->GetDictionary(&pDictionary));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
   // Get a Master MOB Interface
-	check(pCDMasterMob->
-		  CreateInstance(IID_IAAFMasterMob, 
-						 (IUnknown **)&pMasterMob));
+	check(pDictionary->CreateInstance( &AUID_AAFMasterMob,
+						   IID_IAAFMasterMob, 
+						   (IUnknown **)&pMasterMob));
 	// Get a Mob interface and set its variables.
 	check(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 	check(pMob->GetMobID(&masterMobID));
 	check(pMob->SetName(L"A Master Mob"));
 	
 	// Add it to the file 
-	check(pHeader->AddMob(pMob));
+	check(pHeader->AppendMob(pMob));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
 	if(dataFile != NULL)
 	{
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pCDNetworkLocator->
-			  CreateInstance(IID_IAAFLocator, 
-							 (IUnknown **)&pLocator));		
+		check(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+								IID_IAAFLocator, 
+								(IUnknown **)&pLocator));		
 		check(pLocator->SetPath (dataFile->dataFilename));
 		testContainer = dataFile->dataFormat;
 	}
@@ -255,11 +230,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 		// now create the Essence data file
 		check(pMasterMob->CreateEssence(1,				// Slot ID
-									pDdefSound,		// MediaKind
+									DDEF_Sound,		// MediaKind
 									CodecWave,		// codecID
 									editRate,		// edit rate
 									sampleRate,		// sample rate
-									kAAFCompressionDisable,
+									kSDKCompressionDisable,
 									pLocator,	// In current file
 									testContainer,	// In AAF Format
 									&pEssenceAccess));// Compress disabled
@@ -324,7 +299,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 		// close essence data file
 		fclose(pWavFile);
-    pWavFile = NULL;
 
 		// Finish writing the destination
 		check(pEssenceAccess->CompleteWrite());
@@ -363,16 +337,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 cleanup:
 	// Cleanup and return
-	if(pFormat)
-		pFormat->Release();
-	if(format)
-		format->Release();
-	if(pLocator)
-		pLocator->Release();
-
-  if (pWavFile)
-    fclose(pWavFile);
-
 	if (pEssenceAccess)
 		pEssenceAccess->Release();
 	
@@ -394,30 +358,15 @@ cleanup:
 	if (pHeader)
 		pHeader->Release();
 
-	if (pCDMasterMob)
-	  {
-		pCDMasterMob->Release();
-		pCDMasterMob = 0;
-	  }
-
-	if (pCDNetworkLocator)
-	  {
-		pCDNetworkLocator->Release();
-		pCDNetworkLocator = 0;
-	  }
-
-	if (pDdefSound)
-	  {
-		pDdefSound->Release ();
-		pDdefSound = 0;
-	  }
-
 	if (pFile)
-  {
-    pFile->Close();
-		pFile->Release();
-  }
+		pFile->Release(); 
 
+	if(pFormat)
+		pFormat->Release();
+	if(format)
+		format->Release();
+	if(pLocator)
+		pLocator->Release();
 
 	return moduleErrorTmp;
 }
@@ -439,7 +388,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	aafNumSlots_t				numMobs, numSlots;
 	aafSearchCrit_t				criteria;
 	aafRational_t				readSampleRate;
-	aafMobID_t					mobID;
+	aafUID_t					mobID;
 	aafWChar					namebuf[1204];
 	unsigned char				AAFDataBuf[4096];
 	aafUInt32					AAFBytesRead, samplesRead;
@@ -458,13 +407,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 	// Here we check on the number of mobs in the file. 
 	// Get the number of master mobs in the file (should be one)
-	check(pHeader->CountMobs(kAAFMasterMob, &numMobs));
+	check(pHeader->GetNumMobs(kMasterMob, &numMobs));
 	if (1 == numMobs )
 	{
 		printf("Found %ld Master Mobs\n", numMobs);
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFMasterMob;
-		check(pHeader->GetMobs(&criteria, &pMobIter));
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kMasterMob;
+		check(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
 		while(AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
 			char mobIDstr[256];
@@ -474,11 +423,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 			check(pMob->GetMobID (&mobID));
 			check(pMob->GetName (namebuf, sizeof(namebuf)));
 			convert(mobName, sizeof(mobName), namebuf);
-			MobIDtoString(mobID, mobIDstr);
+			AUIDtoString(&mobID, mobIDstr);
 			printf("    MasterMob Name = '%s'\n", mobName);
 			printf("        (mobID %s)\n", mobIDstr);
 			// Make sure we have one slot 
-			check(pMob->CountSlots(&numSlots));
+			check(pMob->GetNumSlots(&numSlots));
 			if (1 == numSlots)
 			{
 				// The essence data is in SlotID 1
@@ -488,8 +437,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 				// Open the Essence Data
 					check(pMasterMob->OpenEssence(	1,						// SlotID 1
 											NULL,				// mediaCriteria (Don't care)
-											kAAFMediaOpenReadOnly,	// Open mode
-											kAAFCompressionDisable,// Compress disabled
+											kMediaOpenReadOnly,	// Open mode
+											kSDKCompressionDisable,// Compress disabled
 											&pEssenceAccess));
 
 				// Open and read the Wave file (for comparison)
@@ -499,7 +448,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					// read in the essence data
 					WAVBytesRead = fread(WAVDataBuf, sizeof(unsigned char), sizeof(WAVDataBuf), pWavFile);
 					fclose(pWavFile);
-          pWavFile = NULL;
 					check(loadWAVEHeader(WAVDataBuf,
 										&bitsPerSample,
 										&numCh,
@@ -629,8 +577,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 cleanup:
 	// Cleanup and return
 
-  if (pWavFile)
-    fclose(pWavFile);
 	if (pRawEssence)
 		pRawEssence->Release();
 	if (pMultiEssence)
@@ -769,7 +715,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
+	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
 	aafUInt8			chunkID[4];
  	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -812,14 +758,14 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = kAAFTrue;
+			fmtFound = AAFTrue;
 		} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
 			*dataLen = chunkSize / bytesPerFrame;
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 	
-			dataFound = kAAFTrue;
+			dataFound = AAFTrue;
 		}
 	
 		if((ptr-buf) > formSize)
@@ -832,39 +778,21 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	return(AAFRESULT_SUCCESS);
 }
 
-// Make sure all of our required plugins have been registered.
-static HRESULT RegisterRequiredPlugins(void)
+void TestPluginManager(void)
 {
-  HRESULT hr = S_OK;
 	IAAFPluginManager	*mgr = NULL;
 
-  // Load the plugin manager 
-  check(AAFGetPluginManager(&mgr));
+//	check(AAFGetPluginManager(&mgr));
 
-  // Attempt load and register all of the plugins
-  // in the shared plugin directory.
-  check(mgr->RegisterSharedPlugins());
-
-  // Attempt to register all of the plugin files
-  // in the given directorys:
-  //check(mgr->RegisterPluginDirectory(directory1));
-  //check(mgr->RegisterPluginDirectory(directory2));
-
-
-  // Attempt to register all of the plugins in any
-  // of the given files:
-  //check(mgr->RegisterPluginFile(file1));
-  //check(mgr->RegisterPluginFile(file2));
-  //...
-
-cleanup:
-  if (mgr)
-    mgr->Release();
-
-	return moduleErrorTmp;
+	// BobT 9/15/99: comment out cleanup label because it is only used
+	// in the check macro.  Since the above line is commented out, the
+	// cleanup: label yields a warning in VC++.  Un-comment it when
+	// the above line is un-commented.
+// cleanup:
+	return;
 }
 
-int main()
+main()
 {
 	CComInitialize comInit;
   CAAFInitialize aafInit;
@@ -874,9 +802,6 @@ int main()
 	aafWChar *	rawData = L"EssenceTestRaw.wav";
 	aafWChar *	externalAAF = L"ExternalAAFEssence.aaf";
 	testDataFile_t	dataFile;
-
-  // Make sure all of our required plugins have been registered.
-  checkFatal(RegisterRequiredPlugins());
 
 	printf("***Creating file %s using writeRawData (Internal Media)\n", pFileName);
 	checkFatal(CreateAAFFile(pwFileName, NULL, testRawCalls));
@@ -914,6 +839,8 @@ int main()
 	checkFatal(CreateAAFFile(pwFileName, &dataFile, testStandardCalls));
 	printf("***Re-opening file %s using ReadSamples\n", pFileName);
 	ReadAAFFile(pwFileName, testStandardCalls);
+
+//	TestPluginManager();
 
 	printf("Done\n");
 
