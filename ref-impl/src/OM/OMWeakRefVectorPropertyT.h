@@ -80,7 +80,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::save(void) const
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  OMPropertyTag tag = file()->referencedProperties()->insert(_targetName);
+  OMPropertyTag tag = targetTag();
 
   // create a vector index
   //
@@ -114,7 +114,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::save(void) const
 
   // save the vector index
   //
-  store()->save(name(),
+  store()->save(storedName(),
                 index,
                 count,
                 tag,
@@ -180,7 +180,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::restore(
   size_t entries;
   OMPropertyTag tag;
   OMPropertyId keyPropertyId;
-  store()->restore(name(),
+  store()->restore(storedName(),
                    vectorIndex,
                    entries,
                    tag,
@@ -190,6 +190,9 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::restore(
   ASSERT("Valid vector index", IMPLIES(entries == 0, vectorIndex == 0));
   ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
   _targetTag = tag;
+  ASSERT("Consistent target tag and name",
+  compareWideString(_targetName,
+                    file()->referencedProperties()->valueAt(_targetTag)) == 0);
 
   // Iterate over the index restoring the elements of the vector.
   //
@@ -265,7 +268,13 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
 
   PRECONDITION("Valid index", (index >= 0) && (index <= count()));
   PRECONDITION("Valid object", object != 0);
-
+#if defined(OM_VALIDATE_WEAK_REFERENCES)
+  PRECONDITION("Source container object attached to file",
+                                                        container()->inFile());
+  PRECONDITION("Target object attached to file", object->inFile());
+  PRECONDITION("Source container object and target object in same file",
+                                        container()->file() == object->file());
+#endif
   if (index == count()) {
     // This is an append, make sure the new element is defined.
     OMUniqueObjectIdentification key = object->identification();
@@ -276,6 +285,9 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
   // Set the vector to contain the new object
   //
   VectorElement& element = _vector.getAt(index);
+#if defined(OM_VALIDATE_WEAK_REFERENCES)
+  element.reference().setTargetTag(targetTag());
+#endif
   ReferencedObject* oldObject = element.setValue(object);
   setPresent();
 
@@ -787,6 +799,24 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::setBits(
     setValueAt(object, i);
   }
 
+}
+
+template<typename ReferencedObject>
+OMPropertyTag
+OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::targetTag");
+
+  PRECONDITION("Property is attached to file", container()->inFile());
+
+  OMWeakReferenceVectorProperty<ReferencedObject>* nonConstThis =
+            const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
+  if (_targetTag == nullOMPropertyTag) {
+    nonConstThis->_targetTag =
+                           file()->referencedProperties()->insert(_targetName);
+  }
+  POSTCONDITION("Valid target property tag", _targetTag != nullOMPropertyTag);
+  return _targetTag;
 }
 
 #endif

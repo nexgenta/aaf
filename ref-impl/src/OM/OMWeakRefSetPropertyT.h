@@ -112,7 +112,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
 
   // save the set index
   //
-  store()->save(name(),
+  store()->save(storedName(),
                 index,
                 count,
                 tag,
@@ -181,7 +181,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
   size_t entries;
   OMPropertyTag tag;
   OMPropertyId keyPropertyId;
-  store()->restore(name(),
+  store()->restore(storedName(),
                    setIndex,
                    entries,
                    tag,
@@ -191,6 +191,9 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
   ASSERT("Valid set index", IMPLIES(entries == 0, setIndex == 0));
   ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
   _targetTag = tag;
+  ASSERT("Consistent target tag and name",
+  compareWideString(_targetName,
+                    file()->referencedProperties()->valueAt(_targetTag)) == 0);
 
   // Iterate over the index restoring the elements of the set.
   // Since the index entries are stored on disk in order of their
@@ -250,11 +253,21 @@ void OMWeakReferenceSetProperty<ReferencedObject>::insert(
 
   PRECONDITION("Valid object", object != 0);
   PRECONDITION("Object is not present", !containsValue(object));
-
+#if defined(OM_VALIDATE_WEAK_REFERENCES)
+  PRECONDITION("Source container object attached to file",
+                                                        container()->inFile());
+  PRECONDITION("Target object attached to file", object->inFile());
+  PRECONDITION("Source container object and target object in same file",
+                                        container()->file() == object->file());
+#endif
   // Set the set to contain the new object
   //
   OMUniqueObjectIdentification key = object->identification();
   SetElement newElement(this, key, _targetTag);
+#if defined(OM_VALIDATE_WEAK_REFERENCES)
+  _targetTag = file()->referencedProperties()->insert(_targetName);
+  newElement.reference().setTargetTag(_targetTag);
+#endif
   newElement.setValue(object);
   _set.insert(newElement);
   setPresent();
@@ -606,6 +619,24 @@ void OMWeakReferenceSetProperty<ReferencedObject>::setBits(const OMByte* bits,
     insert(object);
   }
 
+}
+
+template<typename ReferencedObject>
+OMPropertyTag
+OMWeakReferenceSetProperty<ReferencedObject>::targetTag(void) const
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::targetTag");
+
+  PRECONDITION("Property is attached to file", container()->inFile());
+
+  OMWeakReferenceSetProperty<ReferencedObject>* nonConstThis =
+               const_cast<OMWeakReferenceSetProperty<ReferencedObject>*>(this);
+  if (_targetTag == nullOMPropertyTag) {
+    nonConstThis->_targetTag =
+                           file()->referencedProperties()->insert(_targetName);
+  }
+  POSTCONDITION("Valid target property tag", _targetTag != nullOMPropertyTag);
+  return _targetTag;
 }
 
 #endif
