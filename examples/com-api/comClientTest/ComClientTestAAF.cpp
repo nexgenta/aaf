@@ -1,28 +1,30 @@
 /***********************************************************************
  *
- *              Copyright (c) 1996 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
- * Permission to use, copy and modify this software and to distribute
- * and sublicense application software incorporating this software for
- * any purpose is hereby granted, provided that (i) the above
- * copyright notice and this permission notice appear in all copies of
- * the software and related documentation, and (ii) the name Avid
- * Technology, Inc. may not be used in any advertising or publicity
- * relating to the software without the specific, prior written
- * permission of Avid Technology, Inc.
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
  *
- * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
- * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
- * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
- * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
- * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
  *
  ************************************************************************/
+
 
 #include <stdio.h>
 #include <string.h>
@@ -32,20 +34,8 @@
 #include "AAF.h"
 
 
-// Include the defintions for the AAF Stored Object identifiers.
-#define INIT_AUID
+// Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
-
-#ifdef __cplusplus
-extern "C"{
-#endif 
-
-STDAPI AAFLoad(const char * dllname);
-STDAPI AAFUnload();
-
-#ifdef __cplusplus
-}
-#endif
 
 
 
@@ -233,7 +223,7 @@ static void ReadAAFFile(aafWChar * pFileName)
       if (SUCCEEDED(hr))
       {
         IAAFIdentification *pIdent = NULL;
-        aafInt32 numMobs = 0;
+        aafNumSlots_t numMobs = 0;
 
 
         hr = pHeader->GetLastIdentification(&pIdent);
@@ -265,7 +255,7 @@ static void ReadAAFFile(aafWChar * pFileName)
         }
         if (SUCCEEDED(hr)) // EnumAAFAllMobs && GetNumMobs SUCCEEDED
         {
-          aafInt32 n = 0;
+          aafUInt32 n = 0;
 
 
           for(n = 0; n < numMobs; n++)
@@ -370,7 +360,7 @@ static void ReadAAFFile(aafWChar * pFileName)
                 if(SUCCEEDED(hr))
                 {
                   IAAFMobSlot    *slot = NULL;
-                  aafInt32 s;
+                  aafUInt32 s;
 
 
                   for(s = 0; s < numSlots; s++)
@@ -425,6 +415,8 @@ static void ReadAAFFile(aafWChar * pFileName)
   }
 }
 
+const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+
 static void CreateAAFFile(aafWChar * pFileName)
 {
   IAAFFile *          pFile = NULL;
@@ -447,7 +439,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   ProductInfo.productVersion.patchLevel = 0;
   ProductInfo.productVersion.type = kVersionUnknown;
   ProductInfo.productVersionString = NULL;
-  ProductInfo.productID = -1;
+  ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
   
   check(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
