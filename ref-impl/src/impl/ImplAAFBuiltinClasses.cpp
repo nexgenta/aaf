@@ -286,8 +286,9 @@ ImplAAFBuiltinClasses::ImplAAFBuiltinClasses (ImplAAFDictionary* dictionary)
 {
   _axClassDefs = new ImplAAFClassDefSP[ksNumAxClasses];
   dictionary->SetBuiltinClasses(this);
-  instantiateProps ();
   instantiateClasses ();
+  instantiateProps ();
+  FinishInitClasses();
 }
 
 
@@ -318,13 +319,9 @@ ImplAAFBuiltinClasses::NewBuiltinClassDef (const aafUID_t & rClassID,
 	  if (EqualAUID (sBuiltinClassTable[i].pThisId, &rClassID))
 		{
 		  // We've found the desired class in our table.
-		  ImplAAFClassDef * pcd = (ImplAAFClassDef*)
-			_dictionary->pvtInstantiate(AUID_AAFClassDef);
+		  ImplAAFClassDef * pcd = (ImplAAFClassDef*)_dictionary->pvtInstantiate(AUID_AAFClassDef);
 		  assert (pcd);
-		  _dictionary
-			->GetBuiltinDefs()
-			->cdClassDef()
-			->InitOMProperties (pcd);
+      pcd->InitOMProperties(_dictionary->GetBuiltinDefs()->cdClassDef());
 
 		  status = InitBuiltinClassDef (rClassID, pcd);
 		  if (AAFRESULT_SUCCEEDED (status))
@@ -532,7 +529,14 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 			dynamic_cast<ImplAAFPropertyDef*>(obj);
 		  assert (propDef);
 
-		  AAFRESULT hr = propDef->pvtInitialize
+//		  ImplAAFTypeDef	*pTypeDef;
+			AAFRESULT hr;
+
+//		hr = _dictionary->pvtLookupAxiomaticTypeDef (*propInfo->pTypeGuid, &pTypeDef);
+//		  assert (AAFRESULT_SUCCEEDED (hr));
+//			assert (pTypeDef);
+
+			hr = propDef->pvtInitialize
 			(propInfo->id,
 			 propInfo->tag,
 			 propInfo->name,
@@ -556,6 +560,7 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 		  propInfo = propInfo->nextProp;
 		}
 	}  
+
 
   assert (propIdx == numProps);
   for (propIdx = 0; propIdx < numProps; propIdx++)
@@ -602,6 +607,46 @@ void ImplAAFBuiltinClasses::instantiateClasses ()
 												  NULL,	// Make NULL & fill in later
 												  cte->pName);
 	  assert (AAFRESULT_SUCCEEDED (hr));
+  }
+  for (classIdx = 0; classIdx < ksNumAxClasses; classIdx++)
+	{
+	  AAFRESULT hr;
+
+	  const ClassTblEntry * cte = lookupClassEntry(*sAxClassIDs[classIdx]);
+	  assert (cte);
+
+	  // Lookup and set the parent here
+ 	  parent = LookupAxiomaticClass(*cte->pParentId);
+	  if(parent)
+	  {
+//		 hr = _axClassDefs[classIdx]->SetParent(parent);
+//		 assert (AAFRESULT_SUCCEEDED (hr));
+		 hr = _axClassDefs[classIdx]->SetBootstrapParent(parent);
+		 assert (AAFRESULT_SUCCEEDED (hr));
+		 parent->ReleaseReference();
+	  }
+	  else
+	  {
+			aafBool isRoot;
+		  hr = _axClassDefs[classIdx]->IsRoot(&isRoot);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert(isRoot);
+//		  hr = _axClassDefs[classIdx]->SetParent(_axClassDefs[classIdx]);	// Make root curcular
+//		  assert (AAFRESULT_SUCCEEDED (hr));
+	  }
+	}
+}
+
+void ImplAAFBuiltinClasses::FinishInitClasses ()
+{
+  aafUInt32			classIdx;
+  AAFRESULT			hr;
+
+  // foreach axiomatic class id, instantiate a class def object.
+  for (classIdx = 0; classIdx < ksNumAxClasses; classIdx++)
+	{
+	  const ClassTblEntry * cte = lookupClassEntry(*sAxClassIDs[classIdx]);
+	  assert (cte);
 
 	  // foreach property def contained in that class def, get the
 	  // (already existing) axiomatic property def object, init it,
@@ -623,28 +668,8 @@ void ImplAAFBuiltinClasses::instantiateClasses ()
   // Initialize the OM properties for each axiomatic class.
   for (classIdx = 0; classIdx < ksNumAxClasses; classIdx++)
 	{
-	  AAFRESULT hr;
 	  const ClassTblEntry * cte = lookupClassEntry(*sAxClassIDs[classIdx]);
 
-	  // Lookup and set the parent here
- 	  parent = LookupAxiomaticClass(*cte->pParentId);
-	  if(parent)
-	  {
-//		 hr = _axClassDefs[classIdx]->SetParent(parent);
-//		 assert (AAFRESULT_SUCCEEDED (hr));
-		 hr = _axClassDefs[classIdx]->SetBootstrapParent(parent);
-		 assert (AAFRESULT_SUCCEEDED (hr));
-		 parent->ReleaseReference();
-	  }
-	  else
-	  {
-			aafBool isRoot;
-		  hr = _axClassDefs[classIdx]->IsRoot(&isRoot);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-		  assert(isRoot);
-//		  hr = _axClassDefs[classIdx]->SetParent(_axClassDefs[classIdx]);	// Make root curcular
-//		  assert (AAFRESULT_SUCCEEDED (hr));
-	  }
 
 	  ImplAAFClassDef * pcd = _axClassDefs[classIdx];
 	  assert (pcd);

@@ -32,7 +32,6 @@
 
 class ImplEnumAAFPropertyDefs;
 class ImplAAFDefObject;
-class ImplAAFTypeDef;
 class ImplAAFPropertyDef;
 
 #ifndef __ImplAAFMetaDefinition_h__
@@ -41,6 +40,10 @@ class ImplAAFPropertyDef;
 
 #ifndef __ImplAAFPropertyDef_h__
 #include "ImplAAFPropertyDef.h"
+#endif
+
+#ifndef __ImplAAFTypeDef_h__
+#include "ImplAAFTypeDef.h"
 #endif
 
 class ImplAAFClassDef : public ImplAAFMetaDefinition
@@ -255,8 +258,6 @@ public:
   // Make sure that the type definition of each property definition
   // has been loaded into memory.
   void AssurePropertyTypesLoaded ();
-
-  void InitOMProperties (ImplAAFObject * pObj);
 
   // Find the unique identifier property defintion for this class or any parent class
   // (RECURSIVE)

@@ -62,6 +62,7 @@
 #include "ImplAAFObjectCreation.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "OMProperty.h"
 #include "OMPropertyDefinition.h"
 #include "AAFUtils.h"
 
@@ -393,18 +394,18 @@ AAFRESULT ImplPropertyCollection::GetNthElement
 
 
 ImplAAFObject::ImplAAFObject ()
-  : _generation(PID_InterchangeObject_Generation, L"Generation"),
+  : _generation(PID_InterchangeObject_Generation, "Generation"),
 	_pProperties (0),
 	_cachedDefinition (0),
 	_apSavedProps (0),
 	_savedPropsSize (0),
-	_savedPropsCount (0),
-	_isInitialized (kAAFFalse)
+	_savedPropsCount (0)
 {
   _persistentProperties.put(_generation.address());
 
   const aafUID_t null_uid = { 0 };
   _soid = null_uid;
+  _isInitialized = kAAFFalse;
 }
 
 
@@ -419,8 +420,8 @@ ImplAAFObject::SavedProp::~SavedProp ()
 {
   assert (_p);
   // The template argument here *must* match the type allocated in
-  // ImplAAFTypeDefFixedArray::pvtCreateOMProperty() and
-  // ImplAAFTypeDefVariableArray::pvtCreateOMProperty().
+  // ImplAAFTypeDefFixedArray::pvtCreateOMPropertyMBS() and
+  // ImplAAFTypeDefVariableArray::pvtCreateOMPropertyMBS().
   OMStrongReferenceVectorProperty<ImplAAFObject> * srv =
 	dynamic_cast<OMStrongReferenceVectorProperty <ImplAAFObject>*>(_p);
   if (srv)
@@ -440,7 +441,7 @@ ImplAAFObject::SavedProp::~SavedProp ()
 	{
 	  // The template argument here *must* match the type
 	  // allocated in
-	  // ImplAAFTypeDefStrongObjRef::pvtCreateOMProperty().
+	  // ImplAAFTypeDefStrongObjRef::pvtCreateOMPropertyMBS().
 	  OMStrongReferenceProperty<ImplAAFObject> * sro =
 		dynamic_cast<OMStrongReferenceProperty<ImplAAFObject>*>(_p);
 	  if (sro)
@@ -1188,19 +1189,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-aafBool ImplAAFObject::isInitialized () const
-{
-  return _isInitialized;
-}
-
-
-void ImplAAFObject::setInitialized ()
-{
-  _isInitialized = kAAFTrue;
-  assert (isInitialized());
-}
-
-
 void ImplAAFObject::onSave(void* clientContext) const
 {
   if (clientContext)
@@ -1213,13 +1201,4 @@ void ImplAAFObject::onSave(void* clientContext) const
 		  pNonConstThis->_generation = *pGen;
 		}
 	}
-}
-
-
-void ImplAAFObject::onRestore(void* /*clientContext*/) const
-{
-  // clientContext currently unused
-
-  // Cast away constness (maintaining logical constness)
-  ((ImplAAFObject*) this)->setInitialized ();
 }
