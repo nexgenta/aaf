@@ -47,10 +47,11 @@
 
 #endif
 
-
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
+#include "AAFOperationDefs.h"
+
 
 const int MAX_INDENT = 8;
 
@@ -82,6 +83,8 @@ typedef struct _AafOmfGlobals
 	aafBool			bAAFFileOpen;
 	aafBool			bLogFile;
 	aafBool			bDefFile;
+	aafBool			bDeleteOutput;
+	aafBool			bConvertAAFFile;
 
 	// For Statistical summary
 	aafInt32		nNumOMFMobs;
