@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFDigitalImageDescriptor\
 #endm
@@ -6,7 +13,7 @@ AAFDigitalImageDescriptor\
 AAFFileDescriptor\
 #endm
 #c
-#import ./AAFFileDescriptor.exp
+#c #import ./AAFFileDescriptor.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFDigitalImageDescriptor interface is implemented by objects
@@ -101,8 +108,8 @@ AD_XCLASS_BEGIN(Abstract, StoredObject)
 AD_XMETHOD1(SetCompression,
 			[in],
 				objPass,
-				aafUID_t *,
-				pCodecID,
+				aafUID_constref,
+				codecID,
 			Identifies a Codec definition for the desired compression and
 	// format of compression information.,
 
@@ -110,19 +117,13 @@ AD_XMETHOD1(SetCompression,
   // information of the video essence data.  This property is
   // optional.  If there is no compression\, the property is omitted.
   // 
-  // Succeeds if all of the following are true:
-  // - the pCompression pointer is valid.
-  // 
   // If this method fails the Data Definition property will not be
   // changed.
   // 
   // This method will return the following codes:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pFormat arg is NULL.)
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_XMETHOD1(GetCompression,
@@ -409,7 +410,7 @@ AD_XMETHOD4(GetDisplayView,
 
 AD_XMETHOD1(SetFrameLayout,
 			[in],
-				objPass,
+				enumIn,
 				aafFrameLayout_t,
 				FrameLayout,
 				layout of the frame,
@@ -628,7 +629,7 @@ AD_XMETHOD1(GetImageAspectRatio,
 
 AD_XMETHOD1(SetAlphaTransparency,
 			[in],
-				objPass,
+				enumIn,
 				aafAlphaTransparency_t,
 				AlphaTransparency,
 				Alpha Transparency value.,
@@ -684,7 +685,7 @@ AD_XMETHOD1(GetAlphaTransparency,
 AD_XMETHOD1(SetGamma,
 			[in],
 				objPass,
-				aafRational_t,
+				aafUID_t,
 				Gamma,
 				Optional,
 			Sets the Gamma property.  Specifies the expected output gamma
@@ -705,7 +706,7 @@ AD_XMETHOD1(SetGamma,
 AD_XMETHOD1(GetGamma,
 			[out],
 				objPass,
-				aafRational_t *,
+				aafUID_t *,
 				pGamma,
 				Optional.,
 			Gets the Gamma property.  Specifies the expected output gamma
@@ -728,7 +729,7 @@ AD_XMETHOD1(GetGamma,
 AD_XMETHOD1(SetImageAlignmentFactor,
 			[in],
 				objPass,
-				aafInt32,
+				aafUInt32,
 				ImageAlignmentFactor,
 				Optional.,
 			Sets the ImageAlignmentFactor property.  Specifies the alignment
@@ -752,7 +753,7 @@ AD_XMETHOD1(SetImageAlignmentFactor,
 AD_XMETHOD1(GetImageAlignmentFactor,
 			[out],
 				objPass,
-				aafInt32 *,
+				aafUInt32 *,
 				pImageAlignmentFactor,
 				Optional.,
 			Gets the ImageAlignmentFactor property.  Specifies the alignment when
