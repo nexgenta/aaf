@@ -1,31 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFTaggedValues
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #include "AAF.h"
@@ -37,7 +19,6 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
 
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 static aafWChar* TagNames[3] = { L"TAG01", L"TAG02", L"TAG03" };
@@ -84,14 +65,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFTaggedValues Test";
+	ProductInfo.productName = L"AAFEnumTaggedValues Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -203,20 +184,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 	IAAFMobSlot		*slot = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t	numMobs, n, slt;
-	aafUInt32		numComments, bytesRead, com;
+	aafNumSlots_t	numMobs, n, s;
+	aafUInt32		numComments, bytesRead;
 	HRESULT						hr = S_OK;
 	aafWChar		tag[64];
 	aafWChar		Value[64];
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFTaggedValues Test";
+	ProductInfo.productName = L"AAFMob Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
   try
@@ -252,13 +234,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		  checkResult(aMob->GetNumComments(&numComments));
 		  checkExpression(3 == numComments, AAFRESULT_TEST_FAILED);
 		  checkResult(aMob->EnumAAFAllMobComments(&pCommentIterator));
-		  for(com = 0; com < numComments; com++)
+		  for(s = 0; s < numComments; s++)
 		  {
 			  checkResult(pCommentIterator->NextOne(&pComment));
 			  checkResult(pComment->GetName(tag, sizeof(tag)));
 			  checkResult(pComment->GetValue( sizeof(Value), (unsigned char *)Value, &bytesRead));
-			  checkExpression(wcscmp(tag, TagNames[com])== 0, AAFRESULT_TEST_FAILED);
-			  checkExpression(wcscmp(Value, Comments[com])== 0, AAFRESULT_TEST_FAILED);
+			  checkExpression(wcscmp(tag, TagNames[s])== 0, AAFRESULT_TEST_FAILED);
+			  checkExpression(wcscmp(Value, Comments[s])== 0, AAFRESULT_TEST_FAILED);
 			  pComment->Release();
 		  }
 		  // now check reset
@@ -286,22 +268,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		  checkExpression(wcscmp(tag, TagNames[0])== 0, AAFRESULT_TEST_FAILED);
 		  checkExpression(wcscmp(Value, Comments[0])== 0, AAFRESULT_TEST_FAILED);
 		  pComment->Release();
-		  
+
 		
 		  pCommentIterator->Release();
-		  pCloneIterator->Release();
 			
 		  checkResult(aMob->GetNumSlots (&numSlots));
 		  checkExpression(5 == numSlots, AAFRESULT_TEST_FAILED);
 
 			checkResult(aMob->EnumAAFAllMobSlots(&slotIter));
 
-			for(slt = 0; slt < numSlots; slt++)
+			for(s = 0; s < numSlots; s++)
 			{
 				checkResult(slotIter->NextOne (&slot));
 				checkResult(slot->GetName (slotName, sizeof(slotName)));
 				checkResult(slot->GetSlotID(&trackID));
-				checkExpression (wcscmp(slotName, slotNames[slt]) == 0, AAFRESULT_TEST_FAILED);
+				checkExpression (wcscmp(slotName, slotNames[s]) == 0, AAFRESULT_TEST_FAILED);
 
 				slot->Release();
 				slot = NULL;
@@ -346,7 +327,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CEnumAAFTaggedValues_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
- 	aafWChar * pFileName = L"EnumAAFTaggedValuesTest.aaf";
+ 	aafWChar * pFileName = L"EnumTaggedValuesTest.aaf";
 
 	try
 	{

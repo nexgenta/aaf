@@ -1,31 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFCodecDefs object
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/************************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\************************************************/
 
 #include "AAF.h"
 
@@ -37,9 +19,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "AAFCodecDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -81,17 +61,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFCodecDefs Test";
+	ProductInfo.productName = L"AAFMasterMob Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
-
-	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -100,11 +78,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
@@ -128,7 +103,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFCodecDef*	pCodecDef = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	aafUID_t			uid;
 /*	long				test;
 */
 
@@ -152,10 +126,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-	uid = DDEF_Matte;
-	checkResult(pCodecDef->AppendEssenceKind (&uid));
-	uid = NoCodec;
-	checkResult(pDef->Init (&uid, sName1, sDescription1));
+	checkResult(pDef->SetName(sName1));
+	checkResult(pDef->SetDescription(sDescription1));
 	checkResult(pDictionary->RegisterCodecDefinition(pCodecDef));
 	pDef->Release();
 	pDef = NULL;
@@ -167,10 +139,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     
 	checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
-	uid = DDEF_Matte;
-	checkResult(pCodecDef->AppendEssenceKind (&uid));
-	uid = NoCodec;
-	checkResult(pDef->Init (&uid, sName2, sDescription2));
+
+	checkResult(pDef->SetName(sName2));
+	checkResult(pDef->SetDescription(sDescription2));
 
 	checkResult(pDictionary->RegisterCodecDefinition(pCodecDef));
   }
@@ -297,10 +268,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkExpression (wcscmp(testString, sName2) == 0, AAFRESULT_TEST_FAILED);
 		pDef->Release();
 		pDef = NULL;
-		pArrayDef[0]->Release();
-		pArrayDef[0] = NULL;
-		pArrayDef[1]->Release();
-		pArrayDef[1] = NULL;
 		/* Read one past to make sure that it fails */
 		checkExpression(pPlug->NextOne(&pCodecDef) != AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED);
 		/* Clone the enumerator, and read one element */
@@ -325,9 +292,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	// Cleanup and return
 	if (pHeader)
 		pHeader->Release();
-      
-	if (pDictionary)
-		pDictionary->Release();
       
 	if (pPlug)
 		pPlug->Release();
