@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -42,6 +42,8 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFCodecDefs.h"
+
+#include "CAAFBuiltinDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -76,20 +78,22 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFCodecDef Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -121,7 +125,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader *        pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
 	IAAFCodecDef*	pPlugDef = NULL;
-	IAAFDefObject	*pDef = NULL;
 	IAAFDataDef		*pDataDef = NULL;
 	IAAFClassDef	*classDef = NULL;
 	bool bFileOpen = false;
@@ -137,26 +140,25 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
     
-		checkResult(pDictionary->CreateInstance(&AUID_AAFCodecDef,
-							  IID_IAAFCodecDef, 
-							  (IUnknown **)&pPlugDef));
+		checkResult(defs.cdCodecDef()->
+					CreateInstance(IID_IAAFCodecDef,
+								   (IUnknown **)&pPlugDef));
     
-		checkResult(pPlugDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
 		uid = CodecWave;
-		checkResult(pDef->Init (&uid, L"TestCodec", L"TestCodecDescription"));
+		checkResult(pPlugDef->Initialize (uid, L"TestCodec", L"TestCodecDescription"));
 
-		uid = DDEF_Matte;
-		checkResult(pPlugDef->AppendEssenceKind (&uid));
-		checkResult(pDictionary->RegisterCodecDefinition(pPlugDef));
+		checkResult(pPlugDef->AddEssenceKind (defs.ddMatte()));
+		checkResult(pDictionary->RegisterCodecDef(pPlugDef));
 		uid = kAAFClassID_WAVEDescriptor;
-//		checkResult(pDictionary->LookupClass(&uid, &classDef));
-//		checkResult(pPlugDef->SetFileDescriptorClass (classDef));
+		checkResult(pDictionary->LookupClassDef(uid, &classDef));
+		checkResult(pPlugDef->SetFileDescriptorClass (classDef));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -165,9 +167,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
   // Cleanup and return
-  if (pDef)
-    pDef->Release();
-
   if (classDef)
     classDef->Release();
 
@@ -207,29 +206,29 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	bool					bFileOpen = false;
 	aafBool					testResult;
 	aafUID_t				codecID = CodecWave;
-	aafUID_t				testMatte = DDEF_Matte, testPicture = DDEF_Picture;
 	aafUID_t				readFlavour, checkFlavour = NilCodecFlavour;
 	HRESULT					hr = S_OK;
 
 	try
 	{
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		checkResult(pDictionary->LookupCodecDefinition(&codecID, &pCodec));
+		CAAFBuiltinDefs defs (pDictionary);
+		checkResult(pDictionary->LookupCodecDef(codecID, &pCodec));
 
-		checkResult(pCodec->IsEssenceKindSupported (&testMatte, &testResult));
-		checkExpression (testResult == AAFTrue, AAFRESULT_TEST_FAILED);
-		checkResult(pCodec->IsEssenceKindSupported (&testPicture, &testResult));
-		checkExpression (testResult == AAFFalse, AAFRESULT_TEST_FAILED);
+		checkResult(pCodec->IsEssenceKindSupported (defs.ddMatte(), &testResult));
+		checkExpression (testResult == kAAFTrue, AAFRESULT_TEST_FAILED);
+		checkResult(pCodec->IsEssenceKindSupported (defs.ddPicture(), &testResult));
+		checkExpression (testResult == kAAFFalse, AAFRESULT_TEST_FAILED);
 		checkResult(pCodec->EnumCodecFlavours (&pEnum));
 		checkResult(pEnum->NextOne (&readFlavour));
 		checkExpression (memcmp(&readFlavour, &checkFlavour, sizeof(checkFlavour)) == 0,
 						 AAFRESULT_TEST_FAILED);
 		checkResult(pCodec->AreThereFlavours (&testResult));
-		checkExpression (AAFFalse == testResult,
+		checkExpression (kAAFFalse == testResult,
 						 AAFRESULT_TEST_FAILED);
 	}
 	catch (HRESULT& rResult)
