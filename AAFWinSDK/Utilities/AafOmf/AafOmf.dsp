@@ -37,21 +37,20 @@ RSC=rc.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "../../Release/Utilities"
+# PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /WX /GX /O2 /I "..\..\include" /I "..\..\..\OMF\include" /I "..\..\..\OMF\portinc" /D "COM_NO_WINDOWS_H" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /D "NO_CONTAINER_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 aaf.lib aafiid.lib libbento.lib libjpeg.lib libomfi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /nodefaultlib:"msvcrtd.lib" /nodefaultlib:"msvcirtd.lib" /libpath:"..\..\lib" /libpath:"..\..\..\OMF"
-# SUBTRACT LINK32 /pdb:none /nodefaultlib
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 libbento.lib libjpeg.lib libomfi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /libpath:"C:\OMF2_12"
 
 !ELSEIF  "$(CFG)" == "AafOmf - Win32 Debug"
 
@@ -62,21 +61,20 @@ LINK32=link.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "../../Debug/Utilities"
+# PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /WX /Gm /GX /ZI /Od /I "..\..\include" /I "..\..\..\OMF\include" /I "..\..\..\OMF\portinc"  /I "../../../Utilities/Include" /D "COM_NO_WINDOWS_H" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /D "NO_CONTAINER_EXPORTS" /YX /FD /GZ /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ  /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "C:\OMF2_12\include" /I "C:\OMF2_12\portinc" /I "../../../ref-impl/include" /I "../../../ref-impl/include/com-api" /I "../../../ref-impl/include/OM" /I "../../ref-impl/include/comidl" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ  /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 aafd.lib aafiidd.lib libbentod.lib libjpegd.lib libomfid.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"msvcrt.lib" /nodefaultlib:"msvcirt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /pdbtype:sept /libpath:"..\..\lib" /libpath:"..\..\..\OMF"
-# SUBTRACT LINK32 /pdb:none /nodefaultlib
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 libbento.lib libjpeg.lib libomfi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"C:\OMF2_12"
 
 !ENDIF 
 
@@ -89,152 +87,20 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\..\..\Utilities\AafOmf\Aaf2Omf.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\AAFDomainExtensions.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\AAFDomainUtils.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\AAFException.cpp
+SOURCE="..\..\ref-impl\include\comidl\AAF_i.c"
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\Utilities\AafOmf\AafOmf.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\Assertion.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\EffectTranslate.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\ExceptionBase.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\Extensions.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\LoggerBase.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\Omf2Aaf.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\OMFDomainExtensionUtils.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\OMFDomainUtils.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\OMFException.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\StreamLogger.cpp
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\Aaf2Omf.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\AAFDomainExtensions.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\AafOmf.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\EffectTranslate.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\Utilities\AafOmf\Omf2Aaf.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\OMFDomainUtils.h
-# End Source File
 # End Group
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-# End Group
-# Begin Group "AAF Libraries"
-
-# PROP Default_Filter "lib"
-# Begin Source File
-
-SOURCE=..\..\lib\AAF.lib
-
-!IF  "$(CFG)" == "AafOmf - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "AafOmf - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\lib\AAFD.lib
-
-!IF  "$(CFG)" == "AafOmf - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "AafOmf - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\lib\AAFIID.lib
-
-!IF  "$(CFG)" == "AafOmf - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "AafOmf - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\lib\AAFIIDD.lib
-
-!IF  "$(CFG)" == "AafOmf - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "AafOmf - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
 # End Group
 # End Target
 # End Project
