@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.cpp,v 1.9 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxDictionary.cpp,v 1.10 2004/04/10 14:14:06 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -106,6 +106,15 @@ IAAFDataDefSP AxDictionary::LookupDataDef( aafUID_constref  dataDefinitionId )
 	return spDataDef;
 }
 
+IAAFParameterDefSP AxDictionary::LookupParameterDef( const aafUID_t& opDefId )
+{
+	IAAFParameterDefSP spIaafParameterDef;
+
+	CHECK_HRESULT( _spIaafDictionary->LookupParameterDef( opDefId, &spIaafParameterDef ) );
+
+	return spIaafParameterDef;
+}
+
 IAAFOperationDefSP AxDictionary::LookupOperationDef( const aafUID_t& opDefId )
 {
 	IAAFOperationDefSP spIaafOperationDef;
@@ -122,6 +131,15 @@ IAAFContainerDefSP AxDictionary::LookupContainerDef( const aafUID_t& contDefId )
 	CHECK_HRESULT( _spIaafDictionary->LookupContainerDef( contDefId, &spIaafContainerDef ) );
 
 	return spIaafContainerDef;
+}
+
+IAAFInterpolationDefSP AxDictionary::LookupInterpolationDef( const aafUID_t& interpDefId )
+{
+	IAAFInterpolationDefSP spIaafInterpolationDef;
+
+	CHECK_HRESULT( _spIaafDictionary->LookupInterpolationDef( interpDefId, &spIaafInterpolationDef ) );
+
+	return spIaafInterpolationDef;
 }
 
 IAAFCodecDefSP AxDictionary::LookupCodecDef( const aafUID_t& codecDefId )

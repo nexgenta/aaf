@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.h,v 1.16 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxDictionary.h,v 1.17 2004/04/10 14:14:04 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,7 +42,9 @@ public:
 	IAAFClassDefSP LookupClassDef( const aafUID_t& classId );
 	IAAFDataDefSP LookupDataDef( const aafUID_t& dataDefId );
 	IAAFOperationDefSP LookupOperationDef( const aafUID_t& opDefId );
+	IAAFParameterDefSP LookupParameterDef( const aafUID_t& interpDefId );
 	IAAFContainerDefSP LookupContainerDef( const aafUID_t& contDefId );
+	IAAFInterpolationDefSP LookupInterpolationDef( const aafUID_t& interpDefId );
 	IAAFCodecDefSP LookupCodecDef( const aafUID_t& codecDefId );
 
 	IEnumAAFClassDefsSP GetClassDefs();
