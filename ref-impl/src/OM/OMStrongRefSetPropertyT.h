@@ -148,6 +148,25 @@ void OMStrongReferenceSetProperty<ReferencedObject>::close(void)
   }
 }
 
+  // @mfunc Detach this <c OMStrongReferenceSetProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+template <typename ReferencedObject>
+void OMStrongReferenceSetProperty<ReferencedObject>::detach(void)
+{
+  TRACE("OMStrongReferenceSetProperty<ReferencedObject>::detach");
+
+  OMSetIterator<OMUniqueObjectIdentification,
+                OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                             ReferencedObject> > iterator(_set, OMBefore);
+  while (++iterator) {
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject>& element = iterator.value();
+    element.detach();
+  }
+}
+
   // @mfunc Restore this <c OMStrongReferenceSetProperty>, the external
   //        (persisted) size of the <c OMStrongReferenceSetProperty> is
   //        <p externalSize>.
@@ -198,9 +217,9 @@ void OMStrongReferenceSetProperty<ReferencedObject>::restore(
     setIndex->iterate(context, localKey, count, key);
     char* name = elementName(localKey);
     OMSetElement<OMStrongObjectReference<ReferencedObject>,
-                 ReferencedObject> element(this, name, localKey, key);
-    element.restore();
-    _set.insert(element);
+                 ReferencedObject> newElement(this, name, localKey, key);
+    newElement.restore();
+    _set.insert(newElement);
     delete [] name;
     name = 0; // for BoundsChecker
   }
@@ -247,6 +266,7 @@ void OMStrongReferenceSetProperty<ReferencedObject>::insert(
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::insert");
 
   PRECONDITION("Valid object", object != 0);
+  PRECONDITION("Object is not present", !containsValue(object));
 
   // Set the set to contain the new object
   //
@@ -261,7 +281,34 @@ void OMStrongReferenceSetProperty<ReferencedObject>::insert(
   setPresent();
   delete [] name;
 
+  POSTCONDITION("Object is present", containsValue(object));
   //POSTCONDITION("Optional property is present", isPresent());
+}
+
+  // @mfunc If it is not already present, insert <p object> into this
+  //        <c OMStrongReferenceSetProperty> and return true,
+  //        otherwise return false.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The object to insert.
+  //   @rdesc True if the object was inserted, false if it was already present.
+template <typename ReferencedObject>
+bool OMStrongReferenceSetProperty<ReferencedObject>::ensurePresent(
+                                                const ReferencedObject* object)
+{
+  TRACE("OMStrongReferenceSetProperty<ReferencedObject>::ensurePresent");
+
+  PRECONDITION("Valid object", object != 0);
+
+  // tjb - Current cost is 2 * O(lg N) this should be halved to
+  //       O(lg N) by implementing an ensurePresent() on OMSet.
+  bool present = containsValue(object);
+  if (!present) {
+    insert(object);
+  }
+  POSTCONDITION("Object is present", containsValue(object));
+  return !present;
 }
 
   // @mfunc Append the given <p ReferencedObject> <p object> to
@@ -279,6 +326,7 @@ void OMStrongReferenceSetProperty<ReferencedObject>::appendValue(
 
   OBSOLETE("OMStrongReferenceSetProperty<ReferencedObject>::insert");
   insert(object);
+  POSTCONDITION("Object is present", containsValue(object));
 }
 
   // @mfunc Remove the <p ReferencedObject> identified by
@@ -298,9 +346,44 @@ OMStrongReferenceSetProperty<ReferencedObject>::remove(
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::remove");
 
-  ASSERT("Unimplemented code not reached", false);
+  PRECONDITION("Object is present", contains(identification));
 
-  return 0;
+  OMSetElement<OMStrongObjectReference<ReferencedObject>,
+               ReferencedObject>* element = 0;
+  bool found = _set.find(identification, &element);
+  ASSERT("Object found", found);
+  ReferencedObject* result = element->setValue(0);
+  _set.remove(identification);
+
+  POSTCONDITION("Object is not present", !contains(identification));
+
+  return result;
+}
+
+  // @mfunc If it is present, remove the <p ReferencedObject> identified by
+  //        <p identification> from this <c OMStrongReferenceSetProperty>
+  //        and return true, otherwise return false.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The object to remove.
+  //   @rdesc True if the object was removed, false if it was already absent.
+template <typename ReferencedObject>
+bool OMStrongReferenceSetProperty<ReferencedObject>::ensureAbsent(
+                            const OMUniqueObjectIdentification& identification)
+{
+  TRACE("OMStrongReferenceSetProperty<ReferencedObject>::ensureAbsent");
+
+  OMSetElement<OMStrongObjectReference<ReferencedObject>,
+               ReferencedObject>* element = 0;
+  bool result = _set.find(identification, &element);
+  if (result) {
+    ReferencedObject* result = element->setValue(0);
+    _set.remove(identification);
+  }
+
+  POSTCONDITION("Object is not present", !contains(identification));
+  return result;
 }
 
   // @mfunc Remove <p object> from this
@@ -315,7 +398,36 @@ void OMStrongReferenceSetProperty<ReferencedObject>::removeValue(
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::removeValue");
 
-  ASSERT("Unimplemented code not reached", false);
+  PRECONDITION("Valid object", object != 0);
+  PRECONDITION("Object is present", containsValue(object));
+
+  OMUniqueObjectIdentification identification = object->identification();
+  remove(identification);
+
+  POSTCONDITION("Object is not present", !containsValue(object));
+}
+
+  // @mfunc If it is present, remove <p object> from this
+  //        <c OMStrongReferenceSetProperty> and return true,
+  //        otherwise return false.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The object to remove.
+  //   @rdesc True if the object was removed, false if it was already absent.
+template <typename ReferencedObject>
+bool OMStrongReferenceSetProperty<ReferencedObject>::ensureAbsent(
+                                                const ReferencedObject* object)
+{
+  TRACE("OMStrongReferenceSetProperty<ReferencedObject>::ensureAbsent");
+
+  PRECONDITION("Valid object", object != 0);
+
+  OMUniqueObjectIdentification identification = object->identification();
+  bool result = ensureAbsent(identification);
+
+  POSTCONDITION("Object is not present", !containsValue(object));
+  return result;
 }
 
   // @mfunc Does this <c OMStrongReferenceSetProperty> contain
@@ -348,9 +460,33 @@ bool OMStrongReferenceSetProperty<ReferencedObject>::contains(
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::contains");
 
-  ASSERT("Unimplemented code not reached", false);
+  return _set.contains(identification);
+}
 
-  bool result = false;
+  // @mfunc The <p ReferencedObject> in this
+  //        <c OMStrongReferenceSetProperty> identified by
+  //        <p identification>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The unique identification of the desired object, the search key.
+  //   @rdesc A pointer to the <p ReferencedObject>.
+  //   @this const
+template <typename ReferencedObject>
+ReferencedObject* OMStrongReferenceSetProperty<ReferencedObject>::value(
+                     const OMUniqueObjectIdentification& identification) const
+{
+  TRACE("OMStrongReferenceSetProperty<ReferencedObject>::value");
+
+  PRECONDITION("Object is present", contains(identification));
+
+  OMSetElement<OMStrongObjectReference<ReferencedObject>,
+               ReferencedObject>* element = 0;
+
+  _set.find(identification, &element);
+  ReferencedObject* result = element->getValue();
+
+  POSTCONDITION("Valid result", result != 0);
   return result;
 }
 
@@ -373,9 +509,43 @@ bool OMStrongReferenceSetProperty<ReferencedObject>::find(
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::find");
 
-  ASSERT("Unimplemented code not reached", false);
+  OMSetElement<OMStrongObjectReference<ReferencedObject>,
+               ReferencedObject>* element = 0;
 
-  bool result = false;
+  bool result = _set.find(identification, &element);
+  if (result) {
+    object = element->getValue();
+  }
+
+  return result;
+}
+
+  // @mfunc Is this <c OMStrongReferenceSetProperty> void ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @rdesc True if this <c OMStrongReferenceSetProperty> is void,
+  //          false otherwise. 
+  //   @this const
+template <typename ReferencedObject>
+bool OMStrongReferenceSetProperty<ReferencedObject>::isVoid(void) const
+{
+  TRACE("OMStrongReferenceSetProperty<ReferencedObject>::isVoid");
+
+  bool result = true;
+
+  OMSetIterator<OMUniqueObjectIdentification,
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject> > iterator(_set, OMBefore);
+  while (++iterator) {
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject>& element = iterator.value();
+    ReferencedObject* object = element.getValue();
+    if (object != 0) {
+      result = false;
+      break;
+    }
+  }
   return result;
 }
 
@@ -387,11 +557,11 @@ template <typename ReferencedObject>
 void OMStrongReferenceSetProperty<ReferencedObject>::remove(void)
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::remove");
+
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
-
-  ASSERT("Unimplemented code not reached", false);
-
+  PRECONDITION("Property is void", isVoid());
+  clearPresent();
   POSTCONDITION("Optional property no longer present", !isPresent());
 }
   // @mfunc The size of the raw bits of this
@@ -407,9 +577,7 @@ size_t OMStrongReferenceSetProperty<ReferencedObject>::bitsSize(void) const
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::bitsSize");
 
-  ASSERT("Unimplemented code not reached", false);
-
-  return 0;
+  return sizeof(ReferencedObject*) * count();
 }
 
   // @mfunc Get the raw bits of this <c OMStrongReferenceSetProperty>.
@@ -426,12 +594,22 @@ void OMStrongReferenceSetProperty<ReferencedObject>::getBits(OMByte* bits,
                                                              size_t size) const
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::getBits");
+
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  ASSERT("Unimplemented code not reached", false);
+  const ReferencedObject** p = (const ReferencedObject**)bits;
+
+  OMSetIterator<OMUniqueObjectIdentification,
+                OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                             ReferencedObject> > iterator(_set, OMBefore);
+  while (++iterator) {
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject>& element = iterator.value();
+    *p++ = element.getValue();
+  }
 }
 
   // @mfunc Set the raw bits of this
@@ -449,10 +627,18 @@ void OMStrongReferenceSetProperty<ReferencedObject>::setBits(
                                                             size_t size)
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::setBits");
+
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  ASSERT("Unimplemented code not reached", false);
+  size_t count = size / sizeof(ReferencedObject*);
+  ReferencedObject** p = (ReferencedObject**)bits;
+
+  for (size_t i = 0; i < count; i++) {
+    ReferencedObject* object = p[i];
+    insert(object);
+  }
+
 }
 
 #endif
