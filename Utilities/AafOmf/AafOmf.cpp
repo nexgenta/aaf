@@ -67,11 +67,12 @@ namespace OMF2
 #include "EffectTranslate.h"
 
 //#include "AAFUtils.h"
-//AAFRESULT aafMobIDNew(aafMobID_t *mobID);
-//AAFRESULT aafMobIDFromMajorMinor(
-//        aafUInt32	major,
-//		aafUInt32	minor,
-//		aafMobID_t *mobID);     /* OUT - Newly created Mob ID */
+AAFRESULT aafMobIDNew(aafUID_t *mobID);
+AAFRESULT aafMobIDFromMajorMinor(
+        aafUInt32	major,
+		aafUInt32	minor,
+		aafUID_t *mobID);     /* OUT - Newly created Mob ID */
+
 
 // ============================================================================
 // Global Variables and functions
@@ -121,42 +122,29 @@ void AUIDtoString(aafUID_t *uid, char *buf)
 			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
 			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
 }
-
-void MobIDtoString(aafMobID_t *mobID, char *buf)
-{
-	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			mobID->Data1, mobID->Data2, mobID->Data3, (int)mobID->Data4[0],
-			(int)mobID->Data4[1], (int)mobID->Data4[2], (int)mobID->Data4[3], (int)mobID->Data4[4],
-			(int)mobID->Data4[5], (int)mobID->Data4[6], (int)mobID->Data4[7]);
-}
-
-
-
-struct SMPTELabel		// Change to match GUID to ensure correct byte swapping
+struct SMPTELabel
 {
 	aafUInt32	MobIDMajor;
-	aafUInt16	MobIDMinorLow;
-	aafUInt16	MobIDMinorHigh;
+	aafUInt32	MobIDMinor;
 	aafUInt8	oid;
 	aafUInt8	size;
 	aafUInt8	ulcode;
 	aafUInt8	SMPTE;
 	aafUInt8	Registry;
 	aafUInt8	unused;
-	aafUInt8	MobIDPrefixLow;
-	aafUInt8	MobIDPrefixHigh;
+	aafUInt16	MobIDPrefix;
 };
 
 union label
 {
-	aafMobID_t			mobID;
+	aafUID_t			guid;
 	struct SMPTELabel	smpte;
 };
 
 AAFRESULT aafMobIDFromMajorMinor(
         aafUInt32	major,
 		aafUInt32	minor,
-		aafMobID_t *mobID)     /* OUT - Newly created Mob ID */
+		aafUID_t *mobID)     /* OUT - Newly created Mob ID */
 {
 	union label		aLabel;
 	
@@ -166,14 +154,12 @@ AAFRESULT aafMobIDFromMajorMinor(
 	aLabel.smpte.SMPTE = 0x34;
 	aLabel.smpte.Registry = 0x02;
 	aLabel.smpte.unused = 0;
-	aLabel.smpte.MobIDPrefixLow = 42;		// Means its an OMF Uid
-	aLabel.smpte.MobIDPrefixHigh = 0;		// Means its an OMF Uid
+	aLabel.smpte.MobIDPrefix = 42;		// Means its an OMF Uid
 
 	aLabel.smpte.MobIDMajor = major;
-	aLabel.smpte.MobIDMinorLow = (aafUInt16)(minor & 0xFFFF);
-	aLabel.smpte.MobIDMinorHigh =  (aafUInt16)((minor >> 16L) & 0xFFFF);
+	aLabel.smpte.MobIDMinor = minor;
 
-	*mobID = aLabel.mobID;
+	*mobID = aLabel.guid;
 	return(AAFRESULT_SUCCESS);
 }
 
@@ -189,18 +175,18 @@ static HRESULT InitGlobalVars( void )
 	if (gpGlobals == NULL)
 		return AAFRESULT_NOMEMORY;
 
-	gpGlobals->bAAFFileOpen = kAAFFalse;
-	gpGlobals->bConvertAllObjects = kAAFFalse;
-	gpGlobals->bCreateTOCFile = kAAFFalse;
-	gpGlobals->bDefFile = kAAFFalse;
-	gpGlobals->bLogFile = kAAFFalse;
+	gpGlobals->bAAFFileOpen = AAFFalse;
+	gpGlobals->bConvertAllObjects = AAFFalse;
+	gpGlobals->bCreateTOCFile = AAFFalse;
+	gpGlobals->bDefFile = AAFFalse;
+	gpGlobals->bLogFile = AAFFalse;
 	gpGlobals->pLogger = NULL;
-	gpGlobals->bOMFFileOpen = kAAFFalse;
-	gpGlobals->bVerboseMode = kAAFFalse;
+	gpGlobals->bOMFFileOpen = AAFFalse;
+	gpGlobals->bVerboseMode = AAFFalse;
 	gpGlobals->numIndents = 0;
 	gpGlobals->pProgramName = NULL;
-	gpGlobals->bDeleteOutput  = kAAFTrue;
-	gpGlobals->bConvertAAFFile  = kAAFFalse;
+	gpGlobals->bDeleteOutput  = AAFTrue;
+	gpGlobals->bConvertAAFFile  = AAFFalse;
 
 	gpGlobals->nNumAAFMobs = 0;
 	gpGlobals->nNumAAFObjects = 0;
@@ -329,10 +315,10 @@ static HRESULT GetUserInput(int argc, char* argv[])
 				switch( flag )
 				{
 					case 'v':
-						gpGlobals->bVerboseMode = kAAFTrue;
+						gpGlobals->bVerboseMode = AAFTrue;
 						break;
 					case 's':
-						gpGlobals->bConvertAllObjects = kAAFTrue;
+						gpGlobals->bConvertAllObjects = AAFTrue;
 						break;
 					case 'p':
 						if ((i + 1 < argc)&& (*argv[i+1] != '-'))
@@ -341,7 +327,7 @@ static HRESULT GetUserInput(int argc, char* argv[])
 							pFileName = argv[i];
 							if (strlen(pFileName))
 							{
-								gpGlobals->bLogFile = kAAFTrue;
+								gpGlobals->bLogFile = AAFTrue;
 								strcpy(gpGlobals->sLogFileName, pFileName);
 							}
 						}
@@ -353,7 +339,7 @@ static HRESULT GetUserInput(int argc, char* argv[])
 							pFileName = argv[i];
 							if (strlen(pFileName))
 							{
-								gpGlobals->bDefFile = kAAFTrue;
+								gpGlobals->bDefFile = AAFTrue;
 								strcpy(gpGlobals->sDefinitionFileName, pFileName);
 							}
 						}
@@ -365,7 +351,7 @@ static HRESULT GetUserInput(int argc, char* argv[])
 							pFileName = argv[i];
 							if (strlen(pFileName))
 							{
-								gpGlobals->bCreateTOCFile = kAAFTrue;
+								gpGlobals->bCreateTOCFile = AAFTrue;
 								strcpy(gpGlobals->sTOCFileName, pFileName);
 							}
 						}
@@ -390,11 +376,11 @@ static HRESULT GetUserInput(int argc, char* argv[])
 					}
 					if (strcmp(lc, "nr") == 0)
 					{
-						gpGlobals->bDeleteOutput = kAAFFalse;
+						gpGlobals->bDeleteOutput = AAFFalse;
 					}
 					else if ( strcmp(lc, "omf") == 0 ) 
 					{
-						gpGlobals->bConvertAAFFile = kAAFTrue;
+						gpGlobals->bConvertAAFFile = AAFTrue;
 					}
 					else
 						rc = AAFRESULT_BAD_FLAGS;
@@ -465,42 +451,6 @@ HRESULT IsOMFFile (char * pFileName )
 	return rc;
 }
 
-void RegisterCodecProperties(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession)
-{
-	OMFCheck	OMFError;
-
-	// To get the CDCI codec related properties we first reister them in OMF
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "ComponentWidth", OMClassCDCI, 
-									   OMF2::OMVersionType, OMF2::kPropRequired, 
-									   &(globals->omCDCIComponentWidth));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "HorizontalSubsampling", OMClassCDCI, 
-									   OMF2::OMBoolean, OMF2::kPropRequired, 
-									   &(globals->omCDCIHorizontalSubsampling));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "ColorSiting", OMClassCDCI, 
-									   OMF2::OMBoolean, OMF2::kPropRequired, 
-									   &(globals->omCDCIColorSiting));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "BlackReferenceLevel", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIBlackReferenceLevel));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "WhiteReferenceLevel", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIWhiteReferenceLevel));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "ColorRange", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIColorRange));
-	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
-									   "PaddingBits", OMClassCDCI, 
-									   OMF2::OMInt32, OMF2::kPropRequired, 
-									   &(globals->omCDCIPaddingBits));
-}
-
-#ifndef COMPILE_AS_DLL
 // ============================================================================
 // MAIN Module 
 //
@@ -570,7 +520,7 @@ int main(int argc, char *argv[])
 		{
 			// User indicated input file must be an AAF 
 			// Convert AAF to OMF
-			AAFMain.ConvertFile();
+			check = AAFMain.ConvertFile();
 		}
 		else
 		{
@@ -600,7 +550,7 @@ int main(int argc, char *argv[])
 		else
 		{
 			gpGlobals->pLogger->Log( kLogError, 
-				"main(): %s exception %0lx\n", e.Type(), e.Code() );
+				"main(): %s exception %ld\n", e.Type(), e.Code() );
 		}
 		hr = e.Code();
 	}
@@ -610,5 +560,40 @@ int main(int argc, char *argv[])
 
 	return( hr );
 }
-#endif
+
+
+void RegisterCodecProperties(AafOmfGlobals *globals, OMF2::omfSessionHdl_t OMFSession)
+{
+	OMFCheck	OMFError;
+
+	// To get the CDCI codec related properties we first reister them in OMF
+	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+									   "ComponentWidth", OMClassCDCI, 
+									   OMF2::OMVersionType, OMF2::kPropRequired, 
+									   &(globals->omCDCIComponentWidth));
+	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+									   "HorizontalSubsampling", OMClassCDCI, 
+									   OMF2::OMBoolean, OMF2::kPropRequired, 
+									   &(globals->omCDCIHorizontalSubsampling));
+	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+									   "ColorSiting", OMClassCDCI, 
+									   OMF2::OMBoolean, OMF2::kPropRequired, 
+									   &(globals->omCDCIColorSiting));
+	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+									   "BlackReferenceLevel", OMClassCDCI, 
+									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   &(globals->omCDCIBlackReferenceLevel));
+	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+									   "WhiteReferenceLevel", OMClassCDCI, 
+									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   &(globals->omCDCIWhiteReferenceLevel));
+	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+									   "ColorRange", OMClassCDCI, 
+									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   &(globals->omCDCIColorRange));
+	OMFError = OMF2::omfsRegisterDynamicProp(OMFSession, OMF2::kOmfTstRevEither, 
+									   "PaddingBits", OMClassCDCI, 
+									   OMF2::OMInt32, OMF2::kPropRequired, 
+									   &(globals->omCDCIPaddingBits));
+}
 
