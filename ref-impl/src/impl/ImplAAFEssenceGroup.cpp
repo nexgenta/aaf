@@ -61,8 +61,8 @@ typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
 extern "C" const aafClassID_t CLSID_AAFEssenceAccess;
 
 ImplAAFEssenceGroup::ImplAAFEssenceGroup ()
-:   _choices(	PID_EssenceGroup_Choices,		"Choices"),
-  _stillFrame(	PID_EssenceGroup_StillFrame,    "StillFrame")
+:   _choices(	PID_EssenceGroup_Choices,		L"Choices"),
+  _stillFrame(	PID_EssenceGroup_StillFrame,    L"StillFrame")
 {
 	_persistentProperties.put(_choices.address());
 	_persistentProperties.put(_stillFrame.address());
@@ -247,7 +247,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (! choice)
 	return AAFRESULT_NULL_PARAM;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -268,7 +268,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 

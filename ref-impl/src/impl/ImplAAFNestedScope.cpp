@@ -65,7 +65,7 @@ extern "C" const aafClassID_t CLSID_AAFSegment;
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
 ImplAAFNestedScope::ImplAAFNestedScope ()
-:  _slots( PID_NestedScope_Slots, "Slots")
+:  _slots( PID_NestedScope_Slots, L"Slots")
 {
 	_persistentProperties.put(_slots.address());
 }
@@ -108,7 +108,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -127,7 +127,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
