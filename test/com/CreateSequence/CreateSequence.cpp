@@ -1,32 +1,27 @@
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
+
 // @com Executable test program by Chris Morgan, intern for Avid Technology, Tewksbury 
 // @com This is used for scalability testing of AAF code.  Last modified on 7/23/99.
-
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -46,7 +41,7 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
-#if defined(macintosh) || defined(_MAC)
+#if defined( OS_MACOS )
 #include "DataInput.h"
 #endif
 
@@ -55,7 +50,7 @@
 //
 // NOTE: If your compiler does not support 64 bit integers then this example will NOT
 // print out the correct lengths.
-#ifdef _MSC_VER
+#if defined( COMPILER_MSC )
 #define L64 "I64"
 #else
 #define L64 "ll"
@@ -80,7 +75,7 @@ static aafSourceRef_t sourceRef;
 #define TEST_PATH	L"AnotherFile.aaf"
 
 #define assert(b, msg) \
-  if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
+  if (!(b)) {fprintf(stderr, "ASSERT: %s\n", msg); exit(1);}
 
 static void     LogError(HRESULT errcode, int line, char *file)
 {
@@ -113,7 +108,7 @@ static HRESULT convert(char* cName, size_t length, const wchar_t* name)
 
   size_t status = wcstombs(cName, name, length);
   if (status == (size_t)-1) {
-    fprintf(stderr, ": Error : Conversion failed.\n\n");
+    fprintf(stderr, ": Error : Conversion failed.\n");
     return -1; 
   }
   else
@@ -564,7 +559,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	pFile->Release();
 	pFile=NULL;
 #if USE_TIMER_LIB
-	printf("Open time = %ld\n\n", elapsedtime);
+	printf("Open time = %ld\n", elapsedtime);
 #endif
 cleanup:
 	if (pFile)
@@ -580,7 +575,7 @@ void usage(void)
 {
 	printf("Usage:\n Createsequence.exe <Number of components in file> <file name>.aaf \n");
 	printf(" NB: Number is required to be integer greater than zero.\n");
-	printf(" If only the number is given, the filename defaults to <number>.aaf\n\n");
+	printf(" If only the number is given, the filename defaults to <number>.aaf\n");
 }
 
 //  Main adapted to use command-line arguments with argument checking
@@ -603,7 +598,7 @@ int main(int argumentCount, char *argumentVector[])
 	//  Testing for correct second argument
 	if ((end != expectedEnd) || (N < 1))
 	{ 
-		printf("The first argument was of the incorrect form. [%s]\n\n",argumentVector[1]);
+		printf("The first argument was of the incorrect form. [%s]\n",argumentVector[1]);
 		usage();
 		return 0;
 	}
@@ -634,7 +629,7 @@ int main(int argumentCount, char *argumentVector[])
 	aafWChar * pwFileName = FileNameBuffer;
 
 	//  Give a nice output here too...
-	printf("Creating file %s with %ld components...\n\n",niceFileName,N);
+	printf("Creating file %s with %ld components...\n",niceFileName,N);
 	checkFatal(CreateAAFFile(pwFileName, N));
 	
 	// Open the file and gather statistics
