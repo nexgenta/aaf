@@ -86,8 +86,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	  ImplAAFTypeDefVariableArray * pNonConstThis =
 		  (ImplAAFTypeDefVariableArray*) this;
-	  aafUID_t id = _ElementType;
-	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedElemType);
+	  hr = pDict->LookupTypeDef (_ElementType, &pNonConstThis->_cachedElemType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedElemType);
@@ -104,9 +103,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefVariableArray::Initialize (
-      const aafUID_t *  pID,
+      const aafUID_t & id,
       ImplAAFTypeDef * pTypeDef,
-      wchar_t *  pTypeName)
+      const aafCharacter * pTypeName)
 {
   if (! pTypeDef)  return AAFRESULT_NULL_PARAM;
 
@@ -114,33 +113,30 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsVariableArrayable())
 	return AAFRESULT_BAD_TYPE;
 
-  aafUID_t id;
-  AAFRESULT hr = pTypeDef->GetAUID(&id);
+  aafUID_t typeId;
+  AAFRESULT hr = pTypeDef->GetAUID(&typeId);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  return pvtInitialize (pID, &id, pTypeName);
+  return pvtInitialize (id, typeId, pTypeName);
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefVariableArray::pvtInitialize (
-      const aafUID_t *  pID,
-      const aafUID_t * pTypeId,
-      wchar_t *  pTypeName)
+      const aafUID_t & id,
+      const aafUID_t & typeId,
+      const aafCharacter * pTypeName)
 {
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
-  if (! pTypeId)   return AAFRESULT_NULL_PARAM;
-  if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  assert (pTypeId);
-  _ElementType = *pTypeId;
+  _ElementType = typeId;
 
   return AAFRESULT_SUCCESS;
 }
@@ -458,7 +454,7 @@ aafUInt32 ImplAAFTypeDefVariableArray::pvtCount
 
 aafBool ImplAAFTypeDefVariableArray::IsFixedSize (void) const
 {
-  return AAFFalse;
+  return kAAFFalse;
 }
 
 
@@ -510,7 +506,19 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMPropertyMBS
 	{
 	  // We don't support variable arrays of variably-sized properties.
 	  assert (ptd->IsFixedSize());
-	  aafUInt32 elemSize = ptd->NativeSize ();
+
+	  // aafUInt32 elemSize = ptd->NativeSize ();
+	  // BobT, 2000-02-14: Hack to handle unpersisting objects which have
+	  // properties of client-defined types which have not yet had
+	  // their types registered.
+	  //
+	  // Was: aafUInt32 elemSize = ptd->NativeSize ();
+	  //
+	  aafUInt32 elemSize;
+	  if (ptd->IsRegistered())
+		elemSize = ptd->NativeSize ();
+	  else
+		elemSize = ptd->PropValSize ();
 
 	  // But even though elems are fixed size, the variable array is
 	  // of variable size.  Specify a size of one element.
@@ -519,6 +527,15 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMPropertyMBS
 
   assert (result);
   return result;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefVariableArray::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  // Return variable array of unsigned char
+  return pvtGetUInt8Array8Type (ppRawTypeDef);
 }
 
 
