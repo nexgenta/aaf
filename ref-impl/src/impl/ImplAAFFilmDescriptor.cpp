@@ -1,11 +1,29 @@
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -39,12 +57,10 @@ ImplAAFFilmDescriptor::~ImplAAFFilmDescriptor ()
 }
 
 
-//@access Public Members
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmManufacturer (
-      wchar_t *name)
+      const aafCharacter *name)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -55,10 +71,10 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmManufacturer (
-      wchar_t *name, aafInt32 bufSize)
+      aafCharacter *name, aafUInt32 bufSize)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -77,12 +93,10 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-	//@comm Returns a zero-length string if the property was not present
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmManufacturerBufLen (
-      aafInt32 *bufSize)
+      aafUInt32 *bufSize)
 {
 	if(bufSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -94,10 +108,10 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 	
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmModel (
-      wchar_t *name)
+      const aafCharacter *name)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -108,10 +122,10 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmModel (
-      wchar_t *name, aafInt32 bufSize)
+      aafCharacter *name, aafUInt32 bufSize)
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -130,10 +144,10 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmModelBufLen (
-      aafInt32 *bufSize)
+      aafUInt32 *bufSize)
 {		
 	if(bufSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -145,7 +159,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmFormat (
       aafFilmType_t*filmFormat)
@@ -159,9 +173,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-	//@comm Film format may be: kFt35MM, kFt16MM, kFt8MM, kFt65MM
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFrameRate (
       aafUInt32*  rate)
@@ -176,7 +188,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetPerfPerFrame (
       aafUInt8* perfPerFrame)
@@ -191,7 +203,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::GetFilmAspectRatio (
       aafRational_t*aspectRatio)
@@ -206,7 +218,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmFormat (
       aafFilmType_t  filmFormat)
@@ -215,9 +227,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS); 
 }
 
-	//@comm kFt35MM, kFt16MM, kFt8MM, kFt65MM
 
-/****/
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFrameRate (
       aafUInt32 rate)
@@ -227,7 +237,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetPerfPerFrame (
       aafUInt8 perfPerFrame)
@@ -237,7 +247,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-/****/
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFilmDescriptor::SetFilmAspectRatio (
       aafRational_t  aspectRatio)
@@ -248,5 +258,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFFilmDescriptor, AUID_AAFFilmDescriptor);
-
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFFilmDescriptor::GetOwningMobKind (aafMobKind_t *pMobKind)
+{
+	*pMobKind = kFilmMob;
+	return(AAFRESULT_SUCCESS);
+}
