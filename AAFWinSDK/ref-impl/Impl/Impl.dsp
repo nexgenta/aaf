@@ -110,7 +110,15 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBaseClassFactory.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltins.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinClasses.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinProps.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFBuiltinTypes.cpp"
 # End Source File
 # Begin Source File
 
@@ -518,10 +526,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDataDefs.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFDefs.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFEssenceData.cpp"
 # End Source File
 # Begin Source File
@@ -547,10 +551,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFMobs.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFMobSlots.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFObjects.cpp"
 # End Source File
 # Begin Source File
 
