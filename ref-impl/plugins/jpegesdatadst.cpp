@@ -16,12 +16,27 @@
  * than 8 bits on your machine, you may need to do some tweaking.
  */
 
-/* Include the prototype for jpeg_essencestream_dest */
-#include "jpegesdata.h"
+/* Include the definition for IAAFEssenceStream */
+#include "AAFPlugin.h"
 
 
 /* this is not a core library module, so it doesn't define JPEG_INTERNALS */
+#include "jinclude.h"
+#include "jpeglib.h"
 #include "jerror.h"
+
+
+
+
+/* Redefine the JFWRITE macro originally used by the stdio implementation. */
+inline int aaf_jfwrite(IAAFEssenceStream *stream, const void *buffer, size_t len)
+{
+	HRESULT hr = stream->Write((aafDataBuffer_t)buffer, (aafInt32)len);
+	if (SUCCEEDED(hr))
+		return len;
+	else
+		return 0;
+}
 
 
 /* Expanded data destination object for stdio output */
@@ -29,7 +44,8 @@
 typedef struct {
   struct jpeg_destination_mgr pub; /* public fields */
 
-	IAAFEssenceStream *outfile; /* target stream */
+	IAAFEssenceStream *outfile;
+//  FILE * outfile;		/* target stream */
   JOCTET * buffer;		/* start of buffer */
 } my_destination_mgr;
 
@@ -85,11 +101,14 @@ METHODDEF(boolean)
 empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
-  aafUInt32 bytesWritten;
 
-  HRESULT hr = (dest->outfile)->Write(OUTPUT_BUF_SIZE, (aafDataBuffer_t)dest->buffer, &bytesWritten);
+  HRESULT hr = (dest->outfile)->Write((aafDataBuffer_t)dest->buffer, OUTPUT_BUF_SIZE);
 	if (FAILED(hr))
     ERREXIT(cinfo, JERR_FILE_WRITE);
+
+//  if (JFWRITE(dest->outfile, dest->buffer, OUTPUT_BUF_SIZE) !=
+//      (size_t) OUTPUT_BUF_SIZE)
+//    ERREXIT(cinfo, JERR_FILE_WRITE);
 
   dest->pub.next_output_byte = dest->buffer;
   dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
@@ -113,18 +132,25 @@ term_destination (j_compress_ptr cinfo)
 	HRESULT hr = S_OK;
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
   size_t datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
-  aafUInt32 bytesWritten;
 
   /* Write any data remaining in the buffer */
   if (datacount > 0) {
-    hr = (dest->outfile)->Write(datacount, (aafDataBuffer_t)dest->buffer, &bytesWritten);
+    hr = (dest->outfile)->Write((aafDataBuffer_t)dest->buffer, datacount);
 	  if (FAILED(hr))
       ERREXIT(cinfo, JERR_FILE_WRITE);
+
+//    if (JFWRITE(dest->outfile, dest->buffer, datacount) != datacount)
+//      ERREXIT(cinfo, JERR_FILE_WRITE);
   }
 
 	hr = (dest->outfile)->FlushCache();
 	if (FAILED(hr))
     ERREXIT(cinfo, JERR_FILE_WRITE);
+
+//  fflush(dest->outfile);
+//  /* Make sure we wrote the output file OK */
+//  if (ferror(dest->outfile))
+//    ERREXIT(cinfo, JERR_FILE_WRITE);
 }
 
 
