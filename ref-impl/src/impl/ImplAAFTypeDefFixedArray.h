@@ -1,43 +1,29 @@
+//@doc
+//@class    AAFTypeDefFixedArray | Implementation class for AAFTypeDefFixedArray
 #ifndef __ImplAAFTypeDefFixedArray_h__
 #define __ImplAAFTypeDefFixedArray_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
 
-#ifndef __ImplAAFTypeDefArray_h__
-#include "ImplAAFTypeDefArray.h"
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
+
+
+
+#ifndef __ImplAAFTypeDef_h__
+#include "ImplAAFTypeDef.h"
 #endif
 
-#include "OMWeakRefVectorProperty.h"
-#include "OMWeakRefProperty.h"
 
-class ImplEnumAAFPropertyValues;
-
-class ImplAAFTypeDefFixedArray : public ImplAAFTypeDefArray
+class ImplAAFTypeDefFixedArray : public ImplAAFTypeDef
 {
 public:
   //
@@ -51,20 +37,13 @@ protected:
 
 public:
 
-  // override from ImplAAFTypeDefArray
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetType
-        // @parm [out] type of elements in this array
-        (ImplAAFTypeDef ** ppTypeDef) const;
-
-
   //****************
   // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
+         aafUID_t *  pID,
 
          // @parm [in] type of each element to be contained in this array
          ImplAAFTypeDef * pTypeDef,
@@ -73,7 +52,16 @@ public:
          aafUInt32  nElements,
 
          // @parm [in] friendly name of this type definition
-         const aafCharacter * pTypeName);
+         wchar_t *  pTypeName);
+
+
+  //****************
+  // GetType()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetType
+        // @parm [out] type of elements in this array
+        (ImplAAFTypeDef ** ppTypeDef);
 
 
   //****************
@@ -82,145 +70,110 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetCount
         // @parm [out] count of elements in this array
-        (aafUInt32 *  pCount) const;
-
-
-  // Override from AAFTypeDef
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
+        (aafUInt32 *  pCount);
 
 
   //****************
-  // CreateValueFromValues() 
-  //
-  // Implementation inherited from ImplAAFTypeDefArray
-
-
-  //****************
-  // CreateValueFromCArray() 
-  //
-  // Implementation inherited from ImplAAFTypeDefArray
-
-
-  //****************
-  // GetElements() 
+  // CreateValueFromValues()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-		GetElements (
-								ImplAAFPropertyValue *pInPropVal,
-								ImplEnumAAFPropertyValues **ppEnum);
+    CreateValueFromValues
+        (// @parm [in, size_is(numElements)] array of property values for elements of array value which
+    // is to be created.
+         ImplAAFPropertyValue * pElementValues,
+
+         // @parm [in] size of pElementValues array.
+         aafUInt32  numElements,
+
+         // @parm [out] newly-created property value
+         ImplAAFPropertyValue ** ppPropVal);
 
 
   //****************
-  // SetCArray() 
+  // CreateValueFromCArray()
   //
-  // Implementation inherited from ImplAAFTypeDefArray
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateValueFromCArray
+        (// @parm [in, size_is(initDataSize)] pointer to compile-time C array containing data to use
+         aafMemPtr_t  pInitData,
 
+         // @parm [in] size of data in pInitData, in bytes
+         aafUInt32  initDataSize,
 
-  //*************************************************************
-  //
-  // Overrides from OMType, via inheritace through ImplAAFTypeDef
-  //
-  //*************************************************************
+         // @parm [out] newly created property value
+         ImplAAFPropertyValue ** ppPropVal);
 
-  virtual void reorder(OMByte* bytes,
-                       size_t bytesSize) const;
-
-  virtual size_t externalSize(OMByte* internalBytes,
-                              size_t internalBytesSize) const;
-
-  virtual void externalize(OMByte* internalBytes,
-                           size_t internalBytesSize,
-                           OMByte* externalBytes,
-                           size_t externalBytesSize,
-                           OMByteOrder byteOrder) const;
-
-  virtual size_t internalSize(OMByte* externalBytes,
-                              size_t externalBytesSize) const;
-
-  virtual void internalize(OMByte* externalBytes,
-                           size_t externalBytesSize,
-                           OMByte* internalBytes,
-                           size_t internalBytesSize,
-                           OMByteOrder byteOrder) const;
 
   //****************
-  // pvtInitialize()
+  // GetElementValue()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
-        (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
+    GetElementValue
+        (// @parm [in] property value to read
+         ImplAAFPropertyValue * pInPropVal,
 
-         // @parm [in] type of each element to be contained in this array
-         const ImplAAFTypeDef * pTypeDef,
+         // @parm [in] zero-based index into elements in this array type
+         aafUInt32  index,
 
-         // @parm [in] number of elements to be in this array
-         aafUInt32  nElements,
-
-         // @parm [in] friendly name of this type definition
-         const aafCharacter * pTypeName);
+         // @parm [out] value that is read
+         ImplAAFPropertyValue ** ppOutPropVal);
 
 
-protected:
-  // returns number of elements in this array
-	virtual aafUInt32 pvtCount (ImplAAFPropertyValue * pInPropVal) const;
-
+  //****************
+  // GetCArray()
+  //
   virtual AAFRESULT STDMETHODCALLTYPE
-	  ValidateInputParams (ImplAAFPropertyValue ** ppElementValues,
-						aafUInt32  numElements);
+    GetCArray
+        (// @parm [in] property value to read
+         ImplAAFPropertyValue * pPropVal,
 
-  virtual bool IsArrayable(ImplAAFTypeDef * pSourceTypeDef) const;
+         // @parm [out, size_is(dataSize)] buffer into which C array data should be written
+         aafMemPtr_t  pData,
+
+         // @parm [in] size of pData buffer in bytes
+         aafUInt32  dataSize);
+
+
+  //****************
+  // SetElementValue()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetElementValue
+        (// @parm [in] property value to write
+         ImplAAFPropertyValue * pPropVal,
+
+         // @parm [in] zero-based index into members in this array type
+         aafUInt32  index,
+
+         // @parm [in] value to be placed into this array
+         ImplAAFPropertyValue * pMemberPropVal);
+
+
+  //****************
+  // SetCArray()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetCArray
+        (// @parm [in] property value to write
+         ImplAAFPropertyValue * pPropVal,
+
+         // @parm [in, size_is(dataSize)] buffer from which C array data should be read
+         aafMemPtr_t  pData,
+
+         // @parm [in] size of pData buffer in bytes
+         aafUInt32  dataSize);
+
 
 public:
-
-  // overrides from ImplAAFTypeDef
+  // Declare this class to be storable.
   //
-  virtual aafBool IsFixedSize (void) const;
-  virtual size_t PropValSize (void) const;
-  aafBool IsRegistered (void) const;
-  size_t NativeSize (void) const;
+  OMDECLARE_STORABLE(ImplAAFTypeDefFixedArray)
 
-  virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RawAccessType
-        (ImplAAFTypeDef ** ppRawTypeDef);
-
-public:
-  // Overrides from ImplAAFTypeDef
-  virtual bool IsAggregatable () const;
-  virtual bool IsStreamable () const;
-  virtual bool IsFixedArrayable () const;
-  virtual bool IsVariableArrayable () const;
-  virtual bool IsStringable () const;
-
-
-  // override from OMStorable.
-  virtual const OMClassId& classId(void) const;
-
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
-
-private:
-  ImplAAFTypeDefSP BaseType (void) const;
-
-  OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
-  OMFixedSizeProperty<aafUInt32>          _ElementCount;
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFTypeDefFixedArrayTest.cpp.
+  static AAFRESULT test();
 };
 
-//
-// smart pointer
-//
-
-#ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
-#include "ImplAAFSmartPointer.h"
-#endif
-
-typedef ImplAAFSmartPointer<ImplAAFTypeDefFixedArray> ImplAAFTypeDefFixedArraySP;
-
 #endif // ! __ImplAAFTypeDefFixedArray_h__
+
+
