@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\**************************************************/
 #startm .this-module 0
 AAFHTMLClip\
 #endm
@@ -13,23 +6,30 @@ AAFHTMLClip\
 AAFTextClip\
 #endm
 #c
+#import ./AAFTextClip.exp
 AD_HEAD
-AD_IDL(//
-// An HTMLClip is a reference to HTML text essence.
-//
-// Typically an HTMLClip is in a StaticMobSlot and defines a section
-// of HTML text that is associated with the essence data in a parallel
-// TimelineMobSlot. The duration\, accessed through IAAFComponent\,
-// defines the extent of the association with the parallel Mob Slot.
-//)
+
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+ 
+/***********************************************\
+*  Stub only.   Implementation not yet added    *
+\***********************************************/
+
+
+
+
 AD_CLASS_UUID(e684d783, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 
 AD_DEFAULT_UUID(e684d784, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(BeginAnchor,
-     the Begin Anchor string property.)
 
-
-AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(EndAnchor,
-     the End Anchor string property.)
 AD_XCLASS_END(Concrete, StoredObject)
