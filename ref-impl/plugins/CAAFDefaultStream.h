@@ -1,49 +1,39 @@
 //@doc
 //@class    AAFEssenceStream | Implementation class for AAFEssenceStream
-#ifndef __CAAFDefaultStream_h__
-#define __CAAFDefaultStream_h__
+#ifndef __CAAFEssenceStream_h__
+#define __CAAFEssenceStream_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
-#ifndef __AAFPlugin_h__
-#include "AAFPlugin.h"
-#endif
-
-#ifndef __CAAFUnknown_h__
-#include "CAAFUnknown.h"
+#ifndef __AAF_h__
+#include "AAF.h"
 #endif
 
 
-EXTERN_C const CLSID CLSID_AAFDefaultStream;
 
-class CAAFDefaultStream
+
+
+
+#ifndef __CAAFRoot_h__
+#include "CAAFRoot.h"
+#endif
+
+//
+// Forward declaration
+//
+class ImplAAFEssenceStream;
+
+
+class CAAFEssenceStream
   : public IAAFEssenceStream,
-    public CAAFUnknown
+    public CAAFRoot
 {
 protected:
 
@@ -51,8 +41,8 @@ protected:
   //
   // Constructor/destructor
   //
-  CAAFDefaultStream (IUnknown * pControllingUnknown, aafBool doInit = kAAFTrue);
-  virtual ~CAAFDefaultStream ();
+  CAAFEssenceStream (IUnknown * pControllingUnknown, aafBool doInit = AAFTrue);
+  virtual ~CAAFEssenceStream ();
 
 public:
 
@@ -70,15 +60,15 @@ public:
 
   // Seek to the absolute byte offset into the stream.
   STDMETHOD (Seek)
-    (/*[in]*/ aafInt64  byteOffset); // The absolute byte offset into the stream. 
+    (/*[in]*/ aafUInt32  byteOffset); // The absolute byte offset into the stream. 
 
   // Seek forward or backward the given byte count.
   STDMETHOD (SeekRelative)
     (/*[in]*/ aafInt32  byteOffset); // The relative byte offset into the stream. 
 
-  // Returns kAAFTrue if the byte offset is within the stream.
+  // Returns AAFTrue if the byte offset is within the stream.
   STDMETHOD (IsPosValid)
-    (/*[in]*/ aafInt64  byteOffset, // The absolute byte offset into the stream.
+    (/*[in]*/ aafUInt32  byteOffset, // The absolute byte offset into the stream.
      /*[out]*/ aafBool *  isValid); // The result. 
 
   // Returns the position within the stream.
