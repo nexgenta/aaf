@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCompositionMob.cpp,v 1.29.2.1 2004/06/04 16:54:31 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFCompositionMob.cpp,v 1.29.2.2 2004/07/02 16:24:48 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,7 @@ ImplAAFCompositionMob::ImplAAFCompositionMob ():
 	_defaultFadeLen(	PID_CompositionMob_DefaultFadeLength,		L"DefaultFadeLength"),
 	_defaultFadeType(	PID_CompositionMob_DefFadeType,			L"DefFadeType"),
 	_defaultFadeEditUnit(PID_CompositionMob_DefFadeEditUnit,	L"DefFadeEditUnit"),
-	_rendering(PID_CompositionMob_Rendering,	L"Rendering")
+	_rendering(PID_CompositionMob_CompositionRendering,	L"CompositionRendering")
 {
 	_persistentProperties.put(		_defaultFadeLen.address());
 	_persistentProperties.put(		_defaultFadeType.address());

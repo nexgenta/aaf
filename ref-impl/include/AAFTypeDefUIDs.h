@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.11.2.5 2004/05/08 22:18:45 jptrainor Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.11.2.6 2004/07/02 16:23:52 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -246,7 +246,7 @@ const aafUID_t kAAFTypeID_Stream =
 {0x04100200, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{02020102-0000-0000-060e-2b3401040101}
-const aafUID_t kAAFTypeID_GammaType =
+const aafUID_t kAAFTypeID_TransferCharacteristicType =
 {0x02020102, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{02020103-0000-0000-060e-2b3401040101}
@@ -256,6 +256,14 @@ const aafUID_t kAAFTypeID_CategoryType =
 //{02020104-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_UsageCodeType =
 {0x02020104, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{02020105-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_ColorPrimariesType =
+{0x02020105, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{02020106-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_CodingEquationsType =
+{0x02020106, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{04100100-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_DataValue =

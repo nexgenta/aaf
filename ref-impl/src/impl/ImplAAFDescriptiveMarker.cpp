@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFDescriptiveMarker.cpp,v 1.1.2.2 2004/05/11 02:17:52 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDescriptiveMarker.cpp,v 1.1.2.3 2004/07/02 16:24:48 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,7 @@
 #include <string.h>
 
 ImplAAFDescriptiveMarker::ImplAAFDescriptiveMarker ()
-  : _descriptiveFramework( PID_DescriptiveMarker_DescriptiveFramework, L"DescriptiveFramework" )
+  : _descriptiveFramework( PID_DescriptiveMarker_Description, L"Description" )
 {
   _persistentProperties.put( _descriptiveFramework.address() );
 }

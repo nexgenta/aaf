@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.24 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.24.2.1 2004/07/02 16:24:48 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,7 +47,7 @@ ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()
 	_videoLineMap(PID_DigitalImageDescriptor_VideoLineMap,					L"VideoLineMap"),
 	_imageAspectRatio(PID_DigitalImageDescriptor_ImageAspectRatio,			L"ImageAspectRatio"),
 	_alphaTransparency(PID_DigitalImageDescriptor_AlphaTransparency,		L"AlphaTransparency"),
-	_gamma(PID_DigitalImageDescriptor_Gamma,								L"Gamma"),
+	_gamma(PID_DigitalImageDescriptor_TransferCharacteristic,								L"TransferCharacteristic"),
 	_imageAlignmentFactor(PID_DigitalImageDescriptor_ImageAlignmentFactor,	L"ImageAlignmentFactor")
 {
 	aafInt32	videoLineMap[2];
