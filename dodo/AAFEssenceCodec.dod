@@ -23,7 +23,7 @@ AD_IDL(//
 AD_CLASS_UUID(3631F7A1, 9121, 11d2, 80, 88, 00, 60, 08, 14, 3e, 6f)
 
 AD_DEFAULT_UUID(3631F7A2, 9121, 11d2, 80, 88, 00, 60, 08, 14, 3e, 6f)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Abstract, Transient)
 
 AD_IDL(//
 	//**************
@@ -119,7 +119,7 @@ AD_IDL(//
 	// to before the stream is actually opened.
 	//)
 	
-AD_XMETHOD3(GetNumChannels,
+AD_XMETHOD4(GetNumChannels,
 		   [in],
 		   objIn,
 		   Unknown,
@@ -130,6 +130,11 @@ AD_XMETHOD3(GetNumChannels,
 		   aafUID_t,
 		   essenceKind,
 		   This is the type of essence to open,
+			[in],
+			objIn,
+			AAFEssenceStream,
+			stream,
+			Here is an essence stream with the raw data,
 		   [out],
 		   objPass,
 		   aafInt16 *,
@@ -169,7 +174,7 @@ AD_XMETHOD5(SemanticCheck,
 			// in the essence descriptor\, and any such values contained within
 			// the essence data)
 		
-AD_XMETHOD3(Create,
+AD_XMETHOD5(Create,
 			[in],
 			objIn,
 			Unknown,
@@ -185,6 +190,16 @@ AD_XMETHOD3(Create,
 			AAFEssenceStream,
 			stream,
 			Here is an essence stream with the raw data,
+			[in],
+			objPass,
+			aafInt32,
+			numParms,
+			Here are the number of create parameters,
+			[in],
+			objPass,
+			aafmMultiCreate_t *,
+			createParms,
+			Here are the create parameters,
 			Create a media data object\, and attach the correct type of
 			//EssenceDescriptor to the fileMob)
 
@@ -257,7 +272,7 @@ AD_XMETHOD1(Seek,
 			// sample frame is one frame for picture\, and one sample
 			// times the number of interleaved channels for audio.)
 
-AD_METHOD0(Close,
+AD_METHOD0(CompleteWrite,
 			Close the media stream\, ready to open another or Finish.)
 		
 AD_IDL(	// Old video write/read lines become fractional samples)
@@ -313,7 +328,7 @@ AD_METHOD3(WriteRawData,
 			buffer,
 			to a buffer,
 			[in],
-			aafInt32,
+			aafUInt32,
 			buflen,
 			of this size,
 			Write some number of bytes to the stream exactly and with no formatting or compression.)
@@ -389,4 +404,4 @@ AD_XMETHOD1(GetEssenceFormat,
 			Supply an essence format object specifying what data is
 			// required\, and it is filled in with the data values.)
 
-AD_CLASS_END
+AD_XCLASS_END(Abstract, Transient)
