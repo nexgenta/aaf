@@ -76,12 +76,9 @@
 
 //#include "masterhd.h"
 #include <string.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
 #include <ctype.h>
 #include <stdlib.h> 
-
+#include <wchar.h>
 
 //#include "omPublic.h"
 #include "AAFTypes.h"
@@ -1031,7 +1028,6 @@ aafErr_t TimecodeToString(
 {
 	register int i, ten;
   aafInt16 hours, minutes, seconds, frames;
-  aafErr_t aafError = AAFRESULT_SUCCESS;
 
   XPROTECT()
 	{
@@ -1077,7 +1073,6 @@ aafErr_t TimecodeToString(
 
   XEXCEPT
 	{
-	  return(XCODE());
 	}
   XEND;
 
@@ -1192,7 +1187,6 @@ aafErr_t StringToTimecode(
 	
 	XEXCEPT
 	{
-		return(XCODE());
 	}
 	XEND;
 
