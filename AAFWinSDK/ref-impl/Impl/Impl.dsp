@@ -83,10 +83,6 @@ LIB32=link.exe -lib
 # Name "Impl - Win32 Debug"
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\aafansic.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\aafCvt.cpp"
 # End Source File
 # Begin Source File
@@ -127,10 +123,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFClassDef.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFClassFactory.cpp"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFCodecDef.cpp"
 # End Source File
 # Begin Source File
@@ -156,6 +148,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFContainerDef.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFContentStorage.cpp"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFContext.cpp"
 # End Source File
 # Begin Source File
 
@@ -299,7 +295,7 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMIDIData.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMIDIDescriptor.cpp"
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFMIDIFileDescriptor.cpp"
 # End Source File
 # Begin Source File
 
@@ -392,10 +388,6 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSelector.cpp"
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSequence.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplAAFSession.cpp"
 # End Source File
 # Begin Source File
 
