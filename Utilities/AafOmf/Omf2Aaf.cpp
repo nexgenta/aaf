@@ -1,31 +1,26 @@
 // @doc INTERNAL
 // @com This file implements the conversion of OMF files to AAF file format.
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include <stdio.h>
 #include <string.h>
@@ -546,7 +541,8 @@ void Omf2Aaf::ConvertOMFDataDefinitionObject( omfObject_t obj )
 	}
 
 	omfClassID_t		objClass;
-	OMFCheck OMFError = omfsReadClassID(OMFFileHdl, obj, OMFPropertyID, objClass);
+	OMFCheck OMFError;
+	OMFError = omfsReadClassID(OMFFileHdl, obj, OMFPropertyID, objClass);
 	char id[ 5 ];
 	strncpy(id, objClass, 4);
 	id[4] = '\0';
@@ -575,6 +571,8 @@ void Omf2Aaf::ConvertOMFDataDefinitionObject( omfObject_t obj )
 // ============================================================================
 void Omf2Aaf::ConvertOMFClassDictionaryObject( omfObject_t obj )
 {
+	OMFCheck rc;
+
 	IncIndentLevel();
 
 	omfProperty_t		OMFPropertyID;
@@ -589,7 +587,7 @@ void Omf2Aaf::ConvertOMFClassDictionaryObject( omfObject_t obj )
 
 	char id[5];
 	memset(id, 0, sizeof(id));
-	OMFCheck rc = omfsReadClassID(OMFFileHdl, obj, OMFPropertyID, id);
+	rc = omfsReadClassID(OMFFileHdl, obj, OMFPropertyID, id);
 	gpGlobals->pLogger->Log( kLogInfo, "%sProcessing: %s Class Definition\n", gpGlobals->indentLeader, id);
 
 	DecIndentLevel();
@@ -883,7 +881,9 @@ void Omf2Aaf::ConvertOMFDatakind( omfDDefObj_t datakind,
 								   aafUID_t * pDatakind)
 {
 	omfUniqueName_t	datakindName;
-	OMFCheck rc = omfiDatakindGetName(OMFFileHdl, datakind, 64, datakindName);
+	OMFCheck rc;
+
+	rc = omfiDatakindGetName(OMFFileHdl, datakind, 64, datakindName);
 
 	if (strncmp("omfi:data:Picture", datakindName, strlen(datakindName))== 0)
 		*pDatakind = DDEF_Picture;
@@ -912,7 +912,8 @@ void Omf2Aaf::ConvertOMFDataDef			// Used for essence types audio, video, smell,
 {
   aafUID_t defUid;
   ConvertOMFDatakind (datakind, &defUid);
-  AAFCheck rc = pDictionary->LookupDataDef (defUid, ppDataDef);
+  AAFCheck rc;
+  rc = pDictionary->LookupDataDef (defUid, ppDataDef);
 }
 
 void Omf2Aaf::ConvertOMFDataDefType		// Used for parameter types Integer, Rational, etc...
@@ -952,10 +953,11 @@ void Omf2Aaf::ConvertOMFMOBObject( omfObject_t obj, IAAFMob* pMob )
 
 	omfErr_t	testErr;
 	testErr = omfiMobGetInfo(OMFFileHdl, obj, &OMFMobID, sizeof(sMobName), sMobName, NULL, NULL);
-	char *src = (OM_ERR_NONE == testErr) ? sMobName : "<not named>";
+	char *src = (OM_ERR_NONE == testErr) ? sMobName : (char*)"<not named>";
 	aafWChar*	pwMobName = new wchar_t[strlen(src)+1];
 	mbstowcs(pwMobName, src, strlen(src)+1);
-	AAFCheck aafCheck = pMob->SetName(pwMobName);
+	AAFCheck aafCheck;
+	aafCheck = pMob->SetName(pwMobName);
 	gpGlobals->pLogger->Log( kLogInfo, "%sMob Name: %s\n", gpGlobals->indentLeader, src );
 
 	// Convert OMF MobID into AAF AUID and set mob id
@@ -965,7 +967,8 @@ void Omf2Aaf::ConvertOMFMOBObject( omfObject_t obj, IAAFMob* pMob )
 
 	// Set comments
 	aafInt32				numComments;
-	OMFCheck omfCheck = omfiMobGetNumComments(OMFFileHdl, obj, &numComments);
+	OMFCheck omfCheck;
+	omfCheck = omfiMobGetNumComments(OMFFileHdl, obj, &numComments);
 	if (numComments > 0)
 	{
 		gpGlobals->pLogger->Log( kLogInfo, "Processing %ld comments...\n",  (long) numComments );
@@ -1065,7 +1068,8 @@ void Omf2Aaf::ConvertOMFCompositionObject(omfObject_t obj,
 	// Set default fade values
 	if (AAFDefaultFade.valid)
 	{
-		AAFCheck rc = pCompMob->SetDefaultFade(AAFDefaultFade.fadeLength,
+		AAFCheck rc;
+		rc = pCompMob->SetDefaultFade(AAFDefaultFade.fadeLength,
 								 AAFDefaultFade.fadeType,
 								 AAFDefaultFade.fadeEditUnit);
 		gpGlobals->nNumAAFProperties++;
@@ -1107,7 +1111,8 @@ void Omf2Aaf::TraverseOMFMob( omfObject_t obj, IAAFMob* pMob )
 	gpGlobals->pLogger->Log( kLogInfo,"%sFound: %ld sub tracks\n", gpGlobals->indentLeader, numSlots);
 
 	omfIterHdl_t		OMFIterator;
-	OMFCheck omfCheck = omfiIteratorAlloc(OMFFileHdl, &OMFIterator);
+	OMFCheck		omfCheck;
+	omfCheck = omfiIteratorAlloc(OMFFileHdl, &OMFIterator);
 	for (aafInt32 times = 0; times < numSlots; times++)
 	{
 		
@@ -1137,7 +1142,8 @@ void Omf2Aaf::TraverseOMFMob( omfObject_t obj, IAAFMob* pMob )
 			{
 				AutoRelease<IAAFComponent> pcomp( pComponent );
 				IAAFSegment* pSegment;
-				AAFCheck rc = pComponent->QueryInterface(IID_IAAFSegment, (void **)&pSegment);
+				AAFCheck rc;
+				rc = pComponent->QueryInterface(IID_IAAFSegment, (void **)&pSegment);
 				AutoRelease<IAAFSegment> pseg( pSegment );
 				IncIndentLevel();
 				
@@ -1194,7 +1200,9 @@ void Omf2Aaf::ConvertOMFSelector( omfObject_t selector, IAAFSelector* pSelector 
 	omfLength_t		OMFLength;
 	omfDDefObj_t		OMFDatakind;
 	omfSegObj_t		OMFSelected;
-	OMFCheck OMFError = omfiSelectorGetInfo( OMFFileHdl, 
+	OMFCheck		OMFError;
+
+	OMFError = omfiSelectorGetInfo( OMFFileHdl, 
 									selector,
 									&OMFDatakind,
 									&OMFLength,
@@ -1204,7 +1212,8 @@ void Omf2Aaf::ConvertOMFSelector( omfObject_t selector, IAAFSelector* pSelector 
 	IAAFDataDefSP pDataDef;
 	ConvertOMFDataDef(OMFDatakind, &pDataDef);
 	IAAFComponent*			pComponent;
-	AAFCheck rc = pSelector->QueryInterface(IID_IAAFComponent, (void **)&pComponent);
+	AAFCheck rc;
+	rc = pSelector->QueryInterface(IID_IAAFComponent, (void **)&pComponent);
 	AutoRelease< IAAFComponent > pcomp( pComponent );
 	rc = pComponent->SetDataDef(pDataDef);
 	rc = pComponent->SetLength(OMFLength);
@@ -1222,7 +1231,8 @@ void Omf2Aaf::ConvertOMFSelector( omfObject_t selector, IAAFSelector* pSelector 
 			rc = pComponent->QueryInterface(IID_IAAFSegment, (void **)&pSegment);
 			AutoRelease< IAAFSegment > pseg( pSegment );
 			rc = pSelector->SetSelectedSegment(pSegment);
-			OMFCheck OMFError = omfiSelectorGetNumAltSlots(OMFFileHdl,
+			OMFCheck OMFError;
+			OMFError = omfiSelectorGetNumAltSlots(OMFFileHdl,
 											  selector,
 											  &numAlternates);
 			if (numAlternates > 0)
@@ -1790,13 +1800,15 @@ void Omf2Aaf::ConvertOMFSequence(omfObject_t sequence,
 {
 	// Get a pointer to a component interface
 	IAAFComponent*			pComponent;
-	AAFCheck rc = pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponent);
+	AAFCheck rc;
+	rc = pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponent);
 	AutoRelease<IAAFComponent> pcomp( pComponent );
 
 	// Get Sequence data kind 
 	omfDDefObj_t		datakind = NULL;
 	omfLength_t		sequLength = 0;
-	OMFCheck OMFError = omfiSequenceGetInfo(OMFFileHdl, sequence, &datakind, &sequLength);
+	OMFCheck		OMFError;
+	OMFError = omfiSequenceGetInfo(OMFFileHdl, sequence, &datakind, &sequLength);
 	IAAFDataDefSP pDataDef;
 	ConvertOMFDataDef(datakind, &pDataDef);
 	rc = pComponent->SetDataDef(pDataDef);
@@ -1915,7 +1927,8 @@ void Omf2Aaf::ConvertOMFComponentProperties(omfObject_t component,
 void Omf2Aaf::TraverseOMFSequence(omfObject_t sequence, IAAFSequence* pSequence )
 {
 	aafInt32				numComponents = 0;
-	OMFCheck OMFError = omfiSequenceGetNumCpnts(OMFFileHdl, sequence, &numComponents);
+	OMFCheck				OMFError;
+	OMFError  = omfiSequenceGetNumCpnts(OMFFileHdl, sequence, &numComponents);
 	if (numComponents > 0)
 	{
 		omfIterHdl_t		componentIterator;
@@ -1931,7 +1944,8 @@ void Omf2Aaf::TraverseOMFSequence(omfObject_t sequence, IAAFSequence* pSequence 
 			if( pComponent )
 			{
 				AutoRelease<IAAFComponent> pcomp( pComponent );
-				AAFCheck rc = pSequence->AppendComponent(pComponent);
+				AAFCheck rc;
+				rc = pSequence->AppendComponent(pComponent);
 			}
 		}
 		OMFError = omfiIteratorDispose(OMFFileHdl, componentIterator);
@@ -1968,11 +1982,13 @@ void Omf2Aaf::ConvertOMFLocator(omfObject_t obj,
 	CAAFBuiltinDefs defs (pDictionary);
 
 	omfIterHdl_t		locatorIter;
-	OMFCheck omfCheck = omfiIteratorAlloc(OMFFileHdl, &locatorIter);
+	OMFCheck		omfCheck;
 	omfErr_t			testErr;
 
 	omfObject_t		OMFLocator;
 	OMFCheck				OMFError;
+	omfCheck = omfiIteratorAlloc(OMFFileHdl, &locatorIter);
+
 	testErr = omfmMobGetNextLocator(locatorIter, obj, &OMFLocator);
 
 	while((testErr == OM_ERR_NONE) &&(OMFLocator != NULL))
@@ -1985,7 +2001,8 @@ void Omf2Aaf::ConvertOMFLocator(omfObject_t obj,
 		mbstowcs(pwLocatorPath, locatorPath, strlen(locatorPath)+1);
 
 		IAAFNetworkLocator*		pNetworkLocator;
-		AAFCheck aafCheck = defs.cdNetworkLocator()->
+		AAFCheck aafCheck;
+		aafCheck = defs.cdNetworkLocator()->
 		  CreateInstance(IID_IAAFNetworkLocator,
 						 (IUnknown **)&pNetworkLocator);
 		AutoRelease<IAAFNetworkLocator> pnetloc( pNetworkLocator );
@@ -2783,7 +2800,8 @@ void Omf2Aaf::ConvertOMFNestedScope(omfSegObj_t segment,
 
 	omfDDefObj_t		nsDatakind;
 	omfLength_t		nsLength;
-	OMFCheck OMFError = omfiNestedScopeGetInfo(OMFFileHdl, segment, &nsDatakind, &nsLength);
+	OMFCheck		OMFError;
+	OMFError = omfiNestedScopeGetInfo(OMFFileHdl, segment, &nsDatakind, &nsLength);
 
 	omfNumSlots_t		numSlots;
 	OMFError = omfiNestedScopeGetNumSlots(OMFFileHdl, segment, &numSlots);
@@ -2796,7 +2814,8 @@ void Omf2Aaf::ConvertOMFNestedScope(omfSegObj_t segment,
 	ConvertOMFDataDef(nsDatakind, &pDataDef);
 	AutoRelease<IAAFDataDef> pdatadef( pDataDef );
 	IAAFComponent*			pSegmentComp;
-	AAFCheck rc = pNestedScope->QueryInterface(IID_IAAFComponent, (void **)&pSegmentComp);
+	AAFCheck rc;
+	rc = pNestedScope->QueryInterface(IID_IAAFComponent, (void **)&pSegmentComp);
 	AutoRelease<IAAFComponent> pseg( pSegmentComp );
 
 	rc = pSegmentComp->SetDataDef(pDataDef);
@@ -2876,7 +2895,8 @@ void Omf2Aaf::OMFFileClose()
 {
 	if( gpGlobals->bOMFFileOpen == kAAFTrue )
 	{
-		OMFCheck check = omfsCloseFile(OMFFileHdl);
+		OMFCheck check;
+		check = omfsCloseFile(OMFFileHdl);
 		OMFFileHdl = NULL;
 		check = omfsEndSession(OMFSession);
 		OMFSession = NULL;

@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDigitalImageDescriptor
+// @com This file implements the module test for CAAFRGBADescriptor
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -60,10 +60,16 @@
 #define kGammaNumTestVal				7
 #define kGammaDenTestVal				8
 
+#define NUM_TEST_ELEMENTS	3
+aafRGBAComponent_t	testElements[NUM_TEST_ELEMENTS] = { {kAAFCompRed,8}, {kAAFCompGreen,8}, {kAAFCompBlue,8} };
+aafRGBAComponent_t	testElements2[NUM_TEST_ELEMENTS] = { {kAAFCompGreen,8}, {kAAFCompBlue,8}, {kAAFCompRed,8} };
+#define TEST_PALETTE_SIZE	16
+aafUInt8	bogusPalette[TEST_PALETTE_SIZE] = { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31 };
+
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
-{0x4b8a7f32, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+{0x37792fba, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -106,8 +112,9 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	v.tertiary = 0;
 	v.patchLevel = 0;
 	v.type = kAAFVersionUnknown;
+
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFDigitalImageDescriptor Test";
+	ProductInfo.productName = L"AAFRGBADescriptor Test";
 	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
@@ -159,6 +166,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceMob*	pSourceMob = NULL;
 	IAAFMob*	pMob = NULL;
 	IAAFDigitalImageDescriptor*	pDIDesc = NULL;
+	IAAFRGBADescriptor*	pRGBADesc = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
@@ -182,20 +190,21 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 
     checkResult(pMob->SetMobID(TEST_MobID));
-    checkResult(pMob->SetName(L"DigitalImageDescriptorTest"));
+    checkResult(pMob->SetName(L"RGBADescriptorTest"));
 
 
-    // Create a concrete subclass of DigitialImageDescriptor.
+    // Create a digitial image descriptor.
     checkResult(defs.cdRGBADescriptor()->
-				CreateInstance(IID_IAAFDigitalImageDescriptor, 
-							   (IUnknown **)&pDIDesc));		
+				CreateInstance(IID_IAAFRGBADescriptor, 
+							   (IUnknown **)&pRGBADesc));		
+    checkResult(pRGBADesc->QueryInterface(IID_IAAFDigitalImageDescriptor, (void **)&pDIDesc));
 
     aafRational_t	ratio;
     aafInt32		VideoLineMap[kVideoLineMapMaxElement] = {kVideoLineMap1TestVal,kVideoLineMap2TestVal};
     aafUID_t		compression;
     memset(&compression, 0, sizeof(aafUID_t));
 
-    // Add all DigitalImage properties
+    // Add all RGBA properties
     // Reguired Properties
     checkResult(pDIDesc->SetStoredView(kStoredHeightTestVal, kStoredWidthTestVal));
     checkResult(pDIDesc->SetFrameLayout(kFrameLayoutTestVal));
@@ -212,11 +221,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal));
     checkResult(pDIDesc->SetImageAlignmentFactor(kImageAlignmentFactorTestVal));
 
-//!!!    ratio.numerator = kGammaNumTestVal;
-//    ratio.denominator = kGammaDenTestVal;
-//    checkResult(pDIDesc->SetGamma(ratio));
+ //   ratio.numerator = kGammaNumTestVal;
+//!!!    ratio.denominator = kGammaDenTestVal;
+//!!!    checkResult(pDIDesc->SetGamma(ratio));
 
-    // Save the initialized descriptor with the source mob.
+    checkResult(pRGBADesc->SetPixelLayout(NUM_TEST_ELEMENTS, testElements));
+    checkResult(pRGBADesc->SetPalette(sizeof(bogusPalette), bogusPalette));
+    checkResult(pRGBADesc->SetPaletteLayout(NUM_TEST_ELEMENTS, testElements2));
+  
+	// Save the initialized descriptor with the source mob.
     checkResult(pDIDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc));
     checkResult(pSourceMob->SetEssenceDescriptor(pEssDesc));
 
@@ -234,6 +247,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
   if (pDIDesc)
     pDIDesc->Release();
+
+  if (pRGBADesc)
+    pRGBADesc->Release();
 
   if (pMob)
     pMob->Release();
@@ -266,16 +282,20 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFSourceMob*	pSourceMob = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
 	IAAFDigitalImageDescriptor*	pDIDesc = NULL;
+	IAAFRGBADescriptor*	pRGBADesc = NULL;
 	aafNumSlots_t	numMobs = 0;
 	HRESULT			hr = AAFRESULT_SUCCESS;
-
+	aafRGBAComponent_t	readElements[NUM_TEST_ELEMENTS];
+	aafInt32		n;
+	aafUInt32		readPaletteSize;
+	aafUInt8		readPalette[TEST_PALETTE_SIZE];
 
   try
   {
 	  // Open the AAF file
 	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 
-    // Make sure there is one a single mob in the file.
+	  // Make sure there is one a single mob in the file.
 	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
@@ -288,18 +308,20 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // Back into testing mode
 	  checkResult(pSourceMob->GetEssenceDescriptor(&pEssDesc));
 
-    // if there is an Essence Descriptor then it MUST be an (essence) DigitalImage Descriptor
+    // if there is an Essence Descriptor then it MUST be an (essence) RGBA Descriptor
 	  checkResult(pEssDesc->QueryInterface(IID_IAAFDigitalImageDescriptor, (void **) &pDIDesc));
+	  checkResult(pEssDesc->QueryInterface(IID_IAAFRGBADescriptor, (void **) &pRGBADesc));
 
     // TODO: test for expected DigitalImage properties
-	  aafUInt32				val1, val2, iaf;
+	  aafUInt32				val1, val2, resultElements, iaf;
 	  aafInt32				val3, val4;
 	  aafFrameLayout_t		framelayout;
 	  aafAlphaTransparency_t	alphaTrans;
 	  aafRational_t			ratio;
-	  aafUID_t				gamma;
+		aafUID_t			gamma;
 	  aafInt32				VideoLineMap[kVideoLineMapMaxElement];
-	  aafUID_t				compression, compTestVal;
+	  aafUID_t				compression;
+	  aafUID_t				compTestVal;
 
 	  memset(&compTestVal, 0, sizeof(aafUID_t));
 
@@ -352,6 +374,38 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 //!!!		checkExpression(ratio.numerator == kGammaNumTestVal &&
 //			              ratio.denominator == kGammaDenTestVal,
  //                   AAFRESULT_TEST_FAILED);
+
+		checkResult(pRGBADesc->CountPixelLayoutElements (&resultElements));
+		checkExpression(resultElements == NUM_TEST_ELEMENTS, AAFRESULT_TEST_FAILED);
+			
+		checkResult(pRGBADesc->GetPixelLayout(NUM_TEST_ELEMENTS, readElements));
+		for(n = 0; n < NUM_TEST_ELEMENTS; n++)
+		{
+			if(readElements[n].Code != testElements[n].Code)
+				throw AAFRESULT_TEST_FAILED;
+			if(readElements[n].Size != testElements[n].Size)
+				throw AAFRESULT_TEST_FAILED;
+		}
+		checkResult(pRGBADesc->GetPaletteSize(&readPaletteSize));
+ 		if(readPaletteSize != TEST_PALETTE_SIZE)
+			throw AAFRESULT_TEST_FAILED;
+		checkResult(pRGBADesc->GetPalette(TEST_PALETTE_SIZE, readPalette));
+ 		for(n = 0; n < TEST_PALETTE_SIZE; n++)
+		{
+			if(readPalette[n] != bogusPalette[n])
+				throw AAFRESULT_TEST_FAILED;
+		}
+
+		checkResult(pRGBADesc->CountPaletteLayoutElements (&resultElements));
+		checkExpression(resultElements == NUM_TEST_ELEMENTS, AAFRESULT_TEST_FAILED);
+		checkResult(pRGBADesc->GetPaletteLayout(NUM_TEST_ELEMENTS, readElements));
+		for(n = 0; n < NUM_TEST_ELEMENTS; n++)
+		{
+			if(readElements[n].Code != testElements2[n].Code)
+				throw AAFRESULT_TEST_FAILED;
+			if(readElements[n].Size != testElements2[n].Size)
+				throw AAFRESULT_TEST_FAILED;
+		}
   }
   catch (HRESULT& rResult)
   {
@@ -361,6 +415,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   // Cleanup and return
   if (pEssDesc)
     pEssDesc->Release();
+
+  if (pRGBADesc)
+    pRGBADesc->Release();
 
   if (pDIDesc)
     pDIDesc->Release();
@@ -386,13 +443,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFDigitalImageDescriptor_test(testMode_t mode);
-extern "C" HRESULT CAAFDigitalImageDescriptor_test(testMode_t mode)
+extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFRGBADescriptor_test(testMode_t mode)
 {
-	aafWChar*	pFileName = L"AAFDigitalImageDescripTest.aaf";
+	aafWChar*	pFileName = L"AAFRGBADescripTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
-	try
+
+   	try
 	{
 		if(mode == kAAFUnitTestReadWrite)
 			hr = CreateAAFFile(pFileName);
@@ -403,11 +461,30 @@ extern "C" HRESULT CAAFDigitalImageDescriptor_test(testMode_t mode)
 	}
 	catch (...)
 	{
-		cerr << "CAAFDigitalImageDescriptor_test..."
-			 << "Caught general C++ exception!" << endl; 
+		cerr << "CAAFRGBADescriptor_test..."
+			 << "Caught general C++ exception!" << endl;
 		hr = AAFRESULT_TEST_FAILED;
 	}
+
+	// When all of the functionality of this class is tested, we can return success.
+	// When a method and its unit test have been implemented, remove it from the list.
+//	if (SUCCEEDED(hr))
+//	{
+//		cout << "The following IAAFParameter methods have not been implemented:" << endl; 
+//		cout << "     GetPalette" << endl; 
+//		cout << "     GetPaletteSize" << endl; 
+//		cout << "     GetPaletteLayout" << endl; 
+//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+//	}
 
 	return hr;
 }
 
+
+    
+    
+    
+    
+    
+    
+    

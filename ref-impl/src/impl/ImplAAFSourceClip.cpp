@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplAAFDataDef_h__
@@ -44,15 +39,21 @@
 #include <assert.h>
 #include "aafCvt.h" 
 #include "AAFResult.h"
+#include "AAFUtils.h"
 #include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
 #include "ImplAAFHeader.h"
 
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
+typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
+
 ImplAAFSourceClip::ImplAAFSourceClip ():
-	_fadeInLength(		PID_SourceClip_FadeInLength,		"FadeInLength"),
-	_fadeInType(	PID_SourceClip_FadeInType,		"FadeInType"),
-	_fadeOutLength(	PID_SourceClip_FadeOutLength,		"FadeOutLength"),
-	_fadeOutType(	PID_SourceClip_FadeOutType,		"FadeOutType"),
-	_startTime(		PID_SourceClip_StartTime,		"StartTime")
+	_fadeInLength(		PID_SourceClip_FadeInLength,		L"FadeInLength"),
+	_fadeInType(	PID_SourceClip_FadeInType,		L"FadeInType"),
+	_fadeOutLength(	PID_SourceClip_FadeOutLength,		L"FadeOutLength"),
+	_fadeOutType(	PID_SourceClip_FadeOutType,		L"FadeOutType"),
+	_startTime(		PID_SourceClip_StartTime,		L"StartTime")
 {
 	_persistentProperties.put(		_fadeInLength.address());
 	_persistentProperties.put(		_fadeInType.address());
@@ -68,24 +69,26 @@ ImplAAFSourceClip::~ImplAAFSourceClip ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceClip::Initialize(const aafUID_t &       datadef,
+    ImplAAFSourceClip::Initialize(ImplAAFDataDef *       pDataDef,
 								  const aafLength_t &    length,
 								  const aafSourceRef_t & sourceRef)
 {
-    AAFRESULT aafError = AAFRESULT_SUCCESS;
-	SetDataDef( datadef );
-	SetLength( length );
-	SetSourceID( sourceRef.sourceID );
-	SetSourceMobSlotID( sourceRef.sourceSlotID );
-	_startTime = sourceRef.startTime;
+  if (! pDataDef)
+	return AAFRESULT_NULL_PARAM;
 
-	_fadeInLength		= 0;
-	_fadeInType		= kFadeNone;
+  SetDataDef( pDataDef );
+  SetLength( length );
+  SetSourceID( sourceRef.sourceID );
+  SetSourceMobSlotID( sourceRef.sourceSlotID );
+  _startTime = sourceRef.startTime;
+
+  _fadeInLength		= 0;
+  _fadeInType		= kAAFFadeNone;
 	
-	_fadeOutLength		= 0;
-	_fadeOutType	= kFadeNone;
+  _fadeOutLength		= 0;
+  _fadeOutType	= kAAFFadeNone;
 
-	return aafError;
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -121,27 +124,27 @@ AAFRESULT STDMETHODCALLTYPE
 
 	else
 	{
-	
-        *fadeInLen      = _fadeInLength;
+		
+		*fadeInLen      = _fadeInLength;
 		*fadeInType		= _fadeInType;
 		if (_fadeInLength > 0)
 		{
-			*fadeInPresent	= AAFTrue;
+			*fadeInPresent	= kAAFTrue;
 		}
 		else
 		{
-			*fadeInPresent = AAFFalse;
+			*fadeInPresent = kAAFFalse;
 		}
-
+		
 		*fadeOutLen		= _fadeOutLength;
 		*fadeOutType	= _fadeOutType;
 		if (_fadeOutLength > 0)
 		{
-			*fadeOutPresent	= AAFTrue;
+			*fadeOutPresent	= kAAFTrue;
 		}
 		else
 		{
-			*fadeOutPresent = AAFFalse;
+			*fadeOutPresent = kAAFFalse;
 		}
 	}
 
@@ -168,9 +171,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSourceClip::ResolveRef (ImplAAFMob ** mob)
 {
     aafSourceRef_t sourceRef;
-	ImplAAFMob * tmpMob = NULL;
-	ImplAAFHeader *head = NULL;
-	aafInt32 index = 0;
+    ImplAAFHeader *head = NULL;
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
 	*mob = NULL;
@@ -200,7 +201,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if(head)
 		  head->ReleaseReference();
 		head = 0;
-		return(XCODE());
 	  }
 	XEND;
 
@@ -234,8 +234,11 @@ AAFRESULT STDMETHODCALLTYPE
 	{	
 		if (pSourceRef)
 		{
-			GetSourceID( &sourceID );
-			GetSourceMobSlotID( &slotID );
+			if (! _startTime.isPresent())
+				RAISE(AAFRESULT_PROP_NOT_PRESENT);
+
+			CHECK(GetSourceID( &sourceID ));
+			CHECK(GetSourceMobSlotID( &slotID ));
 			pSourceRef->sourceID = sourceID;
 			pSourceRef->sourceSlotID = slotID;
 			pSourceRef->startTime = _startTime;
@@ -248,7 +251,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XEXCEPT
 	  {
-		return(XCODE());
+		//return(XCODE());
 	  }
 	XEND;
 
@@ -261,32 +264,43 @@ AAFRESULT STDMETHODCALLTYPE
                            aafFadeType_t	fadeInType,
                            aafInt32			fadeOutLen,
                            aafFadeType_t	fadeOutType)
-{
-    AAFRESULT aafError = AAFRESULT_SUCCESS;
+ {
+	 AAFRESULT aafError = AAFRESULT_SUCCESS;
+	 
+	 ImplAAFDataDefSP dataDef;
+	 aafBool		isSound;
+	 
+	 aafError = GetDataDef (&dataDef);
+	if (AAFRESULT_FAILED(aafError))
+		return aafError;
 
-	if (fadeInLen > 0)
-	{
-		_fadeInLength	= fadeInLen;
-		_fadeInType	= fadeInType;
-	}
-
-	if (fadeOutLen > 0)
-	{
-		_fadeOutLength		= fadeOutLen;
-		_fadeOutType	= fadeOutType;
-	}
-
-	return aafError;
-}
+	 dataDef->IsSoundKind(&isSound);
+	 if(isSound)
+	 {
+		 if (fadeInLen > 0)
+		 {
+			 _fadeInLength	= fadeInLen;
+			 _fadeInType	= fadeInType;
+		 }
+		 
+		 if (fadeOutLen > 0)
+		 {
+			 _fadeOutLength		= fadeOutLen;
+			 _fadeOutType	= fadeOutType;
+		 }
+	 }
+	 else
+		 aafError = AAFRESULT_INVALID_DATADEF;		// Must be sound Datadef for this call
+	 
+	 return aafError;
+ }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSourceClip::SetSourceReference (aafSourceRef_t  sourceRef)
 {
-    aafInt32	tmp1xSourcePosition = 0;
-	aafInt16	tmp1xTrackNum = 0;
 	AAFRESULT   aafError = AAFRESULT_SUCCESS;
-  static const aafMobID_t nullMobID = {0};
+	static const aafMobID_t nullMobID = {0};
 	
 	/* If MobID is NUL - make the rest of the fields 0 too. */
 	if(memcmp(&sourceRef.sourceID, &nullMobID, sizeof(sourceRef.sourceID)) == 0)
@@ -305,10 +319,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 											ImplAAFSegment **sclp,
-											ImplAAFPulldown **pulldownObj,
-											aafInt32 *pulldownPhase,
+											ImplAAFPulldown ** /*pulldownObj*/,
+											aafInt32 * /*pulldownPhase*/,
 											aafLength_t *sclpLen,
-											aafBool *isMask)
+											aafBool * /*isMask*/)
 {
 	XPROTECT()
 	{
@@ -329,6 +343,3 @@ AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 	
 	return(AAFRESULT_SUCCESS);
 }
-
-
-

@@ -1,34 +1,31 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "CAAFEssenceFileStream.h"
 #include "CAAFEssenceFileContainer.h"
 
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 #include "AAFResult.h"
 
 #include <errno.h>
@@ -38,20 +35,19 @@
 
 
 
-
 //
 // NOTE: The following two routines will have to be rewritten
-// if fpos_t is defined to be a structure or aafInt64 is a 
+// if fpos_t is defined to be a structure or aafPosition_t is a 
 // structure.
 //
-/*inline*/ bool AafPos2AnsiPos(fpos_t *ansiPos, const aafInt64 *aafPos)
+/*inline*/ bool AafPos2AnsiPos(fpos_t *ansiPos, const aafPosition_t *aafPos)
 {
   // For first version just assume that platform an perform conversion.
-  if (sizeof(fpos_t) < sizeof(aafInt64))
+  if (sizeof(fpos_t) < sizeof(aafPosition_t))
   {
     // The following test assumes 64 bit arithematic!
-    aafInt64 trunPos = (0x00000000FFFFFFFF & *aafPos);
-    if (trunPos != *aafPos && 0xFFFFFFFFFFFFFFFF != *aafPos)
+    aafPosition_t trunPos = (AAFCONSTINT64(0x00000000FFFFFFFF) & *aafPos);
+    if (trunPos != *aafPos && AAFCONSTINT64(0xFFFFFFFFFFFFFFFF) != *aafPos)
       return false;
 
     *ansiPos = *aafPos;
@@ -63,7 +59,7 @@
 }
 
 
-/*inline*/ bool AnsiPos2AafPos(aafInt64 *aafPos, const fpos_t *ansiPos)
+/*inline*/ bool AnsiPos2AafPos(aafPosition_t *aafPos, const fpos_t *ansiPos)
 {
   // For first version just assume that platform an perform conversion.
   *aafPos = *ansiPos;
@@ -418,14 +414,16 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Write (aafDataBuffer_t  buffer,
-        aafInt32  buflen)
+    CAAFEssenceFileStream::Write (
+      aafUInt32 bytes,
+      aafDataBuffer_t  buffer,
+      aafUInt32 * bytesWritten)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
-  if (NULL == buffer)
+  if (NULL == buffer || NULL == bytesWritten)
     return E_INVALIDARG;
-  if (0 > buflen)
+  if (0 > bytes)
     return E_INVALIDARG;
   if (openRead == _streamMode)
     return AAFRESULT_NOT_WRITEABLE;
@@ -449,8 +447,8 @@ HRESULT STDMETHODCALLTYPE
   // Write the given data to the file at the current file
   // position.
   errno = 0;
-  size_t bytesWritten = fwrite(buffer, 1, buflen, _pFile);
-  if (bytesWritten != (size_t)buflen)
+  *bytesWritten = fwrite(buffer, 1, bytes, _pFile);
+  if (*bytesWritten != (size_t)bytes)
   { // What error code should we return?
     long err = errno;
 
@@ -508,7 +506,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::Seek (aafInt64  byteOffset)
+    CAAFEssenceFileStream::Seek (aafPosition_t  byteOffset)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -558,7 +556,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::IsPosValid (aafInt64  byteOffset,
+    CAAFEssenceFileStream::IsPosValid (aafPosition_t  byteOffset,
         aafBool *  isValid)
 {
   if (NULL == _pFile) 
@@ -566,18 +564,18 @@ HRESULT STDMETHODCALLTYPE
   if (NULL == isValid)
     return E_INVALIDARG;
   
-  *isValid = AAFFalse;
+  *isValid = kAAFFalse;
 
   if (0 < byteOffset)
   {
-    aafInt64 length = 0;
+    aafLength_t length = 0;
     HRESULT hr = GetLength(&length);
     if (AAFRESULT_SUCCESS != hr)
       return hr;
 
     if (byteOffset < length)
     {
-      *isValid = AAFTrue;
+      *isValid = kAAFTrue;
     }
     else if (byteOffset == length)
     {
@@ -586,7 +584,7 @@ HRESULT STDMETHODCALLTYPE
         // we don't know whether or not the next
         // file operation will be a read or a write
         // so we just return true.
-        *isValid = AAFTrue;
+        *isValid = kAAFTrue;
       }
     }
   }
@@ -596,7 +594,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::GetPosition (aafInt64 *  position)
+    CAAFEssenceFileStream::GetPosition (aafPosition_t *  position)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -631,7 +629,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::GetLength (aafInt64 *  position)
+    CAAFEssenceFileStream::GetLength (aafLength_t *  position)
 {
   if (NULL == _pFile) 
     return AAFRESULT_NOT_OPEN;
@@ -675,7 +673,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileStream::SetCacheSize (aafInt32  itsSize)
+    CAAFEssenceFileStream::SetCacheSize (aafUInt32  itsSize)
 {
   // PRE-CONDITION
   // Ansi states that setvbuf should be called before the first read or write
@@ -706,6 +704,10 @@ HRESULT STDMETHODCALLTYPE
 //
 // 
 // 
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFEssenceFileStream::InternalQueryInterface
 (
     REFIID riid,
@@ -717,13 +719,13 @@ HRESULT CAAFEssenceFileStream::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IAAFEssenceStream interface
-    if (riid == IID_IAAFEssenceStream) 
+    if (EQUAL_UID(riid,IID_IAAFEssenceStream)) 
     { 
         *ppvObj = (IAAFEssenceStream *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
