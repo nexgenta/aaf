@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.5 2004/04/30 10:12:29 bakerian Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.6 2004/04/30 12:05:51 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -779,70 +779,6 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
-
-#if(0)
-//****************
-// AppendNewStaticSlot()
-//
-AAFRESULT STDMETHODCALLTYPE
-	ImplAAFMob::AppendNewStaticSlot
-        (        
-		ImplAAFSegment * pSegment,// @parm [in] AAFSegment | pSegment | Segment to append as slot component
-	    aafSlotID_t  slotID,   // @parm [in] aafSlotID_t | slotID | new slot ID
-		aafCharacter_constptr  pSlotName,   // @parm [in, string] aafCharacter_constptr | pSlotName | new slot name
-		ImplAAFStaticMobSlot ** ppNewSlot)  // @parm [out] AAFStaticMobSlot | ppNewSlot | Newly created slot
-{
-	ImplAAFStaticMobSlot	*aSlot = NULL;
-	ImplAAFMobSlot			*tmpSlot = NULL;
-  ImplAAFDictionary *pDictionary = NULL;
-///fLength_t length = CvtInt32toLength(0, length);
-///	aafLength_t	mobLength = CvtInt32toLength(0, mobLength);
-
-
-  // Validate input pointers...
-  if (NULL == pSegment || NULL == pSlotName || NULL == ppNewSlot)
-    return (AAFRESULT_NULL_PARAM);
-
-	*ppNewSlot = NULL;
-
-	XPROTECT()
-	  {
-		CHECK(GetDictionary(&pDictionary));
-		CHECK(pDictionary->GetBuiltinDefs()->cdStaticMobSlot()->
-			  CreateInstance ((ImplAAFObject**) &aSlot));
-		pDictionary->ReleaseReference();
-		pDictionary = NULL;
-		CHECK(aSlot->Initialize());
-		CHECK(aSlot->SetSegment(pSegment));
-		CHECK(aSlot->SetSlotID(slotID));
-		CHECK(aSlot->SetName(pSlotName));
-		CHECK(aSlot->SetEditRate(editRate));
-		CHECK(aSlot->SetOrigin(origin));
-
-		/* Append new slot to mob */
-		tmpSlot = aSlot;
-		_slots.appendValue(tmpSlot);
-
-	  } /* XPROTECT */
-
-	XEXCEPT
-	  {
-		if (aSlot)
-		  aSlot->ReleaseReference();
-		aSlot = 0;
-		if(pDictionary != NULL)
-		  pDictionary->ReleaseReference();
-		pDictionary = 0;
-	  }
-	XEND;
-
-	*ppNewSlot = aSlot;
-	if (aSlot)
-		aSlot->AcquireReference();
-
-	return(AAFRESULT_SUCCESS);
-}
-#endif
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::GetSlots (ImplEnumAAFMobSlots **ppEnum)
