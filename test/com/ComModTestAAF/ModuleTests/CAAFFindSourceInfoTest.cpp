@@ -31,6 +31,8 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -296,9 +298,17 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				ref,
 				TAPE_MOB_LENGTH_ARR[test]));
 			
-			checkResult(defs.cdEssenceDescriptor()->
+			// Create a concrete subclass of EssenceDescriptor
+			checkResult(defs.cdAIFCDescriptor()->
 				CreateInstance(IID_IAAFEssenceDescriptor, 
 				(IUnknown **)&pDesc));	
+
+			IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+			checkResult(pDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+			checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+			pAIFCDesc->Release();
+			pAIFCDesc = NULL;
+
 			checkResult(pSrcMob->SetEssenceDescriptor(pDesc));
 			pDesc->Release();
 			pDesc = NULL;
@@ -384,7 +394,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFMasterMob*		pMasterMob = NULL;
 	IEnumAAFMobSlots*	pSlotIter = NULL;
 	IAAFMobSlot*		pSlot;
-	aafWChar*			pTapeName = NULL;
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
 	IAAFSearchSource*  pSearchSource = NULL;
@@ -585,7 +594,9 @@ extern "C" HRESULT CAAFFindSourceInfo_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFFindSourceInfo_test...Caught general C++ exception!" << endl; 
+	  cerr << "CAAFFindSourceInfo_test..."
+		   << "Caught general C++ exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
 	}
 	
 	if (SUCCEEDED(hr))
