@@ -5,7 +5,7 @@
 
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -30,9 +30,13 @@
  *
  ************************************************************************/
 
-class ImplEnumAAFPropertyDefs;
+class ImplAAFObject;
 class ImplAAFDefObject;
 class ImplAAFPropertyDef;
+
+template <class T> 
+class ImplAAFEnumerator;
+typedef ImplAAFEnumerator<ImplAAFPropertyDef> ImplEnumAAFPropertyDefs;
 
 #ifndef __ImplAAFMetaDefinition_h__
 #include "ImplAAFMetaDefinition.h"
@@ -46,7 +50,12 @@ class ImplAAFPropertyDef;
 #include "ImplAAFTypeDef.h"
 #endif
 
-class ImplAAFClassDef : public ImplAAFMetaDefinition
+#include "OMClassDefinition.h"
+#include "OMWeakRefProperty.h"
+#include "OMStrongRefSetProperty.h"
+
+class ImplAAFClassDef : public ImplAAFMetaDefinition,
+                        public OMClassDefinition
 {
 public:
   //
@@ -72,7 +81,10 @@ public:
 		ImplAAFClassDef * pParentClass,
 
 		// Human-legible name
-		const aafCharacter * pClassName);
+		const aafCharacter * pClassName,
+
+		// Can objects of this class be instantiated
+		aafBool isConcrete);
 
 
   //****************
@@ -172,6 +184,13 @@ public:
         (aafBool* isRootClass);
 
   //****************
+  // IsConcrete()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsConcrete
+        (aafBool* pResult);
+
+  //****************
   // IsUniquelyIdentified
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -218,11 +237,20 @@ public:
         (const aafUID_t & classID,
 
 		// Inheritance parent of this class
-		const ImplAAFClassDef * pParentClassId,
+		ImplAAFClassDef * pParentClass,
 
 		// Human-legible name
-		const aafCharacter * pClassName);
+		const aafCharacter * pClassName,
 
+		// Can objects of this class be instantiated
+		aafBool isConcrete);
+
+
+  // Returns true if this class can be instantiated.
+  aafBool pvtIsConcrete () const;
+
+  // Private method to set the "IsConcrete" property (used for bootstrap).
+  void pvtSetIsConcrete (aafBoolean_t isConcrete);
 
   // Private method to unconditionally register a property def (ignoring
   // whether or not property is optional or not, or if this class has
@@ -259,11 +287,23 @@ public:
   // has been loaded into memory.
   void AssurePropertyTypesLoaded ();
 
-  void InitOMProperties (ImplAAFObject * pObj);
-
   // Find the unique identifier property defintion for this class or any parent class
   // (RECURSIVE)
   ImplAAFPropertyDef * pvtGetUniqueIdentifier(void); // result is NOT reference counted.
+
+
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
+
+
+  // Method is called after associated class has been added to MetaDictionary.
+  // If this method fails the class is removed from the MetaDictionary and the
+  // registration method will fail.
+  virtual HRESULT CompleteClassRegistration(void);
 
 private:
 
@@ -337,6 +377,8 @@ private:
   OMWeakReferenceProperty<ImplAAFClassDef>         _ParentClass;
 
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPropertyDef> _Properties;
+
+  OMFixedSizeProperty<aafBool> _IsConcrete;
 
   ImplAAFClassDef	*_BootstrapParent;
 

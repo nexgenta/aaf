@@ -42,6 +42,7 @@
 #endif
 
 #include "OMReferenceSet.h"
+#include "OMIdentitySet.h"
 
 // Forward declarations:
 class ImplAAFMetaDefinition;
@@ -55,8 +56,11 @@ class ImplAAFTypeDefStrongObjRef;
 class ImplAAFTypeDefWeakObjRef;
 class ImplAAFTypeDefSet;
 
-class ImplEnumAAFClassDefs;
-class ImplEnumAAFTypeDefs;
+template <class T> 
+class ImplAAFEnumerator;
+typedef ImplAAFEnumerator<ImplAAFClassDef> ImplEnumAAFClassDefs;
+typedef ImplAAFEnumerator<ImplAAFTypeDef> ImplEnumAAFTypeDefs;
+
 class ImplAAFDictionary;
 
 #include "ImplAAFClassDef.h"
@@ -118,7 +122,7 @@ public:
 
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
-  //  virtual void onRestore(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 
 
 
@@ -277,114 +281,14 @@ public:
         (aafUInt32 * pResult);
 
 
-  //
-  // Meta definition factory methods:
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateClassDef (
-      aafUID_constref classID,
-      aafCharacter_constptr pClassName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pParentClass,
-      ImplAAFClassDef ** ppNewClass);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefVariableArray (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefVariableArray ** ppNewVariableArray);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateTypeDefFixedArray (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      aafUInt32  nElements,
-      ImplAAFTypeDefFixedArray **pNewFixedArray);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateTypeDefRecord (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef ** ppMemberTypes,
-      aafCharacter_constptr * pMemberNames,
-      aafUInt32 numMembers,
-      ImplAAFTypeDefRecord ** ppNewRecord);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateTypeDefRename (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pBaseType,
-      ImplAAFTypeDefRename ** ppNewRename);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefString (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefString ** ppNewString);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStrongObjRef (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pTargetObjType,
-      ImplAAFTypeDefStrongObjRef ** ppNewStrongObjRef);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefWeakObjRef (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pTargetObjType,
-      aafUID_constptr * pTargetHint,
-      aafUInt32 targetHintCount,
-      ImplAAFTypeDefWeakObjRef ** ppNewWeakObjRef);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStrongObjRefVector (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewStrongObjRefVector);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefWeakObjRefVector (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewWeakObjRefVector);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStrongObjRefSet (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefSet ** ppNewStrongObjRefSet);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefWeakObjRefSet (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefSet ** ppNewWeakObjRefSet);
-
 public:
   //
   // Methods private to the SDK
   //
+
+  // Private registration method to add the given class definiion
+  // to the set. 
+  AAFRESULT PvtRegisterClassDef (ImplAAFClassDef * pClassDef);
 
 
   // These are low-level OMSet tests for containment.
@@ -450,13 +354,32 @@ public:
   void RegisterAxiomaticProperties(void); // throw AAFRESULT
 
   // Initialize all of the OMProperties for each aximatic definition.
-  void InitializeAxiomaticOMProperties(void); // throw AAFRESULT
+  void InitializeAxiomaticOMDefinitions(void); // throw AAFRESULT
+  
+  // Complete the registration of the axiomatic class definitions
+  // This must be called AFTER all other aximatic definitions have
+  // been initialized and registered.
+  void CompleteAxiomaticClassRegistration(void); // throw AAFRESULT
 
   // Create all of the axiomatic definitions.
   void CreateAxiomaticDefinitions(void); // throw AAFRESULT
 
   // Initialize all of the axiomatic definitions.
   void InitializeAxiomaticDefinitions(void); // throw AAFRESULT
+  
+  
+  //
+  // Methods that would be inherited or overriden from ImplAAFStrorable
+  //
+  
+  // Associate OMClassDefinition and OMPropertyDefinitions with this object.
+  virtual void InitializeOMStorable(ImplAAFClassDef * pClassDef);
+
+protected:
+  // Associate the existing OMProperties with corresponding property definitions from
+  // the given class definition. NOTE: This call is recursive, it calls itself again
+  // for the parent class of the given class until current class is a "root" class.
+  virtual void InitOMProperties (ImplAAFClassDef * pClassDef);
 
 private:
 
@@ -474,25 +397,7 @@ private:
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFClassDef> _axiomaticClassDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFPropertyDef> _axiomaticPropertyDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFTypeDef> _axiomaticTypeDefinitions;
-
-  // Private class that represents a forward class reference.
-  class ForwardClassReference
-  {
-  public:
-    ForwardClassReference();
-    ForwardClassReference(const ForwardClassReference& rhs);
-    ForwardClassReference(aafUID_constref classId);
-
-    // Methods required by OMSet
-    const OMUniqueObjectIdentification identification(void) const;
-    ForwardClassReference& operator= (const ForwardClassReference& rhs);
-    bool operator== (const ForwardClassReference& rhs);
-
-  private:
-    aafUID_t _classId;
-  };
-
-  OMSet<OMUniqueObjectIdentification, ForwardClassReference> _forwardClassReferences;
+  OMIdentitySet<OMUniqueObjectIdentification> _forwardClassReferences;
 
   //
   // Temporary data members used while converting to the "two-roots" containment

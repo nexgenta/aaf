@@ -25,93 +25,28 @@
  *
  ************************************************************************/
 
-#ifndef __ImplAAFDictionary_h__
 #include "ImplAAFDictionary.h"
-#endif
-
-#ifndef __ImplAAFMetaDictionary_h__
 #include "ImplAAFMetaDictionary.h"
-#endif
-
-#ifndef __ImplAAFClassDef_h__
 #include "ImplAAFClassDef.h"
-#endif
-
-#ifndef __ImplEnumAAFClassDefs_h__
 #include "ImplEnumAAFClassDefs.h"
-#endif
-
-#ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
-#endif
-
-#ifndef __ImplAAFPropertyDef_h__
 #include "ImplAAFPropertyDef.h"
-#endif
-
-#ifndef __ImplEnumAAFTypeDefs_h__
 #include "ImplEnumAAFTypeDefs.h"
-#endif
-
-#ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
-#endif
-
-#ifndef __ImplEnumAAFDataDefs_h__
 #include "ImplEnumAAFDataDefs.h"
-#endif
-
-#ifndef __ImplAAFOperationDef_h__
 #include "ImplAAFOperationDef.h"
-#endif
-
-#ifndef __ImplAAFParameterDef_h__
 #include "ImplAAFParameterDef.h"
-#endif
-
-#ifndef __ImplEnumAAFOperationDefs_h__
 #include "ImplEnumAAFOperationDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFCodecDefs_h__
 #include "ImplEnumAAFCodecDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFPropertyDefs_h__
 #include "ImplEnumAAFPropertyDefs.h"
-#endif
-
-#ifndef __ImplAAFTypeDefRename_h__
 #include "ImplAAFTypeDefRename.h"
-#endif
-
-#ifndef __ImplEnumAAFContainerDefs_h__
 #include "ImplEnumAAFContainerDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFInterpolationDefs_h__
 #include "ImplEnumAAFInterpolationDefs.h"
-#endif
-
-#ifndef __ImplEnumAAFPluginDefs_h__
 #include "ImplEnumAAFPluginDefs.h"
-#endif
-
-#ifndef __AAFTypeDefUIDs_h__
 #include "AAFTypeDefUIDs.h"
-#endif
-
-#ifndef __ImplAAFBaseClassFactory_h__
 #include "ImplAAFBaseClassFactory.h"
-#endif
-
-#ifndef __ImplAAFBuiltinClasses_h__
 #include "ImplAAFBuiltinClasses.h"
-#endif
-
-#ifndef __ImplAAFBuiltinTypes_h__
 #include "ImplAAFBuiltinTypes.h"
-#endif
 
 #include "ImplAAFMob.h"
 #include "AAFStoredObjectIDs.h"
@@ -121,12 +56,16 @@
 #include "AAFContainerDefs.h"
 #include "AAFClassDefUIDs.h"
 
-
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 #include "AAFUtils.h"
 #include "AAFDataDefs.h"
+
+#include "ImplAAFSmartPointer.h"
+
+typedef ImplAAFSmartPointer<ImplEnumAAFClassDefs> ImplEnumAAFClassDefsSP;
+typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 
 extern "C" const aafClassID_t CLSID_EnumAAFCodecDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFContainerDefs;
@@ -139,10 +78,6 @@ extern "C" const aafClassID_t CLSID_EnumAAFPluginDefs;
 
 
 
-// Enable/disable the use of the new AAFObjectModel initialized objects.
-#ifndef USE_AAFOBJECT_MODEL
-#define USE_AAFOBJECT_MODEL 0
-#endif
 
 
 
@@ -183,7 +118,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFCodecDef>codecDefinitions(_codecDefinitions);
 	while(++codecDefinitions)
 	{
-		ImplAAFCodecDef *pCodec = codecDefinitions.setValue(0);
+		ImplAAFCodecDef *pCodec = codecDefinitions.clearValue();
 		if (pCodec)
 		{
 		  pCodec->ReleaseReference();
@@ -194,7 +129,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFContainerDef>containerDefinitions(_containerDefinitions);
 	while(++containerDefinitions)
 	{
-		ImplAAFContainerDef *pContainer = containerDefinitions.setValue(0);
+		ImplAAFContainerDef *pContainer = containerDefinitions.clearValue();
 		if (pContainer)
 		{
 		  pContainer->ReleaseReference();
@@ -205,7 +140,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFOperationDef>operationDefinitions(_operationDefinitions);
 	while(++operationDefinitions)
 	{
-		ImplAAFOperationDef *pOp = operationDefinitions.setValue(0);
+		ImplAAFOperationDef *pOp = operationDefinitions.clearValue();
 		if (pOp)
 		{
 		  pOp->ReleaseReference();
@@ -216,7 +151,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef>parameterDefinitions(_parameterDefinitions);
 	while(++parameterDefinitions)
 	{
-		ImplAAFParameterDef *pParm = parameterDefinitions.setValue(0);
+		ImplAAFParameterDef *pParm = parameterDefinitions.clearValue();
 		if (pParm)
 		{
 		  pParm->ReleaseReference();
@@ -227,7 +162,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFInterpolationDef>interpolateDefinitions(_interpolationDefinitions);
 	while(++interpolateDefinitions)
 	{
-		ImplAAFInterpolationDef *pInterp = interpolateDefinitions.setValue(0);
+		ImplAAFInterpolationDef *pInterp = interpolateDefinitions.clearValue();
 		if (pInterp)
 		{
 		  pInterp->ReleaseReference();
@@ -238,7 +173,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDef>pluginDefinitions(_pluginDefinitions);
 	while(++pluginDefinitions)
 	{
-		ImplAAFPluginDef *pPlug = pluginDefinitions.setValue(0);
+		ImplAAFPluginDef *pPlug = pluginDefinitions.clearValue();
 		if (pPlug)
 		{
 		  pPlug->ReleaseReference();
@@ -249,7 +184,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFDataDef>dataDefinitions(_dataDefinitions);
 	while(++dataDefinitions)
 	{
-		ImplAAFDataDef *pData = dataDefinitions.setValue(0);
+		ImplAAFDataDef *pData = dataDefinitions.clearValue();
 		if (pData)
 		{
 		  pData->ReleaseReference();
@@ -407,7 +342,7 @@ ImplAAFDictionary::CreateAndInit(ImplAAFClassDef * pClassDef) const
   pNewObject = pvtInstantiate (auid);
   if (pNewObject)
 	{
-	  pNewObject->InitOMProperties (pClassDef);
+	  pNewObject->InitializeOMStorable (pClassDef);
 
 	  // Attempt to initialize any class extensions associated
 	  // with this object. Only the most derived extension that has an
@@ -554,35 +489,8 @@ AAFRESULT STDMETHODCALLTYPE
     // object pointer requested in auid
     ImplAAFMetaDefinition ** ppMetaObject)
 {
-#if 0  
-  if (!ppMetaObject)
-    return AAFRESULT_NULL_PARAM;
-
-  *ppMetaObject = NULL;
-
-  // Temporary: The first version just calls the old CreateInstance method.
-  // This will be replaced when the "two-roots", data and meta-data, are 
-  // implemented. transdel:2000-APR-21.
-  ImplAAFObject * pObject = NULL;
-  AAFRESULT result = CreateInstance(classId, &pObject);
-  if (AAFRESULT_SUCCEEDED(result))
-  {
-    // Make sure that this object is in fact a meta definition.
-    *ppMetaObject = dynamic_cast<ImplAAFMetaDefinition*>(pObject);
-    if (NULL == *ppMetaObject)
-    {
-      // Cleanup on failure.
-      pObject->ReleaseReference();
-      pObject = NULL;
-      result = AAFRESULT_INVALID_PARAM;
-    }
-  }
-
-  return (result);
-#else // #if 0
   // Ask the meta dictionary to create the meta definition
   return (metaDictionary()->CreateMetaInstance(classId, ppMetaObject));
-#endif
 }
 
 
@@ -607,16 +515,11 @@ bool ImplAAFDictionary::PvtIsClassPresent (
 bool
 ImplAAFDictionary::IsAxiomaticClass (const aafUID_t &classID) const
 {
-#if USE_AAFOBJECT_MODEL
-  ImplAAFClassDef *pAxiomaticClass = findAxiomaticClassDefinition(classID); // return value NOT reference counted! 
-  if (ImplAAFClassDef)
+  ImplAAFClassDef *pAxiomaticClass = metaDictionary()->findAxiomaticClassDefinition(classID); // return value NOT reference counted! 
+  if (pAxiomaticClass)
     return true;
   else
     return false;
-#else // #if USE_AAFOBJECT_MODEL
-  assert (_pBuiltinClasses);
-  return _pBuiltinClasses->IsAxiomaticClass (classID);
-#endif // #else // #if USE_AAFOBJECT_MODEL
 }
 
 
@@ -625,9 +528,7 @@ ImplAAFDictionary::pvtLookupAxiomaticClassDef (const aafUID_t &classID,
 										   ImplAAFClassDef **
 										   ppClassDef)
 {
-#if USE_AAFOBJECT_MODEL
-
-  *ppClassDef = findAxiomaticClassDefinition(classID); // return value NOT reference counted!
+  *ppClassDef = metaDictionary()->findAxiomaticClassDefinition(classID); // return value NOT reference counted!
   if (*ppClassDef)
   {
     (*ppClassDef)->AcquireReference(); // We will be returning this references!
@@ -637,20 +538,6 @@ ImplAAFDictionary::pvtLookupAxiomaticClassDef (const aafUID_t &classID,
   {
     return false;
   }
-
-#else // #if USE_AAFOBJECT_MODEL
-
-  if (_pBuiltinClasses->IsAxiomaticClass (classID))
-	{
-	  // It's axiomatic.
-	  assert (ppClassDef);
-	  *ppClassDef = _pBuiltinClasses->LookupAxiomaticClass (classID);
-	  assert (*ppClassDef); // reference count already incremented by LookupAxiomaticClass.
-	  return true;
-	}
-  return false;
-
-#endif // #else // #if USE_AAFOBJECT_MODEL
 }
 
 
@@ -715,7 +602,7 @@ AAFRESULT STDMETHODCALLTYPE
 					 parent->ReleaseReference();
 				  }
 				  (*ppClassDef)->SetBootstrapParent(NULL);
-				  status = RegisterClassDef(*ppClassDef);
+				  status = PvtRegisterClassDef(*ppClassDef);
 				  assert (AAFRESULT_SUCCEEDED (status));
 			  }
 		  }
@@ -755,7 +642,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // Yup, found it in builtins.  Register it.
   assert (*ppClassDef);
-  status = RegisterClassDef (*ppClassDef);
+  status = PvtRegisterClassDef (*ppClassDef);
   if (AAFRESULT_FAILED (status))
 	return status;
 		  
@@ -783,6 +670,17 @@ AAFRESULT STDMETHODCALLTYPE
   return (metaDictionary()->HasForwardClassReference(classId, pResult));
 }
 
+
+// Private class registration. This version does not perform any
+// initialization that requires other classes, types or properties or
+// types to be in the dictionary...it only adds the given class
+// to the set in the dictionary.
+AAFRESULT ImplAAFDictionary::PvtRegisterClassDef(ImplAAFClassDef * pClassDef)
+{
+  assert (_defRegistrationAllowed);
+  // Defer to the meta dictionary.
+  return (metaDictionary()->PvtRegisterClassDef(pClassDef));
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterClassDef (
@@ -840,81 +738,13 @@ bool ImplAAFDictionary::PvtIsTypePresent (
   return(metaDictionary()->containsType(typeID));
 }
 
-/*static*/
-const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] = 
-{
-  & kAAFTypeID_AUID,
-  & kAAFTypeID_AUIDArray,
-  & kAAFTypeID_Boolean,
-  & kAAFTypeID_Character,
-  & kAAFTypeID_DateStruct,
-  & kAAFTypeID_TimeStruct,
-  & kAAFTypeID_Int16,
-  & kAAFTypeID_Int32,
-  & kAAFTypeID_Int64,
-  & kAAFTypeID_Int64Array,
-  & kAAFTypeID_Int8,
-  & kAAFTypeID_Character,
-  & kAAFTypeID_String,
-  & kAAFTypeID_TimeStamp,
-  & kAAFTypeID_UInt16,
-  & kAAFTypeID_UInt32,
-  & kAAFTypeID_UInt8,
-  & kAAFTypeID_UInt8Array8,
-  & kAAFTypeID_Indirect,
-  & kAAFTypeID_Opaque,
-  & kAAFTypeID_Stream,
-  & kAAFTypeID_VersionType,
-  & kAAFTypeID_RGBAComponent,
-  & kAAFTypeID_MobID,
-  & kAAFTypeID_DataValue,
-  & kAAFTypeID_CategoryType,
-
-  & kAAFTypeID_ClassDefinitionStrongReference,
-  & kAAFTypeID_ClassDefinitionStrongReferenceSet,
-  & kAAFTypeID_ClassDefinitionWeakReference,
-  & kAAFTypeID_CodecDefinitionStrongReference,
-  & kAAFTypeID_CodecDefinitionStrongReferenceSet,
-  & kAAFTypeID_ContainerDefinitionStrongReference,
-  & kAAFTypeID_ContainerDefinitionStrongReferenceSet,
-  & kAAFTypeID_DataDefinitionStrongReference,
-  & kAAFTypeID_DataDefinitionStrongReferenceSet,
-  & kAAFTypeID_DataDefinitionWeakReference,
-  & kAAFTypeID_DataDefinitionWeakReferenceSet,
-  & kAAFTypeID_DefinitionObjectWeakReference,
-  & kAAFTypeID_InterpolationDefinitionStrongReference,
-  & kAAFTypeID_InterpolationDefinitionStrongReferenceSet,
-  & kAAFTypeID_LocatorStrongReference,
-  & kAAFTypeID_MobStrongReferenceSet,
-  & kAAFTypeID_NetworkLocatorStrongReference,
-  & kAAFTypeID_OperationDefinitionStrongReference,
-  & kAAFTypeID_OperationDefinitionStrongReferenceSet,
-  & kAAFTypeID_OperationDefinitionWeakReference,
-  & kAAFTypeID_OperationDefinitionWeakReferenceVector,
-  & kAAFTypeID_ParameterDefinitionStrongReference,
-  & kAAFTypeID_ParameterDefinitionStrongReferenceSet,
-  & kAAFTypeID_ParameterDefinitionWeakReference,
-  & kAAFTypeID_ParameterDefinitionWeakReferenceSet,
-  & kAAFTypeID_PluginDefinitionStrongReference,
-  & kAAFTypeID_PluginDefinitionStrongReferenceSet,
-  & kAAFTypeID_PluginDefinitionWeakReference,
-  & kAAFTypeID_PluginDefinitionWeakReferenceSet,
-  & kAAFTypeID_PropertyDefinitionStrongReference,
-  & kAAFTypeID_PropertyDefinitionStrongReferenceSet,
-  & kAAFTypeID_TypeDefinitionStrongReference,
-  & kAAFTypeID_TypeDefinitionStrongReferenceSet,
-  & kAAFTypeID_TypeDefinitionWeakReference,
-  & kAAFTypeID_TypeDefinitionWeakReferenceVector
-};
 
 bool
 ImplAAFDictionary::pvtLookupAxiomaticTypeDef (const aafUID_t &typeID,
 										   ImplAAFTypeDef **
 										   ppTypeDef)
 {
-#if USE_AAFOBJECT_MODEL
-
-  *ppTypeDef = findAxiomaticTypeDefinition(typeID); // return value NOT reference counted!
+  *ppTypeDef = metaDictionary()->findAxiomaticTypeDefinition(typeID); // return value NOT reference counted!
   if (*ppTypeDef)
   {
     (*ppTypeDef)->AcquireReference (); // We will be returning this references!
@@ -924,56 +754,6 @@ ImplAAFDictionary::pvtLookupAxiomaticTypeDef (const aafUID_t &typeID,
   {
     return false;
   }
-
-#else // #if USE_AAFOBJECT_MODEL
-
-  static const aafUInt32 ksNumAxiomaticTypes
-	= sizeof (sAxiomaticTypeGuids) / sizeof (sAxiomaticTypeGuids[0]);
-
-  if (! _axiomaticTypes)
-	{
-	  _axiomaticTypes = new ImplAAFTypeDefSP [ksNumAxiomaticTypes];
-	  for (aafUInt32 i = 0; i < ksNumAxiomaticTypes; i++)
-		_axiomaticTypes[i] = 0;
-	}
-  assert (_axiomaticTypes);
-
-  for (aafUInt32 i = 0; i < ksNumAxiomaticTypes; i++)
-	{
-	  if (EqualAUID (&typeID, sAxiomaticTypeGuids[i]))
-		{
-		  // It's axiomatic.  
-		  if (! _axiomaticTypes[i])
-			{
-			  // We haven't allocated one yet.
-			  AAFRESULT hr;
-			  ImplAAFTypeDefSP tmp;
-			  hr = _pBuiltinTypes-> NewBuiltinTypeDef (typeID, &tmp);
-			  assert (AAFRESULT_SUCCEEDED (hr));
-
-			  // In the case where a type is aliased
-			  // (e.g. TypeDefWeakRef is aliased to TypeDefAUID) then
-			  // in the process of making the referring type, the
-			  // ref'd type may already be created.  Check to make
-			  // sure that it didn't get created in the process.  If
-			  // so, then simply throw the new one away (currently in
-			  // tmp).
-			  if (! _axiomaticTypes[i])
-				_axiomaticTypes[i] = tmp;
-
-			 assert (_axiomaticTypes[i]);
-			}
-		  assert (_axiomaticTypes[i]);
-		  assert (ppTypeDef);
-		  *ppTypeDef = _axiomaticTypes[i];
-		  (*ppTypeDef)->AcquireReference ();
-		  return true;
-		}
-	}
-  return false;
-
-#endif // #else // #if USE_AAFOBJECT_MODEL
-
 }
 
 
@@ -1154,6 +934,9 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (hr != AAFRESULT_SUCCESS) {
     // This type is not yet registered, add it to the dictionary.
+    // first making sure it's being used somewhere else.
+    if (pDataDef->attached())
+	return AAFRESULT_OBJECT_ALREADY_ATTACHED;
     _dataDefinitions.appendValue(pDataDef);
     pDataDef->AcquireReference();
     // Set up the (non-persistent) dictionary pointer.
@@ -1220,7 +1003,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFDataDef>(_dataDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFDataDefs,this,iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1230,7 +1013,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1259,6 +1041,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (NULL == pOperationDef)
 		return AAFRESULT_NULL_PARAM;
+
+	if (pOperationDef->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_operationDefinitions.appendValue(pOperationDef);
 	// trr - We are saving a copy of pointer in _pluginDefinitions
@@ -1312,7 +1097,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFOperationDef>(_operationDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFOperationDefs, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1322,7 +1107,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1405,7 +1189,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef>(_parameterDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFParameterDefs, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1415,7 +1199,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1442,6 +1225,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (NULL == pPlugDef)
 		return AAFRESULT_NULL_PARAM;
+
+	if (pPlugDef->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_codecDefinitions.appendValue(pPlugDef);
 	// trr - We are saving a copy of pointer in _pluginDefinitions
@@ -1508,7 +1294,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFCodecDef>(_codecDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFCodecDefs,this,iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1518,7 +1304,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1546,6 +1331,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (NULL == pPlugDef)
 		return AAFRESULT_NULL_PARAM;
+
+	if (pPlugDef->attached())
+		return AAFRESULT_OBJECT_NOT_FOUND;
 
 	_containerDefinitions.appendValue(pPlugDef);
 	// trr - We are saving a copy of pointer in _pluginDefinitions
@@ -1611,7 +1399,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFContainerDef>(_containerDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFContainerDefs,this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1621,7 +1409,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1758,8 +1545,6 @@ void ImplAAFDictionary::InitBuiltins()
   containerDef = NULL;
 
 
-  _pBuiltinClasses;
-
   AssureClassPropertyTypes ();
 }
 
@@ -1795,6 +1580,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (NULL == pInterpolationDef)
 		return AAFRESULT_NULL_PARAM;
+
+	if (pInterpolationDef->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_interpolationDefinitions.appendValue(pInterpolationDef);
 	// trr - We are saving a copy of pointer in _pluginDefinitions
@@ -1848,7 +1636,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFInterpolationDef>(_interpolationDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFInterpolationDefs,this,iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1858,7 +1646,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1885,6 +1672,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (NULL == pDesc)
 		return AAFRESULT_NULL_PARAM;
+
+	if (pDesc->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_pluginDefinitions.appendValue(pDesc);
 	// trr - We are saving a copy of pointer in _pluginDefinitions
@@ -1938,7 +1728,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDef>(_pluginDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFPluginDefs, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1948,7 +1738,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -2011,7 +1800,6 @@ AAFRESULT ImplAAFDictionary::PvtIsPropertyDefDuplicate(
 			classEnum->ReleaseReference();
 			classEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 
@@ -2123,6 +1911,9 @@ void ImplAAFDictionary::pvtAttemptBuiltinSizeRegistration
 void ImplAAFDictionary::AssurePropertyTypes (ImplAAFClassDef * pcd)
 {
   assert (pcd);
+// All axiomatic definitions have already been loaded all other 
+// property and types can be loaded "lazily" if necessary.
+// Why do we need this stuff??? transdel 2000-DEC-20
   if (_OKToAssurePropTypes)
 	{
 	  pcd->AssurePropertyTypesLoaded ();
@@ -2140,9 +1931,6 @@ void ImplAAFDictionary::AssureClassPropertyTypes ()
 
   hr = GetClassDefs (&enumClassDefs);
   assert (AAFRESULT_SUCCEEDED (hr));
-
-  // do axiomatic classes
-  _pBuiltinClasses->AssurePropertyTypes ();
 
   // do registered (normal) classes
   while (AAFRESULT_SUCCEEDED
@@ -2179,17 +1967,12 @@ void ImplAAFDictionary::InitializeMetaDefinitions(void)
 {
   if (!_metaDefinitionsInitialized)
   {
+    _metaDefinitionsInitialized = true;
+
       //
       // TEMPORARY:
       // Initialize the built-in types and classes if necessary.
       //
-#if USE_AAFOBJECT_MODEL
-      // Experimental: Create and initialize all of the axiomatic definitions.
-      // This must be done before another other definitions or data objects
-      // can be created.
-      AAFRESULT result = InstantiateAxiomaticDefinitions();
-      assert(AAFRESULT_SUCCEEDED(result));
-#endif // #if USE_AAFOBJECT_MODEL
 
     if (!_pBuiltinTypes)
       _pBuiltinTypes   = new ImplAAFBuiltinTypes (this);
@@ -2199,170 +1982,746 @@ void ImplAAFDictionary::InitializeMetaDefinitions(void)
       _pBuiltinClasses = new ImplAAFBuiltinClasses (this);
     assert (_pBuiltinClasses);
 
-    _metaDefinitionsInitialized = true;
   }
 }
 
-//
-// Meta definition factory methods:
-//
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDictionary::CreateClassDef (
-      aafUID_constref classID,
-      aafCharacter_constptr pClassName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pParentClass,
-      ImplAAFClassDef **ppNewClass)
+
+
+/*************************************************************************
+    aafLookupTypeDef()
+
+	This helper function searches for specified type definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_typedef	- type definition to look for.
+
+    Returns:
+	kAAFTrue - type definition found in given objects dictionary.
+	kAAFFalse - type def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupTypeDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFTypeDef		*p_typedef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateClassDef(classID, pClassName, pDescription, pParentClass, ppNewClass));
+    assert( p_holder );
+    assert( p_typedef );
+
+    AAFRESULT		hr = AAFRESULT_TYPE_NOT_FOUND; // Important init.
+    aafUID_t		typedef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the type def we're looking for.
+    p_typedef->GetAUID( &typedef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFTypeDef		*p_tmp_typedef = NULL;
+
+	hr = p_dict->LookupTypeDef( typedef_id, &p_tmp_typedef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_typedef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefVariableArray (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefVariableArray ** ppNewVariableArray)
+
+/*************************************************************************
+    aafLookupOperationDef()
+
+	This helper function searches for specified operation definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_operdef	- operation definition to look for.
+
+    Returns:
+	kAAFTrue - operation definition found in given objects dictionary.
+	kAAFFalse - operation def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupOperationDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFOperationDef		*p_operdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefVariableArray(typeID, pTypeName, pDescription, pElementType, ppNewVariableArray));
+    assert( p_holder );
+    assert( p_operdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		operdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the operation def we're looking for.
+    p_operdef->GetAUID( &operdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFOperationDef		*p_tmp_operdef = NULL;
+
+	hr = p_dict->LookupOperationDef( operdef_id, &p_tmp_operdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_operdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefFixedArray (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      aafUInt32  nElements,
-      ImplAAFTypeDefFixedArray **pNewFixedArray)
+
+/*************************************************************************
+    aafLookupParameterDef()
+
+	This helper function searches for specified parameter definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_paramdef	- parameter definition to look for.
+
+    Returns:
+	kAAFTrue - parameter definition found in given objects dictionary.
+	kAAFFalse - parameter def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupParameterDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFParameterDef		*p_paramdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefFixedArray(typeID, pTypeName, pDescription, pElementType, nElements, pNewFixedArray));
+    assert( p_holder );
+    assert( p_paramdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		paramdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the parameter def we're looking for.
+    p_paramdef->GetAUID( &paramdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFParameterDef		*p_tmp_paramdef = NULL;
+
+	hr = p_dict->LookupParameterDef( paramdef_id, &p_tmp_paramdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_paramdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDictionary::CreateTypeDefRecord (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef ** ppMemberTypes,
-      aafCharacter_constptr * pMemberNames,
-      aafUInt32 numMembers,
-      ImplAAFTypeDefRecord ** ppNewRecord)
+
+/*************************************************************************
+    aafLookupClassDef()
+
+	This helper function searches for specified class definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_classdef	- class definition to look for.
+
+    Returns:
+	kAAFTrue - class definition found in given objects dictionary.
+	kAAFFalse - class def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupClassDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFClassDef		*p_classdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefRecord(typeID, pTypeName, pDescription, ppMemberTypes, pMemberNames, numMembers, ppNewRecord));
+    assert( p_holder );
+    assert( p_classdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		classdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the class def we're looking for.
+    p_classdef->GetAUID( &classdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFClassDef		*p_tmp_classdef = NULL;
+
+	hr = p_dict->LookupClassDef( classdef_id, &p_tmp_classdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_classdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDictionary::CreateTypeDefRename (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pBaseType,
-      ImplAAFTypeDefRename ** ppNewRename)
+
+/*************************************************************************
+    aafLookupDataDef()
+
+	This helper function searches for specified data definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_datadef	- data definition to look for.
+
+    Returns:
+	kAAFTrue - data definition found in given objects dictionary.
+	kAAFFalse - data def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupDataDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFDataDef		*p_datadef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefRename(typeID, pTypeName, pDescription, pBaseType, ppNewRename));
+    assert( p_holder );
+    assert( p_datadef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		datadef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the data def we're looking for.
+    p_datadef->GetAUID( &datadef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFDataDef		*p_tmp_datadef = NULL;
+
+	hr = p_dict->LookupDataDef( datadef_id, &p_tmp_datadef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_datadef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefString (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefString ** ppNewString)
+
+/*************************************************************************
+    aafLookupCodecDef()
+
+	This helper function searches for specified codec definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_codecdef	- codec definition to look for.
+
+    Returns:
+	kAAFTrue - codec definition found in given objects dictionary.
+	kAAFFalse - codec def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupCodecDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFCodecDef		*p_codecdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefString(typeID, pTypeName, pDescription, pElementType, ppNewString));
+    assert( p_holder );
+    assert( p_codecdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		codecdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the codec def we're looking for.
+    p_codecdef->GetAUID( &codecdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFCodecDef		*p_tmp_codecdef = NULL;
+
+	hr = p_dict->LookupCodecDef( codecdef_id, &p_tmp_codecdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_codecdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefStrongObjRef (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pTargetObjType,
-      ImplAAFTypeDefStrongObjRef ** ppNewStrongObjRef)
+
+/*************************************************************************
+    aafLookupContainerDef()
+
+	This helper function searches for specified container definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_containerdef	- container definition to look for.
+
+    Returns:
+	kAAFTrue - container definition found in given objects dictionary.
+	kAAFFalse - container def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupContainerDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFContainerDef		*p_containerdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefStrongObjRef(typeID, pTypeName, pDescription, pTargetObjType, ppNewStrongObjRef));
+    assert( p_holder );
+    assert( p_containerdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		containerdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the container def we're looking for.
+    p_containerdef->GetAUID( &containerdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFContainerDef		*p_tmp_containerdef = NULL;
+
+	hr = p_dict->LookupContainerDef( containerdef_id, &p_tmp_containerdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_containerdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefWeakObjRef (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFClassDef * pTargetObjType,
-      aafUID_constptr * pTargetHint,
-      aafUInt32 targetHintCount,
-      ImplAAFTypeDefWeakObjRef ** ppNewWeakObjRef)
+
+/*************************************************************************
+    aafLookupInterpolationDef()
+
+	This helper function searches for specified interpolation definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_interpoldef	- interpolation definition to look for.
+
+    Returns:
+	kAAFTrue - interpolation definition found in given objects dictionary.
+	kAAFFalse - interpolation def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupInterpolationDef( 
+    ImplAAFObject	*p_holder,
+    ImplAAFInterpolationDef		*p_interpoldef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefWeakObjRef(typeID, pTypeName, pDescription, pTargetObjType, pTargetHint, targetHintCount, ppNewWeakObjRef));
+    assert( p_holder );
+    assert( p_interpoldef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		interpoldef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the interpolation def we're looking for.
+    p_interpoldef->GetAUID( &interpoldef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFInterpolationDef		*p_tmp_interpoldef = NULL;
+
+	hr = p_dict->LookupInterpolationDef( interpoldef_id, &p_tmp_interpoldef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_interpoldef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefStrongObjRefVector (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewStrongObjRefVector)
+
+/****/
+/*************************************************************************
+    aafLookupTypeDef()
+
+	This helper function searches for specified type definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_typedef	- type definition to look for.
+
+    Returns:
+	kAAFTrue - type definition found in given objects dictionary.
+	kAAFFalse - type def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupTypeDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFTypeDef		*p_typedef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefStrongObjRefVector(typeID, pTypeName, pDescription, pStrongObjRef, ppNewStrongObjRefVector));
+    assert( p_holder );
+    assert( p_typedef );
+
+    AAFRESULT		hr = AAFRESULT_TYPE_NOT_FOUND; // Important init.
+    aafUID_t		typedef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the type def we're looking for.
+    p_typedef->GetAUID( &typedef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFTypeDef		*p_tmp_typedef = NULL;
+
+	hr = p_dict->LookupTypeDef( typedef_id, &p_tmp_typedef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_typedef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefWeakObjRefVector (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefVariableArray ** ppNewWeakObjRefVector)
+
+/*************************************************************************
+    aafLookupOperationDef()
+
+	This helper function searches for specified operation definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_operdef	- operation definition to look for.
+
+    Returns:
+	kAAFTrue - operation definition found in given objects dictionary.
+	kAAFFalse - operation def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupOperationDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFOperationDef		*p_operdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefWeakObjRefVector(typeID, pTypeName, pDescription, pWeakObjRef, ppNewWeakObjRefVector));
+    assert( p_holder );
+    assert( p_operdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		operdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the operation def we're looking for.
+    p_operdef->GetAUID( &operdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFOperationDef		*p_tmp_operdef = NULL;
+
+	hr = p_dict->LookupOperationDef( operdef_id, &p_tmp_operdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_operdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefStrongObjRefSet (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
-      ImplAAFTypeDefSet ** ppNewStrongObjRefSet)
+
+/*************************************************************************
+    aafLookupParameterDef()
+
+	This helper function searches for specified parameter definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_paramdef	- parameter definition to look for.
+
+    Returns:
+	kAAFTrue - parameter definition found in given objects dictionary.
+	kAAFFalse - parameter def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupParameterDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFParameterDef		*p_paramdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefStrongObjRefSet(typeID, pTypeName, pDescription, pStrongObjRef, ppNewStrongObjRefSet));
+    assert( p_holder );
+    assert( p_paramdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		paramdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the parameter def we're looking for.
+    p_paramdef->GetAUID( &paramdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFParameterDef		*p_tmp_paramdef = NULL;
+
+	hr = p_dict->LookupParameterDef( paramdef_id, &p_tmp_paramdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_paramdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-   ImplAAFDictionary::CreateTypeDefWeakObjRefSet (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
-      ImplAAFTypeDefSet ** ppNewWeakObjRefSet)
+
+/*************************************************************************
+    aafLookupClassDef()
+
+	This helper function searches for specified class definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_classdef	- class definition to look for.
+
+    Returns:
+	kAAFTrue - class definition found in given objects dictionary.
+	kAAFFalse - class def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupClassDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFClassDef		*p_classdef )
 {
-  // Defer to the meta dictionary.
-  return(metaDictionary()->CreateTypeDefWeakObjRefSet(typeID, pTypeName, pDescription, pWeakObjRef, ppNewWeakObjRefSet));
+    assert( p_holder );
+    assert( p_classdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		classdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the class def we're looking for.
+    p_classdef->GetAUID( &classdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFClassDef		*p_tmp_classdef = NULL;
+
+	hr = p_dict->LookupClassDef( classdef_id, &p_tmp_classdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_classdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
 }
+
+
+
+/*************************************************************************
+    aafLookupDataDef()
+
+	This helper function searches for specified data definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_datadef	- data definition to look for.
+
+    Returns:
+	kAAFTrue - data definition found in given objects dictionary.
+	kAAFFalse - data def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupDataDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFDataDef		*p_datadef )
+{
+    assert( p_holder );
+    assert( p_datadef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		datadef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the data def we're looking for.
+    p_datadef->GetAUID( &datadef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFDataDef		*p_tmp_datadef = NULL;
+
+	hr = p_dict->LookupDataDef( datadef_id, &p_tmp_datadef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_datadef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
+}
+
+
+
+/*************************************************************************
+    aafLookupCodecDef()
+
+	This helper function searches for specified codec definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_codecdef	- codec definition to look for.
+
+    Returns:
+	kAAFTrue - codec definition found in given objects dictionary.
+	kAAFFalse - codec def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupCodecDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFCodecDef		*p_codecdef )
+{
+    assert( p_holder );
+    assert( p_codecdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		codecdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the codec def we're looking for.
+    p_codecdef->GetAUID( &codecdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFCodecDef		*p_tmp_codecdef = NULL;
+
+	hr = p_dict->LookupCodecDef( codecdef_id, &p_tmp_codecdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_codecdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
+}
+
+
+
+/*************************************************************************
+    aafLookupContainerDef()
+
+	This helper function searches for specified container definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_containerdef	- container definition to look for.
+
+    Returns:
+	kAAFTrue - container definition found in given objects dictionary.
+	kAAFFalse - container def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupContainerDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFContainerDef		*p_containerdef )
+{
+    assert( p_holder );
+    assert( p_containerdef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		containerdef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the container def we're looking for.
+    p_containerdef->GetAUID( &containerdef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFContainerDef		*p_tmp_containerdef = NULL;
+
+	hr = p_dict->LookupContainerDef( containerdef_id, &p_tmp_containerdef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_containerdef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
+}
+
+
+
+/*************************************************************************
+    aafLookupInterpolationDef()
+
+	This helper function searches for specified interpolation definition in 
+	given object's dictionary.
+
+    Inputs:
+	p_holder	- definition object to look in.
+	p_interpoldef	- interpolation definition to look for.
+
+    Returns:
+	kAAFTrue - interpolation definition found in given objects dictionary.
+	kAAFFalse - interpolation def is not in a dictionary.
+ *************************************************************************/
+aafBoolean_t aafLookupInterpolationDef( 
+    ImplAAFMetaDefinition	*p_holder,
+    ImplAAFInterpolationDef		*p_interpoldef )
+{
+    assert( p_holder );
+    assert( p_interpoldef );
+
+    AAFRESULT		hr = AAFRESULT_OBJECT_NOT_FOUND; // Important init.
+    aafUID_t		interpoldef_id;
+    ImplAAFDictionary	*p_dict = NULL;
+
+
+    // Get UID of the interpolation def we're looking for.
+    p_interpoldef->GetAUID( &interpoldef_id );
+
+    if( p_holder->GetDictionary( &p_dict ) == AAFRESULT_SUCCESS )
+    {
+	ImplAAFInterpolationDef		*p_tmp_interpoldef = NULL;
+
+	hr = p_dict->LookupInterpolationDef( interpoldef_id, &p_tmp_interpoldef );
+	if( hr == AAFRESULT_SUCCESS )
+	    p_tmp_interpoldef->ReleaseReference();
+
+	p_dict->ReleaseReference();
+    }
+
+
+    return (hr == AAFRESULT_SUCCESS ? kAAFTrue : kAAFFalse);
+}
+
+
+
