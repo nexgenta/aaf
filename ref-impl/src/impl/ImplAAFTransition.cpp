@@ -25,6 +25,8 @@
  *
  ************************************************************************/
 
+
+
 #ifndef __ImplAAFOperationGroup_h__
 #include "ImplAAFOperationGroup.h"
 #endif
@@ -169,6 +171,5 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFTransition, AUID_AAFTransition);
 
 

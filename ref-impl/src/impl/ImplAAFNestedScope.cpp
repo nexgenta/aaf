@@ -25,6 +25,8 @@
  *
  ************************************************************************/
 
+
+
 /*************************************************************************
  * 
  * @class AAFNestedScope | an AAFNestedScope object defines a scope that 
@@ -151,6 +153,5 @@ AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafUID_t *from, aafUID_t
 
 
 
-OMDEFINE_STORABLE(ImplAAFNestedScope, AUID_AAFNestedScope);
 
 
