@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -56,7 +56,10 @@
 extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefString::ImplAAFTypeDefString ()
-  : _ElementType  ( PID_TypeDefinitionString_ElementType,  "ElementType")
+  : _ElementType  ( PID_TypeDefinitionString_ElementType,
+                    L"ElementType",
+                    L"/MetaDictionary/TypeDefinitions", 
+                    PID_MetaDefinition_Identification)
 {
   _persistentProperties.put(_ElementType.address());
 }
@@ -77,11 +80,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsStringable())
 	return AAFRESULT_BAD_TYPE;
 
-  aafUID_t typeId;
-  AAFRESULT hr = pTypeDef->GetAUID(&typeId);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  return pvtInitialize (id, typeId, pTypeName);
+  return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
 
@@ -89,19 +88,18 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::pvtInitialize (
       const aafUID_t & id,
-	  const aafUID_t & typeId,
+      const ImplAAFTypeDef * pTypeDef,
       const aafCharacter * pTypeName)
 {
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
-  hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (id);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
-  _ElementType = typeId;
+  _ElementType = pTypeDef;
 
   return AAFRESULT_SUCCESS;
 }
@@ -112,30 +110,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::GetType (
       ImplAAFTypeDef ** ppTypeDef) const
 {
-  if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
+  if (! ppTypeDef)
+	return AAFRESULT_NULL_PARAM;
 
-  if (!_cachedBaseType)
-	{
-	  ImplAAFDictionarySP pDict;
+   if(_ElementType.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFTypeDef *pTypeDef = _ElementType;
 
-	  AAFRESULT hr;
-	  hr = GetDictionary(&pDict);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pDict);
-
-	  ImplAAFTypeDefString * pNonConstThis =
-		  (ImplAAFTypeDefString *) this;
-	  hr = pDict->LookupTypeDef (_ElementType, &pNonConstThis->_cachedBaseType);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (_cachedBaseType);
-	}
-  assert (ppTypeDef);
-  *ppTypeDef = _cachedBaseType;
+  *ppTypeDef = pTypeDef;
   assert (*ppTypeDef);
   (*ppTypeDef)->AcquireReference ();
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -155,7 +139,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED(hr)) return hr;
   assert (ptd);
   assert (ptd->IsFixedSize());
-  aafUInt32 elemSize = ptd->PropValSize();
+  aafUInt32 elemSize = ptd->NativeSize();
   aafUInt32 propSize;
   assert (pPropVal);
 
@@ -197,6 +181,10 @@ AAFRESULT STDMETHODCALLTYPE
   assert (1 == refCount);
 
   AAFRESULT hr;
+  hr = pvd->Initialize(this);
+  if (! AAFRESULT_SUCCEEDED (hr))
+	return hr;
+
   hr = SetCString (pvd, pInitData, initDataSize);
   if (AAFRESULT_FAILED (hr))
 	return hr;
@@ -229,6 +217,7 @@ AAFRESULT STDMETHODCALLTYPE
   hr = GetType (&pBaseType);
 
   assert (pBaseType->IsFixedSize ());
+  pBaseType->AttemptBuiltinRegistration ();
   assert (pBaseType->IsRegistered ());
   // Size of individual elements
   aafUInt32 elemSize = pBaseType->NativeSize ();
@@ -260,12 +249,128 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+template <class T1, class T2>
+aafBoolean_t  AreUnksSame(T1& cls1, T2& cls2)
+{
+	IUnknown	*pUnk1=NULL, *pUnk2=NULL;
+	
+	pUnk1 = static_cast<IUnknown *> (cls1->GetContainer());
+	assert (pUnk1);
+
+	pUnk2 = static_cast<IUnknown *> (cls2->GetContainer());
+	assert (pUnk2);
+	
+	if (pUnk1 == pUnk2)
+		return kAAFTrue;
+	else
+		return kAAFFalse;
+
+}
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefString::AppendElements (
-      ImplAAFPropertyValue * /*pInPropVal*/,
-      aafMemPtr_t  /*pElements*/)
+      ImplAAFPropertyValue * pInPropVal,
+      aafMemPtr_t  pElements)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (! pInPropVal)
+		return AAFRESULT_NULL_PARAM;
+	
+	if (! pElements)
+		return AAFRESULT_NULL_PARAM;
+	
+	if (! IsRegistered ())
+		return AAFRESULT_NOT_REGISTERED;
+	
+	AAFRESULT hr;
+	
+	ImplAAFTypeDefSP  pIncomingType;
+	hr = GetType (&pIncomingType);
+	
+	ImplAAFTypeDefSP  pBaseType;
+	hr = GetType (&pBaseType);
+	
+	//compare types ... make sure there're the same
+	if (!AreUnksSame(pIncomingType, pBaseType))
+		return AAFRESULT_ILLEGAL_VALUE;
+	
+	//do the size thing ...
+	
+	assert (pBaseType->IsFixedSize ());
+	pBaseType->AttemptBuiltinRegistration ();
+	assert (pBaseType->IsRegistered ());
+	// Size of individual elements
+	aafUInt32 elementSize = pBaseType->NativeSize ();
+	
+	// Get the current size of the property
+    aafUInt32 originalDataSize;
+	
+	ImplAAFPropValDataSP pvd;
+	pvd = dynamic_cast<ImplAAFPropValData *>(pInPropVal);
+	assert (pvd);
+	hr = pvd->GetBitsSize (&originalDataSize);
+	
+	//get the data
+	aafMemPtr_t pOriginalData = NULL;
+	hr = pvd->GetBits (&pOriginalData);
+	assert(hr == AAFRESULT_SUCCESS);
+		
+	/////
+	//Now, find out what additional size we need based on the new data coming in.
+	
+	//first, see how many elements we have
+	aafMemPtr_t pNewData = pElements;
+	
+	aafUInt32 newElemCount =0;
+	
+	//outer loop of the entire memory buffer passed in ...
+	while (pNewData)
+	{
+		aafUInt32 count_of_zeroes = 0;
+
+		//inner loop - chunking in size of elementSize
+		for (aafUInt32 i=0; i<elementSize; i++, pNewData++)
+			if (*pNewData == 0)
+				count_of_zeroes++;
+		
+		if (count_of_zeroes == elementSize)
+			//we have a null! ... done!
+			break;
+		
+		//otherwise, increment new element count, and move on
+		newElemCount++;
+		
+	}//while
+	
+	
+	//At this point, our newElemCount holds a count of new elements to be added 
+	//and the new size of bits is:
+	aafUInt32 newsize = (newElemCount+1/*don't forget EOS*/) * elementSize;
+	
+	//Add this "newsize" to the original originalDataSize to get the new Total buffer size
+	aafUInt32 TotalSize = originalDataSize + newsize;
+	
+	//Save the orginal buffer, before we re-allocate
+	aafMemPtr_t tmp_buffer = new aafUInt8[originalDataSize+1];
+	memcpy(tmp_buffer, pOriginalData, originalDataSize);
+	
+	//Allocate the grand total # of bits (orginal + the new stuff) ...
+	aafMemPtr_t pBits = 0;
+	hr = pvd->AllocateBits (TotalSize, &pBits);
+	if (AAFRESULT_FAILED (hr))
+		return hr;
+	assert (pBits);
+	
+	//copy over the first part
+	memcpy (pBits, tmp_buffer, originalDataSize);
+	pBits += originalDataSize;
+	
+	//copy over the second part
+	memcpy (pBits, pElements, newsize);
+	
+	//delete our tmp_buffer
+	delete [] tmp_buffer;
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -346,7 +451,7 @@ void ImplAAFTypeDefString::reorder(OMByte* externalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::externalSize(OMByte* internalBytes,
+size_t ImplAAFTypeDefString::externalSize(OMByte* /*internalBytes*/,
 										  size_t internalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
@@ -375,11 +480,9 @@ void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
   assert (ptd->IsFixedSize ());
   aafUInt32 extElemSize = ptd->PropValSize ();
   aafUInt32 intElemSize = ptd->NativeSize ();
-  // aafUInt32 intElemSize = ptd->NativeSize ();
-  // aafUInt32 extElemSize = ptd->PropValSize ();
   aafUInt32 numElems = internalBytesSize / intElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafInt32 intNumBytesLeft = internalBytesSize;
+  aafInt32 extNumBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
 
   for (elem = 0; elem < numElems; elem++)
@@ -399,7 +502,7 @@ void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::internalSize(OMByte* externalBytes,
+size_t ImplAAFTypeDefString::internalSize(OMByte* /*externalBytes*/,
 										  size_t externalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
@@ -431,8 +534,8 @@ void ImplAAFTypeDefString::internalize(OMByte* externalBytes,
   // aafUInt32 intElemSize = ptd->internalSize (0, 0);
   // aafUInt32 extElemSize = ptd->externalSize (0, 0);
   aafUInt32 numElems = externalBytesSize / extElemSize;
-  aafInt32 intNumBytesLeft = externalBytesSize;
-  aafInt32 extNumBytesLeft = internalBytesSize;
+  aafInt32 intNumBytesLeft = internalBytesSize;
+  aafInt32 extNumBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
 
   for (elem = 0; elem < numElems; elem++)
@@ -479,9 +582,9 @@ size_t ImplAAFTypeDefString::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefString::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefString::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
 
@@ -506,8 +609,7 @@ OMProperty * ImplAAFTypeDefString::pvtCreateOMPropertyMBS
 	  {
 	    // element is integral type
 	    aafUInt32 intSize;
-	    AAFRESULT hr;
-	    hr = ptdi->GetSize (&intSize);
+	    ptdi->GetSize (&intSize);
 	    switch (intSize)
 		  {
 		  case 1:
@@ -558,3 +660,25 @@ bool ImplAAFTypeDefString::IsVariableArrayable () const
 
 bool ImplAAFTypeDefString::IsStringable () const
 { return false; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefString::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefString));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefString::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefString::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
