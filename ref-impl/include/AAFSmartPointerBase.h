@@ -2,7 +2,7 @@
 #define __AAFSmartPointerBase_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSmartPointerBase.h,v 1.12 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: AAFSmartPointerBase.h,v 1.13 2004/10/21 17:12:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -207,7 +207,6 @@ AAFSmartPointerBase<ReferencedType, RefCountType>::
 {
   if (_rep)
 	{
-	  aafUInt32 refCnt =
 	  release (_rep);
 	  _rep = 0;
 	}
