@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -66,7 +66,6 @@
 
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
-#include "ImplAAFHeader.h"
 
 #include <assert.h>
 #include <string.h>
@@ -134,12 +133,11 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::Initialize(const aafUID_t & datadef,
+    ImplAAFOperationGroup::Initialize(ImplAAFDataDef * pDataDef,
 							 aafLength_t    length,
                              ImplAAFOperationDef* pOperationDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
-	ImplAAFHeader*			pHeader = NULL;
 	ImplAAFDictionary*		pDictionary = NULL;
 //	ImplAAFOperationDef*		pOldOperationDef = NULL;
 	aafUID_t				OperationDefAUID;
@@ -148,15 +146,15 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pOperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
+	if (pDataDef == NULL)
+		return AAFRESULT_NULL_PARAM;
+
 	XPROTECT()
 	{
-		// Get the Header and the dictionary objects for this file.
-		CHECK(pOperationDef->MyHeadObject(&pHeader));
-		CHECK(pHeader->GetDictionary(&pDictionary));
-		pHeader->ReleaseReference();
-		pHeader = NULL;
+		// Get the dictionary objects for this file.
+		CHECK(GetDictionary(&pDictionary));
 
-		CHECK(SetNewProps(length, datadef));
+		CHECK(SetNewProps(length, pDataDef));
 		CHECK(pOperationDef->GetAUID(&uid));
 		_operationDefinition = uid;
 		// Lookup the OperationGroup definition's AUID
@@ -172,9 +170,6 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
-		if(pHeader != NULL)
-		  pHeader->ReleaseReference();
-		pHeader = 0;
 		if(pDictionary)
 		  pDictionary->ReleaseReference();
 		pDictionary = 0;
@@ -193,7 +188,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	aafUID_t			defUID;
 	ImplAAFDictionary	*dict = NULL;
-	ImplAAFHeader		*head = NULL;
 
 	if(OperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -201,22 +195,16 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		defUID = _operationDefinition;
-		CHECK(MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
+		CHECK(GetDictionary(&dict));
 		CHECK(dict->LookupOperationDef(defUID, OperationDef));
 		dict->ReleaseReference();
 		dict = 0;
-		head->ReleaseReference();
-		head = 0;
 	}
 	XEXCEPT
 	{
 		if(dict != NULL)
 		  dict->ReleaseReference();
 		dict = 0;
-		if(head != NULL)
-		  head->ReleaseReference();
-		head = 0;
 	}
 	XEND;
 
