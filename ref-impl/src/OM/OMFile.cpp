@@ -249,7 +249,7 @@ OMFile* OMFile::openNewTransient(const OMClassFactory* factory,
 
   // Not yet implemented.
   //
-  ASSERT("Not yet implemented", false);
+  ASSERT("Unimplemented code not reached", false);
   return 0;
 }
 
@@ -262,7 +262,7 @@ bool OMFile::validSignature(const OMFileSignature& signature)
   TRACE("OMFile::validSignature");
   bool result;
 
-  if ((signature.Data2 == 0x4F4F) && (signature.Data3 == 0x4D4D)) {
+  if (signature.Data3 == 0x4D4F) { // "OM"
     result = true;
   } else {
     result = false;
@@ -270,34 +270,17 @@ bool OMFile::validSignature(const OMFileSignature& signature)
   return result;
 }
 
-  // @mfunc Initialize the Object Manager specific parts
-  //        (Data2 and Data3) of the OMFileSignature <p prototype>.
-  //   @parm A prototype (partially complete) OMFileSignature.
-  //   @rdesc The fully initialized OMFileSignature.
-OMFileSignature OMFile::initializeSignature(const OMFileSignature& prototype)
-{
-  TRACE("OMFile::initializeSignature");
-
-  PRECONDITION("Reserved fields zero",
-                           ((prototype.Data2 == 0) && (prototype.Data3 == 0)));
-
-  OMFileSignature result = prototype;
-  result.Data2 = 0x4F4F; // "OO"
-  result.Data3 = 0x4D4D; // "MM" 
-
-  POSTCONDITION("Valid signature", validSignature(result));
-  return result;
-}
-
   // @mfunc Save all changes made to the contents of this
   //        <c OMFile>. It is not possible to <mf OMFile::save>
   //        read-only or transient files.
-void OMFile::save(void)
+  //   @parm Client context for callbacks.
+void OMFile::save(void* clientContext)
 {
   TRACE("OMFile::save");
 
   if (_mode == modifyMode) {
-    _root->save();
+    _root->onSave(clientContext);
+    _root->save(clientContext);
   }
 }
 
@@ -314,7 +297,7 @@ void OMFile::saveAs(const wchar_t* fileName) const
   TRACE("OMFile::saveAs");
   PRECONDITION("Valid file name", validWideString(fileName));
 
-  ASSERT("Not yet implemented", false);
+  ASSERT("Unimplemented code not reached", false);
 }
 
   // @mfunc Discard all changes made to this <c OMFile> since the
@@ -323,7 +306,7 @@ void OMFile::revert(void)
 {
   TRACE("OMFile::revert");
 
-  ASSERT("Not yet implemented", false);
+  ASSERT("Unimplemented code not reached", false);
 }
 
   // @mfunc Restore the root <c OMStorable> object from this <c OMFile>.
