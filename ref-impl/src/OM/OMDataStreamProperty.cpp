@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.59.2.3 2004/07/22 18:46:24 tbingham Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.59.2.4 2004/07/23 16:22:42 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -152,8 +152,6 @@ OMUInt64 OMDataStreamProperty::position(void) const
   TRACE("OMDataStreamProperty::position");
 
   OMUInt64 result = stream()->position();
-
-  POSTCONDITION("Valid position", result <= size());
   return result;
 }
 
