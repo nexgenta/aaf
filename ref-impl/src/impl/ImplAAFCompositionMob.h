@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCompositionMob.h,v 1.18 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCompositionMob.h,v 1.19 2004/06/04 12:39:47 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -91,7 +91,7 @@ public:
   // METHOD NAME: GetMobKind()
   //
   // DESCRIPTION:
-  // @mfunc AAFRESULT | AAFMobPrivate | GetMobKind |
+  // @mfunc AAFRESULT | GetMobKind |
   // This method returns the kind of this mob.
   // 
   // Succeeds if all of the following are true:
