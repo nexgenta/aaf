@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFSourceClip.h"
 #include "ImplAAFSourceMob.h"
@@ -21,11 +39,15 @@
 #include <assert.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFEssenceGroup.h"
+#include "ImplAAFBuiltinDefs.h"
+
+#include "ImplAAFSmartPointer.h"
+typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
 
 extern "C" const aafClassID_t CLSID_AAFEssenceAccess;
 
@@ -53,7 +75,7 @@ ImplAAFMasterMob::Initialize ()
 // new slot in the Master Mob contains a Source Clip that specifies
 // the Source Mob in its source reference properties.
 //
-// The pDataDef parameter requires a data kind valid for a media
+// The dataDef parameter requires a data kind valid for a media
 // stream. Valid data kinds are:
 //
 // - DDEF_Picture
@@ -91,18 +113,18 @@ ImplAAFMasterMob::Initialize ()
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::AddMasterSlot (aafUID_t*			pDataDef,
+    ImplAAFMasterMob::AddMasterSlot (ImplAAFDataDef *   pDataDef,
 									 aafSlotID_t		sourceSlotID,
 									 ImplAAFSourceMob*	pSourceMob,
 									 aafSlotID_t		masterSlotID,
-									 aafWChar*			pSlotName)
+									 const aafWChar*	pSlotName)
 {
 	aafLength_t	slotLength;
-	aafUID_t	sourceMobID;
+	aafMobID_t	sourceMobID;
 	HRESULT		hr = AAFRESULT_SUCCESS;
 	ImplAAFMobSlot*	pMobSlot;
 	ImplAAFTimelineMobSlot* pTimelineMobSlot = NULL;
-	aafUID_t	DataDef;
+	aafUID_t	segDataDef;
 	ImplAAFSegment*	pSegment = NULL;
 	ImplAAFSourceClip*	pSrcClip = NULL;
 	aafSourceRef_t		ref;
@@ -112,13 +134,13 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFDictionary *pDictionary = NULL;
 
 
-	if (!pDataDef || !pSourceMob || !pSlotName)
+	if (!pSourceMob || !pSlotName)
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
 		// Get the slot length and mob id.  Verify that data kind
-		// of the slot is the same as pDataDef
+		// of the slot is the same as dataDef
 		CHECK(pSourceMob->GetMobID(&sourceMobID));
 
 		CHECK(pSourceMob->FindSlotBySlotID(sourceSlotID, &pMobSlot));
@@ -131,12 +153,16 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(pMobSlot->GetSegment(&pSegment));
 
 		pSegment->GetLength(&slotLength);
-		pSegment->GetDataDef(&DataDef);
+		ImplAAFDataDefSP pSegDataDef;
+		pSegment->GetDataDef(&pSegDataDef);
+		pSegDataDef->GetAUID(&segDataDef);
 		pSegment->ReleaseReference();
 		pSegment = NULL;
 
 		// Make sure the slot contains the expected media type.
-		if (!EqualAUID(&DataDef, pDataDef))
+		aafUID_t dataDef;
+		CHECK(pDataDef->GetAUID(&dataDef));
+		if (!EqualAUID(&segDataDef, &dataDef))
 			RAISE(AAFRESULT_INVALID_DATADEF);
 
 		pMobSlot->ReleaseReference();
@@ -149,13 +175,13 @@ AAFRESULT STDMETHODCALLTYPE
 		ref.sourceSlotID = sourceSlotID;
 		ref.startTime = zeroPos;
 		CHECK(GetDictionary(&pDictionary));
-		pSrcClip = (ImplAAFSourceClip *)pDictionary->CreateImplObject(AUID_AAFSourceClip);
-		if(pSrcClip == NULL)
-			RAISE(E_FAIL);
+		CHECK(pDictionary->GetBuiltinDefs()->cdSourceClip()->
+			  CreateInstance((ImplAAFObject**) &pSrcClip));
+
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
 
-		CHECK(pSrcClip->Initialize(pDataDef, &slotLength, ref));
+		CHECK(pSrcClip->Initialize(pDataDef, slotLength, ref));
 		CHECK(AppendNewTimelineSlot(editRate,pSrcClip, masterSlotID, pSlotName, 
 									zeroPos,&pNewTimelineSlot));
 
@@ -224,16 +250,16 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetTapeName (aafInt32		masterSlotID,
+    ImplAAFMasterMob::GetTapeName (aafUInt32		masterSlotID,
 								   aafWChar*	pTapeName,
-								   aafInt32		bufSize)
+								   aafUInt32	bufSize)
 {
 	ImplAAFFindSourceInfo	*info = NULL;
 	ImplAAFMob				*mob = NULL;
 
 	XPROTECT()
 	{
-		CHECK(SearchSource (masterSlotID, 0, kTapeMob, NULL, NULL,
+		CHECK(SearchSource (masterSlotID, 0, kAAFTapeMob, NULL, NULL,
 									&info));
 		CHECK(info->GetMob(&mob));
 		CHECK(mob->GetName(pTapeName, bufSize));
@@ -287,8 +313,8 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetTapeNameBufLen (aafInt32	masterSlotID,
-										 aafInt32*  pLen)
+    ImplAAFMasterMob::GetTapeNameBufLen (aafUInt32	masterSlotID,
+										 aafUInt32*  pLen)
 {
 	ImplAAFFindSourceInfo	*info = NULL;
 	ImplAAFMob				*mob = NULL;
@@ -298,7 +324,7 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(SearchSource (masterSlotID, 0, kTapeMob, NULL, NULL,
+		CHECK(SearchSource (masterSlotID, 0, kAAFTapeMob, NULL, NULL,
 									&info));
 		CHECK(info->GetMob(&mob));
 		CHECK(mob->GetNameBufLen(pLen));
@@ -413,9 +439,9 @@ AAFRESULT STDMETHODCALLTYPE
 //   - TODO: add this to idl
 //
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetRepresentationSourceClip (aafSlotID_t			slotID,
-												   aafInt32				index,
-												   ImplAAFSourceClip**	ppSourceClip)
+    ImplAAFMasterMob::GetRepresentation (aafSlotID_t			slotID,
+										 aafUInt32				index,
+										 ImplAAFSegment**		ppSegment)
 {
 	ImplAAFMobSlot	*pSlot = NULL;
 	ImplAAFSegment	*pSegment = NULL;
@@ -423,7 +449,7 @@ AAFRESULT STDMETHODCALLTYPE
 	HRESULT			hr;
 	aafNumSlots_t	numReps;
 
-	if (!ppSourceClip)
+	if (!ppSegment)
 		return AAFRESULT_NULL_PARAM;
 
 	numReps = 0;
@@ -435,16 +461,21 @@ AAFRESULT STDMETHODCALLTYPE
 		if (SUCCEEDED(hr))
 		{
 			hr = pSegment->NumRepresentations(&numReps);
-			if(index < 0 || index >= numReps)
+			if(index >= numReps)
 				return(AAFRESULT_BADINDEX);
 			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
-			if(pGroup == NULL)
+			if(pGroup != NULL)
+			{
+				hr = pGroup->GetChoiceAt (index, ppSegment);
+				pGroup->ReleaseReference();
+				pGroup = NULL;
+				pSegment->ReleaseReference();
+				pSegment = NULL;
+			}
+			else if(index == 0)
+				*ppSegment = pSegment;
+			else
 				return(AAFRESULT_INCONSISTANCY);
-			hr = pGroup->GetIndexedChoice (index, ppSourceClip);
-			pGroup->ReleaseReference();
-			pGroup = NULL;
-			pSegment->ReleaseReference();
-			pSegment = NULL;
 		}
 		pSlot->ReleaseReference();
 		pSlot = NULL;
@@ -501,9 +532,9 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetCriteriaSourceClip (aafSlotID_t			slotID,
+    ImplAAFMasterMob::GetCriteriaSegment (aafSlotID_t			slotID,
 											 aafMediaCriteria_t*	pCriteria,
-											 ImplAAFSourceClip**	ppSourceClip)
+											 ImplAAFSegment**	ppSourceClip)
 {
 	ImplAAFMobSlot	*pSlot = NULL;
 	ImplAAFSegment	*pSegment = NULL;
@@ -524,13 +555,16 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 			hr = pSegment->NumRepresentations(&numReps);
 			pGroup = dynamic_cast<ImplAAFEssenceGroup*>(pSegment);
-			if(pGroup == NULL)
-				return(AAFRESULT_INCONSISTANCY);
-			hr = pGroup->GetCriteriaSourceClip (pCriteria, ppSourceClip);
-			pGroup->ReleaseReference();
-			pGroup = NULL;
-			pSegment->ReleaseReference();
-			pSegment = NULL;
+			if(pGroup != NULL)
+			{
+				hr = pGroup->GetCriteriaSegment (pCriteria, ppSourceClip);
+				pGroup->ReleaseReference();
+				pGroup = NULL;
+				pSegment->ReleaseReference();
+				pSegment = NULL;
+			}
+			else
+				*ppSourceClip = pSegment;
 		}
 		pSlot->ReleaseReference();
 		pSlot = NULL;
@@ -568,7 +602,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // GetMobKind()
 //
-// Returns kMasterMob in *pMobKind.
+// Returns kAAFMasterMob in *pMobKind.
 // 
 // AAFRESULT_SUCCESS
 //   - succeeded.  (This is the only code indicating success.)
@@ -582,7 +616,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pMobKind == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	*pMobKind = kMasterMob;
+	*pMobKind = kAAFMasterMob;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -591,28 +625,46 @@ AAFRESULT STDMETHODCALLTYPE
 // NewPhysSourceRef()
 //
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::NewPhysSourceRef (aafRational_t  editrate,
-                           aafSlotID_t  aMobSlot,
-                           aafUID_t *pEssenceKind,
-							aafSourceRef_t  ref,
-                           aafLength_t  srcRefLength)
+    ImplAAFMasterMob::NewPhysSourceRef (const aafRational_t & editrate,
+										aafSlotID_t  aMobSlot,
+										ImplAAFDataDef * pEssenceKind,
+										aafSourceRef_t  ref,
+										aafLength_t  srcRefLength)
 {
-	return(ImplAAFMob::AddPhysSourceRef(kAAFForceOverwrite, editrate, aMobSlot,
-							pEssenceKind, ref, srcRefLength));
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+	aafUID_t essenceKind;
+	AAFRESULT hr = pEssenceKind->GetAUID(&essenceKind);
+	if (AAFRESULT_FAILED (hr))return hr;
+	return(ImplAAFMob::AddPhysSourceRef(kAAFForceOverwrite,
+										editrate,
+										aMobSlot,
+										essenceKind,
+										ref,
+										srcRefLength));
 }
 
 //****************
 // AppendPhysSourceRef()
 //
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::AppendPhysSourceRef (aafRational_t  editrate,
-                           aafSlotID_t  aMobSlot,
-                           aafUID_t *pEssenceKind,
-							aafSourceRef_t  ref,
-                           aafLength_t  srcRefLength)
+    ImplAAFMasterMob::AppendPhysSourceRef (const aafRational_t & editrate,
+										   aafSlotID_t  aMobSlot,
+										   ImplAAFDataDef * pEssenceKind,
+										   aafSourceRef_t  ref,
+										   aafLength_t  srcRefLength)
 {
-	return(ImplAAFMob::AddPhysSourceRef(kAAFAppend, editrate, aMobSlot,
-							pEssenceKind, ref, srcRefLength));
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+	aafUID_t essenceKind;
+	AAFRESULT hr = pEssenceKind->GetAUID(&essenceKind);
+	if (AAFRESULT_FAILED (hr))return hr;
+	return(ImplAAFMob::AddPhysSourceRef(kAAFAppend,
+										editrate,
+										aMobSlot,
+										essenceKind,
+										ref,
+										srcRefLength));
 }
 
 
@@ -644,8 +696,8 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 	ImplEnumAAFMobSlots	*slotIter = NULL, *fileSlotIter = NULL;
 	ImplAAFMobSlot		*fileSlot = NULL, *slot = NULL;
 	ImplAAFSegment		*fileSeg = NULL, *seg = NULL;
-	aafInt32			loop;
-	aafInt32			numSlots, fileNumSlots;
+	aafUInt32			loop;
+	aafNumSlots_t		numSlots, fileNumSlots;
 	aafPosition_t		endPos;
 
 	XPROTECT()
@@ -653,17 +705,17 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 		/* Adjust the SCLP length from the master mob to the length of
 		 * the file mob, in the units of the master mob
 		 */
-		CHECK(EnumAAFAllMobSlots (&slotIter));
-		CHECK(GetNumSlots(&numSlots));
+		CHECK(GetSlots (&slotIter));
+		CHECK(CountSlots(&numSlots));
 		for (loop = 1; loop <= numSlots; loop++)
 		{
 			CHECK(slotIter->NextOne(&slot));
 			CHECK(slot->GetSegment(&seg));
 			CHECK(((ImplAAFSourceClip *)seg)->ResolveRef( &fileMob));
-			CHECK(fileMob->GetNumSlots(&fileNumSlots));
+			CHECK(fileMob->CountSlots(&fileNumSlots));
 			if(fileNumSlots >= 1)
 			{
-				CHECK(fileMob->EnumAAFAllMobSlots (&fileSlotIter));
+				CHECK(fileMob->GetSlots (&fileSlotIter));
 				CHECK(fileSlotIter->NextOne(&fileSlot));
 				CHECK(fileSlot->GetSegment(&fileSeg));
 				CHECK(fileSeg->GetLength(&endPos));
@@ -684,7 +736,7 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 			}
 			slot->ReleaseReference();
 			slot = NULL;
-			CHECK(seg->SetLength(&endPos));
+			CHECK(seg->SetLength(endPos));
 			seg->ReleaseReference();
 			seg = NULL;
 		}			
@@ -717,7 +769,7 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 /****/
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFMasterMob::CreateEssence (aafSlotID_t		masterSlotID,
-								aafUID_t			mediaKind,
+								ImplAAFDataDef * pMediaKind,
 								aafUID_t			codecID,
 								aafRational_t	editRate,
 								aafRational_t	sampleRate,
@@ -726,21 +778,38 @@ ImplAAFMasterMob::CreateEssence (aafSlotID_t		masterSlotID,
 								aafUID_t			fileFormat,
 								ImplAAFEssenceAccess **result)
 {
-	ImplAAFEssenceAccess	*access;
+  ImplAAFEssenceAccess	*access = NULL;
+
+  if (NULL == result)
+    return AAFRESULT_NULL_PARAM;
+
+  if (! pMediaKind)
+	return AAFRESULT_NULL_PARAM;
+  aafUID_t mediaKind;
+  AAFRESULT hr = pMediaKind->GetAUID(&mediaKind);
+  if (AAFRESULT_FAILED (hr))return hr;
 
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-	*result = access;
 
 	XPROTECT()
 	{
+    if (NULL == access)
+      RAISE(AAFRESULT_NOMEMORY);
+
 		if(destination != NULL)
 		{
 			CHECK(access->SetEssenceDestination(destination, fileFormat));
 		}
 		
 		CHECK(access->Create(this, masterSlotID, mediaKind, codecID, editRate, sampleRate, enable));
+	  
+    *result = access;
 	}
 	XEXCEPT
+  {
+		if (access)
+      access->ReleaseReference();
+  }
 	XEND;
 
 	return(AAFRESULT_SUCCESS);
@@ -762,40 +831,85 @@ ImplAAFMasterMob::CreateEssence (aafSlotID_t		masterSlotID,
 /****/
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMasterMob::CreateMultiEssence (aafUID_t codecID,
-							aafInt16  arrayElemCount,
+							aafUInt16  arrayElemCount,
 							aafmMultiCreate_t *mediaArray,
 							aafCompressEnable_t Enable,
-							ImplAAFLocator		*destination,
-							aafUID_t			fileFormat,
+							ImplAAFLocator		*/*destination*/,
+							aafUID_t			/*fileFormat*/,
 							IAAFEssenceMultiAccess **result)
 {
-	ImplAAFEssenceAccess	*access;
+	ImplAAFEssenceAccess	*access = NULL;
 	IUnknown				*iUnk = NULL;
-	AAFRESULT				hr;
+  IAAFEssenceMultiAccess *pMultiAccess = NULL;
+  
+  if (NULL == result)
+    return AAFRESULT_NULL_PARAM;
 
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-	iUnk = static_cast<IUnknown *> (access->GetContainer());
-	hr = iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)result);
-	if(hr != AAFRESULT_SUCCESS)
-		return hr;
 
-	iUnk->Release();
-	iUnk = NULL;
-	return access->MultiCreate(this, codecID, arrayElemCount, mediaArray, Enable);
+	XPROTECT()
+	{
+    if (NULL == access)
+      RAISE(AAFRESULT_NOMEMORY);
+
+    // Return a IAAFEssenceMultiAccess interface to the new EssenceAccess
+    // object.
+	  iUnk = static_cast<IUnknown *> (access->GetContainer());
+    assert(NULL != iUnk);
+	  CHECK(iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)&pMultiAccess));
+
+	  CHECK(access->MultiCreate(this, codecID, arrayElemCount, mediaArray, Enable));
+
+    *result = pMultiAccess;
+    pMultiAccess = NULL;
+    access->ReleaseReference();
+    access = NULL;
+	}
+	XEXCEPT
+  {
+    if (pMultiAccess)
+      pMultiAccess->Release();
+		if (access)
+      access->ReleaseReference();
+  }
+	XEND;
+
+	return(AAFRESULT_SUCCESS);
 }
 
 /****/
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMasterMob::GetNumChannels (
+    ImplAAFMasterMob::CountChannels (
                            aafSlotID_t  slotID,
                            aafMediaCriteria_t *essenceCrit,
-                           aafUID_t essenceKind,
-                           aafInt16 *numCh)
+                           ImplAAFDataDef * pEssenceKind,
+                           aafUInt16 *numCh)
 {
-	ImplAAFEssenceAccess	*access;
+	if (! pEssenceKind)
+	  return AAFRESULT_NULL_PARAM;
+	aafUID_t essenceKind;
+	AAFRESULT hr = pEssenceKind->GetAUID(&essenceKind);
+	if (AAFRESULT_FAILED (hr))return hr;
 
+	ImplAAFEssenceAccess	*access = NULL;
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-	return access->GetNumChannels(this, slotID, essenceCrit, essenceKind, numCh);
+
+	XPROTECT()
+	{
+    if (NULL == access)
+      RAISE(AAFRESULT_NOMEMORY);
+
+	  CHECK(access->CountChannels(this, slotID, essenceCrit, essenceKind, numCh));
+    access->ReleaseReference();
+	}
+	XEXCEPT
+  {
+		if (access)
+      access->ReleaseReference();
+  }
+	XEND;
+
+	return(AAFRESULT_SUCCESS);
 }
 
 /****/
@@ -806,11 +920,30 @@ AAFRESULT STDMETHODCALLTYPE
                            aafCompressEnable_t  compEnable,
 							ImplAAFEssenceAccess **result)
 {
-	ImplAAFEssenceAccess	*access;
+	ImplAAFEssenceAccess	*access = NULL;
+
+  if (NULL == result)
+    return AAFRESULT_NULL_PARAM;
 
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-	*result = access;
-	return access->Open(this, slotID, mediaCrit, openMode, compEnable);
+
+	XPROTECT()
+	{
+    if (NULL == access)
+      RAISE(AAFRESULT_NOMEMORY);
+
+	  CHECK(access->Open(this, slotID, mediaCrit, openMode, compEnable));
+    *result = access;
+    access = NULL;
+	}
+	XEXCEPT
+  {
+		if (access)
+      access->ReleaseReference();
+  }
+	XEND;
+
+	return(AAFRESULT_SUCCESS);
 }
 
 	//@comm If the essence is interleaved,
@@ -838,16 +971,40 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	ImplAAFEssenceAccess	*access;
 	IUnknown				*iUnk = NULL;
-	AAFRESULT				hr;
+  IAAFEssenceMultiAccess *pMultiAccess = NULL;
+  
+  if (NULL == result)
+    return AAFRESULT_NULL_PARAM;
 
 	access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-	iUnk = static_cast<IUnknown *> (access->GetContainer());
-	hr = iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)result);
-	if(hr != AAFRESULT_SUCCESS)
-		return hr;
-	iUnk->Release();
-	iUnk = NULL;
-	return access->MultiOpen(this, slotID, mediaCrit, openMode, compEnable);
+
+	XPROTECT()
+	{
+    if (NULL == access)
+      RAISE(AAFRESULT_NOMEMORY);
+
+    // Return a IAAFEssenceMultiAccess interface to the new EssenceAccess
+    // object.
+	  iUnk = static_cast<IUnknown *> (access->GetContainer());
+	  CHECK(iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)&pMultiAccess));
+
+	  CHECK(access->MultiOpen(this, slotID, mediaCrit, openMode, compEnable));
+
+    *result = pMultiAccess;
+    pMultiAccess = NULL;
+    access->ReleaseReference();
+    access = NULL;
+	}
+	XEXCEPT
+  {
+    if (pMultiAccess)
+      pMultiAccess->Release();
+		if (access)
+      access->ReleaseReference();
+  }
+	XEND;
+
+	return(AAFRESULT_SUCCESS);
 }
 
 	//@comm This routine
