@@ -20,28 +20,29 @@
 #
 ###############################################################################
 
+#------------------------------------------------------------------------------
+#
+# pdefs-i686Linux.mk
+#
+#	This file contains makefile definitions for the Linux platform.
+#
+#
+# Uses:
+#	COMPILER, XL, RPATH, CC
+#	
+# Requires:
+#	XL, RPATH, CC
+#
+# Sets:
+#	MIPS_ABI, COMPILER, PLATFORM_CFLAGS, RPATH_OPT, 
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL, BYTE_ORDER
+#
+#------------------------------------------------------------------------------
 
-MACHINE=`(uname -m) 2>/dev/null` || MACHINE=Unknown
-OS=`(uname -s) 2>/dev/null` || OS=Unknown
 
-case "${MACHINE}:${OS}" in
-    *:IRIX*)
-	echo MipsIrix
-	exit 0;;
+#------------------------------------------------------------------------------
+# Include common Unix definitions.
+#------------------------------------------------------------------------------
+include $(AAFBASE)/build/pdefs-i586Linux.mk
 
-    *:Linux)
-	echo ${MACHINE}Linux
-	exit 0;;
-
-    sun*:SunOS)
-	echo SunSunOS
-	exit 0;;
-
-    *86:Windows_NT)
-	echo Win
-	exit 0;;
-esac
-
-echo Unknown
-exit 1
 

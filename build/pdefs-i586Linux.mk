@@ -22,75 +22,85 @@
 
 #------------------------------------------------------------------------------
 #
-# rules.mk
+# pdefs-i586Linux.mk
 #
-# This file contains makefile rules necessary to build the AAF toolkit.
+#	This file contains makefile definitions for the Linux platform.
+#
+#
+# Uses:
+#	COMPILER, XL, RPATH, CC
+#	
+# Requires:
+#	XL, RPATH, CC
+#
+# Sets:
+#	MIPS_ABI, COMPILER, PLATFORM_CFLAGS, RPATH_OPT, 
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL, BYTE_ORDER
 #
 #------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
-# Rules to compile the source files.
-#------------------------------------------------------------------------------
 
-$(OBJDIR)/%$(OBJ): %.c
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
-
-$(OBJDIR)/%$(OBJ): %.$(CPP_EXTENSION)
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+#------------------------------------------------------------------------------
+# Include common Unix definitions.
+#------------------------------------------------------------------------------
+include $(AAFBASE)/build/pdefs-Unix.mk
 
 
 #------------------------------------------------------------------------------
-# Rules to generate the header file dependencies makefiles from the source
-# files.
+# Compiler-specific definitions
 #------------------------------------------------------------------------------
-
-$(OBJDIR)/%.d : %.c 
-	$(SHELL) -ec 'if [ ! -d $(OBJDIR) ]; then $(MKDIR) $(OBJDIR); fi; \
-	$(CC) -M $(CFLAGS) $(INCLUDES) $< \
-	| sed '\''s,\($(*F)\)\.o[ :]*,$(@D)/\1.o $@ : ,g'\'' > $@; \
-	[ -s $@ ] || rm -f $@'
-
-$(OBJDIR)/%.d : %.$(CPP_EXTENSION)
-	$(SHELL) -ec 'if [ ! -d $(OBJDIR) ]; then $(MKDIR) $(OBJDIR); fi; \
-	$(CC) -M $(CFLAGS) $(INCLUDES) $< \
-	| sed '\''s,\($(*F)\)\.o[ :]*,$(@D)/\1.o $@ : ,g'\'' > $@; \
-	[ -s $@ ] || rm -f $@'
+COMPILER ?= g++
+include $(AAFBASE)/build/cdefs-$(COMPILER).mk
 
 
 #------------------------------------------------------------------------------
-# Rules to make the different directories.
+# Platform specific compiler options
 #------------------------------------------------------------------------------
-
-$(OBJDIR):
-	$(MKDIR) $@
-
-$(LIBDIR):
-	$(MKDIR) $@
-
-$(BINDIR):
-	$(MKDIR) $@
+PLATFORM_CFLAGS = 
 
 
 #------------------------------------------------------------------------------
-# Now includes the header file dependencies makefiles.
+# Linker command and options
 #------------------------------------------------------------------------------
+RPATH_OPT = $(XL)-rpath $(XL)$(RPATH)
 
-ifneq ($(GENDEPS), 0)
--include $(DEPS)
+# Command to link executable.
+LD = $(CC) -ldl -rdynamic
+
+# Command to link static library
+ifndef LD_STAT_LIB
+    # Note: CC is invoked here to use IRIX specific 
+    # compiler option -ar.
+    LD_STAT_LIB = ar -cr 
 endif
 
-# Disable header dependencies for now, because they make the build process 
-# approximately 10^64 times slower.
+# Command to link dynamic library
+ifndef LD_DYN_LIB
+    LD_DYN_LIB = $(CC) -shared
+endif
 
-#ifneq (,$(CXXFILES))
-#include $(CXXFILES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.d)
-#endif
 
-#ifneq (,$(CXXFILES2))
-#include $(CXXFILES2:%.$(CPP_EXTENSION)=$(OBJDIR)/%.d)
-#endif
+#------------------------------------------------------------------------------
+# Select UNICODE or ansi API's:
+#   U_OPTS=use_unicode
+#   U_OPTS=no_unicode
+#------------------------------------------------------------------------------
+U_OPTS=no_unicode
 
-#ifneq (,$(CFILES))
-#include $(CFILES:%.c=$(OBJDIR)/%.d)
-#endif
+
+#------------------------------------------------------------------------------
+# Binary file extensions
+#------------------------------------------------------------------------------
+OBJ ?= .o
+EXE ?= 
+LIB ?= .a
+DLL ?= .so
+
+
+#------------------------------------------------------------------------------
+# Intel machines are Little Endian (lower byte first)
+# Mac, HP, SUN, etc. are Big Endian (higher byte first)
+# BYTE_ORDER = -DBIGENDIAN=1
+#------------------------------------------------------------------------------
+BYTE_ORDER = -DLITTLEENDIAN=1
 

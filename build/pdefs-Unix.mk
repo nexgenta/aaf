@@ -20,28 +20,24 @@
 #
 ###############################################################################
 
+#------------------------------------------------------------------------------
+#
+# pdefs-Unix.mk
+#
+# This file contains makefile definitions common to Unix platforms.
+# Platform definition files (pdefs-*.mk) for Unix include this file.
+#
+#------------------------------------------------------------------------------
 
-MACHINE=`(uname -m) 2>/dev/null` || MACHINE=Unknown
-OS=`(uname -s) 2>/dev/null` || OS=Unknown
-
-case "${MACHINE}:${OS}" in
-    *:IRIX*)
-	echo MipsIrix
-	exit 0;;
-
-    *:Linux)
-	echo ${MACHINE}Linux
-	exit 0;;
-
-    sun*:SunOS)
-	echo SunSunOS
-	exit 0;;
-
-    *86:Windows_NT)
-	echo Win
-	exit 0;;
-esac
-
-echo Unknown
-exit 1
+ECHO = echo
+MV = mv
+CP = cp
+RM = rm -f
+RMDIR = rm -rf
+CAT = cat
+MKDIR = mkdir -p
+TOUCH = touch
+CHMOD = chmod
+SH = sh
+PERL = perl
 
