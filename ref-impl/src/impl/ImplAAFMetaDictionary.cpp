@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.3 2004/12/19 03:51:26 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.32.2.4 2004/12/20 17:39:12 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1348,12 +1348,26 @@ AAFRESULT ImplAAFMetaDictionary::InstantiateAxiomaticDefinitions(void)
       else
       {
 #if 0
-	// FIXME - Is this necessary now that _classDefinitions is not persistent?
-	  ImplAAFClassDef* old = nonConstThis->_classDefinitions.replace(pAxiomaticClassDef);
-	    if (old != 0)
-	      old->ReleaseReference();
+	// FIXME - Is this necessary now that _classDefinitions is not
+	// persistent?
+        //
+	// ANSWER - It is not necessary because _classDefinition is always
+	// empty to begin with (now that it is non-persistent).  Hence, there
+	// is never an existing axiomatic defintion in the class.  We can
+	// assert this. If _fileClassDefitions was used (as used to be case)
+	// then it would be necessary because the axiomitic definition in the
+	// file may be out of date w.r.t. the builtin definition - hence the
+	// need to replace it.
+
+	ImplAAFClassDef* old = nonConstThis->_classDefinitions.replace(pAxiomaticClassDef);
+	if (old != 0)
+	    old->ReleaseReference();
+#else
+	// There should never be an existing class definition found in the
+	// _classDefinitions.  Assert this.
+	assert(0);
 #endif
-	  }
+      }
       pAxiomaticClassDef->AcquireReference(); // saving another reference...
     }
   }
