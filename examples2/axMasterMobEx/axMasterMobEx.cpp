@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axMasterMobEx.cpp,v 1.14 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
+// $Id: axMasterMobEx.cpp,v 1.15 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,6 @@
 #include <AxComponent.h>
 #include <AxDictionary.h>
 #include <AxEx.h>
-#include <AxMacMain.h>
 
 #include <AAFStoredObjectIDs.h>
 #include <AAFDataDefs.h>

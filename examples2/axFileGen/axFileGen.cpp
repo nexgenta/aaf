@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.cpp,v 1.15 2004/10/27 14:07:16 stuart_hc Exp $ $Name:  $
+// $Id: axFileGen.cpp,v 1.16 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,6 @@
 #include <AxDictionary.h>
 #include <AxInit.h>
 #include <AxUtil.h>
-#include <AxMacMain.h>
 
 #include <iostream>
 #include <sstream>

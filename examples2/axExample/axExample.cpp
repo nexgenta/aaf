@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axExample.cpp,v 1.6 2004/02/27 14:26:37 stuart_hc Exp $ $Name:  $
+// $Id: axExample.cpp,v 1.7 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,7 +24,6 @@
 #include <AxFile.h>
 #include <AxEx.h>
 #include <AxUtil.h>
-#include <AxMacMain.h>
 
 #include <iostream>
 #include <sstream>

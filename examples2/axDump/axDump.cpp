@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axDump.cpp,v 1.9 2004/02/27 14:26:37 stuart_hc Exp $ $Name:  $
+// $Id: axDump.cpp,v 1.10 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,6 @@
 #include <AxBaseObjIter.h>
 #include <AxUtil.h>
 #include <AxEx.h>
-#include <AxMacMain.h>
 
 #include <AAFStoredObjectIDs.h>
 #include <AAFTypeDefUIDs.h>
