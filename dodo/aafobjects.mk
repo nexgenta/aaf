@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.9 2004/06/08 13:45:04 stuart_hc Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.10 2004/08/12 15:58:54 akharkev Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,7 @@ AAFNONPERSISTENTOBJECTS=""
 AAFCOMINTERFACESONLY="\
 	AAFDataDef2 \
 	AAFEndian \
+	AAFHeader2 \
 	AAFSearchSource \
 	AAFEssenceDataEx \
 	AAFEssenceMultiAccess \
