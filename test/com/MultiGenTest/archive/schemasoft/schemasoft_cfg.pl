@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ###############################################################################
 #
-# $Id: schemasoft_cfg.pl,v 1.3 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+# $Id: schemasoft_cfg.pl,v 1.4 2004/10/22 16:01:16 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -154,7 +154,7 @@ $SharedTestDirPath = "testfiles";
   # Map the file kind to the argument that must be passed to FileOp to
   # inform it what file kind (impl) to use.
   #
-  # These FileOp arguments map to aafFileKind UID's.  The selected UID
+  # These FileOp arguments map to kAAFFileKind_ UID's.  The selected UID
   # is, in turn, passed to AAFCreateAAFFileOnRawStorage(). For further
   # information, refer the the AAFFileKind.h header, and the ref-impl
   # files that depend on it.

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileOp.cpp,v 1.9 2004/09/10 17:13:13 stuart_hc Exp $ $Name:  $
+// $Id: FileOp.cpp,v 1.10 2004/10/22 16:02:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,7 +43,7 @@ public:
   KindMap()
   {
     #define ADD_KIND( X ) \
-    _kindMap[ string( #X ) ] = aafFileKindAaf##X;
+    _kindMap[ string( #X ) ] = kAAFFileKind_Aaf##X;
 
     ADD_KIND( M512Binary );
     ADD_KIND( S512Binary );

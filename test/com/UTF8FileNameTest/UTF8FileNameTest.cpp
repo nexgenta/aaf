@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: UTF8FileNameTest.cpp,v 1.6 2004/09/28 11:12:50 stuart_hc Exp $ $Name:  $
+// $Id: UTF8FileNameTest.cpp,v 1.7 2004/10/22 16:01:16 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -204,7 +204,7 @@ static HRESULT WriteAAFFile(IAAFFile* pFile, aafWChar *pExternalFilename)
 	
 	checkResult(pMasterMob->CreateEssence(
 						1,
-						defs.ddSound(),
+						defs.ddkAAFSound(),
 						kAAFCodecWAVE,
 						testRate,
 						testRate,
@@ -254,7 +254,7 @@ static HRESULT WriteAAFFile(IAAFFile* pFile, aafWChar *pExternalFilename)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName,
 			   bool UseRaw = false,
-                           const aafUID_t* pFileKind = &aafFileKindDontCare)
+                           const aafUID_t* pFileKind = &kAAFFileKind_DontCare)
 {
   IAAFRawStorage* pRawStorage = 0;
   IAAFFile* pFile = NULL;
@@ -368,40 +368,40 @@ struct _fileinfo_t {
     L"CFKT-Default-4K.aaf",
 		true,
 		true,
-    &aafFileKindAaf4KBinary,
+    &kAAFFileKind_Aaf4KBinary,
     "4K",
     true,
-    &aafFileKindAaf4KBinary,
+    &kAAFFileKind_Aaf4KBinary,
     "4K"
   },
   {
     L"CFKT-Default-512.aaf",
 		true,
 		true,
-    &aafFileKindAaf512Binary,
+    &kAAFFileKind_Aaf512Binary,
     "512",
     true,
-    &aafFileKindAaf512Binary,
+    &kAAFFileKind_Aaf512Binary,
     "512"
   },
   {
     L"CFKT-S512.aaf",
 		true,
 		true,
-    &aafFileKindAafS512Binary,
+    &kAAFFileKind_AafS512Binary,
     "S512",
     true,
-    &aafFileKindAafS512Binary,
+    &kAAFFileKind_AafS512Binary,
     "S512"
   },
   {
     L"CFKT-S4K.aaf",
 		true,
 		true,
-    &aafFileKindAafS4KBinary,
+    &kAAFFileKind_AafS4KBinary,
     "S4K",
     true,
-    &aafFileKindAafS4KBinary,
+    &kAAFFileKind_AafS4KBinary,
     "S4K"
   }
 #ifdef OS_WINDOWS
@@ -409,20 +409,20 @@ struct _fileinfo_t {
     L"CFKT-M512.aaf",
 		true,
 		true,
-    &aafFileKindAafM512Binary,
+    &kAAFFileKind_AafM512Binary,
     "M512",
     true,
-	&aafFileKindAafM512Binary,
+	&kAAFFileKind_AafM512Binary,
 	"M512"
   },
   {
     L"CFKT-M4K.aaf",
 		true,
 		true,
-    &aafFileKindAafM4KBinary,
+    &kAAFFileKind_AafM4KBinary,
     "M4K",
     true,
-    &aafFileKindAafM4KBinary,
+    &kAAFFileKind_AafM4KBinary,
     "M4K"
   }
 #endif
