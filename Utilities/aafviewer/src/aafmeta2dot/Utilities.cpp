@@ -1,5 +1,5 @@
 /*
- * $Id: Utilities.cpp,v 1.3.2.1 2004/06/08 13:45:03 stuart_hc Exp $ $Name:  $
+ * $Id: Utilities.cpp,v 1.3.2.2 2004/07/16 16:11:31 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -21,7 +21,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #pragma warning (disable:4786)
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: AAFXsMapper.cpp,v 1.3.2.2 2004/07/14 15:24:17 stuart_hc Exp $ $Name:  $
+ * $Id: AAFXsMapper.cpp,v 1.3.2.3 2004/07/16 16:11:31 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -21,7 +21,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #pragma warning (disable:4786)
 #pragma warning (disable:4800)
 #endif
