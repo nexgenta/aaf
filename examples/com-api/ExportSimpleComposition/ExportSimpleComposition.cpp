@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 #if defined(macintosh) || defined(_MAC)
-#include <console.h> /* Mac command line window */
+#include "DataInput.h"
 #endif
 
 #include "AAFTypes.h"
@@ -49,7 +49,7 @@ static aafSourceRef_t sourceRef;
 
 static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
 {
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
+	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
 }
 
 #define TEST_PATH	L"SomeFile.dat"
@@ -90,13 +90,18 @@ static void convert(char* cName, size_t length, const wchar_t* name)
 
 static void MobIDToString(aafMobID_t *uid, char *buf)
 {
-	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
-			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
-			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
+	sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x--%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
+		(int)uid->SMPTELabel[0], (int)uid->SMPTELabel[1], (int)uid->SMPTELabel[2], (int)uid->SMPTELabel[3], 
+		(int)uid->SMPTELabel[4], (int)uid->SMPTELabel[5], (int)uid->SMPTELabel[6], (int)uid->SMPTELabel[7], 
+		(int)uid->SMPTELabel[8], (int)uid->SMPTELabel[8], (int)uid->SMPTELabel[10], (int)uid->SMPTELabel[11], 
+		(int)uid->length, (int)uid->instanceHigh, (int)uid->instanceMid, (int)uid->instanceLow, 
+		uid->material.Data1, uid->material.Data2, uid->material.Data3, (int)uid->material.Data4[0],
+		(int)uid->material.Data4[1], (int)uid->material.Data4[2], (int)uid->material.Data4[3],
+		(int)uid->material.Data4[4],
+		(int)uid->material.Data4[5], (int)uid->material.Data4[6], (int)uid->material.Data4[7]);
 }
 
-typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
+typedef enum { testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
 
 typedef aafInt16	AAFByteOrder;
 const AAFByteOrder INTEL_ORDER		      = 0x4949; // 'II' for Intel
@@ -136,7 +141,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
-	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
@@ -156,6 +160,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
   IAAFClassDef *pMasterMobDef = NULL;
   IAAFClassDef *pNetworkLocatorDef = NULL;
   IAAFDataDef *pSoundDef = NULL;
+  aafUInt32 samplesWritten, bytesWritten;
 
   
   // Delete any previous test file before continuing...
@@ -170,13 +175,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		remove(chFileName);
 	}
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF-East: Avid Technology";
 	ProductInfo.productName = L"Export Simple Composition";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -250,10 +257,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 			/* Create the Essence Data specifying the codec, container, edit rate and sample rate */
 			check(pMasterMob->CreateEssence(1,				// Slot ID
 				pSoundDef,			// MediaKind
-				CodecWave,			// codecID
+				kAAFCodecWAVE,		// codecID
 				editRate,			// edit rate
 				sampleRate,			// sample rate
-				kSDKCompressionDisable,
+				kAAFCompressionDisable,
 				pLocator,			// In current file
 				testContainer,		// In AAF Format
 				&pEssenceAccess));	// Compress disabled
@@ -287,8 +294,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 			while (samplesLeft >0)
 			{
 				check(pEssenceAccess->WriteSamples(	dataLen,	//!!! hardcoded bytes/sample ==1// Number of Samples
-					dataPtr,	// THE Raw data
-					sizeof(dataBuff)));// buffer size
+					sizeof(dataBuff), // buffer size
+					dataPtr,	// THE data
+					&samplesWritten,
+					&bytesWritten));
 				samplesLeft=samplesLeft-dataLen;
 			}
 			
@@ -373,7 +382,6 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
 	IAAFHeader *				pHeader = NULL;
 	IAAFDictionary*				pDictionary = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
-	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat			*fmtTemplate =  NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
@@ -429,12 +437,12 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
   
 
 	// Get the number of master mobs in the existing file (must not be zero)
-	check(pHeader->CountMobs(kMasterMob, &numMobs));
+	check(pHeader->CountMobs(kAAFMasterMob, &numMobs));
 	if (numMobs != 0)
 	{
 		printf("Found %ld Master Mobs\n", numMobs);
-		criteria.searchTag = kByMobKind;
-		criteria.tags.mobKind = kMasterMob;
+		criteria.searchTag = kAAFByMobKind;
+		criteria.tags.mobKind = kAAFMasterMob;
 		check(pHeader->GetMobs(&criteria, &pMobIter));
 
 		/* Create a Composition Mob */
@@ -496,10 +504,10 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
 					check(pMobSlot->GetDataDef(&pDataDef));
 					
 					// Check that we have a sound file by examining its data definition
-          aafBool bIsSoundKind = AAFFalse;
+          aafBool bIsSoundKind = kAAFFalse;
           check(pDataDef->IsSoundKind(&bIsSoundKind));
 
-          if (AAFTrue == bIsSoundKind)
+          if (kAAFTrue == bIsSoundKind)
 					{
 						printf("Found a sound file\n");
 
@@ -738,7 +746,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
+	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
 	aafUInt8			chunkID[4];
  	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -781,14 +789,14 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = AAFTrue;
+			fmtFound = kAAFTrue;
 		} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
 			*dataLen = chunkSize / bytesPerFrame;
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 	
-			dataFound = AAFTrue;
+			dataFound = kAAFTrue;
 		}
 	
 		if((ptr-buf) > formSize)
@@ -849,7 +857,8 @@ int main(int argumentCount, char* argumentVector[])
 {
 	/* console window for mac */
 	#if defined(macintosh) || defined(_MAC)
-	argumentCount = ccommand(&argumentVector);
+	char dataFile[] = "ExportSimpleComposition.inp";
+	getInputData(&argumentCount, argumentVector, dataFile);
 	#endif
 
 
@@ -893,6 +902,10 @@ int main(int argumentCount, char* argumentVector[])
 	printf("Working on file %s using ReadSamples\n", pFileName);
 	ProcessAAFFile(pwFileName, testStandardCalls);
 	
+	#ifdef _MAC
+ 	cleanUpInputData(argumentCount, argumentVector);
+	#endif
+
 	printf("DONE\n\n");
 
 	return(0);
