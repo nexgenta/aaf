@@ -1,31 +1,31 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
-
+/***********************************************************************
+ *
+ *              Copyright (c) 1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ *
+ ************************************************************************/
 #ifndef __AAFRDLI_H__
 #define __AAFRDLI_H__
 
-#if defined(macintosh) || defined(_MAC)
-#include <Files.h>
-#endif
 
 /* 
  * The AAF Runtime Dynamic (Library) Loader Interface 
@@ -38,20 +38,14 @@
 /* Opaque type for platform dependent data. */
 typedef void * AAFLibraryHandle;
 typedef void * AAFSymbolAddr;
-typedef void * AAFUserData;
 typedef long AAFRDLIRESULT;
 
-
-
-
-// Callback function signature for AAFFindLibrary.
-
-typedef AAFRDLIRESULT (* LPFNAAFTESTFILEPROC)(
-	const char* path,
-    const char* name,
-		char isDirectory,
-		void * userData);
-
+typedef struct _AAFLibInfo
+{
+	int nameBufferSize; /* input: size of nameBuffer */
+	char* nameBuffer;   /* input: pointer for path; outpout: contains path to library.*/
+	int actualNameSize; /* output: actual size of  */
+} AAFLibInfo;
 
 
 #ifdef __cplusplus
@@ -65,26 +59,7 @@ AAFRDLIRESULT AAFUnloadLibrary(AAFLibraryHandle libHandle);
 
 AAFRDLIRESULT AAFFindSymbol(AAFLibraryHandle libHandle, const char* symbolName, AAFSymbolAddr* pSymbol);
 
-AAFRDLIRESULT AAFFindLibrary(const char* name, LPFNAAFTESTFILEPROC testProc, void *userData);
-
-#if defined(macintosh) || defined(_MAC)
-// Given just a file name this routine will use GetSharedLibrary() to load the code fragment.
-AAFRDLIRESULT AAFLoadSharedLibrary(const char* name, AAFLibraryHandle* pLibHandle);
-
-// Given a full path to a file this routine will use the file's cfrg resource to load
-// the code fragment.
-AAFRDLIRESULT AAFLoadLibraryFile(const char* name, AAFLibraryHandle* pLibHandle);
-
-// Same as above except that it attempts to load the library from a mac file spec.
-AAFRDLIRESULT AAFFSpLoadLibraryFile(FSSpec *pSpec, AAFLibraryHandle* pLibHandle);
-
-// Given a pathname return the corresponding file spec.
-AAFRDLIRESULT AAFPathToFSSpec(const char* name, FSSpec *pSpec);
-
-// Given a pathname return the corresponding file spec.
-AAFRDLIRESULT AAFFSSpecToPath(const FSSpec *pSpec, char *pathBuffer, int pathBufferSize);
-#endif 
-
+AAFRDLIRESULT AAFGetLibraryInfo(AAFLibraryHandle libHandle, AAFLibInfo* pLibInfo);
 
 
 #ifdef __cplusplus
