@@ -34,11 +34,11 @@
 
 #include <assert.h>
 #include "AAFResult.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 ImplAAFSourceReference::ImplAAFSourceReference ():
-	_sourceID(			PID_SourceReference_SourceID,		"SourceID"),
-	_sourceMobSlotId(	PID_SourceReference_SourceMobSlotID,	"SourceMobSlotID")
+	_sourceID(			PID_SourceReference_SourceID,		L"SourceID"),
+	_sourceMobSlotId(	PID_SourceReference_SourceMobSlotID,	L"SourceMobSlotID")
 {
 	_persistentProperties.put(		_sourceID.address());
 	_persistentProperties.put(		_sourceMobSlotId.address());
@@ -112,7 +112,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT ImplAAFSourceReference::ChangeContainedReferences(aafMobID_constref from,
 															aafMobID_constref to)
 {
-	aafMobID_t			myID;
+	aafMobID_t			myID = _sourceID;
 
 	if(memcmp(&myID, &from, sizeof(aafMobID_t)) == 0)
 		SetSourceID(to);

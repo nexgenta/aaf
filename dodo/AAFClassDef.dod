@@ -1,16 +1,16 @@
 #c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
+#c*                                                 *
+#c* Advanced Authoring Format                       *
+#c*                                                 *
+#c* Copyright (c) 1998-2000 Avid Technology, Inc.   *
+#c*                                                 *
 #c\*************************************************/
 #startm .this-module 0
 AAFClassDef\
 #endm
 #c
 #startm .parent-module 0
-AAFDefObject\
+AAFMetaDefinition\
 #endm
 #c
 AD_HEAD
@@ -20,15 +20,19 @@ AD_IDL(//
 // the position of the class within the class heirarchy\, and
 // accessing property definitions associated with the class.
 AD_STD_COMMENT_IFC_HEADER)
+
+AD_FORWARD_DECLARATION(AAFObject)
 AD_FORWARD_DECLARATION(EnumAAFPropertyDefs)
 AD_FORWARD_DECLARATION(AAFPropertyDef)
-AD_FORWARD_DECLARATION(AAFDefObject)
+AD_FORWARD_DECLARATION(AAFMetaDefinition)
 AD_FORWARD_DECLARATION(AAFTypeDef)
+AD_INCLUDE(AAFObjectModel)
+
 AD_CLASS_UUID(dfbd6526, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(dfbd6525, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_XMETHOD3(Initialize,
+AD_XMETHOD4(Initialize,
 
 			[in\, ref],
 			objPass,
@@ -48,8 +52,16 @@ AD_XMETHOD3(Initialize,
 			pClassName,
 			friendly name of this type definition,
 
+			[in],
+			objPass,
+			aafBoolean_t,
+			isConcrete,
+			can objects of this class be instantiated,
+
      Initializes this class definition object to inherit from the
-  // given parent class.
+  // given parent class.  If isConcrete is set to AAFTrue\, objects of
+  // this class can be instantiated; otherwise\, it will be illegal to
+  // instantiate such objects.
   // 
   // Succeeds if:
   // - The pID pointer is valid.
@@ -88,7 +100,7 @@ AD_XMETHOD1(CountPropertyDefs,
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pCount\))
 
 
-AD_XMETHOD5(RegisterNewPropertyDef,
+AD_XMETHOD6(RegisterNewPropertyDef,
 			[in\, ref],
 			objPass,
 			aafUID_constref,
@@ -108,10 +120,16 @@ AD_XMETHOD5(RegisterNewPropertyDef,
 			type of the new property,
 
 			[in],
-			objPass,
-			aafBool,
+			enumIn,
+			aafBoolean_t,
 			isOptional,
 			true if new property is to be optional,
+
+			[in],
+			enumIn,
+			aafBoolean_t,
+			isUniqueIdentifier,
+			true if new property is to be the unique identifier of the class,
 
 			[out],
 			objOut,
@@ -144,6 +162,9 @@ AD_XMETHOD5(RegisterNewPropertyDef,
   //
   // AAFRESULT_OBJECT_ALREADY_ATTACHED
   //   - This class has already been registered.
+  //
+  // AAFRESULT_ALREADY_UNIQUELY_INDENTIFED
+  //   - This class already has a unique indentifier property.
   //
   // AAFRESULT_BAD_PARAM
   //   - The given ID has already been registered.)
@@ -242,13 +263,80 @@ AD_XMETHOD1(GetParent,
 			parent class definition,
 
      Gets the Parent class for this object.  If there is no parent\,
-  // returns the NULL AUID.  The only class which has no parent will
+  // returns the result AAFRESULT_NO_PARENT.  The only class which has no parent will
   // be AAFObject.
   // 
   // Succeeds if:
   // - The ppClassDef pointer is valid.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pClassDef\))
+
+
+AD_XMETHOD1(IsConcrete,
+			[out\, retval],
+			objPass,
+			aafBoolean_t*,
+			pResult,
+			Can this class be instantiated,
+
+     Returns true if this class can be instantiated; returns false
+  // otherwise. 
+  // 
+  // Succeeds if:
+  // - The ppClassDef pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pResult\))
+
+
+AD_XMETHOD1(IsRoot,
+			[out\, retval],
+			objPass,
+			aafBoolean_t*,
+			isRoot,
+			Is this a root \(base\) class,
+
+     Returns true if this class is the base of the inheritance
+  // hierarchy; returns false otherwise.
+  // 
+  // Succeeds if:
+  // - The ppClassDef pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(isRoot\))
+
+
+AD_XMETHOD1(IsUniquelyIdentified,
+			[out\, retval],
+			objPass,
+			aafBoolean_t*,
+			pIsUniquelyIdentified,
+			Is this a UniquelyIdentified class,
+
+     Returns true if this class is uniquely identified.
+  // 
+  // Succeeds if:
+  // - The pIsUniquelyIdentified pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pIsUniquelyIdentified\))
+
+
+AD_XMETHOD1(GetUniqueIdentifier,
+			[out\, retval],
+			objOut,
+			AAFPropertyDef,
+			ppUniqueIdentifier,
+			The unique identifier,
+
+     Returns the property definition corresponding to this class'
+  // unique identifier.
+  // 
+  // Succeeds if:
+  // - The ppUniqueIdentifier pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppUniqueIdentifier\)
+  //
+  // AAFRESULT_PROP_NOT_PRESENT
+  //   - If this class definition does not have a unique identifier
+  //     property definition.)
 
 
 AD_CLASSDEF_FACTORY(CreateInstance,

@@ -45,7 +45,7 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 #include <assert.h>
 #include <string.h>
@@ -55,7 +55,7 @@ typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
 
 
 ImplAAFEventMobSlot::ImplAAFEventMobSlot ():
-  _editRate(PID_EventMobSlot_EditRate,	"EditRate")
+  _editRate(PID_EventMobSlot_EditRate,	L"EditRate")
 {
   _persistentProperties.put(_editRate.address());
 }
@@ -148,7 +148,7 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
       CHECK(pComponent->GetDataDef(&pComponentDataDef));
 	  CHECK(pComponentDataDef->DoesDataDefConvertTo(pSequDataDef,
 													&willConvert));
-	  if (willConvert == AAFFalse)
+	  if (willConvert == kAAFFalse)
 		  RAISE(AAFRESULT_OBJECT_SEMANTIC);
 
       // Get the runtime type info for validation.
@@ -178,7 +178,7 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
         // sequence.
 		CHECK(pComponentDataDef->DoesDataDefConvertTo(pSequDataDef,
 													  &willConvert));
-		if (willConvert == AAFFalse)
+		if (willConvert == kAAFFalse)
 			RAISE(AAFRESULT_INVALID_DATADEF);
 
         // Validate that this event is the "same" type of event as the

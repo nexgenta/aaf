@@ -29,6 +29,7 @@
 #include "CAAFEssenceFileStream.h"
 
 #include <assert.h>
+#include <string.h>
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 #include "aafErr.h"
@@ -36,10 +37,7 @@
 #include "AAFContainerDefs.h"
 
 #include <errno.h>
-
-#if defined(_MAC) || defined(macintosh)
-#include <wstring.h>
-#endif
+#include <wchar.h>
 
 const aafUID_t  EXAMPLE_FILE_PLUGIN =	{ 0x914B3AD1, 0xEDE7, 0x11d2, { 0x80, 0x9F, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
 
@@ -140,22 +138,8 @@ HRESULT CAAFEssenceFileContainer::CheckExistingStreams(
 }
 
 
-// Set up the plugin.
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::Start(void)
-{
-  return S_OK;
-}
-
-// Tear down the plugin.
-HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::Finish(void)
-{
-  return S_OK;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetNumDefinitions (aafInt32 *pDefCount)
+    CAAFEssenceFileContainer::CountDefinitions (aafUInt32 *pDefCount)
 {
 	if(pDefCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -165,7 +149,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
+    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
 {
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -183,11 +167,10 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	aafUID_t			uid;
 	IAAFContainerDef	*container = NULL;
-	IAAFDefObject		*obj = NULL;
     IAAFClassDef        *pcd = 0;
 
 	if((dict == NULL) || (def == NULL))
@@ -201,11 +184,8 @@ HRESULT STDMETHODCALLTYPE
 		pcd->Release();
 		pcd = 0;
 		uid = ContainerFile;
-		CHECK(container->SetEssenceIsIdentified(AAFFalse));
-		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)&obj));
-		CHECK(obj->Initialize(uid, L"Raw file Container", L"Essence is in a non-container file."));
-		obj->Release();
-		obj = NULL;
+		CHECK(container->SetEssenceIsIdentified(kAAFFalse));
+		CHECK(container->Initialize(uid, L"Raw file Container", L"Essence is in a non-container file."));
 		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)def));
 		container->Release();
 		container = NULL;
@@ -216,11 +196,6 @@ HRESULT STDMETHODCALLTYPE
 		  {
 			container->Release();
 			container = 0;
-		  }
-		if(obj != NULL)
-		  {
-			obj->Release();
-			obj = 0;
 		  }
 		if (pcd)
 		  {
@@ -243,21 +218,22 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
+    CAAFEssenceFileContainer::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
 {
-	IAAFPluginDescriptor	*desc = NULL;
+	IAAFPluginDef			*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
 	IAAFNetworkLocator		*pNetLoc = NULL;
 	IAAFClassDef            *pcd = 0;
 	
 	XPROTECT()
 	{
-	    CHECK(dict->LookupClassDef(AUID_AAFPluginDescriptor, &pcd));
-		CHECK(pcd->CreateInstance(IID_IAAFPluginDescriptor, 
+	    CHECK(dict->LookupClassDef(AUID_AAFPluginDef, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFPluginDef, 
 								  (IUnknown **)&desc));
 		pcd->Release();
 		pcd = 0;
 		*descPtr = desc;
+		desc->AddRef();
 		CHECK(desc->Initialize(EXAMPLE_FILE_PLUGIN, L"Essence File Container", L"Handles non-container files."));
 
 		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
@@ -275,9 +251,9 @@ HRESULT STDMETHODCALLTYPE
 
 		CHECK(desc->SetManufacturerID(MANUF_JEFFS_PLUGINS));
 		CHECK(desc->SetPluginManufacturerName(manufName));
-		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
-		CHECK(desc->SetIsAccelerated(AAFFalse));
-		CHECK(desc->SetSupportsAuthentication(AAFFalse));
+		CHECK(desc->SetIsSoftwareOnly(kAAFTrue));
+		CHECK(desc->SetIsAccelerated(kAAFFalse));
+		CHECK(desc->SetSupportsAuthentication(kAAFFalse));
 		
 		/**/
 		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
@@ -458,6 +434,10 @@ HRESULT STDMETHODCALLTYPE
 //
 // 
 // 
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFEssenceFileContainer::InternalQueryInterface
 (
     REFIID riid,
@@ -469,14 +449,14 @@ HRESULT CAAFEssenceFileContainer::InternalQueryInterface
         return E_INVALIDARG;
 
     // We support the IAAFEssenceContainer interface 
-    if (riid == IID_IAAFEssenceContainer) 
+    if (EQUAL_UID(riid,IID_IAAFEssenceContainer)) 
     { 
         *ppvObj = (IAAFEssenceContainer *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
     // and the IAAFPlugin interface
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();

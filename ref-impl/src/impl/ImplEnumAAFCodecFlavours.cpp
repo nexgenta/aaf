@@ -39,7 +39,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFCodecFlavours;
 ImplEnumAAFCodecFlavours::ImplEnumAAFCodecFlavours ()
 {
 	_current = 0;
-	_codec = NULL;
+	_codec = 0;
 }
 
 
@@ -48,7 +48,7 @@ ImplEnumAAFCodecFlavours::~ImplEnumAAFCodecFlavours ()
 	if (_codec)
 	{
 		_codec->Release();
-		_codec = NULL;
+		_codec = 0;
 	}
 }
 
@@ -57,15 +57,15 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFCodecFlavours::NextOne (
       aafUID_t *pAAFCodecFlavour)
 {
-	aafInt32			numElem;
+	aafUInt32			numElem;
 
 	XPROTECT()
 	{
-		CHECK(_codec->GetFlavourCount(&numElem))
-		if(pAAFCodecFlavour == NULL)
+		CHECK(_codec->CountFlavours(&numElem))
+		if(pAAFCodecFlavour == 0)
 			RAISE(AAFRESULT_NULL_PARAM);
 		if(_current >= numElem)
-			RAISE(AAFRESULT_NO_MORE_OBJECTS);
+			RAISE(AAFRESULT_NO_MORE_FLAVOURS);
 		CHECK(_codec->GetIndexedFlavourID (_current, pAAFCodecFlavour));
 
 		_current++;
@@ -89,7 +89,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUInt32			numDefs;
 	HRESULT				hr;
 
-	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
+	if ((!pFetched && count != 1) || (!pFetched && count == 1))
 		return E_INVALIDARG;
 
 	// Point at the first component in the array.
@@ -119,10 +119,10 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32  count)
 {
 	AAFRESULT	hr;
-	aafInt32	newCurrent;
-	aafInt32	numElem;
+	aafUInt32	newCurrent;
+	aafUInt32	numElem;
 
-	hr = _codec->GetFlavourCount(&numElem);
+	hr = _codec->CountFlavours(&numElem);
 	if(hr != AAFRESULT_SUCCESS)
 		return hr;
 
@@ -135,7 +135,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		hr = E_FAIL;
+		hr = AAFRESULT_NO_MORE_FLAVOURS;
 	}
 
 	return hr;
@@ -158,7 +158,7 @@ AAFRESULT STDMETHODCALLTYPE
 	AAFRESULT				hr;
 
 	result = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
-	if (result == NULL)
+	if (!result)
 		return E_FAIL;
 
 	hr = result->SetEnumCodec(_codec);
@@ -172,7 +172,7 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  result->ReleaseReference();
 	  result = 0;
-	  *ppEnum = NULL;
+	  *ppEnum = 0;
 	}
 	
 	return hr;
