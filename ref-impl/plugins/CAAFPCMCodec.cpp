@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.5 2004/11/22 15:02:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.6 2004/11/22 15:33:37 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -932,12 +932,12 @@ HRESULT STDMETHODCALLTYPE
 {
 	plugin_trace("CAAFPCMCodec::ReadBlocks()\n");
 
-	aafUInt32       nbytes, fileBytes;
-	aafUInt32        n, startBuflen, xferSamples, sub;
+	aafUInt32		nbytes, fileBytes;
+	aafUInt32		n, xferSamples, sub;
 	aafUInt32		maxSamplesLeft;
 	aafUInt8		*start;
 	aafmMultiXfer_t *xfer;
-	aafmMultiResult_t *result;
+	aafmMultiResult_t *result = NULL;
 	aafUInt16		ch, xf;
 	aafUInt8		tmpBuf[256];
 
@@ -1002,7 +1002,7 @@ HRESULT STDMETHODCALLTYPE
 		}
 		else
 		{
-			aafUInt32	bytesPerSample;
+			aafUInt32	bytesPerSample, startBuflen = 0;
 
 			if(_interleaveBuf == NULL)
 				_interleaveBuf = new pcm_interleaveBuf_t[_numCh];

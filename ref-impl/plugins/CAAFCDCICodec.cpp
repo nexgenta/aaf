@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.15 2004/11/04 17:55:07 phil_tudor Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.16 2004/11/22 15:33:36 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -697,7 +697,7 @@ HRESULT STDMETHODCALLTYPE
 	HRESULT hr = S_OK;
 	aafUInt32		storedWidth, storedHeight;
 	aafInt16		padBits;
-	aafUInt32		compWidth, bitsPerPixel;
+	aafUInt32		compWidth, bitsPerPixel = 0;
 	aafUInt32		subSampling;
 	aafRational_t		sampleRate = NULL_RATIONAL;
 	aafFrameLayout_t	frameLayout;

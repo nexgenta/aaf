@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.49 2004/11/22 15:02:44 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.50 2004/11/22 15:33:37 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -715,7 +715,7 @@ HRESULT STDMETHODCALLTYPE
 	HRESULT hr = S_OK;
 	aafUInt32		storedWidth, storedHeight;
 	aafInt16		padBits;
-	aafInt32		compWidth, bitsPerPixel;
+	aafInt32		compWidth, bitsPerPixel = 0;
 	aafUInt32	subSampling;
 	aafRational_t sampleRate = NULL_RATIONAL;
 	aafFrameLayout_t frameLayout;

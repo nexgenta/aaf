@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.12 2004/11/22 15:02:43 stuart_hc Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.13 2004/11/22 15:33:36 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -766,12 +766,12 @@ CAAFAIFCCodec::ReadBlocks (aafDeinterleave_t  inter,
 						   aafmMultiXfer_t *  xferBlock,
 						   aafmMultiResult_t *  resultBlock)
 {
-	aafUInt32       nbytes, fileBytes;
-	aafUInt32        n, startBuflen, xferSamples, sub;
+	aafUInt32		nbytes, fileBytes;
+	aafUInt32		n, xferSamples, sub;
 	aafUInt32		maxSamplesLeft;
 	aafUInt8		*start;
 	aafmMultiXfer_t *xfer;
-	aafmMultiResult_t *result;
+	aafmMultiResult_t *result = NULL;
 	aafUInt16		ch, xf;
 	aafUInt8		tmpBuf[256];
 	
@@ -842,7 +842,7 @@ CAAFAIFCCodec::ReadBlocks (aafDeinterleave_t  inter,
 		}
 		else
 		{
-			aafUInt32	bytesPerSample;
+			aafUInt32	bytesPerSample, startBuflen = 0;
 			
 			if(_interleaveBuf == NULL)
 				_interleaveBuf = new interleaveBufAIFF_t[_numCh];
