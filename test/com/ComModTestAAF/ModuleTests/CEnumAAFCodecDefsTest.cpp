@@ -1,12 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFCodecDefs object
-/************************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\************************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -126,32 +145,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
     
-	checkResult(pDictionary->CreateInstance(&AUID_AAFCodecDef,
+	checkResult(pDictionary->CreateInstance(AUID_AAFCodecDef,
 							  IID_IAAFCodecDef, 
 							  (IUnknown **)&pCodecDef));
     
 	checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-	uid = DDEF_Matte;
-	checkResult(pCodecDef->AppendEssenceKind (&uid));
+	checkResult(pCodecDef->AppendEssenceKind (DDEF_Matte));
 	uid = NoCodec;
-	checkResult(pDef->Init (&uid, sName1, sDescription1));
+	checkResult(pDef->Initialize (uid, sName1, sDescription1));
 	checkResult(pDictionary->RegisterCodecDefinition(pCodecDef));
 	pDef->Release();
 	pDef = NULL;
 	pCodecDef->Release();
 	pCodecDef = NULL;
-	checkResult(pDictionary->CreateInstance(&AUID_AAFCodecDef,
+	checkResult(pDictionary->CreateInstance(AUID_AAFCodecDef,
 							  IID_IAAFCodecDef, 
 							  (IUnknown **)&pCodecDef));
     
 	checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
-	uid = DDEF_Matte;
-	checkResult(pCodecDef->AppendEssenceKind (&uid));
+	checkResult(pCodecDef->AppendEssenceKind (DDEF_Matte));
 	uid = NoCodec;
-	checkResult(pDef->Init (&uid, sName2, sDescription2));
+	checkResult(pDef->Initialize (uid, sName2, sDescription2));
 
 	checkResult(pDictionary->RegisterCodecDefinition(pCodecDef));
   }

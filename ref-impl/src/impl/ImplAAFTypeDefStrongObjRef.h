@@ -30,6 +30,7 @@
  *
  ************************************************************************/
 
+
 class ImplAAFPropertyValue;
 
 class ImplAAFClassDef;
@@ -65,7 +66,7 @@ public:
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType) const;
+    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -78,17 +79,13 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTypeDefStrongObjRef)
-
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
-        (const aafUID_t *  pID,
-         const aafUID_t * pRefdObjID,
-         wchar_t *  pTypeName);
+        (const aafUID_t & id,
+         const aafUID_t & refdObjID,
+         const aafCharacter * pTypeName);
 
   // overrides from ImplAAFTypeDef
   //

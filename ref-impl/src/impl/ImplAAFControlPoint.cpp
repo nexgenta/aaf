@@ -138,7 +138,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFControlPoint::SetEditHint (
       aafEditHint_t  editHint)
 {
-	_hint = (aafUInt16)editHint;
+	_hint = editHint;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -218,7 +218,7 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(MyHeadObject(&head));
 		CHECK(head->GetDictionary(&dict));
 		typeID = _type;
-		CHECK(dict->LookupType(&typeID, ppTypeDef));
+		CHECK(dict->LookupType(typeID, ppTypeDef));
 //		(*ppTypeDef)->AcquireReference();
 		head->ReleaseReference();
 		head = NULL;

@@ -1,22 +1,49 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTypeDef
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
+#include "AAFTypeDefUIDs.h"
 
 #include <iostream.h>
 #include <assert.h>
 #include <stdio.h>
 
+#include "AAFSmartPointer.h"
+typedef IAAFSmartPointer<IAAFDictionary> IAAFDictionarySP;
+typedef IAAFSmartPointer<IAAFFile>       IAAFFileSP;
+typedef IAAFSmartPointer<IAAFHeader>     IAAFHeaderSP;
+typedef IAAFSmartPointer<IAAFTypeDef>    IAAFTypeDefSP;
+typedef IAAFSmartPointer<IAAFTypeDefInt> IAAFTypeDefIntSP;
+typedef IAAFSmartPointer<IUnknown>       IUnknownSP;
 
 // {C3930DD6-E603-11d2-842A-00600832ACB8}
 static aafUID_t TypeID_LocalInt32 = 
@@ -56,36 +83,36 @@ static HRESULT TestTypeDef ()
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
 
-  IAAFFile* pFile = NULL;
+  IAAFFileSP pFile;
   RemoveTestFile (testFileName);
   hr = AAFFileOpenNewModify(testFileName, 0, &ProductInfo, &pFile);
   if (! SUCCEEDED (hr)) return hr;
 
-  IAAFHeader * pHeader = NULL;
+  IAAFHeaderSP pHeader;
   hr = pFile->GetHeader (&pHeader);
   if (! SUCCEEDED (hr)) return hr;
   assert (pHeader);
 
-  IAAFDictionary * pDict = NULL;
+  IAAFDictionarySP pDict;
   hr = pHeader->GetDictionary (&pDict);
   if (! SUCCEEDED (hr)) return hr;
   assert (pDict);
 
   // Let's try to do something interesting with a type definition
-  IAAFTypeDefInt * pTypeDefInt = NULL;
-  hr = pDict->CreateInstance (&AUID_AAFTypeDefInt,
+  IAAFTypeDefIntSP pTypeDefInt;
+  hr = pDict->CreateInstance (AUID_AAFTypeDefInt,
 							  IID_IAAFTypeDefInt,
 							  (IUnknown **) &pTypeDefInt);
   if (! SUCCEEDED (hr)) return hr;
   assert (pTypeDefInt);
 
-  hr = pTypeDefInt->Initialize (&TypeID_LocalInt32,
+  hr = pTypeDefInt->Initialize (TypeID_LocalInt32,
 								4,        // 4-byte (32-bit) int
 								AAFTrue,  // signed
 								L"Local 32-bit int");
   if (! SUCCEEDED (hr)) return hr;
 
-  IAAFTypeDef * pTypeDef = NULL;
+  IAAFTypeDefSP pTypeDef;
   hr = pTypeDefInt->QueryInterface(IID_IAAFTypeDef, (void **)&pTypeDef);
   if (! SUCCEEDED (hr)) return hr;
   assert (pTypeDef);
@@ -106,16 +133,32 @@ static HRESULT TestTypeDef ()
   if (kAAFTypeCatInt != typeCat)
 	return AAFRESULT_TEST_FAILED;
 
+  // Test for RawAccessType().  It should be array of unsigned chars.
+  IAAFTypeDefSP pRawType;
+  hr = pTypeDef->RawAccessType (&pRawType);
+  if (! SUCCEEDED (hr)) return hr;
+
+  IUnknownSP    pUnkRawType;
+  hr = pRawType->QueryInterface(IID_IUnknown, (void **)&pUnkRawType);
+  if (! SUCCEEDED (hr)) return hr;
+
+  IAAFTypeDefSP pUInt8ArrayType;
+  hr = pDict->LookupType (kAAFTypeID_UInt8Array, &pUInt8ArrayType);
+  if (! SUCCEEDED (hr)) return hr;
+
+  IUnknownSP    pUnkUInt8Array;
+  hr = pUInt8ArrayType->QueryInterface(IID_IUnknown, (void **)&pUnkUInt8Array);
+  if (! SUCCEEDED (hr)) return hr;
+
+  if (pUnkUInt8Array != pUnkRawType)
+	return AAFRESULT_TEST_FAILED;
+
+
   // that's all we can test for.  Clean up.
-  pTypeDef->Release();
-  pTypeDefInt->Release();
-  pDict->Release();
-  pHeader->Release();
   hr = pFile->Save();
   if (! SUCCEEDED (hr)) return hr;
   hr = pFile->Close();
   if (! SUCCEEDED (hr)) return hr;
-  pFile->Release();
 
   return AAFRESULT_SUCCESS;
 }
@@ -135,22 +178,6 @@ extern "C" HRESULT CAAFTypeDef_test()
       cerr << "CAAFTypeDef_test...Caught general C++"
         " exception!" << endl; 
     }
-
-  // When all of the functionality of this class is tested, we can return success.
-  // When a method and its unit test have been implemented, remove it from the list.
-  if (SUCCEEDED(hr))
-	{
-	  cout << "The following AAFTypeDef methods have not been implemented:" << endl; 
-	  cout << "     RawAccessType - needs unit test" << endl;
-	  cout << "     GetMinVersion - needs unit test" << endl;
-	  cout << "     SetMinVersion - needs unit test" << endl;
-	  cout << "     GetMaxVersion - needs unit test" << endl;
-	  cout << "     SetMaxVersion - needs unit test" << endl;
-	  cout << "     GetSwapNeeded - needs unit test" << endl;
-	  cout << "     SetSwapNeeded - needs unit test" << endl;
-	  cout << "     GetRefValues  - needs unit test" << endl;
-	  hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-	}
 
   return hr;
 }
