@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOperationDef.cpp,v 1.36 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFOperationDef.cpp,v 1.37 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,7 +50,6 @@
 
 #include "ImplAAFDictionary.h"
 #include "ImplAAFDataDef.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -430,16 +429,4 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
 	return (result);
-}
-
-void ImplAAFOperationDef::onCopy(void* clientContext) const
-{
-  ImplAAFDefObject::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_dataDef);
-    pResolver->ResolveWeakReference(_degradeTo);
-    pResolver->ResolveWeakReference(_paramDefined);
-  }
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.31 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.32 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -182,12 +182,8 @@ ImplAAFMetaDictionary *ImplAAFMetaDictionary::CreateMetaDictionary(void)
       // must have a reference to a factory. Since the meta dictionary is not created
       // by the OMClassFactory interface we just set the factory to "itself".
       //
-//
-//      pMetaDictionary->setClassFactory(pMetaDictionary);
 
-      // NOTE: We will probably need to change the previous
-      // line to use a "setMetaClassFactory()" (to be provided by OM)
-      // transdel:2000-APR-11  
+      pMetaDictionary->setClassFactory(pMetaDictionary);
     }
     else
     {
@@ -205,11 +201,6 @@ bool ImplAAFMetaDictionary::isRegistered(const OMClassId& classId ) const
 {
 	assert( sizeof(OMClassId) == sizeof(aafUID_t) );
 	return containsClass( reinterpret_cast<const aafUID_t&>(classId) );
-}
-
-void ImplAAFMetaDictionary::cloneClassDef( const OMClassId& id, OMClassFactory* pDstFactory )
-{
-  ImplAAFCloneResolver::CloneClassDef(id, pDstFactory, this);
 }
 
 //

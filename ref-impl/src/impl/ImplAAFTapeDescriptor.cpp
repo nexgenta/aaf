@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTapeDescriptor.cpp,v 1.27 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTapeDescriptor.cpp,v 1.28 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,7 @@
 #include "AAFPropertyIDs.h"
 
 #include <assert.h>
+#include <wchar.h>
 #include "AAFResult.h"
 
 
@@ -69,6 +70,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pName == NULL)
 	{
 		aafError = AAFRESULT_NULL_PARAM;
+	}
+	else if (wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+		aafError = AAFRESULT_BAD_SIZE;
 	}
 	else
 	{
@@ -131,6 +136,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pModelName == NULL)
 	{
 		aafError = AAFRESULT_NULL_PARAM;
+	}
+	else if (wcslen(pModelName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+		aafError = AAFRESULT_BAD_SIZE;
 	}
 	else
 	{

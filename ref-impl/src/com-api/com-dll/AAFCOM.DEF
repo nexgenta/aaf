@@ -1,6 +1,6 @@
 ; --------------------------------------------------------------------------
 ;
-; $Id: AAFCOM.DEF,v 1.13 2004/05/06 17:55:47 asuraparaju Exp $ $Name:  $
+; $Id: AAFCOM.DEF,v 1.14 2004/09/10 17:13:04 stuart_hc Exp $ $Name:  $
 ;
 ; The contents of this file are subject to the AAF SDK Public
 ; Source License Agreement (the "License"); You may not use this file
@@ -45,3 +45,6 @@ EXPORTS		AAFCreateRawStorageMemory
 EXPORTS		AAFCreateRawStorageDisk
 EXPORTS		AAFCreateRawStorageCachedDisk
 EXPORTS		AAFCreateAAFFileOnRawStorage
+EXPORTS		AAFGetLibraryVersion
+EXPORTS		AAFGetLibraryPathNameBufLen
+EXPORTS		AAFGetLibraryPathName

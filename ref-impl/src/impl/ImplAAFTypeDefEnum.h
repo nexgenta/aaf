@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.h,v 1.28 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.h,v 1.29 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,7 @@
 #endif
 
 #include "OMWeakRefProperty.h"
+#include "OMArrayProperty.h"
 
 class ImplAAFPropertyValue;
 
@@ -312,7 +313,7 @@ private:
   OMVariableSizeProperty<wchar_t> _ElementNames;
 
   // array of values for elements.
-  OMVariableSizeProperty<aafInt64> _ElementValues;
+  OMArrayProperty<aafInt64> _ElementValues;
 
   aafBool          _isRegistered;
   aafBool          _registrationAttempted;
@@ -340,7 +341,6 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
-  virtual void onCopy(void* clientContext) const;
 };
 
 //

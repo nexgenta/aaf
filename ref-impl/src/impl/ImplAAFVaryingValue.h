@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFVaryingValue.h,v 1.15 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFVaryingValue.h,v 1.16 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -165,9 +165,6 @@ public:
 
 public:
 	// SDK-private methods
-
-  // OM deep copy notification
-  virtual void onCopy(void* clientContext) const;
 
 private:
 	OMWeakReferenceProperty<ImplAAFInterpolationDef>		_interpolation;

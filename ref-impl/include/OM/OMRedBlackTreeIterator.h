@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRedBlackTreeIterator.h,v 1.14 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMRedBlackTreeIterator.h,v 1.15 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -131,7 +131,7 @@ public:
     // @cmember Return the <p Key> of the <p Value> in the associated
     //          <c OMRedBlackTree> at the position currently designated by this
     //          <c OMRedBlackTreeIterator>.
-  Key key(void) const;
+  const Key& key(void) const;
 
 private:
 

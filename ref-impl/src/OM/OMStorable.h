@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStorable.h,v 1.60 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStorable.h,v 1.61 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -205,6 +205,9 @@ protected:
 private:
 
   const OMStorable* container(void) const;
+
+  static OMPropertyId destinationId(const OMStorable* destination,
+                                    const OMProperty* property);
 
   const OMStorable* _container;
   wchar_t* _name;

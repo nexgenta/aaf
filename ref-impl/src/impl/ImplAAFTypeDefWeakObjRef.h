@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.h,v 1.27 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.h,v 1.28 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,7 +35,9 @@ class ImplAAFClassDef;
 #ifndef __ImplAAFTypeDefObjectRef_h__
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
+#include "AAFUtils.h"
 #include "OMWeakRefProperty.h"
+#include "OMArrayProperty.h"
 
 
 class ImplAAFTypeDefWeakObjRef : public ImplAAFTypeDefObjectRef
@@ -144,18 +146,16 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
-  virtual void onCopy(void* clientContext) const;
 
   // Method is called after class has been added to MetaDictionary.
   // If this method fails the class is removed from the MetaDictionary and the
   // registration method will fail.
   virtual HRESULT CompleteClassRegistration(void);
 
-
 private:
   // Persistent member properties
   OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
-  OMVariableSizeProperty<aafUID_t> _targetSet; // array of property definition ids
+  OMArrayProperty<aafUID_t> _targetSet; // array of property definition ids
   
   // Transient members
   OMPropertyId * _targetPids;

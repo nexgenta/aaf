@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOperationGroup.cpp,v 1.58 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFOperationGroup.cpp,v 1.59 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,7 +64,6 @@
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
 #include "ImplEnumAAFParameters.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -632,12 +631,22 @@ AAFRESULT ImplAAFOperationGroup::ChangeContainedReferences(aafMobID_constref fro
 }
 
 
-void ImplAAFOperationGroup::onCopy( void* clientContext ) const
+void ImplAAFOperationGroup::Accept(AAFComponentVisitor& visitor)
 {
-  ImplAAFSegment::onCopy(clientContext);
+	aafUInt32 count = 0;
+	CountSourceSegments(&count);
+	for(aafUInt32 i=0; i<count; i++)
+	{
+		ImplAAFSegment* pSegment = 0;
+		GetInputSegmentAt(i, &pSegment);
 
-  if (clientContext) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_operationDefinition);
-  }
+       	        pSegment->Accept(visitor);
+
+		pSegment->ReleaseReference();
+		pSegment = NULL;
+	}
+
+	// TODO
+	// visitor.VisitOperationGroup(this);
 }
+

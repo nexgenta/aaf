@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMProperty.h,v 1.73 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMProperty.h,v 1.74 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,8 @@
 // representation of a given property.
 //
 const OMStoredForm SF_DATA                                   = 0x82;
+const OMStoredForm SF_DATA_VECTOR                            = 0xD2;
+const OMStoredForm SF_DATA_SET                               = 0xDA;
 const OMStoredForm SF_DATA_STREAM                            = 0x42;
 const OMStoredForm SF_STRONG_OBJECT_REFERENCE                = 0x22;
 const OMStoredForm SF_STRONG_OBJECT_REFERENCE_VECTOR         = 0x32;

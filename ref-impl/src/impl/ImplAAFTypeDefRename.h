@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.h,v 1.25 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.h,v 1.26 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -169,7 +169,6 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
-  virtual void onCopy(void* clientContext) const;
 
 private:
   ImplAAFTypeDefSP BaseType () const;

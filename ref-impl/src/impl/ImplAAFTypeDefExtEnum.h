@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefExtEnum.h,v 1.21 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefExtEnum.h,v 1.22 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,9 @@ class ImplAAFPropertyValue;
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
 #endif
+
+#include "AAFUtils.h"
+#include "OMArrayProperty.h"
 
 
 class ImplAAFTypeDefExtEnum : public ImplAAFTypeDef
@@ -242,7 +245,7 @@ private:
 	OMVariableSizeProperty<wchar_t>  _ElementNames;
 	
 	// array of values for elements.
-	OMVariableSizeProperty<aafUID_t> _ElementValues;
+	OMArrayProperty<aafUID_t> _ElementValues;
 	
 	ImplAAFTypeDefSP _cachedBaseType;
 	

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFKLVData.cpp,v 1.9 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFKLVData.cpp,v 1.10 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -207,6 +207,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if (!pValue)
 		return AAFRESULT_NULL_PARAM;
 	
+	if (valueSize > OMPROPERTYSIZE_MAX)
+		return AAFRESULT_BAD_SIZE;
+
 	if (!_cachedRenameTypeDef)
 	{
 		// Lookup the type definition from this KLV data. If it fails

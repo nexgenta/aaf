@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTaggedValue.cpp,v 1.18 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTaggedValue.cpp,v 1.19 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,6 +40,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 #include "AAFResult.h"
 #include "aafErr.h"
 
@@ -70,8 +71,10 @@ AAFRESULT STDMETHODCALLTYPE
       aafDataBuffer_t pValue)
 {
   AAFRESULT	result = AAFRESULT_SUCCESS;
-	if (!pName || !pType || !pValue)
-		return AAFRESULT_NULL_PARAM;
+  if (!pName || !pType || !pValue)
+    return AAFRESULT_NULL_PARAM;
+  if (wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+    return AAFRESULT_BAD_SIZE;
   if (_initialized)
     return AAFRESULT_ALREADY_INITIALIZED;
 
@@ -208,6 +211,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (!pValue)
 		return AAFRESULT_NULL_PARAM;
+
+	if (valueSize > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 //	_value.setValue(pValue, valueSize);
   if (!_cachedTypeDef)

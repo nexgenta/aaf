@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMAssertions.h,v 1.36 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: OMAssertions.h,v 1.37 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -268,24 +268,6 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define OLD(name) \
   oldValueOf##name
 
-  // @func Define, or redefine, ISO assert() to call
-  //       <f assertionViolation> instead of <f abort>. The behavior
-  //       of <f abort> is to exit the program, whereas the behavior
-  //       of <f assertionViolation> can be customized. The setting of
-  //       the ISO macro NDEBUG is honored.
-  //   @parm The condition expression. The expression should be
-  //         free of side effects.
-#if !defined(NDEBUG)
-#if defined(assert)
-#undef assert
-#endif
-#define assert(expression) \
-  (expression) \
-    ? (void)0  \
-    : assertionViolation("Assertion", "ISO assert", #expression, \
-                         "unknown", __FILE__, __LINE__)
-#endif
-
 #else
 
 #define TRACE(name)
@@ -313,13 +295,6 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define SAVE_EXPRESSION(name, expression, type)
 
 #define OLD(name)
-
-#if defined(NDEBUG)
-#if defined(assert)
-#undef assert
-#endif
-#define assert(expression)
-#endif
 
 #endif
 

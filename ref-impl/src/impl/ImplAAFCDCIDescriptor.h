@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCDCIDescriptor.h,v 1.15 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCDCIDescriptor.h,v 1.16 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -173,6 +173,38 @@ public:
 		// @parm [out] Address to store the number of bits.
         (aafInt16 *  pPaddingBits);
 
+  //****************
+  // SetAlphaSamplingWidth()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetAlphaSamplingWidth
+        // @parm [in] Optional.
+        (aafUInt32  alphaSamplingWidth);
+
+  //****************
+  // GetAlphaSamplingWidth()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetAlphaSamplingWidth
+        // @parm [out] Optional.
+        (aafUInt32 *  pAlphaSamplingWidth);
+
+  //****************
+  // SetReversedByteOrder()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetReversedByteOrder
+        // @parm [in] Optional.
+        (aafBoolean_t  reversedByteOrder);
+
+  //****************
+  // GetReversedByteOrder()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetReversedByteOrder
+        // @parm [out] Optional.
+        (aafBoolean_t *  pReversedByteOrder);
+
 protected:
 	OMFixedSizeProperty<aafInt32>			_componentWidth;
 	OMFixedSizeProperty<aafUInt32>			_horizontalSubsampling;
@@ -182,6 +214,8 @@ protected:
 	OMFixedSizeProperty<aafUInt32>			_whiteReferenceLevel;
 	OMFixedSizeProperty<aafUInt32>			_colorRange;
 	OMFixedSizeProperty<aafInt16>			_paddingBits;
+	OMFixedSizeProperty<aafUInt32>			_alphaSamplingWidth;
+	OMFixedSizeProperty<aafBool>			_reversedByteOrder;
 };
 
 #endif // ! __ImplAAFCDCIDescriptor_h__

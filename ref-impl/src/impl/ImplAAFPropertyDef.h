@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.h,v 1.26 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.h,v 1.27 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -163,12 +163,13 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
-  virtual void onCopy(void *clientContext) const;
 
   // Method is called after class has been added to MetaDictionary.
   // If this method fails the class is removed from the MetaDictionary and the
   // registration method will fail.
   virtual HRESULT CompleteClassRegistration(void);
+
+  virtual AAFRESULT MergeTo( ImplAAFClassDef* pDestClassDef );
 
 private:
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSelector.cpp,v 1.25 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSelector.cpp,v 1.26 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -399,4 +399,26 @@ AAFRESULT ImplAAFSelector::ChangeContainedReferences(aafMobID_constref from,
 	XEND;
 
 	return AAFRESULT_SUCCESS;
+}
+
+void ImplAAFSelector::Accept(AAFComponentVisitor& visitor)
+{
+	assert(_selected);
+	_selected->Accept(visitor);
+
+	aafInt32 count = 0;
+	GetNumAlternateSegments(&count);
+	for(aafInt32 i=0; i<count; i++)
+	{
+		ImplAAFSegment* pSegment = 0;
+		GetNthSegment(i, &pSegment);
+
+       	        pSegment->Accept(visitor);
+
+		pSegment->ReleaseReference();
+		pSegment = NULL;
+	}
+
+	// TODO
+	// visitor.VisitSelector(this);
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFNestedScope.cpp,v 1.31 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFNestedScope.cpp,v 1.32 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -261,7 +261,21 @@ AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafMobID_constref from,
 	return AAFRESULT_SUCCESS;
 }
 
+void ImplAAFNestedScope::Accept(AAFComponentVisitor& visitor)
+{
+	aafUInt32 count = 0;
+	CountSegments(&count);
+	for(aafUInt32 i=0; i<count; i++)
+	{
+		ImplAAFSegment* pSegment = 0;
+		GetSegmentAt(i, &pSegment);
 
+       	        pSegment->Accept(visitor);
 
+		pSegment->ReleaseReference();
+		pSegment = NULL;
+	}
 
-
+	// TODO
+	// visitor.VisitNestedScope(this);
+}

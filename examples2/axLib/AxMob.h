@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMob.h,v 1.11 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxMob.h,v 1.12 2004/09/10 17:12:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,8 @@
 class AxMob : public AxObject {
 
 public:
-	AxMob( IAAFMobSP spIaafMob );
+	AxMob( IAAFMobSP  spIaafMob );
+	AxMob( IAAFMob2SP spIaafMob );
 	virtual ~AxMob();
 
 	aafMobID_t GetMobID();
@@ -65,7 +66,13 @@ public:
 	
 	IEnumAAFMobSlotsSP GetSlots();
 
+	void SetUsageCode( const aafUID_t& usageCode );
+	aafUID_t GetUsageCode();
+
 	inline operator IAAFMobSP ()
+	{ return AxQueryInterface<IAAFMob2,IAAFMob>( _spIaafMob ); }
+
+	inline operator IAAFMob2SP ()
 	{ return _spIaafMob; }
 
 	AxMob()
@@ -75,7 +82,7 @@ private:
 	AxMob( const AxMob& );
 	AxMob& operator=( const AxMob& );
 
-	IAAFMobSP _spIaafMob;
+	IAAFMob2SP _spIaafMob;
 };
 
 //=---------------------------------------------------------------------=

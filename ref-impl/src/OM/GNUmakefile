@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11 2004/06/08 15:14:54 jptrainor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.12 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -46,10 +46,19 @@ endif
 INCLUDES = -I. \
 	   -I../../include/OM \
 	   -I$(AAFBASE)/ss-impl/ref \
+		 -I$(AAFBASE)/ref-impl/include \
        -I$(AAFBASE)/sss-impl/include
 
+# Optional libgsf support is enabled by LIBGSF_PATH variable
+# E.g. "make LIBGSF_PATH=/usr/local"
+ifndef LIBGSF_PATH
+DEPS:=$(filter-out %/OMGSFStructuredStorage.d,$(DEPS))
+DEPS:=$(filter-out %/OMGSFxMSSStoredObjectFactory.d,$(DEPS))
+CXXOBJS:=$(filter-out %/OMGSFStructuredStorage.o,$(CXXOBJS))
+CXXOBJS:=$(filter-out %/OMGSFxMSSStoredObjectFactory.o,$(CXXOBJS))
+endif
 
-CFLAGS +=  -DOM_PERMIT_ZERO_LENGTH -DOM_STACK_TRACE_ON_ASSERT
+CFLAGS += -DOM_PERMIT_ZERO_LENGTH -DOM_STACK_TRACE_ON_ASSERT
 
 
 .PHONY : all

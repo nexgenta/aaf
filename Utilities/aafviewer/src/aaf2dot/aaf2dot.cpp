@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaf2dot.cpp,v 1.2 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+// $Id: aaf2dot.cpp,v 1.3 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,9 @@
 //
 //=---------------------------------------------------------------------=
 
+#ifdef _MSC_VER
 #pragma warning (disable:4786)
+#endif
 
 #include <AxFile.h>
 #include <AxTypes.h>

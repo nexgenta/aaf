@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCodecDef.cpp,v 1.33 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCodecDef.cpp,v 1.34 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,6 @@
 #include "ImplAAFDataDef.h"
 #include "ImplAAFPluginManager.h"
 #include "ImplAAFDictionary.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -312,9 +311,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		*ppEnum = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
-		if(*ppEnum == NULL)
-			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(GetAUID(&uid));
 		mgr = ImplAAFPluginManager::GetPluginManager();
 		// Only looks at first codec matching
@@ -329,6 +325,9 @@ AAFRESULT STDMETHODCALLTYPE
 		if(!found)
 			RAISE(AAFRESULT_CODEC_INVALID);
 
+		*ppEnum = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
+		if(*ppEnum == NULL)
+			RAISE(AAFRESULT_NOMEMORY);
 		(*ppEnum)->SetEnumCodec(pCodec);
 		pPlug->Release();
 		pPlug = NULL;
@@ -388,13 +387,5 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
-void ImplAAFCodecDef::onCopy(void* clientContext) const
-{
-  ImplAAFDefObject::onCopy(clientContext);
 
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_dataDefs);
-    pResolver->ResolveWeakReference(_fileDescClass);
-  }
-}
+

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.43 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.44 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -153,6 +152,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	  totalNameSize += (wcslen (pMemberNames[i]) + 1);
 	}
+
+  if ((totalNameSize * sizeof(aafCharacter)) > OMPROPERTYSIZE_MAX)
+	return AAFRESULT_BAD_SIZE;
 
   aafCharacter * namesBuf = new aafCharacter[totalNameSize];
   if (!namesBuf)
@@ -1293,14 +1295,4 @@ void ImplAAFTypeDefRecord::onSave(void* clientContext) const
 void ImplAAFTypeDefRecord::onRestore(void* clientContext) const
 {
   ImplAAFTypeDef::onRestore(clientContext);
-}
-
-void ImplAAFTypeDefRecord::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDef::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_memberTypes);
-  }
 }

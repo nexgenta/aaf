@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileOp.cpp,v 1.8 2004/06/03 17:59:02 stuart_hc Exp $ $Name:  $
+// $Id: FileOp.cpp,v 1.9 2004/09/10 17:13:13 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,8 +45,8 @@ public:
     #define ADD_KIND( X ) \
     _kindMap[ string( #X ) ] = aafFileKindAaf##X;
 
-    ADD_KIND( MSSBinary );
-    ADD_KIND( SSSBinary );
+    ADD_KIND( M512Binary );
+    ADD_KIND( S512Binary );
     ADD_KIND( M4KBinary );
     ADD_KIND( S4KBinary );
   }
@@ -202,7 +202,7 @@ void FileOp::RunTest( CmdState& state, int argc, char** argv )
 StandardFactory<FileOp> factory(
   "FileOp",
   "File Operations",
-  "{ (write|read|modify MSSBinary|SSSBinary|M4KBinary|S4KBinary filename} | save | close | save_and_close }",
+  "{ (write|read|modify M512Binary|S512Binary|M4KBinary|S4KBinary filename} | save | close | save_and_close }",
   "",
   2, 4
   );

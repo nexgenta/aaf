@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefString.cpp,v 1.44 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefString.cpp,v 1.45 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -184,6 +183,9 @@ AAFRESULT STDMETHODCALLTYPE
   if (! IsRegistered ())
 	return AAFRESULT_NOT_REGISTERED;
 
+  if (initDataSize > OMPROPERTYSIZE_MAX)
+	return AAFRESULT_BAD_SIZE;
+
   ImplAAFPropValDataSP pvd;
   ImplAAFPropValData * tmp;
   tmp = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
@@ -226,6 +228,9 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (! IsRegistered ())
 	return AAFRESULT_NOT_REGISTERED;
+
+  if (dataSize > OMPROPERTYSIZE_MAX)
+	return AAFRESULT_BAD_SIZE;
 
   // Get the property value's embedded type and 
   // check if it's the same as the base type.
@@ -375,6 +380,11 @@ AAFRESULT STDMETHODCALLTYPE
 	//Add this "newsize" to the original originalDataSize to get the new Total buffer size
 	aafUInt32 TotalSize = originalDataSize + newsize;
 	
+	// Make sure that the new size doesn't exceed maximum
+        // size allowed for simple properties.
+        if (TotalSize > OMPROPERTYSIZE_MAX)
+		return AAFRESULT_BAD_SIZE;
+
 	//Save the orginal buffer, before we re-allocate
 	aafMemPtr_t tmp_buffer = new aafUInt8[originalDataSize+1];
 	memcpy(tmp_buffer, pOriginalData, originalDataSize);
@@ -719,14 +729,4 @@ void ImplAAFTypeDefString::onSave(void* clientContext) const
 void ImplAAFTypeDefString::onRestore(void* clientContext) const
 {
   ImplAAFTypeDef::onRestore(clientContext);
-}
-
-void ImplAAFTypeDefString::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDef::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_ElementType);
-  }
 }

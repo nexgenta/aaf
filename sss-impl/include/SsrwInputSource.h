@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFHeader.
 //=---------------------------------------------------------------------=
 //
-// $Id: SsrwInputSource.h,v 1.3 2004/04/07 16:02:46 bakerian Exp $ $Name:  $
+// $Id: SsrwInputSource.h,v 1.4 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,9 +53,6 @@
 * 
 *  Copyright (C) 2002 - 2004 Schema Software, Inc. All rights reserved.
 *
-*  $Revision: 1.3 $
-*  $Date: 2004/04/07 16:02:46 $
-*  
 */
 
 #ifndef SSRWINPUTSOURCE_H_INCLUDED

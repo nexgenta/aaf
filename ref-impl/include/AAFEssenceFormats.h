@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFEssenceFormats.h,v 1.11 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFEssenceFormats.h,v 1.12 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -83,3 +83,7 @@ const aafUID_t kAAFPadBytesPerRow = { 0xc146bde0, 0x4c0d, 0x11d3, { 0xbf, 0xdc, 
 // data will be very lossy non-baseline JPEG image. The image quality does not improve
 // much past 95.
 const aafUID_t kAAFCompressionQuality = { 0xc146bde1, 0x4c0d, 0x11d3, { 0xbf, 0xdc, 0x0, 0x10, 0x4b, 0xc9, 0x15, 0x6d } };
+
+// kAAFLegacyDV is used as a boolean specifier to select whether the CDCI codec
+// should create properties needed by legacy applications
+const aafUID_t kAAFLegacyDV = { 0x6AEFC514, 0x9041, 0x11d2, { 0x80, 0x88, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };

@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFileDescriptor.h,v 1.21 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFileDescriptor.h,v 1.22 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -131,9 +131,6 @@ public:
 	// Functions internal to the toolkit
 	virtual AAFRESULT STDMETHODCALLTYPE
 		GetOwningMobKind (aafMobKind_t *pMobKind);
-
-  // OM deep copy notification
-  virtual void onCopy(void* clientContext) const;
 
 private:
 	OMFixedSizeProperty<aafRational_t>	_sampleRate;

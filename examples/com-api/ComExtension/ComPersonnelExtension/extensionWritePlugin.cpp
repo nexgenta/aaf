@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionWritePlugin.cpp,v 1.13 2004/05/20 15:36:42 asuraparaju Exp $ $Name:  $
+// $Id: extensionWritePlugin.cpp,v 1.14 2004/09/10 17:12:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,6 +38,8 @@
 
 #if defined( OS_WINDOWS ) || defined( OS_MACOS )
 #define AAFPERSONNELEXTENSION_DLLNAME L"AAFPersonnelExtension.dll"
+#elif defined( OS_DARWIN )
+#define AAFPERSONNELEXTENSION_DLLNAME L"libAAFPersonnelExtension.dylib"
 #elif defined( OS_UNIX )
 #define AAFPERSONNELEXTENSION_DLLNAME L"libAAFPersonnelExtension.so"
 #else

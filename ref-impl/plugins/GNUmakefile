@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.13 2004/05/05 15:41:40 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.14 2004/09/10 17:13:02 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -61,7 +61,8 @@ SUPOBJS = $(OBJDIR)/aafCvt$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFClassFactory$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFServer$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFUnknown$(OBJ) \
-		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFInProcServer$(OBJ)
+		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFInProcServer$(OBJ) \
+		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/utf8$(OBJ)
 
 
 .PHONY : all
@@ -97,7 +98,7 @@ $(DYN_PGAPI_LIB) : $(CXXOBJS)
 	-L$(LIBDIR) $(SUPOBJS) $(CXXOBJS) -o $@ \
 	$(AAFBUILDDIR)/aaflib/$(AAFTARGETDIR)/libaaflib$(LIB) \
 	$(AAFBUILDDIR)/aafiid/$(AAFTARGETDIR)/libaafiid$(LIB) \
-	-ljpeg
+	-ljpeg $(OPT_CODEC_LIBS)
 
 
 CXXFILES2 = AAFInterpCOM.cpp \

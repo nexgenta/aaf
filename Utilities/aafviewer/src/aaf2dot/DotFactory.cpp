@@ -1,6 +1,6 @@
 
 /*
- * $Id: DotFactory.cpp,v 1.5 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotFactory.cpp,v 1.6 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -23,7 +23,9 @@
  */
 
 
+#ifdef _MSC_VER
 #pragma warning (disable:4786)
+#endif
 
 #include <iostream>
 #include <sstream>

@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.h,v 1.26 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSequence.h,v 1.27 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -179,6 +179,10 @@ public:
 									  aafLength_t *sclpLen,
 									  aafBool *isMask);
 
+	// Visit this component and its sub-components
+	// with the specified visitor.
+	virtual void Accept(AAFComponentVisitor& visitor);
+	
 private:
 
    // Sequences have two distinct forms: i) a sequence exclusively composed of events,

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.cpp,v 1.36 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.cpp,v 1.37 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,8 +44,6 @@
 #ifndef __AAFTypeDefUIDs_h__
 #include "AAFTypeDefUIDs.h"
 #endif
-
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -126,6 +124,9 @@ ImplAAFTypeDefEnum::pvtInitialize (
 	if (!pTypeName)
 		return AAFRESULT_NULL_PARAM;
 	
+	if ((numElements*sizeof(aafInt64)) > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
+
 	AAFRESULT hr;
 	
 	hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
@@ -142,6 +143,10 @@ ImplAAFTypeDefEnum::pvtInitialize (
 		totalNameSize += (wcslen (pElementNames[i]) + 1);
 	}
 	
+	if ((totalNameSize * sizeof(OMCharacter)) > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
+
+
 	wchar_t * namesBuf = new wchar_t[totalNameSize];
 	if (!namesBuf)
 		return AAFRESULT_NOMEMORY;
@@ -330,7 +335,7 @@ ImplAAFTypeDefEnum::GetElementType (
 	
 	if(_ElementType.isVoid())
 		return AAFRESULT_OBJECT_NOT_FOUND;
-	ImplAAFTypeDef *pTypeDef = _ElementType;
+	ImplAAFTypeDef *pTypeDef = bootstrapTypeWeakReference(_ElementType);
 	
 	*ppTypeDef = pTypeDef;
 	assert (*ppTypeDef);
@@ -1208,14 +1213,4 @@ void ImplAAFTypeDefEnum::onSave(void* clientContext) const
 void ImplAAFTypeDefEnum::onRestore(void* clientContext) const
 {
 	ImplAAFTypeDef::onRestore(clientContext);
-}
-
-void ImplAAFTypeDefEnum::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDef::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_ElementType);
-  }
 }

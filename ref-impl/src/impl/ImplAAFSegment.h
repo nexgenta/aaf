@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSegment.h,v 1.18 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSegment.h,v 1.19 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -102,9 +102,6 @@ public:
 	virtual AAFRESULT GenerateSequence(ImplAAFSequence **seq);
 
 	virtual AAFRESULT GetComponentType(implCompType_t* pType) {*pType = kSegment; return AAFRESULT_SUCCESS;}
-
-	// OM deep copy notification
-	virtual void onCopy(void* clientContext) const;
 };
 
 #endif // ! __ImplAAFSegment_h__

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEvent.cpp,v 1.12 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEvent.cpp,v 1.13 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,11 +29,12 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
-#include <AAFResult.h>
+#include "AAFResult.h"
 
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 
 ImplAAFEvent::ImplAAFEvent ():
@@ -79,6 +80,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (NULL == pComment)
 		return (AAFRESULT_NULL_PARAM);
+
+	if (wcslen(pComment)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return (AAFRESULT_BAD_SIZE);
 	
 	_comment = pComment;
 	

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDataDef.cpp,v 1.9 2004/06/03 12:27:09 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDataDef.cpp,v 1.10 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,8 @@
 
 #include <assert.h>
 #include <string.h>
+
+
 
 // CLSID for AAFDataDef 
 // {dfbd652A-1d81-11d2-bf96-006097116212}

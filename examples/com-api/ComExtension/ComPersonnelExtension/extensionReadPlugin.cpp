@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionReadPlugin.cpp,v 1.8 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+// $Id: extensionReadPlugin.cpp,v 1.9 2004/09/10 17:12:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,8 @@ using namespace std;
 
 #if defined( OS_WINDOWS ) || defined( OS_MACOS )
 #define AAFPERSONNELEXTENSION_DLLNAME L"AAFPersonnelExtension.dll"
+#elif defined( OS_DARWIN )
+#define AAFPERSONNELEXTENSION_DLLNAME L"libAAFPersonnelExtension.dylib"
 #elif defined( OS_UNIX )
 #define AAFPERSONNELEXTENSION_DLLNAME L"libAAFPersonnelExtension.so"
 #else

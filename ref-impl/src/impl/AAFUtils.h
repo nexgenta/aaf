@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.h,v 1.24 2004/05/10 18:39:52 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.h,v 1.25 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,12 +27,7 @@
 #define _AAF_UTIL_API_ 1
 
 #include <stdio.h>
-
-//removed by Ian Baker 20031219
-//not needed for GCC Solaris build so is it ever used??
-//#if defined(sun)
-//#include <sys/stdtypes.h>
-//#endif
+#include <string.h>  // For use of memcmp() below.
 
 #include "aafErr.h"
 #include "AAFTypes.h"
@@ -71,6 +66,58 @@ aafUInt32 aafGetTickCount();
 
 // Initializes a new auid
 AAFRESULT aafAUIDNew(aafUID_t * auid);
+
+// aafUID_t comparison operators.
+
+inline bool operator == (const aafUID_t& lhs,
+                         const aafUID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafUID_t)) == 0;
+}
+
+inline bool operator != (const aafUID_t& lhs,
+                         const aafUID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafUID_t)) != 0;
+}
+
+inline bool operator < (const aafUID_t& lhs,
+                        const aafUID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafUID_t)) < 0;
+}
+
+inline bool operator > (const aafUID_t& lhs,
+                        const aafUID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafUID_t)) > 0;
+}
+
+// aafMobID_t comparison operators.
+
+inline bool operator == (const aafMobID_t& lhs,
+                         const aafMobID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafMobID_t)) == 0;
+}
+
+inline bool operator != (const aafMobID_t& lhs,
+                         const aafMobID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafMobID_t)) != 0;
+}
+
+inline bool operator < (const aafMobID_t& lhs,
+                        const aafMobID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafMobID_t)) < 0;
+}
+
+inline bool operator > (const aafMobID_t& lhs,
+                        const aafMobID_t& rhs)
+{
+  return memcmp(&lhs, &rhs, sizeof(aafMobID_t)) > 0;
+}
 
 /************************************************************************
  *

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMClassFactory.h,v 1.18 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: OMClassFactory.h,v 1.19 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,12 +43,6 @@ public:
 
     // @cmember Is the given class id registered ?
   virtual bool isRegistered(const OMClassId& classId) const = 0;
-
-  // @cmember Copy the class identified by id to the destination class
-  //          factory.  A Subsequent call to dstFactory->create(id) should
-  //          succeed.  Return value is true if the copy succeed.  In normal
-  //          operation there is no reason for the copy to fail.
-  virtual void cloneClassDef(const OMClassId& id, OMClassFactory* dstFactory) = 0;
 
     // @cmember Create an instance of the appropriate derived class,
     //          given the class id.

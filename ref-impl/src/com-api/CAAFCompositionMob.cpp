@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFCompositionMob.cpp,v 1.6 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCompositionMob.cpp,v 1.7 2004/09/10 17:13:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,7 +62,6 @@ CAAFCompositionMob::CAAFCompositionMob (IUnknown * pControllingUnknown, aafBool 
 CAAFCompositionMob::~CAAFCompositionMob ()
 {
 }
-
 
 HRESULT STDMETHODCALLTYPE
     CAAFCompositionMob::Initialize (aafCharacter_constptr  pName)
@@ -227,6 +226,109 @@ HRESULT STDMETHODCALLTYPE
   return hr;
 }
 
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFCompositionMob::SetRendering (aafMobID_constref  mobID)
+{
+  HRESULT hr;
+
+  ImplAAFCompositionMob * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFCompositionMob*> (pO);
+  assert (ptr);
+
+
+  try
+    {
+      hr = ptr->SetRendering (mobID);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFCompositionMob::GetRendering (aafMobID_t *  pMobID)
+{
+  HRESULT hr;
+
+  ImplAAFCompositionMob * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFCompositionMob*> (pO);
+  assert (ptr);
+
+
+  try
+    {
+      hr = ptr->GetRendering (pMobID);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+  return hr;
+}
+
+
 //
 // 
 // 
@@ -239,6 +341,8 @@ HRESULT CAAFCompositionMob::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
+    HRESULT hr = S_OK;
+
     if (NULL == ppvObj)
         return E_INVALIDARG;
 
@@ -246,6 +350,13 @@ HRESULT CAAFCompositionMob::InternalQueryInterface
     if (EQUAL_UID(riid,IID_IAAFCompositionMob)) 
     { 
         *ppvObj = (IAAFCompositionMob *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+
+    if (EQUAL_UID(riid,IID_IAAFCompositionMob2)) 
+    { 
+        *ppvObj = (IAAFCompositionMob2 *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
@@ -258,4 +369,3 @@ HRESULT CAAFCompositionMob::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFCompositionMob)
-

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModel.h,v 1.6 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModel.h,v 1.7 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -771,6 +771,19 @@ public:
 private:
   aafUID_constptr _elementTypeId; // 
   const TypeDefinition *_elementType; // 
+};
+
+//
+// class for all of non-reference sets
+//
+class TypeDefinitionValueSet : public TypeDefinitionSet
+{
+public:
+  TypeDefinitionValueSet(aafCharacter_constptr name, 
+                       aafUID_constptr id,
+                       aafUID_constptr elementTypeId) :
+    TypeDefinitionSet (name, id, elementTypeId, true /*always concrete*/)
+  {}
 };
 
 //

@@ -1,5 +1,5 @@
 /*
- * $Id: DotThingWithID.cpp,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotThingWithID.cpp,v 1.4 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -21,7 +21,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #pragma warning (disable:4786)
 #endif
 

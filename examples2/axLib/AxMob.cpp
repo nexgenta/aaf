@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMob.cpp,v 1.11 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxMob.cpp,v 1.12 2004/09/10 17:12:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,11 @@
 
 AxMob::AxMob( IAAFMobSP spIaafMob )
 : AxObject( AxQueryInterface<IAAFMob, IAAFObject>( spIaafMob ) ),
+	_spIaafMob( AxQueryInterface<IAAFMob, IAAFMob2>( spIaafMob ) )
+{}
+
+AxMob::AxMob( IAAFMob2SP spIaafMob )
+: AxObject( AxQueryInterface<IAAFMob2, IAAFObject>( spIaafMob ) ),
 	_spIaafMob( spIaafMob )
 {}
 
@@ -131,6 +136,18 @@ IAAFMobSlotSP AxMob::LookupSlot( aafSlotID_t slotId )
 	CHECK_HRESULT( _spIaafMob->LookupSlot( slotId, &spIAAFMobSlot ) );
 
 	return spIAAFMobSlot;
+}
+
+void AxMob::SetUsageCode( const aafUID_t& usageCode )
+{
+  CHECK_HRESULT( _spIaafMob->SetUsageCode( usageCode ) );
+}
+
+aafUID_t AxMob::GetUsageCode()
+{
+  aafUID_t usageCode;
+  CHECK_HRESULT( _spIaafMob->GetUsageCode( &usageCode ) );
+  return usageCode;
 }
 
 IAAFMobSP AxMob::Copy( const AxString& newMobName )

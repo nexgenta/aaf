@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFWAVEDescriptor.cpp,v 1.13 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFWAVEDescriptor.cpp,v 1.14 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,6 +89,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pSummary == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(size > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_summary.setValue(pSummary, size);
 

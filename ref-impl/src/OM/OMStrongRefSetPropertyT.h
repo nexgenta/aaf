@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStrongRefSetPropertyT.h,v 1.72 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStrongRefSetPropertyT.h,v 1.73 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -979,15 +979,17 @@ void OMStrongReferenceSetProperty<UniqueIdentification,
   OMClassFactory* factory = container->classFactory();
   ASSERT("Valid class factory", factory != 0);
 
-  ASSERT("Destination set is void", dest->isVoid());
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
     SetElement& element = iterator.value();
-    OMStorable* source = element.getValue();
-    OMStorable* d = source->shallowCopy(factory);
-    dest->insertObject(d);
-    d->onCopy(clientContext);
-    source->deepCopyTo(d, clientContext);
+    void* id = element.identification();
+    if (!dest->contains(id)) {
+      OMStorable* source = element.getValue();
+      OMStorable* d = source->shallowCopy(factory);
+      dest->insertObject(d);
+      d->onCopy(clientContext);
+      source->deepCopyTo(d, clientContext);
+    }
   }
 }
 

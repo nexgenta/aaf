@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.h,v 1.29 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.h,v 1.30 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -140,8 +140,9 @@ public:
 					 aafLength_t *sclpLen,
 					 aafBool *isMask);
 
-	// OM deep copy notification
-	virtual void onCopy(void* clientContext) const;
+	// Visit this component and its sub-components
+	// with the specified visitor.
+	virtual void Accept(AAFComponentVisitor& visitor);
 
 private:
 	OMFixedSizeProperty<aafLength_t>	_fadeInLength;

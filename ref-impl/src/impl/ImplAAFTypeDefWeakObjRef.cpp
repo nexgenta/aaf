@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.38 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.39 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,6 @@
 #include "AAFClassDefUIDs.h"
 #endif
 
-#include "ImplAAFCloneResolver.h"
 #include "ImplAAFDictionary.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyDefs.h"
@@ -175,7 +174,11 @@ AAFRESULT STDMETHODCALLTYPE
       OMPropertyId * targetPids,
       OMPropertyId uniqueIdentifierPid)
 {
-  if (! pTypeName) return AAFRESULT_NULL_PARAM;
+  if (! pTypeName)
+    return AAFRESULT_NULL_PARAM;
+
+  if (ids * sizeof(aafUID_t) > OMPROPERTYSIZE_MAX)
+    return AAFRESULT_BAD_SIZE;
 
   AAFRESULT hr;
 
@@ -807,14 +810,3 @@ HRESULT ImplAAFTypeDefWeakObjRef::CompleteClassRegistration(void)
 
   return rc;
 }
-
-void ImplAAFTypeDefWeakObjRef::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDefObjectRef::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_referencedType);
-  }
-}
-

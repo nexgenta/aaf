@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEdgecode.cpp,v 1.16 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEdgecode.cpp,v 1.17 2004/09/10 17:13:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,6 +65,14 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	HRESULT		rc = AAFRESULT_SUCCESS;
 	
+	// Even though the AAF specification does not limit the size of the
+	// edge code header this reference implementation uses fixed size
+	// header which contains only 8 bytes. The following check,
+	// unneccesary in the current implementation provided for consistancy
+	// with the specification.
+	if (sizeof(edgecode.header) > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
+
 	XPROTECT()
 	{
 		ImplAAFDictionarySP pDict;

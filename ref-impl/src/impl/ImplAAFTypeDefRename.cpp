@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.cpp,v 1.33 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.cpp,v 1.34 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,6 @@
 #endif
 
 #include "ImplAAFDictionary.h"
-#include "ImplAAFCloneResolver.h"
 
 #include <assert.h>
 #include <string.h>
@@ -349,14 +348,4 @@ void ImplAAFTypeDefRename::onSave(void* clientContext) const
 void ImplAAFTypeDefRename::onRestore(void* clientContext) const
 {
   ImplAAFTypeDef::onRestore(clientContext);
-}
-
-void ImplAAFTypeDefRename::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDef::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_RenamedType);
-  }
 }

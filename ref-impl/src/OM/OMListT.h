@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMListT.h,v 1.6 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMListT.h,v 1.7 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,6 +28,7 @@
 #define OMLISTT_H
 
 #include "OMAssertions.h"
+#include "OMContainerIterator.h"
 
 // This implementation was taken from [1].
 //
@@ -287,6 +288,9 @@ void OMList<Element>::clear(void)
     p = p->_next;
     delete q;
   }
+  _nil->_next = _nil;
+  _nil->_previous = _nil;
+  _count = 0;
 }
 
   // @mfunc The number of elements with value <p value>.

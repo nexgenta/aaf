@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginDef.cpp,v 1.38 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPluginDef.cpp,v 1.39 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,6 +43,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 #include "aafErr.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
@@ -239,6 +240,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pVersionString == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if(wcslen(pVersionString)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return AAFRESULT_BAD_SIZE;
+
 	_pluginVersionString = pVersionString;
 
 	return(AAFRESULT_SUCCESS); 
@@ -290,6 +294,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pManufacturerName == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(wcslen(pManufacturerName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return AAFRESULT_BAD_SIZE;
 
 	_pluginManufacturerName = pManufacturerName;
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStreamPropertyT.h,v 1.17 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStreamPropertyT.h,v 1.18 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -218,7 +218,7 @@ void OMStreamProperty<Element>::appendElements(OMUInt32 elementCount,
   PRECONDITION("Valid element count", elementCount > 0);
   PRECONDITION("Valid buffer", elements != 0);
 
-  writeElements(elementCount(), elementCount, elements);
+  writeElements(this->elementCount(), elementCount, elements);
 }
 
   // @mfunc Write a single <p Element> to the end of

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFilmDescriptor.cpp,v 1.13 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFilmDescriptor.cpp,v 1.14 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 #include "aafErr.h"
 
 ImplAAFFilmDescriptor::ImplAAFFilmDescriptor ()
@@ -61,6 +62,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(wcslen(name)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_manufacturer = name;
 
@@ -112,6 +116,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(name == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(wcslen(name)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_model = name;
 

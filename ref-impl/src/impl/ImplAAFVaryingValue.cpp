@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFVaryingValue.cpp,v 1.36 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFVaryingValue.cpp,v 1.37 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,6 @@
 #include "ImplAAFControlPoint.h"
 #include "ImplAAFDictionary.h"
 #include "ImplAAFPluginManager.h"
-#include "ImplAAFCloneResolver.h"
 #include "AAFPlugin.h"
 
 #include <assert.h>
@@ -378,12 +377,3 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-void ImplAAFVaryingValue::onCopy(void* clientContext) const
-{
-  ImplAAFParameter::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_interpolation);
-  }
-}

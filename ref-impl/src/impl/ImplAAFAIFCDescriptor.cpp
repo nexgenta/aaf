@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFAIFCDescriptor.cpp,v 1.8 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFAIFCDescriptor.cpp,v 1.9 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,6 +81,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pSummary == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(size > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_summary.setValue(pSummary, size);
 

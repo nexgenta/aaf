@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPulldown.cpp,v 1.21 2004/05/20 15:32:56 asuraparaju Exp $ $Name:  $
+// $Id: ImplAAFPulldown.cpp,v 1.22 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -526,4 +526,16 @@ AAFRESULT ImplAAFPulldown::ChangeContainedReferences(aafMobID_constref from,
 		seg->ChangeContainedReferences(from, to);
 
 	return AAFRESULT_SUCCESS;
+}
+
+
+
+void ImplAAFPulldown::Accept(AAFComponentVisitor& visitor)
+{
+	assert(_inputSegment);
+
+	_inputSegment->Accept(visitor);
+
+	// TODO
+	// visitor.VisitPulldown(this);
 }

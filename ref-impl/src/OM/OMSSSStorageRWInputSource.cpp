@@ -8,12 +8,11 @@
 *  Copyright (C) 2002 - 2003 Schema Software, Inc. All rights reserved.
 *  Portions Copyright (C) 2003 Metaglue Corparation. All rights reserved.
 *
-*  $Revision: 1.4 $
-*  $Date: 2004/04/11 07:41:54 $
+*  $Revision: 1.5 $
+*  $Date: 2004/09/10 17:13:10 $
 *  
 \******************************************************************************/
-#include "OMRawStorage.h"
-#include "OMSSSStructuredStorage.h"
+#include "OMSSSStorageRWInputSource.h"
 
 
 //Type definitiosn taken from the schemasoft source

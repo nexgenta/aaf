@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFNetworkLocator.cpp,v 1.20 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFNetworkLocator.cpp,v 1.21 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,6 +35,7 @@
 #include "AAFResult.h"
 
 #include <assert.h>
+#include <wchar.h>
 
 
 ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
@@ -97,6 +98,11 @@ ImplAAFNetworkLocator::SetPath (const aafCharacter *  pPathBuf)
   if (! pPathBuf)
 	{
 	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (wcslen(pPathBuf)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+	  return AAFRESULT_BAD_SIZE;
 	}
 
 	_path = pPathBuf;

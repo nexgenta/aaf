@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.39 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.40 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,6 @@
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
-#include "ImplAAFCloneResolver.h"
 
 
 #include <assert.h>
@@ -459,14 +458,3 @@ void ImplAAFTypeDefStrongObjRef::onRestore(void* clientContext) const
 {
   ImplAAFTypeDefObjectRef::onRestore(clientContext);
 }
-
-void ImplAAFTypeDefStrongObjRef::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDefObjectRef::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_referencedType);
-  }
-}
-

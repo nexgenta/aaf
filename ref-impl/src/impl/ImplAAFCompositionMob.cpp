@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCompositionMob.cpp,v 1.29 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCompositionMob.cpp,v 1.30 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,11 +37,13 @@
 ImplAAFCompositionMob::ImplAAFCompositionMob ():
 	_defaultFadeLen(	PID_CompositionMob_DefaultFadeLength,		L"DefaultFadeLength"),
 	_defaultFadeType(	PID_CompositionMob_DefFadeType,			L"DefFadeType"),
-	_defaultFadeEditUnit(PID_CompositionMob_DefFadeEditUnit,	L"DefFadeEditUnit")
+	_defaultFadeEditUnit(PID_CompositionMob_DefFadeEditUnit,	L"DefFadeEditUnit"),
+	_rendering(PID_CompositionMob_Rendering,	L"Rendering")
 {
 	_persistentProperties.put(		_defaultFadeLen.address());
 	_persistentProperties.put(		_defaultFadeType.address());
 	_persistentProperties.put(		_defaultFadeEditUnit.address());	
+	_persistentProperties.put(		_rendering.address());	
 }
 
 ImplAAFCompositionMob::~ImplAAFCompositionMob ()
@@ -142,4 +144,24 @@ AAFRESULT STDMETHODCALLTYPE
 
 	return AAFRESULT_SUCCESS;
 }
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCompositionMob::SetRendering (aafMobID_constref mobID)
+{
+  _rendering = mobID;
+
+  return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCompositionMob::GetRendering (aafMobID_t *  pMobID)
+{
+  if(pMobID == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  *pMobID = _rendering;
+
+  return(AAFRESULT_SUCCESS); 
+}
+
 

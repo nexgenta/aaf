@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTransition.cpp,v 1.28 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTransition.cpp,v 1.29 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -203,5 +203,16 @@ AAFRESULT ImplAAFTransition::ChangeContainedReferences(aafMobID_constref from,
 		seg->ChangeContainedReferences(from, to);
 
 	return AAFRESULT_SUCCESS;
+}
+
+
+
+void ImplAAFTransition::Accept(AAFComponentVisitor& visitor)
+{
+	assert(_operationGroup);
+	_operationGroup->Accept(visitor);
+
+	// TODO
+	// visitor.VisitTransition(this);
 }
 

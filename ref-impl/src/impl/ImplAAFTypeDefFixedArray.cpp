@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.48 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.49 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,7 +48,6 @@
 
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
-#include "ImplAAFCloneResolver.h"
 #include "AAFClassIDs.h"
 
 #include <assert.h>
@@ -335,6 +334,14 @@ void ImplAAFTypeDefFixedArray::internalize(const OMByte* externalBytes,
 	}
 }
 
+OMType* ImplAAFTypeDefFixedArray::elementType(void) const
+{
+  ImplAAFTypeDef* result = 0;
+  AAFRESULT hr = GetType(&result);
+  assert(hr == 0);
+  result->ReleaseReference();
+  return result;
+}
 
 aafBool ImplAAFTypeDefFixedArray::IsFixedSize (void) const
 {
@@ -483,14 +490,4 @@ void ImplAAFTypeDefFixedArray::onSave(void* clientContext) const
 void ImplAAFTypeDefFixedArray::onRestore(void* clientContext) const
 {
   ImplAAFTypeDefArray::onRestore(clientContext);
-}
-
-void ImplAAFTypeDefFixedArray::onCopy(void* clientContext) const
-{
-  ImplAAFTypeDefArray::onCopy(clientContext);
-
-  if ( clientContext ) {
-    ImplAAFCloneResolver* pResolver = reinterpret_cast<ImplAAFCloneResolver*>(clientContext);
-    pResolver->ResolveWeakReference(_ElementType);
-  }
 }

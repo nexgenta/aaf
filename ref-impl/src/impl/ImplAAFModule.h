@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.h,v 1.14 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFModule.h,v 1.15 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -412,3 +412,38 @@ ImplAAFCreateAAFFileOnRawStorage
    aafUInt32  modeFlags,
    aafProductIdentification_constptr  pIdent,
    ImplAAFFile ** ppNewFile);
+
+//***********************************************************
+//
+// ImplAAFGetLibraryVersion()
+//
+// Return the version of the AAF library currently
+// running on this machine\, which implements these interfaces.
+// 
+// Succeeds if all of the following are true:
+// - the pVersion pointer is valid.
+// 
+// If this method fails nothing is written to *pVersion.
+// 
+// This method will return the following codes.  If more than one of
+// the listed errors is in effect\, it will return the first one
+// encountered in the order given below:
+// 
+// AAFRESULT_SUCCESS
+//   - succeeded.  (This is the only code indicating success.)
+//
+// AAFRESULT_NULL_PARAM
+//   - pVersion is null.
+//
+STDAPI
+ImplAAFGetLibraryVersion
+  (aafProductVersion_t *  pVersion);
+
+extern const aafProductVersion_t AAFReferenceImplementationVersion;
+
+STDAPI ImplAAFGetLibraryPathNameBufLen
+  (aafUInt32 *  pBufSize);
+
+STDAPI ImplAAFGetLibraryPathName
+   (aafCharacter *  pLibraryPathName,
+    aafUInt32  bufSize);
