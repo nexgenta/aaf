@@ -29,6 +29,33 @@
 #include "OMRawStorageLockBytes.h"
 
 #include "OMAssertions.h"
+HRESULT STDMETHODCALLTYPE
+OMRawStorageLockBytes::QueryInterface(REFIID riid,
+                                      void** ppvObject)
+{
+  TRACE("OMRawStorageLockBytes::QueryInterface");
+
+  // TBS
+  return E_FAIL;
+}
+
+ULONG STDMETHODCALLTYPE
+OMRawStorageLockBytes::AddRef(void)
+{
+  TRACE("OMRawStorageLockBytes::AddRef");
+
+  // TBS
+  return 0;
+}
+
+ULONG STDMETHODCALLTYPE
+OMRawStorageLockBytes::Release(void)
+{
+  TRACE("OMRawStorageLockBytes::Release");
+
+  // TBS
+  return 0;
+}
 
   // @mfunc Constructor.
 OMRawStorageLockBytes::OMRawStorageLockBytes(OMRawStorage* rawStorage)
@@ -58,7 +85,7 @@ OMRawStorageLockBytes::ReadAt(ULARGE_INTEGER ulOffset,
   // TBS
   return E_FAIL;
 }
-        
+
   // @mfunc Write bytes (see Microsoft documentation for details).
 HRESULT STDMETHODCALLTYPE
 OMRawStorageLockBytes::WriteAt(ULARGE_INTEGER ulOffset,
@@ -71,7 +98,7 @@ OMRawStorageLockBytes::WriteAt(ULARGE_INTEGER ulOffset,
   // TBS
   return E_FAIL;
 }
-        
+
   // @mfunc Flush any buffered bytes (see Microsoft documentation
   //        for details).
 HRESULT STDMETHODCALLTYPE
@@ -82,7 +109,7 @@ OMRawStorageLockBytes::Flush(void)
   // TBS
   return E_FAIL;
 }
-        
+
   // @mfunc Set the size, either grow or shrink (see Microsoft
   //        documentation for details).
 HRESULT STDMETHODCALLTYPE
@@ -93,7 +120,7 @@ OMRawStorageLockBytes::SetSize(ULARGE_INTEGER cb)
   // TBS
   return E_FAIL;
 }
-        
+
   // @mfunc See Microsoft documentation for details.
 HRESULT STDMETHODCALLTYPE
 OMRawStorageLockBytes::LockRegion(ULARGE_INTEGER libOffset,
@@ -105,7 +132,7 @@ OMRawStorageLockBytes::LockRegion(ULARGE_INTEGER libOffset,
   // TBS
   return E_FAIL;
 }
-        
+
   // @mfunc See Microsoft documentation for details.
 HRESULT STDMETHODCALLTYPE
 OMRawStorageLockBytes::UnlockRegion(ULARGE_INTEGER libOffset,
@@ -117,7 +144,7 @@ OMRawStorageLockBytes::UnlockRegion(ULARGE_INTEGER libOffset,
   // TBS
   return E_FAIL;
 }
-        
+
   // @mfunc See Microsoft documentation for details.
 HRESULT STDMETHODCALLTYPE
 OMRawStorageLockBytes::Stat(STATSTG *pstatstg,
