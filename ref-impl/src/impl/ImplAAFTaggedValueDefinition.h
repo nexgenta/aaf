@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFTaggedValueDefinition.h,v 1.1.2.1 2004/04/08 00:43:33 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFTaggedValueDefinition.h,v 1.1.2.2 2004/04/17 20:47:21 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,8 @@ typedef ImplAAFEnumerator<ImplAAFPropertyDef> ImplEnumAAFPropertyDefs;
 #ifndef __ImplAAFDefObject_h__
 #include "ImplAAFDefObject.h"
 #endif
+
+#include "OMWeakRefSetProperty.h"
 
 
 class ImplAAFTaggedValueDefinition : public ImplAAFDefObject
@@ -91,6 +93,10 @@ public:
     RemoveParentProperty
         // @parm [in] Property to remove.
         (ImplAAFPropertyDef * pParentProperty);
+
+ private:
+
+  OMWeakReferenceSetProperty<ImplAAFPropertyDef> _parentProperties;
 
 };
 

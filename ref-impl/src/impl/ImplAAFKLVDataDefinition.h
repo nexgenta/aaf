@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.1 2004/04/08 00:43:33 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFKLVDataDefinition.h,v 1.1.2.2 2004/04/17 20:47:21 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,8 @@ typedef ImplAAFEnumerator<ImplAAFPropertyDef> ImplEnumAAFPropertyDefs;
 #include "ImplAAFDefObject.h"
 #endif
 
+#include "OMWeakRefSetProperty.h"
+#include "OMWeakRefProperty.h"
 
 class ImplAAFKLVDataDefinition : public ImplAAFDefObject
 {
@@ -110,6 +112,10 @@ public:
         // @parm [in] Data definition object
         (ImplAAFTypeDef * pTypeDef);
 
+ private:
+  OMWeakReferenceSetProperty<ImplAAFPropertyDef> _parentProperties;
+  OMWeakReferenceProperty<ImplAAFTypeDef> _klvDataTypeDef;
+    
 };
 
 #endif // ! __ImplAAFKLVDataDefinition_h__
