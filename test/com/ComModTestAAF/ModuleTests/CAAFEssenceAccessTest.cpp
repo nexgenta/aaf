@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.46 2004/10/22 14:20:46 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.47 2004/10/27 16:56:37 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2386,7 +2386,7 @@ HRESULT CAAFEssenceAccess_test(testMode_t mode)
 	if(hr == AAFRESULT_SUCCESS && mode == kAAFUnitTestReadWrite)
 	{
         cout << "        WriteSamples (Legacy DDEF_Sound)" << endl;
-		hr = CreateAudioAAFFile(L"EssenceAccessAIFCLegacy.aaf", NULL, testStandardCalls, kAAFCODEC_AIFC, kAAFDataDef_Sound);
+		hr = CreateAudioAAFFile(L"EssenceAccessAIFCLegacy.aaf", NULL, testStandardCalls, kAAFCODEC_AIFC, DDEF_Sound);
 	}
 	
 	if(hr == AAFRESULT_SUCCESS)
