@@ -29,17 +29,8 @@
 #ifndef OMREDBLACKTREE_H
 #define OMREDBLACKTREE_H
 
-#if defined (_MSC_VER)
-  // - 'identifier' : identifier was truncated to 'number' characters in
-  //   the debug information
-#pragma warning(disable:4786) // Gak !
-#endif
-
 #include "OMAssertions.h"
 #include <stddef.h>
-
-template <typename Key, typename Value>
-class OMRedBlackTreeIterator;
 
   // @class Red-black trees. A red-black tree is an approximately
   //        balanced binary search tree providing O(lg N) performance
@@ -69,16 +60,12 @@ public:
     //          <p k>.  If the item is found it is returned in
     //          <p v> and the result is true. If the element is not
     //          found the result is false.
+    //   @this const
   bool find(const Key k, Value& v) const;
-
-    // @cmember Find the item in this <c OMRedBlackTree> identified
-    //          <p k>.  If the item is found it is returned in
-    //          <p v> and the result is true. If the element is not
-    //          found the result is false.
-  bool find(const Key k, Value** v) const;
 
     // @cmember Does this <c OMRdBlackTree> contain an item
     //          identified by <p k>?
+    //   @this const
   bool contains(const Key k) const;
 
     // @cmember Remove the item assciated with <p Key> k from this
@@ -88,22 +75,26 @@ public:
     // @cmember The number of items in this <c OMRedBlackTree>.
     //          <mf OMRedBlackTree::count> returns the actual number
     //          of items in the <c OMRedBlackTree>.
+    //   @this const
   size_t count(void) const;
 
     // @cmember Traverse this <c OMRedBlackTree> in order, the
     //          function <p f> is called for each item in the tree.
+    //   @this const
   void traverseInOrder(void (*f)(size_t height,
                                  Key k,
                                  const Value& v)) const;
 
     // @cmember Traverse this <c OMRedBlackTree> in pre-order, the
     //          function <p f> is called for each item in the tree.
+    //   @this const
   void traverseInPreOrder(void (*f)(size_t height,
                                     Key k,
                                     const Value& v)) const;
 
     // @cmember Traverse this <c OMRedBlackTree> in post-order, the
     //          function <p f> is called for each item in the tree.
+    //   @this const
   void traverseInPostOrder(void (*f)(size_t height,
                                      Key k,
                                      const Value& v)) const;
@@ -173,8 +164,6 @@ private:
     Node* _right;
     Color _color;
   };
-
-  friend class OMRedBlackTreeIterator<Key, Value>;
 
 };
 
