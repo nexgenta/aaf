@@ -3,32 +3,14 @@
 #ifndef __ImplAAFClassDef_h__
 #define __ImplAAFClassDef_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*                                               *
+\***********************************************/
 
 class ImplEnumAAFPropertyDefs;
 class ImplAAFDefObject;
@@ -63,7 +45,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         // @parm [in] auid to be used to identify this type
-        (const aafUID_t & classID,
+        (const aafUID_t * pID,
 
 		// Inheritance parent of this class
 		ImplAAFClassDef * pParentClass,
@@ -96,7 +78,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendNewPropertyDef
         (// @parm [in] auid to be used to identify this property
-         const aafUID_t & id,
+         aafUID_t *  pID,
 
          // @parm [in, string] name of the new property
          wchar_t *  pName,
@@ -117,7 +99,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendOptionalPropertyDef
         (// @parm [in] auid to be used to identify this property
-         const aafUID_t & id,
+         aafUID_t *  pID,
 
          // @parm [in, string] name of the new property
          wchar_t *  pName,
@@ -135,7 +117,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     LookupPropertyDef
         (// @parm [in] auid reprepresenting property to look up
-         const aafUID_t & propID,
+         aafUID_t *  pPropID,
 
          // @parm [out] resulting property definition
          ImplAAFPropertyDef ** ppPropDef) const;
@@ -157,40 +139,30 @@ public:
   //
 
   //****************
-  // pvtInitialize()
-  //
-  // Same as Initialize(), but takes guid for parent class instead of
-  // object pointer.
+  // Similar to AppendNewPropertyDef(), except it does not require
+  // that class be unregistered.
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
-        // @parm [in] auid to be used to identify this type
-        (const aafUID_t & classID,
+    pvtAppendNewPropertyDef
+        (// @parm [in] auid to be used to identify this property
+         aafUID_t *  pID,
 
-		// Inheritance parent of this class
-		const aafUID_t * pParentClassId,
-
-		// Human-legible name
-		const aafCharacter * pClassName);
-
-
-  // Private method to unconditionally append a property def (ignoring
-  // whether or not property is optional or not, or if this class has
-  // already been registered).
-  AAFRESULT STDMETHODCALLTYPE
-    pvtAppendPropertyDef
-        (const aafUID_t & id,
+         // @parm [in, string] name of the new property
          wchar_t *  pName,
-         const aafUID_t & typeId,
+
+         // @parm [in] type of the new property
+         ImplAAFTypeDef * pTypeDef,
+
+         // @parm [in] true if new property is to be optional
          aafBool  isOptional,
+
+         // @parm [out] return pointer to newly created property def
          ImplAAFPropertyDef ** ppPropDef);
 
 
-  // Appends an existing property def object.
-  AAFRESULT STDMETHODCALLTYPE
-    pvtAppendExistingPropertyDef
-        (// PropertyDef to append
-		 ImplAAFPropertyDef * pPropDef);
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFClassDef)
 
 
   //****************
@@ -205,16 +177,19 @@ public:
          ImplAAFPropertyDef ** ppPropDef) const;
 
 
-  // Returns the AUID of the parent class.  Returns the NULL auid if
-  // this is the end of the line.
-  void pvtGetParentAUID (aafUID_t & result);
-
-
-  // Make sure that the type definition of each property definition
-  // has been loaded into memory.
-  void AssurePropertyTypesLoaded ();
-
 private:
+
+  // Private method to unconditionally append a property def (ignoring
+  // whether or not property is optional or not, or if this class has
+  // already been registered).
+  AAFRESULT STDMETHODCALLTYPE
+    pvtAppendPropertyDef
+        (aafUID_t *  pID,
+         wchar_t *  pName,
+         ImplAAFTypeDef * pTypeDef,
+         aafBool  isOptional,
+         ImplAAFPropertyDef ** ppPropDef);
+
 
   //
   // Private implementation classes to share lookup code between
@@ -280,8 +255,6 @@ private:
 
   // didn't use shorthand here in an attempt to avoid circular references
   ImplAAFSmartPointer<ImplAAFClassDef> _cachedParentClass;
-
-  bool _propTypesLoaded;
 };
 
 //
