@@ -4,27 +4,14 @@
 #define __ImplAAFHTMLClip_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -32,7 +19,6 @@
 #include "ImplAAFTextClip.h"
 #endif
 
-#include "OMWideStringProperty.h"
 
 class ImplAAFHTMLClip : public ImplAAFTextClip
 {
@@ -55,7 +41,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetBeginAnchor
         (// @parm [in,string] Begin Anchor Name
-         aafCharacter *  pName,
+         wchar_t *  pName,
 
          // @parm [in] length of the buffer to hold Begin Anchor Name
          aafInt32  bufSize);
@@ -74,7 +60,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetBeginAnchor
         // @parm [in, string] Specifies the HTML tag that defines the start of the text
-        (const aafCharacter *  pName);
+        (wchar_t *  pName);
 
   //****************
   // GetEndAnchor()
@@ -82,7 +68,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetEndAnchor
         (// @parm [in,string] End Anchor Name
-         aafCharacter *  pName,
+         wchar_t *  pName,
 
          // @parm [in] length of the buffer to hold End Anchor Name
          aafInt32  bufSize);
@@ -101,7 +87,14 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetEndAnchor
         // @parm [in, string] Specifies the HTML tag that defines the end of the text
-        (const aafCharacter *  pName);
+        (wchar_t *  pName);
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFHTMLClip)
 
 protected:
   // Persistent properties...
