@@ -49,7 +49,7 @@
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
-#include "AafUtils.h"
+#include "AAFUtils.h"
 #include "ImplAAFDictionary.h"
 
 #include "ImplAAFSmartPointer.h"
@@ -60,12 +60,12 @@ extern "C" const aafClassID_t CLSID_EnumAAFCodecFlavours;
 
 ImplAAFCodecDef::ImplAAFCodecDef ()
 :  _dataDefs     ( PID_CodecDefinition_DataDefinitions,
-                   "DataDefinitions", 
-                   "/Dictionary/DataDefinitions", 
+                   L"DataDefinitions", 
+                   L"/Header/Dictionary/DataDefinitions", 
                    PID_DefinitionObject_Identification),
    _fileDescClass( PID_CodecDefinition_FileDescriptorClass,
-                   "FileDescriptorClass", 
-                   "/Dictionary/ClassDefinitions", 
+                   L"FileDescriptorClass", 
+                   L"/MetaDictionary/ClassDefinitions", 
                    PID_MetaDefinition_Identification)
 
 {
@@ -366,7 +366,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMWeakReferenceVectorIterator</*OMUniqueObjectIdentification,*/ ImplAAFDataDef>(_dataDefs);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFDataDefs, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
