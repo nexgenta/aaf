@@ -4,32 +4,14 @@
 #define __ImplAAFMasterMob_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 class ImplAAFSourceClip;
 
@@ -45,7 +27,7 @@ class ImplAAFEssenceAccess;
 
 class ImplAAFLocator;
 
-#include "AAF.h"
+
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
@@ -73,7 +55,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AddMasterSlot
         (// @parm [in] Data kind of new Master Mob slot
-		 ImplAAFDataDef * pDataDef,
+		 aafUID_t * pDataDef,
 
 		 // @parm [in] Slot ID of the Source Mob slot to be added to the Master Mob
          aafSlotID_t  sourceSlotID,
@@ -85,7 +67,7 @@ public:
 		 aafSlotID_t  masterSlotID,
 
 		 // @parm [in, string] Name to assign to new slot in Master Mob
-		 const aafWChar *  pSlotName);
+		 aafWChar *  pSlotName);
 
 
 
@@ -101,7 +83,7 @@ public:
 		 aafWChar *  pTapeName,
 
 		 // @parm [in] the size of the pTapeName buffer
-         aafUInt32  bufSize);
+         aafInt32  bufSize);
 
 
   //****************
@@ -113,7 +95,7 @@ public:
 		 aafInt32  masterSlotID,
 
 		 // @parm [out] required buffer length
-         aafUInt32 *  pLen);
+         aafInt32 *  pLen);
 
 
   //****************
@@ -137,7 +119,7 @@ public:
 		 aafSlotID_t  slotID,
 
 		 // @parm [in] Index of requested representation
-		 aafUInt32  index,
+		 aafInt32  index,
 
 		 // @parm [out] Requested Source Clip
          ImplAAFSourceClip ** ppSourceClip);
@@ -249,15 +231,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     NewPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 const aafRational_t & editrate,
+		 aafRational_t  editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         ImplAAFDataDef * pEssenceKind,
+         aafUID_t * pEssenceKind,
 
-		 aafSourceRef_t  ref,
+		aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -268,15 +250,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
-		 const aafRational_t & editrate,
+		 aafRational_t  editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         ImplAAFDataDef * pEssenceKind,
+         aafUID_t * pEssenceKind,
 
-		 aafSourceRef_t  ref,
+		aafSourceRef_t  ref,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
@@ -291,7 +273,7 @@ public:
          aafSlotID_t  masterSlotID,
 
          // @parm [in] create essence of this type
-         ImplAAFDataDef * pMediaKind,
+         aafUID_t	mediaKind,
 
  		 aafUID_t			codecID,
 		 aafRational_t	editRate,
@@ -328,7 +310,7 @@ public:
                            aafCompressEnable_t  /*Enable*/,
 							ImplAAFLocator		*destination,
 							aafUID_t			fileFormat,
-							IAAFEssenceMultiAccess **result);
+							ImplAAFEssenceAccess **result);
 	//@comm The essence handle from this call can be used with
 	// WriteDataSamples or WriteMultiSamples but NOT with 
 	// or WriteDataLines.
@@ -385,7 +367,7 @@ public:
 
          // @parm [in] optionally decompressing
          aafCompressEnable_t  compEnable,
-		IAAFEssenceMultiAccess **result);
+		ImplAAFEssenceAccess **result);
 	//@comm This routine
 	// follows the locator, and may call the locator failure callback if
 	// the essence can not be found.  If the failure callback finds the essence,
@@ -411,7 +393,7 @@ public:
          aafMediaCriteria_t*  mediaCrit,
 
          // @parm [in] for this essence type
-         ImplAAFDataDef * pMediaKind,
+         aafUID_t mediaKind,
 
          // @parm [out] How many channels?
          aafInt16*  numCh);
@@ -423,9 +405,17 @@ public:
 	//@comm Replaces omfmGetNumChannels*/
 
 public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFMasterMob)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFMasterMobTest.cpp.
+  static AAFRESULT test();
 
   // Internal to the SDK
   virtual AAFRESULT ReconcileMobLength(void);
+
 };
 
 #endif // ! __ImplAAFMasterMob_h__
