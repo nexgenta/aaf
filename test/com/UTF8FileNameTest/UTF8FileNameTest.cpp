@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: UTF8FileNameTest.cpp,v 1.5 2004/09/22 15:00:22 bakerian Exp $ $Name:  $
+// $Id: UTF8FileNameTest.cpp,v 1.6 2004/09/28 11:12:50 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -354,7 +354,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName,
   return hr;
 }
 
-struct {
+struct _fileinfo_t {
   wchar_t* name;
 	bool create;
 	bool createraw;
