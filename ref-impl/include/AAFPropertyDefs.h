@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.3 2004/03/24 17:52:46 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.4 2004/04/07 13:41:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -940,6 +940,18 @@ const aafUID_t kAAFPropID_TimelineMobSlot_EditRate =
 //{07020103-0103-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_TimelineMobSlot_Origin =
 {0x07020103, 0x0103, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{07020103-010c-0000-060e-2b3401010107}
+const aafUID_t kAAFPropID_TimelineMobSlot_MarkIn =
+{0x07020103, 0x010c, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x07}};
+
+//{07020103-0103-0000-060e-2b3401010107}
+const aafUID_t kAAFPropID_TimelineMobSlot_MarkOut =
+{0x07020103, 0x0103, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x07}};
+
+//{07020103-010d-0000-060e-2b3401010107}
+const aafUID_t kAAFPropID_TimelineMobSlot_UserPos =
+{0x07020103, 0x010d, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x07}};
 
 //{06010104-0104-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_Parameter_Definition =

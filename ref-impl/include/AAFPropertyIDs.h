@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.3 2004/03/24 17:52:46 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.4 2004/04/07 13:41:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -267,6 +267,9 @@ const int PID_MobSlot_PhysicalTrackNumber                        = 0x4804;
 const int PID_EventMobSlot_EditRate                              = 0x4901;
 const int PID_TimelineMobSlot_EditRate                           = 0x4B01;
 const int PID_TimelineMobSlot_Origin                             = 0x4B02;
+const int PID_TimelineMobSlot_MarkIn                             = 0x4B03;
+const int PID_TimelineMobSlot_MarkOut                            = 0x4B04;
+const int PID_TimelineMobSlot_UserPos                            = 0x4B05;
 const int PID_Parameter_Definition                               = 0x4C01;
 const int PID_ConstantValue_Value                                = 0x4D01;
 const int PID_VaryingValue_Interpolation                         = 0x4E01;
