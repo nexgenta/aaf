@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -37,6 +37,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "CAAFBuiltinDefs.h"
+
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFDictionary> IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFFile>       IAAFFileSP;
@@ -44,10 +46,6 @@ typedef IAAFSmartPointer<IAAFHeader>     IAAFHeaderSP;
 typedef IAAFSmartPointer<IAAFTypeDef>    IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefInt> IAAFTypeDefIntSP;
 typedef IAAFSmartPointer<IUnknown>       IUnknownSP;
-
-// {C3930DD6-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalInt32 = 
-{ 0xc3930dd6, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
 static wchar_t testFileName[] = L"AAFTypeDefTest.aaf";
 
@@ -72,13 +70,15 @@ static HRESULT TestTypeDef ()
   HRESULT hr = E_FAIL;
   aafProductIdentification_t ProductInfo;
 
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFTypeDef Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -98,19 +98,13 @@ static HRESULT TestTypeDef ()
   if (! SUCCEEDED (hr)) return hr;
   assert (pDict);
 
+  CAAFBuiltinDefs defs (pDict);
+
   // Let's try to do something interesting with a type definition
   IAAFTypeDefIntSP pTypeDefInt;
-  hr = pDict->CreateInstance (&AUID_AAFTypeDefInt,
-							  IID_IAAFTypeDefInt,
-							  (IUnknown **) &pTypeDefInt);
+  hr = defs.tdInt32()->QueryInterface (IID_IAAFTypeDefInt, (void **) &pTypeDefInt);
   if (! SUCCEEDED (hr)) return hr;
   assert (pTypeDefInt);
-
-  hr = pTypeDefInt->Initialize (&TypeID_LocalInt32,
-								4,        // 4-byte (32-bit) int
-								AAFTrue,  // signed
-								L"Local 32-bit int");
-  if (! SUCCEEDED (hr)) return hr;
 
   IAAFTypeDefSP pTypeDef;
   hr = pTypeDefInt->QueryInterface(IID_IAAFTypeDef, (void **)&pTypeDef);
@@ -143,7 +137,7 @@ static HRESULT TestTypeDef ()
   if (! SUCCEEDED (hr)) return hr;
 
   IAAFTypeDefSP pUInt8ArrayType;
-  hr = pDict->LookupType ((aafUID_t*) &kAAFTypeID_UInt8Array, &pUInt8ArrayType);
+  hr = pDict->LookupTypeDef (kAAFTypeID_UInt8Array, &pUInt8ArrayType);
   if (! SUCCEEDED (hr)) return hr;
 
   IUnknownSP    pUnkUInt8Array;
