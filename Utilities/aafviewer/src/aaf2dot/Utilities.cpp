@@ -1,5 +1,5 @@
 /*
- * $Id: Utilities.cpp,v 1.7 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: Utilities.cpp,v 1.8 2005/01/24 16:16:20 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -420,9 +420,9 @@ UIDToString( aafUID_t &uid )
 string
 DateToString( _aafDateStruct_t &date )
 {
-   char buf[11];
+   char buf[13];
 
-   sprintf( buf, "%02d-%02d-%04d", date.day, date.month, date.year );
+   sprintf( buf, "%04d-%02d-%02d", date.year, date.month, date.day );
 
    return buf;
 }
