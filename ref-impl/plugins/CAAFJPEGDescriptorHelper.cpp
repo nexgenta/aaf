@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 #include "CAAFJPEGDescriptorHelper.h"
 
 #include <assert.h>
@@ -26,20 +31,13 @@
 
 #include "AAF.h"
 
-#include "AAFUtils.h"
+#include "aafUtils.h"
 #include "aafCvt.h"
-#include "AAFDataDefs.h"
-#include "AAFDefUIDs.h"
-#include "AAFTypeDefUIDs.h"
+#include "aafDataDefs.h"
+#include "aafDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
-
-const aafUID_t kAAFPropID_CDCIOffsetToFrameIndexes = { 0x9d15fca3, 0x54c5, 0x11d3, { 0xa0, 0x29, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
-const aafUID_t kAAFPropID_DIDFrameIndexByteOrder = { 0xb57e925d, 0x170d, 0x11d4, { 0xa0, 0x8f, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
-const aafUID_t kAAFPropID_DIDResolutionID = { 0xce2aca4d, 0x51ab, 0x11d3, { 0xa0, 0x24, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
-const aafUID_t kAAFPropID_DIDFirstFrameOffset = { 0xce2aca4e, 0x51ab, 0x11d3, { 0xa0, 0x24, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
-const aafUID_t kAAFPropID_DIDFrameSampleSize = { 0xce2aca50, 0x51ab, 0x11d3, { 0xa0, 0x24, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
 
 
 // local function for simplifying error handling.
@@ -223,18 +221,18 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetCodecDef (IAAFCodecDef *pCodecDef)
+    CAAFJPEGDescriptorHelper::SetIsInContainer (aafBool  isAAF)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->SetCodecDef (pCodecDef);
+	return _filedes->SetIsInContainer (isAAF);
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetCodecDef (IAAFCodecDef **ppCodecDef)
+    CAAFJPEGDescriptorHelper::GetIsInContainer (aafBool *  pIsAAF)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->GetCodecDef (ppCodecDef);
+	return _filedes->GetIsInContainer (pIsAAF);
 }
 
 
@@ -255,27 +253,27 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetContainerFormat (IAAFContainerDef *pFormat)
+    CAAFJPEGDescriptorHelper::SetContainerFormat (const aafUID_t & format)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->SetContainerFormat (pFormat);
+	return _filedes->SetContainerFormat (format);
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetContainerFormat (IAAFContainerDef **ppFormat)
+    CAAFJPEGDescriptorHelper::GetContainerFormat (aafUID_t *  pFormat)
 {
 	checkAssertion(NULL != _filedes);
-	return _filedes->GetContainerFormat (ppFormat);
+	return _filedes->GetContainerFormat (pFormat);
 }
 
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetCompression (const aafUID_t & compression)
+    CAAFJPEGDescriptorHelper::SetCompression (const aafUID_t & codecID)
 {
   checkAssertion(NULL != _dides);
-	return _dides->SetCompression (compression);
+	return _dides->SetCompression (codecID);
 }
 
 
@@ -440,7 +438,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetGamma (aafUID_t  Gamma)
+    CAAFJPEGDescriptorHelper::SetGamma (aafRational_t  Gamma)
 {
   checkAssertion(NULL != _dides);
 	return _dides->SetGamma (Gamma);
@@ -449,7 +447,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetGamma (aafUID_t *  pGamma)
+    CAAFJPEGDescriptorHelper::GetGamma (aafRational_t *  pGamma)
 {
   checkAssertion(NULL != _dides);
 	return _dides->GetGamma (pGamma);
@@ -458,7 +456,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetImageAlignmentFactor (aafUInt32  ImageAlignmentFactor)
+    CAAFJPEGDescriptorHelper::SetImageAlignmentFactor (aafInt32  ImageAlignmentFactor)
 {
   checkAssertion(NULL != _dides);
 	return _dides->SetImageAlignmentFactor (ImageAlignmentFactor);
@@ -467,7 +465,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetImageAlignmentFactor (aafUInt32 *  pImageAlignmentFactor)
+    CAAFJPEGDescriptorHelper::GetImageAlignmentFactor (aafInt32 *  pImageAlignmentFactor)
 {
   checkAssertion(NULL != _dides);
 	return _dides->GetImageAlignmentFactor (pImageAlignmentFactor);
@@ -600,536 +598,3 @@ HRESULT STDMETHODCALLTYPE
 	checkAssertion(NULL != _cdcides);
 	return _cdcides->GetPaddingBits (pPaddingBits);
 }
-
-HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetOffsetFrameIndexes(aafUInt32 *pOffset)
-{
-	IAAFClassDef		*pClassDef = NULL;
-	IAAFObject			*pObj = NULL;
-	IAAFPropertyDef		*pPropertyDef = NULL;
-	IAAFPropertyValue	*pPropValue = NULL;
-	IAAFTypeDef			*pTypeDef = NULL;
-	IAAFTypeDefInt		*pTypeDefInt = NULL;
-	aafInt32			val;
-
-	HRESULT				hr = S_OK;
-
-	checkAssertion(NULL != _dides);
-	checkAssertion(NULL != pOffset);
-	try
-	{
-		checkResult(_dides->QueryInterface(IID_IAAFObject, (void **)&pObj));
-		checkResult(pObj->GetDefinition (&pClassDef));
-		checkResult(pClassDef->LookupPropertyDef(kAAFPropID_CDCIOffsetToFrameIndexes, &pPropertyDef));
-		checkResult(pObj->GetPropertyValue (pPropertyDef, &pPropValue));
-		checkResult(pPropValue->GetType(&pTypeDef));
-		checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefInt, (void**)&pTypeDefInt));
-		checkResult(pTypeDefInt->GetInteger(pPropValue, (aafMemPtr_t) &val, sizeof (val)));
-		*pOffset  = val;
-	}
-	catch (HRESULT& rhr)
-	{
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-	if( pClassDef != NULL )
-	    pClassDef->Release();
-	if( pObj != NULL )
-	    pObj->Release();
-	if( pPropertyDef != NULL )
-	    pPropertyDef->Release();
-	if( pPropValue != NULL )
-	    pPropValue->Release();
-	if( pTypeDef != NULL )
-	    pTypeDef->Release();
-	if( pTypeDefInt != NULL )
-	    pTypeDefInt->Release();
-
-	return hr;
-}
-				
-HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetFrameIndexByteOrder(aafUInt16 *byteOrder)
-{
-	IAAFClassDef		*pClassDef = NULL;
-	IAAFObject			*pObj = NULL;
-	IAAFPropertyDef		*pPropertyDef = NULL;
-	IAAFPropertyValue	*pPropValue = NULL;
-	IAAFTypeDef			*pTypeDef = NULL;
-	IAAFTypeDefInt		*pTypeDefInt = NULL;
-	aafInt16			val;
-
-	HRESULT				hr = S_OK;
-
-	checkAssertion(NULL != _dides);
-	checkAssertion(NULL != byteOrder);
-	try
-	{
-		checkResult(_dides->QueryInterface(IID_IAAFObject, (void **)&pObj));
-		checkResult(pObj->GetDefinition (&pClassDef));
-		checkResult(pClassDef->LookupPropertyDef(kAAFPropID_DIDFrameIndexByteOrder, &pPropertyDef));
-		checkResult(pObj->GetPropertyValue (pPropertyDef, &pPropValue));
-		checkResult(pPropValue->GetType(&pTypeDef));
-		checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefInt, (void**)&pTypeDefInt));
-		checkResult(pTypeDefInt->GetInteger(pPropValue, (aafMemPtr_t) &val, sizeof (val)));
-		*byteOrder  = val;
-	}
-	catch (HRESULT& rhr)
-	{
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-	if( pClassDef != NULL )
-	    pClassDef->Release();
-	if( pObj != NULL )
-	    pObj->Release();
-	if( pPropertyDef != NULL )
-	    pPropertyDef->Release();
-	if( pPropValue != NULL )
-	    pPropValue->Release();
-	if( pTypeDef != NULL )
-	    pTypeDef->Release();
-	if( pTypeDefInt != NULL )
-	    pTypeDefInt->Release();
-
-	return hr;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::PutFrameIndexProperties(aafUInt32 offset, aafUInt16 byteOrder)
-{
-	IAAFClassDef		*pClassDef = NULL;
-	IAAFObject			*pObj = NULL;
-	IAAFPropertyDef		*pPropertyDef = NULL;
-	IAAFPropertyValue	*pPropValue = NULL;
-	IAAFTypeDef			*pTypeDef = NULL;
-	IAAFTypeDefInt		*pTypeDefInt = NULL;
-	IAAFDictionary		*pDictionary = NULL;
-
-	HRESULT				hr = S_OK;
-
-	checkAssertion(NULL != _dides);
-
-	try
-	{
-		checkResult(_dides->QueryInterface(IID_IAAFObject, (void **)&pObj));
-		checkResult(pObj->GetDefinition (&pClassDef));
-		checkResult(pObj->GetDictionary(&pDictionary));
-		if(pClassDef->LookupPropertyDef(kAAFPropID_CDCIOffsetToFrameIndexes, &pPropertyDef) != AAFRESULT_SUCCESS)
-		{
-			checkResult(pDictionary->LookupTypeDef(kAAFTypeID_Int32, &pTypeDef));
-			checkResult(pClassDef->RegisterOptionalPropertyDef (kAAFPropID_CDCIOffsetToFrameIndexes,
-												L"OffsetToFrameIndexes",
-												pTypeDef, &pPropertyDef));
-		}
-		else
-		{
-			checkResult(pPropertyDef->GetTypeDef(&pTypeDef));
-		}
-		checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefInt, (void**)&pTypeDefInt));
-		checkResult(pTypeDefInt->CreateValue ((aafMemPtr_t) &offset, sizeof (offset), &pPropValue));
-		checkResult(pObj->SetPropertyValue (pPropertyDef, pPropValue));
-		pPropertyDef->Release();
-		pPropertyDef = NULL;
-		pPropValue->Release();
-		pPropValue = NULL;
-		pTypeDefInt->Release();
-		pTypeDefInt = NULL;
-		pTypeDef->Release();
-		pTypeDef = NULL;
-
-		if(pClassDef->LookupPropertyDef(kAAFPropID_DIDFrameIndexByteOrder, &pPropertyDef) != AAFRESULT_SUCCESS)
-		{
-			checkResult(pDictionary->LookupTypeDef(kAAFTypeID_Int16, &pTypeDef));
-			checkResult(pClassDef->RegisterOptionalPropertyDef (kAAFPropID_DIDFrameIndexByteOrder,
-												L"FrameIndexByteOrder",
-												pTypeDef, &pPropertyDef));
-		}
-		else
-		{
-			checkResult(pPropertyDef->GetTypeDef(&pTypeDef));
-		}
-
-		checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefInt, (void**)&pTypeDefInt));
-		checkResult(pTypeDefInt->CreateValue ((aafMemPtr_t) &byteOrder, sizeof (byteOrder), &pPropValue));
-		checkResult(pObj->SetPropertyValue (pPropertyDef, pPropValue));
-		pPropertyDef->Release();
-		pPropertyDef = NULL;
-		pPropValue->Release();
-		pPropValue = NULL;
-		pTypeDefInt->Release();
-		pTypeDefInt = NULL;
-		pTypeDef->Release();
-		pTypeDef = NULL;
-		/**/
-		pClassDef->Release();
-		pClassDef = NULL;
-		pObj->Release();
-		pObj = NULL;
-		pDictionary->Release();
-		pDictionary = NULL;
-	}
-	catch (HRESULT& rhr)
-	{
-		if(pPropertyDef != NULL)
-			pPropertyDef->Release();
-		if(pPropValue != NULL)
-			pPropValue->Release();
-		if(pTypeDefInt != NULL)
-			pTypeDefInt->Release();
-		if(pTypeDef != NULL)
-			pTypeDef->Release();
-		if(pClassDef != NULL)
-			pClassDef->Release();
-		if(pObj != NULL)
-			pObj->Release();
-		if(pDictionary != NULL)
-			pDictionary->Release();
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-	return hr;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::GetResolutionID( aafInt32 *p_resid )
-{
-	IAAFClassDef		*pClassDef = NULL;
-	IAAFObject		*pObj = NULL;
-	IAAFPropertyDef		*pPropertyDef = NULL;
-	IAAFPropertyValue	*pPropValue = NULL;
-	IAAFTypeDef		*pTypeDef = NULL;
-	IAAFTypeDefInt		*pTypeDefInt = NULL;
-	aafInt32			val;
-
-	HRESULT				hr = S_OK;
-
-	checkAssertion(NULL != _dides);
-	checkAssertion(NULL != p_resid);
-	try
-	{
-		checkResult(_dides->QueryInterface(IID_IAAFObject, (void **)&pObj));
-		checkResult(pObj->GetDefinition (&pClassDef));
-		checkResult(pClassDef->LookupPropertyDef(kAAFPropID_DIDResolutionID, &pPropertyDef));
-		checkResult(pObj->GetPropertyValue (pPropertyDef, &pPropValue));
-		checkResult(pPropValue->GetType(&pTypeDef));
-		checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefInt, (void**)&pTypeDefInt));
-		checkResult(pTypeDefInt->GetInteger(pPropValue, (aafMemPtr_t) &val, sizeof (val)));
-		*p_resid  = val;
-	}
-	catch (HRESULT& rhr)
-	{
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-	if( pClassDef != NULL )
-	    pClassDef->Release();
-	if( pObj != NULL )
-	    pObj->Release();
-	if( pPropertyDef != NULL )
-	    pPropertyDef->Release();
-	if( pPropValue != NULL )
-	    pPropValue->Release();
-	if( pTypeDef != NULL )
-	    pTypeDef->Release();
-	if( pTypeDefInt != NULL )
-	    pTypeDefInt->Release();
-
-	return hr;
-}
-
-
-
-HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetResolutionID( aafInt32  resolutionID )
-{
-	HRESULT			hr = S_OK;
-	IAAFObject		*p_obj = NULL;
-	IAAFClassDef		*p_classdef = NULL;
-	IAAFPropertyDef		*p_propdef = NULL;
-	IAAFPropertyValue	*p_propval = NULL;
-	IAAFTypeDef		*p_typedef = NULL;
-	IAAFTypeDefInt		*p_typedef_int = NULL;
-
-
-	checkAssertion(NULL != _dides);
-
-	try
-	{
-	    // Get DigitalImageDescriptor class definition
-	    checkResult( _dides->QueryInterface( IID_IAAFObject, 
-		(void**)&p_obj ) );
-
-	    checkResult( p_obj->GetDefinition( &p_classdef ) );
-
-
-	    // Get ResolutionID property definition
-	    checkResult( p_classdef->LookupPropertyDef( 
-		kAAFPropID_DIDResolutionID, &p_propdef ) );
-
-	    checkResult( p_propdef->GetTypeDef( &p_typedef ) );
-
-	    checkResult( p_typedef->QueryInterface( IID_IAAFTypeDefInt, 
-		(void**)&p_typedef_int ) );
-
-
-	    // Try to get prop value. If it doesn't exist, create it.
-	    hr = p_obj->GetPropertyValue( p_propdef, &p_propval );
-	    if( hr != AAFRESULT_SUCCESS )
-	    {
-		if( hr == AAFRESULT_PROP_NOT_PRESENT )
-		{
-		    checkResult( p_typedef_int->CreateValue( 
-			reinterpret_cast<aafMemPtr_t>(&resolutionID), 
-			sizeof(resolutionID), &p_propval ) );
-
-		    // At this point hr equals AAFRESULT_PROP_NOT_PRESENT.
-		    // Reset it.
-		    hr = AAFRESULT_SUCCESS;
-		}
-		else
-		    throw hr;
-	    }
-	    else
-	    {
-		// Property value exists, modify it.
-		checkResult( p_typedef_int->SetInteger( 
-		    p_propval, reinterpret_cast<aafMemPtr_t>(&resolutionID), 
-		    sizeof(resolutionID) ) );
-	    }
-
-	    // Set modified property value.
-	    checkResult( p_obj->SetPropertyValue( p_propdef, p_propval ) );
-	}
-	catch (HRESULT& rhr)
-	{
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-
-	// Cleanup
-	if( p_obj != NULL )
-	    p_obj->Release();
-	if( p_classdef != NULL )
-	    p_classdef->Release();
-	if( p_propdef != NULL )
-	    p_propdef->Release();
-	if( p_propval != NULL )
-	    p_propval->Release();
-	if( p_typedef != NULL )
-	    p_typedef->Release();
-	if( p_typedef_int != NULL )
-	    p_typedef_int->Release();
-
-
-	return hr;
-}
-
-
-
-HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetFirstFrameOffset( aafInt32  firstFrameOffset )
-{
-	HRESULT			hr = S_OK;
-	IAAFObject		*p_obj = NULL;
-	IAAFClassDef		*p_classdef = NULL;
-	IAAFPropertyDef		*p_propdef = NULL;
-	IAAFPropertyValue	*p_propval = NULL;
-	IAAFTypeDef		*p_typedef = NULL;
-	IAAFTypeDefInt		*p_typedef_int = NULL;
-
-
-	checkAssertion(NULL != _dides);
-
-	try
-	{
-	    checkResult( _dides->QueryInterface( IID_IAAFObject, 
-		(void**)&p_obj ) );
-
-	    checkResult( p_obj->GetDefinition( &p_classdef ) );
-
-	    checkResult( p_classdef->LookupPropertyDef( 
-		kAAFPropID_DIDFirstFrameOffset, &p_propdef));
-
-	    checkResult( p_propdef->GetTypeDef( &p_typedef ) );
-
-	    checkResult( p_typedef->QueryInterface( IID_IAAFTypeDefInt, 
-		(void**)&p_typedef_int ) );
-
-	    // Try to get prop value. If it doesn't exist, create it.
-	    hr = p_obj->GetPropertyValue( p_propdef, &p_propval );
-	    if( hr != AAFRESULT_SUCCESS )
-	    {
-		if( hr == AAFRESULT_PROP_NOT_PRESENT )
-		{
-		    checkResult( p_typedef_int->CreateValue( 
-			reinterpret_cast<aafMemPtr_t>(&firstFrameOffset), 
-			sizeof(firstFrameOffset), &p_propval ) );
-
-		    // At this point hr equals AAFRESULT_PROP_NOT_PRESENT.
-		    // Reset it.
-		    hr = AAFRESULT_SUCCESS;
-		}
-		else
-		    throw hr;
-	    }
-	    else
-	    {
-		// Property value exists, modify it.
-		checkResult( p_typedef_int->SetInteger( 
-		    p_propval, reinterpret_cast<aafMemPtr_t>(&firstFrameOffset), 
-		    sizeof(firstFrameOffset) ) );
-	    }
-
-	    checkResult( p_obj->SetPropertyValue( p_propdef, p_propval ) );
-	}
-	catch (HRESULT& rhr)
-	{
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-
-	// Cleanup
-	if( p_obj != NULL )
-	    p_obj->Release();
-	if( p_classdef != NULL )
-	    p_classdef->Release();
-	if( p_propdef != NULL )
-	    p_propdef->Release();
-	if( p_propval != NULL )
-	    p_propval->Release();
-	if( p_typedef != NULL )
-	    p_typedef->Release();
-	if( p_typedef_int != NULL )
-	    p_typedef_int->Release();
-
-
-	return hr;
-}
-
-
-
-HRESULT STDMETHODCALLTYPE
-    CAAFJPEGDescriptorHelper::SetFrameSampleSize( aafInt32 frameSampleSize )
-{
-	HRESULT			hr = S_OK;
-	IAAFObject		*p_obj = NULL;
-	IAAFClassDef		*p_classdef = NULL;
-	IAAFPropertyDef		*p_propdef = NULL;
-	IAAFPropertyValue	*p_propval = NULL;
-	IAAFTypeDef		*p_typedef = NULL;
-	IAAFTypeDefInt		*p_typedef_int = NULL;
-
-
-	checkAssertion(NULL != _dides);
-
-	try
-	{
-	    checkResult( _dides->QueryInterface( IID_IAAFObject, 
-		(void**)&p_obj ) );
-
-	    checkResult( p_obj->GetDefinition( &p_classdef ) );
-
-	    checkResult( p_classdef->LookupPropertyDef( 
-		kAAFPropID_DIDFrameSampleSize, &p_propdef));
-
-	    checkResult( p_propdef->GetTypeDef( &p_typedef ) );
-
-	    checkResult( p_typedef->QueryInterface( IID_IAAFTypeDefInt, 
-		(void**)&p_typedef_int ) );
-
-	    // Try to get prop value. If it doesn't exist, create it.
-	    hr = p_obj->GetPropertyValue( p_propdef, &p_propval );
-	    if( hr != AAFRESULT_SUCCESS )
-	    {
-		if( hr == AAFRESULT_PROP_NOT_PRESENT )
-		{
-		    checkResult( p_typedef_int->CreateValue( 
-			reinterpret_cast<aafMemPtr_t>(&frameSampleSize), 
-			sizeof(frameSampleSize), &p_propval ) );
-
-		    // At this point hr equals AAFRESULT_PROP_NOT_PRESENT.
-		    // Reset it.
-		    hr = AAFRESULT_SUCCESS;
-		}
-		else
-		    throw hr;
-	    }
-	    else
-	    {
-		checkResult( p_typedef_int->SetInteger( 
-		    p_propval, 
-		    reinterpret_cast<aafMemPtr_t>(&frameSampleSize),
-		    sizeof(frameSampleSize) ) );
-	    }
-
-	    checkResult( p_obj->SetPropertyValue( p_propdef, p_propval ) );
-	}
-	catch (HRESULT& rhr)
-	{
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-
-	// Cleanup
-	if( p_obj != NULL )
-	    p_obj->Release();
-	if( p_classdef != NULL )
-	    p_classdef->Release();
-	if( p_propdef != NULL )
-	    p_propdef->Release();
-	if( p_propval != NULL )
-	    p_propval->Release();
-	if( p_typedef != NULL )
-	    p_typedef->Release();
-	if( p_typedef_int != NULL )
-	    p_typedef_int->Release();
-
-
-	return hr;
-}
-
-
-

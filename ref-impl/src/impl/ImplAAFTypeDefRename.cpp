@@ -1,30 +1,39 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
 #ifndef __ImplAAFTypeDefRename_h__
 #include "ImplAAFTypeDefRename.h"
+#endif
+
+#ifndef __ImplAAFHeader_h__
+#include "ImplAAFHeader.h"
 #endif
 
 #ifndef __ImplAAFPropValData_h__
@@ -35,8 +44,6 @@
 #include "ImplAAFObjectCreation.h"
 #endif
 
-#include "ImplAAFDictionary.h"
-
 #include <assert.h>
 #include <string.h>
 
@@ -44,10 +51,7 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 
 ImplAAFTypeDefRename::ImplAAFTypeDefRename ()
-  : _RenamedType  ( PID_TypeDefinitionRename_RenamedType, 
-                    L"RenamedType",
-                    L"/MetaDictionary/TypeDefinitions",
-                    PID_MetaDefinition_Identification)
+  : _RenamedType  ( PID_TypeDefinitionRename_RenamedType, "RenamedType")
 {
   _persistentProperties.put(_RenamedType.address());
 }
@@ -67,53 +71,68 @@ AAFRESULT STDMETHODCALLTYPE
 
   HRESULT hr;
 
-  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
-	if (AAFRESULT_FAILED (hr))
-    return hr;
+  hr = SetName (pTypeName);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  // Check if specified type definition is in the dictionary.
-  if( !aafLookupTypeDef( this, pBaseType ) )
-	return AAFRESULT_TYPE_NOT_FOUND;
+  hr = SetAUID (id);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _RenamedType = pBaseType;
+  aafUID_t baseId;
+  assert (pBaseType);
+  hr = pBaseType->GetAUID(&baseId);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  _RenamedType = baseId;
 
   return AAFRESULT_SUCCESS;
 }
+
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRename::GetBaseType (
       ImplAAFTypeDef ** ppBaseType) const
 {
-  if (! ppBaseType)
-	return AAFRESULT_NULL_PARAM;
+  if (! ppBaseType) return AAFRESULT_NULL_PARAM;
 
-  if(_RenamedType.isVoid())
-		return AAFRESULT_OBJECT_NOT_FOUND;
-  ImplAAFTypeDef *pTypeDef = _RenamedType;
+  if (!_cachedBaseType)
+	{
+	  ImplAAFHeaderSP pHead;
+	  ImplAAFDictionarySP pDict;
 
-  *ppBaseType = pTypeDef;
+	  AAFRESULT hr;
+	  hr = MyHeadObject(&pHead);
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (pHead);
+	  hr = (pHead->GetDictionary(&pDict));
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (pDict);
+
+	  ImplAAFTypeDefRename * pNonConstThis =
+		  (ImplAAFTypeDefRename *) this;
+	  hr = pDict->LookupTypeDef (_RenamedType, &pNonConstThis->_cachedBaseType);
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (_cachedBaseType);
+	}
+  assert (ppBaseType);
+  *ppBaseType = _cachedBaseType;
   assert (*ppBaseType);
   (*ppBaseType)->AcquireReference ();
+
   return AAFRESULT_SUCCESS;
 }
 
+
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefRename::GetBaseValue (
+    ImplAAFTypeDefRename::GetValue (
       ImplAAFPropertyValue * pInPropVal,
       ImplAAFPropertyValue ** ppOutPropVal)
 {
   if (! pInPropVal) return AAFRESULT_NULL_PARAM;
   if (! ppOutPropVal) return AAFRESULT_NULL_PARAM;
-
-  // Get the property value's embedded type and 
-  // check if it's the same as the base type.
-  ImplAAFTypeDefSP pInPropType;
-  if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
-	return AAFRESULT_BAD_TYPE;
-  assert (pInPropType);
-  if( (ImplAAFTypeDef *)pInPropType != this )
-	return AAFRESULT_BAD_TYPE;
 
   aafUInt32 inBitsSize;
   ImplAAFPropValDataSP pOutPVData;
@@ -124,7 +143,7 @@ AAFRESULT STDMETHODCALLTYPE
   hr = GetBaseType (&ptd);
   if (AAFRESULT_FAILED (hr)) return hr;
   assert (ptd);
-//  aafUInt32 elementSize = ptd->PropValSize();
+  aafUInt32 elementSize = ptd->PropValSize();
 
   assert (pInPropVal);
   pvd = dynamic_cast<ImplAAFPropValData*> (pInPropVal);
@@ -158,48 +177,6 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefRename::CreateValue (
-      ImplAAFPropertyValue * pInPropVal,
-      ImplAAFPropertyValue ** ppOutPropVal)
-{
-  if (! pInPropVal) return AAFRESULT_NULL_PARAM;
-  if (! ppOutPropVal) return AAFRESULT_NULL_PARAM;
-
-  aafUInt32 inBitsSize;
-  ImplAAFPropValDataSP pOutPVData;
-  ImplAAFPropValDataSP pvd;
-  AAFRESULT hr;
-
-  assert (pInPropVal);
-  pvd = dynamic_cast<ImplAAFPropValData*> (pInPropVal);
-  assert (pvd);
-
-  hr = pvd->GetBitsSize (&inBitsSize);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  pOutPVData = (ImplAAFPropValData *)CreateImpl(CLSID_AAFPropValData);
-  if (! pOutPVData) return AAFRESULT_NOMEMORY;
-
-  // SmartPointer operator= will automatically AddRef; CreateImpl *also* will 
-  // addref, so we've got one too many.  Put us back to normal.
-  pOutPVData->ReleaseReference ();
-
-  hr = pOutPVData->Initialize (this);
-  if (AAFRESULT_FAILED(hr)) return hr;
-
-  hr = pOutPVData->AllocateFromPropVal (pvd,
-										0,
-										inBitsSize,
-										NULL);
-  if (AAFRESULT_FAILED(hr)) return hr;
-
-  assert (ppOutPropVal);
-  *ppOutPropVal = pOutPVData;
-  (*ppOutPropVal)->AcquireReference ();
-  assert (*ppOutPropVal);
-  return AAFRESULT_SUCCESS;
-}
 
 ImplAAFTypeDefSP ImplAAFTypeDefRename::BaseType () const
 {
@@ -251,7 +228,7 @@ void ImplAAFTypeDefRename::internalize(OMByte* externalBytes,
 									   size_t internalBytesSize,
 									   OMByteOrder byteOrder) const
 {
-  BaseType()->internalize (externalBytes,
+  BaseType()->externalize (externalBytes,
 						   externalBytesSize,
 						   internalBytes,
 						   internalBytesSize,
@@ -284,11 +261,11 @@ size_t ImplAAFTypeDefRename::NativeSize() const
 }
 
 
-OMProperty * ImplAAFTypeDefRename::pvtCreateOMProperty
+OMProperty * ImplAAFTypeDefRename::pvtCreateOMPropertyMBS
   (OMPropertyId pid,
-   const wchar_t * name) const
+   const char * name) const
 {
-  return BaseType()->pvtCreateOMProperty (pid, name);
+  return BaseType()->pvtCreateOMPropertyMBS (pid, name);
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -325,25 +302,3 @@ bool ImplAAFTypeDefRename::IsVariableArrayable () const
 
 bool ImplAAFTypeDefRename::IsStringable () const
 { return BaseType()->IsStringable(); }
-
-
-
-
-
-
-// override from OMStorable.
-const OMClassId& ImplAAFTypeDefRename::classId(void) const
-{
-  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefRename));
-}
-
-// Override callbacks from OMStorable
-void ImplAAFTypeDefRename::onSave(void* clientContext) const
-{
-  ImplAAFTypeDef::onSave(clientContext);
-}
-
-void ImplAAFTypeDefRename::onRestore(void* clientContext) const
-{
-  ImplAAFTypeDef::onRestore(clientContext);
-}
