@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.42 2004/09/28 13:46:21 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.43 2004/10/18 15:29:54 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <strings.h>		// for strncasecmp()
 #include <iostream>
 using namespace std;
 

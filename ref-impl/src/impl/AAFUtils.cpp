@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.54 2004/09/24 12:32:49 bakerian Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.55 2004/10/18 15:29:54 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <strings.h>		// for strncasecmp()
 #include <assert.h>
 #include <time.h>
 #include <math.h>
