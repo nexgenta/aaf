@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2004/09/24 15:23:24 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9 2004/09/28 10:18:21 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,7 @@ all : aafomf eli2aaf aafviewer
 # with the SDK.  They are available from http://aafassociation.org/download/
 .PHONY : aafomf
 aafomf:
-	@if [ -e ../OMF/Include/omDefs.h ] ; then cd AafOmf && $(MAKE); else echo; echo "OMF libraries not present - AafOmf will not be built"; echo; fi
+	@if [ -r ../OMF/Include/omDefs.h ] ; then cd AafOmf && $(MAKE); else echo; echo "OMF libraries not present - AafOmf will not be built"; echo; fi
 
 .PHONY : eli2aaf
 eli2aaf:
