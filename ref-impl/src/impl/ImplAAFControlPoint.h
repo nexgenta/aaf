@@ -32,14 +32,6 @@
  ************************************************************************/
 
 
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\***********************************************/ 
-
 class ImplAAFDataDef;
 
 
@@ -152,12 +144,6 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeDefinition (
       ImplAAFTypeDef **ppTypeDef);
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFControlPoint)
 
 private:
 	OMFixedSizeProperty<aafUID_t>		_type;
