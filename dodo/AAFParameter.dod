@@ -17,6 +17,12 @@ AD_HEAD
 *                                          *
 \******************************************/
 
+AD_INCLUDE(AAFTypes)
+AD_FORWARD_DECLARATION(AAFDataDefinition)
+
+AD_CLASS_UUID(9c568a82, 2096, 11d2, bf, 98, 00, 60, 97, 11, 62, 1) 
+
+AD_DEFAULT_UUID(9c568a81, 2096, 11d2, bf, 98, 00, 60, 97, 11, 62, 12)
 AD_CLASS_BEGIN
 
 AD_METHOD1(SetLength,
@@ -37,18 +43,18 @@ AD_METHOD1(GetLength,
 		   // stored as an implicit property on 1.x objects\, so this routine
 		   // recursively calculates the length.)
 	
-AD_METHOD1(SetDataKind,
+AD_METHOD1(SetDataDefinition,
 		   [in],
-		   AAFDataDefinition,
-		   datakind,
-		   DataKind of this object,
+		   AAFDataDefinition *,
+		   datadef,
+		   Data Definition of this object,
 		   sets the datakind property values on the input component object.)
 
 AD_METHOD1(GetDataKind,
 		  [retval][out],
 		  AAFDataDefinition *,
-		  datakind,
-		  DataKind of this object,
+		  datadef,
+		  Data Definition of this object,
 		  returns datakind definition object)
 
 AD_OVERRIDE(.method-Test)
