@@ -1,25 +1,16 @@
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
+
 
 
 #ifndef __ImplAAFIdentification_h__
@@ -28,7 +19,6 @@
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "AAFUtils.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -40,15 +30,15 @@ ImplAAFIdentification::~ImplAAFIdentification ()
 {}
 
 ImplAAFIdentification::ImplAAFIdentification():
-  _companyName(         PID_Identification_CompanyName,          L"CompanyName"),
-  _productName(         PID_Identification_ProductName,          L"ProductName"),
-  _productVersion(      PID_Identification_ProductVersion,       L"ProductVersion"),
-  _productVersionString(PID_Identification_ProductVersionString, L"ProductVersionString"),
-  _productId(			  PID_Identification_ProductID,            L"ProductID"),
-  _date(                PID_Identification_Date,                 L"Date"),
-  _toolkitVersion(      PID_Identification_ToolkitVersion,       L"ToolkitVersion"),
-  _platform(            PID_Identification_Platform,             L"Platform"),
-  _generation(       PID_Identification_GenerationAUID,       L"GenerationAUID")
+_companyName(         PID_Identification_CompanyName,          "CompanyName"),
+_productName(         PID_Identification_ProductName,          "ProductName"),
+_productVersion(      PID_Identification_ProductVersion,       "ProductVersion"),
+_productVersionString(PID_Identification_ProductVersionString, "ProductVersionString"),
+// _productId(        PID_Identification_ProductID,            "ProductID"),
+_date(                PID_Identification_Date,                 "Date"),
+_toolkitVersion(      PID_Identification_ToolkitVersion,       "ToolkitVersion"),
+_platform(            PID_Identification_Platform,             "Platform")
+// _generation(       PID_Identification_GenerationAUID,       "GenerationAUID")
 {
   // Insert the properties into the persistent property set.
   //
@@ -56,63 +46,77 @@ ImplAAFIdentification::ImplAAFIdentification():
   _persistentProperties.put(   _productName.address());
   _persistentProperties.put(_productVersion.address());
   _persistentProperties.put(   _productVersionString.address());
-  _persistentProperties.put(_productId.address());
+  // _persistentProperties.put(_productId.address());
   _persistentProperties.put(   _date.address());
   _persistentProperties.put(_toolkitVersion.address());
   _persistentProperties.put(   _platform.address());
-  _persistentProperties.put(_generation.address());
+  // _persistentProperties.put(_generation.address());
 
   
-#if defined( OS_WINDOWS )
+#if defined(_WIN32)
   _platform = L"Win32";
-#elif defined( OS_MACOS )
+#elif defined(macintosh) || defined(_MAC)
   _platform = L"MacOS";
-#elif defined( OS_UNIX )
-  _platform = L"Unix";
 #else
   _platform = L"Unknown";
 #endif
 
 }
 
+ImplAAFIdentification::ImplAAFIdentification(
+                                     const wchar_t* companyName,
+                                     const wchar_t* productName,
+                                     const aafProductVersion_t* productVersion,
+                                     const wchar_t* productVersionString,
+                                     // const AUID* productId,
+                                     const aafTimeStamp_t date,
+                                     const aafProductVersion_t* toolKitVersion,
+                                     const wchar_t* platform
+                                     // const AUID* generation
+                                     ):
+_companyName(         PID_Identification_CompanyName,          "Company Name"),
+_productName(         PID_Identification_ProductName,          "Product Name"),
+_productVersion(      PID_Identification_ProductVersion,       "Product Version"),
+_productVersionString(PID_Identification_ProductVersionString, "Product Version String"),
+// _productId(        PID_Identification_ProductID,            "Product ID"),
+_date(                PID_Identification_Date,                 "Date"),
+_toolkitVersion(      PID_Identification_ToolkitVersion,       "Toolkit Version"),
+_platform(            PID_Identification_Platform,             "Platform")
+// _generation(       PID_Identification_GenerationAUID,       "Generation AUID")
+{
+  // Insert the properties into the persistent property set.
+  //
+  _persistentProperties.put(   _companyName.address());
+  _persistentProperties.put(   _productName.address());
+  _persistentProperties.put(_productVersion.address());
+  _persistentProperties.put(   _productVersionString.address());
+  // _persistentProperties.put(_productId.address());
+  _persistentProperties.put(   _date.address());
+  _persistentProperties.put(_toolkitVersion.address());
+  _persistentProperties.put(   _platform.address());
+  // _persistentProperties.put(_generation.address());
+
+  // Initialize members.
+  //
+  _companyName = companyName;
+  _productName = productName;
+	_productVersion = *productVersion;
+  _productVersionString = productVersionString;
+	// _productId.???;
+  _date = date;
+	_toolkitVersion = *toolKitVersion;
+  _platform = platform;
+  // _generation.???;
+
+};
+
+
+OMDEFINE_STORABLE(ImplAAFIdentification, AUID_AAFIdentification);
+
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFIdentification::Initialize
- (aafCharacter_constptr companyName,
-  aafCharacter_constptr productName,
-  aafCharacter_constptr productVersionString,
-  aafUID_constref productID)
+ImplAAFIdentification::Initialize ()
 {
-  if (isInitialized ()) return AAFRESULT_ALREADY_INITIALIZED;
-
-  if (! companyName)          return AAFRESULT_NULL_PARAM;
-  if (! productName)          return AAFRESULT_NULL_PARAM;
-  if (! productVersionString) return AAFRESULT_NULL_PARAM;
-
-  AAFRESULT hr;
-
-  hr = SetCompanyName (companyName);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  hr = SetProductName (productName);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  hr = SetProductVersionString (productVersionString);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  hr = SetProductID (productID);
-  if (AAFRESULT_FAILED (hr)) return hr;
-
-  aafUID_t gen;
-  hr = aafAUIDNew (&gen);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  _generation = gen;
-
-  aafTimeStamp_t timestamp;
-  AAFGetDateTime (&timestamp);
-  _date = timestamp;
-
-  _toolkitVersion = AAFReferenceImplementationVersion;
-
-  setInitialized ();
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -121,8 +125,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetCompanyName (aafWChar *  pName,
 										   aafUInt32 bufSize)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   bool stat;
   if (! pName)
 	{
@@ -140,8 +142,6 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetCompanyNameBufLen (aafUInt32 *  pLen)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   if (! pLen)
 	{
 	  return AAFRESULT_NULL_PARAM;
@@ -156,8 +156,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetProductName (aafWChar *  pProductName,
 										   aafUInt32 bufSize)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   bool stat;
   if (! pProductName)
 	{
@@ -175,8 +173,6 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetProductNameBufLen (aafUInt32 *  pLen)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   if (! pLen)
 	{
 	  return AAFRESULT_NULL_PARAM;
@@ -190,17 +186,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetProductVersion (aafProductVersion_t* productVersion)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
 	if (! productVersion)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-
-	if(!_productVersion.isPresent())
-	{
-		return AAFRESULT_PROP_NOT_PRESENT;
-	}	
+	
 	*productVersion = _productVersion;
 	return AAFRESULT_SUCCESS;
 }
@@ -210,8 +200,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetProductVersionString (aafWChar *  pVS,
 													aafUInt32 bufSize)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   bool stat;
   if (! pVS)
 	{
@@ -229,8 +217,6 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetProductVersionStringBufLen (aafUInt32 *  pLen)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   if (! pLen)
 	{
 	  return AAFRESULT_NULL_PARAM;
@@ -244,24 +230,17 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetProductID (aafUID_t * pPID)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   if (! pPID)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-
-  *pPID = _productId;
-
-  return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetDate (aafTimeStamp_t * pTS)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
   if (! pTS)
 	{
 	  return AAFRESULT_NULL_PARAM;
@@ -274,18 +253,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetRefImplVersion (aafProductVersion_t* productVersion)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
 	if (! productVersion)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 	
-	if(!_toolkitVersion.isPresent())
-	{
-		return AAFRESULT_PROP_NOT_PRESENT;
-	}
-
 	*productVersion = _toolkitVersion;
 
 	return AAFRESULT_SUCCESS;
@@ -296,66 +268,45 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetPlatform (aafWChar *  pPlatform,
 										aafUInt32 bufSize)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
-	if (! pPlatform)
+  bool stat;
+  if (! pPlatform)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
-	
-	if(!_platform.isPresent())
+  stat = _platform.copyToBuffer(pPlatform, bufSize);
+  if (! stat)
 	{
-		return AAFRESULT_PROP_NOT_PRESENT;
+	  return AAFRESULT_SMALLBUF;
 	}
-
-	bool stat;
-	
-	stat = _platform.copyToBuffer(pPlatform, bufSize);
-	if (! stat)
-	{
-		return AAFRESULT_SMALLBUF;
-	}
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetPlatformBufLen (aafUInt32 *  pLen)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
-	if (! pLen)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-
-	if(!_platform.isPresent())
-	{
-		return AAFRESULT_PROP_NOT_PRESENT;
-	}
-		
-	*pLen = _platform.size();
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::GetGenerationID (aafUID_t *  pGen)
-{
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
-  if (! pGen)
+  if (! pLen)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-
-  *pGen = _generation;
+  *pLen = _platform.size();
   return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetCompanyName (const aafCharacter * pName)
+    ImplAAFIdentification::GetGeneration (aafUID_t *  pGen)
+{
+  if (! pGen)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFIdentification::SetCompanyName (aafWChar *  pName)
 {
   if (! pName)
 	{
@@ -369,7 +320,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetProductName (const aafCharacter * pName)
+    ImplAAFIdentification::SetProductName (aafWChar *  pName)
 {
   if (! pName)
 	{
@@ -383,33 +334,40 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetProductVersion (aafProductVersion_constref productVersion)
+    ImplAAFIdentification::SetProductVersion (aafProductVersion_t* productVersion)
 {
-  if (! isInitialized ()) return AAFRESULT_NOT_INITIALIZED;
-
-	_productVersion = productVersion;
-
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetProductVersionString (const aafCharacter * pVS)
-{
-	if (! pVS)
+	
+	if (! productVersion)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-	
-	_productVersionString = pVS;
-	
+
+	_productVersion = *productVersion;
+
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFIdentification::SetProductID (const aafUID_t & PID)
+    ImplAAFIdentification::SetProductVersionString (aafWChar * pVS)
 {
-  _productId = PID;
+  if (! pVS)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+
+  _productVersionString = pVS;
+
   return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFIdentification::SetProductID (aafUID_t * pPID)
+{
+  if (! pPID)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
