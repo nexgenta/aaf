@@ -122,9 +122,9 @@ ImplAAFHeader::~ImplAAFHeader ()
 {
 	// Release all of the id pointers in the id list.
 	//
-	size_t size = _identificationList.getSize();
-	for (size_t i = 0; i < size; i++) {
-		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
+	size_t count = _identificationList.count();
+	for (size_t i = 0; i < count; i++) {
+		ImplAAFIdentification *pIdent = _identificationList.clearValueAt(i);
 
 		if (pIdent) {
 		  pIdent->ReleaseReference();
@@ -437,13 +437,12 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
   AAFRESULT result;
-  size_t size;
-  _identificationList.getSize(size);
+  size_t count = _identificationList.count();
 
-  if (size > 0) {
-    // For size entries the valid positions are 0 .. size - 1
+  if (count > 0) {
+    // For count entries the valid positions are 0 .. count - 1
     // get the last one in the vector.
-    _identificationList.getValueAt(*ppIdentification, size - 1);
+    _identificationList.getValueAt(*ppIdentification, count - 1);
 
 		// We are returning a non-null reference.
 		if (*ppIdentification) {
@@ -498,14 +497,13 @@ AAFRESULT STDMETHODCALLTYPE
 ImplAAFHeader::CountIdentifications
 (aafUInt32 *  pNumIdents)
 {
- 	size_t	siz;
 	if (! pNumIdents)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-		
-	_identificationList.getSize(siz);
-	*pNumIdents = siz;
+
+ 	size_t	count = _identificationList.count();
+	*pNumIdents = count;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -533,7 +531,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
-		return(XCODE());
 	}
 	XEND;
 	
@@ -572,8 +569,6 @@ AAFRESULT
 {
 	ImplAAFIdentification *		identObj;
 	aafProductIdentification_t	fiction;
-	aafBool						dummyIDNT = kAAFFalse;
-	aafProductVersion_t			dummyVersion;
 	
 	XPROTECT()
 	{		
@@ -586,7 +581,6 @@ AAFRESULT
 			fiction.platform = (aafWChar*)NULL;
 			fiction.productVersion = 0;
 			pIdent = &fiction;
-			dummyIDNT = kAAFTrue;
 		}
 		
 	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
@@ -618,7 +612,6 @@ AAFRESULT
 
     _identificationList.appendValue(identObj);
  
-    dummyVersion.major = 0;
 	}
 	XEXCEPT
 	{
