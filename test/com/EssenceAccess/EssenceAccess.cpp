@@ -67,10 +67,6 @@ static aafSourceRef_t sourceRef;
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
 
-static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
-{
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
-}
 
 #define TEST_PATH	L"SomeFile.dat"
 
@@ -108,12 +104,17 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
-static void AUIDtoString(aafUID_t *uid, char *buf)
+static void MobIDtoString(aafMobID_constref uid, char *buf)
 {
-	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
-			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
-			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
+	sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x--%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
+		(int)uid.SMPTELabel[0], (int)uid.SMPTELabel[1], (int)uid.SMPTELabel[2], (int)uid.SMPTELabel[3], 
+		(int)uid.SMPTELabel[4], (int)uid.SMPTELabel[5], (int)uid.SMPTELabel[6], (int)uid.SMPTELabel[7], 
+		(int)uid.SMPTELabel[8], (int)uid.SMPTELabel[8], (int)uid.SMPTELabel[10], (int)uid.SMPTELabel[11], 
+		(int)uid.length, (int)uid.instanceHigh, (int)uid.instanceMid, (int)uid.instanceLow, 
+		uid.material.Data1, uid.material.Data2, uid.material.Data3, (int)uid.material.Data4[0],
+		(int)uid.material.Data4[1], (int)uid.material.Data4[2], (int)uid.material.Data4[3],
+		(int)uid.material.Data4[4],
+		(int)uid.material.Data4[5], (int)uid.material.Data4[6], (int)uid.material.Data4[7]);
 }
 
 typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
@@ -166,8 +167,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
+	IAAFClassDef                *pCDMasterMob = 0;
+	IAAFClassDef                *pCDNetworkLocator = 0;
+	IAAFDataDef                 *pDdefSound = 0;
 	// !!!Previous revisions of this file contained variables here required to handle external essence
-	aafUID_t					masterMobID;
+	aafMobID_t					masterMobID;
 	aafProductIdentification_t	ProductInfo;
 	aafRational_t				editRate = {44100, 1};
 	aafRational_t				sampleRate = {44100, 1};
@@ -198,7 +202,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -206,15 +210,22 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
 	check(pFile->GetHeader(&pHeader));
 
-  // Get the AAF Dictionary so that we can create valid AAF objects.
-  check(pHeader->GetDictionary(&pDictionary));
+	// Get the AAF Dictionary so that we can create valid AAF objects.
+	check(pHeader->GetDictionary(&pDictionary));
+
+	check(pDictionary->LookupClassDef(AUID_AAFMasterMob,
+									  &pCDMasterMob));
+	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
+									  &pCDNetworkLocator));
+	check(pDictionary->LookupDataDef(DDEF_Sound,
+									 &pDdefSound));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
   // Get a Master MOB Interface
-	check(pDictionary->CreateInstance(AUID_AAFMasterMob,
-						   IID_IAAFMasterMob, 
-						   (IUnknown **)&pMasterMob));
+	check(pCDMasterMob->
+		  CreateInstance(IID_IAAFMasterMob, 
+						 (IUnknown **)&pMasterMob));
 	// Get a Mob interface and set its variables.
 	check(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 	check(pMob->GetMobID(&masterMobID));
@@ -228,9 +239,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	if(dataFile != NULL)
 	{
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pDictionary->CreateInstance(AUID_AAFNetworkLocator,
-								IID_IAAFLocator, 
-								(IUnknown **)&pLocator));		
+		check(pCDNetworkLocator->
+			  CreateInstance(IID_IAAFLocator, 
+							 (IUnknown **)&pLocator));		
 		check(pLocator->SetPath (dataFile->dataFilename));
 		testContainer = dataFile->dataFormat;
 	}
@@ -272,11 +283,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 		// now create the Essence data file
 		check(pMasterMob->CreateEssence(1,				// Slot ID
-									DDEF_Sound,		// MediaKind
+									pDdefSound,		// MediaKind
 									CodecWave,		// codecID
 									editRate,		// edit rate
 									sampleRate,		// sample rate
-									kSDKCompressionDisable,
+									kAAFCompressionDisable,
 									pLocator,	// In current file
 									testContainer,	// In AAF Format
 									&pEssenceAccess));// Compress disabled
@@ -452,6 +463,24 @@ cleanup:
 	if (pHeader)
 		pHeader->Release();
 
+	if (pCDMasterMob)
+	  {
+		pCDMasterMob->Release();
+		pCDMasterMob = 0;
+	  }
+
+	if (pCDNetworkLocator)
+	  {
+		pCDNetworkLocator->Release();
+		pCDNetworkLocator = 0;
+	  }
+
+	if (pDdefSound)
+	  {
+		pDdefSound->Release();
+		pDdefSound = 0;
+	  }
+
 	if (pFile)
   {
     pFile->Close();
@@ -475,10 +504,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
 	IAAFEssenceFormat*			pFormat = NULL;
+	IAAFDataDef*				pddSound = 0;
 
 	aafNumSlots_t				numMobs, numSlots;
 	aafSearchCrit_t				criteria;
-	aafUID_t					mobID, dataID = DDEF_Sound;
+	aafMobID_t					mobID;
 	aafWChar					namebuf[1204];
 	unsigned char						*AAFDataBuf = NULL;
 	aafUInt32					AAFBytesRead, samplesRead;
@@ -493,15 +523,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	// Get the AAF Dictionary so that we can create valid AAF objects.
 	check(pHeader->GetDictionary(&pDictionary));
 
-
 	// Here we check on the number of mobs in the file. 
 	// Get the number of master mobs in the file (should be one)
-	check(pHeader->CountMobs(kMasterMob, &numMobs));
+	check(pHeader->CountMobs(kAAFMasterMob, &numMobs));
 	if (1 == numMobs )
 	{
 		printf("Found %ld Master Mobs\n", numMobs);
-		criteria.searchTag = kByMobKind;
-		criteria.tags.mobKind = kMasterMob;
+		criteria.searchTag = kAAFByMobKind;
+		criteria.tags.mobKind = kAAFMasterMob;
 		check(pHeader->GetMobs(&criteria, &pMobIter));
 		while(AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
@@ -512,7 +541,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 			check(pMob->GetMobID (&mobID));
 			check(pMob->GetName (namebuf, sizeof(namebuf)));
 			convert(mobName, sizeof(mobName), namebuf);
-			AUIDtoString(&mobID, mobIDstr);
+			MobIDtoString(mobID, mobIDstr);
 			printf("    MasterMob Name = '%s'\n", mobName);
 			printf("        (mobID %s)\n", mobIDstr);
 			// Make sure we have one slot 
@@ -526,8 +555,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 				// Open the Essence Data
 					check(pMasterMob->OpenEssence(	1,						// SlotID 1
 											NULL,				// mediaCriteria (Don't care)
-											kMediaOpenReadOnly,	// Open mode
-											kSDKCompressionDisable,// Compress disabled
+											kAAFMediaOpenReadOnly,	// Open mode
+											kAAFCompressionDisable,// Compress disabled
 											&pEssenceAccess));
 
 #if 0
@@ -557,7 +586,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 					
 #else
-					check(pEssenceAccess->GetSampleCount(dataID, &sampleCount));
+					check(pDictionary->LookupDataDef(DDEF_Sound, &pddSound));
+					check(pEssenceAccess->GetSampleCount(pddSound, &sampleCount));
 					samplesToRead = (aafInt32)sampleCount;		// !!! Possible loss of data if > 4gig
 #endif
 					aafUInt32			sampleBits;
@@ -746,6 +776,12 @@ cleanup:
 	if (pFormat)
 		pFormat->Release();
 
+	if (pddSound)
+	  {
+		pddSound->Release();
+		pddSound = 0;
+	  }
+
 	if (pFile) 
 	{
 		pFile->Close();
@@ -860,7 +896,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
+	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
 	aafUInt8			chunkID[4];
  	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -903,14 +939,14 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = AAFTrue;
+			fmtFound = kAAFTrue;
 		} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
 			*dataLen = chunkSize / bytesPerFrame;
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 	
-			dataFound = AAFTrue;
+			dataFound = kAAFTrue;
 		}
 	
 		if((ptr-buf) > formSize)
