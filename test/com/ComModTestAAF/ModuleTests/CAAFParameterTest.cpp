@@ -102,14 +102,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kAAFMediaOpenAppend)
+	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -143,6 +143,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDictionary*		pDictionary = NULL;
 	IAAFOperationDef*		pOperationDef = NULL;
 	IAAFParameterDef*	pParamDef = NULL;
+	IAAFDefObject*		pDefObject = NULL;
 	IAAFOperationGroup			*pOperationGroup = NULL;
 	IAAFMob				*pMob = NULL;
 	IAAFSegment			*pSeg = NULL;
@@ -171,7 +172,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
@@ -189,10 +190,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
-		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
+		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
+		pDefObject->Release();
+		pDefObject = NULL;
 
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
-		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
+		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
@@ -201,7 +205,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
-		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
+		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
+		pDefObject->Release();
+		pDefObject = NULL;
 
 
 		//Make the first mob
@@ -301,6 +308,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSourceRef->Release();
 	if(pSourceClip)
 		pSourceClip->Release();
+	if (pDefObject)
+		pDefObject->Release();
 	if (pOperationGroup)
 		pOperationGroup->Release();
 	if (pMob)
@@ -378,11 +387,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 		
 		aafSearchCrit_t		criteria;
-		criteria.searchTag = kAAFNoSearch;
+		criteria.searchTag = kNoSearch;
 		checkResult(pHeader->GetMobs (&criteria, &mobIter));
 				
 		checkResult(mobIter->NextOne (&pMob));			

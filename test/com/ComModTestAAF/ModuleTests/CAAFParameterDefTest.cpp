@@ -95,14 +95,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kAAFMediaOpenAppend)
+	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -149,7 +149,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
@@ -175,7 +175,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 //!!!Not testing the Init() on AAFDefObject
 		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
-		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
+		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
 		checkResult(pOperationDef->AddParameterDef (pParamDef));
@@ -256,7 +256,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
@@ -274,11 +274,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		pDefObject->Release();
 		pDefObject = NULL;
 		
-		aafBool bResult = kAAFFalse;
+		aafBool bResult = AAFFalse;
 		checkResult (pReadDataDef->IsDataDefOf(defs.ddPicture(), &bResult));
-		checkExpression(bResult == kAAFTrue, AAFRESULT_TEST_FAILED);
+		checkExpression(bResult == AAFTrue, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->IsTimeWarp (&readIsTimeWarp));
-		checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
+		checkExpression(readIsTimeWarp == AAFFalse, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->GetCategoryBufLen (&catLen));
 		testLen = wcslen(TEST_CATEGORY);
 		checkResult(pOperationDef->GetCategory (checkCat, sizeof(checkCat)));

@@ -38,8 +38,8 @@
 // The static variables are here so they can be referenced throughout the whole program.
 
 // Filename variables
-static aafWChar *	pwFileName; 
-static char *		pFileName; 
+aafWChar *	pwFileName; 
+char *		pFile; 
 
 static aafSourceRef_t sourceRef; 
 
@@ -49,7 +49,7 @@ static aafSourceRef_t sourceRef;
 
 static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
 {
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
+	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
 }
 
 #define TEST_PATH	L"SomeFile.dat"
@@ -176,7 +176,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -253,7 +253,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 				CodecWave,			// codecID
 				editRate,			// edit rate
 				sampleRate,			// sample rate
-				kAAFCompressionDisable,
+				kSDKCompressionDisable,
 				pLocator,			// In current file
 				testContainer,		// In AAF Format
 				&pEssenceAccess));	// Compress disabled
@@ -429,12 +429,12 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
   
 
 	// Get the number of master mobs in the existing file (must not be zero)
-	check(pHeader->CountMobs(kAAFMasterMob, &numMobs));
+	check(pHeader->CountMobs(kMasterMob, &numMobs));
 	if (numMobs != 0)
 	{
 		printf("Found %ld Master Mobs\n", numMobs);
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFMasterMob;
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kMasterMob;
 		check(pHeader->GetMobs(&criteria, &pMobIter));
 
 		/* Create a Composition Mob */
@@ -496,10 +496,10 @@ static HRESULT ProcessAAFFile(aafWChar * pFileName, testType_t testType)
 					check(pMobSlot->GetDataDef(&pDataDef));
 					
 					// Check that we have a sound file by examining its data definition
-          aafBool bIsSoundKind = kAAFFalse;
+          aafBool bIsSoundKind = AAFFalse;
           check(pDataDef->IsSoundKind(&bIsSoundKind));
 
-          if (kAAFTrue == bIsSoundKind)
+          if (AAFTrue == bIsSoundKind)
 					{
 						printf("Found a sound file\n");
 
@@ -738,7 +738,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
+	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
 	aafUInt8			chunkID[4];
  	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -781,14 +781,14 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = kAAFTrue;
+			fmtFound = AAFTrue;
 		} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
 			*dataLen = chunkSize / bytesPerFrame;
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 	
-			dataFound = kAAFTrue;
+			dataFound = AAFTrue;
 		}
 	
 		if((ptr-buf) > formSize)
@@ -845,7 +845,7 @@ void usage(void)
 //  NOTE:  defining [0] program name; [1] filename.aaf; 
 //  Specifying that use file ExportSimpleComposition.aaf as default
 //  The specified filename is the name of the file that is created by the program.
-int main(int argumentCount, char* argumentVector[])
+main(int argumentCount, char* argumentVector[])
 {
 	/* console window for mac */
 	#if defined(macintosh) || defined(_MAC)
@@ -865,7 +865,7 @@ int main(int argumentCount, char* argumentVector[])
 	{
 		// Initialise filename variables to default settings and inform user
 		pwFileName = L"ExportSimpleComposition.aaf";
-		pFileName = "ExportSimpleComposition.aaf";
+		pFile = "ExportSimpleComposition.aaf";
 
 		printf("No file specified => defaulting to ExportSimpleComposition.aaf\n\n");
 	}
@@ -882,7 +882,7 @@ int main(int argumentCount, char* argumentVector[])
 		aafWChar FileNameBuffer[80];
 		mbstowcs(FileNameBuffer,niceFileName,80);
 		pwFileName = FileNameBuffer;
-		pFileName = niceFileName;
+		pFile = niceFileName;
 	}
 	else
 	{
@@ -890,7 +890,7 @@ int main(int argumentCount, char* argumentVector[])
 		return 0;
 	}
 	// Access the AAF file with name set from argument or lack thereof
-	printf("Working on file %s using ReadSamples\n", pFileName);
+	printf("Working on file %s using ReadSamples\n", pFile);
 	ProcessAAFFile(pwFileName, testStandardCalls);
 	
 	printf("DONE\n\n");

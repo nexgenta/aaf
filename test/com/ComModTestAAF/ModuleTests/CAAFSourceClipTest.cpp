@@ -31,7 +31,6 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -43,20 +42,10 @@
 static aafWChar *slotName = L"SLOT1";
 static aafInt32 fadeInLen  = 1000;
 static aafInt32 fadeOutLen = 2000;
-static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
-static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
+static aafFadeType_t fadeInType = kFadeLinearAmp;
+static aafFadeType_t fadeOutType = kFadeLinearPower;
 static aafSourceRef_t sourceRef; 
 
-
-static const	aafMobID_t	TEST_MobID = 
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xa121c634, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
-static const	aafMobID_t	TEST_referencedMobID = 
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0xa85e495e, 0x0404, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -96,21 +85,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob*					pReferencedMob = NULL;
 	IAAFTimelineMobSlot*		newSlot = NULL;
 	IAAFSegment*				seg = NULL;
-	IAAFComponent*		pComponent = NULL;
 	IAAFSourceClip*				sclp = NULL;
+	aafRational_t				audioRate = { 44100, 1 };
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
+	aafMobID_t					newMobID, referencedMobID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFSourceClip Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -135,28 +123,26 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdMasterMob()->
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pReferencedMob));
-		checkResult(pReferencedMob->SetMobID(TEST_referencedMobID));
+		checkResult(CoCreateGuid((GUID *)&referencedMobID));
+		checkResult(pReferencedMob->SetMobID(referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
 
 		// Create a Mob
 		checkResult(defs.cdCompositionMob()->
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pMob));
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"AAFSourceClipTest"));
 
 		// Create a SourceClip
 		checkResult(defs.cdSourceClip()->
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&sclp));
-		 checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddSound()));
-		pComponent->Release();
-		pComponent = NULL;
 								 		
 		// Set the properties for the SourceClip
 		checkResult(sclp->SetFade( fadeInLen, fadeInType, fadeOutLen, fadeOutType));
-		sourceRef.sourceID = TEST_referencedMobID;
+		sourceRef.sourceID = referencedMobID;
 		sourceRef.sourceSlotID = 0;
 		sourceRef.startTime = 0;
 		checkResult(sclp->SetSourceReference(sourceRef));
@@ -187,9 +173,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	if (sclp)
 		sclp->Release();
-
-	if (pComponent)
-		pComponent->Release();
 
 	if (pMob)
 		pMob->Release();
@@ -230,6 +213,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFSegment*				pSegment = NULL;
 	IAAFSourceClip*				pSourceClip = NULL;
 	bool bFileOpen = false;
+	aafProductIdentification_t	ProductInfo;
 	aafSearchCrit_t				criteria;
 	aafNumSlots_t				numMobs, numSlots;
 	aafLength_t					rFadeInLen;
@@ -242,6 +226,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafMobID_t					rReferencedMobID;
 
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"AAFSourceClip Test. NOT!";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.platform = NULL;
+
 	try
 	{ 
     // Open the file
@@ -252,12 +246,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		checkExpression(2 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over all Composition Mobs
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFCompMob;
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kCompMob;
 		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
@@ -275,10 +269,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 									&rFadeOutLen, &rFadeOutType, &fadeOutPresent ));
 				checkResult(pSourceClip->GetSourceReference( &rSourceRef)); 
 				// verify that we read exactly the same thing as we wrote to the file !!
-				checkExpression(kAAFTrue == fadeInPresent, AAFRESULT_TEST_FAILED);
+				checkExpression(AAFTrue == fadeInPresent, AAFRESULT_TEST_FAILED);
 				checkExpression(rFadeInLen == fadeInLen && rFadeInType == fadeInType,
 				                AAFRESULT_TEST_FAILED);
-				checkExpression(kAAFTrue == fadeOutPresent, AAFRESULT_TEST_FAILED);
+				checkExpression(AAFTrue == fadeOutPresent, AAFRESULT_TEST_FAILED);
 				checkExpression(rFadeOutLen == fadeOutLen && rFadeOutType == fadeOutType, 
 				                AAFRESULT_TEST_FAILED);
 				checkExpression(memcmp(&(rSourceRef.sourceID), &(sourceRef.sourceID), sizeof(sourceRef.sourceID)) == 0, 
@@ -357,7 +351,7 @@ extern "C" HRESULT CAAFSourceClip_test()
 	catch (...)
 	{
 	  cerr << "CAAFSourceClip_test...Caught general C++"
-		   << " exception!" << endl; 
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

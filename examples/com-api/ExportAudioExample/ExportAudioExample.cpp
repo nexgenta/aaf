@@ -156,7 +156,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -228,7 +228,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 									CodecWave,			// codecID
 									editRate,			// edit rate
 									sampleRate,			// sample rate
-									kAAFCompressionDisable,
+									kSDKCompressionDisable,
 									pLocator,			// In current file
 									testContainer,		// In AAF Format
 									&pEssenceAccess));	// Compress disabled
@@ -455,7 +455,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
+	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
 	aafUInt8			chunkID[4];
  	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -498,7 +498,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = kAAFTrue;
+			fmtFound = AAFTrue;
 		} 
 		else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
@@ -506,7 +506,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 	
-			dataFound = kAAFTrue;
+			dataFound = AAFTrue;
 		}
 	
 		if((ptr-buf) > formSize)
@@ -552,7 +552,7 @@ cleanup:
 }
 
 
-int main()
+main()
 {
 	CComInitialize comInit;
 	CAAFInitialize aafInit;
