@@ -1,8 +1,7 @@
 //@doc
-//@class    AAFEdgecode | Implementation class for AAFEdgecode
-#ifndef __ImplAAFEdgecode_h__
-#define __ImplAAFEdgecode_h__
-
+//@class    AAFCommentMarker | Implementation class for AAFCommentMarker
+#ifndef __ImplAAFCommentMarker_h__
+#define __ImplAAFCommentMarker_h__
 
 //=---------------------------------------------------------------------=
 //
@@ -26,58 +25,54 @@
 //
 //=---------------------------------------------------------------------=
 
-
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-#ifndef __ImplAAFSegment_h__
-#include "ImplAAFSegment.h"
+#ifndef __ImplAAFEvent_h__
+#include "ImplAAFEvent.h"
 #endif
-#include "OMVariableSizeProperty.h"
 
-class ImplAAFEdgecode : public ImplAAFSegment
+
+#include "OMStrongRefProperty.h"
+
+// Forward declaration
+class ImplAAFSourceReference;
+
+
+class ImplAAFCommentMarker : public ImplAAFEvent
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFEdgecode ();
+  ImplAAFCommentMarker ();
 
 protected:
-  virtual ~ImplAAFEdgecode ();
+  virtual ~ImplAAFCommentMarker ();
 
 public:
 
 
   //****************
-  // Initialize()
+  // GetAnnotation()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (// @parm [in] Length Property Value
-         aafLength_t    length,
-
-         // @parm [in] Edgecode Value
-         aafEdgecode_t  edgecode);
+    GetAnnotation
+        // @parm [out,retval] Annotation property value
+        (ImplAAFSourceReference ** ppResult);
 
   //****************
-  // GetEdgecode()
+  // SetAnnotation()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetEdgecode
-        // @parm [out] Edgecode
-        (aafEdgecode_t *  edgecode);
+    SetAnnotation
+        // @parm [in] Annotation property value
+        (ImplAAFSourceReference * pAnnotation);
 
-private:
-	OMFixedSizeProperty<aafPosition_t>			_start;
-	OMFixedSizeProperty<aafFilmType_t>			_filmType;
-	OMFixedSizeProperty<aafEdgeType_t>			_edgeType;
-	OMVariableSizeProperty<aafUInt8>			_header;
-
+protected:
+  // The stored object model defines the annotation to be a 
+  // an optional strong reference.
+  OMStrongReferenceProperty<ImplAAFSourceReference> _annotation;
 };
 
-#endif // ! __ImplAAFEdgecode_h__
+#endif // ! __ImplAAFCommentMarker_h__
 
 

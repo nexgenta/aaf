@@ -1,7 +1,7 @@
 //@doc
-//@class    AAFEdgecode | Implementation class for AAFEdgecode
-#ifndef __ImplAAFEdgecode_h__
-#define __ImplAAFEdgecode_h__
+//@class    AAFContainerDef | Implementation class for AAFContainerDef
+#ifndef __ImplAAFContainerDef_h__
+#define __ImplAAFContainerDef_h__
 
 
 //=---------------------------------------------------------------------=
@@ -27,28 +27,18 @@
 //=---------------------------------------------------------------------=
 
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-#ifndef __ImplAAFSegment_h__
-#include "ImplAAFSegment.h"
+#ifndef __ImplAAFDefObject_h__
+#include "ImplAAFDefObject.h"
 #endif
-#include "OMVariableSizeProperty.h"
 
-class ImplAAFEdgecode : public ImplAAFSegment
+class ImplAAFContainerDef : public ImplAAFDefObject
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFEdgecode ();
-
-protected:
-  virtual ~ImplAAFEdgecode ();
-
-public:
+  ImplAAFContainerDef ();
 
 
   //****************
@@ -56,28 +46,38 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
-        (// @parm [in] Length Property Value
-         aafLength_t    length,
+        // @parm [in] Pointer to an AUID reference
+        (const aafUID_t & id,
+		 const aafCharacter *name,
+		 const aafCharacter *description);
 
-         // @parm [in] Edgecode Value
-         aafEdgecode_t  edgecode);
+protected:
+  virtual ~ImplAAFContainerDef ();
+
+public:
+
 
   //****************
-  // GetEdgecode()
+  // EssenceIsIdentified()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetEdgecode
-        // @parm [out] Edgecode
-        (aafEdgecode_t *  edgecode);
+    EssenceIsIdentified
+        // @parm [out] The EssenceIsIdentified
+        (aafBool *  pEssenceIsIdentified);
+
+
+  //****************
+  // SetEssenceIsIdentified()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEssenceIsIdentified
+        // @parm [in] The EssenceIsIdentified flag
+        (aafBool  EssenceIsIdentified);
 
 private:
-	OMFixedSizeProperty<aafPosition_t>			_start;
-	OMFixedSizeProperty<aafFilmType_t>			_filmType;
-	OMFixedSizeProperty<aafEdgeType_t>			_edgeType;
-	OMVariableSizeProperty<aafUInt8>			_header;
-
+	OMFixedSizeProperty<aafBool>					_isIdentified;
 };
 
-#endif // ! __ImplAAFEdgecode_h__
+#endif // ! __ImplAAFContainerDef_h__
 
 

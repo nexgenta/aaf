@@ -1,10 +1,24 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
+#c *********************************************************************
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c 
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c 
+#c The Original Code of this file is Copyright 1998-2001, Licensor of the
+#c AAF Association.
+#c 
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFDigitalImageDescriptor\
 #endm
@@ -410,7 +424,7 @@ AD_XMETHOD4(GetDisplayView,
 
 AD_XMETHOD1(SetFrameLayout,
 			[in],
-				objPass,
+				enumIn,
 				aafFrameLayout_t,
 				FrameLayout,
 				layout of the frame,
@@ -629,7 +643,7 @@ AD_XMETHOD1(GetImageAspectRatio,
 
 AD_XMETHOD1(SetAlphaTransparency,
 			[in],
-				objPass,
+				enumIn,
 				aafAlphaTransparency_t,
 				AlphaTransparency,
 				Alpha Transparency value.,
@@ -685,7 +699,7 @@ AD_XMETHOD1(GetAlphaTransparency,
 AD_XMETHOD1(SetGamma,
 			[in],
 				objPass,
-				aafRational_t,
+				aafUID_t,
 				Gamma,
 				Optional,
 			Sets the Gamma property.  Specifies the expected output gamma
@@ -706,7 +720,7 @@ AD_XMETHOD1(SetGamma,
 AD_XMETHOD1(GetGamma,
 			[out],
 				objPass,
-				aafRational_t *,
+				aafUID_t *,
 				pGamma,
 				Optional.,
 			Gets the Gamma property.  Specifies the expected output gamma
@@ -729,7 +743,7 @@ AD_XMETHOD1(GetGamma,
 AD_XMETHOD1(SetImageAlignmentFactor,
 			[in],
 				objPass,
-				aafInt32,
+				aafUInt32,
 				ImageAlignmentFactor,
 				Optional.,
 			Sets the ImageAlignmentFactor property.  Specifies the alignment
@@ -753,7 +767,7 @@ AD_XMETHOD1(SetImageAlignmentFactor,
 AD_XMETHOD1(GetImageAlignmentFactor,
 			[out],
 				objPass,
-				aafInt32 *,
+				aafUInt32 *,
 				pImageAlignmentFactor,
 				Optional.,
 			Gets the ImageAlignmentFactor property.  Specifies the alignment when

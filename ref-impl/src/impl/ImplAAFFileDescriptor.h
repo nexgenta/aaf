@@ -4,38 +4,36 @@
 #define __ImplAAFFileDescriptor_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplAAFEssenceDescriptor_h__
 #include "ImplAAFEssenceDescriptor.h"
 #endif
+#include "OMWeakRefProperty.h"
 
+#include "ImplAAFContainerDef.h"
+#include "ImplAAFCodecDef.h"
 
 
 class ImplAAFFileDescriptor : public ImplAAFEssenceDescriptor
@@ -75,21 +73,21 @@ public:
 
 
   //****************
-  // SetIsInContainer()
+  // SetCodecDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetIsInContainer
+    SetCodecDef
 		// @parm [in] is this AAF or raw essence
-        (aafBool  isAAF);
+        (ImplAAFCodecDef *pDef);
 
 
   //****************
-  // GetIsInContainer()
+  // GetCodecDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIsInContainer
+    GetCodecDef
 		// @parm [out] is this AAF or raw medi
-        (aafBool*  pIsAAF);
+        (ImplAAFCodecDef **ppDef);
 
 
   //****************
@@ -116,7 +114,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetContainerFormat
 		// @parm [in] Identifies the file format
-        (const aafUID_t & format);
+        (ImplAAFContainerDef *pDef);
 
 
   //****************
@@ -125,7 +123,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetContainerFormat
 		// @parm [out] Identifies the file format
-        (aafUID_t *  pFormat);
+        (ImplAAFContainerDef **ppDef);
 
 public:
 	// Functions internal to the toolkit
@@ -135,8 +133,8 @@ public:
 private:
 	OMFixedSizeProperty<aafRational_t>	_sampleRate;
 	OMFixedSizeProperty<aafLength_t>	_length;
-	OMFixedSizeProperty<aafBool>        _isInContainer;
-	OMFixedSizeProperty<aafUID_t>       _containerFmt;
+	OMWeakReferenceProperty<ImplAAFCodecDef> _codecDef;
+	OMWeakReferenceProperty<ImplAAFContainerDef> _containerFmt;
 };
 
 #endif // ! __ImplAAFFileDescriptor_h__

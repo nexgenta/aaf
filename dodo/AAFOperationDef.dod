@@ -1,10 +1,24 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
+#c *********************************************************************
+#c
+#c The contents of this file are subject to the AAF SDK Public
+#c Source License Agreement (the "License"); You may not use this file
+#c except in compliance with the License.  The License is available in
+#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+#c Association or its successor.
+#c 
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.
+#c 
+#c The Original Code of this file is Copyright 1998-2001, Licensor of the
+#c AAF Association.
+#c 
+#c The Initial Developer of the Original Code of this file and the
+#c Licensor of the AAF Association is Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
 #startm .this-module 0
 AAFOperationDef\
 #endm
@@ -39,6 +53,25 @@ AD_CLASS_UUID(14035d92, 1ff5, 11d2, bf, 97, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(14035d91, 1ff5, 11d2, bf, 97, 00, 60, 97, 11, 62, 12)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_XMETHOD3(Initialize,
+		   [in\, ref],
+		   objPass,
+		   aafUID_constref,
+		   id,
+		   AUID for new DeObject,
+		   [in\, string],
+		   objPass,
+		   aafCharacter_constptr,
+		   pName,
+		   Name for new DefObject,
+		   [in\, string],
+		   objPass,
+		   aafCharacter_constptr,
+		   pDescription,
+		   Description for new DefObject,
+		   Init all fields of a definition object.)
+
+
 AD_XMETHOD1(GetDataDef,
 
 			[out],
@@ -116,7 +149,7 @@ AD_XMETHOD1(SetDataDef,
 
 AD_METHOD1(IsTimeWarp,
 		   [out\\\, retval],
-		   aafBool *,
+		   aafBoolean_t *,
 		   bIsTimeWarp,
 		   pointer to the return value, 
 
@@ -140,22 +173,23 @@ AD_METHOD1(IsTimeWarp,
   //   - bIsTimeWarp arg is NULL.)
 
 
-AD_METHOD1(SetIsTimeWarp,
+AD_XMETHOD1(SetIsTimeWarp,
 		   [in],
-		   aafBool,
+		   enumIn,
+		   aafBoolean_t,
 		   IsTimeWarp,
 		   is timewarp value, 
 
      Sets the IsTimeWarp boolean.  IsTimeWarp is true if the length of
   // an IAAFOperationGroup is different from the lengths of the input
-  // segments.  For example\\\, a slow motion effect.
+  // segments.  For example\, a slow motion effect.
   // 
   // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\\\, it will return the first one
+  // the listed errors is in effect\, it will return the first one
   // encountered in the order given below:
   // 
   // AAFRESULT_SUCCESS
-  //   - succeeded.  \\\(This is the only code indicating success.\\\))
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_XMETHOD1(PrependDegradeToOperation,
@@ -339,8 +373,48 @@ AD_XMETHOD1(CountDegradeToOperations,
   //   - pResult is null.)
 
 
-AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(Category,
-     the Category string property.)
+AD_XMETHOD1(GetCategory,
+			[out],
+			objPass,
+			aafUID_t*,
+			pValue,
+			The enumeration describing the current category,
+
+			This method returns an AUID indicating the category of the given operation.
+  //
+  // Succeeds if all of the following are true:
+  // - the pValue pointer is valid.
+  // 
+  // If this method fails nothing will be written to *pValue.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pValue arg is NULL.)
+
+
+AD_XMETHOD1(SetCategory,
+			[in\, ref],
+			objPass,
+			aafUID_constref,
+			value,
+			The enumeration describing the current categor,
+
+			This method sets an AUID indicating the category of the given operation.
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\))
 
 
 AD_METHOD1(GetNumberInputs,

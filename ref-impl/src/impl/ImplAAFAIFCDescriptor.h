@@ -1,7 +1,7 @@
 //@doc
-//@class    AAFEdgecode | Implementation class for AAFEdgecode
-#ifndef __ImplAAFEdgecode_h__
-#define __ImplAAFEdgecode_h__
+//@class    AAFAIFCDescriptor | Implementation class for AAFAIFCDescriptor
+#ifndef __ImplAAFAIFCDescriptor_h__
+#define __ImplAAFAIFCDescriptor_h__
 
 
 //=---------------------------------------------------------------------=
@@ -27,57 +27,72 @@
 //=---------------------------------------------------------------------=
 
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-#ifndef __ImplAAFSegment_h__
-#include "ImplAAFSegment.h"
+#ifndef __ImplAAFFileDescriptor_h__
+#include "ImplAAFFileDescriptor.h"
 #endif
+
 #include "OMVariableSizeProperty.h"
 
-class ImplAAFEdgecode : public ImplAAFSegment
+
+class ImplAAFAIFCDescriptor : public ImplAAFFileDescriptor
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFEdgecode ();
+  ImplAAFAIFCDescriptor ();
 
 protected:
-  virtual ~ImplAAFEdgecode ();
+  virtual ~ImplAAFAIFCDescriptor ();
 
 public:
-
 
   //****************
   // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (// @parm [in] Length Property Value
-         aafLength_t    length,
+    Initialize ();
 
-         // @parm [in] Edgecode Value
-         aafEdgecode_t  edgecode);
+
 
   //****************
-  // GetEdgecode()
+  // GetSummary()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetEdgecode
-        // @parm [out] Edgecode
-        (aafEdgecode_t *  edgecode);
+    GetSummary
+        (// @parm [in] Size of preallocated buffer
+         aafUInt32  size,
+
+         // @parm [out, size_is(size)] Preallocated buffer to hold the AIFC file information
+         aafDataValue_t  pSummary);
+
+  //****************
+  // GetSummaryBufferSize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetSummaryBufferSize
+        // @parm [out] required buffer size
+        (aafUInt32 *  pSize);
+
+  //****************
+  // SetSummary()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetSummary
+        (// @parm [in] Size of preallocated buffer
+         aafUInt32  size,
+
+         // @parm [in, size_is(size)] buffer containing value
+         aafDataValue_t  pSummary);
+
 
 private:
-	OMFixedSizeProperty<aafPosition_t>			_start;
-	OMFixedSizeProperty<aafFilmType_t>			_filmType;
-	OMFixedSizeProperty<aafEdgeType_t>			_edgeType;
-	OMVariableSizeProperty<aafUInt8>			_header;
+  // Persistent Properties
+	OMVariableSizeProperty<aafUInt8> _summary;
 
 };
 
-#endif // ! __ImplAAFEdgecode_h__
+#endif // ! __ImplAAFAIFCDescriptor_h__
 
 
