@@ -47,6 +47,8 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 
+#include "CAAFBuiltinDefs.h"
+
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -93,7 +95,7 @@ private:
   bool _bWritableFile;
   IAAFHeader *_pHeader;
   IAAFDictionary *_pDictionary;
-  aafUID_t _compositionMobID;
+  aafMobID_t _compositionMobID;
 
   // MobSlot static data
   static const wchar_t* _slotName;
@@ -105,7 +107,7 @@ private:
   static const wchar_t* _eventComment;
 };
 
-const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+const aafUID_t NIL_UID = { 0 };
 
 extern "C" HRESULT CAAFEvent_test()
 {
@@ -253,12 +255,13 @@ void EventTest::CreateEvent()
   IAAFMobSlot *pMobSlot = NULL;
   IAAFMob *pMob = NULL;
 
+  CAAFBuiltinDefs defs (_pDictionary);
 
   try
   {
     // Create an event (note: this will be replaced by a concrete event in a
     // later version after such an event is implemented.)
-    checkResult(_pDictionary->CreateInstance(AUID_AAFEvent,
+    checkResult(_pDictionary->CreateInstance(defs.cdEvent(),
                                              IID_IAAFEvent, 
                                              (IUnknown **)&pEvent));
     checkResult(pEvent->SetPosition(_position));
@@ -268,7 +271,7 @@ void EventTest::CreateEvent()
     checkResult(pEvent->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 
     // Create and initialize an EventMobSlot
-    checkResult(_pDictionary->CreateInstance(AUID_AAFEventMobSlot,
+    checkResult(_pDictionary->CreateInstance(defs.cdEventMobSlot(),
                                              IID_IAAFEventMobSlot, 
                                              (IUnknown **)&pEventMobSlot));
     checkResult(pEventMobSlot->SetEditRate(const_cast<aafRational_t *>(&_editRate)));
@@ -280,7 +283,7 @@ void EventTest::CreateEvent()
     checkResult(pMobSlot->SetSegment(pSegment));
 
     // Create the mob to hold the new event mob slot.
-    checkResult(_pDictionary->CreateInstance(AUID_AAFCompositionMob,
+    checkResult(_pDictionary->CreateInstance(defs.cdCompositionMob(),
                                              IID_IAAFMob, 
                                              (IUnknown **)&pMob));
     checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));

@@ -87,7 +87,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -110,9 +110,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		CAAFBuiltinDefs defs (pDictionary);
 
 		// Create an Abstract SourceReference
-		checkResult(defs.cdSourceReference()->
-					CreateInstance(IID_IAAFSourceReference, 
-								   (IUnknown **)&pSourceReference));
+		checkResult(pDictionary->CreateInstance(defs.cdSourceReference(),
+								  IID_IAAFSourceReference, 
+								  (IUnknown **)&pSourceReference));
 
 		// module-specific tests go here
 		//		Set Values.	

@@ -36,6 +36,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 #define TEST_NAME	L"This is a text locator"
 
 static aafWChar* Manufacturer = L"Sony";
@@ -86,7 +88,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob						*pMob = NULL;
 	IAAFEssenceDescriptor		*edesc = NULL;
 	IAAFTapeDescriptor*			pTapeDescriptor = NULL;
-	aafUID_t					newUID;
+	aafMobID_t					newMobID;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafRational_t	audioRate = { 44100, 1 };
@@ -119,19 +121,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
  		
 		//Make the first mob
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
+		checkResult(pDictionary->CreateInstance(defs.cdSourceMob(),
 								IID_IAAFSourceMob, 
 								(IUnknown **)&pSourceMob));
 
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(CoCreateGuid((GUID *)&newUID));
-		checkResult(pMob->SetMobID(newUID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"TextLocatorTestSourceMOB"));
 		
-		checkResult(pDictionary->CreateInstance(AUID_AAFTapeDescriptor,
+		checkResult(pDictionary->CreateInstance(defs.cdTapeDescriptor(),
 								IID_IAAFTapeDescriptor, 
 								(IUnknown **)&pTapeDescriptor));
 		
@@ -152,7 +155,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
   
 		// Make a locator, and attach it to the EssenceDescriptor
-		checkResult(pDictionary->CreateInstance(AUID_AAFTextLocator,
+		checkResult(pDictionary->CreateInstance(defs.cdTextLocator(),
 								IID_IAAFTextLocator, 
 								(IUnknown **)&pTextLocator));		
 		checkResult(pTextLocator->QueryInterface (IID_IAAFLocator, (void **)&pLocator));
@@ -231,7 +234,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IEnumAAFMobs*			pMobIter = NULL;
 	IAAFMob*				pMob = NULL;
 	aafUInt32				numLocators;
-	aafInt32				readLen;
+	aafUInt32				readLen;
 	aafNumSlots_t			numMobs, n;
 
 	HRESULT					hr = AAFRESULT_SUCCESS;
@@ -256,7 +259,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500];
-			aafUID_t		mobID;
+			aafMobID_t		mobID;
 
 			checkResult(pMobIter->NextOne (&pMob));
 			checkResult(pMob->GetName (name, sizeof(name)));

@@ -88,7 +88,7 @@ static HRESULT TestPropertyValue ()
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kAAFVersionUnknown;
+  ProductInfo.productVersion.type = kVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -112,14 +112,15 @@ static HRESULT TestPropertyValue ()
 
   // Let's try to do something interesting with a type definition
   IAAFTypeDefInt * pTypeDef = NULL;
-  hr = defs.cdTypeDefInt()->CreateInstance (IID_IAAFTypeDefInt,
-											(IUnknown **) &pTypeDef);
+  hr = pDict->CreateInstance (defs.cdTypeDefInt(),
+							  IID_IAAFTypeDefInt,
+							  (IUnknown **) &pTypeDef);
   if (! SUCCEEDED (hr)) return hr;
   assert (pTypeDef);
 
   hr = pTypeDef->Initialize (TypeID_LocalInt32,
 							 4,        // 4-byte (32-bit) int
-							 kAAFTrue,  // signed
+							 AAFTrue,  // signed
 							 L"Local 32-bit int");
   if (! SUCCEEDED (hr)) return hr;
 
@@ -191,10 +192,10 @@ static HRESULT TestPropertyValue ()
 
   // Test IsDefinedType ()
   // (Currently only returns true.)
-  aafBool b = kAAFFalse;
+  aafBool b = AAFFalse;
   hr = pv->IsDefinedType (&b);
 	if (! SUCCEEDED (hr)) return hr;
-  if (kAAFTrue != b)
+  if (AAFTrue != b)
 	return AAFRESULT_TEST_FAILED;
 
   pTypeDefUnknown->Release();

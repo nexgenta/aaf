@@ -37,6 +37,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 
@@ -79,7 +81,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSegment				*seg = NULL;
 	IAAFSourceClip			*sclp = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafUID_t					newUID;
+	aafMobID_t					newMobID;
 	HRESULT						hr = S_OK;
 	
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -108,6 +110,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs (pDictionary);
 		
 		//Make the first mob
 		long	test;
@@ -115,24 +118,24 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// aafRational_t	audioRate = { 44100, 1 };
 		
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFMob,
+		checkResult(pDictionary->CreateInstance(defs.cdMob(),
 			IID_IAAFMob, 
 			(IUnknown **)&pMob));
 		
-		checkResult(CoCreateGuid((GUID *)&newUID));
-		checkResult(pMob->SetMobID(newUID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"MOBTest"));
 		
 		// Add some slots
 		for(test = 0; test < 5; test++)
 		{
-			checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
+			checkResult(pDictionary->CreateInstance(defs.cdSourceClip(),
 				IID_IAAFSourceClip, 
 				(IUnknown **)&sclp));		
 			
 			checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 			
-			checkResult(pDictionary->CreateInstance(AUID_AAFTimelineMobSlot,
+			checkResult(pDictionary->CreateInstance(defs.cdTimelineMobSlot(),
 				IID_IAAFTimelineMobSlot, 
 				(IUnknown **)&timelineSlot));		
 			checkResult(timelineSlot->SetEditRate (checkEditRate));
@@ -244,7 +247,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		{
 			aafWChar		name[500], slotName[500];
 			aafNumSlots_t	numSlots;
-			aafUID_t		mobID;
+			aafMobID_t		mobID;
 			aafSlotID_t		trackID;
 			
 			checkResult(mobIter->NextOne (&aMob));
