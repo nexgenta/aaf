@@ -37,17 +37,16 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "AAFUtils.h"
 #include "AAFInterpolatorDefs.h"
 #include "AAFTypeDefUIDs.h"
 #include "AAFSmartPointer.h"
-
-#include "AAFWideString.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -56,6 +55,11 @@ extern "C" const CLSID CLSID_AAFVaryingValue; // generated
 
 static aafMobID_t	zeroMobID = { 0 };
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+
+static aafBool  EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
+{
+    return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
+}
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -678,14 +682,18 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFVaryingValue_test()
+extern "C" HRESULT CAAFVaryingValue_test(testMode_t mode);
+extern "C" HRESULT CAAFVaryingValue_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFVaryingValueTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
