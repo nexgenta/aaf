@@ -249,12 +249,12 @@ bool OMFile::validSignature(const OMFileSignature& signature)
 }
 
   // @mfunc Save all changes made to the contents of this
-  //        <c OMFile>. It is not possible to <mf OMFile::save>
+  //        <c OMFile>. It is not possible to save
   //        read-only or transient files.
   //   @parm Client context for callbacks.
-void OMFile::save(void* clientOnSaveContext)
+void OMFile::saveFile(void* clientOnSaveContext)
 {
-  TRACE("OMFile::save");
+  TRACE("OMFile::saveFile");
 
   _clientOnSaveContext = clientOnSaveContext;
 
@@ -430,7 +430,7 @@ OMProperty* OMFile::findPropertyPath(const wchar_t* propertyPathName) const
   PRECONDITION("Valid root", _root != 0);
 
   wchar_t* path = saveWideString(propertyPathName);
-  
+
   wchar_t* element = path;
   element++; // skip first '/'
 
@@ -438,7 +438,7 @@ OMProperty* OMFile::findPropertyPath(const wchar_t* propertyPathName) const
   OMProperty* result = 0;
 
   wchar_t* end = findWideCharacter(element, L'/');
-  
+
   while (end != 0) {
     *end = 0;
     storable = storable->find(element);
