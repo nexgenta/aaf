@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -39,10 +39,10 @@
 template <typename ReferencedObject>
 OMStrongReferenceVectorProperty<ReferencedObject>::
                  OMStrongReferenceVectorProperty(const OMPropertyId propertyId,
-                                                 const char* name)
-: OMContainerProperty<ReferencedObject>(propertyId,
-                                        SF_STRONG_OBJECT_REFERENCE_VECTOR,
-                                        name)
+                                                 const wchar_t* name)
+: OMReferenceVectorProperty(propertyId,
+                            SF_STRONG_OBJECT_REFERENCE_VECTOR,
+                            name)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::"
                                             "OMStrongReferenceVectorProperty");
@@ -55,53 +55,35 @@ OMStrongReferenceVectorProperty<ReferencedObject>::
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::"
                                            "~OMStrongReferenceVectorProperty");
-  size_t count = _vector.count();
-  for (size_t i = 0; i < count; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
-    element.setValue(0);
-  }
 }
 
   // @mfunc Save this <c OMStrongReferenceVectorProperty>.
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @parm Client context for callbacks.
   //   @this const
 template <typename ReferencedObject>
-void OMStrongReferenceVectorProperty<ReferencedObject>::save(
-                                                     void* clientContext) const
+void OMStrongReferenceVectorProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::save");
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* s = container->store();
-
-  const char* propertyName = name();
 
   // create a vector index
   //
   size_t count = _vector.count();
   OMStoredVectorIndex* index = new OMStoredVectorIndex(count);
   ASSERT("Valid heap pointer", index != 0);
-  index->setHighWaterMark(localKey());
+  index->setFirstFreeKey(localKey());
   size_t position = 0;
 
   // Iterate over the vector saving each element
   //
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
 
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
 
     // enter into the index
     //
@@ -109,7 +91,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::save(
 
     // save the object
     //
-    element.save(clientContext);
+    element.save();
 
     position = position + 1;
 
@@ -118,15 +100,12 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::save(
   // save the vector index
   //
   ASSERT("Valid vector index", index->isValid());
-  s->save(index, name());
+  store()->save(index, storedName());
   delete index;
 
   // make an entry in the property index
   //
-  s->write(_propertyId,
-           _storedForm,
-           (void *)propertyName,
-           strlen(propertyName) + 1);
+  saveName();
 
 }
 
@@ -139,8 +118,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::close(void)
 {
   size_t count = _vector.count();
   for (size_t i = 0; i < count; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
+    VectorElement& element = _vector.getAt(i);
     element.close();
   }
 }
@@ -155,8 +133,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::detach(void)
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::detach");
   size_t count = _vector.count();
   for (size_t i = 0; i < count; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
+    VectorElement& element = _vector.getAt(i);
     element.detach();
   }
 }
@@ -177,22 +154,14 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
 
   // get the name of the vector index stream
   //
-  char* propertyName = new char[externalSize];
-  ASSERT("Valid heap pointer", propertyName != 0);
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  store->read(_propertyId, _storedForm, propertyName, externalSize);
-  ASSERT("Consistent property size", externalSize == strlen(propertyName) + 1);
-  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
-  delete [] propertyName;
+  restoreName(externalSize);
 
   // restore the index
   //
   OMStoredVectorIndex* vectorIndex = 0;
-  store->restore(vectorIndex, name());
+  store()->restore(vectorIndex, storedName());
   ASSERT("Valid vector index", vectorIndex->isValid());
-  setLocalKey(vectorIndex->highWaterMark());
+  setLocalKey(vectorIndex->firstFreeKey());
 
   // Iterate over the index restoring the elements of the vector
   //
@@ -203,9 +172,8 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
     OMUInt32 localKey;
     for (size_t i = 0; i < entries; i++) {
       vectorIndex->iterate(context, localKey);
-      char* name = elementName(localKey);
-      OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                      ReferencedObject> newElement(this, name, localKey);
+      wchar_t* name = elementName(localKey);
+      VectorElement newElement(this, name, localKey);
       newElement.restore();
       _vector.setAt(newElement, i);
       delete [] name;
@@ -273,22 +241,20 @@ ReferencedObject*
                                                 const size_t index)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::setValueAt");
-  PRECONDITION("Valid index", (index >= 0) && (index <= count()));
+  PRECONDITION("Valid index", index <= count());
   
   if (index == count()) {
     // This is an append, make sure the new element is defined.
     OMUInt32 localKey = nextLocalKey();
-    char* name = elementName(localKey);
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> newElement(this, name, localKey);
+    wchar_t* name = elementName(localKey);
+    VectorElement newElement(this, name, localKey);
     _vector.append(newElement);
     delete [] name;
   }
 
   // Set the vector to contain the new object
   //
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject>& element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
   ReferencedObject* oldObject = element.setValue(object);
   setPresent();
 
@@ -312,10 +278,9 @@ ReferencedObject* OMStrongReferenceVectorProperty<ReferencedObject>::valueAt(
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::valueAt");
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  PRECONDITION("Valid index", ((index >= 0) && (index < count())));
+  PRECONDITION("Valid index", index < count());
 
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject>& element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
 
   ReferencedObject* result = element.getValue();
   return result;
@@ -338,10 +303,9 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getValueAt(
   OBSOLETE("OMStrongReferenceVectorProperty<ReferencedObject>::valueAt");
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  PRECONDITION("Valid index", ((index >= 0) && (index < count())));
+  PRECONDITION("Valid index", index < count());
 
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject>& element = _vector.getAt(index);
+  VectorElement& element = _vector.getAt(index);
 
   object = element.getValue();
 
@@ -436,12 +400,11 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::insertAt(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insertAt");
 
-  PRECONDITION("Valid index", (index >= 0) && (index <= count()));
+  PRECONDITION("Valid index", index <= count());
   
   OMUInt32 localKey = nextLocalKey();
-  char* name = elementName(localKey);
-  OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                  ReferencedObject> newElement(this, name, localKey);
+  wchar_t* name = elementName(localKey);
+  VectorElement newElement(this, name, localKey);
   newElement.setValue(object);
   _vector.insertAt(newElement, index);
   delete [] name;
@@ -464,16 +427,13 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::containsValue(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::containsValue");
 
+  PRECONDITION("Valid object", object != 0);
+
   bool result = false;
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       result = true;
       break;
     }
@@ -493,6 +453,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::removeValue(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeValue");
 
+  PRECONDITION("Valid object", object != 0);
   PRECONDITION("Object is present", containsValue(object));
 
   size_t index = indexOfValue(object);
@@ -515,7 +476,8 @@ template <typename ReferencedObject>
 ReferencedObject*
 OMStrongReferenceVectorProperty<ReferencedObject>::removeAt(const size_t index)
 {
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeLast");
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeAt");
+  PRECONDITION("Valid index", index <= count());
 
   ReferencedObject* result = setValueAt(0, index);
   _vector.removeAt(index);
@@ -571,19 +533,15 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue");
 
+  PRECONDITION("Valid object", object != 0);
   PRECONDITION("Object is present", containsValue(object));
 
   size_t result;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       result = iterator.index();
       break;
     }
@@ -604,17 +562,15 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::countOfValue(
                                           const ReferencedObject* object) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::countOfValue");
+
+  PRECONDITION("Valid object", object != 0);
+
   size_t result = 0;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       result = result + 1;
     }
   }
@@ -661,15 +617,10 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::findIndex(
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::findIndex");
   bool result = false;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  // This loop causes objects to be loaded but the one we are
-  // looking for must already be loaded.
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    if (element.getValue() == object) {
+    VectorElement& element = iterator.value();
+    if (element.pointer() == object) {
       index = iterator.index();
       result = true;
       break;
@@ -696,8 +647,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::grow(
 
   // Make sure the new elements are defined.
   for (size_t i = oldCount; i < capacity; i++) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> voidElement;
+    VectorElement voidElement;
     _vector.insert(voidElement);
   }
 }
@@ -716,12 +666,9 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::isVoid(void) const
 
   bool result = true;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     ReferencedObject* object = element.getValue();
     if (object != 0) {
       result = false;
@@ -785,12 +732,9 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
 
   const ReferencedObject** p = (const ReferencedObject**)bits;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
+  VectorIterator iterator(_vector, OMBefore);
   while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
+    VectorElement& element = iterator.value();
     *p++ = element.getValue();
   }
 }
@@ -822,6 +766,215 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
     setValueAt(object, i);
   }
 
+}
+
+  // @mfunc Insert <p object> into this
+  //        <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The <c OMObject> to insert.
+template <typename ReferencedObject>
+void
+OMStrongReferenceVectorProperty<ReferencedObject>::insert(
+                                                        const OMObject* object)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insert");
+
+  PRECONDITION("Valid object", object != 0);
+
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  insert(p);
+}
+
+  // @mfunc Does this <c OMStrongReferenceVectorProperty> contain
+  //        <p object> ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The <c OMObject> for which to search.
+  //   @rdesc True if <p object> is present, false otherwise.
+  //   @this const
+template <typename ReferencedObject>
+bool
+OMStrongReferenceVectorProperty<ReferencedObject>::containsValue(
+                                                  const OMObject* object) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::containsValue");
+
+  PRECONDITION("Valid object", object != 0);
+
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  return containsValue(p);
+}
+
+  // @mfunc Remove <p object> from this
+  //        <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The <c OMObject> to remove.
+template <typename ReferencedObject>
+void
+OMStrongReferenceVectorProperty<ReferencedObject>::removeValue(
+                                                        const OMObject* object)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeValue");
+
+  PRECONDITION("Valid object", object != 0);
+
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  removeValue(p);
+}
+
+  // @mfunc Create an <c OMReferenceContainerIterator> over this
+  //        <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @rdesc An <c OMReferenceContainerIterator> over this
+  //          <c OMStrongReferenceVectorProperty>.
+  //   @this const
+template <typename ReferencedObject>
+OMReferenceContainerIterator*
+OMStrongReferenceVectorProperty<ReferencedObject>::createIterator(void) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::createIterator");
+
+  OMStrongReferenceVectorIterator<ReferencedObject>* result =
+        new OMStrongReferenceVectorIterator<ReferencedObject>(*this, OMBefore);
+  ASSERT("Valid heap pointer", result != 0);
+
+  return result;
+}
+
+  // @mfunc Set the value of this <c OMStrongReferenceVectorProperty>
+  //        at position <p index> to <p object>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The new object.
+  //   @parm The index.
+  //   @rdesc The old object.
+template <typename ReferencedObject>
+OMObject*
+OMStrongReferenceVectorProperty<ReferencedObject>::setObjectAt(
+                                                        const OMObject* object,
+                                                        const size_t index)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::setObjectAt");
+
+  PRECONDITION("Valid index", index < count());
+
+  // TBS
+  return 0;
+}
+
+  // @mfunc The value of this <c OMStrongReferenceVectorProperty>
+  //        at position <p index>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The index.
+  //   @rdesc The object.
+  //   @this const
+template <typename ReferencedObject>
+OMObject*
+OMStrongReferenceVectorProperty<ReferencedObject>::getObjectAt(
+                                                      const size_t index) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getObjectAt");
+
+  PRECONDITION("Valid index", index <= count());
+
+  // TBS
+  return 0;
+}
+
+  // @mfunc Append the given <p OMObject> <p object> to
+  //        this <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The object to append.
+template <typename ReferencedObject>
+void
+OMStrongReferenceVectorProperty<ReferencedObject>::appendObject(
+                                                        const OMObject* object)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::appendObject");
+
+  PRECONDITION("Valid object ", object != 0);
+
+  insertObjectAt(object, count());
+}
+
+  // @mfunc Prepend the given <p OMObject> <p object> to
+  //        this <c OMStrongReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The object to prepend.
+template <typename ReferencedObject>
+void
+OMStrongReferenceVectorProperty<ReferencedObject>::prependObject(
+                                                        const OMObject* object)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::prependObject");
+
+  PRECONDITION("Valid object ", object != 0);
+
+  insertObjectAt(object, 0);
+}
+
+  // @mfunc Remove the object from this
+  //        <c OMStrongReferenceVectorProperty> at position <p index>.
+  //        Existing objects in this <c OMStrongReferenceVectorProperty>
+  //        at <p index> + 1 and higher are shifted down one index
+  //        position.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The index of the object to remove.
+template <typename ReferencedObject>
+OMObject*
+OMStrongReferenceVectorProperty<ReferencedObject>::removeObjectAt(
+                                                            const size_t index)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeObjectAt");
+
+  PRECONDITION("Valid index", index < count());
+
+  // TBS
+  return 0;
+}
+
+  // @mfunc Insert <p object> into this <c OMStrongReferenceVectorProperty>
+  //        at position <p index>. Existing objects at <p index> and
+  //        higher are shifted up one index position.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @parm The object to insert.
+  //   @parm The index at which to insert the object.
+template <typename ReferencedObject>
+void
+OMStrongReferenceVectorProperty<ReferencedObject>::insertObjectAt(
+                                                        const OMObject* object,
+                                                        const size_t index)
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insertObjectAt");
+
+  PRECONDITION("Valid index", index <= count());
+  PRECONDITION("Valid object ", object != 0);
+
+  // TBS
 }
 
 #endif
