@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFile
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.40 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.41 2004/11/02 16:03:21 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -312,7 +312,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  mobIter = NULL;
 
 	checkResult(pFile->GetRevision(&testRev));
-    checkExpression(kAAFRev1 == testRev, AAFRESULT_TEST_FAILED);
+    checkExpression(kAAFRev2 == testRev, AAFRESULT_TEST_FAILED);
 
 	checkResult(pFile->Close());
     bFileOpen = false;

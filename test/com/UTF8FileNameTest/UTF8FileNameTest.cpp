@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: UTF8FileNameTest.cpp,v 1.8 2004/10/28 17:23:22 stuart_hc Exp $ $Name:  $
+// $Id: UTF8FileNameTest.cpp,v 1.9 2004/11/02 16:03:21 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -330,7 +330,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName,
     mobIter = NULL;
 
     checkResult(pFile->GetRevision(&testRev));
-    checkExpression(kAAFRev1 == testRev, AAFRESULT_TEST_FAILED);
+    checkExpression(kAAFRev2 == testRev, AAFRESULT_TEST_FAILED);
 
     checkResult(pFile->Close());
     checkResult(pFile->Release());

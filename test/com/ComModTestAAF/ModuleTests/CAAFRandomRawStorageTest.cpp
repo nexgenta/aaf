@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomRawStorageTest.cpp,v 1.20 2004/10/22 14:20:48 phil_tudor Exp $ $Name:  $
+// $Id: CAAFRandomRawStorageTest.cpp,v 1.21 2004/11/02 16:03:21 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -980,7 +980,7 @@ static HRESULT ReadAAFFile(fileInfo_t info, wchar_t * filename)
 	  mobIter = NULL;
 
 	  checkResult(pFile->GetRevision(&testRev));
-	  checkExpression(kAAFRev1 == testRev, AAFRESULT_TEST_FAILED);
+	  checkExpression(kAAFRev2 == testRev, AAFRESULT_TEST_FAILED);
 
 	  checkResult(info.closeReadFunc(filename, &pFile));
 	  bFileOpen = false;
