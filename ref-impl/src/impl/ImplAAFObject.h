@@ -25,6 +25,8 @@ class AAFObject;
 #include "OMStorable.h"
 #include "ImplAAFRoot.h"
 
+#include <assert.h>
+
 class ImplAAFObject : public OMStorable, public ImplAAFRoot
 {
 public:
@@ -91,24 +93,23 @@ public:
   );
 
 
-public:
-	// Interfaces ivisible inside the toolkit, but not exposed through the API
-  
-	// Gets the head object of the file containing this object.
-	// This function is used to maintain MOB and Definition tables in the
-	// head object.
-	virtual AAFRESULT MyHeadObject
-		(class ImplAAFHeader **header);
-
+  // tjb - this is temporary and should be removed
+  virtual const OMClassId& classId(void) const
+  {
+    // This function must be overidden by subclasses. It is pure
+    // virtual on OMStorable. It is defined here since some dodo
+    // generated code attempts to instantiate this class.
+    //
+    assert(!"This code should not be reached.");
+    return nullOMClassId;
+  }
+ 
 
 public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFObjectTest.cpp.
   static AAFRESULT test();
-
-  OMDECLARE_STORABLE(ImplAAFObject)
 };
-
 
 #endif // ! __ImplAAFObject_h__
 
