@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.42 2004/02/27 15:45:08 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.43 2004/05/20 15:32:57 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2019,7 +2019,7 @@ void CAAFJPEGCodec::UpdateCalculatedData(void)
 	} /* end switch */
 
 	// The is true for RGB or YUV. (no alpha support)
-	_memBitsPerPixel = _componentWidth * 3;
+	_memBitsPerPixel = (aafInt16)(_componentWidth * 3);
 
 
 	// Computer the file bytes per sample.

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.19 2004/03/01 18:44:31 stuart_hc Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.20 2004/05/20 15:32:57 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2549,7 +2549,7 @@ HRESULT dumpRawStreamPropertyValue
 		if (bytesLeft > kStreamReadSize)
 		  bytes = kStreamReadSize;
 		else
-		  bytes = bytesLeft;
+		  bytes = (aafUInt32)bytesLeft;
 		
 		streamResult = pStreamType->Read(pPVal, bytes, streamBuffer, &bytesRead);
 		if (AAFRESULT_FAILED(streamResult))
@@ -2563,7 +2563,7 @@ HRESULT dumpRawStreamPropertyValue
 		os << " /*" << dec << setw(kOffsetWidth) << ostream_int64(offset) << " */";  
 		offset += kStreamBytesPerLine;    
 		
-		aafUInt64 i;
+		aafUInt32 i;
 		char savedFill = os.fill();
 		for (i = 0; (i < kStreamBytesPerLine) && (i < bytesRead);)
 		  {

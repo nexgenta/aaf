@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MultiGenTest.cpp,v 1.9 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+// $Id: MultiGenTest.cpp,v 1.10 2004/05/20 15:32:57 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -292,16 +292,17 @@ void ProcessCommandLineArgs( int argc, char** argv )
   vector<int> optionIndices;
   vector<CmdFunc*> optionCmdFuncs;
 
-  int i;
-  for( i = 1; i < argc; i++ ) {
-    string arg( argv[i] );
+  int j;
+  for( j = 1; j < argc; j++ ) {
+    string arg( argv[j] );
 
     if ( arg == "-r" || arg == "-run" ) {
-      optionIndices.push_back(i);
+      optionIndices.push_back(j);
       optionCmdFuncs.push_back( new RunCmd );
     }
   }
 
+  unsigned int i;
   optionIndices.push_back( argc );
   for(i = 0; i < optionIndices.size()-1; i++ ) {
 
