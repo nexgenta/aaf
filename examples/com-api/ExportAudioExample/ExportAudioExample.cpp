@@ -77,7 +77,7 @@ static void convert(char* cName, size_t length, const wchar_t* name)
 }
 
 
-typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
+typedef enum { testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
 
 typedef aafInt16	AAFByteOrder;
 const AAFByteOrder INTEL_ORDER		      = 0x4949; // 'II' for Intel
@@ -117,7 +117,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
-	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
@@ -136,6 +135,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
   IAAFClassDef *pMasterMobDef = NULL;
   IAAFClassDef *pNetworkLocatorDef = NULL;
   IAAFDataDef *pSoundDef = NULL;
+  aafUInt32 samplesWritten, bytesWritten;
 
 
 	// Delete any previous test file before continuing...
@@ -156,7 +156,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -228,7 +228,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 									CodecWave,			// codecID
 									editRate,			// edit rate
 									sampleRate,			// sample rate
-									kSDKCompressionDisable,
+									kAAFCompressionDisable,
 									pLocator,			// In current file
 									testContainer,		// In AAF Format
 									&pEssenceAccess));	// Compress disabled
@@ -262,8 +262,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		while (samplesLeft >0)
 		{
 			check(pEssenceAccess->WriteSamples(	dataLen,	//!!! hardcoded bytes/sample ==1// Number of Samples
-												dataPtr,	// THE Raw data
-												sizeof(dataBuff)));// buffer size
+												sizeof(dataBuff), // buffer size
+												dataPtr,	// THE data
+												&samplesWritten,
+												&bytesWritten));
 			samplesLeft=samplesLeft-dataLen;
 		}
 
@@ -455,7 +457,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
+	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
 	aafUInt8			chunkID[4];
  	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -498,7 +500,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = AAFTrue;
+			fmtFound = kAAFTrue;
 		} 
 		else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
@@ -506,7 +508,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 	
-			dataFound = AAFTrue;
+			dataFound = kAAFTrue;
 		}
 	
 		if((ptr-buf) > formSize)
