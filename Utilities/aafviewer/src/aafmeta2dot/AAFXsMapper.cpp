@@ -1,5 +1,5 @@
 /*
- * $Id: AAFXsMapper.cpp,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: AAFXsMapper.cpp,v 1.4 2004/03/02 12:02:37 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -33,6 +33,7 @@ using namespace std;
 #include <AAFXsMapper.h>
 #include <Utilities.h>
 #include <AxMetaDef.h>
+#include <AxIterator.h>
 
 
 //-----------------------------------------------------------------------------
