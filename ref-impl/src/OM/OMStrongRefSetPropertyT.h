@@ -82,53 +82,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  // create a set index
-  //
-  size_t count = _set.count();
-  size_t keySize = sizeof(UniqueIdentification);
-  ASSERT("Valid key size", keySize <= (OMKeySize)~0);
-  OMStoredSetIndex* index = new OMStoredSetIndex(
-                                              count,
-                                              _keyPropertyId,
-                                              static_cast<OMKeySize>(keySize));
-  ASSERT("Valid heap pointer", index != 0);
-  index->setFirstFreeKey(localKey());
-  size_t position = 0;
-
-  // Iterate over the set saving each element. The index entries
-  // are written in order of their unique keys.
-  //
-  SetIterator iterator(_set, OMBefore);
-  while (++iterator) {
-
-    SetElement& element = iterator.value();
-
-    // enter into the index
-    //
-    UniqueIdentification key = element.identification();
-    index->insert(position,
-                  element.localKey(),
-                  element.referenceCount(),
-                  &key);
-
-    // save the object
-    //
-    element.save();
-
-    position = position + 1;
-
-  }
-
-  // save the set index
-  //
-  ASSERT("Valid set index", index->isValid());
-  store()->save(index, storedName());
-  delete index;
-
-  // make an entry in the property index
-  //
-  saveName();
-
+  store()->save(*this);
 }
 
   // @mfunc Close this <c OMStrongReferenceSetProperty>.
@@ -185,44 +139,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::restore");
 
-  // get the name of the set index stream
-  //
-  restoreName(externalSize);
-
-  // restore the index
-  //
-  OMStoredSetIndex* setIndex = 0;
-  store()->restore(setIndex, storedName());
-  ASSERT("Valid set index", setIndex->isValid());
-  ASSERT("Consistent key sizes",
-                          setIndex->keySize() == sizeof(UniqueIdentification));
-  ASSERT("Consistent key property ids",
-                                  setIndex->keyPropertyId() == _keyPropertyId);
-  setLocalKey(setIndex->firstFreeKey());
-
-  // Iterate over the index restoring the elements of the set.
-  // Since the index entries are stored on disk in order of their
-  // unique keys this loop is the worst cast order of insertion. This
-  // code will eventually be replaced by code that inserts the keys in
-  // "binary search" order. That is the middle key is inserted first
-  // then (recursively) all the keys below the middle key followed by
-  // (recursively) all the keys above the middle key.
-  //
-  size_t entries = setIndex->entries();
-  size_t context = 0;
-  OMUInt32 localKey;
-  OMUInt32 count;
-  UniqueIdentification key;
-  for (size_t i = 0; i < entries; i++) {
-    setIndex->iterate(context, localKey, count, &key);
-    wchar_t* name = elementName(localKey);
-    SetElement newElement(this, name, localKey, count, key);
-    newElement.restore();
-    _set.insert(key, newElement);
-    delete [] name;
-    name = 0; // for BoundsChecker
-  }
-  delete setIndex;
+  store()->restore(*this, externalSize);
   setPresent();
 }
 
@@ -265,8 +182,8 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   UniqueIdentification key = object->identification();
   ASSERT("Valid identification", isValidIdentification(key));
 
-  SetElement newElement(this, name, localKey, 1/*tjb*/, key);
-  newElement.setValue(object);
+  SetElement newElement(this, name, localKey, 1/*tjb*/, &key, sizeof(key));
+  newElement.setValue(&key, object);
   _set.insert(key, newElement);
   setPresent();
   delete [] name;
@@ -350,7 +267,14 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   SetElement* element = 0;
   bool found = _set.find(identification, &element);
   ASSERT("Object found", found);
-  ReferencedObject* result = element->setValue(0);
+  UniqueIdentification nullUniqueIdentification;
+  memset(&nullUniqueIdentification, 0, sizeof(UniqueIdentification));
+  ReferencedObject* result = 0;
+  OMStorable* p = element->setValue(&nullUniqueIdentification, 0);
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  }
   _set.remove(identification);
 
   POSTCONDITION("Object is not present", !contains(identification));
@@ -888,6 +812,34 @@ OMStrongReferenceSetProperty<UniqueIdentification,
     }
   }
   return result;
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+OMContainerIterator<OMStrongReferenceSetElement>*
+OMStrongReferenceSetProperty<UniqueIdentification,
+                             ReferencedObject>::iterator(void) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification,"
+                                     "ReferencedObject>::iterator");
+
+  OMSetIterator<UniqueIdentification, SetElement>* result =
+           new OMSetIterator<UniqueIdentification, SetElement>(_set, OMBefore);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+void
+OMStrongReferenceSetProperty<UniqueIdentification,
+                             ReferencedObject>::insert(
+                                    void* key,
+                                    const OMStrongReferenceSetElement& element)
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification,"
+                                     "ReferencedObject>::insert");
+
+  UniqueIdentification* k = reinterpret_cast<UniqueIdentification*>(key);
+  _set.insert(*k, element);
 }
 
 template <typename UniqueIdentification, typename ReferencedObject>
