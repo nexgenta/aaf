@@ -1,13 +1,33 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-\******************************************/
-
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 #include "CAAFWAVECodec.h"
 
 #include <assert.h>
+#include <string.h>
 #include "AAFResult.h"
 
 #include "AAF.h"
@@ -15,21 +35,23 @@
 //#include "CAAFEssenceFormat.h"
 //#include "ImplAAFEssenceFormat.h"
 #include "aafErr.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 #include "aafCvt.h"
-#include "aafDataDefs.h"
-#include "aafDefUIDs.h"
+#include "AAFDataDefs.h"
+#include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
 
-#define STD_HDRSIZE_DATA		42
-#define STD_HDRSIZE_NODATA		36
+#include "CAAFBuiltinDefs.h"
 
-const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kVersionBeta};
+
+#define HEADER_BUFSIZE			2000			// Big enough to hold ANY single-entry coding history
+
+const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kAAFVersionBeta};
 const aafRational_t		defaultRate = { 44100, 1 };
-const aafInt32			defaultSampleWidth = 8;
-const aafInt32			defaultNumCh = 1;
+const aafUInt32			defaultSampleWidth = 8;
+const aafUInt32			defaultNumCh = 1;
 
 // CLSID for AAFEssenceCodec 
 //{8D7B04B1-95E1-11d2-8089-006008143E6F}
@@ -37,22 +59,10 @@ const CLSID CLSID_AAFWaveCodec = { 0x8D7B04B1, 0x95E1, 0x11d2, { 0x80, 0x89, 0x0
 
 const aafUID_t JEFFS_WAVE_PLUGIN = { 0x431D5CA1, 0xEDE2, 0x11d2, { 0x80, 0x9F, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
-static void SplitBuffers(void *original, aafInt32 srcSamples, aafInt16 sampleSize, aafInt16 numDest, interleaveBuf_t *destPtr);
+static void SplitBuffers(void *original, aafUInt32 srcSamples, aafUInt16 sampleSize, aafUInt16 numDest, interleaveBuf_t *destPtr);
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::Start (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::Finish (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetNumDefinitions (aafInt32 *pDefCount)
+    CAAFWaveCodec::CountDefinitions (aafUInt32 *pDefCount)
 {
 	if(pDefCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -62,12 +72,12 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
+    CAAFWaveCodec::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
 {
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	*uid = CodecWave;		// UID of the WAVE codec definition
+	*uid = kAAFCodecWAVE;		// UID of the WAVE codec definition
 	return AAFRESULT_SUCCESS;
 }
 
@@ -93,10 +103,12 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFWaveCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
+	IAAFClassDef	*fileClass = NULL;
 	IAAFCodecDef	*codecDef = NULL;
 	IAAFDefObject	*obj = NULL;
+	IAAFClassDef    *pcd = 0;
 	aafUID_t		uid;
 	
 	if((dict == NULL) || (def == NULL))
@@ -104,15 +116,20 @@ HRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		//!!!Later, add in dataDefs supported & filedescriptor class
-		CHECK(dict->CreateInstance(&AUID_AAFCodecDef,
-							IID_IAAFCodecDef, 
-							(IUnknown **)&codecDef));
-		uid = CodecWave;
+	  	CHECK(dict->LookupClassDef(AUID_AAFCodecDef, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFCodecDef, 
+								  (IUnknown **)&codecDef));
+		pcd->Release ();
+		pcd = 0;
+		uid = kAAFCodecWAVE;
 		CHECK(codecDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
-		CHECK(obj->Init(&uid, L"WAVE Codec", L"Handles RIFF WAVE data."));
-		uid = DDEF_Sound;
-		CHECK(codecDef->AppendEssenceKind (&uid));
+		CHECK(codecDef->Initialize(uid, L"WAVE Codec", L"Handles RIFF WAVE data."));
+		CAAFBuiltinDefs defs (dict);
+		CHECK(codecDef->AddEssenceKind (defs.ddSound()));
+	  	CHECK(dict->LookupClassDef(AUID_AAFWAVEDescriptor, &fileClass));
+		CHECK(codecDef->SetFileDescriptorClass (fileClass));
+		fileClass->Release ();
+		fileClass = 0;
 		*def = obj;
 		codecDef->Release();
 		codecDef = NULL;
@@ -120,9 +137,25 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(codecDef != NULL)
+		  {
 			codecDef->Release();
+			codecDef = 0;
+		  }
 		if(obj != NULL)
+		  {
 			obj->Release();
+			obj = 0;
+		  }
+		if (pcd)
+		  {
+			pcd->Release ();
+			pcd = 0;
+		  }
+		if (fileClass)
+		  {
+			fileClass->Release ();
+			fileClass = 0;
+		  }
 	}
 	XEND
 
@@ -138,28 +171,29 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
+    CAAFWaveCodec::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
 {
-	IAAFPluginDescriptor	*desc = NULL;
+	IAAFPluginDef	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
  	IAAFNetworkLocator		*pNetLoc = NULL;
-	aafUID_t				category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
-	aafUID_t				plugID = JEFFS_WAVE_PLUGIN;
+	IAAFClassDef            *pcd = 0;
 	
 	XPROTECT()
 	{
-		CHECK(dict->CreateInstance(&AUID_AAFPluginDescriptor,
-			IID_IAAFPluginDescriptor, 
-			(IUnknown **)&desc));
+	    CHECK(dict->LookupClassDef(AUID_AAFPluginDef, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFPluginDef, 
+								  (IUnknown **)&desc));
+		pcd->Release ();
+		pcd = 0;
 		*descPtr = desc;
 		desc->AddRef();
-		CHECK(desc->Init(&plugID, L"Example WAVE Codec", L"Handles RIFF WAVE data."));
+		CHECK(desc->Initialize(JEFFS_WAVE_PLUGIN, L"Example WAVE Codec", L"Handles RIFF WAVE data."));
 
-		CHECK(desc->SetCategoryClass(&category));
+		CHECK(desc->SetCategoryClass(AUID_AAFCodecDef));
 		CHECK(desc->SetPluginVersionString(manufRev));
-		CHECK(dict->CreateInstance(&AUID_AAFNetworkLocator,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (manufURL));
 		CHECK(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		CHECK(desc->SetManufacturerInfo(pNetLoc));
@@ -168,16 +202,17 @@ HRESULT STDMETHODCALLTYPE
 		pLoc->Release();
 		pLoc = NULL;
 
-		CHECK(desc->SetManufacturerID(&manufacturer));
+		CHECK(desc->SetManufacturerID(MANUF_JEFFS_PLUGINS));
 		CHECK(desc->SetPluginManufacturerName(manufName));
-		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
-		CHECK(desc->SetIsAccelerated(AAFFalse));
-		CHECK(desc->SetSupportsAuthentication(AAFFalse));
+		CHECK(desc->SetIsSoftwareOnly(kAAFTrue));
+		CHECK(desc->SetIsAccelerated(kAAFFalse));
+		CHECK(desc->SetSupportsAuthentication(kAAFFalse));
 		
 		/**/
-		CHECK(dict->CreateInstance(&AUID_AAFNetworkLocator,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
+		pcd->Release ();
+		pcd = 0;
 		CHECK(pLoc->SetPath (downloadURL));
 		CHECK(desc->AppendLocator(pLoc));
 		desc->Release();	// We have addRefed for the return value
@@ -188,11 +223,25 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(desc != NULL)
+		  {
 			desc->Release();
+			desc = 0;
+		  }
 		if(pLoc != NULL)
+		  {
 			pLoc->Release();
+			pLoc = 0;
+		  }
 		if(pNetLoc != NULL)
+		  {
 			pNetLoc->Release();
+			pNetLoc = 0;
+		  }
+		if (pcd)
+		  {
+			pcd->Release ();
+			pcd = 0;
+		  }
 	}
 	XEND
 
@@ -200,10 +249,10 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
-CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown, aafBool doInit)
+CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown, aafBoolean_t doInit)
   : CAAFUnknown (pControllingUnknown)
 {
-	_headerLoaded = AAFFalse;
+	_headerLoaded = kAAFFalse;
 	_nativeByteOrder = GetNativeByteOrder();
 	_sampleRate = defaultRate;
 	_bitsPerSample = defaultSampleWidth;
@@ -213,11 +262,11 @@ CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown, aafBool doInit)
 	_interleaveBuf = NULL;
 	_dataStartOffset = 0;
 	_dataSizeOffset = 0;
-	_readOnly = AAFFalse;
+	_readOnly = kAAFFalse;
 	_stream = NULL;
 	_access = NULL;
-	_sampleDataHeaderWritten = AAFFalse;
-	_initialSeekPerformed = AAFFalse;
+	_sampleDataHeaderWritten = kAAFFalse;
+	_initialSeekPerformed = kAAFFalse;
 	_mdes = NULL;
 	_interleaveBuf = NULL;
 }
@@ -225,8 +274,9 @@ CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown, aafBool doInit)
 
 CAAFWaveCodec::~CAAFWaveCodec ()
 {
-	if(_access != NULL)
-		_access->Release();
+  // Do NOT release the _access interface since this object
+  // contains the reference to this codec instance! We need
+  // avoid the dreaded reference counting cycle of death!
 	if(_stream != NULL)
 		_stream->Release();
 	if(_mdes != NULL)
@@ -237,19 +287,16 @@ CAAFWaveCodec::~CAAFWaveCodec ()
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::SetEssenceAccess(IAAFEssenceAccess *access)
 {
-	if(_access != NULL)
-		_access->Release();
-	if(access != NULL)
-	{
-		_access = access;
-		_access->AddRef();
-	}
+	if(access == NULL)
+		return AAFRESULT_NULL_PARAM;
 
-	return AAFRESULT_SUCCESS;
+	_access = access;
+
+  return AAFRESULT_SUCCESS;
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetFlavourCount(aafInt32 *pCount)
+    CAAFWaveCodec::CountFlavours(aafUInt32 *pCount)
 {
 	if(pCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -258,25 +305,18 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetIndexedFlavourID (aafInt32  index,
-        aafUID_t *  pVariant)
+    CAAFWaveCodec::GetIndexedFlavourID (aafUInt32  index,
+        aafUID_t *  pFlavour)
 {
-	if(pVariant == NULL)
+	if(pFlavour == NULL)
 		return AAFRESULT_NULL_PARAM;
-	*pVariant = NilCodecFlavour;
+	*pFlavour = kAAFNilCodecFlavour;
 	return AAFRESULT_SUCCESS;
 }
 
 
-	
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::SetCompressionEnabled (aafBool  enable)
-{
-  return HRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetDataDefinitionCount (aafInt32 *pDefCount)
+    CAAFWaveCodec::CountDataDefinitions (aafUInt32 *pDefCount)
 {
 	//!!!Add error checking
 	*pDefCount = 1;
@@ -284,9 +324,12 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetIndexedDataDefinition (aafInt32  index,
-        aafUID_t *  pVariant)
+    CAAFWaveCodec::GetIndexedDataDefinition (aafUInt32  index,
+        aafUID_t * pDataDefID)
 {
+  if (! pDataDefID)
+	return AAFRESULT_NOT_IMPLEMENTED;
+
   return HRESULT_NOT_IMPLEMENTED;
 }
 
@@ -298,7 +341,7 @@ const wchar_t	name[] = L"WAVE Codec";
 
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::GetMaxCodecDisplayNameLength (
-        aafInt32  *bufSize)
+        aafUInt32  *bufSize)
 {
 	if(bufSize == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -308,11 +351,11 @@ HRESULT STDMETHODCALLTYPE
 }	
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetCodecDisplayName (aafUID_t  variant,
-        wchar_t *  pName,
-        aafInt32  bufSize)
+    CAAFWaveCodec::GetCodecDisplayName (aafUID_constref flavour,
+        aafCharacter *  pName,
+        aafUInt32  bufSize)
 {
-	aafInt32	len = sizeof(name);
+	aafUInt32	len = sizeof(name);
 	if(len > bufSize)
 		len = bufSize;
 	memcpy(pName, name, len);
@@ -320,10 +363,10 @@ HRESULT STDMETHODCALLTYPE
 }
 	
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetNumChannels (IAAFSourceMob *fileMob,
-        aafUID_t  essenceKind,
+    CAAFWaveCodec::CountChannels (IAAFSourceMob *fileMob,
+        aafUID_constref essenceKind,
         IAAFEssenceStream *stream,
-        aafInt16 *  pNumChannels)
+        aafUInt16 *  pNumChannels)
 {
 	XPROTECT()
 	{
@@ -365,13 +408,13 @@ HRESULT STDMETHODCALLTYPE
 			}
 			CHECK(loadWAVEHeader());
 		}
-		pSelectInfo->willHandleMDES = AAFTrue;
+		pSelectInfo->willHandleMDES = kAAFTrue;
 #if PORT_BYTESEX_LITTLE_ENDIAN
-		pSelectInfo->isNative = AAFTrue;
+		pSelectInfo->isNative = kAAFTrue;
 #else
-		pSelectInfo->isNative = AAFFalse;
+		pSelectInfo->isNative = kAAFFalse;
 #endif
-		pSelectInfo->hwAssisted = AAFFalse;
+		pSelectInfo->hwAssisted = kAAFFalse;
 		pSelectInfo->relativeLoss = 0;
 		pSelectInfo->avgBitsPerSec =
 			(_bitsPerSample *
@@ -386,8 +429,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetNumSamples (
-        aafUID_t  essenceKind,
+    CAAFWaveCodec::CountSamples (
+        aafUID_constref essenceKind,
         aafLength_t *  pNumSamples)
 {
 	if(EqualAUID(&essenceKind, &DDEF_Sound))
@@ -405,60 +448,36 @@ HRESULT STDMETHODCALLTYPE
         IAAFEssenceStream *stream,
 		aafCheckVerbose_t  verbose,
         aafCheckWarnings_t warning,
-         aafInt32  bufSize,
+         aafUInt32  bufSize,
 		wchar_t *  pName,
-        aafInt32  *bytesWritten)
+        aafUInt32  *bytesWritten)
 {
 	return HRESULT_NOT_IMPLEMENTED;
 }
 
 		
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::Create (IAAFSourceMob *unk,
-        aafUID_t  variant,
-        IAAFEssenceStream * stream,
-        aafInt32 numParms,
-        aafmMultiCreate_t *createParms)
+CAAFWaveCodec::Create (IAAFSourceMob *unk,
+  aafUID_constref flavour,
+  aafUID_constref essenceKind,
+  aafRational_constref sampleRate,
+  IAAFEssenceStream * stream,
+  aafCompressEnable_t compEnable)
 {
-	IAAFSourceMob			*fileMob = NULL;
-	IAAFEssenceDescriptor	*mdes = NULL;
-	IAAFFileDescriptor		*fileDesc = NULL;
-	AAFRESULT				aafError;
-	unsigned char			header[STD_HDRSIZE_NODATA];
+	aafmMultiCreate_t createParms;
 
-	if(_stream == NULL)
+
+  XPROTECT()
 	{
-		_stream = stream;
-		_stream->AddRef();
-	}
-	_readOnly = AAFFalse;
-	XPROTECT()
-	{
-		_sampleRate = createParms[0].sampleRate;	// !!!Assumes all sample rates are the same
-
-		aafError = (unk->QueryInterface(IID_IAAFSourceMob, (void **)&fileMob));
-		CHECK(fileMob->GetEssenceDescriptor(&mdes));
-		fileMob->Release();
-		fileMob = NULL;
-		CHECK(mdes->QueryInterface(IID_IAAFWAVEDescriptor, (void **)&_mdes));
-		CHECK(CreateWAVEheader(header, STD_HDRSIZE_NODATA, (aafInt16)numParms));
-		CHECK(_mdes->SetSummary (STD_HDRSIZE_NODATA, header));
-		CHECK(mdes->QueryInterface(IID_IAAFFileDescriptor, (void **)&fileDesc));
-		mdes->Release();
-		fileDesc->Release();
-
-//!!!		omfsCvtInt32toInt64(0, &pdata->formSizeOffset);
-//		omfsCvtInt32toInt64(0, &pdata->numSamplesOffset);
-
+    memset(&createParms, 0, sizeof(createParms));
+    createParms.mediaKind = &essenceKind;
+    createParms.subTrackNum = 1;
+    createParms.slotID = 1;
+    createParms.sampleRate = sampleRate;
+    CHECK(MultiCreate(unk, flavour, stream, compEnable, 1, &createParms));
 	}
 	XEXCEPT
 	{
-		if(fileMob != NULL)
-			fileMob->Release();
-		if(mdes != NULL)
-			mdes->Release();
-		if(fileDesc != NULL)
-			fileDesc->Release();
 	}
 	XEND;
 
@@ -468,41 +487,16 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::Open (IAAFSourceMob *unk,
-        aafSlotID_t	slotID,
 		aafMediaOpenMode_t  openMode,
-        IAAFEssenceStream * stream)
+    IAAFEssenceStream * stream,
+    aafCompressEnable_t compEnable)
 {
-	AAFRESULT		aafError;
-	IAAFSourceMob	*fileMob = NULL;
-	IAAFEssenceDescriptor *edes = NULL;
-
-	if(_stream == NULL)
-	{
-		_stream = stream;
-		_stream->AddRef();
-	}
-	_readOnly = openMode == kMediaOpenReadOnly ? AAFTrue : AAFFalse;
 	XPROTECT()
 	{
-		aafError = (unk->QueryInterface(IID_IAAFSourceMob, (void **)&fileMob));
-		CHECK(fileMob->GetEssenceDescriptor(&edes));
-		aafError = (edes->QueryInterface(IID_IAAFWAVEDescriptor, (void **)&_mdes));
-
-		if(!_headerLoaded)
-		{
-			CHECK(loadWAVEHeader());
-		}
-		fileMob->Release();
-		fileMob = NULL;
-		edes->Release();
-		edes = NULL;
+    CHECK(MultiOpen(unk, openMode,stream, compEnable));
 	}
 	XEXCEPT
 	{
-		if(fileMob != NULL)
-			fileMob->Release();
-		if(edes != NULL)
-			edes->Release();
 	}
 	XEND;
 	return AAFRESULT_SUCCESS;
@@ -510,37 +504,90 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
+    CAAFWaveCodec::WriteSamples (aafUInt32  nSamples,
+        aafUInt32  buflen,
+        aafDataBuffer_t  buffer,
+        aafUInt32 *samplesWritten,
+        aafUInt32 *bytesWritten)
+{
+  HRESULT hr = S_OK;
+
+  if (NULL == buffer || NULL == samplesWritten || NULL == bytesWritten)
+    return AAFRESULT_NULL_PARAM;
+  if (0 == nSamples)
+    return AAFRESULT_INVALID_PARAM;
+
+  // If there multiple channels in the WAVE file and the data is interleaved
+  // then write all of the interleaved samples together.
+  aafmMultiXfer_t xferBlock;
+  aafmMultiResult_t resultBlock;
+  aafUID_t ddef = DDEF_Sound;
+
+  resultBlock.bytesXfered = 0;
+  resultBlock.samplesXfered = 0;
+  xferBlock.mediaKind = &ddef; // temp var necessary because the mediaKind is non-const.
+  xferBlock.subTrackNum = 1; // This should be a good default.
+  xferBlock.numSamples = nSamples;
+  xferBlock.buflen = buflen;
+  xferBlock.buffer = buffer;
+
+  hr = WriteBlocks(kAAFleaveInterleaved, 1, &xferBlock, &resultBlock);
+
+  *samplesWritten = resultBlock.samplesXfered;
+  *bytesWritten = resultBlock.bytesXfered;
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::WriteBlocks (aafDeinterleave_t  inter,
-        aafInt16  xferBlockCount,
+        aafUInt16  xferBlockCount,
         aafmMultiXfer_t *  xferBlock,
         aafmMultiResult_t *  resultBlock)
 {
 	aafUInt32      	fileBytes;
-	aafInt32      	n, xfers, samp;
-	aafUInt32		maxSamplesLeft;
+	aafUInt32      	n, xfers, samp;
+	aafUInt32		maxSamplesLeft, headerSize;
 	aafmMultiXfer_t *xfer;
 	aafmMultiResult_t *result;
 	interleaveBuf_t	*interPtr;
 	aafUInt8		*destPtr;
 	aafUInt32		zero = 0;
 	aafUInt8		sampleBuf[256];
-	unsigned char	header[STD_HDRSIZE_NODATA];
+  aafUInt32 bytesWritten;
+	unsigned char	header[HEADER_BUFSIZE];
 
-	XPROTECT()
+
+  // Perform basic validation of input parameters.
+  if (NULL == xferBlock || NULL == resultBlock)
+    return AAFRESULT_NULL_PARAM;
+  
+  for (n = 0; n < xferBlockCount; n++)
+  {
+    if (NULL == xferBlock[n].buffer)
+      return AAFRESULT_NULL_PARAM;
+    else if (0 == xferBlock[n].buflen)
+      return AAFRESULT_INVALID_PARAM;
+  }
+
+  
+  XPROTECT()
 	{
 		XASSERT(_bitsPerSample != 0, AAFRESULT_ZERO_SAMPLESIZE);
 
 		if(!_sampleDataHeaderWritten)
 		{
-			CHECK(CreateWAVEheader(header, STD_HDRSIZE_NODATA, _numCh));
+			CHECK(CreateWAVEheader(header, HEADER_BUFSIZE, _numCh, &headerSize));
 
 			_stream->Seek(0);
-			_sampleDataHeaderWritten = AAFTrue;
+			_sampleDataHeaderWritten = kAAFTrue;
 			// The next four lines won't work for raw writes
-			_stream->Write(header, STD_HDRSIZE_NODATA);
-			_stream->Write((aafUInt8 *)"data", 4);
+			_stream->Write(headerSize, header, &bytesWritten);
+			_stream->Write(4, (aafUInt8 *)"data", &bytesWritten);
 			_stream->GetPosition(&_dataSizeOffset);
-			_stream->Write((aafUInt8 *)&zero, 4);		
+			_stream->Write(4, (aafUInt8 *)&zero, &bytesWritten);		
 		}
 
 		for (n = 0; n < xferBlockCount; n++)
@@ -549,7 +596,7 @@ HRESULT STDMETHODCALLTYPE
 			resultBlock[n].samplesXfered = 0;
 		}
 		
-		if(inter == leaveInterleaved)
+		if(inter == kAAFleaveInterleaved)
 		{
 			for (n = 0; n < xferBlockCount; n++)
 			{
@@ -559,10 +606,10 @@ HRESULT STDMETHODCALLTYPE
 				if (fileBytes > xfer->buflen)
 					RAISE(AAFRESULT_SMALLBUF);
 				
-				CHECK(_stream->Write(xfer->buffer, fileBytes));
+				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 				
 				resultBlock->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				resultBlock->samplesXfered += xfer->numSamples / _bytesPerFrame;
+				resultBlock->samplesXfered += xfer->numSamples;
 			}
 		}
 		else if(_numCh == 1)
@@ -576,16 +623,16 @@ HRESULT STDMETHODCALLTYPE
 				if (fileBytes > xfer->buflen)
 					RAISE(AAFRESULT_SMALLBUF);
 				
-				CHECK(_stream->Write(xfer->buffer, fileBytes));
+				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 		
 		
 				result->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				result->samplesXfered += xfer->numSamples / _bytesPerFrame;
+				result->samplesXfered += xfer->numSamples;
 			}
 		}
 		else
 		{
-			aafInt32	bytesPerSample;
+			aafUInt32	bytesPerSample;
 			
 			if(_interleaveBuf == NULL)
 				_interleaveBuf = new interleaveBuf_t[_numCh];
@@ -619,7 +666,7 @@ HRESULT STDMETHODCALLTYPE
 			{
 				xfers = sizeof(sampleBuf) / (bytesPerSample * xferBlockCount);
 				if((aafUInt32) xfers > maxSamplesLeft)
-					xfers = (aafInt32) maxSamplesLeft;
+					xfers = (aafUInt32) maxSamplesLeft;
 					
 				destPtr = sampleBuf;
 				for (samp = 0; samp < xfers; samp++)
@@ -637,7 +684,7 @@ HRESULT STDMETHODCALLTYPE
 				}
 				
 				fileBytes = xfers * bytesPerSample * xferBlockCount;
-				CHECK(_stream->Write(sampleBuf, fileBytes));
+				CHECK(_stream->Write(fileBytes, sampleBuf, &bytesWritten));
 			}
 		}
 	}
@@ -648,28 +695,76 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
+
+HRESULT STDMETHODCALLTYPE
+    CAAFWaveCodec::ReadSamples (aafUInt32  nSamples,
+        aafUInt32  buflen,
+        aafDataBuffer_t  buffer,
+        aafUInt32 *  samplesRead,
+        aafUInt32 *  bytesRead)
+{
+  HRESULT hr = S_OK;
+
+  // If there multiple channels in the WAVE file and the data is interleaved
+  // then read all of the interleaved samples together.
+  aafmMultiXfer_t xferBlock;
+  aafmMultiResult_t resultBlock;
+  aafUID_t ddef = DDEF_Sound;
+
+	resultBlock.bytesXfered = 0;
+	resultBlock.samplesXfered = 0;
+  xferBlock.mediaKind = &ddef; // temp var necessary because the mediaKind is non-const.
+  xferBlock.subTrackNum = 1; // This should be a good default.
+  xferBlock.numSamples = nSamples;
+  xferBlock.buflen = buflen;
+  xferBlock.buffer = buffer;
+
+  hr = ReadBlocks(kAAFleaveInterleaved, 1, &xferBlock, &resultBlock);
+
+	*samplesRead = resultBlock.samplesXfered;
+	*bytesRead = resultBlock.bytesXfered;
+
+  return hr;
+}
+
+
+
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::ReadBlocks (aafDeinterleave_t  inter,
-        aafInt16  xferBlockCount,
+        aafUInt16  xferBlockCount,
         aafmMultiXfer_t *  xferBlock,
         aafmMultiResult_t *  resultBlock)
 {
 	aafUInt32       nbytes, fileBytes;
-	aafInt32        n, startBuflen, xferSamples, sub;
+	aafUInt32        n, startBuflen, xferSamples, sub;
 	aafUInt32		maxSamplesLeft;
 	aafUInt8		*start;
 	aafmMultiXfer_t *xfer;
 	aafmMultiResult_t *result;
-	aafInt16		ch, xf;
+	aafUInt16		ch, xf;
 	aafUInt8		tmpBuf[256];
-	
+
+
+  // Perform basic validation of input parameters.
+  if (NULL == xferBlock || NULL == resultBlock)
+    return AAFRESULT_NULL_PARAM;
+  
+  for (n = 0; n < xferBlockCount; n++)
+  {
+    if (NULL == xferBlock[n].buffer)
+      return AAFRESULT_NULL_PARAM;
+    else if (0 == xferBlock[n].buflen)
+      return AAFRESULT_INVALID_PARAM;
+  }
+
+
 
 	XPROTECT()
 	{
 		if(!_initialSeekPerformed)
 		{
 			CHECK(_stream->Seek(_dataStartOffset));	// Not compatible with raw read
-			_initialSeekPerformed = AAFTrue;
+			_initialSeekPerformed = kAAFTrue;
 		}
 
 		XASSERT(_bitsPerSample != 0, AAFRESULT_ZERO_SAMPLESIZE);
@@ -677,9 +772,10 @@ HRESULT STDMETHODCALLTYPE
 		for (n = 0; n < xferBlockCount; n++)
 		{
 			resultBlock[n].bytesXfered = 0;
+			resultBlock[n].samplesXfered = 0;
 		}
 		
-		if(inter == leaveInterleaved)
+		if(inter == kAAFleaveInterleaved)
 		{
 			for (n = 0; n < xferBlockCount; n++)
 			{
@@ -715,7 +811,7 @@ HRESULT STDMETHODCALLTYPE
 		}
 		else
 		{
-			aafInt32	bytesPerSample;
+			aafUInt32	bytesPerSample;
 
 			if(_interleaveBuf == NULL)
 				_interleaveBuf = new interleaveBuf_t[_numCh];
@@ -772,7 +868,7 @@ HRESULT STDMETHODCALLTYPE
 					start = tmpBuf;
 				}
 				fileBytes = xferSamples * bytesPerSample * _numCh;
-				if ((aafInt32)fileBytes > startBuflen)
+				if ((aafUInt32)fileBytes > startBuflen)
 					RAISE(AAFRESULT_SMALLBUF);
 		
 				CHECK(_stream->Read(fileBytes, start, &nbytes));
@@ -817,7 +913,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	aafInt64          nBytes;
 	aafInt64          temp, offset, one;
-	aafInt32           bytesPerFrame;
+	aafUInt32           bytesPerFrame;
 
 	XPROTECT()
 	{
@@ -850,7 +946,8 @@ HRESULT STDMETHODCALLTYPE
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::CompleteWrite (IAAFSourceMob *fileMob)
 {
-	aafInt64	byteLen, sampleLen;
+	aafInt64				sampleLen;
+	aafUInt32				WAVEDataLen;
 	IAAFEssenceDescriptor	*essenceDesc = NULL;
 	IAAFFileDescriptor		*fileDesc = NULL;
 	IAAFWAVEDescriptor		*waveDesc = NULL;
@@ -858,15 +955,17 @@ HRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		CHECK(_stream->GetLength (&byteLen));
-		sampleLen = byteLen / _bytesPerFrame;
+		if(!_readOnly && _sampleDataHeaderWritten)
+			CHECK(CreateAudioDataEnd());	// Don't do this for raw calls?
+
+		CHECK(_stream->Seek(_dataSizeOffset));
+		CHECK(GetWAVEData(sizeof(WAVEDataLen), &WAVEDataLen));	// Read the AIFC data length
+		sampleLen = WAVEDataLen / _bytesPerFrame;
 		CHECK(_mdes->QueryInterface(IID_IAAFFileDescriptor, (void **)&fileDesc));
 		CHECK(fileDesc->SetLength(sampleLen));
 		fileDesc->Release();
 		fileDesc = NULL;
 
-		if(!_readOnly && _sampleDataHeaderWritten)
-			CHECK(CreateAudioDataEnd());	// Don't do this for raw calls?
 //		_stream = NULL;
 		
 		if(_interleaveBuf != NULL)
@@ -916,67 +1015,13 @@ HRESULT STDMETHODCALLTYPE
 }		
 
 
-HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::WriteFractionalSample (aafDataBuffer_t  buffer,
-        aafInt32  buflen)
-{
-	unsigned char	header[STD_HDRSIZE_NODATA];
-	aafUInt32		zero = 0;
-
-	XPROTECT()
-	{
-		if(!_sampleDataHeaderWritten)
-		{
-			CHECK(CreateWAVEheader(header, STD_HDRSIZE_NODATA, _numCh));
-
-			_stream->Seek(0);
-			_sampleDataHeaderWritten = AAFTrue;
-			// The next four lines won't work for raw writes
-			_stream->Write(header, STD_HDRSIZE_NODATA);
-			_stream->Write((aafUInt8 *)"data", 4);
-			_stream->GetPosition(&_dataSizeOffset);
-			_stream->Write((aafUInt8 *)&zero, 4);		
-		}
-		CHECK(_stream->Write (buffer, buflen));
-	}
-	XEXCEPT
-	XEND
-
-	return HRESULT_SUCCESS;
-}
-
-
-
-
-
-HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::ReadFractionalSample (aafUInt32  buflen,
-        aafDataBuffer_t  buffer,
-        aafUInt32 *  bytesRead)
-{
-	XPROTECT()
-	{
-		if(!_initialSeekPerformed)
-		{
-			CHECK(_stream->Seek(_dataStartOffset));	// Not compatible with raw read
-			_initialSeekPerformed = AAFTrue;
-		}
-		CHECK(_stream->Read (buflen, buffer, bytesRead));
-	}
-	XEXCEPT
-	XEND
-
-	return HRESULT_SUCCESS;
-}
-
-
-
 
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::WriteRawData (aafUInt32 nSamples, aafDataBuffer_t  buffer,
         aafUInt32  buflen)
 {
-	return _stream->Write (buffer, nSamples * _bytesPerFrame);
+  aafUInt32 bytesWritten;
+	return _stream->Write (nSamples * _bytesPerFrame, buffer, &bytesWritten);
 }
 
 
@@ -995,7 +1040,7 @@ HRESULT STDMETHODCALLTYPE
 		if(!_initialSeekPerformed)
 		{
 			CHECK(_stream->Seek(0L));
-			_initialSeekPerformed = AAFTrue;
+			_initialSeekPerformed = kAAFTrue;
 		}
 
 		CHECK(_stream->Read (nSamples * _bytesPerFrame, buffer, bytesRead));
@@ -1033,11 +1078,11 @@ HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::PutEssenceFormat (IAAFEssenceFormat * pFormat)
 {
 	aafInt32		numSpecifiers, n, bytesRead;
-	aafUInt32		valueUInt32;
+	aafUInt32		valueUInt32, headerSize;
 	aafRational_t	valueRat;
 	aafUID_t		opcode;
 	aafUInt8		buf[256];
-	aafUInt8		header[STD_HDRSIZE_NODATA];
+	aafUInt8		header[HEADER_BUFSIZE];
 
 	XPROTECT()
 	{
@@ -1093,11 +1138,11 @@ HRESULT STDMETHODCALLTYPE
 			}
 		}
 		
-		CHECK(CreateWAVEheader(header, STD_HDRSIZE_NODATA, _numCh));
-		CHECK(_mdes->SetSummary (STD_HDRSIZE_NODATA, header));
+		CHECK(CreateWAVEheader(header, HEADER_BUFSIZE, _numCh, &headerSize));
+		CHECK(_mdes->SetSummary (headerSize, header));
 		
 		// This will output the header on the next non-raw write
-		_sampleDataHeaderWritten = AAFFalse;
+		_sampleDataHeaderWritten = kAAFFalse;
 	}
 	XEXCEPT
 	XEND
@@ -1110,11 +1155,11 @@ HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::GetEssenceFormat (IAAFEssenceFormat *pTemplate, IAAFEssenceFormat **pResult)
 {
 	aafInt32		numSpecifiers, n, bytesRead;
-	aafUInt32		valueUInt32;
+	aafUInt32		valueUInt32, headerSize;
 	aafRational_t	valueRat;
 	aafUID_t		opcode;
 	aafUInt8		buf[256];
-	aafUInt8		header[STD_HDRSIZE_NODATA];
+	aafUInt8		header[HEADER_BUFSIZE];
 	IAAFEssenceFormat *fmt;
 
 	XPROTECT()
@@ -1162,11 +1207,11 @@ HRESULT STDMETHODCALLTYPE
 				RAISE(AAFRESULT_INVALID_OP_CODEC);
 		}
 		
-		CHECK(CreateWAVEheader(header, STD_HDRSIZE_NODATA, _numCh));
-		CHECK(_mdes->SetSummary (STD_HDRSIZE_NODATA, header));
+		CHECK(CreateWAVEheader(header, HEADER_BUFSIZE, _numCh, &headerSize));
+		CHECK(_mdes->SetSummary (headerSize, header));
 		
 		// This will output the header on the next non-raw write
-		_sampleDataHeaderWritten = AAFFalse;
+		_sampleDataHeaderWritten = kAAFFalse;
 	}
 	XEXCEPT
 	XEND
@@ -1202,14 +1247,17 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetIndexedSampleSize (aafUID_t dataDefID, aafPosition_t pos, aafLength_t *pResult)
+    CAAFWaveCodec::GetIndexedSampleSize
+ (aafUID_constref dataDefID,
+  aafPosition_t pos,
+  aafLength_t *pResult)
 {
-	aafUID_t	uid = DDEF_Sound;
 	if(pResult == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	if(pos < 0 || pos >=_sampleFrames)
 		return(AAFRESULT_EOF);
-	if(EqualAUID(&dataDefID, &uid))
+
+	if(EqualAUID(&dataDefID, &DDEF_Sound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);
@@ -1218,22 +1266,127 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetLargestSampleSize (aafUID_t dataDefID, aafLength_t *pResult)
+    CAAFWaveCodec::GetLargestSampleSize (aafUID_constref dataDefID,
+										 aafLength_t *pResult)
 {
-	aafUID_t	uid = DDEF_Sound;
 	if(pResult == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	if(EqualAUID(&dataDefID, &uid))
+
+	if(EqualAUID(&dataDefID, &DDEF_Sound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);
 	return (AAFRESULT_SUCCESS);
 }
 
+
+		
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::AddSampleIndexEntry (aafPosition_t pos)
+    CAAFWaveCodec::MultiCreate (IAAFSourceMob *unk,
+        aafUID_constref flavour,
+        IAAFEssenceStream * stream,
+        aafCompressEnable_t compEnable,
+        aafUInt32 numParms,
+        aafmMultiCreate_t *createParms)
 {
-	return (AAFRESULT_SUCCESS);
+	IAAFSourceMob			*fileMob = NULL;
+	IAAFEssenceDescriptor	*mdes = NULL;
+	IAAFFileDescriptor		*fileDesc = NULL;
+	unsigned char			header[HEADER_BUFSIZE];
+	aafUInt32				headerSize;
+
+	if(_stream == NULL)
+	{
+		_stream = stream;
+		_stream->AddRef();
+	}
+	_readOnly = kAAFFalse;
+	XPROTECT()
+	{
+		_sampleRate = createParms[0].sampleRate;	// !!!Assumes all sample rates are the same
+
+    // whether or not we will be compressing the samples as they are read.
+    CHECK(SetCompressionEnabled(compEnable));
+
+		CHECK(unk->QueryInterface(IID_IAAFSourceMob, (void **)&fileMob));
+		CHECK(fileMob->GetEssenceDescriptor(&mdes));
+		fileMob->Release();
+		fileMob = NULL;
+		CHECK(mdes->QueryInterface(IID_IAAFWAVEDescriptor, (void **)&_mdes));
+		CHECK(CreateWAVEheader(header, HEADER_BUFSIZE, (aafUInt16)numParms, &headerSize));
+		CHECK(_mdes->SetSummary (headerSize, header));
+		CHECK(mdes->QueryInterface(IID_IAAFFileDescriptor, (void **)&fileDesc));
+		mdes->Release();
+		fileDesc->Release();
+
+//!!!		omfsCvtInt32toInt64(0, &pdata->formSizeOffset);
+//		omfsCvtInt32toInt64(0, &pdata->numSamplesOffset);
+
+	}
+	XEXCEPT
+	{
+		if(fileMob != NULL)
+			fileMob->Release();
+		if(mdes != NULL)
+			mdes->Release();
+		if(fileDesc != NULL)
+			fileDesc->Release();
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFWaveCodec::MultiOpen (IAAFSourceMob *unk,
+		aafMediaOpenMode_t  openMode,
+    IAAFEssenceStream * stream,
+    aafCompressEnable_t compEnable)
+{
+	IAAFSourceMob	*fileMob = NULL;
+	IAAFEssenceDescriptor *edes = NULL;
+
+	if(_stream == NULL)
+	{
+		_stream = stream;
+		_stream->AddRef();
+	}
+	_readOnly = openMode == kAAFMediaOpenReadOnly ? kAAFTrue : kAAFFalse;
+
+
+	XPROTECT()
+	{
+    // whether or not we will be compressing the samples as they are read.
+    CHECK(SetCompressionEnabled(compEnable));
+		CHECK(unk->QueryInterface(IID_IAAFSourceMob, (void **)&fileMob));
+		CHECK(fileMob->GetEssenceDescriptor(&edes));
+		CHECK(edes->QueryInterface(IID_IAAFWAVEDescriptor, (void **)&_mdes));
+
+		if(!_headerLoaded)
+		{
+			CHECK(loadWAVEHeader());
+		}
+		fileMob->Release();
+		fileMob = NULL;
+		edes->Release();
+		edes = NULL;
+	}
+	XEXCEPT
+	{
+		if(fileMob != NULL)
+			fileMob->Release();
+		if(edes != NULL)
+			edes->Release();
+	}
+	XEND;
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT CAAFWaveCodec::SetCompressionEnabled (aafCompressEnable_t /*compEnable*/)
+{
+  return HRESULT_SUCCESS;
 }
 
 /************************
@@ -1250,7 +1403,7 @@ HRESULT STDMETHODCALLTYPE
  * Possible Errors:
  *		Standard errors (see top of file).
  */
-AAFRESULT CAAFWaveCodec::fillSwappedWAVEData(aafUInt8 **destBufHdl, aafInt32 maxsize, void *data)
+AAFRESULT CAAFWaveCodec::fillSwappedWAVEData(aafUInt8 **destBufHdl, aafUInt32 maxsize, void *data)
 {
 	aafInt32        dataL;
 	aafInt16        dataS;
@@ -1273,7 +1426,7 @@ AAFRESULT CAAFWaveCodec::fillSwappedWAVEData(aafUInt8 **destBufHdl, aafInt32 max
 	return (AAFRESULT_SUCCESS);
 }
 
-AAFRESULT CAAFWaveCodec::scanSwappedWAVEData(aafUInt8 **srcBufHdl, aafInt32 maxsize, void *data)
+AAFRESULT CAAFWaveCodec::scanSwappedWAVEData(aafUInt8 **srcBufHdl, aafUInt32 maxsize, void *data)
 {
 	memcpy(data, *srcBufHdl, maxsize);
 	(*srcBufHdl) += maxsize;
@@ -1327,20 +1480,53 @@ AAFRESULT CAAFWaveCodec::GetWAVEData(aafUInt32 len, void *buf)
  */
 
 AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
-								aafInt32	bufsize,
-								aafInt16	numCh)
+								aafUInt32	bufsize,
+								aafUInt16	numCh,
+								aafUInt32	*bytesWritten)
 
 {
 	aafInt32           chunksize, avgBytesPerSec, samplesPerSec;
+	aafUInt32			headerSize;
 	aafInt32           zero = 0, len;
 	aafInt16           bytesPerFrame;
 	aafInt16           pcm_format = 1;
-	aafUInt8			*ptr = buffer;
+	aafUInt8			*ptr = buffer, *nextChunk;
+#if INCLUDE_BEXT
+	aafUInt32			bextSize, headerSize, n;
+	char				bextDescription[256+1];
+	char				bextOriginator[32+1];
+	char				bextOriginatorReference[32+1];
+	char				bextOriginationDate[10+1];
+	char				bextOriginationTime[8+1];
+	aafInt64			bextTimeReference;
+	aafUInt16			bextVersion;
+	char				bextReserved[254];
+	char				bextCodingHistory[512];
+	aafUInt16			bextLenCodingHistory;
+	aafTimeStamp_t		dateTime;
+#endif
 
 	XPROTECT()
 	{	
+#if INCLUDE_BEXT
+		if(_sampleRate.denominator != 0)
+		{
+			sprintf(bextCodingHistory, "PCM: %s, %d bits, %g hz\r\n", (_numCh == 2 ? "stereo" : "mono"),
+				_bitsPerSample, (double)_sampleRate.numerator / (double)_sampleRate.denominator);
+		}
+		else
+		{
+			sprintf(bextCodingHistory, "PCM: %s, %d bits", (numCh == 2 ? "stereo" : "mono"), _bitsPerSample);
+		}
+		bextLenCodingHistory = strlen(bextCodingHistory)+1;
+		bextSize = 256+32+32+10+8+8+2+sizeof(bextReserved)+bextLenCodingHistory;
+		headerSize = 36 + bextSize;
+#else
+		headerSize = 36;
+#endif
+
 		_numCh = numCh;
-		if(bufsize < STD_HDRSIZE_NODATA)
+		if(bufsize < headerSize)
 			RAISE(AAFRESULT_SMALLBUF);
 
 		*ptr++ = 'R';		// Make sure that this is NOT byte-swapped
@@ -1379,9 +1565,66 @@ AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
 		// !!!Postcondition to make sure that offset within
 
 		/* patch FORM size here. */
+		nextChunk = ptr;
 		len = ptr - buffer;
 		ptr = buffer+ 4;
 		CHECK(fillSwappedWAVEData(&ptr, 4L, &len));	// Patch in
+
+#if INCLUDE_BEXT
+		// Set up for the broadcast chunk
+		memset(bextDescription, 0, sizeof(bextDescription));
+		sprintf(bextDescription, "<tbd>");
+		/***/
+		memset(bextOriginator, 0, sizeof(bextOriginator));
+		sprintf(bextOriginator, "<tbd>");
+		/***/
+		memset(bextOriginatorReference, 0, sizeof(bextOriginatorReference));
+		sprintf(bextOriginatorReference, "<tbd>");
+		/***/
+		memset(bextOriginationDate, 0, sizeof(bextOriginationDate));
+		memset(bextOriginationTime, 0, sizeof(bextOriginationTime));
+		AAFGetDateTime(&dateTime);
+		sprintf(bextOriginationDate, "%04d-%02d-%02d", dateTime.date.year,
+										dateTime.date.month, dateTime.date.day);
+		sprintf(bextOriginationTime, "%02d:%02d:%02d", dateTime.time.hour,
+										dateTime.time.minute, dateTime.time.second);
+		/***/
+		bextTimeReference = 0;
+		/***/
+		bextVersion = 0;
+		/***/
+		memset(bextReserved, 0, sizeof(bextReserved));
+		/***/
+		
+		// Now write the broadcast chunk
+		ptr = nextChunk;
+		*ptr++ = 'b';
+		*ptr++ = 'e';
+		*ptr++ = 'x';
+		*ptr++ = 't';
+		len =  bextSize;
+		CHECK(fillSwappedWAVEData(&ptr, 4L, &len));
+		memcpy(ptr, bextDescription, 256);
+		ptr += 256;
+		memcpy(ptr, bextOriginator, 32);
+		ptr += 32;
+		memcpy(ptr, bextOriginatorReference, 32);
+		ptr += 32;
+		memcpy(ptr, bextOriginationDate, 10);
+		ptr += 10;
+		memcpy(ptr, bextOriginationTime, 8);
+		ptr += 8;
+		CHECK(fillSwappedWAVEData(&ptr, sizeof(bextTimeReference), &bextTimeReference));
+		CHECK(fillSwappedWAVEData(&ptr, sizeof(bextVersion), &bextVersion));
+		memcpy(ptr, bextReserved, sizeof(bextReserved));
+		ptr += sizeof(bextReserved);
+		memcpy(ptr, bextCodingHistory, bextLenCodingHistory);
+		ptr += bextLenCodingHistory;
+#else
+		ptr = nextChunk;
+#endif
+		
+		*bytesWritten = ptr - buffer;
 	}
 	XEXCEPT
 	XEND
@@ -1411,7 +1654,7 @@ AAFRESULT CAAFWaveCodec::loadWAVEHeader(void)
 	aafInt16			pcm_format;
 	aafUInt8            chunkID[4];
 	aafUInt32			chunkSize, bytesRead;
-	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
+	aafBoolean_t				fmtFound = kAAFFalse, dataFound = kAAFFalse;
  	aafInt32			junk32, rate;
 	aafInt64			savePos;
 #if DEBUG_READ
@@ -1471,14 +1714,14 @@ AAFRESULT CAAFWaveCodec::loadWAVEHeader(void)
 	
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 	
-				fmtFound = AAFTrue;
+				fmtFound = kAAFTrue;
 			} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 			{
 				CvtInt32toInt64(chunkSize / _bytesPerFrame, &_sampleFrames);
 				/* Positioned at beginning of audio data */
 				CHECK(_stream->GetPosition(&_dataStartOffset));
 	
-				dataFound = AAFTrue;
+				dataFound = kAAFTrue;
 			}
 			CHECK(TruncInt64toInt32(chunkStart64, &chunkStart));	// OK - 32-bit format
 			offset = chunkStart + chunkSize;
@@ -1489,7 +1732,7 @@ AAFRESULT CAAFWaveCodec::loadWAVEHeader(void)
 				break;
 			CHECK(_stream->Seek(offset));
 		}
-		_headerLoaded = AAFTrue;
+		_headerLoaded = kAAFTrue;
 		CHECK(_stream->Seek (savePos));
 	}
 	XEXCEPT
@@ -1521,7 +1764,7 @@ AAFRESULT CAAFWaveCodec::ComputeWriteChunkSize(
 			aafInt64 end)
 {
 	aafInt64          tmpOffset, savePos, result;
-	aafUInt32          size;
+	aafUInt32          size, bytesWritten;
 	aafUInt8			*tmp;
 	// BobT: buf[] only *really* needs to be pointer-sized, but we're
 	// adding 1 here to keep BoundsChecker happy
@@ -1547,7 +1790,7 @@ AAFRESULT CAAFWaveCodec::ComputeWriteChunkSize(
 		CHECK(_stream->Seek(sizeOff));
 		tmp = buf;
 		CHECK(fillSwappedWAVEData(&tmp, 4L, &size));
-		CHECK(_stream->Write(buf, 4L));
+		CHECK(_stream->Write(4L, buf, &bytesWritten));
 	
 		CHECK(_stream->Seek(savePos));
 	}
@@ -1587,7 +1830,7 @@ AAFRESULT CAAFWaveCodec::CreateAudioDataEnd(void)
  * The number of entries in dest[] must be equal to numDest, and the dest array WILL
  * BE MODIFIED during execution, so it will have to be reloaded.
  */
-static void SplitBuffers(void *original, aafInt32 srcSamples, aafInt16 sampleSize, aafInt16 numDest, interleaveBuf_t *destPtr)
+static void SplitBuffers(void *original, aafUInt32 srcSamples, aafUInt16 sampleSize, aafUInt16 numDest, interleaveBuf_t *destPtr)
 {
 	aafInt16	*src16, *srcEnd16, *dest16;
 	char	*src8, *srcEnd8, *dest8;
@@ -1641,6 +1884,10 @@ static void SplitBuffers(void *original, aafInt32 srcSamples, aafInt16 sampleSiz
 //
 // 
 // 
+inline int EQUAL_UID(const GUID & a, const GUID & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
 HRESULT CAAFWaveCodec::InternalQueryInterface
 (
     REFIID riid,
@@ -1651,22 +1898,19 @@ HRESULT CAAFWaveCodec::InternalQueryInterface
     if (NULL == ppvObj)
         return E_INVALIDARG;
 
-    // We only support the IClassFactory interface 
-    if (riid == IID_IAAFEssenceCodec) 
+    if (EQUAL_UID(riid,IID_IAAFMultiEssenceCodec)) 
+    { 
+        *ppvObj = (IAAFMultiEssenceCodec *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+    else if (EQUAL_UID(riid,IID_IAAFEssenceCodec)) 
     { 
         *ppvObj = (IAAFEssenceCodec *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-#if 0
-    else if (riid == IID_IAAFEssenceSampleStream) 
-    { 
-        *ppvObj = (IAAFEssenceSampleStream *)this; 
-        ((IUnknown *)*ppvObj)->AddRef();
-        return S_OK;
-    }
-#endif
-    else if (riid == IID_IAAFPlugin) 
+    else if (EQUAL_UID(riid,IID_IAAFPlugin)) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
@@ -1680,14 +1924,4 @@ HRESULT CAAFWaveCodec::InternalQueryInterface
 //
 // Define the contrete object support implementation.
 // 
-HRESULT CAAFWaveCodec::COMCreate(IUnknown *pUnkOuter, void **ppvObjOut)
-{
-	*ppvObjOut = NULL;
- 	CAAFWaveCodec *pAAFWaveCodec = new CAAFWaveCodec(pUnkOuter);
- 	if (NULL == pAAFWaveCodec)
- 		return E_OUTOFMEMORY;
- 	*ppvObjOut = static_cast<IAAFEssenceCodec *>(pAAFWaveCodec);
- 	((IUnknown *)(*ppvObjOut))->AddRef();
- 	return S_OK;
- }
-
+AAF_DEFINE_FACTORY(AAFWaveCodec)
