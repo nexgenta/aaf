@@ -130,11 +130,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
-  hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (id);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
   _ElementType = typeId;
 
@@ -279,6 +278,57 @@ ImplAAFTypeDefVariableArray::CreateEmptyValue
   assert (*ppPropVal);
   (*ppPropVal)->AcquireReference ();
   return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefVariableArray::CreateValueFromValues (
+      ImplAAFPropertyValue ** ppElementValues,
+      aafUInt32  numElements,
+      ImplAAFPropertyValue ** ppPropVal)
+{
+	AAFRESULT hr;
+
+	//first validate params + basic stuff ...
+	if (!ppElementValues || !ppPropVal)
+		return AAFRESULT_NULL_PARAM;
+
+	//verify that all the individual elem types are the same as each other,
+	// AND that each of them is VARIABLE  Arrayable
+
+	//get Base TD and size
+	ImplAAFTypeDefSP spTargetTD;
+	hr = GetType(&spTargetTD); //gets base elem type
+	if (AAFRESULT_FAILED (hr)) 
+		return hr;
+	aafUInt32 targetElemSize = spTargetTD->NativeSize();
+
+	for (aafUInt32 i=0; i<numElements; i++)
+	{
+		//get  source size
+		ImplAAFTypeDefSP  spSourceTD;
+		hr = ppElementValues[i]->GetType (&spSourceTD);
+		if (AAFRESULT_FAILED (hr)) 
+			return hr;
+
+		//verify FIXED Arrayable
+		if (! spSourceTD->IsVariableArrayable())
+			return AAFRESULT_BAD_TYPE;
+
+		//verify that spTargetTD == spSourceTD
+		if (spSourceTD != spTargetTD )
+			return AAFRESULT_BAD_TYPE;
+
+		//verify that the target elem size is equal to that of source 
+		aafUInt32 sourceSize = spSourceTD->NativeSize();	
+		if (sourceSize != targetElemSize )
+			return AAFRESULT_BAD_SIZE;
+
+	}//for each elem
+
+	// All params validated; proceed ....
+
+	//... just defer to Base-Class Array implementation:
+	return ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues, numElements, ppPropVal);
 }
 
 
