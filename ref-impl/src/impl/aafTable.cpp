@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafTable.cpp,v 1.20 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: aafTable.cpp,v 1.21 2004/10/29 14:52:01 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,8 @@
 #define TABLE_COOKIE		0x5461626C
 #define TABLE_ITER_COOKIE	0x54424C49
 
-#define _lookup(table,key) 	( (table->map ? (aafUInt32)table->map(key) : (aafUInt32)key) % table->hashTableSize)
+// On both 32bit and 64bit CPUs, unsigned long can hold a void *
+#define _lookup(table,key) 	( (table->map ? (unsigned long)table->map(key) : (unsigned long)key) % table->hashTableSize)
 
 typedef enum
 {
