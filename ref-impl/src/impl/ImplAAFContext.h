@@ -1,117 +1,62 @@
 //@doc
-//@class    AAFSession | Implementation class for AAFSession
-#ifndef __ImplAAFSession_h__
-#define __ImplAAFSession_h__
+//@class    AAFContext | Implementation class for AAFContext
+#ifndef __ImplAAFContext_h__
+#define __ImplAAFContext_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAFTypes.h"
 #include "ImplAAFRoot.h"
 
-class ImplAAFFile;
-class AAFFile;
-
-#include "Container.h"
 
 //
 // Forward declaration
 //
-struct IAAFSession;
-class AAFSession;
+class ImplAAFFile;
+class ImplAAFPluginManager;
 
 
-class ImplAAFSession : public ImplAAFRoot
+class ImplAAFContext : public ImplAAFRoot
 {
 public:
-  OMDECLARE_STORABLE(ImplAAFSession)
 
   //****************
   // GetInstance()
   //
   // Allows clients to get the single instance of this class.
   //
-  static ImplAAFSession * GetInstance ();
-
-
-  //****************
-  // EndSession()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    EndSession ();
-
-
-  //****************
-  // CreateFile()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateFile
-        (aafWChar *  filePath,   //@parm [in] File path [replace with object later]
-		 aafFileRev_t  rev,   //@parm [in] File revision to create
-         ImplAAFFile ** file);  //@parm [out] Current AAF file
-
-
-  //****************
-  // OpenReadFile()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    OpenReadFile
-        (aafWChar *  filePath,   //@parm [in] File path [replace with object later]
-		 ImplAAFFile ** file);  //@parm [out] Current AAF file
-
-
-  //****************
-  // OpenModifyFile()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    OpenModifyFile
-        (aafWChar *  filePath,   //@parm [in] File path [replace with object later]
-		 ImplAAFFile ** file);  //@parm [out] Current AAF file
-
-  //***********************************************************
-  // METHOD NAME: SetCurrentIdentification()
-  //
-  // DESCRIPTION:
-  // @mfunc AAFRESULT | AAFSession | SetCurrentIdentification |
-  // Sets the object which identifies the creator of the file.
-  // @end
-  // 
-  virtual AAFRESULT STDMETHODCALLTYPE
-  SetDefaultIdentification (
-    // @parm aafProductIdentification | ident | [in] a struct from which it is initialized
-    aafProductIdentification_t  *ident
-  );
-
-
-  //***********************************************************
-  // METHOD NAME: GetIdentification()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-  GetIdentification (
-    aafProductIdentification_t  *ident
-  );
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-  BeginSession (
-    aafProductIdentification_t  *ident
-  );
+  static ImplAAFContext * GetInstance ();
 
 
 public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFSessionTest.cpp.
-  static AAFRESULT test();
 
-	ImplAAFFile *GetTopFile(void);
-	void SetTopFile(ImplAAFFile *file);
-	OMLSession	GetContainerSession(void);
-	aafProductIdentification_t *GetDefaultIdent(void);
+  void InitPluginManager (void);
+  ImplAAFPluginManager *GetPluginManager (void);
 
 private:
 
@@ -119,15 +64,20 @@ private:
   // Constructor/destructor
   //
   //********
-  ImplAAFSession ();
-  virtual ~ImplAAFSession ();
+  ImplAAFContext ();
+  virtual ~ImplAAFContext ();
 
   // single instance of this class
-  static ImplAAFSession * _singleton;
+  static ImplAAFContext * _singleton;
 
-  ImplAAFFile	*_topFile;
-  aafProductIdentification_t	*_defaultIdent;
+  ImplAAFPluginManager	*_plugins;
+
+  // Make private helper class a friend so that it
+  // may call the destructor. This helper class is used
+  // to ensure that the singleton context instance is 
+  // cleaned up properly.
+  friend class ImplAAFContextHelper;
 };
 
-#endif // ! __ImplAAFSession_h__
+#endif // ! __ImplAAFContext_h__
 
