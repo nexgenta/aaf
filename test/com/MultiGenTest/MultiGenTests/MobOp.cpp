@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MobOp.cpp,v 1.2 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+// $Id: MobOp.cpp,v 1.3 2005/03/31 02:49:46 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -278,6 +278,31 @@ void CountComments::RunTest( CmdState& state, int argc, char** argv )
     anError << "Count does not match (" << count << " != " << expectedCount << ").";
     throw TestFailedEx( anError.str() );
   }
+}
+
+//====================================================================
+
+STANDARD_TEST_DECLARATION(CopyMob);
+StandardFactory<CopyMob> CopyMobFactory(
+  "CopyMob",
+  "Copy a mob.",
+  "mob_name copied_mob_name",
+  "Excercise the mob cloning code by cloning a mob with a single file.",
+  3, 3
+  );
+
+void CopyMob::RunTest( CmdState& state, int argc, char** argv )
+{
+  const char* name        = argv[1];
+  const char* copied_name = argv[2];
+
+  IAAFSmartPointer<IAAFMob> mob;
+  get_mob_throw_if_not_found( state, name, mob );
+
+  IAAFSmartPointer<IAAFMob> copiedMob;
+
+  auto_ptr<wchar_t> wcopiedName( ToWideString(copied_name) );
+  CHECK_HRESULT( mob->Copy( wcopiedName.get(), &copiedMob ) );
 }
 
 //====================================================================
