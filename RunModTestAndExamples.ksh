@@ -131,7 +131,11 @@ RunExamples ()
 if [ CHECK_DEBUG -eq 1 ]; then
 	SetPath "Debug"
 
+	RegisterTargetDLLs "Debug" "/s"
 	RunExamples "Debug"
+
+	##UnRegister the DLLs##
+	RegisterTargetDLLs "Debug" "/s /u"
 
 	ResetPath
 fi
@@ -140,7 +144,11 @@ fi
 if [ CHECK_RELEASE -eq 1 ]; then
 	SetPath "Release"
 
+	RegisterTargetDLLs "Release" "/s"
 	RunExamples "Release"
+
+	##UnRegister the DLLs##
+	RegisterTargetDLLs "Release" "/s /u"
 
 	ResetPath
 fi
