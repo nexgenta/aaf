@@ -3,7 +3,7 @@
 //=---------------------------------------------------------------------=
 //
 
-// $Id: CAAFMobTest.cpp,v 1.56 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFMobTest.cpp,v 1.57 2004/09/16 15:09:09 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,9 @@
 // The Initial Developer of the Original Code of this file and the
 // Licensor of the AAF Association is Avid Technology.
 // All rights reserved.
+//
+// Portions created by British Broadcasting Corporation are
+// Copyright 2004, British Broadcasting Corporation.  All rights reserved.
 //
 //=---------------------------------------------------------------------=
 

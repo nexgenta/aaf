@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.25 2004/09/10 17:13:06 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.26 2004/09/16 15:05:46 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,6 +19,9 @@
 // The Initial Developer of the Original Code of this file and the
 // Licensor of the AAF Association is Avid Technology.
 // All rights reserved.
+//
+// Portions created by British Broadcasting Corporation are
+// Copyright 2004, British Broadcasting Corporation.  All rights reserved.
 //
 //=---------------------------------------------------------------------=
 #include "ImplAAFDigitalImageDescriptor.h"
