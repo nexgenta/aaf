@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -63,8 +64,6 @@ AAFRESULT STDMETHODCALLTYPE
       if (AAFRESULT_SUCCESS == hr)
         _current = ++cur;
     }
-		else
-			return AAFRESULT_NO_MORE_OBJECTS;
   }
   return hr;
 }
@@ -141,8 +140,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if (theEnum)
-		  theEnum->ReleaseReference();
-		theEnum = 0;
+			theEnum->ReleaseReference();
 		return(XCODE());
 	}
 	XEND;
@@ -158,7 +156,6 @@ AAFRESULT
 {
   if (_contentStorage)
     _contentStorage->ReleaseReference();
-  _contentStorage = 0;
 
   _contentStorage = pContentStorage;
 
