@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.64.2.2 2004/04/18 16:22:39 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.64.2.3 2004/04/18 19:38:45 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,6 +81,12 @@ class ImplAAFTypeDefSet;
 #include "ImplAAFTypeDef.h"
 #include "ImplAAFDataDef.h"
 #include "ImplAAFPluginDef.h"
+
+// FIXMEJPT Put this here for windows. 
+// Not required on Linux
+#include "ImplAAFKLVDataDefinition.h"
+#include "ImplAAFTaggedValueDefinition.h"
+
 
 class ImplAAFDictionary :
   public OMClassFactory,
