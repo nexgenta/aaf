@@ -63,6 +63,9 @@ public:
     // @cmember Close this <c OMStrongReferenceVectorProperty>.
   virtual void close(void);
 
+    // @cmember Detach this <c OMStrongReferenceVectorProperty>.
+  virtual void detach(void);
+
     // @cmember Restore this <c OMStrongReferenceVectorProperty>, the
     //          external (persisted) size of the
     //          <c OMStrongReferenceVectorProperty> is <p externalSize>.
@@ -83,9 +86,18 @@ public:
   ReferencedObject* setValueAt(const ReferencedObject* object,
                                const size_t index);
 
+    // @cmember The value of this <c OMStrongReferenceVectorProperty>
+    //          at position <p index>.
+  ReferencedObject* valueAt(const size_t index) const;
+
     // @cmember Get the value of this <c OMStrongReferenceVectorProperty>
     //          at position <p index> into <p object>.
   void getValueAt(ReferencedObject*& object, const size_t index) const;
+
+    // @cmember If <p index> is valid, get the value of this
+    //          <c OMStrongReferenceVectorProperty> at position <p index>
+    //          into <p object> and return true, otherwise return false.
+  bool find(const size_t index, ReferencedObject*& object) const;
 
     // @cmember Append the given <p ReferencedObject> <p object> to
     //          this <c OMStrongReferenceVectorProperty>.
@@ -134,6 +146,19 @@ public:
     // @cmember The index of the <p ReferencedObject*> <p object>.
   size_t indexOfValue(const ReferencedObject* object) const;
 
+    // @cmember The number of occurrences of <p object> in this
+    //          <c OMStrongReferenceVectorProperty>.
+  size_t countOfValue(const ReferencedObject* object) const;
+
+    // @cmember Does this <c OMStrongReferenceVectorProperty> contain
+    //          <p index> ? Is <p index> valid ?
+  bool containsIndex(const size_t index) const;
+
+    // @cmember If this <c OMStrongReferenceProperty> contains <p object>
+    //          then place its index in <p index> and return true, otherwise
+    //          return false.
+  bool findIndex(const ReferencedObject* object, size_t& index) const;
+
     // @cmember Increase the capacity of this
     //          <c OMStrongReferenceVectorProperty> so that it
     //          can contain at least <p capacity> <p ReferencedObject>s
@@ -141,6 +166,9 @@ public:
   void grow(const size_t capacity);
 
   // Optional property interface
+
+    // @cmember Is this <c OMStrongReferenceVectorProperty> void ?
+  virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceVectorProperty>.
   virtual void remove(void);
@@ -167,8 +195,7 @@ public:
 private:
 
     // The vector of references.
-  OMVector<OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                           ReferencedObject> > _vector;
+  OMVector<OMStrongReferenceVectorElement<ReferencedObject> > _vector;
 
   friend class OMStrongReferenceVectorIterator<ReferencedObject>;
 
