@@ -1,24 +1,14 @@
 ; --------------------------------------------------------------------------
-;
-; The contents of this file are subject to the AAF SDK Public
-; Source License Agreement (the "License"); You may not use this file
-; except in compliance with the License.  The License is available in
-; AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-; Association or its successor.
-; 
-; Software distributed under the License is distributed on an "AS IS"
-; basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-; the License for the specific language governing rights and limitations
-; under the License.
-; 
-; The Original Code of this file is Copyright 1998-2001, Licensor of the
-; AAF Association.
-; 
-; The Initial Developer of the Original Code of this file and the
-; Licensor of the AAF Association is Avid Technology.
-; All rights reserved.
-;
+; AAFCOM.def - Module definition file for AAFCOM.DLL
 ; --------------------------------------------------------------------------
+; Copyright 1998-1999 Avid Technology, Inc.  All Rights Reserved.
+;
+; THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF 
+; ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO 
+; THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A 
+; PARTICULAR PURPOSE.
+;=--------------------------------------------------------------------------=
+;
 
 LIBRARY		AAFCOAPI
 
@@ -29,14 +19,8 @@ EXPORTS		DllUnregisterServer private
 EXPORTS		DllCanUnloadNow private
 EXPORTS		DllGetClassObject private
 
-
-;=--------------------------------------------------------------------------=
-; AAF exports.
 EXPORTS		AAFFileOpenExistingRead
 EXPORTS		AAFFileOpenExistingModify
 EXPORTS		AAFFileOpenNewModify
 EXPORTS		AAFFileOpenTransient
 EXPORTS		AAFGetPluginManager
-EXPORTS		AAFCreateRawStorageMemory
-EXPORTS		AAFCreateRawStorageDisk
-EXPORTS		AAFCreateAAFFileOnRawStorage
