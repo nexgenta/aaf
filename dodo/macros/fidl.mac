@@ -118,6 +118,18 @@ AD_CLASS_BEGIN\
 
 #ccccccccccccccccccccccccccc
 #c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT2_CLASS_BEGIN 02
+AD_CLASS_BEGIN\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Starts a class definition with no parent class
 #c
 #c Arguments: none
@@ -953,6 +965,18 @@ AD_CLASS_END\
 
 #ccccccccccccccccccccccccccc
 #c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT2_CLASS_END 02
+AD_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
 #c Ends a class definition
 #c
 #c Arguments: none
@@ -1659,4 +1683,13 @@ cpp_quote("          .%08-adornment%09 .%08-indirection %10,")
 cpp_quote("          .%13-adornment%14 .%13-indirection %15,")
 cpp_quote("          .%18-adornment%19 .%18-indirection %20);")
 cpp_quote("")\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c macro for things which are not to be exported.
+#c
+#startm AD_NO_EXPORT 01
+%01\
 #endm
