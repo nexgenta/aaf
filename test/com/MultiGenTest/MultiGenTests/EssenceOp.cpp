@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EssenceOp.cpp,v 1.5 2004/10/28 17:23:22 stuart_hc Exp $ $Name:  $
+// $Id: EssenceOp.cpp,v 1.6 2004/12/07 17:20:35 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -347,7 +347,7 @@ void CountSamples::RunTest( CmdState& state, int argc, char** argv)
   const char* name = argv[1];
   aafSlotID_t slotId = ToULong( argv[2] );
   string compress( argv[3] );
-  unsigned long expectedCount = ToULong( argv[4] );
+  aafLength_t expectedCount = ToULong( argv[4] );
 
   aafCompressEnable_t compressEnable;
  
@@ -385,7 +385,7 @@ void CountSamples::RunTest( CmdState& state, int argc, char** argv)
   if ( expectedCount != count ) {
     stringstream anError;
     anError << "sample counts do not match ("
-	    << static_cast<int>(count) << " != " << static_cast<int>(expectedCount) << ")";
+	    << count << " != " << expectedCount << ")";
     throw TestFailedEx( anError.str() );
   }
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.50 2004/11/22 15:33:37 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.51 2004/12/07 17:20:34 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1190,7 +1190,7 @@ cplusplus_error_exit (j_common_ptr cinfo)
   (*cinfo->err->output_message) (cinfo);
 
   /* Return control to catch block in main compress or decompress routine. */
-  throw HRESULT(cinfo->err);
+  throw cinfo->err;
 }
 
 HRESULT STDMETHODCALLTYPE
