@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: install-headers.bash,v 1.2 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+# $Id: install-headers.bash,v 1.3 2004/02/27 18:32:41 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,13 +42,6 @@ AAFTypeDefUIDs.h \
 
 SOURCE=./include
 DEST=../../ref-impl/include
-
-SDKS="\
-../../AAFMacSDK/include \
-../../AAFMipsIrixSDK/MIPSpro/include \
-../../AAFWinSDK/include \
-../../AAFi686LinuxSDK/g++/include \
-"
 
 FAILURE=1
 SUCCESS=0
@@ -116,41 +109,6 @@ do
       echo "File needs updating \"${DEST}/$h\"."
     fi
   fi
-done
-
-for h in $HEADERS
-do
-  for s in $SDKS
-  do
-    if [[ ! -f $s/$h ]]
-    then
-      if [[ $mode == "update" ]]
-      then
-        echo "Creating \"$s/$h\"."
-        cp ${SOURCE}/$h $s/$h
-      else
-        echo "Can't find \"$s/$h\"."
-      fi
-    fi
-  done
-done
-
-for h in $HEADERS
-do
-  for s in $SDKS
-  do
-    cmp -s $SOURCE/$h $s/$h
-    if [[ ${?} != 0 ]]
-    then
-      if [[ $mode == "update" ]]
-      then
-        echo "Updating \"$s/$h\"."
-        cp $SOURCE/$h $s/$h
-      else
-        echo "File needs updating \"$s/$h\"."
-      fi
-    fi
-  done
 done
 
 exit $SUCCESS
