@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumeratorTest.h,v 1.8 2004/02/27 18:46:43 stuart_hc Exp $ $Name:  $
+// $Id: CEnumeratorTest.h,v 1.9 2004/05/25 17:08:22 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,7 +98,7 @@ void CEnumeratorTest<TEnum,TItem>::Run(testMode_t mode)
 		RemoveTestFile(L"CEnumeratorTest.aaf");
 
 	// Create new AAF file.
-	IAAFFileSP pFile;
+	IAAFFile *pFile;
 	if(mode == kAAFUnitTestReadWrite)
 	{
 		checkResult(AAFFileOpenNewModify(L"CEnumeratorTest.aaf",0,&ProductInfo,
