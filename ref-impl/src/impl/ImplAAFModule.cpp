@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2001 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 ////////////////////////////////////////////////////////////////////////////////
 // @doc
@@ -33,8 +28,6 @@
 // Implementation of DLL Exports
 // 
 // @end
-//
-// Copyright (c)1998-1999 Avid Technologies, Inc. All Rights Reserved
 //
 // Tom Ransdell, Avid AAF Development Team
 // Plugin manager call added by Jeffrey Bedell.
@@ -64,13 +57,6 @@ extern "C" const aafClassID_t CLSID_AAFRawStorage;
 extern "C" const aafClassID_t CLSID_AAFRandomRawStorage;
 
 #include <assert.h>
-
-
-// The first release of AAF (v1.0) does not fully support read/modify/write
-// (a.k.a. edit-in-place).
-#ifndef READMODIFYWRITE_SUPPORTED
-#define READMODIFYWRITE_SUPPORTED 0
-#endif
 
 
 // Define this to 1 to use raw storage implementations of the
@@ -315,7 +301,7 @@ STDAPI ImplAAFFileOpenExistingRead (
 //   - The named file is not a valid AAF file.
 // 
 
-#if ! READMODIFYWRITE_SUPPORTED
+#if defined(READMODIFYWRITE_NOT_SUPPORTED)
 	
 STDAPI ImplAAFFileOpenExistingModify (
   const aafCharacter *,
@@ -326,7 +312,7 @@ STDAPI ImplAAFFileOpenExistingModify (
 	return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
-#else // #if ! READMODIFYWRITE_SUPPORTED	
+#else // #if defined(READMODIFYWRITE_NOT_SUPPORTED)	
 
 STDAPI ImplAAFFileOpenExistingModify (
   // Null-terminated string containing name of filesystem file to be
@@ -424,7 +410,7 @@ STDAPI ImplAAFFileOpenExistingModify (
 #endif // USE_RAW_STORAGE
 }
 
-#endif // #else // #if ! READMODIFYWRITE_SUPPORTED	
+#endif // #else // #if defined(READMODIFYWRITE_NOT_SUPPORTED)	
 
 
 
@@ -867,7 +853,7 @@ ImplAAFCreateAAFFileOnRawStorage
   if (! ppNewFile)
 	return AAFRESULT_NULL_PARAM;
 
-#if ! READMODIFYWRITE_SUPPORTED
+#if defined(READMODIFYWRITE_NOT_SUPPORTED)
 
   if ((kAAFFileExistence_existing == existence) &&
       (kAAFFileAccess_modify == access))
