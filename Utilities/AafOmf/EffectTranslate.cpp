@@ -236,8 +236,13 @@ HRESULT EffectTranslate::GetAAFEffectID(	OMF2::omfUniqueNamePtr_t OMFEffectIDPtr
 		//		printf("%sInvalid DataDef Found in sequence AUID : %s\n", gpGlobals->indentLeader, szAUID);
 		//		fprintf(stderr,"%sInvalid DataDef Found in sequence AUID : %s\n", gpGlobals->indentLeader, szAUID);
 		rc = AAFRESULT_INVALID_DATADEF;
+		*aafUID = kAAFOperationUnknown;
 	}
 
 	return rc;
 }
 
+bool EffectTranslate::RequiresNestedScope(aafUID_t &effectDefAUID)
+{
+	return isPrivateEffect(effectDefAUID);
+}
