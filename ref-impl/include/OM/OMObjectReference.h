@@ -32,11 +32,10 @@
 #include "OMDataTypes.h"
 
 class OMProperty;
+class OMStorable;
 
   // @class Persistent references to persistent objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          object. This type must be a descendant of <c OMStorable>.
-template <typename ReferencedObject>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMObjectReference {
 public:
   // @access Public members.
@@ -59,13 +58,12 @@ public:
     // @cmember Assignment.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide assignment of object references.
-  OMObjectReference<ReferencedObject>& operator=
-                              (const OMObjectReference<ReferencedObject>& rhs);
+  OMObjectReference& operator= (const OMObjectReference& rhs);
 
     // @cmember Equality.
     //          This operator provides value semantics for <c OMContainer>.
     //          This operator does not provide equality of object references.
-  bool operator== (const OMObjectReference<ReferencedObject>& rhs) const;
+  bool operator== (const OMObjectReference& rhs) const;
 
     // @cmember Save this <c OMObjectReference>.
   virtual void save(void) const = 0;
@@ -80,17 +78,17 @@ public:
   virtual void restore(void) = 0;
 
     // @cmember Get the value of this <c OMObjectReference>.
-    //          The value is a pointer to the <c ReferencedObject>.
-  virtual ReferencedObject* getValue(void) const = 0;
+    //          The value is a pointer to the referenced <c OMStorable>.
+  virtual OMStorable* getValue(void) const = 0;
 
     // @cmember Set the value of this <c OMObjectReference>.
-    //          The value is a pointer to the <c ReferencedObject>.
-  virtual ReferencedObject* setValue(const ReferencedObject* value) = 0;
+    //          The value is a pointer to the referenced <c OMStorable>.
+  virtual OMStorable* setValue(const OMStorable* value) = 0;
 
     // @cmember The value of this <c OMObjectReference> as a pointer.
     //          This function provides low-level access. If the object exits
     //          but has not yet been loaded then the value returned is 0.
-  virtual ReferencedObject* pointer(void) const;
+  virtual OMStorable* pointer(void) const;
 
 protected:
   // @access Protected members.
@@ -99,7 +97,7 @@ protected:
   OMProperty* _property;
 
     // @cmember A pointer to the actual object.
-  ReferencedObject* _pointer;
+  OMStorable* _pointer;
 
 };
 
@@ -107,8 +105,9 @@ protected:
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMObjectReference>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
-class OMStrongObjectReference : public OMObjectReference<ReferencedObject> {
+class OMStrongObjectReference : public OMObjectReference {
 public:
   // @access Public members.
 
@@ -151,12 +150,12 @@ public:
   virtual void restore(void);
 
     // @cmember Get the value of this <c OMStrongObjectReference>.
-    //          The value is a pointer to the <c ReferencedObject>.
-  virtual ReferencedObject* getValue(void) const;
+    //          The value is a pointer to the referenced <c OMStorable>.
+  virtual OMStorable* getValue(void) const;
 
     // @cmember Set the value of this <c OMStrongObjectReference>.
     //          The value is a pointer to the <c ReferencedObject>.
-  virtual ReferencedObject* setValue(const ReferencedObject* value);
+  virtual OMStorable* setValue(const OMStorable* value);
 
 protected:
   // @access Protected members.
@@ -193,8 +192,9 @@ class OMStrongReferenceSetProperty;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @base public | <c OMObjectReference>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
-class OMWeakObjectReference : public OMObjectReference<ReferencedObject> {
+class OMWeakObjectReference : public OMObjectReference {
 public:
   // @access Public members.
 
@@ -243,12 +243,12 @@ public:
   virtual void restore(void);
 
     // @cmember Get the value of this <c OMWeakObjectReference>.
-    //          The value is a pointer to the <c ReferencedObject>.
-  virtual ReferencedObject* getValue(void) const;
+    //          The value is a pointer to the referenced <c OMStorable>.
+  virtual OMStorable* getValue(void) const;
 
     // @cmember Set the value of this <c OMWeakObjectReference>.
-    //          The value is a pointer to the <c ReferencedObject>.
-  virtual ReferencedObject* setValue(const ReferencedObject* value);
+    //          The value is a pointer to the referenced <c OMStorable>.
+  virtual OMStorable* setValue(const OMStorable* value);
 
   void setTargetTag(OMPropertyTag targetTag);
 
