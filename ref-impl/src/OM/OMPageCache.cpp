@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPageCache.cpp,v 1.9 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMPageCache.cpp,v 1.9.2.1 2004/07/22 18:18:12 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,9 @@ OMPageCache::OMPageCache(OMUInt32 pageSize,
 : _pageSize(pageSize),
   _pageCount(pageCount),
   _validPageCount(0),
-  _mruEntry(0)
+  _mruEntry(0),
+  _cache(),
+  _mruList()
 {
   TRACE("OMPageCache::OMPageCache");
 
