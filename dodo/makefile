@@ -1,82 +1,119 @@
-#################################################
-#                                               #
-# Copyright (c) 1998-1999 Avid Technology, Inc. #
-#                                               #
-#################################################
+############################################
+#                                          #
+# Copyright (c) 1998 Avid Technology, Inc. #
+#                                          #
+############################################
 
-all : dodo-app aafobjects.all targets.mk depend.mk targets
+all : tool targets
 
 BLD_CFG_DIR = ../ref-impl/bld_cfg
-
-SRC_DIR = ../ref-impl/src
-
-INCLUDE_DIR = ../ref-impl/include
-
 
 include $(BLD_CFG_DIR)/common.mk
 
 DODO = dodo.$(EXE)
 
-dodo-app:
-	@$(ECHO) "\n======== [ /coresw/AAF-toolkit/dodo/tool ] \n"
-	cd tool ;  $(MAKE) $(RELENG_MAKEFLAGS)
+tool:
+	$(SH_PREFIX) cd tool ;  $(MAKE) $(SH_SUFFIX)
 
 test_only:
-	cd tool ; $(MAKE) $(RELENG_MAKEFLAGS) test_only
-	$(MAKE) -f dodotargets.mak $(RELENG_MAKEFLAGS)
-	$(MAKE) -f dododepend.mak $(RELENG_MAKEFLAGS)
-	$(MAKE) -f maketargets.mak $(RELENG_MAKEFLAGS)
+	$(SH_PREFIX) cd tool ; $(MAKE) test_only $(SH_SUFFIX)
 
 run:
-	$(MAKE) -f dodotargets.mak $(RELENG_MAKEFLAGS)
-	$(MAKE) -f dododepend.mak $(RELENG_MAKEFLAGS)
-	$(MAKE) -f maketargets.mak $(RELENG_MAKEFLAGS)
-	cd tool ; $(MAKE) $(RELENG_MAKEFLAGS) run
+	 $(SH_PREIX) cd tool ; $(MAKE) run $(SH_SUFFIX)
 
+.SUFFIXES: .cpp .h .comc .comh .dod .exp .idl
 
+DODO_TARGETS = \
+	AAFSourceClip.all \
+	AAFSourceReference.all \
+	AAFComponent.all \
+	AAFUnitTest.all \
+	AAFCompositionMob.all
 
-# Make sure our list of objects in the include src directories is up-to-date.
-# (TomR) We should probably move aafobjects.mk and the following behavior to 
-# the ref-impl make file...
-aafobjects.all : \
-	$(INCLUDE_DIR)/com-api/aafobjects.mk \
-	$(SRC_DIR)/com-api/aafobjects.mk 
+targets: $(DODO_TARGETS)
 
-$(INCLUDE_DIR)/com-api/aafobjects.mk : aafobjects.mk
-	@$(ECHO) "\n======== [ /coresw/AAF-toolkit/dodo ] \"Building $(INCLUDE_DIR)/com-api/aafobjects.mk\"\n"
-	$(RM) -f $(INCLUDE_DIR)/com-api/aafobjects.mk
-	$(CP) aafobjects.mk $(INCLUDE_DIR)/com-api
+.dod.exp :
+	$(SH_PREFIX) $(RM) -f $*.exp $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/exp.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.exp $(SH_SUFFIX)
 
-$(SRC_DIR)/com-api/aafobjects.mk : aafobjects.mk
-	@$(ECHO) "\n======== [ /coresw/AAF-toolkit/dodo ] \"Building $(SRC_DIR)/com-api/aafobjects.mk\"\n"
-	$(RM) -f $(SRC_DIR)/com-api/aafobjects.mk
-	$(CP) aafobjects.mk $(SRC_DIR)/com-api
+.dod.h :
+	$(SH_PREFIX) $(RM) -f $*.h $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/h.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.h $(SH_SUFFIX)
 
+.dod.comh :
+	$(SH_PREFIX) $(RM) -f $*.comh $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/comh.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.comh $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.comh C$*.h $(SH_SUFFIX)
 
+.dod.comc :
+	$(SH_PREFIX) $(RM) -f $*.comc $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/comc.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.comc $(SH_SUFFIX)
+	$(SH_PREFIX) cp $*.comc C$*.cpp $(SH_SUFFIX)
 
+.dod.cpp :
+	$(SH_PREFIX) $(RM) -f $*.cpp $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/cpp.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.cpp $(SH_SUFFIX)
 
-
-#targets: aafobjects.mk targets.mk depend.mk
-
-targets: 
-	@$(ECHO) "\n======== [ /coresw/AAF-toolkit/dodo ] \"Building targets\"\n"
-	$(MAKE) -f maketargets.mak $(RELENG_MAKEFLAGS)
-
-
-targets.mk : aafobjects.mk
-	@$(ECHO) "\n======== [ /coresw/AAF-toolkit/dodo ] \"Building targets.mk\"\n"
-	$(MAKE) -f dodotargets.mak $(RELENG_MAKEFLAGS)
-
-depend.mk : aafobjects.mk
-	@$(ECHO) "\n======== [ /coresw/AAF-toolkit/dodo ] \"Building depend.mk\"\n"
-	$(MAKE) -f dododepend.mak $(RELENG_MAKEFLAGS)
-
-depend : targets.mk depend.mk
+.dod.idl :
+	$(SH_PREFIX) $(RM) -f $*.idl $(SH_SUFFIX)
+	$(SH_PREFIX) ./tool/$(DODO) -f macros/idl.mac < $*.dod > $*.tmp $(SH_SUFFIX)
+	$(SH_PREFIX) mv $*.tmp $*.idl $(SH_SUFFIX)
 
 clean:
-	cd tool ; $(MAKE) clean
-	$(MAKE) -f dodotargets.mak clean
-	$(MAKE) -f dododepend.mak clean
-	$(TOUCH) targets.mk depend.mk
-	$(MAKE) -f maketargets.mak clean
-	$(RM) -f targets.mk depend.mk
+	$(SH_PREFIX) cd tool ; $(MAKE) clean $(SH_SUFFIX)
+	$(SH_PREFIX) $(RM) -rf *.cpp *.h *.idl *.exp *.comc *.comh $(SH_SUFFIX)
+
+AAFUnitTest.all : AAFUnitTest.cpp AAFUnitTest.h
+AAFUnitTest.all : AAFUnitTest.comc AAFUnitTest.comh
+AAFUnitTest.all : AAFUnitTest.exp AAFUnitTest.idl
+AAFUnitTest.exp : AAFUnitTest.dod macros/exp.mac
+AAFUnitTest.h : AAFUnitTest.exp macros/h.mac
+AAFUnitTest.cpp : AAFUnitTest.exp macros/cpp.mac
+AAFUnitTest.idl : AAFUnitTest.exp macros/idl.mac
+AAFUnitTest.comc : AAFUnitTest.exp macros/comc.mac
+AAFUnitTest.comh : AAFUnitTest.exp macros/comh.mac
+
+AAFComponent.all : AAFComponent.cpp AAFComponent.h
+AAFComponent.all : AAFComponent.comc AAFComponent.comh
+AAFComponent.all : AAFComponent.exp AAFComponent.idl
+AAFComponent.exp : AAFUnitTest.exp macros/exp.mac
+AAFComponent.h : AAFComponent.exp macros/h.mac
+AAFComponent.cpp : AAFComponent.exp macros/cpp.mac
+AAFComponent.idl : AAFComponent.exp macros/idl.mac
+AAFComponent.comc : AAFComponent.exp macros/comc.mac
+AAFComponent.comh : AAFComponent.exp macros/comh.mac
+
+AAFSourceReference.all : AAFSourceReference.cpp AAFSourceReference.h
+AAFSourceReference.all : AAFSourceReference.comc AAFSourceReference.comh
+AAFSourceReference.all : AAFSourceReference.exp AAFSourceReference.idl
+AAFSourceReference.exp : AAFSourceReference.dod AAFUnitTest.exp macros/exp.mac
+AAFSourceReference.h : AAFSourceReference.exp macros/h.mac
+AAFSourceReference.cpp : AAFSourceReference.exp macros/cpp.mac
+AAFSourceReference.idl : AAFSourceReference.exp macros/idl.mac
+AAFSourceReference.comc : AAFSourceReference.exp macros/comc.mac
+AAFSourceReference.comh : AAFSourceReference.exp macros/comh.mac
+
+AAFSourceClip.all : AAFSourceClip.cpp AAFSourceClip.h
+AAFSourceClip.all : AAFSourceClip.comc AAFSourceClip.comh
+AAFSourceClip.all : AAFSourceClip.exp AAFSourceClip.idl
+AAFSourceClip.exp : AAFSourceReference.exp AAFUnitTest.exp macros/exp.mac
+AAFSourceClip.h : AAFSourceClip.exp macros/h.mac
+AAFSourceClip.cpp : AAFSourceClip.exp macros/cpp.mac
+AAFSourceClip.idl : AAFSourceClip.exp macros/idl.mac
+AAFSourceClip.comc : AAFSourceClip.exp macros/comc.mac
+AAFSourceClip.comh : AAFSourceClip.exp macros/comh.mac
+
+AAFCompositionMob.all : AAFCompositionMob.cpp AAFCompositionMob.h
+AAFCompositionMob.all : AAFCompositionMob.comc AAFCompositionMob.comh
+AAFCompositionMob.all : AAFCompositionMob.exp AAFCompositionMob.idl
+AAFCompositionMob.exp : AAFUnitTest.exp macros/exp.mac
+AAFCompositionMob.h : AAFCompositionMob.exp macros/h.mac
+AAFCompositionMob.cpp : AAFCompositionMob.exp macros/cpp.mac
+AAFCompositionMob.idl : AAFCompositionMob.exp macros/idl.mac
+AAFCompositionMob.comc : AAFCompositionMob.exp macros/comc.mac
+AAFCompositionMob.comh : AAFCompositionMob.exp macros/comh.mac
