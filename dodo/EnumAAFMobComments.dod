@@ -1,24 +1,3 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
 #startm .this-module 0
 EnumAAFMobComments\
 #endm
@@ -27,16 +6,20 @@ AAFRoot\
 #endm
 #c
 AD_HEAD
- 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 AD_CLASS_UUID(B1A213A7, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A213A6, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_XCLASS_BEGIN(Concrete, Transient)
+AD_CLASS_BEGIN
 
 AD_METHOD1(NextOne,
 			[out\\\,retval], aafMobComment_t *, pMobComment, The Next MobComment,
@@ -79,4 +62,4 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_XCLASS_END(Concrete, Transient)
+AD_CLASS_END
