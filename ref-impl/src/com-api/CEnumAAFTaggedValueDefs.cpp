@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFTaggedValueDefs.cpp,v 1.1.2.1 2004/04/18 19:11:53 jptrainor Exp $ $Name:  $
+// $Id: CEnumAAFTaggedValueDefs.cpp,v 1.1.2.2 2004/04/29 13:11:04 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,11 +25,14 @@
 //=---------------------------------------------------------------------=
 
 
+#include "ImplAAFPropertyDef.h"
+
 
 #include "CEnumAAFTaggedValueDefs.h"
 #include "ImplEnumAAFTaggedValueDefs.h"
 #include "AAFResult.h"
 #include "CAAFEnumValidation.h"
+
 
 #include "OMAssertions.h"
 #include "OMExceptions.h"

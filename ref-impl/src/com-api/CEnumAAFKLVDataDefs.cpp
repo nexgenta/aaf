@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFKLVDataDefs.cpp,v 1.1.2.1 2004/04/18 19:12:47 jptrainor Exp $ $Name:  $
+// $Id: CEnumAAFKLVDataDefs.cpp,v 1.1.2.2 2004/04/29 13:11:43 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,8 @@
 //=---------------------------------------------------------------------=
 
 
+#include "ImplAAFPropertyDef.h"
+#include "ImplAAFTypeDef.h"
 
 #include "CEnumAAFKLVDataDefs.h"
 #include "ImplEnumAAFKLVDataDefs.h"
