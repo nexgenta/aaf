@@ -1,29 +1,24 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
 #include "OMObjectReference.h"
@@ -383,6 +378,13 @@ OMStorable* OMStrongObjectReference::setValue(const OMStorable* value)
   return oldObject;
 }
 
+const wchar_t* OMStrongObjectReference::name(void) const
+{
+  TRACE("OMStrongObjectReference::name");
+
+  return _name;
+}
+
   // @mfunc Is this <c OMStrongObjectReference> in the loaded state. If false
   //        there is a persisted representation of this
   //        <c OMStrongObjectReference> that can be loaded.
@@ -605,6 +607,12 @@ OMStorable* OMWeakObjectReference::getValue(void) const
     set()->find(&nonConstThis->_identification, object);
     nonConstThis->_pointer = object;
   }  
+  // If the following assertion is violated we have a dangling weak
+  // reference.  The reference illegally designates an object that is
+  // not present in the target set.  Code elsewhere prevents the
+  // removal of objects that are weakly referenced hence a dangling
+  // reference is an assertion violation rather than a run-time error.
+  //
   POSTCONDITION("Object found",
                    IMPLIES(_identification != nullOMUniqueObjectIdentification,
                            _pointer != 0));
@@ -642,6 +650,27 @@ OMStorable* OMWeakObjectReference::setValue(
   return oldObject;
 }
 
+OMStrongReferenceSet*
+OMWeakObjectReference::targetSet(const OMProperty* property,
+                                 OMPropertyTag targetTag)
+{
+  TRACE("OMWeakObjectReference::targetSet");
+
+  ASSERT("Valid containing property", property != 0);
+  OMFile* file = property->propertySet()->container()->file();
+  OMPropertyTable* table = file->referencedProperties();
+  ASSERT("Valid target tag", table->isValid(targetTag));
+  const OMPropertyId* targetPath = table->valueAt(targetTag);
+  ASSERT("Valid target path", validPropertyPath(targetPath));
+
+  OMProperty* set = file->findProperty(targetPath);
+
+  OMStrongReferenceSet* result = dynamic_cast<OMStrongReferenceSet*>(set);
+
+  POSTCONDITION("Valid result", result != 0);
+  return result;
+}
+
 const OMUniqueObjectIdentification&
 OMWeakObjectReference::identification(void) const
 {
@@ -658,18 +687,9 @@ OMStrongReferenceSet* OMWeakObjectReference::set(void) const
   TRACE("OMWeakObjectReference::set");
 
   if (_targetSet == 0) {
-    ASSERT("Valid containing property", _property != 0);
-    OMFile* file = _property->propertySet()->container()->file();
-    OMPropertyTable* table = file->referencedProperties();
-    ASSERT("Valid target tag", table->isValid(_targetTag));
-    const OMPropertyId* targetPath = table->valueAt(_targetTag);
-    ASSERT("Valid target path", validPropertyPath(targetPath));
-
-    OMProperty* property = file->findProperty(targetPath);
-
     OMWeakObjectReference* nonConstThis =
                                       const_cast<OMWeakObjectReference*>(this);
-    nonConstThis->_targetSet = dynamic_cast<OMStrongReferenceSet*>(property);
+    nonConstThis->_targetSet = targetSet(_property, _targetTag);
   }
 
   POSTCONDITION("Valid result", _targetSet != 0);
