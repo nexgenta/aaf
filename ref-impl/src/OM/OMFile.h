@@ -104,6 +104,15 @@ public:
                                const OMFileSignature& signature,
                                OMDictionary* dictionary = 0);
 
+    // @cmember Is the given <c OMRawStorage> compatible with the given file
+    //          access mode and signature ? Can a file of the encoding
+    //          specified by <p signature> be created successfully on
+    //          <p rawStorage> and then accessed successfully in the mode
+    //          specified by <p accessMode> ?
+  static bool compatibleRawStorage(const OMRawStorage* rawStorage,
+                                   const OMAccessMode accessMode,
+                                   const OMFileSignature& signature);
+
     // @cmember Open an existing <c OMFile> for read-only access.
     // @devnote Will superceed openExistingRead() above.
   static OMFile* openExistingRead(OMRawStorage* rawStorage,
@@ -120,6 +129,15 @@ public:
                                     const OMLoadMode loadMode,
                                     OMDictionary* dictionary = 0);
 
+    // @cmember Open a new <c OMFile> for write access.
+  static OMFile* openNewWrite(OMRawStorage* rawStorage,
+                              const OMClassFactory* factory,
+                              void* clientOnRestoreContext,
+                              const OMByteOrder byteOrder,
+                              OMStorable* clientRoot,
+                              const OMFileSignature& signature,
+                              OMDictionary* dictionary = 0);
+
     // @cmember Open a new <c OMFile> for modify access.
     // @devnote Will superceed openNewModify() above.
   static OMFile* openNewModify(OMRawStorage* rawStorage,
@@ -135,58 +153,13 @@ public:
 
   // @access Public members.
 
-    // @cmember Constructor. Create an <c OMFile> object representing
-    //          an existing external file.
-  OMFile(const wchar_t* fileName,
-         void* clientOnRestoreContext,
-         const OMAccessMode mode,
-         OMStoredObject* store,
-         const OMClassFactory* factory,
-         OMDictionary* dictionary,
-         const OMLoadMode loadMode);
-
-    // @cmember Constructor. Create an <c OMFile> object representing
-    //          a new external file.
-  OMFile(const wchar_t* fileName,
-         void* clientOnRestoreContext,
-         OMFileSignature signature,
-         const OMAccessMode mode,
-         OMStoredObject* store,
-         const OMClassFactory* factory,
-         OMDictionary* dictionary,
-         OMRootStorable* root);
-
-    // @cmember Constructor. Create an <c OMFile> object representing
-    //          an existing external file.
-    // @devnote Will superceed OMFile::OMFile (for existing files) above.
-  OMFile(OMRawStorage* rawStorage,
-         const OMFileEncoding encoding,
-         void* clientOnRestoreContext,
-         const OMAccessMode mode,
-         OMStoredObject* store,
-         const OMClassFactory* factory,
-         OMDictionary* dictionary,
-         const OMLoadMode loadMode);
-
-    // @cmember Constructor. Create an <c OMFile> object representing
-    //          a new external file.
-    // @devnote Will superceed OMFile::OMFile (for new files) above.
-  OMFile(OMRawStorage* rawStorage,
-         const OMFileEncoding encoding,
-         void* clientOnRestoreContext,
-         OMFileSignature signature,
-         const OMAccessMode mode,
-         OMStoredObject* store,
-         const OMClassFactory* factory,
-         OMDictionary* dictionary,
-         OMRootStorable* root);
-
     // @cmember Destructor.
   ~OMFile(void);
 
     // @cmember Save all changes made to the contents of this
     //          <c OMFile>. It is not possible to save
     //          read-only or transient files.
+    //   @precondition <f isOpen()>
   void saveFile(void* clientOnSaveContext = 0);
 
     // @cmember Save the entire contents of this <c OMFile> as well as
@@ -202,10 +175,29 @@ public:
 
     // @cmember Restore the client root <c OMStorable> object from
     //          this <c OMFile>.
+    //   @precondition <f isOpen()>
   OMStorable* restore(void);
 
+    // @cmember Open this <c OMFile>.
+    //   @precondition <f !isOpen()>
+    //   @precondition <f !isClosed()>
+    //   @postcondition <f isOpen()>
+  void open(void);
+
     // @cmember Close this <c OMFile>, any unsaved changes are discarded.
+    //   @precondition <f isOpen()>
+    //   @postcondition <f !isOpen()>
+    //   @postcondition <f isClosed()>
   void close(void);
+
+    // @cmember Is this <c OMFile> open ?
+  bool isOpen(void) const;
+
+    // @cmember Is this <c OMFile> closed ? Note that <f isClosed()> is not the
+    //          same as !<f isOpen()> since before open() is called,
+    //          <f isClosed()> is false. That is, <f isClosed()> means
+    //          "was once open and is now closed".
+  bool isClosed(void) const;
 
     // @cmember Retrieve the client root <c OMStorable> from this <c OMFile>.
   OMStorable* clientRoot(void);
@@ -229,6 +221,12 @@ public:
 
     // @cmember The access mode of this <c OMFile>.
   OMAccessMode accessMode(void) const;
+
+    // @cmember Is it possible to read from this <c OMFile> ?
+  bool isReadable(void) const;
+
+    // @cmember Is it possible to write to this <c OMFile> ?
+  bool isWritable(void) const;
 
     // @cmember Is this file recognized by the Object Manager ?
   bool isOMFile(void) const;
@@ -271,6 +269,49 @@ public:
 private:
   // @access Private members.
 
+    // @cmember Constructor. Create an <c OMFile> object representing
+    //          an existing external file.
+  OMFile(const wchar_t* fileName,
+         void* clientOnRestoreContext,
+         const OMAccessMode mode,
+         OMStoredObject* store,
+         const OMClassFactory* factory,
+         OMDictionary* dictionary,
+         const OMLoadMode loadMode);
+
+    // @cmember Constructor. Create an <c OMFile> object representing
+    //          a new external file.
+  OMFile(const wchar_t* fileName,
+         void* clientOnRestoreContext,
+         OMFileSignature signature,
+         const OMAccessMode mode,
+         OMStoredObject* store,
+         const OMClassFactory* factory,
+         OMDictionary* dictionary,
+         OMRootStorable* root);
+
+    // @cmember Constructor. Create an <c OMFile> object representing
+    //          an existing external file.
+    // @devnote Will superceed OMFile::OMFile (for existing files) above.
+  OMFile(OMRawStorage* rawStorage,
+         void* clientOnRestoreContext,
+         const OMAccessMode mode,
+         const OMClassFactory* factory,
+         OMDictionary* dictionary,
+         const OMLoadMode loadMode);
+
+    // @cmember Constructor. Create an <c OMFile> object representing
+    //          a new external file.
+    // @devnote Will superceed OMFile::OMFile (for new files) above.
+  OMFile(OMRawStorage* rawStorage,
+         void* clientOnRestoreContext,
+         OMFileSignature signature,
+         const OMAccessMode mode,
+         const OMClassFactory* factory,
+         OMDictionary* dictionary,
+         OMRootStorable* root,
+         const OMByteOrder byteOrder);
+
     // @cmember Read the signature from the given file.
   static void readSignature(const wchar_t* fileName,
                             OMFileSignature& signature);
@@ -280,6 +321,14 @@ private:
                             OMFileSignature& signature);
 
   static OMFileEncoding encodingOf(const OMFileSignature& signature);
+
+  void openRead(void);
+
+  void openModify(void);
+
+  void createModify(void);
+
+  void createWrite(void);
 
   OMRootStorable* _root;
   OMStoredObject* _rootStore;
@@ -298,6 +347,12 @@ private:
 
   enum OMFileEncoding _encoding;
   OMRawStorage* _rawStorage;
+
+  bool _isOpen;
+  bool _isClosed;
+  bool _isNew;
+  OMByteOrder _byteOrder;
+
 };
 
 #endif
