@@ -34,10 +34,6 @@
 #include "ImplAAFObject.h"
 #include "OMProperty.h"
 
-// Persistent Property IDs
-
-const int PID_SOURCEREFERENCE_SOURCEID		= 2;
-const int PID_SOURCEREFERENCE_SOURCEMOBSLOTID	= 3;
 
 class ImplAAFSourceReference : public ImplAAFSegment
 {
@@ -83,6 +79,10 @@ public:
 		// @parm [in] Source Mob ID to set
         (aafSlotID_t   mobSlotID);
 
+public:
+	//SDK-private
+
+	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
 
 
 public:

@@ -7,7 +7,6 @@
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
 #endif
-#include "OMProperty.h"
 
 /******************************************\
 *                                          *
@@ -29,10 +28,6 @@
 // aafUInt32,
 // AAFDataDef
 
-const int PID_MOBSLOT_NAME				= 0;
-const int PID_MOBSLOT_TRACKID			= 1;
-const int PID_MOBSLOT_PHYSICAL_TRACK	= 2;
-const int PID_MOBSLOT_SEGMENT			= 3;
 
 class ImplAAFSegment;
 
@@ -116,7 +111,7 @@ public:
 
 
   //****************
-  // GetDataKind()
+  // GetDataDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetDataDef
@@ -141,13 +136,24 @@ public:
   );
 
 public:
+// Internal to the SDK, but available to other SDK internal code.
+  virtual AAFRESULT FindSegment(aafPosition_t offset,
+										  ImplAAFSegment **segment,
+										  aafRational_t *srcRate,
+										  aafPosition_t *diffPos);
+  virtual AAFRESULT ConvertToEditRate(aafPosition_t tmpPos,
+										aafRational_t destRate,
+										aafPosition_t *convertPos);
+  virtual AAFRESULT ConvertToMyRate(aafPosition_t tmpPos,
+										  ImplAAFMobSlot *srcSlot,
+										aafPosition_t *convertPos);
+  virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
+
+
+public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFMobSlotTest.cpp.
   static AAFRESULT test();
-
-  // Return this objects stored object class.
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
 
 protected:
 	OMWideStringProperty				_name;
