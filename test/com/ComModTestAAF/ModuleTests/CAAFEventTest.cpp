@@ -27,22 +27,14 @@
  *
  ************************************************************************/
 
-
-
-
-
-
-
 #include "AAF.h"
-
 
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
 #include <memory.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -63,7 +55,6 @@ static void RemoveTestFile(const wchar_t* pFileName)
   }
 }
 
-
 // convenient error handlers.
 inline void checkResult(HRESULT r)
 {
@@ -75,6 +66,9 @@ inline void checkExpression(bool expression, HRESULT r)
   if (!expression)
     throw r;
 }
+
+static const aafUID_t DDEF_TEST = 
+{ 0x81831639, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 
 class EventTest
@@ -116,13 +110,15 @@ extern "C" HRESULT CAAFEvent_test()
   aafWChar * pFileName = L"AAFEventTest.aaf";
 
   // Initialize the product info for this module test
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFEvent Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -145,7 +141,8 @@ extern "C" HRESULT CAAFEvent_test()
   }
   catch (...)
   {
-    cerr << "CAAFEventMobSlot_test...Caught general C++ exception!" << endl;
+    cerr << "CAAFEventMobSlot_test..."
+		 << "Caught general C++ exception!" << endl;
     hr = AAFRESULT_TEST_FAILED;
   }
 
@@ -253,19 +250,31 @@ void EventTest::CreateEvent()
   IAAFEventMobSlot *pEventMobSlot = NULL;
   IAAFSegment *pSegment = NULL;
   IAAFMobSlot *pMobSlot = NULL;
+  IAAFDataDef *pDataDef = NULL;
+  IAAFComponent *pComp = NULL;
   IAAFMob *pMob = NULL;
 
   CAAFBuiltinDefs defs (_pDictionary);
 
   try
   {
-    // Create an event (note: this will be replaced by a concrete event in a
-    // later version after such an event is implemented.)
-    checkResult(defs.cdEvent()->
+	  // not already in dictionary
+		checkResult(defs.cdDataDef()->
+					CreateInstance (IID_IAAFDataDef,
+									(IUnknown **)&pDataDef));
+	  hr = pDataDef->Initialize (DDEF_TEST, L"Test", L"Test data");
+	  hr = _pDictionary->RegisterDataDef (pDataDef);
+
+	// Create a concrete subclass of event
+    checkResult(defs.cdCommentMarker()->
 				CreateInstance(IID_IAAFEvent, 
 							   (IUnknown **)&pEvent));
     checkResult(pEvent->SetPosition(_position));
     checkResult(pEvent->SetComment(const_cast<wchar_t*>(_eventComment)));
+	checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pComp));
+	checkResult(pComp->SetDataDef(pDataDef));
+	pComp->Release();
+	pComp = NULL;
 
     // Get the segment inteface to the event to install into the mob slot.
     checkResult(pEvent->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
@@ -309,6 +318,18 @@ void EventTest::CreateEvent()
   {
     pMob->Release();
     pMob = NULL;
+  }
+
+  if (pDataDef)
+  {
+    pDataDef->Release();
+    pDataDef = NULL;
+  }
+
+  if (pComp)
+  {
+    pComp->Release();
+    pComp = NULL;
   }
 
   if (pMobSlot)
@@ -383,7 +404,7 @@ void EventTest::OpenEvent()
 
     // Validate the comment buffer size.
     aafUInt32 expectedLen = wcslen(_eventComment) + 1;
-    aafUInt32 expectedSize = expectedLen * 2;
+    aafUInt32 expectedSize = expectedLen * sizeof(wchar_t);
     aafUInt32 commentBufSize = 0;
     checkResult(pEvent->GetCommentBufLen(&commentBufSize));
     checkExpression(commentBufSize == expectedSize, AAFRESULT_TEST_FAILED);

@@ -32,12 +32,15 @@
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"
+#include "AAFClassDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -48,6 +51,7 @@ typedef IAAFSmartPointer<IAAFComponent>             IAAFComponentSP;
 typedef IAAFSmartPointer<IAAFContainerDef>          IAAFContainerDefSP;
 typedef IAAFSmartPointer<IAAFDataDef>               IAAFDataDefSP;
 typedef IAAFSmartPointer<IAAFDefObject>             IAAFDefObjectSP;
+typedef IAAFSmartPointer<IAAFMetaDefinition>        IAAFMetaDefinitionSP;
 typedef IAAFSmartPointer<IAAFDictionary>            IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFFile>                  IAAFFileSP;
 typedef IAAFSmartPointer<IAAFFiller>                IAAFFillerSP;
@@ -58,7 +62,7 @@ typedef IAAFSmartPointer<IAAFMobSlot>               IAAFMobSlotSP;
 typedef IAAFSmartPointer<IAAFObject>                IAAFObjectSP;
 typedef IAAFSmartPointer<IAAFOperationDef>          IAAFOperationDefSP;
 typedef IAAFSmartPointer<IAAFParameterDef>          IAAFParameterDefSP;
-typedef IAAFSmartPointer<IAAFPluginDescriptor>      IAAFPluginDescriptorSP;
+typedef IAAFSmartPointer<IAAFPluginDef>				IAAFPluginDefSP;
 typedef IAAFSmartPointer<IAAFPropertyDef>           IAAFPropertyDefSP;
 typedef IAAFSmartPointer<IAAFPropertyValue>         IAAFPropertyValueSP;
 typedef IAAFSmartPointer<IAAFSegment>               IAAFSegmentSP;
@@ -66,6 +70,7 @@ typedef IAAFSmartPointer<IAAFSequence>              IAAFSequenceSP;
 typedef IAAFSmartPointer<IAAFTimelineMobSlot>       IAAFTimelineMobSlotSP;
 typedef IAAFSmartPointer<IAAFTypeDef>               IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefInt>            IAAFTypeDefIntSP;
+typedef IAAFSmartPointer<IAAFTypeDefRename>         IAAFTypeDefRenameSP;
 typedef IAAFSmartPointer<IEnumAAFClassDefs>         IEnumAAFClassDefsSP;
 typedef IAAFSmartPointer<IEnumAAFCodecDefs>         IEnumAAFCodecDefsSP;
 typedef IAAFSmartPointer<IEnumAAFComponents>        IEnumAAFComponentsSP;
@@ -76,7 +81,7 @@ typedef IAAFSmartPointer<IEnumAAFMobSlots>          IEnumAAFMobSlotsSP;
 typedef IAAFSmartPointer<IEnumAAFMobs>              IEnumAAFMobsSP;
 typedef IAAFSmartPointer<IEnumAAFOperationDefs>     IEnumAAFOperationDefsSP;
 typedef IAAFSmartPointer<IEnumAAFParameterDefs>     IEnumAAFParameterDefsSP;
-typedef IAAFSmartPointer<IEnumAAFPluginDescriptors> IEnumAAFPluginDescriptorsSP;
+typedef IAAFSmartPointer<IEnumAAFPluginDefs>		IEnumAAFPluginDefsSP;
 typedef IAAFSmartPointer<IEnumAAFTypeDefs>          IEnumAAFTypeDefsSP;
 typedef IAAFSmartPointer<IUnknown>                  IUnknownSP;
 
@@ -132,8 +137,14 @@ static const aafUID_t kTestInterpolationDefID =
 { 0x8cf6dbb3, 0x7bfc, 0x11d3, { 0x84, 0x4f, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
 // {8CF6DBB4-7BFC-11d3-844F-00600832ACB8}
-static const aafUID_t kTestPluginDescriptorID = 
+static const aafUID_t kTestPluginDefID = 
 { 0x8cf6dbb4, 0x7bfc, 0x11d3, { 0x84, 0x4f, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
+
+// Test MobID
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x17c73136, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -183,14 +194,29 @@ static void RegisterNewClass (IAAFDictionary * pDictionary)
   checkResult (pDictionary->LookupClassDef (AUID_AAFFiller, &pFillClass));
   assert (pFillClass);
 
+  // Create a foward class reference to the new filler class (not really required).
+  // This is just to test the methods on Dictionary that implement foward class
+  // references.
+  checkResult (pDictionary->CreateForwardClassReference(kClassAUID_NewFill));
+
+  // Try a negative test: Attempt to create a forward class reference with the
+  // same class id. This should fail.
+  checkExpression(FAILED(pDictionary->CreateForwardClassReference(kClassAUID_NewFill)), AAFRESULT_TEST_FAILED);
+
+  // Make sure that the new filler class is recognized as a foward class reference.
+  aafBoolean_t isaFowardReference;
+  checkResult (pDictionary->HasForwardClassReference(kClassAUID_NewFill, &isaFowardReference));
+  checkExpression (kAAFTrue == isaFowardReference, AAFRESULT_TEST_FAILED);
+
   // Create new object for our new filler class, and initialize it.
   IAAFClassDefSP pNewFillClass;
-  checkResult (defs.cdClassDef()->
-			   CreateInstance(IID_IAAFClassDef,
-							  (IUnknown **)&pNewFillClass));
+  checkResult (pDictionary->CreateMetaInstance(AUID_AAFClassDef,
+                                               IID_IAAFClassDef,
+                                               (IUnknown **)&pNewFillClass));
   checkResult (pNewFillClass->Initialize (kClassAUID_NewFill,
 										  pFillClass,
-										  L"New Filler"));
+										  L"New Filler",
+										  kAAFTrue));
 
   // Get type def for uint32
   IAAFTypeDefSP ptd;
@@ -203,13 +229,56 @@ static void RegisterNewClass (IAAFDictionary * pDictionary)
 	(pNewFillClass->RegisterNewPropertyDef (kPropAUID_NewFill_Odor,
 											L"Odor",
 											ptd,
-											AAFFalse,  // mandatory
+											kAAFFalse,  // mandatory
+											kAAFFalse,  // not a unique identifer
 											0));
 
   // Register it in the dictionary.
   checkResult (pDictionary->RegisterClassDef (pNewFillClass));
+ 
+  // If RegisterClassDef succeeds then there should be no foward reference
+  // to kClassAUID_NewFill. Test: Make sure that the new filler class is no longer 
+  // recognized as a foward class reference.
+  checkResult (pDictionary->HasForwardClassReference(kClassAUID_NewFill, &isaFowardReference));
+  checkExpression (kAAFFalse == isaFowardReference, AAFRESULT_TEST_FAILED);
 }
 										  
+#define RegisterOneMetaDef( \
+ pDict,   /* Dictionary with which to test */ \
+ auid,   /* auid of class def for the def to test */ \
+ \
+ initTypeIID, /* IID of type to pass to Init */ \
+ initTypeSP, /* Type of smart pointer to use with Init */ \
+ initInvoc, /* expression to invoke to initialize */ \
+ \
+ qiTypeIID, /* IID of type to QI */ \
+ qiTypeSP,  /* SP for type to QI */ \
+ \
+ registerTypeIID, /* IID of type to register */ \
+ registerTypeSP, /* Type of smart pointer to register def */ \
+ regFunc) /* Registration function on dict */ \
+{ \
+  HRESULT hr; \
+  assert (pDict); \
+  \
+  initTypeSP pInitIfc; \
+  hr = pDict->CreateMetaInstance(auid, initTypeIID, (IUnknown**) &pInitIfc); \
+  if (AAFRESULT_FAILED (hr)) return hr; \
+  \
+  hr = pInitIfc->initInvoc; \
+  if (AAFRESULT_FAILED (hr)) return hr; \
+  \
+  qiTypeSP pDef; \
+  hr = pInitIfc->QueryInterface (qiTypeIID, (void **)&pDef); \
+  if (AAFRESULT_FAILED (hr)) return hr; \
+  \
+  registerTypeSP pRegIfc; \
+  hr = pInitIfc->QueryInterface (registerTypeIID, (void **)&pRegIfc); \
+  if (AAFRESULT_FAILED (hr)) return hr; \
+  \
+  hr = pDict->regFunc (pRegIfc); \
+  if (AAFRESULT_FAILED (hr)) return hr; \
+}
 
 
 #define RegisterOneDef( \
@@ -329,22 +398,41 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
 
   CAAFBuiltinDefs defs (pDict);
 
-  RegisterOneDef (/* dictionary*/                  pDict,
-				  /* def object's class */         defs.cdTypeDefInt(),
-				  /* IID of def to pass to Init */ IID_IAAFTypeDefInt,
-				  /* SP of def to use with Init */ IAAFTypeDefIntSP,
+  
+//  IAAFTypeDefSP pTypeUInt8;
+//  checkResult(pDict->LookupTypeDef(kAAFTypeID_UInt8, &pTypeUInt8));
+  { // Create an opaque type and register it in the dictionary.
+    IAAFTypeDefSP pOpaqueType;
+    IAAFTypeDefRenameSP pOpaqueTestType;
+	  checkResult(pDict->CreateMetaInstance(AUID_AAFTypeDefRename, IID_IAAFTypeDefRename, (IUnknown **)&pOpaqueTestType));
+    checkResult(pOpaqueTestType->Initialize(kTestTypeID, defs.tdUInt8(), L"TestUInt8"));
+    checkResult(pOpaqueTestType->QueryInterface(IID_IAAFTypeDef, (void **)&pOpaqueType));
+    checkResult(pDict->RegisterOpaqueTypeDef(pOpaqueType));
+  }
+
+  RegisterOneMetaDef (/* dictionary*/      pDict,
+				  /* def object's class id */      AUID_AAFTypeDefRename,
+				  /* IID of def to pass to Init */ IID_IAAFTypeDefRename,
+				  /* SP of def to use with Init */ IAAFTypeDefRenameSP,
 				  /* Init() invocation */
-				  Initialize (kTestTypeID, 1, AAFFalse, L"TestUInt8"),
-				  /* IID of type to QI */          IID_IAAFDefObject,
-				  /* SP for type to QI */          IAAFDefObjectSP,
+				  Initialize (kTestTypeID, defs.tdUInt8(), L"TestUInt8"),
+				  /* IID of type to QI */          IID_IAAFMetaDefinition,
+				  /* SP for type to QI */          IAAFMetaDefinitionSP,
 				  /* IID of def to register */     IID_IAAFTypeDef,
 				  /* SP for def to register */     IAAFTypeDefSP,
 				  /* reg method on pDict */        RegisterTypeDef);
-  
+
+  { // Make sure that "TestUInt8" is no longer opaque.
+    IAAFTypeDefSP pOpaqueTestType;
+    checkExpression(FAILED(pDict->LookupOpaqueTypeDef(kTestTypeID, &pOpaqueTestType)),
+                    AAFRESULT_TEST_FAILED);
+  }
+
+    
   RegisterOneDef (/* dictionary*/                  pDict,
 				  /* def object's class */         defs.cdDataDef(),
-				  /* IID of def to pass to Init */ IID_IAAFDefObject,
-				  /* SP of def to use with Init */ IAAFDefObjectSP,
+				  /* IID of def to pass to Init */ IID_IAAFDataDef,
+				  /* SP of def to use with Init */ IAAFDataDefSP,
 				  /* Init() invocation */
 				  Initialize (kTestDataDefID, L"TestDataDef", L"Desc"),
 				  /* IID of type to QI */          IID_IAAFDefObject,
@@ -355,8 +443,8 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
   
   RegisterOneDef (/* dictionary*/                  pDict,
 				  /* def object's class */         defs.cdOperationDef(),
-				  /* IID of def to pass to Init */ IID_IAAFDefObject,
-				  /* SP of def to use with Init */ IAAFDefObjectSP,
+				  /* IID of def to pass to Init */ IID_IAAFOperationDef,
+				  /* SP of def to use with Init */ IAAFOperationDefSP,
 				  /* Init() invocation */
 				  Initialize (kTestOperationDefID, L"TestOperationDef", L"Desc"),
 				  /* IID of type to QI */          IID_IAAFDefObject,
@@ -364,23 +452,31 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
 				  /* IID of def to register */     IID_IAAFOperationDef,
 				  /* SP for def to register */     IAAFOperationDefSP,
 				  /* reg method on pDict */        RegisterOperationDef);
+
+  // Hack!
+  {
+	IAAFOperationDefSP od;
+	checkResult (pDict->LookupOperationDef (kTestOperationDefID,
+										    &od));
+	checkResult (od->SetDataDef (defs.ddMatte()));
+  }  
   
   RegisterOneDef (/* dictionary*/                  pDict,
 				  /* def object's class */         defs.cdParameterDef(),
-				  /* IID of def to pass to Init */ IID_IAAFDefObject,
-				  /* SP of def to use with Init */ IAAFDefObjectSP,
+				  /* IID of def to pass to Init */ IID_IAAFParameterDef,
+				  /* SP of def to use with Init */ IAAFParameterDefSP,
 				  /* Init() invocation */
-				  Initialize (kTestParameterDefID, L"TestParameterDef", L"Desc"),
+				  Initialize (kTestParameterDefID, L"TestParameterDef", L"Desc", defs.tdRational()),
 				  /* IID of type to QI */          IID_IAAFDefObject,
 				  /* SP for type to QI */          IAAFDefObjectSP,
 				  /* IID of def to register */     IID_IAAFParameterDef,
 				  /* SP for def to register */     IAAFParameterDefSP,
 				  /* reg method on pDict */        RegisterParameterDef);
 
-  RegisterOneDef (/* dictionary*/                  pDict,
+				  RegisterOneDef (/* dictionary*/                  pDict,
 				  /* def object's class */         defs.cdCodecDef(),
-				  /* IID of def to pass to Init */ IID_IAAFDefObject,
-				  /* SP of def to use with Init */ IAAFDefObjectSP,
+				  /* IID of def to pass to Init */ IID_IAAFCodecDef,
+				  /* SP of def to use with Init */ IAAFCodecDefSP,
 				  /* Init() invocation */
 				  Initialize (kTestCodecDefID, L"TestCodecDef", L"Desc"),
 				  /* IID of type to QI */          IID_IAAFDefObject,
@@ -393,15 +489,18 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
   // order to be saved correctly...
   {
 	IAAFCodecDefSP cd;
+	IAAFClassDefSP pClassDef;
 	checkResult (pDict->LookupCodecDef (kTestCodecDefID,
 										&cd));
 	checkResult (cd->AddEssenceKind (defs.ddMatte()));
+	checkResult(pDict->LookupClassDef(kAAFClassID_EssenceDescriptor, &pClassDef));
+	checkResult(cd->SetFileDescriptorClass (pClassDef));
   }  
 
   RegisterOneDef (/* dictionary*/                  pDict,
 				  /* def object's class */         defs.cdContainerDef(),
-				  /* IID of def to pass to Init */ IID_IAAFDefObject,
-				  /* SP of def to use with Init */ IAAFDefObjectSP,
+				  /* IID of def to pass to Init */ IID_IAAFContainerDef,
+				  /* SP of def to use with Init */ IAAFContainerDefSP,
 				  /* Init() invocation */
 				  Initialize (kTestContainerDefID, L"TestContainerDef", L"Desc"),
 				  /* IID of type to QI */          IID_IAAFDefObject,
@@ -412,8 +511,8 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
   
   RegisterOneDef (/* dictionary*/                  pDict,
 				  /* def object's class */         defs.cdInterpolationDefinition(),
-				  /* IID of def to pass to Init */ IID_IAAFDefObject,
-				  /* SP of def to use with Init */ IAAFDefObjectSP,
+				  /* IID of def to pass to Init */ IID_IAAFInterpolationDef,
+				  /* SP of def to use with Init */ IAAFInterpolationDefSP,
 				  /* Init() invocation */
 				  Initialize (kTestInterpolationDefID, L"TestInterpolationDef", L"Desc"),
 				  /* IID of type to QI */          IID_IAAFDefObject,
@@ -423,15 +522,15 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
 				  /* reg method on pDict */        RegisterInterpolationDef);
   
   RegisterOneDef (/* dictionary*/                  pDict,
-				  /* def object's class */         defs.cdPluginDescriptor(),
-				  /* IID of def to pass to Init */ IID_IAAFPluginDescriptor,
-				  /* SP of def to use with Init */ IAAFPluginDescriptorSP,
+				  /* def object's class */         defs.cdPluginDef(),
+				  /* IID of def to pass to Init */ IID_IAAFPluginDef,
+				  /* SP of def to use with Init */ IAAFPluginDefSP,
 				  /* Init() invocation */
-				  Initialize (kTestPluginDescriptorID, L"TestPluginDescriptor", L"Desc"),
+				  Initialize (kTestPluginDefID, L"TestPluginDef", L"Desc"),
 				  /* IID of type to QI */          IID_IAAFObject,
 				  /* SP for type to QI */          IAAFObjectSP,
-				  /* IID of def to register */     IID_IAAFPluginDescriptor,
-				  /* SP for def to register */     IAAFPluginDescriptorSP,
+				  /* IID of def to register */     IID_IAAFPluginDef,
+				  /* SP for def to register */     IAAFPluginDefSP,
 				  /* reg method on pDict */        RegisterPluginDef);
   
   return AAFRESULT_SUCCESS;
@@ -448,8 +547,8 @@ static HRESULT LookupDefs (IAAFDictionary * pDict)
 				/* IID of def for lookup */    IID_IAAFTypeDef,
 				/* SP of def to lookup */      IAAFTypeDefSP,
 				/* lookup method on pDict */   LookupTypeDef,
-				/* IID of def for name */      IID_IAAFDefObject,
-				/* SP of def for name */       IAAFDefObjectSP,
+				/* IID of def for name */      IID_IAAFMetaDefinition,
+				/* SP of def for name */       IAAFMetaDefinitionSP,
 				/* SP of enumerator */         IEnumAAFTypeDefsSP,
 				/* get-enum method on pDict */ GetTypeDefs);
 
@@ -520,14 +619,14 @@ static HRESULT LookupDefs (IAAFDictionary * pDict)
 				/* get-enum method on pDict */ GetInterpolationDefs);
 
   LookupOneDef (/* dictionary */               pDict,
-				/* ID of def to look up */     kTestPluginDescriptorID,
-				/* def's name */               L"TestPluginDescriptor",
-				/* IID of def for lookup */    IID_IAAFPluginDescriptor,
-				/* SP of def to lookup */      IAAFPluginDescriptorSP,
+				/* ID of def to look up */     kTestPluginDefID,
+				/* def's name */               L"TestPluginDef",
+				/* IID of def for lookup */    IID_IAAFPluginDef,
+				/* SP of def to lookup */      IAAFPluginDefSP,
 				/* lookup method on pDict */   LookupPluginDef,
-				/* IID of def for name */      IID_IAAFPluginDescriptor,
-				/* SP of def for name */       IAAFPluginDescriptorSP,
-				/* SP of enumerator */         IEnumAAFPluginDescriptorsSP,
+				/* IID of def for name */      IID_IAAFDefObject,
+				/* SP of def for name */       IAAFDefObjectSP,
+				/* SP of enumerator */         IEnumAAFPluginDefsSP,
 				/* get-enum method on pDict */ GetPluginDefs);
 
   return AAFRESULT_SUCCESS;
@@ -542,13 +641,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFDictionary Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -557,11 +658,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	switch (mode)
 	{
-	case kMediaOpenReadOnly:
+	case kAAFMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kMediaOpenAppend:
+	case kAAFMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -601,7 +702,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFSequenceSP   pSequence;
   IAAFSegmentSP    pSegment;
   IAAFComponentSP  pComponent;
-  aafMobID_t         NewMobID;
   int              i;
   HRESULT          hr = S_OK;
 	
@@ -612,7 +712,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  RemoveTestFile(pFileName);
 		
 	  // Create the AAF file
-	  checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
 		
 	  // Get the AAF Dictionary so that we can create valid AAF objects.
 	  checkResult(pHeader->GetDictionary(&pDictionary));
@@ -626,8 +726,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				  CreateInstance(IID_IAAFMob, 
 								 (IUnknown **)&pMob));
 		
-	  checkResult(CoCreateGuid((GUID *)&NewMobID));
-	  checkResult(pMob->SetMobID(NewMobID));
+	  checkResult(pMob->SetMobID(TEST_MobID));
 	  checkResult(pMob->SetName(L"AAFDictionaryTest"));
 		
 	  // Add mob slot w/ Sequence
@@ -723,7 +822,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 	  // Add the master mob to the file and cleanup
 	  pHeader->AddMob(pMob);
-		
+
 	  checkResult (RegisterDefs (pDictionary));
 	}
   catch (HRESULT& rResult)
@@ -761,10 +860,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
   try
 	{
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		
 	  // Validate that there is only one composition mob.
-	  checkResult(pHeader->CountMobs(kCompMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 		
 	  // Get the AAF Dictionary so that we can create valid AAF objects.
@@ -772,8 +871,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	  CAAFBuiltinDefs defs (pDictionary);
 
 	  // Check a data definition from a composition MOB in order to test weak references
-	  criteria.searchTag = kByMobKind;
-	  criteria.tags.mobKind = kCompMob;
+	  criteria.searchTag = kAAFByMobKind;
+	  criteria.tags.mobKind = kAAFCompMob;
 	  checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 	  while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 		{					
@@ -790,10 +889,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		  checkResult(pComp->GetDataDef(&pDataDef));
 		  checkResult(pDataDef->IsSoundKind(&testBool));
-		  checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
+		  checkExpression(testBool == kAAFFalse, AAFRESULT_TEST_FAILED);
 
 		  checkResult(pDataDef->IsDataDefOf(defs.ddPictureWithMatte(), &testBool));
-		  checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
+		  checkExpression(testBool == kAAFTrue, AAFRESULT_TEST_FAILED);
 		
 		  // Make sure first component is a filler, and is our extended
 		  // class.  To do that, we'll compare the class def we looked
@@ -837,8 +936,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		  IAAFClassDefSP cd;
 		  while (SUCCEEDED (pClassDefEnum->NextOne (&cd)))
 			{
-			  IAAFDefObjectSP def;
-			  checkResult(cd->QueryInterface(IID_IAAFDefObject,
+			  IAAFMetaDefinitionSP def;
+			  checkResult(cd->QueryInterface(IID_IAAFMetaDefinition,
 											 (void **) &def));
 			  aafUID_t classid;
 			  checkResult (def->GetAUID (&classid));
@@ -850,7 +949,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				}
 			}
 		  // make sure we found it the hard way.
-		  checkExpression(found == AAFTrue, AAFRESULT_TEST_FAILED);
+		  checkExpression(found == kAAFTrue, AAFRESULT_TEST_FAILED);
 
 		  // Get the 'odor' property from our new fill clip.  Make
 		  // sure it is set to the value we think it should be
@@ -915,7 +1014,9 @@ extern "C" HRESULT CAAFDictionary_test()
 	}
   catch (...)
 	{
-	  cerr << "CAAFDictionary_test...Caught general C++ exception!" << endl; 
+	  cerr << "CAAFDictionary_test..."
+		   << "Caught general C++ exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
 	}
 
   return hr;

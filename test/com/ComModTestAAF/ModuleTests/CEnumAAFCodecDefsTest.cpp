@@ -34,12 +34,15 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
+#include "AAFClassDefUIDs.h"
 #include "AAFCodecDefs.h"
+#include "AAFContainerDefs.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -72,6 +75,9 @@ static wchar_t *sName1 = L"Test Descriptor Name1";
 static wchar_t *sDescription1 = L"Test Descriptor Description1";
 static wchar_t *sName2 = L"Test Descriptor Name2";
 static wchar_t *sDescription2 = L"Test Descriptor Description2";
+// {E4E190C9-EA4A-11d3-A352-009027DFCA6A}
+static const aafUID_t TESTID_2 = 
+{ 0xe4e190c9, 0xea4a, 0x11d3, { 0xa3, 0x52, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
@@ -82,20 +88,22 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"EnumAAFCodecDefs Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -126,8 +134,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFFile*			pFile = NULL;
 	IAAFHeader *		pHeader = NULL;
 	IAAFDictionary*		pDictionary = NULL;
-	IAAFDefObject*		pDef = NULL;
 	IAAFCodecDef*	pCodecDef = NULL;
+	IAAFClassDef*		pClass = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
 	aafUID_t			uid;
@@ -141,7 +149,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Create the AAF file
-	checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+	checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
     bFileOpen = true;
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
@@ -152,26 +160,22 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFCodecDef, 
 							   (IUnknown **)&pCodecDef));
     
-	checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject,
-                                          (void **)&pDef));
-
 	checkResult(pCodecDef->AddEssenceKind (defs.ddMatte()));
-	uid = NoCodec;
-	checkResult(pDef->Initialize (uid, sName1, sDescription1));
+	uid = kAAFNoCodec;
+	checkResult(pCodecDef->Initialize (uid, sName1, sDescription1));
+	checkResult(pDictionary->LookupClassDef(kAAFClassID_EssenceDescriptor, &pClass));
+	checkResult(pCodecDef->SetFileDescriptorClass (pClass));
 	checkResult(pDictionary->RegisterCodecDef(pCodecDef));
-	pDef->Release();
-	pDef = NULL;
 	pCodecDef->Release();
 	pCodecDef = NULL;
 	checkResult(defs.cdCodecDef()->
 				CreateInstance(IID_IAAFCodecDef, 
 							   (IUnknown **)&pCodecDef));
     
-	checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject,
-                                          (void **)&pDef));
 	checkResult(pCodecDef->AddEssenceKind (defs.ddMatte()));
-	uid = NoCodec;
-	checkResult(pDef->Initialize (uid, sName2, sDescription2));
+	uid = TESTID_2;
+	checkResult(pCodecDef->Initialize (uid, sName2, sDescription2));
+	checkResult(pCodecDef->SetFileDescriptorClass (pClass));
 
 	checkResult(pDictionary->RegisterCodecDef(pCodecDef));
   }
@@ -182,9 +186,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
   // Cleanup and return
-  if (pDef)
-    pDef->Release();
-
   if (pCodecDef)
     pCodecDef->Release();
 
@@ -193,6 +194,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
   if (pHeader)
     pHeader->Release();
+      
+  if (pClass)
+    pClass->Release();
       
   if (pFile)
   {  // Close file
@@ -226,7 +230,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
@@ -371,7 +375,9 @@ extern "C" HRESULT CEnumAAFCodecDefs_test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFCodecDefs_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFCodecDefs_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;

@@ -31,6 +31,8 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -40,11 +42,15 @@
 
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafTapeCaseType_t FormFactor = kVHSVideoTape;
-static aafVideoSignalType_t VideoSignalType = kPALSignal;
-static aafTapeFormatType_t TapeFormat = kVHSFormat;
-static aafLength_t TapeLength = 3200 ;
+static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
+static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
+static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
+static aafUInt32 TapeLength = 3200 ;
 
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x37c13606, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -85,33 +91,34 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTapeDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
-  // Remove the previous test file if any.
-  RemoveTestFile(pFileName);
+	// Remove the previous test file if any.
+	RemoveTestFile(pFileName);
 
-  hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile);
+	hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile);
 
 	if (AAFRESULT_SUCCESS == hr)
 	{
 		hr = pFile->GetHeader(&pHeader);
 		if (AAFRESULT_SUCCESS == hr)
 		{
-      hr = pHeader->GetDictionary(&pDictionary);
-			if (AAFRESULT_SUCCESS == hr)
+		  hr = pHeader->GetDictionary(&pDictionary);
+		  if (AAFRESULT_SUCCESS == hr)
 			{
 				// Create a source mob
 
@@ -124,8 +131,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					hr = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
 					if (AAFRESULT_SUCCESS == hr)
 					{
-						CoCreateGuid((GUID *)&newMobID);
-						pMob->SetMobID(newMobID);
+						pMob->SetMobID(TEST_MobID);
 						pMob->SetName(L"TapeDescriptorTest");
 						hr = defs.cdTapeDescriptor()->
 						  CreateInstance(IID_IAAFTapeDescriptor, 
@@ -213,29 +219,31 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafTapeCaseType_t			readFormFactor;
 	aafVideoSignalType_t		readVideoSignalType;
 	aafTapeFormatType_t			readTapeFormat;
-	aafLength_t					readTapeLength ;
+	aafUInt32					readTapeLength ;
 	aafUInt32					length;
 
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTapeDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
-  hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
+	hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
 
 	if (AAFRESULT_SUCCESS == hr)
 	{
 		hr = pFile->GetHeader(&pHeader);
 		if (AAFRESULT_SUCCESS == hr)
 		{
-			hr = pHeader->CountMobs(kAllMob, &numMobs);
+			hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
 			if (AAFRESULT_SUCCESS == hr)
 			{
 				if (1 == numMobs )
@@ -337,7 +345,8 @@ extern "C" HRESULT CAAFTapeDescriptor_test()
 	catch (...)
 	{
 		cerr << "CAAFTapeDescriptor_test...Caught general C++"
-			" exception!" << endl; 
+			 << " exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;

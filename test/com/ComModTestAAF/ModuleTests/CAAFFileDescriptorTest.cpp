@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <iostream.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -41,6 +42,11 @@
 #include "CAAFBuiltinDefs.h"
 
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0xe86291dc, 0x03fe, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 static aafRational_t	checkSampleRate = { 2997, 100 };
 static aafUID_t			checkContainer = ContainerFile;
@@ -79,22 +85,24 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
+	IAAFContainerDef*  pContainer = NULL;
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
 	IAAFEssenceDescriptor *edesc = NULL;
 	IAAFFileDescriptor *pFileDesc = NULL;
 	
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
 	HRESULT						hr = S_OK;
 	
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFFileDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -127,8 +135,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(L"FileDescriptorTest"));
 		
 		// Add some slots
@@ -137,14 +144,26 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(pSourceMob->AddNilReference (test+1, 0, defs.ddSound(), audioRate));
 		}
 		
-		checkResult(defs.cdFileDescriptor()->
+		// Create a concrete subclass of FileDescriptor
+		checkResult(defs.cdAIFCDescriptor()->
 					CreateInstance(IID_IAAFEssenceDescriptor, 
 								   (IUnknown **)&edesc));		
+
+		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
+
 		checkResult(edesc->QueryInterface(IID_IAAFFileDescriptor, (void **) &pFileDesc));
 		checkResult(pFileDesc->SetSampleRate (checkSampleRate));
-		checkResult(pFileDesc->SetContainerFormat (checkContainer));
+		checkResult(pDictionary->LookupContainerDef(checkContainer, &pContainer));
+		checkResult(pFileDesc->SetContainerFormat (pContainer));
+		pContainer->Release();
+		pContainer = NULL;
+
 		checkResult(pFileDesc->SetLength (checkLength));
-		checkResult(pFileDesc->SetIsInContainer (AAFTrue));
+//		checkResult(pFileDesc->SetIsInContainer (kAAFTrue));
 		
 		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 		
@@ -193,6 +212,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
 	IEnumAAFMobs *mobIter = NULL;
+	IAAFContainerDef*  pContainer = NULL;
+	IAAFDefObject	*  pDef = NULL;
 	IAAFEssenceDescriptor		*pEdesc = NULL;
 	IAAFSourceMob				*pSourceMob = NULL;
 	IAAFMob			*aMob = NULL;
@@ -205,19 +226,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafRational_t				testSampleRate;
 	aafUID_t					testContainer;
 	aafLength_t					testLength;
-	aafBool						testBool;
+//	aafBool						testBool;
 	
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
 	ProductInfo.productName = L"AAFFileDescriptor Test. NOT!";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
-	
-	
 	
 	try
 	{ 
@@ -229,7 +250,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 		
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 		
 		
@@ -267,12 +288,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(pFileDesc->GetSampleRate (&testSampleRate));
 			checkExpression(testSampleRate.numerator == checkSampleRate.numerator, AAFRESULT_TEST_FAILED);
 			checkExpression(testSampleRate.denominator == checkSampleRate.denominator, AAFRESULT_TEST_FAILED);
-			checkResult(pFileDesc->GetContainerFormat (&testContainer));
+			checkResult(pFileDesc->GetContainerFormat (&pContainer));
+			checkResult(pContainer->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
+			checkResult(pDef->GetAUID(&testContainer));
+			pContainer->Release();
+			pContainer = NULL;
+			pDef->Release();
+			pDef = NULL;
 			checkExpression(memcmp(&testContainer, &checkContainer, sizeof(testContainer)) == 0, AAFRESULT_TEST_FAILED);
 			checkResult(pFileDesc->GetLength (&testLength));
 			checkExpression(checkLength == testLength, AAFRESULT_TEST_FAILED);
-			checkResult(pFileDesc->GetIsInContainer (&testBool));
-			checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
+//			checkResult(pFileDesc->GetIsInContainer (&testBool));
+//			checkExpression(testBool == kAAFTrue, AAFRESULT_TEST_FAILED);
 			
 			pEdesc->Release();
 			pEdesc = NULL;
@@ -340,7 +367,8 @@ extern "C" HRESULT CAAFFileDescriptor_test()
 	catch (...)
 	{
 		cerr << "CAAFFileDescriptor_test...Caught general C++"
-			" exception!" << endl; 
+			 << " exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 	
 	return hr;

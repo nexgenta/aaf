@@ -38,13 +38,7 @@
 #include <iostream.h>
 #include <assert.h>
 #include <stdio.h>
-
-// {C3930DD1-E603-11d2-842A-00600832ACB8}
-static aafUID_t TypeID_LocalInt32 = 
-{ 0xc3930dd1, 0xe603, 0x11d2, { 0x84, 0x2a, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-
-
+#include <stdlib.h>
 
 
 // convenient error handlers.
@@ -82,13 +76,15 @@ static HRESULT TestPropertyValue ()
   long hr = E_FAIL;
   aafProductIdentification_t ProductInfo;
 
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFPropertyValue Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -112,16 +108,9 @@ static HRESULT TestPropertyValue ()
 
   // Let's try to do something interesting with a type definition
   IAAFTypeDefInt * pTypeDef = NULL;
-  hr = defs.cdTypeDefInt()->CreateInstance (IID_IAAFTypeDefInt,
-											(IUnknown **) &pTypeDef);
+  hr = defs.tdInt32()->QueryInterface (IID_IAAFTypeDefInt, (void **) &pTypeDef);
   if (! SUCCEEDED (hr)) return hr;
   assert (pTypeDef);
-
-  hr = pTypeDef->Initialize (TypeID_LocalInt32,
-							 4,        // 4-byte (32-bit) int
-							 AAFTrue,  // signed
-							 L"Local 32-bit int");
-  if (! SUCCEEDED (hr)) return hr;
 
   // Now attempt to create invalid property values; check for errors.
   const aafInt32 forty_two = 42;
@@ -191,10 +180,10 @@ static HRESULT TestPropertyValue ()
 
   // Test IsDefinedType ()
   // (Currently only returns true.)
-  aafBool b = AAFFalse;
+  aafBool b = kAAFFalse;
   hr = pv->IsDefinedType (&b);
 	if (! SUCCEEDED (hr)) return hr;
-  if (AAFTrue != b)
+  if (kAAFTrue != b)
 	return AAFRESULT_TEST_FAILED;
 
   pTypeDefUnknown->Release();
@@ -225,7 +214,8 @@ extern "C" HRESULT CAAFPropertyValue_test()
 	}
   catch (...)
 	{
-	  cerr << "CAAFPropertyValue_test...Caught general C++ exception!" << endl; 
+	  cerr << "CAAFPropertyValue_test..."
+		   << "Caught general C++ exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

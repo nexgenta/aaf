@@ -34,6 +34,7 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -43,8 +44,14 @@
 
 
 static aafInt32 fadeInLen  = 1000;
-static aafFadeType_t fadeInType = kFadeLinearAmp;
+static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
 static aafRational_t fadeInEditUnit = { 25, 1};
+
+static const	aafMobID_t	TEST_MobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x9269dfa2, 0x0407, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 
 
 // Cross-platform utility to delete a file.
@@ -83,7 +90,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFCompositionMob*			pCompMob = NULL;
 	IAAFMob*					pMob = NULL;
 
-	aafMobID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
 
@@ -92,13 +98,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
       // Remove the previous test file if any.
       RemoveTestFile(pFileName);
 
+	  aafProductVersion_t v;
+	  v.major = 1;
+	  v.minor = 0;
+	  v.tertiary = 0;
+	  v.patchLevel = 0;
+	  v.type = kAAFVersionUnknown;
 	  ProductInfo.companyName = L"AAF Developers Desk";
 	  ProductInfo.productName = L"AAFCompositionMobTest";
-	  ProductInfo.productVersion.major = 1;
-	  ProductInfo.productVersion.minor = 0;
-	  ProductInfo.productVersion.tertiary = 0;
-	  ProductInfo.productVersion.patchLevel = 0;
-	  ProductInfo.productVersion.type = kVersionUnknown;
+	  ProductInfo.productVersion = &v;
 	  ProductInfo.productVersionString = NULL;
 	  ProductInfo.productID = UnitTestProductID;
 	  ProductInfo.platform = NULL;
@@ -123,8 +131,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		
 	  // Assign the mob a new id.
-	  checkResult(CoCreateGuid((GUID *)&newMobID));
-	  checkResult(pMob->SetMobID(newMobID));
+	  checkResult(pMob->SetMobID(TEST_MobID));
     
 	  // Initialize the composition mob.
 	  checkResult(pCompMob->Initialize( L"COMPMOB01" ));
@@ -169,30 +176,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-	IAAFFile *					pFile = NULL;
-	IAAFHeader *				pHeader = NULL;
+  IAAFFile *					pFile = NULL;
+  IAAFHeader *				pHeader = NULL;
  
-	IEnumAAFMobs*				pMobIter = NULL;
-	IAAFMob*					pMob = NULL;
-	IAAFCompositionMob*			pCompMob = NULL;
+  IEnumAAFMobs*				pMobIter = NULL;
+  IAAFMob*					pMob = NULL;
+  IAAFCompositionMob*			pCompMob = NULL;
 
-	aafSearchCrit_t				criteria;
-	aafDefaultFade_t			defaultFade;
-	aafProductIdentification_t	ProductInfo;
-	aafNumSlots_t				numMobs;
-	HRESULT						hr = S_OK;
+  aafSearchCrit_t				criteria;
+  aafDefaultFade_t			defaultFade;
+  aafProductIdentification_t	ProductInfo;
+  aafNumSlots_t				numMobs;
+  HRESULT						hr = S_OK;
 
-
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFCompositionMob Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
-
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
+  ProductInfo.companyName = L"AAF Developers Desk";
+  ProductInfo.productName = L"AAFCompositionMob Test";
+  ProductInfo.productVersion = &v;
+  ProductInfo.productVersionString = NULL;
+  ProductInfo.platform = NULL;
   
   try
   {
@@ -200,12 +207,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs( kAllMob, &numMobs ));
+		checkResult(pHeader->CountMobs( kAAFAllMob, &numMobs ));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over all Composition Mobs
-		criteria.searchTag = kByMobKind;
-		criteria.tags.mobKind = kCompMob;
+		criteria.searchTag = kAAFByMobKind;
+		criteria.tags.mobKind = kAAFCompMob;
 		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (pMobIter && (pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS))
 		{
@@ -216,7 +223,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
       checkExpression( (defaultFade.fadeLength == fadeInLen) &&
 				  (defaultFade.fadeType == fadeInType) &&
 				  (memcmp( &( defaultFade.fadeEditUnit), &fadeInEditUnit, sizeof( fadeInEditUnit ))== 0) &&
-				  (defaultFade.valid == AAFTrue), 
+				  (defaultFade.valid == kAAFTrue), 
          AAFRESULT_TEST_FAILED);
 
 			pCompMob->Release();
@@ -269,7 +276,7 @@ extern "C" HRESULT CAAFCompositionMob_test()
 	catch (...)
 	{
 	  cerr << "CAAFCompositionMob_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

@@ -31,6 +31,8 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -40,10 +42,15 @@
 
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafFilmType_t FilmFormat = kFt35MM;
+static aafFilmType_t FilmFormat = kAAFFt35MM;
 static aafUInt32 FrameRate = 24;
 static aafUInt8 PerfPerFrame = 4;
 static aafRational_t	AspectRatio = { 1000, 1 };	// !!!Find a real aspect ratio
+
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x302e420e, 0x03ff, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -83,17 +90,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFFilmDescriptor*			pFilmDesc = NULL;
 	
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	
 	
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFFilmDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -111,8 +119,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFSourceMob, 
 							   (IUnknown **)&pSourceMob));
 	checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
-	CoCreateGuid((GUID *)&newMobID);
-	pMob->SetMobID(newMobID);
+	pMob->SetMobID(TEST_MobID);
 	pMob->SetName(L"FilmDescriptorTest");
 	checkResult(defs.cdFilmDescriptor()->
 				CreateInstance(IID_IAAFFilmDescriptor, 
@@ -175,19 +182,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFFilmDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 	
 	checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 	checkResult(pFile->GetHeader(&pHeader));
-	checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+	checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 	checkResult(pHeader->GetMobs(NULL, &pMobIter));
 	checkResult(pMobIter->NextOne(&pMob));
@@ -247,7 +256,8 @@ extern "C" HRESULT CAAFFilmDescriptor_test()
 	catch (...)
 	{
 		cerr << "CAAFFilmDescriptor_test...Caught general C++"
-			" exception!" << endl; 
+			 << " exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 //	if (SUCCEEDED(hr))

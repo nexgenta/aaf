@@ -34,6 +34,8 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
@@ -43,7 +45,8 @@
 // Default testing values for CDCI
 #define kCWTest		8
 #define kHSTest		2
-#define kCSTest		kCoSiting
+#define kVSTest		2
+#define kCSTest		kAAFCoSiting
 #define kBRLTest	16
 #define kWRLTest	255
 #define kCRTest		255
@@ -52,7 +55,7 @@
 // default test values for DID
 #define kStoredHeightTestVal			248
 #define kStoredWidthTestVal				720
-#define kFrameLayoutTestVal				kSeparateFields
+#define kFrameLayoutTestVal				kAAFSeparateFields
 #define kVideoLineMapSizeTestVal		2
 #define kVideoLineMap1TestVal			10
 #define kVideoLineMap2TestVal			11
@@ -66,10 +69,16 @@
 #define kDisplayWidthTestVal			718
 #define kDisplayXOffsetTestVal			7
 #define kDisplayYOffsetTestVal			8
-#define kAlphaTransparencyTestVal		kMaxValueTransparent
+#define kAlphaTransparencyTestVal		kAAFMaxValueTransparent
 #define kImageAlignmentFactorTestVal	0
 #define kGammaNumTestVal				7
 #define kGammaDenTestVal				8
+
+// our test Mob id 
+static const aafMobID_t	TEST_MobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x3b38e782, 0x03fd, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 static HRESULT SetDigitalImageDescProps(IAAFCDCIDescriptor* pDesc)
 {
@@ -99,9 +108,9 @@ static HRESULT SetDigitalImageDescProps(IAAFCDCIDescriptor* pDesc)
 	pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal);
 	pDIDesc->SetImageAlignmentFactor(kImageAlignmentFactorTestVal);
 
-	ratio.numerator = kGammaNumTestVal;
-	ratio.denominator = kGammaDenTestVal;
-	pDIDesc->SetGamma(ratio);
+//	ratio.numerator = kGammaNumTestVal;
+//	ratio.denominator = kGammaDenTestVal;
+//!!!	pDIDesc->SetGamma(ratio);
 
 	pDIDesc->Release();
 
@@ -129,13 +138,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFCDCIDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -144,11 +155,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	switch (mode)
 	{
-	case kMediaOpenReadOnly:
+	case kAAFMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kMediaOpenAppend:
+	case kAAFMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -184,7 +195,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*	pDictionary = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
-	aafMobID_t		newMobID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -192,7 +202,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   RemoveTestFile(pFileName);
 
 	// Create the AAF file
-	hr = OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader);
+	hr = OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader);
 	if (FAILED(hr))
 		return hr;
 
@@ -214,8 +224,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		  {
 			  IAAFCDCIDescriptor*	pCDCIDesc = NULL;
 
-			  CoCreateGuid((GUID *)&newMobID);
-			  pMob->SetMobID(newMobID);
+			  pMob->SetMobID(TEST_MobID);
 			  pMob->SetName(L"CDCIDescriptorTest");
 			  hr = defs.cdCDCIDescriptor()->
 				CreateInstance(IID_IAAFCDCIDescriptor, 
@@ -225,6 +234,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				  // Add all CDCI properties
 				  hr = pCDCIDesc->SetComponentWidth(kCWTest);
 				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetHorizontalSubsampling(kHSTest);
+				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetVerticalSubsampling(kVSTest);
 				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetColorSiting(kCSTest);
 				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetBlackReferenceLevel(kBRLTest);
 				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetWhiteReferenceLevel(kWRLTest);
@@ -287,11 +297,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 	// Open the AAF file
-	hr = OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader);
+	hr = OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader);
 	if (FAILED(hr))
 		return hr;
 
-	hr = pHeader->CountMobs(kAllMob, &numMobs);
+	hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
 	if (1 != numMobs)
 	{
 		hr = AAFRESULT_TEST_FAILED;
@@ -333,7 +343,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 						if (SUCCEEDED(hr) && val == kCWTest)
 							hr = pCDCIDesc->GetHorizontalSubsampling(&uval);
 
-						if (SUCCEEDED(hr) && uval == kHSTest)
+						if (SUCCEEDED(hr) && val == kHSTest)
+							hr = pCDCIDesc->GetVerticalSubsampling(&uval);
+
+						if (SUCCEEDED(hr) && uval == kVSTest)
 							hr = pCDCIDesc->GetColorSiting(&csval);
 
 						if (SUCCEEDED(hr) && csval == kCSTest)
@@ -401,7 +414,9 @@ extern "C" HRESULT CAAFCDCIDescriptor_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFCDCIDescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFCDCIDescriptor_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;

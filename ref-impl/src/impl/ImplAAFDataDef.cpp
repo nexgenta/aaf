@@ -36,7 +36,7 @@
 #include <assert.h>
 #include <string.h>
 #include "AAFDataDefs.h"
-#include "aafUtils.h"
+#include "AAFUtils.h"
 
 #include "ImplAAFBuiltinDefs.h"
 
@@ -49,6 +49,24 @@ ImplAAFDataDef::ImplAAFDataDef ()
 ImplAAFDataDef::~ImplAAFDataDef ()
 {
   // _pCachedDict is *NOT* reference counted!
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDataDef::Initialize (
+      const aafUID_t & id,
+	  const aafWChar * pName,
+	  const aafWChar * pDesc)
+{
+	if (pName == NULL || pDesc == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+	  return pvtInitialize(id, pName, pDesc);
+	}
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -102,13 +120,13 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK (pDataDef->GetAUID (&id));
 		
 		CHECK(IsDataDefOf (pDataDef, &result));
-		if(result == AAFFalse)
+		if(result == kAAFFalse)
 		{
 			aafBool	isPWM;
 			aafUID_t	picture = DDEF_Picture;
 			CHECK(IsPictureWithMatteKind (&isPWM));
-			if((isPWM == AAFTrue) && EqualAUID(&picture, &id))
-				result = AAFTrue;
+			if((isPWM == kAAFTrue) && EqualAUID(&picture, &id))
+				result = kAAFTrue;
 		}
 		*bDoesConvertTo = result;
 	}
@@ -161,15 +179,15 @@ AAFRESULT STDMETHODCALLTYPE
 		aafBool	result;
 		
 		CHECK(IsDataDefOf (pDataDef, &result));
-		if(result == AAFFalse)
+		if(result == kAAFFalse)
 		{
 			aafBool		isPict;
 			aafUID_t	pictureMatte = DDEF_PictureWithMatte;
 			CHECK(IsPictureKind (&isPict));
 			aafUID_t id;
 			CHECK(pDataDef->GetAUID (&id));
-			if((isPict == AAFTrue) && EqualAUID(&pictureMatte, &id))
-				result = AAFTrue;
+			if((isPict == kAAFTrue) && EqualAUID(&pictureMatte, &id))
+				result = kAAFTrue;
 		}
 		*bDoesConvertFrom = result;
 	}
