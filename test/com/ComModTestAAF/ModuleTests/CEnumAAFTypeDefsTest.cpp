@@ -1,76 +1,91 @@
 // @doc INTERNAL
-// @com This file implements the module test for CEnumAAFTypeDefs
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+// @com This file implements the module test for CAAFDefinitionObject
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
+
+
+
+
+
+
+#include "CEnumAAFTypeDefs.h"
+#include "CEnumAAFTypeDefs.h"
+#ifndef __CEnumAAFTypeDefs_h__
+#error - improperly defined include guard
+#endif
+
 
 #include <iostream.h>
-#include <stdio.h>
-#include <wchar.h>
 
-#include "AAF.h"
-#include "AAFResult.h"
-#include "ModuleTest.h"
+// Temporarily necessary global declarations.
+extern "C" const CLSID CLSID_EnumAAFTypeDefs; // generated
 
-#include "CEnumeratorTest.h"
 
-class CEnumAAFTypeDefsTest: public CEnumeratorTest<IEnumAAFTypeDefs,IAAFTypeDef>
+HRESULT CEnumAAFTypeDefs::test()
 {
-public:
-	HRESULT CountItems(IAAFDictionary *pDictionary,aafUInt32 *piCount)
-	{
-		return(pDictionary->CountTypeDefs(piCount));
-	}
-	HRESULT GetItems(IAAFDictionary *pDictionary,IEnumAAFTypeDefs **ppEnumerator)
-	{
-		return(pDictionary->GetTypeDefs(ppEnumerator));
-	}
-	aafBool ItemIsPresent(IAAFDictionary *pDictionary,aafUID_t& Id)
-	{
-		IAAFSmartPointer<IAAFTypeDef> pTypeDef;
-		return(pDictionary->LookupTypeDef(Id,&pTypeDef)==AAFRESULT_SUCCESS?
-			kAAFTrue:kAAFFalse);
-	}
-};
+  HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
+  IEnumAAFTypeDefs *pObject = NULL;
 
-extern "C" HRESULT CEnumAAFTypeDefs_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFTypeDefs_test(testMode_t mode)
-{
-	try
-	{
-		CEnumAAFTypeDefsTest Test;
-		Test.Run(mode);
-	}
-	catch(HRESULT& rResult)
-	{
-		return(rResult);
-	}
+  try
+    {
+      // Attempt to create an EnumAAFTypeDefs.
+      hr =  CoCreateInstance(
+                             CLSID_EnumAAFTypeDefs,
+                             NULL, 
+                             CLSCTX_INPROC_SERVER, 
+                             IID_IEnumAAFTypeDefs, (void **)&pObject);
+      if (FAILED(hr))
+        {
+          cerr << "CEnumAAFTypeDefs::test...FAILED!";
+          cerr << hr;
+          cerr << "\tCoCreateInstance(&CLSID_EnumAAFTypeDefs, NULL,"
+            " CLSCTX_INPROC_SERVER, &IID_IEnumAAFTypeDefs, ...);" <<
+              endl;
+          return hr;
+        }
 
-	return AAFRESULT_SUCCESS;
+      // module-specific tests go here
+
+      if (pObject)
+        pObject->Release();
+      return AAFRESULT_NOT_IMPLEMENTED;
+
+    }
+  catch (...)
+    {
+      cerr << "CEnumAAFTypeDefs::test...Caught general C++"
+        " exception!" << endl; 
+    }
+
+  // Cleanup our object if it exists.
+  if (pObject)
+    pObject->Release();
+
+  return hr;
 }
+
 
 
 
