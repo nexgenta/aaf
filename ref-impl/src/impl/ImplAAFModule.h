@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -41,12 +41,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "AAFRoot.h"
+#include "AAFPrivate.h"
 #include "AAFResult.h"
 #include "ImplAAFPluginManager.h"
 #include "ImplAAFFile.h"
-#include "ImplAAFObjectCreation.h"
+#include "ImplAAFRawStorage.h"
+//#include "ImplAAFObjectCreation.h"
 
+#include "AAFTypes.h"
+
+class ImplAAFFile;
+class ImplAAFPluginManager;
 
 //***********************************************************
 //
@@ -125,7 +130,7 @@ STDAPI ImplAAFFileOpenExistingRead (
   // Null-terminated string containing name of filesystem file to be
   // opened for reading.  Filename must be in a form that would be
   // acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ wchar_t *  pFileName,
+  /*[in, string]*/ const aafCharacter *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -198,7 +203,7 @@ STDAPI ImplAAFFileOpenExistingModify (
   // Null-terminated string containing name of filesystem file to be
   // opened for modification.  Filename must be in a form that would
   // be acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ wchar_t *  pFileName,
+  /*[in, string]*/ const aafCharacter *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -267,7 +272,7 @@ STDAPI ImplAAFFileOpenNewModify (
   // Null-terminated string containing name of filesystem file to be
   // opened for modification.  Filename must be in a form that would
   // be acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ wchar_t *  pFileName,
+  /*[in, string]*/ const aafCharacter *  pFileName,
 
   // File open mode flags.  May be any of the following ORed together.
   // All other bits must be set to zero.
@@ -327,6 +332,16 @@ STDAPI ImplAAFFileOpenTransient (
   // Pointer to buffer to receive pointer to new file.
   /*[out]*/ ImplAAFFile ** ppFile);
 
+//***********************************************************
+//
+// AAFFileIsAAFFile()
+//
+// Please see AAF.h for comments.
+//
+STDAPI ImplAAFFileIsAAFFile (
+  const aafCharacter *  pFileName,
+  aafUID_t * pAAFFileKind,
+  aafBool *  pFileIsAAFFile);
 
 //***********************************************************
 //
@@ -347,3 +362,24 @@ STDAPI ImplAAFFileOpenTransient (
 STDAPI ImplAAFGetPluginManager (
   /*[out]*/ ImplAAFPluginManager ** ppManager);
 
+
+STDAPI
+ImplAAFCreateRawStorageMemory
+  (aafFileAccess_e  access,
+   ImplAAFRawStorage ** ppNewRawStorage);
+
+STDAPI
+ImplAAFCreateRawStorageDisk
+  (aafCharacter_constptr  pFilename,
+   aafFileExistence_e  existence,
+   aafFileAccess_e  access,
+   ImplAAFRawStorage ** ppNewRawStorage);
+
+
+STDAPI
+ImplAAFCreateAAFFileOnRawStorage
+  (IAAFRawStorage * pRawStorage,
+   aafUID_constptr  pFileKind,
+   aafUInt32  modeFlags,
+   aafProductIdentification_constptr  pIdent,
+   ImplAAFFile ** ppNewFile);
