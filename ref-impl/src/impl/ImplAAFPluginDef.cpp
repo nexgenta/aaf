@@ -101,7 +101,7 @@ ImplAAFPluginDef::ImplAAFPluginDef ()
 ImplAAFPluginDef::~ImplAAFPluginDef ()
 {
 	// Release the manufacturer locator
-	ImplAAFNetworkLocator *pNetLocator = _manufacturerURL.setValue(0);
+	ImplAAFNetworkLocator *pNetLocator = _manufacturerURL.clearValue();
 	if (pNetLocator)
 	{
 	  pNetLocator->ReleaseReference();
@@ -112,7 +112,7 @@ ImplAAFPluginDef::~ImplAAFPluginDef ()
 	size_t size = _locators.getSize();
 	for (size_t i = 0; i < size; i++)
 	{
-		ImplAAFLocator *pLocator = _locators.setValueAt(0, i);
+		ImplAAFLocator *pLocator = _locators.clearValueAt(i);
 		if (pLocator)
 		{
 		  pLocator->ReleaseReference();
@@ -733,18 +733,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pLocator == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	size_t			siz;
-	long			n;
-	ImplAAFLocator	*obj = NULL;
-
-	_locators.getSize(siz);
-	for(n = siz-1; n >= 0; n--)
-	{
-		_locators.getValueAt(obj, n);
-		_locators.setValueAt(NULL, n);
-		_locators.setValueAt(obj, n+1);
-	}
-	_locators.setValueAt(pLocator, 0);
+	_locators.prependValue(pLocator);
 	pLocator->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
@@ -855,8 +844,11 @@ AAFRESULT STDMETHODCALLTYPE
 		
 	XPROTECT()
 	{
-		CHECK(theEnum->SetPluginDescriptor(this));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFLocator>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFLocator>(_locators);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFPluginLocators, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
