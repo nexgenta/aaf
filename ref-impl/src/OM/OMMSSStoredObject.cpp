@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSSStoredObject.cpp,v 1.68 2004/06/21 15:16:56 stuart_hc Exp $ $Name:  $
+// $Id: OMMSSStoredObject.cpp,v 1.69 2004/06/24 17:07:59 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,10 +75,10 @@ const OMUniqueObjectIdentification aafSignature_Aaf_SSBinary =
 {0x42464141, 0x000d, 0x4d4f, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
 
 // the signature actually stored in all AAF SS (4096) files
-// TO BE CONFIRMED
-// [060e2b34.0401.0105.0d010101.03020000]
+// [060e2b34.0302.0101.0d010201.02000000]
 const OMUniqueObjectIdentification aafSignature_Aaf_SSBin_4K = 
-{0x0101010d, 0x0203, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x05}};
+{0x0d010201, 0x0200, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x03, 0x02, 0x01, 0x01}};
+
 
 const OMVersion currentVersion = 32;
 
