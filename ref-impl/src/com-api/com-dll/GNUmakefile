@@ -1,10 +1,10 @@
+
+PACKAGE = com-dll
+
 AAFBASE ?= ../../../..
 
+include $(AAFBASE)/build/defs.mk
 
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-# Include directories
 INCLUDES = -I../../../include/ref-api \
 	   -I../../../include/OM \
 	   -I../../../src/OM \
@@ -12,25 +12,20 @@ INCLUDES = -I../../../include/ref-api \
 	   -I../../../include/platform \
 	   -I../test -I.. -I. -I../../impl
 
-
-OBJDIR = $(PACKDIR)/obj/com-dll
-
+OBJDIR = $(PACKDIR)/obj
 
 CFLAGS += -DDONT_DELETE_LAST_REFERENCE
-
 
 .PHONY : all
 all : com-dll
 
-
 .PHONY : com-dll
 com-dll : $(OBJDIR) $(LIBDIR) $(CXXOBJS)
 
-
 .PHONY : clean
 clean:
-	$(RM) $(OBJDIR)/*$(OBJ)
-
+	-@rm -rf $(OBJDIR)/*.o
+	-@rm -rf $(LIBTARGET)
 
 include $(AAFBASE)/build/rules.mk
 
