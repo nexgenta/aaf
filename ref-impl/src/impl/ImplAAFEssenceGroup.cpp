@@ -134,9 +134,17 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 			ImplAAFSourceClip *pOldClip = _stillFrame;
 			if (pOldClip)
+			{
+			  if( pOldClip == stillFrame )
+				RAISE( AAFRESULT_SUCCESS );
+
 			  pOldClip->ReleaseReference();
-			pOldClip = 0;
+			  pOldClip = 0;
+			}
 		}
+
+		if( stillFrame->attached() )
+			RAISE( AAFRESULT_OBJECT_ALREADY_ATTACHED );
 
 		_stillFrame = stillFrame;
 		
@@ -185,6 +193,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(choice == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if(choice->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
 	AAFRESULT ar=ValidateChoice(choice);
 	if(AAFRESULT_FAILED(ar))
 		return(ar);
@@ -202,6 +213,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(choice == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if(choice->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
 	AAFRESULT ar=ValidateChoice(choice);
 	if(AAFRESULT_FAILED(ar))
 		return(ar);
@@ -233,6 +247,9 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT ar=ValidateChoice(choice);
   if(AAFRESULT_FAILED(ar))
 	return(ar);
+
+  if(choice->attached())
+	return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
 
   _choices.insertAt(choice,index);
   choice->AcquireReference();

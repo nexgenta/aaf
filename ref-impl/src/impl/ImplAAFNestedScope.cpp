@@ -95,6 +95,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if(pSegment->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
 	_slots.appendValue(pSegment);
 	pSegment->AcquireReference();
 
@@ -107,6 +110,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(pSegment->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
 
 	_slots.prependValue(pSegment);
 	pSegment->AcquireReference();
@@ -129,6 +135,9 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (index > count)
 	return AAFRESULT_BADINDEX;
+
+  if(pSegment->attached())
+	return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
 
   _slots.insertAt(pSegment,index);
   pSegment->AcquireReference();
@@ -167,7 +176,12 @@ AAFRESULT STDMETHODCALLTYPE
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  _slots.getValueAt(*ppSegment,index);
+
+  assert(*ppSegment);
+  (*ppSegment)->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -216,7 +230,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (*ppEnum)
 		  (*ppEnum)->ReleaseReference();
 		(*ppEnum) = 0;
-		return(XCODE());
 	}
 	XEND;
 

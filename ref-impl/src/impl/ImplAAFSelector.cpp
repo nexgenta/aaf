@@ -110,26 +110,29 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::SetSelectedSegment (ImplAAFSegment* pSelSegment)
 {
-	HRESULT				hr = AAFRESULT_SUCCESS;
 	ImplAAFSegment*		pPrevSelected = NULL;
 
 	if (pSelSegment == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	pPrevSelected = _selected;
+	if (pPrevSelected)
 	{
-		hr = AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		pPrevSelected = _selected;
-		if (pPrevSelected)
-		{
-		  pPrevSelected->ReleaseReference();
-		  pPrevSelected = 0;
-		}
-		_selected = pSelSegment;
-		_selected->AcquireReference();
+	  if( pPrevSelected == pSelSegment )
+		return AAFRESULT_SUCCESS;
+
+	  pPrevSelected->ReleaseReference();
+	  pPrevSelected = 0;
 	}
 
-	return hr;
+	if (pSelSegment->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+	_selected = pSelSegment;
+	_selected->AcquireReference();
+
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -161,6 +164,12 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::RemoveAlternateSegment (ImplAAFSegment* pSegment)
 {
+	if (pSegment == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	if( !pSegment->attached() )
+		return AAFRESULT_SEGMENT_NOT_FOUND;
+
 	if (!_alternates.containsValue(pSegment))
 	  return AAFRESULT_SEGMENT_NOT_FOUND;
 
@@ -261,7 +270,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (*ppEnum)
 		  (*ppEnum)->ReleaseReference();
 		(*ppEnum) = 0;
-		return(XCODE());
 	}
 	XEND;
 

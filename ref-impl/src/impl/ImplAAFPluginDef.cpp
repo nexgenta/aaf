@@ -331,9 +331,17 @@ AAFRESULT STDMETHODCALLTYPE
 	  {
 		ImplAAFNetworkLocator *pOldLoc = _manufacturerURL;
 		if (pOldLoc)
+		{
+		  if( pOldLoc == pManufacturerInfo )
+			return AAFRESULT_SUCCESS;
+
 		  pOldLoc->ReleaseReference();
-		pOldLoc = 0;
+		  pOldLoc = 0;
+		}
 	  }
+
+	if( pManufacturerInfo->attached() )
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_manufacturerURL = pManufacturerInfo;
 	
@@ -717,6 +725,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pLocator == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if(pLocator->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
 	_locators.appendValue(pLocator);
 	pLocator->AcquireReference();
 
@@ -731,6 +742,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pLocator == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(pLocator->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
 
 	_locators.prependValue(pLocator);
 	pLocator->AcquireReference();
@@ -755,6 +769,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if (index > count)
 	  return AAFRESULT_BADINDEX;
+
+	if(pLocator->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
 
 	_locators.insertAt(pLocator,index);
 	pLocator->AcquireReference();
@@ -855,7 +872,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
-		return(XCODE());
 	}
 	XEND;
 	

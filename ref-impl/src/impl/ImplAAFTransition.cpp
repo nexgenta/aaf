@@ -78,7 +78,7 @@ _cutPoint( PID_Transition_CutPoint, L"CutPoint")
 
 ImplAAFTransition::~ImplAAFTransition ()
 {
-	ImplAAFOperationGroup *group = _operationGroup.setValue(0);
+	ImplAAFOperationGroup *group = _operationGroup.clearValue();
 	if (group)
 	{
 	  group->ReleaseReference();
@@ -106,8 +106,17 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(SetNewProps(length, pDataDef));
 		_cutPoint = cutPoint;
 		if (_operationGroup)
+		{
+		  if( pOperationGroup == _operationGroup )
+			RAISE( AAFRESULT_SUCCESS );
+
 		  _operationGroup->ReleaseReference();
-		_operationGroup = 0;
+		  _operationGroup = 0;
+		}
+
+		if (pOperationGroup->attached())
+			RAISE(  AAFRESULT_OBJECT_ALREADY_ATTACHED );
+
 		_operationGroup = pOperationGroup;
 		if (pOperationGroup)
 			pOperationGroup->AcquireReference();
@@ -166,8 +175,16 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	
 	if (_operationGroup)
+	{
+	  if( pEffObj == _operationGroup )
+		return AAFRESULT_SUCCESS;
+
 	  _operationGroup->ReleaseReference();
-	_operationGroup = 0;
+	  _operationGroup = 0;
+	}
+
+	if( pEffObj->attached() )
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_operationGroup = pEffObj;
 	_operationGroup->AcquireReference();
@@ -190,3 +207,4 @@ AAFRESULT ImplAAFTransition::ChangeContainedReferences(aafMobID_constref from,
 
 	return AAFRESULT_SUCCESS;
 }
+
