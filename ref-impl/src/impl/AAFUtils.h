@@ -1,25 +1,28 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
-
+/***********************************************************************
+ *
+ *              Copyright (c) 1996 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and to distribute
+ * and sublicense application software incorporating this software for
+ * any purpose is hereby granted, provided that (i) the above
+ * copyright notice and this permission notice appear in all copies of
+ * the software and related documentation, and (ii) the name Avid
+ * Technology, Inc. may not be used in any advertising or publicity
+ * relating to the software without the specific, prior written
+ * permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR OTHER DAMAGES OF
+ * ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE, INCLUDING, 
+ * WITHOUT  LIMITATION, DAMAGES RESULTING FROM LOSS OF USE,
+ * DATA OR PROFITS, AND WHETHER OR NOT ADVISED OF THE POSSIBILITY OF
+ * DAMAGE, REGARDLESS OF THE THEORY OF LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef _AAF_UTIL_API_
 #define _AAF_UTIL_API_ 1
@@ -32,41 +35,12 @@
 
 #include "aafErr.h"
 #include "AAFTypes.h"
+#include "Stubs.h"
 
-class ImplAAFFile;
-class ImplAAFObject;
-
-
-typedef enum
+#if PORT_LANG_CPLUSPLUS
+extern          "C"
 {
-	kRoundCeiling, kRoundFloor
-} aafRounding_t;
-
-typedef aafInt16	AAFByteOrder;
-const AAFByteOrder INTEL_ORDER		      = 0x4949; // 'II' for Intel
-const AAFByteOrder MOTOROLA_ORDER         = 0x4d4d; // 'MM' for Motorola
-
-AAFByteOrder GetNativeByteOrder(void);
-
-aafBool	EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2);
-aafBool	EqualMobID(aafMobID_constref mobID1, aafMobID_constref mobID2);
-aafBool aafIsEqualGUID( const GUID& guid1, const GUID& guid2 );
-#define aafIsEqualIID(x, y) aafIsEqualGUID(x, y)
-#define aafIsEqualCLSID(x, y) aafIsEqualGUID(x, y)
-
-AAFRESULT aafMobIDNew(aafMobID_t *mobID);
-AAFRESULT aafMobIDFromMajorMinor(
-        aafUInt32	prefix,
-        aafUInt32	major,
-		aafUInt32	minor,
-		aafUInt8	UMIDType,	// 0x01-picture, 0x02-audio, 0x03-sound, 0x04-data
-		aafMobID_t *mobID);     /* OUT - Newly created Mob ID */
-void aafCreateGUID( GUID *p_guid );
-aafUInt32 aafGetTickCount();
-
-
-// Initializes a new auid
-AAFRESULT aafAUIDNew(aafUID_t * auid);
+#endif
 
 /************************************************************************
  *
@@ -95,6 +69,8 @@ AAFRESULT aafAUIDNew(aafUID_t * auid);
  * Possible Errors:
  *		Standard errors (see top of file).
  *************************************************************************/
+//!!! These should be somewhere else (AAFUtils??)
+/* omfmTimecodeToOffset */
 aafErr_t PvtOffsetToTimecode(
 	aafFrameOffset_t offset, /* IN - Offset into a track */
 	aafInt16 frameRate,      /* IN - Frame rate */
@@ -147,36 +123,83 @@ aafErr_t PvtTimecodeToOffset(
 /* omfsGetDateTime */
 void AAFGetDateTime(aafTimeStamp_t *time);
 
+
+/************************************************************************
+ *
+ * Container Functions
+ *
+ ************************************************************************/
+
+#if FULL_TOOLKIT
+aafBool omfsIsPropPresent(
+			AAFFile *			file,		/* IN -- For this aaf file */
+			AAFObject *		obj,		/* IN -- in this object */
+			aafProperty_t	prop,		/* IN -- read this property */
+			aafType_t		dataType);/* IN -- check the type */
+
+/************************************************************************
+ *
+ * Object Creation / Deletion Functions
+ *
+ ************************************************************************/
+
+aafErr_t AAFObjectNew(
+			AAFFile *				file,		/* IN - In this file */
+			aafClassID_t	*classID,	/* IN - create an object of this class */
+			AAFObject *			*result);	/* OUT - and return the result here. */
+#endif
+
 /************************************************************************
  *
  * Utility Functions
  *
  ************************************************************************/
 
+void *AAFMalloc(
+			size_t size);	/* Allocate this many bytes */
+
+void AAFFree(
+			void *ptr);	/* Free up this buffer */
+
+#if FULL_TOOLKIT
+aafErr_t AAFSetProgressCallback(
+			AAFFile *				file,		/* IN - For this file */
+			aafProgressProc_t aProc);	/* IN - Set this progress callback */
+#endif
+
+/* omfsFixShort */
 void AAFByteSwap16(
 			aafInt16 * wp);	/* IN/OUT -- Byte swap this value */
 			
+/* omfsFixLong */
 void AAFByteSwap32(
 			aafInt32 *lp);	/* IN/OUT -- Byte swap this value */
 
+/* omfsFixLong64 */
 void AAFByteSwap64(
 			aafInt64 *lp);	/* IN/OUT -- Byte swap this value */
 
 #define PROGRESS_UNKNOWN	-1
 
+aafBool isObjFunc(AAFFile * file,
+                         ImplAAFObject * obj,
+                         void *data);
 
+#if FULL_TOOLKIT
 aafErr_t AAFConvertEditRate(
 	aafRational_t srcRate,        /* IN - Source Edit Rate */
 	aafPosition_t srcPosition,    /* IN - Source Position */
 	aafRational_t destRate,       /* IN - Destination Edit Rate */
 	aafRounding_t howRound,	      /* IN - Rounding method (floor or ceiling) */
 	aafPosition_t *destPosition) ; /* OUT - Destination Position */
+	
+AAFObject *AAFNewClassFromContainerObj(AAFFile *file, OMLObject obj);
+AAFObject *AAFNewClassFromClassID(AAFFile *file, char *classID, OMLObject obj);
+#endif
 
-double FloatFromRational(
-			aafRational_t	e);		/* IN - Convert this into a double */
-aafRational_t RationalFromFloat(
-			double	f);		/* IN - Convert this number into a rational */
-
+#if PORT_LANG_CPLUSPLUS
+}
+#endif
 #endif				/* _AAF_UTIL_API_ */
 
 /* INDENT OFF */
