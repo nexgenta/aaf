@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -44,7 +44,7 @@
 
 #include "AAFUtils.h" // AAFByteOrder
 
-#include "jpegesdata.h"
+
 
 // ID for this Plugin's CoClass.
 EXTERN_C const CLSID CLSID_AAFJPEGCodec;
@@ -73,24 +73,32 @@ public:
   // IAAFPlugin interface methods
 	//
 
-  STDMETHOD (CountDefinitions)
-	  (/*[out]*/ aafUInt32 *pDefCount);
+  // Set up a codec.
+  STDMETHOD (Start)
+     (void);
+
+  // Tear down a codec.
+  STDMETHOD (Finish)
+     (void);
+
+  STDMETHOD (GetNumDefinitions)
+	  (/*[out]*/ aafInt32 *pDefCount);
 
   STDMETHOD (GetIndexedDefinitionID)
-	  (/*[in] */ aafUInt32 index, 
+	  (/*[in] */ aafInt32 index, 
 		 /*[out]*/ aafUID_t *result);
 
   STDMETHOD (GetPluginDescriptorID)
 	  (/*[out]*/ aafUID_t *result);
 
   STDMETHOD (GetIndexedDefinitionObject)
-	  (/*[in] */ aafUInt32 index, 
+	  (/*[in] */ aafInt32 index, 
 		 /*[in] */ IAAFDictionary *dict, 
 		 /*[out]*/ IAAFDefObject **def);
 
   STDMETHOD (CreateDescriptor)
 	  (/*[in] */ IAAFDictionary *dict,
-		 /*[out]*/ IAAFPluginDef **desc);
+		 /*[out]*/ IAAFPluginDescriptor **desc);
 
 
   //
@@ -101,8 +109,8 @@ public:
   STDMETHOD (SetEssenceAccess)
     (/*[in] */ IAAFEssenceAccess *access);
 
-  STDMETHOD (CountFlavours)
-    (/*[in] */ aafUInt32  *pCount);
+  STDMETHOD (GetFlavourCount)
+    (/*[in] */ aafInt32  *pCount);
 
 	// Some codecs have variants handled by a single codec.
 	// (For example, the Avid AVR codec handles multiple AVRs.)
@@ -110,36 +118,41 @@ public:
 	// by the AAFPluginManager.
 	//
   STDMETHOD (GetIndexedFlavourID)
-    (/*[in] */ aafUInt32  index, // Which flavour to get the ID for
-     /*[out]*/ aafUID_t *  pFlavour); // The returned flavour ID 
+    (/*[in] */ aafInt32  index, // Which variant to get the ID for
+     /*[out]*/ aafUID_t *  pVariant); // The returned variant ID 
 
-  STDMETHOD (CountDataDefinitions)
-    (/*[out] */ aafUInt32 *pCount);
+	
+  // Sets a value indicating whether the SDK is handling the compression.
+  STDMETHOD (SetCompressionEnabled)
+    (/*[in] */ aafBool  enable); // isCompressionEnabled 
+
+  STDMETHOD (GetDataDefinitionCount)
+    (/*[out] */ aafInt32 *pCount);
 
 	// All codecs handle at least one kind of media (picture, sound, control)
 	    // but some handle more than one.  The kind of media is specified by an
 	    // AAFDataDefinition.  The numnber of data definitions is returned by
 	    // GetIndexedDataDefinition, and cached by the AAFPluginManager.
   STDMETHOD (GetIndexedDataDefinition)
-    (/*[in] */ aafUInt32  index, // Which data definition to get the ID for
-     /*[out]*/ aafUID_t * pFlavour); // The returned dataDefinition 
+    (/*[in] */ aafInt32  index, // Which data definition to get the ID for
+     /*[out]*/ aafUID_t *  pVariant); // The returned dataDefinition 
 
   STDMETHOD (GetMaxCodecDisplayNameLength)
-    (/*[out]*/ aafUInt32  *bufSize);
+    (/*[out]*/ aafInt32  *bufSize);
 
-	// Given a flavour ID, return the human readable name
+	// Given a variant ID, return the human readable name
   STDMETHOD (GetCodecDisplayName)
-    (/*[in] */ aafUID_constref  flavour, // which flavour of the codec to use
-     /*[in,string]*/ aafCharacter *  pName, // Human-readable name of the flavour
-     /*[in] */ aafUInt32  bufSize); // length of the buffer to hold flavour Name 
+    (/*[in] */ aafUID_t  variant, // which variant of the codec to use
+     /*[in,string]*/ wchar_t *  pName, // Human-readable name of the variant
+     /*[in] */ aafInt32  bufSize); // length of the buffer to hold variant Name 
 	
   // Returns the number of channels which this codec can handle
 			// of the given essence kind
-  STDMETHOD (CountChannels)
+  STDMETHOD (GetNumChannels)
     (/*[in] */ IAAFSourceMob *fileMob, // Get the number of processable channels on this file mob
-     /*[in] */ aafUID_constref essenceKind, // This is the type of essence to open
+     /*[in] */ aafUID_t essenceKind, // This is the type of essence to open
      /*[in] */ IAAFEssenceStream *stream,
-     /*[out]*/ aafUInt16 *  pNumChannels); // The number of channels present 
+     /*[out]*/ aafInt16 *  pNumChannels); // The number of channels present 
 
   STDMETHOD (GetSelectInfo)
 	  (/*[in] */ IAAFSourceMob *fileMob, 
@@ -155,58 +168,43 @@ public:
      /*[in] */ IAAFEssenceStream *stream,
      /*[in] */ aafCheckVerbose_t  verbose, // This is the verbosity level of the output
      /*[out]*/ aafCheckWarnings_t warning, // This determines whether the output contains warnings
-     /*[in] */ aafUInt32  bufSize,
+     /*[in] */ aafInt32  bufSize,
 		 /*[in, string] */ wchar_t *  pName,
-     /*[out]*/ aafUInt32  *bytesWritten);
+     /*[out]*/ aafInt32  *bytesWritten);
 		
   // Create a media data object, and attach the correct type of
 			//EssenceDescriptor to the fileMob
   STDMETHOD (Create)
     (/*[in]*/ IAAFSourceMob *fileMob, // Create the essence attached to this file mob
-     /*[in]*/ aafUID_constref flavour, // which flavour of the codec to use
-     /*[in]*/ aafUID_constref essenceKind, // This is the type of essence to create
-     /*[in]*/ aafRational_constref sampleRate,
-     /*[in]*/ IAAFEssenceStream * stream, // stream to write the data
-     /*[in]*/ aafCompressEnable_t compEnable); // whether or not samples should be written compressed
+     /*[in]*/ aafUID_t  variant, // which variant of the codec to use
+     /*[in]*/ IAAFEssenceStream * stream,
+     /*[in]*/ aafInt32 numParms,
+     /*[in]*/ aafmMultiCreate_t *createParms);
 
   // Open a media data object.
   STDMETHOD (Open)
     (/*[in]*/ IAAFSourceMob *fileMob, // Open the essence attached to this file mob
+     /*[in]*/ aafSlotID_t	slotID,
      /*[in]*/ aafMediaOpenMode_t  openMode, // In this mode
-     /*[in]*/ IAAFEssenceStream * stream, // Here is an essence stream with the raw data 
-     /*[in]*/ aafCompressEnable_t compEnable); // whether or not samples should be read compressed
-
+     /*[in]*/ IAAFEssenceStream * stream); // Here is an essence stream with the raw data 
+	
   // Returns the number of samples which this codec can find on the
 			// given slot.
-  STDMETHOD (CountSamples)
-    (/*[in] */ aafUID_constref essenceKind, // This is the type of essence to check
+  STDMETHOD (GetNumSamples)
+    (/*[in] */ aafUID_t  essenceKind, // This is the type of essence to check
 	   /*[out]*/ aafLength_t *  pNumSamples); // The number of samples present of that type
-
-  STDMETHOD (WriteSamples) (
-    /*[in]*/ aafUInt32  nSamples, // write this many samples
-    /*[in]*/ aafUInt32  buflen,  // size of buffer
-    /*[in,size_is(buflen)]*/ aafDataBuffer_t  buffer, // from a buffer
-    /*[out]*/ aafUInt32 *samplesWritten, // write this many samples
-    /*[out]*/ aafUInt32 *bytesWritten);  // size of buffer
 
   // Write blocks from one or more buffers, interleaving if needed.
   STDMETHOD (WriteBlocks)
     (/*[in]*/ aafDeinterleave_t  inter, // Whether the material will be de-interleaved on read
-     /*[in]*/ aafUInt16  xferBlockCount, // How many aafMultiXfer blocks follow
+     /*[in]*/ aafInt16  xferBlockCount, // How many aafMultiXfer blocks follow
      /*[in]*/ aafmMultiXfer_t *  xferBlock, // One or more blocks containing buffer pointer and length 
      /*[in]*/ aafmMultiResult_t *  resultBlock);
-
-  STDMETHOD (ReadSamples) (  
-    /*[in]*/ aafUInt32  nSamples, // Read this many samples
-    /*[in]*/ aafUInt32  buflen, // into a buffer of this size
-    /*[out]*/ aafDataBuffer_t  buffer, // The transfer buffer
-    /*[out, ref]*/ aafUInt32 *  samplesRead, // The number of samples actually read
-    /*[out, ref]*/ aafUInt32 *  bytesRead); // The number of bytes actually read
 
   // Read blocks into one or more buffers, de-interleaving if needed.
   STDMETHOD (ReadBlocks)
     (/*[in]*/ aafDeinterleave_t  inter, // Whether the material will be de-interleaved on read
-     /*[in]*/ aafUInt16  xferBlockCount, // How many aafmMultiXfer blocks follow
+     /*[in]*/ aafInt16  xferBlockCount, // How many aafmMultiXfer blocks follow
      /*[in]*/ aafmMultiXfer_t *  xferBlock, // One or more blocks containing buffer pointer and length 
      /*[in]*/ aafmMultiResult_t *  resultBlock);
 
@@ -220,6 +218,22 @@ public:
   STDMETHOD (CompleteWrite)
      (IAAFSourceMob *desc);
 
+  // Write some number of bytes to the stream,
+			// formatting it as usual.  When the number of bytes passes
+			//the size of a sample frame, then the number of sample frames is
+			// bumped by one.
+  STDMETHOD (WriteFractionalSample)
+    (/*[in,size_is(buflen)]*/ aafDataBuffer_t  buffer, // to a buffer
+     /*[in]*/ aafInt32  buflen); // of this size 
+
+  // Read some number of bytes to the stream, removing any
+			// formatting.  When the number of bytes passes
+			//the size of a sample frame, then the number of sample frames read is
+			// bumped by one.
+  STDMETHOD (ReadFractionalSample)
+    (/*[in]*/ aafUInt32  buflen, // to a buffer of this size
+     /*[out, size_is(buflen), length_is(*bytesRead)]*/ aafDataBuffer_t  buffer, // here is the buffer
+     /*[out,ref]*/ aafUInt32 *  bytesRead); // Return bytes actually read 
 
   // Write some number of bytes to the stream exactly and with no formatting or compression.
   STDMETHOD (WriteRawData)
@@ -265,13 +279,16 @@ public:
 	  (/*[out]*/ aafUID_t *result);
 
   STDMETHOD (GetIndexedSampleSize)
-    (/*[in] */ aafUID_constref dataDefID,
+    (/*[in] */aafUID_t dataDefID, 
 		 /*[in] */aafPosition_t pos, 
 		 /*[out]*/aafLength_t *pResult);
 
   STDMETHOD (GetLargestSampleSize)
-    (/*[in] */aafUID_constref dataDefID,
+    (/*[in] */aafUID_t dataDefID, 
 		 /*[out]*/aafLength_t *pResult);
+
+  STDMETHOD (AddSampleIndexEntry)
+    (/*[in] */aafPosition_t pos);
 
 
 protected:
@@ -279,7 +296,7 @@ protected:
   // Declare the QI that implements for the interfaces
   // for this module. This will be called by CAAFUnknown::QueryInterface().
   // 
-  STDMETHOD(InternalQueryInterface)(REFIID riid, void **ppvObjOut);
+  virtual HRESULT InternalQueryInterface(REFIID riid, void **ppvObjOut);
 
 
 public:
@@ -295,19 +312,15 @@ public:
 
 private:
 	void SetEssenceStream(IAAFEssenceStream *stream);
-  void SetCompressionEnabled(aafCompressEnable_t compEnable);
-  HRESULT AddSampleIndexEntry(aafPosition_t pos);
 	void SetNumberOfSamples(const aafLength_t& numberOfSamples);
 	void SetCurrentIndex(aafUInt32 currentIndex);
 	void SetWriteIndex(aafUInt32 writeIndex);
-	aafUInt32 GetSampleSizeFromIndex(const aafPosition_t& pos); // throw HRESULT
 
 	typedef struct _aafCompressionParams
 	{
 		aafUInt32 imageWidth;
 		aafUInt32 imageHeight;
 
-		aafUInt16 components;
 		aafColorSpace_t colorSpace;
 		aafUInt32 horizontalSubsampling;
 		aafUInt32 verticalSubsampling;
@@ -324,20 +337,14 @@ private:
 
 	} aafCompressionParams;
 
-	void DumpSampleImage(const aafCompressionParams& param, JSAMPIMAGE rawSampleImage);
-
-	JSAMPIMAGE GetRawSampleImage(const aafCompressionParams& param); // throw HRESULT
-	aafUInt32 CopyDataToSampleImage(const aafCompressionParams& param, aafUInt32 startingOffset, JSAMPIMAGE rawSampleImage); // throw HRESULT
-	aafUInt32 CopyDataFromSampleImage(JSAMPIMAGE rawSampleImage, aafUInt32 startingOffset, aafCompressionParams& param); // throw HRESULT
-
 	// Compress a single image data from the given buffer. Return the actual
 	// number of bytes written.
-	HRESULT CompressImage(const aafCompressionParams& param, struct jpeg_compress_struct& cinfo);
+	HRESULT CompressImage(const aafCompressionParams& param);
 
 	// Decompress a single image from the current position in the stream returning
 	// the image data in buffer and the actual number of bytes written. Note: bufLen must
 	// be large enough to hold all of the decompressed data
-	HRESULT DecompressImage(aafCompressionParams& param, struct jpeg_decompress_struct& cinfo);
+	HRESULT DecompressImage(aafCompressionParams& param);
 
 	// Utility to get the current offset in the stream and add
 	// it the the sample index
@@ -354,13 +361,6 @@ private:
 	HRESULT ReadSampleIndex();
 	HRESULT WriteSampleIndex();
 
-	// Helper utility to make sure the given descriptor information is synchronized
-	// with the current information in the codec. Called in CompleteWrite method.
-	void UpdateDescriptor (CAAFJPEGDescriptorHelper& descriptorHelper);
-
-	// Routine to keep calculated member data up-to-date.
-	void UpdateCalculatedData(void);
-
 private:
 	AAFByteOrder		_nativeByteOrder;
 
@@ -375,7 +375,7 @@ private:
 
 	// Data from/to FileDescriptor
 	aafLength_t _length; // total size of file (informational?)
-	aafBoolean_t _isInAAFContainer; // set to true by refimpl if the essence stream is actually in an essence data.
+	aafBool _isInAAFContainer; // set to true by refimpl if the essence stream is actually in an essence data.
 	aafRational_t _sampleRate; // same for all samples.
 	aafUID_t _containerFormat;	// set by refimpl
 
@@ -419,7 +419,7 @@ private:
 	aafUInt32 _imageHeight; 
 	aafUInt32 _imageWidth;
 	aafUInt32 _fileBytesPerSample;
-	aafBoolean_t _descriptorFlushed;
+	aafBool _descriptorFlushed;
 	aafUInt32 _startingIndex; // index that we cannot write before...
 	aafUInt32 _currentIndex;
 	aafUInt32 _writeIndex;
@@ -430,7 +430,7 @@ private:
 	aafCompArray_t _compArray;
 
 	//jpeg_tables     compressionTables[3];
-	//aafBoolean_t _customTables;
+	//aafBool _customTables;
 	//omfJPEGInfo_t   jpeg;
 	aafFieldDom_t	_fieldDominance;
 	aafInt16 _memBitsPerPixel;
@@ -442,16 +442,9 @@ private:
 	aafLength_t	_numberOfSamples; /* was _sampleFrames in WaveCodec) */
 
 	aafUInt16 _padBytesPerRow;
-	aafUInt32 _compression_IJG_Quality;
 
 
-	// Data do define and hold the sample image buffer used for raw sub-sampled
-	// YUV data (4-2-2 YCbCr). This is the buffer used with the jpeg_write_raw_data
-	// and jpeg_read_raw_data functions.
-	JSAMPIMAGE _rawSampleImage; /* a 3-D sample array: top index is color */
-	JSAMPARRAY _rawSampleArray; // array of all sample row pointers in raw sample image.
-	JSAMPLE * _rawSampleImageBuffer; // ultimate buffer for _sampleImage.
-	aafUInt32 _rawSampleImageBufferSize;
+	bool _headerLoaded; // has the jpeg header been loaded?
 
 };
 
