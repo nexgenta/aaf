@@ -101,30 +101,25 @@ ImplAAFHeader::~ImplAAFHeader ()
 {
 	// Release all of the id pointers in the id list.
 	//
-	ImplAAFIdentification *pIdent = NULL;
-  size_t size;
-  _identificationList.getSize(size);
+	size_t size = _identificationList.getSize();
 	for (size_t i = 0; i < size; i++) {
-		_identificationList.getValueAt(pIdent, i);
+		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
 
 		if (pIdent) {
 			pIdent->ReleaseReference();
-			// Set value to 0 so the OM can perform any necessary cleanup.
-			pIdent = 0;
-			_identificationList.setValueAt(pIdent, i);
 		}
 	}
 
 	// Release the content storage pointer.
-	if (_contentStorage) {
-		_contentStorage->ReleaseReference();
-		_contentStorage = 0;
+	ImplAAFContentStorage *contentStorage = _contentStorage.setValue(0);
+	if (contentStorage) {
+		contentStorage->ReleaseReference();
 	}
 
 	// Release the dictionary pointer.
-	if (_dictionary) {
-		_dictionary->ReleaseReference();
-		_dictionary = 0;
+	ImplAAFDictionary *dictionary = _dictionary.setValue(0);
+	if (dictionary) {
+		dictionary->ReleaseReference();
 	}
 }
 
@@ -133,12 +128,21 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::LookupMob (aafUID_t *pMobID,
                            ImplAAFMob **ppMob)
 {
+    ImplAAFContentStorage *cstore = NULL;
+
     if ((! pMobID) || (! ppMob))
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->LookupMob(pMobID, ppMob));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->LookupMob(pMobID, ppMob));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -146,24 +150,44 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::GetNumMobs (aafMobKind_t mobKind,
                            aafNumSlots_t *pNumMobs)
 {
+    ImplAAFContentStorage *cstore = NULL;
+
     if (! pNumMobs)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->GetNumMobs(mobKind, pNumMobs));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->GetNumMobs(mobKind, pNumMobs));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::EnumAAFPrimaryMobs (ImplEnumAAFMobs **ppEnum)
 {
+    ImplAAFContentStorage *cstore = NULL;
+
     if (! ppEnum)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->GetPrimaryMobs(ppEnum));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->GetPrimaryMobs(ppEnum));
+	}
+	XEXCEPT
+	{
+	}
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -171,47 +195,84 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::EnumAAFAllMobs (aafSearchCrit_t *pSearchCriteria,
                            ImplEnumAAFMobs **ppEnum)
 {
+    ImplAAFContentStorage *cstore = NULL;
     if (! ppEnum)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->GetMobs(pSearchCriteria, ppEnum));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->GetMobs(pSearchCriteria, ppEnum));
+	}
+	XEXCEPT
+	{
+	}
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::AppendMob (ImplAAFMob *pMob)
 {
+    ImplAAFContentStorage *cstore = NULL;
+
     if (! pMob)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->AppendMob(pMob));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->AppendMob(pMob));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::RemoveMob (ImplAAFMob *pMob)
 {
+    ImplAAFContentStorage *cstore = NULL;
+
     if (! pMob)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->RemoveMob(pMob));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->RemoveMob(pMob));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::GetNumEssenceData(aafUInt32 *  pNumEssenceData)
 {
-  if(pNumEssenceData == NULL)
-    return AAFRESULT_NULL_PARAM;
+    ImplAAFContentStorage *cstore = NULL;
 
-  ImplAAFContentStorage *cstore = GetContentStorage();
-  return(cstore->GetNumEssenceData(pNumEssenceData));
+	if(pNumEssenceData == NULL)
+		 return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->GetNumEssenceData(pNumEssenceData));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -223,24 +284,41 @@ AAFRESULT STDMETHODCALLTYPE
                            aafFileFormat_t fmt,
                            aafBool *pResult)
 {
+    ImplAAFContentStorage *cstore = NULL;
     if ((! pFileMobID) || (! pResult))
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->IsEssenceDataPresent(pFileMobID, fmt, pResult));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->IsEssenceDataPresent(pFileMobID, fmt, pResult));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::EnumEssenceData (ImplEnumAAFEssenceData **ppEnum)
 {
-    if (! ppEnum)
+    ImplAAFContentStorage *cstore = NULL;
+	
+	if (! ppEnum)
 	  {
 		return AAFRESULT_NULL_PARAM;
 	  }
-	ImplAAFContentStorage *cstore = GetContentStorage();
-	return(cstore->EnumEssenceData(ppEnum));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->EnumEssenceData(ppEnum));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -248,12 +326,20 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::AppendEssenceData (ImplAAFEssenceData * pEssenceData)
 {
-  if (! pEssenceData)
+    ImplAAFContentStorage *cstore = NULL;
+	if (! pEssenceData)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		 return AAFRESULT_NULL_PARAM;
 	}
-  ImplAAFContentStorage *cstore = GetContentStorage();
-  return(cstore->AppendEssenceData(pEssenceData));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->AppendEssenceData(pEssenceData));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -261,12 +347,20 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::RemoveEssenceData (ImplAAFEssenceData * pEssenceData)
 {
-  if (! pEssenceData)
+    ImplAAFContentStorage *cstore = NULL;
+	if (! pEssenceData)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  ImplAAFContentStorage *cstore = GetContentStorage();
-  return(cstore->RemoveEssenceData(pEssenceData));
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->RemoveEssenceData(pEssenceData));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
 }
 
 
