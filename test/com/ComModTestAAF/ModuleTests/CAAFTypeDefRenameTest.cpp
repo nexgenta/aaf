@@ -29,12 +29,11 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
+#if defined(macintosh) || defined(_MAC)
+#include <wstring.h>
+#endif
 #include "AAF.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
-#include "AAFDefUIDs.h"
 #include "AAFSmartPointer.h"
 #include "AAFStoredObjectIDs.h"
 #include "CAAFBuiltinDefs.h"
@@ -141,7 +140,6 @@ static void FillInProductInfo(aafProductIdentification_t& ProductInfo,
 	ProductInfo.productName = L"AAFFile Test";
 	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 }
 
@@ -153,9 +151,9 @@ static const 	aafMobID_t	TEST_MobID =
 // Function to check if property value has a specific type.
 static aafBool PropValTypeIs(IAAFPropertyValue *pPropVal,aafUID_t *pAUID)
 {
-	IAAFTypeDefSP pTypeDef;
+	IAAFTypeDef *pTypeDef;
 	checkResult(pPropVal->GetType(&pTypeDef));
-	IAAFMetaDefinitionSP pMetaDef;
+	IAAFMetaDefinition *pMetaDef;
 	checkResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition,
 		(void**)&pMetaDef));
 	aafUID_t PropValAUID;
@@ -319,7 +317,7 @@ static void ReadTypeDefRenameFile(aafWChar *pFilename)
 		(void**)&pWordMetaDefinition));
 	aafUInt32 iNameLen;
 	checkResult(pWordMetaDefinition->GetNameBufLen(&iNameLen));
-	checkExpression(iNameLen==sizeof(wchar_t)*(wcslen(gpAliasName)+1));
+	checkExpression(iNameLen==2*(wcslen(gpAliasName)+1));
 	aafWChar *pNameBuf=new aafWChar[iNameLen/sizeof(aafWChar)];
 	checkResult(pWordMetaDefinition->GetName(pNameBuf,iNameLen));
 	checkExpression(!wcscmp(pNameBuf,gpAliasName));
@@ -377,17 +375,15 @@ static void ReadTypeDefRenameFile(aafWChar *pFilename)
 	pFile->Close();
 }
 
-extern "C" HRESULT CAAFTypeDefRename_test(testMode_t mode);
-extern "C" HRESULT CAAFTypeDefRename_test(testMode_t mode)
+extern "C" HRESULT CAAFTypeDefRename_test()
 {
 	aafWChar *pTestFilename=L"TypeDefRenameTest.aaf";
 
 	try
 	{
-      	if(mode == kAAFUnitTestReadWrite)
-			CreateTypeDefRenameFile(pTestFilename);
+		CreateTypeDefRenameFile(pTestFilename);
 		ReadTypeDefRenameFile(pTestFilename);
-//		RemoveTestFile(pTestFilename);
+		RemoveTestFile(pTestFilename);
 	}
 	catch(HRESULT& rResult)
 	{
