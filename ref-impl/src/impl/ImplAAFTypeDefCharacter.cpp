@@ -31,23 +31,14 @@
 #include "ImplAAFPropertyValue.h"
 #endif
 
+
+
+
+
 #include "AAFStoredObjectIDs.h"
 
 #ifndef __ImplAAFTypeDefCharacter_h__
 #include "ImplAAFTypeDefCharacter.h"
-#endif
-
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
-#include "ImplAAFObjectCreation.h"
-#include "AAFClassIDs.h"
-
-#ifndef __ImplAAFPropValData_h__
-#include "ImplAAFPropValData.h"
-#endif
-
-#ifndef __AAFTypeDefUIDs_h__
-#include "AAFTypeDefUIDs.h"
 #endif
 
 #include <assert.h>
@@ -56,18 +47,9 @@
 // We only support two byte unicode characters.
 const aafUInt32 kExternalCharacterSize = 2;
 
-
-//some macros
-#define check_hr(expr)\
-{\
-	HRESULT  the_hresult = (expr);\
-	if (FAILED(the_hresult))\
-	   return the_hresult;\
-}
-
-
 ImplAAFTypeDefCharacter::ImplAAFTypeDefCharacter ()
 {}
+
 
 ImplAAFTypeDefCharacter::~ImplAAFTypeDefCharacter ()
 {}
@@ -78,136 +60,26 @@ AAFRESULT ImplAAFTypeDefCharacter::pvtInitialize (
       aafCharacter_constptr  pTypeName)
 {
   // The description string needs to be initialized elsewhere...
-  return ImplAAFMetaDefinition::Initialize(id, pTypeName, L"Two-byte Unicode Character Type Definition");
+  return ImplAAFDefObject::pvtInitialize(id, pTypeName, L"Two-byte Unicode Character Type Definition");
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefCharacter::CreateValueFromCharacter (
-      aafCharacter  character,
-      ImplAAFPropertyValue ** ppCharacterValue)
+      aafCharacter  /*character*/,
+      ImplAAFPropertyValue ** /*ppCharacterValue*/)
 {
-    if (! ppCharacterValue)
-		return AAFRESULT_NULL_PARAM;
-	
-	aafUInt32 cbChar = NativeSize();
-	
-	// Create a temporary pointer to copy to the smartptr
-	ImplAAFPropValData * tmp = (ImplAAFPropValData *)CreateImpl(CLSID_AAFPropValData);
-	if (NULL == tmp)
-		return AAFRESULT_NOMEMORY;
-	ImplAAFPropValDataSP pv;
-	pv = tmp;
-	
-	tmp->ReleaseReference(); // we don't need this reference anymore.
-	tmp = 0;
-	
-	//Initialize
-	check_hr ( pv->Initialize(this) );
-	
-	//Allocate appropriate bits
-	aafMemPtr_t pBits = NULL;
-	check_hr ( pv->AllocateBits (cbChar, &pBits) );
-	
-	//Set the bits to incoming character
-	assert (pBits);
-	memcpy (pBits, &character, cbChar);
-	
-	*ppCharacterValue = pv;
-	(*ppCharacterValue)->AcquireReference ();
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefCharacter::SetCharacter (
-      ImplAAFPropertyValue * pCharacterValue,
-      aafCharacter  character)
-{
-	if (! pCharacterValue)
-		return AAFRESULT_NULL_PARAM;
-	
-	//get a pointer to the Val Data
-	ImplAAFPropValDataSP pvd;
-	pvd = dynamic_cast<ImplAAFPropValData*>(pCharacterValue);
-	if (!pvd) return AAFRESULT_BAD_TYPE;
-	
-	// get the property value's embedded type
-	ImplAAFTypeDefSP pPropType;
-	check_hr ( pvd->GetType (&pPropType) );
-	assert (pPropType);
-	//Make sure the TD of the pv passed in, matches that of the ImplAAFTypeDefCharacter
-	if ((ImplAAFTypeDef *)pPropType != this) // call operator ImplAAFTypeDef *
-		return AAFRESULT_BAD_TYPE;
-	
-	//check to make sure that the size in the val data matches that of the native size
-	aafUInt32 cbChar = 0;
-	check_hr ( pvd->GetBitsSize(&cbChar) );
-	
-	if (cbChar != NativeSize())
-	{
-		return AAFRESULT_BAD_SIZE;
-	}
-	
-	//ok all set with initial conditions
-	//now set the value to the incoming character
-	
-	aafMemPtr_t pBits = NULL;
-	check_hr ( pvd->GetBits (&pBits)  );
-	assert (pBits);
-	
-	memcpy (pBits, &character, cbChar);
-	
-	return AAFRESULT_SUCCESS;
-	
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefCharacter::GetCharacter (
-      ImplAAFPropertyValue * pCharacterValue,
-      aafCharacter *  pCharacter)
+      ImplAAFPropertyValue * /*pCharacterValue*/,
+      aafCharacter *  /*pCharacter*/)
 {
-	if (! pCharacterValue)
-		return AAFRESULT_NULL_PARAM;
-	
-	if (! pCharacter)
-		return AAFRESULT_NULL_PARAM;
-
-	//get a pointer to the Val Data
-	ImplAAFPropValDataSP pvd;
-	pvd = dynamic_cast<ImplAAFPropValData*>(pCharacterValue);
-	if (!pvd) return AAFRESULT_BAD_TYPE;
-	
-	// get the property value's embedded type
-	ImplAAFTypeDefSP pPropType;
-	check_hr ( pvd->GetType (&pPropType) );
-	assert (pPropType);
-	//Make sure the TD of the pv passed in, matches that of the ImplAAFTypeDefCharacter
-	if ((ImplAAFTypeDef *)pPropType != this) // call operator ImplAAFTypeDef *
-		return AAFRESULT_BAD_TYPE;
-	
-	//check to make sure that the size in the val data matches that of the native size
-	aafUInt32 cbChar = 0;
-	check_hr (  pvd->GetBitsSize(&cbChar) );
-
-	if (cbChar != NativeSize())
-	{
-		return AAFRESULT_BAD_SIZE;
-	}
-
-	//Now set the character from that contained in the prop val data
-
-	aafMemPtr_t pBits = NULL;
-	check_hr ( pvd->GetBits (&pBits) );
-	assert (pBits);
-	
-	memcpy (pCharacter, pBits, cbChar);
-	
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
-
-
 
 
 // Override from AAFTypeDef
@@ -225,7 +97,7 @@ AAFRESULT STDMETHODCALLTYPE
 // class ImplAAFTypeDefCharacter
 
 void ImplAAFTypeDefCharacter::reorder(OMByte* externalBytes,
-                             size_t ANAME(externalBytesSize)) const
+                             size_t externalBytesSize) const
 {
   TRACE("ImplAAFTypeDefCharacter::reorder");
   PRECONDITION("Valid external bytes", externalBytes != 0);
@@ -234,10 +106,10 @@ void ImplAAFTypeDefCharacter::reorder(OMByte* externalBytes,
   reorderInteger(externalBytes, kExternalCharacterSize);
 }
 
-size_t ImplAAFTypeDefCharacter::externalSize(OMByte* ANAME(internalBytes),
-                                    size_t ANAME(internalBytesSize)) const
+size_t ImplAAFTypeDefCharacter::externalSize(OMByte* internalBytes,
+                                    size_t internalBytesSize) const
 {
-  TRACE("ImplAAFTypeDefCharacter::externalSize");
+  TRACE("WideStringType::externalSize");
 
   PRECONDITION("Valid internal bytes", internalBytes != 0);
   PRECONDITION("Valid internal bytes size", internalBytesSize >= kExternalCharacterSize);
@@ -246,7 +118,7 @@ size_t ImplAAFTypeDefCharacter::externalSize(OMByte* ANAME(internalBytes),
 }
 
 void ImplAAFTypeDefCharacter::externalize(OMByte* internalBytes,
-                                 size_t ANAME(internalBytesSize),
+                                 size_t internalBytesSize,
                                  OMByte* externalBytes,
                                  size_t externalBytesSize,
                                  OMByteOrder byteOrder) const
@@ -265,8 +137,8 @@ void ImplAAFTypeDefCharacter::externalize(OMByte* internalBytes,
     contract(internalBytes, sizeof(aafCharacter), externalBytes, kExternalCharacterSize, byteOrder);
 }
 
-size_t ImplAAFTypeDefCharacter::internalSize(OMByte* ANAME(externalBytes),
-                                    size_t ANAME(externalBytesSize)) const
+size_t ImplAAFTypeDefCharacter::internalSize(OMByte* externalBytes,
+                                    size_t externalBytesSize) const
 {
   TRACE("ImplAAFTypeDefCharacter::internalSize");
 
@@ -277,7 +149,7 @@ size_t ImplAAFTypeDefCharacter::internalSize(OMByte* ANAME(externalBytes),
 }
 
 void ImplAAFTypeDefCharacter::internalize(OMByte* externalBytes,
-                                 size_t ANAME(externalBytesSize),
+                                 size_t externalBytesSize,
                                  OMByte* internalBytes,
                                  size_t internalBytesSize,
                                  OMByteOrder byteOrder) const
@@ -335,9 +207,9 @@ size_t ImplAAFTypeDefCharacter::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefCharacter::pvtCreateOMProperty
+OMProperty * ImplAAFTypeDefCharacter::pvtCreateOMPropertyMBS
   (OMPropertyId pid,
-   const wchar_t * name) const
+   const char * name) const
 {
   assert (name);
 
@@ -369,21 +241,3 @@ bool ImplAAFTypeDefCharacter::IsStringable () const
 
 
 
-
-
-// override from OMStorable.
-const OMClassId& ImplAAFTypeDefCharacter::classId(void) const
-{
-  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefCharacter));
-}
-
-// Override callbacks from OMStorable
-void ImplAAFTypeDefCharacter::onSave(void* clientContext) const
-{
-  ImplAAFTypeDef::onSave(clientContext);
-}
-
-void ImplAAFTypeDefCharacter::onRestore(void* clientContext) const
-{
-  ImplAAFTypeDef::onRestore(clientContext);
-}
