@@ -25,6 +25,11 @@
 *
 ************************************************************************/
 
+
+
+
+
+
 #ifndef __ImplEnumAAFStorablePropVals_h__
 #include "ImplEnumAAFStorablePropVals.h"
 #endif
@@ -109,7 +114,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-  
+	
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFStorablePropVals::NextOne (
@@ -120,35 +125,35 @@ AAFRESULT STDMETHODCALLTYPE
   if (!isInitialized())
     return AAFRESULT_NOT_INITIALIZED;
   
-  if (NULL == ppPropertyValue)
-    return AAFRESULT_NULL_PARAM;
-  *ppPropertyValue = NULL;
-  
-  if (_containerIterator->before() || _containerIterator->valid())
-  {
-    if (++(*_containerIterator))
-    {
-      OMObject* object = _containerIterator->currentObject();
-      ImplAAFStorable* obj = dynamic_cast<ImplAAFStorable*>(object);
-      assert(NULL != obj);
-      if (NULL == obj)
-        return AAFRESULT_INVALID_OBJ;
-      
-      // Use the container's element type to create the proper subclass
-      // of object reference.
-      result = _elementType->CreateValue(obj, ppPropertyValue);
-    }
-    else
-    {
-      result = AAFRESULT_NO_MORE_OBJECTS;
-    }
-  }
-  else
-  {
-    result = AAFRESULT_NO_MORE_OBJECTS;
-  }
-  
-  return result;
+	if (NULL == ppPropertyValue)
+		return AAFRESULT_NULL_PARAM;
+	*ppPropertyValue = NULL;
+	
+	if (_containerIterator->before() || _containerIterator->valid())
+	{
+		if (++(*_containerIterator))
+		{
+			OMObject* object = _containerIterator->currentObject();
+			ImplAAFStorable* obj = dynamic_cast<ImplAAFStorable*>(object);
+			assert(NULL != obj);
+			if (NULL == obj)
+			  return AAFRESULT_INVALID_OBJ;
+			
+			// Use the container's element type to create the proper subclass
+			// of object reference.
+			result = _elementType->CreateValue(obj, ppPropertyValue);
+		}
+		else
+		{
+		  result = AAFRESULT_NO_MORE_OBJECTS;
+		}
+	}
+	else
+	{
+	  result = AAFRESULT_NO_MORE_OBJECTS;
+	}
+	
+	return result;
 }
 
 
@@ -164,23 +169,23 @@ AAFRESULT STDMETHODCALLTYPE
   if (!isInitialized())
     return AAFRESULT_NOT_INITIALIZED;
 
-  if (NULL == ppPropertyValues || NULL == pFetched)
-    return AAFRESULT_NULL_PARAM;
-  
-  if (0 == count)
-    return AAFRESULT_INVALID_PARAM;
+	if (NULL == ppPropertyValues || NULL == pFetched)
+		return AAFRESULT_NULL_PARAM;
+	
+	if (0 == count)
+		return AAFRESULT_INVALID_PARAM;
 
-  aafUInt32      numItems;
-  for (numItems = 0; numItems < count; numItems++)
-  {
-    result = NextOne(&ppPropertyValues[numItems]);
-    if (FAILED(result))
-      break;
-  }
-  
-  *pFetched = numItems;
+	aafUInt32			numItems;
+	for (numItems = 0; numItems < count; numItems++)
+	{
+		result = NextOne(&ppPropertyValues[numItems]);
+		if (FAILED(result))
+			break;
+	}
+	
+	*pFetched = numItems;
 
-  return result;
+	return result;
 }
 
 
@@ -194,31 +199,31 @@ AAFRESULT STDMETHODCALLTYPE
   if (!isInitialized())
     return AAFRESULT_NOT_INITIALIZED;
 
-  if (0 == count)
-    return AAFRESULT_INVALID_PARAM;
+	if (0 == count)
+		return AAFRESULT_INVALID_PARAM;
 
-  AAFRESULT ar=AAFRESULT_SUCCESS;
-  aafUInt32 n;
-  
-  for(n =1 ; n <= count; n++)
-  {
-    // Defined behavior of skip is to NOT advance at all if it would push 
-    // us off of the end
-    if(!++(*_containerIterator))
-    {
-      // Off the end, decrement n and iterator back to the starting 
-      // position
-      while(n>=1)
-      {
-        --(*_containerIterator);
-        n--;
-      }
-      result = AAFRESULT_NO_MORE_OBJECTS;
-      break;
-    }
-  }
+	AAFRESULT ar=AAFRESULT_SUCCESS;
+	aafUInt32 n;
+	
+	for(n =1 ; n <= count; n++)
+	{
+		// Defined behavior of skip is to NOT advance at all if it would push 
+		// us off of the end
+		if(!++(*_containerIterator))
+		{
+			// Off the end, decrement n and iterator back to the starting 
+			// position
+			while(n>=1)
+			{
+				--(*_containerIterator);
+				n--;
+			}
+			result = AAFRESULT_NO_MORE_OBJECTS;
+			break;
+		}
+	}
 
-  return result;
+	return result;
 }
 
 
@@ -242,9 +247,9 @@ AAFRESULT STDMETHODCALLTYPE
       ImplEnumAAFPropertyValues ** ppEnum)
 {
   AAFRESULT result = AAFRESULT_SUCCESS;  
-  if (NULL == ppEnum)
-    return AAFRESULT_NULL_PARAM;
-  *ppEnum = NULL;
+	if (NULL == ppEnum)
+		return AAFRESULT_NULL_PARAM;
+	*ppEnum = NULL;
 
   assert(isInitialized());
   if (!isInitialized())
