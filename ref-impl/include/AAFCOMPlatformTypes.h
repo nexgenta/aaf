@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOMPlatformTypes.h,v 1.10 2004/06/24 16:11:20 creederickson Exp $ $Name:  $
+// $Id: AAFCOMPlatformTypes.h,v 1.11 2004/10/25 12:46:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,8 +60,8 @@
   // defined BYTE et al, but due to nested includes we had to defined
   // them in terms of primitives...
 
-  typedef long SCODE;
-  typedef long HRESULT;
+  typedef int SCODE;
+  typedef int HRESULT;
 
 #ifndef BOOL 
   typedef int BOOL;
@@ -69,7 +69,7 @@
   typedef unsigned char BYTE;
   typedef BYTE * LPBYTE;
   typedef unsigned short WORD;
-  typedef unsigned long DWORD;
+  typedef unsigned int DWORD;
   typedef DWORD ULONG;
   typedef void *LPVOID;
   typedef char *LPSTR;
@@ -77,9 +77,6 @@
   typedef unsigned short WCHAR;
   typedef WCHAR TCHAR;
   typedef WCHAR *LPWSTR;
-
-# define _MAX_PATH 1024
-# define MAX_PATH  _MAX_PATH
 
   typedef struct tagGUID
   {
@@ -196,8 +193,8 @@ const GUID IID_IUnknown = {0x0,0x0,0x0,{0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};
 # define SEVERITY_ERROR      1
 
 # define MAKE_SCODE(sev,fac,code) \
-      ((SCODE) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | \
-                ((unsigned long)(code))) )
+      ((SCODE) (((unsigned int)(sev)<<31) | ((unsigned int)(fac)<<16) | \
+                ((unsigned int)(code))) )
 
 # define E_OUTOFMEMORY       MAKE_SCODE(SEVERITY_ERROR,   FACILITY_NULL, 2)
 # define E_INVALIDARG        MAKE_SCODE(SEVERITY_ERROR,   FACILITY_NULL, 3)   
