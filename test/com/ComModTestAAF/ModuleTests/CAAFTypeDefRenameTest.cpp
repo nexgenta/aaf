@@ -29,11 +29,11 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <stdlib.h>
+#include <wchar.h>
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFSmartPointer.h"
 #include "AAFStoredObjectIDs.h"
 #include "CAAFBuiltinDefs.h"
@@ -151,9 +151,9 @@ static const 	aafMobID_t	TEST_MobID =
 // Function to check if property value has a specific type.
 static aafBool PropValTypeIs(IAAFPropertyValue *pPropVal,aafUID_t *pAUID)
 {
-	IAAFTypeDef *pTypeDef;
+	IAAFTypeDefSP pTypeDef;
 	checkResult(pPropVal->GetType(&pTypeDef));
-	IAAFMetaDefinition *pMetaDef;
+	IAAFMetaDefinitionSP pMetaDef;
 	checkResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition,
 		(void**)&pMetaDef));
 	aafUID_t PropValAUID;
@@ -317,7 +317,7 @@ static void ReadTypeDefRenameFile(aafWChar *pFilename)
 		(void**)&pWordMetaDefinition));
 	aafUInt32 iNameLen;
 	checkResult(pWordMetaDefinition->GetNameBufLen(&iNameLen));
-	checkExpression(iNameLen==2*(wcslen(gpAliasName)+1));
+	checkExpression(iNameLen==sizeof(wchar_t)*(wcslen(gpAliasName)+1));
 	aafWChar *pNameBuf=new aafWChar[iNameLen/sizeof(aafWChar)];
 	checkResult(pWordMetaDefinition->GetName(pNameBuf,iNameLen));
 	checkExpression(!wcscmp(pNameBuf,gpAliasName));
@@ -375,15 +375,17 @@ static void ReadTypeDefRenameFile(aafWChar *pFilename)
 	pFile->Close();
 }
 
-extern "C" HRESULT CAAFTypeDefRename_test()
+extern "C" HRESULT CAAFTypeDefRename_test(testMode_t mode);
+extern "C" HRESULT CAAFTypeDefRename_test(testMode_t mode)
 {
 	aafWChar *pTestFilename=L"TypeDefRenameTest.aaf";
 
 	try
 	{
-		CreateTypeDefRenameFile(pTestFilename);
+      	if(mode == kAAFUnitTestReadWrite)
+			CreateTypeDefRenameFile(pTestFilename);
 		ReadTypeDefRenameFile(pTestFilename);
-		RemoveTestFile(pTestFilename);
+//		RemoveTestFile(pTestFilename);
 	}
 	catch(HRESULT& rResult)
 	{
