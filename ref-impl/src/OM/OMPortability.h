@@ -1,35 +1,55 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
 #ifndef OMPORTABILITY_H
 #define OMPORTABILITY_H
 
-// Contents TBS
+// @module OMPortability | Definitions supporting the portability
+//         of the Object Manager.
+//   @mauthor Tim Bingham | tjb | Avid Technology, Inc.
+
+// Figure out the compiler and define a symbol of the
+// form COMPILER_<compiler name>_<processor>_<operating system>
+//
+#if defined (_MSC_VER) && defined(_M_IX86) && defined(_WIN32)
+#define COMPILER_MSC_INTEL_WINDOWS
+#elif defined(__MWERKS__) && defined(__POWERPC__) && defined(macintosh)
+#define COMPILER_MWERKS_PPC_MACOS
+#elif defined(__GNUC__) && defined(__mips__) && defined(__sgi__)
+#define COMPILER_GCC_MIPS_SGI
+#elif defined(__GNUC__) && defined(__i386__) && defined(__linux__)
+#define COMPILER_GCC_INTEL_LINUX
+#elif defined(__GNUC__) && defined(__i386__) && defined(__FreeBSD__)
+#define COMPILER_GCC_INTEL_FREEBSD
+#elif defined(mips) && defined(sgi)
+#define COMPILER_SGICC_MIPS_SGI
+#elif defined(__GNUC__) && defined(__ppc__) && defined(__APPLE__)
+#define COMPILER_GCC_PPC_MACOSX
+#elif defined(__GNUC__) && defined(__sparc__) && defined(__sun__)
+#define COMPILER_GCC_SPARC_SUNOS
+#else
+#error "Unknown compiler"
+#endif
 
 #endif
 
