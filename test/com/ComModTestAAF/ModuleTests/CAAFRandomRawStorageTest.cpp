@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2001 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -36,10 +36,7 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
-#include <string.h>
-#include <wchar.h>
 
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFRawStorage>  IAAFRawStorageSP;
@@ -244,8 +241,6 @@ static HRESULT localOpenFileDiskStgWrite
   // create the file and open it.
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
-								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,
@@ -274,8 +269,6 @@ static HRESULT localOpenFileDiskStgRead
   // create the file and open it.
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
-								   kAAFFileExistence_existing,
-								   kAAFFileAccess_read,
 								   0,
 								   0,
 								   0,
@@ -301,14 +294,12 @@ static HRESULT localOpenFileMemStgWrite
   // Create a mem raw storage.
   IAAFRawStorageSP pStg;
   checkResult
-	(AAFCreateRawStorageMemory (kAAFFileAccess_modify,
+	(AAFCreateRawStorageMemory (kAAFFileAccess_write,
 								&pStg));
 
   // create the file and open it.
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
-								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,
@@ -335,8 +326,6 @@ static HRESULT localOpenFileMemStgRead
   // create the file and open it.
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
-								   kAAFFileExistence_existing,
-								   kAAFFileAccess_read,
 								   0,
 								   0,
 								   0,
@@ -392,8 +381,7 @@ class CCustomRawStorage :
 {
 public:
   CCustomRawStorage (const aafWChar * pFileName,
-					 aafFileAccess_e access,
-					 aafFileExistence_e exist)
+					 aafFileAccess_e access)
 	: _refCnt (1),
 	  _access (access),
 	  _file (0),
@@ -405,24 +393,9 @@ public:
 	if (kAAFFileAccess_write == access)
 	  _file = fopen (cFileName, "wb");
 	else if (kAAFFileAccess_read == access)
-	  {
-		assert (kAAFFileExistence_existing == exist);
-		_file = fopen (cFileName, "rb");
-	  }
+	  _file = fopen (cFileName, "rb");
 	else if (kAAFFileAccess_modify == access)
-	  {
-		switch (exist)
-		  {
-		  case kAAFFileExistence_existing:
-			_file = fopen (cFileName, "r+b");
-			break;
-		  case kAAFFileExistence_new:
-			_file = fopen (cFileName, "w+b");
-			break;
-		  default:
-			assert (0);
-		  }
-	  }
+	  _file = fopen (cFileName, "r+b");
 	else
 	  assert (0);
 	assert (_file); }
@@ -432,25 +405,25 @@ public:
 
   // IUnknown overrides
   HRESULT STDMETHODCALLTYPE
-    QueryInterface (REFIID iid, void ** ppIfc)
+    QueryInterface (const struct _GUID & iid, void ** ppIfc)
     { if (! ppIfc) return AAFRESULT_NULL_PARAM;
-	  if (equalUID (iid, IID_IUnknown))
+	  if (iid == IID_IUnknown)
 		{ IUnknown * runk = (IAAFRawStorage*) this;
 		*ppIfc = (void*) runk;
 		AddRef ();
 		return AAFRESULT_SUCCESS; }
-	  else if (equalUID (iid, IID_IAAFRawStorage))
+	  else if (iid == IID_IAAFRawStorage)
 		{ IAAFRawStorage * rrs = this;
 		*ppIfc = (void*) rrs;
 		AddRef ();
 		return AAFRESULT_SUCCESS; }
-	  else if (equalUID (iid, IID_IAAFRandomRawStorage))
+	  else if (iid == IID_IAAFRandomRawStorage)
 		{ IAAFRandomRawStorage * rrrs = this;
 		*ppIfc = (void*) rrrs;
 		AddRef ();
 		return AAFRESULT_SUCCESS; }
 	  else
-		return E_NOINTERFACE; }
+		return E_FAIL; }
 
   aafUInt32 STDMETHODCALLTYPE
     AddRef () {return ++_refCnt;}
@@ -476,9 +449,6 @@ public:
 		  aafUInt32 *pNumRead)
     { if (! _file) return AAFRESULT_NOT_INITIALIZED;
 	  if (! pNumRead) return AAFRESULT_NULL_PARAM;
-	  aafBoolean_t readable = kAAFFalse;
-	  IsReadable (&readable);
-	  if (! readable) return AAFRESULT_NOT_READABLE;
 	  size_t actualByteCount = fread(buf, 1, bufSize, _file);
 	  *pNumRead = actualByteCount;
 	  return AAFRESULT_SUCCESS; }
@@ -497,9 +467,6 @@ public:
 		   aafUInt32 *pNumWritten)
     { if (! _file) return AAFRESULT_NOT_INITIALIZED;
 	  if (! pNumWritten) return AAFRESULT_NULL_PARAM;
-	  aafBoolean_t writeable = kAAFFalse;
-	  IsWriteable (&writeable);
-	  if (! writeable) return AAFRESULT_NOT_WRITEABLE;
 	  size_t actualByteCount = fwrite(buf, 1, bufSize, _file);
 	  *pNumWritten = actualByteCount;
 	  return AAFRESULT_SUCCESS; }
@@ -563,9 +530,6 @@ private:
   { int seekStatus = fseek(_file, static_cast<long>(position), SEEK_SET);
     assert (0 == seekStatus); }
 
-  int equalUID(const GUID & a, const GUID & b)
-  { return (0 == memcmp((&a), (&b), sizeof (aafUID_t))); }
-
   aafUInt32       _refCnt;
   aafFileAccess_e _access;  
   FILE *          _file;
@@ -588,14 +552,11 @@ static HRESULT localOpenFileCustomStgWrite
   // Create a custom raw storage.
   IAAFRawStorage * pStg =
 	new CCustomRawStorage (pFileName,
-						   kAAFFileAccess_modify,
-						   kAAFFileExistence_new);
+						   kAAFFileAccess_write);
 
   // create the file and open it.
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
-								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,
@@ -617,14 +578,11 @@ static HRESULT localOpenFileCustomStgRead
   // Create a custom raw storage.
   IAAFRawStorage * pStg =
 	new CCustomRawStorage (pFileName,
-						   kAAFFileAccess_read,
-						   kAAFFileExistence_existing);
+						   kAAFFileAccess_read);
 
   // create the file and open it.
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pStg,
-								   kAAFFileExistence_existing,
-								   kAAFFileAccess_read,
 								   0,
 								   0,
 								   0,
@@ -728,7 +686,7 @@ static const fileInfo_t sFileDescriptions[] =
   {
 	{
 	  fileInfo_t::kStgTypeDisk,
-	  L"AAFRandomRawStgTest.aaf",
+	  L"AAFRandomRawStgTestDisk.aaf",
 	  "Disk",
 	  localOpenFileDiskWrite,
 	  localOpenFileDiskRead,
@@ -737,7 +695,7 @@ static const fileInfo_t sFileDescriptions[] =
 	},
 	{
 	  fileInfo_t::kStgTypeDiskStg,
-	  L"AAFRandomRawStgTestDisk.aaf",
+	  L"AAFRandomRawStgTestDiskStg.aaf",
 	  "Disk Storage",
 	  localOpenFileDiskStgWrite,
 	  localOpenFileDiskStgRead,
@@ -746,7 +704,7 @@ static const fileInfo_t sFileDescriptions[] =
 	},
 	{
 	  fileInfo_t::kStgTypeMemStg,
-	  L"AAFRandomRawStgTestMem.aaf",
+	  L"AAFRandomRawStgTestMemStg.aaf",
 	  "Mem Storage",
 	  localOpenFileMemStgWrite,
 	  localOpenFileMemStgRead,
@@ -755,7 +713,7 @@ static const fileInfo_t sFileDescriptions[] =
 	},
 	{
 	  fileInfo_t::kStgTypeCustomStg,
-	  L"AAFRandomRawStgTestCstm.aaf",
+	  L"AAFRandomRawStgTestCustomStg.aaf",
 	  "Custom Storage",
 	  localOpenFileCustomStgWrite,
 	  localOpenFileCustomStgRead,

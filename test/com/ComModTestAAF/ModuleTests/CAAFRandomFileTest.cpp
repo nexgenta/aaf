@@ -91,14 +91,12 @@ static HRESULT TestGetSetFileBits ()
   // writing.
   IAAFRawStorageSP pWriteStg;
   checkResult
-	(AAFCreateRawStorageMemory (kAAFFileAccess_modify,
+	(AAFCreateRawStorageMemory (kAAFFileAccess_write,
 								&pWriteStg));
 	  
   IAAFFileSP pWriteFile;
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pWriteStg,
-								   kAAFFileExistence_new,
-								   kAAFFileAccess_write,
 								   &aafFileKindAafSSBinary,
 								   0,
 								   &sIdent,
@@ -122,6 +120,11 @@ static HRESULT TestGetSetFileBits ()
   // GetBits should fail because file's never been opened
   hr = pWriteRandFile->GetFileBits (&pgfb);
   checkExpression (AAFRESULT_BADOPEN == hr, AAFRESULT_TEST_FAILED);
+  // SetBits should not succeed 'cause this file is only open for
+  // write
+  hr = pWriteRandFile->SetFileBits (&psfb);
+  checkExpression (AAFRESULT_NOT_READABLE == hr,
+				   AAFRESULT_TEST_FAILED);
 
   checkResult (pWriteFile->Open());
   // Both GetBits and SetBits should fail while file is open.
@@ -148,8 +151,6 @@ static HRESULT TestGetSetFileBits ()
   IAAFFileSP pReadFile;
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pReadStg,
-								   kAAFFileExistence_existing,
-								   kAAFFileAccess_read,
 								   0,
 								   0,
 								   0,
