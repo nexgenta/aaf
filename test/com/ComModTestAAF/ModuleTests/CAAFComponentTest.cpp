@@ -1,12 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFSegment
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -58,14 +77,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*  pDictionary = NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFMob*					pReferencedMob = NULL;
-	IAAFMobSlot*				newSlot = NULL;
+	IAAFTimelineMobSlot*		newSlot = NULL;
 	IAAFComponent*				comp = NULL;
 	IAAFSegment*				seg = NULL;
 	aafRational_t				audioRate = { 44100, 1 };
 	aafLength_t					testLength = TEST_LENGTH;
 	bool bFileOpen = false;
 	aafProductIdentification_t	ProductInfo;
-	aafUID_t					newMobID, referencedMobID, dataDef = TEST_DDEF;
+	aafMobID_t					newMobID, referencedMobID;
+	aafUID_t					dataDef = TEST_DDEF;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -95,36 +115,42 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pHeader->GetDictionary(&pDictionary));
  		
 		//Make the MOB to be referenced
-		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
+		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
 								 IID_IAAFMob, 
 								 (IUnknown **)&pReferencedMob));
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
-		checkResult(pReferencedMob->SetMobID(&referencedMobID));
+		checkResult(pReferencedMob->SetMobID(referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
 
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
 								 IID_IAAFMob, 
 								 (IUnknown **)&pMob));
 		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"AAFSourceClipTest"));
 
 		// Create a SourceClip
-		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
+		checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
 								 IID_IAAFSegment, 
 								 (IUnknown **)&seg));
 		checkResult(seg->QueryInterface (IID_IAAFComponent,
                                           (void **)&comp));
-		checkResult(comp->SetDataDef (&dataDef));
-		checkResult(comp->SetLength (&testLength));
+		checkResult(comp->SetDataDef (dataDef));
+		checkResult(comp->SetLength (testLength));
 		comp->Release();
 		comp = NULL;
 								 		
-		checkResult(pMob->AppendNewSlot (seg, 1, slotName, &newSlot));
+		aafRational_t editRate = { 0, 1};
+		checkResult(pMob->AppendNewTimelineSlot (editRate,
+												 seg,
+												 1,
+												 slotName,
+												 0,
+												 &newSlot));
 
-		checkResult(pHeader->AppendMob(pMob));
-		checkResult(pHeader->AppendMob(pReferencedMob));
+		checkResult(pHeader->AddMob(pMob));
+		checkResult(pHeader->AddMob(pReferencedMob));
 	}
   catch (HRESULT& rResult)
   {
@@ -209,19 +235,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		checkExpression(2 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over all Composition Mobs
 		criteria.searchTag = kByMobKind;
 		criteria.tags.mobKind = kCompMob;
-		checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
+		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
 		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
-			checkResult(pMob->GetNumSlots(&numSlots));
+			checkResult(pMob->CountSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
 
-			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
+			checkResult(pMob->GetSlots(&pSlotIter));
 			while (AAFRESULT_SUCCESS == pSlotIter->NextOne(&pSlot))
 			{
 				// The segment should be a source clip...
