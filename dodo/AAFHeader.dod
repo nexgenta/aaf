@@ -1,9 +1,9 @@
 #c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
+#c*                                                 *
+#c* Advanced Authoring Format                       *
+#c*                                                 *
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.   *
+#c*                                                 *
 #c\*************************************************/
 #startm .this-module 0
 AAFHeader\
@@ -44,22 +44,21 @@ AD_CLASS_UUID(B1A21383, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 AD_DEFAULT_UUID(B1A21382, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 AD_COM_EXT_CLASS_BEGIN(public IAAFEndian)
 AD_XMETHOD2(LookupMob,
-			[in\,ref],
+			[in\, ref],
 			  objPass,
-			  aafUID_t *,
-			  pMobID,
+			  aafMobID_constref,
+			  mobID,
 			  The Mob ID,
 			[out\,retval],
 			  objOut,
 			  AAFMob,
 			  ppMob,
 			  Matching Mob,
-			Looks up the Mob that matches the given mob id and puts it into
+     Looks up the Mob that matches the given mob id and puts it into
   // the ppMob argument.  The returned mob interface is AddRef\(\)ed
   // before it is returned.
   // 
   // Succeeds if all of the following are true:
-  // - the pMobID pointer is valid.
   // - the ppMob pointer is valid.
   // 
   // If this method fails nothing will be written to *ppMob.
@@ -72,24 +71,24 @@ AD_XMETHOD2(LookupMob,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - either pMobID or ppMob is null
+  //   - ppMob is null
   //
   // AAFRESULT_MOB_NOT_FOUND
   //   - the requested mob wasn't found.)
 
 
-AD_XMETHOD2(GetNumMobs,
+AD_XMETHOD2(CountMobs,
 			[in],
-			  objPass,
+			  enumIn,
 			  aafMobKind_t,
 			  mobKind,
 			  The mob kind to count,
 			[out\, retval],
 			  objPass,
 			  aafNumSlots_t *,
-			  pNumMobs,
+			  pResult,
 			  Total number of mobs of kind mobKind,
-			Writes the number of matches for the given mob kind into the
+     Writes the number of matches for the given mob kind into the
   // *pNumMobs argument.
   // 
   // Succeeds if all of the following are true:
@@ -108,7 +107,7 @@ AD_XMETHOD2(GetNumMobs,
   //   - pNumMobs is null.)
 
 
-AD_XMETHOD2(EnumAAFAllMobs,
+AD_XMETHOD2(GetMobs,
 			[in],
 			  objPass,
 			  aafSearchCrit_t *,
@@ -119,12 +118,12 @@ AD_XMETHOD2(EnumAAFAllMobs,
 			  EnumAAFMobs,
 			  ppEnum,
 			  Mob Enumeration,
-			Places an enumerator for mobs that apply to the criteria into the
-  // *ppEnum argument.  If pSearchCriteria is null\, all mobs are returned.   The
-  // searchTag field of pSearchCriteria\, and exactly ONE of the fields in the union
-  // \(tags.mobID\, tags.name\, etc. \) must be set.  Only one search
-  // criterion may be specified.  The returned enumerator is
-  // AddRef\(\)ed before it is returned.
+     Places an enumerator for mobs that apply to the criteria into the
+  // *ppEnum argument.  If pSearchCriteria is null\, all mobs are
+  // returned.   The searchTag field of pSearchCriteria\, and exactly
+  // ONE of the fields in the union \(tags.mobID\, tags.name\, etc. \)
+  // must be set.  Only one search criterion may be specified.  The
+  // returned enumerator is AddRef\(\)ed before it is returned.
   // 
   // Succeeds if all of the following are true:
   // - the ppEnum pointer is valid.
@@ -142,13 +141,13 @@ AD_XMETHOD2(EnumAAFAllMobs,
   //   - ppEnum is null.)
 
 
-AD_XMETHOD1(AppendMob,
+AD_XMETHOD1(AddMob,
 			[in],
 			objIn,
 			AAFMob,
 			pMob,
-			Mob to add header,
-			Appends the given mob to the header.  If the given mob is already
+			Mob to add,
+     Appends the given mob to the header.  If the given mob is already
   // contained this method will do nothing and will return success.
   // 
   // Succeeds if all of the following are true:
@@ -171,19 +170,49 @@ AD_XMETHOD1(AppendMob,
   //   - the given mob is already contained.)
 
 
-AD_XMETHOD1(GetNumEssenceData,
+AD_XMETHOD1(RemoveMob,
+			[in],
+			objIn,
+			AAFMob,
+			pMob,
+			Mob to remove,
+
+  // Removes the given mob from the header.
+  //
+  // Succeeds if all of the following are true:
+  // - the pMob pointer is valid.
+  // - the given mob is currently in the collection.
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pMob is null.
+  //
+  // AAFRESULT_MOB_NOT_FOUND
+  //   - the given mob is not already contained.)
+
+
+AD_XMETHOD1(CountEssenceData,
 			[out\, retval],
 			  objPass,
 			  aafUInt32 *,
-			  pNumEssenceData,
+			  pResult,
 			  Total number of essence data,
-			Writes the total number of essence data into the
-  // *pNumEssenceData argument.
+     Writes the total number of essence data into the *pNumEssenceData
+  // argument.
   // 
   // Succeeds if all of the following are true:
   // - the pNumEssenceData pointer is valid.
   // 
-  // If this method fails nothing will be written to *pNumEssenceData.
+  // If this method fails nothing will be written to
+  // *pNumEssenceData.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -195,25 +224,25 @@ AD_XMETHOD1(GetNumEssenceData,
   // AAFRESULT_NULL_PARAM
   //   - pNumEssenceData is null.)
 
+
 AD_XMETHOD3(IsEssenceDataPresent,
-			[in],
+			[in\, ref],
 			  objPass,
-			  aafUID_t *,
-			  pFileMobID,
+			  aafMobID_constref,
+			  fileMobID,
 			  A Unique File Mob ID,
 			[in],
-			  objPass,
+			  enumIn,
 			  aafFileFormat_t,
 			  fmt,
 			  The Essence File Format,
 			[out\,retval],
 			  objPass,
-			  aafBool *,
+			  aafBoolean_t *,
 			  pResult,
 			  True if the essence is found,
   // 
   // Succeeds if all of the following are true:
-  // - the pFileMobID pointer is valid.
   // - the pResult pointer is valid.
   // 
   // If this method fails no state will be changed.
@@ -226,7 +255,7 @@ AD_XMETHOD3(IsEssenceDataPresent,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - either pFileMobID or pResult is null.)
+  //   - pResult is null.)
 
 
 AD_XMETHOD1(EnumEssenceData,
@@ -235,9 +264,9 @@ AD_XMETHOD1(EnumEssenceData,
 			  EnumAAFEssenceData,
 			  ppEnum,
 			  Essence Enumeration,
-			Places an enumerator for essence that applies to the criteria into
-  // the *ppEnum argument.  The returned enumerator is AddRef\(\)ed
-  // before it is returned.
+     Places an enumerator for essence that applies to the criteria
+  // into the *ppEnum argument.  The returned enumerator is
+  // AddRef\(\)ed before it is returned.
   // 
   // Succeeds if all of the following are true:
   // - the pMediaCriteria pointer is valid.
@@ -256,7 +285,7 @@ AD_XMETHOD1(EnumEssenceData,
   //   - either pMediaCriteria or ppEnum is null.)
 
 
-AD_XMETHOD1(AppendEssenceData,
+AD_XMETHOD1(AddEssenceData,
 			[in],
 			objIn,
 			AAFEssenceData,
@@ -285,6 +314,66 @@ AD_XMETHOD1(AppendEssenceData,
   // AAFRESULT_NULL_PARAM
   //   - pEssenceData is null.)
 
+AD_XMETHOD1(RemoveEssenceData,
+			[in],
+			objIn,
+			AAFEssenceData,
+			pEssenceData,
+			EssenceData to remove,
+
+  // Removes the given EssenceData from the header.
+  //
+  // Succeeds if all of the following are true:
+  // - the pEssenceData pointer is valid.
+  // - the given EssenceData is currently in the collection.
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pEssenceData is null.
+  //
+  // AAFRESULT_ESSENCE_NOT_FOUND
+  //   - the given EssenceData is not already contained.)
+
+AD_XMETHOD2(LookupEssenceData,
+			[in\, ref],
+			  objPass,
+			  aafMobID_constref,
+			  mobID,
+			  The Mob ID,
+			[out\,retval],
+			  objOut,
+			  AAFEssenceData,
+			  ppEssenceData,
+			  Matching EssenceData,
+     Looks up the EssenceData that matches the given mob id and puts it into
+  // the ppEssenceData argument.  The returned EssenceData interface is AddRef\(\)ed
+  // before it is returned.
+  // 
+  // Succeeds if all of the following are true:
+  // - the ppEssenceData pointer is valid.
+  // 
+  // If this method fails nothing will be written to *ppEssenceData.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppEssenceData is null
+  //
+  // AAFRESULT_MOB_NOT_FOUND
+  //   - the requested EssenceData wasn't found.)
 
 AD_XMETHOD1(GetDictionary,
 			[out\, retval],
@@ -292,13 +381,11 @@ AD_XMETHOD1(GetDictionary,
 			AAFDictionary,
 			ppDictionary,
 			The AAF Dictionary,
-			Places the dictionary that contains all types of aaf definition
+     Places the dictionary that contains all types of aaf definition
   // objects into the *ppDictionary argument.  The returned dictionary
   // is AddRef\(\)ed before it is returned.  Note that the dictionary
   // is automatically created when the header object is created.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the ppDictionary pointer is valid.
   // 
@@ -321,7 +408,7 @@ AD_XMETHOD1(GetLastIdentification,
 			AAFIdentification,
 			ppIdentification,
 			Indentification Object,
-  // Places the identification of the last entity that modified the
+     Places the identification of the last entity that modified the
   // file into the *ppIdentification argument.  The returned
   // identification is AddRef\(\)ed before it is returned.
   // 
@@ -341,26 +428,24 @@ AD_XMETHOD1(GetLastIdentification,
   //   - ppIdentification is null.)
 
 
-AD_XMETHOD2(GetIdentificationByGen,
-			[in\,ref],
+AD_XMETHOD2(LookupIdentification,
+			[in\, ref],
 			  objPass,
-			  aafUID_t *,
-			  pGeneration,
+			  aafUID_constref,
+			  generation,
 			  Unique Generation ID,
 			[out\,retval],
 			  objOut,
 			  AAFIdentification,
 			  ppIdentification,
 			  Indentification Object,
-			Places the Identification that matches the given generation into
+     Places the Identification that matches the given generation into
   // the *ppIdentification argument.  The returned identification is
   // AddRef\(\)ed before it is returned.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
-  // - the pGeneration pointer is valid.
   // - the ppIdentification pointer is valid.
+  // - the given generation was found.
   // 
   // If this method fails no state will be changed.
   // 
@@ -372,24 +457,25 @@ AD_XMETHOD2(GetIdentificationByGen,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - either pGeneration or ppIdentification is null.)
+  //   - ppIdentification is null.
+  //
+  // AAFRESULT_OBJECT_NOT_FOUND
+  //   - the given generation was not found..)
 
 
-AD_XMETHOD1(GetNumIdents,
+AD_XMETHOD1(CountIdentifications,
 			[out\, retval],
 			objPass,
 			aafUInt32 *,
-			pNumIdents,
+			pResult,
 			Total number of identification objects,
-			Writes the number of identification objects into the
-  // *pNumIdents argument.
+     Writes the number of identification objects into the *pResult
+  // argument.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
-  // - the pNumIdents pointer is valid.
+  // - the pResult pointer is valid.
   // 
-  // If this method fails nothing will be written to *pNumIdents.
+  // If this method fails nothing will be written to *pResult.
   // 
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect\, it will return the first one
@@ -399,16 +485,16 @@ AD_XMETHOD1(GetNumIdents,
   //   - succeeded.  \(This is the only code indicating success.\)
   //
   // AAFRESULT_NULL_PARAM
-  //   - pNumIdents is null.)
+  //   - pResult is null.)
 
 
-AD_XMETHOD1(EnumAAFIdents,
+AD_XMETHOD1(GetIdentifications,
 			[out\,retval],
 			objOut,
 			EnumAAFIdentifications,
 			ppEnum,
 			Indentification Enumeration,
-			Places an enumerator for all Identifications criteria into	the
+     Places an enumerator for all Identifications criteria into	the
   // *ppEnum argument.  The returned enumerator is AddRef\(\)ed before
   // it is returned.
   // 
@@ -436,7 +522,7 @@ AD_XMETHOD1(AppendIdentification,
 			AAFIdentification,
 			pIdent,
 			Identification to append,
-			Appends the given Identification class to the header.  This
+     Appends the given Identification class to the header.  This
   // method does not attempt to identify duplicate identifications\, so
   // it will succeed even if an identical identification has already
   // been appended.
@@ -457,13 +543,47 @@ AD_XMETHOD1(AppendIdentification,
   //   - pIdent is null.)
 
 
+AD_XMETHOD2(GetIdentificationAt,
+			[in],
+			objPass,
+			aafUInt32,
+			index,
+			Index of identification to retrieve,
+
+			[out\, retval],
+			objOut,
+			AAFIdentification,
+			ppIdentification,
+			Retrieved identification,
+
+     Retrieves the indexed identification from the header.
+  // 
+  // Succeeds if all of the following are true:
+  // - the ppIdentification pointer is valid.
+  // - index is less than the value returned by CountIdentifications\(\).
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppIdent is null.
+  //
+  // AAFRESULT_BADINDEX
+  //   - index is greater than or equal to result of
+  //     CountIdentifications\(\).)
+
+
 AD_XMETHOD1(GetRefImplVersion,
 			[out\, retval],
 			objPass,
 			aafProductVersion_t *,
 			pVersion,
 			The Reference Implementation Version,
-			Return the version of the Reference Implementation currently
+     Return the version of the Reference Implementation currently
   // running on this machine\, which implements these interfaces.
   // 
   // Succeeds if all of the following are true:
@@ -534,6 +654,36 @@ AD_XMETHOD1(GetLastModified,
   //   - pTimeStamp is null.)
 
 
+AD_XMETHOD1(GetContentStorage,
+			[out],
+			objOut,
+			AAFContentStorage,
+			ppStorage,
+			Returned Content Storage object,
+			Places the Content Storage object attached to the header into the
+  // *ppStorage argument.
+  //
+  // The returned content storage object is
+  // AddRef\(\)ed before it is returned.
+  //
+  // Succeeds if all of the following are true:
+  // - the ppStorage pointer is valid.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize\(\) called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppStorage is null.)
+
 AD_COM_METH(.method-GetStoredByteOrder)
+
+
 AD_COM_METH(.method-GetNativeByteOrder)
 AD_COM_EXT_CLASS_END(AAFEndian)
