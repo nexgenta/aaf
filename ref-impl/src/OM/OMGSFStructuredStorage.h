@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.h,v 1.4 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.h,v 1.5 2004/12/06 18:47:57 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,18 +22,6 @@
 //
 //=---------------------------------------------------------------------=
 
-
-/************************************************************************
-* StructuredStorage.h
-* Public Header file for Structured Storage library
-*
-* (c) Schema Software Inc., 2001-2004
-* Authors: Bob Sabiston, Yuri Khramov, Mark Ambachtsheer
-************************************************************************
-
-$Revision: 1.4 $
-$Date: 2004/10/25 15:37:59 $
-*/
 #ifndef OMGSFSTRUCTUREDSTORAGE_H
 #define OMGSFSTRUCTUREDSTORAGE_H
 
@@ -174,7 +162,7 @@ public:
 protected:
 	// Make default contructor private so that an OMGSFIStorage object cannot
 	// be instantiated
-	OMGSFIStorage(GsfStorage *in_storage, GsfAccessMode _mode, const char  *sname);
+	OMGSFIStorage(GsfStorage *in_storage, GsfAccessMode _mode, const char *sname);
 
 	// keeping destructor protected means that the object must always be
 	// instantiated on the heap;
@@ -255,8 +243,8 @@ public:
 
 protected:
 
-	// Make destructor virtual so that this objeact can only be instantiated
-	// on heap
+	// Make destructor virtual so that this object can only be instantiated
+	// on the heap
 	virtual ~OMGSFIStream();
 
 private:
@@ -266,8 +254,8 @@ private:
 
 
 private:
-	GsfStream*			_stream;
-	GsfAccessMode	_mode;				// TODO: does gsf store this somewhere?
+	GsfStream*		_stream;
+	GsfAccessMode	_mode;						// TODO: does gsf store this somewhere?
 	ULONG 			_referenceCount;
 	char 			_streamName[FILENAME_MAX];	// TODO: does gsf store this somewhere?
 };
