@@ -16,7 +16,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -40,54 +40,40 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
-#include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
 
-#include "ImplAAFDictionary.h"
-#include "ImplAAFSmartPointer.h"
-typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
-typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
-extern "C" const aafClassID_t CLSID_EnumAAFKLVData;
-
 ImplAAFComponent::ImplAAFComponent ():
-	_dataDef(	PID_Component_DataDefinition,	L"DataDefinition", L"/Dictionary/DataDefinitions", PID_DefinitionObject_Identification),
-	_length(	PID_Component_Length,	L"Length"),
-	_KLVData(	PID_Component_KLVData, L"KLVData")
+	_dataDef(	PID_Component_DataDefinition,	"DataDefinition"),
+	_length(	PID_Component_Length,	"Length")
 {
 	_persistentProperties.put(   _dataDef.address());
 	_persistentProperties.put(   _length.address());
-	_persistentProperties.put(   _KLVData.address());
 }
 
 
 ImplAAFComponent::~ImplAAFComponent ()
-{
-	if(_KLVData.isPresent())
-	{
-		size_t size = _KLVData.count();
-		for (size_t j = 0; j < size; j++)
-		{
-			ImplAAFKLVData* pKLVData = _KLVData.setValueAt(0, j);
-			if (pKLVData)
-			  pKLVData->ReleaseReference();
-			pKLVData = 0;
-		}
-	}
-}
+{}
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::SetLength (const aafLength_t & length)
+    ImplAAFComponent::SetLength (aafLength_t *  pLength)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
-	if ( length < 0 )
-	  aafError = AAFRESULT_BAD_LENGTH;
+	if (pLength == NULL)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
 	else
-	  _length = length;
+	{
+		if ( *pLength < 0 )
+			aafError = AAFRESULT_BAD_LENGTH;
+		else
+			_length = *pLength;
+	}
 	return aafError;
 }
 
@@ -122,130 +108,39 @@ AAFRESULT STDMETHODCALLTYPE
 
 	
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::SetDataDef (ImplAAFDataDef * pDataDef)
+    ImplAAFComponent::SetDataDef (aafUID_t*  pDataDef)
 {
-  if (! pDataDef)
-    return AAFRESULT_NULL_PARAM;
-  if (!pDataDef->attached())
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
+    AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-  _dataDef = pDataDef;
-
-  return AAFRESULT_SUCCESS;
-//	assert(_dataDef.isVoid());
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::GetDataDef (ImplAAFDataDef ** ppDataDef)
-{
-  if (! ppDataDef)
-	return AAFRESULT_NULL_PARAM;
-
-   if(_dataDef.isVoid())
-		return AAFRESULT_OBJECT_NOT_FOUND;
-  ImplAAFDataDef *pDataDef = _dataDef;
-
-  *ppDataDef = pDataDef;
-  assert (*ppDataDef);
-  (*ppDataDef)->AcquireReference ();
-  return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::AppendKLVData (ImplAAFKLVData * pData)
-{
-	if (NULL == pData)
+	if (pDataDef == NULL)
+	{
 		return AAFRESULT_NULL_PARAM;
-  if (pData->attached ())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-	_KLVData.appendValue(pData);
-	pData->AcquireReference();
-	return AAFRESULT_SUCCESS;
-}
-
-//****************
-// RemoveKLVData()
-//
-AAFRESULT STDMETHODCALLTYPE
-	ImplAAFComponent::RemoveKLVData
-        (ImplAAFKLVData * pData)
-{
-	if (! pData)
-		return AAFRESULT_NULL_PARAM;
-  if (!pData->attached ()) // object could not possibly be in container.
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
-	if(!_KLVData.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-	
-  size_t index;
-  if (_KLVData.findIndex (pData, index))
-  {
-	  _KLVData.removeAt(index);
-    // We have removed an element from a "stong reference container" so we must
-    // decrement the objects reference count. This will not delete the object
-    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
-    pData->ReleaseReference ();
-  }
-  else
-  {
-    return AAFRESULT_OBJECT_NOT_FOUND;
-  }
-
-	return(AAFRESULT_SUCCESS);
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::CountKLVData (aafUInt32*  pNumComments)
-{
-	if (pNumComments == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if(!_KLVData.isPresent())
-	{	// If the userComments property is not present then
-		// number of user comments is zero!
-		*pNumComments = 0; //return AAFRESULT_PROP_NOT_PRESENT;
 	}
 	else
 	{
-		*pNumComments = _KLVData.count();
+		_dataDef = *pDataDef;
 	}
-		
-	return(AAFRESULT_SUCCESS);
+	return aafError;
 }
 
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFComponent::GetKLVData (ImplEnumAAFKLVData** ppEnum)
+    ImplAAFComponent::GetDataDef (aafUID_t*  pDataDef)
 {
-  if (NULL == ppEnum)
-	return AAFRESULT_NULL_PARAM;
-  *ppEnum = 0;
-	
-  ImplEnumAAFKLVData *theEnum = (ImplEnumAAFKLVData *)CreateImpl (CLSID_EnumAAFKLVData);
-	
-  XPROTECT()
+    AAFRESULT aafError = AAFRESULT_SUCCESS;
+
+	if (pDataDef == NULL)
 	{
-		OMStrongReferenceVectorIterator<ImplAAFKLVData>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFKLVData>(_KLVData);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
-	  *ppEnum = theEnum;
+		return AAFRESULT_NULL_PARAM;
 	}
-  XEXCEPT
+	else
 	{
-	  if (theEnum)
-		{
-		  theEnum->ReleaseReference();
-		  theEnum = 0;
-		}
-	  return(XCODE());
+		*pDataDef = _dataDef;
 	}
-  XEND;
-	
-  return(AAFRESULT_SUCCESS);
+
+	return aafError;
 }
+
 /*************************************************************************
  * Private Function: SetNewProps()
  *
@@ -265,19 +160,23 @@ AAFRESULT STDMETHODCALLTYPE
  *************************************************************************/
 AAFRESULT ImplAAFComponent::SetNewProps(
         aafLength_t length,			/* IN - Length property value */
-        ImplAAFDataDef * pDataDef)			/* IN - DataDef property value */
+        aafUID_t *pDataDef)			/* IN - DataDef property value */
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
-	if (! pDataDef)
-	  return AAFRESULT_NULL_PARAM;
-
-	if ( length < 0 )
-	  aafError = AAFRESULT_BAD_LENGTH;
+	
+	if (pDataDef == NULL)
+	{
+		return aafError = AAFRESULT_NULL_PARAM;
+	}
 	else
-	  {
-		_length	= length;
-		_dataDef = pDataDef;
-	  }
+	{
+		_dataDef = *pDataDef;
+		if ( length < 0 )
+			aafError = AAFRESULT_BAD_LENGTH;
+		else
+			_length	= length;
+	}
+		
 	return aafError;
 }
 
@@ -307,7 +206,7 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 	
 	XPROTECT()
 	{
-		*foundTransition = kAAFFalse;
+		*foundTransition = AAFFalse;
 		*found = this;
 		CHECK(GetLength(&tmpMinLen));
 		if (Int64Less(tmpMinLen, rootLen))
@@ -335,8 +234,7 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 }
 
 
-AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafMobID_constref from,
-													  aafMobID_constref to)
+AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
 {
 	return AAFRESULT_SUCCESS;
 }
