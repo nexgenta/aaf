@@ -3,6 +3,7 @@
 * Advanced Authoring Format						           *
 *												                         *
 * Copyright (c) 1998-1999 Avid Technology, Inc.  *
+* Copyright (c) 1998-1999 Microsoft Corporation  *
 *												                         *
 \************************************************/
 
@@ -188,8 +189,11 @@ HRESULT ImplAAFPluginFile::Unload()
 {
   HRESULT result = AAFRESULT_SUCCESS;
 
-  if (NULL != _libHandle)
+  if (IsLoaded())
   {
+    // All object references should have been released!
+    assert(AAFRESULT_SUCCESS == CanUnloadNow());
+
     result = ::AAFUnloadLibrary((AAFLibraryHandle)_libHandle);
 
     if (AAFRESULT_SUCCEEDED(result))
@@ -208,10 +212,8 @@ HRESULT ImplAAFPluginFile::Unload()
 
 HRESULT ImplAAFPluginFile::CanUnloadNow()
 {
-  if (!_libHandle)
+  if (!IsLoaded())
     return AAFRESULT_NOT_INITIALIZED;
-	else if (!_pfnCanUnloadNow) // If entrypoint was not loaded then CanUnloadNow should return ok.
-		return S_OK;
 
   return _pfnCanUnloadNow();
 }
@@ -220,7 +222,7 @@ HRESULT ImplAAFPluginFile::CanUnloadNow()
 
 HRESULT ImplAAFPluginFile::GetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
-  if (!(_libHandle && _pfnGetClassObject))
+  if (!IsLoaded())
     return AAFRESULT_NOT_INITIALIZED;
 
   return _pfnGetClassObject(rclsid, riid, ppv);
@@ -230,7 +232,7 @@ HRESULT ImplAAFPluginFile::GetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* 
 
 ULONG ImplAAFPluginFile::GetClassCount()
 {
-  if (!(_libHandle && _pfnGetClassCount))
+  if (!IsLoaded())
     return 0;
 
   return _pfnGetClassCount();
@@ -240,7 +242,7 @@ ULONG ImplAAFPluginFile::GetClassCount()
 
 HRESULT ImplAAFPluginFile::GetClassObjectID(ULONG index, CLSID* pClassID)
 {
-  if (!(_libHandle && _pfnGetClassObjectID))
+  if (!IsLoaded())
     return AAFRESULT_NOT_INITIALIZED;
 
   return _pfnGetClassObjectID(index, pClassID);
