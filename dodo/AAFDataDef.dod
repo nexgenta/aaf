@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef.dod,v 1.25 2004/06/03 12:21:53 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef.dod,v 1.26 2004/06/04 14:06:17 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,10 @@ AAFDefObject\
 #endm
 #import ./AAFDataDef2.exp
 AD_HEAD
+AD_IDL(//
+// IAAFDataDef is DEPRECATED\,  Please use IAAFDataDef2.
+//)
+
 AD_CLASS_UUID(dfbd652A, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(dfbd6529, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
