@@ -9,16 +9,17 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
 
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
+#ifndef __ImplAAFPluggableDef_h__
+#include "ImplAAFPluggableDef.h"
 #endif
 
 
-class ImplAAFContainerDef : public ImplAAFDefObject
+class ImplAAFContainerDef : public ImplAAFPluggableDef
 {
 public:
   //
@@ -50,6 +51,15 @@ public:
         // @parm [in] The EssenceIsIdentified flag
         (aafBool  EssenceIsIdentified);
 
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFContainerDef)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFContainerDefTest.cpp.
+  static AAFRESULT test();
 private:
 	OMFixedSizeProperty<aafBool>					_isIdentified;
 };
