@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -74,12 +74,12 @@ public:
     // @cmember Increase the capacity of this <c OMVector> so that it
     //          can contain at least <p capacity> elements without
     //          having to be resized.
-  virtual void grow(const size_t capacity);
+  virtual void grow(size_t capacity);
 
     // @cmember Free any unused capacity in this <c OMVector> while
     //          ensuring that it can contain at least <p capacity>
     //          elements.
-  virtual void shrink(const size_t capacity);
+  virtual void shrink(size_t capacity);
 
     // @cmember Is this <c OMVector> full ?
   virtual bool full(void) const;
