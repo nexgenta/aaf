@@ -60,11 +60,6 @@
 #               switching between configurations. The debug versions of the   #
 #               dlls were not always replaced with release versions for the   #
 #               release and "FULL" builds of the sdk.                         #
-# 06-APR-2000 : transdel adding new required header files.                    #
-# 27-JUL-2000 : transdel adding support for "aafext" plugin directory         #
-# 20-OCT-2000 : transdel added new platform type include                      #
-# 16-FEB-2001 : transdel added missing AAFExtEnum.h and AAFFileSignatures.h   #
-# 07-MAR-2001 : tjb copy OMF toolkit DLL once only.                           #
 ###############################################################################
 
 
@@ -149,8 +144,6 @@ AAFSDK_DEBUG   = $(AAFSDK_BIN)\debug
 AAFSDK_HELP    = $(AAFSDK)\help
 AAFSDK_INCLUDE = $(AAFSDK)\include
 AAFSDK_LIB     = $(AAFSDK)\lib
-AAFSDK_BIN_EXT = $(AAFSDK_BIN)\aafext
-AAFSDK_DEBUG_EXT = $(AAFSDK_DEBUG)\aafext
 
 
 #
@@ -163,9 +156,6 @@ TOOLKIT_PLUGINS = $(AAFTOOLKIT)\ref-impl\plugins
 TOOLKIT_COMIDL = $(AAFTOOLKIT)\AAFWinSDK\ref-impl\include\comidl
 TOOLKIT_DEBUG_REFIMPL = $(AAFTOOLKIT)\AAFWinSDK\Debug\RefImpl
 TOOLKIT_RELEASE_REFIMPL = $(AAFTOOLKIT)\AAFWinSDK\Release\RefImpl
-TOOLKIT_DEBUG_REFIMPL_EXT = $(AAFTOOLKIT)\AAFWinSDK\Debug\RefImpl\aafext
-TOOLKIT_RELEASE_REFIMPL_EXT = $(AAFTOOLKIT)\AAFWinSDK\Release\RefImpl\aafext
-OMF_LIBS = $(AAFTOOLKIT)\Omf
 
 
 #
@@ -173,16 +163,10 @@ OMF_LIBS = $(AAFTOOLKIT)\Omf
 #
 !if "$(CFG)"=="FULL"
 TOOLKIT_TARGET_REFIMPL = $(TOOLKIT_RELEASE_REFIMPL)
-TOOLKIT_TARGET_REFIMPL_EXT = $(TOOLKIT_RELEASE_REFIMPL_EXT)
-OMF_DLL_NAME = "omfToolkit.dll"
 !elseif "$(CFG)"=="Debug"
 TOOLKIT_TARGET_REFIMPL = $(TOOLKIT_DEBUG_REFIMPL)
-TOOLKIT_TARGET_REFIMPL_EXT = $(TOOLKIT_DEBUG_REFIMPL_EXT)
-OMF_DLL_NAME = "omfToolkitd.dll"
 !elseif "$(CFG)"=="Release"
 TOOLKIT_TARGET_REFIMPL = $(TOOLKIT_RELEASE_REFIMPL)
-TOOLKIT_TARGET_REFIMPL_EXT = $(TOOLKIT_RELEASE_REFIMPL_EXT)
-OMF_DLL_NAME = "omfToolkit.dll"
 !else
 !ERROR Unknown configuration!
 !endif
@@ -196,10 +180,8 @@ TARGET_DIRS = \
 	$(AAFSDK) \
 !endif
 	$(AAFSDK_BIN) \
-	$(AAFSDK_BIN_EXT) \
 !if "$(CFG)"=="FULL"
 	$(AAFSDK_DEBUG) \
-	$(AAFSDK_DEBUG_EXT) \
 !endif
 	$(AAFSDK_HELP) \
 	$(AAFSDK_INCLUDE) \
@@ -218,18 +200,12 @@ TARGET_H_FILES = \
 	$(AAFSDK_INCLUDE)\AAFDataDefs.h \
 	$(AAFSDK_INCLUDE)\AAFDefUIDs.h \
 	$(AAFSDK_INCLUDE)\AAFEssenceFormats.h \
-	$(AAFSDK_INCLUDE)\AAFExtEnum.h \
-	$(AAFSDK_INCLUDE)\AAFFileKinds.h \
-	$(AAFSDK_INCLUDE)\AAFFileMode.h \
-	$(AAFSDK_INCLUDE)\AAFFileSignatures.h \
 	$(AAFSDK_INCLUDE)\AAFInterpolatorDefs.h \
 	$(AAFSDK_INCLUDE)\AAFMetaDictionary.h \
 	$(AAFSDK_INCLUDE)\AAFOperationCategories.h \
 	$(AAFSDK_INCLUDE)\AAFOperationDefs.h \
 	$(AAFSDK_INCLUDE)\AAFParameterDefs.h \
-	$(AAFSDK_INCLUDE)\AAFPlatform.h \
 	$(AAFSDK_INCLUDE)\AAFPluginDefs.h \
-	$(AAFSDK_INCLUDE)\AAFPropertyDefs.h \
 	$(AAFSDK_INCLUDE)\AAFPropertyIDs.h \
 	$(AAFSDK_INCLUDE)\AAFResult.h \
 	$(AAFSDK_INCLUDE)\AAFSmartPointer.h \
@@ -295,18 +271,17 @@ TARGET_LIB_FILES = \
 #
 RELEASE_DLL_FILES = \
 	$(AAFSDK_BIN)\aafcoapi.dll \
-	$(AAFSDK_BIN_EXT)\aafintp.dll \
-	$(AAFSDK_BIN_EXT)\aafpgapi.dll \
-	$(AAFSDK_BIN)\omfToolkit.dll
+	$(AAFSDK_BIN)\aafintp.dll \
+	$(AAFSDK_BIN)\aafpgapi.dll
+
 
 #
 # Release dynamic link libraries.
 #
 DEBUG_DLL_FILES = \
 	$(AAFSDK_DEBUG)\aafcoapi.dll \
-	$(AAFSDK_DEBUG_EXT)\aafintp.dll \
-	$(AAFSDK_DEBUG_EXT)\aafpgapi.dll \
-	$(AAFSDK_DEBUG)\omfToolkitd.dll
+	$(AAFSDK_DEBUG)\aafintp.dll \
+	$(AAFSDK_DEBUG)\aafpgapi.dll
 
 
 #
@@ -321,7 +296,8 @@ TARGET_DLL_FILES = \
 !endif
 
 
-## Configuration files that need to be cleanup up from LASTCFG.
+#
+# Configuration files that need to be cleanup up from LASTCFG.
 #
 CONFIG_FILES_TO_REMOVE = \
 !if "$(CFG)"=="Release"
@@ -343,7 +319,6 @@ CONFIG_FILES_TO_REMOVE = \
 #
 CONFIG_DIRS_TO_REMOVE = \
 !if "$(CFG)"=="Release" || "$(CFG)"=="Debug"
-	$(AAFSDK_DEBUG_EXT) \
 	$(AAFSDK_DEBUG)
 !endif
 
@@ -366,9 +341,7 @@ TARGET_FILES_TO_REMOVE = \
 # Note: Order is important: must have child before parent directory.
 #
 TARGET_DIRS_TO_REMOVE = \
-	$(AAFSDK_DEBUG_EXT) \
 	$(AAFSDK_DEBUG) \
-	$(AAFSDK_BIN_EXT) \
 	$(AAFSDK_BIN) \
 	$(AAFSDK_HELP) \
 	$(AAFSDK_INCLUDE) \
@@ -428,17 +401,9 @@ $(AAFSDK_BIN) :
 	if not exist $(AAFSDK_BIN) \
 	    md $(AAFSDK_BIN)
 
-$(AAFSDK_BIN_EXT) : $(AAFSDK_BIN)
-	if not exist $(AAFSDK_BIN_EXT) \
-	    md $(AAFSDK_BIN_EXT)
-
 $(AAFSDK_DEBUG) : $(AAFSDK_BIN)
 	if not exist $(AAFSDK_DEBUG) \
 	    md $(AAFSDK_DEBUG)
-
-$(AAFSDK_DEBUG_EXT) : $(AAFSDK_DEBUG)
-	if not exist $(AAFSDK_DEBUG_EXT) \
-	    md $(AAFSDK_DEBUG_EXT)
 
 $(AAFSDK_HELP) :
 	if not exist $(AAFSDK_HELP) \
@@ -462,11 +427,11 @@ $(AAFSDK_INCLUDE)\AAFClassDefUIDs.h : $(TOOLKIT_INCLUDE)\AAFClassDefUIDs.h
 $(AAFSDK_INCLUDE)\AAFCodecDefs.h : $(TOOLKIT_INCLUDE)\AAFCodecDefs.h
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFCodecDefs.h $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAFCOMPlatform.h : $(TOOLKIT_INCLUDE)\AAFCOMPlatform.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFCOMPlatform.h $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAFCOMPlatform.h : $(TOOLKIT_INCLUDE_REFAPI)\AAFCOMPlatform.h
+	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_REFAPI)\AAFCOMPlatform.h $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAFCOMPlatformTypes.h : $(TOOLKIT_INCLUDE)\AAFCOMPlatformTypes.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFCOMPlatformTypes.h $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAFCOMPlatformTypes.h : $(TOOLKIT_INCLUDE_REFAPI)\AAFCOMPlatformTypes.h
+	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_REFAPI)\AAFCOMPlatformTypes.h $(AAFSDK_INCLUDE)\
 
 $(AAFSDK_INCLUDE)\AAFContainerDefs.h : $(TOOLKIT_INCLUDE)\AAFContainerDefs.h
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFContainerDefs.h $(AAFSDK_INCLUDE)\
@@ -479,18 +444,6 @@ $(AAFSDK_INCLUDE)\AAFDefUIDs.h : $(TOOLKIT_INCLUDE)\AAFDefUIDs.h
 
 $(AAFSDK_INCLUDE)\AAFEssenceFormats.h : $(TOOLKIT_INCLUDE)\AAFEssenceFormats.h
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFEssenceFormats.h $(AAFSDK_INCLUDE)\
-
-$(AAFSDK_INCLUDE)\AAFExtEnum.h : $(TOOLKIT_INCLUDE)\AAFExtEnum.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFExtEnum.h $(AAFSDK_INCLUDE)\
-
-$(AAFSDK_INCLUDE)\AAFFileKinds.h : $(TOOLKIT_INCLUDE)\AAFFileKinds.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFFileKinds.h $(AAFSDK_INCLUDE)\
-
-$(AAFSDK_INCLUDE)\AAFFileMode.h : $(TOOLKIT_INCLUDE)\AAFFileMode.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFFileMode.h $(AAFSDK_INCLUDE)\
-
-$(AAFSDK_INCLUDE)\AAFFileSignatures.h : $(TOOLKIT_INCLUDE)\AAFFileSignatures.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFFileSignatures.h $(AAFSDK_INCLUDE)\
 
 $(AAFSDK_INCLUDE)\AAFInterpolatorDefs.h : $(TOOLKIT_INCLUDE)\AAFInterpolatorDefs.h
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFInterpolatorDefs.h $(AAFSDK_INCLUDE)\
@@ -507,14 +460,8 @@ $(AAFSDK_INCLUDE)\AAFOperationDefs.h : $(TOOLKIT_INCLUDE)\AAFOperationDefs.h
 $(AAFSDK_INCLUDE)\AAFParameterDefs.h : $(TOOLKIT_INCLUDE)\AAFParameterDefs.h
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFParameterDefs.h $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAFPlatform.h : $(TOOLKIT_INCLUDE)\AAFPlatform.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFPlatform.h $(AAFSDK_INCLUDE)\
-
 $(AAFSDK_INCLUDE)\AAFPluginDefs.h : $(TOOLKIT_INCLUDE)\AAFPluginDefs.h
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFPluginDefs.h $(AAFSDK_INCLUDE)\
-
-$(AAFSDK_INCLUDE)\AAFPropertyDefs.h : $(TOOLKIT_INCLUDE)\AAFPropertyDefs.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFPropertyDefs.h $(AAFSDK_INCLUDE)\
 
 $(AAFSDK_INCLUDE)\AAFPropertyIDs.h : $(TOOLKIT_INCLUDE)\AAFPropertyIDs.h
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE)\AAFPropertyIDs.h $(AAFSDK_INCLUDE)\
@@ -550,30 +497,30 @@ $(AAFSDK_INCLUDE)\AAFModuleTest.idl : $(TOOLKIT_INCLUDE_COMAPI)\AAFModuleTest.id
 $(AAFSDK_INCLUDE)\AAFPluginTypes.idl : $(TOOLKIT_INCLUDE_COMAPI)\AAFPluginTypes.idl
 	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAFPluginTypes.idl $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAFPlugin.idl : $(TOOLKIT_INCLUDE_COMAPI)\AAFPlugin.idl
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAFPlugin.idl $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAFPlugin.idl : $(TOOLKIT_PLUGINS)\AAFPlugin.idl
+	$(CP) $(CP_OPTS) $(TOOLKIT_PLUGINS)\AAFPlugin.idl $(AAFSDK_INCLUDE)\
 
 
 #
 # Dependency and build rules for the MIDL generated targets.
 #
-$(AAFSDK_INCLUDE)\AAFTypes.h : $(TOOLKIT_INCLUDE_COMAPI)\AAFTypes.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAFTypes.h $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAFTypes.h : $(TOOLKIT_COMIDL)\AAFTypes.h
+	$(CP) $(CP_OPTS) $(TOOLKIT_COMIDL)\AAFTypes.h $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAF.h : $(TOOLKIT_INCLUDE_COMAPI)\AAF.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAF.h $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAF.h : $(TOOLKIT_COMIDL)\AAF.h
+	$(CP) $(CP_OPTS) $(TOOLKIT_COMIDL)\AAF.h $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAF_i.c : $(TOOLKIT_INCLUDE_COMAPI)\AAF_i.c
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAF_i.c $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAF_i.c : $(TOOLKIT_COMIDL)\AAF_i.c
+	$(CP) $(CP_OPTS) $(TOOLKIT_COMIDL)\AAF_i.c $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAFPluginTypes.h : $(TOOLKIT_INCLUDE_COMAPI)\AAFPluginTypes.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAFPluginTypes.h $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAFPluginTypes.h : $(TOOLKIT_COMIDL)\AAFPluginTypes.h
+	$(CP) $(CP_OPTS) $(TOOLKIT_COMIDL)\AAFPluginTypes.h $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAFPlugin.h : $(TOOLKIT_INCLUDE_COMAPI)\AAFPlugin.h
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAFPlugin.h $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAFPlugin.h : $(TOOLKIT_PLUGINS)\AAFPlugin.h
+	$(CP) $(CP_OPTS) $(TOOLKIT_PLUGINS)\AAFPlugin.h $(AAFSDK_INCLUDE)\
 
-$(AAFSDK_INCLUDE)\AAFPlugin_i.c : $(TOOLKIT_INCLUDE_COMAPI)\AAFPlugin_i.c
-	$(CP) $(CP_OPTS) $(TOOLKIT_INCLUDE_COMAPI)\AAFPlugin_i.c $(AAFSDK_INCLUDE)\
+$(AAFSDK_INCLUDE)\AAFPlugin_i.c : $(TOOLKIT_PLUGINS)\AAFPlugin_i.c
+	$(CP) $(CP_OPTS) $(TOOLKIT_PLUGINS)\AAFPlugin_i.c $(AAFSDK_INCLUDE)\
 
 
 #
@@ -602,15 +549,13 @@ $(AAFSDK_LIB)\aafd.lib : $(TOOLKIT_DEBUG_REFIMPL)\aafd.lib
 $(AAFSDK_BIN)\aafcoapi.dll : $(TOOLKIT_TARGET_REFIMPL)\aafcoapi.dll
 	$(CP) $(CP_OPTS) $(TOOLKIT_TARGET_REFIMPL)\aafcoapi.dll $(AAFSDK_BIN)\
 
-$(AAFSDK_BIN_EXT)\aafintp.dll : $(TOOLKIT_TARGET_REFIMPL_EXT)\aafintp.dll
-	$(CP) $(CP_OPTS) $(TOOLKIT_TARGET_REFIMPL_EXT)\aafintp.dll $(AAFSDK_BIN_EXT)\
+$(AAFSDK_BIN)\aafintp.dll : $(TOOLKIT_TARGET_REFIMPL)\aafintp.dll
+	$(CP) $(CP_OPTS) $(TOOLKIT_TARGET_REFIMPL)\aafintp.dll $(AAFSDK_BIN)\
 
-$(AAFSDK_BIN_EXT)\aafpgapi.dll : $(TOOLKIT_TARGET_REFIMPL_EXT)\aafpgapi.dll
-	$(CP) $(CP_OPTS) $(TOOLKIT_TARGET_REFIMPL_EXT)\aafpgapi.dll $(AAFSDK_BIN_EXT)\
+$(AAFSDK_BIN)\aafpgapi.dll : $(TOOLKIT_TARGET_REFIMPL)\aafpgapi.dll
+	$(CP) $(CP_OPTS) $(TOOLKIT_TARGET_REFIMPL)\aafpgapi.dll $(AAFSDK_BIN)\
 
-$(AAFSDK_BIN)\omfToolkit.dll : $(OMF_LIBS)\$(OMF_DLL_NAME)
-	$(CP) $(CP_OPTS) $(OMF_LIBS)\$(OMF_DLL_NAME) $(AAFSDK_BIN)\omfToolkit.dll
-	
+
 
 #
 # Dependency and build rules for the Debug DLL targets.
@@ -618,14 +563,12 @@ $(AAFSDK_BIN)\omfToolkit.dll : $(OMF_LIBS)\$(OMF_DLL_NAME)
 $(AAFSDK_DEBUG)\aafcoapi.dll : $(TOOLKIT_DEBUG_REFIMPL)\aafcoapi.dll
 	$(CP) $(CP_OPTS) $(TOOLKIT_DEBUG_REFIMPL)\aafcoapi.dll $(AAFSDK_DEBUG)\
 
-$(AAFSDK_DEBUG_EXT)\aafintp.dll : $(TOOLKIT_DEBUG_REFIMPL_EXT)\aafintp.dll
-	$(CP) $(CP_OPTS) $(TOOLKIT_DEBUG_REFIMPL_EXT)\aafintp.dll $(AAFSDK_DEBUG_EXT)\
+$(AAFSDK_DEBUG)\aafintp.dll : $(TOOLKIT_DEBUG_REFIMPL)\aafintp.dll
+	$(CP) $(CP_OPTS) $(TOOLKIT_DEBUG_REFIMPL)\aafintp.dll $(AAFSDK_DEBUG)\
 
-$(AAFSDK_DEBUG_EXT)\aafpgapi.dll : $(TOOLKIT_DEBUG_REFIMPL_EXT)\aafpgapi.dll
-	$(CP) $(CP_OPTS) $(TOOLKIT_DEBUG_REFIMPL_EXT)\aafpgapi.dll $(AAFSDK_DEBUG_EXT)\
+$(AAFSDK_DEBUG)\aafpgapi.dll : $(TOOLKIT_DEBUG_REFIMPL)\aafpgapi.dll
+	$(CP) $(CP_OPTS) $(TOOLKIT_DEBUG_REFIMPL)\aafpgapi.dll $(AAFSDK_DEBUG)\
 
-$(AAFSDK_DEBUG)\omfToolkitd.dll : $(OMF_LIBS)\omfToolkitd.dll
-	$(CP) $(CP_OPTS) $(OMF_LIBS)\omfToolkitd.dll $(AAFSDK_DEBUG)\
 
 #
 # Clean out all files that are specific to a particular configuration.
