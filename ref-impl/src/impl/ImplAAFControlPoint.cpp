@@ -1,10 +1,29 @@
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\***********************************************/ 
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
@@ -17,24 +36,28 @@
 #include "ImplAAFControlPoint.h"
 #endif
 
+#ifndef __ImplAAFVaryingValue_h__
+#include "ImplAAFVaryingValue.h"
+#endif
+
 #include "ImplAAFDictionary.h"
 #include "ImplAAFDefObject.h"
 #include "ImplAAFParameterDef.h"
 #include "ImplAAFTypeDef.h"
 #include "ImplAAFHeader.h"
+#include "ImplAAFTypeDefIndirect.h"
 
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 
-
 ImplAAFControlPoint::ImplAAFControlPoint ()
-: _type(			PID_ControlPoint_Type,			"Type"),
-  _time(			PID_ControlPoint_Time,			"Time"),
-  _value(			PID_ControlPoint_Value,			"Value"),
-  _hint(			PID_ControlPoint_EditHint,		"EditHint")
+: _time(			PID_ControlPoint_Time,			L"Time"),
+  _value(			PID_ControlPoint_Value,			L"Value"),
+  _hint(			PID_ControlPoint_EditHint,		L"EditHint"),
+  _initialized(false),
+  _cachedTypeDef(NULL)
 {
-	_persistentProperties.put(_type.address());
 	_persistentProperties.put(_time.address());
 	_persistentProperties.put(_value.address());
 	_persistentProperties.put(_hint.address());
@@ -42,7 +65,61 @@ ImplAAFControlPoint::ImplAAFControlPoint ()
 
 
 ImplAAFControlPoint::~ImplAAFControlPoint ()
-{}
+{
+  if (_cachedTypeDef)
+    _cachedTypeDef->ReleaseReference ();
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFControlPoint::Initialize
+    (ImplAAFVaryingValue * pVaryingValue,
+     aafRational_constref  time,
+     aafUInt32  valueSize,
+     aafDataBuffer_t  pValue)
+{
+  AAFRESULT result = AAFRESULT_SUCCESS;
+  ImplAAFTypeDef *pType = NULL;
+
+
+  if (!pVaryingValue || !pValue)
+    return (AAFRESULT_NULL_PARAM);
+  if (_initialized)
+    return (AAFRESULT_ALREADY_INITIALIZED);
+
+  // First initialize the time.
+  result = SetTime (time);
+  if (AAFRESULT_SUCCEEDED (result))
+  {
+    // Lookup the type definition from this constrol point. If it fails
+    // then the control point is invalid!
+    result = pVaryingValue->GetTypeDefinition (&pType);
+    if (AAFRESULT_SUCCEEDED (result))
+    {
+      _cachedTypeDef = pType;
+      _cachedTypeDef->AcquireReference ();
+
+      // Install the initial value.
+      result = SetValue (valueSize, pValue);
+    }
+  }
+  
+  if (AAFRESULT_SUCCEEDED (result))
+  {
+    _initialized = true;
+  }
+  else
+  {
+    if (_cachedTypeDef)
+      _cachedTypeDef->ReleaseReference ();
+  }
+
+  // Cleanup
+  if (pType)
+    pType->ReleaseReference ();
+
+  return result;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -66,10 +143,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if (!_hint.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
 	
-	aafUInt16	intHint;
-		
-	intHint = _hint;
-	*pEditHint = (aafEditHint_t)intHint;
+	*pEditHint = _hint;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -78,12 +152,15 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFControlPoint::GetValueBufLen (
       aafUInt32 * pLen)
 {
+  AAFRESULT result = AAFRESULT_SUCCESS;
 	if(pLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	*pLen = _value.size();
+//	*pLen = _value.size();
+	*pLen = 0;
 
-	return(AAFRESULT_SUCCESS); 
+	// Validate the property and get the actual length of the data
+	return (ImplAAFTypeDefIndirect::GetActualPropertySize (_value, pLen)); 
 }
 
 
@@ -96,13 +173,16 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pValue == NULL || bytesRead == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	if (_value.size() > valueSize)
-	  return AAFRESULT_SMALLBUF;
+//	if (_value.size() > valueSize)
+//	  return AAFRESULT_SMALLBUF;
 
-	_value.copyToBuffer(pValue, valueSize);
-	*bytesRead  = _value.size();
+//	_value.copyToBuffer(pValue, valueSize);
+//	*bytesRead  = _value.size();
+	*bytesRead = 0;
 
-	return(AAFRESULT_SUCCESS); 
+	// Validate the property and get the property definition and type definition, 
+	// and the actual length of the data
+	return (ImplAAFTypeDefIndirect::GetActualPropertyValue (_value, pValue, valueSize, bytesRead));
 }
 
 
@@ -119,7 +199,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFControlPoint::SetEditHint (
       aafEditHint_t  editHint)
 {
-	_hint = (aafUInt16)editHint;
+	_hint = editHint;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -129,57 +209,24 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32  valueSize,
       aafDataBuffer_t  pValue)
 {
-	if(pValue == NULL)
+	if (!pValue)
 		return(AAFRESULT_NULL_PARAM);
 
-	_value.setValue(pValue, valueSize);
+//	_value.setValue(pValue, valueSize);
 
-	return(AAFRESULT_SUCCESS); 
-}
+  if (!_cachedTypeDef)
+  {
+    // Lookup the type definition from this constrol point. If it fails
+    // then the control point is invalid!
+    AAFRESULT result = GetTypeDefinition (&_cachedTypeDef);
+    if (AAFRESULT_FAILED (result))
+      return result;
+  }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFControlPoint::SetTypeDefinition (
-      ImplAAFTypeDef*  pTypeDef)
-{
-	aafUID_t			newUID;
-	ImplAAFHeader		*head = NULL;
-	ImplAAFDictionary	*dict = NULL;
-
-	if(pTypeDef == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	XPROTECT()
-	{
-		CHECK(pTypeDef->GetAUID(&newUID));
-		CHECK(pTypeDef->MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
-//		if(dict->LookupType(&newUID, &def) == AAFRESULT_SUCCESS)
-//			def->ReleaseReference();
-
-		_type = newUID;
-//		pTypeDef->AcquireReference();
-		head->ReleaseReference();
-		head = NULL;
-		dict->ReleaseReference();
-		dict = NULL;
-	}
-	XEXCEPT
-	{
-		if(head)
-		  {
-			head->ReleaseReference();
-			head = 0;
-		  }
-		if(dict)
-		  {
-			dict->ReleaseReference();
-			dict = 0;
-		  }
-	}
-	XEND;
-
-	return AAFRESULT_SUCCESS;
+  // Validate the property and get the property definition and type definition, 
+	// and the actual length of the data
+	return (ImplAAFTypeDefIndirect::SetActualPropertyValue (_value, _cachedTypeDef, pValue, valueSize));
 }
 
 
@@ -187,41 +234,12 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFControlPoint::GetTypeDefinition (
       ImplAAFTypeDef **ppTypeDef)
 {
-	ImplAAFHeader		*head = NULL;
-	ImplAAFDictionary	*dict =  NULL;
-	aafUID_t			typeID;
-
 	if(ppTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
-	{
-		CHECK(MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
-		typeID = _type;
-		CHECK(dict->LookupType(&typeID, ppTypeDef));
-//		(*ppTypeDef)->AcquireReference();
-		head->ReleaseReference();
-		head = NULL;
-		dict->ReleaseReference();
-		dict = NULL;
-	}
-	XEXCEPT
-	{
-		if(head)
-		  {
-			head->ReleaseReference();
-			head = 0;
-		  }
-		if(dict)
-		  {
-			dict->ReleaseReference();
-			dict = 0;
-		  }
-	}
-	XEND;
-
-	return AAFRESULT_SUCCESS;
+	// Validate the property and get the actual type definition from the
+  // indirect value.
+	return (ImplAAFTypeDefIndirect::GetActualPropertyType (_value, ppTypeDef));
 }
 
 
