@@ -31,8 +31,6 @@
 #include <coguid.h>	
 #endif
 
-
-
 #include "AAF.h"
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
@@ -43,6 +41,8 @@
 #include <iomanip.h>
 #include <fstream.h>
 #include <stdio.h> // for sprintf()
+#include <stdlib.h>
+#include <string.h>
 
 #ifndef __AAFSmartPointer_h__
 #include "AAFSmartPointer.h"
@@ -265,8 +265,8 @@ static void printTimeStamp (const aafTimeStamp_t & ts,
 	}
 	else
 	{
+		assert (ts.date.month > 0 );
 		aafUInt8 month_index = ts.date.month-1;
-		assert (month_index >= 0);
 		assert (month_index < (sizeof (monthNames) / sizeof (monthNames[0])));
 		strcpy (monthNameBuf, monthNames[month_index]);
 	}
@@ -533,7 +533,6 @@ static HRESULT dumpMetaDefCommon
   // then prints AUID and Description
   HRESULT returnHr = AAFRESULT_SUCCESS;
 	
-  aafUInt32 countPropDefs=0;
   try
     {
       aafCharacter* aafStringBuf=NULL;
@@ -748,7 +747,6 @@ static HRESULT printAAFName(
 		IAAFTypeDef	*pTypeDef,
 		ostream		&os )
 {
-    HRESULT		    status = AAFRESULT_SUCCESS;
     IAAFMetaDefinitionSP    pMetaDef;
 
 
@@ -764,7 +762,6 @@ static HRESULT printAAFName(
 		IAAFClassDef	*pClassDef,
 		ostream		&os )
 {
-    HRESULT		    status = AAFRESULT_SUCCESS;
     IAAFMetaDefinitionSP    pMetaDef;
 
 
