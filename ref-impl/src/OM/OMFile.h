@@ -65,6 +65,7 @@ public:
     //          exist.
   static OMFile* openExistingRead(const wchar_t* fileName,
                                   const OMClassFactory* factory,
+                                  void* clientOnRestoreContext,
                                   const OMLoadMode loadMode);
 
     // @cmember Open an existing <c OMFile> for modify access, the
@@ -73,6 +74,7 @@ public:
     //          exist.
   static OMFile* openExistingModify(const wchar_t* fileName,
                                     const OMClassFactory* factory,
+                                    void* clientOnRestoreContext,
                                     const OMLoadMode loadMode);
 
     // @cmember Open a new <c OMFile> for modify access, the
@@ -83,6 +85,7 @@ public:
     //          created file is given by <p root>.
   static OMFile* openNewModify(const wchar_t* fileName,
                                const OMClassFactory* factory,
+                               void* clientOnRestoreContext,
                                const OMByteOrder byteOrder,
                                OMStorable* root,
                                const OMFileSignature& signature);
@@ -95,6 +98,7 @@ public:
     // @cmember Constructor. Create an <c OMFile> object representing
     //          an existing external file.
   OMFile(const wchar_t* fileName,
+         void* clientOnRestoreContext,
          const OMAccessMode mode,
          OMStoredObject* store,
          const OMClassFactory* factory,
@@ -103,6 +107,7 @@ public:
     // @cmember Constructor. Create an <c OMFile> object representing
     //          a new external file.
   OMFile(const wchar_t* fileName,
+         void* clientOnRestoreContext,
          OMFileSignature signature,
          const OMAccessMode mode,
          OMStoredObject* store,
@@ -115,7 +120,7 @@ public:
     // @cmember Save all changes made to the contents of this
     //          <c OMFile>. It is not possible to <mf OMFile::save>
     //          read-only or transient files.
-  void save(void* clientContext);
+  void save(void* clientOnSaveContext = 0);
 
     // @cmember Save the entire contents of this <c OMFile> as well as
     //          any unsaved changes in the new file <p fileName>. The file
@@ -172,6 +177,10 @@ public:
 
   virtual bool persistent(void) const;
 
+  void* clientOnSaveContext(void);
+
+  void* clientOnRestoreContext(void);
+
 private:
   // @access Private members.
 
@@ -191,6 +200,10 @@ private:
   enum OMLoadMode _loadMode;
   wchar_t* _fileName;
   OMFileSignature _signature;
+
+  void* _clientOnSaveContext;
+  void* _clientOnRestoreContext;
+
 };
 
 #endif
