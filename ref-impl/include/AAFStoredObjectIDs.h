@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFStoredObjectIDs.h,v 1.26.2.2 2004/04/17 20:55:16 jptrainor Exp $ $Name:  $
+// $Id: AAFStoredObjectIDs.h,v 1.26.2.3 2004/05/03 01:26:04 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -285,6 +285,14 @@ DEFINE_AUID(AUID_AAFPhysicalDescriptor,
 //{0d010101-0101-4a00-060e-2b3402060101}
 DEFINE_AUID(AUID_AAFImportDescriptor,
 0x0d010101, 0x0101, 0x4a00, 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01);
+
+//{0d010101-0101-4b00-060e-2b3402060101}
+DEFINE_AUID(AUID_AAFRecordingDescriptor,
+0x0d010101, 0x0101, 0x4b00, 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01);
+
+//{0d010101-0101-4e00-060e-2b3402060101}
+DEFINE_AUID(AUID_AAFAuxiliaryDescriptor,
+0x0d010101, 0x0101, 0x4e00, 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01);
 
 //{0d010101-0101-4c00-060e-2b3402060101}
 DEFINE_AUID(AUID_AAFTaggedValueDefinition,

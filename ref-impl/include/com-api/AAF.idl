@@ -2,7 +2,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAF.idl,v 1.13.4.7 2004/05/01 19:09:01 jptrainor Exp $ $Name:  $")
+cpp_quote("// $Id: AAF.idl,v 1.13.4.8 2004/05/03 01:26:04 jptrainor Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \"License\"); You may not use this file")
@@ -38361,6 +38361,77 @@ interface IAAFSourceReference2 : IUnknown
   // 
   HRESULT GetChannelIDsSize (
     // Number of elements in the pChannelIDs array
+    [out] aafUInt32 *  numberElements);
+
+  //***********************************************************
+  //
+  // SetMonoSourceSlotIDs()
+  //
+  // For reference from a multi-channel MobSlot to multiple mono MobSlots.
+// pMonoSourceSlotIDs identifies the mono slots referenced by this SourceReference
+// object.
+
+// 
+// Return codes:
+//
+// AAFRESULT_SUCCESS
+//   - succeeded
+//
+// AAFRESULT_NULL_PARAM
+//   - pMonoSourceSlotIDs is null 
+  // 
+  HRESULT SetMonoSourceSlotIDs (
+    // Number of elements in the pMonoSourceSlotIDs array
+    [in] aafUInt32  numberElements,
+
+    // Array of slot IDs
+    [in] aafUInt32*  pMonoSourceSlotIDs);
+
+
+  //***********************************************************
+  //
+  // GetMonoSourceSlotIDs()
+  //
+  // // Get the mono slot IDs that are referenced by this object.  Refer to
+// SetMonoSourceSlotIDs for a description of pMonoSourceSlotIDs.
+// Return codes:
+//
+// AAFRESULT_SUCCESS
+//   - succeeded
+//
+// AAFRESULT_NULL_PARAM
+//   - pMonoSourceSlotIDs is null
+//
+// AAFRESULT_PROP_NOT_PRESENT
+//   - the property is not present
+//
+// AAFRESULT_SMALLBUF
+//   - pMonoSourceSlotIDs is too small
+  // 
+  HRESULT GetMonoSourceSlotIDs (
+    // Number of elements in the pMonoSourceSlotIDs array
+    [in] aafUInt32  numberElements,
+
+    // Array of channel IDs
+    [in] aafUInt32*  pMonoSourceSlotIDs);
+
+  //***********************************************************
+  //
+  // GetMonoSourceSlotIDsSize()
+  //
+  // // Get the number of mono slot IDs stored by this SourceReference.
+//
+// AAFRESULT_SUCCESS
+//   - succeeded
+//
+// AAFRESULT_NULL_PARAM
+//   - pMonoSourceSlotIDs is null
+//
+// AAFRESULT_PROP_NOT_PRESENT
+//   - the property is not present
+  // 
+  HRESULT GetMonoSourceSlotIDsSize (
+    // Number of elements in the pMonoSourceSlotIDs array
     [out] aafUInt32 *  numberElements);
 
 

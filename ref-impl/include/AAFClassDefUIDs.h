@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassDefUIDs.h,v 1.12.2.2 2004/04/17 20:55:15 jptrainor Exp $ $Name:  $
+// $Id: AAFClassDefUIDs.h,v 1.12.2.3 2004/05/03 01:26:02 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -276,6 +276,14 @@ const aafUID_t kAAFClassID_PhysicalDescriptor =
 //{0d010101-0101-4a00-060e-2b3402060101}
 const aafUID_t kAAFClassID_ImportDescriptor =
 {0x0d010101, 0x0101, 0x4a00, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
+
+//{0d010101-0101-4b00-060e-2b3402060101}
+const aafUID_t kAAFClassID_RecordingDescriptor =
+{0x0d010101, 0x0101, 0x4b00, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
+
+//{0d010101-0101-4e00-060e-2b3402060101}
+const aafUID_t kAAFClassID_AuxiliaryDescriptor =
+{0x0d010101, 0x0101, 0x4e00, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
 
 //{0d010101-0101-4c00-060e-2b3402060101}
 const aafUID_t kAAFClassID_TaggedValueDefinition =

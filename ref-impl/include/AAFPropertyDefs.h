@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.5 2004/04/17 20:55:16 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.6 2004/05/03 01:26:03 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -168,6 +168,14 @@ const aafUID_t kAAFPropID_SourceReference_SourceID =
 //{06010103-0200-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_SourceReference_SourceMobSlotID =
 {0x06010103, 0x0200, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{06010103-0700-0000-060e-2b3401010107}
+const aafUID_t kAAFPropID_SourceReference_ChannelIDs =
+{0x06010103, 0x0700, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x07}};
+
+//{06010103-0800-0000-060e-2b3401010108}
+const aafUID_t kAAFPropID_SourceReference_MonoSourceSlotIDs =
+{0x06010103, 0x0800, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x08}};
 
 //{07020103-0104-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_SourceClip_StartTime =
@@ -796,6 +804,14 @@ const aafUID_t kAAFPropID_TapeDescriptor_TapeBatchNumber =
 //{04100101-0501-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_TapeDescriptor_TapeStock =
 {0x04100101, 0x0501, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{04090200-0000-0000-060e-2b3401010107}
+const aafUID_t kAAFPropID_AuxiliaryDescriptor_MimeType =
+{0x04090200, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x07}};
+
+//{04090300-0000-0000-060e-2b3401010108}
+const aafUID_t kAAFPropID_AuxiliaryDescriptor_CharSet =
+{0x04090300, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x08}};
 
 //{06010104-0305-0000-060e-2b3401010107}
 const aafUID_t kAAFPropID_TaggedValueDefinition_TaggedValueParentProperties =
