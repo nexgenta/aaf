@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MultiGenTest.cpp,v 1.10 2004/05/20 15:32:57 asuraparaju Exp $ $Name:  $
+// $Id: MultiGenTest.cpp,v 1.11 2004/10/22 16:00:02 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -324,7 +324,7 @@ void ProcessCommandLineArgs( int argc, char** argv )
       MultiGenTestRegistry& registry = MultiGenTestRegistry::GetInstance();
 
       if ( !registry.IsKnown( cmd->GetArgV()[0] ) ) {
-  	    string anError( string( "Unkown test: " ) +
+  	    string anError( string( "Unknown test: " ) +
 			    string( cmd->GetArgV()[0] ) );
 		throw anError;
       }
