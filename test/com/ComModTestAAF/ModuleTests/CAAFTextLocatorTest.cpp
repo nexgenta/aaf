@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTextLocator interface
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTextLocatorTest.cpp,v 1.25 2005/01/12 03:01:38 jfpanisset Exp $ $Name:  $
+// $Id: CAAFTextLocatorTest.cpp,v 1.26 2005/01/20 10:01:01 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -149,8 +149,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pTapeDescriptor->SetSignalType( VideoSignalType ));
 		checkResult(pTapeDescriptor->SetTapeFormat( TapeFormat ));
 		checkResult(pTapeDescriptor->SetTapeLength( TapeLength ));
-
- 		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
 			// Verify that there are no locators
 		checkResult(edesc->CountLocators(&numLocators));

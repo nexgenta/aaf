@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFLocator
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFLocatorTest.cpp,v 1.21 2005/01/11 10:17:09 jfpanisset Exp $ $Name:  $
+// $Id: CAAFLocatorTest.cpp,v 1.22 2005/01/20 10:01:01 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -144,8 +144,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
 		pAIFCDesc->Release();
 		pAIFCDesc = NULL;
-
- 		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
 			// Verify that there are no locators
 		checkResult(edesc->CountLocators(&numLocators));
