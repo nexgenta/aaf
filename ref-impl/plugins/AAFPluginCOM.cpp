@@ -1,25 +1,3 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
-
 ////////////////////////////////////////////////////////////////////////////////
 // @doc
 //
@@ -28,6 +6,10 @@
 // Implementation of DLL Exports
 // 
 // @end
+//
+// Copyright (c)1998 Avid Technologies, Inc. All Rights Reserved
+//
+// Tom Ransdell, Avid AAF Development Team
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -38,25 +20,26 @@
 //		run nmake -f aafcomps.mk in the project directory.
 
 
-#include "AAFTypes.h"
 #include "CAAFInProcServer.h"
 
-static CAAFInProcServer g_AAFInProcServer;
+CAAFInProcServer g_AAFInProcServer;
 CAAFServer* g_pAAFServer = &g_AAFInProcServer;
 
 // Include the table the associates all of the CLSID's with class names and factory methods.
 #include "AAFPluginObjectTable_i.cpp"
 
-// Include the definitions for all of the interface IID's.
-#include "AAFPlugin_i.c"
 
 
-#if defined( OS_MACOS )
+
+#if defined(_MAC)
 
 // Make sure we have defined IID_IUnknown and IID_IClassFactory.
+#define INITGUID
 #include <initguid.h>
 #include <coguid.h>	
 
+// temporarily include this definition here. This will be removed later.
+DEFINE_GUID(IID_IAAFEndian, 0x6BACC0C1, 0x6091, 0x11D2, 0x84, 0x1B, 0x00, 0x60, 0x08, 0x32, 0xAC, 0xB8);
 
 // Define struc
 typedef struct
@@ -92,33 +75,15 @@ void pascal __terminate();
 void pascal DllTerminationRoutine();
 }
 
+#include "MetroNubUtils.h"
 
 
 #pragma export on
-#endif // #if defined( OS_MACOS )
+#endif // #if defined(_MAC)
 
-#if defined( OS_UNIX )
 
-class PluginCOMInitialize {
-public:
-	PluginCOMInitialize();
-	~PluginCOMInitialize();
-};
 
-PluginCOMInitialize::PluginCOMInitialize()
-{
-	// Initialize the inproc server object.
- 	g_AAFInProcServer.Init(AAFPluginObjectMap, 0);
-}
-
-PluginCOMInitialize::~PluginCOMInitialize()
-{}
-
-PluginCOMInitialize init;
-
-#endif  // OS_UNIX
-
-#if defined( OS_WINDOWS )
+#if defined(WIN32) || defined(_WIN32)
 // Include the entry point for the windows dll.
 /////////////////////////////////////////////////////////////////////////////
 // DLL Entry Point
@@ -140,7 +105,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 	return TRUE;    // ok
 }
 
-#endif  // OS_WINDOWS
+#endif
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -178,28 +143,7 @@ STDAPI DllUnregisterServer(void)
 }
 
 
-
-//
-// Calls that need to be available for platforms that do 
-// not support COM or Registry.
-//
-
-
-// Return the number of coclasses exported from this dll.
-STDAPI_(ULONG) AAFGetClassCount(void)
-{
-	return g_AAFInProcServer.GetClassCount();
-}
-
-// Get the nth implementation coclass id.
-STDAPI AAFGetClassObjectID(ULONG index, CLSID *pClassID)
-{
-	return g_AAFInProcServer.GetClassObjectID(index, pClassID);
-}
-
-
-
-#if defined( OS_MACOS )
+#if defined(_MAC)
 //
 //  DllGetVersion
 //
@@ -263,7 +207,7 @@ DllInitializationRoutine(CFragInitBlockPtr initBlkPtr)
 	__initialize(initBlkPtr);
 
 	// Initialize the inproc server object with a copy of the contents of the initBlkPtr.
-	g_AAFInProcServer.Init(AAFPluginObjectMap, (HINSTANCE)&DllData.InitBlock);
+	g_AAFInProcServer.Init(AAFObjectMap, (HINSTANCE)&DllData.InitBlock);
 
 	if (!DllData.Inited && DllData.InitBlock.fragLocator.where == kDataForkCFragLocator)
 	{
@@ -337,5 +281,5 @@ DllTerminationRoutine()
 
 
 #pragma export off
-#endif // #if defined( OS_MACOS )
+#endif // #if defined(_MAC)
 
