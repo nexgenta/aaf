@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModelProcs.cpp,v 1.6 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModelProcs.cpp,v 1.6.2.1 2004/08/09 23:08:41 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -871,6 +871,62 @@ static bool InitializeTypeDefinitionExtendibleEnumeration(
 
 
 //
+// TypeDefinitionValueSet/ImplAAFTypeDef callbacks
+//
+static bool CreateTypeDefinitionValueSet(
+  const TypeDefinitionValueSet *typeDefinitionValueSet, 
+  ImplAAFMetaDictionary *metaDictionary)
+{
+  if (typeDefinitionValueSet->axiomatic())
+  {
+    return CreateTypeDefinition(typeDefinitionValueSet, metaDictionary);
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+static bool InitializeTypeDefinitionValueSet(
+  const TypeDefinitionValueSet *typeDefinitionValueSet, 
+  ImplAAFMetaDictionary *metaDictionary)
+{
+  ImplAAFTypeDefSet *pType = NULL;
+  ImplAAFTypeDef *pElementType = NULL;
+  AAFRESULT result;
+
+  
+  if (typeDefinitionValueSet->axiomatic())
+  {
+    pType = dynamic_cast<ImplAAFTypeDefSet *>
+            (metaDictionary->findAxiomaticTypeDefinition(*typeDefinitionValueSet->id()));
+    assert (pType);
+    if (!pType)
+      throw AAFRESULT_TYPE_NOT_FOUND;
+
+    pElementType = metaDictionary->findAxiomaticTypeDefinition(*typeDefinitionValueSet->elementTypeId());
+    assert (pElementType);
+    if (!pElementType)
+      throw AAFRESULT_TYPE_NOT_FOUND;
+
+    result = pType->pvtInitialize(*typeDefinitionValueSet->id(),
+                                  pElementType,
+                                  typeDefinitionValueSet->name());
+    assert (AAFRESULT_SUCCEEDED(result));
+    if (AAFRESULT_FAILED(result))
+      throw result;
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+//
 // TypeDefinitionStrongReference/ImplAAFTypeDef callbacks
 //
 static bool CreateTypeDefinitionStrongReference(
@@ -1498,10 +1554,16 @@ void InstallAAFObjectModelProcs(void)
         const_cast<TypeDefinition *>(typeDefinition)->setCreateDefinitionProc((CreateDefinitionProcType)CreateTypeDefinitionWeakReferenceSet);
         const_cast<TypeDefinition *>(typeDefinition)->setInitializeDefinitionProc((InitializeDefinitionProcType)InitializeTypeDefinitionWeakReferenceSet);
       }
+      else if (dynamic_cast<const TypeDefinitionValueSet*>(typeDefinition))
+      {
+        const_cast<TypeDefinition *>(typeDefinition)->setCreateDefinitionProc((CreateDefinitionProcType)CreateTypeDefinitionValueSet);
+        const_cast<TypeDefinition *>(typeDefinition)->setInitializeDefinitionProc((InitializeDefinitionProcType)InitializeTypeDefinitionValueSet);
+      }
       else
       {
         assert (dynamic_cast<const TypeDefinitionStrongReferenceSet*>(typeDefinition) ||
-                dynamic_cast<const TypeDefinitionWeakReferenceSet*>(typeDefinition));
+                dynamic_cast<const TypeDefinitionWeakReferenceSet*>(typeDefinition) ||
+                dynamic_cast<const TypeDefinitionValueSet*>(typeDefinition));
       }
       break;
 

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefsGen.h,v 1.14 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefsGen.h,v 1.14.2.1 2004/08/09 23:08:41 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -720,6 +720,29 @@ static TypeStream s_AAFAllTypeStreams [] = \
   TypeStream(MY_TYPE_ID(name), MY_TYPE_NAME(name)),
 #define AAF_TYPE_TABLE_END() \
 };
+
+#include "AAFMetaDictionary.h"
+
+//
+// Pass 25:  Do stuff for set types.
+//
+#define AAF_TYPE_TABLE_BEGIN()  \
+struct TypeSet         \
+{                               \
+  const wchar_t *  typeName;    \
+  aafUID_t         typeId;      \
+  const aafUID_t * pRefdTypeId; \
+  int              isValid;     \
+};                              \
+                                \
+static TypeSet s_AAFAllTypeSets [] = {
+
+#define AAF_TYPE(x) kAAFTypeID_##x
+#define AAF_TYPE_DEFINITION_SET(name, id, type) \
+  {L###name, id, (aafUID_t *)& type, 1},
+
+#define AAF_TYPE_TABLE_END()  \
+0 };
 
 #include "AAFMetaDictionary.h"
 
