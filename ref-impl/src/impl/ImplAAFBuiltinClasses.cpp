@@ -90,6 +90,7 @@ const static aafUID_t NULL2_AUID = { 0 };
 #define AUID_AAFParameterDefinition AUID_AAFParameterDef
 #define AUID_AAFPropertyDefinition AUID_AAFPropertyDef
 #define AUID_AAFTypeDefinition AUID_AAFTypeDef
+#define AUID_AAFTypeDefinitionCharacter AUID_AAFTypeDefCharacter
 #define AUID_AAFTypeDefinitionEnumeration AUID_AAFTypeDefEnum
 #define AUID_AAFTypeDefinitionExtendibleEnumeration AUID_AAFTypeDefExtEnum
 #define AUID_AAFTypeDefinitionFixedArray AUID_AAFTypeDefFixedArray
@@ -246,6 +247,7 @@ const /*static*/ aafUID_t * ImplAAFBuiltinClasses::sAxClassIDs[] =
   &AUID_AAFTypeDefRecord,
   &AUID_AAFTypeDefVariableArray,
   &AUID_AAFTypeDefFixedArray,
+  &AUID_AAFTypeDefCharacter,
   &AUID_AAFTypeDefString,
   &AUID_AAFTypeDefIndirect,
   &AUID_AAFTypeDefEnum,
@@ -278,6 +280,7 @@ ImplAAFBuiltinClasses::ImplAAFBuiltinClasses (ImplAAFDictionary* dictionary)
 	_numAxPropsInited (false)
 {
   _axClassDefs = new ImplAAFClassDefSP[ksNumAxClasses];
+  dictionary->SetBuiltinClasses(this);
   instantiateProps ();
   instantiateClasses ();
 }
@@ -515,13 +518,14 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 		  ImplAAFPropertyDef * propDef =
 			dynamic_cast<ImplAAFPropertyDef*>(obj);
 		  assert (propDef);
-		  
+
 		  AAFRESULT hr = propDef->pvtInitialize
 			(propInfo->id,
 			 propInfo->tag,
 			 propInfo->name,
 			 *propInfo->pTypeGuid,
 			 propInfo->mandatory ? kAAFFalse : kAAFTrue);
+
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  propDef->SetOMPropCreateFunc (propInfo->omPropCreateFunc);
 
