@@ -1,29 +1,24 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplEnumAAFPropertyValues_h__
@@ -248,6 +243,12 @@ const OMType* ImplAAFPropertyDef::type(void) const
   return ptd;
 }
 
+const OMUniqueObjectIdentification&
+ImplAAFPropertyDef::uniqueIdentification(void) const
+{
+  assert(false); // tjb for ak - stub
+  return nullOMUniqueObjectIdentification;
+}
 
 const wchar_t* ImplAAFPropertyDef::name(void) const
 {
@@ -383,7 +384,28 @@ void ImplAAFPropertyDef::onRestore(void* clientContext) const
     AAF_PATCH_PROPETY_TYPE(PID_Dictionary_InterpolationDefinitions, kAAFTypeID_InterpolationDefinitionStrongReferenceSet)
     AAF_PATCH_PROPETY_TYPE(PID_MetaDictionary_ClassDefinitions, kAAFTypeID_ClassDefinitionStrongReferenceSet)
     AAF_PATCH_PROPETY_TYPE(PID_MetaDictionary_TypeDefinitions, kAAFTypeID_TypeDefinitionStrongReferenceSet)
+    AAF_PATCH_PROPETY_TYPE(PID_OperationDefinition_ParametersDefined, kAAFTypeID_ParameterDefinitionWeakReferenceSet)
+  
+    // The DataDefinitions property is implemented as a weak reference vector. The object model for 
+    // DR4, AAFMetaDictionary.h, and earlier incorrectly described this type as a weak reference set.
+    AAF_PATCH_PROPETY_TYPE(PID_CodecDefinition_DataDefinitions, kAAFTypeID_DataDefinitionWeakReferenceVector)    
+   
+    // The Definition property was incorrectly implemented as an AUID. The object model for 
+    // DR4, AAFMetaDictionary.h, and earlier correctly described this type as a weak reference.
+    // Since the file format if "frozen" the new AAFMetaDictionary describes this property
+    // as an AUID to be consistent with the implementation.
+    AAF_PATCH_PROPETY_TYPE(PID_Parameter_Definition, kAAFTypeID_AUID)
+   
+    // The Type property was incorrectly implemented as an AUID. The object model for 
+    // DR4, AAFMetaDictionary.h, and earlier correctly described this type as a weak reference.
+    // Since the file format if "frozen" the new AAFMetaDictionary describes this property
+    // as an AUID to be consistent with the implementation.
+    AAF_PATCH_PROPETY_TYPE(PID_PropertyDefinition_Type, kAAFTypeID_AUID)
 
+    // In DR4 and earlier there were a couple of types that incorrectly used String instead of StringArray.
+//    AAF_PATCH_PROPETY_TYPE(PID_TypeDefinitionExtendibleEnumeration_ElementNames, kAAFTypeID_StringArray)
+//    AAF_PATCH_PROPETY_TYPE(PID_TypeDefinitionRecord_MemberNames, kAAFTypeID_StringArray)
+    
   AAF_END_TYPE_PATCHES()
 
 
@@ -394,3 +416,21 @@ void ImplAAFPropertyDef::onRestore(void* clientContext) const
 #undef AAF_BEGIN_TYPE_PATCHES
 #undef AAF_PATCH_PROPETY_TYPE
 #undef AAF_END_TYPE_PATCHES
+
+
+
+// Method is called after class has been added to MetaDictionary.
+// If this method fails the class is removed from the MetaDictionary and the
+// registration method will fail.
+HRESULT ImplAAFPropertyDef::CompleteClassRegistration(void)
+{
+  // Make sure the associated type definition can complete.
+  //
+  ImplAAFTypeDefSP pType;
+  AAFRESULT hr = GetTypeDef (&pType);
+  if (AAFRESULT_SUCCEEDED(hr))
+  {
+    hr = pType->CompleteClassRegistration();
+  }
+  return hr;
+}
