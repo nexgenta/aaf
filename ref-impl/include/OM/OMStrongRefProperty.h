@@ -71,10 +71,13 @@ public:
   operator ReferencedObject*() const;
 
     // @cmember Save this <c OMStrongReferenceProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember Close this <c OMProperty>.
   virtual void close(void);
+
+    // @cmember Detach this <c OMProperty>.
+  virtual void detach(void);
 
     // @cmember Restore this <c OMStrongReferenceProperty>, the external
     //          (persisted) size of the <c OMStrongReferenceProperty>
@@ -82,6 +85,9 @@ public:
   virtual void restore(size_t externalSize);
 
   // Optional property interface
+
+    // @cmember Is this <c OMStrongReferenceProperty> void ?
+  virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceProperty>.
   virtual void remove(void);
@@ -95,6 +101,10 @@ public:
     //          bits are copied from the buffer at address <p bits> which
     //          is <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
+
+    // @cmember The value of this <c OMStrongReferenceProperty>
+    //          as an <c OMStorable>.
+  virtual OMStorable* storable(void) const;
 
 private:
 
