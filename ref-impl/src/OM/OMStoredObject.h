@@ -2,6 +2,9 @@
 #define OMSTOREDOBJECT_H
 
 #include "OMPortability.h"
+#include "OMTypes.h"
+
+#include <stddef.h>
 
 struct IStorage;
 struct IStream;
@@ -13,23 +16,37 @@ class OMStoredVectorIndex;
 
 class OMStoredObject {
 public:
+
   OMStoredObject(IStorage* s);
+
+  ~OMStoredObject(void);
+
+  static OMStoredObject* openRead(const wchar_t* fileName);
+  static OMStoredObject* openModify(const wchar_t* fileName);
+  static OMStoredObject* createModify(const wchar_t* fileName);
+
+  OMStoredObject* openStoragePath(const char* storagePathName);
 
   void save(OMProperty* p);
   void restore(OMPropertySet& properties);
-  void create(void);
-  void open(void);
   void close(void);
   void write(int pid, int type, void* start, size_t size);
   void read(int pid, int type, void* start, size_t size);
-  void saveClassId(const int cid);
-  int restoreClassId(void);
+  void saveClassId(const OMClassId& cid);
+  OMClassId restoreClassId(void);
   OMStoredObject* createSubStorage(const char* name);
   OMStoredObject* openSubStorage(const char* name);
   void save(const OMStoredVectorIndex* index, const char* vectorName);
   OMStoredVectorIndex* restore(const char* vectorName);
 private:
-  
+
+  static OMStoredObject* open(const wchar_t* fileName,
+                              const OMAccessMode mode);
+  static OMStoredObject* create(const wchar_t* fileName);
+
+  void create(void);
+  void open(const OMAccessMode mode);
+
   void save(OMStoredPropertySetIndex *index);
   OMStoredPropertySetIndex* restore(void);
   
@@ -42,13 +59,15 @@ private:
   void readFromStream(IStream* stream, void* data, size_t size);
 
   IStorage* createStorage(IStorage* storage, const char* storageName);
-  IStorage* openStorage(IStorage* storage, const char* storageName);
+  IStorage* openStorage(IStorage* storage,
+                        const char* storageName,
+                        const OMAccessMode mode);
   void closeStorage(IStorage*& storage);
   size_t streamOffset(IStream* stream);
   void streamSeek(IStream* stream, size_t offset);
 
-  void setClass(IStorage* storage, int cid);
-  void getClass(IStorage* storage, int& cid);
+  void setClass(IStorage* storage, const OMClassId& cid);
+  void getClass(IStorage* storage, OMClassId& cid);
 
   IStorage* _storage;
   OMStoredPropertySetIndex* _index;
@@ -56,8 +75,8 @@ private:
   IStream* _propertiesStream;
   size_t _offset;
 
-  int _classId;
   bool _open;
+  OMAccessMode _mode;
 };
 
 #endif
