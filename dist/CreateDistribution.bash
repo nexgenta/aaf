@@ -1,7 +1,7 @@
 #! /bin/bash
 ###############################################################################
 #
-# $Id: CreateDistribution.bash,v 1.6 2004/05/06 18:46:25 creederickson Exp $ $Name:  $
+# $Id: CreateDistribution.bash,v 1.7 2004/06/03 17:59:02 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -129,9 +129,9 @@ AAF_MAJOR_VERSION=`grep "define AAF_MAJOR_VERSION" ${AAFSDKBUILD_H} | awk '{prin
 AAF_MINOR_VERSION=`grep "define AAF_MINOR_VERSION" ${AAFSDKBUILD_H} | awk '{print $3}'`;
 AAF_MAINT_RELEASE=`grep "define AAF_MAINT_RELEASE" ${AAFSDKBUILD_H} | awk '{print $3}'`;
 AAF_RELEASE_STAGE=`grep "define AAF_RELEASE_STAGE" ${AAFSDKBUILD_H} | awk '{print $3}'`;
-AAF_BUILD_NUMBER=`grep "define AAF_BUILD_NUMBER"  ${AAFSDKBUILD_H} | awk '{print $3}'`;
+AAF_PATCH_LEVEL=`grep "define AAF_PATCH_LEVEL"  ${AAFSDKBUILD_H} | awk '{print $3}'`;
 
-VERSION_STRING=${AAF_MAJOR_VERSION}_${AAF_MINOR_VERSION}_${AAF_MAINT_RELEASE}.${AAF_BUILD_NUMBER}
+VERSION_STRING=${AAF_MAJOR_VERSION}_${AAF_MINOR_VERSION}_${AAF_MAINT_RELEASE}.${AAF_PATCH_LEVEL}
 
 DIST_FILE_NAME=${DIST_FILE}.${AAFPLATFORM}.${VERSION_STRING}
 
@@ -139,7 +139,7 @@ echo AAF_MAJOR_VERSION = $AAF_MAJOR_VERSION
 echo AAF_MINOR_VERSION = $AAF_MINOR_VERSION
 echo AAF_MAINT_RELEASE = $AAF_MAINT_RELEASE
 echo AAF_RELEASE_STAGE = $AAF_RELEASE_STAGE
-echo AAF_BUILD_NUMBER  = $AAF_BUILD_NUMBER
+echo AAF_PATCH_LEVEL  = $AAF_PATCH_LEVEL
 
 echo VERSION_STRING = $VERSION_STRING
 echo DIST_FILE_NAME = $DIST_FILE_NAME

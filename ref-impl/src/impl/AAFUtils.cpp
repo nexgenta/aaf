@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.51 2004/05/11 11:25:46 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.52 2004/06/03 17:59:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,7 +70,7 @@
 extern const char AAFReferenceImplementationIdent[];
 
 const char AAFReferenceImplementationIdent[] = "@(#) " AAF_SDK_RELEASE; // for Linux and Irix
-const aafProductVersion_t AAFReferenceImplementationVersion = {AAF_MAJOR_VERSION, AAF_MINOR_VERSION, AAF_MAINT_RELEASE, AAF_BUILD_NUMBER, AAF_RELEASE_STAGE};
+const aafProductVersion_t AAFReferenceImplementationVersion = {AAF_MAJOR_VERSION, AAF_MINOR_VERSION, AAF_MAINT_RELEASE, AAF_PATCH_LEVEL, AAF_RELEASE_STAGE};
 
 
 
