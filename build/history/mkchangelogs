@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.32 2005/03/03 15:52:04 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.33 2005/04/05 20:58:29 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -165,6 +165,8 @@ do
   #echo $clog
   #echo $html
   #
+  title="Log of changes made between $ptag and $tag"
+  #
   # get the raw "cvs log" output
   #
   if [[ ! -f $log ]]
@@ -183,7 +185,7 @@ do
   # 
   if [[ ! -f $html ]]
   then
-    cat $clog | awk -v TAG1="$ptag" -v TAG2="$tag" -f ${TOOLPATH}/cl2html.awk ${cmfile} > $html
+    cat $clog | awk -v TITLE="$title" -f ${TOOLPATH}/cl2html.awk ${cmfile} > $html
   fi
   #
   # next tag

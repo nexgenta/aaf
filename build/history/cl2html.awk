@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cl2html.awk,v 1.69 2005/03/03 15:52:04 tbingham Exp $ $Name:  $
+# $Id: cl2html.awk,v 1.70 2005/04/05 20:58:28 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,10 +38,8 @@ BEGIN {
     exit 1;
   }
 
-  if ((TAG1 == "") || (TAG2 == "")) {
+  if (TITLE == "") {
     TITLE = "cvs change log";
-  } else {
-    TITLE=sprintf("Log of changes made between %s and %s", TAG1, TAG2);
   }
   entrytext = "";
   createColorMap(ARGV[1]);
