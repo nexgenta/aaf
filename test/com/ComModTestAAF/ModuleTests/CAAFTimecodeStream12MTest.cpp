@@ -1,39 +1,21 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTimecodeStream
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 
 #include "AAF.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
-#include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 #include <iostream.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -60,32 +42,11 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-  static void SwapBytes(void *buffer, size_t count)
-  {
-    unsigned char *pBuffer = (unsigned char *)buffer;
-    unsigned char tmp;
-    int front = 0;
-    int back = count - 1;
-  
-    for (front = 0, back = count - 1; front < back; ++front, --back)
-    {
-      tmp = pBuffer[front];
-      pBuffer[front] = pBuffer[back];
-      pBuffer[back] = tmp;
-    }
-  }
-
-
+static char				testPattern[] = "ATestBuffer Pattern";
 static aafRational_t	testSpeed = { 2997, 100 };
 static aafUInt32		userData1 = 0x526F626E;
 static aafUInt32		userData2 = 0x42656361;
 static aafUInt32		userData3 = 0x53617261;
-
-static const 	aafMobID_t	TEST_MobID =
-{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x58c52650, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
-
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
@@ -95,29 +56,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*  pDictionary = NULL;
 	IAAFCompositionMob*			pCompMob=NULL;
 	IAAFMob						*pMob = NULL;
-	IAAFTimelineMobSlot			*pNewSlot = NULL;
+	IAAFMobSlot					*pNewSlot = NULL;
 	IAAFTimecodeStream12M		*pTimecodeStream12M = NULL;
 	IAAFTimecodeStream			*pTimecodeStream = NULL;
 	IAAFSegment					*pSeg = NULL;
-	IAAFComponent*		pComponent = NULL;
 
+	aafUID_t					newMobID;
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
+	aafLength_t					zero;
 	aafTimecode_t				startTC;
 	aafUInt32					n;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
+	zero = 0;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFTimecodeStream12M Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
+
 
 	try
 	{
@@ -134,37 +96,27 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
 		
 		// Create a CompositionMob
-		checkResult(defs.cdCompositionMob()->
-					CreateInstance(IID_IAAFCompositionMob, 
-								   (IUnknown **)&pCompMob));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+			IID_IAAFCompositionMob, 
+			(IUnknown **)&pCompMob));
 		
 		// Get a MOB interface
 		checkResult(pCompMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
-		checkResult(pMob->SetMobID(TEST_MobID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(&newMobID));
 		
 		checkResult(pCompMob->Initialize(L"COMPMOB01"));
 		
-		checkResult(defs.cdTimecodeStream12M()->
-					CreateInstance(IID_IAAFTimecodeStream12M, 
-								   (IUnknown **)&pTimecodeStream12M));		
-		 checkResult(pTimecodeStream12M->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
-		pComponent->Release();
-		pComponent = NULL;
+		checkResult(pDictionary->CreateInstance(&AUID_AAFTimecodeStream12M,
+			IID_IAAFTimecodeStream12M, 
+			(IUnknown **)&pTimecodeStream12M));		
 		 
 
 		checkResult(pTimecodeStream12M->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
-		aafRational_t editRate = { 0, 1};
-		checkResult(pMob->AppendNewTimelineSlot (editRate,
-												 pSeg,
-												 0,
-												 L"TimecodeStream12M",
-												 0,
-												 &pNewSlot));
-		checkResult(pHeader->AddMob(pMob));
+		checkResult(pMob->AppendNewSlot (pSeg, 0, L"TimecodeStream12M", &pNewSlot));
+		checkResult(pHeader->AppendMob(pMob));
 
 		/* Can we do this bottom up?? !!! */
 		checkResult(pTimecodeStream12M->QueryInterface (IID_IAAFTimecodeStream, (void **)&pTimecodeStream));
@@ -172,7 +124,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pTimecodeStream->SetSourceType(kAAFTimecodeLTC));
 
 		startTC.startFrame = 108000;		// 1 hour, non-drop
-		startTC.drop = kAAFTcNonDrop;
+		startTC.drop = kTcNonDrop;
 		startTC.fps = 30;
 
 		// Set up:
@@ -232,8 +184,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pSeg)
 		pSeg->Release();
 
-	if (pComponent)
-		pComponent->Release();
 	if (pTimecodeStream12M)
 		pTimecodeStream12M->Release();
 
@@ -268,26 +218,39 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
-  // IAAFSession *				pSession = NULL;
-  IAAFFile *					pFile = NULL;
-  bool bFileOpen = false;
-  IAAFHeader *				pHeader = NULL;
-  IEnumAAFMobs*				pMobIter = NULL;
-  IEnumAAFMobSlots*			pEnum = NULL;
-  IAAFMob*					pMob = NULL;
-  IAAFMobSlot*				pMobSlot = NULL;
-  IAAFSegment*				pSeg = NULL;
-  IAAFTimecodeStream12M*		pTimecodeStream12M = NULL;
-  IAAFTimecodeStream*			pTimecodeStream = NULL;
-  aafTimecode_t				startTC;
-  aafTimecodeSourceType_t		checkType;
-  aafRational_t				checkSpeed, testRate;
-  aafUInt32					checkSampleSize, checkUserData;
-  // aafUInt32				checkUserDataLen;
-  aafPosition_t				offset;
-  AAFRESULT					status;
-  aafNumSlots_t				numMobs;
-  HRESULT						hr = S_OK;
+    // IAAFSession *				pSession = NULL;
+	IAAFFile *					pFile = NULL;
+	bool bFileOpen = false;
+	IAAFHeader *				pHeader = NULL;
+	IEnumAAFMobs*				pMobIter = NULL;
+	IEnumAAFMobSlots*			pEnum = NULL;
+	IAAFMob*					pMob = NULL;
+	IAAFMobSlot*				pMobSlot = NULL;
+	IAAFSegment*				pSeg = NULL;
+	IAAFTimecodeStream12M*		pTimecodeStream12M = NULL;
+	IAAFTimecodeStream*			pTimecodeStream = NULL;
+	aafTimecode_t				startTC;
+	aafTimecodeSourceType_t		checkType;
+	aafRational_t				checkSpeed, testRate;
+	aafUInt32					checkSampleSize, checkUserData;
+	// aafUInt32				checkUserDataLen;
+	aafPosition_t				offset;
+	AAFRESULT					status;
+	aafProductIdentification_t	ProductInfo;
+	aafNumSlots_t				numMobs;
+	HRESULT						hr = S_OK;
+
+	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
+	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersionString = NULL;
+	ProductInfo.productID = -1;
+	ProductInfo.platform = NULL;
+
 
   try
   {
@@ -299,13 +262,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 		// Get the number of mobs in the file (should be one)
-		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
-    checkResult(pHeader->GetMobs( NULL, &pMobIter));
+    checkResult(pHeader->EnumAAFAllMobs( NULL, &pMobIter));
 		while (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
-      checkResult(pMob->GetSlots (&pEnum));
+      checkResult(pMob->EnumAAFAllMobSlots (&pEnum));
 
       while (AAFRESULT_SUCCESS == pEnum->NextOne (&pMobSlot))
       {
@@ -327,73 +290,58 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 		checkResult(pTimecodeStream->GetPositionTimecode(0, &startTC));
         checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 
 
 //		checkResult(pTimecodeStream12M->GetUserDataLength((aafInt32*)&checkUserDataLen));
 //       checkExpression(checkUserDataLen == 4, AAFRESULT_TEST_FAILED);	// For 12M
 		checkResult(pTimecodeStream->GetUserDataAtPosition(0, sizeof(checkUserData), (aafUInt8*)&checkUserData));
-        if(checkUserData != userData1)
-		{
-			SwapBytes((aafUInt8*)&checkUserData, sizeof(checkUserData));
-        	if(checkUserData != userData1)
-       			throw AAFRESULT_TEST_FAILED;
-       	}
+        checkExpression(checkUserData == userData1, AAFRESULT_TEST_FAILED);
 		checkResult(pTimecodeStream->GetUserDataAtPosition(120, sizeof(checkUserData), (aafUInt8*)&checkUserData));
-        if(checkUserData != userData2)
-		{
-			SwapBytes((aafUInt8*)&checkUserData, sizeof(checkUserData));
-        	if(checkUserData != userData2)
-       			throw AAFRESULT_TEST_FAILED;
-       	}
+        checkExpression(checkUserData == userData2, AAFRESULT_TEST_FAILED);
 		checkResult(pTimecodeStream->GetUserDataAtPosition(180, sizeof(checkUserData), (aafUInt8*)&checkUserData));
-        if(checkUserData != userData3)
-		{
-			SwapBytes((aafUInt8*)&checkUserData, sizeof(checkUserData));
-        	if(checkUserData != userData3)
-       			throw AAFRESULT_TEST_FAILED;
-       	}
+        checkExpression(checkUserData == userData3, AAFRESULT_TEST_FAILED);
 
 		/**********/
 		offset = 0;		// Group 1 lower bound	 
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 60;	// Group 2 lower bound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == 108090, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 120;	// Group 3 Lower Bound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == (108000L * 2L), AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 121;	// Group 3 Middle
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == (108000L * 2L)+1, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 179;	// Group 3 UpperBound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == (108000L * 2L)+59, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 		/****/
 		offset = 180;	// Group 3 lower bound
 		checkResult(pSeg->SegmentOffsetToTC(&offset, &startTC));
         checkExpression(startTC.startFrame == 0, AAFRESULT_TEST_FAILED);
-        checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
+        checkExpression(startTC.drop == kTcNonDrop, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.fps == 30, AAFRESULT_TEST_FAILED);
 
 		/**********/
-        startTC.drop = kAAFTcNonDrop;
+        startTC.drop = kTcNonDrop;
         startTC.fps = 30;
         startTC.startFrame = 108000;		// Group 1 lower bound (Tests path #1 through code)
 		checkResult(pSeg->SegmentTCToOffset(&startTC, &testRate, &offset));
@@ -491,25 +439,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTimecodeStream12M_test(testMode_t mode);
-extern "C" HRESULT CAAFTimecodeStream12M_test(testMode_t mode)
+extern "C" HRESULT CAAFTimecodeStream12M_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"AAFTimecodeStream12MTest.aaf";
+	aafWChar * pFileName = L"TimecodeStream12MTest.aaf";
 
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CAAFTimecodeStream12M::test...Caught general C++"
-		   << " exception!" << endl; 
+		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
