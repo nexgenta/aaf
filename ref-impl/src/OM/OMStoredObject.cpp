@@ -1,35 +1,31 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMStoredObject
 #include "OMStoredObject.h"
 
 #include "OMUtilities.h"
+#include "OMDataStream.h"
 
   // @mfunc Destructor.
 OMStoredObject::~OMStoredObject(void)
@@ -41,6 +37,31 @@ wchar_t* OMStoredObject::streamName(const wchar_t* propertyName,
                                     OMPropertyId pid)
 {
   return referenceName(propertyName, pid);
+}
+
+OMUInt16 OMStoredObject::_seed = 0;
+
+wchar_t* OMStoredObject::temporaryFileName(const OMDataStream& stream)
+{
+  TRACE("OMStoredObject::temporaryFileName");
+
+  // TBS - tjb
+  // The name currently computed here is not unique enough.
+  // It may not always be possible to buffer streams on disk like this.
+  wchar_t* sName = streamName(stream.name(), stream.propertyId());
+  size_t length = lengthOfWideString(sName);
+  wchar_t* name = new wchar_t[length + 5 + 4 + 1];
+  ASSERT("Valid heap pointer", name != 0);
+  wchar_t sSeed[4];
+  _seed = _seed + 1;
+  toWideString(_seed, sSeed, 4);
+  copyWideString(name, L"0000-", 6);
+  size_t seedLength = lengthOfWideString(sSeed);
+  copyWideString(name + (4 - seedLength), sSeed, seedLength);
+  concatenateWideString(name, sName, length + 1);
+  concatenateWideString(name, L".oms", 4);
+  delete [] sName;
+  return name;
 }
 
 wchar_t* OMStoredObject::referenceName(const wchar_t* propertyName,
