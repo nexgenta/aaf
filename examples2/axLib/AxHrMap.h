@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxHrMap.h,v 1.5 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxHrMap.h,v 1.6 2005/01/11 09:21:06 jfpanisset Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,10 @@
 
 #include <map>
 
+// gcc3 complains that AxHrMap has a private destructor
+// and no friends.  This prevents the warning.
+class AxHrMapFriend_nonexistant;
+
 class AxHrMap {
 
 public:
@@ -37,6 +41,8 @@ public:
 	const AxString& getStr( HRESULT hr ) const;
 
 private:
+
+	friend class AxHrMapFriend_nonexistant;
 
 	AxHrMap();
 	AxHrMap( const AxHrMap& );
