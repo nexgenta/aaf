@@ -68,7 +68,7 @@ ImplAAFBuiltinClasses::sBuiltinClassTable[] = \
 {
 
 #define AAF_CLASS(name, id, parent, concrete) \
-  { &AUID_AAF##name, L"" L# name L"", &AUID_AAF##parent, 0, 0, concrete },
+  { &AUID_AAF##name, L"" L# name L"", &AUID_AAF##parent, 0, 0 },
 
 #define AAF_TABLE_END() \
 };
@@ -90,7 +90,6 @@ const static aafUID_t NULL2_AUID = { 0 };
 #define AUID_AAFParameterDefinition AUID_AAFParameterDef
 #define AUID_AAFPropertyDefinition AUID_AAFPropertyDef
 #define AUID_AAFTypeDefinition AUID_AAFTypeDef
-#define AUID_AAFTypeDefinitionCharacter AUID_AAFTypeDefCharacter
 #define AUID_AAFTypeDefinitionEnumeration AUID_AAFTypeDefEnum
 #define AUID_AAFTypeDefinitionExtendibleEnumeration AUID_AAFTypeDefExtEnum
 #define AUID_AAFTypeDefinitionFixedArray AUID_AAFTypeDefFixedArray
@@ -106,7 +105,6 @@ const static aafUID_t NULL2_AUID = { 0 };
 #define AUID_AAFUNIXLocator AUID_AAFUnixLocator
 #define AUID_AAFCodecDefinition AUID_AAFCodecDef
 #define AUID_AAFContainerDefinition AUID_AAFContainerDef
-#define AUID_AAFPluginDefinition AUID_AAFPluginDef
 #define AUID_AAFPluggableDefinition AUID_AAFPluggableDef
 
 #include "AAFMetaDictionary.h"
@@ -125,14 +123,13 @@ ImplAAFBuiltinClasses::PropTblEntry \
 ImplAAFBuiltinClasses::sBuiltinPropTable[] = \
 {
 
-#define AAF_PROPERTY(name, id, tag, type, mandatory, uid, container) \
+#define AAF_PROPERTY(name, id, tag, type, mandatory, container) \
   { L"" L# name L"", \
 	id, \
     tag, \
     &kAAFTypeID_##type, \
     &kAAFClassID_##container, \
     mandatory, \
-    uid, \
 	ImplAAFBuiltinClasses::CreateOMPropType##type, \
     0 \
   },
@@ -230,11 +227,9 @@ const /*static*/ aafUID_t * ImplAAFBuiltinClasses::sAxClassIDs[] =
 {
   &AUID_AAFHeader,
   &AUID_AAFDictionary,
-  &AUID_AAFMetaDictionary,
   &AUID_AAFClassDef,
   &AUID_AAFPropertyDef,
   &AUID_AAFDefObject,
-  &AUID_AAFMetaDefinition,
   &AUID_AAFTypeDef,
   &AUID_AAFTypeDefInt,
 
@@ -246,15 +241,13 @@ const /*static*/ aafUID_t * ImplAAFBuiltinClasses::sAxClassIDs[] =
   &AUID_AAFParameterDef,
   &AUID_AAFIdentification,
   &AUID_AAFContentStorage,
-  &AUID_AAFPluginDef,
+  &AUID_AAFPluginDescriptor,
 
   &AUID_AAFTypeDefRecord,
   &AUID_AAFTypeDefVariableArray,
   &AUID_AAFTypeDefFixedArray,
-  &AUID_AAFTypeDefCharacter,
   &AUID_AAFTypeDefString,
   &AUID_AAFTypeDefIndirect,
-  &AUID_AAFTypeDefOpaque,
   &AUID_AAFTypeDefEnum,
   &AUID_AAFTypeDefRename,
   &AUID_AAFTypeDefStrongObjRef,
@@ -285,10 +278,8 @@ ImplAAFBuiltinClasses::ImplAAFBuiltinClasses (ImplAAFDictionary* dictionary)
 	_numAxPropsInited (false)
 {
   _axClassDefs = new ImplAAFClassDefSP[ksNumAxClasses];
-  dictionary->SetBuiltinClasses(this);
-  instantiateClasses ();
   instantiateProps ();
-  FinishInitClasses();
+  instantiateClasses ();
 }
 
 
@@ -319,9 +310,13 @@ ImplAAFBuiltinClasses::NewBuiltinClassDef (const aafUID_t & rClassID,
 	  if (EqualAUID (sBuiltinClassTable[i].pThisId, &rClassID))
 		{
 		  // We've found the desired class in our table.
-		  ImplAAFClassDef * pcd = (ImplAAFClassDef*)_dictionary->pvtInstantiate(AUID_AAFClassDef);
+		  ImplAAFClassDef * pcd = (ImplAAFClassDef*)
+			_dictionary->pvtInstantiate(AUID_AAFClassDef);
 		  assert (pcd);
-      pcd->InitOMProperties(_dictionary->GetBuiltinDefs()->cdClassDef());
+		  _dictionary
+			->GetBuiltinDefs()
+			->cdClassDef()
+			->InitOMProperties (pcd);
 
 		  status = InitBuiltinClassDef (rClassID, pcd);
 		  if (AAFRESULT_SUCCEEDED (status))
@@ -370,30 +365,16 @@ ImplAAFBuiltinClasses::InitBuiltinClassDef (const aafUID_t & rClassID,
 				// shallow tree with no loops, this shouldn't be a problem.
 				hr = _dictionary->LookupClassDef(*sBuiltinClassTable[i].pParentId, &parent);
  				assert (AAFRESULT_SUCCEEDED (hr));
-				// If the LookupClassDef method succeeded then there is already a strong reference
-				// in the dictionary that "owns" this class definition. The parent will be used 
-				// as a "weak reference" so it does not have to be reference counted. 
-				aafUInt32 test_count = parent->ReleaseReference ();
-				assert (0 < test_count);
 			}
 			else
 				parent = pClass;	// Hit an object whose parent is NULL, end the recursion.
 			hr = pClass->pvtInitialize (*sBuiltinClassTable[i].pThisId,
 										parent,
-										sBuiltinClassTable[i].pName,
-										sBuiltinClassTable[i].isConcrete);
-			if (AAFRESULT_FAILED (hr))
-				{
-				  status = hr;
-				  break;
-				}
-			
+										sBuiltinClassTable[i].pName);
 			hr = pClass->SetBootstrapParent(parent);
-			if (AAFRESULT_FAILED (hr))
-				{
-				  status = hr;
-				  break;
-				}
+			assert (AAFRESULT_SUCCEEDED (hr));
+			
+			assert (AAFRESULT_SUCCEEDED (hr));
 			
 			RegisterBuiltinProperties (pClass);
 	
@@ -529,22 +510,13 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 		  ImplAAFPropertyDef * propDef =
 			dynamic_cast<ImplAAFPropertyDef*>(obj);
 		  assert (propDef);
-
-//		  ImplAAFTypeDef	*pTypeDef;
-			AAFRESULT hr;
-
-//		hr = _dictionary->pvtLookupAxiomaticTypeDef (*propInfo->pTypeGuid, &pTypeDef);
-//		  assert (AAFRESULT_SUCCEEDED (hr));
-//			assert (pTypeDef);
-
-			hr = propDef->pvtInitialize
+		  
+		  AAFRESULT hr = propDef->pvtInitialize
 			(propInfo->id,
 			 propInfo->tag,
 			 propInfo->name,
 			 *propInfo->pTypeGuid,
-			 propInfo->mandatory ? kAAFFalse : kAAFTrue,
-			 propInfo->isUniqueIdentifier ? kAAFTrue : kAAFFalse);
-
+			 propInfo->mandatory ? kAAFFalse : kAAFTrue);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  propDef->SetOMPropCreateFunc (propInfo->omPropCreateFunc);
 
@@ -561,7 +533,6 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 		  propInfo = propInfo->nextProp;
 		}
 	}  
-
 
   assert (propIdx == numProps);
   for (propIdx = 0; propIdx < numProps; propIdx++)
@@ -606,49 +577,8 @@ void ImplAAFBuiltinClasses::instantiateClasses ()
 	  AAFRESULT hr;
 	  hr = _axClassDefs[classIdx]->pvtInitialize (*cte->pThisId,
 												  NULL,	// Make NULL & fill in later
-												  cte->pName,
-												  cte->isConcrete);
+												  cte->pName);
 	  assert (AAFRESULT_SUCCEEDED (hr));
-  }
-  for (classIdx = 0; classIdx < ksNumAxClasses; classIdx++)
-	{
-	  AAFRESULT hr;
-
-	  const ClassTblEntry * cte = lookupClassEntry(*sAxClassIDs[classIdx]);
-	  assert (cte);
-
-	  // Lookup and set the parent here
- 	  parent = LookupAxiomaticClass(*cte->pParentId);
-	  if(parent)
-	  {
-//		 hr = _axClassDefs[classIdx]->SetParent(parent);
-//		 assert (AAFRESULT_SUCCEEDED (hr));
-		 hr = _axClassDefs[classIdx]->SetBootstrapParent(parent);
-		 assert (AAFRESULT_SUCCEEDED (hr));
-		 parent->ReleaseReference();
-	  }
-	  else
-	  {
-			aafBool isRoot;
-		  hr = _axClassDefs[classIdx]->IsRoot(&isRoot);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-		  assert(isRoot);
-//		  hr = _axClassDefs[classIdx]->SetParent(_axClassDefs[classIdx]);	// Make root curcular
-//		  assert (AAFRESULT_SUCCEEDED (hr));
-	  }
-	}
-}
-
-void ImplAAFBuiltinClasses::FinishInitClasses ()
-{
-  aafUInt32			classIdx;
-  AAFRESULT			hr;
-
-  // foreach axiomatic class id, instantiate a class def object.
-  for (classIdx = 0; classIdx < ksNumAxClasses; classIdx++)
-	{
-	  const ClassTblEntry * cte = lookupClassEntry(*sAxClassIDs[classIdx]);
-	  assert (cte);
 
 	  // foreach property def contained in that class def, get the
 	  // (already existing) axiomatic property def object, init it,
@@ -670,8 +600,27 @@ void ImplAAFBuiltinClasses::FinishInitClasses ()
   // Initialize the OM properties for each axiomatic class.
   for (classIdx = 0; classIdx < ksNumAxClasses; classIdx++)
 	{
+	  AAFRESULT hr;
 	  const ClassTblEntry * cte = lookupClassEntry(*sAxClassIDs[classIdx]);
 
+	  // Lookup and set the parent here
+ 	  parent = LookupAxiomaticClass(*cte->pParentId);
+	  if(parent)
+	  {
+		 hr = _axClassDefs[classIdx]->SetParent(parent);
+		 assert (AAFRESULT_SUCCEEDED (hr));
+		 hr = _axClassDefs[classIdx]->SetBootstrapParent(parent);
+		 assert (AAFRESULT_SUCCEEDED (hr));
+	  }
+	  else
+	  {
+			aafBool isRoot;
+		  hr = _axClassDefs[classIdx]->IsRoot(&isRoot);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert(isRoot);
+		  hr = _axClassDefs[classIdx]->SetParent(_axClassDefs[classIdx]);	// Make root curcular
+		  assert (AAFRESULT_SUCCEEDED (hr));
+	  }
 
 	  ImplAAFClassDef * pcd = _axClassDefs[classIdx];
 	  assert (pcd);
@@ -754,7 +703,6 @@ void ImplAAFBuiltinClasses::RegisterBuiltinProperties
 				 sBuiltinPropTable[i].name,
 				 *sBuiltinPropTable[i].pTypeGuid,
 				 sBuiltinPropTable[i].mandatory ? kAAFFalse : kAAFTrue,
-				 sBuiltinPropTable[i].isUniqueIdentifier ? kAAFTrue : kAAFFalse,
 				 &pd);
 			  assert (AAFRESULT_SUCCEEDED (hr));
 
@@ -770,7 +718,7 @@ void ImplAAFBuiltinClasses::RegisterBuiltinProperties
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeSimple
   (OMPropertyId /*pid*/,
-   const wchar_t * /*name*/)
+   const char * /*name*/)
 {
   // Let's return 0 so the caller will attempt to use the type def to
   // create the property.
@@ -786,7 +734,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeSimple
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeWeakReference
   (OMPropertyId pid,
-   const wchar_t * name)
+   const char * name)
 {
   assert (name);
   if(pid == PID_SourceReference_SourceID)
@@ -798,7 +746,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeWeakReference
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceSet
   (OMPropertyId pid,
-   const wchar_t * name)
+   const char * name)
 {
   assert (name);
   return new OMSimpleProperty (pid, name, sizeof (aafUID_t));
@@ -807,7 +755,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceSet
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceVector
   (OMPropertyId pid,
-   const wchar_t * name)
+   const char * name)
 {
   assert (name);
   return new OMSimpleProperty (pid, name, sizeof (aafUID_t));
@@ -816,7 +764,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceVector
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeStrongReference
   (OMPropertyId pid,
-   const wchar_t * name)
+   const char * name)
 {
   assert (name);
   return new OMStrongReferenceProperty<ImplAAFObject> (pid, name);
@@ -825,7 +773,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeStrongReference
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeStrongReferenceSet
   (OMPropertyId pid,
-   const wchar_t * name)
+   const char * name)
 {
   assert (name);
   return new OMStrongReferenceVectorProperty<ImplAAFObject> (pid, name);
@@ -834,7 +782,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeStrongReferenceSet
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeStrongReferenceVector
   (OMPropertyId pid,
-   const wchar_t * name)
+   const char * name)
 {
   assert (name);
   return new OMStrongReferenceVectorProperty<ImplAAFObject> (pid, name);
