@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.cpp,v 1.12 2004/02/27 14:26:37 stuart_hc Exp $ $Name:  $
+// $Id: axFileGen.cpp,v 1.12.2.1 2004/07/14 14:40:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -17,6 +17,13 @@
 // AAF Association.
 //
 //=---------------------------------------------------------------------=
+
+
+#ifdef WIN32
+// warning C4660: template-class specialization 'AxFGRegistry<class AxFGOp>' is already instantiated
+// etc
+#pragma warning( disable:4660 )
+#endif 
 
 #include "axFileGen.h"
 
