@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModel.cpp,v 1.16 2004/09/10 17:13:04 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModel.cpp,v 1.17 2004/11/23 17:29:52 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3031,7 +3031,6 @@ void TypeDefinitionWeakReference::Initialize(void)
 
 	// Make sure all of the other properties are in the dictionary.
 	const PropertyDefinition *propertyDefinition = NULL;
-	const TypeDefinition * typeDefinition = NULL;
 	for (aafUInt32 i = 1; i < targetSetCount(); i++)
 	{
     propertyDefinition = objectModel()->findPropertyDefinition(_targetSet[i]);

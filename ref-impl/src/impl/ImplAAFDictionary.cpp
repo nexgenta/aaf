@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.124 2004/11/17 18:09:33 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.125 2004/11/23 17:29:54 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -358,7 +358,7 @@ ImplAAFDictionary::CreateAndInit(ImplAAFClassDef * pClassDef) const
 	  // associated  plugin is created.
 	  // QUESTION: How should we "deal with" failure? We really need
 	  // an  error/warning log file for this kind of information.
-	  AAFRESULT result = pNewObject->InitializeExtensions();
+	  pNewObject->InitializeExtensions();
 	}
 
   return pNewObject;

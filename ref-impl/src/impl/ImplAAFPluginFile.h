@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginFile.h,v 1.5 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPluginFile.h,v 1.6 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,7 +68,7 @@ class ImplAAFPluginFile
 protected:
   ImplAAFPluginFile(const char *name);
 
-  ~ImplAAFPluginFile();
+  virtual ~ImplAAFPluginFile();
 
   
 public:

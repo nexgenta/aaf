@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceAccess.cpp,v 1.91 2004/10/19 14:51:07 bakerian Exp $ $Name:  $
+// $Id: ImplAAFEssenceAccess.cpp,v 1.92 2004/11/23 17:29:54 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3666,7 +3666,7 @@ ImplAAFEssenceAccess::ModifyEssenceFileFromLocator (ImplAAFHeader *srcHead, Impl
 	aafProductIdentification_t		identSetup;
 	aafUInt32						length;
 	aafUInt32						buflen;
-	ImplAAFFile						*theFile;
+	ImplAAFFile						*theFile = NULL;
 	aafUID_t						myFileCLSID;
 
 	identSetup.companyName = NULL;

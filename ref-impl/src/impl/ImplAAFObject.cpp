@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFObject.cpp,v 1.77 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFObject.cpp,v 1.78 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,7 +77,7 @@ class ImplPropertyCollection //: public ImplAAFCollection<ImplAAFProperty *>
 {
 public:
   ImplPropertyCollection ();
-  ~ImplPropertyCollection ();
+  virtual ~ImplPropertyCollection ();
 
   // overrides
   virtual AAFRESULT
@@ -1216,7 +1216,6 @@ void ImplAAFObject::InitOMProperties (ImplAAFClassDef * pClassDef)
   //
   OMPropertySet * ps = propertySet();
   assert (ps);
-  const size_t propCount = ps->count();
 
   // Loop through properties of this class
   ImplEnumAAFPropertyDefsSP pdEnumSP;

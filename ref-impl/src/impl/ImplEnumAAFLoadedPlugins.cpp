@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplEnumAAFLoadedPlugins.cpp,v 1.15 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplEnumAAFLoadedPlugins.cpp,v 1.16 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,7 +98,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	aafUID_t			*pDesc;
 	aafUInt32			numDesc;
-	HRESULT				hr;
+	HRESULT				hr = E_FAIL;
 
 	if (pFetched == NULL && count != 1)
 		return AAFRESULT_NULL_PARAM;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.cpp,v 1.37 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.cpp,v 1.38 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -203,7 +203,7 @@ static void pvtZeroFill (const aafMemPtr_t inVal,
 						   aafMemPtr_t outVal,
 						   aafUInt32   outValSize)
 {
-  aafUInt32 localValue;	// only 4 bytes; see below for why it's OK.
+  aafUInt32 localValue = 0;	// only 4 bytes; see below for why it's OK.
 
   assert (inVal);
   assert (outVal);
@@ -648,8 +648,6 @@ ImplAAFTypeDefEnum::GetIntegerValue (
 	// if (AAFRESULT_FAILED(hr)) return hr;
 	localIntSize = NativeSize();
 	
-	aafInt64 retval;
-	
 	ImplAAFDictionarySP pDict;
 	hr = GetDictionary(&pDict);
 	assert (AAFRESULT_SUCCEEDED (hr));
@@ -681,8 +679,9 @@ ImplAAFTypeDefEnum::GetIntegerValue (
 	ImplAAFTypeDefInt * pLocalTd =
 		dynamic_cast<ImplAAFTypeDefInt*>((ImplAAFTypeDef*) ptd);
 	assert (pLocalTd);
-	
+
 	assert (pPropValIn);
+	aafInt64 retval = 0;
 	switch (localIntSize)
 	{
 	case 1:

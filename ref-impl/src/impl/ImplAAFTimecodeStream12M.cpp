@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTimecodeStream12M.cpp,v 1.16 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTimecodeStream12M.cpp,v 1.17 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -80,7 +80,7 @@ const int bits48_55 = 6;
 const int bits56_63 = 7;
 const int bits64_71 = 8;
 const int bits72_79 = 9;
-const int TC_ARRAY_SIZE = 10;
+const unsigned int TC_ARRAY_SIZE = 10;
 
 #include "AAFStoredObjectIDs.h"
 

@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFContentStorage.cpp,v 1.57 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFContentStorage.cpp,v 1.58 2004/11/23 17:29:54 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,10 +62,6 @@
 
 extern "C" const aafClassID_t CLSID_EnumAAFMobs;
 extern "C" const aafClassID_t CLSID_EnumAAFEssenceData;
-static void ReleaseMobRefs(void *valuePtr)
-{
-	ReleaseImplReference((ImplAAFRoot *)valuePtr);
-}
 
 ImplAAFContentStorage::ImplAAFContentStorage ()
 : _mobs(PID_ContentStorage_Mobs, L"Mobs", PID_Mob_MobID),

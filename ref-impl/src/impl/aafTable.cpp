@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafTable.cpp,v 1.21 2004/10/29 14:52:01 stuart_hc Exp $ $Name:  $
+// $Id: aafTable.cpp,v 1.22 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -691,7 +691,7 @@ aafErr_t TableNextEntry(
 			aafBool *foundPtr) 
 {
 	aafTable_t		*table;
-	tableLink_t		*entry;
+	tableLink_t		*entry = NULL;
 	
 	XPROTECT()
 	{

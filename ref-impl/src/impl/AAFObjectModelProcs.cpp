@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModelProcs.cpp,v 1.7 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModelProcs.cpp,v 1.8 2004/11/23 17:29:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -285,13 +285,6 @@ static bool CreateTypeDefinition(
   }
 }
 
-
-static bool InitializeTypeDefinition(
-  const TypeDefinition * /* typeDefinition */, 
-  ImplAAFMetaDictionary * /* metaDictionary */)
-{
-  return false;
-}
 
 
 //

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.cpp,v 1.15 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.cpp,v 1.16 2004/11/23 17:29:55 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -375,7 +375,6 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
   //
   OMPropertySet * ps = propertySet();
   assert (ps);
-  const size_t propCount = ps->count();
 
   // Loop through properties of this class
   ImplEnumAAFPropertyDefsSP pdEnumSP;

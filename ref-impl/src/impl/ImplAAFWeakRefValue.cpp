@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFWeakRefValue.cpp,v 1.8 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFWeakRefValue.cpp,v 1.9 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -153,7 +153,7 @@ static AAFRESULT SetNewObjectReference(
   // The given storable must already be in the target strong reference set!
 
   // Save the reference in the OMReferenceProperty
-  OMObject *object = refProperty->setObject(pNewObject);
+  refProperty->setObject(pNewObject);
   
   return AAFRESULT_SUCCESS;
 }

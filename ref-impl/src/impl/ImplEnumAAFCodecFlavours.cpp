@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplEnumAAFCodecFlavours.cpp,v 1.10 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplEnumAAFCodecFlavours.cpp,v 1.11 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,7 +84,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	aafUID_t*			pDef;
 	aafUInt32			numDefs;
-	HRESULT				hr;
+	HRESULT				hr = E_FAIL;
 
 	if ((!pFetched && count != 1) || (pFetched && count == 1))
 		return E_INVALIDARG;

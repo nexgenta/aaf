@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafCvt.h,v 1.8 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: aafCvt.h,v 1.9 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,7 @@
 #include "aafErr.h"
 #include "AAFTypes.h"
 
-#if PORT_LANG_CPLUSPLUS
+#if defined(PORT_LANG_CPLUSPLUS)
 extern "C" 
   {
 #endif
@@ -160,7 +160,7 @@ aafErr_t StringToTimecode(
 	aafTimecode_t *timecode); /* OUT - Timecode Value */
 
 
-#if PORT_LANG_CPLUSPLUS
+#if defined(PORT_LANG_CPLUSPLUS)
 }
 #endif
 #endif				/* _AAF_CVT_API_ */
