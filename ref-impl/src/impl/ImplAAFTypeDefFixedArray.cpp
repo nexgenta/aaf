@@ -145,8 +145,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT
 ImplAAFTypeDefFixedArray::GetElements (
-								ImplAAFPropertyValue *pInPropVal,
-								ImplEnumAAFPropertyValues **ppEnum)
+								ImplAAFPropertyValue * /*pInPropVal*/,
+								ImplEnumAAFPropertyValues ** /*ppEnum*/)
 {
 	return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
@@ -187,7 +187,7 @@ void ImplAAFTypeDefFixedArray::reorder(OMByte* externalBytes,
   aafUInt32 elem = 0;
 
   ImplAAFTypeDefSP ptd = BaseType ();
-  aafUInt32 elemSize = ptd->NativeSize ();
+  aafUInt32 elemSize = ptd->PropValSize ();
   aafInt32 numBytesLeft = externalBytesSize;
 
   for (elem = 0; elem < numElems; elem++)
@@ -404,20 +404,6 @@ ImplAAFTypeDefFixedArray::ValidateInputParams (
 	return AAFRESULT_SUCCESS;
 
 }//ValidateInputParams()
-
-
-
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFTypeDefFixedArray::CreateValueFromValues (
-													ImplAAFPropertyValue ** ppElementValues,
-													aafUInt32  numElements,
-													ImplAAFPropertyValue ** ppPropVal)
-{
-
-	//simply defer to base impl.
-	return ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues,numElements,
-												ppPropVal);
-}
 
 
 AAFRESULT STDMETHODCALLTYPE
