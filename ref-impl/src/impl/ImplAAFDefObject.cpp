@@ -1,29 +1,30 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
+
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+ 
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
 
 /*************************************************************************
  * 
@@ -36,6 +37,8 @@
  *************************************************************************/
 
 
+
+
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -43,215 +46,143 @@
 #include "ImplAAFDefObject.h"
 #endif
 
-#ifndef __ImplEnumAAFPluginDefs_h__
-#include "ImplEnumAAFPluginDefs.h"
-#endif
-
-#ifndef __ImplAAFDictionary_h_
-#include "ImplAAFDictionary.h"
-#endif
-
 #include <assert.h>
 #include <string.h>
-#include "ImplAAFObjectCreation.h"
-#include "aafErr.h"
-#include "ImplAAFPluginDef.h"
-#include "AAFUtils.h"
-#include "AAFDefUIDs.h"
 
-extern "C" const aafClassID_t CLSID_EnumAAFPluginDescriptors;
 
 ImplAAFDefObject::ImplAAFDefObject ()
-: _name           (PID_DefinitionObject_Name,           L"Name"),
-  _description    (PID_DefinitionObject_Description,    L"Description"),
-  _identification (PID_DefinitionObject_Identification, L"Identification")
-{
-  _persistentProperties.put(_name.address());
-  _persistentProperties.put(_description.address());
-  _persistentProperties.put(_identification.address());
+: _ID(				PID_DefinitionObject_Identification,"Identification"),
+  _name(			PID_DefinitionObject_Name,			"Name"),
+  _description(		PID_DefinitionObject_Description,	"Description")
+{	_persistentProperties.put(_ID.address());
+	_persistentProperties.put(_name.address());
+	_persistentProperties.put(_description.address());
 }
 
 
 ImplAAFDefObject::~ImplAAFDefObject ()
-{
-}
+{}
 
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::pvtInitialize (
-      const aafUID_t & id,
-	  const aafWChar * pName,
-	  const aafWChar * pDesc)
-{
-	if (pName == NULL || pDesc == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_identification = id;
-		_name = pName;
-		_description = pDesc;
-	}
-	return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::Initialize (
-      const aafUID_t & id,
-	  const aafCharacter * pName,
-	  const aafCharacter * pDesc )
-{
-	//validate pName
-	if (pName == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-
-	_identification = id;
-	_name = pName;
-	
-	if (pDesc != NULL)
-		_description = pDesc;
-
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::SetName (
-      const aafCharacter *  pName)
-{
-  if (! pName)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-
-  _name = pName;
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::GetName (
-      wchar_t *  pName,
-      aafUInt32  bufSize)
-{
-  bool stat;
-  if (! pName)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  stat = _name.copyToBuffer(pName, bufSize);
-  if (! stat)
-	{
-	  return AAFRESULT_SMALLBUF;
-	}
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::GetNameBufLen (
-      aafUInt32 *  pBufSize)  //@parm [in,out] Definition Name length
-{
-  if (! pBufSize)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  *pBufSize = _name.size();
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::SetDescription (
-      const aafCharacter * pDescription)
-{
-  if (! pDescription)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-
-  _description = pDescription;
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::GetDescription (
-      wchar_t * pDescription,
-      aafUInt32 bufSize)
-{
-	bool stat;
-	if (! pDescription)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	if (!_description.isPresent())
-	{
-		return AAFRESULT_PROP_NOT_PRESENT;
-	}
-	stat = _description.copyToBuffer(pDescription, bufSize);
-	if (! stat)
-	{
-		return AAFRESULT_SMALLBUF;
-	}
-	
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::GetDescriptionBufLen (
-      aafUInt32 * pBufSize)  //@parm [in,out] Definition Name length
-{
-	if (! pBufSize)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	if (!_description.isPresent())
-		*pBufSize = 0;
-	else
-		*pBufSize = _description.size();
-	
-	return AAFRESULT_SUCCESS;
-}
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::GetAUID (
-      aafUID_t *pAuid) const
+      aafUID_t *pAuid)
 {
-  if (pAuid == NULL)
+	if (pAuid == NULL)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  else
+	else
 	{
-	  *pAuid = _identification;
+		*pAuid = _ID;
 	}
 
-  return AAFRESULT_SUCCESS;
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetAUID (
-      const aafUID_t & id)
+      aafUID_t *pAuid)
 {
-  _identification = id;
-
-  return AAFRESULT_SUCCESS;
+	if (pAuid == NULL)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+		_ID = *pAuid;
+	}
+	return AAFRESULT_SUCCESS;
 }
 
 
 
-const OMUniqueObjectIdentification&
-  ImplAAFDefObject::identification(void) const
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::GetName (aafWChar *pName,
+	aafInt32 bufSize)
 {
-  return *reinterpret_cast<const OMUniqueObjectIdentification*>(&_identification.reference());
+	bool stat;
+
+	if(pName == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	stat = _name.copyToBuffer(pName, bufSize);
+	if (! stat)
+	{
+	  return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
+	}
+
+	return(AAFRESULT_SUCCESS); 
 }
+
+//****************
+// GetNameBufLen()
+//
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFDefObject::GetNameBufLen
+        (aafInt32 *  pSize)  //@parm [in,out] Definition Name length
+{
+	if(pSize == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	*pSize = _name.size();
+	return(AAFRESULT_SUCCESS); 
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::SetName (aafWChar *pName)
+{	
+	if(pName == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	_name = pName;
+
+	return(AAFRESULT_SUCCESS); 
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::GetDescription (aafWChar *pName,
+	aafInt32 bufSize)
+{
+	bool stat;
+
+	if(pName == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	stat = _description.copyToBuffer(pName, bufSize);
+	if (! stat)
+	{
+	  return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
+	}
+
+	return(AAFRESULT_SUCCESS); 
+}
+
+//****************
+// GetNameBufLen()
+//
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFDefObject::GetDescriptionBufLen
+        (aafInt32 *  pSize)  //@parm [in,out] Definition Name length
+{
+	if(pSize == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	*pSize = _description.size();
+	return(AAFRESULT_SUCCESS); 
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::SetDescription (aafWChar *pName)
+{	
+	if(pName == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	_description = pName;
+
+	return(AAFRESULT_SUCCESS); 
+}
+
+OMDEFINE_STORABLE(ImplAAFDefObject, AUID_AAFDefObject);
+
+
