@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef2.dod,v 1.1 2004/04/16 08:21:43 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef2.dod,v 1.2 2004/09/16 15:00:43 phil_tudor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -19,6 +19,9 @@
 #c The Initial Developer of the Original Code of this file and the
 #c Licensor of the AAF Association is Avid Technology.
 #c All rights reserved.
+#c
+#c Portions created by British Broadcasting Corporation are
+#c Copyright 2004, British Broadcasting Corporation.  All rights reserved.
 #c
 #c *********************************************************************
 #startm .this-module 0
