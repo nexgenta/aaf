@@ -29,8 +29,8 @@
 #ifndef OMOBJECT_H
 #define OMOBJECT_H
 
-  // @class Abstract base class for all objects known to the Object Manager.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+// @class Abstract base class for all objects known to the Object Manager.
+//
 class OMObject {
 public:
   // @access Public members.
