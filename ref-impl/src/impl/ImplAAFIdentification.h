@@ -22,17 +22,7 @@
 #include "ImplAAFObject.h"
 #endif
 
-#include "OMProperty.h"
 
-const int PID_IDENTIFICATION_COMPANYNAME          = 0;
-const int PID_IDENTIFICATION_PRODUCTNAME          = 1;
-//const int PID_IDENTIFICATION_PRODUCTVERSION       = 2;
-const int PID_IDENTIFICATION_PRODUCTVERSIONSTRING = 2;
-//const int PID_IDENTIFICATION_PRODUCTID            = 4;
-const int PID_IDENTIFICATION_DATE                 = 3;
-//const int PID_IDENTIFICATION_TOOLKITVERSION       = 6;
-const int PID_IDENTIFICATION_PLATFORM             = 4;
-//const int PID_IDENTIFICATION_GENERATION           = 8;
 
 class ImplAAFIdentification : public ImplAAFObject
 {
@@ -50,7 +40,7 @@ public:
     const wchar_t* productName,
     const aafProductVersion_t* productVersion,
     const wchar_t* productVersionString,
-    // const AUID* productId,
+    const aafUID_t* productId,
     const aafTimeStamp_t date,
     const aafProductVersion_t* toolKitVersion,
     const wchar_t* platform
@@ -73,7 +63,7 @@ public:
          wchar_t *  pName,
 
 		 // @parm [in] The size of the pName buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -82,7 +72,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetCompanyNameBufLen
 		// @parm [out] required buffer length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -103,7 +93,7 @@ public:
          wchar_t *  pName,
 
 		 // @parm [in] The size of the pName buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -112,7 +102,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetProductNameBufLen
 		// @parm [out] Returned length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -133,7 +123,7 @@ public:
          wchar_t *  pVersionString,
 
 		 // @parm [in] The size of the pVersionString buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -142,7 +132,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetProductVersionStringBufLen
 		// @parm [out] required buffer length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -217,7 +207,7 @@ public:
          wchar_t *  pPlatform,
 
 		 // @parm [in] The size of the pPlatform buffer
-		 aafInt32  bufSize);
+		 aafUInt32  bufSize);
 
 
   //****************
@@ -226,7 +216,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPlatformBufLen
 		// @parm [out] Returned length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
 
   //****************
@@ -237,26 +227,16 @@ public:
 		// @parm [out] The unique generation
         (aafUID_t *  pGeneration);
 
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFIdentificationTest.cpp.
-  static AAFRESULT test();
-
-  // Return this objects stored object class.
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
-
 private:
-  OMWideStringProperty                             _companyName;
-  OMWideStringProperty                             _productName;
-  // StructuredProperty<aafProductVersion_t> _productVersion;
-  OMWideStringProperty                             _productVersionString;
-  // FixedSizeProperty<AUID>                 _productId;
-  OMFixedSizeProperty<aafTimeStamp_t>          _date;
-  // StructuredProperty<aafProductVersion_t> _toolkitVersion;
-  OMWideStringProperty                             _platform;
+  OMWideStringProperty                      _companyName;
+  OMWideStringProperty						_productName;
+  OMFixedSizeProperty<aafProductVersion_t>	_productVersion;
+  OMWideStringProperty                      _productVersionString;
+  OMFixedSizeProperty<aafUID_t>             _productId;
+  OMFixedSizeProperty<aafTimeStamp_t>        _date;
+  OMFixedSizeProperty<aafProductVersion_t>	_toolkitVersion;
+  OMWideStringProperty                        _platform;
   // FixedSizeProperty<AUID>                 _generation;
-  aafBool									 _initialized;
 };
 
 #endif // ! __ImplAAFIdentification_h__
