@@ -26,6 +26,7 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMReferenceSetIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMStrongReferenceSetIterator> over the given
@@ -67,7 +68,7 @@ OMReferenceSetIterator<UniqueIdentification,
   //   @rdesc The new <c OMReferenceSetIterator>.
   //   @this const
 template <typename UniqueIdentification, typename ReferencedObject>
-OMReferenceContainerIterator<ReferencedObject>*
+OMReferenceContainerIterator*
 OMReferenceSetIterator<UniqueIdentification,
                        ReferencedObject>::copy(void) const
 {
@@ -251,6 +252,25 @@ ReferencedObject* OMReferenceSetIterator<UniqueIdentification,
 
   ReferencedObject* result = element.setValue(newObject);
 
+  return result;
+}
+
+  // @mfunc Return the <p OMObject> in the associated
+  //        reference container at the position currently
+  //        designated by this <c OMReferenceSetIterator>.
+  //   @tcarg class | ReferencedObject | The type of the contained objects.
+  //   @rdesc The <c OMObject> at the current position.
+  //   @this const
+template <typename UniqueIdentification, typename ReferencedObject>
+OMObject* OMReferenceSetIterator<UniqueIdentification,
+                                 ReferencedObject>::currentObject(void) const
+{
+  TRACE("OMReferenceSetIterator<UniqueIdentification, "
+                               "ReferencedObject>::currentObject");
+
+  OMObject* result = value();
+
+  POSTCONDITION("Valid result", result != 0);
   return result;
 }
 

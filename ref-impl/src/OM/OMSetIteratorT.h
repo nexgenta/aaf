@@ -26,6 +26,7 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMSetIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMSetIterator> over the given
@@ -234,7 +235,7 @@ Element OMSetIterator<Key, Element>::setValue(Element newElement)
   //   @rdesc The <p Key> at the current position.
   //   @this const
 template <typename Key, typename Element>
-const Key OMSetIterator<Key, Element>::key(void) const
+Key OMSetIterator<Key, Element>::key(void) const
 {
   TRACE("OMSetIterator<Key, Element>::key");
 

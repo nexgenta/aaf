@@ -26,17 +26,18 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMSet
 #ifndef OMSETT_H
 #define OMSETT_H
 
 #include "OMAssertions.h"
 
-template<typename Key, typename Element>
+template <typename Key, typename Element>
 OMSet<Key, Element>::OMSet()
 {
 }
 
-template<typename Key, typename Element>
+template <typename Key, typename Element>
 OMSet<Key, Element>::~OMSet()
 {
 }
@@ -48,7 +49,7 @@ OMSet<Key, Element>::~OMSet()
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Element> to insert.
@@ -70,7 +71,7 @@ void OMSet<Key, Element>::insert(const Element value)
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Element> for which to search.
@@ -94,7 +95,7 @@ bool OMSet<Key, Element>::containsValue(const Element value) const
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Key> for which to search.
@@ -121,7 +122,7 @@ bool OMSet<Key, Element>::contains(const Key key) const
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Key> for which to search.
@@ -149,7 +150,7 @@ bool OMSet<Key, Element>::find(const Key key, Element& value) const
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Key> for which to search.
@@ -176,7 +177,7 @@ bool OMSet<Key, Element>::find(const Key key, Element** value) const
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @rdesc The count of elements in this <c OMSet>.
@@ -199,7 +200,7 @@ size_t OMSet<Key, Element>::count(void) const
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Element> to append.
@@ -218,7 +219,7 @@ void OMSet<Key, Element>::append(const Element value)
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Key> of the <p Element> to remove.
@@ -237,7 +238,7 @@ void OMSet<Key, Element>::remove(const Key key)
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @parm The <p Element> to remove.

@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,14 +26,16 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMStoredSetIndex
+
 #include "OMStoredSetIndex.h"
 #include "OMAssertions.h"
 
   // @mfunc Constructor.
   //   @parm The capacity of this <c OMStoredSetIndex>.
 OMStoredSetIndex::OMStoredSetIndex(size_t capacity,
-                                   OMUInt32 keyPid,
-                                   OMUInt32 keySize)
+                                   OMPropertyId keyPid,
+                                   OMKeySize keySize)
 : _firstFreeKey(0), _lastFreeKey(~(OMUInt32)0),
   _capacity(capacity), _entries(0),
   _keyPropertyId(keyPid), _keySize(keySize),

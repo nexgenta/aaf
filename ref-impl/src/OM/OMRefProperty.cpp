@@ -26,6 +26,7 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMReferenceProperty
 
 #include "OMRefProperty.h"
 
@@ -52,6 +53,7 @@ OMReferenceProperty::~OMReferenceProperty(void)
 size_t OMReferenceProperty::bitsSize(void) const
 {
   TRACE("OMReferenceProperty::bitsSize");
+  OBSOLETE("other methods on class OMReferenceProperty");
 
   return sizeof(OMStorable*);
 }

@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMEXTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMReferenceSet
@@ -26,7 +31,6 @@
 #define OMREFERENCESETT_H
 
 #include "OMAssertions.h"
-#include "OMReferenceSetIter.h"
 
   // @mfunc Constructor.
 template <typename UniqueIdentification, typename ReferencedObject>
@@ -58,8 +62,6 @@ size_t OMReferenceSet<UniqueIdentification,
 
   // @mfunc Insert <p object> into this
   //        <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The object to insert.
 template <typename UniqueIdentification, typename ReferencedObject>
@@ -73,9 +75,8 @@ void OMReferenceSet<UniqueIdentification, ReferencedObject>::insert(
 
   // Set the set to contain the new object
   //
-  UniqueIdentification identification = object->identification();
   SetElement newElement(object);
-  _set.insert(identification, newElement);
+  _set.insert(newElement);
 
   POSTCONDITION("Object is present", containsValue(object));
 }
@@ -83,8 +84,6 @@ void OMReferenceSet<UniqueIdentification, ReferencedObject>::insert(
   // @mfunc If it is not already present, insert <p object> into this
   //        <c OMReferenceSet> and return true,
   //        otherwise return false.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The object to insert.
   //   @rdesc True if the object was inserted, false if it was already present.
@@ -109,8 +108,6 @@ bool OMReferenceSet<UniqueIdentification,ReferencedObject>::ensurePresent(
 
   // @mfunc Append the given <p ReferencedObject> <p object> to
   //        this <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm A pointer to a <p ReferencedObject>.
 template <typename UniqueIdentification, typename ReferencedObject>
@@ -127,8 +124,6 @@ void OMReferenceSet<UniqueIdentification, ReferencedObject>::appendValue(
 
   // @mfunc Remove the <p ReferencedObject> identified by
   //        <p identification> from this <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The unique identification of the object to be removed, the
   //         search key.
@@ -158,8 +153,6 @@ OMReferenceSet<UniqueIdentification, ReferencedObject>::remove(
   // @mfunc If it is present, remove the <p ReferencedObject> identified by
   //        <p identification> from this <c OMReferenceSet>
   //        and return true, otherwise return false.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The object to remove.
   //   @rdesc True if the object was removed, false if it was already absent.
@@ -181,8 +174,6 @@ bool OMReferenceSet<UniqueIdentification, ReferencedObject>::ensureAbsent(
 }
 
   // @mfunc Remove <p object> from this <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm A pointer to a <p ReferencedObject>.
 template <typename UniqueIdentification, typename ReferencedObject>
@@ -202,8 +193,6 @@ void OMReferenceSet<UniqueIdentification, ReferencedObject>::removeValue(
 
   // @mfunc If it is present, remove <p object> from this
   //        <c OMReferenceSet> and return true, otherwise return false.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The object to remove.
   //   @rdesc True if the object was removed, false if it was already absent.
@@ -224,8 +213,6 @@ bool OMReferenceSet<UniqueIdentification, ReferencedObject>::ensureAbsent(
 }
 
   // @mfunc Does this <c OMReferenceSet> contain <p object> ?
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm A pointer to a <p ReferencedObject>.
 template <typename UniqueIdentification, typename ReferencedObject>
@@ -242,8 +229,6 @@ bool OMReferenceSet<UniqueIdentification, ReferencedObject>::containsValue(
 
   // @mfunc Does this <c OMReferenceSet> contain a
   //        <p ReferencedObject> identified by <p identification>?
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The unique identification of the desired object, the search key.
   //   @rdesc True if the object is found, false otherwise.
@@ -258,8 +243,6 @@ bool OMReferenceSet<UniqueIdentification, ReferencedObject>::contains(
 
   // @mfunc The <p ReferencedObject> in this <c OMReferenceSet> identified by
   //        <p identification>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The unique identification of the desired object, the search key.
   //   @rdesc A pointer to the <p ReferencedObject>.
@@ -287,8 +270,6 @@ OMReferenceSet<UniqueIdentification, ReferencedObject>::value(
   //        <p identification>.  If the object is found it is returned
   //        in <p object> and the result is true. If the element is
   //        not found the result is false.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
   //   @tcarg class | ReferencedObject | The type of the referenced objects.
   //   @parm The unique identification of the desired object, the search key.
   //   @parm A pointer to a <p ReferencedObject> by reference.
@@ -328,161 +309,6 @@ OMReferenceSet<UniqueIdentification, ReferencedObject>::isValidIdentification(
     }
   }
   return result;
-}
-
-  // @mfunc Insert <p object> into this <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-  //   @parm TBS
-template <typename UniqueIdentification, typename ReferencedObject>
-void
-OMReferenceSet<UniqueIdentification, ReferencedObject>::insertObject(
-                                                        const OMObject* object)
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::"
-                                                               "insertObject");
-
-  const ReferencedObject* obj = dynamic_cast<const ReferencedObject*>(object);
-  ASSERT("Object is correct type", obj != 0);
-  insert(obj);
-}
-
-  // @mfunc Does this <c OMReferenceSet> contain <p object> ?
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-  //   @parm TBS
-  //   @rdesc TBS
-template <typename UniqueIdentification, typename ReferencedObject>
-bool
-OMReferenceSet<UniqueIdentification, ReferencedObject>::containsObject(
-                                                  const OMObject* object) const
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::"
-                                                             "containsObject");
-
-  const ReferencedObject* obj = dynamic_cast<const ReferencedObject*>(object);
-  ASSERT("Object is correct type", obj != 0);
-  return containsValue(obj);
-}
-
-  // @mfunc Remove <p object> from this <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-  //   @parm TBS
-template <typename UniqueIdentification, typename ReferencedObject>
-void
-OMReferenceSet<UniqueIdentification, ReferencedObject>::removeObject(
-                                                        const OMObject* object)
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::"
-                                                               "removeObject");
-
-  const ReferencedObject* obj = dynamic_cast<const ReferencedObject*>(object);
-  ASSERT("Object is correct type", obj != 0);
-  removeValue(obj);
-}
-
-  // @mfunc Remove all objects from this <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-template <typename UniqueIdentification, typename ReferencedObject>
-void
-OMReferenceSet<UniqueIdentification, ReferencedObject>::removeAllObjects(void)
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::"
-                                                           "removeAllObjects");
-
-  _set.clear();
-  POSTCONDITION("All objects removed", count() == 0);
-}
-
-  // @mfunc Create an <c OMReferenceContainerIterator> over this
-  //        <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-  //   @rdesc TBS
-template <typename UniqueIdentification, typename ReferencedObject>
-OMReferenceContainerIterator*
-OMReferenceSet<UniqueIdentification, ReferencedObject>::createIterator(
-                                                                    void) const
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::"
-                                                             "createIterator");
-
-  OMReferenceSetIterator<UniqueIdentification,
-                         ReferencedObject>* result =
-                 new OMReferenceSetIterator<UniqueIdentification,
-                                            ReferencedObject>(*this, OMBefore);
-  ASSERT("Valid heap pointer", result != 0);
-  return result;
-}
-
-  // @mfunc Remove the <c OMObject> identified by <p identification>
-  //        from this <c OMReferenceSet>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-  //   @parm TBS
-  //   @rdesc TBS
-template <typename UniqueIdentification, typename ReferencedObject>
-OMObject*
-OMReferenceSet<UniqueIdentification, ReferencedObject>::remove(
-                                                          void* identification)
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::remove");
-
-  UniqueIdentification* id =
-                       reinterpret_cast<UniqueIdentification*>(identification);
-  return remove(id);
-}
-
-  // @mfunc Does this <c OMReferenceSet> contain an
-  //        <c OMObject> identified by <p identification> ?
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-  //   @parm TBS
-  //   @rdesc TBS
-template <typename UniqueIdentification, typename ReferencedObject>
-bool
-OMReferenceSet<UniqueIdentification, ReferencedObject>::contains(
-                                                    void* identification) const
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::contains");
-
-  UniqueIdentification* id =
-                       reinterpret_cast<UniqueIdentification*>(identification);
-  return contains(id);
-}
-
-  // @mfunc Find the <c OMObject> in this <c OMReferenceSet>
-  //        identified by <p identification>.  If the object is found
-  //        it is returned in <p object> and the result is < e bool.true>.
-  //        If the object is not found the result is <e bool.false>.
-  //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects.
-  //   @tcarg class | ReferencedObject | The type of the referenced objects.
-  //   @parm TBS
-  //   @parm TBS
-  //   @rdesc TBS
-template <typename UniqueIdentification, typename ReferencedObject>
-bool
-OMReferenceSet<UniqueIdentification, ReferencedObject>::findObject(
-                                                       void* identification,
-                                                       OMObject*& object) const
-{
-  TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::findObject");
-
-  UniqueIdentification* id =
-                       reinterpret_cast<UniqueIdentification*>(identification);
-  ReferencedObject* obj = dynamic_cast<ReferencedObject*>(object);
-  ASSERT("Object is correct type", obj != 0);
-  return find(*id, obj);
 }
 
 #endif
