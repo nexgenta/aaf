@@ -491,7 +491,7 @@ template <typename ReferencedObject>
 size_t OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue(
                                           const ReferencedObject* object) const
 {
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeValue");
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::indexOfValue");
 
   ASSERT("Unimplemented code not reached", false);
   return 0;
@@ -521,6 +521,35 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::grow(
   }
 }
 
+  // @mfunc Is this <c OMStrongReferenceVectorProperty> void ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @rdesc True if this <c OMStrongReferenceVectorProperty> is void,
+  //          false otherwise. 
+  //   @this const
+template <typename ReferencedObject>
+bool OMStrongReferenceVectorProperty<ReferencedObject>::isVoid(void) const
+{
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::isVoid");
+
+  bool result = true;
+
+  OMVectorIterator<
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject> > iterator(_vector, OMBefore);
+  while (++iterator) {
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject>& element = iterator.value();
+    ReferencedObject* object = element.getValue();
+    if (object != 0) {
+      result = false;
+      break;
+    }
+  }
+  return result;
+}
+
   // @mfunc Remove this optional <c OMStrongReferenceVectorProperty>.
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
@@ -531,8 +560,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::remove(void)
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::remove");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
-  FORALL(i, count(),
-    PRECONDITION("Property is void", _vector.getAt(i).getValue() == 0));
+  PRECONDITION("Property is void", isVoid());
   clearPresent();
   POSTCONDITION("Optional property no longer present", !isPresent());
 }
@@ -568,16 +596,20 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
                                                          size_t size) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getBits");
+
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
   const ReferencedObject** p = (const ReferencedObject**)bits;
-  size_t count = _vector.count();
-  for (size_t i = 0; i < count; i++) {
+
+  OMVectorIterator<
     OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = _vector.getAt(i);
+                    ReferencedObject> > iterator(_vector, OMBefore);
+  while (++iterator) {
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject>& element = iterator.value();
     *p++ = element.getValue();
   }
 }
@@ -597,15 +629,20 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
                                                          size_t size)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::setBits");
+
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
   size_t count = size / sizeof(ReferencedObject*);
   ReferencedObject** p = (ReferencedObject**)bits;
 
-  for (size_t i = 0; i < count; i++) {
-    ReferencedObject* object = p[i];
-    setValueAt(object, i);
+  OMVectorIterator<
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject> > iterator(_vector, OMBefore);
+  while (++iterator) {
+    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
+                    ReferencedObject>& element = iterator.value();
+    element.setValue(*p++);
   }
 }
 

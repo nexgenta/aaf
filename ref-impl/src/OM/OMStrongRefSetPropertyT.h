@@ -398,6 +398,35 @@ bool OMStrongReferenceSetProperty<ReferencedObject>::find(
   return result;
 }
 
+  // @mfunc Is this <c OMStrongReferenceSetProperty> void ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @rdesc True if this <c OMStrongReferenceSetProperty> is void,
+  //          false otherwise. 
+  //   @this const
+template <typename ReferencedObject>
+bool OMStrongReferenceSetProperty<ReferencedObject>::isVoid(void) const
+{
+  TRACE("OMStrongReferenceSetProperty<ReferencedObject>::isVoid");
+
+  bool result = true;
+
+  OMSetIterator<OMUniqueObjectIdentification,
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject> > iterator(_set, OMBefore);
+  while (++iterator) {
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject>& element = iterator.value();
+    ReferencedObject* object = element.getValue();
+    if (object != 0) {
+      result = false;
+      break;
+    }
+  }
+  return result;
+}
+
   // @mfunc Remove this optional <c OMStrongReferenceSetProperty>.
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
@@ -406,11 +435,11 @@ template <typename ReferencedObject>
 void OMStrongReferenceSetProperty<ReferencedObject>::remove(void)
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::remove");
+
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
-
-  ASSERT("Unimplemented code not reached", false);
-
+  PRECONDITION("Property is void", isVoid());
+  clearPresent();
   POSTCONDITION("Optional property no longer present", !isPresent());
 }
   // @mfunc The size of the raw bits of this
@@ -426,9 +455,7 @@ size_t OMStrongReferenceSetProperty<ReferencedObject>::bitsSize(void) const
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::bitsSize");
 
-  ASSERT("Unimplemented code not reached", false);
-
-  return 0;
+  return sizeof(ReferencedObject*) * count();
 }
 
   // @mfunc Get the raw bits of this <c OMStrongReferenceSetProperty>.
@@ -445,12 +472,22 @@ void OMStrongReferenceSetProperty<ReferencedObject>::getBits(OMByte* bits,
                                                              size_t size) const
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::getBits");
+
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  ASSERT("Unimplemented code not reached", false);
+  const ReferencedObject** p = (const ReferencedObject**)bits;
+
+  OMSetIterator<OMUniqueObjectIdentification,
+                OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                             ReferencedObject> > iterator(_set, OMBefore);
+  while (++iterator) {
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject>& element = iterator.value();
+    *p++ = element.getValue();
+  }
 }
 
   // @mfunc Set the raw bits of this
@@ -468,10 +505,21 @@ void OMStrongReferenceSetProperty<ReferencedObject>::setBits(
                                                             size_t size)
 {
   TRACE("OMStrongReferenceSetProperty<ReferencedObject>::setBits");
+
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  ASSERT("Unimplemented code not reached", false);
+  size_t count = size / sizeof(ReferencedObject*);
+  ReferencedObject** p = (ReferencedObject**)bits;
+
+  OMSetIterator<OMUniqueObjectIdentification,
+                OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                             ReferencedObject> > iterator(_set, OMBefore);
+  while (++iterator) {
+    OMSetElement<OMStrongObjectReference<ReferencedObject>,
+                 ReferencedObject>& element = iterator.value();
+    element.setValue(*p++);
+  }
 }
 
 #endif
