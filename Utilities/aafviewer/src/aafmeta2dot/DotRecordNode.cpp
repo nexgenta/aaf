@@ -1,5 +1,5 @@
 /*
- * $Id: DotRecordNode.cpp,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotRecordNode.cpp,v 1.4 2004/06/01 15:27:53 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -90,10 +90,11 @@ DotRecordNodeAttribute::GetWidth( DotProfile &profile )
 string
 DotRecordNodeAttribute::GetAttributeString()
 {
-   ostringstream attributeString;
-   attributeString << _name << " = " << _value;
+   string attributeString = ProcessRecordString(_name);
+   attributeString.append(" = ");
+   attributeString.append(ProcessRecordString(_value));
 
-   return ProcessStringForQuoting( attributeString.str() );
+   return attributeString;
 }
 
 
@@ -147,10 +148,11 @@ DotRecordNodeClassAttribute::GetWidth( DotProfile &profile )
 string
 DotRecordNodeClassAttribute::GetAttributeString()
 {
-   ostringstream attributeString;
-   attributeString << _name << ": " << _typeName;
-
-   return ProcessStringForQuoting( attributeString.str() );
+   string attributeString = ProcessRecordString(_name);
+   attributeString.append(": ");
+   attributeString.append(ProcessRecordString(_typeName));
+   
+   return attributeString;
 }
 
 

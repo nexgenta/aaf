@@ -2,7 +2,7 @@
 #define __DOTUTILITIES_H__
 
 /*
- * $Id: DotUtilities.h,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotUtilities.h,v 1.4 2004/06/01 15:27:53 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -45,7 +45,7 @@ inline void ErasePointerVector( std::vector< T > &theVector )
 }
 
 
-std::string ProcessStringForQuoting( std::string s );
+std::string ProcessRecordString( std::string s );
 
 std::string LimitAttributeSize( std::string name, int maxLength, int maxWidth );
 
