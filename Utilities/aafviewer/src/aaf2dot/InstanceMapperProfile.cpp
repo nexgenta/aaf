@@ -1,5 +1,5 @@
 /*
- * $Id: InstanceMapperProfile.cpp,v 1.2 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: InstanceMapperProfile.cpp,v 1.3 2004/03/02 11:06:17 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -33,8 +33,9 @@ using namespace std;
 //-----------------------------------------------------------------------------
 InstanceMapperProfile::InstanceMapperProfile() 
    : _dataDefRefs( true ), _onlyFirstDataDefRefs( false ), _dictionary( true ), 
-     _taggedValues( true ), _maxAttributeLength( 128 ), _maxAttributeWidth( 40 ),
-     _concentrate( false ), _cluster( false ), _debug( false ) 
+     _taggedValues( true ), _klvData( true ), _essenceData( true ),
+     _concentrate( false ), _cluster( false ), _debug( false ), 
+     _maxAttributeLength( 128 ), _maxAttributeWidth( 40 )
 {
 }
 
