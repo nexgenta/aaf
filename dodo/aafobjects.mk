@@ -7,50 +7,28 @@
 #
 # Place the object root name is this list if it is a "persistent"
 # aaf object:
-AAFPERSISTENTOBJECTS = \
-	AAFAIFCData \
-	AAFDataDef \
-	AAFJPEGData \
-	AAFHTMLData \
-	AAFImageData \
-	AAFLocator \
-	AAFMIDIData \
-	AAFMIDIFileDescriptor \
-	AAFPluggableCode \
-	AAFReferenceValue \
-	AAFRGBADescriptor \
-	AAFTextLocator \
-	AAFTIFFData \
-	AAFTypeDefSet \
-	AAFWAVEData
+AAFPERSISTENTOBJECTS="\
+	AAFMIDIFileDescriptor "
 
 
 # These are all of the other non-persistent objects:
-AAFNONPERSISTENTOBJECTS = \
-	AAFRoot \
-	EnumAAFClassDefs \
-	EnumAAFCodecFlavours \
-	EnumAAFDataDefs \
-	EnumAAFDefs \
-	EnumAAFIdentifications \
-	EnumAAFObjects \
-	EnumAAFPropertyDefs \
-	EnumAAFPropertyValues \
-	EnumAAFReferenceValues \
+AAFNONPERSISTENTOBJECTS="\
+	EnumAAFPropertyValues "
 
 
 # These are files which specify COM interfaces, but which are
 # implemented in other objects.
-AAFCOMINTERFACESONLY = \
+AAFCOMINTERFACESONLY="\
 	AAFEndian \
-	AAFEssenceSampleStream \
-	AAFSearchSource
+	AAFSearchSource \
+	AAFEssenceMultiAccess "
+
 
 # These are the impl files that are typed by humans.  Be sure to
 # remove them from the other list.  As you check each one in, just add
 # its name here and remove it from either list above where it occurs.
 # Do not add the 'Impl'prefix here.
-HUMAN_TYPED_IMPL = \
+HUMAN_TYPED_IMPL="\
 	AAFAIFCDescriptor \
 	AAFClassDef \
 	AAFCodecDef \
@@ -61,6 +39,7 @@ HUMAN_TYPED_IMPL = \
 	AAFContainerDef \
 	AAFContentStorage \
 	AAFControlPoint \
+	AAFDataDef \
 	AAFDefObject \
 	AAFDictionary \
 	AAFEdgecode \
@@ -68,7 +47,6 @@ HUMAN_TYPED_IMPL = \
 	AAFEssenceAccess \
 	AAFEssenceData \
 	AAFEssenceDescriptor \
-	AAFEssencePlugin \
 	AAFEvent \
 	AAFEventMobSlot \
 	AAFFile \
@@ -88,6 +66,7 @@ HUMAN_TYPED_IMPL = \
 	AAFIdentification \
 	AAFInterpolationDef \
 	AAFIntraFrameMarker \
+	AAFLocator \
 	AAFMasterMob \
 	AAFMob  \
 	AAFMobSlot \
@@ -96,6 +75,7 @@ HUMAN_TYPED_IMPL = \
 	AAFObject \
 	AAFParameter \
 	AAFParameterDef \
+	AAFPluggableCode \
 	AAFProperty \
 	AAFPropertyDef \
 	AAFPropertyValue \
@@ -103,6 +83,7 @@ HUMAN_TYPED_IMPL = \
 	AAFPluginDescriptor \
 	AAFPluginManager \
 	AAFPulldown \
+	AAFRGBADescriptor \
 	AAFScopeReference \
 	AAFSegment \
 	AAFSelector \
@@ -111,21 +92,25 @@ HUMAN_TYPED_IMPL = \
 	AAFSourceMob \
 	AAFSourceReference \
 	AAFStaticMobSlot \
+	AAFTapeDescriptor \
 	AAFTaggedValue \
+	AAFTextClip \
+	AAFTextLocator \
 	AAFTimecode \
 	AAFTimelineMobSlot \
-	AAFTapeDescriptor \
-	AAFTextClip \
 	AAFTransition \
 	AAFTIFFDescriptor \
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTypeDef \
+	AAFTypeDefIndirect \
 	AAFTypeDefInt \
 	AAFTypeDefRename \
 	AAFTypeDefEnum \
+	AAFTypeDefExtEnum \
 	AAFTypeDefFixedArray \
 	AAFTypeDefRecord \
+	AAFTypeDefSet \
 	AAFTypeDefStream \
 	AAFTypeDefString \
 	AAFTypeDefStrongObjRef \
@@ -134,10 +119,14 @@ HUMAN_TYPED_IMPL = \
 	AAFTypeDefVariableArray \
 	AAFVaryingValue \
 	AAFWAVEDescriptor \
+	EnumAAFClassDefs \
 	EnumAAFCodecDefs \
+	EnumAAFCodecFlavours \
 	EnumAAFComponents \
 	EnumAAFContainerDefs \
 	EnumAAFControlPoints \
+	EnumAAFDataDefs \
+	EnumAAFIdentifications \
 	EnumAAFInterpolationDefs \
 	EnumAAFOperationDefs \
 	EnumAAFEssenceData \
@@ -146,45 +135,50 @@ HUMAN_TYPED_IMPL = \
 	EnumAAFMobSlots \
 	EnumAAFMobs \
 	EnumAAFParameterDefs \
+	EnumAAFParameters \
 	EnumAAFProperties \
+	EnumAAFPropertyDefs \
 	EnumAAFPluginDescriptors \
 	EnumAAFPluginLocators \
 	EnumAAFSegments \
 	EnumAAFTaggedValues \
-	EnumAAFTypeDefs 
+	EnumAAFTypeDefs "
 
 # The list of standard dodo targets.
 # AAFTypes have to be handled separately since no object is to be created.
-DODO_TARGET_NAMES = \
-	$(AAFPERSISTENTOBJECTS) \
-	$(AAFNONPERSISTENTOBJECTS) \
-	$(HUMAN_TYPED_IMPL)
+DODO_TARGET_NAMES="\
+	${AAFPERSISTENTOBJECTS} \
+	${AAFNONPERSISTENTOBJECTS} \
+	${HUMAN_TYPED_IMPL} "
 
 
 # Build the list of all objects that need to be built into the COM DLL
-AAFOBJECTS = \
-	$(AAFPERSISTENTOBJECTS) \
-	$(AAFNONPERSISTENTOBJECTS) \
-	$(HUMAN_TYPED_IMPL)
+AAFOBJECTS="\
+	${AAFPERSISTENTOBJECTS} \
+	${AAFNONPERSISTENTOBJECTS} \
+	${HUMAN_TYPED_IMPL} "
 
 
 # Build the list of all objects that have automatically-generated
 # implementation classes.
-AUTO_GEN_IMPL = \
-	$(AAFPERSISTENTOBJECTS) \
-	$(AAFNONPERSISTENTOBJECTS)
+AUTO_GEN_IMPL="\
+	${AAFPERSISTENTOBJECTS} \
+	${AAFNONPERSISTENTOBJECTS} "
 
 #---------------------------------------------
 # Build the list of all objects which are built into plugin.idl and
 # NOT into AAF.idl.
 
-PLUGIN_OBJECTS = \
+PLUGIN_OBJECTS="\
 	AAFPlugin \
+	AAFClassExtension \
 	AAFEssenceStream \
 	AAFEssenceDataStream \
 	AAFEssenceCodec \
+	AAFMultiEssenceCodec \
 	AAFEssenceContainer \
-	AAFInterpolator
+	AAFInterpolator "
+
 
 # objects in PLUGIN_OBJECTS are NOT built into the main interface IDL
 #---------------------------------------------
