@@ -1,3 +1,4 @@
+// @doc OMINTERNAL
 #include "OMFile.h"
 
 #include "OMAssertions.h"
@@ -44,10 +45,17 @@ OMFile::~OMFile(void)
   _objectDirectory = 0;
 }
 
-OMFile* OMFile::openRead(const wchar_t* fileName,
-                         const OMClassFactory* factory)
+  // @mfunc Open an existing <c OMFile> for read-only access, the
+  //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
+  //        <p factory> to create the objects. The file must already
+  //        exist.
+  //   @parm The name of the file to open.
+  //   @parm The factory to use for creating objects.
+  //   @rdesc The newly opened <c OMFile>.
+OMFile* OMFile::openExistingRead(const wchar_t* fileName,
+                                 const OMClassFactory* factory)
 {
-  TRACE("OMFile::openRead");
+  TRACE("OMFile::openExistingRead");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
 
@@ -57,10 +65,17 @@ OMFile* OMFile::openRead(const wchar_t* fileName,
   return newFile;
 }
 
-OMFile* OMFile::openModify(const wchar_t* fileName,
-                           const OMClassFactory* factory)
+  // @mfunc Open an existing <c OMFile> for modify access, the
+  //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
+  //        <p factory> to create the objects. The file must already
+  //        exist.
+  //   @parm The name of the file to open.
+  //   @parm The factory to use for creating objects.
+  //   @rdesc The newly opened <c OMFile>.
+OMFile* OMFile::openExistingModify(const wchar_t* fileName,
+                                   const OMClassFactory* factory)
 {
-  TRACE("OMFile::openModify");
+  TRACE("OMFile::openExistingModify");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
 
@@ -70,12 +85,23 @@ OMFile* OMFile::openModify(const wchar_t* fileName,
   return newFile;
 }
 
-OMFile* OMFile::createWrite(const wchar_t* fileName,
+  // @mfunc Open a new <c OMFile> for write-only access, the
+  //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
+  //        <p factory> to create the objects. The file must not already
+  //        exist. The byte ordering on the newly created file is given
+  //        by <p byteOrder>. The root <c OMStorable> in the newly
+  //        created file is given by <p root>.
+  //   @parm The name of the file to create.
+  //   @parm The factory to use for creating objects.
+  //   @parm The byte order to use for the newly created file.
+  //   @parm The root <c OMStorable> in the newly created file.
+  //   @rdesc The newly created <c OMFile>.
+OMFile* OMFile::openNewWrite(const wchar_t* fileName,
                             const OMClassFactory* factory,
                             const OMByteOrder byteOrder,
                             OMStorable* root)
 {
-  TRACE("OMFile::createWrite");
+  TRACE("OMFile::openNewWrite");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
   PRECONDITION("Valid root", root != 0);
@@ -85,13 +111,23 @@ OMFile* OMFile::createWrite(const wchar_t* fileName,
   return 0;
 }
 
-
-OMFile* OMFile::createModify(const wchar_t* fileName,
-                             const OMClassFactory* factory,
-                             const OMByteOrder byteOrder,
-                             OMStorable* root)
+  // @mfunc Open a new <c OMFile> for modify access, the
+  //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
+  //        <p factory> to create the objects. The file must not already
+  //        exist. The byte ordering on the newly created file is given
+  //        by <p byteOrder>. The root <c OMStorable> in the newly
+  //        created file is given by <p root>.
+  //   @parm The name of the file to create.
+  //   @parm The factory to use for creating objects.
+  //   @parm The byte order to use for the newly created file.
+  //   @parm The root <c OMStorable> in the newly created file.
+  //   @rdesc The newly created <c OMFile>.
+OMFile* OMFile::openNewModify(const wchar_t* fileName,
+                              const OMClassFactory* factory,
+                              const OMByteOrder byteOrder,
+                              OMStorable* root)
 {
-  TRACE("OMFile::createModify");
+  TRACE("OMFile::openNewModify");
   PRECONDITION("Valid file name", validWideString(fileName));
   PRECONDITION("Valid class factory", factory != 0);
   PRECONDITION("Valid root", root != 0);
@@ -102,19 +138,33 @@ OMFile* OMFile::createModify(const wchar_t* fileName,
   return newFile;
 }
 
-OMFile* OMFile::createTransient(const OMClassFactory* factory,
-                                const OMByteOrder byteOrder,
-                                OMStorable* root)
+  // @mfunc Open a new transient <c OMFile> for modify access, the
+  //        <c OMFile> is not named, use the <c OMClassFactory>
+  //        <p factory> to create the objects.
+  //        The byte ordering on the newly created file is given
+  //        by <p byteOrder>. The root <c OMStorable> in the newly
+  //        created file is given by <p root>.
+  //   @parm The factory to use for creating objects.
+  //   @parm The byte order to use for the newly created file.
+  //   @parm The root <c OMStorable> in the newly created file.
+  //   @rdesc The newly created <c OMFile>.
+OMFile* OMFile::openNewTransient(const OMClassFactory* factory,
+                                 const OMByteOrder byteOrder,
+                                 OMStorable* root)
 {
-  TRACE("OMFile::createTransient");
+  TRACE("OMFile::openNewTransient");
   PRECONDITION("Valid class factory", factory != 0);
   PRECONDITION("Valid root", root != 0);
 
   // Not yet implemented.
   //
+  ASSERT("Not yet implemented", false);
   return 0;
 }
 
+  // @mfunc Save all changes made to the contents of this
+  //        <c OMFile>. It is not possible to <mf OMFile::save>
+  //        read-only or transient files.
 void OMFile::save(void)
 {
   TRACE("OMFile::save");
@@ -124,11 +174,33 @@ void OMFile::save(void)
   }
 }
 
+  // @mfunc Save the entire contents of this <c OMFile> as well as
+  //        any unsaved changes in the new file <p fileName>. The file
+  //        must not already exist. <mf OMFile::saveAs> may be called
+  //        for files opened in modify mode and for files opened in
+  //        read-only and transient modes.
+  //   @parm The name of the file to open.
+  //
+  //   @this const
+void OMFile::saveAs(const wchar_t* fileName) const
+{
+  TRACE("OMFile::saveAs");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  ASSERT("Not yet implemented", false);
+}
+
+  // @mfunc Discard all changes made to this <c OMFile> since the
+  //        last <mf OMFile::save> or <mf OMFile::open>.
 void OMFile::revert(void)
 {
   TRACE("OMFile::revert");
+
+  ASSERT("Not yet implemented", false);
 }
 
+  // @mfunc Restore the root <c OMStorable> object from this <c OMFile>.
+  //   @rdesc The newly restored roo <c OMStorable>.
 OMStorable* OMFile::restore(void)
 {
   TRACE("OMFile::restore");
@@ -137,6 +209,7 @@ OMStorable* OMFile::restore(void)
   return root();
 }
 
+  // @mfunc Close this <c OMFile>, any unsaved changes are discarded.
 void OMFile::close(void)
 {
   TRACE("OMFile::close");
@@ -149,6 +222,8 @@ void OMFile::close(void)
 #endif
 }
 
+  // @mfunc Retrieve the root <c OMStorable> from this <c OMFile>.
+  //   @rdesc The root <c OMStorable>.
 OMStorable* OMFile::root(void)
 {
   TRACE("OMFile::root");
@@ -156,6 +231,8 @@ OMStorable* OMFile::root(void)
   return _root;
 }
 
+  // @mfunc Retrieve the root <c OMStoredObject> from this <c OMFile>.
+  //   @rdesc The root <c OMStoredObject>.
 OMStoredObject* OMFile::rootStoredObject(void)
 {
   TRACE("OMFile::rootStoredObject");
@@ -163,6 +240,9 @@ OMStoredObject* OMFile::rootStoredObject(void)
   return _rootStoredObject;
 }
 
+  // @mfunc Retrieve the <c OMClassFactory> from this <c OMFile>.
+  //   @rdesc The <c OMClassfactory> used to create objects in this file.
+  //   @this const
 const OMClassFactory* OMFile::classFactory(void) const
 {
   TRACE("OMFile::classFactory");
@@ -170,6 +250,8 @@ const OMClassFactory* OMFile::classFactory(void) const
   return _classFactory;
 }
 
+  // @mfunc Retrieve the <c OMObjectDirectory> from this <c OMFile>.
+  //   @rdesc The <c OMObjectDirectory> associated with this file.
 OMObjectDirectory* OMFile::objectDirectory(void)
 {
   TRACE("OMFile::objectDirectory");
@@ -181,6 +263,8 @@ OMObjectDirectory* OMFile::objectDirectory(void)
   return _objectDirectory;
 }
 
+  // @mfunc The byte order of this <c OMFile>.
+  //   @this const
 OMByteOrder OMFile::byteOrder(void) const
 {
   ASSERT("Valid root", _rootStoredObject != 0);
