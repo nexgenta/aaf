@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-x86_64Linux.mk,v 1.2 2004/12/01 17:46:43 bakerian Exp $ $Name:  $
+# $Id: pdefs-x86_64Linux.mk,v 1.3 2004/12/06 18:46:36 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,8 @@
 #------------------------------------------------------------------------------
 include $(AAFBASE)/build/pdefs-i586Linux.mk
 
-PLATFORM_CFLAGS += -fPIC -DIA_64
+# -fPIC is necessary when building object code to be used in a shared library
+PLATFORM_CFLAGS += -fPIC
 
+# turn on k8 specific optimisations for Release builds
 REL_FLAGS += -march=k8
