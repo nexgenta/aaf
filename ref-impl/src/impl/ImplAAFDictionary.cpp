@@ -25,9 +25,6 @@
  *
  ************************************************************************/
 
-// Turn on/off experimental object creation code...
-#define USE_NEW_OBJECT_CREATION 1
-
 
 #ifndef __ImplAAFDictionary_h__
 #include "ImplAAFDictionary.h"
@@ -113,6 +110,13 @@
 #include "AAFClassDefUIDs.h"
 
 
+#if USE_NEW_OBJECT_CREATION
+#ifndef __ImplAAFMetaDictionary_h__
+#include "ImplAAFMetaDictionary.h"
+#endif
+#endif // #if USE_NEW_OBJECT_CREATION
+
+
 #include <assert.h>
 #include <string.h>
 #include "aafErr.h"
@@ -131,16 +135,15 @@ extern "C" const aafClassID_t CLSID_EnumAAFPluginDescriptors;
 extern "C" const aafClassID_t CLSID_EnumAAFTypeDefs;
 
 ImplAAFDictionary::ImplAAFDictionary ()
-: _operationDefinitions(PID_Dictionary_OperationDefinitions, "OperationDefinitions"), 
-  _parameterDefinitions(PID_Dictionary_ParameterDefinitions, "ParameterDefinitions"),
-  _codecDefinitions(PID_Dictionary_CodecDefinitions, "CodecDefinitions"),
-  _containerDefinitions(PID_Dictionary_ContainerDefinitions, "ContainerDefinitions"),
-  _typeDefinitions      (PID_Dictionary_TypeDefinitions,      "TypeDefinitions"),
-  _classDefinitions      (PID_Dictionary_ClassDefinitions,    "ClassDefinitions"),
-  _interpolationDefinitions      (PID_Dictionary_InterpolationDefinitions,    "InterpolationDefinitions"),
-  _dataDefinitions      (PID_Dictionary_DataDefinitions,    "DataDefinitions"),
-  _pluginDefinitions      (PID_Dictionary_PluginDefinitions,    "PluginDefinitions"),
-	_opaqueTypeDefinitions (0),
+: _operationDefinitions(PID_Dictionary_OperationDefinitions, "OperationDefinitions", PID_DefinitionObject_Identification), 
+  _parameterDefinitions(PID_Dictionary_ParameterDefinitions, "ParameterDefinitions", PID_DefinitionObject_Identification),
+  _codecDefinitions(PID_Dictionary_CodecDefinitions, "CodecDefinitions", PID_DefinitionObject_Identification),
+  _containerDefinitions(PID_Dictionary_ContainerDefinitions, "ContainerDefinitions", PID_DefinitionObject_Identification),
+  _interpolationDefinitions      (PID_Dictionary_InterpolationDefinitions,    "InterpolationDefinitions", PID_DefinitionObject_Identification),
+  _dataDefinitions      (PID_Dictionary_DataDefinitions,    "DataDefinitions", PID_DefinitionObject_Identification),
+  _pluginDefinitions      (PID_Dictionary_PluginDefinitions,    "PluginDefinitions", PID_PluginDescriptor_Identification),
+  _typeDefinitions      (PID_Dictionary_TypeDefinitions,      "TypeDefinitions", PID_DefinitionObject_Identification),
+  _classDefinitions      (PID_Dictionary_ClassDefinitions,    "ClassDefinitions", PID_DefinitionObject_Identification),
   _pBuiltinClasses (0),
   _pBuiltinTypes (0),
   _pBuiltinDefs (0),
@@ -160,15 +163,30 @@ ImplAAFDictionary::ImplAAFDictionary ()
   _persistentProperties.put(_dataDefinitions.address());
   _persistentProperties.put(_pluginDefinitions.address());
 
-  _pBuiltinClasses = new ImplAAFBuiltinClasses (this);
   _pBuiltinTypes   = new ImplAAFBuiltinTypes (this);
+  _pBuiltinClasses = new ImplAAFBuiltinClasses (this);
 }
 
 
 ImplAAFDictionary::~ImplAAFDictionary ()
 {
+  // Release the _opaqueTypeDefinitions
+  OMSetIterator<OMUniqueObjectIdentification, OpaqueTypeDefinition>opaqueTypeDefinitions(_opaqueTypeDefinitions, OMBefore);
+  while(++opaqueTypeDefinitions)
+  {
+    // NOTE: Temporary OpaqueTypeDefinitions are created to hold the type definition
+    // pointers.           |                               |
+    //                     V                               V
+    ImplAAFTypeDef *pType = opaqueTypeDefinitions.setValue(0);
+    if (pType)
+    {
+		  pType->ReleaseReference();
+		  pType = 0;
+    }
+  }
+
   // Release the _codecDefinitions
-	OMStrongReferenceSetIterator<ImplAAFCodecDef>codecDefinitions(_codecDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFCodecDef>codecDefinitions(_codecDefinitions);
 	while(++codecDefinitions)
 	{
 		ImplAAFCodecDef *pCodec = codecDefinitions.setValue(0);
@@ -179,7 +197,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFContainerDef>containerDefinitions(_containerDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFContainerDef>containerDefinitions(_containerDefinitions);
 	while(++containerDefinitions)
 	{
 		ImplAAFContainerDef *pContainer = containerDefinitions.setValue(0);
@@ -190,7 +208,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFTypeDef>typeDefinitions(_typeDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef>typeDefinitions(_typeDefinitions);
 	while(++typeDefinitions)
 	{
 		ImplAAFTypeDef *pType = typeDefinitions.setValue(0);
@@ -201,7 +219,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFClassDef>classDefinitions(_classDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFClassDef>classDefinitions(_classDefinitions);
 	while(++classDefinitions)
 	{
 		ImplAAFClassDef *pClass = classDefinitions.setValue(0);
@@ -212,7 +230,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFOperationDef>operationDefinitions(_operationDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFOperationDef>operationDefinitions(_operationDefinitions);
 	while(++operationDefinitions)
 	{
 		ImplAAFOperationDef *pOp = operationDefinitions.setValue(0);
@@ -223,7 +241,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFParameterDef>parameterDefinitions(_parameterDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef>parameterDefinitions(_parameterDefinitions);
 	while(++parameterDefinitions)
 	{
 		ImplAAFParameterDef *pParm = parameterDefinitions.setValue(0);
@@ -234,7 +252,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFInterpolationDef>interpolateDefinitions(_interpolationDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFInterpolationDef>interpolateDefinitions(_interpolationDefinitions);
 	while(++interpolateDefinitions)
 	{
 		ImplAAFInterpolationDef *pInterp = interpolateDefinitions.setValue(0);
@@ -245,7 +263,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFPluginDescriptor>pluginDefinitions(_pluginDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDescriptor>pluginDefinitions(_pluginDefinitions);
 	while(++pluginDefinitions)
 	{
 		ImplAAFPluginDescriptor *pPlug = pluginDefinitions.setValue(0);
@@ -256,7 +274,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	OMStrongReferenceSetIterator<ImplAAFDataDef>dataDefinitions(_dataDefinitions);
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFDataDef>dataDefinitions(_dataDefinitions);
 	while(++dataDefinitions)
 	{
 		ImplAAFDataDef *pData = dataDefinitions.setValue(0);
@@ -559,6 +577,14 @@ AAFRESULT ImplAAFDictionary::dictLookupClassDef (
 	return (result);
 }
 
+bool ImplAAFDictionary::PvtIsClassPresent (
+      const aafUID_t & classID)
+{
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-26)
+	return(_classDefinitions.contains((*reinterpret_cast<const OMObjectIdentification *>(&classID))));
+}
 
 bool
 ImplAAFDictionary::IsAxiomaticClass (const aafUID_t &classID) const
@@ -575,7 +601,7 @@ ImplAAFDictionary::pvtLookupAxiomaticClassDef (const aafUID_t &classID,
 {
   if (_pBuiltinClasses->IsAxiomaticClass (classID))
 	{
-	  // It's axiomatic.  
+	  // It's axiomatic.
 	  assert (ppClassDef);
 	  *ppClassDef = _pBuiltinClasses->LookupAxiomaticClass (classID);
 	  assert (*ppClassDef); // reference count already incremented by LookupAxiomaticClass.
@@ -603,8 +629,9 @@ AAFRESULT STDMETHODCALLTYPE
 	  // here's where we assure it's in the dictionary.
 	  if(_defRegistrationAllowed)
 	  {
-		  ImplAAFClassDef	*dictValue, *parent;
+		  ImplAAFClassDef	*parent;
 		  // These classes fail with doubly-opened storages
+#if 0
 		  if(memcmp(&classID, &kAAFClassID_ClassDefinition, sizeof(aafUID_t)) != 0
 		   && memcmp(&classID, &kAAFClassID_TypeDefinitionCharacter, sizeof(aafUID_t)) != 0
 		   && memcmp(&classID, &kAAFClassID_TypeDefinitionString, sizeof(aafUID_t)) != 0
@@ -613,9 +640,9 @@ AAFRESULT STDMETHODCALLTYPE
 		   && memcmp(&classID, &kAAFClassID_TypeDefinitionFixedArray, sizeof(aafUID_t)) != 0
 		   && memcmp(&classID, &kAAFClassID_TypeDefinitionInteger, sizeof(aafUID_t)) != 0
 		   )
+#endif
 		  {
-			  status = dictLookupClassDef(classID, &dictValue);
-			  if(status != AAFRESULT_SUCCESS || dictValue == NULL)
+			  if(!PvtIsClassPresent(classID))
 			  {
 				aafBool		isRoot;
 				aafUID_t	uid;
@@ -684,6 +711,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 #if USE_NEW_OBJECT_CREATION
 
+
+
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::CreateImplClassDef (
       aafUID_constref classID,
@@ -739,6 +770,100 @@ AAFRESULT STDMETHODCALLTYPE
 
 #endif // #if USE_NEW_OBJECT_CREATION
 
+
+
+ImplAAFDictionary::ForwardClassReference::ForwardClassReference()
+{
+}
+
+ImplAAFDictionary::ForwardClassReference::ForwardClassReference(const ImplAAFDictionary::ForwardClassReference& rhs)
+{
+  _classId = rhs._classId;
+}
+
+ImplAAFDictionary::ForwardClassReference::ForwardClassReference(aafUID_constref classId)
+{
+  _classId = classId;
+}
+
+const OMUniqueObjectIdentification 
+  ImplAAFDictionary::ForwardClassReference::identification(void) const
+{
+  return (*reinterpret_cast<const OMUniqueObjectIdentification *>(&_classId));
+}
+
+ImplAAFDictionary::ForwardClassReference& 
+  ImplAAFDictionary::ForwardClassReference::operator= (const ImplAAFDictionary::ForwardClassReference& rhs)
+{
+  _classId = rhs._classId;
+  return *this;
+}
+
+bool ImplAAFDictionary::ForwardClassReference::operator== (const ImplAAFDictionary::ForwardClassReference& rhs)
+{
+  if (&rhs == this)
+    return true;
+  else
+    return (0 == memcmp(&_classId, &rhs._classId, sizeof(_classId)));
+}
+
+bool ImplAAFDictionary::hasForwardClassReference(aafUID_constref classId)
+{
+  // Create a temporary test value and then look for the
+  // corresponding forward class reference in the set.
+  ImplAAFDictionary::ForwardClassReference forwardReference(classId);
+  return (_forwardClassReferences.containsValue(forwardReference));
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDictionary::CreateForwardClassReference (
+      aafUID_constref classId)
+{
+  AAFRESULT result = AAFRESULT_SUCCESS;
+
+  // First check to see of forward class reference has already
+  // been created.
+  if (hasForwardClassReference(classId))
+    return AAFRESULT_INVALID_PARAM;
+
+  // Create a local forward class reference.
+  ImplAAFDictionary::ForwardClassReference forwardReference(classId);
+
+  // If the class has already been registed then we cannot
+  // create a foward reference!
+  if (_classDefinitions.contains(forwardReference.identification()))
+    return AAFRESULT_INVALID_PARAM;
+
+  // It now safe to add the given classId to the set.
+  _forwardClassReferences.append(forwardReference); // the set will copy the value.
+
+  return result;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDictionary::HasForwardClassReference (
+      aafUID_constref classId,
+      aafBoolean_t * pResult)
+{
+  if (NULL == pResult)
+    return AAFRESULT_NULL_PARAM;
+
+  // Call the internal shared implementation.
+  *pResult = hasForwardClassReference(classId);
+
+  return AAFRESULT_SUCCESS;
+}
+
+// Remove the give classId from the foward class reference set.
+void ImplAAFDictionary::RemoveForwardClassReference(aafUID_constref classId)
+{
+  ImplAAFDictionary::ForwardClassReference forwardReference(classId);
+  assert(hasForwardClassReference(classId)); // classId must already be a forward reference!
+  _forwardClassReferences.removeValue(forwardReference);
+}
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterClassDef (
       ImplAAFClassDef * pClassDef)
@@ -755,22 +880,20 @@ AAFRESULT STDMETHODCALLTYPE
     return hr;
 
   // Is this class already registered ?
-  ImplAAFClassDef * pExistingClassDef = NULL;
-  hr = dictLookupClassDef (newAUID, &pExistingClassDef);
-
-  if (hr != AAFRESULT_SUCCESS)
+  if (!PvtIsClassPresent(newAUID))
 	{
+    if (hasForwardClassReference(newAUID))
+    {
+      // This class is now defined so it can no longer have
+      // a forward reference.
+      RemoveForwardClassReference(newAUID);
+    }
+
 	  // This class is not yet registered, add it to the dictionary.
 	  _classDefinitions.appendValue(pClassDef);
 	  pClassDef->AcquireReference();
 	}
-  else
-	{
-	  // This class is already registered, probably because it was
-	  // already in the persisted dictionary.
-	  pExistingClassDef->ReleaseReference();
-	  pExistingClassDef = 0;
-	}
+
   return(AAFRESULT_SUCCESS);
 }
 
@@ -787,8 +910,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
   XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFClassDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFClassDef>(_classDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFClassDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFClassDef>(_classDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -838,23 +961,25 @@ AAFRESULT STDMETHODCALLTYPE
     return hr;
 
   // Is this type already registered ?
-  ImplAAFTypeDef * pExistingTypeDef = NULL;
-  hr = dictLookupTypeDef (newAUID, &pExistingTypeDef);
+  if (!PvtIsTypePresent(newAUID))
+  {
+		// We also need to check if the given type is an opaque type. if it is then we
+		// need to remove it from the opaqueTypeDefinitions set if the registration 
+    // of successful. This makes sense because the type can no longer be opaque.
+    ImplAAFTypeDef *pOpaqueType = findOpaqueTypeDefinition(newAUID);
+    if (pOpaqueType)
+    {
+      // Remove the type from the opaque list and release the reference.
+      // NOTE: This release may actually delete the opaque type from memory
+      // since it is possible that older pOpaqueType is not the same
+      // object pointer as the newer pTypeDef pointer eventhough they
+      // have the same identifier (newAUID).
+      _opaqueTypeDefinitions.removeValue(pOpaqueType);
+      pOpaqueType->ReleaseReference();
+      pOpaqueType = NULL;
+    }
 
-//	if (AAFRESULT_FAILED(hr))
-//	{
-		// TBD:(transdel 2000-MAR-19) we also nee to check it the
-		// given type is an opaque type. if it is then we
-		// need to remove it from the opaqueTypeDefinitions set
-		// if the registration of successful. This make sence
-		// since type can no longer be opaque.
-		// hr = LookupOpaqueTypeDef (newAUID, &pExistingTypeDef);
-		// etc,,,
-		//
-//	}
 
-
-  if (hr != AAFRESULT_SUCCESS) {
     // This type is not yet registered, add it to the dictionary.
     _typeDefinitions.appendValue(pTypeDef);
     pTypeDef->AcquireReference();
@@ -863,16 +988,6 @@ AAFRESULT STDMETHODCALLTYPE
     // BobT 6/15/99: Remove ImplAAFDefObject::Get/SetDict() in favor of
 	// ImplAAFObject::GetDictionary().
 	// pTypeDef->SetDict(this);
-  } else {
-    // This type is already registered, probably because it was
-    // already in the persisted dictionary.
-    // Set up the (non-persistent) dictionary pointer.
-	//
-    // BobT 6/15/99: Remove ImplAAFDefObject::Get/SetDict() in favor of
-	// ImplAAFObject::GetDictionary().
-	// pExistingTypeDef->SetDict(this);
-    pExistingTypeDef->ReleaseReference();
-	pExistingTypeDef = 0;
   }
 
   return(AAFRESULT_SUCCESS);
@@ -907,11 +1022,20 @@ AAFRESULT ImplAAFDictionary::dictLookupTypeDef (
 
 }
 
+bool ImplAAFDictionary::PvtIsTypePresent (
+      const aafUID_t & typeID)
+{
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-26)
+	return(_typeDefinitions.contains((*reinterpret_cast<const OMObjectIdentification *>(&typeID))));
+}
 
 /*static*/
 const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] = 
 {
   & kAAFTypeID_AUID,
+  & kAAFTypeID_AUIDArray,
   & kAAFTypeID_Boolean,
   & kAAFTypeID_Character,
   & kAAFTypeID_DateStruct,
@@ -929,6 +1053,7 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_UInt8,
   & kAAFTypeID_UInt8Array8,
   & kAAFTypeID_Indirect,
+  & kAAFTypeID_Opaque,
   & kAAFTypeID_VersionType,
   & kAAFTypeID_RGBAComponent,
   & kAAFTypeID_MobID,
@@ -1011,7 +1136,8 @@ ImplAAFDictionary::pvtLookupAxiomaticTypeDef (const aafUID_t &typeID,
 			  // tmp).
 			  if (! _axiomaticTypes[i])
 				_axiomaticTypes[i] = tmp;
-			  assert (_axiomaticTypes[i]);
+
+			 assert (_axiomaticTypes[i]);
 			}
 		  assert (_axiomaticTypes[i]);
 		  assert (ppTypeDef);
@@ -1031,26 +1157,24 @@ AAFRESULT STDMETHODCALLTYPE
 {
   ImplAAFTypeDefSP			typeDef;
   AAFRESULT					status;
+//	aafUID_t				foundUID;
 
   if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
 
   if (pvtLookupAxiomaticTypeDef (typeID, &typeDef))
-	{
-	  // Yes, this is an axiomatic type.  typeDef should be filled
-	  // in.  Assure that it's in the dictionary, and return it.
-
-	  // Future! here's where we assure it's in the dictionary.
-	  // if (! type-present-in-dictionary)
-	  // {
-	  //   put-it-into-the-dictionary();
-	  // }
-
+  {
+	  if(_defRegistrationAllowed && !PvtIsTypePresent(typeID))
+	  {
+		  status = RegisterTypeDef(typeDef);
+		  assert (AAFRESULT_SUCCEEDED (status));
+	  }
+	  
 	  assert (ppTypeDef);
 	  *ppTypeDef = typeDef;
 	  assert (*ppTypeDef);
 	  (*ppTypeDef)->AcquireReference ();
 	  return AAFRESULT_SUCCESS;
-	}
+  }
 
   // Not axiomatic.  Check to see if it's already in the dict.
   status = dictLookupTypeDef (typeID, ppTypeDef);
@@ -1077,10 +1201,13 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_NO_MORE_OBJECTS;
 	}
   // Yup, found it in builtins.  Register it.
-  assert (typeDef);
-  status = RegisterTypeDef (typeDef);
-  if (AAFRESULT_FAILED (status))
-	return status;
+  if(_defRegistrationAllowed)
+	 {
+	  assert (typeDef);
+	 status = RegisterTypeDef (typeDef);
+	 if (AAFRESULT_FAILED (status))
+		return status;
+  }
 		  
   assert (ppTypeDef);
   *ppTypeDef = typeDef;
@@ -1103,8 +1230,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFTypeDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFTypeDef>(_typeDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef>(_typeDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1135,6 +1262,58 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
+ImplAAFDictionary::OpaqueTypeDefinition::OpaqueTypeDefinition() :
+  _opaqueTypeDef(NULL)
+{
+}
+
+ImplAAFDictionary::OpaqueTypeDefinition::OpaqueTypeDefinition(const ImplAAFDictionary::OpaqueTypeDefinition& rhs)
+{
+  _opaqueTypeDef = rhs._opaqueTypeDef;
+}
+
+ImplAAFDictionary::OpaqueTypeDefinition::OpaqueTypeDefinition(ImplAAFTypeDef * opaqueTypeDef)
+{
+  _opaqueTypeDef = opaqueTypeDef;
+}
+
+// coersion operator to "transparently" extract the type
+// definition pointer. This will be called when the enumerator
+// attempts to assign an OpaqueTypeDefinition to an ImplAAFTypeDef *.
+ImplAAFDictionary::OpaqueTypeDefinition::operator ImplAAFTypeDef * () const
+{
+  return _opaqueTypeDef;
+}
+
+
+const OMUniqueObjectIdentification 
+  ImplAAFDictionary::OpaqueTypeDefinition::identification(void) const
+{
+  aafUID_t typeId = {0};
+	if (_opaqueTypeDef)
+	{
+		AAFRESULT result = _opaqueTypeDef->GetAUID(&typeId); // ignore error
+		assert (AAFRESULT_SUCCEEDED(result));
+	}
+
+  return (*reinterpret_cast<const OMUniqueObjectIdentification *>(&typeId));
+}
+
+ImplAAFDictionary::OpaqueTypeDefinition& 
+  ImplAAFDictionary::OpaqueTypeDefinition::operator= (const ImplAAFDictionary::OpaqueTypeDefinition& rhs)
+{
+  _opaqueTypeDef = rhs._opaqueTypeDef;
+  return *this;
+}
+
+bool ImplAAFDictionary::OpaqueTypeDefinition::operator== (const ImplAAFDictionary::OpaqueTypeDefinition& rhs)
+{
+  if (&rhs == this)
+    return true;
+  else
+    return (_opaqueTypeDef == rhs._opaqueTypeDef); // pointers are equal.
+}
+
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -1151,13 +1330,38 @@ AAFRESULT STDMETHODCALLTYPE
     return hr;
 
   // Is this type already registered ?
-  
+  // NOTE: Behave like all of the other "register" methods: do not
+  // fail if the type has already been registered. This is a little
+  // ambiguous since the client will not know whether the the given
+  // type definition was already public or already opaque...
+  // (transdel:2000-APR-03)
+  if (!PvtIsTypePresent(newAUID) && !findOpaqueTypeDefinition(newAUID))
+  {
+    // This type is not yet registered, add it to the dictionary.
+    ImplAAFDictionary::OpaqueTypeDefinition opaque(pTypeDef);
+    _opaqueTypeDefinitions.append(opaque);
+    pTypeDef->AcquireReference();
+  }
 
-  // This type is not yet registered, add it to the dictionary.
-//  _opaqueTypeDefinitions.appendValue(pTypeDef);
-//  pTypeDef->AcquireReference();
+  return (AAFRESULT_SUCCESS);
+}
 
-  return (AAFRESULT_NOT_IMPLEMENTED);
+
+ImplAAFTypeDef * ImplAAFDictionary::findOpaqueTypeDefinition(aafUID_constref typeId)
+{
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+  ImplAAFDictionary::OpaqueTypeDefinition opaqueTypeDefinition;
+	if (_opaqueTypeDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&typeId)),
+                             opaqueTypeDefinition))
+  {
+    return (ImplAAFTypeDef *)opaqueTypeDefinition;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 
@@ -1167,15 +1371,18 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFTypeDef ** ppTypeDef)
 {
   ImplAAFTypeDefSP			typeDef;
-//  AAFRESULT					status;
+  AAFRESULT					status = AAFRESULT_SUCCESS;
 
   if (! ppTypeDef) 
 		return AAFRESULT_NULL_PARAM;
-//  *ppTypeDef = typeDef;
-//  assert (*ppTypeDef);
-//  (*ppTypeDef)->AcquireReference ();
+
+  *ppTypeDef = findOpaqueTypeDefinition(typeID);
+  if (*ppTypeDef)
+    (*ppTypeDef)->AcquireReference ();
+  else
+    status = AAFRESULT_TYPE_NOT_FOUND;
 	
-  return (AAFRESULT_NOT_IMPLEMENTED);
+  return (status);
 }
 
 
@@ -1192,8 +1399,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFTypeDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFTypeDef>(_typeDefinitions);
+		OMSetIterator<OMUniqueObjectIdentification, ImplAAFDictionary::OpaqueTypeDefinition>* iter = 
+			new OMSetIterator<OMUniqueObjectIdentification, ImplAAFDictionary::OpaqueTypeDefinition>(_opaqueTypeDefinitions, OMBefore);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1221,9 +1428,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 		return AAFRESULT_NULL_PARAM;
-//	*pResult = _typeDefinitions.count();
-//  return AAFRESULT_SUCCESS;
-  return (AAFRESULT_NOT_IMPLEMENTED);
+	*pResult = _opaqueTypeDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1311,8 +1517,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFDataDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFDataDef>(_dataDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFDataDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFDataDef>(_dataDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1403,8 +1609,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFOperationDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFOperationDef>(_operationDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFOperationDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFOperationDef>(_operationDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1496,8 +1702,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFParameterDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFParameterDef>(_parameterDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef>(_parameterDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1599,8 +1805,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFCodecDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFCodecDef>(_codecDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFCodecDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFCodecDef>(_codecDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1702,8 +1908,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFContainerDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFContainerDef>(_containerDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFContainerDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFContainerDef>(_containerDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1899,8 +2105,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFInterpolationDef>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFInterpolationDef>(_interpolationDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFInterpolationDef>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFInterpolationDef>(_interpolationDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
@@ -1989,8 +2195,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceSetIterator<ImplAAFPluginDescriptor>* iter = 
-			new OMStrongReferenceSetIterator<ImplAAFPluginDescriptor>(_pluginDefinitions);
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDescriptor>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDescriptor>(_pluginDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->SetIterator(this, iter));
