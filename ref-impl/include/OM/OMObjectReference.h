@@ -116,7 +116,7 @@ public:
   OMStrongObjectReference(void);
 
     // @cmember Constructor.
-  OMStrongObjectReference(OMProperty* property, const char* name);
+  OMStrongObjectReference(OMProperty* property, const wchar_t* name);
 
     // @cmember Copy constructor.
   OMStrongObjectReference(const OMStrongObjectReference&);
@@ -182,7 +182,7 @@ protected:
   bool _isLoaded;
 
     // @cmember The name of this <c OMStrongObjectReference>.
-  char* _name;
+  wchar_t* _name;
 
 };
 
@@ -249,6 +249,8 @@ public:
     // @cmember Set the value of this <c OMWeakObjectReference>.
     //          The value is a pointer to the <c ReferencedObject>.
   virtual ReferencedObject* setValue(const ReferencedObject* value);
+
+  void setTargetTag(OMPropertyTag targetTag);
 
   const OMUniqueObjectIdentification& identification(void) const;
 
