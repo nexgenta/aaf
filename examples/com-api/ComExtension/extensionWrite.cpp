@@ -34,7 +34,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 //
 // This example code is intended to show how AAF may be extended to
@@ -139,15 +138,13 @@ void extensionWrite (const aafCharacter * filename)
 
     // Create a new file...
     static const aafUID_t NULL_UID = { 0 };
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
+    ProductInfo.companyName = L"AAF Developers Desk";
     ProductInfo.productName = L"AAF extension example";
-    ProductInfo.productVersion = &v;
+    ProductInfo.productVersion.major = 1;
+    ProductInfo.productVersion.minor = 0;
+    ProductInfo.productVersion.tertiary = 0;
+    ProductInfo.productVersion.patchLevel = 0;
+    ProductInfo.productVersion.type = kAAFVersionUnknown;
     ProductInfo.productVersionString = 0;
     ProductInfo.productID = NULL_UID;
     ProductInfo.platform = 0;

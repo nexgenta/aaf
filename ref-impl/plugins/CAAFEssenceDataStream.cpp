@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "CAAFEssenceDataStream.h"
 
@@ -27,6 +45,9 @@ CAAFEssenceDataStream::CAAFEssenceDataStream (IUnknown * pControllingUnknown)
 
 CAAFEssenceDataStream::~CAAFEssenceDataStream ()
 {
+	if(_data != NULL)
+		_data->Release();
+	_data = NULL;
 }
 
 HRESULT STDMETHODCALLTYPE
@@ -120,7 +141,7 @@ HRESULT STDMETHODCALLTYPE
   if (NULL == isValid)
     return E_INVALIDARG;
   
-  *isValid = AAFFalse;
+  *isValid = kAAFFalse;
 
   if (0 <= byteOffset)
   {
@@ -131,7 +152,7 @@ HRESULT STDMETHODCALLTYPE
 
     if (byteOffset < length)
     {
-      *isValid = AAFTrue;
+      *isValid = kAAFTrue;
     }
     else if (byteOffset == length)
     {
@@ -139,7 +160,7 @@ HRESULT STDMETHODCALLTYPE
       // we don't know whether or not the next
       // file operation will be a read or a write
       // so we just return true.
-      *isValid = AAFTrue;
+      *isValid = kAAFTrue;
     }
   }
 
@@ -173,7 +194,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceDataStream::omcFlushCache ()
+    CAAFEssenceDataStream::FlushCache ()
 {
   return S_OK; //AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -226,16 +247,4 @@ HRESULT CAAFEssenceDataStream::InternalQueryInterface
 //
 // Define the contrete object support implementation.
 // 
-//
-// Define the contrete object support implementation.
-// 
-HRESULT CAAFEssenceDataStream::COMCreate(IUnknown *pUnkOuter, void **ppvObjOut)
-{
-	*ppvObjOut = NULL;
- 	CAAFEssenceDataStream *pAAFEssenceDataStream = new CAAFEssenceDataStream(pUnkOuter);
- 	if (NULL == pAAFEssenceDataStream)
- 		return E_OUTOFMEMORY;
- 	*ppvObjOut = static_cast<IAAFEssenceStream *>(pAAFEssenceDataStream);
- 	((IUnknown *)(*ppvObjOut))->AddRef();
- 	return S_OK;
- }
+AAF_DEFINE_FACTORY(AAFEssenceDataStream)

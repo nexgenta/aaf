@@ -140,8 +140,22 @@ HRESULT CAAFEssenceFileContainer::CheckExistingStreams(
 }
 
 
+// Set up the plugin.
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::CountDefinitions (aafUInt32 *pDefCount)
+    CAAFEssenceFileContainer::Start(void)
+{
+  return S_OK;
+}
+
+// Tear down the plugin.
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceFileContainer::Finish(void)
+{
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceFileContainer::GetNumDefinitions (aafInt32 *pDefCount)
 {
 	if(pDefCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -151,7 +165,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
+    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
 {
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -169,7 +183,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	aafUID_t			uid;
 	IAAFContainerDef	*container = NULL;
@@ -220,17 +234,17 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
+    CAAFEssenceFileContainer::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
 {
-	IAAFPluginDef			*desc = NULL;
+	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
 	IAAFNetworkLocator		*pNetLoc = NULL;
 	IAAFClassDef            *pcd = 0;
 	
 	XPROTECT()
 	{
-	    CHECK(dict->LookupClassDef(AUID_AAFPluginDef, &pcd));
-		CHECK(pcd->CreateInstance(IID_IAAFPluginDef, 
+	    CHECK(dict->LookupClassDef(AUID_AAFPluginDescriptor, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFPluginDescriptor, 
 								  (IUnknown **)&desc));
 		pcd->Release();
 		pcd = 0;
