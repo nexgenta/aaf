@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-# $Id: MultiGenTest.pl,v 1.5 2005/03/17 02:52:41 jptrainor Exp $ $Name:  $
+# $Id: MultiGenTest.pl,v 1.6 2005/03/17 03:26:34 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -533,7 +533,7 @@ sub ModifyTest {
 		}
 		elsif ( IsReadableByVersion( $Cv, $Mv ) eq "false" ) {
 		    print "Excluded: ${Cv} cannot be read by ${Mv}.\n";
-		    $excluded = 1;
+		    $exclude = 1;
 		}
 		
 		if ( $exclude == 1 ) {
