@@ -13,6 +13,8 @@ public:
   //
   OMClassFactory(int capacity);
 
+  virtual ~OMClassFactory(void);
+
   // Register a class id and its associated creation function.
   //
   void add(const OMClassId& classId, OMStorable* (*create)(const OMClassId&));
@@ -25,9 +27,11 @@ public:
   //
   OMStorable* create(const OMClassId& classId) const;
 
-protected:
+private:
 
   struct FactoryEntry;
+
+protected:
 
   // FactoryEntry for `classId' or null if not found.
   //

@@ -1,103 +1,50 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
-
-// @doc OMINTERNAL
 #ifndef OMSTOREDPROPERTYSETINDEX_H
 #define OMSTOREDPROPERTYSETINDEX_H
 
 #include "OMPortability.h"
-#include "OMDataTypes.h"
+#include "OMTypes.h"
 
-#include <stddef.h>
-
-  // @class The in-memory representation of the on-disk index for a
-  //        stored property set.
 class OMStoredPropertySetIndex {
 private:
-  struct IndexEntry;
+  struct IndexEntry;  
 public:
-  // @access Public members.
-
-    // @cmember Constructor.
+  
   OMStoredPropertySetIndex(size_t capacity);
 
-    // @cmember Destructor.
   ~OMStoredPropertySetIndex(void);
 
-    // @cmember Insert a new property into this <c OMStoredPropertySetIndex>.
-    //          The new property has id <p propertyId>. The stored property
-    //          representation is <p storedForm>. The property value
-    //          occupies <p length> bytes starting at offset <p offset>.
-  void insert(OMPropertyId propertyId,
-              OMStoredForm storedForm,
-              OMPropertyOffset offset,
-              OMPropertySize length);
+  void insert(OMPropertyId propertyId, int type, size_t offset, size_t length);
+  
+  IndexEntry* find(OMPropertyId propertyId) const;
 
-    // @cmember The number of properties in this <c OMStoredPropertySetIndex>.
   size_t entries(void) const;
 
-    // @cmember Iterate over the properties in this
-    //          <c OMStoredPropertySetIndex>.
   void iterate(size_t& context,
                OMPropertyId& propertyId,
-               OMStoredForm& storedForm,
-               OMPropertyOffset& offset,
-               OMPropertySize& length) const;
+               int& type,
+               size_t& offset,
+               size_t& length) const;
 
-    // @cmember Find the property with property id <p propertyId> in this
-    //          <c OMStoredPropertySetIndex>. If found the <p storedForm>,
-    //          <p offset> and <p length> of the property are returned.
-  bool find(const OMPropertyId& propertyId,
-            OMStoredForm& storedForm,
-            OMPropertyOffset& offset,
-            OMPropertySize& length) const;
-
-    // @cmember Is this <c OMStoredPropertySetIndex> valid ?
-  bool isValid(OMPropertyOffset baseOffset) const;
+  bool isSorted(void);
 
 protected:
-
+    
   OMStoredPropertySetIndex::IndexEntry* find(void) const;
-
-  OMStoredPropertySetIndex::IndexEntry* find(OMPropertyId propertyId) const;
-
+    
 private:
-
+    
   struct IndexEntry {
     OMPropertyId _propertyId;
-    OMStoredForm _storedForm;
-    OMPropertyOffset _offset;
-    OMPropertySize _length;
+    int _type;
+    size_t _offset;
+    size_t _length;
     bool _valid;
   };
-
+    
   size_t _capacity;
   IndexEntry* _table;
   size_t _entries;
+  bool _dirty;
 };
 
 #endif
