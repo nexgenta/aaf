@@ -54,19 +54,21 @@ public:
   virtual void insert(const Element value);
 
     // @cmember Does this <c OMVector> contain <p value> ?
-    //   @this const
-  virtual bool contains(const Element value) const;
+  virtual bool containsValue(const Element value) const;
 
     // @cmember The number of elements in this <c OMVector>.
     //          <mf OMVector::count> returns the actual number
     //          of elements in the <c OMVector>.
-    //   @this const
   size_t count(void) const;
+
+    // @cmember Remove <p value> from this <c OMVector>.
+    //          In the case of duplicate values, the one with the lowest
+    //          index is removed.
+  virtual void removeValue(const Element value);
 
     // @cmember The capacity of this <c OMVector>.
     //          <mf OMVector::capacity> returns the potential
     //          number of elements in the <c OMVector>.
-    //   @this const
   virtual size_t capacity(void) const;
 
     // @cmember Increase the capacity of this <c OMVector> so that it
@@ -92,13 +94,15 @@ public:
 
     // @cmember Get the value of the <p Element> at
     //          position <p index> in this <c OMVector>.
-    //   @this const
   void getAt(Element& value, const size_t index) const;
 
     // @cmember Get the value of the <p Element> at
     //          position <p index> in this <c OMVector>.
-    //   @this const;
   Element& getAt(const size_t index) const;
+
+    // @cmember The value of the <p Element> at
+    //          position <p index> in this <c OMVector>.
+  Element& valueAt(const size_t index) const;
 
     // @cmember Insert <p value> into this <c OMVector> at
     //          position <p index>. Existing values in this
@@ -132,6 +136,13 @@ public:
     //          from this <c OMVector>. Existing values in this
     //          <c OMVector> are shifted down one index position.
   void removeFirst(void);
+
+    // @cmember The index of the element with value <p value>.
+    //          In the case of duplicate values, lowest index is returned.
+  size_t indexOfValue(const Element value) const;
+
+    // @cmember The number of elements with value <p value>.
+  size_t countValue(const Element value) const;
 
 private:
   // @access Private members.
