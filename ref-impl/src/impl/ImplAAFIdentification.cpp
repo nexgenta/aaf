@@ -4,7 +4,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -111,7 +110,6 @@ _platform(            PID_Identification_Platform,             "Platform")
 };
 
 
-OMDEFINE_STORABLE(ImplAAFIdentification, AUID_AAFIdentification);
 
 
 AAFRESULT STDMETHODCALLTYPE
