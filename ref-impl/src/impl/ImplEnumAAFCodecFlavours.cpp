@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 #ifndef __ImplEnumAAFCodecFlavours_h__
 #include "ImplEnumAAFCodecFlavours.h"
@@ -39,7 +21,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFCodecFlavours;
 ImplEnumAAFCodecFlavours::ImplEnumAAFCodecFlavours ()
 {
 	_current = 0;
-	_codec = 0;
+	_codec = NULL;
 }
 
 
@@ -48,7 +30,7 @@ ImplEnumAAFCodecFlavours::~ImplEnumAAFCodecFlavours ()
 	if (_codec)
 	{
 		_codec->Release();
-		_codec = 0;
+		_codec = NULL;
 	}
 }
 
@@ -57,15 +39,15 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFCodecFlavours::NextOne (
       aafUID_t *pAAFCodecFlavour)
 {
-	aafUInt32			numElem;
+	aafInt32			numElem;
 
 	XPROTECT()
 	{
-		CHECK(_codec->CountFlavours(&numElem))
-		if(pAAFCodecFlavour == 0)
+		CHECK(_codec->GetFlavourCount(&numElem))
+		if(pAAFCodecFlavour == NULL)
 			RAISE(AAFRESULT_NULL_PARAM);
 		if(_current >= numElem)
-			RAISE(AAFRESULT_NO_MORE_FLAVOURS);
+			RAISE(AAFRESULT_NO_MORE_OBJECTS);
 		CHECK(_codec->GetIndexedFlavourID (_current, pAAFCodecFlavour));
 
 		_current++;
@@ -89,7 +71,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUInt32			numDefs;
 	HRESULT				hr;
 
-	if ((!pFetched && count != 1) || (!pFetched && count == 1))
+	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
 		return E_INVALIDARG;
 
 	// Point at the first component in the array.
@@ -119,10 +101,10 @@ AAFRESULT STDMETHODCALLTYPE
       aafUInt32  count)
 {
 	AAFRESULT	hr;
-	aafUInt32	newCurrent;
-	aafUInt32	numElem;
+	aafInt32	newCurrent;
+	aafInt32	numElem;
 
-	hr = _codec->CountFlavours(&numElem);
+	hr = _codec->GetFlavourCount(&numElem);
 	if(hr != AAFRESULT_SUCCESS)
 		return hr;
 
@@ -135,7 +117,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		hr = AAFRESULT_NO_MORE_FLAVOURS;
+		hr = E_FAIL;
 	}
 
 	return hr;
@@ -158,7 +140,7 @@ AAFRESULT STDMETHODCALLTYPE
 	AAFRESULT				hr;
 
 	result = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
-	if (!result)
+	if (result == NULL)
 		return E_FAIL;
 
 	hr = result->SetEnumCodec(_codec);
@@ -170,9 +152,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = 0;
+		result->ReleaseReference();
+		*ppEnum = NULL;
 	}
 	
 	return hr;
