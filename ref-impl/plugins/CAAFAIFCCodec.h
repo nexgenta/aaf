@@ -1,7 +1,7 @@
 //@doc
 //@class    AAFEssenceCodec | Implementation class for AAFEssenceCodec
-#ifndef __CAAFWAVECodec_h__
-#define __CAAFWAVECodec_h__
+#ifndef __CAAFAIFCCodec_h__
+#define __CAAFAIFCCodec_h__
 
 //=---------------------------------------------------------------------=
 //
@@ -31,7 +31,7 @@
 #include "AAFPlugin.h"
 #include "CAAFUnknown.h"
 
-EXTERN_C const CLSID CLSID_AAFWaveCodec;
+EXTERN_C const CLSID CLSID_AAFAIFCCodec;
 
 typedef struct
 {
@@ -40,9 +40,9 @@ typedef struct
 	aafUInt32		samplesLeft;
 	aafUInt32		bytesXfered;
 	aafmMultiXfer_t	*xfer;
-} interleaveBuf_t;
+} interleaveBufAIFF_t;
 
-class CAAFWaveCodec : 
+class CAAFAIFCCodec : 
   public IAAFMultiEssenceCodec,
   public IAAFEssenceCodec,
 	public IAAFPlugin,
@@ -54,8 +54,8 @@ protected:
   //
   // Constructor/destructor
   //
-  CAAFWaveCodec (IUnknown * pControllingUnknown);
-  virtual ~CAAFWaveCodec ();
+  CAAFAIFCCodec (IUnknown * pControllingUnknown);
+  virtual ~CAAFAIFCCodec ();
 
 public:
 
@@ -213,7 +213,7 @@ public:
 
 
 	
-  // Given some raw essence (like a WAVE file), create
+  // Given some raw essence (like a AIFC file), create
 			// an AAFEssenceDescriptor to match, with all fields filled in.
   STDMETHOD (CreateDescriptorFromStream)
     (/*[in]*/ IAAFEssenceStream * pStream, // A raw file stream
@@ -290,7 +290,7 @@ public:
 
 private:
 	IAAFEssenceStream	*_stream;
-	IAAFWAVEDescriptor	*_mdes;
+	IAAFAIFCDescriptor	*_mdes;
 	IAAFEssenceAccess	*_access;
 	AAFByteOrder		_nativeByteOrder;
 	aafRational_t		_sampleRate;
@@ -299,20 +299,21 @@ private:
 	aafUInt16			_bytesPerFrame;
 	aafUInt32			_sampleFrames;
 	aafBoolean_t				_headerLoaded;
-	interleaveBuf_t		*_interleaveBuf;
+	interleaveBufAIFF_t		*_interleaveBuf;
 	aafInt64			_dataStartOffset;
 	aafInt64			_dataSizeOffset;
+	aafInt64			_numSamplesOffset;
 	aafBoolean_t				_readOnly;
 	aafBoolean_t				_sampleDataHeaderWritten;
 	aafBoolean_t				_initialSeekPerformed;
 
 	// Sets a value indicating whether the SDK is handling the compression.
 	AAFRESULT SetCompressionEnabled(aafCompressEnable_t compEnable);
-	AAFRESULT fillSwappedWAVEData(aafUInt8 **destBufHdl, aafUInt32 maxsize, void *data);
-	AAFRESULT scanSwappedWAVEData(aafUInt8 **srcBufHdl, aafUInt32 maxsize, void *data);
-	AAFRESULT CreateWAVEheader(aafUInt8 *buffer, aafUInt32 bufsize, aafUInt16 numCh, aafUInt32 *hdrSize);
-	AAFRESULT loadWAVEHeader(void);
-	AAFRESULT GetWAVEData(aafUInt32 len, void *buf);
+	AAFRESULT fillSwappedAIFCData(aafUInt8 **destBufHdl, aafUInt32 maxsize, void *data);
+	AAFRESULT scanSwappedAIFCData(aafUInt8 **srcBufHdl, aafUInt32 maxsize, void *data);
+	AAFRESULT CreateAIFCheader(aafUInt8 *buffer, aafUInt32 bufsize, aafUInt16 numCh, aafUInt32 *actualSize);
+	AAFRESULT loadAIFCHeader(void);
+	AAFRESULT GetAIFCData(aafUInt32 len, void *buf);
 
 	AAFRESULT ComputeWriteChunkSize(aafInt64 sizeOff, aafInt64 end);
 	AAFRESULT CreateAudioDataEnd(void);

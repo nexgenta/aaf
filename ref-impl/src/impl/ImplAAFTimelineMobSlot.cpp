@@ -1,12 +1,26 @@
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,8 +44,8 @@
 #include "AAFUtils.h"
 
 ImplAAFTimelineMobSlot::ImplAAFTimelineMobSlot ():
-	_editRate(	PID_TimelineMobSlot_EditRate,	"EditRate"),
-	_origin(	PID_TimelineMobSlot_Origin,		"Origin")
+	_editRate(	PID_TimelineMobSlot_EditRate,	L"EditRate"),
+	_origin(	PID_TimelineMobSlot_Origin,		L"Origin")
 
 {
 	_persistentProperties.put( _editRate.address());
@@ -62,12 +76,9 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTimelineMobSlot::SetEditRate (aafRational_t *editRate)
+    ImplAAFTimelineMobSlot::SetEditRate (const aafRational_t & editRate)
 {
-	if (editRate == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	_editRate = *editRate;
+	_editRate = editRate;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -96,8 +107,7 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 					  aafRational_t *srcRate,
 					  aafPosition_t *diffPos)
 {
-	aafBool					foundClip = AAFFalse;
-	ImplAAFMobSlot			*tmpTrack = NULL;
+	aafBool					foundClip = kAAFFalse;
 	aafPosition_t begPos = CvtInt32toPosition(0, begPos);
 	aafRational_t tmpSrcRate;
 	aafPosition_t origin = 0;

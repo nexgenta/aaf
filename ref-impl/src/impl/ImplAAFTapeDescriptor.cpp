@@ -1,10 +1,24 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 #ifndef __ImplAAFTapeDescriptor_h__
@@ -19,12 +33,12 @@
 
 
 ImplAAFTapeDescriptor::ImplAAFTapeDescriptor ():
-	_formFactor(		PID_TapeDescriptor_FormFactor,		"FormFactor"),
-	_videoSignalType(	PID_TapeDescriptor_VideoSignal,		"VideoSignal"),
-	_tapeFormat(		PID_TapeDescriptor_TapeFormat,		"TapeFormat"),
-	_tapeLength(		PID_TapeDescriptor_Length,			"Length"),
-	_manufacturer(		PID_TapeDescriptor_ManufacturerID,	"ManufacturerID"),
-	_model(				PID_TapeDescriptor_Model,			"Model")	
+	_formFactor(		PID_TapeDescriptor_FormFactor,		L"FormFactor"),
+	_videoSignalType(	PID_TapeDescriptor_VideoSignal,		L"VideoSignal"),
+	_tapeFormat(		PID_TapeDescriptor_TapeFormat,		L"TapeFormat"),
+	_tapeLength(		PID_TapeDescriptor_Length,			L"Length"),
+	_manufacturer(		PID_TapeDescriptor_ManufacturerID,	L"ManufacturerID"),
+	_model(				PID_TapeDescriptor_Model,			L"Model")	
 {
 	_persistentProperties.put(_formFactor.address());
 	_persistentProperties.put(_videoSignalType.address());
@@ -47,7 +61,7 @@ ImplAAFTapeDescriptor::Initialize ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::SetTapeManufacturer (aafWChar*  pName)
+    ImplAAFTapeDescriptor::SetTapeManufacturer (const aafCharacter*  pName)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	if (pName == NULL)
@@ -63,8 +77,8 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeManufacturer (aafWChar*	pName,
-												aafInt32	buflen)
+    ImplAAFTapeDescriptor::GetTapeManufacturer (aafCharacter*	pName,
+												aafUInt32	buflen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 	bool		status;
@@ -88,7 +102,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeManBufLen (aafInt32 *pLen)
+    ImplAAFTapeDescriptor::GetTapeManufacturerBufLen (aafUInt32 *pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -109,7 +123,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::SetTapeModel (aafWChar*	pModelName)
+    ImplAAFTapeDescriptor::SetTapeModel (const aafCharacter*	pModelName)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	if (pModelName == NULL)
@@ -125,8 +139,8 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeModel (aafWChar*	pModelName,
-										 aafInt32	buflen)
+    ImplAAFTapeDescriptor::GetTapeModel (aafCharacter*	pModelName,
+										 aafUInt32	buflen)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	bool		status;
@@ -150,7 +164,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeModelBufLen (aafInt32*	pLen)
+    ImplAAFTapeDescriptor::GetTapeModelBufLen (aafUInt32*	pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -176,8 +190,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	
-	if ( formFactor < kTapeCaseNull ||
-		 formFactor > kNagraAudioTape )
+	if ( formFactor < kAAFTapeCaseNull ||
+		 formFactor > kAAFNagraAudioTape )
 	{
 		aafError = AAFRESULT_BAD_TYPE;
 	}
@@ -219,8 +233,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-	if (videoSignal < kVideoSignalNull ||
-		videoSignal > kSECAMSignal)
+	if (videoSignal < kAAFVideoSignalNull ||
+		videoSignal > kAAFSECAMSignal)
 	{
 		aafError = AAFRESULT_BAD_TYPE;
 	}
@@ -262,8 +276,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-	if (tapeFormat < kTapeFormatNull ||
-		tapeFormat > kHi8Format)
+	if (tapeFormat < kAAFTapeFormatNull ||
+		tapeFormat > kAAFHi8Format)
 	{
 		aafError = AAFRESULT_BAD_TYPE;
 	}
@@ -298,24 +312,15 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::SetTapeLength (aafLength_t	tapeLength)
+    ImplAAFTapeDescriptor::SetTapeLength (aafUInt32	tapeLength)
 {
-    AAFRESULT aafError = AAFRESULT_SUCCESS;
+	_tapeLength = tapeLength;
 
-	if (tapeLength < 0)
-	{
-		aafError = AAFRESULT_BAD_LENGTH;
-	}
-	else
-	{
-		_tapeLength = tapeLength;
-	}
-
-	return aafError;
+	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeLength (aafLength_t*	pTapeLength)
+    ImplAAFTapeDescriptor::GetTapeLength (aafUInt32*	pTapeLength)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
@@ -339,7 +344,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTapeDescriptor::GetOwningMobKind (aafMobKind_t *pMobKind)
 {
-	*pMobKind = kTapeMob;		// Abstract superclass, only match "all"
+	*pMobKind = kAAFTapeMob;		// Abstract superclass, only match "all"
 	return(AAFRESULT_SUCCESS);
 }
 
