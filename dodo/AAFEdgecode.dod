@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFEdgecode.dod,v 1.19 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c $Id: AAFEdgecode.dod,v 1.20 2005/02/10 17:47:22 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -42,13 +42,13 @@ AD_METHOD2(Initialize,
 	[in],aafLength_t  ,length  ,Length Property Value,
 	[in],aafEdgecode_t,edgecode,Edgecode Value,
 	This function creates a new edgecode clip with the
-  // given property values.  The edgecode value is represented with an
-  // aafEdgecode_t struct consisting of startFrame\\\, filmKind\\\, and
-  // codeFormat.)
+  /// given property values.  The edgecode value is represented with an
+  /// aafEdgecode_t struct consisting of startFrame\\\, filmKind\\\, and
+  /// codeFormat.)
 
 AD_METHOD1(GetEdgecode,
 		   [out],aafEdgecode_t *,edgecode,Edgecode,
 		   This set of functions returns the required property values
-  // for the object identified by XXX.)
+  /// for the object identified by XXX.)
 
 AD_XCLASS_END(Concrete, StoredObject)

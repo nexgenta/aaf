@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: maketargets.mak,v 1.59 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+# $Id: maketargets.mak,v 1.60 2005/02/10 17:47:27 heydowns Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -511,7 +511,7 @@ $(INCLUDE_DIR)/ref-api/%.h : %.dod macros/refh.mac macros/base.mac
 	$(DODO) -f macros/fidl.mac < $*.dod > $*.tmp
 	perl -p -0 \
 		-e 's/(^\[\n\s*object,\n\s*uuid)/OBJ_INT\n\1/m;'\
-		-e 's/^(\n\n)\n+/\1/mg;'\
+		-e 's/^\n\n\n+OBJ_INT/OBJ_INT/mg;'\
 		$*.tmp > $*X.tmp
 	sed -e '/OBJ_INT/r ObjInt.tmp' -e '/OBJ_INT/d' $*X.tmp > $*.fidl
 	$(CHMOD) -w $*.fidl

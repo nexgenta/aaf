@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFMetaDefinition.dod,v 1.5 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c $Id: AAFMetaDefinition.dod,v 1.6 2005/02/10 17:47:24 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -29,10 +29,10 @@ AAFMetaDefinition\
 AAFRoot\
 #endm
 AD_HEAD
-AD_IDL(//
-// This interface is defines an item to be referenced in the AAF file.
-// It specifies the AUID unique identifier used to define types used
-// in AAF persistent objects.
+AD_IDL(///
+/// This interface is defines an item to be referenced in the AAF file.
+/// It specifies the AUID unique identifier used to define types used
+/// in AAF persistent objects.
 AD_STD_COMMENT_IFC_HEADER
 AD_STD_COMMENT_IFC_INIT)
 AD_INCLUDE(AAFTypes)

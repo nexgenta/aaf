@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: EnumAAFClassDefs.dod,v 1.16 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c $Id: EnumAAFClassDefs.dod,v 1.17 2005/02/10 17:47:27 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -29,11 +29,11 @@ AAFRoot\
 #endm
 #c
 AD_HEAD
-AD_IDL(//
-// This interface is used to enumerate across Class Definition
-// objects.
+AD_IDL(///
+/// This interface is used to enumerate across Class Definition
+/// objects.
 AD_STD_COMMENT_IFC_HEADER
-//)
+///)
 AD_FORWARD_DECLARATION(AAFClassDef)
 AD_CLASS_UUID(B1A2138F, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 

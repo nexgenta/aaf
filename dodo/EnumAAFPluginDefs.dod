@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: EnumAAFPluginDefs.dod,v 1.9 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c $Id: EnumAAFPluginDefs.dod,v 1.10 2005/02/10 17:47:27 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -29,19 +29,19 @@ AAFRoot\
 #endm
 #c
 AD_HEAD
-AD_IDL(//
-// An object which allows iteration over all of the AAFPluginDefinitions
-// in the dictionary.  These descriptors describe particular
-// implementation of the particular plugin interface.
-//
-// In addition to the specific error results listed for each method\,
-// all methods in this interface may also return one of the following
-// values:
-// 
-// AAFRESULT_NOMEMORY
-//   - insufficient system memory is available to perform the
-//     operation.
-//)
+AD_IDL(///
+/// An object which allows iteration over all of the AAFPluginDefinitions
+/// in the dictionary.  These descriptors describe particular
+/// implementation of the particular plugin interface.
+///
+/// In addition to the specific error results listed for each method\,
+/// all methods in this interface may also return one of the following
+/// values:
+/// 
+/// AAFRESULT_NOMEMORY
+///   - insufficient system memory is available to perform the
+///     operation.
+///)
 AD_FORWARD_DECLARATION(AAFPluginDef)
 AD_CLASS_UUID(AD1BB85D, DBB2, 11d2, 80, 9C, 00, 60, 08, 14, 3E, 6F)
 

@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef3.dod,v 1.2 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef3.dod,v 1.3 2005/02/10 17:47:21 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -105,8 +105,8 @@ AD_XMETHOD2(DoesDataDefConvertTo,
 			pointer to result,
 
 		   Sets return value to TRUE if the DataDef of the given object
-   // can be converted to the DataDef specified in the IN 
-   // parameter with the DataDefName string.)
+  /// can be converted to the DataDef specified in the IN 
+  /// parameter with the DataDefName string.)
 		   
 
 AD_XMETHOD2(IsDataDefOf,
@@ -124,8 +124,8 @@ AD_XMETHOD2(IsDataDefOf,
 			pointer to result,
 
 		   Sets the value to TRUE if the DataDef of the given object
-  // matches the DataDef specified in the IN parameter with the
-  // DataDefName string.)
+  /// matches the DataDef specified in the IN parameter with the
+  /// DataDefName string.)
 
 
 AD_XMETHOD2(DoesDataDefConvertFrom,
@@ -143,8 +143,8 @@ AD_XMETHOD2(DoesDataDefConvertFrom,
 			pointer to result,
 
 		   Sets return value to TRUE if the DataDef of the given object
-  // can be converted from the DataDef specified in the IN 
-  // parameter specified with the DataDefName string.)
+  /// can be converted from the DataDef specified in the IN 
+  /// parameter specified with the DataDefName string.)
 
 #c
 #c AAFDataDef2 methods

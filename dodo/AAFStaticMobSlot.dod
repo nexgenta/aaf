@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFStaticMobSlot.dod,v 1.7 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c $Id: AAFStaticMobSlot.dod,v 1.8 2005/02/10 17:47:26 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -31,11 +31,11 @@ AAFMobSlot\
 #c
 AD_HEAD
 
-AD_IDL(//
-// StaticMobSlot describes essence data that has no relationship to time\,
-// such as a static image; consequently\, a StaticMobSlot does not define an
-// edit rate.
-//)
+AD_IDL(///
+/// StaticMobSlot describes essence data that has no relationship to time\,
+/// such as a static image; consequently\, a StaticMobSlot does not define an
+/// edit rate.
+///)
 
 AD_CLASS_UUID(e684d763, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 

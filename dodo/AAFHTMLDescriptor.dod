@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFHTMLDescriptor.dod,v 1.6 2004/02/27 14:26:17 stuart_hc Exp $ $Name:  $
+#c $Id: AAFHTMLDescriptor.dod,v 1.7 2005/02/10 17:47:23 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -31,11 +31,11 @@ AAFFileDescriptor\
 #c
 AD_HEAD
 
-AD_IDL(//
-// The IAAFHTMLDescriptor specifies that the file source mob 
-// describes an HTML essence data object\, which contains text
-// formatted according to the HTML standard.
-//)
+AD_IDL(///
+/// The IAAFHTMLDescriptor specifies that the file source mob 
+/// describes an HTML essence data object\, which contains text
+/// formatted according to the HTML standard.
+///)
 
 AD_CLASS_UUID(e684d76f, b935, 11d2, bf, 9d, 00, 10, 4b, c9, 15, 6d)
 

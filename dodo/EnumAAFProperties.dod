@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: EnumAAFProperties.dod,v 1.11 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+#c $Id: EnumAAFProperties.dod,v 1.12 2005/02/10 17:47:27 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -30,9 +30,9 @@ AAFRoot\
 #endm
 #c
 AD_HEAD
-AD_IDL(//
-// This interface is used to enumerate over the AAFProperties
-// contained in a collection.
+AD_IDL(///
+/// This interface is used to enumerate over the AAFProperties
+/// contained in a collection.
 AD_STD_COMMENT_IFC_HEADER)
 AD_FORWARD_DECLARATION(AAFProperty)
 AD_CLASS_UUID(BE316DB1, 7E73, 11D2, 84, 1D, 00, 60, 08, 32, AC, B8)

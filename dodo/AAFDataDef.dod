@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef.dod,v 1.28 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
+#c $Id: AAFDataDef.dod,v 1.29 2005/02/10 17:47:21 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -31,9 +31,9 @@ AAFDefObject\
 #import ./AAFDataDef2.exp
 #import ./AAFDataDef3.exp
 AD_HEAD
-AD_IDL(//
-// IAAFDataDef is DEPRECATED\,  Please use IAAFDataDef2.
-//)
+AD_IDL(///
+/// IAAFDataDef is DEPRECATED\,  Please use IAAFDataDef2.
+///)
 
 AD_CLASS_UUID(dfbd652A, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
 
@@ -109,8 +109,8 @@ AD_XMETHOD2(DoesDataDefConvertTo,
 			pointer to result,
 
 		   Sets return value to TRUE if the DataDef of the given object
-   // can be converted to the DataDef specified in the IN 
-   // parameter with the DataDefName string.)
+  /// can be converted to the DataDef specified in the IN 
+  /// parameter with the DataDefName string.)
 		   
 
 AD_XMETHOD2(IsDataDefOf,
@@ -128,8 +128,8 @@ AD_XMETHOD2(IsDataDefOf,
 			pointer to result,
 
 		   Sets the value to TRUE if the DataDef of the given object
-  // matches the DataDef specified in the IN parameter with the
-  // DataDefName string.)
+  /// matches the DataDef specified in the IN parameter with the
+  /// DataDefName string.)
 
 
 AD_XMETHOD2(DoesDataDefConvertFrom,
@@ -147,8 +147,8 @@ AD_XMETHOD2(DoesDataDefConvertFrom,
 			pointer to result,
 
 		   Sets return value to TRUE if the DataDef of the given object
-  // can be converted from the DataDef specified in the IN 
-  // parameter specified with the DataDefName string.)
+  /// can be converted from the DataDef specified in the IN 
+  /// parameter specified with the DataDefName string.)
 
 #c
 #c DataDef2 methods

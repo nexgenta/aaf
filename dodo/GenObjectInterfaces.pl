@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GenObjectInterfaces.pl,v 1.4 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+# $Id: GenObjectInterfaces.pl,v 1.5 2005/02/10 17:47:27 heydowns Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -217,23 +217,24 @@ sub printSupportedInterfaces {
   if (($name ne 'AAFRoot' && $name ne 'AAFMetaDictionary') ) {
     $obj = $objects{$name};
     if (defined($obj) && ($obj->parent ne 'AAFRoot' || defined($obj->ex))) {
-      print "//\n";	
-      print "// Objects that implement I", $obj->name, " also implement the following interfaces:\n";
+      print "///\n";	
+      print "/// Objects that implement I", $obj->name, " also implement the following interfaces:\n";
       
       if (defined($obj->ex)) {
-        print "//  - ", $obj->ex, "\n";
+        print "///  - ", $obj->ex, "\n";
       }
       
       while ($obj->parent ne 'AAFRoot') {
         $obj = $objects{$obj->parent};
-        print "//  - I", $obj->name, "\n";
+        print "///  - I", $obj->name, "\n";
 
         if (defined($obj->ex)) {
-          print "//  - ", $obj->ex, "\n";
+          print "///  - ", $obj->ex, "\n";
         }
       }
       
-      print "\n";
+      # JD XXX
+      #print "\n";
     }
   }
 }
