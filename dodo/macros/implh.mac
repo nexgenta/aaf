@@ -174,7 +174,6 @@ public:
 struct I.this-module;
 class .this-module;
 
-#include "AAFTypes.h"
 
 class Impl.this-module
 {
@@ -597,7 +596,7 @@ public:
 
 #ccccccccccccccccccccccccccc
 #c
-#c Ends a class definition for AAFRoot
+#c Ends a class definition for AAFObject
 #c
 #c Arguments: none
 #c
@@ -613,7 +612,7 @@ public:
 
 private:
 
-  void * _pContainer;
+  void * _pParent;
 
 };
 
@@ -819,23 +818,6 @@ private:
         %06 %07,    //@parm %05 %08
         %10 %11,    //@parm %09 %12
         %14 %15);   //@parm %13 %16
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a static method used to bootstrap an AAF
-#c session by creating the first session object.
-#c
-#startm AD_BEGIN_SESSION 00
-#endm
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a static method used for a container to create
-#c its contained objects in the cpp API.
-#c
-#startm AD_STATIC_CREATE 00
 #endm
 
 
