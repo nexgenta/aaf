@@ -9,6 +9,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -19,6 +20,7 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/ 
 
@@ -33,7 +35,6 @@ class ImplAAFDataDef;
 #include "ImplAAFObject.h"
 #endif
 
-class ImplAAFTypeDef;
 
 class ImplAAFControlPoint : public ImplAAFObject
 {
@@ -65,6 +66,14 @@ public:
     GetEditHint
         // @parm [out,retval] Pointer to an aafEditHint_t
         (aafEditHint_t *  pEditHint);
+
+  //****************
+  // GetDataDefID()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDataDefID
+        // @parm [out,retval] Pointer to a Data Definition ID
+        (aafUID_t *  pDatadefID);
 
   //****************
   // GetValueBufLen()
@@ -117,6 +126,14 @@ public:
         (aafEditHint_t  editHint);
 
   //****************
+  // SetDataDefID()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetDataDefID
+        // @parm [in] Control Point data definition ID
+        (aafUID_t *pDatadefID);
+
+  //****************
   // SetValue()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -127,19 +144,16 @@ public:
          // @parm [in, size_is(valueSize)] buffer containing value
          aafDataBuffer_t  pValue);
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetTypeDefinition (
-      ImplAAFTypeDef*  pTypeDef);
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetTypeDefinition (
-      ImplAAFTypeDef **ppTypeDef);
 
-private:
-	OMFixedSizeProperty<aafUID_t>		_type;
-	OMFixedSizeProperty<aafRational_t>	_time;
-	OMVariableSizeProperty<aafUInt8>	_value;
-	OMFixedSizeProperty<aafUInt16>		_hint;
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFControlPoint)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFControlPointTest.cpp.
+  static AAFRESULT test();
 };
 
 #endif // ! __ImplAAFControlPoint_h__

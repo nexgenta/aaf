@@ -1,19 +1,37 @@
 //@doc
-//@class    AAFConstantValue | Implementation class for AAFConstantValue
-#ifndef __ImplAAFConstantValue_h__
-#define __ImplAAFConstantValue_h__
+//@class    AAFConstValue | Implementation class for AAFConstValue
+#ifndef __ImplAAFConstValue_h__
+#define __ImplAAFConstValue_h__
+
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
 
 /***********************************************\
-*                                               *
-* Advanced Authoring Format                     *
-*                                               *
+*												*
+* Advanced Authoring Format						*
+*												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-*                                               *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
 \***********************************************/
 
-
 class ImplAAFDataDef;
+
 class ImplAAFParameter;
+
+
+
+
+
 
 
 #ifndef __ImplAAFParameter_h__
@@ -21,17 +39,17 @@ class ImplAAFParameter;
 #endif
 
 
-class ImplAAFConstantValue : public ImplAAFParameter
+class ImplAAFConstValue : public ImplAAFParameter
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFConstantValue ();
+  ImplAAFConstValue ();
 
 protected:
-  virtual ~ImplAAFConstantValue ();
+  virtual ~ImplAAFConstValue ();
 
 public:
 
@@ -73,10 +91,17 @@ public:
          // @parm [in, size_is(valueSize)] buffer containing value
          aafDataBuffer_t  pValue);
 
-private:
-  OMVariableSizeProperty<aafUInt8>	_value;
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFConstValue)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFConstValueTest.cpp.
+  static AAFRESULT test();
 };
 
-#endif // ! __ImplAAFConstantValue_h__
+#endif // ! __ImplAAFConstValue_h__
 
 
