@@ -10,6 +10,7 @@
 #include "OMFile.h"
 #include "OMClassFactory.h"
 #include "ImplAAFIdentification.h"
+#include "ImplAAFContentStorage.h"
 
 #include "ImplAAFObjectCreation.h"
 
@@ -74,8 +75,13 @@ extern "C" const aafClassID_t CLSID_AAFComponent;
 extern "C" const aafClassID_t CLSID_AAFMob;
 extern "C" const aafClassID_t CLSID_AAFSegment;
 extern "C" const aafClassID_t CLSID_AAFMobSlot;
+extern "C" const aafClassID_t CLSID_AAFContentStorage;
 extern "C" const aafClassID_t CLSID_AAFSourceReference;
 extern "C" const aafClassID_t CLSID_AAFSourceClip;
+extern "C" const aafClassID_t CLSID_AAFEssenceDescriptor;
+extern "C" const aafClassID_t CLSID_AAFFileDescriptor;
+extern "C" const aafClassID_t CLSID_AAFSourceMob;
+extern "C" const aafClassID_t CLSID_AAFTimelineMobSlot;
 
 // Utility function for registering a given class id as legal in a
 // given file.This function hides the type "aafClassID_t" from the OM.
@@ -107,8 +113,13 @@ void OMContainer::OMLOpenContainer(OMLSession sessionData,
   registerClass(_file, CLSID_AAFMob);
   registerClass(_file, CLSID_AAFSegment);
   registerClass(_file, CLSID_AAFMobSlot);
+  registerClass(_file, CLSID_AAFContentStorage);
   registerClass(_file, CLSID_AAFSourceReference);
   registerClass(_file, CLSID_AAFSourceClip);
+  registerClass(_file, CLSID_AAFTimelineMobSlot);
+  registerClass(_file, CLSID_AAFEssenceDescriptor);
+  registerClass(_file, CLSID_AAFFileDescriptor);
+  registerClass(_file, CLSID_AAFSourceMob);
 
   OMStorable* head = OMStorable::restoreFrom(_file, "head", *(_file->root()));
   header = dynamic_cast<ImplAAFHeader *>(head);
