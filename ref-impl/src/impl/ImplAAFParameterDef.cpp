@@ -3,7 +3,6 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
@@ -17,7 +16,8 @@
 
 #include <assert.h>
 #include <string.h>
-
+#include "aafErr.h"
+#include "ImplAAFDictionary.h"
 
 ImplAAFParameterDef::ImplAAFParameterDef ()
 : _typeDef(			PID_ParameterDefinition_Type,					"Type"),
@@ -37,10 +37,29 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameterDef::GetTypeDef (
       ImplAAFTypeDef **ppTypeDef)
 {
+	aafUID_t			uid;
+	ImplAAFDictionary	*dict = NULL;
+
 	if(ppTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	XPROTECT()
+	{
+		uid = _typeDef;
+		CHECK(GetDictionary(&dict));
+		CHECK(dict->LookupType (&uid, ppTypeDef));
+		dict->ReleaseReference();
+		dict = NULL;
+	}
+	XEXCEPT
+	{
+		if(dict != NULL)
+		  dict->ReleaseReference();
+		dict = 0;
+	}
+	XEND;
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -48,10 +67,17 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameterDef::SetTypeDef (
       ImplAAFTypeDef * pTypeDef)
 {
+	aafUID_t	uid;
+	AAFRESULT	hr;
+
 	if(pTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	hr = pTypeDef->GetAUID(&uid);
+	if(hr == AAFRESULT_SUCCESS)
+		_typeDef = uid;
+
+	return hr;
 }
 
 
@@ -60,11 +86,14 @@ AAFRESULT STDMETHODCALLTYPE
       wchar_t *pDisplayUnits,
       aafInt32  bufSize)
 {
-	bool stat;
-
 	if(pDisplayUnits == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if(!_displayUnits.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+	bool stat;
+	
 	stat = _displayUnits.copyToBuffer(pDisplayUnits, bufSize);
 	if (! stat)
 	{
@@ -81,6 +110,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_displayUnits.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*pLen = _displayUnits.size();
 	return(AAFRESULT_SUCCESS); 
 }
