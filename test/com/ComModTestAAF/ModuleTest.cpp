@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTest.cpp,v 1.4 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: ModuleTest.cpp,v 1.4.2.1 2004/03/17 21:43:26 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -135,3 +135,55 @@ HRESULT GetAAFVersions(IAAFHeader * pHeader,
   
   return result;
 }
+
+
+
+bool operator ==( const aafRational_t& a, const aafRational_t& b )
+{
+    bool  are_equal = true;
+
+    if( a.numerator != b.numerator  ||  a.denominator != b.denominator )
+    {
+        are_equal = false;
+    }
+
+
+    return are_equal;
+}
+
+
+
+bool operator !=( const aafRational_t& a, const aafRational_t& b )
+{
+    return (! operator==( a, b ) );
+}
+
+
+
+bool operator ==( const aafTimeStamp_t& a, const aafTimeStamp_t& b )
+{
+    bool  are_equal = true;
+
+    if( a.date.year != b.date.year  ||
+        a.date.month != b.date.month  ||
+        a.date.day != b.date.day  ||
+        a.time.hour != b.time.hour  ||
+        a.time.minute != b.time.minute  ||
+        a.time.second != b.time.second  ||
+        a.time.fraction != b.time.fraction )
+    {
+        are_equal = false;
+    }
+
+
+    return are_equal;
+}
+
+
+
+bool operator !=( const aafTimeStamp_t& a, const aafTimeStamp_t& b )
+{
+    return (! operator==( a, b ) );
+}
+
+
