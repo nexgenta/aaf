@@ -26,7 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMReferenceProperty
 
 #include "OMRefProperty.h"
 
