@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -32,8 +32,7 @@
   // @mfunc Constructor.
   //   @parm The capacity of this <c OMStoredVectorIndex>.
 OMStoredVectorIndex::OMStoredVectorIndex(size_t capacity)
-: _firstFreeKey(0), _lastFreeKey(~(OMUInt32)0),
-  _capacity(capacity), _entries(0), _localKeys(0)
+: _highWaterMark(0), _capacity(capacity), _entries(0), _localKeys(0)
 {
   TRACE("OMStoredVectorIndex::OMStoredVectorIndex");
 
@@ -54,46 +53,25 @@ OMStoredVectorIndex::~OMStoredVectorIndex(void)
   _localKeys = 0;
 }
 
-  // @mfunc The first free key in the set of local keys assigned to
+  // @mfunc The high water mark in the set of local keys assigned to
   //        this <c OMStoredVectorIndex>.
   //   @rdesc The highest previously allocated local key.
   //   @this const
-OMUInt32 OMStoredVectorIndex::firstFreeKey(void) const
+OMUInt32 OMStoredVectorIndex::highWaterMark(void) const
 {
-  TRACE("OMStoredVectorIndex::firstFreeKey");
+  TRACE("OMStoredVectorIndex::highWaterMark");
 
-  return _firstFreeKey;
+  return _highWaterMark;
 }
 
-  // @mfunc Set the first free key in the set of local keys assigned to
+  // @mfunc Set the high water mark in the set of local keys assigned to
   //        this <c OMStoredVectorIndex>.
   //   @parm The highest allocated local key.
-void OMStoredVectorIndex::setFirstFreeKey(OMUInt32 firstFreeKey)
+void OMStoredVectorIndex::setHighWaterMark(OMUInt32 highWaterMark)
 {
-  TRACE("OMStoredVectorIndex::setFirstFreeKey");
+  TRACE("OMStoredVectorIndex::setHighWaterMark");
 
-  _firstFreeKey = firstFreeKey;
-}
-
-  // @mfunc The last free key in the set of local keys assigned to
-  //        this <c OMStoredVectorIndex>.
-  //   @rdesc The highest previously allocated local key.
-  //   @this const
-OMUInt32 OMStoredVectorIndex::lastFreeKey(void) const
-{
-  TRACE("OMStoredVectorIndex::lastFreeKey");
-
-  return _lastFreeKey;
-}
-
-  // @mfunc Set the last free key in the set of local keys assigned to
-  //        this <c OMStoredVectorIndex>.
-  //   @parm The highest allocated local key.
-void OMStoredVectorIndex::setLastFreeKey(OMUInt32 lastFreeKey)
-{
-  TRACE("OMStoredVectorIndex::setLastFreeKey");
-
-  _lastFreeKey = lastFreeKey;
+  _highWaterMark = highWaterMark;
 }
 
   // @mfunc Insert a new element in this <c OMStoredVectorIndex>

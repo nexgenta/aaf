@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -46,21 +46,13 @@ public:
     // @cmember Destructor.
   ~OMStoredVectorIndex(void);
 
-    // @cmember The first free key in the set of local keys assigned to
+    // @cmember The high water mark in the set of local keys assigned to
     //          this <c OMStoredVectorIndex>.
-  OMUInt32 firstFreeKey(void) const;
+  OMUInt32 highWaterMark(void) const;
 
-    // @cmember Set the first free key in the set of local keys assigned to
+    // @cmember Set the high water mark in the set of local keys assigned to
     //          this <c OMStoredVectorIndex>.
-  void setFirstFreeKey(OMUInt32 firstFreeKey);
-
-    // @cmember The last free key in the set of local keys assigned to
-    //          this <c OMStoredVectorIndex>.
-  OMUInt32 lastFreeKey(void) const;
-
-    // @cmember Set the last free key in the set of local keys assigned to
-    //          this <c OMStoredVectorIndex>.
-  void setLastFreeKey(OMUInt32 lastFreeKey);
+  void setHighWaterMark(OMUInt32 highWaterMark);
 
     // @cmember Insert a new element in this <c OMStoredVectorIndex>
     //          at position <p position> with local key <p localKey>.
@@ -85,8 +77,7 @@ public:
 
 private:
 
-  OMUInt32 _firstFreeKey;
-  OMUInt32 _lastFreeKey;
+  OMUInt32 _highWaterMark;
   size_t _capacity;
   size_t _entries;
   OMUInt32* _localKeys;
