@@ -57,7 +57,8 @@ OMFile::OMFile(const wchar_t* fileName,
                const OMLoadMode loadMode)
 : _root(0), _rootStoredObject(store),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
-  _loadMode(loadMode), _fileName(0)
+  _loadMode(loadMode), _fileName(0),
+  _clientOnSaveContext(0)
 {
   TRACE("OMFile::OMFile");
 
@@ -86,7 +87,8 @@ OMFile::OMFile(const wchar_t* fileName,
                OMStorable* root)
 : _root(root), _rootStoredObject(store),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
-  _loadMode(lazyLoad), _fileName(0), _signature(signature)
+  _loadMode(lazyLoad), _fileName(0), _signature(signature),
+  _clientOnSaveContext(0)
 {
   TRACE("OMFile::OMFile");
 
@@ -165,39 +167,6 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   return newFile;
 }
 
-  // @mfunc Open a new <c OMFile> for write-only access, the
-  //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
-  //        <p factory> to create the objects. The file must not already
-  //        exist. The byte ordering on the newly created file is given
-  //        by <p byteOrder>. The root <c OMStorable> in the newly
-  //        created file is given by <p root>.
-  //   @parm const wchar_t* | fileName | The name of the file to create.
-  //   @parm const OMClassFactory* | factory | The factory to use for creating
-  //         objects.
-  //   @parm const OMByteOrder | byteOrder | The byte order to use for the
-  //         newly created file.
-  //   @parm OMStorable* | signature | The root <c OMStorable> in the newly
-  //         created file.
-  //   @rdesc The newly created <c OMFile>.
-OMFile* OMFile::openNewWrite(const wchar_t* ANAME(fileName),
-                             const OMClassFactory* ANAME(factory),
-                             const OMByteOrder ANAME(byteOrder),
-                             OMStorable* ANAME(root),
-                             const OMFileSignature& ANAME(signature))
-{
-  TRACE("OMFile::openNewWrite");
-  PRECONDITION("Valid file name", validWideString(fileName));
-  PRECONDITION("Valid class factory", factory != 0);
-  PRECONDITION("Valid byte order",
-                    ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
-  PRECONDITION("Valid root", root != 0);
-  PRECONDITION("Valid signature", validSignature(signature));
-
-  // Not yet implemented.
-  //
-  return 0;
-}
-
   // @mfunc Open a new <c OMFile> for modify access, the
   //        <c OMFile> is named <p fileName>, use the <c OMClassFactory>
   //        <p factory> to create the objects. The file must not already
@@ -234,35 +203,6 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
   return newFile;
 }
 
-  // @mfunc Open a new transient <c OMFile> for modify access, the
-  //        <c OMFile> is not named, use the <c OMClassFactory>
-  //        <p factory> to create the objects.
-  //        The byte ordering on the newly created file is given
-  //        by <p byteOrder>. The root <c OMStorable> in the newly
-  //        created file is given by <p root>.
-  //   @parm const OMClassFactory* | factory | The factory to use for creating
-  //         objects.
-  //   @parm const OMByteOrder | byteOrder| The byte order to use for the
-  //         newly created file.
-  //   @parm OMStorable* | root | The root <c OMStorable> in the newly created
-  //         file.
-  //   @rdesc The newly created <c OMFile>.
-OMFile* OMFile::openNewTransient(const OMClassFactory* ANAME(factory),
-                                 const OMByteOrder ANAME(byteOrder),
-                                 OMStorable* ANAME(root))
-{
-  TRACE("OMFile::openNewTransient");
-  PRECONDITION("Valid class factory", factory != 0);
-  PRECONDITION("Valid byte order",
-                    ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
-  PRECONDITION("Valid root", root != 0);
-
-  // Not yet implemented.
-  //
-  ASSERT("Unimplemented code not reached", false);
-  return 0;
-}
-
    // @mfunc Is <p signature> a valid signature for an <c OMFile> ?
    //   @parm The signature to check.
    //   @rdesc True if <p signature> is a valid signature for an
@@ -284,13 +224,14 @@ bool OMFile::validSignature(const OMFileSignature& signature)
   //        <c OMFile>. It is not possible to <mf OMFile::save>
   //        read-only or transient files.
   //   @parm Client context for callbacks.
-void OMFile::save(void* clientContext)
+void OMFile::save(void* clientOnSaveContext)
 {
   TRACE("OMFile::save");
 
   if (_mode == modifyMode) {
-    _root->onSave(clientContext);
-    _root->save(clientContext);
+    _clientOnSaveContext = clientOnSaveContext;
+    _root->onSave(_clientOnSaveContext);
+    _root->save();
     _rootStoredObject->save(referencedProperties());
   }
 }
@@ -500,6 +441,11 @@ bool OMFile::persistent(void) const
   // Transient files NYI so by definition a file is persistent.
   //
   return true;
+}
+
+void* OMFile::clientOnSaveContext(void)
+{
+  return _clientOnSaveContext;
 }
 
   // @mfunc Write the signature to the given file.
