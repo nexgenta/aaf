@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.14 2004/09/22 17:48:17 stuart_hc Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.15 2004/09/22 18:05:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -519,7 +519,7 @@ int main(void)
 		printf("         Ex - FileOpenNewModifyEx\n");
 
 		// Run all tests twice: once with small filenames, once with large filenames
-		bool testLongNames = true;
+		bool testLongNames = false;
 		bool allTested = false;
 		while (! allTested)
 		{
