@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.cpp,v 1.17 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.cpp,v 1.18 2004/10/29 12:04:49 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,10 +34,6 @@
 #define LINKAGE __stdcall
 wchar_t* ssLibraryName = L"ole32.dll";
 wchar_t* coLibraryName = L"ole32.dll";
-#elif defined(OM_OS_MACOSX)
-#define LINKAGE
-wchar_t* ssLibraryName = L"Microsoft Structured Storage"; // tjb FIXME for OSX
-wchar_t* coLibraryName = L"Microsoft Component Library"; // tjb FIXME for OSX
 #elif defined(OM_OS_UNIX)
 #define LINKAGE
 wchar_t* ssLibraryName = L"librefstg.so";
