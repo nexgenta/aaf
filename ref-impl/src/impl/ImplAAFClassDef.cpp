@@ -46,6 +46,12 @@
 #include "ImplAAFDictionary.h"
 #endif
 
+
+#ifndef __AAFObjectModel_h__
+#include "AAFObjectModel.h"
+#endif
+
+
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
@@ -88,9 +94,9 @@ extern "C" const aafClassID_t CLSID_AAFObject;
 
 
 ImplAAFClassDef::ImplAAFClassDef ()
-  : _ParentClass  ( PID_ClassDefinition_ParentClass,  "ParentClass", "/Dictionary/ClassDefinitions", PID_MetaDefinition_Identification),
-	_Properties   ( PID_ClassDefinition_Properties,   "Properties", PID_MetaDefinition_Identification),
-	_IsConcrete   ( PID_ClassDefinition_IsConcrete,   "IsConcrete"),
+  : _ParentClass  ( PID_ClassDefinition_ParentClass,  L"ParentClass", L"/Dictionary/ClassDefinitions", PID_MetaDefinition_Identification),
+	_Properties   ( PID_ClassDefinition_Properties,   L"Properties", PID_MetaDefinition_Identification),
+	_IsConcrete   ( PID_ClassDefinition_IsConcrete,   L"IsConcrete"),
 	_propTypesLoaded (false),
 	_BootstrapParent(0)
 {
@@ -136,7 +142,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::pvtInitialize (
       const aafUID_t & classID,
-      const ImplAAFClassDef * pParentClass,
+      ImplAAFClassDef * pParentClass,
       const aafCharacter * pClassName,
 	  aafBool isConcrete)
 {
@@ -150,8 +156,9 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED (hr))
     return hr;
 	
-  _ParentClass = pParentClass;
-  _IsConcrete = isConcrete;
+  SetParent (pParentClass);
+  pvtSetIsConcrete (isConcrete);
+
   return AAFRESULT_SUCCESS;
 }
 
@@ -161,6 +168,10 @@ aafBool ImplAAFClassDef::pvtIsConcrete () const
   return _IsConcrete;
 }
 
+void ImplAAFClassDef::pvtSetIsConcrete (aafBoolean_t isConcrete)
+{
+  _IsConcrete = isConcrete;
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetPropertyDefs (
@@ -794,4 +805,26 @@ void ImplAAFClassDef::AssurePropertyTypesLoaded ()
 		  spDef = parentSP;
 		}
 	}
+}
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFClassDef::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFClassDef));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFClassDef::onSave(void* clientContext) const
+{
+  ImplAAFMetaDefinition::onSave(clientContext);
+}
+
+void ImplAAFClassDef::onRestore(void* clientContext) const
+{
+  ImplAAFMetaDefinition::onRestore(clientContext);
 }

@@ -36,8 +36,6 @@
  *************************************************************************/
 
 
-//#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
 
 #ifndef __ImplAAFMetaDefinition_h__
 #include "ImplAAFMetaDefinition.h"
@@ -48,14 +46,17 @@
 #include "ImplAAFDictionary.h"
 #endif
 
+//#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+
 #include <assert.h>
 #include <string.h>
 
 
 ImplAAFMetaDefinition::ImplAAFMetaDefinition ()
-: _name           (PID_MetaDefinition_Name,           "Name"),
-  _description    (PID_MetaDefinition_Description,    "Description"),
-  _identification (PID_MetaDefinition_Identification, "Identification")
+: _name           (PID_MetaDefinition_Name,           L"Name"),
+  _description    (PID_MetaDefinition_Description,    L"Description"),
+  _identification (PID_MetaDefinition_Identification, L"Identification")
 {
   _persistentProperties.put(_name.address());
   _persistentProperties.put(_description.address());
@@ -74,19 +75,27 @@ AAFRESULT STDMETHODCALLTYPE
 	  aafCharacter_constptr pName,
     aafCharacter_constptr pDescription)
 {
+  AAFRESULT result = AAFRESULT_SUCCESS;
 	//validate pName
-	if (pName == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
+  if (pName == NULL)
+  {
+    return AAFRESULT_NULL_PARAM;
+  }
 
-	_identification = id;
-	_name = pName;
+  result = SetIdentification (id);
+  if (AAFRESULT_SUCCEEDED(result))
+  {
+    result = SetName (pName);
+    if (AAFRESULT_SUCCEEDED(result))
+    {
+      if (pDescription)
+      {
+        result = SetDescription (pDescription);
+      }
+    }
+  }
 
-  if (pDescription)
-	  _description = pDescription;
-
-	return AAFRESULT_SUCCESS;
+  return result;
 }
 
 
@@ -228,4 +237,41 @@ const OMUniqueObjectIdentification&
   ImplAAFMetaDefinition::identification(void) const
 {
   return *reinterpret_cast<const OMUniqueObjectIdentification*>(&_identification.reference());
+}
+
+
+
+// Private method to install the AAFObjectModel definition associated with
+// this meta definition.
+AAFRESULT ImplAAFMetaDefinition::SetIdentification(aafUID_constref identification)
+{
+  _identification = identification;
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFMetaDefinition::classId(void) const
+{
+  // This method needs to be overridden for all subclasses.
+  // All meta definitions class id's are known statically.
+  // The corresponding class defintions cannot be extended
+  // at runtime.
+  static OMObjectIdentification null = {0};
+  return null;
+}
+
+// Override callbacks from OMStorable
+void ImplAAFMetaDefinition::onSave(void* clientContext) const
+{
+  // TEMPORARY: Parent class will not always be ImplAAFObject!
+  ImplAAFObject::onSave(clientContext);
+}
+
+void ImplAAFMetaDefinition::onRestore(void* clientContext) const
+{
+  // TEMPORARY: Parent class will not always be ImplAAFObject!
+  ImplAAFObject::onRestore(clientContext);
 }

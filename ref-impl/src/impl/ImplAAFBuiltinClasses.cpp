@@ -54,6 +54,13 @@
 #include <assert.h>
 
 
+// Enable/disable the use of the new AAFObjectModel initialized objects.
+#ifndef USE_AAFOBJECT_MODEL
+#define USE_AAFOBJECT_MODEL 0
+#endif
+
+
+
 /*static*/
 bool ImplAAFBuiltinClasses::sBuiltinsInited = ImplAAFBuiltinClasses::sInitBuiltins ();
 
@@ -523,6 +530,16 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 
 	  while (propInfo)
 		{
+#if !defined(NDEBUG) && USE_AAFOBJECT_MODEL
+
+    // Check that all of the current manual table entries are in the automatically generated
+    // set.
+    ImplAAFPropertyDef *pAxiomaticProperty = _dictionary->findAxiomaticPropertyDefinition(propInfo->id);
+    assert (pAxiomaticProperty);
+
+    ImplAAFTypeDef *pAxiomaticType = _dictionary->findAxiomaticTypeDefinition(*propInfo->pTypeGuid);
+    assert (pAxiomaticType);
+#endif
 		  ImplAAFObject * obj =
 			_dictionary->pvtInstantiate (AUID_AAFPropertyDef);
 		  assert (obj);
@@ -591,6 +608,12 @@ void ImplAAFBuiltinClasses::instantiateClasses ()
   // foreach axiomatic class id, instantiate a class def object.
   for (classIdx = 0; classIdx < ksNumAxClasses; classIdx++)
 	{
+#if !defined(NDEBUG) && USE_AAFOBJECT_MODEL
+    // Check that all of the current manual table entries are in the automatically generated
+    // set.
+    ImplAAFClassDef *pAxiomaticClass = _dictionary->findAxiomaticClassDefinition(*sAxClassIDs[classIdx]);
+    assert (pAxiomaticClass);
+#endif
 	  // instantiate the class def object
 	  ImplAAFObject * tmp = _dictionary->pvtInstantiate (AUID_AAFClassDef);
 	  assert (tmp);
@@ -770,7 +793,7 @@ void ImplAAFBuiltinClasses::RegisterBuiltinProperties
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeSimple
   (OMPropertyId /*pid*/,
-   const char * /*name*/)
+   const wchar_t * /*name*/)
 {
   // Let's return 0 so the caller will attempt to use the type def to
   // create the property.
@@ -786,7 +809,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeSimple
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeWeakReference
   (OMPropertyId pid,
-   const char * name)
+   const wchar_t * name)
 {
   assert (name);
   if(pid == PID_SourceReference_SourceID)
@@ -798,7 +821,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeWeakReference
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceSet
   (OMPropertyId pid,
-   const char * name)
+   const wchar_t * name)
 {
   assert (name);
   return new OMSimpleProperty (pid, name, sizeof (aafUID_t));
@@ -807,7 +830,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceSet
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceVector
   (OMPropertyId pid,
-   const char * name)
+   const wchar_t * name)
 {
   assert (name);
   return new OMSimpleProperty (pid, name, sizeof (aafUID_t));
@@ -816,7 +839,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeWeakReferenceVector
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeStrongReference
   (OMPropertyId pid,
-   const char * name)
+   const wchar_t * name)
 {
   assert (name);
   return new OMStrongReferenceProperty<ImplAAFObject> (pid, name);
@@ -825,7 +848,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeStrongReference
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeStrongReferenceSet
   (OMPropertyId pid,
-   const char * name)
+   const wchar_t * name)
 {
   assert (name);
   return new OMStrongReferenceVectorProperty<ImplAAFObject> (pid, name);
@@ -834,7 +857,7 @@ ImplAAFBuiltinClasses::CreateOMPropTypeStrongReferenceSet
 /*static*/ OMProperty *
 ImplAAFBuiltinClasses::CreateOMPropTypeStrongReferenceVector
   (OMPropertyId pid,
-   const char * name)
+   const wchar_t * name)
 {
   assert (name);
   return new OMStrongReferenceVectorProperty<ImplAAFObject> (pid, name);
