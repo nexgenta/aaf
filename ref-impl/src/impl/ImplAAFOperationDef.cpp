@@ -1,10 +1,29 @@
-/************************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-*												*
-\************************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAFStoredObjectIDs.h"
@@ -92,11 +111,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::SetDataDefinitionID (
-      aafUID_t  *pDataDefID)
+      const aafUID_t & dataDefID)
 {
-	if(pDataDefID == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	_dataDef = *pDataDefID;
+	_dataDef = dataDefID;
 	
 	return AAFRESULT_SUCCESS;
 }
@@ -127,7 +144,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::PrependDegradeToOperations (
+    ImplAAFOperationDef::PrependDegradeToOperation (
       ImplAAFOperationDef  *pOperationDef)
 {
 	aafUID_t	*tmp = NULL, newUID;
@@ -167,7 +184,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::AppendDegradeToOperations (
+    ImplAAFOperationDef::AppendDegradeToOperation (
       ImplAAFOperationDef  *pOperationDef)
 {
 	aafUID_t	*tmp, newUID;
@@ -202,6 +219,37 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::InsertDegradeToOperationAt (
+	  aafUInt32 index,
+      ImplAAFOperationDef  *pOperationDef)
+{
+  if (! pOperationDef) return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountDegradeToOperations (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::RemoveDegradeToOperationAt (
+	  aafUInt32 index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountDegradeToOperations (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::GetDegradeToOperations (
       ImplEnumAAFOperationDefs  **ppEnum)
 {
@@ -214,6 +262,15 @@ AAFRESULT STDMETHODCALLTYPE
 	(*ppEnum)->SetEnumProperty(this, &_degradeTo);
 
 	return(AAFRESULT_SUCCESS);
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::CountDegradeToOperations (
+	  aafUInt32 * pResult)
+{
+  if (! pResult) return AAFRESULT_NULL_PARAM;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -317,7 +374,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::AddParameterDefs (
+    ImplAAFOperationDef::AddParameterDef (
       ImplAAFParameterDef *pAAFParameterDef)
 {
 	aafUID_t					*tmp, newUID, oldUID;
@@ -335,7 +392,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		CHECK(pAAFParameterDef->GetAUID(&newUID));
-		CHECK(GetParameterDefinitions(&pEnum));
+		CHECK(GetParameterDefs(&pEnum));
 		pEnum->NextOne(&pParmDef);
 		while(pParmDef)
 		{
@@ -391,7 +448,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationDef::GetParameterDefinitions (
+    ImplAAFOperationDef::GetParameterDefs (
       ImplEnumAAFParameterDefs **ppEnum)
 {
 	if(ppEnum == NULL)
@@ -405,8 +462,23 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::CountParameterDefs (
+      aafUInt32 * pResult)
+{
+	if(pResult == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
+	return(AAFRESULT_NOT_IMPLEMENTED);
+}
 
-OMDEFINE_STORABLE(ImplAAFOperationDef, AUID_AAFOperationDef);
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::LookupParameterDef (
+	  const aafUID_t & /*parameterDefId*/,
+	  ImplAAFParameterDef ** ppParameterDef)
+{
+	if(ppParameterDef == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-
+	return(AAFRESULT_NOT_IMPLEMENTED);
+}

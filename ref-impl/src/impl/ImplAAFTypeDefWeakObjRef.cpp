@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -38,15 +38,14 @@
 #include "ImplAAFTypeDefWeakObjRef.h"
 #endif
 
+#ifndef __ImplAAFHeader_h_
+#include "ImplAAFHeader.h"
+#endif
+
 #ifndef __AAFTypeDefUIDs_h__
 #include "AAFTypeDefUIDs.h"
 #endif
 
-#ifndef __AAFClassDefUIDs_h__
-#include "AAFClassDefUIDs.h"
-#endif
-
-#include "ImplAAFDictionary.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
@@ -55,10 +54,7 @@
 
 
 ImplAAFTypeDefWeakObjRef::ImplAAFTypeDefWeakObjRef ()
-  : _referencedType ( PID_TypeDefinitionWeakObjectReference_ReferencedType, 
-                      L"ReferencedType", 
-                      L"/MetaDictionary/ClassDefinitions", 
-                      PID_MetaDefinition_Identification)
+  : _referencedType (PID_TypeDefinitionWeakObjectReference_ReferencedType, "ReferencedType")
 {
   _persistentProperties.put(_referencedType.address());
 }
@@ -68,42 +64,32 @@ ImplAAFTypeDefWeakObjRef::~ImplAAFTypeDefWeakObjRef ()
 {}
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefWeakObjRef::Initialize (
-      const aafUID_t & id,
-      ImplAAFClassDef * pObjType,
-      const aafCharacter * pTypeName,
-	  aafUID_t * pTargetHint,
-	  aafUInt32 targetHintCount)
-{
-  if (! pObjType)  return AAFRESULT_NULL_PARAM;
-  if (! pTypeName)  return AAFRESULT_NULL_PARAM;
-  if (! pTargetHint)  return AAFRESULT_NULL_PARAM;
-
-  return pvtInitialize (id, pObjType, pTypeName);
-}
-
-
-
+/*
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefWeakObjRef::pvtInitialize (
-      const aafUID_t & id,
-      const ImplAAFClassDef * pClassDef,
+    ImplAAFTypeDefWeakObjRef::Initialize (
+      const aafUID_t *  pID,
+      const aafUID_t * pRefdObjID,
       const aafCharacter * pTypeName)
 {
+  if (! pID)       return AAFRESULT_NULL_PARAM;
+  if (! pRefdObjID)  return AAFRESULT_NULL_PARAM;
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
 
-  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
-  if (AAFRESULT_FAILED (hr))
-    return hr;
+  hr = SetName (pTypeName);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _referencedType = pClassDef;
+  _referencedType = *pRefdObjID;
+
+  hr = SetAUID (pID);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
 }
+*/
+
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -131,14 +117,30 @@ ImplAAFTypeDefWeakObjRef::GetObject (ImplAAFPropertyValue * pPropVal,
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefWeakObjRef::GetObjectType (ImplAAFClassDef ** ppObjType)
 {
-  if (! ppObjType)
-	return AAFRESULT_NULL_PARAM;
+  if (! ppObjType) return AAFRESULT_NULL_PARAM;
 
-   if(_referencedType.isVoid())
-		return AAFRESULT_OBJECT_NOT_FOUND;
-  ImplAAFClassDef *pClassDef = _referencedType;
+  if (! _cachedObjType)
+	{
+	  ImplAAFHeaderSP pHead;
+	  ImplAAFDictionarySP pDict;
 
-  *ppObjType = pClassDef;
+	  AAFRESULT hr;
+	  hr = MyHeadObject(&pHead);
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (pHead);
+	  hr = (pHead->GetDictionary(&pDict));
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (pDict);
+
+	  hr = pDict->LookupClassDef (_referencedType, &_cachedObjType);
+	  if (AAFRESULT_FAILED(hr))
+		return hr;
+	  assert (_cachedObjType);
+	}
+  assert (ppObjType);
+  *ppObjType = _cachedObjType;
   assert (*ppObjType);
   (*ppObjType)->AcquireReference ();
   return AAFRESULT_SUCCESS;
@@ -184,28 +186,15 @@ ImplAAFTypeDefSP ImplAAFTypeDefWeakObjRef::BaseType () const
 
 aafBool ImplAAFTypeDefWeakObjRef::IsFixedSize (void) const
 {
-  return kAAFTrue;
+  return AAFTrue;
 }
 
 
 size_t ImplAAFTypeDefWeakObjRef::PropValSize (void) const
 {
-	ImplAAFClassDef	*pClassDef;
-	aafUID_t		tmpID;
-
   // Temp change: currently weak refs are represented as auids.
   // return BaseType()->PropValSize();
-	pClassDef = _referencedType;
-	pClassDef->GetAUID(&tmpID);
-
-	if(memcmp(&tmpID, &kAAFClassID_Mob, sizeof(aafUID_t)) == 0)
-	{
-		return sizeof (aafMobID_t);
-	}
-	else
-	{
-		return sizeof (aafUID_t);
-	}
+  return sizeof (aafUID_t);
 }
 
 
@@ -217,53 +206,19 @@ aafBool ImplAAFTypeDefWeakObjRef::IsRegistered (void) const
 
 size_t ImplAAFTypeDefWeakObjRef::NativeSize (void) const
 {
-	ImplAAFClassDef	*pClassDef;
-	aafUID_t		tmpID;
-
-	// Temp change: currently weak refs are represented as auids.
+  // Temp change: currently weak refs are represented as auids.
   // return sizeof (ImplAAFObject*);
-	pClassDef = _referencedType;
-	pClassDef->GetAUID(&tmpID);
-	if(memcmp(&tmpID, &kAAFClassID_Mob, sizeof(aafUID_t)) == 0)
-	{
-		return sizeof (aafMobID_t);
-	}
-	else
-	{
-		return sizeof (aafUID_t);
-	}
+  return sizeof (aafUID_t);
 }
 
 
-OMProperty * ImplAAFTypeDefWeakObjRef::pvtCreateOMProperty
+OMProperty * ImplAAFTypeDefWeakObjRef::pvtCreateOMPropertyMBS
   (OMPropertyId pid,
-   const wchar_t * name) const
+   const char * name) const
 {
   assert (name);
   size_t elemSize = PropValSize ();
   OMProperty * result = new OMSimpleProperty (pid, name, elemSize);
   assert (result);
   return result;
-}
-
-
-
-
-
-
-// override from OMStorable.
-const OMClassId& ImplAAFTypeDefWeakObjRef::classId(void) const
-{
-  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefWeakObjRef));
-}
-
-// Override callbacks from OMStorable
-void ImplAAFTypeDefWeakObjRef::onSave(void* clientContext) const
-{
-  ImplAAFTypeDefObjectRef::onSave(clientContext);
-}
-
-void ImplAAFTypeDefWeakObjRef::onRestore(void* clientContext) const
-{
-  ImplAAFTypeDefObjectRef::onRestore(clientContext);
 }

@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -99,7 +99,7 @@ public:
          const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         const aafCharacter *  pName,
+         wchar_t *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -120,7 +120,7 @@ public:
          const aafUID_t & id,
 
          // @parm [in, string] name of the new property
-         const aafCharacter *  pName,
+         wchar_t *  pName,
 
          // @parm [in] type of the new property
          ImplAAFTypeDef * pTypeDef,
@@ -148,15 +148,6 @@ public:
     GetParent
         // @parm [out, retval] parent class definition
         (ImplAAFClassDef ** ppClassDef);
-
-
-  //****************
-  // CreateInstance()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateInstance
-        // @parm [out, retval] newly created object
-        (ImplAAFObject ** ppobject);
 
 
 public:
@@ -189,7 +180,7 @@ public:
   AAFRESULT STDMETHODCALLTYPE
     pvtRegisterPropertyDef
         (const aafUID_t & id,
-         const aafCharacter *  pName,
+         wchar_t *  pName,
          const aafUID_t & typeId,
          aafBool  isOptional,
          ImplAAFPropertyDef ** ppPropDef);
@@ -223,8 +214,6 @@ public:
   // has been loaded into memory.
   void AssurePropertyTypesLoaded ();
 
-  void InitOMProperties (ImplAAFObject * pObj);
-
 private:
 
   //
@@ -236,7 +225,7 @@ private:
   class pvtPropertyIdentifier
   {
   public:
-	// Returns kAAFTrue if this property identifier matches the given
+	// Returns AAFTrue if this property identifier matches the given
 	// property definition.
 	virtual aafBool DoesMatch
     (const ImplAAFPropertyDef * pTestPropDef) const = 0;
