@@ -38,7 +38,6 @@
 #include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
-#include "AAFUtils.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -106,6 +105,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafLength_t					stillLength = 1, segLen = SUBSEG_LENGTH;
 	AAFRESULT					hr = AAFRESULT_SUCCESS;
 	aafUInt32					numChoices;
+	aafProductVersion_t			testRev;
 
 	aafProductVersion_t v;
 	v.major = 1;
@@ -186,38 +186,44 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSourceClip = NULL;
 		checkResult(essenceGroup->CountChoices(&numChoices));
 		checkExpression(1 == numChoices, AAFRESULT_TEST_FAILED);
-		// Add another source clip alternate
-		checkResult(defs.cdSourceClip()->
-					CreateInstance(IID_IAAFSourceClip, 
-								   (IUnknown **)&pSourceClip));
-		sourceRef.startTime=0;
-		checkResult(pSourceClip->Initialize(defs.ddSound(),segLen,sourceRef));
-		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
-		checkResult(essenceGroup->PrependChoice(pSegment)); 
-		pSegment->Release();
-		pSegment = NULL;
-		pSourceClip->Release();
-		pSourceClip = NULL;
-		checkResult(essenceGroup->CountChoices(&numChoices));
-		checkExpression(2 == numChoices, AAFRESULT_TEST_FAILED);
-		// Insert a third choice in the middle
-		checkResult(defs.cdSourceClip()->
-					CreateInstance(IID_IAAFSourceClip, 
-								   (IUnknown **)&pSourceClip));
-		sourceRef.startTime=1;
-		checkResult(pSourceClip->Initialize(defs.ddSound(),segLen,sourceRef));
-		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
-		checkResult(essenceGroup->InsertChoiceAt(1,pSegment)); 
-		pSegment->Release();
-		pSegment = NULL;
-		pSourceClip->Release();
-		pSourceClip = NULL;
-		checkResult(essenceGroup->CountChoices(&numChoices));
-		checkExpression(3 == numChoices, AAFRESULT_TEST_FAILED);
-		// Remove the third alternate, check for count of 2
-		checkResult(essenceGroup->RemoveChoiceAt(2));
-		checkResult(essenceGroup->CountChoices(&numChoices));
-		checkExpression(2 == numChoices, AAFRESULT_TEST_FAILED);
+
+		checkResult(GetAAFVersions(pHeader, &testRev, NULL));
+
+		if(DR4TestSupported(testRev))
+		{
+			// Add another source clip alternate
+			checkResult(defs.cdSourceClip()->
+				CreateInstance(IID_IAAFSourceClip, 
+				(IUnknown **)&pSourceClip));
+			sourceRef.startTime=0;
+			checkResult(pSourceClip->Initialize(defs.ddSound(),segLen,sourceRef));
+			checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
+			checkResult(essenceGroup->PrependChoice(pSegment)); 
+			pSegment->Release();
+			pSegment = NULL;
+			pSourceClip->Release();
+			pSourceClip = NULL;
+			checkResult(essenceGroup->CountChoices(&numChoices));
+			checkExpression(2 == numChoices, AAFRESULT_TEST_FAILED);
+			// Insert a third choice in the middle
+			checkResult(defs.cdSourceClip()->
+				CreateInstance(IID_IAAFSourceClip, 
+				(IUnknown **)&pSourceClip));
+			sourceRef.startTime=1;
+			checkResult(pSourceClip->Initialize(defs.ddSound(),segLen,sourceRef));
+			checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
+			checkResult(essenceGroup->InsertChoiceAt(1,pSegment)); 
+			pSegment->Release();
+			pSegment = NULL;
+			pSourceClip->Release();
+			pSourceClip = NULL;
+			checkResult(essenceGroup->CountChoices(&numChoices));
+			checkExpression(3 == numChoices, AAFRESULT_TEST_FAILED);
+			// Remove the third alternate, check for count of 2
+			checkResult(essenceGroup->RemoveChoiceAt(2));
+			checkResult(essenceGroup->CountChoices(&numChoices));
+			checkExpression(2 == numChoices, AAFRESULT_TEST_FAILED);
+		}
 
 		checkResult(essenceGroup->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
 		aafRational_t editRate = { 0, 1};
@@ -327,6 +333,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafSearchCrit_t				criteria;
 	aafNumSlots_t				numMobs, numSlots;
 	aafUInt32					readNumChoices;
+	aafInt32					expectedChoices;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 
@@ -338,6 +345,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
  
     // We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
+
+		aafProductVersion_t testRev, testFileRev;
+		checkResult(GetAAFVersions(pHeader, &testRev, &testFileRev));
 
 		// Get the number of mobs in the file (should be two)
 		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
@@ -371,9 +381,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 				pComponent = NULL;
 				/***/
 				checkResult(pEssenceGroup->CountChoices(&readNumChoices));
-				checkExpression(2 == readNumChoices, AAFRESULT_TEST_FAILED);
+
+				if ( DR4TestSupported(testRev) && DR4TestSupported(testFileRev) )
+					expectedChoices = 2;
+				else
+					expectedChoices = 1;
+				checkExpression(expectedChoices == (aafInt32)readNumChoices, AAFRESULT_TEST_FAILED);
+
 				/***/
-				for(int n=0;n<2;n++)
+				for(int n=0;n<(aafInt32)readNumChoices;n++)
 				{
 					checkResult(pEssenceGroup->GetChoiceAt (n, &pSegment));
 					checkResult(pSegment->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
@@ -383,7 +399,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 						(void**)&pSourceClip));
 					aafSourceRef_t sourceRef;
 					checkResult(pSourceClip->GetSourceReference(&sourceRef));
-					checkExpression(sourceRef.startTime==n);
+					if(expectedChoices != 1)
+					{
+						checkExpression(sourceRef.startTime==n);
+					}
 					pSegment->Release();
 					pSegment = NULL;
 					pComponent->Release();
