@@ -1,8 +1,8 @@
-#################################################
-#                                               #
-# Copyright (c) 1998-1999 Avid Technology, Inc. #
-#                                               #
-#################################################
+############################################
+#                                          #
+# Copyright (c) 1998 Avid Technology, Inc. #
+#                                          #
+############################################
 
 all : targets.mk
 
@@ -17,14 +17,17 @@ include aafobjects.mk
 
 
 targets.mk : aafobjects.mk
-	@ $(ECHO) Creating targets.mk ...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenTargets.sh >> tmp.sh
-	sh tmp.sh > targets.tmp
-	@ $(MV) targets.tmp targets.mk
-	@ $(ECHO) "Done with targets.mk."
+	@echo Creating targets.mk ...
+	@rm -f targets.mk
+	@echo # This file automatically generated make. > targets.mk
+	@echo # Special case AAFTypes since no object is to be built only headers... > depend.mk
+	@echo # special case the utility classes since they will not be exposed by com > depend.mk
+	@echo DODO_TARGETS = AAFTypes.all \>> targets.mk
+	$(SH_PREFIX) for base in $(DODO_TARGET_NAMES) ;  do \
+		echo \\t$$base.all \\>> targets.mk ; \
+	done $(SH_SUFFIX)
+	@echo "Done with targets.mk."
 
 
 clean :
-	$(RM) -rf targets.mk
+	$(SH_PREFIX) $(RM) -rf targets.mk $(SH_SUFFIX)
