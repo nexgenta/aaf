@@ -31,7 +31,12 @@
 #define OMFEXCEPT_H_DEFINED (1)
 
 #include "ExceptionBase.h"
-#include "omErr.h"
+namespace OMF2
+{
+	#include "omErr.h"
+}
+using	OMF2::omfErr_t;
+using	OMF2::OM_ERR_NONE;
 
 /*******************************************************************
 Name: 
@@ -91,7 +96,7 @@ private:
 	OMFCheck & operator= (OMFCheck &status ); // N/A
 	OMFCheck(OMFCheck &status);// N/A
 public:
-	OMFCheck & operator= ( omfErr_t status );
+	operator= ( omfErr_t status );
 	OMFCheck( omfErr_t status = OM_ERR_NONE );
 };
 
@@ -105,10 +110,9 @@ inline OMFCheck::OMFCheck( OMFCheck &status )
 {
 }
 
-inline OMFCheck & OMFCheck::operator= ( omfErr_t status )
+inline OMFCheck::operator= ( omfErr_t status )
 { 
 	OMFException::Check( status ); 
-	return *this;
 }
 	
 inline OMFCheck::OMFCheck( omfErr_t status )
@@ -117,4 +121,3 @@ inline OMFCheck::OMFCheck( omfErr_t status )
 }
 
 #endif // EXCEPTION_H_DEFINED 
-
