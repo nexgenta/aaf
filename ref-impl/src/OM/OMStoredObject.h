@@ -1,229 +1,226 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
-// @doc OMINTERNAL
+// @doc OMEXTERNAL
 #ifndef OMSTOREDOBJECT_H
 #define OMSTOREDOBJECT_H
 
+#include "OMPortability.h"
 #include "OMDataTypes.h"
 #include "OMFile.h"
 
-class OMSimpleProperty;
-class OMDataStream;
-class OMStrongReference;
-class OMStrongReferenceSet;
-class OMStrongReferenceVector;
-class OMWeakReference;
-class OMWeakReferenceSet;
-class OMWeakReferenceVector;
-class OMStoredStream;
+#include <stddef.h>
 
-  // @class Abstract base class fo the in-memory representation
-  //        of a persistent object.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+struct IStorage;
+struct IStream;
+
+class OMStoredPropertySetIndex;
+class OMProperty;
+class OMPropertySet;
+class OMStoredVectorIndex;
+
+  // @class In-memory representation of a persistent object.
 class OMStoredObject {
 public:
+  // @access Static members.
+
+    // @cmember Open the root <c OMStoredObject> in the disk file
+    //          <p fileName> for reading only.
+  static OMStoredObject* openRead(const wchar_t* fileName);
+
+    // @cmember Open the root <c OMStoredObject> in the disk file
+    //          <p fileName> for modification.
+  static OMStoredObject* openModify(const wchar_t* fileName);
+
+    // @cmember Create a new root <c OMStoredObject> in the disk file
+    //          <p fileName>. The byte order of the newly created root
+    //          is given by <p byteOrder>.
+  static OMStoredObject* createModify(const wchar_t* fileName,
+                                      const OMByteOrder byteOrder);
+
   // @access Public members.
 
+    // @cmember Constructor.
+  OMStoredObject(IStorage* s);
+
     // @cmember Destructor.
-  virtual ~OMStoredObject(void);
+  ~OMStoredObject(void);
 
     // @cmember Create a new <c OMStoredObject>, named <p name>,
     //          contained by this <c OMStoredObject>.
-    //   @devnote The name argument to this member function doesn't
-    //            make sense for all derived instances of <c OMStoredObject>.
-  virtual OMStoredObject* create(const wchar_t* name) = 0;
+  OMStoredObject* create(const char* name);
 
     // @cmember Open an exsiting <c OMStoredObject>, named <p name>,
     //          contained by this <c OMStoredObject>.
-    //   @devnote The name argument to this member function doesn't
-    //            make sense for all derived instances of <c OMStoredObject>.
-  virtual OMStoredObject* open(const wchar_t* name) = 0;
+  OMStoredObject* open(const char* name);
+
+  OMStoredObject* openStoragePath(const char* storagePathName);
 
     // @cmember Close this <c OMStoredObject>.
-  virtual void close(void) = 0;
+  void close(void);
 
-  virtual void close(OMFile& file) = 0;
+    // @cmember Save the <c OMClassId> <p cid> in this <c OMStoredObject>.
+  void save(const OMClassId& cid);
 
-    // @cmember The byte order of this <c OMStoredObject>.
-    //   @devnote This member function doesn't make sense for all
-    //            derived instances of <c OMStoredObject>.
-  virtual OMByteOrder byteOrder(void) const = 0;
+    // @cmember Restore the class id of this <c OMStoredObject>.
+  void restore(OMClassId& cid);
 
-  // Saving and restoring properties
-
-  virtual void save(OMFile& file) = 0;
-
-  virtual void save(OMStorable& object) = 0;
-
-    // @cmember Save the <c OMStoredObjectIdentification> <p id>
-    //          in this <c OMStoredObject>.
-  virtual void save(const OMStoredObjectIdentification& id) = 0;
-
-    // @cmember Save the <c OMPropertySet> <p properties> in this
+    // @cmember Save the <c OMPropertSet> <p p properties> in this
     //          <c OMStoredObject>.
-  virtual void save(const OMPropertySet& properties) = 0;
-
-    // @cmember Save the <c OMSimpleProperty> <p property> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMSimpleProperty& property) = 0;
-
-    // @cmember Save the <c OMStrongReference> <p singleton> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMStrongReference& singleton) = 0;
-
-    // @cmember Save the <c OMStrongReferenceVector> <p vector> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMStrongReferenceVector& vector) = 0;
-
-    // @cmember Save the <c OMStrongReferenceSet> <p set> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMStrongReferenceSet& set) = 0;
-
-    // @cmember Save the <c OMWeakReference> <p singleton> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMWeakReference& singleton) = 0;
-
-    // @cmember Save the <c OMWeakReferenceVector> <p vector> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMWeakReferenceVector& vector) = 0;
-
-    // @cmember Save the <c OMWeakReferenceSet> <p set> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMWeakReferenceSet& set) = 0;
-
-    // @cmember Save the <c OMPropertyTable> <p table> in this
-    //          <c OMStoredObject>.
-    //   @devnote Does this member function make sense for all
-    //            derived instances of <c OMStoredObject> ?
-  virtual void save(const OMPropertyTable* table) = 0;
-
-    // @cmember Save the <c OMDataStream> <p stream> in this
-    //          <c OMStoredObject>.
-  virtual void save(const OMDataStream& stream) = 0;
-
-    // @cmember Restore the <c OMStoredObjectIdentification>
-    //          of this <c OMStoredObject> into <p id>.
-  virtual void restore(OMStoredObjectIdentification& id) = 0;
+  void save(const OMPropertySet& properties);
 
     // @cmember Restore the <c OMPropertySet> <p properties> into
     //          this <c OMStoredObject>.
-  virtual void restore(OMPropertySet& properties) = 0;
+  void restore(OMPropertySet& properties);
 
-    // @cmember Restore the <c OMSimpleProperty> <p property> into this
+    // @cmember Check that the <c OMPropertySet> <p propertySet> is
+    //          consistent with the <c OMStoredPropertySetIndex>
+    //          propertySetIndex.
+    //   @this const
+  void validate(const OMPropertySet* propertySet,
+                const OMStoredPropertySetIndex* propertySetIndex) const;
+
+    // @cmember Save the <c OMStoredVectorIndex> <p vector> in this
+    //          <c OMStoredObject>, the vector is named <p vectorName>.
+  void save(const OMStoredVectorIndex* vector, const char* vectorName);
+
+    // @cmember Restore the vector named <p vectorName> into this
     //          <c OMStoredObject>.
-    //   @devnote The externalSize argument to this member function doesn't
-    //            make sense for all derived instances of <c OMStoredObject>.
-  virtual void restore(OMSimpleProperty& property,
-                       size_t externalSize) = 0;
+  void restore(OMStoredVectorIndex*& vector, const char* vectorName);
 
-    // @cmember Restore the <c OMStrongReference> <p singleton> into this
-    //          <c OMStoredObject>.
-  virtual void restore(OMStrongReference& singleton,
-                       size_t externalSize) = 0;
+    // @cmember Write a property value to this <c OMStoredObject>. The
+    //          property value to be written occupies <p size> bytes at
+    //          the address <p start>. The property id is <p propertyId>.
+    //          The property type is <p type>.
+  void write(OMPropertyId propertyId, int type, void* start, size_t size);
 
-    // @cmember Restore the <c OMStrongReferenceVector> <p vector> into this
-    //          <c OMStoredObject>.
-  virtual void restore(OMStrongReferenceVector& vector,
-                       size_t externalSize) = 0;
+    // @cmember Read a property value from this <c OMStoredObject>.
+    //          The property value is read into a buffer which occupies
+    //          <p size> bytes at the address <p start>. The property id
+    //          is <p propertyId>. The property type is <p type>.
+  void read(OMPropertyId propertyId, int type, void* start, size_t size);
 
-    // @cmember Restore the <c OMStrongReferenceSet> <p set> into this
-    //          <c OMStoredObject>.
-  virtual void restore(OMStrongReferenceSet& set,
-                       size_t externalSize) = 0;
+    // @cmember Open a stream called <p streamName> contained within
+    //          this <c OMStoredObject>.
+  IStream* openStream(const char* streamName);
 
-    // @cmember Restore the <c OMWeakReference> <p singleton> into this
-    //          <c OMStoredObject>.
-  virtual void restore(OMWeakReference& singleton,
-                       size_t externalSize) = 0;
+    // @cmember Create a stream called <p streamName> contained within
+    //          this <c OMStoredObject>.
+  IStream* createStream(const char* streamName);
 
-    // @cmember Restore the <c OMWeakReferenceVector> <p vector> into this
-    //          <c OMStoredObject>.
-  virtual void restore(OMWeakReferenceVector& vector,
-                       size_t externalSize) = 0;
+    // @cmember Read <p size> bytes from <p stream> into the buffer at
+    //          address <p data>.
+  void readFromStream(IStream* stream, void* data, size_t size);
 
-    // @cmember Restore the <c OMWeakReferenceSet> <p set> into this
-    //          <c OMStoredObject>.
-  virtual void restore(OMWeakReferenceSet& set,
-                       size_t externalSize) = 0;
+    // @cmember Attempt to read <p bytes> bytes from <p stream> into
+    //          the buffer at address <p data>. The actual number of
+    //          bytes read is returned in <p bytesRead>.
+  void readFromStream(IStream* stream,
+                      OMByte* data,
+                      const OMUInt32 bytes,
+                      OMUInt32& bytesRead);
 
-    // @cmember Restore the <c OMPropertyTable> in this <c OMStoredObject>.
-    //   @devnote Does this member function make sense for all
-    //            derived instances of <c OMStoredObject> ?
-  virtual void restore(OMPropertyTable*& table) = 0;
+    // @cmember Write <p size> bytes from the buffer at address
+    //          <p data> to <p stream>.
+  void writeToStream(IStream* stream, void* data, size_t size);
 
-    // @cmember Restore the <c OMDataStream> <p stream> into this
-    //          <c OMStoredObject>.
-  virtual void restore(OMDataStream& stream,
-                       size_t externalSize) = 0;
+    // @cmember Attempt to write <p bytes> bytes from the buffer at
+    //          address <p data> to <p stream>. The actual number of
+    //          bytes written is returned in <p bytesWritten>.
+  void writeToStream(IStream* stream,
+                     const OMByte* data,
+                     const OMUInt32 bytes,
+                     OMUInt32& bytesWritten);
 
-  // Stream manipulation
+    // @cmember Read a UInt32 from <p stream> into <p i>. If
+    //          <p reorderBytes> is true then the bytes are reordered.
+  void readUInt32FromStream(IStream* stream, OMUInt32& i, bool reorderBytes);
 
-    // @cmember Open the <c OMStoredStream> representing the property
-    //          <p stream> contained within this <c OMStoredObject>.
-  virtual OMStoredStream* openStoredStream(const OMDataStream& property) = 0;
+    // @cmember Reorder the UInt32 <p i>.
+  void reorderOMUInt32(OMUInt32& i);
 
-    // @cmember Create an <c OMStoredStream> representing the property
-    //          <p stream> contained within this <c OMStoredObject>.
-  virtual OMStoredStream* createStoredStream(const OMDataStream& property) = 0;
+    // @cmember Size of <p stream> in bytes.
+  OMUInt64 streamSize(IStream* stream) const;
 
-  // Name manipulation.
+    // @cmember Set the size, in bytes, of <p stream>
+  void streamSetSize(IStream* stream, const OMUInt64 newSize);
 
-    // @cmember Compute the name for a stream.
-    //   @devnote This member function doesn't make sense for all
-    //            derived instances of <c OMStoredObject>.
-  static wchar_t* streamName(const wchar_t* propertyName,
-                             OMPropertyId pid);
+    // @cmember The current position for <f readFromStream()> and
+    //          <f writeToStream()>, as an offset in bytes from the
+    //          begining of the data stream.
+    // @this const
+  OMUInt64 streamPosition(IStream* stream) const;
 
-    // @cmember Compute the name for an object reference.
-    //   @devnote This member function doesn't make sense for all
-    //            derived instances of <c OMStoredObject>.
-  static wchar_t* referenceName(const wchar_t* propertyName,
-                                OMPropertyId pid);
+    // @cmember Set the current position for <f readFromStream()> and
+    //          <f writeToStream()>, as an offset in bytes from the
+    //          begining of the data stream.
+  void streamSetPosition(IStream* stream, const OMUInt64 offset);
 
-    // @cmember Compute the name for a collection.
-    //   @devnote This member function doesn't make sense for all
-    //            derived instances of <c OMStoredObject>.
-  static wchar_t* collectionName(const wchar_t* propertyName,
-                                 OMPropertyId pid);
+    // @cmember Close <p stream>.
+  void closeStream(IStream*& stream);
 
-    // @cmember Compute the name for an object reference
-    //          that is an element of a collection.
-    //   @devnote This member function doesn't make sense for all
-    //            derived instances of <c OMStoredObject>.
-  static wchar_t* elementName(const wchar_t* propertyName,
-                              OMPropertyId pid,
-                              OMUInt32 localKey);
+  OMByteOrder byteOrder(void) const;
 
-protected:
-  // @access Protected members.
+private:
 
-  static void mapCharacters(wchar_t* name, size_t nameLength);
+  static OMStoredObject* open(const wchar_t* fileName,
+                              const OMFile::OMAccessMode mode);
+  static OMStoredObject* create(const wchar_t* fileName);
 
-  static void mangleName(const wchar_t* clearName,
-                         OMPropertyId pid,
-                         wchar_t* mangledName,
-                         size_t mangledNameSize);
+  void create(const OMByteOrder byteOrder);
+  void open(const OMFile::OMAccessMode mode);
 
+  void save(OMStoredPropertySetIndex *index);
+  OMStoredPropertySetIndex* restore(void);
+  
+  char* vectorIndexStreamName(const char* vectorName);
+
+  IStream* createStream(IStorage* storage, const char* streamName);
+  IStream* openStream(IStorage* storage, const char* streamName);
+
+  IStorage* createStorage(IStorage* storage, const char* storageName);
+  IStorage* openStorage(IStorage* storage,
+                        const char* storageName,
+                        const OMFile::OMAccessMode mode);
+  void closeStorage(IStorage*& storage);
+
+  void setClass(IStorage* storage, const OMClassId& cid);
+  void getClass(IStorage* storage, OMClassId& cid);
+
+  IStorage* _storage;
+  OMStoredPropertySetIndex* _index;
+  IStream* _indexStream;
+  IStream* _propertiesStream;
+  size_t _offset;
+
+  bool _open;
+  OMFile::OMAccessMode _mode;
+  OMByteOrder _byteOrder;
+  bool _reorderBytes;
 };
 
 #endif
