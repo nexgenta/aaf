@@ -8,8 +8,8 @@
 *  Copyright (C) 2002 - 2003 Schema Software, Inc. All rights reserved.
 *  Portions Copyright (C) 2003 Metaglue Corparation. All rights reserved.
 *
-*  $Revision: 1.1 $
-*  $Date: 2004/03/05 16:11:30 $
+*  $Revision: 1.2 $
+*  $Date: 2004/04/08 14:22:02 $
 *  
 \******************************************************************************/
 #include "OMRawStorage.h"
@@ -35,6 +35,18 @@ extern void _AssertProc(char* cond, char* file, SINT4 line);
 #else /* DEBUG */
 #define ASSERT(x)
 #endif /* DEBUG */
+
+#ifdef OM_DEBUG
+//we must use Schemasofts debug malloc routines under debug or
+// the heap corruption tests will fail
+#define ss_malloc dbgMalloc
+
+void * dbgMalloc(size_t cb);
+
+
+#else   /* OM_DEBUG */
+#define ss_malloc  malloc
+#endif   /* OM_DEBUG */
 
 extern "C" {
 
@@ -136,7 +148,7 @@ SSRWIS* SsrwConnectToOMRaw(const OMRawStorage* in_pRaw)
 
     SSRWIS*     pIS = NULL;
 
-    pIS = (struct _SsrwInputSource *) malloc(sizeof(SSRWIS));
+    pIS = (struct _SsrwInputSource *) ss_malloc(sizeof(SSRWIS));
     if (pIS != NULL)
     {
         memset( pIS, 0, sizeof(SSRWIS));
