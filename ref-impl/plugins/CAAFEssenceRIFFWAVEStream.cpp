@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceRIFFWAVEStream.cpp,v 1.1 2004/11/04 15:49:26 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceRIFFWAVEStream.cpp,v 1.2 2004/11/04 17:29:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,7 +65,7 @@ typedef long _off_t;
 #define _OFF_T_DEFINED
 
 #define fseeko(fp, off, whence) fsetpos(fp, &off)
-off_t ftello (FILE* fp)
+static off_t ftello (FILE* fp)
 {
 off_t position;
 
