@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MultiGenCommon.cpp,v 1.3 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+// $Id: MultiGenCommon.cpp,v 1.4 2005/02/07 18:52:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -153,9 +153,7 @@ bool get_mob_by_name( IAAFSmartPointer<IAAFHeader> header,
     masmobret = masmob;
     return true;
   }
-  else {
-    return false;
-  }
+  return false;
 }
 
 //=---------------------------------------------------------------------=
@@ -167,9 +165,7 @@ bool get_mob_by_name( IAAFSmartPointer<IAAFHeader> header,
   if ( get_mob_by_name( header, name, 0, mob ) ) {
     return true;
   }
-  else {
-    return false;
-  }
+  return false;
 }
 
 //=---------------------------------------------------------------------=

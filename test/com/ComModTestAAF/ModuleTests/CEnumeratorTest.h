@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumeratorTest.h,v 1.10 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
+// $Id: CEnumeratorTest.h,v 1.11 2005/02/07 18:52:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -117,7 +117,7 @@ void CEnumeratorTest<TEnum,TItem>::Run(testMode_t mode)
 	checkResult(pHeader->GetDictionary(&pDictionary));
 
 	// Get total number of items we should be able to enumerate
-	aafUInt32 iItemsCount=-1;
+	aafUInt32 iItemsCount = (aafUInt32)-1;
 	checkResult(CountItems(pDictionary,&iItemsCount));
 	
 	// Allocate array of AUIDs in which to store AUIDs of enumerated items
