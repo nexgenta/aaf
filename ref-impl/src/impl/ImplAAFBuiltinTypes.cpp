@@ -74,6 +74,9 @@
 #include "AAFStoredObjectIDs.h"
 #endif
 
+#include "ImplAAFBuiltinDefs.h"
+
+
 // Some types which haven't been synchronized yet
 #define aafAUID_t          aafUID_t
 #define aafRectangle_t     aafRect_t
@@ -113,12 +116,12 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefinteger object (as yet uninitialized)
 		  ImplAAFTypeDefInt * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefInt,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefInt()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
-		  AAFRESULT hr = ptd->Initialize (&curInteger->typeID,
+		  AAFRESULT hr = ptd->Initialize (curInteger->typeID,
 										  curInteger->size,
 										  curInteger->isSigned,
 										  curInteger->typeName);
@@ -194,8 +197,8 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 
 		  // Create an impl enumeration object (as yet uninitialized)
 		  ImplAAFTypeDefEnum * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefEnum,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefEnum()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
@@ -210,7 +213,7 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 	  
 		  ImplAAFTypeDefSP pElemType;
 		  // Look up the type of this enumeration
-		  hr = pDict->LookupType((*curEnumeration)->elementType, &pElemType);
+		  hr = pDict->LookupTypeDef(*(*curEnumeration)->pElementTypeId, &pElemType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pElemType);
 
@@ -232,7 +235,7 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 			}
 
 		  // use those arrays to initialize the type def
-		  hr = ptd->Initialize (&(*curEnumeration)->typeID,
+		  hr = ptd->Initialize ((*curEnumeration)->typeID,
 								pElemType,
 								memberValues,
 								memberNames,
@@ -317,8 +320,8 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 
 		  // Create an impl record object (as yet uninitialized)
 		  ImplAAFTypeDefRecord * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefRecord,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefRecord()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
@@ -349,7 +352,7 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 		  for (i = 0; i < numMembers; i++)
 			{
 			  memberTypes[i] = 0;
-			  hr = pDict->LookupType((*curRecord)->members[i]->memberType,
+			  hr = pDict->LookupTypeDef(*(*curRecord)->members[i]->pMemberTypeId,
 									 &memberTypes[i]);
 			  assert (AAFRESULT_SUCCEEDED (hr));
 			  assert (memberTypes[i]);
@@ -361,7 +364,7 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 			}
 
 		  // use those arrays to initialize the type def
-		  hr = ptd->Initialize (&(*curRecord)->typeID,
+		  hr = ptd->Initialize ((*curRecord)->typeID,
 								memberTypes,
 								memberNames,
 								numMembers,
@@ -416,17 +419,17 @@ static AAFRESULT CreateNewVaryingArrayType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvaryingArray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefVariableArray,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefVariableArray()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pElemType;
-		  hr = pDict->LookupType(curElem->baseType, &pElemType);
+		  hr = pDict->LookupTypeDef(*curElem->pBaseTypeId, &pElemType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pElemType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pElemType,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -464,17 +467,17 @@ static AAFRESULT CreateNewFixedArrayType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedeffixedArray object (as yet uninitialized)
 		  ImplAAFTypeDefFixedArray * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefFixedArray,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefFixedArray()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pElemType;
-		  hr = pDict->LookupType(curElem->baseType, &pElemType);
+		  hr = pDict->LookupTypeDef(*curElem->pBaseTypeId, &pElemType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pElemType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pElemType,
 										  curElem->count,
 										  curElem->typeName);
@@ -513,17 +516,17 @@ static AAFRESULT CreateNewRenameType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefRename object (as yet uninitialized)
 		  ImplAAFTypeDefRename * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefRename,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefRename()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pBaseType;
-		  hr = pDict->LookupType(curElem->baseType, &pBaseType);
+		  hr = pDict->LookupTypeDef(*curElem->pBaseTypeId, &pBaseType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pBaseType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pBaseType,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -561,17 +564,17 @@ static AAFRESULT CreateNewStringType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefString object (as yet uninitialized)
 		  ImplAAFTypeDefString * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefString,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefString()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pElemType;
-		  hr = pDict->LookupType(curElem->baseType, &pElemType);
+		  hr = pDict->LookupTypeDef(*curElem->pBaseTypeId, &pElemType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pElemType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pElemType,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -609,12 +612,12 @@ static AAFRESULT CreateNewCharacterType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefinteger object (as yet uninitialized)
 		  ImplAAFTypeDefInt * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefInt,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefInt()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
-		  AAFRESULT hr = ptd->Initialize (&curCharacter->typeID,
+		  AAFRESULT hr = ptd->Initialize (curCharacter->typeID,
 										  curCharacter->size,
 										  AAFFalse,
 										  curCharacter->typeName);
@@ -653,17 +656,17 @@ static AAFRESULT CreateNewStrongRefType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefStrongRef object (as yet uninitialized)
 		  ImplAAFTypeDefStrongObjRef * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefStrongObjRef,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefStrongObjRef()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFClassDefSP pBaseClass;
-		  hr = pDict->LookupClass(curElem->refdType, &pBaseClass);
+		  hr = pDict->LookupClassDef(*curElem->pRefdTypeId, &pBaseClass);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pBaseClass);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pBaseClass,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -701,17 +704,17 @@ static AAFRESULT CreateNewStrongRefSetType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefVariableArray,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefVariableArray()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pRefdType;
-		  hr = pDict->LookupType(curElem->refdType, &pRefdType);
+		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pRefdType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pRefdType,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -749,17 +752,17 @@ static AAFRESULT CreateNewStrongRefVectorType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefVariableArray,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefVariableArray()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pRefdType;
-		  hr = pDict->LookupType(curElem->refdType, &pRefdType);
+		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pRefdType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pRefdType,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -798,8 +801,8 @@ static AAFRESULT CreateNewWeakRefType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefWeakRef object (as yet uninitialized)
 		  ImplAAFTypeDefWeakObjRef * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefWeakObjRef,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefWeakObjRef()->
+			pDict->CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
@@ -812,7 +815,7 @@ static AAFRESULT CreateNewWeakRefType (const aafUID_t & idToCreate,
 #else
 		  ImplAAFTypeDef * ptd = 0;
 		  // Instead, alias to an auid
-		  hr = pDict->LookupType ((aafUID_t*) &kAAFTypeID_AUID, &ptd);
+		  hr = pDict->LookupTypeDef (kAAFTypeID_AUID, &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 #endif
 
@@ -849,17 +852,17 @@ static AAFRESULT CreateNewWeakRefSetType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefVariableArray,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefVariableArray()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pRefdType;
-		  hr = pDict->LookupType(curElem->refdType, &pRefdType);
+		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pRefdType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pRefdType,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -896,17 +899,17 @@ static AAFRESULT CreateNewWeakRefVectorType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateInstance ((aafUID_t*) &AUID_AAFTypeDefVariableArray,
-									  (ImplAAFObject**) &ptd);
+		  hr = pDict->GetBuiltinDefs()->cdTypeDefVariableArray()->
+			CreateInstance ((ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pRefdType;
-		  hr = pDict->LookupType(curElem->refdType, &pRefdType);
+		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (pRefdType);
 
-		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
 										  pRefdType,
 										  curElem->typeName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -946,7 +949,7 @@ AAFRESULT ImplAAFBuiltinTypes::ImportBuiltinTypeDef
 	{
 	  assert (*ppResult);
 	  assert (_dictionary);
-	  AAFRESULT hr = _dictionary->RegisterType (*ppResult);
+	  AAFRESULT hr = _dictionary->RegisterTypeDef (*ppResult);
 	  if (AAFRESULT_FAILED (hr))
 		{
 		  assert (*ppResult);
