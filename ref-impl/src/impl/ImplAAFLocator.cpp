@@ -28,7 +28,6 @@
 
 
 
-
 #include "AAFStoredObjectIDs.h"
 
 #ifndef __ImplAAFLocator_h__
@@ -72,5 +71,6 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_ABSTRACT_CLASS;
 }
 
+OMDEFINE_STORABLE(ImplAAFLocator, AUID_AAFLocator);
 
 
