@@ -1,37 +1,9 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
-
 //
 // An example program that calls the test AAF COM interfaces.
 //
 
 //
 #include <iostream.h>
-#include <fstream.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -41,13 +13,9 @@
 #include <objbase.h>
 #endif
 
-#if defined(macintosh)
-#define _MAC
+#ifdef __powerc
 
-// Make sure we have defined IID_IUnknown and IID_IClassFactory.
-#include <initguid.h>
-#include <coguid.h>	
-#include "DataInput.h"
+#define _MAC
 
 #if !defined(CDECL) && defined(_MSC_VER)
 #define CDECL	_cdecl
@@ -64,72 +32,29 @@
 #endif
 
 
-#ifndef __AAF_h__
-#include "AAF.h"
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
 #endif
 
 
 #include "CAAFModuleTest.h"
 
+#ifdef __powerc
+#include <console.h> /* Mac command line window */
+#endif
+
 #ifdef WIN32
 #include <winbase.h>
-//#include <tchar.h>
+#include <tchar.h>
 #endif
 
 typedef AAFRESULT (*AAFModuleTestProc)();
 
 
+
 #define SUCCESS (0)
 #define FAILURE (-1)
 
-#if defined(__sgi)
-// stubs
-void CoInitialize(void *)
-{
-}
-
-void CoUninitialize(void)
-{
-}
-
-#endif
-
-// routine copied from Tim Bingham's test program...
-static void formatError(DWORD errorCode)
-{
-  cerr << "RESULT = " << (long)errorCode << " (0x" << hex << errorCode << dec << ")" << endl;
-
-#ifdef WIN32
-  CHAR buffer[256];
-
-  int status = FormatMessageA(
-    FORMAT_MESSAGE_FROM_SYSTEM,
-    NULL,
-    errorCode,
-    LANG_SYSTEM_DEFAULT,
-    buffer, sizeof(buffer)/sizeof(buffer[0]),
-    NULL);
-
-  if (status != 0) {
-    int length = strlen(buffer);
-    if (length >= 1) {
-      buffer[length - 1] = '\0';
-    }
-    cerr << buffer << endl;
-  }
-#endif
-
-	cerr << endl;
-}
-
-static void throwIfError(HRESULT hr)
-{
-  if (FAILED(hr))
-  {
-    formatError(hr);
-    throw hr;
-	}
-}
 
 // helper class
 struct CComInitialize
@@ -139,55 +64,45 @@ struct CComInitialize
 };
 
 
-// simple helper class to initialize and cleanup AAF library.
-struct CAAFInitialize
-{
-  CAAFInitialize(const char *dllname = NULL)
-  {
-	  cout << "Attempting to load the AAF dll...";
-	  cout.flush();
-    HRESULT hr = AAFLoad(dllname);
-    if (S_OK != hr)
-  	{
-      cerr << "FAILED! ";
-      throwIfError(hr);
-		}
-    cout << "DONE" << endl;
-  }
-
-  ~CAAFInitialize()
-  {
-    AAFUnload();
-  }
-};
-
-
-// simple helper class to initialize and cleanup AAF library.
-class CAAFInitializePlugins
-{
-public:
-  CAAFInitializePlugins() :
-    pPluginMgr(NULL)
-  {
-    throwIfError(AAFGetPluginManager(&pPluginMgr));
-    throwIfError(pPluginMgr->RegisterSharedPlugins());
-    pPluginMgr->Release();
-    pPluginMgr = NULL;
-  }
-
-  ~CAAFInitializePlugins()
-  {
-    if (pPluginMgr)
-      pPluginMgr->Release();
-  }
-
-  // cached for error cleanup.
-  IAAFPluginManager *pPluginMgr;
-};
 
 
 // forward declarations.
 
+#ifdef WIN32
+// routine copied from Tim Bingham's test program...
+void formatError(DWORD errorCode)
+{
+  TCHAR buffer[256];
+
+  int status = FormatMessage(
+    FORMAT_MESSAGE_FROM_SYSTEM,
+    NULL,
+    errorCode,
+    LANG_SYSTEM_DEFAULT,
+    buffer, sizeof(buffer)/sizeof(buffer[0]),
+    NULL);
+
+  if (status != 0) {
+    int length = _tcslen(buffer);
+    if (length >= 2) {
+      buffer[length - 2] = '\0';
+    }
+    cerr << buffer << endl;
+  } else {
+    cerr << hex << errorCode << dec << endl;
+  }
+}
+#endif
+
+//
+// TEMPORARY
+// Provided to satisfy the linker. This routine needs to be in a
+// public utility file.
+// 
+aafBool	EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
+{
+	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
+}
 
 
 
@@ -201,12 +116,6 @@ public:
 int main(int argc, char* argv[])
 {
 	int result = SUCCESS;
-	aafInt16	count = 0, 
-				i = 0;
-	char 		**myargv = NULL;
-
-
-
 
 	// Initialize com library for this process.
 	CComInitialize comInit;
@@ -217,11 +126,12 @@ int main(int argc, char* argv[])
 	{
 		HRESULT hr = S_OK;
 
-		// Make sure the dll can be loaded and initialized.
-		CAAFInitialize aafInit;
+		/* console window for mac */
 
-		// Make sure the shared plugins can be loaded and registered.
-   		CAAFInitializePlugins aafInitPlugins;
+		#ifdef __powerc
+		argc = ccommand(&argv);
+		#endif
+
 
 		/* Check arguments to see if help was requested */
 
@@ -233,9 +143,7 @@ int main(int argc, char* argv[])
 			cout<< "No arguments --> To run all tests\n";
 			cout<< "Otherwise any AAF object class name can be typed\n";
 			cout<< "and that objects test method will be executed.\n";
-			cout<< "ex AAFSegment AAFTransition etc\n\n";
-			cout<< "Input can also be read in from a text.\n";
-			cout<< "Just name it \"COMMODAAF (PPC)\"" << endl;
+			cout<< "ex AAFSegment AAFTransition etc\n"<< endl;
 
 			return(0);
 		}
@@ -264,7 +172,7 @@ int main(int argc, char* argv[])
 			for (module = 1; module < argc; module++)
 				hr = AAFModuleTest.Test(reinterpret_cast<unsigned char *>(argv[module]));
 		}
-
+		
 		/* Get and Print finish time	*/
 		time_t e_time;
 		time(&e_time);
@@ -279,10 +187,6 @@ int main(int argc, char* argv[])
 
 
 		result = (int)hr;
-	}
-	catch (HRESULT& rhr)
-	{
-		result = rhr;
 	}
 	catch (...)
 	{
