@@ -1,31 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFControlPoints
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 
 
@@ -43,12 +25,8 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "aafUtils.h"
-#include "AAFInterpolatorDefs.h"
-#include "AAFTypeDefUIDs.h"
 
-#include "CAAFBuiltinDefs.h"
-
-static aafMobID_t	zeroMobID = { 0 };
+static aafUID_t	zeroID = { 0 };
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 // Cross-platform utility to delete a file.
@@ -100,17 +78,17 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFControlPoints Test";
+	ProductInfo.productName = L"AAFMasterMob Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	if(mode == kAAFMediaOpenAppend)
+	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -152,11 +130,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceClip		 *pSourceClip = NULL;
 	IAAFControlPoint	 *pControlPoint = NULL;
 	IAAFSourceReference *pSourceRef = NULL;
+	IAAFTypeDefInt		 *pIntDef = NULL;
 	IAAFInterpolationDef *pInterpDef = NULL;
 	IAAFPluginManager	*pMgr = NULL;
 	IAAFTypeDef			*pTypeDef = NULL;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
+	aafUID_t			testDataDef = DDEF_Picture, testInterpDef = kAAFExpRational;
 	aafLength_t			effectLen = TEST_EFFECT_LEN;
 	aafUID_t			effectID = kTestEffectID;
 	aafUID_t			parmID = kTestParmID;
@@ -172,118 +152,124 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 		// Create the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
 		bFileOpen = true;
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
-		CAAFBuiltinDefs defs (pDictionary);
     
-		checkResult(defs.cdOperationDef()->
-					CreateInstance(IID_IAAFOperationDef, 
-								   (IUnknown **)&pOperationDef));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFOperationDef,
+							  IID_IAAFOperationDef, 
+							  (IUnknown **)&pOperationDef));
     
-		checkResult(defs.cdParameterDef()->
-					CreateInstance(IID_IAAFParameterDef, 
-								   (IUnknown **)&pParamDef));
-		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_Rational, &pTypeDef));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFParameterDef,
+							  IID_IAAFParameterDef, 
+							  (IUnknown **)&pParamDef));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFTypeDefInt,
+							  IID_IAAFTypeDefInt, 
+							  (IUnknown **)&pIntDef));
+		checkResult(pIntDef->Initialize (&testInterpDef, sizeof(aafRational_t), AAFTrue, L"Signed Rational Effect Parameter"));
 		checkResult(AAFGetPluginManager(&pMgr));
 		checkResult(pMgr->CreatePluginDefinition(LinearInterpolator, pDictionary, &pDefObject));
 		checkResult(pDefObject->QueryInterface(IID_IAAFInterpolationDef, (void **) &pInterpDef));
 		pDefObject->Release();
 		pDefObject = NULL;
 
-		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
-		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
-		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
-		checkResult(pDictionary->RegisterParameterDef(pParamDef));
-		checkResult(pDictionary->RegisterInterpolationDef(pInterpDef));
+		checkResult(pDictionary->RegisterOperationDefinition(pOperationDef));
+		checkResult(pDictionary->RegisterParameterDefinition(pParamDef));
+		checkResult(pDictionary->RegisterInterpolationDefinition(pInterpDef));
+		checkResult(pIntDef->QueryInterface(IID_IAAFTypeDef, (void **) &pTypeDef));
+		checkResult(pDictionary->RegisterType(pTypeDef));
 
+		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->Init (&effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
+		pDefObject->Release();
+		pDefObject = NULL;
 
-		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
-		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
+		checkResult(pOperationDef->SetDataDefinitionID (&testDataDef));
+		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
-		checkResult(pOperationDef->AddParameterDef (pParamDef));
+		checkResult(pOperationDef->AddParameterDefs (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
 		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
+		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
 
 		checkResult(pParamDef->SetDisplayUnits(TEST_PARAM_UNITS));
+		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObject));
+		checkResult(pDefObject->Init (&parmID, TEST_PARAM_NAME, TEST_PARAM_DESC));
+		pDefObject->Release();
+		pDefObject = NULL;
 
 		//Make the first mob
 		long	test;
 		aafRational_t	videoRate = { 2997, 100 };
 		aafRational_t	startTime = { 0, 1 } , endTime = { 1, 1};
 		// Create a Mob
-		checkResult(defs.cdCompositionMob()->
-					CreateInstance(IID_IAAFMob, 
-								   (IUnknown **)&pMob));
+		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
+							  IID_IAAFMob, 
+							  (IUnknown **)&pMob));
 
 //		checkResult(CoCreateGuid((GUID *)&newUID));
-//		checkResult(pMob->SetMobID(newUID));
+//		checkResult(pMob->SetMobID(&newUID));
 		checkResult(pMob->SetName(L"AAFOperationGroupTest"));
 	  
 		// Add some slots
 		for(test = 0; test < 2; test++)
 		{
- 			checkResult(defs.cdOperationGroup()->
-						CreateInstance(IID_IAAFOperationGroup, 
-									   (IUnknown **)&pOperationGroup));
+ 			checkResult(pDictionary->CreateInstance(&AUID_AAFOperationGroup,
+							     IID_IAAFOperationGroup, 
+							     (IUnknown **)&pOperationGroup));
 			
-			checkResult(defs.cdFiller()->
-						CreateInstance(IID_IAAFSegment, 
-									   (IUnknown **)&pFiller));
+			checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
+							     IID_IAAFSegment, 
+							     (IUnknown **)&pFiller));
 			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
-			checkResult(pComponent->SetLength(effectLen));
-			checkResult(pComponent->SetDataDef(defs.ddPicture()));
- 			checkResult(pOperationGroup->Initialize(defs.ddPicture(),
-													TEST_EFFECT_LEN,
-													pOperationDef));
+			checkResult(pComponent->SetLength(&effectLen));
+			checkResult(pComponent->SetDataDef(&testDataDef));
+ 			checkResult(pOperationGroup->Initialize(&testDataDef, TEST_EFFECT_LEN, pOperationDef));
 
-			checkResult(defs.cdVaryingValue()->
-						CreateInstance(IID_IAAFVaryingValue, 
-									   (IUnknown **)&pVaryingValue));
+			checkResult(pDictionary->CreateInstance(&AUID_AAFVaryingValue,
+							  IID_IAAFVaryingValue, 
+							  (IUnknown **)&pVaryingValue));
 			checkResult(pVaryingValue->SetInterpolationDefinition(pInterpDef));
 
-			checkResult(defs.cdControlPoint()->
-						CreateInstance(IID_IAAFControlPoint, 
-									   (IUnknown **)&pControlPoint));
+			checkResult(pDictionary->CreateInstance(&AUID_AAFControlPoint,
+							  IID_IAAFControlPoint, 
+							  (IUnknown **)&pControlPoint));
 			checkResult(pControlPoint->SetTime(startTime));
 			checkResult(pControlPoint->SetValue(sizeof(testLevel1), (aafDataBuffer_t)&testLevel1));
 			checkResult(pControlPoint->SetTypeDefinition (pTypeDef));
-			checkResult(pVaryingValue->AddControlPoint(pControlPoint));
+			checkResult(pVaryingValue->AppendPoint(pControlPoint));
 			pControlPoint->Release();
 			pControlPoint = NULL;
-			checkResult(defs.cdControlPoint()->
-						CreateInstance(IID_IAAFControlPoint, 
-									   (IUnknown **)&pControlPoint));
+			checkResult(pDictionary->CreateInstance(&AUID_AAFControlPoint,
+							  IID_IAAFControlPoint, 
+							  (IUnknown **)&pControlPoint));
 			checkResult(pControlPoint->SetTypeDefinition (pTypeDef));
 			checkResult(pControlPoint->SetTime(endTime));
 			checkResult(pControlPoint->SetValue(sizeof(testLevel2), (aafDataBuffer_t)&testLevel2));
-			checkResult(pVaryingValue->AddControlPoint(pControlPoint));
+			checkResult(pVaryingValue->AppendPoint(pControlPoint));
 			pControlPoint->Release();
 			pControlPoint = NULL;
 
 			checkResult(pVaryingValue->QueryInterface (IID_IAAFParameter, (void **)&pParm));
 			checkResult(pParm->SetParameterDefinition (pParamDef));
  // !!!  ImplAAFParameter::SetTypeDefinition (ImplAAFTypeDef*  pTypeDef)
-			checkResult(pOperationGroup->AddParameter (pParm));
-			checkResult(pOperationGroup->AppendInputSegment (pFiller));
+			checkResult(pOperationGroup->AddNewParameter (pParm));
+			checkResult(pOperationGroup->AppendNewInputSegment (pFiller));
 			pFiller->Release();
 			pFiller = NULL;
 
 			checkResult(pOperationGroup->SetBypassOverride (1));
-			checkResult(defs.cdSourceClip()->
-						CreateInstance(IID_IAAFSourceClip, 
-									   (IUnknown **)&pSourceClip));
+			checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
+							  IID_IAAFSourceClip, 
+							  (IUnknown **)&pSourceClip));
 			aafSourceRef_t	sourceRef;
-			sourceRef.sourceID = zeroMobID;
+			sourceRef.sourceID = zeroID;
 			sourceRef.sourceSlotID = 0;
 			sourceRef.startTime = 0;
-			checkResult(pSourceClip->Initialize (defs.ddPicture(),
-												 effectLen,
-												 sourceRef));
+			checkResult(pSourceClip->Initialize (&testDataDef,&effectLen, sourceRef));
 			checkResult(pSourceClip->QueryInterface (IID_IAAFSourceReference, (void **)&pSourceRef));
 			checkResult(pOperationGroup->SetRender (pSourceRef));
 			checkResult(pOperationGroup->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
@@ -311,7 +297,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		}
 
 		// Add the mob to the file.
-		checkResult(pHeader->AddMob(pMob));
+		checkResult(pHeader->AppendMob(pMob));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -341,6 +327,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	if (pParm)
 		pParm->Release();
+	if (pIntDef)
+		pIntDef->Release();
 	if (pInterpDef)
 		pInterpDef->Release();
 	if (pVaryingValue)
@@ -416,16 +404,16 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 		
 		aafSearchCrit_t		criteria;
-		criteria.searchTag = kAAFNoSearch;
-		checkResult(pHeader->GetMobs (&criteria, &mobIter));
+		criteria.searchTag = kNoSearch;
+		checkResult(pHeader->EnumAAFAllMobs (&criteria, &mobIter));
 		
 		checkResult(mobIter->NextOne (&pMob));			
-		checkResult(pMob->GetSlots(&slotIter));
-		checkResult(pMob->CountSlots (&numSlots));
+		checkResult(pMob->EnumAAFAllMobSlots(&slotIter));
+		checkResult(pMob->GetNumSlots (&numSlots));
 		
 		for(s = 0; s < numSlots; s++)
 		{
@@ -435,26 +423,26 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			pSeg->Release();
 			pSeg = NULL;
 			
-			checkResult(pOperationGroup->CountSourceSegments(&testNumSources));
+			checkResult(pOperationGroup->GetNumSourceSegments(&testNumSources));
 			checkExpression(testNumSources == TEST_NUM_INPUTS, AAFRESULT_TEST_FAILED);
-			checkResult(pOperationGroup->CountParameters(&testNumParam));
+			checkResult(pOperationGroup->GetNumParameters(&testNumParam));
 			checkExpression(testNumSources == 1, AAFRESULT_TEST_FAILED);
 			
 			checkResult(pOperationGroup->IsATimeWarp (&readIsTimeWarp));
-			checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);
+			checkExpression(readIsTimeWarp == AAFFalse, AAFRESULT_TEST_FAILED);
 			
 			checkResult(pOperationGroup->GetBypassOverride (&readOverride));
 			checkExpression(readOverride == 1, AAFRESULT_TEST_FAILED);
 			
 			checkResult(pOperationGroup->IsValidTranOperation (&readValidTransition));
-			checkExpression(readValidTransition == kAAFFalse, AAFRESULT_TEST_FAILED);
+			checkExpression(readValidTransition == AAFFalse, AAFRESULT_TEST_FAILED);
 			/**/
-			checkResult(pOperationGroup->GetInputSegmentAt (0, &pSeg));
+			checkResult(pOperationGroup->GetIndexedInputSegment (0, &pSeg));
 			checkResult(pSeg->QueryInterface(IID_IAAFFiller, (void **) &pFill));
 			pFill->Release();
 			pFill = NULL;
 			/**/
-			checkResult(pOperationGroup->LookupParameter (kTestParmID, &pParameter));
+			checkResult(pOperationGroup->GetParameterByArgID (kTestParmID, &pParameter));
 			checkResult(pParameter->QueryInterface(IID_IAAFVaryingValue, (void **) &pVaryingValue));
 			
 			aafUInt32		testLen, bytesRead;
