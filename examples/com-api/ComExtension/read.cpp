@@ -30,7 +30,7 @@
 
 void main ()
 {
-  const aafWChar * filename = L"extension.aaf";
+  const aafWChar * filename = L"foo";
 
   bool status = extensionRead (filename);
   if (! status)
