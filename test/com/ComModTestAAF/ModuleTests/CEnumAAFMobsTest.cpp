@@ -138,8 +138,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult(pMob->SetMobID(TEST_File_MobID));
 	  checkResult(pMob->SetName(L"File Mob"));
 	
- 	  checkResult(defs.cdFileDescriptor()->
-				  CreateInstance(IID_IAAFFileDescriptor, 
+	  // Create a concrete subclass of FileDescriptor
+ 	  checkResult(defs.cdHTMLDescriptor()->
+				  CreateInstance(IID_IAAFEssenceDescriptor, 
 								 (IUnknown **)&edesc));		
 
     checkResult(pSourceMob->SetEssenceDescriptor (edesc));
@@ -434,6 +435,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	// Make sure it returns E_INVALIDARG	
 	if (mobIter->Next(1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
 		localhr = AAFRESULT_TEST_FAILED;
+	else
+	{
+		for (i = 0; i < numFetched; i++)
+		if (mobArray[i] != NULL)
+		{
+			mobArray[i]->Release();
+			mobArray[i] = NULL;
+		}
+		else
+			localhr = AAFRESULT_TEST_FAILED;		
+	}
 
 	if (SUCCEEDED(localhr))
 		cout<< "	Next() ...		Passed" << endl;
@@ -562,6 +574,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	
 		if (cloneMobIter->Next(1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
 			localhr = AAFRESULT_TEST_FAILED;
+		else
+		{
+			for (i = 0; i < numFetched; i++)
+			if (mobArray[i] != NULL)
+			{
+				mobArray[i]->Release();
+				mobArray[i] = NULL;
+			}
+			else
+				localhr = AAFRESULT_TEST_FAILED;		
+		}
 
 		cloneMobIter->Release();
  		cloneMobIter = NULL;
@@ -627,7 +650,8 @@ extern "C" HRESULT CEnumAAFMobs_test()
   catch (...)
 	{
 	  cerr << "CEnumAAFMobs_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
+	  hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;
