@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.22 2005/03/21 15:23:11 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.23 2005/04/05 17:21:41 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -126,6 +126,15 @@ inline void checkAssertion(bool test)
   if (!test)
     throw HRESULT(AAFRESULT_ASSERTION_VIOLATION);
 }
+
+// Legacy property names
+const aafCharacter kAAFPropName_DIDResolutionID[] = { 'R','e','s','o','l','u','t','i','o','n','I','D','\0' };
+const aafCharacter kAAFPropName_DIDFrameSampleSize[] = { 'F','r','a','m','e','S','a','m','p','l','e','S','i','z','e','\0' };
+const aafCharacter kAAFPropName_DIDFrameIndexByteOrder[]	= { 'F','r','a','m','e','I','n','d','e','x','B','y','t','e','O','r','d','e','r','\0' };
+const aafCharacter kAAFPropName_DIDFirstFrameOffset[]	= { 'F','i','r','s','t','F','r','a','m','e','O','f','f','s','e','t','\0' };
+const aafCharacter kAAFPropName_DIDImageSize[]	= { 'I','m','a','g','e','S','i','z','e','\0' };
+const aafCharacter kAAFPropName_CDCIOffsetToFrameIndexes[]	= { 'O','f','f','s','e','t','T','o','F','r','a','m','e','I','n','d','e','x','e','s','\0'};
+
 
 inline bool IsDV(const aafUID_t &compId)
 {

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFInProcServer.cpp,v 1.23 2005/02/03 22:13:43 heydowns Exp $ $Name:  $
+// $Id: CAAFInProcServer.cpp,v 1.24 2005/04/05 17:21:41 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -301,62 +301,6 @@ enum eAAFRegFlag
   AAF_REG_SUB_CLASSNAME = 3,
   AAF_REG_SUB_MODULE = 4
 };
-
-
-const AAFRegEntry g_AAFRegEntry[][3] = 
-{
-  {  // [0]
-    { AAF_REG_SUB_CLSID, OLESTR("CLSID\\%s") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLASSNAME, OLESTR("%s Class") }
-  },
-  {  // [1]
-    { AAF_REG_SUB_CLSID, OLESTR("CLSID\\%s\\InprocServer32") },
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_MODULE, OLESTR("%s") }
-  },
-  {  // [2] 
-    { AAF_REG_SUB_CLSID, OLESTR("CLSID\\%s\\NotInsertable") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_SKIP, 0 }
-  },
-  {  // [3]
-    { AAF_REG_SUB_CLSID, OLESTR("CLSID\\%s\\ProgID") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s.1") }
-  },
-  {  // [4] 
-    { AAF_REG_SUB_CLSID, OLESTR("CLSID\\%s\\VersionIndependentProgID") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s") }  
-  },
-  {  // [5]  
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLASSNAME, OLESTR("%s Class") }    
-  },
-  {  // [6]
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s\\CLSID") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLSID, OLESTR("%s") } 
-  },
-  {  // [7]
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s\\CurVer") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s.1") } 
-  },
-  {  // [8]
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s.1") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLASSNAME, OLESTR("%s Class") } 
-  },
-  {  // [9] 
-    { AAF_REG_SUB_CLASSNAME, OLESTR("AAF.%s.1\\CLSID") }, 
-    { AAF_REG_SUB_SKIP, 0 }, 
-    { AAF_REG_SUB_CLSID, OLESTR("%s") } 
-  }
-};
-
 
 
 // Find the next valid index in the internal object table where
