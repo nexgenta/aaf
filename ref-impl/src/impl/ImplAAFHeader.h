@@ -16,11 +16,11 @@
 
 class ImplAAFMob;
 
-class ImplAAFMedia;
+class ImplAAFEssenceData;
 
 class ImplEnumAAFMobs;
 
-class ImplEnumAAFMedia;
+class ImplEnumAAFEssenceData;
 
 class ImplAAFDictionary;
 
@@ -128,45 +128,54 @@ public:
         (ImplAAFMob * pMob);  //@parm [in] Mob to remove from header
 
 
-
   //****************
-  // IsMediaDataPresent()
+  // GetNumEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    IsMediaDataPresent
-        (aafUID_t *  pFileMobID,   //@parm [in,ref] A Unique File Mob ID
-		 aafFileFormat_t  fmt,   //@parm [in] The Media File Format
-         aafBool *  result);  //@parm [out,retval] True if the media is found
+    GetNumEssenceData
+        (aafUInt32 *  pNumEssenceData);  //@parm [out,retval] Total number of essence data with type
 
 
   //****************
-  // EnumAAFMediaObjects()
+  // IsEssenceDataPresent()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    EnumAAFMediaObjects
-	    (// @parm [in,ref] Media Criteria for enumeration
-         aafMediaCriteria_t *  pMediaCriteria,
+    IsEssenceDataPresent
+        (// @parm [in] A Unique File Mob ID
+		 aafUID_t *  pFileMobID,
 
-		 // @parm [out,retval] Media Enumeration
-		 ImplEnumAAFMedia ** ppEnum);
+		 // @parm [in] The Essence File Format
+		 aafFileFormat_t  fmt,
+
+		 // @parm [out,retval] True if the essence is found
+         aafBool *  pResult);
 
 
   //****************
-  // AppendMedia()
+  // EnumAAFEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendMedia
-		// @parm [in] Media object to append
-        (ImplAAFMedia * pMedia);
+    EnumEssenceData
+	    ( // @parm [out,retval] Essence Enumeration
+		 ImplEnumAAFEssenceData ** ppEnum);
 
 
   //****************
-  // RemoveMedia()
+  // AppendEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveMedia
-		// @parm [in] Media object to remove
-        (ImplAAFMedia * pMedia);
+    AppendEssenceData
+		// @parm [in] Essence data object to append
+        (ImplAAFEssenceData * pEssenceData);
+
+
+  //****************
+  // RemoveEssenceData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveEssenceData
+		// @parm [in] Essence data object to Remove
+        (ImplAAFEssenceData * pEssenceData);
 
 
   //****************
@@ -290,6 +299,7 @@ AAFRESULT GetNumIdentifications (aafInt32 * /*pCount*/);
 AAFRESULT AddIdentificationObject (aafProductIdentification_t * /*pIdent*/);
 AAFRESULT BuildMediaCache(void);
 AAFRESULT LoadMobTables(void);
+AAFRESULT SetModified(void);		// To NOW
 
 private:
 	// These are private accessor methods.
