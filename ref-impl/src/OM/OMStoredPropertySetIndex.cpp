@@ -1,3 +1,30 @@
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
+
 // @doc OMINTERNAL
 #include "OMStoredPropertySetIndex.h"
 
@@ -45,6 +72,7 @@ void OMStoredPropertySetIndex::insert(OMPropertyId propertyId,
 
   IndexEntry* entry = find(propertyId);
 
+  ASSERT("New index entry", entry == 0);
   if (entry == 0 ) {
     entry = find();
     ASSERT("Found space for new entry", entry != 0);
@@ -139,44 +167,37 @@ bool OMStoredPropertySetIndex::find(const OMPropertyId& propertyId,
   //   @rdesc True if this <c OMStoredPropertySetIndex> is valid,
   //          false otherwise.
   //   @this const
-bool OMStoredPropertySetIndex::isValid(void) const
+bool OMStoredPropertySetIndex::isValid(OMUInt32 baseOffset) const
 {
   TRACE("OMStoredPropertySetIndex::isValid");
 
+  // The validity constraints are ...
+  // 1) Each entry must have a non-zero length
+  // 2) Entries must not overlap
+  // 3) Entries must be in order of offset
+  // 4) There must be no gaps between entries
+  // We may choose to relax 3 and 4 in the future
   bool result = true;
   size_t entries = 0;
-  size_t position;
-  bool firstEntry = true;
-  size_t previousOffset;
   size_t currentOffset;
   size_t currentLength;
+  size_t position = baseOffset;
 
   for (size_t i = 0; i < _capacity; i++) {
     if (_table[i]._valid) {
       entries++; // count valid entries
       currentOffset = _table[i]._offset;
       currentLength = _table[i]._length;
-      if (currentLength <= 0) {
+      if (currentLength == 0) {
         result = false; // entry has invalid length
         break;
       }
-      if (firstEntry) {
-        previousOffset = currentOffset;
-        position = currentOffset + currentLength;
-        firstEntry = false;
-      } else {
-        if (currentOffset < previousOffset) {
-          result = false; // entries out of order
-          break;
-        } else if (position > currentOffset) {
-          result = false; // entries overlap
-          break; 
-        } else {
-          // this entry is valid
-          previousOffset = currentOffset;
-          position = position + currentLength;
-        }
-      }
+      if (currentOffset != position) {
+        result = false;  // gap or overlap
+        break;
+	  }
+      // this entry is valid, calculate the expected next position
+      position = position + currentLength;
     }
   }
 
