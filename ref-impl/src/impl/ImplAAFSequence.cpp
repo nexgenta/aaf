@@ -90,9 +90,9 @@ ImplAAFSequence::~ImplAAFSequence ()
 //   - pDatadef is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::Initialize (aafUID_t * pDatadef)
+    ImplAAFSequence::Initialize (const aafUID_t & datadef)
 {
-	return (SetDataDef(pDatadef));
+	return (SetDataDef(datadef));
 }
 
 //***********************************************************
@@ -172,10 +172,10 @@ AAFRESULT STDMETHODCALLTYPE
 		pComponent->GetDataDef(&cpntDataDef);
 		
 		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->LookupDataDefinition(&cpntDataDef, &pDef));
+		CHECK(pDict->LookupDataDef(cpntDataDef, &pDef));
 		pDict->ReleaseReference();
 		pDict = NULL;
-		CHECK(pDef->DoesDataDefConvertTo(&sequDataDef, &willConvert));
+		CHECK(pDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
 		pDef->ReleaseReference();
 		pDef = NULL;
 		
@@ -248,7 +248,7 @@ AAFRESULT STDMETHODCALLTYPE
 				}
 				
 				SubInt64fromInt64(cpntLen, &sequLen);
-				CHECK(SetLength(&sequLen));
+				CHECK(SetLength(sequLen));
 			}
 			else // Not a transition
 			{
@@ -263,7 +263,7 @@ AAFRESULT STDMETHODCALLTYPE
 				
 				// Add length of component to sequence, if not transition
 				AddInt64toInt64(cpntLen, &sequLen);
-				CHECK(SetLength(&sequLen));
+				CHECK(SetLength(sequLen));
 			}
 		}
 		// Else handle case #2
@@ -285,6 +285,64 @@ AAFRESULT STDMETHODCALLTYPE
 
 	return(AAFRESULT_SUCCESS);
 }
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::PrependComponent (ImplAAFComponent* pComponent)
+{
+  if (! pComponent) return AAFRESULT_NULL_PARAM;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::InsertComponentAt (aafUInt32 index,
+										ImplAAFComponent* pComponent)
+{
+  if (! pComponent) return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountComponents (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::GetComponentAt (aafUInt32 index,
+									 ImplAAFComponent ** ppComponent)
+{
+  if (! ppComponent) return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountComponents (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSequence::RemoveComponentAt (aafUInt32 index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountComponents (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
 
 //***********************************************************
 //
@@ -317,7 +375,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 //***********************************************************
 //
-// GetNumComponents()
+// CountComponents()
 //
 // This function returns the number of components in the sequence.
 // 
@@ -337,8 +395,10 @@ AAFRESULT STDMETHODCALLTYPE
 //   - pNumCpnts is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::GetNumComponents (aafInt32*  pNumCpnts)
+    ImplAAFSequence::CountComponents (aafUInt32 * pNumCpnts)
 {
+  if (! pNumCpnts) return AAFRESULT_NULL_PARAM;
+
 	size_t	numCpnts;
 
 	_components.getSize(numCpnts);
@@ -349,7 +409,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 //***********************************************************
 //
-// EnumComponents()
+// GetComponents()
 //
 // Places an IEnumAAFComponents enumerator for the components contained in the sequence
 // into the *ppEnum argument.
@@ -374,7 +434,7 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::EnumComponents (ImplEnumAAFComponents ** ppEnum)
+    ImplAAFSequence::GetComponents (ImplEnumAAFComponents ** ppEnum)
 {
 	if(ppEnum == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -611,14 +671,15 @@ AAFRESULT
 	return hr;
 }
 
-AAFRESULT ImplAAFSequence::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+AAFRESULT ImplAAFSequence::ChangeContainedReferences(const aafUID_t & from,
+													 const aafUID_t & to)
 {
-	aafInt32			n, count;
+	aafUInt32			n, count;
 	ImplAAFComponent	*comp = NULL;
 	
 	XPROTECT()
 	{
-		CHECK(GetNumComponents (&count));
+		CHECK(CountComponents (&count));
 		for(n = 0; n < count; n++)
 		{
 			CHECK(GetNthComponent (n, &comp));

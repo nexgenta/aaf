@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -32,14 +50,18 @@
 #include <string.h>
 #include "aafErr.h"
 #include "AafUtils.h"
+#include "ImplAAFDictionary.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFDataDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFCodecFlavours;
 
 ImplAAFCodecDef::ImplAAFCodecDef ()
-:  _dataDefs(		PID_CodecDefinition_DataDefinitions,			"DataDefinitions")
+:  _dataDefs(		PID_CodecDefinition_DataDefinitions,			"DataDefinitions"),
+   _fileDescClass(	PID_CodecDefinition_FileDescriptorClass,		"FileDescriptorClass")
+
 {
 	_persistentProperties.put(_dataDefs.address());
+	_persistentProperties.put(_fileDescClass.address());
 }
 
 
@@ -50,7 +72,7 @@ ImplAAFCodecDef::~ImplAAFCodecDef ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::IsEssenceKindSupported (
-      aafUID_t *pEssenceKind,
+      const aafUID_t & essenceKind,
       aafBool* pIsSupported)
 {
 	ImplEnumAAFDataDefs	*dataEnum = NULL;
@@ -59,11 +81,11 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		CHECK(GetDataDefinitions (&dataEnum));
+		CHECK(GetEssenceKinds (&dataEnum));
 		while((dataEnum->NextOne(&aVal) == AAFRESULT_SUCCESS)
 		   && (result == AAFFalse))
 		{
-			CHECK(aVal->IsDataDefOf(pEssenceKind, &result));
+			CHECK(aVal->IsDataDefOf(essenceKind, &result));
 			aVal->ReleaseReference();
 			aVal = NULL;
 		}
@@ -75,9 +97,15 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(aVal)
+		  {
 			aVal->ReleaseReference();
+			aVal = 0;
+		  }
 		if(dataEnum)
+		  {
 			dataEnum->ReleaseReference();
+			dataEnum = 0;
+		  }
 	}
 	XEND;
 
@@ -85,23 +113,20 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
  
- AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCodecDef::AppendEssenceKind (
-      aafUID_t *pEssenceKind)
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCodecDef::AddEssenceKind (
+      const aafUID_t & essenceKind)
 {
 	aafUID_t	*tmp, newUID;
 	aafInt32	oldBufSize;
 	aafInt32	newBufSize;
 
-	if(pEssenceKind == NULL)
-		return AAFRESULT_NULL_PARAM;
-	
 	XPROTECT()
 	{
 		oldBufSize = _dataDefs.size();
 		newBufSize = oldBufSize + sizeof(aafUID_t);
 		tmp = new aafUID_t[newBufSize];
-		newUID = *pEssenceKind;
+		newUID = essenceKind;
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
 		if(oldBufSize != 0)
@@ -122,30 +147,125 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCodecDef::RemoveEssenceKind (
+      const aafUID_t & essenceKind)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFCodecDef::CountEssenceKinds (
+      aafUInt32 * pResult)
+{
+  if (! pResult) return AAFRESULT_NULL_PARAM;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::AreThereFlavours (
-      aafBool *  /*pResult*/)
+      aafBool *pResult)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	aafUID_t						uid;
+	ImplAAFPluginManager			*mgr = NULL;
+	IAAFPlugin						*pPlug = NULL;
+	IAAFEssenceCodec				*pCodec = NULL;
+	aafBool							found;
+	aafInt32						flavourCount;
+
+	if(pResult == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	XPROTECT()
+	{
+		CHECK(GetAUID(&uid));
+		mgr = ImplAAFPluginManager::GetPluginManager();
+		// Only looks at first codec matching
+		found = AAFFalse;
+		if(mgr->GetPluginInstance(uid, &pPlug) == AAFRESULT_SUCCESS)
+		{
+			if(pPlug->QueryInterface(IID_IAAFEssenceCodec, (void **)&pCodec) == AAFRESULT_SUCCESS)
+			{
+				found = AAFTrue;
+			}
+		}
+		if(!found)
+			RAISE(AAFRESULT_CODEC_INVALID);
+
+		CHECK(pCodec->GetFlavourCount(&flavourCount));
+		*pResult = (flavourCount >= 2 ? AAFTrue : AAFFalse);
+		pPlug->Release();
+		pPlug = NULL;
+		pCodec->Release();
+		pCodec = NULL;
+		mgr->ReleaseReference();
+		mgr = NULL;
+	}
+	XEXCEPT
+	{
+		if(pPlug != NULL)
+			pPlug->Release();
+		if(pCodec != NULL)
+			pCodec->Release();
+		if(mgr != NULL)
+		  {
+			mgr->ReleaseReference();
+			mgr = 0;
+		  }
+	}
+	XEND;
+
+	return(AAFRESULT_SUCCESS);
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::GetFileDescriptorClass (
-      ImplAAFClassDef ** /*ppClass*/)
+      ImplAAFClassDef **ppClass)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	aafUID_t			classID;
+	ImplAAFDictionary	*pDict = NULL;
+	AAFRESULT			status;
+
+	if (ppClass == NULL)
+	{
+		status =  AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+		classID = _fileDescClass;
+		status = GetDictionary(&pDict);
+		if(status == AAFRESULT_SUCCESS)
+			status = pDict->LookupClassDef(classID, ppClass);
+	}
+
+	return status;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFCodecDef::SetFileDescriptorClass (
-      ImplAAFClassDef * /*pClass*/)
+      ImplAAFClassDef *pClass)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	aafUID_t	classID;
+	
+	if (pClass == NULL)
+	{
+		return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+		pClass->GetAUID(&classID);
+		_fileDescClass = classID;
+	}
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -197,7 +317,10 @@ AAFRESULT STDMETHODCALLTYPE
 		if(pCodec != NULL)
 			pCodec->Release();
 		if(mgr != NULL)
+		  {
 			mgr->ReleaseReference();
+			mgr = 0;
+		  }
 	}
 	XEND;
 
@@ -207,7 +330,7 @@ AAFRESULT STDMETHODCALLTYPE
   
 // SDK-private
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFCodecDef::GetDataDefinitions (
+    ImplAAFCodecDef::GetEssenceKinds (
       ImplEnumAAFDataDefs  **ppEnum)
 {
 	if(ppEnum == NULL)
@@ -221,6 +344,5 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
-OMDEFINE_STORABLE(ImplAAFCodecDef, AUID_AAFCodecDef);
 
 
