@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.140.2.3 2005/01/15 21:42:54 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.140.2.4 2005/01/23 03:01:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1172,14 +1172,6 @@ ImplAAFFile::Save ()
 	  AAFRESULT hr = _head->GetDictionary(&dictSP);
 	  if (AAFRESULT_FAILED (hr))
 		return hr;
-
-	  // Sync the file's dictionary with the built in dictionary
-	  // before proceeding with the save.
-	  OMDictionary* mf = _file->dictionary();
-	  assert(mf == _metafactory);
-  	  ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(mf);
-	  assert(d);
-	  checkResult( d->SyncMetaDictionaries() );
 
 	  dictSP->AssureClassPropertyTypes ();
 
