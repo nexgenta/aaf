@@ -47,6 +47,8 @@
 #include "ImplAAFHeader.h"
 #endif
 
+#include "ImplEnumAAFPropertyValues.h"
+
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
 
@@ -57,8 +59,12 @@ extern "C" const aafClassID_t CLSID_AAFPropertyValue;
 
 
 ImplAAFTypeDefFixedArray::ImplAAFTypeDefFixedArray ()
-  : _ElementType  ( PID_TypeDefinitionFixedArray_ElementType,  "ElementType"),
-    _ElementCount ( PID_TypeDefinitionFixedArray_ElementCount, "ElementCount")
+  : _ElementType  ( PID_TypeDefinitionFixedArray_ElementType,  
+                    L"ElementType", 
+                    L"/MetaDictionary/TypeDefinitions", 
+                    PID_MetaDefinition_Identification),
+    _ElementCount ( PID_TypeDefinitionFixedArray_ElementCount, 
+                    L"ElementCount")
 {
   _persistentProperties.put(_ElementType.address());
   _persistentProperties.put(_ElementCount.address());
@@ -73,31 +79,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefFixedArray::GetType (
       ImplAAFTypeDef ** ppTypeDef) const
 {
-  if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
+  if (! ppTypeDef)
+	return AAFRESULT_NULL_PARAM;
 
-  if (!_cachedBaseType)
-	{
-	  ImplAAFTypeDefFixedArray * pNonConstThis =
-		  (ImplAAFTypeDefFixedArray *) this;
+   if(_ElementType.isVoid())
+		return AAFRESULT_OBJECT_NOT_FOUND;
+  ImplAAFTypeDef *pTypeDef = _ElementType;
 
-	  ImplAAFDictionarySP pDict;
-
-	  AAFRESULT hr;
-	  hr = GetDictionary(&pDict);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pDict);
-
-	  hr = pDict->LookupTypeDef (_ElementType, &pNonConstThis->_cachedBaseType);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (_cachedBaseType);
-	}
-  assert (ppTypeDef);
-  *ppTypeDef = _cachedBaseType;
+  *ppTypeDef = pTypeDef;
   assert (*ppTypeDef);
   (*ppTypeDef)->AcquireReference ();
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -115,11 +106,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsFixedArrayable())
 	return AAFRESULT_BAD_TYPE;
 
-  aafUID_t typeId;
-  AAFRESULT hr = pTypeDef->GetAUID(&typeId);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  return pvtInitialize (id, typeId, nElements, pTypeName);
+  return pvtInitialize (id, pTypeDef, nElements, pTypeName);
 }
 
 
@@ -127,7 +114,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefFixedArray::pvtInitialize (
       const aafUID_t & id,
-      const aafUID_t & typeId,
+      const ImplAAFTypeDef * pTypeDef,
       aafUInt32  nElements,
       const aafCharacter * pTypeName)
 {
@@ -135,13 +122,11 @@ AAFRESULT STDMETHODCALLTYPE
 
   HRESULT hr;
 
-  hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
 
-  hr = SetAUID (id);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-
-  _ElementType = typeId;
+  _ElementType = pTypeDef;
   _ElementCount = nElements;
 
   return AAFRESULT_SUCCESS;
@@ -158,6 +143,13 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT
+ImplAAFTypeDefFixedArray::GetElements (
+								ImplAAFPropertyValue *pInPropVal,
+								ImplEnumAAFPropertyValues **ppEnum)
+{
+	return AAFRESULT_NOT_IN_CURRENT_VERSION;
+}
 
 // Override from AAFTypeDef
 AAFRESULT STDMETHODCALLTYPE
@@ -332,6 +324,7 @@ aafBool ImplAAFTypeDefFixedArray::IsRegistered (void) const
 
 size_t ImplAAFTypeDefFixedArray::NativeSize (void) const
 {
+  ((ImplAAFTypeDefFixedArray*)this)->AttemptBuiltinRegistration ();
   assert (IsRegistered());
 
   size_t result;
@@ -343,9 +336,9 @@ size_t ImplAAFTypeDefFixedArray::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
 
@@ -383,15 +376,20 @@ OMProperty * ImplAAFTypeDefFixedArray::pvtCreateOMPropertyMBS
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefFixedArray::CreateValueFromValues (
-      ImplAAFPropertyValue ** ppElementValues,
-      aafUInt32  numElements,
-      ImplAAFPropertyValue ** ppPropVal)
+ImplAAFTypeDefFixedArray::ValidateInputParams (
+												  ImplAAFPropertyValue ** ppElementValues,
+												  aafUInt32  numElements)
+												  
 {
-	AAFRESULT hr;
+	//first call base impl.
+	HRESULT hr;
+	hr = ImplAAFTypeDefArray::ValidateInputParams(ppElementValues, numElements);
+	if (AAFRESULT_FAILED (hr)) 
+		return hr;
 
-	//first validate params + basic stuff ...
-	if (!ppElementValues || !ppPropVal)
+	//Next, do some additional specific checking for Fixed Array ...
+
+	if (!ppElementValues)
 		return AAFRESULT_NULL_PARAM;
 
 	//verify count
@@ -401,45 +399,26 @@ AAFRESULT STDMETHODCALLTYPE
 		return hr;
 	if (numElements != internalCount)
 		return AAFRESULT_DATA_SIZE;
+	
 
-	//verify that all the individual elem types are the same as each other,
-	// AND that each of them is FIXED Arrayable ...
+	return AAFRESULT_SUCCESS;
 
-	//get Base TD and size
-	ImplAAFTypeDefSP spTargetTD;
-	hr = GetType(&spTargetTD); //gets base elem type
-	if (AAFRESULT_FAILED (hr)) 
-		return hr;
-	aafUInt32 targetElemSize = spTargetTD->NativeSize();
+}//ValidateInputParams()
 
-	for (aafUInt32 i=0; i<numElements; i++)
-	{
-		//get  source size
-		ImplAAFTypeDefSP  spSourceTD;
-		hr = ppElementValues[i]->GetType (&spSourceTD);
-		if (AAFRESULT_FAILED (hr)) 
-			return hr;
 
-		//verify FIXED Arrayable
-		if (! spSourceTD->IsFixedArrayable())
-			return AAFRESULT_BAD_TYPE;
 
-		//verify that spTargetTD == spSourceTD
-		if (spSourceTD != spTargetTD )
-			return AAFRESULT_BAD_TYPE;
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTypeDefFixedArray::CreateValueFromValues (
+													ImplAAFPropertyValue ** ppElementValues,
+													aafUInt32  numElements,
+													ImplAAFPropertyValue ** ppPropVal)
+{
 
-		//verify that the target elem size is equal to that of source 
-		aafUInt32 sourceSize = spSourceTD->NativeSize();	
-		if (sourceSize != targetElemSize )
-			return AAFRESULT_BAD_SIZE;
-
-	}//for each elem
-
-	// All params validated; proceed ....
-
-	//... just defer to Base-Class Array implementation:
-	return ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues, numElements, ppPropVal);
+	//simply defer to base impl.
+	return ImplAAFTypeDefArray::CreateValueFromValues(ppElementValues,numElements,
+												ppPropVal);
 }
+
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefFixedArray::RawAccessType (
@@ -464,3 +443,27 @@ bool ImplAAFTypeDefFixedArray::IsVariableArrayable () const
 
 bool ImplAAFTypeDefFixedArray::IsStringable () const
 { return false; }
+
+bool ImplAAFTypeDefFixedArray::IsArrayable(ImplAAFTypeDef * pSourceTypeDef) const
+{ return pSourceTypeDef->IsFixedArrayable(); }
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefFixedArray::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefFixedArray));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefFixedArray::onSave(void* clientContext) const
+{
+  ImplAAFTypeDefArray::onSave(clientContext);
+}
+
+void ImplAAFTypeDefFixedArray::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDefArray::onRestore(clientContext);
+}
