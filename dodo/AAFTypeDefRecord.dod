@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefRecord\
 #endm
@@ -233,7 +240,7 @@ AD_X2METHOD3(CreateValueFromValues,
 AD_XMETHOD3(CreateValueFromStruct,
 			[in\, size_is\(initDataSize\)],
 			objPass,
-			aafMemPtr_t *,
+			aafMemPtr_t,
 			pInitData,
 			pointer to compile-time struct containing data to use,
 
