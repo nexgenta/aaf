@@ -2,7 +2,7 @@
 // @com Common module test routines.
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTestsCommon.cpp,v 1.1.2.1 2004/05/14 21:58:33 jptrainor Exp $ $Name:  $
+// $Id: ModuleTestsCommon.cpp,v 1.1.2.2 2004/05/20 20:01:11 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -217,6 +217,9 @@ IAAFSmartPointer<IAAFMobSlot> GetSlotById( IAAFSmartPointer<IAAFMob>& pMob, aafS
 
   CheckResult( AAFRESULT_TEST_FAILED );
 
+  // Return something to keep MSVC6 happy.
+  IAAFSmartPointer<IAAFMobSlot> null;
+  return null;
 }
 
 //======================================================================
