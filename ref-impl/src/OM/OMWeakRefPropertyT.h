@@ -39,8 +39,10 @@ OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
                                                  const char* targetName)
 : OMReferenceProperty<ReferencedObject>(propertyId,
                                         SF_WEAK_OBJECT_REFERENCE,
-                                        name), _reference(this, name),
-  _targetName(saveString(targetName)), _targetSet(0)
+                                        name), _reference(this),
+  _targetTag(nullOMPropertyTag),
+  _targetName(saveString(targetName)),
+  _keyPropertyId(0 /* tjb */)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty");
 }
@@ -66,7 +68,7 @@ void OMWeakReferenceProperty<ReferencedObject>::getValue(
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  ReferencedObject* result = _reference.getValue(set());
+  ReferencedObject* result = _reference.getValue();
 
   object = result;
 
@@ -86,9 +88,8 @@ ReferencedObject* OMWeakReferenceProperty<ReferencedObject>::setValue(
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::setValue");
 
-  // tjb PRECONDITION("Valid target", set()->containsValue(object));
-
-  return _reference.setValue(object);
+  ReferencedObject* result = _reference.setValue(object);
+  return result;
 }
 
   // @mfunc Assignment operator.
@@ -117,14 +118,18 @@ template<typename ReferencedObject>
 ReferencedObject*
 OMWeakReferenceProperty<ReferencedObject>::operator -> (void)
 {
-  return _reference.getValue(set());
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::operator ->");
+
+  return _reference.getValue();
 }
 
 template<typename ReferencedObject>
 const ReferencedObject*
 OMWeakReferenceProperty<ReferencedObject>::operator -> (void) const
 {
-  return _reference.getValue(set());
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::operator ->");
+
+  return _reference.getValue();
 }
 
   // @mfunc Type conversion. Convert an
@@ -164,10 +169,10 @@ void OMWeakReferenceProperty<ReferencedObject>::save(void* clientContext) const
   OMStoredObject* store = container->store();
 
   OMFile* file = container->file();
-  OMUInt32 tag = file->referencedProperties()->insert(_targetName);
+  OMPropertyTag tag = file->referencedProperties()->insert(_targetName);
 
   const OMUniqueObjectIdentification& id = _reference.identification();
-  store->save(_propertyId, _storedForm, id, tag);
+  store->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
 
   _reference.save(clientContext);
 }
@@ -203,15 +208,15 @@ void OMWeakReferenceProperty<ReferencedObject>::restore(size_t externalSize)
   ASSERT("Valid store", store != 0);
 
   OMUniqueObjectIdentification id;
-  OMUInt32 tag;
+  OMPropertyTag tag;
   ASSERT("Sizes match", (sizeof(id) + sizeof(tag)) == externalSize);
-  store->restore(_propertyId, _storedForm, id, tag);
-
-  _reference.setIdentification(id);
+  OMPropertyId keyPropertyId;
+  store->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
+  ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
+  _targetTag = tag;
+  _reference = OMWeakObjectReference<ReferencedObject>(this, id, _targetTag);
   _reference.restore();
 
-  POSTCONDITION("Target names match",
-                         strcmp(_targetName, _reference.targetName(tag)) == 0);
 }
 
   // @mfunc  Is this <c OMWeakReferenceProperty> void ?
@@ -278,23 +283,6 @@ void OMWeakReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
 
   const ReferencedObject* p = *(const ReferencedObject**)bits;
   setValue(p);
-}
-
-template<typename ReferencedObject>
-OMStrongReferenceSetProperty<ReferencedObject>*
-OMWeakReferenceProperty<ReferencedObject>::set(void) const
-{
-  TRACE("OMWeakReferenceProperty<ReferencedObject>::set");
-
-  OMWeakReferenceProperty<ReferencedObject>* nonConstThis =
-                  const_cast<OMWeakReferenceProperty<ReferencedObject>*>(this);
-
-  if (_targetSet == 0) {
-    ASSERT("Valid target name", validString(_targetName));
-    nonConstThis->_targetSet = _reference.targetSet(_targetName);
-  }
-  POSTCONDITION("Valid result", _targetSet != 0);
-  return _targetSet;
 }
 
 #endif
