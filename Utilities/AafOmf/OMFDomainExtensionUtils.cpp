@@ -1,5 +1,6 @@
 // @doc INTERNAL
-// @com This file implements the module test for CEnumAAFPropertyValues
+// @com This file handles bdirectional translation of effect metadata between OMF and AAF
+
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -22,36 +23,27 @@
 //
 //=---------------------------------------------------------------------=
 
+// Put any extensions required to OMFDomainUtils here.
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <iostream.h>
 
+#include "omPublic.h"
+#include "omMedia.h"
 
+#include "OMFDomainExtensionUtils.h"
 
-
-
-#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
-#include "AAFResult.h"
-#include "ModuleTest.h"
-
-// Required function prototype.
-extern "C" HRESULT CEnumAAFPropertyValues_test(testMode_t);
-
-HRESULT CEnumAAFPropertyValues_test(testMode_t /*mode*/)
+// ============================================================================
+// Constructor
+// ============================================================================
+OMFDomainExtensionUtils::OMFDomainExtensionUtils()
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// ============================================================================
+// Destructor
+// ============================================================================
+OMFDomainExtensionUtils::~OMFDomainExtensionUtils()
+{
+}

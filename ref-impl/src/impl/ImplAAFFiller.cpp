@@ -1,5 +1,3 @@
-// @doc INTERNAL
-// @com This file implements the module test for CEnumAAFPropertyValues
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -23,35 +21,47 @@
 //=---------------------------------------------------------------------=
 
 
+#ifndef __ImplAAFDataDef_h__
+#include "ImplAAFDataDef.h"
+#endif
+
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
 
 
+#ifndef __ImplAAFFiller_h__
+#include "ImplAAFFiller.h"
+#endif
 
-
-
-#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
+#include <assert.h>
 #include "AAFResult.h"
-#include "ModuleTest.h"
 
-// Required function prototype.
-extern "C" HRESULT CEnumAAFPropertyValues_test(testMode_t);
 
-HRESULT CEnumAAFPropertyValues_test(testMode_t /*mode*/)
+ImplAAFFiller::ImplAAFFiller ()
+{}
+
+
+ImplAAFFiller::~ImplAAFFiller ()
+{}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFFiller::Initialize (ImplAAFDataDef * pDataDef,
+							   aafLength_t		length)
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+  if (! pDataDef)
+	return AAFRESULT_NULL_PARAM;
+
+  return( SetNewProps( length, pDataDef ) );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+AAFRESULT ImplAAFFiller::TraverseToClip(aafLength_t /*length*/,
+										 ImplAAFSegment ** /*sclp*/,
+										 ImplAAFPulldown ** /*pulldownObj*/,
+										 aafInt32 * /*pulldownPhase*/,
+										 aafLength_t * /*sclpLen*/,
+										 aafBool * /*isMask*/)
+{
+	return ( AAFRESULT_FILL_FOUND );
+}
 

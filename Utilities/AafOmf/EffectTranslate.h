@@ -1,5 +1,5 @@
-// @doc INTERNAL
-// @com This file implements the module test for CEnumAAFPropertyValues
+#ifndef _EFFECT_TRANSLATE_
+#define _EFFECT_TRANSLATE_
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -22,36 +22,34 @@
 //
 //=---------------------------------------------------------------------=
 
-
-
-
-
-
-
-#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
-#include "AAFResult.h"
-#include "ModuleTest.h"
-
-// Required function prototype.
-extern "C" HRESULT CEnumAAFPropertyValues_test(testMode_t);
-
-HRESULT CEnumAAFPropertyValues_test(testMode_t /*mode*/)
+class EffectTranslate
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
-}
+public:
+	EffectTranslate();
+	virtual ~EffectTranslate();
+
+public:
+	virtual bool isPrivateEffect(aafUID_t& uid);
 
 
+	virtual HRESULT GetEffectIDs(IAAFOperationGroup *effect,
+									   omfUniqueNamePtr_t effectID,
+									   omfUniqueNamePtr_t MCEffectID);
 
+	virtual HRESULT GetAAFEffectID(	omfUniqueNamePtr_t OMFEffectIDPtr,
+						omfUniqueNamePtr_t MCEffectIDPtr,
+						aafUID_t	*aafUID);
+	virtual bool RequiresNestedScope(aafUID_t &effectDefAUID);
+};
 
+typedef struct
+{
+	const aafUID_t	*aafID;
+	const char		*omfEffectID;
+	const char		*ExtendedEffectID;
+} effectXlate_t;
 
-
-
-
-
-
-
-
-
-
-
+extern effectXlate_t	stdXlateTable[];
+extern long				numStdEntries;
+#endif
 

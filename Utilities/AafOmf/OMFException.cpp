@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CEnumAAFPropertyValues
+// @com This file implements the OMF exception handling utility. 
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -22,36 +22,32 @@
 //
 //=---------------------------------------------------------------------=
 
+#include "OMFException.h"
 
+/*******************************************************************
+Name:
+	OMFException
+Description:
+	Test the given error code for a failure condition. If a failure
+	occurred, print the given printf() style message to the log (if 
+	applicable) and throw an exception.
+Returns:
+	None.
+********************************************************************/
 
-
-
-
-
-#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
-#include "AAFResult.h"
-#include "ModuleTest.h"
-
-// Required function prototype.
-extern "C" HRESULT CEnumAAFPropertyValues_test(testMode_t);
-
-HRESULT CEnumAAFPropertyValues_test(testMode_t /*mode*/)
+void OMFException::Check( omfErr_t errCode, const char *fmt, ... ) 
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	if( errCode != OM_ERR_NONE )
+	{
+		if( fmt != 0 && iLogger != 0 )
+		{
+			va_list args;
+			va_start( args, fmt );
+			VaList valist( args );
+			iLogger->Log( 0, fmt, valist );
+			va_end( args );
+		}
+		throw OMFException( errCode );
+	}
+	return;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

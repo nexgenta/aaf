@@ -1,39 +1,36 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFMobs
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -139,9 +136,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult(pMob->SetName(L"File Mob"));
 	
 	  // Create a concrete subclass of FileDescriptor
- 	  checkResult(defs.cdHTMLDescriptor()->
+ 	  checkResult(defs.cdAIFCDescriptor()->
 				  CreateInstance(IID_IAAFEssenceDescriptor, 
 								 (IUnknown **)&edesc));		
+
+
+		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
 
     checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
@@ -215,7 +219,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFFile *					pFile = NULL;
 	bool 						bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs, i;
 	HRESULT						hr = S_OK;
 	HRESULT						localhr = S_OK;
@@ -223,24 +226,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IEnumAAFMobs 				*cloneMobIter = NULL;
 	IAAFMob						*aMob = NULL;
 	IAAFMob						**mobArray = NULL;
-	IAAFMob						**smallMobArray = NULL;
 	aafSearchCrit_t				criteria;
 	aafUInt32					numFetched = 0;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFMobs Test";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
-	ProductInfo.platform = NULL;
-	  
 
   try
   {
@@ -302,10 +290,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	localhr = S_OK;
 	mobIter->Reset();
 	
-	// Try Skipping 0 objects			
-	if (mobIter->Skip(0) != AAFRESULT_SUCCESS)
-			localhr = AAFRESULT_TEST_FAILED;
-
 	// skip over each Mob one at a time.
 	for (i=0; i<numMobs; i++)
 		if (mobIter->Skip(1) != AAFRESULT_SUCCESS)
@@ -341,12 +325,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 	localhr = S_OK;
 	numFetched = 1;
-	// Make sure a count of 0 succeeds
-	if (mobIter->Next(0, &aMob, &numFetched) != AAFRESULT_SUCCESS)
-		localhr = AAFRESULT_TEST_FAILED;
-	
-	if (0 != numFetched)
-		localhr = AAFRESULT_TEST_FAILED;
 
 	// Iterate thru the Mobs using Next doing 1 at a time
 	mobIter->Reset();
@@ -363,7 +341,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	}
 			
 	// Make sure we are at the end
-	if (mobIter->Next(1, &aMob, &numFetched) != AAFRESULT_SUCCESS)
+	if (mobIter->Next(1, &aMob, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
 		localhr = AAFRESULT_TEST_FAILED;
 	if(numFetched != 0)
 		localhr = AAFRESULT_TEST_FAILED;
@@ -392,7 +370,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	}
 
 	// Make sure we can't get more Mobs than numMobs	
-	if (mobIter->Next(i+1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
+	if (mobIter->Next(i+1, mobArray, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
 		localhr = AAFRESULT_TEST_FAILED;
 
 	if (numMobs != numFetched)
@@ -412,7 +390,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	mobIter->Skip(2);
 
 	// Make sure we can't go past the end to fill the array
-	if (mobIter->Next(numMobs, mobArray, &numFetched) != AAFRESULT_SUCCESS)
+	if (mobIter->Next(numMobs, mobArray, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
 		localhr = AAFRESULT_TEST_FAILED;
 
 	if ((numMobs-2) != numFetched)
@@ -435,6 +413,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	// Make sure it returns E_INVALIDARG	
 	if (mobIter->Next(1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
 		localhr = AAFRESULT_TEST_FAILED;
+	else
+	{
+		for (i = 0; i < numFetched; i++)
+		if (mobArray[i] != NULL)
+		{
+			mobArray[i]->Release();
+			mobArray[i] = NULL;
+		}
+		else
+			localhr = AAFRESULT_TEST_FAILED;		
+	}
 
 	if (SUCCEEDED(localhr))
 		cout<< "	Next() ...		Passed" << endl;
@@ -450,64 +439,71 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	localhr = S_OK;
 	mobIter->Reset();
 	if (mobIter->Clone(&cloneMobIter) == AAFRESULT_SUCCESS)	{
-		for (i=0; i < numMobs; i++)	
+		for (i=0; i < numMobs; i++)	{
 			if (cloneMobIter->NextOne(&aMob) == AAFRESULT_SUCCESS)	{
 				aMob->Release();
     			aMob = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;		
+		}
 
 		if (cloneMobIter->NextOne(&aMob) != AAFRESULT_NO_MORE_OBJECTS)
 			localhr = AAFRESULT_TEST_FAILED;
 
 		cloneMobIter->Reset();
-		if (cloneMobIter->Next(numMobs, mobArray, &numFetched) != AAFRESULT_SUCCESS)
+		if (cloneMobIter->Next(numMobs, mobArray, &numFetched) 
+			!= AAFRESULT_SUCCESS)
 			localhr = AAFRESULT_TEST_FAILED;
 
 		if (numMobs != numFetched)
 			localhr = AAFRESULT_TEST_FAILED;
 		
-		for (i = 0; i < numMobs; i++)
+		for (i = 0; i < numMobs; i++) {
 			if (mobArray[i] != NULL)	{
 				mobArray[i]->Release();
 				mobArray[i] = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;
+		}
 
 		cloneMobIter->Reset();
 
-		if (cloneMobIter->Next(numMobs+1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
+		if (cloneMobIter->Next(numMobs+1, mobArray, &numFetched) 
+			!= AAFRESULT_NO_MORE_OBJECTS)
 			localhr = AAFRESULT_TEST_FAILED;
 
 		if (numMobs != numFetched)
 			localhr = AAFRESULT_TEST_FAILED;
 		
-		for (i = 0; i < numMobs; i++)
+		for (i = 0; i < numMobs; i++) {
 			if (mobArray[i] != NULL)	{
 				mobArray[i]->Release();
 				mobArray[i] = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;
+		}
 
 		cloneMobIter->Reset();
 		cloneMobIter->Skip(1);
 
-		if (cloneMobIter->Next(numMobs, mobArray, &numFetched) != AAFRESULT_SUCCESS)
+		if (cloneMobIter->Next(numMobs, mobArray, &numFetched) 
+			!= AAFRESULT_NO_MORE_OBJECTS)
 			localhr = AAFRESULT_TEST_FAILED;
 
 		if ((numMobs-1) != numFetched)
 			localhr = AAFRESULT_TEST_FAILED;
 		
-		for (i = 0; i < numMobs-1; i++)
+		for (i = 0; i < numMobs-1; i++) {
 			if (mobArray[i] != NULL)	{
 				mobArray[i]->Release();
 				mobArray[i] = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;
+		}
 	
 		cloneMobIter->Release();
 	 	cloneMobIter = NULL;
@@ -563,6 +559,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	
 		if (cloneMobIter->Next(1, mobArray, &numFetched) != AAFRESULT_SUCCESS)
 			localhr = AAFRESULT_TEST_FAILED;
+		else
+		{
+			for (i = 0; i < numFetched; i++) {
+				if (mobArray[i] != NULL)
+				{
+					mobArray[i]->Release();
+					mobArray[i] = NULL;
+				}
+				else
+					localhr = AAFRESULT_TEST_FAILED;		
+			}
+		}
 
 		cloneMobIter->Release();
  		cloneMobIter = NULL;
@@ -614,16 +622,23 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
  
-extern "C" HRESULT CEnumAAFMobs_test()
+extern "C" HRESULT CEnumAAFMobs_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFMobs_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_TEST_PARTIAL_SUCCESS; //AAFRESULT_SUCCESS;
  	aafWChar * pFileName = L"EnumAAFMobsTest.aaf";
 
   try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(AAFRESULT_SUCCESS == hr)
 			hr = ReadAAFFile( pFileName );
+		
+		if(hr == AAFRESULT_SUCCESS)
+			hr = AAFRESULT_NOT_IN_CURRENT_VERSION;
 	}
   catch (...)
 	{
