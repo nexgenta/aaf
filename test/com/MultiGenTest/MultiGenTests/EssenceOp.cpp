@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EssenceOp.cpp,v 1.3 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+// $Id: EssenceOp.cpp,v 1.4 2004/10/22 16:03:21 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -201,12 +201,12 @@ void EssenceCreate::RunTest( CmdState& state, int argc, char** argv )
   }
 
   if ( type == "picture" ) {
-    dataDefId = DDEF_Picture;
+    dataDefId = kAAFDataDef_Picture;
     sampleRate.numerator = MULTI_GEN_VIDEO_RATE_NUM;
     sampleRate.denominator = MULTI_GEN_VIDEO_RATE_DEN;
   }
   else if ( type == "sound" ) {
-    dataDefId = DDEF_Sound;
+    dataDefId = kAAFDataDef_Sound;
     sampleRate.numerator = MULTI_GEN_AUDIO_RATE_NUM;
     sampleRate.denominator = MULTI_GEN_AUDIO_RATE_DEN;
   }

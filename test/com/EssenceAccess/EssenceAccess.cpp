@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: EssenceAccess.cpp,v 1.26 2004/05/05 15:48:40 stuart_hc Exp $ $Name:  $
+// $Id: EssenceAccess.cpp,v 1.27 2004/10/22 16:03:21 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -216,7 +216,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 									  &pCDMasterMob));
 	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
 									  &pCDNetworkLocator));
-	check(pDictionary->LookupDataDef(DDEF_Sound,
+	check(pDictionary->LookupDataDef(kAAFDataDef_Sound,
 									 &pDdefSound));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
@@ -553,7 +553,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					dataPtr = WAVDataBuf + dataOffset;
 					
 #else
-					check(pDictionary->LookupDataDef(DDEF_Sound, &pddSound));
+					check(pDictionary->LookupDataDef(kAAFDataDef_Sound, &pddSound));
 					check(pEssenceAccess->CountSamples(pddSound, &sampleCount));
 					samplesToRead = (aafInt32)sampleCount;		// !!! Possible loss of data if > 4gig
 #endif

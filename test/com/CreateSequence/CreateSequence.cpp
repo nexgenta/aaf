@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CreateSequence.cpp,v 1.45 2004/09/10 17:13:13 stuart_hc Exp $ $Name:  $
+// $Id: CreateSequence.cpp,v 1.46 2004/10/22 16:03:20 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -224,7 +224,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
                                     &pCDSourceClip));
   check(pDictionary->LookupClassDef(AUID_AAFFiller,
                                     &pCDFiller));
-  check(pDictionary->LookupDataDef(DDEF_Picture,
+  check(pDictionary->LookupDataDef(kAAFDataDef_Picture,
                                    &pDdefPicture));
 
 // IMPORTANT: major remodification is from this point onwards...
@@ -606,7 +606,7 @@ STDAPI MemoryFileOpenNewModify (
     rs,
     kAAFFileExistence_new,
     kAAFFileAccess_write,
-    &aafFileKindAaf4KBinary,
+    &kAAFFileKind_Aaf4KBinary,
     modeFlags,
     pIdent,
     ppFile);
