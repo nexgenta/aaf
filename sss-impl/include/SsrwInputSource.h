@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFHeader.
 //=---------------------------------------------------------------------=
 //
-// $Id: SsrwInputSource.h,v 1.2 2004/04/07 16:01:12 bakerian Exp $ $Name:  $
+// $Id: SsrwInputSource.h,v 1.3 2004/04/07 16:02:46 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,7 +19,7 @@
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
+// Licensor of the AAF Association is Schema Software, Inc.
 // All rights reserved.
 //
 //=---------------------------------------------------------------------=
@@ -53,8 +53,8 @@
 * 
 *  Copyright (C) 2002 - 2004 Schema Software, Inc. All rights reserved.
 *
-*  $Revision: 1.2 $
-*  $Date: 2004/04/07 16:01:12 $
+*  $Revision: 1.3 $
+*  $Date: 2004/04/07 16:02:46 $
 *  
 */
 
