@@ -86,11 +86,8 @@
 #include "ImplEnumAAFMobSlots.h"
 #include "ImplEnumAAFComponents.h"
 
-#if defined(_MAC) || defined(macintosh)
-#include <wstring.h>
-#endif
-
 #include <assert.h>
+#include <wchar.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
@@ -131,10 +128,10 @@ ImplAAFMob::ImplAAFMob ()
 ImplAAFMob::~ImplAAFMob ()
 {
 	// Release all of the mob slot pointers.
-	size_t size = _slots.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _slots.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFMobSlot *pSlot = _slots.setValueAt(0, i);
+		ImplAAFMobSlot *pSlot = _slots.clearValueAt(i);
 		if (pSlot)
 		{
 		  pSlot->ReleaseReference();
@@ -144,10 +141,10 @@ ImplAAFMob::~ImplAAFMob ()
 
 	if(_userComments.isPresent())
 	{
-		size = _userComments.getSize();
-		for (size_t j = 0; j < size; j++)
+		count = _userComments.count();
+		for (size_t j = 0; j < count; j++)
 		{
-			ImplAAFTaggedValue* pTaggedValue = _userComments.setValueAt(0, j);
+			ImplAAFTaggedValue* pTaggedValue = _userComments.clearValueAt(j);
 			if (pTaggedValue)
 			  pTaggedValue->ReleaseReference();
 			pTaggedValue = 0;
@@ -155,10 +152,10 @@ ImplAAFMob::~ImplAAFMob ()
 	}
 	if(_KLVData.isPresent())
 	{
-		size = _KLVData.getSize();
-		for (size_t j = 0; j < size; j++)
+		count = _KLVData.count();
+		for (size_t j = 0; j < count; j++)
 		{
-			ImplAAFKLVData* pKLVData = _KLVData.setValueAt(0, j);
+			ImplAAFKLVData* pKLVData = _KLVData.clearValueAt(j);
 			if (pKLVData)
 			  pKLVData->ReleaseReference();
 			pKLVData = 0;
@@ -598,7 +595,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if(pDictionary != NULL)
 		  pDictionary->ReleaseReference();
 		pDictionary = 0;
-		return(XCODE());
 	}
 	XEND;
 
@@ -663,7 +659,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if(pDictionary != NULL)
 		  pDictionary->ReleaseReference();
 		pDictionary = 0;
-		return(XCODE());
 	  }
 	XEND;
 
@@ -702,7 +697,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
-		return(XCODE());
 	}
 	XEND;
 	
@@ -759,7 +753,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if (commentFound)
 		{
 			// Update existing comment
-			CHECK(pTaggedValue->SetValue((wcslen(pComment)*sizeof(aafCharacter)+2), (aafDataValue_t)pComment));
+			CHECK(pTaggedValue->SetValue((wcslen(pComment)+1)*sizeof(aafCharacter), (aafDataValue_t)pComment));
 			pTaggedValue->ReleaseReference();
 			pTaggedValue = 0;
 		}
@@ -769,7 +763,7 @@ AAFRESULT STDMETHODCALLTYPE
 			CHECK(pTaggedValueClass->CreateInstance ((ImplAAFObject**) &pTaggedValue));
 			CHECK(pTaggedValue->Initialize(pTagName,
 										   pTaggedValueType,
-                       (wcslen(pComment)*sizeof(aafCharacter)+2), 
+                       ((wcslen(pComment)+1)*sizeof(aafCharacter)), 
                        (aafDataValue_t)pComment));
 			_userComments.appendValue(pTaggedValue);
 		}
@@ -782,7 +776,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if(pDictionary != NULL)
 		  pDictionary->ReleaseReference();
 		pDictionary = 0;
-		return(XCODE());
 	}
 	XEND;
 
@@ -869,7 +862,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
-		return(XCODE());
 	}
 	XEND;
 	
@@ -965,7 +957,6 @@ AAFRESULT STDMETHODCALLTYPE
 		  theEnum->ReleaseReference();
 		  theEnum = 0;
 		}
-	  return(XCODE());
 	}
   XEND;
 	
@@ -982,12 +973,12 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFSegment		*pdwnInput = NULL;
 	ImplEnumAAFMobSlots *iter = NULL;
 	ImplAAFSegment		*seg = NULL;
-	aafTimecode_t		timecode;
+//	aafTimecode_t		timecode;
 	aafBool				reverse = kAAFFalse;
-	aafUInt32			frameOffset;
-	aafUID_t			dataDefID;
-	aafPosition_t		newStart;
-	aafInt32			start32;
+//	aafUInt32			frameOffset;
+//	aafUID_t			dataDefID;
+//	aafPosition_t		newStart;
+//	aafInt32			start32;
 	AAFRESULT			aafError = AAFRESULT_SUCCESS;
 	
 
@@ -995,7 +986,9 @@ AAFRESULT STDMETHODCALLTYPE
   if (NULL == tcSlotID || NULL == offset || NULL == result)
     return (AAFRESULT_NULL_PARAM);
   
-  memset(result, 0, sizeof(aafTimecode_t));
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+#if 0
+	memset(result, 0, sizeof(aafTimecode_t));
 	memset(&timecode, 0, sizeof(aafTimecode_t));
 	result->startFrame = 0;
 	
@@ -1085,11 +1078,11 @@ AAFRESULT STDMETHODCALLTYPE
 		if(pdwnInput != NULL)
 		  pdwnInput->ReleaseReference();
 		pdwnInput = 0;
-		return(XCODE());
 	}
 	XEND;
 	
 	return(AAFRESULT_SUCCESS);
+#endif
 }
 
 
@@ -1239,7 +1232,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (dict)
 		  dict->ReleaseReference();
 		dict = 0;
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1415,7 +1407,6 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	  {
 		/* NOTE: This function needs more cleanup (delete mob, out of index) */
-		return(XCODE());
 	  }
 	XEND;
 
@@ -1586,7 +1577,6 @@ AAFRESULT STDMETHODCALLTYPE
 		/* NOTE: This function needs more cleanup (delete mob, out of index) */
 		if (XCODE() == AAFRESULT_TABLE_DUP_KEY)
 		  return(AAFRESULT_DUPLICATE_MOBID);
-		return(XCODE());
 	  }
 	XEND;
 
@@ -1746,7 +1736,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 	aafSlotID_t				nextTrackID;
 	ImplAAFFindSourceInfo	*sourceInfo = NULL ;
 	ImplAAFComponent		*leafObj = NULL;
-	ImplAAFOperationGroup	*effeObject;
+	ImplAAFOperationGroup	*effeObject = NULL;
 	
 	if(ppSourceInfo == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -1891,7 +1881,7 @@ AAFRESULT ImplAAFMob::MobFindLeaf(ImplAAFMobSlot *track,
 	XEXCEPT
 	{
 		/* At least try and return length if we can */
-		return(XCODE());
+		//return(XCODE());
 	}
 	XEND;
 	
@@ -1984,7 +1974,7 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		nextTrack->ReleaseReference();
 		nextTrack = 0;
 
-//		sclp->ReleaseReference(); // causes 800400c8 to be returned from MasterMob::OpenEssence
+		sclp->ReleaseReference(); // causes 800400c8 to be returned from MasterMob::OpenEssence
 	}
 	XEXCEPT
 	{
@@ -1994,8 +1984,8 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		if (nextMob)
 		  nextMob->ReleaseReference();
 		nextMob = 0;
-//		if (sclp)
-//			sclp->ReleaseReference();
+		if (sclp)
+			sclp->ReleaseReference();
 	}
 	XEND;
 	
