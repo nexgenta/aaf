@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMFile.cpp,v 1.148 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMFile.cpp,v 1.149 2004/11/18 12:26:48 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -438,7 +438,7 @@ bool OMFile::isRecognized(const wchar_t* fileName,
 	// second, search for other factories
 	if( !result ) {
 		FactorySetIterator iterator2(*_factory, OMBefore);
-		while (++iterator) {
+		while (++iterator2) {
 			if ( iterator2.value()->better()
 				 && iterator2.value()->isRecognized(fileName)) {
 				result = true;
@@ -482,7 +482,7 @@ bool OMFile::isRecognized(OMRawStorage* rawStorage,
 	// second, search for other factories
 	if( !result ) {
 		FactorySetIterator iterator2(*_factory, OMBefore);
-		while (++iterator) {
+		while (++iterator2) {
 			ASSERT("Properly positioned raw storage", rawStorage->position() == 0);
 			if ( iterator2.value()->better()
 				 && iterator2.value()->isRecognized(rawStorage)) {
