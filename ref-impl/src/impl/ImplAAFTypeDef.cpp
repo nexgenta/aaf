@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.cpp,v 1.28.2.1 2004/07/21 23:27:46 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.cpp,v 1.28.2.2 2004/07/23 18:23:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,6 +68,14 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+bool ImplAAFTypeDef::isFixedSize(void) const
+{
+  bool result = false;
+  if (IsFixedSize() == kAAFTrue) {
+    result = true;
+  }
+  return result;
+}
 
 void ImplAAFTypeDef::reorder(OMByte* /*bytes*/,
 							 size_t /*bytesSize*/) const
@@ -85,6 +93,10 @@ size_t ImplAAFTypeDef::externalSize(const OMByte* /*internalBytes*/,
   return 0; // Not reached!
 }
 
+size_t ImplAAFTypeDef::externalSize(void) const
+{
+  return PropValSize();
+}
 
 void ImplAAFTypeDef::externalize(const OMByte* /*internalBytes*/,
 								 size_t /*internalBytesSize*/,
@@ -105,6 +117,10 @@ size_t ImplAAFTypeDef::internalSize(const OMByte* /*externalBytes*/,
   return 0; // Not reached!
 }
 
+size_t ImplAAFTypeDef::internalSize(void) const
+{
+  return NativeSize();
+}
 
 void ImplAAFTypeDef::internalize(const OMByte* /*externalBytes*/,
 								 size_t /*externalBytesSize*/,
