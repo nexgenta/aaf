@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFMob.dod,v 1.37.2.1 2004/03/10 18:00:37 jptrainor Exp $ $Name:  $
+#c $Id: AAFMob.dod,v 1.37.2.2 2004/04/01 13:15:40 jptrainor Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -58,6 +58,8 @@ AD_IDL(//
 AD_FORWARD_DECLARATION(AAFSegment)
 AD_FORWARD_DECLARATION(AAFMobSlot)
 AD_FORWARD_DECLARATION(AAFTimelineMobSlot)
+AD_FORWARD_DECLARATION(AAFEventMobSlot)
+AD_FORWARD_DECLARATION(AAFStaticMobSlot)
 AD_FORWARD_DECLARATION(AAFFile)
 AD_FORWARD_DECLARATION(EnumAAFMobSlots)
 AD_FORWARD_DECLARATION(EnumAAFTaggedValues)
@@ -981,5 +983,7 @@ AD_COM_METH(.method-GetAttributes)
 AD_COM_METH(.method-RemoveAttribute)
 AD_COM_METH(.method-SetUsageCode)
 AD_COM_METH(.method-GetUsageCode)
+AD_COM_METH(.method-AppendNewStaticSlot)
+AD_COM_METH(.method-AppendNewEventSlot)
 
 AD_COM_EXT_CLASS_END(AAFMob2)
