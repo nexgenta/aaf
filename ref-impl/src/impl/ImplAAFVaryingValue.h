@@ -54,6 +54,20 @@ public:
   //********
   ImplAAFVaryingValue ();
 
+
+  //****************
+  // Initialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Initialize
+        (// @parm [in] // Parameter definition for this object (this determines the type of the constant value)
+         ImplAAFParameterDef * pParameterDef,
+         
+         // @parm [in] Interpolation definition for this object
+         ImplAAFInterpolationDef * pInterpolationDef);
+
+
+
 protected:
   virtual ~ImplAAFVaryingValue ();
 
@@ -75,11 +89,11 @@ public:
     GetInterpolationDefinition
         (ImplAAFInterpolationDef ** ppDef);
 
-    //****************
-  // AppendPoint()
+  //****************
+  // AddControlPoint()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendPoint
+    AddControlPoint
         // @parm [in] pointer to IAAFControlPoint object
         (ImplAAFControlPoint * pPoint);
 
@@ -91,6 +105,35 @@ public:
     GetControlPoints
         // @parm [out,retval] Parameter definition enumeration
         (ImplEnumAAFControlPoints ** ppEnum);
+
+  //****************
+  // CountControlPoints()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountControlPoints
+        // @parm [out,retval] Parameter definition enumeration
+        (aafUInt32 * pResult);
+
+
+  //****************
+  // GetControlPointAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetControlPointAt
+        // @parm [in] index of control point to retrieve
+        (aafUInt32 index,
+		 // @parm [out,retval] retrieved control point
+		 ImplAAFControlPoint ** ppControlPoint);
+
+
+  //****************
+  // RemoveControlPointAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveControlPointAt
+        // @parm [in] index of control point to remove
+        (aafUInt32 index);
+
 
   //****************
   // GetValueBufLen()
@@ -119,15 +162,12 @@ public:
 
 public:
 	// SDK-private methods
-	virtual AAFRESULT STDMETHODCALLTYPE
-		GetTypeDef(ImplAAFTypeDef **ppTypeDef);
 
 private:
 	OMFixedSizeProperty<aafUID_t>						 _interpolation;
-    OMStrongReferenceVectorProperty<ImplAAFControlPoint> _controlPoints;
-	OMVariableSizeProperty<aafUInt8>					_value;
-    OMWideStringProperty								 _displayValue;
-	OMFixedSizeProperty<aafReferenceType_t>				_significance;
+  OMStrongReferenceVectorProperty<ImplAAFControlPoint> _controlPoints;
+
+  ImplAAFTypeDef * _cachedTypeDef; // NOT REFERENCE COUNTED!
 };	
 
 #endif // ! __ImplAAFVaryingValue_h__
