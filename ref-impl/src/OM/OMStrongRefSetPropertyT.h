@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. |
+//         OMStrongReferenceSetProperty
 #ifndef OMSTRONGREFSETPROPERTYT_H
 #define OMSTRONGREFSETPROPERTYT_H
 
@@ -741,6 +743,21 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   ASSERT("Object is correct type", p != 0);
 
   removeValue(p);
+}
+
+  // @mfunc Remove all objects from this <c OMStrongReferenceSetProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+template <typename UniqueIdentification, typename ReferencedObject>
+void OMStrongReferenceSetProperty<UniqueIdentification,
+                                  ReferencedObject>::removeAllObjects(void)
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::removeAllObjects");
+
+  _set.clear();
+  POSTCONDITION("All objects removed", count() == 0);
 }
 
   // @mfunc Create an <c OMReferenceContainerIterator> over this

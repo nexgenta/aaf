@@ -49,6 +49,7 @@ class OMStrongReferenceSetElement;
   //   @tcarg class | UniqueIdentification | The type of the unique key
   //          used to identify the referenced objects.
   //   @base public | <c OMReferenceSetProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetProperty : public OMReferenceSetProperty {
 public:
@@ -172,6 +173,10 @@ public:
     // @cmember Remove <p object> from this
     //          <c OMStrongReferenceSetProperty>.
   virtual void removeObject(const OMObject* object);
+
+    // @cmember Remove all objects from this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual void removeAllObjects(void);
 
     // @cmember Create an <c OMReferenceContainerIterator> over this
     //          <c OMStrongReferenceSetProperty>.
