@@ -182,8 +182,8 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
 
   virtual AAFRESULT STDMETHODCALLTYPE
     RawAccessType
