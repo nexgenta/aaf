@@ -1,10 +1,12 @@
-#c /***********************************************\
-#c *                                               *
-#c * Advanced Authoring Format                     *
-#c *                                               *
-#c * Copyright (c) 1998-1999 Avid Technology, Inc. *
-#c *                                               *
-#c \***********************************************/
+#c /******************************************\
+#c *                                          *
+#c * Advanced Authoring Format                *
+#c *                                          *
+#c * Copyright (c) 1998 Avid Technology, Inc. *
+#c * Copyright (c) 1998 Microsoft Corporation *
+#c *                                          *
+#c \******************************************/
+
 
 
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -27,33 +29,14 @@
 #startm AD_HEAD 00
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDefinitionObject
-/***********************************************************************
-*
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
-
+/******************************************\\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\\******************************************/
 #endm
 
 
@@ -120,18 +103,6 @@ AD_CLASS_BEGIN\
 
 #ccccccccccccccccccccccccccc
 #c
-#c Ends a class definition for classes which support more than the
-#c primary COM interface.
-#c
-#c Arguments: additional interface name
-#c
-#startm AD_COM_EXT2_CLASS_BEGIN 02
-AD_CLASS_BEGIN\
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
 #c Starts a class definition with no parent class
 #c
 #c Arguments: none
@@ -187,12 +158,6 @@ AAFRESULT .this-module::test()
 #endm
 
 #startm AD_INCLUDE 01
-#endm
-
-#startm AD_CPPINCLUDE 01
-#endm
-
-#startm AD_CPP_QUOTE_INCLUDE 01
 #endm
 
 #startm AD_TYPES_BEGIN 11
@@ -258,22 +223,16 @@ AAFRESULT .this-module::test()
 #startm AD_XMETHOD_11 57
 #endm
 
-#startm AD_X2METHOD3 23
+#startm AD_X2METHOD3 20
 #endm
 
-#startm AD_X2METHOD4 30
-#endm
-
-#startm AD_X2METHOD5 37
+#startm AD_X2METHOD4 26
 #endm
 
 #startm AD_CLASS_END 00
 #endm
 
 #startm AD_COM_EXT_CLASS_END 01
-#endm
-
-#startm AD_COM_EXT2_CLASS_END 02
 #endm
 
 #startm AD_ROOT_CLASS_END 00
@@ -466,181 +425,8 @@ AD_CLASS_END\
 
 #ccccccccccccccccccccccccccc
 #c
+#c CPPT 
 #c Declaration for the dictionary's factory method.
 #c
 #startm AD_DICTIONARY_FACTORY 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Declaration for the dictionary's meta factory method.
-#c
-#startm AD_DICTIONARY_METAFACTORY 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Declaration for the class definition's factory method.
-#c
-#startm AD_CLASSDEF_FACTORY 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Beginning of the module definitions
-#c
-#startm AD_MODULE_BEGIN 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c End of the module definitions
-#c
-#startm AD_MODULE_END 00
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes no arguments.
-#c
-#c Argument1: function name
-#c Argument2: function description
-#c
-#startm AD_FUNCTION0 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes one argument.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt	
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c
-#c Macro Arg 07: function description
-#c
-#startm AD_XFUNCTION1 07
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes two arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c
-#c Macro Arg 12: function description
-#c
-#startm AD_XFUNCTION2 12
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes three arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c
-#c Macro Arg 17: function description
-#c
-#startm AD_XFUNCTION3 17
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes four arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c
-#c Macro Arg 22: function description
-#c
-#startm AD_XFUNCTION4 22
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes five arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c
-#c Macro Arg 27: function description
-#c
-#startm AD_XFUNCTION5 27
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes seven arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c metharg 7    32           33          34      35      36
-#c
-#c Macro Arg 37: function description
-#c
-#startm AD_XFUNCTION7 37
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c macro for things which are not to be exported.
-#c
-#startm AD_NO_EXPORT 01
-%01\
 #endm
