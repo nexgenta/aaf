@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFEssenceData
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFEssenceDataTest.cpp,v 1.29 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFEssenceDataTest.cpp,v 1.30 2004/03/31 08:59:38 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -345,19 +345,11 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
   _pSourceMob = NULL;
 }
 
-#define SZ_ESSENCE 512
 void EnumEssenceDataTest::createEssenceData(IAAFSourceMob *pSourceMob)
 {
   assert(_pFile && _pHeader && _pDictionary);
   assert(pSourceMob);
   assert(NULL == _pEssenceData);
-
-    //prepare dummy essence
-  	char buff[SZ_ESSENCE];
-	aafUInt32 bytesWritten;
-	for(int i=0;i<SZ_ESSENCE;i++)
-		buff[i]=(char)i;
-
 
   CAAFBuiltinDefs defs (_pDictionary);
 
@@ -369,9 +361,6 @@ void EnumEssenceDataTest::createEssenceData(IAAFSourceMob *pSourceMob)
   check(_pEssenceData->SetFileMob(pSourceMob));
   check(_pHeader->AddEssenceData(_pEssenceData));
 
-   check(_pEssenceData->Write(SZ_ESSENCE, (aafDataBuffer_t)buff,&bytesWritten));
-
-  
   _pEssenceData->Release();
   _pEssenceData = NULL;
 }
