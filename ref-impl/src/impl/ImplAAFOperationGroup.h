@@ -1,35 +1,17 @@
 //@doc
-//@class    AAFOperationGroup | Implementation class for AAFOperationGroup
-#ifndef __ImplAAFOperationGroup_h__
-#define __ImplAAFOperationGroup_h__
+//@class    AAFGroup | Implementation class for AAFGroup
+#ifndef __ImplAAFGroup_h__
+#define __ImplAAFGroup_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #ifndef __AAFTypes_h__
@@ -38,38 +20,55 @@
 
 
 class ImplAAFDataDef;
-class ImplAAFOperationDef;
+
+class ImplAAFEffectDef;
+
 class ImplAAFParameter;
-class ImplEnumAAFOperationDefs;
+
+class ImplEnumAAFEffectDefs;
+
 class ImplEnumAAFParameterDefs;
+
 class ImplAAFSegment;
-class ImplAAFSourceReference;
-class ImplEnumAAFParameters;
 
-#ifndef __ImplAAFParameter_h__
-#include "ImplAAFParameter.h"
-#endif
 
-#ifndef __ImplAAFSourceReference_h__
-#include "ImplAAFSourceReference.h"
-#endif
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+ 
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
+
+
+
+
+
+
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
 #endif
 
 
-class ImplAAFOperationGroup : public ImplAAFSegment
+class ImplAAFGroup : public ImplAAFSegment
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFOperationGroup ();
+  ImplAAFGroup ();
 
 protected:
-  virtual ~ImplAAFOperationGroup ();
+  virtual ~ImplAAFGroup ();
 
 public:
 
@@ -79,26 +78,25 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
-        (// @parm [in] Data Definition Object
-         ImplAAFDataDef * pDataDef,
-
+        (// @parm [in] Data definition object
+         ImplAAFDataDef * datadef,
 
          // @parm [in] Length property value
          aafLength_t  length,
 
          // @parm [in] Effect Definition object
-         ImplAAFOperationDef * operationDef);
+         ImplAAFEffectDef * effectDef);
 	//@comm  This function takes an already created effect definition object as an argument.
 	//@comm  To add slots to the effect, call AddNewSlot.
 	//@comm  To add renderings, call SetRender.
 
   //****************
-  // GetOperationDefinition()
+  // GetEffectDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetOperationDefinition
+    GetEffectDefinition
         // @parm [out] Effect definition object
-        (ImplAAFOperationDef ** OperationDef);
+        (ImplAAFEffectDef ** effectDef);
 	//@comm Replaces part of omfiEffectGetInfo
 
 
@@ -108,7 +106,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetRender
         // @parm [out] Final rendering segment
-        (ImplAAFSourceReference ** sourceRef);
+        (ImplAAFSegment ** segment);
 	//@comm If this property does not exist the error
 	// OM_ERR_PROP_NOT_PRESENT will be returned.
 	//@comm Working and final renderings are handled by using
@@ -121,7 +119,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     IsATimeWarp
         // @parm [out] Working rendering source clip
-        (aafBool *  sourceClip);
+        (aafBool **  sourceClip);
 	//@comm Replaces omfiEffectIsATimeWarp
 
 
@@ -131,25 +129,25 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetBypassOverride
         // @parm [out] Bypass override property value
-        (aafUInt32 *  bypassOverride);
+        (aafArgIDType_t *  bypassOverride);
 	//@comm If the property does not exist, the error OM_ERR_PROP_NOT_PRESENT will be returned.)
 	//@comm Replaces omfiEffectGetBypassOverride
 
   //****************
-  // CountSourceSegments()
+  // GetNumSourceSegments()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountSourceSegments
+    GetNumSourceSegments
         // @parm [out] Number of source media segments in the effect
         (aafInt32 *  numSources);
 	//@comm Replaces omfiEffectGetNumSlots
 
 
   //****************
-  // CountParameters()
+  // GetNumParameters()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountParameters
+    GetNumParameters
         // @parm [out] Number of parameter slots in the effect
         (aafInt32 *  numParameters);
 	//@comm Replaces omfiEffectGetNumSlots
@@ -158,45 +156,31 @@ public:
   // IsValidTranEffect()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    IsValidTranOperation
+    IsValidTranEffect
         // @parm [out] TRUE if the effect is valid in a transition
         (aafBool *  validTransition);
 
   //****************
-  // AddParameter()
+  // AddNewParameter()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddParameter
-        (// @parm [in] Parameter to place in effect slot
+    AddNewParameter
+        (// @parm [in] Argument ID for the slot
+         aafArgIDType_t  argID,
+
+         // @parm [in] Parameter to place in effect slot
          ImplAAFParameter * value);
 	//@comm Replaces part of omfiEffectAddNewSlot
 
   //****************
-  // AppendInputSegment()
+  // AddNewInputSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendInputSegment
-        (// @parm [in] Segment to place in effect
-         ImplAAFSegment * value);
-	//@comm Replaces part of omfiEffectAddNewSlot
+    AddNewInputSegment
+        (// @parm [in] Index (1-based) of the input segment
+         aafInt32  index,
 
-  //****************
-  // PrependInputSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    PrependInputSegment
-        (// @parm [in] Segment to place in effect
-         ImplAAFSegment * value);
-	//@comm Replaces part of omfiEffectAddNewSlot
-
-  //****************
-  // PrependInputSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    InsertInputSegmentAt
-        (// @parm [in] index to place segment
-         aafUInt32 index,
-	     // @parm [in] Segment to place in effect
+         // @parm [in] Segment to place in effect
          ImplAAFSegment * value);
 	//@comm Replaces part of omfiEffectAddNewSlot
 
@@ -206,7 +190,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetRender
         // @parm [in] A segment containing a representation of the rendering
-        (ImplAAFSourceReference * sref);
+        (ImplAAFSegment * segment);
 	//@comm Replaces omfiEffectSetFinalRender and omfiEffectSetWorkingRender
 
   //****************
@@ -215,14 +199,14 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetBypassOverride
         // @parm [in] Bypass override
-        (aafUInt32  bypassOverride);
+        (aafArgIDType_t  bypassOverride);
 	//@comm Replaces omfiEffectSetBypassOverride
 
   //****************
   // GetParameterByArgID()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupParameter
+    GetParameterByArgID
         (// @parm [in] Arg ID
          aafArgIDType_t  argID,
 
@@ -230,40 +214,28 @@ public:
          ImplAAFParameter ** parameter);
 
   //****************
-  // GetParameters()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetParameters
-        (// @parm [out] enumerator across parameters
-         ImplEnumAAFParameters ** ppEnum);
-
-  //****************
   // GetIndexedInputSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetInputSegmentAt
+    GetIndexedInputSegment
         (// @parm [in] 1-based index into the effet inputs
-         aafUInt32  index,
+         aafInt32  index,
 
          // @parm [out] Input segment
          ImplAAFSegment ** inputSegment);
 
-  //****************
-  // GetIndexedInputSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveInputSegmentAt
-        (// @parm [in] 1-based index into the effet inputs
-         aafUInt32  index);
 
-private:
-	OMFixedSizeProperty<aafUID_t>						_operationDefinition;
-	OMStrongReferenceVectorProperty<ImplAAFSegment>		_inputSegments;
-	OMStrongReferenceVectorProperty<ImplAAFParameter>	_parameters;
-	OMFixedSizeProperty<aafUInt32>						_bypassOverride;
-	OMStrongReferenceProperty<ImplAAFSourceReference>	_rendering;
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFGroup)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFGroupTest.cpp.
+  static AAFRESULT test();
 };
 
-#endif // ! __ImplAAFOperationGroup_h__
+#endif // ! __ImplAAFGroup_h__
 
 
