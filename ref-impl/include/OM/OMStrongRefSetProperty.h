@@ -31,7 +31,7 @@
 
 #include "OMSet.h"
 #include "OMContainerElement.h"
-#include "OMContainerProperty.h"
+#include "OMStrongReferenceSet.h"
 
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetIterator;
@@ -47,11 +47,11 @@ class OMStrongReferenceSetElement;
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @tcarg class | UniqueIdentification | The type of the unique key
-  //          used to identify the referenced objects. 
-  //   @base public | <c OMContainerProperty>
+  //          used to identify the referenced objects.
+  //   @base public | <c OMStrongReferenceSet>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
-class OMStrongReferenceSetProperty :
-                                 public OMContainerProperty<ReferencedObject> {
+class OMStrongReferenceSetProperty : public OMStrongReferenceSet {
 public:
   // @access Public members.
 
@@ -80,9 +80,6 @@ public:
     // @cmember The number of <p ReferencedObject>s in this
     //          <c OMStrongReferenceSetProperty>.
   size_t count(void) const;
-
-    // @cmember Get the size of this <c OMStrongReferenceSetProperty>.
-  size_t getSize(void) const;
 
     // @cmember Insert <p object> into this
     //          <c OMStrongReferenceSetProperty>.
@@ -129,7 +126,7 @@ public:
     //          <p identification>.
   ReferencedObject* value(
                      const UniqueIdentification& identification) const;
-  
+
     // @cmember Find the <p ReferencedObject> in this
     //          <c OMStrongReferenceSetProperty> identified by
     //          <p identification>.  If the object is found it is returned
@@ -144,7 +141,7 @@ public:
   virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceSetProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
   // Direct property access interface
 
@@ -165,7 +162,47 @@ public:
     //          <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
+    // @cmember Insert <p object> into this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual void insertObject(const OMObject* object);
+
+    // @cmember Does this <c OMStrongReferenceSetProperty> contain
+    //          <p object> ?
+  virtual bool containsObject(const OMObject* object) const;
+
+    // @cmember Remove <p object> from this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual void removeObject(const OMObject* object);
+
+    // @cmember Remove all objects from this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual void removeAllObjects(void);
+
+    // @cmember Create an <c OMReferenceContainerIterator> over this
+    //          <c OMStrongReferenceSetProperty>.
+  virtual OMReferenceContainerIterator* createIterator(void) const;
+
+    // @cmember Remove the <c OMObject> identified by <p identification>
+    //          from this <c OMStrongReferenceSetProperty>.
+  virtual OMObject* remove(void* identification);
+
+    // @cmember Does this <c OMStrongReferenceSetProperty> contain an
+    //          <c OMObject> identified by <p identification> ?
+  virtual bool contains(void* identification) const;
+
+    // @cmember Find the <c OMObject> in this <c OMStrongReferenceSetProperty>
+    //          identified by <p identification>.  If the object is found
+    //          it is returned in <p object> and the result is < e bool.true>.
+    //          If the object is not found the result is <e bool.false>.
+  virtual bool findObject(void* identification, OMObject*& object) const;
+
   bool isValidIdentification(UniqueIdentification& id) const;
+
+  virtual OMKeySize keySize(void) const;
+
+  virtual OMPropertyId keyPropertyId(void) const;
+
+  virtual void find(void* key, OMStorable*& object) const;
 
 private:
 

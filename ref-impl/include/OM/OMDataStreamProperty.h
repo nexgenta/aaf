@@ -31,14 +31,15 @@
 
 #include "OMDataTypes.h"
 
-#include "OMProperty.h"
+#include "OMDataStream.h"
 
 struct IStream;
 
   // @class Persistent data stream properties supported by the Object
   //        Manager.
-  //   @base | public <c OMProperty>.
-class OMDataStreamProperty : public OMProperty {
+  //   @base | public <c OMDataStream>.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+class OMDataStreamProperty : public OMDataStream {
 public:
   // @access Public members.
 
@@ -144,6 +145,10 @@ public:
 
     // @cmember Clear the byte order of this stream
   virtual void clearByteOrder(void);
+
+  virtual OMByteOrder storedByteOrder(void) const;
+
+  virtual void setStoredByteOrder(OMByteOrder byteOrder);
 
 protected:
 
