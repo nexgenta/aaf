@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.h,v 1.4 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.h,v 1.4.2.1 2004/09/08 13:47:00 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,6 +38,11 @@
 
 #ifndef __CAAFCDCIDescriptorHelper_h__
 #include "CAAFCDCIDescriptorHelper.h"
+#endif
+
+#ifdef USE_LIBDV
+#include <libdv/dv_types.h>
+#include <libdv/dv.h>
 #endif
 
 // ID for this Plugin's CoClass.
@@ -261,6 +266,8 @@ public:
 
 private:
 	void SetEssenceStream(IAAFEssenceStream *stream);
+	void SetCompressionEnabled(aafCompressEnable_t compEnable);
+
   	void SetNumberOfSamples(const aafLength_t& numberOfSamples);
 
 
@@ -278,6 +285,7 @@ private:
 	void UpdateCalculatedData(void);
 
 	STDMETHOD( CreateLegacyPropDefs )(IAAFDictionary *p_dict);
+	
 
 private:
 	AAFByteOrder		_nativeByteOrder;
@@ -352,6 +360,16 @@ private:
 	aafLength_t	_numberOfSamples; /* was _sampleFrames in WaveCodec) */
 
 	aafUInt16 _padBytesPerRow;
+
+#ifdef USE_LIBDV
+	// variables for libdv interface
+	unsigned char	_dv_buffer[144000];		// enough for PAL or NTSC frame
+	dv_encoder_t	*_encoder;
+	dv_decoder_t	*_decoder;
+	int				_pitches[3];
+#endif
+
+	aafCompressEnable_t _compressEnable;
 };
 
 #endif // ! __CAAFCDCICodec_h__

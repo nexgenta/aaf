@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11.2.4 2004/07/21 23:58:43 tbingham Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11.2.5 2004/09/08 13:47:00 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -98,7 +98,7 @@ $(DYN_PGAPI_LIB) : $(CXXOBJS)
 	-L$(LIBDIR) $(SUPOBJS) $(CXXOBJS) -o $@ \
 	$(AAFBUILDDIR)/aaflib/$(AAFTARGETDIR)/libaaflib$(LIB) \
 	$(AAFBUILDDIR)/aafiid/$(AAFTARGETDIR)/libaafiid$(LIB) \
-	-ljpeg
+	-ljpeg $(OPT_CODEC_LIBS)
 
 
 CXXFILES2 = AAFInterpCOM.cpp \

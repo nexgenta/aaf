@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i586Linux.mk,v 1.6.2.1 2004/07/07 13:01:08 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i586Linux.mk,v 1.6.2.2 2004/09/08 13:47:00 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -105,6 +105,12 @@ endif
 ifndef UUIDLIB
     UUIDLIB = -luuid
 endif
+
+# libdv is used to provide DV functionality in the CDCICodec.
+# For GNU/Linux target assume libdv is available as a system library
+# so the only required link flag is -ldv when linking libaafpgapi.so
+ADD_CFLAGS += -DUSE_LIBDV
+OPT_CODEC_LIBS += -ldv
 
 # Optional libgsf support is enabled by the LIBGSF_PATH variable which must
 # contain the path to the installed libgsf includes and library
