@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStorable.cpp,v 1.87 2004/04/06 15:58:42 asuraparaju Exp $ $Name:  $
+// $Id: OMStorable.cpp,v 1.88 2004/05/10 15:08:44 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -115,9 +115,6 @@ void OMStorable::save(void) const
   // that were opened on demand as closing them would lose important
   // state information, such as the current seek position.
   //
-  #ifndef OM_USE_STORAGE_EX 
-  //this fix is not needed by  the MSS Ex version and can cause small problems with
-  //schemasoft structured storage.
   if (opened) {
     ASSERT("Valid store", _store != 0);
     _store->close();
@@ -125,7 +122,6 @@ void OMStorable::save(void) const
     delete _store;
     nonConstThis->_store = 0;
   }
-#endif
   nonConstThis->_exists = true;
 }
 
