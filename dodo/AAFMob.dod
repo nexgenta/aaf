@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFMob\
 #endm
@@ -6,7 +13,7 @@ AAFMob\
 AAFObject\
 #endm
 #c
-#import ./AAFObject.exp
+#c #import ./AAFObject.exp
 AD_HEAD
 AD_IDL(//
 // The IAAFMob interface is implemented by objects that specify a
@@ -34,7 +41,7 @@ AD_FORWARD_DECLARATION(AAFMobSlot)
 AD_FORWARD_DECLARATION(AAFTimelineMobSlot)
 AD_FORWARD_DECLARATION(AAFFile)
 AD_FORWARD_DECLARATION(EnumAAFMobSlots)
-AD_FORWARD_DECLARATION(EnumAAFMobComments)
+AD_FORWARD_DECLARATION(EnumAAFTaggedValues)
 AD_CLASS_UUID(B1A21375, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21374, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
@@ -94,7 +101,7 @@ AD_XMETHOD1(SetMobID,
 AD_XMETHOD2(GetName,
 			[in\,string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			Mob Name,
 
@@ -164,7 +171,7 @@ AD_XMETHOD1(GetNameBufLen,
 AD_XMETHOD1(SetName,
 			[in\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			Mob Name,
 
@@ -350,21 +357,20 @@ AD_XMETHOD1(GetCreateTime,
 AD_XMETHOD2(AppendComment,
 			[in\,string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pCategory,
 			Comment heading,
 
 			[in\,string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pComment,
 			Comment value,
 
 			Creates a user-defined comment and appends it to the specified
-  // Mob.
+  // Mob.  A Mob comment is implemented as a AAFTaggedValue object of type 
+  // WCharString.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the pCategory pointer is valid.
   // - the pComment pointer is valid.
@@ -391,8 +397,6 @@ AD_XMETHOD1(GetNumComments,
 
 			return total number of comments attached to this mob.
   //
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the pNumComments pointer is valid.
   // 
@@ -412,15 +416,15 @@ AD_XMETHOD1(GetNumComments,
 AD_XMETHOD1(EnumAAFAllMobComments,
 			[out],
 			objOut,
-			EnumAAFMobComments,
+			EnumAAFTaggedValues,
 			ppEnum,
 			Mob Comments,
 
 			return the enumeration for all mob comments.  The returned
-  // enumerator is AddRef\(\)ed before it is returned.
+  // enumerator is AddRef\(\)ed before it is returned.  Mob comments are 
+  // implemented as AAFTaggedValue of type WCharString.   The enumerator
+  // is implemented as a EnumAAAFTaggedValues.
   // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
   // Succeeds if all of the following are true:
   // - the ppEnum pointer is valid.
   // 
@@ -435,35 +439,6 @@ AD_XMETHOD1(EnumAAFAllMobComments,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-
-
-AD_XMETHOD1(IsAPrimaryMob,
-			[out],
-			objPass,
-			aafBool *,
-			pRetval,
-			Set to true if this is a primary mob,
-
-			This method will return true if this mob is a primary mob. If an
-  // error occurs the retval will be false.
-  //
-  // NOTE! Stub only.   Implementation not yet added.
-  //
-  // Succeeds if all of the following are true:
-  // - the pRetval pointer is valid.
-  // 
-  // If this method fails nothing will be written to *pRetval.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pRetval arg is NULL.)
-
 
 AD_XMETHOD4(AppendNewSlot,
 			[in],
@@ -480,7 +455,7 @@ AD_XMETHOD4(AppendNewSlot,
 
 			[in\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pSlotName,
 			new slot name,
 
@@ -534,7 +509,7 @@ AD_XMETHOD6(AppendNewTimelineSlot,
 
 			[in\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pSlotName,
 			new slot name,
 
@@ -588,7 +563,7 @@ AD_XMETHOD4(GetMobInfo,
 
 			[out\, size_is\(bufSize\)\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			Mob Name,
 
@@ -625,68 +600,6 @@ AD_XMETHOD4(GetMobInfo,
   //
   // AAFRESULT_SMALLBUF
   //   - bufSize indicates the buffer is too small to hold the string.)
-
-
-AD_XMETHOD3(SetNewProps,
-			[in],
-			objPass,
-			aafBool,
-			isMasterMob,
-			Whether or not this is a Master Mob,
-
-			[in\,string],
-			objPass,
-			wchar_t *,
-			pName,
-			Mob Name \(optional\),
-
-			[in],
-			objPass,
-			aafBool,
-			isPrimary,
-			Whether or not this is a primary mob,
-
-			This method is called to create the new properties on a mob.
-  // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
-  // Succeeds if all of the following are true:
-  // - the pName pointer is valid.
-  // 
-  // If this method fails no state will be changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pName arg is NULL.)
-
-
-AD_XMETHOD1(SetPrimary,
-			[in],
-			objPass,
-			aafBool,
-			isPrimary,
-			Whether or not the mob is a primary mob,
-
-			This method is used to either add a mob to the HEAD Primary Mob
-  // index or to take it out of the index.
-  // 
-  // NOTE! Stub only.   Implementation not yet added.
-  //
-  // Always succeeds.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect\, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  \(This is the only code indicating success.\))
-
 
 AD_XMETHOD3(OffsetToMobTimecode,
 			[in],
@@ -876,7 +789,7 @@ AD_XMETHOD4(CloneExternal,
 AD_XMETHOD2(Copy,
 			[in\,string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pDestMobName,
 			Optional Input. The name to be assigned to the new copy of the
 	// Mob.  The destMobName argument is optional. Specify a NULL

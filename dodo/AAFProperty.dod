@@ -1,0 +1,69 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
+#startm .this-module 0
+AAFProperty\
+#endm
+#c
+#startm .parent-module 0
+AAFRoot\
+#endm
+#c
+AD_HEAD
+AD_IDL(//
+// This interface is used to access instances of properties contained
+// in AAF persistent objects.
+AD_STD_COMMENT_IFC_HEADER
+AD_STD_COMMENT_IFC_STUB)
+AD_FORWARD_DECLARATION(AAFPropertyDef)
+AD_FORWARD_DECLARATION(AAFPropertyValue)
+AD_CLASS_UUID(83057d73, 9691, 11d2, aa, 7f, 80, e6, aa, 00, 00, 00)
+
+AD_DEFAULT_UUID(83057d74, 9691, 11d2, aa, 7f, 80, e6, aa, 00, 00, 00)
+AD_XCLASS_BEGIN(Concrete, Transient)
+AD_XMETHOD1(GetDefinition,
+			[out],
+			objOut,
+			AAFPropertyDef,
+			ppPropDef,
+			This property's definition,
+
+            Returns the definition of this property.
+  //
+  // Succeeds if:
+  // - This object has already been Initialize\(\)d.
+  // - The ppPropDef pointer is valid.
+  // - The associated property definition can be found in the
+  //   dictionary.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppPropDef\)
+  //
+  // AAFRESULT_BAD_PROP
+  //   - The definition for this property could not be found in the
+  //     dictionary.)
+
+
+AD_XMETHOD1(GetValue,
+            [out],
+            objOut,
+            AAFPropertyValue,
+		    ppValue,
+		    The Property Value object associated with this property.,
+
+		    Returns the Property Value object associated with this property.
+  //
+  // Succeeds if:
+  // - This object has already been Initialize\(\)d.
+  // - The ppPval pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppValue\)
+  //
+  // AAFRESULT_PROP_NOT_PRESENT
+  //   - The given property is optional and not present.)
+AD_XCLASS_END(Concrete, Transient)
