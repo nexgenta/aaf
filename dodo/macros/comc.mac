@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: comc.mac,v 1.69 2004/09/10 17:12:10 stuart_hc Exp $ $Name:  $
+#c $Id: comc.mac,v 1.70 2004/10/27 14:09:26 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -3127,10 +3127,6 @@ HRESULT C.this-module::%01
 #include "OMExceptions.h"
 
 #include <assert.h>
-
-#if defined(_MAC)
-#pragma export on
-#endif // #if defined(_MAC)
 #endm
 
 
@@ -3138,9 +3134,6 @@ HRESULT C.this-module::%01
 #c End of the module definitions
 #c
 #startm AD_MODULE_END 00
-#if defined(_MAC)
-#pragma export off
-#endif // #if defined(_MAC)
 #endm
 
 

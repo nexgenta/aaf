@@ -2,7 +2,7 @@
 #define _AAF_OMF_	1
 //=---------------------------------------------------------------------=
 //
-// $Id: AafOmf.h,v 1.38 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+// $Id: AafOmf.h,v 1.39 2004/10/27 14:07:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,14 +32,7 @@
  ************************************************************************/
 
   
-#if defined(_MAC) || defined(macintosh)
-#include <initguid.h> // define all of the AAF guids.
 #include "AAF.h"
-#else
-#include "AAF.h"
-
-#endif
-
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.57 2004/10/25 13:11:36 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.58 2004/10/27 14:07:19 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,11 +48,6 @@
 #include <wchar.h>
 
 #include "AAFTypes.h"
-
-#if defined( OS_MACOS )
-#include <OSUtils.h>
-#include <events.h>
-#endif
 
 #if defined (OS_UNIX)
   #include <sys/time.h>
@@ -378,11 +373,6 @@ aafUInt32 aafGetTickCount()
 #if defined( OS_WINDOWS )
 
     ticks = (aafUInt32)GetTickCount();
-
-
-#elif defined( OS_MACOS )
-
-    ticks = (aafUInt32)TickCount();
 
 #elif defined( OS_UNIX )
 

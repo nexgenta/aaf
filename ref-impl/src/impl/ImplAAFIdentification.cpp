@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFIdentification.cpp,v 1.48 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFIdentification.cpp,v 1.49 2004/10/27 14:07:20 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,8 +68,6 @@ ImplAAFIdentification::ImplAAFIdentification():
   
 #if defined( OS_WINDOWS )
   _platform = L"Win32";
-#elif defined( OS_MACOS )
-  _platform = L"MacOS";
 #elif defined( OS_UNIX )
   _platform = L"Unix";
 #else

@@ -2,7 +2,7 @@
 // @com This file implements the conversion of OMF files to AAF file format.
 //=---------------------------------------------------------------------=
 //
-// $Id: AafOmf.cpp,v 1.46 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+// $Id: AafOmf.cpp,v 1.47 2004/10/27 14:07:13 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,10 +29,6 @@
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
-
-#ifdef macintosh
-	#include <console.h>
-#endif 
 
 #include "omPublic.h"
 #include "omMedia.h"

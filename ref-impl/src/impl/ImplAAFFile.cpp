@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.134 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.135 2004/10/27 14:07:20 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1542,11 +1542,6 @@ void ImplAAFFile::registerFactories(void)
                                                        Signature_SSBin_512,
                                                        L"AAF-M",
                                                        L"AAF Microsoft SS"));
-
-#elif defined( OS_MACOS )
-// No SS implementation available since Microsoft 512 (via MacOLE) has been
-// deleted
-#error No SS implementation available on platform
 
 #elif defined( OS_DARWIN ) || defined( OS_IRIX ) || defined( OS_LINUX ) || defined( OS_SOLARIS )
 

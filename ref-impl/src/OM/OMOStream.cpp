@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.cpp,v 1.14 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMOStream.cpp,v 1.15 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -197,7 +197,7 @@ static void debugPrint(const char* string)
   OutputDebugString(s);
 }
 
-#elif defined(OM_OS_MACOS) || defined(OM_OS_MACOSX)
+#elif defined(OM_OS_MACOSX)
 
 #include <MacTypes.h>
 

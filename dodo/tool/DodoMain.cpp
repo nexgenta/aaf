@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DodoMain.cpp,v 1.9 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+// $Id: DodoMain.cpp,v 1.10 2004/10/27 14:07:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,10 +27,6 @@
 // multi-line macro expansions, and is portable across platforms.
 //
 
-#if defined(macintosh)
-#define _MAC
-#endif
-
 
 // #define DEBUG 1
 
@@ -46,11 +42,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if !defined(macintosh)
 #include <assert.h>
-#else
-#include <CursorCtl.h>
-#endif
 
 static void printHelp ()
 {
@@ -156,11 +148,7 @@ static TextStream UnEscape
   return out;
 }
 
-#if defined(_MAC)
-int main(int argc,char *argv[],char */*envp[]*/)
-#else
 int main (int argc, char ** argv)
-#endif
 {
   const char * command = argv[0];
 
@@ -197,12 +185,6 @@ int main (int argc, char ** argv)
       usage (command);	// does not return
     }
 
-#if defined(macintosh)
-  // Intialize the MPW cursors so that we can release time 
-  // to the operating system (pre-MacOS X).
-  InitCursorCtl(NULL);
-#endif
-
   TextStream macroText;
   macroText.Append (macrofile,
 		    SourceInfo (macrofilename, 1));
@@ -229,10 +211,6 @@ int main (int argc, char ** argv)
 	{
 #if DEBUG
 	  fprintf (stderr, "Pass %d...\n\n", repeats+1);
-#endif
-#if defined(macintosh)
-    // Release time to the operating system (pre-MacOS X).
-//	SpinCursor(1);
 #endif
 	  output.Clear();
 	  changed = macros.ApplyMacros (input, output);

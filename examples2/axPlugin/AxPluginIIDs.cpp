@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPluginIIDs.cpp,v 1.5 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxPluginIIDs.cpp,v 1.6 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,10 +24,5 @@
 // should only be included in one of the library's files.
 
 #include <AAFPlugin.h>
-
-#if defined(OS_MACOS)
-// FIXME - Why is this required on mac, but not on Windows?!?!
-#define __IID_DEFINED__
-#endif
 
 #include <AAFPlugin_i.c>

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.cpp,v 1.59 2004/10/21 17:05:19 stuart_hc Exp $ $Name:  $
+// $Id: OMUtilities.cpp,v 1.60 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -818,8 +818,6 @@ int wremove(const wchar_t* fileName)
 
 #if defined(OM_OS_WINDOWS)
 #define OM_USE_COM_CREATEUUID
-#elif defined(OM_OS_MACOS)
-#define OM_USE_OM_CREATEUUID
 #elif defined(OM_OS_UNIX) && defined(__linux__)
 #define OM_USE_LIBUUID_CREATEUUID
 #elif defined(OM_OS_UNIX) && defined(__MACH__)

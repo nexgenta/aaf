@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CreateSequence.cpp,v 1.46 2004/10/22 16:03:20 phil_tudor Exp $ $Name:  $
+// $Id: CreateSequence.cpp,v 1.47 2004/10/27 14:07:21 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,10 +53,6 @@ STDAPI MemoryFileSaveToDisk(
 // Include the AAF Stored Object identifiers. These symbols are defined
 // in aaf.lib.
 #include "AAFStoredObjectIDs.h"
-
-#if defined( OS_MACOS )
-#include "DataInput.h"
-#endif
 
 // There are differences in the microsoft and other compilers in the
 // "Length" specifier used in printf for 64bit integers.

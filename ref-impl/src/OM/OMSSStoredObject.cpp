@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.cpp,v 1.3 2004/10/25 13:01:31 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStoredObject.cpp,v 1.4 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3252,7 +3252,7 @@ static void checkStatus(HRESULT status)
   }
 }
 
-#if defined(OM_WINDOWS_SS) || defined(OM_MACINTOSH_SS)
+#if defined(OM_WINDOWS_SS)
 
 // Simple class to ensure COM initialization/uninitialization.
 

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: EssenceAccess.cpp,v 1.27 2004/10/22 16:03:21 phil_tudor Exp $ $Name:  $
+// $Id: EssenceAccess.cpp,v 1.28 2004/10/27 14:07:21 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,10 +49,6 @@
 #if USE_TIMER_LIB
 // Include this for the purpose of timing the data read/write
 #include "UtlConsole.h"
-#endif
-
-#if defined( OS_MACOS )
-#include "DataInput.h"
 #endif
 
 // This static variables are here so they can be referenced 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.cpp,v 1.35 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: aaflib.cpp,v 1.36 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,8 +39,6 @@
 //
 #if defined( OS_WINDOWS )
 #define DEFAULT_AAFDLL_NAME "AAFCOAPI.dll"
-#elif defined( OS_MACOS )
-#define DEFAULT_AAFDLL_NAME "AAFCOAPI.DLL (PPC)"
 #elif defined( OS_DARWIN )
 #define DEFAULT_AAFDLL_NAME "libcom-api.dylib"
 #elif defined( OS_UNIX )

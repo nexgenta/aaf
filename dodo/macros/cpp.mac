@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: cpp.mac,v 1.58 2004/09/10 17:12:10 stuart_hc Exp $ $Name:  $
+#c $Id: cpp.mac,v 1.59 2004/10/27 14:09:36 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -325,23 +325,6 @@ AD_CLASS_BEGIN\
   } 
 #endif
 }
-
-
-#if defined(macintosh) || defined(_MAC)
-inline long InterlockedIncrement(
-  long * pAddend   // pointer to the variable to increment
-)
-{
-  return ++(*pAddend);
-}
-
-inline long InterlockedDecrement(
-  long * pAddend   // pointer to the variable to decrement
-)
-{
-  return --(*pAddend);
-}
-#endif
 
 
 // Increment the object reference count.

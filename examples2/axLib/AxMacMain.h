@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMacMain.h,v 1.2 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxMacMain.h,v 1.3 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -20,22 +20,5 @@
 // AAF Association.
 //
 //=---------------------------------------------------------------------=
-
-#if defined( OS_MACOS )
-
-// This will get the IID_IUnknown definition (amoung others).
-// FIXME - There is probably a better place for this than here.
-#include <initguid.h>
-#include <coguid.h>
-
-// Include this to avoid polluting code with the conditional include
-// below.  Application is still responsible for linking with
-// AAFMacSDK/DevUils/DataInput.cpp and add the include path for DataInput.h
-// 
-// **** DataInput.h redefines main() !!! ****
-
-#include <DataInput.h>
-
-#endif
 
 #endif

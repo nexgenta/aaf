@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOMPlatform.h,v 1.12 2004/06/24 16:11:20 creederickson Exp $ $Name:  $
+// $Id: AAFCOMPlatform.h,v 1.13 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,12 +33,7 @@
 #include "AAFCOMPlatformTypes.h"
 #endif
 
-#if defined( OS_MACOS )
-  // Include files from ActiveX SDK for the Macintosh
-#  include <compobj.h>
-
-
-#elif defined( OS_WINDOWS )
+#if defined( OS_WINDOWS )
 #  include <unknwn.h>
 #  include <objbase.h>
 

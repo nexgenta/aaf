@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.h,v 1.21 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.h,v 1.22 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,17 +38,11 @@
 //
 // 1) The standard implementation on Windows platforms
 //    for which OM_USE_WINDOWS_SS is defined
-// 2) The implementation on Macintosh
-//    for which OM_USE_MACINTOSH_SS is defined
-// 3) The reference implementation
+// 2) The reference implementation
 //    for which OM_USE_REFERENCE_SS is defined
 //
 #if defined(OM_OS_WINDOWS)
 #define OM_USE_WINDOWS_SS
-#elif defined(OM_OS_MACOS)
-#define OM_USE_MACINTOSH_SS
-#elif defined(OM_OS_MACOSX)
-#define OM_USE_MACINTOSH_SS
 #elif defined(OM_OS_UNIX)
 #define OM_USE_REFERENCE_SS
 #endif
@@ -58,13 +52,6 @@
 //
 #if defined(OM_USE_WINDOWS_SS)
 #include <objbase.h>
-#elif defined(OM_USE_MACINTOSH_SS)
-#include "wintypes.h"
-#define NO_INCLUDES
-#include "macdef.h"
-#include "macpub.h"
-#include "compobj.h"
-#include "storage.h"
 #elif defined (OM_USE_REFERENCE_SS)
 #include "h/storage.h"
 #else
@@ -97,7 +84,7 @@ typedef wchar_t SSCHAR;
 typedef char SSCHAR;
 #endif
 
-#if defined(OM_USE_MACINTOSH_SS) || defined(OM_USE_REFERENCE_SS)
+#if defined(OM_USE_REFERENCE_SS)
 
 // The Macintosh and reference implementation declarations
 // for LARGE_INTEGER and ULARGE_INTEGER don't have a QuadPart.

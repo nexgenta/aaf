@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxImplNullEssenceCodec.cpp,v 1.10 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
+// $Id: AxImplNullEssenceCodec.cpp,v 1.11 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,13 +34,8 @@
 #include <memory>
 
 #if 0
-#if defined( OS_MACOS )
-#include <stdio.h>
-#define TRACE printf( "%s:%d\n", __FILE__, __LINE__ );
-#else
 #include <iostream>
 #define TRACE std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-#endif
 #else
 #define TRACE
 #endif

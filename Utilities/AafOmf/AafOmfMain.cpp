@@ -2,7 +2,7 @@
 // @com This file implements the conversion of OMF files to AAF file format.
 //=---------------------------------------------------------------------=
 //
-// $Id: AafOmfMain.cpp,v 1.11 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+// $Id: AafOmfMain.cpp,v 1.12 2004/10/27 14:07:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,9 +33,6 @@
 #include <iostream>
 using namespace std;
 
-#ifdef macintosh
-	#include "DataInput.h"
-#endif 
 #include "omPublic.h"
 #include "omMedia.h"
 
@@ -70,8 +67,6 @@ static char* baseName(char* fullName)
 	char* result;
 #if defined(WIN32)
 	const int delimiter = '\\';
-#elif defined(_MAC) || defined(macintosh)
-	const int delimiter = ':';
 #else
 	const int delimiter = '/';
 #endif

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TextStream.cpp,v 1.7 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+// $Id: TextStream.cpp,v 1.8 2004/10/27 14:07:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,10 +26,6 @@
 #include "TextStream.h"
 #endif
 
-
-#if defined(macintosh)
-#include <CursorCtl.h>
-#endif
 
 #include <string.h>
 
@@ -208,18 +204,6 @@ void TextStream::Append
   _pData[_cachedLen] = c;
   _cachedLen++;
   _pData[_cachedLen] = '\0';
-  
-  
-#if defined(macintosh)
-  static long int counter = 0;
-  if (counter++ % 1024 == 0)
-  {
-    // Release time to the operating system (pre-MacOS X).
-    SpinCursor(-1);
-  }
-#endif
-  
-  
 }
 
 
@@ -359,15 +343,5 @@ void TextStream::dump (FILE* fp) const
   while (tmp.Consume (c))
 	{
 	  fputc (c, fp);
-	  
-#if defined(macintosh)
-      static long int counter = 0;
-      if (counter++ % 256 == 0)
-      {
-        // Release time to the operating system (pre-MacOS X).
-        SpinCursor(1);
-      }
-#endif
-
 	}
 }

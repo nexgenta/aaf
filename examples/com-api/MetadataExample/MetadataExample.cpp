@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MetadataExample.cpp,v 1.11 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
+// $Id: MetadataExample.cpp,v 1.12 2004/10/27 14:07:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,10 +26,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-
-#if defined(macintosh) || defined(_MAC)
-#include "DataInput.h"
-#endif
 
 #include "AAFTypes.h"
 #include "AAFResult.h"

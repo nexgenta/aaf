@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxTypes.h,v 1.12 2004/07/12 11:58:37 stuart_hc Exp $ $Name:  $
+// $Id: AxTypes.h,v 1.13 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -96,7 +96,7 @@ inline bool operator!=( const aafUID_t& uidL, const aafUID_t& uidR )
 bool operator<( const aafUID_t& uidL, const aafUID_t& uidR );
 
 
-#if !(defined(OS_WINDOWS) || defined(OS_MACOS))
+#if !defined(OS_WINDOWS)
 bool operator==( const tagGUID& uidL, const tagGUID& uidR );
 inline bool operator!=( const tagGUID& uidL, const tagGUID& uidR )
 {

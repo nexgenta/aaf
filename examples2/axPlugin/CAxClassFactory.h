@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAxClassFactory.h,v 1.9 2004/10/22 14:31:31 phil_tudor Exp $ $Name:  $
+// $Id: CAxClassFactory.h,v 1.10 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -80,11 +80,7 @@ class CAxClassFactory : public CAxClassFactoryCounters, public IClassFactory {
 public:
 
 // Schlock required to declare LockServer
-#if defined(OS_MACOS)
-	typedef OLEBOOL LockServerBool_t;
-#else
-	typedef BOOL    LockServerBool_t;
-#endif
+typedef BOOL    LockServerBool_t;
 
 public:
 

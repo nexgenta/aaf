@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComEssenceDataTest.cpp,v 1.63 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
+// $Id: ComEssenceDataTest.cpp,v 1.64 2004/10/27 14:07:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,12 +42,6 @@
 
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
-
-
-
-#if defined( OS_MACOS )
-#include "DataInput.h"
-#endif
 
 
 

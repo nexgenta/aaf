@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPluginMac.cpp,v 1.3 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxPluginMac.cpp,v 1.4 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,29 +19,3 @@
 //=---------------------------------------------------------------------=
 
 #include <AAFPlatform.h>
-
-#if defined(OS_MACOS)
-
-#include <MacTypes.h> 
-
-// The NullEssenceCodecRegister global constructor is not called
-// when the library loads on Mac (as it is on Irix, Linux, and Windows).
-// When that issue is resolved these init/fini routines can be removed.
-// Note, the project's "PPC Link" settings with also have to change when
-// these init/fini routines are removed.
-
-void CAxNullEssenceCodecInit();
-void CAxNullEssenceCodecFini();
-
-OSErr pascal AxMacLibInit()
-{
-	CAxNullEssenceCodecInit();
-	return noErr;
-}
-
-void pascal AxMacLibFini()
-{
-	CAxNullEssenceCodecFini();
-}
-
-#endif

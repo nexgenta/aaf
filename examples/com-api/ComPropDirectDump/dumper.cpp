@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: dumper.cpp,v 1.50 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+// $Id: dumper.cpp,v 1.51 2004/10/27 14:07:15 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,14 +22,6 @@
 //
 //=---------------------------------------------------------------------=
 
-#if defined(macintosh)
-// Make sure we have defined IID_IUnknown and IID_IClassFactory.
-#include <initguid.h>
-#include <coguid.h>	
-#endif
-
-
-
 #include "AAF.h"
 #include "AAFTypes.h"
 #include "AAFResult.h"
@@ -46,10 +38,6 @@ using namespace std;
 
 #ifndef __AAFSmartPointer_h__
 #include "AAFSmartPointer.h"
-#endif
-
-#if defined( OS_MACOS )
-#include "DataInput.h"
 #endif
 
 #if defined( COMPILER_MWERKS )

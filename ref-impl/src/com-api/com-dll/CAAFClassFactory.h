@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFClassFactory.h,v 1.9 2004/10/25 13:25:31 stuart_hc Exp $ $Name:  $
+// $Id: CAAFClassFactory.h,v 1.10 2004/10/27 14:07:19 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,11 +33,7 @@
 // the Win32 used BOOL as an int and ActiveX SDK, MacOLE use
 // unsigned int for OLEBOOL.
 // NOTE: We may have to move this definition to AAFTypes.h.
-#if defined(_MAC) || defined(_MAC_) || defined(macintosh)
-#define AAFBOOL OLEBOOL
-#else
 #define AAFBOOL BOOL
-#endif
 
 // Define the object creation callback function that should be
 // implemented as a static method for every concrete AAF object.

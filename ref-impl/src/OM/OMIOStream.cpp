@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMIOStream.cpp,v 1.14 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMIOStream.cpp,v 1.15 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,8 +41,6 @@ using std::ios;
 
 #if defined(OM_OS_WINDOWS)
 #define NEWLINE "\r\n"
-#elif defined(OM_OS_MACOS)
-#define NEWLINE "\r"
 #elif defined(OM_OS_UNIX)
 #define NEWLINE "\n"
 #elif defined(OM_OS_MACOSX)

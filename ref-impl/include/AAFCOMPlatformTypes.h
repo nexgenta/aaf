@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOMPlatformTypes.h,v 1.11 2004/10/25 12:46:06 stuart_hc Exp $ $Name:  $
+// $Id: AAFCOMPlatformTypes.h,v 1.12 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,14 +34,7 @@
 #include "AAFPlatform.h"
 #endif
 
-#if defined( OS_MACOS )
-  // Include file form ActiveX SDK for the Macintosh. Otherwise the 
-  // OLE (2.08, 2.24) interfaces cannot be used since they use standard
-  // window's types and defines...
-  #include <wintypes.h>
-
-
-#elif defined( OS_WINDOWS )
+#if defined( OS_WINDOWS )
   #include <wtypes.h>
 
 

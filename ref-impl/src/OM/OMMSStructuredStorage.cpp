@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.cpp,v 1.16 2004/10/26 13:37:32 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.cpp,v 1.17 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,10 +34,6 @@
 #define LINKAGE __stdcall
 wchar_t* ssLibraryName = L"ole32.dll";
 wchar_t* coLibraryName = L"ole32.dll";
-#elif defined(OM_OS_MACOS)
-#define LINKAGE
-wchar_t* ssLibraryName = L"Microsoft Structured Storage";
-wchar_t* coLibraryName = L"Microsoft Component Library";
 #elif defined(OM_OS_MACOSX)
 #define LINKAGE
 wchar_t* ssLibraryName = L"Microsoft Structured Storage"; // tjb FIXME for OSX
@@ -622,13 +618,13 @@ void OMCoUninitialize(void)
   MSCOMLibrary::instance()->CoUninitialize();
 }
 
-#if defined(OM_USE_WINDOWS_SS) || defined(OM_USE_MACINTOSH_SS)
+#if defined(OM_USE_WINDOWS_SS)
 static int _COMIsInitialized; // automatically initialized to 0
 #endif
 
 void OMMSSInitialize(void)
 {
-#if defined(OM_USE_WINDOWS_SS) || defined(OM_USE_MACINTOSH_SS)
+#if defined(OM_USE_WINDOWS_SS)
   if (!_COMIsInitialized) {
     CoInitialize(0);
     _COMIsInitialized = 1;
@@ -638,7 +634,7 @@ void OMMSSInitialize(void)
 
 void OMMSSFinalize(void)
 {
-#if defined(OM_USE_WINDOWS_SS) || defined(OM_USE_MACINTOSH_SS)
+#if defined(OM_USE_WINDOWS_SS)
   if (_COMIsInitialized) {
     CoUninitialize();
     _COMIsInitialized = 0;

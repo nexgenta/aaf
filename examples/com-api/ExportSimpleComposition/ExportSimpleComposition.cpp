@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportSimpleComposition.cpp,v 1.22 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
+// $Id: ExportSimpleComposition.cpp,v 1.23 2004/10/27 14:07:15 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,10 +31,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#if defined(macintosh) || defined(_MAC)
-#include "DataInput.h"
-#endif
 
 #include "AAFTypes.h"
 #include "AAFResult.h"

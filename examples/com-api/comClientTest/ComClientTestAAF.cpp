@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComClientTestAAF.cpp,v 1.54 2004/10/22 15:23:21 phil_tudor Exp $ $Name:  $
+// $Id: ComClientTestAAF.cpp,v 1.55 2004/10/27 14:07:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,10 +36,6 @@
 #include "AAFStoredObjectIDs.h"
 
 #include "CAAFBuiltinDefs.h"
-
-#if defined( OS_MACOS )
-#include "DataInput.h"
-#endif
 
 static const aafMobID_t TEST_MobID[5] = {
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.cpp,v 1.14 2004/10/22 14:31:29 phil_tudor Exp $ $Name:  $
+// $Id: axFileGen.cpp,v 1.15 2004/10/27 14:07:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,27 +43,6 @@
 #include <ctype.h>
 
 using namespace std;
-
-#if defined(OS_MACOS)
-
-// Code Warrior 8 does not define isascii.
-// Odd.. ?!?! Should investigate that further or stop using it.
-
-
-inline bool isascii( int c )
-{
-  if ( 0 <= c&0xff && c&0xff <= 0x7f ) {
-	return true;
-  }
-  else {
-	return false;
-  }
-}
-
-#endif
-
-
-//=---------------------------------------------------------------------=
 
 
 //=---------------------------------------------------------------------=

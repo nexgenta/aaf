@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComModTestAAF.cpp,v 1.25 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: ComModTestAAF.cpp,v 1.26 2004/10/27 14:07:20 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,30 +52,6 @@ using namespace std;
 #include <unknwn.h>
 #include <objbase.h>
 #endif
-
-#if defined( OS_MACOS )
-#define _MAC
-
-// Make sure we have defined IID_IUnknown and IID_IClassFactory.
-#include <initguid.h>
-#include <coguid.h>  
-#include "DataInput.h"
-
-#if !defined(CDECL) && defined(_MSC_VER)
-#define CDECL  _cdecl
-#endif // CDECL
-
-#if !defined(FAR)
-#define FAR
-#endif
-
-#include <ole2.h>
-#include "dispatch.h"
-#include "wintypes.h"
-#include <olectl.h>
-
-#endif  // OS_MACOS
-
 
 #include "CAAFModuleTest.h"
 #include "ModuleTest.h"

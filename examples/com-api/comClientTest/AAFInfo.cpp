@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFInfo.cpp,v 1.40 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
+// $Id: AAFInfo.cpp,v 1.41 2004/10/27 14:07:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,10 +40,6 @@
 #include "AAFPropertyDefs.h"
 #include "AAFTypeDefUIDs.h"
 #include "AAFDataDefs.h"
-
-#if defined( OS_MACOS )
-#include "DataInput.h"
-#endif
 
 typedef IAAFSmartPointer<IAAFClassDef> IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFDefObject> IAAFDefObjectSP;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAxUnknown.cpp,v 1.4 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: CAxUnknown.cpp,v 1.5 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,14 +18,6 @@
 //
 //=---------------------------------------------------------------------=
 #include <AAFCOMPlatform.h>
-
-#if defined(OS_MACOS)
-// Must include these at least once where IID_IClassFactory and IID_IUnknown
-// are used  to ensure the linker sucks in the definitions
-// of those constants.
-#include <initguid.h>
-#include <coguid.h>
-#endif
 
 // Credits:
 //
