@@ -3,7 +3,6 @@
 * Advanced Authoring Format                     *
 *                                               *
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *                                               *
 \***********************************************/
 
@@ -113,6 +112,7 @@ AAFRESULT STDMETHODCALLTYPE
 	  assert (tmp);
 	  pNonConstThis->_cachedType = tmp;
 	  tmp->ReleaseReference ();
+	  tmp = 0;
 	}
   assert (ppTypeDef);
   *ppTypeDef = _cachedType;
@@ -177,4 +177,3 @@ OMPropertyId ImplAAFPropertyDef::OmPid (void) const
 }
 
 
-OMDEFINE_STORABLE(ImplAAFPropertyDef, AUID_AAFPropertyDef);
