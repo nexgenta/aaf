@@ -41,7 +41,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.3 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.3.2.1 2004/03/22 11:00:33 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -332,8 +332,24 @@ enum _aafFrameLayout_e
     {	kAAFFullFrame	= 0,
 	kAAFSeparateFields	= 1,
 	kAAFOneField	= 2,
-	kAAFMixedFields	= 3
+	kAAFMixedFields	= 3,
+	kAAFSegmentedFrame	= 4
     }	aafFrameLayout_e;
+
+typedef aafInt32 aafElectroSpatialFormulation_t;
+
+typedef 
+enum _aafElectroSpatialFormulation_e
+    {	kAAFEsDefault	= 0,
+	kAAFEsTwoChannelMode	= 1,
+	kAAFEsSingleChannelMode	= 2,
+	kAAFEsPrimarySecondaryMode	= 3,
+	kAAFEsStereophonicMode	= 4,
+	kAAFEsSingleChannelDoubleSamplingFrequencyMode	= 7,
+	kAAFEsStereoLeftChannelDoubleSamplingFrequencyMode	= 8,
+	kAAFEsStereoRightChannelDoubleSamplingFrequencyMode	= 9,
+	kAAFEsMultiChannelMode	= 15
+    }	aafElectroSpatialFormulation_e;
 
 typedef aafInt32 aafColorSiting_t;
 
@@ -560,7 +576,8 @@ enum _aafRGBAComponentKind_e
 	kAAFCompFill	= 0x46,
 	kAAFCompGreen	= 0x47,
 	kAAFCompPalette	= 0x50,
-	kAAFCompRed	= 0x52
+	kAAFCompRed	= 0x52,
+	kAAFCompNull	= 0
     }	aafRGBAComponentKind_e;
 
 typedef struct  _aafRGBAComponent_t
