@@ -26,8 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. |
-//         OMCharacterStringProperty
 #ifndef OMCHARACTERSTRINGPROPERTYT_H
 #define OMCHARACTERSTRINGPROPERTYT_H
 
@@ -59,7 +57,7 @@ OMCharacterStringProperty<CharacterType>::~OMCharacterStringProperty(void)
   //   @rdesc The result of the conversion as a value of type
   //          pointer to <p CharacterType>.
 template <typename CharacterType>
-OMCharacterStringProperty<CharacterType>::operator const CharacterType*() const
+OMCharacterStringProperty<CharacterType>::operator const CharacterType* ()
 {
   return reinterpret_cast<const CharacterType*>(_bits);
 }
