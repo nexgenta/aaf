@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+*  prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 
 
@@ -45,6 +50,7 @@
 #include "AAFTypeDefUIDs.h"
 #endif
 
+#include <assert.h>
 #include <string.h>
 
 // We only support two byte unicode characters.
@@ -81,9 +87,7 @@ AAFRESULT STDMETHODCALLTYPE
       aafCharacter  character,
       ImplAAFPropertyValue ** ppCharacterValue)
 {
-  TRACE("ImplAAFTypeDefCharacter::CreateValueFromCharacter");
-  
-  if (! ppCharacterValue)
+    if (! ppCharacterValue)
 		return AAFRESULT_NULL_PARAM;
 	
 	aafUInt32 cbChar = NativeSize();
@@ -106,7 +110,7 @@ AAFRESULT STDMETHODCALLTYPE
 	check_hr ( pv->AllocateBits (cbChar, &pBits) );
 	
 	//Set the bits to incoming character
-	ASSERT("Valid bits", pBits != 0);
+	assert (pBits);
 	memcpy (pBits, &character, cbChar);
 	
 	*ppCharacterValue = pv;
@@ -120,8 +124,6 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * pCharacterValue,
       aafCharacter  character)
 {
-  TRACE("ImplAAFTypeDefCharacter::SetCharacter");
-  
 	if (! pCharacterValue)
 		return AAFRESULT_NULL_PARAM;
 	
@@ -133,6 +135,7 @@ AAFRESULT STDMETHODCALLTYPE
 	// get the property value's embedded type
 	ImplAAFTypeDefSP pPropType;
 	check_hr ( pvd->GetType (&pPropType) );
+	assert (pPropType);
 	//Make sure the TD of the pv passed in, matches that of the ImplAAFTypeDefCharacter
 	if ((ImplAAFTypeDef *)pPropType != this) // call operator ImplAAFTypeDef *
 		return AAFRESULT_BAD_TYPE;
@@ -151,7 +154,7 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	aafMemPtr_t pBits = NULL;
 	check_hr ( pvd->GetBits (&pBits)  );
-	ASSERT("Valid bits", pBits != 0);
+	assert (pBits);
 	
 	memcpy (pBits, &character, cbChar);
 	
@@ -165,8 +168,6 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * pCharacterValue,
       aafCharacter *  pCharacter)
 {
-  TRACE("ImplAAFTypeDefCharacter::GetCharacter");
-  
 	if (! pCharacterValue)
 		return AAFRESULT_NULL_PARAM;
 	
@@ -181,6 +182,7 @@ AAFRESULT STDMETHODCALLTYPE
 	// get the property value's embedded type
 	ImplAAFTypeDefSP pPropType;
 	check_hr ( pvd->GetType (&pPropType) );
+	assert (pPropType);
 	//Make sure the TD of the pv passed in, matches that of the ImplAAFTypeDefCharacter
 	if ((ImplAAFTypeDef *)pPropType != this) // call operator ImplAAFTypeDef *
 		return AAFRESULT_BAD_TYPE;
@@ -198,7 +200,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	aafMemPtr_t pBits = NULL;
 	check_hr ( pvd->GetBits (&pBits) );
-	ASSERT("Valid bits", pBits != 0);
+	assert (pBits);
 	
 	memcpy (pCharacter, pBits, cbChar);
 	
@@ -249,7 +251,7 @@ void ImplAAFTypeDefCharacter::externalize(OMByte* internalBytes,
                                  size_t externalBytesSize,
                                  OMByteOrder byteOrder) const
 {
-  TRACE("ImplAAFTypeDefCharacter::externalize");
+  TRACE("WideStringType::externalize");
   PRECONDITION("Valid internal bytes", internalBytes != 0);
   PRECONDITION("Valid internal bytes size",
           internalBytesSize >= internalSize(externalBytes, externalBytesSize));
@@ -328,8 +330,7 @@ aafBool ImplAAFTypeDefCharacter::IsRegistered (void) const
 
 size_t ImplAAFTypeDefCharacter::NativeSize (void) const
 {
-  TRACE("ImplAAFTypeDefCharacter::NativeSize");
-  ASSERT("Valid character size", (2 == sizeof(aafCharacter)) || (4 == sizeof(aafCharacter)));
+  assert( (2 == sizeof(aafCharacter)) || (4 == sizeof(aafCharacter)));
   return (sizeof(aafCharacter));
 }
 
@@ -338,14 +339,13 @@ OMProperty * ImplAAFTypeDefCharacter::pvtCreateOMProperty
   (OMPropertyId pid,
    const wchar_t * name) const
 {
-  TRACE("ImplAAFTypeDefCharacter::pvtCreateOMProperty");
-  PRECONDITION("Valid name", name != 0);
+  assert (name);
 
   OMProperty * result = 0;
 
 	result = new OMFixedSizeProperty<aafCharacter> (pid, name);
 
-  POSTCONDITION("Valid property allocated", result != 0); // need better error handling!
+  assert (result); // need better error handling!
   return result;
 }
 
