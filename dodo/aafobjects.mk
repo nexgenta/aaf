@@ -11,7 +11,6 @@ AAFPERSISTENTOBJECTS = \
 	AAFAttribute \
 	AAFClassDef \
 	AAFDictionary \
-	AAFCompositionMob \
 	AAFConstValue \
 	AAFControlCodeDef \
 	AAFControlPoint \
@@ -20,17 +19,12 @@ AAFPERSISTENTOBJECTS = \
 	AAFEdgecode \
 	AAFEffectDef \
 	AAFEffectInvocation \
-	AAFFiller \
 	AAFFindSourceInfo \
 	AAFIntegerAttribute \
 	AAFLocator \
 	AAFMacLocator \
-	AAFMasterMob \
-	AAFMediaDescriptor \
-	AAFMediaFileDescriptor \
 	AAFMediaFilmDescriptor \
 	AAFMediaGroup  \
-	AAFMediaTapeDescriptor \
 	AAFNestedScope\
 	AAFObjectAttribute \
 	AAFParameter \
@@ -39,12 +33,7 @@ AAFPERSISTENTOBJECTS = \
 	AAFPropertyDef \
 	AAFReferenceValue \
 	AAFScopeReference \
-	AAFSequence \
-	AAFSourceClip \
-	AAFSourceMob \
-	AAFSourceReference \
 	AAFStringAttribute \
-	AAFTimecode \
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTransition \
@@ -61,20 +50,17 @@ AAFNONPERSISTENTOBJECTS = \
 	AAFMedia \
 	EnumAAFAttributes \
 	EnumAAFClassDefs \
-	EnumAAFComponents \
 	EnumAAFControlCodeDefs \
 	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFDefs \
 	EnumAAFEffectDefs \
 	EnumAAFIdentifications \
-	EnumAAFLocators \
 	EnumAAFMedia \
 	EnumAAFMobComments \
-	EnumAAFMobSlots \
-	EnumAAFMobs \
 	EnumAAFParameterSlots \
 	EnumAAFPropertyDefs \
+	EnumAAFProperties \
 	EnumAAFReferenceValues \
 	EnumAAFSegments \
 	EnumAAFTypeDefs 
@@ -83,25 +69,41 @@ AAFNONPERSISTENTOBJECTS = \
 # These are files which specify COM interfaces, but which are
 # implemented in other objects.
 AAFCOMINTERFACESONLY = \
-	AAFEndian
-
+	AAFEndian \
+	AAFSearchSource \
+	AAFMobPrivate
 
 # These are the impl files that are typed by humans.  Be sure to
 # remove them from the other list.  As you check each one in, just add
 # its name here and remove it from either list above where it occurs.
 # Do not add the 'Impl'prefix here.
 HUMAN_TYPED_IMPL = \
+	AAFComponent \
+	AAFCompositionMob \
+	AAFContentStorage \
+	AAFEssenceDescriptor \
 	AAFFile \
+	AAFFileDescriptor \
+	AAFFiller \
 	AAFHeader \
 	AAFIdentification \
-	AAFObject \
-	AAFComponent \
+	AAFMasterMob \
 	AAFMob  \
-	AAFSegment \
 	AAFMobSlot \
+	AAFNetworkLocator \
+	AAFObject \
+	AAFSegment \
+	AAFSequence \
+	AAFSourceClip \
+	AAFSourceMob \
+	AAFSourceReference \
+	AAFTimecode \
 	AAFTimelineMobSlot \
-	AAFSession
-
+	AAFTapeDescriptor \
+	EnumAAFComponents \
+	EnumAAFLocators \
+	EnumAAFMobSlots \
+	EnumAAFMobs
 
 # The list of standard dodo targets.
 # AAFTypes have to be handled separately since no object is to be created.

@@ -45,9 +45,9 @@ class ImplAAFFile;
 #include "ImplAAFObject.h"
 //#include "ImplAAFSession.h"
 #include "ImplAAFIdentification.h"
+#include "ImplAAFContentStorage.h"
 
 #include "OMProperty.h"
-#include "OMTypes.h"
 
 class AAFDataKind;
 class AAFEffectDef;
@@ -56,6 +56,7 @@ class ImplAAFSession;
 const int PID_HEADER_BYTEORDER          = 0;
 const int PID_HEADER_LASTMODIFIED       = 1;
 const int PID_HEADER_IDENTIFICATIONLIST = 2;
+const int PID_HEADER_CONTENTSTORAGE		= 3;
 
 class ImplAAFHeader : public ImplAAFObject
 {
@@ -65,9 +66,12 @@ public:
   //
   //********
   ImplAAFHeader ();
+
+protected:
   ~ImplAAFHeader ();
 
-  OMDECLARE_STORABLE(AAFHeader);
+public:
+  OMDECLARE_STORABLE(ImplAAFHeader)
 
   //****************
   // LookupMob()
@@ -166,6 +170,14 @@ public:
 
 
   //****************
+  // GetContentStorage()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetContentStorage
+        (ImplAAFContentStorage ** ppContentStorage);  //@parm [out,retval] The AAF ContentStorage
+
+
+  //****************
   // GetDictionary()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -192,6 +204,14 @@ public:
 
 		 // @parm [out,retval] Indentification Object
 		 ImplAAFIdentification ** ppIdentification);
+
+
+  //****************
+  // GetNumIdents()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetNumIdents
+        (aafUInt32 *  pNumIdents);  //@parm [out,retval] Total number of identifications
 
 
   //****************
@@ -253,8 +273,8 @@ public:
   // in /test/ImplAAFHeaderTest.cpp.
   static AAFRESULT test();
 
-	aafBool IsMediaDataPresent( 	aafUID_t				fileMobUid,	/* IN -- */
-									aafFileFormat_t	fmt);
+public:
+	// Interfaces visible inside the toolkit, but not exposed through the API
 	AAFRESULT AppendDataObject(aafUID_t mobID,      /* IN - Mob ID */
 						  ImplAAFObject *dataObj) ;    /* IN - Input Mob */ 
 
@@ -267,6 +287,12 @@ AAFRESULT AddIdentificationObject (aafProductIdentification_t * /*pIdent*/);
 AAFRESULT BuildMediaCache(void);
 AAFRESULT LoadMobTables(void);
 
+private:
+	// These are private accessor methods.
+	ImplAAFContentStorage *GetContentStorage(void);
+	ImplAAFDictionary *GetDictionary(void);
+
+public:
 #if FULL_TOOLKIT
 AAFRESULT ReadToolkitRevision(aafProductVersion_t *revision);
 AAFRESULT WriteToolkitRevision(aafProductVersion_t revision);
@@ -298,6 +324,7 @@ private:
 		OMFixedSizeProperty<aafInt16>                      _byteOrder;
 		OMFixedSizeProperty<aafTimeStamp_t>                _lastModified;
     OMStrongReferenceVectorProperty<ImplAAFIdentification> _identificationList;
+		OMStrongReferenceProperty<ImplAAFContentStorage>	_contentStorage;
 };
 
 #endif // ! __ImplAAFHeader_h__
