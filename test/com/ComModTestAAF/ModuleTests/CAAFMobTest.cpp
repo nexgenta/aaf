@@ -37,6 +37,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 
@@ -48,7 +50,9 @@ static const aafTimeStamp_t modificationTimeStamp = { 1941, 12, 7, 5, 31, 12, 2 
 
 // {21F2083C-B260-11d3-BFFE-00104BC9156D}
 static const aafMobID_t MOBTestID = 
-{ 0x21f2083c, 0xb260, 0x11d3, { 0xbf, 0xfe, 0x0, 0x10, 0x4b, 0xc9, 0x15, 0x6d } };
+{ 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02, 0x13, 0x00, 0x00, 0x00,
+	0x21f2083c, 0xb260, 0x11d3, { 0xbf, 0xfe, 0x0, 0x10, 0x4b, 0xc9, 0x15, 0x6d } };
 
 
 
@@ -96,7 +100,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -117,14 +121,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  // Get the AAF Dictionary so that we can create valid AAF objects.
 	  checkResult(pHeader->GetDictionary(&pDictionary));
  		
+	  CAAFBuiltinDefs defs (pDictionary);
+
 	  //Make the first mob
 	  long	test;
 	  aafRational_t	audioRate = { 44100, 1 };
 
 	  // Create a Mob
-	  checkResult(pDictionary->CreateInstance(AUID_AAFMob,
-											  IID_IAAFMob, 
-											  (IUnknown **)&pMob));
+	  checkResult(defs.cdMob()->
+				  CreateInstance(IID_IAAFMob, 
+								 (IUnknown **)&pMob));
 
 	  checkResult(pMob->SetMobID(MOBTestID));
 	  checkResult(pMob->SetName(mobName));
@@ -135,9 +141,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  // Add some slots
 	  for(test = 0; test < 5; test++)
 		{
- 		  checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
-												  IID_IAAFSourceClip, 
-												  (IUnknown **)&sclp));		
+ 		  checkResult(defs.cdSourceClip()->
+					  CreateInstance(IID_IAAFSourceClip, 
+									 (IUnknown **)&sclp));		
 
 		  checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 
@@ -231,7 +237,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.platform = NULL;
 
@@ -245,12 +251,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  checkResult(pFile->GetHeader(&pHeader));
 
 
-	  checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 
 	  aafSearchCrit_t		criteria;
-	  criteria.searchTag = kNoSearch;
+	  criteria.searchTag = kAAFNoSearch;
 	  checkResult(pHeader->GetMobs (&criteria, &mobIter));
 
 	  for(n = 0; n < numMobs; n++)
@@ -259,13 +265,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		  aafNumSlots_t	numSlots;
 		  aafMobID_t		mobID;
 		  aafSlotID_t		trackID;
-      aafInt32 nameBufLen = 0;
+		  aafUInt32 nameBufLen = 0;
 
 		  checkResult(mobIter->NextOne (&aMob));
       
       // Check GetNameBufLen and GetName
       checkResult(aMob->GetNameBufLen(&nameBufLen));
-      checkExpression((aafInt32)((wcslen(mobName) + 1) * sizeof(aafCharacter)) == nameBufLen, AAFRESULT_TEST_FAILED);
+      checkExpression(((wcslen(mobName) + 1) * sizeof(aafCharacter)) == nameBufLen, AAFRESULT_TEST_FAILED);
 		  checkResult(aMob->GetName (name, nameBufLen));
 		  checkExpression (wcscmp(mobName, name) == 0, AAFRESULT_TEST_FAILED);
 
