@@ -239,19 +239,19 @@ void GetStringValue (IAAFObject * pObj,
 bool classDefinitionIsA ( IAAFClassDef *pClassDefQuery,
 							   aafUID_constref targetAUID)
 {
-	IAAFDefObject *pDefObject = NULL;
+	IAAFMetaDefinition *pMetaDefinition = NULL;
 	IAAFClassDef *pParentClass=NULL;
 	bool classMatch=false;
 
 
   try
   {
-	  check(pClassDefQuery->QueryInterface(IID_IAAFDefObject,(void **)&pDefObject));
+	  check(pClassDefQuery->QueryInterface(IID_IAAFMetaDefinition,(void **)&pMetaDefinition));
 
     aafUID_t testAUID;
-	  check(pDefObject->GetAUID(&testAUID));
-	  pDefObject->Release();
-	  pDefObject=NULL;
+	  check(pMetaDefinition->GetAUID(&testAUID));
+	  pMetaDefinition->Release();
+	  pMetaDefinition=NULL;
 
 
     if (!memcmp (&testAUID, &targetAUID, sizeof (aafUID_t)))
@@ -275,8 +275,8 @@ bool classDefinitionIsA ( IAAFClassDef *pClassDefQuery,
     // cleanup after error...
     if (pParentClass)
       pParentClass->Release();
-    if (pDefObject)
-      pDefObject->Release();
+    if (pMetaDefinition)
+      pMetaDefinition->Release();
 
     throw;
   }
@@ -318,7 +318,7 @@ bool IsOptionalPropertyPresent (IAAFObject * pObj,
     throw;
   }
 
-  return (AAFTrue == r) ? true : false;
+  return (kAAFTrue == r) ? true : false;
 }
 
 // Main functions for PersonnelResource
@@ -1138,7 +1138,8 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     // which we've just looked up), and a name for this class.
     check (pcd->Initialize (kClassID_PersonnelResource,
 						    pcd_Object,
-						    L"PersonnelResource"));
+						    L"PersonnelResource",
+							kAAFTrue));
 
     //
     // Now we add definitions for the properties that this class will
@@ -1170,14 +1171,16 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_GivenName,
 									   L"GivenName",
 									   ptd_String,
-									   AAFFalse,	// mandatory
+									   kAAFFalse,	// mandatory
+									   kAAFFalse,	// not a unique identifier
 									   &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_FamilyName,
 									    L"FamilyName",
 									    ptd_String,
-									    AAFFalse,	// mandatory
+									    kAAFFalse,	// mandatory
+									    kAAFFalse,	// not a unique identifier
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1198,7 +1201,8 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_Position,
 									    L"Position",
 									    ptd_Position,
-									    AAFFalse,   // mandatory
+									    kAAFFalse,   // mandatory
+									    kAAFFalse,	// not a unique identifier
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1219,7 +1223,8 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_ContractID,
 									    L"ContractID",
 									    ptd_ui32,
-									    AAFTrue,    // optional
+									    kAAFTrue,    // optional
+									    kAAFFalse,	// not a unique identifier
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1233,7 +1238,8 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_Role,
 									    L"Role",
 									    ptd_String,
-									    AAFTrue,    // optional
+									    kAAFTrue,    // optional
+									    kAAFFalse,	// not a unique identifier
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1288,7 +1294,7 @@ CreateAndRegisterPersonnelResourceReference
 
   IAAFTypeDef *ptd=NULL;
   IAAFClassDef *pcd=NULL;
-  IAAFTypeDefObjectRef *ptdr=NULL;
+  IAAFTypeDefStrongObjRef *ptdsr=NULL;
 
   CAAFBuiltinDefs defs (pDict);
 
@@ -1314,8 +1320,8 @@ CreateAndRegisterPersonnelResourceReference
     // PersonnelResource object.  We'll instantiate a
     // TypeDefinitionStrongObjectReference.
     check (defs.cdTypeDefStrongObjRef()->
-		   CreateInstance (IID_IAAFTypeDefObjectRef,
-						   (IUnknown**) &ptdr));
+		   CreateInstance (IID_IAAFTypeDefStrongObjRef,
+						   (IUnknown**) &ptdsr));
 
     // Initialize our new type def, identifying the given AUID by which
     // this type will be known
@@ -1323,18 +1329,18 @@ CreateAndRegisterPersonnelResourceReference
     // generated), the class definition describing the types of objects
     // to which we'll refer (the ClassDef descriging PersonnelResource
     // objects), and a name for this type.
-    check (ptdr->Initialize (kTypeID_PersonnelResourceStrongReference,
-						     pcd,
-						     L"PersonnelResourceStrongReference"));
+    check (ptdsr->Initialize (kTypeID_PersonnelResourceStrongReference,
+							  pcd,
+							  L"PersonnelResourceStrongReference"));
 
     // Register this type definition in the dictionary.  The
     // dictionary::RegisterTypeDef() method expects an IAAFTypeDef
     // pointer, so we'll QI for that first.
-    check (ptdr->QueryInterface (IID_IAAFTypeDef, (void **)&ptd));
+    check (ptdsr->QueryInterface (IID_IAAFTypeDef, (void **)&ptd));
     check (pDict->RegisterTypeDef (ptd));
 
-    ptdr->Release();
-    ptdr=NULL;
+    ptdsr->Release();
+    ptdsr=NULL;
     ptd->Release();
     ptd=NULL;
     pcd->Release();
@@ -1343,8 +1349,8 @@ CreateAndRegisterPersonnelResourceReference
   catch (...)
   {
     // cleanup after error...
-    if (ptdr)
-      ptdr->Release();
+    if (ptdsr)
+      ptdsr->Release();
     if (ptd)
       ptd->Release();
     if (pcd)
@@ -1481,7 +1487,8 @@ void CreateAndRegisterAdminMob (IAAFDictionary * pDict)
     // we've just looked up), and a name for this class.
     check (pcd->Initialize (kClassID_AdminMob,
 						    pcd_Mob,
-						    L"AdminMob"));
+						    L"AdminMob",
+							kAAFTrue));
 
     //
     // Now we add a definition for the property that this class will
@@ -1514,7 +1521,8 @@ void CreateAndRegisterAdminMob (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_AdminMob_Personnel,
 									    L"Personnel",
 									    ptd_PersonnelVector,
-									    AAFFalse,
+									    kAAFFalse,
+									    kAAFFalse,	// not a unique identifier
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
