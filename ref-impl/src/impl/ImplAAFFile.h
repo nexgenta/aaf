@@ -26,7 +26,6 @@ class OMFile;
 class ImplAAFDictionary;
 class ImplAAFFile;
 class ImplAAFHeader;
-class ImplAAFSession;
 class ImplAAFDataDef;
 
 class ImplAAFFile : public ImplAAFRoot
@@ -85,12 +84,6 @@ public:
   virtual ~ImplAAFFile ();
 
 
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFFileTest.cpp.
-  static AAFRESULT test();
-
-
 private:
 
   // Private state for this file.
@@ -99,6 +92,7 @@ private:
     kOmCreate = 0,
 	kOmModify = 1,
 	kOmOpenRead = 2,
+	kOmTransient = 3,
 	kOmUndefined = -1
   } openType_t;
 	
@@ -107,14 +101,11 @@ private:
 
   aafInt32			_cookie;
   OMFile			*_file;
-  ImplAAFDictionary *_dictionary;
+  ImplAAFDictionary *_factory;
   aafInt16			_byteOrder;
   openType_t			_openType;
   ImplAAFHeader *   _head;		// Needed by Head object
   aafBool   _semanticCheckEnable;	//!!!  /* Used to stop recursion in checks */
-  ImplAAFDataDef *	_nilKind;// !!!
-  ImplAAFDataDef *	_pictureKind;// !!!
-  ImplAAFDataDef *	_soundKind;// !!!
   aafFileRev_t   _setrev;
   aafBool _initialized;
   aafBool _open;
