@@ -28,7 +28,6 @@
  ************************************************************************/
 
 #include "AAF.h"
-#include "AAFTypes.h"
 #include <iostream.h>
 
 //
@@ -40,35 +39,29 @@
 
 //********
 //
-// TypeID for extendable enumeration for ePosition
+// TypeID for extendable enumeration for eRole
 //
 // {5F72AD68-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kTypeID_ePosition = 
+static const aafUID_t kTypeID_eRole = 
 { 0x5f72ad68, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 //
 //
-// Element values for ePosition
+// Element values for eRole
 //
 //    Producer, 
 // {5F72AD69-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kPosition_Producer = 
+static const aafUID_t kRole_Producer = 
 { 0x5f72ad69, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 //
 //  	Editor, 
 // {5F72AD6A-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kPosition_Editor = 
+static const aafUID_t kRole_Editor = 
 { 0x5f72ad6a, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 //
 //  	FloorManager, 
 // {5F72AD6B-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kPosition_FloorManager = 
+static const aafUID_t kRole_FloorManager = 
 { 0x5f72ad6b, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-
-//		Actor
-//  {F611B4AE-9070-11d3-A6A8-00609419FDAF}
-static const aafUID_t kPosition_Actor  = 
-{ 0xf611b4ae, 0x9070, 0x11d3, { 0xa6, 0xa8, 0x0, 0x60, 0x94, 0x19, 0xfd, 0xaf } };
-
 
 
 //********
@@ -99,44 +92,37 @@ static const aafUID_t kClassID_PersonnelResource =
 // PropertyIDs for PersonnelResource class properties
 //
 // {5F72AD6E-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kPropID_PersonnelResource_FamilyName = 
+static const aafUID_t kPropID_PersonnelResource_Name = 
 { 0x5f72ad6e, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
-// {E329CF70-9147-11d3-A6A9-00609419FDAF}
-static const aafUID_t kPropID_PersonnelResource_GivenName = 
-{ 0xe329cf70, 0x9147, 0x11d3, { 0xa6, 0xa9, 0x0, 0x60, 0x94, 0x19, 0xfd, 0xaf } };
-
 //
 // {5F72AD6F-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kPropID_PersonnelResource_Position = 
+static const aafUID_t kPropID_PersonnelResource_Role = 
 { 0x5f72ad6f, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 //
 // {5F72AD70-703D-11d3-8449-00600832ACB8}
 static const aafUID_t kPropID_PersonnelResource_ContractID = 
 { 0x5f72ad70, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
-// {E329CF71-9147-11d3-A6A9-00609419FDAF}
-static const aafUID_t kPropID_PersonnelResource_Role = 
-{ 0xe329cf71, 0x9147, 0x11d3, { 0xa6, 0xa9, 0x0, 0x60, 0x94, 0x19, 0xfd, 0xaf } };
 
 //********
 //
-// ClassID for AdminMob class
+// ClassID for PersonnelMob class
 //
 // {5F72AD71-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kClassID_AdminMob = 
+static const aafUID_t kClassID_PersonnelMob = 
 { 0x5f72ad71, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 //
 //
-// PropertyIDs for AdminMob class properties
+// PropertyIDs for PersonnelMob class properties
 //
 // {5F72AD72-703D-11d3-8449-00600832ACB8}
-static const aafUID_t kPropID_AdminMob_Personnel = 
+static const aafUID_t kPropID_PersonnelMob_Personnel = 
 { 0x5f72ad72, 0x703d, 0x11d3, { 0x84, 0x49, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
 
 //********
 //
-// MobID for our AdminMob instance
+// MobID for our PersonnelMob instance
 //
 // {5F72AD75-703D-11d3-8449-00600832ACB8}
 static const aafUID_t kMobID_Personnel = 
@@ -147,117 +133,122 @@ static const aafUID_t kMobID_Personnel =
 // macro for checking HRESULT return values
 //
 // argument 'r' will probably have side effects, so make sure it is
-// evaluated once and only once.
+// evaluated once and only once, and outside of the assert() macro
+// (since assertions may be turned off).
 //
-#define check(r) {if (FAILED (r)) throw r; }
+#define check(r) {if (FAILED (r)) assert(0); }
 
 
 
 // For local in-memory use, we'll define the following typedef for
-// handy manipulation of ePosition extensible enumerations.
+// handy manipulation of eRole extensible enumerations.
 //
-typedef aafUID_t  ePosition;  
+typedef aafUID_t  eJobFunction, eRole;  // eRole being replaced by eJobFunction
 
 // Contract ID type
 typedef aafUInt32 contractID_t;
 
+// For local in-memory use, we'll define the following struct for
+// handy manipulation of PersonnelResources.
+//
+static const size_t kMaxNameLen = 100;
+struct PersonnelResource
+{
+  aafCharacter name[kMaxNameLen+1];
+  eRole        role;
 
-
-static void SetStringProperty (IAAFObject * pObj,
-						aafUID_constref propertyID,
-						aafCharacter_constptr strValue);
+  // contract ID is optional
+  bool         cid_present;
+  contractID_t cid;
+};
 
 bool classDefinitionIsA ( IAAFClassDef *pClassDefQuery,
-							   aafUID_constref targetAUID);
+							   const aafUID_t targetAUID);
+
+//
+// Returns true if the roles match; returns false otherwise.
+//
+bool AreRolesEqual (const eRole & roleA, const eRole & roleB);
+
+//
+// Prints the given eRole.
+//
+void PrintRole (IAAFDictionary * pDict,
+				const eRole role);
+
+//
+// Simple utility to  create PersonnelResource from name and role
+// info.  No contract ID info will be present.
+// 
+PersonnelResource FormatResource (aafCharacter * name,
+								  const eRole &  role);
 
 
-// Main functions for PersonnelResource
-void PersonnelResourceSetFamilyName(IAAFObject *pResource,
-							   aafCharacter_constptr familyName);
+//
+// Simple utility to  create PersonnelResource from name, role, and
+// contract ID info.
+// 
+PersonnelResource FormatResource (aafCharacter * name,
+								  const eRole &  role,
+								  contractID_t   cid);
 
-void PersonnelResourceSetGivenName(IAAFObject *pResource,
-							   aafCharacter_constptr givenName);
-void PersonnelResourceSetPosition(IAAFObject *pResource,
-							   const ePosition& position);
-void PersonnelResourceSetActorRole (IAAFObject *pResource,
-								  aafCharacter_constptr role);
-void PersonnelResourceSetContractID (IAAFObject * pObj,
+
+//
+// Prints the given PersonnelResource.
+//
+void PrintPersonnelResource (IAAFDictionary * pDict,
+							 const PersonnelResource & resource);
+
+//
+// Prints all personnel resources in the given PersonnelMob.
+//
+void PrintPersonnelResources (IAAFDictionary * pDict,
+							  IAAFMob * pMob);
+
+//
+// Set/Get name on a PersonnelResource object.  GetName requires that
+// buflen be large enough to hold the name.  It can be determined from
+// PersonnelRecordGetNameBufLen().
+//
+void PersonnelRecordSetName (IAAFObject * pObj,
+							 const aafCharacter * name);
+aafUInt32 PersonnelRecordGetNameBufLen (IAAFObject * pObj);
+void PersonnelRecordGetName (IAAFObject * pObj,
+							 aafCharacter * buf,
+							 aafUInt32 buflen);
+
+//
+// Set/Get role from a PersonnelResource object.
+//
+void PersonnelRecordSetRole (IAAFObject * pObj,
+							 eRole role);
+eRole PersonnelRecordGetRole (IAAFObject * pObj);
+
+//
+// Set/Get contract ID on a PersonnelResource object.  Get requires
+// that the contract ID property be present (that is, has already been
+// set).  That can be determined from
+// PersonnelRecordContractIDIsPresent().
+//
+void PersonnelRecordSetContractID (IAAFObject * pObj,
 								   contractID_t cid);
-void PersonnelResourceInitialize(IAAFObject *pResource,
-							   aafCharacter_constptr familyName,
-							   aafCharacter_constptr givenName,
-							   const ePosition& position);
-void PersonnelResourceGetGivenNameBufLen (IAAFObject * pObj, aafUInt32 *bufLen);
-
-
-void PersonnelResourceGetGivenName (IAAFObject * pObj,
-							 aafCharacter * buf,
-							 aafUInt32 buflen);
-void PersonnelResourceGetFamilyNameBufLen (IAAFObject * pObj, aafUInt32 *bufLen);
-
-
-void PersonnelResourceGetFamilyName (IAAFObject * pObj,
-							 aafCharacter * buf,
-							 aafUInt32 buflen);
-
-void PersonnelResourceGetPosition (IAAFObject * pResource,
-							 ePosition *position);
-
-HRESULT PersonnelResourceGetContractID (IAAFObject * pObj,
-								   contractID_t *cid);
-HRESULT PersonnelResourceGetActorNameBufLen (IAAFObject *pObj,
-										   aafUInt32 *bufLen);
-HRESULT PersonnelResourceGetActorName (IAAFObject * pObj,
-							 aafCharacter * buf,
-							 aafUInt32 buflen);
-
-void AdminMobAppendResource (IAAFDictionary *pDict,
-									IAAFMob *pAdminMob,
-							        IAAFObject *pResource);
-void AdminMobGetNumPersonnel (IAAFDictionary * pDict,
-							  IAAFMob * pMob,
-							  aafUInt32 *numPersonnel);
-void AdminMobGetNthPersonnel (IAAFDictionary * pDict,
-							  IAAFMob * pMob,
-							  aafUInt32 index,
-							  IAAFObject **personnelResource);
+bool PersonnelRecordContractIDIsPresent (IAAFObject * pObj);
+contractID_t PersonnelRecordGetContractID (IAAFObject * pObj);
 
 
 //
-// Create and registration functions.
+// Set/Get the personnel resource info in this object.
 //
-void CreateAndRegisterPositionEnum (IAAFDictionary * pDict);
-void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict);
-void CreateAndRegisterPersonnelResourceReference(IAAFDictionary * pDict);
-void CreateAndRegisterPersonnelResourceReferenceVector(IAAFDictionary * pDict);
-void CreateAndRegisterAdminMob (IAAFDictionary * pDict);
-void DefineResourceClassExtensions(IAAFDictionary *pDict);
-void VerifyResourceClassExtensions(IAAFDictionary *pDict);
-
-
-
-//
-// Returns true if the positions match; returns false otherwise.
-//
-bool ArePositionsEqual (const ePosition & positionA, const ePosition & positionB);
-
-//
-// Prints the given ePosition.
-//
-void PrintPosition (IAAFDictionary * pDict,
-				const ePosition & position);
-
-
+void PersonnelRecordSetInfo (IAAFObject * pObj,
+							 const PersonnelResource & info);
+PersonnelResource  PersonnelRecordGetInfo (IAAFObject * pObj);
 
 
 //
 // Prints the given string.
 //
-// On Irix CC, this operator conflicts with ostream::<<(const wchar_t*)
-#if !defined( OS_IRIX )
 ostream& operator<< (ostream& s,
-					 aafCharacter_constptr wstring);
-#endif
+					 const aafCharacter * wstring);
+
 
 #endif // ! __extensionUtils_h__
-
