@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.10 2004/03/05 16:13:14 bakerian Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11 2004/06/08 15:14:54 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,11 @@ endif
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
+# Remove OMMSSStoredObject.o fomr CXXOBJS list sine MIPSpro introduces
+# unusal linking behavior when this unused source file is built.
+ifeq ($(COMPILER),MIPSpro)
+CXXOBJS:=$(filter-out %/OMMSSStoredObject.o,$(CXXOBJS))
+endif
 
 INCLUDES = -I. \
 	   -I../../include/OM \
