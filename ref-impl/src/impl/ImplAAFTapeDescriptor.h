@@ -3,14 +3,32 @@
 #ifndef __ImplAAFTapeDescriptor_h__
 #define __ImplAAFTapeDescriptor_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __AAFTypes_h__
@@ -45,62 +63,62 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeManufacturer
 		// @parm [in,string] Manufacturers name
-        (aafWChar*  pName);
+        (const aafCharacter*  pName);
   //****************
   // GetTapeManufacturer()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeManufacturer
 	    (// @parm [in,string] pass in a buffer which is cleared and filled.
-         aafWChar*  pName,
+         aafCharacter*  pName,
 
 		 // @parm [in] Length of the buffer to hold the Manufacturers name
-		 aafInt32  buflen);
+		 aafUInt32  buflen);
   //****************
-  // GetTapeManBufLen()
+  // GetTapeManufacturerBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTapeManBufLen
+    GetTapeManufacturerBufLen
 		// @parm [out] Manufacturers Name length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
   //****************
   // SetTapeModel()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeModel
 		// @parm [in,string] Tape Manufacturers Brand name
-        (aafWChar*  pModelName);
+        (const aafCharacter*  pModelName);
   //****************
   // GetTapeModel()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeModel
 	    (// @parm [in,string] pass in a buffer which is cleared and filled.
-         aafWChar*  pModelName,
+         aafCharacter*  pModelName,
 
 		 // @parm [in] Length of the buffer to hold the Manufacturers Brand name
-		 aafInt32  buflen);
+		 aafUInt32  buflen);
   //****************
   // GetTapeModelBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeModelBufLen
 		// @parm [out] Model length
-        (aafInt32 *  pLen);
+        (aafUInt32 *  pLen);
 
   //****************
   // SetTapeFormFactor()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetTapeFormFactor
-		// @parm [in] ex: kVHSVideoTape,kDATCartridge 
+		// @parm [in] ex: kAAFVHSVideoTape,kDATCartridge 
         (aafTapeCaseType_t  formFactor);
   //****************
   // GetTapeFormFactor()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTapeFormFactor
-		// @parm [out] ex: kVHSVideoTape,kDATCartridge
+		// @parm [out] ex: kAAFVHSVideoTape,kDATCartridge
         (aafTapeCaseType_t*  formFactor);
 
   //****************
@@ -152,13 +170,6 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFTapeDescriptor)
-
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFTapeDescriptorTest.cpp.
-  static AAFRESULT test();
 
   virtual AAFRESULT	STDMETHODCALLTYPE
 		GetOwningMobKind (aafMobKind_t *pMobKind);
