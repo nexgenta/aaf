@@ -173,7 +173,11 @@ public:
 
     // @cmember Find the property instance in this <c OMFile>
     //          named by <p propertyPathName>.
-  virtual OMProperty* findPropertyPath(const char* propertyPathName) const;
+  virtual OMProperty* findPropertyPath(const wchar_t* propertyPathName) const;
+
+  OMPropertyId* path(const wchar_t* propertyPathName) const;
+
+  OMProperty* findProperty(const OMPropertyId* path) const;
 
   // OMStorable overrides.
   //
