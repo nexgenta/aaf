@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplAAFBuiltinTypes_h__
@@ -37,10 +42,6 @@
 #include "ImplAAFTypeDefEnum.h"
 #endif
 
-#ifndef __ImplAAFTypeDefExtEnum_h__
-#include "ImplAAFTypeDefExtEnum.h"
-#endif
-
 #ifndef __ImplAAFTypeDefVariableArray_h__
 #include "ImplAAFTypeDefVariableArray.h"
 #endif
@@ -57,20 +58,8 @@
 #include "ImplAAFTypeDefInt.h"
 #endif
 
-#ifndef __ImplAAFTypeDefCharacter_h__
-#include "ImplAAFTypeDefCharacter.h"
-#endif
-
 #ifndef __ImplAAFTypeDefString_h__
 #include "ImplAAFTypeDefString.h"
-#endif
-
-#ifndef __ImplAAFTypeDefIndirect_h__
-#include "ImplAAFTypeDefIndirect.h"
-#endif
-
-#ifndef __ImplAAFTypeDefOpaque_h__
-#include "ImplAAFTypeDefOpaque.h"
 #endif
 
 #ifndef __ImplAAFTypeDefStrongObjRef_h__
@@ -81,24 +70,8 @@
 #include "ImplAAFTypeDefWeakObjRef.h"
 #endif
 
-#ifndef __ImplAAFTypeDefStream_h__
-#include "ImplAAFTypeDefStream.h"
-#endif
-
-#ifndef __ImplAAFTypeDefSet_h__
-#include "ImplAAFTypeDefSet.h"
-#endif
-
 #ifndef __AAFStoredObjectIDs_h__
 #include "AAFStoredObjectIDs.h"
-#endif
-
-#ifndef __AAFClassDefUIDs_h__
-#include "AAFClassDefUIDs.h"
-#endif
-
-#ifndef __AAFTypeDefUIDs_h__
-#include "AAFTypeDefUIDs.h"
 #endif
 
 #include "ImplAAFBuiltinDefs.h"
@@ -123,6 +96,7 @@
 #include <assert.h>
 
 
+
 static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 								  ImplAAFDictionary * pDict,
 								  ImplAAFTypeDef ** ppCreatedTypeDef)
@@ -142,9 +116,9 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefinteger object (as yet uninitialized)
 		  ImplAAFTypeDefInt * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefInt, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefInt(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  AAFRESULT hr = ptd->Initialize (curInteger->typeID,
@@ -165,6 +139,7 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 	}
   return AAFRESULT_NO_MORE_OBJECTS;
 }
+
 
 //
 // We have the following structures to work with, defined in
@@ -187,7 +162,6 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 //   aafUID_t   typeID;           
 //   wchar_t *  typeName;         
 //   aafUID_t * elementType;
-//   size_t     size;
 //   TypeEnumerationMember * members;
 // };
 //
@@ -223,99 +197,8 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 
 		  // Create an impl enumeration object (as yet uninitialized)
 		  ImplAAFTypeDefEnum * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefEnum, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
-		  assert (ptd);
-
-		  // count up how many members in this enumeration
-		  aafUInt32 numMembers = 0;
-		  TypeEnumerationMember ** pMember = (*curEnumeration)->members;
-		  while (*pMember)
-			{
-			  numMembers++;
-			  pMember++;
-			}
-	  
-		  ImplAAFTypeDefSP pElemType;
-		  // Look up the type of this enumeration
-		  hr = pDict->LookupTypeDef(*(*curEnumeration)->pElementTypeId, &pElemType);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-		  assert (pElemType);
-
-		  // allocate arrays to hold memberTypes pointers and memberNames.
-		  aafInt64 * memberValues =	new aafInt64 [numMembers];
-		  assert (memberValues);
-	  
-		  aafString_t * memberNames = 
-			new aafString_t[numMembers];
-		  assert (memberNames);
-
-		  // fill the types and names arrays.
-		  aafUInt32 i;
-		  for (i = 0; i < numMembers; i++)
-			{
-			  memberValues[i] = (*curEnumeration)->members[i]->memberValue;
-			  memberNames[i] = (*curEnumeration)->members[i]->memberName;
-			  assert (memberNames[i]);
-			}
-
-		  // use those arrays to initialize the type def
-		  hr = ptd->Initialize ((*curEnumeration)->typeID,
-								pElemType,
-								memberValues,
-								memberNames,
-								numMembers,
-								(*curEnumeration)->typeName);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
-		  hr = ptd->RegisterSize ((*curEnumeration)->size);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
-		  // clean up
-		  delete[] memberValues;
-		  delete[] memberNames;
-
-		  assert (ppCreatedTypeDef);
-		  *ppCreatedTypeDef = ptd;
-		  (*ppCreatedTypeDef)->AcquireReference ();
-		  ptd->ReleaseReference ();
-		  ptd = 0;
-		  return AAFRESULT_SUCCESS;
-		}
-
-	  curEnumeration++;
-	}
-  return AAFRESULT_NO_MORE_OBJECTS;
-}
-
-//
-// Looks up idToCreate in the structures.  If found, creates and
-// initializes a type def to match (using the supplied dictionary),
-// and returns it in ppCreatedTypeDef.  Returns true if successful;
-// returns false if not found.  Does not register the new type.
-//
-static AAFRESULT CreateNewExtEnumerationType (const aafUID_t & idToCreate,
-									  ImplAAFDictionary * pDict,
-									  ImplAAFTypeDef ** ppCreatedTypeDef)
-{
-  assert (pDict);
-  AAFRESULT hr;
-
-  // Go through the enumeration list, attempting to identify the requested
-  // ID.
-  TypeEnumeration ** curEnumeration = s_AAFAllTypeEnumerations;
-  while (*curEnumeration)
-	{
-	  // Check to see if the current enumeration matches the ID of the type
-	  // def we want to create.
-	  if (! memcmp (&idToCreate, &(*curEnumeration)->typeID, sizeof (aafUID_t)))
-		{		
-		  // Yes, this is the one.
-
-		  // Create an impl enumeration object (as yet uninitialized)
-		  ImplAAFTypeDefEnum * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefEnum, (ImplAAFMetaDefinition **) &ptd);
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefEnum(),
+									  (ImplAAFObject**) &ptd);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
@@ -379,98 +262,6 @@ static AAFRESULT CreateNewExtEnumerationType (const aafUID_t & idToCreate,
 	}
   return AAFRESULT_NO_MORE_OBJECTS;
 }
-
-
-
-//
-// We have the following structures to work with, defined in
-// AAFTypeDefsGen.h:
-//
-//
-// One member of an extendible enumeration typedef:
-//
-// struct TypeExtEnumerationMember
-// {                              
-//   wchar_t *        memberName; 
-//   aafUID_t         memberValue; 
-// };                             
-//                                
-//
-// A extendible enumeration, containing a null-terminated list of TypeExtEnumerationMembers:
-//
-// struct TypeExtEnumeration              
-// {                              
-//   aafUID_t   typeID;           
-//   wchar_t *  typeName;         
-//   TypeExtEnumerationMember * members;
-// };
-//
-//
-// A null-terminated array of TypeEnumerations for all enumeration typedefs:
-//
-// static TypeExtEnumeration * s_AAFAllTypeExtEnumerations[];
-//
-
-//
-// Looks up idToCreate in the structures.  If found, creates and
-// initializes a type def to match (using the supplied dictionary),
-// and returns it in ppCreatedTypeDef.  Returns true if successful;
-// returns false if not found.  Does not register the new type.
-//
-static AAFRESULT CreateNewExtendibleEnumerationType (const aafUID_t & idToCreate,
-													 ImplAAFDictionary * pDict,
-													 ImplAAFTypeDef ** ppCreatedTypeDef)
-{
-  assert (pDict);
-  AAFRESULT hr;
-
-  // Go through the extendible enumeration list, attempting to
-  // identify the requested ID.
-  TypeExtEnumeration ** curExtEnumeration = s_AAFAllTypeExtEnumerations;
-  while (*curExtEnumeration)
-	{
-	  // Check to see if the current extendible enumeration matches
-	  // the ID of the type def we want to create.
-	  if (! memcmp (&idToCreate, &(*curExtEnumeration)->typeID, sizeof (aafUID_t)))
-		{		
-		  // Yes, this is the one.
-
-		  // Create an impl enumeration object (as yet uninitialized)
-		  ImplAAFTypeDefExtEnum * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefExtEnum, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
-		  assert (ptd);
-
-		  // Initialize the type def
-		  hr = ptd->Initialize ((*curExtEnumeration)->typeID,
-								(*curExtEnumeration)->typeName);
-		  assert (AAFRESULT_SUCCEEDED (hr));
-
-		  // Add any pre-initialized members
-		  TypeExtEnumerationMember ** pMember = (*curExtEnumeration)->members;
-		  while (*pMember)
-			{
-			  hr = ptd->AppendElement ((*pMember)->memberValue,
-									   (*pMember)->memberName);
-			  assert (AAFRESULT_SUCCEEDED (hr));
-			  pMember++;
-			}
-	  
-		  assert (ppCreatedTypeDef);
-		  *ppCreatedTypeDef = ptd;
-		  (*ppCreatedTypeDef)->AcquireReference ();
-		  ptd->ReleaseReference ();
-		  ptd = 0;
-		  return AAFRESULT_SUCCESS;
-		}
-
-	  curExtEnumeration++;
-	}
-  return AAFRESULT_NO_MORE_OBJECTS;
-}
-
-
 
 
 //
@@ -529,9 +320,9 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 
 		  // Create an impl record object (as yet uninitialized)
 		  ImplAAFTypeDefRecord * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefRecord, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefRecord(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  // count up how many members in this record
@@ -628,9 +419,9 @@ static AAFRESULT CreateNewVaryingArrayType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvaryingArray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefVariableArray, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefVariableArray(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pElemType;
@@ -676,9 +467,9 @@ static AAFRESULT CreateNewFixedArrayType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedeffixedArray object (as yet uninitialized)
 		  ImplAAFTypeDefFixedArray * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefFixedArray, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefFixedArray(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pElemType;
@@ -725,9 +516,9 @@ static AAFRESULT CreateNewRenameType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefRename object (as yet uninitialized)
 		  ImplAAFTypeDefRename * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefRename, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefRename(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pBaseType;
@@ -773,9 +564,9 @@ static AAFRESULT CreateNewStringType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefString object (as yet uninitialized)
 		  ImplAAFTypeDefString * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefString, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefString(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pElemType;
@@ -802,6 +593,49 @@ static AAFRESULT CreateNewStringType (const aafUID_t & idToCreate,
 }
 
 
+static AAFRESULT CreateNewCharacterType (const aafUID_t & idToCreate,
+									ImplAAFDictionary * pDict,
+									ImplAAFTypeDef ** ppCreatedTypeDef)
+{
+  assert (pDict);
+  AAFRESULT hr;
+
+  // Go through the character list, attempting to identify the requested
+  // ID.
+  TypeCharacter * curCharacter = s_AAFAllTypeCharacters;
+  while (curCharacter->isValid)
+	{
+	  // Check to see if the current ID matches the ID of the type
+	  // def we want to create.
+	  if (! memcmp (&idToCreate, &curCharacter->typeID, sizeof (aafUID_t)))
+		{		
+		  // Yes, this is the one.
+		  // Create an impl typedefinteger object (as yet uninitialized)
+		  ImplAAFTypeDefInt * ptd = 0;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefInt(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (ptd);
+
+		  AAFRESULT hr = ptd->Initialize (curCharacter->typeID,
+										  curCharacter->size,
+										  AAFFalse,
+										  curCharacter->typeName);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+
+		  assert (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
+		}
+
+	  curCharacter++;
+	}
+  return AAFRESULT_NO_MORE_OBJECTS;
+}
+
 
 static AAFRESULT CreateNewStrongRefType (const aafUID_t & idToCreate,
 									ImplAAFDictionary * pDict,
@@ -822,9 +656,9 @@ static AAFRESULT CreateNewStrongRefType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefStrongRef object (as yet uninitialized)
 		  ImplAAFTypeDefStrongObjRef * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefStrongObjRef, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefStrongObjRef(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFClassDefSP pBaseClass;
@@ -867,21 +701,14 @@ static AAFRESULT CreateNewStrongRefSetType (const aafUID_t & idToCreate,
 	  // def we want to create.
 	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
 		{		
-#if 0
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefVariableArray, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefVariableArray(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
-#else
-			ImplAAFTypeDefSet* ptd = NULL;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefSet, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-				return hr;
-		  assert (ptd);
-#endif
+
 		  ImplAAFTypeDefSP pRefdType;
 		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
 		  assert (AAFRESULT_SUCCEEDED (hr));
@@ -925,9 +752,9 @@ static AAFRESULT CreateNewStrongRefVectorType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefVariableArray, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefVariableArray(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pRefdType;
@@ -954,13 +781,12 @@ static AAFRESULT CreateNewStrongRefVectorType (const aafUID_t & idToCreate,
 }
 
 
-static AAFRESULT CreateNewWeakRefType
- (const aafUID_t & idToCreate,
+static AAFRESULT CreateNewWeakRefType (const aafUID_t & idToCreate,
 								  ImplAAFDictionary * pDict,
 								  ImplAAFTypeDef ** ppCreatedTypeDef)
 {
   assert (pDict);
-  AAFRESULT hr = AAFRESULT_SUCCESS;
+  AAFRESULT hr;
 
   // Go through the WeakRef list, attempting to identify the
   // requested ID.
@@ -971,55 +797,34 @@ static AAFRESULT CreateNewWeakRefType
 	  // def we want to create.
 	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
 		{		
-      ImplAAFClassDefSP pTargetClass;
-      hr = pDict->LookupClassDef (*curElem->pRefdTypeId, &pTargetClass);
-      assert (AAFRESULT_SUCCEEDED(hr));
-      if (AAFRESULT_FAILED (hr))
-        return hr;
-
+#if 0  // weak refs not implemented yet
 		  // Yes, this is the one.
 		  // Create an impl typedefWeakRef object (as yet uninitialized)
 		  ImplAAFTypeDefWeakObjRef * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefWeakObjRef, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_SUCCEEDED (hr))
-			{
-			  assert (ptd);
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefWeakObjRef(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (ptd);
 
-	      assert(curElem->size > 0);
-	      aafUID_t * targetSet = new aafUID_t[curElem->size];
-	      if (NULL == targetSet)
-	        hr = AAFRESULT_NOMEMORY;
 
-	      if (AAFRESULT_SUCCEEDED (hr))
-	      {
-		      // Copy the property ids to the targetSet array.  
-		      aafUInt32 index;
-		      for (index = 0; index < curElem->size; ++index)
-		      {
-		        memcpy(&targetSet[index], curElem->members[index].propertyId, sizeof(aafUID_t));
-		      }
+		  AAFRESULT hr = ptd->Initialize (&curElem->typeId,
+										  curElem->refdType,
+										  curElem->typeName);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 
-				  hr = ptd->Initialize (curElem->typeId,
-												  pTargetClass,
-												  curElem->typeName,
-												  curElem->size,
-												  targetSet);
-					if (AAFRESULT_SUCCEEDED(hr))
-					{
-					  assert (ppCreatedTypeDef);
-					  *ppCreatedTypeDef = ptd;
-					  (*ppCreatedTypeDef)->AcquireReference (); 
-				  }
-				  
-					delete [] targetSet;
-					targetSet = NULL;
-			  }
-			  
-			  ptd->ReleaseReference ();
-			  ptd = 0;
-		  }
-		  
-		  return hr;
+#else
+		  ImplAAFTypeDef * ptd = 0;
+		  // Instead, alias to an auid
+		  hr = pDict->LookupTypeDef (kAAFTypeID_AUID, &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+#endif
+
+		  assert (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
 		}
 
 	  curElem++;
@@ -1033,7 +838,7 @@ static AAFRESULT CreateNewWeakRefSetType (const aafUID_t & idToCreate,
 									 ImplAAFTypeDef ** ppCreatedTypeDef)
 {
   assert (pDict);
-  AAFRESULT hr = AAFRESULT_SUCCESS;
+  AAFRESULT hr;
 
   // Go through the WeakRefSet list, attempting to identify the
   // requested ID.
@@ -1044,33 +849,30 @@ static AAFRESULT CreateNewWeakRefSetType (const aafUID_t & idToCreate,
 	  // def we want to create.
 	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
 		{		
-			ImplAAFTypeDefSet* ptd = NULL;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefSet, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_SUCCEEDED (hr))
-			{
-			  assert (ptd);
+		  // Yes, this is the one.
+		  // Create an impl typedefvariablearray object (as yet uninitialized)
+		  ImplAAFTypeDefVariableArray * ptd = 0;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefVariableArray(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (ptd);
 
-	      ImplAAFTypeDefSP pRefdType;
-			  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
+		  ImplAAFTypeDefSP pRefdType;
+		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (pRefdType);
 
-			  if (AAFRESULT_SUCCEEDED (hr))
-			  {
-				  assert (pRefdType);
-				  hr = ptd->Initialize (curElem->typeId,
-												  pRefdType,
-												  curElem->typeName);
-				  if (AAFRESULT_SUCCEEDED (hr))
-					{
-					  assert (ppCreatedTypeDef);
-					  *ppCreatedTypeDef = ptd;
-					  (*ppCreatedTypeDef)->AcquireReference ();
-				  }
-			  }
-			  ptd->ReleaseReference ();
-			  ptd = 0;
-		  }
-		  
-		  return hr;
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
+										  pRefdType,
+										  curElem->typeName);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+
+		  assert (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
 		}
 
 	  curElem++;
@@ -1083,10 +885,8 @@ static AAFRESULT CreateNewWeakRefVectorType (const aafUID_t & idToCreate,
 										ImplAAFTypeDef ** ppCreatedTypeDef)
 {
   assert (pDict);
-  AAFRESULT hr = AAFRESULT_SUCCESS;
+  AAFRESULT hr;
 
-	*ppCreatedTypeDef = NULL;
-	
   // Go through the WeakRefVector list, attempting to identify the
   // requested ID.
   TypeWeakRefVector * curElem = s_AAFAllTypeWeakRefVectors;
@@ -1099,32 +899,27 @@ static AAFRESULT CreateNewWeakRefVectorType (const aafUID_t & idToCreate,
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
 		  ImplAAFTypeDefVariableArray * ptd = 0;
-		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefVariableArray, (ImplAAFMetaDefinition **) &ptd);
-		  if (AAFRESULT_FAILED (hr))
-			return hr;
+		  hr = pDict->CreateInstance (pDict->GetBuiltinDefs()->cdTypeDefVariableArray(),
+									  (ImplAAFObject**) &ptd);
+		  assert (AAFRESULT_SUCCEEDED (hr));
 		  assert (ptd);
 
 		  ImplAAFTypeDefSP pRefdType;
 		  hr = pDict->LookupTypeDef(*curElem->pRefdTypeId, &pRefdType);
-		  if (AAFRESULT_SUCCEEDED(hr))
-		  {
-			  assert (pRefdType);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+		  assert (pRefdType);
 
-			  hr = ptd->Initialize (curElem->typeId,
-											  pRefdType,
-											  curElem->typeName);
-			  if (AAFRESULT_SUCCEEDED (hr))
-				{
-				  assert (ppCreatedTypeDef);
-				  *ppCreatedTypeDef = ptd;
-				  (*ppCreatedTypeDef)->AcquireReference ();
-			  }
-			  
-			  ptd->ReleaseReference ();
-			  ptd = 0;
-		  }
-		  
-		  return hr;
+		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
+										  pRefdType,
+										  curElem->typeName);
+		  assert (AAFRESULT_SUCCEEDED (hr));
+
+		  assert (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
 		}
 
 	  curElem++;
@@ -1185,11 +980,6 @@ AAFRESULT ImplAAFBuiltinTypes::NewBuiltinTypeDef
 								 ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
-  hr = CreateNewExtendibleEnumerationType (idToCreate,
-										   _dictionary,
-										   ppCreatedTypeDef);
-  if (AAFRESULT_SUCCEEDED (hr))	return hr;
-
   hr = CreateNewRecordType (idToCreate,
 							_dictionary,
 							ppCreatedTypeDef);
@@ -1213,6 +1003,11 @@ AAFRESULT ImplAAFBuiltinTypes::NewBuiltinTypeDef
   hr = CreateNewStringType (idToCreate,
 							_dictionary,
 							ppCreatedTypeDef);
+  if (AAFRESULT_SUCCEEDED (hr))	return hr;
+
+  hr = CreateNewCharacterType (idToCreate,
+							   _dictionary,
+							   ppCreatedTypeDef);
   if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
   hr = CreateNewStrongRefType (idToCreate,

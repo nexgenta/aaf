@@ -1,31 +1,20 @@
-###############################################################################
 #
-# The contents of this file are subject to the AAF SDK Public
-# Source License Agreement (the "License"); You may not use this file
-# except in compliance with the License.  The License is available in
-# AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-# Association or its successor.
-# 
-# Software distributed under the License is distributed on an "AS IS"
-# basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-# the License for the specific language governing rights and limitations
-# under the License.
-# 
-# The Original Code of this file is Copyright 1998-2001, Licensor of the
-# AAF Association.
-# 
-# The Initial Developer of the Original Code of this file and the
-# Licensor of the AAF Association is Avid Technology.
-# All rights reserved.
 #
-###############################################################################
+# Advanced Authoring Format
+#
+# Copyright (c) 1998 Avid Technology, Inc.
+#
+#
+# Place the object root name is this list if it is a "persistent"
+# aaf object:
 AAFPERSISTENTOBJECTS="\
-	 "
+	AAFMIDIFileDescriptor \
+	AAFRGBADescriptor "
 
 
 # These are all of the other non-persistent objects:
 AAFNONPERSISTENTOBJECTS="\
-	 "
+	EnumAAFPropertyValues "
 
 
 # These are files which specify COM interfaces, but which are
@@ -34,8 +23,7 @@ AAFCOMINTERFACESONLY="\
 	AAFEndian \
 	AAFSearchSource \
 	AAFEssenceMultiAccess \
-	AAFTypeDefVariableArrayEx "
-
+	AAFEssenceRawAccess "
 
 # These are the impl files that are typed by humans.  Be sure to
 # remove them from the other list.  As you check each one in, just add
@@ -54,7 +42,6 @@ HUMAN_TYPED_IMPL="\
 	AAFControlPoint \
 	AAFDataDef \
 	AAFDefObject \
-	AAFPluginDef \
 	AAFDictionary \
 	AAFEdgecode \
 	AAFOperationDef \
@@ -75,12 +62,13 @@ HUMAN_TYPED_IMPL="\
 	AAFOperationGroup \
 	AAFGPITrigger \
 	AAFHeader \
+	AAFHTMLClip \
+	AAFHTMLDescriptor \
 	AAFIdentification \
 	AAFInterpolationDef \
-	AAFKLVData \
+	AAFIntraFrameMarker \
 	AAFLocator \
 	AAFMasterMob \
-	AAFMetaDefinition \
 	AAFMob  \
 	AAFMobSlot \
 	AAFNestedScope\
@@ -88,12 +76,14 @@ HUMAN_TYPED_IMPL="\
 	AAFObject \
 	AAFParameter \
 	AAFParameterDef \
+	AAFPluggableCode \
 	AAFProperty \
 	AAFPropertyDef \
 	AAFPropertyValue \
+	AAFPropValData \
+	AAFPluginDescriptor \
 	AAFPluginManager \
 	AAFPulldown \
-	AAFRGBADescriptor \
 	AAFScopeReference \
 	AAFSegment \
 	AAFSelector \
@@ -104,6 +94,7 @@ HUMAN_TYPED_IMPL="\
 	AAFStaticMobSlot \
 	AAFTapeDescriptor \
 	AAFTaggedValue \
+	AAFTextClip \
 	AAFTextLocator \
 	AAFTimecode \
 	AAFTimelineMobSlot \
@@ -112,8 +103,6 @@ HUMAN_TYPED_IMPL="\
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
 	AAFTypeDef \
-	AAFTypeDefCharacter \
-	AAFTypeDefIndirect \
 	AAFTypeDefInt \
 	AAFTypeDefRename \
 	AAFTypeDefEnum \
@@ -126,7 +115,6 @@ HUMAN_TYPED_IMPL="\
 	AAFTypeDefStrongObjRef \
 	AAFTypeDefWeakObjRef \
 	AAFTypeDefObjectRef \
-	AAFTypeDefOpaque \
 	AAFTypeDefVariableArray \
 	AAFVaryingValue \
 	AAFWAVEDescriptor \
@@ -141,7 +129,6 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFInterpolationDefs \
 	EnumAAFOperationDefs \
 	EnumAAFEssenceData \
-	EnumAAFKLVData \
 	EnumAAFLoadedPlugins \
 	EnumAAFLocators \
 	EnumAAFMobSlots \
@@ -150,20 +137,11 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFParameters \
 	EnumAAFProperties \
 	EnumAAFPropertyDefs \
-	EnumAAFPropertyValues \
-	EnumAAFPluginDefs \
+	EnumAAFPluginDescriptors \
 	EnumAAFPluginLocators \
 	EnumAAFSegments \
 	EnumAAFTaggedValues \
-	EnumAAFTypeDefs \
-	AAFRawStorage \
-	AAFRandomRawStorage \
-	AAFGetFileBits \
-	AAFSetFileBits \
-	AAFRandomFile "
-
-# Defered interfaces
-#	AAFIntraFrameMarker \
+	EnumAAFTypeDefs "
 
 # The list of standard dodo targets.
 # AAFTypes have to be handled separately since no object is to be created.
@@ -173,28 +151,11 @@ DODO_TARGET_NAMES="\
 	${HUMAN_TYPED_IMPL} "
 
 
-# Build the list of all public objects that need to be built into the COM DLL
+# Build the list of all objects that need to be built into the COM DLL
 AAFOBJECTS="\
 	${AAFPERSISTENTOBJECTS} \
 	${AAFNONPERSISTENTOBJECTS} \
 	${HUMAN_TYPED_IMPL} "
-
-# Build the list of all private objects that need to be built into the COM DLL
-# These objects will 
-PRIVATE_AAFOBJECTS="\
-	AAFHTMLClip \
-	AAFHTMLDescriptor \
-	AAFMetaDictionary \
-	AAFPropValData \
-	AAFStreamPropertyValue \
-	AAFStrongRefArrayValue \
-	AAFStrongRefSetValue \
-	AAFStrongRefValue \
-	AAFTextClip \
-	AAFWeakRefArrayValue \
-	AAFWeakRefSetValue \
-	AAFWeakRefValue \
-	EnumAAFStorablePropVals "
 
 
 # Build the list of all objects that have automatically-generated
@@ -209,14 +170,11 @@ AUTO_GEN_IMPL="\
 
 PLUGIN_OBJECTS="\
 	AAFPlugin \
-	AAFClassExtension \
 	AAFEssenceStream \
 	AAFEssenceDataStream \
 	AAFEssenceCodec \
-	AAFMultiEssenceCodec \
 	AAFEssenceContainer \
 	AAFInterpolator "
-
 
 # objects in PLUGIN_OBJECTS are NOT built into the main interface IDL
 #---------------------------------------------

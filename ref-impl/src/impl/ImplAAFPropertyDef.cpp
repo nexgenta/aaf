@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #ifndef __ImplEnumAAFPropertyValues_h__
@@ -43,26 +48,22 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
-#include "AAFTypeDefUIDs.h"
-
 
 #include <assert.h>
 #include <string.h>
 
 
 ImplAAFPropertyDef::ImplAAFPropertyDef ()
-  : _Type(PID_PropertyDefinition_Type, L"Type"),
-    _IsOptional(PID_PropertyDefinition_IsOptional, L"IsOptional"),
-    _pid(PID_PropertyDefinition_LocalIdentification, L"LocalIdentification"),
-    _IsUniqueIdentifier(PID_PropertyDefinition_IsUniqueIdentifier, L"IsUniqueIdentifier"),
+  : _Type(PID_PropertyDefinition_Type, "Type"),
+    _IsOptional(PID_PropertyDefinition_IsOptional, "IsOptional"),
+    _pid(PID_PropertyDefinition_LocalIdentification, "LocalIdentification"),
 	_cachedType (0),  // BobT: don't reference count the cached type!
-	_wname (0),
+	_bname (0),
 	_OMPropCreateFunc (0)
 {
   _persistentProperties.put (_Type.address());
   _persistentProperties.put (_IsOptional.address());
   _persistentProperties.put (_pid.address());
-  _persistentProperties.put (_IsUniqueIdentifier.address());
 }
 
 
@@ -70,76 +71,31 @@ ImplAAFPropertyDef::~ImplAAFPropertyDef ()
 {
   // BobT: don't reference count the cached type!
 
-  delete[] _wname;
+  delete[] _bname;
 }
 
 
-AAFRESULT ImplAAFPropertyDef::pvtInitialize (
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPropertyDef::pvtInitialize (
       const aafUID_t & propertyAuid,
       OMPropertyId omPid,
       const aafCharacter * pPropName,
 	  const aafUID_t & typeId,
-      aafBoolean_t isOptional,
-      aafBoolean_t isUniqueIdentifier)
+      aafBool isOptional)
 {
   AAFRESULT hr;
 
   if (! pPropName) return AAFRESULT_NULL_PARAM;
 
-  hr = ImplAAFMetaDefinition::Initialize(propertyAuid, pPropName, NULL);
-	if (AAFRESULT_FAILED (hr))
-    return hr;
+  hr = SetAUID (propertyAuid);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  hr = SetName (pPropName);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   _Type = typeId;
   _pid = omPid;
   _IsOptional = isOptional;
-
-  if (isUniqueIdentifier)
-  {
-    // Only set this optional property if true.
-    _IsUniqueIdentifier = isUniqueIdentifier;
-  }
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT ImplAAFPropertyDef::pvtInitialize (
-      aafUID_constref propertyAuid,
-      OMPropertyId omPid,
-      aafCharacter_constptr pPropName,
-      ImplAAFTypeDef *pType,
-      aafBoolean_t isOptional,
-      aafBoolean_t isUniqueIdentifier)
-{
-  AAFRESULT hr;
-
-  if (! pPropName) return AAFRESULT_NULL_PARAM;
-  if (! pType)
-    return AAFRESULT_NULL_PARAM;
-
-  aafUID_t typeId;
-  hr = pType->GetAUID(&typeId);
-  if (AAFRESULT_FAILED (hr))
-    return hr;
-
-  hr = ImplAAFMetaDefinition::Initialize(propertyAuid, pPropName, NULL);
-  if (AAFRESULT_FAILED (hr))
-    return hr;
-
-  // Save the type. This is NOT reference counted!
-  _cachedType = pType;
-
-
-  _Type = typeId;
-  _pid = omPid;
-  _IsOptional = isOptional;
-
-  if (isUniqueIdentifier)
-  {
-    // Only set this optional property if true.
-    _IsUniqueIdentifier = isUniqueIdentifier;
-  }
 
   return AAFRESULT_SUCCESS;
 }
@@ -197,28 +153,41 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
+
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPropertyDef::GetIsUniqueIdentifier (
-       aafBool * pIsUniqueIdentifier) const
+    ImplAAFPropertyDef::GetIsSearchable (
+      aafBool *  /*pIsSearchable*/)
 {
-  if (! pIsUniqueIdentifier)
-	  return AAFRESULT_NULL_PARAM;
-
-  if (! _IsUniqueIdentifier.isPresent())
-	{
-    // If the property is not present then this property
-    // definition cannot be for a unique identifier! Just
-    // return false.
-    *pIsUniqueIdentifier = kAAFFalse;
-//	  return AAFRESULT_PROP_NOT_PRESENT;
-	}
-  else
-  {
-    *pIsUniqueIdentifier = _IsUniqueIdentifier;
-  }
-
-  return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPropertyDef::SetIsSearchable (
+      aafBool  /*IsSearchable*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPropertyDef::GetDefaultValue (
+      ImplAAFPropertyValue ** /*ppDataValue*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPropertyDef::SetDefaultValue (
+      ImplAAFPropertyValue * /*pDataValue*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
 
 
 OMPropertyId ImplAAFPropertyDef::OmPid (void) const
@@ -244,29 +213,43 @@ const OMType* ImplAAFPropertyDef::type(void) const
 }
 
 
-const wchar_t* ImplAAFPropertyDef::name(void) const
+const char* ImplAAFPropertyDef::name(void) const
 {
-  if (! _wname)
+  if (! _bname)
 	{
+	  // We'll have to convert the aafCharacter name to regular
+	  // byte-sized characters.
 	  AAFRESULT hr;
+	  aafCharacter * wname = 0;
 	  aafUInt32 nameLen;
 
 	  ImplAAFPropertyDef * pNonConstThis =
 		(ImplAAFPropertyDef *) this;
 	  hr = pNonConstThis->GetNameBufLen (&nameLen);
 	  assert (AAFRESULT_SUCCEEDED (hr));
-	  pNonConstThis->_wname = (aafCharacter*) new aafUInt8[nameLen];
-	  assert (_wname);
+	  wname = (aafCharacter*) new aafUInt8[nameLen];
+	  assert (wname);
 
-	  hr = pNonConstThis->GetName (_wname, nameLen);
+	  hr = pNonConstThis->GetName (wname, nameLen);
 	  assert (AAFRESULT_SUCCEEDED (hr));
+
+	  // Convert the prop name
+	  pNonConstThis->_bname = new char [nameLen];
+	  assert (_bname);
+	  wcstombs (pNonConstThis->_bname, wname, nameLen);
+	  delete [] wname;
+	  // null terminate.  Don't forget nameLen is in bytes for a
+	  // string of aafCharacters, so we'll have to cut it in half in
+	  // order to get the proper index for the null terminator.
+	  _bname[nameLen/(sizeof (aafCharacter) / sizeof (aafUInt8))]
+		= '\0';
 	}
-  assert (_wname);
-  return _wname;
+  assert (_bname);
+  return _bname;
 }
 
 
-OMPropertyId ImplAAFPropertyDef::localIdentification(void) const
+OMPropertyId ImplAAFPropertyDef::identification(void) const
 {
   return _pid;
 }
@@ -274,13 +257,15 @@ OMPropertyId ImplAAFPropertyDef::localIdentification(void) const
 
 bool ImplAAFPropertyDef::isOptional(void) const
 {
-  return (kAAFTrue == _IsOptional) ? true : false;
+  return (AAFTrue == _IsOptional) ? true : false;
 }
 
 
 OMProperty * ImplAAFPropertyDef::CreateOMProperty () const
 {
   OMProperty * result = 0;
+
+  ImplAAFPropertyDef* pNonConstThis = (ImplAAFPropertyDef*) this;
 
   if (_OMPropCreateFunc)
 	{
@@ -295,7 +280,7 @@ OMProperty * ImplAAFPropertyDef::CreateOMProperty () const
 	  AAFRESULT hr = GetTypeDef (&ptd);
 	  assert (AAFRESULT_SUCCEEDED (hr));
 	  assert (ptd);
-	  result = ptd->pvtCreateOMProperty (_pid, name());
+	  result = ptd->pvtCreateOMPropertyMBS (_pid, name());
 	}
 
   return result;
@@ -307,124 +292,4 @@ void ImplAAFPropertyDef::SetOMPropCreateFunc
 {
   assert (pFunc);
   _OMPropCreateFunc = pFunc;
-}
-
-
-
-
-
-
-// override from OMStorable.
-const OMClassId& ImplAAFPropertyDef::classId(void) const
-{
-  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFPropertyDef));
-}
-
-// Override callbacks from OMStorable
-void ImplAAFPropertyDef::onSave(void* clientContext) const
-{
-  ImplAAFMetaDefinition::onSave(clientContext);
-}
-
-
-#define AAF_BEGIN_TYPE_PATCHES()\
-  ImplAAFPropertyDef *nonConstThis;\
-  OMPropertyId pid = _pid;\
-  aafUID_t typeId;\
-  switch (pid)\
-  {
-
-
-#define AAF_PATCH_PROPETY_TYPE(pid, tid)\
-    case pid:\
-    {\
-      nonConstThis = const_cast<ImplAAFPropertyDef *>(this);\
-      typeId = _Type;\
-      if (0 != memcmp(&typeId, &tid, sizeof(aafUID_t)))\
-      {\
-        nonConstThis->_Type = tid;\
-      }\
-    }\
-    break;
-
-      
-#define AAF_END_TYPE_PATCHES()\
-    default:\
-      break;\
-  }
-
-
-void ImplAAFPropertyDef::onRestore(void* clientContext) const
-{
-  // NOTE: This is a patch for DR3 & DR4 and 
-  // earlier files. Such files actually have the wrong type definition
-  // associated with the property definition.
-
-  AAF_BEGIN_TYPE_PATCHES()
-
-    // All strong reference sets in DR3 files were incorrectly described as variable arrays.
-    // DR4 now has an implementation for strong reference sets so we need to "remap" all of
-    // the builtin types so the strong reference sets will be created instead of strong
-    // reference arrays.
-    AAF_PATCH_PROPETY_TYPE(PID_ClassDefinition_Properties, kAAFTypeID_PropertyDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_ContentStorage_Mobs, kAAFTypeID_MobStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_ContentStorage_EssenceData, kAAFTypeID_EssenceDataStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_OperationDefinitions, kAAFTypeID_OperationDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_ParameterDefinitions, kAAFTypeID_ParameterDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_DataDefinitions, kAAFTypeID_DataDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_PluginDefinitions, kAAFTypeID_PluginDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_CodecDefinitions, kAAFTypeID_CodecDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_ContainerDefinitions, kAAFTypeID_ContainerDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_Dictionary_InterpolationDefinitions, kAAFTypeID_InterpolationDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_MetaDictionary_ClassDefinitions, kAAFTypeID_ClassDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_MetaDictionary_TypeDefinitions, kAAFTypeID_TypeDefinitionStrongReferenceSet)
-    AAF_PATCH_PROPETY_TYPE(PID_OperationDefinition_ParametersDefined, kAAFTypeID_ParameterDefinitionWeakReferenceSet)
-  
-    // The DataDefinitions property is implemented as a weak reference vector. The object model for 
-    // DR4, AAFMetaDictionary.h, and earlier incorrectly described this type as a weak reference set.
-    AAF_PATCH_PROPETY_TYPE(PID_CodecDefinition_DataDefinitions, kAAFTypeID_DataDefinitionWeakReferenceVector)    
-   
-    // The Definition property was incorrectly implemented as an AUID. The object model for 
-    // DR4, AAFMetaDictionary.h, and earlier correctly described this type as a weak reference.
-    // Since the file format if "frozen" the new AAFMetaDictionary describes this property
-    // as an AUID to be consistent with the implementation.
-    AAF_PATCH_PROPETY_TYPE(PID_Parameter_Definition, kAAFTypeID_AUID)
-   
-    // The Type property was incorrectly implemented as an AUID. The object model for 
-    // DR4, AAFMetaDictionary.h, and earlier correctly described this type as a weak reference.
-    // Since the file format if "frozen" the new AAFMetaDictionary describes this property
-    // as an AUID to be consistent with the implementation.
-    AAF_PATCH_PROPETY_TYPE(PID_PropertyDefinition_Type, kAAFTypeID_AUID)
-
-    // In DR4 and earlier there were a couple of types that incorrectly used String instead of StringArray.
-//    AAF_PATCH_PROPETY_TYPE(PID_TypeDefinitionExtendibleEnumeration_ElementNames, kAAFTypeID_StringArray)
-//    AAF_PATCH_PROPETY_TYPE(PID_TypeDefinitionRecord_MemberNames, kAAFTypeID_StringArray)
-    
-  AAF_END_TYPE_PATCHES()
-
-
-  ImplAAFMetaDefinition::onRestore(clientContext);
-}
-
-
-#undef AAF_BEGIN_TYPE_PATCHES
-#undef AAF_PATCH_PROPETY_TYPE
-#undef AAF_END_TYPE_PATCHES
-
-
-
-// Method is called after class has been added to MetaDictionary.
-// If this method fails the class is removed from the MetaDictionary and the
-// registration method will fail.
-HRESULT ImplAAFPropertyDef::CompleteClassRegistration(void)
-{
-  // Make sure the associated type definition can complete.
-  //
-  ImplAAFTypeDefSP pType;
-  AAFRESULT hr = GetTypeDef (&pType);
-  if (AAFRESULT_SUCCEEDED(hr))
-  {
-    hr = pType->CompleteClassRegistration();
-  }
-  return hr;
 }
