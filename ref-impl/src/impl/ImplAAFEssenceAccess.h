@@ -4,13 +4,32 @@
 #define __ImplAAFEssenceAccess_h__
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 class ImplAAFMasterMob;
 class ImplAAFSourceMob;
@@ -76,14 +95,14 @@ public:
     Create
         (ImplAAFMasterMob *masterMob,
 		// @parm [in] 
-         aafSlotID_t  masterSlotID,
+		 aafSlotID_t masterSlotID,
 
          // @parm [in] create essence of this type
-         aafUID_t	mediaKind,
+         const aafUID_t & mediaKind,
 
- 		 aafUID_t			codecID,
-		 aafRational_t	editRate,
-		 aafRational_t	sampleRate,
+ 		 const aafUID_t & codecID,
+		 const aafRational_t & editRate,
+		 const aafRational_t & sampleRate,
 
          // @parm [in] optionally compressing it
          aafCompressEnable_t  Enable);
@@ -641,12 +660,24 @@ public:
 	//Toolkit private functions
 	AAFRESULT MakeAAFContainerDef(ImplAAFHeader *head, ImplAAFContainerDef **result);
 	AAFRESULT CreateContainerDef (ImplAAFHeader *head);
-	AAFRESULT CreateCodecDef(ImplAAFHeader *head, aafUID_t codecDef, IAAFPluginDescriptor **newDesc);
-	AAFRESULT CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, ImplAAFLocator *loc, ImplAAFFile **result);
-	AAFRESULT ModifyEssenceFileFromLocator (ImplAAFHeader *srcHead, ImplAAFLocator *loc, ImplAAFFile **result);
-	AAFRESULT CreateFileMob (ImplAAFHeader *newHead, aafBool addSlots, aafSlotID_t slotID, aafUID_t *newMobID,
-							aafUID_t mediaKind, aafRational_t editRate,aafRational_t sampleRate,
-							ImplAAFLocator *addLocator, ImplAAFSourceMob **result);
+	AAFRESULT CreateCodecDef(ImplAAFHeader *head,
+							 const aafUID_t & codecDef,
+							 IAAFPluginDescriptor **newDesc);
+	AAFRESULT CreateEssenceFileFromLocator (ImplAAFHeader *srcHead,
+											ImplAAFLocator *loc,
+											ImplAAFFile **result);
+	AAFRESULT ModifyEssenceFileFromLocator (ImplAAFHeader *srcHead,
+											ImplAAFLocator *loc,
+											ImplAAFFile **result);
+	AAFRESULT CreateFileMob (ImplAAFHeader *newHead,
+							 aafBool addSlots,
+							 aafSlotID_t slotID,
+							 const aafUID_t * newMobID,
+							 const aafUID_t & mediaKind,
+							 const aafRational_t & editRate,
+							 const aafRational_t & sampleRate,
+							 ImplAAFLocator *addLocator,
+							 ImplAAFSourceMob **result);
 
 private:
 	aafUID_t				_codecID;
