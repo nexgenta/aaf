@@ -52,7 +52,7 @@
 extern "C" const aafClassID_t CLSID_EnumAAFLocators;
 
 ImplAAFEssenceDescriptor::ImplAAFEssenceDescriptor ()
-: _locators(         PID_EssenceDescriptor_Locator,          L"Locator")
+: _locators(         PID_EssenceDescriptor_Locator,          "Locator")
 {
   _persistentProperties.put(_locators.address());
 }
@@ -77,12 +77,14 @@ ImplAAFEssenceDescriptor::~ImplAAFEssenceDescriptor ()
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceDescriptor::CountLocators (aafUInt32 *pCount)
 {
+	size_t	siz;
 	if (! pCount)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 
-	*pCount = _locators.count();
+	_locators.getSize(siz);
+	*pCount = siz;
 	return(AAFRESULT_SUCCESS);
 }
 
@@ -108,10 +110,19 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pLocator == NULL)
 		return(AAFRESULT_NULL_PARAM);
-  if (pLocator->attached ())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
-  _locators.prependValue(pLocator);
+	size_t			siz;
+	long			n;
+	ImplAAFLocator	*obj = NULL;
+
+	_locators.getSize(siz);
+	for(n = siz-1; n >= 0; n--)
+	{
+		_locators.getValueAt(obj, n);
+		_locators.setValueAt(NULL, n);
+		_locators.setValueAt(obj, n+1);
+	}
+	_locators.setValueAt(pLocator, 0);
 	pLocator->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
@@ -125,16 +136,17 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceDescriptor::InsertLocatorAt (aafUInt32 index,
 											   ImplAAFLocator *pLocator)
 {
-	if (NULL == pLocator)
-		return AAFRESULT_NULL_PARAM;
-  if (pLocator->attached ())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-  if (index > _locators.count())
-    return AAFRESULT_BADINDEX;
+  if (! pLocator) return AAFRESULT_NULL_PARAM;
 
-	_locators.insertAt(pLocator, index);
-	pLocator->AcquireReference();
-	return AAFRESULT_SUCCESS;
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountLocators (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -142,71 +154,51 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceDescriptor::GetLocatorAt (aafUInt32 index,
 											ImplAAFLocator ** ppLocator)
 {
-	if (! ppLocator) return AAFRESULT_NULL_PARAM;
-	
-	aafUInt32 count;
-	AAFRESULT hr;
-	hr = CountLocators (&count);
-	if (AAFRESULT_FAILED (hr)) return hr;
-	
-	if (index >= count)
-		return AAFRESULT_BADINDEX;
-	
-	_locators.getValueAt(*ppLocator, index);
-	return AAFRESULT_SUCCESS;
+  if (! ppLocator) return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountLocators (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceDescriptor::RemoveLocatorAt (aafUInt32 index)
 {
-	if (index >= _locators.count())
-	  return AAFRESULT_BADINDEX;
-	
-	ImplAAFLocator *pLocator = _locators.removeAt(index);
-  if (pLocator)
-  {
-    // We have removed an element from a "stong reference container" so we must
-    // decrement the objects reference count. This will not delete the object
-    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
-    pLocator->ReleaseReference ();
-  }
-	return AAFRESULT_SUCCESS;
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountLocators (&count);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFEssenceDescriptor::RemoveLocator (ImplAAFLocator *pLocator)
+    ImplAAFEssenceDescriptor::RemoveLocator (ImplAAFLocator * /*pLocator*/)
 {
-	if (NULL == pLocator)
-		return AAFRESULT_NULL_PARAM;
-  if (!pLocator->attached ()) // locator could not possibly be in _locators container.
-    return AAFRESULT_OBJECT_NOT_ATTACHED;
-
-  size_t index;
-  if (_locators.findIndex (pLocator, index))
-	  return RemoveLocatorAt (index);
-  else
-    return AAFRESULT_OBJECT_NOT_FOUND;
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceDescriptor::GetLocators (ImplEnumAAFLocators **ppEnum)
 {
-	if (ppEnum == NULL) return AAFRESULT_NULL_PARAM;
-
 	ImplEnumAAFLocators		*theEnum = (ImplEnumAAFLocators *)CreateImpl (CLSID_EnumAAFLocators);
 		
 	XPROTECT()
 	{
-		OMStrongReferenceVectorIterator<ImplAAFLocator>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFLocator>(_locators);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFLocators, this, iter));
+		CHECK(theEnum->SetEnumStrongProperty(this, &_locators));
+		CHECK(theEnum->Reset());
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -226,7 +218,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceDescriptor::GetOwningMobKind (aafMobKind_t *pMobKind)
 {
-	*pMobKind = kAAFAllMob;		// Abstract superclass, only match "all"
+	*pMobKind = kAllMob;		// Abstract superclass, only match "all"
 	return(AAFRESULT_SUCCESS);
 }
 
@@ -236,12 +228,14 @@ AAFRESULT
 {
 	if(ppLocator == NULL)
 		return(AAFRESULT_NULL_PARAM);
-  if ((aafUInt32)index >= _locators.count())
-		return AAFRESULT_NO_MORE_OBJECTS; // AAFRESULT_BADINDEX ???
 
-	_locators.getValueAt(*ppLocator, index);
-  assert(*ppLocator); // locator should never be NULL.
-	(*ppLocator)->AcquireReference();
+	ImplAAFLocator	*obj = NULL;
+	_locators.getValueAt(obj, index);
+	*ppLocator = obj;
+	if (obj)
+		obj->AcquireReference();
+	else
+		return AAFRESULT_NO_MORE_OBJECTS; // AAFRESULT_BADINDEX ???
 
 	return AAFRESULT_SUCCESS;
 }
