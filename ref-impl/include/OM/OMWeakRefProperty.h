@@ -47,7 +47,8 @@ public:
     // @cmember Constructor.
   OMWeakReferenceProperty(const OMPropertyId propertyId,
                           const char* name,
-                          const char* targetName);
+                          const char* targetName,
+                          const OMPropertyId keyPropertyId);
 
     // @cmember Destructor.
   virtual ~OMWeakReferenceProperty(void);
@@ -102,6 +103,7 @@ private:
   OMWeakObjectReference<ReferencedObject> _reference;
   OMPropertyTag _targetTag;
   char* _targetName;
+  OMPropertyId _keyPropertyId;
 
 };
 

@@ -34,14 +34,16 @@
 
 template<typename ReferencedObject>
 OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
-                                                 const OMPropertyId propertyId,
-                                                 const char* name,
-                                                 const char* targetName)
+                                              const OMPropertyId propertyId,
+                                              const char* name,
+                                              const char* targetName,
+                                              const OMPropertyId keyPropertyId)
 : OMReferenceProperty<ReferencedObject>(propertyId,
                                         SF_WEAK_OBJECT_REFERENCE,
                                         name), _reference(this),
   _targetTag(nullOMPropertyTag),
-  _targetName(saveString(targetName))
+  _targetName(saveString(targetName)),
+  _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty");
 }
@@ -171,7 +173,7 @@ void OMWeakReferenceProperty<ReferencedObject>::save(void* clientContext) const
   OMPropertyTag tag = file->referencedProperties()->insert(_targetName);
 
   const OMUniqueObjectIdentification& id = _reference.identification();
-  store->save(_propertyId, _storedForm, id, tag);
+  store->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
 
   _reference.save(clientContext);
 }
@@ -208,8 +210,10 @@ void OMWeakReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 
   OMUniqueObjectIdentification id;
   OMPropertyTag tag;
-  ASSERT("Sizes match", (sizeof(id) + sizeof(tag)) == externalSize);
-  store->restore(_propertyId, _storedForm, id, tag);
+  ASSERT("Sizes match", (sizeof(tag) + sizeof(OMPropertyId) + sizeof(OMUInt32) + sizeof(id)) == externalSize);
+  OMPropertyId keyPropertyId;
+  store->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
+  ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
   _targetTag = tag;
   _reference = OMWeakObjectReference<ReferencedObject>(this, id, _targetTag);
   _reference.restore();
