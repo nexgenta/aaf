@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -32,6 +32,7 @@
 
 
 class ImplAAFBuiltinClasses;
+class ImplAAFBuiltinDefs;
 class ImplAAFBuiltinTypes;
 class ImplAAFClassDef;
 class ImplAAFCodecDef;
@@ -39,26 +40,36 @@ class ImplAAFContainerDef;
 class ImplAAFDataDef;
 class ImplAAFInterpolationDef;
 class ImplAAFOperationDef;
-class ImplAAFPluginDescriptor;
+class ImplAAFPluginDef;
 class ImplAAFTypeDef;
 class ImplAAFTypeDefEnum;
 class ImplAAFTypeDefRecord;
-class ImplEnumAAFClassDefs;
-class ImplEnumAAFCodecDefs;
-class ImplEnumAAFContainerDefs;
-class ImplEnumAAFDataDefs;
-class ImplEnumAAFInterpolationDefs;
 class ImplEnumAAFOperationDefs;
-class ImplEnumAAFPluggableDefs;
-class ImplEnumAAFPluginDescriptors;
-class ImplEnumAAFTypeDefs;
+template <class T> 
+class ImplAAFEnumerator;
+typedef ImplAAFEnumerator<ImplAAFClassDef>			ImplEnumAAFClassDefs;
+typedef ImplAAFEnumerator<ImplAAFCodecDef>			ImplEnumAAFCodecDefs;
+typedef ImplAAFEnumerator<ImplAAFContainerDef>		ImplEnumAAFContainerDefs;
+typedef ImplAAFEnumerator<ImplAAFDataDef>			ImplEnumAAFDataDefs;
+typedef ImplAAFEnumerator<ImplAAFInterpolationDef>	ImplEnumAAFInterpolationDefs;
+typedef ImplAAFEnumerator<ImplAAFPluginDef>			ImplEnumAAFPluginDefs;
+typedef ImplAAFEnumerator<ImplAAFTypeDef>			ImplEnumAAFTypeDefs;
 
-#ifndef __ImplAAFObject_h__
+class ImplAAFMetaDictionary;
+class ImplAAFMetaDefinition;
+class ImplAAFTypeDefVariableArray;
+class ImplAAFTypeDefFixedArray;
+class ImplAAFTypeDefRecord;
+class ImplAAFTypeDefRename;
+class ImplAAFTypeDefString;
+class ImplAAFTypeDefStrongObjRef;
+class ImplAAFTypeDefWeakObjRef;
+class ImplAAFTypeDefSet;
+
 #include "ImplAAFObject.h"
-#endif
 
 #include "OMClassFactory.h"
-
+#include "OMStrongRefSetProperty.h"
 
 #include "ImplAAFClassDef.h"
 #include "ImplAAFOperationDef.h"
@@ -68,9 +79,10 @@ class ImplEnumAAFTypeDefs;
 #include "ImplAAFInterpolationDef.h"
 #include "ImplAAFTypeDef.h"
 #include "ImplAAFDataDef.h"
+#include "ImplAAFPluginDef.h"
 
 class ImplAAFDictionary :
-  public OMClassFactory, 
+  public OMClassFactory,
   public ImplAAFObject
 {
 public:
@@ -84,8 +96,10 @@ protected:
   virtual ~ImplAAFDictionary ();
 
 public:
-  // Create an instance of the appropriate derived class, given the class id.
-  //  This method implements the OMClassFactory interface.
+  // Create an instance of the appropriate derived class, given the
+  // class id.  Initializes the OM properties.
+  // 
+  // This method implements the OMClassFactory interface.
   //
   OMStorable* create(const OMClassId& classId) const;
 
@@ -97,14 +111,27 @@ public:
   // with a specified stored object id.
   virtual AAFRESULT STDMETHODCALLTYPE 
   CreateInstance (
-    // Class identifier (AUID) of the stored object. This is the
-    // corresponding SMPTE identifier (as a GUID) for all predefined
-    // built-in classes.
-    const aafUID_t & id,
+    // ID of the stored object to be created.
+    aafUID_constref classId,
 
     // Address of output variable that receives the 
     // object pointer requested in pAUID
     ImplAAFObject ** ppvObject);
+
+
+  //****************
+  // CreateMetaInstance()
+  //
+  // Creates a single uninitialized AAF meta definition associated 
+  // with a specified stored object id.
+  virtual AAFRESULT STDMETHODCALLTYPE 
+  CreateMetaInstance (
+    // Stored Object ID of the meta object to be created.
+    aafUID_constref classId,
+
+    // Address of output variable that receives the 
+    // object pointer requested in pAUID
+    ImplAAFMetaDefinition ** ppMetaObject);
 
 
   //****************
@@ -118,6 +145,24 @@ public:
          // @parm [out,retval] Class Definition
          ImplAAFClassDef ** ppClassDef);
 
+  //****************
+  // CreateForwardClassReference()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateForwardClassReference 
+        (// @parm [in] class identification
+         aafUID_constref classId);
+
+  //****************
+  // IsForwardClassReference()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    HasForwardClassReference 
+      (// @parm [in] class identification
+       aafUID_constref classId,
+
+       // @parm [out] kAAFTrue if the given class identification is a forward reference.
+       aafBoolean_t *pResult);
 
   //****************
   // RegisterClassDef()
@@ -164,6 +209,7 @@ public:
          // @parm [out,retval] Type Definition Object
          ImplAAFTypeDef ** ppTypeDef);
 
+
   //****************
   // GetTypeDefs()
   //
@@ -182,6 +228,47 @@ public:
         (aafUInt32 * pResult);
 
   //****************
+  // RegisterOpaqueTypeDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RegisterOpaqueTypeDef
+        (// @parm [in] Type Definition Object
+         ImplAAFTypeDef * pOpaqueTypeDef);
+
+  //****************
+  // LookupOpaqueTypeDef()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    LookupOpaqueTypeDef
+        (// @parm [in,ref] Type Unique ID
+         const aafUID_t & typeID,
+
+         // @parm [out,retval] Type Definition Object
+         ImplAAFTypeDef ** ppOpaqueTypeDef);
+
+  //****************
+  // GetOpaqueTypeDefs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetOpaqueTypeDefs
+        // @parm [out,retval] Type Def Enumeration
+        (ImplEnumAAFTypeDefs ** ppEnum);
+
+
+  //****************
+  // CountOpaqueTypeDefs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountOpaqueTypeDefs
+        // @parm [out, retval] Total number of type definition objects
+        (aafUInt32 * pResult);
+
+	virtual AAFRESULT STDMETHODCALLTYPE
+		RegisterKLVDataKey (
+			aafUID_t keyUID, 
+			ImplAAFTypeDef *underlyingType);
+
+	  //****************
   // RegisterDataDef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -398,7 +485,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     RegisterPluginDef
-        (ImplAAFPluginDescriptor * pPluginDesc);
+        (ImplAAFPluginDef * pPluginDesc);
 
   //****************
   // LookupPluginDef()
@@ -408,14 +495,14 @@ public:
         (// @parm [in,ref] Interpolation Unique ID
          const aafUID_t & interpolationID,
 
-         ImplAAFPluginDescriptor ** ppPluginDesc);
+         ImplAAFPluginDef ** ppPluginDesc);
 
   //****************
   // GetPluginDefs()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetPluginDefs
-        (ImplEnumAAFPluginDescriptors ** ppEnum);
+        (ImplEnumAAFPluginDefs ** ppEnum);
 
 
   //****************
@@ -426,11 +513,130 @@ public:
         // @parm [out, retval] Total number of plugin definition objects
         (aafUInt32 * pResult);
 
+
+  //
+  // Meta definition factory methods:
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateClassDef (
+      aafUID_constref classID,
+      aafCharacter_constptr pClassName,
+      aafCharacter_constptr pDescription,
+      ImplAAFClassDef * pParentClass,
+      ImplAAFClassDef ** ppNewClass);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefVariableArray (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDef *pElementType,
+      ImplAAFTypeDefVariableArray ** ppNewVariableArray);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateTypeDefFixedArray (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDef *pElementType,
+      aafUInt32  nElements,
+      ImplAAFTypeDefFixedArray **pNewFixedArray);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateTypeDefRecord (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDef ** ppMemberTypes,
+      aafCharacter_constptr * pMemberNames,
+      aafUInt32 numMembers,
+      ImplAAFTypeDefRecord ** ppNewRecord);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateTypeDefRename (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDef *pBaseType,
+      ImplAAFTypeDefRename ** ppNewRename);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefString (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDef *pElementType,
+      ImplAAFTypeDefString ** ppNewString);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefStrongObjRef (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFClassDef * pTargetObjType,
+      ImplAAFTypeDefStrongObjRef ** ppNewStrongObjRef);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefWeakObjRef (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFClassDef * pTargetObjType,
+      aafUID_constptr * pTargetHint,
+      aafUInt32 targetHintCount,
+      ImplAAFTypeDefWeakObjRef ** ppNewWeakObjRef);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefStrongObjRefVector (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
+      ImplAAFTypeDefVariableArray ** ppNewStrongObjRefVector);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefWeakObjRefVector (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
+      ImplAAFTypeDefVariableArray ** ppNewWeakObjRefVector);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefStrongObjRefSet (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDefStrongObjRef * pStrongObjRef,
+      ImplAAFTypeDefSet ** ppNewStrongObjRefSet);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+   CreateTypeDefWeakObjRefSet (
+      aafUID_constref typeID,
+      aafCharacter_constptr pTypeName,
+      aafCharacter_constptr pDescription,
+      ImplAAFTypeDefWeakObjRef * pWeakObjRef,
+      ImplAAFTypeDefSet ** ppNewWeakObjRefSet);
+
+
 public:
 
   //
   // Internal to the SDK
   //
+
+  // Return a pointer to the meta dictionary.
+  ImplAAFMetaDictionary *metaDictionary(void) const;
+
+  // Install the meta dictionary (i.e. the factory for creating
+  // meta data: classes, properties and types). This method
+  // can only be called once.
+  void setMetaDictionary(ImplAAFMetaDictionary *metaDictionary);
+AAFRESULT PvtIsPropertyDefDuplicate(
+							aafUID_t propertyDefID,
+							ImplAAFClassDef *correctClass,
+							bool	*isDuplicate);
+
 
   //****************
   // GetNumEssenceData()
@@ -440,26 +646,38 @@ public:
         (aafUInt32 *  pNumCodecDefs);  //@parm [out,retval] Total number of pluggable defs
 
   virtual AAFRESULT
-    GetNthCodecDef (aafInt32 index, ImplAAFCodecDef **ppEnum);
-
-  virtual AAFRESULT
     GetNumContainerDefs
         (aafUInt32 *  pNumContainerDefs);  //@parm [out,retval] Total number of pluggable defs
-
-  virtual AAFRESULT
-    GetNthContainerDef (aafInt32 index, ImplAAFContainerDef **ppEnum);
 
   // make sure built-in types are initialized.
   void InitBuiltins();
 
+  //
+  // Toolkit-internal "Create" methods
+  //
+
   // Factory method for creating a Dictionary.
   static ImplAAFDictionary *CreateDictionary(void);
 
-  // internal utility factory method to create an ImplAAFObject given an auid.
-  // This method was created to make it simpler to replace calls to "Deprecated"
-  // call to CreateImpl which should only be used for instanciating transient
-  // non-ImplAAFObject classes such as an enumerator.
-  ImplAAFObject *CreateImplObject(const aafUID_t & auid); 
+  //
+  // Instantiates an object of the given class and initializes its OM
+  // properties.
+  //
+  ImplAAFObject * CreateAndInit(ImplAAFClassDef * pClassDef) const;
+
+  //
+  // Instantiates the most derived class known to the code which
+  // represents the given AUID.  Doesn't init its OM properties.
+  //
+  ImplAAFObject* pvtInstantiate(const aafUID_t & id) const;
+
+  //
+  // If the given AUID is known to the code, instantiates an object of
+  // that type.  Otherwise, returns NULL.  Doesn't init its OM
+  // properties.
+  //
+  static ImplAAFObject* pvtCreateBaseClassInstance(const aafUID_t & id);
+
 
   // Generates an OM PID corresponding to the given property def auid.
   AAFRESULT GenerateOmPid (const aafUID_t & rAuid,
@@ -476,6 +694,8 @@ public:
 	 // @parm [out,retval] Class Definition
 	 ImplAAFClassDef ** ppClassDef);
 
+bool PvtIsClassPresent (
+      const aafUID_t & classID);
 
   // Like LookupType(), except will only look at types currently
   // registered in this dictionary; will not attempt to look at
@@ -487,12 +707,8 @@ public:
 	 // @parm [out,retval] Type Definition Object
 	 ImplAAFTypeDef ** ppTypeDef);
 
-
-  static ImplAAFObject* pvtCreateBaseClassInstance(const aafUID_t & id);
-
-  // Similar to create(), but takes an AUID as argument and doesn't
-  // init properties.
-  ImplAAFObject* pvtInstantiate(const aafUID_t & id) const;
+bool PvtIsTypePresent (
+      const aafUID_t & typeID);
 
   // Attempt to register the sizes of this type def if it is a
   // built-in type.  Currently implemented for Enum and Record
@@ -513,28 +729,34 @@ public:
 
   bool IsAxiomaticClass (const aafUID_t & classID) const;
 
-private:
-
+  ImplAAFBuiltinDefs * GetBuiltinDefs ();
+  void SetBuiltinClasses(ImplAAFBuiltinClasses *pBuiltinClasses) { _pBuiltinClasses = pBuiltinClasses; };
   bool pvtLookupAxiomaticTypeDef (const aafUID_t & typeID,
 							   ImplAAFTypeDef ** ppTypeDef);
 
+  // Initialize all of the axiomatic and required built-in definitions
+  // have been initialized. This should be called after the file has been opened.
+  void InitializeMetaDefinitions(void);
+
+
+private:
   bool pvtLookupAxiomaticClassDef (const aafUID_t & classID,
 								   ImplAAFClassDef ** ppClassDef);
 
   ImplAAFBuiltinClasses * _pBuiltinClasses;
   ImplAAFBuiltinTypes   * _pBuiltinTypes;
+  ImplAAFBuiltinDefs    * _pBuiltinDefs;
 
-  OMStrongReferenceVectorProperty<ImplAAFCodecDef>         _codecDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFContainerDef>     _containerDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFOperationDef>     _operationDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFParameterDef>     _parameterDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFTypeDef>          _typeDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFClassDef>         _classDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFInterpolationDef> _interpolationDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFDataDef>          _dataDefinitions;
-  OMStrongReferenceVectorProperty<ImplAAFPluginDescriptor> _pluginDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFCodecDef>				_codecDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFContainerDef>			_containerDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFOperationDef>			_operationDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFParameterDef>			_parameterDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFInterpolationDef>		_interpolationDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFDataDef>				_dataDefinitions;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPluginDef>				_pluginDefinitions;
 
-  aafInt32 _lastGeneratedPid;	// must be signed!
+
+  aafInt16 _lastGeneratedPid;	// must be signed!
 
   static const aafUID_t * sAxiomaticTypeGuids[];
   static const aafUID_t * sAxiomaticClassGuids[];
@@ -554,6 +776,12 @@ private:
   bool _OKToAssurePropTypes;
 
   bool _defRegistrationAllowed;
+
+  // Set to true when the all of the axiomatic and required built-in definitions
+  // have been initialized. This should be set after the file has been opened.
+  bool _metaDefinitionsInitialized;
+
+  ImplAAFMetaDictionary *_metaDictionary;
 };
 
 //

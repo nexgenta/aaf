@@ -66,6 +66,7 @@
 
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
+#include "ImplEnumAAFParameters.h"
 
 #include <assert.h>
 #include <string.h>
@@ -80,16 +81,17 @@
 extern "C" const aafClassID_t CLSID_AAFSourceReference;
 extern "C" const aafClassID_t CLSID_AAFParameter;
 extern "C" const aafClassID_t CLSID_AAFSegment;
+extern "C" const aafClassID_t CLSID_EnumAAFParameters;
 
 
 const aafUID_t kNullID = {0};
 
 ImplAAFOperationGroup::ImplAAFOperationGroup ()
-: _operationDefinition( PID_OperationGroup_OperationDefinition, "OperationDefinition"),
-  _inputSegments( PID_OperationGroup_InputSegments, "InputSegments"),
-  _parameters( PID_OperationGroup_Parameters, "Parameters"),
-  _bypassOverride( PID_OperationGroup_BypassOverride, "BypassOverride"),
-  _rendering( PID_OperationGroup_Rendering, "Rendering")
+: _operationDefinition( PID_OperationGroup_OperationDefinition, L"OperationDefinition", L"/Header/Dictionary/OperationDefinitions", PID_DefinitionObject_Identification),
+  _inputSegments( PID_OperationGroup_InputSegments, L"InputSegments"),
+  _parameters( PID_OperationGroup_Parameters, L"Parameters", PID_DefinitionObject_Identification),
+  _bypassOverride( PID_OperationGroup_BypassOverride, L"BypassOverride"),
+  _rendering( PID_OperationGroup_Rendering, L"Rendering")
 {
 	_persistentProperties.put(_operationDefinition.address());
 	_persistentProperties.put(_inputSegments.address());
@@ -112,11 +114,10 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 		  pSeg = 0;
 		}
 	}
-	// Release all of the mob slot pointers.
-	size_t size2 = _parameters.getSize();
-	for (size_t j = 0; j < size2; j++)
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>parameters(_parameters);
+	while(++parameters)
 	{
-		ImplAAFParameter *pParm = _parameters.setValueAt(0, j);
+		ImplAAFParameter *pParm = parameters.setValue(0);
 		if (pParm)
 		{
 		  pParm->ReleaseReference();
@@ -138,10 +139,7 @@ AAFRESULT STDMETHODCALLTYPE
                              ImplAAFOperationDef* pOperationDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
-	ImplAAFDictionary*		pDictionary = NULL;
-//	ImplAAFOperationDef*		pOldOperationDef = NULL;
-	aafUID_t				OperationDefAUID;
-	aafUID_t	uid;
+	ImplAAFOperationDef*	pOldOperationDef = NULL;
 
 	if (pOperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -149,30 +147,29 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pDataDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
+  // Make sure objects are already attached (to the dictionary).
+  if (!pDataDef->attached() || !pOperationDef->attached())
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
+
 	XPROTECT()
 	{
-		// Get the dictionary objects for this file.
-		CHECK(GetDictionary(&pDictionary));
-
 		CHECK(SetNewProps(length, pDataDef));
-		CHECK(pOperationDef->GetAUID(&uid));
-		_operationDefinition = uid;
-		// Lookup the OperationGroup definition's AUID
-		CHECK(pOperationDef->GetAUID(&OperationDefAUID));
-		// find out if this OperationDef is already set
-// !!!JeffB: Not handling weak references as OM references yet.
-//		if (pDictionary->LookupOperationDefinition(&OperationDefAUID, &pOldOperationDef) == AAFRESULT_SUCCESS)
-//			pOldOperationDef->ReleaseReference();
-		_operationDefinition = OperationDefAUID;
+
+    // The operation definition is a weak reference that is
+    // owned by the dictionary so we do NOT need to reference
+    // count it.
+//    // find out if this OperationDef is already set
+//		if(!_operationDefinition.isVoid())
+//		{
+//			pOldOperationDef = _operationDefinition;
+//			if (pOldOperationDef != 0)
+//				pOldOperationDef->ReleaseReference();
+//		}
+		_operationDefinition = pOperationDef;
 //		pOperationDef->AcquireReference();
-		pDictionary->ReleaseReference();
-		pDictionary = 0;
 	}
 	XEXCEPT
 	{
-		if(pDictionary)
-		  pDictionary->ReleaseReference();
-		pDictionary = 0;
 	}
 	XEND;
 
@@ -186,27 +183,29 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::GetOperationDefinition (ImplAAFOperationDef **OperationDef)
 {
-	aafUID_t			defUID;
-	ImplAAFDictionary	*dict = NULL;
+  ImplAAFOperationDef *pOpDef = _operationDefinition;
+  if(!pOpDef)
+		return AAFRESULT_OBJECT_NOT_FOUND;
 
+  *OperationDef = pOpDef;
+  assert (*OperationDef);
+  (*OperationDef)->AcquireReference ();
+
+  return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationGroup::SetOperationDefinition (ImplAAFOperationDef *OperationDef)
+{
 	if(OperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
-	{
-		defUID = _operationDefinition;
-		CHECK(GetDictionary(&dict));
-		CHECK(dict->LookupOperationDef(defUID, OperationDef));
-		dict->ReleaseReference();
-		dict = 0;
-	}
-	XEXCEPT
-	{
-		if(dict != NULL)
-		  dict->ReleaseReference();
-		dict = 0;
-	}
-	XEND;
+  // Make sure object is already attached (to the dictionary).
+  if (!OperationDef->attached())
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
+
+	assert(_operationDefinition.isVoid());
+	_operationDefinition = OperationDef;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -288,7 +287,7 @@ AAFRESULT STDMETHODCALLTYPE
 	//@comm Replaces omfiOperationGroupGetBypassOverride
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::CountSourceSegments (aafInt32 *pNumSources)
+    ImplAAFOperationGroup::CountSourceSegments (aafUInt32 *pNumSources)
 {
    size_t numSlots;
 
@@ -305,13 +304,13 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::CountParameters (aafInt32 * pNumParameters)
+    ImplAAFOperationGroup::CountParameters (aafUInt32 * pNumParameters)
 {
    size_t numSlots;
 
 	if(pNumParameters == NULL)
 		return AAFRESULT_NULL_PARAM;
-	_parameters.getSize(numSlots);
+	numSlots = _parameters.count();
 	
 	*pNumParameters = numSlots;
 
@@ -355,6 +354,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pValue == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+  // Make sure object is not already attached.
+  if (pValue->attached())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
 	_parameters.appendValue(pValue);
 	pValue->AcquireReference();
 
@@ -366,6 +369,13 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::AppendInputSegment (ImplAAFSegment * value)
 {
+	if(value == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+  // Make sure object is not already attached.
+  if (value->attached())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
 	_inputSegments.appendValue(value);
 	value->AcquireReference();
 
@@ -377,10 +387,17 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::PrependInputSegment (ImplAAFSegment * value)
 {
-  if (! value)
-	return AAFRESULT_NULL_PARAM;
+  if(value == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  // Make sure object is not already attached.
+  if (value->attached())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+  _inputSegments.prependValue(value);
+  value->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -389,10 +406,25 @@ AAFRESULT STDMETHODCALLTYPE
       (aafUInt32 index,
 	   ImplAAFSegment * value)
 {
-  if (! value)
-	return AAFRESULT_NULL_PARAM;
+  if(value == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  aafUInt32 count;
+  AAFRESULT ar;
+  ar = CountSourceSegments (&count);
+  if (AAFRESULT_FAILED (ar)) return ar;
+
+  if (index > (aafUInt32)count)
+    return AAFRESULT_BADINDEX;
+
+  // Make sure object is not already attached.
+  if (value->attached())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+  _inputSegments.insertAt(value,index);
+  value->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -402,6 +434,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(sourceRef == NULL)
 		return AAFRESULT_NULL_PARAM;
+
+  // Make sure object is not already attached.
+  if (sourceRef->attached())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_rendering = sourceRef;
 	_rendering->AcquireReference();
@@ -425,6 +461,28 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::LookupParameter (aafArgIDType_t  argID,
                            ImplAAFParameter ** ppParameter)
 {
+#if 1
+	if (!ppParameter) return AAFRESULT_NULL_PARAM;
+
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_parameters.find((*reinterpret_cast<const OMObjectIdentification *>(&argID)),
+                             *ppParameter))
+	{
+		assert(NULL != *ppParameter);
+		(*ppParameter)->AcquireReference();
+	}
+	else
+	{
+	// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
+	}
+
+	return (result);
+
+#else
 	ImplAAFParameter	*parm = NULL;
 	ImplAAFParameterDef	*parmDef = NULL;
 	aafInt32			numParm, n;
@@ -472,6 +530,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND
 
 	return AAFRESULT_SUCCESS;
+#endif
 }
 
 
@@ -480,10 +539,33 @@ AAFRESULT STDMETHODCALLTYPE
         (// @parm [out] enumerator across parameters
          ImplEnumAAFParameters ** ppEnum)
 {
-  if (! ppEnum)
-	return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == ppEnum)
+		return AAFRESULT_NULL_PARAM;
+	*ppEnum = 0;
+	
+	ImplEnumAAFParameters *theEnum = (ImplEnumAAFParameters *)CreateImpl (CLSID_EnumAAFParameters);
+	
+	XPROTECT()
+	{
+		OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>* iter = 
+			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>(_parameters);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFParameters, this, iter));
+		*ppEnum = theEnum;
+	}
+	XEXCEPT
+	{
+		if (theEnum)
+		  {
+			theEnum->ReleaseReference();
+			theEnum = 0;
+		  }
+		return(XCODE());
+	}
+	XEND;
+	
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -512,5 +594,18 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::RemoveInputSegmentAt (aafUInt32  index)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	aafUInt32 count;
+	AAFRESULT hr;
+	ImplAAFSegment	*pSeg;
+	
+	hr = CountSourceSegments (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+	if (index >= count)
+		return AAFRESULT_BADINDEX;
+	
+	pSeg = _inputSegments.removeAt(index);
+	if(pSeg)
+		pSeg->ReleaseReference();
+
+	return AAFRESULT_SUCCESS;
 }
