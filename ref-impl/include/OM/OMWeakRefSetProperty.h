@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -31,7 +31,7 @@
 
 #include "OMSet.h"
 #include "OMContainerElement.h"
-#include "OMContainerProperty.h"
+#include "OMRefSetProperty.h"
 #include "OMDataTypes.h"
 
 template <typename ReferencedObject>
@@ -47,23 +47,28 @@ class OMSetIterator;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable> and of <c OMUnique>.
-  //   @base public | <c OMContainerProperty>
+  //   @base public | <c OMReferenceSetProperty>
 template <typename ReferencedObject>
-class OMWeakReferenceSetProperty :
-                                 public OMContainerProperty<ReferencedObject> {
+class OMWeakReferenceSetProperty : public OMReferenceSetProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
   OMWeakReferenceSetProperty(const OMPropertyId propertyId,
-                             const char* name,
-                             const char* targetName);
+                             const wchar_t* name,
+                             const wchar_t* targetName,
+                             const OMPropertyId keyPropertyId);
 
+    // @cmember Constructor.
+  OMWeakReferenceSetProperty(const OMPropertyId propertyId,
+                             const wchar_t* name,
+                             const OMPropertyId keyPropertyId,
+                             const OMPropertyId* targetPropertyPath);
     // @cmember Destructor.
   virtual ~OMWeakReferenceSetProperty(void);
 
     // @cmember Save this <c OMWeakReferenceSetProperty>.
-  virtual void save(void* clientContext) const;
+  virtual void save(void) const;
 
     // @cmember Close this <c OMWeakReferenceSetProperty>.
   virtual void close(void);
@@ -164,16 +169,40 @@ public:
     //          <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
 
+    // @cmember Insert <p object> into this
+    //          <c OMWeakReferenceSetProperty>.
+  virtual void insertObject(const OMObject* object);
+
+    // @cmember Does this <c OMWeakReferenceSetProperty> contain
+    //          <p object> ?
+  virtual bool containsObject(const OMObject* object) const;
+
+    // @cmember Remove <p object> from this
+    //          <c OMWeakReferenceSetProperty>.
+  virtual void removeObject(const OMObject* object);
+
+    // @cmember Create an <c OMReferenceContainerIterator> over this
+    //          <c OMWeakReferenceSetProperty>.
+  virtual OMReferenceContainerIterator* createIterator(void) const;
+
 private:
 
   typedef OMWeakReferenceSetElement<ReferencedObject> SetElement;
 
   typedef OMSetIterator<OMUniqueObjectIdentification, SetElement> SetIterator;
 
+  OMPropertyTag targetTag(void) const;
+
+  OMPropertyId* targetPropertyPath(void) const;
+
+  void clearTargetTag(void) const;
+
   // The set of references.
   OMSet<OMUniqueObjectIdentification, SetElement> _set;
   OMPropertyTag _targetTag;
-  char* _targetName;
+  const wchar_t* _targetName;
+  OMPropertyId* _targetPropertyPath;
+  OMPropertyId _keyPropertyId;
 
   friend class OMWeakReferenceSetIterator<ReferencedObject>;
 
