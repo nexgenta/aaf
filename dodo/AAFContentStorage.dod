@@ -7,19 +7,20 @@ AAFObject\
 #endm
 #c
 AD_HEAD
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
 
 AD_CLASS_UUID(54D4C481, 5F8B, 11d2, 80, 73, 00, 60, 08, 14, 3E, 6F)
 
 AD_DEFAULT_UUID(54D4C482, 5F8B, 11d2, 80, 73, 00, 60, 08, 14, 3E, 6F)
 
-AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_CLASS_BEGIN
 
-AD_XCLASS_END(Concrete, StoredObject)
+AD_CLASS_END
