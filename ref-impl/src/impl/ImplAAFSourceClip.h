@@ -3,50 +3,59 @@
 #ifndef __ImplAAFSourceClip_h__
 #define __ImplAAFSourceClip_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+#include "OMStorable.h"
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 class ImplAAFDataDef;
 
 class ImplAAFMob;
 
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
 #ifndef __ImplAAFSourceReference_h__
 #include "ImplAAFSourceReference.h"
 #endif
 
+#include "ImplAAFObject.h"
+#include "OMProperty.h"
 
 
+// Persistent Property IDs
+
+const int PID_SOURCECLIP_FADEINLEN		= 1;
+const int PID_SOURCECLIP_FADEINTYPE		= 2;
+const int PID_SOURCECLIP_FADEINPRESENT	= 3;
+const int PID_SOURCECLIP_FADEOUTLEN		= 4;
+const int PID_SOURCECLIP_FADEOUTTYPE	= 5;
+const int PID_SOURCECLIP_FADEOUTPRESENT	= 6;
 
 
 class ImplAAFSourceClip : public ImplAAFSourceReference
 {
 public:
 
+	// Declare class storable
+
+	OMDECLARE_STORABLE(AAFSourceClip);
   //
   // Constructor/destructor
   //
@@ -55,19 +64,20 @@ public:
   virtual ~ImplAAFSourceClip ();
 
 
+
   //****************
-  // Initialize()
+  // InitializeSourceClip()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
+    InitializeSourceClip
         (// @parm [in] Data Definition object
-		 const aafUID_t & datadef,
+		 ImplAAFDataDef * datadef  ,
 
 		 // @parm [in] Length property value
-		 const aafLength_t & length,
+		 aafLength_t      length   ,
 
 		 // @parm [in] Source Reference
-         const aafSourceRef_t & sourceRef);
+         aafSourceRef_t   sourceRef);
 
   //****************
   // GetFade()
@@ -75,7 +85,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetFade
         (// @parm [out] Fade In Length
-		 aafLength_t *       fadeInLen     ,
+		 aafInt32 *       fadeInLen     ,
 
 		 // @parm [out] Fade In Type
 		 aafFadeType_t *  fadeInType    ,
@@ -84,7 +94,7 @@ public:
          aafBool *        fadeInPresent ,
 
 		 // @parm [out] Fade Out Length
-		 aafLength_t *     fadeOutLen    ,
+		 aafInt32 *       fadeOutLen    ,
 
 		 // @parm [out] Fade Out Type
          aafFadeType_t *  fadeOutType   ,
@@ -101,10 +111,10 @@ public:
         (ImplAAFMob ** mob);
 
   //****************
-  // GetSourceReference()
+  // GetRef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetSourceReference
+    GetRef
 		// @parm [out] Source Reference
         (aafSourceRef_t *  sourceRef);
 
@@ -126,29 +136,47 @@ public:
 		 aafFadeType_t  fadeOutType);
 
   //****************
-  // SetSourceReference()
+  // SetRef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetSourceReference
+    SetRef
 		// @parm [in] Source Reference
         (aafSourceRef_t  sourceRef);
 
 
+  // Override from AAFSourceReference
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetSourceID (/*[retval][out]*/ aafUID_t *  pSourceID);
+
+  // Override from AAFSourceReference
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetSourceID (/*[in]*/ aafUID_t   sourceID);
+
+  // Override from AAFSourceReference
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetSourceMobSlotID (/*[retval][out]*/ aafTrackID_t *  pMobSlotID);
+
+  // Override from AAFSourceReference
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetSourceMobSlotID (/*[in]*/ aafTrackID_t   mobSlotID);
+
+
+
+
+
 public:
 
-	virtual AAFRESULT TraverseToClip(aafLength_t length,
-					ImplAAFSegment **sclp,
-					 ImplAAFPulldown **pulldownObj,
-					 aafInt32 *pulldownPhase,
-					 aafLength_t *sclpLen,
-					 aafBool *isMask);
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFSourceClipTest.cpp.
+  static AAFRESULT test();
 
 private:
-	OMFixedSizeProperty<aafLength_t>	_fadeInLength;
+	OMFixedSizeProperty<aafInt32>		_fadeInLen;
 	OMFixedSizeProperty<aafFadeType_t>	_fadeInType;
-	OMFixedSizeProperty<aafLength_t> 	_fadeOutLength;
+	OMFixedSizeProperty<aafBool>		_fadeInPresent;
+	OMFixedSizeProperty<aafInt32> 		_fadeOutLen;
 	OMFixedSizeProperty<aafFadeType_t>	_fadeOutType;
-	OMFixedSizeProperty<aafPosition_t>	_startTime;
+	OMFixedSizeProperty<aafBool>		_fadeOutPresent;
 
 };
 
