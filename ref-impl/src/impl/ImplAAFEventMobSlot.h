@@ -9,7 +9,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -57,12 +56,6 @@ public:
   // Override from AAFMobSlot
   virtual AAFRESULT STDMETHODCALLTYPE
     SetSegment (/*[in]*/ ImplAAFSegment * pSegment);
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFEventMobSlot)
 
 protected:
   OMFixedSizeProperty<aafRational_t>	_editRate;
