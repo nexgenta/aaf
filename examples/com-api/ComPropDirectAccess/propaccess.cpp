@@ -1,36 +1,12 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
-
-#include <stdlib.h>
-#include <string.h>
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 
 #include "AAF.h"
-
-#include "CAAFBuiltinDefs.h"
 
 //
 // This example code is intended to show the following:
@@ -123,7 +99,7 @@ typedef IAAFSmartPointer<IAAFClassDef>          IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFDictionary>        IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFEssenceDescriptor> IAAFEssenceDescriptorSP;
 typedef IAAFSmartPointer<IAAFFile>              IAAFFileSP;
-typedef IAAFSmartPointer<IAAFAIFCDescriptor>    IAAFAIFCDescriptorSP;
+typedef IAAFSmartPointer<IAAFFileDescriptor>    IAAFFileDescriptorSP;
 typedef IAAFSmartPointer<IAAFFiller>            IAAFFillerSP;
 typedef IAAFSmartPointer<IAAFHeader>            IAAFHeaderSP;
 typedef IAAFSmartPointer<IAAFMob>               IAAFMobSP;
@@ -133,7 +109,6 @@ typedef IAAFSmartPointer<IAAFPropertyDef>       IAAFPropertyDefSP;
 typedef IAAFSmartPointer<IAAFPropertyValue>     IAAFPropertyValueSP;
 typedef IAAFSmartPointer<IAAFSegment>           IAAFSegmentSP;
 typedef IAAFSmartPointer<IAAFSourceMob>         IAAFSourceMobSP;
-typedef IAAFSmartPointer<IAAFTimelineMobSlot>   IAAFTimelineMobSlotSP;
 typedef IAAFSmartPointer<IAAFTypeDef>           IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefRecord>     IAAFTypeDefRecordSP;
 typedef IAAFSmartPointer<IAAFTypeDefRename>     IAAFTypeDefRenameSP;
@@ -196,11 +171,9 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
   IAAFTypeDefSP pTDInt16;
   const aafUInt32 kNumMembers = 2;
 
-  CAAFBuiltinDefs defs (pDict);
-
   // Get the pre-defined type for int16
-  PROPAGATE_RESULT(pDict->LookupTypeDef(kAAFTypeID_Int16,
-										&pTDInt16));
+  PROPAGATE_RESULT(pDict->LookupType((aafUID_t*) &kAAFTypeID_Int16,
+									 &pTDInt16));
 
   // load up arrays to initialize our new typedef
   IAAFTypeDef * memberTypes[kNumMembers] =
@@ -216,10 +189,10 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
 
   // Allocate a new typedef which will represent a 16-bit rational
   IAAFTypeDefRecordSP pTDRational16;
-  PROPAGATE_RESULT(pDict->CreateMetaInstance(AUID_AAFTypeDefRecord,
-                                             IID_IAAFTypeDefRecord,
-                                             (IUnknown **) &pTDRational16));
-  PROPAGATE_RESULT(pTDRational16->Initialize(AUID_TypeRational16,
+  PROPAGATE_RESULT(pDict->CreateInstance(&AUID_AAFTypeDefRecord,
+										 IID_IAAFTypeDefRecord,
+										 (IUnknown **) &pTDRational16));
+  PROPAGATE_RESULT(pTDRational16->Initialize((aafUID_t*) &AUID_TypeRational16,
 											 memberTypes,
 											 memberNames,
 											 kNumMembers,
@@ -229,7 +202,7 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
   IAAFTypeDefSP spTypeDef;
   PROPAGATE_RESULT(pTDRational16->QueryInterface(IID_IAAFTypeDef,
 												 (void**)&spTypeDef));
-  PROPAGATE_RESULT(pDict->RegisterTypeDef(spTypeDef));
+  PROPAGATE_RESULT(pDict->RegisterType(spTypeDef));
 
   return S_OK;
 }
@@ -238,20 +211,19 @@ HRESULT createRational16Type (IAAFDictionary * pDict)
 HRESULT createRenamedRational16 (IAAFDictionary * pDict)
 {
   IAAFTypeDefRenameSP pRenamedRational16;
-  CAAFBuiltinDefs defs (pDict);
 
   // look up existing type
   IAAFTypeDefSP pTDRational16;
-  PROPAGATE_RESULT(pDict->LookupTypeDef(AUID_TypeRational16,
-										&pTDRational16));
+  PROPAGATE_RESULT(pDict->LookupType((aafUID_t*) &AUID_TypeRational16,
+									 &pTDRational16));
 
   // create new (rename) type
-  PROPAGATE_RESULT(pDict->CreateMetaInstance(AUID_AAFTypeDefRename,
-                                             IID_IAAFTypeDefRename,
-                                             (IUnknown **) &pRenamedRational16));
+  PROPAGATE_RESULT(pDict->CreateInstance(&AUID_AAFTypeDefRename,
+										 IID_IAAFTypeDefRename,
+										 (IUnknown **) &pRenamedRational16));
 
   // connect 'em up
-  PROPAGATE_RESULT(pRenamedRational16->Initialize(AUID_TypeRenamedRational16,
+  PROPAGATE_RESULT(pRenamedRational16->Initialize((aafUID_t*) &AUID_TypeRenamedRational16,
 												  pTDRational16,
 												  L"RenamedRational16"));
 
@@ -273,8 +245,8 @@ HRESULT registerRational16StructOffsets (IAAFDictionary * pDict)
 {
   // Get the Rational16 type out of the dictionary
   IAAFTypeDefSP spTypeDef;
-  PROPAGATE_RESULT(pDict->LookupTypeDef(AUID_TypeRational16,
-										&spTypeDef));
+  PROPAGATE_RESULT(pDict->LookupType((aafUID_t*) &AUID_TypeRational16,
+									 &spTypeDef));
 
   IAAFTypeDefRecordSP spTypeDefRecord;
   PROPAGATE_RESULT(spTypeDef->QueryInterface(IID_IAAFTypeDefRecord,
@@ -304,23 +276,22 @@ HRESULT registerRational16StructOffsets (IAAFDictionary * pDict)
 HRESULT addRational16ToComponent (IAAFDictionary * pDict)
 {
   IAAFClassDefSP pCDComponent;
-  CAAFBuiltinDefs defs (pDict);
 
   // Get the class def for AAFComponent
-  PROPAGATE_RESULT(pDict->LookupClassDef(AUID_AAFComponent,
-										 &pCDComponent));
+  PROPAGATE_RESULT(pDict->LookupClass((aafUID_t*) &AUID_AAFComponent,
+									  &pCDComponent));
 
   // Get the Rational16 type out of the dictionary
   IAAFTypeDefSP pTDRational16;
-  PROPAGATE_RESULT(pDict->LookupTypeDef(AUID_TypeRational16,
-										&pTDRational16));
+  PROPAGATE_RESULT(pDict->LookupType((aafUID_t*) &AUID_TypeRational16,
+									 &pTDRational16));
 
   IAAFPropertyDefSP pJunk;
   PROPAGATE_RESULT(pCDComponent->
-				   RegisterOptionalPropertyDef(AUID_PropertyComponentOdor,
-											   L"Odor",       // prop name
-											   pTDRational16, // prop ID
-											   &pJunk));
+				   AppendOptionalPropertyDef((aafUID_t*) &AUID_PropertyComponentOdor,
+											 L"Odor",       // prop name
+											 pTDRational16, // prop ID
+											 &pJunk));
 
   return S_OK;
 }
@@ -336,18 +307,16 @@ HRESULT createStinkyFiller (IAAFDictionary * pDict,
   assert (pDict);
   assert (ppCreatedFiller);
 
-  CAAFBuiltinDefs defs (pDict);
-
   //
   // Make a filler object.  Initialize it, then get the generic
   // IAAFObject interface.
   //
   IAAFFiller * pFill = 0;
-  PROPAGATE_RESULT(defs.cdFiller()->
-				   CreateInstance(IID_IAAFFiller,
-								  (IUnknown **) &pFill));
+  PROPAGATE_RESULT(pDict->CreateInstance((aafUID_t*) &AUID_AAFFiller,
+										 IID_IAAFFiller,
+										 (IUnknown **) &pFill));
   assert (pFill);
-  PROPAGATE_RESULT (pFill->Initialize(defs.ddSound(), 10));
+  PROPAGATE_RESULT (pFill->Initialize((aafUID_t*)&DDEF_Sound, 10));
 
   IAAFObjectSP pObj;
   PROPAGATE_RESULT (pFill->QueryInterface(IID_IAAFObject,
@@ -358,11 +327,11 @@ HRESULT createStinkyFiller (IAAFDictionary * pDict,
   // Get the property definition for Component::Odor
   //
   IAAFClassDefSP pCDComponent;
-  PROPAGATE_RESULT(pDict->LookupClassDef(AUID_AAFComponent,
-										 &pCDComponent));
+  PROPAGATE_RESULT(pDict->LookupClass((aafUID_t*) &AUID_AAFComponent,
+									  &pCDComponent));
   IAAFPropertyDefSP pPDComponentOdor;
   PROPAGATE_RESULT(pCDComponent->
-				   LookupPropertyDef(AUID_PropertyComponentOdor,
+				   LookupPropertyDef((aafUID_t*) &AUID_PropertyComponentOdor,
 									 &pPDComponentOdor));
 
 
@@ -395,8 +364,8 @@ HRESULT createStinkyFiller (IAAFDictionary * pDict,
   //
   IAAFTypeDefSP spTypeDef;
   PROPAGATE_RESULT (pDict->
-					LookupTypeDef (AUID_TypeRational16,
-								   &spTypeDef));
+					LookupType ((aafUID_t*) &AUID_TypeRational16,
+								&spTypeDef));
   IAAFTypeDefRecordSP spTypeDefRat16;
   PROPAGATE_RESULT(spTypeDef->
 				   QueryInterface(IID_IAAFTypeDefRecord,
@@ -447,7 +416,6 @@ HRESULT checkStinkyFiller (IAAFDictionary * pDict,
 {
   assert (pFiller);
 
-  CAAFBuiltinDefs defs (pDict);
   IAAFObjectSP pObj;
   PROPAGATE_RESULT(pFiller->QueryInterface(IID_IAAFObject,
 										   (void**)&pObj));
@@ -456,11 +424,11 @@ HRESULT checkStinkyFiller (IAAFDictionary * pDict,
   // Get the property def for Component::Odor
   //
   IAAFClassDefSP pCDComponent;
-  PROPAGATE_RESULT(pDict->LookupClassDef(AUID_AAFComponent,
-										 &pCDComponent));
+  PROPAGATE_RESULT(pDict->LookupClass((aafUID_t*) &AUID_AAFComponent,
+									  &pCDComponent));
   IAAFPropertyDefSP pPDComponentOdor;
   PROPAGATE_RESULT(pCDComponent->
-				   LookupPropertyDef(AUID_PropertyComponentOdor,
+				   LookupPropertyDef((aafUID_t*) &AUID_PropertyComponentOdor,
 									 &pPDComponentOdor));
 
   //
@@ -485,8 +453,8 @@ HRESULT checkStinkyFiller (IAAFDictionary * pDict,
   //
   IAAFTypeDefSP spTypeDef;
   PROPAGATE_RESULT (pDict->
-					LookupTypeDef (AUID_TypeRational16,
-								   &spTypeDef));
+					LookupType ((aafUID_t*) &AUID_TypeRational16,
+								&spTypeDef));
   IAAFTypeDefRecordSP spTypeDefRat16;
   PROPAGATE_RESULT(spTypeDef->
 				   QueryInterface(IID_IAAFTypeDefRecord,
@@ -643,7 +611,7 @@ STDAPI CoCreateGuid(GUID  *pguid)
 
 
 static void ReadAAFFile(aafWChar * pFileName,
-						/*[in]*/ aafMobID_constref createdMobID)
+						/*[in]*/ const aafUID_t & createdMobID)
 {
   IAAFFileSP spFile;
   check (AAFFileOpenExistingRead(pFileName, 0, &spFile));
@@ -651,25 +619,16 @@ static void ReadAAFFile(aafWChar * pFileName,
   IAAFHeaderSP spHeader;
   check (spFile->GetHeader(&spHeader));
 
-  IAAFDictionarySP spDictionary;
-  check (spHeader->GetDictionary(&spDictionary));
-   
-  // This registration needs to be done, even though offsets were
-  // registered when file was written.  Note that if it is to be done
-  // at all, it has to be done before any attempt to read any object
-  // containing a property of this type is done.
-  check (registerRational16StructOffsets (spDictionary));
-
   IAAFMobSP spMob;
-  check (spHeader->LookupMob (createdMobID, &spMob));
+  check (spHeader->LookupMob ((aafUID_t*) &createdMobID, &spMob));
 
   aafNumSlots_t numSlots = 0;
-  check (spMob->CountSlots (&numSlots));
+  check (spMob->GetNumSlots (&numSlots));
   // we only put one in
   assert (1 == numSlots);
 
   IEnumAAFMobSlotsSP spSlotEnum;
-  check (spMob->GetSlots (&spSlotEnum));
+  check (spMob->EnumAAFAllMobSlots (&spSlotEnum));
 
   IAAFMobSlotSP spMobSlot;
   // Since we only put one in, just bother with the first one.
@@ -684,6 +643,13 @@ static void ReadAAFFile(aafWChar * pFileName,
   check (spSegment->QueryInterface(IID_IAAFFiller,
 								   (void**)&spFiller));
 
+  IAAFDictionarySP spDictionary;
+  check (spHeader->GetDictionary(&spDictionary));
+   
+  // This registration needs to be done, even though offsets were
+  // registered when file was written.
+  check (registerRational16StructOffsets (spDictionary));
+
   // We do the checking in this function.
   check (checkStinkyFiller (spDictionary, spFiller));
 
@@ -697,7 +663,7 @@ const aafUID_t NIL_UID = { 0 };
 // clip augmented with our optional property.  The resulting generated
 // mob ID is returned via the createdMobID argument.
 static void CreateAAFFile(aafWChar * pFileName,
-						  /*[out]*/ aafMobID_t & createdMobID)
+						  /*[out]*/ aafUID_t & createdMobID)
 {
   aafProductIdentification_t  ProductInfo;
   
@@ -707,15 +673,13 @@ static void CreateAAFFile(aafWChar * pFileName,
   remove(chFileName);
 
   // Create a new file...
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"Property Access Example";
-  ProductInfo.productVersion = &v;
+  ProductInfo.productVersion.major = 1;
+  ProductInfo.productVersion.minor = 0;
+  ProductInfo.productVersion.tertiary = 0;
+  ProductInfo.productVersion.patchLevel = 0;
+  ProductInfo.productVersion.type = kVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -729,7 +693,6 @@ static void CreateAAFFile(aafWChar * pFileName,
   // Get the AAF Dictionary so that we can create valid AAF objects.
   IAAFDictionarySP spDictionary;
   check (spHeader->GetDictionary(&spDictionary));
-  CAAFBuiltinDefs defs (spDictionary);
    
   // Create and register all new things that have to go into the
   // dictionary
@@ -739,27 +702,28 @@ static void CreateAAFFile(aafWChar * pFileName,
 
   // Create a source Mob
   IAAFSourceMobSP  smob;
-  check (defs.cdSourceMob()->
-		 CreateInstance(IID_IAAFSourceMob, 
-						(IUnknown **)&smob));
+  check (spDictionary->CreateInstance(&AUID_AAFSourceMob, 
+									 IID_IAAFSourceMob, 
+									 (IUnknown **)&smob));
 
   IAAFMobSP spMob;
   check (smob->QueryInterface (IID_IAAFMob, (void **)&spMob));
 
-  aafMobID_t newMobID;
-  check (CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
-  check (spMob->SetMobID(newMobID));
+  aafUID_t newUID;
+  check (CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
+  check (spMob->SetMobID(&newUID));
   check (spMob->SetName(L"a Source Mob"));
 
-  IAAFAIFCDescriptorSP  spAIFCDesc;
-  check (defs.cdAIFCDescriptor()->
-		 CreateInstance(IID_IAAFAIFCDescriptor, 
-						(IUnknown **) &spAIFCDesc));
+  IAAFFileDescriptorSP  spFileDesc;
+  check (spDictionary->
+		 CreateInstance(&AUID_AAFFileDescriptor,
+						IID_IAAFFileDescriptor, 
+						(IUnknown **) &spFileDesc));
   aafRational_t  audioRate = { 44100, 1 };
+  check (spFileDesc->SetSampleRate(&audioRate));
 
   IAAFEssenceDescriptorSP spEssenceDesc;
-  check(spAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
-  check (spAIFCDesc->QueryInterface (IID_IAAFEssenceDescriptor,
+  check (spFileDesc->QueryInterface (IID_IAAFEssenceDescriptor,
 								   (void **)&spEssenceDesc));
   check (smob->SetEssenceDescriptor (spEssenceDesc));
 
@@ -768,23 +732,21 @@ static void CreateAAFFile(aafWChar * pFileName,
   check (createStinkyFiller (spDictionary, &spFill));
   IAAFSegmentSP seg;
   check (spFill->QueryInterface (IID_IAAFSegment, (void **)&seg));
-  IAAFTimelineMobSlotSP newSlot;
-  check (spMob->AppendNewTimelineSlot (audioRate,
-									   seg, // segment to put into new slot
-									   1,   // slot number
-									   L"Slot 1",
-									   0,
-									   &newSlot));
+  IAAFMobSlotSP newSlot;
+  check (spMob->AppendNewSlot (seg, // segment to put into new slot
+							  1,   // slot number
+							  L"Slot 1",
+							  &newSlot));
 
   // Add the newly created and initialized Mob to the end of the mob index.
-  check (spHeader->AddMob(spMob));
+  check (spHeader->AppendMob(spMob));
   
   // save and exit.
   check (spFile->Save());
   check (spFile->Close());
 
   // Return the created mob ID to the user.
-  createdMobID = newMobID;
+  createdMobID = newUID;
 }
 
 
@@ -831,7 +793,7 @@ main()
   aafWChar * pwFileName = L"PropAccess.aaf";
   const char * pFileName = "PropAccess.aaf";
 
-  aafMobID_t createdMobID;
+  aafUID_t createdMobID;
   cout << "***Creating file " << pFileName << endl;
   CreateAAFFile(pwFileName, createdMobID);
   cout << "***Re-opening file " << pFileName << endl;
