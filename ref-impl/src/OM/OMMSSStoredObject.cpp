@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMEXTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMMSSStoredObject
@@ -149,8 +154,7 @@ OMMSSStoredObject* OMMSSStoredObject::openRead(OMRawStorage* rawStorage)
 {
   TRACE("OMMSSStoredObject::openRead");
   PRECONDITION("Valid raw storage", rawStorage != 0);
-  PRECONDITION("Compatible raw storage access mode", rawStorage->isReadable());
-  PRECONDITION("Compatible raw storage", rawStorage->isPositionable());
+  PRECONDITION("Compatible raw storage", rawStorage->isReadable());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::openFile(
                                                          rawStorage,
@@ -169,39 +173,13 @@ OMMSSStoredObject* OMMSSStoredObject::openModify(OMRawStorage* rawStorage)
   TRACE("OMMSSStoredObject::openModify");
 
   PRECONDITION("Valid raw storage", rawStorage != 0);
-  PRECONDITION("Compatible raw storage access mode",
+  PRECONDITION("Compatible raw storage",
                          rawStorage->isReadable() && rawStorage->isWritable());
-  PRECONDITION("Compatible raw storage", rawStorage->isPositionable() &&
-                                         rawStorage->isExtendible());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::openFile(
                                                            rawStorage,
                                                            OMFile::modifyMode);
   newStore->open(OMFile::modifyMode);
-
-  return newStore;
-}
-
-  // @mfunc Create a new root <c OMMSSStoredObject> in the raw storage
-  //        <p rawStorage>. The byte order of the newly created root
-  //        is given by <p byteOrder>.
-  //   @parm The raw storage in which to create the file.
-  //   @parm The desired byte ordering for the new file.
-  //   @rdesc An <c OMMSSStoredObject> representing the root object.
-OMMSSStoredObject* OMMSSStoredObject::createWrite(OMRawStorage* rawStorage,
-                                                  const OMByteOrder byteOrder)
-{
-  TRACE("OMMSSStoredObject::createWrite");
-  PRECONDITION("Valid raw storage", rawStorage != 0);
-  PRECONDITION("Valid byte order",
-                      (byteOrder == littleEndian) || (byteOrder == bigEndian));
-  PRECONDITION("Compatible raw storage access mode",
-                         rawStorage->isWritable() && rawStorage->isReadable());
-  PRECONDITION("Compatible raw storage", rawStorage->isPositionable() &&
-                                         rawStorage->isExtendible());
-
-  OMMSSStoredObject* newStore = OMMSSStoredObject::createFile(rawStorage);
-  newStore->create(byteOrder); // mode == modify
 
   return newStore;
 }
@@ -220,10 +198,8 @@ OMMSSStoredObject* OMMSSStoredObject::createModify(OMRawStorage* rawStorage,
   PRECONDITION("Valid raw storage", rawStorage != 0);
   PRECONDITION("Valid byte order",
                       (byteOrder == littleEndian) || (byteOrder == bigEndian));
-  PRECONDITION("Compatible raw storage access mode",
+  PRECONDITION("Compatible raw storage",
                          rawStorage->isReadable() && rawStorage->isWritable());
-  PRECONDITION("Compatible raw storage", rawStorage->isPositionable() &&
-                                         rawStorage->isExtendible());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::createFile(rawStorage);
   newStore->create(byteOrder);
@@ -295,7 +271,7 @@ void OMMSSStoredObject::close(OMFile& file)
 
   close();
 
-  if (file.isWritable()) {
+  if (file.accessMode() == OMFile::modifyMode) {
     OMFileSignature signature = file.signature();
     OMRawStorage* store = file.rawStorage();
     if (store != 0) {
@@ -363,7 +339,9 @@ void OMMSSStoredObject::save(const OMPropertySet& properties)
   while (++iterator) {
     OMProperty* p = iterator.property();
     ASSERT("Valid property", p != 0);
+#if defined(OM_VALIDATE_DEFINITIONS)
     ASSERT("Property has a definition", p->definition() != 0);
+#endif
     if (!p->isOptional() || p->isPresent()) {
       p->save();
     }
