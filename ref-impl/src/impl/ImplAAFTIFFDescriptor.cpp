@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #include "AAFStoredObjectIDs.h"
@@ -38,10 +20,10 @@
 
 
 ImplAAFTIFFDescriptor::ImplAAFTIFFDescriptor ():
-_isUniform(PID_TIFFDescriptor_IsUniform,	"IsUniform"),
-_isContiguous(PID_TIFFDescriptor_IsContiguous,	"IsContiguous"),
-_leadingLines(PID_TIFFDescriptor_LeadingLines,	"LeadingLines"),
-_trailingLines(PID_TIFFDescriptor_TrailingLines,	"TrailingLines"),
+_isUniform(PID_TIFFDescriptor_IsUniform,	"Is Uniform"),
+_isContiguous(PID_TIFFDescriptor_IsContiguous,	"Is Contiguous"),
+_leadingLines(PID_TIFFDescriptor_LeadingLines,	"Leading Lines"),
+_trailingLines(PID_TIFFDescriptor_TrailingLines,	"Trailing Lines"),
 _jpegTableID(PID_TIFFDescriptor_JPEGTableID,	"JPEGTableID"),
 _summary(PID_TIFFDescriptor_Summary,	"Summary")
 {
@@ -52,8 +34,8 @@ _summary(PID_TIFFDescriptor_Summary,	"Summary")
 	_persistentProperties.put(_jpegTableID.address());
 	_persistentProperties.put(_summary.address());
 
-	_isUniform = kAAFFalse;
-	_isContiguous = kAAFFalse;
+	_isUniform = AAFFalse;
+	_isContiguous = AAFFalse;
 	_leadingLines = 0;
 	_trailingLines = 0;
 	_jpegTableID = 0;
@@ -121,11 +103,10 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTIFFDescriptor::GetLeadingLines (aafInt32* pLeadingLines)
 {
-	if (pLeadingLines == NULL)
-		return AAFRESULT_NULL_PARAM;
-	
-	else if(!_leadingLines.isPresent())
+	if(!_leadingLines.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
+	else if (pLeadingLines == NULL)
+		return AAFRESULT_NULL_PARAM;
 	else
 	{
 		*pLeadingLines = _leadingLines;
@@ -150,12 +131,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTIFFDescriptor::GetTrailingLines (aafInt32* pTrailingLines)
 {
-	if (pTrailingLines == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	else if(!_trailingLines.isPresent())
+	if(!_trailingLines.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
-	else 
+	else if (pTrailingLines == NULL)
+		return AAFRESULT_NULL_PARAM;
+	else
 	{
 		*pTrailingLines = _trailingLines;
 		return AAFRESULT_SUCCESS;
@@ -174,12 +154,10 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTIFFDescriptor::GetJPEGTableID (aafJPEGTableID_t* pJPEGTableID)
 {
-	if (pJPEGTableID == NULL)
-		return AAFRESULT_NULL_PARAM;
-	
-	else if(!_jpegTableID.isPresent())
+	if(!_jpegTableID.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;
-
+	else if (pJPEGTableID == NULL)
+		return AAFRESULT_NULL_PARAM;
 	else
 	{
 		*pJPEGTableID = _jpegTableID;
@@ -228,5 +206,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+OMDEFINE_STORABLE(ImplAAFTIFFDescriptor, AUID_AAFTIFFDescriptor);
 
 
