@@ -3,20 +3,35 @@
 #ifndef __ImplAAFTimecode_h__
 #define __ImplAAFTimecode_h__
 
+#include "OMStorable.h"
 
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
 
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
 #endif
 
+const int PID_TIMECODE_TC           = 5;
 
 class ImplAAFTimecode : public ImplAAFSegment
 {
@@ -31,10 +46,10 @@ public:
 
 
   //****************
-  // Initialize()
+  // InitTimecode()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
+    InitTimecode
 	    (// @parm [in] Length Property Value
          aafLength_t  length,
 
@@ -71,14 +86,23 @@ public:
 	  /*[in]*/ aafRational_t *  pEditRate,
 	  /*[out]*/ aafFrameOffset_t *  pOffset);
 
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFTimecode)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFTimecodeTest.cpp.
+  static AAFRESULT test();
 public:
 	// Methods which are internal to the SDK
 virtual AAFRESULT OffsetToTimecodeClip(aafPosition_t offset, ImplAAFTimecode **result,
 												aafPosition_t *tcStartPos);
 private:
-	OMFixedSizeProperty<aafPosition_t>	_start;
-	OMFixedSizeProperty<aafUInt16>	_FPS;
-	OMFixedSizeProperty<aafBool>	_drop;
+	OMFixedSizeProperty<aafTimecode_t>	_timecode;
 };
 
 #endif // ! __ImplAAFTimecode_h__
