@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFDescriptiveMarker.cpp,v 1.1.2.4 2004/08/19 03:13:32 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFDescriptiveMarker.cpp,v 1.1.2.5 2004/08/19 13:22:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,7 +75,7 @@ AAFRESULT STDMETHODCALLTYPE
   }
 
   _describedSlots.clear();
-  int i;
+  unsigned int i;
   for ( i = 0; i < numberElements; ++i ) {
     _describedSlots.insert( pDescribedSlotIDs[i] );
   }
