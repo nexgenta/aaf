@@ -69,10 +69,10 @@ ImplAAFSelector::~ImplAAFSelector ()
 	  selected = 0;
 	}
 
-	size_t size = _alternates.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _alternates.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFSegment* pSegment = _alternates.setValueAt(0, i);
+		ImplAAFSegment* pSegment = _alternates.clearValueAt(i);
 		if (pSegment)
 		{
 		  pSegment->ReleaseReference();
@@ -110,26 +110,25 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::SetSelectedSegment (ImplAAFSegment* pSelSegment)
 {
-	HRESULT				hr = AAFRESULT_SUCCESS;
 	ImplAAFSegment*		pPrevSelected = NULL;
 
 	if (pSelSegment == NULL)
-	{
-		hr = AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		pPrevSelected = _selected;
-		if (pPrevSelected)
-		{
-		  pPrevSelected->ReleaseReference();
-		  pPrevSelected = 0;
-		}
-		_selected = pSelSegment;
-		_selected->AcquireReference();
-	}
+		return AAFRESULT_NULL_PARAM;
 
-	return hr;
+	if (pSelSegment->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+	pPrevSelected = _selected;
+	if (pPrevSelected)
+	{
+	  pPrevSelected->ReleaseReference();
+	  pPrevSelected = 0;
+	}
+	_selected = pSelSegment;
+	_selected->AcquireReference();
+
+
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -161,6 +160,12 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::RemoveAlternateSegment (ImplAAFSegment* pSegment)
 {
+	if (pSegment == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	if( !pSegment->attached() )
+		return AAFRESULT_SEGMENT_NOT_FOUND;
+
 	if (!_alternates.containsValue(pSegment))
 	  return AAFRESULT_SEGMENT_NOT_FOUND;
 
@@ -196,7 +201,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::GetNumAlternateSegments (aafInt32* pNumSegments)
 {
 	HRESULT	hr = AAFRESULT_SUCCESS;
-	size_t	numSegments;
 
 	if (pNumSegments == NULL)
 	{
@@ -204,7 +208,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		_alternates.getSize(numSegments);
+		size_t	numSegments = _alternates.count();
 		*pNumSegments = numSegments;
 	}
 
@@ -262,7 +266,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (*ppEnum)
 		  (*ppEnum)->ReleaseReference();
 		(*ppEnum) = 0;
-		return(XCODE());
 	}
 	XEND;
 
@@ -286,10 +289,9 @@ AAFRESULT
     ImplAAFSelector::GetNthSegment (aafUInt32 index, ImplAAFSegment** ppSegment)
 {
 	ImplAAFSegment*	obj;
-	size_t			numSegments;
 	HRESULT			hr;
 
-	_alternates.getSize(numSegments);
+	size_t numSegments = _alternates.count();
 	if (index < numSegments)
 	{
 		_alternates.getValueAt(obj, index);

@@ -71,9 +71,9 @@ ImplAAFEssenceGroup::ImplAAFEssenceGroup ()
 
 ImplAAFEssenceGroup::~ImplAAFEssenceGroup ()
 {
-	size_t size = _choices.getSize();
-	for (size_t i = 0; i < size; i++) {
-		ImplAAFSegment *pClip = _choices.setValueAt(0, i);
+	size_t count = _choices.count();
+	for (size_t i = 0; i < count; i++) {
+		ImplAAFSegment *pClip = _choices.clearValueAt(i);
 
 		if (pClip) {
 		  pClip->ReleaseReference();
@@ -102,6 +102,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if (stillFrame == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
+	if (stillFrame->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
 	XPROTECT()
 	{
 		/* Verify that groups's datakind converts to still's datakind */
@@ -185,6 +188,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(choice == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if(choice->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
 	AAFRESULT ar=ValidateChoice(choice);
 	if(AAFRESULT_FAILED(ar))
 		return(ar);
@@ -202,6 +208,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(choice == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if(choice->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
 	AAFRESULT ar=ValidateChoice(choice);
 	if(AAFRESULT_FAILED(ar))
 		return(ar);
@@ -221,6 +230,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if(choice == NULL)
 	return(AAFRESULT_NULL_PARAM);
+
+  if(choice->attached())
+	return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
 
   aafUInt32 count;
   AAFRESULT hr;
@@ -246,9 +258,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::CountChoices (
       aafUInt32  *result)
 {
-	size_t	numClips;
-
-	_choices.getSize(numClips);
+	size_t	numClips = _choices.count();
 	*result = numClips;
 
 	return AAFRESULT_SUCCESS;
@@ -484,7 +494,7 @@ AAFRESULT ImplAAFEssenceGroup::ValidateChoice(
 {
 	aafLength_t	groupLength, newLength;
 	ImplAAFDictionary	*pDict = NULL;
-	ImplAAFDataDef	*pDef = NULL;
+	//ImplAAFDataDef	*pDef = NULL;
 	aafBool			willConvert;
 
 	if(choice == NULL)

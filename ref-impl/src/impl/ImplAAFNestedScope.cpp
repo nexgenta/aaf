@@ -74,10 +74,10 @@ ImplAAFNestedScope::ImplAAFNestedScope ()
 ImplAAFNestedScope::~ImplAAFNestedScope ()
 {
 	// Release all of the slot(segments) pointers in the slot list.
-	size_t size = _slots.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _slots.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFSegment* pSegment = _slots.setValueAt(0, i);
+		ImplAAFSegment* pSegment = _slots.clearValueAt(i);
 
 		if (pSegment)
 		{
@@ -95,6 +95,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if(pSegment->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
 	_slots.appendValue(pSegment);
 	pSegment->AcquireReference();
 
@@ -108,7 +111,13 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	if(pSegment->attached())
+		return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
+	_slots.prependValue(pSegment);
+	pSegment->AcquireReference();
+
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -119,6 +128,9 @@ AAFRESULT STDMETHODCALLTYPE
   if(pSegment == NULL)
 	return(AAFRESULT_NULL_PARAM);
 
+  if(pSegment->attached())
+	return(AAFRESULT_OBJECT_ALREADY_ATTACHED);
+
   aafUInt32 count;
   AAFRESULT hr;
   hr = CountSegments (&count);
@@ -127,7 +139,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  _slots.insertAt(pSegment,index);
+  pSegment->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -138,9 +153,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (NULL == pResult)
     return (AAFRESULT_NULL_PARAM);
 
-  size_t numSegments;
-
-	_slots.getSize(numSegments);
+	size_t numSegments = _slots.count();
 	
 	*pResult = numSegments;
 
@@ -163,7 +176,12 @@ AAFRESULT STDMETHODCALLTYPE
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  _slots.getValueAt(*ppSegment,index);
+
+  assert(*ppSegment);
+  (*ppSegment)->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -198,7 +216,22 @@ AAFRESULT STDMETHODCALLTYPE
 	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
 	if(*ppEnum == NULL)
 		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumStrongProperty(this, &_slots);
+
+	XPROTECT()
+	{
+		OMStrongReferenceVectorIterator<ImplAAFSegment>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFSegment>(_slots);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK((*ppEnum)->Initialize(&CLSID_EnumAAFSegments, this, iter));
+	}
+	XEXCEPT
+	{
+		if (*ppEnum)
+		  (*ppEnum)->ReleaseReference();
+		(*ppEnum) = 0;
+	}
+	XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
@@ -210,7 +243,7 @@ AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafMobID_constref from,
 	
 	XPROTECT()
 	{
-		size_t count = _slots.getSize();
+		size_t count = _slots.count();
 		for (size_t n = 0; n < count; n++)
 		{
 			ImplAAFSegment	*pSegment;

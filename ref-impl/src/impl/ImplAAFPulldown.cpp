@@ -89,6 +89,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if (pInputSegment == NULL)
 		return AAFRESULT_NULL_PARAM;
 
+	if (pInputSegment->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
 	ImplAAFSegment *pOldSeg = _inputSegment;
 	if (pOldSeg)
 	  pOldSeg->ReleaseReference();
@@ -188,7 +191,7 @@ AAFRESULT STDMETHODCALLTYPE
   // Override from AAFSegment
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPulldown::SegmentTCToOffset (aafTimecode_t *pTimecode,
-      aafRational_t *pEditRate,
+      aafRational_t * /*pEditRate*/,
       aafFrameOffset_t *pOffset)
 {
 	ImplAAFTimecode	*pdwnInput;
@@ -228,7 +231,6 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			   aafLength_t *numFrames,
 			   aafInt32 *srcPhase)
 {
-  ImplAAFSegment*	pulldownCVAL = NULL;
   aafUInt32     maskBits;
   aafBool       drop;
   aafUInt32     phaseOffset = 0;
