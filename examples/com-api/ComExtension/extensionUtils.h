@@ -163,7 +163,7 @@ typedef aafUInt32 contractID_t;
 
 
 
-void SetStringProperty (IAAFObject * pObj,
+static void SetStringProperty (IAAFObject * pObj,
 						const aafUID_t propertyID,
 						const aafCharacter * strValue);
 
@@ -221,6 +221,18 @@ void AdminMobGetNthPersonnel (IAAFDictionary * pDict,
 							  IAAFMob * pMob,
 							  aafUInt32 index,
 							  IAAFObject **personnelResource);
+
+
+//
+// Create and registration functions.
+//
+void CreateAndRegisterPositionEnum (IAAFDictionary * pDict);
+void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict);
+void CreateAndRegisterPersonnelResourceReference(IAAFDictionary * pDict);
+void CreateAndRegisterPersonnelResourceReferenceVector(IAAFDictionary * pDict);
+void CreateAndRegisterAdminMob (IAAFDictionary * pDict);
+void DefineResourceClassExtensions(IAAFDictionary *pDict);
+
 
 
 //
