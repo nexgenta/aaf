@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -41,6 +41,9 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
+
+#include "CAAFBuiltinDefs.h"
+
 
 #define STD_HDRSIZE_DATA		42
 #define STD_HDRSIZE_NODATA		36
@@ -116,6 +119,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	IAAFCodecDef	*codecDef = NULL;
 	IAAFDefObject	*obj = NULL;
+	IAAFClassDef    *pcd = 0;
 	aafUID_t		uid;
 	
 	if((dict == NULL) || (def == NULL))
@@ -124,13 +128,16 @@ HRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		//!!!Later, add in dataDefs supported & filedescriptor class
-		CHECK(dict->CreateInstance(AUID_AAFCodecDef,
-							IID_IAAFCodecDef, 
-							(IUnknown **)&codecDef));
+	  	CHECK(dict->LookupClassDef(AUID_AAFCodecDef, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFCodecDef, 
+								  (IUnknown **)&codecDef));
+		pcd->Release ();
+		pcd = 0;
 		uid = CodecWave;
 		CHECK(codecDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
 		CHECK(obj->Initialize(uid, L"WAVE Codec", L"Handles RIFF WAVE data."));
-		CHECK(codecDef->AddEssenceKind (DDEF_Sound));
+		CAAFBuiltinDefs defs (dict);
+		CHECK(codecDef->AddEssenceKind (defs.ddSound()));
 		*def = obj;
 		codecDef->Release();
 		codecDef = NULL;
@@ -138,9 +145,20 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(codecDef != NULL)
+		  {
 			codecDef->Release();
+			codecDef = 0;
+		  }
 		if(obj != NULL)
+		  {
 			obj->Release();
+			obj = 0;
+		  }
+		if (pcd)
+		  {
+			pcd->Release ();
+			pcd = 0;
+		  }
 	}
 	XEND
 
@@ -161,21 +179,24 @@ HRESULT STDMETHODCALLTYPE
 	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
  	IAAFNetworkLocator		*pNetLoc = NULL;
+	IAAFClassDef            *pcd = 0;
 	
 	XPROTECT()
 	{
-		CHECK(dict->CreateInstance(AUID_AAFPluginDescriptor,
-			IID_IAAFPluginDescriptor, 
-			(IUnknown **)&desc));
+	    CHECK(dict->LookupClassDef(AUID_AAFPluginDescriptor, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFPluginDescriptor, 
+								  (IUnknown **)&desc));
+		pcd->Release ();
+		pcd = 0;
 		*descPtr = desc;
 		desc->AddRef();
 		CHECK(desc->Initialize(JEFFS_WAVE_PLUGIN, L"Example WAVE Codec", L"Handles RIFF WAVE data."));
 
 		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
 		CHECK(desc->SetPluginVersionString(manufRev));
-		CHECK(dict->CreateInstance(AUID_AAFNetworkLocator,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (manufURL));
 		CHECK(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		CHECK(desc->SetManufacturerInfo(pNetLoc));
@@ -191,9 +212,10 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(desc->SetSupportsAuthentication(AAFFalse));
 		
 		/**/
-		CHECK(dict->CreateInstance(AUID_AAFNetworkLocator,
-			IID_IAAFLocator, 
-			(IUnknown **)&pLoc));
+		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
+								  (IUnknown **)&pLoc));
+		pcd->Release ();
+		pcd = 0;
 		CHECK(pLoc->SetPath (downloadURL));
 		CHECK(desc->AppendLocator(pLoc));
 		desc->Release();	// We have addRefed for the return value
@@ -204,11 +226,25 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(desc != NULL)
+		  {
 			desc->Release();
+			desc = 0;
+		  }
 		if(pLoc != NULL)
+		  {
 			pLoc->Release();
+			pLoc = 0;
+		  }
 		if(pNetLoc != NULL)
+		  {
 			pNetLoc->Release();
+			pNetLoc = 0;
+		  }
+		if (pcd)
+		  {
+			pcd->Release ();
+			pcd = 0;
+		  }
 	}
 	XEND
 
@@ -301,8 +337,11 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::GetIndexedDataDefinition (aafInt32  index,
-        aafUID_t *  pVariant)
+        aafUID_t * pVariant)
 {
+  if (! pVariant)
+	return AAFRESULT_NOT_IMPLEMENTED;
+
   return HRESULT_NOT_IMPLEMENTED;
 }
 
@@ -314,7 +353,7 @@ const wchar_t	name[] = L"WAVE Codec";
 
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::GetMaxCodecDisplayNameLength (
-        aafInt32  *bufSize)
+        aafUInt32  *bufSize)
 {
 	if(bufSize == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -324,11 +363,11 @@ HRESULT STDMETHODCALLTYPE
 }	
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetCodecDisplayName (aafUID_t  variant,
-        wchar_t *  pName,
-        aafInt32  bufSize)
+    CAAFWaveCodec::GetCodecDisplayName (aafUID_constref variant,
+        aafCharacter *  pName,
+        aafUInt32  bufSize)
 {
-	aafInt32	len = sizeof(name);
+	aafUInt32	len = sizeof(name);
 	if(len > bufSize)
 		len = bufSize;
 	memcpy(pName, name, len);
@@ -337,7 +376,7 @@ HRESULT STDMETHODCALLTYPE
 	
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::GetNumChannels (IAAFSourceMob *fileMob,
-        aafUID_t  essenceKind,
+        aafUID_constref essenceKind,
         IAAFEssenceStream *stream,
         aafInt16 *  pNumChannels)
 {
@@ -403,7 +442,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::GetNumSamples (
-        aafUID_t  essenceKind,
+        aafUID_constref essenceKind,
         aafLength_t *  pNumSamples)
 {
 	if(EqualAUID(&essenceKind, &DDEF_Sound))
@@ -431,7 +470,7 @@ HRESULT STDMETHODCALLTYPE
 		
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::Create (IAAFSourceMob *unk,
-        aafUID_t  variant,
+        aafUID_constref variant,
         IAAFEssenceStream * stream,
         aafInt32 numParms,
         aafmMultiCreate_t *createParms)
@@ -1218,14 +1257,17 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetIndexedSampleSize (aafUID_t dataDefID, aafPosition_t pos, aafLength_t *pResult)
+    CAAFWaveCodec::GetIndexedSampleSize
+ (aafUID_constref dataDefID,
+  aafPosition_t pos,
+  aafLength_t *pResult)
 {
-	aafUID_t	uid = DDEF_Sound;
 	if(pResult == NULL)
 		return(AAFRESULT_NULL_PARAM);
 	if(pos < 0 || pos >=_sampleFrames)
 		return(AAFRESULT_EOF);
-	if(EqualAUID(&dataDefID, &uid))
+
+	if(EqualAUID(&dataDefID, &DDEF_Sound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);
@@ -1234,12 +1276,13 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetLargestSampleSize (aafUID_t dataDefID, aafLength_t *pResult)
+    CAAFWaveCodec::GetLargestSampleSize (aafUID_constref dataDefID,
+										 aafLength_t *pResult)
 {
-	aafUID_t	uid = DDEF_Sound;
 	if(pResult == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	if(EqualAUID(&dataDefID, &uid))
+
+	if(EqualAUID(&dataDefID, &DDEF_Sound))
 		*pResult = _bytesPerFrame;
 	else
 		return(AAFRESULT_CODEC_CHANNELS);
