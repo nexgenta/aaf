@@ -201,8 +201,8 @@ static void pvtZeroFill (const aafMemPtr_t inVal,
 
 
 ImplAAFTypeDefInt::ImplAAFTypeDefInt ()
-  : _size     ( PID_TypeDefinitionInteger_Size,     "Size"),
-    _isSigned ( PID_TypeDefinitionInteger_IsSigned, "IsSigned")
+  : _size     ( PID_TypeDefinitionInteger_Size,     L"Size"),
+    _isSigned ( PID_TypeDefinitionInteger_IsSigned, L"IsSigned")
 {
   _persistentProperties.put(_size.address());
   _persistentProperties.put(_isSigned.address());
@@ -215,12 +215,11 @@ ImplAAFTypeDefInt::~ImplAAFTypeDefInt ()
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefInt::Initialize (
-      const aafUID_t *  pID,
+      const aafUID_t & id,
       aafUInt8  intSize,
       aafBool  isSigned,
-      wchar_t *  pTypeName)
+      const aafCharacter * pTypeName)
 {
-  assert (pID);
   assert (intSize > 0);
   assert (pTypeName);
 
@@ -230,12 +229,14 @@ AAFRESULT STDMETHODCALLTYPE
 	  (8 != intSize))
 	return AAFRESULT_BAD_SIZE;
 
+  AAFRESULT hr;
+
+  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
+	if (AAFRESULT_FAILED (hr))
+    return hr;
+
   _size = intSize;
   _isSigned = isSigned;
-  AAFRESULT hr = SetName (pTypeName);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  hr = SetAUID (pID);
-  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
 }
@@ -643,7 +644,7 @@ void ImplAAFTypeDefInt::internalize(OMByte* externalBytes,
 
 aafBool ImplAAFTypeDefInt::IsFixedSize (void) const
 {
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
@@ -656,7 +657,7 @@ size_t ImplAAFTypeDefInt::PropValSize (void) const
 aafBool ImplAAFTypeDefInt::IsRegistered (void) const
 {
   // int types are registered by default
-  return AAFTrue;
+  return kAAFTrue;
 }
 
 
@@ -667,15 +668,24 @@ size_t ImplAAFTypeDefInt::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefInt::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefInt::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
   size_t elemSize = PropValSize ();
   OMProperty * result = new OMSimpleProperty (pid, name, elemSize);
   assert (result);
   return result;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefInt::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  // Return variable array of unsigned char
+  return pvtGetUInt8Array8Type (ppRawTypeDef);
 }
 
 
@@ -693,3 +703,25 @@ bool ImplAAFTypeDefInt::IsVariableArrayable () const
 
 bool ImplAAFTypeDefInt::IsStringable () const
 { return true; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefInt::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefInt));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefInt::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefInt::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}

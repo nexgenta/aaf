@@ -35,6 +35,7 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefEnum : public ImplAAFTypeDef
 {
@@ -208,8 +209,8 @@ public:
   void AttemptBuiltinRegistration (void);
 
   virtual OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
 
   //*************************************************************
@@ -302,6 +303,14 @@ public:
   virtual bool IsFixedArrayable () const;
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
+
+
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 };
 
 //

@@ -55,9 +55,12 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 
 ImplAAFTypeDefEnum::ImplAAFTypeDefEnum ()
-  : _ElementType   ( PID_TypeDefinitionEnumeration_ElementType,   "ElementType", "/Dictionary/TypeDefinitions", PID_DefinitionObject_Identification),
-	_ElementNames  ( PID_TypeDefinitionEnumeration_ElementNames,  "ElementNames"),
-	_ElementValues ( PID_TypeDefinitionEnumeration_ElementValues, "ElementValues"),
+  : _ElementType   ( PID_TypeDefinitionEnumeration_ElementType,
+                     L"ElementType",
+                     L"/Dictionary/TypeDefinitions",
+                     PID_MetaDefinition_Identification),
+	_ElementNames  ( PID_TypeDefinitionEnumeration_ElementNames,  L"ElementNames"),
+	_ElementValues ( PID_TypeDefinitionEnumeration_ElementValues, L"ElementValues"),
 	_isRegistered (kAAFFalse),
 	_registrationAttempted (kAAFFalse)
 {
@@ -819,7 +822,7 @@ size_t ImplAAFTypeDefEnum::NativeSize (void) const
 
 
 static OMProperty * pvtMakeProperty (OMPropertyId pid,
-									 const char * name,
+									 const wchar_t * name,
 									 size_t size)
 {
   if (0 == size) { assert (0); return 0; }
@@ -832,9 +835,9 @@ static OMProperty * pvtMakeProperty (OMPropertyId pid,
 }
 
 
-OMProperty * ImplAAFTypeDefEnum::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefEnum::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
   size_t elemSize = NativeSize ();
@@ -858,3 +861,25 @@ bool ImplAAFTypeDefEnum::IsVariableArrayable () const
 
 bool ImplAAFTypeDefEnum::IsStringable () const
 { return true; }
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefEnum::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefEnum));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefEnum::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefEnum::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
+}
