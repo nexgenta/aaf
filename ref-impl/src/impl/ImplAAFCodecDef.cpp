@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCodecDef.cpp,v 1.33.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFCodecDef.cpp,v 1.33.2.2 2004/08/03 18:52:58 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -311,9 +311,6 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		*ppEnum = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
-		if(*ppEnum == NULL)
-			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(GetAUID(&uid));
 		mgr = ImplAAFPluginManager::GetPluginManager();
 		// Only looks at first codec matching
@@ -328,6 +325,9 @@ AAFRESULT STDMETHODCALLTYPE
 		if(!found)
 			RAISE(AAFRESULT_CODEC_INVALID);
 
+		*ppEnum = (ImplEnumAAFCodecFlavours *)CreateImpl(CLSID_EnumAAFCodecFlavours);
+		if(*ppEnum == NULL)
+			RAISE(AAFRESULT_NOMEMORY);
 		(*ppEnum)->SetEnumCodec(pCodec);
 		pPlug->Release();
 		pPlug = NULL;
@@ -386,3 +386,6 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	return(AAFRESULT_SUCCESS);
 }
+
+
+
