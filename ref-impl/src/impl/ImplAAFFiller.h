@@ -9,7 +9,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -18,7 +17,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -70,9 +68,6 @@ public:
 									  aafInt32 *pulldownPhase,
 									  aafLength_t *sclpLen,
 									  aafBool *isMask);
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFFiller)
 };
 
 #endif // ! __ImplAAFFiller_h__

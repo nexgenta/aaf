@@ -9,7 +9,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -101,11 +100,6 @@ public:
     aafMobKind_t *  pMobKind
   );
 
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFCompositionMob)
 
 private:
 	OMFixedSizeProperty<aafLength_t>	_defaultFadeLen;
