@@ -22,6 +22,10 @@
 
 
 #include "OMProperty.h"
+#include "OMTypes.h"
+
+#include "OMProperty.h"
+#include "OMTypes.h"
 
 const int PID_NETWORKLOCATOR_URLSTRING          = 0;
 
@@ -34,10 +38,6 @@ public:
   //********
   ImplAAFNetworkLocator ();
   virtual ~ImplAAFNetworkLocator ();
-
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize ();
 
 
   // Override from AAFLocator
@@ -65,10 +65,6 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFNetworkLocatorTest.cpp.
   static AAFRESULT test();
-
-  // Return this objects stored object class.
-  virtual AAFRESULT STDMETHODCALLTYPE
-	GetObjectClass(aafUID_t * pClass);
 
 private:
   OMWideStringProperty                             _path;
