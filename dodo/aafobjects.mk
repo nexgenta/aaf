@@ -8,56 +8,81 @@
 # Place the object root name is this list if it is a "persistent"
 # aaf object:
 AAFPERSISTENTOBJECTS = \
-	AAFAttribute \
+	AAFAIFCData \
+	AAFAIFCDescriptor \
 	AAFClassDef \
 	AAFDictionary \
+	AAFCommentMarker \
 	AAFConstValue \
-	AAFControlCodeDef \
 	AAFControlPoint \
 	AAFDataDef \
 	AAFDefObject \
-	AAFEdgecode \
+	AAFDOSLocator \
 	AAFEffectDef \
-	AAFEffectInvocation \
-	AAFIntegerAttribute \
+	AAFEvent \
+	AAFEventMobSlot \
+	AAFGPITrigger \
+	AAFJPEGData \
+	AAFHTMLClip \
+	AAFHTMLData \
+	AAFHTMLDescriptor \
+	AAFImageData \
+	AAFIntraFrameMarker \
 	AAFLocator \
 	AAFMacLocator \
 	AAFMediaFilmDescriptor \
-	AAFMediaGroup  \
+	AAFMediaGroup \
+	AAFMIDIData \
+	AAFMIDIDescriptor \
 	AAFNestedScope\
-	AAFObjectAttribute \
 	AAFParameter \
-	AAFParameterSlot \
+	AAFParameterDef \
 	AAFPulldown \
 	AAFPropertyDef \
 	AAFReferenceValue \
+	AAFRGBADescriptor \
 	AAFScopeReference \
-	AAFStringAttribute \
+	AAFSelector \
+	AAFStaticMobSlot \
+	AAFTaggedValue \
+	AAFTextClip \
+	AAFTextLocator \
+	AAFTIFFData \
+	AAFTIFFDescriptor \
 	AAFTimecodeStream \
 	AAFTimecodeStream12M \
-	AAFTransition \
 	AAFTypeDef \
+	AAFTypeDefInt \
+	AAFTypeDefRename \
+	AAFTypeDefEnum \
+	AAFTypeDefFixedArray \
+	AAFTypeDefVariableArray \
+	AAFTypeDefStream \
+	AAFTypeDefString \
+	AAFTypeDefObjectRef \
+	AAFTypeDefComposite \
 	AAFUnixLocator \
 	AAFVaryingValue \
+	AAFWAVEData \
 	AAFWindowsLocator
-
 
 
 # These are all of the other non-persistent objects:
 AAFNONPERSISTENTOBJECTS = \
 	AAFRoot \
-	AAFEssenceFormat \
-	EnumAAFAttributes \
+	AAFProperty \
+	AAFPropertyValue \
 	EnumAAFClassDefs \
-	EnumAAFControlCodeDefs \
 	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFDefs \
 	EnumAAFEffectDefs \
 	EnumAAFIdentifications \
 	EnumAAFMobComments \
-	EnumAAFParameterSlots \
+	EnumAAFObjects \
+	EnumAAFParameterDefs \
 	EnumAAFPropertyDefs \
+	EnumAAFPropertyValues \
 	EnumAAFProperties \
 	EnumAAFReferenceValues \
 	EnumAAFSegments \
@@ -78,6 +103,7 @@ HUMAN_TYPED_IMPL = \
 	AAFComponent \
 	AAFCompositionMob \
 	AAFContentStorage \
+	AAFEdgecode \
 	AAFEssenceAccess \
 	AAFEssenceData \
 	AAFEssenceDescriptor \
@@ -86,8 +112,10 @@ HUMAN_TYPED_IMPL = \
 	AAFFileDescriptor \
 	AAFDigitalImageDescriptor \
 	AAFCDCIDescriptor \
+	AAFEssenceFormat \
 	AAFFiller \
 	AAFFindSourceInfo \
+	AAFGroup \
 	AAFHeader \
 	AAFIdentification \
 	AAFMasterMob \
@@ -103,6 +131,7 @@ HUMAN_TYPED_IMPL = \
 	AAFTimecode \
 	AAFTimelineMobSlot \
 	AAFTapeDescriptor \
+	AAFTransition \
 	AAFWAVEDescriptor \
 	EnumAAFComponents \
 	EnumAAFEssenceData \
@@ -136,11 +165,14 @@ AUTO_GEN_IMPL = \
 # NOT into AAF.idl.
 
 PLUGIN_OBJECTS = \
+	AAFRoot \
 	AAFEssenceFormat \
-	AAFPluginTypes \
 	AAFPlugin \
 	AAFEssenceStream \
-	AAFEssenceCodec
+	AAFEssenceSampleStream \
+	AAFEssenceDataStream \
+	AAFEssenceCodec \
+	AAFEssenceContainer
 
 # objects in PLUGIN_OBJECTS are NOT built into the main interface IDL
 #---------------------------------------------
