@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.21 2005/03/19 20:08:48 terabrit Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.22 2005/03/21 15:23:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1119,14 +1119,7 @@ HRESULT STDMETHODCALLTYPE CAAFCDCICodec::WriteSamples(
     {
 	// Check input args
 	checkExpression( buffer != NULL && pTotalSamplesWritten != NULL && 
-		pTotalBytesWritten != NULL, AAFRESULT_NULL_PARAM );
-
-
-	aafPosition_t offset;
-	checkResult(_stream->GetPosition(&offset));
-	if ( offset + buflen > (aafPosition_t)2*1024*1024*1024-1 ) {
-	  return AAFRESULT_EOF;
-	}
+					pTotalBytesWritten != NULL, AAFRESULT_NULL_PARAM );
 
 	// Init output
 	*pTotalBytesWritten = 0;
