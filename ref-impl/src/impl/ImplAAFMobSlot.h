@@ -7,6 +7,7 @@
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
 #endif
+#include "OMProperty.h"
 
 /******************************************\
 *                                          *
@@ -28,6 +29,10 @@
 // aafUInt32,
 // AAFDataDef
 
+const int PID_MOBSLOT_NAME				= 0;
+const int PID_MOBSLOT_TRACKID			= 1;
+const int PID_MOBSLOT_PHYSICAL_TRACK	= 2;
+const int PID_MOBSLOT_SEGMENT			= 3;
 
 class ImplAAFSegment;
 
@@ -152,6 +157,10 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFMobSlotTest.cpp.
   static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 
 protected:
 	OMWideStringProperty				_name;
