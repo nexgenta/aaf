@@ -23,18 +23,14 @@ AD_IDL(//
 //
 // AAFRESULT_NOT_INITIALIZED
 //   - This object has not yet had Initialize\(\) called on it through
-//     this object's primary interface.  Note that
-//     IAAFEssenceDescriptor is a primary interface for an abstract
-//     class\, so it is not appropriate for the Initialize\(\) method
-//     to exist in this interface.  The Initialize\(\) method is
-//     available through the concrete object's primary interface.
+//     this object's primary interface.
 //)
 AD_FORWARD_DECLARATION(AAFLocator)
 AD_FORWARD_DECLARATION(EnumAAFLocators)
 AD_CLASS_UUID(94659784, 2a3c, 11D2, bf, A4, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(94659783, 2a3c, 11D2, bf, A4, 00, 60, 97, 11, 62, 12)
-AD_XCLASS_BEGIN(Abstract, StoredObject)
+AD_CLASS_BEGIN
 AD_XMETHOD1(GetNumLocators,
 			[out],
 			objPass,
@@ -70,8 +66,8 @@ AD_XMETHOD1(AppendLocator,
 			Locator to append,
 
 			Append another locator to this essence descriptor.  Use this
-  // function to add a locator to be scanned last when searching for
-  // the essence \(a secondary location for the essence\).
+  // function to add a locator to be scanned first when searching for
+  // the essence \(a new primary location\).
   // 
   // Succeeds if all of the following are true:
   // - the pLocator pointer is valid.
@@ -96,9 +92,9 @@ AD_XMETHOD1(PrependLocator,
 			pLocator,
 			Locator to append,
 
-			Append another locator to this essence descriptor.  Use this
+  // Append another locator to this essence descriptor.  Use this
   // function to add a locator to be scanned first when searching for
-  // the essence \(a new primary location for the essence\).
+  // the essence \(a secondary location for the essence\).
   // 
   // Succeeds if all of the following are true:
   // - the pLocator pointer is valid.
@@ -114,6 +110,34 @@ AD_XMETHOD1(PrependLocator,
   //
   // AAFRESULT_NULL_PARAM
   //   - pLocator is null.)
+
+
+AD_XMETHOD1(RemoveLocator,
+			[in],
+			objIn,
+			AAFLocator,
+			pLocator,
+			Locator to remove,
+			Removes the given locator from this essence descriptor.
+  // 
+  // Succeeds if all of the following are true:
+  // - the pLocator pointer is valid.
+  // - the given locator is found.
+  // 
+  // If this method fails no state will be changed.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect\, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  \(This is the only code indicating success.\)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pLocator is null.
+  //
+  // AAFRESULT_NOT_FOUND
+  //   - the given locator was not found.)
 
 
 AD_XMETHOD1(EnumAAFAllLocators,
@@ -140,4 +164,4 @@ AD_XMETHOD1(EnumAAFAllLocators,
   //
   // AAFRESULT_NULL_PARAM
   //   - ppEnum is null.)
-AD_XCLASS_END(Abstract, StoredObject)
+AD_CLASS_END
