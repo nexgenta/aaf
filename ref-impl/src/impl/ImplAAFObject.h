@@ -34,7 +34,6 @@
 //
 // Forward declarations
 //
-class ImplEnumAAFProperties;
 class ImplAAFClassDef;
 class ImplAAFIdentification;
 class ImplAAFProperty;
@@ -43,17 +42,22 @@ class ImplAAFPropertyValue;
 class ImplPropertyCollection;
 class ImplAAFDictionary;
 
+template <class T> 
+class ImplAAFEnumerator;
+typedef ImplAAFEnumerator<ImplAAFProperty> ImplEnumAAFProperties;
+
+
 #include "AAFTypes.h"
 #include "OMStorable.h"
 #include "OMFixedSizeProperty.h"
-#include "ImplAAFRoot.h"
+#include "ImplAAFStorable.h"
 
 #ifndef __ImplAAFSmartPointer_h__
 // caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 
-class ImplAAFObject : public OMStorable, public ImplAAFRoot
+class ImplAAFObject : public ImplAAFStorable
 {
 public:
   //
@@ -195,6 +199,9 @@ public:
   // the given class definition. NOTE: This call is recursive, it calls itself again
   // for the parent class of the given class until current class is a "root" class.
   virtual void InitOMProperties (ImplAAFClassDef * pClassDef);
+  
+  // Same as above for a single property (not recursive).
+  virtual OMProperty * InitOMProperty(ImplAAFPropertyDef * pPropertyDef, OMPropertySet * ps);
 
 
   // Gets the head object of the file containing this object.
@@ -224,6 +231,15 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
+
+  
+  // Overrides of ImplAAFStorable.
+  // Return true if this is a meta object
+  // NOTE: These objects will eventually owned by the Object Manager.
+  virtual bool metaObject(void) const;
+  
+  // Return true is this is a data object (Interchange object).
+  virtual bool dataObject(void) const;
 
 private:
 
