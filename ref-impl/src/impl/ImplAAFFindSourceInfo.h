@@ -65,13 +65,15 @@ public:
 	virtual AAFRESULT STDMETHODCALLTYPE
 		GetMob(ImplAAFMob **ppMob);
 	virtual AAFRESULT STDMETHODCALLTYPE
-		GetReference(aafSourceRef_t *pSourceRef);
-
-
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFFindSourceInfoTest.cpp.
-  static AAFRESULT test();
+		GetSourceReference(aafSourceRef_t *pSourceRef);
+	virtual AAFRESULT STDMETHODCALLTYPE
+		GetEditRate(aafRational_t *pEditRate);
+	virtual AAFRESULT STDMETHODCALLTYPE
+		GetLength(aafLength_t *pLength);
+//	virtual AAFRESULT STDMETHODCALLTYPE
+//		GetEnclosingOperationGroup(ImplAAFOperationGroup *pSourceRef);
+//	virtual AAFRESULT STDMETHODCALLTYPE
+//		GetEnclosingComponent(ImplAAFOperationGroup *pSourceRef);
 };
 
 #endif // ! __ImplAAFFindSourceInfo_h__
