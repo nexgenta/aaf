@@ -281,7 +281,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::insert(
 #if defined(OM_VALIDATE_WEAK_REFERENCES)
   newElement.reference().setTargetTag(targetTag());
 #endif
-  newElement.setValue(key, object);
+  newElement.setValue(object);
   _set.insert(key, newElement);
   setPresent();
 
@@ -355,12 +355,7 @@ OMWeakReferenceSetProperty<ReferencedObject>::remove(
   SetElement* element = 0;
   bool found = _set.find(identification, &element);
   ASSERT("Object found", found);
-  OMStorable* p = element->setValue(nullOMUniqueObjectIdentification, 0);
-  ReferencedObject* result = 0;
-  if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
-    ASSERT("Object is correct type", result != 0);
-  }
+  ReferencedObject* result = element->setValue(0);
   _set.remove(identification);
 
   POSTCONDITION("Object is not present", !contains(identification));
@@ -519,13 +514,7 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::find(
 
   bool result = _set.find(identification, &element);
   if (result) {
-    OMStorable* p = element->getValue();
-    if (p != 0) {
-      object = dynamic_cast<ReferencedObject*>(p);
-      ASSERT("Object is correct type", object != 0);
-    } else {
-      object = 0;
-    } 
+    object = element->getValue();
   }
 
   return result;
@@ -548,7 +537,7 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::isVoid(void) const
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
     SetElement& element = iterator.value();
-    OMStorable* object = element.getValue();
+    ReferencedObject* object = element.getValue();
     if (object != 0) {
       result = false;
       break;
@@ -611,7 +600,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::getBits(
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  const OMStorable** p = (const OMStorable**)bits;
+  const ReferencedObject** p = (const ReferencedObject**)bits;
 
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
@@ -821,31 +810,6 @@ OMWeakReferenceSetProperty<ReferencedObject>::findObject(
 
   object = obj;
   return result;
-}
-
-template <typename ReferencedObject>
-OMContainerIterator<OMWeakReferenceSetElement>*
-OMWeakReferenceSetProperty<ReferencedObject>::iterator(void) const
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::iterator");
-
-  OMSetIterator<OMUniqueObjectIdentification, SetElement>* result =
-   new OMSetIterator<OMUniqueObjectIdentification, SetElement>(_set, OMBefore);
-  ASSERT("Valid heap pointer", result != 0);
-  return result;
-}
-
-template <typename ReferencedObject>
-void
-OMWeakReferenceSetProperty<ReferencedObject>::insert(
-                                      void* key,
-                                      const OMWeakReferenceSetElement& element)
-{
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::insert");
-
-  OMUniqueObjectIdentification* k =
-                          reinterpret_cast<OMUniqueObjectIdentification*>(key);
-  _set.insert(*k, element);
 }
 
 template <typename ReferencedObject>

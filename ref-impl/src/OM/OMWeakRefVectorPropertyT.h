@@ -26,6 +26,8 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. |
+//         OMWeakReferenceVectorProperty
 #ifndef OMWEAKREFVECTORPROPERTYT_H
 #define OMWEAKREFVECTORPROPERTYT_H
 
@@ -34,6 +36,8 @@
 #include "OMWeakReferenceVectorIter.h"
 #include "OMPropertyTable.h"
 #include "OMUtilities.h"
+#include "OMStoredObject.h"
+#include "OMFile.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -49,9 +53,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::
                                               const wchar_t* name,
                                               const wchar_t* targetName,
                                               const OMPropertyId keyPropertyId)
-: OMReferenceVectorProperty(propertyId,
-                            SF_WEAK_OBJECT_REFERENCE_VECTOR,
-                            name),
+: OMWeakReferenceVector(propertyId, name),
   _targetTag(nullOMPropertyTag),
   _targetName(targetName),
   _targetPropertyPath(0),
@@ -75,9 +77,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::OMWeakReferenceVectorProperty(
                                         const wchar_t* name,
                                         const OMPropertyId keyPropertyId,
                                         const OMPropertyId* targetPropertyPath)
-: OMReferenceVectorProperty(propertyId,
-                            SF_WEAK_OBJECT_REFERENCE_VECTOR,
-                            name),
+: OMWeakReferenceVector(propertyId, name),
   _targetTag(nullOMPropertyTag),
   _targetName(0),
   _targetPropertyPath(0),
@@ -248,37 +248,6 @@ size_t OMWeakReferenceVectorProperty<ReferencedObject>::count(void) const
   return _vector.count();
 }
 
-  // @mfunc Get the size of this <c OMWeakReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @parm The size of this <c OMWeakReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-void OMWeakReferenceVectorProperty<ReferencedObject>::getSize(
-                                                            size_t& size) const
-{
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMWeakReferenceVectorProperty<ReferencedObject>::count");
-
-  size = count();
-}
-
-  // @mfunc Get the size of this <c OMWeakReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the referenced
-  //          (contained) object. This type must be a descendant of
-  //          <c OMStorable>.
-  //     @rdesc The size of this <c OMWeakReferenceVectorProperty>.
-  //     @this const
-template <typename ReferencedObject>
-size_t OMWeakReferenceVectorProperty<ReferencedObject>::getSize(void) const
-{
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::getSize");
-  OBSOLETE("OMWeakReferenceVectorProperty<ReferencedObject>::count");
-
-  return count();
-}
-
   // @mfunc Set the value of this <c OMWeakReferenceVectorProperty>
   //        at position <p index> to <p object>.
   //   @tcarg class | ReferencedObject | The type of the referenced
@@ -296,7 +265,7 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt");
 
-  PRECONDITION("Valid index", index <= count());
+  PRECONDITION("Valid index", index < count());
   PRECONDITION("Valid object", object != 0);
 #if defined(OM_VALIDATE_WEAK_REFERENCES)
   PRECONDITION("Source container object attached to file",
@@ -305,12 +274,6 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
   PRECONDITION("Source container object and target object in same file",
                                         container()->file() == object->file());
 #endif
-  if (index == count()) {
-    // This is an append, make sure the new element is defined.
-    OMUniqueObjectIdentification key = object->identification();
-    VectorElement newElement(this, key, _targetTag);
-    _vector.append(newElement);
-  }
 
   // Set the vector to contain the new object
   //
@@ -438,7 +401,9 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::appendValue(
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::appendValue");
 
-  setValueAt(object, count());
+  PRECONDITION("Valid object", object != 0);
+
+  insertAt(object, count());
 
 }
 
@@ -453,6 +418,8 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::prependValue(
                                                 const ReferencedObject* object)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::prependValue");
+
+  PRECONDITION("Valid object", object != 0);
 
   insertAt(object, 0);
 }
@@ -470,6 +437,8 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::insert(
                                                 const ReferencedObject* object)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::insert");
+
+  PRECONDITION("Valid object", object != 0);
 
   appendValue(object);
 }
@@ -575,9 +544,9 @@ ReferencedObject*
 OMWeakReferenceVectorProperty<ReferencedObject>::removeAt(const size_t index)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::removeAt");
-  PRECONDITION("Valid index", index <= count());
+  PRECONDITION("Valid index", index < count());
 
-  ReferencedObject* result = setValueAt(0, index);
+  ReferencedObject* result = clearValueAt(index);
   _vector.removeAt(index);
   return result;
 }
@@ -713,6 +682,9 @@ bool OMWeakReferenceVectorProperty<ReferencedObject>::findIndex(
                            const ReferencedObject* object, size_t& index) const
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::findIndex");
+
+  PRECONDITION("Valid object", object != 0);
+
   bool result = false;
 
   VectorIterator iterator(_vector, OMBefore);
@@ -781,9 +753,9 @@ bool OMWeakReferenceVectorProperty<ReferencedObject>::isVoid(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
 template <typename ReferencedObject>
-void OMWeakReferenceVectorProperty<ReferencedObject>::remove(void)
+void OMWeakReferenceVectorProperty<ReferencedObject>::removeProperty(void)
 {
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::remove");
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::removeProperty");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
   PRECONDITION("Property is void", isVoid());
@@ -799,10 +771,11 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::remove(void)
   //   @rdesc The size of the raw bits of this
   //          <c OMWeakReferenceVectorProperty> in bytes.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 size_t OMWeakReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::bitsSize");
+  OBSOLETE("methods on class OMReferenceVectorProperty");
 
   return sizeof(ReferencedObject*) * count();
 }
@@ -816,12 +789,13 @@ size_t OMWeakReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
   //   @parm The address of the buffer into which the raw bits are copied.
   //   @parm size_t | size | The size of the buffer.
   //   @this const
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMWeakReferenceVectorProperty<ReferencedObject>::getBits(
                                                       OMByte* bits,
                                                       size_t ANAME(size)) const
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::getBits");
+  OBSOLETE("methods on class OMReferenceVectorProperty");
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
@@ -846,22 +820,27 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::getBits(
   //          <c OMStorable>.
   //   @parm The address of the buffer from which the raw bits are copied.
   //   @parm The size of the buffer.
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void OMWeakReferenceVectorProperty<ReferencedObject>::setBits(
                                                             const OMByte* bits,
                                                             size_t size)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::setBits");
+  OBSOLETE("methods on class OMReferenceVectorProperty");
 
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  size_t count = size / sizeof(ReferencedObject*);
+  size_t elementCount = size / sizeof(ReferencedObject*);
   ReferencedObject** p = (ReferencedObject**)bits;
 
-  for (size_t i = 0; i < count; i++) {
+  for (size_t i = 0; i < elementCount; i++) {
     ReferencedObject* object = p[i];
-    setValueAt(object, i);
+    if (i < count()) {
+      setValueAt(object, i);
+    } else {
+      appendValue(object);
+    }
   }
 
 }
@@ -874,9 +853,10 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::setBits(
   //   @parm The <c OMObject> to insert.
 template <typename ReferencedObject>
 void
-OMWeakReferenceVectorProperty<ReferencedObject>::insert(const OMObject* object)
+OMWeakReferenceVectorProperty<ReferencedObject>::insertObject(
+                                                        const OMObject* object)
 {
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::insert");
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::insertObject");
 
   PRECONDITION("Valid object", object != 0);
 
@@ -896,10 +876,10 @@ OMWeakReferenceVectorProperty<ReferencedObject>::insert(const OMObject* object)
   //   @this const
 template <typename ReferencedObject>
 bool
-OMWeakReferenceVectorProperty<ReferencedObject>::containsValue(
+OMWeakReferenceVectorProperty<ReferencedObject>::containsObject(
                                                   const OMObject* object) const
 {
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::containsValue");
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::containsObject");
 
   PRECONDITION("Valid object", object != 0);
 
@@ -917,10 +897,10 @@ OMWeakReferenceVectorProperty<ReferencedObject>::containsValue(
   //   @parm The <c OMObject> to remove.
 template <typename ReferencedObject>
 void
-OMWeakReferenceVectorProperty<ReferencedObject>::removeValue(
+OMWeakReferenceVectorProperty<ReferencedObject>::removeObject(
                                                         const OMObject* object)
 {
-  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::removeValue");
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::removeObject");
 
   PRECONDITION("Valid object", object != 0);
 
@@ -928,6 +908,19 @@ OMWeakReferenceVectorProperty<ReferencedObject>::removeValue(
   ASSERT("Object is correct type", p != 0);
 
   removeValue(p);
+}
+
+  // @mfunc Remove all objects from this <c OMWeakReferenceVectorProperty>.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+template <typename ReferencedObject>
+void OMWeakReferenceVectorProperty<ReferencedObject>::removeAllObjects(void)
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::removeAllObjects");
+
+  _vector.clear();
+  POSTCONDITION("All objects removed", count() == 0);
 }
 
   // @mfunc Create an <c OMReferenceContainerIterator> over this
@@ -968,9 +961,12 @@ OMWeakReferenceVectorProperty<ReferencedObject>::setObjectAt(
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::setObjectAt");
 
   PRECONDITION("Valid index", index < count());
+  PRECONDITION("Valid object", object != 0);
 
-  // TBS
-  return 0;
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  return setValueAt(p, index);
 }
 
   // @mfunc The value of this <c OMWeakReferenceVectorProperty>
@@ -988,10 +984,9 @@ OMWeakReferenceVectorProperty<ReferencedObject>::getObjectAt(
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::getObjectAt");
 
-  PRECONDITION("Valid index", index <= count());
+  PRECONDITION("Valid index", index < count());
 
-  // TBS
-  return 0;
+  return valueAt(index);
 }
 
   // @mfunc Append the given <p OMObject> <p object> to
@@ -1007,7 +1002,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::appendObject(
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::appendObject");
 
-  PRECONDITION("Valid object ", object != 0);
+  PRECONDITION("Valid object", object != 0);
 
   insertObjectAt(object, count());
 }
@@ -1025,7 +1020,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::prependObject(
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::prependObject");
 
-  PRECONDITION("Valid object ", object != 0);
+  PRECONDITION("Valid object", object != 0);
 
   insertObjectAt(object, 0);
 }
@@ -1048,8 +1043,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::removeObjectAt(
 
   PRECONDITION("Valid index", index < count());
 
-  // TBS
-  return 0;
+  return removeAt(index);
 }
 
   // @mfunc Insert <p object> into this <c OMWeakReferenceVectorProperty>
@@ -1069,12 +1063,15 @@ OMWeakReferenceVectorProperty<ReferencedObject>::insertObjectAt(
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::insertObjectAt");
 
   PRECONDITION("Valid index", index <= count());
-  PRECONDITION("Valid object ", object != 0);
+  PRECONDITION("Valid object", object != 0);
 
-  // TBS
+  const ReferencedObject* p = dynamic_cast<const ReferencedObject*>(object);
+  ASSERT("Object is correct type", p != 0);
+
+  insertAt(p, index);
 }
 
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 OMPropertyTag
 OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
 {
@@ -1092,7 +1089,26 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
   return _targetTag;
 }
 
-template<typename ReferencedObject>
+template <typename ReferencedObject>
+OMPropertyId
+OMWeakReferenceVectorProperty<ReferencedObject>::keyPropertyId(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::keyPropertyId");
+
+  return _keyPropertyId;
+}
+
+template <typename ReferencedObject>
+void
+OMWeakReferenceVectorProperty<ReferencedObject>::setTargetTag(
+                                                       OMPropertyTag targetTag)
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::setTargetTag");
+
+  _targetTag = targetTag;
+}
+
+template <typename ReferencedObject>
 OMPropertyId*
 OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath(void) const
 {
@@ -1109,7 +1125,7 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath(void) const
   return _targetPropertyPath;
 }
 
-template<typename ReferencedObject>
+template <typename ReferencedObject>
 void
 OMWeakReferenceVectorProperty<ReferencedObject>::clearTargetTag(void) const
 {
