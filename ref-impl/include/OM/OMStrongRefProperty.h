@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,14 +29,9 @@
 #ifndef OMSTRONGREFPROPERTY_H
 #define OMSTRONGREFPROPERTY_H
 
-#if defined (_MSC_VER)
-  // - 'this' : used in base member initializer list
-  //
-#pragma warning(disable:4355) // Gak !
-#endif
-
 #include "OMDataTypes.h"
-#include "OMPropertyBase.h"
+#include "OMProperty.h"
+#include "OMRefProperty.h"
 #include "OMObjectReference.h"
 
   // @class Persistent strong reference (contained object)
@@ -46,13 +41,13 @@
   //          <c OMStorable>.
   //   @base public | <c OMReferenceProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceProperty :
-                                 public OMReferenceProperty<ReferencedObject> {
+class OMStrongReferenceProperty : public OMReferenceProperty {
 public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMStrongReferenceProperty(const OMPropertyId propertyId, const char* name);
+  OMStrongReferenceProperty(const OMPropertyId propertyId,
+                            const wchar_t* name);
 
     // @cmember Destructor.
   virtual ~OMStrongReferenceProperty(void);
@@ -62,6 +57,9 @@ public:
 
     // @cmember Set the value of this <c OMStrongReferenceProperty>.
   virtual ReferencedObject* setValue(const ReferencedObject* object);
+
+    // @cmember Clear the value of this <c OMStrongReferenceProperty>.
+  virtual ReferencedObject* clearValue(void);
 
     // @cmember Assignment operator.
   OMStrongReferenceProperty<ReferencedObject>& operator =
@@ -98,7 +96,7 @@ public:
   virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMStrongReferenceProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
     // @cmember Get the raw bits of this <c OMStrongReferenceProperty>. The
     //          raw bits are copied to the buffer at address <p bits>
@@ -109,6 +107,12 @@ public:
     //          bits are copied from the buffer at address <p bits> which
     //          is <p size> bytes in size.
   virtual void setBits(const OMByte* bits, size_t size);
+
+    // @cmember Get the value of this <c OMStrongReferenceProperty>.
+  virtual OMObject* getObject(void) const;
+
+    // @cmember set the value of this <c OMStrongReferenceProperty>.
+  virtual OMObject* setObject(const OMObject* object);
 
     // @cmember The value of this <c OMStrongReferenceProperty>
     //          as an <c OMStorable>.

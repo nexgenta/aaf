@@ -31,7 +31,7 @@
 
 #include "OMVector.h"
 #include "OMContainerElement.h"
-#include "OMStrongReferenceVector.h"
+#include "OMRefVectorProperty.h"
 
 template <typename ReferencedObject>
 class OMStrongReferenceVectorIterator;
@@ -46,10 +46,9 @@ class OMVectorIterator;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @base public | <c OMStrongReferenceVector>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+  //   @base public | <c OMReferenceVectorProperty>
 template <typename ReferencedObject>
-class OMStrongReferenceVectorProperty : public OMStrongReferenceVector {
+class OMStrongReferenceVectorProperty : public OMReferenceVectorProperty {
 public:
   // @access Public members.
 
@@ -77,6 +76,12 @@ public:
     // @cmember The number of <p ReferencedObject>s in this
     //          <c OMStrongReferenceVectorProperty>.
   size_t count(void) const;
+
+    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
+  void getSize(size_t& size) const;
+
+    // @cmember Get the size of this <c OMStrongReferenceVectorProperty>.
+  size_t getSize(void) const;
 
     // @cmember Set the value of this <c OMStrongReferenceVectorProperty>
     //          at position <p index> to <p object>.
@@ -164,7 +169,7 @@ public:
     //          <c OMStrongReferenceVectorProperty> so that it
     //          can contain at least <p capacity> <p ReferencedObject>s
     //          without having to be resized.
-  virtual void grow(const size_t capacity);
+  void grow(const size_t capacity);
 
   // Optional property interface
 
@@ -205,10 +210,6 @@ public:
     //          <c OMStrongReferenceVectorProperty>.
   virtual void removeObject(const OMObject* object);
 
-    // @cmember Remove all objects from this
-    //          <c OMStrongReferenceVectorProperty>.
-  virtual void removeAllObjects(void);
-
     // @cmember Create an <c OMReferenceContainerIterator> over this
     //          <c OMStrongReferenceVectorProperty>.
   virtual OMReferenceContainerIterator* createIterator(void) const;
@@ -242,22 +243,9 @@ public:
     //          higher are shifted up one index position.
   virtual void insertObjectAt(const OMObject* object, const size_t index);
 
-  virtual OMContainerIterator<OMStrongReferenceVectorElement>*
-                                                          iterator(void) const;
-
-  virtual void insert(const size_t index,
-                      const OMStrongReferenceVectorElement& element);
-
-  // Copying.
-
-  virtual void shallowCopyTo(OMProperty* destination) const;
-
-  virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const;
-
 private:
 
-  typedef OMStrongReferenceVectorElement VectorElement;
+  typedef OMStrongReferenceVectorElement<ReferencedObject> VectorElement;
 
   typedef OMVectorIterator<VectorElement> VectorIterator;
 
@@ -265,15 +253,6 @@ private:
   OMVector<VectorElement> _vector;
 
   friend class OMStrongReferenceVectorIterator<ReferencedObject>;
-
-    // OMStrongReferenceVectorProperty can't be assigned - declare but
-    // don't define
-  OMStrongReferenceVectorProperty& operator = (
-                                   const OMStrongReferenceVectorProperty& rhs);
-
-    // OMStrongReferenceVectorProperty can't be copied - declare but
-    // don't define
-  OMStrongReferenceVectorProperty(const OMStrongReferenceVectorProperty& rhs);
 
 };
 
