@@ -25,8 +25,6 @@ class AAFObject;
 #include "OMStorable.h"
 #include "ImplAAFRoot.h"
 
-#include <assert.h>
-
 class ImplAAFObject : public OMStorable, public ImplAAFRoot
 {
 public:
@@ -38,53 +36,68 @@ public:
   virtual ~ImplAAFObject ();
 
 
-// AxD_XMETHOD1(itsFile,
-// 			[out],objOut,AAFFile,aFile, ,
-// 			Returns the AAFFile containing the object in persistent
-//   // store\, or NULL for transient objects.)
-
   //****************
-  // isForeignByteOrder()
+  // SetGeneration()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    isForeignByteOrder
-        (aafBool*  isForeign);  //@parm [out] 
+    SetGeneration
+		// @parm [in] Generation ID to which this object is to be set
+        (aafUID_t *  pGeneration);
 
-  //@comm This routine is optimized in the common case (objects byte order == file byte order).	
-  //@comm Replaces ompvtIsForeignByteOrder
-
-  //****************
-  // Delete()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Delete ();
-
-  //@comm Replaces omfsObjectDelete
 
   //****************
-  // IsTypeOf()
+  // GetGeneration()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    IsTypeOf
-        (aafUID_t      aClass,   //@parm [in] AUID corresponding to a class
-		 aafBool*  Result);  //@parm [out] 
+    GetGeneration
+		// @parm [out] Generation ID into which this object's generation is to be written
+        (aafUID_t *  pGeneration);
 
-  // tjb - this is temporary and should be removed
-  virtual const OMClassId& classId(void) const
-  {
-    // This function must be overidden by subclasses. It is pure
-    // virtual on OMStorable. It is defined here since some dodo
-    // generated code attempts to instantiate this class.
-    //
-    assert(!"This code should not be reached.");
-    return nullOMClassId;
-  }
+
+  //***********************************************************
+  // METHOD NAME: GetStoredByteOrder()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEndian | GetStoredByteOrder |
+  // Returns the "Endian-ness" in which the current object was or will
+  // be stored.  If this is a transient object (i.e., one which has
+  // not been persisted) then it will return the native byte order of
+  // the platform on which this is running.
+  //
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  GetStoredByteOrder (
+    // @parm [out] aafByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    aafByteOrder_t *  pOrder
+  );
+
+
+
+  //***********************************************************
+  // METHOD NAME: GetNativeByteOrder()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEndian | GetNativeByteOrder |
+  // Returns the native "Endian-ness" of the platform on which this is
+  // running.
+  //
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  GetNativeByteOrder (
+    // @parm [out] aafByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    aafByteOrder_t *  pOrder
+  );
+
+
+  OMDECLARE_STORABLE(AAFObject)
  
+
 public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFObjectTest.cpp.
   static AAFRESULT test();
-
 };
 
 #endif // ! __ImplAAFObject_h__
