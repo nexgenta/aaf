@@ -58,7 +58,7 @@ ImplAAFNetworkLocator::GetPathBufLen (aafInt32 *  pLen)
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  *pLen = _path.length()+1;
+  *pLen = _path.size();
   return AAFRESULT_SUCCESS;
 }
 
@@ -82,4 +82,16 @@ ImplAAFNetworkLocator::SetPath (aafWChar *  pPathBuf)
 extern "C" const aafClassID_t CLSID_AAFNetworkLocator;
 
 OMDEFINE_STORABLE(ImplAAFNetworkLocator, CLSID_AAFNetworkLocator);
+
+// Cheat!  We're using this object's CLSID instead of object class...
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFNetworkLocator::GetObjectClass(aafUID_t * pClass)
+{
+  if (! pClass)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  memcpy (pClass, &CLSID_AAFNetworkLocator, sizeof (aafClassID_t));
+  return AAFRESULT_SUCCESS;
+}
 
