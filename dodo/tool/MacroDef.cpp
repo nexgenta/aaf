@@ -11,9 +11,7 @@
 #include "MacroDef.h"
 #endif
 
-#if !defined(macintosh)
 #include <assert.h>
-#endif
 #include <string.h>
 
 
@@ -186,20 +184,6 @@ const char * MacroDef::InvErrString (eInvokeMacroStat stat)
 int MacroDef::GetNumArgs () const
 {
   return _numArgs;
-}
-
-
-char MacroDef::GetInitial () const
-{
-  const char * rep = _name.GetCString();
-  if (! rep)
-	{
-	  return '\0';
-	}
-  else
-	{
-	  return *rep;
-	}
 }
 
 
