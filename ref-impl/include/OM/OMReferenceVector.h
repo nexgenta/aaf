@@ -43,6 +43,7 @@ class OMVectorIterator;
   //        Objects are accessible by index. The order of objects is
   //        determined externally. Duplicate objects are allowed.
   //   @tcarg class | ReferencedObject | The type of the referenced object.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMReferenceVector {
 public:
@@ -62,6 +63,10 @@ public:
     //          at position <p index> to <p object>.
   ReferencedObject* setValueAt(const ReferencedObject* object,
                                const size_t index);
+
+    // @cmember Set the value of this <c OMReferenceVector>
+    //          at position <p index> to 0.
+  ReferencedObject* clearValueAt(const size_t index);
 
     // @cmember The value of this <c OMReferenceVector> at position <p index>.
   ReferencedObject* valueAt(const size_t index) const;

@@ -25,47 +25,43 @@
 *
 ************************************************************************/
 
-// @doc OMINTERNAL
-#ifndef OMOBJECTDIRECTORY_H
-#define OMOBJECTDIRECTORY_H
+// @doc OMEXTERNAL
+#ifndef OMREFSETPROPERTY_H
+#define OMREFSETPROPERTY_H
 
-#include <stddef.h>
+#include "OMContainerProperty.h"
 
-class OMStorable;
-
-  // @class Debug only data structure for tracking objects by name.
+  // @class Abstract base class for persistent object reference set
+  //        properties supported by the Object Manager.
+  //   @base public | <c OMProperty>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMObjectDirectory {
+class OMReferenceSetProperty : public OMContainerProperty {
 public:
+  // @access Public members.
 
-  OMObjectDirectory(void);
+    // @cmember Constructor.
+  OMReferenceSetProperty(const OMPropertyId propertyId,
+                         const OMStoredForm storedForm,
+                         const wchar_t* name);
 
-  ~OMObjectDirectory(void);
+    // @cmember Destructor.
+  virtual ~OMReferenceSetProperty(void);
 
-  //
-  //
-  bool lookup(const wchar_t* name, const OMStorable*& p) const;
+    // @cmember Remove the <c OMObject> identified by <p identification>
+    //          from this <c OMReferenceSetProperty>.
+  virtual OMObject* remove(void* identification) = 0;
 
-  //
-  //
-  void insert(const wchar_t* name, const OMStorable* p);
+    // @cmember Does this <c OMReferenceSetProperty> contain an
+    //          <c OMObject> identified by <p identification> ?
+  virtual bool contains(void* identification) const = 0;
 
-  // Count of valid entries.
-  //
-  int count(void) const;
-
-  void dump(void) const;
-
-private:
-
-  struct TableEntry {
-    OMStorable* _object;
-    wchar_t* _name;
-  };
-  int _capacity;        // Number of potential entries.
-  int _current;         // Index of first unoccupied entry.
-  TableEntry* _table;   // Dynamically allocated array.
+    // @cmember Find the <c OMObject> in this <c OMReferenceSetProperty>
+    //          identified by <p identification>.  If the object is found
+    //          it is returned in <p object> and the result is < e bool.true>.
+    //          If the object is not found the result is <e bool.false>.
+  virtual bool findObject(void* identification, OMObject*& object) const = 0;
 
 };
 
 #endif
+

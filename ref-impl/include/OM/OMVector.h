@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -39,6 +39,7 @@
   //   @tcarg class | Element | The type of an <c OMVector> element.
   //          This type must support operator = and operator ==.
   //   @base public | <c OMContainer>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Element>
 class OMVector : public OMContainer<Element> {
 public:
@@ -54,12 +55,17 @@ public:
   virtual void insert(const Element value);
 
     // @cmember Does this <c OMVector> contain <p value> ?
-  virtual bool contains(const Element value) const;
+  virtual bool containsValue(const Element value) const;
 
     // @cmember The number of elements in this <c OMVector>.
     //          <mf OMVector::count> returns the actual number
     //          of elements in the <c OMVector>.
   size_t count(void) const;
+
+    // @cmember Remove <p value> from this <c OMVector>.
+    //          In the case of duplicate values, the one with the lowest
+    //          index is removed.
+  virtual void removeValue(const Element value);
 
     // @cmember The capacity of this <c OMVector>.
     //          <mf OMVector::capacity> returns the potential
@@ -69,12 +75,12 @@ public:
     // @cmember Increase the capacity of this <c OMVector> so that it
     //          can contain at least <p capacity> elements without
     //          having to be resized.
-  virtual void grow(const size_t capacity);
+  virtual void grow(size_t capacity);
 
     // @cmember Free any unused capacity in this <c OMVector> while
     //          ensuring that it can contain at least <p capacity>
     //          elements.
-  virtual void shrink(const size_t capacity);
+  virtual void shrink(size_t capacity);
 
     // @cmember Is this <c OMVector> full ?
   virtual bool full(void) const;
@@ -94,6 +100,10 @@ public:
     // @cmember Get the value of the <p Element> at
     //          position <p index> in this <c OMVector>.
   Element& getAt(const size_t index) const;
+
+    // @cmember The value of the <p Element> at
+    //          position <p index> in this <c OMVector>.
+  Element& valueAt(const size_t index) const;
 
     // @cmember Insert <p value> into this <c OMVector> at
     //          position <p index>. Existing values in this
@@ -127,6 +137,13 @@ public:
     //          from this <c OMVector>. Existing values in this
     //          <c OMVector> are shifted down one index position.
   void removeFirst(void);
+
+    // @cmember The index of the element with value <p value>.
+    //          In the case of duplicate values, lowest index is returned.
+  size_t indexOfValue(const Element value) const;
+
+    // @cmember The number of elements with value <p value>.
+  size_t countValue(const Element value) const;
 
 private:
   // @access Private members.
