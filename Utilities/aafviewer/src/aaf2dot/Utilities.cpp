@@ -1,5 +1,5 @@
 /*
- * $Id: Utilities.cpp,v 1.4 2004/06/01 13:43:00 stuart_hc Exp $ $Name:  $
+ * $Id: Utilities.cpp,v 1.5 2004/06/01 15:36:34 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -26,6 +26,8 @@
 #include <iostream>
 #include <assert.h>
 using namespace std;
+
+#include <ctype.h>
 
 #include <AxMetaDef.h>
 #include <AxUtil.h>
@@ -500,32 +502,53 @@ std::string ProductVersionToString( _aafProductVersion_t productVersion )
 string
 AxStringToString( AxString axString )
 {
-   string name;
-	
-   AxString::iterator iter;
-   for ( iter=axString.begin(); iter!=axString.end(); iter++ )
-   {
-      name += *iter;
-   }
-
-   return name;
+   return AxStringUtil::wctomb(axString);
 }
 
 
 //-----------------------------------------------------------------------------
 string 
-ProcessStringForQuoting( string s )
+ProcessRecordString( string s )
 {
    string ret = s;
    unsigned index = 0;
    while ( index < ret.size() )
    {
-      // escape newlines
+      // escape special characters
       if ( ret[ index ] == '\n' )
       {
 	 ret.erase( index, 1 );
 	 ret.insert( index, "\\n" );
+	 index += 2;
       }
+      // escape special characters in quotes
+      else if ( ret[ index ] == '"' ||
+		ret[ index ] == '\\' ||
+		ret[ index ] == '<' ||
+		ret[ index ] == '>' )
+      {
+	 ret.insert( index, "\\" );
+	 index += 1;
+      }
+      // replace special Record Node characters with "?"
+      else if ( ret[ index ] == '{' ||
+		ret[ index ] == '}' ||
+		ret[ index ] == '=' ||
+		ret[ index ] == '|' )
+      {
+	 ret[index] = '?';
+      }
+      // tab etc. become spaces
+      else if (isspace((unsigned char)ret[index]))
+      {
+	 ret[index] = ' ';
+      }
+      // replace non-printable or control characters with "?"
+      else if (!isprint((unsigned char)ret[index]) || iscntrl((unsigned char)ret[index]))
+      {
+	 ret[index] = '?';
+      }
+
       index++;
    }
 
@@ -550,10 +573,39 @@ LimitAttributeSize( string attribute, int maxLength, int maxWidth )
 
    // spread value over lines.
    int newLineIndex = maxWidth;
-   while ( newLineIndex < (int)retAttribute.size() )
+   int index = 0;
+   bool escape = false;
+   while ( index < (int)retAttribute.size() )
    {
-      retAttribute.insert( newLineIndex, "\\n" );
-      newLineIndex += maxWidth + 2;
+      if (index == newLineIndex)
+      {
+	 if (escape)
+	 {
+	    index++;
+	    if (index < retAttribute.size())
+	    {
+	       retAttribute.insert(index,"\\n");
+	    }
+	 }
+	 else
+	 {
+	    retAttribute.insert(index, "\\n");
+	 }
+	 newLineIndex = index + maxWidth + 3;
+      }
+      else 
+      {
+	 if (retAttribute[index] == '\\')
+	 {
+	    escape = !escape;
+	 }
+	 else
+	 {
+	    escape = false;
+	 }
+      }
+
+      index++;
    }
 
    return retAttribute;
