@@ -3,6 +3,16 @@
 #ifndef __ImplAAFFileDescriptor_h__
 #define __ImplAAFFileDescriptor_h__
 
+#include "OMStorable.h"
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 /******************************************\
 *                                          *
@@ -14,11 +24,19 @@
 \******************************************/
 
 
+
+
+
 #ifndef __ImplAAFEssenceDescriptor_h__
 #include "ImplAAFEssenceDescriptor.h"
 #endif
 
+#include "OMProperty.h"
 
+const int PID_FILE_DESC_SAMPLERATE      = 1;
+const int PID_FILE_DESC_LENGTH		    = 2;
+const int PID_FILE_DESC_INCONTAINER     = 3;
+const int PID_FILE_DESC_CONTAINERFMT    = 4;
 
 class ImplAAFFileDescriptor : public ImplAAFEssenceDescriptor
 {
@@ -34,10 +52,7 @@ public:
 
 //@access Public Members
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize ();
-
-
+/****/
   //****************
   // SetLength()
   //
@@ -46,7 +61,7 @@ public:
 		// @parm [in] length of the essence in samples
         (aafLength_t  length);
 
-
+/****/
   //****************
   // GetLength()
   //
@@ -55,7 +70,7 @@ public:
 		// @parm [out] returns length of the essence in samples
         (aafLength_t *  pLength);
 
-
+/****/
   //****************
   // SetIsInContainer()
   //
@@ -64,7 +79,7 @@ public:
 		// @parm [in] is this AAF or raw essence
         (aafBool  isAAF);
 
-
+/****/
   //****************
   // GetIsInContainer()
   //
@@ -73,7 +88,7 @@ public:
 		// @parm [out] is this AAF or raw medi
         (aafBool*  pIsAAF);
 
-
+/****/
   //****************
   // SetSampleRate()
   //
@@ -82,7 +97,7 @@ public:
 		// @parm [in] sample rate of the essence
         (aafRational_t *  pRate);
 
-
+/****/
   //****************
   // GetSampleRate()
   //
@@ -91,7 +106,7 @@ public:
 		// @parm [out] sample rate of the essence
         (aafRational_t*  pRate);
 
-
+/****/
   //****************
   // SetContainerFormat()
   //
@@ -100,7 +115,7 @@ public:
 		// @parm [in] Identifies the file format
         (aafUID_t *  pFormat);
 
-
+/****/
   //****************
   // GetContainerFormat()
   //
@@ -120,11 +135,6 @@ public:
   // in /test/ImplAAFFileDescriptorTest.cpp.
   static AAFRESULT test();
 
-public:
-	// Functions internal to the toolkit
-	virtual AAFRESULT STDMETHODCALLTYPE
-		GetOwningMobKind (aafMobKind_t *pMobKind);
-
 private:
 	OMFixedSizeProperty<aafRational_t>	_sampleRate;
 	OMFixedSizeProperty<aafLength_t>	_length;
@@ -133,3 +143,4 @@ private:
 };
 
 #endif // ! __ImplAAFFileDescriptor_h__
+

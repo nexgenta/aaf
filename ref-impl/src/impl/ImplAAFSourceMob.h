@@ -34,8 +34,7 @@ class ImplAAFSegment;
 
 #include "OMProperty.h"
 
-
-const int FULL_LENGTH = -1;
+const int PID_SOURCEMOB_EDESC	= 5;
 
 class ImplAAFSourceMob : public ImplAAFMob
 {
@@ -48,26 +47,34 @@ public:
   virtual ~ImplAAFSourceMob ();
 
 
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Initialize ();
-
-
   //****************
-  // GetEssenceDescriptor()
+  // GetEssenceDescription()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetEssenceDescriptor
+    GetEssenceDescription
 		// @parm [out] Returned Essence Descriptor object
         (ImplAAFEssenceDescriptor ** ppMdes);
 
 
   //****************
-  // SetEssenceDescriptor()
+  // SetEssenceDescription()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetEssenceDescriptor
+    SetEssenceDescription
 		// @parm [in] Essence Descriptor object
         (ImplAAFEssenceDescriptor * pMdes);
+
+
+  //****************
+  // Setup()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Setup
+	    (// @parm [in] Name of new Source Mob
+         aafWChar *  pName,
+
+		 // @parm [in] ClassID of Essence Descriptor
+		 aafClassID_t *  pMdesClass);
 
 
   //****************
@@ -82,17 +89,17 @@ public:
 		 aafLength_t  length,
 
 		 // @parm [in] Data kind of the new slot
-         aafUID_t * dataDef,
+         ImplAAFDataDef * dataDef,
 
 		 // @parm [in] Edit rate of the new slot
 		 aafRational_t  editRate);
 
 
   //****************
-  // AppendTimecodeSlot()
+  // AddTimecodeClip()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendTimecodeSlot
+    AddTimecodeClip
         (// @parm [in] Edit rate of Timecode slot
 		 aafRational_t  editrate,
 
@@ -107,10 +114,10 @@ public:
 
 
   //****************
-  // AppendEdgecodeSlot()
+  // AddEdgecodeClip()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendEdgecodeSlot
+    AddEdgecodeClip
         (// @parm [in] Edit rate of the Edgecode slot
 		 aafRational_t  editrate,
 
@@ -138,7 +145,7 @@ public:
   // ValidateTimecodeRange()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SpecifyValidCodeRange
+    ValidateTimecodeRange
         (// @parm [in] Data kind for the slot to be added
 		 ImplAAFDataDef * pEssenceKind,
 
@@ -156,29 +163,10 @@ public:
 
 
   //****************
-  // NewPhysSourceRef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    NewPhysSourceRef
-        (// @parm [in] Edit rate of slot to contain reference
-		 aafRational_t  editrate,
-
-		 // @parm [in] SlotID of slot to contain reference
-		 aafSlotID_t  aMobSlot,
-
-		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
-
-		aafSourceRef_t  ref,
-
-		 // @parm [in] Length of the Source Clip
-         aafLength_t  srcRefLength);
-
-  //****************
   // AddPhysSourceRef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendPhysSourceRef
+    AddPhysSourceRef
         (// @parm [in] Edit rate of slot to contain reference
 		 aafRational_t  editrate,
 
@@ -186,30 +174,43 @@ public:
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
+         ImplAAFDataDef * pEssenceKind,
 
-		aafSourceRef_t  ref,
+		 // @parm [in] Physical Source Mob that is being referenced
+		 ImplAAFSegment * pSourceRefObj,
+
+		 // @parm [in] Offset in the physical Source Mob
+         aafPosition_t  srcRefOffset,
+
+		 // @parm [in] SlotID of slot in physical Source Mob
+		 aafInt32  srcRefSlot,
 
 		 // @parm [in] Length of the Source Clip
          aafLength_t  srcRefLength);
+
 
   //****************
   // AddPulldownRef()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     AddPulldownRef
-        (aafAppendOption_t  addType,
-		
-		// @parm [in] Edit rate of slot to contain reference
+        (// @parm [in] Edit rate of slot to contain reference
 		 aafRational_t  editrate,
 
 		 // @parm [in] SlotID of slot to contain reference
 		 aafSlotID_t  aMobSlot,
 
 		 // @parm [in] Data kind of slot to contain reference
-         aafUID_t * pEssenceKind,
+         ImplAAFDataDef * pEssenceKind,
 
-		aafSourceRef_t  ref,
+		 // @parm [in] Physical Source Mob that is being referenced
+		 ImplAAFSegment * pSourceRefObj,
+
+		 // @parm [in] Offset in the physical Source Mob
+         aafPosition_t  srcRefOffset,
+
+		 // @parm [in] SlotID of slot in physical Source Mob
+		 aafInt32  srcRefSlot,
 
 		 // @parm [in] Length of the Source Clip in the Source Mob
          aafLength_t  srcRefLength,
@@ -274,6 +275,9 @@ public:
     // @parm [in] aafEffectChoice_t * | pEffectChoice | Effect Choice
     aafEffectChoice_t *  pEffectChoice,
 
+    // @parm [out] AAFComponent | ppThisCpnt | The found component
+    ImplAAFComponent ** ppThisCpnt,
+
     // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
     ImplAAFFindSourceInfo ** ppSourceInfo
   );
@@ -319,9 +323,6 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFSourceMobTest.cpp.
   static AAFRESULT test();
-
-  // SDK Internal
-  virtual AAFRESULT ReconcileMobLength(void);
 
 private:
 AAFRESULT FindTimecodeClip(
