@@ -1,11 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 /*************************************************************************
  * 
@@ -38,6 +56,8 @@
 #include "ImplAAFObjectCreation.h"
 #include "aafErr.h"
 #include "ImplAAFPluginDescriptor.h"
+#include "aafUtils.h"
+#include "AAFDefUIDs.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFPluginDescriptors;
 
@@ -45,48 +65,34 @@ ImplAAFDefObject::ImplAAFDefObject ()
 : _name           (PID_DefinitionObject_Name,           "Name"),
   _description    (PID_DefinitionObject_Description,    "Description"),
   _identification (PID_DefinitionObject_Identification, "Identification"),
-  _descriptors(    PID_DefinitionObject_PlugInDescriptors, "PluginDescriptors"),
-  _pDict (0)
+  _descriptors(    PID_DefinitionObject_PluginDescriptors, "PluginDescriptors")
 {
   _persistentProperties.put(_name.address());
   _persistentProperties.put(_description.address());
   _persistentProperties.put(_identification.address());
   _persistentProperties.put(_descriptors.address());
+		(void)AppendPluginDef (NULL);		// !!! TEMP Until optional properties
 }
 
 
 ImplAAFDefObject::~ImplAAFDefObject ()
 {
-	// Release all of the descriptor pointers.
-	size_t size = _descriptors.getSize();
-	for (size_t i = 0; i < size; i++)
-	{
-		ImplAAFPluginDescriptor *pDesc = _descriptors.setValueAt(0, i);
-		if (pDesc)
-		{
-			pDesc->ReleaseReference();
-		}
-	}
-  if (_pDict)
-	{
-	  // BobT hack!!!  See comment in SetDict() below...
-	  // _pDict->ReleaseReference ();
-	  _pDict = NULL;
-	}
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::Init (
-      aafUID_t *pAuid, aafWChar *pName, aafWChar *pDesc)
+    ImplAAFDefObject::Initialize (
+      const aafUID_t & id,
+	  const aafWChar * pName,
+	  const aafWChar * pDesc)
 {
-	if (pAuid == NULL || pName == NULL || pDesc == NULL)
+	if (pName == NULL || pDesc == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 	else
 	{
-		_identification = *pAuid;
+		_identification = id;
 		_name = pName;
 		_description = pDesc;
 	}
@@ -94,7 +100,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetName (
-      wchar_t *  pName)
+      const aafCharacter *  pName)
 {
   if (! pName)
 	{
@@ -142,7 +148,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetDescription (
-      wchar_t * pDescription)
+      const aafCharacter * pDescription)
 {
   if (! pDescription)
 	{
@@ -160,18 +166,22 @@ AAFRESULT STDMETHODCALLTYPE
       wchar_t * pDescription,
       aafUInt32 bufSize)
 {
-  bool stat;
-  if (! pDescription)
+	bool stat;
+	if (! pDescription)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  stat = _description.copyToBuffer(pDescription, bufSize);
-  if (! stat)
+	if (!_description.isPresent())
 	{
-	  return AAFRESULT_SMALLBUF;
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
-
-  return AAFRESULT_SUCCESS;
+	stat = _description.copyToBuffer(pDescription, bufSize);
+	if (! stat)
+	{
+		return AAFRESULT_SMALLBUF;
+	}
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -179,18 +189,22 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::GetDescriptionBufLen (
       aafUInt32 * pBufSize)  //@parm [in,out] Definition Name length
 {
-  if (! pBufSize)
+	if (! pBufSize)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  *pBufSize = _description.size();
-  return AAFRESULT_SUCCESS;
+	if (!_description.isPresent())
+		*pBufSize = 0;
+	else
+		*pBufSize = _description.size();
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::GetAUID (
-      aafUID_t *pAuid)
+      aafUID_t *pAuid) const
 {
   if (pAuid == NULL)
 	{
@@ -207,131 +221,183 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetAUID (
-      aafUID_t *pAuid)
+      const aafUID_t & id)
 {
-  if (pAuid == NULL)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  else
-	{
-	  _identification = *pAuid;
-	}
+  _identification = id;
+
   return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::AppendPluginDescriptor (
+    ImplAAFDefObject::AppendPluginDef (
       ImplAAFPluginDescriptor *pPluginDescriptor)
 {
-	if(pPluginDescriptor == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	_descriptors.appendValue(pPluginDescriptor);
-	pPluginDescriptor->AcquireReference();
-
-	return(AAFRESULT_SUCCESS);
-}
+	aafUID_t	*tmp, newUID;
+	aafInt32	oldCount;
+	aafInt32	newCount;
+	static const aafUID_t nullID = { 0 };
 
 
+//!!!	if(pPluginDescriptor == NULL)
+//		return AAFRESULT_NULL_PARAM;
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::PrependPluginDescriptor (
-      ImplAAFPluginDescriptor *pPluginDescriptor)
-{
-	if(pPluginDescriptor == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	size_t					siz;
-	long					n;
-	ImplAAFPluginDescriptor	*obj = NULL;
-
-	_descriptors.getSize(siz);
-	for(n = siz-1; n >= 0; n--)
-	{
-		_descriptors.getValueAt(obj, n);
-		_descriptors.setValueAt(NULL, n);
-		_descriptors.setValueAt(obj, n+1);
-	}
-	_descriptors.setValueAt(pPluginDescriptor, 0);
-	pPluginDescriptor->AcquireReference();
-
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::EnumPluginDescriptors (
-      ImplEnumAAFPluginDescriptors **ppEnum)
-{
-	ImplEnumAAFPluginDescriptors		*theEnum = (ImplEnumAAFPluginDescriptors *)CreateImpl (CLSID_EnumAAFPluginDescriptors);
-		
 	XPROTECT()
 	{
-		CHECK(theEnum->SetDef(this));
-		CHECK(theEnum->Reset());
-		*ppEnum = theEnum;
+		oldCount = _descriptors.count();
+		if (oldCount == 1) {
+			aafUID_t first;
+			_descriptors.getValueAt(&first, 0);
+		  	if(EqualAUID(&first, &nullID))	//!!! Handle non-optional props
+		  	{									//!!!
+				oldCount = 0;					//!!!
+			}									//!!!
+		}
+		newCount = oldCount + 1;
+		if(pPluginDescriptor == NULL)	//!!!
+			newUID = nullID;			//!!!
+		else
+		{
+			CHECK(pPluginDescriptor->GetAUID(&newUID));
+		}
+		tmp = new aafUID_t[newCount];
+		if(tmp == NULL)
+			RAISE(AAFRESULT_NOMEMORY);
+		if(oldCount != 0)
+		{
+			_descriptors.copyToBuffer(tmp, oldCount * sizeof(aafUID_t));
+		}
+		tmp[newCount - 1] = newUID;
+		_descriptors.setValue(tmp, newCount * sizeof(aafUID_t));
+		delete [] tmp;
 	}
 	XEXCEPT
 	{
-		if (theEnum)
-			theEnum->ReleaseReference();
-		return(XCODE());
+		if(tmp != NULL)
+			delete [] tmp;
 	}
 	XEND;
-	
-	return(AAFRESULT_SUCCESS);
-}
-
-
-
-// Internal to the toolkit functions
-AAFRESULT
-    ImplAAFDefObject::GetNthDescriptor (aafInt32 index, ImplAAFPluginDescriptor **ppDescriptor)
-{
-	if(ppDescriptor == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	ImplAAFPluginDescriptor	*obj = NULL;
-	_descriptors.getValueAt(obj, index);
-	*ppDescriptor = obj;
-	if (obj)
-		obj->AcquireReference();
-	else
-		return AAFRESULT_NO_MORE_OBJECTS; // AAFRESULT_BADINDEX ???
 
 	return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT
-    ImplAAFDefObject::GetNumDescriptors (aafInt32 *pCount)
-{
-	size_t	siz;
-	if (! pCount)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
 
-	_descriptors.getSize(siz);
-	*pCount = siz;
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::PrependPluginDef (
+      ImplAAFPluginDescriptor *pPluginDescriptor)
+{
+	aafUID_t	*tmp = NULL, newUID;
+	aafInt32	oldCount;
+	aafInt32	newCount;
+
+	if(pPluginDescriptor == NULL)
+		return AAFRESULT_NULL_PARAM;
+	
+	XPROTECT()
+	{
+		oldCount = _descriptors.count();
+		newCount = oldCount + 1;
+		CHECK(pPluginDescriptor->GetAUID(&newUID));
+		tmp = new aafUID_t[newCount];
+		if(tmp == NULL)
+			RAISE(AAFRESULT_NOMEMORY);
+		if(oldCount != 0)
+			_descriptors.copyToBuffer(&tmp[1], oldCount * sizeof(aafUID_t));
+		tmp[0] = newUID;
+		_descriptors.setValue(tmp, newCount * sizeof(aafUID_t));
+		delete [] tmp;
+	}
+	XEXCEPT
+	{
+		if(tmp != NULL)
+			delete [] tmp;
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::GetPluginDefs (
+      ImplEnumAAFPluginDescriptors **ppEnum)
+{
+	if(ppEnum == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	*ppEnum = (ImplEnumAAFPluginDescriptors *)CreateImpl (CLSID_EnumAAFPluginDescriptors);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumProperty(this, &_descriptors);
+
 	return(AAFRESULT_SUCCESS);
 }
-void ImplAAFDefObject::SetDict (ImplAAFDictionary * pDict)
-{
-  _pDict = pDict;
 
-  // BobT Hack!!!! dict hasn't been fully init'd yet when this is
-  // called, so can't AcquireReference.  Must not ReleaseReference on
-  // destruction...
-  // _pDict->AcquireReference();
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::CountPluginDefs
+        (aafUInt32 * pResult)
+{
+  if (! pResult)
+	return AAFRESULT_NULL_PARAM;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
-ImplAAFDictionary * ImplAAFDefObject::GetDict ()
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::InsertPluginDefAt
+        (aafUInt32 index,
+		 ImplAAFPluginDescriptor * pPluginDescriptor)
 {
-  assert (_pDict);
-  return _pDict;
+  if (! pPluginDescriptor)
+	return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountPluginDefs (&count);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
-OMDEFINE_STORABLE(ImplAAFDefObject, AUID_AAFDefObject);
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::GetPluginDefAt
+        (aafUInt32 index,
+		 ImplAAFPluginDescriptor ** ppPluginDescriptor)
+{
+  if (! ppPluginDescriptor)
+	return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountPluginDefs (&count);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::RemovePluginDefAt
+        (aafUInt32 index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountPluginDefs (&count);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
