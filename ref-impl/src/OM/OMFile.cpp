@@ -7,10 +7,17 @@
 
 #include <string.h>
 
-OMFile::OMFile(const char* name)
-: _name(name), _root(0), _classFactory(0), _objectDirectory(0)
+#define OM_CLASS_FACTORY_CAPACITY      (200)
+#define OM_OBJECT_DIRECTORY_CAPACITY  (5000)
+
+OMFile::OMFile(const char* name, const OMAccessMode mode)
+: _name(0), _root(0), _rootStoredObject(0), _classFactory(0),
+  _objectDirectory(0), _mode(mode)
 {
   TRACE("OMFile::OMFile");
+
+  _name = new char[strlen(name) + 1];
+  strcpy(_name, name);
 
   setName("/");
 }
@@ -18,58 +25,129 @@ OMFile::OMFile(const char* name)
 OMFile::~OMFile(void)
 {
   TRACE("OMFile::~OMFile");
+
+  delete _name;
+  _name = 0;
+  delete _classFactory;
+  _classFactory = 0;
+  delete _objectDirectory;
+  _objectDirectory = 0;
 }
 
-OMFile* OMFile::open(const char* fileName)
+OMFile* OMFile::openRead(const char* fileName)
 {
-  OMFile* newFile = new OMFile(fileName);
-  newFile->open();
+  TRACE("OMFile::openRead");
+  PRECONDITION("Valid file name", validString(fileName));
+
+  OMFile* newFile = new OMFile(fileName, readOnlyMode);
+  newFile->openRead();
   return newFile;
 }
 
-OMFile* OMFile::create(const char* fileName)
+OMFile* OMFile::openModify(const char* fileName)
 {
-  OMFile* newFile = new OMFile(fileName);
-  newFile->create();
+  TRACE("OMFile::openModify");
+  PRECONDITION("Valid file name", validString(fileName));
+
+  OMFile* newFile = new OMFile(fileName, modifyMode);
+  newFile->openModify();
   return newFile;
 }
 
-void OMFile::create(void)
+OMFile* OMFile::createWrite(const char* fileName, const OMStorable* root)
 {
-  TRACE("File::create");
+  TRACE("OMFile::createWrite");
+  PRECONDITION("Valid file name", validString(fileName));
+  PRECONDITION("Valid root", root != 0);
 
-  _root = OMStoredObject::create(_name);
+  // Not yet implemented.
+  //
+  return 0;
 }
 
-void OMFile::open(void)
-{
-  TRACE("OMFile::open");
 
-  _root = OMStoredObject::open(_name);
+OMFile* OMFile::createModify(const char* fileName, const OMStorable* root)
+{
+  TRACE("OMFile::createModify");
+  PRECONDITION("Valid file name", validString(fileName));
+  PRECONDITION("Valid root", root != 0);
+
+  OMFile* newFile = new OMFile(fileName, modifyMode);
+  newFile->createModify(root);
+  return newFile;
+}
+
+void OMFile::openRead(void)
+{
+  TRACE("OMFile::openRead");
+  ASSERT("Valid mode", _mode == readOnlyMode);
+
+  _rootStoredObject = OMStoredObject::openRead(_name);
+}
+
+void OMFile::openModify(void)
+{
+  TRACE("OMFile::openModify");
+  ASSERT("Valid mode", _mode == modifyMode);
+
+  _rootStoredObject = OMStoredObject::openModify(_name);
+}
+
+void OMFile::createModify(const OMStorable* root)
+{
+  TRACE("File::createModify");
+  PRECONDITION("Valid root object", root != 0);
+  ASSERT("Mode is modify", _mode == modifyMode);
+
+  _root = const_cast<OMStorable*>(root);
+  _rootStoredObject = OMStoredObject::createModify(_name);
+}
+
+void OMFile::save(void)
+{
+  TRACE("OMFile::save");
+
+  if (_mode == modifyMode) {
+    _root->setContainingObject(this);
+    _root->setName("head");
+    _root->saveTo(*rootStoredObject());
+  }
+}
+
+void OMFile::revert(void)
+{
+  TRACE("OMFile::revert");
+}
+
+OMStorable* OMFile::restore(void)
+{
+  TRACE("OMFile::restore");
+
+  _root = OMStorable::restoreFrom(this, "head", *rootStoredObject());
+  return root();
 }
 
 void OMFile::close(void)
 {
   TRACE("OMFile::close");
 
-  _root->close();
+  _rootStoredObject->close();
+  delete _rootStoredObject;
+  _rootStoredObject = 0;
 }
 
-OMStoredObject* OMFile::root(void)
+OMStorable* OMFile::root(void)
 {
   TRACE("OMFile::root");
 
   return _root;
 }
 
-OMFile& OMFile::operator << (const OMStorable& o)
+OMStoredObject* OMFile::rootStoredObject(void)
 {
-  TRACE("OMFile::operator <<");
+  TRACE("OMFile::rootStoredObject");
 
-  const_cast<OMStorable&>(o).setContainingObject(this);
-  const_cast<OMStorable&>(o).setName("head");
-  o.saveTo(*root());
-  return *this;
+  return _rootStoredObject;
 }
 
 OMClassFactory* OMFile::classFactory(void)
@@ -77,7 +155,7 @@ OMClassFactory* OMFile::classFactory(void)
   TRACE("OMFile::classFactory");
 
   if (_classFactory == 0) {
-    _classFactory = new OMClassFactory(100);
+    _classFactory = new OMClassFactory(OM_CLASS_FACTORY_CAPACITY);
   }
 
   return _classFactory;
@@ -88,7 +166,7 @@ OMObjectDirectory* OMFile::objectDirectory(void)
   TRACE("OMFile::objectDirectory");
 
   if (_objectDirectory == 0) {
-    _objectDirectory = new OMObjectDirectory(100);
+    _objectDirectory = new OMObjectDirectory(OM_OBJECT_DIRECTORY_CAPACITY);
   }
   return _objectDirectory;
 }
@@ -96,10 +174,8 @@ OMObjectDirectory* OMFile::objectDirectory(void)
 const OMClassId& OMFile::classId(void) const
 {
   TRACE("OMFile::classId");
-  OMClassId g = {0};
-  g.Data4[7] = (unsigned char)63;
 
-  return g;
+  return nullOMClassId;
 }
 
 OMFile* OMFile::file(void) const
