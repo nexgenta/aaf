@@ -37,6 +37,7 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefRename : public ImplAAFTypeDef
 {
@@ -124,8 +125,8 @@ public:
   size_t NativeSize (void) const;
 
   OMProperty * 
-    pvtCreateOMPropertyMBS (OMPropertyId pid,
-							const char * name) const;
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
 
   //****************
   // GetTypeCategory()
