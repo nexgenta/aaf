@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMIOStream.cpp,v 1.13 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMIOStream.cpp,v 1.13.2.1 2004/07/22 18:13:08 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -206,6 +206,9 @@ OMIOStream& OMIOStream::indent(void)
 
 OMIOStream& OMIOStream::outdent(void)
 {
+  TRACE("OMIOStream::outdent");
+  ASSERT("Can decrease indentation", _level > 0);
+
   _level = _level - 1;
   return *this;
 }
