@@ -5,32 +5,14 @@
 #endif
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -38,17 +20,13 @@
 #include "ImplAAFComponent.h"
 #endif
 
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
-
 #include <assert.h>
-#include "AAFResult.h"
-#include "aafErr.h"
-#include "aafCvt.h"
+#include <AAFResult.h>
+
 
 ImplAAFComponent::ImplAAFComponent ():
-	_dataDef(	PID_Component_DataDefinition,	"DataDefinition"),
-	_length(	PID_Component_Length,	"Length")
+	_dataDef(	PID_IDENTIFICATION_DATADEF,	"dataDef"),
+	_length(	PID_IDENTIFICATION_LENGTH,	"length")
 {
 	_persistentProperties.put(   _dataDef.address());
 	_persistentProperties.put(   _length.address());
@@ -92,18 +70,17 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFComponent::GetLength (aafLength_t * pLength)
 {
-  if (pLength == NULL)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
+    AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-  if (! _length.isPresent())
+	if (pLength == NULL)
 	{
-	  return AAFRESULT_PROP_NOT_PRESENT;
+		return AAFRESULT_NULL_PARAM;
 	}
-	
-  *pLength = _length;
-  return AAFRESULT_SUCCESS;
+	else
+	{
+		*pLength = _length;
+	}
+	return aafError;
 }
 
 	
@@ -145,7 +122,7 @@ AAFRESULT STDMETHODCALLTYPE
  * Private Function: SetNewProps()
  *
  *      This is an internal function that is called by functions that
- *      create new components.  It sets the length and data definition property
+ *      create new components.  It sets the length and datakind property
  *      values on the input component object.
  *
  *      This function supports both 1.x and 2.x files.
@@ -191,51 +168,65 @@ AAFRESULT ImplAAFComponent::AccumulateLength(aafLength_t *pLength)
 }
 
 AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
-											 ImplAAFMob *mob, ImplAAFMobSlot *track,
-											 aafMediaCriteria_t *mediaCrit,
-											 aafPosition_t currentObjPos,
-											 aafOperationChoice_t *operationChoice,
-											 ImplAAFComponent	*prevObject,
-											 ImplAAFComponent *nextObject,
-											 ImplAAFScopeStack *scopeStack,
-											 aafPosition_t *diffPos, aafLength_t *minLength,
-											 ImplAAFOperationGroup **groupObject, aafInt32	*nestDepth,
-											 ImplAAFComponent **found, aafBool *foundTransition)
+											ImplAAFMob *mob, ImplAAFMobSlot *track,
+											aafMediaCriteria_t *mediaCrit,
+											aafPosition_t currentObjPos,
+											aafEffectChoice_t *effectChoice,
+											ImplAAFComponent	*prevObject,
+											ImplAAFComponent *nextObject,
+#ifdef FULL_TOOLKIT
+											AAFScopeStack *scopeStack,
+#endif
+											aafPosition_t *diffPos, aafLength_t *minLength,
+											ImplAAFEffectDef **effeObject, aafInt32	*nestDepth,
+											ImplAAFComponent **found, aafBool *foundTransition)
 {
-	aafLength_t	tmpMinLen;
-	
-	XPROTECT()
+#ifdef FULL_TOOLKIT
+  aafLength_t	tmpMinLen;
+  
+  XPROTECT(_file)
 	{
-		*foundTransition = AAFFalse;
-		*found = this;
-		CHECK(GetLength(&tmpMinLen));
-		if (Int64Less(tmpMinLen, rootLen))
+	  *foundTransition = FALSE;
+	  *found = this;
+	  CHECK(GetLength(&tmpMinLen));
+	  if (Int64Less(tmpMinLen, rootLen))
 		{
 			*minLength = tmpMinLen;
 			if(diffPos != NULL)
 			{
-				/* Figure out diffPos */
-				*diffPos = rootPos;
-				SubInt64fromInt64(currentObjPos, diffPos);
+			  /* Figure out diffPos */
+			  *diffPos = rootPos;
+			  SubInt64fromInt64(currentObjPos, diffPos);
 			}
 		}
-		else
+	  else
 		{
 			*minLength = rootLen;
 			if(diffPos != NULL)
-				CvtInt32toInt64(0, diffPos);
+			  CvtInt32toInt64(0, diffPos);
 		}
 	} /* XPROTECT */
-	XEXCEPT
+  XEXCEPT
 	{
 	}
-	XEND;
-	return AAFRESULT_SUCCESS;
+  XEND;
+#endif
+	return(AAFRESULT_SUCCESS);
 }
 
+extern "C" const aafClassID_t CLSID_AAFComponent;
 
-AAFRESULT ImplAAFComponent::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+OMDEFINE_STORABLE(ImplAAFComponent, CLSID_AAFComponent);
+
+// Cheat!  We're using this object's CLSID instead of object class...
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFComponent::GetObjectClass(aafUID_t * pClass)
 {
-	return AAFRESULT_SUCCESS;
+  if (! pClass)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  memcpy (pClass, &CLSID_AAFComponent, sizeof aafClassID_t);
+  return AAFRESULT_SUCCESS;
 }
 

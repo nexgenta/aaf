@@ -50,7 +50,7 @@ ImplAAFSequence::~ImplAAFSequence ()
 
 //***********************************************************
 //
-// SetInitialValue()
+// Initialize()
 //
 // This function sets the properties on a newly created sequence
 // object with the given property values. The length of the sequence is
@@ -74,7 +74,7 @@ ImplAAFSequence::~ImplAAFSequence ()
 //   - pDatadef is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::SetInitialValue (aafUID_t * pDatadef)
+    ImplAAFSequence::Initialize (aafUID_t * pDatadef)
 {
 	return (SetDataDef(pDatadef));
 }
@@ -552,4 +552,16 @@ AAFRESULT
 extern "C" const aafClassID_t CLSID_AAFSequence;
 
 OMDEFINE_STORABLE(ImplAAFSequence, CLSID_AAFSequence);
+
+// Cheat!  We're using this object's CLSID instead of object class...
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFSequence::GetObjectClass(aafUID_t * pClass)
+{
+  if (! pClass)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+  memcpy (pClass, &CLSID_AAFSequence, sizeof aafClassID_t);
+  return AAFRESULT_SUCCESS;
+}
 
