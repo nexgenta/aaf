@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -41,14 +41,11 @@ class OMSetIterator;
   //        are not allowed.
   //   @tcarg class | Element | The type of an <c OMSet> element.
   //          This type must support operator = and operator==.
-  //          Instances of this type must be able to return a unique
-  //          value of type <p Key> to identify themselves through a
-  //          function with the signature
-  //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @base public | <c OMContainer>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename Key, typename Element>
 class OMSet : public OMContainer<Element> {
 public:
@@ -61,36 +58,39 @@ public:
   virtual ~OMSet(void);
 
     // @cmember Insert <p value> into this <c OMSet>.
-  virtual void insert(const Element value);
-
-    // @cmember Does this <c OMSet> contain <p value> ?
-    //   @this const
-  virtual bool contains(const Element value) const;
+  virtual void insert(const Key, const Element value);
 
     // @cmember Does this <c OMSet> contain an <p Element>
     //          identified by <p key>?
-    //   @this const
-  virtual bool containsKey(const Key key) const;
+  virtual bool contains(const Key key) const;
 
     // @cmember Find the <p Element> in this <c OMSet> identified by
     //          <p key>.  If the element is found it is returned in
     //          <p value> and the result is true. If the element is
     //          not found the result is false.
-    //   @this const
   virtual bool find(const Key key, Element& value) const;
+
+    // @cmember Find the <p Element> in this <c OMSet> identified by
+    //          <p key>.  If the element is found it is returned in
+    //          <p value> and the result is true. If the element is
+    //          not found the result is false.
+  virtual bool find(const Key key, Element** value) const;
 
     // @cmember The number of elements in this <c OMSet>.
     //          <mf OMSet::count> returns the actual number
     //          of elements in the <c OMSet>.
-    //   @this const
   size_t count(void) const;
 
     // @cmember Append the given <p Element> <p value> to
     //          this <c OMSet>.
-  void append(const Element value);
+  void append(const Key, const Element value);
 
-    // @cmember Remove <p value> from this <c OMSet>.
-  virtual void remove(const Element value);
+    // @cmember Remove the <p Element> with <p Key> <p key>
+    //          from this <c OMSet>.
+  virtual void remove(const Key key);
+
+    // @cmember Remove all elements from this <c OMSet>.
+  virtual void clear(void);
 
 private:
   // @access Private members.
