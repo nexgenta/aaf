@@ -3,27 +3,38 @@
 #ifndef __ImplAAFObject_h__
 #define __ImplAAFObject_h__
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
-
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*                                               *
+\***********************************************/
 
 
 //
-// Forward declaration
+// Forward declarations
 //
-class AAFObject;
+class ImplEnumAAFProperties;
+class ImplAAFClassDef;
+class ImplAAFProperty;
+class ImplAAFPropertyDef;
+class ImplAAFPropertyValue;
+class ImplPropertyCollection;
+class ImplAAFDictionary;
 
 #include "AAFTypes.h"
 #include "OMStorable.h"
+#include "OMProperty.h"
 #include "ImplAAFRoot.h"
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+
 
 class ImplAAFObject : public OMStorable, public ImplAAFRoot
 {
@@ -54,6 +65,66 @@ public:
         (aafUID_t *  pGeneration);
 
 
+  //****************
+  // GetDefinition()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDefinition
+		// @parm [out] class definition of which this object is an instance.
+        (ImplAAFClassDef ** ppClassDef);
+
+
+  //****************
+  // GetObjectClass()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass
+		(aafUID_t * pClass);
+
+
+  //****************
+  // GetProperties()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetProperties
+		(ImplEnumAAFProperties ** ppEnum);
+
+
+  //****************
+  // CountProperties()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	CountProperties
+		(aafUInt32 * pCount);
+
+
+  //****************
+  // GetPropertyValue()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetPropertyValue
+		(ImplAAFPropertyDef * pPropDef,
+		 ImplAAFPropertyValue ** ppPropVal);
+
+
+  //****************
+  // SetPropertyValue()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	SetPropertyValue
+		(ImplAAFPropertyDef * pPropDef,
+		 ImplAAFPropertyValue * pPropVal);
+
+
+  //****************
+  // IsPropertyPresent()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+	IsPropertyPresent
+		(ImplAAFPropertyDef * pPropDef,
+		 aafBool * pResult);
+
+
   //***********************************************************
   // METHOD NAME: GetStoredByteOrder()
   //
@@ -68,8 +139,8 @@ public:
   // 
   virtual AAFRESULT STDMETHODCALLTYPE
   GetStoredByteOrder (
-    // @parm [out] aafByteOrder_t * | pOrder | Pointer to place where byte order is to be put
-    aafByteOrder_t *  pOrder
+    // @parm [out] eAAFByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    eAAFByteOrder_t *  pOrder
   );
 
 
@@ -86,36 +157,65 @@ public:
   // 
   virtual AAFRESULT STDMETHODCALLTYPE
   GetNativeByteOrder (
-    // @parm [out] aafByteOrder_t * | pOrder | Pointer to place where byte order is to be put
-    aafByteOrder_t *  pOrder
+    // @parm [out] eAAFByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    eAAFByteOrder_t *  pOrder
   );
 
 
 public:
-	// Interfaces ivisible inside the toolkit, but not exposed through the API
-  
-  // OMReferenceCounted interface inherited from OMStorable.
-  // Client code should use AcquireRef(), ReleaseRef() and RefCount() inherited
-  // from ImplAAFRoot.
-  virtual size_t AcquireReference();
-  virtual size_t ReleaseReference();
-  virtual size_t ReferenceCount();
+  // Interfaces ivisible inside the toolkit, but not exposed through the API
 
-	// Gets the head object of the file containing this object.
-	// This function is used to maintain MOB and Definition tables in the
-	// head object.
-	virtual AAFRESULT MyHeadObject
-		(class ImplAAFHeader **header);
+  // Gets the head object of the file containing this object.
+  // This function is used to maintain MOB and Definition tables in the
+  // head object.
+  virtual AAFRESULT MyHeadObject
+    (class ImplAAFHeader **header) const;
+
+  // Gets the dictionary used to create this instance.
+  virtual AAFRESULT STDMETHODCALLTYPE 
+    GetDictionary(ImplAAFDictionary **ppDictionary) const;
+
+
+  // iterate across the properties, calling initialialize on each.
+  //
+  void InitOMProperties (void);
 
 
 public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFObjectTest.cpp.
-  static AAFRESULT test();
-
   OMDECLARE_STORABLE(ImplAAFObject)
+
+protected:
+  void protInitProperty (OMProperty & rPropToInit,
+						 const OMPropertyId propertyId,
+						 const char* name,
+						 const aafUID_t & rTypeID,
+						 const bool isOptional = false) const;
+  //
+  // Initializes the given OM property.
+
+private:
+
+  // private method
+  AAFRESULT InitProperties ();
+
+  ImplPropertyCollection * _pProperties;
+
+  ImplAAFClassDef * _cachedDefinition;
+
+  aafBool                  _OMPropsInited;
+
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFObject> ImplAAFObjectSP;
 
 
 #endif // ! __ImplAAFObject_h__
-
