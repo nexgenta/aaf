@@ -52,8 +52,8 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefStrongObjRef::ImplAAFTypeDefStrongObjRef ()
   : _referencedType ( PID_TypeDefinitionStrongObjectReference_ReferencedType,
-                      "ReferencedType",
-                      "/Dictionary/ClassDefinitions",
+                      L"ReferencedType",
+                      L"/MetaDictionary/ClassDefinitions",
                       PID_MetaDefinition_Identification)
 {
   _persistentProperties.put(_referencedType.address());
@@ -255,13 +255,35 @@ size_t ImplAAFTypeDefStrongObjRef::NativeSize (void) const
 }
 
 
-OMProperty * ImplAAFTypeDefStrongObjRef::pvtCreateOMPropertyMBS
+OMProperty * ImplAAFTypeDefStrongObjRef::pvtCreateOMProperty
   (OMPropertyId pid,
-   const char * name) const
+   const wchar_t * name) const
 {
   assert (name);
   OMProperty * result =
 	new OMStrongReferenceProperty<ImplAAFObject> (pid, name);
   assert (result);
   return result;
+}
+
+
+
+
+
+
+// override from OMStorable.
+const OMClassId& ImplAAFTypeDefStrongObjRef::classId(void) const
+{
+  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefStrongObjRef));
+}
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefStrongObjRef::onSave(void* clientContext) const
+{
+  ImplAAFTypeDefObjectRef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefStrongObjRef::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDefObjectRef::onRestore(clientContext);
 }
