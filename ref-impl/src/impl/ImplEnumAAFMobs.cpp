@@ -73,7 +73,7 @@ AAFRESULT STDMETHODCALLTYPE
 
     XPROTECT()
 	{
-		CHECK(_cStorage->GetNumMobs (kAllMob, &siz));
+		CHECK(_cStorage->CountMobs (kAllMob, &siz));
 		if(cur < siz)
 		{
 			found = AAFFalse;
@@ -153,18 +153,19 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFMobs::Skip (aafUInt32 count)
 {
 	AAFRESULT	hr;
-	aafInt32	newCurrent, siz;
+	aafNumSlots_t newCurrent;
+	aafNumSlots_t siz;
 
 	newCurrent = _current + count;
 
  	switch(_criteria.searchTag)
 	{
 		case kNoSearch:
-			_cStorage->GetNumMobs(kAllMob, &siz);
+			_cStorage->CountMobs(kAllMob, &siz);
 			break;
 
 		case kByMobKind:
-			_cStorage->GetNumMobs(_criteria.tags.mobKind, &siz);
+			_cStorage->CountMobs(_criteria.tags.mobKind, &siz);
 			break;
 
 		default:
