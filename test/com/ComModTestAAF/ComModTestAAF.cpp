@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 //
 // An example program that calls the test AAF COM interfaces.
@@ -28,34 +33,24 @@
 #include <iostream.h>
 #include <fstream.h>
 #include <stdlib.h>
-#include <string.h>
+#include <time.h>
 
 
-#ifndef __AAF_h__
-#include "AAF.h"
-#endif
-
-#ifndef __AAFTypes_h__
-#include "AAFTypes.h"
-#endif
-
-
-#if defined( OS_WINDOWS )
-#include <winbase.h>
+#ifdef WIN32
 #include <unknwn.h>
 #include <objbase.h>
 #endif
 
-#if defined( OS_MACOS )
+#if defined(macintosh)
 #define _MAC
 
 // Make sure we have defined IID_IUnknown and IID_IClassFactory.
 #include <initguid.h>
-#include <coguid.h>  
+#include <coguid.h>	
 #include "DataInput.h"
 
 #if !defined(CDECL) && defined(_MSC_VER)
-#define CDECL  _cdecl
+#define CDECL	_cdecl
 #endif // CDECL
 
 #if !defined(FAR)
@@ -66,13 +61,20 @@
 #include "dispatch.h"
 #include "wintypes.h"
 #include <olectl.h>
+#endif
 
-#endif  // OS_MACOS
+
+#ifndef __AAF_h__
+#include "AAF.h"
+#endif
 
 
 #include "CAAFModuleTest.h"
-#include "ModuleTest.h"
 
+#ifdef WIN32
+#include <winbase.h>
+//#include <tchar.h>
+#endif
 
 typedef AAFRESULT (*AAFModuleTestProc)();
 
@@ -80,12 +82,24 @@ typedef AAFRESULT (*AAFModuleTestProc)();
 #define SUCCESS (0)
 #define FAILURE (-1)
 
+#if defined(__sgi)
+// stubs
+void CoInitialize(void *)
+{
+}
+
+void CoUninitialize(void)
+{
+}
+
+#endif
+
 // routine copied from Tim Bingham's test program...
 static void formatError(DWORD errorCode)
 {
   cerr << "RESULT = " << (long)errorCode << " (0x" << hex << errorCode << dec << ")" << endl;
 
-#if defined( OS_WINDOWS )
+#ifdef WIN32
   CHAR buffer[256];
 
   int status = FormatMessageA(
@@ -103,9 +117,9 @@ static void formatError(DWORD errorCode)
     }
     cerr << buffer << endl;
   }
-#endif // OS_WINDOWS
+#endif
 
-  cerr << endl;
+	cerr << endl;
 }
 
 static void throwIfError(HRESULT hr)
@@ -114,8 +128,15 @@ static void throwIfError(HRESULT hr)
   {
     formatError(hr);
     throw hr;
-  }
+	}
 }
+
+// helper class
+struct CComInitialize
+{
+	CComInitialize() { CoInitialize(NULL); }
+	~CComInitialize() { CoUninitialize(); }
+};
 
 
 // simple helper class to initialize and cleanup AAF library.
@@ -123,14 +144,14 @@ struct CAAFInitialize
 {
   CAAFInitialize(const char *dllname = NULL)
   {
-    cout << "Attempting to load the AAF dll...";
-    cout.flush();
+	  cout << "Attempting to load the AAF dll...";
+	  cout.flush();
     HRESULT hr = AAFLoad(dllname);
     if (S_OK != hr)
-    {
+  	{
       cerr << "FAILED! ";
       throwIfError(hr);
-    }
+		}
     cout << "DONE" << endl;
   }
 
@@ -179,84 +200,97 @@ public:
 
 int main(int argc, char* argv[])
 {
-  int result = SUCCESS;
-  int  startArg = 1;
-  testMode_t  testMode = kAAFUnitTestReadWrite;
-  bool skipTests = false;
+	int result = SUCCESS;
+	aafInt16	count = 0, 
+				i = 0;
+	char 		**myargv = NULL;
 
 
-  // Create the module test object.
-  CAAFModuleTest AAFModuleTest;
-  try
-  {
-    HRESULT hr = S_OK;
 
 
-    for (startArg = 1; (startArg < argc) && ('-' == argv[startArg][0]); startArg++)
-    {
-      /* List the AAF class names, one per line, in the order that the tests will be run. */
-      /* This can be used for more selective automated testing... */
-      if (0 == strcmp(argv[startArg],"-l") || 0 == strcmp(argv[startArg],"--list"))
-      {
-        AAFModuleTest.List();
-        return(0);
-      }
-      else if (0 == strcmp(argv[startArg],"-r") || 0 == strcmp(argv[startArg],"--readonly"))
-      {
-        testMode = kAAFUnitTestReadOnly;
-       }
-      else if (0 == strcmp(argv[startArg],"-s") || 0 == strcmp(argv[startArg],"--skip"))
-      {
-        skipTests = true;
-      }
-      /* Check arguments to see if help was requested */
-      else
-      {
-        cout<< "\nCOMMODAAF [-l] [-r] [-s] [test1 test2 etc] ***********************\n"; 
-        cout<< " No arguments --> To run all tests\n";
-        cout<< " Otherwise any AAF object class name can be typed\n";
-        cout<< " and that objects test method will be executed.\n";
-        cout<< "ex AAFSegment AAFTransition etc\n\n";
-        cout<< " -l : print list of all tests to stdout\n";
-        cout<< " -r : run read/only tests for regression and cross-platform testing.\n";
-        cout<< " -s : Use with -r to skip tests that were not supported in earlier releases.\n";
-        cout<< endl;        
+	// Initialize com library for this process.
+	CComInitialize comInit;
 
-        return(0);
-      }
-    }
+	// Create the module test object.
+	CAAFModuleTest AAFModuleTest;
+	try
+	{
+		HRESULT hr = S_OK;
+
+		// Make sure the dll can be loaded and initialized.
+		CAAFInitialize aafInit;
+
+		// Make sure the shared plugins can be loaded and registered.
+   		CAAFInitializePlugins aafInitPlugins;
+
+		/* Check arguments to see if help was requested */
+
+		if ( argc > 1 &&
+			(0 == strncmp(argv[1],"-h",2) ||
+			 0 == strncmp(argv[1],"-H",2) )	)
+		{
+			cout<< "\nCOMMODAAF***********************\n"; 
+			cout<< "No arguments --> To run all tests\n";
+			cout<< "Otherwise any AAF object class name can be typed\n";
+			cout<< "and that objects test method will be executed.\n";
+			cout<< "ex AAFSegment AAFTransition etc\n\n";
+			cout<< "Input can also be read in from a text.\n";
+			cout<< "Just name it \"COMMODAAF (PPC)\"" << endl;
+
+			return(0);
+		}
+
+		/* Print Header */
+		cout<< "\n\n"<< endl;
+		cout<< "***************************\n";
+		cout<< "*       COMMODAAF         *\n";
+		cout<< "*   AAF COM Module Test   *\n";
+		cout<< "***************************\n"<< endl;	
 
 
-    // Make sure the dll can be loaded and initialized.
-    CAAFInitialize aafInit;
+		/* Get and print start time */
+		time_t s_time;
+		time(&s_time);
+		cout<< ctime(&s_time)<< endl<< endl;
 
-    // Make sure the shared plugins can be loaded and registered.
-     CAAFInitializePlugins aafInitPlugins;
+		if (1 >= argc)
+			// Call all Module tests...
+			hr = AAFModuleTest.Test(NULL);
+		else
+		{
+			// Call only the modules that are named in the command line.
+			int module;
 
-    if (startArg >= argc)
-    {    
-      // Call all Module tests...
-      hr = AAFModuleTest.Test(testMode);
-    }
-    else
-    {
-      // Call only the modules that are named in the command line.
-      hr = AAFModuleTest.Test(testMode, skipTests, argc - startArg, const_cast<const char **>(&argv[startArg]));
-    }
+			for (module = 1; module < argc; module++)
+				hr = AAFModuleTest.Test(reinterpret_cast<unsigned char *>(argv[module]));
+		}
 
-    result = (int)hr;
-  }
-  catch (HRESULT& rhr)
-  {
-    result = rhr;
-  }
-  catch (...)
-  {
-    result = FAILURE;
-  }
-  
+		/* Get and Print finish time	*/
+		time_t e_time;
+		time(&e_time);
+		cout<< endl<< ctime(&e_time)<< endl;
 
-  return result;
+		/* Determine and print elapsed time */
+		double elapsed_time = difftime( e_time, s_time );
+		cout<< "COMMODAAF completed in ";
+		cout<< ((long)elapsed_time/3600) <<":"; /* hours */
+		cout<< (((long)elapsed_time%3600)/60) <<":"; /* minutes */
+		cout<< (((long)elapsed_time%3600)%60) <<"\n" <<endl; /* seconds */
+
+
+		result = (int)hr;
+	}
+	catch (HRESULT& rhr)
+	{
+		result = rhr;
+	}
+	catch (...)
+	{
+		result = FAILURE;
+	}
+	
+
+	return result;
 }
 
 
