@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -35,7 +35,6 @@
 
   // @class Abstract base class describing the data types that may be
   //        assumed by persistent properties supported by the Object Manager.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMType {
 public:
   // @access Public members.
