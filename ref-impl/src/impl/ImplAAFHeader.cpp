@@ -95,7 +95,8 @@ ImplAAFHeader::ImplAAFHeader ()
   _identificationList(PID_Header_IdentificationList, "IdentificationList"),
   _contentStorage(		PID_Header_Content,	"Content"),
   _dictionary(PID_Header_Dictionary,	"Dictionary"),
-  _fileRev(PID_Header_Version,		"Version")
+  _fileRev(PID_Header_Version,		"Version"),
+  _objectModelVersion(PID_Header_ObjectModelVersion, "ObjectModelVersion")
 {
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
@@ -103,13 +104,14 @@ ImplAAFHeader::ImplAAFHeader ()
   _persistentProperties.put(_contentStorage.address());
   _persistentProperties.put(_dictionary.address());
   _persistentProperties.put(_fileRev.address());
+  _persistentProperties.put(_objectModelVersion.address());
 
   //!!!	_head = this;
 //	file->InternalSetHead(this);
 	_toolkitRev.major = 0;
 	_toolkitRev.minor = 0;
 	_toolkitRev.tertiary = 0;
-	_toolkitRev.type = kVersionUnknown;
+	_toolkitRev.type = kAAFVersionUnknown;
 	_toolkitRev.patchLevel = 0;
 //!!!	_byteOrder;
 //!!!	_lastModified;
@@ -384,7 +386,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetDictionary (ImplAAFDictionary ** ppDictionary)
+    ImplAAFHeader::GetDictionary (ImplAAFDictionary ** ppDictionary) const
 {
   if (! ppDictionary)
 	{
@@ -527,7 +529,7 @@ AAFRESULT
 {
 	ImplAAFIdentification *		identObj;
 	aafProductIdentification_t	fiction;
-	aafBool						dummyIDNT = AAFFalse;
+	aafBool						dummyIDNT = kAAFFalse;
 	aafProductVersion_t			dummyVersion;
 	
 	XPROTECT()
@@ -543,9 +545,9 @@ AAFRESULT
 			fiction.productVersion.minor = 0;
 			fiction.productVersion.tertiary = 0;
 			fiction.productVersion.patchLevel = 0;
-			fiction.productVersion.type = kVersionUnknown;
+			fiction.productVersion.type = kAAFVersionUnknown;
 			pIdent = &fiction;
-			dummyIDNT = AAFTrue;
+			dummyIDNT = kAAFTrue;
 		}
 		
 	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
@@ -708,11 +710,45 @@ ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
 }
 
 // Fill in when dictionary property is supported.
-ImplAAFDictionary *ImplAAFHeader::GetDictionary()
+ImplAAFDictionary *ImplAAFHeader::GetDictionary() const
 {
   ImplAAFDictionary	*result = _dictionary;
-  assert(result);
 
+  // Note - in the case where this is the first GetDictionary() on
+  // Header (in order to initialize the OM properties on the
+  // newly-created Header object), the _dictionary property won't be
+  // set up yet.  If that's the case, get the dictionary the
+  // old-fashioned way (through AAFObject).
+  if (! result)
+	{
+	  AAFRESULT hr = ImplAAFObject::GetDictionary(&result);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  assert (result);
+	  // clients of GetDictionary(void) expect the dictionary to *not*
+	  // be reference-counted.
+	  aafUInt32 refcnt = result->ReleaseReference ();
+	  // make sure at least one reference remains.
+	  assert (refcnt > 0);
+	}
   return(result);
 }
 
+
+bool ImplAAFHeader::IsObjectModelVersionPresent () const
+{
+  return _objectModelVersion.isPresent ();
+}
+
+
+aafUInt32 ImplAAFHeader::GetObjectModelVersion () const
+{
+  assert (IsObjectModelVersionPresent());
+  return _objectModelVersion;
+}
+
+
+void ImplAAFHeader::SetObjectModelVersion (aafUInt32 version)
+{
+  _objectModelVersion = version;
+  assert (IsObjectModelVersionPresent());
+}
