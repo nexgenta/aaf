@@ -65,7 +65,7 @@ extern "C" const aafClassID_t CLSID_AAFSegment;
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
 ImplAAFNestedScope::ImplAAFNestedScope ()
-:  _slots( PID_NestedScope_Slots, "Slots")
+:  _slots( PID_NestedScope_Slots, L"Slots")
 {
 	_persistentProperties.put(_slots.address());
 }
@@ -108,7 +108,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -127,7 +127,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 
@@ -171,15 +171,21 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFNestedScope::RemoveSegmentAt (
       aafUInt32 index)
 {
-  aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountSegments (&count);
-  if (AAFRESULT_FAILED (hr)) return hr;
+	aafUInt32 count;
+	AAFRESULT hr;
+	ImplAAFSegment	*pSeg;
+	
+	hr = CountSegments (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+	
+	if (index >= count)
+		return AAFRESULT_BADINDEX;
+	
+	pSeg = _slots.removeAt(index);
+	if(pSeg)
+		pSeg->ReleaseReference();
 
-  if (index >= count)
-	return AAFRESULT_BADINDEX;
-
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -192,7 +198,23 @@ AAFRESULT STDMETHODCALLTYPE
 	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
 	if(*ppEnum == NULL)
 		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumStrongProperty(this, &_slots);
+
+	XPROTECT()
+	{
+		OMStrongReferenceVectorIterator<ImplAAFSegment>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFSegment>(_slots);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK((*ppEnum)->Initialize(&CLSID_EnumAAFSegments, this, iter));
+	}
+	XEXCEPT
+	{
+		if (*ppEnum)
+		  (*ppEnum)->ReleaseReference();
+		(*ppEnum) = 0;
+		return(XCODE());
+	}
+	XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
