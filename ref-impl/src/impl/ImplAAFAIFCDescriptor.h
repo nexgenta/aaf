@@ -31,7 +31,6 @@
  *
  ************************************************************************/
 
-
 #ifndef __ImplAAFFileDescriptor_h__
 #include "ImplAAFFileDescriptor.h"
 #endif
@@ -90,8 +89,15 @@ public:
          aafDataValue_t  pSummary);
 
 
-private:
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFAIFCDescriptor)
+
   // Persistent Properties
+private:
 	OMVariableSizeProperty<aafUInt8> _summary;
 
 };

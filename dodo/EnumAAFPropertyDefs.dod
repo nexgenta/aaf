@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 EnumAAFPropertyDefs\
 #endm
@@ -11,7 +18,6 @@ AD_HEAD
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -27,7 +33,7 @@ AD_FORWARD_DECLARATION(AAFPropertyDef)
 AD_CLASS_UUID(245343C2, 2D59, 11D2, BF, 80, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(245343C1, 2D59, 11D2, BF, 80, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, Transient)
 
 AD_XMETHOD1(NextOne,
 			[out\,retval],
@@ -39,13 +45,13 @@ AD_XMETHOD1(NextOne,
   // properly releasing the returned pointer when it is no longer needed.
   // @comm This is a just simplified version of the Next method. )
 
-AD_XMETHOD3(Next,
-			[in], objPass, aafUInt32, count, number of property definitions requested,
+AD_X2METHOD3(Next,
+			[in], objPass, aafUInt32, count, number of property definitions requested,xxx,
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOut, AAFPropertyDef, ppPropertyDefs,
-			array to receive property definitions,
+			objOutArray, AAFPropertyDef, ppPropertyDefs,
+			array to receive property definitions, count,
 			[out\,ref],objPass, aafUInt32 *, pFetched,
-			number of actual PropertyDefs fetched into ppPropertyDefs array,
+			number of actual PropertyDefs fetched into ppPropertyDefs array,xxx,
 			Enumerates the next count elements \(AAFPropertyDef pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
@@ -75,4 +81,4 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
