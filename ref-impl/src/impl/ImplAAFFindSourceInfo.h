@@ -3,27 +3,14 @@
 #ifndef __ImplAAFFindSourceInfo_h__
 #define __ImplAAFFindSourceInfo_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
@@ -71,22 +58,14 @@ public:
 	virtual AAFRESULT STDMETHODCALLTYPE
 		SetComponent(ImplAAFComponent *cpnt);
 
-	//	virtual AAFRESULT STDMETHODCALLTYPE
-	//		Duplicate(ImplAAFFindSourceInfo *info);
+	virtual AAFRESULT STDMETHODCALLTYPE
+		Duplicate(ImplAAFFindSourceInfo *info);
 	virtual AAFRESULT STDMETHODCALLTYPE
 		Clear(void);
 	virtual AAFRESULT STDMETHODCALLTYPE
 		GetMob(ImplAAFMob **ppMob);
 	virtual AAFRESULT STDMETHODCALLTYPE
-		GetSourceReference(aafSourceRef_t *pSourceRef);
-	virtual AAFRESULT STDMETHODCALLTYPE
-		GetEditRate(aafRational_t *pEditRate);
-	virtual AAFRESULT STDMETHODCALLTYPE
-		GetLength(aafLength_t *pLength);
-//	virtual AAFRESULT STDMETHODCALLTYPE
-//		GetEnclosingOperationGroup(ImplAAFOperationGroup *pSourceRef);
-//	virtual AAFRESULT STDMETHODCALLTYPE
-//		GetEnclosingComponent(ImplAAFOperationGroup *pSourceRef);
+		GetReference(aafSourceRef_t *pSourceRef);
 };
 
 #endif // ! __ImplAAFFindSourceInfo_h__
