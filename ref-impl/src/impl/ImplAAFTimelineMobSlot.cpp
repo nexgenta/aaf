@@ -22,14 +22,17 @@
 #include "ImplAAFTimelineMobSlot.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+
 #include <assert.h>
 #include <AAFResult.h>
 #include "aafCvt.h" 
 #include "AAFUtils.h"
 
 ImplAAFTimelineMobSlot::ImplAAFTimelineMobSlot ():
-	_editRate(	PID_TIMELINEMOBSLOT_EDITRATE,	"EditRate"),
-	_origin(	PID_TIMELINEMOBSLOT_ORIGIN,		"Origin")
+	_editRate(	PID_TimelineMobSlot_EditRate,	"Edit Rate"),
+	_origin(	PID_TimelineMobSlot_Origin,		"Origin")
 
 {
 	_persistentProperties.put( _editRate.address());
@@ -40,6 +43,13 @@ ImplAAFTimelineMobSlot::ImplAAFTimelineMobSlot ():
 
 ImplAAFTimelineMobSlot::~ImplAAFTimelineMobSlot ()
 {}
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTimelineMobSlot::Initialize ()
+{
+  return AAFRESULT_SUCCESS;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -173,19 +183,6 @@ AAFRESULT ImplAAFTimelineMobSlot::ConvertToMyRate(aafPosition_t srcPos,
 	return AAFRESULT_SUCCESS;
 }
 
-extern "C" const aafClassID_t CLSID_AAFTimelineMobSlot;
 
-OMDEFINE_STORABLE(ImplAAFTimelineMobSlot, CLSID_AAFTimelineMobSlot);
-
-// Cheat!  We're using this object's CLSID instead of object class...
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFTimelineMobSlot::GetObjectClass(aafUID_t * pClass)
-{
-  if (! pClass)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  memcpy (pClass, &CLSID_AAFTimelineMobSlot, sizeof (aafClassID_t));
-  return AAFRESULT_SUCCESS;
-}
+OMDEFINE_STORABLE(ImplAAFTimelineMobSlot, AUID_AAFTimelineMobSlot);
 
