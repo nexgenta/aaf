@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFPulldown\
 #endm
@@ -20,15 +27,6 @@ AD_IDL(//
 //   - insufficient system memory is available to perform the
 //     operation.
 //)
-
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
 
 AD_CLASS_UUID(92B88032, 2B2B, 11d2, BF, 7E, 00, 10, 4B, C9, 15, 6D)
 
