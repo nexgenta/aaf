@@ -3,37 +3,27 @@
 #ifndef __CAAFEssenceDataStream_h__
 #define __CAAFEssenceDataStream_h__
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #ifndef __AAFPlugin_h__
 #include "AAFPlugin.h"
 #endif
 
+
+
+
+
+
+#ifndef __CAAFDefaultStream_h__
+#include "CAAFDefaultStream.h"
+#endif
 
 #ifndef __CAAFUnknown_h__
 #include "CAAFUnknown.h"
@@ -46,9 +36,8 @@ interface IAAFEssenceData;
 EXTERN_C const CLSID CLSID_AAFEssenceDataStream;
 
 class CAAFEssenceDataStream
-  : public IAAFEssenceDataStream,
-    public IAAFEssenceStream,
-    public CAAFUnknown
+  : public CAAFDefaultStream,
+  public IAAFEssenceDataStream
 {
 protected:
 
@@ -56,23 +45,13 @@ protected:
   //
   // Constructor/destructor
   //
-  CAAFEssenceDataStream (IUnknown * pControllingUnknown);
+  CAAFEssenceDataStream (IUnknown * pControllingUnknown, aafBool doInit = AAFTrue);
   virtual ~CAAFEssenceDataStream ();
 
 public:
-  //
-  // IAAFEssenceDataStream methods.
-  //
-
-  // Initialize this instance with an IAAFEssenceData interface pointer
-  // ba calling QueryInterface on the given IUnknown pointer.
   STDMETHOD (Init)
             (/* [in] */ IUnknown *essenceData);
 
-  
-  //
-  // IAAFEssenceStream methods.
-  //
 
   // Write some number of bytes to the stream exactly and with no formatting or compression.
   STDMETHOD (Write)
@@ -107,7 +86,7 @@ public:
     (/*[out]*/ aafInt64 *  position); // The length of the stream. 
 
   // Ensure that all bits are written.
-  STDMETHOD (FlushCache)
+  STDMETHOD (omcFlushCache)
      ();
 
 
@@ -116,13 +95,6 @@ public:
   STDMETHOD (SetCacheSize)
     (/*[in]*/ aafInt32  itsSize); // The size of the cache buffer. 
 
-
-  
-  //
-  // IUnknown methods. (Macro defined in CAAFUnknown.h)
-  //
-
-  AAF_DECLARE_STANDARD_UNKNOWN()
 
 protected:
   // 
@@ -134,14 +106,17 @@ protected:
 
 public:
   //
-  // This class as concrete. All objects can be constructed from
+  // This class as concrete. All AAF objects can be constructed from
   // a CLSID. This will allow subclassing all "base-classes" by
   // aggreggation.
   // 
-  AAF_DECLARE_FACTORY();
+  AAF_DECLARE_CONCRETE();
   //
+  //********
 
-
+  // Declare the module test method. The implementation of the will be be
+  // in /test/CAAFEssenceStreamTest.cpp.
+  static HRESULT test();
 private:
 	IAAFEssenceData		*_data;
 };
