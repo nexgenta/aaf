@@ -13,7 +13,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOM.cpp,v 1.25 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
+// $Id: AAFCOM.cpp,v 1.26 2005/02/03 22:13:43 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -186,9 +186,15 @@ const char * AAFGetLibrarySharedDirectoryName()
 
 const char * AAFGetLibraryPluginPrefix()
 {
+#ifdef OS_WINDOWS
     static char g_PluginPrefix[4];
 
     strcpy(g_PluginPrefix, "aaf");
+#else
+    static char g_PluginPrefix[7];
+
+    strcpy(g_PluginPrefix, "libaaf");
+#endif
     
     return g_PluginPrefix;
 }

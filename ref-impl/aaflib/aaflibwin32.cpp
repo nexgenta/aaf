@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflibwin32.cpp,v 1.9 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: aaflibwin32.cpp,v 1.10 2005/02/03 22:13:43 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -97,16 +97,13 @@ AAFRDLIRESULT AAFFindSymbol(AAFLibraryHandle libHandle, const char* symbolName, 
 }
 
 
+// This operates on a new directory component and checks
+// if it should be descended into during a library search (see AAFFindLibrary)
 static bool AAFIsValidDirectory(const char* name)
 {
-	if (NULL == name)
-		return false;
 	// Do not allow any relative addressing in directory names.
-	// This is a simple security check that we might as well
-	// perform to be on the "safe side"...
-	else if ( (0 == strcmp(".", name)) || (0 == strcmp("..", name)) )
-		return false;
-	else if (NULL != strstr(name, ".."))
+	// Otherwise we may recurse in the find routines.
+	if ( (0 == strcmp(".", name)) || (0 == strcmp("..", name)) )
 		return false;
 	else 
 		return true;
@@ -150,9 +147,6 @@ AAFRDLIRESULT AAFFindLibrary(const char* name, LPFNAAFTESTFILEPROC testProc, voi
 	
 	if (NULL == name || NULL == testProc)
 		return AAFRESULT_NULL_PARAM;
-
-	if (!AAFIsValidDirectory(name))
-		return AAFRESULT_INVALID_PARAM;
 
 	nameLength = strlen(name);
 
@@ -208,7 +202,7 @@ AAFRDLIRESULT AAFFindLibrary(const char* name, LPFNAAFTESTFILEPROC testProc, voi
 			
 			if (isDirectory)
 			{
-				if (AAFIsValidDirectory(findData.cFileName) && AAFIsValidDirectory(findPath))
+				if (AAFIsValidDirectory(findData.cFileName))
 				{
 					result = testProc(findPath, findData.cFileName, isDirectory, userData);
 				}
