@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2004/03/30 15:27:45 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,8 @@ axPlugin : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libaxPlugin$(DLL)
 
 $(LIBDIR)/libaxPlugin$(DLL) : $(CXXOBJS)
 	$(LD_DYN_LIB) -o $@ $(CXXOBJS) -L$(OBJDIR) -laxLib \
-	$(AAFBUILDDIR)/aafiid/$(AAFTARGETDIR)/libaafiid$(LIB) \
+	-L$(AAFBUILDDIR)/aafiid/$(AAFTARGETDIR) -laafiid \
+	-L$(AAFBUILDDIR)/aaflib/$(AAFTARGETDIR) -laaflib
 
 
 .PHONY : clean
@@ -65,4 +66,3 @@ clean :
 realclean : clean
 
 include $(AAFBASE)/build/rules.mk
-
