@@ -96,13 +96,13 @@ const aafUID_t NIL_UID = { 0 };
 
 
 ImplAAFHeader::ImplAAFHeader ()
-: _byteOrder(         PID_Header_ByteOrder,          "ByteOrder"),
-  _lastModified(      PID_Header_LastModified,       "LastModified"),
-  _identificationList(PID_Header_IdentificationList, "IdentificationList"),
-  _contentStorage(		PID_Header_Content,	"Content"),
-  _dictionary(PID_Header_Dictionary,	"Dictionary"),
-  _fileRev(PID_Header_Version,		"Version"),
-  _objectModelVersion(PID_Header_ObjectModelVersion, "ObjectModelVersion")
+: _byteOrder(         PID_Header_ByteOrder,          L"ByteOrder"),
+  _lastModified(      PID_Header_LastModified,       L"LastModified"),
+  _identificationList(PID_Header_IdentificationList, L"IdentificationList"),
+  _contentStorage(		PID_Header_Content,	L"Content"),
+  _dictionary(PID_Header_Dictionary,	L"Dictionary"),
+  _fileRev(PID_Header_Version,		L"Version"),
+  _objectModelVersion(PID_Header_ObjectModelVersion, L"ObjectModelVersion")
 {
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
@@ -249,9 +249,11 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFContentStorage *cstore = NULL;
 
     if (! pMob)
-	  {
 		return AAFRESULT_NULL_PARAM;
-	  }
+	  
+ 	if (! pMob->attached())
+		return AAFRESULT_MOB_NOT_FOUND;	
+
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
@@ -357,9 +359,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
     ImplAAFContentStorage *cstore = NULL;
 	if (! pEssenceData)
-	{
 		return AAFRESULT_NULL_PARAM;
-	}
+	
+	if (! pEssenceData->attached())
+		return AAFRESULT_ESSENCE_NOT_FOUND;
+
 	XPROTECT()
 	{
 		cstore = GetContentStorage();		// Does not AddRef
@@ -371,7 +375,26 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::LookupEssenceData (aafMobID_constref mobID,
+                           ImplAAFEssenceData **ppEssenceData)
+{
+    ImplAAFContentStorage *cstore = NULL;
 
+    if (! ppEssenceData)
+	  {
+		return AAFRESULT_NULL_PARAM;
+	  }
+	XPROTECT()
+	{
+		cstore = GetContentStorage();		// Does not AddRef
+		CHECK(cstore->LookupEssence(mobID, ppEssenceData));
+	}
+	XEXCEPT
+	XEND
+
+	return AAFRESULT_SUCCESS;
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::GetContentStorage (ImplAAFContentStorage ** ppContentStorage)
@@ -591,6 +614,11 @@ AAFRESULT
 							   pIdent->productVersionString,
 							   pIdent->productID));
 
+	if (pIdent->productVersion)
+	  {
+		CHECK (identObj->SetProductVersion (*pIdent->productVersion));
+	  }
+
     _identificationList.appendValue(identObj);
  
     dummyVersion.major = 0;
@@ -754,4 +782,44 @@ void ImplAAFHeader::SetObjectModelVersion (aafUInt32 version)
 {
   _objectModelVersion = version;
   assert (IsObjectModelVersionPresent());
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::GetStoredByteOrder (eAAFByteOrder_t *  pOrder)
+{
+  if (!pOrder)
+    return AAFRESULT_NULL_PARAM;
+
+  if (_byteOrder == 0x4d4d) // 'MM'
+  {
+    *pOrder = kAAFByteOrderBig;
+  }
+  else  // 'II'
+  {
+    *pOrder = kAAFByteOrderLittle;
+  }
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::GetNativeByteOrder (eAAFByteOrder_t *  pOrder)
+{
+  if (!pOrder)
+    return AAFRESULT_NULL_PARAM;
+
+	OMByteOrder byteOrder = hostByteOrder();
+	if (byteOrder == littleEndian)
+  {
+		*pOrder = kAAFByteOrderLittle;
+	} 
+  else 
+  {
+		*pOrder = kAAFByteOrderBig;
+	}
+
+  return AAFRESULT_SUCCESS;
 }
