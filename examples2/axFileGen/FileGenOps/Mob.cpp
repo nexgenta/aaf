@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Mob.cpp,v 1.9 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: Mob.cpp,v 1.10 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,7 @@
 #include <AxContentStorage.h>
 #include <AxIterator.h>
 #include <AxEssence.h>
+#include <AxDefObject.h>
 
 #include <AAFResult.h>
 

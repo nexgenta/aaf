@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: WaveHeader.h,v 1.6 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: WaveHeader.h,v 1.7 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -107,6 +107,3 @@ private:
 	int _numChannels;
 
 };
-
-
-

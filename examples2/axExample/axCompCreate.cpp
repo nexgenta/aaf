@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axCompCreate.cpp,v 1.9 2004/02/27 14:26:37 stuart_hc Exp $ $Name:  $
+// $Id: axCompCreate.cpp,v 1.10 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 #include <AxMob.h>
 #include <AxMobSlot.h>
 #include <AxEssence.h>
+#include <AxDefObject.h>
 #include <AxIterator.h>
 #include <AxEx.h>
 #include <AxUtil.h>

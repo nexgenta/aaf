@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: WaveHeader.cpp,v 1.7 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: WaveHeader.cpp,v 1.8 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -85,7 +85,7 @@ WaveHeader::WaveHeader( int sampleRate,
 	// AudioFormat is PCM - indicated by the value 1
 	SetInt16( AUDIO_FORMAT_IDX, 1 );
 
-	// Set num changes as a 16 bit value;
+	// Set num channels as a 16 bit value;
 	SetInt16( NUM_CHANNELS_IDX, _numChannels );
 
 	// Sample rate

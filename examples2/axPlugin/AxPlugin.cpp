@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPlugin.cpp,v 1.3 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxPlugin.cpp,v 1.4 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,7 +24,6 @@
 
 #include "AxPluginRegistry.h"
 #include "CAxClassFactory.h"
-#include "CAxNullEssenceCodec.h"
 #include "CAxUnknown.h"
 
 bool AxPlugin::CanUnloadNow()
