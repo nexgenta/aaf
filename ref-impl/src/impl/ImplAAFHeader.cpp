@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.93 2005/01/11 09:27:07 jfpanisset Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.94 2005/01/11 15:14:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -591,10 +591,7 @@ AAFRESULT
     if (ident.productVersionString == 0) {
       ident.productVersionString = L"Unknown version";
     }
-    if (ident.platform == 0) {
-      ident.platform = L"Windows NT";
-    }
-    
+
     // Get the dictionary so that we can use the factory
     // method to create the identification.
     ImplAAFDictionary *pDictionary = GetDictionary();
