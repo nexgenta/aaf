@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="ComCutsTestAAF" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="ComPropDirectDump" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=ComCutsTestAAF - Win32 Debug
+CFG=ComPropDirectDump - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "ComCutsTestAAF.mak".
+!MESSAGE NMAKE /f "ComPropDirectDump.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "ComCutsTestAAF.mak" CFG="ComCutsTestAAF - Win32 Debug"
+!MESSAGE NMAKE /f "ComPropDirectDump.mak" CFG="ComPropDirectDump - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "ComCutsTestAAF - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "ComCutsTestAAF - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "ComPropDirectDump - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "ComPropDirectDump - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=ComCutsTestAAF - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "ComCutsTestAAF - Win32 Release"
+!IF  "$(CFG)" == "ComPropDirectDump - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../../../../ref-impl/src/impl" /I "../../../../ref-impl/src/OM" /I "..\..\..\aafsdk\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../../../../ref-impl/include" /I "../../../../ref-impl/src/impl" /I "../../../../ref-impl/src/OM" /I "..\..\..\aafsdk\include" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -50,9 +50,9 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ole32.lib uuid.lib /nologo /subsystem:console /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /nodefaultlib:"msvcrtd.lib" /out:"../../../Release/Examples/Com/ComCutsTestAAF.exe" /libpath:"..\..\..\aafsdk\lib"
+# ADD LINK32 ole32.lib uuid.lib /nologo /subsystem:console /machine:I386 /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /nodefaultlib:"msvcrtd.lib" /out:"../../../Release/Examples/Com/ComPropDirectDump.exe" /libpath:"..\..\..\aafsdk\lib"
 
-!ELSEIF  "$(CFG)" == "ComCutsTestAAF - Win32 Debug"
+!ELSEIF  "$(CFG)" == "ComPropDirectDump - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /ZI /Od /I "..\..\..\aafsdk\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "OM_ENABLE_DEBUG" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "../../../../ref-impl\include" /I "..\..\..\aafsdk\include" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /YX /FD /c
 # SUBTRACT CPP /Fr
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -75,15 +75,15 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ole32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /nodefaultlib:"libc.lib libcmt.lib msvcrt.lib libcd.lib libcmtd.lib" /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"msvcrt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /out:"../../../Debug/Examples/Com/ComCutsTestAAF.exe" /pdbtype:sept /libpath:"..\..\..\aafsdk\lib"
+# ADD LINK32 ole32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /nodefaultlib:"libc.lib libcmt.lib msvcrt.lib libcd.lib libcmtd.lib" /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /nodefaultlib:"msvcrt.lib" /nodefaultlib:"libcd.lib" /nodefaultlib:"libcmtd.lib" /out:"../../../Debug/Examples/Com/ComPropDirectDump.exe" /pdbtype:sept /libpath:"..\..\..\aafsdk\lib"
 # SUBTRACT LINK32 /incremental:no /map
 
 !ENDIF 
 
 # Begin Target
 
-# Name "ComCutsTestAAF - Win32 Release"
-# Name "ComCutsTestAAF - Win32 Debug"
+# Name "ComPropDirectDump - Win32 Release"
+# Name "ComPropDirectDump - Win32 Debug"
 # Begin Group "Libraries"
 
 # PROP Default_Filter "lib"
@@ -91,9 +91,9 @@ LINK32=link.exe
 
 SOURCE=..\..\..\aafsdk\lib\AAF.lib
 
-!IF  "$(CFG)" == "ComCutsTestAAF - Win32 Release"
+!IF  "$(CFG)" == "ComPropDirectDump - Win32 Release"
 
-!ELSEIF  "$(CFG)" == "ComCutsTestAAF - Win32 Debug"
+!ELSEIF  "$(CFG)" == "ComPropDirectDump - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
@@ -104,11 +104,11 @@ SOURCE=..\..\..\aafsdk\lib\AAF.lib
 
 SOURCE=..\..\..\aafsdk\lib\AAFD.lib
 
-!IF  "$(CFG)" == "ComCutsTestAAF - Win32 Release"
+!IF  "$(CFG)" == "ComPropDirectDump - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "ComCutsTestAAF - Win32 Debug"
+!ELSEIF  "$(CFG)" == "ComPropDirectDump - Win32 Debug"
 
 !ENDIF 
 
@@ -117,9 +117,9 @@ SOURCE=..\..\..\aafsdk\lib\AAFD.lib
 
 SOURCE=..\..\..\aafsdk\lib\AAFIID.lib
 
-!IF  "$(CFG)" == "ComCutsTestAAF - Win32 Release"
+!IF  "$(CFG)" == "ComPropDirectDump - Win32 Release"
 
-!ELSEIF  "$(CFG)" == "ComCutsTestAAF - Win32 Debug"
+!ELSEIF  "$(CFG)" == "ComPropDirectDump - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
@@ -130,11 +130,11 @@ SOURCE=..\..\..\aafsdk\lib\AAFIID.lib
 
 SOURCE=..\..\..\aafsdk\lib\AAFIIDD.lib
 
-!IF  "$(CFG)" == "ComCutsTestAAF - Win32 Release"
+!IF  "$(CFG)" == "ComPropDirectDump - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "ComCutsTestAAF - Win32 Debug"
+!ELSEIF  "$(CFG)" == "ComPropDirectDump - Win32 Debug"
 
 !ENDIF 
 
@@ -142,7 +142,7 @@ SOURCE=..\..\..\aafsdk\lib\AAFIIDD.lib
 # End Group
 # Begin Source File
 
-SOURCE="..\..\..\..\examples\com-api\ComCutsOnlyTest\CutsOnlyExample.cpp"
+SOURCE="..\..\..\..\examples\com-api\ComPropDirectDump\dumper.cpp"
 # End Source File
 # End Target
 # End Project
