@@ -3,10 +3,10 @@ AAFMediaFilmDescriptor\
 #endm
 #c
 #startm .parent-module 0
-AAFMediaDescriptor\
+AAFEssenceDescriptor\
 #endm
 #c
-#import ./AAFMediaDescriptor.exp
+#import ./AAFEssenceDescriptor.exp
 AD_HEAD
 /******************************************\
 *                                          *
@@ -17,12 +17,16 @@ AD_HEAD
 *                                          *
 \******************************************/
 
+/***********************************************\
+*	Stub only.   Implementation not yet added	*
+\***********************************************/
+
 AD_INCLUDE(AAFTypes)
 
 AD_CLASS_UUID(e58a8564, 2a3e, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(e58a8563, 2a3e, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 
 //@access Public Members
 
@@ -89,5 +93,5 @@ AD_METHOD1(SetFilmAspectRatio,
 [in],aafRational_t,aspectRatio,Film Aspect Ratio,
 Set the image aspect ratio.)
 
-AD_CLASS_END
+AD_XCLASS_END(Concrete, StoredObject)
    
