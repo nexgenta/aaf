@@ -31,9 +31,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -84,7 +87,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceMob	*pSourceMob = NULL;
 	IAAFMob			*pMob = NULL;
 	IAAFEssenceDescriptor *edesc = NULL;
-	aafRational_t	audioRate = { 44100, 1 };
 	aafProductIdentification_t	ProductInfo;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
@@ -131,10 +133,17 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(L"EssenceDescriptorTest"));
 		
-		// Create the descriptor:
-		checkResult(defs.cdEssenceDescriptor()->
+		// Create a concrete subclass of the descriptor:
+		checkResult(defs.cdAIFCDescriptor()->
 					CreateInstance(IID_IAAFEssenceDescriptor, 
 								   (IUnknown **)&edesc));		
+
+		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
+
  		checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
 			// Verify that there are no locators
@@ -219,7 +228,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IEnumAAFLocators *			pCloneEnum = NULL;
 	IAAFLocator	*				pLocator = NULL;
 	aafUInt32					numLocators;
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	bool bFileOpen = false;
@@ -228,17 +236,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFLocator				**	pArrayPoint = pArray;
 	aafUInt32			resultCount;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"EnumAAFLocators Test. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 
 	try
 	{	
@@ -388,14 +385,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
  
-extern "C" HRESULT CEnumAAFLocators_test()
+extern "C" HRESULT CEnumAAFLocators_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFLocators_test(testMode_t mode)
 {
   HRESULT hr = AAFRESULT_SUCCESS;
   aafWChar * pFileName = L"EnumAAFLocators.aaf";
 
   try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

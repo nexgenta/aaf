@@ -31,9 +31,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -209,7 +212,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs;
 
 	aafWChar					readManufacturer[256];
@@ -221,18 +223,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafUInt32					length;
 
 	HRESULT						hr = AAFRESULT_SUCCESS;
-
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFTapeDescriptor Test";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 
 	hr = AAFFileOpenExistingRead(pFileName, 0, &pFile);
 
@@ -329,14 +319,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTapeDescriptor_test()
+extern "C" HRESULT CAAFTapeDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFTapeDescriptor_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFTapeDescriptorTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile( pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

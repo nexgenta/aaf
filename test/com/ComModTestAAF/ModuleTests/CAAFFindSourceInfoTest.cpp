@@ -31,9 +31,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
@@ -83,9 +86,20 @@ static const 	aafMobID_t	TEST_Source_MobIDs[NumMobSlots] =
 };	//end mobid block
 
 
+//{060c2b340205110101001000-13-00-00-00-{f9546632-8d6f-11d4-a380-009027dfca6a}}
+
+static const aafMobID_t TAPE_MOB_ID = {
+
+{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+
+0x13, 0x00, 0x00, 0x00, 
+
+{0xf9546632, 0x8d6f, 0x11d4, 0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+
+
 static const aafPosition_t	TAPE_MOB_OFFSET_ARR[NumMobSlots] = { 15, 25, 35 };
 static const aafLength_t	TAPE_MOB_LENGTH_ARR[NumMobSlots] = { 90, 80, 70 };
-static aafMobID_t			TAPE_MOB_ID = {0};
+static aafMobID_t tapeMobID = TAPE_MOB_ID;
 
 #define TAPE_MOB_NAME	L"A Tape Mob"
 
@@ -189,7 +203,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	HRESULT			hr = S_OK;
 	long			test;
 	aafSourceRef_t	ref;
-	aafMobID_t		tapeMobID;
 	IAAFEssenceDescriptor*		pEssDesc = NULL;
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 	
@@ -269,9 +282,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		}
 		checkResult(pTapeMob->QueryInterface(IID_IAAFMob, (void **) &pTempMob));
 		checkResult(pTempMob->SetName(TAPE_MOB_NAME));
-		checkResult(pTempMob->GetMobID(&tapeMobID));
+		checkResult(pTempMob->SetMobID(tapeMobID));
 		//save the id for future (test) reference
-		TAPE_MOB_ID = tapeMobID;
+//		TAPE_MOB_ID = tapeMobID;
 
 		checkResult(pHeader->AddMob(pTempMob));
 		pTempMob->Release();
@@ -296,9 +309,17 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				ref,
 				TAPE_MOB_LENGTH_ARR[test]));
 			
-			checkResult(defs.cdEssenceDescriptor()->
+			// Create a concrete subclass of EssenceDescriptor
+			checkResult(defs.cdAIFCDescriptor()->
 				CreateInstance(IID_IAAFEssenceDescriptor, 
 				(IUnknown **)&pDesc));	
+
+			IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+			checkResult(pDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+			checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+			pAIFCDesc->Release();
+			pAIFCDesc = NULL;
+
 			checkResult(pSrcMob->SetEssenceDescriptor(pDesc));
 			pDesc->Release();
 			pDesc = NULL;
@@ -384,7 +405,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFMasterMob*		pMasterMob = NULL;
 	IEnumAAFMobSlots*	pSlotIter = NULL;
 	IAAFMobSlot*		pSlot;
-	aafWChar*			pTapeName = NULL;
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
 	IAAFSearchSource*  pSearchSource = NULL;
@@ -491,7 +511,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				//Mob
 				checkExpression(si_mob!=NULL, AAFRESULT_TEST_FAILED); 
 				si_mob->GetMobID(&si_MobID);
-				checkExpression(memcmp(&si_MobID, &TAPE_MOB_ID, sizeof(aafMobID_t))==0,
+				checkExpression(memcmp(&si_MobID, &tapeMobID, sizeof(aafMobID_t))==0,
 										AAFRESULT_TEST_FAILED);
 				//Source Reference
 				checkExpression(si_sourceRef.sourceSlotID == s,					AAFRESULT_TEST_FAILED);
@@ -572,14 +592,18 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
 
 
-extern "C" HRESULT CAAFFindSourceInfo_test()
+extern "C" HRESULT CAAFFindSourceInfo_test(testMode_t mode);
+extern "C" HRESULT CAAFFindSourceInfo_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFFindSourceInfoTest.aaf";
 	
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}

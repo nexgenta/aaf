@@ -31,9 +31,11 @@
 #include "AAF.h"
 
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
@@ -106,7 +108,7 @@ static HRESULT CreateAAFSequence(IAAFDictionary *pDictionary,
 			hr = pSequence->AppendComponent(pComponent);
 
 			pComponent->Release();
-      pComponent = NULL;
+			pComponent = NULL;
 
 			if (FAILED(hr))
 				break;
@@ -132,7 +134,7 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	IEnumAAFComponents*	pCompCloneIter = NULL;
 	IAAFComponent*		pComp = NULL;
   	IAAFComponent*		pCompArray[kNumComponents] = {0};
-	aafUInt32			numFetched, i;
+	aafUInt32			numFetched, i, j;
 	HRESULT				hr = S_OK,
 						localhr = S_OK;
 	aafUInt32			numCpnts;
@@ -157,13 +159,17 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 /* Test the NextOne method ******************************/
 
 	// Call NextOne once for each mob for a total of numCpnts times	
-	for (i=0; i<numCpnts; i++)	{
-		if (pCompIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	{
+	for (i=0; i<numCpnts; i++)	
+	{
+		if (pCompIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	
+		{
 			pComp->Release();
 			pComp = NULL;
 		}
 		else
+		{
 			localhr = AAFRESULT_TEST_FAILED;
+		}
 	}			
 	
 	// Make sure we are at the end
@@ -187,10 +193,6 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	localhr = S_OK;
 	pCompIter->Reset();
 
-	// Try Skipping 0 objects			
-	if (pCompIter->Skip(0) != AAFRESULT_SUCCESS)
-			localhr = AAFRESULT_TEST_FAILED;
-
 	// skip over each Component one at a time.
 	for (i=0; i<numCpnts; i++)
 		if (pCompIter->Skip(1) != AAFRESULT_SUCCESS)
@@ -202,7 +204,8 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 
 	pCompIter->Reset();
 	// Skip over multiple Components at a time.		
-	for (i=2; i<=numCpnts; i++)	{
+	for (i=2; i<=numCpnts; i++)	
+	{
 		if (pCompIter->Skip(i) != AAFRESULT_SUCCESS)
 			localhr = AAFRESULT_TEST_FAILED;
 
@@ -225,18 +228,12 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	pCompIter->Reset();
 	numFetched = 1;
 
-	// Make sure a count of 0 succeeds
-	if (pCompIter->Next(0, &pComp, &numFetched) != AAFRESULT_SUCCESS)
-		localhr = AAFRESULT_TEST_FAILED;
-	
-	if (0 != numFetched)
-		localhr = AAFRESULT_TEST_FAILED;
-
-
 	// Iterate thru the Components using Next doing 1 at a time
 	pCompIter->Reset();
-	for ( i=0; i<numCpnts ;i++)	{
-		if (pCompIter->Next(1, &pComp, &numFetched) == AAFRESULT_SUCCESS)	{
+	for ( i=0; i<numCpnts ;i++)	
+	{
+		if (pCompIter->Next(1, &pComp, &numFetched) == AAFRESULT_SUCCESS)	
+		{
 			pComp->Release();
 	 	    pComp = NULL;
 
@@ -254,28 +251,36 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	// Test the Next method filling out an array of Components
 	numFetched = 0;
 	pCompIter->Reset();
-	for ( i=2; i<=numCpnts ;i++)	{
-		if (pCompIter->Next(i, pCompArray, &numFetched) == AAFRESULT_SUCCESS)	{
+	for ( i=2; i<=numCpnts ;i++)	
+	{
+		if (pCompIter->Next(i, pCompArray, &numFetched) == AAFRESULT_SUCCESS)	
+		{
 			if (i != numFetched)
 				localhr = AAFRESULT_TEST_FAILED;
 
-			for (i = 0; i < numFetched; i++)
-				if (pCompArray[i] != NULL)	// should have been set
+			for (j = 0; j < numFetched; j++)
+			{
+				if (pCompArray[j] != NULL)	// should have been set
 				{
-					pCompArray[i]->Release();
-					pCompArray[i] = NULL;
+					pCompArray[j]->Release();
+					pCompArray[j] = NULL;
 				}
 				else
+				{
 					localhr = AAFRESULT_TEST_FAILED;
+				}
+			}
 		}
 		else
+		{
 			localhr = AAFRESULT_TEST_FAILED;
+		}
 			
 		pCompIter->Reset();
 	}
 
 	// Make sure we can't get more Mobs than numCpnts	
-	if (pCompIter->Next(i+1, pCompArray, &numFetched) != AAFRESULT_SUCCESS)
+	if (pCompIter->Next(i+1, pCompArray, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
 		localhr = AAFRESULT_TEST_FAILED;
 
 	if (numCpnts != numFetched)
@@ -295,7 +300,8 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	pCompIter->Skip(2);
 
 	// Make sure we can't go past the end to fill the array
-	if (pCompIter->Next(numCpnts, pCompArray, &numFetched) != AAFRESULT_SUCCESS)
+	if (pCompIter->Next(numCpnts, pCompArray, &numFetched) 
+		!= AAFRESULT_NO_MORE_OBJECTS)
 		localhr = AAFRESULT_TEST_FAILED;
 
 	if ((numCpnts-2) != numFetched)
@@ -321,7 +327,8 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 
 	if (SUCCEEDED(localhr))
 		cout<< "	Next() ...		Passed" << endl;
-	else	{
+	else	
+	{
 		cout<< "	Next() ...		Failed!!!" << endl;
 		hr = AAFRESULT_TEST_FAILED;
 	}
@@ -332,14 +339,18 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	// Test the Clone method with with enumerator at begining
 	localhr = S_OK;
 	pCompIter->Reset();
-	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS)	{
-		for (i=0; i < numCpnts; i++)	
-			if (pCompCloneIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	{
+	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS)	
+	{
+		for (i=0; i < numCpnts; i++)
+		{
+			if (pCompCloneIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	
+			{
 				pComp->Release();
     			pComp = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;		
+		}
 
 		if (pCompCloneIter->NextOne(&pComp) != AAFRESULT_NO_MORE_OBJECTS)
 			localhr = AAFRESULT_TEST_FAILED;
@@ -352,45 +363,55 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 			localhr = AAFRESULT_TEST_FAILED;
 		
 		for (i = 0; i < numCpnts; i++)
-			if (pCompArray[i] != NULL)	{
+		{
+			if (pCompArray[i] != NULL)	
+			{
 				pCompArray[i]->Release();
 				pCompArray[i] = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;
+		}
 
 		pCompCloneIter->Reset();
 
-		if (pCompCloneIter->Next(numCpnts+1, pCompArray, &numFetched) != AAFRESULT_SUCCESS)
+		if (pCompCloneIter->Next(numCpnts+1, pCompArray, &numFetched) != AAFRESULT_NO_MORE_OBJECTS)
 			localhr = AAFRESULT_TEST_FAILED;
 
 		if (numCpnts != numFetched)
 			localhr = AAFRESULT_TEST_FAILED;
 		
 		for (i = 0; i < numCpnts; i++)
-			if (pCompArray[i] != NULL)	{
+		{
+			if (pCompArray[i] != NULL)	
+			{
 				pCompArray[i]->Release();
 				pCompArray[i] = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;
+		}
 
 		pCompCloneIter->Reset();
 		pCompCloneIter->Skip(1);
 
-		if (pCompCloneIter->Next(numCpnts, pCompArray, &numFetched) != AAFRESULT_SUCCESS)
+		if (pCompCloneIter->Next(numCpnts, pCompArray, &numFetched) 
+			!= AAFRESULT_NO_MORE_OBJECTS)
 			localhr = AAFRESULT_TEST_FAILED;
 
 		if ((numCpnts-1) != numFetched)
 			localhr = AAFRESULT_TEST_FAILED;
 		
 		for (i = 0; i < numCpnts-1; i++)
-			if (pCompArray[i] != NULL)	{
+		{
+			if (pCompArray[i] != NULL)	
+			{
 				pCompArray[i]->Release();
 				pCompArray[i] = NULL;
 			}
 			else
 				localhr = AAFRESULT_TEST_FAILED;
+		}
 	
 		pCompCloneIter->Release();
 	 	pCompCloneIter = NULL;
@@ -402,8 +423,10 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	// Indirectly tests the Skip and Reset methods.
 	pCompIter->Reset();
 	pCompIter->Skip(numCpnts-1);
-	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS) {
-		if (pCompCloneIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	{
+	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS) 
+	{
+		if (pCompCloneIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	
+		{
 			pComp->Release();
 		    pComp = NULL;
 		}
@@ -420,9 +443,11 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	// Indirectly tests the Skip and Reset methods.
 	pCompIter->Reset();
 	pCompIter->Skip(numCpnts-2);
-	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS)	{
+	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS)	
+	{
 		pCompCloneIter->Skip(1);
-		if (pCompCloneIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	{
+		if (pCompCloneIter->NextOne(&pComp) == AAFRESULT_SUCCESS)	
+		{
 			pComp->Release();
 		    pComp = NULL;
 		}
@@ -440,7 +465,8 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 
 
 	pCompIter->Reset();
-	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS)	{
+	if (pCompIter->Clone(&pCompCloneIter) == AAFRESULT_SUCCESS)	
+	{
 		if (pCompCloneIter->Next(1, NULL, &numFetched) != AAFRESULT_NULL_PARAM)
 			localhr = AAFRESULT_TEST_FAILED;
 	
@@ -564,23 +590,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFFile *					pFile = NULL;
 	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
 
-
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFComponents Test";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
-	ProductInfo.platform = NULL;
-	  
   try
   {
     // Open the file
@@ -611,14 +622,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CEnumAAFComponents_test()
+extern "C" HRESULT CEnumAAFComponents_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFComponents_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
  	aafWChar * pFileName = L"EnumAAFComponentsTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

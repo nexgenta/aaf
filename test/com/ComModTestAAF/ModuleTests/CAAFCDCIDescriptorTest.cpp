@@ -31,9 +31,12 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
@@ -399,14 +402,18 @@ Cleanup:
 	return hr;
 }
 
-extern "C" HRESULT CAAFCDCIDescriptor_test()
+extern "C" HRESULT CAAFCDCIDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFCDCIDescriptor_test(testMode_t mode)
 {
 	aafWChar*	pFileName = L"AAFCDCIDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}

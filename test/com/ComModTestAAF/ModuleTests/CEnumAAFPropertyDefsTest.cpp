@@ -27,25 +27,76 @@
  *
  ************************************************************************/
 
-#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
+#include <iostream.h>
+#include <stdio.h>
+#include <wchar.h>
+
+#include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 
-// Required function prototype.
-extern "C" HRESULT CEnumAAFPropertyDefs_test(void);
+#include "CEnumeratorTest.h"
 
-HRESULT CEnumAAFPropertyDefs_test()
+class CEnumAAFPropertyDefsTest: public 
+	CEnumeratorTest<IEnumAAFPropertyDefs,IAAFPropertyDef>
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+public:
+	CEnumAAFPropertyDefsTest()
+	{
+		_pKnownClassDef=0;
+	}
+	// Before performing any testing, we loop up a known class definition, so we
+	// can perform our test by enumerating over its properties.
+	void LookupKnownClassDef(IAAFDictionary *pDictionary)
+	{
+		if(!_pKnownClassDef)
+			checkResult(pDictionary->LookupClassDef(AUID_AAFTapeDescriptor,
+			&_pKnownClassDef));
+	}
+	HRESULT CountItems(IAAFDictionary *pDictionary,aafUInt32 *piCount)
+	{
+		LookupKnownClassDef(pDictionary);
+		return(_pKnownClassDef->CountPropertyDefs(piCount));
+	}
+	HRESULT GetItems(IAAFDictionary *pDictionary,
+						IEnumAAFPropertyDefs **ppEnumerator)
+	{
+		LookupKnownClassDef(pDictionary);
+		return(_pKnownClassDef->GetPropertyDefs(ppEnumerator));
+	}
+	aafBool ItemIsPresent(IAAFDictionary *pDictionary,aafUID_t& Id)
+	{
+		LookupKnownClassDef(pDictionary);
+		IAAFSmartPointer<IAAFPropertyDef> pPropertyDef;
+		return(_pKnownClassDef->LookupPropertyDef(Id,&pPropertyDef)
+			==AAFRESULT_SUCCESS?kAAFTrue:kAAFFalse);
+	}
+	~CEnumAAFPropertyDefsTest()
+	{
+		if(_pKnownClassDef)
+			_pKnownClassDef->Release();
+	}
+
+private:
+	IAAFClassDef *_pKnownClassDef;
+};
+
+extern "C" HRESULT CEnumAAFPropertyDefs_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFPropertyDefs_test(testMode_t mode)
+{
+	try
+	{
+		CEnumAAFPropertyDefsTest Test;
+  		if(mode == kAAFUnitTestReadWrite)
+			Test.Run(mode);		// !!! This test requires create & verify intermixed
+	}
+	catch(HRESULT& rResult)
+	{
+		return(rResult);
+	}
+
+	return AAFRESULT_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
 
 
 

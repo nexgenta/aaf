@@ -37,6 +37,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
@@ -65,6 +66,38 @@ inline void checkExpression(bool expression, HRESULT r)
 {
   if (!expression)
     throw r;
+}
+
+inline void verifyAUID(const aafUID_t *uid1, const aafUID_t **effectIDs, bool *bFoundArray)
+{
+	for (int i=0; i < 2; ++i)
+		if (0 == memcmp(uid1, effectIDs[i], sizeof(aafUID_t)) )
+			if (bFoundArray[i] == false)
+			{
+				bFoundArray[i] = true;
+				break;
+			}
+			else
+				// Found the same AUID
+				throw AAFRESULT_TEST_FAILED;			
+		else if (i == 1 )
+			// Should only get here if effectIDs does not contain uid1
+			throw AAFRESULT_TEST_FAILED;			
+}
+
+inline void resetFoundArray(bool *bFoundArray)
+{
+	for (int i=0; i < 2; i++)
+		bFoundArray[i] = false;
+}
+
+inline void setAUIDtoNULL(aafUID_t *anAUID)
+{		
+	anAUID->Data1 = NULL;
+	anAUID->Data2 = NULL;
+	anAUID->Data3 = NULL;
+	for (int i=0; i < 8; ++i)
+		anAUID->Data4[i] = NULL;
 }
 
 #define TEST_NUM_INPUTS		1
@@ -258,8 +291,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFOperationDef**	pArrayDef = pArray;
 	bool				bFileOpen = false;
 	HRESULT				hr = S_OK;
-	wchar_t				testString[256];
 	aafUInt32			resultCount;
+	aafUID_t			tempAUID;
+	bool				bFoundArray[2] = {false, false};		
 
 	try
 	{
@@ -271,12 +305,15 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	
 		checkResult(pDictionary->GetOperationDefs(&pPlug));
 		/* Read and check the first element */
+		resetFoundArray(bFoundArray);
 		checkResult(pPlug->NextOne(&pOperationDef));
 		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
+		setAUIDtoNULL(&tempAUID);
+		checkResult(pDef->GetAUID (&tempAUID));
+		verifyAUID(&tempAUID, effectIDs, bFoundArray);
+
 		pOperationDef->Release();
 		pOperationDef = NULL;
 		pDef->Release();
@@ -287,20 +324,25 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName[1]) == 0, AAFRESULT_TEST_FAILED);
+		setAUIDtoNULL(&tempAUID);
+		checkResult(pDef->GetAUID (&tempAUID));
+		verifyAUID(&tempAUID, effectIDs, bFoundArray);
+
 		pOperationDef->Release();
 		pOperationDef = NULL;
 		pDef->Release();
 		pDef = NULL;
 		/* Reset, and check the first element again*/
+		resetFoundArray(bFoundArray);
 		checkResult(pPlug->Reset());
 		checkResult(pPlug->NextOne(&pOperationDef));
 		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
+		setAUIDtoNULL(&tempAUID);
+		checkResult(pDef->GetAUID (&tempAUID));
+		verifyAUID(&tempAUID, effectIDs, bFoundArray);
+
 		pOperationDef->Release();
 		pOperationDef = NULL;
 		pDef->Release();
@@ -312,28 +354,35 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName[1]) == 0, AAFRESULT_TEST_FAILED);
+		setAUIDtoNULL(&tempAUID);
+		checkResult(pDef->GetAUID (&tempAUID));
+		verifyAUID(&tempAUID, effectIDs, bFoundArray);
+
 		pOperationDef->Release();
 		pOperationDef = NULL;
 		pDef->Release();
 		pDef = NULL;
 		/* Reset, and read both elements */
+		resetFoundArray(bFoundArray);
 		checkResult(pPlug->Reset());
 		checkResult(pPlug->Next (2, (IAAFOperationDef **)&pArray, &resultCount));
 		checkExpression (resultCount == 2, AAFRESULT_TEST_FAILED);
 		checkResult(pArrayDef[0]->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
+		setAUIDtoNULL(&tempAUID);
+		checkResult(pDef->GetAUID (&tempAUID));
+		verifyAUID(&tempAUID, effectIDs, bFoundArray);
+
 		pDef->Release();
 		pDef = NULL;
 		checkResult(pArrayDef[1]->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName[1]) == 0, AAFRESULT_TEST_FAILED);
+		setAUIDtoNULL(&tempAUID);
+		checkResult(pDef->GetAUID (&tempAUID));
+		verifyAUID(&tempAUID, effectIDs, bFoundArray);
+
 		pDef->Release();
 		pDef = NULL;
 		/* Read one past to make sure that it fails */
@@ -345,8 +394,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
-		checkResult(pDef->GetName (testString, sizeof(testString)));
-		checkExpression (wcscmp(testString, sName[0]) == 0, AAFRESULT_TEST_FAILED);
+		resetFoundArray(bFoundArray);
+		setAUIDtoNULL(&tempAUID);
+		checkResult(pDef->GetAUID (&tempAUID));
+		verifyAUID(&tempAUID, effectIDs, bFoundArray);
+
 		pOperationDef->Release();
 		pOperationDef = NULL;
 		pDef->Release();
@@ -392,14 +444,18 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFOperationDefs_test()
+extern "C" HRESULT CEnumAAFOperationDefs_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFOperationDefs_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EnumAAFOperationDefsTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}

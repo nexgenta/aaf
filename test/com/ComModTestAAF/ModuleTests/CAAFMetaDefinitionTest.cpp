@@ -30,6 +30,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
@@ -59,14 +60,13 @@ static const aafUID_t propDef_id =
 #define TEST_NAME L"Test: Property Def Name"
 #define TEST_DESCRIPTION L"Test: Property Def Description"
 
-static const aafUInt8 TEST_INT_BYTE = 0xAB;
 static const aafUID_t TEST_UID = kAAFTypeID_UInt8;
 
 //Initialize our Non-Implemented flags to False ...
-static aafBoolean_t	 bSetDefaultValue_NI = kAAFFalse;       
-static aafBoolean_t  bSetIsSearchable_NI = kAAFFalse;       
-static aafBoolean_t  bGetDefaultValue_NI = kAAFFalse;       
-static aafBoolean_t  bGetIsSearchable_NI = kAAFFalse;       
+//static aafBoolean_t	 bSetDefaultValue_NI = kAAFFalse;       
+//static aafBoolean_t  bSetIsSearchable_NI = kAAFFalse;       
+//static aafBoolean_t  bGetDefaultValue_NI = kAAFFalse;       
+//static aafBoolean_t  bGetIsSearchable_NI = kAAFFalse;       
 
 
 // convenient error handlers.
@@ -274,14 +274,18 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	
 }
 
-extern "C" HRESULT CAAFMetaDefinition_test()
+extern "C" HRESULT CAAFMetaDefinition_test(testMode_t mode);
+extern "C" HRESULT CAAFMetaDefinition_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
 	aafWChar * pFileName = L"AAFMetaDefinitionTest.aaf";
 	
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}//try

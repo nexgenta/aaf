@@ -29,6 +29,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
@@ -229,8 +230,6 @@ static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const 
 {
 	//CAAFBuiltinDefs defs (pDict);
 	
-	HRESULT hr = 0;
-	
 	/////////////////////////////////////////
 	//  Check the MOb stuff 
 	IAAFMobSP spMob;
@@ -302,7 +301,6 @@ static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const 
 	
 
 	//IAAFTypeDefCharacter::GetCharacter()
-	aafUInt32 i=0;
 	checkResult(spCHAR->GetCharacter(spPropVal, &test_char));
 	//VERIFY values:
 	checkExpression( test_char == TEST_CHAR_VALUE, AAFRESULT_TEST_FAILED );	
@@ -445,8 +443,6 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	IAAFDictionary * pDict = NULL;
 	aafBoolean_t  bFileOpen = kAAFFalse;
 	
-	IEnumAAFMobs*				pMobIter = NULL;
-	
 	try
 	{
 		// Open the file
@@ -481,14 +477,18 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	
 }//ReadAAFFile()
 
-extern "C" HRESULT CAAFTypeDefCharacter_test()
+extern "C" HRESULT CAAFTypeDefCharacter_test(testMode_t mode);
+extern "C" HRESULT CAAFTypeDefCharacter_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
 	aafWChar * pFileName = L"AAFTypeDefCharacterTest.aaf";
 	
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );	
 		

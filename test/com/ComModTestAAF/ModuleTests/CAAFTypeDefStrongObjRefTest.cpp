@@ -27,6 +27,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
@@ -34,6 +35,7 @@
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFClassDef>         IAAFClassDefSP;
@@ -208,9 +210,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	  // create
 	  IAAFTypeDefObjectRefSP tdor;
-	  checkResult (defs.cdTypeDefStrongObjRef()->
-				   CreateInstance(IID_IAAFTypeDefObjectRef,
-								  (IUnknown**)&tdor));
+	  checkResult (pDictionary->CreateMetaInstance(AUID_AAFTypeDefStrongObjRef,
+                                                       IID_IAAFTypeDefObjectRef,
+                                                       (IUnknown**)&tdor));
 
 	  // get class def for the referenced type.  In this case,
 	  // AAFComponent.
@@ -422,7 +424,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	  IAAFPropertyValueSP pv1;
 	  checkResult (mobObj->GetPropertyValue (pd1, &pv1));
 	  IAAFObjectSP fillObj1;
-	  checkResult (tdor->GetObject (pv1, &fillObj1));
+	  checkResult (tdor->GetObject (pv1, IID_IAAFObject, (IUnknown **)&fillObj1));
 	  IAAFComponentSP comp1;
 	  checkResult (fillObj1->QueryInterface (IID_IAAFComponent,
 											 (void **)&comp1));
@@ -434,7 +436,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	  IAAFPropertyValueSP pv2;
 	  checkResult (mobObj->GetPropertyValue (pd2, &pv2));
 	  IAAFObjectSP fillObj2;
-	  checkResult (tdor->GetObject (pv2, &fillObj2));
+	  checkResult (tdor->GetObject (pv2, IID_IAAFObject, (IUnknown **)&fillObj2));
 	  IAAFComponentSP comp2;
 	  checkResult (fillObj2->QueryInterface (IID_IAAFComponent,
 											 (void **)&comp2));
@@ -455,8 +457,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
   return 	hr;
 }
 
+extern "C" HRESULT CAAFTypeDefStrongObjRef_test(testMode_t mode);
 
-extern "C" HRESULT CAAFTypeDefStrongObjRef_test()
+HRESULT CAAFTypeDefStrongObjRef_test(testMode_t mode)
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 
@@ -464,7 +467,10 @@ extern "C" HRESULT CAAFTypeDefStrongObjRef_test()
 
   try
 	{
-	  hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 	  if (SUCCEEDED(hr))
 		hr = ReadAAFFile(pFileName);
 	}

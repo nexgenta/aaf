@@ -31,16 +31,16 @@
 
 #include <stdio.h>
 #include <iostream.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFContainerDefs.h"
 
 #include "CAAFBuiltinDefs.h"
-
-static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
@@ -143,9 +143,17 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(pSourceMob->AddNilReference (test+1, 0, defs.ddSound(), audioRate));
 		}
 		
-		checkResult(defs.cdFileDescriptor()->
+		// Create a concrete subclass of FileDescriptor
+		checkResult(defs.cdAIFCDescriptor()->
 					CreateInstance(IID_IAAFEssenceDescriptor, 
 								   (IUnknown **)&edesc));		
+
+		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
+
 		checkResult(edesc->QueryInterface(IID_IAAFFileDescriptor, (void **) &pFileDesc));
 		checkResult(pFileDesc->SetSampleRate (checkSampleRate));
 		checkResult(pDictionary->LookupContainerDef(checkContainer, &pContainer));
@@ -211,7 +219,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IEnumAAFMobSlots	*slotIter = NULL;
 	IAAFMobSlot		*slot = NULL;
 	IAAFFileDescriptor *pFileDesc = NULL;
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n, s;
 	HRESULT						hr = S_OK;
 	aafRational_t				testSampleRate;
@@ -219,17 +226,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafLength_t					testLength;
 //	aafBool						testBool;
 	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFFileDescriptor Test. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 	
 	try
 	{ 
@@ -344,14 +340,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFFileDescriptor_test()
+extern "C" HRESULT CAAFFileDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFFileDescriptor_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFFileDescriptorTest.aaf";
 	
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

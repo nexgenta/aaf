@@ -32,9 +32,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -118,10 +121,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		
   //Make the first mob
 	  long	test;
-	  aafRational_t	audioRate = { 44100, 1 };
 
-	  // Create a Mob
-	  checkResult(defs.cdMob()->
+	  // Create a concrete subclass of Mob
+	  checkResult(defs.cdMasterMob()->
 				  CreateInstance(IID_IAAFMob, 
 								 (IUnknown **)&pMob));
 
@@ -212,7 +214,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFMob				*aMob = NULL;
 	IEnumAAFMobSlots	*slotIter = NULL;
 	IAAFMobSlot			*slot = NULL;
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t		numMobs, n, s;
 	HRESULT				hr = S_OK;
 	IAAFMobSlot*		pArray[2] = { NULL, NULL };
@@ -220,17 +221,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafUInt32			resultCount;
 	IEnumAAFMobSlots	*slotClone = NULL;
 	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFMobSlots Test";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 	
 	try
 	{
@@ -362,14 +352,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFMobSlots_test()
+extern "C" HRESULT CEnumAAFMobSlots_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFMobSlots_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
  	aafWChar * pFileName = L"EnumAAFMobSlotsTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

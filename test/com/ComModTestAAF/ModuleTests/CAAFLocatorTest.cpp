@@ -34,9 +34,11 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -89,7 +91,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFEssenceDescriptor *edesc = NULL;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
-	aafRational_t	audioRate = { 44100, 1 };
 
 
 	aafProductVersion_t v;
@@ -134,10 +135,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(L"SourceMOBTest"));
 		
-		checkResult(defs.cdEssenceDescriptor()->
+		// Create concrete subclass of EssenceDescriptor
+		checkResult(defs.cdAIFCDescriptor()->
 					CreateInstance(IID_IAAFEssenceDescriptor, 
 								   (IUnknown **)&edesc));
 										
+
+		IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+		checkResult(edesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+		checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+		pAIFCDesc->Release();
+		pAIFCDesc = NULL;
+
  		checkResult(pSourceMob->SetEssenceDescriptor(edesc));
 
 			// Verify that there are no locators
@@ -223,23 +232,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFMob			*aMob = NULL;
 	aafUInt32					numLocators;
 	aafUInt32					readLen;
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t	numMobs, n;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	aafWChar					readBuf[1024];
 	bool bFileOpen = false;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFLocator. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 
 	try
 	{	  
@@ -341,14 +338,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return 	hr;
 }
  
-extern "C" HRESULT CAAFLocator_test()
+extern "C" HRESULT CAAFLocator_test(testMode_t mode);
+extern "C" HRESULT CAAFLocator_test(testMode_t mode)
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
   aafWChar * pFileName = L"AAFLocatorTest.aaf";
 
   try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
 		hr = ReadAAFFile( pFileName );

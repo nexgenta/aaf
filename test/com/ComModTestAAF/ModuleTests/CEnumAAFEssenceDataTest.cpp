@@ -39,6 +39,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -50,8 +51,8 @@ struct EnumEssenceDataTest
   EnumEssenceDataTest();
   ~EnumEssenceDataTest();
 
-  void createFile(wchar_t *pFileName);
-  void openFile(wchar_t *pFileName);
+  void createFile(const wchar_t *pFileName);
+  void openFile(const wchar_t *pFileName);
 
   void createFileMob(int itemNumber);
   void createEssenceData(IAAFSourceMob *pSourceMob);
@@ -80,15 +81,17 @@ struct EnumEssenceDataTest
   static const aafUInt32 _maxMobCount;
 };
 
-extern "C" HRESULT CEnumAAFEssenceData_test()
+extern "C" HRESULT CEnumAAFEssenceData_test(testMode_t mode);
+extern "C" HRESULT CEnumAAFEssenceData_test(testMode_t mode)
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t fileName[] = L"EnumAAFEssenceDataTest.aaf";
+  wchar_t const *fileName = L"EnumAAFEssenceDataTest.aaf";
   EnumEssenceDataTest edt;
 
   try
   {
-    edt.createFile(fileName);
+     if(mode == kAAFUnitTestReadWrite)
+   		 edt.createFile(fileName);
     edt.openFile(fileName);
   }
   catch (HRESULT& ehr)
@@ -251,7 +254,7 @@ void EnumEssenceDataTest::removeTestFile(const wchar_t* pFileName)
   }
 }
 
-void EnumEssenceDataTest::createFile(wchar_t *pFileName)
+void EnumEssenceDataTest::createFile(const wchar_t *pFileName)
 {
   // Remove the previous test file if any.
   removeTestFile(pFileName);
@@ -270,7 +273,7 @@ void EnumEssenceDataTest::createFile(wchar_t *pFileName)
   cleanupReferences();
 }
 
-void EnumEssenceDataTest::openFile(wchar_t *pFileName)
+void EnumEssenceDataTest::openFile(const wchar_t *pFileName)
 {
   check(AAFFileOpenExistingRead(pFileName, 0, &_pFile));
   _bFileOpen = true;
@@ -310,9 +313,17 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
   check(_pMob->SetMobID(TEST_MobIDs[itemNumber]));
   check(_pMob->SetName(wcBuffer));
   
-  check(defs.cdFileDescriptor()->
-		CreateInstance(IID_IAAFEssenceDescriptor, 
+  // Create a concrete subclass of FileDescriptor
+  check(defs.cdAIFCDescriptor()->
+		CreateInstance(IID_IAAFFileDescriptor, 
 					   (IUnknown **)&_pFileDescriptor));
+
+
+	IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+	check(_pFileDescriptor->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+	check(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+	pAIFCDesc->Release();
+	pAIFCDesc = NULL;
 
   check(_pFileDescriptor->QueryInterface (IID_IAAFEssenceDescriptor,
                                           (void **)&_pEssenceDescriptor));

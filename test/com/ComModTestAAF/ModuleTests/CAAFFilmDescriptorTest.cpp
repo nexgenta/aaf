@@ -31,9 +31,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -88,7 +91,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFFilmDescriptor*			pFilmDesc = NULL;
 	
 	aafProductIdentification_t	ProductInfo;
-	HRESULT						hr = AAFRESULT_SUCCESS;
 	
 	
 	aafProductVersion_t v;
@@ -167,7 +169,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFFilmDescriptor*			pFilmDesc = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 	
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs;
 	
 	aafWChar					readManufacturer[256];
@@ -178,19 +179,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafRational_t				readAspectRatio;
 	aafUInt32					length;
 
-	HRESULT						hr = AAFRESULT_SUCCESS;
-	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFFilmDescriptor Test";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 	
 	checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 	checkResult(pFile->GetHeader(&pHeader));
@@ -240,14 +228,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return AAFRESULT_SUCCESS;
 }
 
-extern "C" HRESULT CAAFFilmDescriptor_test()
+extern "C" HRESULT CAAFFilmDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFFilmDescriptor_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFFilmDescriptorTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile( pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}

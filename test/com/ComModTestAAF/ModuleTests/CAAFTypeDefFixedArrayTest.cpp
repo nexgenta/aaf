@@ -29,6 +29,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
@@ -36,6 +37,8 @@
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "CAAFBuiltinDefs.h"
 
@@ -141,16 +144,13 @@ static void RemoveTestFile(const wchar_t* pFileName)
 
 static HRESULT  createFAType (IAAFDictionary * const pDict)
 {
-	CAAFBuiltinDefs defs(pDict);
-	
 	//Look up the Type def based on 16-bit signed integer
 	IAAFTypeDefSP spTD_elem;
 	checkResult(pDict->LookupTypeDef (TEST_ELEM_TYPE_ID, &spTD_elem));
 	
 	//Create a Fixed Array
 	IAAFTypeDefFixedArraySP spFA;
-	checkResult(defs.cdTypeDefFixedArray()->
-		CreateInstance (IID_IAAFTypeDefFixedArray, (IUnknown **) &spFA));
+	checkResult(pDict->CreateMetaInstance (AUID_AAFTypeDefFixedArray, IID_IAAFTypeDefFixedArray, (IUnknown **) &spFA));
 	
 	//IAAFTypeDefFixedArray::Initialize
 	checkResult(spFA->Initialize(TEST_FA_TYPE_ID, spTD_elem, TEST_FA_COUNT, TEST_FA_NAME));
@@ -474,9 +474,9 @@ static HRESULT CreateAAFFile(aafWChar *  pFileName )
 		checkResult(addFATypeToComponent (pDict));
 		///////////
 		
-		//Create a mob 
+		//Create a concrete subclass of mob 
 		IAAFMobSP spMob;
-		checkResult(defs.cdMob()->
+		checkResult(defs.cdMasterMob()->
 			CreateInstance(IID_IAAFMob, 
 			(IUnknown **)&spMob));
 		
@@ -496,9 +496,9 @@ static HRESULT CreateAAFFile(aafWChar *  pFileName )
 		IAAFSegmentSP spSeg;
 		checkResult(spFill->QueryInterface (IID_IAAFSegment, (void **)&spSeg));
 		
-		//Create a mob slot				
+		//Create a concrete subclass of mob slot
 		IAAFMobSlotSP spMobSlot;
-		checkResult(defs.cdMobSlot()->
+		checkResult(defs.cdStaticMobSlot()->
 			CreateInstance(IID_IAAFMobSlot, 
 									   (IUnknown **)&spMobSlot));		
 		
@@ -546,8 +546,6 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	IAAFDictionary * pDict = NULL;
 	aafBoolean_t  bFileOpen = kAAFFalse;
 	
-	IEnumAAFMobs*				pMobIter = NULL;
-	
 	try
 	{
 		// Open the file
@@ -582,17 +580,24 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	
 }//ReadAAFFile()
 
-extern "C" HRESULT CAAFTypeDefFixedArray_test()
+extern "C" HRESULT CAAFTypeDefFixedArray_test(testMode_t mode);
+extern "C" HRESULT CAAFTypeDefFixedArray_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_SUCCESS;
 	aafWChar * pFileName = L"AAFTypeDefFixedArrayTest.aaf";
 	
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );		
 		
+		
+		if(hr == AAFRESULT_SUCCESS)
+			hr = AAFRESULT_NOT_IN_CURRENT_VERSION;
 	}//try
 	catch (...)
 	{

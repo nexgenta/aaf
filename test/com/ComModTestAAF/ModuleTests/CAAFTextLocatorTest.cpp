@@ -31,9 +31,11 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -95,7 +97,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDescriptor = NULL;
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
-	aafRational_t	audioRate = { 44100, 1 };
 
 
 	aafProductVersion_t v;
@@ -348,14 +349,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return 	hr;
 }
  
-extern "C" HRESULT CAAFTextLocator_test()
+extern "C" HRESULT CAAFTextLocator_test(testMode_t mode);
+extern "C" HRESULT CAAFTextLocator_test(testMode_t mode)
 {
   HRESULT	hr = AAFRESULT_NOT_IMPLEMENTED;
   aafWChar*	pFileName = L"AAFTextLocatorTest.aaf";
 
   try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (AAFRESULT_SUCCESS != hr)
 			return hr;
 		hr = ReadAAFFile( pFileName );

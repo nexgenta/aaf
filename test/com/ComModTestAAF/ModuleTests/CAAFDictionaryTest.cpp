@@ -32,9 +32,12 @@
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"
@@ -208,12 +211,13 @@ static void RegisterNewClass (IAAFDictionary * pDictionary)
 
   // Create new object for our new filler class, and initialize it.
   IAAFClassDefSP pNewFillClass;
-  checkResult (defs.cdClassDef()->
-			   CreateInstance(IID_IAAFClassDef,
-							  (IUnknown **)&pNewFillClass));
+  checkResult (pDictionary->CreateMetaInstance(AUID_AAFClassDef,
+                                               IID_IAAFClassDef,
+                                               (IUnknown **)&pNewFillClass));
   checkResult (pNewFillClass->Initialize (kClassAUID_NewFill,
 										  pFillClass,
-										  L"New Filler"));
+										  L"New Filler",
+										  kAAFTrue));
 
   // Get type def for uint32
   IAAFTypeDefSP ptd;
@@ -998,14 +1002,18 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
   return 	hr;
 }
 
-extern "C" HRESULT CAAFDictionary_test()
+extern "C" HRESULT CAAFDictionary_test(testMode_t mode);
+extern "C" HRESULT CAAFDictionary_test(testMode_t mode)
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
   aafWChar * pFileName = L"AAFDictionaryTest.aaf";
 
   try
 	{
-	  hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 	  if (SUCCEEDED(hr))
 		hr = ReadAAFFile(pFileName);
 	}

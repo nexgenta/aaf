@@ -31,9 +31,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
@@ -55,7 +58,6 @@ static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
 static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;
 static aafUInt32 TapeLength = 3200 ;
 
-static aafMobID_t		NewMobID;
 #define TAPE_MOB_OFFSET	10
 #define TAPE_MOB_LENGTH	60
 #define TAPE_MOB_NAME	L"A Tape Mob"
@@ -218,6 +220,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pMob->SetName(MobName));
 		
 		checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
+		checkResult(pMasterMob->Initialize());
 		
 		// Create source mob to associate with our MasterMob.
 		checkResult(defs.cdSourceMob()->
@@ -286,15 +289,34 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			ref.startTime = TAPE_MOB_OFFSET;
 			IAAFDataDefSP pDDef;
 			checkResult(pDictionary->LookupDataDef(*slotDDefs[test], &pDDef));
-			checkResult(pSrcMob->AppendPhysSourceRef (slotRates[test],
+			if(test == 0)
+			{
+				checkResult(pSrcMob->NewPhysSourceRef (slotRates[test],
 													  test,
 													  pDDef,
 													  ref,
 													  TAPE_MOB_LENGTH));
+			}
+			else
+			{
+				checkResult(pSrcMob->AppendPhysSourceRef (slotRates[test],
+													  test,
+													  pDDef,
+													  ref,
+													  TAPE_MOB_LENGTH));
+			}
 			
-			checkResult(defs.cdEssenceDescriptor()->
+			// Create concrete subclass of EssenceDescriptor
+			checkResult(defs.cdAIFCDescriptor()->
 						CreateInstance(IID_IAAFEssenceDescriptor, 
 									   (IUnknown **)&pDesc));	
+
+			IAAFAIFCDescriptor*			pAIFCDesc = NULL;
+			checkResult(pDesc->QueryInterface (IID_IAAFAIFCDescriptor, (void **)&pAIFCDesc));
+			checkResult(pAIFCDesc->SetSummary (5, (unsigned char*)"TEST"));
+			pAIFCDesc->Release();
+			pAIFCDesc = NULL;
+
 			checkResult(pSrcMob->SetEssenceDescriptor(pDesc));
 			pDesc->Release();
 			pDesc = NULL;
@@ -377,6 +399,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IEnumAAFMobs*	pMobIter = NULL;
 	IAAFMob*		pMob = NULL;
+	IAAFSegment*		pSeg = NULL;
 	IAAFMasterMob*		pMasterMob = NULL;
 	IEnumAAFMobSlots*	pSlotIter = NULL;
 	IAAFMobSlot*		pSlot;
@@ -384,7 +407,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
 	HRESULT			hr = S_OK;
-
+	aafMediaCriteria_t	mediaCriteria;
 
 
   try
@@ -454,6 +477,16 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				checkResult(pMasterMob->GetNumRepresentations(slotID, &numReps));
 				checkExpression (numReps == 1, AAFRESULT_TEST_FAILED);
 
+				checkResult(pMasterMob->GetRepresentation (slotID, 0, &pSeg));
+				pSeg->Release();
+				pSeg = NULL;
+
+				mediaCriteria.type = kAAFAnyRepresentation;
+				checkResult(pMasterMob->GetCriteriaSegment (slotID, &mediaCriteria, &pSeg));
+
+				pSeg->Release();
+				pSeg = NULL;
+				
 				pSlot->Release();
 				pSlot = NULL;
 				s++;
@@ -504,14 +537,18 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFMasterMob_test()
+extern "C" HRESULT CAAFMasterMob_test(testMode_t mode);
+extern "C" HRESULT CAAFMasterMob_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFMasterMobTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
@@ -524,26 +561,15 @@ extern "C" HRESULT CAAFMasterMob_test()
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
-	if (SUCCEEDED(hr))
-	{
-		cout << "The following IAAFMasterMob tests have not been implemented:" << endl; 
-		cout << "     GetRepresentationSourceClip" << endl; 
-		cout << "     GetCriteriaSourceClip" << endl; 
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
-	}
+//	if (SUCCEEDED(hr))
+//	{
+//		cout << "The following IAAFMasterMob tests have not been implemented:" << endl; 
+//		cout << "     GetCriteriaSegment" << endl; 
+//		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+//	}
 
 	return hr;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

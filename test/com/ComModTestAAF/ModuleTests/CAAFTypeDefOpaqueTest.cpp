@@ -33,12 +33,14 @@
 #include <wchar.h>
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFSmartPointer.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFPropertyDefs.h"
 #include "CAAFBuiltinDefs.h"
+#include "AAFDefUIDs.h"
 
 typedef IAAFSmartPointer<IAAFFile> IAAFFileSP;
 typedef IAAFSmartPointer<IAAFHeader> IAAFHeaderSP;
@@ -107,6 +109,7 @@ static void FillInProductInfo(aafProductIdentification_t& ProductInfo,
 	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
+	ProductInfo.productID = UnitTestProductID;
 }
 
 // Cross-platform utility to delete a file.
@@ -420,13 +423,15 @@ static void ReadTypeDefOpaqueFile(aafWChar *pFilename)
 	pFile->Close();
 }
 
-extern "C" HRESULT CAAFTypeDefOpaque_test()
+extern "C" HRESULT CAAFTypeDefOpaque_test(testMode_t mode);
+extern "C" HRESULT CAAFTypeDefOpaque_test(testMode_t mode)
 {
 	aafWChar *pTestFilename=L"TypeDefOpaqueTest.aaf";
 
 	try
 	{
-		CreateTypeDefOpaqueFile(pTestFilename);
+		if(mode == kAAFUnitTestReadWrite)
+			CreateTypeDefOpaqueFile(pTestFilename);
 		ReadTypeDefOpaqueFile(pTestFilename);
 	}
 	catch(HRESULT& rResult)
