@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2004/03/26 12:15:23 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.13 2004/05/05 16:04:36 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,8 +32,7 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
-	   -I../../ss-impl/ref
+INCLUDES = -I../../ss-impl/ref
 
 
 ifeq ($(AAFPLATFORM),SparcSolaris)
@@ -46,8 +45,7 @@ else
 all : $(OBJDIR) $(AAFSDKBINDIR)/dump$(EXE)
 
 $(AAFSDKBINDIR)/dump$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) -L$(AAFSDKLIBDIR) $(LIBCIO) -o $@ \
-	$(AAFBUILDDIR)/ss-impl/librefstg$(LIB)
+	$(LD) $(CXXOBJS) $(RPATH_OPT) $(LIBCIO) -o $@ $(AAFBUILDDIR)/ss-impl/librefstg$(LIB)
 
 endif 
 endif 
@@ -65,4 +63,3 @@ realclean : clean
 
 
 include $(AAFBASE)/build/rules.mk
-

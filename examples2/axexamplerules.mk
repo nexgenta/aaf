@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: axexamplerules.mk,v 1.5 2004/02/27 14:26:37 stuart_hc Exp $ $Name:  $
+# $Id: axexamplerules.mk,v 1.6 2004/05/05 16:04:37 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,17 +37,23 @@ endif
 include $(AAFBASE)/build/common.mk
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
-	   -I../axLib
+INCLUDES = -I../../ref-impl/include \
+		-I../../ref-impl/include/ref-api \
+		-I../axLib
 
 BINTARGET = $(AAFSDKBINDIR)/$(PROGNAME)$(EXE)
 
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET)
 
+ifeq ($(AAFTARGET),Debug-static)
+$(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
+	$(LD) $(CXXOBJS) -L$(OBJDIR) $(AXPROGRAM_LD_OPTIONS) -laxLib $(STATIC_LINK_LINE) -o $@
+else
 $(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
 	$(LD) $(CXXOBJS) $(RPATH_OPT) \
 	-L$(AAFSDKLIBDIR) -L$(OBJDIR) $(AXPROGRAM_LD_OPTIONS) -laxLib -laaflib -laafiid $(LIBCIO) -o $@
+endif
 
 .PHONY : clean
 clean ::

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2004/05/05 16:04:36 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@ endif
 include $(AAFBASE)/build/common.mk
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib
+INCLUDES = -I../../ref-impl/include -I../../ref-impl/include/ref-api -I../../examples2/axLib
 
 # AxLib lib directory
 AXLIBPACKAGE = axExamples
@@ -52,9 +52,14 @@ BINTARGET = $(AAFSDKBINDIR)/$(PROGNAME)$(EXE)
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET)
 
+ifeq ($(AAFTARGET),Debug-static)
+$(BINTARGET) : $(CXXOBJS)
+	$(LD) $(CXXOBJS) -L$(AXLIBDIR) -laxLib $(STATIC_LINK_LINE) -o $@
+else
 $(BINTARGET) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) $(RPATH_OPT) \
 	-L$(AAFSDKLIBDIR) -L$(OBJDIR) -L$(AXLIBDIR) -laxLib -laaflib -laafiid $(LIBCIO) -o $@
+endif
 
 .PHONY : clean
 clean ::

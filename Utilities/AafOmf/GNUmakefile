@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.13 2004/03/18 18:41:56 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.14 2004/05/05 16:04:36 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -36,10 +36,10 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I$(AAFBASE)/ref-impl/src/com-api \
+INCLUDES = -I../../ref-impl/src/com-api \
 	   -I../../OMF/Include \
 	   -I../../OMF/portinc \
-	   -I$(AAFSDKINCLUDEDIR)
+	   -I../../ref-impl/include -I../../ref-impl/include/ref-api
 
 
 # CXXOBJS2 is the list of files used to create the executable.

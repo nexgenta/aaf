@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2004/03/24 03:35:07 creederickson Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9 2004/05/05 16:04:38 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,8 +41,13 @@ INCLUDES = -I../../../ref-impl/include \
 all : $(OBJDIR) $(AAFSDKBINDIR)/EssenceAccess$(EXE)
 
 
+ifeq ($(AAFTARGET),Debug-static)
+$(AAFSDKBINDIR)/EssenceAccess$(EXE) : $(CXXOBJS)
+	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
+else
 $(AAFSDKBINDIR)/EssenceAccess$(EXE) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) -o $@
+endif
 
 
 .PHONY : clean

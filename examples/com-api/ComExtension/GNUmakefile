@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/03/18 18:41:56 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2004/05/05 16:04:37 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,7 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
+INCLUDES = -I../../../ref-impl/include -I../../../ref-impl/include/ref-api \
 			-I../../../ref-impl/src/com-api
 
 
@@ -52,8 +52,13 @@ CXXFILES = read.cpp \
 	   extensionUtils.cpp
 
 
+ifeq ($(AAFTARGET),Debug-static)
+$(AAFSDKBINDIR)/ComExtensionRead$(EXE) : $(CXXOBJS)
+	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
+else
 $(AAFSDKBINDIR)/ComExtensionRead$(EXE) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
+endif
 
 
 CXXFILES2 = write.cpp \
@@ -62,8 +67,13 @@ CXXFILES2 = write.cpp \
 	    extensionWrite.cpp
 
 
+ifeq ($(AAFTARGET),Debug-static)
+$(AAFSDKBINDIR)/ComExtensionWrite$(EXE) : $(CXXOBJS2)
+	$(LD) $(CXXOBJS2) $(STATIC_LINK_LINE) -o $@
+else
 $(AAFSDKBINDIR)/ComExtensionWrite$(EXE) : $(CXXOBJS2)
 	$(LD) $(CXXOBJS2) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
+endif
 
 
 .PHONY : clean
@@ -81,4 +91,3 @@ realclean : clean
 
 
 include $(AAFBASE)/build/rules.mk
-

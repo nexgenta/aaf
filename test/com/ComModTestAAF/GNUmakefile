@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.10 2004/03/24 03:34:18 creederickson Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11 2004/05/05 16:04:38 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@ include $(AAFBASE)/build/common.mk
 
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
+INCLUDES = -I../../../ref-impl/include -I../../../ref-impl/include/ref-api \
 	   -I../../../ref-impl/src/com-api
 
 
@@ -49,10 +49,15 @@ all : $(AAFSDKBINDIR)/ComModAAF$(EXE)
 
 
 # $(AAFSDKBINDIR)/ComModAAF$(EXE) : $(CXXOBJS) ModuleTests
+
+ifeq ($(AAFTARGET),Debug-static)
+$(AAFSDKBINDIR)/ComModAAF$(EXE) : $(CXXOBJS) $(CXXOBJS2)
+	$(LD) $(CXXOBJS) $(CXXOBJS2) $(STATIC_LINK_LINE) -o $@
+else
 $(AAFSDKBINDIR)/ComModAAF$(EXE) : $(CXXOBJS) $(CXXOBJS2)
 	$(LD) $(CXXOBJS) $(CXXOBJS2) \
 	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
-
+endif
 
 #.PHONY : ModuleTests
 #ModuleTests :
