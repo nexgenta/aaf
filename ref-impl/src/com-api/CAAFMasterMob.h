@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMasterMob.h,v 1.5.2.2 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
+// $Id: CAAFMasterMob.h,v 1.5.2.3 2004/05/01 18:48:33 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -853,7 +853,7 @@ public:
   // METHOD NAME: CreateStaticEssence()
   //
   // DESCRIPTION:
-  // @mfunc AAFRESULT | AAFMasterMob | CreateStaticEssence |
+  // @mfunc AAFRESULT | AAFMasterMob2 | CreateStaticEssence |
   // Creates and initializes the objects required to represent static essence.
   // @end
   // 
@@ -885,7 +885,7 @@ public:
   // METHOD NAME: CreateEventEssence()
   //
   // DESCRIPTION:
-  // @mfunc AAFRESULT | AAFMasterMob | CreateEventEssence |
+  // @mfunc AAFRESULT | AAFMasterMob2 | CreateEventEssence |
   // Creates and initializes the objects required to represent stream of events.
   // @end
   // 
