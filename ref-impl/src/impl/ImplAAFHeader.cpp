@@ -1,25 +1,30 @@
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAFTypes.h"
@@ -69,7 +74,14 @@ typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
     ImplEnumAAFIdentificationsSP;
 
 #include <assert.h>
-#include <wchar.h>
+
+#if defined(__MWERKS__)
+// Since the ansi standard does not define wcslen and the other wide
+// string functions are not normally placed in string.h along with the
+// single-byte string functions, as is done with VC++, CodeWarrior
+// places all of the "wide-string" functions in wstring.h.
+#include <wstring.h>
+#endif
 
 #include "ImplAAFObjectCreation.h"
 
@@ -100,7 +112,15 @@ ImplAAFHeader::ImplAAFHeader ()
   _persistentProperties.put(_fileRev.address());
   _persistentProperties.put(_objectModelVersion.address());
 
-	_toolkitRev = AAFReferenceImplementationVersion;
+  //!!!	_head = this;
+//	file->InternalSetHead(this);
+	_toolkitRev.major = 0;
+	_toolkitRev.minor = 0;
+	_toolkitRev.tertiary = 0;
+	_toolkitRev.type = kAAFVersionUnknown;
+	_toolkitRev.patchLevel = 0;
+//!!!	_byteOrder;
+//!!!	_lastModified;
 	_file = NULL;
 }
 
@@ -109,9 +129,9 @@ ImplAAFHeader::~ImplAAFHeader ()
 {
 	// Release all of the id pointers in the id list.
 	//
-	size_t count = _identificationList.count();
-	for (size_t i = 0; i < count; i++) {
-		ImplAAFIdentification *pIdent = _identificationList.clearValueAt(i);
+	size_t size = _identificationList.getSize();
+	for (size_t i = 0; i < size; i++) {
+		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
 
 		if (pIdent) {
 		  pIdent->ReleaseReference();
@@ -120,14 +140,14 @@ ImplAAFHeader::~ImplAAFHeader ()
 	}
 
 	// Release the content storage pointer.
-	ImplAAFContentStorage *contentStorage = _contentStorage.clearValue();
+	ImplAAFContentStorage *contentStorage = _contentStorage.setValue(0);
 	if (contentStorage) {
 	  contentStorage->ReleaseReference();
 	  contentStorage = 0;
 	}
 
 	// Release the dictionary pointer.
-	ImplAAFDictionary *dictionary = _dictionary.clearValue();
+	ImplAAFDictionary *dictionary = _dictionary.setValue(0);
 	if (dictionary) {
 	  dictionary->ReleaseReference();
 	  dictionary = 0;
@@ -355,26 +375,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::LookupEssenceData (aafMobID_constref mobID,
-                           ImplAAFEssenceData **ppEssenceData)
-{
-    ImplAAFContentStorage *cstore = NULL;
 
-    if (! ppEssenceData)
-	  {
-		return AAFRESULT_NULL_PARAM;
-	  }
-	XPROTECT()
-	{
-		cstore = GetContentStorage();		// Does not AddRef
-		CHECK(cstore->LookupEssenceData(mobID, ppEssenceData));
-	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
-}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFHeader::GetContentStorage (ImplAAFContentStorage ** ppContentStorage)
@@ -424,12 +425,13 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
   AAFRESULT result;
-  size_t count = _identificationList.count();
+  size_t size;
+  _identificationList.getSize(size);
 
-  if (count > 0) {
-    // For count entries the valid positions are 0 .. count - 1
+  if (size > 0) {
+    // For size entries the valid positions are 0 .. size - 1
     // get the last one in the vector.
-    _identificationList.getValueAt(*ppIdentification, count - 1);
+    _identificationList.getValueAt(*ppIdentification, size - 1);
 
 		// We are returning a non-null reference.
 		if (*ppIdentification) {
@@ -465,7 +467,7 @@ AAFRESULT STDMETHODCALLTYPE
   while (AAFRESULT_SUCCEEDED (pEnumIds->NextOne (&pTestId)))
 	{
 	  aafUID_t testGen;
-	  hr = pTestId->GetGenerationID (&testGen);
+	  hr = pTestId->GetGeneration (&testGen);
 	  if (AAFRESULT_FAILED (hr)) return hr;
 	  if (EqualAUID (&testGen, &generation))
 		{
@@ -484,13 +486,14 @@ AAFRESULT STDMETHODCALLTYPE
 ImplAAFHeader::CountIdentifications
 (aafUInt32 *  pNumIdents)
 {
+ 	size_t	siz;
 	if (! pNumIdents)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-
- 	size_t	count = _identificationList.count();
-	*pNumIdents = count;
+		
+	_identificationList.getSize(siz);
+	*pNumIdents = siz;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -506,11 +509,7 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMStrongReferenceVectorIterator<ImplAAFIdentification>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFIdentification>(_identificationList);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFIdentifications, this, iter));
+		CHECK(theEnum->SetEnumStrongProperty(this, &_identificationList));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -518,6 +517,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
+		return(XCODE());
 	}
 	XEND;
 	
@@ -552,35 +552,33 @@ ImplAAFHeader::GetIdentificationAt
 
 
 AAFRESULT 
-    ImplAAFHeader::AddIdentificationObject
-(aafProductIdentification_constptr pIdent)
+    ImplAAFHeader::AddIdentificationObject (aafProductIdentification_t *pIdent)
 {
 	ImplAAFIdentification *		identObj;
-	aafProductIdentification_t ident;
-
+	aafProductIdentification_t	fiction;
+	aafBool						dummyIDNT = kAAFFalse;
+	aafProductVersion_t			dummyVersion;
+	
 	XPROTECT()
 	{		
 		if(pIdent == (aafProductIdentification_t *)NULL)
 		{
-			ident.companyName = L"Unknown";
-			ident.productName = L"Unknown";
-			ident.productVersionString = (aafWChar*)NULL;
-			ident.productID = NIL_UID;
-			ident.platform = (aafWChar*)NULL;
-			ident.productVersion = 0;
-		}
-		else
-		{
-		    ident = *pIdent;
+			fiction.companyName = L"Unknown";
+			fiction.productName = L"Unknown";
+			fiction.productVersionString = (aafWChar*)NULL;
+			fiction.productID = NIL_UID;
+			fiction.platform = (aafWChar*)NULL;
+			fiction.productVersion = 0;
+			pIdent = &fiction;
+			dummyIDNT = kAAFTrue;
 		}
 		
 	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
-
-    if (ident.productVersionString == 0) {
-      ident.productVersionString = L"Unknown version";
+    if (pIdent->productVersionString == 0) {
+      pIdent->productVersionString = L"Unknown version";
     }
-    if (ident.platform == 0) {
-      ident.platform = L"Windows NT";
+    if (pIdent->platform == 0) {
+      pIdent->platform = L"Windows NT";
     }
     
     // Get the dictionary so that we can use the factory
@@ -592,18 +590,19 @@ AAFRESULT
 		  CreateInstance((ImplAAFObject **)&identObj));
     if (NULL == identObj)
       CHECK(AAFRESULT_NOMEMORY);
-	CHECK(identObj->Initialize(ident.companyName,
-							   ident.productName,
-							   ident.productVersionString,
-							   ident.productID));
+	CHECK(identObj->Initialize(pIdent->companyName,
+							   pIdent->productName,
+							   pIdent->productVersionString,
+							   pIdent->productID));
 
-	if (ident.productVersion)
+	if (pIdent->productVersion)
 	  {
-		CHECK (identObj->SetProductVersion (*ident.productVersion));
+		CHECK (identObj->SetProductVersion (*pIdent->productVersion));
 	  }
 
     _identificationList.appendValue(identObj);
  
+    dummyVersion.major = 0;
 	}
 	XEXCEPT
 	{
@@ -621,9 +620,6 @@ AAFRESULT
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-
-	if (pIdent->attached())
-	    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_identificationList.appendValue(pIdent);
 	pIdent->AcquireReference();
@@ -687,12 +683,6 @@ void ImplAAFHeader::SetByteOrder(const aafInt16 byteOrder)
 
 void ImplAAFHeader::SetDictionary(ImplAAFDictionary *pDictionary)
 {
-  if( !pDictionary )
-	return; // AAFRESULT_NULL_PARAM
-
-  if( pDictionary->attached() )
-	return; // AAFRESULT_OBJECT_ALREADY_ATTACHED
-
   _dictionary = pDictionary;
   if (pDictionary)
     pDictionary->AcquireReference();
@@ -707,7 +697,8 @@ AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 
 // trr - NOTE: Eventhough this method returns a reference counted object it
 // does NOT bump the reference count. Currently only other file that calls
-// this method is ImplAAFMob.cpp. There is another version the conforms to our other API guidlines:
+// this method is ImplAAFMob.cpp. We should probably make this method protected
+// or private and create an new version the conforms to our other API guidlines:
 // AAFRESULT GetContentStorage(ImplAAFContentStorage **ppContentStorage);
 // 
 ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()

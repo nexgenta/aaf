@@ -29,12 +29,6 @@
 #ifndef OMSTRONGREFPROPERTY_H
 #define OMSTRONGREFPROPERTY_H
 
-#if defined (_MSC_VER)
-  // - 'this' : used in base member initializer list
-  //
-#pragma warning(disable:4355) // Gak !
-#endif
-
 #include "OMDataTypes.h"
 #include "OMProperty.h"
 #include "OMObjectReference.h"
@@ -52,7 +46,8 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMStrongReferenceProperty(const OMPropertyId propertyId, const char* name);
+  OMStrongReferenceProperty(const OMPropertyId propertyId,
+                            const wchar_t* name);
 
     // @cmember Destructor.
   virtual ~OMStrongReferenceProperty(void);

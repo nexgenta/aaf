@@ -64,14 +64,7 @@ public:
     // @cmember Constructor.
   OMProperty(const OMPropertyId propertyId,
              const OMStoredForm storedForm,
-             const char* name);
-
-    // @cmember Temporary pseudo-constructor for clients which provide
-    //          a type definition.
-  void initialize(const OMPropertyId propertyId,
-                  const char* name,
-                  OMType* type,
-                  const bool isOptional = false);
+             const wchar_t* name);
 
     // @cmember Temporary pseudo-constructor for clients which provide
     //          a property definition.
@@ -163,15 +156,11 @@ protected:
 
   OMPropertyId _propertyId;
   OMStoredForm _storedForm;
-  const char* _name;
+  const wchar_t* _name;
+  char* _cName;
   const OMPropertySet* _propertySet; // The PropertySet that contains
                                      // this property
-  // The _definition member is set by clients which pass a definition
-  // to initialize().  It is preferred over the _type member, which is
-  // set by clients which pass a type to initialize().  Only one can
-  // be set.
   const OMPropertyDefinition* _definition;
-  const OMType* _type;
 
 private:
 
@@ -193,7 +182,7 @@ public:
     // @cmember Constructor.
   OMReferenceProperty(const OMPropertyId propertyId,
                       const OMStoredForm storedForm,
-                      const char* name);
+                      const wchar_t* name);
 
     // @cmember Destructor.
   virtual ~OMReferenceProperty(void);
@@ -215,11 +204,11 @@ public:
 
     // @cmember Constructor.
   OMSimpleProperty(const OMPropertyId propertyId,
-                   const char* name,
+                   const wchar_t* name,
                    size_t valueSize);
 
     // @cmember Constructor.
-  OMSimpleProperty(const OMPropertyId propertyId, const char* name);
+  OMSimpleProperty(const OMPropertyId propertyId, const wchar_t* name);
 
     // @cmember Destructor.
   virtual ~OMSimpleProperty(void);
