@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-g++.mk,v 1.11 2004/10/21 17:15:03 stuart_hc Exp $ $Name:  $
+# $Id: cdefs-g++.mk,v 1.12 2004/10/22 10:26:27 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -69,7 +69,7 @@ REL_FLAGS = -O2
 # Compiler flags
 #
 #------------------------------------------------------------------------------
-ADD_CFLAGS = -Wall -W
+ADD_CFLAGS = -Wall
 
 #------------------------------------------------------------------------------
 # Compiler flags
