@@ -42,6 +42,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 #if defined(_MAC) || defined(macintosh)
 
 #define WAVE_FORMAT_PCM 0x0001
@@ -200,7 +202,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob*	pMob = NULL;
   IAAFWAVEDescriptor*	pWAVEDesc = NULL;
   IAAFEssenceDescriptor*	pEssDesc = NULL;
-	aafUID_t		newUID;
+	aafMobID_t		newMobID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -215,17 +217,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
+	CAAFBuiltinDefs defs (pDictionary);
  		
 	  // Create a source mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
+		checkResult(pDictionary->CreateInstance(defs.cdSourceMob(),
 							IID_IAAFSourceMob, 
 							(IUnknown **)&pSourceMob));
 		checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 
-		checkResult(CoCreateGuid((GUID *)&newUID));
-		checkResult(pMob->SetMobID(newUID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"WAVEDescriptorTest"));
-		checkResult(pDictionary->CreateInstance(AUID_AAFWAVEDescriptor,
+		checkResult(pDictionary->CreateInstance(defs.cdWAVEDescriptor(),
 									  IID_IAAFWAVEDescriptor, 
 									  (IUnknown **)&pWAVEDesc));		
 
@@ -248,7 +251,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSourceMob->SetEssenceDescriptor(pEssDesc));
 
 		// Add the MOB to the file
-		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pHeader->AddMob(pMob));
 	}
   catch (HRESULT& rResult)
   {
@@ -303,10 +306,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	  // Open the AAF file
 	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 
-	  checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
-	  checkResult(pHeader->EnumAAFAllMobs(NULL, &pMobIter));
+	  checkResult(pHeader->GetMobs(NULL, &pMobIter));
 		checkResult(pMobIter->NextOne(&pMob));
 		checkResult(pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob));
 		

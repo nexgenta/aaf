@@ -41,6 +41,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 
 typedef struct tChunk
 {
@@ -218,7 +220,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFAIFCDescriptor*		pAIFCDesc = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
 
-	aafUID_t		newUID;
+	aafMobID_t		newMobID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -235,16 +237,17 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
  		
 		// Create a source mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
+		CAAFBuiltinDefs defs (pDictionary);
+		checkResult(pDictionary->CreateInstance(defs.cdSourceMob(),
 												IID_IAAFSourceMob, 
 												(IUnknown **)&pSourceMob));
 
 		checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 
-		checkResult(CoCreateGuid((GUID *)&newUID));
-		checkResult(pMob->SetMobID(newUID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+		checkResult(pMob->SetMobID(newMobID));
 		checkResult(pMob->SetName(L"AIFCDescriptorTest"));
-		checkResult(pDictionary->CreateInstance(AUID_AAFAIFCDescriptor,
+		checkResult(pDictionary->CreateInstance(defs.cdAIFCDescriptor(),
 												IID_IAAFAIFCDescriptor, 
 												(IUnknown **)&pAIFCDesc));		
 
@@ -286,7 +289,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSourceMob->SetEssenceDescriptor(pEssDesc));
 
 		// Add the MOB to the file
-		checkResult(pHeader->AppendMob(pMob));
+		checkResult(pHeader->AddMob(pMob));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -341,10 +344,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		// Open the AAF file
 		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
-		checkResult(pHeader->EnumAAFAllMobs(NULL, &pMobIter));
+		checkResult(pHeader->GetMobs(NULL, &pMobIter));
 		checkResult(pMobIter->NextOne(&pMob));
 		checkResult(pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob));
 		
