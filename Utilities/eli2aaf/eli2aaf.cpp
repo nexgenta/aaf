@@ -1,5 +1,5 @@
 //
-// $Id: eli2aaf.cpp,v 1.11 2004/02/27 16:22:50 stuart_hc Exp $ $Name:  $
+// $Id: eli2aaf.cpp,v 1.12 2004/05/10 14:51:48 asuraparaju Exp $ $Name:  $
 //
 // eli2aaf.cpp -	Create an AAF file with embedded media from a lavtools
 //					(mjpegtools) ELI format file.  Such a format is created
@@ -61,6 +61,18 @@
 
 using namespace std;
 
+#if defined( _MSC_VER )
+// MS VC++ cannot cope with a 64bit int passed to the ostream << operator
+// so use this ugly workaround where it is converted to a string first.
+static char str_int64_workaround[30];	// big enough for 2**64-1 as decimal
+static const char *ostream_int64(aafInt64 value)
+{
+	sprintf(str_int64_workaround, "%I64d", value);
+	return str_int64_workaround;
+}
+#else
+#define ostream_int64
+#endif
 const aafMobID_t zerouid = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,{0,0,0,{0,0,0,0,0,0,0,0}}};
 
 const aafUID_t kAAFPropID_CDCIOffsetToFrameIndexes	= { 0x9d15fca3, 0x54c5, 0x11d3, { 0xa0, 0x29, 0x0, 0x60, 0x94, 0xeb, 0x75, 0xcb } };
@@ -577,7 +589,7 @@ static bool addMasterMobForDVFile(
 	} while (true);
 	fclose(fp);
 
-	cout << filename << ": " << total_written << " bytes written for CDCI Essence" << endl;
+	cout << filename << ": " << ostream_int64(total_written) << " bytes written for CDCI Essence" << endl;
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -832,7 +844,7 @@ static bool addMasterMobForDVFile(
 					total_A += byteswritten;
 				}
 				fclose(fp);
-				cout << filename << ": " << total_A << " bytes written for A" << nchan + 1 << " WAVE Essence" << endl;
+				cout << filename << ": " << ostream_int64(total_A) << " bytes written for A" << nchan + 1 << " WAVE Essence" << endl;
 			}
 		}
 	}
