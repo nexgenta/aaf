@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-SparcSolaris.mk,v 1.3 2004/05/18 17:03:02 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-SparcSolaris.mk,v 1.4 2004/07/08 17:43:38 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -104,7 +104,7 @@ endif
 
 # UUID library to use
 ifndef UUIDLIB
-    UUIDLIB =  $(AAFBUILDDIR)/uuid_gen/$(AAFTARGETDIR)/libuuid_gen$(LIB) -l socket -lnsl
+    UUIDLIB =
 endif
 
 

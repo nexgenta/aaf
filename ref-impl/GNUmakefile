@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.6 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.7 2004/07/08 17:43:39 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -24,10 +24,8 @@
 
 .PHONY : all
 all :
-	cd uuid_gen && $(MAKE)
 	cd aaflib && $(MAKE)
 	cd src && $(MAKE)
-	cd uuid_gen && $(MAKE)
 	cd aafiid && $(MAKE)
 	cd libjpeg && $(MAKE)
 	cd plugins && $(MAKE)
@@ -38,7 +36,6 @@ check :
 
 .PHONY : clean
 clean :
-	cd uuid_gen && $(MAKE) GENDEPS=0 $@
 	cd plugins && $(MAKE) GENDEPS=0 $@
 	cd libjpeg && $(MAKE) GENDEPS=0 $@
 	cd aaflib && $(MAKE) GENDEPS=0 $@
@@ -47,10 +44,8 @@ clean :
 
 .PHONY : realclean
 realclean :
-	cd uuid_gen && $(MAKE) GENDEPS=0 $@
 	cd plugins && $(MAKE) GENDEPS=0 $@
 	cd libjpeg && $(MAKE) GENDEPS=0 $@
 	cd aaflib && $(MAKE) GENDEPS=0 $@
 	cd aafiid && $(MAKE) GENDEPS=0 $@
 	cd src && $(MAKE) GENDEPS=0 $@
-
