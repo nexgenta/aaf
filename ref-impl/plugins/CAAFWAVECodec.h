@@ -94,7 +94,10 @@ public:
     (/*[in]*/ aafInt32  index, // Which data definition to get the ID for
      /*[out]*/ aafUID_t *  pVariant); // The returned dataDefinition 
 
-  // Given a variant ID, return the human readable name
+  STDMETHOD (GetMaxCodecDisplayNameLength)
+    (aafInt32  *bufSize);
+
+	// Given a variant ID, return the human readable name
   STDMETHOD (GetCodecDisplayName)
     (/*[in]*/ aafUID_t  variant, // which variant of the codec to use
      /*[in,string]*/ wchar_t *  pName, // Human-readable name of the variant
@@ -103,7 +106,7 @@ public:
   // Returns the number of channels which this codec can handle
 			// of the given essence kind
   STDMETHOD (GetNumChannels)
-    (/*[in]*/ IUnknown *fileMob, // Get the number of processable channels on this file mob
+    (/*[in]*/ IAAFSourceMob *fileMob, // Get the number of processable channels on this file mob
      /*[in]*/ aafUID_t  essenceKind, // This is the type of essence to open
 	 IAAFEssenceStream *stream,
      /*[out]*/ aafInt16 *  pNumChannels); // The number of channels present 
@@ -124,13 +127,14 @@ public:
          IAAFEssenceStream *stream,
     /*[in]*/ aafCheckVerbose_t  verbose, // This is the verbosity level of the output
      /*[out]*/ aafCheckWarnings_t warning, // This determines whether the output contains warnings
-     /*[in,string]*/ wchar_t *  pName, // Human-readable text describing problems (or lack therof) with the media
-     /*[in]*/ aafInt32  bufSize); // length of the buffer to hold variant Name 
+         aafInt32  bufSize,
+		wchar_t *  pName,
+        aafInt32  *bytesWritten);
 		
   // Create a media data object, and attach the correct type of
 			//EssenceDescriptor to the fileMob
   STDMETHOD (Create)
-    (/*[in]*/ IUnknown *fileMob, // Create the essence attached to this file mob
+    (/*[in]*/ IAAFSourceMob *fileMob, // Create the essence attached to this file mob
      /*[in]*/ aafUID_t  variant, // which variant of the codec to use
         IAAFEssenceStream * stream,
         aafInt32 numParms,
@@ -138,7 +142,7 @@ public:
 
   // Open a media data object.
   STDMETHOD (Open)
-    (/*[in]*/ IUnknown *fileMob, // Open the essence attached to this file mob
+    (/*[in]*/ IAAFSourceMob *fileMob, // Open the essence attached to this file mob
         aafSlotID_t	slotID,
      /*[in]*/ aafMediaOpenMode_t  openMode, // In this mode
      /*[in]*/ IAAFEssenceStream * stream); // Here is an essence stream with the raw data 
@@ -233,7 +237,7 @@ public:
     (/*[in]*/ IAAFEssenceFormat *pTemplate, // An essence format template object 
     /*[out]*/ IAAFEssenceFormat **pResult); // An essence format result object 
 
-  STDMETHOD (GetEssenceFormatList)
+  STDMETHOD (GetDefaultEssenceFormat)
     (/*[out]*/ IAAFEssenceFormat **pFormat); // An essence format result object 
 
   STDMETHOD (GetIndexedSampleSize)
