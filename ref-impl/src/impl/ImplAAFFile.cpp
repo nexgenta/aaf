@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -37,9 +37,29 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "ImplAAFObjectCreation.h"
+#include "ImplAAFBuiltinDefs.h"
 
 
 #include <assert.h>
+
+// AAF file signature.
+static const OMFileSignature aafFileSignature  =
+{0x42464141,
+ 0xff0d, 0x4d4f,
+{0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
+
+
+//
+// File Format Version
+//
+// Update this when incompatible changes are made to AAF file format
+// version. 
+//
+//    0 : Tue Jan 11 17:08:26 EST 2000
+//        Initial Release version.
+//
+static const aafUInt32 sCurrentAAFObjectModelVersion = 0;
+
 
 // local function for simplifying error handling.
 inline void checkResult(AAFRESULT r)
@@ -69,14 +89,14 @@ ImplAAFFile::Initialize ()
   _factory = ImplAAFDictionary::CreateDictionary();
 	if (NULL == _factory)
 		return AAFRESULT_NOMEMORY;
-	_initialized = AAFTrue;
+	_initialized = kAAFTrue;
 
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFile::OpenExistingRead (wchar_t * pFileName,
+ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 							   aafUInt32 modeFlags)
 {
 	AAFRESULT stat = AAFRESULT_SUCCESS;
@@ -108,6 +128,10 @@ ImplAAFFile::OpenExistingRead (wchar_t * pFileName,
 		_file = OMFile::openExistingRead(pFileName, _factory, OMFile::lazyLoad);
 		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
 
+        // Check the file's signature.
+        OMFileSignature sig = _file->signature();
+        checkExpression(sig == aafFileSignature, AAFRESULT_NOT_AAF_FILE);
+
 		// Get the byte order
 		_byteOrder = _file->byteOrder();
 
@@ -117,6 +141,22 @@ ImplAAFFile::OpenExistingRead (wchar_t * pFileName,
 		_head = dynamic_cast<ImplAAFHeader *>(head);
 		checkExpression(NULL != _head, AAFRESULT_BADHEAD);
 		
+		// Check for file format version.
+		if (_head->IsObjectModelVersionPresent())
+		  {
+			// If property isn't present, the default version is 0,
+			// which is always (supposed to be) legible.  If it is
+			// present, find out the version number to determine if
+			// the file is legible.
+			if (_head->GetObjectModelVersion() >
+				sCurrentAAFObjectModelVersion)
+			  {
+				// File version is higher than the version understood
+				// by this toolkit.  Therefore this file cannot be read.
+				return AAFRESULT_FILEREV_DIFF;
+			  }
+		  }
+
 		// Now that the file is open and the header has been
 		// restored, complete the initialization of the
 		// dictionary. We obtain the dictionary via the header
@@ -133,7 +173,7 @@ ImplAAFFile::OpenExistingRead (wchar_t * pFileName,
 		// Initialize the mob lookup tables.
 		checkResult(_head->LoadMobTables());
 		
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmOpenRead;
 	}
 	catch (AAFRESULT &r)
@@ -160,7 +200,7 @@ ImplAAFFile::OpenExistingRead (wchar_t * pFileName,
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFile::OpenExistingModify (wchar_t * pFileName,
+ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 								 aafUInt32 modeFlags,
 								 aafProductIdentification_t * pIdent)
 {
@@ -205,6 +245,22 @@ ImplAAFFile::OpenExistingModify (wchar_t * pFileName,
 		_head = dynamic_cast<ImplAAFHeader *>(head);
 		checkExpression(NULL != _head, AAFRESULT_BADHEAD);
 		
+		// Check for file format version.
+		if (! _head->IsObjectModelVersionPresent())
+		  {
+			// If property isn't present, the default version is 0,
+			// which is always (supposed to be) legible.  If it is
+			// present, find out the version number to determine if
+			// the file is legible.
+			if (_head->GetObjectModelVersion() >
+				sCurrentAAFObjectModelVersion)
+			  {
+				// File version is higher than the version understood
+				// by this toolkit.  Therefore this file cannot be read.
+				return AAFRESULT_FILEREV_DIFF;
+			  }
+		  }
+
 		// Now that the file is open and the header has been
 		// restored, complete the initialization of the
 		// dictionary. We obtain the dictionary via the header
@@ -236,7 +292,7 @@ ImplAAFFile::OpenExistingModify (wchar_t * pFileName,
 		_head->AddIdentificationObject(&_ident);
 		
 
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmModify;
 	}
 	catch (AAFRESULT &rc)
@@ -263,7 +319,7 @@ ImplAAFFile::OpenExistingModify (wchar_t * pFileName,
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFile::OpenNewModify (wchar_t * pFileName,
+ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 							aafUInt32 modeFlags,
 							aafProductIdentification_t * pIdent)
 {
@@ -303,6 +359,20 @@ ImplAAFFile::OpenNewModify (wchar_t * pFileName,
 		// dictionary.
 		_head->SetDictionary(_factory);
 
+		// Set the file format version.
+		//
+		// BobT Fri Jan 21 14:37:43 EST 2000: the default behavior is
+		// that if the version isn't present, it's assumed to Version
+		// 0.  Therefore if the current version is 0, don't write out
+		// the property.  We do this so that hackers examining written
+		// files won't know that a mechanism exists to mark future
+		// incompatible versions, and so will work harder to make any
+		// future changes compatible.
+		if (sCurrentAAFObjectModelVersion)
+		  {
+			_head->SetObjectModelVersion(sCurrentAAFObjectModelVersion);
+		  }
+
 		// Add the ident to the header.
 		checkResult(_head->AddIdentificationObject(&_ident));
 		  
@@ -317,7 +387,7 @@ ImplAAFFile::OpenNewModify (wchar_t * pFileName,
 		pCStore = 0;
 
 		// Attempt to create the file.
-		_file = OMFile::openNewModify(pFileName, _factory, _byteOrder, _head);
+		_file = OMFile::openNewModify(pFileName, _factory, _byteOrder, _head, aafFileSignature);
 		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
 
 		// Now that the file is open and the header has been
@@ -329,12 +399,15 @@ ImplAAFFile::OpenNewModify (wchar_t * pFileName,
 		if (hr != AAFRESULT_SUCCESS)
 		  return hr;
 		dictionary->InitBuiltins();
-		dictionary->InitOMProperties ();
+		dictionary->
+		  GetBuiltinDefs()->
+		  cdDictionary()->
+		  InitOMProperties (dictionary);
 
 		dictionary->ReleaseReference();
 		dictionary = 0;
 
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmCreate;
 		GetRevision(&_setrev);
 	}
@@ -420,7 +493,7 @@ ImplAAFFile::OpenTransient (aafProductIdentification_t * pIdent)
 		dictionary->ReleaseReference();
 		dictionary = 0;
 
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmTransient;
 		GetRevision(&_setrev);
 	}
@@ -464,10 +537,12 @@ ImplAAFFile::Save ()
 	  // save operation
 	  ImplAAFDictionarySP dictSP;
 	  AAFRESULT hr = _head->GetDictionary(&dictSP);
+	  if (AAFRESULT_FAILED (hr))
+		return hr;
 	  dictSP->AssureClassPropertyTypes ();
 	  bool regWasEnabled = dictSP->SetEnableDefRegistration (false);
 
-	  _file->save();
+	  _file->save(0);
 
 	  dictSP->SetEnableDefRegistration (regWasEnabled);
 
@@ -484,7 +559,7 @@ ImplAAFFile::Save ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFile::SaveAs (wchar_t * pFileName,
+ImplAAFFile::SaveAs (const aafCharacter * pFileName,
 					 aafUInt32 modeFlags)
 {
 	if (! _initialized)
@@ -536,9 +611,9 @@ ImplAAFFile::ImplAAFFile () :
 		_byteOrder(0),
 		_openType(kOmUndefined),
 		_head(NULL),
-		_semanticCheckEnable(AAFFalse),
-		_initialized(AAFFalse),
-		_open(AAFFalse),
+		_semanticCheckEnable(kAAFFalse),
+		_initialized(kAAFFalse),
+		_open(kAAFFalse),
 		_modeFlags(0)
 {
 	memset (&_ident, 0, sizeof (_ident));
@@ -616,7 +691,7 @@ ImplAAFFile::Close ()
 	}
 
 	_cookie = 0;
-	_open = AAFFalse;
+	_open = kAAFFalse;
 	_openType = kOmUndefined;
 
 
