@@ -32,10 +32,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
-#include "aafCvt.h"
+//#include "aafCvt.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -90,7 +92,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafLength_t					zero;
 	aafTimecode_t				startTC;
 
-	CvtInt32toLength(0, zero);
+//	CvtInt32toLength(0, zero);
+    zero = 0;
 	aafProductVersion_t v;
 	v.major = 1;
 	v.minor = 0;
@@ -136,10 +139,54 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				  CreateInstance(IID_IAAFTimecode, 
 								 (IUnknown **)&pTimecode));		
 
+	  // try Get and Set before its been initialized
+	  checkExpression(pTimecode->GetTimecode(&startTC) == AAFRESULT_NOT_INITIALIZED,
+	  																AAFRESULT_TEST_FAILED);
+	  checkExpression(pTimecode->SetTimecode(&startTC) == AAFRESULT_NOT_INITIALIZED,
+	  																AAFRESULT_TEST_FAILED);
+	  
+	  startTC.startFrame = 0;	// midnight
+	  startTC.drop = kAAFTcNonDrop;
+	  startTC.fps = 24;
+
+	  // Initialize()
+	  // Test Initialize with a NULL timecode
+	  checkExpression(pTimecode->Initialize (zero, NULL) == AAFRESULT_NULL_PARAM,
+	  																AAFRESULT_TEST_FAILED);
+	  // test initialize with bogus drop value
+	  startTC.drop = 2; 
+	  checkExpression(pTimecode->Initialize (zero, &startTC) == AAFRESULT_INVALID_TIMECODE,
+	  																AAFRESULT_TEST_FAILED);
+	  // Set drop to valid value
+	  startTC.drop = kAAFTcDrop;
+	  checkResult(pTimecode->Initialize (zero, &startTC));
+	  
+	  // Make sure it can't be intialized again
+	  checkExpression(pTimecode->Initialize (zero, &startTC) == AAFRESULT_ALREADY_INITIALIZED,
+	  																AAFRESULT_TEST_FAILED);
+
+       checkResult(pTimecode->GetTimecode (&startTC));
+
+       // Check results !!
+       checkExpression(startTC.startFrame == 0, AAFRESULT_TEST_FAILED);
+       checkExpression(startTC.drop == kAAFTcDrop, AAFRESULT_TEST_FAILED);
+       checkExpression(startTC.fps == 24, AAFRESULT_TEST_FAILED);
+
+	  // SetTimecode()
 	  startTC.startFrame = 108000;	// One hour
 	  startTC.drop = kAAFTcNonDrop;
 	  startTC.fps = 30;
-	  checkResult(pTimecode->Initialize (zero, &startTC));
+
+	  // Test SetTimecode with a NULL timecode
+	  checkExpression(pTimecode->SetTimecode(NULL) == AAFRESULT_NULL_PARAM,
+	  												AAFRESULT_TEST_FAILED);
+	  // test SetTimecode with bogus drop value
+	  startTC.drop = 2; 
+	  checkExpression(pTimecode->SetTimecode (&startTC) == AAFRESULT_INVALID_TIMECODE,
+	  															AAFRESULT_TEST_FAILED);
+	  startTC.drop = kAAFTcNonDrop;
+	  checkResult(pTimecode->SetTimecode(&startTC));
+
 	  checkResult(pTimecode->QueryInterface (IID_IAAFSegment, (void **)&pSeg));
 
 	  aafRational_t editRate = { 0, 1};
@@ -208,21 +255,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   IAAFTimecode*				pTimecode = NULL;
   aafTimecode_t				startTC;
 
-  aafProductIdentification_t	ProductInfo;
   aafNumSlots_t				numMobs;
   HRESULT						hr = S_OK;
-
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-  ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-  ProductInfo.productName = L"AAFTimecode test. NOT!";
-  ProductInfo.productVersion = &v;
-  ProductInfo.productVersionString = NULL;
-  ProductInfo.platform = NULL;
 
   try
   {
@@ -248,7 +282,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
         // Get a Timecode interface 
         checkResult(pSeg->QueryInterface (IID_IAAFTimecode, (void **)&pTimecode));
         checkResult(pTimecode->GetTimecode (&startTC));
-
+        checkExpression(pTimecode->GetTimecode (NULL) == AAFRESULT_NULL_PARAM,
+        													 AAFRESULT_TEST_FAILED);
         // Check results !!
         checkExpression(startTC.startFrame == 108000, AAFRESULT_TEST_FAILED);
         checkExpression(startTC.drop == kAAFTcNonDrop, AAFRESULT_TEST_FAILED);
@@ -306,27 +341,27 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTimecode_test()
+extern "C" HRESULT CAAFTimecode_test(testMode_t mode);
+extern "C" HRESULT CAAFTimecode_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFTimecodeTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CAAFTimecodeMob_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
-
-  	// When all of the functionality of this class is tested, we can return success
-	if(hr == AAFRESULT_SUCCESS)
-		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 
 	// Cleanup our object if it exists.
 	return hr;

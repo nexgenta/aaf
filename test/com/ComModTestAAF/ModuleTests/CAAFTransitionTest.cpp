@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTransition
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -32,17 +32,18 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
-#include "aafCvt.h"
+//#include "aafCvt.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
 
 // This values are used for testing purposes
-static aafUID_t    fillerUID = DDEF_Picture;
 static aafLength_t  fillerLength = 3200;
 static aafMobID_t	zeroMobID = { 0 };
 
@@ -98,7 +99,8 @@ do {\
 
 
 #define TEST_NUM_INPUTS		1
-#define TEST_CATEGORY		L"Test Parameters"
+static const aafUID_t TEST_CATEGORY = 
+{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
@@ -147,7 +149,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUID_t					effectID = kTestEffectID;
 	aafUID_t					parmID = kTestParmID;
 
-	CvtInt32toLength(100, transitionLength);
+	//CvtInt32toLength(100, transitionLength);
+	transitionLength = 100;
 	aafProductVersion_t v;
 	v.major = 1;
 	v.minor = 0;
@@ -282,9 +285,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
     checkResult(pConstantValue->QueryInterface (IID_IAAFParameter, (void **)&pParm));
     checkResult(pOperationGroup->AddParameter (pParm));
-//    pParm->Release();
- //	IAAFSegment*				pSegment = NULL;
-   pParm = NULL;
+    pParm->Release();
+    pParm = NULL;
     pConstantValue->Release();
     pConstantValue = NULL;
 
@@ -439,22 +441,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafLength_t					transitionLength;
 	aafPosition_t				cutPoint;
 
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs;
 	aafUInt32					numComponents = 0;
 	HRESULT						hr = S_OK;
-
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFTransition Test. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 
 	try
 	{
@@ -578,21 +567,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTransition_test()
+extern "C" HRESULT CAAFTransition_test(testMode_t mode);
+extern "C" HRESULT CAAFTransition_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFTransitionTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CAAFTransition_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

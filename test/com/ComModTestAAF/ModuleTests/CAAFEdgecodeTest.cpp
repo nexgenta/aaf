@@ -31,10 +31,12 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AAFStoredObjectIDs.h"
-#include "aafCvt.h"
+//#include "aafCvt.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -90,7 +92,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   aafLength_t					zero;
   aafEdgecode_t				startEC;
 
-  CvtInt32toLength(0, zero);
+//  CvtInt32toLength(0, zero);
+  zero = 0;
   aafProductVersion_t v;
   v.major = 1;
   v.minor = 0;
@@ -211,21 +214,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   IAAFEdgecode*				pEdgecode = NULL;
   aafEdgecode_t				startEC;
 
-  aafProductIdentification_t	ProductInfo;
   aafNumSlots_t				numMobs;
   HRESULT						hr = S_OK;
-
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-  ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-  ProductInfo.productName = L"AAFEdgecode Test. NOT!";
-  ProductInfo.productVersion = &v;
-  ProductInfo.productVersionString = NULL;
-  ProductInfo.platform = NULL;
 
 
   try
@@ -305,21 +295,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFEdgecode_test()
+extern "C" HRESULT CAAFEdgecode_test(testMode_t mode);
+extern "C" HRESULT CAAFEdgecode_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFEdgecodeTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CAAFEdgecodeMob_test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

@@ -34,10 +34,13 @@
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
-#include "aafCvt.h"
+//#include "aafCvt.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -91,9 +94,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
-	aafLength_t					zero;
 	
-	CvtInt32toLength(0, zero);
 	aafProductVersion_t v;
 	v.major = 1;
 	v.minor = 0;
@@ -135,7 +136,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		checkResult(pCompMob->Initialize(L"COMPMOB01"));
 		
-		checkResult(defs.cdTimecodeStream()->
+		// Create a concrete subclass fo TimecodeStream
+		checkResult(defs.cdTimecodeStream12M()->
 					CreateInstance(IID_IAAFTimecodeStream, 
 								   (IUnknown **)&pTimecodeStream));		
 		 checkResult(pTimecodeStream->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
@@ -225,21 +227,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafUInt32					sourceLen, bytesRead;
 	aafRational_t				checkSpeed;
 	
-	aafProductIdentification_t	ProductInfo;
 	aafNumSlots_t				numMobs;
 	HRESULT						hr = S_OK;
-	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"AAFTimecodeStream Test. NOT!";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.platform = NULL;
 	
 	try
 	{
@@ -338,21 +327,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTimecodeStream_test()
+extern "C" HRESULT CAAFTimecodeStream_test(testMode_t mode);
+extern "C" HRESULT CAAFTimecodeStream_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFTimecodeStreamTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
 	catch (...)
 	{
 	  cerr << "CAAFTimecodeStream::test...Caught general C++"
-		" exception!" << endl; 
+		   << " exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 
