@@ -30,9 +30,6 @@
 #include "ImplEnumAAFPropertyDefs.h"
 #endif
 
-#include "ImplAAFSmartPointer.h"
-typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
-
 #ifndef __ImplAAFPropertyDef_h__
 #include "ImplAAFPropertyDef.h"
 #endif
@@ -49,11 +46,12 @@ typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 #include "ImplAAFDictionary.h"
 #endif
 
-
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFBuiltinDefs.h"
+#include "ImplAAFBuiltinDefs.h"
+#include "ImplAAFHeader.h"
 #include "AAFUtils.h"
 
 #include <assert.h>
@@ -90,21 +88,13 @@ extern "C" const aafClassID_t CLSID_AAFObject;
 
 
 ImplAAFClassDef::ImplAAFClassDef ()
-  : _ParentClass  ( PID_ClassDefinition_ParentClass,  
-                    L"ParentClass",
-                    L"/MetaDictionary/ClassDefinitions", 
-                    PID_MetaDefinition_Identification),
-    _Properties   ( PID_ClassDefinition_Properties,
-                    L"Properties",
-                    PID_MetaDefinition_Identification),
-    _IsConcrete   ( PID_ClassDefinition_IsConcrete,   
-                    L"IsConcrete"),
+  : _ParentClass  ( PID_ClassDefinition_ParentClass,  "ParentClass", "/Dictionary/ClassDefinitions", PID_MetaDefinition_Identification),
+	_Properties   ( PID_ClassDefinition_Properties,   "Properties", PID_MetaDefinition_Identification),
 	_propTypesLoaded (false),
 	_BootstrapParent(0)
 {
   _persistentProperties.put(_ParentClass.address());
   _persistentProperties.put(_Properties.address());
-  _persistentProperties.put(_IsConcrete.address());
 }
 
 
@@ -118,7 +108,7 @@ ImplAAFClassDef::~ImplAAFClassDef ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPropertyDef>propertyDefinitions(_Properties);
 	while(++propertyDefinitions)
 	{
-		ImplAAFPropertyDef *pProperty = propertyDefinitions.clearValue();
+		ImplAAFPropertyDef *pProperty = propertyDefinitions.setValue(0);
 		if (pProperty)
 		{
 		  pProperty->ReleaseReference();
@@ -132,48 +122,35 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::Initialize (
       const aafUID_t & classID,
       ImplAAFClassDef * pParentClass,
-      const aafCharacter * pClassName,
-	  aafBool isConcrete)
+      const aafCharacter * pClassName)
 {
   if (!pClassName) return AAFRESULT_NULL_PARAM;
 
-  return pvtInitialize (classID, pParentClass, pClassName, isConcrete);
+  return pvtInitialize (classID, pParentClass, pClassName);
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::pvtInitialize (
       const aafUID_t & classID,
-      ImplAAFClassDef * pParentClass,
-      const aafCharacter * pClassName,
-	  aafBool isConcrete)
+      const ImplAAFClassDef * pParentClass,
+      const aafCharacter * pClassName)
 {
 //	ImplAAFClassDef	*oldParent;
-  if (!pClassName) return AAFRESULT_NULL_PARAM;	
+	if (!pClassName) return AAFRESULT_NULL_PARAM;	
   if (pParentClass && !pParentClass->attached())
     return AAFRESULT_OBJECT_NOT_ATTACHED;	
 	
-  HRESULT hr;
+	HRESULT hr;
   hr = ImplAAFMetaDefinition::Initialize(classID, pClassName, NULL);
-  if (AAFRESULT_FAILED (hr))
+	if (AAFRESULT_FAILED (hr))
     return hr;
 	
-  SetParent (pParentClass);
-  pvtSetIsConcrete (isConcrete);
-
-  return AAFRESULT_SUCCESS;
+	_ParentClass = pParentClass;
+	
+	return AAFRESULT_SUCCESS;
 }
 
-
-aafBool ImplAAFClassDef::pvtIsConcrete () const
-{
-  return _IsConcrete;
-}
-
-void ImplAAFClassDef::pvtSetIsConcrete (aafBoolean_t isConcrete)
-{
-  _IsConcrete = isConcrete;
-}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetPropertyDefs (
@@ -194,7 +171,7 @@ AAFRESULT STDMETHODCALLTYPE
   if(iter == 0)
 	hr = AAFRESULT_NOMEMORY;
   else
-	hr = theEnum->Initialize(&CLSID_EnumAAFPropertyDefs,this,iter);
+	hr = theEnum->SetIterator(this, iter);
   if (AAFRESULT_FAILED (hr))
 	{
 		theEnum->ReleaseReference();
@@ -218,7 +195,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (!_Properties.isPresent())
 	*pCount = 0;
 
-  else  *pCount = _Properties.count ();
+  else  *pCount = _Properties.getSize ();
 	
   return AAFRESULT_SUCCESS;
 }
@@ -506,21 +483,7 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	GetAUID (&uid);
 	*isRoot = memcmp(&uid, &AUID_AAFObject, sizeof(aafUID_t)) == 0;
-  	if (!(*isRoot))
-	  *isRoot = memcmp(&uid, &AUID_AAFMetaDefinition, sizeof(aafUID_t)) == 0;
-  	if (!(*isRoot))
-	  *isRoot = memcmp(&uid, &AUID_AAFMetaDictionary, sizeof(aafUID_t)) == 0;
 
-	return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFClassDef::IsConcrete (
-      aafBool * pResult)
-{
-	if (! pResult) return AAFRESULT_NULL_PARAM;
-	*pResult = pvtIsConcrete ();
 	return AAFRESULT_SUCCESS;
 }
 
@@ -531,6 +494,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::IsUniquelyIdentified (
       aafBoolean_t * isUniquelyIdentified)
 {
+  AAFRESULT hr = AAFRESULT_SUCCESS;
 	if (! isUniquelyIdentified)
     return AAFRESULT_NULL_PARAM;
 	
@@ -550,6 +514,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetUniqueIdentifier (
       ImplAAFPropertyDef ** ppUniqueIdentifier)
 {
+  AAFRESULT hr = AAFRESULT_SUCCESS;
 	if (! ppUniqueIdentifier)
     return AAFRESULT_NULL_PARAM;
 
@@ -649,9 +614,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! ppObject)
 	return AAFRESULT_NULL_PARAM;
-
-  if (! pvtIsConcrete ())
-	return AAFRESULT_ABSTRACT_CLASS;
 
   AAFRESULT hr;
   ImplAAFDictionarySP pDict;
@@ -812,23 +774,124 @@ void ImplAAFClassDef::AssurePropertyTypesLoaded ()
 }
 
 
+//
+// Here is the mapping of DM type defs to OMProperty concrete
+// classes.
+//
+// DM TypeDef				Treatment
+// ----------				-------------------------
+// AAFTypeDefEnum			FixedData(sizeof rep'd type)
+//
+// AAFTypeDefExtEnum		FixedData(sizeof auid)
+//
+// AAFTypeDefFixedArray     FixedData(sizeof elem * num elems)
+//
+// AAFTypeDefInt			FixedData(sizeof int)
+//
+// AAFTypeDefRecord         FixedData(sum of sizes of elements)
+//
+// AAFTypeDefRename         <refer to referenced type>
+//
+// AAFTypeDefSet:
+//   if elem type is StrRef	OMStrongReferenceVectorProperty<AAFObject>
+//   if elem type is WkRef  VariableData(sizeof auid)
+//   if elem is fixed data  VariableData(sizeof elem)
+//   else                   <not yet supported; maybe never!>
+//
+// AAFTypeDefStream			<not yet supported>
+//
+// AAFTypeDefString			VariableData(sizeof elem)
+//
+// AAFTypeDefStrongObjRef	OMStrongReferenceProperty<AAFObject>
+//
+// AAFTypeDefVariableArray
+//   if elem type is StrRef	OMStrongReferenceVectorProperty<AAFObject>
+// 	 if elem type is WkRef  VariableData(sizeof auid)
+// 	 if elem is fixed data  VariableData(sizeof elem)
+//   else                   <not yet supported; maybe never!>
+//
+// AAFTypeDefWeakObjRef     FixedData(sizeof auid)
+//
 
 
-
-
-// override from OMStorable.
-const OMClassId& ImplAAFClassDef::classId(void) const
+void ImplAAFClassDef::InitOMProperties (ImplAAFObject * pObj)
 {
-  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFClassDef));
-}
+  assert (pObj);
+  AAFRESULT hr;
 
-// Override callbacks from OMStorable
-void ImplAAFClassDef::onSave(void* clientContext) const
-{
-  ImplAAFMetaDefinition::onSave(clientContext);
-}
+  //
+  // Init base class properties first
+  //
+  ImplAAFClassDefSP parentSP;
+  aafBool		isRoot;
 
-void ImplAAFClassDef::onRestore(void* clientContext) const
-{
-  ImplAAFMetaDefinition::onRestore(clientContext);
+  hr = IsRoot(&isRoot);
+  if(!isRoot)
+  {
+	hr = GetParent (&parentSP);
+	assert (AAFRESULT_SUCCEEDED (hr));
+	if (parentSP)
+	  parentSP->InitOMProperties (pObj);
+  }
+
+  // See if currently existing OM properties are defined in the class
+  // def.
+  //
+  OMPropertySet * ps = pObj->propertySet();
+  assert (ps);
+  const size_t propCount = ps->count();
+
+  // Loop through properties of this class
+  ImplEnumAAFPropertyDefsSP pdEnumSP;
+  hr = GetPropertyDefs (&pdEnumSP);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  ImplAAFPropertyDefSP propDefSP;
+  while (AAFRESULT_SUCCEEDED (pdEnumSP->NextOne (&propDefSP)))
+	{
+	  OMPropertyId defPid = propDefSP->OmPid ();
+	  // assert (ps->isAllowed (defPid));
+	  OMProperty * pProp = 0;
+	  if (ps->isPresent (defPid))
+		{
+		  // Defined property was already in property set.  (Most
+		  // probably declared in the impl constructor.)  Get that
+		  // property.
+		  pProp = ps->get (defPid);
+		}		  
+		else if(defPid != PID_InterchangeObject_ObjClass
+			&& (defPid != PID_InterchangeObject_Generation)
+			&& (defPid != PID_PropertyDefinition_DefaultValue))
+		{
+		  // Defined property wasn't found in OM property set.
+		  // We'll have to install one.
+		  pProp = propDefSP->CreateOMProperty ();
+		  assert (pProp);
+		  
+		  // Remember this property so we can delete it later.
+		  pObj->RememberAddedProp (pProp);
+		  
+		  // Add the property to the property set.
+		  ps->put (pProp);
+	  }
+	  
+	if(defPid != PID_InterchangeObject_ObjClass
+			&& (defPid != PID_InterchangeObject_Generation)
+			&& (defPid != PID_PropertyDefinition_DefaultValue))
+	{
+		  ImplAAFPropertyDef * pPropDef =
+			  (ImplAAFPropertyDef*) propDefSP;
+		  OMPropertyDefinition * pOMPropDef =
+			  dynamic_cast<OMPropertyDefinition*>(pPropDef);
+		  assert (pOMPropDef);
+		  
+		  assert (pProp);
+		  pProp->initialize (pOMPropDef);
+		  
+		  pPropDef = 0;
+		  pOMPropDef = 0;
+	  }
+	  propDefSP = 0;
+	  pProp = 0;
+  }
 }
