@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.h,v 1.23.2.1 2004/06/08 13:46:05 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.h,v 1.23.2.2 2004/07/22 18:28:08 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,12 +27,6 @@
 #define _AAF_UTIL_API_ 1
 
 #include <stdio.h>
-
-//removed by Ian Baker 20031219
-//not needed for GCC Solaris build so is it ever used??
-//#if defined(sun)
-//#include <sys/stdtypes.h>
-//#endif
 
 #include "aafErr.h"
 #include "AAFTypes.h"
