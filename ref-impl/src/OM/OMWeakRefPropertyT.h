@@ -43,7 +43,7 @@ OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty(
                                         SF_WEAK_OBJECT_REFERENCE,
                                         name), _reference(),
   _targetTag(nullOMPropertyTag),
-  _targetName(convertWideString(targetName)),
+  _targetName(targetName),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::OMWeakReferenceProperty");
@@ -55,7 +55,6 @@ template<typename ReferencedObject>
 OMWeakReferenceProperty<ReferencedObject>::~OMWeakReferenceProperty(void)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::~OMWeakReferenceProperty");
-  delete [] _targetName;
 }
 
   // @mfunc Get the value of this <c OMWeakReferenceProperty>.
@@ -166,17 +165,10 @@ void OMWeakReferenceProperty<ReferencedObject>::save(void) const
 
   PRECONDITION("Non-void weak reference", !_reference.isVoid());
 
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* store = container->store();
-
-  OMFile* file = container->file();
-  OMPropertyTag tag = file->referencedProperties()->insert(_targetName);
+  OMPropertyTag tag = file()->referencedProperties()->insert(_targetName);
 
   const OMUniqueObjectIdentification& id = _reference.identification();
-  store->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
+  store()->save(_propertyId, _storedForm, id, tag, _keyPropertyId);
 
   _reference.save();
 }
@@ -204,19 +196,12 @@ void OMWeakReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 {
   TRACE("OMWeakReferenceProperty<ReferencedObject>::restore");
 
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* store = container->store();
-  ASSERT("Valid store", store != 0);
-
   OMUniqueObjectIdentification id;
   OMPropertyTag tag;
   ASSERT("Sizes match", (sizeof(tag) + sizeof(OMPropertyId) +
                          sizeof(OMKeySize) + sizeof(id)) == externalSize);
   OMPropertyId keyPropertyId;
-  store->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
+  store()->restore(_propertyId, _storedForm, id, tag, keyPropertyId);
   ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
   _targetTag = tag;
   _reference = OMWeakObjectReference<ReferencedObject>(this, id, _targetTag);

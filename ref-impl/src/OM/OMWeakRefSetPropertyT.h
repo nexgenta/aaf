@@ -50,7 +50,7 @@ OMWeakReferenceSetProperty<ReferencedObject>::
                                         SF_WEAK_OBJECT_REFERENCE_SET,
                                         name),
   _targetTag(nullOMPropertyTag),
-  _targetName(convertWideString(targetName)),
+  _targetName(targetName),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::"
@@ -63,7 +63,6 @@ OMWeakReferenceSetProperty<ReferencedObject>::~OMWeakReferenceSetProperty(void)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::"
                                                 "~OMWeakReferenceSetProperty");
-  delete [] _targetName;
 }
 
   // @mfunc Save this <c OMWeakReferenceSetProperty>.
@@ -78,16 +77,8 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* s = container->store();
 
-  OMFile* file = container->file();
-  OMPropertyTag tag = file->referencedProperties()->insert(_targetName);
-
-  const char* propertyName = name();
+  OMPropertyTag tag = file()->referencedProperties()->insert(_targetName);
 
   // create a set index
   //
@@ -121,14 +112,17 @@ void OMWeakReferenceSetProperty<ReferencedObject>::save(void) const
 
   // save the set index
   //
-  s->save(_propertyId,
-          _storedForm,
-          propertyName,
-          index,
-          count,
-          tag,
-          _keyPropertyId);
+  store()->save(name(),
+                index,
+                count,
+                tag,
+                _keyPropertyId);
   delete [] index;
+
+  // make an entry in the property index
+  //
+  saveName();
+
 }
 
   // @mfunc Close this <c OMWeakReferenceSetProperty>.
@@ -177,14 +171,9 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::restore");
 
-  PRECONDITION("Consistent property size", externalSize == strlen(name()) + 1);
-
   // get the name of the set index stream
   //
-  char* propertyName = new char[externalSize];
-  ASSERT("Valid heap pointer", propertyName != 0);
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
+  restoreName(externalSize);
 
   // restore the index
   //
@@ -192,21 +181,16 @@ void OMWeakReferenceSetProperty<ReferencedObject>::restore(
   size_t entries;
   OMPropertyTag tag;
   OMPropertyId keyPropertyId;
-  store->restore(_propertyId,
-                 _storedForm,
-                 propertyName,
-                 externalSize,
-                 setIndex,
-                 entries,
-                 tag,
-                 keyPropertyId);
+  store()->restore(name(),
+                   setIndex,
+                   entries,
+                   tag,
+                   keyPropertyId);
 
   ASSERT("Valid set index", IMPLIES(entries != 0, setIndex != 0));
   ASSERT("Valid set index", IMPLIES(entries == 0, setIndex == 0));
   ASSERT("Consistent key property ids", keyPropertyId == _keyPropertyId);
-  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
   _targetTag = tag;
-  delete [] propertyName;
 
   // Iterate over the index restoring the elements of the set.
   // Since the index entries are stored on disk in order of their
