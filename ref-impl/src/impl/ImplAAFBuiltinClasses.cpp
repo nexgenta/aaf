@@ -229,9 +229,11 @@ const /*static*/ aafUID_t * ImplAAFBuiltinClasses::sAxClassIDs[] =
 {
   &AUID_AAFHeader,
   &AUID_AAFDictionary,
+  &AUID_AAFMetaDictionary,
   &AUID_AAFClassDef,
   &AUID_AAFPropertyDef,
   &AUID_AAFDefObject,
+  &AUID_AAFMetaDefinition,
   &AUID_AAFTypeDef,
   &AUID_AAFTypeDefInt,
 
@@ -381,10 +383,18 @@ ImplAAFBuiltinClasses::InitBuiltinClassDef (const aafUID_t & rClassID,
 			hr = pClass->pvtInitialize (*sBuiltinClassTable[i].pThisId,
 										parent,
 										sBuiltinClassTable[i].pName);
-			hr = pClass->SetBootstrapParent(parent);
-			assert (AAFRESULT_SUCCEEDED (hr));
+			if (AAFRESULT_FAILED (hr))
+				{
+				  status = hr;
+				  break;
+				}
 			
-			assert (AAFRESULT_SUCCEEDED (hr));
+			hr = pClass->SetBootstrapParent(parent);
+			if (AAFRESULT_FAILED (hr))
+				{
+				  status = hr;
+				  break;
+				}
 			
 			RegisterBuiltinProperties (pClass);
 	
