@@ -52,8 +52,8 @@
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
 ImplAAFSelector::ImplAAFSelector () :
-	_selected(		PID_Selector_Selected,		L"Selected"),
-	_alternates(	PID_Selector_Alternates,	L"Alternates")
+	_selected(		PID_Selector_Selected,		"Selected"),
+	_alternates(	PID_Selector_Alternates,	"Alternates")
 {
 	_persistentProperties.put(_selected.address());
 	_persistentProperties.put(_alternates.address());
@@ -62,17 +62,17 @@ ImplAAFSelector::ImplAAFSelector () :
 
 ImplAAFSelector::~ImplAAFSelector ()
 {
-	ImplAAFSegment *selected = _selected.clearValue();
+	ImplAAFSegment *selected = _selected.setValue(0);
 	if (selected != NULL)
 	{
 	  selected->ReleaseReference();
 	  selected = 0;
 	}
 
-	size_t count = _alternates.count();
-	for (size_t i = 0; i < count; i++)
+	size_t size = _alternates.getSize();
+	for (size_t i = 0; i < size; i++)
 	{
-		ImplAAFSegment* pSegment = _alternates.clearValueAt(i);
+		ImplAAFSegment* pSegment = _alternates.setValueAt(0, i);
 		if (pSegment)
 		{
 		  pSegment->ReleaseReference();
@@ -110,25 +110,26 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::SetSelectedSegment (ImplAAFSegment* pSelSegment)
 {
+	HRESULT				hr = AAFRESULT_SUCCESS;
 	ImplAAFSegment*		pPrevSelected = NULL;
 
 	if (pSelSegment == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if (pSelSegment->attached())
-		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-	pPrevSelected = _selected;
-	if (pPrevSelected)
 	{
-	  pPrevSelected->ReleaseReference();
-	  pPrevSelected = 0;
+		hr = AAFRESULT_NULL_PARAM;
 	}
-	_selected = pSelSegment;
-	_selected->AcquireReference();
+	else
+	{
+		pPrevSelected = _selected;
+		if (pPrevSelected)
+		{
+		  pPrevSelected->ReleaseReference();
+		  pPrevSelected = 0;
+		}
+		_selected = pSelSegment;
+		_selected->AcquireReference();
+	}
 
-
-	return AAFRESULT_SUCCESS;
+	return hr;
 }
 
 
@@ -160,12 +161,6 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::RemoveAlternateSegment (ImplAAFSegment* pSegment)
 {
-	if (pSegment == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	if( !pSegment->attached() )
-		return AAFRESULT_SEGMENT_NOT_FOUND;
-
 	if (!_alternates.containsValue(pSegment))
 	  return AAFRESULT_SEGMENT_NOT_FOUND;
 
@@ -201,6 +196,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::GetNumAlternateSegments (aafInt32* pNumSegments)
 {
 	HRESULT	hr = AAFRESULT_SUCCESS;
+	size_t	numSegments;
 
 	if (pNumSegments == NULL)
 	{
@@ -208,7 +204,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		size_t	numSegments = _alternates.count();
+		_alternates.getSize(numSegments);
 		*pNumSegments = numSegments;
 	}
 
@@ -252,22 +248,7 @@ AAFRESULT STDMETHODCALLTYPE
 	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
 	if(*ppEnum == NULL)
 		return(AAFRESULT_NOMEMORY);
-
-	XPROTECT()
-	{
-		OMStrongReferenceVectorIterator<ImplAAFSegment>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFSegment>(_alternates);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK((*ppEnum)->Initialize(&CLSID_EnumAAFSegments, this, iter));
-	}
-	XEXCEPT
-	{
-		if (*ppEnum)
-		  (*ppEnum)->ReleaseReference();
-		(*ppEnum) = 0;
-	}
-	XEND;
+	(*ppEnum)->SetEnumStrongProperty(this, &_alternates);
 
 	return(AAFRESULT_SUCCESS);
 }
@@ -289,9 +270,10 @@ AAFRESULT
     ImplAAFSelector::GetNthSegment (aafUInt32 index, ImplAAFSegment** ppSegment)
 {
 	ImplAAFSegment*	obj;
+	size_t			numSegments;
 	HRESULT			hr;
 
-	size_t numSegments = _alternates.count();
+	_alternates.getSize(numSegments);
 	if (index < numSegments)
 	{
 		_alternates.getValueAt(obj, index);
@@ -365,37 +347,3 @@ AAFRESULT
 
 
 
-AAFRESULT ImplAAFSelector::ChangeContainedReferences(aafMobID_constref from,
-													aafMobID_constref to)
-{
-	aafInt32			n, count;
-	ImplAAFSegment		*seg = NULL;
-	ImplAAFComponent	*selected;
-	
-	XPROTECT()
-	{
-		CHECK(GetNumAlternateSegments (&count));
-		for(n = 0; n < count; n++)
-		{
-			CHECK(GetNthSegment (n, &seg));
-			CHECK(seg->ChangeContainedReferences(from, to));
-			seg->ReleaseReference();
-			seg = NULL;
-		}
-
-		selected = _selected;
-		if(selected != NULL)
-		{
-			CHECK(selected->ChangeContainedReferences(from, to));
-		}
-	}
-	XEXCEPT
-	{
-		if(seg != NULL)
-		  seg->ReleaseReference();
-		seg = 0;
-	}
-	XEND;
-
-	return AAFRESULT_SUCCESS;
-}

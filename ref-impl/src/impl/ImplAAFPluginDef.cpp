@@ -1,11 +1,29 @@
-/************************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\************************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFNetworkLocator_h__
 #include "ImplAAFNetworkLocator.h"
@@ -13,10 +31,6 @@
 
 #ifndef __ImplAAFLocator_h__
 #include "ImplAAFLocator.h"
-#endif
-
-#ifndef __ImplAAFPluggableCode_h__
-#include "ImplAAFPluggableCode.h"
 #endif
 
 #ifndef __ImplEnumAAFPluginLocators_h__
@@ -93,7 +107,8 @@ ImplAAFPluginDescriptor::~ImplAAFPluginDescriptor ()
 	ImplAAFNetworkLocator *pNetLocator = _manufacturerURL.setValue(0);
 	if (pNetLocator)
 	{
-		pNetLocator->ReleaseReference();
+	  pNetLocator->ReleaseReference();
+	  pNetLocator = 0;
 	}
 
 	// Release all of the other locator pointers.
@@ -103,30 +118,35 @@ ImplAAFPluginDescriptor::~ImplAAFPluginDescriptor ()
 		ImplAAFLocator *pLocator = _locators.setValueAt(0, i);
 		if (pLocator)
 		{
-			pLocator->ReleaseReference();
+		  pLocator->ReleaseReference();
+		  pLocator = 0;
 		}
 	}
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPluginDescriptor::Init (
-      aafUID_t *pAuid, aafWChar *pName, aafWChar *pDesc)
+    ImplAAFPluginDescriptor::Initialize (
+      const aafUID_t & id,
+	  const aafCharacter * pName,
+	  const aafCharacter * pDesc)
 {
-	if (pAuid == NULL || pName == NULL || pDesc == NULL)
+	if (pName == NULL || pDesc == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 	else
 	{
-		_identification = *pAuid;
+		_identification = id;
 		_name = pName;
 		_description = pDesc;
 	}
 	return AAFRESULT_SUCCESS;
 }
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetName (
-      wchar_t *  pName)
+      const aafCharacter *  pName)
 {
 	if (! pName)
 	{
@@ -141,7 +161,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::GetName (
-      wchar_t *  pName,
+      aafCharacter *  pName,
       aafUInt32  bufSize)
 {
 	bool stat;
@@ -174,7 +194,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetDescription (
-      wchar_t * pDescription)
+      const aafCharacter * pDescription)
 {
 	if (! pDescription)
 	{
@@ -189,7 +209,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::GetDescription (
-      wchar_t * pDescription,
+      aafCharacter * pDescription,
       aafUInt32 bufSize)
 {
 	if (! pDescription)
@@ -248,16 +268,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetAUID (
-      aafUID_t *pAuid)
+      const aafUID_t & id)
 {
-  if (pAuid == NULL)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  else
-	{
-	  _identification = *pAuid;
-	}
+  _identification = id;
+
   return AAFRESULT_SUCCESS;
 }
 
@@ -281,17 +295,10 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetCategoryClass (
-      aafUID_t *pCategoryClass)
+      const aafUID_t & categoryClass)
 {
-	if (pCategoryClass == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_categoryClass = *pCategoryClass;
-	}
-	return AAFRESULT_SUCCESS;
+  _categoryClass = categoryClass;
+  return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -327,8 +334,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::GetPluginVersionString (
-      wchar_t *pVersionString,
-      aafInt32  bufSize)
+      aafCharacter *pVersionString,
+      aafUInt32  bufSize)
 {
 	bool stat;
 
@@ -350,8 +357,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPluginDescriptor::GetProductVersionStringLen (
-      aafInt32 *pLen)
+    ImplAAFPluginDescriptor::GetPluginVersionStringBufLen (
+      aafUInt32 *pLen)
 {
 	if(pLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -366,7 +373,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPluginVersionString (
-      wchar_t * pVersionString)
+      const aafCharacter * pVersionString)
 {
 	if(pVersionString == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -379,8 +386,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::GetPluginManufacturerName (
-      wchar_t *  pManufacturerName,
-      aafInt32  bufSize)
+      aafCharacter *  pManufacturerName,
+      aafUInt32  bufSize)
 {
 	if(pManufacturerName == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -402,8 +409,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPluginDescriptor::GetProductManufacturerNameLen (
-      aafInt32 * pLen)
+    ImplAAFPluginDescriptor::GetPluginManufacturerNameBufLen (
+      aafUInt32 * pLen)
 {
 	if(pLen == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -418,7 +425,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPluginManufacturerName (
-      wchar_t * pManufacturerName)
+      const aafCharacter * pManufacturerName)
 {
 	if(pManufacturerName == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -435,12 +442,12 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (ppResult == NULL)
 		return AAFRESULT_NULL_PARAM;
-
-	if (! _manufacturerURL.isPresent())
-	  {
-		return AAFRESULT_NO_ESSENCE_DESC;
-	  }
-
+	
+	if (!_manufacturerURL.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
+	
 	*ppResult = _manufacturerURL;
 	if (*ppResult)
 		(*ppResult)->AcquireReference();
@@ -461,6 +468,7 @@ AAFRESULT STDMETHODCALLTYPE
 		ImplAAFNetworkLocator *pOldLoc = _manufacturerURL;
 		if (pOldLoc)
 		  pOldLoc->ReleaseReference();
+		pOldLoc = 0;
 	  }
 
 	_manufacturerURL = pManufacturerInfo;
@@ -496,16 +504,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetManufacturerID (
-      aafUID_t *pManufacturerID)
+      const aafUID_t & manufacturerID)
 {
-	if (pManufacturerID == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_pluginManufacturerID = *pManufacturerID;
-	}
+	_pluginManufacturerID = manufacturerID;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -533,7 +534,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetHardwarePlatform (
-      aafHardwarePlatform_t  hardwarePlatform)
+      aafHardwarePlatform_constref hardwarePlatform)
 {
 	_platform = hardwarePlatform;
 	return AAFRESULT_SUCCESS;
@@ -566,33 +567,19 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPlatformMinimumVersion (
-      aafVersionType_t *pMinVersion)
+      const aafVersionType_t & minVersion)
 {
-	if (pMinVersion == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_minPlatformVersion = *pMinVersion;
-	}
-	return AAFRESULT_SUCCESS;
+  _minPlatformVersion = minVersion;
+  return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPlatformMaximumVersion (
-      aafVersionType_t *pMaxVersion)
+      const aafVersionType_t & maxVersion)
 {
-	if (pMaxVersion == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_maxPlatformVersion = *pMaxVersion;
-	}
-	return AAFRESULT_SUCCESS;
+  _maxPlatformVersion = maxVersion;
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -620,7 +607,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetEngine (
-      aafEngine_t  engine)
+      aafEngine_constref  engine)
 {
 	_engine = engine;
 	return AAFRESULT_SUCCESS;
@@ -654,34 +641,20 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetEngineMinimumVersion (
-      aafVersionType_t *pMinVersion)
+      const aafVersionType_t & minVersion)
 {
-	if (pMinVersion == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_minEngineVersion = *pMinVersion;
-	}
-	return AAFRESULT_SUCCESS;
+  _minEngineVersion = minVersion;
+  return AAFRESULT_SUCCESS;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetEngineMaximumVersion (
-      aafVersionType_t *pMaxVersion)
+      const aafVersionType_t & maxVersion)
 {
-	if (pMaxVersion == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_maxEngineVersion = *pMaxVersion;
-	}
-	return AAFRESULT_SUCCESS;
+  _maxEngineVersion = maxVersion;
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -710,7 +683,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPluginAPI (
-      aafPluginAPI_t  pluginAPI)
+      aafPluginAPI_constref  pluginAPI)
 {
 	_pluginAPI = pluginAPI;
 	return AAFRESULT_SUCCESS;
@@ -744,33 +717,19 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPluginAPIMinimumVersion (
-      aafVersionType_t *pMinVersion)
+      const aafVersionType_t & minVersion)
 {
-	if (pMinVersion == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_minPluginAPIVersion = *pMinVersion;
-	}
-	return AAFRESULT_SUCCESS;
+  _minPluginAPIVersion = minVersion;
+  return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDescriptor::SetPluginAPIMaximumVersion (
-      aafVersionType_t *pMaxVersion)
+      const aafVersionType_t & maxVersion)
 {
-	if (pMaxVersion == NULL)
-	{
-		return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		_maxPluginAPIVersion = *pMaxVersion;
-	}
-	return AAFRESULT_SUCCESS;
+  _maxPluginAPIVersion = maxVersion;
+  return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -870,16 +829,9 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPluginDescriptor::GetPluggableCode (
-      ImplAAFPluggableCode ** /*pCode*/)
-{
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
-}
-
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPluginDescriptor::GetNumLocators (
+    ImplAAFPluginDescriptor::CountLocators (
       aafUInt32 *pCount)
 {
 	size_t	siz;
@@ -937,11 +889,68 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPluginDescriptor::IsPluginLocal (
-      aafBool *  /*pIsLocal*/)
+    ImplAAFPluginDescriptor::InsertLocatorAt (
+	  aafUInt32 index,
+      ImplAAFLocator *pLocator)
 {
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	if(pLocator == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	aafUInt32 count;
+	AAFRESULT hr;
+	hr = CountLocators (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+
+	if (index > count)
+	  return AAFRESULT_BADINDEX;
+
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::GetLocatorAt (
+	  aafUInt32 index,
+      ImplAAFLocator ** ppLocator)
+{
+	if(ppLocator == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	aafUInt32 count;
+	AAFRESULT hr;
+	hr = CountLocators (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+
+	if (index >= count)
+	  return AAFRESULT_BADINDEX;
+
+	return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPluginDescriptor::RemoveLocatorAt (
+	  aafUInt32 index)
+{
+	aafUInt32 count;
+	AAFRESULT hr;
+	ImplAAFLocator	*pLoc;
+	
+	hr = CountLocators (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+
+	if (index >= count)
+	  return AAFRESULT_BADINDEX;
+
+	pLoc = _locators.removeAt(index);
+	if(pLoc)
+		pLoc->ReleaseReference();
+
+	return AAFRESULT_SUCCESS;
+}
+
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -967,7 +976,7 @@ AAFRESULT STDMETHODCALLTYPE
   
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFPluginDescriptor::EnumPluginLocators (
+    ImplAAFPluginDescriptor::GetLocators (
       ImplEnumAAFPluginLocators **ppEnum)
 {
 	ImplEnumAAFPluginLocators		*theEnum = (ImplEnumAAFPluginLocators *)CreateImpl (CLSID_EnumAAFPluginLocators);
@@ -981,7 +990,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if (theEnum)
-			theEnum->ReleaseReference();
+		  theEnum->ReleaseReference();
+		theEnum = 0;
 		return(XCODE());
 	}
 	XEND;
@@ -1007,7 +1017,13 @@ AAFRESULT
 	return AAFRESULT_SUCCESS;
 }
 
+const OMUniqueObjectIdentification&
+  ImplAAFPluginDescriptor::identification(void) const
+{
+  return *reinterpret_cast<const OMUniqueObjectIdentification*>(&_identification.reference());
+}
 // Internal to the toolkit functions
+/*
 AAFRESULT
     ImplAAFPluginDescriptor::GetNumLocators (aafInt32 *pCount)
 {
@@ -1021,8 +1037,7 @@ AAFRESULT
 	*pCount = siz;
 	return(AAFRESULT_SUCCESS);
 }
+*/
 
-
-OMDEFINE_STORABLE(ImplAAFPluginDescriptor, AUID_AAFPluginDescriptor);
 
 

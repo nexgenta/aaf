@@ -73,7 +73,7 @@ ImplAAFEssenceGroup::~ImplAAFEssenceGroup ()
 {
 	size_t size = _choices.getSize();
 	for (size_t i = 0; i < size; i++) {
-		ImplAAFSourceClip *pClip = _choices.setValueAt(0, i);
+		ImplAAFSegment *pClip = _choices.setValueAt(0, i);
 
 		if (pClip) {
 		  pClip->ReleaseReference();
@@ -181,7 +181,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::AppendChoice (
-      ImplAAFSourceClip *choice)
+      ImplAAFSegment *choice)
 {
     // aafUID_t	newDataDef;
 	aafLength_t	groupLength, newLength;
@@ -242,7 +242,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::PrependChoice (
-      ImplAAFSourceClip *choice)
+      ImplAAFSegment *choice)
 {
   if (! choice)
 	return AAFRESULT_NULL_PARAM;
@@ -255,7 +255,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::InsertChoiceAt (
 	  aafUInt32 index,
-      ImplAAFSourceClip *choice)
+      ImplAAFSegment *choice)
 {
   if (! choice)
 	return AAFRESULT_NULL_PARAM;
@@ -289,9 +289,9 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceGroup::GetChoiceAt (
       aafUInt32  index,
-      ImplAAFSourceClip  **result)
+      ImplAAFSegment  **result)
 {
-	ImplAAFSourceClip	*obj;
+	ImplAAFSegment	*obj;
 
 	XPROTECT()
 	{
@@ -315,13 +315,18 @@ AAFRESULT STDMETHODCALLTYPE
 {
   aafUInt32 count;
   AAFRESULT hr;
+  ImplAAFSegment	*pSeg;
+  
   hr = CountChoices (&count);
   if (AAFRESULT_FAILED (hr)) return hr;
 
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-	_choices.removeAt(index);
+	pSeg = _choices.removeAt(index);
+	if(pSeg)
+		pSeg->ReleaseReference();
+
 	return AAFRESULT_SUCCESS;
 }
 
@@ -339,7 +344,7 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 										ImplAAFComponent **foundObj, aafBool *foundTransition)
 {
   aafMediaCriteria_t criteriaStruct, *ptrCriteriaStruct;
-  ImplAAFSourceClip	*critClip = NULL;
+  ImplAAFSegment	*critClip = NULL;
   aafSlotID_t trackID;
   ImplAAFComponent	*tmpFound = NULL;
   aafLength_t tmpMinLen;
@@ -355,7 +360,7 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 		  else
 			criteriaStruct.type = kAAFAnyRepresentation;
 		  ptrCriteriaStruct = &criteriaStruct;
-		  CHECK(((ImplAAFMasterMob *)this)->GetCriteriaSourceClip(trackID,
+		  CHECK(((ImplAAFMasterMob *)this)->GetCriteriaSegment(trackID,
 											  ptrCriteriaStruct, &critClip));
 
 		  if (critClip)
@@ -388,15 +393,16 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 	return(AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFEssenceGroup::GetCriteriaSourceClip(
+AAFRESULT ImplAAFEssenceGroup::GetCriteriaSegment(
 			aafMediaCriteria_t *criteria,
-			ImplAAFSourceClip		**retSrcClip)
+			ImplAAFSegment		**retSrcClip)
 {
 	aafInt32				score, highestScore;
 	aafUInt32				n, numReps;
 	ImplAAFMob				*mob = NULL;
 	ImplAAFSourceMob		*fileMob = NULL;
-	ImplAAFSourceClip		*highestScoreSourceClip = NULL, *sourceClip = NULL;
+	ImplAAFSegment			*highestScoreSourceClip = NULL, *sourceClip = NULL;
+	ImplAAFSourceClip		*sclp;
 	aafSelectInfo_t			selectInfo;
 	ImplAAFEssenceAccess	*access;
 
@@ -417,7 +423,11 @@ AAFRESULT ImplAAFEssenceGroup::GetCriteriaSourceClip(
 				highestScoreSourceClip = sourceClip;
 				break;
 			}
-			CHECK(sourceClip->ResolveRef(&mob));
+			sclp = dynamic_cast<ImplAAFSourceClip*>(sourceClip);
+			if(sclp == 0)
+				RAISE(AAFRESULT_INVALID_LINKAGE);
+
+			CHECK(sclp->ResolveRef(&mob));
 			fileMob = dynamic_cast<ImplAAFSourceMob*>(mob);
 			if(fileMob == NULL)
 				RAISE(AAFRESULT_INCONSISTANCY);
