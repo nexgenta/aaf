@@ -19,15 +19,17 @@ public:
     // @cmember Destructor.
   virtual ~OMDataStreamProperty(void);
 
-    // @cmember Save this <c OMDataStreamProperty> to the
-    //          <c OMStoredObject> <p s>.
+    // @cmember Save this <c OMDataStreamProperty>.
     // @this const
-  virtual void saveTo(OMStoredObject& s) const;
+  virtual void save(void) const;
 
     // @cmember Restore this <c OMDataStreamProperty> from the
     //          <c OMStoredObject> <p s>, the size of the
     //          <c OMDataStreamProperty> is <p size>.
   virtual void restoreFrom(OMStoredObject& s, size_t size);
+
+    // @cmember Close this  <c OMDataStreamProperty>.
+  virtual void close(void);
 
     // @cmember The size, in bytes, of the data in this
     //          <c OMDataStreamProperty>.
@@ -64,11 +66,21 @@ public:
              const OMUInt32 bytes,
              OMUInt32& bytesWritten);
 
+  // Direct property access interface
+
+    // @cmember The size of the raw bits of this
+    //          <c OMDataStreamProperty>. The size is given in bytes.
+  virtual size_t bitsSize(void) const;
+
+    // @cmember Get the raw bits of this <c OMDataStreamProperty>. The
+    //          raw bits are copied to the buffer at address <p bits>
+    //          which is <p size> bytes in size.
+  virtual void getBits(OMByte* bits, size_t size) const;
+
 private:
 
   void open(void);
   void create(void);
-  void close(void);
 
   IStream* _stream;
 
