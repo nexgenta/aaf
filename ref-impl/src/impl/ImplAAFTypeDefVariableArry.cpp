@@ -55,6 +55,14 @@
 #include "ImplAAFHeader.h"
 #endif
 
+#ifndef __ImplAAFMob_h__
+#include "ImplAAFMob.h"
+#endif
+
+#ifndef __ImplAAFEssenceData_h__
+#include "ImplAAFEssenceData.h"
+#endif
+
 #include "ImplEnumAAFPropertyValues.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -114,6 +122,10 @@ ImplAAFTypeDefVariableArray::Initialize (
 	if (! pTypeDef->IsVariableArrayable())
 		return AAFRESULT_BAD_TYPE;
 	
+	// Check if specified type definition is in the dictionary.
+	if( !aafLookupTypeDef( this, pTypeDef ) )
+		return AAFRESULT_TYPE_NOT_FOUND;
+
 	return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
@@ -149,6 +161,15 @@ ImplAAFTypeDefVariableArray::GetCount (
 	if (! pPropVal) return AAFRESULT_NULL_PARAM;
 	if (! pCount) return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != (ImplAAFTypeDef *)this )
+		return AAFRESULT_BAD_TYPE;
+
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pPropVal);
   if (NULL != pRefArray)
   {
@@ -203,6 +224,15 @@ ImplAAFTypeDefVariableArray::AppendElement
 	if (!pMemberPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
 	AAFRESULT hr;
 	
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
@@ -267,7 +297,7 @@ ImplAAFTypeDefVariableArray::AppendElement
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefVariableArray::ValidateInputParams (
 												  ImplAAFPropertyValue ** ppElementValues,
-												  aafUInt32  numElements)								  
+												  aafUInt32  numElements)
 {
 	//first call base impl.
 	HRESULT hr;
@@ -288,6 +318,16 @@ ImplAAFTypeDefVariableArray::GetElements (
 {
   if (NULL == pInPropVal || NULL == ppEnum)
 	  return AAFRESULT_NULL_PARAM;
+
+  // Get the property value's embedded type and 
+  // check if it's the same as the local type.
+  ImplAAFTypeDefSP	pInPropType;
+  if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) )  )
+	return AAFRESULT_BAD_TYPE;
+  assert (pInPropType);
+  if( (ImplAAFTypeDef *)pInPropType != this )
+	return AAFRESULT_BAD_TYPE;
+
   *ppEnum = NULL;
   
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
@@ -516,18 +556,50 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMProperty
 	ImplAAFTypeDefSP ptd = BaseType ();
 	assert (ptd);
 	
-	OMProperty * result = 0;
+  OMProperty * result = 0;
+  ImplAAFTypeDefWeakObjRef *pWeakRefType = NULL;
 	
 	if (dynamic_cast<ImplAAFTypeDefStrongObjRef*>((ImplAAFTypeDef*) ptd))
 	{
 		// element is strong ref
 		result = new OMStrongReferenceVectorProperty<ImplAAFObject> (pid, name);
 	}
-	else if (dynamic_cast<ImplAAFTypeDefWeakObjRef*>((ImplAAFTypeDef*) ptd))
+	else if (NULL != (pWeakRefType = dynamic_cast<ImplAAFTypeDefWeakObjRef*>((ImplAAFTypeDef*) ptd)))
 	{
+#if defined(USE_SIMPLEPROPERTY)
 		// element is weak ref, hence implemented as AUID array.
 		// Specify a size of one element.
 		result = new OMSimpleProperty (pid, name, sizeof (aafUID_t));
+#else // #if defined(USE_SIMPLEPROPERTY)
+    
+    if (pWeakRefType->GetTargetPids())
+    {
+      
+      switch (pWeakRefType->GetUniqueIdentifierPid())
+      {
+        case PID_MetaDefinition_Identification:
+          result = new OMWeakReferenceVectorProperty<ImplAAFMetaDefinition>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+          break;
+      
+        case PID_DefinitionObject_Identification:
+          result = new OMWeakReferenceVectorProperty<ImplAAFDefObject>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+          break;
+    
+//			  case PID_Mob_MobID:
+//          result = new OMWeakReferenceVectorProperty<ImplAAFMob>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+//          break;
+//
+//			  case PID_EssenceData_MobID:
+//          result = new OMWeakReferenceVectorProperty<ImplAAFEssenceData>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+//          break;
+    
+        default:
+          // No support for other "key properties"
+          assert (0);
+          break;
+      }
+    }
+#endif // #else // #if defined(USE_SIMPLEPROPERTY)
 	}
 	
 	else
@@ -719,6 +791,15 @@ ImplAAFTypeDefVariableArray::PrependElement(
 	if (!pMemberPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
 	AAFRESULT hr;
 	
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
@@ -790,6 +871,15 @@ ImplAAFTypeDefVariableArray::RemoveElement(
 	if (!pInPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
+
   ImplAAFRefArrayValue* pRefArray = dynamic_cast<ImplAAFRefArrayValue*>(pInPropVal);
   if (NULL != pRefArray)
   {
@@ -871,6 +961,14 @@ ImplAAFTypeDefVariableArray::InsertElement(
 	if (!pMemberPropVal)
 		return AAFRESULT_NULL_PARAM;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the local type.
+	ImplAAFTypeDefSP	pInPropType;
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pInPropType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pInPropType);
+	if( (ImplAAFTypeDef *)pInPropType != this )
+		return AAFRESULT_BAD_TYPE;
 		
 	//CASE 1 -- if the Insert is at "0" postition - this implies a prepend, 
 	//			SO - delegate to PrependElement() routine

@@ -80,6 +80,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pTypeDef->IsStringable())
 	return AAFRESULT_BAD_TYPE;
 
+  // Check if specified type definition is in the dictionary.
+  if( !aafLookupTypeDef( this, pTypeDef ) )
+	return AAFRESULT_TYPE_NOT_FOUND;
+
   return pvtInitialize (id, pTypeDef, pTypeName);
 }
 
@@ -130,11 +134,21 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFPropertyValue * pPropVal,
       aafUInt32 *  pCount)
 {
+  ImplAAFTypeDefSP pIncomingType;
   ImplAAFTypeDefSP ptd;
   AAFRESULT hr;
 
   if (! pPropVal) return AAFRESULT_NULL_PARAM;
   if (! pCount) return AAFRESULT_NULL_PARAM;
+
+  // Get the property value's embedded type and 
+  // check if it's the same as the base type.
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pIncomingType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pIncomingType);
+  if( (ImplAAFTypeDef *)pIncomingType != this )
+	return AAFRESULT_BAD_TYPE;
+
   hr = GetType (&ptd);
   if (AAFRESULT_FAILED(hr)) return hr;
   assert (ptd);
@@ -212,6 +226,15 @@ AAFRESULT STDMETHODCALLTYPE
   if (! IsRegistered ())
 	return AAFRESULT_NOT_REGISTERED;
 
+  // Get the property value's embedded type and 
+  // check if it's the same as the base type.
+  ImplAAFTypeDefSP pIncomingType;
+  if( AAFRESULT_FAILED( pPropVal->GetType( &pIncomingType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pIncomingType);
+  if( (ImplAAFTypeDef *)pIncomingType != this )
+	return AAFRESULT_BAD_TYPE;
+
   AAFRESULT hr;
   ImplAAFTypeDefSP pBaseType;
   hr = GetType (&pBaseType);
@@ -283,15 +306,17 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	AAFRESULT hr;
 	
+	// Get the property value's embedded type and 
+	// check if it's the same as the base type.
 	ImplAAFTypeDefSP  pIncomingType;
-	hr = GetType (&pIncomingType);
+	if( AAFRESULT_FAILED( pInPropVal->GetType( &pIncomingType ) ) )
+		return AAFRESULT_BAD_TYPE;
+	assert (pIncomingType);
+	if( (ImplAAFTypeDef *)pIncomingType != this )
+		return AAFRESULT_BAD_TYPE;
 	
 	ImplAAFTypeDefSP  pBaseType;
 	hr = GetType (&pBaseType);
-	
-	//compare types ... make sure there're the same
-	if (!AreUnksSame(pIncomingType, pBaseType))
-		return AAFRESULT_ILLEGAL_VALUE;
 	
 	//do the size thing ...
 	
@@ -386,6 +411,15 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pInPropVal) return AAFRESULT_NULL_PARAM;
   if (! pBuffer) return AAFRESULT_NULL_PARAM;
 
+  // Get the property value's embedded type and 
+  // check if it's the same as the base type.
+  ImplAAFTypeDefSP pIncomingType;
+  if( AAFRESULT_FAILED( pInPropVal->GetType( &pIncomingType ) ) )
+	return AAFRESULT_BAD_TYPE;
+  assert (pIncomingType);
+  if( (ImplAAFTypeDef *)pIncomingType != this )
+	return AAFRESULT_BAD_TYPE;
+
   ImplAAFPropValDataSP pvd;
   pvd = dynamic_cast<ImplAAFPropValData*>(pInPropVal);
   if (!pvd) return AAFRESULT_BAD_TYPE;
@@ -451,7 +485,7 @@ void ImplAAFTypeDefString::reorder(OMByte* externalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::externalSize(OMByte* internalBytes,
+size_t ImplAAFTypeDefString::externalSize(OMByte* /*internalBytes*/,
 										  size_t internalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
@@ -502,7 +536,7 @@ void ImplAAFTypeDefString::externalize(OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefString::internalSize(OMByte* externalBytes,
+size_t ImplAAFTypeDefString::internalSize(OMByte* /*externalBytes*/,
 										  size_t externalBytesSize) const
 {
   ImplAAFTypeDefSP ptd = BaseType();
