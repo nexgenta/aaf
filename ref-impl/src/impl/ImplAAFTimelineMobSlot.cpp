@@ -5,7 +5,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -93,9 +92,9 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
-										  ImplAAFSegment **segment,
-										  aafRational_t *srcRate,
-										  aafPosition_t *diffPos)
+					  ImplAAFSegment **segment,
+					  aafRational_t *srcRate,
+					  aafPosition_t *diffPos)
 {
 	aafBool					foundClip = AAFFalse;
 	ImplAAFMobSlot			*tmpTrack = NULL;
@@ -139,10 +138,15 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 		*/
 		(*diffPos) = offset;
 		CHECK(SubInt64fromInt64(begPos, diffPos));
+		tmpSegment->ReleaseReference();
+		tmpSegment = 0;
 		
 	} /* XPROTECT */
 	XEXCEPT
 	{
+		if (tmpSegment)	
+		  tmpSegment->ReleaseReference();
+		tmpSegment = 0;
 	}
 	XEND;
 	return(AAFRESULT_SUCCESS);
@@ -184,5 +188,4 @@ AAFRESULT ImplAAFTimelineMobSlot::ConvertToMyRate(aafPosition_t srcPos,
 }
 
 
-OMDEFINE_STORABLE(ImplAAFTimelineMobSlot, AUID_AAFTimelineMobSlot);
 
