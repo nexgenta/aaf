@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -59,7 +59,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in, size_is(numMembers)] array of member types to
 		 // be represented in this record type
@@ -73,7 +73,7 @@ public:
          aafUInt32  numMembers,
 
          // @parm [in] friendly name of this type definition
-         wchar_t *  pTypeName);
+         const aafCharacter *  pTypeName);
 
 
   //****************
@@ -100,7 +100,7 @@ public:
 
          // @parm [out, size_is(bufSize), string] buffer into which
 		 // the member name is written
-         wchar_t *  pName,
+         aafCharacter *  pName,
 
          // @parm [in] The size of the pName buffer, in bytes
          aafUInt32  bufSize);
@@ -278,7 +278,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t *  pID,
+         const aafUID_t & id,
 
          // @parm [in, size_is(numMembers)] array of member types to
 		 // be represented in this record type
@@ -292,7 +292,7 @@ public:
          aafUInt32  numMembers,
 
          // @parm [in] friendly name of this type definition
-         wchar_t *  pTypeName);
+         const aafCharacter *  pTypeName);
 
 
 private:
@@ -305,9 +305,9 @@ private:
   // BobT Note!!! This should be weak reference vector property...
   OMVariableSizeProperty<aafUID_t> _memberTypes;
 
-  // names of members in this record; stored as single wchar_t array
-  // with embedded nulls
-  OMVariableSizeProperty<wchar_t> _memberNames;
+  // names of members in this record; stored as single aafCharacter
+  // array with embedded nulls
+  OMVariableSizeProperty<aafCharacter> _memberNames;
 
   // when registered, will point to array of ints with registered
   // offsets of each field
@@ -337,10 +337,23 @@ public:
   size_t PropValSize (void) const;
   aafBool IsRegistered (void) const;
   size_t NativeSize (void) const;
+  void AttemptBuiltinRegistration (void);
 
   virtual OMProperty * 
     pvtCreateOMPropertyMBS (OMPropertyId pid,
 							const char * name) const;
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RawAccessType
+        (ImplAAFTypeDef ** ppRawTypeDef);
+
+public:
+  // Overrides from ImplAAFTypeDef
+  virtual bool IsAggregatable () const;
+  virtual bool IsStreamable () const;
+  virtual bool IsFixedArrayable () const;
+  virtual bool IsVariableArrayable () const;
+  virtual bool IsStringable () const;
 };
 
 //
