@@ -57,13 +57,13 @@ OMKLVStoredObject* OMKLVStoredObject::openModify(
   //   @parm The raw storage in which to create the file.
   //   @parm The desired byte ordering for the new file.
   //   @rdesc An <c OMKLVStoredObject> representing the root object.
-OMKLVStoredObject* OMKLVStoredObject::createModify(
-                                             OMRawStorage* /* rawStorage */,
-                                             const OMByteOrder /* byteOrder */)
+OMKLVStoredObject* OMKLVStoredObject::createModify(OMRawStorage* rawStorage,
+                                                   const OMByteOrder byteOrder)
 {
   TRACE("OMKLVStoredObject::createModify");
-  ASSERT("Unimplemented code not reached", false); // tjb TBS
-  return 0;
+  OMKLVStoredObject* result= new OMKLVStoredObject(rawStorage, byteOrder);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
 }
 
   // @mfunc Destructor.
@@ -104,7 +104,7 @@ void OMKLVStoredObject::close(void)
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
-void OMKLVStoredObject::close(OMFile& file)
+void OMKLVStoredObject::close(OMFile& /* file */)
 {
   TRACE("OMKLVStoredObject::close");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -120,13 +120,13 @@ OMByteOrder OMKLVStoredObject::byteOrder(void) const
   return unspecified;
 }
 
-void OMKLVStoredObject::save(OMFile& file)
+void OMKLVStoredObject::save(OMFile& /* file */)
 {
   TRACE("OMKLVStoredObject::save(OMFile)");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
-void OMKLVStoredObject::save(OMStorable& object)
+void OMKLVStoredObject::save(OMStorable& /* object */)
 {
   TRACE("OMKLVStoredObject::save(OMFile)");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -350,7 +350,7 @@ void OMKLVStoredObject::restore(OMDataStream& /* stream */,
   //   @parm The <c OMDataStream> to be opened.
   //   @rdesc The newly created <c OMStoredStream>.
 OMStoredStream* OMKLVStoredObject::openStoredStream(
-											const OMDataStream& /* property */)
+                                            const OMDataStream& /* property */)
 {
   TRACE("OMKLVStoredObject::openStoredStream");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -362,7 +362,7 @@ OMStoredStream* OMKLVStoredObject::openStoredStream(
   //   @parm The <c OMDataStream> to be created.
   //   @rdesc The newly created <c OMStoredStream>.
 OMStoredStream* OMKLVStoredObject::createStoredStream(
-											const OMDataStream& /* property */)
+                                            const OMDataStream& /* property */)
 {
   TRACE("OMKLVStoredObject::createStoredStream");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -371,8 +371,10 @@ OMStoredStream* OMKLVStoredObject::createStoredStream(
 
   // @mfunc Constructor.
   //   @parm The <c OMRawStorage> on which this <c OMKLVStoredObject> resides.
-OMKLVStoredObject::OMKLVStoredObject(OMRawStorage* s)
-: _storage(s)
+  //   @parm TBS
+OMKLVStoredObject::OMKLVStoredObject(OMRawStorage* s, OMByteOrder byteOrder)
+: _storage(s),
+  _byteOrder(byteOrder)
 {
   TRACE("OMKLVStoredObject::OMKLVStoredObject");
 }

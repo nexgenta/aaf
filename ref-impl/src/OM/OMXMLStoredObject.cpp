@@ -57,13 +57,13 @@ OMXMLStoredObject* OMXMLStoredObject::openModify(
   //   @parm The raw storage in which to create the file.
   //   @parm The desired byte ordering for the new file.
   //   @rdesc An <c OMXMLStoredObject> representing the root object.
-OMXMLStoredObject* OMXMLStoredObject::createModify(
-                                             OMRawStorage* /* rawStorage */,
-                                             const OMByteOrder /* byteOrder */)
+OMXMLStoredObject* OMXMLStoredObject::createModify(OMRawStorage* rawStorage,
+                                                   const OMByteOrder byteOrder)
 {
   TRACE("OMXMLStoredObject::createModify");
-  ASSERT("Unimplemented code not reached", false); // tjb TBS
-  return 0;
+  OMXMLStoredObject* result = new OMXMLStoredObject(rawStorage, byteOrder);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
 }
 
   // @mfunc Destructor.
@@ -104,7 +104,7 @@ void OMXMLStoredObject::close(void)
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
-void OMXMLStoredObject::close(OMFile& file)
+void OMXMLStoredObject::close(OMFile& /* file */)
 {
   TRACE("OMXMLStoredObject::close");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -120,13 +120,13 @@ OMByteOrder OMXMLStoredObject::byteOrder(void) const
   return unspecified;
 }
 
-void OMXMLStoredObject::save(OMFile& file)
+void OMXMLStoredObject::save(OMFile& /* file */)
 {
   TRACE("OMXMLStoredObject::save(OMFile)");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
-void OMXMLStoredObject::save(OMStorable& object)
+void OMXMLStoredObject::save(OMStorable& /* object */)
 {
   TRACE("OMXMLStoredObject::save(OMFile)");
   ASSERT("Unimplemented code not reached", false); // tjb TBS
@@ -371,8 +371,10 @@ OMStoredStream* OMXMLStoredObject::createStoredStream(
 
   // @mfunc Constructor.
   //   @parm The <c OMRawStorage> on which this <c OMXMLStoredObject> resides.
-OMXMLStoredObject::OMXMLStoredObject(OMRawStorage* s)
-: _storage(s)
+  //   @parm TBS
+OMXMLStoredObject::OMXMLStoredObject(OMRawStorage* s, OMByteOrder byteOrder)
+: _store(s),
+  _byteOrder(byteOrder)
 {
   TRACE("OMXMLStoredObject::OMXMLStoredObject");
 }
