@@ -50,9 +50,7 @@ OMWeakReferenceSetProperty<ReferencedObject>::
                                               const wchar_t* name,
                                               const wchar_t* targetName,
                                               const OMPropertyId keyPropertyId)
-: OMReferenceSetProperty(propertyId,
-                         SF_WEAK_OBJECT_REFERENCE_SET,
-                         name),
+: OMWeakReferenceSet(propertyId, name),
   _targetTag(nullOMPropertyTag),
   _targetName(targetName),
   _targetPropertyPath(0),
@@ -76,9 +74,7 @@ OMWeakReferenceSetProperty<ReferencedObject>::OMWeakReferenceSetProperty(
                                         const wchar_t* name,
                                         const OMPropertyId keyPropertyId,
                                         const OMPropertyId* targetPropertyPath)
-: OMReferenceSetProperty(propertyId,
-                         SF_WEAK_OBJECT_REFERENCE_SET,
-                         name),
+: OMWeakReferenceSet(propertyId, name),
   _targetTag(nullOMPropertyTag),
   _targetName(0),
   _targetPropertyPath(0),
@@ -518,7 +514,13 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::find(
 
   bool result = _set.find(identification, &element);
   if (result) {
-    object = element->getValue();
+    OMStorable* p = element->getValue();
+    if (p != 0) {
+      object = dynamic_cast<ReferencedObject*>(p);
+      ASSERT("Object is correct type", object != 0);
+    } else {
+      object = 0;
+    } 
   }
 
   return result;
@@ -541,7 +543,7 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::isVoid(void) const
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
     SetElement& element = iterator.value();
-    ReferencedObject* object = element.getValue();
+    OMStorable* object = element.getValue();
     if (object != 0) {
       result = false;
       break;
@@ -604,7 +606,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::getBits(
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  const ReferencedObject** p = (const ReferencedObject**)bits;
+  const OMStorable** p = (const OMStorable**)bits;
 
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
@@ -832,6 +834,25 @@ OMWeakReferenceSetProperty<ReferencedObject>::targetTag(void) const
   }
   POSTCONDITION("Valid target property tag", _targetTag != nullOMPropertyTag);
   return _targetTag;
+}
+
+template <typename ReferencedObject>
+void
+OMWeakReferenceSetProperty<ReferencedObject>::setTargetTag(
+                                                       OMPropertyTag targetTag)
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::setTargetTag");
+
+  _targetTag = targetTag;
+}
+
+template <typename ReferencedObject>
+OMPropertyId
+OMWeakReferenceSetProperty<ReferencedObject>::keyPropertyId(void) const
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::keyPropertyId");
+
+  return _keyPropertyId;
 }
 
 template <typename ReferencedObject>
