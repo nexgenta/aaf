@@ -30,7 +30,6 @@
 #define __aaflib_h__
 
 #include "AAF.h"
-#include "AAFTypes.h"
 #include "aafrdli.h"
 
 
@@ -40,10 +39,7 @@
 // Define function prototypes in a manner consistent with the 
 // ActiveX and OLE SDK's.
 
-#if !defined( COMPILER_MSC )
-//
-// Compiler other than MS Visual C++
-//
+#if !defined(_MSC_VER)
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGREAD)(
     const wchar_t *  pFileName,
@@ -70,9 +66,6 @@ typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETPLUGINMANAGER)(
     IAAFPluginManager ** ppPluginManager);
 
 #else
-//
-// MS Visual C++ compiler
-//
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGREAD)(
     const wchar_t *  pFileName,
@@ -240,4 +233,3 @@ void reportAssertionFailure(char* kind,
 
 
 #endif /* __aaflib_h__ */
-

@@ -1,26 +1,34 @@
+//@doc
+//@class  AAFFile | Implementation class for AAFFile
 #ifndef __ImplAAFFile_h__
 #define __ImplAAFFile_h__
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFRoot.h"
 
@@ -29,17 +37,10 @@
 // Forward declaration
 //
 class OMFile;
-class OMRawStorage;
 class ImplAAFDictionary;
-class ImplAAFMetaDictionary;
 class ImplAAFFile;
-class ImplAAFRawStorage;
 class ImplAAFHeader;
 class ImplAAFDataDef;
-class ImplAAFOMRawStorage;
-
-struct IAAFRawStorage;
-struct IAAFRandomRawStorage;
 
 class ImplAAFFile : public ImplAAFRoot
 {
@@ -51,9 +52,6 @@ public:
 
   virtual AAFRESULT STDMETHODCALLTYPE
 	Initialize ();
-
-  virtual AAFRESULT STDMETHODCALLTYPE
-	Open ();
 
   virtual AAFRESULT STDMETHODCALLTYPE
 	OpenExistingRead (const aafCharacter * pFileName,
@@ -73,14 +71,6 @@ public:
 	OpenTransient (aafProductIdentification_t * pIdent);
 
   virtual AAFRESULT STDMETHODCALLTYPE
-    CreateAAFFileOnRawStorage (IAAFRawStorage * pRawStorage,
-							   aafFileExistence_t existence,
-							   aafFileAccess_t access,
-							   aafUID_constptr pFileKind,
-							   aafUInt32 modeFlags,
-							   aafProductIdentification_constptr pIdent);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
 	Close ();
 
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -91,9 +81,6 @@ public:
 			aafUInt32 modeFlags);
 
   virtual AAFRESULT STDMETHODCALLTYPE
-	SaveCopyAs (ImplAAFFile * pDestFile);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
 	Revert ();
 
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -102,9 +89,6 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
 	GetRevision (aafFileRev_t *  rev);
   
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetDictionary
-        (ImplAAFDictionary ** ppDictionary) const;  //@parm [out,retval] The AAF Dictionary
 
   //
   // Constructor/destructor
@@ -113,46 +97,34 @@ public:
   ImplAAFFile ();
   virtual ~ImplAAFFile ();
 
-protected:
-
-  // Returns the OMFile associated with this AAFFile.  Requires
-  // IsOpen().
-  OMFile * omFile (void);
-
-  bool IsReadable () const;
-  bool IsWriteable () const;
-  bool IsOpen () const;
-  bool IsClosed () const;
-  OMRawStorage * RawStorage ();
 
 private:
 
+  // Private state for this file.
+  typedef enum _openType_t
+  {
+    kOmCreate = 0,
+	kOmModify = 1,
+	kOmOpenRead = 2,
+	kOmTransient = 3,
+	kOmUndefined = -1
+  } openType_t;
+	
+
   void InternalReleaseObjects();
-
-  AAFRESULT pvtCreateExistingRead
-    ();
-  AAFRESULT pvtCreateExistingModify
-    (aafProductIdentification_constptr pIdent);
-  AAFRESULT pvtCreateNewModify
-    (aafUID_constptr pFileKind,
-	 aafProductIdentification_constptr pIdent);
-
 
   aafInt32			_cookie;
   OMFile			*_file;
   ImplAAFDictionary *_factory;
-  ImplAAFMetaDictionary *_metafactory;
   aafInt16			_byteOrder;
+  openType_t			_openType;
   ImplAAFHeader *   _head;		// Needed by Head object
   aafBool   _semanticCheckEnable;	//!!!  /* Used to stop recursion in checks */
   aafFileRev_t   _setrev;
   aafBool _initialized;
+  aafBool _open;
   aafUInt32 _modeFlags;
-
-  aafFileExistence_t _existence;
-  aafFileAccess_t    _access;
-
-  aafProductIdentification_t _preOpenIdent;
+  aafProductIdentification_t _ident;
 };
 
 //
