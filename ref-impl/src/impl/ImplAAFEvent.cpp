@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEvent.cpp,v 1.12.2.1 2004/07/22 18:41:38 akharkev Exp $ $Name:  $
+// $Id: ImplAAFEvent.cpp,v 1.12.2.2 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 
 ImplAAFEvent::ImplAAFEvent ():
@@ -79,6 +80,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (NULL == pComment)
 		return (AAFRESULT_NULL_PARAM);
+
+	if (wcslen(pComment)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return (AAFRESULT_BAD_SIZE);
 	
 	_comment = pComment;
 	

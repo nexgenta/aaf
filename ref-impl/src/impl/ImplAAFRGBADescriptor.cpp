@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFRGBADescriptor.cpp,v 1.7 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFRGBADescriptor.cpp,v 1.7.2.1 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,6 +139,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pPalette == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if ((numberElements * sizeof(aafUInt8)) > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_palette.setValue(pPalette, numberElements * sizeof(aafUInt8));
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFParameterDef.cpp,v 1.24.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFParameterDef.cpp,v 1.24.2.2 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 #include "aafErr.h"
 
 ImplAAFParameterDef::ImplAAFParameterDef ()
@@ -156,6 +157,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pDisplayUnits == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(wcslen(pDisplayUnits)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return AAFRESULT_BAD_SIZE;
 
 	_displayUnits = pDisplayUnits;
 

@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFIdentification.cpp,v 1.47 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFIdentification.cpp,v 1.47.2.1 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,7 @@
 #include "AAFPropertyIDs.h"
 
 #include <assert.h>
+#include <wchar.h>
 
 
 ImplAAFIdentification::~ImplAAFIdentification ()
@@ -364,6 +365,11 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_NULL_PARAM;
 	}
 
+  if (wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+	  return AAFRESULT_BAD_SIZE;
+	}
+
   _companyName = pName;
 
   return AAFRESULT_SUCCESS;
@@ -376,6 +382,11 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pName)
 	{
 	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+	  return AAFRESULT_BAD_SIZE;
 	}
 
   _productName = pName;
@@ -403,6 +414,11 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	}
 	
+	if (wcslen(pVS)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+		return AAFRESULT_BAD_SIZE;
+	}
+
 	_productVersionString = pVS;
 	
 	return AAFRESULT_SUCCESS;

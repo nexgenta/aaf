@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMobSlot.cpp,v 1.42 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMobSlot.cpp,v 1.42.2.1 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,7 @@
 #include "AAFPropertyIDs.h"
 
 #include <assert.h>
+#include <wchar.h>
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "aafErr.h"
@@ -156,6 +157,9 @@ ImplAAFMobSlot::GetNameBufLen
 {
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_name = pName;
 

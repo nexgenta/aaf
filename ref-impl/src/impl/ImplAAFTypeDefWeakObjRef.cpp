@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.38.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.38.2.2 2004/08/03 18:05:11 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -174,7 +174,11 @@ AAFRESULT STDMETHODCALLTYPE
       OMPropertyId * targetPids,
       OMPropertyId uniqueIdentifierPid)
 {
-  if (! pTypeName) return AAFRESULT_NULL_PARAM;
+  if (! pTypeName)
+    return AAFRESULT_NULL_PARAM;
+
+  if (ids * sizeof(aafUID_t) > OMPROPERTYSIZE_MAX)
+    return AAFRESULT_BAD_SIZE;
 
   AAFRESULT hr;
 

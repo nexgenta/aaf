@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.24.2.1 2004/07/02 16:24:48 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.24.2.2 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -164,6 +164,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pVideoLineMap == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if ((numberElements * sizeof(aafInt32)) > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_videoLineMap.setValue(pVideoLineMap, numberElements * sizeof(aafInt32));
 

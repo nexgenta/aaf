@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.cpp,v 1.36.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.cpp,v 1.36.2.2 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -124,6 +124,9 @@ ImplAAFTypeDefEnum::pvtInitialize (
 	if (!pTypeName)
 		return AAFRESULT_NULL_PARAM;
 	
+	if ((numElements*sizeof(aafInt64)) > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
+
 	AAFRESULT hr;
 	
 	hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
@@ -140,6 +143,10 @@ ImplAAFTypeDefEnum::pvtInitialize (
 		totalNameSize += (wcslen (pElementNames[i]) + 1);
 	}
 	
+	if ((totalNameSize * sizeof(OMCharacter)) > OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
+
+
 	wchar_t * namesBuf = new wchar_t[totalNameSize];
 	if (!namesBuf)
 		return AAFRESULT_NOMEMORY;

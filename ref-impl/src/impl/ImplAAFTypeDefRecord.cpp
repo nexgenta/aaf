@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.43.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.43.2.2 2004/08/03 18:05:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -152,6 +152,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	  totalNameSize += (wcslen (pMemberNames[i]) + 1);
 	}
+
+  if ((totalNameSize * sizeof(aafCharacter)) > OMPROPERTYSIZE_MAX)
+	return AAFRESULT_BAD_SIZE;
 
   aafCharacter * namesBuf = new aafCharacter[totalNameSize];
   if (!namesBuf)

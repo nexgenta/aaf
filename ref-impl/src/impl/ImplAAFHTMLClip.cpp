@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHTMLClip.cpp,v 1.12 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFHTMLClip.cpp,v 1.12.2.1 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 
 ImplAAFHTMLClip::ImplAAFHTMLClip () :
@@ -86,6 +87,9 @@ ImplAAFHTMLClip::SetBeginAnchor (const aafCharacter *  pName)
 	if (NULL == pName)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if (wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
+
 	_beginAnchor = pName;
 	
 	return (AAFRESULT_SUCCESS); 
@@ -133,6 +137,9 @@ ImplAAFHTMLClip::SetEndAnchor (const aafCharacter *  pName)
 	if (NULL == pName)
 		return(AAFRESULT_NULL_PARAM);
 	
+	if (wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
+
 	_endAnchor = pName;
 	
 	return (AAFRESULT_SUCCESS); 

@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.12 2004/07/23 17:53:44 akharkev Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.13 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -532,6 +532,9 @@ AAFRESULT STDMETHODCALLTYPE
 {	
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+		return(AAFRESULT_BAD_SIZE);
 
 	_name = pName;
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.cpp,v 1.14 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.cpp,v 1.14.2.1 2004/08/03 18:05:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -63,6 +63,7 @@ typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 
 #include <assert.h>
 #include <string.h>
+#include <wchar.h>
 
 
 ImplAAFMetaDefinition::ImplAAFMetaDefinition ()
@@ -137,6 +138,11 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_NULL_PARAM;
 	}
 
+  if (wcslen(pName)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+	  return AAFRESULT_BAD_SIZE;
+	}
+
   _name = pName;
 
   return AAFRESULT_SUCCESS;
@@ -183,6 +189,11 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pDescription)
 	{
 	  return AAFRESULT_NULL_PARAM;
+	}
+
+  if (wcslen(pDescription)*sizeof(OMCharacter) >= OMPROPERTYSIZE_MAX)
+	{
+	  return AAFRESULT_BAD_SIZE;
 	}
 
   _description = pDescription;
