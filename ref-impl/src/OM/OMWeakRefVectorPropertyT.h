@@ -37,6 +37,7 @@
 #include "OMUtilities.h"
 #include "OMStoredObject.h"
 #include "OMFile.h"
+#include "OMStrongReferenceSet.h"
 
   // @mfunc Constructor.
   //   @parm The property id.
@@ -56,7 +57,8 @@ OMWeakReferenceVectorProperty<ReferencedObject>::
   _targetTag(nullOMPropertyTag),
   _targetName(targetName),
   _targetPropertyPath(0),
-  _keyPropertyId(keyPropertyId)
+  _keyPropertyId(keyPropertyId),
+  _targetSet(0)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
                                               "OMWeakReferenceVectorProperty");
@@ -80,7 +82,8 @@ OMWeakReferenceVectorProperty<ReferencedObject>::OMWeakReferenceVectorProperty(
   _targetTag(nullOMPropertyTag),
   _targetName(0),
   _targetPropertyPath(0),
-  _keyPropertyId(keyPropertyId)
+  _keyPropertyId(keyPropertyId),
+  _targetSet(0)
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::"
                                               "OMWeakReferenceVectorProperty");
@@ -196,6 +199,7 @@ ReferencedObject* OMWeakReferenceVectorProperty<ReferencedObject>::setValueAt(
   PRECONDITION("Target object attached to file", object->inFile());
   PRECONDITION("Source container object and target object in same file",
                                         container()->file() == object->file());
+  PRECONDITION("Valid target object", targetSet()->containsObject(object));
 #endif
 
   // Set the vector to contain the new object
@@ -406,6 +410,7 @@ void OMWeakReferenceVectorProperty<ReferencedObject>::insertAt(
   PRECONDITION("Target object attached to file", object->inFile());
   PRECONDITION("Source container object and target object in same file",
                                         container()->file() == object->file());
+  PRECONDITION("Valid target object", targetSet()->containsObject(object));
 #endif
 
   OMUniqueObjectIdentification key = object->identification();
@@ -1053,6 +1058,21 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetTag(void) const
 }
 
 template <typename ReferencedObject>
+OMStrongReferenceSet*
+OMWeakReferenceVectorProperty<ReferencedObject>::targetSet(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::targetSet");
+  OMWeakReferenceVectorProperty<ReferencedObject>* nonConstThis =
+            const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
+  if (_targetSet == 0) {
+    nonConstThis->_targetSet = OMWeakObjectReference::targetSet(this,
+                                                                targetTag());
+  }
+  POSTCONDITION("Valid result", _targetSet != 0);
+  return _targetSet;
+}
+
+template <typename ReferencedObject>
 OMPropertyId
 OMWeakReferenceVectorProperty<ReferencedObject>::keyPropertyId(void) const
 {
@@ -1077,9 +1097,8 @@ OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath(void) const
 {
   TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::targetPropertyPath");
 
-  PRECONDITION("Valid target name", validWideString(_targetName));
-
   if (_targetPropertyPath == 0) {
+    ASSERT("Valid target name", validWideString(_targetName));
     OMWeakReferenceVectorProperty<ReferencedObject>* nonConstThis =
             const_cast<OMWeakReferenceVectorProperty<ReferencedObject>*>(this);
     nonConstThis->_targetPropertyPath = file()->path(_targetName);
