@@ -1,4 +1,5 @@
-/*   FILE: PrintUtilities.java
+/*   $Id: PrintUtilities.java,v 1.3 2004/02/27 16:30:31 stuart_hc Exp $ $Name:  $
+ *   FILE: PrintUtilities.java
  *   DATE OF CREATION:   Fri Jan 10 09:13:53 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Fri Jan 10 09:21:04 2003 by Emmanuel Pietriga

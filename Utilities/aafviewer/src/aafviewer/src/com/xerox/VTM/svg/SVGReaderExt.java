@@ -1,3 +1,6 @@
+/*
+ * $Id: SVGReaderExt.java,v 1.2 2004/02/27 16:30:31 stuart_hc Exp $ $Name:  $
+*/
 package com.xerox.VTM.svg;
 
 

@@ -1,4 +1,5 @@
-/*   FILE: PrefWindow.java
+/*   $Id: PrefWindow.java,v 1.3 2004/02/27 16:30:31 stuart_hc Exp $ $Name:  $
+ *   FILE: PrefWindow.java
  *   DATE OF CREATION:   Thu Jan 09 15:47:07 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Mon Feb 03 11:04:08 2003 by Emmanuel Pietriga

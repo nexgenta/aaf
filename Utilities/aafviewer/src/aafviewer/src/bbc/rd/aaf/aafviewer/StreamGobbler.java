@@ -1,6 +1,7 @@
 package bbc.rd.aaf.aafviewer;
 
 /**
+ * $Id: StreamGobbler.java,v 1.2 2004/02/27 16:30:31 stuart_hc Exp $ $Name:  $
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>

@@ -1,4 +1,5 @@
-/*   FILE: ConfigManager.java
+/*   $Id: ConfigManager.java,v 1.4 2004/02/27 16:30:31 stuart_hc Exp $ $Name:  $
+ *   FILE: ConfigManager.java
  *   DATE OF CREATION:   Thu Jan 09 14:14:35 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Mon Feb 03 09:44:51 2003 by Emmanuel Pietriga

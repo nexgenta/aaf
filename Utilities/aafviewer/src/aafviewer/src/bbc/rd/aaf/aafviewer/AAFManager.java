@@ -1,6 +1,7 @@
 package bbc.rd.aaf.aafviewer;
 
 /**
+ * $Id: AAFManager.java,v 1.3 2004/02/27 16:30:31 stuart_hc Exp $ $Name:  $
  * <p>Title: AAFManager </p>
  * <p>Description: AAF conversion to dot file. Dot file conversion to svg.
  * SVG import.</p>

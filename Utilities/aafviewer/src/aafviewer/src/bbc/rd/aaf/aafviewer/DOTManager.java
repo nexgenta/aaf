@@ -1,4 +1,5 @@
-/*   FILE: DOTManager.java
+/*   $Id: DOTManager.java,v 1.2 2004/02/27 16:30:31 stuart_hc Exp $ $Name:  $
+ *   FILE: DOTManager.java
  *   DATE OF CREATION:   Thu Jan 09 14:14:35 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Fri Jan 17 10:41:41 2003 by Emmanuel Pietriga
