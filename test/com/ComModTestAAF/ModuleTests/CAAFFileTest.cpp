@@ -1,25 +1,23 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFFile
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
 
 
-#ifndef __CAAFFile_h__
-#include "CAAFFile.h"
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFDefUIDs.h"
 
 static aafUID_t		newUID;
 
@@ -73,7 +71,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 
@@ -164,7 +162,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 	  
   try
@@ -225,10 +222,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-HRESULT CAAFFile::test()
+extern "C" HRESULT CAAFFile_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
- 	aafWChar * pFileName = L"FileTest.aaf";
+ 	aafWChar * pFileName = L"AAFFileTest.aaf";
 
 	try
 	{
@@ -238,7 +235,7 @@ HRESULT CAAFFile::test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFMob::test...Caught general C++"
+	  cerr << "CAAFMob_test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}

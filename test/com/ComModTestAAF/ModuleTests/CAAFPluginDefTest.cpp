@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CEnumAAFPluginLocators
+// @com This file implements the module test for CAAFPluginDescriptor
 /***********************************************\
 *												*
 * Advanced Authoring Format						*
@@ -31,19 +31,24 @@ static wchar_t *manuf2URL = L"www.avid.com";
 #include "aafUtils.h"
 
 const aafUID_t MANUF_JEFFS_PLUGINS = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };		/* operand.expPixelFormat */
-static aafVersionType_t samplePluginVersion = { 0, 0 };//, 0, 0, kVersionReleased };
-static aafVersionType_t sampleMinPlatformVersion = { 1, 2 }; //, 3, 4, kVersionDebug };
-static aafVersionType_t sampleMinEngineVersion = { 5, 6 }; //7, 9, kVersionPatched };
-static aafVersionType_t sampleMinAPIVersion = { 10, 11 };//, 12, 13, kVersionBeta };
-static aafVersionType_t sampleMaxPlatformVersion = { 31, 32 };//3, 34, kVersionDebug };
-static aafVersionType_t sampleMaxEngineVersion = { 35, 36 };//, 37, 39, kVersionPatched };
-static aafVersionType_t sampleMaxAPIVersion = { 40, 41 };//, 42, 43, kVersionBeta };
+aafVersionType_t samplePluginVersion = { 0, 0 };//, 0, 0, kVersionReleased };
+aafVersionType_t sampleMinPlatformVersion = { 1, 2 }; //, 3, 4, kVersionDebug };
+aafVersionType_t sampleMinEngineVersion = { 5, 6 }; //7, 9, kVersionPatched };
+aafVersionType_t sampleMinAPIVersion = { 10, 11 };//, 12, 13, kVersionBeta };
+aafVersionType_t sampleMaxPlatformVersion = { 31, 32 };//3, 34, kVersionDebug };
+aafVersionType_t sampleMaxEngineVersion = { 35, 36 };//, 37, 39, kVersionPatched };
+aafVersionType_t sampleMaxAPIVersion = { 40, 41 };//, 42, 43, kVersionBeta };
 
 #define	MobName			L"MasterMOBTest"
 #define	NumMobSlots		3
 
 static wchar_t *manufName = L"Jeff's Plugin-O-Rama";
 static wchar_t *manufRev = L"Rev0.0.0a0";
+
+aafBool	EqualVersion(aafVersionType_t *vers1, aafVersionType_t *vers2)
+{
+	return(memcmp((char *)vers1, (char *)vers2, sizeof(aafVersionType_t)) == 0 ? AAFTrue : AAFFalse);
+}
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -81,7 +86,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"EnumAAFPluginLocators Test";
+	ProductInfo.productName = L"AAFPluginDescriptor Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
@@ -223,27 +228,32 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
   // Cleanup and return
-  if (pPlugDef)
-    pPlugDef->Release();
-
-  if (pCodecDef)
-    pCodecDef->Release();
-
   if (pDesc)
     pDesc->Release();
 
+  if (pPlugDef)
+    pPlugDef->Release();
+
   if (pNetLoc)
     pNetLoc->Release();
+
   if (pNetLoc2)
     pNetLoc2->Release();
+
   if (pNetLoc3)
     pNetLoc3->Release();
+
   if (pLoc)
     pLoc->Release();
+
   if (pLoc2)
     pLoc2->Release();
+
   if (pLoc3)
     pLoc3->Release();
+
+  if (pCodecDef)
+    pCodecDef->Release();
 
   if (pDictionary)
     pDictionary->Release();
@@ -275,17 +285,21 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFPluginDescriptors *pEnumDesc;
 	IAAFPluginDescriptor *pPlugin = NULL;
 	IAAFNetworkLocator	*pNetLoc = NULL;
-	IAAFLocator			*pLocator = NULL;
+	IAAFLocator			*pLoc = NULL;
 	IEnumAAFPluginLocators *pEnumLoc = NULL;
-	IAAFLocator				*	pArray[2] = { NULL, NULL };
-	IAAFLocator				**	pArrayPoint = pArray;
-	IEnumAAFPluginLocators *pCloneEnum = NULL;
-	aafUInt32			resultCount;
 
   bool bFileOpen = false;
 	HRESULT			hr = S_OK;
+	aafUID_t		testUID;
+	aafInt32		testInt32;
 	aafUInt32		count;
-	wchar_t			testname[256];
+	wchar_t			testString[256];
+	aafBool			testBool;
+	aafHardwarePlatform_t testPlatform;
+	aafPluginAPI_t	testAPI;
+	aafEngine_t		testEngine;
+	aafVersionType_t testMinVersion, testMaxVersion;
+  aafUID_t			category = AUID_AAFDefinitionObject, manufacturer = MANUF_JEFFS_PLUGINS;
 
 	try
 	{
@@ -301,68 +315,73 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(pDefObj->EnumPluginDescriptors (&pEnumDesc));
 		checkResult(pEnumDesc->NextOne (&pPlugin));
 
+	  
+		checkResult(pPlugin->GetCategoryClass(&testUID));
+		checkExpression(EqualAUID(&testUID, &category) == AAFTrue, AAFRESULT_TEST_FAILED);
+
+//	checkResult(pPlugin->GetPluginVersion(aafProductVersion_t *  pVersion));
+		checkResult(pPlugin->GetPluginVersionString(testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manufRev) == 0, AAFRESULT_TEST_FAILED);
+
+//	checkResult(pPlugin->GetProductVersionStringLen(aafInt32 *  pLen));
+		checkResult(pPlugin->GetPluginManufacturerName(testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manufName) == 0, AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->GetProductManufacturerNameLen(&testInt32));
+//		checkExpression(testInt32 == (aafInt32)wcslen(testString), AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->GetManufacturerInfo(&pNetLoc));
+		checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
+                                          (void **)&pLoc));
+		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		pNetLoc->Release();
+		pNetLoc = NULL;
+		pLoc->Release();
+		pLoc = NULL;
+		checkExpression (wcscmp(testString, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->GetManufacturerID(&testUID));
+		checkExpression(EqualAUID(&testUID, &manufacturer) == AAFTrue, AAFRESULT_TEST_FAILED);
+
+		/**/
+		checkResult(pPlugin->GetHardwarePlatform(&testPlatform));
+		checkExpression(EqualAUID(&testPlatform, &kAAFPlatformIndependant) == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->GetPlatformVersionRange(&testMinVersion, &testMaxVersion));
+		checkExpression(EqualVersion(&testMinVersion, &sampleMinPlatformVersion) == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkExpression(EqualVersion(&testMaxVersion, &sampleMaxPlatformVersion) == AAFTrue, AAFRESULT_TEST_FAILED);
+
+		/**/
+ 		checkResult(pPlugin->GetEngine(&testEngine));
+		checkExpression(EqualAUID(&testEngine, &kAAFNoEngine) == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->GetEngineVersionRange(&testMinVersion, &testMaxVersion));
+		checkExpression(EqualVersion(&testMinVersion, &sampleMinEngineVersion) == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkExpression(EqualVersion(&testMaxVersion, &sampleMaxEngineVersion) == AAFTrue, AAFRESULT_TEST_FAILED);
+
+		/**/
+		checkResult(pPlugin->GetPluginAPI(&testAPI));
+		checkExpression(EqualAUID(&testAPI, &kAAFEssencePluginAPI) == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->GetPluginAPIVersionRange(&testMinVersion, &testMaxVersion));
+		checkExpression(EqualVersion(&testMinVersion, &sampleMinAPIVersion) == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkExpression(EqualVersion(&testMaxVersion, &sampleMaxAPIVersion) == AAFTrue, AAFRESULT_TEST_FAILED);
+
 		/**/
 		checkResult(pPlugin->GetNumLocators(&count));
 		checkExpression (count == 2, AAFRESULT_TEST_FAILED);
 		checkResult(pPlugin->EnumPluginLocators(&pEnumLoc));
 
-			/* Read and check the first element */
-			checkResult(pEnumLoc->NextOne(&pLocator));
-			checkResult(pLocator->GetPath (testname, sizeof(testname)));
-			checkExpression(wcscmp(testname, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
-			pLocator->Release();
-			pLocator = NULL;
+		checkResult(pEnumLoc->NextOne (&pLoc));
+ 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
 
-			/**/
-			/* Read and check the second element */
-			checkResult(pEnumLoc->NextOne(&pLocator));
-			checkResult(pLocator->GetPath (testname, sizeof(testname)));
-			checkExpression(wcscmp(testname, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
-			pLocator->Release();
-			pLocator = NULL;
-			/*****/
-			
-			/* Reset, and check the first element again*/
-			checkResult(pEnumLoc->Reset());
-			checkResult(pEnumLoc->NextOne(&pLocator));
-			checkResult(pLocator->GetPath (testname, sizeof(testname)));
-			checkExpression(wcscmp(testname, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
-			pLocator->Release();
-			pLocator = NULL;
-			
-			/* Reset, Skip, and check the second element again*/
-			checkResult(pEnumLoc->Reset());
-			checkResult(pEnumLoc->Skip(1));
-			checkResult(pEnumLoc->NextOne(&pLocator));
-			checkResult(pLocator->GetPath (testname, sizeof(testname)));
-			checkExpression(wcscmp(testname, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
-			pLocator->Release();
-			pLocator = NULL;
-
-			/* Reset, and read both elements */
-			checkResult(pEnumLoc->Reset());
-			checkResult(pEnumLoc->Next (2, (IAAFLocator **)&pArray, &resultCount));
-			checkExpression (resultCount == 2, AAFRESULT_TEST_FAILED);
-			checkResult(pArrayPoint[0]->GetPath (testname, sizeof(testname)));
-			checkExpression(wcscmp(testname, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
-			pArrayPoint[0]->Release();
-			pArrayPoint[0] = NULL;
-			
-			checkResult(pArrayPoint[1]->GetPath (testname, sizeof(testname)));
-			checkExpression(wcscmp(testname, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
-			pArrayPoint[1]->Release();
-			pArrayPoint[1] = NULL;
-			
-			/* Read one past to make sure that it fails */
-			checkExpression(pEnumLoc->NextOne(&pLocator) != AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED);
-			/* Clone the enumerator, and read one element */
-			checkResult(pEnumLoc->Clone(&pCloneEnum));
-			checkResult(pCloneEnum->Reset());
-			checkResult(pCloneEnum->NextOne(&pLocator));
-			checkResult(pLocator->GetPath (testname, sizeof(testname)));
-			checkExpression(wcscmp(testname, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
-			pLocator->Release();
-			pLocator = NULL;
+		pLoc->Release(); // this local variable was already has a reference that must be released!
+		pLoc = NULL;
+		checkResult(pEnumLoc->NextOne (&pLoc));
+ 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
+		
+		checkResult(pPlugin->IsSoftwareOnly(&testBool));
+ 		checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->IsAccelerated(&testBool));
+ 		checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
+		checkResult(pPlugin->SupportsAuthentication(&testBool));
+		checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 	}
 	catch (HRESULT& rResult)
 	{
@@ -370,17 +389,14 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	}
 
 	// Cleanup and return
-	if (pEnumPluggable)
-		pEnumPluggable->Release();
-
-	if (pCloneEnum)
-		pCloneEnum->Release();
-
 	if (pEnumLoc)
 		pEnumLoc->Release();
 
-	if (pLocator)
-		pLocator->Release();
+	if (pEnumPluggable)
+		pEnumPluggable->Release();
+
+	if (pLoc)
+		pLoc->Release();
 
   if (pNetLoc)
 		pNetLoc->Release();
@@ -413,10 +429,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CEnumAAFPluginLocators_test()
+extern "C" HRESULT CAAFPluginDescriptor_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"EnumAAFPluginLocatorsTest.aaf";
+	aafWChar * pFileName = L"AAFPluginDescriptorTest.aaf";
 
 	try
 	{
@@ -426,18 +442,16 @@ extern "C" HRESULT CEnumAAFPluginLocators_test()
 	}
 	catch (...)
 	{
-		cerr << "CEnumAAFPluginLocators_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFPluginDescriptor_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IEnumAAFPluginLocators methods have not been implemented:" << endl;       
-//		cout << "     Next" << endl; 
-//		cout << "     Skip" << endl; 
-//		cout << "     Reset" << endl; 
-//		cout << "     Clone" << endl; 
+//		cout << "The following IAAFPluginDescriptor methods have not been implemented:" << endl;       
+//		cout << "     GetPluggableCode" << endl; 
+//		cout << "     IsPluginLocal" << endl; 
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

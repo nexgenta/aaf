@@ -1,17 +1,14 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFSourceClip
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
-#ifndef __CAAFSourceClip_h__
-#include "CAAFSourceClip.h"
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -82,7 +79,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	try
@@ -202,14 +199,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafUID_t					rReferencedMobID;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"MaAAFSourceClip Test. NOT!";
+	ProductInfo.productName = L"AAFSourceClip Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 	try
@@ -313,10 +309,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
  
 
 
-HRESULT CAAFSourceClip::test()
+extern "C" HRESULT CAAFSourceClip_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
- 	aafWChar * pFileName = L"SourceClipTest.aaf";
+ 	aafWChar * pFileName = L"AAFSourceClipTest.aaf";
 
 	try
 	{
@@ -326,7 +322,7 @@ HRESULT CAAFSourceClip::test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFSourceClip::test...Caught general C++"
+	  cerr << "CAAFSourceClip_test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}

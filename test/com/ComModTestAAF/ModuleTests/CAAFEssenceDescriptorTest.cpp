@@ -1,19 +1,14 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFEssenceDescriptor
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
-#include "CAAFEssenceDescriptor.h"
-#include "CAAFEssenceDescriptor.h"
-#ifndef __CAAFEssenceDescriptor_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -66,7 +61,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	bool bFileOpen = false;
-//	aafUID_t					ddef = DDEF_Audio;
+//	aafUID_t					ddef = DDEF_Sound;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFEssenceDescriptor Test";
@@ -76,7 +71,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	try 
@@ -188,14 +183,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	bool bFileOpen = false;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"AAFEssenceDescriptor Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -298,10 +292,10 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
  
-HRESULT CAAFEssenceDescriptor::test()
+extern "C" HRESULT CAAFEssenceDescriptor_test()
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  aafWChar * pFileName = L"EssenceDescTest.aaf";
+  aafWChar * pFileName = L"AAFEssenceDescriptorTest.aaf";
 
   try
 	{
@@ -311,14 +305,23 @@ HRESULT CAAFEssenceDescriptor::test()
 	}
   catch (...)
 	{
-	  cerr << "CAAFEssenceDescriptor::test...Caught general C++"
+	  cerr << "CAAFEssenceDescriptor_test...Caught general C++"
 		" exception!" << endl; 
 	}
 
 
-  	// When all of the functionality of this class is tested, we can return success
-	if(hr == AAFRESULT_SUCCESS)
+	// When all of the functionality of this class is tested, we can return success.
+	// When a method and its unit test have been implemented, remove it from the list.
+	if (SUCCEEDED(hr))
+	{
+		cout << "The following AAFEssenceDescriptor methods have not been implemented:" << endl; 
+//		cout << "     GetNumLocators" << endl; 
+//		cout << "     AppendLocator - needs unit test" << endl; 
+		cout << "     PrependLocator - needs unit test" << endl; 
+//		cout << "     EnumAAFAllLocators - needs unit test" << endl; 
 		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+	}
 
 	return hr;
 }
+

@@ -3,38 +3,28 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
-
-
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
 
 
 #ifndef __ImplAAFTapeDescriptor_h__
 #include "ImplAAFTapeDescriptor.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
+
 #include <assert.h>
 #include "AAFResult.h"
 
 
 ImplAAFTapeDescriptor::ImplAAFTapeDescriptor ():
-	_formFactor(		PID_TAPEDESCRIPTOR_FORMFACTOR,		"FormFactor"),
-	_videoSignalType(	PID_TAPEDESCRIPTOR_VIDEOSIGNAL,		"VideoSignalType"),
-	_tapeFormat(		PID_TAPEDESCRIPTOR_TAPEFORMAT,		"TapeFormat"),
-	_tapeLength(		PID_TAPEDESCRIPTOR_LENGTH,			"TapeLength"),
-	_manufacturer(		PID_TAPEDESCRIPTOR_MANUFACTURER,	"Manufacturer"),
-	_model(				PID_TAPEDESCRIPTOR_MODEL,			"Model")	
+	_formFactor(		PID_TapeDescriptor_FormFactor,		"FormFactor"),
+	_videoSignalType(	PID_TapeDescriptor_VideoSignal,		"VideoSignal"),
+	_tapeFormat(		PID_TapeDescriptor_TapeFormat,		"TapeFormat"),
+	_tapeLength(		PID_TapeDescriptor_Length,			"Length"),
+	_manufacturer(		PID_TapeDescriptor_ManufacturerID,	"ManufacturerID"),
+	_model(				PID_TapeDescriptor_Model,			"Model")	
 {
 	_persistentProperties.put(_formFactor.address());
 	_persistentProperties.put(_videoSignalType.address());
@@ -47,6 +37,13 @@ ImplAAFTapeDescriptor::ImplAAFTapeDescriptor ():
 
 ImplAAFTapeDescriptor::~ImplAAFTapeDescriptor ()
 {}
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTapeDescriptor::Initialize ()
+{
+  return AAFRESULT_SUCCESS;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -76,6 +73,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	else if(!_manufacturer.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		status = _manufacturer.copyToBuffer(pName, buflen);
@@ -95,9 +96,13 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	else if(!_manufacturer.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
-		*pLen = _manufacturer.length()+1;
+		*pLen = _manufacturer.size();
 	}
 
 	return aafError;
@@ -130,6 +135,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	else if(!_model.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		status = _model.copyToBuffer(pModelName, buflen);
@@ -149,9 +158,13 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	else if(!_model.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
-		*pLen = _model.length()+1;
+		*pLen = _model.size();
 	}
 
 	return aafError;
@@ -162,6 +175,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTapeDescriptor::SetTapeFormFactor (aafTapeCaseType_t	formFactor)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
+	
 	if ( formFactor < kTapeCaseNull ||
 		 formFactor > kNagraAudioTape )
 	{
@@ -179,14 +193,20 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTapeDescriptor::GetTapeFormFactor (aafTapeCaseType_t*	pFormFactor)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
-
+	
 	if (pFormFactor == NULL)
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	
+	else if(!_formFactor.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
+	
+
 	else
 	{
-		
 		*pFormFactor = _formFactor;
 	}
 
@@ -221,6 +241,12 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	
+	else if(!_videoSignalType.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
+	 
 	else
 	{
 		*pVideoSignal = _videoSignalType;
@@ -258,6 +284,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	else if(!_tapeFormat.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}	
 	else
 	{
 		*pTapeFormat = _tapeFormat;
@@ -293,6 +323,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		aafError = AAFRESULT_NULL_PARAM;
 	}
+	else if(!_tapeLength.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
 	else
 	{
 		*pTapeLength = _tapeLength;
@@ -302,8 +336,12 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTapeDescriptor::GetOwningMobKind (aafMobKind_t *pMobKind)
+{
+	*pMobKind = kTapeMob;		// Abstract superclass, only match "all"
+	return(AAFRESULT_SUCCESS);
+}
 
-extern "C" const aafClassID_t CLSID_AAFTapeDescriptor;
 
-OMDEFINE_STORABLE(ImplAAFTapeDescriptor, CLSID_AAFTapeDescriptor);
-
+OMDEFINE_STORABLE(ImplAAFTapeDescriptor, AUID_AAFTapeDescriptor);
