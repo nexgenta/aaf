@@ -3,27 +3,14 @@
 #ifndef __ImplAAFNetworkLocator_h__
 #define __ImplAAFNetworkLocator_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -33,9 +20,10 @@
 #include "ImplAAFLocator.h"
 #endif
 
-#include "OMWideStringProperty.h"
 
+#include "OMProperty.h"
 
+#include "AAFPropertyIDs.h"
 
 class ImplAAFNetworkLocator : public ImplAAFLocator
 {
@@ -54,20 +42,33 @@ public:
 
   // Override from AAFLocator
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPath (/*[out, size_is(bufSize), string]*/ aafCharacter *  pPathBuf,
-	  /*[in]*/ aafUInt32  bufSize);
+    GetPath (/*[out, size_is(bufSize), string]*/ aafWChar *  pPathBuf,
+	  /*[in]*/ aafInt32  bufSize);
 
 
 
   // Override from AAFLocator
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPathBufLen (/*[out]*/ aafUInt32 *  pLen);
+    GetPathBufLen (/*[out]*/ aafInt32 *  pLen);
 
 
 
   // Override from AAFLocator
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetPath (/*[in, string]*/ const aafCharacter *  pPathBuf);
+    SetPath (/*[in, string]*/ aafWChar *  pPathBuf);
+
+
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFNetworkLocator)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFNetworkLocatorTest.cpp.
+  static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 
 private:
   OMWideStringProperty                             _path;

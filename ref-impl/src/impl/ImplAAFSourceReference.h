@@ -5,27 +5,26 @@
 
 #include "OMStorable.h"
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
 
 
 #ifndef __ImplAAFSegment_h__
@@ -33,7 +32,9 @@
 #endif
 
 #include "ImplAAFObject.h"
+#include "OMProperty.h"
 
+#include "AAFPropertyIDs.h"
 
 class ImplAAFSourceReference : public ImplAAFSegment
 {
@@ -53,7 +54,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetSourceID
 		// @parm [retval][out] Place to put source ID
-        (aafMobID_t *  pSourceID);
+        (aafUID_t *  pSourceID);
 
   //****************
   // SetSourceID()
@@ -61,7 +62,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetSourceID
 		// @parm [in] Source ID to set
-        (aafMobID_constref   sourceID);
+        (aafUID_t   sourceID);
 
   //****************
   // GetSourceMobSlotID()
@@ -79,14 +80,18 @@ public:
 		// @parm [in] Source Mob ID to set
         (aafSlotID_t   mobSlotID);
 
+
+
 public:
-	//SDK-private
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFSourceReference)
 
-	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
-												aafMobID_constref to);
-
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFSourceReferenceTest.cpp.
+  static AAFRESULT test();
 private:
-	OMFixedSizeProperty<aafMobID_t>	_sourceID;
+	OMFixedSizeProperty<aafUID_t>	_sourceID;
 	OMFixedSizeProperty<aafInt32>	_sourceMobSlotId;
 
 };
