@@ -30,6 +30,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
 
@@ -64,7 +65,6 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-static char				testPattern[] = "ATestBuffer Pattern";
 static aafRational_t	testSpeed = { 2997, 100 };
 static aafUInt32		userData1 = 0x526F626E;
 static aafUInt32		userData2 = 0x42656361;
@@ -92,11 +92,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = S_OK;
-	aafLength_t					zero;
 	aafTimecode_t				startTC;
 	aafUInt32					n;
 
-	zero = 0;
 	aafProductVersion_t v;
 	v.major = 1;
 	v.minor = 0;
@@ -277,21 +275,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   // aafUInt32				checkUserDataLen;
   aafPosition_t				offset;
   AAFRESULT					status;
-  aafProductIdentification_t	ProductInfo;
   aafNumSlots_t				numMobs;
   HRESULT						hr = S_OK;
-
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-  ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-  ProductInfo.productName = L"AAFTimecodeStream12M Test. NOT!";
-  ProductInfo.productVersion = &v;
-  ProductInfo.productVersionString = NULL;
-  ProductInfo.platform = NULL;
 
   try
   {
@@ -480,14 +465,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTimecodeStream12M_test()
+extern "C" HRESULT CAAFTimecodeStream12M_test(testMode_t mode);
+extern "C" HRESULT CAAFTimecodeStream12M_test(testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFTimecodeStream12MTest.aaf";
 
 	try
 	{
-		hr = CreateAAFFile(	pFileName );
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
