@@ -6,7 +6,7 @@ AAFSourceReference\
 AAFSegment\
 #endm
 #c
-#c #import ./AAFSegment.dod
+#import ./AAFSegment.dod
 AD_HEAD
 AD_IDL(//
 // The IAAFSourceReference interface is implemented by objects that
