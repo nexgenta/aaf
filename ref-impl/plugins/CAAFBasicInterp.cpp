@@ -43,7 +43,7 @@
 
 #include "CAAFBuiltinDefs.h"
 
-const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kVersionBeta};
+const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kAAFVersionBeta};
 
 const CLSID CLSID_AAFBasicInterp = { 0x5B6C85A1, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
 
@@ -51,19 +51,7 @@ const aafUID_t BASIC_INTERP_PLUGIN = { 0x5B6C85A2, 0x0EDE, 0x11d3, { 0x80, 0xA9,
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::Start (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::Finish (void)
-{
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetNumDefinitions (aafInt32 *pDefCount)
+    CAAFBasicInterp::CountDefinitions (aafUInt32 *pDefCount)
 {
 	if(pDefCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -72,7 +60,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetIndexedDefinitionID (aafInt32 index, aafUID_t *pUid)
+    CAAFBasicInterp::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *pUid)
 {
 	if(pUid == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -90,7 +78,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBasicInterp::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFBasicInterp::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
 {
 	IAAFInterpolationDef	*interpDef = NULL;
 	IAAFDefObject	*obj = NULL;
@@ -161,9 +149,9 @@ HRESULT STDMETHODCALLTYPE
 
 		CHECK(desc->SetManufacturerID(MANUF_AVID_TECH));
 		CHECK(desc->SetPluginManufacturerName(manufName));
-		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
-		CHECK(desc->SetIsAccelerated(AAFFalse));
-		CHECK(desc->SetSupportsAuthentication(AAFFalse));
+		CHECK(desc->SetIsSoftwareOnly(kAAFTrue));
+		CHECK(desc->SetIsAccelerated(kAAFFalse));
+		CHECK(desc->SetSupportsAuthentication(kAAFFalse));
 		
 		/**/
 		CHECK(defs.cdNetworkLocator()->
@@ -209,7 +197,7 @@ CAAFBasicInterp::~CAAFBasicInterp ()
 
 HRESULT STDMETHODCALLTYPE
     CAAFBasicInterp::GetNumTypesSupported(
-		/* [out] */aafInt32*  pCount)
+		/* [out] */aafUInt32*  pCount)
 {
 	if(pCount == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -219,7 +207,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFBasicInterp::GetIndexedSupportedType(
-		/* [in] */ aafInt32  index,
+		/* [in] */ aafUInt32  index,
 		/* [out] */IAAFTypeDef ** ppType)
 {
 	if(ppType == NULL)
@@ -371,7 +359,7 @@ HRESULT STDMETHODCALLTYPE
 HRESULT CAAFBasicInterp::InterpolateMany(
 	/* [in] */ aafRational_t *  pStartInputValue,
     /* [in] */ aafRational_t *  pInputStep,
-    /* [in] */ aafInt32  pGenerateCount,
+    /* [in] */ aafUInt32  pGenerateCount,
     /* [out] */aafMemPtr_t pOutputValue,
     /* [out] */aafUInt32 *  pResultCount)
 {
@@ -419,7 +407,7 @@ HRESULT CAAFBasicInterp::FindBoundValues(aafRational_t point,
 
 			prevTime = zero;
 			CHECK(pVaryingValue->GetControlPoints(&theEnum));
-			found = AAFFalse;
+			found = kAAFFalse;
 			prevPoint = NULL;
 			while(!found && (theEnum->NextOne(&testPoint) == AAFRESULT_SUCCESS))
 			{

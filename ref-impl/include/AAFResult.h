@@ -6,13 +6,32 @@
 #include <scode.h>
 #endif
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #define AAFRESULT_FAILED(Status) ((AAFRESULT)(Status)<0)
 #define AAFRESULT_SUCCEEDED(Status) (!(AAFRESULT_FAILED(Status)))
@@ -156,6 +175,7 @@
 #define AAFRESULT_DATADEF_EXIST				MAKE_AAFHRESULT(0x00D1)
 #define AAFRESULT_TOO_MANY_TYPES			MAKE_AAFHRESULT(0x00D2)
 #define AAFRESULT_BAD_TYPE_CATEGORY         MAKE_AAFHRESULT(0x00D5)
+#define AAFRESULT_OBJECT_NOT_FOUND          MAKE_AAFHRESULT(0x00D6)
 	
 /* MOB Error Codes */
 #define AAFRESULT_NOT_SOURCE_CLIP			MAKE_AAFHRESULT(0x00FA)
@@ -203,6 +223,7 @@
 #define AAFRESULT_TAPE_DESC_ONLY			MAKE_AAFHRESULT(0x0124)
 #define AAFRESULT_FILM_DESC_ONLY			MAKE_AAFHRESULT(0x0125)
 #define AAFRESULT_UNKNOWN_PARAMETER_CLASS	MAKE_AAFHRESULT(0x0126)
+#define AAFRESULT_PARAMETER_NOT_FOUND		MAKE_AAFHRESULT(0x0127)	
 
 /* SIMPLE COMPOSITION Error Codes */
 #define AAFRESULT_BAD_STRACKHDL				MAKE_AAFHRESULT(0x012C)
@@ -231,6 +252,7 @@
 #define AAFRESULT_ILLEGAL_VALUE				MAKE_AAFHRESULT(0x016A)
 #define AAFRESULT_INVALID_TRANSPARENCY		MAKE_AAFHRESULT(0x016B)
 #define AAFRESULT_INVALID_PARAM			MAKE_AAFHRESULT(0x016C)
+#define AAFRESULT_INVALID_ENUM_VALUE		MAKE_AAFHRESULT(0x016D)
 
 /* SEMANTIC CHECKING Error Codes */
 #define AAFRESULT_REQUIRED_POSITIVE			MAKE_AAFHRESULT(0x0190)
@@ -270,6 +292,9 @@
 /* Reference implementation assertion violation (programming error) */
 #define AAFRESULT_ASSERTION_VIOLATION       MAKE_AAFHRESULT(0x01D0)
 
+/* Reference implementation unexpected C++ exception (programming error) */
+#define AAFRESULT_UNEXPECTED_EXCEPTION      MAKE_AAFHRESULT(0x01D1)
+
 /* Testing Error Codes */
 #define AAFRESULT_TEST_FAILED				MAKE_AAFHRESULT(0x01F4)
 #define AAFRESULT_TEST_PARTIAL_SUCCESS		MAKE_AAFHRESULT(0x01F5)
@@ -280,8 +305,21 @@
 
 /* Property access error codes */
 #define AAFRESULT_BAD_SIZE                  MAKE_AAFHRESULT(0x0200)
+#define AAFRESULT_NOT_REGISTERED            MAKE_AAFHRESULT(0x0201)
+#define AAFRESULT_NOT_EXTENDABLE            MAKE_AAFHRESULT(0x0202)
 
-#define AAFRESULT_MAXCODE					MAKE_AAFHRESULT(0x0201)
+
+/* Object extension error codes */
+#define AAFRESULT_EXTENSION_NOT_FOUND            MAKE_AAFHRESULT(0x0300)
+#define AAFRESULT_EXTENSION_ALREADY_INITIALIZED  MAKE_AAFHRESULT(0x0301)
+#define AAFRESULT_PLUGIN_NOT_REGISTERED          MAKE_AAFHRESULT(0x0302)
+#define AAFRESULT_PLUGIN_ALREADY_REGISTERED      MAKE_AAFHRESULT(0x0303)
+#define AAFRESULT_PLUGIN_CIRCULAR_REFERENCE      MAKE_AAFHRESULT(0x0304)
+#define AAFRESULT_PLUGIN_INVALID_REFERENCE_COUNT MAKE_AAFHRESULT(0x0305)
+
+
+
+#define AAFRESULT_MAXCODE					MAKE_AAFHRESULT(0x0305)
 
 
 #endif // ! __AAFResult_h_
