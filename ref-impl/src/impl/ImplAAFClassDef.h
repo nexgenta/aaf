@@ -32,18 +32,24 @@
 
 class ImplEnumAAFPropertyDefs;
 class ImplAAFDefObject;
-class ImplAAFTypeDef;
 class ImplAAFPropertyDef;
 
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
+#ifndef __ImplAAFMetaDefinition_h__
+#include "ImplAAFMetaDefinition.h"
 #endif
 
 #ifndef __ImplAAFPropertyDef_h__
 #include "ImplAAFPropertyDef.h"
 #endif
 
-class ImplAAFClassDef : public ImplAAFDefObject
+#ifndef __ImplAAFTypeDef_h__
+#include "ImplAAFTypeDef.h"
+#endif
+
+#include "OMWeakRefProperty.h"
+#include "OMStrongRefSetProperty.h"
+
+class ImplAAFClassDef : public ImplAAFMetaDefinition
 {
 public:
   //
@@ -69,7 +75,10 @@ public:
 		ImplAAFClassDef * pParentClass,
 
 		// Human-legible name
-		const aafCharacter * pClassName);
+		const aafCharacter * pClassName,
+
+		// Can objects of this class be instantiated
+		aafBool isConcrete);
 
 
   //****************
@@ -106,6 +115,9 @@ public:
 
          // @parm [in] true if new property is to be optional
          aafBool  isOptional,
+
+         // @parm [in] true if new property is a unique identifier
+         aafBool  isUniqueIdentifier,
 
          // @parm [out] return pointer to newly created property def
          ImplAAFPropertyDef ** ppPropDef);
@@ -165,13 +177,33 @@ public:
     IsRoot
         (aafBool* isRootClass);
 
+  //****************
+  // IsConcrete()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsConcrete
+        (aafBool* pResult);
+
+  //****************
+  // IsUniquelyIdentified
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsUniquelyIdentified
+        (aafBoolean_t * isUniquelyIdentified);
+
+  //****************
+  // GetUniqueIdentifier
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetUniqueIdentifier
+        (ImplAAFPropertyDef ** ppUniqueIdentifier);
+
+
 public:
 
-  //
-  // Non-published methods
-  //
-	ImplAAFClassDef *
-		PvtGetParent ();
+	bool
+    PvtIsPropertyDefRegistered (
+      aafUID_constref propId);
 
   //****************
   // SetParent()
@@ -202,8 +234,14 @@ public:
 		const ImplAAFClassDef * pParentClassId,
 
 		// Human-legible name
-		const aafCharacter * pClassName);
+		const aafCharacter * pClassName,
 
+		// Can objects of this class be instantiated
+		aafBool isConcrete);
+
+
+  // Returns true if this class can be instantiated.
+  aafBool pvtIsConcrete () const;
 
   // Private method to unconditionally register a property def (ignoring
   // whether or not property is optional or not, or if this class has
@@ -214,6 +252,7 @@ public:
          const aafCharacter *  pName,
          const aafUID_t & typeId,
          aafBool  isOptional,
+         aafBool  isUniqueIdentifier,
          ImplAAFPropertyDef ** ppPropDef);
 
 
@@ -239,7 +278,9 @@ public:
   // has been loaded into memory.
   void AssurePropertyTypesLoaded ();
 
-  void InitOMProperties (ImplAAFObject * pObj);
+  // Find the unique identifier property defintion for this class or any parent class
+  // (RECURSIVE)
+  ImplAAFPropertyDef * pvtGetUniqueIdentifier(void); // result is NOT reference counted.
 
 private:
 
@@ -312,7 +353,9 @@ private:
   // OMWeakReferenceProperty<ImplAAFClassDef> _ParentClass;
   OMWeakReferenceProperty<ImplAAFClassDef>         _ParentClass;
 
-  OMStrongReferenceSetProperty<ImplAAFPropertyDef> _Properties;
+  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPropertyDef> _Properties;
+
+  OMFixedSizeProperty<aafBool> _IsConcrete;
 
   ImplAAFClassDef	*_BootstrapParent;
 

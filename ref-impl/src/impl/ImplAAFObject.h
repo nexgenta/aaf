@@ -34,6 +34,7 @@
 //
 // Forward declarations
 //
+class ImplEnumAAFProperties;
 class ImplAAFClassDef;
 class ImplAAFIdentification;
 class ImplAAFProperty;
@@ -42,22 +43,17 @@ class ImplAAFPropertyValue;
 class ImplPropertyCollection;
 class ImplAAFDictionary;
 
-template <class T> 
-class ImplAAFEnumerator;
-typedef ImplAAFEnumerator<ImplAAFProperty> ImplEnumAAFProperties;
-
-
 #include "AAFTypes.h"
 #include "OMStorable.h"
 #include "OMFixedSizeProperty.h"
-#include "ImplAAFStorable.h"
+#include "ImplAAFRoot.h"
 
 #ifndef __ImplAAFSmartPointer_h__
 // caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 
-class ImplAAFObject : public ImplAAFStorable
+class ImplAAFObject : public OMStorable, public ImplAAFRoot
 {
 public:
   //
@@ -111,6 +107,15 @@ public:
 
 
   //****************
+  // GetDefinition()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDefinition
+		// @parm [out] class definition of which this object is an instance.
+        (ImplAAFClassDef ** ppClassDef);
+
+
+  //****************
   // GetObjectClass()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -161,39 +166,50 @@ public:
 		 aafBool * pResult);
 
 
-  //****************
-  // RemoveOptionalProperty()
+  //***********************************************************
+  // METHOD NAME: GetStoredByteOrder()
   //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveOptionalProperty
-        // @parm [in] property definition indentifying desired property
-        (ImplAAFPropertyDef * pPropDef);
-        
-
-  //****************
-  // CreatePropertyValue()
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEndian | GetStoredByteOrder |
+  // Returns the "Endian-ness" in which the current object was or will
+  // be stored.  If this is a transient object (i.e., one which has
+  // not been persisted) then it will return the native byte order of
+  // the platform on which this is running.
   //
+  // @end
+  // 
   virtual AAFRESULT STDMETHODCALLTYPE
-    CreateOptionalPropertyValue
-        (// @parm [in] property definition indentifying desired property
-         ImplAAFPropertyDef * pPropDef,
-
-         // @parm [out] returned AAFPropertyValue
-         ImplAAFPropertyValue ** ppPropVal);
+  GetStoredByteOrder (
+    // @parm [out] eAAFByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    eAAFByteOrder_t *  pOrder
+  );
 
 
 
+  //***********************************************************
+  // METHOD NAME: GetNativeByteOrder()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEndian | GetNativeByteOrder |
+  // Returns the native "Endian-ness" of the platform on which this is
+  // running.
+  //
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  GetNativeByteOrder (
+    // @parm [out] eAAFByteOrder_t * | pOrder | Pointer to place where byte order is to be put
+    eAAFByteOrder_t *  pOrder
+  );
+
+
+public:
   // Interfaces ivisible inside the toolkit, but not exposed through the API
-protected:
 
   // Associate the existing OMProperties with corresponding property definitions from
   // the given class definition. NOTE: This call is recursive, it calls itself again
   // for the parent class of the given class until current class is a "root" class.
   virtual void InitOMProperties (ImplAAFClassDef * pClassDef);
-public:
-  
-  // Same as above for a single property (not recursive).
-  virtual OMProperty * InitOMProperty(ImplAAFPropertyDef * pPropertyDef, OMPropertySet * ps);
 
 
   // Gets the head object of the file containing this object.
@@ -224,15 +240,6 @@ public:
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
 
-  
-  // Overrides of ImplAAFStorable.
-  // Return true if this is a meta object
-  // NOTE: These objects will eventually owned by the Object Manager.
-  virtual bool metaObject(void) const;
-  
-  // Return true is this is a data object (Interchange object).
-  virtual bool dataObject(void) const;
-
 private:
 
   OMFixedSizeProperty<aafUID_t> _generation;
@@ -241,6 +248,8 @@ private:
   AAFRESULT InitProperties ();
 
   ImplPropertyCollection * _pProperties;
+
+  ImplAAFClassDef *        _cachedDefinition;
 
   // stored object ID
   aafUID_t                 _soid;
@@ -273,6 +282,13 @@ private:
   //
   // number of those props that are actually used
   aafUInt32 _savedPropsCount;
+  
+  aafBool	_isInitialized;
+
+
+protected:
+  aafBool isInitialized (void) const;
+  void    setInitialized (void);
 };
 
 //

@@ -5,7 +5,7 @@
 
 /***********************************************************************
  *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -34,18 +34,16 @@
 #include "AAFTypes.h"
 #endif
 
-#include "ImplAAFStorable.h"
+#ifndef __ImplAAFObject_h__
+#include "ImplAAFObject.h"
+#endif
 
-#include "OMStorable.h"
-#include "OMFixedSizeProperty.h"
 #include "OMWideStringProperty.h"
 
 class ImplAAFDictionary;
-class ImplAAFClassDef;
 
 
-class ImplAAFMetaDefinition : 
-  public ImplAAFStorable
+class ImplAAFMetaDefinition : public ImplAAFObject
 {
 public:
   //
@@ -132,51 +130,15 @@ public:
         (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
 
 public:
-  // Private SDK methods.
-
-
-  // Gets the dictionary used to create this instance.
-  virtual AAFRESULT STDMETHODCALLTYPE 
-    GetDictionary(ImplAAFDictionary **ppDictionary) const;
-
-
-protected:
   // Associate the existing OMProperties with corresponding property definitions from
   // the given class definition. NOTE: This call is recursive, it calls itself again
   // for the parent class of the given class until current class is a "root" class.
   virtual void InitOMProperties (ImplAAFClassDef * pClassDef);
-public:
 
 
   virtual const OMUniqueObjectIdentification& identification(void) const;
 
-  // Private method to assign the unique identifier.
-  AAFRESULT SetIdentification(aafUID_constref identification);
-
-
-  // override from OMStorable.
-  virtual const OMClassId& classId(void) const;
-
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
-
-  
-  // Overrides of ImplAAFStorable.
-  // Return true if this is a meta object
-  // NOTE: These objects will eventually owned by the Object Manager.
-  virtual bool metaObject(void) const;
-  
-  // Return true is this is a data object (Interchange object).
-  virtual bool dataObject(void) const;
-
-  // Method is called after associated class has been added to MetaDictionary.
-  // If this method fails the class is removed from the MetaDictionary and the
-  // registration method will fail.
-  virtual HRESULT CompleteClassRegistration(void);
-
 private:
-
   // friendly name of this definition
   OMWideStringProperty          _name;
 
