@@ -630,12 +630,12 @@ size_t OMStrongReferenceVectorProperty<ReferencedObject>::bitsSize(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
   //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm The size of the buffer.
+  //   @parm size_t | size | The size of the buffer.
   //   @this const
 template<typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
-                                                         OMByte* bits,
-                                                         size_t size) const
+                                                      OMByte* bits,
+                                                      size_t ANAME(size)) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::getBits");
 
@@ -667,24 +667,22 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::getBits(
   //   @parm The size of the buffer.
 template<typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
-                                                         const OMByte* bits,
-                                                         size_t size)
+                                                            const OMByte* bits,
+                                                            size_t size)
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::setBits");
 
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
+  size_t count = size / sizeof(ReferencedObject*);
   ReferencedObject** p = (ReferencedObject**)bits;
 
-  OMVectorIterator<
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject> > iterator(_vector, OMBefore);
-  while (++iterator) {
-    OMVectorElement<OMStrongObjectReference<ReferencedObject>,
-                    ReferencedObject>& element = iterator.value();
-    element.setValue(*p++);
+  for (size_t i = 0; i < count; i++) {
+    ReferencedObject* object = p[i];
+    setValueAt(object, i);
   }
+
 }
 
 #endif
