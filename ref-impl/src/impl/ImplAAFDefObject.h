@@ -20,6 +20,10 @@
 #include "ImplAAFObject.h"
 #endif
 
+class ImplAAFDictionary;
+
+#include "ImplAAFPluginDescriptor.h"
+#include "ImplEnumAAFPluginDescriptors.h"
 
 class ImplAAFDefObject : public ImplAAFObject
 {
@@ -35,6 +39,12 @@ protected:
 
 public:
 
+  // SetAUID()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Init
+        // @parm [in] Pointer to an AUID reference
+        (aafUID_t *  pAuid, wchar_t *name, wchar_t *description);
   //****************
   // GetAUID()
   //
@@ -77,7 +87,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetNameBufLen
-        (aafInt32 *  nameLen);  //@parm [in,out] Definition Name length
+        (aafUInt32 *  nameLen);  //@parm [in,out] Definition Name length
 
 
   //****************
@@ -94,7 +104,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetDescription
         (aafWChar *  description,  //@parm [in] Definition Description
-		 aafInt32 bufSize);	  //@parm [in] size of the buffer required to hold Definition Description + terminator
+		 aafUInt32 bufSize);	  //@parm [in] size of the buffer required to hold Definition Description + terminator
 
 
   //****************
@@ -102,7 +112,32 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetDescriptionBufLen
-        (aafInt32 *  descriptionLen);  //@parm [in,out] Definition description length
+        (aafUInt32 *  descriptionLen);  //@parm [in,out] Definition description length
+
+  //****************
+  // AppendPluginDescriptor()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AppendPluginDescriptor
+        // @parm [in] PluginDescriptor to append
+        (ImplAAFPluginDescriptor * pPluginDescriptor);
+
+
+  //****************
+  // PrependPluginDescriptor()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    PrependPluginDescriptor
+        // @parm [in] PluginDescriptor to append
+        (ImplAAFPluginDescriptor * pPluginDescriptor);
+
+  //****************
+  // EnumPluginDescriptors()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    EnumPluginDescriptors
+        // @parm [out, retval] AAFPluginDescriptor Enumeration
+        (ImplEnumAAFPluginDescriptors ** ppEnum);
 
 
 public:
@@ -114,6 +149,9 @@ public:
   // in /test/ImplAAFDefObjectTest.cpp.
   static AAFRESULT test();
 
+public:
+	// Functions internal to the toolkit
+
 private:
   // friendly name of this definition
   OMWideStringProperty          _name;
@@ -123,6 +161,7 @@ private:
 
   // auid to be used to identify this definition
   OMFixedSizeProperty<aafUID_t> _identification;
+  OMVariableSizeProperty<aafUID_t> _descriptors;
 };
 
 #endif // ! __ImplAAFDefObject_h__
