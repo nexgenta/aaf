@@ -1,78 +1,100 @@
 //@doc
-//@class    AAFContext | Implementation class for AAFContext
-#ifndef __ImplAAFContext_h__
-#define __ImplAAFContext_h__
+//@class    AAFSession | Implementation class for AAFSession
+#ifndef __ImplAAFSession_h__
+#define __ImplAAFSession_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
+#ifndef __AAFTypes_h__
 #include "AAFTypes.h"
-#include "ImplAAFRoot.h"
+#endif
+
+class ImplAAFFile;
+class AAFFile;
+
+#include "Stubs.h"
 
 
 //
 // Forward declaration
 //
-class ImplAAFFile;
-class ImplAAFPluginManager;
+struct IAAFSession;
+class AAFSession;
 
 
-class ImplAAFContext : public ImplAAFRoot
+class ImplAAFSession
 {
 public:
-
-  //****************
-  // GetInstance()
-  //
-  // Allows clients to get the single instance of this class.
-  //
-  static ImplAAFContext * GetInstance ();
-
-
-public:
-
-  void InitPluginManager (void);
-  ImplAAFPluginManager *GetPluginManager (void);
-
-private:
-
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFContext ();
-  virtual ~ImplAAFContext ();
+  ImplAAFSession ();
+  virtual ~ImplAAFSession ();
 
-  // single instance of this class
-  static ImplAAFContext * _singleton;
 
-  ImplAAFPluginManager	*_plugins;
 
-  // Make private helper class a friend so that it
-  // may call the destructor. This helper class is used
-  // to ensure that the singleton context instance is 
-  // cleaned up properly.
-  friend class ImplAAFContextHelper;
+
+  //****************
+  // EndSession()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    EndSession ();
+
+
+  //****************
+  // CreateFile()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateFile
+        (aafDataBuffer_t  filePath,   //@parm [in] File path [replace with object later]
+		 aafFileRev_t  rev,   //@parm [in] File revision to create
+         ImplAAFFile ** file);  //@parm [out] Current AAF file
+
+
+  //****************
+  // OpenReadFile()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    OpenReadFile
+        (aafDataBuffer_t  filePath,   //@parm [in] File path [replace with object later]
+		 ImplAAFFile ** file);  //@parm [out] Current AAF file
+
+
+  //****************
+  // OpenModifyFile()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    OpenModifyFile
+        (aafDataBuffer_t  filePath,   //@parm [in] File path [replace with object later]
+		 ImplAAFFile ** file);  //@parm [out] Current AAF file
+
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFSessionTest.cpp.
+  static AAFRESULT test();
+
+  void InitContainer (void * pContainer);
+
+  void * GetContainer ();
+
+	ImplAAFFile *GetTopFile(void);
+	void SetTopFile(ImplAAFFile *file);
+	OMLSession GetContainerSession(void);
+
+private:
+
+  void * _pContainer;
+	ImplAAFFile	*_topFile;
 };
 
-#endif // ! __ImplAAFContext_h__
+#endif // ! __ImplAAFSession_h__
 
