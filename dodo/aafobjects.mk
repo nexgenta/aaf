@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.6 2004/05/01 02:10:42 jptrainor Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.7 2004/05/03 01:14:23 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -175,7 +175,7 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFTaggedValueDefs \
 	EnumAAFKLVDataDefs \
 	AAFRecordingDescriptor \
-	AAFAuxillaryDescriptor "
+	AAFAuxiliaryDescriptor "
 
 # Defered interfaces
 #	AAFIntraFrameMarker \
