@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -12,6 +13,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -41,6 +43,15 @@ ImplAAFDataDef::ImplAAFDataDef ()
 
 ImplAAFDataDef::~ImplAAFDataDef ()
 {}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDataDef::GetName (
+      aafString_t *  /*pstrName*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -84,28 +95,7 @@ AAFRESULT STDMETHODCALLTYPE
       aafUID_t *pAuid,
       aafBool *bDoesConvertTo)
 {
-	if(bDoesConvertTo == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	
-	XPROTECT()
-	{
-		aafBool	result;
-		
-		CHECK(IsDataDefOf (pAuid, &result));
-		if(result == AAFFalse)
-		{
-			aafBool	isPWM;
-			aafUID_t	picture = DDEF_Picture;
-			CHECK(IsPictureWithMatteKind (&isPWM));
-			if((isPWM == AAFTrue) && EqualAUID(&picture, pAuid))
-				result = AAFTrue;
-		}
-		*bDoesConvertTo = result;
-	}
-	XEXCEPT
-	XEND;
-
-	return AAFRESULT_SUCCESS;
+	return(IsDataDefOf (pAuid, bDoesConvertTo));	// !!!No conversion yet
 }
 
 		   
@@ -132,31 +122,11 @@ AAFRESULT STDMETHODCALLTYPE
       aafUID_t *pAuid,
       aafBool * bDoesConvertFrom)
 {
-	if(bDoesConvertFrom == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	
-	XPROTECT()
-	{
-		aafBool	result;
-		
-		CHECK(IsDataDefOf (pAuid, &result));
-		if(result == AAFFalse)
-		{
-			aafBool		isPict;
-			aafUID_t	pictureMatte = DDEF_PictureWithMatte;
-			CHECK(IsPictureKind (&isPict));
-			if((isPict == AAFTrue) && EqualAUID(&pictureMatte, pAuid))
-				result = AAFTrue;
-		}
-		*bDoesConvertFrom = result;
-	}
-	XEXCEPT
-	XEND;
-
-	return AAFRESULT_SUCCESS;
+	return(IsDataDefOf (pAuid, bDoesConvertFrom));	// !!!No conversion yet
 }
 
 
 
+OMDEFINE_STORABLE(ImplAAFDataDef, AUID_AAFDataDef);
 
 

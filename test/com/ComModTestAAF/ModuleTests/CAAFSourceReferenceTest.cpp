@@ -1,31 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFSourceReference
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #include "AAF.h"
@@ -36,7 +18,8 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
+#include "AAFDataDefs.h"
+
 
 
 // Cross-platform utility to delete a file.
@@ -74,7 +57,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDictionary*  pDictionary = NULL;
 	IAAFSourceReference	*pSourceReference = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					inSourceID, outSourceID;
+	aafUID_t					inSourceID, outSourceID;
 	aafUInt32 inMobSlotID, outMobSlotID;
 	HRESULT						hr = S_OK;
 
@@ -87,7 +70,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -108,13 +91,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
  		
 
 		// Create an Abstract SourceReference
-		checkResult(pDictionary->CreateInstance(AUID_AAFSourceReference,
+		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceReference,
 								  IID_IAAFSourceReference, 
 								  (IUnknown **)&pSourceReference));
 
 		// module-specific tests go here
 		//		Set Values.	
-		checkResult(CoCreateGuid((GUID *)&inSourceID));
+
+		inSourceID = DDEF_Picture;   // Could have been any other value !
 		checkResult(pSourceReference->SetSourceID( inSourceID));
 		
 		inMobSlotID = 100;   // Could have been any other value !
@@ -202,7 +186,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CAAFSourceReference_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
- 	aafWChar * pFileName = L"AAFSourceReferenceTest.aaf";
+ 	aafWChar * pFileName = L"SourceReferenceTest.aaf";
 
 	try
 	{
