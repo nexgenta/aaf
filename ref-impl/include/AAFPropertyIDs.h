@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.4 2004/04/07 13:41:49 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.5 2004/04/17 20:55:16 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -144,6 +144,8 @@ const int PID_Dictionary_PluginDefinitions                       = 0x2606;
 const int PID_Dictionary_CodecDefinitions                        = 0x2607;
 const int PID_Dictionary_ContainerDefinitions                    = 0x2608;
 const int PID_Dictionary_InterpolationDefinitions                = 0x2609;
+const int PID_Dictionary_KLVDataDefinitions                      = 0x260A;
+const int PID_Dictionary_TaggedValueDefinitions                  = 0x260B;
 const int PID_EssenceData_MobID                                  = 0x2701;
 const int PID_EssenceData_Data                                   = 0x2702;
 const int PID_EssenceData_SampleIndex                            = 0x2B01;
@@ -229,6 +231,9 @@ const int PID_TapeDescriptor_ManufacturerID                      = 0x3A05;
 const int PID_TapeDescriptor_Model                               = 0x3A06;
 const int PID_TapeDescriptor_TapeBatchNumber                     = 0x3A07;
 const int PID_TapeDescriptor_TapeStock                           = 0x3A08;
+const int PID_TaggedValueDefinition_TaggedValueParentProperties  = 0x6C01;
+const int PID_KLVDataDefinition_KLVDataParentProperties          = 0x6D01;
+const int PID_KLVDataDefinition_KLVDataType                      = 0x4D02;
 const int PID_Header_ByteOrder                                   = 0x3B01;
 const int PID_Header_LastModified                                = 0x3B02;
 const int PID_Header_Content                                     = 0x3B03;

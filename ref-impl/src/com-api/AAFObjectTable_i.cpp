@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.2.2.2 2004/03/11 18:58:37 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.2.2.3 2004/04/17 20:55:32 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -169,6 +169,10 @@
 #include "CAAFGetFileBits.h"
 #include "CAAFSetFileBits.h"
 #include "CAAFRandomFile.h"
+#include "CAAFTaggedValueDefinition.h"
+#include "CAAFKLVDataDefinition.h"
+#include "CEnumAAFTaggedValueDefs.h"
+#include "CEnumAAFKLVDataDefs.h"
 
 //
 // Include Private AAF Objects in Table:
