@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -42,7 +42,7 @@ template <typename UniqueIdentification, typename ReferencedObject>
 OMStrongReferenceSetProperty<UniqueIdentification,
                              ReferencedObject>::OMStrongReferenceSetProperty(
                                               const OMPropertyId propertyId,
-                                              const char* name,
+                                              const wchar_t* name,
                                               const OMPropertyId keyPropertyId)
 : OMContainerProperty<ReferencedObject>(propertyId,
                                         SF_STRONG_OBJECT_REFERENCE_SET,
@@ -81,13 +81,6 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* s = container->store();
-
-  const char* propertyName = name();
 
   // create a set index
   //
@@ -129,15 +122,12 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   // save the set index
   //
   ASSERT("Valid set index", index->isValid());
-  s->save(index, name());
+  store()->save(index, storedName());
   delete index;
 
   // make an entry in the property index
   //
-  s->write(_propertyId,
-           _storedForm,
-           (void *)propertyName,
-           strlen(propertyName) + 1);
+  saveName();
 
 }
 
@@ -195,23 +185,14 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::restore");
 
-  PRECONDITION("Consistent property size", externalSize == strlen(name()) + 1);
-
   // get the name of the set index stream
   //
-  char* propertyName = new char[externalSize];
-  ASSERT("Valid heap pointer", propertyName != 0);
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  store->read(_propertyId, _storedForm, propertyName, externalSize);
-  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
-  delete [] propertyName;
+  restoreName(externalSize);
 
   // restore the index
   //
   OMStoredSetIndex* setIndex = 0;
-  store->restore(setIndex, name());
+  store()->restore(setIndex, storedName());
   ASSERT("Valid set index", setIndex->isValid());
   ASSERT("Consistent key sizes",
                           setIndex->keySize() == sizeof(UniqueIdentification));
@@ -234,7 +215,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   UniqueIdentification key;
   for (size_t i = 0; i < entries; i++) {
     setIndex->iterate(context, localKey, count, &key);
-    char* name = elementName(localKey);
+    wchar_t* name = elementName(localKey);
     SetElement newElement(this, name, localKey, count, key);
     newElement.restore();
     _set.insert(newElement);
@@ -299,7 +280,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   // Set the set to contain the new object
   //
   const size_t localKey = nextLocalKey();
-  char* name = elementName(localKey);
+  wchar_t* name = elementName(localKey);
   UniqueIdentification key = object->identification();
   ASSERT("Valid identification", isValidIdentification(key));
 

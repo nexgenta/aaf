@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -34,14 +34,16 @@
 template <typename ReferencedObject>
 OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
                                                  const OMPropertyId propertyId,
-                                                 const char* name)
+                                                 const wchar_t* name)
 : OMReferenceProperty<ReferencedObject>(propertyId,
                                         SF_STRONG_OBJECT_REFERENCE,
                                         name),
-  _reference(this, name)
+  _reference()
 {
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
+
+  _reference = OMStrongObjectReference<ReferencedObject>(this, storedName());
 }
 
 template <typename ReferencedObject>
@@ -163,19 +165,9 @@ void OMStrongReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::save");
 
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-
   // Write the index entry.
   //
-  OMStoredObject* s = container->store();
-  const char* propertyName = name();
-  s->write(_propertyId,
-           _storedForm,
-           (void *)propertyName,
-           strlen(propertyName) + 1);
+  saveName();
 
   _reference.save();
 
@@ -221,16 +213,7 @@ void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 
   // retrieve sub-storage name
   //
-  char* storageName = new char[externalSize];
-  ASSERT("Valid heap pointer", storageName != 0);
-
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  store->read(_propertyId, _storedForm, storageName, externalSize);
-  ASSERT("Consistent property size", externalSize == strlen(storageName) + 1);
-  ASSERT("Consistent property name", strcmp(storageName, name()) == 0);
-  delete [] storageName;
+  restoreName(externalSize);
 
   _reference.restore();
 

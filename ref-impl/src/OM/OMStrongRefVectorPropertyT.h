@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -39,7 +39,7 @@
 template <typename ReferencedObject>
 OMStrongReferenceVectorProperty<ReferencedObject>::
                  OMStrongReferenceVectorProperty(const OMPropertyId propertyId,
-                                                 const char* name)
+                                                 const wchar_t* name)
 : OMContainerProperty<ReferencedObject>(propertyId,
                                         SF_STRONG_OBJECT_REFERENCE_VECTOR,
                                         name)
@@ -69,13 +69,6 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::save(void) const
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
-  ASSERT("Valid property set", _propertySet != 0);
-  OMStorable* container = _propertySet->container();
-  ASSERT("Valid container", container != 0);
-  ASSERT("Container is persistent", container->persistent());
-  OMStoredObject* s = container->store();
-
-  const char* propertyName = name();
 
   // create a vector index
   //
@@ -107,15 +100,12 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::save(void) const
   // save the vector index
   //
   ASSERT("Valid vector index", index->isValid());
-  s->save(index, name());
+  store()->save(index, storedName());
   delete index;
 
   // make an entry in the property index
   //
-  s->write(_propertyId,
-           _storedForm,
-           (void *)propertyName,
-           strlen(propertyName) + 1);
+  saveName();
 
 }
 
@@ -162,23 +152,14 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::restore");
 
-  PRECONDITION("Consistent property size", externalSize == strlen(name()) + 1);
-
   // get the name of the vector index stream
   //
-  char* propertyName = new char[externalSize];
-  ASSERT("Valid heap pointer", propertyName != 0);
-  OMStoredObject* store = _propertySet->container()->store();
-  ASSERT("Valid store", store != 0);
-
-  store->read(_propertyId, _storedForm, propertyName, externalSize);
-  ASSERT("Consistent property name", strcmp(propertyName, name()) == 0);
-  delete [] propertyName;
+  restoreName(externalSize);
 
   // restore the index
   //
   OMStoredVectorIndex* vectorIndex = 0;
-  store->restore(vectorIndex, name());
+  store()->restore(vectorIndex, storedName());
   ASSERT("Valid vector index", vectorIndex->isValid());
   setLocalKey(vectorIndex->firstFreeKey());
 
@@ -191,7 +172,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::restore(
     OMUInt32 localKey;
     for (size_t i = 0; i < entries; i++) {
       vectorIndex->iterate(context, localKey);
-      char* name = elementName(localKey);
+      wchar_t* name = elementName(localKey);
       VectorElement newElement(this, name, localKey);
       newElement.restore();
       _vector.setAt(newElement, i);
@@ -265,7 +246,7 @@ ReferencedObject*
   if (index == count()) {
     // This is an append, make sure the new element is defined.
     OMUInt32 localKey = nextLocalKey();
-    char* name = elementName(localKey);
+    wchar_t* name = elementName(localKey);
     VectorElement newElement(this, name, localKey);
     _vector.append(newElement);
     delete [] name;
@@ -422,7 +403,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::insertAt(
   PRECONDITION("Valid index", (index >= 0) && (index <= count()));
   
   OMUInt32 localKey = nextLocalKey();
-  char* name = elementName(localKey);
+  wchar_t* name = elementName(localKey);
   VectorElement newElement(this, name, localKey);
   newElement.setValue(object);
   _vector.insertAt(newElement, index);
