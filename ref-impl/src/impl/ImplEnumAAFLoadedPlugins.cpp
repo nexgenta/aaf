@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -13,10 +14,11 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
+#ifndef __ImplAAFPluggableDef_h__
+#include "ImplAAFPluggableDef.h"
 #endif
 
 
@@ -158,9 +160,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-	  theEnum->ReleaseReference();
-	  theEnum = 0;
-	  *ppEnum = NULL;
+		theEnum->ReleaseReference();
+		*ppEnum = NULL;
 	}
 
 	return hr;
