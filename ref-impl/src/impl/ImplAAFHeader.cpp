@@ -58,16 +58,6 @@
 #include <wstring.h>
 #endif
 
-// BobT 11-Sept-1998: Changed '#if 0' to '#if FULL_TOOLKIT'.
-#if FULL_TOOLKIT
-#include <stdio.h>
-#include <string.h>
-#include "aafCvt.h"
-#include "aafTable.h"
-#include "AAFPrivate.h"
-#include "AAFUtils.h"
-#endif
-
 #include "ImplAAFObjectCreation.h"
 
 #define DEFAULT_NUM_MOBS				1000
@@ -76,28 +66,25 @@
 #define DEFAULT_NUM_EFFECT_DEFS		100
 
 
-// This is temporary and will be replaced when sequence
-// factory method is available.
-extern "C" const aafClassID_t CLSID_AAFIdentification;
-extern "C" const aafClassID_t	CLSID_AAFContentStorage;
+// We need the class id of the dictionary so that we can then use the factory
+// method on dictionary 
+extern "C" const aafClassID_t	CLSID_AAFDictionary;
 
 ImplAAFHeader::ImplAAFHeader ()
-: _byteOrder(         PID_Header_ByteOrder,          "Byte Order"),
-  _lastModified(      PID_Header_LastModified,       "Last Modified"),
-  _identificationList(PID_Header_IdentificationList, "Identification List"),
-  _contentStorage(		PID_Header_Content,	"Content")
+: _byteOrder(         PID_Header_ByteOrder,          "ByteOrder"),
+  _lastModified(      PID_Header_LastModified,       "LastModified"),
+  _identificationList(PID_Header_IdentificationList, "IdentificationList"),
+  _contentStorage(		PID_Header_Content,	"Content"),
+  _dictionary(PID_Header_Dictionary,	"Dictionary")
 {
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
   _persistentProperties.put(_identificationList.address());
   _persistentProperties.put(_contentStorage.address());
+  _persistentProperties.put(_dictionary.address());
 
   //!!!	_head = this;
 //	file->InternalSetHead(this);
-#if FULL_TOOLKIT
-	_mobs = (omTable_t *)NULL;
-	_dataObjs = (omTable_t *)NULL;
-#endif
 	_fileRev.major = 0;
 	_fileRev.minor = 0;
 	_toolkitRev.major = 0;
@@ -107,10 +94,6 @@ ImplAAFHeader::ImplAAFHeader ()
 	_toolkitRev.patchLevel = 0;
 //!!!	_byteOrder;
 //!!!	_lastModified;
-// trr - Moved conditional creation of content storage to GetContentStorage method
-// so that we do not leak an object when the file is restored. We may have to do
-// something similar for the dictionary.
-//	_contentStorage = (ImplAAFContentStorage *)CreateImpl(CLSID_AAFContentStorage);
 }
 
 
@@ -118,24 +101,25 @@ ImplAAFHeader::~ImplAAFHeader ()
 {
 	// Release all of the id pointers in the id list.
 	//
-	ImplAAFIdentification *pIdent = NULL;
-  size_t size;
-  _identificationList.getSize(size);
+	size_t size = _identificationList.getSize();
 	for (size_t i = 0; i < size; i++) {
-		_identificationList.getValueAt(pIdent, i);
+		ImplAAFIdentification *pIdent = _identificationList.setValueAt(0, i);
 
 		if (pIdent) {
 			pIdent->ReleaseReference();
-			// Set value to 0 so the OM can perform any necessary cleanup.
-			pIdent = 0;
-			_identificationList.setValueAt(pIdent, i);
 		}
 	}
 
-	// Release the content storage pointer. Set the 
-	if (_contentStorage) {
-		_contentStorage->ReleaseReference();
-		_contentStorage = 0;
+	// Release the content storage pointer.
+	ImplAAFContentStorage *contentStorage = _contentStorage.setValue(0);
+	if (contentStorage) {
+		contentStorage->ReleaseReference();
+	}
+
+	// Release the dictionary pointer.
+	ImplAAFDictionary *dictionary = _dictionary.setValue(0);
+	if (dictionary) {
+		dictionary->ReleaseReference();
 	}
 }
 
@@ -308,7 +292,15 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+
+  *ppDictionary = GetDictionary();
+  if (*ppDictionary)
+  {
+    (*ppDictionary)->AcquireReference();
+    return AAFRESULT_SUCCESS;
+  }
+  else
+    return AAFRESULT_NULLOBJECT;
 }
 
 
@@ -400,7 +392,6 @@ AAFRESULT
 	aafBool						dummyIDNT = AAFFalse;
 	aafProductVersion_t			dummyVersion;
 	
-//!!!	aafAssertValidFHdl(_file);
 	XPROTECT()
 	{		
 		if(pIdent == (aafProductIdentification_t *)NULL)
@@ -419,15 +410,21 @@ AAFRESULT
 			dummyIDNT = AAFTrue;
 		}
 		
-	XASSERT(pIdent != NULL, OM_ERR_NEED_PRODUCT_IDENT);
+	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
     if (pIdent->productVersionString == 0) {
       pIdent->productVersionString = L"Unknown version";
     }
     if (pIdent->platform == 0) {
       pIdent->platform = L"Windows NT";
     }
-
-    identObj = static_cast<ImplAAFIdentification *>(CreateImpl(CLSID_AAFIdentification));
+    
+    // Get the dictionary so that we can use the factory
+    // method to create the identification.
+    ImplAAFDictionary *pDictionary = GetDictionary();
+    if (NULL == pDictionary)
+      CHECK(AAFRESULT_NOMEMORY);
+    CHECK(pDictionary->CreateInstance(&AUID_AAFIdentification, (ImplAAFObject **)&identObj));
+//    identObj = static_cast<ImplAAFIdentification *>(CreateImpl(CLSID_AAFIdentification));
     if (NULL == identObj)
       CHECK(AAFRESULT_NOMEMORY);
     CHECK(identObj->SetCompanyName(pIdent->companyName));
@@ -443,23 +440,22 @@ AAFRESULT
 	}
 	XEND
 	
-	return(OM_ERR_NONE);
+	return(AAFRESULT_SUCCESS);
 }
 
 
 AAFRESULT 
     ImplAAFHeader::AppendIdentification (ImplAAFIdentification * pIdent)
 {
-  if (! pIdent)
+	if (! pIdent)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
 
 	_identificationList.appendValue(pIdent);
 	pIdent->AcquireReference();
 
-
-  return AAFRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -501,17 +497,17 @@ AAFRESULT STDMETHODCALLTYPE
 			if ((_fileRev.major == 1) && (_fileRev.minor == 0))
 			  *pRevision = kAAFRev1;
 			else
-				RAISE(OM_ERR_FILEREV_NOT_SUPP);
+				RAISE(AAFRESULT_FILEREV_NOT_SUPP);
 		  }
 		else
-			RAISE(OM_ERR_FILEREV_NOT_SUPP);
+			RAISE(AAFRESULT_FILEREV_NOT_SUPP);
 	}
 	XEXCEPT
 	{
 	}
 	XEND;
 
-	return (OM_ERR_NONE);
+	return (AAFRESULT_SUCCESS);
 #else
   return AAFRESULT_NOT_IMPLEMENTED;
 #endif
@@ -525,7 +521,8 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pTimeStamp = _lastModified;
+  return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
@@ -533,13 +530,26 @@ AAFRESULT ImplAAFHeader::SetModified(void)		// To NOW
 	aafTimeStamp_t	now;
 
 	AAFGetDateTime(&now);
-	return (OM_ERR_NONE);
+	_lastModified = now;
+	return (AAFRESULT_SUCCESS);
+}
+
+void ImplAAFHeader::SetByteOrder(const aafInt16 byteOrder)
+{
+	_byteOrder = byteOrder;
+}
+
+void ImplAAFHeader::SetDictionary(ImplAAFDictionary *pDictionary)
+{
+	_dictionary = pDictionary;
+  if (pDictionary)
+    pDictionary->AcquireReference();
 }
 
 AAFRESULT ImplAAFHeader::SetToolkitRevisionCurrent()
 {
 	_toolkitRev = AAFReferenceImplementationVersion;
-	return (OM_ERR_NONE);
+	return (AAFRESULT_SUCCESS);
 }
 
 AAFRESULT ImplAAFHeader::LoadMobTables(void)
@@ -548,82 +558,16 @@ AAFRESULT ImplAAFHeader::LoadMobTables(void)
 	return(cstore->LoadMobTables());
 }
 
-/************************
- * Function: BuildMediaCache (INTERNAL)
- *
- * 		This function is a callback from the openFile and createFile
- *		group of functions.  This callback exists in order to allow the
- *		media layer to be independant, and yet have information of its
- *		own in the opaque file handle.
- *
- * Argument Notes:
- *		<none>.
- *
- * ReturnValue:
- *		Error code (see below).
- *
- * Possible Errors:
- *		Standard errors (see top of file).
- */
-AAFRESULT ImplAAFHeader::BuildMediaCache(void)
-{
-#if FULL_TOOLKIT
-	aafInt32						siz, n, dataObjTableSize;
-	AAFObject *				obj;
-	aafUID_t					uid;
-	
-	XPROTECT(_file)
-	{
-		{
-		   siz = GetObjRefArrayLength(OMHEADMediaData);
-			dataObjTableSize = (siz < DEFAULT_NUM_DATAOBJ ? 
-									  DEFAULT_NUM_DATAOBJ : siz);
-			CHECK(NewUIDTable(_file, dataObjTableSize, &(_dataObjs)));
-			for(n = 1; n <= siz; n++)
-			  {
-				 CHECK(ReadNthObjRefArray(OMHEADMediaData, 
-													  &obj, n));
-				 CHECK(obj->ReadUID(OMMDATMobID, &uid));
-				 CHECK(TableAddUID(_dataObjs, uid,obj,kOmTableDupAddDup));
-			  }
-		 }
-	}
-	XEXCEPT
-	XEND
-#endif
-	
-	return(OM_ERR_NONE);
-}
-
-AAFRESULT ImplAAFHeader::AppendDataObject(aafUID_t mobID,      /* IN - Mob ID */
-						  ImplAAFObject *dataObj)    /* IN - Input Mob */ 
-{
-#if FULL_TOOLKIT
-	XPROTECT(_file)
-	  {
-		CHECK(AppendObjRefArray(OMHEADMediaData, dataObj));
-		CHECK(TableAddUID(_dataObjs, mobID, dataObj, kOmTableDupError));
-	  } /* XPROTECT */
-	XEXCEPT
-	  {
-		return(XCODE());
-	  }
-	XEND;
-#endif
-	
-	return(OM_ERR_NONE);
-}
-
 AAFRESULT ImplAAFHeader::IsValidHeadObject(void)
 {
 #if FULL_TOOLKIT
 	aafClassID_t  		omfiID;
 
-	if (GetClassID(omfiID) != OM_ERR_NONE)
-		  return(OM_ERR_NOTAAFFILE);
+	if (GetClassID(omfiID) != AAFRESULT_SUCCESS)
+		  return(AAFRESULT_NOTAAFFILE);
 	if (!streq(omfiID, "HEAD"))
-	  return(OM_ERR_NOTAAFFILE);
-	return(OM_ERR_NONE);
+	  return(AAFRESULT_NOTAAFFILE);
+	return(AAFRESULT_SUCCESS);
 #else
   return AAFRESULT_NOT_IMPLEMENTED;
 #endif
@@ -641,9 +585,15 @@ ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
 	ImplAAFContentStorage	*result = _contentStorage;
 
 	// Create the content storage object if it does not exist.
-	if (NULL == result) {
-		result = (ImplAAFContentStorage *)CreateImpl(CLSID_AAFContentStorage);
-		_contentStorage = result;
+	if (NULL == result)
+  { // Get the dictionary so that we can use the factory
+    // method to create the identification.
+    ImplAAFDictionary *pDictionary = GetDictionary();
+    if (NULL != pDictionary)
+    {
+      pDictionary->CreateInstance(&AUID_AAFContentStorage, (ImplAAFObject **)&result);
+		  _contentStorage = result;
+    }
 	}
 
 	return(result);
@@ -652,19 +602,9 @@ ImplAAFContentStorage *ImplAAFHeader::GetContentStorage()
 // Fill in when dictionary property is supported.
 ImplAAFDictionary *ImplAAFHeader::GetDictionary()
 {
-#if 0
 	ImplAAFDictionary	*result = _dictionary;
-
-	// Create the dictionary object if it does not exist.
-	if (NULL == result) {
-		result = (ImplAAFDictionary *)CreateImpl(CLSID_AAFDictionary);
-		_dictionary = result;
-	}
-
+  assert(result);
 	return(result);
-#else
-	return NULL;
-#endif
 }
 
 OMDEFINE_STORABLE(ImplAAFHeader, AUID_AAFHeader);
