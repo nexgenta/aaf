@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFTypes.dod,v 1.84 2004/12/09 18:13:25 stuart_hc Exp $ $Name:  $
+#c $Id: AAFTypes.dod,v 1.85 2005/02/04 19:31:45 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -246,7 +246,7 @@ AD_CPP_QUOTE(typedef enum _aafJPEGcomponent_e)
 AD_CPP_QUOTE({)
 AD_CPP_QUOTE(	kAAFJcLuminance = 0\,) 
 AD_CPP_QUOTE(	kAAFJcChrominance = 1)
-AD_CPP_QUOTE(#if ! defined(STANDARD_JPEG_Q))
+AD_CPP_QUOTE(#if ! defined\(STANDARD_JPEG_Q\))
 AD_CPP_QUOTE(	\, kAAFJcLuminanceFP16 = 2\,) 
 AD_CPP_QUOTE(	kAAFJcChrominanceFP16 = 3)
 AD_CPP_QUOTE(#endif)
