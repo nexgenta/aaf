@@ -1,5 +1,5 @@
 /*
- * $Id: Utilities.cpp,v 1.5 2004/06/01 15:36:34 philipn Exp $ $Name:  $
+ * $Id: Utilities.cpp,v 1.6 2004/06/02 10:57:42 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -519,7 +519,7 @@ ProcessRecordString( string s )
       {
 	 ret.erase( index, 1 );
 	 ret.insert( index, "\\n" );
-	 index += 2;
+	 index += 1;
       }
       // escape special characters in quotes
       else if ( ret[ index ] == '"' ||
@@ -582,7 +582,7 @@ LimitAttributeSize( string attribute, int maxLength, int maxWidth )
 	 if (escape)
 	 {
 	    index++;
-	    if (index < retAttribute.size())
+	    if (index < (int)retAttribute.size())
 	    {
 	       retAttribute.insert(index,"\\n");
 	    }
