@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStructuredStorage.cpp,v 1.6 2004/11/02 14:16:58 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStructuredStorage.cpp,v 1.7 2004/11/05 09:58:13 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -553,7 +553,7 @@ ULONG STDMETHODCALLTYPE
 OMSSIStream::Release(void)
 {
 	TRACE("OMSSIStream::Release");
-	ULONG result = --_referenceCount;
+	--_referenceCount;
 	sresult status = SSTG_OK;
 	if (_referenceCount == 0)
 	{
