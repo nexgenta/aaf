@@ -25,7 +25,7 @@
 *
 ************************************************************************/
 
-// @doc OMINTERNAL
+// @doc OMEXTERNAL
 #ifndef OMFILE_H
 #define OMFILE_H
 
@@ -36,6 +36,7 @@
 
 class OMClassFactory;
 class OMObjectDirectory;
+class OMPropertyTable;
 class OMStoredObject;
 
 // @class Files supported by the Object Manager.
@@ -74,17 +75,6 @@ public:
                                     const OMClassFactory* factory,
                                     const OMLoadMode loadMode);
 
-    // @cmember Open a new <c OMFile> for write-only access, the
-    //          <c OMFile> is named <p fileName>, use the <c OMClassFactory>
-    //          <p factory> to create the objects. The file must not already
-    //          exist. The byte ordering on the newly created file is given
-    //          by <p byteOrder>. The root <c OMStorable> in the newly
-    //          created file is given by <p root>.
-  static OMFile* openNewWrite(const wchar_t* fileName,
-                              const OMClassFactory* factory,
-                              const OMByteOrder byteOrder,
-                              OMStorable* root);
-
     // @cmember Open a new <c OMFile> for modify access, the
     //          <c OMFile> is named <p fileName>, use the <c OMClassFactory>
     //          <p factory> to create the objects. The file must not already
@@ -94,28 +84,27 @@ public:
   static OMFile* openNewModify(const wchar_t* fileName,
                                const OMClassFactory* factory,
                                const OMByteOrder byteOrder,
-                               OMStorable* root);
+                               OMStorable* root,
+                               const OMFileSignature& signature);
 
-    // @cmember Open a new transient <c OMFile> for modify access, the
-    //          <c OMFile> is not named, use the <c OMClassFactory>
-    //          <p factory> to create the objects.
-    //          The byte ordering on the newly created file is given
-    //          by <p byteOrder>. The root <c OMStorable> in the newly
-    //          created file is given by <p root>.
-  static OMFile* openNewTransient(const OMClassFactory* factory,
-                                  const OMByteOrder byteOrder,
-                                  OMStorable* root);
+     // @cmember Is <p signature> a valid signature for an <c OMFile> ?
+  static bool validSignature(const OMFileSignature& signature);
 
   // @access Public members.
 
-    // @cmember Constructor.
-  OMFile(const OMAccessMode mode,
+    // @cmember Constructor. Create an <c OMFile> object representing
+    //          an existing external file.
+  OMFile(const wchar_t* fileName,
+         const OMAccessMode mode,
          OMStoredObject* store,
          const OMClassFactory* factory,
          const OMLoadMode loadMode);
 
-    // @cmember Constructor.
-  OMFile(const OMAccessMode mode,
+    // @cmember Constructor. Create an <c OMFile> object representing
+    //          a new external file.
+  OMFile(const wchar_t* fileName,
+         OMFileSignature signature,
+         const OMAccessMode mode,
          OMStoredObject* store,
          const OMClassFactory* factory,
          OMStorable* root);
@@ -126,7 +115,7 @@ public:
     // @cmember Save all changes made to the contents of this
     //          <c OMFile>. It is not possible to <mf OMFile::save>
     //          read-only or transient files.
-  void save(void);
+  void save(void* clientOnSaveContext = 0);
 
     // @cmember Save the entire contents of this <c OMFile> as well as
     //          any unsaved changes in the new file <p fileName>. The file
@@ -151,20 +140,27 @@ public:
     // @cmember Retrieve the root <c OMStoredObject> from this <c OMFile>.
   OMStoredObject* rootStoredObject(void);
 
-    // @cmember Retrieve the <c OMClassFactory> from this <c OMFile>.
-    //   @this const
-  const OMClassFactory* classFactory(void) const;
+    // @cmember Retrieve the <c OMPropertyTable> from this <c OMFile>.
+  OMPropertyTable* referencedProperties(void);
 
     // @cmember Retrieve the <c OMObjectDirectory> from this <c OMFile>.
   OMObjectDirectory* objectDirectory(void);
 
     // @cmember The byte order of this <c OMFile>.
-    //   @this const
   OMByteOrder byteOrder(void) const;
 
     // @cmember The loading mode (eager or lazy) of this <c OMFile>.
-    //   @this const
   OMLoadMode loadMode(void) const;
+
+    // @cmember Is this file recognized by the Object Manager ?
+  bool isOMFile(void) const;
+
+    // @cmember The signature of this <c OMFile>.
+  OMFileSignature signature(void) const;
+
+    // @cmember Find the property instance in this <c OMFile>
+    //          named by <p propertyPathName>.
+  virtual OMProperty* findPropertyPath(const char* propertyPathName) const;
 
   // OMStorable overrides.
   //
@@ -176,16 +172,30 @@ public:
 
   virtual bool persistent(void) const;
 
+  void* clientOnSaveContext(void);
+
 private:
+  // @access Private members.
+
+    // @cmember Write the signature to the given file.
+  void writeSignature(const wchar_t* fileName);
+
+    // @cmember Read the signature from the given file.
+  void readSignature(const wchar_t* fileName);
 
   OMStorable* _root;
   OMStoredObject* _rootStoredObject;
   
-  const OMClassFactory* _classFactory;
   OMObjectDirectory* _objectDirectory;
+  OMPropertyTable* _referencedProperties;
 
   enum OMAccessMode _mode;
   enum OMLoadMode _loadMode;
+  wchar_t* _fileName;
+  OMFileSignature _signature;
+
+  void* _clientOnSaveContext;
+
 };
 
 #endif
