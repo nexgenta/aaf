@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFKLVDataDefinition.h,v 1.1.2.2 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
+// $Id: CAAFKLVDataDefinition.h,v 1.1.2.3 2004/05/24 18:56:57 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,6 +64,22 @@ protected:
 public:
 
 
+
+  //***********************************************************
+  //
+  // Initialize()
+  //
+  // Init all fields of a definition object.
+  //
+  STDMETHOD (Initialize) (
+    // AUID for new DeObject
+    /*[in, ref]*/ aafUID_constref  id,
+
+    // Name for new DefObject
+    /*[in, string]*/ aafCharacter_constptr  pName,
+
+    // Description for new DefObject
+    /*[in, string]*/ aafCharacter_constptr  pDescription);
 
   //***********************************************************
   //

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTaggedValueDefinition.h,v 1.1.2.3 2004/05/01 18:48:33 jptrainor Exp $ $Name:  $
+// $Id: CAAFTaggedValueDefinition.h,v 1.1.2.4 2004/05/24 18:56:58 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,6 +65,21 @@ public:
 
 
 
+  //***********************************************************
+  //
+  // Initialize()
+  //
+  // Init all fields of a definition object.
+  //
+  STDMETHOD (Initialize) (
+    // AUID for new DeObject
+    /*[in, ref]*/ aafUID_constref  id,
+
+    // Name for new DefObject
+    /*[in, string]*/ aafCharacter_constptr  pName,
+
+    // Description for new DefObject
+    /*[in, string]*/ aafCharacter_constptr  pDescription);
 
   //***********************************************************
   //
