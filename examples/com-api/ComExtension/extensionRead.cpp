@@ -28,19 +28,17 @@
 
 #include "extensionRead.h"
 #include "extensionUtils.h"
-#include "AAFResult.h"
 
 #include <iostream.h>
 #include <assert.h>
-
 
 //
 // This example code is intended to show how AAF may be extended to
 // store personnel information relating to the staff which worked on a
 // project.
 //
-// See comments in extensionWrite.cpp for a discussion of what we're
-// trying to do and how we're doing it.
+// See comments in extension.cpp for a discussion of what we're trying
+// to do and how we're doing it.
 //
 
 bool extensionRead (const aafCharacter * filename)
@@ -49,171 +47,74 @@ bool extensionRead (const aafCharacter * filename)
 
   cout << "***Reading file " << filename << "***" << endl;
 
-  IAAFFile *pFile=NULL;
+  IAAFFileSP pFile;
   check (AAFFileOpenExistingRead ((aafCharacter*) filename,
 								  0,
 								  &pFile));
   
-  IAAFHeader *pHead=NULL;
+  IAAFHeaderSP pHead;
   check (pFile->GetHeader(&pHead));
 
-  IAAFDictionary *pDict=NULL;
+  IAAFDictionarySP pDict;
   check (pHead->GetDictionary(&pDict));
 
-  IAAFTypeDef *ptd=NULL;
-  IAAFClassDef *pcd=NULL;
+  IAAFTypeDefSP ptd;
+  IAAFClassDefSP pcd;
 
-  cout << "Verifying position enum type has been registered." << endl;
-  check (pDict->LookupTypeDef (kTypeID_ePosition, &ptd));
-  ptd->Release();
-  ptd=NULL;
+  cout << "Verifying role enum type has been registered." << endl;
+  check (pDict->LookupType ((aafUID_t*) &kTypeID_eRole, &ptd));
 
   cout << "Verifying PersonnelResource class has been registered." << endl;
-  check (pDict->LookupClassDef (kClassID_PersonnelResource, &pcd));
-  pcd->Release();
-  pcd=NULL;
+  check (pDict->LookupClass ((aafUID_t*) &kClassID_PersonnelResource, &pcd));
 
-  cout << "Verifying AdminMob class has been registered." << endl;
-  check (pDict->LookupClassDef (kClassID_AdminMob, &pcd));
-  pcd->Release();
-  pcd=NULL;
+  cout << "Verifying PersonnelMob class has been registered." << endl;
+  check (pDict->LookupClass ((aafUID_t*) &kClassID_PersonnelMob, &pcd));
 
   cout << "Verifying PersonnelResourceReference type has been"
 	   << " registered." << endl;
-  check (pDict->LookupTypeDef (kTypeID_PersonnelResourceStrongReference,
-							   &ptd));
-  ptd->Release();
-  ptd=NULL;
+  check (pDict->LookupType ((aafUID_t*) &kTypeID_PersonnelResourceStrongReference,
+							&ptd));
 
   cout << "Verifying PersonnelResourceReferenceVector type has been"
 	   << " registered." << endl; 
-  check (pDict->LookupTypeDef (kTypeID_PersonnelResourceStrongReferenceVector,
-							   &ptd));
-  ptd->Release();
-  ptd=NULL;
+  check (pDict->LookupType ((aafUID_t*) &kTypeID_PersonnelResourceStrongReferenceVector,
+							&ptd));
 
-  cout << "Verifying AdminMob instance has been created and added" 
-	   << " to header." << endl;
-  // Need to find AdminMob, temp iterate through Mobs to find one.
-  IEnumAAFMobs*	pMobIter = NULL;
-  IAAFMob *pMob=NULL;
-  bool foundAdmin=false;
-  check(pHead->GetMobs(NULL, &pMobIter));
-  while(!foundAdmin && (AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob)))
-  {
-	//Check if Mob is a Admin Mob
-	IAAFObject *pObject;
-	check(pMob->QueryInterface(IID_IAAFObject,(void **)&pObject));
-	IAAFClassDef *pMobCD=NULL;
-	check (pObject->GetDefinition(&pMobCD));
-	pObject->Release();
-	pObject=NULL;
-	if (classDefinitionIsA(pMobCD, kClassID_AdminMob))
+  cout << "Verifying PersonnelMob has been created and added to"
+	   << " header." << endl;
+  IAAFMobSP pMob;
+  check (pHead->LookupMob ((aafUID_t*) &kMobID_Personnel,
+						   &pMob));
+
+  /*
+  cout << "Printing contents of PersonnelMob." << endl;
+
+  aafUInt32 numPersonnel = 
+	PersonnelMobGetArraySize (pMob);
+  cout << "There are " << numPersonnel << " personnel registered:"
+	   << endl;
+
+  IAAFObject ** personnelArray = 0;
+  personnelArray = new IAAFObject*[numPersonnel];
+  assert (personnelArray);
+  aafUInt32 i;
+  for (i = 0; i < numPersonnel; i++)
+	personnelArray[i] = 0;
+
+  if (numPersonnel)
+	PersonnelMobGetArray (pMob, personnelArray, numPersonnel);
+
+  for (i = 0; i < numPersonnel; i++)
 	{
-		foundAdmin = true;
-	} else
-	{
-		// will need to release pMob when it is not the right mob
-		pMob->Release();
-		pMob=NULL;
+	  assert (personnelArray[i]);
+	  cout << endl;
+	  PersonnelResource r =
+		PersonnelRecordGetInfo (personnelArray[i]);
+	  PrintPersonnelResource (pDict, r);
 	}
- 	pMobCD->Release();
-	pMobCD=NULL;
-  }
+  */
 
-
-  if (foundAdmin) 
-  {
-	  cout << "Printing contents of Admin Mob." << endl;
-	  aafUInt32 numPersonnel;
-	  AdminMobGetNumPersonnel(pDict, pMob, &numPersonnel);
-      cout << "There are " << numPersonnel
-	   << " personnel record objects." << endl;
-
-      // Print each element in the array.
-      aafUInt32 i;
-      for (i = 0; i < numPersonnel; i++)
-	  {
-		  IAAFObject *personnelResource;
-		  AdminMobGetNthPersonnel(pDict, pMob, i,
-							   &personnelResource);
-		  aafUInt32 bufferLen,numChars;
-		  PersonnelResourceGetGivenNameBufLen (personnelResource, &bufferLen);
-		  numChars = bufferLen/sizeof(aafCharacter);
-
-
-		  aafCharacter *givenName = new aafCharacter [numChars+1];
-		  PersonnelResourceGetGivenName (personnelResource,
-										  givenName,
-										  bufferLen+2);
-          cout << "Given Name:     " << givenName << endl;
-		  delete[] givenName;
-
-		  PersonnelResourceGetFamilyNameBufLen (personnelResource, &bufferLen);
-		  numChars = bufferLen/sizeof(aafCharacter);
-
-
-		  aafCharacter *familyName = new aafCharacter [numChars];
-		  PersonnelResourceGetFamilyName (personnelResource,
-										  familyName,
-										  bufferLen);
-          cout << "Family Name:    " << familyName << endl;
-		  delete[] familyName;
-
-		  ePosition position;
-		  PersonnelResourceGetPosition (personnelResource,
-							 &position);
-		  cout << "Position:       ";
-		  PrintPosition (pDict, position);
-		  cout << endl;
-
-		  HRESULT retStatus;
-		  contractID_t cid;
-		  retStatus = PersonnelResourceGetContractID (personnelResource,
-								   &cid);
-		  if (retStatus == AAFRESULT_PROP_NOT_PRESENT) 
-		  {
-			  cout << "No ContractID defined" << endl;
-		  } else if (SUCCEEDED(retStatus))
-		  {
-			  cout << "ContractID:     " << dec << cid << endl;
-		  } else check (retStatus);
-
-		  retStatus = PersonnelResourceGetActorNameBufLen (personnelResource,
-										   &bufferLen);
-		  if (retStatus == AAFRESULT_PROP_NOT_PRESENT) 
-		  {
-			  cout << "No ActorRole defined" << endl;
-		  } else if (SUCCEEDED(retStatus))
-		  {
-			numChars = bufferLen/sizeof(aafCharacter);
-			aafCharacter *actorRole = new aafCharacter [numChars];
-		    check(PersonnelResourceGetActorName (personnelResource,
-										  actorRole,
-										  bufferLen));
-            cout << "ActorRole:      " << actorRole << endl;
-		    delete[] actorRole;
-		  }
-		  cout << endl;
-		  personnelResource->Release();
-		  personnelResource=NULL;
-	  }
-
-	  pMob->Release();
-	  pMob=NULL;
-  } else
-  {
-	  cout << "Did not find Admin Mob" << endl;
-  }
-  // done.
   pFile->Close ();
-  pFile->Release();
-  pFile=NULL;
-  pHead->Release();
-  pHead=NULL;
-  pDict->Release();
-  pDict=NULL;
-  pMobIter->Release();
-  pMobIter=NULL;
+
   return true;
 }
