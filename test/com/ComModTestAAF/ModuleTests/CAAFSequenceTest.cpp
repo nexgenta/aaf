@@ -249,6 +249,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	if (pFile)
 	{
+		pFile->Save();
 		pFile->Close();
 		pFile->Release();
 	}
@@ -270,7 +271,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFComponents*	pCompIter = NULL;
 	aafNumSlots_t	numMobs;
 	aafSearchCrit_t	criteria;
-	HRESULT			hr;
+	HRESULT			hr = S_OK;
 
 
   try

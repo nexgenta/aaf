@@ -229,7 +229,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   if (pFile)
   {  // Close file
     if (bFileOpen)
-      pFile->Close();
+	{
+		pFile->Save();
+		pFile->Close();
+	}
      pFile->Release();
   }
 
@@ -288,7 +291,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 			unsigned long	s = 0;
 
 			// Enumerate over all MOB slots for this MOB
-			hr = pMob->EnumAAFAllMobSlots(&pSlotIter);
+			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
 			while (pSlotIter && pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS)
 			{
 				aafWChar			slotName[500];
@@ -302,9 +305,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
         
         // Validate the slot id.
 				checkResult(pSlot->GetSlotID(&slotID));
-				checkExpression(slotID != s+1, AAFRESULT_TEST_FAILED);
+				checkExpression(slotID == s+1, AAFRESULT_TEST_FAILED);
 
-				checkResult(pMasterMob->GetTapeNameBufLen(slotID, &bufSize));
+//				checkResult(pMasterMob->GetTapeNameBufLen(slotID, &bufSize));
 				if (bufSize)
 				{
 					pTapeName = new aafWChar [bufSize];

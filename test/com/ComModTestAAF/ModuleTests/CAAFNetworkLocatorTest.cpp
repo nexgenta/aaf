@@ -70,7 +70,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUID_t					newUID;
 	aafInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
-	aafUID_t					ddef = DDEF_Audio;
 	aafRational_t	audioRate = { 44100, 1 };
 
 
@@ -179,7 +178,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pFile)
 	{
 		if (bFileOpen)
+		  {
+			pFile->Save();
 			pFile->Close();
+		  }
 		pFile->Release();
 	}
 	// hr = pSession->EndSession();
