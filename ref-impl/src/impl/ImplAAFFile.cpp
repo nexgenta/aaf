@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.142 2005/03/16 17:58:01 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.143 2005/03/17 08:15:10 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1002,16 +1002,10 @@ ImplAAFFile::CreateAAFFileOnRawStorage
 												0,
 												loadMode,
 												aafFileEncoding,
+
 												_metafactory);
-
-			  // Make sure properties that exist in builtin class
-			  // definitions but not the file's class definition,
-			  // are merged to the file's class definition.
-			  ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(_metafactory);
-			  assert(d);
-			  checkResult( d->MergeBuiltinClassDefs() );
-
 			}
+
 		} // endif new/existing
 	  else
 		{
