@@ -64,7 +64,9 @@ ImplAAFDefObject::~ImplAAFDefObject ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::Init (
-      aafUID_t *pAuid, aafWChar *pName, aafWChar *pDesc)
+      const aafUID_t *pAuid,
+	  const aafWChar *pName,
+	  const aafWChar *pDesc)
 {
 	if (pAuid == NULL || pName == NULL || pDesc == NULL)
 	{
@@ -80,7 +82,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetName (
-      wchar_t *  pName)
+      const wchar_t *  pName)
 {
   if (! pName)
 	{
@@ -146,18 +148,22 @@ AAFRESULT STDMETHODCALLTYPE
       wchar_t * pDescription,
       aafUInt32 bufSize)
 {
-  bool stat;
-  if (! pDescription)
+	bool stat;
+	if (! pDescription)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  stat = _description.copyToBuffer(pDescription, bufSize);
-  if (! stat)
+	if (!_description.isPresent())
 	{
-	  return AAFRESULT_SMALLBUF;
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
-
-  return AAFRESULT_SUCCESS;
+	stat = _description.copyToBuffer(pDescription, bufSize);
+	if (! stat)
+	{
+		return AAFRESULT_SMALLBUF;
+	}
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -165,18 +171,22 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::GetDescriptionBufLen (
       aafUInt32 * pBufSize)  //@parm [in,out] Definition Name length
 {
-  if (! pBufSize)
+	if (! pBufSize)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  *pBufSize = _description.size();
-  return AAFRESULT_SUCCESS;
+	if (!_description.isPresent())
+		*pBufSize = 0;
+	else
+		*pBufSize = _description.size();
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::GetAUID (
-      aafUID_t *pAuid)
+      aafUID_t *pAuid) const
 {
   if (pAuid == NULL)
 	{
@@ -193,7 +203,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetAUID (
-      aafUID_t *pAuid)
+      const aafUID_t *pAuid)
 {
   if (pAuid == NULL)
 	{
