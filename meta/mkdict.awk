@@ -210,15 +210,11 @@ BEGIN {
   printf("//     concrete  = true if the class is concrete\n");
   printf("//                 false if the class is abstract\n");
   printf("//\n");
-  printf("// AAF_CLASS_END(name, id, parent, concrete)\n");
+  printf("// AAF_CLASS_END(name)\n");
   printf("//\n");
   printf("//   End an AAF class definition.\n");
   printf("//\n");
   printf("//     name      = the name of the class\n");
-  printf("//     id        = the auid used to identify the class [*]\n");
-  printf("//     parent    = the immediate ancestor class\n");
-  printf("//     concrete  = true if the class is concrete\n");
-  printf("//                 false if the class is abstract\n");
   printf("//\n");
   printf("// AAF_CLASS_SEPARATOR()\n");
   printf("//\n");
@@ -292,13 +288,11 @@ BEGIN {
   printf("//     value     = the value of this enumeration member\n");
   printf("//     container = the name of the containing enumerated type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_ENUMERATION_END(name, id, type)\n");
+  printf("// AAF_TYPE_DEFINITION_ENUMERATION_END(name)\n");
   printf("//\n");
   printf("//   End an AAF enumerated type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
-  printf("//     id        = the auid used to identify the type [*]\n");
-  printf("//     type      = the type of each enumeration element [*]\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_RECORD(name, id)\n");
   printf("//\n");
@@ -315,12 +309,11 @@ BEGIN {
   printf("//     type      = the type of the field [*]\n");
   printf("//     container = the name of the containing record type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_RECORD_END(name, id)\n");
+  printf("// AAF_TYPE_DEFINITION_RECORD_END(name)\n");
   printf("//\n");
   printf("//   End an AAF record type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
-  printf("//     id        = the auid used to identify the type [*]\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_VARYING_ARRAY(name, id, type)\n");
   printf("//\n");
@@ -371,12 +364,11 @@ BEGIN {
   printf("//     auid      = the auid of this enumeration member [*]\n");
   printf("//     container = the name of the containing extendible enumerated type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name, id)\n");
+  printf("// AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name)\n");
   printf("//\n");
   printf("//   End an AAF extendible enumerated type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
-  printf("//     id        = the auid used to identify the type [*]\n");
   printf("//\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_CHARACTER(name, id)\n");
@@ -448,13 +440,11 @@ BEGIN {
   printf("//     parent    = the parent property for member [*]\n");
   printf("//     container = the name of the containing weak reference type\n");
   printf("//\n");
-  printf("// AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name, id, type)\n");
+  printf("// AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name)\n");
   printf("//\n");
   printf("//   End an AAF extendible enumerated type definition.\n");
   printf("//\n");
   printf("//     name      = the name of the type\n");
-  printf("//     id        = the auid used to identify the type [*]\n");
-  printf("//     type      = the target type [*]\n");
   printf("//\n");
   printf("//\n");
   printf("// AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET(name, id, type)\n");
@@ -502,7 +492,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_CLASS_END\n");
-  printf("#define AAF_CLASS_END(name, id, parent, concrete)\n");
+  printf("#define AAF_CLASS_END(name)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_CLASS_SEPARATOR\n");
@@ -546,7 +536,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_ENUMERATION_END\n");
-  printf("#define AAF_TYPE_DEFINITION_ENUMERATION_END(name, id, type)\n");
+  printf("#define AAF_TYPE_DEFINITION_ENUMERATION_END(name)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_RECORD\n");
@@ -558,7 +548,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_RECORD_END\n");
-  printf("#define AAF_TYPE_DEFINITION_RECORD_END(name, id)\n");
+  printf("#define AAF_TYPE_DEFINITION_RECORD_END(name)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_VARYING_ARRAY\n");
@@ -586,7 +576,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END\n");
-  printf("#define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name, id)\n");
+  printf("#define AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(name)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_CHARACTER\n");
@@ -626,7 +616,7 @@ BEGIN {
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_WEAK_REFERENCE_END\n");
-  printf("#define AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name, id, type)\n");
+  printf("#define AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(name)\n");
   printf("#endif\n");
   printf("\n");
   printf("#ifndef AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET\n");
@@ -671,8 +661,7 @@ BEGIN {
       if ($elementNameC != class) { # This is a new class
         if (class != "" ) {
           # end the old one
-          printf("AAF_CLASS_END(%s,%s,\n  %s,\n  %s)\n",
-                 class, cguid, parent, concrete);
+          printf("AAF_CLASS_END(%s)\n", class);
           printf("AAF_CLASS_SEPARATOR()\n");
           parent = $parentC;
         } else {
@@ -703,17 +692,16 @@ BEGIN {
         errors++;
       }
       # AAF_CLASS(name, id, parent)
-      cguid = formatAUID($SLO00C, $SLO01C, $SLO02C, $SLO03C,
-                         $SLO04C, $SLO05C, $SLO06C, $SLO07C,
-                         $SLO08C, $SLO09C, $SLO10C, $SLO11C,
-                         $SLO12C, $SLO13C, $SLO14C, $SLO15C, "  ");
+      guid = formatAUID($SLO00C, $SLO01C, $SLO02C, $SLO03C,
+                        $SLO04C, $SLO05C, $SLO06C, $SLO07C,
+                        $SLO08C, $SLO09C, $SLO10C, $SLO11C,
+                        $SLO12C, $SLO13C, $SLO14C, $SLO15C, "  ");
       printf("AAF_CLASS(%s,%s,\n  %s,\n  %s)\n",
-             $elementNameC, cguid, parent, concrete);
+             $elementNameC, guid, parent, concrete);
     } else if ($typeNameC == "type" ) {
       # a type
       if (firstType) {
-        printf("AAF_CLASS_END(%s,%s,\n  %s,\n  %s)\n",
-               class, cguid, parent, concrete);
+        printf("AAF_CLASS_END(%s)\n", class);
         printf("\n");
         printf("AAF_TABLE_END()\n");
         printf("\n");
@@ -725,21 +713,21 @@ BEGIN {
       } else {
         # end the previous type
         if (kind == "enumeration" ) {
-          printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s, %s, AAF_TYPE(%s))\n", typeName, tguid, etype);
+          printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s)\n", typeName);
         } else if (kind == "record") {
-          printf("AAF_TYPE_DEFINITION_RECORD_END(%s, %s)\n", typeName, tguid);
+          printf("AAF_TYPE_DEFINITION_RECORD_END(%s)\n", typeName);
         } else if (kind == "extendible") {
-          printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s, %s)\n", typeName, tguid);
+          printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s)\n", typeName);
         } else if ((kind == "reference") && (qualif == "weak")) {
-          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, tguid, targetType);
+          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(AAF_REFERENCE_TYPE_NAME(%s, %s))\n", typeName, targetType);
         }
         printf("AAF_TYPE_SEPARATOR()\n");
       }
 #
-      tguid = formatAUID($SLO00C, $SLO01C, $SLO02C, $SLO03C,
-                         $SLO04C, $SLO05C, $SLO06C, $SLO07C,
-                         $SLO08C, $SLO09C, $SLO10C, $SLO11C,
-                         $SLO12C, $SLO13C, $SLO14C, $SLO15C, "  ");
+      guid = formatAUID($SLO00C, $SLO01C, $SLO02C, $SLO03C,
+                        $SLO04C, $SLO05C, $SLO06C, $SLO07C,
+                        $SLO08C, $SLO09C, $SLO10C, $SLO11C,
+                        $SLO12C, $SLO13C, $SLO14C, $SLO15C, "  ");
 #
       typeName = $elementNameC;
       parentTypeName = typeName;
@@ -754,62 +742,61 @@ BEGIN {
       kind = $kindC;
       qualif = $qualifC;
       if        (kind == "integer") {
-        printf("AAF_TYPE_DEFINITION_INTEGER(%s, %s, %s, %s)\n", typeName, tguid, $qualifC, $elementTypeC);
+        printf("AAF_TYPE_DEFINITION_INTEGER(%s, %s, %s, %s)\n", typeName, guid, $qualifC, $elementTypeC);
       } else if (kind == "enumeration" ) {
-        etype = $qualifC;
-        printf("AAF_TYPE_DEFINITION_ENUMERATION(%s, %s, AAF_TYPE(%s))\n", typeName, tguid, etype);
+        printf("AAF_TYPE_DEFINITION_ENUMERATION(%s, %s, AAF_TYPE(%s))\n", typeName, guid, $qualifC);
       } else if (kind == "array") {
         elementType = $elementTypeC;
         if ($qualifC == "varying") {
-          printf("AAF_TYPE_DEFINITION_VARYING_ARRAY(%s, %s,\n  AAF_TYPE(%s))\n", typeName, tguid, elementType);
+          printf("AAF_TYPE_DEFINITION_VARYING_ARRAY(%s, %s,\n  AAF_TYPE(%s))\n", typeName, guid, elementType);
         } else if ($qualifC == "fixed") {
-          printf("AAF_TYPE_DEFINITION_FIXED_ARRAY(%s, %s,\n  AAF_TYPE(%s), %s)\n", typeName, tguid, elementType, $isMandatoryC);
+          printf("AAF_TYPE_DEFINITION_FIXED_ARRAY(%s, %s,\n  AAF_TYPE(%s), %s)\n", typeName, guid, elementType, $isMandatoryC);
         } else if ($qualifC == "strong") {
           # Special cases for strong reference vectors.
-            printf("AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, tguid, elementType);
+            printf("AAF_TYPE_DEFINITION_STRONG_REFERENCE_VECTOR(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, guid, elementType);
         } else if ($qualifC == "weak") {
           # Special cases for weak reference vectors.
-            printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_VECTOR(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, tguid, elementType);
+            printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_VECTOR(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, guid, elementType);
         } else {
           typeError(typeName, qualifC);
           errors++;
         }
       } else if (kind == "record") {
-        printf("AAF_TYPE_DEFINITION_RECORD(%s, %s)\n", typeName, tguid);
+        printf("AAF_TYPE_DEFINITION_RECORD(%s, %s)\n", typeName, guid);
       } else if (kind == "rename") {
-        printf("AAF_TYPE_DEFINITION_RENAME(%s, %s, %s)\n", typeName, tguid, $elementTypeC);
+        printf("AAF_TYPE_DEFINITION_RENAME(%s, %s, %s)\n", typeName, guid, $elementTypeC);
       } else if (kind == "string") {
-        printf("AAF_TYPE_DEFINITION_STRING(%s, %s, %s)\n", typeName, tguid, $elementTypeC);
+        printf("AAF_TYPE_DEFINITION_STRING(%s, %s, %s)\n", typeName, guid, $elementTypeC);
       } else if (kind == "extendible") {
-        printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(%s, %s)\n", typeName, tguid);
+        printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(%s, %s)\n", typeName, guid);
       } else if (kind == "character") {
-        printf("AAF_TYPE_DEFINITION_CHARACTER(%s, %s)\n", typeName, tguid);
+        printf("AAF_TYPE_DEFINITION_CHARACTER(%s, %s)\n", typeName, guid);
       } else if (kind == "indirect") {
-        printf("AAF_TYPE_DEFINITION_INDIRECT(%s, %s)\n", typeName, tguid);
+        printf("AAF_TYPE_DEFINITION_INDIRECT(%s, %s)\n", typeName, guid);
       } else if (kind == "opaque") {
-        printf("AAF_TYPE_DEFINITION_OPAQUE(%s, %s)\n", typeName, tguid);
+        printf("AAF_TYPE_DEFINITION_OPAQUE(%s, %s)\n", typeName, guid);
       } else if (kind == "set") {
         elementType = $elementTypeC;
         # Special cases for strong/weak reference sets.
         if ($qualifC == "strong") {
-          printf("AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, tguid, elementType);
+          printf("AAF_TYPE_DEFINITION_STRONG_REFERENCE_SET(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, guid, elementType);
         } else if ($qualifC == "weak") {
-          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, tguid, elementType);
+          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_SET(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, elementType, guid, elementType);
         } else { 
-          printf("AAF_TYPE_DEFINITION_SET(%s, %s,\n  AAF_TYPE(%s))\n", typeName, tguid, elementType);
+          printf("AAF_TYPE_DEFINITION_SET(%s, %s,\n  AAF_TYPE(%s))\n", typeName, guid, elementType);
         }
       } else if (kind == "reference") {
         targetType = $elementTypeC;
         if ($qualifC == "strong") {
-          printf("AAF_TYPE_DEFINITION_STRONG_REFERENCE(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, tguid, targetType);
+          printf("AAF_TYPE_DEFINITION_STRONG_REFERENCE(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, guid, targetType);
         } else if ($qualifC == "weak" ) {
-          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, tguid, targetType);
+          printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, guid, targetType);
         } else {
           typeError(typeName, qualifC);
           errors++;
         }
       } else if (kind == "stream") {
-          printf("AAF_TYPE_DEFINITION_STREAM(%s, %s)\n", typeName, tguid);
+          printf("AAF_TYPE_DEFINITION_STREAM(%s, %s)\n", typeName, guid);
       } else {
         # better be another type
       }
@@ -904,11 +891,11 @@ BEGIN {
         uid = "false";
       }
       # AAF_PROPERTY(name, id, tag, type, mandatory, container)
-      pguid = formatAUID($SLO00C, $SLO01C, $SLO02C, $SLO03C,
-                         $SLO04C, $SLO05C, $SLO06C, $SLO07C,
-                         $SLO08C, $SLO09C, $SLO10C, $SLO11C,
-                         $SLO12C, $SLO13C, $SLO14C, $SLO15C, "    ");
-      printf("  AAF_PROPERTY(%s,%s,\n    0x%s,\n    %s,\n    %s,\n    %s,\n    %s)\n", $elementNameC, pguid, $pidC, type, mandatory, uid, class);
+      guid = formatAUID($SLO00C, $SLO01C, $SLO02C, $SLO03C,
+                        $SLO04C, $SLO05C, $SLO06C, $SLO07C,
+                        $SLO08C, $SLO09C, $SLO10C, $SLO11C,
+                        $SLO12C, $SLO13C, $SLO14C, $SLO15C, "    ");
+      printf("  AAF_PROPERTY(%s,%s,\n    0x%s,\n    %s,\n    %s,\n    %s,\n    %s)\n", $elementNameC, guid, $pidC, type, mandatory, uid, class);
     }
   }
 }
@@ -916,13 +903,13 @@ BEGIN {
 END {
   if (errors == 0 ){
     if (kind == "enumeration" ) {
-      printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s, %s, AAF_TYPE(%s))\n", typeName, tguid, etype);
+      printf("AAF_TYPE_DEFINITION_ENUMERATION_END(%s)\n", typeName);
     } else if (kind == "record") {
-      printf("AAF_TYPE_DEFINITION_RECORD_END(%s, %s)\n", typeName, tguid);
+      printf("AAF_TYPE_DEFINITION_RECORD_END(%s)\n", typeName);
     } else if (kind == "extendible") {
-      printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s, %s)\n", typeName, tguid);
+      printf("AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(%s)\n", typeName);
     } else if ((kind == "reference") && (qualif == "weak")) {
-      printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(\n  AAF_REFERENCE_TYPE_NAME(%s, %s), %s,\n  AAF_TYPE(%s))\n", typeName, targetType, tguid, targetType);
+      printf("AAF_TYPE_DEFINITION_WEAK_REFERENCE_END(AAF_REFERENCE_TYPE_NAME(%s, %s))\n", typeName, targetType);
     }
     printf("\n");
     printf("AAF_TYPE_TABLE_END()\n");
