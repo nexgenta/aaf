@@ -1,31 +1,27 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+
+
 
 #ifndef __ImplAAFTimecode_h__
 #include "ImplAAFTimecode.h"
 #endif
-
-#include "ImplAAFDictionary.h"
-#include "ImplAAFBuiltinDefs.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -36,12 +32,12 @@
 #include "aafErr.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
-#include "AAFDataDefs.h"
+#include "AAFDefUIDs.h"
 
 ImplAAFTimecode::ImplAAFTimecode ():
-_start(	PID_Timecode_Start,	L"Start"),
-_FPS(	PID_Timecode_FPS,	L"FPS"),
-_drop(	PID_Timecode_Drop,	L"Drop")
+_start(	PID_Timecode_Start,	"Start"),
+_FPS(	PID_Timecode_FPS,	"FPS"),
+_drop(	PID_Timecode_Drop,	"Drop")
 {
 	_persistentProperties.put(_start.address());
 	_persistentProperties.put(_FPS.address());
@@ -56,38 +52,30 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::Initialize (aafLength_t length,
                            aafTimecode_t *timecode)
 {
+	aafUID_t	tcddef = DDEF_Timecode;
+	
 	XPROTECT()
 	{
-		if (isInitialized ()) 
-		{
-			return AAFRESULT_ALREADY_INITIALIZED;
-		}
-
 		if (timecode == NULL)
 		{
 			return AAFRESULT_NULL_PARAM;
 		}
-		if ((timecode->drop != kAAFTcDrop) && (timecode->drop != kAAFTcNonDrop))
+		if ((timecode->drop != kTcDrop) && (timecode->drop != kTcNonDrop))
 		{
 			return AAFRESULT_INVALID_TIMECODE;
 		}
 
-		ImplAAFDictionarySP pDict;
-		CHECK(GetDictionary (&pDict));
-		CHECK(SetNewProps(length,
-						  pDict->GetBuiltinDefs()->ddTimecode()));
+		CHECK(SetNewProps(length, &tcddef));
 		_start = timecode->startFrame;
-		if (timecode->drop == kAAFTcDrop)
+		if (timecode->drop == kTcDrop)
 		{
-		  _drop = kAAFTrue;
+		  _drop = AAFTrue;
 		}
 		else
 		{
-		  _drop = kAAFFalse;
+		  _drop = AAFFalse;
 		}
 		_FPS = timecode->fps;
-		
-		setInitialized ();
 	}
 	XEXCEPT
 	XEND;
@@ -100,11 +88,6 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::GetTimecode (aafTimecode_t *timecode)
 {
-	if ( !isInitialized ()) 
-	{
-		return AAFRESULT_NOT_INITIALIZED;
-	}
-
 	if (timecode == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
@@ -112,13 +95,13 @@ AAFRESULT STDMETHODCALLTYPE
 
 	timecode->startFrame = _start;
 
-	if (kAAFTrue == _drop)
+	if (AAFTrue == _drop)
 	{
-		timecode->drop = kAAFTcDrop;
+		timecode->drop = kTcDrop;
 	}
 	else
 	{
-		timecode->drop = kAAFTcNonDrop;
+		timecode->drop = kTcNonDrop;
 	}
 	timecode->fps = _FPS;
 	return(AAFRESULT_SUCCESS);
@@ -129,26 +112,22 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecode::SetTimecode (aafTimecode_t  *timecode)
 {
-	if ( !isInitialized ()) 
-	{
-		return AAFRESULT_NOT_INITIALIZED;
-	}
 	if (timecode == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-	if ((timecode->drop != kAAFTcDrop) && (timecode->drop != kAAFTcNonDrop))
+	if ((timecode->drop != kTcDrop) && (timecode->drop != kTcNonDrop))
 	{
 		return AAFRESULT_INVALID_TIMECODE;
 	}
 	_start = timecode->startFrame;
-	if (timecode->drop == kAAFTcDrop)
+	if (timecode->drop == kTcDrop)
 	{
-		_drop = kAAFTrue;
+		_drop = AAFTrue;
 	}
 	else
 	{
-		_drop = kAAFFalse;
+		_drop = AAFFalse;
 	}
 	_FPS = timecode->fps;
 
@@ -246,7 +225,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t /* offset !!!*/, ImplAAFTimecode **result,
+aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t offset, ImplAAFTimecode **result,
 												aafPosition_t *tcStartPos)
 {
   	if(result == NULL)
@@ -257,3 +236,4 @@ aafErr_t ImplAAFTimecode::OffsetToTimecodeClip(aafPosition_t /* offset !!!*/, Im
 }
 
 
+OMDEFINE_STORABLE(ImplAAFTimecode, AUID_AAFTimecode);
