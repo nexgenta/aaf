@@ -6,6 +6,7 @@ AAFTypeDefRename\
 AAFTypeDef\
 #endm
 #c
+#import ./AAFTypeDef.exp
 AD_HEAD
 AD_IDL(//
 // This interface is used to define Renamed types \(analogous to C
@@ -23,6 +24,7 @@ AD_IDL(//
 *	Stub only.   Implementation not yet added	*
 \***********************************************/
 )
+AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_CLASS_UUID(307e9e69, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(307e9e6a, dcb2, 11d2, 84, 29, 00, 60, 08, 32, ac, b8)
@@ -42,7 +44,7 @@ AD_XMETHOD3(Initialize,
 
 			[in\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pTypeName,
 			friendly name of this type definition,
 
@@ -101,7 +103,7 @@ AD_XMETHOD2(GetName,
 
 			[out\, size_is\(bufSize\)\, string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			buffer into which the name is written,
 
@@ -201,4 +203,7 @@ AD_XMETHOD2(GetValue,
   //
   // AAFRESULT_NULL_PARAM
   //   - pInPropVal or ppOutPropVal is NULL.)
+
+
+AD_OVERRIDE(.method-GetTypeCategory)
 AD_XCLASS_END(Concrete, StoredObject)
