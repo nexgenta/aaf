@@ -20,7 +20,13 @@
 #include "ImplAAFTimelineMobSlot.h"
 #endif
 
+#ifndef __ImplAAFTaggedValue_h__
+#include "ImplAAFTaggedValue.h"
+#endif
 
+#ifndef __ImplEnumAAFTaggedValues_h__
+#include "ImplEnumAAFTaggedValues.h"
+#endif
 
 class ImplAAFSegment;
 
@@ -30,14 +36,13 @@ class ImplAAFFile;
 
 class ImplEnumAAFMobSlots;
 
-class ImplEnumAAFMobComments;
+class ImplEnumAAFTaggedValues;
 
 class ImplAAFFindSourceInfo;
 
 class ImplAAFScopeStack;
 
-class ImplAAFEffect;
-
+class ImplAAFOperationGroup;
 
 
 
@@ -236,7 +241,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetNumComments
-        (aafUInt32 *  pEnum);  //@parm [out,retval] Number  of Mob Comments
+        (aafUInt32 *  pNumComments);  //@parm [out,retval] Number  of Mob Comments
 
 
   //****************
@@ -244,7 +249,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     EnumAAFAllMobComments
-        (ImplEnumAAFMobComments ** ppEnum);  //@parm [out,retval] Mob Comments
+        (ImplEnumAAFTaggedValues ** ppEnum);  //@parm [out,retval] Mob Comments
 
 
 
@@ -357,12 +362,12 @@ AAFRESULT
 	aafPosition_t offset,             /* IN */
 	aafMobKind_t mobKind,             /* IN */
 	aafMediaCriteria_t *pMediaCrit,    /* IN */
-	aafEffectChoice_t *pEffectChoice,  /* IN */  /* NOTE: take this arg out? */
+	aafOperationChoice_t *pOperationChoice,  /* IN */  /* NOTE: take this arg out? */
 	ImplAAFFindSourceInfo **ppSourceInfo);  /* OUT */
 
 	virtual AAFRESULT MobFindLeaf(ImplAAFMobSlot *track,
 					 aafMediaCriteria_t *mediaCrit,
-					 aafEffectChoice_t *effectChoice,
+					 aafOperationChoice_t *operationChoice,
 					 ImplAAFComponent *rootObj,
 					 aafPosition_t rootPos,
 					 aafLength_t rootLen,
@@ -373,7 +378,7 @@ AAFRESULT
 					 ImplAAFComponent **foundObj,
 					 aafLength_t *minLength,
 					 aafBool *foundTransition,
-					 ImplAAFEffect **effeObject,
+					 ImplAAFOperationGroup **groupObject,
 					 aafInt32	*nestDepth,
 					 aafPosition_t *diffPos);
 
@@ -394,7 +399,7 @@ virtual AAFRESULT MobFindSource(
 					   aafLength_t length,   /* expected length of clip */
 					   aafMobKind_t mobKind,
 					   aafMediaCriteria_t *mediaCrit,
-					   aafEffectChoice_t *effectChoice,
+					   aafOperationChoice_t *operationChoice,
 					   ImplAAFFindSourceInfo *sourceInfo,
 					   aafBool *foundSource);
 
@@ -412,6 +417,7 @@ virtual AAFRESULT STDMETHODCALLTYPE
 	OMFixedSizeProperty<aafTimeStamp_t>	_lastModified;
 	private:
     OMStrongReferenceVectorProperty<ImplAAFMobSlot> _slots;
+    OMStrongReferenceVectorProperty<ImplAAFTaggedValue> _userComments;
 };
 
 #endif // ! __ImplAAFMob_h__
