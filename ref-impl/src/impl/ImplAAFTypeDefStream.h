@@ -4,32 +4,14 @@
 #define __ImplAAFTypeDefStream_h__
 
 
-/***********************************************************************
- *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 
@@ -39,10 +21,6 @@
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
 #endif
-
-
-class ImplAAFPropertyValue;
-class ImplAAFStreamPropertyValue;
 
 
 class ImplAAFTypeDefStream : public ImplAAFTypeDef
@@ -58,318 +36,114 @@ protected:
   virtual ~ImplAAFTypeDefStream ();
 
 public:
-  //  
-  // All reads/and writes advance the current position 
-  // 
-
-
-  // 
-  // Raw byte stream access 
-  // 
-
-
-  // Stream size and positioning 
 
   //****************
-  // GetSize()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetSize
-        (// @parm [in] stream property value
-         ImplAAFPropertyValue * pStreamPropertyValue,
+    Initialize
+        (// @parm [in] auid to be used to identify this type
+         aafUID_t *  pID,
 
-         // @parm [out] count of bytes in the specified stream property value
-         aafInt64 *  pSize);
+         // @parm [in] type of each element to be contained in this array
+         ImplAAFTypeDef * pTypeDef,
 
-  //****************
-  // SetSize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetSize
-        (// @parm [in] stream property value
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] new count of bytes in the specified stream property value
-         aafInt64  newSize);
-
-  //****************
-  // GetPosition()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetPosition
-        (// @parm [in] stream property value
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [out] current byte position in the specified stream property value
-         aafInt64 *  pPosition);
-
-  //****************
-  // SetPosition()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetPosition
-        (// @parm [in] stream property value
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] the new position in the specified stream property value
-         aafInt64  newPosition);
-
-
-  // Sequential access 
-
-  //****************
-  // Read()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Read
-        (// @parm [in] stream property value to read
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] number of bytes to read
-         aafUInt32  dataSize,
-
-         // @parm [out, size_is(dataSize), length_is(*bytesRead)] buffer into which one element from the stream should be written
-         aafMemPtr_t  pData,
-
-         // @parm [out,ref] number of bytes actually read (will be either dataSize or 0 if there 
-         // is in error)
-         aafUInt32 *  bytesRead);
-
-  //****************
-  // Write()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Write
-        (// @parm [in] stream property value to modify
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] number of bytes to write
-         aafUInt32  dataSize,
-
-         // @parm [in, ref, size_is(dataSize)] buffer into which should contain one element to be written to the stream
-         aafMemPtr_t  pData);
-
-
-  // Extending the stream 
-
-  //****************
-  // Append()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Append
-        (// @parm [in] stream property value to modify
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] number of bytes to write (must be equal to the element type length)
-         aafUInt32  dataSize,
-
-         // @parm [in, ref, size_is(dataSize)] buffer into which should contain one element to be written to the stream
-         aafMemPtr_t  pData);
-
-
-
-  // 
-  // Access byte order of the stream 
-  // 
+         // @parm [in] friendly name of this type definition
+         wchar_t *  pTypeName);
 
 
   //****************
-  // HasStoredByteOrder()
+  // GetType()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    HasStoredByteOrder
-        (// @parm [in] stream property value
-         ImplAAFPropertyValue * pStreamPropertyValue,
+    GetType
+        // @parm [out] type of elements in this array
+        (ImplAAFTypeDef ** ppTypeDef);
 
-         // @parm [out] kAAFTrue if this stream has a stored byte order
-         aafBoolean_t *  pHasByteOrder);
 
   //****************
-  // GetStoredByteOrder()
+  // GetCount()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetStoredByteOrder
-        (// @parm [in] stream property value
-         ImplAAFPropertyValue * pStreamPropertyValue,
+    GetCount
+        (// @parm [in] property value of array
+         ImplAAFPropertyValue * pPropVal,
 
-         // @parm [out] Pointer to variable where byte order is to be copied
-         eAAFByteOrder_t *  pByteOrder);
+         // @parm [out] count of elements in the specified stream property value
+         aafInt64 *  pCount);
 
-  //****************
-  // SetStoredByteOrder()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetStoredByteOrder
-        (// @parm [in] stream property value
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] byte order is to be stored with the stream
-         eAAFByteOrder_t  byteOrder);
-
-  //****************
-  // ClearStoredByteOrder()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    ClearStoredByteOrder
-        // @parm [in] stream property value
-        (ImplAAFPropertyValue * pStreamPropertyValue);
-
-
-
-  // 
-  // Access in typed chunks of Elements 
-  // 
-
-  //****************
-  // ReadElements()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    ReadElements
-        (// @parm [in] stream property value to read
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] the type definition of the elements to read
-         ImplAAFTypeDef * pElementType,
-
-         // @parm [in] number of bytes to read (must be evenly divisible by the element 
-         // type length)
-         aafUInt32  dataSize,
-
-         // @parm [out, size_is(dataSize), length_is(*pBytesRead)] buffer into which elements from the stream should be written
-         aafMemPtr_t  pData,
-
-         // @parm [out,ref] number of bytes actually read (will be either dataSize or 0 if 
-         // there is in error)
-         aafUInt32 *  pBytesRead);
-
-  //****************
-  // WriteElements()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    WriteElements
-        (// @parm [in] stream property value to modify
-         ImplAAFPropertyValue * pStreamPropertyValue,
-
-         // @parm [in] the type definition of the elements to read
-         ImplAAFTypeDef * pElementType,
-
-         // @parm [in] number of bytes to write (must be evenly divisible by the element type 
-         // length)
-         aafUInt32  dataSize,
-
-         // @parm [in, ref, size_is(dataSize)] buffer into which elements from the stream should be written
-         aafMemPtr_t  pData);
-
-
-  // Extend in chunks of typed Elements 
 
   //****************
   // AppendElements()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     AppendElements
-        (// @parm [in] stream property value to modify
-         ImplAAFPropertyValue * pStreamPropertyValue,
+        (// @parm [in] property value corresponding to stream to which elements are to
+    // be appended
+         ImplAAFPropertyValue * pInPropVal,
 
-         // @parm [in] the type definition of the elements to read
-         ImplAAFTypeDef * pElementType,
+         // @parm [in, size_is(numElements)] values to be appended to this stream
+         ImplAAFPropertyValue * pMemberPropVals,
 
-         // @parm [in] number of bytes to write (must be evenly divisible by the element type 
-         // length)
-         aafUInt32  dataSize,
-
-         // @parm [in, ref, size_is(dataSize)] buffer into which elements from the stream should be written
-         aafMemPtr_t  pData);
+         // @parm [in] number of values to be appended
+         aafUInt32  numElements);
 
 
   //****************
-  // GetTypeCategory()
+  // CreateEmpty()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTypeCategory
-        // @parm [out] Returned type category
-        (eAAFTypeCategory_t *  pTid);
+    CreateEmpty
+        // @parm [out] newly-created property value
+        (ImplAAFPropertyValue ** ppPropVal);
 
 
   //****************
-  // RawAccessType()
+  // GetElementValues()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RawAccessType
-        // @parm [out] the raw access type definition
-        (ImplAAFTypeDef ** ppRawTypeDef);
+    GetElementValues
+        (// @parm [in] property value to read
+         ImplAAFPropertyValue * pInPropVal,
 
+         // @parm [in] zero-based index into elements in this array type
+         aafInt64  startElement,
 
-private:
+         // @parm [out, size_is(numElements)] array of values that are read
+         ImplAAFPropertyValue ** pOutPropVals),
+
+         // @parm [in] number of elements to get
+         aafUInt32  numElements);
 
 
   //****************
-  // GetStreamPropertyValue()
-  //
-  // Validate/conversion utility.
-  //
-  AAFRESULT STDMETHODCALLTYPE
-    GetStreamPropertyValue
-        (// @parm [in] opaque property value
-         ImplAAFPropertyValue * pPropertyValue,
-         
-         // @parm [out] stream property value
-         ImplAAFStreamPropertyValue *& pStreamPropertyValue);
- 
-public:
-
-  //
-  // Methods used internally by the SDK.
-  //
-
-  //****************
-  // Allocate and initialize the correct subclass of ImplAAFPropertyValue 
-  // for the given OMProperty.
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreatePropertyValue(OMProperty *property, 
-                        ImplAAFPropertyValue ** pPropertyValue) const;
-
-  //****************
-  // pvtInitialize()
+  // GetElements()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    pvtInitialize
-        (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
+    GetElements
+        (// @parm [in] property value to read
+         ImplAAFPropertyValue * pPropVal,
 
-         // @parm [in] friendly name of this type definition
-         const aafCharacter * pTypeName);
+         // @parm [in] zero-based index into elements in this array type
+         aafInt64  startElement,
+
+         // @parm [out, size_is(numElements)] buffer into which C array data should be written
+         aafMemPtr_t  pData,
+
+         // @parm [in] number of elements to get
+         aafUInt32  numElements);
 
 
 public:
-
+  // Declare this class to be storable.
   //
-  // ImplAAFTypeDef methods
-  //
-  virtual aafBool IsFixedSize (void) const;
-  virtual size_t PropValSize (void) const;
-  virtual aafBool IsRegistered (void) const;
-  virtual size_t NativeSize (void) const;
+  OMDECLARE_STORABLE(ImplAAFTypeDefStream)
 
-  virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
-
-  virtual bool IsAggregatable () const;
-  virtual bool IsStreamable () const;
-  virtual bool IsFixedArrayable () const;
-  virtual bool IsVariableArrayable () const;
-  virtual bool IsStringable () const;
-
-
-  // override from OMStorable.
-  virtual const OMClassId& classId(void) const;
-
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
-
-private:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFTypeDefStreamTest.cpp.
+  static AAFRESULT test();
 };
 
 #endif // ! __ImplAAFTypeDefStream_h__
+
+
