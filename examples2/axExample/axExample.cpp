@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axExample.cpp,v 1.7 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
+// $Id: axExample.cpp,v 1.8 2004/11/02 16:58:17 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,9 +36,8 @@ void throwUsage()
 {
 	using namespace std;
 	wostringstream msg;
-	msg << L"Usage:\t" << L"-file filename [-metadata] [-essence] [-composition] [-mpeg2]" << endl;
+	msg << L"Usage:\t" << L"-file filename [-metadata] [-essence] [-composition]" << endl;
 	msg << L"Notes:\t" << L"Run -essence before composition.  Run -metadata before -essence." << endl;
-	msg << L"      \t" << L"The -mpeg2 option selects the mpeg codec (currently disabled)." << endl;
 	throw AxEx( msg.str().c_str() );
 }
 
