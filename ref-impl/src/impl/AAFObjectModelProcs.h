@@ -1,3 +1,5 @@
+#ifndef __AAFObjectModelProcs_h__
+#define __AAFObjectModelProcs_h__
 //=---------------------------------------------------------------------=
 //
 // The contents of this file are subject to the AAF SDK Public
@@ -20,26 +22,20 @@
 //
 //=---------------------------------------------------------------------=
 
-// Following are the UIDs of the well known constants used in AAFPluginDescriptors.
+//
+// The following callback procs are used to create and register
+// compositional definitions in the correct order.
 //
 
-//******************
-// Which platforms is the code known to run on?
-//
-const aafUID_t kAAFPlatformIndependant = { 0x3D1DD891, 0xE793, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-//******************
-// Which media engines does the code require?
-//
-const aafUID_t kAAFNoEngine = { 0x9FDEF8C1, 0xE847, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+void InstallAAFObjectModelProcs(void);
 
-//******************
-// Which API does this plugin support?
-//
-const aafUID_t kAAFEssencePluginAPI = { 0x69C870A1, 0xE793, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+#ifdef __cplusplus
+}
+#endif
 
-//******************
-// Used for "don't care" when enumerating loaded plugins
-//
-const aafUID_t kAAFPluginNoCategory = { 0x56905e0b, 0x537d, 0x11d4, { 0xa3, 0x6c, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
+#endif // #ifndef __AAFObjectModelProcs_h__
