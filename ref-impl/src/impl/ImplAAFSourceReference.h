@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.h,v 1.23.2.3 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.h,v 1.23.2.4 2004/08/12 20:45:32 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 
 #include "ImplAAFObject.h"
 
+#include "OMArrayProperty.h"
 #include "OMStorable.h"
 
 class ImplAAFSourceReference : public ImplAAFSegment
@@ -154,8 +155,8 @@ public:
 private:
 	OMFixedSizeProperty<aafMobID_t>	_sourceID;
 	OMFixedSizeProperty<aafInt32>	_sourceMobSlotId;
-	OMVariableSizeProperty<aafUInt32> _channelIDs;
-	OMVariableSizeProperty<aafUInt32> _monoSourceSlotIDs;
+	OMArrayProperty<aafUInt32> _channelIDs;
+	OMArrayProperty<aafUInt32> _monoSourceSlotIDs;
 
 };
 
