@@ -66,7 +66,7 @@
 
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
-#include "ImplAAFHeader.h"
+#include "ImplEnumAAFParameters.h"
 
 #include <assert.h>
 #include <string.h>
@@ -81,6 +81,7 @@
 extern "C" const aafClassID_t CLSID_AAFSourceReference;
 extern "C" const aafClassID_t CLSID_AAFParameter;
 extern "C" const aafClassID_t CLSID_AAFSegment;
+extern "C" const aafClassID_t CLSID_EnumAAFParameters;
 
 
 const aafUID_t kNullID = {0};
@@ -113,11 +114,10 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 		  pSeg = 0;
 		}
 	}
-	// Release all of the mob slot pointers.
-	size_t size2 = _parameters.getSize();
-	for (size_t j = 0; j < size2; j++)
+	OMStrongReferenceSetIterator<ImplAAFParameter>parameters(_parameters);
+	while(++parameters)
 	{
-		ImplAAFParameter *pParm = _parameters.setValueAt(0, j);
+		ImplAAFParameter *pParm = parameters.setValue(0);
 		if (pParm)
 		{
 		  pParm->ReleaseReference();
@@ -139,7 +139,6 @@ AAFRESULT STDMETHODCALLTYPE
                              ImplAAFOperationDef* pOperationDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
-	ImplAAFHeader*			pHeader = NULL;
 	ImplAAFDictionary*		pDictionary = NULL;
 //	ImplAAFOperationDef*		pOldOperationDef = NULL;
 	aafUID_t				OperationDefAUID;
@@ -153,11 +152,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		// Get the Header and the dictionary objects for this file.
-		CHECK(pOperationDef->MyHeadObject(&pHeader));
-		CHECK(pHeader->GetDictionary(&pDictionary));
-		pHeader->ReleaseReference();
-		pHeader = NULL;
+		// Get the dictionary objects for this file.
+		CHECK(GetDictionary(&pDictionary));
 
 		CHECK(SetNewProps(length, pDataDef));
 		CHECK(pOperationDef->GetAUID(&uid));
@@ -175,9 +171,6 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
-		if(pHeader != NULL)
-		  pHeader->ReleaseReference();
-		pHeader = 0;
 		if(pDictionary)
 		  pDictionary->ReleaseReference();
 		pDictionary = 0;
@@ -196,7 +189,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	aafUID_t			defUID;
 	ImplAAFDictionary	*dict = NULL;
-	ImplAAFHeader		*head = NULL;
 
 	if(OperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -204,22 +196,16 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		defUID = _operationDefinition;
-		CHECK(MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
+		CHECK(GetDictionary(&dict));
 		CHECK(dict->LookupOperationDef(defUID, OperationDef));
 		dict->ReleaseReference();
 		dict = 0;
-		head->ReleaseReference();
-		head = 0;
 	}
 	XEXCEPT
 	{
 		if(dict != NULL)
 		  dict->ReleaseReference();
 		dict = 0;
-		if(head != NULL)
-		  head->ReleaseReference();
-		head = 0;
 	}
 	XEND;
 
@@ -326,7 +312,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if(pNumParameters == NULL)
 		return AAFRESULT_NULL_PARAM;
-	_parameters.getSize(numSlots);
+	numSlots = _parameters.count();
 	
 	*pNumParameters = numSlots;
 
@@ -347,7 +333,7 @@ AAFRESULT STDMETHODCALLTYPE
 			RAISE(AAFRESULT_NULL_PARAM);
 		CHECK(GetOperationDefinition(&def));
 		CHECK(def->GetNumberInputs (&numInputs));
-		*validTransition = (numInputs == 2 ? AAFTrue : AAFFalse);
+		*validTransition = (numInputs == 2 ? kAAFTrue : kAAFFalse);
 		//!!!Must also have a "level" parameter (Need definition for this!)
 		def->ReleaseReference();
 		def = NULL;
@@ -440,6 +426,28 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::LookupParameter (aafArgIDType_t  argID,
                            ImplAAFParameter ** ppParameter)
 {
+#if 1
+	if (!ppParameter) return AAFRESULT_NULL_PARAM;
+
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_parameters.find((*reinterpret_cast<const OMObjectIdentification *>(&argID)),
+                             *ppParameter))
+	{
+		assert(NULL != *ppParameter);
+		(*ppParameter)->AcquireReference();
+	}
+	else
+	{
+	// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
+	}
+
+	return (result);
+
+#else
 	ImplAAFParameter	*parm = NULL;
 	ImplAAFParameterDef	*parmDef = NULL;
 	aafInt32			numParm, n;
@@ -451,7 +459,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if(ppParameter == NULL)
 			RAISE(AAFRESULT_NULL_PARAM);
 	
-		found = AAFFalse;
+		found = kAAFFalse;
 		CHECK(CountParameters (&numParm))
 		for(n = 0; n < numParm; n++)
 		{
@@ -466,7 +474,7 @@ AAFRESULT STDMETHODCALLTYPE
 				{
 					parm->AcquireReference();
 					*ppParameter = parm;
-					found = AAFTrue;
+					found = kAAFTrue;
 					break;
 				}
 
@@ -487,6 +495,7 @@ AAFRESULT STDMETHODCALLTYPE
 	XEND
 
 	return AAFRESULT_SUCCESS;
+#endif
 }
 
 
@@ -495,10 +504,33 @@ AAFRESULT STDMETHODCALLTYPE
         (// @parm [out] enumerator across parameters
          ImplEnumAAFParameters ** ppEnum)
 {
-  if (! ppEnum)
-	return AAFRESULT_NULL_PARAM;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
+	if (NULL == ppEnum)
+		return AAFRESULT_NULL_PARAM;
+	*ppEnum = 0;
+	
+	ImplEnumAAFParameters *theEnum = (ImplEnumAAFParameters *)CreateImpl (CLSID_EnumAAFParameters);
+	
+	XPROTECT()
+	{
+		OMStrongReferenceSetIterator<ImplAAFParameter>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFParameter>(_parameters);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
+		*ppEnum = theEnum;
+	}
+	XEXCEPT
+	{
+		if (theEnum)
+		  {
+			theEnum->ReleaseReference();
+			theEnum = 0;
+		  }
+		return(XCODE());
+	}
+	XEND;
+	
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -527,5 +559,13 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::RemoveInputSegmentAt (aafUInt32  index)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+	aafInt32 count;
+	AAFRESULT hr;
+	hr = CountSourceSegments (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+	if (index >= (aafUInt32)count)
+		return AAFRESULT_BADINDEX;
+	
+	_inputSegments.removeAt(index);
+	return AAFRESULT_SUCCESS;
 }

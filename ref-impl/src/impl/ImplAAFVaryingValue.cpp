@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -40,7 +40,6 @@
 #endif
 
 #include "ImplAAFControlPoint.h"
-#include "ImplAAFHeader.h"
 #include "ImplAAFDictionary.h"
 #include "ImplAAFPluginManager.h"
 #include "AAFPlugin.h"
@@ -61,7 +60,7 @@ ImplAAFVaryingValue::ImplAAFVaryingValue ()
   _displayValue(         PID_VaryingValue_DisplayValue,      "DisplayValue"),
   _significance(         PID_VaryingValue_Significance,      "Significance")
 {
-	  aafReferenceType_t	ref = kRefLimitMinimum;
+	  aafReferenceType_t	ref = kAAFRefLimitMinimum;
 	 aafInt32				zero = 0;
 	 
 	  _persistentProperties.put(_controlPoints.address());
@@ -173,7 +172,8 @@ AAFRESULT STDMETHODCALLTYPE
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	_controlPoints.removeAt(index);
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -183,7 +183,6 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFInterpolationDef *pDef)
 {
 	aafUID_t			newUID;
-	ImplAAFHeader		*head = NULL;
 	ImplAAFDictionary	*dict = NULL;
 
 	if(pDef == NULL)
@@ -192,24 +191,18 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		CHECK(pDef->GetAUID(&newUID));
-		CHECK(pDef->MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
+		CHECK(GetDictionary(&dict));
 // This is a weak reference, not yet counted
 //		if(dict->LookupParameterDef(&newUID, &def) == AAFRESULT_SUCCESS)
 //			def->ReleaseReference();
 
 		_interpolation = newUID;
 //		pDef->AcquireReference();
-		head->ReleaseReference();
-		head = NULL;
 		dict->ReleaseReference();
 		dict = NULL;
 	}
 	XEXCEPT
 	{
-		if(head)
-		  head->ReleaseReference();
-		head = 0;
 		if(dict)
 		  dict->ReleaseReference();
 		dict = 0;
@@ -223,7 +216,6 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFVaryingValue::GetInterpolationDefinition (
       ImplAAFInterpolationDef **ppDef)
 {
-	ImplAAFHeader		*head = NULL;
 	ImplAAFDictionary	*dict = NULL;
 	aafUID_t			interpID;
 
@@ -232,21 +224,15 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		CHECK(MyHeadObject(&head));
-		CHECK(head->GetDictionary(&dict));
 		interpID = _interpolation;
+		CHECK(GetDictionary(&dict));
 		CHECK(dict->LookupInterpolationDef(interpID, ppDef));
 //		(*ppDef)->AcquireReference();
-		head->ReleaseReference();
-		head = NULL;
 		dict->ReleaseReference();
 		dict = NULL;
 	}
 	XEXCEPT
 	{
-		if(head)
-		  head->ReleaseReference();
-		head = 0;
 		if(dict)
 		  dict->ReleaseReference();
 		dict = 0;
@@ -340,10 +326,10 @@ AAFRESULT STDMETHODCALLTYPE
 		intDef = NULL;
 		iParm->Release();
 		iParm = NULL;
-		plugin->Release();
-		plugin = NULL;
 		iInterp->Release();
 		iInterp = NULL;
+		plugin->Release();
+		plugin = NULL;
 		mgr->ReleaseReference();
 		mgr = NULL;
 		interpDef->ReleaseReference();
@@ -351,17 +337,21 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
-		if(plugin)
-			plugin->Release();
-		if(iUnk)
-			iUnk->Release();
-		if(iInterp)
-			iInterp->Release();
+		if (iTypeDef)
+			iTypeDef->Release();
+		if (intDef)
+			intDef->ReleaseReference();
 		if(iParm)
 			iParm->Release();
+		if(iInterp)
+			iInterp->Release();
+		if(plugin)
+			plugin->Release();
 		if(mgr)
 		  mgr->ReleaseReference();
 		mgr = 0;
+		if (interpDef)
+			interpDef->ReleaseReference();
 	}
 	XEND;
 	

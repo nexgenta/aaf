@@ -102,6 +102,24 @@ ImplAAFOperationDef::~ImplAAFOperationDef ()
 //	}
 }
 
+  
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFOperationDef::Initialize (
+      const aafUID_t & id,
+	  const aafWChar * pName,
+	  const aafWChar * pDesc)
+{
+	if (pName == NULL || pDesc == NULL)
+	{
+	  return AAFRESULT_NULL_PARAM;
+	}
+	else
+	{
+	  return pvtInitialize(id, pName, pDesc);
+	}
+	return AAFRESULT_SUCCESS;
+}
+
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::GetDataDef(
@@ -252,14 +270,16 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::RemoveDegradeToOperationAt (
 	  aafUInt32 index)
 {
-  aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountDegradeToOperations (&count);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  if (index >= count)
-	return AAFRESULT_BADINDEX;
-
-  return AAFRESULT_NOT_IMPLEMENTED;
+	aafUInt32 count;
+	AAFRESULT hr;
+	hr = CountDegradeToOperations (&count);
+	if (AAFRESULT_FAILED (hr)) return hr;
+	if (index >= count)
+		return AAFRESULT_BADINDEX;
+	
+	return AAFRESULT_NOT_IMPLEMENTED;
+//!!!	_degradeTo.removeAt(index);
+//	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -283,7 +303,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult) return AAFRESULT_NULL_PARAM;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _degradeTo.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -395,7 +416,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafInt32					newCount;
 	ImplAAFParameterDef*		pParmDef = NULL;
 	ImplEnumAAFParameterDefs*	pEnum = NULL;
-	aafBool						parmDefFound = AAFFalse;
+	aafBool						parmDefFound = kAAFFalse;
 
 	tmp = NULL;
 
@@ -412,7 +433,7 @@ AAFRESULT STDMETHODCALLTYPE
 			CHECK(pParmDef->GetAUID(&oldUID));
 			if ( memcmp(&newUID, &oldUID, sizeof(aafUID_t)) == 0)
 			{
-				parmDefFound = AAFTrue;
+				parmDefFound = kAAFTrue;
 				break;
 			}
 			pParmDef->ReleaseReference();
