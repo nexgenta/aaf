@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -32,6 +32,8 @@
 #include "AAFTypeDefUIDs.h"
 
 #include "AAFResult.h"
+
+#include "CAAFBuiltinDefs.h"
 
 #if defined(_MAC) || defined(macintosh)
 #include <wstring.h>
@@ -237,19 +239,19 @@ void GetStringValue (IAAFObject * pObj,
 bool classDefinitionIsA ( IAAFClassDef *pClassDefQuery,
 							   aafUID_constref targetAUID)
 {
-	IAAFDefObject *pDefObject = NULL;
+	IAAFMetaDefinition *pMetaDefinition = NULL;
 	IAAFClassDef *pParentClass=NULL;
 	bool classMatch=false;
 
 
   try
   {
-	  check(pClassDefQuery->QueryInterface(IID_IAAFDefObject,(void **)&pDefObject));
+	  check(pClassDefQuery->QueryInterface(IID_IAAFMetaDefinition,(void **)&pMetaDefinition));
 
     aafUID_t testAUID;
-	  check(pDefObject->GetAUID(&testAUID));
-	  pDefObject->Release();
-	  pDefObject=NULL;
+	  check(pMetaDefinition->GetAUID(&testAUID));
+	  pMetaDefinition->Release();
+	  pMetaDefinition=NULL;
 
 
     if (!memcmp (&testAUID, &targetAUID, sizeof (aafUID_t)))
@@ -273,8 +275,8 @@ bool classDefinitionIsA ( IAAFClassDef *pClassDefQuery,
     // cleanup after error...
     if (pParentClass)
       pParentClass->Release();
-    if (pDefObject)
-      pDefObject->Release();
+    if (pMetaDefinition)
+      pMetaDefinition->Release();
 
     throw;
   }
@@ -316,7 +318,7 @@ bool IsOptionalPropertyPresent (IAAFObject * pObj,
     throw;
   }
 
-  return (AAFTrue == r) ? true : false;
+  return (kAAFTrue == r) ? true : false;
 }
 
 // Main functions for PersonnelResource
@@ -1035,6 +1037,7 @@ void CreateAndRegisterPositionEnum (IAAFDictionary * pDict)
   IAAFTypeDef *ptd = NULL;
   IAAFTypeDefExtEnum *ptde = NULL;
 
+  CAAFBuiltinDefs defs (pDict);
 
   // Check to see if we are have already been registered.
   if (SUCCEEDED(pDict->LookupTypeDef (kTypeID_ePosition, &ptd)))
@@ -1048,9 +1051,9 @@ void CreateAndRegisterPositionEnum (IAAFDictionary * pDict)
   {
     // Instantiate a type definition object which will describe ePosition
     // extensible enumerations.
-    check (pDict->CreateInstance (AUID_AAFTypeDefExtEnum,
-								  IID_IAAFTypeDefExtEnum,
-								  (IUnknown**) &ptde));
+    check (defs.cdTypeDefExtEnum()->
+		   CreateInstance (IID_IAAFTypeDefExtEnum,
+						   (IUnknown**) &ptde));
 
     // Initialize the type definition object with the given name, and to
     // be represented by the given AUID.  We've already generated an
@@ -1103,6 +1106,7 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
   IAAFTypeDef *ptd_Position=NULL;
   IAAFTypeDef *ptd_ui32=NULL;
 
+  CAAFBuiltinDefs defs (pDict);
 
   // Check to see if we are have already been registered.
   if (SUCCEEDED(pDict->LookupClassDef (kClassID_PersonnelResource,
@@ -1117,9 +1121,9 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
   {
     // Instantiate a class definition object which will describe
     // PersonnelResource objects.
-    check (pDict->CreateInstance (AUID_AAFClassDef,
-								  IID_IAAFClassDef,
-								  (IUnknown**) &pcd));
+    check (defs.cdClassDef()->
+		   CreateInstance (IID_IAAFClassDef,
+						   (IUnknown**) &pcd));
 
     // We'll have to specify the PersonnelResource class definition's
     // parent class, so look it up here.  Since PersonnelResource
@@ -1166,14 +1170,14 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_GivenName,
 									   L"GivenName",
 									   ptd_String,
-									   AAFFalse,	// mandatory
+									   kAAFFalse,	// mandatory
 									   &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_FamilyName,
 									    L"FamilyName",
 									    ptd_String,
-									    AAFFalse,	// mandatory
+									    kAAFFalse,	// mandatory
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1194,7 +1198,7 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_Position,
 									    L"Position",
 									    ptd_Position,
-									    AAFFalse,   // mandatory
+									    kAAFFalse,   // mandatory
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1215,7 +1219,7 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_ContractID,
 									    L"ContractID",
 									    ptd_ui32,
-									    AAFTrue,    // optional
+									    kAAFTrue,    // optional
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1229,7 +1233,7 @@ void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_PersonnelResource_Role,
 									    L"Role",
 									    ptd_String,
-									    AAFTrue,    // optional
+									    kAAFTrue,    // optional
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
@@ -1286,6 +1290,8 @@ CreateAndRegisterPersonnelResourceReference
   IAAFClassDef *pcd=NULL;
   IAAFTypeDefObjectRef *ptdr=NULL;
 
+  CAAFBuiltinDefs defs (pDict);
+
   // Check to see if we are have already been registered.
   if (SUCCEEDED(pDict->LookupTypeDef
 				(kTypeID_PersonnelResourceStrongReference, &ptd)))
@@ -1307,9 +1313,9 @@ CreateAndRegisterPersonnelResourceReference
     // Instantiate a TypeDefinition for use as a Reference to a
     // PersonnelResource object.  We'll instantiate a
     // TypeDefinitionStrongObjectReference.
-    check (pDict->CreateInstance (AUID_AAFTypeDefStrongObjRef,
-								  IID_IAAFTypeDefObjectRef,
-								  (IUnknown**) &ptdr));
+    check (defs.cdTypeDefStrongObjRef()->
+		   CreateInstance (IID_IAAFTypeDefObjectRef,
+						   (IUnknown**) &ptdr));
 
     // Initialize our new type def, identifying the given AUID by which
     // this type will be known
@@ -1363,6 +1369,7 @@ CreateAndRegisterPersonnelResourceReferenceVector
   IAAFTypeDefVariableArray *ptdv=NULL;
   IAAFTypeDef *ptdr=NULL;
 
+  CAAFBuiltinDefs defs (pDict);
   
   // Check to see if we are have already been registered.
   if (SUCCEEDED(pDict->LookupTypeDef
@@ -1379,9 +1386,9 @@ CreateAndRegisterPersonnelResourceReferenceVector
     // Instantiate a TypeDefinition for use as a Vector of References to
     // PersonnelResource objects.  We'll instantiate a
     // TypeDefinitionVariableArray.
-    check (pDict->CreateInstance (AUID_AAFTypeDefVariableArray,
-								  IID_IAAFTypeDefVariableArray,
-								  (IUnknown**) &ptdv));
+    check (defs.cdTypeDefVariableArray()->
+		   CreateInstance (IID_IAAFTypeDefVariableArray,
+						   (IUnknown**) &ptdv));
 
     // We'll need to describe the type of each element in this vector.
     // In this case, we want to specify that elements are
@@ -1444,6 +1451,8 @@ void CreateAndRegisterAdminMob (IAAFDictionary * pDict)
   IAAFPropertyDef *pd_unused=NULL;
   IAAFTypeDef *ptd_PersonnelVector=NULL;
 
+  CAAFBuiltinDefs defs (pDict);
+
   // Check to see if we are have already been registered.
   if (SUCCEEDED(pDict->LookupClassDef (kClassID_AdminMob, &pcd)))
   {
@@ -1456,9 +1465,9 @@ void CreateAndRegisterAdminMob (IAAFDictionary * pDict)
   {
     // Instantiate a class definition object which will describe
     // AdminMob objects.
-    check (pDict->CreateInstance (AUID_AAFClassDef,
-								  IID_IAAFClassDef,
-								  (IUnknown**) &pcd));
+    check (defs.cdClassDef()->
+		   CreateInstance (IID_IAAFClassDef,
+						   (IUnknown**) &pcd));
 
     // We'll have to specify the AdminMob class definition's parent
     // class, so look it up here.  Since PersonnelResource inherits from
@@ -1505,7 +1514,7 @@ void CreateAndRegisterAdminMob (IAAFDictionary * pDict)
     check (pcd->RegisterNewPropertyDef (kPropID_AdminMob_Personnel,
 									    L"Personnel",
 									    ptd_PersonnelVector,
-									    AAFFalse,
+									    kAAFFalse,
 									    &pd_unused));
     pd_unused->Release();
     pd_unused=NULL;
