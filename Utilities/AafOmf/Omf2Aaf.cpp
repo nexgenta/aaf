@@ -640,7 +640,7 @@ void Omf2Aaf::ConvertOMFMediaDataObject( OMF2::omfObject_t obj, OMF2::omfUID_t i
 	}
 
 	aafMobID_t	mobID;
-	rc = aafMobIDFromMajorMinor(mediaID.major, mediaID.minor, &mobID);
+	rc = aafMobIDFromMajorMinor(42, mediaID.major, mediaID.minor, 4, &mobID);
 	rc = pHeader->LookupMob(mobID, &pMob);
 	pmob = pMob;
 	rc = pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob);
@@ -949,7 +949,7 @@ void Omf2Aaf::ConvertOMFMOBObject( OMF2::omfObject_t obj, IAAFMob* pMob )
 
 	// Convert OMF MobID into AAF AUID and set mob id
 	aafMobID_t				AAFMobUID;
-	aafCheck = aafMobIDFromMajorMinor(OMFMobID.major, OMFMobID.minor, &AAFMobUID);
+	aafCheck = aafMobIDFromMajorMinor(42, OMFMobID.major, OMFMobID.minor, 4, &AAFMobUID);
 	aafCheck = pMob->SetMobID(AAFMobUID);
 
 	// Set comments
@@ -1811,8 +1811,10 @@ void Omf2Aaf::ConvertOMFSourceClip(OMF2::omfObject_t sourceclip,
 									 &fadeoutLen, &OMFFadeoutType, &fadeoutPresent);
 
 	ConvertOMFDataDef(datakind, &pDataDef);
-		rc = aafMobIDFromMajorMinor(OMFSourceRef.sourceID.major,
+		rc = aafMobIDFromMajorMinor(42,
+									OMFSourceRef.sourceID.major,
 									OMFSourceRef.sourceID.minor,
+									4,
 									&sourceRef.sourceID);
 		sourceRef.sourceSlotID = OMFSourceRef.sourceTrackID;
 		sourceRef.startTime    = OMFSourceRef.startTime;
@@ -2014,9 +2016,6 @@ void Omf2Aaf::ConvertOMFCDCIDescriptorLocator(OMF2::omfObject_t mediaDescriptor,
 	aafUInt32			colorRange = 0;
 	aafInt16			paddingBits = 0;
 	aafInt32			videoLineMap[2];
-	aafUInt32			compLen;
-	char				*compress = NULL;
-	aafUID_t			AAFCompress;
 						
 	rc = pAAFDescriptor->QueryInterface(IID_IAAFDigitalImageDescriptor, (void **)&pDigImageDesc);
 
@@ -2123,17 +2122,16 @@ void Omf2Aaf::ConvertOMFCDCIDescriptorLocator(OMF2::omfObject_t mediaDescriptor,
 	rc = pDigImageDesc->SetVideoLineMap( (sizeof(videoLineMap)/sizeof(aafInt32)), videoLineMap);
 
 	//
-	compLen = OMF2::omfsLengthString(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDCompression);
-	compress = new char[compLen+1];			
-	OMFError = OMF2::omfsReadString(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDCompression, compress,
-						compLen+1);
-	if(strcmp(compress, "JFIF") == 0)
-		AAFCompress = CodecJPEG;
-	else
-		AAFCompress = NoCodec;
+	aafUID_t AAFCompress = NoCodec;
+	aafUInt32 compLen = OMF2::omfsLengthString(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDCompression);
+	if( compLen > 0 )
+	{
+		char compress[ 64 ] = "";
+		OMFError = OMF2::omfsReadString(OMFFileHdl, mediaDescriptor, OMF2::OMDIDDCompression, compress, compLen+1);
+		if(strcmp(compress, "JFIF") == 0)
+			AAFCompress = CodecJPEG;
+	}
 	rc = pDigImageDesc->SetCompression(AAFCompress);
-	delete [] compress;
-	compress = NULL;
 	pDigImageDesc->Release();
 	pDigImageDesc = NULL;
 
