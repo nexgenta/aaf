@@ -34,6 +34,8 @@
 #include "OMObjectDirectory.h"
 #include "OMPropertyTable.h"
 #include "OMUtilities.h"
+#include "OMDictionary.h"
+#include "OMRootStorable.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -55,8 +57,10 @@ OMFile::OMFile(const wchar_t* fileName,
                const OMAccessMode mode,
                OMStoredObject* store,
                const OMClassFactory* factory,
+               OMDictionary* dictionary,
                const OMLoadMode loadMode)
 : _root(0), _rootStoredObject(store),
+  _dictionary(dictionary),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
   _loadMode(loadMode), _fileName(0),
   _clientOnSaveContext(0), _clientOnRestoreContext(clientOnRestoreContext)
@@ -86,8 +90,10 @@ OMFile::OMFile(const wchar_t* fileName,
                const OMAccessMode mode,
                OMStoredObject* store,
                const OMClassFactory* factory,
+               OMDictionary* dictionary,
                OMStorable* root)
 : _root(root), _rootStoredObject(store),
+  _dictionary(dictionary),
   _objectDirectory(0), _referencedProperties(0), _mode(mode),
   _loadMode(lazyLoad), _fileName(0), _signature(signature),
   _clientOnSaveContext(0), _clientOnRestoreContext(clientOnRestoreContext)
@@ -126,7 +132,8 @@ OMFile::~OMFile(void)
 OMFile* OMFile::openExistingRead(const wchar_t* fileName,
                                  const OMClassFactory* factory,
                                  void* clientOnRestoreContext,
-                                 const OMLoadMode loadMode)
+                                 const OMLoadMode loadMode,
+                                 OMDictionary* dictionary)
 {
   TRACE("OMFile::openExistingRead");
   PRECONDITION("Valid file name", validWideString(fileName));
@@ -138,6 +145,7 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
                                readOnlyMode,
                                store,
                                factory,
+                               dictionary,
                                loadMode);
   ASSERT("Valid heap pointer", newFile != 0);
   POSTCONDITION("Object Manager file", newFile->isOMFile());
@@ -155,7 +163,8 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
 OMFile* OMFile::openExistingModify(const wchar_t* fileName,
                                    const OMClassFactory* factory,
                                    void* clientOnRestoreContext,
-                                   const OMLoadMode loadMode)
+                                   const OMLoadMode loadMode,
+                                   OMDictionary* dictionary)
 {
   TRACE("OMFile::openExistingModify");
   PRECONDITION("Valid file name", validWideString(fileName));
@@ -167,6 +176,7 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
                                modifyMode,
                                store,
                                factory,
+                               dictionary,
                                loadMode);
   ASSERT("Valid heap pointer", newFile != 0);
   POSTCONDITION("Object Manager file", newFile->isOMFile());
@@ -189,7 +199,8 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
                               void* clientOnRestoreContext,
                               const OMByteOrder byteOrder,
                               OMStorable* root,
-                              const OMFileSignature& signature)
+                              const OMFileSignature& signature,
+                              OMDictionary* dictionary)
 {
   TRACE("OMFile::openNewModify");
   PRECONDITION("Valid file name", validWideString(fileName));
@@ -198,15 +209,24 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
                     ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
   PRECONDITION("Valid root", root != 0);
   PRECONDITION("Valid signature", validSignature(signature));
+  // PRECONDITION("Valid dictionary ", dictionary != 0);
 
   OMStoredObject* store = OMStoredObject::createModify(fileName, byteOrder);
+  OMStorable* rt = 0;
+  if (dictionary == 0) {
+    rt = root;
+  } else {
+    rt = new OMRootStorable(root, dictionary);
+    ASSERT("Valid heap pointer", rt != 0);
+  }
   OMFile* newFile = new OMFile(fileName,
                                clientOnRestoreContext,
                                signature,
                                modifyMode,
                                store,
                                factory,
-                               root);
+                               dictionary,
+                               rt);
   ASSERT("Valid heap pointer", newFile != 0);
   return newFile;
 }
@@ -275,7 +295,23 @@ OMStorable* OMFile::restore(void)
   TRACE("OMFile::restore");
 
   _rootStoredObject->restore(_referencedProperties);
-  _root = OMStorable::restoreFrom(this, "/", *rootStoredObject());
+  OMClassId id;
+  _rootStoredObject->restore(id);
+  if (id == OMRootStorable::_rootClassId) {
+    ASSERT("Valid dictionary", _dictionary != 0);
+    _root = new OMRootStorable();
+    _root->attach(this, "/");
+    _root->setStore(rootStoredObject());
+    _root->setClassFactory(_dictionary);
+
+    _root->restoreContents();
+
+    OMDictionary *metaDictionary = ((OMRootStorable *)_root)->dictionary();
+    ASSERT("Consistent dictionaries", metaDictionary == _dictionary);
+    _root->setClassFactory(classFactory());
+  } else {
+    _root = OMStorable::restoreFrom(this, "/", *rootStoredObject());
+  }
   return root();
 }
 
@@ -289,6 +325,10 @@ void OMFile::close(void)
     writeSignature(_fileName);
   }
   _root->detach();
+  if (_dictionary != 0) {
+    delete _root;
+    _root = 0;
+  }
 }
 
   // @mfunc Retrieve the root <c OMStorable> from this <c OMFile>.
@@ -297,7 +337,13 @@ OMStorable* OMFile::root(void)
 {
   TRACE("OMFile::root");
 
-  return _root;
+  OMStorable* result;
+  if (_dictionary != 0) {
+    result = ((OMRootStorable*)_root)->clientRoot();
+  } else {
+    result = _root;
+  }
+  return result;
 }
 
   // @mfunc Retrieve the root <c OMStoredObject> from this <c OMFile>.
@@ -307,6 +353,13 @@ OMStoredObject* OMFile::rootStoredObject(void)
   TRACE("OMFile::rootStoredObject");
 
   return _rootStoredObject;
+}
+
+OMDictionary* OMFile::dictionary(void) const
+{
+  TRACE("OMFile::dictionary");
+
+  return _dictionary;
 }
 
   // @mfunc Retrieve the <c OMPropertyTable> from this <c OMFile>.
