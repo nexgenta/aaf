@@ -25,93 +25,204 @@
  *
  ************************************************************************/
 
-
-#ifndef __ImplAAFMob_h__
-#include "ImplAAFMob.h"
-#endif
-
-
-
-
-
-
-#ifndef __ImplEnumAAFMobs_h__
 #include "ImplEnumAAFMobs.h"
-#endif
 
-#include <assert.h>
+ImplEnumAAFMobs::ImplEnumAAFMobs()
+{
+	_criteria.searchTag = kAAFNoSearch;
+}
+
+AAFRESULT STDMETHODCALLTYPE 
+	ImplEnumAAFMobs::NextOne(ImplAAFMob ** ppMob)
+{
+	if(ppMob==NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	AAFRESULT ar;
+	ImplAAFMob *pCandidate;
+	while((ar=ImplAAFEnumerator<ImplAAFMob>::NextOne(&pCandidate))
+		==AAFRESULT_SUCCESS)
+	{
+		// Check for Mob that matches our search criteria
+		switch(_criteria.searchTag)
+		{
+		case kAAFNoSearch:
+			(*ppMob)=pCandidate;
+			return(AAFRESULT_SUCCESS);
+
+		case kAAFByMobKind:
+			aafMobKind_t	kind;
+				
+			ar = pCandidate->GetMobKind (&kind);
+			if(ar != AAFRESULT_SUCCESS)
+				return ar;
+			if((kind == _criteria.tags.mobKind) 
+				|| (kAAFAllMob == _criteria.tags.mobKind))
+			{
+				(*ppMob)=pCandidate;
+				return(AAFRESULT_SUCCESS);
+			}
+			break;
+
+		default:
+			return(AAFRESULT_NOT_IN_CURRENT_VERSION);
+		};
+	}
+	return(AAFRESULT_NO_MORE_OBJECTS);
+}
+	
+AAFRESULT STDMETHODCALLTYPE 
+	ImplEnumAAFMobs::Next(
+		aafUInt32  count,
+		ImplAAFMob ** ppMobs,
+		aafUInt32 *  pFetched)
+{
+	aafUInt32			numMobs;
+	AAFRESULT			ar=AAFRESULT_SUCCESS;
+
+	if(ppMobs==NULL||pFetched==NULL)
+		return(AAFRESULT_NULL_PARAM);
+	
+	if(count==0)
+		return(AAFRESULT_INVALID_PARAM);
+
+	for (numMobs = 0; numMobs < count; numMobs++)
+	{
+		ar = NextOne(&ppMobs[numMobs]);
+		if (FAILED(ar))
+			break;
+	}
+	
+	if (pFetched)
+		*pFetched=numMobs;
+
+	return(ar);
+}
+
+AAFRESULT STDMETHODCALLTYPE 
+	ImplEnumAAFMobs::Skip(aafUInt32  count)
+{
+	if(count==0)
+		return(AAFRESULT_INVALID_PARAM);
+
+	aafUInt32 n;
+	
+	for(n=1;n<=count;n++)
+	{
+		// Defined behavior of skip is to NOT advance at all if it would push 
+		// us off of the end
+		ImplAAFMob *pMob;
+		AAFRESULT ar = NextOne(&pMob);
+		if(ar==AAFRESULT_NO_MORE_OBJECTS)
+		{
+			// Off the end, decrement n and iterator back to the starting 
+			// position
+			while(n>=1)
+			{
+				--(*_pIterator);
+				n--;
+			}
+			return(ar);
+		}
+		else if(FAILED(ar))
+		{
+			return(ar);
+		}
+	}
+
+	return(AAFRESULT_SUCCESS);
+}
+
+// Clone() wrapper for pointer compatibility
+
+AAFRESULT STDMETHODCALLTYPE 
+	ImplEnumAAFMobs::Clone(ImplEnumAAFMobs ** ppEnum)
+{
+	// MSDEV requires reinterpret_cast here, even though 
+	// ImplAAFEnumerator<ImplAAFMob> is the base class for ImplEnumAAFMobs.
+	return(ImplAAFEnumerator<ImplAAFMob>::Clone(
+		reinterpret_cast<ImplAAFEnumerator<ImplAAFMob>**>(ppEnum)));
+}
+
+AAFRESULT ImplEnumAAFMobs::SetCriteria(aafSearchCrit_t *pCriteria)
+{
+	if(NULL == pCriteria)
+		_criteria.searchTag = kAAFNoSearch;
+	else
+		_criteria = *pCriteria;
+
+	return AAFRESULT_SUCCESS;
+}
+
+#if(0)
+
 #include "AAFResult.h"
 #include "ImplAAFObjectCreation.h"
 #include "aafUtils.h"
 
-extern "C" const aafClassID_t CLSID_EnumAAFMobs;
-
-
-ImplEnumAAFMobs::ImplEnumAAFMobs ()
+ImplEnumAAFMobs::ImplEnumAAFMobs () : _enumObj(0), _iterator(0)
 {
-	_current = 0;
-	_cStorage = NULL;
-	_criteria.searchTag = kNoSearch;
+	_criteria.searchTag = kAAFNoSearch;
 }
 
 
 ImplEnumAAFMobs::~ImplEnumAAFMobs ()
 {
-  if (_cStorage)
+  if (0 != _enumObj)
   {
-    _cStorage->ReleaseReference();
-    _cStorage = NULL;
+    _enumObj->ReleaseReference();
+	  _enumObj = 0;
   }
+	delete _iterator;
+	_iterator = 0;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFMobs::NextOne (ImplAAFMob **ppMob)
 {
-	aafNumSlots_t	cur = _current, siz;
-	aafBool			found = AAFFalse;
+	AAFRESULT ar = AAFRESULT_NO_MORE_OBJECTS;
+	aafBool	found = kAAFFalse;
 
-    XPROTECT()
+	if(ppMob == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	if (_iterator->before() || _iterator->valid())
 	{
-		CHECK(_cStorage->CountMobs (kAllMob, &siz));
-		if(cur < siz)
+		while(!found && ++(*_iterator))
 		{
-			found = AAFFalse;
-			do {
-				CHECK(_cStorage->GetNthMob (cur, ppMob));
-				_current = ++cur;
+			*ppMob = _iterator->value();
 				switch(_criteria.searchTag)
 				{
-				case kNoSearch:
-					found = AAFTrue;
+				case kAAFNoSearch:
+					found = kAAFTrue;
 					break;
 
-				case kByMobKind:
+				case kAAFByMobKind:
 					aafMobKind_t	kind;
 				
-					CHECK((*ppMob)->GetMobKind (&kind));
-					if((kind == _criteria.tags.mobKind) || (kAllMob == _criteria.tags.mobKind))
-						found = AAFTrue;
+					ar = (*ppMob)->GetMobKind (&kind);
+					if(ar != AAFRESULT_SUCCESS)
+						return ar;
+					if((kind == _criteria.tags.mobKind) || (kAAFAllMob == _criteria.tags.mobKind))
+						found = kAAFTrue;
 					break;
 				default:
 					return AAFRESULT_NOT_IN_CURRENT_VERSION;
 				}
-				if(!found)
-				{
-				  (*ppMob)->ReleaseReference();
-				  *ppMob = 0;
-				}
-
-			} while(!found && cur < siz);
 		}
-	
-		if(!found)
-			RAISE(AAFRESULT_NO_MORE_MOBS);
+		if(found)
+		{
+			(*ppMob)->AcquireReference();
+			ar = AAFRESULT_SUCCESS;
+		}
+		else
+		{
+			*ppMob = NULL;
+			ar = AAFRESULT_NO_MORE_OBJECTS;
+		}
 	}
-	XEXCEPT
-	XEND
-
-	return AAFRESULT_SUCCESS;
+	return ar;
 }
 
 
@@ -120,132 +231,94 @@ AAFRESULT STDMETHODCALLTYPE
                            ImplAAFMob **ppMobs,
                            aafUInt32 *pFetched)
 {
-	ImplAAFMob**	ppMob;
-	aafUInt32		numMobs;
-	HRESULT			hr;
+	ImplAAFMob		**	ppOneMob;
+	aafUInt32			numDefs;
+	HRESULT				hr;
 
-	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
-		return E_INVALIDARG;
+	if(ppMobs == NULL)
+		return AAFRESULT_NULL_PARAM;
+	
+//!!!	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
+//		return E_INVALIDARG;
 
 	// Point at the first component in the array.
-	ppMob = ppMobs;
-	for (numMobs = 0; numMobs < count; numMobs++)
+	ppOneMob = ppMobs;
+	for (numDefs = 0; numDefs < count; numDefs++)
 	{
-		hr = NextOne(ppMob);
+		hr = NextOne(&ppOneMob[numDefs]);
 		if (FAILED(hr))
 			break;
-
-		// Point at the next component in the array.  This
-		// will increment off the end of the array when
-		// numComps == count-1, but the for loop should
-		// prevent access to this location.
-		ppMob++;
 	}
 	
 	if (pFetched)
-		*pFetched = numMobs;
+		*pFetched = numDefs;
 
-	return hr;
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFMobs::Skip (aafUInt32 count)
 {
-	AAFRESULT	hr;
-	aafNumSlots_t newCurrent;
-	aafNumSlots_t siz;
-
-	newCurrent = _current + count;
-
- 	switch(_criteria.searchTag)
+	AAFRESULT	ar = AAFRESULT_SUCCESS;
+	aafUInt32	n;
+	
+	for(n = 1; n <= count; n++)
 	{
-		case kNoSearch:
-			_cStorage->CountMobs(kAllMob, &siz);
+		//!!! JeffB: Handle skip of subset of mobs correctly
+		// Defined behavior of skip is to NOT advance at all if it would push us off of the end
+		if(!++(*_iterator))
+		{
+			// Off the end, decrement n and iterator back to the starting position
+			while(n >= 1)
+			{
+				--(*_iterator);
+				n--;
+			}
+			ar = AAFRESULT_NO_MORE_OBJECTS;
 			break;
-
-		case kByMobKind:
-			_cStorage->CountMobs(_criteria.tags.mobKind, &siz);
-			break;
-
-		default:
-			return AAFRESULT_NOT_IN_CURRENT_VERSION;
 		}
-
-	if(newCurrent < siz)
-	{
-		_current = newCurrent;
-		hr = AAFRESULT_SUCCESS;
-	}
-	else
-	{
-		hr = E_FAIL;
 	}
 
-	return hr;
+	return ar;
 }
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFMobs::Reset ()
-{
-	_current = 0;
-	return AAFRESULT_SUCCESS;
-}
-
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFMobs::Clone (ImplEnumAAFMobs **ppEnum)
 {
-	ImplEnumAAFMobs*	theEnum;
-	HRESULT				hr;
-	
-	theEnum = (ImplEnumAAFMobs *)CreateImpl(CLSID_EnumAAFMobs);
-	if (theEnum == NULL)
+	AAFRESULT			ar = AAFRESULT_SUCCESS;
+	ImplEnumAAFMobs		*result;
+
+	result = (ImplEnumAAFMobs *)CreateImpl(CLSID_EnumAAFMobs);
+	if (result == NULL)
 		return E_FAIL;
-		
-	hr = theEnum->SetContentStorage(_cStorage);
-	if (SUCCEEDED(hr))
+
+    ar = result->SetIterator(_enumObj,_iterator->copy());
+	if (SUCCEEDED(ar))
 	{
-		theEnum->Reset();
-		theEnum->Skip(_current);
-		*ppEnum = theEnum;
+		*ppEnum = result;
 	}
 	else
 	{
-	  theEnum->ReleaseReference();
-	  theEnum = 0;
+	  result->ReleaseReference();
+	  result = 0;
 	  *ppEnum = NULL;
 	}
-
-	return hr;
+	
+	return ar;
 }
 
 //Internal
-AAFRESULT
-    ImplEnumAAFMobs::SetContentStorage(ImplAAFContentStorage *pCStore)
-{
-  if (_cStorage)
-	_cStorage->ReleaseReference();
-  _cStorage = 0;
-
-	_cStorage = pCStore;
-
-  if (pCStore)
-		pCStore->AcquireReference();
-
-	return AAFRESULT_SUCCESS;
-}
 
 AAFRESULT
-    ImplEnumAAFMobs::SetCriteria(aafSearchCrit_t *pCriteria)
+	ImplEnumAAFMobs::SetCriteria(aafSearchCrit_t *pCriteria)
 {
 	if(NULL == pCriteria)
-		_criteria.searchTag = kNoSearch;
+		_criteria.searchTag = kAAFNoSearch;
 	else
 		_criteria = *pCriteria;
 
 	return AAFRESULT_SUCCESS;
 }
 
-
+#endif
