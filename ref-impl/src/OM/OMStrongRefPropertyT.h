@@ -423,4 +423,33 @@ OMStrongReferenceProperty<ReferencedObject>::reference(void) const
   return const_cast<OMStrongObjectReference&>(_reference);
 }
 
+template <typename ReferencedObject>
+void OMStrongReferenceProperty<ReferencedObject>::shallowCopyTo(
+                                           OMProperty* /* destination */) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::shallowCopyTo");
+  // Nothing to do - this is a shallow copy
+}
+
+template <typename ReferencedObject>
+void OMStrongReferenceProperty<ReferencedObject>::deepCopyTo(
+                                                     OMProperty* destination,
+                                                     void* clientContext) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::deepCopyTo");
+  PRECONDITION("Valid destination", destination != 0);
+
+  typedef OMStrongReferenceProperty<ReferencedObject> Property;
+  Property* dest = dynamic_cast<Property*>(destination);
+  ASSERT("Destination is correct type", dest != 0);
+  ASSERT("Valid destination", dest != this);
+
+  ASSERT("Destination reference is void", dest->isVoid());
+  OMStorable* source = _reference.getValue();
+  ASSERT("Valid source", source != 0);
+  OMStorable* d = source->shallowCopy();
+  dest->setObject(d);
+  source->deepCopyTo(d, clientContext);
+}
+
 #endif

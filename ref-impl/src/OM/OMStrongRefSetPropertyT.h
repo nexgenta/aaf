@@ -882,5 +882,42 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   object = p;
 }
 
+template <typename UniqueIdentification, typename ReferencedObject>
+void OMStrongReferenceSetProperty<UniqueIdentification,
+                                  ReferencedObject>::shallowCopyTo(
+                                            OMProperty* /* destination */)const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::shallowCopyTo");
+  // Nothing to do - this is a shallow copy
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+void OMStrongReferenceSetProperty<UniqueIdentification,
+                                  ReferencedObject>::deepCopyTo(
+                                                     OMProperty* destination,
+                                                     void* clientContext) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::deepCopyTo");
+  PRECONDITION("Valid destination", destination != 0);
+
+  typedef OMStrongReferenceSetProperty<UniqueIdentification,
+                                       ReferencedObject> Property;
+  Property* dest = dynamic_cast<Property*>(destination);
+  ASSERT("Destination is correct type", dest != 0);
+  ASSERT("Valid destination", dest != this);
+
+  ASSERT("Destination set is void", dest->isVoid());
+  SetIterator iterator(_set, OMBefore);
+  while (++iterator) {
+    SetElement& element = iterator.value();
+    OMStorable* source = element.getValue();
+    OMStorable* d = source->shallowCopy();
+    dest->insertObject(d);
+    source->deepCopyTo(d, clientContext);
+  }
+}
+
 #endif
 
