@@ -41,8 +41,7 @@
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
-#include "OMAssertions.h"
-
+#include <assert.h>
 #include <string.h>
 
 
@@ -54,11 +53,21 @@ ImplAAFTypeDefObjectRef::~ImplAAFTypeDefObjectRef ()
 {}
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefObjectRef::pvtInitialize (
+      const aafUID_t & /*pID*/,
+      const ImplAAFClassDef * /*pRefdObjID*/,
+      const aafCharacter * /*pTypeName*/)
+{
+  // This is a virtual function should be implemented in a derived class.
+  return AAFRESULT_INTERNAL_ERROR;
+}
+
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::CreateValue (
-      ImplAAFRoot * /*pObj*/,
+      ImplAAFObject * /*pObj*/,
       ImplAAFPropertyValue ** /*ppPropVal*/)
 {
   // This is a virtual function should be implemented in a derived class.
@@ -80,7 +89,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::GetObject (
       ImplAAFPropertyValue * /*pPropVal*/,
-      ImplAAFRoot ** /*ppObject*/)
+      ImplAAFObject ** /*ppObject*/)
 {
   // This is a virtual function should be implemented in a derived class.
   return AAFRESULT_INTERNAL_ERROR;
@@ -91,7 +100,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::SetObject (
       ImplAAFPropertyValue * /*pPropVal*/,
-      ImplAAFRoot * /*ppObject*/)
+      ImplAAFObject * /*ppObject*/)
 {
   // This is a virtual function should be implemented in a derived class.
   return AAFRESULT_INTERNAL_ERROR;
@@ -115,16 +124,10 @@ size_t ImplAAFTypeDefObjectRef::externalSize(OMByte* /*internalBytes*/,
 void ImplAAFTypeDefObjectRef::externalize(OMByte* internalBytes,
 										  size_t internalBytesSize,
 										  OMByte* externalBytes,
-										  size_t ANAME(externalBytesSize),
-										  OMByteOrder NNAME(byteOrder)) const
+										  size_t externalBytesSize,
+										  OMByteOrder /*byteOrder*/) const
 {
-  TRACE("ImplAAFTypeDefObjectRef::externalize");
-  PRECONDITION("Valid internal bytes", internalBytes != 0);
-  PRECONDITION("Valid internal byte size", internalBytesSize > 0);
-  PRECONDITION("Valid external bytes", externalBytes != 0);
-  PRECONDITION("Valid external byte size", externalBytesSize > 0);
-  PRECONDITION("Internal and external sizes are equal", externalBytesSize == internalBytesSize);
-
+  assert (externalBytesSize >= internalBytesSize);
   copy (internalBytes, externalBytes, internalBytesSize);
 }
 
@@ -139,16 +142,10 @@ size_t ImplAAFTypeDefObjectRef::internalSize(OMByte* /*externalBytes*/,
 void ImplAAFTypeDefObjectRef::internalize(OMByte* externalBytes,
 										  size_t externalBytesSize,
 										  OMByte* internalBytes,
-										  size_t ANAME(internalBytesSize),
-										  OMByteOrder NNAME(byteOrder)) const
+										  size_t internalBytesSize,
+										  OMByteOrder /*byteOrder*/) const
 {
-  TRACE("ImplAAFTypeDefObjectRef::internalize");
-  PRECONDITION("Valid external bytes", externalBytes != 0);
-  PRECONDITION("Valid external byte size", externalBytesSize > 0);
-  PRECONDITION("Valid internal bytes", internalBytes != 0);
-  PRECONDITION("Valid internal byte size", internalBytesSize > 0);
-  PRECONDITION("Internal and external sizes are equal", internalBytesSize == externalBytesSize);
-		           
+  assert (internalBytesSize >= externalBytesSize);
   copy (externalBytes, internalBytes, externalBytesSize);
 }
 

@@ -5,7 +5,7 @@
 
 /***********************************************************************
  *
- *              Copyright (c) 1998-2000 Avid Technology, Inc.
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -69,62 +69,46 @@ public:
          // @parm [in, string] friendly name of this type definition
          const aafCharacter * pTypeName,
 
-         // @parm [in] Number of property def IDs in pTargetSet
-         aafUInt32  ids,
+		 // List of property definition IDs indicating the property where
+		 // the target is to be found.
+		 aafUID_t * pTargetHint,
 
-         // @parm [in, size_is(ids)] List of property definition IDs indicating the property where
-         // the target is to be found.
-         aafUID_constptr  pTargetSet);
-
-  // Override from AAFTypeDefObjectRef
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateValue (/*[in]*/ ImplAAFRoot * pObj,
-      /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
+		 // Number of property def IDs in pTargetHint
+		 aafUInt32 targetHintCount);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     SetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[in]*/ ImplAAFRoot * ppObject);
+      /*[in]*/ ImplAAFObject * ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
-      /*[out]*/ ImplAAFRoot ** ppObject);
+      /*[out]*/ ImplAAFObject ** ppObject);
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
+
+  // Override from AAFTypeDefObjectRef
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateValue (/*[in]*/ ImplAAFObject * pObj,
+      /*[out]*/ ImplAAFPropertyValue ** ppPropVal);
 
   // Override from AAFTypeDef
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
 
 
-private:
-  // Synchronize the array of OM pids with the current TargetSet property.
-  AAFRESULT SyncTargetPidsFromTargetSet(void);
-  
-  // Synchronize the TargetSet property from the current targetPids OM pid array.
-  AAFRESULT SyncTargetSetFromTargetPids(void);
 
 public:
 
-
   // Override from AAFTypeDefObjectRef
-  AAFRESULT STDMETHODCALLTYPE
+  virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
         (const aafUID_t & id,
          const ImplAAFClassDef *pType,
-         const aafCharacter * pTypeName,
-         aafUInt32  ids,
-         aafUID_constptr  pTargetSet,
-         OMPropertyId * _targetPids = NULL,
-         OMPropertyId _uniqueIdentifierPid = 0);
-
-  aafUInt32 GetTargetPidCount(void) const;
-  const OMPropertyId * GetTargetPids(void) const;
-  OMPropertyId GetUniqueIdentifierPid(void) const;
-
+         const aafCharacter * pTypeName);
 
   // overrides from ImplAAFTypeDef
   //
@@ -137,11 +121,6 @@ public:
     pvtCreateOMProperty (OMPropertyId pid,
 							const wchar_t * name) const;
 
-  // Allocate and initialize the correct subclass of ImplAAFPropertyValue 
-  // for the given OMProperty.
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreatePropertyValue(OMProperty *property, 
-                        ImplAAFPropertyValue ** pPropertyValue) const;
 
 
   // override from OMStorable.
@@ -151,20 +130,12 @@ public:
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
 
-  // Method is called after class has been added to MetaDictionary.
-  // If this method fails the class is removed from the MetaDictionary and the
-  // registration method will fail.
-  virtual HRESULT CompleteClassRegistration(void);
-
 private:
-  // Persistent member properties
   OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
-  OMVariableSizeProperty<aafUID_t> _targetSet; // array of property definition ids
-  
-  // Transient members
-  OMPropertyId * _targetPids;
-  aafUInt32 _targetPidCount;
-  OMPropertyId _uniqueIdentifierPid;
+
+  ImplAAFTypeDefSP                     _cachedAuidType;
+
+  ImplAAFTypeDefSP BaseType (void) const;
 };
 
 

@@ -33,7 +33,7 @@
 
 
 class ImplAAFPropertyValue;
-class ImplAAFRoot;
+
 class ImplAAFClassDef;
 
 
@@ -65,7 +65,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     CreateValue
         (// @parm [in] object with which to initialize this object reference
-         ImplAAFRoot * pObj,
+         ImplAAFObject * pObj,
 
          // @parm [out] newly created property value
          ImplAAFPropertyValue ** ppPropVal);
@@ -89,7 +89,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [out] pointer to object value
-         ImplAAFRoot ** ppObject);
+         ImplAAFObject ** ppObject);
 
 
   //****************
@@ -101,7 +101,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [in] pointer to object value
-         ImplAAFRoot * ppObject);
+         ImplAAFObject * ppObject);
 
 
 
@@ -133,6 +133,26 @@ public:
                            OMByteOrder byteOrder) const;
 
 
+  // Similar to Initialize(), but doesn't require a real referenced
+  // object type; can merely pass along the ref'd object's AUID.  NOT
+  // FOR CLIENT CONSUMPTION!  This is only here to break a bootstrap
+  // dependency when instantiating the first class definition:
+  //
+  // ClassDef requires
+  // ObjRefArray (array of strong object references), which requires
+  // ObjectReference, which requires
+  // ClassDef (for use as referenced type).
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    pvtInitialize
+        (// @parm [in] auid to be used to identify this type
+         const aafUID_t & id,
+
+         // @parm [in] class def of objects permitted to be referenced
+         const ImplAAFClassDef *pClassDef,
+
+         // @parm [in, string] friendly name of this type definition
+         const aafCharacter * pTypeName);
 
 public:
   // Overrides from ImplAAFTypeDef
