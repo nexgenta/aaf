@@ -112,10 +112,10 @@ public:
         (ImplAAFMob ** mob);
 
   //****************
-  // GetRef()
+  // GetSourceReference()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetRef
+    GetSourceReference
 		// @parm [out] Source Reference
         (aafSourceRef_t *  sourceRef);
 
@@ -137,10 +137,10 @@ public:
 		 aafFadeType_t  fadeOutType);
 
   //****************
-  // SetRef()
+  // SetSourceReference()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetRef
+    SetSourceReference
 		// @parm [in] Source Reference
         (aafSourceRef_t  sourceRef);
 
@@ -150,6 +150,10 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFSourceClipTest.cpp.
   static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 
 private:
 	OMFixedSizeProperty<aafInt32>		_fadeInLen;
