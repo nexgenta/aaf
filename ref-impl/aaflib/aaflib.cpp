@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.cpp,v 1.33 2004/03/22 23:09:15 creederickson Exp $ $Name:  $
+// $Id: aaflib.cpp,v 1.34 2004/05/05 15:41:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,11 @@
 #endif
 
 
+
+// Dynamic loading can be disabled using the Debug-static build.
+#ifndef DISABLE_DYNAMIC_LOADING
+
+
 //
 // Initialize the AUID's.
 //
@@ -62,8 +67,6 @@
 // Initialize static singleton data.
 //
 AAFDLL * AAFDLL::_singleton = NULL;
-
-
 
 
 //
@@ -943,3 +946,16 @@ HRESULT AAFDLL::CreateAAFFileOnRawStorage (
 	 pIdent,
 	 ppNewFile);
 }
+
+#else
+
+// Static builds.
+//
+// AAFLoad not needed since it is defined in CAAFModule.cpp
+// But AAFUnload is not.
+STDAPI AAFUnload()
+{
+  return S_OK;
+}
+
+#endif // DISABLE_DYNAMIC_LOADING
