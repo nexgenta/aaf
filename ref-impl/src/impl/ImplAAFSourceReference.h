@@ -5,6 +5,16 @@
 
 #include "OMStorable.h"
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -33,6 +43,7 @@
  ************************************************************************/
 
 
+
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
 #endif
@@ -59,7 +70,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetSourceID
 		// @parm [retval][out] Place to put source ID
-        (aafMobID_t *  pSourceID);
+        (aafUID_t *  pSourceID);
 
   //****************
   // SetSourceID()
@@ -67,7 +78,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     SetSourceID
 		// @parm [in] Source ID to set
-        (aafMobID_constref   sourceID);
+        (aafUID_t   sourceID);
 
   //****************
   // GetSourceMobSlotID()
@@ -88,11 +99,10 @@ public:
 public:
 	//SDK-private
 
-	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
-												aafMobID_constref to);
+	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
 
 private:
-	OMFixedSizeProperty<aafMobID_t>	_sourceID;
+	OMFixedSizeProperty<aafUID_t>	_sourceID;
 	OMFixedSizeProperty<aafInt32>	_sourceMobSlotId;
 
 };

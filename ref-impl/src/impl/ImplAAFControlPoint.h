@@ -32,7 +32,6 @@
  ************************************************************************/
 
 
-
 /***********************************************\
 *												*
 * Advanced Authoring Format						*
@@ -153,6 +152,12 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetTypeDefinition (
       ImplAAFTypeDef **ppTypeDef);
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFControlPoint)
 
 private:
 	OMFixedSizeProperty<aafUID_t>		_type;

@@ -34,7 +34,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
 ////////////////////////////////////////////////////////////////////////////////
 // Types required by this module:
 //
@@ -72,7 +71,7 @@ public:
   ImplAAFMobSlot ();
   ~ImplAAFMobSlot ();
 
-
+  OMDECLARE_STORABLE(ImplAAFMobSlot)
   //****************
   // GetSegment()
   //
@@ -109,7 +108,7 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     SetName
-        (const aafCharacter *  name);  //@parm [in] Mob Slot Name
+        (aafWChar *  name);  //@parm [in] Mob Slot Name
 
 
   //****************
@@ -165,8 +164,7 @@ public:
   virtual AAFRESULT ConvertToMyRate(aafPosition_t tmpPos,
 										  ImplAAFMobSlot *srcSlot,
 										aafPosition_t *convertPos);
-  virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
-											  aafMobID_constref to);
+  virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
 
 
 protected:
