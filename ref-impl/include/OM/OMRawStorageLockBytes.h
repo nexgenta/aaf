@@ -35,22 +35,10 @@ class OMRawStorage;
 
   // @class An implementation of the Microsoft Structured Storage interface
   //        ILockBytes in terms of <c OMRawStorage>.
-  //        This class is an adapter from the ILockBytes interface to the
-  //        exported <c OMRawStorage> interface. Object Manager clients
-  //        may use the <c OMRawStorage> interface to access or to control
-  //        the storage of the raw bytes of a file.
   //   @base public | ILockBytes
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMRawStorageLockBytes : public ILockBytes {
 public:
   // @access Public members.
-
-  virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
-                                                   void** ppvObject);
-
-  virtual ULONG STDMETHODCALLTYPE AddRef(void);
-
-  virtual ULONG STDMETHODCALLTYPE Release(void);
 
     // @cmember Constructor.
   OMRawStorageLockBytes(OMRawStorage* rawStorage);
@@ -63,13 +51,13 @@ public:
                                            void *pv,
                                            ULONG cb,
                                            ULONG *pcbRead);
-
+        
     // @cmember Write bytes (see Microsoft documentation for details).
   virtual HRESULT STDMETHODCALLTYPE WriteAt(ULARGE_INTEGER ulOffset,
                                             const void *pv,
                                             ULONG cb,
                                             ULONG *pcbWritten);
-
+        
     // @cmember Flush any buffered bytes (see Microsoft documentation
     //          for details).
   virtual HRESULT STDMETHODCALLTYPE Flush(void);
@@ -82,12 +70,12 @@ public:
   virtual HRESULT STDMETHODCALLTYPE LockRegion(ULARGE_INTEGER libOffset,
                                                ULARGE_INTEGER cb,
                                                DWORD dwLockType);
-
+        
     // @cmember See Microsoft documentation for details.
   virtual HRESULT STDMETHODCALLTYPE UnlockRegion(ULARGE_INTEGER libOffset,
                                                  ULARGE_INTEGER cb,
                                                  DWORD dwLockType);
-
+        
     // @cmember See Microsoft documentation for details.
   virtual HRESULT STDMETHODCALLTYPE Stat(STATSTG *pstatstg,
                                          DWORD grfStatFlag);
@@ -95,8 +83,7 @@ public:
 private:
   // @access Private members.
 
-  OMRawStorage* _rawStorage;
-  ULONG _referenceCount;
+  OMRawStorage* _rawStorge;
 
 };
 
