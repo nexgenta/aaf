@@ -14,7 +14,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -36,6 +36,7 @@
 //
 class ImplEnumAAFProperties;
 class ImplAAFClassDef;
+class ImplAAFIdentification;
 class ImplAAFProperty;
 class ImplAAFPropertyDef;
 class ImplAAFPropertyValue;
@@ -64,12 +65,26 @@ public:
 
 
   //****************
-  // SetGeneration()
+  // EnableGenerationTracking()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    SetGeneration
-		// @parm [in] Generation ID to which this object is to be set
-        (aafUID_t *  pGeneration);
+    EnableGenerationTracking ();
+
+
+  //****************
+  // DisableGenerationTracking()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    DisableGenerationTracking ();
+
+
+  //****************
+  // IsGenerationTracked()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsGenerationTracked
+        // @parm [out] set to true if tracked, false otherwise.
+        (aafBoolean_t * pResult) const;
 
 
   //****************
@@ -77,6 +92,16 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     GetGeneration
+		// @parm [out] Identification corresponding to this object's
+		// generation
+        (ImplAAFIdentification **  ppResult);
+
+
+  //****************
+  // GetGenerationAUID()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetGenerationAUID
 		// @parm [out] Generation ID into which this object's generation is to be written
         (aafUID_t *  pGeneration);
 
@@ -194,12 +219,23 @@ public:
 
   void pvtSetSoid (const aafUID_t & id);
 
-  // Initialize the OM Properties in this object.
-  void InitOMProperties ();
-
   virtual const OMClassId& classId(void) const;
 
+  // Create and intialize associated external extensions.
+  AAFRESULT InitializeExtensions(void);
+
+  // Remembers the given property so it will be deleted with this
+  // object.
+  void RememberAddedProp (OMProperty * pProp);
+
+  aafBoolean_t pvtIsGenerationTracked() const;
+
+  // Override callback from OMStorable
+  virtual void onSave(void* clientContext) const;
+
 private:
+
+  OMFixedSizeProperty<aafUID_t> _generation;
 
   // private method
   AAFRESULT InitProperties ();
@@ -211,13 +247,38 @@ private:
   // stored object ID
   aafUID_t                 _soid;
 
-  // This is only kept so we can delete added properties when this
-  // object goes away.
-  enum { kMaxAddedPropCount = 100 };
-  OMProperty* _addedProps[kMaxAddedPropCount];
-  size_t _addedPropCount;
+  // 
+  // The following section is intended only to delete added properties
+  // when this object goes away.
+  // 
+  // Private class to manage saved properties
+  class SavedProp
+  {
+  public:
+	SavedProp (OMProperty * p);
+	~SavedProp ();
 
-  aafBool _OMPropInitStarted;
+  private:
+	// Disallow copy and assignment, so declare them private and don't
+	// implement!
+	SavedProp (const SavedProp&);
+	SavedProp& operator= (const SavedProp&);
+
+	OMProperty * _p;
+  };
+  //
+  // pointer to array of pointers to saved properties.
+  SavedProp ** _apSavedProps;
+  //
+  // size of _pSavedProps array.
+  aafUInt32 _savedPropsSize;
+  //
+  // number of those props that are actually used
+  aafUInt32 _savedPropsCount;
+  
+protected:
+  aafBool	_isInitialized;
+
 };
 
 //
