@@ -1,6 +1,6 @@
 
 /*
- * $Id: AAFDotInstanceMapper.cpp,v 1.14 2004/12/23 13:50:28 stuart_hc Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.cpp,v 1.15 2005/01/12 03:14:37 jfpanisset Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -232,7 +232,7 @@ AAFDotInstanceMapper::MapAAFObject( AxObject axObject, bool &popStack )
    IAAFSourceReferenceSP spIaafSourceReference;
    if ( AxIsA( spIUnknown, spIaafSourceReference ) )
    {
-      aafMobID_t mobID = {0};
+      aafMobID_t mobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,{0,0,0,{0,0,0,0,0,0,0,0}}};
       HRESULT result = spIaafSourceReference->GetSourceID( &mobID );
       if (!SUCCEEDED(result)) {
 	 if (result != AAFRESULT_PROP_NOT_PRESENT) {
