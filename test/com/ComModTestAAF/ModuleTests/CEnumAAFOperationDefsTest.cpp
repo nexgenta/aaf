@@ -40,6 +40,8 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
 {
@@ -87,14 +89,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -122,18 +124,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
-	IAAFFile*			pFile = NULL;
-	IAAFHeader *		pHeader = NULL;
-	IAAFDictionary*		pDictionary = NULL;
-	IAAFDefObject*		pDef = NULL;
-	IAAFOperationDef*	pOperationDef = NULL;
-	IAAFParameterDef*	pParamDef = NULL;
-	bool				bFileOpen = false;
-	HRESULT				hr = S_OK;
-	long				n;
-	aafUID_t			testDataDef = DDEF_Picture;
-/*	long				test;
-*/
+  IAAFFile*			pFile = NULL;
+  IAAFHeader *		pHeader = NULL;
+  IAAFDictionary*		pDictionary = NULL;
+  IAAFDefObject*		pDef = NULL;
+  IAAFOperationDef*	pOperationDef = NULL;
+  IAAFParameterDef*	pParamDef = NULL;
+  bool				bFileOpen = false;
+  HRESULT				hr = S_OK;
+  long				n;
 
   try
   {
@@ -142,23 +141,27 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Create the AAF file
-	checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+	checkResult(OpenAAFFile(pFileName,
+							kAAFMediaOpenAppend,
+							&pFile,
+							&pHeader));
     bFileOpen = true;
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
+	CAAFBuiltinDefs defs (pDictionary);
     
 	for(n = 0; n < 2; n++)
 	{
-		checkResult(pDictionary->CreateInstance(AUID_AAFOperationDef,
-			IID_IAAFOperationDef, 
-			(IUnknown **)&pOperationDef));    
-				checkResult(pDictionary->CreateInstance(AUID_AAFParameterDef,
-									  IID_IAAFParameterDef, 
-									  (IUnknown **)&pParamDef));
+		checkResult(defs.cdOperationDef()->
+					CreateInstance(IID_IAAFOperationDef, 
+								   (IUnknown **)&pOperationDef));    
+		checkResult(defs.cdParameterDef()->
+					CreateInstance(IID_IAAFParameterDef, 
+								   (IUnknown **)&pParamDef));
 		
-		checkResult(pDictionary->RegisterOperationDefinition(pOperationDef));
-		checkResult(pDictionary->RegisterParameterDefinition(pParamDef));
+		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
+		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 		
 		checkResult(pOperationDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
 		checkResult(pDef->SetName (sName[n]));
@@ -167,14 +170,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pDef = NULL;
 		
 		//!!!Not testing the INIT on AAFDefObject
-		checkResult(pOperationDef->SetDataDefinitionID (testDataDef));
-		checkResult(pOperationDef->SetIsTimeWarp (AAFFalse));
+		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
+		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
-		checkResult(pOperationDef->AddParameterDefs (pParamDef));
+		checkResult(pOperationDef->AddParameterDef (pParamDef));
 		checkResult(pOperationDef->SetBypass (TEST_BYPASS));
 		// !!!Added circular definitions because we don't have optional properties
-		checkResult(pOperationDef->AppendDegradeToOperations (pOperationDef));
+		checkResult(pOperationDef->AppendDegradeToOperation (pOperationDef));
 		
 		checkResult(pParamDef->QueryInterface(IID_IAAFDefObject, (void **) &pDef));
 		checkResult(pDef->SetName (TEST_PARAM_NAME));
@@ -242,12 +245,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetOperationDefinitions(&pPlug));
+		checkResult(pDictionary->GetOperationDefs(&pPlug));
 		/* Read and check the first element */
 		checkResult(pPlug->NextOne(&pOperationDef));
 		checkResult(pOperationDef->QueryInterface (IID_IAAFDefObject,

@@ -38,6 +38,8 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 #define kNumComponents	5
 
 
@@ -74,12 +76,14 @@ static HRESULT CreateAAFSequence(IAAFDictionary *pDictionary,
 	HRESULT			hr = S_OK;
 	aafUInt32		i;
 
- 	hr = pDictionary->CreateInstance(AUID_AAFSequence,
-						   IID_IAAFSequence, 
-						   (IUnknown **)&pSequence);		
+	CAAFBuiltinDefs defs (pDictionary);
+
+ 	hr = defs.cdSequence()->
+	  CreateInstance(IID_IAAFSequence, 
+					 (IUnknown **)&pSequence);		
  	if (SUCCEEDED(hr))
 	{
-		pSequence->Initialize(DDEF_Sound);
+		pSequence->Initialize(defs.ddSound());
 
 		//
 		//	Add some segments.  Need to test failure conditions
@@ -91,13 +95,13 @@ static HRESULT CreateAAFSequence(IAAFDictionary *pDictionary,
 	    IAAFComponent*	pComponent = NULL;
 			aafLength_t		len = 10;
 
-			hr = pDictionary->CreateInstance(AUID_AAFFiller,
-									IID_IAAFComponent, 
-									(IUnknown **)&pComponent);
+			hr = defs.cdFiller()->
+			  CreateInstance(IID_IAAFComponent, 
+							 (IUnknown **)&pComponent);
  			if (FAILED(hr))
 				break;
 
-			pComponent->SetDataDef(DDEF_Sound);
+			pComponent->SetDataDef(defs.ddSound());
 			pComponent->SetLength(len);
 			hr = pSequence->AppendComponent(pComponent);
 
@@ -132,13 +136,13 @@ static HRESULT TestEnumerator(IAAFSequence*	pSequence)
 	aafUInt32			numFetched, i;
 #endif
 	HRESULT				hr = S_OK;
-	aafInt32			numCpnts;
+	aafUInt32			numCpnts;
 
-	pSequence->GetNumComponents(&numCpnts);
+	pSequence->CountComponents(&numCpnts);
 	if (numCpnts != kNumComponents)
 		return AAFRESULT_TEST_FAILED;
 
-	hr = pSequence->EnumComponents(&pCompIter);
+	hr = pSequence->GetComponents(&pCompIter);
 	if (FAILED(hr))
 		return AAFRESULT_TEST_FAILED;
 
@@ -298,7 +302,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -321,7 +325,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  // This is temporary as the content storage should be created by
 	  // the call to OpenNewModify above.
     aafNumSlots_t n;
-    checkResult(pHeader->GetNumMobs(kAllMob, &n));
+    checkResult(pHeader->CountMobs(kAAFAllMob, &n));
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
@@ -376,7 +380,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;

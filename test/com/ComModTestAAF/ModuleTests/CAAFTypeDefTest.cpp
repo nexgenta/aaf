@@ -37,6 +37,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "CAAFBuiltinDefs.h"
+
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFDictionary> IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFFile>       IAAFFileSP;
@@ -78,7 +80,7 @@ static HRESULT TestTypeDef ()
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -98,17 +100,18 @@ static HRESULT TestTypeDef ()
   if (! SUCCEEDED (hr)) return hr;
   assert (pDict);
 
+  CAAFBuiltinDefs defs (pDict);
+
   // Let's try to do something interesting with a type definition
   IAAFTypeDefIntSP pTypeDefInt;
-  hr = pDict->CreateInstance (AUID_AAFTypeDefInt,
-							  IID_IAAFTypeDefInt,
-							  (IUnknown **) &pTypeDefInt);
+  hr = defs.cdTypeDefInt()->CreateInstance (IID_IAAFTypeDefInt,
+											(IUnknown **) &pTypeDefInt);
   if (! SUCCEEDED (hr)) return hr;
   assert (pTypeDefInt);
 
   hr = pTypeDefInt->Initialize (TypeID_LocalInt32,
 								4,        // 4-byte (32-bit) int
-								AAFTrue,  // signed
+								kAAFTrue,  // signed
 								L"Local 32-bit int");
   if (! SUCCEEDED (hr)) return hr;
 
@@ -143,7 +146,7 @@ static HRESULT TestTypeDef ()
   if (! SUCCEEDED (hr)) return hr;
 
   IAAFTypeDefSP pUInt8ArrayType;
-  hr = pDict->LookupType (kAAFTypeID_UInt8Array, &pUInt8ArrayType);
+  hr = pDict->LookupTypeDef (kAAFTypeID_UInt8Array, &pUInt8ArrayType);
   if (! SUCCEEDED (hr)) return hr;
 
   IUnknownSP    pUnkUInt8Array;

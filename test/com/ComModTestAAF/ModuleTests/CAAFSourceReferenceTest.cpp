@@ -36,9 +36,9 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
 
 
 // Cross-platform utility to delete a file.
@@ -76,7 +76,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFDictionary*  pDictionary = NULL;
 	IAAFSourceReference	*pSourceReference = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafUID_t					inSourceID, outSourceID;
+	aafMobID_t					inSourceID, outSourceID;
 	aafUInt32 inMobSlotID, outMobSlotID;
 	HRESULT						hr = S_OK;
 
@@ -87,7 +87,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -107,17 +107,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
- 		
+		CAAFBuiltinDefs defs (pDictionary);
 
 		// Create an Abstract SourceReference
-		checkResult(pDictionary->CreateInstance(AUID_AAFSourceReference,
-								  IID_IAAFSourceReference, 
-								  (IUnknown **)&pSourceReference));
+		checkResult(defs.cdSourceReference()->
+					CreateInstance(IID_IAAFSourceReference, 
+								   (IUnknown **)&pSourceReference));
 
 		// module-specific tests go here
 		//		Set Values.	
-
-		inSourceID = DDEF_Picture;   // Could have been any other value !
+		checkResult(CoCreateGuid((GUID *)&inSourceID));
 		checkResult(pSourceReference->SetSourceID( inSourceID));
 		
 		inMobSlotID = 100;   // Could have been any other value !

@@ -47,6 +47,8 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 
+#include "CAAFBuiltinDefs.h"
+
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -93,7 +95,7 @@ private:
   bool _bWritableFile;
   IAAFHeader *_pHeader;
   IAAFDictionary *_pDictionary;
-  aafUID_t _compositionMobID;
+  aafMobID_t _compositionMobID;
 
   // MobSlot static data
   static const wchar_t* _slotName;
@@ -105,7 +107,7 @@ private:
   static const wchar_t* _eventComment;
 };
 
-const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+const aafUID_t NIL_UID = { 0 };
 
 extern "C" HRESULT CAAFEvent_test()
 {
@@ -120,7 +122,7 @@ extern "C" HRESULT CAAFEvent_test()
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
@@ -253,14 +255,15 @@ void EventTest::CreateEvent()
   IAAFMobSlot *pMobSlot = NULL;
   IAAFMob *pMob = NULL;
 
+  CAAFBuiltinDefs defs (_pDictionary);
 
   try
   {
     // Create an event (note: this will be replaced by a concrete event in a
     // later version after such an event is implemented.)
-    checkResult(_pDictionary->CreateInstance(AUID_AAFEvent,
-                                             IID_IAAFEvent, 
-                                             (IUnknown **)&pEvent));
+    checkResult(defs.cdEvent()->
+				CreateInstance(IID_IAAFEvent, 
+							   (IUnknown **)&pEvent));
     checkResult(pEvent->SetPosition(_position));
     checkResult(pEvent->SetComment(const_cast<wchar_t*>(_eventComment)));
 
@@ -268,9 +271,9 @@ void EventTest::CreateEvent()
     checkResult(pEvent->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 
     // Create and initialize an EventMobSlot
-    checkResult(_pDictionary->CreateInstance(AUID_AAFEventMobSlot,
-                                             IID_IAAFEventMobSlot, 
-                                             (IUnknown **)&pEventMobSlot));
+    checkResult(defs.cdEventMobSlot()->
+				CreateInstance(IID_IAAFEventMobSlot, 
+							   (IUnknown **)&pEventMobSlot));
     checkResult(pEventMobSlot->SetEditRate(const_cast<aafRational_t *>(&_editRate)));
 
     // Get the mob slot interface so that we can add the event segment.
@@ -280,16 +283,16 @@ void EventTest::CreateEvent()
     checkResult(pMobSlot->SetSegment(pSegment));
 
     // Create the mob to hold the new event mob slot.
-    checkResult(_pDictionary->CreateInstance(AUID_AAFCompositionMob,
-                                             IID_IAAFMob, 
-                                             (IUnknown **)&pMob));
+    checkResult(defs.cdCompositionMob()->
+				CreateInstance(IID_IAAFMob, 
+							   (IUnknown **)&pMob));
     checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));
 
     // Append event slot to the composition mob.
     checkResult(pMob->AppendSlot(pMobSlot));
 
     // Attach the mob to the header...
-    checkResult(_pHeader->AppendMob(pMob));
+    checkResult(_pHeader->AddMob(pMob));
 
     // Save the id of the composition mob that contains our test
     // event mob slot.
@@ -361,7 +364,7 @@ void EventTest::OpenEvent()
     checkResult(_pHeader->LookupMob(_compositionMobID, &pMob));
 
     // Get the first mob slot and check that it is an event mob slot.
-    checkResult(pMob->EnumAAFAllMobSlots(&pEnumSlots));
+    checkResult(pMob->GetSlots(&pEnumSlots));
     checkResult(pEnumSlots->NextOne(&pMobSlot));
     checkResult(pMobSlot->QueryInterface(IID_IAAFEventMobSlot, (void **)&pEventMobSlot));
     checkResult(pEventMobSlot->GetEditRate(&editRate));

@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -29,13 +29,6 @@
 
 
 
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
-
-
 #include "AAF.h"
 #include "AAFResult.h"
 
@@ -44,11 +37,13 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
+#include "CAAFBuiltinDefs.h"
+
 
 // Default testing values for CDCI
 #define kCWTest		8
 #define kHSTest		2
-#define kCSTest		kCoSiting
+#define kCSTest		kAAFCoSiting
 #define kBRLTest	16
 #define kWRLTest	255
 #define kCRTest		255
@@ -57,7 +52,7 @@
 // default test values for DID
 #define kStoredHeightTestVal			248
 #define kStoredWidthTestVal				720
-#define kFrameLayoutTestVal				kSeparateFields
+#define kFrameLayoutTestVal				kAAFSeparateFields
 #define kVideoLineMapSizeTestVal		2
 #define kVideoLineMap1TestVal			10
 #define kVideoLineMap2TestVal			11
@@ -71,7 +66,7 @@
 #define kDisplayWidthTestVal			718
 #define kDisplayXOffsetTestVal			7
 #define kDisplayYOffsetTestVal			8
-#define kAlphaTransparencyTestVal		kMaxValueTransparent
+#define kAlphaTransparencyTestVal		kAAFMaxValueTransparent
 #define kImageAlignmentFactorTestVal	0
 #define kGammaNumTestVal				7
 #define kGammaDenTestVal				8
@@ -140,7 +135,7 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -149,11 +144,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	switch (mode)
 	{
-	case kMediaOpenReadOnly:
+	case kAAFMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kMediaOpenAppend:
+	case kAAFMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -189,7 +184,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*	pDictionary = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
-	aafUID_t		newUID;
+	aafMobID_t		newMobID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -197,7 +192,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   RemoveTestFile(pFileName);
 
 	// Create the AAF file
-	hr = OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader);
+	hr = OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader);
 	if (FAILED(hr))
 		return hr;
 
@@ -205,10 +200,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   hr = pHeader->GetDictionary(&pDictionary);
 	if (SUCCEEDED(hr))
   {
+	  CAAFBuiltinDefs defs (pDictionary);
 	  // Create a source mob
-	  hr = pDictionary->CreateInstance(AUID_AAFSourceMob,
-						  IID_IAAFSourceMob, 
-						  (IUnknown **)&pSourceMob);
+	  hr = defs.cdSourceMob()->
+		CreateInstance(IID_IAAFSourceMob, 
+					   (IUnknown **)&pSourceMob);
 	  if (SUCCEEDED(hr))
 	  {
 		  IAAFMob*	pMob = NULL;
@@ -218,12 +214,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		  {
 			  IAAFCDCIDescriptor*	pCDCIDesc = NULL;
 
-			  CoCreateGuid((GUID *)&newUID);
-			  pMob->SetMobID(newUID);
+			  CoCreateGuid((GUID *)&newMobID);
+			  pMob->SetMobID(newMobID);
 			  pMob->SetName(L"CDCIDescriptorTest");
-			  hr = pDictionary->CreateInstance(AUID_AAFCDCIDescriptor,
-									  IID_IAAFCDCIDescriptor, 
-									  (IUnknown **)&pCDCIDesc);		
+			  hr = defs.cdCDCIDescriptor()->
+				CreateInstance(IID_IAAFCDCIDescriptor, 
+							   (IUnknown **)&pCDCIDesc);		
 			  if (SUCCEEDED(hr))
 			  {
 				  // Add all CDCI properties
@@ -257,7 +253,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 			  // Add the MOB to the file
 			  if (SUCCEEDED(hr))
-				  hr = pHeader->AppendMob(pMob);
+				  hr = pHeader->AddMob(pMob);
 
 			  pMob->Release();
 			  pMob = NULL;
@@ -291,18 +287,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 	// Open the AAF file
-	hr = OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader);
+	hr = OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader);
 	if (FAILED(hr))
 		return hr;
 
-	hr = pHeader->GetNumMobs(kAllMob, &numMobs);
+	hr = pHeader->CountMobs(kAAFAllMob, &numMobs);
 	if (1 != numMobs)
 	{
 		hr = AAFRESULT_TEST_FAILED;
 		goto Cleanup;
 	}
 
-	hr = pHeader->EnumAAFAllMobs(NULL, &pMobIter);
+	hr = pHeader->GetMobs(NULL, &pMobIter);
 	if (SUCCEEDED(hr))
 	{
 		IAAFMob*	pMob = NULL;

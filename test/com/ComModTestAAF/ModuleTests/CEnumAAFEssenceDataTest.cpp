@@ -41,6 +41,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 
 // Utility class to implement the test.
 struct EnumEssenceDataTest
@@ -127,7 +129,7 @@ EnumEssenceDataTest::EnumEssenceDataTest():
   _productInfo.productVersion.minor = 0;
   _productInfo.productVersion.tertiary = 0;
   _productInfo.productVersion.patchLevel = 0;
-  _productInfo.productVersion.type = kVersionUnknown;
+  _productInfo.productVersion.type = kAAFVersionUnknown;
   _productInfo.productVersionString = NULL;
   _productInfo.productID = UnitTestProductID;
   _productInfo.platform = NULL;
@@ -265,27 +267,28 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
     check(AAFRESULT_INTERNAL_ERROR);
 
 
+  CAAFBuiltinDefs defs (_pDictionary);
   // Create a Mob
-  check(_pDictionary->CreateInstance(AUID_AAFSourceMob,
-              IID_IAAFSourceMob, 
-              (IUnknown **)&_pSourceMob));
+  check(defs.cdSourceMob()->
+		CreateInstance(IID_IAAFSourceMob, 
+					   (IUnknown **)&_pSourceMob));
 
   check(_pSourceMob->QueryInterface (IID_IAAFMob, (void **)&_pMob));
   
-  aafUID_t newUID = {0};
-  check(CoCreateGuid((GUID *)&newUID));
-  check(_pMob->SetMobID(newUID));
+  aafMobID_t newMobID = {0};
+  check(CoCreateGuid((GUID *)&newMobID));
+  check(_pMob->SetMobID(newMobID));
   check(_pMob->SetName(wcBuffer));
   
-  check(_pDictionary->CreateInstance(AUID_AAFFileDescriptor,
-              IID_IAAFEssenceDescriptor, 
-              (IUnknown **)&_pFileDescriptor));
+  check(defs.cdFileDescriptor()->
+		CreateInstance(IID_IAAFEssenceDescriptor, 
+					   (IUnknown **)&_pFileDescriptor));
 
   check(_pFileDescriptor->QueryInterface (IID_IAAFEssenceDescriptor,
                                           (void **)&_pEssenceDescriptor));
   check(_pSourceMob->SetEssenceDescriptor (_pEssenceDescriptor));
 
-  check(_pHeader->AppendMob(_pMob));
+  check(_pHeader->AddMob(_pMob));
 
   createEssenceData(_pSourceMob);
 
@@ -309,14 +312,15 @@ void EnumEssenceDataTest::createEssenceData(IAAFSourceMob *pSourceMob)
   assert(pSourceMob);
   assert(NULL == _pEssenceData);
 
+  CAAFBuiltinDefs defs (_pDictionary);
 
   // Attempt to create an AAFEssenceData.
-  check(_pDictionary->CreateInstance(AUID_AAFEssenceData,
-                         IID_IAAFEssenceData,
-                         (IUnknown **)&_pEssenceData));
+  check(defs.cdEssenceData()->
+		CreateInstance(IID_IAAFEssenceData,
+					   (IUnknown **)&_pEssenceData));
 
   check(_pEssenceData->SetFileMob(pSourceMob));
-  check(_pHeader->AppendEssenceData(_pEssenceData));
+  check(_pHeader->AddEssenceData(_pEssenceData));
   
   _pEssenceData->Release();
   _pEssenceData = NULL;
@@ -330,7 +334,7 @@ void EnumEssenceDataTest::openEssenceData()
   assert(NULL == _pSourceMob);
 
   aafUInt32 essenceDataCount = 0;
-  check(_pHeader->GetNumEssenceData(&essenceDataCount));
+  check(_pHeader->CountEssenceData(&essenceDataCount));
   if (_maxMobCount != essenceDataCount)
     check(AAFRESULT_TEST_FAILED);
  

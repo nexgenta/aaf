@@ -36,9 +36,11 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";
-static aafFilmType_t FilmFormat = kFt35MM;
+static aafFilmType_t FilmFormat = kAAFFt35MM;
 static aafUInt32 FrameRate = 24;
 static aafUInt8 PerfPerFrame = 4;
 static aafRational_t	AspectRatio = { 1000, 1 };	// !!!Find a real aspect ratio
@@ -81,7 +83,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFFilmDescriptor*			pFilmDesc = NULL;
 	
 	aafProductIdentification_t	ProductInfo;
-	aafUID_t					newUID;
+	aafMobID_t					newMobID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	
 	
@@ -91,7 +93,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -102,18 +104,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 	checkResult(pFile->GetHeader(&pHeader));
 	checkResult(pHeader->GetDictionary(&pDictionary));
+	CAAFBuiltinDefs defs (pDictionary);
 
 	// Create a film mob
-	checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
-					IID_IAAFSourceMob, 
-					(IUnknown **)&pSourceMob));
+	checkResult(defs.cdSourceMob()->
+				CreateInstance(IID_IAAFSourceMob, 
+							   (IUnknown **)&pSourceMob));
 	checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
-	CoCreateGuid((GUID *)&newUID);
-	pMob->SetMobID(newUID);
+	CoCreateGuid((GUID *)&newMobID);
+	pMob->SetMobID(newMobID);
 	pMob->SetName(L"FilmDescriptorTest");
-	checkResult(pDictionary->CreateInstance(AUID_AAFFilmDescriptor,
-							IID_IAAFFilmDescriptor, 
-							(IUnknown **)&pFilmDesc));		
+	checkResult(defs.cdFilmDescriptor()->
+				CreateInstance(IID_IAAFFilmDescriptor, 
+							   (IUnknown **)&pFilmDesc));		
 	checkResult(pFilmDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc));
 	checkResult(pSourceMob->SetEssenceDescriptor(pEssDesc));
 	checkResult(pFilmDesc->SetFilmManufacturer( Manufacturer ));
@@ -127,7 +130,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	pFilmDesc->Release();
 	pFilmDesc = NULL;
 	// Add the MOB to the file
-	checkResult(pHeader->AppendMob(pMob));
+	checkResult(pHeader->AddMob(pMob));
 						
 	pMob->Release();
 	pMob = NULL;
@@ -168,7 +171,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafUInt32					readFrameRate;
 	aafUInt8					readPerfPerFrame;
 	aafRational_t				readAspectRatio;
-	aafInt32					length;
+	aafUInt32					length;
 
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	
@@ -178,15 +181,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 	
 	checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 	checkResult(pFile->GetHeader(&pHeader));
-	checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+	checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
-	checkResult(pHeader->EnumAAFAllMobs(NULL, &pMobIter));
+	checkResult(pHeader->GetMobs(NULL, &pMobIter));
 	checkResult(pMobIter->NextOne(&pMob));
 	checkResult(pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob));
 	// Back into testing mode

@@ -39,6 +39,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 static aafWChar* TagNames[3] = { L"TAG01", L"TAG02", L"TAG03" };
 static aafWChar* Comments[3] = { L"Comment 1", L"Comment 2", L"Comment 3"};	
@@ -76,11 +78,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFHeader *        pHeader = NULL;
   IAAFDictionary*  pDictionary = NULL;
 	IAAFMob						*pMob = NULL;
-	IAAFMobSlot		*newSlot = NULL;
+	IAAFTimelineMobSlot	*newSlot = NULL;
 	IAAFSegment		*seg = NULL;
 	IAAFSourceClip	*sclp = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafUID_t					newUID;
+	aafMobID_t					newMobID;
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -89,7 +91,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -109,18 +111,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
+	CAAFBuiltinDefs defs (pDictionary);
  		
   //Make the first mob
 	  long	test;
 	  aafRational_t	audioRate = { 44100, 1 };
 
 	  // Create a Mob
-	  checkResult(pDictionary->CreateInstance(AUID_AAFMob,
-							  IID_IAAFMob, 
-							  (IUnknown **)&pMob));
+	  checkResult(defs.cdMob()->
+				  CreateInstance(IID_IAAFMob, 
+								 (IUnknown **)&pMob));
 
-		checkResult(CoCreateGuid((GUID *)&newUID));
-	  checkResult(pMob->SetMobID(newUID));
+		checkResult(CoCreateGuid((GUID *)&newMobID));
+	  checkResult(pMob->SetMobID(newMobID));
 	  checkResult(pMob->SetName(L"EnumAAFTaggedValuesTest"));
 		// append some comments to this mob !!
 	  for (test = 0; test < 3; test++)
@@ -130,26 +133,32 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  // Add some slots
 	  for(test = 0; test < 5; test++)
 	  {
- 		  checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
-							     IID_IAAFSourceClip, 
-							     (IUnknown **)&sclp));		
+ 		  checkResult(defs.cdSourceClip()->
+					  CreateInstance(IID_IAAFSourceClip, 
+									 (IUnknown **)&sclp));		
 
 		  checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 
-		  checkResult(pMob->AppendNewSlot (seg, test+1, slotNames[test], &newSlot));
+		  aafRational_t editRate = { 0, 1};
+		  checkResult(pMob->AppendNewTimelineSlot (editRate,
+												   seg,
+												   test+1,
+												   slotNames[test],
+												   0,
+												   &newSlot));
 
 		  newSlot->Release();
-      newSlot = NULL;
+		  newSlot = NULL;
 
 		  seg->Release();
-      seg = NULL;
+		  seg = NULL;
 
-      sclp->Release();
-      sclp = NULL;
+		  sclp->Release();
+		  sclp = NULL;
 	  }
 
     // Add the mob to the file.
-	  checkResult(pHeader->AppendMob(pMob));
+	  checkResult(pHeader->AddMob(pMob));
   }
   catch (HRESULT& rResult)
   {
@@ -215,7 +224,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 
@@ -229,19 +238,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   	checkResult(pFile->GetHeader(&pHeader));
 
 
-	  checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 
 	  aafSearchCrit_t		criteria;
-	  criteria.searchTag = kNoSearch;
-    checkResult(pHeader->EnumAAFAllMobs (&criteria, &mobIter));
+	  criteria.searchTag = kAAFNoSearch;
+    checkResult(pHeader->GetMobs (&criteria, &mobIter));
 
     for(n = 0; n < numMobs; n++)
 	  {
 		  aafWChar		name[500], slotName[500];
 		  aafNumSlots_t	numSlots;
-		  aafUID_t		mobID;
+		  aafMobID_t		mobID;
 		  aafSlotID_t		trackID;
 
 		  checkResult(mobIter->NextOne (&aMob));
@@ -249,9 +258,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		  checkResult(aMob->GetMobID (&mobID));
 
 		  // Check for comments
-		  checkResult(aMob->GetNumComments(&numComments));
+		  checkResult(aMob->CountComments(&numComments));
 		  checkExpression(3 == numComments, AAFRESULT_TEST_FAILED);
-		  checkResult(aMob->EnumAAFAllMobComments(&pCommentIterator));
+		  checkResult(aMob->GetComments(&pCommentIterator));
 		  for(com = 0; com < numComments; com++)
 		  {
 			  checkResult(pCommentIterator->NextOne(&pComment));
@@ -260,6 +269,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			  checkExpression(wcscmp(tag, TagNames[com])== 0, AAFRESULT_TEST_FAILED);
 			  checkExpression(wcscmp(Value, Comments[com])== 0, AAFRESULT_TEST_FAILED);
 			  pComment->Release();
+        pComment = NULL;
 		  }
 		  // now check reset
 		  checkResult(pCommentIterator->Reset());
@@ -269,6 +279,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		  checkExpression(wcscmp(tag, TagNames[0])== 0, AAFRESULT_TEST_FAILED);
 		  checkExpression(wcscmp(Value, Comments[0])== 0, AAFRESULT_TEST_FAILED);
 		  pComment->Release();
+      pComment = NULL;
 		  // test skip
 		  checkResult(pCommentIterator->Skip(1));
 		  checkResult(pCommentIterator->NextOne(&pComment));
@@ -277,6 +288,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		  checkExpression(wcscmp(tag, TagNames[2])== 0, AAFRESULT_TEST_FAILED);
 		  checkExpression(wcscmp(Value, Comments[2])== 0, AAFRESULT_TEST_FAILED);
 		  pComment->Release();
+      pComment = NULL;
 		  // test clone
 		  checkResult(pCommentIterator->Clone(&pCloneIterator));
 		  checkResult(pCloneIterator->Reset());
@@ -286,15 +298,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		  checkExpression(wcscmp(tag, TagNames[0])== 0, AAFRESULT_TEST_FAILED);
 		  checkExpression(wcscmp(Value, Comments[0])== 0, AAFRESULT_TEST_FAILED);
 		  pComment->Release();
-		  
+		  pComment = NULL;
 		
 		  pCommentIterator->Release();
+      pCommentIterator = NULL;
 		  pCloneIterator->Release();
+      pCloneIterator = NULL;
 			
-		  checkResult(aMob->GetNumSlots (&numSlots));
+		  checkResult(aMob->CountSlots (&numSlots));
 		  checkExpression(5 == numSlots, AAFRESULT_TEST_FAILED);
 
-			checkResult(aMob->EnumAAFAllMobSlots(&slotIter));
+			checkResult(aMob->GetSlots(&slotIter));
 
 			for(slt = 0; slt < numSlots; slt++)
 			{
@@ -322,6 +336,15 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
   if (slotIter)
     slotIter->Release();
+
+  if (pComment)
+    pComment->Release();
+
+  if (pCloneIterator)
+    pCloneIterator->Release();
+
+  if (pCommentIterator)
+    pCommentIterator->Release();
 
   if (aMob)
     aMob->Release();

@@ -43,7 +43,7 @@
 
 
 // Both plugins currently only support a single definition
-const aafUInt32 kSupportedDefinitions = 1;
+const aafInt32 kSupportedDefinitions = 1;
 
 
 const wchar_t kPersonnelResourceDisplayName[] = L"Example AAF Personel Resource Class Extension";
@@ -600,7 +600,19 @@ CAAFPersonnelResource::GetPart
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFPersonnelResource::CountDefinitions (aafUInt32 *pDefCount)
+    CAAFPersonnelResource::Start (void)
+{
+	return AAFRESULT_SUCCESS;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFPersonnelResource::Finish (void)
+{
+	return AAFRESULT_SUCCESS;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFPersonnelResource::GetNumDefinitions (aafInt32 *pDefCount)
 {
 	if(NULL == pDefCount)
 		return AAFRESULT_NULL_PARAM;
@@ -611,7 +623,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFPersonnelResource::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
+    CAAFPersonnelResource::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
 {
 	if(NULL == uid)
 		return AAFRESULT_NULL_PARAM;
@@ -633,7 +645,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE CAAFPersonnelResource::GetIndexedDefinitionObject(
-    aafUInt32 index, 
+    aafInt32 index, 
     IAAFDictionary *pDictionary, 
     IAAFDefObject **pDef)
 {
@@ -650,8 +662,15 @@ HRESULT STDMETHODCALLTYPE CAAFPersonnelResource::GetIndexedDefinitionObject(
 
 	try
 	{
-    // Make sure all of the definitions are registered.
-		checkResult(RegisterDefinitions(pDictionary));
+		//!!!Later, add in dataDefs supported & filedescriptor class
+
+    // Register the extensible enumeration describing Position in the
+    // dictionary.
+    CreateAndRegisterPositionEnum (pDictionary);
+
+    // Create a class definition describing PesonnelResource objects and
+    // register it in the dictionary.
+    CreateAndRegisterPersonnelResource (pDictionary);
 
     checkResult(pDictionary->LookupClassDef(kClassID_PersonnelResource, &pClassDef));
     checkResult(pClassDef->QueryInterface(IID_IAAFDefObject, (void **)pDef));
@@ -758,43 +777,6 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
-
-HRESULT STDMETHODCALLTYPE
-    CAAFPersonnelResource::RegisterDefinitions (IAAFDictionary *pDictionary)
-{
-	HRESULT hr = S_OK;
-
-  
-	if (pDictionary == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	try
-	{
-		//!!!Later, add in dataDefs supported & filedescriptor class
-
-    // Register the extensible enumeration describing Position in the
-    // dictionary.
-    CreateAndRegisterPositionEnum (pDictionary);
-
-    // Create a class definition describing PesonnelResource objects and
-    // register it in the dictionary.
-    CreateAndRegisterPersonnelResource (pDictionary);
-  }
-	catch (HRESULT& rhr)
-	{
-		hr = rhr; // return thrown error code.
-	}
-	catch (...)
-	{
-		// We CANNOT throw an exception out of a COM interface method!
-		// Return a reasonable exception code.
-		hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-	}
-
-	return hr;
-}
-
-
 //
 // COM Infrastructure
 // 
@@ -822,13 +804,6 @@ HRESULT CAAFPersonnelResource::InternalQueryInterface
     else if (riid == IID_IAAFPlugin) 
     { 
         *ppvObj = (IAAFPlugin *)this; 
-        ((IUnknown *)*ppvObj)->AddRef();
-        return S_OK;
-    }
-		// and the IAAFClassExtension interface.
-    else if (riid == IID_IAAFClassExtension) 
-    { 
-        *ppvObj = (IAAFClassExtension *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }

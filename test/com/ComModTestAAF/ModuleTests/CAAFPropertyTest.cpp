@@ -33,6 +33,8 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
@@ -101,7 +103,7 @@ static HRESULT ObjectTest ()
 	  ProductInfo.productVersion.minor = 0;
 	  ProductInfo.productVersion.tertiary = 0;
 	  ProductInfo.productVersion.patchLevel = 0;
-	  ProductInfo.productVersion.type = kVersionUnknown;
+	  ProductInfo.productVersion.type = kAAFVersionUnknown;
 	  ProductInfo.productVersionString = NULL;
 	  ProductInfo.productID = -1;
 	  ProductInfo.platform = NULL;
@@ -113,6 +115,7 @@ static HRESULT ObjectTest ()
 	  assert (pHeader);
 	  checkResult (pHeader->GetDictionary (&pDict));
 	  assert (pDict);
+	  CAAFBuiltinDefs defs (pDict);
 
 	  checkResult (pDict->CreateInstance (AUID_IAAFTypeDefInt,
 										  IID_IAAFTypeDefInt,
@@ -120,17 +123,17 @@ static HRESULT ObjectTest ()
 	  assert (pTypeDefInt);
 	  checkResult (pTypeDefInt->Initialize (&TypeID_Local1,
 											1,
-											AAFTrue,
+											kAAFTrue,
 											L"Fake local 1-byte signed int type");
 	  
-	  checkResult (pDict->CreateInstance (AUID_AAFPropertyDef,
+	  checkResult (pDict->CreateInstance (defs.cdPropertyDef(),
 										  IID_IAAFPropertyDef,
 										  (IUnknown **) &pPropDef));
 	  assert (pPropDef);
 	  checkResult (pPropDef->Initialize (&PropID_Local1,
 										 pTypeDefInt,
 										 L"Fake local property def");										 
-	  checkResult (pDict->CreateInstance (AUID_AAFProperty,
+	  checkResult (pDict->CreateInstance (defs.cdProperty(),
 										  IID_IAAFProperty,
 										  (IUnknown **) &pProp));
 	  assert (pProp);

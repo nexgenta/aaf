@@ -36,6 +36,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
 {
@@ -74,7 +76,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob			*pMob = NULL;
 	IAAFEssenceDescriptor *edesc = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafUID_t					newUID;
+	aafMobID_t					newMobID;
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -83,7 +85,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -104,57 +106,58 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
+	CAAFBuiltinDefs defs (pDictionary);
  		
     //Make the first mob
 
 	  // Create a FileMob
-	  checkResult(pDictionary->CreateInstance(AUID_AAFSourceMob,
-							IID_IAAFSourceMob, 
-							(IUnknown **)&pSourceMob));
+	  checkResult(defs.cdSourceMob()->
+				  CreateInstance(IID_IAAFSourceMob, 
+								 (IUnknown **)&pSourceMob));
 
 	  checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 
-	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
-	  checkResult(pMob->SetMobID(newUID));
+	  checkResult(CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
+	  checkResult(pMob->SetMobID(newMobID));
 	  checkResult(pMob->SetName(L"File Mob"));
 	
- 	  checkResult(pDictionary->CreateInstance(AUID_AAFFileDescriptor,
-							IID_IAAFFileDescriptor, 
-							(IUnknown **)&edesc));		
+ 	  checkResult(defs.cdFileDescriptor()->
+				  CreateInstance(IID_IAAFFileDescriptor, 
+								 (IUnknown **)&edesc));		
 
     checkResult(pSourceMob->SetEssenceDescriptor (edesc));
 
-	  checkResult(pHeader->AppendMob(pMob));
+	  checkResult(pHeader->AddMob(pMob));
 
     // Reusing local variable so we need to release the inteface.
     pMob->Release();
     pMob = NULL;
 
 	  // Create a MasterMob
-	  checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
-							IID_IAAFMob, 
-							(IUnknown **)&pMob));
+	  checkResult(defs.cdMasterMob()->
+				  CreateInstance(IID_IAAFMob, 
+								 (IUnknown **)&pMob));
 
-	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
-	  checkResult(pMob->SetMobID(newUID));
+	  checkResult(CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
+	  checkResult(pMob->SetMobID(newMobID));
 	  checkResult(pMob->SetName(L"Master Mob"));
 
-	  checkResult(pHeader->AppendMob(pMob));
+	  checkResult(pHeader->AddMob(pMob));
 
     // Reusing local variable so we need to release the inteface.
     pMob->Release();
     pMob = NULL;
 
 	  // Create a CompositionMob
-	  checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
-							  IID_IAAFMob, 
-							  (IUnknown **)&pMob));
+	  checkResult(defs.cdCompositionMob()->
+				  CreateInstance(IID_IAAFMob, 
+								 (IUnknown **)&pMob));
 
-	  checkResult(CoCreateGuid((GUID *)&newUID)); // hack: we need a utility function.
-	  checkResult(pMob->SetMobID(newUID));
+	  checkResult(CoCreateGuid((GUID *)&newMobID)); // hack: we need a utility function.
+	  checkResult(pMob->SetMobID(newMobID));
   	checkResult(pMob->SetName(L"Composition Mob"));
 
-	  checkResult(pHeader->AppendMob(pMob));
+	  checkResult(pHeader->AddMob(pMob));
 	}
   catch (HRESULT& rResult)
   {
@@ -206,7 +209,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -222,16 +225,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 
 	  // Make sure that we have one master, one file, and one composition (three total)
-	  checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 	  checkExpression (3 == numMobs, AAFRESULT_TEST_FAILED);
 
-	  checkResult(pHeader->GetNumMobs(kMasterMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFMasterMob, &numMobs));
 	  checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
-	  checkResult(pHeader->GetNumMobs(kFileMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFFileMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
-	  checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
+	  checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 	}
   catch (HRESULT& rResult)

@@ -39,6 +39,8 @@
 #include "AAFResult.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
+
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
 {
@@ -84,14 +86,14 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kVersionUnknown;
+	ProductInfo.productVersion.type = kAAFVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 	*ppFile = NULL;
 
-	if(mode == kMediaOpenAppend)
+	if(mode == kAAFMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
@@ -136,29 +138,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
 	// Create the AAF file
-	checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
+	checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, /*&pSession,*/ &pFile, &pHeader));
     bFileOpen = true;
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
+	CAAFBuiltinDefs defs (pDictionary);
     
-	checkResult(pDictionary->CreateInstance(AUID_AAFContainerDef,
-							  IID_IAAFContainerDef, 
-							  (IUnknown **)&pContainerDef));
+	checkResult(defs.cdContainerDef()->
+				CreateInstance(IID_IAAFContainerDef, 
+							   (IUnknown **)&pContainerDef));
     
 	checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
 
 	checkResult(pDef->SetName(sName1));
 	checkResult(pDef->SetDescription(sDescription1));
-	checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
+	checkResult(pDictionary->RegisterContainerDef(pContainerDef));
 	pDef->Release();
 	pDef = NULL;
 	pContainerDef->Release();
 	pContainerDef = NULL;
-	checkResult(pDictionary->CreateInstance(AUID_AAFContainerDef,
-							  IID_IAAFContainerDef, 
-							  (IUnknown **)&pContainerDef));
+	checkResult(defs.cdContainerDef()->
+				CreateInstance(IID_IAAFContainerDef, 
+							   (IUnknown **)&pContainerDef));
     
 	checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,
                                           (void **)&pDef));
@@ -166,7 +169,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(pDef->SetName(sName2));
 	checkResult(pDef->SetDescription(sDescription2));
 
-	checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
+	checkResult(pDictionary->RegisterContainerDef(pContainerDef));
   }
   catch (HRESULT& rResult)
   {
@@ -219,12 +222,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
 		bFileOpen = true;
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetContainerDefinitions(&pPlug));
+		checkResult(pDictionary->GetContainerDefs(&pPlug));
 		/* Read and check the first element */
 		checkResult(pPlug->NextOne(&pContainerDef));
 		checkResult(pContainerDef->QueryInterface (IID_IAAFDefObject,

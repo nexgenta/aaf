@@ -40,6 +40,7 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 
+#include "CAAFBuiltinDefs.h"
 
 static aafUID_t    fillerUID = DDEF_Timecode;
 static aafLength_t  fillerLength = 3200;
@@ -79,10 +80,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFCompositionMob*      pCompMob = NULL;
   IAAFMob*          pMob = NULL;
   IAAFFiller*          pFiller = NULL;
-  IAAFMobSlot*        pSlot = NULL;
+  IAAFTimelineMobSlot*        pSlot = NULL;
   IAAFSegment*        pSegment = NULL;
   aafProductIdentification_t  ProductInfo;
-  aafUID_t          newMobID;
+  aafMobID_t          newMobID;
   HRESULT            hr = AAFRESULT_SUCCESS;
 
 
@@ -92,7 +93,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -113,12 +114,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
-     
+	CAAFBuiltinDefs defs (pDictionary);
      
     // Create a Composition mob - it should work !!
-    checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
-                IID_IAAFCompositionMob, 
-                (IUnknown **)&pCompMob));
+    checkResult(defs.cdCompositionMob()->
+				CreateInstance(IID_IAAFCompositionMob, 
+							   (IUnknown **)&pCompMob));
     // get a IAAFMob interface
     checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
     // Initialize the CompMob
@@ -127,18 +128,24 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pMob->SetName(L"AAFFillerTest"));
 
     // Create a AAFFiller - since it is the first time we will check the error code
-    checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
-                IID_IAAFFiller, 
-                (IUnknown **)&pFiller));
+    checkResult(defs.cdFiller()->
+				CreateInstance(IID_IAAFFiller, 
+							   (IUnknown **)&pFiller));
     // Get a IAAFSegment interface for it
     checkResult(pFiller->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
     // Set filler properties
-    checkResult(pFiller->Initialize( fillerUID, fillerLength));
+    checkResult(pFiller->Initialize(defs.ddTimecode(), fillerLength));
     // append the filler to the MOB tree
-    checkResult(pMob->AppendNewSlot(pSegment, 1, L"FillerSlot", &pSlot)); 
+	aafRational_t editRate = { 0, 1};
+    checkResult(pMob->AppendNewTimelineSlot(editRate,
+											pSegment,
+											1,
+											L"FillerSlot",
+											0,
+											&pSlot)); 
 
     // Add the Mob to the file
-    checkResult(pHeader->AppendMob(pMob));
+    checkResult(pHeader->AddMob(pMob));
   }
   catch (HRESULT& rResult)
   {
@@ -196,6 +203,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   IAAFComponent*        pComponent = NULL;
   IEnumAAFMobs*        pMobIter = NULL;
   IEnumAAFMobSlots*      pSlotIter = NULL;
+  IAAFDataDef * pDataDef = 0;
+  IAAFDefObject * pDefObj = 0;
   
   aafProductIdentification_t  ProductInfo;
   aafNumSlots_t        numMobs, numSlots;
@@ -210,7 +219,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   ProductInfo.productVersion.minor = 0;
   ProductInfo.productVersion.tertiary = 0;
   ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion.type = kAAFVersionUnknown;
   ProductInfo.productVersionString = NULL;
   ProductInfo.platform = NULL;
 
@@ -223,19 +232,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
+		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
 		checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
     // Enumerate over all Composition Mobs
-    criteria.searchTag = kByMobKind;
-    criteria.tags.mobKind = kCompMob;
-    checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
+    criteria.searchTag = kAAFByMobKind;
+    criteria.tags.mobKind = kAAFCompMob;
+    checkResult(pHeader->GetMobs(&criteria, &pMobIter));
     while (pMobIter && (pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS))
     {
-      checkResult(pMob->GetNumSlots(&numSlots));
+      checkResult(pMob->CountSlots(&numSlots));
       checkExpression (1 == numSlots, AAFRESULT_TEST_FAILED);
 
-      checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
+      checkResult(pMob->GetSlots(&pSlotIter));
       while (pSlotIter && (pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS))
       {
         checkResult(pSlot->GetSegment(&pSegment));
@@ -246,7 +255,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
         checkResult(pSegment->QueryInterface(IID_IAAFComponent, (void **) &pComponent));
         // retrieve properties
         checkResult(pComponent->GetLength( &readFillerLength));
-        checkResult(pComponent->GetDataDef( &readFillerUID));
+        checkResult(pComponent->GetDataDef( &pDataDef));
+        checkResult(pDataDef->QueryInterface(IID_IAAFDefObject, (void **) &pDefObj));
+		pDataDef->Release ();
+		pDataDef = 0;
+        checkResult(pDefObj->GetAUID( &readFillerUID));
+		pDefObj->Release ();
+		pDefObj = 0;
         
         // Compare results
         checkExpression((readFillerLength == fillerLength) &&
@@ -279,36 +294,72 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
   // Cleanup and return
 
+  if (pDataDef)
+	{
+	  pDataDef->Release ();
+	  pDataDef = 0;
+	}
+  if (pDefObj)
+	{
+	  pDefObj->Release ();
+	  pDefObj = 0;
+	}
+
   if (pComponent)
-    pComponent->Release();
+	{
+	  pComponent->Release();
+	  pComponent = 0;
+	}
 
   if (pSegment)
-    pSegment->Release();
+	{
+	  pSegment->Release();
+	  pSegment = 0;
+	}
 
   if (pSlot)
-    pSlot->Release();
+	{
+	  pSlot->Release();
+	  pSlot = 0;
+	}
 
   if (pFiller)
-    pFiller->Release();
+	{
+	  pFiller->Release();
+	  pFiller = 0;
+	}
 
   if (pSlotIter)
-    pSlotIter->Release();
+	{
+	  pSlotIter->Release();
+	  pSlotIter = 0;
+	}
 
   if (pMob)
-    pMob->Release();
+	{
+	  pMob->Release();
+	  pMob = 0;
+	}
 
   if (pMobIter)
-    pMobIter->Release();
+	{
+	  pMobIter->Release();
+	  pMobIter = 0;
+	}
 
   if (pHeader)
-    pHeader->Release();
+	{
+	  pHeader->Release();
+	  pHeader = 0;
+	}
       
   if (pFile)
-  {  // Close file
-    if (bFileOpen)
-      pFile->Close();
-     pFile->Release();
-  }
+	{  // Close file
+	  if (bFileOpen)
+		pFile->Close();
+	  pFile->Release();
+	  pFile = 0;
+	}
 
   return hr;
 }
@@ -333,8 +384,3 @@ extern "C" HRESULT CAAFFiller_test()
   // Cleanup our object if it exists.
   return hr;
 }
-
-
-
-
-
