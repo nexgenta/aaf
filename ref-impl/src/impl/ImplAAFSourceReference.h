@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.h,v 1.23 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.h,v 1.23.2.1 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -80,6 +80,39 @@ public:
     SetSourceMobSlotID
 		// @parm [in] Source Mob ID to set
         (aafSlotID_t   mobSlotID);
+
+
+  //****************
+  // SetChannelIDs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetChannelIDs
+        (// @parm [in] Number of elements in the pChannelIDs array
+         aafUInt32  numberElements,
+
+         // @parm [in] Array of channel IDs
+         aafUInt32*  pChannelIDs);
+
+
+  //****************
+  // GetChannelIDs()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetChannelIDs
+        (// @parm [in] Number of elements in the pChannelIDs array
+         aafUInt32  numberElements,
+
+         // @parm [in] Array of channel IDs
+         aafUInt32*  pChannelIDs);
+
+  //****************
+  // GetChannelIDsSize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetChannelIDsSize
+        // @parm [out] Number of elements in the pChannelIDs array
+        (aafUInt32 *  numberElements);
+
 
 public:
 	//SDK-private

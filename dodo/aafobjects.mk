@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.5 2004/04/17 18:31:00 jptrainor Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.6 2004/05/01 02:10:42 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,8 +38,9 @@ AAFCOMINTERFACESONLY="\
 	AAFMob2 \
 	AAFTimelineMobSlot2 \
 	AAFComponent2 \
-	AAFDictionary2 "
-
+	AAFDictionary2 \
+	AAFSourceReference2 \
+	AAFMasterMob2 "
 
 # These are the impl files that are typed by humans.  Be sure to
 # remove them from the other list.  As you check each one in, just add
@@ -172,8 +173,9 @@ HUMAN_TYPED_IMPL="\
 	AAFTaggedValueDefinition \
 	AAFKLVDataDefinition \
 	EnumAAFTaggedValueDefs \
-	EnumAAFKLVDataDefs "
-
+	EnumAAFKLVDataDefs \
+	AAFRecordingDescriptor \
+	AAFAuxillaryDescriptor "
 
 # Defered interfaces
 #	AAFIntraFrameMarker \

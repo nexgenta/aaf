@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.cpp,v 1.25 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.cpp,v 1.25.2.1 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -105,6 +105,34 @@ AAFRESULT STDMETHODCALLTYPE
 
 	return aafError;
 }
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSourceReference::SetChannelIDs (
+      aafUInt32  /*numberElements*/,
+      aafUInt32*  /*pChannelIDs*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSourceReference::GetChannelIDs (
+      aafUInt32  /*numberElements*/,
+      aafUInt32*  /*pChannelIDs*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSourceReference::GetChannelIDsSize (
+      aafUInt32 *  /*numberElements*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
 
 
 AAFRESULT ImplAAFSourceReference::ChangeContainedReferences(aafMobID_constref from,

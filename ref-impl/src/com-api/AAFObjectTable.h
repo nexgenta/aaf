@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.2.2.3 2004/04/17 20:55:32 jptrainor Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.2.2.4 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -195,4 +195,6 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFKLVDataDefinition)
 	AAF_OBJECT_ENTRY(EnumAAFTaggedValueDefs)
 	AAF_OBJECT_ENTRY(EnumAAFKLVDataDefs)
+	AAF_OBJECT_ENTRY(AAFRecordingDescriptor)
+	AAF_OBJECT_ENTRY(AAFAuxillaryDescriptor)
 AAF_END_OBJECT_MAP()

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.cpp,v 1.56 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.cpp,v 1.56.2.1 2004/05/01 02:10:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1189,3 +1189,31 @@ AAFRESULT STDMETHODCALLTYPE
 	// 	Standard errors (see top of file).
 	// 	AAFRESULT_NOMEMORY -- couldn't allocate memory for the essence handle
 	//@comm Replaces omfmMediaMultiOpen*/
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFMasterMob::CreateStaticEssence (aafSlotID_t  /*masterSlotID*/,
+                           ImplAAFDataDef * /*pMediaKind*/,
+                           aafUID_constref  /*codecID*/,
+                           aafCompressEnable_t  /*Enable*/,
+                           ImplAAFLocator * /*destination*/,
+                           aafUID_constref  /*fileFormat*/,
+                           ImplAAFEssenceAccess ** /*access*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFMasterMob::CreateEventEssence (aafSlotID_t  /*masterSlotID*/,
+                           ImplAAFDataDef * /*pMediaKind*/,
+                           aafUID_constref  /*codecID*/,
+                           aafRational_t  /*editRate*/,
+                           aafRational_t  /*samplerate*/,
+                           aafCompressEnable_t  /*Enable*/,
+                           ImplAAFLocator * /*destination*/,
+                           aafUID_constref  /*fileFormat*/,
+                           ImplAAFEssenceAccess ** /*access*/)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
