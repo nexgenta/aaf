@@ -37,7 +37,6 @@
 #include "ImplAAFRoot.h"
 #include "OMStorable.h"
 
-class ImplAAFClassDef;
 
 class ImplAAFStorable : 
   public OMStorable,
@@ -54,11 +53,6 @@ protected:
 
 public:
   // Private SDK methods.
-  
-  // Associate OMClassDefinition and OMPropertyDefinitions with this object.
-  virtual void InitializeOMStorable(ImplAAFClassDef * pClassDef);
-  
-  virtual AAFRESULT GetDefinition(ImplAAFClassDef ** ppClassDef);
 
   // Return true if this is a meta object
   // NOTE: These objects will eventually owned by the Object Manager.
@@ -66,12 +60,6 @@ public:
   
   // Return true is this is a data object (Interchange object).
   virtual bool dataObject(void) const = 0;
-
-protected:
-  // Associate the existing OMProperties with corresponding property definitions from
-  // the given class definition. NOTE: This call is recursive, it calls itself again
-  // for the parent class of the given class until current class is a "root" class.
-  virtual void InitOMProperties (ImplAAFClassDef * pClassDef) = 0;
 };
 
 //
@@ -84,14 +72,5 @@ protected:
 #endif
 
 typedef ImplAAFSmartPointer<ImplAAFStorable> ImplAAFStorableSP;
-
-
-//
-// Inlude the generic enumerator for storables.
-//
-#ifndef __ImplAAFEnumerator_h__
-#include "ImplAAFEnumerator.h"
-#endif
-typedef ImplAAFEnumerator<ImplAAFStorable> ImplEnumAAFStorables;
 
 #endif // ! __ImplAAFStorable_h__
