@@ -1,31 +1,26 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFTypeDefStream
-/***********************************************************************
- *
- *              Copyright (c) 2000 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 
 
@@ -34,6 +29,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFTypeDefUIDs.h"
@@ -63,6 +59,8 @@ typedef IAAFSmartPointer<IEnumAAFEssenceData>       IEnumAAFEssenceDataSP;
 #include <iostream.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 static const aafMobID_t sMobID[] = {
   //{060c2b340205110101001000-13-00-00-00-{78de46cd-4622-11d4-8029-00104bc9156d}}
@@ -132,7 +130,7 @@ static const aafCharacter sTruncatedCharacters[] = L"Truncated Characters";
 extern "C"
 {
   // Main test function.
-  HRESULT CAAFTypeDefStream_test(void);
+  HRESULT CAAFTypeDefStream_test(testMode_t mode);
 
   // Create the test file.
   void CAAFTypeDefStream_create (aafCharacter_constptr pFileName); // throw HRESULT
@@ -142,7 +140,7 @@ extern "C"
 }
 
 
-HRESULT CAAFTypeDefStream_test()
+HRESULT CAAFTypeDefStream_test(testMode_t mode)
 {
   HRESULT result = AAFRESULT_SUCCESS;
   aafCharacter_constptr wFileName = L"AAFTypeDefStreamTest.aaf";
@@ -152,7 +150,8 @@ HRESULT CAAFTypeDefStream_test()
   {
     // Run through a basic set of tests. Create the file, 
     // and then read and validate the new file.
-    CAAFTypeDefStream_create (wFileName);
+     if(mode == kAAFUnitTestReadWrite)
+    	CAAFTypeDefStream_create (wFileName);
     CAAFTypeDefStream_read (wFileName);
   }
   catch (HRESULT &rhr)
@@ -162,9 +161,6 @@ HRESULT CAAFTypeDefStream_test()
 
   return result;
 }
-
-
-
 
 #ifndef _DEBUG
 // convenient error handlers.
@@ -402,8 +398,11 @@ static void Test_EssenceStreamWrite(
     reinterpret_cast<aafMemPtr_t>(const_cast<aafCharacter *>(sTestCharacter))));
   
 
-  expectedSize += sizeof(sTestCharacter);
-  expectedPosition += sizeof(sTestCharacter);
+  // The expected size and position must be incremented according to the
+  // *persisted* size of aafCharacter, which is always 2, whereas the 
+  // in-memory size may be 2 or 4, depending on the platform.
+  expectedSize += (sizeof(sTestCharacter)/sizeof(wchar_t))*2; // sizeof(sTestCharacter);
+  expectedPosition += (sizeof(sTestCharacter)/sizeof(wchar_t))*2; // sizeof(sTestCharacter);
   checkResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
   checkExpression(expectedSize == streamSize, AAFRESULT_TEST_FAILED);
   checkResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
@@ -491,7 +490,6 @@ static void Test_EssenceStreamRead(
   checkExpression(bytesRead == sizeof(sTestCharacter), AAFRESULT_TEST_FAILED);
   checkExpression(0 == memcmp(characterTest, sTestCharacter, bytesRead),
                   AAFRESULT_TEST_FAILED);
-
 }
 
 // Create the test file.
