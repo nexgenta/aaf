@@ -35,7 +35,6 @@ class OMType;
 
   // @class Abstract base class used to define persistent properties
   //        supported by the Object Manager.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMPropertyDefinition {
 public:
   // @access Public members.
@@ -58,51 +57,6 @@ public:
     // @cmember Is the <c OMProperty> defined by this
     //          <c OMPropertyDefinition> optional? 
   virtual bool isOptional(void) const = 0;
-
-};
-
-  // @class Definitions of persistent properties supported by
-  //        the Object Manager.
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-  //   @devnote This is a temporary class and will be merged into
-  //            <c OMPropertyDefinition>. This will require changes
-  //            to code in Object Manager clients.
-class OMBuiltinPropertyDefinition : public OMPropertyDefinition {
-public:
-  // @access Public members.
-
-    // @cmember Constructor.
-  OMBuiltinPropertyDefinition(const OMType* type,
-                              const wchar_t* name,
-                              const OMPropertyId propertyId,
-                              const bool isOptional);
-
-    // @cmember Destructor.
-  ~OMBuiltinPropertyDefinition(void);
-
-    // @cmember The type of the <c OMProperty> defined by this
-    //          <c OMBuiltinPropertyDefinition>.
-  virtual const OMType* type(void) const;
-
-    // @cmember The name of the <c OMProperty> defined by this
-    //          <c OMBuiltinPropertyDefinition>.
-  virtual const wchar_t* name(void) const;
-
-    // @cmember The locally unique identification of the <c OMProperty>
-    //          defined by this <c OMBuiltinPropertyDefinition>.
-  virtual OMPropertyId localIdentification(void) const;
-
-    // @cmember Is the <c OMProperty> defined by this
-    //          <c OMBuiltinPropertyDefinition> optional? 
-  virtual bool isOptional(void) const;
-
-private:
-  // @access Private members.
-
-  const OMType* _type;
-  const wchar_t* _name;
-  const OMPropertyId _propertyId;
-  const bool _isOptional;
 
 };
 
