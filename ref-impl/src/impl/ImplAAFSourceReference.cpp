@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.cpp,v 1.25.2.2 2004/05/03 01:16:19 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.cpp,v 1.25.2.3 2004/05/11 02:16:40 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -161,10 +161,11 @@ AAFRESULT STDMETHODCALLTYPE
   }
 
   if( !_channelIDs.isPresent() ) {
-    return AAFRESULT_PROP_NOT_PRESENT;
+    *pNumberElements = 0;
   }
-
-  *pNumberElements = _channelIDs.size();
+  else {
+    *pNumberElements = _channelIDs.size();
+  }
 
   return AAFRESULT_SUCCESS;
 }
@@ -192,7 +193,7 @@ AAFRESULT STDMETHODCALLTYPE
   if( NULL == pMonoSourceSlotIDs ) {
     return AAFRESULT_NULL_PARAM;
   }
-  
+
   if( !_monoSourceSlotIDs.isPresent() ) {
     return AAFRESULT_PROP_NOT_PRESENT;
   }
@@ -202,7 +203,8 @@ AAFRESULT STDMETHODCALLTYPE
   }
 
   _monoSourceSlotIDs.copyToBuffer( pMonoSourceSlotIDs, numberElements );
-  
+
+
   return AAFRESULT_SUCCESS;
 }
 
@@ -216,10 +218,11 @@ AAFRESULT STDMETHODCALLTYPE
   }
 
   if( !_monoSourceSlotIDs.isPresent() ) {
-    return AAFRESULT_PROP_NOT_PRESENT;
+    *pNumberElements = 0;
   }
-
-  *pNumberElements = _monoSourceSlotIDs.size();
+  else {
+    *pNumberElements = _monoSourceSlotIDs.size();
+  }
 
   return AAFRESULT_SUCCESS;
 }
