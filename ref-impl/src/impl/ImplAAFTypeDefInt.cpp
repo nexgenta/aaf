@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -289,6 +288,7 @@ AAFRESULT STDMETHODCALLTYPE
   // AddRef; CreateImpl *also* will addref, so we've got one too
   // many.  Put us back to normal.
   tmp->ReleaseReference(); // we don't need this reference anymore.
+  tmp = 0;
 
   AAFRESULT hr;
   hr = pv->Initialize(this);
