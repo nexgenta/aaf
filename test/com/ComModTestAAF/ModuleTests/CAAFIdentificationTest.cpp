@@ -74,7 +74,7 @@ inline void checkExpression(bool expression, HRESULT r)
 #define PRODUCT_NAME		L"AAFDictionary Test"
 #define TEST_VERSION		L"TEST VERSION"
 
-aafProductVersion_t			testVersion =  { 1, 0, 0, 0, kVersionUnknown };
+aafProductVersion_t			testVersion =  { 1, 0, 0, 0, kAAFVersionUnknown };
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
@@ -102,7 +102,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 		
-		checkResult(pHeader->GetNumIdents(&readNumIdents));
+		checkResult(pHeader->CountIdentifications(&readNumIdents));
 		checkExpression(1 == readNumIdents, AAFRESULT_TEST_FAILED);
 		checkResult(pHeader->GetLastIdentification (&pIdent));
 		checkResult(pIdent->Initialize());
@@ -165,7 +165,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		
 		// We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
-		checkResult(pHeader->GetNumIdents(&readNumIdents));
+		checkResult(pHeader->CountIdentifications(&readNumIdents));
 		checkExpression(1 == readNumIdents, AAFRESULT_TEST_FAILED);
 		checkResult(pHeader->GetLastIdentification (&pIdent));
 		/***/
