@@ -91,7 +91,7 @@ private:
 	bool _bWritableFile;
 	IAAFHeader *_pHeader;
 	IAAFDictionary *_pDictionary;
-	aafMobID_t _compositionMobID;
+	static const aafMobID_t _compositionMobID;
 	
 	// MobSlot static data
 	static const wchar_t* _slotName;
@@ -112,13 +112,15 @@ extern "C" HRESULT CAAFCommentMarker_test()
 	aafWChar * pFileName = L"AAFCommentMarkerTest.aaf";
 	
 	// Initialize the product info for this module test
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFCommentMarker Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -159,6 +161,11 @@ extern "C" HRESULT CAAFCommentMarker_test()
 const aafRational_t CommentMarkerTest::_editRate = { 2997, 100 };
 const aafPosition_t CommentMarkerTest::_position = 0;
 const wchar_t *CommentMarkerTest::_eventComment = L"Event::Comment:This is a test event";
+const aafMobID_t CommentMarkerTest::_compositionMobID = 
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x3e2db3b8, 0x0a61, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 
 CommentMarkerTest::CommentMarkerTest() :
 _pFile(NULL),
@@ -166,7 +173,8 @@ _bWritableFile(false),
 _pHeader(NULL),
 _pDictionary(NULL)
 {
-	memset(&_compositionMobID, 0, sizeof(_compositionMobID));
+	//--cf no need ... memset(&_compositionMobID, 0, sizeof(_compositionMobID));
+	;
 }
 
 CommentMarkerTest::~CommentMarkerTest()
@@ -321,6 +329,7 @@ void CommentMarkerTest::CreateEvent()
 					CreateInstance(IID_IAAFMob, 
 								   (IUnknown **)&pMob));
 		checkResult(pMob->SetName(L"CompositionMob::Name:Test mob to hold an event mob slot"));
+		checkResult(pMob->SetMobID(_compositionMobID)); //--cf
 		
 		// Append event slot to the composition mob.
 		checkResult(pMob->AppendSlot(pMobSlot));
@@ -328,9 +337,6 @@ void CommentMarkerTest::CreateEvent()
 		// Attach the mob to the header...
 		checkResult(_pHeader->AddMob(pMob));
 		
-		// Save the id of the composition mob that contains our test
-		// event mob slot.
-		checkResult(pMob->GetMobID(&_compositionMobID));
 	}
 	catch (HRESULT& rHR)
 	{
