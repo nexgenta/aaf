@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceAccess.cpp,v 1.84 2004/03/15 13:28:02 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEssenceAccess.cpp,v 1.85 2004/03/15 13:33:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1698,13 +1698,14 @@ AAFRESULT STDMETHODCALLTYPE
 				&sourceInfo));
 			//			masterMob->AcquireReference();		//!!!DEBUG
 			
-			CHECK(sourceInfo->GetLength(&access.length));
 			CHECK(sourceInfo->GetMob((ImplAAFMob **)&access.fileMob));
 			CHECK(sourceInfo->GetSourceReference(&fileRef));
 			sourceInfo->ReleaseReference();
 			sourceInfo = NULL;
 			
 			CHECK(access.fileMob->GetEssenceDescriptor((ImplAAFEssenceDescriptor **)&access.mdes));
+			CHECK(access.mdes->GetLength(&access.length));
+
 			if(access.mdes->GetContainerFormat (&containerDef) == AAFRESULT_SUCCESS)
 			{
 				CHECK(containerDef->GetAUID(&testFormat));
@@ -2089,13 +2090,14 @@ AAFRESULT STDMETHODCALLTYPE
 				&sourceInfo));
 			//			masterMob->AcquireReference();		//!!!DEBUG
 			
-			CHECK(sourceInfo->GetLength(&access.length));
 			CHECK(sourceInfo->GetMob((ImplAAFMob **)&access.fileMob));
 			CHECK(sourceInfo->GetSourceReference(&fileRef));
 			sourceInfo->ReleaseReference();
 			sourceInfo = NULL;
 			
 			CHECK(access.fileMob->GetEssenceDescriptor((ImplAAFEssenceDescriptor **)&access.mdes));
+			CHECK(access.mdes->GetLength(&access.length));
+
 			if(access.mdes->GetContainerFormat (&containerDef) == AAFRESULT_SUCCESS)
 			{
 				CHECK(containerDef->GetAUID(&testFormat));
