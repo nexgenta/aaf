@@ -78,7 +78,7 @@ _cutPoint( PID_Transition_CutPoint, L"CutPoint")
 
 ImplAAFTransition::~ImplAAFTransition ()
 {
-	ImplAAFOperationGroup *group = _operationGroup.setValue(0);
+	ImplAAFOperationGroup *group = _operationGroup.clearValue();
 	if (group)
 	{
 	  group->ReleaseReference();
@@ -178,3 +178,15 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+AAFRESULT ImplAAFTransition::ChangeContainedReferences(aafMobID_constref from,
+													aafMobID_constref to)
+{
+	ImplAAFSegment	*seg;
+	
+	seg = _operationGroup;
+
+	if(seg != NULL)
+		seg->ChangeContainedReferences(from, to);
+
+	return AAFRESULT_SUCCESS;
+}

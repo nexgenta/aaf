@@ -32,6 +32,7 @@
 #endif
 
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 #include "aafErr.h"
 #include "aafCvt.h"
@@ -54,7 +55,7 @@ ImplAAFPulldown::ImplAAFPulldown ()
 
 ImplAAFPulldown::~ImplAAFPulldown ()
 {
-	ImplAAFSegment *seg = _inputSegment.setValue(0);
+	ImplAAFSegment *seg = _inputSegment.clearValue();
 	if (seg)
 	{
 	  seg->ReleaseReference();
@@ -507,3 +508,15 @@ AAFRESULT ImplAAFPulldown::TraverseToClip(aafLength_t length,
 
 
 
+AAFRESULT ImplAAFPulldown::ChangeContainedReferences(aafMobID_constref from,
+													aafMobID_constref to)
+{
+	ImplAAFSegment	*seg;
+	
+	seg = _inputSegment;
+
+	if(seg != NULL)
+		seg->ChangeContainedReferences(from, to);
+
+	return AAFRESULT_SUCCESS;
+}
