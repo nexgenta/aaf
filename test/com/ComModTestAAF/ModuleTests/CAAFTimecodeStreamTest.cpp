@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFClassDef
+// @com This file implements the module test for CAAFTimecodeStream
 /***********************************************\
 *                                               *
 * Advanced Authoring Format                     *
@@ -14,14 +14,11 @@
 
 
 
-
-
-
 #include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
 
 
-extern "C" HRESULT CAAFClassDef_test()
+extern "C" HRESULT CAAFTimecodeStream_test()
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -39,6 +36,7 @@ extern "C" HRESULT CAAFClassDef_test()
 
 
 
+							 
 
 
 
@@ -46,6 +44,20 @@ extern "C" HRESULT CAAFClassDef_test()
 
 
 
+
+
+
+
+
+
+
+/****/
+
+
+
+
+
+/****/
 
 
 

@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFEdgecode
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -9,18 +9,7 @@
 *                                          *
 \******************************************/
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-#ifndef __CAAFEdgecode_h__
-#include "CAAFEdgecode.h"
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -94,13 +83,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 
     // Create the file
-		checkResult(CoCreateInstance(CLSID_AAFFile,
-								 NULL, 
-								 CLSCTX_INPROC_SERVER, 
-								 IID_IAAFFile, 
-								 (void **)&pFile));
-		checkResult(pFile->Initialize());
-		checkResult(pFile->OpenNewModify(pFileName, 0, &ProductInfo));
+	  checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
  
     // We can't really do anthing in AAF without the header.
@@ -213,13 +196,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   try
   {
     // Open the file
-		checkResult(CoCreateInstance(CLSID_AAFFile,
-								 NULL, 
-								 CLSCTX_INPROC_SERVER, 
-								 IID_IAAFFile, 
-								 (void **)&pFile));
-		checkResult(pFile->Initialize());
-		checkResult(pFile->OpenExistingRead(pFileName, 0));
+		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
  
     // We can't really do anthing in AAF without the header.
@@ -290,7 +267,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-HRESULT CAAFEdgecode::test()
+extern "C" HRESULT CAAFEdgecode_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"EdgecodeTest.aaf";
@@ -303,7 +280,7 @@ HRESULT CAAFEdgecode::test()
 	}
 	catch (...)
 	{
-	  cerr << "CAAFEdgecodeMob::test...Caught general C++"
+	  cerr << "CAAFEdgecodeMob_test...Caught general C++"
 		" exception!" << endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
