@@ -13,6 +13,7 @@
 #include "AAF.h"
 #include "AAFResult.h"
 #include "AAFStoredObjectIDs.h"
+#include "AAFDefUIDs.h"
 
 #include <iostream.h>
 #include <stdio.h>
@@ -77,7 +78,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
 
 
@@ -232,7 +233,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafTimecode_t				startTC;
 	aafTimecodeSourceType_t		checkType;
 	aafRational_t				checkSpeed, testRate;
-	aafUInt32					checkSampleSize, checkUserDataLen, checkUserData;
+	aafUInt32					checkSampleSize, checkUserData;
+	// aafUInt32				checkUserDataLen;
 	aafPosition_t				offset;
 	AAFRESULT					status;
 	aafProductIdentification_t	ProductInfo;
@@ -240,14 +242,13 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	HRESULT						hr = S_OK;
 
 	ProductInfo.companyName = L"AAF Developers Desk. NOT!";
-	ProductInfo.productName = L"Make AVR Example. NOT!";
+	ProductInfo.productName = L"AAFTimecodeStream12M Test. NOT!";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
 
@@ -441,7 +442,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 extern "C" HRESULT CAAFTimecodeStream12M_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"TimecodeStream12MTest.aaf";
+	aafWChar * pFileName = L"AAFTimecodeStream12MTest.aaf";
 
 	try
 	{
