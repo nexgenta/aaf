@@ -12,7 +12,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -67,6 +67,10 @@ static aafSourceRef_t sourceRef;
   if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
 
+static aafBool	EqualAUID(aafUID_t *uid1, aafUID_t *uid2)
+{
+	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? AAFTrue : AAFFalse);
+}
 
 #define TEST_PATH	L"SomeFile.dat"
 
@@ -104,20 +108,15 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
-static void MobIDtoString(aafMobID_constref uid, char *buf)
+static void AUIDtoString(aafUID_t *uid, char *buf)
 {
-	sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x--%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
-		(int)uid.SMPTELabel[0], (int)uid.SMPTELabel[1], (int)uid.SMPTELabel[2], (int)uid.SMPTELabel[3], 
-		(int)uid.SMPTELabel[4], (int)uid.SMPTELabel[5], (int)uid.SMPTELabel[6], (int)uid.SMPTELabel[7], 
-		(int)uid.SMPTELabel[8], (int)uid.SMPTELabel[8], (int)uid.SMPTELabel[10], (int)uid.SMPTELabel[11], 
-		(int)uid.length, (int)uid.instanceHigh, (int)uid.instanceMid, (int)uid.instanceLow, 
-		uid.material.Data1, uid.material.Data2, uid.material.Data3, (int)uid.material.Data4[0],
-		(int)uid.material.Data4[1], (int)uid.material.Data4[2], (int)uid.material.Data4[3],
-		(int)uid.material.Data4[4],
-		(int)uid.material.Data4[5], (int)uid.material.Data4[6], (int)uid.material.Data4[7]);
+	sprintf(buf, "%08lx-%04x-%04x-%02x%02x%02x%02x%02x%02x%02x%02x",
+			uid->Data1, uid->Data2, uid->Data3, (int)uid->Data4[0],
+			(int)uid->Data4[1], (int)uid->Data4[2], (int)uid->Data4[3], (int)uid->Data4[4],
+			(int)uid->Data4[5], (int)uid->Data4[6], (int)uid->Data4[7]);
 }
 
-typedef enum { testStandardCalls, testMultiCalls } testType_t;
+typedef enum { testRawCalls, testStandardCalls, testMultiCalls, testFractionalCalls } testType_t;
 
 typedef aafInt16	AAFByteOrder;
 const AAFByteOrder INTEL_ORDER		      = 0x4949; // 'II' for Intel
@@ -151,7 +150,6 @@ char* externalkind = "";
 char* kind = "";
 char* location = "";
 
-
 //  Note: function modified to take N as an argument
 static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, testType_t testType, long int N)
 {
@@ -162,27 +160,24 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	IAAFMasterMob*				pMasterMob = NULL;
 
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat*			pFormat = NULL;
 	IAAFEssenceFormat			*format = NULL;
 	IAAFLocator					*pLocator = NULL;
-	IAAFClassDef                *pCDMasterMob = 0;
-	IAAFClassDef                *pCDNetworkLocator = 0;
-	IAAFDataDef                 *pDdefSound = 0;
 	// !!!Previous revisions of this file contained variables here required to handle external essence
-	aafMobID_t					masterMobID;
+	aafUID_t					masterMobID;
 	aafProductIdentification_t	ProductInfo;
 	aafRational_t				editRate = {44100, 1};
 	aafRational_t				sampleRate = {44100, 1};
 	FILE*						pWavFile = NULL;
 	unsigned char				dataBuff[4096], *dataPtr;
 	size_t						bytesRead;
-//	aafUInt32					bytesWritten;
-	aafUInt32					dataOffset, dataLen;
+	aafUInt32					bytesWritten, dataOffset, dataLen;
 	aafUInt16					bitsPerSample, numCh;
 		aafInt32			n, numSpecifiers;
 		aafUID_t			essenceFormatCode, testContainer;
-  aafUInt32 samplesWritten, bytesWritten;
+ 
 
 		// delete any previous test file before continuing...
   char chFileName[1000];
@@ -196,15 +191,13 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	remove(chFileName);
   }
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF-East Avid@Tewksbury";
 	ProductInfo.productName = L"Essence Data Transfer Rate Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
@@ -212,38 +205,31 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
 	check(pFile->GetHeader(&pHeader));
 
-	// Get the AAF Dictionary so that we can create valid AAF objects.
-	check(pHeader->GetDictionary(&pDictionary));
-
-	check(pDictionary->LookupClassDef(AUID_AAFMasterMob,
-									  &pCDMasterMob));
-	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator,
-									  &pCDNetworkLocator));
-	check(pDictionary->LookupDataDef(DDEF_Sound,
-									 &pDdefSound));
+  // Get the AAF Dictionary so that we can create valid AAF objects.
+  check(pHeader->GetDictionary(&pDictionary));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
   // Get a Master MOB Interface
-	check(pCDMasterMob->
-		  CreateInstance(IID_IAAFMasterMob, 
-						 (IUnknown **)&pMasterMob));
+	check(pDictionary->CreateInstance( &AUID_AAFMasterMob,
+						   IID_IAAFMasterMob, 
+						   (IUnknown **)&pMasterMob));
 	// Get a Mob interface and set its variables.
 	check(pMasterMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 	check(pMob->GetMobID(&masterMobID));
 	check(pMob->SetName(L"A Master Mob"));
 	
 	// Add it to the file 
-	check(pHeader->AddMob(pMob));
+	check(pHeader->AppendMob(pMob));
 
 	// !!!Previous revisions of this file contained code here required to handle external essence
 
 	if(dataFile != NULL)
 	{
 		// Make a locator, and attach it to the EssenceDescriptor
-		check(pCDNetworkLocator->
-			  CreateInstance(IID_IAAFLocator, 
-							 (IUnknown **)&pLocator));		
+		check(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
+								IID_IAAFLocator, 
+								(IUnknown **)&pLocator));		
 		check(pLocator->SetPath (dataFile->dataFilename));
 		testContainer = dataFile->dataFormat;
 	}
@@ -273,15 +259,23 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 										&sampleRate,
 										&dataOffset,
 										&dataLen));
-		dataPtr = dataBuff + dataOffset;
+		if(testType != testRawCalls)
+		{
+			dataPtr = dataBuff + dataOffset;
+		}
+		else
+		{	
+			dataPtr = dataBuff;
+			dataLen = bytesRead;
+		}
 
 		// now create the Essence data file
 		check(pMasterMob->CreateEssence(1,				// Slot ID
-									pDdefSound,		// MediaKind
+									DDEF_Sound,		// MediaKind
 									CodecWave,		// codecID
 									editRate,		// edit rate
 									sampleRate,		// sample rate
-									kAAFCompressionDisable,
+									kSDKCompressionDisable,
 									pLocator,	// In current file
 									testContainer,	// In AAF Format
 									&pEssenceAccess));// Compress disabled
@@ -320,14 +314,30 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		{
 
 			// write out the data
-			if(testType == testStandardCalls)
+			if(testType == testRawCalls)
+			{
+				check(pEssenceAccess->QueryInterface(IID_IAAFEssenceRawAccess, (void **)&pRawEssence));
+				check(pRawEssence->WriteRawData(	dataLen,	// Number of Samples
+												dataPtr,	// THE Raw data
+												sizeof(dataBuff)));// buffer size
+				pRawEssence->Release();
+				pRawEssence = NULL;
+				kind = "raw calls";
+			}
+			else if(testType == testStandardCalls)
 			{
 				check(pEssenceAccess->WriteSamples(	dataLen,		//!!! hardcoded bytes/sample ==1// Number of Samples
-												sizeof(dataBuff), 	// buffer size
-												dataPtr,			// THE  data
-												&samplesWritten,
-												&bytesWritten));
+												dataPtr,			// THE Raw data
+												sizeof(dataBuff)));	// buffer size
 				kind = "standard calls";
+			}
+			else if(testType == testFractionalCalls)
+			{
+				check(pEssenceAccess->WriteFractionalSample(
+												dataLen,			// number of bytes
+												dataPtr,			// THE data	
+												&bytesWritten));	// !!!Check this when it works
+				kind = "fractional calls";
 			}
 			else if(testType == testMultiCalls)
 			{
@@ -344,11 +354,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 				check(pMultiEssence->WriteMultiSamples(1, &xfer, &result));
 				pMultiEssence->Release();
 				pMultiEssence = NULL;
-
-
-				samplesWritten = result.samplesXfered;
-				bytesWritten = result.bytesXfered;
-				
 				kind  = "multi calls";
 			}
 
@@ -374,7 +379,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		
 		// close essence data file
 		fclose(pWavFile);
-    pWavFile = NULL;
 
 		// Finish writing the destination
 		check(pEssenceAccess->CompleteWrite());
@@ -413,20 +417,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 cleanup:
 	// Cleanup and return
-  if (pWavFile)
-    fclose(pWavFile);
-
-  if(pFormat)
-		pFormat->Release();
-
-	if(format)
-		format->Release();
-
-	if(pLocator)
-		pLocator->Release();
-
 	if (pEssenceAccess)
 		pEssenceAccess->Release();
+	
+	if (pRawEssence)
+		pRawEssence->Release();
 	
 	if (pMultiEssence)
 		pMultiEssence->Release();
@@ -443,30 +438,15 @@ cleanup:
 	if (pHeader)
 		pHeader->Release();
 
-	if (pCDMasterMob)
-	  {
-		pCDMasterMob->Release();
-		pCDMasterMob = 0;
-	  }
-
-	if (pCDNetworkLocator)
-	  {
-		pCDNetworkLocator->Release();
-		pCDNetworkLocator = 0;
-	  }
-
-	if (pDdefSound)
-	  {
-		pDdefSound->Release();
-		pDdefSound = 0;
-	  }
-
 	if (pFile)
-  {
-    pFile->Close();
-		pFile->Release();
-  }
+		pFile->Release(); 
 
+	if(pFormat)
+		pFormat->Release();
+	if(format)
+		format->Release();
+	if(pLocator)
+		pLocator->Release();
 
 	return moduleErrorTmp;
 }
@@ -477,19 +457,19 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	IAAFHeader *				pHeader = NULL;
 	IAAFDictionary*					pDictionary = NULL;
 	IAAFEssenceAccess*			pEssenceAccess = NULL;
+	IAAFEssenceRawAccess*		pRawEssence = NULL;
 	IAAFEssenceMultiAccess*		pMultiEssence = NULL;
 	IAAFEssenceFormat			*fmtTemplate =  NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFMasterMob*				pMasterMob = NULL;
 	IAAFEssenceFormat*			pFormat = NULL;
-	IAAFDataDef*				pddSound = 0;
 
 	aafNumSlots_t				numMobs, numSlots;
 	aafSearchCrit_t				criteria;
-	aafMobID_t					mobID;
+	aafUID_t					mobID, dataID = DDEF_Sound;
 	aafWChar					namebuf[1204];
-	unsigned char						*AAFDataBuf = NULL;
+	unsigned char						*AAFDataBuf;
 	aafUInt32					AAFBytesRead, samplesRead;
 	FILE*						pWavFile = NULL;
 //	size_t						WAVBytesRead;
@@ -502,15 +482,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 	// Get the AAF Dictionary so that we can create valid AAF objects.
 	check(pHeader->GetDictionary(&pDictionary));
 
+
 	// Here we check on the number of mobs in the file. 
 	// Get the number of master mobs in the file (should be one)
-	check(pHeader->CountMobs(kAAFMasterMob, &numMobs));
+	check(pHeader->GetNumMobs(kMasterMob, &numMobs));
 	if (1 == numMobs )
 	{
 		printf("Found %ld Master Mobs\n", numMobs);
-		criteria.searchTag = kAAFByMobKind;
-		criteria.tags.mobKind = kAAFMasterMob;
-		check(pHeader->GetMobs(&criteria, &pMobIter));
+		criteria.searchTag = kByMobKind;
+		criteria.tags.mobKind = kMasterMob;
+		check(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
 		while(AAFRESULT_SUCCESS == pMobIter->NextOne(&pMob))
 		{
 			char mobIDstr[256];
@@ -520,11 +501,11 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 			check(pMob->GetMobID (&mobID));
 			check(pMob->GetName (namebuf, sizeof(namebuf)));
 			convert(mobName, sizeof(mobName), namebuf);
-			MobIDtoString(mobID, mobIDstr);
+			AUIDtoString(&mobID, mobIDstr);
 			printf("    MasterMob Name = '%s'\n", mobName);
 			printf("        (mobID %s)\n", mobIDstr);
 			// Make sure we have one slot 
-			check(pMob->CountSlots(&numSlots));
+			check(pMob->GetNumSlots(&numSlots));
 			if (1 == numSlots)
 			{
 				// The essence data is in SlotID 1
@@ -534,8 +515,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 				// Open the Essence Data
 					check(pMasterMob->OpenEssence(	1,						// SlotID 1
 											NULL,				// mediaCriteria (Don't care)
-											kAAFMediaOpenReadOnly,	// Open mode
-											kAAFCompressionDisable,// Compress disabled
+											kMediaOpenReadOnly,	// Open mode
+											kSDKCompressionDisable,// Compress disabled
 											&pEssenceAccess));
 
 #if 0
@@ -546,18 +527,25 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					// read in the essence data
 					WAVBytesRead = fread(WAVDataBuf, sizeof(unsigned char), sizeof(WAVDataBuf), pWavFile);
 					fclose(pWavFile);
-          pWavFile = NULL
 					check(loadWAVEHeader(WAVDataBuf,
 										&bitsPerSample,
 										&numCh,
 										&readSampleRate,
 										&dataOffset,
 										&dataLen));
-					dataPtr = WAVDataBuf + dataOffset;
+					if(testType != testRawCalls)
+					{
+						dataPtr = WAVDataBuf + dataOffset;
+					}
+					else
+					{	
+						dataPtr = WAVDataBuf;
+						dataLen = WAVBytesRead;
+					}
+
 					
 #else
-					check(pDictionary->LookupDataDef(DDEF_Sound, &pddSound));
-					check(pEssenceAccess->CountSamples(pddSound, &sampleCount));
+					check(pEssenceAccess->GetSampleCount(dataID, &sampleCount));
 					samplesToRead = (aafInt32)sampleCount;		// !!! Possible loss of data if > 4gig
 #endif
 					aafUInt32			sampleBits;
@@ -593,13 +581,30 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					aafUInt32 dataReadRate = 0;
 #endif
 
-					// Read the Data from the AAF file
-					if(testType == testStandardCalls)
+					// Read the Raw Data from the AAF file
+					if(testType == testRawCalls)
+					{
+						check(pEssenceAccess->QueryInterface(IID_IAAFEssenceRawAccess, (void **)&pRawEssence));
+						check(pRawEssence->ReadRawData(	samplesToRead,		// Number of Samples 
+														bytesToRead,	// Maximum buffer size
+														AAFDataBuf,			// Buffer for the data
+														&AAFBytesRead,	// Actual number of bytes read
+														&samplesRead));		// Actual number of samples read
+						pRawEssence->Release();
+						pRawEssence = NULL;
+					}
+					else if(testType == testStandardCalls)
 					{
 						check(pEssenceAccess->ReadSamples(	samplesToRead,	//!!! Hardcoded	// Number of Samples 
 														bytesToRead,	// Maximum buffer size
 														AAFDataBuf,			// Buffer for the data
 														&samplesRead,		// Actual number of samples read
+														&AAFBytesRead));	// Actual number of bytes read
+					}
+					else if(testType == testFractionalCalls)
+					{
+						check(pEssenceAccess->ReadFractionalSample(samplesToRead,	// bytes to read
+														AAFDataBuf,			// Buffer for the data
 														&AAFBytesRead));	// Actual number of bytes read
 					}
 					else if(testType == testMultiCalls)
@@ -650,13 +655,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					}
 #endif
 					delete [] AAFDataBuf;
-          AAFDataBuf = NULL;
-
-          if (pWavFile)
-          { // close essence data file
-		        fclose(pWavFile);
-            pWavFile = NULL;
-          }
 #if 0
 				}
 				else
@@ -699,12 +697,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 
 cleanup:
 	// Cleanup and return
-  if (AAFDataBuf)
-    delete [] AAFDataBuf;
 
-  if (pWavFile)
-    fclose(pWavFile);
-
+	if (pRawEssence)
+		pRawEssence->Release();
 	if (pMultiEssence)
 		pMultiEssence->Release();
 	if(fmtTemplate)
@@ -726,12 +721,6 @@ cleanup:
 		pMobIter->Release();
 	if (pFormat)
 		pFormat->Release();
-
-	if (pddSound)
-	  {
-		pddSound->Release();
-		pddSound = 0;
-	  }
 
 	if (pFile) 
 	{
@@ -847,7 +836,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafInt32			formSize;
 	aafInt16			pcm_format, junk16;
 	aafUInt32			chunkSize;
-	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
+	aafBool				fmtFound = AAFFalse, dataFound = AAFFalse;
 	aafUInt8			chunkID[4];
  	aafInt32			junk32, rate, bytesPerFrame;
 	aafUInt8			*ptr;
@@ -890,14 +879,14 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 			// WAVE field Sample Width
 			scanSwappedWAVEData(&ptr, sizeof(aafUInt16), (aafUInt8 *)bitsPerSample);
 			bytesPerFrame = (((*bitsPerSample) + 7) / 8) * (*numCh);
-			fmtFound = kAAFTrue;
+			fmtFound = AAFTrue;
 		} else if (memcmp(&chunkID, "data", (size_t) 4) == 0)
 		{
 			*dataLen = chunkSize / bytesPerFrame;
 			// Positioned at beginning of audio data
 			*dataOffset = ptr - buf;
 	
-			dataFound = kAAFTrue;
+			dataFound = AAFTrue;
 		}
 	
 		if((ptr-buf) > formSize)
@@ -908,39 +897,6 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	}	
 	
 	return(AAFRESULT_SUCCESS);
-}
-
-
-// Make sure all of our required plugins have been registered.
-static HRESULT RegisterRequiredPlugins(void)
-{
-  HRESULT hr = S_OK;
-	IAAFPluginManager	*mgr = NULL;
-
-  // Load the plugin manager 
-  check(AAFGetPluginManager(&mgr));
-
-  // Attempt load and register all of the plugins
-  // in the shared plugin directory.
-  check(mgr->RegisterSharedPlugins());
-
-  // Attempt to register all of the plugin files
-  // in the given directorys:
-  //check(mgr->RegisterPluginDirectory(directory1));
-  //check(mgr->RegisterPluginDirectory(directory2));
-
-
-  // Attempt to register all of the plugins in any
-  // of the given files:
-  //check(mgr->RegisterPluginFile(file1));
-  //check(mgr->RegisterPluginFile(file2));
-  //...
-
-cleanup:
-  if (mgr)
-    mgr->Release();
-
-	return moduleErrorTmp;
 }
 
 
@@ -993,19 +949,20 @@ int main(int argumentCount, char *argumentVector[])
 	CComInitialize comInit;
 	CAAFInitialize aafInit;
 
-  // Make sure all of our required plugins have been registered.
-  checkFatal(RegisterRequiredPlugins());
-
-
 	//  The new, non-interleaved code to fix the caching issues relating to statistic gathering
 
 	//  first, for the write calls, creating 6 different files, one for each test type
 
 	aafWChar *		pwFileName = L"";
 	char *	pFileName = "";
+	aafWChar *	rawData = L"EssenceTestRaw.wav";
 	aafWChar *	externalAAF = L"ExternalAAFEssence.aaf";
 	testDataFile_t	dataFile;
 	
+	pwFileName = L"InternalRaw.aaf";
+	pFileName = "InternalRaw.aaf";
+	printf("***Creating file %s using writeRawData (Internal Media)\n", pFileName);
+	checkFatal(CreateAAFFile(pwFileName, NULL, testRawCalls, N));
 	
 	pwFileName = L"InternalStandard.aaf";
 	pFileName = "InternalStandard.aaf";
@@ -1016,7 +973,20 @@ int main(int argumentCount, char *argumentVector[])
 	pFileName = "InternalMulti.aaf";
 	printf("***Creating file %s using WriteMultiSamples (Internal Media)\n", pFileName);
 	checkFatal(CreateAAFFile(pwFileName, NULL, testMultiCalls, N));
-			
+	
+	pwFileName = L"InternalFractional.aaf";
+	pFileName = "InternalFractional.aaf";
+	printf("***Creating file %s using WriteFractionalSample (Internal Media)\n", pFileName);
+	checkFatal(CreateAAFFile(pwFileName, NULL, testFractionalCalls, N));
+	
+	pwFileName = L"ExternalStandardRaw.aaf";
+	pFileName = "ExternalStandardRaw.aaf";
+	dataFile.dataFilename = rawData;
+	dataFile.dataFormat = ContainerFile;
+	externalkind = "Raw ";
+	printf("***Creating file %s using WriteSamples (External Raw Media)\n", pFileName);
+	checkFatal(CreateAAFFile(pwFileName, &dataFile, testStandardCalls, N));
+	
 	pwFileName = L"ExternalStandardAAF.aaf";
 	pFileName = "ExternalStandardAAF.aaf";
 	dataFile.dataFilename = externalAAF;
@@ -1026,7 +996,12 @@ int main(int argumentCount, char *argumentVector[])
 	checkFatal(CreateAAFFile(pwFileName, &dataFile, testStandardCalls, N));
 	
 	//  now, for the read calls, reading the 6 different files created
-		
+	
+	pwFileName = L"InternalRaw.aaf";
+	pFileName = "InternalRaw.aaf";
+	printf("***Re-opening file %s using readRawData\n", pFileName);
+	ReadAAFFile(pwFileName, testRawCalls);
+	
 	pwFileName = L"InternalStandard.aaf";
 	pFileName = "InternalStandard.aaf";
 	printf("***Re-opening file %s using ReadSamples\n", pFileName);
@@ -1036,7 +1011,20 @@ int main(int argumentCount, char *argumentVector[])
 	pFileName = "InternalMulti.aaf";
 	printf("***Re-opening file %s using ReadMultiSamples\n", pFileName);
 	ReadAAFFile(pwFileName, testMultiCalls);
-			
+	
+	pwFileName = L"InternalFractional.aaf";
+	pFileName = "InternalFractional.aaf";
+	printf("***Re-opening file %s using ReadFractionalSample\n", pFileName);
+	ReadAAFFile(pwFileName, testFractionalCalls);
+	
+	pwFileName = L"ExternalStandardRaw.aaf";
+	pFileName = "ExternalStandardRaw.aaf";
+	dataFile.dataFilename = rawData;
+	dataFile.dataFormat = ContainerFile;
+	externalkind = "Raw ";
+	printf("***Re-opening file %s using ReadSamples\n", pFileName);
+	ReadAAFFile(pwFileName, testStandardCalls);
+	
 	pwFileName = L"ExternalStandardAAF.aaf";
 	pFileName = "ExternalStandardAAF.aaf";
 	dataFile.dataFilename = externalAAF;
