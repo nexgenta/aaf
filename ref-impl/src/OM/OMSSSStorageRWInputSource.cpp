@@ -8,8 +8,8 @@
 *  Copyright (C) 2002 - 2003 Schema Software, Inc. All rights reserved.
 *  Portions Copyright (C) 2003 Metaglue Corparation. All rights reserved.
 *
-*  $Revision: 1.3 $
-*  $Date: 2004/04/11 07:29:44 $
+*  $Revision: 1.4 $
+*  $Date: 2004/04/11 07:41:54 $
 *  
 \******************************************************************************/
 #include "OMRawStorage.h"
@@ -40,6 +40,7 @@ extern void AssertProc(char* cond, char* file, SINT4 line);
 //we must use Schemasofts debug malloc routines under schemasoft debug builds or
 // the heap corruption tests will fail
 //This will only be needed for devleopers who have access to the  schemasoft code
+//SS_DEBUG should be defined when you get run time errors that guard bytes were corrupted.
 #define ss_malloc dbgMalloc
 
 void * dbgMalloc(size_t cb);
