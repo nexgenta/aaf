@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFAuxiliaryDescriptorTest.cpp,v 1.2 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFAuxiliaryDescriptorTest.cpp,v 1.3 2005/04/05 14:07:08 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -103,18 +103,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     IAAFSmartPointer<IAAFAuxiliaryDescriptor> pAuxDesc;
     CheckResult( pDesc->QueryInterface( IID_IAAFAuxiliaryDescriptor, (void**)&pAuxDesc ));
 
-    // FIXME - Why is a 30 wchar buffer required to read a 15
-    // character string???  The OM returns the correct string, but
-    // returns SMALL_BUF if less than 30 is used?
-    const unsigned int bufSize = 30;
-    aafCharacter* stringBuf[bufSize];
-    CheckResult( pAuxDesc->GetMimeType( (aafCharacter*)stringBuf, 2*bufSize ) );
-    CheckExpression( ::wcscmp( (aafCharacter*)stringBuf, L"Marcel Marceau" ) == 0,
-		     AAFRESULT_TEST_FAILED );
+    aafCharacter stringBuf[15];
+    CheckResult( pAuxDesc->GetMimeType( stringBuf, sizeof(stringBuf) ) );
+    CheckExpression( ::wcscmp( stringBuf, L"Marcel Marceau" ) == 0, AAFRESULT_TEST_FAILED );
     
-    CheckResult( pAuxDesc->GetCharSet( (aafCharacter*)stringBuf, 2*bufSize ) );
-    CheckExpression( ::wcscmp( (aafCharacter*)stringBuf, L"csISO069French" ) == 0,
-		     AAFRESULT_TEST_FAILED );
+    CheckResult( pAuxDesc->GetCharSet( stringBuf, sizeof(stringBuf) ) );
+    CheckExpression( ::wcscmp( stringBuf, L"csISO069French" ) == 0, AAFRESULT_TEST_FAILED );
 
     CheckResult( filePointers.pFile->Close() );
   }
