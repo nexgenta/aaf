@@ -54,8 +54,8 @@
 extern "C" const aafClassID_t CLSID_EnumAAFControlPoints;
 
 ImplAAFVaryingValue::ImplAAFVaryingValue ()
-: _controlPoints(         PID_VaryingValue_PointList,          "PointList"),
-  _interpolation(         PID_VaryingValue_Interpolation,      "Interpolation")
+: _controlPoints(         PID_VaryingValue_PointList,          L"PointList"),
+  _interpolation(         PID_VaryingValue_Interpolation,      L"Interpolation", L"/Header/Dictionary/InterpolationDefinitions", PID_DefinitionObject_Identification)
 {
 	  aafReferenceType_t	ref = kAAFRefLimitMinimum;
 	 aafInt32				zero = 0;
@@ -193,13 +193,20 @@ AAFRESULT STDMETHODCALLTYPE
   if(! ppControlPoint) return(AAFRESULT_NULL_PARAM);
 
   aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountControlPoints (& count);
-  if (AAFRESULT_FAILED (hr)) return hr;
+  AAFRESULT ar;
+  ar = CountControlPoints (& count);
+  if (AAFRESULT_FAILED (ar)) return ar;
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  ImplAAFControlPoint *pPoint;
+  _controlPoints.getValueAt(pPoint,index);
+
+  assert(pPoint);
+  pPoint->AcquireReference();
+  (*ppControlPoint)=pPoint;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -233,32 +240,10 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFVaryingValue::SetInterpolationDefinition (
       ImplAAFInterpolationDef *pDef)
 {
-	aafUID_t			newUID;
-	ImplAAFDictionary	*dict = NULL;
-
 	if(pDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
-	{
-		CHECK(pDef->GetAUID(&newUID));
-		CHECK(GetDictionary(&dict));
-// This is a weak reference, not yet counted
-//		if(dict->LookupParameterDef(&newUID, &def) == AAFRESULT_SUCCESS)
-//			def->ReleaseReference();
-
-		_interpolation = newUID;
-//		pDef->AcquireReference();
-		dict->ReleaseReference();
-		dict = NULL;
-	}
-	XEXCEPT
-	{
-		if(dict)
-		  dict->ReleaseReference();
-		dict = 0;
-	}
-	XEND
+	_interpolation = pDef;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -267,28 +252,11 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFVaryingValue::GetInterpolationDefinition (
       ImplAAFInterpolationDef **ppDef)
 {
-	ImplAAFDictionary	*dict = NULL;
-	aafUID_t			interpID;
-
 	if(ppDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
-	{
-		interpID = _interpolation;
-		CHECK(GetDictionary(&dict));
-		CHECK(dict->LookupInterpolationDef(interpID, ppDef));
-//		(*ppDef)->AcquireReference();
-		dict->ReleaseReference();
-		dict = NULL;
-	}
-	XEXCEPT
-	{
-		if(dict)
-		  dict->ReleaseReference();
-		dict = 0;
-	}
-	XEND;
+	*ppDef = _interpolation;
+	(*ppDef)->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
 }
