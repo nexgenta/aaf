@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefString
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStringTest.cpp,v 1.17 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTypeDefStringTest.cpp,v 1.18 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -154,7 +154,7 @@ static HRESULT  createSTRType (IAAFDictionary * const pDict)
 	IAAFTypeDefStringSP spSTR;
 	//checkResult(defs.cdTypeDefString()->
 		//CreateInstance (IID_IAAFTypeDefString, (IUnknown **) &spSTR));
-	HRESULT hr = pDict->CreateMetaInstance(AUID_AAFTypeDefString, IID_IAAFTypeDefString,
+	pDict->CreateMetaInstance(AUID_AAFTypeDefString, IID_IAAFTypeDefString,
 		(IUnknown **) &spSTR) ;
 
 	

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.49 2004/11/04 16:35:46 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.50 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -727,8 +727,6 @@ static HRESULT CreateStaticEssenceAAFFile(
 	// !!!Previous revisions of this file contained variables here required to handle external essence
 	aafMobID_t					masterMobID;
 	aafProductIdentification_t	ProductInfo;
-	aafRational_t				editRate = {44100, 1};
-	aafRational_t				sampleRate = {44100, 1};
 	aafUID_t			 testContainer;
 
 	// delete any previous test file before continuing...
@@ -2225,7 +2223,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafUInt32			chunkSize;
 	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
 	aafUInt8			chunkID[4];
-	aafInt32			junk32, rate, bytesPerFrame;
+	aafInt32			junk32, rate, bytesPerFrame = 0;
 	aafUInt8			*ptr;
 	
 	ptr = buf;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPluginRegistry.cpp,v 1.3 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AxPluginRegistry.cpp,v 1.4 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -101,7 +101,7 @@ HRESULT AxPluginRegistry::GetClassObjectID( int index, CLSID *pClassID )
 	if ( _factoryV.empty() ) {
 		return CLASS_E_CLASSNOTAVAILABLE;
 	}
-	else if ( index >= 0  &&  index < _factoryV.size() ) {
+	else if ( index >= 0  &&  index < (int)(_factoryV.size()) ) {
 		*pClassID = _factoryV[index]->GetClassID();
 		return S_OK;
 	}

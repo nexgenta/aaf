@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFPluginDef
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFPluginDescTest.cpp,v 1.28 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
+// $Id: CEnumAAFPluginDescTest.cpp,v 1.29 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,10 +67,6 @@ static aafVersionType_t sampleMaxAPIVersion = { 40, 41 };//, 42, 43, kAAFVersion
 static wchar_t *manufName[] = { L"A test plugin manufacturer", L"Another test plugin manufacturer" };
 static wchar_t *manufRev = L"Rev0.0.0a0";
 
-static aafBool	EqualVersion(aafVersionType_t *vers1, aafVersionType_t *vers2)
-{
-	return(memcmp((char *)vers1, (char *)vers2, sizeof(aafVersionType_t)) == 0 ? kAAFTrue : kAAFFalse);
-}
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)

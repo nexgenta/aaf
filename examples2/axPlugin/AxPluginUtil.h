@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPluginUtil.h,v 1.8 2004/07/12 12:13:50 stuart_hc Exp $ $Name:  $
+// $Id: AxPluginUtil.h,v 1.9 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@
 
 #include <map>
 
-#if _DEBUG
+#ifdef _DEBUG
 #include <iostream>
 #endif
 
@@ -69,7 +69,7 @@ public:
 // implementation that, generally, has identical method
 // name and arguments but does not return an error code.
 
-#if _DEBUG
+#ifdef _DEBUG
 #define AX_PLUGIN_LOG_WHAT( EX )  std::wcout << L"Codec error: " << (EX).what() << std::endl; 
 #else
 #define AX_PLUGIN_LOG_WHAT( EX )

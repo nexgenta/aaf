@@ -2,7 +2,7 @@
 // @com Common module test routines.
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTestsCommon.cpp,v 1.3 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
+// $Id: ModuleTestsCommon.cpp,v 1.4 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,8 +62,6 @@ void CreateSimpleAAFFile(aafWChar * pFileName, aafWChar* pTestName,
 			 SimpleFilePointers* pFilePointers )
 {
   aafProductIdentification_t  ProductInfo;
-
-  HRESULT hr = AAFRESULT_SUCCESS;
 
   aafProductVersion_t v;
   v.major = 1;

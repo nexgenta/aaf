@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEx.cpp,v 1.7 2004/04/15 15:20:09 philipn Exp $ $Name:  $
+// $Id: AxEx.cpp,v 1.8 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -100,10 +100,10 @@ AxExHResult::AxExHResult( HRESULT hr, const wchar_t* what )
 
 AxExHResult::AxExHResult( HRESULT hr, const char* file, int line )
 : AxEx(),
-  _widewhat( L"" ),
-  _what( "" ),
   _file( file ),
   _line( line ),	
+  _widewhat( L"" ),
+  _what( "" ),
   _hresult( hr )
 {
 	std::wostringstream os;

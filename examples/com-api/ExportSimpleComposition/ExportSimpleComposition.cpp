@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportSimpleComposition.cpp,v 1.25 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
+// $Id: ExportSimpleComposition.cpp,v 1.26 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -756,7 +756,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafUInt32			chunkSize;
 	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
 	aafUInt8			chunkID[4];
- 	aafInt32			junk32, rate, bytesPerFrame;
+ 	aafInt32			junk32, rate, bytesPerFrame = 0;
 	aafUInt8			*ptr;
 
 	ptr = buf;

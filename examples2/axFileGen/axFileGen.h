@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.h,v 1.3 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: axFileGen.h,v 1.4 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -73,8 +73,8 @@ public:
 	AxString GetDesc() const;
 	AxString GetUsage() const;
 	AxString GetNotes() const;
-	int GetMinArgC() const;
-	int GetMaxArgC() const;
+	size_t GetMinArgC() const;
+	size_t GetMaxArgC() const;
 
 protected:
 

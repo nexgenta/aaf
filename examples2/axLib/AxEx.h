@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEx.h,v 1.5 2004/04/15 15:20:09 philipn Exp $ $Name:  $
+// $Id: AxEx.h,v 1.6 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -55,8 +55,8 @@ public:
 	virtual const char* what() const throw();
 
 private:
-	std::string _what;
 	AxString _widewhat;
+	std::string _what;
 };
 
 class AxExHResult : public AxEx {
@@ -78,8 +78,8 @@ public:
 private:
 	const char* _file;
 	int _line;
-	std::string _what;
 	AxString _widewhat;
+	std::string _what;
 	HRESULT _hresult;
 };
 

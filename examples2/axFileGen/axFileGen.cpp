@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.cpp,v 1.16 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
+// $Id: axFileGen.cpp,v 1.17 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -119,12 +119,12 @@ AxString AxFGOp::GetNotes() const
 	return AxFGOpFactoryRegistry::GetInstance().Get(_operationName).GetNotes();
 }
 
-int AxFGOp::GetMinArgC() const
+size_t AxFGOp::GetMinArgC() const
 {
 	return AxFGOpFactoryRegistry::GetInstance().Get(_operationName).GetMinArgC();
 }
 
-int AxFGOp::GetMaxArgC() const
+size_t AxFGOp::GetMaxArgC() const
 {
 	return AxFGOpFactoryRegistry::GetInstance().Get(_operationName).GetMaxArgC();
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaf2dot.cpp,v 1.3 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+// $Id: aaf2dot.cpp,v 1.4 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -360,7 +360,7 @@ int main( int argc, char** argv )
 
 	 // ... and run through all values registering
 	 // a renamed type for each opaque type.
-	 int count = renamePeskyOpaques( axDictionary, recIter );
+	 renamePeskyOpaques( axDictionary, recIter );
       }
 
 

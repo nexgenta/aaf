@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumeratorTest.h,v 1.9 2004/05/25 17:08:22 stuart_hc Exp $ $Name:  $
+// $Id: CEnumeratorTest.h,v 1.10 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,7 @@ class CEnumeratorTest
 {
   public:
 	CEnumeratorTest() {}
+	virtual ~CEnumeratorTest() {}
 	void Run(testMode_t mode);
 
   protected:

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTapeDescriptor
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPhysicalDescriptorTest.cpp,v 1.2 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPhysicalDescriptorTest.cpp,v 1.3 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -225,7 +225,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFSourceMob*				pSourceMob = NULL;
 	IAAFMob*					pMob = NULL;
 	IAAFEssenceDescriptor*		pEssDesc = NULL;
-	IAAFImportDescriptor*		pImportDesc = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
 
 	aafNumSlots_t				numMobs;
@@ -298,7 +297,6 @@ extern "C" HRESULT CAAFPhysicalDescriptor_test(
     testMode_t mode)
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	const size_t fileNameBufLen = 128;
 	aafWChar* pFileName = L"AAFPhysicalDescriptorTest.aaf";
 
 	try

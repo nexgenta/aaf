@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefEnum
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefEnumTest.cpp,v 1.15 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTypeDefEnumTest.cpp,v 1.16 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -162,7 +162,7 @@ static HRESULT  createENUMType (IAAFDictionary * const pDict)
 	IAAFTypeDefEnumSP spENUM;
 	//checkResult(defs.cdTypeDefEnum()->
 		//CreateInstance (IID_IAAFTypeDefEnum, (IUnknown **) &spENUM));
-	HRESULT hr = pDict->CreateMetaInstance(AUID_AAFTypeDefEnum, IID_IAAFTypeDefEnum,
+	pDict->CreateMetaInstance(AUID_AAFTypeDefEnum, IID_IAAFTypeDefEnum,
 		(IUnknown **) &spENUM) ;
 
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: AAFTypeDefinition.cpp,v 1.4 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: AAFTypeDefinition.cpp,v 1.5 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -232,7 +232,7 @@ AAFTypeDefinitionEnum::BuildDot( AAFDotHome *dotHome, DotFactory *factory, DotGr
    for ( iter=_elements.begin(); iter!=_elements.end(); iter++ )
    {
       char buffer[21];
-      sprintf( buffer, "%d", (unsigned long int)(*iter).second );
+      sprintf( buffer, "%ld", (unsigned long int)(*iter).second );
       DotRecordNodeAttribute elemAttribute( (*iter).first, buffer );
       node->AddAttribute( elemAttribute );
    }
@@ -573,7 +573,7 @@ AAFTypeDefinitionRecord::AddMember( string name, AAFTypeDefinition *typeDef )
 //-----------------------------------------------------------------------------
 AAFTypeDefinitionRef::AAFTypeDefinitionRef( string name, string auid, string description,
 					    string refClassDefAuid )
-   : AAFTypeDefinition( name, auid, description ), _refClassDef( 0 ), _refClassDefAuid( refClassDefAuid )
+   : AAFTypeDefinition( name, auid, description ), _refClassDefAuid( refClassDefAuid ), _refClassDef( 0 )
 {
 }
 

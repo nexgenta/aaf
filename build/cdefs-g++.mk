@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-g++.mk,v 1.12 2004/10/22 10:26:27 stuart_hc Exp $ $Name:  $
+# $Id: cdefs-g++.mk,v 1.13 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -58,18 +58,18 @@ CCVERSION = g++ -v 2>&1 | tail -1
 #------------------------------------------------------------------------------
 # Debug info generation
 #------------------------------------------------------------------------------
-DBG_FLAGS = -g
+DBG_FLAGS = -g -Wall -Wundef -Werror
 
 #------------------------------------------------------------------------------
 # Optimisation flags when building a Release
 #------------------------------------------------------------------------------
-REL_FLAGS = -O2
+REL_FLAGS = -O2 -Wall -Wundef -Werror
 
 #------------------------------------------------------------------------------
 # Compiler flags
 #
 #------------------------------------------------------------------------------
-ADD_CFLAGS = -Wall
+ADD_CFLAGS =
 
 #------------------------------------------------------------------------------
 # Compiler flags

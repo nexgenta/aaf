@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionUtils.cpp,v 1.29 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+// $Id: extensionUtils.cpp,v 1.30 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -662,9 +662,12 @@ ostream& operator<< (ostream& s,
   char * cstring = new char [numChars+1];
   assert (cstring);
 
-  size_t status = wcstombs(cstring, wstring, numChars);
-
+#ifdef _DEBUG
+  size_t status =
+#endif
+  wcstombs(cstring, wstring, numChars);
   assert (status != (size_t)-1);
+
   cstring[numChars] = '\0';
 
   s << cstring;

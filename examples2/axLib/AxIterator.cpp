@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxIterator.cpp,v 1.14 2004/06/17 20:31:51 jptrainor Exp $ $Name:  $
+// $Id: AxIterator.cpp,v 1.15 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 //
 //=---------------------------------------------------------------------=
 
-#if WIN32
+#ifdef _WIN32
 // Disable VC6 
 // warning C4660: template-class specialization 'AxArrayIterator<struct IAAFTypeDefFixedArray>' is already instantiated
 // etc
@@ -142,8 +142,8 @@ AxRecordIterator::AxRecordIterator( IAAFPropertyValueSP& spPropVal,
 				    IAAFTypeDefRecordSP& spTypeDef )
 :	_spPropVal( spPropVal ),
 	_spTypeDef( spTypeDef ),
-	_current( 0 ),
-	_count( AxTypeDefRecord(spTypeDef).GetCount() )
+	_count( AxTypeDefRecord(spTypeDef).GetCount() ),
+	_current( 0 )
 {}
 
 AxRecordIterator::~AxRecordIterator()

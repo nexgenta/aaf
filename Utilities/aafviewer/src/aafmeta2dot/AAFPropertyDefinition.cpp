@@ -1,5 +1,5 @@
 /*
- * $Id: AAFPropertyDefinition.cpp,v 1.6 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: AAFPropertyDefinition.cpp,v 1.7 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -49,7 +49,6 @@ void
 AAFPropertyDefinition::BuildDot( AAFDotHome *dotHome, DotFactory *factory, DotGraph *graph, DotRecordNode *node )
 {
    aafUInt32 count = 0;
-   AAFTypeDefinition *typeDef = _typeDef;
    bool isArrayOrSet = false;
 
    AAFTypeDefinitionRef *typeRef = 0;

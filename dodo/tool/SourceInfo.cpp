@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: SourceInfo.cpp,v 1.3 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+// $Id: SourceInfo.cpp,v 1.4 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,8 +47,8 @@ SourceInfo::~SourceInfo ()
 
 SourceInfo::SourceInfo
 (const SourceInfo & src)
-: _lineNumber (src._lineNumber),
-  _fileName (0)
+: _fileName (0),
+  _lineNumber (src._lineNumber)
 {
   allocate (src._fileName);
 }

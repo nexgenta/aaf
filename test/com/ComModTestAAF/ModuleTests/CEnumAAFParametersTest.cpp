@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFParameters
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFParametersTest.cpp,v 1.8 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
+// $Id: CEnumAAFParametersTest.cpp,v 1.9 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -112,7 +112,7 @@ public:
 		return(_pOperationGroup->LookupParameter(Id,&pParameter)
 			==AAFRESULT_SUCCESS?kAAFTrue:kAAFFalse);
 	}
-	~CEnumAAFParametersTest()
+	virtual ~CEnumAAFParametersTest()
 	{
 		if(_pOperationGroup)
 			_pOperationGroup->Release();

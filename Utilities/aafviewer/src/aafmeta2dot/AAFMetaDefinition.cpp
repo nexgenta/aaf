@@ -1,5 +1,5 @@
 /*
- * $Id: AAFMetaDefinition.cpp,v 1.4 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: AAFMetaDefinition.cpp,v 1.5 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -33,8 +33,8 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 AAFMetaDefinition::AAFMetaDefinition( string name, string auid, string description )
-   : _name( name ), _auid( auid ), _description( description ), 
-     _wasBuilt( false )
+   : _wasBuilt( false ), _name( name ), _auid( auid ),
+	_description( description )
 {
 }
 

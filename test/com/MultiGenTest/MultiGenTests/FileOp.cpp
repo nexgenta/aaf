@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileOp.cpp,v 1.10 2004/10/22 16:02:47 phil_tudor Exp $ $Name:  $
+// $Id: FileOp.cpp,v 1.11 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -170,8 +170,9 @@ void FileOp::RunTest( CmdState& state, int argc, char** argv )
     }
     else {
       assert(0);
+	  return;
     }
-    
+
     spFile =
       CreateFileOfKind( fileName,
 			existance,

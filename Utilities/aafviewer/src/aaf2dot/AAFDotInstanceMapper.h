@@ -2,7 +2,7 @@
 #define __AAFDOTINSTANCEMAPPER_H__
 
 /*
- * $Id: AAFDotInstanceMapper.h,v 1.6 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.h,v 1.7 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -62,7 +62,7 @@ typedef std::deque< Stalker* > StalkerStack;
 class ObjectStalker : public Stalker
 {
   public:
-   ObjectStalker( DotRecordNode *node, std::string name ) : _node( node ), _name( name ),
+   ObjectStalker( DotRecordNode *node, std::string name ) : _name( name ), _node( node ),
       _subGraph( 0 ) {};
    virtual ~ObjectStalker() {};
 
@@ -124,7 +124,7 @@ class AAFDotInstanceMapper : public AxBaseObjRecIterListener
 {
   public:
    AAFDotInstanceMapper( InstanceMapperProfile profile );
-   ~AAFDotInstanceMapper();
+   virtual ~AAFDotInstanceMapper();
 
    void SetDotFactory( DotFactory *dotFactory );
    void SetDotGraph( DotGraph *graph );

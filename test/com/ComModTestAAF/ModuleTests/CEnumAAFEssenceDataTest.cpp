@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFEssenceData
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFEssenceDataTest.cpp,v 1.30 2004/03/31 08:59:38 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFEssenceDataTest.cpp,v 1.31 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -296,7 +296,7 @@ void EnumEssenceDataTest::createFileMob(int itemNumber)
   char cBuffer[256];
   sprintf(cBuffer, "EnumEssenceDataTest File Mob %d", itemNumber);
   size_t count = mbstowcs(wcBuffer, cBuffer, strlen(cBuffer) + 1);
-  if (-1 == count)
+  if (static_cast<size_t>(-1) == count)
     check(AAFRESULT_INTERNAL_ERROR);
 
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFModuleTest.cpp,v 1.28 2004/03/19 17:27:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFModuleTest.cpp,v 1.29 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -203,7 +203,7 @@ HRESULT CAAFModuleTest::Test
   aafInt16  failCount = 0;  /* number of tests that failed */
   aafInt16  nImplCount = 0;  /* number of tests not implemented */
   aafInt16  notInCurrentCount = 0;
-  aafInt32  index = 0;    /* General purpose index counter */
+  aafUInt32  index = 0;    /* General purpose index counter */
   aafInt32  totalTestCount = 0; 
   aafInt16  partialSuccessCount = 0;  /*number of tests that partially succeeded */
   aafInt16  skippedCount = 0;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMDescriptorTest.cpp,v 1.5 2004/11/04 16:35:46 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMDescriptorTest.cpp,v 1.6 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -174,7 +174,6 @@ HRESULT CAAFPCMDescriptor_test(
     testMode_t mode )
 {
     HRESULT  hr = AAFRESULT_NOT_IMPLEMENTED;
-    const size_t fileNameBufLen = 128;
     aafWChar* pFileName = L"AAFPCMDescriptorTest.aaf";
 
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MacroSet.cpp,v 1.12 2004/10/27 14:07:14 stuart_hc Exp $ $Name:  $
+// $Id: MacroSet.cpp,v 1.13 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -63,7 +63,7 @@ void MacroSet::Append
 		return;
 	}
   // Made it here without finding our initial.  Add it.
-  assert ((tmp - _nameInitials) < sizeof (_nameInitials));
+  assert ((size_t)(tmp - _nameInitials) < sizeof (_nameInitials));
   *tmp++ = initial;
   *tmp = '\0';
 }

@@ -2,7 +2,7 @@
 #define __DOTELEMENT_H__
 
 /*
- * $Id: DotElement.h,v 1.3 2004/02/27 16:41:23 stuart_hc Exp $ $Name:  $
+ * $Id: DotElement.h,v 1.4 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -42,6 +42,7 @@ class DotElement
 {
   public:
    DotElement( std::string name, std::string uid ) : _name( name ), _uid( uid ) {};
+   virtual ~DotElement() {}
 
    // write element to DOT file
    virtual void Write( std::ofstream &dotFile, InstanceMapperProfile &profile ) = 0;

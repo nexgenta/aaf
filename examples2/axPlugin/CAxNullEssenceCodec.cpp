@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAxNullEssenceCodec.cpp,v 1.7 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
+// $Id: CAxNullEssenceCodec.cpp,v 1.8 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,11 +98,9 @@ const aafUID_t CAX_AAF_CODEC_MANUFACTURER_ID =
 //=---------------------------------------------------------------------=
 
 CAxNullEssenceCodec::CAxNullEssenceCodec( IUnknown* pUnkOuter )
-:  CAxUnknown( pUnkOuter ),
-   CAxPlugin<AxImplPlugin>(
-		std::auto_ptr<AxImplPlugin>( new AxImplPlugin ) ),
-   CAxEssenceCodec<AxImplNullEssenceCodec>(
-		std::auto_ptr<AxImplNullEssenceCodec>( new AxImplNullEssenceCodec ) )
+:  CAxEssenceCodec<AxImplNullEssenceCodec>( std::auto_ptr<AxImplNullEssenceCodec>( new AxImplNullEssenceCodec ) ),
+   CAxPlugin<AxImplPlugin>( std::auto_ptr<AxImplPlugin>( new AxImplPlugin ) ),
+   CAxUnknown( pUnkOuter )
 {
 	//
 	// AxImplNullEssenceCodec init

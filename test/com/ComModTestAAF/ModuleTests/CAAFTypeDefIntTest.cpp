@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefInt
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefIntTest.cpp,v 1.24 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefIntTest.cpp,v 1.25 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -233,7 +233,7 @@ static HRESULT TestOneValue (aafUInt32 setDataSize,
 	}
 
   v8 = v4 = v2 = v1 = -1;
-  aafInt64 getVal;
+  aafInt64 getVal = -1;
   // OK, it should succeed.
   switch (getDataSize)
 	{

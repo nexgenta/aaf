@@ -3,7 +3,7 @@
 
 
 /*
- * $Id: DotGraph.h,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotGraph.h,v 1.4 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -41,6 +41,7 @@ class DefaultNode : public DotElement
 {
   public:
    DefaultNode();
+   virtual ~DefaultNode() {}
 
    virtual void Write( std::ofstream &dotFile, DotProfile &profile );
 

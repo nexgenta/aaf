@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: WaveHeader.cpp,v 1.8 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
+// $Id: WaveHeader.cpp,v 1.9 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -54,12 +54,12 @@ WaveHeader::WaveHeader( int sampleRate,
 						int bytesPerSample,
 						int bitsPerSample,
 						int numChannels )
-: _sampleRate( sampleRate ),
+: _headerSize( HEADER_SIZE ),
+  _sampleRate( sampleRate ),
   _numSamples( numSamples ),
   _bytesPerSample( bytesPerSample ),
   _bitsPerSample( bitsPerSample ),
-  _numChannels( numChannels ),
-  _headerSize( HEADER_SIZE )
+  _numChannels( numChannels )
 {
 	memset( &_header, 0, sizeof(_header) );
 

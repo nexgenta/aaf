@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2004/09/28 14:42:38 phil_tudor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,12 @@ AAFBASE ?= ../../..
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
+# Turn off error-on-warning behaviour for this directory
+# Workaround for "defined but not used" warnings in AAFMetaDictionary.h
+# FIXME: remove this once AAFMetaDictionary.h generation is fixed
+ifeq ($(CC),g++)
+  ADD_CFLAGS += -Wno-error
+endif
 
 # Include directories
 INCLUDES = -I. \

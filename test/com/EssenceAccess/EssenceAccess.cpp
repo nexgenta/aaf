@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: EssenceAccess.cpp,v 1.30 2004/11/03 12:57:31 phil_tudor Exp $ $Name:  $
+// $Id: EssenceAccess.cpp,v 1.31 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,7 +47,7 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
-#if USE_TIMER_LIB
+#if defined(USE_TIMER_LIB)
 // Include this for the purpose of timing the data read/write
 #include "UtlConsole.h"
 #endif
@@ -297,7 +297,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		pFormat->Release();
 		pFormat = NULL;
 	 
-#if USE_TIMER_LIB
+#if defined(USE_TIMER_LIB)
 		//  start the write timer here
 		aafUInt32 timerID, elapsedtime;
 		moduleErrorTmp = UTLStartPeriod(&timerID);
@@ -348,7 +348,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 		//  end of the loop
 		}
 
-#if USE_TIMER_LIB
+#if defined(USE_TIMER_LIB)
 		//  stop the timer here
 		moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
 
@@ -574,7 +574,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					bytesToRead = samplesToRead * (sampleBits+7)/8;
 					AAFDataBuf = (unsigned char *)new char[bytesToRead];
 
-#if USE_TIMER_LIB
+#if defined(USE_TIMER_LIB)
 					// start the read timer here
 
 					aafUInt32 timerID, elapsedtime;
@@ -611,7 +611,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName, testType_t testType)
 					}
 
 						
-#if USE_TIMER_LIB
+#if defined(USE_TIMER_LIB)
 					//  stop the timer here
 					moduleErrorTmp = UTLEndPeriod(timerID, &elapsedtime);
 					
@@ -832,7 +832,7 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 	aafUInt32			chunkSize;
 	aafBool				fmtFound = kAAFFalse, dataFound = kAAFFalse;
 	aafUInt8			chunkID[4];
- 	aafInt32			junk32, rate, bytesPerFrame;
+ 	aafInt32			junk32, rate, bytesPerFrame = 0;
 	aafUInt8			*ptr;
 
 	ptr = buf;
@@ -959,7 +959,7 @@ int main(int argumentCount, char *argumentVector[])
 		return 0;
 	}
 	
-#if USE_TIMER_LIB
+#if defined(USE_TIMER_LIB)
 	//  Initialise timers
 	UTLInitTimers(1000);
 #endif

@@ -2,7 +2,7 @@
 #define _TextStream_h_
 //=---------------------------------------------------------------------=
 //
-// $Id: TextStream.h,v 1.5 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+// $Id: TextStream.h,v 1.6 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,7 +62,7 @@ struct TextStream
   //********
 
 
-  int GetLength () const;
+  size_t GetLength () const;
   //
   // Returns the number of characters contained in this TextStream.
   //
@@ -176,7 +176,7 @@ private:
   int			_numAllocated;
 
   char *		_pData;
-  int			_cachedLen;
+  size_t		_cachedLen;
 
   SourceInfo	_startSi;
 };

@@ -1,5 +1,5 @@
 /*
- * $Id: AAFXsMapper.cpp,v 1.7 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: AAFXsMapper.cpp,v 1.8 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -58,7 +58,6 @@ AAFXsMapper::MapAAFClassDef( AxClassDef &axClassDef )
     }
 
   // first map the parent classdef
-  bool hasParent = false;
   AAFClassDefinition *parentClassDef = 0;
   try
     {

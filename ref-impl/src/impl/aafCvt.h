@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafCvt.h,v 1.9 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
+// $Id: aafCvt.h,v 1.10 2004/11/26 17:20:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,8 +44,8 @@ extern "C"
 #define IsInt64Positive(a) ((a) >= 0)
 #define CvtInt32toLength(in, out)		((out) = (in))
 #define CvtInt32toPosition(in, out)		((out) = (in))
-#define CvtInt32toInt64(in, out)		(*out = (in), AAFRESULT_SUCCESS)
-#define CvtUInt32toInt64(in, out)		(*out = (in), AAFRESULT_SUCCESS)
+#define CvtInt32toInt64(in, out)		(*out = (in))
+#define CvtUInt32toInt64(in, out)		(*out = (in))
 #else
 #define IsInt64Positive(a) (((aafInt16)(a).words[0]) >= 0)
 #define CvtInt32toLength(in, out)		\

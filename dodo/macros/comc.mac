@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: comc.mac,v 1.70 2004/10/27 14:09:26 stuart_hc Exp $ $Name:  $
+#c $Id: comc.mac,v 1.71 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -1359,8 +1359,6 @@ HRESULT C.this-module::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 
@@ -1410,8 +1408,6 @@ HRESULT C.this-module::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 
@@ -1468,8 +1464,6 @@ HRESULT C.this-module::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 
@@ -1530,8 +1524,6 @@ HRESULT C.this-module::InternalQueryInterface
     REFIID riid,
     void **ppvObj)
 {
-    HRESULT hr = S_OK;
-
     if (NULL == ppvObj)
         return E_INVALIDARG;
 

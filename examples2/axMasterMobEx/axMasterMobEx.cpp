@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axMasterMobEx.cpp,v 1.15 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
+// $Id: axMasterMobEx.cpp,v 1.16 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -240,11 +240,11 @@ public:
 						compression,
 						bytesPerPixel * width * height,
 						1 ),
-		  _numFramesToWrite( numFramesToWrite ),
 		  _width( width ),
 		  _height( height ),
 		  _bytesPerPixel( bytesPerPixel ),
-		  _rate( _rate )
+		  _rate( _rate ),
+		  _numFramesToWrite( numFramesToWrite )
 	{}
 
 	virtual ~VideoSampleSource()
@@ -317,9 +317,9 @@ public:
 						compression,
 						bytesPerSample,
 						10*1024*1024/bytesPerSample ),
-		  _numSamplesToWrite( numSamplesToWrite ),
 		  _bitsPerSample( bitsPerSample ),
-		  _bytesPerSample( bytesPerSample )
+		  _bytesPerSample( bytesPerSample ),
+		  _numSamplesToWrite( numSamplesToWrite )
 	{}
 
 	virtual ~AudioSampleSource()

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MobSlots.cpp,v 1.8 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: MobSlots.cpp,v 1.9 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -220,7 +220,7 @@ void GetMobSlot::Execute( const std::vector<AxString>& argv )
 	GetInstance( mobName ).GetCOM( spMob );
 	AxMob axMob( spMob );
 
-	int slotIdVal = AxStringUtil::strtol( slotId );
+	aafSlotID_t slotIdVal = AxStringUtil::strtol( slotId );
 
 	AxMobSlotIter axSlotIter( axMob.GetSlots() );
 	IAAFMobSlotSP nextSlot;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPropertyValueDump.cpp,v 1.10 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxPropertyValueDump.cpp,v 1.11 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,8 +45,8 @@ AxPropertyValueDump::AxPropertyValueDump( std::wostream& os,
 					  bool dumpValue,
 					  const AxString& sep )
 :	_os( os ),
-	_dumpValueType( dumpValueType ),
 	_dumpValue( dumpValue ),
+	_dumpValueType( dumpValueType ),
 	_sep( sep )
 {
 	if ( !_dumpValue ) {
