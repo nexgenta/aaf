@@ -7,11 +7,11 @@
 
 #include <stddef.h>
 
-const int TID_NONE                           = 0;
-const int TID_PROPERTY_DATA                  = 0;
+const int TID_DATA                           = 0;
 const int TID_STRONG_OBJECT_REFERENCE        = 1;
 const int TID_STRONG_OBJECT_REFERENCE_VECTOR = 2;
 const int TID_WEAK_OBJECT_REFERENCE          = 3;
+const int TID_DATA_STREAM                    = 4;
 
 class OMStoredObject;
 class OMStorable;
@@ -22,9 +22,6 @@ class OMPropertySet;
 class OMProperty {
 public:
   // @access Public members.
-
-    // @cmember Constructor.
-  OMProperty(const OMPropertyId propertyId, const char* name);
 
     // @cmember Constructor.
   OMProperty(const OMPropertyId propertyId, const int type, const char* name);
@@ -57,7 +54,7 @@ public:
     // @cmember The address of this <c OMProperty> object.
   OMProperty* address(void);
 
-  virtual void detach(const OMStorable* object, const size_t index);
+  virtual void detach(const OMStorable* object, const size_t key);
 
 protected:
   int _propertyId;
@@ -153,7 +150,7 @@ public:
     //          <c OMStrongReferenceProperty> is <p size>.
   virtual void restoreFrom(OMStoredObject& s, size_t size);
 
-  virtual void detach(const OMStorable* object, const size_t index);
+  virtual void detach(const OMStorable* object, const size_t key);
 
 };
 
@@ -391,7 +388,7 @@ public:
     //          this <c OMStrongReferenceVectorProperty>.
   void appendValue(const ReferencedObject*& value);
 
-  virtual void detach(const OMStorable* object, const size_t index);
+  virtual void detach(const OMStorable* object, const size_t key);
 
 private:
 
