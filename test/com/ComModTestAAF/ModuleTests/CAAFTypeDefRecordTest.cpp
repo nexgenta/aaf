@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefRecord
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefRecordTest.cpp,v 1.13 2004/05/27 17:06:49 asuraparaju Exp $ $Name:  $
+// $Id: CAAFTypeDefRecordTest.cpp,v 1.14 2004/09/16 17:07:47 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -83,6 +83,7 @@ inline void checkExpression(bool expression, HRESULT r)
 #define COMPANY_NAME		L"AAF Developers Desk"
 #define PRODUCT_NAME		L"AAFTypeDefRecord Test"
 #define TEST_VERSION		L"TEST VERSION"
+#define TEST_PLATFORM		L"TEST PLATFORM"
 
 static aafProductVersion_t testVersion =
 { 1, 0, 0, 0, kAAFVersionUnknown };
@@ -174,6 +175,7 @@ static HRESULT WriteRecord (const aafWChar * pFileName)
   ProductInfo.productName = PRODUCT_NAME;
   ProductInfo.productVersionString = TEST_VERSION;
   ProductInfo.productID = UnitTestProductID;
+  ProductInfo.platform = TEST_PLATFORM;
   ProductInfo.productVersion = &testVersion;
   IAAFFileSP   pFile;
 
