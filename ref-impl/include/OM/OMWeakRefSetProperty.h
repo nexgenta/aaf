@@ -31,7 +31,7 @@
 
 #include "OMSet.h"
 #include "OMContainerElement.h"
-#include "OMRefSetProperty.h"
+#include "OMWeakReferenceSet.h"
 #include "OMDataTypes.h"
 
 template <typename ReferencedObject>
@@ -47,9 +47,10 @@ class OMSetIterator;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable> and of <c OMUnique>.
-  //   @base public | <c OMReferenceSetProperty>
+  //   @base public | <c OMWeakReferenceSet>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
-class OMWeakReferenceSetProperty : public OMReferenceSetProperty {
+class OMWeakReferenceSetProperty : public OMWeakReferenceSet {
 public:
   // @access Public members.
 
@@ -84,9 +85,6 @@ public:
     // @cmember The number of <p ReferencedObject>s in this
     //          <c OMWeakReferenceSetProperty>.
   size_t count(void) const;
-
-    // @cmember Get the size of this <c OMWeakReferenceSetProperty>.
-  size_t getSize(void) const;
 
     // @cmember Insert <p object> into this
     //          <c OMWeakReferenceSetProperty>.
@@ -133,7 +131,7 @@ public:
     //          <p identification>.
   ReferencedObject* value(
                      const OMUniqueObjectIdentification& identification) const;
-  
+
     // @cmember Find the <p ReferencedObject> in this
     //          <c OMWeakReferenceSetProperty> identified by
     //          <p identification>.  If the object is found it is returned
@@ -148,7 +146,7 @@ public:
   virtual bool isVoid(void) const;
 
     // @cmember Remove this optional <c OMWeakReferenceSetProperty>.
-  virtual void remove(void);
+  virtual void removeProperty(void);
 
   // Direct property access interface
 
@@ -171,19 +169,45 @@ public:
 
     // @cmember Insert <p object> into this
     //          <c OMWeakReferenceSetProperty>.
-  virtual void insert(const OMObject* object);
+  virtual void insertObject(const OMObject* object);
 
     // @cmember Does this <c OMWeakReferenceSetProperty> contain
     //          <p object> ?
-  virtual bool containsValue(const OMObject* object) const;
+  virtual bool containsObject(const OMObject* object) const;
 
     // @cmember Remove <p object> from this
     //          <c OMWeakReferenceSetProperty>.
-  virtual void removeValue(const OMObject* object);
+  virtual void removeObject(const OMObject* object);
+
+    // @cmember Remove all objects from this
+    //          <c OMWeakReferenceSetProperty>.
+  virtual void removeAllObjects(void);
 
     // @cmember Create an <c OMReferenceContainerIterator> over this
     //          <c OMWeakReferenceSetProperty>.
   virtual OMReferenceContainerIterator* createIterator(void) const;
+
+    // @cmember Remove the <c OMObject> identified by <p identification>
+    //          from this <c OMWeakReferenceSetProperty>.
+  virtual OMObject* remove(void* identification);
+
+    // @cmember Does this <c OMWeakReferenceSetProperty> contain an
+    //          <c OMObject> identified by <p identification> ?
+  virtual bool contains(void* identification) const;
+
+    // @cmember Find the <c OMObject> in this <c OMWeakReferenceSetProperty>
+    //          identified by <p identification>.  If the object is found
+    //          it is returned in <p object> and the result is < e bool.true>.
+    //          If the object is not found the result is <e bool.false>.
+  virtual bool findObject(void* identification, OMObject*& object) const;
+
+  virtual OMPropertyId keyPropertyId(void) const;
+
+  virtual OMPropertyTag targetTag(void) const;
+
+  virtual void setTargetTag(OMPropertyTag targetTag);
+
+  virtual void clearTargetTag(void) const;
 
 private:
 
@@ -191,11 +215,7 @@ private:
 
   typedef OMSetIterator<OMUniqueObjectIdentification, SetElement> SetIterator;
 
-  OMPropertyTag targetTag(void) const;
-
   OMPropertyId* targetPropertyPath(void) const;
-
-  void clearTargetTag(void) const;
 
   // The set of references.
   OMSet<OMUniqueObjectIdentification, SetElement> _set;
