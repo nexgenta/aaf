@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
@@ -42,9 +24,6 @@
 #include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
-#include "aafErr.h"
-#include "ImplAAFHeader.h"
-#include "ImplAAFDictionary.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
@@ -52,18 +31,14 @@ extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 ImplEnumAAFSegments::ImplEnumAAFSegments ()
 {
 	_current = 0;
-	_enumObj = NULL;
-	_enumStrongProp = NULL;
+	_pSelector = NULL;
 }
 
 
 ImplEnumAAFSegments::~ImplEnumAAFSegments ()
 {
-	if (_enumObj)
-	{
-		_enumObj->ReleaseReference();
-		_enumObj = NULL;
-	}
+	if (_pSelector)
+		_pSelector->ReleaseReference();
 }
 
 
@@ -97,56 +72,24 @@ ImplEnumAAFSegments::~ImplEnumAAFSegments ()
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFSegments::NextOne (ImplAAFSegment** ppSegment)
 {
-	aafUInt32			numElem;
-	ImplAAFHeader		*head = NULL;
-	ImplAAFDictionary	*dict = NULL;
-
-	if(_enumStrongProp != NULL)
-	{
-		size_t	siz;
+	AAFRESULT	result;
+	aafInt32	cur = _current, siz;
 		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
+	assert(_pSelector);
+
+	if (ppSegment == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+    _pSelector->GetNumAlternateSegments(&siz);
+	if(cur < siz)
+	{
+		result = _pSelector->GetNthSegment(cur, ppSegment);
+		_current = ++cur;
 	}
 	else
-		return(AAFRESULT_INCONSISTANCY);
+		result = AAFRESULT_NO_MORE_OBJECTS;
 
-	if(ppSegment == NULL)
-		return(AAFRESULT_NULL_PARAM);
-	if(_current >= numElem)
-		return AAFRESULT_NO_MORE_OBJECTS;
-	XPROTECT()
-	{
-		if(_enumStrongProp != NULL)
-		{
-			_enumStrongProp->getValueAt(*ppSegment, _current);
-			(*ppSegment)->AcquireReference();
-		}
-		else
-			RAISE(AAFRESULT_INCONSISTANCY);
-
-		_current++;
-		if (head) {
-			head->ReleaseReference();
-			head = NULL;
-		}
-		if (dict) {
-			dict->ReleaseReference();
-			dict = NULL;
-		}
-	}
-	XEXCEPT
-	{
-		if(head)
-		  head->ReleaseReference();
-		head = 0;
-		if(dict)
-		  dict->ReleaseReference();
-		dict = 0;
-	}
-	XEND;
-
-	return(AAFRESULT_SUCCESS); 
+	return result;
 }
 
 
@@ -182,30 +125,30 @@ AAFRESULT STDMETHODCALLTYPE
 								ImplAAFSegment**	ppSegments,
 								aafUInt32*			pFetched)
 {
-	ImplAAFSegment**	ppDef;
-	aafUInt32			numDefs;
+	ImplAAFSegment**	ppSegment;
+	aafUInt32			numSegments;
 	HRESULT				hr;
 
-	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
-		return E_INVALIDARG;
+	if (pFetched == NULL && count != 1)
+		return AAFRESULT_NULL_PARAM;
 
 	// Point at the first component in the array.
-	ppDef = ppSegments;
-	for (numDefs = 0; numDefs < count; numDefs++)
+	ppSegment = ppSegments;
+	for (numSegments = 0; numSegments < count; numSegments++)
 	{
-		hr = NextOne(ppDef);
+		hr = NextOne(ppSegment);
 		if (FAILED(hr))
 			break;
 
 		// Point at the next component in the array.  This
 		// will increment off the end of the array when
-		// numComps == count-1, but the for loop should
+		// numSegments == count-1, but the for loop should
 		// prevent access to this location.
-		ppDef++;
+		ppSegment++;
 	}
 	
 	if (pFetched)
-		*pFetched = numDefs;
+		*pFetched = numSegments;
 
 	return hr;
 }
@@ -236,29 +179,19 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFSegments::Skip (aafUInt32 count)
 {
 	AAFRESULT	hr;
-	aafUInt32	newCurrent;
-	aafUInt32	numElem;
-	
-	if(_enumStrongProp != NULL)
-	{
-		size_t	siz;
-		
-		_enumStrongProp->getSize(siz);
-		numElem = siz;
-	}
-	else
-		return(AAFRESULT_INCONSISTANCY);
+	aafInt32	newCurrent, size;
 
 	newCurrent = _current + count;
 
-	if(newCurrent < numElem)
+    _pSelector->GetNumAlternateSegments(&size);
+	if(newCurrent < size)
 	{
 		_current = newCurrent;
 		hr = AAFRESULT_SUCCESS;
 	}
 	else
 	{
-		hr = E_FAIL;
+		hr = AAFRESULT_NO_MORE_OBJECTS;
 	}
 
 	return hr;
@@ -315,45 +248,53 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFSegments::Clone (ImplEnumAAFSegments** ppEnum)
 {
-	ImplEnumAAFSegments	*result;
-	AAFRESULT				hr;
+	ImplEnumAAFSegments*	theEnum;
+	HRESULT					hr;
 
-	result = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
-	if (result == NULL)
+	if (ppEnum == NULL)
+		return AAFRESULT_NULL_PARAM;
+	
+	theEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
+	if (theEnum == NULL)
 		return E_FAIL;
-
-	if(_enumStrongProp != NULL)
-		hr = result->SetEnumStrongProperty(_enumObj, _enumStrongProp);
-	else
-		return(AAFRESULT_INCONSISTANCY);
-
+		
+	hr = theEnum->SetEnumSelector(_pSelector);
 	if (SUCCEEDED(hr))
 	{
-		result->_current = _current;
-		*ppEnum = result;
+		theEnum->Reset();
+		theEnum->Skip(_current);
+		*ppEnum = theEnum;
 	}
 	else
 	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = NULL;
+		theEnum->ReleaseReference();
+		*ppEnum = NULL;
 	}
-	
+
 	return hr;
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFSegments::SetEnumStrongProperty( ImplAAFObject *pObj, SegmentStrongRefArrayProp_t *pProp)
+//***********************************************************
+//
+// SetEnumSelector()
+//
+// Internal method for use by the SDK.  Set the selector which
+// will be enumerated over.
+// 
+// AAFRESULT_SUCCESS
+//   - Successfuly set the selector.
+// 
+AAFRESULT
+    ImplEnumAAFSegments::SetEnumSelector(ImplAAFSelector * pSelector)
 {
-	if (_enumObj)
-	  _enumObj->ReleaseReference();
-	_enumObj = 0;
-	_enumObj = pObj;
-	if (pObj)
-		pObj->AcquireReference();
-	/**/
-	_enumStrongProp = pProp;				// Don't refcount, same lifetime as the object.
+	if (_pSelector)
+		_pSelector->ReleaseReference();
+
+	_pSelector = pSelector;
+	_pSelector->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
 }
+
+
 
