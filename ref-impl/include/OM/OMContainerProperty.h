@@ -37,6 +37,7 @@ class OMReferenceContainerIterator;
   // @class Abstract base class for persistent object reference container
   //        properties supported by the Object Manager.
   //   @base public | <c OMProperty>
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMContainerProperty : public OMProperty {
 public:
   // @access Public members.
@@ -63,6 +64,9 @@ public:
 
     // @cmember Remove <p object> from this <c OMContainerProperty>.
   virtual void removeObject(const OMObject* object) = 0;
+
+    // @cmember Remove all objects from this <c OMContainerProperty>.
+  virtual void removeAllObjects(void) = 0;
 
     // @cmember Create an <c OMReferenceContainerIterator> over this
     //          <c OMContainerProperty>.
