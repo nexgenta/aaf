@@ -3,7 +3,6 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
@@ -62,7 +61,8 @@ AAFRESULT STDMETHODCALLTYPE
 		_enumStrongProp->getSize(siz);
 		numElem = siz;
 	}
-	//!!!Else assert
+	else
+		return(AAFRESULT_INCONSISTANCY);
 
 	if(ppInterpDef == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -86,7 +86,8 @@ AAFRESULT STDMETHODCALLTYPE
 			_enumStrongProp->getValueAt(*ppInterpDef, _current);
 			(*ppInterpDef)->AcquireReference();
 		}
-		//!!!Else assert
+		else
+			RAISE(AAFRESULT_INCONSISTANCY);
 		_current++;
 		if (head) {
 			head->ReleaseReference();
@@ -100,9 +101,11 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(head)
-			head->ReleaseReference();
+		  head->ReleaseReference();
+		head = 0;
 		if(dict)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 	}
 	XEND;
 
@@ -162,7 +165,8 @@ AAFRESULT STDMETHODCALLTYPE
 		_enumStrongProp->getSize(siz);
 		numElem = siz;
 	}
-	//!!!Else assert
+	else
+		return(AAFRESULT_INCONSISTANCY);
 
 	newCurrent = _current + count;
 
@@ -210,8 +214,9 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		result->ReleaseReference();
-		*ppEnum = NULL;
+	  result->ReleaseReference();
+	  result = 0;
+	  *ppEnum = NULL;
 	}
 	
 	return hr;
@@ -221,7 +226,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFInterpolationDefs::SetEnumProperty( ImplAAFObject *pObj, parmDefWeakRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-		_enumObj->ReleaseReference();
+	  _enumObj->ReleaseReference();
+	_enumObj = 0;
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
@@ -235,7 +241,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFInterpolationDefs::SetEnumStrongProperty( ImplAAFObject *pObj, interpDefStrongRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-		_enumObj->ReleaseReference();
+	  _enumObj->ReleaseReference();
+	_enumObj = 0;
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();

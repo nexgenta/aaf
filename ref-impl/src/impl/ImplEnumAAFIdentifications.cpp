@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -106,9 +105,11 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(head)
-			head->ReleaseReference();
+		  head->ReleaseReference();
+		head = 0;
 		if(dict)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 	}
 	XEND;
 
@@ -119,12 +120,12 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFIdentifications::Next (
-      aafInt32  count,
+      aafUInt32  count,
       ImplAAFIdentification ** ppIdentifications,
-      aafInt32 * pNumFetched)
+      aafUInt32 * pNumFetched)
 {
 	ImplAAFIdentification**	ppDef;
-	aafInt32				numDefs;
+	aafUInt32				numDefs;
 	HRESULT					hr;
 
 	if ((pNumFetched == NULL && count != 1) || (pNumFetched != NULL && count == 1))
@@ -223,8 +224,9 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		result->ReleaseReference();
-		*ppEnum = NULL;
+	  result->ReleaseReference();
+	  result = 0;
+	  *ppEnum = NULL;
 	}
 	
 	return hr;
@@ -236,7 +238,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFIdentifications::SetEnumProperty( ImplAAFObject *pObj, identWeakRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-		_enumObj->ReleaseReference();
+	  _enumObj->ReleaseReference();
+	_enumObj = 0;
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
@@ -250,7 +253,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFIdentifications::SetEnumStrongProperty( ImplAAFObject *pObj, identStrongRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-		_enumObj->ReleaseReference();
+	  _enumObj->ReleaseReference();
+	_enumObj = 0;
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();

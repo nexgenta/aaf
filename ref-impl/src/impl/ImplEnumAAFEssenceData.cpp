@@ -1,29 +1,10 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
 
 #ifndef __ImplAAFEssenceData_h__
@@ -51,38 +32,41 @@ extern "C" const aafClassID_t CLSID_EnumAAFEssenceData;
 
 
 ImplEnumAAFEssenceData::ImplEnumAAFEssenceData ()
-: _enumObj(0), _iterator(0)
 {
+  _current = 0;
+  _contentStorage = NULL;
 }
 
 
 ImplEnumAAFEssenceData::~ImplEnumAAFEssenceData ()
 {
-	if (_enumObj)
-		_enumObj->ReleaseReference();
-
-	_enumObj = NULL;
-
-	delete _iterator;
-	_iterator = 0;
+  if (_contentStorage)
+  {
+    _contentStorage->ReleaseReference();
+    _contentStorage = NULL;
+  }
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFEssenceData::NextOne (ImplAAFEssenceData ** ppEssenceData)
 {
-	AAFRESULT ar = AAFRESULT_NO_MORE_OBJECTS;
-	
-	if (_iterator->before() || _iterator->valid())
-	{
-		if (++(*_iterator))
-		{
-			*ppEssenceData = _iterator->value();
-			(*ppEssenceData)->AcquireReference();
-			ar = AAFRESULT_SUCCESS;
-		}
-	}
-	return ar;
+  AAFRESULT hr = AAFRESULT_SUCCESS;
+  aafUInt32 cur = _current, siz = 0;
+
+  hr = _contentStorage->GetNumEssenceData (&siz);
+  if (AAFRESULT_SUCCESS == hr)
+  {    
+    if (cur < siz)
+    {
+      hr = _contentStorage->GetNthEssenceData (cur, ppEssenceData);
+      if (AAFRESULT_SUCCESS == hr)
+        _current = ++cur;
+    }
+		else
+			return AAFRESULT_NO_MORE_OBJECTS;
+  }
+  return hr;
 }
 
 
@@ -91,108 +75,103 @@ AAFRESULT STDMETHODCALLTYPE
                            ImplAAFEssenceData ** ppEssenceData,
                            aafUInt32 *  pFetched)
 {
-	ImplAAFEssenceData**	ppDef;
-	aafUInt32				numDefs;
-	HRESULT					hr;
+	aafUInt32		numEssenceData = 0;
+	AAFRESULT		result = AAFRESULT_SUCCESS;
 
-	if ((pFetched == NULL && count != 1) || (pFetched != NULL && count == 1))
-		return E_INVALIDARG;
+	if ((pFetched == NULL) || (NULL == ppEssenceData))
+		return AAFRESULT_NULL_PARAM;
 
-	// Point at the first component in the array.
-	ppDef = ppEssenceData;
-	for (numDefs = 0; numDefs < count; numDefs++)
+	for (numEssenceData = 0; numEssenceData < count; numEssenceData++)
 	{
-		hr = NextOne(&ppDef[numDefs]);
-		if (FAILED(hr))
+		result = NextOne(&ppEssenceData[numEssenceData]);
+		if (AAFRESULT_SUCCESS != result)
 			break;
 	}
 	
-	if (pFetched)
-		*pFetched = numDefs;
+	*pFetched = numEssenceData;
 
-	return AAFRESULT_SUCCESS;
+	return result;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFEssenceData::Skip (aafUInt32  count)
 {
-	AAFRESULT	ar = AAFRESULT_SUCCESS;
-	aafUInt32	n;
-	
-	for(n = 1; n <= count; n++)
-	{
-		// Defined behavior of skip is to NOT advance at all if it would push us off of the end
-		if(!++(*_iterator))
-		{
-			// Off the end, decrement n and iterator back to the starting position
-			while(n >= 1)
-			{
-				--(*_iterator);
-				n--;
-			}
-			ar = AAFRESULT_NO_MORE_OBJECTS;
-			break;
-		}
-	}
+  AAFRESULT result = AAFRESULT_SUCCESS;
+  aafUInt32 newCurrent = _current + count;
+  aafUInt32 siz = 0;
 
-	return ar;
+  result = _contentStorage->GetNumEssenceData(&siz);
+  if (AAFRESULT_SUCCESS == result)
+  {
+    if (newCurrent < siz)
+      _current = newCurrent;
+    else
+      result = AAFRESULT_NO_MORE_OBJECTS;
+  }
+
+  return result;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFEssenceData::Reset ()
 {
-	AAFRESULT ar = AAFRESULT_SUCCESS;
-	_iterator->reset();
-	return ar;
+  _current = 0;
+  return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFEssenceData::Clone (ImplEnumAAFEssenceData ** ppEnum)
 {
-	AAFRESULT				ar = AAFRESULT_SUCCESS;
-	ImplEnumAAFEssenceData	*result;
-
-	result = (ImplEnumAAFEssenceData *)CreateImpl(CLSID_EnumAAFEssenceData);
-	if (result == NULL)
-		return E_FAIL;
-
-    ar = result->SetIterator(_enumObj,_iterator->copy());
-	if (SUCCEEDED(ar))
-	{
-		*ppEnum = result;
-	}
-	else
-	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = NULL;
-	}
+	if (NULL == ppEnum)
+		return AAFRESULT_NULL_PARAM;
+	*ppEnum = 0;
 	
-	return ar;
+	ImplEnumAAFEssenceData *theEnum = (ImplEnumAAFEssenceData *)CreateImpl (CLSID_EnumAAFEssenceData);
+	
+	XPROTECT()
+	{
+		CHECK(theEnum->SetContentStorage(_contentStorage));
+		CHECK(theEnum->Reset());
+		CHECK(theEnum->Skip(_current));
+		*ppEnum = theEnum;
+	}
+	XEXCEPT
+	{
+		if (theEnum)
+		  theEnum->ReleaseReference();
+		theEnum = 0;
+		return(XCODE());
+	}
+	XEND;
+	
+	return(AAFRESULT_SUCCESS);
 }
 
-AAFRESULT STDMETHODCALLTYPE
-    ImplEnumAAFEssenceData::SetIterator(
-                        ImplAAFObject *pObj,
-                        OMReferenceContainerIterator<ImplAAFEssenceData>* iterator)
+
+
+//Internal
+AAFRESULT
+    ImplEnumAAFEssenceData::SetContentStorage(ImplAAFContentStorage *pContentStorage)
 {
-	AAFRESULT ar = AAFRESULT_SUCCESS;
-	
-	if (_enumObj)
-		_enumObj->ReleaseReference();
-	_enumObj = 0;
-	
-	_enumObj = pObj;
-	if (pObj)
-		pObj->AcquireReference();
-	
-	delete _iterator;
-	_iterator = iterator;
-	return ar;
+  if (_contentStorage)
+    _contentStorage->ReleaseReference();
+  _contentStorage = 0;
+
+  _contentStorage = pContentStorage;
+
+  if (pContentStorage)
+    pContentStorage->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
+
+
+
+
+
 
 
 

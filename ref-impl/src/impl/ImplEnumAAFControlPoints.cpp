@@ -3,7 +3,6 @@
 * Advanced Authoring Format						*
 *												*
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
 *												*
 \***********************************************/
 
@@ -50,7 +49,6 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFControlPoint **ppControlPoint)
 {
 	aafUInt32			numElem;
-	aafUID_t			value;
 	ImplAAFHeader		*head = NULL;
 	ImplAAFDictionary	*dict = NULL;
 	size_t	siz;
@@ -163,7 +161,6 @@ AAFRESULT STDMETHODCALLTYPE
 		return E_FAIL;
 
 	hr = result->SetEnumStrongProperty(_enumObj, _enumStrongProp);
-	// !!!Else assert
 	if (SUCCEEDED(hr))
 	{
 		result->_current = _current;
@@ -171,8 +168,9 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		result->ReleaseReference();
-		*ppEnum = NULL;
+	  result->ReleaseReference();
+	  result = 0;
+	  *ppEnum = NULL;
 	}
 	
 	return hr;
@@ -185,7 +183,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFControlPoints::SetEnumStrongProperty( ImplAAFObject *pObj, ControlPointStrongRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-		_enumObj->ReleaseReference();
+	  _enumObj->ReleaseReference();
+	_enumObj = 0;
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
