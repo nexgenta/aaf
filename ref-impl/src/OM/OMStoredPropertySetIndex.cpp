@@ -1,9 +1,15 @@
 #include "OMStoredPropertySetIndex.h"
 
+#include "OMAssertions.h"
+
 OMStoredPropertySetIndex::OMStoredPropertySetIndex(size_t capacity)
 : _capacity(capacity), _table(0), _entries(0), _dirty(false)
 {
+  TRACE("OMStoredPropertySetIndex::OMStoredPropertySetIndex");
+
   _table = new IndexEntry[_capacity];
+  ASSERT("Valid heap pointer", _table != 0);
+
   for (size_t i = 0; i < _capacity; i++) {
     _table[i]._valid = false;
     _table[i]._propertyId = 0;
@@ -15,15 +21,19 @@ OMStoredPropertySetIndex::OMStoredPropertySetIndex(size_t capacity)
 
 OMStoredPropertySetIndex::~OMStoredPropertySetIndex(void)
 {
+  TRACE("OMStoredPropertySetIndex::~OMStoredPropertySetIndex");
+
   delete [] _table;
   _table = 0;
 }
 
 void OMStoredPropertySetIndex::insert(OMPropertyId propertyId,
-                                      int type,
-                                      size_t offset,
-                                      size_t length)
+                                      OMUInt32 type,
+                                      OMUInt32 offset,
+                                      OMUInt32 length)
 {
+  TRACE("OMStoredPropertySetIndex::insert");
+
   IndexEntry* entry = find(propertyId);
 
   if (entry == 0 ) {
@@ -47,6 +57,8 @@ void OMStoredPropertySetIndex::insert(OMPropertyId propertyId,
 OMStoredPropertySetIndex::IndexEntry* OMStoredPropertySetIndex::find(
                                                  OMPropertyId propertyId) const
 {
+  TRACE("OMStoredPropertySetIndex::find");
+
   OMStoredPropertySetIndex::IndexEntry* result = 0;
 
   for (size_t i = 0; i < _capacity; i++) {
@@ -63,15 +75,19 @@ OMStoredPropertySetIndex::IndexEntry* OMStoredPropertySetIndex::find(
 
 size_t OMStoredPropertySetIndex::entries(void) const
 {
+  TRACE("OMStoredPropertySetIndex::entries");
+
   return _entries;
 }
 
 void OMStoredPropertySetIndex::iterate(size_t& context,
                                        OMPropertyId& propertyId,
-                                       int& type,
-                                       size_t& offset,
-                                       size_t& length) const
+                                       OMUInt32& type,
+                                       OMUInt32& offset,
+                                       OMUInt32& length) const
 {
+  TRACE("OMStoredPropertySetIndex::iterate");
+
   OMStoredPropertySetIndex::IndexEntry* entry = 0;
   size_t start = context;
   size_t found = 0;
@@ -94,24 +110,49 @@ void OMStoredPropertySetIndex::iterate(size_t& context,
   }
 }
 
-bool OMStoredPropertySetIndex::isSorted(void)
+bool OMStoredPropertySetIndex::isValid(void) const
 {
+  TRACE("OMStoredPropertySetIndex::isValid");
+
   bool result = true;
-  bool haveLastOffset = false;
-  size_t lastOffset;
-  
+  size_t entries = 0;
+  size_t position;
+  bool firstEntry = true;
+  size_t previousOffset;
+  size_t currentOffset;
+  size_t currentLength;
+
   for (size_t i = 0; i < _capacity; i++) {
     if (_table[i]._valid) {
-      if (haveLastOffset) {
-        if (_table[i]._offset <= lastOffset) {
-          result = false;
-          break;
-        }
+      entries++; // count valid entries
+      currentOffset = _table[i]._offset;
+      currentLength = _table[i]._length;
+      if (currentLength <= 0) {
+        result = false; // entry has invalid length
+        break;
+      }
+      if (firstEntry) {
+        previousOffset = currentOffset;
+        position = currentOffset + currentLength;
+        firstEntry = false;
       } else {
-        lastOffset = _table[i]._offset;
-        haveLastOffset = true;
+        if (currentOffset <= previousOffset) {
+          result = false; // entries out of order
+          break;
+        } else if (position > currentOffset) {
+          result = false; // entries overlap
+          break; 
+        } else {
+          // this entry is valid
+          previousOffset = currentOffset;
+          position = position + currentLength;
+        }
       }
     }
+  }
+
+  if (entries != _entries) {
+    result = false;
   }
   
   return result;
@@ -120,6 +161,8 @@ bool OMStoredPropertySetIndex::isSorted(void)
 OMStoredPropertySetIndex::IndexEntry* OMStoredPropertySetIndex::find(
                                                                     void) const
 {
+  TRACE("OMStoredPropertySetIndex::find");
+
   OMStoredPropertySetIndex::IndexEntry* result = 0;
 
   for (size_t i = 0; i < _capacity; i++) {
