@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -50,7 +50,7 @@
 //static aafTapeFormatType_t TapeFormat = kVHSFormat;
 //static aafLength_t TapeLength = 3200 ;
 
-static aafMobID_t		NewMobID;
+static GUID		NewMobID;	// NOTE: this should really be aafUID_t, but problems w/ IsEqualGUID()
 //#define TAPE_MOB_OFFSET	10
 //#define TAPE_MOB_LENGTH	60
 //#define TAPE_MOB_NAME	L"A Tape Mob"
@@ -168,20 +168,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		
 		// Create a Master Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
+		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
 			IID_IAAFMob, 
 			(IUnknown **)&pMob));
 		
 		// Set the IAAFMob properties
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		aafMobID_t NewMobAUID;
-		memcpy (&NewMobAUID, &NewMobID, sizeof (NewMobID));
-		checkResult(pMob->SetMobID(NewMobAUID));
+		checkResult(pMob->SetMobID((aafUID_t *)&NewMobID));
 		checkResult(pMob->SetName(MobName));
 		
 		checkResult(pMob->QueryInterface(IID_IAAFMasterMob, (void **) &pMasterMob));
 		// Add the master mob to the file BEFORE creating the essence
-		checkResult(pHeader->AddMob(pMob));
+		checkResult(pHeader->AppendMob(pMob));
 		checkResult(pMasterMob->CreateEssence (1, DDEF_Sound, CodecWave, rate, rate,
 												kSDKCompressionDisable, NULL, ContainerAAF, &pAccess));
 		

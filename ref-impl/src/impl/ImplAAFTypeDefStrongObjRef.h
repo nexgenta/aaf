@@ -39,8 +39,6 @@ class ImplAAFClassDef;
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
-#include "OMWeakRefVectorProperty.h"
-#include "OMWeakRefProperty.h"
 
 class ImplAAFTypeDefStrongObjRef : public ImplAAFTypeDefObjectRef
 {
@@ -56,21 +54,6 @@ protected:
 
 public:
 
-  //****************
-  // Initialize()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    Initialize
-        (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
-
-         // @parm [in] class def of objects permitted to be referenced
-         ImplAAFClassDef * pObjType,
-
-         // @parm [in, string] friendly name of this type definition
-         const aafCharacter * pTypeName);
-
-
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     SetObject (/*[in]*/ ImplAAFPropertyValue * pPropVal,
@@ -83,7 +66,7 @@ public:
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType);
+    GetObjectType (/*[out]*/ ImplAAFClassDef ** ppObjType) const;
 
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -100,9 +83,9 @@ public:
   // Override from AAFTypeDefObjectRef
   virtual AAFRESULT STDMETHODCALLTYPE
     pvtInitialize
-        (const aafUID_t & id,
-         const ImplAAFClassDef *pType,
-         const aafCharacter * pTypeName);
+        (const aafUID_t *  pID,
+         const aafUID_t * pRefdObjID,
+         wchar_t *  pTypeName);
 
   // overrides from ImplAAFTypeDef
   //
@@ -112,12 +95,16 @@ public:
   size_t NativeSize (void) const;
 
   virtual OMProperty * 
-    pvtCreateOMProperty (OMPropertyId pid,
-							const wchar_t * name) const;
+    pvtCreateOMPropertyMBS (OMPropertyId pid,
+							const char * name) const;
 
 
 private:
-  OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
+  // OMWeakReferenceProperty<ImplAAFClassDef> _referencedType;
+  OMFixedSizeProperty<aafUID_t> _referencedType;
+
+  // avoid shortcut typedef in an effort to not include other headers
+  ImplAAFSmartPointer<ImplAAFClassDef> _cachedObjType;
 };
 
 

@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -131,11 +131,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
 	IAAFMob*		pMob = NULL;
-	IAAFTimelineMobSlot*	pMobSlot = NULL;
+	IAAFMobSlot*	pMobSlot = NULL;
 	IAAFSequence*	pSequence = NULL;
 	IAAFSegment*	pSegment = NULL;
 	IAAFComponent*	pComponent = NULL;
-	aafMobID_t		NewMobID;
+	aafUID_t		NewMobID;
 	int				i;
 	HRESULT			hr = S_OK;
 	
@@ -153,19 +153,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
 		
 		// Create a Composition Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
+		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
 			IID_IAAFMob, 
 			(IUnknown **)&pMob));
 		
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		checkResult(pMob->SetMobID(NewMobID));
+		checkResult(pMob->SetMobID(&NewMobID));
 		checkResult(pMob->SetName(L"EnumAAFDataDefTest"));
 		
 		// Add mob slot w/ Sequence
-		checkResult(pDictionary->CreateInstance(AUID_AAFSequence,
+		checkResult(pDictionary->CreateInstance(&AUID_AAFSequence,
 			IID_IAAFSequence, 
 			(IUnknown **)&pSequence));		
-		checkResult(pSequence->Initialize(DDEF_Picture));
+		checkResult(pSequence->Initialize((aafUID_t*)&DDEF_Picture));
 		
 		//
 		//	Add some segments.  Need to test failure conditions
@@ -176,20 +176,20 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		{
 			aafLength_t		len = 10;
 			
-			checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
+			checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
 				IID_IAAFComponent, 
 				(IUnknown **)&pComponent));
 			
 			if(i == 0)
 			{
-				checkResult(pComponent->SetDataDef(DDEF_PictureWithMatte));
+				checkResult(pComponent->SetDataDef((aafUID_t*)&DDEF_PictureWithMatte));
 			}
 			else
 			{
-				checkResult(pComponent->SetDataDef(DDEF_Picture));
+				checkResult(pComponent->SetDataDef((aafUID_t*)&DDEF_Picture));
 			}
 
-			checkResult(pComponent->SetLength(len));
+			checkResult(pComponent->SetLength(&len));
 			checkResult(pSequence->AppendComponent(pComponent));
 			
 			pComponent->Release();
@@ -198,13 +198,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 		checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
 		
-		aafRational_t editRate = { 0, 1};
-		checkResult(pMob->AppendNewTimelineSlot(editRate,
-												pSegment,
-												1,
-												L"AAF Test Sequence",
-												0,
-												&pMobSlot));
+		checkResult(pMob->AppendNewSlot(pSegment, 1, L"AAF Test Sequence", &pMobSlot));
 		
 		pMobSlot->Release();
 		pMobSlot = NULL;
@@ -213,7 +207,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSegment = NULL;
 		
 		// Add the master mob to the file and cleanup
-		pHeader->AddMob(pMob);
+		pHeader->AppendMob(pMob);
 		
 	}
 	catch (HRESULT& rResult)
@@ -284,13 +278,13 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 		
 		// Validate that there is only one composition mob.
-		checkResult(pHeader->CountMobs(kCompMob, &numMobs));
+		checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 		
 		// Get the AAF Dictionary so that we can create valid AAF objects.
 		checkResult(pHeader->GetDictionary(&pDictionary));
 		
-		checkResult(pDictionary->GetDataDefs(&pEnumDataDef));
+		checkResult(pDictionary->GetDataDefinitions(&pEnumDataDef));
 		/* Read and check the first element */
 		checkResult(pEnumDataDef->NextOne(&pDataDef));
 		checkResult(pDataDef->IsPictureKind(&testBool));
@@ -368,27 +362,27 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		// Enumerate over Composition MOBs
 		criteria.searchTag = kByMobKind;
 		criteria.tags.mobKind = kCompMob;
-		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
+		checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
 		while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 		{
 			aafNumSlots_t		numSlots = 0;
 			
-			checkResult(pMob->CountSlots(&numSlots));
+			checkResult(pMob->GetNumSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
 			
 			// Enumerate over all MOB slots for this MOB
-			checkResult(pMob->GetSlots(&pSlotIter));
+			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
 			while (pSlotIter && pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS)
 			{
-				aafUInt32			numCpnts;
+				aafInt32			numCpnts;
 				
 				checkResult(pSlot->GetSegment(&pSegment));
 				checkResult(pSegment->QueryInterface(IID_IAAFSequence, (void **) &pSequence));
 				
-				checkResult(pSequence->CountComponents(&numCpnts));
+				checkResult(pSequence->GetNumComponents(&numCpnts));
 				checkExpression(numCpnts == kNumComponents, AAFRESULT_TEST_FAILED);
 				
-				checkResult(pSequence->GetComponents(&pCompIter));
+				checkResult(pSequence->EnumComponents(&pCompIter));
 				numCpnts = 0;
 				index = 0;
 				while (pCompIter && pCompIter->NextOne(&pComp) == AAFRESULT_SUCCESS)
@@ -400,7 +394,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 					numCpnts++;
 					
 					checkResult(pComp->GetDataDef(&dataDef));
-					checkResult(pDictionary->LookupDataDef(dataDef, &pDataDef));
+					checkResult(pDictionary->LookupDataDefintion(&dataDef, &pDataDef));
 					checkResult(pDataDef->IsSoundKind(&testBool));
 					checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 					checkResult(pDataDef->IsMatteKind(&testBool));
@@ -408,29 +402,29 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 					
 					if(index == 0)	// First segment is Picture with Matte, converts to picture
 					{
-						checkResult(pDataDef->IsDataDefOf(pwmID, &testBool));
+						checkResult(pDataDef->IsDataDefOf(&pwmID, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureKind(&testBool));
 						checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureWithMatteKind(&testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
-						checkResult(pDataDef->DoesDataDefConvertTo (pictureID, &testBool));
+						checkResult(pDataDef->DoesDataDefConvertTo (&pictureID, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 					}
 					else		// First segment is Picture, converts from picture with Matte
 					{
-						checkResult(pDataDef->IsDataDefOf(pictureID, &testBool));
+						checkResult(pDataDef->IsDataDefOf(&pictureID, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureKind(&testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 						checkResult(pDataDef->IsPictureWithMatteKind(&testBool));
 						checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
-						checkResult(pDataDef->DoesDataDefConvertFrom (pwmID, &testBool));
+						checkResult(pDataDef->DoesDataDefConvertFrom (&pwmID, &testBool));
 						checkExpression(testBool == AAFTrue, AAFRESULT_TEST_FAILED);
 					}
-					checkResult(pDataDef->DoesDataDefConvertTo (soundID, &testBool));
+					checkResult(pDataDef->DoesDataDefConvertTo (&soundID, &testBool));
 					checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
-					checkResult(pDataDef->DoesDataDefConvertFrom (soundID, &testBool));
+					checkResult(pDataDef->DoesDataDefConvertFrom (&soundID, &testBool));
 					checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 					
 					pComp->Release();

@@ -27,44 +27,25 @@
  *
  ************************************************************************/
 
-#include <iostream.h>
-#include <stdio.h>
-#include <wchar.h>
-#include "AAF.h"
+#include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
 
-#include "CEnumeratorTest.h"
+// Required function prototype.
+extern "C" HRESULT CEnumAAFClassDefs_test(void);
 
-class CEnumAAFClassDefsTest: public CEnumeratorTest<IEnumAAFClassDefs,IAAFClassDef>
+HRESULT CEnumAAFClassDefs_test()
 {
-public:
-	HRESULT CountItems(IAAFDictionary *pDictionary,aafUInt32 *piCount)
-	{
-		return(pDictionary->CountClassDefs(piCount));
-	}
-	HRESULT GetItems(IAAFDictionary *pDictionary,IEnumAAFClassDefs **ppEnumerator)
-	{
-		return(pDictionary->GetClassDefs(ppEnumerator));
-	}
-	aafBool ItemIsPresent(IAAFDictionary *pDictionary,aafUID_t& Id)
-	{
-		IAAFClassDefSP pClassDef;
-		return(pDictionary->LookupClassDef(Id,&pClassDef)==AAFRESULT_SUCCESS?
-			kAAFTrue:kAAFFalse);
-	}
-};
-
-extern "C" HRESULT CEnumAAFClassDefs_test()
-{
-	try
-	{
-		CEnumAAFClassDefsTest Test;
-		Test.Run();
-	}
-	catch(HRESULT& rResult)
-	{
-		return(rResult);
-	}
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
+
+
+
+
+
+
+
+
+
+
+
+

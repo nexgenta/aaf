@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -78,8 +78,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFSourceClip	*sclp = NULL;
 	IAAFComponent	*pComp = NULL;
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
-  aafUID_t  typeUID = DDEF_Picture;
+	aafUID_t					newUID, typeUID = DDEF_Picture;
 	HRESULT						hr = S_OK;
 	
 	ProductInfo.companyName = L"AAF Developers Desk";
@@ -114,28 +113,28 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		aafRational_t	audioRate = { 44100, 1 };
 		
 		// Create a Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFMob,
+		checkResult(pDictionary->CreateInstance(&AUID_AAFMob,
 			IID_IAAFMob, 
 			(IUnknown **)&pMob));
 		
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(CoCreateGuid((GUID *)&newUID));
+		checkResult(pMob->SetMobID(&newUID));
 		checkResult(pMob->SetName(L"MOBTest"));
 		
 		// Add some slots
 		for(test = 0; test < 5; test++)
 		{
-			checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
+			checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
 				IID_IAAFSourceClip, 
 				(IUnknown **)&sclp));		
 			
 			checkResult(sclp->QueryInterface (IID_IAAFComponent, (void **)&pComp));
-			checkResult(pComp->SetDataDef (typeUID));
+			checkResult(pComp->SetDataDef (&typeUID));
 			pComp->Release();
 			pComp = NULL;
 			checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 			
-			checkResult(pDictionary->CreateInstance( AUID_AAFMobSlot,
+			checkResult(pDictionary->CreateInstance(&AUID_AAFMobSlot,
 				IID_IAAFMobSlot, 
 				(IUnknown **)&newSlot));		
 			
@@ -156,7 +155,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		}
 		
 		// Add the mob to the file.
-		checkResult(pHeader->AddMob(pMob));
+		checkResult(pHeader->AppendMob(pMob));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -237,29 +236,29 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pFile->GetHeader(&pHeader));
 		
 		
-		checkResult(pHeader->CountMobs(kAllMob, &numMobs));
+		checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 		
 		
 		aafSearchCrit_t		criteria;
 		criteria.searchTag = kNoSearch;
-		checkResult(pHeader->GetMobs (&criteria, &mobIter));
+		checkResult(pHeader->EnumAAFAllMobs (&criteria, &mobIter));
 		
 		for(n = 0; n < numMobs; n++)
 		{
 			aafWChar		name[500], slotName[500];
 			aafNumSlots_t	numSlots;
-			aafMobID_t		mobID;
+			aafUID_t		mobID;
 			aafSlotID_t		trackID;
 			
 			checkResult(mobIter->NextOne (&aMob));
 			checkResult(aMob->GetName (name, sizeof(name)));
 			checkResult(aMob->GetMobID (&mobID));
 			
-			checkResult(aMob->CountSlots (&numSlots));
+			checkResult(aMob->GetNumSlots (&numSlots));
 			checkExpression(5 == numSlots, AAFRESULT_TEST_FAILED);
 			
-			checkResult(aMob->GetSlots(&slotIter));
+			checkResult(aMob->EnumAAFAllMobSlots(&slotIter));
 			
 			for(s = 0; s < (aafSlotID_t)numSlots; s++)
 			{

@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -134,14 +134,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*			pHeader = NULL;
 	IAAFDictionary*		pDictionary = NULL;
 	IAAFMob*			pMob = NULL;
-	IAAFTimelineMobSlot*		pMobSlot = NULL;
+	IAAFMobSlot*		pMobSlot = NULL;
 	IAAFMob*			pReferencedMob = NULL;
 	IAAFSourceClip*		pSourceClip = NULL;
 	IAAFFiller*			pFiller = NULL;
 	IAAFSegment*		pSegment = NULL;
 	IAAFPulldown*		pPulldown = NULL;
 	IAAFCompositionMob*	pCompMob = NULL;
-	aafMobID_t			NewMobID, referencedMobID;
+	aafUID_t			NewMobID, referencedMobID;
 	aafInt32			fadeInLen  = 1000;
 	aafInt32			fadeOutLen = 2000;
 	aafFadeType_t		fadeInType = kFadeLinearAmp;
@@ -165,29 +165,29 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->GetDictionary(&pDictionary));
  		
 		// Create a mob to be referenced by the source clip
-		checkResult(pDictionary->CreateInstance(AUID_AAFMasterMob,
+		checkResult(pDictionary->CreateInstance(&AUID_AAFMasterMob,
 								 IID_IAAFMob, 
 								 (IUnknown **)&pReferencedMob));
 		checkResult(CoCreateGuid((GUID *)&referencedMobID));
-		checkResult(pReferencedMob->SetMobID(referencedMobID));
+		checkResult(pReferencedMob->SetMobID(&referencedMobID));
 		checkResult(pReferencedMob->SetName(L"AAFSourceClipTest::ReferencedMob"));
-		checkResult(pHeader->AddMob(pReferencedMob));
+		checkResult(pHeader->AppendMob(pReferencedMob));
 		pReferencedMob->Release();
 		pReferencedMob = NULL;
 
 		// Create a Composition Mob
-		checkResult(pDictionary->CreateInstance(AUID_AAFCompositionMob,
+		checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
 											  IID_IAAFCompositionMob, 
 											  (IUnknown **)&pCompMob));
 
 	    // get a IAAFMob interface
 		checkResult(pCompMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 		checkResult(CoCreateGuid((GUID *)&NewMobID));
-		checkResult(pMob->SetMobID(NewMobID));
+		checkResult(pMob->SetMobID(&NewMobID));
 		checkResult(pMob->SetName(L"AAFPulldownTest"));
 	  
 		// Create a Source clip 
- 		checkResult(pDictionary->CreateInstance(AUID_AAFSourceClip,
+ 		checkResult(pDictionary->CreateInstance(&AUID_AAFSourceClip,
 						     IID_IAAFSourceClip, 
 						     (IUnknown **)&pSourceClip));		
 
@@ -199,14 +199,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pSourceClip->SetSourceReference(sourceRef));
 
 		// create a filler 
-	    checkResult(pDictionary->CreateInstance(AUID_AAFFiller,
+	    checkResult(pDictionary->CreateInstance(&AUID_AAFFiller,
 												IID_IAAFFiller, 
 												(IUnknown **)&pFiller));
 		// Set its properties.
-	    checkResult(pFiller->Initialize( fillerUID, fillerLength));
+	    checkResult(pFiller->Initialize( &fillerUID, fillerLength));
 
 		// Now create a selector 
-	    checkResult(pDictionary->CreateInstance(AUID_AAFPulldown,
+	    checkResult(pDictionary->CreateInstance(&AUID_AAFPulldown,
 												IID_IAAFPulldown, 
 												(IUnknown **)&pPulldown));
 
@@ -224,16 +224,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pSegment->Release();
 		checkResult(pPulldown->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 	    // append the Selector to the MOB tree
-		aafRational_t editRate = { 0, 1};
-		checkResult(pMob->AppendNewTimelineSlot(editRate,
-												pSegment,
-												1,
-												L"SelectorSlot",
-												0,
-												&pMobSlot)); 
+		checkResult(pMob->AppendNewSlot(pSegment, 1, L"SelectorSlot", &pMobSlot)); 
 		
 		// Add the composition mob to the file
-		pHeader->AddMob(pMob);
+		pHeader->AppendMob(pMob);
 
 	}
 	catch (HRESULT& rResult)
@@ -307,22 +301,22 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 
 		// Validate that there is only one composition mob.
-		checkResult(pHeader->CountMobs(kCompMob, &numMobs));
+		checkResult(pHeader->GetNumMobs(kCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 		// Enumerate over Composition MOBs
 		criteria.searchTag = kByMobKind;
 		criteria.tags.mobKind = kCompMob;
-		checkResult(pHeader->GetMobs(&criteria, &pMobIter));
+		checkResult(pHeader->EnumAAFAllMobs(&criteria, &pMobIter));
 		while (pMobIter && pMobIter->NextOne(&pMob) == AAFRESULT_SUCCESS)
 		{
 			aafNumSlots_t		numSlots = 0;
 
-			checkResult(pMob->CountSlots(&numSlots));
+			checkResult(pMob->GetNumSlots(&numSlots));
 			checkExpression(1 == numSlots, AAFRESULT_TEST_FAILED);
 
 			// Enumerate over all MOB slots for this MOB
-			checkResult(pMob->GetSlots(&pSlotIter));
+			checkResult(pMob->EnumAAFAllMobSlots(&pSlotIter));
 			while (pSlotIter && pSlotIter->NextOne(&pSlot) == AAFRESULT_SUCCESS)
 			{
 				checkResult(pSlot->GetSegment(&pSegment));

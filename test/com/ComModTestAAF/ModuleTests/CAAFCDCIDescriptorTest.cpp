@@ -98,7 +98,7 @@ static HRESULT SetDigitalImageDescProps(IAAFCDCIDescriptor* pDesc)
 	pDIDesc->SetImageAspectRatio(ratio);
 
 	// Optional Properties
-	pDIDesc->SetCompression(compression);
+	pDIDesc->SetCompression(&compression);
 	pDIDesc->SetSampledView(kSampledHeightTestVal, kSampledWidthTestVal, kSampledXOffsetTestVal, kSampledYOffsetTestVal);
 	pDIDesc->SetDisplayView(kDisplayHeightTestVal, kDisplayWidthTestVal, kDisplayXOffsetTestVal, kDisplayYOffsetTestVal);
 	pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal);
@@ -189,7 +189,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*	pDictionary = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
-	aafMobID_t		newMobID;
+	aafUID_t		newUID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -206,7 +206,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (SUCCEEDED(hr))
   {
 	  // Create a source mob
-	  hr = pDictionary->CreateInstance(AUID_AAFSourceMob,
+	  hr = pDictionary->CreateInstance(&AUID_AAFSourceMob,
 						  IID_IAAFSourceMob, 
 						  (IUnknown **)&pSourceMob);
 	  if (SUCCEEDED(hr))
@@ -218,10 +218,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		  {
 			  IAAFCDCIDescriptor*	pCDCIDesc = NULL;
 
-			  CoCreateGuid((GUID *)&newMobID);
-			  pMob->SetMobID(newMobID);
+			  CoCreateGuid((GUID *)&newUID);
+			  pMob->SetMobID(&newUID);
 			  pMob->SetName(L"CDCIDescriptorTest");
-			  hr = pDictionary->CreateInstance(AUID_AAFCDCIDescriptor,
+			  hr = pDictionary->CreateInstance(&AUID_AAFCDCIDescriptor,
 									  IID_IAAFCDCIDescriptor, 
 									  (IUnknown **)&pCDCIDesc);		
 			  if (SUCCEEDED(hr))
@@ -257,7 +257,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 			  // Add the MOB to the file
 			  if (SUCCEEDED(hr))
-				  hr = pHeader->AddMob(pMob);
+				  hr = pHeader->AppendMob(pMob);
 
 			  pMob->Release();
 			  pMob = NULL;
@@ -295,14 +295,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (FAILED(hr))
 		return hr;
 
-	hr = pHeader->CountMobs(kAllMob, &numMobs);
+	hr = pHeader->GetNumMobs(kAllMob, &numMobs);
 	if (1 != numMobs)
 	{
 		hr = AAFRESULT_TEST_FAILED;
 		goto Cleanup;
 	}
 
-	hr = pHeader->GetMobs(NULL, &pMobIter);
+	hr = pHeader->EnumAAFAllMobs(NULL, &pMobIter);
 	if (SUCCEEDED(hr))
 	{
 		IAAFMob*	pMob = NULL;

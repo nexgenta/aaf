@@ -11,7 +11,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
+ *  prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -83,7 +83,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFTapeDescriptor*			pTapeDesc = NULL;
 
 	aafProductIdentification_t	ProductInfo;
-	aafMobID_t					newMobID;
+	aafUID_t					newUID;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 
@@ -113,7 +113,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			{
 				// Create a source mob
 
-				hr = pDictionary->CreateInstance(AUID_AAFSourceMob,
+				hr = pDictionary->CreateInstance(&AUID_AAFSourceMob,
 										IID_IAAFSourceMob, 
 										(IUnknown **)&pSourceMob);
 				if (AAFRESULT_SUCCESS == hr)
@@ -121,10 +121,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					hr = pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob);
 					if (AAFRESULT_SUCCESS == hr)
 					{
-						CoCreateGuid((GUID *)&newMobID);
-						pMob->SetMobID(newMobID);
+						CoCreateGuid((GUID *)&newUID);
+						pMob->SetMobID(&newUID);
 						pMob->SetName(L"TapeDescriptorTest");
-						hr = pDictionary->CreateInstance(AUID_AAFTapeDescriptor,
+						hr = pDictionary->CreateInstance(&AUID_AAFTapeDescriptor,
 												IID_IAAFTapeDescriptor, 
 												(IUnknown **)&pTapeDesc);		
  						if (AAFRESULT_SUCCESS == hr)
@@ -164,7 +164,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 						// Add the MOB to the file
 						if (AAFRESULT_SUCCESS == hr)
-							hr = pHeader->AddMob(pMob);
+							hr = pHeader->AppendMob(pMob);
 
 						pMob->Release();
 						pMob = NULL;
@@ -232,12 +232,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		hr = pFile->GetHeader(&pHeader);
 		if (AAFRESULT_SUCCESS == hr)
 		{
-			hr = pHeader->CountMobs(kAllMob, &numMobs);
+			hr = pHeader->GetNumMobs(kAllMob, &numMobs);
 			if (AAFRESULT_SUCCESS == hr)
 			{
 				if (1 == numMobs )
 				{
-					hr = pHeader->GetMobs(NULL, &pMobIter);
+					hr = pHeader->EnumAAFAllMobs(NULL, &pMobIter);
 					if (AAFRESULT_SUCCESS == hr)
 					{
 						hr = pMobIter->NextOne(&pMob);
