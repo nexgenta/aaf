@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFMetaDictionary.h,v 1.109 2004/03/10 17:39:58 jptrainor Exp $ $Name:  $
+// $Id: AAFMetaDictionary.h,v 1.106.2.1 2004/03/10 18:00:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,7 +48,7 @@
 //
 // AAFMetaDict.csv 
 //
-// This file was generated on Wed Mar 10 12:47:16 EST 2004
+// This file was generated on Wed Mar 10 13:05:03 EST 2004
 // by user jpt on system warbler.localdomain.
 //
 // Key to macros.
@@ -3452,6 +3452,26 @@ AAF_CLASS(Mob,
     false,
     false,
     Mob)
+  AAF_PROPERTY(Attributes,
+    // {03010210-0700-0000-060E-2B3401010107}
+    AAF_LITERAL_AUID(0x03010210,
+      0x0700, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x07),
+    0x4409,
+    AAF_REFERENCE_TYPE(StrongReferenceVector, TaggedValue),
+    false,
+    false,
+    Mob)
+  AAF_PROPERTY(UsageCode,
+    // {05010108-0000-0000-060E-2B3401010107}
+    AAF_LITERAL_AUID(0x05010108,
+      0x0000, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x07),
+    0x4408,
+    AAF_TYPE(UsageCodeType),
+    false,
+    false,
+    Mob)
 AAF_CLASS_END(Mob,
   // {0D010101-0101-3400-060E-2B3402060101}
   AAF_LITERAL_AUID(0x0D010101,
@@ -5270,6 +5290,50 @@ AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(CategoryType,
 AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(CategoryType, 
   // {02020103-0000-0000-060E-2B3401040101}
   AAF_LITERAL_AUID(0x02020103,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01))
+AAF_TYPE_SEPARATOR()
+
+// UsageCodeType
+//
+AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION(UsageCodeType, 
+  // {02020104-0000-0000-060E-2B3401040101}
+  AAF_LITERAL_AUID(0x02020104,
+    0x0000, 0x0000,
+    0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01))
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFUsage_SubClip,
+    // {0D010102-0101-0500-060E-2B3404010101}
+    AAF_LITERAL_AUID(0x0D010102,
+      0x0101, 0x0500,
+      0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01),
+    UsageCodeType)
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFUsage_AdjustedClip,
+    // {0D010102-0101-0600-060E-2B3404010101}
+    AAF_LITERAL_AUID(0x0D010102,
+      0x0101, 0x0600,
+      0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01),
+    UsageCodeType)
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFUsage_TopLevel,
+    // {0D010102-0101-0700-060E-2B3404010101}
+    AAF_LITERAL_AUID(0x0D010102,
+      0x0101, 0x0700,
+      0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01),
+    UsageCodeType)
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFUsage_LowerLevel,
+    // {0D010102-0101-0800-060E-2B3404010101}
+    AAF_LITERAL_AUID(0x0D010102,
+      0x0101, 0x0800,
+      0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01),
+    UsageCodeType)
+  AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_MEMBER(kAAFUsage_Template,
+    // {0D010102-0101-0900-060E-2B3404010101}
+    AAF_LITERAL_AUID(0x0D010102,
+      0x0101, 0x0900,
+      0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01),
+    UsageCodeType)
+AAF_TYPE_DEFINITION_EXTENDIBLE_ENUMERATION_END(UsageCodeType, 
+  // {02020104-0000-0000-060E-2B3401040101}
+  AAF_LITERAL_AUID(0x02020104,
     0x0000, 0x0000,
     0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01))
 AAF_TYPE_SEPARATOR()

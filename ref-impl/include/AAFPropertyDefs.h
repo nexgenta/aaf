@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.8 2004/03/10 17:20:21 jptrainor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.1 2004/03/10 18:00:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -973,5 +973,12 @@ const aafUID_t kAAFPropID_Root_MetaDictionary =
 const aafUID_t kAAFPropID_Root_Header =
 {0x0d010301, 0x0102, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
 
+//{03010210-0700-0000-060E-2B3401010107}
+const aafUID_t kAAFPropID_Mob_Attributes =
+{0x03010210, 0x0700, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x07}};
+
+// {05010108-0000-0000-060E-2B3401010107}
+const aafUID_t kAAFPropID_Mob_UsageCode =
+{0x05010108, 0x0000, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x07}};
 
 #endif // ! __AAFPropertyDefs_h__

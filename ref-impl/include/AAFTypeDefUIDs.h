@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.13 2004/03/10 17:20:21 jptrainor Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.11.2.1 2004/03/10 18:00:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -525,6 +525,8 @@ const aafUID_t kAAFTypeID_TypeDefinitionWeakReferenceVector =
 const aafUID_t kAAFTypeID_DataDefinitionWeakReferenceVector =
 {0x05040300, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
-
+// {02020104-0000-0000-060E-2B3401040101}
+const aafUID_t kAAFTypeID_UsageCodeType = 
+{0x02020104, 0x0000, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 #endif // ! __AAFTypeDefUIDs_h__
