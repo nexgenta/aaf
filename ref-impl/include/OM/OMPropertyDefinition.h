@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -39,23 +39,24 @@ class OMPropertyDefinition {
 public:
   // @access Public members.
 
-    // @cmember Destructor.
-  virtual ~OMPropertyDefinition(void) {}
-
     // @cmember The type of the <c OMProperty> defined by this
     //          <c OMPropertyDefinition>.
+    // @this const 
   virtual const OMType* type(void) const = 0;
 
     // @cmember The name of the <c OMProperty> defined by this
     //          <c OMPropertyDefinition>.
-  virtual const wchar_t* name(void) const = 0;
+    // @this const 
+  virtual const char* name(void) const = 0;
 
-    // @cmember The locally unique identification of the <c OMProperty>
-    //          defined by this <c OMPropertyDefinition>.
-  virtual OMPropertyId localIdentification(void) const = 0;
+    // @cmember The unique identification of the <c OMProperty> defined by
+    //          this <c OMPropertyDefinition>.
+    // @this const
+  virtual OMPropertyId identification(void) const = 0;
 
     // @cmember Is the <c OMProperty> defined by this
     //          <c OMPropertyDefinition> optional? 
+    //   @this const
   virtual bool isOptional(void) const = 0;
 
 };
