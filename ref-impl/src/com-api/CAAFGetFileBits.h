@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFGetFileBits.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFGetFileBits.h,v 1.4 2005/02/10 17:49:47 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,17 +65,17 @@ public:
   // ReadAt()
   //
   // Attempts to read bufsize bytes from this stream at the given byte
-  // offset.  Places the data into buf.  Any attempt to read beyond
-  // the size of this file, as reported by GetSize(), will be
-  // considered an error.
-  //
-  // A value of zero for position indicates the beginning of the
-  // stream.
-  //
-  // Succeeds if:
-  // - The pNumBytes pointer is valid.
-  // - position + buSize is not larger than the size of this file, as
-  //   reported by GetSize().
+  /// offset.  Places the data into buf.  Any attempt to read beyond
+  /// the size of this file, as reported by GetSize(), will be
+  /// considered an error.
+  ///
+  /// A value of zero for position indicates the beginning of the
+  /// stream.
+  ///
+  /// Succeeds if:
+  /// - The pNumBytes pointer is valid.
+  /// - position + buSize is not larger than the size of this file, as
+  ///   reported by GetSize().
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -86,9 +86,9 @@ public:
   //
   // AAFRESULT_NULL_PARAM
   //   - buf arg is NULL.
-  //
-  // AAFRESULT_OFFSET_SIZE
-  //   - position + size is larger than the size of this file.
+  ///
+  /// AAFRESULT_OFFSET_SIZE
+  ///   - position + size is larger than the size of this file.
   //
   STDMETHOD (ReadAt) (
     // Buffer into which data is read
@@ -106,9 +106,9 @@ public:
   // GetSize()
   //
   // Returns the size of this file, in bytes, in *pSize.
-  //
-  // Succeeds if:
-  // - The pSize pointer is valid.
+  ///
+  /// Succeeds if:
+  /// - The pSize pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTimecode.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTimecode.h,v 1.4 2005/02/10 17:49:50 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,25 +65,25 @@ public:
   // Initialize()
   //
   // Initializes this object with the given length and timecode
-  // values.  Length is specified in units of the edit rate of the
-  // containing timeline mob slot.
-  // 
-  // Succeeds if all of the following are true:
-  // - this object has not yet been initialized.
-  // - the pTimecode pointer is valid.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize() has already been called on this object.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pTimecode argument is NULL.
+  /// values.  Length is specified in units of the edit rate of the
+  /// containing timeline mob slot.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - this object has not yet been initialized.
+  /// - the pTimecode pointer is valid.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize() has already been called on this object.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pTimecode argument is NULL.
   //
   STDMETHOD (Initialize) (
     // Length Property Value
@@ -98,24 +98,24 @@ public:
   // GetTimecode()
   //
   // Get the timecode fields.
-  //
-  // Succeeds if all of the following are true:
-  // - the pTimecode pointer is valid.
-  // 
-  // If this method fails nothing will be written to *pTimecode.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - Initialize() has already been called on this object.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pTimecode arg is NULL.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pTimecode pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pTimecode.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - Initialize() has already been called on this object.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pTimecode arg is NULL.
   //
   STDMETHOD (GetTimecode) (
     // Timecode (startFrame, drop, fps) 
@@ -127,24 +127,24 @@ public:
   // SetTimecode()
   //
   // Set the timecode fields.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pTimecode pointer is valid.
-  // 
-  // If this method fails no state will be changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - Initialize() has already been called on this object.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pTimecode arg is NULL.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pTimecode pointer is valid.
+  /// 
+  /// If this method fails no state will be changed.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - Initialize() has already been called on this object.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pTimecode arg is NULL.
   //
   STDMETHOD (SetTimecode) (
     // Timecode (startFrame, drop, fps) 

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFContainerDef.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFContainerDef.h,v 1.4 2005/02/10 17:49:29 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,27 +82,27 @@ public:
   // EssenceIsIdentified()
   //
   // Tells whether the given plugin is capable of supporting
-  // authentication.  The methods for authenticating a plugin are
-  // still <tbd>.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pEssenceIsIdentified pointer is valid.
-  // 
-  // If this method fails nothing will be written to
-  // *pEssenceIsIdentified.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pEssenceIsIdentified arg is NULL.
+  /// authentication.  The methods for authenticating a plugin are
+  /// still <tbd>.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pEssenceIsIdentified pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to
+  /// *pEssenceIsIdentified.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pEssenceIsIdentified arg is NULL.
   //
   STDMETHOD (EssenceIsIdentified) (
     // The EssenceIsIdentified 
@@ -114,18 +114,18 @@ public:
   // SetEssenceIsIdentified()
   //
   // Tells whether the given plugin is capable of supporting
-  // authentication.  The methods for authenticating a plugin are
-  // still <tbd>.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
+  /// authentication.  The methods for authenticating a plugin are
+  /// still <tbd>.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
   //
   STDMETHOD (SetEssenceIsIdentified) (
     // The EssenceIsIdentified flag 

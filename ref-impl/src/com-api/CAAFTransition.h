@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTransition.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTransition.h,v 1.4 2005/02/10 17:49:50 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,7 +82,7 @@ public:
     /*[in]*/ aafLength_t  length,
 
     // The point at which a cut would be inserted if the transition
-	// were removed
+	/// were removed
     /*[in]*/ aafPosition_t  cutPoint,
 
     // A reference to an operation group object
@@ -94,7 +94,7 @@ public:
   // GetCutPoint()
   //
   // Gets the point at which a cut would be inserted if the transition
-  // were removed.
+  /// were removed.
   //
   STDMETHOD (GetCutPoint) (
     // Cut Point 
@@ -117,7 +117,7 @@ public:
   // SetCutPoint()
   //
   // Sets the point at which a cut would be inserted if the transition
-  // were removed.
+  /// were removed.
   //
   STDMETHOD (SetCutPoint) (
     // Cut Point 

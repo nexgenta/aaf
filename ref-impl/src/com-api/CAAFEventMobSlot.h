@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEventMobSlot.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEventMobSlot.h,v 1.4 2005/02/10 17:49:47 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,22 +66,22 @@ public:
   // GetEditRate()
   //
   // This method will get the edit rate for this mob slot.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pEditRate pointer is valid.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pEditRate arg is NULL.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pEditRate pointer is valid.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pEditRate arg is NULL.
   //
   STDMETHOD (GetEditRate) (
     // Edit rate property value 
@@ -93,22 +93,22 @@ public:
   // SetEditRate()
   //
   // This method will get set edit rate for this mob slot.
-  // 
-  // Succeeds if all of the following are true:
-  // - the pEditRate pointer is valid.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pEditRate arg is NULL.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pEditRate pointer is valid.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pEditRate arg is NULL.
   //
   STDMETHOD (SetEditRate) (
     // Edit rate property value 

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefObjectRef.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefObjectRef.h,v 1.4 2005/02/10 17:49:50 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,12 +70,12 @@ public:
   // GetObjectType()
   //
   // Returns the class def representing objects to which this type def
-  // can refer.  The returned type def is the class definition of the
-  // least-derived type which is permissible to be represented.
-  //
-  // Succeeds if:
-  // - this object has been Initialize()d.
-  // - The ppObjType pointer is valid.
+  /// can refer.  The returned type def is the class definition of the
+  /// least-derived type which is permissible to be represented.
+  ///
+  /// Succeeds if:
+  /// - this object has been Initialize()d.
+  /// - The ppObjType pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -99,12 +99,12 @@ public:
   // CreateValue()
   //
   // Creates a property value which contains an object reference.
-  // Initializes it to refer to the given object, and returns the
-  // newly-created property value in ppPropVal.
-  //
-  // Succeeds if:
-  // - The pObj pointer is valid.
-  // - The ppPropVal pointer is valid.
+  /// Initializes it to refer to the given object, and returns the
+  /// newly-created property value in ppPropVal.
+  ///
+  /// Succeeds if:
+  /// - The pObj pointer is valid.
+  /// - The ppPropVal pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -131,12 +131,12 @@ public:
   // GetObject()
   //
   // Returns the object contained in the named property value.
-  // Requires that pPropVal be a strong object reference or a weak
-  // object reference.
-  //
-  // Succeeds if:
-  // - The pPropVal pointer is valid.
-  // - The ppObject pointer is valid.
+  /// Requires that pPropVal be a strong object reference or a weak
+  /// object reference.
+  ///
+  /// Succeeds if:
+  /// - The pPropVal pointer is valid.
+  /// - The ppObject pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -167,12 +167,12 @@ public:
   // SetObject()
   //
   // Sets the named property value to refer to the named object.
-  // Requires that pPropVal be a strong object reference or a weak
-  // object reference.
-  //
-  // Succeeds if:
-  // - The pPropVal pointer is valid.
-  // - The ppObject pointer is valid.
+  /// Requires that pPropVal be a strong object reference or a weak
+  /// object reference.
+  ///
+  /// Succeeds if:
+  /// - The pPropVal pointer is valid.
+  /// - The ppObject pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMob.cpp,v 1.11 2004/11/26 17:21:08 stuart_hc Exp $ $Name:  $
+// $Id: CAAFMob.cpp,v 1.12 2005/02/10 17:49:47 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1877,7 +1877,7 @@ HRESULT STDMETHODCALLTYPE
   return hr;
 }
 
-  //
+  ///
 
 HRESULT STDMETHODCALLTYPE
     CAAFMob::AppendKLVData (IAAFKLVData * pData)

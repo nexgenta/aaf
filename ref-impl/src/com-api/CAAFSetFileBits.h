@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFSetFileBits.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFSetFileBits.h,v 1.4 2005/02/10 17:49:49 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,18 +65,18 @@ public:
   // WriteAt()
   //
   // Writes bufsize bytes into this file at the given byte offset.
-  // Obtains the data from buf.  A value of zero for position
-  // indicates the beginning of the stream.
-  //
-  // Succeeds if sufficient space is available in the file to write
-  // the given number of bytes at the given position.  It's possible
-  // to guarantee that this method will succeed if SetSize() is first
-  // called to reserve the required space.  If SetSize() is not first
-  // called to reserve the space, this method will attempt to request
-  // it, but this attempt may fail.
-  //
-  // Succeeds if:
-  // - The buf argument is a valid pointer.
+  /// Obtains the data from buf.  A value of zero for position
+  /// indicates the beginning of the stream.
+  ///
+  /// Succeeds if sufficient space is available in the file to write
+  /// the given number of bytes at the given position.  It's possible
+  /// to guarantee that this method will succeed if SetSize() is first
+  /// called to reserve the required space.  If SetSize() is not first
+  /// called to reserve the space, this method will attempt to request
+  /// it, but this attempt may fail.
+  ///
+  /// Succeeds if:
+  /// - The buf argument is a valid pointer.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -87,9 +87,9 @@ public:
   //
   // AAFRESULT_NULL_PARAM
   //   - buf arg is NULL.
-  //
-  // AAFRESULT_DATA_SIZE
-  //   - The requested space is not available.
+  ///
+  /// AAFRESULT_DATA_SIZE
+  ///   - The requested space is not available.
   //
   STDMETHOD (WriteAt) (
     // Buffer from which data is written
@@ -107,9 +107,9 @@ public:
   // SetSize()
   //
   // Attempts to reserve size bytes of storage.
-  //
-  // Succeeds if:
-  // - The requested space is available.
+  ///
+  /// Succeeds if:
+  /// - The requested space is available.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -117,9 +117,9 @@ public:
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_DATA_SIZE
-  //   - size bytes are not available.
+  ///
+  /// AAFRESULT_DATA_SIZE
+  ///   - size bytes are not available.
   //
   STDMETHOD (SetSize) (
     // The requested file size 

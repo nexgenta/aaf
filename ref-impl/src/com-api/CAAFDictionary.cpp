@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDictionary.cpp,v 1.10 2004/11/26 17:21:07 stuart_hc Exp $ $Name:  $
+// $Id: CAAFDictionary.cpp,v 1.11 2005/02/10 17:49:29 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -126,7 +126,7 @@ CAAFDictionary::~CAAFDictionary ()
 
 //
 // Creates a single uninitialized AAF object of the class associated 
-  // with a specified stored object id.
+  /// with a specified stored object id.
 HRESULT CAAFDictionary::CreateInstance
    (// Class identifier (AUID) of the stored object. This is the
     // corresponding SMPTE identifier (as a GUID) for all predefined
@@ -192,7 +192,7 @@ HRESULT CAAFDictionary::CreateInstance
 
 //
 // Creates a single uninitialized AAF meta class or type associated 
-  // with a specified stored object id.
+  /// with a specified stored object id.
 HRESULT CAAFDictionary::CreateMetaInstance
    (// Identifier (id) of a class or type definition. This is the
     // corresponding SMPTE identifier (as a GUID) for all predefined

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefRename.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefRename.h,v 1.4 2005/02/10 17:49:50 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,28 +66,28 @@ public:
   // Initialize()
   //
   // Initializes this type def to be an alias for the given type
-  // (similar to a C typedef).
-  // 
-  // This method must be called after allocation, and before
-  // any other method can be called.
-  //
-  // Succeeds if:
-  // - Initialize() has not yet been called on this object.
-  // - pBaseType is a valid pointer.
-  // - pTypeName is a valid pointer.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  // 
-  // AAFRESULT_NULL_PARAM
-  //   - pBaseType or pTypeName is null.
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize() has already been called on this object.
+  /// (similar to a C typedef).
+  /// 
+  /// This method must be called after allocation, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize() has not yet been called on this object.
+  /// - pBaseType is a valid pointer.
+  /// - pTypeName is a valid pointer.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  /// 
+  /// AAFRESULT_NULL_PARAM
+  ///   - pBaseType or pTypeName is null.
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize() has already been called on this object.
   //
   STDMETHOD (Initialize) (
     // auid to be used to identify this type
@@ -105,23 +105,23 @@ public:
   // GetBaseType()
   //
   // Returns the type definition to which this type def is an alias.
-  //
-  // Succeeds if:
-  // - this object has been Initialize()d.
-  // - The ppBaseType pointer is valid.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - ppBaseType pointer is NULL.
+  ///
+  /// Succeeds if:
+  /// - this object has been Initialize()d.
+  /// - The ppBaseType pointer is valid.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - ppBaseType pointer is NULL.
   //
   STDMETHOD (GetBaseType) (
     // type definition for which this is an alias 
@@ -132,26 +132,26 @@ public:
   //
   // GetBaseValue()
   //
-  // // Gets the property value of the base type from the given property
-  // value of the typedef type and places a pointer to the base type's
-  // property value into *ppOutPropVal.
-  //
-  // Succeeds if:
-  // - The pInPropVal pointer is valid.
-  // - The ppOutPropVal pointer is valid.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pInPropVal or ppOutPropVal is NULL.
+  // /// Gets the property value of the base type from the given property
+  /// value of the typedef type and places a pointer to the base type's
+  /// property value into *ppOutPropVal.
+  ///
+  /// Succeeds if:
+  /// - The pInPropVal pointer is valid.
+  /// - The ppOutPropVal pointer is valid.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pInPropVal or ppOutPropVal is NULL.
   //
   STDMETHOD (GetBaseValue) (
     // property value from which value is to be read
@@ -164,26 +164,26 @@ public:
   //
   // CreateValue()
   //
-  // // Gets the property value of the typedef type from the given property
-  // value of the base type and places a pointer to the base type's
-  // property value into *ppOutPropVal.
-  //
-  // Succeeds if:
-  // - The pInPropVal pointer is valid.
-  // - The ppOutPropVal pointer is valid.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NOT_INITIALIZED
-  //   - This object has not yet had Initialize() called on it.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pInPropVal or ppOutPropVal is NULL.
+  // /// Gets the property value of the typedef type from the given property
+  /// value of the base type and places a pointer to the base type's
+  /// property value into *ppOutPropVal.
+  ///
+  /// Succeeds if:
+  /// - The pInPropVal pointer is valid.
+  /// - The ppOutPropVal pointer is valid.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pInPropVal or ppOutPropVal is NULL.
   //
   STDMETHOD (CreateValue) (
     // property value from which value is to be read

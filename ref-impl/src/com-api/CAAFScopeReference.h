@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFScopeReference.h,v 1.4 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFScopeReference.h,v 1.5 2005/02/10 17:49:49 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -69,23 +69,23 @@ public:
   // Create()
   //
   // Constructs a Scope Reference object.
-  // 
-  // If this method fails the length property will not be
-  // changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
+  /// 
+  /// If this method fails the length property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
   //
   STDMETHOD (Create) (
     // Number of nested scopes to pass to find the Nested Scope slot
     /*[in]*/ aafUInt32  RelativeScope,
 
     // Number of slots to look backwards from the slot containing the
-    // Scope Reference
+  /// Scope Reference
     /*[in]*/ aafUInt32  RelativeSlot);
 
   //***********************************************************
@@ -93,16 +93,16 @@ public:
   // Initialize()
   //
   // Constructs a Scope Reference object.
-  // 
-  // If this method fails the length property will not be
-  // changed.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
+  /// 
+  /// If this method fails the length property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
   //
   STDMETHOD (Initialize) (
     // Data definition for referenced slot
@@ -112,7 +112,7 @@ public:
     /*[in]*/ aafUInt32  RelativeScope,
 
     // Number of slots to look backwards from the slot containing the
-    // Scope Reference
+  /// Scope Reference
     /*[in]*/ aafUInt32  RelativeSlot);
 
   //***********************************************************
@@ -120,22 +120,22 @@ public:
   // GetRelativeScope()
   //
   // Gets the number of nested scopes to pass to find the Nested Scope
-  // slot.
-  //	
-  // Succeeds if all of the following are true:
-  // - the pnRelativeScope pointer is valid.
-  // 
-  // If this method fails nothing will be written to *pnRelativeScope.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pnRelativeScope arg is NULL.
+  /// slot.
+  ///	
+  /// Succeeds if all of the following are true:
+  /// - the pnRelativeScope pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pnRelativeScope.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pnRelativeScope arg is NULL.
   //
   STDMETHOD (GetRelativeScope) (
     // Pointer to a Relative Scope 
@@ -147,22 +147,22 @@ public:
   // GetRelativeSlot()
   //
   // Gets the number of slots that preced the slot containing the
-  // Scope Reference. 
-  //	
-  // Succeeds if all of the following are true:
-  // - the pnRelativeScope pointer is valid.
-  // 
-  // If this method fails nothing will be written to *pnRelativeSlot.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pnRelativeSlot arg is NULL.
+  /// Scope Reference. 
+  ///	
+  /// Succeeds if all of the following are true:
+  /// - the pnRelativeScope pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pnRelativeSlot.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pnRelativeSlot arg is NULL.
   //
   STDMETHOD (GetRelativeSlot) (
     // Pointer to a Relative Slot 

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEdgecode.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEdgecode.h,v 1.4 2005/02/10 17:49:47 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,9 +67,9 @@ public:
   // Initialize()
   //
   // This function creates a new edgecode clip with the
-  // given property values.  The edgecode value is represented with an
-  // aafEdgecode_t struct consisting of startFrame, filmKind, and
-  // codeFormat.
+  /// given property values.  The edgecode value is represented with an
+  /// aafEdgecode_t struct consisting of startFrame, filmKind, and
+  /// codeFormat.
   //
   STDMETHOD (Initialize) (
     // Length Property Value
@@ -83,7 +83,7 @@ public:
   // GetEdgecode()
   //
   // This set of functions returns the required property values
-  // for the object identified by XXX.
+  /// for the object identified by XXX.
   //
   STDMETHOD (GetEdgecode) (
     // Edgecode 

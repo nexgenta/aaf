@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFModule.cpp,v 1.11 2004/10/27 14:14:53 stuart_hc Exp $ $Name:  $
+// $Id: CAAFModule.cpp,v 1.12 2005/02/10 17:49:48 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFProperty.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFProperty.h,v 1.4 2005/02/10 17:49:48 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,12 +68,12 @@ public:
   // GetDefinition()
   //
   // Returns the definition of this property.
-  //
-  // Succeeds if:
-  // - This object has already been Initialize()d.
-  // - The ppPropDef pointer is valid.
-  // - The associated property definition can be found in the
-  //   dictionary.
+  ///
+  /// Succeeds if:
+  /// - This object has already been Initialize()d.
+  /// - The ppPropDef pointer is valid.
+  /// - The associated property definition can be found in the
+  ///   dictionary.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -87,10 +87,10 @@ public:
   //
   // AAFRESULT_NULL_PARAM
   //   - ppPropDef arg is NULL.
-  //
-  // AAFRESULT_BAD_PROP
-  //   - The definition for this property could not be found in the
-  //     dictionary.
+  ///
+  /// AAFRESULT_BAD_PROP
+  ///   - The definition for this property could not be found in the
+  ///     dictionary.
   //
   STDMETHOD (GetDefinition) (
     // This property's definition 
@@ -102,10 +102,10 @@ public:
   // GetValue()
   //
   // Returns the Property Value object associated with this property.
-  //
-  // Succeeds if:
-  // - This object has already been Initialize()d.
-  // - The ppPval pointer is valid.
+  ///
+  /// Succeeds if:
+  /// - This object has already been Initialize()d.
+  /// - The ppPval pointer is valid.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -119,9 +119,9 @@ public:
   //
   // AAFRESULT_NULL_PARAM
   //   - ppValue arg is NULL.
-  //
-  // AAFRESULT_PROP_NOT_PRESENT
-  //   - The given property is optional and not present.
+  ///
+  /// AAFRESULT_PROP_NOT_PRESENT
+  ///   - The given property is optional and not present.
   //
   STDMETHOD (GetValue) (
     // The Property Value object associated with this property. 

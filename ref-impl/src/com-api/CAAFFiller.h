@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFFiller.h,v 1.3 2004/02/27 14:26:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFiller.h,v 1.4 2005/02/10 17:49:47 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,28 +70,28 @@ public:
   // Initialize()
   //
   // This function will create a new filler object with the given
-  // property values.  Length is specified in units of the edit rate
-  // of the containing timeline mob slot.
-  // 
-  // Succeeds if all of the following are true:
-  // - this object has not yet been initialized.
-  // - the length is valid.
-  // 
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
-  // 
-  // AAFRESULT_SUCCESS
-  //   - succeeded.  (This is the only code indicating success.)
-  //
-  // AAFRESULT_ALREADY_INITIALIZED
-  //   - Initialize() has already been called on this object.
-  //
-  // AAFRESULT_NULL_PARAM
-  //   - pDataDef is null.
-  //
-  // AAFRESULT_BAD_LENGTH
-  //   - length is negative.
+  /// property values.  Length is specified in units of the edit rate
+  /// of the containing timeline mob slot.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - this object has not yet been initialized.
+  /// - the length is valid.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize() has already been called on this object.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pDataDef is null.
+  ///
+  /// AAFRESULT_BAD_LENGTH
+  ///   - length is negative.
   //
   STDMETHOD (Initialize) (
     // Data Definition Object

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFParameterDefs.cpp,v 1.6 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFParameterDefs.cpp,v 1.7 2005/02/10 17:49:51 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -333,9 +333,9 @@ HRESULT STDMETHODCALLTYPE
   return hr;
 }
 
-  // @comm There is no guarantee that the same set of elements will be enumerated on 
-  // each pass through the list\, nor will the elements necessarily be enumerated in 
-  // the same order. The exact behavior depends on the collection being enumerated.)
+  /// @comm There is no guarantee that the same set of elements will be enumerated on 
+  /// each pass through the list\, nor will the elements necessarily be enumerated in 
+  /// the same order. The exact behavior depends on the collection being enumerated.)
 
 HRESULT STDMETHODCALLTYPE
     CEnumAAFParameterDefs::Clone (IEnumAAFParameterDefs ** ppEnum)
