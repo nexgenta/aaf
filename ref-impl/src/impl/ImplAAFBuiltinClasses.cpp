@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -71,15 +71,13 @@ bool ImplAAFBuiltinClasses::sBuiltinsInited = ImplAAFBuiltinClasses::sInitBuilti
 //
 
 #define AAF_TABLE_BEGIN() \
-/*static*/ ImplAAFBuiltinClasses::ClassTblEntry \
-ImplAAFBuiltinClasses::sBuiltinClassTable[] = \
-{
+ImplAAFBuiltinClasses::ClassTblEntry \
+ImplAAFBuiltinClasses::sBuiltinClassTable[] = {
 
 #define AAF_CLASS(name, id, parent, concrete) \
-  { &AUID_AAF##name, L"" L# name L"", &AUID_AAF##parent, 0, 0, concrete },
+  { &AUID_AAF##name,  L## #name  , &AUID_AAF##parent, 0, 0, concrete },
 
-#define AAF_TABLE_END() \
-};
+#define AAF_TABLE_END()  };
 
 const static aafUID_t NULL2_AUID = { 0 };
 
@@ -128,103 +126,28 @@ const /*static*/ aafUInt32 ImplAAFBuiltinClasses::ksNumClassDefs =
 //
 
 #define AAF_TABLE_BEGIN() \
-/*static*/ \
 ImplAAFBuiltinClasses::PropTblEntry \
 ImplAAFBuiltinClasses::sBuiltinPropTable[] = \
 {
 
-#define AAF_PROPERTY(name, id, tag, type, mandatory, uid, container) \
-  { L"" L# name L"", \
-	id, \
-    tag, \
-    &kAAFTypeID_##type, \
-    &kAAFClassID_##container, \
-    mandatory, \
-    uid, \
-	ImplAAFBuiltinClasses::CreateOMPropType##type, \
-    0 \
-  },
+#define AAF_PROPERTY(name, id, tag, type, mandatory, uid, container) { L## #name , id, tag, &kAAFTypeID_##type, &kAAFClassID_##container, mandatory, uid, ImplAAFBuiltinClasses::CreateOMPropType##type, 0 },
 
-#define AAF_TABLE_END() \
-};
+#define AAF_TABLE_END() };
 
-#define kAAFTypeID_AAF_REFERENCE_TYPE(type, target) \
-  kAAFTypeID_##target##type
+#define kAAFTypeID_AAF_REFERENCE_TYPE(type, target) kAAFTypeID_##target##type
 
-#define kAAFTypeID_AAF_TYPE(type) \
-  kAAFTypeID_##type
+#define kAAFTypeID_AAF_TYPE(type) kAAFTypeID_##type
 
-#define CreateOMPropTypeAAF_REFERENCE_TYPE(type, target) \
-  CreateOMPropType##type
+#define CreateOMPropTypeAAF_REFERENCE_TYPE(type, target) CreateOMPropType##type
 
-#define CreateOMPropTypeAAF_TYPE(target) \
-  CreateOMPropTypeSimple
-
-#if 0
-
-//
-// Compatibility 
-//
-#define kAAFTypeID_WeakReference         kAAFTypeID_RefAUID
-#define kAAFTypeID_WeakReferenceVector   kAAFTypeID_RefAUIDArray
-#define kAAFTypeID_WeakReferenceSet      kAAFTypeID_RefAUIDArray
-#define kAAFTypeID_StrongReference       kAAFTypeID_ObjRef
-#define kAAFTypeID_StrongReferenceVector kAAFTypeID_ObjRefArray
-#define kAAFTypeID_StrongReferenceSet    kAAFTypeID_ObjRefArray
-
-// names changed to be more clear
-#define kAAFTypeID_String kAAFTypeID_WCharString
-
-// hax here to "alias" different types
-#define kAAFTypeID_RefAUID kAAFTypeID_AUID
-#define kAAFTypeID_RefAUIDArray kAAFTypeID_AUIDArray
-#define kAAFTypeID_Length kAAFTypeID_Int64
-#define kAAFTypeID_Position kAAFTypeID_Int64
-#define kAAFTypeID_ColorSitingType kAAFTypeID_UInt32
-#define kAAFTypeID_EdgeType kAAFTypeID_UInt32
-#define kAAFTypeID_FilmType kAAFTypeID_UInt32
-//#define kAAFTypeID_Boolean kAAFTypeID_UInt8
-// on NT sizeof(aafBool) == 4 and that's
-// how it is currently persisted
-#define kAAFTypeID_Boolean kAAFTypeID_UInt32
-#define kAAFTypeID_CompCodeArray kAAFTypeID_UInt8
-#define kAAFTypeID_TCSource kAAFTypeID_UInt32
-#define kAAFTypeID_TapeCaseType kAAFTypeID_UInt32
-#define kAAFTypeID_TapeFormatType kAAFTypeID_UInt32
-#define kAAFTypeID_VideoSignalType kAAFTypeID_UInt32
-#define kAAFTypeID_LayoutType kAAFTypeID_Int32
-#define kAAFTypeID_EditHintType kAAFTypeID_UInt16
-#define kAAFTypeID_JPEGTableIDType kAAFTypeID_UInt32
-#define kAAFTypeID_PulldownKindType kAAFTypeID_UInt32
-#define kAAFTypeID_PulldownDirectionType kAAFTypeID_UInt32
-#define kAAFTypeID_PhaseFrameType kAAFTypeID_UInt16
-
-// bogus types 
-#define kAAFTypeID_DataStream kAAFTypeID_UInt8Array
-#define kAAFTypeID_DataValue kAAFTypeID_UInt8Array
-#define kAAFTypeID_ReferenceType kAAFTypeID_UInt8Array
-#define kAAFTypeID_StringArray kAAFTypeID_UInt8Array
-#define kAAFTypeID_TimeStamp kAAFTypeID_UInt8Array
-#define kAAFTypeID_Int64Array kAAFTypeID_UInt8Array
-#define kAAFTypeID_PositionArray kAAFTypeID_UInt8Array
-#define kAAFTypeID_ProductVersion kAAFTypeID_UInt8Array
-#define kAAFTypeID_Rational kAAFTypeID_UInt8Array
-#define kAAFTypeID_VersionType kAAFTypeID_UInt8Array
-#define kAAFTypeID_Rectangle kAAFTypeID_UInt8Array
-#define kAAFTypeID_Int32Array kAAFTypeID_UInt8Array
-#define kAAFTypeID_CompSizeArray kAAFTypeID_UInt8Array
-#define kAAFTypeID_RGBALayout kAAFTypeID_UInt8Array
-
-#else
+#define CreateOMPropTypeAAF_TYPE(target) CreateOMPropTypeSimple
 
 // Streams are not yet implemented.
-#define kAAFTypeID_DataStream kAAFTypeID_UInt8Array
+//#define kAAFTypeID_DataStream kAAFTypeID_UInt8Array
 
 // String arrays are currently implemented as a single
 // null-character-delimited string
 #define kAAFTypeID_StringArray kAAFTypeID_String
-
-#endif
 
 #include "AAFMetaDictionary.h"
 
@@ -264,12 +187,15 @@ const /*static*/ aafUID_t * ImplAAFBuiltinClasses::sAxClassIDs[] =
   &AUID_AAFTypeDefIndirect,
   &AUID_AAFTypeDefOpaque,
   &AUID_AAFTypeDefEnum,
+  &AUID_AAFTypeDefStream,
   &AUID_AAFTypeDefRename,
   &AUID_AAFTypeDefStrongObjRef,
 
   /*
   &AUID_AAFTypeDefExtEnum,
+  */
   &AUID_AAFTypeDefSet,
+  /*
   &AUID_AAFTypeDefStream,
   &AUID_AAFTypeDefWeakObjRef,
   */
@@ -537,18 +463,22 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 		{
 #if !defined(NDEBUG) && USE_AAFOBJECT_MODEL
 
-    // Check that all of the current manual table entries are in the automatically generated
-    // set.
-    ImplAAFPropertyDef *pAxiomaticProperty = metaDictionary()->findAxiomaticPropertyDefinition(propInfo->id);
-    assert (pAxiomaticProperty);
+		  // Check that all of the current manual table entries are in the
+		  // automatically generated set.
+		  ImplAAFPropertyDef *pAxiomaticProperty =
+			metaDictionary()->findAxiomaticPropertyDefinition(propInfo->id);
+		  assert (pAxiomaticProperty);
 
-    ImplAAFTypeDef *pAxiomaticType = metaDictionary()->findAxiomaticTypeDefinition(*propInfo->pTypeGuid);
-    assert (pAxiomaticType);
+		  ImplAAFTypeDef *pAxiomaticType =
+			metaDictionary()->
+			findAxiomaticTypeDefinition(*propInfo->pTypeGuid);
+		  assert (pAxiomaticType);
 #endif
 
 #if 1
 		  ImplAAFMetaDefinition * obj = 
-                        (_dictionary->metaDictionary())->pvtCreateMetaDefinition(AUID_AAFPropertyDef);
+			(_dictionary->metaDictionary())->
+			pvtCreateMetaDefinition(AUID_AAFPropertyDef);
 #else // #if 1
 		  ImplAAFObject * obj =
 			_dictionary->pvtInstantiate (AUID_AAFPropertyDef);
@@ -558,14 +488,15 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 			dynamic_cast<ImplAAFPropertyDef*>(obj);
 		  assert (propDef);
 
-//		  ImplAAFTypeDef	*pTypeDef;
-			AAFRESULT hr;
+		  //		  ImplAAFTypeDef	*pTypeDef;
+		  AAFRESULT hr;
 
-//		hr = _dictionary->pvtLookupAxiomaticTypeDef (*propInfo->pTypeGuid, &pTypeDef);
-//		  assert (AAFRESULT_SUCCEEDED (hr));
-//			assert (pTypeDef);
+		  // hr = _dictionary->
+		  //   pvtLookupAxiomaticTypeDef (*propInfo->pTypeGuid, &pTypeDef);
+		  //		  assert (AAFRESULT_SUCCEEDED (hr));
+		  //			assert (pTypeDef);
 
-			hr = propDef->pvtInitialize
+		  hr = propDef->pvtInitialize
 			(propInfo->id,
 			 propInfo->tag,
 			 propInfo->name,
@@ -588,8 +519,11 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 		  propIdx++;
 		  propInfo = propInfo->nextProp;
 		}
-	}  
+	}
 
+  const ClassTblEntry * const pClassForPropDef =
+	lookupClassEntry (AUID_AAFPropertyDef);
+  assert (pClassForPropDef);
 
   assert (propIdx == numProps);
   for (propIdx = 0; propIdx < numProps; propIdx++)
@@ -597,16 +531,24 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 	  OMPropertySet * ps = _axPropDefs[propIdx].pPropDef->propertySet();
 	  assert (ps);
 	  size_t numOmProps = ps->count ();
-	  size_t context = 0;
-	  while (numOmProps--)
+	  
+	  const ClassTblEntry * pClass = 0;
+	  for (pClass = pClassForPropDef; pClass; pClass = pClass->pParent)
 		{
-		  OMProperty * p = 0;
-		  ps->iterate (context, p);
-		  assert (p);
-		  ImplAAFPropertyDef * pd = lookupAxProp (p->propertyId());
-		  assert (pd);
-		  p->initialize (pd);
+		  const PropTblEntry * pProp = 0;
+		  for (pProp = pClass->pProperties; pProp; pProp = pProp->nextProp)
+			{
+			  assert (pProp);
+			  OMProperty * p = ps->get (pProp->tag);
+			  assert (p);
+			  ImplAAFPropertyDef * pd = lookupAxProp (pProp->tag);
+			  assert (pd);
+			  p->initialize (pd);
+			  numOmProps--;
+			}
+		  assert (pClass != pClass->pParent);
 		}
+	  assert (0 == numOmProps);
 	}
 }
 
@@ -710,22 +652,34 @@ void ImplAAFBuiltinClasses::FinishInitClasses ()
 	{
 	  const ClassTblEntry * cte = lookupClassEntry(*sAxClassIDs[classIdx]);
 
-
 	  ImplAAFClassDef * pcd = _axClassDefs[classIdx];
 	  assert (pcd);
 	  OMPropertySet * ps = pcd->propertySet();
 	  assert (ps);
 	  size_t numOmProps = ps->count ();
-	  size_t context = 0;
-	  while (numOmProps--)
+
+	  const ClassTblEntry * const pClassForClassDef =
+		lookupClassEntry (AUID_AAFClassDef);
+	  assert (pClassForClassDef);
+
+	  const ClassTblEntry * pClass = 0;
+	  for (pClass = pClassForClassDef; pClass; pClass = pClass->pParent)
 		{
-		  OMProperty * p = 0;
-		  ps->iterate (context, p);
-		  assert (p);
-		  ImplAAFPropertyDef * pd = lookupAxProp (p->propertyId());
-		  assert (pd);
-		  p->initialize (pd);
+		  const PropTblEntry * pProp = 0;
+		  for (pProp = pClass->pProperties; pProp; pProp = pProp->nextProp)
+			{
+			  assert (pProp);
+			  OMProperty * p = ps->get (pProp->tag);
+			  assert (p);
+			  ImplAAFPropertyDef * pd = lookupAxProp (pProp->tag);
+			  assert (pd);
+			  p->initialize (pd);
+			  numOmProps--;
+			}
+		  assert (pClass != pClass->pParent);
 		}
+	  assert (0 == numOmProps);
+	  
 	}
 }
 
@@ -900,7 +854,7 @@ bool ImplAAFBuiltinClasses::sInitBuiltins ()
 			{
 			  // 'parent' is parent of 'this'
 			  sBuiltinClassTable[thisIdx].pParent =
-				&sBuiltinClassTable[thisIdx];
+				&sBuiltinClassTable[parentIdx];
 			  break; // out of 'parent' loop
 			}
 		}

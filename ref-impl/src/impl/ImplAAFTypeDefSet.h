@@ -6,7 +6,7 @@
 
 /***********************************************************************
  *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *              Copyright (c) 1998-2000 Avid Technology, Inc.
  *
  * Permission to use, copy and modify this software and accompanying 
  * documentation, and to distribute and sublicense application software
@@ -33,10 +33,9 @@
 
 
 class ImplAAFPropertyValue;
-
 class ImplEnumAAFPropertyValues;
-
-
+class ImplAAFTypeDefRecord;
+class ImplAAFPropertyDef;
 
 
 
@@ -66,22 +65,58 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         const aafUID_t & id,
+         aafUID_constref  id,
 
          // @parm [in] type of each element to be contained in this set
          ImplAAFTypeDef * pTypeDef,
 
-         // @parm [in] friendly name of this type definition
-         const aafCharacter *  pTypeName);
-
+         // @parm [in,string] friendly name of this type definition
+         aafCharacter_constptr  pTypeName);
 
   //****************
-  // GetType()
+  // GetElementType()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetType
+    GetElementType
         // @parm [out] type of elements in this array
-        (ImplAAFTypeDef ** ppTypeDef);
+        (ImplAAFTypeDef ** ppTypeDef) const;
+
+  //****************
+  // AddElement()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddElement
+        (// @parm [in] property value corresponding to set to which element is added
+         ImplAAFPropertyValue * pSetPropertyValue,
+
+         // @parm [in] value to be added to this set
+         ImplAAFPropertyValue * pElementPropertyValue);
+
+  //****************
+  // RemoveElement()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveElement
+        (// @parm [in] property value corresponding to set from which element is removed
+         ImplAAFPropertyValue * pSetPropertyValue,
+
+         // @parm [in] value to be removed from this set
+         ImplAAFPropertyValue * pElementPropertyValue);
+
+  //****************
+  // ContainsElement()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ContainsElement
+        (// @parm [in] property value corresponding to set to which element is added
+         ImplAAFPropertyValue * pSetPropertyValue,
+
+         // @parm [in] value whose presence is being tested in this set
+         ImplAAFPropertyValue * pElementPropertyValue,
+
+         // @parm [out] value to be added to this set
+         aafBoolean_t*  pContainsElement);
+
 
 
   //****************
@@ -90,53 +125,54 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetCount
         (// @parm [in] property value of array
-         ImplAAFPropertyValue * pPropVal,
+         ImplAAFPropertyValue * pSetPropertyValue,
 
          // @parm [out] count of elements in the specified set property value
          aafUInt32 *  pCount);
 
 
   //****************
-  // AddElement()
+  // CreateKey()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AddElement
-        (// @parm [in] property value corresponding to set to which element is added
-         ImplAAFPropertyValue * pInPropVal,
+    CreateKey
+        (// @parm [in,size_is(length)] Pointer to the key value bytes
+         aafDataBuffer_t  pKeyPtr,
 
-         // @parm [in] value to be added to this set
-         ImplAAFPropertyValue * pMemberPropVal);
+         // @parm [in] The size of the key in bytes
+         aafUInt32  length,
+
+         // @parm [out] An interface which may be passed to LookupElement() or ContainsKey()
+         ImplAAFPropertyValue ** ppKey);
 
 
   //****************
-  // CreateValueFromValues()
+  // LookupElement()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CreateValueFromValues
-        (// @parm [in, size_is(numElements)] array of property values for elements of set value which
-    // is to be created.
-         ImplAAFPropertyValue ** pElementValues,
+    LookupElement
+        (// @parm [in] property value of set
+         ImplAAFPropertyValue * pSetPropertyValue,
 
-         // @parm [in] size of pElementValues array.
-         aafUInt32  numElements,
+         // @parm [in] A key returned from CreateKey()
+         ImplAAFPropertyValue * pKey,
 
-         // @parm [out] newly-created property value
-         ImplAAFPropertyValue ** ppPropVal);
-
+         // @parm [out] The returned property value
+         ImplAAFPropertyValue ** ppElementPropertyValue);
 
   //****************
-  // CreateValueFromCArray()
+  // ContainsKey()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CreateValueFromCArray
-        (// @parm [in, size_is(initDataSize)] pointer to compile-time C array containing data to use
-         aafMemPtr_t  pInitData,
+    ContainsKey
+        (// @parm [in] property value of set
+         ImplAAFPropertyValue * pSetPropertyValue,
 
-         // @parm [in] size of data in pInitData, in bytes
-         aafUInt32  initDataSize,
+         // @parm [in] A key returned from CreateKey()
+         ImplAAFPropertyValue * pKey,
 
-         // @parm [out] newly created property value
-         ImplAAFPropertyValue ** ppPropVal);
+         // @parm [out] Value returned is AAFTrue if an entry with the correct key is present
+         aafBoolean_t*  pContainsKey);
 
 
   //****************
@@ -145,11 +181,15 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     GetElements
         (// @parm [in] property value to read
-         ImplAAFPropertyValue * pInPropVal,
+         ImplAAFPropertyValue * pSetPropertyValue,
 
          // @parm [out] enumerator across property values
          ImplEnumAAFPropertyValues ** ppEnum);
 
+
+  // Override from AAFTypeDef
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
 
 public:
   //****************
@@ -165,42 +205,9 @@ public:
 
          // @parm [in] friendly name of this type definition
          const aafCharacter *  pTypeName);
-
-
-
-  //*************************************************************
-  //
-  // Overrides from OMType, via inheritace through ImplAAFTypeDef
-  //
-  //*************************************************************
-
-  /*
-  virtual void reorder(OMByte* bytes,
-                       size_t bytesSize) const;
-
-  virtual size_t externalSize(void) const;
-
-  virtual void externalize(OMByte* internalBytes,
-                           size_t internalBytesSize,
-                           OMByte* externalBytes,
-                           size_t externalBytesSize,
-                           OMByteOrder byteOrder) const;
-
-  virtual size_t internalSize(void) const;
-
-  virtual void internalize(OMByte* externalBytes,
-                           size_t externalBytesSize,
-                           OMByte* internalBytes,
-                           size_t internalBytesSize,
-                           OMByteOrder byteOrder) const;
-						   */
-
-  // overrides from ImplAAFTypeDef
-  //
-  virtual aafBool IsFixedSize (void) const;
-  virtual size_t PropValSize (void) const;
-  virtual aafBool IsRegistered (void) const;
-  virtual size_t NativeSize (void) const;
+         
+  ImplAAFTypeDefRecord* STDMETHODCALLTYPE 
+    GetUIDType(ImplAAFTypeDef* pElementType, AAFRESULT& result) const;
 
 public:
   // Overrides from ImplAAFTypeDef
@@ -210,6 +217,16 @@ public:
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
 
+
+  virtual OMProperty * 
+    pvtCreateOMProperty (OMPropertyId pid,
+							const wchar_t * name) const;
+
+  // Allocate and initialize the correct subclass of ImplAAFPropertyValue 
+  // for the given OMProperty.
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreatePropertyValue(OMProperty *property, 
+                        ImplAAFPropertyValue ** pPropertyValue) const;
 
 
   // override from OMStorable.
@@ -224,6 +241,12 @@ private:
   // Persistent properties
   //
   OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
+  
+  //
+  // Non-persistent data.
+  //
+  ImplAAFPropertyDef* _uidProperty; // pid for the uid
+  ImplAAFTypeDefRecord* _uidType; // cached type for the unique identifier property.
 };
 
 #endif // ! __ImplAAFTypeDefSet_h__
