@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFAuxiliaryDescriptor.h,v 1.1.2.1 2004/05/01 18:48:33 jptrainor Exp $ $Name:  $
+// $Id: CAAFAuxiliaryDescriptor.h,v 1.1.2.2 2004/05/08 23:19:34 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,20 +67,16 @@ protected:
 public:
 
 
+
   //***********************************************************
   //
   // Initialize()
   //
-  // Initializes a newly allocated, empty
+  // Initializes a newly allocated,
   // IAAFAuxiliaryDescriptor object.  This method must be called
   // after allocation, and before any other method can be called.
   //
-  // Succeeds if:
-  // - Initialize() has not yet been called on this object.
-  //
-  // This method will return the following codes.  If more than one of
-  // the listed errors is in effect, it will return the first one
-  // encountered in the order given below:
+  // Return codes:
   // 
   // AAFRESULT_SUCCESS
   //   - succeeded.  (This is the only code indicating success.)

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFAuxiliaryDescriptor.cpp,v 1.1.2.1 2004/05/01 18:48:33 jptrainor Exp $ $Name:  $
+// $Id: CAAFAuxiliaryDescriptor.cpp,v 1.1.2.2 2004/05/08 23:19:34 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,6 +66,7 @@ CAAFAuxiliaryDescriptor::CAAFAuxiliaryDescriptor (IUnknown * pControllingUnknown
 CAAFAuxiliaryDescriptor::~CAAFAuxiliaryDescriptor ()
 {
 }
+
 
 
 HRESULT STDMETHODCALLTYPE
