@@ -2,7 +2,7 @@
 // @com This file implements the conversion of OMF files to AAF file format.
 //=---------------------------------------------------------------------=
 //
-// $Id: Aaf2Omf.cpp,v 1.63 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+// $Id: Aaf2Omf.cpp,v 1.63.2.1 2004/07/16 10:23:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,6 +59,14 @@ using namespace std;
 #include "AAFException.h"
 #include "OMFException.h"
 //#include "omcAvJPED.h"
+
+#ifdef _MSC_VER
+// For printf MSVC gives unpredictable behaviour for the %ll conversion
+// specifier so use the MSVC specific conversion specifier %I64.
+#define INT64FMT "I64"
+#else
+#define INT64FMT "ll"		// ISO C99
+#endif
 
 extern AafOmfGlobals* gpGlobals;
 
@@ -1448,7 +1456,7 @@ void Aaf2Omf::ProcessComponent(IAAFComponent* pComponent,
 		{
 			printf("%sProcessing Timecode Clip of length: %ld\n ", gpGlobals->indentLeader, (int)length);
 			IncIndentLevel();
-			printf("%sstart Frame\t: %ld\n", gpGlobals->indentLeader, edgecode.startFrame);
+			printf("%sstart Frame\t: %"INT64FMT"d\n", gpGlobals->indentLeader, edgecode.startFrame);
 			DecIndentLevel();				
 		}
 		OMFError = omfiEdgecodeNew(OMFFileHdl, (omfLength_t)length, OMFEdgecode, pOMFSegment);		
@@ -1862,7 +1870,7 @@ void Aaf2Omf::ConvertSelector(IAAFSelector* pSelector,
 	pComponent->GetLength(&length);
 	
 	if (gpGlobals->bVerboseMode)
-		printf("%sProcessing Selector object of length = %ld\n", gpGlobals->indentLeader, length);
+		printf("%sProcessing Selector object of length = %"INT64FMT"d\n", gpGlobals->indentLeader, length);
 	
 	pComponent->Release();
 	pComponent = NULL;
@@ -1929,7 +1937,7 @@ void Aaf2Omf::ConvertNestedScope(IAAFNestedScope* pNest,
 	pComponent->GetLength(&length);
 
 	if (gpGlobals->bVerboseMode)
-		printf("%sProcessing Nest object of length = %ld\n", gpGlobals->indentLeader, length);
+		printf("%sProcessing Nest object of length = %"INT64FMT"d\n", gpGlobals->indentLeader, length);
 
 	rc = pNest->GetSegments (&pEnumSegments);
 	while(pEnumSegments->NextOne (&pSegment) == AAFRESULT_SUCCESS)
@@ -1980,7 +1988,7 @@ void Aaf2Omf::ConvertEssenceGroup(IAAFEssenceGroup* pGroup,
 	pComponent->GetLength(&length);
 
 	if (gpGlobals->bVerboseMode)
-		printf("%sProcessing EssenceGroup object of length = %ld\n", gpGlobals->indentLeader, length);
+		printf("%sProcessing EssenceGroup object of length = %"INT64FMT"d\n", gpGlobals->indentLeader, length);
 
 	rc = pGroup->CountChoices (&numChoices);
 	for(n = 0; n < numChoices; n++)
