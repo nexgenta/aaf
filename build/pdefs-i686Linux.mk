@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i686Linux.mk,v 1.4 2004/05/05 15:43:46 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i686Linux.mk,v 1.5 2004/05/18 17:03:02 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -47,4 +47,4 @@
 #------------------------------------------------------------------------------
 include $(AAFBASE)/build/pdefs-i586Linux.mk
 
-PLATFORM_CFLAGS += -march=i686
+REL_FLAGS += -march=i686

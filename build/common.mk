@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.9 2004/05/05 15:41:40 stuart_hc Exp $ $Name:  $
+# $Id: common.mk,v 1.10 2004/05/18 17:03:02 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -82,7 +82,7 @@ ifeq ($(findstring Debug, $(AAFTARGET)), Debug)
 else
 ifeq ($(AAFTARGET), Release)
     ifneq ($(findstring -DNDEBUG, $(DBG_FLAGS)), -DNDEBUG)
-        DBG_FLAGS = -DNDEBUG
+        DBG_FLAGS = -DNDEBUG $(REL_FLAGS)
     endif
 endif
 endif

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-SparcSolaris.mk,v 1.2 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-SparcSolaris.mk,v 1.3 2004/05/18 17:03:02 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -59,7 +59,7 @@ include $(AAFBASE)/build/cdefs-$(COMPILER).mk
 #------------------------------------------------------------------------------
 # Platform specific compiler options
 #------------------------------------------------------------------------------
-PLATFORM_CFLAGS = -fPIC -g -D_DEBUG -O0
+PLATFORM_CFLAGS = -fPIC
 
 
 # Platform specific compiler options
