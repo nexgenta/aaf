@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.2.2.5 2004/05/01 18:48:33 jptrainor Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.2.2.6 2004/05/08 23:20:04 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -175,6 +175,8 @@
 #include "CEnumAAFKLVDataDefs.h"
 #include "CAAFRecordingDescriptor.h"
 #include "CAAFAuxiliaryDescriptor.h"
+#include "CAAFDescriptiveFramework.h"
+#include "CAAFDescriptiveMarker.h"
 
 //
 // Include Private AAF Objects in Table:
