@@ -3,6 +3,7 @@
 * Advanced Authoring Format                     *
 *                                               *
 * Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
 *                                               *
 \***********************************************/
 //@doc
@@ -72,7 +73,11 @@ public:
   //
   OMDECLARE_STORABLE(ImplAAFTextLocator)
 
-  // Persistent data
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFTextLocatorTest.cpp.
+  static AAFRESULT test();
+
+	// Persistent data
 private:
 	OMWideStringProperty                      _name;
 };
