@@ -46,9 +46,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
                                               const OMPropertyId propertyId,
                                               const wchar_t* name,
                                               const OMPropertyId keyPropertyId)
-: OMReferenceSetProperty(propertyId,
-                         SF_STRONG_OBJECT_REFERENCE_SET,
-                          name),
+: OMStrongReferenceSet(propertyId, name),
   _keyPropertyId(keyPropertyId)
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
@@ -220,7 +218,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
     wchar_t* name = elementName(localKey);
     SetElement newElement(this, name, localKey, count, key);
     newElement.restore();
-    _set.insert(newElement);
+    _set.insert(key, newElement);
     delete [] name;
     name = 0; // for BoundsChecker
   }
@@ -268,8 +266,8 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   ASSERT("Valid identification", isValidIdentification(key));
 
   SetElement newElement(this, name, localKey, 1/*tjb*/, key);
-  newElement.setValue(object);
-  _set.insert(newElement);
+  newElement.setValue(key, object);
+  _set.insert(key, newElement);
   setPresent();
   delete [] name;
 
@@ -352,7 +350,14 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   SetElement* element = 0;
   bool found = _set.find(identification, &element);
   ASSERT("Object found", found);
-  ReferencedObject* result = element->setValue(0);
+  UniqueIdentification nullUniqueIdentification;
+  memset(&nullUniqueIdentification, 0, sizeof(UniqueIdentification));
+  ReferencedObject* result = 0;
+  OMStorable* p = element->setValue(nullUniqueIdentification, 0);
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  }
   _set.remove(identification);
 
   POSTCONDITION("Object is not present", !contains(identification));
@@ -533,7 +538,13 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 
   bool result = _set.find(identification, &element);
   if (result) {
-    object = element->getValue();
+    OMStorable* p = element->getValue();
+    if (p != 0) {
+      object = dynamic_cast<ReferencedObject*>(p);
+      ASSERT("Object is correct type", object != 0);
+    } else {
+      object = 0;
+    } 
   }
 
   POSTCONDITION("Consistent keys",
@@ -561,7 +572,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
     SetElement& element = iterator.value();
-    ReferencedObject* object = element.getValue();
+    OMStorable* object = element.getValue();
     if (object != 0) {
       result = false;
       break;
@@ -633,7 +644,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  const ReferencedObject** p = (const ReferencedObject**)bits;
+  const OMStorable** p = (const OMStorable**)bits;
 
   SetIterator iterator(_set, OMBefore);
   while (++iterator) {
@@ -884,6 +895,38 @@ OMStrongReferenceSetProperty<UniqueIdentification,
     }
   }
   return result;
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+OMKeySize OMStrongReferenceSetProperty<UniqueIdentification,
+                                       ReferencedObject>::keySize(void) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::keySize");
+  return sizeof(UniqueIdentification);
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+OMPropertyId
+OMStrongReferenceSetProperty<UniqueIdentification,
+                             ReferencedObject>::keyPropertyId(void) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::keyPropertyId");
+  return _keyPropertyId;
+}
+
+template <typename UniqueIdentification, typename ReferencedObject>
+void
+OMStrongReferenceSetProperty<UniqueIdentification,
+                             ReferencedObject>::find(void* key,
+                                                     OMStorable*& object) const
+{
+  TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
+                                     "ReferencedObject>::find");
+  ReferencedObject* p = 0;
+  find(*reinterpret_cast<UniqueIdentification*>(key), p);
+  object = p;
 }
 
 #endif

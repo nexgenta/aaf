@@ -31,7 +31,7 @@
 
 #include "OMSet.h"
 #include "OMContainerElement.h"
-#include "OMRefSetProperty.h"
+#include "OMStrongReferenceSet.h"
 
 template <typename UniqueIdentification, typename ReferencedObject>
 class OMStrongReferenceSetIterator;
@@ -48,10 +48,10 @@ class OMStrongReferenceSetElement;
   //          <c OMStorable>.
   //   @tcarg class | UniqueIdentification | The type of the unique key
   //          used to identify the referenced objects.
-  //   @base public | <c OMReferenceSetProperty>
+  //   @base public | <c OMStrongReferenceSet>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename UniqueIdentification, typename ReferencedObject>
-class OMStrongReferenceSetProperty : public OMReferenceSetProperty {
+class OMStrongReferenceSetProperty : public OMStrongReferenceSet {
 public:
   // @access Public members.
 
@@ -198,10 +198,15 @@ public:
 
   bool isValidIdentification(UniqueIdentification& id) const;
 
+  virtual OMKeySize keySize(void) const;
+
+  virtual OMPropertyId keyPropertyId(void) const;
+
+  virtual void find(void* key, OMStorable*& object) const;
+
 private:
 
-  typedef OMStrongReferenceSetElement<UniqueIdentification,
-                                      ReferencedObject> SetElement;
+  typedef OMStrongReferenceSetElement<UniqueIdentification> SetElement;
 
   typedef OMSetIterator<UniqueIdentification, SetElement> SetIterator;
 
