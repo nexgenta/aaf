@@ -2,42 +2,38 @@
 #define OMSTOREDPROPERTYSETINDEX_H
 
 #include "OMPortability.h"
-#include "OMTypes.h"
 
 class OMStoredPropertySetIndex {
-private:
-  struct IndexEntry;  
 public:
   
   OMStoredPropertySetIndex(size_t capacity);
-
-  ~OMStoredPropertySetIndex(void);
-
-  void insert(OMPropertyId propertyId, int type, size_t offset, size_t length);
+  void insert(int pid, int type, size_t offset, size_t length);
   
-  IndexEntry* find(OMPropertyId propertyId) const;
+  struct IndexEntry;
+  
+  IndexEntry* find(int pid) const;
 
   size_t entries(void) const;
 
-  void iterate(size_t& context,
-               OMPropertyId& propertyId,
-               int& type,
-               size_t& offset,
-               size_t& length) const;
+  void iterate(size_t& context, int& pid, int& type, size_t& offset, size_t& length) const;
+
+  bool isDirty(void);
+  void setDirty(void);
+  void clearDirty(void);
 
   bool isSorted(void);
 
 protected:
     
-  OMStoredPropertySetIndex::IndexEntry* find(void) const;
+  OMStoredPropertySetIndex::IndexEntry* OMStoredPropertySetIndex::find(void) const;
     
 private:
     
   struct IndexEntry {
-    OMPropertyId _propertyId;
+    int _pid;
     int _type;
     size_t _offset;
-    size_t _length;
+  size_t _length;
     bool _valid;
   };
     
