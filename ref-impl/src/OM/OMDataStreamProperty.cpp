@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.60 2004/03/02 16:34:43 bakerian Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.59.2.1 2004/04/07 11:33:18 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,17 +50,8 @@ OMDataStreamProperty::OMDataStreamProperty(const OMPropertyId propertyId,
 OMDataStreamProperty::~OMDataStreamProperty(void)
 {
   TRACE("OMDataStreamProperty::~OMDataStreamProperty");
-
-  try 
-  {
-	if (_stream != 0) {
-		close();
-	}
-  }
-  catch(...)
-  {
-	  //close can throw exceptions under limited circustances with schemasoft library.
-	  //This is to ensure that excpetions do not get thrown outside the destructor.
+  if (_stream != 0) {
+    close();
   }
   POSTCONDITION("Stream closed", _stream == 0);
 }
@@ -79,6 +70,9 @@ void OMDataStreamProperty::save(void) const
   OMDataStreamProperty* p = const_cast<OMDataStreamProperty*>(this);
   if (!_exists) {
     p->create();
+	// Overcomes Schemasoft library SEGV when writing zero-length DataStream
+	// property
+    p->close();
   }
   if (hasStreamAccess()) {
     // Set the current position to the end of the stream
