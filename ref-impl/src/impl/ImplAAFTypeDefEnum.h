@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.h,v 1.29 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.h,v 1.30 2005/02/24 18:11:17 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -324,6 +324,11 @@ private:
   //
 
   ImplAAFTypeDefSP BaseType (void) const;
+
+  // Lookup a value identifier by name. pName is assumed
+  // to be non-null. Returns AAFRESULT_SUCCESS if found.
+  // Returns AAFRESULT_INVALID_PARAM if not found.
+  AAFRESULT LookupValByName(aafInt64 *pVal, const aafCharacter *pName);
 
 
 public:
