@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.13 2004/07/02 17:17:03 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -87,13 +87,13 @@ dist :  release-dist sdk-dist
 
 .PHONY : release-dist
 release-dist :
-	$(MAKE) CFG=Release ref-impl
+	$(MAKE) CFG=Release install
 	cd dist && $(MAKE) release-dist
 
 .PHONY : sdk-dist
 sdk-dist :
-	$(MAKE) CFG=Release everything
-	$(MAKE) CFG=Debug everything
+	$(MAKE) CFG=Release install
+	$(MAKE) CFG=Debug install
 	cd dist && $(MAKE) sdk-dist
 
 # This target simply prints the compiler version.
