@@ -108,7 +108,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pSegment == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	_slots.prependValue(pSegment);
+	pSegment->AcquireReference();
+
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -127,7 +130,10 @@ AAFRESULT STDMETHODCALLTYPE
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+  _slots.insertAt(pSegment,index);
+  pSegment->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -198,7 +204,23 @@ AAFRESULT STDMETHODCALLTYPE
 	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
 	if(*ppEnum == NULL)
 		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumStrongProperty(this, &_slots);
+
+	XPROTECT()
+	{
+		OMStrongReferenceVectorIterator<ImplAAFSegment>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFSegment>(_slots);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK((*ppEnum)->Initialize(&CLSID_EnumAAFSegments, this, iter));
+	}
+	XEXCEPT
+	{
+		if (*ppEnum)
+		  (*ppEnum)->ReleaseReference();
+		(*ppEnum) = 0;
+		return(XCODE());
+	}
+	XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
