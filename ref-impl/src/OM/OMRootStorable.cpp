@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -29,8 +29,8 @@
 #include "OMRootStorable.h"
 
 OMRootStorable::OMRootStorable(void)
-: _clientRoot(0xFFFF, "Header"),
-  _dictionary(0xFFFE, "MetaDictionary")
+: _clientRoot(0xFFFF, L"Header"),
+  _dictionary(0xFFFE, L"MetaDictionary")
 {
   _persistentProperties.put(_clientRoot.address());
   _persistentProperties.put(_dictionary.address());
@@ -41,8 +41,8 @@ OMRootStorable::OMRootStorable(void)
 
 OMRootStorable::OMRootStorable(OMStorable* clientRoot,
                                OMDictionary* dictionary)
-: _clientRoot(0xFFFF, "Header"),
-  _dictionary(0xFFFE, "MetaDictionary")
+: _clientRoot(0xFFFF, L"Header"),
+  _dictionary(0xFFFE, L"MetaDictionary")
 {
   _persistentProperties.put(_clientRoot.address());
   _persistentProperties.put(_dictionary.address());
@@ -62,6 +62,23 @@ const OMClassId OMRootStorable::_rootClassId =
 const OMClassId& OMRootStorable::classId(void) const
 {
   return _rootClassId;
+}
+
+  // @mfunc Save this <c OMRootStorable>.
+void OMRootStorable::save(void) const
+{
+  TRACE("OMRootStorable::save");
+
+  store()->save(classId());
+  store()->save(_persistentProperties);
+}
+
+  // @mfunc Restore the contents of an <c OMRootStorable>.
+void OMRootStorable::restoreContents(void)
+{
+  TRACE("OMRootStorable::restoreContents");
+
+  store()->restore(_persistentProperties);
 }
 
 OMStorable* OMRootStorable::clientRoot(void) const
