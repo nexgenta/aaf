@@ -77,10 +77,10 @@ public:
 		 // @parm [in] Length of the buffer to hold the Manufacturers name
 		 aafInt32  buflen);
   //****************
-  // GetManufacturerNameLen()
+  // GetTapeManBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetManufacturerNameLen
+    GetTapeManBufLen
 		// @parm [out] Manufacturers Name length
         (aafInt32 *  pLen);
   //****************
@@ -101,10 +101,10 @@ public:
 		 // @parm [in] Length of the buffer to hold the Manufacturers Brand name
 		 aafInt32  buflen);
   //****************
-  // GetTapeModelLen()
+  // GetTapeModelBufLen()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTapeModelLen
+    GetTapeModelBufLen
 		// @parm [out] Model length
         (aafInt32 *  pLen);
 
@@ -179,6 +179,13 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFTapeDescriptorTest.cpp.
   static AAFRESULT test();
+
+  virtual AAFRESULT	STDMETHODCALLTYPE
+		GetOwningMobKind (aafMobKind_t *pMobKind);
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
 
 	// Persistent properties
 private:
