@@ -14,6 +14,7 @@
 #include "ImplAAFNetworkLocator.h"
 #endif
 
+#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
 #include "AAFResult.h"
@@ -22,7 +23,7 @@
 
 
 ImplAAFNetworkLocator::ImplAAFNetworkLocator ()
-: _path(PID_NETWORKLOCATOR_URLSTRING, "URLString")
+: _path(PID_NetworkLocator_URLString, "URL String")
 {
   _persistentProperties.put(_path.address());
   _path = L"";
@@ -89,19 +90,5 @@ ImplAAFNetworkLocator::SetPath (aafWChar *  pPathBuf)
 }
 
 
-extern "C" const aafClassID_t CLSID_AAFNetworkLocator;
 
-OMDEFINE_STORABLE(ImplAAFNetworkLocator, CLSID_AAFNetworkLocator);
-
-// Cheat!  We're using this object's CLSID instead of object class...
-AAFRESULT STDMETHODCALLTYPE
-ImplAAFNetworkLocator::GetObjectClass(aafUID_t * pClass)
-{
-  if (! pClass)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  memcpy (pClass, &CLSID_AAFNetworkLocator, sizeof (aafClassID_t));
-  return AAFRESULT_SUCCESS;
-}
-
+OMDEFINE_STORABLE(ImplAAFNetworkLocator, AUID_AAFNetworkLocator);
