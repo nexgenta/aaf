@@ -378,7 +378,7 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::appendValue(
 
   PRECONDITION("Valid object", object != 0);
 
-  setValueAt(object, count());
+  insertAt(object, count());
 
 }
 
@@ -719,9 +719,9 @@ bool OMStrongReferenceVectorProperty<ReferencedObject>::isVoid(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
 template <typename ReferencedObject>
-void OMStrongReferenceVectorProperty<ReferencedObject>::remove(void)
+void OMStrongReferenceVectorProperty<ReferencedObject>::removeProperty(void)
 {
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::remove");
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeProperty");
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
   PRECONDITION("Property is void", isVoid());
@@ -797,12 +797,16 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
 
-  size_t count = size / sizeof(ReferencedObject*);
+  size_t elementCount = size / sizeof(ReferencedObject*);
   ReferencedObject** p = (ReferencedObject**)bits;
 
-  for (size_t i = 0; i < count; i++) {
+  for (size_t i = 0; i < elementCount; i++) {
     ReferencedObject* object = p[i];
-    setValueAt(object, i);
+    if (i < count()) {
+      setValueAt(object, i);
+    } else {
+      appendValue(object);
+    }
   }
 
 }
@@ -815,10 +819,10 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::setBits(
   //   @parm The <c OMObject> to insert.
 template <typename ReferencedObject>
 void
-OMStrongReferenceVectorProperty<ReferencedObject>::insert(
+OMStrongReferenceVectorProperty<ReferencedObject>::insertObject(
                                                         const OMObject* object)
 {
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insert");
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::insertObject");
 
   PRECONDITION("Valid object", object != 0);
 
@@ -838,10 +842,10 @@ OMStrongReferenceVectorProperty<ReferencedObject>::insert(
   //   @this const
 template <typename ReferencedObject>
 bool
-OMStrongReferenceVectorProperty<ReferencedObject>::containsValue(
+OMStrongReferenceVectorProperty<ReferencedObject>::containsObject(
                                                   const OMObject* object) const
 {
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::containsValue");
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::containsObject");
 
   PRECONDITION("Valid object", object != 0);
 
@@ -859,10 +863,10 @@ OMStrongReferenceVectorProperty<ReferencedObject>::containsValue(
   //   @parm The <c OMObject> to remove.
 template <typename ReferencedObject>
 void
-OMStrongReferenceVectorProperty<ReferencedObject>::removeValue(
+OMStrongReferenceVectorProperty<ReferencedObject>::removeObject(
                                                         const OMObject* object)
 {
-  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeValue");
+  TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::removeObject");
 
   PRECONDITION("Valid object", object != 0);
 
