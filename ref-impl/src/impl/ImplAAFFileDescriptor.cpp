@@ -38,11 +38,15 @@
 #include <assert.h>
 #include "AAFResult.h"
 
+// Declare these two functions to avoid including the whole ImplAAFDictionary.h
+aafBoolean_t aafLookupCodecDef( ImplAAFObject *, ImplAAFCodecDef *p_codecdef );
+aafBoolean_t aafLookupContainerDef( ImplAAFObject *,ImplAAFContainerDef * );
+
 ImplAAFFileDescriptor::ImplAAFFileDescriptor ()
-: _sampleRate(			PID_FileDescriptor_SampleRate,		"SampleRate"),
- _length(				PID_FileDescriptor_Length,			"Length"),
- _codecDef(				PID_FileDescriptor_CodecDefinition,		"CodecDefinition", "/Dictionary/CodecDefinitions", PID_DefinitionObject_Identification),
- _containerFmt(         PID_FileDescriptor_ContainerFormat,	"ContainerFormat", "/Dictionary/ContainerDefinitions", PID_DefinitionObject_Identification)
+: _sampleRate(			PID_FileDescriptor_SampleRate,		L"SampleRate"),
+ _length(				PID_FileDescriptor_Length,			L"Length"),
+ _codecDef(				PID_FileDescriptor_CodecDefinition,		L"CodecDefinition", L"/Header/Dictionary/CodecDefinitions", PID_DefinitionObject_Identification),
+ _containerFmt(         PID_FileDescriptor_ContainerFormat,	L"ContainerFormat", L"/Header/Dictionary/ContainerDefinitions", PID_DefinitionObject_Identification)
 {
   _persistentProperties.put(_sampleRate.address());
   _persistentProperties.put(_length.address());
@@ -85,7 +89,14 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::SetCodecDef (ImplAAFCodecDef *pDef)
 {
-	_codecDef = pDef;
+  if (! pDef)
+    return AAFRESULT_NULL_PARAM;
+  if (!pDef->attached())
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
+  if (!aafLookupCodecDef( this, pDef ) )
+    return AAFRESULT_INVALID_OBJ;
+
+  _codecDef = pDef;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -97,6 +108,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return(AAFRESULT_NULL_PARAM);
 	*ppDef = _codecDef;
 	assert (*ppDef);
+  if (*ppDef)
 	 (*ppDef)->AcquireReference ();
 	return AAFRESULT_SUCCESS;
 }
@@ -123,6 +135,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFFileDescriptor::SetContainerFormat (ImplAAFContainerDef *pDef)
 {
+	if( pDef == NULL )
+		return AAFRESULT_NULL_PARAM;
+	if( !aafLookupContainerDef( this, pDef ) )
+		return AAFRESULT_INVALID_OBJ;
+
 	_containerFmt = pDef;
 	return AAFRESULT_SUCCESS;
 }

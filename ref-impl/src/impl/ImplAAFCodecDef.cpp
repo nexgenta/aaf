@@ -152,6 +152,10 @@ AAFRESULT STDMETHODCALLTYPE
 	if (! pEssenceKind)
 	  return AAFRESULT_NULL_PARAM;
 
+	// Check if given data definition is in the dict.
+	if( !aafLookupDataDef( this, pEssenceKind ) )
+	    return AAFRESULT_INVALID_OBJ;
+
 	_dataDefs.appendValue(pEssenceKind);
 
 	return AAFRESULT_SUCCESS;
@@ -281,6 +285,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_OBJECT_NOT_ATTACHED;
 	}
+	else if (!aafLookupClassDef( this, pClass ) )
+	{
+	    return AAFRESULT_INVALID_OBJ;
+	}
 	else
 	{
 		_fileDescClass = pClass;
@@ -375,7 +383,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	

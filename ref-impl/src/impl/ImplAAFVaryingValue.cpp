@@ -57,9 +57,6 @@ ImplAAFVaryingValue::ImplAAFVaryingValue ()
 : _controlPoints(         PID_VaryingValue_PointList,          L"PointList"),
   _interpolation(         PID_VaryingValue_Interpolation,      L"Interpolation", L"/Header/Dictionary/InterpolationDefinitions", PID_DefinitionObject_Identification)
 {
-	  aafReferenceType_t	ref = kAAFRefLimitMinimum;
-	 aafInt32				zero = 0;
-	 
 	  _persistentProperties.put(_controlPoints.address());
 	  _persistentProperties.put(_interpolation.address());
 }
@@ -68,10 +65,10 @@ ImplAAFVaryingValue::ImplAAFVaryingValue ()
 ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 {
 	// Release all of the locator pointers.
-	size_t size = _controlPoints.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _controlPoints.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFControlPoint *pControl = _controlPoints.setValueAt(0, i);
+		ImplAAFControlPoint *pControl = _controlPoints.clearValueAt(i);
 		if (pControl)
 		{
 		  pControl->ReleaseReference();
@@ -138,7 +135,6 @@ AAFRESULT STDMETHODCALLTYPE
 		  controlPointsType->ReleaseReference();
 		if (parameterType)
 		  parameterType->ReleaseReference();
-		return(XCODE());
 	}
 	XEND;
 
@@ -155,8 +151,12 @@ AAFRESULT STDMETHODCALLTYPE
 		
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_controlPoints));
-		CHECK(theEnum->Reset());
+		OMStrongReferenceVectorIterator<ImplAAFControlPoint>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFControlPoint>(_controlPoints);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFControlPoints, this, iter));
+		
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -164,7 +164,6 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
-		return(XCODE());
 	}
 	XEND;
 	
@@ -178,7 +177,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if(! pResult) return(AAFRESULT_NULL_PARAM);
 
-  *pResult = _controlPoints.getSize();
+  *pResult = _controlPoints.count();
 
   return AAFRESULT_SUCCESS;
 }
@@ -193,13 +192,20 @@ AAFRESULT STDMETHODCALLTYPE
   if(! ppControlPoint) return(AAFRESULT_NULL_PARAM);
 
   aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountControlPoints (& count);
-  if (AAFRESULT_FAILED (hr)) return hr;
+  AAFRESULT ar;
+  ar = CountControlPoints (& count);
+  if (AAFRESULT_FAILED (ar)) return ar;
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  ImplAAFControlPoint *pPoint;
+  _controlPoints.getValueAt(pPoint,index);
+
+  assert(pPoint);
+  pPoint->AcquireReference();
+  (*ppControlPoint)=pPoint;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -235,6 +241,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pDef == NULL)
 		return AAFRESULT_NULL_PARAM;
+
+	// Check if given definition is in the dict.
+	if( !aafLookupInterpolationDef( this, pDef ) )
+		return AAFRESULT_INVALID_OBJ;
 
 	_interpolation = pDef;
 

@@ -84,8 +84,6 @@ extern "C" const aafClassID_t CLSID_AAFSegment;
 extern "C" const aafClassID_t CLSID_EnumAAFParameters;
 
 
-const aafUID_t kNullID = {0};
-
 ImplAAFOperationGroup::ImplAAFOperationGroup ()
 : _operationDefinition( PID_OperationGroup_OperationDefinition, L"OperationDefinition", L"/Header/Dictionary/OperationDefinitions", PID_DefinitionObject_Identification),
   _inputSegments( PID_OperationGroup_InputSegments, L"InputSegments"),
@@ -104,10 +102,10 @@ ImplAAFOperationGroup::ImplAAFOperationGroup ()
 ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 {
 	// Release all of the mob slot pointers.
-	size_t size = _inputSegments.getSize();
-	for (size_t i = 0; i < size; i++)
+	size_t count = _inputSegments.count();
+	for (size_t i = 0; i < count; i++)
 	{
-		ImplAAFSegment *pSeg = _inputSegments.setValueAt(0, i);
+		ImplAAFSegment *pSeg = _inputSegments.clearValueAt(i);
 		if (pSeg)
 		{
 		  pSeg->ReleaseReference();
@@ -117,14 +115,14 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameter>parameters(_parameters);
 	while(++parameters)
 	{
-		ImplAAFParameter *pParm = parameters.setValue(0);
+		ImplAAFParameter *pParm = parameters.clearValue();
 		if (pParm)
 		{
 		  pParm->ReleaseReference();
 		  pParm = 0;
 		}
 	}
-	ImplAAFSourceReference *ref = _rendering.setValue(0);
+	ImplAAFSourceReference *ref = _rendering.clearValue();
 	if (ref)
 	{
 	  ref->ReleaseReference();
@@ -139,7 +137,7 @@ AAFRESULT STDMETHODCALLTYPE
                              ImplAAFOperationDef* pOperationDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
-	ImplAAFOperationDef*	pOldOperationDef = NULL;
+//	ImplAAFOperationDef*	pOldOperationDef = NULL;
 
 	if (pOperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -150,6 +148,10 @@ AAFRESULT STDMETHODCALLTYPE
   // Make sure objects are already attached (to the dictionary).
   if (!pDataDef->attached() || !pOperationDef->attached())
     return AAFRESULT_OBJECT_NOT_ATTACHED;
+
+  // Check if given definition is in the dict.
+  if( !aafLookupOperationDef( this, pOperationDef ) )
+    return AAFRESULT_INVALID_OBJ;
 
 	XPROTECT()
 	{
@@ -203,6 +205,10 @@ AAFRESULT STDMETHODCALLTYPE
   // Make sure object is already attached (to the dictionary).
   if (!OperationDef->attached())
     return AAFRESULT_OBJECT_NOT_ATTACHED;
+
+  // Check if given definition is in the dict.
+  if( !aafLookupOperationDef( this, OperationDef ) )
+    return AAFRESULT_INVALID_OBJ;
 
 	assert(_operationDefinition.isVoid());
 	_operationDefinition = OperationDef;
@@ -289,11 +295,10 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationGroup::CountSourceSegments (aafUInt32 *pNumSources)
 {
-   size_t numSlots;
-
 	if(pNumSources == NULL)
 		return AAFRESULT_NULL_PARAM;
-	_inputSegments.getSize(numSlots);
+
+	size_t numSlots = _inputSegments.count();
 	
 	*pNumSources = numSlots;
 
@@ -561,7 +566,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
