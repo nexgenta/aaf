@@ -26,45 +26,32 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-#ifndef OMOBJECTDIRECTORY_H
-#define OMOBJECTDIRECTORY_H
+#ifndef OMCONTAINER_H
+#define OMCONTAINER_H
 
-#include "OMPortability.h"
+#include <stddef.h>
 
-class OMStorable;
-
-class OMObjectDirectory {
+  // @class Abstract base class for collections of elements.
+  //   @tcarg class | Element | The type of an <c OMContainer> element.
+  //          This type must support = and ==.
+template <typename Element>
+class OMContainer {
 public:
+  // @access Public members.
 
-  // Create with space for `capacity' entries.
-  //
-  OMObjectDirectory(int capacity);
+    // @cmember Insert <p value> into this <c OMContainer>.
+  virtual void insert(const Element value) = 0;
 
-  ~OMObjectDirectory(void);
+    // @cmember Does this <c OMContainer> contain <p value> ?
+  virtual bool containsValue(const Element value) const = 0;
 
-  //
-  //
-  bool lookup(const char* name, const OMStorable*& p) const;
+    // @cmember The number of elements in this <c OMContainer>.
+    //          <mf OMContainer::count> returns the actual number
+    //          of elements in the <c OMContainer>.
+  virtual size_t count(void) const = 0;
 
-  //
-  //
-  void insert(const char* name, const OMStorable* p);
-
-  // Count of valid entries.
-  //
-  int count(void) const;
-
-  void dump(void) const;
-
-private:
-
-  struct TableEntry {
-    OMStorable* _object;
-  char* _name;
-  };
-  int _capacity;        // Number of potential entries.
-  int _current;         // Index of first unoccupied entry.
-  TableEntry* _table;   // Dynamically allocated array.
+    // @cmember Remove <p value> from this <c OMContainer>.
+  virtual void removeValue(const Element value) = 0;
 
 };
 

@@ -45,28 +45,28 @@ OMPropertyTable::~OMPropertyTable(void)
 
   size_t elements = _vector.count();
   for (size_t i = 0; i < elements; i++) {
-    OMPropertyId* p = _vector.valueAt(i);
+    char* p = _vector.valueAt(i);
     delete [] p;
   }
 }
 
-  // @mfunc If <p propertyPath> is not already present then insert
+  // @mfunc If <p propertyName> is not already present then insert
   //        it (by copying) into the table and return its tag,
   //        otherwise just return its tag. Tags are allocated
   //        sequentially.
-  //   @parm The property path to insert.
+  //   @parm The property name to insert.
   //   @rdesc The assigned index.
-OMPropertyTag OMPropertyTable::insert(const OMPropertyId* propertyPath)
+OMPropertyTag OMPropertyTable::insert(const char* propertyName)
 {
   TRACE("OMPropertyTable::insert");
 
-  PRECONDITION("Valid property path", validPropertyPath(propertyPath));
+  PRECONDITION("Valid property name", validString(propertyName));
 
   OMPropertyTag result;
   bool found = false;
   size_t elements = _vector.count();
   for (size_t i = 0; i < elements; i++) {
-    if (comparePropertyPath(_vector.valueAt(i), propertyPath) == 0) {
+    if (strcmp(_vector.valueAt(i), propertyName) == 0) {
      result = i;
      found = true;
      break;
@@ -74,7 +74,7 @@ OMPropertyTag OMPropertyTable::insert(const OMPropertyId* propertyPath)
   }
 
   if (!found) {
-    _vector.append(savePropertyPath(propertyPath));
+    _vector.append(saveString(propertyName));
     result = elements;
   }
 
@@ -82,11 +82,11 @@ OMPropertyTag OMPropertyTable::insert(const OMPropertyId* propertyPath)
   return result;
 }
 
-  // @mfunc The property path corresponding to <p tag> in the table.
+  // @mfunc The property name corresponding to <p tag> in the table.
   //   @parm The index.
-  //   @rdesc The property path.
+  //   @rdesc The property name.
   //   @this const
-const OMPropertyId* OMPropertyTable::valueAt(OMPropertyTag tag) const
+const char* OMPropertyTable::valueAt(OMPropertyTag tag) const
 {
   TRACE("OMPropertyTable::valueAt");
 

@@ -29,7 +29,6 @@
 #include "OMObjectDirectory.h"
 #include "OMAssertions.h"
 #include "OMPortability.h"
-#include "OMUtilities.h"
 
 #include <string.h>
 #include <iostream.h>
@@ -56,14 +55,14 @@ OMObjectDirectory::~OMObjectDirectory(void)
   _table = 0;
 }
 
-bool OMObjectDirectory::lookup(const wchar_t* name, const OMStorable*& p) const
+bool OMObjectDirectory::lookup(const char* name, const OMStorable*& p) const
 {
   TRACE("OMObjectDirectory::lookup");
-  PRECONDITION("Valid name to look up", validWideString(name));
+  PRECONDITION("Valid name to look up", validString(name));
   bool result = false;
-
+  
   for (int i = 0; i < _current; i++) {
-    int status = compareWideString(name, _table[i]._name);
+    int status = strcmp(name, _table[i]._name);
     if (status == 0) {
       result = true;
       p = _table[i]._object;
@@ -73,12 +72,14 @@ bool OMObjectDirectory::lookup(const wchar_t* name, const OMStorable*& p) const
   return result;
 }
 
-void OMObjectDirectory::insert(const wchar_t* name, const OMStorable* p)
+void OMObjectDirectory::insert(const char* name, const OMStorable* p)
 {
   TRACE("OMObjectDirectory::insert");
 
   if (_current < _capacity) {
-    wchar_t* n = saveWideString(name);
+    char* n = new char[strlen(name) + 1];
+    ASSERT("Valid heap pointer", n != 0);
+    strcpy(n , name);
     _table[_current]._object = const_cast<OMStorable *>(p);
     _table[_current]._name = n;
     _current++;
@@ -95,8 +96,6 @@ int OMObjectDirectory::count(void) const
 void OMObjectDirectory::dump(void) const
 {
   for (int i = 0; i < _current; i++) {
-    cout << i << " [" << _table[i]._object << "] \"";
-    printWideString(_table[i]._name);
-    cout << "\"" << endl;
+    cout << i << " [" << _table[i]._object << "] \"" << _table[i]._name << "\"" << endl;
   }
 }
