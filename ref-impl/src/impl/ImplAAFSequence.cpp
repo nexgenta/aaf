@@ -57,9 +57,9 @@ ImplAAFSequence::ImplAAFSequence ()
 
 ImplAAFSequence::~ImplAAFSequence ()
 {
-	size_t size = _components.getSize();
-	for (size_t i = 0; i < size; i++) {
-		ImplAAFComponent *pComp = _components.setValueAt(0, i);
+	size_t count = _components.count();
+	for (size_t i = 0; i < count; i++) {
+		ImplAAFComponent *pComp = _components.clearValueAt(i);
 
 		if (pComp) {
 		  pComp->ReleaseReference();
@@ -160,9 +160,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafLength_t		sequLen, cpntLen, prevLen;
 	ImplAAFDataDefSP sequDataDef, cpntDataDef;
 	aafBool			isPrevTran = kAAFFalse, willConvert;
-	aafErr_t		aafError = AAFRESULT_SUCCESS;
 	implCompType_t	type;
-	ImplAAFDictionary	*pDict = NULL;
 	AAFRESULT		status, sclpStatus;
 
 	if (pComponent == NULL)
@@ -215,7 +213,7 @@ AAFRESULT STDMETHODCALLTYPE
 			CHECK(sclpStatus);
 			// Get the previous component in the sequence to verify
 			// neighboring transitions and source clip lengths.
-			_components.getSize(numCpnts);
+			numCpnts = _components.count();
 			if (numCpnts)
 			{
 				ImplAAFComponent*	pPrevCpnt = NULL;
@@ -287,9 +285,16 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::PrependComponent (ImplAAFComponent* pComponent)
 {
-  if (! pComponent) return AAFRESULT_NULL_PARAM;
+  if(!pComponent)
+		return(AAFRESULT_NULL_PARAM);
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (pComponent->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+  _components.prependValue(pComponent);
+  pComponent->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -297,16 +302,23 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::InsertComponentAt (aafUInt32 index,
 										ImplAAFComponent* pComponent)
 {
-  if (! pComponent) return AAFRESULT_NULL_PARAM;
+  if (!pComponent) 
+    return AAFRESULT_NULL_PARAM;
+
+  if (pComponent->attached())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
   aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountComponents (&count);
-  if (AAFRESULT_FAILED (hr)) return hr;
+  AAFRESULT ar;
+  ar = CountComponents (&count);
+  if (AAFRESULT_FAILED (ar)) return ar;
   if (index > count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  _components.insertAt(pComponent,index);
+  pComponent->AcquireReference();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -314,16 +326,24 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::GetComponentAt (aafUInt32 index,
 									 ImplAAFComponent ** ppComponent)
 {
-  if (! ppComponent) return AAFRESULT_NULL_PARAM;
+  if (!ppComponent) 
+    return AAFRESULT_NULL_PARAM;
 
   aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountComponents (&count);
-  if (AAFRESULT_FAILED (hr)) return hr;
+  AAFRESULT ar;
+  ar = CountComponents (&count);
+  if (AAFRESULT_FAILED (ar)) return ar;
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+  ImplAAFComponent *pComponent;
+  _components.getValueAt(pComponent,index);
+
+  assert(pComponent);
+  pComponent->AcquireReference();
+  (*ppComponent)=pComponent;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -379,6 +399,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if (!_components.containsValue(pComponent))
 	  return AAFRESULT_BADINDEX;
 
+	if (!pComponent->attached())
+	  return AAFRESULT_OBJECT_NOT_ATTACHED;
+
 	_components.removeValue(pComponent);
 	pComponent->ReleaseReference();
 
@@ -411,9 +434,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pNumCpnts) return AAFRESULT_NULL_PARAM;
 
-	size_t	numCpnts;
-
-	_components.getSize(numCpnts);
+	size_t	numCpnts = _components.count();
 	*pNumCpnts = numCpnts;
 
 	return AAFRESULT_SUCCESS;
@@ -448,17 +469,33 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::GetComponents (ImplEnumAAFComponents ** ppEnum)
 {
-	if(ppEnum == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	*ppEnum = (ImplEnumAAFComponents *)CreateImpl(CLSID_EnumAAFComponents);
-	if(*ppEnum == NULL)
-		return(AAFRESULT_NOMEMORY);
-	(*ppEnum)->SetEnumStrongProperty(this, &_components);
+  if (NULL == ppEnum)
+	return AAFRESULT_NULL_PARAM;
+  *ppEnum = 0;
+	
+  ImplEnumAAFComponents *theEnum = (ImplEnumAAFComponents *)CreateImpl (CLSID_EnumAAFComponents);
+	
+  XPROTECT()
+	{
+		OMStrongReferenceVectorIterator<ImplAAFComponent>* iter = 
+			new OMStrongReferenceVectorIterator<ImplAAFComponent>(_components);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFComponents, this, iter));
+	  *ppEnum = theEnum;
+	}
+  XEXCEPT
+	{
+	  if (theEnum)
+		{
+		  theEnum->ReleaseReference();
+		  theEnum = 0;
+		}
+	}
+  XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
-
 
 
 //***********************************************************
@@ -567,7 +604,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 	segStart = 0;
 	CvtInt32toInt64(0, &junk);
 
-	_components.getSize(numCpnts);
+	numCpnts = _components.count();
 	for (index=0; index < numCpnts; index++)
 	{
 		ImplAAFSegment*	pSubSegment;
@@ -666,10 +703,9 @@ AAFRESULT
     ImplAAFSequence::GetNthComponent (aafUInt32 index, ImplAAFComponent** ppComponent)
 {
 	ImplAAFComponent*	obj;
-	size_t				numCpnts;
 	HRESULT				hr;
 
-	_components.getSize(numCpnts);
+	size_t numCpnts = _components.count();
 	if (index < numCpnts)
 	{
 		_components.getValueAt(obj, index);
@@ -715,10 +751,12 @@ AAFRESULT ImplAAFSequence::ChangeContainedReferences(aafMobID_constref from,
 AAFRESULT
     ImplAAFSequence::SetNthComponent (aafUInt32 index, ImplAAFComponent* pComponent)
 {
-	size_t				numCpnts;
 	HRESULT				hr;
 
-	_components.getSize(numCpnts);
+	if (pComponent->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
+	size_t numCpnts = _components.count();
 	if (index < numCpnts)
 	{
 		_components.setValueAt(pComponent, index);

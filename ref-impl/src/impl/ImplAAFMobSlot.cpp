@@ -93,14 +93,17 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMobSlot::SetSegment (ImplAAFSegment *value)
 {
+	if( value == NULL )
+	    return AAFRESULT_NULL_PARAM;
+
+	if( value->attached() )
+	    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+
 	if (_segment)
 	  _segment->ReleaseReference();
-	_segment = 0;
 
 	_segment = value;
-
-	if (value)
-		value->AcquireReference();
+	_segment->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
 }
@@ -261,7 +264,7 @@ AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
 }
 
 AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
-										aafRational_t destRate,
+										aafRational_t /*destRate*/,
 										aafPosition_t *convertPos)
 {
 	if(convertPos == NULL )
@@ -271,7 +274,7 @@ AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
 }
 
 AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
-										  ImplAAFMobSlot *srcSlot,
+										  ImplAAFMobSlot * /*srcSlot*/,
 										aafPosition_t *convertPos)
 {
 	if(convertPos == NULL )
