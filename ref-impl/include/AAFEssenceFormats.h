@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFEssenceFormats.h,v 1.12 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFEssenceFormats.h,v 1.13 2004/11/04 13:10:26 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -86,4 +86,4 @@ const aafUID_t kAAFCompressionQuality = { 0xc146bde1, 0x4c0d, 0x11d3, { 0xbf, 0x
 
 // kAAFLegacyDV is used as a boolean specifier to select whether the CDCI codec
 // should create properties needed by legacy applications
-const aafUID_t kAAFLegacyDV = { 0x6AEFC514, 0x9041, 0x11d2, { 0x80, 0x88, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+const aafUID_t kAAFLegacyDV = { 0xa7f3060f, 0x27df, 0x4769, { 0xa2, 0x52, 0x12, 0xa7, 0xd9, 0x46, 0x3e, 0xa2 } };
