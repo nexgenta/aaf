@@ -251,6 +251,10 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplAAFImageData.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplAAFInterpolationDef.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplAAFIntraFrameMarker.cpp"
 # End Source File
 # Begin Source File
@@ -547,15 +551,15 @@ SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFIdentifications.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFInterpolationDefs.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFLoadedPlugins.cpp"
 # End Source File
 # Begin Source File
 
 SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFLocators.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\..\ref-impl\src\impl\ImplEnumAAFMobComments.cpp"
 # End Source File
 # Begin Source File
 
