@@ -45,7 +45,7 @@ class ImplAAFDictionary;
 
 #include "AAFTypes.h"
 #include "OMStorable.h"
-#include "OMProperty.h"
+#include "OMFixedSizeProperty.h"
 #include "ImplAAFRoot.h"
 
 #ifndef __ImplAAFSmartPointer_h__
@@ -282,13 +282,6 @@ private:
   //
   // number of those props that are actually used
   aafUInt32 _savedPropsCount;
-  
-  aafBool	_isInitialized;
-
-
-protected:
-  aafBool isInitialized (void) const;
-  void    setInitialized (void);
 };
 
 //
