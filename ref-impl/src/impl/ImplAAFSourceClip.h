@@ -61,13 +61,13 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] Data Definition object
-		 ImplAAFDataDef * pDataDef,
+		 aafUID_t * pDatadef  ,
 
 		 // @parm [in] Length property value
-		 const aafLength_t & length,
+		 aafLength_t *     pLength   ,
 
 		 // @parm [in] Source Reference
-         const aafSourceRef_t & sourceRef);
+         aafSourceRef_t   sourceRef);
 
   //****************
   // GetFade()
