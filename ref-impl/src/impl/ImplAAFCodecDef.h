@@ -21,13 +21,12 @@ class ImplEnumAAFCodecFlavours;
 
 
 
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
+#ifndef __ImplAAFPluggableDef_h__
+#include "ImplAAFPluggableDef.h"
 #endif
 
-#include "ImplEnumAAFDataDefs.h"
 
-class ImplAAFCodecDef : public ImplAAFDefObject
+class ImplAAFCodecDef : public ImplAAFPluggableDef
 {
 public:
   //
@@ -48,7 +47,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     IsEssenceKindSupported
         (// @parm [in,ref] The essence kind
-         aafUID_t *pEssenceKind,
+         aafUID_t *  pEssenceKind,
 
          // @parm [out,retval] Is this type supported
          aafBool*  pIsSupported);
@@ -99,15 +98,6 @@ public:
         (ImplEnumAAFCodecFlavours ** ppEnum);
   
 
-public:
-	// SDK-private
-  //****************
-  // GetParameterDefinitions()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetDataDefinitions
-        // @parm [out,retval] Parameter definition enumeration
-        (ImplEnumAAFDataDefs ** ppEnum);
 
 public:
   // Declare this class to be storable.
@@ -117,8 +107,6 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFCodecDefTest.cpp.
   static AAFRESULT test();
-private:
-	DataDefWeakRefArrayProp_t						_dataDefs;
 };
 
 #endif // ! __ImplAAFCodecDef_h__
