@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionWritePlugin.cpp,v 1.15 2004/10/27 14:07:15 stuart_hc Exp $ $Name:  $
+// $Id: extensionWritePlugin.cpp,v 1.16 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,7 @@
 #include "AAFPlugin.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFTypeDefUIDs.h"
+#include "AAFFileKinds.h"
 
 #include "extensionUtils.h"
 #include "extensionWritePlugin.h"
@@ -173,7 +174,8 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
     ProductInfo.productID = NULL_UID;
     ProductInfo.platform = 0;
   
-    check (AAFFileOpenNewModify ((aafCharacter*) filename,
+    check (AAFFileOpenNewModifyEx ((aafCharacter*) filename,
+							     &kAAFFileKind_Aaf4KBinary,
 							     0,
 							     &ProductInfo,
 							     &pFile));

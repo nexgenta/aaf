@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CreateSequence.cpp,v 1.47 2004/10/27 14:07:21 stuart_hc Exp $ $Name:  $
+// $Id: CreateSequence.cpp,v 1.48 2004/11/03 12:57:31 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -194,7 +194,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, long int N)
 #if USE_MEMORY_FILE
   check(MemoryFileOpenNewModify (0, &ProductInfo, &pFile));
 #else
-  check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
+  check(AAFFileOpenNewModifyEx (pFileName, &kAAFFileKind_Aaf4KBinary, 0, &ProductInfo, &pFile));
 #endif
 
   check(pFile->GetHeader(&pHeader));

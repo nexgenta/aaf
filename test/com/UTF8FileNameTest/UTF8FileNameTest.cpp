@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: UTF8FileNameTest.cpp,v 1.9 2004/11/02 16:03:21 phil_tudor Exp $ $Name:  $
+// $Id: UTF8FileNameTest.cpp,v 1.10 2004/11/03 12:57:32 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -124,8 +124,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName,
 
 		if( !UseRaw )
 		{
-			checkResult(AAFFileOpenNewModify(
+			checkResult(AAFFileOpenNewModifyEx(
 				pFileName,
+				pFileKind,
 				0,
 				&ProductInfo,
 				ppFile));

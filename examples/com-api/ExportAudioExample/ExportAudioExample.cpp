@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportAudioExample.cpp,v 1.17 2004/10/22 15:23:20 phil_tudor Exp $ $Name:  $
+// $Id: ExportAudioExample.cpp,v 1.18 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,7 @@
 #include "AAFContainerDefs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
+#include "AAFFileKinds.h"
 
 // Include the AAF interface declarations.
 #include "AAF.h"
@@ -175,7 +176,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
 
 	/* Create a new AAF file */
 
-	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
+	check(AAFFileOpenNewModifyEx (pFileName, &kAAFFileKind_Aaf4KBinary, 0, &ProductInfo, &pFile));
 	check(pFile->GetHeader(&pHeader));
 	
 	/* Get the AAF Dictionary from the file */

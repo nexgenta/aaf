@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFile
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.41 2004/11/02 16:03:21 phil_tudor Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.42 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -130,7 +130,7 @@ static HRESULT checkModeFlags ()
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 
-  temphr = checkModeFlag (AAF_FILE_MODE_USE_SMALL_SS_SECTORS,
+  temphr = checkModeFlag (AAF_FILE_MODE_USE_LARGE_SS_SECTORS,
 						  AAFRESULT_NOT_IN_CURRENT_VERSION);
   if (AAFRESULT_FAILED (temphr)) return temphr;
 

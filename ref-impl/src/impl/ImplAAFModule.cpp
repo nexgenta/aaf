@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.31 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.32 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -184,10 +184,10 @@ STDAPI ImplAAFFileOpenExistingRead (
   if (AAFRESULT_SUCCEEDED (hr))
 	{
 	  const aafUID_t* pFileKind;
-	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &kAAFFileKind_Aaf512Binary;
-      else
+	  if (modeFlags & AAF_FILE_MODE_USE_LARGE_SS_SECTORS)
 	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
+    else
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
@@ -357,10 +357,10 @@ STDAPI ImplAAFFileOpenExistingModify (
   if (AAFRESULT_SUCCEEDED (hr))
 	{
 	  const aafUID_t* pFileKind;
-	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &kAAFFileKind_Aaf512Binary;
-      else
+	  if (modeFlags & AAF_FILE_MODE_USE_LARGE_SS_SECTORS)
 	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
+		else
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
@@ -516,10 +516,10 @@ STDAPI ImplAAFFileOpenNewModify (
   if (AAFRESULT_SUCCEEDED (hr))
 	{
 	  const aafUID_t* pFileKind;
-	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &kAAFFileKind_Aaf512Binary;
-      else
+	  if (modeFlags & AAF_FILE_MODE_USE_LARGE_SS_SECTORS)
 	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
+		else
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
@@ -702,10 +702,10 @@ STDAPI ImplAAFFileOpenTransient (
   if (AAFRESULT_SUCCEEDED (hr))
 	{
 	  const aafUID_t* pFileKind;
-	  if (modeFlags & AAF_FILE_MODE_USE_SMALL_SS_SECTORS)
-	  	pFileKind = &kAAFFileKind_Aaf512Binary;
-      else
+	  if (modeFlags & AAF_FILE_MODE_USE_LARGE_SS_SECTORS)
 	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
+		else
+	  	pFileKind = &kAAFFileKind_Aaf512Binary;
 
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,

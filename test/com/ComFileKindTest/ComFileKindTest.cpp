@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.24 2004/11/02 16:03:21 phil_tudor Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.25 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -303,7 +303,7 @@ static HRESULT OpenAAFFile(const aafUID_t *written_kind, aafWChar * pFileName)
 						filekind[j].kind == &kAAFFileKind_AafS512Binary ||
 						filekind[j].kind == &kAAFFileKind_AafM512Binary ||
 						filekind[j].kind == &kAAFFileKind_AafG512Binary) &&
-							(written_kind == NULL ||	// NULL (meaning NM default) is 4K
+							(
 							written_kind == &kAAFFileKind_Aaf4KBinary ||
 							written_kind == &kAAFFileKind_AafS4KBinary ||
 							written_kind == &kAAFFileKind_AafM4KBinary ||
@@ -316,7 +316,7 @@ static HRESULT OpenAAFFile(const aafUID_t *written_kind, aafWChar * pFileName)
 						filekind[j].kind == &kAAFFileKind_AafS4KBinary ||
 						filekind[j].kind == &kAAFFileKind_AafM4KBinary ||
 						filekind[j].kind == &kAAFFileKind_AafG4KBinary) &&
-							(
+							(written_kind == NULL ||	// NULL (meaning NM default) is 512
 							written_kind == &kAAFFileKind_Aaf512Binary ||
 							written_kind == &kAAFFileKind_AafS512Binary ||
 							written_kind == &kAAFFileKind_AafM512Binary ||

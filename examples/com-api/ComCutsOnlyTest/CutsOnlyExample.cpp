@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFDefinitionObject
 //=---------------------------------------------------------------------=
 //
-// $Id: CutsOnlyExample.cpp,v 1.49 2004/10/28 17:12:22 stuart_hc Exp $ $Name:  $
+// $Id: CutsOnlyExample.cpp,v 1.50 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
+#include "AAFFileKinds.h"
 
 // Include the AAF interface declarations.
 #include "AAF.h"
@@ -213,7 +214,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;
 
-	check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
+	check(AAFFileOpenNewModifyEx (pFileName, &kAAFFileKind_Aaf4KBinary, 0, &ProductInfo, &pFile));
 
 	check(pFile->GetHeader(&pHeader));
 

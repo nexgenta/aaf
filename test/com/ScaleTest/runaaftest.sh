@@ -1,7 +1,7 @@
 #!/bin/sh
 ###############################################################################
 #
-# $Id: runaaftest.sh,v 1.4 2004/09/10 17:13:13 stuart_hc Exp $ $Name:  $
+# $Id: runaaftest.sh,v 1.5 2004/11/03 12:57:32 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -49,9 +49,9 @@ runtest()
 	eli2aaf)
 		if [ $arg == "-netloc" ]
 		then
-			cmd="$exename $arg $i512bflag $AAF_DATA_DIR/$numEss.eli $numEss$ext.aaf"
+			cmd="$exename $arg $i4kflag $AAF_DATA_DIR/$numEss.eli $numEss$ext.aaf"
 		else
-			cmd="$exename $i512bflag $AAF_DATA_DIR/$numEss.eli $numEss.aaf"
+			cmd="$exename $i4kflag $AAF_DATA_DIR/$numEss.eli $numEss.aaf"
 		fi
 		;;
 	InfoDumper)
@@ -155,14 +155,14 @@ AAF_DATA_DIR=$BASEDIR/aaftestdata  #where the data resides
 if [ -z "$*" ] ; then
 	echo "Usage: $0 operation_list maxcuts"
 	echo "    operation_list  is a space separated list of read|write|bigfile"
-	echo "    512b              set for 512 byte sectors"
+	echo "    4k              set for 4k sectors"
 	echo "    maxcuts         is the maximum number of essence elements"
 	exit 1
 fi
 
 # parse arguments
 maxcuts=1000000
-i512bflag=""
+i4kflag=""
 for arg in $*
 do
 	if [ $arg == "read" ] ; then
@@ -171,8 +171,8 @@ do
 		writeFile=1
 	elif [ $arg == "bigfile" ] ; then
 		bigFile=1
-	elif [ $arg == "512b" ] ; then
-		i512bflag="-smallSectors"
+	elif [ $arg == "4k" ] ; then
+		i4kflag="-largeSectors"
 	else
 		maxcuts=$arg
 	fi

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MetadataExample.cpp,v 1.13 2004/10/28 17:12:26 stuart_hc Exp $ $Name:  $
+// $Id: MetadataExample.cpp,v 1.14 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,6 +38,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyDefs.h"
 #include "AAFTypeDefUIDs.h"
+#include "AAFFileKinds.h"
 
 // Include the AAF interface declarations.
 #include "AAF.h"
@@ -237,7 +238,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, testDataFile_t *dataFile, tes
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
 
-  check(AAFFileOpenNewModify (pFileName, 0, &ProductInfo, &pFile));
+  check(AAFFileOpenNewModifyEx (pFileName, &kAAFFileKind_Aaf4KBinary, 0, &ProductInfo, &pFile));
   check(pFile->GetHeader(&pHeader));
 
   // test

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFFileMode.h,v 1.7 2004/09/10 17:12:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFFileMode.h,v 1.8 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -91,18 +91,18 @@
 
 // Unpublished mode flags
 
-// Control of use of sector size mode in Structured Storage
+// Control of use of large sector size mode in Structured Storage
 // The following applies to:
 //
-// - When set, the bit signifies that 512-byte sector size mode will be
-//   used in Structured Storage.
-// - When clear (the default), 4k-sized sectors will be used in
-//   Structured Storage.
+// - When set, the bit signifies that large sector size mode will be
+//   used in Structured Storage (ie. 4K sectors).
+// - When clear (the default), normal-sized sectors will be used in
+//   Structured Storage (ie. 512 byte sectors).
 //
 // - AAFFileOpenExistingModify()
 // - AAFFileOpenExistingWrite()
 // - IAAFFile::SaveAs()
-#define AAF_FILE_MODE_USE_SMALL_SS_SECTORS    (1 << 28)
+#define AAF_FILE_MODE_USE_LARGE_SS_SECTORS    (1 << 28)
 
 // Indicates if Close() should fail when there are dirty objects
 //

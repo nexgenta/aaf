@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: propaccess.cpp,v 1.24 2004/10/28 17:12:24 stuart_hc Exp $ $Name:  $
+// $Id: propaccess.cpp,v 1.25 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 
 #include "AAF.h"
 #include "AAFFileMode.h"
+#include "AAFFileKinds.h"
 
 
 #include "CAAFBuiltinDefs.h"
@@ -610,7 +611,7 @@ static void CreateAAFFile(aafWChar * pFileName,
   ProductInfo.platform = NULL;
   
   IAAFFileSP spFile;
-  check (AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &spFile));
+  check (AAFFileOpenNewModifyEx(pFileName, &kAAFFileKind_Aaf4KBinary, 0, &ProductInfo, &spFile));
   
   IAAFHeaderSP spHeader;
   check (spFile->GetHeader(&spHeader));

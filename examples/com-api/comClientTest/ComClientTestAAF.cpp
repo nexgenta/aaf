@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComClientTestAAF.cpp,v 1.56 2004/10/28 17:12:27 stuart_hc Exp $ $Name:  $
+// $Id: ComClientTestAAF.cpp,v 1.57 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
+#include "AAFFileKinds.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -434,7 +435,7 @@ static void CreateAAFFile(aafWChar * pFileName)
   ProductInfo.productID = NIL_UID;
   ProductInfo.platform = NULL;
   
-  check(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
+  check(AAFFileOpenNewModifyEx(pFileName, &kAAFFileKind_Aaf4KBinary, 0, &ProductInfo, &pFile));
   check(pFile->GetHeader(&pHeader));
 
   // Get the AAF Dictionary so that we can create valid AAF objects.
