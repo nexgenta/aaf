@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFDefinitionObject
 //=---------------------------------------------------------------------=
 //
-// $Id: CutsOnlyExample.cpp,v 1.50 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
+// $Id: CutsOnlyExample.cpp,v 1.51 2004/12/23 13:50:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,17 +43,6 @@
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
 
-
-// There are differences in the microsoft and other compilers in the "Length" specifier
-// used in printf for 64bit integers.
-//
-// NOTE: If your compiler does not support 64 bit integers then this example will NOT
-// print out the correct lengths.
-#if defined( COMPILER_MSC )
-#define L64 "I64"
-#else
-#define L64 "ll"
-#endif
 
 // 060c2b340205110101041000-13-00-00-00-041a3300932f0004060e2b347f7f2a80
 static const aafMobID_t kATapeMobID = 
@@ -782,7 +771,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 					if(AAFRESULT_SUCCESS == hr)
 					{
 						printf("    Found source clip on slot\n");
-						printf("        It has length %" L64 "d\n", length);
+						printf("        It has length %"AAFFMT64"d\n", length);
 
 						hr = pSourceClip->ResolveRef(&pReferencedMob);
 						if(hr == AAFRESULT_SUCCESS)
@@ -812,7 +801,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 							check(pSequence->CountComponents (&numComponents));
 							printf("    Found Sequence on slot with %d components\n",
 								numComponents);
-							printf("        It has length %" L64 "d\n", length);
+							printf("        It has length %"AAFFMT64"d\n", length);
 							check(pSequence->GetComponents (&pCompIter));
 							while (pCompIter && AAFRESULT_SUCCESS == pCompIter->NextOne(&pComponent))
 							{
@@ -824,7 +813,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 									aafSourceRef_t		ref;
 
 									check(pSourceClip->GetSourceReference (&ref));
-									printf("        %d) A length %" L64 "d source clip\n", item, length);
+									printf("        %d) A length %"AAFFMT64"d source clip\n", item, length);
 									check(pSourceClip->ResolveRef(&pReferencedMob));
 									check(pReferencedMob->GetMobID(&mobID));
 									check(pReferencedMob->GetName (bufW, sizeof(bufW)));
@@ -855,7 +844,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 								hr = pComponent->QueryInterface(IID_IAAFFiller, (void **) &pFiller);
 								if(AAFRESULT_SUCCESS == hr)
 								{
-									printf("        %d) A length %" L64 "d filler\n", item, length);
+									printf("        %d) A length %"AAFFMT64"d filler\n", item, length);
 
 									pFiller->Release();
 									pFiller = NULL;

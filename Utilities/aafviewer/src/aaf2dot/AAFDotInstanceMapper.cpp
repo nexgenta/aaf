@@ -1,6 +1,6 @@
 
 /*
- * $Id: AAFDotInstanceMapper.cpp,v 1.13 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.cpp,v 1.14 2004/12/23 13:50:28 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -41,14 +41,6 @@ using namespace std;
 #include <MapperSettings.h>
 #include <Utilities.h>
 #include <Logging.h>
-
-#ifdef _MSC_VER
-// For printf MSVC gives unpredictable behaviour for the %ll conversion
-// specifier so use the MSVC specific conversion specifier %I64.
-#define INT64FMT "I64"
-#else
-#define INT64FMT "ll"		// ISO C99
-#endif
 
 
 //-----------------------------------------------------------------------------
@@ -1199,15 +1191,15 @@ AAFDotInstanceMapper::GetIntValue( AxTypeDefInt &axTypeDefInt, AxPropertyValue a
       case 8:
 	 if (axTypeDefInt.IsSigned()) {
 	    if (displayHex) {
-	       strSize = sprintf(buffer, "0x%"INT64FMT"x", *((aafInt64*)bytes));
+	       strSize = sprintf(buffer, "0x%"AAFFMT64"x", *((aafInt64*)bytes));
 	    } else {
-	       strSize = sprintf(buffer, "%"INT64FMT"d", *((aafInt64*)bytes));
+	       strSize = sprintf(buffer, "%"AAFFMT64"d", *((aafInt64*)bytes));
 	    }
 	 } else {
 	    if (displayHex) {
-	       strSize = sprintf(buffer, "0x%"INT64FMT"x", *((aafUInt64*)bytes));
+	       strSize = sprintf(buffer, "0x%"AAFFMT64"x", *((aafUInt64*)bytes));
 	    } else {
-	       strSize = sprintf(buffer, "%"INT64FMT"u", *((aafUInt64*)bytes));
+	       strSize = sprintf(buffer, "%"AAFFMT64"u", *((aafUInt64*)bytes));
 	    }
 	 }
 	 break;

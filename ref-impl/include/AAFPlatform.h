@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFPlatform.h,v 1.11 2004/11/04 18:28:15 stuart_hc Exp $ $Name:  $
+// $Id: AAFPlatform.h,v 1.12 2004/12/23 13:50:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -256,8 +256,8 @@ typedef aafInt64_t              aafUInt64;
 /*
  *  AAFCONSTINT64() AAFCONSTUINT64()
  *
- *  Some compilers require 64-bit integer constants to have a suffix letter
- *  indicating its type. In case of g++ it looks like this: 
+ *  POSIX compilers require 64-bit integer constants to have a suffix letter
+ *  indicating its width. In case of g++ it looks like this: 
  *    0xFFFF1111FFFF1111LL
  *  Here is declaration of AAFCONSTINT64() and AAFCONSTUINT64(). Whenever
  *  64-bit constant appears in the code it should be inside this macro.
@@ -270,6 +270,21 @@ typedef aafInt64_t              aafUInt64;
 #define AAFCONSTINT64(i)	(i)
 #define AAFCONSTUINT64(i)	(i)
 
+#endif
+
+/*
+ *  printf-style formatting for 64bit integers
+ *
+ *  The POSIX standard does not specify a printf() length modifier for 64bit
+ *  integers.  Instead, experiment has revealed the following modifiers
+ *  work on their respective platforms.
+ */
+#if defined(_MSC_VER)
+#define AAFFMT64 "I64"
+#elif defined(__x86_64__)
+#define AAFFMT64 "l"
+#else			// all 32bit platforms using POSIX compilers
+#define AAFFMT64 "ll"
 #endif
 
 

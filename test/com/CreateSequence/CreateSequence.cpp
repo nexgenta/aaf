@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CreateSequence.cpp,v 1.49 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
+// $Id: CreateSequence.cpp,v 1.50 2004/12/23 13:50:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,17 +53,6 @@ STDAPI MemoryFileSaveToDisk(
 // Include the AAF Stored Object identifiers. These symbols are defined
 // in aaf.lib.
 #include "AAFStoredObjectIDs.h"
-
-// There are differences in the microsoft and other compilers in the
-// "Length" specifier used in printf for 64bit integers.
-//
-// NOTE: If your compiler does not support 64 bit integers then this
-// example will NOT print out the correct lengths.
-#if defined( COMPILER_MSC )
-#define L64 "I64"
-#else
-#define L64 "ll"
-#endif
 
 // MAX is used for arrays when converting between types - set here for
 // debugging.
