@@ -1,10 +1,3 @@
-#c/*************************************************\
-#c*													*
-#c* Advanced Authoring Format						*
-#c*													*
-#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
-#c*													*
-#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefExtEnum\
 #endm
@@ -19,22 +12,23 @@ AD_IDL(//
 // This interface is used to define field-extendible enumerated types
 // used in AAF persistent objects.  Enumerated types are assumed to be
 // based on AUIDs.
-AD_STD_COMMENT_IFC_HEADER)
+AD_STD_COMMENT_IFC_HEADER
+AD_STD_COMMENT_IFC_STUB)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 AD_CLASS_UUID(a5456f02, 0ef2, 11d3, 84, 2e, 00, 60, 08, 32, ac, b8)
 
 AD_DEFAULT_UUID(a5456f01, 0ef2, 11d3, 84, 2e, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD2(Initialize,
-			[in\, ref],
+			[in],
 			objPass,
-			aafUID_constref,
-			id,
+			aafUID_t *,
+			pID,
 			auid to be used to identify this type,
 
 			[in],
 			objPass,
-			aafCharacter_constptr,
+			wchar_t *,
 			pTypeName,
 			friendly name of this type definition,
 
@@ -51,7 +45,7 @@ AD_XMETHOD2(Initialize,
   // - pTypeName is a valid pointer.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pTypeName\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pID or pTypeName\)
   //
   // AAFRESULT_DUPLICATE
   //   - duplicate name or value is found.)
@@ -74,32 +68,38 @@ AD_XMETHOD1(CountElements,
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pCount\))
 
 
-AD_XMETHOD2(GetElementValue,
+AD_XMETHOD2(GetElementValues,
+			[out\, size_is\(numElems\)],
+			objPass,
+			aafUID_t *,
+			pValues,
+			array to hold values,
+
 			[in],
 			objPass,
 			aafUInt32,
-			index,
-			index of element to retrieve,
+			numElems,
+       number of elements in the pValues array,
 
-			[out],
-			objPass,
-			aafUID_t *,
-			pOutValue,
-			requested value,
-
-     Gets the indexed element in this enumerated type.  The
-  // value is written into the client-allocated *pOutValue.  Index
-  // must be less than the value returned by CountElements\(\).
+     Gets the values of all elements in this enumerated type.  The
+  // values are written into the client-allocated pValues array.  
+  //
+  // The number of elements in the pNames array is zero if it is NULL\,
+  // or is numElements otherwise.  If pNames is NULL\, no names will be
+  // written.  If pNames is not NULL\, it points to a user-allocated
+  // array of pointers to strings; each string pointer in that array
+  // points to memory allocated by the caller.  The required size of
+  // each string may be determined by calling
+  // GetElementNameLengths\(\).
+  //
+  // The number of elements in the pValues array is zero if it is
+  // NULL\, or is numElements otherwise. if pValues is NULL\, no values
+  // will be written.
   //
   // Succeeds if:
-  // - pOutValue is a valid pointer.
-  // - index is less than CountElements\(\).
+  // - pNameLengths is a valid pointer.
   AD_STD_COMMENT_METH_ERR_HEADER
-  AD_STD_COMMENT_METH_ERR_NO_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pOutValue\)
-  //
-  // AAFRESULT_BADINDEX
-  //   - index is not less than CountElements\(\).)
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
 
 
 AD_XMETHOD3(GetNameFromValue,
@@ -111,7 +111,7 @@ AD_XMETHOD3(GetNameFromValue,
 
 			[out\, size_is\(bufSize\)\, string],
 			objPass,
-			aafCharacter *,
+			wchar_t *,
 			pName,
 			buffer into which the element name is written,
 
@@ -183,15 +183,15 @@ AD_XMETHOD2(GetNameBufLenFromValue,
 
 
 AD_XMETHOD3(GetNameFromAUID,
-			[in\, ref],
+			[in],
 			objPass,
-			aafUID_constref,
-			value,
+			aafUID_t *,
+			pValue,
 			value of element to get,
 
 			[out\, size_is\(bufSize\)\, string],
 			objPass,
-			aafCharacter *,
+			wchar_t *,
 			pName,
 			buffer into which the element name is written,
 
@@ -210,6 +210,7 @@ AD_XMETHOD3(GetNameFromAUID,
   // required buffer size.
   // 
   // Succeeds if all of the following are true:
+  // - the pValue pointer is valid.
   // - the pName pointer is valid.
   // - bufSize indicates the buffer is large enough to hold the name.
   // - the integer value is associated with an element of this
@@ -218,7 +219,7 @@ AD_XMETHOD3(GetNameFromAUID,
   // If this method fails nothing will be written to
   // *pName.
   AD_STD_COMMENT_METH_ERR_HEADER
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pName\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pValue or pName\)
   //
   // AAFRESULT_SMALLBUF
   //   - bufSize indicates the buffer is too small to hold the string.
@@ -229,10 +230,10 @@ AD_XMETHOD3(GetNameFromAUID,
 
 
 AD_XMETHOD2(GetNameBufLenFromAUID,
-			[in\, ref],
+			[in],
 			objPass,
-			aafUID_constref,
-			value,
+			aafUID_t *,
+			pValue,
 			value of element to get,
 
 			[out],
@@ -247,13 +248,14 @@ AD_XMETHOD2(GetNameBufLenFromAUID,
   // trailing null character.
   //
   // Succeeds if all of the following are true:
+  // - the pValue pointer is valid.
   // - the pLen pointer is valid.
   // - the value is associated with an element of this enumerated
   //   type.
   //
   // If this method fails nothing will be written to *pLen.
   AD_STD_COMMENT_METH_ERR_HEADER
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pLen\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pValue or pLen\)
   //
   // AAFRESULT_BAD_PARAM
   //   - the given value is not associated with an element of this
@@ -291,20 +293,21 @@ AD_XMETHOD2(SetAUIDValue,
 			pPropValToSet,
 			property value to set,
 
-			[in\, ref],
+			[in],
 			objPass,
-			aafUID_constref,
-			valueIn,
+			aafUID_t *,
+			pValueIn,
 			new value of the enum represented by the given property value,
 
-     Sets the given property to the value given in valueIn.
+     Sets the given property to the value given in pValueIn.
   //
   // Succeeds if:
   // - The pPropValToSet pointer is valid.
+  // - The pValueIn pointer is valid.
   // - valueIn is a correct value for this enumerated type.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pPropValToSet\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pPropValToSet or pValueIn\)
   //
   // AAFRESULT_BAD_PARAM
   //   - valueIn is not a correct value for this enumerated type.
@@ -312,15 +315,15 @@ AD_XMETHOD2(SetAUIDValue,
 
 
 AD_XMETHOD2(AppendElement,
-			[in\, ref],
+			[in],
 			objPass,
-			aafUID_constref,
-			value,
+			aafUID_t *,
+			pValue,
 			value of appended element,
 
 			[in],
 			objPass,
-			aafCharacter_constptr,
+			wchar_t *,
 			pName,
 			name of appended element,
 
@@ -329,10 +332,11 @@ AD_XMETHOD2(AppendElement,
   // have elements with duplicate names or values.
   // 
   // Succeeds if:
+  // - The pValue pointer is valid.
   // - the pName pointer is valid.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pName\)
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pValue or pName\)
   //
   // AAFRESULT_DUPLICATE
   //   - duplicate name or value is found.)
