@@ -1,0 +1,47 @@
+#startm .this-module 0
+AAFDefObject\
+#endm
+#c
+#startm .parent-module 0
+AAFObject\
+#endm
+AD_HEAD
+
+
+AD_INCLUDE(AAFTypes)
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
+
+/*************************************************************************
+ * 
+ * @module AAFDefObject | AAFDefObject is an abstract class
+ *		  that defines an item to be referenced in the AAF file. 
+ *		  AAFDefObject specifies the AUID unique identifier.
+ *
+ * @base public | AAFObject
+ *
+ *************************************************************************/
+
+AD_CLASS_UUID(dfbd6528, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
+
+AD_DEFAULT_UUID(dfbd6527, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
+AD_CLASS_BEGIN
+
+
+AD_XMETHOD1(GetAUID,
+		   [retval\,out],
+		   objPass,
+		   aafUID_t *,
+		   pAuid,
+		   Pointer to an AUID reference,
+		   Gets the AUID for this object.)
+
+
+AD_CLASS_END
