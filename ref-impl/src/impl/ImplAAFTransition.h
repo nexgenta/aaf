@@ -1,7 +1,8 @@
 //@doc
-//@class    EnumAAFTypeDefs | Implementation class for EnumAAFTypeDefs
-#ifndef __ImplEnumAAFTypeDefs_h__
-#define __ImplEnumAAFTypeDefs_h__
+//@class    AAFTransition | Implementation class for AAFTransition
+#ifndef __ImplAAFTransition_h__
+#define __ImplAAFTransition_h__
+
 
 /***********************************************************************
  *
@@ -30,93 +31,95 @@
  *
  ************************************************************************/
 
-class ImplAAFTypeDef;
 
-#ifndef __ImplAAFObject_h__
-#include "ImplAAFObject.h"
+#ifndef __AAFTypes_h__
+#include "AAFTypes.h"
 #endif
 
 
-typedef OMVariableSizeProperty<aafUID_t> typeDefWeakRefArrayProp_t;
-typedef OMStrongReferenceVectorProperty<ImplAAFTypeDef> typeDefStrongRefArrayProp_t;
+class ImplAAFDataDef;
 
+#ifndef __ImplAAFComponent_h__
+#include "ImplAAFComponent.h"
+#endif
 
-class ImplEnumAAFTypeDefs : public ImplAAFRoot
+#ifndef __ImplAAFOperationGroup_h__
+#include "ImplAAFOperationGroup.h"
+#endif
+
+class ImplAAFTransition : public ImplAAFComponent
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplEnumAAFTypeDefs ();
+  ImplAAFTransition ();
 
 protected:
-  virtual ~ImplEnumAAFTypeDefs ();
+  virtual ~ImplAAFTransition ();
 
 public:
 
-
   //****************
-  // NextOne()
+  // Create()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    NextOne
-        // @parm [out,retval] The Next TypeDefinition
-        (ImplAAFTypeDef ** ppTypeDef);
+    Create
+        (// @parm [in] Data Definition Object
+         aafUID_t * pDatadef,
+
+		 // @parm [in] Length property value
+         aafLength_t  length,
+
+         // @parm [in] The point at which a cut would be inserted if the transition were removed
+         aafPosition_t  cutPoint,
+
+         // @parm [in] A reference to an OperationGroup object
+         ImplAAFOperationGroup * group);	 
 
   //****************
-  // Next()
+  // GetCutPoint()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Next
-        (// @parm [in] number of type definition definitions requested
-         aafUInt32  count,
-
-         // @parm [out, size_is(count), length_is(*pFetched)] array to receive type definition definitions
-         ImplAAFTypeDef ** ppTypeDefs,
-
-         // @parm [out,ref] number of actual TypeDefs fetched into ppTypeDefs array
-         aafUInt32 *  pFetched);
+    GetCutPoint
+        // @parm [out] Cut Point
+        (aafPosition_t *  cutPoint);
+	//@comm Replaces part of omfsTransitionGetInfo
 
   //****************
-  // Skip()
+  // GetEffect()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Skip
-        // @parm [in] Number of elements to skip
-        (aafUInt32  count);
+    GetOperationGroup
+        // @parm [out] Effect used by transition
+        (ImplAAFOperationGroup ** effObj);
+	//@comm Replaces part of omfsTransitionGetInfo
 
   //****************
-  // Reset()
+  // SetCutPoint()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Reset ();
-
+    SetCutPoint
+        // @parm [in] Cut Point
+        (aafPosition_t  cutPoint);
 
   //****************
-  // Clone()
+  // SetEffect()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    Clone
-        // @parm [out,retval] new enumeration
-        (ImplEnumAAFTypeDefs ** ppEnum);
+    SetOperationGroup
+        // @parm [in] Effect used by transition
+        (ImplAAFOperationGroup * group);
 
 
-
-public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumProperty( ImplAAFObject *pObj, typeDefWeakRefArrayProp_t *pProp);
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumStrongProperty( ImplAAFObject *pObj, typeDefStrongRefArrayProp_t *pProp);
 
 private:
-	aafUInt32						_current;
-	ImplAAFObject					*_enumObj;
-	typeDefWeakRefArrayProp_t		*_enumProp;
-	typeDefStrongRefArrayProp_t		*_enumStrongProp;
+	OMStrongReferenceProperty<ImplAAFOperationGroup>	_operationGroup;
+	OMFixedSizeProperty<aafPosition_t>					_cutPoint;
+
 };
 
-#endif // ! __ImplEnumAAFTypeDefs_h__
+#endif // ! __ImplAAFTransition_h__
 
 

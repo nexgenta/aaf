@@ -1,19 +1,9 @@
 //@doc
-//@class    EnumAAFSegments | Implementation class for EnumAAFSegments
-#ifndef __ImplEnumAAFSegments_h__
-#define __ImplEnumAAFSegments_h__
+//@class    EnumAAFLoadedPlugins | Implementation class for EnumAAFLoadedPlugins
+#ifndef __ImplEnumAAFLoadedPlugins_h__
+#define __ImplEnumAAFLoadedPlugins_h__
 
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
-
-/******************************************\
-*                                          *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -40,27 +30,29 @@
  * LIABILITY.
  *
  ************************************************************************/
-class ImplAAFSelector;
 
 
-#ifndef __ImplAAFObject_h__
-#include "ImplAAFObject.h"
+class ImplAAFPluginDescriptor;
+
+#ifndef __ImplAAFRoot_h__
+#include "ImplAAFRoot.h"
 #endif
 
-typedef OMStrongReferenceVectorProperty<ImplAAFSegment> SegmentStrongRefArrayProp_t;
+#include "aafTable.h"
 
+class ImplAAFPluginManager;
 
-class ImplEnumAAFSegments : public ImplAAFRoot
+class ImplEnumAAFLoadedPlugins : public ImplAAFRoot
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplEnumAAFSegments ();
+  ImplEnumAAFLoadedPlugins ();
 
 protected:
-  virtual ~ImplEnumAAFSegments ();
+  virtual ~ImplEnumAAFLoadedPlugins ();
 
 public:
 
@@ -70,21 +62,21 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     NextOne
-        // @parm [out,retval] The Next Segment
-        (ImplAAFSegment ** ppSegment);
+        // @parm [out,retval] The Next AAFPluginDescriptor
+        (ImplAAFPluginDescriptor ** ppAAFPluginDescriptor);
 
   //****************
   // Next()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     Next
-        (// @parm [in] number of segments requested
+        (// @parm [in] number of AAFPluginDescriptor requested
          aafUInt32  count,
 
-         // @parm [out, size_is(count), length_is(*pFetched)] array to receive segments
-         ImplAAFSegment ** ppSegments,
+         // @parm [out, size_is(count), length_is(*pFetched)] array to receive AAFPluginDescriptors
+         ImplAAFPluginDescriptor ** ppAAFPluginDesc,
 
-         // @parm [out,ref] number of actual Segments fetched into ppSegments array
+         // @parm [out,ref] number of actual AAFPluginDescriptor fetched into ppAAFPluginDesc array
          aafUInt32 *  pFetched);
 
   //****************
@@ -108,20 +100,20 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Clone
         // @parm [out,retval] new enumeration
-        (ImplEnumAAFSegments ** ppEnum);
+        (ImplEnumAAFLoadedPlugins ** ppEnum);
 
 
 public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetEnumStrongProperty( ImplAAFObject *pObj, SegmentStrongRefArrayProp_t *pProp);
+// Private to the SDK
+	virtual AAFRESULT SetCategory(aafUID_t *category);
 
 private:
-	aafUInt32					_current;
-	ImplAAFObject				*_enumObj;
-	SegmentStrongRefArrayProp_t	*_enumStrongProp;
+	aafUID_t				_category;
+	ImplAAFPluginManager	*_manager;
+	aafTableIterate_t		_tableIter;
+	aafBool					_isFirst;
 };
 
-#endif // ! __ImplEnumAAFSegments_h__
+#endif // ! __ImplEnumAAFLoadedPlugins_h__
 
 
