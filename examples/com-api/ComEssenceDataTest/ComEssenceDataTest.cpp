@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -18,9 +19,6 @@
 #include "AAFDefUIDS.h"
 #include "AAFDataDefs.h"
 #include "AAFOperationDefs.h"
-#include "AAFContainerDefs.h"
-#include "AAFCodecDefs.h"
-#include "AAFEssenceFormats.h"
 
 // Include the AAF interface declarations.
 #include "AAF.h"

@@ -4,6 +4,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -189,11 +190,7 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-
-	if(!_productVersion.isPresent())
-	{
-		return AAFRESULT_PROP_NOT_PRESENT;
-	}	
+	
 	*productVersion = _productVersion;
 	return AAFRESULT_SUCCESS;
 }
@@ -264,11 +261,6 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	}
 	
-	if(!_toolkitVersion.isPresent())
-	{
-		return AAFRESULT_PROP_NOT_PRESENT;
-	}
-
 	*productVersion = _toolkitVersion;
 
 	return AAFRESULT_SUCCESS;
@@ -279,42 +271,29 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetPlatform (aafWChar *  pPlatform,
 										aafUInt32 bufSize)
 {
-	if (! pPlatform)
+  bool stat;
+  if (! pPlatform)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
-	
-	if(!_platform.isPresent())
+  stat = _platform.copyToBuffer(pPlatform, bufSize);
+  if (! stat)
 	{
-		return AAFRESULT_PROP_NOT_PRESENT;
+	  return AAFRESULT_SMALLBUF;
 	}
-
-	bool stat;
-	
-	stat = _platform.copyToBuffer(pPlatform, bufSize);
-	if (! stat)
-	{
-		return AAFRESULT_SMALLBUF;
-	}
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetPlatformBufLen (aafUInt32 *  pLen)
 {
-	if (! pLen)
+  if (! pLen)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
-
-	if(!_platform.isPresent())
-	{
-		return AAFRESULT_PROP_NOT_PRESENT;
-	}
-		
-	*pLen = _platform.size();
-	return AAFRESULT_SUCCESS;
+  *pLen = _platform.size();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -375,14 +354,14 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::SetProductVersionString (aafWChar * pVS)
 {
-	if (! pVS)
+  if (! pVS)
 	{
-		return AAFRESULT_NULL_PARAM;
+	  return AAFRESULT_NULL_PARAM;
 	}
-	
-	_productVersionString = pVS;
-	
-	return AAFRESULT_SUCCESS;
+
+  _productVersionString = pVS;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
