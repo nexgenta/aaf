@@ -28,6 +28,7 @@
 // @doc OMINTERNAL
 #include "OMObjectDirectory.h"
 #include "OMAssertions.h"
+#include "OMPortability.h"
 #include "OMUtilities.h"
 
 #include <string.h>

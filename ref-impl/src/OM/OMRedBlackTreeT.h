@@ -1,27 +1,31 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+*
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*
+* Permission to use, copy and modify this software and accompanying
+* documentation, and to distribute and sublicense application software
+* incorporating this software for any purpose is hereby granted,
+* provided that (i) the above copyright notice and this permission
+* notice appear in all copies of the software and related documentation,
+* and (ii) the name Avid Technology, Inc. may not be used in any
+* advertising or publicity relating to the software without the specific,
+* prior written permission of Avid Technology, Inc.
+*
+* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+* LIABILITY.
+*
+************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRedBlackTree
 #ifndef OMREDBLACKTREET_H
 #define OMREDBLACKTREET_H
 
@@ -97,10 +101,7 @@ OMRedBlackTree<Key, Value>::~OMRedBlackTree(void)
 
   // @mfunc Insert the <p Value> <p v> into this
   //         <c OMRedBlackTree> and associate it with <p Key> <p k>.
-  //         If this the first instance of an item identified
-  //         by <p Key> <p k> in this <c OMRedBlackTree>, the result
-  //         is true, otherwise the result is false.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -127,7 +128,7 @@ bool OMRedBlackTree<Key, Value>::insert(const Key k, Value v)
   //        by <p k>.  If the item is found it is returned in
   //        <p v> and the result is true. If the element is not
   //        found the result is false.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -166,7 +167,7 @@ bool OMRedBlackTree<Key, Value>::find(const Key k, Value& v) const
   //        by <p k>.  If the item is found it is returned in
   //        <p v> and the result is true. If the element is not
   //        found the result is false.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -203,7 +204,7 @@ bool OMRedBlackTree<Key, Value>::find(const Key k, Value** v) const
 
   // @mfunc Does this <c OMRdBlackTree> contain an item
   //        identified by <p k>?
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -237,7 +238,7 @@ bool OMRedBlackTree<Key, Value>::contains(const Key k) const
 
   // @mfunc Remove the item assciated with <p Key> <p k> from this
   //        <c OMRedBlackTree>.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -298,29 +299,10 @@ bool OMRedBlackTree<Key, Value>::remove(const Key k)
   return result;
 }
 
-  // @mfunc Remove all items from this <c OMRedBlackTree>.
-  //   @tcarg class | Key  | The type of the unique key used to identify
-  //          elements. This type must support operator =, operator !=
-  //          and operator <lt>.
-  //   @tcarg class | Value | The type of the value carried in an
-  //          <c OMRedBlackTree> item. This type must support operator =.
-template <typename Key, typename Value>
-void OMRedBlackTree<Key, Value>::clear(void)
-{
-  TRACE("OMRedBlackTree<Key, Value>::clear");
-
-  destroy(_root);
-  _root = _nil;
-
-  POSTCONDITION("Empty tree", _root == _nil);
-  POSTCONDITION("All elements removed", count() == 0);
-  INVARIANT();
-}
-
   // @mfunc The number of items in this <c OMRedBlackTree>.
   //        <mf OMRedBlackTree::count> returns the actual number
   //        of items in the <c OMRedBlackTree>.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -336,7 +318,7 @@ size_t OMRedBlackTree<Key, Value>::count(void) const
 
   // @mfunc Traverse this <c OMRedBlackTree> in order, the
   //        function <p f> is called for each item.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -357,7 +339,7 @@ void OMRedBlackTree<Key, Value>::traverseInOrder(
 
   // @mfunc Traverse this <c OMRedBlackTree> in pre-order, the
   //        function <p f> is called for each item.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -379,7 +361,7 @@ void OMRedBlackTree<Key, Value>::traverseInPreOrder(
 
   // @mfunc Traverse this <c OMRedBlackTree> in post-order, the
   //        function <p f> is called for each item.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -400,7 +382,7 @@ void OMRedBlackTree<Key, Value>::traverseInPostOrder(
 }
 
   // @mfunc The height of this <c OMRedBlackTree>.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -861,7 +843,6 @@ void OMRedBlackTree<Key, Value>::destroy(Node* subTree)
     destroy(subTree->_left);
     destroy(subTree->_right);
     delete subTree;
-    _count = _count - 1;
   }
 }
 
