@@ -1,11 +1,10 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+*                                               *
+\***********************************************/
 
 #include "ImplAAFTimecode.h"
 #include "ImplAAFComponent.h"
@@ -14,7 +13,10 @@
 #include "ImplEnumAAFComponents.h"
 #include "ImplAAFSequence.h"
 #include "ImplAAFObjectCreation.h"
+#include "ImplAAFDictionary.h"
 
+#include "AAFStoredObjectIDs.h"
+#include "AAFPropertyIDs.h"
 
 #include <assert.h>
 #include "AAFResult.h"
@@ -25,25 +27,19 @@
 extern "C" const aafClassID_t CLSID_EnumAAFComponents;
 
 ImplAAFSequence::ImplAAFSequence ()
-:   _components(			PID_SEQUENCE_COMPONENTS,		"Components")
+:   _components(			PID_Sequence_Components,		"Components")
 {
 	_persistentProperties.put(_components.address());
 }
 
 ImplAAFSequence::~ImplAAFSequence ()
 {
-	ImplAAFComponent *pComp = NULL;
-	size_t size;
-
-	_components.getSize(size);
+	size_t size = _components.getSize();
 	for (size_t i = 0; i < size; i++) {
-		_components.getValueAt(pComp, i);
+		ImplAAFComponent *pComp = _components.setValueAt(0, i);
 
 		if (pComp) {
 			pComp->ReleaseReference();
-			// Set value to 0 so the OM can perform any necessary cleanup.
-			pComp = 0;
-			_components.setValueAt(pComp, i);
 		}
 	}
 }
@@ -90,7 +86,7 @@ AAFRESULT STDMETHODCALLTYPE
 // that it is not the first object in a transition, and that it is
 // not neighboring another transition.  It also verifies that there
 // is enough source material on either side of the transition.  The
-// function also verifies that the datakinds are compatible.
+// function also verifies that the datadefs are compatible.
 //
 // If the component is successfully appended to the sequence, the
 // reference count of the component is incremented.
@@ -110,7 +106,7 @@ AAFRESULT STDMETHODCALLTYPE
 // AAFRESULT_NULL_PARAM
 //   - pComponent is null.
 //
-// AAFRESULT_INVALID_DATAKIND
+// AAFRESULT_INVALID_DATADEF
 //   - The data kind of the component is not compatible with the 
 //     data kind of the sequence.
 //
@@ -125,6 +121,10 @@ AAFRESULT STDMETHODCALLTYPE
 // AAFRESULT_INSUFF_TRAN_MATERIAL
 //   - There is not enough source material to add this component.
 //
+// AAFRESULT_OBJECT_ALREADY_ATTACHED
+//   - Attempted to append a component that is already attached to
+//     (owned by) another object.
+//
 // 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::AppendComponent (ImplAAFComponent* pComponent)
@@ -132,87 +132,136 @@ AAFRESULT STDMETHODCALLTYPE
 	size_t			numCpnts;
 	aafLength_t		sequLen, cpntLen, prevLen;
 	aafUID_t		sequDataDef, cpntDataDef;
-	aafBool			isPrevTran = AAFFalse;
+	aafBool			isPrevTran = AAFFalse, willConvert;
 	aafErr_t		aafError = AAFRESULT_SUCCESS;
 	implCompType_t	type;
-	HRESULT			hr;
+	ImplAAFDictionary	*pDict = NULL;
+	ImplAAFDataDef	*pDef = NULL;
+	AAFRESULT		status, sclpStatus;
 
 	if (pComponent == NULL)
 		return AAFRESULT_NULL_PARAM;
+	
+	if (pComponent->attached())
+		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
-	// Verify that component's datakind converts to sequence's datakind
-	GetDataDef(&sequDataDef);
-	pComponent->GetDataDef(&cpntDataDef);
-	if (memcmp(&sequDataDef, &cpntDataDef, sizeof(aafUID_t)) != 0)
-			return AAFRESULT_INVALID_DATAKIND;
-
-	GetLength(&sequLen);
-	pComponent->GetLength(&cpntLen);
-
-	// Get the previous component in the sequence to verify
-	// neighboring transitions and source clip lengths.
-	_components.getSize(numCpnts);
-	if (numCpnts)
+	XPROTECT()
 	{
-		ImplAAFComponent*	pPrevCpnt = NULL;
-
-		_components.getValueAt(pPrevCpnt, numCpnts - 1);
-		pPrevCpnt->GetLength(&prevLen);
-		pPrevCpnt->GetComponentType(&type);
-		if (type == kTransition)
-			isPrevTran = AAFTrue;
-	}
-
-	// Is the newly appended component a transition?
-	pComponent->GetComponentType(&type);
-	if (type == kTransition)
-	{
-		if (isPrevTran) 
-		{
-			// Can not have back to back transitions in a sequence
-			hr = AAFRESULT_ADJACENT_TRAN;
-		}
-		else if (numCpnts == 0)
-		{
-			 // A transition can not be the first component in a sequence
-			hr = AAFRESULT_LEADING_TRAN;
-		}
+		// Verify that component's datadef converts to sequence's datadef
+		GetDataDef(&sequDataDef);
+		pComponent->GetDataDef(&cpntDataDef);
+		
+		CHECK(GetDictionary(&pDict));
+		CHECK(pDict->LookupDataDefintion(&cpntDataDef, &pDef));
+		pDict->ReleaseReference();
+		pDict = NULL;
+		CHECK(pDef->DoesDataDefConvertTo(&sequDataDef, &willConvert));
+		pDef->ReleaseReference();
+		pDef = NULL;
+		
+		if (willConvert == AAFFalse)
+			RAISE(AAFRESULT_INVALID_DATADEF);
+		
+		status = GetLength(&sequLen);
+		if(status == AAFRESULT_PROP_NOT_PRESENT /*AAFRESULT_BAD_PROP ???*/)
+			sequLen = 0;
 		else
 		{
-			// Verify that previous component is at least as long as the transition
-			if (Int64Less(prevLen, cpntLen))
-			{
-				hr = AAFRESULT_INSUFF_TRAN_MATERIAL;
-			}
+			CHECK(status);
 		}
-
-		SubInt64fromInt64(cpntLen, &sequLen);
-		hr = SetLength(&sequLen);
-	}
-	else // Not a transition
-	{
-		if (isPrevTran)
+		
+		// Here we have 4 cases:
+		// 1) Sequence does not have a length, component DOES have a length
+		//		Add component and set length on the sequence
+		// 2) Sequence does not have a length, component does NOT have a length
+		//		Add component without setting length on the sequence
+		// 3) Sequence has a length, component DOES have a length
+		//		Add component and adjust length on the sequence
+		// 4) Sequence has a length, component does NOT have a length
+		//		Add zero-length component and set length on the sequence
+		sclpStatus = pComponent->GetLength(&cpntLen);
+		if(sclpStatus == AAFRESULT_PROP_NOT_PRESENT /*AAFRESULT_BAD_PROP ???*/ && status == AAFRESULT_SUCCESS)
 		{
-			// Verify that component length is at least as long as the prev transition
-			if (Int64Less(cpntLen, prevLen))
+			// Case #4
+			sequLen = 0;
+			sclpStatus = AAFRESULT_SUCCESS;
+		}
+		if(sclpStatus != AAFRESULT_PROP_NOT_PRESENT /*AAFRESULT_BAD_PROP??? */)
+		{
+			// Make it here on cases #1, #3, and #4
+			CHECK(sclpStatus);
+			// Get the previous component in the sequence to verify
+			// neighboring transitions and source clip lengths.
+			_components.getSize(numCpnts);
+			if (numCpnts)
 			{
-				hr = AAFRESULT_INSUFF_TRAN_MATERIAL;
+				ImplAAFComponent*	pPrevCpnt = NULL;
+				
+				_components.getValueAt(pPrevCpnt, numCpnts - 1);
+				CHECK(pPrevCpnt->GetLength(&prevLen));
+				pPrevCpnt->GetComponentType(&type);
+				if (type == kTransition)
+					isPrevTran = AAFTrue;
+			}
+			
+			// Is the newly appended component a transition?
+			pComponent->GetComponentType(&type);
+			if (type == kTransition)
+			{
+				if (isPrevTran) 
+				{
+					// Can not have back to back transitions in a sequence
+					RAISE(AAFRESULT_ADJACENT_TRAN);
+				}
+				else if (numCpnts == 0)
+				{
+					// A transition can not be the first component in a sequence
+					RAISE(AAFRESULT_LEADING_TRAN);
+				}
+				else
+				{
+					// Verify that previous component is at least as long as the transition
+					if (Int64Less(prevLen, cpntLen))
+					{
+						RAISE(AAFRESULT_INSUFF_TRAN_MATERIAL);
+					}
+				}
+				
+				SubInt64fromInt64(cpntLen, &sequLen);
+				CHECK(SetLength(&sequLen));
+			}
+			else // Not a transition
+			{
+				if (isPrevTran)
+				{
+					// Verify that component length is at least as long as the prev transition
+					if (Int64Less(cpntLen, prevLen))
+					{
+						RAISE(AAFRESULT_INSUFF_TRAN_MATERIAL);
+					}
+				}
+				
+				// Add length of component to sequence, if not transition
+				AddInt64toInt64(cpntLen, &sequLen);
+				CHECK(SetLength(&sequLen));
 			}
 		}
-
-		// Add length of component to sequence, if not transition
-		AddInt64toInt64(cpntLen, &sequLen);
-		hr = SetLength(&sequLen);
-	}
-
-	// If it all checks out, append the component to the sequence
-	if (SUCCEEDED(hr))
-	{
+		// Else handle case #2
+		
+		// If it all checks out, append the component to the sequence
 		pComponent->AcquireReference();
 		_components.appendValue(pComponent);
 	}
+	XEXCEPT
+	{
+		if(pDict != NULL)
+			pDict->ReleaseReference();
+		if(pDef != NULL)
+			pDef->ReleaseReference();
+	}
+	XEND;
 
-	return(hr);
+	return(AAFRESULT_SUCCESS);
 }
 
 //***********************************************************
@@ -241,7 +290,7 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::RemoveComponent (ImplAAFComponent* pComponent)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 //***********************************************************
@@ -305,26 +354,15 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::EnumComponents (ImplEnumAAFComponents ** ppEnum)
 {
-	ImplEnumAAFComponents*	theEnum;
-	HRESULT					hr;
-	
-	theEnum = (ImplEnumAAFComponents *)CreateImpl(CLSID_EnumAAFComponents);
-	if (theEnum == NULL)
-		return E_FAIL;
-		
-	hr = theEnum->SetEnumSequence(this);
-	if (SUCCEEDED(hr))
-	{
-		theEnum->Reset();
-		*ppEnum = theEnum;
-	}
-	else
-	{
-		theEnum->ReleaseReference();
-		*ppEnum = NULL;
-	}
+	if(ppEnum == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-	return hr;
+	*ppEnum = (ImplEnumAAFComponents *)CreateImpl(CLSID_EnumAAFComponents);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumStrongProperty(this, &_components);
+
+	return(AAFRESULT_SUCCESS);
 }
 
 
@@ -549,7 +587,50 @@ AAFRESULT
 	return hr;
 }
 
-extern "C" const aafClassID_t CLSID_AAFSequence;
+AAFRESULT ImplAAFSequence::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+{
+	aafInt32			n, count;
+	ImplAAFComponent	*comp = NULL;
+	
+	XPROTECT()
+	{
+		CHECK(GetNumComponents (&count));
+		for(n = 0; n < count; n++)
+		{
+			CHECK(GetNthComponent (n, &comp));
+			CHECK(comp->ChangeContainedReferences(from, to));
+			comp->ReleaseReference();
+			comp = NULL;
+		}
+	}
+	XEXCEPT
+	{
+		if(comp != NULL)
+			comp->ReleaseReference();
+	}
+	XEND;
 
-OMDEFINE_STORABLE(ImplAAFSequence, CLSID_AAFSequence);
+	return AAFRESULT_SUCCESS;
+}
 
+//SDK Internal
+AAFRESULT
+    ImplAAFSequence::SetNthComponent (aafUInt32 index, ImplAAFComponent* pComponent)
+{
+	size_t				numCpnts;
+	HRESULT				hr;
+
+	_components.getSize(numCpnts);
+	if (index < numCpnts)
+	{
+		_components.setValueAt(pComponent, index);
+		pComponent->AcquireReference();
+		hr =  AAFRESULT_SUCCESS;
+	}
+	else
+		hr = AAFRESULT_NO_MORE_OBJECTS;
+
+	return hr;
+}
+
+OMDEFINE_STORABLE(ImplAAFSequence, AUID_AAFSequence);

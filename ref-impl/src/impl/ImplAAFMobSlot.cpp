@@ -4,7 +4,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -51,10 +50,10 @@ ImplAAFMobSlot::ImplAAFMobSlot ()
 
 ImplAAFMobSlot::~ImplAAFMobSlot ()
 {
-	if (_segment)
+	ImplAAFSegment *segment = _segment.setValue(0);
+	if (segment)
 	{
-		_segment->ReleaseReference();
-		_segment = 0;
+		segment->ReleaseReference();
 	}
 }
 
@@ -97,6 +96,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pName == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if(!_name.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	stat = _name.copyToBuffer(pName, size);
 	if (! stat)
 	{
@@ -116,6 +118,10 @@ ImplAAFMobSlot::GetNameBufLen
 {
 	if(pSize == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_name.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*pSize = _name.size();
 
 	return(AAFRESULT_SUCCESS); 
@@ -138,6 +144,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(result == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if(!_physicalTrackNum.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*result = _physicalTrackNum;
 	return AAFRESULT_SUCCESS;
 }
@@ -235,7 +245,7 @@ AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
 {
 	if(convertPos == NULL )
 		return(AAFRESULT_NULL_PARAM);
-	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping!!!
+	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping
 	return AAFRESULT_SUCCESS;
 }
 
@@ -245,6 +255,18 @@ AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
 {
 	if(convertPos == NULL )
 		return(AAFRESULT_NULL_PARAM);
-	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping!!!
+	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT ImplAAFMobSlot::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+{
+	ImplAAFSegment	*seg;
+	
+	seg = _segment;
+
+	if(seg != NULL)
+		seg->ChangeContainedReferences(from, to);
+
 	return AAFRESULT_SUCCESS;
 }
