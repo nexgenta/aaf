@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFTimecode.h"
 #include "ImplAAFComponent.h"
@@ -37,24 +42,20 @@
 #include "aafCvt.h"
 #include "AAFUtils.h"
 
-#include "ImplAAFSmartPointer.h"
-typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
-typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
-
 
 extern "C" const aafClassID_t CLSID_EnumAAFComponents;
 
 ImplAAFSequence::ImplAAFSequence ()
-:   _components(			PID_Sequence_Components,		L"Components")
+:   _components(			PID_Sequence_Components,		"Components")
 {
 	_persistentProperties.put(_components.address());
 }
 
 ImplAAFSequence::~ImplAAFSequence ()
 {
-	size_t count = _components.count();
-	for (size_t i = 0; i < count; i++) {
-		ImplAAFComponent *pComp = _components.clearValueAt(i);
+	size_t size = _components.getSize();
+	for (size_t i = 0; i < size; i++) {
+		ImplAAFComponent *pComp = _components.setValueAt(0, i);
 
 		if (pComp) {
 		  pComp->ReleaseReference();
@@ -89,12 +90,9 @@ ImplAAFSequence::~ImplAAFSequence ()
 //   - pDatadef is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::Initialize (ImplAAFDataDef * pDataDef)
+    ImplAAFSequence::Initialize (const aafUID_t & datadef)
 {
-  if (! pDataDef)
-	return AAFRESULT_NULL_PARAM;
-
-  return (SetDataDef(pDataDef));
+	return (SetDataDef(datadef));
 }
 
 //***********************************************************
@@ -153,9 +151,12 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	size_t			numCpnts;
 	aafLength_t		sequLen, cpntLen, prevLen;
-	ImplAAFDataDefSP sequDataDef, cpntDataDef;
-	aafBool			isPrevTran = kAAFFalse, willConvert;
+	aafUID_t		sequDataDef, cpntDataDef;
+	aafBool			isPrevTran = AAFFalse, willConvert;
+	aafErr_t		aafError = AAFRESULT_SUCCESS;
 	implCompType_t	type;
+	ImplAAFDictionary	*pDict = NULL;
+	ImplAAFDataDef	*pDef = NULL;
 	AAFRESULT		status, sclpStatus;
 
 	if (pComponent == NULL)
@@ -167,16 +168,19 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		// Verify that component's datadef converts to sequence's datadef
-		if(GetDataDef(&sequDataDef) == AAFRESULT_SUCCESS)
-		{
-			pComponent->GetDataDef(&cpntDataDef);
-			CHECK(cpntDataDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
+		GetDataDef(&sequDataDef);
+		pComponent->GetDataDef(&cpntDataDef);
 		
-			if (willConvert == kAAFFalse)
-				RAISE(AAFRESULT_INVALID_DATADEF);
-		}
-		else
-			SetDataDef(cpntDataDef);
+		CHECK(GetDictionary(&pDict));
+		CHECK(pDict->LookupDataDefinition(cpntDataDef, &pDef));
+		pDict->ReleaseReference();
+		pDict = NULL;
+		CHECK(pDef->DoesDataDefConvertTo(sequDataDef, &willConvert));
+		pDef->ReleaseReference();
+		pDef = NULL;
+		
+		if (willConvert == AAFFalse)
+			RAISE(AAFRESULT_INVALID_DATADEF);
 		
 		status = GetLength(&sequLen);
 		if(status == AAFRESULT_PROP_NOT_PRESENT /*AAFRESULT_BAD_PROP ???*/)
@@ -208,7 +212,7 @@ AAFRESULT STDMETHODCALLTYPE
 			CHECK(sclpStatus);
 			// Get the previous component in the sequence to verify
 			// neighboring transitions and source clip lengths.
-			numCpnts = _components.count();
+			_components.getSize(numCpnts);
 			if (numCpnts)
 			{
 				ImplAAFComponent*	pPrevCpnt = NULL;
@@ -217,7 +221,7 @@ AAFRESULT STDMETHODCALLTYPE
 				CHECK(pPrevCpnt->GetLength(&prevLen));
 				pPrevCpnt->GetComponentType(&type);
 				if (type == kTransition)
-					isPrevTran = kAAFTrue;
+					isPrevTran = AAFTrue;
 			}
 			
 			// Is the newly appended component a transition?
@@ -270,100 +274,17 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
+		if(pDict != NULL)
+		  pDict->ReleaseReference();
+		pDict = 0;
+		if(pDef != NULL)
+		  pDef->ReleaseReference();
+		pDef = 0;
 	}
 	XEND;
 
 	return(AAFRESULT_SUCCESS);
 }
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::PrependComponent (ImplAAFComponent* pComponent)
-{
-  if(!pComponent)
-		return(AAFRESULT_NULL_PARAM);
-
-  if (pComponent->attached())
-		return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-  _components.prependValue(pComponent);
-  pComponent->AcquireReference();
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::InsertComponentAt (aafUInt32 index,
-										ImplAAFComponent* pComponent)
-{
-  if (!pComponent) 
-    return AAFRESULT_NULL_PARAM;
-
-  aafUInt32 count;
-  AAFRESULT ar;
-  ar = CountComponents (&count);
-  if (AAFRESULT_FAILED (ar)) return ar;
-  if (index > count)
-	return AAFRESULT_BADINDEX;
-
-  if (pComponent->attached())
-    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-  _components.insertAt(pComponent,index);
-  pComponent->AcquireReference();
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::GetComponentAt (aafUInt32 index,
-									 ImplAAFComponent ** ppComponent)
-{
-  if (!ppComponent) 
-    return AAFRESULT_NULL_PARAM;
-
-  aafUInt32 count;
-  AAFRESULT ar;
-  ar = CountComponents (&count);
-  if (AAFRESULT_FAILED (ar)) return ar;
-  if (index >= count)
-	return AAFRESULT_BADINDEX;
-
-  ImplAAFComponent *pComponent;
-  _components.getValueAt(pComponent,index);
-
-  assert(pComponent);
-  pComponent->AcquireReference();
-  (*ppComponent)=pComponent;
-
-  return AAFRESULT_SUCCESS;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::RemoveComponentAt (aafUInt32 index)
-{
-  aafUInt32 count;
-  AAFRESULT hr;
-  hr = CountComponents (&count);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  if (index >= count)
-	return AAFRESULT_BADINDEX;
-
-	ImplAAFComponent *pComp = NULL;
-	pComp = 	_components.removeAt(index);
-	if (pComp)
-	{
-		// We have removed an element from a "stong reference container" so we must
-		// decrement the objects reference count. This will not delete the object
-		// since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
-		pComp->ReleaseReference ();
-	}
-	return AAFRESULT_SUCCESS;
-}
-
 
 //***********************************************************
 //
@@ -391,21 +312,12 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::RemoveComponent (ImplAAFComponent* pComponent)
 {
-	if (!_components.containsValue(pComponent))
-	  return AAFRESULT_BADINDEX;
-
-	if (!pComponent->attached())
-	  return AAFRESULT_OBJECT_NOT_ATTACHED;
-
-	_components.removeValue(pComponent);
-	pComponent->ReleaseReference();
-
-	return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }
 
 //***********************************************************
 //
-// CountComponents()
+// GetNumComponents()
 //
 // This function returns the number of components in the sequence.
 // 
@@ -425,11 +337,11 @@ AAFRESULT STDMETHODCALLTYPE
 //   - pNumCpnts is null.
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::CountComponents (aafUInt32 * pNumCpnts)
+    ImplAAFSequence::GetNumComponents (aafInt32*  pNumCpnts)
 {
-  if (! pNumCpnts) return AAFRESULT_NULL_PARAM;
+	size_t	numCpnts;
 
-	size_t	numCpnts = _components.count();
+	_components.getSize(numCpnts);
 	*pNumCpnts = numCpnts;
 
 	return AAFRESULT_SUCCESS;
@@ -437,7 +349,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 //***********************************************************
 //
-// GetComponents()
+// EnumComponents()
 //
 // Places an IEnumAAFComponents enumerator for the components contained in the sequence
 // into the *ppEnum argument.
@@ -462,35 +374,19 @@ AAFRESULT STDMETHODCALLTYPE
 //
 // 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSequence::GetComponents (ImplEnumAAFComponents ** ppEnum)
+    ImplAAFSequence::EnumComponents (ImplEnumAAFComponents ** ppEnum)
 {
-  if (NULL == ppEnum)
-	return AAFRESULT_NULL_PARAM;
-  *ppEnum = 0;
-	
-  ImplEnumAAFComponents *theEnum = (ImplEnumAAFComponents *)CreateImpl (CLSID_EnumAAFComponents);
-	
-  XPROTECT()
-	{
-		OMStrongReferenceVectorIterator<ImplAAFComponent>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFComponent>(_components);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFComponents, this, iter));
-	  *ppEnum = theEnum;
-	}
-  XEXCEPT
-	{
-	  if (theEnum)
-		{
-		  theEnum->ReleaseReference();
-		  theEnum = 0;
-		}
-	}
-  XEND;
+	if(ppEnum == NULL)
+		return(AAFRESULT_NULL_PARAM);
+
+	*ppEnum = (ImplEnumAAFComponents *)CreateImpl(CLSID_EnumAAFComponents);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumStrongProperty(this, &_components);
 
 	return(AAFRESULT_SUCCESS);
 }
+
 
 
 //***********************************************************
@@ -590,7 +486,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 	ImplAAFTimecode*	pTC;
 	aafFrameOffset_t	begPos, endPos;
 	aafPosition_t		sequPos;
-	aafBool				found = kAAFFalse;
+	aafBool				found = AAFFalse;
 	aafLength_t			junk;
 
 	if (pOffset == NULL || pTimecode == NULL || pEditRate == NULL)
@@ -599,7 +495,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 	segStart = 0;
 	CvtInt32toInt64(0, &junk);
 
-	numCpnts = _components.count();
+	_components.getSize(numCpnts);
 	for (index=0; index < numCpnts; index++)
 	{
 		ImplAAFSegment*	pSubSegment;
@@ -636,7 +532,7 @@ ImplAAFSequence::SegmentTCToOffset (aafTimecode_t*		pTimecode,
 					pComponent->AccumulateLength(&sequPos);
   					TruncInt64toInt32(sequPos, &segStart);	// OK FRAMEOFFSET
 					pTC->GetLength(&tcLen);
-					found = kAAFTrue;
+					found = AAFTrue;
 					break;
 				}
 			}
@@ -698,9 +594,10 @@ AAFRESULT
     ImplAAFSequence::GetNthComponent (aafUInt32 index, ImplAAFComponent** ppComponent)
 {
 	ImplAAFComponent*	obj;
+	size_t				numCpnts;
 	HRESULT				hr;
 
-	size_t numCpnts = _components.count();
+	_components.getSize(numCpnts);
 	if (index < numCpnts)
 	{
 		_components.getValueAt(obj, index);
@@ -714,15 +611,15 @@ AAFRESULT
 	return hr;
 }
 
-AAFRESULT ImplAAFSequence::ChangeContainedReferences(aafMobID_constref from,
-													 aafMobID_constref to)
+AAFRESULT ImplAAFSequence::ChangeContainedReferences(const aafUID_t & from,
+													 const aafUID_t & to)
 {
-	aafUInt32			n, count;
+	aafInt32			n, count;
 	ImplAAFComponent	*comp = NULL;
 	
 	XPROTECT()
 	{
-		CHECK(CountComponents (&count));
+		CHECK(GetNumComponents (&count));
 		for(n = 0; n < count; n++)
 		{
 			CHECK(GetNthComponent (n, &comp));
@@ -746,31 +643,12 @@ AAFRESULT ImplAAFSequence::ChangeContainedReferences(aafMobID_constref from,
 AAFRESULT
     ImplAAFSequence::SetNthComponent (aafUInt32 index, ImplAAFComponent* pComponent)
 {
+	size_t				numCpnts;
 	HRESULT				hr;
 
-
-	if( pComponent == NULL )
-		return AAFRESULT_NULL_PARAM;
-
-	size_t numCpnts = _components.count();
+	_components.getSize(numCpnts);
 	if (index < numCpnts)
 	{
-		// Retreive the old component
-		// If it's the same as one we are setting just return success.
-		//
-		ImplAAFComponent	*pOldComponent = NULL;
-		_components.getValueAt( pOldComponent, index );
-		assert(pOldComponent);
-		if( pOldComponent != NULL && pOldComponent == pComponent )
-			return AAFRESULT_SUCCESS;
-
-		// Make sure the new component is not already in use.
-		if (pComponent->attached())
-			return AAFRESULT_OBJECT_ALREADY_ATTACHED;
-
-		if( pOldComponent != NULL )
-		    pOldComponent->ReleaseReference();
-
 		_components.setValueAt(pComponent, index);
 		pComponent->AcquireReference();
 		hr =  AAFRESULT_SUCCESS;

@@ -1,25 +1,30 @@
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types required by this module:
@@ -50,10 +55,10 @@
 #include "aafErr.h"
 
 ImplAAFMobSlot::ImplAAFMobSlot ()
-: _name(			PID_MobSlot_SlotName,			L"SlotName"),
-  _trackID(			PID_MobSlot_SlotID,		L"SlotID"),
-  _physicalTrackNum(PID_MobSlot_PhysicalTrackNumber,	L"PhysicalTrackNumber"),
-  _segment(			PID_MobSlot_Segment,		L"Segment") 
+: _name(			PID_MobSlot_SlotName,			"SlotName"),
+  _trackID(			PID_MobSlot_SlotID,		"SlotID"),
+  _physicalTrackNum(PID_MobSlot_PhysicalTrackNumber,	"PhysicalTrackNumber"),
+  _segment(			PID_MobSlot_Segment,		"Segment") 
 {
 	_persistentProperties.put(_name.address());
 	_persistentProperties.put(_trackID.address());
@@ -64,7 +69,7 @@ ImplAAFMobSlot::ImplAAFMobSlot ()
 
 ImplAAFMobSlot::~ImplAAFMobSlot ()
 {
-	ImplAAFSegment *segment = _segment.clearValue();
+	ImplAAFSegment *segment = _segment.setValue(0);
 	if (segment)
 	{
 	  segment->ReleaseReference();
@@ -77,10 +82,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(result == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	if(_segment.isVoid())
-		return (AAFRESULT_NULLOBJECT);
 	*result = _segment;
-	(*result)->AcquireReference();
+	if (*result)
+		(*result)->AcquireReference();
+	else
+		return (AAFRESULT_NULLOBJECT);
 
   return AAFRESULT_SUCCESS;
 }
@@ -88,21 +94,14 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMobSlot::SetSegment (ImplAAFSegment *value)
 {
-	if( value == NULL )
-	    return AAFRESULT_NULL_PARAM;
-
 	if (_segment)
-	{
-	  if( _segment == value )
-		return AAFRESULT_SUCCESS;
 	  _segment->ReleaseReference();
-	}
-
-	if( value->attached() )
-	    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
+	_segment = 0;
 
 	_segment = value;
-	_segment->AcquireReference();
+
+	if (value)
+		value->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
 }
@@ -110,7 +109,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMobSlot::GetName
-        (aafCharacter *  pName,  //@parm [in] buffer provided by client to hold the Mob Slot Name
+        (aafWChar *  pName,  //@parm [in] buffer provided by client to hold the Mob Slot Name
 		aafInt32	size)	//@parm [in] length of the buffer provided to hold the slot name
 {
 	bool stat;
@@ -135,7 +134,7 @@ AAFRESULT STDMETHODCALLTYPE
   //
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFMobSlot::GetNameBufLen
-		(aafUInt32	*pSize)	//@parm [in] length of the buffer provided to hold the slot name
+		(aafInt32	*pSize)	//@parm [in] length of the buffer provided to hold the slot name
 							// including the terminator
 {
 	if(pSize == NULL)
@@ -184,7 +183,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMobSlot::GetDataDef (ImplAAFDataDef ** result)
+    ImplAAFMobSlot::GetDataDef (aafUID_t *result)
 {
 	ImplAAFSegment	*seg = _segment;
 	if(result == NULL)
@@ -225,7 +224,7 @@ AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
 {
 	ImplAAFSegment	*tmpSegment = NULL;
 	aafPosition_t begPos = CvtInt32toPosition(0, begPos);
-	aafBool					foundClip = kAAFFalse;
+	aafBool					foundClip = AAFFalse;
 
 	if(diffPos == NULL || segment == NULL || srcRate == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -263,7 +262,7 @@ AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
 }
 
 AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
-										aafRational_t /*destRate*/,
+										aafRational_t destRate,
 										aafPosition_t *convertPos)
 {
 	if(convertPos == NULL )
@@ -273,7 +272,7 @@ AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
 }
 
 AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
-										  ImplAAFMobSlot * /*srcSlot*/,
+										  ImplAAFMobSlot *srcSlot,
 										aafPosition_t *convertPos)
 {
 	if(convertPos == NULL )
@@ -282,8 +281,8 @@ AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
 	return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT ImplAAFMobSlot::ChangeContainedReferences(aafMobID_constref from,
-													aafMobID_constref to)
+AAFRESULT ImplAAFMobSlot::ChangeContainedReferences(const aafUID_t & from,
+													const aafUID_t & to)
 {
 	ImplAAFSegment	*seg;
 	

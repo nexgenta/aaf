@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 #include "AAFStoredObjectIDs.h"
@@ -34,11 +39,8 @@
 #include "ImplAAFDictionary.h"
 
 ImplAAFParameterDef::ImplAAFParameterDef ()
-: _typeDef     ( PID_ParameterDefinition_Type,
-                 L"Type",
-                 L"/MetaDictionary/TypeDefinitions",
-                 PID_MetaDefinition_Identification),
-  _displayUnits(	PID_ParameterDefinition_DisplayUnits,			L"DisplayUnits")
+: _typeDef(			PID_ParameterDefinition_Type,					"Type"),
+  _displayUnits(	PID_ParameterDefinition_DisplayUnits,			"DisplayUnits")
 {
 	_persistentProperties.put(_typeDef.address());
 	_persistentProperties.put(_displayUnits.address());
@@ -51,42 +53,32 @@ ImplAAFParameterDef::~ImplAAFParameterDef ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFParameterDef::Initialize (
-      const aafUID_t & id,
-	  const aafWChar * pName,
-	  const aafWChar * pDesc,
-    ImplAAFTypeDef * pType)
-{
-  AAFRESULT result = AAFRESULT_SUCCESS;
-	if (pName == NULL || pDesc == NULL || pType == NULL)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-    AAFRESULT result = pvtInitialize(id, pName, pDesc);
-	  if (AAFRESULT_SUCCEEDED (result))
-      result = SetTypeDef (pType);
-	}
-	return result;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFParameterDef::GetTypeDefinition (
+    ImplAAFParameterDef::GetTypeDef (
       ImplAAFTypeDef **ppTypeDef)
 {
-  if (! ppTypeDef)
-	return AAFRESULT_NULL_PARAM;
+	aafUID_t			uid;
+	ImplAAFDictionary	*dict = NULL;
 
-   if(_typeDef.isVoid())
-		return AAFRESULT_OBJECT_NOT_FOUND;
-  ImplAAFTypeDef *pTypeDef = _typeDef;
+	if(ppTypeDef == NULL)
+		return AAFRESULT_NULL_PARAM;
 
-  *ppTypeDef = pTypeDef;
-  assert (*ppTypeDef);
-  (*ppTypeDef)->AcquireReference ();
-  return AAFRESULT_SUCCESS;
+	XPROTECT()
+	{
+		uid = _typeDef;
+		CHECK(GetDictionary(&dict));
+		CHECK(dict->LookupType (_typeDef, ppTypeDef));
+		dict->ReleaseReference();
+		dict = NULL;
+	}
+	XEXCEPT
+	{
+		if(dict != NULL)
+		  dict->ReleaseReference();
+		dict = 0;
+	}
+	XEND;
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -94,23 +86,24 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameterDef::SetTypeDef (
       ImplAAFTypeDef * pTypeDef)
 {
+	aafUID_t	uid;
+	AAFRESULT	hr;
+
 	if(pTypeDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-	// Check if given definition is in the dict.
-	if( !aafLookupTypeDef( this, pTypeDef ) )
-		return AAFRESULT_INVALID_OBJ;
+	hr = pTypeDef->GetAUID(&uid);
+	if(hr == AAFRESULT_SUCCESS)
+		_typeDef = uid;
 
-	_typeDef = pTypeDef;
-
-	return AAFRESULT_SUCCESS;
+	return hr;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameterDef::GetDisplayUnits (
-      aafCharacter *pDisplayUnits,
-      aafUInt32  bufSize)
+      wchar_t *pDisplayUnits,
+      aafInt32  bufSize)
 {
 	if(pDisplayUnits == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -132,7 +125,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameterDef::GetDisplayUnitsBufLen (
-      aafUInt32 * pLen)
+      aafInt32 * pLen)
 {
 	if(pLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
@@ -149,7 +142,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFParameterDef::SetDisplayUnits (
-      const aafCharacter *pDisplayUnits)
+      wchar_t *pDisplayUnits)
 {
 	if(pDisplayUnits == NULL)
 		return(AAFRESULT_NULL_PARAM);

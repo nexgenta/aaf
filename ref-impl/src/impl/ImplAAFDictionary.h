@@ -3,31 +3,35 @@
 #ifndef __ImplAAFDictionary_h__
 #define __ImplAAFDictionary_h__
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 class ImplAAFBuiltinClasses;
-class ImplAAFBuiltinDefs;
 class ImplAAFBuiltinTypes;
 class ImplAAFClassDef;
 class ImplAAFCodecDef;
@@ -35,36 +39,26 @@ class ImplAAFContainerDef;
 class ImplAAFDataDef;
 class ImplAAFInterpolationDef;
 class ImplAAFOperationDef;
-class ImplAAFPluginDef;
+class ImplAAFPluginDescriptor;
 class ImplAAFTypeDef;
 class ImplAAFTypeDefEnum;
 class ImplAAFTypeDefRecord;
-template <class T> 
-class ImplAAFEnumerator;
-typedef ImplAAFEnumerator<ImplAAFClassDef>			ImplEnumAAFClassDefs;
-typedef ImplAAFEnumerator<ImplAAFCodecDef>			ImplEnumAAFCodecDefs;
-typedef ImplAAFEnumerator<ImplAAFContainerDef>		ImplEnumAAFContainerDefs;
-typedef ImplAAFEnumerator<ImplAAFDataDef>			ImplEnumAAFDataDefs;
-typedef ImplAAFEnumerator<ImplAAFInterpolationDef>	ImplEnumAAFInterpolationDefs;
-typedef ImplAAFEnumerator<ImplAAFPluginDef>			ImplEnumAAFPluginDefs;
-typedef ImplAAFEnumerator<ImplAAFTypeDef>			ImplEnumAAFTypeDefs;
-typedef ImplAAFEnumerator<ImplAAFOperationDef>		ImplEnumAAFOperationDefs;
+class ImplEnumAAFClassDefs;
+class ImplEnumAAFCodecDefs;
+class ImplEnumAAFContainerDefs;
+class ImplEnumAAFDataDefs;
+class ImplEnumAAFInterpolationDefs;
+class ImplEnumAAFOperationDefs;
+class ImplEnumAAFPluggableDefs;
+class ImplEnumAAFPluginDescriptors;
+class ImplEnumAAFTypeDefs;
 
-class ImplAAFMetaDictionary;
-class ImplAAFMetaDefinition;
-class ImplAAFTypeDefVariableArray;
-class ImplAAFTypeDefFixedArray;
-class ImplAAFTypeDefRecord;
-class ImplAAFTypeDefRename;
-class ImplAAFTypeDefString;
-class ImplAAFTypeDefStrongObjRef;
-class ImplAAFTypeDefWeakObjRef;
-class ImplAAFTypeDefSet;
-
+#ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
+#endif
 
 #include "OMClassFactory.h"
-#include "OMStrongRefSetProperty.h"
+
 
 #include "ImplAAFClassDef.h"
 #include "ImplAAFOperationDef.h"
@@ -74,10 +68,9 @@ class ImplAAFTypeDefSet;
 #include "ImplAAFInterpolationDef.h"
 #include "ImplAAFTypeDef.h"
 #include "ImplAAFDataDef.h"
-#include "ImplAAFPluginDef.h"
 
 class ImplAAFDictionary :
-  public OMClassFactory,
+  public OMClassFactory, 
   public ImplAAFObject
 {
 public:
@@ -91,10 +84,8 @@ protected:
   virtual ~ImplAAFDictionary ();
 
 public:
-  // Create an instance of the appropriate derived class, given the
-  // class id.  Initializes the OM properties.
-  // 
-  // This method implements the OMClassFactory interface.
+  // Create an instance of the appropriate derived class, given the class id.
+  //  This method implements the OMClassFactory interface.
   //
   OMStorable* create(const OMClassId& classId) const;
 
@@ -106,8 +97,10 @@ public:
   // with a specified stored object id.
   virtual AAFRESULT STDMETHODCALLTYPE 
   CreateInstance (
-    // ID of the stored object to be created.
-    aafUID_constref classId,
+    // Class identifier (AUID) of the stored object. This is the
+    // corresponding SMPTE identifier (as a GUID) for all predefined
+    // built-in classes.
+    const aafUID_t & id,
 
     // Address of output variable that receives the 
     // object pointer requested in pAUID
@@ -115,167 +108,76 @@ public:
 
 
   //****************
-  // CreateMetaInstance()
-  //
-  // Creates a single uninitialized AAF meta definition associated 
-  // with a specified stored object id.
-  virtual AAFRESULT STDMETHODCALLTYPE 
-  CreateMetaInstance (
-    // Stored Object ID of the meta object to be created.
-    aafUID_constref classId,
-
-    // Address of output variable that receives the 
-    // object pointer requested in pAUID
-    ImplAAFMetaDefinition ** ppMetaObject);
-
-
-  //****************
-  // LookupClassDef()
+  // LookupClass()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupClassDef
+    LookupClass
         (// @parm [in,ref] Class Unique ID
          const aafUID_t & classId,
 
          // @parm [out,retval] Class Definition
          ImplAAFClassDef ** ppClassDef);
 
-  //****************
-  // CreateForwardClassReference()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreateForwardClassReference 
-        (// @parm [in] class identification
-         aafUID_constref classId);
 
   //****************
-  // IsForwardClassReference()
+  // RegisterClass()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    HasForwardClassReference 
-      (// @parm [in] class identification
-       aafUID_constref classId,
-
-       // @parm [out] kAAFTrue if the given class identification is a forward reference.
-       aafBoolean_t *pResult);
-
-  //****************
-  // RegisterClassDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterClassDef
+    RegisterClass
         (// @parm [in] Class Definition
          ImplAAFClassDef * pClassDef);
 
 
   //****************
-  // GetClassDefs()
+  // GetClassDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetClassDefs
+    GetClassDefinitions
         // @parm [out,retval] Class Definition Enumeration
         (ImplEnumAAFClassDefs ** ppEnum);
 
 
   //****************
-  // CountClassDefs()
+  // RegisterType()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountClassDefs
-        // @parm [out, retval] Total number of class definition objects
-        (aafUInt32 * pResult);
-
-  //****************
-  // RegisterTypeDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterTypeDef
+    RegisterType
         (// @parm [in] Type Definition Object
          ImplAAFTypeDef * pTypeDef);
 
   //****************
-  // LookupTypeDef()
+  // LookupType()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupTypeDef
+    LookupType
         (// @parm [in,ref] Type Unique ID
          const aafUID_t & typeID,
 
          // @parm [out,retval] Type Definition Object
          ImplAAFTypeDef ** ppTypeDef);
 
-
   //****************
-  // GetTypeDefs()
+  // GetTypeDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetTypeDefs
+    GetTypeDefinitions
         // @parm [out,retval] Type Def Enumeration
         (ImplEnumAAFTypeDefs ** ppEnum);
 
 
   //****************
-  // CountTypeDefs()
+  // RegisterDataDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountTypeDefs
-        // @parm [out, retval] Total number of type definition objects
-        (aafUInt32 * pResult);
-
-  //****************
-  // RegisterOpaqueTypeDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterOpaqueTypeDef
-        (// @parm [in] Type Definition Object
-         ImplAAFTypeDef * pOpaqueTypeDef);
-
-  //****************
-  // LookupOpaqueTypeDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    LookupOpaqueTypeDef
-        (// @parm [in,ref] Type Unique ID
-         const aafUID_t & typeID,
-
-         // @parm [out,retval] Type Definition Object
-         ImplAAFTypeDef ** ppOpaqueTypeDef);
-
-  //****************
-  // GetOpaqueTypeDefs()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetOpaqueTypeDefs
-        // @parm [out,retval] Type Def Enumeration
-        (ImplEnumAAFTypeDefs ** ppEnum);
-
-
-  //****************
-  // CountOpaqueTypeDefs()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountOpaqueTypeDefs
-        // @parm [out, retval] Total number of type definition objects
-        (aafUInt32 * pResult);
-
-	virtual AAFRESULT STDMETHODCALLTYPE
-		RegisterKLVDataKey (
-			aafUID_t keyUID, 
-			ImplAAFTypeDef *underlyingType);
-
-	  //****************
-  // RegisterDataDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterDataDef
+    RegisterDataDefinition
         // @parm [in] Data Definition Object
         (ImplAAFDataDef * pDataDef);
 
   //****************
-  // LookupDataDef()
+  // LookupDataDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupDataDef
+    LookupDataDefinition
         (// @parm [in,ref] Datak Definition Unique ID
          const aafUID_t & dataDefinitionId,
 
@@ -283,35 +185,27 @@ public:
          ImplAAFDataDef ** ppDataDef);
 
   //****************
-  // GetDataDefs()
+  // GetDataDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetDataDefs
+    GetDataDefinitions
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFDataDefs ** ppEnum);
 
 
   //****************
-  // CountDataDefs()
+  // RegisterOperationDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountDataDefs
-        // @parm [out, retval] Total number of data definition objects
-        (aafUInt32 * pResult);
-
-  //****************
-  // RegisterOperationDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterOperationDef
+    RegisterOperationDefinition
         // @parm [in] Effect Definition Object
         (ImplAAFOperationDef * pOperationDef);
 
   //****************
-  // LookupOperationDef()
+  // LookupOperationDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupOperationDef
+    LookupOperationDefinition
         (// @parm [in,ref] Effect Unique ID
          const aafUID_t & effectId,
 
@@ -319,36 +213,26 @@ public:
          ImplAAFOperationDef ** ppOperationDef);
 
   //****************
-  // GetOperationDefs()
+  // GetOperationDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetOperationDefs
+    GetOperationDefinitions
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFOperationDefs ** ppEnum);
 
-
   //****************
-  // CountOperationDefs()
+  // RegisterParameterDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountOperationDefs
-        // @parm [out, retval] Total number of interpolation definition objects
-        (aafUInt32 * pResult);
-
-
-  //****************
-  // RegisterParameterDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterParameterDef
+    RegisterParameterDefinition
         // @parm [in] Parameter Definition Object
         (ImplAAFParameterDef * pParameterDef);
 
   //****************
-  // LookupParameterDef()
+  // LookupParameterDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupParameterDef
+    LookupParameterDefinition
         (// @parm [in,ref] Parameter Unique ID
          const aafUID_t & parameterId,
 
@@ -356,102 +240,72 @@ public:
          ImplAAFParameterDef ** ppParameterDef);
 
   //****************
-  // GetParameterDefs()
+  // GetParameterDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetParameterDefs
+    GetParameterDefinitions
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFParameterDefs ** ppEnum);
 
   //****************
-  // CountParameterDefs()
+  // RegisterCodecDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountParameterDefs
-        // @parm [out, retval] Total number of parameter definition objects
-        (aafUInt32 * pResult);
-
-  //****************
-  // RegisterCodecDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterCodecDef
+    RegisterCodecDefinition
         // @parm [in] Pluggable Definition
         (ImplAAFCodecDef * pPlugDef);
 
   //****************
-  // GetCodecDefs()
+  // RegisterCodecDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-   GetCodecDefs
+   GetCodecDefinitions
       // @parm [out,retval] Definition Enumeration
       (ImplEnumAAFCodecDefs ** ppEnum);
 
 
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupCodecDef
+    LookupCodecDefinition
       (const aafUID_t & containerId,
 	   ImplAAFCodecDef **result);
 
 
-  //****************
-  // CountCodecDefs()
+	//****************
+  // RegisterContainerDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountCodecDefs
-        // @parm [out, retval] Total number of codec definition objects
-        (aafUInt32 * pResult);
-
-
-  //****************
-  // RegisterContainerDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterContainerDef
+    RegisterContainerDefinition
         // @parm [in] Pluggable Definition
         (ImplAAFContainerDef * pPlugDef);
 
-
   //****************
-  // GetContainerDefs()
+  // GetContainerDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetContainerDefs
+    GetContainerDefinitions
         // @parm [out,retval] Definition Enumeration
        (ImplEnumAAFContainerDefs ** ppEnum);
 
 
-  //****************
-  // LookupContainerDef()
-  //
   virtual AAFRESULT STDMETHODCALLTYPE
-     LookupContainerDef
+     LookupContainerDefinition
        (const aafUID_t & containerID,
 		ImplAAFContainerDef **result);
 
 
   //****************
-  // CountContainerDefs()
+  // RegisterInterpolationDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountContainerDefs
-        // @parm [out, retval] Total number of container definition objects
-        (aafUInt32 * pResult);
-
-
-  //****************
-  // RegisterInterpolationDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterInterpolationDef
+    RegisterInterpolationDefinition
         // @parm [in] Interpolation Definition Object
         (ImplAAFInterpolationDef * pInterpolationDef);
 
   //****************
-  // LookupInterpolationDef()
+  // LookupInterpolationDefinition()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    LookupInterpolationDef
+    LookupInterpolationDefinition
         (// @parm [in,ref] Interpolation Unique ID
          const aafUID_t & interpolationID,
 
@@ -459,81 +313,42 @@ public:
          ImplAAFInterpolationDef ** ppInterpolationDef);
 
   //****************
-  // GetInterpolationDefs()
+  // GetInterpolationDefinitions()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetInterpolationDefs
+    GetInterpolationDefinitions
         // @parm [out,retval] Definition Enumeration
         (ImplEnumAAFInterpolationDefs ** ppEnum);
 
   //****************
-  // CountInterpolationDefs()
+  // RegisterPluginDescriptor()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountInterpolationDefs
-        // @parm [out, retval] Total number of interpolation definition objects
-        (aafUInt32 * pResult);
-
+    RegisterPluginDescriptor
+        (ImplAAFPluginDescriptor * pPluginDesc);
 
   //****************
-  // RegisterPluginDef()
+  // LookupPluginDescriptor()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RegisterPluginDef
-        (ImplAAFPluginDef * pPluginDesc);
-
-  //****************
-  // LookupPluginDef()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    LookupPluginDef
+    LookupPluginDescriptor
         (// @parm [in,ref] Interpolation Unique ID
          const aafUID_t & interpolationID,
 
-         ImplAAFPluginDef ** ppPluginDesc);
+         ImplAAFPluginDescriptor ** ppPluginDesc);
 
   //****************
-  // GetPluginDefs()
+  // GetPluginDescriptors()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetPluginDefs
-        (ImplEnumAAFPluginDefs ** ppEnum);
-
-
-  //****************
-  // CountPluginDefs()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountPluginDefs
-        // @parm [out, retval] Total number of plugin definition objects
-        (aafUInt32 * pResult);
-
+    GetPluginDescriptors
+        (ImplEnumAAFPluginDescriptors ** ppEnum);
 
 public:
 
   //
   // Internal to the SDK
   //
-
-  // Return a pointer to the meta dictionary.
-  ImplAAFMetaDictionary *metaDictionary(void) const;
-
-  // Install the meta dictionary (i.e. the factory for creating
-  // meta data: classes, properties and types). This method
-  // can only be called once.
-  void setMetaDictionary(ImplAAFMetaDictionary *metaDictionary);
-
-  // Private class registration. This version does not perform any
-  // initialization that requires other classes, types or properties or
-  // types to be in the dictionary...it only adds the given class
-  // to the set in the dictionary.
-  AAFRESULT PvtRegisterClassDef(ImplAAFClassDef * pClassDef);
-
-AAFRESULT PvtIsPropertyDefDuplicate(
-							aafUID_t propertyDefID,
-							ImplAAFClassDef *correctClass,
-							bool	*isDuplicate);
-
 
   //****************
   // GetNumEssenceData()
@@ -543,69 +358,59 @@ AAFRESULT PvtIsPropertyDefDuplicate(
         (aafUInt32 *  pNumCodecDefs);  //@parm [out,retval] Total number of pluggable defs
 
   virtual AAFRESULT
+    GetNthCodecDef (aafInt32 index, ImplAAFCodecDef **ppEnum);
+
+  virtual AAFRESULT
     GetNumContainerDefs
         (aafUInt32 *  pNumContainerDefs);  //@parm [out,retval] Total number of pluggable defs
+
+  virtual AAFRESULT
+    GetNthContainerDef (aafInt32 index, ImplAAFContainerDef **ppEnum);
 
   // make sure built-in types are initialized.
   void InitBuiltins();
 
-  //
-  // Toolkit-internal "Create" methods
-  //
-
   // Factory method for creating a Dictionary.
   static ImplAAFDictionary *CreateDictionary(void);
 
-  //
-  // Instantiates an object of the given class and initializes its OM
-  // properties.
-  //
-  ImplAAFObject * CreateAndInit(ImplAAFClassDef * pClassDef) const;
-
-  //
-  // Instantiates the most derived class known to the code which
-  // represents the given AUID.  Doesn't init its OM properties.
-  //
-  ImplAAFObject* pvtInstantiate(const aafUID_t & id) const;
-
-  //
-  // If the given AUID is known to the code, instantiates an object of
-  // that type.  Otherwise, returns NULL.  Doesn't init its OM
-  // properties.
-  //
-  static ImplAAFObject* pvtCreateBaseClassInstance(const aafUID_t & id);
-
+  // internal utility factory method to create an ImplAAFObject given an auid.
+  // This method was created to make it simpler to replace calls to "Deprecated"
+  // call to CreateImpl which should only be used for instanciating transient
+  // non-ImplAAFObject classes such as an enumerator.
+  ImplAAFObject *CreateImplObject(const aafUID_t & auid); 
 
   // Generates an OM PID corresponding to the given property def auid.
   AAFRESULT GenerateOmPid (const aafUID_t & rAuid,
 						   OMPropertyId & rOutPid);
 
 
-  // Like LookupClassDef(), except will only look at classes currently
+  // Like LookupClass(), except will only look at classes currently
   // registered in this dictionary; will not attempt to look at
   // builtins which may not have already been entered into the dict.
-  AAFRESULT dictLookupClassDef
+  AAFRESULT dictLookupClass
     (// @parm [in,ref] Class Unique ID
 	 const aafUID_t & classID,
 
 	 // @parm [out,retval] Class Definition
 	 ImplAAFClassDef ** ppClassDef);
 
-bool PvtIsClassPresent (
-      const aafUID_t & classID);
 
   // Like LookupType(), except will only look at types currently
   // registered in this dictionary; will not attempt to look at
   // builtins which may not have already been entered into the dict.
-  AAFRESULT dictLookupTypeDef
+  AAFRESULT dictLookupType
     (// @parm [in,ref] Type Unique ID
 	 const aafUID_t & typeID,
 
 	 // @parm [out,retval] Type Definition Object
 	 ImplAAFTypeDef ** ppTypeDef);
 
-bool PvtIsTypePresent (
-      const aafUID_t & typeID);
+
+  static ImplAAFObject* pvtCreateBaseClassInstance(const aafUID_t & id);
+
+  // Similar to create(), but takes an AUID as argument and doesn't
+  // init properties.
+  ImplAAFObject* pvtInstantiate(const aafUID_t & id) const;
 
   // Attempt to register the sizes of this type def if it is a
   // built-in type.  Currently implemented for Enum and Record
@@ -626,34 +431,28 @@ bool PvtIsTypePresent (
 
   bool IsAxiomaticClass (const aafUID_t & classID) const;
 
-  ImplAAFBuiltinDefs * GetBuiltinDefs ();
-  void SetBuiltinClasses(ImplAAFBuiltinClasses *pBuiltinClasses) { _pBuiltinClasses = pBuiltinClasses; };
-  bool pvtLookupAxiomaticTypeDef (const aafUID_t & typeID,
+private:
+
+  bool pvtLookupAxiomaticType (const aafUID_t & typeID,
 							   ImplAAFTypeDef ** ppTypeDef);
 
-  // Initialize all of the axiomatic and required built-in definitions
-  // have been initialized. This should be called after the file has been opened.
-  void InitializeMetaDefinitions(void);
-
-
-private:
-  bool pvtLookupAxiomaticClassDef (const aafUID_t & classID,
-								   ImplAAFClassDef ** ppClassDef);
+  bool pvtLookupAxiomaticClass (const aafUID_t & classID,
+								ImplAAFClassDef ** ppClassDef);
 
   ImplAAFBuiltinClasses * _pBuiltinClasses;
   ImplAAFBuiltinTypes   * _pBuiltinTypes;
-  ImplAAFBuiltinDefs    * _pBuiltinDefs;
 
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFCodecDef>				_codecDefinitions;
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFContainerDef>			_containerDefinitions;
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFOperationDef>			_operationDefinitions;
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFParameterDef>			_parameterDefinitions;
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFInterpolationDef>		_interpolationDefinitions;
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFDataDef>				_dataDefinitions;
-  OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPluginDef>				_pluginDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFCodecDef>         _codecDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFContainerDef>     _containerDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFOperationDef>     _operationDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFParameterDef>     _parameterDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFTypeDef>          _typeDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFClassDef>         _classDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFInterpolationDef> _interpolationDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFDataDef>          _dataDefinitions;
+  OMStrongReferenceVectorProperty<ImplAAFPluginDescriptor> _pluginDefinitions;
 
-
-  aafInt16 _lastGeneratedPid;	// must be signed!
+  aafInt32 _lastGeneratedPid;	// must be signed!
 
   static const aafUID_t * sAxiomaticTypeGuids[];
   static const aafUID_t * sAxiomaticClassGuids[];
@@ -673,12 +472,6 @@ private:
   bool _OKToAssurePropTypes;
 
   bool _defRegistrationAllowed;
-
-  // Set to true when the all of the axiomatic and required built-in definitions
-  // have been initialized. This should be set after the file has been opened.
-  bool _metaDefinitionsInitialized;
-
-  ImplAAFMetaDictionary *_metaDictionary;
 };
 
 //
@@ -691,72 +484,5 @@ private:
 #endif
 
 typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
-
-
-/*************************************************************************
-    aafLookup*Def()
-
-	These helper functions search for specified definition in 
-	given object's dictionary.
-
-    Inputs:
-	p_holder	- definition object to look in.
-	p_*def		- definition to look for.
-
-    Returns:
-	kAAFTrue - definition found in given objects dictionary.
-	kAAFFalse - definition is not in a dictionary.
- *************************************************************************/
-aafBoolean_t aafLookupTypeDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFTypeDef		*p_typedef );
-aafBoolean_t aafLookupOperationDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFOperationDef		*p_operdef );
-aafBoolean_t aafLookupParameterDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFParameterDef		*p_paramdef );
-aafBoolean_t aafLookupClassDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFClassDef		*p_classdef );
-aafBoolean_t aafLookupDataDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFDataDef		*p_datadef );
-aafBoolean_t aafLookupCodecDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFCodecDef		*p_codecdef );
-aafBoolean_t aafLookupContainerDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFContainerDef		*p_containerdef );
-aafBoolean_t aafLookupInterpolationDef( 
-    ImplAAFObject	*p_holder,
-    ImplAAFInterpolationDef	*p_interpoldef );
-
-aafBoolean_t aafLookupTypeDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFTypeDef		*p_typedef );
-aafBoolean_t aafLookupOperationDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFOperationDef		*p_operdef );
-aafBoolean_t aafLookupParameterDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFParameterDef		*p_paramdef );
-aafBoolean_t aafLookupClassDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFClassDef		*p_classdef );
-aafBoolean_t aafLookupDataDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFDataDef		*p_datadef );
-aafBoolean_t aafLookupCodecDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFCodecDef		*p_codecdef );
-aafBoolean_t aafLookupContainerDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFContainerDef		*p_containerdef );
-aafBoolean_t aafLookupInterpolationDef( 
-    ImplAAFMetaDefinition	*p_holder,
-    ImplAAFInterpolationDef	*p_interpoldef );
-
-
 
 #endif // ! __ImplAAFDictionary_h__

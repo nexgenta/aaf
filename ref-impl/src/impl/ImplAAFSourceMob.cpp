@@ -24,6 +24,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 #ifndef __ImplAAFEssenceDescriptor_h__
 #include "ImplAAFEssenceDescriptor.h"
 #endif
@@ -146,9 +147,9 @@ AAFRESULT STDMETHODCALLTYPE
 //
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFSourceMob::AddNilReference (aafSlotID_t slotID,
-                           aafLength_t  length,
-                           aafUID_t *dataDef,
-                           aafRational_t  editRate)
+                           const aafLength_t & length,
+                           const aafUID_t & dataDef,
+                           const aafRational_t & editRate)
 {
 	ImplAAFSourceClip *		sub = NULL;
  	aafPosition_t	zeroPos = CvtInt32toPosition(0, zeroPos);
@@ -171,7 +172,7 @@ AAFRESULT STDMETHODCALLTYPE
 			RAISE(E_FAIL);
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
-		CHECK(sub->Initialize (dataDef, &length, sourceRef));
+		CHECK(sub->Initialize (dataDef, length, sourceRef));
 		CHECK(AppendNewTimelineSlot(editRate, sub, slotID, L"Test", zeroPos, 
 												&newSlot));
 		newSlot->ReleaseReference();
@@ -245,7 +246,7 @@ AAFRESULT STDMETHODCALLTYPE
 			aSequ = (ImplAAFSequence *)pDictionary->CreateImplObject(AUID_AAFSequence);
 			if(aSequ == NULL)
 				RAISE(E_FAIL);
-			CHECK(aSequ->Initialize(&timecodeKind));
+			CHECK(aSequ->Initialize(timecodeKind));
 			CHECK(aSequ->AppendComponent(tccp));
 			CHECK(mobSlot->SetSegment(aSequ));
 
@@ -255,7 +256,7 @@ AAFRESULT STDMETHODCALLTYPE
 			aSequ = (ImplAAFSequence *)pDictionary->CreateImplObject(AUID_AAFSequence);
 			if(aSequ == NULL)
 				RAISE(E_FAIL);
-			CHECK(aSequ->Initialize(&timecodeKind));
+			CHECK(aSequ->Initialize(timecodeKind));
 			CHECK(aSequ->AppendComponent(tccp));
 			CHECK(AppendNewTimelineSlot(editrate, aSequ, slotID,
 										L"Timecode", zeroPos, &newSlot));
@@ -267,9 +268,9 @@ AAFRESULT STDMETHODCALLTYPE
 											 startTC.drop, &maxLength));
 			{
 				CvtInt32toLength(maxLength, length);
-				CHECK(tccp->SetLength(&length) );
+				CHECK(tccp->SetLength(length) );
 				/* NOTE: What if the sequence already existed? */
-				CHECK(aSequ->SetLength(&length) );
+				CHECK(aSequ->SetLength(length) );
 			}
 		}
 		if(newSlot != NULL)
@@ -327,7 +328,6 @@ AAFRESULT STDMETHODCALLTYPE
 	aafLength_t		length, zeroLen;
 	ImplAAFTimelineMobSlot *	newSlot;
 	aafEdgecode_t	edge;
-	aafUID_t		edgekind = DDEF_Edgecode;
 	ImplAAFDictionary *pDictionary = NULL;
 
 	// Validate film mobs only, return AAFRESULT_FILM_DESC_ONLY
@@ -339,16 +339,16 @@ AAFRESULT STDMETHODCALLTYPE
 		filler1 = (ImplAAFFiller *)pDictionary->CreateImplObject(AUID_AAFFiller);
 		if(filler1 == NULL)
 			RAISE(E_FAIL);
-		CHECK(filler1->Initialize(&edgekind, zeroLen));	
+		CHECK(filler1->Initialize(DDEF_Edgecode, zeroLen));	
 		filler2 = (ImplAAFFiller *)pDictionary->CreateImplObject(AUID_AAFFiller);
 		if(filler2 == NULL)
 			RAISE(E_FAIL);
-		CHECK(filler2->Initialize(&edgekind, zeroLen));	
+		CHECK(filler2->Initialize(DDEF_Edgecode, zeroLen));	
 
 		ecSequence = (ImplAAFSequence *)pDictionary->CreateImplObject(AUID_AAFSequence);
 		if(ecSequence == NULL)
 			RAISE(E_FAIL);
-		CHECK(ecSequence->Initialize(&edgekind));	
+		CHECK(ecSequence->Initialize(DDEF_Edgecode));	
 
 		CvtInt32toLength(length32, length);
 		CvtInt32toPosition(startEC, startPos);
@@ -447,17 +447,17 @@ AAFRESULT STDMETHODCALLTYPE
 		sourceRef.sourceSlotID = 0;
 		CvtInt32toPosition(0, sourceRef.startTime);
 		CHECK(GetDictionary(&pDict));
-		CHECK(pDict->CreateInstance(&AUID_AAFSourceClip, (ImplAAFObject **)&sclp));
+		CHECK(pDict->CreateInstance(AUID_AAFSourceClip, (ImplAAFObject **)&sclp));
 
 		if(FindSlotBySlotID(slotID, (ImplAAFMobSlot **)&slot) != AAFRESULT_SUCCESS)
 		{
-			CHECK(pDict->CreateInstance(&AUID_AAFSequence, (ImplAAFObject **)&aSequ));
-			CHECK(pDict->CreateInstance(&AUID_AAFFiller, (ImplAAFObject **)&filler1));
+			CHECK(pDict->CreateInstance(AUID_AAFSequence, (ImplAAFObject **)&aSequ));
+			CHECK(pDict->CreateInstance(AUID_AAFFiller, (ImplAAFObject **)&filler1));
 			if(aSequ == NULL || filler1 == NULL)
 				RAISE(E_FAIL);
 			CHECK(aSequ->AppendComponent(filler1));
 			CHECK(aSequ->AppendComponent(sclp));
-			CHECK(pDict->CreateInstance(&AUID_AAFFiller, (ImplAAFObject **)&filler2));
+			CHECK(pDict->CreateInstance(AUID_AAFFiller, (ImplAAFObject **)&filler2));
 			CHECK(aSequ->AppendComponent(filler2));
 
 			/* (SPR#343) Change to validate multiple ranges */
@@ -494,14 +494,14 @@ AAFRESULT STDMETHODCALLTYPE
 						CHECK(SubInt64fromInt64(length, &endFillLen));
 						CHECK(SubInt64fromInt64(firstFillLen, &endFillLen));
 						/****/
-						CHECK(subSegment->SetLength(&firstFillLen));
+						CHECK(subSegment->SetLength(firstFillLen));
 						/* 1.x does not have a Sequence Length property */
 						CHECK(segSequ->GetLength(&sequLen));
 						SubInt64fromInt64(oldFillLen, &sequLen);
 						AddInt64toInt64(firstFillLen, &sequLen);
-						CHECK(segSequ->SetLength(&sequLen));
+						CHECK(segSequ->SetLength(sequLen));
 
-						CHECK(pDict->CreateInstance(&AUID_AAFFiller, (ImplAAFObject **)&filler2));
+						CHECK(pDict->CreateInstance(AUID_AAFFiller, (ImplAAFObject **)&filler2));
 //!!!						filler2 = CreateImpl(CLSID_AAFFiller(_file, mediaKind, endFillLen);	
 						CHECK(segSequ->AppendComponent(sclp));
 						CHECK(segSequ->AppendComponent(filler2));
@@ -608,28 +608,36 @@ AAFRESULT STDMETHODCALLTYPE
 // NewPhysSourceRef()
 //
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::NewPhysSourceRef (aafRational_t  editrate,
-                           aafSlotID_t  aMobSlot,
-                           aafUID_t *pEssenceKind,
-							aafSourceRef_t  ref,
-                           aafLength_t  srcRefLength)
+    ImplAAFSourceMob::NewPhysSourceRef (const aafRational_t & editrate,
+										aafSlotID_t  aMobSlot,
+										const aafUID_t & essenceKind,
+										aafSourceRef_t  ref,
+										aafLength_t  srcRefLength)
 {
-	return(ImplAAFMob::AddPhysSourceRef(kAAFForceOverwrite, editrate, aMobSlot,
-							pEssenceKind, ref, srcRefLength));
+	return(ImplAAFMob::AddPhysSourceRef(kAAFForceOverwrite,
+										editrate,
+										aMobSlot,
+										essenceKind,
+										ref,
+										srcRefLength));
 }
 
 //****************
 // AppendPhysSourceRef()
 //
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFSourceMob::AppendPhysSourceRef (aafRational_t  editrate,
-                           aafSlotID_t  aMobSlot,
-                           aafUID_t *pEssenceKind,
-							aafSourceRef_t  ref,
-                           aafLength_t  srcRefLength)
+    ImplAAFSourceMob::AppendPhysSourceRef (const aafRational_t & editrate,
+										   aafSlotID_t  aMobSlot,
+										   const aafUID_t & essenceKind,
+										   aafSourceRef_t  ref,
+										   aafLength_t  srcRefLength)
 {
-	return(ImplAAFMob::AddPhysSourceRef(kAAFAppend, editrate, aMobSlot,
-							pEssenceKind, ref, srcRefLength));
+	return(ImplAAFMob::AddPhysSourceRef(kAAFAppend,
+										editrate,
+										aMobSlot,
+										essenceKind,
+										ref,
+										srcRefLength));
 }
 
 
@@ -639,14 +647,14 @@ AAFRESULT STDMETHODCALLTYPE
 //
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSourceMob::AddPulldownRef (aafAppendOption_t  addType,
-							aafRational_t  editrate,
-                           aafSlotID_t  aMobSlot,
-                           aafUID_t * pEssenceKind,
-							aafSourceRef_t  ref,
-                           aafLength_t  srcRefLength,
-                           aafPulldownKind_t  pulldownKind,
-                           aafPhaseFrame_t  phaseFrame,
-                           aafPulldownDir_t  direction)
+									  const aafRational_t & editrate,
+									  aafSlotID_t  aMobSlot,
+									  const aafUID_t & essenceKind,
+									  aafSourceRef_t  ref,
+									  aafLength_t  srcRefLength,
+									  aafPulldownKind_t  pulldownKind,
+									  aafPhaseFrame_t  phaseFrame,
+									  aafPulldownDir_t  direction)
 {
 	ImplAAFSourceClip	*sclp = NULL;
 	ImplAAFTimelineMobSlot		*trkd = NULL;
@@ -672,8 +680,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 		CvtInt32toPosition(0, zeroPos);
 		{
-			CHECK(dict->CreateInstance(&AUID_AAFPulldown, (ImplAAFObject **)&pdwn));
-			CHECK(pdwn->SetDataDef(pEssenceKind));
+			CHECK(dict->CreateInstance(AUID_AAFPulldown, (ImplAAFObject **)&pdwn));
+			CHECK(pdwn->SetDataDef(essenceKind));
 			CHECK(pdwn->SetPulldownKind(pulldownKind));
 			CHECK(pdwn->SetPhaseFrame(phaseFrame));
 			CHECK(pdwn->SetPulldownDirection(direction));
@@ -682,7 +690,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 			if(isOneToOne)
 			{
-				CHECK(pdwn->SetLength(&srcRefLength));
+				CHECK(pdwn->SetLength(srcRefLength));
 			}
 			else
 			{
@@ -690,7 +698,7 @@ AAFRESULT STDMETHODCALLTYPE
 				 * the input length (so the ratios look backwards)
 				 */
 				CHECK(pdwn->MapOffset(srcRefLength, AAFTrue, &outLength, NULL));
-				CHECK(pdwn->SetLength(&outLength));
+				CHECK(pdwn->SetLength(outLength));
 			}
 		}
 			
@@ -715,8 +723,8 @@ AAFRESULT STDMETHODCALLTYPE
 				if(numSegments == 0)
 				{
 					CHECK(sequence->AppendComponent(pdwn));
-					CHECK(dict->CreateInstance(&AUID_AAFSourceClip, (ImplAAFObject **)&sclp));
-					CHECK(sclp->Initialize(pEssenceKind, &srcRefLength, ref));
+					CHECK(dict->CreateInstance(AUID_AAFSourceClip, (ImplAAFObject **)&sclp));
+					CHECK(sclp->Initialize(essenceKind, srcRefLength, ref));
 				}
 				for(n = 0; n < numSegments; n++)
 				{
@@ -740,12 +748,12 @@ AAFRESULT STDMETHODCALLTYPE
 			}
 			
 			XASSERT(sclp != NULL, AAFRESULT_NOT_SOURCE_CLIP);
-			CHECK(sclp->Initialize(pEssenceKind, &srcRefLength, ref));
+			CHECK(sclp->Initialize(essenceKind, srcRefLength, ref));
 		}
 		else
 		{
-			CHECK(dict->CreateInstance(&AUID_AAFSourceClip, (ImplAAFObject **)&sclp));
-			CHECK(sclp->Initialize(pEssenceKind, &srcRefLength, ref));
+			CHECK(dict->CreateInstance(AUID_AAFSourceClip, (ImplAAFObject **)&sclp));
+			CHECK(sclp->Initialize(essenceKind, srcRefLength, ref));
 			CHECK(AppendNewTimelineSlot(editrate, pdwn,
 								aMobSlot, NULL, zeroPos, &trkd) );
 		}
@@ -918,7 +926,8 @@ AAFRESULT ImplAAFSourceMob::FindTimecodeClip(
  */
 AAFRESULT ImplAAFSourceMob::ReconcileMobLength(void)
 {
-	aafInt32					numSlots, loop;
+	aafNumSlots_t				numSlots;
+	aafUInt32					loop;
 	aafLength_t					len;
 	ImplAAFMobSlot				*slot = NULL;
 	ImplAAFTimelineMobSlot		*timelineSlot = NULL;
@@ -956,7 +965,7 @@ AAFRESULT ImplAAFSourceMob::ReconcileMobLength(void)
 					{
 						CHECK(AAFConvertEditRate(	srcRate, len, destRate, kRoundFloor, &len));
 					}
-					CHECK(seg->SetLength(&len));
+					CHECK(seg->SetLength(len));
 					seg->ReleaseReference();
 					seg = NULL;
 				}
@@ -994,5 +1003,4 @@ AAFRESULT ImplAAFSourceMob::ReconcileMobLength(void)
 }
 
 
-OMDEFINE_STORABLE(ImplAAFSourceMob, AUID_AAFSourceMob);
 

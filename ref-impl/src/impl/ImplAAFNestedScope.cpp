@@ -1,15 +1,3 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
-
-
-
-/******************************************\
-*                                          *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -36,6 +24,9 @@
  * LIABILITY.
  *
  ************************************************************************/
+
+
+
 /*************************************************************************
  * 
  * @class AAFNestedScope | an AAFNestedScope object defines a scope that 
@@ -133,7 +124,8 @@ AAFRESULT STDMETHODCALLTYPE
 	return(AAFRESULT_SUCCESS);
 }
 
-AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafUID_t *from, aafUID_t *to)
+AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(const aafUID_t & from,
+														const aafUID_t & to)
 {
 	ImplAAFComponent	*comp = NULL;
 	
