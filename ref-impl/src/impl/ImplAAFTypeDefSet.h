@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefSet.h,v 1.17.2.1 2004/07/23 19:25:35 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefSet.h,v 1.17.2.2 2004/08/09 22:10:48 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,9 +40,10 @@ class ImplAAFPropertyDef;
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMSetType.h"
 #include "OMWeakRefProperty.h"
 
-class ImplAAFTypeDefSet : public ImplAAFTypeDef
+class ImplAAFTypeDefSet : public ImplAAFTypeDef, public OMSetType
 {
 public:
   //
@@ -189,6 +190,9 @@ public:
     GetTypeCategory (/*[out]*/ eAAFTypeCategory_t *  pTid);
 
 public:
+
+  virtual OMType* elementType(void) const;
+
   //****************
   // pvtInitialize()
   //
