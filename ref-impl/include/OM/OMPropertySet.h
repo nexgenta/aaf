@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -53,7 +53,7 @@ public:
   OMProperty* get(const OMPropertyId propertyId) const;
 
     // @cmember Get the <c OMProperty> named <p propertyName>.
-  OMProperty* get(const char* propertyName) const;
+  OMProperty* get(const wchar_t* propertyName) const;
 
     // @cmember Insert the <c OMProperty> <p property> into this
     //          <c OMPropertySet>.
@@ -69,7 +69,7 @@ public:
 
     // @cmember Is an <c OMProperty> with name <p propertyName>
     //          present in this <c OMPropertySet> ?
-  bool isPresent(const char* propertyName) const;
+  bool isPresent(const wchar_t* propertyName) const;
 
     // @cmember Is an <c OMProperty> with property id <p propertyId>
     //          allowed in this <c OMPropertySet> ?
@@ -109,7 +109,7 @@ private:
 
   // OMPropertySetElement for 'propertyName' or null if not found.
   //
-  OMPropertySetElement* find(const char* propertyName) const;
+  OMPropertySetElement* find(const wchar_t* propertyName) const;
 
   // First free entry or null if full.
   //
