@@ -38,7 +38,8 @@
 ImplAAFPropertyDef::ImplAAFPropertyDef ()
   : _Type(PID_PropertyDefinition_Type, "Type"),
     _IsOptional(PID_PropertyDefinition_IsOptional, "IsOptional"),
-    _pid(PID_PropertyDefinition_LocalIdentification, "LocalIdentification")
+    _pid(PID_PropertyDefinition_LocalIdentification, "LocalIdentification"),
+	_cachedType (0)  // BobT: don't reference count the cached type!
 {
   _persistentProperties.put (_Type.address());
   _persistentProperties.put (_IsOptional.address());
@@ -47,7 +48,9 @@ ImplAAFPropertyDef::ImplAAFPropertyDef ()
 
 
 ImplAAFPropertyDef::~ImplAAFPropertyDef ()
-{}
+{
+  // BobT: don't reference count the cached type!
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -89,38 +92,47 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! ppTypeDef) return AAFRESULT_NULL_PARAM;
 
-  ImplAAFDictionary * pDict = 0;
-  ImplAAFTypeDef * ptd = 0;
-  AAFRESULT hr;
+  if (! _cachedType)
+	{
+	  ImplAAFDictionarySP pDict;
+	  AAFRESULT hr;
 
-  hr = GetDictionary(&pDict);
-  if (AAFRESULT_FAILED (hr)) return hr;
-  assert (pDict);
+	  hr = GetDictionary(&pDict);
+	  if (AAFRESULT_FAILED (hr)) return hr;
+	  assert (pDict);
 
-  aafUID_t typeId = _Type;
-  hr = pDict->LookupType (&typeId, &ptd);
-  if (AAFRESULT_FAILED (hr))
-    {
-      assert (pDict);
-      pDict->ReleaseReference ();
-      pDict = 0;
-      return hr;
-    }
-  assert (ptd);
+	  ImplAAFPropertyDef * pNonConstThis =
+		  (ImplAAFPropertyDef *) this;
+	  aafUID_t typeId = _Type;
+
+	  // Remember that _cachedType is *not* referenced counted!
+	  ImplAAFTypeDef * tmp = 0;
+	  hr = pDict->LookupType (&typeId, &tmp);
+	  if (AAFRESULT_FAILED (hr))
+		return hr;
+	  assert (tmp);
+	  pNonConstThis->_cachedType = tmp;
+	  tmp->ReleaseReference ();
+	}
   assert (ppTypeDef);
-  *ppTypeDef = ptd;
-
-  // release/acquire cancel each other
-  // ptd->ReleaseReference ();
-  // (*ppTypeDef)->AcquireReference ();
-
-  assert (pDict);
-  pDict->ReleaseReference ();
-  pDict = 0;
+  *ppTypeDef = _cachedType;
+  assert (*ppTypeDef);
+  (*ppTypeDef)->AcquireReference ();
 
   return AAFRESULT_SUCCESS;
 }
 
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPropertyDef::GetIsOptional (
+       aafBool * pIsOptional) const
+{
+  if (! pIsOptional)
+	return AAFRESULT_NULL_PARAM;
+  *pIsOptional = _IsOptional;
+  return AAFRESULT_SUCCESS;
+}
 
 
 AAFRESULT STDMETHODCALLTYPE
