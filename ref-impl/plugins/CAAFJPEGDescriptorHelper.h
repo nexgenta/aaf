@@ -1,30 +1,3 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
-
 //@doc
 //@class    CAAFJPEGDescriptorHelper | class that wraps all of the descriptor interfaces
 // needed by the JPEG codec. This class should be replaced by a future
@@ -60,7 +33,7 @@ public:
 	//
 	// EssenceDescriptor methods:
 	//
-	STDMETHOD (GetNumLocators) (aafUInt32 *  pCount);
+	STDMETHOD (GetNumLocators) (aafInt32 *  pCount);
 	STDMETHOD (AppendLocator) (IAAFLocator * pLocator);
 	STDMETHOD (PrependLocator) (IAAFLocator * pLocator);
 	STDMETHOD (EnumAAFAllLocators) (IEnumAAFLocators ** ppEnum);
@@ -69,16 +42,16 @@ public:
 	//
 	STDMETHOD (SetLength) (aafLength_t  length);
 	STDMETHOD (GetLength) (aafLength_t *  pLength);
-	STDMETHOD (SetCodecDef) (IAAFCodecDef *codecDef);
-	STDMETHOD (GetCodecDef) (IAAFCodecDef **  ppCodecDef);
-	STDMETHOD (SetSampleRate) (const aafRational_t & rate);
+	STDMETHOD (SetIsInContainer) (aafBool  isAAF);
+	STDMETHOD (GetIsInContainer) (aafBool *  pIsAAF);
+	STDMETHOD (SetSampleRate) (aafRational_t *  pRate);
 	STDMETHOD (GetSampleRate) (aafRational_t*  pRate);
-	STDMETHOD (SetContainerFormat) (IAAFContainerDef *pFormat);
-	STDMETHOD (GetContainerFormat) (IAAFContainerDef **ppFormat);
+	STDMETHOD (SetContainerFormat) (aafUID_t *  pFormat);
+	STDMETHOD (GetContainerFormat) (aafUID_t *  pFormat);
 	//
 	// DigitalImageDescriptor methods:
 	//
-	STDMETHOD (SetCompression) (const aafUID_t & codecID);
+	STDMETHOD (SetCompression) (aafUID_t *  pCodecID);
 	STDMETHOD (GetCompression) (aafUID_t *  pCompression);
 	STDMETHOD (SetStoredView) (aafUInt32  StoredHeight, aafUInt32  StoredWidth);
 	STDMETHOD (GetStoredView) (aafUInt32 *  pStoredHeight, aafUInt32 *  pStoredWidth);
@@ -95,10 +68,10 @@ public:
 	STDMETHOD (GetImageAspectRatio) (aafRational_t *  pImageAspectRatio);
 	STDMETHOD (SetAlphaTransparency) (aafAlphaTransparency_t  AlphaTransparency);
 	STDMETHOD (GetAlphaTransparency) (aafAlphaTransparency_t *  pAlphaTransparency);
-	STDMETHOD (SetGamma) (aafUID_t  Gamma);
-	STDMETHOD (GetGamma) (aafUID_t *  pGamma);
-	STDMETHOD (SetImageAlignmentFactor) (aafUInt32  ImageAlignmentFactor);
-	STDMETHOD (GetImageAlignmentFactor) (aafUInt32 *  pImageAlignmentFactor);
+	STDMETHOD (SetGamma) (aafRational_t  Gamma);
+	STDMETHOD (GetGamma) (aafRational_t *  pGamma);
+	STDMETHOD (SetImageAlignmentFactor) (aafInt32  ImageAlignmentFactor);
+	STDMETHOD (GetImageAlignmentFactor) (aafInt32 *  pImageAlignmentFactor);
 	//
 	// CDCIDescriptor methods:
 	//
@@ -116,13 +89,7 @@ public:
 	STDMETHOD (GetColorRange) (aafUInt32 *  pColorRange);
 	STDMETHOD (SetPaddingBits) (aafInt16  PaddingBits);
 	STDMETHOD (GetPaddingBits) ( aafInt16 *  pPaddingBits);
-	STDMETHOD (GetOffsetFrameIndexes) (aafUInt32 * pOffset);
-	STDMETHOD (GetFrameIndexByteOrder) (aafUInt16 *byteOrder);
-	STDMETHOD (PutFrameIndexProperties) (aafUInt32 offset, aafUInt16 byteOrder);
-	STDMETHOD (GetResolutionID) ( aafInt32 *p_resid );
-	STDMETHOD (SetResolutionID) ( aafInt32  resolutionID );
-	STDMETHOD (SetFirstFrameOffset) ( aafInt32  firstFrameOffset );
-	STDMETHOD (SetFrameSampleSize) ( aafInt32 frameSampleSize );
+
 
 private:
 	IUnknown *_filemob_unk; // used for equality testing.
