@@ -7,25 +7,17 @@
 *                                          *
 \******************************************/
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
- 
 /***********************************************\
-*	Stub only.   Implementation not yet added	*
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
 \***********************************************/
 
-
-
-
 #include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIds.h"
+#include "AAFPropertyIDs.h"
 
 #ifndef __ImplAAFEdgecode_h__
 #include "ImplAAFEdgecode.h"
@@ -38,14 +30,14 @@
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "aafCvt.h"
-#include "aafUtils.h"
-#include "AAFDefUIDs.h"
+#include "AAFUtils.h"
+#include "AAFDataDefs.h"
 
 
 ImplAAFEdgecode::ImplAAFEdgecode ():
 _start( PID_EdgeCode_Start, "Start"),
-_filmType( PID_EdgeCode_FilmKind, "Film type"),
-_edgeType( PID_EdgeCode_CodeFormat, "Edge type"),
+_filmType( PID_EdgeCode_FilmKind, "FilmKind"),
+_edgeType( PID_EdgeCode_CodeFormat, "CodeFormat"),
 _header( PID_EdgeCode_Header, "Header")
 {
 	_persistentProperties.put(_start.address());
