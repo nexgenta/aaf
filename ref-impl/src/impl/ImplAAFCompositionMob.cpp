@@ -22,16 +22,13 @@
 #include "ImplAAFCompositionMob.h"
 #endif
 
-#include "AAFStoredObjectIDs.h"
-#include "AAFPropertyIDs.h"
-
 #include <assert.h>
 #include "AAFResult.h"
 
 ImplAAFCompositionMob::ImplAAFCompositionMob ():
-	_defaultFadeLen(	PID_CompositionMob_DefaultFadeLength,		"Default Fade Length"),
-	_defaultFadeType(	PID_CompositionMob_DefFadeType,			"Default Fade Type"),
-	_defaultFadeEditUnit(PID_CompositionMob_DefFadeEditUnit,	"Default Fade Edit Unit")
+	_defaultFadeLen(	PID_COMPOSITIONMOB_DEFAULTFADELENGTH,		"defaultFadeLength"),
+	_defaultFadeType(	PID_COMPOSITIONMOB_DEFAULTFADETYPE,			"defaultFadeType"),
+	_defaultFadeEditUnit(PID_COMPOSITIONMOB_DEFAULTFADEEDITUNIT,	"defaultFadeEditUnit")
 {
 	_persistentProperties.put(		_defaultFadeLen.address());
 	_persistentProperties.put(		_defaultFadeType.address());
@@ -131,4 +128,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-OMDEFINE_STORABLE(ImplAAFCompositionMob, AUID_AAFCompositionMob);
+extern "C" const aafClassID_t CLSID_AAFCompositionMob;
+
+OMDEFINE_STORABLE(ImplAAFCompositionMob, CLSID_AAFCompositionMob);
+
