@@ -38,6 +38,10 @@
 #include "AAF.h"
 // TODO: This should not be here, I added them for now to get a good link.
 const CLSID CLSID_AAFSession = { 0xF0C10891, 0x3073, 0x11d2, { 0x80, 0x4A, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+
+const CLSID CLSID_AAFMob =            { 0xB1A21375, 0x1A7D, 0x11d2, { 0xBF, 0x78, 0x00, 0x10, 0x4B, 0xC9, 0x15, 0x6D } };
+
+const CLSID CLSID_AAFSegment =        { 0x7a2f0571, 0x1ba3, 0x11D2, { 0xbf, 0xaa, 0x00, 0x60, 0x97, 0x11, 0x62, 0x12 } };
 #endif
 
 static void     FatalErrorCode(HRESULT errcode, int line, char *file)
@@ -64,30 +68,32 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 
 static void printIdentification(IAAFIdentification* pIdent)
 {
-	aafString_t companyName;
-	check(pIdent->GetCompanyName(&companyName));
-	wprintf(L"CompanyName          = \"%s\"\n", companyName.value);
+    aafWChar companyName[500];
+	check(pIdent->GetCompanyName(companyName, sizeof (companyName)));
+	wprintf(L"CompanyName          = \"%s\"\n", companyName);
 
-	aafString_t productName;
-	check(pIdent->GetProductName(&productName));
-	wprintf(L"ProductName          = \"%s\"\n", productName.value);
+	aafWChar productName[500];
+	check(pIdent->GetProductName(productName, sizeof (productName)));
+	wprintf(L"ProductName          = \"%s\"\n", productName);
 
-	aafString_t productVersionString;
-	check(pIdent->GetProductVersionString(&productVersionString));
-	wprintf(L"ProductVersionString = \"%s\"\n", productVersionString.value);
+	aafWChar productVersionString[500];
+	check(pIdent->GetProductVersionString(productVersionString,
+										  sizeof (productVersionString)));
+	wprintf(L"ProductVersionString = \"%s\"\n", productVersionString);
 
-	aafString_t platform;
-	check(pIdent->GetPlatform(&platform));
-	wprintf(L"Platform             = \"%s\"\n", platform.value);
+	aafWChar platform[500];
+	check(pIdent->GetPlatform(platform, sizeof (platform)));
+	wprintf(L"Platform             = \"%s\"\n", platform);
 }
 
-static void ReadAAFFile(unsigned char * pFileName)
+static void ReadAAFFile(aafWChar * pFileName)
 {
 	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
 	IAAFHeader *				pHeader = NULL;
 	IAAFIdentification *		pIdent;
 	aafProductIdentification_t	ProductInfo;
+	aafNumSlots_t	numMobs, n, s;
 
 	ProductInfo.companyName = (unsigned char *)"AAF Developers Desk. NOT!";
 	ProductInfo.productName = (unsigned char *)"Make AVR Example. NOT!";
@@ -117,6 +123,44 @@ static void ReadAAFFile(unsigned char * pFileName)
 	wprintf(L"LastIdentification\n");
 	printIdentification(pIdent);
 
+	check(pHeader->GetNumMobs(kAllMob, &numMobs));
+	printf("Number of Mobs = %ld\n", numMobs);
+
+	IEnumAAFMobs *mobIter;
+//!!!	aafSearchCrit_t		criteria;
+//!!!	criteria.searchTag = kNoSearch;
+    check(pHeader->EnumAAFAllMobs (NULL, &mobIter));
+	for(n = 0; n < numMobs; n++)
+	{
+		IAAFMob			*aMob;
+		aafString_t		name, slotName;
+		aafNumSlots_t	numSlots;
+		IEnumAAFMobSlots	*slotIter;
+		IAAFMobSlot		*slot;
+		aafUID_t		mobID;
+		aafTrackID_t	trackID;
+
+		check(mobIter->NextOne (&aMob));
+		check(aMob->GetName (&name));
+		check(aMob->GetMobID (&mobID));
+		wprintf(L"Mob %ld: (ID %ld) is named '%s'\n", n, mobID.Data1, name.value);
+	    check(aMob->GetNumSlots (&numSlots));
+		printf("Found %ld slots\n", numSlots);
+		if(numSlots != 0)
+		{
+			check(aMob->GetAllMobSlots(&slotIter));
+			for(s = 0; s < numSlots; s++)
+			{
+				check(slotIter->NextOne (&slot));
+				check(slot->GetName (&slotName));
+				check(slot->GetTrackID(&trackID));
+				wprintf(L"    Slot %ld: (ID %ld), is named '%s'\n",
+							s, trackID, slotName.value);
+			}
+		}
+	}
+
+	//!!! Problem deleting, let it leak -- 	delete mobIter;
 	check(pFile->Close());
 
 	check(pSession->EndSession());
@@ -126,11 +170,14 @@ static void ReadAAFFile(unsigned char * pFileName)
 	if (pSession) pSession->Release();
 }
 
-static void CreateAAFFile(unsigned char * pFileName)
+static void CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFSession *				pSession = NULL;
 	IAAFFile *					pFile = NULL;
+	IAAFHeader *				pHeader = NULL;
 	aafProductIdentification_t	ProductInfo;
+	aafString_t					newName;
+	aafUID_t					newUID;
 
 	ProductInfo.companyName = (unsigned char *)"AAF Developers Desk";
 	ProductInfo.productName = (unsigned char *)"Make AVR Example";
@@ -153,6 +200,50 @@ static void CreateAAFFile(unsigned char * pFileName)
 
 	check(pSession->CreateFile(pFileName, kAAFRev1, &pFile));
   
+  	check(pFile->GetHeader(&pHeader));
+ 	
+//Make the first mob
+	IAAFMob						*pMob;
+	long	test;
+	aafWChar		*names[5] = { L"FOOBAR1", L"FOOBAR2", L"FOOBAR3", L"FOOBAR4", L"FOOBAR5" };
+	aafRational_t	editRate = { 2997, 100 };
+	IAAFMobSlot		*newSlot;
+	aafString_t		slotName;
+	IAAFSegment		*seg;
+	aafInt32		testSlot;
+	aafWChar		*slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+
+	
+	for(test = 0; test < 5; test++)
+	{
+ 		check(CoCreateInstance(CLSID_AAFMob,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFMob, 
+						   (void **)&pMob));
+		newUID.Data1 = test;
+		check(pMob->SetIdentity(&newUID));
+		newName.length = 7;
+		newName.value = names[test];
+		check(pMob->SetName(&newName));
+
+		for(testSlot = 0; testSlot < 3; testSlot++)
+		{
+ 			check(CoCreateInstance(CLSID_AAFSegment,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFSegment, 
+						   (void **)&seg));		//!!!Temp, abstract superclass
+			slotName.length = 6;
+			slotName.value = slotNames[testSlot];
+	
+			check(pMob->AppendNewSlot (editRate, seg, testSlot+1, &slotName, &newSlot));
+//			seg->Release();
+//			newSlot->Release();
+		}
+		check(pHeader->AppendMob(pMob));
+//		pMob->Release();
+	}
 	check(pFile->Close());
 
 	check(pSession->EndSession());
@@ -178,7 +269,7 @@ struct CComInitialize
 main()
 {
 	CComInitialize comInit;
-	unsigned char * pFileName = (unsigned char *)"Foo.aaf";
+	aafWChar * pFileName = L"Foo.aaf";
 
   	wprintf(L"***Creating file %s\n", pFileName);
 	CreateAAFFile(pFileName);
