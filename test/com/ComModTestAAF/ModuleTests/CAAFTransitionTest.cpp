@@ -279,14 +279,19 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
     checkResult(pConstantValue->QueryInterface (IID_IAAFParameter, (void **)&pParm));
     checkResult(pOperationGroup->AddParameter (pParm));
-    pParm->Release();
-    pParm = NULL;
+//    pParm->Release();
+ //	IAAFSegment*				pSegment = NULL;
+   pParm = NULL;
     pConstantValue->Release();
     pConstantValue = NULL;
 
 		checkResult(defs.cdFiller()->
 					CreateInstance(IID_IAAFSegment,
 								   (IUnknown **) &pEffectFiller));
+		 checkResult(pEffectFiller->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		pComponent->Release();
+		pComponent = NULL;
 		checkResult(pOperationGroup->AppendInputSegment (pEffectFiller));
 		// release the filler
 		pEffectFiller->Release();
