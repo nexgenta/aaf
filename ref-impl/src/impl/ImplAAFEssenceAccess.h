@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceAccess.h,v 1.38 2004/09/10 17:13:06 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEssenceAccess.h,v 1.39 2004/10/28 15:18:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -119,39 +119,7 @@ public:
  //Sets which variety of the codec ID is to be used.)
   virtual AAFRESULT STDMETHODCALLTYPE
 	SetEssenceCodecFlavour(aafUID_t variety);
-/*
-  //****************
-  // CreateStatic()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
 
-	      CreateStatic
-        (ImplAAFMasterMob *masterMob,
-		// @parm [in] 
-		 aafSlotID_t masterSlotID,
-
-         // @parm [in] create essence of this type
-         const aafUID_t & mediaKind,
-
- 		 const aafUID_t & codecID,
-		 const aafRational_t & editRate,
-		 const aafRational_t & sampleRate,
-
-         // @parm [in] optionally compressing it
-         aafCompressEnable_t  Enable);
-	//@comm Creates a single channel stream of essence.  Convenience functions
-	// exist to create audio or video essence, and a separate call
-	// (MultiCreate) exists to create interleaved audio and
-	// video data.
-	//@comm The essence handle from this call can be used with
-	// WriteDataSamples  and possibly WriteDataLines, but NOT with
-	// WriteMultiSamples.
-	//@comm If you are creating the essence, and then attaching it to a master
-	// mob, then the "masterMob" field may be left NULL.
-	// For video, the sampleRate should be the edit rate of the file mob.
-	// For audio, the sample rate should be the actual samples per second.
-	//@comm Replaces omfmMediaCreate
-*/
   virtual AAFRESULT STDMETHODCALLTYPE
     Create
         (ImplAAFMasterMob *masterMob,
