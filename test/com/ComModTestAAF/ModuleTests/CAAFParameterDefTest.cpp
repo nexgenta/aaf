@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFParameterDefTest.cpp,v 1.33 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFParameterDefTest.cpp,v 1.34 2004/10/22 14:20:48 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -190,7 +190,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pDefObject = NULL;
 
 //!!!Not testing the Init() on AAFDefObject
-		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
+		checkResult(pOperationDef->SetDataDef (defs.ddkAAFPicture()));
 		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
@@ -287,7 +287,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		pDefObject = NULL;
 		
 		aafBool bResult = kAAFFalse;
-		checkResult (pReadDataDef->IsDataDefOf(defs.ddPicture(), &bResult));
+		checkResult (pReadDataDef->IsDataDefOf(defs.ddkAAFPicture(), &bResult));
 		checkExpression(bResult == kAAFTrue, AAFRESULT_TEST_FAILED);
 		checkResult(pOperationDef->IsTimeWarp (&readIsTimeWarp));
 		checkExpression(readIsTimeWarp == kAAFFalse, AAFRESULT_TEST_FAILED);

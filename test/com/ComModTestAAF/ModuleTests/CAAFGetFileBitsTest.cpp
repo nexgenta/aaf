@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFGetFileBitsTest.cpp,v 1.7 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFGetFileBitsTest.cpp,v 1.8 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -116,7 +116,7 @@ static HRESULT GetFileBitsTest ()
 	(AAFCreateAAFFileOnRawStorage (pWriteStg,
 								   kAAFFileExistence_new,
 								   kAAFFileAccess_modify,
-								   &aafFileKindAaf4KBinary,
+								   &kAAFFileKind_Aaf4KBinary,
 								   0,
 								   &sIdent,
 								   &pWriteFile));

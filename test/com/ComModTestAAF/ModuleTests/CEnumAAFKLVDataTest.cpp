@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFKLVData
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFKLVDataTest.cpp,v 1.13 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFKLVDataTest.cpp,v 1.14 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -202,7 +202,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					  CreateInstance(IID_IAAFSourceClip, 
 									 (IUnknown **)&sclp));		
 		 checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		pComponent->Release();
 		pComponent = NULL;
 

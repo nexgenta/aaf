@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFile
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.39 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.40 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -200,7 +200,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool useEx )
 
 	  // Create the file.
 	  if ( useEx ) {
-	    aafUID_t fileKind = aafFileKindAaf4KBinary;
+	    aafUID_t fileKind = kAAFFileKind_Aaf4KBinary;
 	    checkResult(AAFFileOpenNewModifyEx(pFileName, &fileKind, 0, &ProductInfo, &pFile));
 	  }
 	  else {

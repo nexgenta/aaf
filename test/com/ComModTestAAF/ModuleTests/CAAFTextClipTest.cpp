@@ -5,7 +5,7 @@
 // @com This file implements the module test for CAAFTextClip
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTextClipTest.cpp,v 1.22 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTextClipTest.cpp,v 1.23 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -267,7 +267,7 @@ void TextClipTest::CreateTextClip()
 			  CreateInstance(IID_IAAFTextClip, 
 							 (IUnknown **)&pTextClip));
   checkResult(pTextClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-  checkResult(pComponent->SetDataDef(defs.ddPicture()));
+  checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
   pComponent->Release();
   pComponent = NULL;
 

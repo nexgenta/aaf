@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefOpaque
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefOpaqueTest.cpp,v 1.10 2004/02/27 18:46:43 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefOpaqueTest.cpp,v 1.11 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -326,7 +326,7 @@ static void CreateTypeDefOpaqueFile(aafWChar *pFilename)
 	IAAFSequenceSP pSequence;
 	checkResult(pDictionary->CreateInstance(AUID_AAFSequence,IID_IAAFSequence,
 		(IUnknown**)&pSequence));
-	checkResult(pSequence->Initialize(defs.ddSound()));
+	checkResult(pSequence->Initialize(defs.ddkAAFSound()));
 
 	// Set value of our new property to property value created above
 	IAAFObjectSP pObject;

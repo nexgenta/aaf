@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFileDescriptor
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileDescriptorTest.cpp,v 1.28 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFileDescriptorTest.cpp,v 1.29 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,7 +139,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// Add some slots
 		for(test = 0; test < 2; test++)
 		{
-			checkResult(pSourceMob->AddNilReference (test+1, 0, defs.ddSound(), audioRate));
+			checkResult(pSourceMob->AddNilReference (test+1, 0, defs.ddkAAFSound(), audioRate));
 		}
 		
 		// Create a concrete subclass of FileDescriptor

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFParameters
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFParametersTest.cpp,v 1.7 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFParametersTest.cpp,v 1.8 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -140,7 +140,7 @@ void CEnumAAFParametersTest::CreateOperationGroup(IAAFDictionary *pDictionary)
 	checkResult(pOperationDef->Initialize (kTestEffectID,L"An effect name",
 		L"An effect description"));
 
-	checkResult(pOperationDef->SetDataDef(defs.ddPicture()));
+	checkResult(pOperationDef->SetDataDef(defs.ddkAAFPicture()));
 	checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 	checkResult(pOperationDef->SetNumberInputs(3));
 	checkResult(pOperationDef->SetCategory(kTestCategoryID));
@@ -165,7 +165,7 @@ void CEnumAAFParametersTest::CreateOperationGroup(IAAFDictionary *pDictionary)
 	// Create & initialize operation group
 	checkResult(defs.cdOperationGroup()->CreateInstance(
 		IID_IAAFOperationGroup,(IUnknown **)&_pOperationGroup));
-	checkResult(_pOperationGroup->Initialize(defs.ddPicture(),60,
+	checkResult(_pOperationGroup->Initialize(defs.ddkAAFPicture(),60,
 		pOperationDef));
 
 	// Add parameters to operation group

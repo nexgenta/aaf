@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefWeakObjRef
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefWeakObjRefTest.cpp,v 1.16 2004/05/20 15:36:42 asuraparaju Exp $ $Name:  $
+// $Id: CAAFTypeDefWeakObjRefTest.cpp,v 1.17 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -383,16 +383,16 @@ void CAAFTypeDefWeakObjRef_create (aafCharacter_constptr pFileName) // throw HRE
 	  //
 	  IAAFSequenceSP pSequence;
 	  checkResult (defs.cdSequence()->CreateInstance(IID_IAAFSequence, (IUnknown **)&pSequence));
-	  checkResult (pSequence->Initialize (defs.ddPicture()));
+	  checkResult (pSequence->Initialize (defs.ddkAAFPicture()));
 
 	  
 	  IAAFFillerSP pFiller1;
 	  checkResult (defs.cdFiller()->CreateInstance(IID_IAAFFiller, (IUnknown **)&pFiller1));
-	  checkResult (pFiller1->Initialize (defs.ddPicture(), 16));
+	  checkResult (pFiller1->Initialize (defs.ddkAAFPicture(), 16));
 	
 		IAAFFillerSP pFiller2;
 	  checkResult (defs.cdFiller()->CreateInstance(IID_IAAFFiller, (IUnknown **)&pFiller2));
-	  checkResult (pFiller2->Initialize (defs.ddPicture(), 32));
+	  checkResult (pFiller2->Initialize (defs.ddkAAFPicture(), 32));
 
 
     if (weakReferencesSupported)

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFGPITrigger
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFGPITriggerTest.cpp,v 1.13 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFGPITriggerTest.cpp,v 1.14 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -69,7 +69,7 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-static const aafUID_t DDEF_TEST = 
+static const aafUID_t kAAFDataDef_Test = 
 { 0x81831639, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 
@@ -277,7 +277,7 @@ void GPITriggerTest::CreateGPITrigger()
 		checkResult(defs.cdDataDef()->
 					CreateInstance (IID_IAAFDataDef,
 									(IUnknown **)&pDataDef));
-	  checkResult(pDataDef->Initialize (DDEF_TEST, L"Test", L"Test data"));
+	  checkResult(pDataDef->Initialize (kAAFDataDef_Test, L"Test", L"Test data"));
 	  checkResult(_pDictionary->RegisterDataDef (pDataDef));
 
 	// Create a GPITrigger

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFNestedScope
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFNestedScopeTest.cpp,v 1.29 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFNestedScopeTest.cpp,v 1.30 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -204,7 +204,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&pSourceClip));		
 		 checkResult(pSourceClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		 checkResult(pComponent->SetLength(fillerLength));
 		pComponent->Release();
 		pComponent = NULL;
@@ -220,14 +220,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFFiller, 
 								   (IUnknown **)&pFiller));
 		// Set its properties.
-	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
+	    checkResult(pFiller->Initialize(defs.ddkAAFPicture(), fillerLength));
 
 		// Now create a nested scope 
 	    checkResult(defs.cdNestedScope()->
 					CreateInstance(IID_IAAFNestedScope, 
 								   (IUnknown **)&pNestedScope));
 		 checkResult(pNestedScope->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		 checkResult(pComponent->SetLength(fillerLength));
 		pComponent->Release();
 		pComponent = NULL;
@@ -252,7 +252,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(defs.cdFiller()->
 				CreateInstance(IID_IAAFFiller, 
 				(IUnknown **)&pFiller));
-			checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
+			checkResult(pFiller->Initialize(defs.ddkAAFPicture(), fillerLength));
 			checkResult(pFiller->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 			checkResult(pNestedScope->PrependSegment(pSegment));
 			// Release the intreface so we can reuse the pointer
@@ -265,7 +265,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			checkResult(defs.cdFiller()->
 				CreateInstance(IID_IAAFFiller, 
 				(IUnknown **)&pFiller));
-			checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
+			checkResult(pFiller->Initialize(defs.ddkAAFPicture(), fillerLength));
 			checkResult(pFiller->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 			checkResult(pNestedScope->InsertSegmentAt(1,pSegment));
 			pFiller->Release();

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTimelineMobSlot
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTimelineMobSlotTest.cpp,v 1.28 2004/09/16 15:09:09 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTimelineMobSlotTest.cpp,v 1.29 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -155,7 +155,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 						CreateInstance(IID_IAAFSourceClip, 
 									   (IUnknown **)&sclp));		
 		 checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		pComponent->Release();
 		pComponent = NULL;
 			

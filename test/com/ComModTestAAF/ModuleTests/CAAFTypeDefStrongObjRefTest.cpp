@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStrongObjRefTest.cpp,v 1.26 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefStrongObjRefTest.cpp,v 1.27 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -279,12 +279,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult (defs.cdFiller()->
 				   CreateInstance(IID_IAAFFiller,
 								  (IUnknown **)&fill1));
-	  checkResult (fill1->Initialize (defs.ddPictureWithMatte(), 13));
+	  checkResult (fill1->Initialize (defs.ddkAAFPictureWithMatte(), 13));
 	  IAAFFillerSP fill2;
 	  checkResult (defs.cdFiller()->
 				   CreateInstance(IID_IAAFFiller,
 								  (IUnknown **)&fill2));
-	  checkResult (fill2->Initialize (defs.ddPictureWithMatte(), 26));
+	  checkResult (fill2->Initialize (defs.ddkAAFPictureWithMatte(), 26));
 
 	  // get the AAFObject interfaces
 	  IAAFObjectSP fillObj1;

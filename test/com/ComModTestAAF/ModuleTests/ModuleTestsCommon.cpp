@@ -2,7 +2,7 @@
 // @com Common module test routines.
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTestsCommon.cpp,v 1.2 2004/09/10 17:13:13 stuart_hc Exp $ $Name:  $
+// $Id: ModuleTestsCommon.cpp,v 1.3 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -122,7 +122,7 @@ void CreateSimpleAAFFile(aafWChar * pFileName, aafWChar* pTestName,
   CheckResult(defs.cdSourceClip()->
 	      CreateInstance(IID_IAAFSourceClip, 
 			     (IUnknown **)&pSourceClip));
-  CheckResult(pSourceClip->Initialize( defs.ddPicture(), 1, srcRef));
+  CheckResult(pSourceClip->Initialize( defs.ddkAAFPicture(), 1, srcRef));
 
   IAAFSmartPointer<IAAFSegment>	pSeg;
   CheckResult(pSourceClip->QueryInterface(IID_IAAFSegment, (void **)&pSeg));
@@ -142,7 +142,7 @@ void CreateSimpleAAFFile(aafWChar * pFileName, aafWChar* pTestName,
 	      CreateInstance(IID_IAAFSourceClip, 
 			     (IUnknown **)&pEndSourceClip));
   memset( &srcRef, 0, sizeof(srcRef) );
-  CheckResult(pEndSourceClip->Initialize( defs.ddPicture(), 1, srcRef));
+  CheckResult(pEndSourceClip->Initialize( defs.ddkAAFPicture(), 1, srcRef));
   
   IAAFSmartPointer<IAAFSegment>	pEndSeg;
   CheckResult(pEndSourceClip->QueryInterface(IID_IAAFSegment, (void **)&pEndSeg));
@@ -164,7 +164,7 @@ void CreateSimpleAAFFile(aafWChar * pFileName, aafWChar* pTestName,
   pFilePointers->pCompositionMob = pMob;
   pFilePointers->pReferencedMasterMob = pReferencedMob;
 
-  IAAFSmartPointer<IAAFDataDef> pDataDef( defs.ddPicture() );
+  IAAFSmartPointer<IAAFDataDef> pDataDef( defs.ddkAAFPicture() );
   pFilePointers->pDataDef = pDataDef;
 }
 
@@ -261,7 +261,7 @@ IAAFSmartPointer<IAAFSourceMob> AddChainedSourceMob( SimpleFilePointers* pFilePo
 			     (IUnknown **)&pSourceClip));
   aafSourceRef_t srcRef;
   memset( &srcRef, 0, sizeof(srcRef) );
-  CheckResult(pSourceClip->Initialize( defs.ddPicture(), 1, srcRef));
+  CheckResult(pSourceClip->Initialize( defs.ddkAAFPicture(), 1, srcRef));
 
   IAAFSmartPointer<IAAFSegment>	pSeg;
   CheckResult(pSourceClip->QueryInterface(IID_IAAFSegment, (void **)&pSeg));

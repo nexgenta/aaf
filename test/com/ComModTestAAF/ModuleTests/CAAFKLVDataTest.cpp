@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFKLVData
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFKLVDataTest.cpp,v 1.12 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFKLVDataTest.cpp,v 1.13 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -54,7 +54,7 @@ typedef IAAFSmartPointer<IAAFTypeDefOpaque> IAAFTypeDefOpaqueSP;
 typedef IAAFSmartPointer<IAAFKLVData> IAAFKLVDataSP;
 
 static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
-static const aafUID_t *	slotDDefs[5] = {&DDEF_Picture, &DDEF_Sound, &DDEF_Sound, &DDEF_Picture, &DDEF_Picture};
+static const aafUID_t *	slotDDefs[5] = {&kAAFDataDef_Picture, &kAAFDataDef_Sound, &kAAFDataDef_Sound, &kAAFDataDef_Picture, &kAAFDataDef_Picture};
 static aafLength_t	slotsLength[5] = { 297, 44100, 44100, 44100, 44100};
 
 static aafSourceRef_t sourceRef; 

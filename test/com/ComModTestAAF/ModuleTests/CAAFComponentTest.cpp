@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFSegment
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFComponentTest.cpp,v 1.29 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFComponentTest.cpp,v 1.30 2004/10/22 14:20:45 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -88,7 +88,7 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-#define TEST_DDEF	DDEF_Sound
+#define TEST_DDEF	kAAFDataDef_Sound
 #define TEST_LENGTH	42L
 
 

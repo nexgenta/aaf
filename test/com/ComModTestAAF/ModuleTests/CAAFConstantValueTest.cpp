@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFConstantValue
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFConstantValueTest.cpp,v 1.35 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFConstantValueTest.cpp,v 1.36 2004/10/22 14:20:45 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -191,7 +191,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(pDictionary->RegisterParameterDef(pParamDef));
 
 
-		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
+		checkResult(pOperationDef->SetDataDef (defs.ddkAAFPicture()));
 		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));
@@ -223,8 +223,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 									   (IUnknown **)&pFiller));
 			checkResult(pFiller->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
 			checkResult(pComponent->SetLength(effectLen));
-			checkResult(pComponent->SetDataDef(defs.ddPicture()));
- 			checkResult(pOperationGroup->Initialize(defs.ddPicture(), TEST_EFFECT_LEN, pOperationDef));
+			checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
+ 			checkResult(pOperationGroup->Initialize(defs.ddkAAFPicture(), TEST_EFFECT_LEN, pOperationDef));
 
 			checkResult(defs.cdConstantValue()->
 						CreateInstance(IID_IAAFConstantValue, 
@@ -246,7 +246,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 			sourceRef.sourceID = zeroMobID;
 			sourceRef.sourceSlotID = 0;
 			sourceRef.startTime = 0;
-			checkResult(pSourceClip->Initialize (defs.ddPicture(),
+			checkResult(pSourceClip->Initialize (defs.ddkAAFPicture(),
 												 effectLen,
 												 sourceRef));
 			checkResult(pSourceClip->QueryInterface (IID_IAAFSourceReference, (void **)&pSourceRef));

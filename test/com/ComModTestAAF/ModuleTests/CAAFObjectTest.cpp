@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFObject
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFObjectTest.cpp,v 1.31 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFObjectTest.cpp,v 1.32 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -291,7 +291,7 @@ static HRESULT ObjectWriteTest ()
 		  IAAFSequenceSP pSequence;
 		  checkResult (pClassDef->CreateInstance (IID_IAAFSequence,
 			  (IUnknown **)&pSequence));
-		  checkResult(pSequence->Initialize(defs.ddSound()));
+		  checkResult(pSequence->Initialize(defs.ddkAAFSound()));
 		  
 		  // Add sequence to composition Mob
 		  IAAFSegmentSP pSegment;

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceGroup
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceGroupTest.cpp,v 1.29 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceGroupTest.cpp,v 1.30 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -153,7 +153,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFEssenceGroup, 
 								   (IUnknown **)&essenceGroup));
 		checkResult(essenceGroup->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
-		checkResult(pComponent->SetDataDef (defs.ddSound()));
+		checkResult(pComponent->SetDataDef (defs.ddkAAFSound()));
 		checkResult(pComponent->SetLength (segLen));
 		pComponent->Release();
 		pComponent = NULL;
@@ -162,7 +162,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&pSourceClip));
 		checkResult(pSourceClip->QueryInterface (IID_IAAFComponent, (void **)&pComponent));
-		checkResult(pComponent->SetDataDef (defs.ddSound()));
+		checkResult(pComponent->SetDataDef (defs.ddkAAFSound()));
 		checkResult(pComponent->SetLength (stillLength));
 		checkResult(essenceGroup->SetStillFrame(pSourceClip)); 
 		pComponent->Release();
@@ -175,7 +175,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&pSourceClip));
 		sourceRef.startTime=2;
-		checkResult(pSourceClip->Initialize(defs.ddSound(),segLen,sourceRef));
+		checkResult(pSourceClip->Initialize(defs.ddkAAFSound(),segLen,sourceRef));
 		checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
 		checkResult(essenceGroup->AppendChoice(pSegment)); 
 		pSegment->Release();
@@ -194,7 +194,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFSourceClip, 
 				(IUnknown **)&pSourceClip));
 			sourceRef.startTime=0;
-			checkResult(pSourceClip->Initialize(defs.ddSound(),segLen,sourceRef));
+			checkResult(pSourceClip->Initialize(defs.ddkAAFSound(),segLen,sourceRef));
 			checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
 			checkResult(essenceGroup->PrependChoice(pSegment)); 
 			pSegment->Release();
@@ -208,7 +208,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 				CreateInstance(IID_IAAFSourceClip, 
 				(IUnknown **)&pSourceClip));
 			sourceRef.startTime=1;
-			checkResult(pSourceClip->Initialize(defs.ddSound(),segLen,sourceRef));
+			checkResult(pSourceClip->Initialize(defs.ddkAAFSound(),segLen,sourceRef));
 			checkResult(pSourceClip->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
 			checkResult(essenceGroup->InsertChoiceAt(1,pSegment)); 
 			pSegment->Release();

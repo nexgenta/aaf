@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFLocators
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFLocatorsTest.cpp,v 1.27 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFLocatorsTest.cpp,v 1.28 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,7 +89,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	aafUInt32					numLocators;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 	bool bFileOpen = false;
-//	aafUID_t					ddef = DDEF_Sound;
+//	aafUID_t					ddef = kAAFDataDef_Sound;
 
 	aafProductVersion_t v;
 	v.major = 1;

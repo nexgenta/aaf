@@ -5,7 +5,7 @@
 // @com This file implements the module test for CAAFHTMLClip
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFHTMLClipTest.cpp,v 1.21 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFHTMLClipTest.cpp,v 1.22 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -278,7 +278,7 @@ void HTMLClipTest::CreateHTMLClip()
     checkResult(pHTMLClip->SetEndAnchor(const_cast<wchar_t *>(_endAnchor)));
      checkResult(pHTMLClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
 
-	 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+	 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 	 pComponent->Release();
 	 pComponent = NULL;
 

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFMobSlot
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFMobSlotTest.cpp,v 1.25 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFMobSlotTest.cpp,v 1.26 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -137,7 +137,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 									   (IUnknown **)&sclp));		
 			
 			checkResult(sclp->QueryInterface (IID_IAAFComponent, (void **)&pComp));
-			checkResult(pComp->SetDataDef (defs.ddPicture()));
+			checkResult(pComp->SetDataDef (defs.ddkAAFPicture()));
 			pComp->Release();
 			pComp = NULL;
 			checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
@@ -224,7 +224,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	aafSlotID_t				s;
 	aafUInt32				length;
 	HRESULT					hr = S_OK;
-	aafUID_t				readUID, typeUID = DDEF_Picture;
+	aafUID_t				readUID, typeUID = kAAFDataDef_Picture;
 	
 	try
 	{

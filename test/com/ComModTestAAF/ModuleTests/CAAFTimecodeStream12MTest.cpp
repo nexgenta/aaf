@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTimecodeStream
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTimecodeStream12MTest.cpp,v 1.26 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTimecodeStream12MTest.cpp,v 1.27 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -154,7 +154,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFTimecodeStream12M, 
 								   (IUnknown **)&pTimecodeStream12M));		
 		 checkResult(pTimecodeStream12M->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		pComponent->Release();
 		pComponent = NULL;
 		 

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFScopeReferenceTest.cpp,v 1.14 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFScopeReferenceTest.cpp,v 1.15 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -146,7 +146,7 @@ static void CreateScopeReferenceFile(aafWChar *pFilename)
 	checkResult(pScopeRef1->Create(kTestRelativeScope,kTestRelativeSlot));
 	IAAFComponentSP pComponent;
 	checkResult(pScopeRef1->QueryInterface(IID_IAAFComponent,(void**)&pComponent));
-	checkResult(pComponent->SetDataDef(defs.ddPicture()));
+	checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 
 	// Verify that GetRelativeScope() and GetRelativeSlot() return correct values
 	aafUInt32 returnedRelativeScope=0xff,returnedRelativeSlot=0xff;
@@ -159,7 +159,7 @@ static void CreateScopeReferenceFile(aafWChar *pFilename)
 	IAAFScopeReferenceSP pScopeRef2;
 	checkResult(defs.cdScopeReference()->CreateInstance(IID_IAAFScopeReference,
 		(IUnknown**)&pScopeRef2));
-	checkResult(pScopeRef2->Initialize(defs.ddPicture(),kTestRelativeScope,
+	checkResult(pScopeRef2->Initialize(defs.ddkAAFPicture(),kTestRelativeScope,
 		kTestRelativeSlot));
 
 	// Verify that GetRelativeScope() and GetRelativeSlot() return correct values
@@ -174,7 +174,7 @@ static void CreateScopeReferenceFile(aafWChar *pFilename)
 	IAAFFillerSP pFiller;
 	checkResult(defs.cdFiller()->CreateInstance(IID_IAAFFiller, 
 		(IUnknown **)&pFiller));
-	checkResult(pFiller->Initialize(defs.ddPicture(),3665));
+	checkResult(pFiller->Initialize(defs.ddkAAFPicture(),3665));
 
 	// Add filler to composition Mob
 	IAAFSegmentSP pSegment;

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFCodecDef
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCodecDefTest.cpp,v 1.33 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCodecDefTest.cpp,v 1.34 2004/10/22 14:20:45 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -167,7 +167,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		uid = kAAFCodecWAVE;
 		checkResult(pPlugDef->Initialize (uid, L"TestCodec", L"TestCodecDescription"));
 
-		checkResult(pPlugDef->AddEssenceKind (defs.ddMatte()));
+		checkResult(pPlugDef->AddEssenceKind (defs.ddkAAFMatte()));
 		checkResult(pDictionary->RegisterCodecDef(pPlugDef));
 		uid = kAAFClassID_WAVEDescriptor;
 		checkResult(pDictionary->LookupClassDef(uid, &classDef));
@@ -248,9 +248,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		CAAFBuiltinDefs defs (pDictionary);
 		checkResult(pDictionary->LookupCodecDef(codecID, &pCodec));
 
-		checkResult(pCodec->IsEssenceKindSupported (defs.ddMatte(), &testResult));
+		checkResult(pCodec->IsEssenceKindSupported (defs.ddkAAFMatte(), &testResult));
 		checkExpression (testResult == kAAFTrue, AAFRESULT_TEST_FAILED);
-		checkResult(pCodec->IsEssenceKindSupported (defs.ddPicture(), &testResult));
+		checkResult(pCodec->IsEssenceKindSupported (defs.ddkAAFPicture(), &testResult));
 		checkExpression (testResult == kAAFFalse, AAFRESULT_TEST_FAILED);
 		checkResult(pCodec->EnumCodecFlavours (&pEnum));
 		checkResult(pEnum->NextOne (&readFlavour));

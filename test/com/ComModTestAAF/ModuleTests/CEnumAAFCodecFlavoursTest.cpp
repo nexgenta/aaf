@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFCodecFlavours
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFCodecFlavoursTest.cpp,v 1.25 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFCodecFlavoursTest.cpp,v 1.26 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -154,7 +154,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(mgr->CreatePluginDefinition (kAAFCodecWAVE, pDictionary, &pDef));
 
 		checkResult(pDef->QueryInterface(IID_IAAFCodecDef, (void **)&pCodecDef));
-		checkResult(pCodecDef->AddEssenceKind (defs.ddSound()));
+		checkResult(pCodecDef->AddEssenceKind (defs.ddkAAFSound()));
 		checkResult(pDictionary->RegisterCodecDef(pCodecDef));
 	}
 	catch (HRESULT& rResult)
@@ -207,7 +207,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	bool bFileOpen = false;
 	aafBool			testResult;
 	aafUID_t		codecID = kAAFCodecWAVE;
-	// aafUID_t		testMatte = DDEF_Matte;
+	// aafUID_t		testMatte = kAAFDataDef_Matte;
 	aafUID_t		checkFlavour = kAAFNilCodecFlavour;
 	aafUID_t		testFlavour;
 	HRESULT			hr = S_OK;
@@ -222,7 +222,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		CAAFBuiltinDefs defs (pDictionary);
 		checkResult(pDictionary->LookupCodecDef(codecID, &pCodec));
 
-		checkResult(pCodec->IsEssenceKindSupported (defs.ddPicture(), &testResult));
+		checkResult(pCodec->IsEssenceKindSupported (defs.ddkAAFPicture(), &testResult));
 		checkExpression (testResult == kAAFFalse, AAFRESULT_TEST_FAILED);
 		checkResult(pCodec->EnumCodecFlavours (&pEnum));
 		checkResult(pEnum->NextOne (&testFlavour));

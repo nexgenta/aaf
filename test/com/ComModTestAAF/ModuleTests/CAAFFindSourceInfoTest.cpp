@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFindSourceInfo
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFindSourceInfoTest.cpp,v 1.23 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFindSourceInfoTest.cpp,v 1.24 2004/10/22 14:20:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,7 +48,7 @@ typedef IAAFSmartPointer<IAAFDataDef> IAAFDataDefSP;
 #define	NumMobSlots		3
 
 static aafWChar *		slotNames[NumMobSlots] = { L"VIDEO SLOT", L"AUDIO SLOT1", L"AUDIO SLOT2"};
-static const aafUID_t *	slotDDefs[NumMobSlots] = {&DDEF_Picture, &DDEF_Sound, &DDEF_Sound};
+static const aafUID_t *	slotDDefs[NumMobSlots] = {&kAAFDataDef_Picture, &kAAFDataDef_Sound, &kAAFDataDef_Sound};
 static aafRational_t	slotRates[NumMobSlots] = { {2997,100}, {44100, 1}, {48000, 1}};
 static aafWChar* Manufacturer = L"Sony";
 static aafWChar* Model = L"MyModel";

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFCommentMarker
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCommentMarkerTest.cpp,v 1.24 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCommentMarkerTest.cpp,v 1.25 2004/10/22 14:20:45 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,7 +68,7 @@ inline void checkExpression(bool expression, HRESULT r)
 }
 
 // {81831639-EDF4-11d3-A353-009027DFCA6A}
-static const aafUID_t DDEF_TEST = 
+static const aafUID_t kAAFDataDef_Test = 
 { 0x81831639, 0xedf4, 0x11d3, { 0xa3, 0x53, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
 
 
@@ -281,7 +281,7 @@ void CommentMarkerTest::CreateEvent()
 		checkResult(defs.cdDataDef()->
 					CreateInstance (IID_IAAFDataDef,
 									(IUnknown **)&pDataDef));
-	  hr = pDataDef->Initialize (DDEF_TEST, L"Test", L"Test data");
+	  hr = pDataDef->Initialize (kAAFDataDef_Test, L"Test", L"Test data");
 	  hr = _pDictionary->RegisterDataDef (pDataDef);
 
 	  // Create an event (note: this will be replaced by a concrete event in a

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFSelector
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSelectorTest.cpp,v 1.28 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFSelectorTest.cpp,v 1.29 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -200,7 +200,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFSourceClip, 
 								   (IUnknown **)&pSourceClip));		
 		 checkResult(pSourceClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		pComponent->Release();
 		pComponent = NULL;
 
@@ -215,14 +215,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 					CreateInstance(IID_IAAFFiller, 
 								   (IUnknown **)&pFiller));
 		// Set its properties.
-	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
+	    checkResult(pFiller->Initialize(defs.ddkAAFPicture(), fillerLength));
 
 		// Now create a selector 
 	    checkResult(defs.cdSelector()->
 					CreateInstance(IID_IAAFSelector, 
 								   (IUnknown **)&pSelector));
 		 checkResult(pSelector->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
-		 checkResult(pComponent->SetDataDef(defs.ddPicture()));
+		 checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 		pComponent->Release();
 		pComponent = NULL;
 
@@ -247,7 +247,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	    checkResult(defs.cdFiller()->
 					CreateInstance(IID_IAAFFiller, 
 								   (IUnknown **)&pFiller));
-	    checkResult(pFiller->Initialize(defs.ddPicture(), fillerLength));
+	    checkResult(pFiller->Initialize(defs.ddkAAFPicture(), fillerLength));
 		checkResult(pFiller->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
 		checkResult(pSelector->AppendAlternateSegment(pSegment));
 		checkResult(pSelector->GetNumAlternateSegments (&numAlternates));

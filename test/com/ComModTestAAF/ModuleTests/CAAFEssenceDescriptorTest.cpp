@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceDescriptor
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDescriptorTest.cpp,v 1.40 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceDescriptorTest.cpp,v 1.41 2004/10/22 14:20:46 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -90,7 +90,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	HRESULT						hr = AAFRESULT_SUCCESS,
 								localhr = AAFRESULT_SUCCESS;
 	bool bFileOpen = false;
-//	aafUID_t					ddef = DDEF_Sound;
+//	aafUID_t					ddef = kAAFDataDef_Sound;
 
 	aafProductVersion_t v;
 	v.major = 1;

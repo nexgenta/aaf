@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFComponents
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFComponentsTest.cpp,v 1.29 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFComponentsTest.cpp,v 1.30 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -83,7 +83,7 @@ static HRESULT CreateAAFSequence(IAAFDictionary *pDictionary,
 					 (IUnknown **)&pSequence);		
  	if (SUCCEEDED(hr))
 	{
-		pSequence->Initialize(defs.ddSound());
+		pSequence->Initialize(defs.ddkAAFSound());
 
 		//
 		//	Add some segments.  Need to test failure conditions
@@ -101,7 +101,7 @@ static HRESULT CreateAAFSequence(IAAFDictionary *pDictionary,
  			if (FAILED(hr))
 				break;
 
-			pComponent->SetDataDef(defs.ddSound());
+			pComponent->SetDataDef(defs.ddkAAFSound());
 			pComponent->SetLength(len);
 			hr = pSequence->AppendComponent(pComponent);
 

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFPluginLocators
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFPluginLocatorsTest.cpp,v 1.26 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFPluginLocatorsTest.cpp,v 1.27 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -230,7 +230,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(pPlugDef->QueryInterface (IID_IAAFCodecDef,
                                           (void **)&pCodecDef));
 	checkResult(pCodecDef->Initialize (kAAFNoCodec, L"TestCodec", L"Just a test"));
-	checkResult(pCodecDef->AddEssenceKind (defs.ddMatte()));
+	checkResult(pCodecDef->AddEssenceKind (defs.ddkAAFMatte()));
 	checkResult(pDictionary->LookupClassDef(kAAFClassID_EssenceDescriptor, &pClassDef));
 	checkResult(pCodecDef->SetFileDescriptorClass (pClassDef));
 	checkResult(pDictionary->RegisterCodecDef(pCodecDef));

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFSourceMob
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSourceMobTest.cpp,v 1.37 2004/09/28 16:29:17 stuart_hc Exp $ $Name:  $
+// $Id: CAAFSourceMobTest.cpp,v 1.38 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -135,7 +135,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  // Add some slots
 	  for(test = 0; test < 2; test++)
 	  {
-		  checkResult(pSourceMob->AddNilReference (test+1, 0, defs.ddSound(), audioRate));
+		  checkResult(pSourceMob->AddNilReference (test+1, 0, defs.ddkAAFSound(), audioRate));
 	  }
 
 	  // Test AppendTimecodeSlot()

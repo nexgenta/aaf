@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFContainerDefs object
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFOperationDefsTest.cpp,v 1.30 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFOperationDefsTest.cpp,v 1.31 2004/10/22 14:20:51 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -222,7 +222,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		pDef = NULL;
 		
 		//!!!Not testing the INIT on AAFDefObject
-		checkResult(pOperationDef->SetDataDef (defs.ddPicture()));
+		checkResult(pOperationDef->SetDataDef (defs.ddkAAFPicture()));
 		checkResult(pOperationDef->SetIsTimeWarp (kAAFFalse));
 		checkResult(pOperationDef->SetNumberInputs (TEST_NUM_INPUTS));
 		checkResult(pOperationDef->SetCategory (TEST_CATEGORY));

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefIndirect
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefIndirectTest.cpp,v 1.15 2004/05/20 15:36:42 asuraparaju Exp $ $Name:  $
+// $Id: CAAFTypeDefIndirectTest.cpp,v 1.16 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -643,7 +643,7 @@ void CAAFTypeDefIndirect_create (aafCharacter_constptr pFileName)
   checkResult (pMobSlot->SetName (L"AAFIndirectTypeTest-MobSlot"));
 
   checkResult (defs.cdSequence()->CreateInstance(IID_IAAFSequence, (IUnknown **)&pSequence));
-  checkResult (pSequence->Initialize(defs.ddPicture()));
+  checkResult (pSequence->Initialize(defs.ddkAAFPicture()));
 
 
   // Test kAAFTypeID_String

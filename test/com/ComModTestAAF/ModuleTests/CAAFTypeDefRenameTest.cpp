@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefRename
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefRenameTest.cpp,v 1.16 2004/02/27 18:46:43 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefRenameTest.cpp,v 1.17 2004/10/22 14:20:50 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -272,10 +272,10 @@ static void CreateTypeDefRenameFile(aafWChar *pFilename)
 
 	// Set up sequence
 	IAAFSmartPointer<IAAFComponent> pComponent;
-	checkResult(pSequence->Initialize(defs.ddSound()));
+	checkResult(pSequence->Initialize(defs.ddkAAFSound()));
 	checkResult(defs.cdFiller()->CreateInstance(IID_IAAFComponent,
 		(IUnknown **)&pComponent));
-	checkResult(pComponent->SetDataDef(defs.ddSound()));
+	checkResult(pComponent->SetDataDef(defs.ddkAAFSound()));
 	checkResult(pComponent->SetLength(1000));
 	checkResult(pSequence->AppendComponent(pComponent));
 	  

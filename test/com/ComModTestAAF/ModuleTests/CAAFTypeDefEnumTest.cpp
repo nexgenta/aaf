@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFTypeDefEnum
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefEnumTest.cpp,v 1.14 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFTypeDefEnumTest.cpp,v 1.15 2004/10/22 14:20:49 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -475,7 +475,7 @@ static HRESULT CreateAAFFile(aafWChar *  pFileName )
 		/// first, create  Filler 
 		IAAFFillerSP  spFill;
 		checkResult(defs.cdFiller()->CreateInstance(IID_IAAFFiller, (IUnknown**)&spFill));
-		checkResult(spFill->Initialize(defs.ddSound(), 10));
+		checkResult(spFill->Initialize(defs.ddkAAFSound(), 10));
 		
 		checkResult(createENUMFiller(pDict, spFill));
 		
