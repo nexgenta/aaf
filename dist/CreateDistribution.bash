@@ -1,7 +1,7 @@
 #! /bin/bash
 ###############################################################################
 #
-# $Id: CreateDistribution.bash,v 1.8 2004/06/21 17:45:03 stuart_hc Exp $ $Name:  $
+# $Id: CreateDistribution.bash,v 1.9 2004/07/02 17:11:53 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -95,7 +95,7 @@ AAF_PATCH_LEVEL=`grep "define AAF_PATCH_LEVEL" ${AAFSDKBUILD_H} | awk '{print $3
 
 VERSION_STRING=${AAF_MAJOR_VERSION}.${AAF_MINOR_VERSION}.${AAF_MAINT_RELEASE}.${AAF_PATCH_LEVEL}
 
-DIST_FILE_NAME=${DIST_FILE}.${AAFPLATFORM}.${VERSION_STRING}
+DIST_FILE_NAME=${DIST_FILE}-${AAFPLATFORM}-${VERSION_STRING}
 
 echo AAF_MAJOR_VERSION = $AAF_MAJOR_VERSION
 echo AAF_MINOR_VERSION = $AAF_MINOR_VERSION
