@@ -9,8 +9,8 @@
 
 
 
-#ifndef __ImplAAFGroup_h__
-#include "ImplAAFGroup.h"
+#ifndef __ImplAAFEffect_h__
+#include "ImplAAFEffect.h"
 #endif
 
 #ifndef __ImplAAFDataDef_h__
@@ -68,10 +68,10 @@ _cutPoint( PID_Transition_CutPoint, "CutPoint")
 
 ImplAAFTransition::~ImplAAFTransition ()
 {
-	if (_effect)
+	ImplAAFEffect *effect = _effect.setValue(0);
+	if (effect)
 	{
-		_effect->ReleaseReference();
-		_effect = NULL;
+		effect->ReleaseReference();
 	}
 }
 
@@ -80,7 +80,7 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFTransition::Create (aafUID_t*		pDatadef,
 							   aafLength_t		length,
 							   aafPosition_t	cutPoint,
-							   ImplAAFGroup*	pEffect)
+							   ImplAAFEffect*	pEffect)
 {
 	HRESULT		rc = AAFRESULT_SUCCESS;
 
@@ -120,7 +120,7 @@ AAFRESULT STDMETHODCALLTYPE
 	//@comm Replaces part of omfsTransitionGetInfo
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTransition::GetEffect (ImplAAFGroup ** ppEffObj)
+    ImplAAFTransition::GetEffect (ImplAAFEffect ** ppEffObj)
 {
 	if (ppEffObj == NULL)
 		return AAFRESULT_NULL_PARAM;
@@ -144,7 +144,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTransition::SetEffect (ImplAAFGroup * pEffObj)
+    ImplAAFTransition::SetEffect (ImplAAFEffect * pEffObj)
 {
 
 	if (pEffObj == NULL)
