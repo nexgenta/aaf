@@ -1,31 +1,27 @@
-/***********************************************************************
-*
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
-*
-* Permission to use, copy and modify this software and accompanying
-* documentation, and to distribute and sublicense application software
-* incorporating this software for any purpose is hereby granted,
-* provided that (i) the above copyright notice and this permission
-* notice appear in all copies of the software and related documentation,
-* and (ii) the name Avid Technology, Inc. may not be used in any
-* advertising or publicity relating to the software without the specific,
-* prior written permission of Avid Technology, Inc.
-*
-* THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
-* WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-* IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
-* SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
-* OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
-* ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
-* RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
-* ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
-* LIABILITY.
-*
-************************************************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMVector
 #ifndef OMVECTORT_H
 #define OMVECTORT_H
 
@@ -444,6 +440,24 @@ void OMVector<Element>::removeFirst(void)
   removeAt(0);
 }
 
+  // @mfunc Remove all elements from this <c OMVector>.
+  //        from this <c OMVector>. Existing values in this
+  //        <c OMVector> are shifted down one index position.
+  //   @tcarg class | Element | The type of an <c OMVector> element.
+  //          This type must support operator = and operator ==.
+template <typename Element>
+void OMVector<Element>::clear(void)
+{
+  TRACE("OMVector<Element>::clear");
+
+  size_t elementCount = count();
+  for (size_t i = 0; i < elementCount; i++) {
+    removeLast();
+  }
+  POSTCONDITION("All elements removed", count() == 0);
+  POSTCONDITION("Empty", capacity() == 0);
+}
+
   // @mfunc The index of the element with value <p value>.
   //        In the case of duplicate values, lowest index is returned.
   //   @tcarg class | Element | The type of an <c OMVector> element.
@@ -508,17 +522,17 @@ size_t OMVector<Element>::nextHigherCapacity(size_t capacity)
   // common case of creating a vector from scratch using a sequence
   // of append operations.
   // 
-  const size_t SIZE_T_MAX = ~(size_t)0;
-  const size_t SIZE_T_MASK = ~(SIZE_T_MAX >> 1); // set only the msb
+  const size_t OMSIZE_T_MAX = ~(size_t)0;
+  const size_t OMSIZE_T_MASK = ~(OMSIZE_T_MAX >> 1); // set only the msb
 
   size_t result;
   if (capacity == 0) {
     result = 0;
-  } else if (capacity < SIZE_T_MASK) {
+  } else if (capacity < OMSIZE_T_MASK) {
     ASSERT("Non-zero capacity", capacity > 0);
-    ASSERT("Capacity can be doubled", capacity < SIZE_T_MASK);
+    ASSERT("Capacity can be doubled", capacity < OMSIZE_T_MASK);
 
-    size_t mask = SIZE_T_MASK;
+    size_t mask = OMSIZE_T_MASK;
     size_t oldMask;
 
     do {
@@ -532,7 +546,7 @@ size_t OMVector<Element>::nextHigherCapacity(size_t capacity)
       result = oldMask; // next higher power
     }
   } else {
-    result = SIZE_T_MAX;
+    result = OMSIZE_T_MAX;
   }
   POSTCONDITION("Valid result", result >= capacity);
   return result;
