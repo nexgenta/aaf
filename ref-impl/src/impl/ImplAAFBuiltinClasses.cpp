@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -111,6 +110,7 @@ ImplAAFBuiltinClasses::NewBuiltinClassDef (const aafUID_t & rClassID,
 		  ImplAAFObject *pObj = _dictionary->pvtCreateBaseClassInstance(&AUID_AAFClassDef);
 		  if (! pObj) return AAFRESULT_NOMEMORY;
 		  pObj->setClassFactory(_dictionary);
+		  pObj->pvtSetSoid (AUID_AAFClassDef);
 
 		  ImplAAFClassDef * pcd = static_cast<ImplAAFClassDef*>(pObj);
 		  assert (pcd);
@@ -134,7 +134,10 @@ ImplAAFBuiltinClasses::NewBuiltinClassDef (const aafUID_t & rClassID,
 								sBuiltinClassTable[i].pName);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  if (pParentClass)
-			pParentClass->ReleaseReference ();
+			{
+			  pParentClass->ReleaseReference ();
+			  pParentClass = 0;
+			}
 
 		  assert (ppResult);
 		  *ppResult = pcd;
@@ -151,7 +154,7 @@ AAFRESULT ImplAAFBuiltinClasses::ImportBuiltinClassDef
    ImplAAFClassDef ** ppResult)
 {
   AAFRESULT hr;
-  ImplAAFClassDef * pcd = 0;
+  ImplAAFClassDefSP pcd;
 
   assert (ppResult);
 
@@ -171,18 +174,17 @@ AAFRESULT ImplAAFBuiltinClasses::ImportBuiltinClassDef
   hr = _dictionary->RegisterClass (pcd);
 
   if (AAFRESULT_FAILED (hr))
-	{
-	  assert (pcd);
-	  pcd->ReleaseReference ();
-	  return hr;
-	}
+	return hr;
 
   assert (pcd);
 
-  pcd->InitOMProperties ();
+  ImplAAFObjectSP objSP;
+  objSP = (ImplAAFObject*) pcd;
+  _dictionary->pvtInitObjectProperties (objSP);
 
   assert (ppResult);
   *ppResult = pcd;
+  (*ppResult)->AcquireReference ();
 
   return AAFRESULT_SUCCESS;
 }
