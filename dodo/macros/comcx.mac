@@ -1,24 +1,11 @@
-#c *********************************************************************
-#c
-#c The contents of this file are subject to the AAF SDK Public
-#c Source License Agreement (the "License"); You may not use this file
-#c except in compliance with the License.  The License is available in
-#c AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-#c Association or its successor.
-#c 
-#c Software distributed under the License is distributed on an "AS IS"
-#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-#c the License for the specific language governing rights and limitations
-#c under the License.
-#c 
-#c The Original Code of this file is Copyright 1998-2001, Licensor of the
-#c AAF Association.
-#c 
-#c The Initial Developer of the Original Code of this file and the
-#c Licensor of the AAF Association is Avid Technology.
-#c All rights reserved.
-#c
-#c *********************************************************************
+#c /******************************************\
+#c *                                          *
+#c * Advanced Authoring Format                *
+#c *                                          *
+#c * Copyright (c) 1998 Avid Technology, Inc. *
+#c * Copyright (c) 1998 Microsoft Corporation *
+#c *                                          *
+#c \******************************************/
 
 
 #ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -38,16 +25,17 @@
 #startm AD_INCLUDE 01
 #endm
 
-#startm AD_CPPINCLUDE 01
-#endm
-
-#startm AD_CPP_QUOTE_INCLUDE 01
-#endm
-
-
 #startm AD_HEAD 00
+/******************************************\\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\\******************************************/
 
-#include "AAFCOMPlatformTypes.h"
+#include <wtypes.h>
 #endm
 
 #startm AD_TYPES_HEAD 00
@@ -57,9 +45,6 @@
 #endm
 
 #startm AD_COM_EXT_CLASS_BEGIN 01
-#endm
-
-#startm AD_COM_EXT2_CLASS_BEGIN 02
 #endm
 
 #startm AD_ROOT_CLASS_BEGIN 00
@@ -107,25 +92,10 @@
 #startm AD_XMETHOD_11 57
 #endm
 
-#startm AD_X2METHOD3 23
-#endm
-
-#startm AD_X2METHOD4 30
-#endm
-
-#startm AD_X2METHOD5 37
-#endm
-
-#startm AD_GETOBJECT3 17
-#endm
-
 #startm AD_CLASS_END 00
 #endm
 
 #startm AD_COM_EXT_CLASS_END 01
-#endm
-
-#startm AD_COM_EXT2_CLASS_END 02
 #endm
 
 #startm AD_ROOT_CLASS_END 00
@@ -185,9 +155,9 @@
 #c TomR:980713: Added
 #c
 #startm AD_DEFAULT_UUID 11
-#c // Default Interface for .this-module 
-#c // {%01-%02-%03-%04%05-%06%07%08%09%10%11}
-#c extern "C" const IID IID_I.this-module = { 0x%01, 0x%02, 0x%03, { 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11 } };
+// Default Interface for .this-module 
+// {%01-%02-%03-%04%05-%06%07%08%09%10%11}
+extern "C" const IID IID_I.this-module = { 0x%01, 0x%02, 0x%03, { 0x%04, 0x%05, 0x%06, 0x%07, 0x%08, 0x%09, 0x%10, 0x%11 } };
 #endm
 
 #startm AD_CLASS_UUID 11
@@ -350,244 +320,4 @@ AD_CLASS_BEGIN\
 
 #startm .end-Concrete-StoredObject 00
 AD_CLASS_END\
-#endm
-
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Declaration for the dictionary's factory method.
-#c
-#startm AD_DICTIONARY_FACTORY 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Declaration for the dictionary's meta factory method.
-#c
-#startm AD_DICTIONARY_METAFACTORY 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Declaration for the class definition's factory method.
-#c
-#startm AD_CLASSDEF_FACTORY 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c Beginning of the module definitions
-#c
-#startm AD_MODULE_BEGIN 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c End of the module definitions
-#c
-#startm AD_MODULE_END 00
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes no arguments.
-#c
-#c Argument1: function name
-#c Argument2: function description
-#c
-#startm AD_FUNCTION0 02
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes one argument.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt	
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c
-#c Macro Arg 07: function description
-#c
-#startm AD_XFUNCTION1 07
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes two arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c
-#c Macro Arg 12: function description
-#c
-#startm AD_XFUNCTION2 12
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes three arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c
-#c Macro Arg 17: function description
-#c
-#startm AD_XFUNCTION3 17
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes one argument.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt	
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c
-#c Macro Arg 07: function description
-#c
-#startm AD_XFUNCTION1 07
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes two arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c
-#c Macro Arg 12: function description
-#c
-#startm AD_XFUNCTION2 12
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes three arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c
-#c Macro Arg 17: function description
-#c
-#startm AD_XFUNCTION3 17
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes four arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c
-#c Macro Arg 22: function description
-#c
-#startm AD_XFUNCTION4 22
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes five arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c
-#c Macro Arg 27: function description
-#c
-#startm AD_XFUNCTION5 27
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c Inserts declaration for a function which takes seven arguments.
-#c
-#c Macro Arg 01: function name
-#c
-#c Macro arguments 02+:
-#c 
-#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
-#c ----------   ----------   ---------   ----    ----    --------
-#c metharg 1    02           03          04      05      06
-#c metharg 2    07           08          09      10      11
-#c metharg 3    12           13          14      15      16
-#c metharg 4    17           18          19      20      21
-#c metharg 5    22           23          24      25      26
-#c metharg 6    27           28          29      30      31
-#c metharg 7    32           33          34      35      36
-#c
-#c Macro Arg 37: function description
-#c
-#startm AD_XFUNCTION7 37
-#endm
-
-
-#ccccccccccccccccccccccccccc
-#c
-#c macro for things which are not to be exported.
-#c
-#startm AD_NO_EXPORT 01
-%01\
 #endm
