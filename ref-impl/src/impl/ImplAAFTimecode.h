@@ -14,18 +14,6 @@
 *                                          *
 \******************************************/
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
-
-
 
 #ifndef __ImplAAFSegment_h__
 #include "ImplAAFSegment.h"
@@ -46,10 +34,10 @@ public:
 
 
   //****************
-  // InitTimecode()
+  // Initialize()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    InitTimecode
+    Initialize
 	    (// @parm [in] Length Property Value
          aafLength_t  length,
 
@@ -97,6 +85,11 @@ public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFTimecodeTest.cpp.
   static AAFRESULT test();
+
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
+
 public:
 	// Methods which are internal to the SDK
 virtual AAFRESULT OffsetToTimecodeClip(aafPosition_t offset, ImplAAFTimecode **result,
