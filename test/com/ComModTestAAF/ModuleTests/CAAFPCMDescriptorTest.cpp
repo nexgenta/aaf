@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMDescriptorTest.cpp,v 1.3 2004/09/14 23:05:30 akharkev Exp $ $Name:  $
+// $Id: CAAFPCMDescriptorTest.cpp,v 1.4 2004/10/27 16:55:14 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -310,14 +310,13 @@ static HRESULT CreateAAFFile(
         checkResult(pMob->SetName(L"PCMDescriptorTest"));
 
 
-        // Create a PCMDescriptor,
-        // add the descriptor to the source mob.
+        // Create a PCMDescriptor
         checkResult(defs.cdPCMDescriptor()->CreateInstance(
             IID_IAAFPCMDescriptor,
             (IUnknown **)&pPCMDesc));
 
 
-        // Before initialization test if the SoundDescriptor
+        // Before initialization test if the PCMDescriptor
         // methods return valid error values.
         checkResult(Test_IAAFPCMDescriptor_Uninitialized (pPCMDesc));
 
