@@ -53,7 +53,7 @@
 #include <assert.h>
 #include <string.h>
 
-extern "C" const aafClassID_t CLSID_AAFPropertyValue;
+extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 
 ImplAAFTypeDefVariableArray::ImplAAFTypeDefVariableArray ()
@@ -110,8 +110,11 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pTypeDef)  return AAFRESULT_NULL_PARAM;
 
-  aafUID_t id;
   assert (pTypeDef);
+  if (! pTypeDef->IsVariableArrayable())
+	return AAFRESULT_BAD_TYPE;
+
+  aafUID_t id;
   AAFRESULT hr = pTypeDef->GetAUID(&id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
@@ -192,11 +195,94 @@ ImplAAFTypeDefVariableArray::GetTypeCategory (eAAFTypeCategory_t *  pTid)
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefVariableArray::AppendElement
 (
- ImplAAFPropertyValue * /*pInPropVal*/,
- ImplAAFPropertyValue * /*pMemberPropVal*/
+ ImplAAFPropertyValue * pInPropVal,
+ ImplAAFPropertyValue * pMemberPropVal
 )
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (!pInPropVal)
+	return AAFRESULT_NULL_PARAM;
+  if (!pMemberPropVal)
+	return AAFRESULT_NULL_PARAM;
+
+  AAFRESULT hr;
+
+  ImplAAFPropValData* inPvd =
+	dynamic_cast<ImplAAFPropValData*> (pInPropVal);
+  assert (inPvd);
+
+  ImplAAFPropValData* memPvd =
+	dynamic_cast<ImplAAFPropValData*> (pMemberPropVal);
+  assert (memPvd);
+
+  aafUInt32 oldSize = 0;
+  hr = inPvd->GetBitsSize (&oldSize);
+  assert (AAFRESULT_SUCCEEDED (hr));
+
+  aafUInt32 newElemSize = 0;
+  hr = memPvd->GetBitsSize (&newElemSize);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  
+  aafUInt32 newSize = oldSize + newElemSize;
+  assert (newSize);
+  // sizeof (*buf) must be 1
+  aafUInt8* buf = new aafUInt8[newSize];
+  assert (buf);
+
+  aafMemPtr_t pBits = 0;
+
+  // Copy old bits into our buffer
+  if (oldSize)
+	{
+	  pBits = 0;
+	  hr = inPvd->GetBits (&pBits);
+	  assert (AAFRESULT_SUCCEEDED (hr));
+	  assert (pBits);
+	  memcpy (buf, pBits, oldSize);
+	}
+
+  // Append new prop val onto end of our buffer
+  pBits = 0;
+  hr = memPvd->GetBits (&pBits);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (pBits);
+  // Following ptr addition depends on buf being a byte pointer
+  memcpy (buf+oldSize, pBits, newElemSize);
+  
+  // Re-allocate prop val bits to hold newly expanded data
+  pBits = 0;
+  hr = inPvd->AllocateBits (newSize, &pBits);
+  assert (AAFRESULT_SUCCEEDED (hr));
+  assert (pBits);
+  memcpy (pBits, buf, newSize);
+
+  delete[] buf;
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFTypeDefVariableArray::CreateEmptyValue
+(ImplAAFPropertyValue ** ppPropVal)
+{
+  if (! ppPropVal)
+	return AAFRESULT_NULL_PARAM;
+
+  ImplAAFPropValDataSP pvd;
+  ImplAAFPropValData * tmp;
+  tmp = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+  if (!tmp) return AAFRESULT_NOMEMORY;
+  pvd = tmp;
+  // the pvd smart pointer will maintain a reference for us...
+  aafUInt32 refCount;
+  refCount = tmp->ReleaseReference ();
+  // ...make sure it really does
+  assert (1 == refCount);
+
+  assert (ppPropVal);
+  *ppPropVal = pvd;
+  assert (*ppPropVal);
+  (*ppPropVal)->AcquireReference ();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -217,7 +303,7 @@ void ImplAAFTypeDefVariableArray::reorder(OMByte* externalBytes,
   assert (ptd);
 
   assert (ptd->IsFixedSize ());
-  aafUInt32 extElemSize = PropValSize ();
+  aafUInt32 extElemSize = ptd->PropValSize ();
   aafUInt32 numElems = externalBytesSize / extElemSize;
   aafInt32 numBytesLeft = externalBytesSize;
   aafUInt32 elem = 0;
@@ -434,3 +520,28 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMPropertyMBS
   assert (result);
   return result;
 }
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefVariableArray::RawAccessType (
+      ImplAAFTypeDef ** ppRawTypeDef)
+{
+  // Return variable array of unsigned char
+  return pvtGetUInt8Array8Type (ppRawTypeDef);
+}
+
+
+bool ImplAAFTypeDefVariableArray::IsAggregatable () const
+{ return false; }
+
+bool ImplAAFTypeDefVariableArray::IsStreamable () const
+{ return false; }
+
+bool ImplAAFTypeDefVariableArray::IsFixedArrayable () const
+{ return false; }
+
+bool ImplAAFTypeDefVariableArray::IsVariableArrayable () const
+{ return false; }
+
+bool ImplAAFTypeDefVariableArray::IsStringable () const
+{ return false; }
