@@ -1,10 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 /*************************************************************************
  * 
@@ -52,7 +71,7 @@ ImplAAFDefObject::ImplAAFDefObject ()
   _persistentProperties.put(_description.address());
   _persistentProperties.put(_identification.address());
   _persistentProperties.put(_descriptors.address());
-		(void)AppendPluginDescriptor (NULL);		// !!! TEMP Until optional properties
+		(void)AppendPluginDef (NULL);		// !!! TEMP Until optional properties
 }
 
 
@@ -62,18 +81,18 @@ ImplAAFDefObject::~ImplAAFDefObject ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::Init (
-      const aafUID_t *pAuid,
-	  const aafWChar *pName,
-	  const aafWChar *pDesc)
+    ImplAAFDefObject::Initialize (
+      const aafUID_t & id,
+	  const aafWChar * pName,
+	  const aafWChar * pDesc)
 {
-	if (pAuid == NULL || pName == NULL || pDesc == NULL)
+	if (pName == NULL || pDesc == NULL)
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
 	else
 	{
-		_identification = *pAuid;
+		_identification = id;
 		_name = pName;
 		_description = pDesc;
 	}
@@ -81,7 +100,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetName (
-      const wchar_t *  pName)
+      const aafCharacter *  pName)
 {
   if (! pName)
 	{
@@ -129,7 +148,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetDescription (
-      wchar_t * pDescription)
+      const aafCharacter * pDescription)
 {
   if (! pDescription)
 	{
@@ -202,54 +221,51 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDefObject::SetAUID (
-      const aafUID_t *pAuid)
+      const aafUID_t & id)
 {
-  if (pAuid == NULL)
-	{
-	  return AAFRESULT_NULL_PARAM;
-	}
-  else
-	{
-	  _identification = *pAuid;
-	}
+  _identification = id;
+
   return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::AppendPluginDescriptor (
+    ImplAAFDefObject::AppendPluginDef (
       ImplAAFPluginDescriptor *pPluginDescriptor)
 {
 	aafUID_t	*tmp, newUID;
-	aafInt32	oldBufSize;
-	aafInt32	newBufSize;
+	aafInt32	oldCount;
+	aafInt32	newCount;
 
 //!!!	if(pPluginDescriptor == NULL)
 //		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
 	{
-		oldBufSize = _descriptors.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
+		oldCount = _descriptors.count();
+        if (oldCount == 1) {
+          aafUID_t first;
+          _descriptors.getValueAt(&first, 0);
+		  if(EqualAUID(&first, &NilMOBID))	//!!! Handle non-optional props
+		  {									//!!!
+			oldCount = 0;					//!!!
+		  }									//!!!
+		}
+		newCount = oldCount + 1;
 		if(pPluginDescriptor == NULL)	//!!!
 			newUID = NilMOBID;			//!!!
 		else
 		{
 			CHECK(pPluginDescriptor->GetAUID(&newUID));
 		}
-		tmp = new aafUID_t[newBufSize];
+		tmp = new aafUID_t[newCount];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
+		if(oldCount != 0)
 		{
-			_descriptors.copyToBuffer(tmp, oldBufSize);
-			if(EqualAUID(tmp, &NilMOBID))		//!!! Handle non-optional props
-			{									//!!!
-				oldBufSize = 0;					//!!!
-				newBufSize -= sizeof(aafUID_t);	//!!!
-			}									//!!!
+			_descriptors.copyToBuffer(tmp, oldCount * sizeof(aafUID_t));
 		}
-		tmp[oldBufSize/sizeof(aafUID_t)] = newUID;
-		_descriptors.setValue(tmp, newBufSize);
+		tmp[newCount - 1] = newUID;
+		_descriptors.setValue(tmp, newCount * sizeof(aafUID_t));
 		delete [] tmp;
 	}
 	XEXCEPT
@@ -265,33 +281,28 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::PrependPluginDescriptor (
+    ImplAAFDefObject::PrependPluginDef (
       ImplAAFPluginDescriptor *pPluginDescriptor)
 {
 	aafUID_t	*tmp = NULL, newUID;
-	aafInt32	oldBufSize;
-	aafInt32	newBufSize;
-	aafInt32	n;
+	aafInt32	oldCount;
+	aafInt32	newCount;
 
 	if(pPluginDescriptor == NULL)
 		return AAFRESULT_NULL_PARAM;
 	
 	XPROTECT()
 	{
-		oldBufSize = _descriptors.size();
-		newBufSize = oldBufSize + sizeof(aafUID_t);
+		oldCount = _descriptors.count();
+		newCount = oldCount + 1;
 		CHECK(pPluginDescriptor->GetAUID(&newUID));
-		tmp = new aafUID_t[newBufSize];
+		tmp = new aafUID_t[newCount];
 		if(tmp == NULL)
 			RAISE(AAFRESULT_NOMEMORY);
-		if(oldBufSize != 0)
-			_descriptors.copyToBuffer(tmp, oldBufSize);
-		for(n = oldBufSize/sizeof(aafUID_t); n >= 0; n--)
-		{
-			tmp[n+1] = tmp[n];
-		}
+		if(oldCount != 0)
+			_descriptors.copyToBuffer(&tmp[1], oldCount * sizeof(aafUID_t));
 		tmp[0] = newUID;
-		_descriptors.setValue(tmp, newBufSize);
+		_descriptors.setValue(tmp, newCount * sizeof(aafUID_t));
 		delete [] tmp;
 	}
 	XEXCEPT
@@ -306,7 +317,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFDefObject::EnumPluginDescriptors (
+    ImplAAFDefObject::GetPluginDefs (
       ImplEnumAAFPluginDescriptors **ppEnum)
 {
 	if(ppEnum == NULL)
@@ -321,3 +332,70 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::CountPluginDefs
+        (aafUInt32 * pResult)
+{
+  if (! pResult)
+	return AAFRESULT_NULL_PARAM;
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::InsertPluginDefAt
+        (aafUInt32 index,
+		 ImplAAFPluginDescriptor * pPluginDescriptor)
+{
+  if (! pPluginDescriptor)
+	return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountPluginDefs (&count);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
+  if (index > count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::GetPluginDefAt
+        (aafUInt32 index,
+		 ImplAAFPluginDescriptor ** ppPluginDescriptor)
+{
+  if (! ppPluginDescriptor)
+	return AAFRESULT_NULL_PARAM;
+
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountPluginDefs (&count);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDefObject::RemovePluginDefAt
+        (aafUInt32 index)
+{
+  aafUInt32 count;
+  AAFRESULT hr;
+  hr = CountPluginDefs (&count);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
+  if (index >= count)
+	return AAFRESULT_BADINDEX;
+
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
