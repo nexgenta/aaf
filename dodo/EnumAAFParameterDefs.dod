@@ -1,44 +1,46 @@
 #startm .this-module 0
-EnumAAFControlCodeDefinitions\
+EnumAAFParameterDefs\
+#endm
+#startm .parent-module 0
+AAFRoot\
 #endm
 #c
-#import ./AAFUnitTest.exp
 AD_HEAD
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
+\***********************************************/
 
-AD_FORWARD_DECLARATION(AAFControlCodeDefinition)
+AD_FORWARD_DECLARATION(AAFParameterDef)
 
 
 AD_CLASS_UUID(B1A213A5, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A213A4, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_ROOT_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, Transient)
 
 AD_XMETHOD1(NextOne,
 			[out\,retval],
 			objOut,
-			AAFControlCodeDefinition,
-			ppControlCodeDefinition,
-			The Next ControlCodeDefinition,
+			AAFParameterDef,
+			ppParameterDef,
+			The Next ParameterDefinition,
 			Enumerates to the next element in the enumerators list. The caller is responsible for 
   // properly releasing the returned pointer when it is no longer needed.
   // @comm This is a just simplified version of the Next method. )
 
-AD_XMETHOD3(Next,
-			[in], objPass, aafUInt32, count, number of control code definitions requested,
+AD_X2METHOD3(Next,
+			[in], objPass, aafUInt32, count, number of control code definitions requested,xxx,
 			[out\, size_is\(count\)\, length_is\(*pFetched\)],
-			objOut, AAFControlCodeDefinition, ppControlCodeDefinitions,
-			array to receive control code definitions,
+			objOutArray, AAFParameterDef, ppParameterDefs,
+			array to receive control code definitions,count,
 			[out\,ref], objPass, aafUInt32 *, pFetched,
-			number of actual ControlCodeDefinitions fetched into ppControlCodeDefinitions array,
-			Enumerates the next count elements \(AAFControlCodeDefinition pointers\) in 
+			number of actual ParameterDefs fetched into ppParameterDefs array,xxx,
+			Enumerates the next count elements \(AAFParameterDef pointers\) in 
   // the enumerator's list\, returning them in the given array along with the actual 
   // number of enumerated elements in pcFetched. The caller is responsible for 
   // properly releasing the returned pointers.)
@@ -46,7 +48,7 @@ AD_XMETHOD3(Next,
 AD_METHOD1(Skip,
 		   [in], aafUInt32, count, Number of elements to skip,
 		   Instructs the enumerator to skip the next count elements in the enumeration so that 
-  // the next call to EnumAAFControlCodeDefinitions::Next will not return 
+  // the next call to EnumAAFParameterDefs::Next will not return 
   // those elements.)
 
 AD_METHOD0(Reset,
@@ -56,13 +58,11 @@ Instructs the enumerator to position itself at the beginning of the list of elem
   // the same order. The exact behavior depends on the collection being enumerated.)
 
 AD_XMETHOD1(Clone,
-			[out\,retval], objOut, EnumAAFControlCodeDefinitions, ppEnum, new enumeration,
+			[out\,retval], objOut, EnumAAFParameterDefs, ppEnum, new enumeration,
 			Creates another control code definition enumerator with the same state as the current 
   // enumerator to iterate over the same list. This method makes it possible to 
   // record a point in the enumeration sequence in order to return to that point 
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_OVERRIDE(.method-Test)
-
-AD_ROOT_CLASS_END
+AD_XCLASS_END(Concrete, Transient)
