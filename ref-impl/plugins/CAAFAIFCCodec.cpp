@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.15 2005/03/21 13:59:15 stuart_hc Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.16 2005/03/31 13:32:57 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1645,6 +1645,7 @@ AAFRESULT CAAFAIFCCodec::loadAIFCHeader(void)
 
 				/* AIFC field sampleSize */
 				CHECK(GetAIFCData(2L, &_bitsPerSample));
+				_bytesPerFrame = (_bitsPerSample+7)/8;
 
 				/* AIFC field: sampleRate */	// Need extended float code!!!
 				CHECK(GetAIFCData(sizeof(ieeerate), &ieeerate));
