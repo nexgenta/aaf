@@ -5,7 +5,7 @@ AAFEssencePlugin\
 AAFRoot\
 #endm
 #c
-#import ./AAFObject.exp
+#c #import ./AAFObject.exp
 #import ./AAFEndian.exp
 AD_HEAD
 /******************************************\
@@ -48,7 +48,7 @@ AD_XMETHOD6(GetIndexedCodecInfo,
 			Which codec. 1 to number of codecs,
 			[in\,string],
 			objPass,
-			wchar_t *,
+			aafCharacter *,
 			pName,
 			Codec Name,
 			[in],
