@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceFileStream.cpp,v 1.21 2004/09/22 14:50:18 bakerian Exp $ $Name:  $
+// $Id: CAAFEssenceFileStream.cpp,v 1.22 2004/10/25 13:27:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -528,8 +528,6 @@ HRESULT STDMETHODCALLTYPE
   *bytesWritten = fwrite(buffer, 1, bytes, _pFile);
   if (*bytesWritten != (size_t)bytes)
   { // What error code should we return?
-    long err = errno;
-
     return AAFRESULT_CONTAINERWRITE;
   }
 
@@ -572,8 +570,6 @@ HRESULT STDMETHODCALLTYPE
   *bytesRead = fread(buffer, 1, buflen, _pFile);
   if (ferror(_pFile))
   { // What error code should we return?
-    long err = errno;
-
     return AAFRESULT_END_OF_DATA;
   }
   else if (feof(_pFile))
