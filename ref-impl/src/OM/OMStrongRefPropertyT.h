@@ -32,6 +32,7 @@
 #define OMSTRONGREFPROPERTYT_H
 
 #include "OMAssertions.h"
+#include "OMStoredObject.h"
 
 template <typename ReferencedObject>
 OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
@@ -43,7 +44,7 @@ OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
 
-  _reference = OMStrongObjectReference<ReferencedObject>(this, storedName());
+  _reference = OMStrongObjectReference(this, storedName());
 }
 
 template <typename ReferencedObject>
@@ -68,9 +69,14 @@ void OMStrongReferenceProperty<ReferencedObject>::getValue(
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  ReferencedObject* result = _reference.getValue();
-
-  object = result;
+  OMStorable* p = _reference.getValue();
+  if (p != 0) {
+    ReferencedObject* result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+    object = result;
+  } else {
+    object = 0;
+  }
 }
 
   // @mfunc Set the value of this <c OMStrongReferenceProperty>.
@@ -89,7 +95,14 @@ ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::setValue(
 
   // tjb - PRECONDITION("Valid object", object != 0);
 
-  ReferencedObject* result = _reference.setValue(object);
+  OMStorable* p = _reference.setValue(object);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
   setPresent();
   return result;
 }
@@ -106,8 +119,14 @@ ReferencedObject* OMStrongReferenceProperty<ReferencedObject>::clearValue(void)
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::clearValue");
 
-  ReferencedObject* result = _reference.setValue(0);
-
+  OMStorable* p = _reference.setValue(0);
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
   return result;
 }
 
@@ -137,7 +156,17 @@ template <typename ReferencedObject>
 ReferencedObject*
 OMStrongReferenceProperty<ReferencedObject>::operator -> (void)
 {
-  return _reference.getValue();
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::operator ->");
+
+  OMStorable* p = _reference.getValue();
+  ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<ReferencedObject*>(p);
+    ASSERT("Object is correct type", result != 0);
+  } else {
+    result = 0;
+  }
+  return result;
 }
 
   // @mfunc Dereference operator.
@@ -150,7 +179,17 @@ template <typename ReferencedObject>
 const ReferencedObject*
 OMStrongReferenceProperty<ReferencedObject>::operator -> (void) const
 {
-  return _reference.getValue();
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::operator ->");
+
+  OMStorable*p = _reference.getValue();
+  const ReferencedObject* result = 0;
+  if (p != 0) {
+    result = dynamic_cast<const ReferencedObject*>(p);
+    ASSERT("Object is correct type", p != 0);
+  } else {
+    result = 0;
+  }
+  return result;
 }
 
   // @mfunc Type conversion. Convert an
@@ -184,12 +223,7 @@ void OMStrongReferenceProperty<ReferencedObject>::save(void) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::save");
 
-  // Write the index entry.
-  //
-  saveName();
-
-  _reference.save();
-
+  store()->save(*this);
 }
 
   // @mfunc Close this <c OMStrongReferenceProperty>.
@@ -230,14 +264,8 @@ void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::restore");
 
-  // retrieve sub-storage name
-  //
-  restoreName(externalSize);
-
-  _reference.restore();
-
+  store()->restore(*this, externalSize);
   setPresent();
-
 }
 
   // @mfunc  Is this <c OMStrongReferenceProperty> void ?
@@ -384,6 +412,32 @@ OMStorable* OMStrongReferenceProperty<ReferencedObject>::storable(void) const
     result = dynamic_cast<OMStorable*>(pointer);
   }
   return result;
+}
+
+template <typename ReferencedObject>
+OMStrongObjectReference&
+OMStrongReferenceProperty<ReferencedObject>::reference(void) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::storable");
+
+  return const_cast<OMStrongObjectReference&>(_reference);
+}
+
+template <typename ReferencedObject>
+void OMStrongReferenceProperty<ReferencedObject>::shallowCopyTo(
+                                           OMProperty* /* destination */) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::shallowCopyTo");
+  // Nothing to do - this is a shallow copy
+}
+
+template <typename ReferencedObject>
+void OMStrongReferenceProperty<ReferencedObject>::deepCopyTo(
+                                                     OMProperty* destination,
+                                                     void* clientContext) const
+{
+  TRACE("OMStrongReferenceProperty<ReferencedObject>::deepCopyTo");
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
 #endif
