@@ -34,17 +34,18 @@ class ImplEnumAAFPropertyValues;
 class ImplAAFPropertyValue;
 class ImplAAFTypeDef;
 
-#ifndef __ImplAAFDefObject_h__
-#include "ImplAAFDefObject.h"
+#ifndef __ImplAAFMetaDefinition_h__
+#include "ImplAAFMetaDefinition.h"
 #endif
 
 #include "OMPropertyDefinition.h"
+#include "OMVariableSizeProperty.h"
 
 typedef OMProperty* (*ImplAAFOMPropertyCreateFunc_t)
   (OMPropertyId pid,
    const char * name);
 
-class ImplAAFPropertyDef : public ImplAAFDefObject,
+class ImplAAFPropertyDef : public ImplAAFMetaDefinition,
 						   public OMPropertyDefinition
 {
 public:
@@ -78,21 +79,12 @@ public:
 
 
   //****************
-  // GetIsSearchable()
+  // IsUniqueIdentifier()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetIsSearchable
-        // @parm [out, retval] pointer to the result
-        (aafBool *  pIsSearchable);
-
-
-  //****************
-  // SetIsSearchable()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    SetIsSearchable
-        // @parm [in] is searchable value
-        (aafBool  IsSearchable);
+    GetIsUniqueIdentifier
+      (// @parm [out] pointer to the result
+       aafBool * pIsUniqueIdentifier) const;
 
 
   //****************
@@ -136,7 +128,10 @@ public:
 	    const aafUID_t & typeID,
 
         // @parm [in] Is this property optional? (mandatory, if not)
-		aafBool isOptional);
+		  aafBoolean_t isOptional,
+
+        // @parm [in] Is this property a unique identifier
+		  aafBoolean_t isUniqueIdentifier);
 
 
 
@@ -169,8 +164,9 @@ private:
 
   OMFixedSizeProperty<OMPropertyId>          _pid;
 
-  OMFixedSizeProperty<aafBool>               _IsSearchable;
   OMVariableSizeProperty<aafUInt8>			 _DefaultValue;
+
+  OMFixedSizeProperty<aafBool>               _IsUniqueIdentifier;
 
   ImplAAFTypeDef *                           _cachedType;
 
