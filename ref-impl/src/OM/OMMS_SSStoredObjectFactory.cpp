@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.1 2004/09/28 11:57:08 phil_tudor Exp $ $Name:  $
+// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.2 2004/10/11 10:16:09 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,7 +89,7 @@ OMStoredObject*
 OMMS_SSStoredObjectFactory::openFile (OMRawStorage* rawStorage,
                                      const OMFile::OMAccessMode mode)
 {
-  TRACE("OMSSStoredObject::openFile");
+  TRACE("OMMS_SSStoredObjectFactory::openFile");
   PRECONDITION("Valid raw storage", rawStorage != 0);
   PRECONDITION("Valid mode", (mode == OMFile::modifyMode) ||
                              (mode == OMFile::readOnlyMode));
