@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -33,98 +33,70 @@
 
 #include "OMDataStreamProperty.h"
 
-  // @class Persistent typed data stream properties supported by the
-  //        Object Manager.
-  //   @tcarg class | Element | The type of an <c OMStreamProperty> element.
-  //   @base | public <c OMDataStreamProperty>.
 template <typename Element>
 class OMStreamProperty : public OMDataStreamProperty {
 public:
-  // @access Public members.
 
-    // @cmember Constructor.
-  OMStreamProperty(const OMPropertyId propertyId, const wchar_t* name);
+  OMStreamProperty(const OMPropertyId propertyId, const char* name);
 
-    // @cmember Destructor.
   virtual ~OMStreamProperty(void);
-
+ 
     // All reads/and writes advance the current element
 
-  // Random access in chunks of Elements
+// General access
 
-    // @cmember Read <p elementCount> <p Element>s, starting at <p index>,
-    //          from this <c OMStreamProperty> into <p elements>.
-  void readElements(OMUInt64 index,
-                    OMUInt32 elementCount,
+    // Read elementCount Elements, starting at startElement,
+    // from the stream into elements.
+  void readElements(size_t startElement,
+                    size_t elementCount,
                     Element* elements) const;
 
-    // @cmember Write <p elementCount> <p Element>s, starting at <p index>,
-    //          to this <c OMStreamProperty> from <p elements>.
-  void writeElements(OMUInt64 index,
-                     OMUInt32 elementCount,
+    // Write elementCount Elements, starting at startElement,
+    // to the stream from elements.
+  void writeElements(size_t startElement,
+                     size_t elementCount,
                      const Element* elements);
 
-  // Random access one Element at a time.
+// Sequential access in chunks of Elements
 
-    // @cmember Read a single <p Element>, at <p index>,
-    //          from this <c OMStreamProperty> into <p element>.
-  void readElement(OMUInt64 index,
-                   Element* element) const;
-
-    // @cmember Write a single <p Element>s, at <p index>,
-    //          to this <c OMStreamProperty> from <p element>.
-  void writeElement(OMUInt64 index,
-                    const Element* element);
-
-  // Sequential access in chunks of Elements
-
-    // @cmember Read <p elementCount> <p Element>s from the current position in
-    //          this <c OMStreamProperty> into <p elements>.
-  void readElements(OMUInt32 elementCount,
+    // Read elementCount Elements from the stream into elements.
+  void readElements(size_t elementCount,
                     Element* elements) const;
 
-    // @cmember Write <p elementCount> <p Element>s to the current position in
-    //          this <c OMStreamProperty> from <p elements>.
-  void writeElements(OMUInt32 elementCount,
+    // Write elementCount Elements to the stream from elements.
+  void writeElements(size_t elementCount,
                      const Element* elements);
 
-  // Sequential access one Element at a time.
+// Sequential access one Element at a time.
 
-    // @cmember Read a single <p Element> from the current position in
-    //          this <c OMStreamProperty> into <p element>.
+    // Read the current Element into element.
   void readElement(Element* element) const;
 
-    // @cmember Write a single <p Element> to the current position in
-    //          this <c OMStreamProperty> from <p element>.
+    // Write an Element at the current position.
   void writeElement(const Element* element);
 
-  // Extend in chunks of Elements
+// Extend in chunks of Elements
 
-    // @cmember Write <p elementCount> <p Element>s to the end of this
-    //          <c OMStreamProperty> from <p elements>.
-  void appendElements(OMUInt32 elementCount,
+    // Write elementCount Elements to the end of the stream from elements.
+  void appendElements(size_t elementCount,
                       const Element* elements);
 
-  // Extend one Element at a time
+// Extend one Element at a time
 
-    // @cmember Write a single <p Element> to the end of
-    //          this <c OMStreamProperty>.
+    // Write an element at the end of the stream.
   void appendElement(const Element* element);
 
-  // Stream positioning and count of elements
 
-    // @cmember The index of the current <p Element>.
-  OMUInt64 index(void) const;
+// Stream positioning and count of elements
 
-    // @cmember Make the <p Element> at <p newIndex> the current one.
-  void setIndex(const OMUInt64 newIndex) const;
+    // The ordinal of the current element.
+  size_t position(void) const;
 
-    // @cmember The count of <p Element>s in this <c OMStreamProperty>.
-  OMUInt64 elementCount(void) const;
+    // Make the element at ordinal newPosition the currentOne.
+  void setPosition(size_t newPosition);
 
-    // @cmember Set the count of <p Element>s in this <c OMStreamProperty>
-    //          to <p newElementCount>.
-  void setElementCount(OMUInt64 newElementCount);
+    // The count of elements in the stream.
+  size_t elementCount(void) const;
 
 };
 
