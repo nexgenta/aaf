@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.50 2004/05/10 18:39:51 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.51 2004/05/11 11:25:46 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -924,6 +924,13 @@ void wcsconvertURLtoFilepath(wchar_t *url, wchar_t *filepath)
 	char *fpath = tmp + strlen("file://");
 	while (*fpath && *fpath != '/')
 		fpath++;
+
+#ifdef _WIN32
+	// WIN32 filepaths must start with a drive letter, so remove the
+	// initial '/' from the URL.
+	if (*fpath == '/')
+		fpath++;
+#endif
 
 	unescapeURI(fpath);
 

@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.38 2004/05/10 18:43:43 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.39 2004/05/11 11:25:45 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -297,6 +297,13 @@ static void wcsconvertURLtoFilepath(wchar_t *url, wchar_t *filepath)
 	char *fpath = tmp + strlen("file://");
 	while (*fpath && *fpath != '/')
 		fpath++;
+
+#ifdef _WIN32
+	// WIN32 filepaths must start with a drive letter, so remove the
+	// initial '/' from the URL.
+	if (*fpath == '/')
+		fpath++;
+#endif
 
 	unescapeURI(fpath);
 
