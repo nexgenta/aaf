@@ -1,9 +1,6 @@
 #startm .this-module 0
 EnumAAFControlPoints\
 #endm
-#startm .parent-module 0
-AAFRoot\
-#endm
 #c
 AD_HEAD
 /******************************************\
@@ -15,19 +12,13 @@ AD_HEAD
 *                                          *
 \******************************************/
 
-
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
-
-
 AD_FORWARD_DECLARATION(AAFControlPoint)
 
 
 AD_CLASS_UUID(B1A2139D, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A2139C, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_XCLASS_BEGIN(Concrete, Transient)
+AD_ROOT_CLASS_BEGIN
 
 AD_XMETHOD1(NextOne,
 			[out\,retval], objOut,
@@ -69,4 +60,4 @@ AD_XMETHOD1(Clone,
   // at a later time.
   // @comm The caller must release this new enumerator separately from the first enumerator.)
 
-AD_XCLASS_END(Concrete, Transient)
+AD_ROOT_CLASS_END
