@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -24,6 +24,7 @@
  * LIABILITY.
  *
  ************************************************************************/
+
 
 #ifndef __ImplAAFTapeDescriptor_h__
 #include "ImplAAFTapeDescriptor.h"
@@ -65,7 +66,7 @@ ImplAAFTapeDescriptor::Initialize ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::SetTapeManufacturer (aafWChar*  pName)
+    ImplAAFTapeDescriptor::SetTapeManufacturer (const aafCharacter*  pName)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	if (pName == NULL)
@@ -81,8 +82,8 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeManufacturer (aafWChar*	pName,
-												aafInt32	buflen)
+    ImplAAFTapeDescriptor::GetTapeManufacturer (aafCharacter*	pName,
+												aafUInt32	buflen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 	bool		status;
@@ -106,7 +107,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeManBufLen (aafInt32 *pLen)
+    ImplAAFTapeDescriptor::GetTapeManufacturerBufLen (aafUInt32 *pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -127,7 +128,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::SetTapeModel (aafWChar*	pModelName)
+    ImplAAFTapeDescriptor::SetTapeModel (const aafCharacter*	pModelName)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	if (pModelName == NULL)
@@ -143,8 +144,8 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeModel (aafWChar*	pModelName,
-										 aafInt32	buflen)
+    ImplAAFTapeDescriptor::GetTapeModel (aafCharacter*	pModelName,
+										 aafUInt32	buflen)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	bool		status;
@@ -168,7 +169,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTapeDescriptor::GetTapeModelBufLen (aafInt32*	pLen)
+    ImplAAFTapeDescriptor::GetTapeModelBufLen (aafUInt32*	pLen)
 {
     AAFRESULT	aafError = AAFRESULT_SUCCESS;
 
@@ -194,8 +195,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 	
-	if ( formFactor < kTapeCaseNull ||
-		 formFactor > kNagraAudioTape )
+	if ( formFactor < kAAFTapeCaseNull ||
+		 formFactor > kAAFNagraAudioTape )
 	{
 		aafError = AAFRESULT_BAD_TYPE;
 	}
@@ -237,8 +238,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-	if (videoSignal < kVideoSignalNull ||
-		videoSignal > kSECAMSignal)
+	if (videoSignal < kAAFVideoSignalNull ||
+		videoSignal > kAAFSECAMSignal)
 	{
 		aafError = AAFRESULT_BAD_TYPE;
 	}
@@ -280,8 +281,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
 
-	if (tapeFormat < kTapeFormatNull ||
-		tapeFormat > kHi8Format)
+	if (tapeFormat < kAAFTapeFormatNull ||
+		tapeFormat > kAAFHi8Format)
 	{
 		aafError = AAFRESULT_BAD_TYPE;
 	}
@@ -357,9 +358,8 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTapeDescriptor::GetOwningMobKind (aafMobKind_t *pMobKind)
 {
-	*pMobKind = kTapeMob;		// Abstract superclass, only match "all"
+	*pMobKind = kAAFTapeMob;		// Abstract superclass, only match "all"
 	return(AAFRESULT_SUCCESS);
 }
 
 
-OMDEFINE_STORABLE(ImplAAFTapeDescriptor, AUID_AAFTapeDescriptor);

@@ -27,6 +27,7 @@
  *
  ************************************************************************/
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Types required by this module:
 //
@@ -80,12 +81,9 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTimelineMobSlot::SetEditRate (aafRational_t *editRate)
+    ImplAAFTimelineMobSlot::SetEditRate (const aafRational_t & editRate)
 {
-	if (editRate == NULL)
-		return AAFRESULT_NULL_PARAM;
-
-	_editRate = *editRate;
+	_editRate = editRate;
 	return AAFRESULT_SUCCESS;
 }
 
@@ -114,7 +112,7 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 					  aafRational_t *srcRate,
 					  aafPosition_t *diffPos)
 {
-	aafBool					foundClip = AAFFalse;
+	aafBool					foundClip = kAAFFalse;
 	ImplAAFMobSlot			*tmpTrack = NULL;
 	aafPosition_t begPos = CvtInt32toPosition(0, begPos);
 	aafRational_t tmpSrcRate;
@@ -206,5 +204,4 @@ AAFRESULT ImplAAFTimelineMobSlot::ConvertToMyRate(aafPosition_t srcPos,
 }
 
 
-OMDEFINE_STORABLE(ImplAAFTimelineMobSlot, AUID_AAFTimelineMobSlot);
 
