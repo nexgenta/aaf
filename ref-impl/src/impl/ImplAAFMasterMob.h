@@ -27,7 +27,7 @@ class ImplAAFEssenceAccess;
 
 class ImplAAFLocator;
 
-
+#include "AAF.h"
 
 #ifndef __ImplAAFMob_h__
 #include "ImplAAFMob.h"
@@ -187,8 +187,8 @@ public:
     // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
     aafMediaCriteria_t *  pMediaCrit,
 
-    // @parm [in] aafEffectChoice_t * | pEffectChoice | Effect Choice
-    aafEffectChoice_t *  pEffectChoice,
+    // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
+    aafOperationChoice_t *  pOperationChoice,
 
     // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
     ImplAAFFindSourceInfo ** ppSourceInfo
@@ -310,7 +310,7 @@ public:
                            aafCompressEnable_t  /*Enable*/,
 							ImplAAFLocator		*destination,
 							aafUID_t			fileFormat,
-							ImplAAFEssenceAccess **result);
+							IAAFEssenceMultiAccess **result);
 	//@comm The essence handle from this call can be used with
 	// WriteDataSamples or WriteMultiSamples but NOT with 
 	// or WriteDataLines.
@@ -367,7 +367,7 @@ public:
 
          // @parm [in] optionally decompressing
          aafCompressEnable_t  compEnable,
-		ImplAAFEssenceAccess **result);
+		IAAFEssenceMultiAccess **result);
 	//@comm This routine
 	// follows the locator, and may call the locator failure callback if
 	// the essence can not be found.  If the failure callback finds the essence,
