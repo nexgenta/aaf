@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.122 2004/11/02 12:41:27 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.123 2004/11/04 15:49:26 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1500,6 +1500,7 @@ void ImplAAFDictionary::InitBuiltins()
 
   InitContainerDef (ContainerAAF, L"AAF", L"AAF Container");
   InitContainerDef (ContainerFile, L"External", L"External Container");
+  InitContainerDef (ContainerRIFFWAVE, L"RIFFWAVE", L"RIFFWAVE Container");
   InitContainerDef (ContainerOMF, L"OMF", L"OMF Container");
 
   AssureClassPropertyTypes ();

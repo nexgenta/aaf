@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.14 2004/09/10 17:13:02 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.15 2004/11/04 15:49:26 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -46,12 +46,15 @@ CXXFILES = AAFPluginCOM.cpp \
 		CAAFEssenceDataStream.cpp \
 		CAAFEssenceFileStream.cpp \
 		CAAFEssenceFileContainer.cpp \
+		CAAFEssenceRIFFWAVEStream.cpp \
+		CAAFEssenceRIFFWAVEContainer.cpp \
 		CAAFJPEGCodec.cpp \
 		CAAFJPEGDescriptorHelper.cpp \
 		CAAFCDCICodec.cpp \
 		CAAFCDCIDescriptorHelper.cpp \
 		CAAFWAVECodec.cpp \
 		CAAFAIFCCodec.cpp \
+		CAAFPCMCodec.cpp \
 		jpegesdatadst.cpp \
 		jpegesdatasrc.cpp
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFPluginObjectTable_i.cpp,v 1.16 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: AAFPluginObjectTable_i.cpp,v 1.17 2004/11/04 15:49:26 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,8 +27,10 @@
 //
 #include "CAAFEssenceDataStream.h"
 #include "CAAFEssenceFileContainer.h"
+#include "CAAFEssenceRIFFWAVEContainer.h"
 #include "CAAFAIFCCodec.h"
 #include "CAAFWAVECodec.h"
+#include "CAAFPCMCodec.h"
 #include "CAAFJPEGCodec.h"
 #include "CAAFCDCICodec.h"
 
@@ -38,8 +40,10 @@
 AAF_BEGIN_OBJECT_MAP(AAFPluginObjectMap)
 	AAF_OBJECT_ENTRY(AAFEssenceDataStream)
 	AAF_OBJECT_ENTRY(AAFEssenceFileContainer)
+	AAF_OBJECT_ENTRY(AAFEssenceRIFFWAVEContainer)
 	AAF_OBJECT_ENTRY(AAFAIFCCodec)
 	AAF_OBJECT_ENTRY(AAFWaveCodec)
+	AAF_OBJECT_ENTRY(AAFPCMCodec)
 	AAF_OBJECT_ENTRY(AAFJPEGCodec)
 	AAF_OBJECT_ENTRY(AAFCDCICodec)
 AAF_END_OBJECT_MAP()
