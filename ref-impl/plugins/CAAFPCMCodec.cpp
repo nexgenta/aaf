@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.3 2004/11/05 11:49:13 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.4 2004/11/10 18:30:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1517,15 +1517,9 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(containerDef->QueryInterface(IID_IAAFDefObject, (void **)&defObj));
 		CHECK(defObj->GetAUID(&_containerFormat));
 
-		if (_containerFormat == ContainerRIFFWAVE)
-		{
-			printf("CAAFPCMCodec::MultiCreate() ... _containerFormat == ContainerRIFFWAVE\n");
-		}
-
 		containerDef->Release();
 		defObj->Release();
 
-		//_snddes->Initialize();			// FIXME: meant to be concrete
 		_pcmdes->Initialize();
 
 		mdes->Release();
