@@ -49,26 +49,19 @@
   //        Additionally a number of built-in implementations of this
   //        interface are provided -
   //
-  //        <c OMDiskRawStorage>       - an implementation of <c OMRawStorage>
-  //                                     for disk files. Uses ANSI file
-  //                                     functions only.
+  //          <c OMDiskRawStorage>   - an implementation of <c OMRawStorage>
+  //                                   for disk files. Uses ANSI file
+  //                                   functions only.
   //
-  //        <c OMMemoryRawStorage>     - an implementation of <c OMRawStorage>
-  //                                     that stores the file in memory.
+  //          <c OMMemoryRawStorage> - an implementation of <c OMRawStorage>
+  //                                   that stores the file in memory.
   //
-  //        <c OMMappedFileRawStorage> - an implementation of <c OMRawStorage>
-  //                                     for files mapped into memory.
-  //
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMRawStorage {
 public:
   // @access Public members.
 
     // @cmember Destructor.
   virtual ~OMRawStorage(void) {}
-
-    // @cmember Is it possible to read from this <c OMRawStorage> ?
-  virtual bool isReadable(void) const = 0;
 
     // @cmember Attempt to read the number of bytes given by <p byteCount>
     //          from the current position in this <c OMRawStorage>
@@ -78,13 +71,9 @@ public:
     //          <mf OMRawStorage::size> causes <p bytesRead> to be less
     //          than <p byteCount>. Reading bytes that have never been written
     //          returns undefined data in <p bytes>.
-    //          @precondition <f isReadable()>
   virtual void read(OMByte* bytes,
                     OMUInt32 byteCount,
                     OMUInt32& bytesRead) const = 0;
-
-    // @cmember Is it possible to write to this <c OMRawStorage> ?
-  virtual bool isWritable(void) const = 0;
 
     // @cmember Attempt to write the number of bytes given by <p byteCount>
     //          to the current position in this <c OMRawStorage>
@@ -95,7 +84,6 @@ public:
     //          <mf OMRawStorage::size> causes this <c OMRawStorage>
     //          to be extended, however such extension can fail, causing
     //          <p bytesWritten> to be less than <p byteCount>.
-    //          @precondition <f isWritable()>
     //   @devnote How is failure to extend indicated ?
   virtual void write(const OMByte* bytes,
                      OMUInt32 byteCount,
@@ -110,7 +98,7 @@ public:
   virtual bool isSizeable(void) const = 0;
 
     // @cmember The current size of this <c OMRawStorage> in bytes.
-    //          @precondition <f isSizeable()>
+    //          precondition - isSizeable()
   virtual OMUInt64 size(void) const = 0;
 
     // @cmember Set the size of this <c OMRawStorage> to <p newSize> bytes.
@@ -120,7 +108,7 @@ public:
     //          <c OMRawStorage> is truncated. Truncation may also result
     //          in the current position for <f read()> and <f write()>
     //          being set to <mf OMRawStorage::size>.
-    //          @precondition <f isSizeable()>
+    //          precondition - isSizeable()
     //   @devnote How is failure to extend indicated ?
   virtual void setSize(OMUInt64 newSize) = 0;
 
@@ -134,22 +122,13 @@ public:
 
     // @cmember The current position for <f read()> and <f write()>, as an
     //          offset in bytes from the beginning of this <c OMRawStorage>.
-    //          @precondition <f isPositionable()>
+    //          precondition - isPositionable()
   virtual OMUInt64 position(void) const = 0;
 
     // @cmember Set the current position for <f read()> and <f write()>, as an
     //          offset in bytes from the beginning of this <c OMRawStorage>.
-    //          @precondition <f isPositionable()>
+    //          precondition - isPositionable()
   virtual void setPosition(OMUInt64 newPosition) = 0;
-
-    // @cmember Synchronize this <c OMRawStorage> with its external
-    //          representation.
-    //          An implementation of <c OMRawStorage> for disk files would
-    //          most probably implement this virtual function as a flush.
-    //          This virtual function would probably be implemented as a
-    //          noop in implemetations for network streams and for memory
-    //          files.
-  virtual void synchronize(void) = 0;
 
 };
 

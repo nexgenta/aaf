@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -45,7 +45,7 @@ class OMSetIterator;
   //          value of type <p Key> to identify themselves through a
   //          function with the signature
   //          const Key Element::identification(void) const.
-  //   @tcarg class | Key  | The type of the unique key used to identify
+  //   @tcarg class | Key | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @base public | <c OMContainer>

@@ -41,8 +41,7 @@
   //        <c OMRawStorage> interface. The implementation uses
   //        ANSI file functions only.
   //
-  //   @base public | <c OMRawStorage>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+  //   @base public | OMRawStorage
 class OMDiskRawStorage : public OMRawStorage {
 public:
   // @access Static members.
@@ -64,11 +63,11 @@ public:
 
   // @access Public members.
 
+    // @cmember Constructor.
+  OMDiskRawStorage(FILE* file, OMFile::OMAccessMode accessMode);
+
     // @cmember Destructor.
   virtual ~OMDiskRawStorage(void);
-
-    // @cmember Is it possible to read from this <c OMDiskRawStorage> ?
-  virtual bool isReadable(void) const;
 
     // @cmember Attempt to read the number of bytes given by <p byteCount>
     //          from the current position in this <c OMDiskRawStorage>
@@ -81,9 +80,6 @@ public:
   virtual void read(OMByte* bytes,
                     OMUInt32 byteCount,
                     OMUInt32& bytesRead) const;
-
-    // @cmember Is it possible to write to this <c OMDiskRawStorage> ?
-  virtual bool isWritable(void) const;
 
     // @cmember Attempt to write the number of bytes given by <p byteCount>
     //          to the current position in this <c OMDiskRawStorage>
@@ -99,6 +95,11 @@ public:
                      OMUInt32& bytesWritten);
 
     // @cmember May this <c OMDiskRawStorage> be changed in size ?
+    //          An implementation of <c OMDiskRawStorage> for disk files
+    //          would most probably return true. An implemetation
+    //          for network streams would return false. An implementation
+    //          for fixed size contiguous memory files (avoiding copying)
+    //          would return false.
   virtual bool isSizeable(void) const;
 
     // @cmember The current size of this <c OMDiskRawStorage> in bytes.
@@ -117,6 +118,10 @@ public:
 
     // @cmember May the current position, for <f read()> and <f write()>,
     //          of this <c OMDiskRawStorage> be changed ?
+    //          An implementation of <c OMDiskRawStorage> for disk files
+    //          would most probably return true. An implemetation
+    //          for network streams would return false. An implementation
+    //          for memory files would return true.
   virtual bool isPositionable(void) const;
 
     // @cmember The current position for <f read()> and <f write()>, as an
@@ -130,34 +135,6 @@ public:
     //          <c OMDiskRawStorage>.
     //          precondition - isPositionable()
   virtual void setPosition(OMUInt64 newPosition);
-
-    // @cmember Synchronize this <c OMDiskRawStorage> with its external
-    //          representation.
-  virtual void synchronize(void);
-
-protected:
-  // @access Protected members.
-
-    // @cmember Constructor.
-  OMDiskRawStorage(FILE* file, OMFile::OMAccessMode accessMode);
-
-  virtual void read(FILE* file,
-                    OMByte* bytes,
-                    OMUInt32 byteCount,
-                    OMUInt32& bytesRead) const;
-
-  virtual void write(FILE* file,
-                     const OMByte* bytes,
-                     OMUInt32 byteCount,
-                     OMUInt32& bytesWritten);
-
-  virtual OMUInt64 size(FILE* file) const;
-
-  virtual void setSize(FILE* file, OMUInt64 newSize);
-
-  virtual OMUInt64 position(FILE* file) const;
-
-  virtual void setPosition(FILE* file, OMUInt64 newPosition);
 
 private:
   // @access Private members.

@@ -31,7 +31,6 @@
 
 #include "OMRawStorage.h"
 #include "OMFile.h"
-#include "OMVector.h"
 
 #include <stdio.h>
 
@@ -41,8 +40,7 @@
   //        This is an Object Manager built-in implementation of the
   //        <c OMRawStorage> interface.
   //
-  //   @base public | <c OMRawStorage>
-  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+  //   @base public | OMRawStorage
 class OMMemoryRawStorage : public OMRawStorage {
 public:
   // @access Static members.
@@ -52,11 +50,11 @@ public:
 
   // @access Public members.
 
+    // @cmember Constructor.
+  OMMemoryRawStorage(void);
+
     // @cmember Destructor.
   virtual ~OMMemoryRawStorage(void);
-
-    // @cmember Is it possible to read from this <c OMMemoryRawStorage> ?
-  virtual bool isReadable(void) const;
 
     // @cmember Attempt to read the number of bytes given by <p byteCount>
     //          from the current position in this <c OMMemoryRawStorage>
@@ -69,9 +67,6 @@ public:
   virtual void read(OMByte* bytes,
                     OMUInt32 byteCount,
                     OMUInt32& bytesRead) const;
-
-    // @cmember Is it possible to write to this <c OMMemoryRawStorage> ?
-  virtual bool isWritable(void) const;
 
     // @cmember Attempt to write the number of bytes given by <p byteCount>
     //          to the current position in this <c OMMemoryRawStorage>
@@ -88,6 +83,11 @@ public:
                      OMUInt32& bytesWritten);
 
     // @cmember May this <c OMMemoryRawStorage> be changed in size ?
+    //          An implementation of <c OMMemoryRawStorage> for disk files
+    //          would most probably return true. An implemetation
+    //          for network streams would return false. An implementation
+    //          for fixed size contiguous memory files (avoiding copying)
+    //          would return false.
   virtual bool isSizeable(void) const;
 
     // @cmember The current size of this <c OMMemoryRawStorage> in bytes.
@@ -107,6 +107,10 @@ public:
 
     // @cmember May the current position, for <f read()> and <f write()>,
     //          of this <c OMMemoryRawStorage> be changed ?
+    //          An implementation of <c OMMemoryRawStorage> for disk files
+    //          would most probably return true. An implemetation
+    //          for network streams would return false. An implementation
+    //          for memory files would return true.
   virtual bool isPositionable(void) const;
 
     // @cmember The current position for <f read()> and <f write()>, as an
@@ -121,32 +125,10 @@ public:
     //          precondition - isPositionable()
   virtual void setPosition(OMUInt64 newPosition);
 
-    // @cmember Synchronize this <c OMMemoryRawStorage> with its external
-    //          representation.
-  virtual void synchronize(void);
-
 private:
   // @access Private members.
 
-    // @cmember Constructor.
-  OMMemoryRawStorage(void);
-
-    // @cmember Write a page or partial page.
-  virtual void write(size_t page,
-                     size_t offset,
-                     size_t byteCount,
-                     const OMByte* source);
-
-    // @cmember Read a page or partial page.
-  virtual void read(size_t page,
-                    size_t offset,
-                    size_t byteCount,
-                    OMByte* destination) const;
-
-  OMVector<OMByte*> _pageVector;
-  size_t _pageSize;
-  OMUInt64 _size;
-  OMUInt64 _position;
+  // NYI
 };
 
 #endif
