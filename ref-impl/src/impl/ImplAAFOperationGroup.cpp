@@ -1,14 +1,29 @@
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-
-
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #ifndef __ImplAAFDataDef_h__
 #include "ImplAAFDataDef.h"
@@ -41,8 +56,6 @@
 #ifndef __ImplAAFSourceReference_h__
 #include "ImplAAFSourceReference.h"
 #endif
-
-
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIds.h"
@@ -96,7 +109,8 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 		ImplAAFSegment *pSeg = _inputSegments.setValueAt(0, i);
 		if (pSeg)
 		{
-			pSeg->ReleaseReference();
+		  pSeg->ReleaseReference();
+		  pSeg = 0;
 		}
 	}
 	// Release all of the mob slot pointers.
@@ -106,19 +120,21 @@ ImplAAFOperationGroup::~ImplAAFOperationGroup ()
 		ImplAAFParameter *pParm = _parameters.setValueAt(0, j);
 		if (pParm)
 		{
-			pParm->ReleaseReference();
+		  pParm->ReleaseReference();
+		  pParm = 0;
 		}
 	}
 	ImplAAFSourceReference *ref = _rendering.setValue(0);
 	if (ref)
 	{
-		ref->ReleaseReference();
+	  ref->ReleaseReference();
+	  ref = 0;
 	}
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFOperationGroup::Initialize(aafUID_t*		pDatadef,
+    ImplAAFOperationGroup::Initialize(const aafUID_t & datadef,
 							 aafLength_t    length,
                              ImplAAFOperationDef* pOperationDef)
 {
@@ -129,7 +145,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUID_t				OperationDefAUID;
 	aafUID_t	uid;
 
-	if (pDatadef == NULL || pOperationDef == NULL)
+	if (pOperationDef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
 	XPROTECT()
@@ -140,7 +156,7 @@ AAFRESULT STDMETHODCALLTYPE
 		pHeader->ReleaseReference();
 		pHeader = NULL;
 
-		CHECK(SetNewProps(length, pDatadef));
+		CHECK(SetNewProps(length, datadef));
 		CHECK(pOperationDef->GetAUID(&uid));
 		_operationDefinition = uid;
 		// Lookup the OperationGroup definition's AUID
@@ -152,13 +168,16 @@ AAFRESULT STDMETHODCALLTYPE
 		_operationDefinition = OperationDefAUID;
 //		pOperationDef->AcquireReference();
 		pDictionary->ReleaseReference();
+		pDictionary = 0;
 	}
 	XEXCEPT
 	{
 		if(pHeader != NULL)
-			pHeader->ReleaseReference();
+		  pHeader->ReleaseReference();
+		pHeader = 0;
 		if(pDictionary)
-			pDictionary->ReleaseReference();
+		  pDictionary->ReleaseReference();
+		pDictionary = 0;
 	}
 	XEND;
 
@@ -184,16 +203,20 @@ AAFRESULT STDMETHODCALLTYPE
 		defUID = _operationDefinition;
 		CHECK(MyHeadObject(&head));
 		CHECK(head->GetDictionary(&dict));
-		CHECK(dict->LookupOperationDefinition(&defUID, OperationDef));
+		CHECK(dict->LookupOperationDefinition(defUID, OperationDef));
 		dict->ReleaseReference();
+		dict = 0;
 		head->ReleaseReference();
+		head = 0;
 	}
 	XEXCEPT
 	{
 		if(dict != NULL)
-			dict->ReleaseReference();
+		  dict->ReleaseReference();
+		dict = 0;
 		if(head != NULL)
-			head->ReleaseReference();
+		  head->ReleaseReference();
+		head = 0;
 	}
 	XEND;
 
@@ -209,8 +232,8 @@ AAFRESULT STDMETHODCALLTYPE
 	if(sourceRef == NULL)
 		return AAFRESULT_NULL_PARAM;
 
-//	if (_rendering.isPresent())
-//	{
+	if (_rendering.isPresent())
+	{
 		if (_rendering)
 		{
 			*sourceRef = _rendering;
@@ -218,9 +241,9 @@ AAFRESULT STDMETHODCALLTYPE
 		}
 		else
 			return AAFRESULT_PROP_NOT_PRESENT;
-//	}
-//	else
-//		return AAFRESULT_PROP_NOT_PRESENT;
+	}
+	else
+		return AAFRESULT_PROP_NOT_PRESENT;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -248,7 +271,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(def)
-				def->ReleaseReference();
+		  def->ReleaseReference();
+		def = 0;
 	}
 	XEND
 
@@ -263,6 +287,10 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pBypassOverride == NULL)
 		return AAFRESULT_NULL_PARAM;
+
+	if (!_bypassOverride.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	*pBypassOverride = _bypassOverride;
 
 	return AAFRESULT_SUCCESS;
@@ -324,7 +352,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(def)
-				def->ReleaseReference();
+		  def->ReleaseReference();
+		def = 0;
 	}
 	XEND;
 
@@ -418,9 +447,11 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(parm != NULL)
-			parm->ReleaseReference();
+		  parm->ReleaseReference();
+		parm = 0;
 		if(parmDef != NULL)
-			parmDef->ReleaseReference();
+		  parmDef->ReleaseReference();
+		parmDef = 0;
 	}
 	XEND
 
@@ -451,6 +482,5 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFOperationGroup, AUID_AAFOperationGroup);
 
 
