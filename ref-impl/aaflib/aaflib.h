@@ -30,6 +30,7 @@
 #define __aaflib_h__
 
 #include "AAF.h"
+#include "AAFTypes.h"
 #include "aafrdli.h"
 
 
@@ -39,7 +40,10 @@
 // Define function prototypes in a manner consistent with the 
 // ActiveX and OLE SDK's.
 
-#if !defined(_MSC_VER)
+#if !defined( COMPILER_MSC )
+//
+// Compiler other than MS Visual C++
+//
 
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENEXISTINGREAD)(
     const wchar_t *  pFileName,
@@ -65,7 +69,27 @@ typedef STDAPICALLTYPE HRESULT (* LPFNAAFFILEOPENTRANSIENT)(
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETPLUGINMANAGER)(
     IAAFPluginManager ** ppPluginManager);
 
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATERAWSTORAGEMEMORY)(
+	aafFileAccess_t  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATERAWSTORAGEDISK)(
+    aafCharacter_constptr  pFilename,
+    aafFileExistence_t  existence,
+	aafFileAccess_t  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
+    IAAFRawStorage * pRawStorage,
+	aafUID_constptr  pFileKind,
+	aafUInt32  modeFlags,
+	aafProductIdentification_constptr  pIdent,
+	IAAFFile ** ppNewFile);
+
 #else
+//
+// MS Visual C++ compiler
+//
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENEXISTINGREAD)(
     const wchar_t *  pFileName,
@@ -90,6 +114,23 @@ typedef HRESULT (STDAPICALLTYPE * LPFNAAFFILEOPENTRANSIENT)(
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETPLUGINMANAGER)(
     IAAFPluginManager ** ppPluginManager);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATERAWSTORAGEMEMORY)(
+	aafFileAccess_t  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATERAWSTORAGEDISK)(
+    aafCharacter_constptr  pFilename,
+    aafFileExistence_t  existence,
+	aafFileAccess_t  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
+    IAAFRawStorage * pRawStorage,
+	aafUID_constptr  pFileKind,
+	aafUInt32  modeFlags,
+	aafProductIdentification_constptr  pIdent,
+	IAAFFile ** ppNewFile);
 
 #endif
 
@@ -161,7 +202,23 @@ public:
   HRESULT GetPluginManager (
     IAAFPluginManager ** ppPluginManager);
   
+  HRESULT CreateRawStorageMemory (
+	aafFileAccess_t  access,
+	IAAFRawStorage ** ppNewRawStorage);
   
+  HRESULT CreateRawStorageDisk (
+    aafCharacter_constptr  pFilename,
+    aafFileExistence_t  existence,
+	aafFileAccess_t  access,
+	IAAFRawStorage ** ppNewRawStorage);
+
+  HRESULT CreateAAFFileOnRawStorage (
+    IAAFRawStorage * pRawStorage,
+	aafUID_constptr  pFileKind,
+	aafUInt32  modeFlags,
+	aafProductIdentification_constptr  pIdent,
+	IAAFFile ** ppNewFile);
+
 protected:
   //
   // The single instance of the dll wrapper.
@@ -177,11 +234,14 @@ protected:
   // Callback function member data loaded by overridden versions
   // of the Load() method:
   //
-  LPFNAAFFILEOPENEXISTINGREAD   _pfnOpenExistingRead;
-  LPFNAAFFILEOPENEXISTINGMODIFY _pfnOpenExistingModify;
-  LPFNAAFFILEOPENNEWMODIFY      _pfnOpenNewModify;
-  LPFNAAFFILEOPENTRANSIENT      _pfnOpenTransient;
-  LPFNAAFGETPLUGINMANAGER       _pfnGetPluginManager;
+  LPFNAAFFILEOPENEXISTINGREAD      _pfnOpenExistingRead;
+  LPFNAAFFILEOPENEXISTINGMODIFY    _pfnOpenExistingModify;
+  LPFNAAFFILEOPENNEWMODIFY         _pfnOpenNewModify;
+  LPFNAAFFILEOPENTRANSIENT         _pfnOpenTransient;
+  LPFNAAFGETPLUGINMANAGER          _pfnGetPluginManager;
+  LPFNAAFCREATERAWSTORAGEMEMORY    _pfnCreateRawStorageMemory;
+  LPFNAAFCREATERAWSTORAGEDISK      _pfnCreateRawStorageDisk;
+  LPFNAAFCREATEAAFFILEONRAWSTORAGE _pfnCreateAAFFileOnRawStorage;
 };
 
 
@@ -233,3 +293,4 @@ void reportAssertionFailure(char* kind,
 
 
 #endif /* __aaflib_h__ */
+
