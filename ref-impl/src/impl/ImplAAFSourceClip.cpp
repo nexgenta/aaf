@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.cpp,v 1.46.2.2 2004/07/23 21:39:27 akharkev Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.cpp,v 1.46.2.3 2004/08/13 17:53:20 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,20 +84,7 @@ AAFRESULT STDMETHODCALLTYPE
   SetSourceMobSlotID( sourceRef.sourceSlotID );
   _startTime = sourceRef.startTime;
 
-  aafBool isSound;
-  AAFRESULT hr = pDataDef->IsSoundKind( &isSound );
-  if ( AAFRESULT_SUCCESS != hr ) {
-    return hr;
-  }
 
-  // Only set fade default values if the essence type is sound.
-  if ( isSound ) {
-       _fadeInLength		= 0;
-       _fadeInType		= kAAFFadeNone;
-       
-       _fadeOutLength		= 0;
-       _fadeOutType	        = kAAFFadeNone;
-  };
 
   return AAFRESULT_SUCCESS;
 }
