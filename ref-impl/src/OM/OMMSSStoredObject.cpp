@@ -154,6 +154,8 @@ OMMSSStoredObject* OMMSSStoredObject::openRead(OMRawStorage* rawStorage)
 {
   TRACE("OMMSSStoredObject::openRead");
   PRECONDITION("Valid raw storage", rawStorage != 0);
+  PRECONDITION("Compatible raw storage access mode", rawStorage->isReadable());
+  PRECONDITION("Compatible raw storage", rawStorage->isPositionable());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::openFile(
                                                          rawStorage,
@@ -172,11 +174,39 @@ OMMSSStoredObject* OMMSSStoredObject::openModify(OMRawStorage* rawStorage)
   TRACE("OMMSSStoredObject::openModify");
 
   PRECONDITION("Valid raw storage", rawStorage != 0);
+  PRECONDITION("Compatible raw storage access mode",
+                         rawStorage->isReadable() && rawStorage->isWritable());
+  PRECONDITION("Compatible raw storage", rawStorage->isPositionable() &&
+                                         rawStorage->isExtendible());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::openFile(
                                                            rawStorage,
                                                            OMFile::modifyMode);
   newStore->open(OMFile::modifyMode);
+
+  return newStore;
+}
+
+  // @mfunc Create a new root <c OMMSSStoredObject> in the raw storage
+  //        <p rawStorage>. The byte order of the newly created root
+  //        is given by <p byteOrder>.
+  //   @parm The raw storage in which to create the file.
+  //   @parm The desired byte ordering for the new file.
+  //   @rdesc An <c OMMSSStoredObject> representing the root object.
+OMMSSStoredObject* OMMSSStoredObject::createWrite(OMRawStorage* rawStorage,
+                                                  const OMByteOrder byteOrder)
+{
+  TRACE("OMMSSStoredObject::createWrite");
+  PRECONDITION("Valid raw storage", rawStorage != 0);
+  PRECONDITION("Valid byte order",
+                      (byteOrder == littleEndian) || (byteOrder == bigEndian));
+  PRECONDITION("Compatible raw storage access mode",
+                         rawStorage->isWritable() && rawStorage->isReadable());
+  PRECONDITION("Compatible raw storage", rawStorage->isPositionable() &&
+                                         rawStorage->isExtendible());
+
+  OMMSSStoredObject* newStore = OMMSSStoredObject::createFile(rawStorage);
+  newStore->create(byteOrder); // mode == modify
 
   return newStore;
 }
@@ -195,6 +225,10 @@ OMMSSStoredObject* OMMSSStoredObject::createModify(OMRawStorage* rawStorage,
   PRECONDITION("Valid raw storage", rawStorage != 0);
   PRECONDITION("Valid byte order",
                       (byteOrder == littleEndian) || (byteOrder == bigEndian));
+  PRECONDITION("Compatible raw storage access mode",
+                         rawStorage->isReadable() && rawStorage->isWritable());
+  PRECONDITION("Compatible raw storage", rawStorage->isPositionable() &&
+                                         rawStorage->isExtendible());
 
   OMMSSStoredObject* newStore = OMMSSStoredObject::createFile(rawStorage);
   newStore->create(byteOrder);
@@ -334,9 +368,7 @@ void OMMSSStoredObject::save(const OMPropertySet& properties)
   while (++iterator) {
     OMProperty* p = iterator.property();
     ASSERT("Valid property", p != 0);
-#if defined(OM_VALIDATE_DEFINITIONS)
     ASSERT("Property has a definition", p->definition() != 0);
-#endif
     if (!p->isOptional() || p->isPresent()) {
       p->save();
     }
@@ -927,17 +959,24 @@ void OMMSSStoredObject::restore(OMStrongReferenceSet& set,
 
   for (size_t i = 0; i < entries; i++) {
     setIndex->iterate(context, localKey, count, key);
-    wchar_t* name = elementName(setName, setId, localKey);
-    OMStrongReferenceSetElement element(&set,
-                                        name,
-                                        localKey,
-                                        count,
-                                        key,
-                                        keySize);
-    element.restore();
-    set.insert(key, element);
-    delete [] name;
-    name = 0; // for BoundsChecker
+    // Restore the object only if it doesn't already exist in the set.
+    // Since the object is uniquely identified by the key, the
+    // external copy is identical to the internal one, so we may
+    // safely ignore the external one.
+    //
+    if (!set.contains(key)) {
+      wchar_t* name = elementName(setName, setId, localKey);
+      OMStrongReferenceSetElement element(&set,
+                                          name,
+                                          localKey,
+                                          count,
+                                          key,
+                                          keySize);
+      element.restore();
+      set.insert(key, element);
+      delete [] name;
+      name = 0; // for BoundsChecker
+    }
   }
   delete [] key;
   delete setIndex;
