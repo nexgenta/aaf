@@ -568,9 +568,9 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::isVoid(void) const
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable> and <c OMUnique>.
 template <typename ReferencedObject>
-void OMWeakReferenceSetProperty<ReferencedObject>::remove(void)
+void OMWeakReferenceSetProperty<ReferencedObject>::removeProperty(void)
 {
-  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::remove");
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::removeProperty");
 
   PRECONDITION("Property is optional", isOptional());
   PRECONDITION("Optional property is present", isPresent());
@@ -590,6 +590,7 @@ template<typename ReferencedObject>
 size_t OMWeakReferenceSetProperty<ReferencedObject>::bitsSize(void) const
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::bitsSize");
+  OBSOLETE("methods on class OMReferenceSetProperty");
 
   return sizeof(ReferencedObject*) * count();
 }
@@ -609,6 +610,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::getBits(
                                                       size_t ANAME(size)) const
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::getBits");
+  OBSOLETE("methods on class OMReferenceSetProperty");
 
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
@@ -638,6 +640,7 @@ void OMWeakReferenceSetProperty<ReferencedObject>::setBits(const OMByte* bits,
                                                            size_t size)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::setBits");
+  OBSOLETE("methods on class OMReferenceSetProperty");
 
   PRECONDITION("Valid bits", bits != 0);
   PRECONDITION("Valid size", size >= bitsSize());
@@ -751,8 +754,11 @@ OMWeakReferenceSetProperty<ReferencedObject>::remove(void* identification)
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::remove");
 
-  // TBS
-  return 0;
+  PRECONDITION("Valid identification", identification != 0);
+
+  OMUniqueObjectIdentification* id =
+               reinterpret_cast<OMUniqueObjectIdentification*>(identification);
+  return remove(*id);
 }
 
   // @mfunc Does this <c OMWeakReferenceSetProperty> contain an
@@ -770,8 +776,12 @@ OMWeakReferenceSetProperty<ReferencedObject>::contains(
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::containsObject");
 
-  // TBS
-  return false;
+
+  PRECONDITION("Valid identification", identification != 0);
+
+  OMUniqueObjectIdentification* id =
+               reinterpret_cast<OMUniqueObjectIdentification*>(identification);
+  return contains(*id);
 }
 
   // @mfunc Find the <c OMObject> in this <c OMWeakReferenceSetProperty>
@@ -793,8 +803,17 @@ OMWeakReferenceSetProperty<ReferencedObject>::findObject(
 {
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::findObject");
 
-  // TBS
-  return false;
+  PRECONDITION("Valid identification", identification != 0);
+
+  OMUniqueObjectIdentification* id =
+               reinterpret_cast<OMUniqueObjectIdentification*>(identification);
+
+  ReferencedObject* obj = 0;
+
+  bool result = find(*id, obj);
+
+  object = obj;
+  return result;
 }
 
 template<typename ReferencedObject>
