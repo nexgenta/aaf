@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFStoredObjectIDs.h,v 1.26.2.3 2004/05/03 01:26:04 jptrainor Exp $ $Name:  $
+// $Id: AAFStoredObjectIDs.h,v 1.26.2.4 2004/05/08 22:18:45 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -105,6 +105,14 @@ DEFINE_AUID(AUID_AAFGPITrigger,
 //{0d010101-0101-0800-060e-2b3402060101}
 DEFINE_AUID(AUID_AAFCommentMarker,
 0x0d010101, 0x0101, 0x0800, 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01);
+
+//{0d010101-0101-4100-060e-2b3402060101}
+DEFINE_AUID(AUID_AAFDescriptiveMarker,
+0x0d010101, 0x0101, 0x4100, 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01);
+
+//{0d010401-0000-0000-060e-2b3402060101}
+DEFINE_AUID(AUID_AAFDescriptiveFramework,
+0x0d010401, 0x0000, 0x0000, 0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01);
 
 //{0d010101-0101-0900-060e-2b3402060101}
 DEFINE_AUID(AUID_AAFFiller,

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.2.2.5 2004/05/01 19:09:02 jptrainor Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.2.2.6 2004/05/08 22:16:02 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -179,5 +179,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFTaggedValueDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFKLVDataDefs;
 extern "C" const aafClassID_t CLSID_AAFRecordingDescriptor;
 extern "C" const aafClassID_t CLSID_AAFAuxiliaryDescriptor;
+extern "C" const aafClassID_t CLSID_AAFDescriptiveFramework;
+extern "C" const aafClassID_t CLSID_AAFDescriptiveMarker;
 
 #endif // __AAFClassIDs_h__
