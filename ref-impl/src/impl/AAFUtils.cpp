@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.59 2005/02/07 18:50:59 stuart_hc Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.60 2005/03/13 16:30:02 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -189,7 +189,7 @@ aafErr_t AAFConvertEditRate(
 		{
 			*destPosition = destPos;
 			if(remainder != 0)
-				*destPosition = 1;
+				*destPosition++;
 		}
 	} /* XPROTECT */
 	XEXCEPT
