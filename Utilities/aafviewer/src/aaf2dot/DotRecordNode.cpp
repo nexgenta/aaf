@@ -1,5 +1,5 @@
 /*
- * $Id: DotRecordNode.cpp,v 1.4 2004/06/01 13:43:00 stuart_hc Exp $ $Name:  $
+ * $Id: DotRecordNode.cpp,v 1.5 2004/06/01 15:36:00 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -90,10 +90,11 @@ DotRecordNodeAttribute::GetWidth( InstanceMapperProfile &profile )
 string
 DotRecordNodeAttribute::GetAttributeString()
 {
-   ostringstream attributeString;
-   attributeString << _name << " = " << _value;
+   string attributeString = ProcessRecordString(_name);
+   attributeString.append(" = ");
+   attributeString.append(ProcessRecordString(_value));
 
-   return ProcessStringForQuoting( attributeString.str() );
+   return attributeString;
 }
 
 
