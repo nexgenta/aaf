@@ -93,10 +93,12 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile*		pFile = NULL;
-  IAAFHeader *        pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
-  IAAFContainerDef*	pContainerDef = NULL;
-  bool bFileOpen = false;
+	IAAFHeader *        pHeader = NULL;
+	IAAFDictionary*  pDictionary = NULL;
+	IAAFContainerDef*	pContainerDef = NULL;
+	IAAFDefObject*	pDef = NULL;
+	bool bFileOpen = false;
+	aafUID_t		uid = ContainerFile;
 	HRESULT			hr = S_OK;
 /*	long			test;
 */
@@ -118,6 +120,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 							  IID_IAAFContainerDef, 
 							  (IUnknown **)&pContainerDef));
     
+		checkResult(pContainerDef->QueryInterface(IID_IAAFDefObject, (void **)&pDef));
+		checkResult(pDef->Init(&uid, L"Test Container", L"Test Container Definition"));
+
 		checkResult(pContainerDef->SetEssenceIsIdentified (AAFTrue));
 
 		checkResult(pDictionary->RegisterContainerDefinition(pContainerDef));
@@ -131,6 +136,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   // Cleanup and return
   if (pContainerDef)
     pContainerDef->Release();
+
+  if (pDef)
+    pDef->Release();
 
   if (pDictionary)
     pDictionary->Release();
