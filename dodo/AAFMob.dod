@@ -38,7 +38,7 @@ AD_FORWARD_DECLARATION(EnumAAFMobComments)
 AD_CLASS_UUID(B1A21375, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21374, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Abstract, StoredObject)
 AD_XMETHOD1(GetMobID,
 			[out],
 			objPass,
@@ -715,8 +715,10 @@ AD_XMETHOD3(OffsetToMobTimecode,
   // NOTE! Stub only.   Implementation not yet added.
   //
   // Succeeds if all of the following are true:
+  // - the pTcSeg pointer is valid.
   // - the pOffset pointer is valid.
   // - the pResult pointer is valid.
+  // - Timecode track exists.
   // 
   // If this method fails nothing will be written to *pResult.
   // 
@@ -731,7 +733,7 @@ AD_XMETHOD3(OffsetToMobTimecode,
   //   - either pOffset or pResult argument is NULL.
   //
   // AAFRESULT_TIMECODE_NOT_FOUND
-  //   - pTcSeg is NULL and timecode track wasn't found.)
+  //   - timecode track wasn't found.)
 
 
 AD_XMETHOD2(FindSlotBySlotID,
@@ -911,4 +913,4 @@ AD_XMETHOD2(Copy,
   //
   // AAFRESULT_NULL_PARAM
   //   - either pDestMobName or pDestMob arguments is NULL.)
-AD_CLASS_END
+AD_XCLASS_END(Abstract, StoredObject)
