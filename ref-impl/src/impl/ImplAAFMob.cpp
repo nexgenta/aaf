@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.100 2004/10/22 13:44:37 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.101 2004/12/09 18:13:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2140,7 +2140,8 @@ AAFRESULT ImplAAFMob::MobFindSource(
 			(mobKind == kAAFMasterMob) || 
 			(mobKind == kAAFFileMob) ||
 			(mobKind == kAAFTapeMob) ||
-			(mobKind == kAAFFilmMob))
+			(mobKind == kAAFFilmMob) ||
+			(mobKind == kAAFPhysicalMob) )
 		{
 			*foundSource = (mobKind == tstKind ? kAAFTrue : kAAFFalse);
 		}

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPhysicalDescriptor.h,v 1.2 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPhysicalDescriptor.h,v 1.3 2004/12/09 18:13:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,8 +52,8 @@ public:
 
 public:
 
-//  virtual AAFRESULT	STDMETHODCALLTYPE
-//		GetOwningMobKind (aafMobKind_t *pMobKind);
+  virtual AAFRESULT	STDMETHODCALLTYPE
+		GetOwningMobKind (aafMobKind_t *pMobKind);
 
 	// Persistent properties
 private:

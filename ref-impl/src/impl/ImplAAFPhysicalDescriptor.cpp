@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPhysicalDescriptor.cpp,v 1.2 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPhysicalDescriptor.cpp,v 1.3 2004/12/09 18:13:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,5 +43,11 @@ ImplAAFPhysicalDescriptor::~ImplAAFPhysicalDescriptor ()
 {}
 
 
-
-
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPhysicalDescriptor::GetOwningMobKind (aafMobKind_t *pMobKind)
+{
+	if(pMobKind  == NULL)
+		return(AAFRESULT_NULL_PARAM);
+	*pMobKind = kAAFPhysicalMob;
+	return(AAFRESULT_SUCCESS);
+}

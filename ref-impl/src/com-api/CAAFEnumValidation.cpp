@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.cpp,v 1.4 2004/11/02 11:37:29 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEnumValidation.cpp,v 1.5 2004/12/09 18:13:26 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -499,6 +499,7 @@ bool Is_aafMobKind_t_Valid(aafMobKind_t param)
     case kAAFFilmMob:
     case kAAFPrimaryMob:
     case kAAFAllMob:
+    case kAAFPhysicalMob:
       return true;
     default:
       return false;

@@ -41,7 +41,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.7 2004/11/26 17:21:07 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.8 2004/12/09 18:13:25 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -455,7 +455,8 @@ enum _aafMobKind_e
 	kAAFTapeMob	= 3,
 	kAAFFilmMob	= 4,
 	kAAFPrimaryMob	= 5,
-	kAAFAllMob	= 6
+	kAAFAllMob	= 6,
+	kAAFPhysicalMob	= 7
     }	aafMobKind_e;
 
 typedef aafInt32 aafOperationChoice_t;
