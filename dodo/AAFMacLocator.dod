@@ -12,7 +12,6 @@ AD_HEAD
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -26,7 +25,7 @@ AD_INCLUDE(AAFTypes)
 AD_CLASS_UUID(94659781, 2a3c, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(94659781, 2a3c, 11D2, bf, a4, 00, 60, 97, 11, 62, 12)
-AD_CLASS_BEGIN
+AD_XCLASS_BEGIN(Concrete, StoredObject)
 
 AD_METHOD1(GetVolumeName,
 [out],aafString_t*,volname,Pass in a string which will be filled in,
@@ -53,4 +52,4 @@ AD_METHOD1(SetDirID,
 [in],aafInt32 ,DirID, directory ID,
 Set the DirID for a Mac locator.)
 
-AD_CLASS_END
+AD_XCLASS_END(Concrete, StoredObject)
