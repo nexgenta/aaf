@@ -42,7 +42,6 @@ class ImplAAFParameter;
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
 #endif
-#include "OMReferenceContainerIter.h"
 
 class ImplEnumAAFParameters : public ImplAAFRoot
 {
@@ -103,16 +102,6 @@ public:
     Clone
         // @parm [out,retval] new enumeration
         (ImplEnumAAFParameters ** ppEnum);
-
-
-public:
-  // SDK Internal 
-  virtual AAFRESULT STDMETHODCALLTYPE
-	  SetIterator(ImplAAFObject *pObj,
-				OMReferenceContainerIterator<ImplAAFParameter>* iterator);
-private:
-	ImplAAFObject*	_enumObj;
-	OMReferenceContainerIterator<ImplAAFParameter>*	_iterator;
 };
 
 #endif // ! __ImplEnumAAFParameters_h__
