@@ -91,6 +91,7 @@ ImplAAFClassDef::~ImplAAFClassDef ()
 	  if (pd)
 		{
 		  pd->ReleaseReference();
+		  pd = 0;
 		}
 	}
 }
@@ -328,6 +329,13 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
+void ImplAAFClassDef::pvtGetParentAUID (aafUID_t & result)
+{
+  result = _ParentClass;
+}
+
+
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::GetParent (
       ImplAAFClassDef ** ppClassDef)
@@ -340,7 +348,8 @@ AAFRESULT STDMETHODCALLTYPE
 	  AAFRESULT hr;
 
 	  // If no parent, return NULL (and success)
-	  aafUID_t parentClass = _ParentClass;
+	  aafUID_t parentClass;
+	  pvtGetParentAUID (parentClass);
 	  const aafUID_t null_UID = { 0 };
 	  if (EqualAUID(&parentClass, &null_UID))
 		{
@@ -378,7 +387,6 @@ AAFRESULT STDMETHODCALLTYPE
   if (! pID) return AAFRESULT_NULL_PARAM;
   if (! pName) return AAFRESULT_NULL_PARAM;
   if (! pTypeDef) return AAFRESULT_NULL_PARAM;
-  if (! ppPropDef) return AAFRESULT_NULL_PARAM;
 
   ImplAAFDictionarySP pDict;
   ImplAAFPropertyDefSP pd;
@@ -397,6 +405,7 @@ AAFRESULT STDMETHODCALLTYPE
   // AddRef; CreateImpl *also* will addref, so we've got one too
   // many.  Put us back to normal.
   tmp->ReleaseReference ();
+  tmp = 0;
 
   check_result (pd->Initialize (pID,
 								omPid,
@@ -440,4 +449,3 @@ aafBool ImplAAFClassDef::pvtPropertyIdentifierAUID::DoesMatch
   return (EqualAUID (&_id, &testUID) ? AAFTrue : AAFFalse);
 }
 
-OMDEFINE_STORABLE(ImplAAFClassDef, AUID_AAFClassDef);
