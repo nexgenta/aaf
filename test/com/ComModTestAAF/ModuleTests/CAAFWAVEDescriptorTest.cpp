@@ -28,23 +28,24 @@
  ************************************************************************/
 
 
-#if defined(WIN32) || defined(_WIN32)
 #undef WIN32_LEAN_AND_MEAN
-#endif
 
 
 #include "AAF.h"
 
 #include <iostream.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "AAFTypes.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 
 #include "CAAFBuiltinDefs.h"
 
-#if defined(_MAC) || defined(macintosh)
+#if !defined( OS_WINDOWS )
 
 #define WAVE_FORMAT_PCM 0x0001
 
@@ -61,17 +62,8 @@ typedef struct tWAVEFORMATEX
 } WAVEFORMATEX, *PWAVEFORMATEX;
 
 
-#endif
+#endif  // !defined( OS_WINDOWS )
 
-
-
-#if defined(_WIN32) || defined(WIN32)
-  // Wave data does not have to be swapped on Windows platforms.
-  #define SWAPSUMMARY(summary)
-#else
-  // Assume all other platforms are big-endian.
-  // this will change when we adapt the sdk to
-  // other platforms...
 
   // Simple utilities to swap bytes.
   static void SwapBytes(void *buffer, size_t count)
@@ -102,8 +94,17 @@ typedef struct tWAVEFORMATEX
     // Ignore extra information for now trr: 1999-02-19
   }
 
+#if defined( OS_WINDOWS )
+  // Wave data does not have to be swapped on Windows platforms.
+  #define SWAPSUMMARY(summary)
+#else
+  // Assume all other platforms are big-endian.
+  // this will change when we adapt the sdk to
+  // other platforms...
+
+
   #define SWAPSUMMARY(summary) SwapSummary(summary);
-#endif
+#endif  // OS_WINDOWS
 
 
 static const 	aafMobID_t	TEST_MobID =
@@ -326,16 +327,21 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     aafUInt32		size = 0;
 
 		checkResult(pWAVEDesc->GetSummaryBufferSize(&size));
-		checkExpression(size == sizeof(WAVEFORMATEX), AAFRESULT_TEST_FAILED);
+// THe next line may not be true cross-platform due to padding
+//		checkExpression(size == sizeof(WAVEFORMATEX), AAFRESULT_TEST_FAILED);
 
 
     checkResult(pWAVEDesc->GetSummary(size, (aafDataValue_t)&summary));
 
     // NOTE: The elements in the summary structure need to be byte swapped
-		//       on Big Endian system (i.e. the MAC).
-    SWAPSUMMARY(summary)
+	//       on Big Endian system (i.e. the MAC).
+	// Result depends upon format of the file AND the current machine, not just the current machine.
+    if(summary.wFormatTag != WAVE_FORMAT_PCM)
+    {
+    	SwapSummary(summary);
+    }
 
-		checkExpression(summary.cbSize == sizeof(WAVEFORMATEX)	&&
+		checkExpression(/*summary.cbSize == sizeof(WAVEFORMATEX)	&& */
 									summary.wFormatTag == WAVE_FORMAT_PCM	&&
 									summary.wBitsPerSample == 16			&&
 									summary.nAvgBytesPerSec == 88200		&&
@@ -378,20 +384,26 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFWAVEDescriptor_test()
+extern "C" HRESULT CAAFWAVEDescriptor_test(testMode_t mode);
+extern "C" HRESULT CAAFWAVEDescriptor_test(testMode_t mode)
 {
 	aafWChar*	pFileName = L"AAFWAVEDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try
 	{
-		hr = CreateAAFFile(pFileName);
+		if(mode == kAAFUnitTestReadWrite)
+			hr = CreateAAFFile(pFileName);
+		else
+			hr = AAFRESULT_SUCCESS;
 		if (SUCCEEDED(hr))
 			hr = ReadAAFFile(pFileName);
 	}
 	catch (...)
 	{
-		cerr << "CAAFWAVEDescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFWAVEDescriptor_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;
