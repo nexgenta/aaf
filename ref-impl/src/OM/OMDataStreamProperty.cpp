@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.59 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.60 2004/03/02 16:34:43 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,8 +50,17 @@ OMDataStreamProperty::OMDataStreamProperty(const OMPropertyId propertyId,
 OMDataStreamProperty::~OMDataStreamProperty(void)
 {
   TRACE("OMDataStreamProperty::~OMDataStreamProperty");
-  if (_stream != 0) {
-    close();
+
+  try 
+  {
+	if (_stream != 0) {
+		close();
+	}
+  }
+  catch(...)
+  {
+	  //close can throw exceptions under limited circustances with schemasoft library.
+	  //This is to ensure that excpetions do not get thrown outside the destructor.
   }
   POSTCONDITION("Stream closed", _stream == 0);
 }
