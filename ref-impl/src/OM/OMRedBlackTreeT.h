@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,7 +26,6 @@
 ************************************************************************/
 
 // @doc OMINTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRedBlackTree
 #ifndef OMREDBLACKTREET_H
 #define OMREDBLACKTREET_H
 
@@ -102,10 +101,7 @@ OMRedBlackTree<Key, Value>::~OMRedBlackTree(void)
 
   // @mfunc Insert the <p Value> <p v> into this
   //         <c OMRedBlackTree> and associate it with <p Key> <p k>.
-  //         If this the first instance of an item identified
-  //         by <p Key> <p k> in this <c OMRedBlackTree>, the result
-  //         is true, otherwise the result is false.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -132,13 +128,13 @@ bool OMRedBlackTree<Key, Value>::insert(const Key k, Value v)
   //        by <p k>.  If the item is found it is returned in
   //        <p v> and the result is true. If the element is not
   //        found the result is false.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
   //          <c OMRedBlackTree> item. This type must support operator =.
   //   @parm The <p Key> for which to search.
-  //   @parm The <p Value> associated with <p k>, if any, by reference.
+  //   @parm The <p Value> associated with <p k>, if any.
   //   @rdesc True if <p k> was found in this <c OMRedBlackTree>, false
   //          otherwise.
   //   @this const
@@ -167,48 +163,9 @@ bool OMRedBlackTree<Key, Value>::find(const Key k, Value& v) const
   return result;
 }
 
-  // @mfunc Find the item in this <c OMRedBlackTree> identified
-  //        by <p k>.  If the item is found it is returned in
-  //        <p v> and the result is true. If the element is not
-  //        found the result is false.
-  //   @tcarg class | Key | The type of the unique key used to identify
-  //          elements. This type must support operator =, operator !=
-  //          and operator <lt>.
-  //   @tcarg class | Value | The type of the value carried in an
-  //          <c OMRedBlackTree> item. This type must support operator =.
-  //   @parm The <p Key> for which to search.
-  //   @parm The <p Value> associated with <p k>, if any, by pointer.
-  //   @rdesc True if <p k> was found in this <c OMRedBlackTree>, false
-  //          otherwise.
-  //   @this const
-template <typename Key, typename Value>
-bool OMRedBlackTree<Key, Value>::find(const Key k, Value** v) const
-{
-  TRACE("OMRedBlackTree<Key, Value>::find");
-  INVARIANT();
-
-  bool result;
-
-  Node* n = find(k, _root);
-
-  if (n != _nil) {
-    // found
-    result = true;
-    *v = &n->_value;
-  } else {
-    // not found
-    result = false;
-  }
-
-  INVARIANT();
-  POSTCONDITION("Consistent result", IMPLIES( result,  contains(k)));
-  POSTCONDITION("Consistent result", IMPLIES(!result, !contains(k)));
-  return result;
-}
-
   // @mfunc Does this <c OMRdBlackTree> contain an item
   //        identified by <p k>?
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -242,7 +199,7 @@ bool OMRedBlackTree<Key, Value>::contains(const Key k) const
 
   // @mfunc Remove the item assciated with <p Key> <p k> from this
   //        <c OMRedBlackTree>.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -306,7 +263,7 @@ bool OMRedBlackTree<Key, Value>::remove(const Key k)
   // @mfunc The number of items in this <c OMRedBlackTree>.
   //        <mf OMRedBlackTree::count> returns the actual number
   //        of items in the <c OMRedBlackTree>.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -322,7 +279,7 @@ size_t OMRedBlackTree<Key, Value>::count(void) const
 
   // @mfunc Traverse this <c OMRedBlackTree> in order, the
   //        function <p f> is called for each item.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -343,7 +300,7 @@ void OMRedBlackTree<Key, Value>::traverseInOrder(
 
   // @mfunc Traverse this <c OMRedBlackTree> in pre-order, the
   //        function <p f> is called for each item.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -365,7 +322,7 @@ void OMRedBlackTree<Key, Value>::traverseInPreOrder(
 
   // @mfunc Traverse this <c OMRedBlackTree> in post-order, the
   //        function <p f> is called for each item.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -386,7 +343,7 @@ void OMRedBlackTree<Key, Value>::traverseInPostOrder(
 }
 
   // @mfunc The height of this <c OMRedBlackTree>.
-  //   @tcarg class | Key | The type of the unique key used to identify
+  //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
   //   @tcarg class | Value | The type of the value carried in an
@@ -471,8 +428,8 @@ size_t OMRedBlackTree<Key, Value>::blackHeight(Node* subTree) const
 }
 
 template <typename Key, typename Value>
-typename OMRedBlackTree<Key, Value>::Node*
-OMRedBlackTree<Key, Value>::find(Key k, Node* x) const
+OMRedBlackTree<Key, Value>::Node* OMRedBlackTree<Key, Value>::find(Key k,
+                                                               Node* x) const
 {
   TRACE("OMRedBlackTree<Key, Value>::find");
   INVARIANT();
@@ -511,7 +468,7 @@ bool OMRedBlackTree<Key, Value>::insert(Node* n, Key k, Value v)
       n = n->_right;
     }
   }
-
+  
   if (n == _nil) {
     // There is no existing node with this key, create one
     result = true;
@@ -579,8 +536,8 @@ bool OMRedBlackTree<Key, Value>::insert(Node* n, Key k, Value v)
 }
 
 template <typename Key, typename Value>
-typename OMRedBlackTree<Key, Value>::Node*
-OMRedBlackTree<Key, Value>::predecessor(Node* x) const
+OMRedBlackTree<Key, Value>::Node* OMRedBlackTree<Key, Value>::predecessor(
+                                                                 Node* x) const
 {
   TRACE("OMRedBlackTree<Key, Value>::predecessor");
   // Cormen et. al. page 249 TREE-PREDECESSOR [by symmetry with TREE-SUCCESSOR]
@@ -600,8 +557,8 @@ OMRedBlackTree<Key, Value>::predecessor(Node* x) const
 }
 
 template <typename Key, typename Value>
-typename OMRedBlackTree<Key, Value>::Node*
-OMRedBlackTree<Key, Value>::successor(Node* x) const
+OMRedBlackTree<Key, Value>::Node* OMRedBlackTree<Key, Value>::successor(
+                                                                 Node* x) const
 {
   TRACE("OMRedBlackTree<Key, Value>::successor");
   // Cormen et. al. page 249 TREE-SUCCESSOR
@@ -621,8 +578,8 @@ OMRedBlackTree<Key, Value>::successor(Node* x) const
 }
 
 template <typename Key, typename Value>
-typename OMRedBlackTree<Key, Value>::Node*
-OMRedBlackTree<Key, Value>::minimum(Node* x) const
+OMRedBlackTree<Key, Value>::Node* OMRedBlackTree<Key, Value>::minimum(
+                                                                 Node* x) const
 {
   TRACE("OMRedBlackTree<Key, Value>::minimum");
   // Cormen et. al. page 248 TREE-MINIMUM
@@ -635,8 +592,8 @@ OMRedBlackTree<Key, Value>::minimum(Node* x) const
 }
 
 template <typename Key, typename Value>
-typename OMRedBlackTree<Key, Value>::Node*
-OMRedBlackTree<Key, Value>::maximum(Node* x) const
+OMRedBlackTree<Key, Value>::Node* OMRedBlackTree<Key, Value>::maximum(
+                                                                 Node* x) const
 {
   TRACE("OMRedBlackTree<Key, Value>::maximum");
   // Cormen et. al. page 248 TREE-MAXIMUM
