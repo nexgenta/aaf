@@ -86,6 +86,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
+	*ppFile = NULL;
+
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
@@ -93,7 +95,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		*ppFile = NULL;
 		return hr;
 	}
@@ -340,7 +346,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafUID_t			readSourceID;
 	aafBool				readIsTimeWarp;
 	aafInt32			catLen, checkNumInputs, testNumSources, testNumParam;
-	aafUInt32			checkBypass, testLen;
+	aafUInt32			checkBypass;
 	HRESULT				hr = S_OK;
 	wchar_t				checkCat[256], checkName[256];
 	aafNumSlots_t		s;
