@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.145.2.12 2004/08/13 13:48:57 phil_tudor Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.145.2.13 2004/09/07 15:19:54 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -43,6 +43,7 @@ AAFCOMINTERFACESONLY="\
 	AAFMasterMob2 \
 	AAFMasterMobEx \
 	AAFMob2 \
+	AAFRGBADescriptor2 \
 	AAFSearchSource \
 	AAFSourceReference2 \
 	AAFTimelineMobSlot2 \

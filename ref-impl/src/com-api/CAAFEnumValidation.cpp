@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.cpp,v 1.2.2.6 2004/09/02 17:14:01 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEnumValidation.cpp,v 1.2.2.7 2004/09/07 15:23:07 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -612,6 +612,23 @@ bool Is_aafReferenceType_t_Valid(aafReferenceType_t param)
     case kAAFRefMinimum:
     case kAAFRefMaximum:
     case kAAFRefEnumvalue:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool Is_aafScanningDirection_t_Valid(aafScanningDirection_t param)
+{
+  switch (param) {
+    case kAAFScanningLeftToRightTopToBottom:
+    case kAAFScanningRightToLeftTopToBottom:
+    case kAAFScanningLeftToRightBottomToTop:
+    case kAAFScanningRightToLeftBottomToTop:
+    case kAAFScanningTopToBottomLeftToRight:
+    case kAAFScanningTopToBottomRightToLeft:
+    case kAAFScanningBottomToTopLeftToRight:
+    case kAAFScanningBottomToTopRightToLeft:
       return true;
     default:
       return false;
