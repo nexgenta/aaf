@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataDef.h,v 1.13 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDataDef.h,v 1.14 2004/04/16 08:24:54 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -120,6 +120,22 @@ public:
 
          // @parm [retval,out] pointer to result
          aafBool *  bDoesConvertFrom);
+
+  //****************
+  // IsTimecodeKind()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsTimecodeKind
+        // @parm [retval,out] pointer to the return value
+        (aafBool *  bIsTimecodeKind);
+
+  //****************
+  // IsEdgecodeKind()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsEdgecodeKind
+        // @parm [retval,out] pointer to the return value
+        (aafBool *  bIsEdgecodeKind);
 
 private:
   // *NOT* reference counted!
