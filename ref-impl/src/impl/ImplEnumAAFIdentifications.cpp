@@ -3,6 +3,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -105,11 +106,9 @@ AAFRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(head)
-		  head->ReleaseReference();
-		head = 0;
+			head->ReleaseReference();
 		if(dict)
-		  dict->ReleaseReference();
-		dict = 0;
+			dict->ReleaseReference();
 	}
 	XEND;
 
@@ -224,9 +223,8 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-	  result->ReleaseReference();
-	  result = 0;
-	  *ppEnum = NULL;
+		result->ReleaseReference();
+		*ppEnum = NULL;
 	}
 	
 	return hr;
@@ -238,8 +236,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFIdentifications::SetEnumProperty( ImplAAFObject *pObj, identWeakRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-	  _enumObj->ReleaseReference();
-	_enumObj = 0;
+		_enumObj->ReleaseReference();
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
@@ -253,8 +250,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFIdentifications::SetEnumStrongProperty( ImplAAFObject *pObj, identStrongRefArrayProp_t *pProp)
 {
 	if (_enumObj)
-	  _enumObj->ReleaseReference();
-	_enumObj = 0;
+		_enumObj->ReleaseReference();
 	_enumObj = pObj;
 	if (pObj)
 		pObj->AcquireReference();
