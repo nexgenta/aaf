@@ -259,13 +259,6 @@ public:
     GetLastModified
         (aafTimeStamp_t *  pLastModified);  //@parm [out,retval] The modification date-time stamp
 
-
-
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFHeaderTest.cpp.
-  static AAFRESULT test();
-
 public:
 	// Interfaces visible inside the toolkit, but not exposed through the API
 
@@ -301,5 +294,16 @@ private:
 		OMStrongReferenceProperty<ImplAAFDictionary>		_dictionary;
 		OMFixedSizeProperty<aafVersionType_t>               _fileRev;
 };
+
+//
+// smart pointer
+//
+
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFHeader> ImplAAFHeaderSP;
 
 #endif // ! __ImplAAFHeader_h__
