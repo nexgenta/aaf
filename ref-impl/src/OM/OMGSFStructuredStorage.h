@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.h,v 1.3 2004/09/23 13:32:09 stuart_hc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.h,v 1.4 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,8 +31,8 @@
 * Authors: Bob Sabiston, Yuri Khramov, Mark Ambachtsheer
 ************************************************************************
 
-$Revision: 1.3 $
-$Date: 2004/09/23 13:32:09 $
+$Revision: 1.4 $
+$Date: 2004/10/25 15:37:59 $
 */
 #ifndef OMGSFSTRUCTUREDSTORAGE_H
 #define OMGSFSTRUCTUREDSTORAGE_H
@@ -42,7 +42,7 @@ $Date: 2004/09/23 13:32:09 $
 #include "OMFile.h"
 
 // TODO: revisit all these typedefs
-typedef long  HRESULT;
+typedef OMInt32 HRESULT;
 
 typedef enum { GSF_READ, GSF_WRITE, GSF_READWRITE } GsfAccessMode;
 
@@ -60,7 +60,7 @@ class OMGSFIStorage : public IStorage
 								const TCHAR FAR* in_filename,
 								OMFile::OMAccessMode in_accessMode,
 								void **out_storage,
-								unsigned long in_sectorSize);
+								ULONG in_sectorSize);
 
 	// function to open a compound file
 	static HRESULT STDMETHODCALLTYPE StgOpenStorageEx(
@@ -73,7 +73,7 @@ class OMGSFIStorage : public IStorage
 								const OMRawStorage* in_pRaw,
 								OMFile::OMAccessMode in_accessMode,
 								void** out_storage,
-								unsigned long in_sectorSize);
+								ULONG in_sectorSize);
 
 	// function to open root storage in raw storage
 	static HRESULT STDMETHODCALLTYPE StgOpenStorageInOMRawStorage(

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.h,v 1.20 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.h,v 1.21 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,8 +114,8 @@ static inline OMUInt64 toOMUInt64(const ULARGE_INTEGER &x)
 static inline ULARGE_INTEGER fromOMUInt64(const OMUInt64& x)
 {
   ULARGE_INTEGER result;
-  result.HighPart = (unsigned long)(((OMUInt64)x) >> 32);
-  result.LowPart  = (unsigned long) (0x00000000FFFFFFFF & (OMUInt64)x);
+  result.HighPart = (OMUInt32)(((OMUInt64)x) >> 32);
+  result.LowPart  = (OMUInt32) (0x00000000FFFFFFFF & (OMUInt64)x);
   return result;
 }
 

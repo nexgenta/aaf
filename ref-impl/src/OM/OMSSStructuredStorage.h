@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStructuredStorage.h,v 1.1 2004/09/28 11:57:08 phil_tudor Exp $ $Name:  $
+// $Id: OMSSStructuredStorage.h,v 1.2 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@ class OMSSIStorage : public IStorage
 								const TCHAR FAR* in_filename,
 								const OMFile::OMAccessMode in_accessMode,
 								void **out_storage,
-								unsigned long in_sectorSize);
+								ULONG in_sectorSize);
 
 
 	// function to open a compound file
@@ -52,7 +52,7 @@ class OMSSIStorage : public IStorage
 								const OMRawStorage* in_pRaw,
 								const OMFile::OMAccessMode in_accessMode,
 								void** out_storage,
-								unsigned long in_sectorSize);
+								ULONG in_sectorSize);
 
 	// function to open root storage in raw storage
 	static HRESULT STDMETHODCALLTYPE StgOpenStorageInOMRawStorage(

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStructuredStorage.cpp,v 1.2 2004/10/21 17:08:47 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStructuredStorage.cpp,v 1.3 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -138,7 +138,7 @@ HRESULT STDMETHODCALLTYPE
 OMSSIStorage::StgCreateStorageEx( const TCHAR FAR* in_filename,
 				const OMFile::OMAccessMode in_accessMode,
 				void **out_storage,
-				unsigned long in_sectorSize)
+				ULONG in_sectorSize)
 {
 	TRACE("OMSSIStorage::StgCreateStorageEx");
 	PRECONDITION("Valid mode", (in_accessMode == OMFile::modifyMode));
@@ -218,7 +218,7 @@ OMSSIStorage::StgCreateStorageInOMRawStorage(
 				const OMRawStorage* in_pRaw,
 				const OMFile::OMAccessMode in_accessMode,
 				void** out_storage,
-				unsigned long in_sectorSize)
+				ULONG in_sectorSize)
 {
 	TRACE("OMSSIStorage::StgCreateStorageInOMRawStorage");
 	PRECONDITION("Valid mode", (in_accessMode == OMFile::modifyMode));
