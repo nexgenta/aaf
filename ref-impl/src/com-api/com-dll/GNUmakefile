@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9 2004/11/23 15:40:36 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,13 @@ AAFBASE ?= ../../../..
 
 # Common definitions
 include $(AAFBASE)/build/common.mk
+
+# Turn off error-on-warning behaviour for this directory
+# Short term workaround for invalid use of offsetof macro in CAAFUnknown.cpp
+# FIXME: remove this once CAAFUnknown.cpp is fixed
+ifeq ($(CC),g++)
+  ADD_CFLAGS += -Wno-error
+endif
 
 # Include directories
 INCLUDES = -I../../../include/ref-api \

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFClassFactory.cpp,v 1.9 2004/02/27 14:26:46 stuart_hc Exp $ $Name:  $
+// $Id: CAAFClassFactory.cpp,v 1.10 2004/11/23 15:40:35 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,8 +59,6 @@ HRESULT CAAFClassFactory::InternalQueryInterface
 	REFIID riid,
 	void **ppvObj)
 {
-	HRESULT hr = S_OK;
-
 	if (!ppvObj)
 		return E_INVALIDARG;
 

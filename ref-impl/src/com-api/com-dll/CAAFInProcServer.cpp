@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFInProcServer.cpp,v 1.21 2004/10/27 14:07:19 stuart_hc Exp $ $Name:  $
+// $Id: CAAFInProcServer.cpp,v 1.22 2004/11/23 15:40:36 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -306,49 +306,6 @@ const AAFRegEntry g_AAFRegEntry[][3] =
   }
 };
 
-
-static int FormatRegBuffer 
-(
-  LPOLESTR pBuffer,
-  const AAFRegEntry& entry,
-  LPOLESTR pCLSIDString,
-  LPCOLESTR pClassName,
-  LPOLESTR pFileName
-)
-{
-  LPCOLESTR pParam = 0;
-
-  switch (entry.flags)
-  {
-    case AAF_REG_SUB_CLSID:
-      pParam = pCLSIDString;
-      break;
-
-    case AAF_REG_SUB_CLASSNAME:
-      pParam = pClassName;
-      break;
-
-    case AAF_REG_SUB_MODULE:
-      pParam = pFileName;
-      break;
-    
-    case AAF_REG_SUB_SKIP:
-      pBuffer[0] = 0; // set to empty string so that we set the 
-      return 0;
-
-    case AAF_REG_SUB_NONE:
-      // No parameter substitution, just copy the format string.
-      return _stprintf(pBuffer, entry.pFormat);      
-
-    default: // signal end (and/or error)
-      return -1;
-  } // switch (entry.flags)
-  
-  // Format the buffer.
-  assert(pParam!=0);
-  return _stprintf(pBuffer, entry.pFormat, pParam);
-  
-}
 
 
 // Find the next valid index in the internal object table where
