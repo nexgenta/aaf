@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.120 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.121 2004/03/22 23:09:15 creederickson Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1553,13 +1553,13 @@ void ImplAAFFile::registerFactories(void)
                                                        L"AAF Microsoft SS"));
 
 #elif defined( OS_DARWIN )
-// DEFAULT is SSS 512. MSS availability unknown (via Carbon lib(?).
+// DEFAULT is SchemaSoft  512.
 
   OMFile::registerFactory(ENCODING(DEFAULTFileKind),
-                          new OMMSSStoredObjectFactory(AAFMSSEncoding,
+                          new OMSSSStoredObjectFactory(AAFSSSEncoding,
                                                        Signature_SSBinary,
-                                                       L"AAF-M",
-                                                       L"AAF Microsoft SS"));
+                                                       L"AAF-S",
+                                                       L"AAF Schemasoft SS"));
 
 #elif defined( OS_IRIX )
 
