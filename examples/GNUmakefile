@@ -1,17 +1,12 @@
 
-all: com-examples
+all: cpp-examples com-examples
 
+cpp-examples:
+	cd cpp-api; $(MAKE)
 
 com-examples:
 	cd com-api; $(MAKE)
 
-
 clean:
-	cd com-api; $(MAKE) GENDEPS=0 $@
-
-
-.PHONY : realclean
-realclean :
-	cd com-api; $(MAKE) GENDEPS=0 $@
-
-
+	cd cpp-api; $(MAKE) clean
+	cd com-api; $(MAKE) clean

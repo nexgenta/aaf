@@ -1,14 +1,8 @@
 PACKAGE = ref-impl
 export PACKAGE
 
-AAFBASE ?= ../../..
+include $(AAFBASE)/build/defs.mk
 
-
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-
-# Include directories
 INCLUDES = -I. \
 	   -I../../include/ref-api \
 	   -I../../include \
@@ -17,30 +11,22 @@ INCLUDES = -I. \
 	   -I../../src/OM \
 	   -I../../aaflib
 
-
 .PHONY : all
 all : impl
 
-
 .PHONY : impl
-impl : $(LIBDIR)/libimpl$(LIB)
+impl : $(LIBDIR)/libimpl$(LIB_SUFFIX)
 
-
-$(LIBDIR)/libimpl$(LIB) : $(OBJDIR) $(LIBDIR) $(CXXOBJS)
-	$(LD_STAT_LIB) $@ $(CXXOBJS)
-
+$(LIBDIR)/libimpl$(LIB_SUFFIX) : $(OBJDIR) $(LIBDIR) $(CXXOBJS)
+	$(LD_DYN_LIB)  $(CC2LDOPT) $(LD_DYN_LIB_PATH_FLAG) \
+	$(LIBDIR) -L$(LIBDIR) $(CXXOBJS) -o $@ -lrefstg -lom -lm
 
 .PHONY : clean
 clean :
-	@$(RM) $(CXXOBJS)
-	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libimpl$(LIB)
-	@$(RMDIR) $(OBJDIR)/ii_files
-
-
-.PHONY : realclean
-realclean : clean
-
+	-@rm -rf $(OBJDIR)/*.o
+	-@rm -f $(LIBDIR)/libimpl$(LIB_SUFFIX)
 
 include $(AAFBASE)/build/rules.mk
+
+
 

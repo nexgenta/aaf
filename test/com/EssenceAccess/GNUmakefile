@@ -1,38 +1,24 @@
+
 PACKAGE = Test
 
-AAFBASE ?= ../../..
+include $(AAFBASE)/build/defs.mk
 
-
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-
-# Include directories
 INCLUDES = -I../../../ref-impl/include \
 	   -I../../../ref-impl/include/ref-api \
 	   -I../../../ref-impl/include/com-api \
 	   -I../../../Utilities/Include
 
-
 .PHONY : all
-all : $(BINDIR)/EssenceAccess$(EXE)
+all : $(BINDIR)/EssenceAccess$(EXE_SUFFIX)
 
-
-$(BINDIR)/EssenceAccess$(EXE) : $(BINDIR) $(OBJDIR) $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(LIBDIR) -laaflib -laafiid -o $@
-
+$(BINDIR)/EssenceAccess$(EXE_SUFFIX) : $(BINDIR) $(OBJDIR) $(CXXOBJS)
+	$(CC) -n32 -Wl,-wall $(CXXOBJS) $(CC2LDOPT) \
+	$(LD_DYN_LIB_PATH_FLAG) $(CC2LDOPT) $(LIBDIR) \
+	-L$(LIBDIR) $(CC2LDOPT) -laaflib -laafiid -o $@ -lC -laafutils
 
 .PHONY : clean
 clean :
-	@$(RM) $(CXXOBJS)
-	@$(RM) $(DEPS)
-	@$(RM) $(BINDIR)/EssenceAccess$(EXE)
-	@$(RMDIR) $(OBJDIR)/ii_files
-
-
-.PHONY : realclean
-realclean : clean
-
+	@rm -f $(CXXOBJS)
+	@rm -f $(BINDIR)/EssenceAccess$(EXE_SUFFIX)
 
 include $(AAFBASE)/build/rules.mk
-

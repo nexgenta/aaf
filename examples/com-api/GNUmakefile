@@ -46,32 +46,3 @@ MetadataExample :
 .PHONY : comClientTest
 comClientTest :
 	cd comClientTest && $(MAKE)
-
-.PHONY : clean
-clean :
-	cd ComCutsOnlyTest && $(MAKE) GENDEPS=0 $@
-	cd ComEssenceDataTest && $(MAKE) GENDEPS=0 $@
-	cd ComExtension && $(MAKE) GENDEPS=0 $@
-	cd ComPropDirectAccess && $(MAKE) GENDEPS=0 $@
-	cd ComPropDirectDump && $(MAKE) GENDEPS=0 $@
-	cd ExportAudioExample && $(MAKE) GENDEPS=0 $@
-	cd ExportSimpleComposition && $(MAKE) GENDEPS=0 $@
-	cd ImportAudioExample && $(MAKE) GENDEPS=0 $@
-	cd InfoDumper && $(MAKE) GENDEPS=0 $@
-	cd MetadataExample && $(MAKE) GENDEPS=0 $@
-	cd comClientTest && $(MAKE) GENDEPS=0 $@
-
-.PHONY : realclean
-realclean :
-	cd ComCutsOnlyTest && $(MAKE) GENDEPS=0 $@
-	cd ComEssenceDataTest && $(MAKE) GENDEPS=0 $@
-	cd ComExtension && $(MAKE) GENDEPS=0 $@
-	cd ComPropDirectAccess && $(MAKE) GENDEPS=0 $@
-	cd ComPropDirectDump && $(MAKE) GENDEPS=0 $@
-	cd ExportAudioExample && $(MAKE) GENDEPS=0 $@
-	cd ExportSimpleComposition && $(MAKE) GENDEPS=0 $@
-	cd ImportAudioExample && $(MAKE) GENDEPS=0 $@
-	cd InfoDumper && $(MAKE) GENDEPS=0 $@
-	cd MetadataExample && $(MAKE) GENDEPS=0 $@
-	cd comClientTest && $(MAKE) GENDEPS=0 $@
-

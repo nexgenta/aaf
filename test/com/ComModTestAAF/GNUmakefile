@@ -1,62 +1,47 @@
 PACKAGE = ComModAAF
 
-AAFBASE ?= ../../..
+include $(AAFBASE)/build/defs.mk
 
-
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-
-# Include directories
 INCLUDES = -I../../../ref-impl/include \
-	   -I../../../ref-impl/include/ref-api \
 	   -I../../../ref-impl/include/com-api \
 	   -I../../../ref-impl/src/com-api/com-dll \
            -I../../../ref-impl/src/com-api \
            -I../../../ref-impl/src/impl \
-	   -I../../../Utilities/Include
+	   -I../../../ref-impl/include/ref-api
 
-
-# CXXFILES2 is declared just to get the list of object files
-# from ModuleTests directory. These object files are created 
-# when building target ModuleTests
-CXXFILES_TMP = $(wildcard ModuleTests/*.$(CPP_EXTENSION)) $(wildcard ModuleTests/*.c)
-CXXFILES2 = $(CXXFILES_TMP:ModuleTests/%=%)
-
+CXXFILES = CAAFModuleTest.cpp \
+	   ComModTestAAF.cpp
 
 .PHONY : all
-all : $(BINDIR)/ComModAAF$(EXE)
+all : $(BINDIR)/ComModAAF$(EXE_SUFFIX)
 
-
-$(BINDIR)/ComModAAF$(EXE) : $(BINDIR) $(OBJDIR) $(CXXOBJS) ModuleTests
-	$(LD) $(CXXOBJS) $(CXXOBJS2) \
-	-L$(LIBDIR) -laaflib -laafiid -o $@
-
+#tbd: -n32 should not go here (need a link options flag)
+#tbd: need -lstdc++ for gcc, but can't use it for CC
+$(BINDIR)/ComModAAF$(EXE_SUFFIX) : $(BINDIR) $(OBJDIR) $(CXXOBJS) \
+	ModuleTests
+	$(CC) -n32 -Wl,-wall $(CXXOBJS) $(CC2LDOPT) \
+	$(LD_DYN_LIB_PATH_FLAG) $(CC2LDOPT) $(LIBDIR) \
+	-L$(LIBDIR) $(CC2LDOPT) -lModuleTests  \
+	-laaflib -laafiid -o $@ -lC -laafutils
 
 .PHONY : ModuleTests
 ModuleTests :
 	@echo "\nBuilding ModuleTests\n"
 	cd ModuleTests && $(MAKE)
 
-
 .PHONY : clean
 clean :
-	cd ModuleTests && $(MAKE) GENDEPS=0 $@
-	@$(RM) $(CXXOBJS)
-	@$(RM) $(DEPS)
-	@$(RM) $(BINDIR)/ComModAAF$(EXE)
-	@$(RMDIR) $(OBJDIR)/ii_files
-
-
-.PHONY : realclean
-realclean : clean
-	cd ModuleTests && $(MAKE) GENDEPS=0 $@
-
+	@rm -f $(CXXOBJS)
+	@rm -f $(BINDIR)/ComModAAF$(EXE_SUFFIX)
+	cd ModuleTests && $(MAKE) clean
 
 .PHONY : check
-check : $(BINDIR)/ComModAAF$(EXE)
-	$(BINDIR)/ComModAAF$(EXE)
-
+check : $(BINDIR)/ComModAAF$(EXE_SUFFIX)
+	$(BINDIR)/ComModAAF$(EXE_SUFFIX)
 
 include $(AAFBASE)/build/rules.mk
+
+
+
+
 

@@ -1,13 +1,8 @@
+
 PACKAGE = Examples
 
-AAFBASE ?= ../../../..
+include $(AAFBASE)/build/defs.mk
 
-
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-
-# Include directories
 INCLUDES = -I../../../../ref-impl/include \
 	   -I../../../../ref-impl/include/ref-api \
 	   -I../../../../ref-impl/include/com-api \
@@ -15,50 +10,38 @@ INCLUDES = -I../../../../ref-impl/include \
 	   -I../../../../Utilities/Include \
 	   -I..
 
-
 .PHONY : all
-all : $(BINDIR)/libAAFPersonnelExtension$(DLL) \
-      $(BINDIR)/ComPersonnelPluginWrite$(EXE)
-
+all : $(LIBDIR)/libAAFPersonnelExtension$(LIB_SUFFIX) \
+      $(BINDIR)/ComPersonnelPluginWrite$(EXE_SUFFIX)
 
 CXXFILES = AAFPersonnelExtension.cpp \
 	   CAAFAdminMob.cpp \
 	   CAAFPersonnelResource.cpp
 
+SUPOBJS = $(OBJDIR)/../../com-dll/obj/com-dll/CAAFClassFactory.o \
+	  $(OBJDIR)/../../com-dll/obj/com-dll/CAAFServer.o \
+	  $(OBJDIR)/../../com-dll/obj/com-dll/CAAFUnknown.o \
+	  $(OBJDIR)/extensionUtils.o
 
-SUPOBJS = $(AAFSDK)/com-api/$(AAFTARGETDIR)/CAAFClassFactory$(OBJ) \
-	  $(AAFSDK)/com-api/$(AAFTARGETDIR)/CAAFServer$(OBJ) \
-	  $(AAFSDK)/com-api/$(AAFTARGETDIR)/CAAFUnknown$(OBJ) \
-	  $(OBJDIR)/extensionUtils$(OBJ)
-
-
-$(BINDIR)/libAAFPersonnelExtension$(DLL) : $(BINDIR) $(OBJDIR) $(CXXOBJS)
-	$(LD_DYN_LIB) $(SUPOBJS) $(CXXOBJS) -L$(LIBDIR) -o $@ -laaflib -laafiid
-
+$(LIBDIR)/libAAFPersonnelExtension$(LIB_SUFFIX) : $(LIBDIR) $(OBJDIR) $(CXXOBJS)
+	$(LD_DYN_LIB)  $(CC2LDOPT) $(LD_DYN_LIB_PATH_FLAG) $(LIBDIR) \
+	-L$(LIBDIR) $(SUPOBJS) $(CXXOBJS) -o $@ -laaflib -laafiid
 
 CXXFILES2 = extensionReadPlugin.cpp \
 	    extensionWritePlugin.cpp \
 	    writePlugin.cpp
 
-
-$(BINDIR)/ComPersonnelPluginWrite$(EXE) : $(BINDIR) $(OBJDIR) $(CXXOBJS2)
-	$(LD) $(CXXOBJS2) $(OBJDIR)/extensionUtils$(OBJ) \
-	-L$(LIBDIR) -laaflib -laafiid -o $@
-
+$(BINDIR)/ComPersonnelPluginWrite$(EXE_SUFFIX) : $(BINDIR) $(OBJDIR) $(CXXOBJS2)
+	$(CC) -n32 -Wl,-wall $(CXXOBJS2) $(CC2LDOPT) \
+	$(LD_DYN_LIB_PATH_FLAG) $(CC2LDOPT) $(LIBDIR) \
+	-L$(LIBDIR) $(CC2LDOPT) -laaflib -laafiid -o $@ -lC -laafutils \
+	-lAAFPersonnelExtension
 
 .PHONY : clean
 clean :
-	@$(RM) $(CXXOBJS)
-	@$(RM) $(CXXOBJS2)
-	@$(RM) $(DEPS)
-	@$(RM) $(BINDIR)/ComPersonnelExtension$(EXE)
-	@$(RM) $(BINDIR)/ComPersonnelPluginWrite$(EXE)
-	@$(RMDIR) $(OBJDIR)/ii_files
-
-
-.PHONY : realclean
-realclean : clean
-
+	@rm -f $(CXXOBJS)
+	@rm -f $(CXXOBJS2)
+	@rm -f $(BINDIR)/ComPersonnelExtension$(EXE_SUFFIX)
+	@rm -f $(BINDIR)/ComPersonnelPluginWrite$(EXE_SUFFIX)
 
 include $(AAFBASE)/build/rules.mk
-

@@ -1,40 +1,29 @@
 PACKAGE = aaflib
 
-AAFBASE ?= ../..
+include $(AAFBASE)/build/defs.mk
 
-
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-
-# Include directories
 INCLUDES = -I../include/ref-api \
 	   -I../include
 
+CXXFILES = aaflib.cpp \
+	   aaflibsgi.cpp
 
 .PHONY : all
 all : aaflib
 
-
 .PHONY : aaflib
-aaflib : $(LIBDIR)/libaaflib$(LIB)
+aaflib : $(LIBDIR)/libaaflib$(LIB_SUFFIX)
 
-
-$(LIBDIR)/libaaflib$(LIB) : $(OBJDIR) $(LIBDIR) $(CXXOBJS)
-	$(LD_STAT_LIB) $@ $(CXXOBJS)
-
+$(LIBDIR)/libaaflib$(LIB_SUFFIX) : $(OBJDIR) $(LIBDIR) $(CXXOBJS)
+	$(LD_DYN_LIB) $(CC2LDOPT) $(LD_DYN_LIB_PATH_FLAG) $(CC2LDOPT) \
+	$(LIBDIR) $(CC2LDOPT) -shared -L$(LIBDIR) $(CXXOBJS) -o \
+	$@ $(PROPS_LIB)
 
 .PHONY : clean
 clean:
-	@$(RM) $(CXXOBJS)
-	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libaaflib$(LIB)
-	@$(RMDIR) $(OBJDIR)/ii_files
-
-
-.PHONY : realclean
-realclean : clean
-
+	-@rm -rf $(OBJDIR)/*.o
+	-@rm -rf $(LIBDIR)/libaaflib$(LIB_SUFFIX)
 
 include $(AAFBASE)/build/rules.mk
+
 
