@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCodecDefs.h,v 1.8 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFCodecDefs.h,v 1.9 2004/11/04 14:35:35 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,9 @@
 //
 const aafUID_t kAAFNoCodec =
 { 0x568FB761, 0x9458, 0x11d2, { 0x80, 0x89, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+
+const aafUID_t kAAFCodecPCM =
+{ 0x90ac17c8, 0xe3e2, 0x4596, { 0x9e, 0x9e, 0xa6, 0xdd, 0x1c, 0x70, 0xc8, 0x92 } };
 
 const aafUID_t kAAFCodecWAVE = 
 { 0x820F09B1, 0xEB9B, 0x11d2, { 0x80, 0x9F, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
