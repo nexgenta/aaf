@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.11 2004/07/23 16:19:17 akharkev Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.12 2004/07/23 17:53:44 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,7 +82,6 @@
 #include "AAFDataDefs.h"
 #include "ImplEnumAAFMobSlots.h"
 #include "ImplEnumAAFComponents.h"
-#include "ImplAAFCloneResolver.h"
 #include "ImplAAFTaggedValueUtil.h"
 
 #include <assert.h>
@@ -93,6 +92,7 @@
 #include "aafCvt.h"
 #include "AAFUtils.h"
 
+#include "OMIdentitySet.h"
 #include "OMIdentitySetIter.h"
 
 #include "ImplAAFBuiltinDefs.h"
