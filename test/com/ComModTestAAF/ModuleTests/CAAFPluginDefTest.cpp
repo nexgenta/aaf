@@ -1,17 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFPluginDescriptor
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
+/***********************************************\
+*												*
+* Advanced Authoring Format						*
+*												*
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*												*
 \******************************************/
-
- 
-
-
 
 
 #include "AAF.h"
@@ -30,6 +26,7 @@ static wchar_t *manuf2URL = L"www.avid.com";
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "aafUtils.h"
 
@@ -78,6 +75,8 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
+static aafUID_t TestPluginDesc = { 0x7C77C181, 0x2283, 0x11d2, { 0x80, 0xAD, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
+
 static HRESULT OpenAAFFile(aafWChar*			pFileName,
 						   aafMediaOpenMode_t	mode,
 						   IAAFFile**			ppFile,
@@ -97,6 +96,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
+	*ppFile = NULL;
+
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	else
@@ -104,8 +105,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -123,15 +127,16 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile*		pFile = NULL;
-  IAAFHeader *        pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
+  IAAFHeader *      pHeader = NULL;
+  IAAFDictionary*	pDictionary = NULL;
   IAAFDefObject*	pPlugDef = NULL;
   IAAFCodecDef*		pCodecDef = NULL;
   IAAFPluginDescriptor *pDesc;
   IAAFNetworkLocator *pNetLoc, *pNetLoc2, *pNetLoc3;
-  IAAFLocator *pLoc, *pLoc2, *pLoc3;
+  IAAFLocator		*pLoc, *pLoc2, *pLoc3;
   aafUID_t			category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
-  bool bFileOpen = false;
+  bool				bFileOpen = false;
+  aafUID_t			uid;
 	HRESULT			hr = S_OK;
 /*	long			test;
 */
@@ -163,6 +168,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
                                           (void **)&pLoc));
 	checkResult(pLoc->SetPath (manuf2URL));
 
+	checkResult(pDesc->Init (&TestPluginDesc, L"Test Plugin", L"TestPlugin Description"));
 	checkResult(pDesc->SetCategoryClass(&category));
 	checkResult(pDesc->SetPluginVersionString(manufRev));
     checkResult(pDesc->SetManufacturerInfo(pNetLoc));
@@ -186,7 +192,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDesc->SetPluginAPIMinimumVersion(&sampleMinAPIVersion));
     checkResult(pDesc->SetPluginAPIMaximumVersion(&sampleMaxAPIVersion));
 
-	/**/
+	checkResult(pDictionary->RegisterPluginDescriptor (	pDesc));
+
+	  /**/
 	checkResult(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
 							  IID_IAAFNetworkLocator, 
 							  (IUnknown **)&pNetLoc2));
@@ -200,6 +208,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	
 	checkResult(pPlugDef->QueryInterface (IID_IAAFCodecDef,
                                           (void **)&pCodecDef));
+	uid = DDEF_Matte;
+	checkResult(pCodecDef->AppendEssenceKind (&uid));
 	checkResult(pDictionary->RegisterCodecDefinition(pCodecDef));
 	/**/
 	checkResult(pDictionary->CreateInstance(&AUID_AAFNetworkLocator,
@@ -372,9 +382,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		pCodecDef->Release();
 	if (pDefObj)
 		pDefObj->Release();
-
-//!!!	if (pEnumPluggable)
-//!!!		pEnumPluggable->Release();
 
 	if (pDictionary)
 		pDictionary->Release();
