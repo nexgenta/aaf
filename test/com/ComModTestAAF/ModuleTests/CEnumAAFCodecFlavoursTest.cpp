@@ -1,13 +1,31 @@
 // @doc INTERNAL
 // @com This file implements the module test for CEnumAAFCodecFlavours
-/***********************************************\
-*												*
-* Advanced Authoring Format						*
-*												*
-* Copyright (c) 1998-1999 Avid Technology, Inc. *
-* Copyright (c) 1998-1999 Microsoft Corporation *
-*												*
-\***********************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "AAF.h"
 
@@ -23,6 +41,7 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "aafUtils.h"
+#include "AAFCodecDefs.h"
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -58,15 +77,17 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFMasterMob Test";
+	ProductInfo.productName = L"EnumAAFCodecFlavours Test";
 	ProductInfo.productVersion.major = 1;
 	ProductInfo.productVersion.minor = 0;
 	ProductInfo.productVersion.tertiary = 0;
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = -1;
+	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
+
+	*ppFile = NULL;
 
 	if(mode == kMediaOpenAppend)
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
@@ -75,8 +96,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
+		if (*ppFile)
+		{
+			(*ppFile)->Release();
+			*ppFile = NULL;
+		}
 		return hr;
 	}
   
@@ -178,7 +202,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafUID_t		codecID = CodecWave;
 	// aafUID_t		testMatte = DDEF_Matte;
 	aafUID_t		testPicture = DDEF_Picture;
-	aafUID_t		checkFlavour = NilCodecVariety;
+	aafUID_t		checkFlavour = NilCodecFlavour;
 	aafUID_t		testFlavour;
 	HRESULT			hr = S_OK;
 
@@ -230,7 +254,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 extern "C" HRESULT CEnumAAFCodecFlavours_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"CodecDefTest.aaf";
+	aafWChar * pFileName = L"EnumAAFCodecFlavoursTest.aaf";
 
 	try
 	{
@@ -240,14 +264,14 @@ extern "C" HRESULT CEnumAAFCodecFlavours_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFCodecDef_test...Caught general C++ exception!" << endl; 
+		cerr << "CEnumAAFCodecFlavours_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
 	// When a method and its unit test have been implemented, remove it from the list.
 	if (SUCCEEDED(hr))
 	{
-		cout << "The following IAAFCodecDef methods have not been implemented:" << endl; 
+		cout << "The following IEnumAAFCodecFlavours tests have not been implemented:" << endl; 
 		cout << "     Next" << endl; 
 		cout << "     Skip" << endl; 
 		cout << "     Reset" << endl; 

@@ -1,12 +1,30 @@
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
@@ -34,7 +52,7 @@ _companyName(         PID_Identification_CompanyName,          "CompanyName"),
 _productName(         PID_Identification_ProductName,          "ProductName"),
 _productVersion(      PID_Identification_ProductVersion,       "ProductVersion"),
 _productVersionString(PID_Identification_ProductVersionString, "ProductVersionString"),
-// _productId(        PID_Identification_ProductID,            "ProductID"),
+_productId(			  PID_Identification_ProductID,            "ProductID"),
 _date(                PID_Identification_Date,                 "Date"),
 _toolkitVersion(      PID_Identification_ToolkitVersion,       "ToolkitVersion"),
 _platform(            PID_Identification_Platform,             "Platform")
@@ -46,7 +64,7 @@ _platform(            PID_Identification_Platform,             "Platform")
   _persistentProperties.put(   _productName.address());
   _persistentProperties.put(_productVersion.address());
   _persistentProperties.put(   _productVersionString.address());
-  // _persistentProperties.put(_productId.address());
+  _persistentProperties.put(_productId.address());
   _persistentProperties.put(   _date.address());
   _persistentProperties.put(_toolkitVersion.address());
   _persistentProperties.put(   _platform.address());
@@ -68,7 +86,7 @@ ImplAAFIdentification::ImplAAFIdentification(
                                      const wchar_t* productName,
                                      const aafProductVersion_t* productVersion,
                                      const wchar_t* productVersionString,
-                                     // const AUID* productId,
+                                     const aafUID_t* productId,
                                      const aafTimeStamp_t date,
                                      const aafProductVersion_t* toolKitVersion,
                                      const wchar_t* platform
@@ -78,7 +96,7 @@ _companyName(         PID_Identification_CompanyName,          "Company Name"),
 _productName(         PID_Identification_ProductName,          "Product Name"),
 _productVersion(      PID_Identification_ProductVersion,       "Product Version"),
 _productVersionString(PID_Identification_ProductVersionString, "Product Version String"),
-// _productId(        PID_Identification_ProductID,            "Product ID"),
+_productId(			  PID_Identification_ProductID,            "Product ID"),
 _date(                PID_Identification_Date,                 "Date"),
 _toolkitVersion(      PID_Identification_ToolkitVersion,       "Toolkit Version"),
 _platform(            PID_Identification_Platform,             "Platform")
@@ -90,7 +108,7 @@ _platform(            PID_Identification_Platform,             "Platform")
   _persistentProperties.put(   _productName.address());
   _persistentProperties.put(_productVersion.address());
   _persistentProperties.put(   _productVersionString.address());
-  // _persistentProperties.put(_productId.address());
+  _persistentProperties.put(_productId.address());
   _persistentProperties.put(   _date.address());
   _persistentProperties.put(_toolkitVersion.address());
   _persistentProperties.put(   _platform.address());
@@ -102,7 +120,7 @@ _platform(            PID_Identification_Platform,             "Platform")
   _productName = productName;
 	_productVersion = *productVersion;
   _productVersionString = productVersionString;
-	// _productId.???;
+  _productId = *productId;
   _date = date;
 	_toolkitVersion = *toolKitVersion;
   _platform = platform;
@@ -111,7 +129,6 @@ _platform(            PID_Identification_Platform,             "Platform")
 };
 
 
-OMDEFINE_STORABLE(ImplAAFIdentification, AUID_AAFIdentification);
 
 
 AAFRESULT STDMETHODCALLTYPE
@@ -190,7 +207,11 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		return AAFRESULT_NULL_PARAM;
 	}
-	
+
+	if(!_productVersion.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}	
 	*productVersion = _productVersion;
 	return AAFRESULT_SUCCESS;
 }
@@ -234,7 +255,10 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+
+  *pPID = _productId;
+
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -258,6 +282,11 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
 	}
 	
+	if(!_toolkitVersion.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
+
 	*productVersion = _toolkitVersion;
 
 	return AAFRESULT_SUCCESS;
@@ -268,29 +297,42 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetPlatform (aafWChar *  pPlatform,
 										aafUInt32 bufSize)
 {
-  bool stat;
-  if (! pPlatform)
+	if (! pPlatform)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  stat = _platform.copyToBuffer(pPlatform, bufSize);
-  if (! stat)
+	
+	if(!_platform.isPresent())
 	{
-	  return AAFRESULT_SMALLBUF;
+		return AAFRESULT_PROP_NOT_PRESENT;
 	}
-  return AAFRESULT_SUCCESS;
+
+	bool stat;
+	
+	stat = _platform.copyToBuffer(pPlatform, bufSize);
+	if (! stat)
+	{
+		return AAFRESULT_SMALLBUF;
+	}
+	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::GetPlatformBufLen (aafUInt32 *  pLen)
 {
-  if (! pLen)
+	if (! pLen)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-  *pLen = _platform.size();
-  return AAFRESULT_SUCCESS;
+
+	if(!_platform.isPresent())
+	{
+		return AAFRESULT_PROP_NOT_PRESENT;
+	}
+		
+	*pLen = _platform.size();
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -351,14 +393,14 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFIdentification::SetProductVersionString (aafWChar * pVS)
 {
-  if (! pVS)
+	if (! pVS)
 	{
-	  return AAFRESULT_NULL_PARAM;
+		return AAFRESULT_NULL_PARAM;
 	}
-
-  _productVersionString = pVS;
-
-  return AAFRESULT_SUCCESS;
+	
+	_productVersionString = pVS;
+	
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -369,5 +411,6 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  return AAFRESULT_NULL_PARAM;
 	}
-  return AAFRESULT_NOT_IMPLEMENTED;
+  _productId = *pPID;
+  return AAFRESULT_SUCCESS;
 }

@@ -1,47 +1,45 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFIdentification
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-1999 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 
 
 #include "AAF.h"
 
 #include <iostream.h>
-#include <iomanip.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
-#include <time.h>
-#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "ModuleTest.h"
 #include "AAFDefUIDs.h"
-#include "CAAFBuiltinDefs.h"
 
-HRESULT				localhr = AAFRESULT_SUCCESS;
-HRESULT				hr = S_OK;
+static aafUID_t		newUID;
+
 
 // Cross-platform utility to delete a file.
 static void RemoveTestFile(const wchar_t* pFileName)
@@ -67,53 +65,6 @@ inline void checkExpression(bool expression, HRESULT r)
   if (!expression)
     throw r;
 }
-inline void TestMethod(HRESULT expression, HRESULT r)
-{
-  if (expression != r)
-    localhr = AAFRESULT_TEST_FAILED;
-}
-inline void PrintTestResult(char *testName)
-{
-  if (localhr == AAFRESULT_SUCCESS)
-	cout<< "    "<< setw(40)<< setiosflags(ios::left) << testName<< "Passed"<< endl;
-  else
-	{
- 	  cout<< "    " << setw(40)<< setiosflags(ios::left) << testName<< "FAILED"<< endl;
-	  hr = AAFRESULT_TEST_FAILED;
-	}
-}
-
-/************************
- * GetDateTime
- *
- * 	Returns the number of seconds since the standard root date
- *		for the current machine.  The date returned here will be converted
- *		to the canonical date format in the date write routine.
- *
- * Argument Notes:
- *		Time - is NATIVE format.  That is relative to 1/1/1904 for the
- *			Mac and 1/1/70? for everyone else.
- *
- * ReturnValue:
- *		None
- *
- */
-static void GetDateTime(aafTimeStamp_t *ts)
-{
-    if( ts )
-    {
-	const time_t t = time(0);
-	const struct tm * ansitime = gmtime (&t);
-
-	ts->date.year   = ansitime->tm_year+1900;
-	ts->date.month  = ansitime->tm_mon+1;  // AAF months are 1-based
-	ts->date.day    = ansitime->tm_mday;   // tm_mday already 1-based
-	ts->time.hour   = ansitime->tm_hour;
-	ts->time.minute = ansitime->tm_min;
-	ts->time.second = ansitime->tm_sec;
-	ts->time.fraction = 0;            // not implemented yet!
-    }
-}
 
 
 #define MOB_NAME_TEST L"MOBTest"
@@ -123,46 +74,28 @@ static void GetDateTime(aafTimeStamp_t *ts)
 #define PRODUCT_NAME		L"AAFDictionary Test"
 #define TEST_VERSION		L"TEST VERSION"
 
-#if defined( OS_MACOS )
-#define PLATFORM_NAME		L"MacOS"
-#elif defined( OS_WINDOWS )
-#define PLATFORM_NAME		L"Win32"
-#elif defined( OS_UNIX )
-#define PLATFORM_NAME		L"Unix"
-#else
-#define PLATFORM_NAME		L"Unknown"
-#endif
-
-aafProductVersion_t			testVersion =  { 1, 0, 0, 0, kAAFVersionUnknown };
+aafProductVersion_t			testVersion =  { 1, 0, 0, 0, kVersionUnknown };
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
 {
 	IAAFFile *					pFile = NULL;
-	bool 						bFileOpen = false;
+	bool bFileOpen = false;
 	IAAFHeader *				pHeader = NULL;
-	IAAFDictionary				*pDictionary = NULL;
 	IAAFIdentification			*pIdent = NULL;
-	IAAFIdentification			*pTestIdent = NULL;
-	aafUInt32					readNumIdents;
-	char 						testName[35];
-	aafCharacter 				*myBuffer;
-	aafUInt32 					bufSize = 0;
-	aafUInt32 					bufSize2 = 0;
-
 	aafProductIdentification_t	ProductInfo;
-  memset(&ProductInfo, 0, sizeof(ProductInfo));
-	ProductInfo.companyName = COMPANY_NAME;
-	ProductInfo.productName = PRODUCT_NAME;
-	ProductInfo.productVersionString = TEST_VERSION;
-	ProductInfo.productID = UnitTestProductID;
-	ProductInfo.productVersion = &testVersion;
-	hr = S_OK;
+	HRESULT						hr = S_OK;
+	aafUInt32					readNumIdents;
+	aafUID_t					uid;
+	ProductInfo.companyName = L"";
+	ProductInfo.productName = L"";
+	ProductInfo.productVersionString = L"";
 
 	try 
 	{
 		// Remove the previous test file if any.
 		RemoveTestFile(pFileName);
-				
+		
+		
 		// Create the file.
 		checkResult(AAFFileOpenNewModify(pFileName, 0, &ProductInfo, &pFile));
 		bFileOpen = true;
@@ -170,293 +103,16 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		// We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
 		
- 	    checkResult(pHeader->GetDictionary(&pDictionary));
-	    CAAFBuiltinDefs defs (pDictionary);
-		
-		checkResult(pHeader->CountIdentifications(&readNumIdents));
+		checkResult(pHeader->GetNumIdents(&readNumIdents));
 		checkExpression(1 == readNumIdents, AAFRESULT_TEST_FAILED);
 		checkResult(pHeader->GetLastIdentification (&pIdent));
-
-		checkResult(defs.cdIdentification()->
-					CreateInstance(IID_IAAFIdentification, 
-								   (IUnknown **)&pTestIdent));	
-
-	/* Initialize */
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "Initialize()");
-		TestMethod(pTestIdent->Initialize(NULL,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_NULL_PARAM);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   NULL,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_NULL_PARAM);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   NULL,
-									   UnitTestProductID), AAFRESULT_NULL_PARAM);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_SUCCESS);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_ALREADY_INITIALIZED);									   
-		pTestIdent->Release();
-		PrintTestResult(testName);
-									   
-
-	/* GetCompanyNameBufLen *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetCompanyNameBufLen()");
-		bufSize = sizeof(COMPANY_NAME);
-		bufSize2 = 0;
-		TestMethod(pIdent->GetCompanyNameBufLen(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetCompanyNameBufLen(&bufSize2), AAFRESULT_SUCCESS);
-		if (bufSize != bufSize2)
-			localhr = AAFRESULT_TEST_FAILED;
-		
-		PrintTestResult(testName);
-
-	/* GetCompanyName *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetCompanyName()");
-		myBuffer = new aafCharacter [bufSize];
-		TestMethod(pIdent->GetCompanyName(NULL, bufSize), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetCompanyName(myBuffer, bufSize-1), AAFRESULT_SMALLBUF);
-		TestMethod(pIdent->GetCompanyName(myBuffer, bufSize), AAFRESULT_SUCCESS);
-		if (wcscmp(myBuffer, COMPANY_NAME))
-			localhr = AAFRESULT_TEST_FAILED;
-								
-		delete [] myBuffer;
-
-		PrintTestResult(testName);		
-
-	/* GetProductNameBufLen *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetProductNameBufLen()");
-		bufSize = sizeof(PRODUCT_NAME);
-		bufSize2 = 0;
-		TestMethod(pIdent->GetProductNameBufLen(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetProductNameBufLen(&bufSize2), AAFRESULT_SUCCESS);
-		if (bufSize != bufSize2)
-			localhr = AAFRESULT_TEST_FAILED;
-		
-		PrintTestResult(testName);
-
-	/* GetProductName *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetProductName()");
-		myBuffer = new aafCharacter [bufSize];
-		TestMethod(pIdent->GetProductName(NULL, bufSize), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetProductName(myBuffer, bufSize-1), AAFRESULT_SMALLBUF);
-		TestMethod(pIdent->GetProductName(myBuffer, bufSize), AAFRESULT_SUCCESS);
-		if (wcscmp(myBuffer, PRODUCT_NAME))
-			localhr = AAFRESULT_TEST_FAILED;
-							
-		delete [] myBuffer;
-
-		PrintTestResult(testName);
-		
-	/* GetProductVersionStringBufLen *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetProductVersionStringBufLen()");
-		bufSize = sizeof(TEST_VERSION);
-		bufSize2 = 0;
-		TestMethod(pIdent->GetProductVersionStringBufLen(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetProductVersionStringBufLen(&bufSize2), AAFRESULT_SUCCESS);
-		if (bufSize != bufSize2)
-			localhr = AAFRESULT_TEST_FAILED;
-		
-		PrintTestResult(testName);
-
-	/* GetProductVersionString *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetProductVersionString()");
-		myBuffer = new aafCharacter [bufSize];
-		TestMethod(pIdent->GetProductVersionString(NULL, bufSize), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetProductVersionString(myBuffer, bufSize-1), AAFRESULT_SMALLBUF);
-		TestMethod(pIdent->GetProductVersionString(myBuffer, bufSize), AAFRESULT_SUCCESS);	
-		if (wcscmp(myBuffer, TEST_VERSION))
-			localhr = AAFRESULT_TEST_FAILED;
-					
-		delete [] myBuffer;
-
-		PrintTestResult(testName);
-
-	/* SetProductVersion *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "SetProductVersion()");
-
-		checkResult(defs.cdIdentification()->
-					CreateInstance(IID_IAAFIdentification, 
-								   (IUnknown **)&pTestIdent));	
-
-		TestMethod(pTestIdent->SetProductVersion(testVersion), AAFRESULT_NOT_INITIALIZED);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_SUCCESS);
-		TestMethod(pTestIdent->SetProductVersion(testVersion), AAFRESULT_SUCCESS);
-		TestMethod(pIdent->SetProductVersion(testVersion), AAFRESULT_SUCCESS);
-			
-		pTestIdent->Release();
-		PrintTestResult(testName);
-
-	/* GetProductVersion *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetProductVersion()");
-		aafProductVersion_t productVersion;
-		checkResult(defs.cdIdentification()->
-					CreateInstance(IID_IAAFIdentification, 
-								   (IUnknown **)&pTestIdent));	
-
-		TestMethod(pTestIdent->GetProductVersion(&productVersion), AAFRESULT_NOT_INITIALIZED);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_SUCCESS);
-									   
-		TestMethod(pTestIdent->GetProductVersion(&productVersion), AAFRESULT_PROP_NOT_PRESENT);
-		TestMethod(pTestIdent->SetProductVersion(testVersion), AAFRESULT_SUCCESS);
-
-		TestMethod(pTestIdent->GetProductVersion(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pTestIdent->GetProductVersion(&productVersion), AAFRESULT_SUCCESS);
-		if (productVersion.major != testVersion.major ||
-			productVersion.minor != testVersion.minor ||
-			productVersion.tertiary != testVersion.tertiary ||
-			productVersion.patchLevel != testVersion.patchLevel ||
-			productVersion.type != testVersion.type)
-			localhr = AAFRESULT_TEST_FAILED;	
-
-
-		pTestIdent->Release();
-		PrintTestResult(testName);
-		
-	/* GetPlatformBufLen *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetPlatformBufLen()");
-		TestMethod(pIdent->GetPlatformBufLen(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetPlatformBufLen(&bufSize), AAFRESULT_SUCCESS);
-		
-		if (bufSize != sizeof(PLATFORM_NAME))
-			localhr = AAFRESULT_TEST_FAILED;
-
-		PrintTestResult(testName);
-
-	/* GetPlatform *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetPlatform()");
-		myBuffer = new aafCharacter [bufSize];
-		TestMethod(pIdent->GetPlatform(NULL, bufSize), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetPlatform(myBuffer, bufSize-1), AAFRESULT_SMALLBUF);
-		TestMethod(pIdent->GetPlatform(myBuffer, bufSize), AAFRESULT_SUCCESS);
-
-		if (wcscmp(myBuffer, PLATFORM_NAME))
-			localhr = AAFRESULT_TEST_FAILED;
-							
-		delete [] myBuffer;
-
-		PrintTestResult(testName);
-
-
-	/* GetProductID *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetProductID()");
-		aafUID_t thisProductID;
-		checkResult(defs.cdIdentification()->
-					CreateInstance(IID_IAAFIdentification, 
-								   (IUnknown **)&pTestIdent));	
-		TestMethod(pTestIdent->GetProductID(&thisProductID), AAFRESULT_NOT_INITIALIZED);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_SUCCESS);
-									   
-		TestMethod(pTestIdent->GetProductID(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pTestIdent->GetProductID(&thisProductID), AAFRESULT_SUCCESS);
-		
-		if (memcmp(&UnitTestProductID, &thisProductID, sizeof(UnitTestProductID)) != 0)
-			localhr = AAFRESULT_TEST_FAILED;
-			
-		pTestIdent->Release();
-		PrintTestResult(testName);
-
-	/* GetRefImplVersion *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetRefImplVersion()");
-		aafProductVersion_t refImplVersion;
-		checkResult(defs.cdIdentification()->
-					CreateInstance(IID_IAAFIdentification, 
-								   (IUnknown **)&pTestIdent));	
-		TestMethod(pTestIdent->GetRefImplVersion(&refImplVersion), AAFRESULT_NOT_INITIALIZED);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_SUCCESS);
-
-		TestMethod(pTestIdent->GetRefImplVersion(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pTestIdent->GetRefImplVersion(&refImplVersion), AAFRESULT_SUCCESS);
-		
-		pTestIdent->Release();
-		PrintTestResult(testName);
-
-
-	/* GetDate *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetDate()");
-		aafTimeStamp_t timeStamp;
-		aafTimeStamp_t startTimeStamp;
-		checkResult(defs.cdIdentification()->
-					CreateInstance(IID_IAAFIdentification, 
-								   (IUnknown **)&pTestIdent));	
-		TestMethod(pTestIdent->GetDate(&timeStamp), AAFRESULT_NOT_INITIALIZED);
-
-		GetDateTime (&startTimeStamp);
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_SUCCESS);
-
-		TestMethod(pTestIdent->GetDate(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pTestIdent->GetDate(&timeStamp), AAFRESULT_SUCCESS);
-
-		if (timeStamp.date.year != startTimeStamp.date.year ||
-			timeStamp.date.month != startTimeStamp.date.month ||
-			timeStamp.date.day != startTimeStamp.date.day)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		if (timeStamp.time.hour != startTimeStamp.time.hour ||
-			timeStamp.time.minute != startTimeStamp.time.minute ||
-			timeStamp.time.second != startTimeStamp.time.second)
-			localhr = AAFRESULT_TEST_FAILED;
-
-		pTestIdent->Release();
-		PrintTestResult(testName);
-
-
-	/* GetGeneration *****/
-		localhr = AAFRESULT_SUCCESS;
-		strcpy(testName, "GetGeneration()");
-		aafUID_t generation;
-		checkResult(defs.cdIdentification()->
-					CreateInstance(IID_IAAFIdentification, 
-								   (IUnknown **)&pTestIdent));	
-		TestMethod(pTestIdent->GetGenerationID(&generation), AAFRESULT_NOT_INITIALIZED);
-
-		TestMethod(pTestIdent->Initialize(COMPANY_NAME,
-									   PRODUCT_NAME,
-									   TEST_VERSION,
-									   UnitTestProductID), AAFRESULT_SUCCESS);
-
-		TestMethod(pIdent->GetGenerationID(NULL), AAFRESULT_NULL_PARAM);
-		TestMethod(pIdent->GetGenerationID(&generation), AAFRESULT_SUCCESS);
-		
-		pTestIdent->Release();
-		PrintTestResult(testName);
-
+		checkResult(pIdent->Initialize());
+		checkResult(pIdent->SetCompanyName(COMPANY_NAME));
+		checkResult(pIdent->SetProductName(PRODUCT_NAME));
+		checkResult(pIdent->SetProductVersionString(TEST_VERSION));
+		uid = UnitTestProductID;
+		checkResult(pIdent->SetProductID(&uid));
+		checkResult(pIdent->SetProductVersion(&testVersion));
 		
 		// Attempt to save the file.
 		checkResult(pFile->Save());
@@ -478,9 +134,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pHeader)
 		pHeader->Release();
 	
-	if (pDictionary)
-		pDictionary->Release();
-
 	if (pFile)
 	{	// Close file
 		if (bFileOpen)
@@ -514,7 +167,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		
 		// We can't really do anthing in AAF without the header.
 		checkResult(pFile->GetHeader(&pHeader));
-		checkResult(pHeader->CountIdentifications(&readNumIdents));
+		checkResult(pHeader->GetNumIdents(&readNumIdents));
 		checkExpression(1 == readNumIdents, AAFRESULT_TEST_FAILED);
 		checkResult(pHeader->GetLastIdentification (&pIdent));
 		/***/
@@ -570,18 +223,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFIdentification_test(testMode_t mode);
-extern "C" HRESULT CAAFIdentification_test(testMode_t mode)
+extern "C" HRESULT CAAFIdentification_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFIdentificationTest.aaf";
 	
 	try
 	{
-		if(mode == kAAFUnitTestReadWrite)
-			hr = CreateAAFFile(pFileName);
-		else
-			hr = AAFRESULT_SUCCESS;
+		hr = CreateAAFFile(	pFileName );
 		if(hr == AAFRESULT_SUCCESS)
 			hr = ReadAAFFile( pFileName );
 	}
@@ -592,5 +241,18 @@ extern "C" HRESULT CAAFIdentification_test(testMode_t mode)
 		hr = AAFRESULT_TEST_FAILED;
 	}
 	
+	
+	// When all of the functionality of this class is tested, we can return success.
+	// When a method and its unit test have been implemented, remove it from the list.
+	if (SUCCEEDED(hr))
+	{
+		cout << "The following AAFIdentification tests have not been implemented:" << endl; 
+		cout << "     GetDate" << endl; 
+		cout << "     GetRefImplVersion" << endl; 
+		cout << "     GetPlatform" << endl; 
+		cout << "     GetPlatformBufLen" << endl; 
+		cout << "     GetGeneration" << endl; 
+		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
+	}
 	return hr;
 }
