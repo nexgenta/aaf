@@ -9,8 +9,15 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
+
+
+
+
+
+
 
 
 #ifndef __ImplAAFSegment_h__
@@ -79,9 +86,16 @@ public:
         // @parm [out] size of required buffer, in bytes
         (aafUInt32 *  pBufSize);
 
-protected:
-  OMFixedSizeProperty<aafPosition_t> _position;
-  OMWideStringProperty _comment;
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFEvent)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFEventTest.cpp.
+  static AAFRESULT test();
 };
 
 #endif // ! __ImplAAFEvent_h__

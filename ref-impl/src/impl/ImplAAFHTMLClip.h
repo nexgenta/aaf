@@ -9,8 +9,14 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
+
+
+
+
+
 
 
 
@@ -88,10 +94,16 @@ public:
         // @parm [in, string] Specifies the HTML tag that defines the end of the text
         (wchar_t *  pName);
 
-protected:
-  // Persistent properties...
-  OMWideStringProperty _beginAnchor;
-  OMWideStringProperty _endAnchor;
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFHTMLClip)
+
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFHTMLClipTest.cpp.
+  static AAFRESULT test();
 };
 
 #endif // ! __ImplAAFHTMLClip_h__
