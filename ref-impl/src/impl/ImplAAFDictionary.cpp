@@ -122,7 +122,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFCodecDef>codecDefinitions(_codecDefinitions);
 	while(++codecDefinitions)
 	{
-		ImplAAFCodecDef *pCodec = codecDefinitions.setValue(0);
+		ImplAAFCodecDef *pCodec = codecDefinitions.clearValue();
 		if (pCodec)
 		{
 		  pCodec->ReleaseReference();
@@ -133,7 +133,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFContainerDef>containerDefinitions(_containerDefinitions);
 	while(++containerDefinitions)
 	{
-		ImplAAFContainerDef *pContainer = containerDefinitions.setValue(0);
+		ImplAAFContainerDef *pContainer = containerDefinitions.clearValue();
 		if (pContainer)
 		{
 		  pContainer->ReleaseReference();
@@ -144,7 +144,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFOperationDef>operationDefinitions(_operationDefinitions);
 	while(++operationDefinitions)
 	{
-		ImplAAFOperationDef *pOp = operationDefinitions.setValue(0);
+		ImplAAFOperationDef *pOp = operationDefinitions.clearValue();
 		if (pOp)
 		{
 		  pOp->ReleaseReference();
@@ -155,7 +155,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef>parameterDefinitions(_parameterDefinitions);
 	while(++parameterDefinitions)
 	{
-		ImplAAFParameterDef *pParm = parameterDefinitions.setValue(0);
+		ImplAAFParameterDef *pParm = parameterDefinitions.clearValue();
 		if (pParm)
 		{
 		  pParm->ReleaseReference();
@@ -166,7 +166,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFInterpolationDef>interpolateDefinitions(_interpolationDefinitions);
 	while(++interpolateDefinitions)
 	{
-		ImplAAFInterpolationDef *pInterp = interpolateDefinitions.setValue(0);
+		ImplAAFInterpolationDef *pInterp = interpolateDefinitions.clearValue();
 		if (pInterp)
 		{
 		  pInterp->ReleaseReference();
@@ -177,7 +177,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPluginDef>pluginDefinitions(_pluginDefinitions);
 	while(++pluginDefinitions)
 	{
-		ImplAAFPluginDef *pPlug = pluginDefinitions.setValue(0);
+		ImplAAFPluginDef *pPlug = pluginDefinitions.clearValue();
 		if (pPlug)
 		{
 		  pPlug->ReleaseReference();
@@ -188,7 +188,7 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFDataDef>dataDefinitions(_dataDefinitions);
 	while(++dataDefinitions)
 	{
-		ImplAAFDataDef *pData = dataDefinitions.setValue(0);
+		ImplAAFDataDef *pData = dataDefinitions.clearValue();
 		if (pData)
 		{
 		  pData->ReleaseReference();
@@ -493,35 +493,8 @@ AAFRESULT STDMETHODCALLTYPE
     // object pointer requested in auid
     ImplAAFMetaDefinition ** ppMetaObject)
 {
-#if 0  
-  if (!ppMetaObject)
-    return AAFRESULT_NULL_PARAM;
-
-  *ppMetaObject = NULL;
-
-  // Temporary: The first version just calls the old CreateInstance method.
-  // This will be replaced when the "two-roots", data and meta-data, are 
-  // implemented. transdel:2000-APR-21.
-  ImplAAFObject * pObject = NULL;
-  AAFRESULT result = CreateInstance(classId, &pObject);
-  if (AAFRESULT_SUCCEEDED(result))
-  {
-    // Make sure that this object is in fact a meta definition.
-    *ppMetaObject = dynamic_cast<ImplAAFMetaDefinition*>(pObject);
-    if (NULL == *ppMetaObject)
-    {
-      // Cleanup on failure.
-      pObject->ReleaseReference();
-      pObject = NULL;
-      result = AAFRESULT_INVALID_PARAM;
-    }
-  }
-
-  return (result);
-#else // #if 0
   // Ask the meta dictionary to create the meta definition
   return (metaDictionary()->CreateMetaInstance(classId, ppMetaObject));
-#endif
 }
 
 
@@ -654,7 +627,7 @@ AAFRESULT STDMETHODCALLTYPE
 					 parent->ReleaseReference();
 				  }
 				  (*ppClassDef)->SetBootstrapParent(NULL);
-				  status = RegisterClassDef(*ppClassDef);
+				  status = PvtRegisterClassDef(*ppClassDef);
 				  assert (AAFRESULT_SUCCEEDED (status));
 			  }
 		  }
@@ -694,7 +667,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // Yup, found it in builtins.  Register it.
   assert (*ppClassDef);
-  status = RegisterClassDef (*ppClassDef);
+  status = PvtRegisterClassDef (*ppClassDef);
   if (AAFRESULT_FAILED (status))
 	return status;
 		  
@@ -722,6 +695,17 @@ AAFRESULT STDMETHODCALLTYPE
   return (metaDictionary()->HasForwardClassReference(classId, pResult));
 }
 
+
+// Private class registration. This version does not perform any
+// initialization that requires other classes, types or properties or
+// types to be in the dictionary...it only adds the given class
+// to the set in the dictionary.
+AAFRESULT ImplAAFDictionary::PvtRegisterClassDef(ImplAAFClassDef * pClassDef)
+{
+  assert (_defRegistrationAllowed);
+  // Defer to the meta dictionary.
+  return (metaDictionary()->PvtRegisterClassDef(pClassDef));
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::RegisterClassDef (
@@ -820,7 +804,7 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_DataDefinitionStrongReferenceSet,
   & kAAFTypeID_DataDefinitionWeakReference,
   & kAAFTypeID_DataDefinitionWeakReferenceSet,
-  & kAAFTypeID_DefinitionObjectWeakReference,
+//  & kAAFTypeID_DefinitionObjectWeakReference, // This is not a valid weak reference!
   & kAAFTypeID_InterpolationDefinitionStrongReference,
   & kAAFTypeID_InterpolationDefinitionStrongReferenceSet,
   & kAAFTypeID_LocatorStrongReference,
@@ -1169,7 +1153,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1251,7 +1234,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFOperationDef>(_operationDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFOperationDefs, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1261,7 +1244,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1344,7 +1326,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef>(_parameterDefinitions);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->SetIterator(this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFParameterDefs, this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1354,7 +1336,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1457,7 +1438,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1560,7 +1540,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1697,8 +1676,6 @@ void ImplAAFDictionary::InitBuiltins()
   containerDef = NULL;
 
 
-  _pBuiltinClasses;
-
   AssureClassPropertyTypes ();
 }
 
@@ -1797,7 +1774,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1887,7 +1863,6 @@ AAFRESULT STDMETHODCALLTYPE
 			theEnum->ReleaseReference();
 			theEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 	
@@ -1950,7 +1925,6 @@ AAFRESULT ImplAAFDictionary::PvtIsPropertyDefDuplicate(
 			classEnum->ReleaseReference();
 			classEnum = 0;
 		  }
-		return(XCODE());
 	}
 	XEND;
 

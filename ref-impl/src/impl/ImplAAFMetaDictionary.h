@@ -42,6 +42,7 @@
 #endif
 
 #include "OMReferenceSet.h"
+#include "OMIdentitySet.h"
 
 // Forward declarations:
 class ImplAAFMetaDefinition;
@@ -389,6 +390,10 @@ public:
   // Methods private to the SDK
   //
 
+  // Private registration method to add the given class definiion
+  // to the set. 
+  AAFRESULT PvtRegisterClassDef (ImplAAFClassDef * pClassDef);
+
 
   // These are low-level OMSet tests for containment.
   bool containsClass(aafUID_constref classId);
@@ -454,6 +459,11 @@ public:
 
   // Initialize all of the OMProperties for each aximatic definition.
   void InitializeAxiomaticOMProperties(void); // throw AAFRESULT
+  
+  // Complete the registration of the axiomatic class definitions
+  // This must be called AFTER all other aximatic definitions have
+  // been initialized and registered.
+  void CompleteAxiomaticClassRegistration(void); // throw AAFRESULT
 
   // Create all of the axiomatic definitions.
   void CreateAxiomaticDefinitions(void); // throw AAFRESULT
@@ -477,25 +487,7 @@ private:
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFClassDef> _axiomaticClassDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFPropertyDef> _axiomaticPropertyDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFTypeDef> _axiomaticTypeDefinitions;
-
-  // Private class that represents a forward class reference.
-  class ForwardClassReference
-  {
-  public:
-    ForwardClassReference();
-    ForwardClassReference(const ForwardClassReference& rhs);
-    ForwardClassReference(aafUID_constref classId);
-
-    // Methods required by OMSet
-    const OMUniqueObjectIdentification identification(void) const;
-    ForwardClassReference& operator= (const ForwardClassReference& rhs);
-    bool operator== (const ForwardClassReference& rhs);
-
-  private:
-    aafUID_t _classId;
-  };
-
-  OMSet<OMUniqueObjectIdentification, ForwardClassReference> _forwardClassReferences;
+  OMIdentitySet<OMUniqueObjectIdentification> _forwardClassReferences;
 
   //
   // Temporary data members used while converting to the "two-roots" containment

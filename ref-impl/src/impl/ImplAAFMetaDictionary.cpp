@@ -149,7 +149,7 @@ ImplAAFMetaDictionary::~ImplAAFMetaDictionary ()
   OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef>typeDefinitions(_typeDefinitions);
   while(++typeDefinitions)
   {
-    ImplAAFTypeDef *pType = typeDefinitions.setValue(0);
+    ImplAAFTypeDef *pType = typeDefinitions.clearValue();
     if (pType)
     {
       pType->ReleaseReference();
@@ -161,7 +161,7 @@ ImplAAFMetaDictionary::~ImplAAFMetaDictionary ()
   OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFClassDef>classDefinitions(_classDefinitions);
   while(++classDefinitions)
   {
-    ImplAAFClassDef *pClass = classDefinitions.setValue(0);
+    ImplAAFClassDef *pClass = classDefinitions.clearValue();
     if (pClass)
     {
       pClass->ReleaseReference();
@@ -228,22 +228,13 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
   else
   {
     //
-    // Temporary: For compatibility use the "data" dictionary OMFactory to create 
-    // meta data objects.
-    //
-    // This needs to be replaced with code that only creates "meta" data objects:
-    // class definitions, property definitions and type definitions.
-    // transdel:2000-APR-11
-    //
-//    storable = dataDictionary()->create(classId);
-
-    //
     // Create the appropriate meta definition object for the given
     // classId.
     // transdel:2000-MAY-16
     //
     ImplAAFMetaDefinition *pMetaObject = NULL;
-    AAFRESULT result = (const_cast<ImplAAFMetaDictionary *>(this))->CreateMetaInstance((*reinterpret_cast<const aafUID_t *>(&classId)), &pMetaObject);
+    ImplAAFMetaDictionary *pNonConstThis = const_cast<ImplAAFMetaDictionary *>(this);
+    AAFRESULT result = pNonConstThis->CreateMetaInstance((*reinterpret_cast<const aafUID_t *>(&classId)), &pMetaObject);
     assert(AAFRESULT_SUCCEEDED(result));
     storable = pMetaObject;
   }
@@ -260,13 +251,13 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
 //
 const OMClassId& ImplAAFMetaDictionary::classId(void) const
 {
-  return *reinterpret_cast<const OMClassId* const>(&AUID_AAFMetaDictionary);
+  return *reinterpret_cast<const OMClassId*>(&AUID_AAFMetaDictionary);
 }
 
 
 
 // Override callback from OMStorable
-void ImplAAFMetaDictionary::onSave(void* clientContext) const
+void ImplAAFMetaDictionary::onSave(void* /*clientContext*/) const
 {
 }
 
@@ -291,59 +282,18 @@ ImplAAFDictionary * ImplAAFMetaDictionary::dataDictionary(void) const
 
 
 
-//////////////////////////////
-//
-//////////////////////////////
-
-ImplAAFMetaDictionary::ForwardClassReference::ForwardClassReference()
-{
-}
-
-ImplAAFMetaDictionary::ForwardClassReference::ForwardClassReference(const ImplAAFMetaDictionary::ForwardClassReference& rhs)
-{
-  _classId = rhs._classId;
-}
-
-ImplAAFMetaDictionary::ForwardClassReference::ForwardClassReference(aafUID_constref classId)
-{
-  _classId = classId;
-}
-
-const OMUniqueObjectIdentification 
-  ImplAAFMetaDictionary::ForwardClassReference::identification(void) const
-{
-  return (*reinterpret_cast<const OMUniqueObjectIdentification *>(&_classId));
-}
-
-ImplAAFMetaDictionary::ForwardClassReference& 
-  ImplAAFMetaDictionary::ForwardClassReference::operator= (const ImplAAFMetaDictionary::ForwardClassReference& rhs)
-{
-  _classId = rhs._classId;
-  return *this;
-}
-
-bool ImplAAFMetaDictionary::ForwardClassReference::operator== (const ImplAAFMetaDictionary::ForwardClassReference& rhs)
-{
-  if (&rhs == this)
-    return true;
-  else
-    return (0 == memcmp(&_classId, &rhs._classId, sizeof(_classId)));
-}
-
 bool ImplAAFMetaDictionary::containsForwardClassReference(aafUID_constref classId)
 {
-  // Create a temporary test value and then look for the
-  // corresponding forward class reference in the set.
-  ImplAAFMetaDictionary::ForwardClassReference forwardReference(classId);
-  return (_forwardClassReferences.containsValue(forwardReference));
+  const OMUniqueObjectIdentification* id = reinterpret_cast<const OMUniqueObjectIdentification*>(&classId);
+  return (_forwardClassReferences.contains(*id));
 }
 
 // Remove the give classId from the foward class reference set.
 void ImplAAFMetaDictionary::RemoveForwardClassReference(aafUID_constref classId)
 {
-  ImplAAFMetaDictionary::ForwardClassReference forwardReference(classId);
   assert(containsForwardClassReference(classId)); // classId must already be a forward reference!
-  _forwardClassReferences.removeValue(forwardReference);
+  const OMUniqueObjectIdentification* id = reinterpret_cast<const OMUniqueObjectIdentification*>(&classId);
+  _forwardClassReferences.remove(*id);
 }
 
 //////////////////////////////
@@ -543,6 +493,8 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED (hr))
     return hr;
 
+  if (! pClassDef->pvtIsConcrete ())
+	return AAFRESULT_ABSTRACT_CLASS;
 
   // Create the correct definition object.
   *ppMetaObject = pvtCreateMetaDefinition(classId);
@@ -606,16 +558,14 @@ AAFRESULT STDMETHODCALLTYPE
   if (containsForwardClassReference(classId))
     return AAFRESULT_INVALID_PARAM;
 
-  // Create a local forward class reference.
-  ImplAAFMetaDictionary::ForwardClassReference forwardReference(classId);
-
+  const OMUniqueObjectIdentification* id = reinterpret_cast<const OMUniqueObjectIdentification*>(&classId);
   // If the class has already been registed then we cannot
   // create a foward reference!
-  if (_classDefinitions.contains(forwardReference.identification()))
+  if (_classDefinitions.contains(*id))
     return AAFRESULT_INVALID_PARAM;
 
   // It now safe to add the given classId to the set.
-  _forwardClassReferences.append(forwardReference); // the set will copy the value.
+  _forwardClassReferences.insert(*id);
 
   return result;
 }
@@ -644,26 +594,58 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFMetaDictionary::RegisterClassDef(
     ImplAAFClassDef * pClassDef)
 {
-
+  AAFRESULT hr = AAFRESULT_SUCCESS;
   if (NULL == pClassDef)
     return AAFRESULT_NULL_PARAM;
   
   // Get the AUID of the new class to register.
   aafUID_t newAUID;
-  HRESULT hr = pClassDef->GetAUID(&newAUID);
+  hr = pClassDef->GetAUID(&newAUID);
   if (hr != AAFRESULT_SUCCESS)
     return hr;
 
-  // Is this class already registered ?
-  if (!containsClass(newAUID))
-  {
-    if (containsForwardClassReference(newAUID))
+  hr = PvtRegisterClassDef(pClassDef);
+  if (AAFRESULT_SUCCEEDED(hr))
+  {  
+    bool forwardClassReference = containsForwardClassReference(newAUID);
+    if (forwardClassReference)
     {
       // This class is now defined so it can no longer have
       // a forward reference.
       RemoveForwardClassReference(newAUID);
     }
 
+    // Now validate that this classes properties and types
+    // are valid.
+    hr = pClassDef->CompleteClassRegistration();
+    if (AAFRESULT_FAILED(hr))
+    {
+      // Restore the state of the meta dictionary.
+      _classDefinitions.removeValue(pClassDef);
+      pClassDef->ReleaseReference();
+      
+      if (forwardClassReference)
+      {
+        CreateForwardClassReference(newAUID); // ignore error...
+      }
+    }
+  }
+
+  return(hr);
+}
+
+
+// Private registration method to add the given class definiion
+// to the set. 
+AAFRESULT ImplAAFMetaDictionary::PvtRegisterClassDef (
+  ImplAAFClassDef * pClassDef)
+{
+  if (NULL == pClassDef)
+    return AAFRESULT_NULL_PARAM;
+
+  // Is this class already registered ?
+  if (!_classDefinitions.containsValue(pClassDef))
+  {
     // This class is not yet registered, add it to the dictionary.
     _classDefinitions.appendValue(pClassDef);
     pClassDef->AcquireReference();
@@ -702,7 +684,6 @@ AAFRESULT STDMETHODCALLTYPE
       theEnum->ReleaseReference();
       theEnum = 0;
     }
-    return(XCODE());
   }
   XEND;
   
@@ -831,7 +812,6 @@ AAFRESULT STDMETHODCALLTYPE
       theEnum->ReleaseReference();
       theEnum = 0;
       }
-    return(XCODE());
   }
   XEND;
   
@@ -935,7 +915,6 @@ AAFRESULT STDMETHODCALLTYPE
       theEnum->ReleaseReference();
       theEnum = 0;
       }
-    return(XCODE());
   }
   XEND;
   
@@ -1213,6 +1192,29 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMProperties(void)
 }
 
 
+  
+// Complete the registration of the axiomatic class definitions
+// This must be called AFTER all other aximatic definitions have
+// been initialized and registered.
+void ImplAAFMetaDictionary::CompleteAxiomaticClassRegistration(void) // throw AAFRESULT
+{
+#if USE_AAFOBJECT_MODEL
+  AAFRESULT result = AAFRESULT_SUCCESS;
+  OMReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFClassDef> axiomaticClassDefinitions(_axiomaticClassDefinitions, OMBefore);
+  while(++axiomaticClassDefinitions)
+  {
+    ImplAAFClassDef *pClass = axiomaticClassDefinitions.value();
+    assert (pClass);
+    if (!pClass)
+      throw AAFRESULT_INVALID_OBJ;
+
+    result = pClass->CompleteClassRegistration();
+    if (AAFRESULT_FAILED(result))
+      throw result;
+  }
+#endif // #if USE_AAFOBJECT_MODEL
+}
+
 // Create all of the axiomatic definitions.
 void ImplAAFMetaDictionary::CreateAxiomaticDefinitions(void)
 {
@@ -1230,6 +1232,8 @@ void ImplAAFMetaDictionary::InitializeAxiomaticDefinitions(void)
 
   RegisterAxiomaticProperties();
   InitializeAxiomaticOMProperties();
+  
+  CompleteAxiomaticClassRegistration();
 }
 
 // Create and initialize all of the axiomatic definitions.
@@ -1260,9 +1264,9 @@ AAFRESULT ImplAAFMetaDictionary::InstantiateAxiomaticDefinitions(void)
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMetaDictionary::CreateClassDef (
-      aafUID_constref classID,
+      aafUID_constref /*classID*/,
       aafCharacter_constptr pClassName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFClassDef * pParentClass,
       ImplAAFClassDef **ppNewClass)
 {
@@ -1275,9 +1279,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefVariableArray (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDef *pElementType,
       ImplAAFTypeDefVariableArray ** ppNewVariableArray)
 {
@@ -1290,11 +1294,11 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefFixedArray (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDef *pElementType,
-      aafUInt32  nElements,
+      aafUInt32  /*nElements*/,
       ImplAAFTypeDefFixedArray **pNewFixedArray)
 {
   if (!pTypeName || !pElementType || !pNewFixedArray) 
@@ -1306,12 +1310,12 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMetaDictionary::CreateTypeDefRecord (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDef ** ppMemberTypes,
       aafCharacter_constptr * pMemberNames,
-      aafUInt32 numMembers,
+      aafUInt32 /*numMembers*/,
       ImplAAFTypeDefRecord ** ppNewRecord)
 {
   if (!pTypeName || !ppMemberTypes || !pMemberNames || !ppNewRecord) 
@@ -1323,9 +1327,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMetaDictionary::CreateTypeDefRename (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDef *pBaseType,
       ImplAAFTypeDefRename ** ppNewRename)
 {
@@ -1338,9 +1342,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefString (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDef *pElementType,
       ImplAAFTypeDefString ** ppNewString)
 {
@@ -1353,9 +1357,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefStrongObjRef (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFClassDef * pTargetObjType,
       ImplAAFTypeDefStrongObjRef ** ppNewStrongObjRef)
 {
@@ -1368,12 +1372,12 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefWeakObjRef (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFClassDef * pTargetObjType,
       aafUID_constptr * pTargetHint,
-      aafUInt32 targetHintCount,
+      aafUInt32 /*targetHintCount*/,
       ImplAAFTypeDefWeakObjRef ** ppNewWeakObjRef)
 {
   if (!pTypeName || !pTargetObjType || !pTargetHint || !ppNewWeakObjRef) 
@@ -1385,9 +1389,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefStrongObjRefVector (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDefStrongObjRef * pStrongObjRef,
       ImplAAFTypeDefVariableArray ** ppNewStrongObjRefVector)
 {
@@ -1400,9 +1404,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefWeakObjRefVector (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDefWeakObjRef * pWeakObjRef,
       ImplAAFTypeDefVariableArray ** ppNewWeakObjRefVector)
 {
@@ -1415,9 +1419,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefStrongObjRefSet (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDefStrongObjRef * pStrongObjRef,
       ImplAAFTypeDefSet ** ppNewStrongObjRefSet)
 {
@@ -1430,9 +1434,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFMetaDictionary::CreateTypeDefWeakObjRefSet (
-      aafUID_constref typeID,
+      aafUID_constref /*typeID*/,
       aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
+      aafCharacter_constptr /*pDescription*/,
       ImplAAFTypeDefWeakObjRef * pWeakObjRef,
       ImplAAFTypeDefSet ** ppNewWeakObjRefSet)
 {
