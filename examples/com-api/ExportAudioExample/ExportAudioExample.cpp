@@ -1,13 +1,27 @@
 // @com Executable example program by Chris Morgan, intern for Avid Technology, Tewksbury 
 // @com This is based upon ComEssenceDataTest.cpp  Last modified on 8/4/99.
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1999 Avid Technology, Inc. *
-*                                          *
-\******************************************/
+//=---------------------------------------------------------------------=
+//
+// The contents of this file are subject to the AAF SDK Public
+// Source License Agreement (the "License"); You may not use this file
+// except in compliance with the License.  The License is available in
+// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
+// Association or its successor.
+// 
+// Software distributed under the License is distributed on an "AS IS"
+// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+// the License for the specific language governing rights and limitations
+// under the License.
+// 
+// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// AAF Association.
+// 
+// The Initial Developer of the Original Code of this file and the
+// Licensor of the AAF Association is Avid Technology.
+// All rights reserved.
+//
+//=---------------------------------------------------------------------=
 
 #include <stdio.h>
 #include <string.h>
@@ -357,9 +371,14 @@ struct CAAFInitialize
 {
   CAAFInitialize(const char *dllname = NULL)
   {
-  	printf("Attempting to load the AAF dll...\n");
     HRESULT hr = AAFLoad(dllname);
-    (SUCCEEDED(hr)) ? printf("DONE\n\n") : printf("FAILED\n\n");
+	if (!AAFRESULT_SUCCEEDED(hr)) {
+	  fprintf(stderr, "Error : Failed to load the AAF library, ");
+	  fprintf(stderr, "check environment variables -\n");
+	  fprintf(stderr, "  Windows    - $PATH\n");
+	  fprintf(stderr, "  Unix/Linux - $LD_LIBRARY_PATH\n");
+	  exit(hr);
+	}
   }
 
   ~CAAFInitialize()
