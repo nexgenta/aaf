@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPortability.h,v 1.31 2004/10/25 14:25:12 stuart_hc Exp $ $Name:  $
+// $Id: OMPortability.h,v 1.32 2004/10/26 13:35:32 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,9 +37,6 @@
 #if defined (_MSC_VER) && defined(_M_IX86) && defined(_WIN32)
 #define OM_COMPILER_MSC_INTEL_WINDOWS
 #define OM_OS_WINDOWS
-#elif defined(__MWERKS__) && defined(__POWERPC__) && defined(macintosh)
-#define OM_COMPILER_MWERKS_PPC_MACOS
-#define OM_OS_MACOS
 #elif defined(__MWERKS__) && defined(__MACH__)
 #define OM_COMPILER_MWERKS_PPC_MACOSX
 #define OM_OS_MACOSX
@@ -72,4 +69,3 @@
 #endif
 
 #endif
-
