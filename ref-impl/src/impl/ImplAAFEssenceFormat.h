@@ -9,6 +9,7 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -105,6 +106,11 @@ public:
          // @parm [out] Number of actual bytes read
          aafInt32*  bytesRead);
 
+
+public:
+  // Declare the module test method. The implementation of the will be be
+  // in /test/ImplAAFEssenceFormatTest.cpp.
+  static AAFRESULT test();
 
 private:
 		oneParm_t	*_elements;
