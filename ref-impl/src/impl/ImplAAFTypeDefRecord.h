@@ -41,7 +41,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         aafUID_t *  pID,
+         const aafUID_t *  pID,
 
          // @parm [in, size_is(numMembers)] array of member types to
 		 // be represented in this record type
@@ -232,8 +232,8 @@ public:
   //
   //*************************************************************
 
-  virtual void reorder(OMByte* bytes,
-                       size_t bytesSize) const;
+  virtual void reorder(OMByte* externalBytes,
+                       size_t externalBytesSize) const;
 
   virtual size_t externalSize(OMByte* internalBytes,
 							  size_t internalBytesSize) const;
@@ -245,7 +245,7 @@ public:
                            OMByteOrder byteOrder) const;
 
   virtual size_t internalSize(OMByte* externalBytes,
-							  size_t externalSize) const;
+							  size_t externalBytesSize) const;
 
   virtual void internalize(OMByte* externalBytes,
                            size_t externalBytesSize,
@@ -255,6 +255,10 @@ public:
 
 
 private:
+
+  void pvtInitInternalSizes (void) const;
+
+
   // types of members in this record
   //
   // BobT Note!!! This should be weak reference vector property...
@@ -264,11 +268,17 @@ private:
   // with embedded nulls
   OMVariableSizeProperty<wchar_t> _memberNames;
 
-  // Pointer to array of ints with registered offsets of each field
+  // when registered, will point to array of ints with registered
+  // offsets of each field
   aafUInt32 * _registeredOffsets;
 
   // when registered, will contain native size of this record
   aafUInt32 _registeredSize;
+
+  // will contain internal (native) size of each data member.  If
+  // registered, will be determined from registered offsets.  If not
+  // registered, will be determined from PropValSize()s.
+  aafUInt32 * _internalSizes;
 
 public:
   // Declare this class to be storable.

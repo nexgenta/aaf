@@ -38,7 +38,7 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
     Initialize
         (// @parm [in] auid to be used to identify this type
-         aafUID_t *  pID,
+         const aafUID_t *  pID,
 
          // @parm [in] type of each element to be contained in this array
          ImplAAFTypeDef * pTypeDef,
@@ -108,11 +108,11 @@ public:
   //
   //*************************************************************
 
-  /*
-  virtual void reorder(OMByte* bytes,
-                       size_t bytesSize) const;
+  virtual void reorder(OMByte* externalBytes,
+                       size_t externalBytesSize) const;
 
-  virtual size_t externalSize(void) const;
+  virtual size_t externalSize(OMByte* internalBytes,
+							  size_t internalBytesSize) const;
 
   virtual void externalize(OMByte* internalBytes,
                            size_t internalBytesSize,
@@ -120,14 +120,14 @@ public:
                            size_t externalBytesSize,
                            OMByteOrder byteOrder) const;
 
-  virtual size_t internalSize(void) const;
+  virtual size_t internalSize(OMByte* externalBytes,
+							  size_t externalBytesSize) const;
 
   virtual void internalize(OMByte* externalBytes,
                            size_t externalBytesSize,
                            OMByte* internalBytes,
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
-						   */
 
 private:
   // OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
