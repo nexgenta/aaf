@@ -10,7 +10,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -19,7 +18,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -75,10 +73,6 @@ public:
 
 
 public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFSegment)
-
 
 	virtual AAFRESULT NumRepresentations(aafInt32 *  pCount);
 
