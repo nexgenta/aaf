@@ -124,8 +124,6 @@ extern "C" const aafClassID_t CLSID_EnumAAFParameterDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFPluginDescriptors;
 extern "C" const aafClassID_t CLSID_EnumAAFTypeDefs;
 
-
-
 ImplAAFDictionary::ImplAAFDictionary ()
 : _operationDefinitions(PID_Dictionary_OperationDefinitions, "OperationDefinitions"), 
   _parameterDefinitions(PID_Dictionary_ParameterDefinitions, "ParameterDefinitions"),
@@ -163,12 +161,11 @@ ImplAAFDictionary::ImplAAFDictionary ()
 
 ImplAAFDictionary::~ImplAAFDictionary ()
 {
-  size_t i;
   // Release the _codecDefinitions
-  size_t size = _codecDefinitions.getSize();
-  for (i = 0; i < size; i++)
+	OMStrongReferenceSetIterator<ImplAAFCodecDef>codecDefinitions(_codecDefinitions);
+	while(++codecDefinitions)
 	{
-		ImplAAFCodecDef *pCodec = _codecDefinitions.setValueAt(0, i);
+		ImplAAFCodecDef *pCodec = codecDefinitions.setValue(0);
 		if (pCodec)
 		{
 		  pCodec->ReleaseReference();
@@ -176,10 +173,10 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	size_t containerDefSize = _containerDefinitions.getSize();
-	for (i = 0; i < containerDefSize; i++)
+	OMStrongReferenceSetIterator<ImplAAFContainerDef>containerDefinitions(_containerDefinitions);
+	while(++containerDefinitions)
 	{
-		ImplAAFContainerDef *pContainer = _containerDefinitions.setValueAt(0, i);
+		ImplAAFContainerDef *pContainer = containerDefinitions.setValue(0);
 		if (pContainer)
 		{
 		  pContainer->ReleaseReference();
@@ -187,10 +184,10 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-	size_t typeDefSize = _typeDefinitions.getSize();
-	for (i = 0; i < typeDefSize; i++)
+	OMStrongReferenceSetIterator<ImplAAFTypeDef>typeDefinitions(_typeDefinitions);
+	while(++typeDefinitions)
 	{
-		ImplAAFTypeDef *pType = _typeDefinitions.setValueAt(0, i);
+		ImplAAFTypeDef *pType = typeDefinitions.setValue(0);
 		if (pType)
 		{
 		  pType->ReleaseReference();
@@ -198,66 +195,69 @@ ImplAAFDictionary::~ImplAAFDictionary ()
 		}
 	}
 
-  size_t classDefSize = _classDefinitions.getSize();
-  for (i = 0; i < classDefSize; i++)
+	OMStrongReferenceSetIterator<ImplAAFClassDef>classDefinitions(_classDefinitions);
+	while(++classDefinitions)
 	{
-	  ImplAAFClassDef *pClass = _classDefinitions.setValueAt(0, i);
-	  if (pClass)
+		ImplAAFClassDef *pClass = classDefinitions.setValue(0);
+		if (pClass)
 		{
 		  pClass->ReleaseReference();
 		  pClass = 0;
 		}
 	}
-  size_t opsDefSize = _operationDefinitions.getSize();
-  for (i = 0; i < opsDefSize; i++)
+
+	OMStrongReferenceSetIterator<ImplAAFOperationDef>operationDefinitions(_operationDefinitions);
+	while(++operationDefinitions)
 	{
-	  ImplAAFOperationDef *pOps = _operationDefinitions.setValueAt(0, i);
-	  if (pOps)
+		ImplAAFOperationDef *pOp = operationDefinitions.setValue(0);
+		if (pOp)
 		{
-		  pOps->ReleaseReference();
-		  pOps = 0;
+		  pOp->ReleaseReference();
+		  pOp = 0;
 		}
 	}
-  size_t parmDefSize = _parameterDefinitions.getSize();
-  for (i = 0; i < parmDefSize; i++)
+
+	OMStrongReferenceSetIterator<ImplAAFParameterDef>parameterDefinitions(_parameterDefinitions);
+	while(++parameterDefinitions)
 	{
-	  ImplAAFParameterDef *pParm = _parameterDefinitions.setValueAt(0, i);
-	  if (pParm)
+		ImplAAFParameterDef *pParm = parameterDefinitions.setValue(0);
+		if (pParm)
 		{
 		  pParm->ReleaseReference();
 		  pParm = 0;
 		}
 	}
-  size_t interpDefSize = _interpolationDefinitions.getSize();
-  for (i = 0; i < interpDefSize; i++)
+
+	OMStrongReferenceSetIterator<ImplAAFInterpolationDef>interpolateDefinitions(_interpolationDefinitions);
+	while(++interpolateDefinitions)
 	{
-	  ImplAAFInterpolationDef *pInterp = _interpolationDefinitions.setValueAt(0, i);
-	  if (pInterp)
+		ImplAAFInterpolationDef *pInterp = interpolateDefinitions.setValue(0);
+		if (pInterp)
 		{
 		  pInterp->ReleaseReference();
 		  pInterp = 0;
 		}
 	}
 
-  size_t pluginDescSize = _pluginDefinitions.getSize();
-  for (i = 0; i < pluginDescSize; i++)
+	OMStrongReferenceSetIterator<ImplAAFPluginDescriptor>pluginDefinitions(_pluginDefinitions);
+	while(++pluginDefinitions)
 	{
-	  ImplAAFPluginDescriptor *pDesc = _pluginDefinitions.setValueAt(0, i);
-	  if (pDesc)
+		ImplAAFPluginDescriptor *pPlug = pluginDefinitions.setValue(0);
+		if (pPlug)
 		{
-		  pDesc->ReleaseReference();
-		  pDesc = 0;
+		  pPlug->ReleaseReference();
+		  pPlug = 0;
 		}
 	}
 
-  size_t dataDefSize = _dataDefinitions.getSize();
-  for (i = 0; i < dataDefSize; i++)
+	OMStrongReferenceSetIterator<ImplAAFDataDef>dataDefinitions(_dataDefinitions);
+	while(++dataDefinitions)
 	{
-	  ImplAAFDataDef *pDDef = _dataDefinitions.setValueAt(0, i);
-	  if (pDDef)
+		ImplAAFDataDef *pData = dataDefinitions.setValue(0);
+		if (pData)
 		{
-		  pDDef->ReleaseReference();
-		  pDDef = 0;
+		  pData->ReleaseReference();
+		  pData = 0;
 		}
 	}
 
@@ -386,6 +386,7 @@ ImplAAFDictionary::CreateAndInit(ImplAAFClassDef * pClassDef) const
 
 ImplAAFObject* ImplAAFDictionary::pvtInstantiate(const aafUID_t & auid) const
 {
+  static const aafUID_t kNullUID = { 0 } ;
   ImplAAFObject *result = 0;
 
   // Is this a request to create the dictionary?
@@ -428,7 +429,6 @@ ImplAAFObject* ImplAAFDictionary::pvtInstantiate(const aafUID_t & auid) const
 			  break;
 			}
 		  pcd->pvtGetParentAUID (parentAUID);
-		  const aafUID_t kNullUID = { 0 } ;
 		  if (EqualAUID (&parentAUID, &kNullUID))
 			{
 			  // Class was apparently registered, but no appropriate
@@ -515,63 +515,23 @@ AAFRESULT ImplAAFDictionary::dictLookupClassDef (
 {
   if (!ppClassDef) return AAFRESULT_NULL_PARAM;
 
-  ImplEnumAAFClassDefs		*classEnum = NULL;
-  ImplAAFClassDef			*classDef = NULL;
-  aafBool						defFound;
-  AAFRESULT					status;
-  aafUID_t					testAUID;
-
-  if (! ppClassDef)
-	return AAFRESULT_NULL_PARAM;
-
-  XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-26)
+	if (_classDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&classID)),
+                             *ppClassDef))
 	{
-	  CHECK(GetClassDefs (&classEnum));
-	  status = classEnum->NextOne (&classDef);
-	  defFound = AAFFalse;
-	  while(status == AAFRESULT_SUCCESS && !defFound)
-		{
-		  CHECK(classDef->GetAUID (&testAUID));
-		  if(EqualAUID(&classID, &testAUID))
-			{
-			  defFound = AAFTrue;
-			  *ppClassDef = classDef;
-			  classDef->AcquireReference();
-			  break;
-			}
-		  classDef->ReleaseReference();
-		  classDef = NULL;
-		  status = classEnum->NextOne (&classDef);
-		}
-	  if(classDef != NULL)
-		{
-		  classDef->ReleaseReference();
-		  classDef = NULL;
-		}
-	  classEnum->ReleaseReference();
-	  classEnum = NULL;
-	  if(!defFound)
-		{
-		  // no recognized class guid in dictionary
-		  RAISE(AAFRESULT_NO_MORE_OBJECTS);
-		}
+		assert(NULL != *ppClassDef);
+    (*ppClassDef)->AcquireReference();
 	}
-  XEXCEPT
+	else
 	{
-	  if(classEnum != NULL)
-		{
-		  classEnum->ReleaseReference();
-		  classEnum = 0;
-		}
-	  if(classDef != NULL)
-		{
-		  classDef->ReleaseReference();
-		  classDef = 0;
-		}
+    // no recognized class guid in dictionary
+    result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-  XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 
@@ -593,8 +553,7 @@ ImplAAFDictionary::pvtLookupAxiomaticClassDef (const aafUID_t &classID,
 	  // It's axiomatic.  
 	  assert (ppClassDef);
 	  *ppClassDef = _pBuiltinClasses->LookupAxiomaticClass (classID);
-	  assert (*ppClassDef);
-	  (*ppClassDef)->AcquireReference ();
+	  assert (*ppClassDef); // reference count already incremented by LookupAxiomaticClass.
 	  return true;
 	}
   return false;
@@ -606,13 +565,13 @@ AAFRESULT STDMETHODCALLTYPE
       const aafUID_t & classID,
       ImplAAFClassDef ** ppClassDef)
 {
-  ImplAAFClassDefSP			classDef;
   AAFRESULT					status;
 
   if (! ppClassDef) return AAFRESULT_NULL_PARAM;
 
-  if (pvtLookupAxiomaticClassDef (classID, &classDef))
+  if (pvtLookupAxiomaticClassDef (classID, ppClassDef))
 	{
+	  assert (*ppClassDef);
 	  // Yes, this is an axiomatic class.  classDef should be filled
 	  // in.  Assure that it's in the dictionary, and return it.
 
@@ -622,12 +581,7 @@ AAFRESULT STDMETHODCALLTYPE
 	  //   put-it-into-the-dictionary();
 	  // }
 
-	  AssurePropertyTypes (classDef);
-
-	  assert (ppClassDef);
-	  *ppClassDef = classDef;
-	  assert (*ppClassDef);
-	  (*ppClassDef)->AcquireReference ();
+	  AssurePropertyTypes (*ppClassDef);
 	  return AAFRESULT_SUCCESS;
 	}
 
@@ -649,7 +603,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
   // If we're here, it was not found in dict.  Try it in builtins.
-  status = _pBuiltinClasses->NewBuiltinClassDef (classID, &classDef);
+  status = _pBuiltinClasses->NewBuiltinClassDef (classID, ppClassDef);
   if (AAFRESULT_FAILED (status))
 	{
 	  // no recognized class guid
@@ -657,15 +611,12 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
   // Yup, found it in builtins.  Register it.
-  assert (classDef);
-  status = RegisterClassDef (classDef);
+  assert (*ppClassDef);
+  status = RegisterClassDef (*ppClassDef);
   if (AAFRESULT_FAILED (status))
 	return status;
 		  
-  AssurePropertyTypes (classDef);
-  assert (ppClassDef);
-  *ppClassDef = classDef;
-  (*ppClassDef)->AcquireReference ();
+  AssurePropertyTypes (*ppClassDef);
 	
   return(AAFRESULT_SUCCESS);
 }
@@ -719,7 +670,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
   XPROTECT()
 	{
-	  CHECK(theEnum->SetEnumStrongProperty(this, &_classDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFClassDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFClassDef>(_classDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 	  *ppEnum = theEnum;
 	}
   XEXCEPT
@@ -744,7 +699,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+	*pResult = _classDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -797,65 +753,28 @@ AAFRESULT ImplAAFDictionary::dictLookupTypeDef (
       const aafUID_t & typeID,
       ImplAAFTypeDef ** ppTypeDef)
 {
-  ImplEnumAAFTypeDefs		*typeEnum = NULL;
-  ImplAAFTypeDef			*typeDef = NULL;
-  aafBool						defFound;
-  AAFRESULT					status;
-  aafUID_t					testAUID;
-
   if (! ppTypeDef)
-	return AAFRESULT_NULL_PARAM;
+    return AAFRESULT_NULL_PARAM;
 
-  XPROTECT()
-	{
-	  CHECK(GetTypeDefs (&typeEnum));
-	  status = typeEnum->NextOne (&typeDef);
-	  defFound = AAFFalse;
-	  while(status == AAFRESULT_SUCCESS && !defFound)
-		{
-		  CHECK(typeDef->GetAUID (&testAUID));
-		  if(EqualAUID(&typeID, &testAUID))
-			{
-			  defFound = AAFTrue;
-			  *ppTypeDef = typeDef;
-			  typeDef->AcquireReference();
-			  break;
-			}
-		  typeDef->ReleaseReference();
-		  typeDef = NULL;
-		  status = typeEnum->NextOne (&typeDef);
-		}
-	  if(typeDef != NULL)
-		{
-		  typeDef->ReleaseReference();
-		  typeDef = NULL;
-		}
-	  typeEnum->ReleaseReference();
-	  typeEnum = NULL;
-	  if(!defFound)
-		{
-		  // Not found in dictionary.  Look in builtins.
-		  assert (0 == typeDef);
-		  // no recognized type guid
-		  RAISE(AAFRESULT_NO_MORE_OBJECTS);
-		}
-	}
-  XEXCEPT
-	{
-	  if(typeEnum != NULL)
-		{
-		  typeEnum->ReleaseReference();
-		  typeEnum = 0;
-		}
-	  if(typeDef != NULL)
-		{
-		  typeDef->ReleaseReference();
-		  typeDef = 0;
-		}
-	}
-  XEND
 	
-	return(AAFRESULT_SUCCESS);
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-26)
+	if (_typeDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&typeID)),
+                             *ppTypeDef))
+	{
+		assert(NULL != *ppTypeDef);
+    (*ppTypeDef)->AcquireReference();
+	}
+	else
+	{
+    // no recognized class guid in dictionary
+    result = AAFRESULT_NO_MORE_OBJECTS;
+	}
+
+	return (result);
+
 }
 
 
@@ -879,6 +798,9 @@ const aafUID_t * ImplAAFDictionary::sAxiomaticTypeGuids[] =
   & kAAFTypeID_UInt8,
   & kAAFTypeID_UInt8Array8,
   & kAAFTypeID_VersionType,
+  & kAAFTypeID_RGBAComponent,
+  & kAAFTypeID_MobID,
+  & kAAFTypeID_DataValue,
  
   & kAAFTypeID_ClassDefinitionStrongReference,
   & kAAFTypeID_ClassDefinitionStrongReferenceSet,
@@ -1049,7 +971,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_typeDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFTypeDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFTypeDef>(_typeDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1073,7 +999,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+	*pResult = _typeDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1127,57 +1054,25 @@ AAFRESULT STDMETHODCALLTYPE
       const aafUID_t & dataDefinitionID,
       ImplAAFDataDef **ppDataDef)
 {
-	ImplEnumAAFDataDefs		*dataEnum = NULL;
-	ImplAAFDataDef			*dataDef = NULL;
-	aafBool						defFound;
-	AAFRESULT					status;
-	aafUID_t					testAUID;
+  if (!ppDataDef) return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_dataDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&dataDefinitionID)),
+                             *ppDataDef))
 	{
-		CHECK(GetDataDefs (&dataEnum));
-		status = dataEnum->NextOne (&dataDef);
-		defFound = AAFFalse;
-		while(status == AAFRESULT_SUCCESS && !defFound)
-		{
-			CHECK(dataDef->GetAUID (&testAUID));
-			if(EqualAUID(&dataDefinitionID, &testAUID))
-			{
-				defFound = AAFTrue;
-				*ppDataDef = dataDef;
-				dataDef->AcquireReference();
-				break;
-			}
-			dataDef->ReleaseReference();
-			dataDef = NULL;
-			status = dataEnum->NextOne (&dataDef);
-		}
-		if(dataDef != NULL)
-		{
-			dataDef->ReleaseReference();
-			dataDef = NULL;
-		}
-		dataEnum->ReleaseReference();
-		dataEnum = NULL;
-		if(!defFound)
-			 RAISE(AAFRESULT_NO_MORE_OBJECTS);
+		assert(NULL != *ppDataDef);
+		(*ppDataDef)->AcquireReference();
 	}
-	XEXCEPT
+	else
 	{
-		if(dataEnum != NULL)
-		  {
-			dataEnum->ReleaseReference();
-			dataEnum = 0;
-		  }
-		if(dataDef != NULL)
-		  {
-			dataDef->ReleaseReference();
-			dataDef = 0;
-		  }
+		// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-	XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 
@@ -1193,7 +1088,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_dataDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFDataDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFDataDef>(_dataDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1218,7 +1117,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _dataDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1246,57 +1146,25 @@ AAFRESULT STDMETHODCALLTYPE
       const aafUID_t & effectID,
       ImplAAFOperationDef **ppOperationDef)
 {
-	ImplEnumAAFOperationDefs	*effectEnum = NULL;
-	ImplAAFOperationDef			*effectDef = NULL;
-	aafBool						defFound;
-	AAFRESULT					status;
-	aafUID_t					testAUID;
+  if (!ppOperationDef) return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_operationDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&effectID)),
+                             *ppOperationDef))
 	{
-		CHECK(GetOperationDefs (&effectEnum));
-		status = effectEnum->NextOne (&effectDef);
-		defFound = AAFFalse;
-		while(status == AAFRESULT_SUCCESS && !defFound)
-		{
-			CHECK(effectDef->GetAUID (&testAUID));
-			if(EqualAUID(&effectID, &testAUID))
-			{
-				defFound = AAFTrue;
-				*ppOperationDef = effectDef;
-				effectDef->AcquireReference();
-				break;
-			}
-			effectDef->ReleaseReference();
-			effectDef = NULL;
-			status = effectEnum->NextOne (&effectDef);
-		}
-		if(effectDef != NULL)
-		{
-			effectDef->ReleaseReference();
-			effectDef = NULL;
-		}
-		effectEnum->ReleaseReference();
-		effectEnum = NULL;
-		if(!defFound)
-			 RAISE(AAFRESULT_NO_MORE_OBJECTS);
+		assert(NULL != *ppOperationDef);
+		(*ppOperationDef)->AcquireReference();
 	}
-	XEXCEPT
+	else
 	{
-		if(effectEnum != NULL)
-		  {
-			effectEnum->ReleaseReference();
-			effectEnum = 0;
-		  }
-		if(effectDef != NULL)
-		  {
-			effectDef->ReleaseReference();
-			effectDef = 0;
-		  }
+		// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-	XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 
@@ -1312,7 +1180,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_operationDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFOperationDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFOperationDef>(_operationDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1336,7 +1208,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _operationDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1363,57 +1236,25 @@ AAFRESULT STDMETHODCALLTYPE
       const aafUID_t & parameterID,
       ImplAAFParameterDef **ppParameterDef)
 {
-	ImplEnumAAFParameterDefs		*parameterEnum = NULL;
-	ImplAAFParameterDef			*parameterDef = NULL;
-	aafBool						defFound;
-	AAFRESULT					status;
-	aafUID_t					testAUID;
+  if (!ppParameterDef) return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_parameterDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&parameterID)),
+                             *ppParameterDef))
 	{
-		CHECK(GetParameterDefs (&parameterEnum));
-		status = parameterEnum->NextOne (&parameterDef);
-		defFound = AAFFalse;
-		while(status == AAFRESULT_SUCCESS && !defFound)
-		{
-			CHECK(parameterDef->GetAUID (&testAUID));
-			if(EqualAUID(&parameterID, &testAUID))
-			{
-				defFound = AAFTrue;
-				*ppParameterDef = parameterDef;
-				parameterDef->AcquireReference();
-				break;
-			}
-			parameterDef->ReleaseReference();
-			parameterDef = NULL;
-			status = parameterEnum->NextOne (&parameterDef);
-		}
-		if(parameterDef != NULL)
-		{
-			parameterDef->ReleaseReference();
-			parameterDef = NULL;
-		}
-		parameterEnum->ReleaseReference();
-		parameterEnum = NULL;
-		if(!defFound)
-			 RAISE(AAFRESULT_NO_MORE_OBJECTS);
+		assert(NULL != *ppParameterDef);
+		(*ppParameterDef)->AcquireReference();
 	}
-	XEXCEPT
+	else
 	{
-		if(parameterEnum != NULL)
-		  {
-			parameterEnum->ReleaseReference();
-			parameterEnum = 0;
-		  }
-		if(parameterDef != NULL)
-		  {
-			parameterDef->ReleaseReference();
-			parameterDef = 0;
-		  }
+		// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-	XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 
@@ -1429,7 +1270,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_parameterDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFParameterDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFParameterDef>(_parameterDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1453,7 +1298,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _parameterDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1483,79 +1329,35 @@ AAFRESULT
   if(pNumCodecDefs == NULL)
     return AAFRESULT_NULL_PARAM;
   
-  _codecDefinitions.getSize(siz);
+  siz = _codecDefinitions.count();
   
   *pNumCodecDefs = siz;
   return AAFRESULT_SUCCESS;
 }
 
-AAFRESULT
-    ImplAAFDictionary::GetNthCodecDef (aafInt32 index, ImplAAFCodecDef **ppPluggableDefs)
-{
-  if (NULL == ppPluggableDefs)
-    return AAFRESULT_NULL_PARAM;
-
-  ImplAAFCodecDef *obj = NULL;
-  _codecDefinitions.getValueAt(obj, index);
-  *ppPluggableDefs = obj;
-	
-  // trr - We are returning a copy of pointer stored in _mobs so we need
-  // to bump its reference count.
-  if (obj)
-    obj->AcquireReference();
-  else
-    return AAFRESULT_NO_MORE_OBJECTS;
-
-  return AAFRESULT_SUCCESS;
-}
-
 AAFRESULT ImplAAFDictionary::LookupCodecDef
   (const aafUID_t & defID,
-   ImplAAFCodecDef **result)
+   ImplAAFCodecDef **ppResult)
 {
-	ImplAAFCodecDef				*codec = NULL;
-	aafBool						defFound;
-	aafUID_t					testAUID;
-	aafUInt32					n, numCodecs;
+  if (!ppResult) return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_codecDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&defID)),
+                             *ppResult))
 	{
-		*result = NULL;
-		CHECK(GetNumCodecDefs(&numCodecs));
-		defFound = AAFFalse;
-		for(n = 0; n < numCodecs && !defFound; n++)
-		{
-			CHECK(GetNthCodecDef (n, &codec));
-			CHECK(codec->GetAUID (&testAUID));
-			if(EqualAUID(&defID, &testAUID))
-			{
-				defFound = AAFTrue;
-				*result = codec;
-				codec->AcquireReference();
-				break;
-			}
-			codec->ReleaseReference();
-			codec = NULL;
-		}
-		if(codec != NULL)
-		{
-			codec->ReleaseReference();
-			codec = NULL;
-		}
-		if(!defFound)
-			 RAISE(AAFRESULT_NO_MORE_OBJECTS);
+		assert(NULL != *ppResult);
+		(*ppResult)->AcquireReference();
 	}
-	XEXCEPT
+	else
 	{
-		if(codec != NULL)
-		  {
-			codec->ReleaseReference();
-			codec = 0;
-		  }
+		// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-	XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 
@@ -1571,7 +1373,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_codecDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFCodecDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFCodecDef>(_codecDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1595,7 +1401,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _codecDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1620,51 +1427,27 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::LookupContainerDef
 	  (const aafUID_t & defID,
-	   ImplAAFContainerDef **result)
+	   ImplAAFContainerDef **ppResult)
 {
-	ImplAAFContainerDef			*container = NULL;
-	aafBool						defFound;
-	aafUID_t					testAUID;
-	aafUInt32					n, numContainers;
+  if (!ppResult) return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_containerDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&defID)),
+                             *ppResult))
 	{
-		*result = NULL;
-		CHECK(GetNumContainerDefs(&numContainers));
-		defFound = AAFFalse;
-		for(n = 0; n < numContainers && !defFound; n++)
-		{
-			CHECK(GetNthContainerDef (n, &container));
-			CHECK(container->GetAUID (&testAUID));
-			if(EqualAUID(&defID, &testAUID))
-			{
-				defFound = AAFTrue;
-				*result = container;
-				container->AcquireReference();
-				break;
-			}
-			container->ReleaseReference();
-			container = NULL;
-		}
-		if(container != NULL)
-		{
-			container->ReleaseReference();
-			container = NULL;
-		}
-		if(!defFound)
-			 RAISE(AAFRESULT_NO_MORE_OBJECTS);
+		assert(NULL != *ppResult);
+		(*ppResult)->AcquireReference();
 	}
-	XEXCEPT
+	else
 	{
-		if(container != NULL)
-		  {
-			container->ReleaseReference();
-			container = 0;
-		  }
+		// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-	XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 AAFRESULT
@@ -1675,29 +1458,9 @@ AAFRESULT
   if(pNumContainerDefs == NULL)
     return AAFRESULT_NULL_PARAM;
   
-  _containerDefinitions.getSize(siz);
+  siz = _containerDefinitions.count();
   
   *pNumContainerDefs = siz;
-  return AAFRESULT_SUCCESS;
-}
-
-AAFRESULT
-    ImplAAFDictionary::GetNthContainerDef (aafInt32 index, ImplAAFContainerDef **ppPluggableDefs)
-{
-  if (NULL == ppPluggableDefs)
-    return AAFRESULT_NULL_PARAM;
-
-  ImplAAFContainerDef *obj = NULL;
-  _containerDefinitions.getValueAt(obj, index);
-  *ppPluggableDefs = obj;
-	
-  // trr - We are returning a copy of pointer stored in _mobs so we need
-  // to bump its reference count.
-  if (obj)
-    obj->AcquireReference();
-  else
-    return AAFRESULT_NO_MORE_OBJECTS;
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -1713,7 +1476,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_containerDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFContainerDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFContainerDef>(_containerDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1737,7 +1504,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _containerDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1869,57 +1637,25 @@ AAFRESULT STDMETHODCALLTYPE
       const aafUID_t & interpolationID,
       ImplAAFInterpolationDef **ppInterpolationDef)
 {
-	ImplEnumAAFInterpolationDefs		*InterpolationEnum = NULL;
-	ImplAAFInterpolationDef			*InterpolationDef = NULL;
-	aafBool						defFound;
-	AAFRESULT					status;
-	aafUID_t					testAUID;
+  if (!ppInterpolationDef) return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_interpolationDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&interpolationID)),
+                             *ppInterpolationDef))
 	{
-		CHECK(GetInterpolationDefs (&InterpolationEnum));
-		status = InterpolationEnum->NextOne (&InterpolationDef);
-		defFound = AAFFalse;
-		while(status == AAFRESULT_SUCCESS && !defFound)
-		{
-			CHECK(InterpolationDef->GetAUID (&testAUID));
-			if(EqualAUID(&interpolationID, &testAUID))
-			{
-				defFound = AAFTrue;
-				*ppInterpolationDef = InterpolationDef;
-				InterpolationDef->AcquireReference();
-				break;
-			}
-			InterpolationDef->ReleaseReference();
-			InterpolationDef = NULL;
-			status = InterpolationEnum->NextOne (&InterpolationDef);
-		}
-		if(InterpolationDef != NULL)
-		{
-			InterpolationDef->ReleaseReference();
-			InterpolationDef = NULL;
-		}
-		InterpolationEnum->ReleaseReference();
-		InterpolationEnum = NULL;
-		if(!defFound)
-			 RAISE(AAFRESULT_NO_MORE_OBJECTS);
+		assert(NULL != *ppInterpolationDef);
+		(*ppInterpolationDef)->AcquireReference();
 	}
-	XEXCEPT
+	else
 	{
-		if(InterpolationEnum != NULL)
-		  {
-			InterpolationEnum->ReleaseReference();
-			InterpolationEnum = 0;
-		  }
-		if(InterpolationDef != NULL)
-		  {
-			InterpolationDef->ReleaseReference();
-			InterpolationDef = 0;
-		  }
+		// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-	XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 
@@ -1935,7 +1671,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_interpolationDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFInterpolationDef>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFInterpolationDef>(_interpolationDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -1959,7 +1699,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _interpolationDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 
@@ -1986,57 +1727,25 @@ AAFRESULT STDMETHODCALLTYPE
       const aafUID_t & interpolationID,
       ImplAAFPluginDescriptor **ppPluginDesc)
 {
-	ImplEnumAAFPluginDescriptors		*pEnum = NULL;
-	ImplAAFPluginDescriptor			*pDesc = NULL;
-	aafBool						defFound;
-	AAFRESULT					status;
-	aafUID_t					testAUID;
+  if (!ppPluginDesc) return AAFRESULT_NULL_PARAM;
 
-	XPROTECT()
+	AAFRESULT result = AAFRESULT_SUCCESS;
+  // NOTE: The following type cast is temporary. It should be removed as soon
+	// as the OM has a declarative sytax to include the type
+	// of the key used in the set. (trr:2000-FEB-29)
+	if (_pluginDefinitions.find((*reinterpret_cast<const OMObjectIdentification *>(&interpolationID)),
+                             *ppPluginDesc))
 	{
-		CHECK(GetPluginDefs (&pEnum));
-		status = pEnum->NextOne (&pDesc);
-		defFound = AAFFalse;
-		while(status == AAFRESULT_SUCCESS && !defFound)
-		{
-			CHECK(pDesc->GetAUID (&testAUID));
-			if(EqualAUID(&interpolationID, &testAUID))
-			{
-				defFound = AAFTrue;
-				*ppPluginDesc = pDesc;
-				pDesc->AcquireReference();
-				break;
-			}
-			pDesc->ReleaseReference();
-			pDesc = NULL;
-			status = pEnum->NextOne (&pDesc);
-		}
-		if(pDesc != NULL)
-		{
-			pDesc->ReleaseReference();
-			pDesc = NULL;
-		}
-		pEnum->ReleaseReference();
-		pEnum = NULL;
-		if(!defFound)
-			 RAISE(AAFRESULT_NO_MORE_OBJECTS);
+		assert(NULL != *ppPluginDesc);
+		(*ppPluginDesc)->AcquireReference();
 	}
-	XEXCEPT
+	else
 	{
-		if(pEnum != NULL)
-		  {
-			pEnum->ReleaseReference();
-			pEnum = 0;
-		  }
-		if(pDesc != NULL)
-		  {
-			pDesc->ReleaseReference();
-			pDesc = 0;
-		  }
+		// no recognized class guid in dictionary
+		result = AAFRESULT_NO_MORE_OBJECTS;
 	}
-	XEND
-	
-	return(AAFRESULT_SUCCESS);
+
+	return (result);
 }
 
 
@@ -2052,7 +1761,11 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		CHECK(theEnum->SetEnumStrongProperty(this, &_pluginDefinitions));
+		OMStrongReferenceSetIterator<ImplAAFPluginDescriptor>* iter = 
+			new OMStrongReferenceSetIterator<ImplAAFPluginDescriptor>(_pluginDefinitions);
+		if(iter == 0)
+			RAISE(AAFRESULT_NOMEMORY);
+		CHECK(theEnum->SetIterator(this, iter));
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -2076,7 +1789,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! pResult)
 	return AAFRESULT_NULL_PARAM;
-  return AAFRESULT_NOT_IMPLEMENTED;
+  *pResult = _pluginDefinitions.count();
+  return AAFRESULT_SUCCESS;
 }
 
 

@@ -41,6 +41,9 @@
 #ifndef __AAFTypeDefUIDs_h__
 #include "AAFTypeDefUIDs.h"
 #endif
+#ifndef __AAFPropertyIDs_h__
+#include "AAFPropertyIDs.h"
+#endif
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -455,6 +458,9 @@ ImplAAFClassDef * ImplAAFBuiltinClasses::LookupAxiomaticClass
 		{
 		  result = _axClassDefs[i];
 		  assert (result);
+      // We are returning a reference to a reference counted object so
+      // we need to bump the reference count.
+      result->AcquireReference ();
 		  break;
 		}
 	}
@@ -493,7 +499,7 @@ void ImplAAFBuiltinClasses::instantiateProps ()
 			 propInfo->tag,
 			 propInfo->name,
 			 *propInfo->pTypeGuid,
-			 propInfo->mandatory ? AAFFalse : AAFTrue);
+			 propInfo->mandatory ? kAAFFalse : kAAFTrue);
 		  assert (AAFRESULT_SUCCEEDED (hr));
 		  propDef->SetOMPropCreateFunc (propInfo->omPropCreateFunc);
 
@@ -654,7 +660,7 @@ void ImplAAFBuiltinClasses::RegisterBuiltinProperties
 				(sBuiltinPropTable[i].id,
 				 sBuiltinPropTable[i].name,
 				 *sBuiltinPropTable[i].pTypeGuid,
-				 sBuiltinPropTable[i].mandatory ? AAFFalse : AAFTrue,
+				 sBuiltinPropTable[i].mandatory ? kAAFFalse : kAAFTrue,
 				 &pd);
 			  assert (AAFRESULT_SUCCEEDED (hr));
 
@@ -689,7 +695,10 @@ ImplAAFBuiltinClasses::CreateOMPropTypeWeakReference
    const char * name)
 {
   assert (name);
-  return new OMSimpleProperty (pid, name, sizeof (aafUID_t));
+  if(pid == PID_SourceReference_SourceID)
+	return new OMSimpleProperty (pid, name, sizeof (aafMobID_t));
+  else
+	return new OMSimpleProperty (pid, name, sizeof (aafUID_t));
 }
 
 /*static*/ OMProperty *
