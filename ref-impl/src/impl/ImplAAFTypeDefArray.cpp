@@ -145,6 +145,10 @@ AAFRESULT STDMETHODCALLTYPE
   assert (1 == refCount);
 
   AAFRESULT hr;
+  hr = pvd->Initialize(this);
+  if (! AAFRESULT_SUCCEEDED (hr))
+	return hr;
+
   hr = SetCArray (pvd, pInitData, initDataSize);
   if (AAFRESULT_FAILED (hr))
 	return hr;
@@ -233,6 +237,7 @@ AAFRESULT STDMETHODCALLTYPE
   hr = GetType (&pBaseType);
 
   assert (pBaseType->IsFixedSize ());
+  pBaseType->AttemptBuiltinRegistration ();
   assert (pBaseType->IsRegistered ());
   aafUInt32 elemSize = pBaseType->NativeSize ();
   aafUInt32 elemCount = pvtCount (pPropVal);
@@ -371,6 +376,7 @@ AAFRESULT STDMETHODCALLTYPE
   hr = GetType (&pBaseType);
 
   assert (pBaseType->IsFixedSize ());
+  pBaseType->AttemptBuiltinRegistration ();
   assert (pBaseType->IsRegistered ());
   // Size of individual elements
   aafUInt32 elemSize = pBaseType->NativeSize ();
@@ -408,4 +414,17 @@ AAFRESULT STDMETHODCALLTYPE
 
   memcpy (pBits, pData, propSize);
   return AAFRESULT_SUCCESS;
+}
+
+
+
+// Override callbacks from OMStorable
+void ImplAAFTypeDefArray::onSave(void* clientContext) const
+{
+  ImplAAFTypeDef::onSave(clientContext);
+}
+
+void ImplAAFTypeDefArray::onRestore(void* clientContext) const
+{
+  ImplAAFTypeDef::onRestore(clientContext);
 }
