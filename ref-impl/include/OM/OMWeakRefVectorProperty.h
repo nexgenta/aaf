@@ -47,7 +47,7 @@ class OMVectorIterator;
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
   //          <c OMStorable>.
-  //   @base public | <c OMweakReferenceVector>
+  //   @base public | <c OMWeakReferenceVector>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 template <typename ReferencedObject>
 class OMWeakReferenceVectorProperty : public OMWeakReferenceVector {
@@ -249,6 +249,12 @@ public:
     //          at position <p index>. Existing objects at <p index> and
     //          higher are shifted up one index position.
   virtual void insertObjectAt(const OMObject* object, const size_t index);
+
+  virtual OMContainerIterator<OMWeakReferenceVectorElement>*
+                                                          iterator(void) const;
+
+  virtual void insert(const size_t index,
+                      const OMWeakReferenceVectorElement& element);
 
   virtual OMPropertyId keyPropertyId(void) const;
 
