@@ -10,31 +10,19 @@
 AAFPERSISTENTOBJECTS = \
 	AAFAIFCData \
 	AAFDataDef \
-	AAFDOSLocator \
 	AAFJPEGData \
 	AAFHTMLData \
 	AAFImageData \
 	AAFLocator \
-	AAFMacLocator \
-	AAFMediaFilmDescriptor \
-	AAFMediaGroup \
 	AAFMIDIData \
 	AAFMIDIFileDescriptor \
-	AAFNestedScope\
 	AAFPluggableCode \
-	AAFPulldown \
 	AAFReferenceValue \
 	AAFRGBADescriptor \
-	AAFScopeReference \
-	AAFTaggedValue \
 	AAFTextLocator \
 	AAFTIFFData \
-	AAFTimecodeStream \
-	AAFTimecodeStream12M \
 	AAFTypeDefSet \
-	AAFUnixLocator \
-	AAFWAVEData \
-	AAFWindowsLocator
+	AAFWAVEData
 
 
 # These are all of the other non-persistent objects:
@@ -42,15 +30,13 @@ AAFNONPERSISTENTOBJECTS = \
 	AAFRoot \
 	EnumAAFClassDefs \
 	EnumAAFCodecFlavours \
-	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFDefs \
 	EnumAAFIdentifications \
-	EnumAAFMobComments \
 	EnumAAFObjects \
 	EnumAAFPropertyDefs \
 	EnumAAFPropertyValues \
-	EnumAAFReferenceValues
+	EnumAAFReferenceValues \
 
 
 # These are files which specify COM interfaces, but which are
@@ -71,7 +57,7 @@ HUMAN_TYPED_IMPL = \
 	AAFCommentMarker \
 	AAFComponent \
 	AAFCompositionMob \
-	AAFConstValue \
+	AAFConstantValue \
 	AAFContainerDef \
 	AAFContentStorage \
 	AAFControlPoint \
@@ -87,9 +73,11 @@ HUMAN_TYPED_IMPL = \
 	AAFEventMobSlot \
 	AAFFile \
 	AAFFileDescriptor \
+	AAFFilmDescriptor \
 	AAFDigitalImageDescriptor \
 	AAFCDCIDescriptor \
 	AAFEssenceFormat \
+	AAFEssenceGroup \
 	AAFFiller \
 	AAFFindSourceInfo \
 	AAFOperationGroup \
@@ -98,10 +86,12 @@ HUMAN_TYPED_IMPL = \
 	AAFHTMLClip \
 	AAFHTMLDescriptor \
 	AAFIdentification \
+	AAFInterpolationDef \
 	AAFIntraFrameMarker \
 	AAFMasterMob \
 	AAFMob  \
 	AAFMobSlot \
+	AAFNestedScope\
 	AAFNetworkLocator \
 	AAFObject \
 	AAFParameter \
@@ -112,6 +102,8 @@ HUMAN_TYPED_IMPL = \
 	AAFPropValData \
 	AAFPluginDescriptor \
 	AAFPluginManager \
+	AAFPulldown \
+	AAFScopeReference \
 	AAFSegment \
 	AAFSelector \
 	AAFSequence \
@@ -119,12 +111,15 @@ HUMAN_TYPED_IMPL = \
 	AAFSourceMob \
 	AAFSourceReference \
 	AAFStaticMobSlot \
+	AAFTaggedValue \
 	AAFTimecode \
 	AAFTimelineMobSlot \
 	AAFTapeDescriptor \
 	AAFTextClip \
 	AAFTransition \
 	AAFTIFFDescriptor \
+	AAFTimecodeStream \
+	AAFTimecodeStream12M \
 	AAFTypeDef \
 	AAFTypeDefInt \
 	AAFTypeDefRename \
@@ -142,6 +137,8 @@ HUMAN_TYPED_IMPL = \
 	EnumAAFCodecDefs \
 	EnumAAFComponents \
 	EnumAAFContainerDefs \
+	EnumAAFControlPoints \
+	EnumAAFInterpolationDefs \
 	EnumAAFOperationDefs \
 	EnumAAFEssenceData \
 	EnumAAFLoadedPlugins \
@@ -153,6 +150,7 @@ HUMAN_TYPED_IMPL = \
 	EnumAAFPluginDescriptors \
 	EnumAAFPluginLocators \
 	EnumAAFSegments \
+	EnumAAFTaggedValues \
 	EnumAAFTypeDefs 
 
 # The list of standard dodo targets.
@@ -185,7 +183,8 @@ PLUGIN_OBJECTS = \
 	AAFEssenceStream \
 	AAFEssenceDataStream \
 	AAFEssenceCodec \
-	AAFEssenceContainer
+	AAFEssenceContainer \
+	AAFInterpolator
 
 # objects in PLUGIN_OBJECTS are NOT built into the main interface IDL
 #---------------------------------------------
