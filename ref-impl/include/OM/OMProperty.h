@@ -49,6 +49,7 @@ const OMStoredForm SF_WEAK_OBJECT_REFERENCE_STORED_OBJECT_ID = 0x03;
 const OMStoredForm SF_UNIQUE_OBJECT_ID                       = 0x86;
 const OMStoredForm SF_OPAQUE_STREAM                          = 0x40;
 
+class OMFile;
 class OMStoredObject;
 class OMStorable;
 class OMPropertySet;
@@ -154,16 +155,38 @@ protected:
     // @cmember The type of this <c OMProperty>.
   const OMType* type(void) const;
 
+    // @cmember The <c OMStorable> that contains this <c OMProperty>.
+  OMStorable* container(void) const;
+
+    // @cmember The <c OMStoredObject> that contains the persisted
+    //          representation of this <c OMProperty>.
+  OMStoredObject* store(void) const;
+
+    // @cmember The <c OMFile> that contains the persisted
+    //          representation of this <c OMProperty>.
+  OMFile* file(void) const;
+
+    // @cmember The persisted value of this property is its name.
+    //          Write the property name and enter it into the property index.
+  void saveName(void) const;
+
+    // @cmember The persisted value of this property is its name.
+    //          Read (and check) the property name.
+  void restoreName(size_t size);
+
+  virtual const wchar_t* storedName(void) const;
+
   OMPropertyId _propertyId;
   OMStoredForm _storedForm;
+  wchar_t* _storedName;
   const wchar_t* _name;
+
+private:
+
   char* _cName;
   const OMPropertySet* _propertySet; // The PropertySet that contains
                                      // this property
   const OMPropertyDefinition* _definition;
-
-private:
-
   bool _isOptional;
   bool _isPresent;
 
