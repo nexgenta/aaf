@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOMPlatformTypes.h,v 1.12 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
+// $Id: AAFCOMPlatformTypes.h,v 1.13 2004/11/04 16:36:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,12 +39,6 @@
 
 
 #elif defined( OS_UNIX )
-
-  // Bobt: for some reason, gcc on FreeBSD needs this in order to  
-  // properly do rtti stuff.
-# if defined ( OS_FREEBSD )
-#  include <g++/std/typeinfo.h>
-# endif
 
   // Note! Much of the stuff in this section copied from
   // ss-impl/.../ref.hxx
