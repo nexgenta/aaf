@@ -6,7 +6,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -141,13 +140,6 @@ public:
     GetPaddingBits
 		// @parm [out] Address to store the number of bits.
         (aafInt16 *  pPaddingBits);
-
-
-
-public:
-  // Declare this class to be storable.
-  //
-  OMDECLARE_STORABLE(ImplAAFCDCIDescriptor)
 
 protected:
 	OMFixedSizeProperty<aafInt32>			_componentWidth;
