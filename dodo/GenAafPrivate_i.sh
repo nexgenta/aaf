@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GenAafPrivate_i.sh,v 1.5 2004/02/27 14:26:18 stuart_hc Exp $ $Name:  $
+# $Id: GenAafPrivate_i.sh,v 1.6 2004/10/25 17:32:17 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@ echo \#define __IID_DEFINED__
 echo ""
 echo "typedef struct _IID"
 echo "{"
-echo "    unsigned long x;"
+echo "    unsigned int x;"
 echo "    unsigned short s1;"
 echo "    unsigned short s2;"
 echo "    unsigned char  c[8];"
