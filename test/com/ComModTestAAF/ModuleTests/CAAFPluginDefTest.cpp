@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
+// @com This file implements the module test for CAAFPluginDescriptor
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
@@ -10,24 +10,14 @@
 \******************************************/
 
  
-/***********************************************\
-*	Stub only.   Implementation not yet added	*
-\***********************************************/
 
 
 
 
-#include "CAAFPluginDescriptor.h"
-#include "CAAFPluginDescriptor.h"
-#ifndef __CAAFPluginDescriptor_h__
-#error - improperly defined include guard
-#endif
+#include "AAF.h"
 
 #include <iostream.h>
 
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_AAFPluginDescriptor; // generated
-extern "C" const aafUID_t AUID_AAFPluggableDesc; // generated
 
 static wchar_t *manuf1URL = L"www.microsoft.com";
 static wchar_t *manuf2URL = L"www.avid.com";
@@ -255,8 +245,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*  pDictionary = NULL;
-//!!!	IEnumAAFPluggableDefs *pEnumPluggable = NULL;
-	IAAFCodecDef *pPluggable = NULL;
+	IEnumAAFCodecDefs *pEnumPluggable = NULL;
+	IAAFCodecDef *pCodecDef = NULL;
+	IAAFDefObject *pDefObj = NULL;
 	IEnumAAFPluginDescriptors *pEnumDesc;
 	IAAFPluginDescriptor *pPlugin = NULL;
 	IAAFNetworkLocator	*pNetLoc = NULL;
@@ -284,10 +275,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-#if 0	//!!!
-		checkResult(pDictionary->GetPluggableDefinitions(&pEnumPluggable));
-		checkResult(pEnumPluggable->NextOne (&pPluggable));
-		checkResult(pPluggable->EnumPluginDescriptors (&pEnumDesc));
+		checkResult(pDictionary->GetCodecDefinitions(&pEnumPluggable));
+		checkResult(pEnumPluggable->NextOne (&pCodecDef));
+		checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject, (void **)&pDefObj));
+		checkResult(pDefObj->EnumPluginDescriptors (&pEnumDesc));
 		checkResult(pEnumDesc->NextOne (&pPlugin));
 
 	  
@@ -337,14 +328,14 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		checkExpression (count == 2, AAFRESULT_TEST_FAILED);
 		checkResult(pPlugin->EnumPluginLocators(&pEnumLoc));
 
-    pLoc->Release(); // this local variable was already has a reference that must be released!
-    pLoc = NULL;
+		pLoc->Release(); // this local variable was already has a reference that must be released!
+		pLoc = NULL;
 		checkResult(pEnumLoc->NextOne (&pLoc));
  		checkResult(pLoc->GetPath (testString, sizeof(testString)));
 		checkExpression (wcscmp(testString, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
 
-    pLoc->Release(); // this local variable was already has a reference that must be released!
-    pLoc = NULL;
+		pLoc->Release(); // this local variable was already has a reference that must be released!
+		pLoc = NULL;
 		checkResult(pEnumLoc->NextOne (&pLoc));
  		checkResult(pLoc->GetPath (testString, sizeof(testString)));
 		checkExpression (wcscmp(testString, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
@@ -355,7 +346,6 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
  		checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
 		checkResult(pPlugin->SupportsAuthentication(&testBool));
 		checkExpression(testBool == AAFFalse, AAFRESULT_TEST_FAILED);
-#endif
 	}
 	catch (HRESULT& rResult)
 	{
@@ -378,8 +368,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	if (pEnumDesc)
 		pEnumDesc->Release();
 
-	if (pPluggable)
-		pPluggable->Release();
+	if (pCodecDef)
+		pCodecDef->Release();
+	if (pDefObj)
+		pDefObj->Release();
 
 //!!!	if (pEnumPluggable)
 //!!!		pEnumPluggable->Release();
@@ -401,7 +393,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-HRESULT CAAFPluginDescriptor::test()
+extern "C" HRESULT CAAFPluginDescriptor_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	aafWChar * pFileName = L"AAFPluginDescriptorTest.aaf";
@@ -414,7 +406,7 @@ HRESULT CAAFPluginDescriptor::test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFPluginDescriptor::test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFPluginDescriptor_test...Caught general C++ exception!" << endl; 
 	}
 
 	// When all of the functionality of this class is tested, we can return success.
@@ -429,24 +421,3 @@ HRESULT CAAFPluginDescriptor::test()
 
 	return hr;
 }
-
-#if 0
-  //****************
-  // GetPluggableCode()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetPluggableCode
-        // @parm [out] An interface pointer to the pluggable code object
-        (ImplAAFPluggableCode ** pCode);
-
-
-
-
-  //****************
-  // IsPluginLocal()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    IsPluginLocal
-        // @parm [out] Returns AAFTrue if the plugin is local
-        (aafBool *  pIsLocal); 
-#endif

@@ -1,31 +1,13 @@
 // @doc INTERNAL
 // @com This file implements the module test for CAAFDigitalImageDescriptor
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #include "AAF.h"
@@ -35,15 +17,12 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
-#include "AAFDefUIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 
 // default test values
 #define kStoredHeightTestVal			248
 #define kStoredWidthTestVal				720
-#define kFrameLayoutTestVal				kAAFSeparateFields
+#define kFrameLayoutTestVal				kSeparateFields
 #define kVideoLineMapMaxElement			2
 #define kVideoLineMap1TestVal			10
 #define kVideoLineMap2TestVal			11
@@ -57,7 +36,7 @@
 #define kDisplayWidthTestVal			718
 #define kDisplayXOffsetTestVal			7
 #define kDisplayYOffsetTestVal			8
-#define kAlphaTransparencyTestVal		kAAFMaxValueTransparent
+#define kAlphaTransparencyTestVal		kMaxValueTransparent
 #define kImageAlignmentFactorTestVal	0
 #define kGammaNumTestVal				7
 #define kGammaDenTestVal				8
@@ -97,28 +76,25 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFDigitalImageDescriptor Test";
-	ProductInfo.productVersion = &v;
+	ProductInfo.productVersion.major = 1;
+	ProductInfo.productVersion.minor = 0;
+	ProductInfo.productVersion.tertiary = 0;
+	ProductInfo.productVersion.patchLevel = 0;
+	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	*ppFile = NULL;
 
 	switch (mode)
 	{
-	case kAAFMediaOpenReadOnly:
+	case kMediaOpenReadOnly:
 		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 		break;
 
-	case kAAFMediaOpenAppend:
+	case kMediaOpenAppend:
 		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 		break;
 
@@ -129,11 +105,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
@@ -157,7 +130,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFMob*	pMob = NULL;
 	IAAFDigitalImageDescriptor*	pDIDesc = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
-	aafMobID_t		newMobID;
+	aafUID_t		newUID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -167,27 +140,27 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     RemoveTestFile(pFileName);
 
     // Create the AAF file
-    checkResult(OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
+    checkResult(OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader));
 
     // Get the AAF Dictionary so that we can create valid AAF objects.
     checkResult(pHeader->GetDictionary(&pDictionary));
-	CAAFBuiltinDefs defs (pDictionary);
+
 
     // Create a source mob
-    checkResult(defs.cdSourceMob()->
-				CreateInstance(IID_IAAFSourceMob, 
-							   (IUnknown **)&pSourceMob));
+    checkResult(pDictionary->CreateInstance(&AUID_AAFSourceMob,
+                IID_IAAFSourceMob, 
+                (IUnknown **)&pSourceMob));
     checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 
-    checkResult(CoCreateGuid((GUID *)&newMobID));
-    checkResult(pMob->SetMobID(newMobID));
+    checkResult(CoCreateGuid((GUID *)&newUID));
+    checkResult(pMob->SetMobID(&newUID));
     checkResult(pMob->SetName(L"DigitalImageDescriptorTest"));
 
 
     // Create a digitial image descriptor.
-    checkResult(defs.cdDigitalImageDescriptor()->
-				CreateInstance(IID_IAAFDigitalImageDescriptor, 
-							   (IUnknown **)&pDIDesc));		
+    checkResult(pDictionary->CreateInstance(&AUID_AAFDigitalImageDescriptor,
+                IID_IAAFDigitalImageDescriptor, 
+                (IUnknown **)&pDIDesc));		
 
     aafRational_t	ratio;
     aafInt32		VideoLineMap[kVideoLineMapMaxElement] = {kVideoLineMap1TestVal,kVideoLineMap2TestVal};
@@ -205,7 +178,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pDIDesc->SetImageAspectRatio(ratio));
 
     // Optional Properties
-    checkResult(pDIDesc->SetCompression(compression));
+    checkResult(pDIDesc->SetCompression(&compression));
     checkResult(pDIDesc->SetSampledView(kSampledHeightTestVal, kSampledWidthTestVal, kSampledXOffsetTestVal, kSampledYOffsetTestVal));
     checkResult(pDIDesc->SetDisplayView(kDisplayHeightTestVal, kDisplayWidthTestVal, kDisplayXOffsetTestVal, kDisplayYOffsetTestVal));
     checkResult(pDIDesc->SetAlphaTransparency(kAlphaTransparencyTestVal));
@@ -220,7 +193,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
     checkResult(pSourceMob->SetEssenceDescriptor(pEssDesc));
 
     // Add the MOB to the file
-    checkResult(pHeader->AddMob(pMob));
+    checkResult(pHeader->AppendMob(pMob));
   }
   catch (HRESULT& rResult)
   {
@@ -272,14 +245,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   try
   {
 	  // Open the AAF file
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &pFile, &pHeader));
 
     // Make sure there is one a single mob in the file.
-	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+	  checkResult(pHeader->GetNumMobs(kAllMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
     // Loop to the first mob.
-	  checkResult(pHeader->GetMobs(NULL, &pMobIter));
+	  checkResult(pHeader->EnumAAFAllMobs(NULL, &pMobIter));
 	  checkResult(pMobIter->NextOne(&pMob));
 
 	  checkResult(pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob));
@@ -366,9 +339,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   if (pMob)
     pMob->Release();
 
-  if (pMobIter)
-    pMobIter->Release();
-
   if (pSourceMob)
     pSourceMob->Release();
 
@@ -386,7 +356,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 extern "C" HRESULT CAAFDigitalImageDescriptor_test()
 {
-	aafWChar*	pFileName = L"AAFDigitalImageDescripTest.aaf";
+	aafWChar*	pFileName = L"AAFDigitalImageDescTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
 
 	try
