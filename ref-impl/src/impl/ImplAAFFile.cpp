@@ -38,15 +38,16 @@
 #include "AAFStoredObjectIDs.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFBuiltinDefs.h"
+#include "ImplAAFFileSignatures.h"
 
 
 #include <assert.h>
 
 // AAF file signature.
-static const OMFileSignature aafFileSignature  =
-{0x42464141,
- 0xff0d, 0x4d4f,
-{0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
+//static const OMFileSignature aafFileSignature  =
+//{0x42464141,
+//0xff0d, 0x4d4f,
+//{0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff}};
 
 
 //
@@ -89,7 +90,7 @@ ImplAAFFile::Initialize ()
   _factory = ImplAAFDictionary::CreateDictionary();
 	if (NULL == _factory)
 		return AAFRESULT_NOMEMORY;
-	_initialized = AAFTrue;
+	_initialized = kAAFTrue;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -130,6 +131,7 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 
         // Check the file's signature.
         OMFileSignature sig = _file->signature();
+		const OMFileSignature aafFileSignature  = *reinterpret_cast<const OMFileSignature *>(&aafFileSignatureGUID);
         checkExpression(sig == aafFileSignature, AAFRESULT_NOT_AAF_FILE);
 
 		// Get the byte order
@@ -173,7 +175,7 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 		// Initialize the mob lookup tables.
 		checkResult(_head->LoadMobTables());
 		
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmOpenRead;
 	}
 	catch (AAFRESULT &r)
@@ -292,7 +294,7 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 		_head->AddIdentificationObject(&_ident);
 		
 
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmModify;
 	}
 	catch (AAFRESULT &rc)
@@ -387,6 +389,7 @@ ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 		pCStore = 0;
 
 		// Attempt to create the file.
+		const OMFileSignature aafFileSignature  = *reinterpret_cast<const OMFileSignature *>(&aafFileSignatureGUID);
 		_file = OMFile::openNewModify(pFileName, _factory, _byteOrder, _head, aafFileSignature);
 		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
 
@@ -407,7 +410,7 @@ ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 		dictionary->ReleaseReference();
 		dictionary = 0;
 
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmCreate;
 		GetRevision(&_setrev);
 	}
@@ -493,7 +496,7 @@ ImplAAFFile::OpenTransient (aafProductIdentification_t * pIdent)
 		dictionary->ReleaseReference();
 		dictionary = 0;
 
-		_open = AAFTrue;
+		_open = kAAFTrue;
 		_openType = kOmTransient;
 		GetRevision(&_setrev);
 	}
@@ -611,9 +614,9 @@ ImplAAFFile::ImplAAFFile () :
 		_byteOrder(0),
 		_openType(kOmUndefined),
 		_head(NULL),
-		_semanticCheckEnable(AAFFalse),
-		_initialized(AAFFalse),
-		_open(AAFFalse),
+		_semanticCheckEnable(kAAFFalse),
+		_initialized(kAAFFalse),
+		_open(kAAFFalse),
 		_modeFlags(0)
 {
 	memset (&_ident, 0, sizeof (_ident));
@@ -691,7 +694,7 @@ ImplAAFFile::Close ()
 	}
 
 	_cookie = 0;
-	_open = AAFFalse;
+	_open = kAAFFalse;
 	_openType = kOmUndefined;
 
 
