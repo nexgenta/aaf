@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFFileMode.h,v 1.4 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+// $Id: AAFFileMode.h,v 1.5 2004/05/10 15:05:34 asuraparaju Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -90,11 +90,6 @@
 // ...
 
 // Unpublished mode flags
-
-//When set this flag uses the non default library for the structured 
-//storage library;
-
-#define AAF_FILE_MODE_USE_ALTERNATE_LIBRARY    (1 << 27)
 
 // Control of use of large sector size mode in Structured Storage
 // The following applies to:
