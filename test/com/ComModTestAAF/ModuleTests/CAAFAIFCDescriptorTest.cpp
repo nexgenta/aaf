@@ -87,6 +87,12 @@ typedef struct tAIFCSUMMARY
 	SoundDataChunk	ssndChunk;
 } AIFCSummary;
 
+// our test Mob id 
+static const aafMobID_t	TEST_MobID = 
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x1f64f50a, 0x03fd, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
+
 #if defined(_WIN32) || defined(WIN32)
   // Wave data does not have to be swapped on Windows platforms.
   #define SWAPSUMMARY(summary)
@@ -161,13 +167,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
 	ProductInfo.productName = L"AAFAIFCDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -220,7 +228,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	IAAFAIFCDescriptor*		pAIFCDesc = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
 
-	aafMobID_t		newMobID;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -244,8 +251,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 
-		checkResult(CoCreateGuid((GUID *)&newMobID));
-		checkResult(pMob->SetMobID(newMobID));
+		checkResult(pMob->SetMobID(TEST_MobID));
 		checkResult(pMob->SetName(L"AIFCDescriptorTest"));
 		checkResult(defs.cdAIFCDescriptor()->
 					CreateInstance(IID_IAAFAIFCDescriptor, 
