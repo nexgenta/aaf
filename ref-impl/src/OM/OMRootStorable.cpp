@@ -29,26 +29,18 @@
 #include "OMRootStorable.h"
 
 OMRootStorable::OMRootStorable(void)
-: _clientRoot(0xFFFF, L"Header"),
-  _dictionary(0xFFFE, L"MetaDictionary")
+: _clientRoot(0x0002, L"Header"),
+  _dictionary(0x0001, L"MetaDictionary")
 {
-  _persistentProperties.put(_clientRoot.address());
-  _persistentProperties.put(_dictionary.address());
-
-  _clientRoot = 0;
-  _dictionary = 0;
+  initialize(0, 0);
 }
 
 OMRootStorable::OMRootStorable(OMStorable* clientRoot,
                                OMDictionary* dictionary)
-: _clientRoot(0xFFFF, L"Header"),
-  _dictionary(0xFFFE, L"MetaDictionary")
+: _clientRoot(0x0002, L"Header"),
+  _dictionary(0x0001, L"MetaDictionary")
 {
-  _persistentProperties.put(_clientRoot.address());
-  _persistentProperties.put(_dictionary.address());
-
-  _clientRoot = clientRoot;
-  _dictionary = dictionary;
+  initialize(clientRoot, dictionary);
 }
 
 OMRootStorable::~OMRootStorable(void)
@@ -89,4 +81,14 @@ OMStorable* OMRootStorable::clientRoot(void) const
 OMDictionary* OMRootStorable::dictionary(void) const
 {
   return _dictionary;
+}
+
+void OMRootStorable::initialize(OMStorable* clientRoot,
+                                OMDictionary* dictionary)
+{
+  _persistentProperties.put(_clientRoot.address());
+  _persistentProperties.put(_dictionary.address());
+
+  _clientRoot = clientRoot;
+  _dictionary = dictionary;
 }
