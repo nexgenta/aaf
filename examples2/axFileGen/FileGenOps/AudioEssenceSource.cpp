@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AudioEssenceSource.cpp,v 1.5.2.1 2004/06/08 13:45:07 stuart_hc Exp $ $Name:  $
+// $Id: AudioEssenceSource.cpp,v 1.5.2.2 2004/07/14 14:40:49 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -223,7 +223,7 @@ std::auto_ptr< SampleSrcBuffer > ToneSource::GetNext()
 		aafUInt8* buf8 = buf.get();
 		int i;
 		for( i = 0; i < _waveHeader.GetNumSamples(); i++ ) {
-			buf8[i] = _toneGen->NextSample();
+			buf8[i] = static_cast<aafUInt8>(_toneGen->NextSample());
 		}
 	}
 	else if ( 2 == _waveHeader.GetBytesPerSample() ) {
@@ -234,7 +234,7 @@ std::auto_ptr< SampleSrcBuffer > ToneSource::GetNext()
 	
 		int i;
 		for( i = 0; i < _waveHeader.GetNumSamples(); i++ ) {
-			buf16[i] = _toneGen->NextSample();
+			buf16[i] = static_cast<aafUInt16>(_toneGen->NextSample());
 		}
 	}
 	else if ( 4 == _waveHeader.GetBytesPerSample() ) {
