@@ -1,3 +1,10 @@
+#c/*************************************************\
+#c*													*
+#c* Advanced Authoring Format						*
+#c*													*
+#c* Copyright (c) 1998-1999 Avid Technology, Inc.	*
+#c*													*
+#c\*************************************************/
 #startm .this-module 0
 AAFTypeDefSet\
 #endm
@@ -20,10 +27,10 @@ AD_CLASS_UUID(381e1f21, e7bb, 11d2, 84, 2a, 00, 60, 08, 32, ac, b8)
 AD_DEFAULT_UUID(381e1f22, e7bb, 11d2, 84, 2a, 00, 60, 08, 32, ac, b8)
 AD_XCLASS_BEGIN(Concrete, StoredObject)
 AD_XMETHOD3(Initialize,
-			[in],
+			[in\, ref],
 			objPass,
-			aafUID_t *,
-			pID,
+			aafUID_constref,
+			id,
 			auid to be used to identify this type,
 
 			[in],
@@ -34,7 +41,7 @@ AD_XMETHOD3(Initialize,
 
 			[in],
 			objPass,
-			wchar_t *,
+			aafCharacter_constptr,
 			pTypeName,
 			friendly name of this type definition,
 
@@ -45,11 +52,11 @@ AD_XMETHOD3(Initialize,
   //
   // Succeeds if:
   // - Initialize\(\) has not yet been called on this object.
-  // - pTypeDef is a valid pointer.
+  // - pTypeName is a valid pointer.
   //
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_ALREADY_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(Either pTypeDef or pTypeName\))
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pTypeName\))
 
 
 AD_XMETHOD1(GetType,
@@ -128,6 +135,7 @@ AD_X2METHOD3(CreateValueFromValues,
        array of property values for elements of set value which
     // is to be created.,
 			 numElements,
+			 ,
 
 			 [in],
 			 objPass,
@@ -135,12 +143,14 @@ AD_X2METHOD3(CreateValueFromValues,
 			 numElements,
 			 size of pElementValues array.,
 			 ,
+			 ,
 
 			 [out],
 			 objOut,
 			 AAFPropertyValue,
 			 ppPropVal,
 			 newly-created property value,
+			 ,
 			 ,
 
      Creates a property value which contains a set type.
