@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.29 2004/09/22 18:00:42 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.30 2004/09/28 12:02:42 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -795,7 +795,7 @@ STDAPI ImplAAFFileIsAAFFile (
     return AAFRESULT_NULL_PARAM;
 
   // Crude file existance check.  May be better done in 
-  // OMMSSStoredObjectFactory::isRecognized(OMRawStorage* rawStorage) but
+  // OMSSStoredObjectFactory::isRecognized(OMRawStorage* rawStorage) but
   // reporting the right HRESULT is difficult from there.
   // There may also be another reason for failing to open the file than
   // non-existance. e.g. permissions problems.
