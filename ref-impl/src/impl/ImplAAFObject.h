@@ -91,14 +91,24 @@ public:
   );
 
 
-  OMDECLARE_STORABLE(AAFObject)
- 
+public:
+	// Interfaces ivisible inside the toolkit, but not exposed through the API
+
+	// Gets the head object of the file containing this object.
+	// This function is used to maintain MOB and Definition tables in the
+	// head object.
+	virtual AAFRESULT MyHeadObject
+		(class ImplAAFHeader **header);
+
 
 public:
   // Declare the module test method. The implementation of the will be be
   // in /test/ImplAAFObjectTest.cpp.
   static AAFRESULT test();
+
+  OMDECLARE_STORABLE(ImplAAFObject);
 };
+
 
 #endif // ! __ImplAAFObject_h__
 
