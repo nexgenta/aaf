@@ -30,34 +30,64 @@
  *
  ************************************************************************/
 
-#include "ImplAAFObject.h"
+#include "OMDictionary.h"
 #include "OMStrongRefSetProperty.h"
+
+#ifndef __ImplAAFClassDef_h__
+#include "ImplAAFClassDef.h"
+#endif
+
+#ifndef __ImplAAFTypeDef_h__
+#include "ImplAAFTypeDef.h"
+#endif
+
 #include "OMReferenceSet.h"
+#include "OMIdentitySet.h"
 
 // Forward declarations:
-
 class ImplAAFMetaDefinition;
-class ImplAAFClassDef;
-class ImplAAFTypeDef;
 class ImplAAFMetaDefinition;
 class ImplAAFTypeDefVariableArray;
 class ImplAAFTypeDefFixedArray;
 class ImplAAFTypeDefRecord;
 class ImplAAFTypeDefRename;
-class ImplAAFTypeDefStream;
 class ImplAAFTypeDefString;
 class ImplAAFTypeDefStrongObjRef;
 class ImplAAFTypeDefWeakObjRef;
 class ImplAAFTypeDefSet;
 
-class ImplEnumAAFClassDefs;
-class ImplEnumAAFTypeDefs;
+template <class T> 
+class ImplAAFEnumerator;
+typedef ImplAAFEnumerator<ImplAAFClassDef> ImplEnumAAFClassDefs;
+typedef ImplAAFEnumerator<ImplAAFTypeDef> ImplEnumAAFTypeDefs;
+
+class ImplAAFDictionary;
+
+#include "ImplAAFClassDef.h"
+#include "ImplAAFPropertyDef.h"
+#include "ImplAAFTypeDef.h"
+
+//
+// Indicates the "mode" for creating and initializing any of the axiomatic and
+// built-in class definitions.
+//
+typedef enum _aafObjectCreationMode_e
+{
+  // Objects need to be created and all properties fully initialized, including all
+  // object references.
+  kAAFCreatingNewObjects,
+
+  // Objects only need to be created, no properties need to be (or should be)
+  // initialized. Only runtime data such as known record offsets need to be
+  // initialized.
+  kAAFRestoringOldObjects
+
+} aafObjectCreationMode_e;
 
 
 class ImplAAFMetaDictionary :
-  public ImplAAFObject
-//  public OMClassFactory, 
-//  public OMStorable
+  public ImplAAFRoot,
+  public OMDictionary
 {
 public:
   //
@@ -70,22 +100,35 @@ protected:
   virtual ~ImplAAFMetaDictionary ();
 
 public:
+
+  //
+  // Factory method to create an instance of ImplAAFMetaDictionary
+  //
+  static ImplAAFMetaDictionary *CreateMetaDictionary(void);
+
+
   //
   // Create an instance of the appropriate derived class, given the
   // class id.  Initializes the OM properties.
   // 
   // This method implements the OMClassFactory interface.
   //
-  //  OMStorable* create(const OMClassId& classId) const;
+  OMStorable* create(const OMClassId& classId) const;
 
   //
   // This method implements the required OMStorable interface method
   //
-  //  virtual const OMClassId& classId(void) const;
+  virtual const OMClassId& classId(void) const;
 
-  // Override callback from OMStorable
-  //  virtual void onSave(void* clientContext) const;
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  //  virtual void onRestore(void* clientContext) const;
 
+
+
+
+  //
+  // Class and type access methods ...
 
 
   //****************
@@ -285,14 +328,6 @@ public:
       ImplAAFTypeDefRename ** ppNewRename);
 
   virtual AAFRESULT STDMETHODCALLTYPE
-   CreateTypeDefStream (
-      aafUID_constref typeID,
-      aafCharacter_constptr pTypeName,
-      aafCharacter_constptr pDescription,
-      ImplAAFTypeDef *pElementType,
-      ImplAAFTypeDefStream ** ppNewStream);
-
-  virtual AAFRESULT STDMETHODCALLTYPE
    CreateTypeDefString (
       aafUID_constref typeID,
       aafCharacter_constptr pTypeName,
@@ -351,6 +386,11 @@ public:
       ImplAAFTypeDefSet ** ppNewWeakObjRefSet);
 
 public:
+  //
+  // Methods private to the SDK
+  //
+
+
   // These are low-level OMSet tests for containment.
   bool containsClass(aafUID_constref classId);
   bool containsType(aafUID_constref typeId);
@@ -360,18 +400,67 @@ public:
   void RemoveForwardClassReference(aafUID_constref classId);
 
   // Find the opaque type definition associated with the given type id.
-  ImplAAFTypeDef * findOpaqueTypeDefinition(aafUID_constref typeId); // NOT REFERENCE COUNTED!
+  ImplAAFTypeDef * findOpaqueTypeDefinition(aafUID_constref typeId) const; // NOT REFERENCE COUNTED!
+
+
+  // Add the given class definition to the set of axiomatic class definitions.
+  void addAxiomaticClassDefinition(ImplAAFClassDef *pClassDef);
+
+  // Add the given property definition to the set of axiomatic property definitions.
+  void addAxiomaticPropertyDefinition(ImplAAFPropertyDef *pPropertyDef);
+
+  // Add the given type definition to the set of axiomatic type definitions.
+  void addAxiomaticTypeDefinition(ImplAAFTypeDef *pTypeDef);
 
   // Find the aximatic class definition associated with the given class id.
-  ImplAAFClassDef * findAxiomaticClassDefinition(aafUID_constref classId); // NOT REFERENCE COUNTED!
+  ImplAAFClassDef * findAxiomaticClassDefinition(aafUID_constref classId) const; // NOT REFERENCE COUNTED!
 
   // Find the aximatic property definition associated with the given property id.
-  ImplAAFPropertyDef * findAxiomaticPropertyDefinition(aafUID_constref propertyId); // NOT REFERENCE COUNTED!
+  ImplAAFPropertyDef * findAxiomaticPropertyDefinition(aafUID_constref propertyId) const; // NOT REFERENCE COUNTED!
 
   // Find the aximatic type definition associated with the given type id.
-  ImplAAFTypeDef * findAxiomaticTypeDefinition(aafUID_constref typeId); // NOT REFERENCE COUNTED!
+  ImplAAFTypeDef * findAxiomaticTypeDefinition(aafUID_constref typeId) const; // NOT REFERENCE COUNTED!
+
+  // Factory function to create an unitialized meta defintion for the 
+  // given auid.
+  ImplAAFMetaDefinition * pvtCreateMetaDefinition(const aafUID_t & auid);
+
+  // Create and initialize all of the axiomatic definitions.
+  AAFRESULT InstantiateAxiomaticDefinitions(void);
+
+  // Create all of the axiomatic classes as uninitialized objects.
+  void CreateAxiomaticClasses(void); // throw AAFRESULT
+
+  // Create all of the axiomatic properties as uninitialized objects.
+  void CreateAxiomaticProperties(void); // throw AAFRESULT
+
+  // Create all of the axiomatic types as uninitialized objects.
+  void CreateAxiomaticTypes(void); // throw AAFRESULT
+
+  // Initialize all of the axiomatic classes with their parent and class
+  // definitions.
+  void InitializeAxiomaticClasses(void); // throw AAFRESULT
+
+  // Initialize all of the property definitions with their type definitions.
+  void InitializeAxiomaticProperties(void); // throw AAFRESULT
+
+  // Initialize all of the type definitions with there appropriate class and type
+  // definitions.
+  void InitializeAxiomaticTypes(void); // throw AAFRESULT
 
 
+  // Register all of the axiomatic properties with their corresponding
+  //  axiomatic class definitions.
+  void RegisterAxiomaticProperties(void); // throw AAFRESULT
+
+  // Initialize all of the OMProperties for each aximatic definition.
+  void InitializeAxiomaticOMProperties(void); // throw AAFRESULT
+
+  // Create all of the axiomatic definitions.
+  void CreateAxiomaticDefinitions(void); // throw AAFRESULT
+
+  // Initialize all of the axiomatic definitions.
+  void InitializeAxiomaticDefinitions(void); // throw AAFRESULT
 
 private:
 
@@ -389,27 +478,18 @@ private:
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFClassDef> _axiomaticClassDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFPropertyDef> _axiomaticPropertyDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFTypeDef> _axiomaticTypeDefinitions;
+  OMIdentitySet<OMUniqueObjectIdentification> _forwardClassReferences;
 
-  // Private class that represents a forward class reference.
-  class ForwardClassReference
-  {
-  public:
-    ForwardClassReference();
-    ForwardClassReference(const ForwardClassReference& rhs);
-    ForwardClassReference(aafUID_constref classId);
+  //
+  // Temporary data members used while converting to the "two-roots" containment
+  // model.
+  //
+private:
+  ImplAAFDictionary *_dataDictionary;
 
-    // Methods required by OMSet
-    const OMUniqueObjectIdentification identification(void) const;
-    ForwardClassReference& operator= (const ForwardClassReference& rhs);
-    bool operator== (const ForwardClassReference& rhs);
-
-  private:
-    aafUID_t _classId;
-  };
-
-  OMSet<OMUniqueObjectIdentification, ForwardClassReference> _forwardClassReferences;
-
-
+public:
+  void setDataDictionary(ImplAAFDictionary *dataDictionary);
+  ImplAAFDictionary * dataDictionary(void) const;
 };
 
 #endif // #ifndef __ImplAAFMetaDictionary_h__
