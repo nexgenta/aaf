@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.9 2004/02/27 14:26:39 stuart_hc Exp $ $Name:  $
+# $Id: common.mk,v 1.9.2.1 2004/03/19 17:40:50 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,11 @@
 # Get host type, and include appropriate host-specific makefile
 #
 UNAME := $(shell uname)
+
+# Newer cygwin environments return "CYGWIN_NT" instead of Windows_NT
+ifneq (,$(findstring CYGWIN_NT,$(UNAME)))
+	UNAME = Windows_NT
+endif 
 
 include $(BLD_CFG_DIR)/$(UNAME).mk
 

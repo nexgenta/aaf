@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafplatform.sh,v 1.6 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: aafplatform.sh,v 1.6.2.1 2004/03/19 17:40:50 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -34,27 +34,38 @@ else
 fi
 
 case "${MACHINE}:${OS}" in
-    *:IRIX*)
+	*:IRIX*)
 	echo MipsIrix
 	exit 0;;
 
-    *:Linux)
+	*:Linux)
 	echo ${MACHINE}Linux
 	exit 0;;
 
-    sparc*:SunOS)
+	sparc*:SunOS)
 	echo SparcSolaris
 	exit 0;;
 
-    *86:Windows_NT)
+	# New cygwin environments return "CYGWIN_NT-5.x" so set to Windows_NT
+	*86:CYGWIN_NT*)
+	OS=Windows_NT
 	echo Win
 	exit 0;;
 
-    "Power Macintosh:Darwin")
+	# Cygwin builds
+	*86:Windows_NT)
+	echo Win
+	exit 0;;
+
+	# Mingw builds (E.g. using MSYS shell)
+	*86:MINGW32_NT*)
+	echo Win
+	exit 0;;
+
+	"Power Macintosh:Darwin")
 	echo PPCDarwin
 	exit 0;;
 esac
 
 echo Unknown
 exit 1
-
