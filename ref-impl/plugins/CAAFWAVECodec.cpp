@@ -76,7 +76,8 @@ HRESULT STDMETHODCALLTYPE
 {
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
-
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	*uid = kAAFCodecWAVE;		// UID of the WAVE codec definition
 	return AAFRESULT_SUCCESS;
 }
@@ -113,6 +114,8 @@ HRESULT STDMETHODCALLTYPE
 	
 	if((dict == NULL) || (def == NULL))
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 
 	XPROTECT()
 	{
@@ -249,7 +252,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
-CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown, aafBoolean_t doInit)
+CAAFWaveCodec::CAAFWaveCodec (IUnknown * pControllingUnknown)
   : CAAFUnknown (pControllingUnknown)
 {
 	_headerLoaded = kAAFFalse;
@@ -310,6 +313,8 @@ HRESULT STDMETHODCALLTYPE
 {
 	if(pFlavour == NULL)
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	*pFlavour = kAAFNilCodecFlavour;
 	return AAFRESULT_SUCCESS;
 }
@@ -324,7 +329,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetIndexedDataDefinition (aafUInt32  index,
+    CAAFWaveCodec::GetIndexedDataDefinition (aafUInt32  /*index*/,
         aafUID_t * pDataDefID)
 {
   if (! pDataDefID)
@@ -351,7 +356,7 @@ HRESULT STDMETHODCALLTYPE
 }	
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetCodecDisplayName (aafUID_constref flavour,
+    CAAFWaveCodec::GetCodecDisplayName (aafUID_constref /*flavour*/,
         aafCharacter *  pName,
         aafUInt32  bufSize)
 {
@@ -363,7 +368,7 @@ HRESULT STDMETHODCALLTYPE
 }
 	
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::CountChannels (IAAFSourceMob *fileMob,
+    CAAFWaveCodec::CountChannels (IAAFSourceMob * /*fileMob*/,
         aafUID_constref essenceKind,
         IAAFEssenceStream *stream,
         aafUInt16 *  pNumChannels)
@@ -393,7 +398,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::GetSelectInfo (IAAFSourceMob *fileMob,
+    CAAFWaveCodec::GetSelectInfo (IAAFSourceMob * /*fileMob*/,
         IAAFEssenceStream *stream,
         aafSelectInfo_t *  pSelectInfo)
 {
@@ -444,13 +449,13 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::ValidateEssence (IAAFSourceMob *fileMob,
-        IAAFEssenceStream *stream,
-		aafCheckVerbose_t  verbose,
-        aafCheckWarnings_t warning,
-         aafUInt32  bufSize,
-		wchar_t *  pName,
-        aafUInt32  *bytesWritten)
+    CAAFWaveCodec::ValidateEssence (IAAFSourceMob * /*fileMob*/,
+        IAAFEssenceStream * /*stream*/,
+		aafCheckVerbose_t   /*verbose*/,
+        aafCheckWarnings_t  /*warning*/,
+         aafUInt32   /*bufSize*/,
+		wchar_t *   /*pName*/,
+        aafUInt32  * /*bytesWritten*/)
 {
 	return HRESULT_NOT_IMPLEMENTED;
 }
@@ -608,8 +613,8 @@ HRESULT STDMETHODCALLTYPE
 				
 				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 				
-				resultBlock->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				resultBlock->samplesXfered += xfer->numSamples;
+				resultBlock->bytesXfered = bytesWritten;
+				resultBlock->samplesXfered += (bytesWritten / _bytesPerFrame);
 			}
 		}
 		else if(_numCh == 1)
@@ -626,8 +631,8 @@ HRESULT STDMETHODCALLTYPE
 				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 		
 		
-				result->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				result->samplesXfered += xfer->numSamples;
+				resultBlock->bytesXfered = bytesWritten;
+				resultBlock->samplesXfered += (bytesWritten / _bytesPerFrame);
 			}
 		}
 		else
@@ -912,12 +917,12 @@ HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::Seek (aafPosition_t  sampleFrame)
 {
 	aafInt64          nBytes;
-	aafInt64          temp, offset, one;
+	aafInt64          temp, offset, zero;
 	aafUInt32           bytesPerFrame;
 
 	XPROTECT()
 	{
-		CvtInt32toInt64(1, &one);
+		CvtInt32toInt64(0, &zero);
 		temp = _sampleFrames;
 		CHECK(AddInt32toInt64(1, &temp));
 		if (Int64Greater(sampleFrame, temp))
@@ -925,10 +930,8 @@ HRESULT STDMETHODCALLTYPE
 	
 		nBytes = sampleFrame;
 		
-		/* Make the result zero-based (& check for bad frame numbers as well). */
-		if(Int64Less(nBytes, one))
+		if(Int64Less(nBytes, zero))
 			RAISE(AAFRESULT_BADSAMPLEOFFSET);
-		CHECK(SubInt64fromInt64(one, &nBytes));
 		bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 		CHECK(MultInt32byInt64(bytesPerFrame, nBytes, &nBytes));
 		offset = _dataStartOffset;
@@ -1021,6 +1024,9 @@ HRESULT STDMETHODCALLTYPE
         aafUInt32  buflen)
 {
   aafUInt32 bytesWritten;
+  
+  	if(buflen < (nSamples * _bytesPerFrame))
+  		return AAFRESULT_SMALLBUF;
 	return _stream->Write (nSamples * _bytesPerFrame, buffer, &bytesWritten);
 }
 
@@ -1056,8 +1062,8 @@ HRESULT STDMETHODCALLTYPE
 
 	
 HRESULT STDMETHODCALLTYPE
-    CAAFWaveCodec::CreateDescriptorFromStream (IAAFEssenceStream * pStream,
-        IAAFSourceMob *fileMob)
+    CAAFWaveCodec::CreateDescriptorFromStream (IAAFEssenceStream *  /*pStream*/,
+        IAAFSourceMob * /*fileMob*/)
 {
 	return(AAFRESULT_NOT_IMPLEMENTED);
 }
@@ -1120,6 +1126,7 @@ HRESULT STDMETHODCALLTYPE
 			{
 				XASSERT(bytesRead == sizeof(valueUInt32), AAFRESULT_INVALID_PARM_SIZE);
 				memcpy(&valueUInt32, buf, bytesRead);
+                                XASSERT(valueUInt32 > 0, AAFRESULT_ZERO_SAMPLESIZE);
 				_bitsPerSample = (aafUInt16)valueUInt32;
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 			}
@@ -1133,6 +1140,7 @@ HRESULT STDMETHODCALLTYPE
 			{
 				XASSERT(bytesRead == sizeof(valueUInt32), AAFRESULT_INVALID_PARM_SIZE);
 				memcpy(&valueUInt32, buf, bytesRead);
+                                XASSERT(valueUInt32 > 0, AAFRESULT_CODEC_CHANNELS);
 				_numCh = (aafUInt16)valueUInt32;
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 			}
@@ -1283,7 +1291,7 @@ HRESULT STDMETHODCALLTYPE
 		
 HRESULT STDMETHODCALLTYPE
     CAAFWaveCodec::MultiCreate (IAAFSourceMob *unk,
-        aafUID_constref flavour,
+        aafUID_constref /*flavour*/,
         IAAFEssenceStream * stream,
         aafCompressEnable_t compEnable,
         aafUInt32 numParms,
@@ -1486,11 +1494,13 @@ AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
 
 {
 	aafInt32           chunksize, avgBytesPerSec, samplesPerSec;
-	aafUInt32		 bextSize, headerSize, n;
+	aafUInt32			headerSize;
 	aafInt32           zero = 0, len;
 	aafInt16           bytesPerFrame;
 	aafInt16           pcm_format = 1;
 	aafUInt8			*ptr = buffer, *nextChunk;
+#if INCLUDE_BEXT
+	aafUInt32			bextSize, headerSize, n;
 	char				bextDescription[256+1];
 	char				bextOriginator[32+1];
 	char				bextOriginatorReference[32+1];
@@ -1501,10 +1511,12 @@ AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
 	char				bextReserved[254];
 	char				bextCodingHistory[512];
 	aafUInt16			bextLenCodingHistory;
-
+	aafTimeStamp_t		dateTime;
+#endif
 
 	XPROTECT()
 	{	
+#if INCLUDE_BEXT
 		if(_sampleRate.denominator != 0)
 		{
 			sprintf(bextCodingHistory, "PCM: %s, %d bits, %g hz\r\n", (_numCh == 2 ? "stereo" : "mono"),
@@ -1517,6 +1529,9 @@ AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
 		bextLenCodingHistory = strlen(bextCodingHistory)+1;
 		bextSize = 256+32+32+10+8+8+2+sizeof(bextReserved)+bextLenCodingHistory;
 		headerSize = 36 + bextSize;
+#else
+		headerSize = 36;
+#endif
 
 		_numCh = numCh;
 		if(bufsize < headerSize)
@@ -1563,27 +1578,30 @@ AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
 		ptr = buffer+ 4;
 		CHECK(fillSwappedWAVEData(&ptr, 4L, &len));	// Patch in
 
+#if INCLUDE_BEXT
 		// Set up for the broadcast chunk
-		for(n = 0; n < sizeof(bextDescription); n++)			bextDescription[n] = 0;
+		memset(bextDescription, 0, sizeof(bextDescription));
 		sprintf(bextDescription, "<tbd>");
 		/***/
-		for(n = 0; n < sizeof(bextOriginator); n++)				bextOriginator[n] = 0;
+		memset(bextOriginator, 0, sizeof(bextOriginator));
 		sprintf(bextOriginator, "<tbd>");
 		/***/
-		for(n = 0; n < sizeof(bextOriginatorReference); n++)	bextOriginatorReference[n] = 0;
+		memset(bextOriginatorReference, 0, sizeof(bextOriginatorReference));
 		sprintf(bextOriginatorReference, "<tbd>");
 		/***/
-		for(n = 0; n < sizeof(bextOriginationDate); n++)		bextOriginationDate[n] = 0;
-		sprintf(bextOriginationDate, "0000-00-00");
-		/***/
-		for(n = 0; n < sizeof(bextOriginationTime); n++)		bextOriginationTime[n] = 0;
-		sprintf(bextOriginationTime, "00:00:00");
+		memset(bextOriginationDate, 0, sizeof(bextOriginationDate));
+		memset(bextOriginationTime, 0, sizeof(bextOriginationTime));
+		AAFGetDateTime(&dateTime);
+		sprintf(bextOriginationDate, "%04d-%02d-%02d", dateTime.date.year,
+										dateTime.date.month, dateTime.date.day);
+		sprintf(bextOriginationTime, "%02d:%02d:%02d", dateTime.time.hour,
+										dateTime.time.minute, dateTime.time.second);
 		/***/
 		bextTimeReference = 0;
 		/***/
 		bextVersion = 0;
 		/***/
-		for(n = 0; n < sizeof(bextReserved); n++)	bextReserved[n] = 0;
+		memset(bextReserved, 0, sizeof(bextReserved));
 		/***/
 		
 		// Now write the broadcast chunk
@@ -1610,6 +1628,9 @@ AAFRESULT CAAFWaveCodec::CreateWAVEheader(aafUInt8		*buffer,
 		ptr += sizeof(bextReserved);
 		memcpy(ptr, bextCodingHistory, bextLenCodingHistory);
 		ptr += bextLenCodingHistory;
+#else
+		ptr = nextChunk;
+#endif
 		
 		*bytesWritten = ptr - buffer;
 	}

@@ -76,6 +76,8 @@ CAAFAIFCCodec::GetIndexedDefinitionID (aafUInt32 index, aafUID_t *uid)
 {
 	if(uid == NULL)
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	
 	*uid = kAAFCODEC_AIFC;		// UID of the AIFC codec definition
 	return AAFRESULT_SUCCESS;
@@ -113,6 +115,8 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 	
 	if((dict == NULL) || (def == NULL))
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	
 	XPROTECT()
 	{
@@ -249,7 +253,7 @@ CAAFAIFCCodec::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
 }
 
 
-CAAFAIFCCodec::CAAFAIFCCodec (IUnknown * pControllingUnknown, aafBoolean_t doInit)
+CAAFAIFCCodec::CAAFAIFCCodec (IUnknown * pControllingUnknown)
 : CAAFUnknown (pControllingUnknown)
 {
 	_headerLoaded = kAAFFalse;
@@ -310,6 +314,8 @@ CAAFAIFCCodec::GetIndexedFlavourID (aafUInt32  index,
 {
 	if(pFlavour == NULL)
 		return AAFRESULT_NULL_PARAM;
+	if(index > 0)
+		return AAFRESULT_BADINDEX;
 	*pFlavour = kAAFNilCodecFlavour;
 	return AAFRESULT_SUCCESS;
 }
@@ -324,7 +330,7 @@ CAAFAIFCCodec::CountDataDefinitions (aafUInt32 *pDefCount)
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::GetIndexedDataDefinition (aafUInt32  index,
+CAAFAIFCCodec::GetIndexedDataDefinition (aafUInt32  /*index*/,
 										 aafUID_t * pDataDefID)
 {
 	if (! pDataDefID)
@@ -351,7 +357,7 @@ CAAFAIFCCodec::GetMaxCodecDisplayNameLength (
 }	
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::GetCodecDisplayName (aafUID_constref flavour,
+CAAFAIFCCodec::GetCodecDisplayName (aafUID_constref /*flavour*/,	// No flavors
 									aafCharacter *  pName,
 									aafUInt32  bufSize)
 {
@@ -363,7 +369,7 @@ CAAFAIFCCodec::GetCodecDisplayName (aafUID_constref flavour,
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::CountChannels (IAAFSourceMob *fileMob,
+CAAFAIFCCodec::CountChannels (IAAFSourceMob * /*fileMob*/,
 							  aafUID_constref essenceKind,
 							  IAAFEssenceStream *stream,
 							  aafUInt16 *  pNumChannels)
@@ -393,7 +399,7 @@ CAAFAIFCCodec::CountChannels (IAAFSourceMob *fileMob,
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::GetSelectInfo (IAAFSourceMob *fileMob,
+CAAFAIFCCodec::GetSelectInfo (IAAFSourceMob * /*fileMob*/,
 							  IAAFEssenceStream *stream,
 							  aafSelectInfo_t *  pSelectInfo)
 {
@@ -444,13 +450,13 @@ CAAFAIFCCodec::CountSamples (
 }
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::ValidateEssence (IAAFSourceMob *fileMob,
-								IAAFEssenceStream *stream,
-								aafCheckVerbose_t  verbose,
-								aafCheckWarnings_t warning,
-								aafUInt32  bufSize,
-								wchar_t *  pName,
-								aafUInt32  *bytesWritten)
+CAAFAIFCCodec::ValidateEssence (IAAFSourceMob * /*fileMob*/,
+								IAAFEssenceStream * /*stream*/,
+								aafCheckVerbose_t   /*verbose*/,
+								aafCheckWarnings_t  /*warning*/,
+								aafUInt32   /*bufSize*/,
+								wchar_t *   /*pName*/,
+								aafUInt32  * /*bytesWritten*/)
 {
 	return HRESULT_NOT_IMPLEMENTED;
 }
@@ -621,8 +627,8 @@ CAAFAIFCCodec::WriteBlocks (aafDeinterleave_t  inter,
 				
 				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 				
-				resultBlock->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				resultBlock->samplesXfered += xfer->numSamples;
+				resultBlock->bytesXfered = bytesWritten;
+				resultBlock->samplesXfered += (bytesWritten / _bytesPerFrame);
 			}
 		}
 		else if(_numCh == 1)
@@ -639,8 +645,8 @@ CAAFAIFCCodec::WriteBlocks (aafDeinterleave_t  inter,
 				CHECK(_stream->Write(fileBytes, xfer->buffer, &bytesWritten));
 				
 				
-				result->bytesXfered = xfer->numSamples * _bytesPerFrame;
-				result->samplesXfered += xfer->numSamples;
+				result->bytesXfered = bytesWritten;
+				result->samplesXfered += (bytesWritten / _bytesPerFrame);
 			}
 		}
 		else
@@ -925,12 +931,12 @@ HRESULT STDMETHODCALLTYPE
 CAAFAIFCCodec::Seek (aafPosition_t  sampleFrame)
 {
 	aafInt64          nBytes;
-	aafInt64          temp, offset, one;
+	aafInt64          temp, offset, zero;
 	aafUInt32           bytesPerFrame;
 	
 	XPROTECT()
 	{
-		CvtInt32toInt64(1, &one);
+		CvtInt32toInt64(0, &zero);
 		temp = _sampleFrames;
 		CHECK(AddInt32toInt64(1, &temp));
 		if (Int64Greater(sampleFrame, temp))
@@ -938,10 +944,8 @@ CAAFAIFCCodec::Seek (aafPosition_t  sampleFrame)
 		
 		nBytes = sampleFrame;
 		
-		/* Make the result zero-based (& check for bad frame numbers as well). */
-		if(Int64Less(nBytes, one))
+		if(Int64Less(nBytes, zero))
 			RAISE(AAFRESULT_BADSAMPLEOFFSET);
-		CHECK(SubInt64fromInt64(one, &nBytes));
 		bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 		CHECK(MultInt32byInt64(bytesPerFrame, nBytes, &nBytes));
 		offset = _dataStartOffset;
@@ -1035,6 +1039,8 @@ CAAFAIFCCodec::WriteRawData (aafUInt32 nSamples, aafDataBuffer_t  buffer,
 							 aafUInt32  buflen)
 {
 	aafUInt32 bytesWritten;
+  	if(buflen < (nSamples * _bytesPerFrame))
+  		return AAFRESULT_SMALLBUF;
 	return _stream->Write (nSamples * _bytesPerFrame, buffer, &bytesWritten);
 }
 
@@ -1070,8 +1076,8 @@ CAAFAIFCCodec::ReadRawData (aafUInt32 nSamples,
 
 
 HRESULT STDMETHODCALLTYPE
-CAAFAIFCCodec::CreateDescriptorFromStream (IAAFEssenceStream * pStream,
-										   IAAFSourceMob *fileMob)
+CAAFAIFCCodec::CreateDescriptorFromStream (IAAFEssenceStream *  /*pStream*/,
+										   IAAFSourceMob * /*fileMob*/)
 {
 	return(AAFRESULT_NOT_IMPLEMENTED);
 }
@@ -1134,6 +1140,7 @@ CAAFAIFCCodec::PutEssenceFormat (IAAFEssenceFormat * pFormat)
 			{
 				XASSERT(bytesRead == sizeof(valueUInt32), AAFRESULT_INVALID_PARM_SIZE);
 				memcpy(&valueUInt32, buf, bytesRead);
+				XASSERT(valueUInt32 > 0, AAFRESULT_ZERO_SAMPLESIZE);
 				_bitsPerSample = (aafUInt16)valueUInt32;
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 			}
@@ -1147,6 +1154,7 @@ CAAFAIFCCodec::PutEssenceFormat (IAAFEssenceFormat * pFormat)
 			{
 				XASSERT(bytesRead == sizeof(valueUInt32), AAFRESULT_INVALID_PARM_SIZE);
 				memcpy(&valueUInt32, buf, bytesRead);
+				XASSERT(valueUInt32 > 0, AAFRESULT_CODEC_CHANNELS);
 				_numCh = (aafUInt16)valueUInt32;
 				_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 			}
@@ -1297,7 +1305,7 @@ CAAFAIFCCodec::GetLargestSampleSize (aafUID_constref dataDefID,
 
 HRESULT STDMETHODCALLTYPE
 CAAFAIFCCodec::MultiCreate (IAAFSourceMob *unk,
-							aafUID_constref flavour,
+							aafUID_constref /*flavour*/,
 							IAAFEssenceStream * stream,
 							aafCompressEnable_t compEnable,
 							aafUInt32 numParms,
