@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.6.2.10 2004/07/05 15:20:19 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.6.2.11 2004/08/12 15:22:49 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -856,6 +856,18 @@ const aafUID_t kAAFPropID_Header_IdentificationList =
 //{03010201-0400-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_Header_ObjectModelVersion =
 {0x03010201, 0x0400, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{01020203-0000-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_Header_OperationalPattern =
+{0x01020203, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{01020210-0201-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_Header_EssenceContainers =
+{0x01020210, 0x0201, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{01020210-0202-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_Header_DescriptiveSchemes =
+{0x01020210, 0x0202, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
 
 //{05200701-0201-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_Identification_CompanyName =

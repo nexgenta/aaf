@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.12.2.11 2004/07/05 15:20:19 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.12.2.12 2004/08/12 15:22:49 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -246,6 +246,9 @@ const int PID_Header_Dictionary                                  = 0x3B04;
 const int PID_Header_Version                                     = 0x3B05;
 const int PID_Header_IdentificationList                          = 0x3B06;
 const int PID_Header_ObjectModelVersion                          = 0x3B07;
+const int PID_Header_OperationalPattern                          = 0x3B09;
+const int PID_Header_EssenceContainers                           = 0x3B0A;
+const int PID_Header_DescriptiveSchemes                          = 0x3B0B;
 const int PID_Identification_CompanyName                         = 0x3C01;
 const int PID_Identification_ProductName                         = 0x3C02;
 const int PID_Identification_ProductVersion                      = 0x3C03;
