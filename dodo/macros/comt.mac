@@ -1,11 +1,11 @@
-#c /******************************************\
-#c *                                          *
-#c * Advanced Authoring Format                *
-#c *                                          *
-#c * Copyright (c) 1998 Avid Technology, Inc. *
-#c * Copyright (c) 1998 Microsoft Corporation *
-#c *                                          *
-#c \******************************************/
+#c /***********************************************\
+#c *                                               *
+#c * Advanced Authoring Format                     *
+#c *                                               *
+#c * Copyright (c) 1998-1999 Avid Technology, Inc. *
+#c * Copyright (c) 1998-1999 Microsoft Corporation *
+#c *                                               *
+#c \***********************************************/
 
 
 
@@ -28,15 +28,15 @@
 #c
 #startm AD_HEAD 00
 // @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
-/******************************************\\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\\******************************************/
+// @com This file implements the module test for C.this-module
+/***********************************************\\
+*                                               *
+* Advanced Authoring Format                     *
+*                                               *
+* Copyright (c) 1998-1999 Avid Technology, Inc. *
+* Copyright (c) 1998-1999 Microsoft Corporation *
+*                                               *
+\\***********************************************/
 #endm
 
 
@@ -53,55 +53,13 @@
 #error - improperly defined include guard
 #endif
 
-
-#include <iostream.h>
-
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_.this-module; // generated
+#include "AAFResult.h"
 
 
 HRESULT C.this-module::test()
 {
-  HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-  I.this-module *pObject = NULL;
-
-  try
-    {
-      // Attempt to create an .this-module.
-      hr =  CoCreateInstance(
-                             CLSID_.this-module,
-                             NULL, 
-                             CLSCTX_INPROC_SERVER, 
-                             IID_I.this-module, (void **)&pObject);
-      if (FAILED(hr))
-        {
-          cerr << "C.this-module::test...FAILED!";
-          cerr << hr;
-          cerr << "\\tCoCreateInstance(&CLSID_.this-module, NULL,"
-            " CLSCTX_INPROC_SERVER, &IID_I.this-module, ...);" <<
-              endl;
-          return hr;
-        }
-
-      // module-specific tests go here
-
-      if (pObject)
-        pObject->Release();
-      return AAFRESULT_NOT_IMPLEMENTED;
-
-    }
-  catch (...)
-    {
-      cerr << "C.this-module::test...Caught general C++"
-        " exception!" << endl; 
-    }
-
-  // Cleanup our object if it exists.
-  if (pObject)
-    pObject->Release();
-
-  return hr;
-}
+  return AAFRESULT_NOT_IMPLEMENTED;
+}\
 #endm
 
 
@@ -130,55 +88,13 @@ AD_CLASS_BEGIN\
 #error - improperly defined include guard
 #endif
 
-
-#include <iostream.h>
-
-// Temporarily necessary global declarations.
-extern "C" const CLSID CLSID_.this-module; // generated
+#include "AAFResult.h"
 
 
 HRESULT C.this-module::test()
 {
-  HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-  I.this-module *pObject = NULL;
-
-  try
-    {
-      // Attempt to create an .this-module.
-      hr =  CoCreateInstance(
-                             CLSID_.this-module,
-                             NULL, 
-                             CLSCTX_INPROC_SERVER, 
-                             IID_I.this-module, (void **)&pObject);
-      if (FAILED(hr))
-        {
-          cerr << "C.this-module::test...FAILED!";
-          cerr << hr; 
-          cerr << "\\tCoCreateInstance(&CLSID_.this-module, NULL,"
-            " CLSCTX_INPROC_SERVER, &IID_I.this-module, ...);" <<
-              endl;
-          return hr;
-        }
-
-      // module-specific tests go here
-
-      if (pObject)
-        pObject->Release();
-      return AAFRESULT_NOT_IMPLEMENTED;
-
-    }
-  catch (...)
-    {
-      cerr << "C.this-module::test...Caught general C++"
-        " exception!" << endl;
-    }
-
-  // Cleanup our object if it exists.
-  if (pObject)
-    pObject->Release();
-
-  return hr;
-}
+  return AAFRESULT_NOT_IMPLEMENTED;
+}\
 #endm
 
 
@@ -253,6 +169,15 @@ HRESULT C.this-module::test()
 #endm
 
 #startm AD_XMETHOD_11 57
+#endm
+
+#startm AD_X2METHOD3 20
+#endm
+
+#startm AD_X2METHOD4 26
+#endm
+
+#startm AD_X2METHOD5 32
 #endm
 
 #startm AD_CLASS_END 00
@@ -455,4 +380,116 @@ AD_CLASS_END\
 #c Declaration for the dictionary's factory method.
 #c
 #startm AD_DICTIONARY_FACTORY 02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c Begining of the module definitions
+#c
+#startm AD_MODULE_BEGIN 02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c End of the module definitions
+#c
+#startm AD_MODULE_END 00
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a function which takes no arguments.
+#c
+#c Argument1: function name
+#c Argument2: function description
+#c
+#startm AD_FUNCTION0 02
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a function which takes one argument.
+#c
+#c Macro Arg 01: function name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt	
+#c ----------   ----------   ---------   ----    ----    --------
+#c metharg 1    02           03          04      05      06
+#c
+#c Macro Arg 07: function description
+#c
+#startm AD_XFUNCTION1 07
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a function which takes two arguments.
+#c
+#c Macro Arg 01: function name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
+#c ----------   ----------   ---------   ----    ----    --------
+#c metharg 1    02           03          04      05      06
+#c metharg 2    07           08          09      10      11
+#c
+#c Macro Arg 12: function description
+#c
+#startm AD_XFUNCTION2 12
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a function which takes three arguments.
+#c
+#c Macro Arg 01: function name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
+#c ----------   ----------   ---------   ----    ----    --------
+#c metharg 1    02           03          04      05      06
+#c metharg 2    07           08          09      10      11
+#c metharg 3    12           13          14      15      16
+#c
+#c Macro Arg 17: function description
+#c
+#startm AD_XFUNCTION3 17
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Inserts declaration for a function which takes four arguments.
+#c
+#c Macro Arg 01: function name
+#c
+#c Macro arguments 02+:
+#c 
+#c meth arg #   arg modfrs   obj style   type    name    arg cmnt
+#c ----------   ----------   ---------   ----    ----    --------
+#c metharg 1    02           03          04      05      06
+#c metharg 2    07           08          09      10      11
+#c metharg 3    12           13          14      15      16
+#c metharg 4    17           18          19      20      21
+#c
+#c Macro Arg 22: function description
+#c
+#startm AD_XFUNCTION4 22
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c macro for things which are not to be exported.
+#c
+#startm AD_NO_EXPORT 01
+%01\
 #endm
