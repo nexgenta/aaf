@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObject.h,v 1.19.2.1 2004/07/23 17:20:04 tbingham Exp $ $Name:  $
+// $Id: OMXMLStoredObject.h,v 1.19.2.2 2004/07/23 17:35:35 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,7 @@
 
 class OMSimpleProperty;
 class OMDataVector;
+class OMDataSet;
 class OMDataStream;
 class OMStrongReference;
 class OMStrongReferenceSet;
@@ -116,6 +117,10 @@ public:
     //          <c OMXMLStoredObject>.
   virtual void save(const OMDataVector& property);
 
+    // @cmember Save the <c OMDataSet> <p property> in this
+    //          <c OMXMLStoredObject>.
+  virtual void save(const OMDataSet& property);
+
     // @cmember Save the <c OMStrongReference> <p singleton> in this
     //          <c OMXMLStoredObject>.
   virtual void save(const OMStrongReference& singleton);
@@ -174,6 +179,13 @@ public:
     //   @devnote The externalSize argument to this member function doesn't
     //            make sense for all derived instances of <c OMStoredObject>.
   virtual void restore(OMDataVector& property,
+                       size_t externalSize);
+
+    // @cmember Restore the <c OMDataSet> <p property> into this
+    //          <c OMXMLStoredObject>.
+    //   @devnote The externalSize argument to this member function doesn't
+    //            make sense for all derived instances of <c OMStoredObject>.
+  virtual void restore(OMDataSet& property,
                        size_t externalSize);
 
     // @cmember Restore the <c OMStrongReference> <p singleton> into this
