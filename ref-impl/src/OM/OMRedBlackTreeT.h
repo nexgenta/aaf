@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-1999 Avid Technology, Inc.
+*              Copyright (c) 1998-2000 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -101,6 +101,9 @@ OMRedBlackTree<Key, Value>::~OMRedBlackTree(void)
 
   // @mfunc Insert the <p Value> <p v> into this
   //         <c OMRedBlackTree> and associate it with <p Key> <p k>.
+  //         If this the first instance of an item identified
+  //         by <p Key> <p k> in this <c OMRedBlackTree>, the result
+  //         is true, otherwise the result is false.
   //   @tcarg class | Key  | The type of the unique key used to identify
   //          elements. This type must support operator =, operator !=
   //          and operator <lt>.
@@ -507,7 +510,7 @@ bool OMRedBlackTree<Key, Value>::insert(Node* n, Key k, Value v)
       n = n->_right;
     }
   }
-  
+
   if (n == _nil) {
     // There is no existing node with this key, create one
     result = true;
