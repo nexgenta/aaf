@@ -28,6 +28,7 @@
 #include "extensionUtils.h"
 #include "AAF.h"
 #include <assert.h>
+#include "AAFStoredObjectIDs.h"
 
 #if defined(_MAC) || defined(macintosh)
 #include <wstring.h>
@@ -35,7 +36,33 @@
 
 #include <iostream.h>
 
+bool classDefinitionIsA ( IAAFClassDef *pClassDefQuery,
+							   const aafUID_t targetAUID)
+{
+	IAAFDefObject *pDefObject;
+	check(pClassDefQuery->QueryInterface(IID_IAAFDefObject,(void **)&pDefObject));
+	aafUID_t testAUID;
+	check(pDefObject->GetAUID(&testAUID));
+	pDefObject->Release();
+	pDefObject=NULL;
+    if (!memcmp (&testAUID, &targetAUID, sizeof (aafUID_t)))
+	{
+		// AUIDs match
+		return true;
+	} else if (!memcmp(&testAUID, (aafUID_t *) &AUID_AAFInterchangeObject, sizeof(aafUID_t)))
+	{
+		return false;
+	}
 
+	// Get parent class
+	IAAFClassDef *pParentClass=NULL;
+	check(pClassDefQuery->GetParent(&pParentClass));
+	bool classMatch=false;
+	classMatch= classDefinitionIsA( pParentClass, targetAUID);
+	pParentClass->Release();
+	pParentClass=NULL;
+	return classMatch;
+}
 
 //
 // Temporarily (?) only used to print out the role enum.
@@ -101,20 +128,20 @@ void PrintRole (IAAFDictionary * pDict,
 {
   assert (pDict);
   IAAFTypeDef *ptd=NULL;
-  check (pDict->LookupType ((aafUID_t*) &kTypeID_eRole, &ptd));
+  check (pDict->LookupType (kTypeID_eRole, &ptd));
 
   IAAFTypeDefExtEnum *ptde=NULL;
   check (ptd->QueryInterface (IID_IAAFTypeDefExtEnum, (void **)&ptde));
 
   aafUInt32 nameLen = 0;
-  check (ptde->GetNameBufLenFromAUID ((aafUID_t*) &role, &nameLen));
+  check (ptde->GetNameBufLenFromAUID (role, &nameLen));
   assert (nameLen);
 
   aafCharacter *buf = 0;
   buf = new aafCharacter[nameLen];
   assert (buf);
 
-  check (ptde->GetNameFromAUID ((aafUID_t*) &role, buf, nameLen));
+  check (ptde->GetNameFromAUID (role, buf, nameLen));
 
   cout << buf;
 
@@ -158,7 +185,7 @@ void PrintPersonnelResources (IAAFDictionary * pDict,
   // Use the class definition to get the definition for the Personnel
   // property.
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelMob_Personnel,
+  check (cd->LookupPropertyDef (kPropID_PersonnelMob_Personnel,
 								&pd));
 
   // Get the property value for the array of personnel objects
@@ -267,7 +294,7 @@ void PersonnelRecordSetName (IAAFObject * pObj,
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_Name,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_Name,
 								&pd));
 
   IAAFPropertyValue *pv=NULL;
@@ -305,7 +332,7 @@ aafUInt32 PersonnelRecordGetNameBufLen (IAAFObject * pObj)
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_Name,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_Name,
 								&pd));
 
   IAAFPropertyValue *pv=NULL;
@@ -348,7 +375,7 @@ void PersonnelRecordGetName (IAAFObject * pObj,
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_Name,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_Name,
 								&pd));
 
   IAAFPropertyValue *pv=NULL;
@@ -386,7 +413,7 @@ void PersonnelRecordSetRole (IAAFObject * pObj,
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_Role,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_Role,
 								&pd));
 
   IAAFPropertyValue *pv=NULL;
@@ -398,7 +425,7 @@ void PersonnelRecordSetRole (IAAFObject * pObj,
   IAAFTypeDefExtEnum *tde=NULL;
   check (td->QueryInterface (IID_IAAFTypeDefExtEnum, (void **)&tde));
 
-  check (tde->SetAUIDValue (pv, &role));
+  check (tde->SetAUIDValue (pv, role));
   check (pObj->SetPropertyValue (pd, pv));
   cd->Release();
   cd=NULL;
@@ -422,7 +449,7 @@ eRole PersonnelRecordGetRole (IAAFObject * pObj)
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_Role,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_Role,
 								&pd));
 
   IAAFPropertyValue *pv=NULL;
@@ -458,7 +485,7 @@ void PersonnelRecordSetContractID (IAAFObject * pObj,
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_ContractID,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_ContractID,
 								&pd));
 
   IAAFTypeDef *td=NULL;
@@ -493,7 +520,7 @@ bool PersonnelRecordContractIDIsPresent (IAAFObject * pObj)
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_ContractID,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_ContractID,
 								&pd));
 
   check (pObj->IsPropertyPresent (pd, &r));
@@ -516,7 +543,7 @@ contractID_t PersonnelRecordGetContractID (IAAFObject * pObj)
   check (pObj->GetDefinition (&cd));
 
   IAAFPropertyDef *pd=NULL;
-  check (cd->LookupPropertyDef ((aafUID_t*) &kPropID_PersonnelResource_ContractID,
+  check (cd->LookupPropertyDef (kPropID_PersonnelResource_ContractID,
 								&pd));
 
   IAAFPropertyValue *pv=NULL;
