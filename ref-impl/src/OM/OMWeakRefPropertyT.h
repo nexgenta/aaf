@@ -66,8 +66,10 @@ void OMWeakReferenceProperty<ReferencedObject>::getValue(
   PRECONDITION("Optional property is present",
                                            IMPLIES(isOptional(), isPresent()));
 
-  ReferencedObject* result = _reference.getValue(set());
-
+  ReferencedObject* result = _reference.pointer();
+  if (result == 0) {
+    result = _reference.getValue(set());
+  }
   object = result;
 
 }
@@ -117,14 +119,22 @@ template<typename ReferencedObject>
 ReferencedObject*
 OMWeakReferenceProperty<ReferencedObject>::operator -> (void)
 {
-  return _reference.getValue(set());
+  ReferencedObject* result = _reference.pointer();
+  if (result == 0) {
+    result = _reference.getValue(set());
+  }
+  return result;
 }
 
 template<typename ReferencedObject>
 const ReferencedObject*
 OMWeakReferenceProperty<ReferencedObject>::operator -> (void) const
 {
-  return _reference.getValue(set());
+  ReferencedObject* result = _reference.pointer();
+  if (result == 0) {
+    result = _reference.getValue(set());
+  }
+  return result;
 }
 
   // @mfunc Type conversion. Convert an
@@ -212,6 +222,29 @@ void OMWeakReferenceProperty<ReferencedObject>::restore(size_t externalSize)
 
   POSTCONDITION("Target names match",
                          strcmp(_targetName, _reference.targetName(tag)) == 0);
+}
+
+  // @mfunc  Is this <c OMWeakReferenceProperty> void ?
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable>.
+  //   @rdesc True if this <c OMWeakReferenceProperty> is void, false
+  //          otherwise
+  //   @this const
+template<typename ReferencedObject>
+bool OMWeakReferenceProperty<ReferencedObject>::isVoid(void) const
+{
+  TRACE("OMWeakReferenceProperty<ReferencedObject>::isVoid");
+
+  bool result;
+  const OMUniqueObjectIdentification& key = _reference.identification();
+  if (key == nullOMUniqueObjectIdentification) {
+    result = true;
+  } else {
+    result = false;
+  }
+
+  return result;
 }
 
   // @mfunc Get the raw bits of this <c OMWeakReferenceProperty>. The raw bits
