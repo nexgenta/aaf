@@ -1,5 +1,5 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFPluginDescriptor
+// @com This file implements the module test for CAAFPluginDef
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -36,6 +36,7 @@
 
 static wchar_t *manuf1URL = L"www.microsoft.com";
 static wchar_t *manuf2URL = L"www.avid.com";
+static wchar_t *manuf3URL = L"www.softimage.com";
 
 #include <iostream.h>
 #include <stdlib.h>
@@ -47,6 +48,7 @@ static wchar_t *manuf2URL = L"www.avid.com";
 #include "AAFResult.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
+#include "AAFClassDefUIDs.h"
 #include "aafUtils.h"
 
 #include "CAAFBuiltinDefs.h"
@@ -109,13 +111,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	aafProductIdentification_t	ProductInfo;
 	HRESULT						hr = AAFRESULT_SUCCESS;
 
+	aafProductVersion_t v;
+	v.major = 1;
+	v.minor = 0;
+	v.tertiary = 0;
+	v.patchLevel = 0;
+	v.type = kAAFVersionUnknown;
 	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFPluginDescriptor Test";
-	ProductInfo.productVersion.major = 1;
-	ProductInfo.productVersion.minor = 0;
-	ProductInfo.productVersion.tertiary = 0;
-	ProductInfo.productVersion.patchLevel = 0;
-	ProductInfo.productVersion.type = kAAFVersionUnknown;
+	ProductInfo.productName = L"AAFPluginDef Test";
+	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.platform = NULL;
@@ -155,15 +159,14 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   IAAFDictionary*	pDictionary = NULL;
   IAAFDefObject*	pPlugDef = NULL;
   IAAFCodecDef*		pCodecDef = NULL;
-  IAAFPluginDescriptor *pDesc = NULL;
-  IAAFNetworkLocator *pNetLoc = NULL, *pNetLoc2 = NULL, *pNetLoc3 = NULL;
-  IAAFLocator		*pLoc = NULL, *pLoc2 = NULL, *pLoc3 = NULL;
+  IAAFPluginDef *pDesc = NULL;
+  IAAFClassDef *pClassDef = NULL;
+  IAAFNetworkLocator *pNetLoc = NULL;
+  IAAFLocator		*pLoc = NULL;
   aafUID_t			category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
   bool				bFileOpen = false;
   aafUInt32			numLocators;
 	HRESULT			hr = S_OK;
-/*	long			test;
-*/
 
   try
   {
@@ -182,8 +185,8 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	checkResult(defs.cdCodecDef()->
 				CreateInstance(IID_IAAFDefObject, 
 							   (IUnknown **)&pPlugDef));
-	checkResult(defs.cdPluginDescriptor()->
-				CreateInstance(IID_IAAFPluginDescriptor, 
+	checkResult(defs.cdPluginDef()->
+				CreateInstance(IID_IAAFPluginDef, 
 							   (IUnknown **)&pDesc));
 	checkResult(defs.cdNetworkLocator()->
 				CreateInstance(IID_IAAFNetworkLocator, 
@@ -221,45 +224,56 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  /**/
 	checkResult(defs.cdNetworkLocator()->
 				CreateInstance(IID_IAAFNetworkLocator, 
-							   (IUnknown **)&pNetLoc2));
-	checkResult(pNetLoc2->QueryInterface (IID_IAAFLocator,
-                                          (void **)&pLoc2));
-	checkResult(pLoc2->SetPath (manuf2URL));
-    checkResult(pDesc->AppendLocator(pLoc2));
+							   (IUnknown **)&pNetLoc));
+	checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
+                                          (void **)&pLoc));
+	checkResult(pLoc->SetPath (manuf3URL));
+    checkResult(pDesc->AppendLocator(pLoc));
 	/**/
-	checkResult(pPlugDef->AppendPluginDef(pDesc));
+	checkResult(pDesc->SetDefinitionObjectID(CODEC_DEF_ID));
 
 	
 	checkResult(pPlugDef->QueryInterface (IID_IAAFCodecDef,
                                           (void **)&pCodecDef));
     checkResult(pCodecDef->Initialize (CODEC_DEF_ID, L"Test", L"Really, just a test."));
 	checkResult(pCodecDef->AddEssenceKind (defs.ddMatte()));
+	checkResult(pDictionary->LookupClassDef(kAAFClassID_EssenceDescriptor, &pClassDef));
+	checkResult(pCodecDef->SetFileDescriptorClass (pClassDef));
 	checkResult(pDictionary->RegisterCodecDef(pCodecDef));
 	/**/
 	checkResult(defs.cdNetworkLocator()->
 				CreateInstance(IID_IAAFNetworkLocator, 
-							   (IUnknown **)&pNetLoc3));
-	checkResult(pNetLoc3->QueryInterface (IID_IAAFLocator,
-                                          (void **)&pLoc3));
-	checkResult(pLoc3->SetPath (manuf1URL));
-    checkResult(pDesc->PrependLocator(pLoc3));
-	pLoc3->Release();
-	pLoc3 = NULL;
-	// Create a second locator, check for three locators, then delete it and recheck for two.
+							   (IUnknown **)&pNetLoc));
+	checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
+                                          (void **)&pLoc));
+	checkResult(pLoc->SetPath (manuf1URL));
+    checkResult(pDesc->PrependLocator(pLoc));
+	pLoc->Release();
+	pLoc = NULL;
+	// Create a third locator, check for three locators, then delete it and recheck for two.
 	checkResult(defs.cdNetworkLocator()->
 				CreateInstance(IID_IAAFNetworkLocator, 
-							   (IUnknown **)&pNetLoc3));
-	checkResult(pNetLoc3->QueryInterface (IID_IAAFLocator,
-                                          (void **)&pLoc3));
-	checkResult(pLoc3->SetPath (manuf1URL));
-    checkResult(pDesc->AppendLocator(pLoc3));
-	pLoc3->Release();
-	pLoc3 = NULL;
+							   (IUnknown **)&pNetLoc));
+	checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
+                                          (void **)&pLoc));
+	checkResult(pLoc->SetPath (manuf1URL));
+    checkResult(pDesc->AppendLocator(pLoc));
+	pLoc->Release();
+	pLoc = NULL;
     checkResult(pDesc->CountLocators (&numLocators));
 	checkExpression(3 == numLocators, AAFRESULT_TEST_FAILED);
     checkResult(pDesc->RemoveLocatorAt(2));
     checkResult(pDesc->CountLocators (&numLocators));
 	checkExpression(2 == numLocators, AAFRESULT_TEST_FAILED);
+
+	// Now create a new locator and add it using InsertLocatorAt()
+	checkResult(defs.cdNetworkLocator()->
+				CreateInstance(IID_IAAFNetworkLocator, 
+							   (IUnknown **)&pNetLoc));
+	checkResult(pNetLoc->QueryInterface (IID_IAAFLocator,
+                                          (void **)&pLoc));
+	checkResult(pLoc->SetPath (manuf2URL));
+    checkResult(pDesc->InsertLocatorAt(1,pLoc));
   }
   catch (HRESULT& rResult)
   {
@@ -274,23 +288,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
   if (pPlugDef)
     pPlugDef->Release();
 
+  if (pClassDef)
+    pClassDef->Release();
+
+
   if (pNetLoc)
     pNetLoc->Release();
 
-  if (pNetLoc2)
-    pNetLoc2->Release();
-
-  if (pNetLoc3)
-    pNetLoc3->Release();
-
   if (pLoc)
     pLoc->Release();
-
-  if (pLoc2)
-    pLoc2->Release();
-
-  if (pLoc3)
-    pLoc3->Release();
 
   if (pCodecDef)
     pCodecDef->Release();
@@ -322,8 +328,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFCodecDefs *pEnumPluggable = NULL;
 	IAAFCodecDef *pCodecDef = NULL;
 	IAAFDefObject *pDefObj = NULL;
-	IEnumAAFPluginDescriptors *pEnumDesc;
-	IAAFPluginDescriptor *pPlugin = NULL;
+	IEnumAAFPluginDefs *pEnumDesc;
+	IAAFPluginDef *pPlugin = NULL;
 	IAAFNetworkLocator	*pNetLoc = NULL;
 	IAAFLocator			*pLoc = NULL;
 	IEnumAAFPluginLocators *pEnumLoc = NULL;
@@ -349,10 +355,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		checkResult(pHeader->GetDictionary(&pDictionary));
 	
-		checkResult(pDictionary->GetCodecDefs(&pEnumPluggable));
-		checkResult(pEnumPluggable->NextOne (&pCodecDef));
-		checkResult(pCodecDef->QueryInterface (IID_IAAFDefObject, (void **)&pDefObj));
-		checkResult(pDefObj->GetPluginDefs (&pEnumDesc));
+		checkResult(pDictionary->GetPluginDefs (&pEnumDesc));
 		checkResult(pEnumDesc->NextOne (&pPlugin));
 
 	  
@@ -403,18 +406,47 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		/**/
 		checkResult(pPlugin->CountLocators(&count));
-		checkExpression (count == 2, AAFRESULT_TEST_FAILED);
+		checkExpression (count == 3, AAFRESULT_TEST_FAILED);
+
+		/* Verify using enumerator */
 		checkResult(pPlugin->GetLocators(&pEnumLoc));
 
 		checkResult(pEnumLoc->NextOne (&pLoc));
  		checkResult(pLoc->GetPath (testString, sizeof(testString)));
 		checkExpression (wcscmp(testString, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
-
-		pLoc->Release(); // this local variable was already has a reference that must be released!
+		pLoc->Release();
 		pLoc = NULL;
+
 		checkResult(pEnumLoc->NextOne (&pLoc));
  		checkResult(pLoc->GetPath (testString, sizeof(testString)));
 		checkExpression (wcscmp(testString, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
+		pLoc->Release();
+		pLoc = NULL;
+
+		checkResult(pEnumLoc->NextOne (&pLoc));
+ 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manuf3URL) == 0, AAFRESULT_TEST_FAILED);
+		pLoc->Release();
+		pLoc = NULL;
+
+		/* Verify using GetLocatorAt() */
+		checkResult(pPlugin->GetLocatorAt(0,&pLoc));
+ 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manuf1URL) == 0, AAFRESULT_TEST_FAILED);
+		pLoc->Release();
+		pLoc = NULL;
+
+		checkResult(pPlugin->GetLocatorAt(1,&pLoc));
+ 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manuf2URL) == 0, AAFRESULT_TEST_FAILED);
+		pLoc->Release();
+		pLoc = NULL;
+
+		checkResult(pPlugin->GetLocatorAt(2,&pLoc));
+ 		checkResult(pLoc->GetPath (testString, sizeof(testString)));
+		checkExpression (wcscmp(testString, manuf3URL) == 0, AAFRESULT_TEST_FAILED);
+		pLoc->Release();
+		pLoc = NULL;
 		
 		checkResult(pPlugin->IsSoftwareOnly(&testBool));
  		checkExpression(testBool == kAAFTrue, AAFRESULT_TEST_FAILED);
@@ -469,10 +501,10 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 }
  
 
-extern "C" HRESULT CAAFPluginDescriptor_test()
+extern "C" HRESULT CAAFPluginDef_test()
 {
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
-	aafWChar * pFileName = L"AAFPluginDescriptorTest.aaf";
+	aafWChar * pFileName = L"AAFPluginDefTest.aaf";
 
 	try
 	{
@@ -482,7 +514,9 @@ extern "C" HRESULT CAAFPluginDescriptor_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFPluginDescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFPluginDef_test..."
+			 << "Caught general C++ exception!" << endl; 
+		hr = AAFRESULT_TEST_FAILED;
 	}
 
 	return hr;
