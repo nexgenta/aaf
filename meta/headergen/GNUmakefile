@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.10 2004/02/27 15:43:02 phil_tudor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10.2.1 2004/03/11 17:30:26 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,7 @@ PROGS=classDefUid$(EXE) \
 
 # main build target
 all : $(PROGS) \
+        $(GEN_H_DIR) \
         $(GEN_H_DIR)/AAFClassDefUIDs.h \
         $(GEN_H_DIR)/AAFExtEnum.h \
         $(GEN_H_DIR)/AAFPropertyDefs.h \
@@ -94,6 +95,9 @@ typeDefUid$(OBJ) : typeDefUid.cpp headerGenUtils.h \
 	$(COMPILE) $(COMPILEFLAGS) -c $< -o $@
 
 # targets for generated source files
+$(GEN_H_DIR) :
+	mkdir $(GEN_H_DIR)
+
 $(GEN_H_DIR)/AAFClassDefUIDs.h : classDefUid$(EXE)
 	./classDefUid AAFClassDefUIDs > $(GEN_H_DIR)/AAFClassDefUIDs.h
 
