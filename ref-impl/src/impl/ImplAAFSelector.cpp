@@ -29,6 +29,7 @@
 #include "AAFResult.h"
 #include "aafCvt.h"
 #include "AAFUtils.h"
+#include "ImplAAFMob.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
 
@@ -43,24 +44,19 @@ ImplAAFSelector::ImplAAFSelector () :
 
 ImplAAFSelector::~ImplAAFSelector ()
 {
-	ImplAAFSegment*		pSegment = NULL;
-	size_t				size;
-
-	if (_selected != NULL)
+	ImplAAFSegment *selected = _selected.setValue(0);
+	if (selected != NULL)
 	{
-		_selected->ReleaseReference();
-		_selected = NULL;
+		selected->ReleaseReference();
 	}
 
-	_alternates.getSize(size);
-	for (size_t i = 0; i <size; i++)
+	size_t size = _alternates.getSize();
+	for (size_t i = 0; i < size; i++)
 	{
-		_alternates.getValueAt(pSegment, i);
+		ImplAAFSegment* pSegment = _alternates.setValueAt(0, i);
 		if (pSegment)
 		{
 			pSegment->ReleaseReference();
-			pSegment = NULL;
-			_alternates.setValueAt(pSegment, i);
 		}
 	}
 }
@@ -213,37 +209,15 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSelector::EnumAlternateSegments (ImplEnumAAFSegments** ppEnum)
 {
-	ImplEnumAAFSegments*	theEnum = NULL;
-	HRESULT					hr = AAFRESULT_SUCCESS;
+	if(ppEnum == NULL)
+		return(AAFRESULT_NULL_PARAM);
 
-	if (ppEnum == NULL)
-	{
-		hr = AAFRESULT_NULL_PARAM;
-	}
-	else
-	{
-		theEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
-		if (theEnum == NULL)
-		{
-			hr = E_FAIL;
-		}
-		else
-		{
-			hr = theEnum->SetEnumSelector(this);
-			if (SUCCEEDED(hr))
-			{
-				theEnum->Reset();
-				*ppEnum = theEnum;
-			}
-			else
-			{
-				theEnum->ReleaseReference();
-				*ppEnum = NULL;
-			}
-		}
-	}
+	*ppEnum = (ImplEnumAAFSegments *)CreateImpl(CLSID_EnumAAFSegments);
+	if(*ppEnum == NULL)
+		return(AAFRESULT_NOMEMORY);
+	(*ppEnum)->SetEnumStrongProperty(this, &_alternates);
 
-	return hr;
+	return(AAFRESULT_SUCCESS);
 }
 
 //***********************************************************
@@ -281,6 +255,62 @@ AAFRESULT
 }
 
 
+
+AAFRESULT
+	ImplAAFSelector::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
+										ImplAAFMob *mob, ImplAAFMobSlot *track,
+										aafMediaCriteria_t *mediaCrit,
+										aafPosition_t currentObjPos,
+										aafOperationChoice_t *effectChoice,
+										ImplAAFComponent	*prevObject,
+										ImplAAFComponent *nextObject,
+										ImplAAFScopeStack *scopeStack,
+										aafPosition_t *diffPos, aafLength_t *minLength,
+										ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
+										ImplAAFComponent **foundObj, aafBool *foundTransition)
+{  
+	ImplAAFSegment		*selected = NULL;
+	ImplAAFComponent	*tmpFound = NULL;
+	aafLength_t	tmpMinLen;
+	
+	XPROTECT()
+	{
+	*foundObj = NULL;
+	
+	  CHECK(GetSelectedSegment(&selected));
+	  if (selected)
+		{
+		  CHECK(mob->MobFindLeaf(track, mediaCrit, effectChoice,
+							selected, rootPos, rootLen,
+							prevObject, nextObject, 
+							scopeStack, 
+							currentObjPos, &tmpFound, &tmpMinLen, foundTransition,
+							effeObject, nestDepth, diffPos));
+		  if (tmpFound)
+			{
+			  *foundObj = tmpFound;
+			  if (Int64Less(tmpMinLen, rootLen))
+				*minLength = tmpMinLen;
+			  else
+				*minLength = rootLen;
+			}
+		  else
+			{
+			  RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+			}
+		}
+	  else
+		{
+		  RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+		}
+	} /* XPROTECT */
+  XEXCEPT
+	{
+	}
+  XEND;
+
+  return(AAFRESULT_SUCCESS);
+}
 
 OMDEFINE_STORABLE(ImplAAFSelector, AUID_AAFSelector);
 
