@@ -62,10 +62,10 @@ extern "C" const aafClassID_t CLSID_AAFSourceClip;
 extern "C" const aafClassID_t CLSID_AAFFindSourceInfo;
 
 ImplAAFMob::ImplAAFMob ()
-: _mobID(			PID_Mob_MobID,			"Mob ID"),
+: _mobID(			PID_Mob_MobID,			"MobID"),
   _name(			PID_Mob_Name,			"Name"),
-  _creationTime(    PID_Mob_CreationTime,	"Creation Time"),
-  _lastModified(    PID_Mob_LastModified,		"Last Modified"),
+  _creationTime(    PID_Mob_CreationTime,	"CreationTime"),
+  _lastModified(    PID_Mob_LastModified,		"LastModified"),
   _slots(			PID_Mob_Slots,			"Slots")
 {
 	_persistentProperties.put(_mobID.address());
@@ -110,10 +110,13 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::AppendSlot
         (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
 {
+	AAFRESULT aafError = AAFRESULT_SUCCESS;
+
 	if (NULL == pSlot)
 		return AAFRESULT_NULL_PARAM;
 
-  return AAFRESULT_NOT_IMPLEMENTED;
+	_slots.appendValue(pSlot);
+	return aafError;
 }
 
 //****************
@@ -266,6 +269,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
+	  if (inFile())
+          {
 		hr = MyHeadObject(&head);
 		if(hr == AAFRESULT_SUCCESS)
 		{			
@@ -293,12 +298,11 @@ AAFRESULT STDMETHODCALLTYPE
 			head->ReleaseReference();
 			head = NULL;
 		}
-		else if (hr == AAFRESULT_NOT_IN_FILE)
-		{
-			_mobID = *newMobID;
-		}
 		else
 			RAISE(hr);
+	  }
+          else
+		 _mobID = *newMobID;
 
 	} /* XPROTECT */
 	XEXCEPT
