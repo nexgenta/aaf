@@ -1,29 +1,11 @@
-/***********************************************************************
- *
- *              Copyright (c) 1998-1999 Avid Technology, Inc.
- *
- * Permission to use, copy and modify this software and accompanying 
- * documentation, and to distribute and sublicense application software
- * incorporating this software for any purpose is hereby granted, 
- * provided that (i) the above copyright notice and this permission
- * notice appear in all copies of the software and related documentation,
- * and (ii) the name Avid Technology, Inc. may not be used in any
- * advertising or publicity relating to the software without the specific,
- * prior written permission of Avid Technology, Inc.
- *
- * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
- * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
- * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
- * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
- * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
- * LIABILITY.
- *
- ************************************************************************/
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 #include "CAAFEssenceFileContainer.h"
 #include "CAAFEssenceFileStream.h"
@@ -33,7 +15,6 @@
 #include "AAFDefUIDs.h"
 #include "aafErr.h"
 #include "AAFStoredObjectIDs.h"
-#include "AAFContainerDefs.h"
 
 #include <errno.h>
 
@@ -155,21 +136,8 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetNumDefinitions (aafInt32 *pDefCount)
+    CAAFEssenceFileContainer::GetPluggableID (aafUID_t *uid)
 {
-	if(pDefCount == NULL)
-		return AAFRESULT_NULL_PARAM;
-	
-	*pDefCount = 1;
-	return AAFRESULT_SUCCESS;
-}
-
-HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionID (aafInt32 index, aafUID_t *uid)
-{
-	if(uid == NULL)
-		return AAFRESULT_NULL_PARAM;
-
 	*uid = ContainerFile;		// UID of the DefObject
 	return AAFRESULT_SUCCESS;
 }
@@ -183,25 +151,22 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::GetIndexedDefinitionObject (aafInt32 index, IAAFDictionary *dict, IAAFDefObject **def)
+    CAAFEssenceFileContainer::GetDefinitionObject (IAAFDictionary *dict, IAAFDefObject **def)
 {
 	aafUID_t			uid;
 	IAAFContainerDef	*container = NULL;
-    IAAFClassDef        *pcd = 0;
-
-	if((dict == NULL) || (def == NULL))
-		return AAFRESULT_NULL_PARAM;
-
+	IAAFDefObject		*obj = NULL;
 	XPROTECT()
 	{
-		CHECK(dict->LookupClassDef(AUID_AAFContainerDef, &pcd));
-		CHECK(pcd->CreateInstance(IID_IAAFContainerDef, 
-								  (IUnknown **)&container));
-		pcd->Release();
-		pcd = 0;
+		CHECK(dict->CreateInstance(&AUID_AAFContainerDef,
+							IID_IAAFContainerDef, 
+							(IUnknown **)&container));
 		uid = ContainerFile;
 		CHECK(container->SetEssenceIsIdentified(AAFFalse));
-		CHECK(container->Initialize(uid, L"Raw file Container", L"Essence is in a non-container file."));
+		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)&obj));
+		CHECK(obj->Init(&uid, L"Raw file Container", L"Essence is in a non-container file."));
+		obj->Release();
+		obj = NULL;
 		CHECK(container->QueryInterface(IID_IAAFDefObject, (void **)def));
 		container->Release();
 		container = NULL;
@@ -209,15 +174,9 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(container != NULL)
-		  {
 			container->Release();
-			container = 0;
-		  }
-		if (pcd)
-		  {
-			pcd->Release();
-			pcd = 0;
-		  }
+		if(obj != NULL)
+			obj->Release();
 	}
 	XEND
 
@@ -225,6 +184,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
+//!!!Need some real values for the descriptor
 static wchar_t *manufURL = L"http://www.avid.com";
 static wchar_t *downloadURL = L"ftp://ftp.avid.com/pub/";
 const aafUID_t MANUF_JEFFS_PLUGINS = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
@@ -234,28 +194,31 @@ static wchar_t *manufName = L"Avid Technology, Inc.";
 static wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
+    CAAFEssenceFileContainer::GetDescriptor (IAAFDictionary *dict, IAAFPluginDescriptor **descPtr)
 {
 	IAAFPluginDescriptor	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
 	IAAFNetworkLocator		*pNetLoc = NULL;
-	IAAFClassDef            *pcd = 0;
+	IAAFDefObject			*defObject = NULL;
+	aafUID_t				category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
+	aafUID_t				plugID = EXAMPLE_FILE_PLUGIN;
 	
 	XPROTECT()
 	{
-	    CHECK(dict->LookupClassDef(AUID_AAFPluginDescriptor, &pcd));
-		CHECK(pcd->CreateInstance(IID_IAAFPluginDescriptor, 
-								  (IUnknown **)&desc));
-		pcd->Release();
-		pcd = 0;
+		CHECK(dict->CreateInstance(&AUID_AAFPluginDescriptor,
+			IID_IAAFPluginDescriptor, 
+			(IUnknown **)&desc));
 		*descPtr = desc;
-		CHECK(desc->Initialize(EXAMPLE_FILE_PLUGIN, L"Essence File Container", L"Handles non-container files."));
+		CHECK(desc->QueryInterface(IID_IAAFDefObject, (void **)&defObject));
+		CHECK(defObject->Init(&plugID, L"Essence File Container", L"Handles non-container files."));
+		defObject->Release();
+		defObject = NULL;
 
-		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
+		CHECK(desc->SetCategoryClass(&category));
 		CHECK(desc->SetPluginVersionString(manufRev));
-		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
-		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
-								  (IUnknown **)&pLoc));
+		CHECK(dict->CreateInstance(&AUID_AAFNetworkLocator,
+			IID_IAAFLocator, 
+			(IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (manufURL));
 		CHECK(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		CHECK(desc->SetManufacturerInfo(pNetLoc));
@@ -264,17 +227,16 @@ HRESULT STDMETHODCALLTYPE
 		pLoc->Release();
 		pLoc = NULL;
 
-		CHECK(desc->SetManufacturerID(MANUF_JEFFS_PLUGINS));
+		CHECK(desc->SetManufacturerID(&manufacturer));
 		CHECK(desc->SetPluginManufacturerName(manufName));
 		CHECK(desc->SetIsSoftwareOnly(AAFTrue));
 		CHECK(desc->SetIsAccelerated(AAFFalse));
 		CHECK(desc->SetSupportsAuthentication(AAFFalse));
 		
 		/**/
-		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
-								  (IUnknown **)&pLoc));
-		pcd->Release ();
-		pcd = 0;
+		CHECK(dict->CreateInstance(&AUID_AAFNetworkLocator,
+			IID_IAAFLocator, 
+			(IUnknown **)&pLoc));
 		CHECK(pLoc->SetPath (downloadURL));
 		CHECK(desc->AppendLocator(pLoc));
 		desc->Release();
@@ -285,25 +247,13 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	{
 		if(desc != NULL)
-		  {
 			desc->Release();
-			desc = 0;
-		  }
 		if(pLoc != NULL)
-		  {
 			pLoc->Release();
-			pLoc = 0;
-		  }
 		if(pNetLoc != NULL)
-		  {
 			pNetLoc->Release();
-			pNetLoc = 0;
-		  }
-		if (pcd)
-		  {
-			pcd->Release ();
-			pcd = 0;
-		  }
+		if(defObject != NULL)
+			defObject->Release();
 	}
 	XEND
 
@@ -311,8 +261,8 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::CreateEssenceStream (const aafCharacter * pName,
-		aafMobID_constptr pMobID,
+    CAAFEssenceFileContainer::CreateEssenceStream (wchar_t *  pName,
+        aafUID_t *  pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   HRESULT hr = S_OK;
@@ -354,8 +304,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::CreateEssenceStreamWriteOnly (const aafCharacter * pName,
-        aafMobID_constptr pMobID,
+    CAAFEssenceFileContainer::CreateEssenceStreamWriteOnly (wchar_t *  pName,
+        aafUID_t *  pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   return HRESULT_NOT_IMPLEMENTED;
@@ -363,8 +313,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::OpenEssenceStreamReadOnly (const aafCharacter * pName,
-        aafMobID_constptr pMobID,
+    CAAFEssenceFileContainer::OpenEssenceStreamReadOnly (wchar_t *  pName,
+        aafUID_t *  pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   HRESULT hr = S_OK;
@@ -405,8 +355,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEssenceFileContainer::OpenEssenceStreamAppend (const aafCharacter * pName,
-        aafMobID_constptr pMobID,
+    CAAFEssenceFileContainer::OpenEssenceStreamAppend (wchar_t *  pName,
+        aafUID_t *  pMobID,
         IAAFEssenceStream ** ppEssenceStream)
 {
   HRESULT hr = S_OK;
@@ -478,7 +428,17 @@ HRESULT CAAFEssenceFileContainer::InternalQueryInterface
     return CAAFUnknown::InternalQueryInterface(riid, ppvObj);
 }
 
+
 //
 // Define the contrete object support implementation.
 // 
-AAF_DEFINE_FACTORY(AAFEssenceFileContainer)
+HRESULT CAAFEssenceFileContainer::COMCreate(IUnknown *pUnkOuter, void **ppvObjOut)
+{
+	*ppvObjOut = NULL;
+ 	CAAFEssenceFileContainer *pAAFEssenceFileContainer = new CAAFEssenceFileContainer(pUnkOuter);
+ 	if (NULL == pAAFEssenceFileContainer)
+ 		return E_OUTOFMEMORY;
+ 	*ppvObjOut = static_cast<IAAFEssenceContainer *>(pAAFEssenceFileContainer);
+ 	((IUnknown *)(*ppvObjOut))->AddRef();
+ 	return S_OK;
+}
