@@ -68,13 +68,13 @@ extern "C" const aafClassID_t CLSID_EnumAAFOperationDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFParameterDefs;
  
 ImplAAFOperationDef::ImplAAFOperationDef ()
-: _dataDef(	PID_OperationDefinition_DataDefinition,	"DataDefinition", "/Dictionary/DataDefinitions"),
-  _isTimeWarp(		PID_OperationDefinition_IsTimeWarp,			"IsTimeWarp"),
-  _degradeTo(		PID_OperationDefinition_DegradeTo,			"DegradeTo"),
-  _category(		PID_OperationDefinition_Category,			"Category"),
-  _numInputs(		PID_OperationDefinition_NumberInputs,		"NumberInputs"),
-  _bypass(			PID_OperationDefinition_Bypass,				"Bypass"),
-  _paramDefined(	PID_OperationDefinition_ParametersDefined,	"ParametersDefined")
+: _dataDef(	PID_OperationDefinition_DataDefinition,	L"DataDefinition", L"/Header/Dictionary/DataDefinitions", PID_DefinitionObject_Identification),
+  _isTimeWarp(		PID_OperationDefinition_IsTimeWarp,			L"IsTimeWarp"),
+  _degradeTo(		PID_OperationDefinition_DegradeTo,			L"DegradeTo"),
+  _category(		PID_OperationDefinition_Category,			L"Category"),
+  _numInputs(		PID_OperationDefinition_NumberInputs,		L"NumberInputs"),
+  _bypass(			PID_OperationDefinition_Bypass,				L"Bypass"),
+  _paramDefined(	PID_OperationDefinition_ParametersDefined,	L"ParametersDefined")
 {
 	_persistentProperties.put(_dataDef.address());
 	_persistentProperties.put(_isTimeWarp.address());
@@ -308,50 +308,19 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::GetCategory (
-       aafCharacter		*pCategory,
-		aafUInt32	bufSize)
+       aafUID_t		*pCategory)
 {
-	bool stat;
-
 	if(pCategory == NULL)
 		return(AAFRESULT_NULL_PARAM);
-
-	if(!_category.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
-	stat = _category.copyToBuffer(pCategory, bufSize);
-	if (! stat)
-	{
-	  return AAFRESULT_SMALLBUF;	// Shouldn't the API have a length parm?
-	}
-
-	return(AAFRESULT_SUCCESS); 
-}
- 
-  //****************
-  // GetCategoryBufLen()
-  //
-AAFRESULT STDMETHODCALLTYPE
-	ImplAAFOperationDef::GetCategoryBufLen (
-			aafUInt32 *		pLen)
-{
-	if(pLen == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
-	if(!_category.isPresent())
-		return AAFRESULT_PROP_NOT_PRESENT;
-
-	*pLen = _category.size();
-	return(AAFRESULT_SUCCESS); 
+	*pCategory = _category;
+	
+	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFOperationDef::SetCategory (
-      const aafCharacter *pCategory)
+      const aafUID_t pCategory)
 {
-	if(pCategory == NULL)
-		return(AAFRESULT_NULL_PARAM);
-
 	_category = pCategory;
 
 	return(AAFRESULT_SUCCESS); 

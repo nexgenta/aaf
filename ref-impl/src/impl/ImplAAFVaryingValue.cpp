@@ -68,10 +68,10 @@ ImplAAFVaryingValue::ImplAAFVaryingValue ()
 ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 {
 	// Release all of the locator pointers.
-	size_t count = _controlPoints.count();
-	for (size_t i = 0; i < count; i++)
+	size_t size = _controlPoints.getSize();
+	for (size_t i = 0; i < size; i++)
 	{
-		ImplAAFControlPoint *pControl = _controlPoints.clearValueAt(i);
+		ImplAAFControlPoint *pControl = _controlPoints.setValueAt(0, i);
 		if (pControl)
 		{
 		  pControl->ReleaseReference();
@@ -138,6 +138,7 @@ AAFRESULT STDMETHODCALLTYPE
 		  controlPointsType->ReleaseReference();
 		if (parameterType)
 		  parameterType->ReleaseReference();
+		return(XCODE());
 	}
 	XEND;
 
@@ -154,12 +155,8 @@ AAFRESULT STDMETHODCALLTYPE
 		
 	XPROTECT()
 	{
-		OMStrongReferenceVectorIterator<ImplAAFControlPoint>* iter = 
-			new OMStrongReferenceVectorIterator<ImplAAFControlPoint>(_controlPoints);
-		if(iter == 0)
-			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFControlPoints, this, iter));
-		
+		CHECK(theEnum->SetEnumStrongProperty(this, &_controlPoints));
+		CHECK(theEnum->Reset());
 		*ppEnum = theEnum;
 	}
 	XEXCEPT
@@ -167,6 +164,7 @@ AAFRESULT STDMETHODCALLTYPE
 		if (theEnum)
 		  theEnum->ReleaseReference();
 		theEnum = 0;
+		return(XCODE());
 	}
 	XEND;
 	
@@ -180,7 +178,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if(! pResult) return(AAFRESULT_NULL_PARAM);
 
-  *pResult = _controlPoints.count();
+  *pResult = _controlPoints.getSize();
 
   return AAFRESULT_SUCCESS;
 }
@@ -195,20 +193,13 @@ AAFRESULT STDMETHODCALLTYPE
   if(! ppControlPoint) return(AAFRESULT_NULL_PARAM);
 
   aafUInt32 count;
-  AAFRESULT ar;
-  ar = CountControlPoints (& count);
-  if (AAFRESULT_FAILED (ar)) return ar;
+  AAFRESULT hr;
+  hr = CountControlPoints (& count);
+  if (AAFRESULT_FAILED (hr)) return hr;
   if (index >= count)
 	return AAFRESULT_BADINDEX;
 
-  ImplAAFControlPoint *pPoint;
-  _controlPoints.getValueAt(pPoint,index);
-
-  assert(pPoint);
-  pPoint->AcquireReference();
-  (*ppControlPoint)=pPoint;
-
-  return AAFRESULT_SUCCESS;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 

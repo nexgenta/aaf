@@ -39,14 +39,14 @@
 #include "AAFResult.h"
 
 ImplAAFFileDescriptor::ImplAAFFileDescriptor ()
-: _sampleRate(			PID_FileDescriptor_SampleRate,	"SampleRate"),
- _length(				PID_FileDescriptor_Length,		"Length"),
- _isInContainer(        PID_FileDescriptor_IsInContainer,	"IsInContainer"),
- _containerFmt(         PID_FileDescriptor_ContainerFormat,	"ContainerFormat")
+: _sampleRate(			PID_FileDescriptor_SampleRate,		L"SampleRate"),
+ _length(				PID_FileDescriptor_Length,			L"Length"),
+ _codecDef(				PID_FileDescriptor_CodecDefinition,		L"CodecDefinition", L"/Header/Dictionary/CodecDefinitions", PID_DefinitionObject_Identification),
+ _containerFmt(         PID_FileDescriptor_ContainerFormat,	L"ContainerFormat", L"/Header/Dictionary/ContainerDefinitions", PID_DefinitionObject_Identification)
 {
   _persistentProperties.put(_sampleRate.address());
   _persistentProperties.put(_length.address());
-  _persistentProperties.put(_isInContainer.address());
+  _persistentProperties.put(_codecDef.address());
   _persistentProperties.put(_containerFmt.address());
 }
 
@@ -83,19 +83,21 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::SetIsInContainer (aafBool isAAF)
+    ImplAAFFileDescriptor::SetCodecDef (ImplAAFCodecDef *pDef)
 {
-	_isInContainer = isAAF;
+	_codecDef = pDef;
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::GetIsInContainer (aafBool* pIsAAF)
+    ImplAAFFileDescriptor::GetCodecDef (ImplAAFCodecDef **ppDef)
 {
-	if(pIsAAF == NULL)
+	if(ppDef == NULL)
 		return(AAFRESULT_NULL_PARAM);
-	*pIsAAF = _isInContainer;
+	*ppDef = _codecDef;
+	assert (*ppDef);
+	 (*ppDef)->AcquireReference ();
 	return AAFRESULT_SUCCESS;
 }
 
@@ -119,23 +121,25 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::SetContainerFormat (const aafUID_t & format)
+    ImplAAFFileDescriptor::SetContainerFormat (ImplAAFContainerDef *pDef)
 {
-	_containerFmt = format;
+	_containerFmt = pDef;
 	return AAFRESULT_SUCCESS;
 }
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFFileDescriptor::GetContainerFormat (aafUID_t *pFormat)
+    ImplAAFFileDescriptor::GetContainerFormat (ImplAAFContainerDef **ppDef)
 {
-	if(pFormat == NULL)
+	if(ppDef == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
 	if (!_containerFmt.isPresent())
 		return AAFRESULT_PROP_NOT_PRESENT;	
 	
-	*pFormat = _containerFmt;
+	*ppDef = _containerFmt;
+	assert (*ppDef);
+	 (*ppDef)->AcquireReference ();
 	return AAFRESULT_SUCCESS;
 }
 
