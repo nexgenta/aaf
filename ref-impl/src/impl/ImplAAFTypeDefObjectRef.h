@@ -4,31 +4,18 @@
 #define __ImplAAFTypeDefObjectRef_h__
 
 
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 class ImplAAFPropertyValue;
-class ImplAAFRoot;
+
 class ImplAAFClassDef;
 
 
@@ -55,12 +42,27 @@ protected:
 public:
 
   //****************
+  // Initialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    Initialize
+        (// @parm [in] auid to be used to identify this type
+         const aafUID_t *  pID,
+
+         // @parm [in] class def of objects permitted to be referenced
+         ImplAAFClassDef * pObjType,
+
+         // @parm [in, string] friendly name of this type definition
+         wchar_t *  pTypeName);
+
+
+  //****************
   // CreateValue()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     CreateValue
         (// @parm [in] object with which to initialize this object reference
-         ImplAAFRoot * pObj,
+         ImplAAFObject * pObj,
 
          // @parm [out] newly created property value
          ImplAAFPropertyValue ** ppPropVal);
@@ -84,7 +86,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [out] pointer to object value
-         ImplAAFRoot ** ppObject);
+         ImplAAFObject ** ppObject);
 
 
   //****************
@@ -96,7 +98,7 @@ public:
          ImplAAFPropertyValue * pPropVal,
 
          // @parm [in] pointer to object value
-         ImplAAFRoot * ppObject);
+         ImplAAFObject * ppObject);
 
 
 
@@ -128,29 +130,28 @@ public:
                            OMByteOrder byteOrder) const;
 
 
+  // Similar to Initialize(), but doesn't require a real referenced
+  // object type; can merely pass along the ref'd object's AUID.  NOT
+  // FOR CLIENT CONSUMPTION!  This is only here to break a bootstrap
+  // dependency when instantiating the first class definition:
+  //
+  // ClassDef requires
+  // ObjRefArray (array of strong object references), which requires
+  // ObjectReference, which requires
+  // ClassDef (for use as referenced type).
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    pvtInitialize
+        (// @parm [in] auid to be used to identify this type
+         const aafUID_t *  pID,
 
-public:
-  // Overrides from ImplAAFTypeDef
-  virtual bool IsAggregatable () const;
-  virtual bool IsStreamable () const;
-  virtual bool IsFixedArrayable () const;
-  virtual bool IsVariableArrayable () const;
-  virtual bool IsStringable () const;
+         // @parm [in] class def of objects permitted to be referenced
+         const aafUID_t * pRefdObjID,
 
-  // Override callbacks from OMStorable
-  virtual void onSave(void* clientContext) const;
-  virtual void onRestore(void* clientContext) const;
+         // @parm [in, string] friendly name of this type definition
+         wchar_t *  pTypeName);
 };
 
-//
-// smart pointer
-//
-
-#ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
-#include "ImplAAFSmartPointer.h"
-#endif
-
-typedef ImplAAFSmartPointer<ImplAAFTypeDefObjectRef> ImplAAFTypeDefObjectRefSP;
-
 #endif // ! __ImplAAFTypeDefObjectRef_h__
+
+

@@ -1,24 +1,11 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #ifndef __ImplAAFPropertyValue_h__
@@ -36,8 +23,7 @@
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
-#include "OMAssertions.h"
-
+#include <assert.h>
 #include <string.h>
 
 
@@ -49,15 +35,41 @@ ImplAAFTypeDefObjectRef::~ImplAAFTypeDefObjectRef ()
 {}
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefObjectRef::Initialize (
+      const aafUID_t *  pID,
+      ImplAAFClassDef * pObjType,
+      wchar_t *  pTypeName)
+{
+  AAFRESULT hr;
+  aafUID_t id;
+
+  if (! pObjType)  return AAFRESULT_NULL_PARAM;
+  hr = pObjType->GetAUID(&id);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
+
+  return pvtInitialize (pID, &id, pTypeName);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefObjectRef::pvtInitialize (
+      const aafUID_t *  pID,
+      const aafUID_t * pRefdObjID,
+      wchar_t *  pTypeName)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
 
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::CreateValue (
-      ImplAAFRoot * /*pObj*/,
+      ImplAAFObject * /*pObj*/,
       ImplAAFPropertyValue ** /*ppPropVal*/)
 {
-  // This is a virtual function should be implemented in a derived class.
-  return AAFRESULT_INTERNAL_ERROR;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -66,8 +78,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::GetObjectType (
       ImplAAFClassDef ** /*ppObjType*/)
 {
-  // This is a virtual function should be implemented in a derived class.
-  return AAFRESULT_INTERNAL_ERROR;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -75,10 +86,9 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::GetObject (
       ImplAAFPropertyValue * /*pPropVal*/,
-      ImplAAFRoot ** /*ppObject*/)
+      ImplAAFObject ** /*ppObject*/)
 {
-  // This is a virtual function should be implemented in a derived class.
-  return AAFRESULT_INTERNAL_ERROR;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -86,10 +96,9 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefObjectRef::SetObject (
       ImplAAFPropertyValue * /*pPropVal*/,
-      ImplAAFRoot * /*ppObject*/)
+      ImplAAFObject * /*ppObject*/)
 {
-  // This is a virtual function should be implemented in a derived class.
-  return AAFRESULT_INTERNAL_ERROR;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -110,16 +119,10 @@ size_t ImplAAFTypeDefObjectRef::externalSize(OMByte* /*internalBytes*/,
 void ImplAAFTypeDefObjectRef::externalize(OMByte* internalBytes,
 										  size_t internalBytesSize,
 										  OMByte* externalBytes,
-										  size_t ANAME(externalBytesSize),
-										  OMByteOrder NNAME(byteOrder)) const
+										  size_t externalBytesSize,
+										  OMByteOrder /*byteOrder*/) const
 {
-  TRACE("ImplAAFTypeDefObjectRef::externalize");
-  PRECONDITION("Valid internal bytes", internalBytes != 0);
-  PRECONDITION("Valid internal byte size", internalBytesSize > 0);
-  PRECONDITION("Valid external bytes", externalBytes != 0);
-  PRECONDITION("Valid external byte size", externalBytesSize > 0);
-  PRECONDITION("Internal and external sizes are equal", externalBytesSize == internalBytesSize);
-
+  assert (externalBytesSize >= internalBytesSize);
   copy (internalBytes, externalBytes, internalBytesSize);
 }
 
@@ -134,45 +137,9 @@ size_t ImplAAFTypeDefObjectRef::internalSize(OMByte* /*externalBytes*/,
 void ImplAAFTypeDefObjectRef::internalize(OMByte* externalBytes,
 										  size_t externalBytesSize,
 										  OMByte* internalBytes,
-										  size_t ANAME(internalBytesSize),
-										  OMByteOrder NNAME(byteOrder)) const
+										  size_t internalBytesSize,
+										  OMByteOrder /*byteOrder*/) const
 {
-  TRACE("ImplAAFTypeDefObjectRef::internalize");
-  PRECONDITION("Valid external bytes", externalBytes != 0);
-  PRECONDITION("Valid external byte size", externalBytesSize > 0);
-  PRECONDITION("Valid internal bytes", internalBytes != 0);
-  PRECONDITION("Valid internal byte size", internalBytesSize > 0);
-  PRECONDITION("Internal and external sizes are equal", internalBytesSize == externalBytesSize);
-		           
+  assert (internalBytesSize >= externalBytesSize);
   copy (externalBytes, internalBytes, externalBytesSize);
-}
-
-
-bool ImplAAFTypeDefObjectRef::IsAggregatable () const
-{ return false; }
-
-bool ImplAAFTypeDefObjectRef::IsStreamable () const
-{ return false; }
-
-bool ImplAAFTypeDefObjectRef::IsFixedArrayable () const
-{ return false; }
-
-bool ImplAAFTypeDefObjectRef::IsVariableArrayable () const
-{ return true; }
-
-bool ImplAAFTypeDefObjectRef::IsStringable () const
-{ return false; }
-
-
-
-
-// Override callbacks from OMStorable
-void ImplAAFTypeDefObjectRef::onSave(void* clientContext) const
-{
-  ImplAAFTypeDef::onSave(clientContext);
-}
-
-void ImplAAFTypeDefObjectRef::onRestore(void* clientContext) const
-{
-  ImplAAFTypeDef::onRestore(clientContext);
 }
