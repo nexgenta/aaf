@@ -3,7 +3,6 @@
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
@@ -67,7 +66,7 @@ ImplAAFEssenceData::~ImplAAFEssenceData ()
   {
     _mediaData.write(buffer, bytes, *bytesWritten);
     if (0 < bytes && 0 == *bytesWritten)
-      result = AAFRESULT_NOT_IMPLEMENTED;
+      result = AAFRESULT_CONTAINERWRITE;
   }
   //catch (OMException& ome)
   //{
@@ -98,7 +97,7 @@ ImplAAFEssenceData::~ImplAAFEssenceData ()
   {
     _mediaData.read(buffer, bytes, *bytesRead);
     if (0 < bytes && 0 == *bytesRead)
-      result = AAFRESULT_NOT_IMPLEMENTED;
+      result = AAFRESULT_END_OF_DATA;
   }
   //catch (OMException& ome)
   //{
@@ -241,6 +240,7 @@ AAFRESULT STDMETHODCALLTYPE
   XEXCEPT
   {  // save the error code.
     result = (XCODE());
+	NO_PROPAGATE();
   }
   XEND;
 
@@ -305,6 +305,7 @@ AAFRESULT STDMETHODCALLTYPE
   XEXCEPT
   {  // save the error code.
     result = (XCODE());
+	NO_PROPAGATE();
   }
   XEND;
 
@@ -343,4 +344,3 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 
-OMDEFINE_STORABLE(ImplAAFEssenceData, AUID_AAFEssenceData);
