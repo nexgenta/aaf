@@ -1,4 +1,4 @@
-/***********************************************************************
+ /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
  *
@@ -38,7 +38,7 @@
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFClassDef>         IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFComponent>        IAAFComponentSP;
-typedef IAAFSmartPointer<IAAFDefObject>        IAAFDefObjectSP;
+typedef IAAFSmartPointer<IAAFMetaDefinition>   IAAFMetaDefinitionSP;
 typedef IAAFSmartPointer<IAAFDictionary>       IAAFDictionarySP;
 typedef IAAFSmartPointer<IAAFFile>             IAAFFileSP;
 typedef IAAFSmartPointer<IAAFFiller>           IAAFFillerSP;
@@ -51,6 +51,7 @@ typedef IAAFSmartPointer<IAAFTypeDef>          IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefObjectRef> IAAFTypeDefObjectRefSP;
 typedef IAAFSmartPointer<IEnumAAFMobs>         IEnumAAFMobsSP;
 
+#include "CAAFBuiltinDefs.h"
 
 //
 // TypeID for our new component obj ref typedef
@@ -73,6 +74,11 @@ static const aafUID_t kTestPropID_CompMob_NewCompProp1 =
 static const aafUID_t kTestPropID_CompMob_NewCompProp2 = 
 { 0x248f0cf, 0x7cb6, 0x11d3, { 0x84, 0x50, 0x0, 0x60, 0x8, 0x32, 0xac, 0xb8 } };
 
+
+static const 	aafMobID_t	TEST_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0xc68dee88, 0x0405, 0x11d4, 0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}};
 
 
 // Cross-platform utility to delete a file.
@@ -118,13 +124,15 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
   aafProductIdentification_t	ProductInfo;
   HRESULT						hr = AAFRESULT_SUCCESS;
 
+  aafProductVersion_t v;
+  v.major = 1;
+  v.minor = 0;
+  v.tertiary = 0;
+  v.patchLevel = 0;
+  v.type = kAAFVersionUnknown;
   ProductInfo.companyName = L"AAF Developers Desk";
   ProductInfo.productName = L"AAFDictionary Test";
-  ProductInfo.productVersion.major = 1;
-  ProductInfo.productVersion.minor = 0;
-  ProductInfo.productVersion.tertiary = 0;
-  ProductInfo.productVersion.patchLevel = 0;
-  ProductInfo.productVersion.type = kVersionUnknown;
+  ProductInfo.productVersion = &v;
   ProductInfo.productVersionString = NULL;
   ProductInfo.productID = UnitTestProductID;
   ProductInfo.platform = NULL;
@@ -133,11 +141,11 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
   switch (mode)
 	{
-	case kMediaOpenReadOnly:
+	case kAAFMediaOpenReadOnly:
 	  hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
 	  break;
 
-	case kMediaOpenAppend:
+	case kAAFMediaOpenAppend:
 	  hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
 	  break;
 
@@ -181,11 +189,12 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		
 	  // Create the AAF file
 	  IAAFHeaderSP pHeader;
-	  checkResult (OpenAAFFile(pFileName, kMediaOpenAppend, &pFile, &pHeader));
+	  checkResult (OpenAAFFile(pFileName, kAAFMediaOpenAppend, &pFile, &pHeader));
 		
 	  // Get the AAF Dictionary so that we can create valid AAF objects.
 	  IAAFDictionarySP pDictionary;
 	  checkResult (pHeader->GetDictionary(&pDictionary));
+	  CAAFBuiltinDefs defs (pDictionary);
 
 	  //
 	  // Create a type def describing a strong object ref to
@@ -197,17 +206,17 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	  // create
 	  IAAFTypeDefObjectRefSP tdor;
-	  checkResult (pDictionary->CreateInstance(&AUID_AAFTypeDefStrongObjRef,
-											   IID_IAAFTypeDefObjectRef,
-											   (IUnknown**)&tdor));
+	  checkResult (defs.cdTypeDefStrongObjRef()->
+				   CreateInstance(IID_IAAFTypeDefObjectRef,
+								  (IUnknown**)&tdor));
 
 	  // get class def for the referenced type.  In this case,
 	  // AAFComponent.
 	  IAAFClassDefSP cdComp;
-	  checkResult (pDictionary->LookupClass (&AUID_AAFComponent, &cdComp));
+	  checkResult (pDictionary->LookupClassDef (AUID_AAFComponent, &cdComp));
 
 	  // init our new type def strong obj ref
-	  checkResult (tdor->Initialize ((aafUID_t*) &kTestTypeID_ObjRef,
+	  checkResult (tdor->Initialize (kTestTypeID_ObjRef,
 									 cdComp,
 									 L"StrongRefToComponent"));
 
@@ -216,7 +225,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  IAAFTypeDefSP td;
 	  checkResult (tdor->QueryInterface (IID_IAAFTypeDef,
 										 (void **)&td));
-	  checkResult (pDictionary->RegisterType (td));
+	  checkResult (pDictionary->RegisterTypeDef (td));
 
 	  //
 	  // It's now ready for use.  Let's try appending two properties
@@ -225,18 +234,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	  // get the existing class def describing comp mob
 	  IAAFClassDefSP cdCompMob;
-	  checkResult (pDictionary->LookupClass (&AUID_AAFCompositionMob, &cdCompMob));
+	  checkResult (pDictionary->LookupClassDef (AUID_AAFCompositionMob, &cdCompMob));
 
 	  // append the new prop defs to it
 	  IAAFPropertyDefSP pd1; // remember this for later use
-	  checkResult (cdCompMob->AppendOptionalPropertyDef
-				   ((aafUID_t*) &kTestPropID_CompMob_NewCompProp1,
+	  checkResult (cdCompMob->RegisterOptionalPropertyDef
+				   (kTestPropID_CompMob_NewCompProp1,
 					L"NewCompProp1",
 					td,
 					&pd1));
 	  IAAFPropertyDefSP pd2; // remember this for later use
-	  checkResult (cdCompMob->AppendOptionalPropertyDef
-				   ((aafUID_t*) &kTestPropID_CompMob_NewCompProp2,
+	  checkResult (cdCompMob->RegisterOptionalPropertyDef
+				   (kTestPropID_CompMob_NewCompProp2,
 					L"NewCompProp2",
 					td,
 					&pd2));
@@ -248,12 +257,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	  // Create a Composition Mob
 	  IAAFMobSP pMob;
-	  checkResult(pDictionary->CreateInstance(&AUID_AAFCompositionMob,
-											  IID_IAAFMob, 
-											  (IUnknown **)&pMob));
-	  aafUID_t mobID;
-	  checkResult(CoCreateGuid((GUID *)&mobID));
-	  checkResult(pMob->SetMobID(&mobID));
+	  checkResult(defs.cdCompositionMob()->
+				  CreateInstance(IID_IAAFMob, 
+								 (IUnknown **)&pMob));
+	  checkResult(pMob->SetMobID(TEST_MobID));
 	  checkResult(pMob->SetName(L"TestCompMob"));
 
 	  //
@@ -262,15 +269,15 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  // different lengths (13 for #1, 26 for #2).
 	  //
 	  IAAFFillerSP fill1;
-	  checkResult (pDictionary->CreateInstance(&AUID_AAFFiller,
-											   IID_IAAFFiller,
-											   (IUnknown **)&fill1));
-	  checkResult (fill1->Initialize ((aafUID_t*) &DDEF_PictureWithMatte, 13));
+	  checkResult (defs.cdFiller()->
+				   CreateInstance(IID_IAAFFiller,
+								  (IUnknown **)&fill1));
+	  checkResult (fill1->Initialize (defs.ddPictureWithMatte(), 13));
 	  IAAFFillerSP fill2;
-	  checkResult (pDictionary->CreateInstance(&AUID_AAFFiller,
-											   IID_IAAFFiller,
-											   (IUnknown **)&fill2));
-	  checkResult (fill2->Initialize ((aafUID_t*) &DDEF_PictureWithMatte, 26));
+	  checkResult (defs.cdFiller()->
+				   CreateInstance(IID_IAAFFiller,
+								  (IUnknown **)&fill2));
+	  checkResult (fill2->Initialize (defs.ddPictureWithMatte(), 26));
 
 	  // get the AAFObject interfaces
 	  IAAFObjectSP fillObj1;
@@ -303,7 +310,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	  checkResult (compMobObject->SetPropertyValue (pd2, pv2));
 
 	  // CompMob is ready to go.  Pop it into the file.
-	  checkResult (pHeader->AppendMob(pMob));
+	  checkResult (pHeader->AddMob(pMob));
 	}		
   catch (HRESULT& rResult)
 	{
@@ -329,7 +336,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	{
 	  // Open the AAF file
 	  IAAFHeaderSP header;
-	  checkResult(OpenAAFFile(pFileName, kMediaOpenReadOnly, &file, &header));
+	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &file, &header));
 
 	  // Get the dictionary.
 	  IAAFDictionarySP dict;
@@ -337,16 +344,16 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 	  // Validate that there is only one composition mob.
 	  aafNumSlots_t numMobs = 0;
-	  checkResult(header->GetNumMobs(kCompMob, &numMobs));
+	  checkResult(header->CountMobs(kAAFCompMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
 
 	  // Get an enumerator for the composition mob.
 	  aafSearchCrit_t      criteria;
-	  criteria.searchTag = kByMobKind;
-	  criteria.tags.mobKind = kCompMob;
+	  criteria.searchTag = kAAFByMobKind;
+	  criteria.tags.mobKind = kAAFCompMob;
 
 	  IEnumAAFMobsSP mobEnum;
-	  checkResult(header->EnumAAFAllMobs(&criteria, &mobEnum));
+	  checkResult(header->GetMobs(&criteria, &mobEnum));
 
 	  // Now get the mob.
 	  IAAFMobSP mob;
@@ -363,9 +370,9 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	  // Get the prop defs for our two new props
 	  IAAFPropertyDefSP pd1;
 	  IAAFPropertyDefSP pd2;
-	  checkResult (cdMob->LookupPropertyDef ((aafUID_t*) &kTestPropID_CompMob_NewCompProp1,
+	  checkResult (cdMob->LookupPropertyDef (kTestPropID_CompMob_NewCompProp1,
 											 &pd1));
-	  checkResult (cdMob->LookupPropertyDef ((aafUID_t*) &kTestPropID_CompMob_NewCompProp2,
+	  checkResult (cdMob->LookupPropertyDef (kTestPropID_CompMob_NewCompProp2,
 											 &pd2));
 
 	  // Find the object type for one of them.
@@ -381,18 +388,18 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 	  // Compare this class def with one from the dict, using GUIDs
 	  // First, get the referenced object class def
-	  IAAFDefObjectSP refdDef;
-	  checkResult (refdObjClass->QueryInterface (IID_IAAFDefObject,
+	  IAAFMetaDefinitionSP refdDef;
+	  checkResult (refdObjClass->QueryInterface (IID_IAAFMetaDefinition,
 												 (void **)&refdDef));
 	  aafUID_t refdObjID;
 	  checkResult (refdDef->GetAUID (&refdObjID));
 	  
 	  // now get the expected class from the dictionary 
 	  IAAFClassDefSP dictClass;
-	  checkResult (dict->LookupClass (&AUID_AAFComponent,
+	  checkResult (dict->LookupClassDef (AUID_AAFComponent,
 									  &dictClass));
-	  IAAFDefObjectSP dictDef;
-	  checkResult (dictClass->QueryInterface (IID_IAAFDefObject,
+	  IAAFMetaDefinitionSP dictDef;
+	  checkResult (dictClass->QueryInterface (IID_IAAFMetaDefinition,
 											  (void **)&dictDef));
 	  aafUID_t dictObjID;
 	  checkResult (dictDef->GetAUID (&dictObjID));
