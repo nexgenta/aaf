@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFAuxiliaryDescriptor.cpp,v 1.1.2.3 2004/05/11 02:17:52 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFAuxiliaryDescriptor.cpp,v 1.1.2.4 2004/07/22 18:41:38 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,7 @@
 #include "ImplAAFAuxiliaryDescriptor.h"
 #endif
 
-#include <AAFPropertyIDs.h>
+#include "AAFPropertyIDs.h"
 
 #include <assert.h>
 #include <string.h>

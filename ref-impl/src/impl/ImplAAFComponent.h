@@ -7,7 +7,7 @@
 #include "ImplAAFDataDef.h"
 #endif
 
-#include <ImplEnumAAFTaggedValues.h>
+#include "ImplEnumAAFTaggedValues.h"
 
 class ImplAAFMob;
 class ImplAAFMobSlot;
@@ -18,7 +18,7 @@ class ImplAAFTaggedValue;
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFComponent.h,v 1.32.2.2 2004/03/24 17:49:19 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFComponent.h,v 1.32.2.3 2004/07/22 18:41:38 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

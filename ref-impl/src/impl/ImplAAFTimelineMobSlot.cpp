@@ -2,7 +2,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTimelineMobSlot.cpp,v 1.32.2.1 2004/04/07 13:16:59 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFTimelineMobSlot.cpp,v 1.32.2.2 2004/07/22 18:41:38 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@
 #include "AAFPropertyIDs.h"
 
 #include <assert.h>
-#include <AAFResult.h>
+#include "AAFResult.h"
 #include "aafCvt.h" 
 #include "AAFUtils.h"
 
