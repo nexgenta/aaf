@@ -62,7 +62,6 @@ AAFPERSISTENTOBJECTS = \
 	AAFTypeDefRename \
 	AAFTypeDefEnum \
 	AAFTypeDefFixedArray \
-	AAFTypeDefVariableArray \
 	AAFTypeDefStream \
 	AAFTypeDefString \
 	AAFTypeDefObjectRef \
@@ -86,6 +85,7 @@ AAFNONPERSISTENTOBJECTS = \
 	EnumAAFEffectDefs \
 	EnumAAFIdentifications \
 	EnumAAFLoadedPlugins \
+	EnumAAFMobComments \
 	EnumAAFObjects \
 	EnumAAFParameterDefs \
 	EnumAAFPluginDescriptors \
@@ -141,6 +141,7 @@ HUMAN_TYPED_IMPL = \
 	AAFTimelineMobSlot \
 	AAFTapeDescriptor \
 	AAFTransition \
+	AAFTypeDefVariableArray \
 	AAFWAVEDescriptor \
 	EnumAAFComponents \
 	EnumAAFEssenceData \
