@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-*              Copyright (c) 1998-2000 Avid Technology, Inc.
+*              Copyright (c) 1998-1999 Avid Technology, Inc.
 *
 * Permission to use, copy and modify this software and accompanying
 * documentation, and to distribute and sublicense application software
@@ -26,8 +26,6 @@
 ************************************************************************/
 
 // @doc OMEXTERNAL
-// @author Tim Bingham | tjb | Avid Technology, Inc. |
-//         OMStrongReferenceVectorIterator
 #include "OMAssertions.h"
 
   // @mfunc Create an <c OMStrongReferenceVectorIterator> over the given
@@ -62,22 +60,6 @@ OMStrongReferenceVectorIterator<ReferencedObject>::
                                               ~OMStrongReferenceVectorIterator(
                                                                           void)
 {
-}
-
-  // @mfunc Create a copy of this <c OMStrongReferenceVectorIterator>.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The new <c OMStrongReferenceVectorIterator>.
-  //   @this const
-template <typename ReferencedObject>
-OMReferenceContainerIterator*
-            OMStrongReferenceVectorIterator<ReferencedObject>::copy(void) const
-{
-  TRACE("OMStrongReferenceVectorIterator<ReferencedObject>::copy");
-
-  OMStrongReferenceVectorIterator<ReferencedObject>*
-     result = new OMStrongReferenceVectorIterator<ReferencedObject>(_iterator);
-
-  return result;
 }
 
   // @mfunc Reset this <c OMStrongReferenceVectorIterator> to the given
@@ -126,30 +108,6 @@ template <typename ReferencedObject>
 bool OMStrongReferenceVectorIterator<ReferencedObject>::after(void) const
 {
   return _iterator.after();
-}
-
-  // @mfunc Is this <c OMStrongReferenceVectorIterator> validly
-  //        positioned on a <p ReferencedObject> ?
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc <e bool.true> if this <c OMStrongReferenceVectorIterator> is
-  //          positioned on a <p ReferencedObject>, <e bool.false>
-  //          otherwise.
-  //   @this const
-template <typename ReferencedObject>
-bool OMStrongReferenceVectorIterator<ReferencedObject>::valid(void) const
-{
-  return _iterator.valid();
-}
-
-  // @mfunc The number of <p ReferencedObject>s in the associated
-  //        <c OMStrongReferenceVectorProperty>.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The number of <p ReferencedObject>s
-  //   @this const
-template <typename ReferencedObject>
-size_t OMStrongReferenceVectorIterator<ReferencedObject>::count(void) const
-{
-  return _iterator.count();
 }
 
   // @mfunc Advance this <c OMStrongReferenceVectorIterator> to the next
@@ -210,7 +168,7 @@ OMStrongReferenceVectorIterator<ReferencedObject>::value(void) const
 {
   TRACE("OMStrongReferenceVectorIterator<ReferencedObject>::value");
 
-  const VectorElement& element = _iterator.value();
+  const OMVectorElement<OMStrongObjectReference<ReferencedObject>, ReferencedObject>& element = _iterator.value();
 
   ReferencedObject* result = element.getValue();
 
@@ -233,28 +191,9 @@ OMStrongReferenceVectorIterator<ReferencedObject>::setValue(
 {
   TRACE("OMStrongReferenceVectorIterator<ReferencedObject>::setValue");
 
-  VectorElement& element = _iterator.value();
+  OMVectorElement<OMStrongObjectReference<ReferencedObject>, ReferencedObject>& element = _iterator.value();
 
   ReferencedObject* result = element.setValue(newObject);
-
-  return result;
-}
-
-  // @mfunc Set the <p ReferencedObject> in the associated
-  //        <c OMStrongReferenceVectorProperty> at the position currently
-  //        designated by this <c OMStrongReferenceVectorIterator> to 0.
-  //        The previous <p ReferencedObject>, if any, is returned.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The previous <p ReferencedObject> if any, otherwise 0.
-template <typename ReferencedObject>
-ReferencedObject*
-OMStrongReferenceVectorIterator<ReferencedObject>::clearValue(void)
-{
-  TRACE("OMStrongReferenceVectorIterator<ReferencedObject>::clearValue");
-
-  VectorElement& element = _iterator.value();
-
-  ReferencedObject* result = element.setValue(0);
 
   return result;
 }
@@ -270,33 +209,4 @@ template <typename ReferencedObject>
 size_t OMStrongReferenceVectorIterator<ReferencedObject>::index(void) const
 {
   return _iterator.index();
-}
-
-  // @mfunc Return the <c OMObject> in the associated
-  //        <c OMStrongReferenceVectorProperty> at the position currently
-  //        designated by this <c OMStrongReferenceVectorIterator>.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @rdesc The <c OMObject> at the current position.
-  //   @this const
-template <typename ReferencedObject>
-OMObject*
-OMStrongReferenceVectorIterator<ReferencedObject>::currentObject(void) const
-{
-  TRACE("OMStrongReferenceVectorIterator<ReferencedObject>::currentObject");
-
-  OMObject* result = value();
-
-  return result;
-}
-
-  // @mfunc Create an <c OMStrongReferenceVectorIterator> given
-  //        an underlying <c OMVectorIterator>.
-  //   @tcarg class | ReferencedObject | The type of the contained objects.
-  //   @parm The underlying <c OMVectorIterator>.
-template <typename ReferencedObject>
-OMStrongReferenceVectorIterator<ReferencedObject>::
-                                               OMStrongReferenceVectorIterator(
-                                                   const VectorIterator & iter)
-  : _iterator(iter) // probably bitwise
-{
 }
