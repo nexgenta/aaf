@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -32,10 +32,6 @@
 #include "ImplAAFTypeDefRename.h"
 #endif
 
-#ifndef __ImplAAFHeader_h__
-#include "ImplAAFHeader.h"
-#endif
-
 #ifndef __ImplAAFPropValData_h__
 #include "ImplAAFPropValData.h"
 #endif
@@ -43,6 +39,8 @@
 #ifndef __ImplAAFObjectCreation_h__
 #include "ImplAAFObjectCreation.h"
 #endif
+
+#include "ImplAAFDictionary.h"
 
 #include <assert.h>
 #include <string.h>
@@ -62,27 +60,26 @@ ImplAAFTypeDefRename::~ImplAAFTypeDefRename ()
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRename::Initialize (
-      const aafUID_t * pID,
+      const aafUID_t & id,
       ImplAAFTypeDef * pBaseType,
-      wchar_t * pTypeName)
+      const aafCharacter * pTypeName)
 {
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
   if (! pBaseType)  return AAFRESULT_NULL_PARAM;
-  if (! pID)       return AAFRESULT_NULL_PARAM;
 
   HRESULT hr;
 
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  aafUID_t id;
+  aafUID_t baseId;
   assert (pBaseType);
-  hr = pBaseType->GetAUID(&id);
+  hr = pBaseType->GetAUID(&baseId);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
-  _RenamedType = id;
+  _RenamedType = baseId;
 
   return AAFRESULT_SUCCESS;
 }
@@ -97,23 +94,17 @@ AAFRESULT STDMETHODCALLTYPE
 
   if (!_cachedBaseType)
 	{
-	  ImplAAFHeaderSP pHead;
 	  ImplAAFDictionarySP pDict;
 
 	  AAFRESULT hr;
-	  hr = MyHeadObject(&pHead);
-	  if (AAFRESULT_FAILED(hr))
-		return hr;
-	  assert (pHead);
-	  hr = (pHead->GetDictionary(&pDict));
+	  hr = (GetDictionary(&pDict));
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (pDict);
 
 	  ImplAAFTypeDefRename * pNonConstThis =
 		  (ImplAAFTypeDefRename *) this;
-	  aafUID_t id = _RenamedType;
-	  hr = pDict->LookupType (&id, &pNonConstThis->_cachedBaseType);
+	  hr = pDict->LookupTypeDef (_RenamedType, &pNonConstThis->_cachedBaseType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedBaseType);
