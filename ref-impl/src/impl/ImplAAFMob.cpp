@@ -151,14 +151,14 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::AppendSlot
         (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
 {
-	AAFRESULT aafError = AAFRESULT_SUCCESS;
-
 	if (NULL == pSlot)
 		return AAFRESULT_NULL_PARAM;
+  if (pSlot->attached ())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
 	_slots.appendValue(pSlot);
 	pSlot->AcquireReference();
-	return aafError;
+	return AAFRESULT_SUCCESS;
 }
 
 //****************
@@ -168,12 +168,14 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::PrependSlot
         (ImplAAFMobSlot *  pSlot)  //@parm [in,out] Mob Name length
 {
-	AAFRESULT aafError = AAFRESULT_SUCCESS;
-
 	if (NULL == pSlot)
 		return AAFRESULT_NULL_PARAM;
+  if (pSlot->attached ())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	_slots.prependValue(pSlot);
+	pSlot->AcquireReference();
+	return AAFRESULT_SUCCESS;
 }
 
 //****************
@@ -184,20 +186,17 @@ AAFRESULT STDMETHODCALLTYPE
         (aafUInt32 index,          //@parm [in] index to insert
 		 ImplAAFMobSlot *  pSlot)  //@parm [in] Mob Name length
 {
-	AAFRESULT aafError = AAFRESULT_SUCCESS;
-
 	if (NULL == pSlot)
 		return AAFRESULT_NULL_PARAM;
+  if (pSlot->attached ())
+    return AAFRESULT_OBJECT_ALREADY_ATTACHED;
 
-	aafUInt32 count;
-	aafError = CountSlots (&count);
-	if (AAFRESULT_FAILED (aafError))
-	  return aafError;
-
-	if (index > count)
+	if (index > _slots.count()) // we can "insert" one after the end
 	  return AAFRESULT_BADINDEX;
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	_slots.insertAt(pSlot, index);
+	pSlot->AcquireReference();
+	return AAFRESULT_SUCCESS;
 }
 
 //****************
@@ -207,17 +206,20 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::RemoveSlotAt
         (aafUInt32 index)  //@parm [in] index of slot to remove
 {
-	AAFRESULT aafError = AAFRESULT_SUCCESS;
-
-	aafUInt32 count;
-	aafError = CountSlots (&count);
-	if (AAFRESULT_FAILED (aafError))
-	  return aafError;
-
-	if (index >= count)
+	if (index >= _slots.count())
 	  return AAFRESULT_BADINDEX;
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	ImplAAFMobSlot *pSlot = NULL;
+  pSlot = _slots.removeAt(index);
+  if (pSlot)
+  {
+    // We have removed an element from a "stong reference container" so we must
+    // decrement the objects reference count. This will not delete the object
+    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
+    pSlot->ReleaseReference ();
+  }
+
+  return AAFRESULT_SUCCESS;
 }
 
 //****************
@@ -233,15 +235,18 @@ AAFRESULT STDMETHODCALLTYPE
 	if (NULL == ppSlot)
 		return AAFRESULT_NULL_PARAM;
 
-	aafUInt32 count;
-	aafError = CountSlots (&count);
-	if (AAFRESULT_FAILED (aafError))
-	  return aafError;
 
-	if (index >= count)
-	  return AAFRESULT_BADINDEX;
+	if (_slots.find (index, *ppSlot))
+  {
+    assert (*ppSlot); // It is an internal DM programming error if this assertion fails!
+    (*ppSlot)->AcquireReference ();
+  }
+  else
+  {
+	  aafError = AAFRESULT_BADINDEX;
+  }
 
-	return AAFRESULT_NOT_IMPLEMENTED;
+	return aafError;
 }
 
 //****************
@@ -252,12 +257,7 @@ AAFRESULT STDMETHODCALLTYPE
         (aafSlotID_t slotId,          //@parm [in] ID of slot to get
 		 ImplAAFMobSlot ** ppSlot)  //@parm [out] returned slot
 {
-	AAFRESULT aafError = AAFRESULT_SUCCESS;
-
-	if (NULL == ppSlot)
-		return AAFRESULT_NULL_PARAM;
-
-	return AAFRESULT_NOT_IMPLEMENTED;
+	return FindSlotBySlotID (slotId, ppSlot);
 }
 
 //****************
@@ -269,8 +269,16 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if (NULL == pSlot)
 		return AAFRESULT_NULL_PARAM;
+  if (!pSlot->attached ()) // slot could not possibly be in _slots container.
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
 
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+  size_t index;
+  if (_slots.findIndex (pSlot, index))
+	  return RemoveSlotAt (index);
+  else
+    return AAFRESULT_OBJECT_NOT_FOUND;
+
+	return AAFRESULT_SUCCESS;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -404,12 +412,8 @@ AAFRESULT STDMETHODCALLTYPE
   // Validate input pointer...
   if (NULL == pNumSlots)
     return (AAFRESULT_NULL_PARAM);
-
-  size_t numSlots;
-
-	_slots.getSize(numSlots);
 	
-	*pNumSlots = numSlots;
+	*pNumSlots = _slots.count();
 
 	return(AAFRESULT_SUCCESS);
 }
@@ -525,6 +529,11 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
+// This method creates an "abstract" class. It should FAIL but it does not.
+// We should either remove this method from the API or change it so that
+// it taks the class definition for one of the "derived" classes TimelineMobSlot,
+// StaticMobSlot, EventMobSlot, etc...(transdel 2000-MAR-10)
+//
  AAFRESULT STDMETHODCALLTYPE
    ImplAAFMob::AppendNewSlot (ImplAAFSegment *segment,
                            aafSlotID_t  slotID,
@@ -611,7 +620,7 @@ AAFRESULT STDMETHODCALLTYPE
 			  CreateInstance ((ImplAAFObject**) &aSlot));
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
-
+    CHECK(aSlot->Initialize());
 		CHECK(aSlot->SetSegment(segment));
 		CHECK(aSlot->SetSlotID(slotID));
 		CHECK(aSlot->SetName(slotName));
@@ -714,6 +723,14 @@ AAFRESULT STDMETHODCALLTYPE
 			pEnum->ReleaseReference();
 			pEnum = 0;
 		}
+
+		CHECK(GetDictionary(&pDictionary));
+    // Do not reference count the following type and class definitions...
+    ImplAAFTypeDef *pTaggedValueType = pDictionary->GetBuiltinDefs()->tdString();
+    assert (pTaggedValueType); // this is supposed to be a builtin type.
+ 		ImplAAFClassDef *pTaggedValueClass = pDictionary->GetBuiltinDefs()->cdTaggedValue();
+    assert (pTaggedValueClass); // this is supposed to be a builtin type.
+
 		if (commentFound)
 		{
 			// Update existing comment
@@ -724,17 +741,16 @@ AAFRESULT STDMETHODCALLTYPE
 		else
 		{
 			// Create a new comment and add it to the list!
-			CHECK(GetDictionary(&pDictionary));
-			CHECK(pDictionary->GetBuiltinDefs()->cdTaggedValue()->
-				  CreateInstance ((ImplAAFObject**) &pTaggedValue));
+			CHECK(pTaggedValueClass->CreateInstance ((ImplAAFObject**) &pTaggedValue));
 			CHECK(pTaggedValue->Initialize(pTagName,
-										   pDictionary->GetBuiltinDefs()->
-										   tdString()));
-			pDictionary->ReleaseReference();
-			pDictionary = NULL;
-			CHECK(pTaggedValue->SetValue((wcslen(pComment)*sizeof(aafCharacter)+2), (aafDataValue_t)pComment));
+										   pTaggedValueType,
+                       (wcslen(pComment)*sizeof(aafCharacter)+2), 
+                       (aafDataValue_t)pComment));
 			_userComments.appendValue(pTaggedValue);
 		}
+		pDictionary->ReleaseReference();
+		pDictionary = NULL;
+
 	}
 	XEXCEPT
 	{
@@ -758,17 +774,33 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFMob::RemoveComment
         (ImplAAFTaggedValue * comment)
 {
-  if (! comment)
-	return AAFRESULT_NULL_PARAM;
+	if (! comment)
+		return AAFRESULT_NULL_PARAM;
+  if (!comment->attached ()) // object could not possibly be in container.
+    return AAFRESULT_OBJECT_NOT_ATTACHED;
+	if(!_userComments.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+	
+  size_t index;
+  if (_userComments.findIndex (comment, index))
+  {
+	  _userComments.removeAt(index);
+    // We have removed an element from a "stong reference container" so we must
+    // decrement the objects reference count. This will not delete the object
+    // since the caller must have alread acquired a reference. (transdel 2000-MAR-10)
+    comment->ReleaseReference ();
+  }
+  else
+  {
+    return AAFRESULT_OBJECT_NOT_FOUND;
+  }
 
-  return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	return(AAFRESULT_SUCCESS);
 }
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::CountComments (aafUInt32*  pNumComments)
 {
-	size_t	numComments;
-
 	if (pNumComments == NULL)
 		return AAFRESULT_NULL_PARAM;
 
@@ -779,9 +811,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 	else
 	{
-		_userComments.getSize(numComments);
-
-		*pNumComments = numComments;
+		*pNumComments = _userComments.count();
 	}
 		
 	return(AAFRESULT_SUCCESS);
@@ -2040,6 +2070,11 @@ AAFRESULT ImplAAFMob::ReconcileMobLength(void)
 }
 
 
+const OMMaterialIdentification&
+  ImplAAFMob::identification(void) const
+{
+  return *reinterpret_cast<const OMMaterialIdentification*>(&_mobID.reference());
+}
 
 
 
