@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMob.cpp,v 1.95.2.7 2004/06/16 19:00:52 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMob.cpp,v 1.95.2.8 2004/07/22 21:22:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1482,9 +1482,13 @@ AAFRESULT STDMETHODCALLTYPE
 	    	 CHECK( newMob->SetName( destMobName ) );
 		}
 
-		deepCopyTo( newStorable, 0 );
+		ImplAAFSmartPointer<ImplAAFHeader> spHeader;
+		CHECK( MyHeadObject( &spHeader ) );
+		CHECK( spHeader->AddMob(newMob) );
 
-			newMob->AcquireReference();
+		deepCopyTo( newMob, 0 );
+
+ 		newMob->AcquireReference();
 		*destMob = newMob;
 	}
 	XEXCEPT
