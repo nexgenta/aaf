@@ -40,6 +40,10 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMWeakRefProperty.h"
+
+class ImplAAFPropertyValue;
+
 
 class ImplAAFTypeDefStream : public ImplAAFTypeDef
 {
@@ -152,6 +156,20 @@ public:
          aafUInt32  numElements);
 
 
+public:
+  //****************
+  // pvtInitialize()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    pvtInitialize
+        (// @parm [in] auid to be used to identify this type
+         const aafUID_t & id,
+
+         // @parm [in] type of each element to be contained in this array
+         ImplAAFTypeDef * pTypeDef,
+
+         // @parm [in] friendly name of this type definition
+         const aafCharacter * pTypeName);
   //*************************************************************
   //
   // Overrides from OMType, via inheritace through ImplAAFTypeDef
@@ -186,6 +204,15 @@ public:
   virtual bool IsFixedArrayable () const;
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
+
+
+
+  // override from OMStorable.
+  virtual const OMClassId& classId(void) const;
+
+  // Override callbacks from OMStorable
+  virtual void onSave(void* clientContext) const;
+  virtual void onRestore(void* clientContext) const;
 
 private:
 	OMWeakReferenceProperty<ImplAAFTypeDef>		_elementType;
