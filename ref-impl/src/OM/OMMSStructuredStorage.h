@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.h,v 1.23 2004/10/29 12:00:13 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.h,v 1.24 2004/11/29 11:33:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -140,7 +140,10 @@ static inline ULARGE_INTEGER fromOMUInt64(const OMUInt64& x)
 #ifdef _MSC_VER
 #define UINT64_C(c)	c
 #else
-#define UINT64_C(c) c##LL
+
+#define __STDC_CONSTANT_MACROS	// needed in C++ to enable macros like INT64_C
+#include <inttypes.h>
+
 // Also, provide a replacement Int32x32To64() for non-MSVC compilers
 static inline OMInt64 Int32x32To64 (DWORD multiplier, DWORD multiplicand)
 {
