@@ -1,6 +1,6 @@
 #################################################
 #                                               #
-# Copyright (c) 1998-2001 Avid Technology, Inc. #
+# Copyright (c) 1998-1999 Avid Technology, Inc. #
 #                                               #
 #################################################
 
@@ -14,7 +14,7 @@ PLUGIN_DIR = $(AAFBASE)/ref-impl/plugins
 include $(BLD_CFG_DIR)/common.mk
 
 PACKAGE = dodoTool
-include $(AAFBASE)/build/common.mk
+include $(AAFBASE)/build/defs.mk
 
 DODO = $(BINDIR)/dodo
 
@@ -31,7 +31,7 @@ run:
 
 # This file contains the list of all of the targets to be built...
 include targets.mk
-include aafobjects.mk
+include aafobjects_gnu.mk
 
 
 INCLUDE_DIR = ../ref-impl/include
@@ -42,12 +42,10 @@ TEST_DIR = ../test/com/ComModTestAAF/ModuleTests
 
 targets: $(DODO_TARGETS)
 targets: $(PLUGIN_TARGETS)
-targets: $(INCLUDE_DIR)/com-api/AAFPrivate.idl
 targets: $(INCLUDE_DIR)/com-api/AAF.idl
-targets: $(INCLUDE_DIR)/com-api/AAFPlugin.idl
-targets: $(INCLUDE_DIR)/ref-api/AAFPrivate.h
+targets: $(PLUGIN_DIR)/AAFPlugin.idl
 targets: $(INCLUDE_DIR)/ref-api/AAF.h
-targets: $(UUID_DIR)/AAFPrivate_i.c
+targets: $(UUID_DIR)/AAFRoot_i.c
 targets: $(UUID_DIR)/AAF_i.c
 targets: $(INCLUDE_DIR)/ref-api/AAFPlugin.h
 targets: $(UUID_DIR)/AAFPlugin_i.c
@@ -55,263 +53,704 @@ targets: $(COMAPI_DIR)/AAFCLSIDs.h
 targets: $(IMPL_DIR)/AAFClassIDs.h
 targets: $(COMAPI_DIR)/AAFObjectTable.h
 targets: $(COMAPI_DIR)/AAFObjectTable_i.cpp
-targets: $(COMAPI_DIR)/CAAFEnumValidation.h
-targets: $(COMAPI_DIR)/CAAFEnumValidation.cpp
 
 
-$(INCLUDE_DIR)/com-api/AAFPrivate.idl : $(PRIVATE_FIDL_TARGETS) aafobjects.mk CopyrightMessage.txt GenAafPrivateIdl.sh
-	@ $(ECHO) Generating AAFPrivate.idl...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenAafPrivateIdl.sh >> tmp.sh
-	$(SH) tmp.sh > $(INCLUDE_DIR)/com-api/AAFPrivate.tmp
-	$(RM) tmp.sh
-	@if [ -f $(INCLUDE_DIR)/com-api/AAFPrivate.idl ] && cmp -s $(INCLUDE_DIR)/com-api/AAFPrivate.tmp $(INCLUDE_DIR)/com-api/AAFPrivate.idl; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/com-api/AAFPrivate.idl did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/com-api/AAFPrivate.idl; \
-		$(CP) -f $(INCLUDE_DIR)/com-api/AAFPrivate.tmp $(INCLUDE_DIR)/com-api/AAFPrivate.idl; \
-		$(CHMOD) +w $(INCLUDE_DIR)/com-api/AAFPrivate.idl; \
-	fi
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAFPrivate.tmp
+$(INCLUDE_DIR)/com-api/AAF.idl : $(FIDL_TARGETS)
+	@ echo Generating AAF.idl...
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.idl
+	@ ( echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
+	    echo "cpp_quote(\"// (C) Copyright 1998-1999 Avid Technology.\")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "cpp_quote(\"// This file was GENERATED for the AAF SDK on \")" ; \
+	    echo "cpp_quote(\"//  `date`\")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "cpp_quote(\"// Permission to use, copy and modify this software and accompanying \")" ; \
+	    echo "cpp_quote(\"// documentation, and to distribute and sublicense application software \")" ; \
+	    echo "cpp_quote(\"// incorporating this software for any purpose is hereby granted, \")" ; \
+	    echo "cpp_quote(\"// provided that (i) the above copyright notice and this permission \")" ; \
+	    echo "cpp_quote(\"// notice appear in all copies of the software and related documentation, \")" ; \
+	    echo "cpp_quote(\"// and (ii) the name Avid Technology, Inc. may not be used in any \")" ; \
+	    echo "cpp_quote(\"// advertising or publicity relating to the software without the specific, \")" ; \
+	    echo "cpp_quote(\"// prior written permission of Avid Technology, Inc. \")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "cpp_quote(\"// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, \")" ; \
+	    echo "cpp_quote(\"// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY \")" ; \
+	    echo "cpp_quote(\"// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. \")" ; \
+	    echo "cpp_quote(\"// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, \")" ; \
+	    echo "cpp_quote(\"// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR \")" ; \
+	    echo "cpp_quote(\"// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF \")" ; \
+	    echo "cpp_quote(\"// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND \")" ; \
+	    echo "cpp_quote(\"// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES \")" ; \
+	    echo "cpp_quote(\"// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT \")" ; \
+	    echo "cpp_quote(\"// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF \")" ; \
+	    echo "cpp_quote(\"// LIABILITY. \")" ; \
+	    echo "cpp_quote(\"// \")" ; \
+	    echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
+	    echo "cpp_quote(\"// AAF Interfaces.\")" ; \
+	    echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "" ; \
+	    echo \#ifndef DO_NO_IMPORTS ; \
+	    echo import \"unknwn.idl\"\; ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef DO_NO_IMPORTS ; \
+	    echo import \"objidl.idl\"\; ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef DO_NO_IMPORTS ; \
+	    echo import \"AAFTypes.idl\"\; ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
+	    	echo interface I$$class\;; \
+	    done ; \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
+	    	echo ""; \
+	    	echo ""; \
+	    	cat $$class.fidl; \
+	    done ; \
+	    echo "" ; \
+	    echo "" ; \
+	    echo "" ; \
+	    cat AAFModule.fidl; \
+	    echo "" ; \
+	) > $(INCLUDE_DIR)/com-api/AAF.idl
+	chmod -w $(INCLUDE_DIR)/com-api/AAF.idl
+
+$(PLUGIN_DIR)/AAFPlugin.idl : $(PLUGIN_FIDL_TARGETS)
+	@ echo Generating Plugin.idl...
+	$(RM) -f $(PLUGIN_DIR)/AAFPlugin.idl
+	@ ( echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
+	    echo "cpp_quote(\"// (C) Copyright 1998-1999 Avid Technology.\")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "cpp_quote(\"// This file was GENERATED for the AAF SDK on \")" ; \
+	    echo "cpp_quote(\"//  `date`\")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "cpp_quote(\"// Permission to use, copy and modify this software and accompanying \")" ; \
+	    echo "cpp_quote(\"// documentation, and to distribute and sublicense application software \")" ; \
+	    echo "cpp_quote(\"// incorporating this software for any purpose is hereby granted, \")" ; \
+	    echo "cpp_quote(\"// provided that (i) the above copyright notice and this permission \")" ; \
+	    echo "cpp_quote(\"// notice appear in all copies of the software and related documentation, \")" ; \
+	    echo "cpp_quote(\"// and (ii) the name Avid Technology, Inc. may not be used in any \")" ; \
+	    echo "cpp_quote(\"// advertising or publicity relating to the software without the specific, \")" ; \
+	    echo "cpp_quote(\"// prior written permission of Avid Technology, Inc. \")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "cpp_quote(\"// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, \")" ; \
+	    echo "cpp_quote(\"// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY \")" ; \
+	    echo "cpp_quote(\"// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. \")" ; \
+	    echo "cpp_quote(\"// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, \")" ; \
+	    echo "cpp_quote(\"// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR \")" ; \
+	    echo "cpp_quote(\"// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF \")" ; \
+	    echo "cpp_quote(\"// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND \")" ; \
+	    echo "cpp_quote(\"// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES \")" ; \
+	    echo "cpp_quote(\"// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT \")" ; \
+	    echo "cpp_quote(\"// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF \")" ; \
+	    echo "cpp_quote(\"// LIABILITY. \")" ; \
+	    echo "cpp_quote(\"// \")" ; \
+	    echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
+	    echo "cpp_quote(\"// AAF Interfaces.\")" ; \
+	    echo "cpp_quote(\"//=--------------------------------------------------------------------------=\")" ; \
+	    echo "cpp_quote(\"//\")" ; \
+	    echo "" ; \
+	    echo \#ifndef DO_NO_IMPORTS ; \
+	    echo import \"unknwn.idl\"\; ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef DO_NO_IMPORTS ; \
+	    echo import \"objidl.idl\"\; ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef DO_NO_IMPORTS ; \
+	    echo import \"AAF.idl\"\; ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef DO_NO_IMPORTS ; \
+	    echo import \"AAFPluginTypes.idl\"\; ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    for class in $(PLUGIN_OBJECTS) ; do \
+	    	echo interface I$$class\;; \
+	    done ; \
+	    for class in $(PLUGIN_OBJECTS) ; do \
+	    	echo ""; \
+	    	echo ""; \
+	    	cat $$class.fidl; \
+	    done ; \
+	) > $(PLUGIN_DIR)/AAFPlugin.idl
+	chmod -w $(PLUGIN_DIR)/AAFPlugin.idl
+
+$(INCLUDE_DIR)/ref-api/AAF.h : $(FREFH_TARGETS)
+	@ echo Generating reference AAF.h...
+	$(RM) -f $(INCLUDE_DIR)/ref-api/AAF.h
+	@ ( echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  `date`" ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "// " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// AAF Interfaces." ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "//" ; \
+	    echo \#ifndef __AAF_h__ ; \
+	    echo \#define __AAF_h__ ; \
+	    echo "" ; \
+	    echo \#ifndef __AAFCOMPlatform_h__ ; \
+	    echo \#include \"AAFCOMPlatform.h\" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef __AAFTypes_h__ ; \
+	    echo \#include \"AAFTypes.h\" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifdef __cplusplus ; \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
+	    	echo interface I$$class\;; \
+	    done ; \
+	    echo \#else ; \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
+	    	echo typedef interface I$$class I$$class\;;  \
+	    done ; \
+	    echo \#endif ; \
+	    for class in $(DODO_TARGET_NAMES) $(AAFCOMINTERFACESONLY) ; do \
+	    	echo ""; \
+	    	echo "// I$$class"; \
+	    	echo ""; \
+	    	cat $$class.frefh; \
+	    done ; \
+	    echo "" ; \
+	    echo "" ; \
+	    echo "" ; \
+	    cat AAFModule.frefh; \
+	    echo "" ; \
+	    echo \#endif // __AAF_h__ ; \
+	) > $(INCLUDE_DIR)/ref-api/AAF.h
+	chmod -w $(INCLUDE_DIR)/ref-api/AAF.h
 
 
-$(INCLUDE_DIR)/com-api/AAF.idl : $(FIDL_TARGETS) aafobjects.mk CopyrightMessage.txt GenAafIdl.sh
-	@ $(ECHO) Generating AAF.idl...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenAafIdl.sh >> tmp.sh
-	$(SH) tmp.sh > $(INCLUDE_DIR)/com-api/AAF.tmp
-	$(RM) tmp.sh
-	@if [ -f $(INCLUDE_DIR)/com-api/AAF.idl ] && cmp -s $(INCLUDE_DIR)/com-api/AAF.tmp $(INCLUDE_DIR)/com-api/AAF.idl; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/com-api/AAF.idl did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/com-api/AAF.idl; \
-		$(CP) -f $(INCLUDE_DIR)/com-api/AAF.tmp $(INCLUDE_DIR)/com-api/AAF.idl; \
-		$(CHMOD) +w $(INCLUDE_DIR)/com-api/AAF.idl; \
-	fi
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.tmp
+$(INCLUDE_DIR)/ref-api/AAFPlugin.h : $(PLUGIN_FREFH_TARGETS)
+	@ echo Generating reference AAFPlugin.h...
+	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFPlugin.h
+	@ ( echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// AAF Plugin Interfaces." ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "//" ; \
+	    echo \#ifndef __AAFPlugin_h__ ; \
+	    echo \#define __AAFPlugin_h__ ; \
+	    echo "" ; \
+	    echo \#ifndef __AAF_h__ ; \
+	    echo \#include \"AAF.h\" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef __AAFPluginTypes_h__ ; \
+	    echo \#include \"AAFPluginTypes.h\" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifdef __cplusplus ; \
+	    for class in $(PLUGIN_OBJECTS) ; do \
+	    	echo interface I$$class\;; \
+	    done ; \
+	    echo \#else ; \
+	    for class in $(PLUGIN_OBJECTS) ; do \
+	    	echo typedef interface I$$class I$$class\;;  \
+	    done ; \
+	    echo \#endif ; \
+	    for class in $(PLUGIN_OBJECTS) ; do \
+	    	echo ""; \
+	    	echo "// I$$class"; \
+	    	echo ""; \
+	    	cat $$class.frefh; \
+	    done ; \
+	    echo "" ; \
+	    echo \#endif // __AAFPlugin_h__ ; \
+	) > $(INCLUDE_DIR)/ref-api/AAFPlugin.h
+	chmod -w $(INCLUDE_DIR)/ref-api/AAFPlugin.h
 
 
-$(INCLUDE_DIR)/com-api/AAFPlugin.idl : $(PLUGIN_FIDL_TARGETS) aafobjects.mk CopyrightMessage.txt GenPluginIdl.sh
-	@ $(ECHO) Generating Plugin.idl...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenPluginIdl.sh >> tmp.sh
-	$(SH) tmp.sh > $(INCLUDE_DIR)/com-api/AAFPlugin.tmp
-	$(RM) tmp.sh
-	@if [ -f $(INCLUDE_DIR)/com-api/AAFPlugin.idl ] && cmp -s $(INCLUDE_DIR)/com-api/AAFPlugin.tmp $(INCLUDE_DIR)/com-api/AAFPlugin.idl;\
-	then \
-		$(ECHO) $(INCLUDE_DIR)/com-api/AAFPlugin.idl did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/com-api/AAFPlugin.idl; \
-		$(CP) -f $(INCLUDE_DIR)/com-api/AAFPlugin.tmp $(INCLUDE_DIR)/com-api/AAFPlugin.idl; \
-		$(CHMOD) +w $(INCLUDE_DIR)/com-api/AAFPlugin.idl; \
-	fi
-	$(RM) -f $(INCLUDE_DIR)/com-api/AAFPlugin.tmp
+$(UUID_DIR)/AAF_i.c : aafobjects_gnu.mk dod2iid.awk
+	@ echo Generating reference AAF_i.c...
+	$(RM) -f $(UUID_DIR)/AAF_i.c
+	@ ( echo "/* this file contains the actual definitions of */" ; \
+	    echo "/* the IIDs and CLSIDs */" ; \
+	    echo "" ; \
+	    echo "/* link this file in with the server and any clients */" ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// Definitions for all of the public IID needed by an AAF SDK client" ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "//" ; \
+	    echo "" ; \
+	    echo \#ifdef __cplusplus ; \
+	    echo "extern \"C\"{" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo "" ; \
+	    echo \#ifndef __IID_DEFINED__ ; \
+	    echo \#define __IID_DEFINED__ ; \
+	    echo "" ; \
+	    echo "typedef struct _IID" ; \
+	    echo "{" ; \
+	    echo "    unsigned long x;" ; \
+	    echo "    unsigned short s1;" ; \
+	    echo "    unsigned short s2;" ; \
+	    echo "    unsigned char  c[8];" ; \
+	    echo "} IID;" ; \
+	    echo "" ; \
+	    echo \#endif "// __IID_DEFINED__" ; \
+	    echo "" ; \
+	    echo \#ifndef CLSID_DEFINED ; \
+	    echo \#define CLSID_DEFINED ; \
+	    echo "typedef IID CLSID;" ; \
+	    echo \#endif "// CLSID_DEFINED" ; \
+	    echo "" ; \
+	    for class in $(AAFOBJECTS) $(AAFCOMINTERFACESONLY) ; do \
+	    	awk -f dod2iid.awk C=$$class $$class.dod ; \
+	    done ; \
+	    echo \#ifdef __cplusplus ; \
+	    echo "}" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	) > $(UUID_DIR)/AAF_i.c
+	chmod -w $(UUID_DIR)/AAF_i.c
 
 
-$(INCLUDE_DIR)/ref-api/AAFPrivate.h : aafobjects.mk $(PRIVATE_FREFH_TARGETS) CopyrightMessage.txt GenAafPrivateh.sh
-	@ $(ECHO) Generating reference AAFPrivate.h...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenAafPrivateh.sh >> tmp.sh
-	$(SH) tmp.sh > $(INCLUDE_DIR)/ref-api/AAFPrivate.tmp
-	$(RM) tmp.sh
-	@if [ -f $(INCLUDE_DIR)/ref-api/AAFPrivate.h ] && cmp -s $(INCLUDE_DIR)/ref-api/AAFPrivate.tmp $(INCLUDE_DIR)/ref-api/AAFPrivate.h; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/ref-api/AAFPrivate.h did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/ref-api/AAFPrivate.h; \
-		$(CP) -f $(INCLUDE_DIR)/ref-api/AAFPrivate.tmp $(INCLUDE_DIR)/ref-api/AAFPrivate.h; \
-		$(CHMOD) +w $(INCLUDE_DIR)/ref-api/AAFPrivate.h; \
-	fi
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFPrivate.tmp
+$(UUID_DIR)/AAFPlugin_i.c : aafobjects_gnu.mk dod2iid.awk
+	@ echo Generating reference AAFPlugin_i.c...
+	$(RM) -f $(UUID_DIR)/AAFPlugin_i.c
+	@ ( echo "/* this file contains the actual definitions of */" ; \
+	    echo "/* the IIDs and CLSIDs */" ; \
+	    echo "" ; \
+	    echo "/* link this file in with the server and any clients */" ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// Definitions for all public IID's needed by an AAF SDK Plugin author" ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "//" ; \
+	    echo "" ; \
+	    echo \#ifdef __cplusplus ; \
+	    echo "extern \"C\"{" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo "" ; \
+	    echo \#ifndef __IID_DEFINED__ ; \
+	    echo \#define __IID_DEFINED__ ; \
+	    echo "" ; \
+	    echo "typedef struct _IID" ; \
+	    echo "{" ; \
+	    echo "    unsigned long x;" ; \
+	    echo "    unsigned short s1;" ; \
+	    echo "    unsigned short s2;" ; \
+	    echo "    unsigned char  c[8];" ; \
+	    echo "} IID;" ; \
+	    echo "" ; \
+	    echo \#endif "// __IID_DEFINED__" ; \
+	    echo "" ; \
+	    echo \#ifndef CLSID_DEFINED ; \
+	    echo \#define CLSID_DEFINED ; \
+	    echo "typedef IID CLSID;" ; \
+	    echo \#endif "// CLSID_DEFINED" ; \
+	    echo "" ; \
+	    for class in $(PLUGIN_OBJECTS) ; do \
+	    	awk -f dod2iid.awk C=$$class $$class.dod ; \
+	    done ; \
+	    echo \#ifdef __cplusplus ; \
+	    echo "}" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	) > $(UUID_DIR)/AAFPlugin_i.c
+	chmod -w $(UUID_DIR)/AAFPlugin_i.c
 
 
-$(INCLUDE_DIR)/ref-api/AAF.h : $(FREFH_TARGETS) aafobjects.mk CopyrightMessage.txt GenAafh.sh
-	@ $(ECHO) Generating reference AAF.h...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenAafh.sh >> tmp.sh
-	$(SH) tmp.sh > $(INCLUDE_DIR)/ref-api/AAF.tmp
-	$(RM) tmp.sh
-	@if [ -f $(INCLUDE_DIR)/ref-api/AAF.h ] && cmp -s $(INCLUDE_DIR)/ref-api/AAF.tmp $(INCLUDE_DIR)/ref-api/AAF.h; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/ref-api/AAF.h did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/ref-api/AAF.h; \
-		$(CP) -f $(INCLUDE_DIR)/ref-api/AAF.tmp $(INCLUDE_DIR)/ref-api/AAF.h; \
-		$(CHMOD) +w $(INCLUDE_DIR)/ref-api/AAF.h; \
-	fi
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAF.tmp
+$(UUID_DIR)/AAFRoot_i.c : aafobjects_gnu.mk dod2iid.awk
+	@ echo Generating reference AAFRoot_i.c...
+	$(RM) -f $(UUID_DIR)/AAFRoot_i.c
+	@ ( echo "/* this file contains the actual definitions of */" ; \
+	    echo "/* the IIDs and CLSIDs */" ; \
+	    echo "" ; \
+	    echo "/* link this file in with the server and any clients */" ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// Definitions for all public IID's needed by an AAF SDK Plugin author" ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "//" ; \
+	    echo "" ; \
+	    echo \#ifdef __cplusplus ; \
+	    echo "extern \"C\"{" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo "" ; \
+	    echo \#ifndef __IID_DEFINED__ ; \
+	    echo \#define __IID_DEFINED__ ; \
+	    echo "" ; \
+	    echo "typedef struct _IID" ; \
+	    echo "{" ; \
+	    echo "    unsigned long x;" ; \
+	    echo "    unsigned short s1;" ; \
+	    echo "    unsigned short s2;" ; \
+	    echo "    unsigned char  c[8];" ; \
+	    echo "} IID;" ; \
+	    echo "" ; \
+	    echo \#endif "// __IID_DEFINED__" ; \
+	    echo "" ; \
+	    echo \#ifndef CLSID_DEFINED ; \
+	    echo \#define CLSID_DEFINED ; \
+	    echo "typedef IID CLSID;" ; \
+	    echo \#endif "// CLSID_DEFINED" ; \
+	    echo "" ; \
+	    for class in AAFRoot ; do \
+	    	awk -f dod2iid.awk C=$$class $$class.dod ; \
+	    done ; \
+	    echo \#ifdef __cplusplus ; \
+	    echo "}" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	) > $(UUID_DIR)/AAFRoot_i.c
+	chmod -w $(UUID_DIR)/AAFRoot_i.c
 
 
-$(INCLUDE_DIR)/ref-api/AAFPlugin.h : $(PLUGIN_FREFH_TARGETS) aafobjects.mk CopyrightMessage.txt GenPluginh.sh
-	@ $(ECHO) Generating reference AAFPlugin.h...
-	$(CP) aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenPluginh.sh >> tmp.sh
-	$(SH) tmp.sh > $(INCLUDE_DIR)/ref-api/AAFPlugin.tmp
-	$(RM) tmp.sh
-	@if [ -f $(INCLUDE_DIR)/ref-api/AAFPlugin.h ] && cmp -s $(INCLUDE_DIR)/ref-api/AAFPlugin.tmp $(INCLUDE_DIR)/ref-api/AAFPlugin.h; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/ref-api/AAFPlugin.h did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/ref-api/AAFPlugin.h; \
-		$(CP) -f $(INCLUDE_DIR)/ref-api/AAFPlugin.tmp $(INCLUDE_DIR)/ref-api/AAFPlugin.h; \
-		$(CHMOD) +w $(INCLUDE_DIR)/ref-api/AAFPlugin.h; \
-	fi
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFPlugin.tmp
+$(IMPL_DIR)/AAFClassIDs.h : aafobjects_gnu.mk
+	@ echo Generating reference AAFClassIDs.h...
+	$(RM) -f $(IMPL_DIR)/AAFClassIDs.h
+	@ ( echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// Declarations for all of the private AAF code class ids" ; \
+	    echo "// This file is private to the AAF Reference Implementation." ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "//" ; \
+	    echo \#ifndef __AAFClassIDs_h__ ; \
+	    echo \#define __AAFClassIDs_h__ ; \
+	    echo "" ; \
+	    echo \#ifndef __AAFTypes_h__ ; \
+	    echo \#include \"AAFTypes.h\" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo "" ; \
+	    for class in $(AAFOBJECTS) ; do \
+	    	echo "extern \"C\" const aafClassID_t CLSID_$$class;"; \
+	    done ; \
+	    echo "" ; \
+	    echo \#endif // __AAFClassIDs_h__ ; \
+	) > $(IMPL_DIR)/AAFClassIDs.h
+	chmod -w $(IMPL_DIR)/AAFClassIDs.h
 
 
-$(UUID_DIR)/AAF_i.c : aafobjects.mk dod2iid.awk CopyrightMessage.txt GenAaf_i.sh
-	@ $(ECHO) Generating reference AAF_i.c...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenAaf_i.sh >> tmp.sh
-	$(SH) tmp.sh > $(UUID_DIR)/AAF_i.tmp
-	$(RM) tmp.sh
-	@if [ -f $(UUID_DIR)/AAF_i.c ] && cmp -s $(UUID_DIR)/AAF_i.tmp $(UUID_DIR)/AAF_i.c; \
-	then \
-		$(ECHO) $(UUID_DIR)/AAF_i.c did not change; \
-	else \
-		$(ECHO) Updating $(UUID_DIR)/AAF_i.c; \
-		$(CP) -f $(UUID_DIR)/AAF_i.tmp $(UUID_DIR)/AAF_i.c; \
-		$(CHMOD) +w $(UUID_DIR)/AAF_i.c; \
-	fi
-	$(RM) -f $(UUID_DIR)/AAF_i.tmp
+$(COMAPI_DIR)/AAFCLSIDs.h : aafobjects_gnu.mk
+	@ echo Generating reference AAFCLSIDs.h...
+	$(RM) -f $(COMAPI_DIR)/AAFCLSIDs.h
+	@ ( echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// Declarations for all of the private AAF code class ids" ; \
+	    echo "// This file is private to the AAF Reference Implementation." ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "//" ; \
+	    echo \#ifndef __AAFCLSIDs_h__ ; \
+	    echo \#define __AAFCLSIDs_h__ ; \
+	    echo "" ; \
+	    echo \#ifndef __AAFCOMPlatformTypes_h__ ; \
+	    echo \#include \"AAFCOMPlatformTypes.h\" ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    for class in $(AAFOBJECTS) ; do \
+	    	echo "EXTERN_C const CLSID CLSID_$$class;"; \
+	    done ; \
+	    echo "" ; \
+	    echo \#endif // __AAFCLSIDs_h__ ; \
+	) > $(COMAPI_DIR)/AAFCLSIDs.h
+	chmod -w $(COMAPI_DIR)/AAFCLSIDs.h
 
 
-$(UUID_DIR)/AAFPlugin_i.c : aafobjects.mk dod2iid.awk CopyrightMessage.txt GenPlugin_i.sh
-	@ $(ECHO) Generating reference AAFPlugin_i.c...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenPlugin_i.sh >> tmp.sh
-	$(SH) tmp.sh > $(UUID_DIR)/AAFPlugin_i.tmp
-	$(RM) tmp.sh
-	@if [ -f $(UUID_DIR)/AAFPlugin_i.c ] && cmp -s $(UUID_DIR)/AAFPlugin_i.tmp $(UUID_DIR)/AAFPlugin_i.c; \
-	then \
-		$(ECHO) $(UUID_DIR)/AAFPlugin_i.c did not change; \
-	else \
-		$(ECHO) Updating $(UUID_DIR)/AAFPlugin_i.c; \
-		$(CP) -f $(UUID_DIR)/AAFPlugin_i.tmp $(UUID_DIR)/AAFPlugin_i.c; \
-		$(CHMOD) +w $(UUID_DIR)/AAFPlugin_i.c; \
-	fi
-	$(RM) -f $(UUID_DIR)/AAFPlugin_i.tmp
+$(COMAPI_DIR)/AAFObjectTable.h : aafobjects_gnu.mk
+	@ echo Generating reference AAFObjectTable.h...
+	@ $(RM) -f $(COMAPI_DIR)/AAFObjectTable.tmp
+	@ ( echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// This file contains invocations of the macros described below." ; \
+	    echo "//" ; \
+	    echo "// To use this file -" ; \
+	    echo "//   1) #define the macros to suit your usage" ; \
+	    echo "//   2) #include this file" ; \
+	    echo "//   3) #undef the macros" ; \
+	    echo "" ; \
+	    echo "// Default empty definitions so that you only have to define" ; \
+	    echo "// those macros you actually want to use." ; \
+	    echo "//" ; \
+	    echo \#ifndef AAF_BEGIN_OBJECT_MAP ; \
+	    echo \#define AAF_BEGIN_OBJECT_MAP\(x\) ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef AAF_END_OBJECT_MAP ; \
+	    echo \#define AAF_END_OBJECT_MAP\(\) ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo \#ifndef AAF_END_OBJECT_MAP ; \
+	    echo \#define AAF_OBJECT_ENTRY\(name\) ; \
+	    echo \#endif ; \
+	    echo "" ; \
+	    echo "" ; \
+	    echo "//" ; \
+	    echo "// Include all objects in the following table:" ; \
+	    echo "//" ; \
+	    echo AAF_BEGIN_OBJECT_MAP\(AAFObjectMap\) ; \
+	    for AAF in ${AAFOBJECTS} ; do \
+		echo "	AAF_OBJECT_ENTRY("$$AAF")" ; \
+	    done ; \
+	    echo AAF_END_OBJECT_MAP\(\) ; \
+	) > $(COMAPI_DIR)/AAFObjectTable.tmp
+	$(RM) -f $(COMAPI_DIR)/AAFObjectTable.h
+	mv $(COMAPI_DIR)/AAFObjectTable.tmp $(COMAPI_DIR)/AAFObjectTable.h
+	chmod -w $(COMAPI_DIR)/AAFObjectTable.h
 
 
-$(UUID_DIR)/AAFPrivate_i.c : aafobjects.mk dod2iid.awk CopyrightMessage.txt GenAafPrivate_i.sh
-	@ $(ECHO) Generating reference AAFPrivate_i.c...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenAafPrivate_i.sh >> tmp.sh
-	$(SH) tmp.sh > $(UUID_DIR)/AAFPrivate_i.tmp
-	$(RM) tmp.sh
-	@if [ -f $(UUID_DIR)/AAFPrivate_i.c ] && cmp -s $(UUID_DIR)/AAFPrivate_i.tmp $(UUID_DIR)/AAFPrivate_i.c; \
-	then \
-		$(ECHO) $(UUID_DIR)/AAFPrivate_i.c did not change; \
-	else \
-		$(ECHO) Updating $(UUID_DIR)/AAFPrivate_i.c; \
-		$(CP) -f $(UUID_DIR)/AAFPrivate_i.tmp $(UUID_DIR)/AAFPrivate_i.c; \
-		$(CHMOD) +w $(UUID_DIR)/AAFPrivate_i.c; \
-	fi
-	$(RM) -f $(UUID_DIR)/AAFPrivate_i.tmp
+$(COMAPI_DIR)/AAFObjectTable_i.cpp : aafobjects_gnu.mk
+	@ echo Generating reference AAFObjectTable_i.cpp...
+	@ $(RM) -f $(COMAPI_DIR)/AAFObjectTable_i.tmp
+	@ ( echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "// (C) Copyright 1998-1999 Avid Technology." ; \
+	    echo "//" ; \
+	    echo "// This file was GENERATED for the AAF SDK on " ; \
+	    echo "//  "`date` ; \
+	    echo "//" ; \
+	    echo "// Permission to use, copy and modify this software and accompanying " ; \
+	    echo "// documentation, and to distribute and sublicense application software " ; \
+	    echo "// incorporating this software for any purpose is hereby granted, " ; \
+	    echo "// provided that (i) the above copyright notice and this permission " ; \
+	    echo "// notice appear in all copies of the software and related documentation, " ; \
+	    echo "// and (ii) the name Avid Technology, Inc. may not be used in any " ; \
+	    echo "// advertising or publicity relating to the software without the specific, " ; \
+	    echo "// prior written permission of Avid Technology, Inc. " ; \
+	    echo "//" ; \
+	    echo "// THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND, " ; \
+	    echo "// EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY " ; \
+	    echo "// WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. " ; \
+	    echo "// IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT, " ; \
+	    echo "// SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR " ; \
+	    echo "// OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF " ; \
+	    echo "// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND " ; \
+	    echo "// ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES " ; \
+	    echo "// RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT " ; \
+	    echo "// ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF " ; \
+	    echo "// LIABILITY. " ; \
+	    echo "//=--------------------------------------------------------------------------=" ; \
+	    echo "" ; \
+	    echo "//" ; \
+	    echo "// Include the CLSID declarations..." ; \
+	    echo "//" ; \
+	    echo \#include \"AAFCLSIDs.h\" ; \
+	    echo "" ; \
+	    echo "//" ; \
+	    echo "// Include the appropriate header files:" ; \
+	    echo "//" ; \
+	    for AAF in ${AAFOBJECTS} ; do \
+	        echo \#include \"C$$AAF.h\" ; \
+	    done ; \
+	    echo "" ; \
+	    echo "//" ; \
+	    echo "// Include AAF Object Table:" ; \
+	    echo "//" ; \
+	    echo \#include \"AAFObjectTable.h\" ; \
+	) > $(COMAPI_DIR)/AAFObjectTable_i.tmp
+	$(RM) -f $(COMAPI_DIR)/AAFObjectTable_i.cpp
+	mv $(COMAPI_DIR)/AAFObjectTable_i.tmp $(COMAPI_DIR)/AAFObjectTable_i.cpp
+	chmod -w $(COMAPI_DIR)/AAFObjectTable_i.cpp
 
-
-$(IMPL_DIR)/AAFClassIDs.h : aafobjects.mk CopyrightMessage.txt GenClassIDs.sh
-	@ $(ECHO) Generating reference AAFClassIDs.h...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenClassIDs.sh >> tmp.sh
-	$(SH) tmp.sh > $(IMPL_DIR)/AAFClassIDs.tmp
-	$(RM) tmp.sh
-	@if [ -f $(IMPL_DIR)/AAFClassIDs.h ] && cmp -s $(IMPL_DIR)/AAFClassIDs.tmp $(IMPL_DIR)/AAFClassIDs.h; \
-	then \
-		$(ECHO) $(IMPL_DIR)/AAFClassIDs.h did not change; \
-	else \
-		$(ECHO) Updating $(IMPL_DIR)/AAFClassIDs.h; \
-		$(CP) -f $(IMPL_DIR)/AAFClassIDs.tmp $(IMPL_DIR)/AAFClassIDs.h; \
-		$(CHMOD) +w $(IMPL_DIR)/AAFClassIDs.h; \
-	fi
-	$(RM) -f $(IMPL_DIR)/AAFClassIDs.tmp
-
-
-$(COMAPI_DIR)/AAFCLSIDs.h : aafobjects.mk CopyrightMessage.txt GenCLSIDs.sh
-	@ $(ECHO) Generating reference AAFCLSIDs.h...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenCLSIDs.sh >> tmp.sh
-	$(SH) tmp.sh > $(COMAPI_DIR)/AAFCLSIDs.tmp
-	$(RM) tmp.sh
-	@if [ -f $(COMAPI_DIR)/AAFCLSIDs.h ] && cmp -s $(COMAPI_DIR)/AAFCLSIDs.tmp $(COMAPI_DIR)/AAFCLSIDs.h; \
-	then \
-		$(ECHO) $(COMAPI_DIR)/AAFCLSIDs.h did not change; \
-	else \
-		$(ECHO) Updating $(COMAPI_DIR)/AAFCLSIDs.h; \
-		$(CP) -f $(COMAPI_DIR)/AAFCLSIDs.tmp $(COMAPI_DIR)/AAFCLSIDs.h; \
-		$(CHMOD) +w $(COMAPI_DIR)/AAFCLSIDs.h; \
-	fi
-	$(RM) -f $(COMAPI_DIR)/AAFCLSIDs.tmp
-
-
-$(COMAPI_DIR)/AAFObjectTable.h : aafobjects.mk CopyrightMessage.txt GenObjectTable.sh
-	@ $(ECHO) Generating reference AAFObjectTable.h...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenObjectTable.sh >> tmp.sh
-	$(SH) tmp.sh > $(COMAPI_DIR)/AAFObjectTable.tmp
-	$(RM) tmp.sh
-	@if [ -f  $(COMAPI_DIR)/AAFObjectTable.h ] && cmp -s $(COMAPI_DIR)/AAFObjectTable.tmp $(COMAPI_DIR)/AAFObjectTable.h; \
-	then \
-		$(ECHO) $(COMAPI_DIR)/AAFObjectTable.h did not change; \
-	else \
-		$(ECHO) Updating $(COMAPI_DIR)/AAFObjectTable.h; \
-		$(CP) -f $(COMAPI_DIR)/AAFObjectTable.tmp $(COMAPI_DIR)/AAFObjectTable.h; \
-		$(CHMOD) +w $(COMAPI_DIR)/AAFObjectTable.h; \
-	fi
-	$(RM) -f $(COMAPI_DIR)/AAFObjectTable.tmp
-
-
-$(COMAPI_DIR)/AAFObjectTable_i.cpp : aafobjects.mk CopyrightMessage.txt GenObjectTable_i.sh
-	@ $(ECHO) Generating reference AAFObjectTable_i.cpp...
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(CAT) GenObjectTable_i.sh >> tmp.sh
-	$(SH) tmp.sh > $(COMAPI_DIR)/AAFObjectTable_i.tmp
-	$(RM) tmp.sh
-	@if [ -f $(COMAPI_DIR)/AAFObjectTable_i.cpp ] && cmp -s $(COMAPI_DIR)/AAFObjectTable_i.tmp $(COMAPI_DIR)/AAFObjectTable_i.cpp; \
-	then \
-		$(ECHO) $(COMAPI_DIR)/AAFObjectTable_i.cpp did not change; \
-	else \
-		$(ECHO) Updating $(COMAPI_DIR)/AAFObjectTable_i.cpp; \
-		$(CP) -f $(COMAPI_DIR)/AAFObjectTable_i.tmp $(COMAPI_DIR)/AAFObjectTable_i.cpp; \
-		$(CHMOD) +w $(COMAPI_DIR)/AAFObjectTable_i.cpp; \
-	fi
-	$(RM) -f $(COMAPI_DIR)/AAFObjectTable_i.tmp
-
-$(COMAPI_DIR)/CAAFEnumValidation.cpp $(COMAPI_DIR)/CAAFEnumValidation.h : GenEnumValidation.pl AAFPluginTypes.dod AAFTypes.dod
-	@ $(ECHO) Generating references CAAFEnumValidation.cpp and CAAFEnumValidation.h ...
-	$(PERL) GenEnumValidation.pl AAFTypes.dod AAFPluginTypes.dod > GenEnumValidationLog.txt
-	@if [ -f $(COMAPI_DIR)/CAAFEnumValidation.cpp ] && cmp -s CAAFEnumValidation.cpp $(COMAPI_DIR)/CAAFEnumValidation.cpp; \
-	then \
-		$(ECHO) $(COMAPI_DIR)/CAAFEnumValidation.cpp did not change; \
-	else \
-		$(ECHO) Updating $(COMAPI_DIR)/CAAFEnumValidation.cpp; \
-		$(CP) -f CAAFEnumValidation.cpp $(COMAPI_DIR); \
-		$(CHMOD) +w $(COMAPI_DIR)/CAAFEnumValidation.cpp; \
-	fi
-	@if [ -f $(COMAPI_DIR)/CAAFEnumValidation.h ] && cmp -s CAAFEnumValidation.h $(COMAPI_DIR)/CAAFEnumValidation.h; \
-	then \
-		$(ECHO) $(COMAPI_DIR)/CAAFEnumValidation.h did not change; \
-	else \
-		$(ECHO) Updating $(COMAPI_DIR)/CAAFEnumValidation.h; \
-		$(CP) -f CAAFEnumValidation.h $(COMAPI_DIR); \
-		$(CHMOD) +w $(COMAPI_DIR)/CAAFEnumValidation.h; \
-	fi
-	$(RM) -f CAAFEnumValidation.cpp CAAFEnumValidation.h
 
 
 SRC_DIR = ../ref-impl/src
@@ -319,217 +758,155 @@ SRC_DIR = ../ref-impl/src
 .dod.exp :
 	$(RM) -f $*.exp
 	$(DODO) -f macros/exp.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.exp
-	$(CHMOD) -w $*.exp
+	mv $*.tmp $*.exp
+	chmod -w $*.exp
 
 .dod.h :
 	$(RM) -f $*.h
 	$(DODO) -f macros/h.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.h
-	$(CHMOD) -w $*.h
-	@if [ -f $(INCLUDE_DIR)/cpp-api/$*.h ] && cmp -s $*.h $(INCLUDE_DIR)/cpp-api/$*.h; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/cpp-api/$*.h did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/cpp-api/$*.h; \
-		$(CP) -f $*.h $(INCLUDE_DIR)/cpp-api; \
-		$(CHMOD) -w $(INCLUDE_DIR)/cpp-api/$*.h; \
-	fi
+	mv $*.tmp $*.h
+	chmod -w $*.h
+	cp -f $*.h $(INCLUDE_DIR)/cpp-api/
+	chmod -w $(INCLUDE_DIR)/cpp-api/$*.h
 
 .dod.cppt :
 	$(RM) -f $*.cppt
 	$(DODO) -f macros/cppt.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.cppt
-	$(CHMOD) -w $*.cppt
-	@if [ -f $(TEST_DIR)/$*Test.cpp ] && cmp -s $*.cppt $(TEST_DIR)/$*Test.cpp; \
-	then \
-		$(ECHO) $(TEST_DIR)/$*Test.cpp did not change; \
-	else \
-		$(ECHO) Updating $(TEST_DIR)/$*Test.cpp; \
-		$(CP) -f $*.cppt $(TEST_DIR)/$*Test.cpp; \
-		$(CHMOD) +w $(TEST_DIR)/$*Test.cpp; \
-	fi
+	mv $*.tmp $*.cppt
+	chmod -w $*.cppt
+	cp -f $*.cppt $(TEST_DIR)/$*Test.cpp
+	chmod -w $(TEST_DIR)//$*Test.cpp
 
 .dod.comh :
 	$(RM) -f $*.comh
 	$(DODO) -f macros/comh.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.comh
-	$(CHMOD) -w $*.comh
-	@if [ -f $(SRC_DIR)/com-api/C$*.h ] && cmp -s $*.comh $(SRC_DIR)/com-api/C$*.h; \
-	then \
-		$(ECHO) $(SRC_DIR)/com-api/C$*.h did not change; \
-	else \
-		$(ECHO) Updating $(SRC_DIR)/com-api/C$*.h; \
-		$(CP) -f $*.comh $(SRC_DIR)/com-api/C$*.h; \
-		$(CHMOD) +w $(SRC_DIR)/com-api/C$*.h; \
-	fi
+	mv $*.tmp $*.comh
+	chmod -w $*.comh
+	cp -f $*.comh $(SRC_DIR)/com-api/C$*.h
+	chmod -w $(SRC_DIR)/com-api/C$*.h
 
 .dod.comc :
 	$(RM) -f $*.comc
 	$(DODO) -f macros/comc.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.comc
-	$(CHMOD) -w $*.comc
-	@if [ -f $(SRC_DIR)/com-api/C$*.cpp ] && cmp -s $*.comc $(SRC_DIR)/com-api/C$*.cpp; \
-	then \
-		$(ECHO) $(SRC_DIR)/com-api/C$*.cpp did not change; \
-	else \
-		$(ECHO) Updating $(SRC_DIR)/com-api/C$*.cpp; \
-		$(CP) -f $*.comc $(SRC_DIR)/com-api/C$*.cpp; \
-		$(CHMOD) +w $(SRC_DIR)/com-api/C$*.cpp; \
-	fi
+	mv $*.tmp $*.comc
+	chmod -w $*.comc
+	cp -f $*.comc $(SRC_DIR)/com-api/C$*.cpp
+	chmod -w $(SRC_DIR)/com-api/C$*.cpp
 
 .dod.comcx :
 	$(RM) -f $*.comcx
 	$(DODO) -f macros/comcx.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.comcx
-	$(CHMOD) -w $*.comcx
-	@if [ -f $(SRC_DIR)/com-api/C$*.cpp ] && cmp -s $*.comcx $(SRC_DIR)/com-api/C$*.cpp; \
-	then \
-		$(ECHO) $(SRC_DIR)/com-api/C$*.cpp did not change; \
-	else \
-		$(ECHO) Updating $(SRC_DIR)/com-api/C$*.cpp; \
-		$(CP) -f $*.comcx $(SRC_DIR)/com-api/C$*.cpp; \
-		$(CHMOD) +w $(SRC_DIR)/com-api/C$*.cpp; \
-	fi
+	mv $*.tmp $*.comcx
+	chmod -w $*.comcx
+	cp -f $*.comcx $(SRC_DIR)/com-api/C$*.cpp
+	chmod -w $(SRC_DIR)/com-api/C$*.cpp
 
 .dod.comt :
 	$(RM) -f $*.comt
 	$(DODO) -f macros/comt.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.comt
-	$(CHMOD) -w $*.comt
-	@if [ -f $(TEST_DIR)/C$*Test.cpp ] && cmp -s $*.comt $(TEST_DIR)/C$*Test.cpp; \
-	then \
-		$(ECHO) $(TEST_DIR)/C$*Test.cpp did not change; \
-	else \
-		$(ECHO) Updating $(TEST_DIR)/C$*Test.cpp; \
-		$(CP) -f $*.comt $(TEST_DIR)/C$*Test.cpp; \
-		$(CHMOD) +w $(TEST_DIR)/C$*Test.cpp; \
-	fi
+	mv $*.tmp $*.comt
+	chmod -w $*.comt
+	cp -f $*.comt $(TEST_DIR)/C$*Test.cpp
+	chmod -w $(TEST_DIR)/C$*Test.cpp
 
 .dod.implh :
 	$(RM) -f $*.implh ;
 	$(DODO) -f macros/implh.mac < $*.dod > $*.tmp ;
-	$(MV) $*.tmp $*.implh ;
-	$(CHMOD) -w $*.implh ;
-	@if [ -f $(SRC_DIR)/impl/Impl$*.h ] && cmp -s $*.implh $(SRC_DIR)/impl/Impl$*.h; \
-	then \
-		$(ECHO) $(SRC_DIR)/impl/Impl$*.h did not change; \
-	else \
-		$(ECHO) Updating $(SRC_DIR)/impl/Impl$*.h; \
-		$(CP) -f $*.implh $(SRC_DIR)/impl/Impl$*.h ; \
-		$(CHMOD) +w $(SRC_DIR)/impl/Impl$*.h ; \
-	fi
+	mv $*.tmp $*.implh ;
+	chmod -w $*.implh ;
+	cp -f $*.implh $(SRC_DIR)/impl/Impl$*.h ;
+	chmod -w $(SRC_DIR)/impl/Impl$*.h ;
 
 .dod.implc :
 	$(RM) -f $*.implc ;
 	$(DODO) -f macros/implc.mac < $*.dod > $*.tmp ;
-	$(MV) $*.tmp $*.implc ;
-	$(CHMOD) -w $*.implc ;
-	@if [ -f $(SRC_DIR)/impl/Impl$*.cpp ] && cmp -s $*.implc $(SRC_DIR)/impl/Impl$*.cpp; \
-	then \
-		$(ECHO) $(SRC_DIR)/impl/Impl$*.cpp did not change; \
-	else \
-		$(ECHO) Updating $(SRC_DIR)/impl/Impl$*.cpp; \
-		$(CP) -f $*.implc $(SRC_DIR)/impl/Impl$*.cpp ; \
-		$(CHMOD) +w $(SRC_DIR)/impl/Impl$*.cpp ; \
-	fi
+	mv $*.tmp $*.implc ;
+	chmod -w $*.implc ;
+	cp -f $*.implc $(SRC_DIR)/impl/Impl$*.cpp ;
+	chmod -w $(SRC_DIR)/impl/Impl$*.cpp ;
 
 .dod.cpp :
 	$(RM) -f $*.cpp
 	$(DODO) -f macros/cpp.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.cpp
-	$(CHMOD) -w $*.cpp
-	@if [ -f $(SRC_DIR)/cpp-api/$*.cpp ] && cmp -s $*.cpp $(SRC_DIR)/cpp-api/$*.cpp; \
-	then \
-		$(ECHO) $(SRC_DIR)/cpp-api/$*.cpp did not change; \
-	else \
-		$(ECHO) Updating $(SRC_DIR)/cpp-api/$*.cpp; \
-		$(CP) -f $*.cpp $(SRC_DIR)/cpp-api; \
-		$(CHMOD) +w $(SRC_DIR)/cpp-api/$*.cpp; \
-	fi
+	mv $*.tmp $*.cpp
+	chmod -w $*.cpp
+	cp -f $*.cpp $(SRC_DIR)/cpp-api
+	chmod -w $(SRC_DIR)/cpp-api/$*.cpp
 
 .dod.idl :
 	$(RM) -f $*.idl
 	$(DODO) -f macros/idl.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.idl
-	$(CHMOD) -w $*.idl
-	@if [ -f $(INCLUDE_DIR)/com-api/$*.idl ] && cmp -s $*.idl $(INCLUDE_DIR)/com-api/$*.idl; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/com-api/$*.idl did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/com-api/$*.idl; \
-		$(CP) -f $*.idl $(INCLUDE_DIR)/com-api; \
-		$(CHMOD) +w $(INCLUDE_DIR)/com-api/$*.idl; \
-	fi
+	mv $*.tmp $*.idl
+	chmod -w $*.idl
+	cp -f $*.idl $(INCLUDE_DIR)/com-api/
+	chmod -w $(INCLUDE_DIR)/com-api/$*.idl
 
 .dod.fidl :
 	$(RM) -f $*.fidl
 	$(DODO) -f macros/fidl.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.fidl
-	$(CHMOD) -w $*.fidl
+	mv $*.tmp $*.fidl
+	chmod -w $*.fidl
 
 .dod.refh :
 	$(RM) -f $*.refh
 	$(DODO) -f macros/refh.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.refh
-	$(CHMOD) -w $*.refh
-	@if [ -f $(INCLUDE_DIR)/ref-api/$*.h ] && cmp -s $*.refh $(INCLUDE_DIR)/ref-api/$*.h; \
-	then \
-		$(ECHO) $(INCLUDE_DIR)/ref-api/$*.h did not change; \
-	else \
-		$(ECHO) Updating $(INCLUDE_DIR)/ref-api/$*.h; \
-		$(CP) -f $*.refh $(INCLUDE_DIR)/ref-api/$*.h; \
-		$(CHMOD) +w $(INCLUDE_DIR)/ref-api/$*.h; \
-	fi
+	mv $*.tmp $*.refh
+	chmod -w $*.refh
+	cp -f $*.refh $(INCLUDE_DIR)/ref-api/$*.h
+	chmod -w $(INCLUDE_DIR)/ref-api/$*.h
 
 .dod.frefh :
 	$(RM) -f $*.frefh
 	$(DODO) -f macros/frefh.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.frefh
-	$(CHMOD) -w $*.frefh
+	mv $*.tmp $*.frefh
+	chmod -w $*.frefh
 
 
 
 clean:
+	cd tool ; $(MAKE) clean
 	$(RM) -f *.idl *.fidl *.exp
 	$(RM) -f *.comc *.comcx *.comh *.comt *.refh *.frefh
 	$(RM) -f *.implc *.implh
 	$(RM) -f core
-	$(RM) -f GenEnumValidationLog.txt
-
-
-realclean : clean
-#	$(RM) -f $(TEST_DIR)/CAAF*Test.cpp
-#	$(RM) -f $(TEST_DIR)/CEnumAAF*Test.cpp
-	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFPrivate.h
+	@for file in $(AAFOBJECTS) ; do \
+		echo $(RM) -f $(SRC_DIR)/com-api/C$$file.h ; \
+		$(RM) -f $(SRC_DIR)/com-api/C$$file.h ; \
+		echo $(RM) -f $(SRC_DIR)/com-api/C$$file.cpp ; \
+		$(RM) -f $(SRC_DIR)/com-api/C$$file.cpp ; \
+		echo $(RM) -f $(INCLUDE_DIR)/ref-api/$$file.h ; \
+		$(RM) -f $(INCLUDE_DIR)/ref-api/$$file.h ; \
+	done
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.h
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAFTypes.h
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAFPluginTypes.h
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAF.idl
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAFTypes.idl
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAFRoot.idl
+	$(RM) -f $(INCLUDE_DIR)/com-api/AAFPluginTypes.idl
 	$(RM) -f $(INCLUDE_DIR)/ref-api/AAF.h
 	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFTypes.h
 	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFRoot.h
 	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFPluginTypes.h
 	$(RM) -f $(INCLUDE_DIR)/ref-api/AAFPlugin.h
 	$(RM) -f $(IMPL_DIR)/AAFClassIDs.h
-	$(RM) -f $(IMPL_DIR)/ImplAAFRoot.h
-	$(RM) -f $(IMPL_DIR)/ImplAAFRoot.cpp
-	$(RM) -f $(UUID_DIR)/AAFPrivate_i.c
+	$(RM) -f $(UUID_DIR)/AAFRoot_i.c
 	$(RM) -f $(UUID_DIR)/AAF_i.c
 	$(RM) -f $(UUID_DIR)/AAFPlugin_i.c
 	$(RM) -f $(COMAPI_DIR)/AAFCLSIDs.h
 	$(RM) -f $(COMAPI_DIR)/AAFObjectTable_i.tmp
 	$(RM) -f $(COMAPI_DIR)/AAFObjectTable.h
 	$(RM) -f $(COMAPI_DIR)/AAFObjectTable_i.cpp
-	$(RM) -f $(COMAPI_DIR)/CAAFEnumValidation.h
-	$(RM) -f $(COMAPI_DIR)/CAAFEnumValidation.cpp
-	$(RM) -f $(COMAPI_DIR)/CAAFModule.cpp
-	$(RM) -f $(COMAPI_DIR)/CAAFRoot.h
-	$(RM) -f $(COMAPI_DIR)/CAAFRoot.cpp
-	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
-	$(ECHO) SRC_DIR=$(SRC_DIR) >> tmp.sh
-	$(ECHO) INCLUDE_DIR=$(INCLUDE_DIR) >> tmp.sh
-	$(ECHO) TEST_DIR=$(TEST_DIR) >> tmp.sh
-	$(CAT) DelTargets.sh >> tmp.sh
-	$(SH) tmp.sh
-	$(RM) tmp.sh
+#	AUTO_GEN_IMPL is empty now
+#	@for file in $(AUTO_GEN_IMPL) ; do \
+#		echo $(RM) -f $(SRC_DIR)/impl/Impl$$file.cpp ; \
+#		$(RM) -f $(SRC_DIR)/impl/Impl$$file.cpp ; \
+#		echo $(RM) -f $(SRC_DIR)/impl/Impl$$file.h ; \
+#		$(RM) -f $(SRC_DIR)/impl/Impl$$file.h ; \
+#		echo $(RM) -f $(TEST_DIR)/C$${file}Test.cpp ; \
+#		$(RM) -f $(TEST_DIR)/C$${file}Test.cpp ; \
+#	done
 
 # This file contains the list of all dependents...
 include depend.mk
+
