@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.2 2004/11/04 17:30:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.3 2004/11/05 11:49:13 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,8 +34,6 @@
 
 #include "AAF.h"
 
-//#include "CAAFEssenceFormat.h"
-//#include "ImplAAFEssenceFormat.h"
 #include "aafErr.h"
 #include "AAFUtils.h"
 #include "aafCvt.h"
@@ -79,7 +77,6 @@ inline void checkResult(AAFRESULT r)
 // Debugging log function which is optimised away for default builds
 static void plugin_trace(const char *fmt, ...)
 {
-#define PLUGIN_TRACE 1
 #ifdef PLUGIN_TRACE
 	va_list		ap;
 
