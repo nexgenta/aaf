@@ -53,7 +53,7 @@ AAFRESULT aafMobIDFromMajorMinor(
 
 #include "AafOmf.h"
 #include "omf2aaf.h"
-
+#include "EffectTranslate.h"
 
 // Include the AAF Stored Object identifiers. These symbols are defined in aaf.lib.
 #include "AAFStoredObjectIDs.h"
@@ -947,23 +947,24 @@ HRESULT Omf2Aaf::ConvertOMFMediaDataObject( OMF2::omfObject_t obj, OMF2::omfUID_
 // Returns: AAFRESULT_SUCCESS if datakind is converted succesfully
 //
 // ============================================================================
+#if 0
 HRESULT Omf2Aaf::ConvertUniqueNameToAUID(OMF2::omfUniqueName_t datakindName,
-										 aafUID_t* pDatadef)
+										 aafUID_t* pEffectdef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
 
 	if (strcmp(datakindName, "omfi:effect:VideoDissolve")== 0)
-		*pDatadef = kAAFEffectVideoDissolve;
+		*pEffectdef = kAAFEffectVideoDissolve;
 	else if (strcmp(datakindName, "omfi:effect:SimpleVideoDissolve")== 0)
-		*pDatadef = kAAFEffectVideoDissolve;
+		*pEffectdef = kAAFEffectVideoDissolve;
 	else if (strcmp(datakindName, "omfi:effect:MonoAudioDissolve") == 0)
-		*pDatadef = kAAFEffectMonoAudioDissolve;
+		*pEffectdef = kAAFEffectMonoAudioDissolve;
 	else if (strcmp(datakindName, "omfi:effect:SimpleMonoAudioDissolve") == 0)
-		*pDatadef = kAAFEffectMonoAudioDissolve;
+		*pEffectdef = kAAFEffectMonoAudioDissolve;
 	else if(strcmp(datakindName, "omfi:effect:StereoAudioDissolve") == 0)
-		*pDatadef = kAAFEffectStereoAudioDissolve;
+		*pEffectdef = kAAFEffectStereoAudioDissolve;
 	else if(strcmp(datakindName, "omfi:effect:SimpleStereoAudioDissolve") == 0)
-		*pDatadef = kAAFEffectStereoAudioDissolve;
+		*pEffectdef = kAAFEffectStereoAudioDissolve;
 	else if(strcmp(datakindName, "omfi:effect:SimpleStereoAudioDissoolve") == 0)
 		*pDatadef = kAAFEffectStereoAudioDissolve;
 	else if(strcmp(datakindName, "omfi:effect:VideoFadeToBlack") == 0)
@@ -989,6 +990,8 @@ HRESULT Omf2Aaf::ConvertUniqueNameToAUID(OMF2::omfUniqueName_t datakindName,
 
 	return rc;
 }
+#endif
+
 // ============================================================================
 // ConvertOMFDatakind
 //
@@ -1605,7 +1608,7 @@ HRESULT Omf2Aaf::ProcessOMFComponent(OMF2::omfObject_t OMFSegment, IAAFComponent
 				rc = pDictionary->CreateInstance(AUID_AAFFiller,
 												  IID_IAAFFiller,
 												  (IUnknown **) &pFiller);
-				rc = pFiller->Initialize( datadef, (aafLength_t)OMFLength);
+				rc = pFiller->Initialize(datadef, (aafLength_t)OMFLength);
 				rc = pFiller->QueryInterface(IID_IAAFComponent, (void **)ppComponent);
 				pFiller->Release();
 				pFiller = NULL;
@@ -1681,7 +1684,7 @@ HRESULT Omf2Aaf::ProcessOMFComponent(OMF2::omfObject_t OMFSegment, IAAFComponent
 							printf("%sReplacing 1.x Transition with a Audio Dissolve Effect!\n ", gpGlobals->indentLeader);
 						}
 						rc = pDictionary->CreateInstance(AUID_AAFOperationGroup, IID_IAAFOperationGroup, (IUnknown **) &pEffect);
-						rc = GetAAFOperationDefinition("omfi::effectSimpleMonoAudioDissolve", "Simple Mono Audio Dissolve", "Combines two mono audio streams",
+						rc = GetAAFOperationDefinition("omfi::effectSimpleMonoAudioDissolve", NULL, "Simple Mono Audio Dissolve", "Combines two mono audio streams",
 										-1, AAFFalse, 2, DDEF_Sound, &pEffectDef);
 						rc = GetParameterDefinition((aafUID_t *)&kAAFParameterDefLevel, NULL, 
 													L"Level", 
@@ -1705,7 +1708,7 @@ HRESULT Omf2Aaf::ProcessOMFComponent(OMF2::omfObject_t OMFSegment, IAAFComponent
 							printf("%sReplacing 1.x Transition with a Video Dissolve Effect!\n ", gpGlobals->indentLeader);
 						}
 						rc = pDictionary->CreateInstance(AUID_AAFOperationGroup, IID_IAAFOperationGroup, (IUnknown **) &pEffect);
-						rc = GetAAFOperationDefinition("omfi::effectSimpleVideoDissolve", "Simple Video Dissolve", "Combines two video streams",
+						rc = GetAAFOperationDefinition("omfi::effectSimpleVideoDissolve", NULL, "Simple Video Dissolve", "Combines two video streams",
 										-1, AAFFalse, 2, DDEF_PictureWithMatte, &pEffectDef);
 						rc = GetParameterDefinition((aafUID_t *)&kAAFParameterDefLevel, NULL, 
 													L"Level", 
@@ -1735,7 +1738,7 @@ HRESULT Omf2Aaf::ProcessOMFComponent(OMF2::omfObject_t OMFSegment, IAAFComponent
 							printf("%sReplacing 1.x Transition with a SMPTE Video Wipe Effect!\n ", gpGlobals->indentLeader);
 						}
 						rc = pDictionary->CreateInstance(AUID_AAFOperationGroup, IID_IAAFOperationGroup, (IUnknown **) &pEffect);
-						rc = GetAAFOperationDefinition("omfi:effect:SMPTEVideoWipe", "SMPTE Video Wipe", "Combines two video streams according to SMPTE ",
+						rc = GetAAFOperationDefinition("omfi:effect:SMPTEVideoWipe", NULL, "SMPTE Video Wipe", "Combines two video streams according to SMPTE ",
 										-1, AAFFalse, 2, DDEF_Picture, &pEffectDef);
 						rc = GetParameterDefinition((aafUID_t *)&kAAFParameterDefSMPTEWipeNumber, NULL, 
 													L"Wipe Number", 
@@ -3177,6 +3180,7 @@ HRESULT Omf2Aaf::ConvertOMFEffects(OMF2::omfEffObj_t	effect,
 	OMF2::omfDDefObj_t		effectDef;
 	OMF2::omfInt32			nameSize = 64, idSize = 64;
 	OMF2::omfUniqueName_t	effectID;
+	OMF2::omfUniqueName_t	MCEffectID;
 	char					effectDefName[64];
 	OMF2::omfRational_t		speedRatio;
 	OMF2::omfUInt32			phaseOffset = 0;
@@ -3214,14 +3218,19 @@ HRESULT Omf2Aaf::ConvertOMFEffects(OMF2::omfEffObj_t	effect,
 		if (OMF2::OM_ERR_PROP_NOT_PRESENT == OMFError)
 			bypassOverride = 0;
 		// Get the AAF Effect definition interface pointer !!
-		ConvertUniqueNameToAUID(effectID, &effectDefAUID);
+		if(OMF2::omfsReadUniqueName(OMFFileHdl, effect, gpGlobals->pvtEffectIDProp,
+									MCEffectID, sizeof(MCEffectID)) == OMF2::OM_ERR_NONE)
+			(void)GetAAFEffectID(effectID, MCEffectID, &effectDefAUID);
+		else
+			(void)GetAAFEffectID(effectID, NULL, &effectDefAUID);
+
 		ConvertOMFDatakind(effectDatakind, &effectAUID);
-		rc = ConvertOMFEffectDefinition(effectDef, &pEffectDef);
+		rc = ConvertOMFEffectDefinition(effectDef, effect, &pEffectDef);
 		if (strcmp(effectID, "omfi:effect:VideoSpeedControl") == 0)
 		{
 			rc = GetParameterDefinition((aafUID_t *)&kAAFParameterDefSpeedRatio, NULL, 
 										L"Speed Ratio", 
-										L"Defines the ration of output length to input length. Range is -infinity to +infinity",
+										L"Defines the ratio of output length to input length. Range is -infinity to +infinity",
 										L" ",
 										&pParameterDef);
 			pEffectDef->AddParameterDefs(pParameterDef);
@@ -3716,6 +3725,7 @@ HRESULT Omf2Aaf::ConvertOMFEffects(OMF2::omfEffObj_t	effect,
 //
 // ============================================================================
 HRESULT Omf2Aaf::ConvertOMFEffectDefinition(OMF2::omfDDefObj_t	effectDef,
+											OMF2::omfObject_t effect,
 											IAAFOperationDef**	ppEffectDef)
 {
 	HRESULT					rc = AAFRESULT_SUCCESS;
@@ -3724,7 +3734,7 @@ HRESULT Omf2Aaf::ConvertOMFEffectDefinition(OMF2::omfDDefObj_t	effectDef,
 	OMF2::omfArgIDType_t	bypassOverride;
 	OMF2::omfBool			isTimeWarp;
 	OMF2::omfInt32			nameSize = 64, idSize = 64, descSize = 120;
-	OMF2::omfUniqueName_t	effectID;
+	OMF2::omfUniqueName_t	effectID, MCEffectID;
 	char					effectName[64], descBuffer[120];
 
 	aafUID_t				effectDataDef;
@@ -3802,7 +3812,11 @@ HRESULT Omf2Aaf::ConvertOMFEffectDefinition(OMF2::omfDDefObj_t	effectDef,
 			effectDataDef = DDEF_Picture;
 		}
 
-		rc = GetAAFOperationDefinition( effectID, 
+		if(OMF2::omfsReadUniqueName(OMFFileHdl, effect, gpGlobals->pvtEffectIDProp,
+								MCEffectID, sizeof(MCEffectID)) != OMF2::OM_ERR_NONE)
+			MCEffectID[0] ='\0';
+		rc = GetAAFOperationDefinition( effectID,
+										MCEffectID,
 										effectName, 
 										descBuffer,
 										(aafUInt32)bypassOverride,
@@ -3887,7 +3901,8 @@ HRESULT Omf2Aaf::GetParameterDefinition(aafUID_t* pDefUID,
 // Returns: None
 //
 // ============================================================================
-HRESULT Omf2Aaf::GetAAFOperationDefinition(OMF2::omfUniqueName_t datakindName,
+HRESULT Omf2Aaf::GetAAFOperationDefinition(OMF2::omfUniqueName_t effectID,
+										   OMF2::omfUniqueName_t MCEffectID,
 										   char* defName, 
 										   char* defDescription, 
 										   aafUInt32 bypassOverride, 
@@ -3912,7 +3927,8 @@ HRESULT Omf2Aaf::GetAAFOperationDefinition(OMF2::omfUniqueName_t datakindName,
 	pwName = new wchar_t[strlen(defName)+1];
 	mbstowcs(pwName, defName, strlen(defName)+1);
 
-	ConvertUniqueNameToAUID(datakindName, &effectDefAUID);
+	(void)GetAAFEffectID(effectID, MCEffectID, &effectDefAUID);
+
 	// Look in the dictionary to find if the effect Definition exists
 	// if it exists use it.
 	rc = pDictionary->LookupOperationDefinition(effectDefAUID, ppEffectDef);
