@@ -1,24 +1,29 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/***********************************************************************
+ *
+ *              Copyright (c) 2000 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ *  prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
 #include "ImplAAFRefArrayValue.h"
 
@@ -41,26 +46,18 @@
 
 #include "OMProperty.h"
 #include "OMRefVectorProperty.h"
-#include "OMReferenceVector.h"
 
 #include <assert.h>
 #include <string.h>
 
 
-
-
-
-
 ImplAAFRefArrayValue::ImplAAFRefArrayValue () :
-  _fixedSize(false),
-  _tempStorableVector(NULL)
+  _fixedSize(false)
 {}
 
 
 ImplAAFRefArrayValue::~ImplAAFRefArrayValue ()
 {
-	delete _tempStorableVector;
-	_tempStorableVector = NULL;
 }
 
 
@@ -70,21 +67,6 @@ bool ImplAAFRefArrayValue::fixedSize(void) const
   return _fixedSize;
 }
 
-
-AAFRESULT ImplAAFRefArrayValue::Initialize (
-	  const ImplAAFTypeDefArray *containerType,
-	  bool fixed)
-{
-  _fixedSize = fixed; // TBD: Add validation
-  
-  _tempStorableVector = new OMReferenceVector<ImplAAFStorable>;
-  if (NULL == _tempStorableVector)
-  {
-    return AAFRESULT_NOMEMORY;
-  }
-
-  return (ImplAAFRefContainerValue::Initialize(containerType));
-}
 
 
 AAFRESULT ImplAAFRefArrayValue::Initialize (
@@ -104,49 +86,10 @@ AAFRESULT ImplAAFRefArrayValue::Initialize (
 }
 
   
-// Retrieve the property or temporary reference vector as an OMReferenceContainer.
-OMReferenceContainer* ImplAAFRefArrayValue::referenceContainer(void) const
+// Retrieve the property as an OMReferenceVectorProperty.
+OMReferenceVectorProperty * ImplAAFRefArrayValue::referenceVectorProperty(void) const
 {
-  assert (isInitialized());
-  OMReferenceContainer* result = NULL;
-  OMProperty* p = property();
-  
-  if (NULL != p)
-  {
-  	// If there is a property for "direct access" then use the container's
-  	// implementation to extract the OMReferenceContainer.
-  	result = ImplAAFRefContainerValue::referenceContainer();
-  }
-  else
-  {
-  	// There is no property for "direct access" so get the container interface from
-  	// the temporary reference vector.
-		result = (const_cast<ImplAAFRefArrayValue *>(this)->_tempStorableVector);
-  }
-  
-  assert(result != 0);
-  return result;
-}
-
-// Retrieve the property or temporary reference vector as an OMObjectVector.
-OMObjectVector * ImplAAFRefArrayValue::referenceVector(void) const
-{
-	OMObjectVector * result = NULL;
-  OMProperty* p = property();
-
-  if (NULL != p)
-  {
-  	result = static_cast<OMReferenceVectorProperty *>(p);
- 	}
- 	else
- 	{
-  	// There is no property for "direct access" so get the vector interface from
-  	// the temporary reference vector.
-		result = (const_cast<ImplAAFRefArrayValue *>(this)->_tempStorableVector);
- 	}
-  
-  assert(result != 0);
-  return result;
+  return static_cast<OMReferenceVectorProperty *>(property());
 }
 
 
@@ -156,83 +99,6 @@ OMObjectVector * ImplAAFRefArrayValue::referenceVector(void) const
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::WriteTo(
   OMProperty* pOmProp)
 {
-  AAFRESULT result = AAFRESULT_SUCCESS;
-  OMObject* object;
-  ImplAAFStorable* obj;
-  if (NULL == property())
-  {
-    // First empty the current property.
-    OMContainerProperty * pNewContainerProperty = dynamic_cast<OMContainerProperty *>(pOmProp);
-    if (NULL == pNewContainerProperty)
-      return AAFRESULT_INVALID_OBJ;
-    OMReferenceContainer *pNewReferenceContainer = pNewContainerProperty->referenceContainer();
-    if (NULL == pNewReferenceContainer)
-      return AAFRESULT_INVALID_OBJ;
-    
-    if (usesReferenceCounting())
-    {
-      result = ReleaseAllObjects(pNewReferenceContainer);
-      if (AAFRESULT_FAILED(result))
-        return result;
-    }
-      
-    // Make sure that there are no elements in the new property container.
-    pNewReferenceContainer->removeAllObjects();
-    
-    // Install the new "empty" container property.
-    SetProperty(pOmProp);
-
-    OMReferenceContainerIterator* tempIterator = _tempStorableVector->createIterator();
-    if (NULL == tempIterator)
-    {
-      result = AAFRESULT_NOMEMORY;
-    }
-    else
-    {
-      while (AAFRESULT_SUCCEEDED(result) && (tempIterator->before() || tempIterator->valid()))
-      {
-        if (++(*tempIterator))
-        {
-          object = tempIterator->currentObject();
-          obj = dynamic_cast<ImplAAFStorable*>(object);
-          assert(NULL != obj);
-          if (NULL == obj)
-          {
-            result = AAFRESULT_INVALID_OBJ;
-          }
-          else
-          {
-//            if (usesReferenceCounting())
-//            {
-//              obj->detach();
-//            }
-            
-            // Add the element from the temporary property container to the property.
-            result = InsertObject(obj); // reference counts if necessary...
-            
-            if (AAFRESULT_SUCCEEDED(result))
-            {
-              if (usesReferenceCounting())
-              {
-                obj->ReleaseReference();
-              }
-            }
-          }
-        }
-      }
-   
-      delete tempIterator;
-      tempIterator = NULL;
-    }
-    
-    // Cleanup the temporary property now the the the pOmProp has been created and initialized.
-		delete _tempStorableVector;
-		_tempStorableVector = NULL;
-    
-    if (AAFRESULT_FAILED(result))
-      return result;
-  }
-
   return (ImplAAFRefContainerValue::WriteTo(pOmProp));
 }
 
@@ -267,11 +133,14 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::RemoveObject(
   
 
 //
-// Methods to access the elements from the OMObjectVector
+// Methods to access the elements from the OMReferenceVectorProperty
 // 
 
+// NOTE: THE SetObjectAt METHOD WILL NEED TO BE OVERRIDDEN FOR 
+// STRONG REFERENCE ARRAYS TO PERFORM PROPER REFERENCE COUNTING
+// FOR CONTAINED OBJECTS! transdel:2000-AUG-30
 
-// Set the value of the OMObjectVector at position index to pObject.
+// Set the value of the OMReferenceVectorProperty at position index to pObject.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::SetObjectAt(
   ImplAAFStorable* pObject,
   aafUInt32 index)
@@ -286,13 +155,13 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::SetObjectAt(
     return AAFRESULT_INVALID_OBJ;
   
   // Validate the index...  
-  OMObjectVector * pReferenceVector = referenceVector();
-  assert (NULL != pReferenceVector);
-  aafUInt32 elementCount = pReferenceVector->count();
+  OMReferenceVectorProperty * pReferenceVectorProperty = referenceVectorProperty();
+  assert (NULL != pReferenceVectorProperty);
+  aafUInt32 elementCount = pReferenceVectorProperty->count();
   if (index >= elementCount)
     return AAFRESULT_BADINDEX;
     
-  OMObject *oldStorable = pReferenceVector->setObjectAt(newStorable, index);
+  OMObject *oldStorable = pReferenceVectorProperty->setObjectAt(newStorable, index);
   if (usesReferenceCounting())
   {
     newStorable->AcquireReference();
@@ -305,7 +174,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::SetObjectAt(
 }  
 
 
-// Get the value of the OMObjectVector at position index.
+// Get the value of the OMReferenceVectorProperty at position index.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::GetObjectAt(
   aafUInt32 index, 
   ImplAAFStorable** ppObject) const
@@ -316,13 +185,13 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::GetObjectAt(
   *ppObject = NULL;
   
   // Validate the index...  
-  OMObjectVector * pReferenceVector = referenceVector();
-  assert (NULL != pReferenceVector);
-  aafUInt32 elementCount = pReferenceVector->count();
+  OMReferenceVectorProperty * pReferenceVectorProperty = referenceVectorProperty();
+  assert (NULL != pReferenceVectorProperty);
+  aafUInt32 elementCount = pReferenceVectorProperty->count();
   if (index >= elementCount)
     return AAFRESULT_BADINDEX;
     
-  OMObject *object = pReferenceVector->getObjectAt(index);
+  OMObject *object = pReferenceVectorProperty->getObjectAt(index);
   assert(NULL != object);
   if (NULL == object)
     return AAFRESULT_INVALID_OBJ;
@@ -340,7 +209,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::GetObjectAt(
 }  
 
 
-// Append the given pObject to the OMObjectVector.
+// Append the given pObject to the OMReferenceVectorProperty.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::AppendObject(
   ImplAAFStorable* pObject)
 {
@@ -358,9 +227,9 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::AppendObject(
   if (NULL == storable)
     result = AAFRESULT_INVALID_OBJ; 
     
-  OMObjectVector * pReferenceVector = referenceVector();
-  assert (NULL != pReferenceVector);
-  pReferenceVector->appendObject(storable);
+  OMReferenceVectorProperty * pReferenceVectorProperty = referenceVectorProperty();
+  assert (NULL != pReferenceVectorProperty);
+  pReferenceVectorProperty->appendObject(storable);
 
   if (usesReferenceCounting())
   {
@@ -371,7 +240,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::AppendObject(
 }  
 
 
-// Prepend the given pObject> to the OMObjectVector.
+// Prepend the given pObject> to the OMReferenceVectorProperty.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::PrependObject(
   ImplAAFStorable* pObject)
 {
@@ -388,9 +257,9 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::PrependObject(
   if (NULL == storable)
     result = AAFRESULT_INVALID_OBJ; 
     
-  OMObjectVector * pReferenceVector = referenceVector();
-  assert (NULL != pReferenceVector);
-  pReferenceVector->prependObject(storable);
+  OMReferenceVectorProperty * pReferenceVectorProperty = referenceVectorProperty();
+  assert (NULL != pReferenceVectorProperty);
+  pReferenceVectorProperty->prependObject(storable);
 
   if (usesReferenceCounting())
   {
@@ -401,8 +270,8 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::PrependObject(
 }  
 
 
-// Remove the object from the OMObjectVector at position index.
-// Existing objects in the OMObjectVector at index + 1 and higher 
+// Remove the object from the OMReferenceVectorProperty at position index.
+// Existing objects in the OMReferenceVectorProperty at index + 1 and higher 
 // are shifted down one index position.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::RemoveObjectAt(
   aafUInt32 index)
@@ -415,14 +284,14 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::RemoveObjectAt(
     return AAFRESULT_INVALID_OBJ;    
   
   // Validate the index...  
-  OMObjectVector * pReferenceVector = referenceVector();
-  assert (NULL != pReferenceVector);
-  aafUInt32 elementCount = pReferenceVector->count();
+  OMReferenceVectorProperty * pReferenceVectorProperty = referenceVectorProperty();
+  assert (NULL != pReferenceVectorProperty);
+  aafUInt32 elementCount = pReferenceVectorProperty->count();
   if (index >= elementCount)
     return AAFRESULT_BADINDEX;
     
     
-  OMObject *oldStorable = pReferenceVector->removeObjectAt(index);
+  OMObject *oldStorable = pReferenceVectorProperty->removeObjectAt(index);
   if (usesReferenceCounting())
   {
     if (oldStorable)
@@ -432,7 +301,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::RemoveObjectAt(
   return result;
 }  
 
-// Insert pObject into the OMObjectVector at position index. 
+// Insert pObject into the OMReferenceVectorProperty at position index. 
 // Existing objects at index> and higher are shifted up one index position.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::InsertObjectAt(
   ImplAAFStorable* pObject,
@@ -448,13 +317,13 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::InsertObjectAt(
     return AAFRESULT_INVALID_OBJ;    
   
   // Validate the index...  
-  OMObjectVector * pReferenceVector = referenceVector();
-  assert (NULL != pReferenceVector);
-  aafUInt32 elementCount = pReferenceVector->count();
+  OMReferenceVectorProperty * pReferenceVectorProperty = referenceVectorProperty();
+  assert (NULL != pReferenceVectorProperty);
+  aafUInt32 elementCount = pReferenceVectorProperty->count();
   if (index > elementCount) // it is valid to insert after the last element
     return AAFRESULT_BADINDEX;
 
-  pReferenceVector->insertObjectAt(pObject, index);
+  pReferenceVectorProperty->insertObjectAt(pObject, index);
   
   if (usesReferenceCounting())
   {
@@ -466,7 +335,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::InsertObjectAt(
 }  
 
 
-// Set the value of the OMObjectVector at position index to the
+// Set the value of the OMReferenceVectorProperty at position index to the
 // object inside the property value.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::SetElementAt(
   ImplAAFPropertyValue* pPropertyValue,
@@ -485,7 +354,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::SetElementAt(
 }
 
 
-// Get the value of the OMObjectVector at position index.
+// Get the value of the OMReferenceVectorProperty at position index.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::GetElementAt(
   aafUInt32 index,
   ImplAAFPropertyValue** ppPropertyValue) const
@@ -513,7 +382,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::GetElementAt(
 }
 
 
-// Append the given pObject to the OMObjectVector.
+// Append the given pObject to the OMReferenceVectorProperty.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::AppendElement(
   ImplAAFPropertyValue* pPropertyValue)
 {
@@ -530,7 +399,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::AppendElement(
 }
 
 
-// Prepend the given pObject> to the OMObjectVector.
+// Prepend the given pObject> to the OMReferenceVectorProperty.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::PrependElement(
   ImplAAFPropertyValue* pPropertyValue)
 {
@@ -546,7 +415,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::PrependElement(
   return result;
 }
 
-// Insert pObject into the OMObjectVector at position index. 
+// Insert pObject into the OMReferenceVectorProperty at position index. 
 // Existing objects at index> and higher are shifted up one index position.
 AAFRESULT STDMETHODCALLTYPE ImplAAFRefArrayValue::InsertElementAt(
   ImplAAFPropertyValue* pPropertyValue,
