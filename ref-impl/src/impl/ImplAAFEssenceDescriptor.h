@@ -4,7 +4,17 @@
 #define __ImplAAFEssenceDescriptor_h__
 
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
 
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -31,10 +41,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
-class ImplAAFLocator;
-
-class ImplEnumAAFLocators;
 
 
 
@@ -64,12 +70,12 @@ public:
 
 
   //****************
-  // CountLocators()
+  // GetNumLocators()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    CountLocators
+    GetNumLocators
 		// @parm [out] Returns the number of locators
-        (aafUInt32 *  pCount);
+        (aafInt32 *  pCount);
   //@comm The number of locators may be zero if the essence is in the current file.
 
   //****************
@@ -92,38 +98,6 @@ public:
   //@comm    Use this function to add a locator to be scanned first when searching for
   // the essence (a secondary location for the essence).
 
-
-  //****************
-  // InsertLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    InsertLocatorAt
-		// @parm [in] place to insert locator
-        (aafUInt32 index,
-		// @parm [in] Locator to insert
-		 ImplAAFLocator * pLocator);
-
-
-  //****************
-  // GetLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetLocatorAt
-		// @parm [in] index of locator to get
-        (aafUInt32 index,
-		// @parm [in] returned locator
-		 ImplAAFLocator ** ppLocator);
-
-
-  //****************
-  // GetLocatorAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveLocatorAt
-		// @parm [in] index of locator to remove
-        (aafUInt32 index);
-
-
   //****************
   // RemoveLocator()
   //
@@ -133,14 +107,21 @@ public:
         (ImplAAFLocator * pLocator);
 
   //****************
-  // GetLocators()
+  // EnumAAFAllLocators()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    GetLocators
+    EnumAAFAllLocators
 		// @parm [out] An enumerator to the locators on this essence descriptor
         (ImplEnumAAFLocators ** ppEnum);
   //@comm The number of locators may be zero if the essence is in the current file.
 
+
+
+
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFEssenceDescriptor)
 
 public:
 	// Functions internal to the toolkit

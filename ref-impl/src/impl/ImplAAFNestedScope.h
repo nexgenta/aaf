@@ -31,7 +31,6 @@
  *
  ************************************************************************/
 
-
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
@@ -86,65 +85,31 @@ public:
         (ImplAAFSegment * pSegment);
 
   //****************
-  // PrependSegment()
+  // RemoveSegment()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    PrependSegment
+    RemoveSegment
         // @parm [in] Pointer to segment to be added
         (ImplAAFSegment * pSegment);
 
   //****************
-  // InsertSegmentAt()
+  // GetSlots()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    InsertSegmentAt
-        // @parm [in] index where segment is to be inserted
-        (aafUInt32 index,
-        // @parm [in] Pointer to segment to be added
-		 ImplAAFSegment * pSegment);
-
-  //****************
-  // CountSegments()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CountSegments
-        // @parm [out\, retval] number of segments
-        (aafUInt32 * pResult);
-
-  //****************
-  // RemoveSegment()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveSegmentAt
-        // @parm [in] index of segment to be removed
-        (aafUInt32 index);
-
-  //****************
-  // GetSegmentAt()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetSegmentAt
-        // @parm [in] index of segment to retrieve
-        (aafUInt32 index,
-        // @parm [out, retval] retrieved segment
-		 ImplAAFSegment ** ppSegment);
-
-  //****************
-  // GetSegments()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    GetSegments
+    GetSlots
         // @parm [retval][out] Slots - segment list  enumeration
         (ImplEnumAAFSegments ** ppEnum);
 
 public:
 	// SDK-internal
 
-	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
-												aafMobID_constref to);
+	virtual AAFRESULT ChangeContainedReferences(aafUID_t *from, aafUID_t *to);
 
 
-private:
+public:
+  // Declare this class to be storable.
+  //
+  OMDECLARE_STORABLE(ImplAAFNestedScope)
 
   // Persistent Properties	
   OMStrongReferenceVectorProperty<ImplAAFSegment>		_slots;

@@ -1,3 +1,14 @@
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+*                                          *
+\******************************************/
+
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
 /***********************************************************************
  *
  *              Copyright (c) 1998-1999 Avid Technology, Inc.
@@ -24,11 +35,6 @@
  * LIABILITY.
  *
  ************************************************************************/
-
-
-#ifndef __ImplAAFMobSlot_h__
-#include "ImplAAFMobSlot.h"
-#endif
 
 
 
@@ -70,7 +76,7 @@ AAFRESULT STDMETHODCALLTYPE
 	AAFRESULT		result;
 	aafNumSlots_t	cur = _current, siz;
 
-    _mob->CountSlots (&siz);
+    _mob->GetNumSlots (&siz);
 	if(cur < siz)
 	{
 		result = _mob->GetNthMobSlot (cur, ppMobSlot);
@@ -121,11 +127,11 @@ AAFRESULT STDMETHODCALLTYPE
     ImplEnumAAFMobSlots::Skip (aafUInt32 count)
 {
 	AAFRESULT	hr;
-	aafNumSlots_t	newCurrent, siz;
+	aafInt32	newCurrent, siz;
 
 	newCurrent = _current + count;
 
-    _mob->CountSlots(&siz);
+    _mob->GetNumSlots(&siz);
 	if(newCurrent < siz)
 	{
 		_current = newCurrent;

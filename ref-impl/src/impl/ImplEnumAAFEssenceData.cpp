@@ -25,7 +25,6 @@
  *
  ************************************************************************/
 
-
 #ifndef __ImplAAFEssenceData_h__
 #include "ImplAAFEssenceData.h"
 #endif
@@ -73,7 +72,7 @@ AAFRESULT STDMETHODCALLTYPE
   AAFRESULT hr = AAFRESULT_SUCCESS;
   aafUInt32 cur = _current, siz = 0;
 
-  hr = _contentStorage->CountEssenceData (&siz);
+  hr = _contentStorage->GetNumEssenceData (&siz);
   if (AAFRESULT_SUCCESS == hr)
   {    
     if (cur < siz)
@@ -120,7 +119,7 @@ AAFRESULT STDMETHODCALLTYPE
   aafUInt32 newCurrent = _current + count;
   aafUInt32 siz = 0;
 
-  result = _contentStorage->CountEssenceData(&siz);
+  result = _contentStorage->GetNumEssenceData(&siz);
   if (AAFRESULT_SUCCESS == result)
   {
     if (newCurrent < siz)
