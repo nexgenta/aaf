@@ -1,24 +1,11 @@
-//=---------------------------------------------------------------------=
-//
-// The contents of this file are subject to the AAF SDK Public
-// Source License Agreement (the "License"); You may not use this file
-// except in compliance with the License.  The License is available in
-// AAFSDKPSL.TXT, or you may obtain a copy of the License from the AAF
-// Association or its successor.
-// 
-// Software distributed under the License is distributed on an "AS IS"
-// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
-// the License for the specific language governing rights and limitations
-// under the License.
-// 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
-// AAF Association.
-// 
-// The Initial Developer of the Original Code of this file and the
-// Licensor of the AAF Association is Avid Technology.
-// All rights reserved.
-//
-//=---------------------------------------------------------------------=
+/******************************************\
+*                                          *
+* Advanced Authoring Format                *
+*                                          *
+* Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
+*                                          *
+\******************************************/
 
 
 #ifndef __ImplAAFTypeDefInt_h__
@@ -30,18 +17,14 @@
 #include "ImplAAFObjectCreation.h"
 #include "AAFClassIDs.h"
 
-#ifndef __ImplAAFPropValData_h__
-#include "ImplAAFPropValData.h"
-#endif
-
-#ifndef __AAFTypeDefUIDs_h__
-#include "AAFTypeDefUIDs.h"
+#ifndef __ImplAAFPropertyValue_h__
+#include "ImplAAFPropertyValue.h"
 #endif
 
 #include <assert.h>
 #include <string.h>
 
-extern "C" const aafClassID_t CLSID_AAFPropValData;
+extern "C" const aafClassID_t CLSID_AAFPropertyValue;
 
 // Internal utilities to sign-extend or zero-fill.  Current
 // implementations only allow integer sizes of 1, 2, 4, and 8 bytes.
@@ -53,7 +36,7 @@ extern "C" const aafClassID_t CLSID_AAFPropValData;
 // requires that in/outValSize are supported values from the set {1,
 // 2, 4, 8} bytes.
 //
-static void pvtSignExtend (const aafMemPtr_t inVal,
+static void pvtSignExtend (aafMemPtr_t inVal,
 						   aafUInt32   inValSize,
 						   aafMemPtr_t outVal,
 						   aafUInt32   outValSize)
@@ -73,7 +56,7 @@ static void pvtSignExtend (const aafMemPtr_t inVal,
 		  (8 == outValSize));
   if (inValSize == outValSize)
 	{
-	  memcpy (outVal, inVal, inValSize);
+	  memcpy (inVal, outVal, inValSize);
 	}
   else
 	{
@@ -126,7 +109,7 @@ static void pvtSignExtend (const aafMemPtr_t inVal,
 // requires that in/outValSize are supported values from the set {1,
 // 2, 4, 8} bytes.
 //
-static void pvtZeroFill (const aafMemPtr_t inVal,
+static void pvtZeroFill (aafMemPtr_t inVal,
 						   aafUInt32   inValSize,
 						   aafMemPtr_t outVal,
 						   aafUInt32   outValSize)
@@ -146,7 +129,7 @@ static void pvtZeroFill (const aafMemPtr_t inVal,
 		  (8 == outValSize));
   if (inValSize == outValSize)
 	{
-	  memcpy (outVal, inVal, inValSize);
+	  memcpy (inVal, outVal, inValSize);
 	}
   else
 	{
@@ -196,25 +179,26 @@ static void pvtZeroFill (const aafMemPtr_t inVal,
 
 
 ImplAAFTypeDefInt::ImplAAFTypeDefInt ()
-  : _size     ( PID_TypeDefinitionInteger_Size,     L"Size"),
-    _isSigned ( PID_TypeDefinitionInteger_IsSigned, L"IsSigned")
+  : _size     ( PID_TypeDefinitionInteger_Size,     "Size"),
+	_isSigned ( PID_TypeDefinitionInteger_IsSigned, "IsSigned")
 {
   _persistentProperties.put(_size.address());
   _persistentProperties.put(_isSigned.address());
 }
 
+
 ImplAAFTypeDefInt::~ImplAAFTypeDefInt ()
-{
-}
+{}
 
 
 AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefInt::Initialize (
-      const aafUID_t & id,
-      aafUInt8  intSize,
+      aafUID_t *  pID,
+      aafUInt32  intSize,
       aafBool  isSigned,
-      const aafCharacter * pTypeName)
+      wchar_t *  pTypeName)
 {
+  assert (pID);
   assert (intSize > 0);
   assert (pTypeName);
 
@@ -224,14 +208,10 @@ AAFRESULT STDMETHODCALLTYPE
 	  (8 != intSize))
 	return AAFRESULT_BAD_SIZE;
 
-  AAFRESULT hr;
-
-  hr = ImplAAFMetaDefinition::Initialize(id, pTypeName, NULL);
-	if (AAFRESULT_FAILED (hr))
-    return hr;
-
   _size = intSize;
   _isSigned = isSigned;
+  AAFRESULT hr = SetName (pTypeName);
+  if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
 }
@@ -283,7 +263,7 @@ AAFRESULT STDMETHODCALLTYPE
   // sign-extend or zero-fill the value.
   aafUInt8 valBuf[8];
   assert (_size <= sizeof (valBuf));
-  if (_isSigned != 0)
+  if (_isSigned)
 	{
 	  pvtSignExtend (pVal, valSize, valBuf, _size);
 	}
@@ -292,34 +272,32 @@ AAFRESULT STDMETHODCALLTYPE
 	  pvtZeroFill (pVal, valSize, valBuf, _size);
 	}
 
-  // Create a temporary pointer to copy to the smartptr
-  ImplAAFPropValData * tmp = (ImplAAFPropValData *)CreateImpl(CLSID_AAFPropValData);
-  if (NULL == tmp)
-	return AAFRESULT_NOMEMORY;
-  ImplAAFPropValDataSP pv;
-  pv = tmp;
-
-  // Bobt: Hack bugfix! SmartPointer operator= will automatically
-  // AddRef; CreateImpl *also* will addref, so we've got one too
-  // many.  Put us back to normal.
-  tmp->ReleaseReference(); // we don't need this reference anymore.
-  tmp = 0;
+  ImplAAFPropertyValue * pv = NULL;
+  pv = (ImplAAFPropertyValue *)CreateImpl(CLSID_AAFPropertyValue);
+  if (! pv)
+	{
+	  return AAFRESULT_NOMEMORY;
+	}
 
   AAFRESULT hr;
   hr = pv->Initialize(this);
   if (! AAFRESULT_SUCCEEDED (hr))
-	return hr;
+	{
+	  pv->ReleaseReference ();
+	  return hr;
+	}
 
   aafMemPtr_t pBits = NULL;
-  hr = pv->AllocateBits (_size, &pBits);
+  hr = pv->AllocateBits (valSize, &pBits);
   if (! AAFRESULT_SUCCEEDED (hr))
-	return hr;
-
+	{
+	  pv->ReleaseReference ();
+	  return hr;
+	}
   assert (pBits);
-  memcpy (pBits, valBuf, _size);
+  memcpy (pBits, valBuf, valSize);
 
   *ppPropVal = pv;
-  (*ppPropVal)->AcquireReference ();
   return AAFRESULT_SUCCESS;
 }
 
@@ -344,28 +322,23 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_BAD_SIZE;
 	}
 
-  ImplAAFPropValDataSP pvd;
-  pvd = dynamic_cast<ImplAAFPropValData*>(pPropVal);
-  if (!pvd) return AAFRESULT_BAD_TYPE;
-
   // get the property value's embedded type
-  ImplAAFTypeDefSP pPropType;
+  ImplAAFTypeDef * pPropType;
   AAFRESULT hr;
-  hr = pvd->GetType (&pPropType);
+  hr = pPropVal->GetType (&pPropType);
   if (! AAFRESULT_SUCCEEDED (hr))
 	{
 	  return hr;
 	}
-  assert (pPropType);
 
   // determine if the property value's embedded type is compatible
   // with this one for reading.  For now, we'll only allow integral
-  // and enumeration type properties to be read by this integral type def.
-  //
-  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
-  pPropType->GetTypeCategory( &type_category );
-  if( type_category != kAAFTypeCatInt && type_category != kAAFTypeCatEnum )
-	return AAFRESULT_BAD_TYPE;
+  // type properties to be read by this integral type def.
+  assert (pPropType);
+  if (! dynamic_cast<ImplAAFTypeDefInt *>(pPropType))
+	{
+	  return AAFRESULT_BAD_TYPE;
+	}
 
   // current impl only allows 1, 2, 4, and 8-bit ints.
   if ((1 != valSize) &&
@@ -379,7 +352,7 @@ AAFRESULT STDMETHODCALLTYPE
   // sign-extend or zero-fill the value.
   aafUInt8 valBuf[8];
   aafUInt32 bitsSize = 0;
-  hr = pvd->GetBitsSize(&bitsSize);
+  hr = pPropVal->GetBitsSize(&bitsSize);
   if (! AAFRESULT_SUCCEEDED (hr))
 	{
 	  return hr;
@@ -395,14 +368,14 @@ AAFRESULT STDMETHODCALLTYPE
 		  (8 == bitsSize));
   assert (bitsSize <= sizeof (valBuf));  // I know, redundant test...
   aafMemPtr_t pBits = NULL;
-  hr = pvd->GetBits (&pBits);
+  hr = pPropVal->GetBits (&pBits);
   if (AAFRESULT_FAILED(hr)) return hr;
   assert (pBits);
 
-  memcpy (valBuf, pBits, bitsSize);
+  memcpy (pBits, valBuf, bitsSize);
 
   // BTW, we know that valsize >= bitsSize (from tests above)
-  if (_isSigned != 0)
+  if (_isSigned)
 	{
 	  pvtSignExtend (valBuf, bitsSize, pVal, valSize);
 	}
@@ -434,28 +407,23 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_BAD_SIZE;
 	}
 
-  ImplAAFPropValDataSP pvd;
-  pvd = dynamic_cast<ImplAAFPropValData*>(pPropVal);
-  if (!pvd) return AAFRESULT_BAD_TYPE;
-
   // get the property value's embedded type
-  ImplAAFTypeDefSP pPropType;
+  ImplAAFTypeDef * pPropType;
   AAFRESULT hr;
-  hr = pvd->GetType (&pPropType);
+  hr = pPropVal->GetType (&pPropType);
   if (! AAFRESULT_SUCCEEDED (hr))
 	{
 	  return hr;
 	}
-  assert (pPropType);
 
   // determine if the property value's embedded type is compatible
   // with this one for reading.  For now, we'll only allow integral
-  // and enumeration type properties to be read by this integral type def.
-  //
-  eAAFTypeCategory_t	type_category = kAAFTypeCatUnknown;
-  pPropType->GetTypeCategory( &type_category );
-  if( type_category != kAAFTypeCatInt && type_category != kAAFTypeCatEnum )
-	return AAFRESULT_BAD_TYPE;
+  // type properties to be read by this integral type def.
+  assert (pPropType);
+  if (! dynamic_cast<ImplAAFTypeDefInt *>(pPropType))
+	{
+	  return AAFRESULT_BAD_TYPE;
+	}
 
   // current impl only allows 1, 2, 4, and 8-bit ints.
   if ((1 != valSize) &&
@@ -469,7 +437,7 @@ AAFRESULT STDMETHODCALLTYPE
   // sign-extend or zero-fill the value.
   aafUInt8 valBuf[8];
   assert (_size <= sizeof (valBuf));
-  if (_isSigned != 0)
+  if (_isSigned)
 	{
 	  pvtSignExtend (pVal, valSize, valBuf, _size);
 	}
@@ -479,13 +447,14 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
   aafMemPtr_t pBits = NULL;
-  hr = pvd->AllocateBits (_size, &pBits);
+  hr = pPropVal->AllocateBits (_size, &pBits);
   if (! AAFRESULT_SUCCEEDED (hr))
 	{
+	  pPropVal->ReleaseReference ();
 	  return hr;
 	}
   assert (pBits);
-  memcpy (pBits, valBuf, _size);
+  memcpy (pBits, valBuf, valSize);
 
   if (! AAFRESULT_SUCCEEDED (hr))
 	{
@@ -523,197 +492,16 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-void ImplAAFTypeDefInt::reorder(OMByte* bytes,
-								size_t bytesSize) const
-
+aafBool ImplAAFTypeDefInt::IsFixedSize (void)
 {
-  assert (IsFixedSize());
-  assert (PropValSize() == bytesSize);
-  assert (bytes);
-  if (bytesSize > 1)
-	reorderInteger (bytes, bytesSize);
+  return AAFTrue;
 }
 
 
-size_t ImplAAFTypeDefInt::externalSize(OMByte* /*internalBytes*/,
-									   size_t /*internalBytesSize*/) const
-{
-  assert (IsFixedSize());
-  return PropValSize();
-}
-
-
-void ImplAAFTypeDefInt::externalize(OMByte* internalBytes,
-									size_t internalBytesSize,
-									OMByte* externalBytes,
-									size_t externalBytesSize,
-									OMByteOrder byteOrder) const
-{
-  assert (internalBytes);
-  assert (externalBytes);
-  // assert (internalBytesSize == externalBytesSize);
-  const size_t thisPropValSize = PropValSize ();
-  assert (externalBytesSize == thisPropValSize);
-
-  if (internalBytesSize > externalBytesSize)
-	{
-	  // contracting
-	  contract (internalBytes,
-				internalBytesSize,
-				externalBytes,
-				externalBytesSize,
-				byteOrder);
-	}
-
-  else if (internalBytesSize < externalBytesSize)
-	{
-	  // expanding
-	  expand (internalBytes,
-				internalBytesSize,
-				externalBytes,
-				externalBytesSize,
-				byteOrder);
-	}
-
-  else
-	{
-	  // size remains the same
-	  copy (internalBytes,
-			externalBytes,
-			externalBytesSize);
-	}
-}
-
-
-size_t ImplAAFTypeDefInt::internalSize(OMByte* /*externalBytes*/,
-									   size_t /*externalSize*/) const
-{
-  return NativeSize ();
-}
-
-
-void ImplAAFTypeDefInt::internalize(OMByte* externalBytes,
-									size_t externalBytesSize,
-									OMByte* internalBytes,
-									size_t internalBytesSize,
-									OMByteOrder byteOrder) const
-{
-  assert (externalBytes);
-  assert (internalBytes);
-  // assert (internalBytesSize == externalBytesSize);
-  // const size_t thisNativeSize = NativeSize ();
-  // assert (internalBytesSize == thisNativeSize);
-
-  if (externalBytesSize > internalBytesSize)
-	{
-	  // contracting
-	  contract (externalBytes,
-				externalBytesSize,
-				internalBytes,
-				internalBytesSize,
-				byteOrder);
-	}
-
-  else if (externalBytesSize < internalBytesSize)
-	{
-	  // expanding
-	  expand (externalBytes,
-				externalBytesSize,
-				internalBytes,
-				internalBytesSize,
-				byteOrder);
-	}
-
-  else
-	{
-	  // size remains the same
-	  copy (externalBytes,
-			internalBytes,
-			internalBytesSize);
-	}
-}
-
-
-aafBool ImplAAFTypeDefInt::IsFixedSize (void) const
-{
-  return kAAFTrue;
-}
-
-
-size_t ImplAAFTypeDefInt::PropValSize (void) const
+size_t ImplAAFTypeDefInt::PropValSize (void)
 {
   return _size;
 }
 
 
-aafBool ImplAAFTypeDefInt::IsRegistered (void) const
-{
-  // int types are registered by default
-  return kAAFTrue;
-}
-
-
-size_t ImplAAFTypeDefInt::NativeSize (void) const
-{
-  // same as property value size
-  return PropValSize();
-}
-
-
-OMProperty * ImplAAFTypeDefInt::pvtCreateOMProperty
-  (OMPropertyId pid,
-   const wchar_t * name) const
-{
-  assert (name);
-  size_t elemSize = PropValSize ();
-  OMProperty * result = new OMSimpleProperty (pid, name, elemSize);
-  assert (result);
-  return result;
-}
-
-
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefInt::RawAccessType (
-      ImplAAFTypeDef ** ppRawTypeDef)
-{
-  // Return variable array of unsigned char
-  return pvtGetUInt8Array8Type (ppRawTypeDef);
-}
-
-
-bool ImplAAFTypeDefInt::IsAggregatable () const
-{ return true; }
-
-bool ImplAAFTypeDefInt::IsStreamable () const
-{ return true; }
-
-bool ImplAAFTypeDefInt::IsFixedArrayable () const
-{ return true; }
-
-bool ImplAAFTypeDefInt::IsVariableArrayable () const
-{ return true; }
-
-bool ImplAAFTypeDefInt::IsStringable () const
-{ return true; }
-
-
-
-
-
-
-// override from OMStorable.
-const OMClassId& ImplAAFTypeDefInt::classId(void) const
-{
-  return (*reinterpret_cast<const OMClassId *>(&AUID_AAFTypeDefInt));
-}
-
-// Override callbacks from OMStorable
-void ImplAAFTypeDefInt::onSave(void* clientContext) const
-{
-  ImplAAFTypeDef::onSave(clientContext);
-}
-
-void ImplAAFTypeDefInt::onRestore(void* clientContext) const
-{
-  ImplAAFTypeDef::onRestore(clientContext);
-}
+OMDEFINE_STORABLE(ImplAAFTypeDefInt, AUID_AAFTypeDefInt);
