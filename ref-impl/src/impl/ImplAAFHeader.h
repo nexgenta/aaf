@@ -16,11 +16,11 @@
 
 class ImplAAFMob;
 
-class ImplAAFMedia;
+class ImplAAFEssenceData;
 
 class ImplEnumAAFMobs;
 
-class ImplEnumAAFMedia;
+class ImplEnumAAFEssenceData;
 
 class ImplAAFDictionary;
 
@@ -48,7 +48,6 @@ class ImplAAFFile;
 #include "ImplAAFContentStorage.h"
 
 #include "OMProperty.h"
-#include "OMTypes.h"
 
 class AAFDataKind;
 class AAFEffectDef;
@@ -67,9 +66,12 @@ public:
   //
   //********
   ImplAAFHeader ();
+
+protected:
   ~ImplAAFHeader ();
 
-  OMDECLARE_STORABLE(AAFHeader);
+public:
+  OMDECLARE_STORABLE(ImplAAFHeader)
 
   //****************
   // LookupMob()
@@ -126,45 +128,57 @@ public:
         (ImplAAFMob * pMob);  //@parm [in] Mob to remove from header
 
 
-
   //****************
-  // IsMediaDataPresent()
+  // IsEssenceDataPresent()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    IsMediaDataPresent
-        (aafUID_t *  pFileMobID,   //@parm [in,ref] A Unique File Mob ID
-		 aafFileFormat_t  fmt,   //@parm [in] The Media File Format
-         aafBool *  result);  //@parm [out,retval] True if the media is found
+    IsEssenceDataPresent
+        (// @parm [in] A Unique File Mob ID
+		 aafUID_t *  pFileMobID,
+
+		 // @parm [in] The Essence File Format
+		 aafFileFormat_t  fmt,
+
+		 // @parm [out,retval] True if the essence is found
+         aafBool *  pResult);
 
 
   //****************
-  // EnumAAFMediaObjects()
+  // EnumAAFEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    EnumAAFMediaObjects
-	    (// @parm [in,ref] Media Criteria for enumeration
+    EnumEssenceData
+	    (// @parm [in,ref] Essence Criteria for enumeration
          aafMediaCriteria_t *  pMediaCriteria,
 
-		 // @parm [out,retval] Media Enumeration
-		 ImplEnumAAFMedia ** ppEnum);
+		 // @parm [out,retval] Essence Enumeration
+		 ImplEnumAAFEssenceData ** ppEnum);
 
 
   //****************
-  // AppendMedia()
+  // AppendEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    AppendMedia
-		// @parm [in] Media object to append
-        (ImplAAFMedia * pMedia);
+    AppendEssenceData
+		// @parm [in] Essence data object to append
+        (ImplAAFEssenceData * pEssenceData);
 
 
   //****************
-  // RemoveMedia()
+  // RemoveEssenceData()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
-    RemoveMedia
-		// @parm [in] Media object to remove
-        (ImplAAFMedia * pMedia);
+    RemoveEssenceData
+		// @parm [in] Essence data object to Remove
+        (ImplAAFEssenceData * pEssenceData);
+
+
+  //****************
+  // GetContentStorage()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetContentStorage
+        (ImplAAFContentStorage ** ppContentStorage);  //@parm [out,retval] The AAF ContentStorage
 
 
   //****************
@@ -194,6 +208,14 @@ public:
 
 		 // @parm [out,retval] Indentification Object
 		 ImplAAFIdentification ** ppIdentification);
+
+
+  //****************
+  // GetNumIdents()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetNumIdents
+        (aafUInt32 *  pNumIdents);  //@parm [out,retval] Total number of identifications
 
 
   //****************
@@ -255,6 +277,10 @@ public:
   // in /test/ImplAAFHeaderTest.cpp.
   static AAFRESULT test();
 
+  // Return this objects stored object class.
+  virtual AAFRESULT STDMETHODCALLTYPE
+	GetObjectClass(aafUID_t * pClass);
+
 public:
 	// Interfaces visible inside the toolkit, but not exposed through the API
 	AAFRESULT AppendDataObject(aafUID_t mobID,      /* IN - Mob ID */
@@ -268,8 +294,13 @@ AAFRESULT GetNumIdentifications (aafInt32 * /*pCount*/);
 AAFRESULT AddIdentificationObject (aafProductIdentification_t * /*pIdent*/);
 AAFRESULT BuildMediaCache(void);
 AAFRESULT LoadMobTables(void);
-ImplAAFContentStorage *GetContentStorage(void);
 
+private:
+	// These are private accessor methods.
+	ImplAAFContentStorage *GetContentStorage(void);
+	ImplAAFDictionary *GetDictionary(void);
+
+public:
 #if FULL_TOOLKIT
 AAFRESULT ReadToolkitRevision(aafProductVersion_t *revision);
 AAFRESULT WriteToolkitRevision(aafProductVersion_t revision);
