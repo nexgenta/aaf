@@ -30,14 +30,15 @@
 
 #include <iostream.h>
 #include <stdio.h>
-#if defined(macintosh) || defined(_MAC)
-#include <wstring.h>
-#endif
+#include <stdlib.h>
+#include <wchar.h>
+
 #include "AAF.h"
 #include "AAFResult.h"
 #include "AAFSmartPointer.h"
 #include "AAFStoredObjectIDs.h"
 #include "CAAFBuiltinDefs.h"
+#include "AAFDefUIDs.h"
 
 typedef IAAFSmartPointer<IAAFComponent> IAAFComponentSP;
 typedef IAAFSmartPointer<IAAFCompositionMob> IAAFCompositionMobSP;
@@ -85,6 +86,7 @@ static void FillInProductInfo(aafProductIdentification_t& ProductInfo,
 	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
+	ProductInfo.productID = UnitTestProductID;
 }
 
 // Cross-platform utility to delete a file.
