@@ -51,8 +51,8 @@
 
 
 ImplAAFScopeReference::ImplAAFScopeReference ():
-	_relativeScope(			PID_ScopeReference_RelativeScope,		"RelativeScope"),
-	_relativeSlot(			PID_ScopeReference_RelativeSlot,		"RelativeSlot")
+	_relativeScope(			PID_ScopeReference_RelativeScope,		L"RelativeScope"),
+	_relativeSlot(			PID_ScopeReference_RelativeSlot,		L"RelativeSlot")
 {
 	_persistentProperties.put(		_relativeScope.address());
 	_persistentProperties.put(		_relativeSlot.address());
@@ -62,6 +62,18 @@ ImplAAFScopeReference::ImplAAFScopeReference ():
 ImplAAFScopeReference::~ImplAAFScopeReference ()
 {}
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFScopeReference::Initialize(ImplAAFDataDef *pDataDef,
+	aafUInt32 RelativeScope,aafUInt32 RelativeSlot)
+{
+	if(!pDataDef)
+		return(AAFRESULT_NULL_PARAM);
+
+	_relativeScope = RelativeScope;
+	_relativeSlot = RelativeSlot;
+
+	return(ImplAAFComponent::SetDataDef(pDataDef));
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFScopeReference::Create (aafUInt32 RelativeScope, aafUInt32 RelativeSlot)
