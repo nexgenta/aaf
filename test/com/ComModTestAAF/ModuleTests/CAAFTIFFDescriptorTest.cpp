@@ -1,14 +1,17 @@
 // @doc INTERNAL
-// @com This file implements the module test for CAAFTIFFDescriptor
+// @com This file implements the module test for CAAFDefinitionObject
 /******************************************\
 *                                          *
 * Advanced Authoring Format                *
 *                                          *
 * Copyright (c) 1998 Avid Technology, Inc. *
+* Copyright (c) 1998 Microsoft Corporation *
 *                                          *
 \******************************************/
 
-#include "AAF.h"
+#ifndef __CAAFTIFFDescriptor_h__
+#include "CAAFTIFFDescriptor.h"
+#endif
 
 
 #include <iostream.h>
@@ -105,19 +108,28 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 	ProductInfo.productVersion.patchLevel = 0;
 	ProductInfo.productVersion.type = kVersionUnknown;
 	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
+	ProductInfo.productID = -1;
 	ProductInfo.platform = NULL;
 
-	*ppFile = NULL;
+	hr = CoCreateInstance(CLSID_AAFFile,
+						   NULL, 
+						   CLSCTX_INPROC_SERVER, 
+						   IID_IAAFFile, 
+						   (void **)ppFile);
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
+    hr = (*ppFile)->Initialize();
+	if (AAFRESULT_SUCCESS != hr)
+		return hr;
 
 	switch (mode)
 	{
 	case kMediaOpenReadOnly:
-		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
+		hr = (*ppFile)->OpenExistingRead(pFileName, 0);
 		break;
 
 	case kMediaOpenAppend:
-		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
+		hr = (*ppFile)->OpenNewModify(pFileName, 0, &ProductInfo);
 		break;
 
 	default:
@@ -127,11 +139,8 @@ static HRESULT OpenAAFFile(aafWChar*			pFileName,
 
 	if (FAILED(hr))
 	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
+		(*ppFile)->Release();
+		*ppFile = NULL;
 		return hr;
 	}
   
@@ -237,9 +246,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 	if (pTIFFDesc)
 	   pTIFFDesc->Release();
 
-	if (pDictionary)
-	   pDictionary->Release();
-
 	if (pEssDesc)
 		pEssDesc->Release();
 
@@ -254,7 +260,6 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 	if (pFile)
 	{
-		pFile->Save();
 		pFile->Close();
 		pFile->Release();
 	}
@@ -306,9 +311,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkExpression(leadingLines == 10, AAFRESULT_TEST_FAILED);
 		checkExpression(trailingLines == 20, AAFRESULT_TEST_FAILED);
 #if defined(_WIN32) || defined(WIN32)
-		checkExpression(memcmp(summary, "II", 2) == 0, AAFRESULT_TEST_FAILED);
+		checkExpression(memcmp(summary, "II*", 3) == 0, AAFRESULT_TEST_FAILED);
 #else
-		checkExpression(memcmp(summary, "MM", 2) == 0, AAFRESULT_TEST_FAILED);
+		checkExpression(memcmp(summary, "MM*", 3) == 0, AAFRESULT_TEST_FAILED);
 #endif
 
     // NOTE: The elements in the summary structure need to be byte swapped
@@ -336,9 +341,6 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (pHeader)
 	    pHeader->Release();
 
-	if (pMobIter)
-	    pMobIter->Release();
-
 	if (pFile)
 	{
 		pFile->Close();
@@ -348,7 +350,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	return hr;
 }
 
-extern "C" HRESULT CAAFTIFFDescriptor_test()
+HRESULT CAAFTIFFDescriptor::test()
 {
 	aafWChar*	pFileName = L"AAFTIFFDescriptorTest.aaf";
 	HRESULT		hr = AAFRESULT_NOT_IMPLEMENTED;
@@ -361,7 +363,7 @@ extern "C" HRESULT CAAFTIFFDescriptor_test()
 	}
 	catch (...)
 	{
-		cerr << "CAAFTIFFDescriptor_test...Caught general C++ exception!" << endl; 
+		cerr << "CAAFTIFFDescriptor::test...Caught general C++ exception!" << endl; 
 	}
 
   return hr;
