@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.41 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.42 2004/02/27 15:45:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -443,7 +443,7 @@ HRESULT STDMETHODCALLTYPE
 		                      const_cast<wchar_t *>(kDisplayName),
 		                      const_cast<wchar_t *>(kDescription)));
 
-	  	checkResult(dict->LookupClassDef(AUID_AAFWAVEDescriptor, &fileClass));
+	  	checkResult(dict->LookupClassDef(AUID_AAFCDCIDescriptor, &fileClass));
 		checkResult(codecDef->SetFileDescriptorClass (fileClass));
 		fileClass->Release ();
 		fileClass = 0;
