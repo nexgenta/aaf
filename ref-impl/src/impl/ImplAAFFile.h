@@ -1,38 +1,50 @@
-//@doc
-//@class    AAFFile | Implementation class for AAFFile
 #ifndef __ImplAAFFile_h__
 #define __ImplAAFFile_h__
+/***********************************************************************
+ *
+ *              Copyright (c) 1998-2001 Avid Technology, Inc.
+ *
+ * Permission to use, copy and modify this software and accompanying 
+ * documentation, and to distribute and sublicense application software
+ * incorporating this software for any purpose is hereby granted, 
+ * provided that (i) the above copyright notice and this permission
+ * notice appear in all copies of the software and related documentation,
+ * and (ii) the name Avid Technology, Inc. may not be used in any
+ * advertising or publicity relating to the software without the specific,
+ * prior written permission of Avid Technology, Inc.
+ *
+ * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL AVID TECHNOLOGY, INC. BE LIABLE FOR ANY DIRECT,
+ * SPECIAL, INCIDENTAL, PUNITIVE, INDIRECT, ECONOMIC, CONSEQUENTIAL OR
+ * OTHER DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE AND
+ * ACCOMPANYING DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, DAMAGES
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, AND WHETHER OR NOT
+ * ADVISED OF THE POSSIBILITY OF DAMAGE, REGARDLESS OF THE THEORY OF
+ * LIABILITY.
+ *
+ ************************************************************************/
 
-/******************************************\
-*                                          *
-* Advanced Authoring Format                *
-*                                          *
-* Copyright (c) 1998 Avid Technology, Inc. *
-* Copyright (c) 1998 Microsoft Corporation *
-*                                          *
-\******************************************/
-
-#include "AAFTypes.h"
 #include "ImplAAFRoot.h"
 
-#include "Container.h"
-
-typedef enum
-{
-	kOmCreate, kOmModify, kOmOpenRead, kOmUndefined = -1
-}				openType_t;
 
 //
 // Forward declaration
 //
-struct IAAFFile;
-class AAFFile;
-struct IAAFMedia;
-class AAFMedia;
+class OMFile;
+class OMRawStorage;
+class ImplAAFDictionary;
+class ImplAAFMetaDictionary;
+class ImplAAFFile;
+class ImplAAFRawStorage;
 class ImplAAFHeader;
-struct IAAFSession;
-class ImplAAFSession;
 class ImplAAFDataDef;
+class ImplAAFOMRawStorage;
+
+struct IAAFRawStorage;
+struct IAAFRandomRawStorage;
 
 class ImplAAFFile : public ImplAAFRoot
 {
@@ -46,27 +58,45 @@ public:
 	Initialize ();
 
   virtual AAFRESULT STDMETHODCALLTYPE
-	OpenExistingRead (wchar_t * pFileName,
+	Open ();
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	OpenExistingRead (const aafCharacter * pFileName,
 					  aafUInt32 modeFlags);
 
   virtual AAFRESULT STDMETHODCALLTYPE
-	OpenExistingModify (wchar_t * pFileName,
+	OpenExistingModify (const aafCharacter * pFileName,
 						aafUInt32 modeFlags,
 						aafProductIdentification_t * pIdent);
 
   virtual AAFRESULT STDMETHODCALLTYPE
-	OpenNewModify (wchar_t * pFileName,
+	OpenNewModify (const aafCharacter * pFileName,
 				   aafUInt32 modeFlags,
 				   aafProductIdentification_t * pIdent);
 
   virtual AAFRESULT STDMETHODCALLTYPE
-	OpenTransient ();
+	OpenTransient (aafProductIdentification_t * pIdent);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateAAFFileOnRawStorage (IAAFRawStorage * pRawStorage,
+							   aafFileExistence_t existence,
+							   aafFileAccess_t access,
+							   aafUID_constptr pFileKind,
+							   aafUInt32 modeFlags,
+							   aafProductIdentification_constptr pIdent);
 
   virtual AAFRESULT STDMETHODCALLTYPE
 	Close ();
 
   virtual AAFRESULT STDMETHODCALLTYPE
 	Save ();
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	SaveAs (const aafCharacter * pFileName,
+			aafUInt32 modeFlags);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	SaveCopyAs (ImplAAFFile * pDestFile);
 
   virtual AAFRESULT STDMETHODCALLTYPE
 	Revert ();
@@ -77,6 +107,9 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
 	GetRevision (aafFileRev_t *  rev);
   
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDictionary
+        (ImplAAFDictionary ** ppDictionary) const;  //@parm [out,retval] The AAF Dictionary
 
   //
   // Constructor/destructor
@@ -84,67 +117,58 @@ public:
   //********
   ImplAAFFile ();
   virtual ~ImplAAFFile ();
-#if 0
-  OMDECLARE_STORABLE(ImplAAFFile)
-#endif
 
+protected:
 
-public:
-  // Declare the module test method. The implementation of the will be be
-  // in /test/ImplAAFFileTest.cpp.
-  static AAFRESULT test();
+  // Returns the OMFile associated with this AAFFile.  Requires
+  // IsOpen().
+  OMFile * omFile (void);
 
-AAFRESULT Create(
-			aafWChar*		stream, 
-			ImplAAFSession *	session, 
-			aafFileRev_t		rev);
-AAFRESULT OpenRead(
-			aafWChar*		stream, 
-			ImplAAFSession *	session);
-AAFRESULT OpenModify(
-			aafWChar*		stream, 
-			ImplAAFSession *	session);
+  bool IsReadable () const;
+  bool IsWriteable () const;
+  bool IsOpen () const;
+  bool IsClosed () const;
+  OMRawStorage * RawStorage ();
+
 private:
 
-	AAFRESULT InternOpenFile(aafWChar* stream, 
-								   ImplAAFSession * session,
-								   OMLContainerUseMode useMode, 
-								   openType_t type);
-  
   void InternalReleaseObjects();
 
-		aafInt32       	_cookie;
-		aafFileFormat_t _fmt;
-		OMContainer     *_container;
-		aafInt16           _byteOrder;
-		openType_t		_openType;
-		ImplAAFFile			*_prevFile;
-		ImplAAFHeader *     _head;		// Needed by Head object
-#if FULL_TOOLKIT
-		aafCloseMediaPtr _closeMediaProc;
-		aafBool			_customStreamFuncsExist;	//!!!	
-		struct aafCodecStreamFuncs _streamFuncs;	//!!!	
-		aafRawStream_t	*_rawFile;	//!!!	
-		aafLocatorFailureCB _locatorFailureCallback;	//!!!	
-		aafCodecID_t	_rawCodecID;	//!!!	
-		void           	*_rawFileDesc;		//!!!/* If non-omfi file */
-		AAFMedia *   _topMedia;	//!!!
-#endif
-		aafBool         _semanticCheckEnable;	//!!!  /* Used to stop recursion in checks */
-		ImplAAFSession		 *_session;		//!!!  used by file checker
-		ImplAAFDataDef *	_nilKind;// !!!
-		ImplAAFDataDef *	_pictureKind;// !!!
-		ImplAAFDataDef *	_soundKind;// !!!
-#ifdef AAF_ERROR_TRACE
-		char			*_stackTrace;	//!!!	
-		aafInt32		_stackTraceSize;	//!!!	
-#endif
-		aafFileRev_t     _setrev;
+  AAFRESULT pvtCreateExistingRead
+    ();
+  AAFRESULT pvtCreateExistingModify
+    (aafProductIdentification_constptr pIdent);
+  AAFRESULT pvtCreateNewModify
+    (aafUID_constptr pFileKind,
+	 aafProductIdentification_constptr pIdent);
 
+
+  aafInt32			_cookie;
+  OMFile			*_file;
+  ImplAAFDictionary *_factory;
+  ImplAAFMetaDictionary *_metafactory;
+  aafInt16			_byteOrder;
+  ImplAAFHeader *   _head;		// Needed by Head object
+  aafBool   _semanticCheckEnable;	//!!!  /* Used to stop recursion in checks */
+  aafFileRev_t   _setrev;
   aafBool _initialized;
-  aafBool _open;
-  aafProductIdentification_t _ident;
+  aafUInt32 _modeFlags;
+
+  aafFileExistence_t _existence;
+  aafFileAccess_t    _access;
+
+  aafProductIdentification_t _preOpenIdent;
 };
 
-#endif // ! __ImplAAFFile_h__
+//
+// smart pointer
+//
 
+#ifndef __ImplAAFSmartPointer_h__
+// caution! includes assert.h
+#include "ImplAAFSmartPointer.h"
+#endif
+
+typedef ImplAAFSmartPointer<ImplAAFFile> ImplAAFFileSP;
+
+#endif // ! __ImplAAFFile_h__
