@@ -44,10 +44,13 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "ImplAAFObjectCreation.h"
 
 #include <assert.h>
 #include <string.h>
 
+
+extern "C" const aafClassID_t CLSID_AAFPropValData;
 
 ImplAAFTypeDefStrongObjRef::ImplAAFTypeDefStrongObjRef ()
   : _referencedType (PID_TypeDefinitionStrongObjectReference_ReferencedType, "ReferencedType")
@@ -62,12 +65,10 @@ ImplAAFTypeDefStrongObjRef::~ImplAAFTypeDefStrongObjRef ()
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStrongObjRef::pvtInitialize (
-      const aafUID_t *  pID,
-      const aafUID_t * pRefdObjID,
-      wchar_t *  pTypeName)
+      const aafUID_t & id,
+      const aafUID_t & refdObjID,
+      const aafCharacter * pTypeName)
 {
-  if (! pID)       return AAFRESULT_NULL_PARAM;
-  if (! pRefdObjID)  return AAFRESULT_NULL_PARAM;
   if (! pTypeName) return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
@@ -75,9 +76,9 @@ AAFRESULT STDMETHODCALLTYPE
   hr = SetName (pTypeName);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
-  _referencedType = *pRefdObjID;
+  _referencedType = refdObjID;
 
-  hr = SetAUID (pID);
+  hr = SetAUID (id);
   if (! AAFRESULT_SUCCEEDED (hr)) return hr;
 
   return AAFRESULT_SUCCESS;
@@ -153,7 +154,7 @@ ImplAAFTypeDefStrongObjRef::GetObject (ImplAAFPropertyValue * pPropVal,
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefStrongObjRef::GetObjectType (ImplAAFClassDef ** ppObjType) const
+    ImplAAFTypeDefStrongObjRef::GetObjectType (ImplAAFClassDef ** ppObjType)
 {
   if (! ppObjType) return AAFRESULT_NULL_PARAM;
 
@@ -172,10 +173,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return hr;
 	  assert (pDict);
 
-	  ImplAAFTypeDefStrongObjRef * pNonConstThis =
-		  (ImplAAFTypeDefStrongObjRef*) this;
-	  aafUID_t id = _referencedType;
-	  hr = pDict->LookupClass (&id, &pNonConstThis->_cachedObjType);
+	  hr = pDict->LookupClass (_referencedType, &_cachedObjType);
 	  if (AAFRESULT_FAILED(hr))
 		return hr;
 	  assert (_cachedObjType);
@@ -189,10 +187,38 @@ AAFRESULT STDMETHODCALLTYPE
 
 // Override from AAFTypeDefObjectRef
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefStrongObjRef::CreateValue (/*[in]*/ ImplAAFObject * /*pObj*/,
-      /*[out]*/ ImplAAFPropertyValue ** /*ppPropVal*/)
+    ImplAAFTypeDefStrongObjRef::CreateValue (/*[in]*/ ImplAAFObject * pObj,
+      /*[out]*/ ImplAAFPropertyValue ** ppPropVal)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (! pObj)
+	return AAFRESULT_NULL_PARAM;
+  if (! ppPropVal)
+	return AAFRESULT_NULL_PARAM;
+
+  ImplAAFPropValData * pvd = 0;
+  pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+  if (!pvd) return AAFRESULT_NOMEMORY;
+
+  ImplAAFPropValDataSP spPvd;
+  spPvd = pvd;
+  // SmartPointer operator= will automatically
+  // AddRef; CreateImpl *also* will addref, so we've got one too
+  // many.  Put us back to normal.
+  pvd->ReleaseReference ();
+  pvd = 0;
+
+  AAFRESULT hr;
+  hr = spPvd->Initialize (this);
+  if (AAFRESULT_FAILED (hr)) return hr;
+
+  hr = SetObject (spPvd, pObj);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+  assert (ppPropVal);
+  *ppPropVal = spPvd;
+  assert (*ppPropVal);
+  (*ppPropVal)->AcquireReference ();
+  return AAFRESULT_SUCCESS;
 }
 
 

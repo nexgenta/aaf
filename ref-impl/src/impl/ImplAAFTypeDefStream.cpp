@@ -9,7 +9,7 @@
  * notice appear in all copies of the software and related documentation,
  * and (ii) the name Avid Technology, Inc. may not be used in any
  * advertising or publicity relating to the software without the specific,
- *  prior written permission of Avid Technology, Inc.
+ * prior written permission of Avid Technology, Inc.
  *
  * THE SOFTWARE IS PROVIDED AS-IS AND WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
@@ -46,12 +46,22 @@ ImplAAFTypeDefStream::ImplAAFTypeDefStream ()
 ImplAAFTypeDefStream::~ImplAAFTypeDefStream ()
 {}
 
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::Initialize (
-      const aafUID_t *  /*pID*/,
-      ImplAAFTypeDef * /*pTypeDef*/,
-      wchar_t *  /*pTypeName*/)
+      const aafUID_t & id,
+      ImplAAFTypeDef * pTypeDef,
+      const aafCharacter * pTypeName)
 {
+  if (! pTypeDef)
+	return AAFRESULT_NULL_PARAM;
+  if (! pTypeName)
+	return AAFRESULT_NULL_PARAM;
+
+  assert (pTypeDef);
+  if (! pTypeDef->IsStreamable())
+	return AAFRESULT_BAD_TYPE;
+
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
@@ -59,8 +69,11 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::GetType (
-      ImplAAFTypeDef ** /*ppTypeDef*/)
+      ImplAAFTypeDef ** ppTypeDef)
 {
+  if (! ppTypeDef)
+	return AAFRESULT_NULL_PARAM;
+
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
@@ -68,9 +81,14 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::GetCount (
-      ImplAAFPropertyValue * /*pPropVal*/,
-      aafInt64 *  /*pCount*/)
+      ImplAAFPropertyValue * pPropVal,
+      aafInt64 * pCount)
 {
+  if (! pPropVal)
+	return AAFRESULT_NULL_PARAM;
+  if (! pCount)
+	return AAFRESULT_NULL_PARAM;
+
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
@@ -78,10 +96,15 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::AppendElements (
-      ImplAAFPropertyValue * /*pInPropVal*/,
-      ImplAAFPropertyValue ** /*ppMemberPropVals*/,
+      ImplAAFPropertyValue * pInPropVal,
+      ImplAAFPropertyValue ** ppMemberPropVals,
       aafUInt32  /*numElements*/)
 {
+  if (! pInPropVal)
+	return AAFRESULT_NULL_PARAM;
+  if (! ppMemberPropVals)
+	return AAFRESULT_NULL_PARAM;
+
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
@@ -89,8 +112,11 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::CreateEmpty (
-      ImplAAFPropertyValue ** /*ppPropVal*/)
+      ImplAAFPropertyValue ** ppPropVal)
 {
+  if (! ppPropVal)
+	return AAFRESULT_NULL_PARAM;
+
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
@@ -98,11 +124,16 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::GetElementValues (
-      ImplAAFPropertyValue * /*pInPropVal*/,
+      ImplAAFPropertyValue * pInPropVal,
       aafInt64  /*startElement*/,
-      ImplAAFPropertyValue ** /*pOutPropVals*/,
+      ImplAAFPropertyValue ** pOutPropVals,
       aafUInt32  /*numElements*/)
 {
+  if (! pInPropVal)
+	return AAFRESULT_NULL_PARAM;
+  if (! pOutPropVals)
+	return AAFRESULT_NULL_PARAM;
+
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
@@ -110,14 +141,31 @@ AAFRESULT STDMETHODCALLTYPE
 
  AAFRESULT STDMETHODCALLTYPE
    ImplAAFTypeDefStream::GetElements (
-      ImplAAFPropertyValue * /*pPropVal*/,
+      ImplAAFPropertyValue * pPropVal,
       aafInt64  /*startElement*/,
-      aafMemPtr_t  /*pData*/,
+      aafMemPtr_t pData,
       aafUInt32  /*numElements*/)
 {
+  if (! pPropVal)
+	return AAFRESULT_NULL_PARAM;
+  if (! pData)
+	return AAFRESULT_NULL_PARAM;
+
   return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
+bool ImplAAFTypeDefStream::IsAggregatable () const
+{ return false; }
 
+bool ImplAAFTypeDefStream::IsStreamable () const
+{ return false; }
 
+bool ImplAAFTypeDefStream::IsFixedArrayable () const
+{ return false; }
+
+bool ImplAAFTypeDefStream::IsVariableArrayable () const
+{ return false; }
+
+bool ImplAAFTypeDefStream::IsStringable () const
+{ return false; }
