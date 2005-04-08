@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-# $Id: MultiGenTest.pl,v 1.8 2005/03/31 04:10:32 jptrainor Exp $ $Name:  $
+# $Id: MultiGenTest.pl,v 1.9 2005/04/08 11:39:09 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -338,6 +338,18 @@ sub PrintConfigSummary {
     }
     print "\n";
 
+    print "Incompatible versions:\n";
+    foreach my $CreateVersion ( @{$CFG{Versions}} ) {
+	printf "\t$CreateVersion cannot be read by: ";
+	foreach my $ReadVersion ( @{$CFG{Versions}} ) {
+	    if ( IsReadableByVersion($CreateVersion, $ReadVersion) eq "false" ) {
+		printf "$ReadVersion ";
+	    }
+	}
+	printf "\n";
+    }
+	printf "\n";
+
     print "Exclusion Rules:\n";
     print "\tModify operations using version(s): ";
     foreach $version ( @{$CFG{Versions}} ) {
@@ -425,7 +437,7 @@ sub IsReadableByVersion
 
     my $result;
 
-    if ( $CFG{IncompatibleVersions}{$readVersion} eq $createVersion ) {
+    if ( $CFG{IncompatibleVersions}{$readVersion}{$createVersion} eq "true" ) {
 	$result = "false";
     }
     else {
