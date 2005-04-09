@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-# $Id: MultiGenTest.pl,v 1.9 2005/04/08 11:39:09 jptrainor Exp $ $Name:  $
+# $Id: MultiGenTest.pl,v 1.10 2005/04/09 23:30:04 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -583,19 +583,17 @@ sub ModifyTest {
 			foreach my $Vf ( GetCompatibleFileKinds( $Vp, $Vv, $Mf ) ) {
 			
 			    $what = "verify $modify_filename by running $T on $Vp using $Vv with file impl $Vf";
+			    print "${what}\n";
 
 			    if ( IsReadableByVersion( $Mv, $Vv ) eq "false" ) {
 				print "Excluded: ${Mv} cannot be read by ${Vv}.\n\n";
 				$GlobalState{TestExcludedCount} += 1;
 			    }
 			    elsif ( $exclude == 1 ) {
-				print "${what}\n";
 				print "Excluded: create or modify test was excluded.\n\n";
 				$GlobalState{TestExcludedCount} += 1;
 			    }
 			    else {
-				print "${what}\n";
-
 				my( $status ) = VerifyFile( $Vp, $Vv, $Vf, $T, $modify_filename );
 				TestStatus( $status, $what );
 				print "\n";
