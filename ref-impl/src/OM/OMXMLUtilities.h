@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.1 2005/03/31 09:59:03 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.2 2005/04/11 15:07:12 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,5 +35,8 @@
 void oidToURI(OMUniqueObjectIdentification oid, wchar_t* uri);
 void umidToURI(OMMaterialIdentification umid, wchar_t* uri);
 
+bool isURI(const wchar_t* uri);
+void uriToOID(const wchar_t* uri, OMUniqueObjectIdentification* oid);
+void uriToUMID(const wchar_t* uri, OMMaterialIdentification* umid);
 
 #endif 
