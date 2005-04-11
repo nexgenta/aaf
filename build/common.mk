@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.12 2004/10/19 13:27:11 stuart_hc Exp $ $Name:  $
+# $Id: common.mk,v 1.12.4.1 2005/04/11 14:57:39 philipn Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -60,6 +60,16 @@ endif
 ifdef LIBGSF_PATH
     PLATFORMLIBS += -L$(LIBGSF_PATH)/lib -lgsf-1 -lgobject-2.0 -lglib-2.0 -lz
     ADD_CFLAGS += -I$(LIBGSF_PATH)/include -I$(LIBGSF_PATH)/include/glib-2.0 -I$(LIBGSF_PATH)/lib/glib-2.0/include -I$(LIBGSF_PATH)/include/libgsf-1 -DUSE_LIBGSF
+endif
+
+
+#--------------------------------------------------------------------------
+# Prototype AAF-XML stored format support can be turned on using e.g.
+# make LIBEXPAT_PATH=/usr/local
+#--------------------------------------------------------------------------
+ifdef LIBEXPAT_PATH
+    PLATFORMLIBS += -L$(LIBEXPAT_PATH)/lib -lexpat
+    ADD_CFLAGS += -I$(LIBEXPAT_PATH)/include -DHAVE_EXPAT
 endif
 
 
