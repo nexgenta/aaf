@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.33 2005/02/05 18:13:36 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.1 2005/04/11 15:10:10 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -240,6 +240,25 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
 }
 
 
+bool  
+ImplAAFMetaDictionary::registerClassDef(const OMClassId& classId)
+{
+    const aafUID_t* auid = reinterpret_cast<const aafUID_t*>(&classId);
+    ImplAAFClassDefSP pClassDef;
+    AAFRESULT hr = dataDictionary()->LookupClassDef(*auid, &pClassDef);
+    return AAFRESULT_SUCCEEDED(hr);
+}
+
+bool 
+ImplAAFMetaDictionary::registerTypeDef(const OMClassId& typeId)
+{
+    const aafUID_t* auid = reinterpret_cast<const aafUID_t*>(&typeId);
+    ImplAAFTypeDefSP pTypeDef;
+    AAFRESULT hr = dataDictionary()->LookupTypeDef(*auid, &pTypeDef);
+    return AAFRESULT_SUCCEEDED(hr);
+}
+
+
 //
 // Define the symbol for the stored object id
 //
@@ -247,7 +266,6 @@ const OMClassId& ImplAAFMetaDictionary::classId(void) const
 {
   return *reinterpret_cast<const OMClassId*>(&AUID_AAFMetaDictionary);
 }
-
 
 
 // Override callback from OMStorable

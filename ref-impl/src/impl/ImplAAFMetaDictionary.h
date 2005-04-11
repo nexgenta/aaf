@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.25 2005/02/05 18:13:37 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.25.2.1 2005/04/11 15:10:11 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -113,6 +113,11 @@ public:
   //
   OMStorable* create(const OMClassId& classId) const;
 
+  // Override from OMDictionary
+  virtual bool registerClassDef(const OMClassId& classId);
+  virtual bool registerTypeDef(const OMClassId& typeId);
+
+  
   //
   // This method implements the required OMStorable interface method
   //
