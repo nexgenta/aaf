@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRootStorable.cpp,v 1.19 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMRootStorable.cpp,v 1.19.6.1 2005/04/11 15:03:08 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -148,6 +148,14 @@ OMStorable* OMRootStorable::clientRoot(void) const
 OMDictionary* OMRootStorable::dictionary(void) const
 {
   return _dictionary;
+}
+
+void OMRootStorable::setDictionary(OMDictionary* dictionary)
+{
+  TRACE("OMRootStorable::setDictionary");
+  PRECONDITION("Dictionary is null", _dictionary.isVoid());
+  
+  _dictionary = dictionary;
 }
 
 void OMRootStorable::initialize(OMStorable* clientRoot,
