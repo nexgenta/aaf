@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLReader.h,v 1.1.2.1 2005/03/31 09:59:03 philipn Exp $ $Name:  $
+// $Id: XMLReader.h,v 1.1.2.2 2005/04/11 15:09:04 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,7 @@
 #ifndef __XMLREADER_H__
 #define __XMLREADER_H__
 
-#include <expat.h>
+
 #include <OMDataTypes.h>
 #include <string>
 #include <vector>
@@ -148,6 +148,11 @@ public:
 };
 
 
+
+#if defined(HAVE_EXPAT)
+
+#include <expat.h>
+
 class XMLReaderExpat : public XMLReader
 {
 public:
@@ -193,7 +198,7 @@ void expat_StartElementHandler(void* userData, const XML_Char* name, const XML_C
 void expat_EndElementHandler(void* userData, const XML_Char* name);
 void expat_CharacterDataHandler(void* userData, const XML_Char* s, int len);
 
-
+#endif // HAVE_EXPAT
 
 #endif
 
