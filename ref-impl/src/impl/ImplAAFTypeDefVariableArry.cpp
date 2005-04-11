@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.63 2004/10/08 19:35:52 terabrit Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.63.4.1 2005/04/11 15:13:00 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -826,6 +826,12 @@ void ImplAAFTypeDefVariableArray::onSave(void* clientContext) const
 void ImplAAFTypeDefVariableArray::onRestore(void* clientContext) const
 {
 	ImplAAFTypeDefArray::onRestore(clientContext);
+}
+
+
+const OMPropertyId* ImplAAFTypeDefVariableArray::getTargetPath() const
+{
+    return elementType()->getTargetPath();
 }
 
 /////////////////////////////////////////////////////////////////////

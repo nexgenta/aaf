@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.cpp,v 1.34 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.cpp,v 1.34.4.1 2005/04/11 15:12:59 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -349,3 +349,10 @@ void ImplAAFTypeDefRename::onRestore(void* clientContext) const
 {
   ImplAAFTypeDef::onRestore(clientContext);
 }
+
+
+const OMPropertyId* ImplAAFTypeDefRename::getTargetPath() const
+{
+    return BaseType()->getTargetPath();
+}
+

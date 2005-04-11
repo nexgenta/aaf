@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.49 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.49.4.1 2005/04/11 15:12:59 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -491,3 +491,11 @@ void ImplAAFTypeDefFixedArray::onRestore(void* clientContext) const
 {
   ImplAAFTypeDefArray::onRestore(clientContext);
 }
+
+
+const OMPropertyId* ImplAAFTypeDefFixedArray::getTargetPath() const
+{
+    return elementType()->getTargetPath();
+}
+
+

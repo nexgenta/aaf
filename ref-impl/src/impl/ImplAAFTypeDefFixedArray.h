@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.h,v 1.31 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.h,v 1.31.4.1 2005/04/11 15:12:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -203,6 +203,10 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
+
+  
+  // PdN: temporary; override from OMType
+  virtual const OMPropertyId* getTargetPath() const;
 
 private:
   ImplAAFTypeDefSP BaseType (void) const;
