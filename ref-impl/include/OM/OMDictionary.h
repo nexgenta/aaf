@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.h,v 1.11 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMDictionary.h,v 1.11.6.1 2005/04/11 14:59:21 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,6 +52,11 @@ public:
   static void initialize(void);
 
   static void finalize(void);
+
+  
+  virtual bool registerClassDef(const OMClassId& classId) = 0;
+  
+  virtual bool registerTypeDef(const OMClassId& typeId) = 0;
 
 private:
 
