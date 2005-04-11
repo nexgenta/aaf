@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStorage.h,v 1.1.2.1 2005/03/31 09:59:03 philipn Exp $ $Name:  $
+// $Id: OMXMLStorage.h,v 1.1.2.2 2005/04/11 15:04:44 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,11 +45,15 @@ public:
     OMXMLWriter* getWriter();
     OMXMLReader* getReader();
     
-    const wchar_t* getBaselineSymbolspace() const;
-    const wchar_t* getBaselinePrefix() const;
+    OMSymbolspace* getBaselineSymbolspace() const;
+    OMSymbolspace* getDefaultExtSymbolspace() const;
+    OMSymbolspace* createDefaultExtSymbolspace(OMClassId id);
     
     bool getSymbol(OMClassId id, const wchar_t** symbolspaceURI, const wchar_t** symbol) const;
-    const wchar_t* getStringId(OMClassId id);
+    const wchar_t* getDefinitionSymbol(OMClassId id);
+    OMClassId getId(const wchar_t* symbolspaceURI, const wchar_t* symbol) const;
+    OMPropertyId getPropertyId(const wchar_t* symbolspaceURI, const wchar_t* symbol) const;
+    OMClassId getId(const wchar_t* definitionSymbol) const;
     
     const wchar_t* getDataStreamNotationName(OMClassId typeId);
     const wchar_t* getDataStreamEntityName(void* ref);
@@ -72,7 +76,8 @@ private:
     OMSymbolspace*  _defaultExtSymbolspace;
     
     OMSet<OMWString, OMSymbolspace*> _symbolspaces;
-    OMSet<OMClassId, OMWString> _stringIds;
+    OMSet<OMClassId, OMWString> _idToDefSymbol;
+    OMSet<OMWString, OMClassId> _defSymbolToId;
 
     int             _dataStreamNotationNameIndex;
     int             _dataStreamEntityNameIndex;

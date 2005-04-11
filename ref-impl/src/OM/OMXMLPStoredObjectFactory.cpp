@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObjectFactory.cpp,v 1.1.2.1 2005/03/31 09:59:03 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObjectFactory.cpp,v 1.1.2.2 2005/04/11 15:04:44 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,9 @@
 #include "OMAssertions.h"
 #include "OMRawStorage.h"
 #include "OMDiskRawStorage.h"
+#include "OMXMLException.h"
+#include "OMListIterator.h"
+
 
 #include <ctype.h>
 
@@ -122,12 +125,11 @@ OMXMLPStoredObjectFactory::createModify(OMRawStorage* rawStorage,
   //   @rdesc An <c OMXMLPStoredObject> representing the root object in
   //          the disk file.
 OMStoredObject*
-OMXMLPStoredObjectFactory::openRead(const wchar_t* /* fileName */)
+OMXMLPStoredObjectFactory::openRead(const wchar_t* fileName )
 {
   TRACE("OMXMLPStoredObjectFactory::openRead");
-  ASSERT("Unimplemented code not reached", false);
-//return OMXMLPStoredObject::openRead(fileName);
-  return 0;
+  OMRawStorage* rawStorage = OMDiskRawStorage::openExistingRead(fileName);
+  return OMXMLPStoredObjectFactory::openRead(rawStorage);
 }
 
   // @mfunc Open the root <c OMXMLPStoredObject> in the disk file
@@ -205,25 +207,20 @@ OMXMLPStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
 {
   TRACE("OMXMLPStoredObjectFactory::isRecognized");
   PRECONDITION("Valid raw storage", rawStorage != 0);
-  PRECONDITION("Positionable raw storage", rawStorage->isPositionable());
 
-  char signature[] = "<?XML VERSION=\"1.0\"?>"
-  "<?OM SIGNATURE=\"{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}\"?>";
-  char* p = strchr(signature, '{');
-  ASSERT("Found place holder", p != 0);
-  toString(encoding(), p);
-  size_t bufferSize = strlen(signature) + 1;
-  char* buffer = new char[bufferSize];
-  ASSERT("Valid heap pointer", buffer != 0);
-  bool result = readSignature(rawStorage, buffer, bufferSize);
-  if (result) {
-    if (strcmp(signature, buffer) != 0) {
-      result = false;
+  try
+  {
+    OMXMLReader reader(rawStorage);
+    if (reader.nextElement() &&
+          reader.elementEquals(OMSymbolspace::getBaselineURI(), L"AAF"))
+    {
+          return true;
     }
   }
-  delete [] buffer;
-  rawStorage->setPosition(0);
-  return result;
+  catch (OMXMLException&)
+  {}
+
+  return false;
 }
 
   // @mfunc Can a file be created successfully on the given
