@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMType.h,v 1.12 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMType.h,v 1.12.4.1 2005/04/11 15:00:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -189,6 +189,10 @@ public:
                    OMByte* outputBytes,
                    size_t bytesSize);
 
+
+  // PdN: temporary function
+  virtual const OMPropertyId* getTargetPath() const { return 0; };
+                   
 };
 
 #endif
