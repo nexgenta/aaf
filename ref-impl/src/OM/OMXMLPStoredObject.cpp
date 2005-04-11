@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.cpp,v 1.1.2.2 2005/04/11 15:04:44 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.cpp,v 1.1.2.3 2005/04/11 16:04:24 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -691,13 +691,17 @@ OMXMLPStoredObject::restore(OMStrongReferenceVector& vector,
     }
 
     vector.setLocalKey(localKey);
-    vector.grow(localKey);
-
-    OMListIterator<OMStrongReferenceVectorElement> iter(elements, OMAfter);
-    while (--iter)
+    
+    if (localKey != 0)
     {
-        localKey--;
-        vector.insert(localKey, iter.value());
+        vector.grow(localKey);
+    
+        OMListIterator<OMStrongReferenceVectorElement> iter(elements, OMAfter);
+        while (--iter)
+        {
+            localKey--;
+            vector.insert(localKey, iter.value());
+        }
     }
 }
 
@@ -808,13 +812,17 @@ OMXMLPStoredObject::restore(OMWeakReferenceVector&  vector,
     }
 
     vector.setLocalKey(index);
-    vector.grow(index);
-
-    OMListIterator<OMWeakReferenceVectorElement> iter(elements, OMAfter);
-    while (--iter)
+    
+    if (index != 0)
     {
-        index--;
-        vector.insert(index, iter.value());
+        vector.grow(index);
+    
+        OMListIterator<OMWeakReferenceVectorElement> iter(elements, OMAfter);
+        while (--iter)
+        {
+            index--;
+            vector.insert(index, iter.value());
+        }
     }
 }
 
