@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i586Linux.mk,v 1.10 2005/02/04 16:58:25 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i586Linux.mk,v 1.10.2.1 2005/04/11 16:20:27 philipn Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -117,6 +117,15 @@ ifndef LIBDV_PATH
 	TMP_LIBDV_PATH := $(shell for f in /usr/local/lib /usr/lib /lib /usr/lib64 /lib64; do test -e $$f/libdv.a && echo $$f && break; done)
 	ifneq "$(TMP_LIBDV_PATH)" ""
 		LIBDV_PATH = $(TMP_LIBDV_PATH)
+	endif
+endif
+
+# Check availablity of expat library. Set LIBEXPAT_PATH path if found.
+# If this detection fails, LIBEXPAT_PATH can be passed on the make command line.
+ifndef LIBEXPAT_PATH
+	TMP_LIBEXPAT_PATH := $(shell for f in /usr/local /usr; do test -e $$f/lib/libexpat.a && echo $$f && break; done)
+	ifneq "$(TMP_LIBEXPAT_PATH)" ""
+		LIBEXPAT_PATH = $(TMP_LIBEXPAT_PATH)
 	endif
 endif
 
