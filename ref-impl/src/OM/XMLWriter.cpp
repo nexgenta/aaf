@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLWriter.cpp,v 1.1.2.1 2005/03/31 09:59:03 philipn Exp $ $Name:  $
+// $Id: XMLWriter.cpp,v 1.1.2.2 2005/04/11 15:08:18 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -443,6 +443,12 @@ XMLWriterSimple::WriteProcInstruction(const char* target, const char* instructio
     {
         _prevWriteType = PROC_INSTRUCTION;
     }
+}
+
+void 
+XMLWriterSimple::WriteText(const char* text)
+{
+    Write(text, strlen(text));
 }
 
 void

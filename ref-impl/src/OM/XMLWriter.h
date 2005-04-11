@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLWriter.h,v 1.1.2.1 2005/03/31 09:59:03 philipn Exp $ $Name:  $
+// $Id: XMLWriter.h,v 1.1.2.2 2005/04/11 15:08:18 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -63,6 +63,7 @@ public:
     virtual void WriteElementEnd(void) = 0;
     virtual void WriteComment(const char* comment) = 0;
     virtual void WriteProcInstruction(const char* target, const char* instruction) = 0;
+    virtual void WriteText(const char* text) = 0;
 
     virtual void Synchronize(void) = 0;
 };
@@ -105,6 +106,7 @@ public:
     virtual void WriteElementEnd(void);
     virtual void WriteComment(const char* comment);
     virtual void WriteProcInstruction(const char* target, const char* instruction);
+    virtual void WriteText(const char* text);
 
     virtual void Synchronize(void);
 
