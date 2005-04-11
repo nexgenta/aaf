@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-PPCDarwin.mk,v 1.6 2004/04/05 10:49:20 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-PPCDarwin.mk,v 1.7 2005/04/11 11:31:21 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -84,8 +84,10 @@ ifndef LD_DYN_LIB
 endif
 
 # UUID library to use
+# CoreFoundation contains definitions for CFUUIDCreate(), CFUUIDGetUUIDBytes()
+# UUIDLIB is currently only used for static builds (AAFTARGET=Debug-static)
 ifndef UUIDLIB
-    UUIDLIB =
+    UUIDLIB = -framework CoreFoundation
 endif
 
 
