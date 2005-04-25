@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.2 2005/04/11 15:07:12 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.3 2005/04/25 08:38:14 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,11 @@
 #define XML_MAX_OID_URI_SIZE  46
 #define XML_MAX_UMID_URI_SIZE 79
 #define XML_MAX_URI_SIZE 79 // max(XML_MAX_OID_URI_SIZE, XML_MAX_UMID_URI_SIZE)
+#define XML_MAX_INTEGER_STRING_SIZE 22
+#define XML_MAX_BYTE_ORDER_STRING_SIZE 13
+#define XML_MAX_TIMESTAMP_STRING_SIZE 26
+#define XML_MAX_TIMESTRUCT_STRING_SIZE 13
+#define XML_MAX_DATESTRUCT_STRING_SIZE 14
 
 
 void oidToURI(OMUniqueObjectIdentification oid, wchar_t* uri);
@@ -38,5 +43,13 @@ void umidToURI(OMMaterialIdentification umid, wchar_t* uri);
 bool isURI(const wchar_t* uri);
 void uriToOID(const wchar_t* uri, OMUniqueObjectIdentification* oid);
 void uriToUMID(const wchar_t* uri, OMMaterialIdentification* umid);
+
+void integerToString(const OMByte* value, OMUInt8 size, bool isSigned, wchar_t* str);
+
+void byteOrderToString(OMByteOrder byteOrder, wchar_t* str);
+
+void timeStampToString(const OMByte* internalBytes, wchar_t* str);
+void timeStructToString(const OMByte* internalBytes, wchar_t* str);
+void dateStructToString(const OMByte* internalBytes, wchar_t* str);
 
 #endif 
