@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSetType.h,v 1.2 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMSetType.h,v 1.2.4.1 2005/04/25 08:14:49 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,13 +25,12 @@
 #ifndef OMSETTYPE_H
 #define OMSETTYPE_H
 
-class OMType;
+#include "OMType.h"
 
-class OMSetType {
+class OMSetType : virtual public OMType 
+{
 public:
-
-  virtual OMType* elementType(void) const = 0;
-
+    virtual OMType* elementType(void) const = 0;
 };
 
 #endif

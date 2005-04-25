@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStringType.h,v 1.4 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMStringType.h,v 1.4.6.1 2005/04/25 08:14:49 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,13 @@
 #ifndef OMSTRINGTYPE_H
 #define OMSTRINGTYPE_H
 
-// Nothing yet
+#include "OMType.h"
+
+class OMStringType : virtual public OMType
+{
+public:
+    virtual OMType* elementType(void) const = 0;
+};
+
 
 #endif

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMIntegerType.h,v 1.7 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMIntegerType.h,v 1.7.4.1 2005/04/25 08:14:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,9 +32,8 @@
 class OMIntegerType;
 
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMIntegerType
-class OMIntegerType : public OMType {
+class OMIntegerType : public OMInternalType {
 public:
-
   OMIntegerType(void);
 
   virtual ~OMIntegerType(void);

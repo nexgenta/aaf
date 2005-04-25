@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUniqueObjectIdentType.h,v 1.7 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMUniqueObjectIdentType.h,v 1.7.4.1 2005/04/25 08:14:49 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,10 +36,9 @@ class OMUniqueObjectIdentificationType;
   //   @base public | <c OMSingleton>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMUniqueObjectIdentificationType :
-                         public OMType,
+                         public OMInternalType,
                          public OMSingleton<OMUniqueObjectIdentificationType> {
 public:
-
   OMUniqueObjectIdentificationType(void);
 
   virtual ~OMUniqueObjectIdentificationType(void);

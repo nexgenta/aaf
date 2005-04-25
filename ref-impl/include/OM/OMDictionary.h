@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.h,v 1.11.6.1 2005/04/11 14:59:21 philipn Exp $ $Name:  $
+// $Id: OMDictionary.h,v 1.11.6.2 2005/04/25 08:14:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,8 +28,10 @@
 #include "OMClassFactory.h"
 #include "OMStorable.h"
 #include "OMRedBlackTree.h"
+#include "OMVector.h"
 
 class OMPropertyDefinition;
+class OMType;
 
   // @class Dictionary containing definitions of classes, properties and types.
   //        The dictionary is a factory for <c OMstorable> objects.
@@ -58,6 +60,10 @@ public:
   
   virtual bool registerTypeDef(const OMClassId& typeId) = 0;
 
+  virtual void classDefinitions(OMVector<OMClassDefinition*>& classDefs) const = 0;
+
+  virtual void typeDefinitions(OMVector<OMType*>& typeDefs) const = 0;
+  
 private:
 
   typedef OMRedBlackTree<OMPropertyId,

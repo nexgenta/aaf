@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReferenceType.h,v 1.4 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMObjectReferenceType.h,v 1.4.6.1 2005/04/25 08:14:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,16 @@
 #ifndef OMOBJECTREFERENCETYPE_H
 #define OMOBJECTREFERENCETYPE_H
 
-// Nothing yet
+#include "OMType.h"
+#include "OMClassDefinition.h"
+#include "OMVector.h"
+
+
+class OMObjectReferenceType : virtual public OMType
+{
+public:
+    virtual OMClassDefinition* referencedClass(void) const = 0;
+};
+
 
 #endif

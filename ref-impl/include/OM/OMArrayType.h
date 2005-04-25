@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMArrayType.h,v 1.5 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMArrayType.h,v 1.5.4.1 2005/04/25 08:14:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,11 +29,12 @@
 #include "OMType.h"
 
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMArrayType
-class OMArrayType {
+class OMArrayType : virtual public OMType 
+{
 public:
-
-  virtual OMType* elementType(void) const = 0;
+    virtual OMType* elementType(void) const = 0;
 
 };
+
 
 #endif

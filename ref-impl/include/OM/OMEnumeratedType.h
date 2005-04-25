@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMEnumeratedType.h,v 1.4 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMEnumeratedType.h,v 1.4.6.1 2005/04/25 08:14:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,17 @@
 #ifndef OMENUMERATEDTYPE_H
 #define OMENUMERATEDTYPE_H
 
-// Nothing yet
+#include "OMType.h"
+
+class OMEnumeratedType : virtual public OMType
+{
+public:
+    virtual OMType* elementType(void) const = 0;
+    virtual OMUInt32 elementCount(void) const = 0;
+    virtual wchar_t* elementName(OMUInt32 index) const = 0;
+    virtual OMInt64 elementValue(OMUInt32 index) const = 0;
+    virtual wchar_t* elementNameFromValue(OMInt64 value) const = 0;
+};
+
 
 #endif
