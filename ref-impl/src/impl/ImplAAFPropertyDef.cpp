@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.cpp,v 1.35 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.cpp,v 1.35.4.1 2005/04/25 08:44:38 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -245,42 +245,6 @@ const OMType* ImplAAFPropertyDef::type(void) const
   return ptd;
 }
 
-const OMUniqueObjectIdentification&
-ImplAAFPropertyDef::uniqueIdentification(void) const
-{
-  assert( sizeof(OMUniqueObjectIdentification) == sizeof(aafUID_t) );
-  static aafUID_t auid;
-  HRESULT hr = GetAUID( &auid );
-
-  if ( AAFRESULT_SUCCESS != hr ) {
-	return nullOMUniqueObjectIdentification;
-  }
-
-  return reinterpret_cast<const OMUniqueObjectIdentification&>( auid );
-}
-
-const wchar_t* ImplAAFPropertyDef::name(void) const
-{
-  if (! _wname)
-	{
-	  AAFRESULT hr;
-	  aafUInt32 nameLen;
-
-	  ImplAAFPropertyDef * pNonConstThis =
-		(ImplAAFPropertyDef *) this;
-	  hr = pNonConstThis->GetNameBufLen (&nameLen);
-	  assert (AAFRESULT_SUCCEEDED (hr));
-	  pNonConstThis->_wname = (aafCharacter*) new aafUInt8[nameLen];
-	  assert (_wname);
-
-	  hr = pNonConstThis->GetName (_wname, nameLen);
-	  assert (AAFRESULT_SUCCEEDED (hr));
-	}
-  assert (_wname);
-  return _wname;
-}
-
-
 OMPropertyId ImplAAFPropertyDef::localIdentification(void) const
 {
   return _pid;
@@ -290,6 +254,18 @@ OMPropertyId ImplAAFPropertyDef::localIdentification(void) const
 bool ImplAAFPropertyDef::isOptional(void) const
 {
   return (kAAFTrue == _IsOptional) ? true : false;
+}
+
+bool ImplAAFPropertyDef::isUniqueIdentifier(void) const
+{
+  if (!_IsUniqueIdentifier.isPresent())
+  {
+      return false;
+  }
+  else
+  {
+      return _IsUniqueIdentifier == kAAFTrue;
+  }
 }
 
 

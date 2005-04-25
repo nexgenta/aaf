@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.h,v 1.25 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.h,v 1.25.4.1 2005/04/25 08:44:38 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,15 +32,13 @@
 #include "ImplAAFMetaDefinition.h"
 #endif
 
-#ifndef OMTYPE_H
 #include "OMType.h"
-#endif
 
 
 
 class ImplAAFPropertyValue;
 
-class ImplAAFTypeDef : public ImplAAFMetaDefinition, public OMType
+class ImplAAFTypeDef : public ImplAAFMetaDefinition, virtual public OMType
 {
 public:
   //
@@ -134,6 +132,10 @@ public:
                            OMByte* internalBytes,
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
+
+  
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return TYPE; }
 
   // Allocate an OMProperty that can represent this type.  Implemented
   // by derived classes.

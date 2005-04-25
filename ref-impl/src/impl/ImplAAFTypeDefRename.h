@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.h,v 1.26.4.1 2005/04/11 15:12:59 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.h,v 1.26.4.2 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,11 +35,12 @@
 #endif
 
 #include "OMWeakRefProperty.h"
+#include "OMRenamedType.h"
 
 class ImplAAFPropertyValue;
 
 
-class ImplAAFTypeDefRename : public ImplAAFTypeDef
+class ImplAAFTypeDefRename : public ImplAAFTypeDef, public OMRenamedType
 {
 public:
   //
@@ -127,6 +128,13 @@ public:
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
 
+                           
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return RENAMED_TYPE; }
+
+  // overrides from OMRenamedType
+  virtual OMType* renamedType(void) const;
+  
 
   // overrides from ImplAAFTypeDef
   //

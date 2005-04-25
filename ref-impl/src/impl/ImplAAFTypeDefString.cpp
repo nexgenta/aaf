@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefString.cpp,v 1.45 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefString.cpp,v 1.45.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -600,6 +600,17 @@ void ImplAAFTypeDefString::internalize(const OMByte* externalBytes,
 	  assert (intNumBytesLeft >= 0);
 	  assert (extNumBytesLeft >= 0);
 	}
+}
+
+
+OMType* ImplAAFTypeDefString::elementType(void) const
+{
+    ImplAAFTypeDef* pElementTypeDef = 0;
+    HRESULT hr = GetType(&pElementTypeDef);
+    assert(AAFRESULT_SUCCEEDED(hr));
+    pElementTypeDef->ReleaseReference();
+    
+    return pElementTypeDef;
 }
 
 

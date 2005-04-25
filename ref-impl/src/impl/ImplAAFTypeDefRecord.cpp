@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.45 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.45.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1175,6 +1175,73 @@ void ImplAAFTypeDefRecord::internalize(const OMByte* externalBytes,
 	}
 }
 
+
+OMUInt32 ImplAAFTypeDefRecord::memberCount(void) const
+{
+    aafUInt32 count;
+    HRESULT hr = GetCount(&count);
+    assert(AAFRESULT_SUCCEEDED(hr));
+    
+    return count;
+}
+  
+wchar_t* ImplAAFTypeDefRecord::memberName(OMUInt32 index) const
+{
+    assert(index < memberCount());
+
+    // position charIndex at the first character in the string
+    wchar_t c;
+    size_t numChars = _memberNames.count();
+    aafUInt32 stringNum = 0;
+    size_t charIndex = 0;
+    while (stringNum != index && charIndex < numChars)
+    {
+        _memberNames.getValueAt(&c, charIndex);
+        if (c == 0)
+        {
+            stringNum++;
+        }
+        charIndex++;
+    }
+    assert(stringNum == index && charIndex < numChars);
+    size_t startIndex = charIndex;
+    
+    // position charIndex at the character after the null character in the string
+    do 
+    {
+        _memberNames.getValueAt(&c, charIndex);
+        charIndex++;
+    }
+    while (c != 0 && charIndex < numChars);
+    assert(c == 0 && charIndex <= numChars);
+    
+    // create a copy of the string
+    wchar_t* result = new wchar_t[charIndex - startIndex];
+    wchar_t* resultPtr = result;
+    charIndex = startIndex;
+    do
+    {
+        _memberNames.getValueAt(&c, charIndex);
+        *resultPtr = c;
+        resultPtr++;
+        charIndex++;
+    }
+    while (c != 0);
+    
+    return result;
+}
+  
+OMType* ImplAAFTypeDefRecord::memberType(OMUInt32 index) const
+{
+    ImplAAFTypeDefRecord* pNonConstThis = const_cast<ImplAAFTypeDefRecord*>(this);
+    
+    ImplAAFTypeDef* pMemberType = 0;
+    HRESULT hr = pNonConstThis->GetMemberType(index, &pMemberType);
+    assert(AAFRESULT_SUCCEEDED(hr));
+    pMemberType->ReleaseReference();
+    
+    return pMemberType;
+}
 
 
 aafBool ImplAAFTypeDefRecord::IsFixedSize (void) const

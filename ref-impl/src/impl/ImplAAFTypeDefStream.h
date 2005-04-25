@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.h,v 1.18 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.h,v 1.18.6.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,12 +37,13 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMStreamType.h"
 
 class ImplAAFPropertyValue;
 class ImplAAFStreamPropertyValue;
 
 
-class ImplAAFTypeDefStream : public ImplAAFTypeDef
+class ImplAAFTypeDefStream : public ImplAAFTypeDef, public OMStreamType
 {
 public:
   //
@@ -358,6 +359,9 @@ public:
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
 
+
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return STREAM_TYPE; }
 
   // override from OMStorable.
   virtual const OMClassId& classId(void) const;

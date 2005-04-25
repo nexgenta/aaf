@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.40 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.40.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -436,6 +436,7 @@ OMProperty * ImplAAFTypeDefStrongObjRef::pvtCreateOMProperty
   assert (result);
   return result;
 }
+
 
 
 

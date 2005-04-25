@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefObjectRef.h,v 1.20 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefObjectRef.h,v 1.20.6.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,7 +42,10 @@ class ImplAAFClassDef;
 #endif
 
 
-class ImplAAFTypeDefObjectRef : public ImplAAFTypeDef
+#include "OMObjectReferenceType.h"
+
+
+class ImplAAFTypeDefObjectRef : public ImplAAFTypeDef, virtual public OMObjectReferenceType
 {
 public:
   //
@@ -138,6 +141,9 @@ public:
   virtual bool IsFixedArrayable () const;
   virtual bool IsVariableArrayable () const;
   virtual bool IsStringable () const;
+
+  // overrides from OMObjectReferenceType
+  OMClassDefinition* referencedClass(void) const;
 
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;

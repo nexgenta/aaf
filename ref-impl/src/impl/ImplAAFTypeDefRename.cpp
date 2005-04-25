@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.cpp,v 1.34.4.1 2005/04/11 15:12:59 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.cpp,v 1.34.4.2 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -260,6 +260,16 @@ void ImplAAFTypeDefRename::internalize(const OMByte* externalBytes,
 						   byteOrder);
 }
 
+
+OMType* ImplAAFTypeDefRename::renamedType(void) const
+{
+    ImplAAFTypeDef* pRenamedTypeDef = 0;
+    HRESULT hr = GetBaseType(&pRenamedTypeDef);
+    assert(AAFRESULT_SUCCEEDED(hr));
+    pRenamedTypeDef->ReleaseReference();
+    
+    return pRenamedTypeDef;
+}
 
 
 aafBool ImplAAFTypeDefRename::IsFixedSize() const

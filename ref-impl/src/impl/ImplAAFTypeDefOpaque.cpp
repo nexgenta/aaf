@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefOpaque.cpp,v 1.7 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefOpaque.cpp,v 1.7.6.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -545,6 +545,31 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+OMUniqueObjectIdentification ImplAAFTypeDefOpaque::actualTypeId(
+    const OMByte* externalBytes, size_t externalSize) const
+{
+    return ImplAAFTypeDefIndirect::actualTypeId(externalBytes, externalSize);
+}
+
+OMType* ImplAAFTypeDefOpaque::actualType(const OMByte* externalBytes, 
+    size_t externalSize) const
+{
+    assert(false);
+    return 0;
+}
+  
+OMByteOrder ImplAAFTypeDefOpaque::byteOrder(const OMByte* externalBytes,
+    size_t externalSize) const
+{
+    return ImplAAFTypeDefIndirect::byteOrder(externalBytes, externalSize);
+}
+
+void ImplAAFTypeDefOpaque::actualData(const OMByte* externalBytes, size_t externalSize,
+    const OMByte*& actualBytes, size_t& actualBytesSize) const
+{
+    ImplAAFTypeDefIndirect::actualData(externalBytes, externalSize, actualBytes, 
+        actualBytesSize);
+}
 
 
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.49.4.1 2005/04/11 15:12:59 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.49.4.2 2005/04/25 08:44:44 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -343,6 +343,11 @@ OMType* ImplAAFTypeDefFixedArray::elementType(void) const
   return result;
 }
 
+OMUInt32 ImplAAFTypeDefFixedArray::elementCount(void) const
+{
+    return _ElementCount;
+}
+
 aafBool ImplAAFTypeDefFixedArray::IsFixedSize (void) const
 {
   return BaseType()->IsFixedSize();
@@ -490,12 +495,6 @@ void ImplAAFTypeDefFixedArray::onSave(void* clientContext) const
 void ImplAAFTypeDefFixedArray::onRestore(void* clientContext) const
 {
   ImplAAFTypeDefArray::onRestore(clientContext);
-}
-
-
-const OMPropertyId* ImplAAFTypeDefFixedArray::getTargetPath() const
-{
-    return elementType()->getTargetPath();
 }
 
 

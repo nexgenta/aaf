@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.1 2005/04/11 15:10:10 philipn Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.2 2005/04/25 08:44:38 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -240,8 +240,7 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
 }
 
 
-bool  
-ImplAAFMetaDictionary::registerClassDef(const OMClassId& classId)
+bool ImplAAFMetaDictionary::registerClassDef(const OMUniqueObjectIdentification& classId)
 {
     const aafUID_t* auid = reinterpret_cast<const aafUID_t*>(&classId);
     ImplAAFClassDefSP pClassDef;
@@ -249,13 +248,40 @@ ImplAAFMetaDictionary::registerClassDef(const OMClassId& classId)
     return AAFRESULT_SUCCEEDED(hr);
 }
 
-bool 
-ImplAAFMetaDictionary::registerTypeDef(const OMClassId& typeId)
+bool ImplAAFMetaDictionary::registerTypeDef(const OMUniqueObjectIdentification& typeId)
 {
     const aafUID_t* auid = reinterpret_cast<const aafUID_t*>(&typeId);
     ImplAAFTypeDefSP pTypeDef;
     AAFRESULT hr = dataDictionary()->LookupTypeDef(*auid, &pTypeDef);
     return AAFRESULT_SUCCEEDED(hr);
+}
+
+void ImplAAFMetaDictionary::classDefinitions(OMVector<OMClassDefinition*>& classDefs) const
+{
+    if (_classDefinitions.count() > 0)
+    {
+        OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFClassDef> 
+            iter(_classDefinitions);
+        classDefs.grow(iter.count());
+        while(++iter)
+        {
+            classDefs.append(iter.value());
+        }
+    }
+}
+
+void ImplAAFMetaDictionary::typeDefinitions(OMVector<OMType*>& typeDefs) const
+{
+    if (_typeDefinitions.count() > 0)
+    {
+        OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFTypeDef> 
+            iter(_typeDefinitions);
+        typeDefs.grow(iter.count());
+        while(++iter)
+        {
+            typeDefs.append(iter.value());
+        }
+    }
 }
 
 

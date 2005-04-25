@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.h,v 1.30 2005/02/24 18:11:17 heydowns Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.h,v 1.30.2.1 2005/04/25 08:44:39 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,11 +34,12 @@
 
 #include "OMWeakRefProperty.h"
 #include "OMArrayProperty.h"
+#include "OMEnumeratedType.h"
 
 class ImplAAFPropertyValue;
 
 
-class ImplAAFTypeDefEnum : public ImplAAFTypeDef
+class ImplAAFTypeDefEnum : public ImplAAFTypeDef, public OMEnumeratedType
 {
 public:
   //
@@ -278,6 +279,21 @@ public:
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
 
+                           
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return ENUMERATED_TYPE; }
+
+  // overrides from OMEnumeratedType
+  virtual OMType* elementType(void) const;
+  
+  virtual OMUInt32 elementCount(void) const;
+  
+  virtual wchar_t* elementName(OMUInt32 index) const;
+  
+  virtual OMInt64 elementValue(OMUInt32 index) const;
+
+  virtual wchar_t* elementNameFromValue(OMInt64 value) const;
+  
 
   //****************
   // pvtInitialize()

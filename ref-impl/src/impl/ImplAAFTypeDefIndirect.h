@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefIndirect.h,v 1.9 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefIndirect.h,v 1.9.6.1 2005/04/25 08:44:44 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,8 @@
 #endif
 
 
+#include "OMIndirectType.h"
+
 
 // Forward declarations:
 class ImplAAFPropertyValue;
@@ -42,7 +44,7 @@ class ImplAAFDictioanry;
 
 
 
-class ImplAAFTypeDefIndirect : public ImplAAFTypeDef
+class ImplAAFTypeDefIndirect : public ImplAAFTypeDef, public OMIndirectType
 {
 public:
   //
@@ -170,6 +172,20 @@ public:
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
 
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return INDIRECT_TYPE; }
+
+  // overrides from OMIndirectType
+  virtual OMUniqueObjectIdentification actualTypeId(const OMByte* externalBytes, 
+      size_t externalSize) const;
+  
+  virtual OMType* actualType(const OMByte* externalBytes, size_t externalSize) const;
+  
+  virtual OMByteOrder byteOrder(const OMByte* externalBytes, size_t externalSize) const;
+
+  virtual void actualData(const OMByte* externalBytes, size_t externalSize,
+    const OMByte*& actualBytes, size_t& actualBytesSize) const;
+  
 
   //****************
   // Initialize() 

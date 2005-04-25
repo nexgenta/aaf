@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefSet.cpp,v 1.26.4.1 2005/04/11 15:12:59 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefSet.cpp,v 1.26.4.2 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -889,11 +889,6 @@ void ImplAAFTypeDefSet::onRestore(void* clientContext) const
   ImplAAFTypeDef::onRestore(clientContext);
 }
 
-
-const OMPropertyId* ImplAAFTypeDefSet::getTargetPath() const
-{
-    return elementType()->getTargetPath();
-}
 
 
 // Method is called after associated class has been added to MetaDictionary.

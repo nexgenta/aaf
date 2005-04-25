@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.h,v 1.27 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.h,v 1.27.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,8 +36,10 @@ class ImplEnumAAFPropertyValues;
 #endif
 
 #include "OMWeakRefVectorProperty.h"
+#include "OMRecordType.h"
 
-class ImplAAFTypeDefRecord : public ImplAAFTypeDef
+
+class ImplAAFTypeDefRecord : public ImplAAFTypeDef, public OMRecordType
 {
 public:
   //
@@ -269,6 +271,17 @@ public:
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
 
+
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return RECORD_TYPE; }
+
+  // overrides from OMRecordType
+  virtual OMUInt32 memberCount(void) const;
+  
+  virtual wchar_t* memberName(OMUInt32 index) const;
+  
+  virtual OMType* memberType(OMUInt32 index) const;
+  
 
   //****************
   // pvtInitialize()

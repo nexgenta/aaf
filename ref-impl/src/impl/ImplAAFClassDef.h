@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.h,v 1.37 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFClassDef.h,v 1.37.4.1 2005/04/25 08:44:37 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -201,6 +201,10 @@ public:
     GetUniqueIdentifier
         (ImplAAFPropertyDef ** ppUniqueIdentifier);
 
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return CLASS; }
+
+  // Overrides from OMClassDefinition
   const OMPropertyDefinition* propertyDefinition(
                                  const OMUniqueObjectIdentification& id) const;
 
@@ -208,6 +212,12 @@ public:
 			     const OMStorable* pDstStorable,
 				 const OMPropertyDefinition* pSrcPropertyDef );
 
+  virtual bool isConcrete(void) const;
+  
+  virtual OMClassDefinition* parentClass(void) const;
+
+  virtual void propertyDefinitions(OMVector<OMPropertyDefinition*>& propertyDefs) const;
+  
 public:
 
 	bool

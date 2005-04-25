@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefOpaque.h,v 1.6 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefOpaque.h,v 1.6.6.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,10 +32,12 @@
 #include "ImplAAFTypeDefIndirect.h"
 #endif
 
+#include "OMOpaqueType.h"
+
 class ImplAAFPropertyValue;
 
 
-class ImplAAFTypeDefOpaque : public ImplAAFTypeDefIndirect
+class ImplAAFTypeDefOpaque : public ImplAAFTypeDefIndirect, public OMOpaqueType
 {
 public:
   //
@@ -142,7 +144,21 @@ public:
        ImplAAFDictionary *pDictionary);
 
 
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return OPAQUE_TYPE; }
 
+  // overrides from OMIndirectType
+  virtual OMUniqueObjectIdentification actualTypeId(const OMByte* externalBytes, 
+      size_t externalSize) const;
+  
+  virtual OMType* actualType(const OMByte* externalBytes, size_t externalSize) const;
+  
+  virtual OMByteOrder byteOrder(const OMByte* externalBytes, size_t externalSize) const;
+
+  virtual void actualData(const OMByte* externalBytes, size_t externalSize,
+    const OMByte*& actualBytes, size_t& actualBytesSize) const;
+
+  
   // override from OMStorable.
   virtual const OMClassId& classId(void) const;
 

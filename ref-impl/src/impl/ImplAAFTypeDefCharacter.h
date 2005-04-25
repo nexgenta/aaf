@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefCharacter.h,v 1.7 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefCharacter.h,v 1.7.6.1 2005/04/25 08:44:39 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,8 +41,10 @@ class ImplAAFPropertyValue;
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMCharacterType.h"
 
-class ImplAAFTypeDefCharacter : public ImplAAFTypeDef
+
+class ImplAAFTypeDefCharacter : public ImplAAFTypeDef, public OMCharacterType
 {
 public:
   //
@@ -130,6 +132,9 @@ public:
                            OMByteOrder byteOrder) const;
 
   
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return CHARACTER_TYPE; }
+
   
   //
   // ImplAAFTypeDef methods

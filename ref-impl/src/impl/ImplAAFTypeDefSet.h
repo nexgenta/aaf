@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefSet.h,v 1.18.4.1 2005/04/11 15:12:59 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefSet.h,v 1.18.4.2 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -238,8 +238,8 @@ public:
   virtual void onRestore(void* clientContext) const;
 
 
-  // PdN: temporary; override from OMType
-  virtual const OMPropertyId* getTargetPath() const;
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return SET_TYPE; }
 
   
   // Method is called after class has been added to MetaDictionary.

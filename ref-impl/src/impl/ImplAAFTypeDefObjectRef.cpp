@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefObjectRef.cpp,v 1.22 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefObjectRef.cpp,v 1.22.6.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,6 +41,7 @@
 #include "OMAssertions.h"
 
 #include <string.h>
+#include <assert.h>
 
 
 ImplAAFTypeDefObjectRef::ImplAAFTypeDefObjectRef ()
@@ -165,6 +166,18 @@ bool ImplAAFTypeDefObjectRef::IsVariableArrayable () const
 bool ImplAAFTypeDefObjectRef::IsStringable () const
 { return false; }
 
+
+OMClassDefinition* ImplAAFTypeDefObjectRef::referencedClass(void) const
+{
+    ImplAAFTypeDefObjectRef* pNonConstThis = const_cast<ImplAAFTypeDefObjectRef*>(this);
+    
+    ImplAAFClassDef* pClassDef = 0;
+    HRESULT hr = pNonConstThis->GetObjectType(&pClassDef);
+    assert(AAFRESULT_SUCCEEDED(hr));
+    pClassDef->ReleaseReference();
+    
+    return pClassDef;
+}
 
 
 

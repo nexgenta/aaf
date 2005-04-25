@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.39.4.1 2005/04/11 15:13:00 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.39.4.2 2005/04/25 08:44:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -775,6 +775,22 @@ OMProperty * ImplAAFTypeDefWeakObjRef::pvtCreateOMProperty
 }
 
 
+void ImplAAFTypeDefWeakObjRef::targetSet(OMVector<OMUniqueObjectIdentification>& result) const
+{
+    for (size_t i=0; i<_targetSet.count(); i++)
+    {
+        aafUID_t value;
+        _targetSet.getValueAt(&value, i);
+        result.insert((*reinterpret_cast<const OMUniqueObjectIdentification*>(&value)));
+    }
+}
+
+const OMPropertyId* ImplAAFTypeDefWeakObjRef::targetPath(void) const
+{
+    return GetTargetPids();
+}
+
+
 
 
 
@@ -811,10 +827,5 @@ HRESULT ImplAAFTypeDefWeakObjRef::CompleteClassRegistration(void)
   return rc;
 }
 
-
-const OMPropertyId* ImplAAFTypeDefWeakObjRef::getTargetPath() const
-{
-    return GetTargetPids();
-}
 
 

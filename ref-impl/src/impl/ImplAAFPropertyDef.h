@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.h,v 1.27 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.h,v 1.27.4.1 2005/04/25 08:44:38 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,14 +139,14 @@ public:
   //
   // Returns the OM pid (small integer) identifying this property
 
-  //
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return PROPERTY; }
+
   // Overrides from OMPropertyDefinition
-  //
   const OMType* type(void) const;
-  const OMUniqueObjectIdentification& uniqueIdentification(void) const;
-  const wchar_t* name(void) const;
   OMPropertyId localIdentification(void) const;
   bool isOptional(void) const;
+  bool isUniqueIdentifier(void) const;
 
   // Allocates and returns an OMProperty which can represent this
   // property.  

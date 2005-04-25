@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.h,v 1.12 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.h,v 1.12.4.1 2005/04/25 08:44:38 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,11 @@
 //
 //=---------------------------------------------------------------------=
 
+#ifdef _MSC_VER
+#pragma warning (disable: 4250) // inherits ... via dominance
+#endif
+
+
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
@@ -36,6 +41,7 @@
 #include "OMStorable.h"
 #include "OMFixedSizeProperty.h"
 #include "OMWideStringProperty.h"
+#include "OMMetaDefinition.h"
 
 class ImplAAFDictionary;
 class ImplAAFClassDef;
@@ -46,7 +52,7 @@ template <typename ReferencedObject>
 class OMWeakReferenceVectorProperty;
 
 class ImplAAFMetaDefinition : 
-  public ImplAAFStorable
+  public ImplAAFStorable, virtual public OMMetaDefinition
 {
 public:
   //
@@ -158,8 +164,11 @@ protected:
 public:
 
 
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return META; }
   virtual const OMUniqueObjectIdentification& identification(void) const;
   virtual const wchar_t* name(void) const;
+  virtual const wchar_t* description(void) const;
 
   // Private method to assign the unique identifier.
   AAFRESULT SetIdentification(aafUID_constref identification);

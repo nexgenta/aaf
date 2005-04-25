@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefString.h,v 1.27 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefString.h,v 1.27.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,8 +35,9 @@ class ImplAAFPropertyValue;
 
 #include "OMWeakRefVectorProperty.h"
 #include "OMWeakRefProperty.h"
+#include "OMStringType.h"
 
-class ImplAAFTypeDefString : public ImplAAFTypeDef
+class ImplAAFTypeDefString : public ImplAAFTypeDef, public OMStringType
 {
 public:
   //
@@ -180,6 +181,13 @@ public:
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
 
+                           
+  // overrides from OMMetaDefinition
+  virtual Category category(void) const { return STRING_TYPE; }
+
+  // overrides from OMStringType
+  virtual OMType* elementType(void) const;
+  
 
   //****************
   // pvtInitialize()

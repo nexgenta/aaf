@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefInt.cpp,v 1.35 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefInt.cpp,v 1.35.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -633,6 +633,16 @@ void ImplAAFTypeDefInt::internalize(const OMByte* externalBytes,
 			internalBytes,
 			internalBytesSize);
 	}
+}
+
+bool ImplAAFTypeDefInt::isSigned(void) const
+{
+    return _isSigned == kAAFTrue;
+}
+  
+OMUInt8 ImplAAFTypeDefInt::size(void) const
+{
+    return _size;
 }
 
 
