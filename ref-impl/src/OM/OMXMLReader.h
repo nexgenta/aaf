@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.h,v 1.1.2.2 2005/04/11 15:06:40 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.h,v 1.1.2.3 2005/04/25 08:34:52 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,7 @@
 #include "OMRawStorage.h"
 #include "OMWString.h"
 #include "OMList.h"
+#include "OMListIterator.h"
 
 
 class OMXMLIStream;
