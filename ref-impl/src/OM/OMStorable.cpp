@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStorable.cpp,v 1.89 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMStorable.cpp,v 1.89.4.1 2005/04/25 08:26:38 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -593,7 +593,7 @@ OMPropertyId OMStorable::destinationId(const OMStorable* destination,
 
   const OMPropertyDefinition* srcPropDef = property->definition();
   ASSERT("Valid property definition", srcPropDef != 0);
-  OMUniqueObjectIdentification id = srcPropDef->uniqueIdentification();
+  OMUniqueObjectIdentification id = srcPropDef->identification();
   const OMClassDefinition* dstClassDef = destination->definition();
   ASSERT("Valid class definition", dstClassDef != 0);
   const OMPropertyDefinition* dstPropDef = dstClassDef->propertyDefinition(id);
