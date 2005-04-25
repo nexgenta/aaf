@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertyDefinition.cpp,v 1.9 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMPropertyDefinition.cpp,v 1.9.6.1 2005/04/25 08:25:32 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,10 +34,12 @@
 OMBuiltinPropertyDefinition::OMBuiltinPropertyDefinition(
                                                  const OMType* type,
                                                  const wchar_t* name,
+                                                 const wchar_t* description,
                                                  const OMPropertyId propertyId,
                                                  const bool isOptional)
 : _type(type),
   _name(name),
+  _description(description),
   _propertyId(propertyId),
   _isOptional(isOptional)
 {
@@ -58,13 +60,11 @@ const OMType* OMBuiltinPropertyDefinition::type(void) const
   return _type;
 }
 
-  // @mfunc The unique identification of the <c OMProperty> defined by
-  //        this <c OMPropertyDefinition>.
 const OMUniqueObjectIdentification&
-OMBuiltinPropertyDefinition::uniqueIdentification(void) const
+OMBuiltinPropertyDefinition::identification(void) const
 {
-  TRACE("OMBuiltinPropertyDefinition::uniqueIdentification");
-  ASSERT("Unimplemented code not reached", false); // tjb -stub
+  TRACE("OMBuiltinPropertyDefinition::identification");
+  ASSERT("Unimplemented code not reached", false);
   return nullOMUniqueObjectIdentification;
 }
 
@@ -74,6 +74,12 @@ const wchar_t* OMBuiltinPropertyDefinition::name(void) const
 {
   TRACE("OMBuiltinPropertyDefinition::name");
   return _name;
+}
+
+const wchar_t* OMBuiltinPropertyDefinition::description(void) const
+{
+  TRACE("OMBuiltinPropertyDefinition::description");
+  return _description;
 }
 
   // @mfunc The locally unique identification of the <c OMProperty>
@@ -91,4 +97,13 @@ bool OMBuiltinPropertyDefinition::isOptional(void) const
   TRACE("OMBuiltinPropertyDefinition::isOptional");
   return _isOptional;
 }
+
+  // @mfunc Is the <c OMProperty> defined by this
+  //        <c OMBuiltinPropertyDefinition> uniquely identify the class?
+bool OMBuiltinPropertyDefinition::isUniqueIdentifier(void) const
+{
+  TRACE("OMBuiltinPropertyDefinition::isUniqueIdentifier");
+  return false;
+}
+
 
