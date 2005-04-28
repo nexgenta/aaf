@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.143 2005/03/17 08:15:10 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.144 2005/04/28 15:39:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1182,6 +1182,10 @@ ImplAAFFile::Save ()
 	  aafUID_t latestGen;
 	  hr = pLatestIdent->GetGenerationID (&latestGen);
 	  if (AAFRESULT_FAILED (hr)) return hr;
+
+	  // Record the fact that this file was modified
+	  _head->SetModified();
+
 	  _file->saveFile(&latestGen);
 
 	  dictSP->SetEnableDefRegistration (regWasEnabled);
@@ -1189,10 +1193,6 @@ ImplAAFFile::Save ()
 	} else {
 	  return AAFRESULT_WRONG_OPENMODE;
 	}
-
-
-	// Record the fact that this file was modified
-	_head->SetModified();
 
 	return AAFRESULT_SUCCESS;
 }
