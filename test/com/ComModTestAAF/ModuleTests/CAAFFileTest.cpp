@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFFile
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.43 2005/01/11 10:07:37 jfpanisset Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.44 2005/04/28 17:04:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -292,8 +292,16 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     // We can't really do anthing in AAF without the header.
   	checkResult(pFile->GetHeader(&pHeader));
 
-		checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
-		checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
+	// Check mandatory Header properties are sane
+	aafTimeStamp_t ts;
+	checkResult(pHeader->GetLastModified(&ts));
+	checkExpression(			// YYYY-MM-DD should not be 0000-00-00
+		!( ts.date.year == 0 && ts.date.month == 0 && ts.date.day == 0),
+		AAFRESULT_TEST_FAILED);
+
+	// Check written mobs preserved
+	checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
+	checkExpression (1 == numMobs, AAFRESULT_TEST_FAILED);
 
     checkResult(pHeader->GetMobs (NULL, &mobIter));
     for(n = 0; n < numMobs; n++)
