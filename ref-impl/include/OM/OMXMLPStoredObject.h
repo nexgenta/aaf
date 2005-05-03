@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.h,v 1.1.2.3 2005/04/25 08:19:28 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.h,v 1.1.2.4 2005/05/03 10:05:56 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 #include "OMFile.h"
 #include "OMXMLStorage.h"
 #include "OMList.h"
+#include "OMByteArray.h"
 
 class OMSimpleProperty;
 class OMDataVector;
@@ -62,6 +63,8 @@ class OMStringType;
 class OMStrongObjectReferenceType;
 class OMVariableArrayType;
 class OMWeakObjectReferenceType;
+
+class OMXMLAttribute;
 
   // @class In-memory representation of an object persisted in an
   //        eXtensible Markup Language (XML) text file.
@@ -295,6 +298,37 @@ private:
 
     void writeDataInHex(const OMByte* data, size_t size, bool isElementContent);
 
+    
+    void restoreExtensions(OMDictionary* dictionary);
+    
+    void restoreSimpleValue(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMType* type);
+    void restoreCharacter(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMCharacterType* type);
+    void restoreEnum(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMEnumeratedType* type);
+    void restoreExtEnum(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMExtEnumeratedType* type);
+    void restoreFixedArray(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMFixedArrayType* type);
+    void restoreIndirect(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMIndirectType* type);
+    void restoreInteger(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMIntType* type);
+    void restoreOpaque(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMOpaqueType* type);
+    void restoreRecord(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMRecordType* type);
+    void restoreRenamed(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMRenamedType* type);
+    void restoreSet(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMSetType* type);
+    void restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMStringType* type);
+    void restoreVariableArray(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const char* str, const OMVariableArrayType* type);
+    
+    
     const OMType* baseType(const OMType* type);
     
     void restoreWeakRef(OMFile* file, const OMType* type,
