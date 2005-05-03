@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertyDefinition.cpp,v 1.9.6.1 2005/04/25 08:25:32 philipn Exp $ $Name:  $
+// $Id: OMPropertyDefinition.cpp,v 1.9.6.2 2005/05/03 10:17:21 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -106,4 +106,29 @@ bool OMBuiltinPropertyDefinition::isUniqueIdentifier(void) const
   return false;
 }
 
+OMUniqueObjectIdentification OMBuiltinPropertyDefinition::typeId(void) const
+{
+  TRACE("OMBuiltinPropertyDefinition::typeId");
+  ASSERT("Ask for type id from non-builtin properties only", false);
+  return nullOMUniqueObjectIdentification;
+}
+
+bool OMBuiltinPropertyDefinition::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description)
+{
+  TRACE("OMBuiltinPropertyDefinition::initialise");
+  ASSERT("Initialise non-builtin properties only", false);
+  return false;
+}
+
+bool OMBuiltinPropertyDefinition::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description, 
+    OMPropertyId localId, const OMUniqueObjectIdentification& typeId, 
+    bool isOptional, bool isUniqueIdentifier)
+{
+  TRACE("OMBuiltinPropertyDefinition::initialise");
+  ASSERT("Initialise non-builtin properties only", false);
+  return false;
+}
+    
 
