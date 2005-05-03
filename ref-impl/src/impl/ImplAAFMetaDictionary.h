@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.25.2.2 2005/04/25 08:44:38 philipn Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.25.2.3 2005/05/03 10:34:56 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -118,6 +118,11 @@ public:
   virtual bool registerTypeDef(const OMUniqueObjectIdentification& typeId);
   virtual void classDefinitions(OMVector<OMClassDefinition*>& classDefs) const;
   virtual void typeDefinitions(OMVector<OMType*>& typeDefs) const;
+  virtual int registerExtClassDef(OMClassDefinition* classDef);
+  virtual int registerExtPropertyDef(const OMUniqueObjectIdentification& classId, 
+    OMPropertyDefinition* propertyDef);
+  virtual int registerExtTypeDef(OMType* typeDef);
+  
 
   
   //
