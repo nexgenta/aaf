@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLException.cpp,v 1.1.2.1 2005/04/11 14:52:15 philipn Exp $ $Name:  $
+// $Id: OMXMLException.cpp,v 1.1.2.2 2005/05/03 10:20:32 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,7 @@ OMXMLException::OMXMLException(const wchar_t* message, const wchar_t* secondaryM
         {
             _message = new wchar_t[lengthOfWideString(message) + 
                 lengthOfWideString(secondaryMessage) + 3];
+            _message[0] = L'\0';
             concatenateWideString(_message, message);
             concatenateWideString(_message, L":\n");
             concatenateWideString(_message, secondaryMessage);
