@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.cpp,v 1.60.4.1 2005/04/25 08:44:38 philipn Exp $ $Name:  $
+// $Id: ImplAAFClassDef.cpp,v 1.60.4.2 2005/05/03 10:27:32 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -761,6 +761,40 @@ void ImplAAFClassDef::propertyDefinitions(OMVector<OMPropertyDefinition*>& prope
     }
 }
 
+bool ImplAAFClassDef::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description, 
+    const OMUniqueObjectIdentification& parentClassId, bool isConcrete,
+    OMPropertyTag classDefsTag)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+    
+    OMWeakObjectReference& reference = _ParentClass.reference();
+    reference = OMWeakObjectReference(&_ParentClass, parentClassId, 
+        classDefsTag);
+    
+    _IsConcrete = isConcrete;
+    
+    //setInitialized();
+    
+    return true;
+}
+
+bool ImplAAFClassDef::registerExtPropertyDef(OMPropertyDefinition* propertyDef)
+{
+    if (PvtIsPropertyDefRegistered(*(reinterpret_cast<const aafUID_t*>(
+        &(propertyDef->identification())))))
+    {
+        return false;
+    }
+    
+    HRESULT result = pvtRegisterExistingPropertyDef(dynamic_cast<ImplAAFPropertyDef*>(
+        propertyDef));
+        
+    return AAFRESULT_SUCCEEDED(result);
+}
 
 
 // Find the unique identifier property defintion for this class or any parent class
