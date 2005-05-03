@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMClassDefinition.h,v 1.10.6.1 2005/04/25 08:14:48 philipn Exp $ $Name:  $
+// $Id: OMClassDefinition.h,v 1.10.6.2 2005/05/03 10:04:06 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,6 +57,13 @@ public:
   
   virtual void propertyDefinitions(OMVector<OMPropertyDefinition*>& propertyDefs) const = 0;
 
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+    const wchar_t* description, 
+    const OMUniqueObjectIdentification& parentClassId, bool isConcrete,
+    OMPropertyTag classDefsTag) = 0;
+
+  virtual bool registerExtPropertyDef(OMPropertyDefinition* propertyDef) = 0;
+    
 };
 
 #endif

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakObjectReferenceType.h,v 1.1.2.1 2005/04/25 08:11:16 philipn Exp $ $$
+// $Id: OMWeakObjectReferenceType.h,v 1.1.2.2 2005/05/03 10:04:07 philipn Exp $ $$
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,10 @@ class OMWeakObjectReferenceType : virtual public OMObjectReferenceType
 public:
     virtual void targetSet(OMVector<OMUniqueObjectIdentification>& result) const = 0;
     virtual const OMPropertyId* targetPath(void) const = 0;
+    virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+        const wchar_t* description,
+        const OMUniqueObjectIdentification& refClassId, OMPropertyTag classDefsTag,
+        OMVector<OMUniqueObjectIdentification>& targetSet) = 0;
 };
 
 

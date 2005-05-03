@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRecordType.h,v 1.4.6.1 2005/04/25 08:14:48 philipn Exp $ $Name:  $
+// $Id: OMRecordType.h,v 1.4.6.2 2005/05/03 10:04:07 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 #define OMRECORDTYPE_H
 
 #include "OMType.h"
+#include "OMVector.h"
 
 class OMRecordType : virtual public OMType
 {
@@ -34,6 +35,10 @@ public:
     virtual OMUInt32 memberCount(void) const = 0;
     virtual wchar_t* memberName(OMUInt32 index) const = 0;
     virtual OMType* memberType(OMUInt32 index) const = 0;
+    virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+        const wchar_t* description, OMVector<wchar_t*>& memberNames, 
+        OMVector<OMUniqueObjectIdentification>& memberTypeIds, 
+        OMPropertyTag typeDefsTag) = 0;
 };
 
 

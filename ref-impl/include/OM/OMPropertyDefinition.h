@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertyDefinition.h,v 1.13.6.1 2005/04/25 08:14:48 philipn Exp $ $Name:  $
+// $Id: OMPropertyDefinition.h,v 1.13.6.2 2005/05/03 10:04:07 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,6 +59,14 @@ public:
     //          <c OMPropertyDefinition> uniquely identify the class?
   virtual bool isUniqueIdentifier(void) const = 0;
 
+  virtual OMUniqueObjectIdentification typeId(void) const = 0;
+  
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+    const wchar_t* description, 
+    OMPropertyId localId, const OMUniqueObjectIdentification& typeId, 
+    bool isOptional, bool isUniqueIdentifier) = 0;
+    
+  
 };
 
   // @class Definitions of persistent properties supported by
@@ -113,7 +121,16 @@ public:
     //          <c OMPropertyDefinition> uniquely identify the class?
   virtual bool isUniqueIdentifier(void) const;
 
+  virtual OMUniqueObjectIdentification typeId(void) const;
+
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+    const wchar_t* description);
   
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+    const wchar_t* description, 
+    OMPropertyId localId, const OMUniqueObjectIdentification& typeId, 
+    bool isOptional, bool isUniqueIdentifier);
+    
 
 private:
   // @access Private members.

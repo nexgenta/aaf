@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStrongObjectReferenceType.h,v 1.1.2.1 2005/04/25 08:11:16 philipn Exp $ $Name:  $
+// $Id: OMStrongObjectReferenceType.h,v 1.1.2.2 2005/05/03 10:04:07 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,12 @@
 
 
 class OMStrongObjectReferenceType : virtual public OMObjectReferenceType
-{};
+{
+public:
+    virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+        const wchar_t* description,
+        const OMUniqueObjectIdentification& refClassId, OMPropertyTag classDefsTag) = 0;
+};
 
 
 #endif

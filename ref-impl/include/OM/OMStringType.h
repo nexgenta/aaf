@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStringType.h,v 1.4.6.1 2005/04/25 08:14:49 philipn Exp $ $Name:  $
+// $Id: OMStringType.h,v 1.4.6.2 2005/05/03 10:04:07 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,9 @@ class OMStringType : virtual public OMType
 {
 public:
     virtual OMType* elementType(void) const = 0;
+    virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+        const wchar_t* description, const OMUniqueObjectIdentification& elementTypeId,
+        OMPropertyTag typeDefsTag) = 0;
 };
 
 

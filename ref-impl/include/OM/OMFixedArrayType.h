@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMFixedArrayType.h,v 1.1.2.1 2005/04/25 08:11:15 philipn Exp $ $Name:  $
+// $Id: OMFixedArrayType.h,v 1.1.2.2 2005/05/03 10:04:07 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,9 @@ class OMFixedArrayType : virtual public OMArrayType
 {
 public:
     virtual OMUInt32 elementCount(void) const = 0;
+    virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+        const wchar_t* description, const OMUniqueObjectIdentification& elementTypeId,
+        OMPropertyTag typeDefsTag, OMUInt32 elementCount) = 0;
 };
 
 

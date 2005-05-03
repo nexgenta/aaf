@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMCharacterType.h,v 1.1.2.1 2005/04/25 08:11:13 philipn Exp $ $Name:  $
+// $Id: OMCharacterType.h,v 1.1.2.2 2005/05/03 10:04:06 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,11 @@
 #include "OMType.h"
 
 class OMCharacterType : virtual public OMType
-{};
+{
+public:
+    virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+        const wchar_t* description) = 0;
+};
 
 
 #endif
