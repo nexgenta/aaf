@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMType.cpp,v 1.13.4.1 2005/04/25 08:33:03 philipn Exp $ $Name:  $
+// $Id: OMType.cpp,v 1.13.4.2 2005/05/03 10:19:17 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -190,5 +190,13 @@ const wchar_t* OMInternalType::description() const
   TRACE("OMInternalType::description");
   ASSERT("Internal type not asked for description", false);
   return 0;
+}
+
+bool OMInternalType::initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+    const wchar_t* description)
+{
+  TRACE("OMInternalType::initialise");
+  ASSERT("Internal type not asked to initialise", false);
+  return false;
 }
 
