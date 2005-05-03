@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefInt.h,v 1.20.6.1 2005/04/25 08:44:44 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefInt.h,v 1.20.6.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -178,6 +178,9 @@ public:
   virtual bool isSigned(void) const;
   
   virtual OMUInt8 size(void) const;
+
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+    const wchar_t* description, OMUInt8 size, bool isSigned);
 
   
 public:

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.h,v 1.30.2.1 2005/04/25 08:44:39 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.h,v 1.30.2.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -293,6 +293,13 @@ public:
   virtual OMInt64 elementValue(OMUInt32 index) const;
 
   virtual wchar_t* elementNameFromValue(OMInt64 value) const;
+
+  virtual OMInt64 elementValueFromName(const wchar_t* name) const;
+
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+      const wchar_t* description, const OMUniqueObjectIdentification& elementTypeId,
+      OMPropertyTag typeDefsTag, OMVector<wchar_t*>& elementNames, 
+      OMVector<OMInt64>& elementValues);
   
 
   //****************

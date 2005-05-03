@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.40.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.40.4.2 2005/05/03 10:33:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -400,6 +400,26 @@ AAFRESULT STDMETHODCALLTYPE
   }
   return result;
 }
+
+
+bool ImplAAFTypeDefStrongObjRef::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description,
+    const OMUniqueObjectIdentification& refClassId, OMPropertyTag classDefsTag)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+    
+    OMWeakObjectReference& reference = _referencedType.reference();
+    reference = OMWeakObjectReference(&_referencedType, refClassId, 
+        classDefsTag);
+    
+    setInitialized();
+    
+    return true;
+}
+
 
 
 aafBool ImplAAFTypeDefStrongObjRef::IsFixedSize (void) const

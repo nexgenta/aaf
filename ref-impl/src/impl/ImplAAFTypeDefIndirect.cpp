@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefIndirect.cpp,v 1.22.6.1 2005/04/25 08:44:44 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefIndirect.cpp,v 1.22.6.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1392,7 +1392,32 @@ void ImplAAFTypeDefIndirect::actualData(const OMByte* externalBytes,
     actualBytesSize = externalSize - (sizeof(OMByteOrder) + _externalAUIDSize);
 }
 
+OMType* ImplAAFTypeDefIndirect::actualType(OMUniqueObjectIdentification id) const
+{
+    TRACE("ImplAAFTypeDefIndirect::actualType");
+    PRECONDITION("Object has been initialized", _initialized);
 
+    ImplAAFTypeDef* pActualType;
+    HRESULT hr = LookupActualType(*(reinterpret_cast<aafUID_t*>(&id)), 
+        &pActualType);
+    assert(AAFRESULT_SUCCEEDED(hr));
+    pActualType->ReleaseReference();
+    
+    return pActualType;    
+}
+
+bool ImplAAFTypeDefIndirect::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+
+    setInitialized();
+
+    return true;    
+}
 
 
 

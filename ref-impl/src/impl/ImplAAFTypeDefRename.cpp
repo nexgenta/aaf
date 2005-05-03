@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.cpp,v 1.34.4.2 2005/04/25 08:44:45 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.cpp,v 1.34.4.3 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -270,6 +270,25 @@ OMType* ImplAAFTypeDefRename::renamedType(void) const
     
     return pRenamedTypeDef;
 }
+
+bool ImplAAFTypeDefRename::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description, 
+    const OMUniqueObjectIdentification& renamedTypeId, OMPropertyTag typeDefsTag)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+    
+    OMWeakObjectReference& reference = _RenamedType.reference();
+    reference = OMWeakObjectReference(&_RenamedType, renamedTypeId, 
+        typeDefsTag);
+    
+    //setInitialized();
+    
+    return true;
+}
+
 
 
 aafBool ImplAAFTypeDefRename::IsFixedSize() const

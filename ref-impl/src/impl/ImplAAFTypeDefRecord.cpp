@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.45.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.45.4.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1241,6 +1241,38 @@ OMType* ImplAAFTypeDefRecord::memberType(OMUInt32 index) const
     pMemberType->ReleaseReference();
     
     return pMemberType;
+}
+
+bool ImplAAFTypeDefRecord::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description, OMVector<wchar_t*>& memberNames, 
+    OMVector<OMUniqueObjectIdentification>& memberTypeIds, 
+    OMPropertyTag typeDefsTag)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+    
+    size_t count = memberTypeIds.count();
+    _memberTypes.grow(count);
+    for (size_t i = 0; i < count; i++)
+    {
+        const wchar_t* namePtr = memberNames.getAt(i);
+        while (*namePtr != 0)
+        {
+            _memberNames.appendValue(namePtr);
+            namePtr++;
+        }
+        _memberNames.appendValue(namePtr);
+
+        OMWeakReferenceVectorElement element(&_memberTypes, memberTypeIds.getAt(i), 
+            typeDefsTag);
+        _memberTypes.insert(i, element);
+    }
+    
+    setInitialized();
+    
+    return true;
 }
 
 

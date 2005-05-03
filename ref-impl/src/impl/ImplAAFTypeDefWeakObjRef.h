@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.h,v 1.28.4.2 2005/04/25 08:44:46 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.h,v 1.28.4.3 2005/05/03 10:33:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -143,6 +143,10 @@ public:
 
   // overrides from OMMetaDefinition
   virtual Category category(void) const { return WEAK_REF_TYPE; }
+    virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+        const wchar_t* description,
+        const OMUniqueObjectIdentification& refClassId, OMPropertyTag classDefsTag,
+        OMVector<OMUniqueObjectIdentification>& targetSet);
 
   // overrides from OMWeakObjectReferenceType
   virtual void targetSet(OMVector<OMUniqueObjectIdentification>& result) const;

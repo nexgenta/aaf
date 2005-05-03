@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.h,v 1.27.4.1 2005/04/25 08:44:38 philipn Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.h,v 1.27.4.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -143,10 +143,15 @@ public:
   virtual Category category(void) const { return PROPERTY; }
 
   // Overrides from OMPropertyDefinition
-  const OMType* type(void) const;
-  OMPropertyId localIdentification(void) const;
-  bool isOptional(void) const;
-  bool isUniqueIdentifier(void) const;
+  virtual const OMType* type(void) const;
+  virtual OMPropertyId localIdentification(void) const;
+  virtual bool isOptional(void) const;
+  virtual bool isUniqueIdentifier(void) const;
+  virtual OMUniqueObjectIdentification typeId(void) const;
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+    const wchar_t* description, 
+    OMPropertyId localId, const OMUniqueObjectIdentification& typeId, 
+    bool isOptional, bool isUniqueIdentifier);
 
   // Allocates and returns an OMProperty which can represent this
   // property.  

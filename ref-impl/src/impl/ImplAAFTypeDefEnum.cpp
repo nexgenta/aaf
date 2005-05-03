@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.cpp,v 1.39.2.1 2005/04/25 08:44:39 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.cpp,v 1.39.2.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1210,6 +1210,51 @@ wchar_t* ImplAAFTypeDefEnum::elementNameFromValue(OMInt64 value) const
     assert(AAFRESULT_SUCCEEDED(hr));
     
     return result;
+}
+
+OMInt64 
+ImplAAFTypeDefEnum::elementValueFromName(const wchar_t* name) const
+{
+    ImplAAFTypeDefEnum* pNonConstThis = const_cast<ImplAAFTypeDefEnum*>(this);
+    
+    aafInt64 result;
+    HRESULT hr = pNonConstThis->LookupValByName(&result, static_cast<const aafCharacter*>(name));
+    assert(AAFRESULT_SUCCEEDED(hr));
+    
+    return result;
+}
+
+bool 
+ImplAAFTypeDefEnum::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description, 
+    const OMUniqueObjectIdentification& elementTypeId, OMPropertyTag typeDefsTag, 
+    OMVector<wchar_t*>& elementNames, OMVector<OMInt64>& elementValues)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+    
+    OMWeakObjectReference& reference = _ElementType.reference();
+    reference = OMWeakObjectReference(&_ElementType, elementTypeId, 
+        typeDefsTag);
+
+    size_t count = elementValues.count();
+    for (size_t i = 0; i < count; i++)
+    {
+        const wchar_t* namePtr = elementNames.getAt(i);
+        while (*namePtr != 0)
+        {
+            _ElementNames.appendValue(namePtr);
+            namePtr++;
+        }
+        _ElementNames.appendValue(namePtr);
+        _ElementValues.append(elementValues.getAt(i));
+    }
+    
+    //setInitialized();
+    
+    return true;
 }
 
 

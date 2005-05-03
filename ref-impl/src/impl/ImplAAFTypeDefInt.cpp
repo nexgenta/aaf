@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefInt.cpp,v 1.35.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefInt.cpp,v 1.35.4.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -644,6 +644,31 @@ OMUInt8 ImplAAFTypeDefInt::size(void) const
 {
     return _size;
 }
+
+bool ImplAAFTypeDefInt::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description,
+    OMUInt8 size, bool isSigned)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+    
+    _size = size;
+    if (isSigned)
+    {
+        _isSigned = kAAFTrue;
+    }
+    else
+    {
+        _isSigned = kAAFFalse;
+    }
+    
+    //setInitialized();
+
+    return true;    
+}
+
 
 
 aafBool ImplAAFTypeDefInt::IsFixedSize (void) const

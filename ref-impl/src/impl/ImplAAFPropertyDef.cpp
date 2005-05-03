@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.cpp,v 1.35.4.1 2005/04/25 08:44:38 philipn Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.cpp,v 1.35.4.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -266,6 +266,39 @@ bool ImplAAFPropertyDef::isUniqueIdentifier(void) const
   {
       return _IsUniqueIdentifier == kAAFTrue;
   }
+}
+
+OMUniqueObjectIdentification ImplAAFPropertyDef::typeId(void) const
+{
+    aafUID_t tid = _Type;
+    return *(reinterpret_cast<OMUniqueObjectIdentification*>(&tid));
+}
+
+bool ImplAAFPropertyDef::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description, 
+    OMPropertyId localId, const OMUniqueObjectIdentification& typeId, 
+    bool isOptional, bool isUniqueIdentifier)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+
+    _pid = localId;    
+    _Type = *(reinterpret_cast<const aafUID_t*>(&typeId));
+    _IsOptional = isOptional;
+    if (_IsUniqueIdentifier.isPresent() && isUniqueIdentifier == false)
+    {
+        _IsUniqueIdentifier = false;
+    }
+    else if (isUniqueIdentifier)
+    {
+        _IsUniqueIdentifier = true;
+    }
+    assert(_cachedType == 0);
+    //setInitialized();
+    
+    return true;
 }
 
 

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.25.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.25.4.2 2005/05/03 10:33:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -122,6 +122,9 @@ public:
 
   // overrides from OMMetaDefinition
   virtual Category category(void) const { return STRONG_REF_TYPE; }
+  virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
+      const wchar_t* description,
+      const OMUniqueObjectIdentification& refClassId, OMPropertyTag classDefsTag);
 
   // override from OMStorable.
   virtual const OMClassId& classId(void) const;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefCharacter.cpp,v 1.13 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefCharacter.cpp,v 1.13.6.1 2005/05/03 10:33:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -297,7 +297,18 @@ void ImplAAFTypeDefCharacter::internalize(const OMByte* externalBytes,
 }
 
 
+bool ImplAAFTypeDefCharacter::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
 
+    //setInitialized();
+
+    return true;    
+}
 
 
 

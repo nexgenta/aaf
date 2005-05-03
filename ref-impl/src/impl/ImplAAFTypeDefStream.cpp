@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.19 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.19.6.1 2005/05/03 10:33:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -440,6 +440,19 @@ OMProperty * ImplAAFTypeDefStream::pvtCreateOMProperty
   // TEMPORARY: Need to use non-template class: Use existing OMDataStreamProperty
   // until new non-template typed-stream class is available.
   return new OMDataStreamProperty(pid, name);
+}
+
+bool ImplAAFTypeDefStream::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+
+    setInitialized();
+
+    return true;    
 }
 
 

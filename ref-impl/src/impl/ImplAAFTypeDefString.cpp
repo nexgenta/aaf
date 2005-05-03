@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefString.cpp,v 1.45.4.1 2005/04/25 08:44:45 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefString.cpp,v 1.45.4.2 2005/05/03 10:33:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -612,6 +612,25 @@ OMType* ImplAAFTypeDefString::elementType(void) const
     
     return pElementTypeDef;
 }
+
+bool ImplAAFTypeDefString::initialise(const OMUniqueObjectIdentification& id, 
+    const wchar_t* name, const wchar_t* description, 
+    const OMUniqueObjectIdentification& elementTypeId, OMPropertyTag typeDefsTag)
+{
+    if (!ImplAAFMetaDefinition::initialise(id, name, description))
+    {
+        return false;
+    }
+    
+    OMWeakObjectReference& reference = _ElementType.reference();
+    reference = OMWeakObjectReference(&_ElementType, elementTypeId, 
+        typeDefsTag);
+    
+    //setInitialized();
+    
+    return true;
+}
+
 
 
 aafBool ImplAAFTypeDefString::IsFixedSize (void) const
