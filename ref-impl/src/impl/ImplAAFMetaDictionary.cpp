@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.2 2005/04/25 08:44:38 philipn Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.3 2005/05/03 10:28:25 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -283,6 +283,86 @@ void ImplAAFMetaDictionary::typeDefinitions(OMVector<OMType*>& typeDefs) const
         }
     }
 }
+
+int ImplAAFMetaDictionary::registerExtClassDef(OMClassDefinition* classDef)
+{
+    if (isRegistered(classDef->identification()))
+    {
+        return OM_CLASS_REGISTERED_ALREADY_REGISTERED;
+    }
+    
+    HRESULT result = RegisterClassDef(dynamic_cast<ImplAAFClassDef*>(classDef));
+    if (AAFRESULT_SUCCEEDED(result))
+    {
+        return OM_CLASS_REGISTERED_OK;
+    }
+    else
+    {
+        return OM_CLASS_REGISTERED_FAILED;
+    }
+}
+
+int ImplAAFMetaDictionary::registerExtPropertyDef(const OMUniqueObjectIdentification& classId, 
+    OMPropertyDefinition* propertyDef)
+{
+    ImplAAFClassDefSP spClassDef;
+    HRESULT result = dataDictionary()->LookupClassDef(*(reinterpret_cast<const aafUID_t*>(
+        &classId)), &spClassDef);
+    if (!AAFRESULT_SUCCEEDED(result))
+    {
+        return OM_PROPERTY_REGISTERED_FAILED;
+    }
+    spClassDef->AssurePropertyTypesLoaded();
+
+    ImplAAFPropertyDefSP spPropertyDef;
+    result = spClassDef->LookupPropertyDef(*(reinterpret_cast<const aafUID_t*>(
+        &propertyDef->identification())), &spPropertyDef);
+    if (AAFRESULT_SUCCEEDED(result))
+    {
+        return OM_PROPERTY_REGISTERED_ALREADY_REGISTERED;
+    }
+    
+    ImplAAFTypeDefSP spTypeDef;
+    OMUniqueObjectIdentification typeId = propertyDef->typeId();
+    result = dataDictionary()->LookupTypeDef(*(reinterpret_cast<const aafUID_t*>(
+        &typeId)), &spTypeDef);
+    if (!AAFRESULT_SUCCEEDED(result))
+    {
+        return OM_PROPERTY_REGISTERED_FAILED;
+    }
+
+    if (spClassDef->registerExtPropertyDef(propertyDef))
+    {
+        return OM_PROPERTY_REGISTERED_OK;
+    }
+    else
+    {
+        return OM_PROPERTY_REGISTERED_FAILED;
+    }
+}
+
+int ImplAAFMetaDictionary::registerExtTypeDef(OMType* typeDef)
+{
+    OMUniqueObjectIdentification typeId = typeDef->identification();
+    ImplAAFTypeDefSP spTypeDef;
+    HRESULT result = dataDictionary()->LookupTypeDef(*(reinterpret_cast<const aafUID_t*>(
+        &typeId)), &spTypeDef);
+    if (AAFRESULT_SUCCEEDED(result))
+    {
+        return OM_TYPE_REGISTERED_ALREADY_REGISTERED;
+    }
+
+    result = RegisterTypeDef(dynamic_cast<ImplAAFTypeDef*>(typeDef));
+    if (AAFRESULT_SUCCEEDED(result))
+    {
+        return OM_TYPE_REGISTERED_OK;
+    }
+    else
+    {
+        return OM_TYPE_REGISTERED_FAILED;
+    }
+}
+
 
 
 //

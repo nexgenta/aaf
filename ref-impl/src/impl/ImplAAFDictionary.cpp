@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.126 2005/03/18 18:18:55 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.126.2.1 2005/05/03 10:28:11 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
