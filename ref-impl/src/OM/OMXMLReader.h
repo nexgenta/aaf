@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.h,v 1.1.2.3 2005/04/25 08:34:52 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.h,v 1.1.2.4 2005/05/03 10:22:27 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,6 +56,7 @@ public:
     bool next();
     bool nextElement();
     bool nextEndElement();
+    bool moveToEndElement();
     void skipContent();
     EventType getEventType();
     bool elementEquals(const wchar_t* uri, const wchar_t* localName);

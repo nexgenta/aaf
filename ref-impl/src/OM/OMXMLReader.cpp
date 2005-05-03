@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.cpp,v 1.1.2.1 2005/04/11 14:52:15 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.cpp,v 1.1.2.2 2005/05/03 10:22:28 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,13 +25,14 @@
 #include "OMXMLReader.h"
 #include "OMListIterator.h"
 #include "OMUtilities.h"
+#include "OMXMLUtilities.h"
 #include "OMAssertions.h"
 #include "OMXMLException.h"
 
 
 #define COPY_STRING(DEST, SRC) \
 { \
-    wchar_t* tmp = convertString(SRC); \
+    wchar_t* tmp = convertToWideString(SRC); \
     DEST = tmp; \
     delete [] tmp; \
 }
@@ -118,6 +119,19 @@ OMXMLReader::nextEndElement()
     return true;
 }
 
+bool 
+OMXMLReader::moveToEndElement()
+{
+    TRACE("OMXMLReader::moveToEndElement");
+
+    if (getEventType() == END_ELEMENT)
+    {
+        return true;
+    }
+    
+    return nextEndElement();
+}
+
 void 
 OMXMLReader::skipContent()
 {
@@ -143,8 +157,9 @@ OMXMLReader::skipContent()
 bool 
 OMXMLReader::elementEquals(const wchar_t* uri, const wchar_t* localName)
 {
-    TRACE("OMXMLReader::skipContent");
-    PRECONDITION("Event is start element", _eventType == START_ELEMENT);
+    TRACE("OMXMLReader::elementEquals");
+    PRECONDITION("Event is start or end element", 
+        _eventType == START_ELEMENT || _eventType == END_ELEMENT);
     
     if (compareWideString(_uri.c_str(), uri) == 0 &&
         compareWideString(_localName.c_str(), localName) == 0)
