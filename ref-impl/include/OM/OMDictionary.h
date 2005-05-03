@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.h,v 1.11.6.2 2005/04/25 08:14:48 philipn Exp $ $Name:  $
+// $Id: OMDictionary.h,v 1.11.6.3 2005/05/03 10:05:05 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,20 @@
 
 #ifndef OMDICTIONARY_H
 #define OMDICTIONARY_H
+
+
+#define OM_CLASS_REGISTERED_OK                      0
+#define OM_CLASS_REGISTERED_FAILED                  1
+#define OM_CLASS_REGISTERED_ALREADY_REGISTERED      2
+
+#define OM_PROPERTY_REGISTERED_OK                   0
+#define OM_PROPERTY_REGISTERED_FAILED               1
+#define OM_PROPERTY_REGISTERED_ALREADY_REGISTERED   2
+
+#define OM_TYPE_REGISTERED_OK                       0
+#define OM_TYPE_REGISTERED_FAILED                   1
+#define OM_TYPE_REGISTERED_ALREADY_REGISTERED       2
+
 
 #include "OMClassFactory.h"
 #include "OMStorable.h"
@@ -56,13 +70,16 @@ public:
   static void finalize(void);
 
   
-  virtual bool registerClassDef(const OMClassId& classId) = 0;
-  
-  virtual bool registerTypeDef(const OMClassId& typeId) = 0;
+  virtual bool registerClassDef(const OMUniqueObjectIdentification& classId) = 0;
+  virtual bool registerTypeDef(const OMUniqueObjectIdentification& typeId) = 0;
 
   virtual void classDefinitions(OMVector<OMClassDefinition*>& classDefs) const = 0;
-
   virtual void typeDefinitions(OMVector<OMType*>& typeDefs) const = 0;
+  
+  virtual int registerExtClassDef(OMClassDefinition* classDef) = 0;
+  virtual int registerExtPropertyDef(const OMUniqueObjectIdentification& classId, 
+    OMPropertyDefinition* propertyDef) = 0;
+  virtual int registerExtTypeDef(OMType* typeDef) = 0;
   
 private:
 
