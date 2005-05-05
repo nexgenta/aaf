@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.h,v 1.26.4.3 2005/05/03 10:33:30 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.h,v 1.26.4.4 2005/05/05 09:25:36 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -180,9 +180,6 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
-
-  // PdN: temporary; override from OMType
-  virtual const OMPropertyId* getTargetPath() const;
 
   
 private:

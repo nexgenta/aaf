@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMType.h,v 1.12.4.3 2005/05/03 10:04:07 philipn Exp $ $Name:  $
+// $Id: OMType.h,v 1.12.4.4 2005/05/05 09:25:01 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -191,10 +191,6 @@ public:
                    size_t bytesSize);
 
 
-  // PdN: temporary function
-  virtual const OMPropertyId* getTargetPath() const { return 0; };
-  
-  
 };
 
 // internal types that are not TypeDefinitions registered in the Dictionary
