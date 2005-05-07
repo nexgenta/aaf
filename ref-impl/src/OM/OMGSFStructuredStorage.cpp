@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.cpp,v 1.4 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.cpp,v 1.5 2005/05/07 13:03:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,7 +114,7 @@ ULONG STDMETHODCALLTYPE
 OMGSFIStorage::Release(void)
 {
 	TRACE("OMGSFIStorage::Release");
-	ULONG result = --_referenceCount;
+	--_referenceCount;
 	if (_referenceCount == 0)
 	{
 		if (_storage != 0)
@@ -131,15 +131,6 @@ OMGSFIStorage::Release(void)
 	return _referenceCount;
 }
 
-
-// FIXME: Need proper error handling which does not always return -1 on error!!!
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern void gsf_outfile_msole_set_sector_size (int size);
-#ifdef __cplusplus
-}
-#endif
 
 HRESULT STDMETHODCALLTYPE
 OMGSFIStorage::StgCreateStorageEx( const TCHAR FAR* in_filename,
@@ -160,10 +151,6 @@ OMGSFIStorage::StgCreateStorageEx( const TCHAR FAR* in_filename,
 	 convertWideStringToString (storageName, in_filename, FILENAME_MAX);
 #endif
 
-
-	// Set the root sector size
-	gsf_outfile_msole_set_sector_size (in_sectorSize);
-
 	int status = GSTG_OK;
 	GError *err;
 
@@ -171,7 +158,10 @@ OMGSFIStorage::StgCreateStorageEx( const TCHAR FAR* in_filename,
 
 	if (output != NULL)
 	{
-		storage = GSF_OUTFILE (gsf_outfile_msole_new (output));
+		storage = GSF_OUTFILE (gsf_outfile_msole_new_full (
+									output,
+									in_sectorSize,	// sector size - 512 or 4096 bytes
+									64));			// mini-sector size always 64 bytes
 		g_object_unref (G_OBJECT (output));
 	}
 	else
