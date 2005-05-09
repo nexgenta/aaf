@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.43 2004/11/29 19:09:26 stuart_hc Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.44 2005/05/09 17:15:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,8 +53,9 @@ typedef unsigned __int64       OMUInt64;
 #define UINT64_C(c)	c
 
 #elif defined(OM_COMPILER_GCC_INTEL_LINUX) || defined(OM_COMPILER_GCC_X86_64_LINUX) \
-   || defined(OM_COMPILER_SGICC_MIPS_SGI) || defined(OM_COMPILER_GCC_MIPS_SGI) \
+   || defined(OM_COMPILER_GCC_PPC64_LINUX) \
    || defined(OM_COMPILER_GCC_PPC_MACOSX) || defined(OM_COMPILER_MWERKS_PPC_MACOSX) \
+   || defined(OM_COMPILER_SGICC_MIPS_SGI) || defined(OM_COMPILER_GCC_MIPS_SGI) \
    || defined(OM_COMPILER_GCC_SPARC_SUNOS) || defined(OM_COMPILER_GCC_INTEL_FREEBSD) \
    || defined(OM_COMPILER_GCC_INTEL_OPENBSD) || defined(OM_COMPILER_GCC_INTEL_CYGWIN)
 
