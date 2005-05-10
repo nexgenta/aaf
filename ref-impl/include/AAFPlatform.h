@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFPlatform.h,v 1.15 2005/05/09 17:15:58 stuart_hc Exp $ $Name:  $
+// $Id: AAFPlatform.h,v 1.16 2005/05/10 12:29:54 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -305,7 +305,7 @@ typedef wchar_t			aafCharacter;
  */
 #if defined(_MSC_VER)
 #define AAFFMT64 "I64"
-#elif defined(__x86_64__) or defined(__powerpc64__)
+#elif defined(__x86_64__) || defined(__powerpc64__)
 #define AAFFMT64 "l"
 #else			// all 32bit platforms using POSIX compilers
 #define AAFFMT64 "ll"
