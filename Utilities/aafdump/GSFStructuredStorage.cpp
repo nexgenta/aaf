@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: GSFStructuredStorage.cpp,v 1.1 2004/12/06 17:21:11 philipn Exp $ $Name:  $
+// $Id: GSFStructuredStorage.cpp,v 1.2 2005/05/11 09:21:54 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1015,7 +1015,10 @@ void convertWideStringToString(char*  result,
   if (length > (resultSize - 1)) {
     length = resultSize - 1;
   }
-  size_t status = wcstombs(result, string, resultSize);
+#if defined(OM_DEBUG)
+  size_t status =
+#endif
+  wcstombs(result, string, resultSize);
   assert(status != (size_t)-1);
 }
 
@@ -1025,7 +1028,10 @@ wchar_t* convertString(const char* string)
   size_t length = strlen(string);
   wchar_t* result = new wchar_t[length + 1];
   assert(result != 0);
-  size_t status = mbstowcs(result, string, length + 1);
+#if defined(OM_DEBUG)
+  size_t status =
+#endif
+  mbstowcs(result, string, length + 1);
   assert(status != (size_t)-1);
   return result;
 }
