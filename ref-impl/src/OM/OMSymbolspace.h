@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSymbolspace.h,v 1.1.2.4 2005/05/03 10:18:27 philipn Exp $ $Name:  $
+// $Id: OMSymbolspace.h,v 1.1.2.5 2005/05/11 17:39:38 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,9 @@
 #include "OMSet.h"
 #include "OMStorable.h"
 #include "OMVector.h"
+
+
+#define XML_MAX_BASELINE_SYMBOL_SIZE                     128
 
 
 class OMDictionary;
@@ -75,11 +78,11 @@ public:
     void setPrefix(const wchar_t* prefix);
     const wchar_t* getDescription() const;
     
-    const wchar_t* getSymbol(OMUniqueObjectIdentification id) const;
-    OMUniqueObjectIdentification getId(const wchar_t* symbol) const;
-    OMPropertyId getPropertyId(const wchar_t* symbol) const;
-    const wchar_t* getDefinitionSymbol(OMUniqueObjectIdentification id);
-    OMUniqueObjectIdentification getDefinitionId(const wchar_t* symbol) const;
+    const wchar_t* getMetaDefSymbol(OMUniqueObjectIdentification id) const;
+    OMUniqueObjectIdentification getMetaDefId(const wchar_t* symbol) const;
+    OMPropertyId getPropertyDefId(const wchar_t* symbol) const;
+    const wchar_t* getDefSymbol(OMUniqueObjectIdentification id);
+    OMUniqueObjectIdentification getDefId(const wchar_t* symbol) const;
 
     void addClassDef(OMClassDefinition* classDef);
     void addTypeDef(OMType* typeDef);
@@ -87,6 +90,7 @@ public:
 
     void save();
     void restore(OMDictionary* dictionary);
+    void registerPropertyDefs(OMDictionary* dictionary);
 
     
     static OMSymbolspace* createDefaultExtSymbolspace(OMXMLStorage* storage, 
@@ -103,14 +107,14 @@ private:
     OMXMLWriter* getWriter();
     OMXMLReader* getReader();
 
-    void addSymbol(OMUniqueObjectIdentification id, const wchar_t* symbol);
-    void addPropertySymbol(OMUniqueObjectIdentification id, OMPropertyId localId, const wchar_t* symbol);
+    void addMetaDefSymbol(OMUniqueObjectIdentification id, const wchar_t* symbol);
+    void addPropertyDefSymbol(OMUniqueObjectIdentification id, OMPropertyId localId, const wchar_t* symbol);
     const wchar_t* createSymbolForClass(OMUniqueObjectIdentification id, const wchar_t* name);
     const wchar_t* createSymbolForProperty(OMUniqueObjectIdentification id, OMPropertyId localId,
         const wchar_t* name);
     const wchar_t* createSymbolForType(OMUniqueObjectIdentification id, const wchar_t* name);
     wchar_t* createSymbol(const wchar_t* name);
-    void addDefinitionSymbol(OMUniqueObjectIdentification id, const wchar_t* symbol);
+    void addDefSymbol(OMUniqueObjectIdentification id, const wchar_t* symbol);
 
     void saveMetaDef(OMMetaDefinition* metaDef);
     void saveClassDef(OMClassDefinition* classDef);
@@ -138,12 +142,10 @@ private:
         OMUniqueObjectIdentification ownerClassId;
         OMPropertyDefinition* propertyDef;
     };
-    void restoreMetaDictDefinition(OMDictionary* dictionary, 
-        OMVector<RegisterPropertyPair*>& propertyDefs);
+    void restoreMetaDictDefinition(OMDictionary* dictionary);
     bool restoreMetaDef(MetaDef* metaDef);
     void restoreClassDef(OMDictionary* dictionary);
-    void restorePropertyDef(OMDictionary* dictionary,
-        OMVector<RegisterPropertyPair*>& propertyDefs);
+    void restorePropertyDef(OMDictionary* dictionary);
     void restoreCharacterTypeDef(OMDictionary* dictionary);
     void restoreEnumeratedTypeDef(OMDictionary* dictionary);
     void restoreExtEnumeratedTypeDef(OMDictionary* dictionary);
@@ -160,13 +162,14 @@ private:
     void restoreVariableArrayTypeDef(OMDictionary* dictionary);
     void restoreWeakObjectReferenceTypeDef(OMDictionary* dictionary);
     
-    void registerPropertyDefs(OMDictionary* dictionary, 
-        OMVector<RegisterPropertyPair*>& propertyDefs);
+    OMUniqueObjectIdentification restoreMetaDefAUID(const char* idStr);
+    void saveMetaDefAUID(OMUniqueObjectIdentification id, wchar_t* idStr);
     
     OMPropertyTag getClassDefsTag(OMDictionary* dictionary);
     OMPropertyTag getTypeDefsTag(OMDictionary* dictionary);
     
     static const wchar_t* _baselineURI;
+    static const OMUniqueObjectIdentification _baselineId;
     
     bool            _isInitialised;
     OMXMLStorage*   _store;
@@ -192,6 +195,8 @@ private:
     OMVector<OMClassDefinition*> _classDefs;
     OMVector<OMType*> _typeDefs;
     OMVector<PropertyPair*> _propertyDefs;
+
+    OMVector<RegisterPropertyPair*> _propertyDefsForRegistration;
     
 };
 

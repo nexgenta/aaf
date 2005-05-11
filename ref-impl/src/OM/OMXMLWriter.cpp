@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLWriter.cpp,v 1.1.2.3 2005/05/03 10:25:50 philipn Exp $ $Name:  $
+// $Id: OMXMLWriter.cpp,v 1.1.2.4 2005/05/11 17:39:39 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -206,7 +206,7 @@ OMXMLWriter::writeText(const wchar_t* text)
 {
     char* text8 = convertFromWideString(text);    
     
-    _xmlWriter->WriteComment(text8);
+    _xmlWriter->WriteText(text8);
     
     delete [] text8;
 }

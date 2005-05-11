@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLReader.h,v 1.1.2.2 2005/04/11 15:09:04 philipn Exp $ $Name:  $
+// $Id: XMLReader.h,v 1.1.2.3 2005/05/11 17:39:39 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -165,6 +165,10 @@ public:
     
 public:
     // internal
+    void EntityDeclHandler(const XML_Char *entityName, 
+        int is_parameter_entity, const XML_Char *value, int value_length, 
+        const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, 
+        const XML_Char *notationName);
     void StartElementHandler(const XML_Char* name, const XML_Char** atts);
     void EndElementHandler(const XML_Char* name);
     void CharacterDataHandler(const XML_Char* s, int len);
@@ -194,6 +198,10 @@ private:
 
 
 // expat handlers
+void expat_EntityDeclHandler(void* userData, const XML_Char *entityName, 
+    int is_parameter_entity, const XML_Char *value, int value_length, 
+    const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, 
+    const XML_Char *notationName);
 void expat_StartElementHandler(void* userData, const XML_Char* name, const XML_Char** atts);
 void expat_EndElementHandler(void* userData, const XML_Char* name);
 void expat_CharacterDataHandler(void* userData, const XML_Char* s, int len);
