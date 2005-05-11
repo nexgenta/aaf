@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.64 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.64.4.1 2005/05/11 17:35:30 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -539,7 +539,11 @@ void OMDataStreamProperty::deepCopyTo(OMProperty* destination,
   OMUInt64 bytesToCopy = size();
   OMByte buffer[1024];
   while (bytesToCopy != 0) {
-    read(buffer, sizeof(buffer), bytesRead);
+    if (bytesToCopy < sizeof(buffer)) {
+        read(buffer, (OMUInt32)bytesToCopy, bytesRead);
+    } else {
+        read(buffer, sizeof(buffer), bytesRead);
+    }
     dest->write(buffer, bytesRead, bytesWritten);
     bytesToCopy = bytesToCopy - bytesWritten;
   }
