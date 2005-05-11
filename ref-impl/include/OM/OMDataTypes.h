@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.43 2004/11/29 19:09:26 stuart_hc Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.43.4.1 2005/05/11 17:32:55 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,6 +75,15 @@ typedef uint64_t               OMUInt64;
 #else
 #error "Unknown compiler"
 #endif
+
+#if defined(_MSC_VER)
+#define OMFMT64 "I64"
+#elif defined(__x86_64__)
+#define OMFMT64 "l"
+#else			// all 32bit platforms using POSIX compilers
+#define OMFMT64 "ll"
+#endif
+
 
 typedef OMUInt8                OMByte;
 typedef OMUInt16               OMCharacter;
