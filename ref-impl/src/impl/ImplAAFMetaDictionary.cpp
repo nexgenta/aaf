@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.3 2005/05/03 10:28:25 philipn Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.4 2005/05/19 13:02:25 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,13 +56,15 @@
 #include "ImplAAFCloneResolver.h"
 #include "aafErr.h"
 
+#include "ImplAAFTypeDefExtEnum.h"
+
+
 
 #include <assert.h>
 
 
 #include "AAFObjectModel.h"
 #include "AAFObjectModelProcs.h"
-
 
 extern "C" const aafClassID_t CLSID_AAFMetaDictionary;
 extern "C" const aafClassID_t CLSID_AAFPropertyDef;
@@ -243,8 +245,9 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
 bool ImplAAFMetaDictionary::registerClassDef(const OMUniqueObjectIdentification& classId)
 {
     const aafUID_t* auid = reinterpret_cast<const aafUID_t*>(&classId);
-    ImplAAFClassDefSP pClassDef;
-    AAFRESULT hr = dataDictionary()->LookupClassDef(*auid, &pClassDef);
+    ImplAAFClassDefSP spClassDef;
+    AAFRESULT hr = dataDictionary()->LookupClassDef(*auid, &spClassDef);
+    spClassDef->AssurePropertyTypesLoaded();
     return AAFRESULT_SUCCEEDED(hr);
 }
 
@@ -363,6 +366,27 @@ int ImplAAFMetaDictionary::registerExtTypeDef(OMType* typeDef)
     }
 }
 
+bool ImplAAFMetaDictionary::registerExtEnumExt(OMUniqueObjectIdentification typeId,
+    OMVector<const wchar_t*>& names, OMVector<OMUniqueObjectIdentification>& values)
+{
+    ImplAAFTypeDef* pTypeDef;
+    HRESULT hresult = dataDictionary()->LookupTypeDef(*(reinterpret_cast<const aafUID_t*>(
+        &typeId)), &pTypeDef);
+    if (!AAFRESULT_SUCCEEDED(hresult))
+    {
+        return false;
+    }
+
+    bool result = false;
+    ImplAAFTypeDefExtEnum* pTypeDefExtEnum = dynamic_cast<ImplAAFTypeDefExtEnum*>(pTypeDef);
+    if (pTypeDefExtEnum != 0)
+    {
+        result = pTypeDefExtEnum->registerExtensions(names, values);
+    }
+    pTypeDef->ReleaseReference();
+
+    return result;
+}
 
 
 //
