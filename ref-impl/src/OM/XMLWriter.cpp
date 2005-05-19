@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLWriter.cpp,v 1.1.2.3 2005/05/11 17:39:39 philipn Exp $ $Name:  $
+// $Id: XMLWriter.cpp,v 1.1.2.4 2005/05/19 13:08:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -889,9 +889,9 @@ XMLWriterSimple::ToUTF16(const char* str, OMByte* utf16Bytes, size_t* utf16Len)
                 c |= (((OMUInt16)*strPtr) & 0x3F);
                 strPtr++;
                 c -= 0x10000;
-                *utf16StrPtr = (OMUInt16)((c >> 10) & 0x03FF);
+                *utf16StrPtr = (OMUInt16)(0xD800 | ((c >> 10) & 0x03FF));
                 utf16StrPtr++;
-                *utf16StrPtr = (OMUInt16)(c & 0x03FF);
+                *utf16StrPtr = (OMUInt16)(0xDC00 | (c & 0x03FF));
                 utf16StrPtr++;
             }
             else

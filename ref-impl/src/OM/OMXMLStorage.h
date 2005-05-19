@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStorage.h,v 1.1.2.5 2005/05/11 17:39:38 philipn Exp $ $Name:  $
+// $Id: OMXMLStorage.h,v 1.1.2.6 2005/05/19 13:08:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,6 +60,8 @@ public:
     OMUniqueObjectIdentification getBaselineMetaDefId(const wchar_t* symbol) const;
     const wchar_t* getBaselineDefSymbol(OMUniqueObjectIdentification id);
     const wchar_t* getBaselineMetaDefSymbol(OMUniqueObjectIdentification id);
+    bool knownBaselineExtEnum(OMUniqueObjectIdentification id, 
+        OMUniqueObjectIdentification value) const;
     
     const wchar_t* getDataStreamNotationName(OMUniqueObjectIdentification typeId);
     const wchar_t* getDataStreamEntityName(void* ref);

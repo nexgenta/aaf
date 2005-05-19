@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.cpp,v 1.1.2.2 2005/05/03 10:22:28 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.cpp,v 1.1.2.3 2005/05/19 13:08:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 
 #define COPY_STRING(DEST, SRC) \
 { \
-    wchar_t* tmp = convertToWideString(SRC); \
+    wchar_t* tmp = utf8ToUTF16(SRC); \
     DEST = tmp; \
     delete [] tmp; \
 }
