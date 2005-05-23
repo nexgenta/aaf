@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.cpp,v 1.1.2.3 2005/05/19 13:08:48 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.cpp,v 1.1.2.4 2005/05/23 11:25:20 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -359,8 +359,8 @@ OMXMLIStream::~OMXMLIStream()
     TRACE("OMXMLIStream::~OMXMLIStream");
 }
     
-OMUInt64 
-OMXMLIStream::Read(OMByte* data, OMUInt64 count)
+OMUInt32 
+OMXMLIStream::Read(OMByte* data, OMUInt32 count)
 {
     TRACE("OMXMLIStream::Read");
 
@@ -370,7 +370,7 @@ OMXMLIStream::Read(OMByte* data, OMUInt64 count)
     OMUInt32 realCount = count;
     if (realCount > (_size - _position))
     {
-        realCount = _size - _position;
+        realCount = (OMUInt32)(_size - _position);
     }
     if (realCount == 0)
     {

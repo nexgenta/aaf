@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.h,v 1.1.2.4 2005/05/03 10:22:27 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.h,v 1.1.2.5 2005/05/23 11:25:20 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -131,7 +131,7 @@ public:
     OMXMLIStream(OMRawStorage* storage);
     virtual ~OMXMLIStream();
     
-    virtual OMUInt64 Read(OMByte* data, OMUInt64 count);
+    virtual OMUInt32 Read(OMByte* data, OMUInt32 count);
     
 private:
     OMRawStorage*   _storage;

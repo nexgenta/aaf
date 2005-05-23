@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLWriter.cpp,v 1.1.2.5 2005/05/19 13:08:48 philipn Exp $ $Name:  $
+// $Id: OMXMLWriter.cpp,v 1.1.2.6 2005/05/23 11:25:20 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,11 +35,11 @@ OMXMLOStream::OMXMLOStream(OMRawStorage* storage)
 OMXMLOStream::~OMXMLOStream()
 {}
     
-OMUInt64 
-OMXMLOStream::Write(const OMByte* data, OMUInt64 count)
+OMUInt32 
+OMXMLOStream::Write(const OMByte* data, OMUInt32 count)
 {
     OMUInt32 numWritten;
-    _storage->write(data, (OMUInt32)count, numWritten);
+    _storage->write(data, count, numWritten);
     
     return numWritten;
 }
