@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.cpp,v 1.1.2.6 2005/05/19 13:08:48 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.cpp,v 1.1.2.7 2005/05/23 12:06:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -235,12 +235,12 @@ utf16CodeToUTF8(char* u8Code, const wchar_t* u16Code, int* u16Len, int* u8Len)
     return *u8Len;
 }
 
-int 
+long 
 utf16StrLen(const char* u8str)
 {
     TRACE("::utf16StrLen");
 
-    int len = 0;
+    long len = 0;
     const char* u8strPtr = u8str;
     while (*u8strPtr != '\0')
     {
@@ -258,12 +258,12 @@ utf16StrLen(const char* u8str)
     return len;
 }
 
-int 
+long 
 utf8StrLen(const wchar_t* u16str)
 {
     TRACE("::utf8StrLen");
 
-    int len = 0;
+    long len = 0;
     const wchar_t* u16strPtr = u16str;
     while (*u16strPtr != L'\0')
     {
@@ -286,7 +286,7 @@ utf8ToUTF16(const char* u8str)
 {
     TRACE("::utf8ToUTF16");
 
-    int u16Len = utf16StrLen(u8str);
+    long u16Len = utf16StrLen(u8str);
     if (u16Len == -1)
     {
         return 0;
@@ -323,7 +323,7 @@ utf8ToUTF16(wchar_t* u16str, const char* u8str, size_t u16Size)
     {
         return;
     }
-    int u16Len = utf16StrLen(u8str);
+    long u16Len = utf16StrLen(u8str);
     if (u16Len == -1)
     {
         return;
@@ -365,7 +365,7 @@ utf16ToUTF8(const wchar_t* u16str)
 {
     TRACE("::utf16ToUTF8");
 
-    int u8Len = utf8StrLen(u16str);
+    long u8Len = utf8StrLen(u16str);
     if (u8Len == -1)
     {
         return 0;
@@ -402,7 +402,7 @@ utf16ToUTF8(char* u8str, const wchar_t* u16str, size_t u8Size)
     {
         return;
     }
-    int u8Len = utf8StrLen(u16str);
+    long u8Len = utf8StrLen(u16str);
     if (u8Len == -1)
     {
         return;

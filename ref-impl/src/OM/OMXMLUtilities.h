@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.6 2005/05/19 13:08:48 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.7 2005/05/23 12:06:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,8 +49,8 @@ int utf16CodeLen(const char* u8Code);
 int utf8CodeLen(const wchar_t* u16Code);
 int utf8CodeToUTF16(wchar_t* u16Code, const char* u8Code, int* u8Len, int* u16Len);
 int utf16CodeToUTF8(char* u8Code, const wchar_t* u16Code, int* u16Len, int* u8Len);
-int utf16StrLen(const char* u8str);
-int utf8StrLen(const wchar_t* u16str);
+long utf16StrLen(const char* u8str);
+long utf8StrLen(const wchar_t* u16str);
 wchar_t* utf8ToUTF16(const char* u8str);
 void utf8ToUTF16(wchar_t* u16str, const char* u8str, size_t u16Size);
 char* utf16ToUTF8(const wchar_t* u16str);
