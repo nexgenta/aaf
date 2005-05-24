@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSymbolspace.h,v 1.1.2.6 2005/05/19 13:08:33 philipn Exp $ $Name:  $
+// $Id: OMSymbolspace.h,v 1.1.2.7 2005/05/24 16:35:34 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -176,7 +176,7 @@ private:
     void restoreWeakObjectReferenceTypeDef(OMDictionary* dictionary);
     void restoreExtEnumExt(OMDictionary* dictionary);
     
-    OMUniqueObjectIdentification restoreMetaDefAUID(const char* idStr);
+    OMUniqueObjectIdentification restoreMetaDefAUID(const wchar_t* idStr);
     void saveMetaDefAUID(OMUniqueObjectIdentification id, wchar_t* idStr);
     
     OMPropertyTag getClassDefsTag(OMDictionary* dictionary);

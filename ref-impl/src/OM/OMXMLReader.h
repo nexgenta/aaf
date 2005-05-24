@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.h,v 1.1.2.5 2005/05/23 11:25:20 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.h,v 1.1.2.6 2005/05/24 16:35:35 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,7 @@ public:
     void getStartElement(const wchar_t*& uri, const wchar_t*& localName, 
         const OMList<OMXMLAttribute*>*& attributes);
     void getEndElement(const wchar_t*& uri, const wchar_t*& localName);
-    void getCharacters(const char*& data, size_t& length);
+    void getCharacters(const wchar_t*& data, size_t& length);
 
     const wchar_t* getPositionString();
     
@@ -95,8 +95,7 @@ private:
     OMWString   _notationName;
     OMWString   _uri;
     OMWString   _localName;
-    const char* _data;
-    size_t      _dataLength;
+    OMWString   _data;
     OMList<OMXMLAttribute*>   _attributes;
     OMWString   _positionString;
 };

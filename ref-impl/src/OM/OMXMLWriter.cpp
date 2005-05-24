@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLWriter.cpp,v 1.1.2.6 2005/05/23 11:25:20 philipn Exp $ $Name:  $
+// $Id: OMXMLWriter.cpp,v 1.1.2.7 2005/05/24 16:35:35 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,7 +23,6 @@
 //=---------------------------------------------------------------------=
 
 #include "OMXMLWriter.h"
-#include "OMUtilities.h"
 #include "OMXMLUtilities.h"
 #include "OMAssertions.h"
 
