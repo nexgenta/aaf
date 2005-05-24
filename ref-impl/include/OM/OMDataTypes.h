@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.43.4.1 2005/05/11 17:32:55 philipn Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.43.4.2 2005/05/24 16:28:00 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,11 +77,11 @@ typedef uint64_t               OMUInt64;
 #endif
 
 #if defined(_MSC_VER)
-#define OMFMT64 "I64"
+#define OMWFMT64 L"I64"
 #elif defined(__x86_64__)
-#define OMFMT64 "l"
+#define OMWFMT64 L"l"
 #else			// all 32bit platforms using POSIX compilers
-#define OMFMT64 "ll"
+#define OMWFMT64 L"ll"
 #endif
 
 
