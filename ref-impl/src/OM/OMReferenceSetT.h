@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMReferenceSetT.h,v 1.10 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMReferenceSetT.h,v 1.11 2005/05/25 17:44:47 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -147,7 +147,10 @@ OMReferenceSet<UniqueIdentification, ReferencedObject>::remove(
   PRECONDITION("Object is present", contains(identification));
 
   SetElement* element = 0;
-  bool found = _set.find(identification, &element);
+#if defined(OM_DEBUG)
+  bool found =
+#endif
+  _set.find(identification, &element);
   ASSERT("Object found", found);
   ReferencedObject* result = element->setValue(0);
   _set.remove(identification);

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStrongRefSetPropertyT.h,v 1.73 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
+// $Id: OMStrongRefSetPropertyT.h,v 1.74 2005/05/25 17:44:48 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -289,7 +289,10 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   PRECONDITION("Object is present", contains(identification));
 
   SetElement* element = 0;
-  bool found = _set.find(identification, &element);
+#if defined(OM_DEBUG)
+  bool found =
+#endif
+  _set.find(identification, &element);
   ASSERT("Object found", found);
   UniqueIdentification nullUniqueIdentification;
   memset(&nullUniqueIdentification, 0, sizeof(UniqueIdentification));
@@ -888,7 +891,10 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   PRECONDITION("Object already present", contains(identification));
 
   SetElement* element = 0;
-  bool found = _set.find(identification, &element);
+#if defined(OM_DEBUG)
+  bool found =
+#endif
+  _set.find(identification, &element);
   ASSERT("Object found", found);
   OMStrongObjectReference& reference = element->reference();
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefSetPropertyT.h,v 1.64 2004/11/30 22:04:52 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefSetPropertyT.h,v 1.65 2005/05/25 17:44:48 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -287,7 +287,10 @@ OMWeakReferenceSetProperty<ReferencedObject>::remove(
   PRECONDITION("Object is present", contains(identification));
 
   SetElement* element = 0;
-  bool found = _set.find(identification, &element);
+#if defined(OM_DEBUG)
+  bool found =
+#endif
+  _set.find(identification, &element);
   ASSERT("Object found", found);
   OMStorable* p = element->setValue(nullOMUniqueObjectIdentification, 0);
   ReferencedObject* result = 0;
