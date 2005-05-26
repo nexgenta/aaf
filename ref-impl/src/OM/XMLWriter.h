@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLWriter.h,v 1.1.2.3 2005/05/23 11:25:20 philipn Exp $ $Name:  $
+// $Id: XMLWriter.h,v 1.1.2.4 2005/05/26 17:10:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,7 @@
 #if defined (_MSC_VER)
   // - 'identifier' : identifier was truncated to 'number' characters in
   //   the debug information
-#pragma warning(disable:4786) // Gak !
+#pragma warning(disable:4786)
 #endif
 
 #include <OMDataTypes.h>
@@ -66,6 +66,7 @@ public:
     virtual void WriteText(const char* text) = 0;
 
     virtual void Synchronize(void) = 0;
+    virtual void Reset(void) = 0;
 };
 
 
@@ -77,6 +78,7 @@ public:
     
     virtual OMUInt32 Write(const OMByte* data, OMUInt32 count) = 0;
     virtual void Synchronize(void) = 0;
+    virtual void SetPosition(OMUInt64 position) = 0;
 };
 
 
@@ -109,6 +111,7 @@ public:
     virtual void WriteText(const char* text);
 
     virtual void Synchronize(void);
+    virtual void Reset(void);
 
 private:
     enum XMLEncoding

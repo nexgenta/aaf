@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLWriter.cpp,v 1.1.2.4 2005/05/19 13:08:48 philipn Exp $ $Name:  $
+// $Id: XMLWriter.cpp,v 1.1.2.5 2005/05/26 17:10:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -463,6 +463,22 @@ void
 XMLWriterSimple::Synchronize(void)
 {
     _xmlStream->Synchronize();
+}
+
+void
+XMLWriterSimple::Reset(void)
+{
+    vector<Element*>::iterator iter;
+    for (iter = _elementStack.begin(); iter != _elementStack.end(); iter++)
+    {
+        delete *iter;
+    }
+    _elementStack.clear();
+    
+    _prevWriteType = NONE;
+    _level = 0;
+
+    _xmlStream->SetPosition(0);
 }
 
 string

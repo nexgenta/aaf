@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLWriter.h,v 1.1.2.3 2005/05/23 11:25:20 philipn Exp $ $Name:  $
+// $Id: OMXMLWriter.h,v 1.1.2.4 2005/05/26 17:10:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,6 +38,7 @@ public:
     
     virtual OMUInt32 Write(const OMByte* data, OMUInt32 count);
     virtual void Synchronize(void);
+    virtual void SetPosition(OMUInt64 position);
     
 private:
     OMRawStorage*   _storage;
@@ -65,6 +66,7 @@ public:
     void writeText(const wchar_t* text);
     
     void synchronize(void);
+    void reset(void);
     
 private:
     XMLWriter*      _xmlWriter;

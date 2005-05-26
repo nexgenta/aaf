@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLWriter.cpp,v 1.1.2.7 2005/05/24 16:35:35 philipn Exp $ $Name:  $
+// $Id: OMXMLWriter.cpp,v 1.1.2.8 2005/05/26 17:10:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,12 @@ void
 OMXMLOStream::Synchronize(void)
 {
     _storage->synchronize();
+}
+
+void 
+OMXMLOStream::SetPosition(OMUInt64 position)
+{
+    _storage->setPosition(position);
 }
 
 
@@ -214,6 +220,12 @@ void
 OMXMLWriter::synchronize(void)
 {
     _xmlWriter->Synchronize();
+}
+
+void 
+OMXMLWriter::reset(void)
+{
+    _xmlWriter->Reset();
 }
 
 
