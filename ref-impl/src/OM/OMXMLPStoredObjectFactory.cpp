@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObjectFactory.cpp,v 1.1.2.2 2005/04/11 15:04:44 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObjectFactory.cpp,v 1.1.2.3 2005/05/26 17:08:10 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -207,20 +207,24 @@ OMXMLPStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
 {
   TRACE("OMXMLPStoredObjectFactory::isRecognized");
   PRECONDITION("Valid raw storage", rawStorage != 0);
+  PRECONDITION("Positionable raw storage", rawStorage->isPositionable());
 
+  bool isRecog = false;
   try
   {
     OMXMLReader reader(rawStorage);
     if (reader.nextElement() &&
           reader.elementEquals(OMSymbolspace::getBaselineURI(), L"AAF"))
     {
-          return true;
+        isRecog = true;
     }
   }
-  catch (OMXMLException&)
+  catch (...)
   {}
 
-  return false;
+  rawStorage->setPosition(0);
+  
+  return isRecog;
 }
 
   // @mfunc Can a file be created successfully on the given
@@ -285,25 +289,6 @@ bool OMXMLPStoredObjectFactory::readSignature(OMRawStorage* rawStorage,
                                              size_t signatureSize)
 {
   TRACE("OMXMLPStoredObjectFactory::readSignature");
-  size_t index = 0;
-  while (index < signatureSize - 1) {
-    unsigned char ch;
-    OMUInt32 bytesRead;
-    rawStorage->read(reinterpret_cast<OMByte*>(&ch), 1, bytesRead);
-    if (bytesRead != 1) {
-      break;
-    }
-    int c = ch;
-    if (isprint(c)) {
-      signature[index++] = toupper(ch);
-    }
-  }
-  bool result;
-  if (index == (signatureSize - 1)) {
-  signature[index] = 0;
-    result = true;
-  } else {
-    result = false;
-  }
-  return result;
+  ASSERT("Unimplemented code not reached", false);
+  return false;
 }
