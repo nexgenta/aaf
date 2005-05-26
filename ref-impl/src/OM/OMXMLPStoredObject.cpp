@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.cpp,v 1.1.2.10 2005/05/26 17:05:35 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.cpp,v 1.1.2.11 2005/05/26 17:22:27 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -317,7 +317,10 @@ OMXMLPStoredObject::save(OMFile& file)
             if (_store->isBaselineSymbolspace(symbolspace) || !symbolspace->isEmpty())
             {
                 getWriter()->declareNamespace(symbolspace->getURI(), symbolspace->getPrefix());
-                haveExtensions = true;
+                if (!_store->isBaselineSymbolspace(symbolspace))
+                {
+                    haveExtensions = true;
+                }
             }
         }
 
