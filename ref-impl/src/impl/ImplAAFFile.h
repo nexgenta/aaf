@@ -2,7 +2,7 @@
 #define __ImplAAFFile_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.h,v 1.44 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFile.h,v 1.44.6.1 2005/05/31 16:59:08 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,6 +70,12 @@ public:
 	OpenNewModify (const aafCharacter * pFileName,
 				   aafUInt32 modeFlags,
 				   aafProductIdentification_t * pIdent);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	OpenNewModifyEx (const aafCharacter * pFileName,
+				     aafUID_constptr pFileKind,
+				     aafUInt32 modeFlags,
+				     aafProductIdentification_t * pIdent);
 
   virtual AAFRESULT STDMETHODCALLTYPE
 	OpenTransient (aafProductIdentification_t * pIdent);
