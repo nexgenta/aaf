@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.8 2005/05/24 16:35:35 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.9 2005/05/31 16:59:49 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,5 +114,13 @@ wchar_t* unescapeString(const wchar_t* str);
 wchar_t* unescapeCharacter(const wchar_t* cstr);
 
 wchar_t* wideCharacterStringDup(const wchar_t* str);
+
+bool isRelativePath(const wchar_t* filepath);
+bool isFileURL(const wchar_t* uri);
+bool isRelativeURI(const wchar_t* uri);
+
+void wcsconvertURItoFilepath(const wchar_t *uri, wchar_t *filepath);
+void wcsconvertFilepathtoURI(const wchar_t *filepath, wchar_t *uri);
+
 
 #endif 
