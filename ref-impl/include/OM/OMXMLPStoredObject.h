@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.h,v 1.1.2.6 2005/05/24 16:29:41 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.h,v 1.1.2.7 2005/05/31 17:03:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,19 +77,19 @@ public:
 
     // @cmember Open the root <c OMXMLPStoredObject> in the raw storage
     //          <p rawStorage> for reading only.
-    static OMXMLPStoredObject* openRead(OMRawStorage* rawStorage);
+    static OMXMLPStoredObject* openRead(OMDiskRawStorageGroup* groupStorage);
 
     // @cmember Open the root <c OMXMLPStoredObject> in the raw storage
     //          <p rawStorage> for modification.
-    static OMXMLPStoredObject* openModify(OMRawStorage* rawStorage);
+    static OMXMLPStoredObject* openModify(OMDiskRawStorageGroup* groupStorage);
 
     // @cmember Create a new root <c OMXMLStoredObject> in the raw storage
     //          <p rawStorage>.
-    static OMXMLPStoredObject* createWrite(OMRawStorage* rawStorage);
+    static OMXMLPStoredObject* createWrite(OMDiskRawStorageGroup* groupStorage);
 
     // @cmember Create a new root <c OMXMLPStoredObject> in the raw storage
     //          <p rawStorage>.
-    static OMXMLPStoredObject* createModify(OMRawStorage* rawStorage);
+    static OMXMLPStoredObject* createModify(OMDiskRawStorageGroup* groupStorage);
 
   // @access Public members.
 
