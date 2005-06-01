@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.cpp,v 1.1.2.6 2005/05/26 17:09:13 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.cpp,v 1.1.2.7 2005/06/01 15:31:11 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,7 @@
 #include "OMListIterator.h"
 #include "OMXMLUtilities.h"
 #include "OMAssertions.h"
-#include "OMXMLException.h"
+#include "OMExceptions.h"
 
 
 #define COPY_STRING(DEST, SRC) \
@@ -75,9 +75,7 @@ OMXMLReader::next()
     }
     catch (XMLReaderException& ex)
     {
-        OMWString message;
-        COPY_STRING(message, ex.GetMessage());
-        throw OMXMLException(message.c_str());
+        throw OMException(ex.GetMessage());
     }
 }
 
@@ -118,11 +116,11 @@ OMXMLReader::nextEndElement()
     
     if (!haveNext)
     {
-        throw OMXMLException(L"Failed to read next end element - reached end of document");
+        throw OMException("Failed to read next end element - reached end of document");
     }
     else if (getEventType() == START_ELEMENT)
     {
-        throw OMXMLException(L"Expecting an end element, but found a start element");
+        throw OMException("Expecting an end element, but found a start element");
     }
     return true;
 }
