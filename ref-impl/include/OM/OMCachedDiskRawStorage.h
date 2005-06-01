@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMCachedDiskRawStorage.h,v 1.8 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMCachedDiskRawStorage.h,v 1.8.6.1 2005/06/01 15:34:34 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -198,6 +198,7 @@ private:
     // @cmember Constructor.
   OMCachedDiskRawStorage(OMStream* file,
                          OMFile::OMAccessMode accessMode,
+                         const wchar_t* fileName,
                          OMUInt32 pageSize,
                          OMUInt32 pageCount);
 
