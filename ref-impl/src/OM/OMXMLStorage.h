@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStorage.h,v 1.1.2.8 2005/05/31 17:00:58 philipn Exp $ $Name:  $
+// $Id: OMXMLStorage.h,v 1.1.2.9 2005/06/01 15:30:41 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,7 @@
 #ifndef __OMXMLSTORAGE_H__
 #define __OMXMLSTORAGE_H__
 
-#include "OMDiskRawStorageGroup.h"
+#include "OMDiskRawStorage.h"
 #include "OMXMLWriter.h"
 #include "OMXMLReader.h"
 #include "OMSymbolspace.h"
@@ -41,7 +41,7 @@ public:
     enum Mode {READ_MODE, WRITE_MODE, EXISTING_MODIFY_MODE, NEW_MODIFY_MODE};
     
     // note that OMXMLStorage takes ownership of storage
-    OMXMLStorage(OMDiskRawStorageGroup* storage, Mode mode);
+    OMXMLStorage(OMDiskRawStorage* storage, Mode mode);
     ~OMXMLStorage();
     
     Mode mode();
@@ -64,12 +64,14 @@ public:
     OMPropertyId getPropertyDefId(const wchar_t* symbolspaceURI, const wchar_t* symbol) const;
     const wchar_t* getDefSymbol(OMUniqueObjectIdentification id);
     OMUniqueObjectIdentification getDefId(const wchar_t* symbol) const;
+    
     OMUniqueObjectIdentification getBaselineDefId(const wchar_t* symbol) const;
     OMUniqueObjectIdentification getBaselineMetaDefId(const wchar_t* symbol) const;
     const wchar_t* getBaselineDefSymbol(OMUniqueObjectIdentification id);
     const wchar_t* getBaselineMetaDefSymbol(OMUniqueObjectIdentification id);
     bool knownBaselineExtEnum(OMUniqueObjectIdentification id, 
         OMUniqueObjectIdentification value) const;
+
     OMSymbolspace* getSymbolspaceForDef(OMUniqueObjectIdentification id) const;
     OMSymbolspace* getSymbolspaceForMetaDef(OMUniqueObjectIdentification id) const;
     OMSymbolspace* getSymbolspaceForExtEnum(OMUniqueObjectIdentification id,
@@ -97,7 +99,7 @@ private:
     void setUniquePrefix(OMSymbolspace* symbolspace);
 
     Mode            _mode;
-    OMDiskRawStorageGroup*   _storage;
+    OMDiskRawStorage*   _storage;
     OMXMLWriter*    _xmlWriter;
     OMXMLReader*    _xmlReader;
     
