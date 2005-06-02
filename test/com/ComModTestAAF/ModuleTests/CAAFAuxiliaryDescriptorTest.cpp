@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFAuxiliaryDescriptorTest.cpp,v 1.3 2005/04/05 14:07:08 tbingham Exp $ $Name:  $
+// $Id: CAAFAuxiliaryDescriptorTest.cpp,v 1.4 2005/06/02 20:59:43 greek_fire Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,8 @@
 #include <AAFResult.h>
 #include <AAFTypes.h>
 #include <AAFStoredObjectIDs.h>
+
+#include <assert.h>
 
 #include <wchar.h>
 #include <iostream>
@@ -111,6 +113,24 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     CheckExpression( ::wcscmp( stringBuf, L"csISO069French" ) == 0, AAFRESULT_TEST_FAILED );
 
     CheckResult( filePointers.pFile->Close() );
+
+    //test the get buf length methods
+    aafUInt32 bufSize;
+
+    if(pAuxDesc->GetMimeTypeBufLen(&bufSize) != AAFRESULT_SUCCESS)
+      CheckResult(AAFRESULT_TEST_FAILED);
+    
+    //ensure the sizes match
+    if(bufSize != sizeof(stringBuf))
+      CheckResult(AAFRESULT_TEST_FAILED);
+
+    if(pAuxDesc->GetCharSetBufLen(&bufSize) != AAFRESULT_SUCCESS)
+      CheckResult(AAFRESULT_TEST_FAILED);
+
+    //ensure the sizes match
+    if(bufSize != sizeof(stringBuf))
+      CheckResult(AAFRESULT_TEST_FAILED);
+
   }
   catch( const AAFRESULT& hr ) {
     cout << "failed hr = " << hr << endl;
