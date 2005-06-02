@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.cpp,v 1.1.2.13 2005/06/01 15:32:22 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.cpp,v 1.1.2.14 2005/06/02 16:01:10 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1702,6 +1702,7 @@ OMXMLPStoredObject::saveSet(const OMByte* internalBytes, OMUInt16 internalSize,
         getWriter()->writeElementEnd();
         
         count -= elementType->internalSize();
+        elementBytes += elementType->internalSize();
     }
 }
 
@@ -1875,6 +1876,7 @@ OMXMLPStoredObject::saveVariableArray(const OMByte* internalBytes, OMUInt16 inte
             getWriter()->writeElementEnd();
             
             count -= elementType->internalSize();
+            elementBytes += elementType->internalSize();
         }
     }
 }
