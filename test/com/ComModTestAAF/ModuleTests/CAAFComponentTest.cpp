@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFSegment
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFComponentTest.cpp,v 1.33 2005/06/02 20:59:44 greek_fire Exp $ $Name:  $
+// $Id: CAAFComponentTest.cpp,v 1.34 2005/06/02 21:23:56 greek_fire Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -189,7 +189,8 @@ void CheckNameValuePairs( IEnumAAFTaggedValues* pEnum,
     count++;
   }
 
-  checkExpression( count == nameValArraySize, AAFRESULT_TEST_FAILED );
+  //since we removed one attribute & comment count is count--
+  checkExpression( count == nameValArraySize - nameValuePairOffset, AAFRESULT_TEST_FAILED );
 }
 
 static HRESULT CreateAAFFile(aafWChar * pFileName)
