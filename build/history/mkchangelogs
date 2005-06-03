@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.41 2005/06/03 19:40:50 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.42 2005/06/03 19:58:10 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -138,6 +138,18 @@ cmfile=${2}
 if [[ ! -s $cmfile ]]
 then
   echo "$TOOLNAME : Can't find color map \"${cmfile}\"."
+  exit 1
+fi
+
+if [[ ! -f ${TOOLPATH}/cvs2cl.pl ]]
+then
+  echo "$TOOLNAME : Can't find \"${TOOLPATH}/cvs2cl.pl\"."
+  exit 1
+fi
+
+if [[ ! -f ${TOOLPATH}/cl2html.awk ]]
+then
+  echo "$TOOLNAME : Can't find \"${TOOLPATH}/cl2html.awk\"."
   exit 1
 fi
 
