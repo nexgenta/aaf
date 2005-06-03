@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.cpp,v 1.1.2.14 2005/06/02 16:01:10 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.cpp,v 1.1.2.15 2005/06/03 18:36:08 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2116,8 +2116,42 @@ OMXMLPStoredObject::restoreEnum(OMByteArray& bytes, const OMList<OMXMLAttribute*
     }
 
     OMInt64 value = type->elementValueFromName(data);
-
-    bytes.append(reinterpret_cast<OMByte*>(&value), sizeof(OMInt64));    
+    
+    // Can't call internalSize() - no parameters - because it will go to 
+    // ImplAAFTypeDef::internalSize() which calls NativeSize() which for extensions 
+    // will try de-reference the enum element type which will fail because
+    // the OMFile::_root (RootStorable) must still be set
+    // Note also that we assume that internalSize(externalBytes, externalBytesSize)
+    // allows zero values for the parameters
+    switch (type->internalSize(0,0))
+    {
+        case 1:
+            {
+                OMInt8 internalValue = value;
+                bytes.append(reinterpret_cast<OMByte*>(&internalValue), sizeof(OMInt8));
+            }
+            break;
+        case 2:
+            {
+                OMInt16 internalValue = value;
+                bytes.append(reinterpret_cast<OMByte*>(&internalValue), sizeof(OMInt16));    
+            }
+            break;
+        case 4:
+            {
+                OMInt32 internalValue = value;
+                bytes.append(reinterpret_cast<OMByte*>(&internalValue), sizeof(OMInt32));    
+            }
+            break;
+        case 8:
+            {
+                bytes.append(reinterpret_cast<OMByte*>(&value), sizeof(OMInt64));    
+            }
+            break;
+        default:
+            ASSERT("Valid integer size", false);
+            break;
+    }
     
     if (isElementContent)
     {
