@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.40 2005/06/03 19:04:25 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.41 2005/06/03 19:40:50 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -221,7 +221,7 @@ do
   #
   if [[ ! -f $log ]]
   then
-    cvs update -C -P -A -d -D "${date}" > /dev/null
+    cvs update -C -P -A -d -D "${date}" > /dev/null 2>&1
     cvs -q log -d"${pdate}<${date}" > $log
   fi
   #
