@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.36 2005/06/03 18:48:42 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.37 2005/06/03 18:50:11 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -97,6 +97,17 @@ usage ()
 
 TOOLNAME=${0##*/}
 TOOLPATH=${0%/${TOOLNAME}}
+
+while getopts ":" opt
+do
+  case $opt in
+  \?)
+    echo "$TOOLNAME : Error Illegal option (-${OPTARG})."
+    exit
+    ;;
+  esac
+done
+shift $(($OPTIND - 1))
 
 if [[ ${#} != 2 ]]
 then
