@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.39 2005/06/03 19:00:29 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.40 2005/06/03 19:04:25 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -216,10 +216,12 @@ do
   #
   title="Log of changes made between $ptag and $tag"
   #
-  # get the raw "cvs log" output
+  # get the raw "cvs log" output, after first making a working copy
+  # corresponging to $tag/$date
   #
   if [[ ! -f $log ]]
   then
+    cvs update -C -P -A -d -D "${date}" > /dev/null
     cvs -q log -d"${pdate}<${date}" > $log
   fi
   #
