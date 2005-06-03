@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.42 2005/06/03 19:58:10 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.43 2005/06/03 20:04:31 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -92,17 +92,29 @@ writeFooter ()
 
 usage ()
 {
-  echo "$TOOLNAME : Usage : $TOOLNAME [-f -h] <tagdates> <colormap>"
+  echo "$TOOLNAME : Usage : $TOOLNAME [-v -f -h] <tagdates> <colormap>"
+}
+
+verbosePrint ()
+{
+  if [ $VERBOSE = 1 ]
+  then
+    echo "$*"
+  fi
 }
 
 TOOLNAME=${0##*/}
 TOOLPATH=${0%/${TOOLNAME}}
 
+VERBOSE=0
 FORCE=0
 
-while getopts ":fh" opt
+while getopts ":vfh" opt
 do
   case $opt in
+  v)
+    VERBOSE=1
+    ;;
   f)
     FORCE=1
     ;;
