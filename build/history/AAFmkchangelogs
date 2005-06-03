@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: AAFmkchangelogs,v 1.3 2004/02/27 14:26:16 stuart_hc Exp $ $Name:  $
+# $Id: AAFmkchangelogs,v 1.4 2005/06/03 18:45:03 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -25,4 +25,4 @@
 TOOLNAME=${0##*/}
 TOOLPATH=${0%/${TOOLNAME}}
 
-${TOOLPATH}/mkchangelogs ${TOOLPATH}/AAFtagdates ${TOOLPATH}/AAFcolormap
+${TOOLPATH}/mkchangelogs $* ${TOOLPATH}/AAFtagdates ${TOOLPATH}/AAFcolormap
