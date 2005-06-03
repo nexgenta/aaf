@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.10 2005/06/01 15:29:53 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.11 2005/06/03 13:01:57 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,13 +33,13 @@
 #define XML_MAX_MOBID_URI_SIZE                  79
 // XML_MAX_URI_SIZE = max(XML_MAX_AUID_URI_SIZE, XML_MAX_MOBID_URI_SIZE)
 #define XML_MAX_URI_SIZE                        79 
-#define XML_MAX_INTEGER_STRING_SIZE             22
+#define XML_MAX_INTEGER_STRING_SIZE             21
 #define XML_MAX_BYTE_ORDER_STRING_SIZE          13
-#define XML_MAX_TIMESTAMP_STRING_SIZE           26
-#define XML_MAX_TIMESTRUCT_STRING_SIZE          13
-#define XML_MAX_DATESTRUCT_STRING_SIZE          14
+#define XML_MAX_TIMESTAMP_STRING_SIZE           32
+#define XML_MAX_TIMESTRUCT_STRING_SIZE          17
+#define XML_MAX_DATESTRUCT_STRING_SIZE          16
 #define XML_MAX_BOOL_STRING_SIZE                6
-#define XML_MAX_RATIONAL_STRING_SIZE            23
+#define XML_MAX_RATIONAL_STRING_SIZE            24
 #define XML_MAX_VERSIONTYPE_STRING_SIZE         10
 
 
