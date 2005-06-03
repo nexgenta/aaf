@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.37 2005/06/03 18:50:11 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.38 2005/06/03 18:52:31 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -92,15 +92,19 @@ writeFooter ()
 
 usage ()
 {
-  echo "$TOOLNAME : Usage : $TOOLNAME <tagdates> <colormap>"
+  echo "$TOOLNAME : Usage : $TOOLNAME [-h] <tagdates> <colormap>"
 }
 
 TOOLNAME=${0##*/}
 TOOLPATH=${0%/${TOOLNAME}}
 
-while getopts ":" opt
+while getopts ":h" opt
 do
   case $opt in
+  h)
+    usage
+    exit 0
+    ;;
   \?)
     echo "$TOOLNAME : Error Illegal option (-${OPTARG})."
     exit
