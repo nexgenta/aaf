@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.35 2005/06/03 18:47:55 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.36 2005/06/03 18:48:42 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -101,7 +101,7 @@ TOOLPATH=${0%/${TOOLNAME}}
 if [[ ${#} != 2 ]]
 then
   echo "$TOOLNAME : Error wrong number of arguments (${#})."
-  echo "$TOOLNAME : Usage : $TOOLNAME <tagdates> <colormap>"
+  usage
   exit 1
 fi
 
