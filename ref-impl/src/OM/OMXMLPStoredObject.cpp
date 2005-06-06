@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.cpp,v 1.1.2.15 2005/06/03 18:36:08 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.cpp,v 1.1.2.16 2005/06/06 14:17:33 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2338,6 +2338,10 @@ OMXMLPStoredObject::restoreOpaque(OMByteArray& bytes, const OMList<OMXMLAttribut
     bytes.grow(externalIdentSize);
     identType.externalize(reinterpret_cast<OMByte*>(&typeId), sizeof(typeId), 
         &(bytes.bytes()[bytes.size()]), externalIdentSize, byteOrder);
+    if (byteOrder != hostByteOrder())
+    {
+        identType.reorder(&(bytes.bytes()[bytes.size()]), externalIdentSize); 
+    }
     bytes.setSize(bytes.size() + externalIdentSize);
     
     getReader()->next();
