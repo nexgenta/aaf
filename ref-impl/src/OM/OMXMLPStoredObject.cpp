@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.cpp,v 1.1.2.16 2005/06/06 14:17:33 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.cpp,v 1.1.2.17 2005/06/07 17:40:57 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -809,6 +809,10 @@ OMXMLPStoredObject::restore(OMStoredObjectIdentification& id)
         const OMList<OMXMLAttribute*>* attrs;
         getReader()->getStartElement(nmspace, localName, attrs);
         id = _store->getMetaDefId(nmspace, localName);
+        if (id == nullOMUniqueObjectIdentification)
+        {
+            throw OMException("Unknown class encountered");
+        }
     }
 }
 
