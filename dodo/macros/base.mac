@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: base.mac,v 1.18 2005/02/10 17:47:28 heydowns Exp $ $Name:  $
+#c $Id: base.mac,v 1.19 2005/06/08 15:37:06 montrowe Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 #c the License for the specific language governing rights and limitations
 #c under the License.
 #c
-#c The Original Code of this file is Copyright 1998-2004, Licensor of the
+#c The Original Code of this file is Copyright 1998-2005, Licensor of the
 #c AAF Association.
 #c
 #c The Initial Developer of the Original Code of this file and the
@@ -798,7 +798,7 @@ AD_XMETHOD1(Clone,
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: base.mac,v 1.18 2005/02/10 17:47:28 heydowns Exp $ $Name:  $
+// $Id: base.mac,v 1.19 2005/06/08 15:37:06 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -811,7 +811,7 @@ AD_XMETHOD1(Clone,
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -833,7 +833,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: base.mac,v 1.18 2005/02/10 17:47:28 heydowns Exp $ $Name:  $")
+cpp_quote("// $Id: base.mac,v 1.19 2005/06/08 15:37:06 montrowe Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \\"License\\"); You may not use this file")
@@ -846,7 +846,7 @@ cpp_quote("// basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  S
 cpp_quote("// the License for the specific language governing rights and limitations")
 cpp_quote("// under the License.")
 cpp_quote("//")
-cpp_quote("// The Original Code of this file is Copyright 1998-2004, Licensor of the")
+cpp_quote("// The Original Code of this file is Copyright 1998-2005, Licensor of the")
 cpp_quote("// AAF Association.")
 cpp_quote("//")
 cpp_quote("// The Initial Developer of the Original Code of this file and the")
