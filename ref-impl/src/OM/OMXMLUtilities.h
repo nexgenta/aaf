@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.11 2005/06/03 13:01:57 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.12 2005/06/09 13:43:00 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,12 +114,11 @@ void uint8FromString(const wchar_t* str, OMUInt8& value);
 
 
 bool stringRequiresEscaping(const wchar_t* str);
-bool characterRequiresEscaping(const wchar_t* c);
 bool characterRequiresEscaping(OMUInt32 code);
 wchar_t* escapeString(const wchar_t* str);
-wchar_t* escapeCharacter(const wchar_t* c);
+wchar_t* escapeCharacter(const wchar_t c);
 wchar_t* unescapeString(const wchar_t* str);
-wchar_t* unescapeCharacter(const wchar_t* cstr);
+wchar_t unescapeCharacter(const wchar_t* cstr);
 
 wchar_t* wideCharacterStringDup(const wchar_t* str);
 
