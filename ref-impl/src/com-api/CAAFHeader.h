@@ -1,4 +1,3 @@
-
 //@doc
 //@class    AAFHeader | Implementation class for AAFHeader
 #ifndef __CAAFHeader_h__
@@ -8,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFHeader.h,v 1.7 2005/02/10 17:49:47 heydowns Exp $ $Name:  $
+// $Id: CAAFHeader.h,v 1.8 2005/06/09 12:11:18 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,7 +20,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -207,7 +206,7 @@ public:
   //
   // RemoveMob()
   //
-  // /// Removes the given mob from the header.
+  // Removes the given mob from the header.
   ///
   /// Succeeds if all of the following are true:
   /// - the pMob pointer is valid.
@@ -265,7 +264,8 @@ public:
   //
   // IsEssenceDataPresent()
   //
-  // /// 
+  // Returns true if the essence is found.
+  ///
   /// Succeeds if all of the following are true:
   /// - the pResult pointer is valid.
   /// 
@@ -354,7 +354,7 @@ public:
   //
   // RemoveEssenceData()
   //
-  // /// Removes the given EssenceData from the header.
+  // Removes the given EssenceData from the header.
   ///
   /// Succeeds if all of the following are true:
   /// - the pEssenceData pointer is valid.
@@ -535,7 +535,7 @@ public:
   //
   // GetIdentifications()
   //
-  // Places an enumerator for all Identifications criteria into	the
+  // Places an enumerator for all Identifications criteria into the
   /// *ppEnum argument.  The returned enumerator is AddRef()ed before
   /// it is returned.
   /// 
@@ -728,6 +728,7 @@ public:
   STDMETHOD (GetContentStorage) (
     // Returned Content Storage object 
     /*[out]*/ IAAFContentStorage ** ppStorage);
+
 
 
   //***********************************************************
@@ -1016,7 +1017,8 @@ public:
   //
   // DESCRIPTION:
   // @mfunc AAFRESULT | AAFHeader2 | IsEssenceContainerPresent |
-  // ///
+  // Returns true if the essence container is present.
+  ///
   /// Succeeds if all of the following are true:
   /// - the pIsPresent pointer is valid.
   /// - the EssenceContainers property is present
@@ -1128,7 +1130,9 @@ public:
   //
   // DESCRIPTION:
   // @mfunc AAFRESULT | AAFHeader2 | IsDescriptiveSchemePresent |
-  // ///
+  // Returns true if the descriptive scheme ID is present.
+  ///
+  ///
   /// Succeeds if all of the following are true:
   /// - the pIsPresent pointer is valid;
   /// - the DescriptiveSchemes property is present
