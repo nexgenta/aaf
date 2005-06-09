@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSymbolspace.h,v 1.1.2.8 2005/05/26 17:04:01 philipn Exp $ $Name:  $
+// $Id: OMSymbolspace.h,v 1.1.2.9 2005/06/09 13:48:03 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,6 +89,7 @@ public:
     void addPropertyDef(OMClassDefinition* classDef, OMPropertyDefinition* propertyDef);
     void addExtEnumExtension(OMUniqueObjectIdentification id, const wchar_t* name,
         OMUniqueObjectIdentification value);
+    void addExtEnumValue(OMUniqueObjectIdentification id, OMUniqueObjectIdentification value);
     
     void save();
     void restore(OMDictionary* dictionary);
