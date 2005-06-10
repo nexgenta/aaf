@@ -1,8 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFSegment
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFComponentTest.cpp,v 1.34 2005/06/02 21:23:56 greek_fire Exp $ $Name:  $
+// $Id: CAAFComponentTest.cpp,v 1.35 2005/06/10 21:12:41 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the

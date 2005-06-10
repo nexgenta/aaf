@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.12 2005/03/19 20:16:17 terabrit Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.13 2005/06/10 21:13:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -768,6 +768,10 @@ const aafUID_t kAAFPropID_PCMDescriptor_PeakEnvelopeTimestamp =
 //{04020301-0e00-0000-060e-2b3401010108}
 const aafUID_t kAAFPropID_PCMDescriptor_PeakEnvelopeData =
 {0x04020301, 0x0e00, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x08}};
+
+//{06010104-060b-0000-060e-2b3401010104}
+const aafUID_t kAAFPropID_MultipleDescriptor_FileDescriptors =
+{0x06010104, 0x060b, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
 
 //{05020103-0101-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_TIFFDescriptor_IsUniform =

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.18 2005/03/19 20:16:17 terabrit Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.19 2005/06/10 21:13:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -140,6 +140,22 @@ const aafUID_t kAAFTypeID_FieldNumber =
 //{02010122-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_ElectroSpatialFormulation =
 {0x02010122, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{02010123-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_EmphasisType =
+{0x02010123, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{02010124-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_AuxBitsModeType =
+{0x02010124, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{02010125-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_ChannelStatusModeType =
+{0x02010125, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{02010126-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_UserDataModeType =
+{0x02010126, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{02010127-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_SignalStandardType =
@@ -409,6 +425,10 @@ const aafUID_t kAAFTypeID_TypeDefinitionStrongReference =
 const aafUID_t kAAFTypeID_KLVDataStrongReference =
 {0x05021c00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
+//{05021d00-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_FileDescriptorStrongReference =
+{0x05021d00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
 //{05021f00-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_DescriptiveFrameworkStrongReference =
 {0x05021f00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
@@ -516,6 +536,10 @@ const aafUID_t kAAFTypeID_KLVDataStrongReferenceVector =
 //{05060a00-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_ParameterStrongReferenceVector =
 {0x05060a00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{05060b00-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_FileDescriptorStrongReferenceVector =
+{0x05060b00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{05010100-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_ClassDefinitionWeakReference =

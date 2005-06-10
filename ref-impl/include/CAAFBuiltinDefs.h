@@ -2,7 +2,7 @@
 #define __CAAFBuiltinDefs_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBuiltinDefs.h,v 1.4 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
+// $Id: CAAFBuiltinDefs.h,v 1.5 2005/06/10 21:13:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -187,6 +187,7 @@ public:
   CLASS_DEF_METHOD(MasterMob);
   CLASS_DEF_METHOD(Mob);
   CLASS_DEF_METHOD(MobSlot);
+  CLASS_DEF_METHOD(MultipleDescriptor);
   CLASS_DEF_METHOD(NestedScope);
   CLASS_DEF_METHOD(NetworkLocator);
   CLASS_DEF_METHOD(OperationDef);

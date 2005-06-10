@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCLSIDs.h,v 1.6 2005/06/09 12:11:17 montrowe Exp $ $Name:  $
+// $Id: AAFCLSIDs.h,v 1.7 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,6 +49,7 @@ EXTERN_C const CLSID CLSID_AAFWeakRefArrayValue;
 EXTERN_C const CLSID CLSID_AAFWeakRefSetValue;
 EXTERN_C const CLSID CLSID_AAFWeakRefValue;
 EXTERN_C const CLSID CLSID_EnumAAFStorablePropVals;
+EXTERN_C const CLSID CLSID_AAFAES3PCMDescriptor;
 EXTERN_C const CLSID CLSID_AAFAIFCDescriptor;
 EXTERN_C const CLSID CLSID_AAFAuxiliaryDescriptor;
 EXTERN_C const CLSID CLSID_AAFCDCIDescriptor;
@@ -93,6 +94,7 @@ EXTERN_C const CLSID CLSID_AAFMasterMob;
 EXTERN_C const CLSID CLSID_AAFMetaDefinition;
 EXTERN_C const CLSID CLSID_AAFMob;
 EXTERN_C const CLSID CLSID_AAFMobSlot;
+EXTERN_C const CLSID CLSID_AAFMultipleDescriptor;
 EXTERN_C const CLSID CLSID_AAFNestedScope;
 EXTERN_C const CLSID CLSID_AAFNetworkLocator;
 EXTERN_C const CLSID CLSID_AAFObject;

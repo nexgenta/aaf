@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.6 2005/06/09 12:11:17 montrowe Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.7 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,6 +46,7 @@
 #include "CAAFWeakRefSetValue.h"
 #include "CAAFWeakRefValue.h"
 #include "CEnumAAFStorablePropVals.h"
+#include "CAAFAES3PCMDescriptor.h"
 #include "CAAFAIFCDescriptor.h"
 #include "CAAFAuxiliaryDescriptor.h"
 #include "CAAFCDCIDescriptor.h"
@@ -90,6 +91,7 @@
 #include "CAAFMetaDefinition.h"
 #include "CAAFMob.h"
 #include "CAAFMobSlot.h"
+#include "CAAFMultipleDescriptor.h"
 #include "CAAFNestedScope.h"
 #include "CAAFNetworkLocator.h"
 #include "CAAFObject.h"

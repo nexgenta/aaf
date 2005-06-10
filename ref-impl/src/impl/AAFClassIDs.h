@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.5 2005/06/09 12:11:21 montrowe Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.6 2005/06/10 21:12:41 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,7 @@ extern "C" const aafClassID_t CLSID_AAFWeakRefArrayValue;
 extern "C" const aafClassID_t CLSID_AAFWeakRefSetValue;
 extern "C" const aafClassID_t CLSID_AAFWeakRefValue;
 extern "C" const aafClassID_t CLSID_EnumAAFStorablePropVals;
+extern "C" const aafClassID_t CLSID_AAFAES3PCMDescriptor;
 extern "C" const aafClassID_t CLSID_AAFAIFCDescriptor;
 extern "C" const aafClassID_t CLSID_AAFAuxiliaryDescriptor;
 extern "C" const aafClassID_t CLSID_AAFCDCIDescriptor;
@@ -94,6 +95,7 @@ extern "C" const aafClassID_t CLSID_AAFMasterMob;
 extern "C" const aafClassID_t CLSID_AAFMetaDefinition;
 extern "C" const aafClassID_t CLSID_AAFMob;
 extern "C" const aafClassID_t CLSID_AAFMobSlot;
+extern "C" const aafClassID_t CLSID_AAFMultipleDescriptor;
 extern "C" const aafClassID_t CLSID_AAFNestedScope;
 extern "C" const aafClassID_t CLSID_AAFNetworkLocator;
 extern "C" const aafClassID_t CLSID_AAFObject;

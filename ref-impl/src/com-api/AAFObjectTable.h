@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.6 2005/06/09 12:11:17 montrowe Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.7 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,6 +68,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_PRIVATE_OBJECT_ENTRY(AAFWeakRefSetValue)
 	AAF_PRIVATE_OBJECT_ENTRY(AAFWeakRefValue)
 	AAF_PRIVATE_OBJECT_ENTRY(EnumAAFStorablePropVals)
+	AAF_OBJECT_ENTRY(AAFAES3PCMDescriptor)
 	AAF_OBJECT_ENTRY(AAFAIFCDescriptor)
 	AAF_OBJECT_ENTRY(AAFAuxiliaryDescriptor)
 	AAF_OBJECT_ENTRY(AAFCDCIDescriptor)
@@ -112,6 +113,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFMetaDefinition)
 	AAF_OBJECT_ENTRY(AAFMob)
 	AAF_OBJECT_ENTRY(AAFMobSlot)
+	AAF_OBJECT_ENTRY(AAFMultipleDescriptor)
 	AAF_OBJECT_ENTRY(AAFNestedScope)
 	AAF_OBJECT_ENTRY(AAFNetworkLocator)
 	AAF_OBJECT_ENTRY(AAFObject)

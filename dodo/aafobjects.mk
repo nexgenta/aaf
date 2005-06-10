@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.153 2005/06/08 15:37:06 montrowe Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.154 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -55,6 +55,7 @@ AAFCOMINTERFACESONLY="\
 # its name here and remove it from either list above where it occurs.
 # Do not add the 'Impl'prefix here.
 HUMAN_TYPED_IMPL="\
+	AAFAES3PCMDescriptor \
 	AAFAIFCDescriptor \
 	AAFAuxiliaryDescriptor \
 	AAFCDCIDescriptor \
@@ -99,6 +100,7 @@ HUMAN_TYPED_IMPL="\
 	AAFMetaDefinition \
 	AAFMob  \
 	AAFMobSlot \
+	AAFMultipleDescriptor \
 	AAFNestedScope\
 	AAFNetworkLocator \
 	AAFObject \

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.17 2005/03/19 20:16:17 terabrit Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.18 2005/06/10 21:13:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -224,6 +224,7 @@ const int PID_PCMDescriptor_PeakFrames                           = 0x3D2E;
 const int PID_PCMDescriptor_PeakOfPeaksPosition                  = 0x3D2F;
 const int PID_PCMDescriptor_PeakEnvelopeTimestamp                = 0x3D30;
 const int PID_PCMDescriptor_PeakEnvelopeData                     = 0x3D31;
+const int PID_MultipleDescriptor_FileDescriptors                 = 0x3F01;
 const int PID_TIFFDescriptor_IsUniform                           = 0x3701;
 const int PID_TIFFDescriptor_IsContiguous                        = 0x3702;
 const int PID_TIFFDescriptor_LeadingLines                        = 0x3703;
