@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMultipleDescriptorTest.cpp,v 1.1 2005/06/10 21:12:41 montrowe Exp $ $Name:  $
+// $Id: CAAFMultipleDescriptorTest.cpp,v 1.2 2005/06/13 14:36:03 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,6 +29,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 using namespace std;
 
 #include "AAFResult.h"
