@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFMetaDictionary.h,v 1.116 2005/06/10 21:13:30 montrowe Exp $ $Name:  $
+// $Id: AAFMetaDictionary.h,v 1.117 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +15,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -48,7 +48,7 @@
 //
 // AAFMetaDict.csv 
 //
-// This file was generated on Fri Jun 10 13:28:12 EDT 2005
+// This file was generated on Tue Jun 14 10:56:48 EDT 2005
 // by user pmontrow on system tjb.global.avidww.com.
 //
 // Key to macros.

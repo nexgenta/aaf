@@ -2,7 +2,7 @@
 #define __headerGenUtils_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: headerGenUtils.h,v 1.14 2005/03/18 16:09:08 terabrit Exp $ $Name:  $
+// $Id: headerGenUtils.h,v 1.15 2005/06/14 20:26:29 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +15,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -28,7 +28,7 @@
 // implementation by Bob Tillman.
 
 
-#include "AAFTypes.h"
+#include "headerGenTypes.h"
 
 #include <iostream>
 using namespace std;
@@ -47,17 +47,17 @@ void validateArgs(int argc, char** argv, char*& moduleName, char*& prefix);
 // print a GUID like this -
 //{0x0D010101, 0x0101, 0x0100,
 //{0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01}}
-void print(const aafUID_t& id, ostream& s);
+void print(const uid& id, ostream& s);
 
 // print a GUID like this -
 //{0101010D-0101-0100-060E-2B3402060101}
-void printReg(const aafUID_t& id, ostream& s);
+void printReg(const uid& id, ostream& s);
 
 void printDefinition(const char* type,
                      const char* prefix,
                      const char* name,
                      size_t width,
-                     const aafUID_t& identifier,
+                     const uid& identifier,
                      ostream& s);
 
 void printDefinition(const char* type,
@@ -86,7 +86,7 @@ void printAlias(	 const char* type,
 void printMacroInvocation(const char* prefix,
                           const char* macro,
                           const char* name,
-                          const aafUID_t& identifier,
+                          const uid& identifier,
                           ostream& s);
 
 void printName(const char* name,
