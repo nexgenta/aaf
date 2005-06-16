@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.9 2005/03/21 15:23:11 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.10 2005/06/16 13:38:20 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -571,7 +571,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	plugin_trace("CAAFPCMCodec::CountChannels()\n");
 
-	if(EqualAUID(&essenceKind, &DDEF_Sound)
+	if(EqualAUID(&essenceKind, &kAAFDataDef_Sound)
 		|| EqualAUID(&essenceKind, &kAAFDataDef_LegacySound))
 	{
 		if(_stream == NULL)
