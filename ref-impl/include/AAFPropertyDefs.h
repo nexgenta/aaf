@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.14 2005/06/14 20:27:52 montrowe Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.15 2005/06/17 23:19:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -504,6 +504,34 @@ const aafUID_t kAAFPropID_FileDescriptor_ContainerFormat =
 //{06010104-0103-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_FileDescriptor_CodecDefinition =
 {0x06010104, 0x0103, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{04020501-0600-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_AES3PCMDescriptor_Emphasis =
+{0x04020501, 0x0600, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04020302-0300-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_AES3PCMDescriptor_BlockStartOffset =
+{0x04020302, 0x0300, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04020501-0100-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_AES3PCMDescriptor_AuxBitsMode =
+{0x04020501, 0x0100, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04020501-0200-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_AES3PCMDescriptor_ChannelStatusMode =
+{0x04020501, 0x0200, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04020501-0300-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_AES3PCMDescriptor_FixedChannelStatusData =
+{0x04020501, 0x0300, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04020501-0400-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_AES3PCMDescriptor_UserDataMode =
+{0x04020501, 0x0400, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
+
+//{04020501-0500-0000-060e-2b3401010105}
+const aafUID_t kAAFPropID_AES3PCMDescriptor_FixedUserData =
+{0x04020501, 0x0500, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
 
 //{03030302-0200-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_AIFCDescriptor_Summary =

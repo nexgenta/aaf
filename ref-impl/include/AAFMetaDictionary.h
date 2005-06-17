@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFMetaDictionary.h,v 1.117 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
+// $Id: AAFMetaDictionary.h,v 1.118 2005/06/17 23:19:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,8 +48,8 @@
 //
 // AAFMetaDict.csv 
 //
-// This file was generated on Tue Jun 14 10:56:48 EDT 2005
-// by user pmontrow on system tjb.global.avidww.com.
+// This file was generated on Fri Jun 17 18:27:19 EST 2005
+// by user akharkev on system akharkevichxp2.
 //
 // Key to macros.
 //
@@ -2609,6 +2609,94 @@ AAF_CLASS_END(FileDescriptor,
     0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01),
   EssenceDescriptor,
   false)
+AAF_CLASS_SEPARATOR()
+
+// AES3PCMDescriptor
+//
+AAF_CLASS(AES3PCMDescriptor,
+  // {0D010101-0101-4700-060E-2B3402060101}
+  AAF_LITERAL_AUID(0x0D010101,
+    0x0101, 0x4700,
+    0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01),
+  PCMDescriptor,
+  true)
+  AAF_PROPERTY(Emphasis,
+    // {04020501-0600-0000-060E-2B3401010105}
+    AAF_LITERAL_AUID(0x04020501,
+      0x0600, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x05),
+    0x3d0d,
+    AAF_TYPE(EmphasisType),
+    false,
+    false,
+    AES3PCMDescriptor)
+  AAF_PROPERTY(BlockStartOffset,
+    // {04020302-0300-0000-060E-2B3401010105}
+    AAF_LITERAL_AUID(0x04020302,
+      0x0300, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x05),
+    0x3d0f,
+    AAF_TYPE(UInt16),
+    false,
+    false,
+    AES3PCMDescriptor)
+  AAF_PROPERTY(AuxBitsMode,
+    // {04020501-0100-0000-060E-2B3401010105}
+    AAF_LITERAL_AUID(0x04020501,
+      0x0100, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x05),
+    0x3d08,
+    AAF_TYPE(AuxBitsModeType),
+    false,
+    false,
+    AES3PCMDescriptor)
+  AAF_PROPERTY(ChannelStatusMode,
+    // {04020501-0200-0000-060E-2B3401010105}
+    AAF_LITERAL_AUID(0x04020501,
+      0x0200, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x05),
+    0x3d10,
+    AAF_TYPE(ChannelStatusModeType),
+    false,
+    false,
+    AES3PCMDescriptor)
+  AAF_PROPERTY(FixedChannelStatusData,
+    // {04020501-0300-0000-060E-2B3401010105}
+    AAF_LITERAL_AUID(0x04020501,
+      0x0300, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x05),
+    0x3d11,
+    AAF_TYPE(UInt8Array),
+    false,
+    false,
+    AES3PCMDescriptor)
+  AAF_PROPERTY(UserDataMode,
+    // {04020501-0400-0000-060E-2B3401010105}
+    AAF_LITERAL_AUID(0x04020501,
+      0x0400, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x05),
+    0x3d12,
+    AAF_TYPE(UserDataModeType),
+    false,
+    false,
+    AES3PCMDescriptor)
+  AAF_PROPERTY(FixedUserData,
+    // {04020501-0500-0000-060E-2B3401010105}
+    AAF_LITERAL_AUID(0x04020501,
+      0x0500, 0x0000,
+      0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x05),
+    0x3d13,
+    AAF_TYPE(UInt8Array),
+    false,
+    false,
+    AES3PCMDescriptor)
+AAF_CLASS_END(AES3PCMDescriptor,
+  // {0D010101-0101-4700-060E-2B3402060101}
+  AAF_LITERAL_AUID(0x0D010101,
+    0x0101, 0x4700,
+    0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01),
+  PCMDescriptor,
+  true)
 AAF_CLASS_SEPARATOR()
 
 // AIFCDescriptor

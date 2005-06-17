@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassDefUIDs.h,v 1.16 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
+// $Id: AAFClassDefUIDs.h,v 1.17 2005/06/17 23:19:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -232,6 +232,10 @@ const aafUID_t kAAFClassID_EssenceDescriptor =
 //{0d010101-0101-2500-060e-2b3402060101}
 const aafUID_t kAAFClassID_FileDescriptor =
 {0x0d010101, 0x0101, 0x2500, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
+
+//{0d010101-0101-4700-060e-2b3402060101}
+const aafUID_t kAAFClassID_AES3PCMDescriptor =
+{0x0d010101, 0x0101, 0x4700, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
 
 //{0d010101-0101-2600-060e-2b3402060101}
 const aafUID_t kAAFClassID_AIFCDescriptor =

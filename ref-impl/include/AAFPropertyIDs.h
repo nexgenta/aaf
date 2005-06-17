@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.19 2005/06/14 20:27:52 montrowe Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.20 2005/06/17 23:19:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -158,6 +158,13 @@ const int PID_FileDescriptor_SampleRate                          = 0x3001;
 const int PID_FileDescriptor_Length                              = 0x3002;
 const int PID_FileDescriptor_ContainerFormat                     = 0x3004;
 const int PID_FileDescriptor_CodecDefinition                     = 0x3005;
+const int PID_AES3PCMDescriptor_Emphasis                         = 0x3D0D;
+const int PID_AES3PCMDescriptor_BlockStartOffset                 = 0x3D0F;
+const int PID_AES3PCMDescriptor_AuxBitsMode                      = 0x3D08;
+const int PID_AES3PCMDescriptor_ChannelStatusMode                = 0x3D10;
+const int PID_AES3PCMDescriptor_FixedChannelStatusData           = 0x3D11;
+const int PID_AES3PCMDescriptor_UserDataMode                     = 0x3D12;
+const int PID_AES3PCMDescriptor_FixedUserData                    = 0x3D13;
 const int PID_AIFCDescriptor_Summary                             = 0x3101;
 const int PID_DigitalImageDescriptor_Compression                 = 0x3201;
 const int PID_DigitalImageDescriptor_StoredHeight                = 0x3202;
