@@ -964,7 +964,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.12 2005/06/13 14:35:57 montrowe Exp $ $Name:  $
+// $Id: AAF.h,v 1.13 2005/06/22 21:57:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

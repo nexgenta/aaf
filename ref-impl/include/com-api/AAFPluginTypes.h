@@ -42,7 +42,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPluginTypes.h,v 1.4 2005/06/13 14:36:02 montrowe Exp $ $Name:  $
+// $Id: AAFPluginTypes.h,v 1.5 2005/06/22 21:58:13 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
