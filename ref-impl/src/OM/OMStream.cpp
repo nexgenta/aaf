@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStream.cpp,v 1.11 2005/03/30 20:42:51 bakerian Exp $ $Name:  $
+// $Id: OMStream.cpp,v 1.9.4.1 2005/06/27 11:14:07 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -138,7 +138,6 @@ void OMStream::read(OMByte* bytes,
   ASSERT("Successful read", ferror(_file) == 0);
 
   bytesRead = actualByteCount;
-  POSTCONDITION("All bytes read", actualByteCount == byteCount);
 }
 
 void OMStream::write(const OMByte* bytes,
@@ -156,51 +155,24 @@ void OMStream::write(const OMByte* bytes,
   POSTCONDITION("All bytes written", actualByteCount == byteCount);
 }
 
-
-
-
-OMUInt64 OMStream::size(void) const
+OMUInt64 OMStream::size(void) 
 {
-TRACE("OMStream::size");
+  TRACE("OMStream::size");
   PRECONDITION("No error on stream", ferror(_file) == 0);
-	// where are we now?
-	OMUInt64 oldposition = position();
 
-	// seek to end
-  errno = 0;
-
-#if defined( OM_OS_UNIX )
-
-	// all POSIX-compliant
-	int status = fseeko64( _file, (__off64_t)0, SEEK_END);
-  
-#elif defined( OM_OS_WINDOWS )
-
-	// we have to rely upon fseek( _file, 0, SEEK_END ) to do the right thing
-  int status = fseek(_file, 0L, SEEK_END);
-  //ASSERT("Successful seek", status == 0);
-
-#else
-
-	// have to be regular ISO
-  int status = fseek(_file, 0L, SEEK_END);
-  //ASSERT("Successful seek", status == 0);
-
+  struct stat fileStat;
+  fflush( _file );
+#if defined(OM_DEBUG)
+  OMInt64 status =
 #endif
-  ASSERT("Successful seek", status == 0);
+  fstat( fileno( _file ), &fileStat );
+  ASSERT( "Successful fstat", status == 0 );
+  OMUInt64 result = fileStat.st_size;
 
-	// where is the end?
-	OMUInt64 result = position();
-
-	// back to where we started from
-	OMStream* nonConstThis = const_cast<OMStream*>(this);
-	nonConstThis->setPosition( oldposition );
-
-	return result;
+  return result;
 }
 
-
-void OMStream::setSize(OMUInt64 newSize) 
+void OMStream::setSize(OMUInt64 newSize)
 {
   TRACE("OMStream::setSize");
   PRECONDITION("Stream is writable", isWritable());
