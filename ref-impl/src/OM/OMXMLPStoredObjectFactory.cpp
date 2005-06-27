@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObjectFactory.cpp,v 1.1.2.5 2005/06/01 15:31:37 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObjectFactory.cpp,v 1.1.2.6 2005/06/27 11:17:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -210,11 +210,12 @@ OMXMLPStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
   PRECONDITION("Positionable raw storage", rawStorage->isPositionable());
 
   bool isRecog = false;
+  OMXMLReader* reader = 0;
   try
   {
-    OMXMLReader reader(rawStorage);
-    if (reader.nextElement() &&
-          reader.elementEquals(OMSymbolspace::getBaselineURI(), L"AAF"))
+    reader = OMXMLReader::create(rawStorage);
+    if (reader->nextElement() &&
+          reader->elementEquals(OMSymbolspace::getBaselineURI(), L"AAF"))
     {
         isRecog = true;
     }
@@ -222,6 +223,11 @@ OMXMLPStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
   catch (...)
   {}
 
+  if (reader != 0)
+  {
+    delete reader;
+  }
+  
   rawStorage->setPosition(0);
   
   return isRecog;
