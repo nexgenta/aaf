@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.cpp,v 1.1.2.20 2005/06/28 09:35:40 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.cpp,v 1.1.2.21 2005/06/28 11:15:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2125,13 +2125,13 @@ OMXMLPStoredObject::restoreEnum(OMByteArray& bytes, const OMList<OMXMLAttribute*
             break;
         case 2:
             {
-                OMInt16 internalValue = (OMInt8)value;
+                OMInt16 internalValue = (OMInt16)value;
                 bytes.append(reinterpret_cast<OMByte*>(&internalValue), sizeof(OMInt16));    
             }
             break;
         case 4:
             {
-                OMInt32 internalValue = (OMInt8)value;
+                OMInt32 internalValue = (OMInt32)value;
                 bytes.append(reinterpret_cast<OMByte*>(&internalValue), sizeof(OMInt32));    
             }
             break;
