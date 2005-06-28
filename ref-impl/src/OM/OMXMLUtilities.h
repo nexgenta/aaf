@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.12 2005/06/09 13:43:00 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.13 2005/06/28 09:33:51 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -123,6 +123,7 @@ wchar_t unescapeCharacter(const wchar_t* cstr);
 wchar_t* wideCharacterStringDup(const wchar_t* str);
 
 bool fileExists(const wchar_t* fileName);
+int wmkdir(const wchar_t* dirpath);
 
 bool isRelativePath(const wchar_t* filepath);
 bool isFileURL(const wchar_t* uri);

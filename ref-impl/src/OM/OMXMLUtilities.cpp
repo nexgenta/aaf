@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.cpp,v 1.1.2.12 2005/06/27 11:17:12 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.cpp,v 1.1.2.13 2005/06/28 09:33:51 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,13 @@
 #include "OMExceptions.h"
 #include "OMAssertions.h"
 #include "wchar.h"
+
+// includes for function wmkdir()
+#if defined(_MSC_VER)
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#endif
 
 
 
@@ -1690,12 +1697,25 @@ fileExists(const wchar_t* fileName)
     return true;
 }
 
+int 
+wmkdir(const wchar_t* dirpath)
+{
+    char* u8Dirpath = utf16ToUTF8(dirpath);
+#if defined(_MSC_VER)
+    int status = _mkdir(u8Dirpath);
+#else
+    int status = mkdir(u8Dirpath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
+    delete [] u8Dirpath;
+    
+    return status;
+}
 
 bool 
 isRelativePath(const wchar_t* filepath)
 {
 #ifdef _WIN32
-    // check if the path starts with a drive letter, i.e. xxx:
+    // check if the path starts with a drive letter, i.e. x:
     const wchar_t* pathPtr = filepath;
     while (*pathPtr != 0 && *pathPtr != L'\\' && *pathPtr != L'/' && *pathPtr != L':')
     {
