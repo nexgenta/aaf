@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStorage.h,v 1.1.2.9 2005/06/01 15:30:41 philipn Exp $ $Name:  $
+// $Id: OMXMLStorage.h,v 1.1.2.10 2005/06/28 09:38:55 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -86,8 +86,8 @@ public:
     const wchar_t* getDataStreamEntityValue(const wchar_t* name);
     bool registerDataStreamNotation(const wchar_t* notationName, const wchar_t* systemId);
     
-    OMRawStorage* openExistingDataStream(const wchar_t* fileName);
-    OMRawStorage* openNewDataStream(const wchar_t* fileName);
+    OMRawStorage* openExistingDataStream(const wchar_t* uri);
+    OMRawStorage* openNewDataStream(const wchar_t* uri);
     
     void forwardObjectSetId(const wchar_t* id);
     bool haveForwardedObjectSetId();
