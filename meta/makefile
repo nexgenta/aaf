@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: makefile,v 1.5 2005/06/14 20:26:27 montrowe Exp $ $Name:  $
+# $Id: makefile,v 1.6 2005/06/29 14:43:32 montrowe Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,7 @@ INSTALL_DIR=../ref-impl/include
 
 all : AAFMetaDictionary.h
 
-AAFMetaDict.csv : AAFMetaDict.xls 
+AAFMetaDict.csv : AAFMetaDict.xls
 	@$(ECHO) "1) Save the new .xls file as a .csv file"
 	@$(ECHO) "   Choose File/Save As ..."
 	@$(ECHO) "   File name: AAFMetaDict.csv"

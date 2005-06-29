@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extEnumUid.cpp,v 1.13 2005/06/14 20:26:28 montrowe Exp $ $Name:  $
+// $Id: extEnumUid.cpp,v 1.14 2005/06/29 14:43:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -88,5 +88,5 @@ int main (int argc, char ** argv)
   validateArgs (argc, argv, moduleName);
   assert (moduleName);
   doFile (moduleName);
-  return 0;
+  return EXIT_SUCCESS;
 }
