@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.h,v 1.11.6.4 2005/05/19 12:58:26 philipn Exp $ $Name:  $
+// $Id: OMDictionary.h,v 1.11.6.5 2005/07/01 15:42:08 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -80,8 +80,8 @@ public:
   virtual int registerExtPropertyDef(const OMUniqueObjectIdentification& classId, 
     OMPropertyDefinition* propertyDef) = 0;
   virtual int registerExtTypeDef(OMType* typeDef) = 0;
-  virtual bool registerExtEnumExt(OMUniqueObjectIdentification typeId,
-    OMVector<const wchar_t*>& names, OMVector<OMUniqueObjectIdentification>& values) = 0;
+  virtual bool registerExtEnumElement(OMUniqueObjectIdentification elementOf,
+    const wchar_t* name, OMUniqueObjectIdentification value) = 0;
   
 private:
 

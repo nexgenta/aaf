@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.25.2.4 2005/05/19 13:02:25 philipn Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.25.2.5 2005/07/01 15:43:05 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -122,8 +122,8 @@ public:
   virtual int registerExtPropertyDef(const OMUniqueObjectIdentification& classId, 
     OMPropertyDefinition* propertyDef);
   virtual int registerExtTypeDef(OMType* typeDef);
-  virtual bool registerExtEnumExt(OMUniqueObjectIdentification typeId,
-    OMVector<const wchar_t*>& names, OMVector<OMUniqueObjectIdentification>& values);
+  virtual bool registerExtEnumElement(OMUniqueObjectIdentification elementOf,
+    const wchar_t* name, OMUniqueObjectIdentification value);
   
 
   

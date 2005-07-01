@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.4 2005/05/19 13:02:25 philipn Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.33.2.5 2005/07/01 15:43:06 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -366,12 +366,12 @@ int ImplAAFMetaDictionary::registerExtTypeDef(OMType* typeDef)
     }
 }
 
-bool ImplAAFMetaDictionary::registerExtEnumExt(OMUniqueObjectIdentification typeId,
-    OMVector<const wchar_t*>& names, OMVector<OMUniqueObjectIdentification>& values)
+bool ImplAAFMetaDictionary::registerExtEnumElement(OMUniqueObjectIdentification elementOf,
+    const wchar_t* name, OMUniqueObjectIdentification value)
 {
     ImplAAFTypeDef* pTypeDef;
     HRESULT hresult = dataDictionary()->LookupTypeDef(*(reinterpret_cast<const aafUID_t*>(
-        &typeId)), &pTypeDef);
+        &elementOf)), &pTypeDef);
     if (!AAFRESULT_SUCCEEDED(hresult))
     {
         return false;
@@ -381,7 +381,7 @@ bool ImplAAFMetaDictionary::registerExtEnumExt(OMUniqueObjectIdentification type
     ImplAAFTypeDefExtEnum* pTypeDefExtEnum = dynamic_cast<ImplAAFTypeDefExtEnum*>(pTypeDef);
     if (pTypeDefExtEnum != 0)
     {
-        result = pTypeDefExtEnum->registerExtensions(names, values);
+        result = pTypeDefExtEnum->registerElement(name, value);
     }
     pTypeDef->ReleaseReference();
 
