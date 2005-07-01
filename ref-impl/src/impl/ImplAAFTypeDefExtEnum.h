@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefExtEnum.h,v 1.23.2.3 2005/05/19 13:04:08 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefExtEnum.h,v 1.23.2.4 2005/07/01 15:43:39 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -255,13 +255,11 @@ public:
     virtual OMUniqueObjectIdentification elementValueFromName(const wchar_t* name) const;
     
     virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
-        const wchar_t* description, OMVector<wchar_t*>& elementNames, 
-        OMVector<OMUniqueObjectIdentification>& elementValues);
+        const wchar_t* description);
 
     virtual bool isValidValue(OMUniqueObjectIdentification value) const;
     
-    virtual bool registerExtensions(OMVector<const wchar_t*>& names, 
-        OMVector<OMUniqueObjectIdentification>& values);
+    virtual bool registerElement(const wchar_t* name, OMUniqueObjectIdentification value);
         
 private:
 	// names of elements in this record; stored as single wchar_t array

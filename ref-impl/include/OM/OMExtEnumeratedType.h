@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMExtEnumeratedType.h,v 1.1.2.3 2005/05/19 12:58:57 philipn Exp $ $Name:  $
+// $Id: OMExtEnumeratedType.h,v 1.1.2.4 2005/07/01 15:41:37 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,10 +37,8 @@ public:
     virtual wchar_t* elementNameFromValue(OMUniqueObjectIdentification value) const = 0;
     virtual OMUniqueObjectIdentification elementValueFromName(const wchar_t* name) const = 0;
     virtual bool initialise(const OMUniqueObjectIdentification& id, const wchar_t* name,
-        const wchar_t* description, OMVector<wchar_t*>& elementNames, 
-        OMVector<OMUniqueObjectIdentification>& elementValues) = 0;
-    virtual bool registerExtensions(OMVector<const wchar_t*>& names, 
-        OMVector<OMUniqueObjectIdentification>& values) = 0;
+        const wchar_t* description) = 0;
+    virtual bool registerElement(const wchar_t* name, OMUniqueObjectIdentification value) = 0;
     
     // only defined and used because converting from older files does not handle
     // extendible enumerations properly
