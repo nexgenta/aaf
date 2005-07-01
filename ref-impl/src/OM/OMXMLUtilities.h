@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.1.2.13 2005/06/28 09:33:51 philipn Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.1.2.14 2005/07/01 15:40:43 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -78,8 +78,9 @@ OMUInt32 codePoint(const wchar_t* u16Code);
 void auidToURI(OMUniqueObjectIdentification id, wchar_t* uri);
 void mobIdToURI(OMMaterialIdentification mobId, wchar_t* uri);
 
-bool isAUIDURI(const wchar_t* uri);
-bool isUMIDURI(const wchar_t* uri);
+bool isQSymbol(const wchar_t* str);
+bool isAUIDURI(const wchar_t* str);
+bool isUMIDURI(const wchar_t* str);
 void uriToAUID(const wchar_t* uri, OMUniqueObjectIdentification* id);
 void uriToMobId(const wchar_t* uri, OMMaterialIdentification* mobId);
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStorage.h,v 1.1.2.10 2005/06/28 09:38:55 philipn Exp $ $Name:  $
+// $Id: OMXMLStorage.h,v 1.1.2.11 2005/07/01 15:40:32 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,26 @@
 #include "OMWString.h"
 #include "OMSet.h"
 #include "OMDataStreamProperty.h"
+#include "OMByteArray.h"
 
+
+class OMQSymbolMap
+{
+public:
+    OMQSymbolMap();
+    ~OMQSymbolMap();
+    
+    void addQSymbol(OMUniqueObjectIdentification id, const wchar_t* qSymbol);
+    void addQSymbol(OMUniqueObjectIdentification id, const wchar_t* symbolspace,
+        const wchar_t* symbol);
+    
+    OMUniqueObjectIdentification getId(const wchar_t* qSymbol) const;
+    const wchar_t* getQSymbol(OMUniqueObjectIdentification id) const;
+    
+private:
+    OMSet<OMUniqueObjectIdentification, OMWString> _idToQSymbol;
+    OMSet<OMWString, OMUniqueObjectIdentification> _qSymbolToId;    
+};
 
 
 class OMXMLStorage
@@ -58,6 +77,10 @@ public:
     OMSymbolspace* createSymbolspace();
     void addSymbolspace(OMSymbolspace* symbolspace);
     OMSet<OMWString, OMSymbolspace*>& getSymbolspaces();
+
+    OMUniqueObjectIdentification getMetaDefIdFromQSymbol(const wchar_t* qSymbol) const;
+    void addQSymbolToMap(OMUniqueObjectIdentification id, const wchar_t* symbolspace, 
+        const wchar_t* symbol); 
     
     bool getMetaDefSymbol(OMUniqueObjectIdentification id, const wchar_t** symbolspaceURI, const wchar_t** symbol) const;
     OMUniqueObjectIdentification getMetaDefId(const wchar_t* symbolspaceURI, const wchar_t* symbol) const;
@@ -69,12 +92,10 @@ public:
     OMUniqueObjectIdentification getBaselineMetaDefId(const wchar_t* symbol) const;
     const wchar_t* getBaselineDefSymbol(OMUniqueObjectIdentification id);
     const wchar_t* getBaselineMetaDefSymbol(OMUniqueObjectIdentification id);
-    bool knownBaselineExtEnum(OMUniqueObjectIdentification id, 
-        OMUniqueObjectIdentification value) const;
 
     OMSymbolspace* getSymbolspaceForDef(OMUniqueObjectIdentification id) const;
     OMSymbolspace* getSymbolspaceForMetaDef(OMUniqueObjectIdentification id) const;
-    OMSymbolspace* getSymbolspaceForExtEnum(OMUniqueObjectIdentification id,
+    bool isKnownExtEnumElement(OMUniqueObjectIdentification elementOf,
         OMUniqueObjectIdentification value) const;
     bool isBaselineSymbolspace(OMSymbolspace* symbolspace) const;
         
@@ -122,6 +143,8 @@ private:
     OMSet<OMWString, OMWString> _inputDataStreamEntities;
     
     OMSet<OMWString, OMWString> _namespacesPrefixMap;
+    
+    OMQSymbolMap _qSymbolMap;
 };
 
 

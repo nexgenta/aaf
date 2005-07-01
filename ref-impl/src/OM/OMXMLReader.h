@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.h,v 1.1.2.8 2005/06/27 11:20:19 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.h,v 1.1.2.9 2005/07/01 15:40:32 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,6 +70,7 @@ public:
     };
 
     virtual bool next() = 0;
+    virtual void reset() = 0;
     
     virtual EventType getEventType() = 0;
     virtual void getNotationDecl(const wchar_t*& name, const wchar_t*& publicID, 
@@ -110,6 +111,7 @@ public:
     virtual ~OMXMLReaderExpat();
 
     virtual bool next();
+    virtual void reset();
     
     virtual EventType getEventType();
     virtual void getNotationDecl(const wchar_t*& name, const wchar_t*& publicID, 
