@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.h,v 1.1.2.8 2005/06/01 15:34:59 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.h,v 1.1.2.9 2005/07/01 15:42:26 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,6 +35,7 @@
 #include "OMXMLStorage.h"
 #include "OMList.h"
 #include "OMByteArray.h"
+#include "OMVector.h"
 
 class OMSimpleProperty;
 class OMDataVector;
@@ -342,7 +343,7 @@ private:
         ANY
     };
     OMUniqueObjectIdentification restoreAUID(const wchar_t* idStr, AUIDTargetType targetType);
-    void saveAUID(OMUniqueObjectIdentification id, wchar_t* idStr, AUIDTargetType targetType);
+    wchar_t* saveAUID(OMUniqueObjectIdentification id, AUIDTargetType targetType);
     
     
     const OMType* baseType(const OMType* type);
@@ -362,7 +363,6 @@ private:
     
     OMXMLStorage*   _store;
     bool            _isRoot;
-  
 };
 
 #endif
