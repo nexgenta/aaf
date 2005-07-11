@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.39.4.3 2005/05/03 10:33:31 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.39.4.4 2005/07/11 11:58:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -211,7 +211,7 @@ AAFRESULT STDMETHODCALLTYPE
 		}
 	}
 
-	if (0 != _uniqueIdentifierPid)
+	if (0 != uniqueIdentifierPid)
 	{
 		_uniqueIdentifierPid = uniqueIdentifierPid;
 	}
@@ -811,8 +811,7 @@ bool ImplAAFTypeDefWeakObjRef::initialise(const OMUniqueObjectIdentification& id
         _targetSet.append(*(reinterpret_cast<aafUID_t*>(&id)));
     }
         
-    // TODO: not fully initialised? 
-    // setInitialized();
+    setInitialized();
     
     return true;
 }
