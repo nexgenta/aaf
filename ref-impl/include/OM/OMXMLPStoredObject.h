@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLPStoredObject.h,v 1.1.2.9 2005/07/01 15:42:26 philipn Exp $ $Name:  $
+// $Id: OMXMLPStoredObject.h,v 1.1.2.10 2005/07/11 12:04:04 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -353,12 +353,11 @@ private:
     void saveWeakRef(OMWeakObjectReference& weakRef, 
         const OMWeakObjectReferenceType* weakRefType);
     
-    void getHeaderVersion(OMFile& file, wchar_t* versionStr);
     OMUniqueObjectIdentification getExtensionSymbolspaceId(OMFile& file);
 
     void getDataStreams(OMStorable* storable, OMVector<OMDataStream*>& dataStreams);
     
-    void readSetId(OMByte* key, OMKeySize keySize, const wchar_t* idStr);
+    void createDictionaryMap();
 
     
     OMXMLStorage*   _store;
