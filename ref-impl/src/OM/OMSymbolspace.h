@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSymbolspace.h,v 1.1.2.10 2005/07/01 15:40:31 philipn Exp $ $Name:  $
+// $Id: OMSymbolspace.h,v 1.1.2.11 2005/07/11 12:21:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,6 +77,7 @@ public:
     const wchar_t* getPreferredPrefix() const;
     const wchar_t* getPrefix() const;
     const wchar_t* getDescription() const;
+    const wchar_t* getVersion() const;
     
     const wchar_t* getMetaDefSymbol(OMUniqueObjectIdentification id) const;
     OMUniqueObjectIdentification getMetaDefId(const wchar_t* symbol) const;
@@ -100,7 +101,8 @@ public:
     
     static OMSymbolspace* createDefaultExtSymbolspace(OMXMLStorage* storage, 
         OMUniqueObjectIdentification id);
-    static OMSymbolspace* createV11Symbolspace(OMXMLStorage* storage);
+    static OMSymbolspace* createBaselineSymbolspace(OMXMLStorage* storage);
+    static OMSymbolspace* createBaselineSymbolspace(OMXMLStorage* storage, const wchar_t* uri);
     
     static const wchar_t* getBaselineURI();
 
@@ -181,6 +183,7 @@ private:
     
     static const wchar_t* _baselineURI;
     static const OMUniqueObjectIdentification _baselineId;
+    static const wchar_t* _baselineVersion;
     
     bool            _isInitialised;
     OMXMLStorage*   _store;
@@ -190,6 +193,7 @@ private:
     wchar_t*        _preferredPrefix;
     wchar_t*        _prefix;
     wchar_t*        _description;
+    wchar_t*        _version;
     
     OMUInt32        _uniqueSymbolSuffix;
     
