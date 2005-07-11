@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefExtEnum.cpp,v 1.28.2.4 2005/07/01 15:43:39 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefExtEnum.cpp,v 1.28.2.5 2005/07/11 11:53:51 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -857,7 +857,7 @@ bool ImplAAFTypeDefExtEnum::initialise(const OMUniqueObjectIdentification& id,
         return false;
     }
     
-    setInitialized();
+    //setInitialized();
     
     return true;
 }

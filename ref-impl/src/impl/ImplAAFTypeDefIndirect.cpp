@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefIndirect.cpp,v 1.22.6.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefIndirect.cpp,v 1.22.6.3 2005/07/11 11:53:51 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1414,7 +1414,7 @@ bool ImplAAFTypeDefIndirect::initialise(const OMUniqueObjectIdentification& id,
         return false;
     }
 
-    setInitialized();
+    //setInitialized();
 
     return true;    
 }
