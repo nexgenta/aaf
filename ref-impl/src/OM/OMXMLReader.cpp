@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.cpp,v 1.1.2.9 2005/07/01 15:40:32 philipn Exp $ $Name:  $
+// $Id: OMXMLReader.cpp,v 1.1.2.10 2005/07/11 12:08:25 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -265,12 +265,14 @@ OMXMLReaderExpat::~OMXMLReaderExpat()
     {
         delete iter.value();
     }
-    
+    _attributes.clear();
+
     size_t elementCount = _startNmspaceDecls.count();
     for (size_t i = 0; i < elementCount; i++)
     {
         delete _startNmspaceDecls.getAt(i);
     }
+    _startNmspaceDecls.clear();
 }
 
 bool 
@@ -368,12 +370,14 @@ OMXMLReaderExpat::reset()
     {
         delete iter.value();
     }
+    _attributes.clear();
     
     size_t elementCount = _startNmspaceDecls.count();
     for (size_t i = 0; i < elementCount; i++)
     {
         delete _startNmspaceDecls.getAt(i);
     }
+    _startNmspaceDecls.clear();
     _endNmspaceDecls.clear();
     
     
