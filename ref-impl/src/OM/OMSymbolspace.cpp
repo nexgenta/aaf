@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSymbolspace.cpp,v 1.1.2.14 2005/07/12 17:01:26 philipn Exp $ $Name:  $
+// $Id: OMSymbolspace.cpp,v 1.1.2.15 2005/07/15 16:09:14 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -638,8 +638,7 @@ OMSymbolspace::getReader()
 }
 
 const wchar_t* 
-OMSymbolspace::createSymbolForClass(OMUniqueObjectIdentification id, 
-    const wchar_t* name)
+OMSymbolspace::createSymbolForClass(OMUniqueObjectIdentification id, const wchar_t* name)
 {
     TRACE("OMSymbolspace::createSymbolForClass");
     PRECONDITION("Valid name", name != 0);
@@ -647,17 +646,6 @@ OMSymbolspace::createSymbolForClass(OMUniqueObjectIdentification id,
     if (!_idToSymbol.contains(id))
     {
         wchar_t* symbol = createSymbol(name);
-        while (_symbolToId.contains(symbol))
-        {
-            wchar_t suffix[9];
-            std_swprintf(suffix, 9, L"%u", _uniqueSymbolSuffix);
-            size_t len = wcslen(symbol);
-            wchar_t* newSymbol = new wchar_t[len + 8 + 1];
-            wcscpy(newSymbol, symbol);
-            delete [] symbol;
-            symbol = wcscat(newSymbol, suffix);
-            _uniqueSymbolSuffix++;
-        }
         addMetaDefSymbol(id, symbol);
         delete [] symbol;
     }
@@ -675,18 +663,6 @@ OMSymbolspace::createSymbolForProperty(OMUniqueObjectIdentification id, OMProper
     if (!_idToSymbol.contains(id))
     {
         wchar_t* symbol = createSymbol(name);
-        while (_symbolToId.contains(symbol))
-        {
-            wchar_t suffix[9];
-            std_swprintf(suffix, 9, L"%u", _uniqueSymbolSuffix);
-            size_t len = wcslen(symbol);
-            wchar_t* newSymbol = new wchar_t[len + 8 + 1 + 1];
-            newSymbol[0] = L'_';
-            wcscpy(&newSymbol[1], symbol);
-            delete [] symbol;
-            symbol = wcscat(newSymbol, suffix);
-            _uniqueSymbolSuffix++;
-        }
         addPropertyDefSymbol(id, localId, symbol);
         delete [] symbol;
     }
@@ -695,8 +671,7 @@ OMSymbolspace::createSymbolForProperty(OMUniqueObjectIdentification id, OMProper
 }
 
 const wchar_t* 
-OMSymbolspace::createSymbolForType(OMUniqueObjectIdentification id, 
-    const wchar_t* name)
+OMSymbolspace::createSymbolForType(OMUniqueObjectIdentification id, const wchar_t* name)
 {
     TRACE("OMSymbolspace::createSymbolForType");
     PRECONDITION("Valid name", name != 0);
@@ -704,17 +679,6 @@ OMSymbolspace::createSymbolForType(OMUniqueObjectIdentification id,
     if (!_idToSymbol.contains(id))
     {
         wchar_t* symbol = createSymbol(name);
-        while (_symbolToId.contains(symbol))
-        {
-            wchar_t suffix[9];
-            std_swprintf(suffix, 9, L"%u", _uniqueSymbolSuffix);
-            size_t len = wcslen(symbol);
-            wchar_t* newSymbol = new wchar_t[len + 8 + 1];
-            wcscpy(newSymbol, symbol);
-            delete [] symbol;
-            symbol = wcscat(newSymbol, suffix);
-            _uniqueSymbolSuffix++;
-        }
         addMetaDefSymbol(id, symbol);
         delete [] symbol;
     }
@@ -784,6 +748,20 @@ OMSymbolspace::createSymbol(const wchar_t* name)
         namePtr++;
     }
     *symbolPtr = L'\0';
+
+    
+    // modify the symbol until it is unique
+    while (_symbolToId.contains(symbol))
+    {
+        wchar_t suffix[9];
+        std_swprintf(suffix, 9, L"%u", _uniqueSymbolSuffix);
+        size_t len = wcslen(symbol);
+        wchar_t* newSymbol = new wchar_t[len + 8 + 1];
+        wcscpy(&newSymbol[0], symbol);
+        delete [] symbol;
+        symbol = wcscat(newSymbol, suffix);
+        _uniqueSymbolSuffix++;
+    }
     
     return symbol;
 }
