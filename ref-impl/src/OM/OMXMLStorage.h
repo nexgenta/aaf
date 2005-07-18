@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStorage.h,v 1.1.2.12 2005/07/11 12:24:48 philipn Exp $ $Name:  $
+// $Id: OMXMLStorage.h,v 1.1.2.13 2005/07/18 15:17:40 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -158,7 +158,6 @@ private:
 
     int             _dataStreamNotationNameIndex;
     int             _dataStreamEntityNameIndex;
-    int             _dataStreamEntityValueIndex;
     OMSet<OMUniqueObjectIdentification, OMWString> _dataStreamNotationNames;
     OMSet<void*, OMWString> _dataStreamEntityNames;
     OMSet<void*, OMWString> _dataStreamEntityValues;
