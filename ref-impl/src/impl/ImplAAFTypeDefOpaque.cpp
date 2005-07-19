@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefOpaque.cpp,v 1.7.6.2 2005/05/03 10:33:30 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefOpaque.cpp,v 1.7.6.3 2005/07/19 11:15:42 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -564,17 +564,29 @@ OMByteOrder ImplAAFTypeDefOpaque::byteOrder(const OMByte* externalBytes,
     return ImplAAFTypeDefIndirect::byteOrder(externalBytes, externalSize);
 }
 
-void ImplAAFTypeDefOpaque::actualData(const OMByte* externalBytes, size_t externalSize,
-    const OMByte*& actualBytes, size_t& actualBytesSize) const
+void ImplAAFTypeDefOpaque::actualSize(const OMByte* externalBytes, 
+    size_t externalSize, size_t& actualSize) const
 {
-    ImplAAFTypeDefIndirect::actualData(externalBytes, externalSize, actualBytes, 
-        actualBytesSize);
+    assert(false);
+}
+
+void ImplAAFTypeDefOpaque::actualData(const OMByte* externalBytes, size_t externalSize,
+    OMByte* actualBytes, size_t& actualSize) const
+{
+    assert(false);
 }
 
 OMType* ImplAAFTypeDefOpaque::actualType(OMUniqueObjectIdentification id) const
 {
     assert(false);
     return 0;
+}
+
+void ImplAAFTypeDefOpaque::externalData(const OMByte* externalBytes, size_t externalSize,
+    const OMByte*& externalDataBytes, size_t& externalDataSize) const
+{
+    ImplAAFTypeDefIndirect::externalData(externalBytes, externalSize, externalDataBytes, 
+        externalDataSize);
 }
 
 bool ImplAAFTypeDefOpaque::initialise(const OMUniqueObjectIdentification& id, 
@@ -585,6 +597,7 @@ bool ImplAAFTypeDefOpaque::initialise(const OMUniqueObjectIdentification& id,
         return false;
     }
 
+    _initialized = true;
     //setInitialized();
 
     return true;    
