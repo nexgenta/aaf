@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFTypedObjNode.h,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: AAFTypedObjNode.h,v 1.2 2005/07/20 20:46:12 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,8 +37,9 @@ template<typename AAFObjType>
 class AAFTypedObjNode : public Node
 {
  public:
-  AAFTypedObjNode(IAAFObjectSP ObjectType );
-  AAFTypedObjNode(IAAFObjectSP ObjectType, const std::basic_string<wchar_t>& name );
+  AAFTypedObjNode(IAAFSmartPointer<AAFObjType> ObjectType );
+  AAFTypedObjNode(IAAFSmartPointer<AAFObjType> ObjectType,
+		  const std::basic_string<wchar_t>& name );
   ~AAFTypedObjNode();
   
   bool PreOrderVisit(boost::shared_ptr<Visitor> spVisitor);
@@ -56,13 +57,14 @@ class AAFTypedObjNode : public Node
 };
 
 template<typename AAFObjType>
-AAFTypedObjNode<AAFObjType>::AAFTypedObjNode(IAAFObjectSP spObject )
+AAFTypedObjNode<AAFObjType>::AAFTypedObjNode(IAAFSmartPointer<AAFObjType> spObject)
   : _spTypedObj( spObject ),
     Node( L"" )
 {}
 
 template<typename AAFObjType>
-AAFTypedObjNode<AAFObjType>::AAFTypedObjNode(IAAFObjectSP spObject, const std::basic_string<wchar_t>& name)
+AAFTypedObjNode<AAFObjType>::AAFTypedObjNode(IAAFSmartPointer<AAFObjType> spObject,
+					     const std::basic_string<wchar_t>& name)
   : Node( name ),
     _spTypedObj( spObject )
 {}

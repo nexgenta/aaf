@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactoryRegistry.cpp,v 1.3 2005/07/19 20:27:34 greek_fire Exp $
+// $Id: TypedNodeFactoryRegistry.cpp,v 1.4 2005/07/20 20:46:12 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,8 +21,8 @@
 #include "TypedNodeFactoryRegistry.h"
 
 #include "TypedNodeFactoryImpl.h"
-#include <AAFMetaDictionary.h>
-#include <iostream>
+#include <AxSmartPointer.h>
+#include <AAF.h>
 
 namespace {
 
@@ -44,6 +44,11 @@ TypedNodeFactoryRegistry::TypedNodeFactoryRegistry()
 {
   //while() parse thru input file and register classes
   Register(AUID_AAFInterchangeObject, boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFObject>()));
+
+  // Get the AUID for SourceMob (i.e. AUID_AAFMob)
+  IAAFSourceMob* unused = 0;
+  aafUID_t auid = AxAUID(unused);
+  Register(auid, boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFSourceMob>()));
 }
 
 TypedNodeFactoryRegistry::~TypedNodeFactoryRegistry()
@@ -84,20 +89,17 @@ boost::shared_ptr<TypedNodeFactory> TypedNodeFactoryRegistry::LookUp(AxClassDef&
   //upwards until an Auid is found.  An exception will be thrown if no Auid is found at the
   //topmost level (i.e. no parent exists for IAAFObject).  This is not handled because it should 
   //not happen in a correct file.
-  boost::shared_ptr<TypedNodeFactory> spNodeFactory;
   aafUID_t Auid = clsDef.GetAUID();
 
-  if(IsPresent(Auid))//Base Case:
+  //Base Case:
+  if(IsPresent(Auid))
   {
-    spNodeFactory = _Map[Auid];
-  }
-  else//Recursive Case:
-  {
-    AxClassDef clsParent(clsDef.GetParent());
-    spNodeFactory = LookUp(clsParent);         
-  }
+    return _Map[Auid];
+  }  
+  //Recursive Case:
+  AxClassDef clsParent(clsDef.GetParent());
 
-  return spNodeFactory;
+  return LookUp(clsParent);//Use Tail Recursion to avoid potential problem of stack overflow
 }
 
 void TypedNodeFactoryRegistry::Register(aafUID_t AUID, boost::shared_ptr<TypedNodeFactory> spFactory)

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactoryRegistry.h,v 1.3 2005/07/19 20:27:34 greek_fire Exp $
+// $Id: TypedNodeFactoryRegistry.h,v 1.4 2005/07/20 20:46:12 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -20,11 +20,6 @@
 
 #ifndef __TYPEDNODEFACTORYREGISTRY_h__
 #define __TYPEDNODEFACTORYREGISTRY_h__
-
-//project files
-
-//AAF files
-#include <AAFTypes.h>
 
 //Ax files
 #include <AxMetaDef.h>
