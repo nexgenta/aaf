@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefIndirect.cpp,v 1.22.6.4 2005/07/19 11:15:42 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefIndirect.cpp,v 1.22.6.5 2005/07/21 17:05:24 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1394,7 +1394,7 @@ void ImplAAFTypeDefIndirect::actualSize(const OMByte* externalBytes,
     size_t externalDataSize;
     externalData(externalBytes, externalSize, externalDataBytes, externalDataSize);
 
-    actualSize = pActualType->internalSize(externalDataBytes, externalSize);    
+    actualSize = pActualType->internalSize(externalDataBytes, externalDataSize);    
 }
 
 void ImplAAFTypeDefIndirect::actualData(const OMByte* externalBytes, 
@@ -1416,6 +1416,7 @@ void ImplAAFTypeDefIndirect::actualData(const OMByte* externalBytes,
         pActualType->reorder((OMByte*)externalDataBytes, externalDataSize);
     }
 
+    actualSize = pActualType->internalSize(externalDataBytes, externalDataSize);    
 	pActualType->internalize(externalDataBytes, externalDataSize, actualBytes, 
         actualSize, hostByteOrder());
 
