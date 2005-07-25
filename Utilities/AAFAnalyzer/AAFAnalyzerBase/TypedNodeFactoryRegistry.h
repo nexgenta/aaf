@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactoryRegistry.h,v 1.4 2005/07/20 20:46:12 greek_fire Exp $
+// $Id: TypedNodeFactoryRegistry.h,v 1.5 2005/07/25 20:43:56 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,6 +52,7 @@ class TypedNodeFactoryRegistry
   bool IsPresent(aafUID_t AUID);
   bool Deregister(aafUID_t AUID);
   void Register(aafUID_t AUID, boost::shared_ptr<TypedNodeFactory> spFactory);
+  void RegisterAAFObjects();
 
   static TypedNodeFactoryRegistry* _pFactory;
   Map _Map;  

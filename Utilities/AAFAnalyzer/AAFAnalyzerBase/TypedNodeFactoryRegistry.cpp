@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactoryRegistry.cpp,v 1.4 2005/07/20 20:46:12 greek_fire Exp $
+// $Id: TypedNodeFactoryRegistry.cpp,v 1.5 2005/07/25 20:43:56 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,13 +42,12 @@ TypedNodeFactoryRegistry* TypedNodeFactoryRegistry::_pFactory = NULL;
 
 TypedNodeFactoryRegistry::TypedNodeFactoryRegistry()
 {
-  //while() parse thru input file and register classes
-  Register(AUID_AAFInterchangeObject, boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFObject>()));
+  RegisterAAFObjects();
 
-  // Get the AUID for SourceMob (i.e. AUID_AAFMob)
+  //temporary lines, will be deleted once autogen scripts finished
+  /*Register(AUID_AAFInterchangeObject, boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFObject>()));
   IAAFSourceMob* unused = 0;
-  aafUID_t auid = AxAUID(unused);
-  Register(auid, boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFSourceMob>()));
+  Register(AxAUID(unused), boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFSourceMob>()));*/
 }
 
 TypedNodeFactoryRegistry::~TypedNodeFactoryRegistry()
@@ -109,6 +108,11 @@ void TypedNodeFactoryRegistry::Register(aafUID_t AUID, boost::shared_ptr<TypedNo
   {
     _Map[AUID] = spFactory;
   }
+}
+
+void TypedNodeFactoryRegistry::RegisterAAFObjects()
+{
+#include "RegistrationCode.cpp.gen"
 }
 
 } // end of namespace diskstream
