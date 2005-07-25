@@ -1,8 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFVaryingValue
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVaryingValueTest.cpp,v 1.44 2005/01/12 02:52:14 jfpanisset Exp $ $Name:  $
+// $Id: CAAFVaryingValueTest.cpp,v 1.45 2005/07/25 20:23:22 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -58,19 +56,6 @@ static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT
 static aafBool  EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
 {
     return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
-}
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
 }
 
 // convenient error handlers.

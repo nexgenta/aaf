@@ -1,10 +1,8 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFAuxiliaryDescriptor
 //=---------------------------------------------------------------------=
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFAuxiliaryDescriptorTest.cpp,v 1.4 2005/06/02 20:59:43 greek_fire Exp $ $Name:  $
+// $Id: CAAFAuxiliaryDescriptorTest.cpp,v 1.5 2005/07/25 20:23:16 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -17,7 +15,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the

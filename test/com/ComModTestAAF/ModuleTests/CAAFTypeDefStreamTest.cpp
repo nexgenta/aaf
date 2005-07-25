@@ -1,8 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFTypeDefStream
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.17 2005/01/12 02:53:58 jfpanisset Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.18 2005/07/25 20:23:22 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -201,21 +199,6 @@ do {\
 } while (false)
 
 #endif // #else // #ifndef _DEBUG
-
-
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
 
 // Get the stream property values from the given essence data.
 static void Test_LookupEssenceDataStreamPropertyDefinitions(

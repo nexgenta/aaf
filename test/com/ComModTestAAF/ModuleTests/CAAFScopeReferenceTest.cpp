@@ -1,9 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFScopeReference
-
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFScopeReferenceTest.cpp,v 1.16 2005/01/11 10:38:44 jfpanisset Exp $ $Name:  $
+// $Id: CAAFScopeReferenceTest.cpp,v 1.17 2005/07/25 20:23:19 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -16,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -86,19 +83,6 @@ static void FillInProductInfo(aafProductIdentification_t& ProductInfo,
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.platform = NULL;
 	ProductInfo.productID = UnitTestProductID;
-}
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
 }
 
 static const aafMobID_t	kTestMobID = 

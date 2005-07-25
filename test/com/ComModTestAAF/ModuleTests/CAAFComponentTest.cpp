@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFComponentTest.cpp,v 1.35 2005/06/10 21:12:41 montrowe Exp $ $Name:  $
+// $Id: CAAFComponentTest.cpp,v 1.36 2005/07/25 20:23:16 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -69,19 +69,6 @@ const aafCharacter* CommentNames[]   = { L"Component Comment A Name", L"Componen
 const aafCharacter* CommentValues[] = { L"Component Comment A Value", L"Component Comment B Value" };
 
 };
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)

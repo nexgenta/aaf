@@ -1,8 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CEnumAAFPluginDef
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFPluginDescTest.cpp,v 1.29 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFPluginDescTest.cpp,v 1.30 2005/07/25 20:23:22 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -67,19 +65,6 @@ static aafVersionType_t sampleMaxAPIVersion = { 40, 41 };//, 42, 43, kAAFVersion
 static wchar_t *manufName[] = { L"A test plugin manufacturer", L"Another test plugin manufacturer" };
 static wchar_t *manufRev = L"Rev0.0.0a0";
 
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)

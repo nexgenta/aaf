@@ -1,8 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFTextLocator interface
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTextLocatorTest.cpp,v 1.26 2005/01/20 10:01:01 phil_tudor Exp $ $Name:  $
+// $Id: CAAFTextLocatorTest.cpp,v 1.27 2005/07/25 20:23:21 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -54,19 +52,6 @@ static const 	aafMobID_t	TEST_MobID =
 
 // Temporarily necessary global declarations.
 extern "C" const CLSID CLSID_AAFTextLocator; // generated
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)

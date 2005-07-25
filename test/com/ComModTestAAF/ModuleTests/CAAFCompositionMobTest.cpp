@@ -1,8 +1,6 @@
-// @doc INTERNAL
-// @com This file implements the module test for CAAFDefinitionObject
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCompositionMobTest.cpp,v 1.35 2005/01/11 09:47:53 jfpanisset Exp $ $Name:  $
+// $Id: CAAFCompositionMobTest.cpp,v 1.36 2005/07/25 20:23:16 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -60,20 +58,6 @@ static const	aafMobID_t	TEST_rendering_mobID =
 0x13, 0x00, 0x00, 0x00,
 {0x9269dfa3, 0x0407, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
-
-
-// Cross-platform utility to delete a file.
-static void RemoveTestFile(const wchar_t* pFileName)
-{
-  const size_t kMaxFileName = 512;
-  char cFileName[kMaxFileName];
-
-  size_t status = wcstombs(cFileName, pFileName, kMaxFileName);
-  if (status != (size_t)-1)
-  { // delete the file.
-    remove(cFileName);
-  }
-}
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)
