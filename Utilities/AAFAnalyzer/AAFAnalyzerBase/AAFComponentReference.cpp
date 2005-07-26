@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFComponentReference.cpp,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: AAFComponentReference.cpp,v 1.2 2005/07/26 16:30:15 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,7 +19,7 @@
 //=---------------------------------------------------------------------=
 
 #include "AAFComponentReference.h"
-#include "Visitor.h"
+#include "TypedVisitor.h"
 
 namespace {
 
@@ -46,6 +46,12 @@ AAFComponentReference::~AAFComponentReference()
 
 bool AAFComponentReference::Visit(boost::shared_ptr<Visitor> spVisitor)
 {
+  boost::shared_ptr<TypedVisitor> spTypedVis = boost::dynamic_pointer_cast<TypedVisitor>(spVisitor);
+  if(spTypedVis)
+  {
+    return spTypedVis->EdgeVisit(*this);
+  }
+
   return spVisitor->EdgeVisit(*this);
 }
 
