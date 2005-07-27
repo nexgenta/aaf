@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DepthFirstTraversal.cpp,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: DepthFirstTraversal.cpp,v 1.2 2005/07/27 19:43:26 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,8 +24,6 @@
 #include "Visitor.h"
 #include "EdgeMap.h"
 #include "Edge.h"
-
-#include <iostream>
 
 namespace {
 

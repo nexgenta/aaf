@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: GraphBuilder.cpp,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: GraphBuilder.cpp,v 1.2 2005/07/27 19:43:26 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -78,7 +78,7 @@ void BuildTree( AxBaseObjRecIter& recIter,
 
        // We now have a parent, and a child. Create a containment edge
        // and add it to the edge map.
-       shared_ptr<AAFContainment> spEdge( new AAFContainment( parentStack.top().second, spChildNode ) );
+       shared_ptr<Edge> spEdge( new AAFContainment( parentStack.top().second, spChildNode ) );
        edgeMap.AddEdge( spEdge );
         
        // The child node becomes the new parent for lower level objects.

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactoryRegistry.cpp,v 1.5 2005/07/25 20:43:56 greek_fire Exp $
+// $Id: TypedNodeFactoryRegistry.cpp,v 1.6 2005/07/27 19:43:26 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,11 +43,6 @@ TypedNodeFactoryRegistry* TypedNodeFactoryRegistry::_pFactory = NULL;
 TypedNodeFactoryRegistry::TypedNodeFactoryRegistry()
 {
   RegisterAAFObjects();
-
-  //temporary lines, will be deleted once autogen scripts finished
-  /*Register(AUID_AAFInterchangeObject, boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFObject>()));
-  IAAFSourceMob* unused = 0;
-  Register(AxAUID(unused), boost::shared_ptr<TypedNodeFactory>(new TypedNodeFactoryImpl<IAAFSourceMob>()));*/
 }
 
 TypedNodeFactoryRegistry::~TypedNodeFactoryRegistry()
