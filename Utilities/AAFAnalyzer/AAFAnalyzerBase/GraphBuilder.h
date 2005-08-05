@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: GraphBuilder.h,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: GraphBuilder.h,v 1.2 2005/08/05 20:15:46 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,7 @@
 
 //stl files
 #include <string>
+#include <map>
 
 //boost files
 #include <boost/shared_ptr.hpp>
@@ -43,7 +44,7 @@ class GraphBuilder
 
   TestGraph CreateGraph(const std::basic_string<wchar_t>& fileName, boost::shared_ptr<NodeFactory> spFactory );
 
- private:
+ private:  
 
   // prohibited
   GraphBuilder( const GraphBuilder& );

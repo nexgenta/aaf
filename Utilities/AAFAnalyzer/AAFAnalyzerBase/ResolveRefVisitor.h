@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFTypedObjNode.h,v 1.4 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: ResolveRefVisitor.h,v 1.1 2005/08/05 20:15:46 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,43 +18,37 @@
 //
 //=---------------------------------------------------------------------=
 
-#ifndef __AAFTYPEDOBJNODE_h__
-#define __AAFTYPEDOBJNODE_h__
+#ifndef __RESOLVEREFVISITOR_h__
+#define __RESOLVEREFVISITOR_h__
 
-//project files
-#include "AAFObjNode.h"
-
-//Ax files
-#include <AxSmartPointer.h>
+#include "TypedVisitor.h"
 
 //boost files
 #include <boost/shared_ptr.hpp>
 
 namespace aafanalyzer {
 
-template<typename AAFObjType>
-class AAFTypedObjNode : public AAFObjNode
+class Edge;
+class EdgeMap;
+
+class ResolveRefVisitor : public TypedVisitor
 {
  public:
-  AAFTypedObjNode(IAAFSmartPointer<AAFObjType> ObjectType );
-  AAFTypedObjNode(IAAFSmartPointer<AAFObjType> ObjectType,
-		  const std::basic_string<wchar_t>& name );
-  ~AAFTypedObjNode();
-  
-  bool PreOrderVisit(boost::shared_ptr<Visitor> spVisitor);
-  bool PostOrderVisit(boost::shared_ptr<Visitor> spVisitor);
-  IAAFSmartPointer<AAFObjType> GetAAFObjectOfType() const;
+  ResolveRefVisitor(boost::shared_ptr<EdgeMap> spEdgeMap);
+  virtual ~ResolveRefVisitor();
+
+  virtual bool PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node);
+  virtual bool EdgeVisit(Edge& edge);
 
  private:
 
-  //prohibited
-  AAFTypedObjNode();
-  AAFTypedObjNode( const AAFTypedObjNode& );
-  AAFTypedObjNode& operator=( const AAFTypedObjNode& );
+  boost::shared_ptr<EdgeMap> _spEdgeMap;
 
-  IAAFSmartPointer<AAFObjType> _spTypedObj;
+  // prohibited
+  ResolveRefVisitor( const ResolveRefVisitor& );
+  ResolveRefVisitor& operator=( const ResolveRefVisitor& );
 };
 
 } // end of namespace diskstream
 
-#endif/*__TEMPLATE_h__*/
+#endif

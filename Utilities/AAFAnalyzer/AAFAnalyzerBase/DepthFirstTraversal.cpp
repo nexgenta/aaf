@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DepthFirstTraversal.cpp,v 1.2 2005/07/27 19:43:26 greek_fire Exp $
+// $Id: DepthFirstTraversal.cpp,v 1.3 2005/08/05 20:15:46 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,12 +52,17 @@ DepthFirstTraversal::~DepthFirstTraversal()
 void DepthFirstTraversal::TraverseDown(boost::shared_ptr<Visitor> spVisitor, boost::shared_ptr<Node> spNode)
 {
   EdgeMap::EdgeVectorSP theChildren = _spEdgeMap->GetChildren(spNode);  
-  spNode->PreOrderVisit(spVisitor);  
+  if(!spNode->PreOrderVisit(spVisitor))
+  { //method failed, do not proceed further with tests
+    return;
+  }
     
   for(unsigned int i = 0; i < theChildren->size(); i++)
   {
-    theChildren->at(i)->Visit(spVisitor);
-    TraverseDown(spVisitor, theChildren->at(i)->GetChildNode());
+    if(theChildren->at(i)->Visit(spVisitor))
+    {
+      TraverseDown(spVisitor, theChildren->at(i)->GetChildNode());
+    }
   }
 
   spNode->PostOrderVisit(spVisitor);
@@ -66,12 +71,17 @@ void DepthFirstTraversal::TraverseDown(boost::shared_ptr<Visitor> spVisitor, boo
 void DepthFirstTraversal::TraverseUp(boost::shared_ptr<Visitor> spVisitor, boost::shared_ptr<Node> spNode)
 {
   EdgeMap::EdgeVectorSP theParents = _spEdgeMap->GetParents(spNode);  
-  spNode->PreOrderVisit(spVisitor);  
+  if(!spNode->PreOrderVisit(spVisitor))
+  { //method failed, do not proceed further with tests
+    return;
+  }
   
   for(unsigned int i = 0; i < theParents->size(); i++)
   {
-    theParents->at(i)->Visit(spVisitor);
-    TraverseUp(spVisitor, theParents->at(i)->GetParentNode());
+    if(theParents->at(i)->Visit(spVisitor))
+    {
+      TraverseUp(spVisitor, theParents->at(i)->GetParentNode());
+    }
   }
 
   spNode->PostOrderVisit(spVisitor);

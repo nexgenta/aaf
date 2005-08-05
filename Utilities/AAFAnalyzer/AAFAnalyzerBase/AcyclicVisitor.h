@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFTypedObjNode.h,v 1.4 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: AcyclicVisitor.h,v 1.1 2005/08/05 20:15:46 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,43 +18,45 @@
 //
 //=---------------------------------------------------------------------=
 
-#ifndef __AAFTYPEDOBJNODE_h__
-#define __AAFTYPEDOBJNODE_h__
+#ifndef __ACYCLICVISITOR_h__
+#define __ACYCLICVISITOR_h__
 
-//project files
-#include "AAFObjNode.h"
+#include "Visitor.h"
 
-//Ax files
-#include <AxSmartPointer.h>
+//stl files
+#include <vector>
 
 //boost files
 #include <boost/shared_ptr.hpp>
 
 namespace aafanalyzer {
 
-template<typename AAFObjType>
-class AAFTypedObjNode : public AAFObjNode
+class Node;
+
+class AcyclicVisitor : public Visitor
 {
  public:
-  AAFTypedObjNode(IAAFSmartPointer<AAFObjType> ObjectType );
-  AAFTypedObjNode(IAAFSmartPointer<AAFObjType> ObjectType,
-		  const std::basic_string<wchar_t>& name );
-  ~AAFTypedObjNode();
-  
-  bool PreOrderVisit(boost::shared_ptr<Visitor> spVisitor);
-  bool PostOrderVisit(boost::shared_ptr<Visitor> spVisitor);
-  IAAFSmartPointer<AAFObjType> GetAAFObjectOfType() const;
+
+  typedef std::vector<unsigned int> Vector;
+
+  AcyclicVisitor();
+  virtual ~AcyclicVisitor();
+
+  virtual bool PreOrderVisit(Node& node);
+  virtual bool PostOrderVisit(Node& node);
 
  private:
+  bool IsPresent(unsigned int lid);
+  void Erase(unsigned int lid);
 
-  //prohibited
-  AAFTypedObjNode();
-  AAFTypedObjNode( const AAFTypedObjNode& );
-  AAFTypedObjNode& operator=( const AAFTypedObjNode& );
+  Vector _Vector;
+  
 
-  IAAFSmartPointer<AAFObjType> _spTypedObj;
+  // prohibited
+  AcyclicVisitor( const AcyclicVisitor& );
+  AcyclicVisitor& operator=( const AcyclicVisitor& );
 };
 
 } // end of namespace diskstream
 
-#endif/*__TEMPLATE_h__*/
+#endif

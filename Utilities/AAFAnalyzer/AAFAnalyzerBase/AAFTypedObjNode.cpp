@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFTypedObjNode.cpp,v 1.2 2005/07/26 16:30:16 greek_fire Exp $
+// $Id: AAFTypedObjNode.cpp,v 1.3 2005/08/05 20:15:46 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,14 +39,14 @@ namespace aafanalyzer {
 
 template<typename AAFObjType>
 AAFTypedObjNode<AAFObjType>::AAFTypedObjNode(IAAFSmartPointer<AAFObjType> spObject)
-  : Node( L"" ),
+  : AAFObjNode(AxQueryInterface<AAFObjType,IAAFObject>( spObject ), L"" ),
     _spTypedObj( spObject )
 {}
 
 template<typename AAFObjType>
 AAFTypedObjNode<AAFObjType>::AAFTypedObjNode(IAAFSmartPointer<AAFObjType> spObject,
 					     const std::basic_string<wchar_t>& name)
-  : Node( name ),
+  : AAFObjNode(AxQueryInterface<AAFObjType,IAAFObject>( spObject ), name ),
     _spTypedObj( spObject )
 {}
 
@@ -80,7 +80,7 @@ bool AAFTypedObjNode<AAFObjType>::PostOrderVisit(boost::shared_ptr<Visitor> spVi
 }
 
 template<typename AAFObjType>
-IAAFSmartPointer<AAFObjType> AAFTypedObjNode<AAFObjType>::GetAAFObjectType() const
+IAAFSmartPointer<AAFObjType> AAFTypedObjNode<AAFObjType>::GetAAFObjectOfType() const
 {
   return _spTypedObj;
 }
