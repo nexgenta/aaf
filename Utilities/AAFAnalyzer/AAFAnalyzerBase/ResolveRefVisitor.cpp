@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.cpp,v 1.1 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: ResolveRefVisitor.cpp,v 1.2 2005/08/08 20:23:13 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,13 +21,13 @@
 #include "ResolveRefVisitor.h"
 
 #include "AAFMobReference.h"
-#include "Edge.h"
+#include "AAFSlotReference.h"
 #include "EdgeMap.h"
 #include "MobNodeMap.h"
 #include "TempAllNodeMap.h"
 
 //Ax files
-#include <AxMob.h>
+#include <AxMobSlot.h>
 #include <AxComponent.h>
 #include <AAFResult.h>
 #include <AxUtil.h>
@@ -85,6 +85,27 @@ bool ResolveRefVisitor::PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node)
       {
         boost::shared_ptr<AAFMobReference> spMobRefEdge(new AAFMobReference(spSrcClp, spNode)); 
         _spEdgeMap->AddEdge(spMobRefEdge);
+        
+        //now create a Slot Edge from the source clip to the mobslot and add to Edgemap
+        boost::shared_ptr<AAFTypedObjNode<IAAFTimelineMobSlot> > spMobSlotNode;
+        EdgeMap::EdgeVectorSP mobChildren = _spEdgeMap->GetChildren(spNode);
+
+        for(unsigned int i = 0; i < mobChildren->size(); i++)
+        {
+          spMobSlotNode = boost::dynamic_pointer_cast<AAFTypedObjNode<IAAFTimelineMobSlot> >(mobChildren->at(i)->GetChildNode());
+
+          if(spMobSlotNode)
+          {
+            AxTimelineMobSlot axMobSlot(spMobSlotNode->GetAAFObjectOfType());
+            aafSlotID_t slotid = srcRef.sourceSlotID;
+
+            if(axMobSlot.GetSlotID() == slotid)
+            {
+              boost::shared_ptr<AAFSlotReference> spSlotEdge(new AAFSlotReference(spSrcClp, spMobSlotNode));
+              _spEdgeMap->AddEdge(spSlotEdge);
+            }
+          }
+        }   
       }
     }
     //keep track of unresolved source clips
