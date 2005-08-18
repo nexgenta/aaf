@@ -737,6 +737,8 @@ void printUsage(void)
   fprintf(stderr, "print more detailed information (-v)\n");
   fprintf(stderr, "--debug         = ");
   fprintf(stderr, "print information useful in debugging this program (-d)\n");
+  fprintf(stderr, "--version       = ");
+  fprintf(stderr, "print the program version number and exit\n");
 }
 
 const char* baseName(char* fullName);
@@ -1323,7 +1325,7 @@ bool getInteger(int& i, char* s)
   return result;
 }
 
-const char* VERSION ="$Revision: 1.154 $";
+const char* VERSION ="$Revision: 1.155 $";
 
 int main(int argumentCount, char* argumentVector[])
 {
