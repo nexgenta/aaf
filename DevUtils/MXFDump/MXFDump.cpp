@@ -1481,10 +1481,20 @@ void printPrimer(mxfKey& k, mxfLength& len, FILE* infile);
 void printPrimer(mxfKey& k, mxfLength& len, FILE* infile)
 {
   printKL(k, len);
+
   mxfUInt32 elementCount;
   readMxfUInt32(elementCount, infile);
   mxfUInt32 elementSize;
   readMxfUInt32(elementSize, infile);
+
+  fprintf(stdout, "  [ Number of entries = ");
+  printField(stdout, elementCount);
+  fprintf(stdout, ", Entry size        = ");
+  printField(stdout, elementSize);
+  fprintf(stdout, " ]\n");
+
+  fprintf(stdout, "  Local Tag      UID\n");
+
   for (mxfUInt32 j = 0; j < elementCount; j++) {
     mxfLocalKey identifier;
     readMxfLocalKey(identifier, infile);
@@ -1492,7 +1502,7 @@ void printPrimer(mxfKey& k, mxfLength& len, FILE* infile)
     readMxfKey(longIdentifier, infile);
     fprintf(stdout, "  ");
     printMxfLocalKey(identifier, stdout);
-    fprintf(stdout, " : ");
+    fprintf(stdout, "     :    ");
     printMxfKey(longIdentifier, stdout);
     fprintf(stdout, "\n");
   }
@@ -1666,7 +1676,7 @@ bool getInteger(int& i, char* s)
   return result;
 }
 
-const char* VERSION ="$Revision: 1.186 $";
+const char* VERSION ="$Revision: 1.187 $";
 
 int main(int argumentCount, char* argumentVector[])
 {
