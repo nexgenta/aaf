@@ -778,6 +778,7 @@ struct {
   // All objects
   {"InstanceUID",          0x3c0a},
   // Preface
+  {"Primary Package",      0x3b08},
   {"Operational Pattern",  0x3b09},
   {"Essence Containers",   0x3b0a},
   {"DM Schemes",           0x3b0b},
@@ -1357,7 +1358,7 @@ bool getInteger(int& i, char* s)
   return result;
 }
 
-const char* VERSION ="$Revision: 1.163 $";
+const char* VERSION ="$Revision: 1.164 $";
 
 int main(int argumentCount, char* argumentVector[])
 {
