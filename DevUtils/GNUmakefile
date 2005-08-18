@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2005/08/18 22:19:05 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -24,17 +24,23 @@
 
 
 .PHONY : all
-all : dump
+all : dump MXFDump
 
 .PHONY : dump
 dump :
 	cd Dump && $(MAKE)
 
+.PHONY : MXFDump
+MXFDump :
+	cd MXFDump && $(MAKE)
+
 .PHONY : clean
 clean :
 	cd Dump && $(MAKE) GENDEPS=0 $@
+	cd MXFDump && $(MAKE) GENDEPS=0 $@
 
 .PHONY : realclean
 realclean :
 	cd Dump && $(MAKE) GENDEPS=0 $@
+	cd MXFDump && $(MAKE) GENDEPS=0 $@
 
