@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MXFDump.cpp,v 1.777 2005/08/18 21:42:19 tbingham Exp $ $Name:  $
+// $Id: MXFDump.cpp,v 1.778 2005/08/18 21:42:26 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,6 +21,7 @@
 // All rights reserved.
 //
 //=---------------------------------------------------------------------=
+
 // KLV/MXF file dumper.
 //
 // Tim Bingham - October 2002 - Tim_Bingham@avid.com
