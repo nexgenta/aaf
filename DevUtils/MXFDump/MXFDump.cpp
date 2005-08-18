@@ -1401,8 +1401,6 @@ void mxfDumpFile(char* fileName)
       printEssence(k, len, lFlag, limit, infile);
     } else if (memcmp(&ClosedFooterPartition, &k, sizeof(mxfKey)) == 0) {
       printFooterPartition(k, len, infile);
-    } else if (unknownAsSets) {
-      printLocalSet(k, len, infile);
     } else {
       printKL(k, len);
       printV(len, false, 0, infile);
@@ -1450,7 +1448,7 @@ bool getInteger(int& i, char* s)
   return result;
 }
 
-const char* VERSION ="$Revision: 1.174 $";
+const char* VERSION ="$Revision: 1.175 $";
 
 int main(int argumentCount, char* argumentVector[])
 {
