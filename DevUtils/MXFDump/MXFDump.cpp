@@ -1190,6 +1190,13 @@ void printHeaderPartition(mxfKey& k, mxfLength& len, FILE* infile)
   printPartition(k, len, infile);
 }
 
+void printBodyPartition(mxfKey& k, mxfLength& len, FILE* infile);
+
+void printBodyPartition(mxfKey& k, mxfLength& len, FILE* infile)
+{
+  printPartition(k, len, infile);
+}
+
 void printFooterPartition(mxfKey& k, mxfLength& len, FILE* infile);
 
 void printFooterPartition(mxfKey& k, mxfLength& len, FILE* infile)
@@ -1251,6 +1258,10 @@ void mxfDumpFile(char* fileName)
       printHeaderPartition(k, len, infile);
     } else if (memcmp(&Primer, &k, sizeof(mxfKey)) == 0) {
       printPrimer(k, len, infile);
+    } else if (memcmp(&OpenBodyPartition, &k, sizeof(mxfKey)) == 0) {
+      printBodyPartition(k, len, infile);
+    } else if (memcmp(&ClosedBodyPartition, &k, sizeof(mxfKey)) == 0) {
+      printBodyPartition(k, len, infile);
     } else if (isFill(k)) {
       printFill(k, len, infile);
     } else if (isEssenceElement(k)) {
@@ -1330,7 +1341,7 @@ bool getInteger(int& i, char* s)
   return result;
 }
 
-const char* VERSION ="$Revision: 1.159 $";
+const char* VERSION ="$Revision: 1.160 $";
 
 int main(int argumentCount, char* argumentVector[])
 {
