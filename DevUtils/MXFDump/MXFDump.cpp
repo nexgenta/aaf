@@ -1399,7 +1399,7 @@ bool getInteger(int& i, char* s)
   return result;
 }
 
-const char* VERSION ="$Revision: 1.171 $";
+const char* VERSION ="$Revision: 1.172 $";
 
 int main(int argumentCount, char* argumentVector[])
 {
@@ -1421,6 +1421,7 @@ int main(int argumentCount, char* argumentVector[])
       setMode(localSetMode);
     } else if ((strcmp(p, "-m") == 0) || (strcmp(p, "--mxf-dump") == 0)) {
       setMode(mxfMode);
+      unknownAsSets = true;
     } else if ((strcmp(p, "-a") == 0) || (strcmp(p, "--aaf-dump") == 0)) {
       setMode(aafMode);
       unknownAsSets = true;
