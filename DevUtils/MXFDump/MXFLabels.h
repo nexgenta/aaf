@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MXFLabels.h,v 1.10 2005/08/18 20:14:03 tbingham Exp $ $Name:  $
+// $Id: MXFLabels.h,v 1.11 2005/08/18 20:14:06 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,7 +22,11 @@
 //
 //=---------------------------------------------------------------------=
 
-// Essence container labels
+// MXF Essence container labels
+
+// This file is hand maintained. It is based on RP224. Eventually this file,
+// or one like it, should be automatically generated from the SMPTE registry.
+//
 
 // Generic container (deprecated)
 //
