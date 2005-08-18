@@ -799,6 +799,9 @@ struct {
   mxfUInt16 _key;
 } localKeyTable [] = {
 #include "AAFMetaDictionary.h"
+  // local keys not in AAFMetaDictionary.h
+  {"MetaDictionary",       0x0001},
+  {"Header",               0x0002},
   // All objects
   {"InstanceUID",          0x3c0a},
   // Preface
@@ -1389,7 +1392,7 @@ bool getInteger(int& i, char* s)
   return result;
 }
 
-const char* VERSION ="$Revision: 1.169 $";
+const char* VERSION ="$Revision: 1.170 $";
 
 int main(int argumentCount, char* argumentVector[])
 {
