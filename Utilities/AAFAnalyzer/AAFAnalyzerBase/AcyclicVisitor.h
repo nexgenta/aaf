@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.1 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: AcyclicVisitor.h,v 1.2 2005/08/18 20:37:59 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,8 +23,11 @@
 
 #include "Visitor.h"
 
+#include <TestResult.h>
+
 //stl files
 #include <vector>
+#include <iostream>
 
 //boost files
 #include <boost/shared_ptr.hpp>
@@ -39,7 +42,7 @@ class AcyclicVisitor : public Visitor
 
   typedef std::vector<unsigned int> Vector;
 
-  AcyclicVisitor();
+  AcyclicVisitor(std::ostream& os, TestResult& result);
   virtual ~AcyclicVisitor();
 
   virtual bool PreOrderVisit(Node& node);
@@ -49,6 +52,8 @@ class AcyclicVisitor : public Visitor
   bool IsPresent(unsigned int lid);
   void Erase(unsigned int lid);
 
+  std::ostream& _os;
+  TestResult& _Result;
   Vector _Vector;
   
 

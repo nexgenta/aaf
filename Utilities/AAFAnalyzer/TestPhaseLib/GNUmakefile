@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.1 2005/08/18 14:07:23 greek_fire Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.2 2005/08/18 20:41:12 greek_fire Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -40,14 +40,14 @@ include $(AAFBASE)/build/common.mk
 INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../AAFAnalyzerBase
 
 .PHONY : all
-all : AAFAnalyzerBase
+all : TestPhase
 
 
-.PHONY : AAFAnalyzerBase
-AAFAnalyzerBase : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libAAFAnalyzerBase$(LIB)
+.PHONY : TestPhase
+TestPhase : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libTestPhase$(LIB)
 
 
-$(LIBDIR)/libAAFAnalyzerBase$(LIB) : $(CXXOBJS)
+$(LIBDIR)/libTestPhase$(LIB) : $(CXXOBJS)
 	$(LD_STAT_LIB) $@ $(CXXOBJS)
 
 
@@ -55,7 +55,7 @@ $(LIBDIR)/libAAFAnalyzerBase$(LIB) : $(CXXOBJS)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libAAFAnalyzerBase$(LIB)
+	@$(RM) $(LIBDIR)/libTestPhase$(LIB)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 .PHONY : realclean

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestGraph.h,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: TestGraph.h,v 1.2 2005/08/18 20:38:00 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,7 +35,6 @@ class TestGraph
    
   // The default copy constructor is okay.
   TestGraph(boost::shared_ptr<EdgeMap> spEdgeMap, boost::shared_ptr<Node> spRootNode);
-  //TestGraph& operator=(const TestGraph& graph);
   ~TestGraph();
 
   boost::shared_ptr<EdgeMap> GetEdgeMap() const;
@@ -47,7 +46,7 @@ class TestGraph
 
   // prohibited
   TestGraph();
-
+  TestGraph& operator=(const TestGraph& graph);
 };
 
 } // end of namespace diskstream

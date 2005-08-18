@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.1 2005/08/18 16:02:19 greek_fire Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.2 2005/08/18 20:40:14 greek_fire Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -40,14 +40,14 @@ include $(AAFBASE)/build/common.mk
 INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../AAFAnalyzerBase -I../TestPhaseLib
 
 .PHONY : all
-all : AAFAnalyzerBase
+all : EditProtocolTest
 
 
-.PHONY : AAFAnalyzerBase
-AAFAnalyzerBase : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libAAFAnalyzerBase$(LIB)
+.PHONY : EditProtocolTest
+EditProtocolTest : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libEditProtocolTest$(LIB)
 
 
-$(LIBDIR)/libAAFAnalyzerBase$(LIB) : $(CXXOBJS)
+$(LIBDIR)/libEditProtocolTest$(LIB) : $(CXXOBJS)
 	$(LD_STAT_LIB) $@ $(CXXOBJS)
 
 
@@ -55,10 +55,11 @@ $(LIBDIR)/libAAFAnalyzerBase$(LIB) : $(CXXOBJS)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libAAFAnalyzerBase$(LIB)
+	@$(RM) $(LIBDIR)/libEditProtocolTest$(LIB)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 .PHONY : realclean
 realclean : clean
 
 include $(AAFBASE)/build/rules.mk
+

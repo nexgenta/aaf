@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.h,v 1.1 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: ResolveRefVisitor.h,v 1.2 2005/08/18 20:38:00 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,8 +23,10 @@
 
 #include "TypedVisitor.h"
 
-//boost files
-#include <boost/shared_ptr.hpp>
+#include <TestResult.h>
+
+//stl files
+#include <iostream>
 
 namespace aafanalyzer {
 
@@ -34,15 +36,16 @@ class EdgeMap;
 class ResolveRefVisitor : public TypedVisitor
 {
  public:
-  ResolveRefVisitor(boost::shared_ptr<EdgeMap> spEdgeMap);
+  ResolveRefVisitor(std::ostream& os, boost::shared_ptr<EdgeMap> spEdgeMap, TestResult& result);
   virtual ~ResolveRefVisitor();
 
   virtual bool PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node);
   virtual bool EdgeVisit(Edge& edge);
 
  private:
-
+  std::ostream& _os;
   boost::shared_ptr<EdgeMap> _spEdgeMap;
+  TestResult& _Result;
 
   // prohibited
   ResolveRefVisitor( const ResolveRefVisitor& );

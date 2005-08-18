@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: LoadPhase.h,v 1.1 2005/08/18 16:04:20 greek_fire Exp $ $Name:  $
+// $Id: LoadPhase.h,v 1.2 2005/08/18 20:39:07 greek_fire Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,7 +22,7 @@
 #define __LOADPHASE_h__
 
 //test files
-#include "TestPhase.h"
+#include <TestPhase.h>
 #include "FileLoad.h"
 #include "RefResolver.h"
 #include "AcyclicAnalysis.h"

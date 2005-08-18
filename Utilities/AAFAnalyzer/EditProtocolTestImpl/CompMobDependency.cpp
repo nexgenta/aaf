@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.cpp,v 1.1 2005/08/18 16:02:19 greek_fire Exp $
+// $Id: CompMobDependency.cpp,v 1.2 2005/08/18 20:40:14 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,7 @@
 
 #include <DepthFirstTraversal.h>
 #include <CompositionMobVisitor.h>
+
 
 namespace {
 
@@ -50,7 +51,7 @@ CompMobDependency::~CompMobDependency()
 TestResult CompMobDependency::Execute()
 {
   TestResult result;
-  boost::shared_ptr<CompositionMobVisitor> spVisitor(new CompositionMobVisitor(GetOutStream()));
+  boost::shared_ptr<CompositionMobVisitor> spVisitor(new CompositionMobVisitor(GetOutStream(), result));
   DepthFirstTraversal dfs(GetTestGraph()->GetEdgeMap(), GetTestGraph()->GetRootNode());
 
   //output to screen

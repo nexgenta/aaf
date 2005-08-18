@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2005/08/18 20:37:59 greek_fire Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.1 2005/08/18 20:37:34 greek_fire Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -22,44 +22,7 @@
 #
 ###############################################################################
 
-PACKAGE = AAFAnalyzer
-export PACKAGE
 
-AAFBASE ?= ../../..
+PROGNAME = AAFAnalyzerTest
 
-ifeq ($(shell uname), IRIX)
-# Warnings turned off:
-# 1107 - signed bit field has length of 1 bit in various stl files
-# 1682 - partial overide of AxPropertyValuePrtcl::process
-MODULE_PLATFORM_CFLAGS = -LANG:std -woff 1107,1682
-endif
-
-# Common definitions
-include $(AAFBASE)/build/common.mk
-
-INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../TestPhaseLib
-
-.PHONY : all
-all : AAFAnalyzerBase
-
-
-.PHONY : AAFAnalyzerBase
-AAFAnalyzerBase : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libAAFAnalyzerBase$(LIB)
-
-
-$(LIBDIR)/libAAFAnalyzerBase$(LIB) : $(CXXOBJS)
-	$(LD_STAT_LIB) $@ $(CXXOBJS)
-
-
-.PHONY : clean
-clean :
-	@$(RM) $(CXXOBJS)
-	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libAAFAnalyzerBase$(LIB)
-	@$(RMDIR) $(OBJDIR)/ii_files
-
-.PHONY : realclean
-realclean : clean
-
-include $(AAFBASE)/build/rules.mk
-
+include ../aafanalyzer.mk

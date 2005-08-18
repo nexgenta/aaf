@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.cpp,v 1.2 2005/08/08 20:23:13 greek_fire Exp $
+// $Id: ResolveRefVisitor.cpp,v 1.3 2005/08/18 20:38:00 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,8 +44,10 @@ using namespace aafanalyzer;
 //======================================================================
 namespace aafanalyzer {
 
-ResolveRefVisitor::ResolveRefVisitor(boost::shared_ptr<EdgeMap> spEdgeMap)
-: _spEdgeMap( spEdgeMap )
+ResolveRefVisitor::ResolveRefVisitor(std::ostream& os, boost::shared_ptr<EdgeMap> spEdgeMap, TestResult& result)
+: _os(os),
+  _spEdgeMap(spEdgeMap),
+  _Result(result)
 {
 }
 

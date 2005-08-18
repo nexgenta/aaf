@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RefResolver.h,v 1.1 2005/08/18 16:04:20 greek_fire Exp $ $Name:  $
+// $Id: RefResolver.h,v 1.2 2005/08/18 20:39:07 greek_fire Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,7 +22,7 @@
 #define __REFRESOLVER_h__
 
 //project files
-#include "Test.h"
+#include <Test.h>
 
 namespace aafanalyzer {
 

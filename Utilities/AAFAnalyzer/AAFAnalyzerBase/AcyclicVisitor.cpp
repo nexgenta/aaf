@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.1 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: AcyclicVisitor.cpp,v 1.2 2005/08/18 20:37:59 greek_fire Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,9 @@ using namespace aafanalyzer;
 //======================================================================
 namespace aafanalyzer {
 
-AcyclicVisitor::AcyclicVisitor()
+AcyclicVisitor::  AcyclicVisitor(std::ostream& os, TestResult& result)
+: _os(os),
+  _Result(result)
 {
 }
 
@@ -68,8 +70,11 @@ bool AcyclicVisitor::PreOrderVisit(Node& node)
     return true;
   }
  
-  //a cycle was detected so add the error to the logger
-  std::cout << "Error: Cycle detected!" << std::endl;
+  //a cycle was detected
+  _Result.SetExplanation("Error: Cycle detected!");
+  _Result.SetResult(TestResult::error);
+
+  std::cout << "Nodes of the cycle:" << std::endl;
   for(unsigned int i = 0; i < _Vector.size(); i++)
   {
     std::cout << _Vector.at(i) << std::endl;
@@ -90,8 +95,10 @@ bool AcyclicVisitor::PostOrderVisit(Node& node)
     return true;
   }
 
-  //an unkown error occured, add error to the logger
-  std::cout << "Error: UNKNOWN ERROR!" << std::endl;
+  //an unkown error occured
+  _Result.SetExplanation("Error: Unknown error occured during postorder visit!");
+  _Result.SetResult(TestResult::error);
+
   return false;
 }
 
