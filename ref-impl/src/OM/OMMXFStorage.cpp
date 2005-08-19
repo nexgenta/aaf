@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.174 2005/08/19 18:01:44 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.175 2005/08/19 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1886,7 +1886,11 @@ void OMMXFStorage::restoreStreams(void)
       // Restore index stream segment
       //
       if (indexSID != 0) {
-        OMUInt64 indexSize = partitionStart - indexStart - fillBufferZoneSize;
+        OMUInt64 indexSize = partitionStart - indexStart;
+        // HACK4MEIP2
+        if (indexSize <= (indexSize - fillBufferZoneSize)) {
+          indexSize = indexSize - fillBufferZoneSize;
+        }
         streamRestoreSegment(indexSID,
                              indexStart,
                              indexSize,
