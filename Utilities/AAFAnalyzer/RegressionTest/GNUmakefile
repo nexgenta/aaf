@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2005/08/19 19:11:31 greek_fire Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2005/08/19 19:15:44 greek_fire Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,3 @@ include ../aafanalyzer.mk
 .PHONY : check
 check : $(AAFSDKBINDIR)/RegressionTest$(EXE)
 	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/RegressionTest$(EXE)
-
-
-#$(AAFSDKBINDIR)/RegressionTest$(EXE)
