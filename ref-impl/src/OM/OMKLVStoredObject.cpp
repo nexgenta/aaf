@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.187 2005/08/19 19:31:45 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.188 2005/08/19 19:31:49 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -76,7 +76,6 @@
 #include "OMRawStorage.h"
 
 #define USETAGTABLE 1
-//#define OMONLY 1
 
   // @mfunc Open the root <c OMKLVStoredObject> in the raw storage
   //        <p rawStorage> for reading only.
@@ -2006,11 +2005,7 @@ void OMKLVStoredObject::writePrimerPack(const OMDictionary* dictionary)
       OMPropertyId pid = propertyDefinition->localIdentification();
       OMDictionary::mapToKLV(pid);
       _storage->write(pid, _reorderBytes);
-#if defined(OMONLY)
       OMUniqueObjectIdentification id = propertyDefinition->identification();
-#else
-      OMUniqueObjectIdentification id = propertyDefinition->identification();
-#endif
       OMDictionary::mapToKLV(id);
       OMKLVKey k;
       convert(k, id);
