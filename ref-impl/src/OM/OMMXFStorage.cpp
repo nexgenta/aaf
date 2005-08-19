@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.163 2005/08/19 18:00:22 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.164 2005/08/19 18:00:37 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,6 +51,10 @@ OMMXFStorage::OMMXFStorage(OMRawStorage* store)
   : OMWrappedRawStorage(store),
   _primerPosition(0),
   _headerByteCount(0),
+  _inIndex(false),
+  _indexSID(0),
+  _indexKey(nullOMKLVKey),
+  _indexPosition(0),
   _fillStart(0),
   _fillEnd(0),
   _fixups(),
@@ -2098,13 +2102,37 @@ void OMMXFStorage::markIndexStart(OMKLVKey key,
                                   OMUInt64 indexKeyPosition)
 {
   TRACE("OMMXFStorage::markIndexStart");
-  ASSERT("Unimplemented code not reached", false);
+
+  ASSERT("Not in index", !_inIndex);
+
+  _inIndex = true;
+  _indexSID = sid;
+  _indexKey = key;
+  _indexPosition = indexKeyPosition;
 }
 
 void OMMXFStorage::markIndexEnd(OMUInt64 endKeyPosition)
 {
   TRACE("OMMXFStorage::markIndexEnd");
-  ASSERT("Unimplemented code not reached", false);
+
+  if (_inIndex) {
+    OMUInt64 free = 0;
+    if (endKeyPosition == _fillEnd) {
+      free = _fillEnd - _fillStart;
+    }
+    OMUInt64 indexByteCount = endKeyPosition - _indexPosition;
+    streamRestoreSegment(_indexSID,
+                         _indexPosition,
+                         indexByteCount + free,
+                         indexByteCount,
+                         _indexKey,
+                         /* gridSize */ 512);
+
+    _inIndex = false;
+    _indexSID = 0;
+    _indexKey = nullOMKLVKey;
+    _indexPosition = 0;
+  }
 }
 
 void OMMXFStorage::markEssenceSegmentStart(OMKLVKey key,
