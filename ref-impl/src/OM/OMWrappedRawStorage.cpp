@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.cpp,v 1.10 2005/08/19 19:46:58 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.cpp,v 1.11 2005/08/19 19:47:03 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -253,14 +253,6 @@ void OMWrappedRawStorage::setPosition(OMUInt64 newPosition) const
   _store->setPosition(newPosition);
 }
 
-void OMWrappedRawStorage::streamRead(OMByte* bytes,
-                                     OMUInt32 byteCount,
-                                     OMUInt32& bytesRead) const
-{
-  TRACE("OMWrappedRawStorage::streamRead");
-  ASSERT("Unimplemented code not reached", false);
-}
-
 void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
                                        OMByte* bytes,
                                        OMUInt32 byteCount,
@@ -269,14 +261,6 @@ void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
   TRACE("OMWrappedRawStorage::");
 
   _store->streamReadAt(position, bytes, byteCount, bytesRead);
-}
-
-void OMWrappedRawStorage::streamRead(OMIOVector buffers,
-                                     OMUInt32 bufferCount,
-                                     OMUInt32& bytesRead) const
-{
-  TRACE("OMWrappedRawStorage::streamRead");
-  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
@@ -289,14 +273,6 @@ void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
   _store->streamReadAt(position, buffers, bufferCount, bytesRead);
 }
 
-void OMWrappedRawStorage::streamWrite(const OMByte* bytes,
-                                      OMUInt32 byteCount,
-                                      OMUInt32& bytesWritten)
-{
-  TRACE("OMWrappedRawStorage::streamWrite");
-  ASSERT("Unimplemented code not reached", false);
-}
-
 void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
                                         const OMByte* bytes,
                                         OMUInt32 byteCount,
@@ -305,14 +281,6 @@ void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
   TRACE("OMWrappedRawStorage::streamWriteAt");
 
   _store->streamWriteAt(position, bytes, byteCount, bytesWritten);
-}
-
-void OMWrappedRawStorage::streamWrite(OMIOVector buffers,
-                                      OMUInt32 bufferCount,
-                                      OMUInt32& bytesWritten)
-{
-  TRACE("OMWrappedRawStorage::streamWrite");
-  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
