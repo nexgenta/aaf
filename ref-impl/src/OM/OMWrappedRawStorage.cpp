@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.cpp,v 1.12 2005/08/19 19:47:07 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.cpp,v 1.13 2005/08/19 19:47:12 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -273,6 +273,26 @@ void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
   _store->streamReadAt(position, buffers, bufferCount, bytesRead);
 }
 
+void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
+                                       OMByte* buffer,
+                                       const OMUInt32 bytes,
+                                       void* /* */ completion,
+                                       const void* clientArgument) const
+{
+  TRACE("OMWrappedRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
+                                       OMIOBufferDescriptor* buffers,
+                                       OMUInt32 bufferCount,
+                                       void* /* */ completion,
+                                       const void* clientArgument) const
+{
+  TRACE("OMWrappedRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
 void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
                                         const OMByte* bytes,
                                         OMUInt32 byteCount,
@@ -291,4 +311,24 @@ void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
   TRACE("OMWrappedRawStorage::streamWriteAt");
 
   _store->streamWriteAt(position, buffers, bufferCount, bytesWritten);
+}
+
+void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
+                                        const OMByte* buffer,
+                                        const OMUInt32 bytes,
+                                        void* /* */ completion,
+                                        const void* clientArgument)
+{
+  TRACE("OMWrappedRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
+                                        const OMIOBufferDescriptor* buffers,
+                                        OMUInt32 bufferCount,
+                                        void* /* */ completion,
+                                        const void* clientArgument)
+{
+  TRACE("OMWrappedRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
 }
