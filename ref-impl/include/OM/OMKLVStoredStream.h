@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.20 2005/08/19 19:17:07 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.21 2005/08/19 19:17:12 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,7 +64,7 @@ public:
     //          an error has been encountered on one buffer no additional
     //          buffers are read.
     //          The number of bytes read is returned in <p bytesRead>.
-  virtual void read(OMIOVector buffers,
+  virtual void read(OMIOBufferDescriptor* buffers,
                     OMUInt32 bufferCount,
                     OMUInt32& bytesRead) const;
 
@@ -86,7 +86,7 @@ public:
     //          an error has been encountered on one buffer no additional
     //          buffers are written.
     //          The number of bytes written is returned in <p bytesWritten>.
-  virtual void write(OMIOVector buffers,
+  virtual void write(OMIOBufferDescriptor* buffers,
                      OMUInt32 bufferCount,
                      OMUInt32& bytesWritten);
 
