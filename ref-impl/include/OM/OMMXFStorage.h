@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.113 2005/08/19 17:44:02 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.114 2005/08/19 17:44:08 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -423,7 +423,8 @@ public:
 
   virtual void streamRestoreSegment(OMUInt32 sid,
                                     OMUInt64 start,
-                                    OMUInt64 size,
+                                    OMUInt64 allocatedSize,
+                                    OMUInt64 occupiedSize,
                                     OMKLVKey label,
                                     OMUInt32 gridSize);
 
