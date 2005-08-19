@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.16 2005/08/19 19:16:44 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.17 2005/08/19 19:16:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -105,6 +105,10 @@ public:
 
     // @cmember The file offset of this essence element.
   virtual OMUInt64 fileOffset(void) const;
+
+  static bool readKLVKey(OMStoredStream& stream, OMKLVKey& key);
+
+  static bool readKLVLength(OMStoredStream& stream, OMUInt64& length);
 
 private:
   // @access Private members.
