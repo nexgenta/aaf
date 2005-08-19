@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.223 2005/08/19 21:12:13 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.224 2005/08/19 21:16:29 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1386,8 +1386,8 @@ void OMMXFStorage::clearObjectDirectory(void)
       ObjectDirectoryEntry e = iterator.value();
       if (e._flags != 1) {
         if (e._object != 0) {
-          OMClassFactory* factory = e._object->classFactory();
 #if 0 // tjb not yet
+          OMClassFactory* factory = e._object->classFactory();
           factory->destroy(e._object);
 #else
           // leak like a sieve
