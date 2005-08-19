@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.135 2005/08/19 17:45:45 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.136 2005/08/19 17:45:48 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -256,6 +256,9 @@ public:
   virtual void writeRandomIndex(void);
 
   virtual void readRandomIndex(OMUInt64 length);
+
+  virtual bool findRandomIndex(OMUInt64 fileSize,
+                               OMUInt64& indexPosition);
 
   virtual bool isRandomIndex(OMUInt64 fileSize, OMUInt32 ripSize);
 
