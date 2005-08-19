@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.23 2005/08/19 19:17:20 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.24 2005/08/19 21:02:59 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,7 +56,7 @@ public:
   virtual void read(OMByte* data,
                     const OMUInt32 bytes,
                     OMUInt32& bytesRead) const;
-
+#if 0 // tjb not yet
     // @cmember Attempt to read the vector of buffers given by <p buffers>
     //          from this <c OMKLVStoredStream>. This is "read scatter". The
     //          <p bufferCount> buffers are read in order until all have
@@ -89,7 +89,7 @@ public:
   virtual void probe(OMUInt64 position,
                      OMUInt32 bytesRequired,
                      OMUInt32& bytesAvailable) const;
-
+#endif
     // @cmember Write <p size> bytes from the buffer at address
     //          <p data> to this <c OMKLVStoredStream>.
   virtual void write(void* data, size_t size);
@@ -100,7 +100,7 @@ public:
   virtual void write(const OMByte* data,
                      const OMUInt32 bytes,
                      OMUInt32& bytesWritten);
-
+#if 0 // tjb not yet
     // @cmember Attempt to write the vector of buffers given by <p buffers>
     //          to this <c OMKLVStoredStream>. This is "write gather". The
     //          <p bufferCount> buffers are written in order until all have
@@ -125,7 +125,7 @@ public:
                      OMUInt32 bufferCount,
                      void* /* */ completion,
                      const void* clientArgument);
-
+#endif
     // @cmember The size of this <c OMKLVStoredStream> in bytes.
   virtual OMUInt64 size(void) const;
 

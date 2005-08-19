@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.cpp,v 1.14 2005/08/19 19:47:21 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.cpp,v 1.15 2005/08/19 21:00:58 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -252,7 +252,7 @@ void OMWrappedRawStorage::setPosition(OMUInt64 newPosition) const
 
   _store->setPosition(newPosition);
 }
-
+#if 0 // tjb not yet
 void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
                                        OMByte* bytes,
                                        OMUInt32 byteCount,
@@ -344,3 +344,4 @@ void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
                         completion,
                         clientArgument);
 }
+#endif
