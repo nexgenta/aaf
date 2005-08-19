@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.206 2005/08/19 19:33:34 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.207 2005/08/19 19:33:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1274,6 +1274,40 @@ void OMKLVStoredObject::write(bool b)
     byte = 0x00; // false
   }
   _storage->write(byte);
+}
+
+void OMKLVStoredObject::read(const wchar_t* string, OMUInt16 characterCount)
+{
+  TRACE("OMKLVStoredObject::read");
+
+  PRECONDITION("Valid buffer", string != 0);
+  PRECONDITION("Valid count", characterCount != 0);
+
+  OMCharacter* buffer = new OMCharacter[characterCount];
+  ASSERT("Valid heap pointer", buffer != 0);
+  OMPropertySize externalBytesSize = characterCount * 2;
+  _storage->read(reinterpret_cast<OMByte*>(buffer), externalBytesSize);
+
+  if (_reorderBytes) {
+    reorderString(buffer, characterCount);
+  }
+
+  internalizeString(buffer, const_cast<wchar_t*>(string), characterCount);
+}
+
+void OMKLVStoredObject::read(bool& b)
+{
+  TRACE("OMKLVStoredObject::read");
+
+  OMByte byte;
+  _storage->read(byte);
+  ASSERT("Valid bool", (byte == 0x00) || (byte == 0xff)); // tjb - error
+
+  if (byte == 0x00) {
+    b = false;
+  } else {
+    b = true;
+  }
 }
 
 void OMKLVStoredObject::writeProperty(OMPropertyId pid, const OMUInt32& value)
