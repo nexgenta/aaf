@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.175 2005/08/19 19:30:55 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.176 2005/08/19 19:30:59 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -86,15 +86,15 @@ OMKLVStoredObject* OMKLVStoredObject::openRead(OMMXFStorage* rawStorage)
   //   @parm The raw storage in which to open the file.
   //   @rdesc An <c OMKLVStoredObject> representing the root object.
   //        <p rawStorage> for modification.
-OMKLVStoredObject* OMKLVStoredObject::openModify(
-                                               OMMXFStorage* ANAME(rawStorage))
+OMKLVStoredObject* OMKLVStoredObject::openModify(OMMXFStorage* rawStorage)
 {
   TRACE("OMKLVStoredObject::openModify");
   PRECONDITION("Compatible raw storage access mode",
                          rawStorage->isReadable() && rawStorage->isWritable());
   PRECONDITION("Compatible raw storage", rawStorage->isPositionable());
-  ASSERT("Unimplemented code not reached", false); // tjb TBS
-  return 0;
+  OMKLVStoredObject* result = new OMKLVStoredObject(rawStorage, littleEndian);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
 }
 
   // @mfunc Create a new root <c OMKLVStoredObject> in the raw storage
