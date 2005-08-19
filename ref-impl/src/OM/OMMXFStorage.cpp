@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.180 2005/08/19 18:02:17 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.181 2005/08/19 18:02:27 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -471,6 +471,16 @@ void OMMXFStorage::readRandomIndex(OMUInt64 length)
   }
   OMUInt32 overallLength;
   read(overallLength, _reorderBytes);
+}
+
+bool OMMXFStorage::findRandomIndex(OMUInt64 fileSize,
+                                   OMUInt64& indexPosition)
+{
+  TRACE("OMMXFStorage::findRandomIndex");
+
+  ASSERT("Unimplemented code not reached", false);
+  bool result = false;
+  return result;
 }
 
 bool OMMXFStorage::isRandomIndex(OMUInt64 fileSize, OMUInt32 ripSize)
