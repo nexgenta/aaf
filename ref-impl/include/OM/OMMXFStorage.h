@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.129 2005/08/19 17:45:21 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.130 2005/08/19 17:45:26 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,6 +35,7 @@
 #include "OMVector.h"
 
 #define OM_NEW_STREAM_PARSING
+//#define OM_NEW_STREAM_WRITING
 
 static const OMKLVKey OpenIncompleteHeaderPartitionKey =
   {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
