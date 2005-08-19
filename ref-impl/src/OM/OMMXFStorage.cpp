@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.175 2005/08/19 18:01:51 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.176 2005/08/19 18:01:57 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2333,6 +2333,30 @@ OMMXFStorage::streamSegment(OMUInt32 sid, OMUInt64 position)
   POSTCONDITION("Valid result", result != 0);
   POSTCONDITION("Valid result", position >= result->_start);
   POSTCONDITION("Valid result", position <= result->_start + result->_size);
+  return result;
+}
+
+
+OMUInt64 OMMXFStorage::validSize(Segment* segment)
+{
+  TRACE("OMMXFStorage::validSize");
+
+  PRECONDITION("Valid segment", segment != 0);
+  Stream* stream = segment->_stream;
+  ASSERT("Valid stream", stream != 0);
+
+  OMUInt64 result; // length of valid portion of segment
+  if (stream->_size > segment->_start + segment->_size) {
+    // eos in later segment
+    result = segment->_size;
+  } else if (stream->_size < segment->_start) {
+    // eos in earlier segment
+    result = 0;
+  } else {
+    // eos in this segment
+    result = stream->_size - segment->_start;
+  }
+  ASSERT("Valid length", result <= segment->_size);
   return result;
 }
 
