@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.128 2005/08/19 17:45:18 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.129 2005/08/19 17:45:21 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -576,6 +576,7 @@ private:
   virtual Segment* findLastSegment(Stream* s);
   virtual OMUInt64 allocatedSize(Stream* s);
   virtual Segment* streamSegment(OMUInt32 sid, OMUInt64 position);
+  virtual OMUInt64 OMMXFStorage::validSize(Segment* segment);
 
     // debugging
   void printPartitions(void);
