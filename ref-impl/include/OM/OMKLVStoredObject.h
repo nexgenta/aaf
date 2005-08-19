@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.h,v 1.70 2005/08/19 19:15:39 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.h,v 1.71 2005/08/19 19:15:43 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -250,6 +250,13 @@ public:
     //          <c OMKLVStoredObject>.
   virtual void restore(OMDataStream& stream,
                        size_t externalSize);
+
+  static void reorderString(OMCharacter* string,
+                            size_t characterCount);
+
+  static void externalizeString(const wchar_t* internalString,
+                                OMCharacter* externalString,
+                                size_t characterCount);
 
   virtual void write(const wchar_t* string);
   virtual void write(bool b);
