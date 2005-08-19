@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.167 2005/08/19 19:29:50 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.168 2005/08/19 19:29:56 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1940,6 +1940,12 @@ void OMKLVStoredObject::deepRestore(const OMPropertySet& properties)
 void OMKLVStoredObject::streamRestore(void)
 {
   TRACE("OMKLVStoredObject::streamRestore")
+
+#if 1 // HACK4MEIP2
+  OMUInt64 headerPosition;
+  OMMXFStorage::findHeader(_storage, headerPosition);
+  _storage->setPosition(headerPosition);
+#endif
 
   OMKLVKey k;
   while (_storage->readOuterKLVKey(k)) {
