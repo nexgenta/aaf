@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.180 2005/08/19 19:31:19 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.181 2005/08/19 19:31:23 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1460,15 +1460,6 @@ void OMKLVStoredObject::flatRestore(const OMPropertySet& properties)
 
   const OMUInt16 overhead = sizeof(OMPropertyId) + sizeof(OMPropertySize);
 
-  OMPropertyId rPid;
-  _storage->read(rPid, _reorderBytes);
-  ASSERT("Property is reference/instance UID", rPid == PID_InterchangeObject_InstanceUID);
-  OMPropertySize length;
-  _storage->read(length, _reorderBytes);
-  ASSERT("Valid length", length == sizeof(OMUniqueObjectIdentification));
-  referenceRestore(properties.container(), PID_InterchangeObject_InstanceUID);
-  setLength = setLength - (overhead + sizeof(OMUniqueObjectIdentification));
-
   if (properties.container()->classId() == Class_Root) {
     OMUniqueObjectIdentification id;
     OMUInt64 objectDirectoryOffset = restoreObjectDirectoryReference(id);
@@ -1490,8 +1481,10 @@ void OMKLVStoredObject::flatRestore(const OMPropertySet& properties)
     OMPropertySize length;
     _storage->read(length, _reorderBytes);
 
-    // HACK4MEIP2
-    if ((!properties.isAllowed(pid)) && (pid > 0x8000)) {
+    if (pid == PID_InterchangeObject_InstanceUID) {
+      // The UID of this object
+      referenceRestore(properties.container(), pid);
+    } else if ((!properties.isAllowed(pid)) && (pid > 0x8000)) { // HACK4MEIP2
       // Dark extension
       OMByte b;
       for (OMPropertySize i = 0; i < length; i++) {
