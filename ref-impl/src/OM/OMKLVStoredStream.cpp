@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.cpp,v 1.23 2005/08/19 19:35:10 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.cpp,v 1.24 2005/08/19 19:35:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -131,7 +131,12 @@ void OMKLVStoredStream::write(OMIOVector buffers,
                               OMUInt32& bytesWritten)
 {
   TRACE("OMKLVStoredStream::write");
-  ASSERT("Unimplemented code not reached", false);
+  PRECONDITION("Valid store", _store != 0);
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  _store->streamWriteAt(_sid, _position, buffers, bufferCount, bytesWritten);
+  _position = _position + bytesWritten;
 }
 
 OMUInt64 OMKLVStoredStream::size(void) const
