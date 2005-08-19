@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.108 2005/08/19 17:43:40 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.109 2005/08/19 17:43:45 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -262,6 +262,15 @@ public:
   virtual void writeKLVLength(const OMUInt16& length);
   virtual void writeKLVLength(const OMUInt32& length);
   virtual void writeKLVLength(const OMUInt64& length);
+
+  virtual OMUInt64 reserveKLVLength(void);
+  virtual void fixupKLVLength(const OMUInt64 lengthPosition);
+
+  virtual OMUInt64 reserve(OMUInt32 size);
+  virtual void fixup(const OMUInt64& patchOffset, const OMUInt8& patchValue);
+  virtual void fixup(const OMUInt64& patchOffset, const OMUInt16& patchValue);
+  virtual void fixup(const OMUInt64& patchOffset, const OMUInt32& patchValue);
+  virtual void fixup(const OMUInt64& patchOffset, const OMUInt64& patchValue);
 
   virtual void writeBerLength(OMUInt32 lengthSize, const OMUInt64& length);
 
