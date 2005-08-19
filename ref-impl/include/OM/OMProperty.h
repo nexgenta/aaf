@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMProperty.h,v 1.74 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMProperty.h,v 1.75 2005/08/19 21:25:19 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -163,9 +163,6 @@ public:
   virtual void deepCopyTo(OMProperty* destination,
                           void* clientContext) const = 0;
 
-protected:
-  // @access Protected members.
-
     // @cmember Set the bit that indicates that this optional <c OMProperty>
     //          is present.
   void setPresent(void);
@@ -173,6 +170,9 @@ protected:
     // @cmember Clear the bit that indicates that this optional <c OMProperty>
     //          is present.
   void clearPresent(void);
+
+protected:
+  // @access Protected members.
 
     // @cmember The <c OMStoredObject> that contains the persisted
     //          representation of this <c OMProperty>.
