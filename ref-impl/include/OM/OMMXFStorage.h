@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.122 2005/08/19 17:44:45 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.123 2005/08/19 17:44:48 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -251,7 +251,7 @@ public:
 
   virtual void writeRandomIndex(void);
 
-  virtual void readRandomIndex(void);
+  virtual void readRandomIndex(OMUInt64 length);
 
     // @cmember Write a fill key, a BER encoded length and
     //          <p length> bytes of fill.
