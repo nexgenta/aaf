@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.192 2005/08/19 18:03:20 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.193 2005/08/19 18:03:26 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2175,6 +2175,32 @@ void OMMXFStorage::restoreStreams(void)
   omout << "OMMXFStorage::restoreStreams" << endl;
   printPartitions();
   printStreams();
+#endif
+}
+
+void OMMXFStorage::checkStreams(void)
+{
+  TRACE("OMMXFStorage::checkStreams");
+#if defined(OM_DEBUG)
+  if (_segments != 0) {
+    SegmentListIterator sl(*_segments, OMBefore);
+    while (++sl) {
+      Segment* seg = sl.value();
+      OMUInt64 start = seg->_origin;
+      OMUInt64 end = seg->_origin + seg->_size;
+      setPosition(start);
+      while (position() < end) {
+        OMKLVKey k;
+        bool b = readOuterKLVKey(k);
+        ASSERT("Read key", b);
+        OMUInt64 length = readKLVLength();
+        skipV(length);
+      }
+      OMUInt64 pos = position();
+ 
+     ASSERT("Segment is KLV consistent", pos == end);
+    }
+  }
 #endif
 }
 
