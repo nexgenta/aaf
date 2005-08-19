@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.185 2005/08/19 19:31:37 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.186 2005/08/19 19:31:40 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1169,6 +1169,16 @@ void OMKLVStoredObject::restore(OMDataStream& /* stream */,
   TRACE("OMKLVStoredObject::restore(OMDataStream)");
 
   ASSERT("NYI", false);
+}
+
+void OMKLVStoredObject::write(const wchar_t* string)
+{
+  TRACE("OMKLVStoredObject::write");
+}
+
+void OMKLVStoredObject::write(bool b)
+{
+  TRACE("OMKLVStoredObject::write");
 }
 
 void OMKLVStoredObject::writeProperty(OMPropertyId pid, const OMUInt32& value)
