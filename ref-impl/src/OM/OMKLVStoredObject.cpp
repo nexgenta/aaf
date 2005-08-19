@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.164 2005/08/19 19:29:34 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.165 2005/08/19 19:29:39 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -956,7 +956,8 @@ void OMKLVStoredObject::restore(OMDataVector& property,
   OMType* elementType = at->elementType();
   ASSERT("Fixed size elements", elementType->isFixedSize());
   OMUInt32 elementSize = elementType->externalSize();
-  ASSERT("Consistent element size", elementSize = property.elementSize());
+
+  ASSERT("Consistent element size", elementSize == property.elementSize());
 
   // Allocate buffer for one element
   OMByte* buffer = new OMByte[elementSize];
@@ -1011,7 +1012,7 @@ void OMKLVStoredObject::restore(OMDataSet& property,
   OMType* elementType = st->elementType();
   ASSERT("Fixed size elements", elementType->isFixedSize());
   OMUInt32 elementSize = elementType->externalSize();
-  ASSERT("Consistent element size", elementSize = property.elementSize());
+  ASSERT("Consistent element size", elementSize == property.elementSize());
 
   // Allocate buffer for one element
   OMByte* buffer = new OMByte[elementSize];
