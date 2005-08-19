@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.h,v 1.72 2005/08/19 19:15:48 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.h,v 1.73 2005/08/19 19:15:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -257,6 +257,10 @@ public:
 
   static void externalizeString(const wchar_t* internalString,
                                 OMCharacter* externalString,
+                                size_t characterCount);
+
+  static void internalizeString(const OMCharacter* externalString,
+                                wchar_t* internalString,
                                 size_t characterCount);
 
   virtual void write(const wchar_t* string);
