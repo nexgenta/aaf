@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.145 2005/08/19 17:58:40 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.146 2005/08/19 17:58:45 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -224,6 +224,19 @@ OMUniqueObjectIdentification OMMXFStorage::generation(void) const
 {
   TRACE("OMMXFStorage::generation");
   return _generation;
+}
+
+bool OMMXFStorage::findHeader(const OMRawStorage* store,
+                              OMUInt64& headerPosition)
+{
+  OMUInt64 startPosition = 0;
+  store->setPosition(startPosition);
+  return findPattern(store,
+                     startPosition,
+                     headerPosition,
+                     HeaderPrefix,
+                     sizeof(HeaderPrefix),
+                     RunInLimit);
 }
 
 bool OMMXFStorage::isHeader(const OMKLVKey& k)
