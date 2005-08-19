@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.218 2005/08/19 18:05:35 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.219 2005/08/19 18:05:41 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2283,6 +2283,8 @@ void OMMXFStorage::saveStreams(void)
       if ((seg == last) &&  (seg->_stream->_label == IndexTableSegmentKey)) {
         // If the last segment is index - put it in the footer.
         writeFooterPartition(s->_sid, s->_gridSize);
+      } else if (s->_label == IndexTableSegmentKey) {
+        writeBodyPartition(0, s->_sid, s->_gridSize);
       } else {
         // Otherwise this segment gets its own body
         writeBodyPartition(s->_sid, 0, s->_gridSize);
@@ -2379,6 +2381,8 @@ void OMMXFStorage::saveStreams(void)
         // and it's a part of an index stream - put it
         // in the footer partition.
         writeFooterPartition(s->_sid, s->_gridSize);
+      } else if (s->_label == IndexTableSegmentKey) {
+        writeBodyPartition(0, s->_sid, s->_gridSize);
       } else {
         writeBodyPartition(s->_sid, 0, s->_gridSize);
       }
