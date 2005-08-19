@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.205 2005/08/19 19:33:30 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.206 2005/08/19 19:33:34 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -1224,6 +1224,17 @@ void OMKLVStoredObject::externalizeString(const wchar_t* internalString,
 
   for (size_t i = 0; i < characterCount; i++) {
     externalString[i] = internalString[i];
+  }
+}
+
+void OMKLVStoredObject::internalizeString(const OMCharacter* externalString,
+                                          wchar_t* internalString,
+                                          size_t characterCount)
+{
+  TRACE("OMKLVStoredObject::internalizeString");
+
+  for (size_t i = 0; i < characterCount; i++) {
+    internalString[i] = externalString[i];
   }
 }
 
