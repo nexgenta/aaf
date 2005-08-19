@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.207 2005/08/19 19:33:38 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.208 2005/08/19 19:33:42 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -176,7 +176,23 @@ OMKLVStoredObject::isRecognized(OMRawStorage* rawStorage)
               OMUInt16 minorVersion;
               if (OMMXFStorage::read(rawStorage, minorVersion, reorderBytes)) {
                 if (minorVersion == currentMinorVersion) {
-                  result = true;
+                  // Skip up to count of essence container labels.
+                  OMUInt64 skip = fixedPartitionSize -
+                                  (2 * sizeof(OMUInt16)) - // major/minor
+                                  (2 * sizeof(OMUInt32));  // ecl count/size
+                  OMMXFStorage::skipBytes(rawStorage, skip);
+                  // Read essence container label count and size.
+                  OMUInt32 elementCount;
+                  OMMXFStorage::read(rawStorage, elementCount, reorderBytes);
+                  OMUInt32 elementSize;
+                  OMMXFStorage::read(rawStorage, elementSize, reorderBytes);
+                  // Check for consistency between partition length and essence
+                  // container label count and size.
+                  OMUInt64 expectedLength = fixedPartitionSize +
+                                            (elementCount * elementSize);
+                  if (length == expectedLength) {
+                    result = true;
+                  }
                 }
               }
             }
