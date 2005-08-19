@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.204 2005/08/19 18:04:17 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.205 2005/08/19 18:04:21 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1537,6 +1537,8 @@ OMUInt64 OMMXFStorage::streamSize(OMUInt32 sid)
 
 void OMMXFStorage::streamSetSize(OMUInt32 /* sid */, OMUInt64 /* newSize */)
 {
+  TRACE("OMMXFStorage::streamSetSize");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMMXFStorage::streamRawWrite(OMUInt32 /* sid */,
