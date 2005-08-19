@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.160 2005/08/19 19:29:10 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.161 2005/08/19 19:29:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -430,11 +430,13 @@ void OMKLVStoredObject::save(const OMPropertySet& properties)
   TRACE("OMKLVStoredObject::save(OMPropertySet)");
 
   // Length
-  OMUInt64 setLength = length(properties);
-  _storage->writeKLVLength(setLength);
+  OMUInt64 lengthPosition = _storage->reserveKLVLength();
 
   // Flat properties
   flatSave(properties);
+
+  // patch length
+  _storage->fixupKLVLength(lengthPosition);
 
   // Deep properties
   deepSave(properties);
