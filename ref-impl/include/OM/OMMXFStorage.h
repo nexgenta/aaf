@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.136 2005/08/19 17:45:48 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.137 2005/08/19 17:45:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -318,6 +318,14 @@ public:
                              OMUInt32& bodySID,
                              OMUInt32& indexSID,
                              OMUInt32& KAGSize);
+
+  virtual void readPartition(OMUInt64 length,
+                             OMUInt32& bodySID,
+                             OMUInt32& indexSID,
+                             OMUInt32& KAGSize,
+                             OMUInt64& previousPartition,
+                             OMUInt64& thisPartition,
+                             OMUInt64& footerPartition);
 
   virtual void readHeaderPartition(void);
 
