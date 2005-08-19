@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.33 2005/02/05 18:13:36 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.34 2005/08/19 23:56:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -306,7 +306,20 @@ void ImplAAFMetaDictionary::onRestore(void* /* clientContext */) const
 #endif // #if 0
 }
 
+void
+ImplAAFMetaDictionary::associate(const OMObjectIdentification& id,
+                                 const OMPropertyId propertyId)
+{
+#if 0 // tjb not yet
+  assert(_dataDictionary);
+  _dataDictionary->associate(*reinterpret_cast<const aafUID_t *>(&id), propertyId);
+#endif
+}
 
+ClassDefinitionsIterator* ImplAAFMetaDictionary::classDefinitions(void) const
+{
+  return _classDefinitions.createIterator();
+}
 
 // Temporary method to set the 
 void ImplAAFMetaDictionary::setDataDictionary(ImplAAFDictionary *dataDictionary)

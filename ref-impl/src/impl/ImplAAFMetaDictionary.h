@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.h,v 1.25 2005/02/05 18:13:37 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.h,v 1.26 2005/08/19 23:56:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -122,8 +122,11 @@ public:
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
 
+  // Overrides from OMDictionary
+  virtual void associate(const OMObjectIdentification& id,
+                         const OMPropertyId propertyId);
 
-
+  virtual ClassDefinitionsIterator* classDefinitions(void) const;
 
   //
   // Class and type access methods ...
