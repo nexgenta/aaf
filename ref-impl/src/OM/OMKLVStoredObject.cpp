@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.192 2005/08/19 19:32:09 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.193 2005/08/19 19:32:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1202,6 +1202,28 @@ void OMKLVStoredObject::restore(OMDataStream& /* stream */,
   TRACE("OMKLVStoredObject::restore(OMDataStream)");
 
   ASSERT("NYI", false);
+}
+
+void OMKLVStoredObject::reorderString(OMCharacter* string,
+                                      size_t characterCount)
+{
+  TRACE("OMKLVStoredObject::reorderString");
+
+  for (size_t i = 0; i < characterCount; i++) {
+    OMByte* src = reinterpret_cast<OMByte*>(&string[i]);
+    OMType::reorderInteger(src, sizeof(OMUInt16));
+  }
+}
+
+void OMKLVStoredObject::externalizeString(const wchar_t* internalString,
+                                          OMCharacter* externalString,
+                                          size_t characterCount)
+{
+  TRACE("OMKLVStoredObject::externalizeString");
+
+  for (size_t i = 0; i < characterCount; i++) {
+    externalString[i] = internalString[i];
+  }
 }
 
 #if defined(OM_EXTENSIONSONLY)
