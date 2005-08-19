@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.161 2005/08/19 17:59:54 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.162 2005/08/19 17:59:59 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,6 +51,8 @@ OMMXFStorage::OMMXFStorage(OMRawStorage* store)
   : OMWrappedRawStorage(store),
   _primerPosition(0),
   _headerByteCount(0),
+  _fillStart(0),
+  _fillEnd(0),
   _fixups(),
   _reorderBytes(false),
   _operationalPattern(nullOMKLVKey),
@@ -2119,7 +2121,9 @@ void OMMXFStorage::markEssenceSegmentEnd(OMUInt64 endKeyPosition)
 void OMMXFStorage::markFill(OMUInt64 fillKeyPosition, OMUInt64 fillEndPosition)
 {
   TRACE("OMMXFStorage::markFill");
-  ASSERT("Unimplemented code not reached", false);
+
+  _fillStart = fillKeyPosition;
+  _fillEnd = fillEndPosition;
 }
 
 OMMXFStorage::Stream* OMMXFStorage::createStream(OMUInt32 sid,
