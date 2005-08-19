@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.172 2005/08/19 18:01:30 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.173 2005/08/19 18:01:37 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,6 @@
 
 //#define INSTANCEID_DEBUG 1
 //#define OMONLY 1
-//#define OM_NEW_STREAM_PARSING
 
   // @mfunc Constructor.
 OMMXFStorage::OMMXFStorage(OMRawStorage* store)
