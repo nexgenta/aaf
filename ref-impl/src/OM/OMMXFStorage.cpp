@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.219 2005/08/19 18:05:41 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.220 2005/08/19 18:05:45 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -938,7 +938,11 @@ void OMMXFStorage::readHeaderPartition(void)
 {
   TRACE("OMMXFStorage::readHeaderPartition");
 
+#if defined(OM_DEBUG)
+  OMUInt64 length = readKLVLength();
+#else
   readKLVLength();
+#endif
   OMUInt16 majorVersion;
   read(majorVersion, _reorderBytes);
   OMUInt16 minorVersion;
@@ -966,6 +970,8 @@ void OMMXFStorage::readHeaderPartition(void)
   read(elementCount, _reorderBytes);
   OMUInt32 elementSize;
   read(elementSize, _reorderBytes);
+  ASSERT("Consistent length",
+         length == fixedPartitionSize + (elementCount * elementSize));
   OMKLVKey essenceContainer;
   for (OMUInt32 i = 0; i < elementCount; i++) {
     readKLVKey(essenceContainer);
