@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.131 2005/08/19 17:45:29 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.132 2005/08/19 17:45:33 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -371,7 +371,7 @@ public:
 
   virtual void fixupReference(OMUInt64 patchOffset, OMUInt64 patchValue);
 
-  virtual void restoreObjectDirectory(void);
+  virtual void restoreObjectDirectory(OMUInt64 headerOffset);
 
   virtual void setObjectDirectoryOffset(OMUInt64 objectDirectoryOffset);
 
