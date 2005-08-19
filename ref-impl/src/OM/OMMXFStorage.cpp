@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.214 2005/08/19 18:05:17 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.215 2005/08/19 18:05:20 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2047,7 +2047,35 @@ void OMMXFStorage::streamReadAt(OMUInt32 sid,
                                 const void* clientArgument)
 {
   TRACE("OMMXFStorage::streamReadAt");
-  ASSERT("Unimplemented code not reached", false);
+
+  PRECONDITION("Valid buffer", buffer != 0);
+  PRECONDITION("Buffer not empty", bytes != 0);
+
+  // Calculate read size (not yet used)
+  OMUInt32 readCount = bytes;
+  OMUInt64 streamBytes = streamSize(sid);
+  if (position > streamBytes) {
+    readCount = 0;
+  } else if ((position + bytes) > streamBytes) {
+    readCount = static_cast<OMUInt32>(streamBytes - position);
+  }
+
+  // Map position (and check that we don't split the buffer)
+  OMUInt64 rawPosition;
+  OMUInt32 rawByteCount;
+  streamFragment(sid,
+                 position,
+                 bytes,
+                 rawPosition,
+                 rawByteCount);
+  ASSERT("Buffer not split", bytes == rawByteCount);
+  // Read through the raw storage
+  OMWrappedRawStorage::streamReadAt(rawPosition,
+                                    buffer,
+                                    rawByteCount,
+                                    completion,
+                                    clientArgument);
+  // The I/O hasn't happened yet
 }
 
 void OMMXFStorage::streamReadAt(OMUInt32 sid,
