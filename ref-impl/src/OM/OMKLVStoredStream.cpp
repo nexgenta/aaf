@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.cpp,v 1.25 2005/08/19 19:35:21 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.cpp,v 1.26 2005/08/19 19:35:26 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,7 @@ void OMKLVStoredStream::read(void* ANAME(data), size_t ANAME(size)) const
   //   @parm The vector of buffers into which the bytes are to be read.
   //   @parm The count of buffers.
   //   @parm The actual number of bytes that were read.
-void OMKLVStoredStream::read(OMIOVector buffers,
+void OMKLVStoredStream::read(OMIOBufferDescriptor* buffers,
                              OMUInt32 bufferCount,
                              OMUInt32& bytesRead) const
 {
@@ -132,7 +132,7 @@ void OMKLVStoredStream::write(const OMByte* data,
   //   @parm The vector of buffers from which the bytes are to be written.
   //   @parm The count of buffers.
   //   @parm The actual number of bytes that were written.
-void OMKLVStoredStream::write(OMIOVector buffers,
+void OMKLVStoredStream::write(OMIOBufferDescriptor* buffers,
                               OMUInt32 bufferCount,
                               OMUInt32& bytesWritten)
 {
