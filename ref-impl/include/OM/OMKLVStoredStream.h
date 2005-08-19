@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.22 2005/08/19 19:17:16 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.23 2005/08/19 19:17:20 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,6 +81,14 @@ public:
                     OMUInt32 bufferCount,
                     void* /* */ completion,
                     const void* clientArgument) const;
+
+    // @cmember Find out if <p bytesRequired> contiguous bytes, starting at
+    //          <p position>, in this <c OMKLVStoredStream> are available for
+    //          writing. The actual number of bytes available is returned
+    //          in <p bytesAvailable>.
+  virtual void probe(OMUInt64 position,
+                     OMUInt32 bytesRequired,
+                     OMUInt32& bytesAvailable) const;
 
     // @cmember Write <p size> bytes from the buffer at address
     //          <p data> to this <c OMKLVStoredStream>.
