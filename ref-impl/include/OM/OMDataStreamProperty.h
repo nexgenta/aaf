@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.h,v 1.37 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMDataStreamProperty.h,v 1.38 2005/08/19 20:59:09 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -169,13 +169,13 @@ public:
 
   OMDataStreamAccess* streamAccess(void) const;
 
+  OMStoredStream* stream(void) const; // tjb should be private
+
 protected:
 
   virtual const wchar_t* storedName(void) const;
 
 private:
-
-  OMStoredStream* stream(void) const;
 
   void open(void);
   void create(void);
