@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.cpp,v 1.60 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFClassDef.cpp,v 1.61 2005/08/19 23:55:07 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -714,6 +714,11 @@ const OMPropertyDefinition* ImplAAFClassDef::propertyDefinition(
   }
   
   return pDstPropertyDef;
+}
+
+PropertyDefinitionsIterator* ImplAAFClassDef::propertyDefinitions(void) const
+{
+  return _Properties.createIterator();
 }
 
 // Find the unique identifier property defintion for this class or any parent class

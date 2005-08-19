@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMClassDefinition.h,v 1.10 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMClassDefinition.h,v 1.11 2005/08/19 23:55:06 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,9 @@
 class OMPropertyDefinition;
 class OMStorable;
 
+class OMReferenceContainerIterator;
+typedef OMReferenceContainerIterator PropertyDefinitionsIterator;
+
   // @class Abstract base class used to define persistent classes
   //        supported by the Object Manager.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
@@ -49,6 +52,8 @@ public:
   virtual const OMPropertyDefinition* propertyDefinition(
 			     const  OMStorable* pDstStorable,
 			     const OMPropertyDefinition* pSrcProperty ) = 0;
+
+  virtual PropertyDefinitionsIterator* propertyDefinitions(void) const = 0;
 
 };
 

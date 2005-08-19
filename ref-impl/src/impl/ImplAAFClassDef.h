@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.h,v 1.38 2005/04/05 17:23:38 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFClassDef.h,v 1.39 2005/08/19 23:55:06 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -207,6 +207,8 @@ public:
   const OMPropertyDefinition* propertyDefinition(
 			     const OMStorable* pDstStorable,
 				 const OMPropertyDefinition* pSrcPropertyDef );
+
+   virtual PropertyDefinitionsIterator* propertyDefinitions(void) const;
 
 public:
 
