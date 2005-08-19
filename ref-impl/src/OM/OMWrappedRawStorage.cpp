@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.cpp,v 1.7 2005/08/19 19:46:47 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.cpp,v 1.8 2005/08/19 19:46:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -284,7 +284,8 @@ void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
                                        OMUInt32& bytesRead) const
 {
   TRACE("OMWrappedRawStorage::streamReadAt");
-  ASSERT("Unimplemented code not reached", false);
+
+  _store->streamReadAt(position, buffers, bufferCount, bytesRead);
 }
 
 void OMWrappedRawStorage::streamWrite(const OMByte* bytes,
