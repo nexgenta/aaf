@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.132 2005/08/19 17:45:33 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.133 2005/08/19 17:45:37 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -117,7 +117,7 @@ static const OMUInt64 minimumFill = sizeof(OMKLVKey) + 1 + sizeof(OMUInt64);
 //
 static const OMUInt64 fillBufferZoneSize = 32;
 
-static const OMUInt32 preallocatedMetadataSize = 0x20000;
+static const OMUInt32 preallocatedMetadataSize = 0x40000;
 static const OMUInt64 bodyPartitionOffset = preallocatedMetadataSize +
                                             fillBufferZoneSize;
 
