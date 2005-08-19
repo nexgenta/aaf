@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.197 2005/08/19 19:32:39 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.198 2005/08/19 19:32:46 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -800,7 +800,7 @@ OMRootStorable* OMKLVStoredObject::restore(OMFile& file)
     _storage->removeObject(*root);
     // restore the meta object directory
     //
-    _storage->restoreObjectDirectory();
+    _storage->restoreObjectDirectory(headerPosition);
     _storage->readKLVKey(k);
     convert(cid, k);
   } else {
