@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.204 2005/08/19 19:33:26 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.205 2005/08/19 19:33:30 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2273,6 +2273,12 @@ void OMKLVStoredObject::writeMetaDictionary(const OMDictionary* dictionary)
     _storage->fixupKLVLength(lengthPosition);
 
   } // else no extensions - no dictionary
+}
+
+void OMKLVStoredObject::writeDefinition(const OMDefinition* /* d */)
+{
+  TRACE("OMKLVStoredObject::writeDefinition");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMKLVStoredObject::writeClassDefinition(const OMClassDefinition* cd)
