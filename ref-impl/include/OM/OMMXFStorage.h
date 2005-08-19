@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.115 2005/08/19 17:44:12 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.116 2005/08/19 17:44:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,6 +89,10 @@ static const OMKLVKey IndexTableSegmentKey =
 static const OMKLVKey RandomIndexMetadataKey =
   {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
    0x0d, 0x01, 0x02, 0x01, 0x01, 0x11, 0x01, 0x00};
+
+static const OMKLVKey SystemMetadataKey =
+  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
+   0x0d, 0x01, 0x03, 0x01, 0x04, 0x01, 0x01, 0x00};
 
 static const OMByte EssenceElementPrefix[] =
   {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01};
