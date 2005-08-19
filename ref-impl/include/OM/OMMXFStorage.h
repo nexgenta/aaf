@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.141 2005/08/19 17:46:09 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.142 2005/08/19 17:46:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -456,6 +456,8 @@ public:
 
   virtual void saveStreams(void);
   virtual void restoreStreams(void);
+
+  virtual void checkStreams(void);
 
   struct Stream;
   struct Segment {
