@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObjectFactory.cpp,v 1.30 2005/08/19 19:37:20 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObjectFactory.cpp,v 1.31 2005/08/19 19:37:28 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -272,6 +272,7 @@ void OMKLVStoredObjectFactory::close(OMFile* file)
   if (OMKLVStoredObject::hasMxfStorage(file)) {
     OMMXFStorage* store = OMKLVStoredObject::mxfStorage(file);
     ASSERT("Valid store", store != 0);
+    store->checkStreams();
     delete store;
   }
 }
