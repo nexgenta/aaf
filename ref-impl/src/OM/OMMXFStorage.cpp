@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.157 2005/08/19 17:59:35 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.158 2005/08/19 17:59:39 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2024,6 +2024,42 @@ bool OMMXFStorage::findPattern(const OMRawStorage* store,
     }
   } while ((!found) && (pos < limit) && (c == 1));
   return found;
+}
+
+void OMMXFStorage::markMetadataStart(OMUInt64 primerKeyPosition)
+{
+  TRACE("OMMXFStorage::");
+}
+
+void OMMXFStorage::markMetadataEnd(OMUInt64 endKeyPosition)
+{
+  TRACE("OMMXFStorage::markMetadataEnd");
+}
+
+void OMMXFStorage::markIndexStart(OMUInt32 sid, OMUInt64 indexKeyPosition)
+{
+  TRACE("OMMXFStorage::markIndexStart");
+}
+
+void OMMXFStorage::markIndexEnd(OMUInt64 endKeyPosition)
+{
+  TRACE("OMMXFStorage::markIndexEnd");
+}
+
+void OMMXFStorage::markEssenceSegmentStart(OMUInt32 sid,
+                                           OMUInt64 essenceKeyPosition)
+{
+  TRACE("OMMXFStorage::markEssenceSegmentStart");
+}
+
+void OMMXFStorage::markEssenceSegmentEnd(OMUInt64 endKeyPosition)
+{
+  TRACE("OMMXFStorage::markEssenceSegmentEnd");
+}
+
+void OMMXFStorage::markFill(OMUInt64 fillKeyPosition, OMUInt64 fillEndPosition)
+{
+  TRACE("OMMXFStorage::markFill");
 }
 
 OMMXFStorage::Stream* OMMXFStorage::createStream(OMUInt32 sid,
