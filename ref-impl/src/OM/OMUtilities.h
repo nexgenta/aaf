@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.h,v 1.44 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMUtilities.h,v 1.45 2005/08/19 20:54:30 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -244,6 +244,18 @@ void fromString(OMObjectIdentification& id, const char* idString);
 
   // Does idString represent a vaild OMObjectIdentification ?
 bool isValidObjectIdentificationString(const char* idString);
+
+  // @func Convert the <c OMUniqueObjectIdentification> id
+  //       into the <c OMKLVKey> key.
+  //   @parm The resulting <c OMKLVKey>.
+  //   @parm The input <c OMUniqueObjectIdentification>.
+void convert(OMKLVKey& key, const OMUniqueObjectIdentification& id);
+
+  // @func Convert the <c OMKLVKey> key
+  //       into the <c OMUniqueObjectIdentification> id.
+  //   @parm The resulting <c OMUniqueObjectIdentification>.
+  //   @parm The input <c OMKLVKey>.
+void convert(OMUniqueObjectIdentification& id, const OMKLVKey& key);
 
   // Check of types
 
