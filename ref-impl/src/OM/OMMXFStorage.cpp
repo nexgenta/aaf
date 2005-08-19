@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.169 2005/08/19 18:01:08 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.170 2005/08/19 18:01:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,7 @@
 
 //#define INSTANCEID_DEBUG 1
 //#define OMONLY 1
+//#define OM_NEW_STREAM_PARSING
 
   // @mfunc Constructor.
 OMMXFStorage::OMMXFStorage(OMRawStorage* store)
@@ -1807,8 +1808,6 @@ void OMMXFStorage::saveStreams(void)
     writePartition(FooterKey, 0, 0, defaultKAGSize);
   }
 }
-
-//#define OM_NEW_STREAM_PARSING
 
 void OMMXFStorage::restoreStreams(void)
 {
