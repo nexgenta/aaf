@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.220 2005/08/19 18:05:45 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.221 2005/08/19 18:05:49 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -1009,6 +1009,46 @@ bool OMMXFStorage::read(const OMRawStorage* store,
   if (bytesRead == sizeof(OMUInt16)) {
     if (reorderBytes) {
       OMType::reorderInteger(dest, sizeof(OMUInt16));
+    }
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool OMMXFStorage::read(const OMRawStorage* store,
+                        OMUInt32& i,
+                        bool reorderBytes)
+{
+  TRACE("OMMXFStorage::read");
+  bool result;
+  OMUInt32 bytesRead;
+  OMByte* dest = reinterpret_cast<OMByte*>(&i);
+  store->read(dest, sizeof(OMUInt32), bytesRead);
+  if (bytesRead == sizeof(OMUInt32)) {
+    if (reorderBytes) {
+      OMType::reorderInteger(dest, sizeof(OMUInt32));
+    }
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool OMMXFStorage::read(const OMRawStorage* store,
+                        OMUInt64& i,
+                        bool reorderBytes)
+{
+  TRACE("OMMXFStorage::read");
+  bool result;
+  OMUInt32 bytesRead;
+  OMByte* dest = reinterpret_cast<OMByte*>(&i);
+  store->read(dest, sizeof(OMUInt64), bytesRead);
+  if (bytesRead == sizeof(OMUInt64)) {
+    if (reorderBytes) {
+      OMType::reorderInteger(dest, sizeof(OMUInt64));
     }
     result = true;
   } else {
