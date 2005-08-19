@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.h,v 1.73 2005/08/19 19:15:52 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.h,v 1.74 2005/08/19 19:15:55 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -265,6 +265,9 @@ public:
 
   virtual void write(const wchar_t* string);
   virtual void write(bool b);
+
+  virtual void read(const wchar_t* string, OMUInt16 characterCount);
+  virtual void read(bool& b);
 
   virtual void writeProperty(OMPropertyId pid, const OMUInt32& value);
   virtual void readProperty(const OMPropertyId& pid, OMUInt32& value);
