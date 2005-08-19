@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.202 2005/08/19 18:04:09 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.203 2005/08/19 18:04:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1720,6 +1720,16 @@ void OMMXFStorage::streamReadAt(OMUInt32 sid,
     pos = pos + r;
     p = p + r;
   }
+}
+
+void OMMXFStorage::streamReadAt(OMUInt32 sid,
+                                OMUInt64 position,
+                                OMIOVector buffers,
+                                OMUInt32 bufferCount,
+                                OMUInt32& bytesRead)
+{
+  TRACE("OMMXFStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMMXFStorage::streamRestoreSegment(OMUInt32 sid,
