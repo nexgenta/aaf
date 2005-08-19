@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.193 2005/08/19 18:03:26 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.194 2005/08/19 18:03:34 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2404,8 +2404,8 @@ void OMMXFStorage::markIndexEnd(OMUInt64 endKeyPosition)
     OMUInt64 indexByteCount = endKeyPosition - _indexPosition;
     streamRestoreSegment(_indexSID,
                          _indexPosition,
-                         indexByteCount + free,
                          indexByteCount,
+                         indexByteCount - free,
                          _indexKey,
                          _gridSize);
 
@@ -2445,8 +2445,8 @@ void OMMXFStorage::markEssenceSegmentEnd(OMUInt64 endKeyPosition)
     OMUInt64 essenceByteCount = endKeyPosition - _essencePosition;
     streamRestoreSegment(_essenceSID,
                          _essencePosition,
-                         essenceByteCount + free,
                          essenceByteCount,
+                         essenceByteCount - free,
                          _essenceKey,
                          _gridSize);
 
