@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.h,v 1.71 2005/08/19 19:15:43 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.h,v 1.72 2005/08/19 19:15:48 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -46,6 +46,7 @@ class OMDataStreamProperty;
 class OMKLVStoredStream;
 
 class OMDictionary;
+class OMDefinition;
 class OMClassDefinition;
 class OMPropertyDefinition;
 class OMType;
@@ -295,6 +296,8 @@ public:
   OMUInt64 restoreObjectDirectoryReference(OMUniqueObjectIdentification& id);
 
   void writeMetaDictionary(const OMDictionary* dictionary);
+
+  void writeDefinition(const OMDefinition* d);
 
   void writeClassDefinition(const OMClassDefinition* cd);
 
