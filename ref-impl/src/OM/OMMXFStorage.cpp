@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.182 2005/08/19 18:02:31 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.183 2005/08/19 18:02:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -487,8 +487,18 @@ bool OMMXFStorage::isRandomIndex(OMUInt64 fileSize, OMUInt32 ripSize)
 {
   TRACE("OMMXFStorage::isRandomIndex");
   
-  ASSERT("Unimplemented code not reached", false);
   bool result = false;
+  // How do we check for a reasonable size ?
+  if ((ripSize > 21) && (ripSize < fileSize)) {
+    setPosition(fileSize - ripSize);
+    OMKLVKey k;
+    if (readOuterKLVKey(k)) {
+      if (k == RandomIndexMetadataKey) {
+        // Also check length ?
+        result = true;
+      }
+    }
+  }
   return result;
 }
 
