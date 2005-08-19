@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.199 2005/08/19 19:32:52 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.200 2005/08/19 19:33:00 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2547,16 +2547,15 @@ void OMKLVStoredObject::writeTypeDefinition(const OMType* td)
     OMUInt32 count = rt->memberCount();
     _storage->write(count, _reorderBytes);
     for (OMUInt32 i = 0; i < count; i++) {
-      const OMRecordType::Member member = rt->member(i);
       // MemberType
-      const OMType* mType = member._type;
+      const OMType* mType = rt->memberType(i);
       OMUniqueObjectIdentification id = mType->identification();
       ASSERT("Valid identification", id != nullOMUniqueObjectIdentification);
       OMKLVKey k;
       convert(k, id);
       _storage->writeKLVKey(k);
       // MemberName
-      const wchar_t* mName = member._name;
+      const wchar_t* mName = rt->memberName(i);
       write(mName);
     }
     break;
