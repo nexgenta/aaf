@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafanalyzer.mk,v 1.2 2005/08/18 20:41:38 greek_fire Exp $ $Name:  $
+# $Id: aafanalyzer.mk,v 1.3 2005/08/19 17:35:20 greek_fire Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -56,11 +56,11 @@ all : $(OBJDIR) $(BINTARGET)
 
 ifeq ($(AAFTARGET),Debug-static)
 $(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
-	$(LD) $(CXXOBJS) -L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) -lAAFAnalyzerBase -lEditProtocolTest -lBaseTest -lTestPhase -laxLib $(STATIC_LINK_LINE) -o $@
+	$(LD) $(CXXOBJS) -L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) $(PROGLIBS) -laxLib $(STATIC_LINK_LINE) -o $@
 else
 $(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
 	$(LD) $(CXXOBJS) $(RPATH_OPT) \
-	-L$(AAFSDKLIBDIR) -L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) -lAAFAnalyzerBase -lEditProtocolTest -lBaseTest -lTestPhase -laxLib -laaflib -laafiid $(LIBCIO) -o $@
+	-L$(AAFSDKLIBDIR) -L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) $(PROGLIBS) -laxLib -laaflib -laafiid $(LIBCIO) -o $@
 endif
 
 .PHONY : clean
