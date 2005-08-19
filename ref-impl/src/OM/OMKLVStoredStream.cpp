@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.cpp,v 1.28 2005/08/19 19:35:36 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.cpp,v 1.29 2005/08/19 19:35:42 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -108,7 +108,7 @@ void OMKLVStoredStream::read(OMUInt64 position,
   PRECONDITION("Valid size", bytes > 0);
 
   _store->streamReadAt(_sid,
-                       _position,
+                       position,
                        buffer,
                        bytes,
                        completion,
