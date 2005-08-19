@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.154 2005/08/19 17:59:23 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.155 2005/08/19 17:59:26 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1695,7 +1695,9 @@ void OMMXFStorage::saveStreams(void)
 
     // We expect to be positioned in the pre-allocated header
     // space just after the last metadata object
-    ASSERT("Valid position", position() < bodyPartitionOffset);
+    if (position() >= bodyPartitionOffset) {
+      throw OMException("Preallocated metadata space exhausted.");
+    }
 
     // fill remainder of pre-allocated space
     OMUInt32 fillAlignment = bodyPartitionOffset;
