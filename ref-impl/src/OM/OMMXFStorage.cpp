@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.187 2005/08/19 18:02:55 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.188 2005/08/19 18:02:59 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2654,6 +2654,8 @@ void OMMXFStorage::addPartition(OMUInt64 address,
   ASSERT("Valid heap pointer", newPartition != 0);
   newPartition->_address = address;
   newPartition->_bodySID = bodySID;
+  newPartition->_previous = 0;
+  newPartition->_indexSID = 0;
   _partitions.insertAt(newPartition, index);
 }
 
