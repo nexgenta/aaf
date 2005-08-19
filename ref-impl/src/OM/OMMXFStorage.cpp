@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.158 2005/08/19 17:59:39 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.159 2005/08/19 17:59:46 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1794,10 +1794,55 @@ void OMMXFStorage::saveStreams(void)
   }
 }
 
+//#define OM_NEW_STREAM_PARSING
+
 void OMMXFStorage::restoreStreams(void)
 {
   TRACE("OMMXFStorage::restoreStreams");
+#if defined(OM_NEW_STREAM_PARSING)
+  OMUInt64 headerPosition;
+  findHeader(this, headerPosition);
+  setPosition(headerPosition);
 
+  OMUInt32 bodySID = 0;
+  OMUInt32 indexSID = 0;
+  OMUInt32 gridSize = 0;
+
+  OMKLVKey k;
+  OMUInt64 keyPosition = position();
+  while (readOuterKLVKey(k)) {
+    OMUInt64 length = readKLVLength();
+    if (k == primerKey) {
+      markMetadataStart(keyPosition);
+      skipV(length);
+    } else if (isPartition(k)) {
+      markMetadataEnd(keyPosition);
+      markIndexEnd(keyPosition);
+      markEssenceSegmentEnd(keyPosition);
+      readPartition(bodySID, indexSID, gridSize);
+    } else if (k == RandomIndexMetadataKey) {
+      markMetadataEnd(keyPosition);
+      markIndexEnd(keyPosition);
+      readRandomIndex();
+    } else if (isEssence(k) || k == SystemMetadataKey) {
+      markMetadataEnd(keyPosition);
+      markIndexEnd(keyPosition);
+      markEssenceSegmentStart(bodySID, keyPosition);
+      skipV(length);
+    } else if (isIndex(k)) {
+      markMetadataEnd(keyPosition);
+      markIndexStart(indexSID, keyPosition);
+    } else if (k == fillKey) {
+      skipV(length);
+      markFill(keyPosition, position());
+    } else {
+      skipV(length);
+    }
+    keyPosition = position();
+  }
+  markMetadataEnd(keyPosition);
+  markIndexEnd(keyPosition);
+#else
   OMUInt64 headerPosition;
   findHeader(this, headerPosition);
   setPosition(headerPosition);
@@ -1870,6 +1915,7 @@ void OMMXFStorage::restoreStreams(void)
                          indexKey,
                          gridSize);
   }
+#endif
 }
 
 OMMXFStorage::SegmentListIterator*
