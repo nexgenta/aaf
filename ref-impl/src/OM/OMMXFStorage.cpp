@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.166 2005/08/19 18:00:52 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.167 2005/08/19 18:00:58 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1845,6 +1845,7 @@ void OMMXFStorage::restoreStreams(void)
     } else if (isIndex(k)) {
       markMetadataEnd(keyPosition);
       markIndexStart(k, indexSID, gridSize, keyPosition);
+      skipV(length);
     } else if (k == fillKey) {
       skipV(length);
       markFill(keyPosition, position());
