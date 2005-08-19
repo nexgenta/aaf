@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.189 2005/08/19 18:03:04 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.190 2005/08/19 18:03:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1935,6 +1935,15 @@ void OMMXFStorage::restoreStreams(void)
   setPosition(footer + header);
   current = footer + header;
   readOuterKLVKey(k);
+#if 1
+  if (!isFooter(k)) {
+    OMUInt64 last = size();
+    footer = (last & ~(OMUInt64)0xffffffff) + footer;
+    setPosition(footer + header);
+    current = footer + header;
+    readOuterKLVKey(k);
+  }
+#endif
   ASSERT("Read footer", isFooter(k));
   length = readKLVLength();
   readPartition(length, bodySID, indexSID, gridSize, previous, here, footer);
