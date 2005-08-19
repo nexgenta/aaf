@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.1 2005/08/18 20:37:34 greek_fire Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.2 2005/08/19 17:32:17 greek_fire Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,8 @@
 ###############################################################################
 
 
-PROGNAME = AAFAnalyzerTest
+PROGNAME = AAFAnalyzer
+
+PROGLIBS = -lBaseTest -lEditProtocolTest -lAAFAnalyzerBase -lTestPhaseLib 
 
 include ../aafanalyzer.mk
