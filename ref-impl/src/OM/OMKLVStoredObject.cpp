@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.193 2005/08/19 19:32:13 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.194 2005/08/19 19:32:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1235,29 +1235,20 @@ void OMKLVStoredObject::write(const wchar_t* string)
 
   // include terminating null
   size_t characterCount = lengthOfWideString(string) + 1;
-  const OMByte* bits = reinterpret_cast<const OMByte*>(string);
-  OMType* stringType = OMStringType::instance();
-
-  OMPropertySize internalBytesSize = characterCount * sizeof(wchar_t);
-  OMPropertySize externalBytesSize =
-    stringType->externalSize(bits, internalBytesSize);
-
+  OMPropertySize externalBytesSize = characterCount * 2;
   ASSERT("Valid length", externalBytesSize <= (size_t)OMINT16_MAX);
   OMUInt16 len = externalBytesSize;
   _storage->write(len, _reorderBytes);
 
-  OMByte* buffer = new OMByte[externalBytesSize];
+  OMCharacter* buffer = new OMCharacter[characterCount];
   ASSERT("Valid heap pointer", buffer != 0);
 
-  stringType->externalize(bits,
-                          internalBytesSize,
-                          buffer,
-                          externalBytesSize,
-                          hostByteOrder());
+  externalizeString(string, buffer, characterCount);
+
   if (_reorderBytes) {
-    stringType->reorder(buffer, externalBytesSize);
+    reorderString(buffer, characterCount);
   }
-  _storage->write(buffer, externalBytesSize);
+  _storage->write(reinterpret_cast<OMByte*>(buffer), externalBytesSize);
   delete [] buffer;
 }
 #else
