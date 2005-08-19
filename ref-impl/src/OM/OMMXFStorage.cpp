@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.194 2005/08/19 18:03:34 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.195 2005/08/19 18:03:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,6 +51,7 @@
 
 //#define INSTANCEID_DEBUG 1
 //#define OMONLY 1
+//#define OM_CHECK_STREAMS
 
   // @mfunc Constructor.
 OMMXFStorage::OMMXFStorage(OMRawStorage* store)
@@ -2181,7 +2182,7 @@ void OMMXFStorage::restoreStreams(void)
 void OMMXFStorage::checkStreams(void)
 {
   TRACE("OMMXFStorage::checkStreams");
-#if defined(OM_DEBUG)
+#if defined(OM_CHECK_STREAMS)
   if (_segments != 0) {
     SegmentListIterator sl(*_segments, OMBefore);
     while (++sl) {
