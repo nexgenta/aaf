@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.181 2005/08/19 18:02:27 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.182 2005/08/19 18:02:31 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -870,6 +870,19 @@ void OMMXFStorage::readPartition(OMUInt64 ANAME(length),
   for (OMUInt32 i = 0; i < elementCount; i++) {
     readKLVKey(essenceContainer);
   }
+}
+
+void OMMXFStorage::readPartition(OMUInt64 ANAME(length),
+                                 OMUInt32& bodySID,
+                                 OMUInt32& indexSID,
+                                 OMUInt32& KAGSize,
+                                 OMUInt64& previousPartition,
+                                 OMUInt64& thisPartition,
+                                 OMUInt64& footerPartition)
+{
+  TRACE("OMMXFStorage::readPartition");
+
+  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMMXFStorage::readHeaderPartition(void)
