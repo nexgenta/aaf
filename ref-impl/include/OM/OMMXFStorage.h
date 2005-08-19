@@ -1,5 +1,7 @@
 //=---------------------------------------------------------------------=
 //
+// $Id: OMMXFStorage.h,v 1.108 2005/08/19 17:43:40 tbingham Exp $ $Name:  $
+//
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
 // except in compliance with the License.  The License is available in
