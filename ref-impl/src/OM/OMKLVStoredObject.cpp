@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.179 2005/08/19 19:31:12 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.180 2005/08/19 19:31:19 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1463,6 +1463,9 @@ void OMKLVStoredObject::flatRestore(const OMPropertySet& properties)
   OMPropertyId rPid;
   _storage->read(rPid, _reorderBytes);
   ASSERT("Property is reference/instance UID", rPid == PID_InterchangeObject_InstanceUID);
+  OMPropertySize length;
+  _storage->read(length, _reorderBytes);
+  ASSERT("Valid length", length == sizeof(OMUniqueObjectIdentification));
   referenceRestore(properties.container(), PID_InterchangeObject_InstanceUID);
   setLength = setLength - (overhead + sizeof(OMUniqueObjectIdentification));
 
@@ -1948,9 +1951,8 @@ void OMKLVStoredObject::referenceRestore(OMStorable* object,
 {
   TRACE("OMKLVStoredObject::referenceRestore");
 
-  OMPropertySize length;
-  _storage->read(length, _reorderBytes);
-  ASSERT("Valid length", length == sizeof(OMUniqueObjectIdentification));
+  ASSERT("Property is reference/instance UID",
+         pid == PID_InterchangeObject_InstanceUID);
   OMUniqueObjectIdentification iid;
   _storage->read(iid, _reorderBytes);
   _storage->associate(object, iid);
