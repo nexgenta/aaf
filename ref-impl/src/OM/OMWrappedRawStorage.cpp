@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.cpp,v 1.11 2005/08/19 19:47:03 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.cpp,v 1.12 2005/08/19 19:47:07 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -264,7 +264,7 @@ void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
 }
 
 void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
-                                       OMIOVector buffers,
+                                       OMIOBufferDescriptor* buffers,
                                        OMUInt32 bufferCount,
                                        OMUInt32& bytesRead) const
 {
@@ -284,7 +284,7 @@ void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
 }
 
 void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
-                                        OMIOVector buffers,
+                                        OMIOBufferDescriptor* buffers,
                                         OMUInt32 bufferCount,
                                         OMUInt32& bytesWritten)
 {
