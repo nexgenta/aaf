@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2005/08/19 18:10:16 jptrainor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2005/08/19 19:11:31 greek_fire Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -54,6 +54,10 @@ EditProtocolTestImpl: AAFAnalyzerBase TestPhaseLib
 .PHONY: AAFAnalyzer
 AAFAnalyzer: EditProtocolTestImpl AAFAnalyzerBase TestPhaseLib
 	cd AAFAnalyzer && $(MAKE)
+
+.PHONY : check
+check : RegressionTest
+	cd RegressionTest && $(MAKE) $@
 
 .PHONY: clean
 clean:
