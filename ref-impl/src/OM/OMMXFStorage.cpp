@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.167 2005/08/19 18:00:58 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.168 2005/08/19 18:01:03 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -443,11 +443,10 @@ void OMMXFStorage::writeRandomIndex(void)
   write(overallLength, _reorderBytes);
 }
 
-void OMMXFStorage::readRandomIndex(void)
+void OMMXFStorage::readRandomIndex(OMUInt64 length)
 {
   TRACE("OMMXFStorage::readRandomIndex");
   OMUInt32 entrySize = sizeof(OMUInt32) + sizeof(OMUInt64);
-  OMUInt64 length = readKLVLength();
   OMUInt64 entryCount = (length - sizeof(OMUInt32)) / entrySize;
   for (OMUInt32 i = 0; i < entryCount; i++) {
     OMUInt32 sid;
@@ -1836,7 +1835,7 @@ void OMMXFStorage::restoreStreams(void)
     } else if (k == RandomIndexMetadataKey) {
       markMetadataEnd(keyPosition);
       markIndexEnd(keyPosition);
-      readRandomIndex();
+      readRandomIndex(length);
     } else if (isEssence(k) || k == SystemMetadataKey) {
       markMetadataEnd(keyPosition);
       markIndexEnd(keyPosition);
@@ -1912,7 +1911,8 @@ void OMMXFStorage::restoreStreams(void)
       essenceKey = k;
       skipV(essenceLength);
     } else if (k == RandomIndexMetadataKey) {
-      readRandomIndex();
+      OMUInt64 randomIndexLength = readKLVLength();
+      readRandomIndex(randomIndexLength);
     } else {
       skipLV();
     }
