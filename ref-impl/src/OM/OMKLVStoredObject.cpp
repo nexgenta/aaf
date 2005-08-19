@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.203 2005/08/19 19:33:22 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.204 2005/08/19 19:33:26 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1591,7 +1591,7 @@ void OMKLVStoredObject::flatRestore(const OMPropertySet& properties)
                (properties.container()->classId() == Class_Root)) {
       OMUInt32 version; // Not yet used
       _storage->read(version, _reorderBytes);
-    } else if ((!properties.isAllowed(pid)) && (pid > 0x8000)) { // HACK4MEIP2
+    } else if ((!properties.isAllowed(pid)) && (pid >= 0x8000)) { // HACK4MEIP2
       // Dark extension
       _storage->skipV(length);  // discard value !! tjb
     } else if (pid == 0x3b08) { // Preface::PrimaryPackage
