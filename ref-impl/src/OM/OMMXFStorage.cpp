@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.171 2005/08/19 18:01:23 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.172 2005/08/19 18:01:30 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1075,7 +1075,7 @@ void OMMXFStorage::skipLV(void) const
   skipV(length);
 }
 
-void OMMXFStorage::skipV(OMUInt64& length) const
+void OMMXFStorage::skipV(OMUInt64 length) const
 {
   TRACE("OMMXFStorage::skipV");
 
