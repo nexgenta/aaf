@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.201 2005/08/19 18:04:04 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.202 2005/08/19 18:04:09 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1642,6 +1642,16 @@ void OMMXFStorage::streamWriteAt(OMUInt32 sid,
     pos = pos + w;
     p = p + w;
   }
+}
+
+void OMMXFStorage::streamWriteAt(OMUInt32 sid,
+                                 OMUInt64 position,
+                                 OMIOVector buffers,
+                                 OMUInt32 bufferCount,
+                                 OMUInt32& bytesWritten)
+{
+  TRACE("OMMXFStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMMXFStorage::streamRawRead(OMUInt32 /* sid */,
