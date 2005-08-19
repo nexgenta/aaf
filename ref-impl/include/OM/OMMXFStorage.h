@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.124 2005/08/19 17:44:53 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.125 2005/08/19 17:44:57 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -337,7 +337,7 @@ public:
 
   virtual void skipLV(void) const;
 
-  virtual void skipV(OMUInt64& length) const;
+  virtual void skipV(OMUInt64 length) const;
 
   static OMUInt64 readBerLength(const OMRawStorage* store);
 
