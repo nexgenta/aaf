@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.198 2005/08/19 18:03:51 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.199 2005/08/19 18:03:56 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2136,6 +2136,7 @@ void OMMXFStorage::restoreStreams(void)
       keyPosition = position();
       bool b = readOuterKLVKey(k);
       ASSERT("Read key", b);
+      ASSERT("Key is not a partition key", !isPartition(k));
       length = readKLVLength();
       if (k == primerKey) {
         markMetadataStart(keyPosition);
