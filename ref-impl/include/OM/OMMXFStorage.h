@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.137 2005/08/19 17:45:51 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.138 2005/08/19 17:45:55 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -608,6 +608,10 @@ private:
   struct Partition {
     OMUInt64 _address;
     OMUInt32 _sid;
+#if defined(OM_FASTER_STREAM_PARSING)
+    OMUInt64 _previous;
+    OMUInt32 _indexSID;
+#endif
   };
   void destroyPartitions(void);
   bool findPartition(OMUInt64 address, OMUInt32& index);
