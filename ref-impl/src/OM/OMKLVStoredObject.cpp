@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.184 2005/08/19 19:31:34 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.185 2005/08/19 19:31:37 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1990,8 +1990,7 @@ void OMKLVStoredObject::writePrimerPack(const OMDictionary* dictionary)
 #if defined(OMONLY)
       OMUniqueObjectIdentification id = propertyDefinition->identification();
 #else
-      OMUniqueObjectIdentification id =
-                                    propertyDefinition->uniqueIdentification();
+      OMUniqueObjectIdentification id = propertyDefinition->identification();
 #endif
       OMDictionary::mapToKLV(id);
       OMKLVKey k;
