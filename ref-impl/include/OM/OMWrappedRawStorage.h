@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.h,v 1.6 2005/08/19 19:47:45 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.h,v 1.7 2005/08/19 19:47:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -182,9 +182,23 @@ public:
     //          buffers are read.
     //          The number of bytes read is returned in <p bytesRead>.
   virtual void streamReadAt(OMUInt64 position,
-                            OMIOVector buffers,
+                            OMIOBufferDescriptor* buffers,
                             OMUInt32 bufferCount,
                             OMUInt32& bytesRead) const;
+
+    // Asynchronous read - single buffer
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* buffer,
+                            const OMUInt32 bytes,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
+
+    // Asynchronous read - multiple buffers
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
 
     // @cmember Attempt to write the number of stream data bytes given by
     //          <p byteCount> to offset  <p position> in this
@@ -208,9 +222,23 @@ public:
     //          buffers are written.
     //          The number of bytes written is returned in <p bytesWritten>.
   virtual void streamWriteAt(OMUInt64 position,
-                             OMIOVector buffers,
+                             OMIOBufferDescriptor* buffers,
                              OMUInt32 bufferCount,
                              OMUInt32& bytesWritten);
+
+    // Asynchronous write - single buffer
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* buffer,
+                             const OMUInt32 bytes,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
+    // Asynchronous write - multiple buffers
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             void* /* */ completion,
+                             const void* clientArgument);
 
 private:
   OMRawStorage* _store;
