@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.196 2005/08/19 19:32:35 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.197 2005/08/19 19:32:39 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1237,7 +1237,7 @@ void OMKLVStoredObject::write(const wchar_t* string)
   size_t characterCount = lengthOfWideString(string) + 1;
   OMPropertySize externalBytesSize = characterCount * 2;
   ASSERT("Valid length", externalBytesSize <= (size_t)OMINT16_MAX);
-  OMUInt16 len = externalBytesSize;
+  OMUInt16 len = characterCount;
   _storage->write(len, _reorderBytes);
 
   OMCharacter* buffer = new OMCharacter[characterCount];
