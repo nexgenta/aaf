@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.177 2005/08/19 19:31:04 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.178 2005/08/19 19:31:09 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1458,8 +1458,9 @@ void OMKLVStoredObject::flatRestore(const OMPropertySet& properties)
 
   OMUInt64 setLength = _storage->readKLVLength();
 
-  referenceRestore(properties.container(), PID_InterchangeObject_InstanceUID);
   const OMUInt16 overhead = sizeof(OMPropertyId) + sizeof(OMPropertySize);
+
+  referenceRestore(properties.container(), PID_InterchangeObject_InstanceUID);
   setLength = setLength - (overhead + sizeof(OMUniqueObjectIdentification));
 
   if (properties.container()->classId() == Class_Root) {
