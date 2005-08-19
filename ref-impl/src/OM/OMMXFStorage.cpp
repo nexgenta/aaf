@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.152 2005/08/19 17:59:13 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.153 2005/08/19 17:59:17 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -279,6 +279,22 @@ bool OMMXFStorage::isFooter(const OMKLVKey& k)
   if (memcmp(&IncompleteFooterKey, &k, sizeof(k)) == 0) {
     result = true;
   } else if (memcmp(&FooterKey, &k, sizeof(k)) == 0) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool OMMXFStorage::isPartition(const OMKLVKey& k)
+{
+  TRACE("OMMXFStorage::isPartition");
+  bool result;
+  if (isHeader(k)) {
+    result = true;
+  } else if (isBody(k)) {
+    result = true;
+  } else if (isFooter(k)) {
     result = true;
   } else {
     result = false;
