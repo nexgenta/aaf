@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.h,v 1.67 2005/08/19 19:15:23 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.h,v 1.68 2005/08/19 19:15:29 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -268,7 +268,6 @@ public:
 
   virtual void flatRestore(const OMPropertySet& properties);
   virtual void deepRestore(const OMPropertySet& properties);
-  virtual void streamRestore(void);
 
   virtual void referenceRestore(OMStorable* object, OMPropertyId pid);
 
