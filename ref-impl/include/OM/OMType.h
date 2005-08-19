@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMType.h,v 1.12 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMType.h,v 1.13 2005/08/19 23:53:42 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -188,6 +188,9 @@ public:
   static void copy(const OMByte* inputBytes,
                    OMByte* outputBytes,
                    size_t bytesSize);
+
+  // tjb - temporary - should be inherited from OMDefinition
+  virtual const OMUniqueObjectIdentification& identification(void) const;
 
 };
 
