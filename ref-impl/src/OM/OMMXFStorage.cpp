@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.188 2005/08/19 18:02:59 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.189 2005/08/19 18:03:04 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1963,29 +1963,15 @@ void OMMXFStorage::restoreStreams(void)
   }
 
   // 2) Find the random index pack (or the end of the file);
+  //
   OMUInt64 last = size();
-#if 1
   OMUInt64 indexPosition;
   if (findRandomIndex(last, indexPosition)) {
     last = indexPosition;
   }
-#else
-  setPosition(last - sizeof(OMUInt32));
-  OMUInt32 ripSize;
-  read(ripSize, _reorderBytes);
-  if (true) { // How do we check for a reasonable size ?
-    setPosition(last - ripSize + sizeof(OMUInt32));
-    if (readOuterKLVKey(k)) {
-      if (k == RandomIndexMetadataKey) {
-        last = last - ripSize + sizeof(OMUInt32);
-      }
-    }
-  }
-#endif
 
   // 3) Find essence and index within the partitions
   //
-
   size_t count = _partitions.count();
   for (size_t i = 0; i < count; i++) {
     p = _partitions.valueAt(i);
