@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.114 2005/08/19 17:44:08 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.115 2005/08/19 17:44:12 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -225,6 +225,8 @@ public:
   static bool isBody(const OMKLVKey& k);
 
   static bool isFooter(const OMKLVKey& k);
+
+  static bool isPartition(const OMKLVKey& k);
 
   static bool isIndex(const OMKLVKey& k);
 
