@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.199 2005/08/19 18:03:56 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.200 2005/08/19 18:03:59 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -332,6 +332,8 @@ bool OMMXFStorage::isIndex(const OMKLVKey& k)
   TRACE("OMMXFStorage::isIndex");
   bool result;
   if (memcmp(&IndexTableSegmentKey, &k, sizeof(k)) == 0) {
+    result = true;
+  } else if (memcmp(&V10IndexTableSegmentKey, &k, sizeof(k)) == 0) {
     result = true;
   } else {
     result = false;
