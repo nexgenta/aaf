@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.171 2005/08/19 19:30:24 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.172 2005/08/19 19:30:32 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1683,7 +1683,9 @@ void OMKLVStoredObject::deepRestore(const OMPropertySet& properties)
   while (++iterator) {
     OMProperty* p = iterator.property();
     ASSERT("Valid property", p != 0);
+#if 0 // HACK4MEIP2
     ASSERT("Property has a definition", p->definition() != 0);
+#endif
     if (!p->isOptional() || p->isPresent()) {
       switch (p->storedForm()) {
       case SF_STRONG_OBJECT_REFERENCE: {
