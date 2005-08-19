@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.201 2005/08/19 19:33:10 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.202 2005/08/19 19:33:17 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2586,12 +2586,11 @@ void OMKLVStoredObject::writeTypeDefinition(const OMType* td)
     OMUInt32 count = ot->elementCount();
     _storage->write(count, _reorderBytes);
     for (OMUInt32 i = 0; i < count; i++) {
-      const OMExtendibleEnumeratedType::Element element = ot->element(i);
       // ElementName
-      const wchar_t* eName = element._name;
+      const wchar_t* eName = ot->elementName(i);
       write(eName);
       // ElementValue
-      OMUniqueObjectIdentification id = element._value;
+      OMUniqueObjectIdentification id = ot->elementValue(i);
       ASSERT("Valid identification", id != nullOMUniqueObjectIdentification);
       OMKLVKey k;
       convert(k, id);
