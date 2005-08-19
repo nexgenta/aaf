@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.148 2005/08/19 17:46:47 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.149 2005/08/19 17:46:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -335,6 +335,8 @@ public:
 
   static bool read(const OMRawStorage* store, OMUInt8& i);
   static bool read(const OMRawStorage* store, OMUInt16& i, bool reorderBytes);
+  static bool read(const OMRawStorage* store, OMUInt32& i, bool reorderBytes);
+  static bool read(const OMRawStorage* store, OMUInt64& i, bool reorderBytes);
   static bool read(const OMRawStorage* store, OMKLVKey& key);
   static bool readKLVLength(const OMRawStorage* store, OMUInt64& length);
 
