@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.cpp,v 1.30 2005/08/19 19:35:46 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.cpp,v 1.31 2005/08/19 19:35:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,6 +79,14 @@ void OMKLVStoredStream::read(OMIOBufferDescriptor* buffers,
   _store->readStreamAt(_sid, _position, buffers, bufferCount, bytesRead);
   OMKLVStoredStream* nonConstThis = const_cast<OMKLVStoredStream*>(this);
   nonConstThis->_position = _position + bytesRead;
+}
+
+void OMKLVStoredStream::probe(OMUInt64 /* position */,
+                              OMUInt32 /* bytesRequired */,
+                              OMUInt32& /* bytesAvailable */) const
+{
+  TRACE("OMKLVStoredStream::probe");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMKLVStoredStream::read(OMByte* data,
