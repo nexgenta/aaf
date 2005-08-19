@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.121 2005/08/19 17:44:39 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.122 2005/08/19 17:44:45 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -510,6 +510,11 @@ private:
   OMUInt32 _indexSID;
   OMKLVKey _indexKey;
   OMUInt64 _indexPosition;
+
+  bool _inEssence;
+  OMUInt32 _essenceSID;
+  OMKLVKey _essenceKey;
+  OMUInt64 _essencePosition;
 
   OMUInt64 _fillStart;
   OMUInt64 _fillEnd;
