@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.h,v 1.66 2005/08/19 19:15:11 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.h,v 1.67 2005/08/19 19:15:23 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -261,7 +261,6 @@ public:
 
   // KLV functions
 
-  virtual OMUInt64 length(const OMPropertySet& properties) const;
   virtual void flatSave(const OMPropertySet& properties) const;
   virtual void deepSave(const OMPropertySet& properties) const;
 
