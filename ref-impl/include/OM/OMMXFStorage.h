@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.118 2005/08/19 17:44:27 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.119 2005/08/19 17:44:30 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -487,10 +487,14 @@ private:
   void markMetadataStart(OMUInt64 primerKeyPosition);
   void markMetadataEnd(OMUInt64 endKeyPosition);
 
-  void markIndexStart(OMUInt32 sid, OMUInt64 indexKeyPosition);
+  void markIndexStart(OMKLVKey key,
+                      OMUInt32 sid,
+                      OMUInt64 indexKeyPosition);
   void markIndexEnd(OMUInt64 endKeyPosition);
 
-  void markEssenceSegmentStart(OMUInt32 sid, OMUInt64 essenceKeyPosition);
+  void markEssenceSegmentStart(OMKLVKey key,
+                               OMUInt32 sid,
+                               OMUInt64 essenceKeyPosition);
   void markEssenceSegmentEnd(OMUInt64 endKeyPosition);
 
   void markFill(OMUInt64 fillKeyPosition, OMUInt64 fillEndPosition);
