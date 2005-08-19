@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.156 2005/08/19 17:59:30 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.157 2005/08/19 17:59:35 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1829,7 +1829,11 @@ void OMMXFStorage::restoreStreams(void)
       // Restore essence stream segment
       //
       if (bodySID != 0) {
-        OMUInt64 essenceSize = partitionStart - essenceStart - fillBufferZoneSize;
+        OMUInt64 essenceSize = partitionStart - essenceStart;
+        // HACK4MEIP2
+        if (essenceLength <= (essenceSize - fillBufferZoneSize)) {
+          essenceSize = essenceSize - fillBufferZoneSize;
+        }
         streamRestoreSegment(bodySID,
                              essenceStart,
                              essenceSize,
