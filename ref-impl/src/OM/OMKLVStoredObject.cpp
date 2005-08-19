@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.194 2005/08/19 19:32:24 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.195 2005/08/19 19:32:30 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2317,7 +2317,7 @@ void OMKLVStoredObject::writeClassDefinition(const OMClassDefinition* cd)
 
   // parent (key)
   // An extension cannot be a root
-  ASSERT("Class is not a root", !cd->hasParent());
+  ASSERT("Class is not a root", cd->hasParent());
   const OMClassDefinition* pc = cd->parent();
   ASSERT("Valid parent class definition", pc != 0);
   id = pc->identification();
