@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.177 2005/08/19 18:02:00 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.178 2005/08/19 18:02:07 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1294,14 +1294,14 @@ void OMMXFStorage::fixupReference(OMUInt64 patchOffset, OMUInt64 patchValue)
   setPosition(savedPosition);
 }
 
-void OMMXFStorage::restoreObjectDirectory(void)
+void OMMXFStorage::restoreObjectDirectory(OMUInt64 headerOffset)
 {
   TRACE("OMMXFStorage::restoreObjectDirectory");
   PRECONDITION("Valid metadata directory", _instanceIdToObject != 0);
   PRECONDITION("Valid metadata directory offset", _objectDirectoryOffset != 0);
 
   OMUInt64 savedPosition = position();
-  setPosition(_objectDirectoryOffset);
+  setPosition(_objectDirectoryOffset + headerOffset);
 
   OMKLVKey k;
   readKLVKey(k);
