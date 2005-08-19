@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.182 2005/08/19 19:31:26 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.183 2005/08/19 19:31:31 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1488,6 +1488,12 @@ void OMKLVStoredObject::flatRestore(const OMPropertySet& properties)
       // Dark extension
       OMUInt64 len = length;
       _storage->skipV(len);  // discard value !! tjb
+    } else if (pid == 0x3b08) { // Preface::PrimaryPackage
+      // HACK4MXFLIB
+      // Temporary hack - ignore this property - we don't yet have
+      // compiled-in knowlege of its 'type'
+      OMUInt64 len = length;
+      _storage->skipV(len);
     } else {
     OMProperty* p = properties.get(pid);
     ASSERT("Valid property", p != 0);
