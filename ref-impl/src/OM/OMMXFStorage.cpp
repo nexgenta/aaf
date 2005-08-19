@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.148 2005/08/19 17:58:54 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.149 2005/08/19 17:58:57 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1666,6 +1666,8 @@ void OMMXFStorage::streamGrow(OMUInt32 sid, OMUInt64 growBytes)
 void OMMXFStorage::saveStreams(void)
 {
   TRACE("OMMXFStorage::saveStreams");
+
+  destroyPartitions();
 
   if (_segments != 0) {
     // The file contains streams
