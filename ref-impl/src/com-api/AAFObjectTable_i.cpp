@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.7 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.8 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,6 +75,7 @@
 #include "CAAFEventMobSlot.h"
 #include "CAAFFile.h"
 #include "CAAFFileDescriptor.h"
+#include "CAAFFileEncoding.h"
 #include "CAAFFiller.h"
 #include "CAAFFilmDescriptor.h"
 #include "CAAFFindSourceInfo.h"
@@ -159,6 +160,7 @@
 #include "CEnumAAFControlPoints.h"
 #include "CEnumAAFDataDefs.h"
 #include "CEnumAAFEssenceData.h"
+#include "CEnumAAFFileEncodings.h"
 #include "CEnumAAFIdentifications.h"
 #include "CEnumAAFInterpolationDefs.h"
 #include "CEnumAAFKLVData.h"

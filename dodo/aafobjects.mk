@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.154 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.155 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -84,6 +84,7 @@ HUMAN_TYPED_IMPL="\
 	AAFEventMobSlot \
 	AAFFile \
 	AAFFileDescriptor \
+	AAFFileEncoding \
 	AAFFiller \
 	AAFFilmDescriptor \
 	AAFFindSourceInfo \
@@ -168,6 +169,7 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFEssenceData \
+	EnumAAFFileEncodings \
 	EnumAAFIdentifications \
 	EnumAAFInterpolationDefs \
 	EnumAAFKLVData \

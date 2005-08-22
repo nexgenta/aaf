@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.6 2005/06/10 21:12:41 montrowe Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.7 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,6 +79,7 @@ extern "C" const aafClassID_t CLSID_AAFEvent;
 extern "C" const aafClassID_t CLSID_AAFEventMobSlot;
 extern "C" const aafClassID_t CLSID_AAFFile;
 extern "C" const aafClassID_t CLSID_AAFFileDescriptor;
+extern "C" const aafClassID_t CLSID_AAFFileEncoding;
 extern "C" const aafClassID_t CLSID_AAFFiller;
 extern "C" const aafClassID_t CLSID_AAFFilmDescriptor;
 extern "C" const aafClassID_t CLSID_AAFFindSourceInfo;
@@ -163,6 +164,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFContainerDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFControlPoints;
 extern "C" const aafClassID_t CLSID_EnumAAFDataDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFEssenceData;
+extern "C" const aafClassID_t CLSID_EnumAAFFileEncodings;
 extern "C" const aafClassID_t CLSID_EnumAAFIdentifications;
 extern "C" const aafClassID_t CLSID_EnumAAFInterpolationDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFKLVData;

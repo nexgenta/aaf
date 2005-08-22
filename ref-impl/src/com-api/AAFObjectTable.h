@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.7 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.8 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -97,6 +97,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFEventMobSlot)
 	AAF_OBJECT_ENTRY(AAFFile)
 	AAF_OBJECT_ENTRY(AAFFileDescriptor)
+	AAF_OBJECT_ENTRY(AAFFileEncoding)
 	AAF_OBJECT_ENTRY(AAFFiller)
 	AAF_OBJECT_ENTRY(AAFFilmDescriptor)
 	AAF_OBJECT_ENTRY(AAFFindSourceInfo)
@@ -181,6 +182,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(EnumAAFControlPoints)
 	AAF_OBJECT_ENTRY(EnumAAFDataDefs)
 	AAF_OBJECT_ENTRY(EnumAAFEssenceData)
+	AAF_OBJECT_ENTRY(EnumAAFFileEncodings)
 	AAF_OBJECT_ENTRY(EnumAAFIdentifications)
 	AAF_OBJECT_ENTRY(EnumAAFInterpolationDefs)
 	AAF_OBJECT_ENTRY(EnumAAFKLVData)

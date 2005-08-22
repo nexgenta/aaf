@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.h,v 1.15 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFModule.h,v 1.16 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -41,6 +41,7 @@
 #include "ImplAAFPluginManager.h"
 #include "ImplAAFFile.h"
 #include "ImplAAFRawStorage.h"
+#include "ImplEnumAAFFileEncodings.h"
 //#include "ImplAAFObjectCreation.h"
 
 #include "AAFTypes.h"
@@ -412,6 +413,31 @@ ImplAAFCreateAAFFileOnRawStorage
    aafUInt32  modeFlags,
    aafProductIdentification_constptr  pIdent,
    ImplAAFFile ** ppNewFile);
+
+//***********************************************************
+//
+// ImplAAFGetFileEncodings()
+//
+// Returns an enumeration of file encodings supported by this version
+// of the library.
+//
+// This method will succeed if the following are true:
+// - The ppFileEncodings pointer is valid.
+//
+// This method will return the following codes.  If more than one of
+// the listed errors is in effect, it will return the first one
+// encountered in the order given below:
+// 
+// AAFRESULT_SUCCESS
+//   - succeeded.  (This is the only code indicating success.)
+//
+// AAFRESULT_NULL_PARAM
+//   - ppFileEncodings arg is NULL.
+// 
+STDAPI
+ImplAAFGetFileEncodings
+  (ImplEnumAAFFileEncodings** ppFileEncodings);
+
 
 //***********************************************************
 //
