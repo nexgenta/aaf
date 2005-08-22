@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredStream.cpp,v 1.2 2004/10/25 13:01:31 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStoredStream.cpp,v 1.3 2005/08/22 20:56:40 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -143,7 +143,7 @@ OMUInt64 OMSSStoredStream::position(void) const
   return result;
 }
 
-void OMSSStoredStream::setPosition(const OMUInt64 offset)
+void OMSSStoredStream::setPosition(const OMUInt64 offset) const
 {
   TRACE("OMSSStoredStream::setPosition");
   PRECONDITION("Valid stream", _stream != 0);

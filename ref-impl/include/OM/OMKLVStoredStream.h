@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.25 2005/08/19 23:59:14 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.26 2005/08/22 20:56:40 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -140,7 +140,7 @@ public:
     // @cmember Set the current position for <f read()> and
     //          <f write()>, as an offset in bytes from the
     //          begining of this <c OMKLVStoredStream>.
-  virtual void setPosition(const OMUInt64 offset);
+  virtual void setPosition(const OMUInt64 offset) const;
 
     // @cmember Close this <c OMKLVStoredStream>.
   virtual void close(void);

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredStream.h,v 1.7 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMXMLStoredStream.h,v 1.8 2005/08/22 20:56:40 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,7 +79,7 @@ public:
     // @cmember Set the current position for <f read()> and
     //          <f write()>, as an offset in bytes from the
     //          begining of this <c OMStoredStream>.
-  virtual void setPosition(const OMUInt64 offset);
+  virtual void setPosition(const OMUInt64 offset) const;
 
     // @cmember Close this <c OMStoredStream>.
   virtual void close(void);
