@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.127 2005/04/01 16:44:21 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.128 2005/08/22 20:39:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -337,6 +337,12 @@ OMStorable* ImplAAFDictionary::create(const OMClassId& classId) const
   // return CreateAndInit (pcd);
 }
 
+void ImplAAFDictionary::destroy(OMStorable* victim) const
+{
+  ImplAAFObject* v = dynamic_cast<ImplAAFObject*>(victim);
+  assert(v != 0);
+  v->ReleaseReference();
+}
 
 ImplAAFObject *
 ImplAAFDictionary::CreateAndInit(ImplAAFClassDef * pClassDef) const

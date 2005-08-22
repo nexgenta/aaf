@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.69 2004/11/17 18:09:33 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.70 2005/08/22 20:39:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,6 +114,7 @@ public:
   //
   OMStorable* create(const OMClassId& classId) const;
 
+  void destroy(OMStorable* victim) const;
 
   //****************
   // CreateInstance()
