@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFKLVDataDefTest.cpp,v 1.2 2004/09/10 17:13:12 stuart_hc Exp $ $Name:  $
+// $Id: CAAFKLVDataDefinitionTest.cpp,v 1.1 2005/08/22 22:40:56 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
