@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Mob.cpp,v 1.10 2004/04/10 18:07:32 jptrainor Exp $ $Name:  $
+// $Id: Mob.cpp,v 1.11 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -197,13 +197,12 @@ void FindNamedMob::Execute( const std::vector<AxString>& argv )
 
 	AxMobIter axMobIter( axHeader.GetMobs( criteria ) );
 	
-	IAAFMobSP spMob;
+	IAAFSmartPointer2<IAAFMob> spMob;
 	bool notAtEnd;
-    notAtEnd = axMobIter.NextOne( spMob );
+	notAtEnd = axMobIter.NextOne( spMob );
   	if ( !notAtEnd ) {
 		throw AxFGEx( L"Mob not found." );
 	}
-
 
 	SetCOM( spMob );
 	RegisterInstance( mobRefName );
@@ -241,9 +240,9 @@ void FindMobByDataDef::Execute( const std::vector<AxString>& argv )
 
 	AxMobIter axMobIter( axHeader.GetMobs( criteria ) );
 	
-	IAAFMobSP spMob;
+	IAAFSmartPointer2<IAAFMob> spMob;
 	bool notAtEnd;
-    notAtEnd = axMobIter.NextOne( spMob );
+	notAtEnd = axMobIter.NextOne( spMob );
   	if ( !notAtEnd ) {
 		throw AxFGEx( L"Mob not found." );
 	}

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxBaseObjIter.h,v 1.6 2004/11/30 10:29:07 stuart_hc Exp $ $Name:  $
+// $Id: AxBaseObjIter.h,v 1.7 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,7 +77,7 @@ public:
 	  // up on it.  It should be fine.
 	        IterType::TypeSP typeSP;
 #else
-		IAAFSmartPointer<IAAFType> typeSP;
+		IAAFSmartPointer2<IAAFType> typeSP;
 #endif
 		bool rc;
 		rc = _iter.NextOne( typeSP );

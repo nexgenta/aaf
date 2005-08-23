@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: unixaafsdk.mak,v 1.13 2005/03/18 18:18:42 phil_tudor Exp $ $Name:  $
+# $Id: unixaafsdk.mak,v 1.14 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -227,6 +227,7 @@ TARGET_H_FILES = \
 	$(AAFSDK_INCLUDE)/AAFPropertyIDs.h \
 	$(AAFSDK_INCLUDE)/AAFResult.h \
 	$(AAFSDK_INCLUDE)/AAFSmartPointer.h \
+	$(AAFSDK_INCLUDE)/AAFSmartPointer2.h \
 	$(AAFSDK_INCLUDE)/AAFSmartPointerBase.h \
 	$(AAFSDK_INCLUDE)/AAFStoredObjectIDs.h \
 	$(AAFSDK_INCLUDE)/AAFTypeDefUIDs.h \
@@ -496,6 +497,9 @@ $(AAFSDK_INCLUDE)/AAFSmartPointerBase.h : $(TOOLKIT_INCLUDE)/AAFSmartPointerBase
 
 $(AAFSDK_INCLUDE)/AAFSmartPointer.h : $(TOOLKIT_INCLUDE)/AAFSmartPointer.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)/AAFSmartPointer.h $@
+
+$(AAFSDK_INCLUDE)/AAFSmartPointer2.h : $(TOOLKIT_INCLUDE)/AAFSmartPointer2.h
+	$(UPDATE) $(TOOLKIT_INCLUDE)/AAFSmartPointer2.h $@
 
 $(AAFSDK_INCLUDE)/AAFStoredObjectIDs.h : $(TOOLKIT_INCLUDE)/AAFStoredObjectIDs.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)/AAFStoredObjectIDs.h $@

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axPluginInfo.cpp,v 1.8 2004/10/29 11:58:12 stuart_hc Exp $ $Name:  $
+// $Id: axPluginInfo.cpp,v 1.9 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -76,12 +76,12 @@ void ProcessEssenceKinds( AxCodecDef& axCodecDef )
 {
 	AxDataDefsIter axDataDefsIter( axCodecDef.GetEssenceKinds() );
 	bool notAtEnd;
-	IAAFDataDefSP spDataDef;
+	IAAFSmartPointer2<IAAFDataDef> spDataDef;
 
 	wcout << L"Essence Kinds:\t\t";
 	for( notAtEnd = axDataDefsIter.NextOne( spDataDef );
-		 notAtEnd;
-		 notAtEnd = axDataDefsIter.NextOne( spDataDef ) ) {
+	     notAtEnd;
+	     notAtEnd = axDataDefsIter.NextOne( spDataDef ) ) {
 
 		AxDataDef axDataDef( spDataDef );
 		

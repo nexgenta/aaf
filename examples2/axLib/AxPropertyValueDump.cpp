@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxPropertyValueDump.cpp,v 1.11 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
+// $Id: AxPropertyValueDump.cpp,v 1.12 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -334,12 +334,12 @@ void AxPropertyValueDump::process( IAAFPropertyValueSP& spPropVal,
 
 			// Pluck out the value of the Name property.
 			AxPropertyIter axPropIter( axObj.GetProperties() );
-			IAAFPropertySP nextProp;
+			IAAFSmartPointer2<IAAFProperty> nextProp;
 			bool notAtEnd;
 			for ( notAtEnd = axPropIter.NextOne( nextProp );
-				notAtEnd;
-				notAtEnd = axPropIter.NextOne( nextProp ) ) {
-				AxProperty axProp ( nextProp );
+			      notAtEnd;
+ 			      notAtEnd = axPropIter.NextOne( nextProp ) ) {
+			        AxProperty axProp ( nextProp );
 				if ( L"Name" == axProp.GetName() ) {
 					AxPropertyValue axPropVal( axProp.GetValue() );
 					AxPropertyValueDump dump( _os, false, true, _s );

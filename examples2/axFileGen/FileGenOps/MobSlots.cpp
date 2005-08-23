@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MobSlots.cpp,v 1.9 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
+// $Id: MobSlots.cpp,v 1.10 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -223,12 +223,12 @@ void GetMobSlot::Execute( const std::vector<AxString>& argv )
 	aafSlotID_t slotIdVal = AxStringUtil::strtol( slotId );
 
 	AxMobSlotIter axSlotIter( axMob.GetSlots() );
-	IAAFMobSlotSP nextSlot;
+	IAAFSmartPointer2<IAAFMobSlot> nextSlot;
 	bool notAtEnd;
 
 	for( notAtEnd = axSlotIter.NextOne( nextSlot );
 	     notAtEnd;
-		 notAtEnd = axSlotIter.NextOne( nextSlot ) ) {
+	     notAtEnd = axSlotIter.NextOne( nextSlot ) ) {
 		AxMobSlot axSlot( nextSlot );
 		if ( slotIdVal == axSlot.GetSlotID() ) {
 			break;

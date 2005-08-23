@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.h,v 1.4 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
+// $Id: axFileGen.h,v 1.5 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -20,6 +20,8 @@
 
 #include <AxTypes.h>
 #include <AxSmartPointer.h>
+
+#include <AAFSmartPointer2.h>
 
 #include <memory>
 #include <map>
@@ -84,6 +86,13 @@ protected:
 	void SetCOM( IAAFSmartPointer<ComType> spComType ) 
 	{
 		AxQueryInterface( spComType, _spIUnknown ); 
+	}
+
+	template <class ComType>
+	void SetCOM( IAAFSmartPointer2<ComType> spComType2 ) 
+	{
+	  IAAFSmartPointer<ComType> spComType1 = spComType2;
+	  AxQueryInterface( spComType1, _spIUnknown ); 
 	}
 
 private:

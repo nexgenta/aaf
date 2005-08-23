@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axMasterMobEx.cpp,v 1.16 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
+// $Id: axMasterMobEx.cpp,v 1.17 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -772,7 +772,7 @@ void open_mastermob_and_read_essence( AxHeader& axHeader,
 	criteria.searchTag = kAAFByMobKind;
 	criteria.tags.mobKind = kAAFMasterMob;
 	AxMobIter axMobIter( axContentStorage.GetMobs( &criteria ) );
-	IAAFMobSP nextMob;
+	IAAFSmartPointer2<IAAFMob> nextMob;
 	bool notAtEnd;
 
 	// Expect at least one master mob, and read the first mob found.
