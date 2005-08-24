@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.35 2005/08/22 20:39:36 tbingham Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.36 2005/08/24 16:16:41 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -312,14 +312,12 @@ void ImplAAFMetaDictionary::onRestore(void* /* clientContext */) const
 #endif // #if 0
 }
 
+// Use "propertyId" as the "local tag" (2 bytes) for "id" (16 bytes).
 void
-ImplAAFMetaDictionary::associate(const OMObjectIdentification& id,
-                                 const OMPropertyId propertyId)
+ImplAAFMetaDictionary::associate(const OMObjectIdentification& /* id */,
+                                 const OMPropertyId /* propertyId */)
 {
-#if 0 // tjb not yet
-  assert(_dataDictionary);
-  _dataDictionary->associate(*reinterpret_cast<const aafUID_t *>(&id), propertyId);
-#endif
+  // Not yet implemented - will be needed for "dynamic local tags"
 }
 
 ClassDefinitionsIterator* ImplAAFMetaDictionary::classDefinitions(void) const
