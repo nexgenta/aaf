@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.h,v 1.75 2005/08/20 00:00:28 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.h,v 1.76 2005/08/24 16:11:45 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -301,17 +301,7 @@ public:
   void saveObjectDirectoryReference(const OMUniqueObjectIdentification& id);
 
   OMUInt64 restoreObjectDirectoryReference(OMUniqueObjectIdentification& id);
-#if 0 // tjb not yet
-  void writeMetaDictionary(const OMDictionary* dictionary);
 
-  void writeDefinition(const OMDefinition* d);
-
-  void writeClassDefinition(const OMClassDefinition* cd);
-
-  void writePropertyDefinition(const OMPropertyDefinition* pd);
-
-  void writeTypeDefinition(const OMType* td);
-#endif
 private:
   // @access Private members.
 

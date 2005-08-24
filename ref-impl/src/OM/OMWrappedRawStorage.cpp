@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.cpp,v 1.15 2005/08/19 21:00:58 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.cpp,v 1.16 2005/08/24 16:01:49 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -252,96 +252,3 @@ void OMWrappedRawStorage::setPosition(OMUInt64 newPosition) const
 
   _store->setPosition(newPosition);
 }
-#if 0 // tjb not yet
-void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
-                                       OMByte* bytes,
-                                       OMUInt32 byteCount,
-                                       OMUInt32& bytesRead) const
-{
-  TRACE("OMWrappedRawStorage::");
-
-  _store->streamReadAt(position, bytes, byteCount, bytesRead);
-}
-
-void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
-                                       OMIOBufferDescriptor* buffers,
-                                       OMUInt32 bufferCount,
-                                       OMUInt32& bytesRead) const
-{
-  TRACE("OMWrappedRawStorage::streamReadAt");
-
-  _store->streamReadAt(position, buffers, bufferCount, bytesRead);
-}
-
-void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
-                                       OMByte* buffer,
-                                       const OMUInt32 bytes,
-                                       void* /* */ completion,
-                                       const void* clientArgument) const
-{
-  TRACE("OMWrappedRawStorage::streamReadAt");
-
-  _store->streamReadAt(position, buffer, bytes, completion, clientArgument);
-}
-
-void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
-                                       OMIOBufferDescriptor* buffers,
-                                       OMUInt32 bufferCount,
-                                       void* /* */ completion,
-                                       const void* clientArgument) const
-{
-  TRACE("OMWrappedRawStorage::streamReadAt");
-
-  _store->streamReadAt(position,
-                       buffers,
-                       bufferCount,
-                       completion,
-                       clientArgument);
-}
-
-void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
-                                        const OMByte* bytes,
-                                        OMUInt32 byteCount,
-                                        OMUInt32& bytesWritten)
-{
-  TRACE("OMWrappedRawStorage::streamWriteAt");
-
-  _store->streamWriteAt(position, bytes, byteCount, bytesWritten);
-}
-
-void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
-                                        OMIOBufferDescriptor* buffers,
-                                        OMUInt32 bufferCount,
-                                        OMUInt32& bytesWritten)
-{
-  TRACE("OMWrappedRawStorage::streamWriteAt");
-
-  _store->streamWriteAt(position, buffers, bufferCount, bytesWritten);
-}
-
-void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
-                                        const OMByte* buffer,
-                                        const OMUInt32 bytes,
-                                        void* /* */ completion,
-                                        const void* clientArgument)
-{
-  TRACE("OMWrappedRawStorage::streamWriteAt");
-
-  _store->streamWriteAt(position, buffer, bytes, completion, clientArgument);
-}
-
-void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
-                                        const OMIOBufferDescriptor* buffers,
-                                        OMUInt32 bufferCount,
-                                        void* /* */ completion,
-                                        const void* clientArgument)
-{
-  TRACE("OMWrappedRawStorage::streamWriteAt");
-
-  _store->streamWriteAt(position,
-                        buffers,
-                        bufferCount,
-                        completion,
-                        clientArgument);
-}
-#endif

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.151 2005/08/19 21:12:13 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.152 2005/08/24 16:08:32 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -434,27 +434,7 @@ public:
                              const OMByte* bytes,
                              OMUInt32 byteCount,
                              OMUInt32& bytesWritten);
-#if 0 // tjb not yet
-  virtual void writeStreamAt(OMUInt32 sid,
-                             OMUInt64 position,
-                             OMIOBufferDescriptor* buffers,
-                             OMUInt32 bufferCount,
-                             OMUInt32& bytesWritten);
 
-  virtual void writeStreamAt(OMUInt32 sid,
-                             OMUInt64 position,
-                             const OMByte* buffer,
-                             const OMUInt32 bytes,
-                             void* /* */ completion,
-                             const void* clientArgument);
-
-  virtual void writeStreamAt(OMUInt32 sid,
-                             OMUInt64 position,
-                             const OMIOBufferDescriptor* buffers,
-                             OMUInt32 bufferCount,
-                             void* /* */ completion,
-                             const void* clientArgument);
-#endif
   virtual void streamRawRead(OMUInt32 sid,
                              OMUInt64 rawPosition,
                              OMByte* rawBytes,
@@ -471,27 +451,7 @@ public:
                             OMByte* bytes,
                             OMUInt32 byteCount,
                             OMUInt32& bytesRead);
-#if 0 // tjb not yet
-  virtual void readStreamAt(OMUInt32 sid,
-                            OMUInt64 position,
-                            OMIOBufferDescriptor* buffers,
-                            OMUInt32 bufferCount,
-                            OMUInt32& bytesRead);
 
-  virtual void readStreamAt(OMUInt32 sid,
-                            OMUInt64 position,
-                            OMByte* buffer,
-                            const OMUInt32 bytes,
-                            void* /* */ completion,
-                            const void* clientArgument);
-
-  virtual void readStreamAt(OMUInt32 sid,
-                            OMUInt64 position,
-                            OMIOBufferDescriptor* buffers,
-                            OMUInt32 bufferCount,
-                            void* /* */ completion,
-                            const void* clientArgument);
-#endif
   virtual void streamRestoreSegment(OMUInt32 sid,
                                     OMUInt64 start,
                                     OMUInt64 allocatedSize,
