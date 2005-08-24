@@ -2,7 +2,7 @@
 #define __AAFSmartPointer2_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSmartPointer2.h,v 1.1 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
+// $Id: AAFSmartPointer2.h,v 1.2 2005/08/24 02:26:19 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -78,11 +78,19 @@ class IAAFSmartPointer2
 
   // Allows passing this smart ptr as argument to methods which expect
   // a ReferencedType**, in order to fill it in.
-  ReferencedType** GetAddrOf() const;
+  ReferencedType** GetAddrOf()
   {
-    return &_sp;
+    return _sp.operator&();
   }
- 
+
+#if 0
+  // Allows passing this smart ptr as argument to methods which expect
+  // a ReferencedType**, in order to fill it in.
+  ReferencedType** GetAddrOf()
+  {
+    return _sp.operator&();
+  }
+#endif
   // Allows passing this smart ptr as argument to methods which expect
   // a ReferencedType*
   operator ReferencedType * () const
@@ -108,7 +116,7 @@ class IAAFSmartPointer2
   }
 
  private:
-  IAAFSmartPointer<ReferencedType>_sp;
+  IAAFSmartPointer<ReferencedType> _sp;
 };
 
 #endif
