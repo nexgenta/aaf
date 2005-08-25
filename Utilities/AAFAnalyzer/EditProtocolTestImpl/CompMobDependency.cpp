@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.cpp,v 1.3 2005/08/25 02:53:51 jptrainor Exp $
+// $Id: CompMobDependency.cpp,v 1.4 2005/08/25 22:11:55 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,6 +64,9 @@ TestResult CompMobDependency::Execute()
   result.SetDescription(GetDescription());
 
   dfs.TraverseDown(spVisitor, GetTestGraph()->GetRootNode()); 
+
+  _spRootCompMobs = spVisitor->GetNodesWithCount(0);
+
   return result;
 }
 
@@ -79,5 +82,9 @@ std::string CompMobDependency::GetDescription()
   return description;
 }
 
+CompMobDependency::CompMobNodeVectorSP CompMobDependency::GetRootCompMobNodes()
+{
+  return _spRootCompMobs;
+}
 
 } // end of namespace diskstream
