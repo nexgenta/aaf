@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEx.cpp,v 1.8 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
+// $Id: AxEx.cpp,v 1.9 2005/08/25 00:28:14 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -159,7 +159,7 @@ AxExSmartPointer::~AxExSmartPointer() throw()
 //=---------------------------------------------------------------------=
 
 AxExBadImp::AxExBadImp( const wchar_t* what )
-:	AxEx( what )
+  :	AxEx( AxString(AxString(L"Bad implementation: ") + AxString(what)).c_str() )
 {}
 
 AxExBadImp::~AxExBadImp() throw()
