@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.h,v 1.14 2004/04/10 14:28:40 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.h,v 1.15 2005/08/25 00:28:58 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,8 +59,8 @@ public:
 	// Get index of option "opt" at or after argv[n].  True if found.
 	std::pair<bool,int> get( const char* opt, int n=0 );
 
-	// Return argv[n].  True if n < argc.
-	std::pair<bool,const char*> get( int n );
+	// Return argv[n].  True if m <= n < argc
+	std::pair<bool,const char*> get( int n, int m=0 );
 	
 private:
 	int _argc;

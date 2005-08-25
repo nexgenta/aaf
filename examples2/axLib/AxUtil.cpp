@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.cpp,v 1.17 2004/10/22 14:31:30 phil_tudor Exp $ $Name:  $
+// $Id: AxUtil.cpp,v 1.18 2005/08/25 00:28:58 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -119,11 +119,11 @@ std::pair<bool,int> AxCmdLineArgs::get( const char* opt, int i )
 	return result;
 }
 
-std::pair<bool,const char*> AxCmdLineArgs::get( int n )
+std::pair<bool,const char*> AxCmdLineArgs::get( int n, int m )
 {
 	std::pair<bool,const char*> result(false,0);
 
-	if ( n < _argc ) {
+	if ( m <= n  &&  n < _argc ) {
 		result.first = true;
 		result.second = _argv[n];
 	}
