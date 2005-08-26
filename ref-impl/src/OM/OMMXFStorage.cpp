@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.226 2005/08/24 16:08:32 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.227 2005/08/26 20:23:33 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1691,7 +1691,7 @@ void OMMXFStorage::writeStreamAt(OMUInt32 sid,
   PRECONDITION("Valid buffer", bytes != 0);
   PRECONDITION("Buffer not empty", byteCount != 0);
 
-#if 1
+#if 0 // tjb not yet
   // Grow stream if needed
   OMUInt64 streamBytes = 0;
   Stream* s = 0;
@@ -1796,7 +1796,7 @@ void OMMXFStorage::readStreamAt(OMUInt32 sid,
 
   PRECONDITION("Valid buffer", bytes != 0);
   PRECONDITION("Buffer not empty", byteCount != 0);
-#if 1
+#if 0 // tjb not yet
   // Calculate read size (not yet used)
   OMUInt32 readCount = byteCount;
   OMUInt64 streamBytes = streamSize(sid);
