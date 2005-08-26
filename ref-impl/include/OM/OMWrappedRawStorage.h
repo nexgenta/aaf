@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWrappedRawStorage.h,v 1.9 2005/08/24 16:01:49 tbingham Exp $ $Name:  $
+// $Id: OMWrappedRawStorage.h,v 1.10 2005/08/26 20:24:40 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -161,28 +161,6 @@ public:
     // @cmember Synchronize this <c OMWrappedRawStorage> with its external
     //          representation.
   virtual void synchronize(void);
-
-  // Functions for accessing stream data within this <c OMWrappedRawStorage>
-
-    // @cmember Attempt to read the number of stream data bytes given by
-    //          <p byteCount> from offset <p position> in this
-    //          <c OMWrappedRawStorage> into the buffer at address <p bytes>.
-    //          The actual number of bytes read is returned in <p bytesRead>.
-  virtual void streamReadAt(OMUInt64 position,
-                            OMByte* bytes,
-                            OMUInt32 byteCount,
-                            OMUInt32& bytesRead) const;
-
-    // @cmember Attempt to write the number of stream data bytes given by
-    //          <p byteCount> to offset  <p position> in this
-    //          <c OMWrappedRawStorage>
-    //          from the buffer at address <p bytes>.
-    //          The actual number of bytes written is returned in
-    //          <p bytesWritten>.
-  virtual void streamWriteAt(OMUInt64 position,
-                             const OMByte* bytes,
-                             OMUInt32 byteCount,
-                             OMUInt32& bytesWritten);
 
 private:
   OMRawStorage* _store;
