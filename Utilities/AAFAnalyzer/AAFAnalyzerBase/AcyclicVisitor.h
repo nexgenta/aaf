@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.2 2005/08/18 20:37:59 greek_fire Exp $
+// $Id: AcyclicVisitor.h,v 1.3 2005/08/26 14:02:52 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,8 @@
 
 #include <TestResult.h>
 
+#include <Node.h>
+
 //stl files
 #include <vector>
 #include <iostream>
@@ -34,28 +36,27 @@
 
 namespace aafanalyzer {
 
-class Node;
-
 class AcyclicVisitor : public Visitor
 {
  public:
 
-  typedef std::vector<unsigned int> Vector;
+  typedef std::vector<Node::LID> Vector;
 
-  AcyclicVisitor(std::ostream& os, TestResult& result);
+  AcyclicVisitor(std::ostream& os);
   virtual ~AcyclicVisitor();
 
   virtual bool PreOrderVisit(Node& node);
   virtual bool PostOrderVisit(Node& node);
 
+  TestResult GetTestResult() const;
+
  private:
-  bool IsPresent(unsigned int lid);
-  void Erase(unsigned int lid);
+  bool IsPresent(Node::LID lid);
+  void Erase(Node::LID lid);
 
   std::ostream& _os;
-  TestResult& _Result;
+  TestResult _Result;
   Vector _Vector;
-  
 
   // prohibited
   AcyclicVisitor( const AcyclicVisitor& );

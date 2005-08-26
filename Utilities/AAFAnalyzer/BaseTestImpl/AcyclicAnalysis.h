@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicAnalysis.h,v 1.2 2005/08/18 20:39:07 greek_fire Exp $ $Name:  $
+// $Id: AcyclicAnalysis.h,v 1.3 2005/08/26 14:02:52 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,8 +33,8 @@ class AcyclicAnalysis : public Test
   ~AcyclicAnalysis();
 
   TestResult Execute();
-  std::string GetName();
-  std::string GetDescription();
+  std::string GetName() const;
+  std::string GetDescription() const;
 
  private:
 
