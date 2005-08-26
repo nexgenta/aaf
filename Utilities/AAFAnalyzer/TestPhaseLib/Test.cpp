@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.cpp,v 1.1 2005/08/18 14:07:23 greek_fire Exp $
+// $Id: Test.cpp,v 1.2 2005/08/26 15:25:28 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,19 +43,19 @@ Test::~Test()
 {
 }
 
-std::string Test::GetName()
+std::string Test::GetName() const
 {
   std::string null;
   return null;
 }
 
-std::string Test::GetDescription()
+std::string Test::GetDescription() const
 {
   std::string null;
   return null;
 }
 
-std::ostream& Test::GetOutStream()
+std::ostream& Test::GetOutStream() const
 {
   return _os;
 }

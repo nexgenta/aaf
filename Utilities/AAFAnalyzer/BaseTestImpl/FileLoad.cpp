@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileLoad.cpp,v 1.1 2005/08/18 16:04:20 greek_fire Exp $
+// $Id: FileLoad.cpp,v 1.2 2005/08/26 15:25:28 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,21 +52,24 @@ FileLoad::~FileLoad()
 
 TestResult FileLoad::Execute()
 {
-  TestResult result;
   GraphBuilder graphBuild;
   boost::shared_ptr<NodeFactory> spFactory(new NodeFactoryImpl());
 
   //output to screen
   //GetOutStream() << GetName() << std::endl << GetDescription() << std::endl << std::endl;
-
-  //set result properties
-  result.SetName(GetName());
-  result.SetDescription(GetDescription());
-
+    
   //build the graph and initialize TestGraph 
   boost::shared_ptr<TestGraph> spTestGraph(new TestGraph(graphBuild.CreateGraph(_File, spFactory)));
   SetTestGraph(spTestGraph);
-
+  
+  // Set result properties.
+  // If the graph builder did not through an exception, then
+  // it succeeded, therefore, result is PASS.
+  TestResult result( "FileLoad",
+		     "Loads and AAF file and builds the test graph.",
+		     "File loaded correctly.",
+		     "-", // DOCREF
+		     TestResult::PASS );
   return result;
 }
 

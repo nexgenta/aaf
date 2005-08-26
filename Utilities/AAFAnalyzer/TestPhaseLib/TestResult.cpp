@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.cpp,v 1.2 2005/08/26 14:02:52 jptrainor Exp $
+// $Id: TestResult.cpp,v 1.3 2005/08/26 15:25:28 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,24 +70,29 @@ TestResult& TestResult::operator=(const TestResult& test)
   return *this;
 }
 
-const string& TestResult::GetExplanation()
+const string& TestResult::GetExplanation() const
 {
   return _expl;
 }
 
-const string& TestResult::GetDocumentRef()
+const string& TestResult::GetDocumentRef() const
 {
   return _docRef;
 }
 
-const string& TestResult::GetName()
+const string& TestResult::GetName() const
 {
   return _name;
 }
 
-const string& TestResult::GetDescription()
+const string& TestResult::GetDescription() const
 {
   return _desc;
+}
+
+enum TestResult::Result TestResult::GetResult() const
+{
+  return _result;
 }
 
 void TestResult::SetExplanation(const string& exp)
@@ -109,11 +114,6 @@ void TestResult::SetResult(Result result)
 {
   //can only be set to success, warning, or failure
   _result = result;
-}
-
-enum TestResult::Result TestResult::GetResult()
-{
-  return _result;
 }
 
 } // end of namespace diskstream

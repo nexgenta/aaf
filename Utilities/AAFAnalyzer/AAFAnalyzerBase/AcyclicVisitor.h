@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.3 2005/08/26 14:02:52 jptrainor Exp $
+// $Id: AcyclicVisitor.h,v 1.4 2005/08/26 15:25:28 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,7 +48,7 @@ class AcyclicVisitor : public Visitor
   virtual bool PreOrderVisit(Node& node);
   virtual bool PostOrderVisit(Node& node);
 
-  TestResult GetTestResult() const;
+  const TestResult& GetTestResult() const;
 
  private:
   bool IsPresent(Node::LID lid);

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.h,v 1.1 2005/08/18 14:07:23 greek_fire Exp $ $Name:  $
+// $Id: Test.h,v 1.2 2005/08/26 15:25:28 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,9 +41,9 @@ class Test
   virtual ~Test();
 
   virtual TestResult Execute() = 0;
-  virtual std::string GetName();
-  virtual std::string GetDescription();
-  std::ostream& GetOutStream();
+  virtual std::string GetName() const;
+  virtual std::string GetDescription() const;
+  std::ostream& GetOutStream() const;
   boost::shared_ptr<TestGraph> GetTestGraph();
 
 protected:

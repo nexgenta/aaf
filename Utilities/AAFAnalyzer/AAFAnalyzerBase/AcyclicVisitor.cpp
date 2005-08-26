@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.3 2005/08/26 14:02:52 jptrainor Exp $
+// $Id: AcyclicVisitor.cpp,v 1.4 2005/08/26 15:25:28 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -117,7 +117,7 @@ void AcyclicVisitor::Erase(unsigned int lid)
   }  
 }
 
-TestResult AcyclicVisitor::GetTestResult() const
+const TestResult& AcyclicVisitor::GetTestResult() const
 {
   return _Result;
 }
