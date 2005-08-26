@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.cpp,v 1.29 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.cpp,v 1.30 2005/08/26 22:53:44 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -133,6 +133,10 @@ void ImplAAFTypeDef::internalize(const OMByte* /*externalBytes*/,
   assert (0);
 }
 
+const OMUniqueObjectIdentification& ImplAAFTypeDef::uniqueIdentification(void) const
+{
+  return identification();
+}
 
 aafBool ImplAAFTypeDef::IsFixedSize (void) const
 {

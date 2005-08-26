@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.h,v 1.25 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.h,v 1.26 2005/08/26 22:53:44 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -134,6 +134,9 @@ public:
                            OMByte* internalBytes,
                            size_t internalBytesSize,
                            OMByteOrder byteOrder) const;
+
+  // tjb - temporary
+  virtual const OMUniqueObjectIdentification& uniqueIdentification(void) const;
 
   // Allocate an OMProperty that can represent this type.  Implemented
   // by derived classes.
