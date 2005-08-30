@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.24 2005/08/30 15:13:53 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.25 2005/08/30 22:26:17 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1884,13 +1884,13 @@ void CAAFCDCICodec::UpdateDescriptor (CAAFCDCIDescriptorHelper& descriptorHelper
 		{
 	    	checkResult( descriptorHelper.SetResolutionID( 0x8d ) );
 	    	checkResult( descriptorHelper.SetFrameSampleSize(DV_PAL_FRAME_SIZE));
-	    	checkResult( descriptorHelper.SetImageSize( _numberOfSamples * DV_PAL_FRAME_SIZE ) );
+	    	checkResult( descriptorHelper.SetImageSize( static_cast<aafInt32>(_numberOfSamples * DV_PAL_FRAME_SIZE) ) );
 		}
 		else
 		{
 	    	checkResult( descriptorHelper.SetResolutionID( 0x8c ) );
 	    	checkResult( descriptorHelper.SetFrameSampleSize( DV_NTSC_FRAME_SIZE));
-			checkResult( descriptorHelper.SetImageSize( _numberOfSamples * DV_NTSC_FRAME_SIZE ) );
+			checkResult( descriptorHelper.SetImageSize( static_cast<aafInt32>(_numberOfSamples * DV_NTSC_FRAME_SIZE) ) );
 		}
 	}
 }
