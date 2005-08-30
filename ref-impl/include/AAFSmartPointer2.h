@@ -2,7 +2,7 @@
 #define __AAFSmartPointer2_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSmartPointer2.h,v 1.3 2005/08/24 02:58:05 jptrainor Exp $ $Name:  $
+// $Id: AAFSmartPointer2.h,v 1.4 2005/08/30 20:27:23 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -138,12 +138,12 @@ class IAAFSmartPointer2
   // member access operators (non-const and const)
   ReferencedType * operator-> ()
   {
-    return _sp->operator->();
+    return _sp.operator->();
   }
 
   const ReferencedType * operator-> () const
   {
-    return _sp->operator->();
+    return _sp.operator->();
   }
 
  private:
