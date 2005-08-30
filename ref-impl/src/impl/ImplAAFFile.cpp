@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.147 2005/08/30 19:02:02 tbingham Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.148 2005/08/30 19:04:48 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -323,6 +323,9 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 		dictionary->InitBuiltins();
 		dictionary->ReleaseReference();
 		dictionary = 0;
+
+		restoreMirroredMetadata();
+
 	}
 	catch (AAFRESULT &r)
 	{
@@ -482,6 +485,9 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 		}
 		// Now, always add the information from THIS application */
 		_head->AddIdentificationObject(pIdent);
+
+		restoreMirroredMetadata();
+
 	}
 	catch (AAFRESULT &rc)
 	{
@@ -653,6 +659,9 @@ ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 		dictionary->ReleaseReference();
 		dictionary = 0;
 		GetRevision(&_setrev);
+
+		restoreMirroredMetadata();
+
 	}
 	catch (AAFRESULT &rc)
 	{
@@ -1139,6 +1148,8 @@ ImplAAFFile::Open ()
 		{
 		  assert (0);
 		}
+
+	  restoreMirroredMetadata();
 	}
 
   catch (AAFRESULT &r)
@@ -1184,6 +1195,8 @@ ImplAAFFile::Save ()
 	  aafUID_t latestGen;
 	  hr = pLatestIdent->GetGenerationID (&latestGen);
 	  if (AAFRESULT_FAILED (hr)) return hr;
+
+	  saveMirroredMetadata();
 
 	  // Record the fact that this file was modified
 	  _head->SetModified();
