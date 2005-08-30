@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.145 2005/08/26 22:55:18 tbingham Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.146 2005/08/30 18:57:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1361,6 +1361,15 @@ void ImplAAFFile::InternalReleaseObjects()
 {
 }
 
+void ImplAAFFile::saveMirroredMetadata(void)
+{
+  // tjb - nothing yet
+}
+
+void ImplAAFFile::restoreMirroredMetadata(void)
+{
+  // tjb - nothing yet
+}
 
 //***********************************************************
 // METHOD NAME: Close()

@@ -2,7 +2,7 @@
 #define __ImplAAFFile_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.h,v 1.44 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFile.h,v 1.45 2005/08/30 18:57:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,6 +139,14 @@ private:
     (aafUID_constptr pFileKind,
 	 aafProductIdentification_constptr pIdent);
 
+  // In order to avoid storage specific APIs in the public AAF interface
+  // some storage specific data is mirrored in the AAF metadata. Clients
+  // of the public API set and get values for this metadata. The following
+  // functions ensure that the data are synchronized.
+
+  void saveMirroredMetadata(void);
+
+  void restoreMirroredMetadata(void);
 
   aafInt32			_cookie;
   OMFile			*_file;
