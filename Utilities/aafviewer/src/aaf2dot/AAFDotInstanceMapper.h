@@ -2,7 +2,7 @@
 #define __AAFDOTINSTANCEMAPPER_H__
 
 /*
- * $Id: AAFDotInstanceMapper.h,v 1.7 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
+ * $Id: AAFDotInstanceMapper.h,v 1.8 2005/08/30 20:28:40 jptrainor Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -164,7 +164,7 @@ class AAFDotInstanceMapper : public AxBaseObjRecIterListener
    std::string GetIntValue( AxTypeDefInt &axTypeDefInt, AxPropertyValue axPropertyValue,
 			    std::string objectName, std::string propertyName );
    std::string GetIntValue( AxTypeDefInt &axTypeDefInt, AxPropertyValue axPropertyValue );
-
+   std::string GetIntValue( AxTypeDefInt &axTypeDefInt, IAAFPropertyValueSP axPropertyValue );
 
    // find the node referenced by the scope reference. 
    // relative scope > 0 not implemented.  
