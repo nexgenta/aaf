@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCompressionDefs.h,v 1.3 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
+// $Id: AAFCompressionDefs.h,v 1.4 2005/08/30 15:13:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,6 +56,26 @@ const aafUID_t kAAFCompressionDef_IEC_DV_525_60 =
 //{04010202-0201-0200-060e-2b3404010101}
 const aafUID_t kAAFCompressionDef_IEC_DV_625_50 =
 {0x04010202, 0x0201, 0x0200, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{04010202-0202-0100-060e-2b3404010101}
+const aafUID_t kAAFCompressionDef_DV_Based_25Mbps_525_60 =
+{0x04010202, 0x0202, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{04010202-0202-0200-060e-2b3404010101}
+const aafUID_t kAAFCompressionDef_DV_Based_25Mbps_625_50 =
+{0x04010202, 0x0202, 0x0200, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{04010202-0202-0300-060e-2b3404010101}
+const aafUID_t kAAFCompressionDef_DV_Based_50Mbps_525_60 =
+{0x04010202, 0x0202, 0x0300, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{04010202-0202-0400-060e-2b3404010101}
+const aafUID_t kAAFCompressionDef_DV_Based_50Mbps_625_50 =
+{0x04010202, 0x0202, 0x0400, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 // AAF CompressionDefinition legacy aliases

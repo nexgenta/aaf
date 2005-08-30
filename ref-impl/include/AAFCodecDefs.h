@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCodecDefs.h,v 1.12 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
+// $Id: AAFCodecDefs.h,v 1.13 2005/08/30 15:13:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -91,6 +91,26 @@ const aafUID_t kAAFCodecFlavour_IEC_DV_625_50 =
 //{af4de587-23d7-4c7f-b37b-c1c13870e711}
 const aafUID_t kAAFCodecFlavour_IEC_DV_525_60 =
 {0xaf4de587, 0x23d7, 0x4c7f, {0xb3, 0x7b, 0xc1, 0xc1, 0x38, 0x70, 0xe7, 0x11}};
+
+
+//{af4de587-23d7-4c80-b37b-c1c13870e711}
+const aafUID_t kAAFCodecFlavour_DV_Based_25Mbps_525_60 =
+{0xaf4de587, 0x23d7, 0x4c80, {0xb3, 0x7b, 0xc1, 0xc1, 0x38, 0x70, 0xe7, 0x11}};
+
+
+//{af4de587-23d7-4c81-b37b-c1c13870e711}
+const aafUID_t kAAFCodecFlavour_DV_Based_25Mbps_625_50 =
+{0xaf4de587, 0x23d7, 0x4c81, {0xb3, 0x7b, 0xc1, 0xc1, 0x38, 0x70, 0xe7, 0x11}};
+
+
+//{af4de587-23d7-4c82-b37b-c1c13870e711}
+const aafUID_t kAAFCodecFlavour_DV_Based_50Mbps_525_60 =
+{0xaf4de587, 0x23d7, 0x4c82, {0xb3, 0x7b, 0xc1, 0xc1, 0x38, 0x70, 0xe7, 0x11}};
+
+
+//{af4de587-23d7-4c83-b37b-c1c13870e711}
+const aafUID_t kAAFCodecFlavour_DV_Based_50Mbps_625_50 =
+{0xaf4de587, 0x23d7, 0x4c83, {0xb3, 0x7b, 0xc1, 0xc1, 0x38, 0x70, 0xe7, 0x11}};
 
 
 // AAF CodecDefinition legacy aliases
