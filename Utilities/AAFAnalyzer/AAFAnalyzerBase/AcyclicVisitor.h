@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.4 2005/08/26 15:25:28 jptrainor Exp $
+// $Id: AcyclicVisitor.h,v 1.5 2005/08/30 18:42:15 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,14 +48,14 @@ class AcyclicVisitor : public Visitor
   virtual bool PreOrderVisit(Node& node);
   virtual bool PostOrderVisit(Node& node);
 
-  const TestResult& GetTestResult() const;
+  boost::shared_ptr<const TestResult> GetTestResult() const;
 
  private:
   bool IsPresent(Node::LID lid);
   void Erase(Node::LID lid);
 
   std::ostream& _os;
-  TestResult _Result;
+  boost::shared_ptr< TestResult > _spResult;
   Vector _Vector;
 
   // prohibited

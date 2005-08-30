@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.cpp,v 1.2 2005/08/26 15:25:28 jptrainor Exp $
+// $Id: Test.cpp,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,15 +43,15 @@ Test::~Test()
 {
 }
 
-std::string Test::GetName() const
+AxString Test::GetName() const
 {
-  std::string null;
+  AxString null;
   return null;
 }
 
-std::string Test::GetDescription() const
+AxString Test::GetDescription() const
 {
-  std::string null;
+  AxString null;
   return null;
 }
 

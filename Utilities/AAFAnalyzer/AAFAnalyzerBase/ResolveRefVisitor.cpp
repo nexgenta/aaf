@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.cpp,v 1.4 2005/08/26 15:25:28 jptrainor Exp $
+// $Id: ResolveRefVisitor.cpp,v 1.5 2005/08/30 18:42:15 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,11 +47,11 @@ namespace aafanalyzer {
 ResolveRefVisitor::ResolveRefVisitor(std::ostream& os, boost::shared_ptr<EdgeMap> spEdgeMap )
 : _os(os),
   _spEdgeMap(spEdgeMap),
-  _result( "ReferenceResolver",
-	   "Resolve source references in an AAF file.",
-	   "-",
-	   "-",
-	   TestResult::PASS )
+  _spResult( new TestResult( L"ReferenceResolver",
+                           L"Resolve source references in an AAF file.",
+                           L"-",
+                           L"-",
+                           TestResult::PASS ) )
 {}
 
 ResolveRefVisitor::~ResolveRefVisitor()
@@ -138,9 +138,9 @@ bool ResolveRefVisitor::EdgeVisit(Edge& edge)
   return true;
 }
 
-const TestResult& ResolveRefVisitor::GetTestResult() const
+boost::shared_ptr<const TestResult> ResolveRefVisitor::GetTestResult() const
 {
-  return _result;
+  return _spResult;
 }
 
 }

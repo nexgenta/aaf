@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileLoad.h,v 1.2 2005/08/18 20:39:07 greek_fire Exp $ $Name:  $
+// $Id: FileLoad.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,9 +32,9 @@ class FileLoad : public Test
   FileLoad(std::ostream& os, const std::basic_string<wchar_t> AAFFile);
   ~FileLoad();
 
-  TestResult Execute();
-  std::string GetName();
-  std::string GetDescription();
+  boost::shared_ptr<TestResult> Execute();
+  AxString GetName();
+  AxString GetDescription();
 
  private:
   const std::basic_string<wchar_t> _File;

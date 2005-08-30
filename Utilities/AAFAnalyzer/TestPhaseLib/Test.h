@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.h,v 1.2 2005/08/26 15:25:28 jptrainor Exp $ $Name:  $
+// $Id: Test.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,6 +21,9 @@
 #ifndef __TEST_h__
 #define __TEST_h__
 
+//Ax files
+#include <AxTypes.h>
+
 //project files
 #include "TestResult.h"
 #include <TestGraph.h>
@@ -40,9 +43,9 @@ class Test
   Test(std::ostream& os);
   virtual ~Test();
 
-  virtual TestResult Execute() = 0;
-  virtual std::string GetName() const;
-  virtual std::string GetDescription() const;
+  virtual boost::shared_ptr<TestResult> Execute() = 0;
+  virtual AxString GetName() const;
+  virtual AxString GetDescription() const;
   std::ostream& GetOutStream() const;
   boost::shared_ptr<TestGraph> GetTestGraph();
 

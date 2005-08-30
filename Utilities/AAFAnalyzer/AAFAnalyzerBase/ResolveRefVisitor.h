@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.h,v 1.3 2005/08/26 15:25:28 jptrainor Exp $
+// $Id: ResolveRefVisitor.h,v 1.4 2005/08/30 18:42:15 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,12 +42,12 @@ class ResolveRefVisitor : public TypedVisitor
   virtual bool PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node);
   virtual bool EdgeVisit(Edge& edge);
 
-  const TestResult& GetTestResult() const;
+  boost::shared_ptr<const TestResult> GetTestResult() const;
 
  private:
   std::ostream& _os;
   boost::shared_ptr<EdgeMap> _spEdgeMap;
-  TestResult _result;
+  boost::shared_ptr< TestResult > _spResult;
 
   // prohibited
   ResolveRefVisitor( const ResolveRefVisitor& );

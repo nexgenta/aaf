@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileDumper.h,v 1.2 2005/08/18 20:39:07 greek_fire Exp $ $Name:  $
+// $Id: FileDumper.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,9 +32,9 @@ class FileDumper : public Test
   FileDumper(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph);
   ~FileDumper();
 
-  TestResult Execute();
-  std::string GetName();
-  std::string GetDescription();
+  boost::shared_ptr<TestResult> Execute();
+  AxString GetName();
+  AxString GetDescription();
 
  private:
 

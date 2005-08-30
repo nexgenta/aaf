@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileDumper.cpp,v 1.1 2005/08/18 16:04:20 greek_fire Exp $
+// $Id: FileDumper.cpp,v 1.2 2005/08/30 18:42:15 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,34 +48,34 @@ FileDumper::~FileDumper()
 {
 }
 
-TestResult FileDumper::Execute()
+boost::shared_ptr<TestResult> FileDumper::Execute()
 {
-  TestResult result;
   boost::shared_ptr<TestVisitor> spVisitor(new TestVisitor());
   DepthFirstTraversal dfs(GetTestGraph()->GetEdgeMap(), GetTestGraph()->GetRootNode());
 
   //output to screen
   //GetOutStream() << GetName() << std::endl << GetDescription() << std::endl << std::endl;
 
+  boost::shared_ptr<TestResult> spResult(new TestResult());
+
   //set result properties
-  result.SetName(GetName());
-  result.SetDescription(GetDescription());
+  spResult->SetName(GetName());
+  spResult->SetDescription(GetDescription());
 
   dfs.TraverseDown(spVisitor, GetTestGraph()->GetRootNode()); 
-  return result;
+  return spResult;
 }
 
-std::string FileDumper::GetName()
+AxString FileDumper::GetName()
 {
-  std::string name = "--- File Dump ---";
+  AxString name = L"--- File Dump ---";
   return name;
 }
 
-std::string FileDumper::GetDescription()
+AxString FileDumper::GetDescription()
 {
-  std::string description = "Test Description: Dump the AAF graph to screen.";
+  AxString description = L"Test Description: Dump the AAF graph to screen.";
   return description;
 }
-
 
 } // end of namespace diskstream

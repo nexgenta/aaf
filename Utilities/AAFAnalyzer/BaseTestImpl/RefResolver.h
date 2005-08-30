@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RefResolver.h,v 1.3 2005/08/26 15:25:28 jptrainor Exp $ $Name:  $
+// $Id: RefResolver.h,v 1.4 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,9 +32,9 @@ class RefResolver : public Test
   RefResolver(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph);
   ~RefResolver();
 
-  TestResult Execute();
-  std::string GetName() const;
-  std::string GetDescription() const;
+  boost::shared_ptr<TestResult> Execute();
+  AxString GetName() const;
+  AxString GetDescription() const;
 
  private:
 

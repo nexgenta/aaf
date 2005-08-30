@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhase.h,v 1.1 2005/08/18 14:07:23 greek_fire Exp $ $Name:  $
+// $Id: TestPhase.h,v 1.2 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,7 +42,7 @@ class TestPhase
 
   virtual std::string GetDescription();
   virtual std::string GetName();
-  virtual std::vector<TestResult> Execute() = 0; 
+  virtual boost::shared_ptr<TestResult> Execute() = 0; 
   std::ostream& GetOutStream(); 
 
  private:
