@@ -2,7 +2,7 @@
 #define __AAFSmartPointerBase_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSmartPointerBase.h,v 1.13 2004/10/21 17:12:08 stuart_hc Exp $ $Name:  $
+// $Id: AAFSmartPointerBase.h,v 1.14 2005/08/30 02:41:12 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -194,7 +194,8 @@ template <typename ReferencedType, typename RefCountType>
 AAFSmartPointerBase<ReferencedType, RefCountType>::
 AAFSmartPointerBase
   (const AAFSmartPointerBase<ReferencedType, RefCountType> & src)
-	: _rep (src._rep)
+	: RefCountType(),
+          _rep (src._rep)
 {
   if (_rep)
 	acquire(_rep);
