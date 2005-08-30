@@ -1,5 +1,5 @@
 /*
- * $Id: AAFXsMapper.cpp,v 1.8 2004/11/26 17:20:27 stuart_hc Exp $ $Name:  $
+ * $Id: AAFXsMapper.cpp,v 1.9 2005/08/30 20:32:28 jptrainor Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -88,7 +88,7 @@ AAFXsMapper::MapAAFClassDef( AxClassDef &axClassDef )
 
   // map the property definitions
   AxPropertyDefIter propertyDefIter(axClassDef.GetPropertyDefs());
-  IAAFPropertyDefSP spIaafPropertyDef;
+  IAAFSmartPointer2<IAAFPropertyDef> spIaafPropertyDef;
   while (propertyDefIter.NextOne(spIaafPropertyDef))
     {
       AxPropertyDef axPropertyDef(spIaafPropertyDef);

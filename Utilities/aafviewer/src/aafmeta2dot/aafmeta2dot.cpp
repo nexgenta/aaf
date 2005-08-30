@@ -1,5 +1,5 @@
 /*
- * $Id: aafmeta2dot.cpp,v 1.5 2005/01/24 16:18:03 philipn Exp $ $Name:  $
+ * $Id: aafmeta2dot.cpp,v 1.6 2005/08/30 20:32:28 jptrainor Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -90,7 +90,7 @@ void Export( AxString aafFilename, string dotFilename, AAFMetaMapProfile *profil
    // map the type definitions
    Logging::DebugLogStream() << "Mapping the type definitions..." << endl;
    AxTypeDefIter typeDefIter( axDictionary.GetTypeDefs() );
-   IAAFTypeDefSP spIaafTypeDef;
+   IAAFSmartPointer2<IAAFTypeDef> spIaafTypeDef;
    while ( typeDefIter.NextOne( spIaafTypeDef ) )
    {
       AxTypeDef axTypeDef( spIaafTypeDef );
@@ -100,7 +100,7 @@ void Export( AxString aafFilename, string dotFilename, AAFMetaMapProfile *profil
    // map the class definitions
    Logging::DebugLogStream() << "Mapping the class definitions..." << endl;
    AxClassDefIter classDefIter( axDictionary.GetClassDefs() );
-   IAAFClassDefSP spIaafClassDef;
+   IAAFSmartPointer2<IAAFClassDef> spIaafClassDef;
    while ( classDefIter.NextOne(spIaafClassDef) )
    {
       AxClassDef axClassDef( spIaafClassDef );
