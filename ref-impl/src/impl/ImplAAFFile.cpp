@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.146 2005/08/30 18:57:16 tbingham Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.147 2005/08/30 19:02:02 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,8 @@
 #include "OMUtilities.h"
 #include "OMClassFactory.h"
 #include "OMMemoryRawStorage.h"
+#include "OMKLVStoredObject.h"
+#include "OMMXFStorage.h"
 
 #include "OMSSStoredObjectFactory.h"
 #include "OMMS_SSStoredObjectFactory.h"
@@ -1363,7 +1365,28 @@ void ImplAAFFile::InternalReleaseObjects()
 
 void ImplAAFFile::saveMirroredMetadata(void)
 {
-  // tjb - nothing yet
+  assert(_file != 0);
+  if (OMKLVStoredObject::hasMxfStorage(_file)) {
+    OMMXFStorage*  p_storage = OMKLVStoredObject::mxfStorage( _file );
+    assert( p_storage != 0 );
+
+    // Operational pattern
+    //
+    aafUID_t  operational_pattern;
+    AAFRESULT hr = _head->GetOperationalPattern( &operational_pattern );
+    if( hr == AAFRESULT_SUCCESS )
+    {
+      OMKLVKey operational_pattern_label;
+      convert(operational_pattern_label,
+	      *(OMUniqueObjectIdentification*)&operational_pattern );
+
+      p_storage->setOperationalPattern( operational_pattern_label );
+    }
+    else if( hr == AAFRESULT_PROP_NOT_PRESENT )
+    {
+      // should set a value meaning unconstrained here
+    }
+  }
 }
 
 void ImplAAFFile::restoreMirroredMetadata(void)
