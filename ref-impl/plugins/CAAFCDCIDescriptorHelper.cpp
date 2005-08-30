@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCIDescriptorHelper.cpp,v 1.7 2005/02/08 14:32:32 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCIDescriptorHelper.cpp,v 1.8 2005/08/30 15:10:48 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1566,7 +1566,7 @@ HRESULT STDMETHODCALLTYPE
 }
 
 HRESULT STDMETHODCALLTYPE
-    CAAFCDCIDescriptorHelper::SetImageSize( aafInt64 imageSize )
+    CAAFCDCIDescriptorHelper::SetImageSize( aafInt32 imageSize )
 {
 	HRESULT			hr = S_OK;
 	IAAFObject		*p_obj = NULL;

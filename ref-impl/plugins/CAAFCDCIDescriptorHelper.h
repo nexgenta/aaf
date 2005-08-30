@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCIDescriptorHelper.h,v 1.9 2005/04/05 17:21:41 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCIDescriptorHelper.h,v 1.10 2005/08/30 15:10:48 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,7 +139,7 @@ public:
 	STDMETHOD (SetOffsetToFrameIndexes) ( aafInt32  offsetToFrameIndexes );
 	STDMETHOD (SetFrameIndexByteOrder) ( aafInt16 frameIndexByteOrder );
 	STDMETHOD (SetFirstFrameOffset) ( aafInt32 firstFrameOffset );
-	STDMETHOD (SetImageSize) ( aafInt64 imageSize );
+	STDMETHOD (SetImageSize) ( aafInt32 imageSize );
 
 
 private:
